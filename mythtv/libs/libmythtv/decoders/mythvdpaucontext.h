@@ -10,7 +10,7 @@ class MythVDPAUContext : public MythCodecContext
     MythVDPAUContext(DecoderBase *Parent, MythCodecID CodecID);
 
     void   InitVideoCodec                (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
-    bool   RetrieveFrame                 (AVCodecContext *Context, VideoFrame* Frame, AVFrame* AvFrame) override;
+    bool   RetrieveFrame                 (AVCodecContext *Context, MythVideoFrame* Frame, AVFrame* AvFrame) override;
     bool   DecoderWillResetOnFlush       (void) override;
     bool   DecoderWillResetOnAspect      (void) override;
     bool   DecoderNeedsReset             (AVCodecContext *Context) override;

@@ -57,7 +57,7 @@ MythMMALInterop* MythMMALInterop::Create(MythRenderOpenGL *Context, Type Interop
     return nullptr;
 }
 
-MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame)
+MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, MythVideoFrame *Frame)
 {
     MMAL_BUFFER_HEADER_T* result = nullptr;
 
@@ -93,7 +93,7 @@ MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, V
 
 vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
                                                    MythVideoColourSpace *ColourSpace,
-                                                   VideoFrame *Frame,
+                                                   MythVideoFrame *Frame,
                                                    FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;

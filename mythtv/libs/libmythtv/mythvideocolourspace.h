@@ -27,7 +27,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     explicit MythVideoColourSpace(MythVideoColourSpace *Parent = nullptr);
 
     int           ChangePictureAttribute(PictureAttribute AttributeType, bool Direction);
-    bool          UpdateColourSpace(const VideoFrame *Frame);
+    bool          UpdateColourSpace(const MythVideoFrame *Frame);
     PictureAttributeSupported SupportedAttributes(void) const;
     void          SetSupportedAttributes(PictureAttributeSupported Supported);
     int           GetPictureAttribute(PictureAttribute Attribute);

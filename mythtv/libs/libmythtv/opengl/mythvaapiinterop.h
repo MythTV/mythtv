@@ -40,7 +40,7 @@ class MythVAAPIInterop : public MythOpenGLInterop
   public:
     static MythVAAPIInterop* Create(MythRenderOpenGL *Context, Type InteropType);
 
-    VASurfaceID VerifySurface(MythRenderOpenGL *Context, VideoFrame *Frame);
+    VASurfaceID VerifySurface(MythRenderOpenGL *Context, MythVideoFrame *Frame);
     VADisplay   GetDisplay   (void);
     QString     GetVendor    (void);
 
@@ -55,7 +55,7 @@ class MythVAAPIInterop : public MythOpenGLInterop
 
     static Type GetInteropType       (VideoFrameType Format);
     void        InitaliseDisplay     (void);
-    VASurfaceID Deinterlace          (VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan);
+    VASurfaceID Deinterlace          (MythVideoFrame *Frame, VASurfaceID Current, FrameScanType Scan);
     virtual void DestroyDeinterlacer (void);
     virtual void PostInitDeinterlacer(void) { }
 

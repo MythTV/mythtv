@@ -14,7 +14,7 @@ class ClassicLogoDetector : public LogoDetectorBase
     virtual void deleteLater(void);
 
     bool searchForLogo(MythCommFlagPlayer* player) override; // LogoDetectorBase
-    bool doesThisFrameContainTheFoundLogo(VideoFrame* frame) override; // LogoDetectorBase
+    bool doesThisFrameContainTheFoundLogo(MythVideoFrame* frame) override; // LogoDetectorBase
     bool pixelInsideLogo(unsigned int x, unsigned int y) override; // LogoDetectorBase
 
     unsigned int getRequiredAvailableBufferForSearch() override; // LogoDetectorBase
@@ -25,7 +25,7 @@ class ClassicLogoDetector : public LogoDetectorBase
   private:
     void SetLogoMaskArea();
     void DumpLogo(bool fromCurrentFrame,const unsigned char* framePtr);
-    void DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges, int edgeDiff);
+    void DetectEdges(MythVideoFrame *frame, EdgeMaskEntry *edges, int edgeDiff);
 
     ClassicCommDetector *m_commDetector                    {nullptr};
     unsigned int         m_frameNumber                     {0};

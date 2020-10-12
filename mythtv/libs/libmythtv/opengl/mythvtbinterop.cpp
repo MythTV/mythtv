@@ -44,7 +44,7 @@ MythVTBInterop::~MythVTBInterop()
 {
 }
 
-CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, MythVideoColourSpace *ColourSpace, VideoFrame *Frame)
+CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, MythVideoColourSpace *ColourSpace, MythVideoFrame *Frame)
 {
     if (!Frame)
         return nullptr;
@@ -81,7 +81,7 @@ CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, MythVideoColo
 
 vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
                                                   MythVideoColourSpace *ColourSpace,
-                                                  VideoFrame *Frame,
+                                                  MythVideoFrame *Frame,
                                                   FrameScanType)
 {
     vector<MythVideoTexture*> result;
@@ -174,7 +174,7 @@ MythVTBSurfaceInterop::~MythVTBSurfaceInterop()
 
 vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Context,
                                                          MythVideoColourSpace *ColourSpace,
-                                                         VideoFrame *Frame,
+                                                         MythVideoFrame *Frame,
                                                          FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;

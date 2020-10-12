@@ -197,7 +197,7 @@ bool MythAVFormatWriter::NextFrameIsKeyFrame(void)
            (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I);
 }
 
-int MythAVFormatWriter::WriteVideoFrame(VideoFrame *Frame)
+int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
 {
     long long framesEncoded = m_framesWritten + m_bufferedVideoFrameTimes.size();
 

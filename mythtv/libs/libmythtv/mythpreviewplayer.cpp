@@ -117,7 +117,7 @@ char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, 
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Waited 100ms for video frame");
     }
 
-    VideoFrame *frame = nullptr;
+    MythVideoFrame *frame = nullptr;
     if (!(frame = m_videoOutput->GetLastDecodedFrame()))
         return nullptr;
     if (!frame->buf)

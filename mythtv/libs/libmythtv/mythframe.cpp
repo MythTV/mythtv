@@ -1,36 +1,8 @@
-//
-//  mythframe.cpp
-//  MythTV
-//
-//  Created by Jean-Yves Avenard on 10/06/2014.
-//  Copyright (c) 2014 Bubblestuff Pty Ltd. All rights reserved.
-//
-// derived from copy.c: Fast YV12/NV12 copy from VLC project
-// portion of SSE Code Copyright (C) 2010 Laurent Aimar
-
-/******************************************************************************
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- *****************************************************************************/
-
-#include "mythtimer.h"
-#include "mythconfig.h"
-#include "mythframe.h"
-#include "mythcorecontext.h"
+// MythTV
 #include "mythlogging.h"
+#include "mythframe.h"
 
-MythDeintType GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type,
+MythDeintType GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Type,
                                   MythDeintType Override)
 {
     if (Frame)
@@ -43,7 +15,7 @@ MythDeintType GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type,
     return DEINT_NONE;
 }
 
-MythDeintType GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type,
+MythDeintType GetDoubleRateOption(const MythVideoFrame* Frame, MythDeintType Type,
                                   MythDeintType Override)
 {
     if (Frame)
@@ -78,63 +50,63 @@ void MythVideoFrame::CopyPlane(uint8_t *To, int ToPitch, const uint8_t *From, in
     }
 }
 
-void MythVideoFrame::Clear(VideoFrame *Frame)
+void MythVideoFrame::Clear()
 {
-    if (!Frame || !Frame->buf)
+    if (!buf)
         return;
 
     // luma (or RGBA)
-    int uv_height = GetHeightForPlane(Frame->codec, Frame->height, 1);
-    int uv = (1 << (ColorDepth(Frame->codec) - 1)) - 1;
-    if (FMT_YV12 == Frame->codec || FMT_YUV422P == Frame->codec || FMT_YUV444P == Frame->codec)
+    int uv_height = GetHeightForPlane(codec, height, 1);
+    int uv = (1 << (ColorDepth(codec) - 1)) - 1;
+    if (FMT_YV12 == codec || FMT_YUV422P == codec || FMT_YUV444P == codec)
     {
-        memset(Frame->buf + Frame->offsets[0], 0, static_cast<size_t>(Frame->pitches[0] * Frame->height));
-        memset(Frame->buf + Frame->offsets[1], uv & 0xff, static_cast<size_t>(Frame->pitches[1] * uv_height));
-        memset(Frame->buf + Frame->offsets[2], uv & 0xff, static_cast<size_t>(Frame->pitches[2] * uv_height));
+        memset(buf + offsets[0], 0, static_cast<size_t>(pitches[0] * height));
+        memset(buf + offsets[1], uv & 0xff, static_cast<size_t>(pitches[1] * uv_height));
+        memset(buf + offsets[2], uv & 0xff, static_cast<size_t>(pitches[2] * uv_height));
     }
-    else if ((FormatIs420(Frame->codec) || FormatIs422(Frame->codec) || FormatIs444(Frame->codec)) &&
-             (Frame->pitches[1] == Frame->pitches[2]))
+    else if ((FormatIs420(codec) || FormatIs422(codec) || FormatIs444(codec)) &&
+             (pitches[1] == pitches[2]))
     {
-        memset(Frame->buf + Frame->offsets[0], 0, static_cast<size_t>(Frame->pitches[0] * Frame->height));
+        memset(buf + offsets[0], 0, static_cast<size_t>(pitches[0] * height));
         unsigned char uv1 = (uv & 0xff00) >> 8;
         unsigned char uv2 = (uv & 0x00ff);
-        unsigned char* buf1 = Frame->buf + Frame->offsets[1];
-        unsigned char* buf2 = Frame->buf + Frame->offsets[2];
+        unsigned char* buf1 = buf + offsets[1];
+        unsigned char* buf2 = buf + offsets[2];
         for (int row = 0; row < uv_height; ++row)
         {
-            for (int col = 0; col < Frame->pitches[1]; col += 2)
+            for (int col = 0; col < pitches[1]; col += 2)
             {
                 buf1[col]     = buf2[col]     = uv1;
                 buf1[col + 1] = buf2[col + 1] = uv2;
             }
-            buf1 += Frame->pitches[1];
-            buf2 += Frame->pitches[2];
+            buf1 += pitches[1];
+            buf2 += pitches[2];
         }
     }
-    else if (FMT_NV12 == Frame->codec)
+    else if (FMT_NV12 == codec)
     {
-        memset(Frame->buf + Frame->offsets[0], 0, static_cast<size_t>(Frame->pitches[0] * Frame->height));
-        memset(Frame->buf + Frame->offsets[1], uv & 0xff, static_cast<size_t>(Frame->pitches[1] * uv_height));
+        memset(buf + offsets[0], 0, static_cast<size_t>(pitches[0] * height));
+        memset(buf + offsets[1], uv & 0xff, static_cast<size_t>(pitches[1] * uv_height));
     }
-    else if (FormatIsNV12(Frame->codec))
+    else if (FormatIsNV12(codec))
     {
-        memset(Frame->buf + Frame->offsets[0], 0, static_cast<size_t>(Frame->pitches[0] * Frame->height));
+        memset(buf + offsets[0], 0, static_cast<size_t>(pitches[0] * height));
         unsigned char uv1 = (uv & 0xff00) >> 8;
         unsigned char uv2 = (uv & 0x00ff);
-        unsigned char* buf = Frame->buf + Frame->offsets[1];
+        unsigned char* buf3 = buf + offsets[1];
         for (int row = 0; row < uv_height; ++row)
         {
-            for (int col = 0; col < Frame->pitches[1]; col += 4)
+            for (int col = 0; col < pitches[1]; col += 4)
             {
-                buf[col]     = buf[col + 2] = uv1;
-                buf[col + 1] = buf[col + 3] = uv2;
+                buf3[col]     = buf3[col + 2] = uv1;
+                buf3[col + 1] = buf3[col + 3] = uv2;
             }
-            buf += Frame->pitches[1];
+            buf3 += pitches[1];
         }
     }
 }
 
-bool MythVideoFrame::CopyFrame(VideoFrame *To, VideoFrame *From)
+bool MythVideoFrame::CopyFrame(MythVideoFrame *To, MythVideoFrame *From)
 {
     // Sanity checks
     if (!(To && From) || (To == From))

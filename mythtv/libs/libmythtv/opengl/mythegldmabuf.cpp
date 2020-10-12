@@ -61,7 +61,7 @@ static void inline DebugDRMFrame(AVDRMFrameDescriptor* Desc)
 */
 inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
-                                                               VideoFrame *Frame, FrameScanType Scan) const
+                                                               MythVideoFrame *Frame, FrameScanType Scan) const
 {
     Frame->already_deinterlaced = true;
     std::vector<MythVideoTexture*> result;
@@ -178,7 +178,7 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDe
 */
 inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDescriptor* Desc,
                                                                MythRenderOpenGL *Context,
-                                                               VideoFrame *Frame) const
+                                                               MythVideoFrame *Frame) const
 {
     // N.B. this works for YV12/NV12/P010 etc but will probably break for YUV422 etc
     std::vector<QSize> sizes;
@@ -268,7 +268,7 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDe
 */
 inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameDescriptor* Desc,
                                                                 MythRenderOpenGL *Context,
-                                                                VideoFrame *Frame) const
+                                                                MythVideoFrame *Frame) const
 {
     // As for CreateSeparate - may not work for some formats
     AVDRMLayerDescriptor* layer = &Desc->layers[0];
@@ -365,7 +365,7 @@ void MythEGLDMABUF::ClearDMATextures(MythRenderOpenGL* Context,
 
 std::vector<MythVideoTexture*> MythEGLDMABUF::CreateTextures(AVDRMFrameDescriptor* Desc,
                                                         MythRenderOpenGL *Context,
-                                                        VideoFrame *Frame,
+                                                        MythVideoFrame *Frame,
                                                         bool UseSeparate,
                                                         FrameScanType Scan)
 {

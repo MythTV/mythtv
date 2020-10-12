@@ -140,7 +140,7 @@ bool MythDRMPRIMEContext::DecoderWillResetOnFlush(void)
     return true;
 }
 
-bool MythDRMPRIMEContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
+bool MythDRMPRIMEContext::RetrieveFrame(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame)
 {
     // Hrm - Context doesn't have the correct pix_fmt here (v4l2 at least). Bug? Use AvFrame
     if (AvFrame->format == AV_PIX_FMT_DRM_PRIME)
@@ -159,7 +159,7 @@ AVPixelFormat MythDRMPRIMEContext::GetFormat(AVCodecContext */*Context*/, const 
     return AV_PIX_FMT_NONE;
 }
 
-bool MythDRMPRIMEContext::GetDRMBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int /*unused*/)
+bool MythDRMPRIMEContext::GetDRMBuffer(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame, int /*unused*/)
 {
     if (!Context || !AvFrame || !Frame)
         return false;

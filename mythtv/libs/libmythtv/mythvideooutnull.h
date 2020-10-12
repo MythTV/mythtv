@@ -15,8 +15,8 @@ class MythVideoOutputNull : public MythVideoOutput
               float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecID) override;
     void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE) override;
 
-    void PrepareFrame (VideoFrame* Frame, FrameScanType Scan) override;
-    void RenderFrame  (VideoFrame* Frame, FrameScanType Scan) override;
+    void PrepareFrame (MythVideoFrame* Frame, FrameScanType Scan) override;
+    void RenderFrame  (MythVideoFrame* Frame, FrameScanType Scan) override;
     void RenderOverlays (OSD* /*Osd*/) override { }
     void RenderEnd    () override { }
     void EndFrame     () override { }
@@ -33,6 +33,6 @@ class MythVideoOutputNull : public MythVideoOutput
   private:
     Q_DISABLE_COPY(MythVideoOutputNull)
     QMutex     m_globalLock   { QMutex::Recursive };
-    VideoFrame m_avPauseFrame { };
+    MythVideoFrame m_avPauseFrame { };
 };
 #endif

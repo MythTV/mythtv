@@ -94,7 +94,7 @@ void MythVideoOutputNull::CreatePauseFrame(void)
 
     m_avPauseFrame.frameNumber = m_videoBuffers.GetScratchFrame()->frameNumber;
     m_avPauseFrame.frameCounter = m_videoBuffers.GetScratchFrame()->frameCounter;
-    MythVideoFrame::Clear(&m_avPauseFrame);
+    m_avPauseFrame.Clear();
 }
 
 bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
@@ -200,7 +200,7 @@ void MythVideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDei
     m_videoBuffers.SetDeinterlacing(DEINT_NONE, DEINT_NONE, m_videoCodecID);
 }
 
-void MythVideoOutputNull::RenderFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
+void MythVideoOutputNull::RenderFrame(MythVideoFrame* Frame, FrameScanType /*Scan*/)
 {
     if (!Frame)
         Frame = m_videoBuffers.GetScratchFrame();
@@ -216,7 +216,7 @@ void MythVideoOutputNull::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTy
 
     // Try used frame first, then fall back to scratch frame.
     m_videoBuffers.BeginLock(kVideoBuffer_used);
-    VideoFrame *used = nullptr;
+    MythVideoFrame *used = nullptr;
     if (m_videoBuffers.Size(kVideoBuffer_used) > 0)
         used = m_videoBuffers.Head(kVideoBuffer_used);
 
@@ -233,7 +233,7 @@ void MythVideoOutputNull::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTy
     DisplayTimecode = m_avPauseFrame.disp_timecode;
 }
 
-void MythVideoOutputNull::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
+void MythVideoOutputNull::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
     if (Frame && !Frame->dummy)
         m_deinterlacer.Filter(Frame, Scan, nullptr);

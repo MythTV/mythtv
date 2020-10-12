@@ -27,7 +27,7 @@ class MTV_PUBLIC MythCommFlagPlayer : public MythPlayer
   public:
     explicit MythCommFlagPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
     bool RebuildSeekTable(bool ShowPercentage = true, StatusCallback Callback = nullptr, void* Opaque = nullptr);
-    VideoFrame* GetRawVideoFrame(long long FrameNumber = -1);
+    MythVideoFrame* GetRawVideoFrame(long long FrameNumber = -1);
 };
 
 #endif

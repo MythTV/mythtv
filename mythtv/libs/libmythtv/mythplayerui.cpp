@@ -393,7 +393,7 @@ void MythPlayerUI::InitFrameInterval()
         .arg(1000000.0 / m_frameInterval, 0, 'f', 3));
 }
 
-void MythPlayerUI::RenderVideoFrame(VideoFrame *Frame, FrameScanType Scan, bool Prepare, int64_t Wait)
+void MythPlayerUI::RenderVideoFrame(MythVideoFrame *Frame, FrameScanType Scan, bool Prepare, int64_t Wait)
 {
     if (!m_videoOutput)
         return;
@@ -438,7 +438,7 @@ void MythPlayerUI::RefreshPauseFrame()
     }
 }
 
-void MythPlayerUI::DoDisplayVideoFrame(VideoFrame* Frame, int64_t Due)
+void MythPlayerUI::DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due)
 {
     if (Due < 0)
     {
@@ -519,7 +519,7 @@ void MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
 
     // retrieve the next frame
     m_videoOutput->StartDisplayingFrame();
-    VideoFrame *frame = m_videoOutput->GetLastShownFrame();
+    MythVideoFrame *frame = m_videoOutput->GetLastShownFrame();
 
     // Check aspect ratio
     CheckAspectRatio(frame);
@@ -543,7 +543,7 @@ void MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
     m_outputJmeter.RecordCycleTime();
 }
 
-void MythPlayerUI::ReleaseNextVideoFrame(VideoFrame* Frame, int64_t Timecode, bool Wrap)
+void MythPlayerUI::ReleaseNextVideoFrame(MythVideoFrame* Frame, int64_t Timecode, bool Wrap)
 {
     MythPlayer::ReleaseNextVideoFrame(Frame, Timecode, Wrap);
     m_detectLetterBox.Detect(Frame);

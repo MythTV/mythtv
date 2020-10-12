@@ -16,7 +16,7 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
     int  SetPictureAttribute(PictureAttribute Attribute, int Value);
 
   protected:
-    uint GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan);
+    uint GetFlagsForFrame(MythVideoFrame *Frame, FrameScanType Scan);
     void InitPictureAttributes(MythVideoColourSpace *ColourSpace);
 
   protected:
@@ -33,7 +33,7 @@ class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
     ~MythVAAPIInteropGLXCopy() override;
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       MythVideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame, FrameScanType Scan) override;
+                                      MythVideoFrame *Frame, FrameScanType Scan) override;
 
   private:
     void* m_glxSurface { nullptr };
@@ -51,7 +51,7 @@ class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
     ~MythVAAPIInteropGLXPixmap() override;
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       MythVideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame, FrameScanType Scan) override;
+                                      MythVideoFrame *Frame, FrameScanType Scan) override;
     static bool IsSupported(MythRenderOpenGL *Context);
 
   private:

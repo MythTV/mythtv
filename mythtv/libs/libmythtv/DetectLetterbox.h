@@ -17,8 +17,8 @@ class MTV_PUBLIC DetectLetterbox
     ~DetectLetterbox() = default;
     void SetDetectLetterbox(bool Detect);
     bool GetDetectLetterbox() const;
-    void Detect(VideoFrame *Frame);
-    void SwitchTo(VideoFrame *Frame);
+    void Detect(MythVideoFrame *Frame);
+    void SwitchTo(MythVideoFrame *Frame);
 
   private:
     bool           m_isDetectLetterbox                 { false };

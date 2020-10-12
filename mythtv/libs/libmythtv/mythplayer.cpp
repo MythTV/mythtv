@@ -690,7 +690,7 @@ const VideoFrameTypes *MythPlayer::DirectRenderFormats(void)
  *   DiscardVideoFrame() call; but limboed frames are also freed
  *   during a seek reset.
  */
-VideoFrame *MythPlayer::GetNextVideoFrame(void)
+MythVideoFrame *MythPlayer::GetNextVideoFrame(void)
 {
     if (m_videoOutput)
         return m_videoOutput->GetNextFreeFrame();
@@ -700,7 +700,7 @@ VideoFrame *MythPlayer::GetNextVideoFrame(void)
 /** \fn MythPlayer::ReleaseNextVideoFrame(VideoFrame*, int64_t)
  *  \brief Places frame on the queue of frames ready for display.
  */
-void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
+void MythPlayer::ReleaseNextVideoFrame(MythVideoFrame *buffer,
                                        int64_t timecode,
                                        bool wrap)
 {
@@ -719,7 +719,7 @@ void MythPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
 /** \fn MythPlayer::DiscardVideoFrame(VideoFrame*)
  *  \brief Places frame in the available frames queue.
  */
-void MythPlayer::DiscardVideoFrame(VideoFrame *buffer)
+void MythPlayer::DiscardVideoFrame(MythVideoFrame *buffer)
 {
     if (m_videoOutput)
         m_videoOutput->DiscardFrame(buffer);
@@ -758,12 +758,12 @@ bool MythPlayer::HasReachedEof(void) const
     return false;
 }
 
-VideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
+MythVideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
 {
     w = m_videoDim.width();
     h = m_videoDim.height();
 
-    VideoFrame *retval = nullptr;
+    MythVideoFrame *retval = nullptr;
 
     m_vidExitLock.lock();
     if (m_videoOutput)
@@ -775,13 +775,13 @@ VideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
     return retval;
 }
 
-void MythPlayer::DeLimboFrame(VideoFrame *frame)
+void MythPlayer::DeLimboFrame(MythVideoFrame *frame)
 {
     if (m_videoOutput)
         m_videoOutput->DeLimboFrame(frame);
 }
 
-void MythPlayer::ReleaseCurrentFrame(VideoFrame *frame)
+void MythPlayer::ReleaseCurrentFrame(MythVideoFrame *frame)
 {
     if (frame)
         m_vidExitLock.unlock();
@@ -1401,7 +1401,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     return true;
 }
 
-void MythPlayer::CheckAspectRatio(VideoFrame* frame)
+void MythPlayer::CheckAspectRatio(MythVideoFrame* frame)
 {
     if (!frame)
         return;

@@ -163,7 +163,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::GetReferenceFrames(void)
 
 vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context,
                                                        MythVideoColourSpace *ColourSpace,
-                                                       VideoFrame *Frame,
+                                                       MythVideoFrame *Frame,
                                                        FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;
@@ -276,7 +276,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
 vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquireVAAPI(VASurfaceID Id,
                                                             MythRenderOpenGL *Context,
-                                                            VideoFrame *Frame)
+                                                            MythVideoFrame *Frame)
 {
     vector<MythVideoTexture*> result;
 
@@ -399,7 +399,7 @@ static inline void VADRMtoPRIME(VADRMPRIMESurfaceDescriptor* VaDRM, AVDRMFrameDe
 */
 vector<MythVideoTexture*> MythVAAPIInteropDRM::AcquirePrime(VASurfaceID Id,
                                                             MythRenderOpenGL *Context,
-                                                            VideoFrame *Frame)
+                                                            MythVideoFrame *Frame)
 {
     vector<MythVideoTexture*> result;
 
@@ -474,7 +474,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
                                        &vadesc);
         if (status == VA_STATUS_SUCCESS)
         {
-            VideoFrame frame {};
+            MythVideoFrame frame {};
             init(&frame, FMT_DRMPRIME, nullptr, 1920, 1080, 0);
             frame.sw_pix_fmt = AV_PIX_FMT_NV12;
             AVDRMFrameDescriptor drmdesc;

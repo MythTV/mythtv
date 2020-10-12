@@ -194,7 +194,7 @@ QString DeinterlacerPref(MythDeintType Deint)
     return result;
 }
 
-int AVPictureFill(AVFrame *pic, const VideoFrame *frame, AVPixelFormat fmt)
+int AVPictureFill(AVFrame *pic, const MythVideoFrame *frame, AVPixelFormat fmt)
 {
     if (fmt == AV_PIX_FMT_NONE)
     {
@@ -252,7 +252,7 @@ MythAVCopy::~MythAVCopy()
     delete d;
 }
 
-void MythAVCopy::FillFrame(VideoFrame *frame, const AVFrame *pic, int pitch,
+void MythAVCopy::FillFrame(MythVideoFrame *frame, const AVFrame *pic, int pitch,
                            int width, int height, AVPixelFormat pix_fmt)
 {
     int size = av_image_get_buffer_size(pix_fmt, width, height, IMAGE_ALIGN);
@@ -308,7 +308,7 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
     return d->SizeData(width, height, dst_pix_fmt);
 }
 
-int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
+int MythAVCopy::Copy(MythVideoFrame *dst, const MythVideoFrame *src)
 {
     AVFrame srcpic;
     AVFrame dstpic;
@@ -319,7 +319,7 @@ int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
                 src->width, src->height);
 }
 
-int MythAVCopy::Copy(AVFrame *pic, const VideoFrame *frame,
+int MythAVCopy::Copy(AVFrame *pic, const MythVideoFrame *frame,
                  unsigned char *buffer, AVPixelFormat fmt)
 {
     VideoFrameType type = PixelFormatToFrameType(fmt);
@@ -338,11 +338,11 @@ int MythAVCopy::Copy(AVFrame *pic, const VideoFrame *frame,
     return Copy(pic, fmt, &pic_in, fmt_in, frame->width, frame->height);
 }
 
-int MythAVCopy::Copy(VideoFrame *frame, const AVFrame *pic, AVPixelFormat fmt)
+int MythAVCopy::Copy(MythVideoFrame *frame, const AVFrame *pic, AVPixelFormat fmt)
 {
     if (fmt == AV_PIX_FMT_NV12 || fmt == AV_PIX_FMT_YUV420P)
     {
-        VideoFrame framein {};
+        MythVideoFrame framein {};
         FillFrame(&framein, pic, frame->width, frame->width, frame->height, fmt);
         return Copy(frame, &framein);
     }

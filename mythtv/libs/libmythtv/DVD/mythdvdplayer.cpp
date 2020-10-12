@@ -15,7 +15,7 @@ MythDVDPlayer::MythDVDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* 
 {
 }
 
-void MythDVDPlayer::AutoDeint(VideoFrame *Frame, MythVideoOutput *VideoOutput, int FrameInterval, bool AllowLock)
+void MythDVDPlayer::AutoDeint(MythVideoFrame *Frame, MythVideoOutput *VideoOutput, int FrameInterval, bool AllowLock)
 {
     bool dummy = false;
     if (m_decoder && m_decoder->GetMythCodecContext()->IsDeinterlacing(dummy))
@@ -34,7 +34,7 @@ void MythDVDPlayer::AutoDeint(VideoFrame *Frame, MythVideoOutput *VideoOutput, i
  *                   'wrap' indication and computes its own based on
  *                   whether or not video is currently playing.
  */
-void MythDVDPlayer::ReleaseNextVideoFrame(VideoFrame *Buffer,
+void MythDVDPlayer::ReleaseNextVideoFrame(MythVideoFrame *Buffer,
                                           int64_t Timecode, bool /*wrap*/)
 {
     MythPlayerUI::ReleaseNextVideoFrame(Buffer, Timecode,
@@ -567,7 +567,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
 
     bool expired = false;
 
-    VideoFrame *currentFrame = m_videoOutput ? m_videoOutput->GetLastShownFrame() : nullptr;
+    MythVideoFrame *currentFrame = m_videoOutput ? m_videoOutput->GetLastShownFrame() : nullptr;
 
     if (!currentFrame)
     {

@@ -117,7 +117,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     void SetupRTjpeg(void);
     int AudioInit(bool skipdevice = false);
     void SetVideoAspect(float newAspect) {m_videoAspect = newAspect; };
-    void WriteVideo(VideoFrame *frame, bool skipsync = false, 
+    void WriteVideo(MythVideoFrame *frame, bool skipsync = false, 
                     bool forcekey = false);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
     void WriteText(unsigned char *buf, int len, int timecode, int pagenr);

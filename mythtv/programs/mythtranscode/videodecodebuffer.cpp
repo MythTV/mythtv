@@ -70,7 +70,7 @@ void VideoDecodeBuffer::run()
     m_isRunning = false;
 }
 
-VideoFrame *VideoDecodeBuffer::GetFrame(int &DidFF, bool &Key)
+MythVideoFrame *VideoDecodeBuffer::GetFrame(int &DidFF, bool &Key)
 {
     QMutexLocker locker(&m_queueLock);
 

@@ -254,7 +254,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     return true;
 }
 
-bool VBI608Extractor::ExtractCC(const VideoFrame *picframe, uint max_lines)
+bool VBI608Extractor::ExtractCC(const MythVideoFrame *picframe, uint max_lines)
 {
     int ypitch = picframe->pitches[0];
     int ywidth = picframe->width;

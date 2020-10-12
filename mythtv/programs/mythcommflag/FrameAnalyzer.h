@@ -57,7 +57,7 @@ public:
      */
     static const long long kAnyFrame = LLONG_MAX;
     static const long long kNextFrame = -1;
-    virtual enum analyzeFrameResult analyzeFrame(const VideoFrame *frame,
+    virtual enum analyzeFrameResult analyzeFrame(const MythVideoFrame *frame,
             long long frameno, long long *pNextFrame /* [out] */) = 0;
 
     virtual int finished(long long nframes, bool final) {

@@ -25,7 +25,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            WindowResized         (const QSize& Size) override;
     void            SetVideoFrameRate     (float NewRate) override;
     void            DiscardFrames         (bool KeyFrame, bool Flushed) override;
-    void            DoneDisplayingFrame   (VideoFrame* Frame) override;
+    void            DoneDisplayingFrame   (MythVideoFrame* Frame) override;
     void            UpdatePauseFrame      (int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
     bool            InputChanged          (const QSize& VideoDim, const QSize& VideoDispDim,
                                            float Aspect, MythCodecID CodecId, bool& AspectOnly,
@@ -40,8 +40,8 @@ class MythVideoOutputGPU : public MythVideoOutput
     virtual QRect   GetDisplayVisibleRectAdj();
     bool            Init                  (const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
                                            const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
-    void            PrepareFrame          (VideoFrame* Frame, FrameScanType Scan) override;
-    void            RenderFrame           (VideoFrame* Frame, FrameScanType Scan) override;
+    void            PrepareFrame          (MythVideoFrame* Frame, FrameScanType Scan) override;
+    void            RenderFrame           (MythVideoFrame* Frame, FrameScanType Scan) override;
     void            RenderOverlays        (OSD* Osd) override;
     bool            CreateBuffers         (MythCodecID CodecID, QSize Size);
     void            DestroyBuffers        ();

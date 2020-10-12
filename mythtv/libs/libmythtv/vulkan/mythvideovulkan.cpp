@@ -78,7 +78,7 @@ void MythVideoVulkan::StartFrame()
     QGuiApplication::sendEvent(m_vulkanWindow, &update);
 }
 
-void MythVideoVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
+void MythVideoVulkan::PrepareFrame(MythVideoFrame* Frame, FrameScanType /*Scan*/)
 {
     if (!(m_valid && IsValidVulkan() && (Frame->codec == FMT_NONE)))
         return;
@@ -137,7 +137,7 @@ void MythVideoVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType /*Scan*/)
     m_vulkanRender->FinishSingleUseCommandBuffer(cmdbuffer);
 }
 
-void MythVideoVulkan::RenderFrame(VideoFrame* /*Frame*/, bool /*TopFieldFirst*/,
+void MythVideoVulkan::RenderFrame(MythVideoFrame* /*Frame*/, bool /*TopFieldFirst*/,
                                   FrameScanType /*Scan*/, StereoscopicMode /*StereoOverride*/,
                                   bool /*DrawBorder*/)
 {

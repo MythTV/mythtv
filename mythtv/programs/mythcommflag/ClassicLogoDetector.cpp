@@ -113,7 +113,7 @@ bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
         long long seekFrame = m_commDetector->m_preRoll + seekIncrement;
         while (loops < maxLoops && player->GetEof() == kEofStateNone)
         {
-            VideoFrame* vf = player->GetRawVideoFrame(seekFrame);
+            MythVideoFrame* vf = player->GetRawVideoFrame(seekFrame);
 
             if ((loops % 50) == 0)
                 m_commDetector->logoDetectorBreathe();
@@ -363,7 +363,7 @@ void ClassicLogoDetector::DumpLogo(bool fromCurrentFrame,
  * which are partially mods based on Myth's original commercial skip
  * code written by Chris Pinkham. */
 bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
-    VideoFrame* frame)
+    MythVideoFrame* frame)
 {
     int radius = 2;
     int goodEdges = 0;
@@ -435,7 +435,7 @@ bool ClassicLogoDetector::pixelInsideLogo(unsigned int x, unsigned int y)
             (y > m_logoMinY) && (y < m_logoMaxY));
 }
 
-void ClassicLogoDetector::DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges,
+void ClassicLogoDetector::DetectEdges(MythVideoFrame *frame, EdgeMaskEntry *edges,
                                       int edgeDiff)
 {
     int r = 2;

@@ -223,7 +223,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
  *         the frame returned, as this marks the frame as
  *         being used and hence unavailable for decoding.
  */
-VideoFrame* MythCommFlagPlayer::GetRawVideoFrame(long long FrameNumber)
+MythVideoFrame* MythCommFlagPlayer::GetRawVideoFrame(long long FrameNumber)
 {
     m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
     if (m_playerCtx->m_playingInfo)

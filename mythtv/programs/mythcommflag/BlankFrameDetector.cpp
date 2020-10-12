@@ -406,7 +406,7 @@ BlankFrameDetector::MythPlayerInited(MythPlayer *player, long long nframes)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-BlankFrameDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
+BlankFrameDetector::analyzeFrame(const MythVideoFrame *frame, long long frameno,
         long long *pNextFrame)
 {
     *pNextFrame = kNextFrame;

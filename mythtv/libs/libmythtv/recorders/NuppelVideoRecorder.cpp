@@ -2554,7 +2554,7 @@ void NuppelVideoRecorder::doWriteThread(void)
         {
             case ACTION_VIDEO:
             {
-                VideoFrame frame {};
+                MythVideoFrame frame {};
                 init(&frame,
                      FMT_YV12, m_videoBuffer[m_actVideoEncode]->buffer,
                      m_width, m_height, m_videoBuffer[m_actVideoEncode]->bufferlen);
@@ -2653,7 +2653,7 @@ void NuppelVideoRecorder::FinishRecording(void)
     m_positionMapLock.unlock();
 }
 
-void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
+void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
                                      bool forcekey)
 {
     int tmp = 0;

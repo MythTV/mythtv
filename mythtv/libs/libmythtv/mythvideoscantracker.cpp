@@ -64,7 +64,7 @@ void MythVideoScanTracker::SetScanOverride(FrameScanType Scan)
     }
 }
 
-FrameScanType MythVideoScanTracker::GetScanForDisplay(VideoFrame *Frame, bool &SecondField)
+FrameScanType MythVideoScanTracker::GetScanForDisplay(MythVideoFrame *Frame, bool &SecondField)
 {
     if (!Frame)
         return kScan_Progressive;
@@ -173,7 +173,7 @@ void MythVideoScanTracker::SetScanType(FrameScanType Scan, MythVideoOutput* Vide
  * deinterlacers are not continually switched on and off) and correctly deinterlaces
  * material that is not otherwise flagged correctly.
 */
-void MythVideoScanTracker::AutoDeint(VideoFrame* Frame, MythVideoOutput* VideoOutput,
+void MythVideoScanTracker::AutoDeint(MythVideoFrame* Frame, MythVideoOutput* VideoOutput,
                                      int FrameInterval, bool AllowLock)
 {
     if (!Frame)

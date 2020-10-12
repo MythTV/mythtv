@@ -279,7 +279,7 @@ std::vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRend
 /*! \brief Update the contents of the given Textures for data held in Frame.
 */
 void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
-                                      const VideoFrame *Frame,
+                                      const MythVideoFrame *Frame,
                                       const std::vector<MythVideoTexture*> &Textures)
 {
     if (!Context || !Frame || Textures.empty())
@@ -482,7 +482,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 }
 
 /// \brief Copy YV12 frame data to 'YV12' textures.
-inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
+inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const MythVideoFrame *Frame,
                                          MythVideoTexture *Texture, uint Plane)
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)
@@ -509,7 +509,7 @@ inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const VideoF
 }
 
 /// \brief Copy YV12 frame data to a YUYV texture.
-inline void MythVideoTexture::YV12ToYUYV(const VideoFrame *Frame, MythVideoTexture *Texture)
+inline void MythVideoTexture::YV12ToYUYV(const MythVideoFrame *Frame, MythVideoTexture *Texture)
 {
     // Create a buffer
     if (!Texture->m_data)
@@ -535,7 +535,7 @@ inline void MythVideoTexture::YV12ToYUYV(const VideoFrame *Frame, MythVideoTextu
 }
 
 /// \brief Copy NV12 video frame data to 'NV12' textures.
-inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const VideoFrame *Frame,
+inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const MythVideoFrame *Frame,
                                          MythVideoTexture *Texture, uint Plane)
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)

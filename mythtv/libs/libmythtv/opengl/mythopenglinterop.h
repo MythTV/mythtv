@@ -47,7 +47,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     static void        GetInteropTypeCallback(void *Wait, void *Format, void* Result);
     static vector<MythVideoTexture*> Retrieve(MythRenderOpenGL *Context,
                                               MythVideoColourSpace *ColourSpace,
-                                              VideoFrame *Frame,
+                                              MythVideoFrame *Frame,
                                               FrameScanType Scan);
     static QString     TypeToString          (Type InteropType);
     static MythOpenGLInterop* CreateDummy    (void);
@@ -55,7 +55,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     ~MythOpenGLInterop() override;
     virtual vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                               MythVideoColourSpace *ColourSpace,
-                                              VideoFrame *Frame, FrameScanType Scan);
+                                              MythVideoFrame *Frame, FrameScanType Scan);
 
     Type               GetType               (void);
     MythPlayer*        GetPlayer             (void);

@@ -41,7 +41,7 @@ void MythVTBContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStream
     MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
-bool MythVTBContext::RetrieveFrame(AVCodecContext* Context, VideoFrame* Frame, AVFrame* AvFrame)
+bool MythVTBContext::RetrieveFrame(AVCodecContext* Context, MythVideoFrame* Frame, AVFrame* AvFrame)
 {
     if (AvFrame->format != AV_PIX_FMT_VIDEOTOOLBOX)
         return false;

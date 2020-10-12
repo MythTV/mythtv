@@ -389,7 +389,7 @@ bool MythVideoOutput::EnoughDecodedFrames()
 }
 
 /// \bug not implemented correctly. vpos is not updated.
-VideoFrame* MythVideoOutput::GetLastDecodedFrame()
+MythVideoFrame* MythVideoOutput::GetLastDecodedFrame()
 {
     return m_videoBuffers.GetLastDecodedFrame();
 }
@@ -402,7 +402,7 @@ QString MythVideoOutput::GetFrameStatus() const
 
 /// \brief Returns frame from the head of the ready to be displayed queue,
 ///        if StartDisplayingFrame has been called.
-VideoFrame* MythVideoOutput::GetLastShownFrame()
+MythVideoFrame* MythVideoOutput::GetLastShownFrame()
 {
     return m_videoBuffers.GetLastShownFrame();
 }
@@ -481,20 +481,20 @@ const VideoFrameTypes *MythVideoOutput::DirectRenderFormats() const
 /**
  * \brief Blocks until it is possible to return a frame for decoding onto.
  */
-VideoFrame* MythVideoOutput::GetNextFreeFrame()
+MythVideoFrame* MythVideoOutput::GetNextFreeFrame()
 {
     return m_videoBuffers.GetNextFreeFrame();
 }
 
 /// \brief Releases a frame from the ready for decoding queue onto the
 ///        queue of frames ready for display.
-void MythVideoOutput::ReleaseFrame(VideoFrame* Frame)
+void MythVideoOutput::ReleaseFrame(MythVideoFrame* Frame)
 {
     m_videoBuffers.ReleaseFrame(Frame);
 }
 
 /// \brief Releases a frame for reuse if it is in limbo.
-void MythVideoOutput::DeLimboFrame(VideoFrame* Frame)
+void MythVideoOutput::DeLimboFrame(MythVideoFrame* Frame)
 {
     m_videoBuffers.DeLimboFrame(Frame);
 }
@@ -508,14 +508,14 @@ void MythVideoOutput::StartDisplayingFrame()
 
 /// \brief Releases frame returned from GetLastShownFrame() onto the
 ///        queue of frames ready for decoding onto.
-void MythVideoOutput::DoneDisplayingFrame(VideoFrame* Frame)
+void MythVideoOutput::DoneDisplayingFrame(MythVideoFrame* Frame)
 {
     m_videoBuffers.DoneDisplayingFrame(Frame);
 }
 
 /// \brief Releases frame from any queue onto the
 ///        queue of frames ready for decoding onto.
-void MythVideoOutput::DiscardFrame(VideoFrame* Frame)
+void MythVideoOutput::DiscardFrame(MythVideoFrame* Frame)
 {
     m_videoBuffers.DiscardFrame(Frame);
 }

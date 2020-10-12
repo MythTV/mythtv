@@ -180,7 +180,7 @@ protected:
 
         void Init();
         void SetVideoParams(float aspect);
-        void ProcessFrame(VideoFrame *frame, long long frame_number);
+        void ProcessFrame(MythVideoFrame *frame, long long frame_number);
         QMap<long long, FrameInfoEntry> m_frameInfo;
 
 public slots:

@@ -149,7 +149,7 @@ void MythOpenGLVideo::CleanupDeinterlacers()
     m_deinterlacer2x = false;
 }
 
-bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame* Frame, FrameScanType Scan,
+bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType Scan,
                                       MythDeintType Filter  /* = DEINT_SHADER */,
                                       bool CreateReferences /* = true */)
 {
@@ -540,7 +540,7 @@ void MythOpenGLVideo::ResetFrameFormat()
 }
 
 /// \brief Update the current input texture using the data from the given video frame.
-void MythOpenGLVideo::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
+void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
     if (Frame->codec == FMT_NONE)
         return;
@@ -639,7 +639,7 @@ void MythOpenGLVideo::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
         m_openglRender->logDebugMarker(LOC + "UPDATE_FRAME_END");
 }
 
-void MythOpenGLVideo::RenderFrame(VideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
+void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
                                   StereoscopicMode StereoOverride, bool DrawBorder)
 {
     if (!m_openglRender)

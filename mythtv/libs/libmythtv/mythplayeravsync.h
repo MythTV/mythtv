@@ -17,7 +17,7 @@ class MythPlayerAVSync
 
   public:
     void     InitAVSync          ();
-    int64_t  AVSync              (AudioPlayer* Audio, VideoFrame* Frame, int FrameInterval,
+    int64_t  AVSync              (AudioPlayer* Audio, MythVideoFrame* Frame, int FrameInterval,
                                   float PlaySpeed, bool HaveVideo, bool Force);
     void     WaitForFrame        (int64_t FrameDue);
     int64_t& DisplayTimecode     ();

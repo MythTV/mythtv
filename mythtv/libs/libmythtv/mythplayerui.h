@@ -22,7 +22,7 @@ class MythPlayerUI : public MythPlayerAudioUI, public MythVideoScanTracker
     void VideoStart() override;
     virtual bool VideoLoop();
     void ChangeSpeed() override;
-    void ReleaseNextVideoFrame(VideoFrame* Frame, int64_t Timecode, bool Wrap = true) override;
+    void ReleaseNextVideoFrame(MythVideoFrame* Frame, int64_t Timecode, bool Wrap = true) override;
     void SetVideoParams(int Width, int Height, double FrameRate, float Aspect,
                         bool ForceUpdate, int ReferenceFrames,
                         FrameScanType Scan = kScan_Ignore,
@@ -57,8 +57,8 @@ class MythPlayerUI : public MythPlayerAudioUI, public MythVideoScanTracker
     virtual void DisplayNormalFrame(bool CheckPrebuffer = true);
 
     void RefreshPauseFrame();
-    void RenderVideoFrame(VideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
-    void DoDisplayVideoFrame(VideoFrame* Frame, int64_t Due);
+    void RenderVideoFrame(MythVideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
+    void DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due);
 
     Jitterometer    m_outputJmeter { "Player" };
 

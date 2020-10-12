@@ -859,7 +859,7 @@ TemplateFinder::resetBuffers(int newwidth, int newheight)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-TemplateFinder::analyzeFrame(const VideoFrame *frame, long long frameno,
+TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
         long long *pNextFrame)
 {
     /*

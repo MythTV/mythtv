@@ -138,7 +138,7 @@ void MythV4L2M2MContext::InitVideoCodec(AVCodecContext *Context, bool SelectedSt
     return MythDRMPRIMEContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
-bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
+bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame)
 {
     if (s_useV4L2Request && codec_is_v4l2(m_codecID))
         return MythCodecContext::GetBuffer2(Context, Frame, AvFrame, 0);
@@ -176,7 +176,7 @@ void MythV4L2M2MContext::SetDecoderOptions(AVCodecContext* Context, AVCodec* Cod
  * AvFormatDecoder but we copy the data from the AVFrame rather than providing
  * our own buffer (the codec does not support direct rendering).
 */
-bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int /*Flags*/)
+bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame, int /*Flags*/)
 {
     // Sanity checks
     if (!Context || !AvFrame || !Frame)

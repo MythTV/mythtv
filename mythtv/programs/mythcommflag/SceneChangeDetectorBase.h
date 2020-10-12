@@ -12,7 +12,7 @@ class SceneChangeDetectorBase : public QObject
     SceneChangeDetectorBase(unsigned int w, unsigned int h) :
         m_width(w), m_height(h) {}
 
-    virtual void processFrame(VideoFrame* frame) = 0;
+    virtual void processFrame(MythVideoFrame* frame) = 0;
 
   signals:
     void haveNewInformation(unsigned int framenum, bool scenechange,

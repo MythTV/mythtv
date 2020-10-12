@@ -228,7 +228,7 @@ QRect MythVideoOutputOpenGL::GetDisplayVisibleRectAdj()
     return dvr;
 }
 
-void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
+void MythVideoOutputOpenGL::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
     if (!m_openglRender)
         return;
@@ -254,7 +254,7 @@ void MythVideoOutputOpenGL::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
         m_openglRender->logDebugMarker(LOC + "PROCESS_FRAME_END");
 }
 
-void MythVideoOutputOpenGL::RenderFrame(VideoFrame* Frame, FrameScanType Scan)
+void MythVideoOutputOpenGL::RenderFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
     if (!m_openglRender)
         return;

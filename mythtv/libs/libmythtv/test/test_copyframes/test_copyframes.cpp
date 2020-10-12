@@ -8,7 +8,7 @@ void TestCopyFrames::initTestCase(void)
 
 void TestCopyFrames::TestInvalidFrames()
 {
-    VideoFrame dummy;
+    MythVideoFrame dummy;
     QVERIFY(!MythVideoFrame::CopyFrame(nullptr, nullptr));
     QVERIFY(!MythVideoFrame::CopyFrame(nullptr, &dummy));
     QVERIFY(!MythVideoFrame::CopyFrame(&dummy,  nullptr));
@@ -17,8 +17,8 @@ void TestCopyFrames::TestInvalidFrames()
 
 void TestCopyFrames::TestInvalidFormats()
 {
-    VideoFrame dummy1;
-    VideoFrame dummy2;
+    MythVideoFrame dummy1;
+    MythVideoFrame dummy2;
     dummy1.codec = FMT_YV12;
     dummy2.codec = FMT_NV12;
     QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
@@ -32,8 +32,8 @@ void TestCopyFrames::TestInvalidFormats()
 
 void TestCopyFrames::TestInvalidSizes()
 {
-    VideoFrame dummy1;
-    VideoFrame dummy2;
+    MythVideoFrame dummy1;
+    MythVideoFrame dummy2;
     dummy1.codec = FMT_YV12;
     dummy2.codec = FMT_YV12;
     dummy1.width  = 720;
@@ -58,8 +58,8 @@ void TestCopyFrames::TestInvalidSizes()
 
 void TestCopyFrames::TestInvalidBuffers()
 {
-    VideoFrame dummy1;
-    VideoFrame dummy2;
+    MythVideoFrame dummy1;
+    MythVideoFrame dummy2;
     // Both null buffers
     init(&dummy1, FMT_YV12, nullptr, 720, 576, 0);
     init(&dummy2, FMT_YV12, nullptr, 720, 576, 0);
@@ -88,7 +88,7 @@ void TestCopyFrames::TestInvalidBuffers()
 
 #include "mythmiscutil.h"
 
-static uint64_t FillRandom(VideoFrame* Frame)
+static uint64_t FillRandom(MythVideoFrame* Frame)
 {
     uint64_t sum = 0;
     uint64_t counts = 0;
@@ -108,7 +108,7 @@ static uint64_t FillRandom(VideoFrame* Frame)
     return sum;
 }
 
-static uint64_t GetSum(const VideoFrame* Frame)
+static uint64_t GetSum(const MythVideoFrame* Frame)
 {
     uint64_t sum = 0;
     uint64_t counts = 0;
@@ -200,11 +200,11 @@ void TestCopyFrames::TestCopy()
     }
     };
 
-    auto freeframe = [](VideoFrame* F) { av_free(F->buf); delete F; };
+    auto freeframe = [](MythVideoFrame* F) { av_free(F->buf); delete F; };
 
     auto gettestframe = [](VideoFrameType T, const frametest& P)
     {
-        VideoFrame* frame = new VideoFrame;
+        MythVideoFrame* frame = new MythVideoFrame;
         init(frame, T, MythVideoFrame::GetAlignedBufferZero(std::get<3>(P)), std::get<1>(P), std::get<2>(P),
              static_cast<int>(std::get<3>(P)), std::get<4>(P), std::get<5>(P), true, 1.0, 1.0, std::get<0>(P));
         return frame;
@@ -213,7 +213,7 @@ void TestCopyFrames::TestCopy()
     auto getdefaultframe = [](VideoFrameType T, int W, int H, int A)
     {
         size_t size = MythVideoFrame::GetBufferSize(T, W, H, A);
-        VideoFrame* frame = new VideoFrame;
+        MythVideoFrame* frame = new MythVideoFrame;
         init(frame, T, MythVideoFrame::GetAlignedBufferZero(size), W, H, static_cast<int>(size), 1.0, 1.0, A);
         return frame;
     };

@@ -146,7 +146,7 @@ SceneChangeDetector::MythPlayerInited(MythPlayer *player,
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-SceneChangeDetector::analyzeFrame(const VideoFrame *frame, long long frameno,
+SceneChangeDetector::analyzeFrame(const MythVideoFrame *frame, long long frameno,
         long long *pNextFrame)
 {
     *pNextFrame = kNextFrame;

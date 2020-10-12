@@ -118,7 +118,7 @@ bool MythPlayerInited(FrameAnalyzerItem &pass,
 long long processFrame(FrameAnalyzerItem &pass,
                        FrameAnalyzerItem &finishedAnalyzers,
                        FrameAnalyzerItem &deadAnalyzers,
-                       const VideoFrame *frame,
+                       const MythVideoFrame *frame,
                        long long frameno)
 {
     long long nextFrame = 0;
@@ -548,7 +548,7 @@ bool CommDetector2::go(void)
 
             (void)gettimeofday(&start, nullptr);
             bool fetchNext = (nextFrame == m_currentFrameNumber + 1);
-            VideoFrame *currentFrame =
+            MythVideoFrame *currentFrame =
                 m_player->GetRawVideoFrame(fetchNext ? -1 : nextFrame);
             long long lastFrameNumber = m_currentFrameNumber;
             m_currentFrameNumber = currentFrame->frameNumber + 1;

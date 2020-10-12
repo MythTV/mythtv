@@ -65,7 +65,7 @@ MythOpenGLInterop::Type MythDRMPRIMEInterop::GetInteropType(VideoFrameType Forma
     return HaveDMABuf(context) ? DRMPRIME : Unsupported;
 }
 
-AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame)
+AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Context, MythVideoFrame *Frame)
 {
     AVDRMFrameDescriptor* result = nullptr;
 
@@ -100,7 +100,7 @@ AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Contex
 
 vector<MythVideoTexture*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
                                                        MythVideoColourSpace *ColourSpace,
-                                                       VideoFrame *Frame,
+                                                       MythVideoFrame *Frame,
                                                        FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;

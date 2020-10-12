@@ -69,7 +69,7 @@ PGMConverter::MythPlayerInited(const MythPlayer *player)
 }
 
 const AVFrame *
-PGMConverter::getImage(const VideoFrame *frame, long long _frameno,
+PGMConverter::getImage(const MythVideoFrame *frame, long long _frameno,
         int *pwidth, int *pheight)
 {
 #ifdef PGM_CONVERT_GREYSCALE

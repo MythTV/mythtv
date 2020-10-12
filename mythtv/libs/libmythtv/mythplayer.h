@@ -228,13 +228,13 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Decoder stuff..
     const VideoFrameTypes* DirectRenderFormats(void);
-    VideoFrame *GetNextVideoFrame(void);
-    VideoFrame *GetCurrentFrame(int &w, int &h);
-    void DeLimboFrame(VideoFrame *frame);
-    virtual void ReleaseNextVideoFrame(VideoFrame *buffer, int64_t timecode,
+    MythVideoFrame *GetNextVideoFrame(void);
+    MythVideoFrame *GetCurrentFrame(int &w, int &h);
+    void DeLimboFrame(MythVideoFrame *frame);
+    virtual void ReleaseNextVideoFrame(MythVideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
-    void ReleaseCurrentFrame(VideoFrame *frame);
-    void DiscardVideoFrame(VideoFrame *buffer);
+    void ReleaseCurrentFrame(MythVideoFrame *frame);
+    void DiscardVideoFrame(MythVideoFrame *buffer);
     void DiscardVideoFrames(bool KeyFrame, bool Flushed);
     /// Returns the stream decoder currently in use.
     DecoderBase *GetDecoder(void) { return m_decoder; }
@@ -403,7 +403,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Playback
     virtual bool PrebufferEnoughFrames(int min_buffers = 0);
     void         SetBuffering(bool new_buffering);
-    void         CheckAspectRatio(VideoFrame* frame);
+    void         CheckAspectRatio(MythVideoFrame* frame);
     virtual void DisplayPauseFrame(void) { } // FIXME
     virtual void PreProcessNormalFrame(void);
     virtual void VideoStart(void);

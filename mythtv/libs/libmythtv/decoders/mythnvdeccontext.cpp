@@ -330,7 +330,7 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
     }
 }
 
-void MythNVDECContext::PostProcessFrame(AVCodecContext* /*Context*/, VideoFrame *Frame)
+void MythNVDECContext::PostProcessFrame(AVCodecContext* /*Context*/, MythVideoFrame *Frame)
 {
     // Remove interlacing flags and set deinterlacer if necessary
     if (Frame && m_deinterlacer)
@@ -380,7 +380,7 @@ enum AVPixelFormat MythNVDECContext::GetFormat(AVCodecContext* Context, const AV
     return AV_PIX_FMT_NONE;
 }
 
-bool MythNVDECContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
+bool MythNVDECContext::RetrieveFrame(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame)
 {
     if (AvFrame->format != AV_PIX_FMT_CUDA)
         return false;
@@ -396,7 +396,7 @@ bool MythNVDECContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame,
  * \note The CUDA decoder returns a complete AVFrame which should represent an NV12
  * frame held in device (GPU) memory. There is no need to call avcodec_default_get_buffer2.
 */
-bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, VideoFrame *Frame,
+bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, MythVideoFrame *Frame,
                                  AVFrame *AvFrame, int /*Flags*/)
 {
     if ((AvFrame->format != AV_PIX_FMT_CUDA) || !AvFrame->data[0])

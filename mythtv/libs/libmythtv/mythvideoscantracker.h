@@ -25,9 +25,9 @@ class MTV_PUBLIC MythVideoScanTracker
     void           ResetTracker         ();
 
     void           SetScanType          (FrameScanType Scan, MythVideoOutput* VideoOutput, int FrameInterval);
-    FrameScanType  GetScanForDisplay    (VideoFrame* Frame, bool& SecondField);
+    FrameScanType  GetScanForDisplay    (MythVideoFrame* Frame, bool& SecondField);
     FrameScanType  GetScanType          () const;
-    virtual void   AutoDeint            (VideoFrame* Frame, MythVideoOutput* VideoOutput,
+    virtual void   AutoDeint            (MythVideoFrame* Frame, MythVideoOutput* VideoOutput,
                                          int FrameInterval, bool AllowLock = true);
     void           CheckScanUpdate      (MythVideoOutput* VideoOutput, int FrameInterval);
     QString        GetDeinterlacerName  ();

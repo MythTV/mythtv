@@ -398,7 +398,7 @@ free_cropped:
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-TemplateMatcher::analyzeFrame(const VideoFrame *frame, long long frameno,
+TemplateMatcher::analyzeFrame(const MythVideoFrame *frame, long long frameno,
         long long *pNextFrame)
 {
     /*

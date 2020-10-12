@@ -304,7 +304,7 @@ bool VideoOutputD3D::CreatePauseFrame(void)
     return true;
 }
 
-void VideoOutputD3D::RenderFrame(VideoFrame *buffer, FrameScanType t, OSD *osd)
+void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer, FrameScanType t, OSD *osd)
 {
     (void)osd;
     if (IsErrored())
@@ -412,7 +412,7 @@ void VideoOutputD3D::StopEmbedding(void)
 void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode, FrameScanType)
 {
     QMutexLocker locker(&m_lock);
-    VideoFrame *used_frame = m_videoBuffers.Head(kVideoBuffer_used);
+    MythVideoFrame *used_frame = m_videoBuffers.Head(kVideoBuffer_used);
 
     if (codec_is_std(m_videoCodecID))
     {
@@ -433,7 +433,7 @@ void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode, FrameScanType)
     }
 }
 
-void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
+void VideoOutputD3D::UpdateFrame(MythVideoFrame *frame, D3D9Image *img)
 {
     if (codec_is_dxva2(m_videoCodecID))
         return;
@@ -458,7 +458,7 @@ void VideoOutputD3D::UpdateFrame(VideoFrame *frame, D3D9Image *img)
     img->ReleaseBuffer();
 }
 
-void VideoOutputD3D::PrepareFrame(VideoFrame *frame, const PIPMap &pipPlayers,
+void VideoOutputD3D::PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayers,
                                   FrameScanType scan)
 {
     if (!m_render || !m_video)
@@ -533,7 +533,7 @@ void VideoOutputD3D::ShowPIP(MythPlayer *pipplayer, PIPLocation loc)
         return;
 
     int pipw, piph;
-    VideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
+    MythVideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
     const float pipVideoAspect = pipplayer->GetVideoAspect();
     const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
     const bool  pipActive      = pipplayer->IsPIPActive();

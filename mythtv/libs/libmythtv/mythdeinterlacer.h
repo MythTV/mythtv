@@ -17,17 +17,17 @@ class MythDeinterlacer
     MythDeinterlacer() = default;
    ~MythDeinterlacer();
 
-    void             Filter       (VideoFrame *Frame, FrameScanType Scan,
+    void             Filter       (MythVideoFrame *Frame, FrameScanType Scan,
                                    VideoDisplayProfile *Profile, bool Force = false);
 
   private:
-    bool             Initialise   (VideoFrame *Frame, MythDeintType Deinterlacer,
+    bool             Initialise   (MythVideoFrame *Frame, MythDeintType Deinterlacer,
                                    bool DoubleRate, bool TopFieldFirst,
                                    VideoDisplayProfile *Profile);
     inline void      Cleanup      (void);
-    void             OneField     (VideoFrame *Frame, FrameScanType Scan);
-    void             Blend        (VideoFrame *Frame, FrameScanType Scan);
-    bool             SetUpCache   (VideoFrame *Frame);
+    void             OneField     (MythVideoFrame *Frame, FrameScanType Scan);
+    void             Blend        (MythVideoFrame *Frame, FrameScanType Scan);
+    bool             SetUpCache   (MythVideoFrame *Frame);
 
   private:
     Q_DISABLE_COPY(MythDeinterlacer)
@@ -43,7 +43,7 @@ class MythDeinterlacer
     AVFilterGraph*   m_graph      { nullptr };
     AVFilterContext* m_source     { nullptr };
     AVFilterContext* m_sink       { nullptr };
-    VideoFrame*      m_bobFrame   { nullptr };
+    MythVideoFrame*      m_bobFrame   { nullptr };
     SwsContext*      m_swsContext { nullptr };
     long long        m_discontinuityCounter { 0 };
     bool             m_autoFieldOrder  { false };

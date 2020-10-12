@@ -41,8 +41,8 @@ class MythVideoOutput : public MythVideoBounds
                       float VideoAspect, const QRect& WindowRect, MythCodecID CodecID);
     virtual void SetVideoFrameRate(float playback_fps);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
-    virtual void PrepareFrame (VideoFrame* Frame, FrameScanType Scan = kScan_Ignore) = 0;
-    virtual void RenderFrame  (VideoFrame* Frame, FrameScanType) = 0;
+    virtual void PrepareFrame (MythVideoFrame* Frame, FrameScanType Scan = kScan_Ignore) = 0;
+    virtual void RenderFrame  (MythVideoFrame* Frame, FrameScanType) = 0;
     virtual void RenderOverlays (OSD* Osd) = 0;
     virtual void RenderEnd    () = 0;
     virtual void EndFrame     () = 0;
@@ -74,16 +74,16 @@ class MythVideoOutput : public MythVideoBounds
     bool         EnoughFreeFrames();
     bool         EnoughDecodedFrames();
     const VideoFrameTypes* DirectRenderFormats() const;
-    virtual VideoFrame* GetNextFreeFrame();
-    virtual void ReleaseFrame(VideoFrame* Frame);
-    virtual void DeLimboFrame(VideoFrame* Frame);
+    virtual MythVideoFrame* GetNextFreeFrame();
+    virtual void ReleaseFrame(MythVideoFrame* Frame);
+    virtual void DeLimboFrame(MythVideoFrame* Frame);
     virtual void StartDisplayingFrame();
-    virtual void DoneDisplayingFrame(VideoFrame* Frame);
-    virtual void DiscardFrame(VideoFrame* frame);
+    virtual void DoneDisplayingFrame(MythVideoFrame* Frame);
+    virtual void DiscardFrame(MythVideoFrame* frame);
     virtual void DiscardFrames(bool KeyFrame, bool Flushed);
     virtual void CheckFrameStates() { }
-    virtual VideoFrame* GetLastDecodedFrame();
-    virtual VideoFrame* GetLastShownFrame();
+    virtual MythVideoFrame* GetLastDecodedFrame();
+    virtual MythVideoFrame* GetLastShownFrame();
     QString      GetFrameStatus() const;
     virtual void UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) = 0;
 

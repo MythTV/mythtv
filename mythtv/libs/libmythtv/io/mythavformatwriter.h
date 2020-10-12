@@ -25,7 +25,7 @@ class MTV_PUBLIC MythAVFormatWriter : public MythMediaWriter
     bool Init                (void) override;
     bool OpenFile            (void) override;
     bool CloseFile           (void) override;
-    int  WriteVideoFrame     (VideoFrame *Frame) override;
+    int  WriteVideoFrame     (MythVideoFrame *Frame) override;
     int  WriteAudioFrame     (unsigned char *Buffer, int FrameNumber, long long &Timecode) override;
     int  WriteTextFrame      (int VBIMode, unsigned char *Buffer, int Length,
                               long long Timecode, int PageNumber) override;

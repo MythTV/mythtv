@@ -15,7 +15,7 @@ class LogoDetectorBase : public QObject
         m_width(w),m_height(h) {}
 
     virtual bool searchForLogo(MythCommFlagPlayer* player) = 0;
-    virtual bool doesThisFrameContainTheFoundLogo(VideoFrame* frame) = 0;
+    virtual bool doesThisFrameContainTheFoundLogo(MythVideoFrame* frame) = 0;
     virtual bool pixelInsideLogo(unsigned int x, unsigned int y) = 0;
     virtual unsigned int getRequiredAvailableBufferForSearch() = 0;
 

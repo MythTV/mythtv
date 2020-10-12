@@ -270,7 +270,7 @@ class AvFormatDecoder : public DecoderBase
     URLContext         m_readContext                  {};
 
     int                m_frameDecoded                 {0};
-    VideoFrame        *m_decodedVideoFrame            {nullptr};
+    MythVideoFrame    *m_decodedVideoFrame            {nullptr};
     MythAVFormatBuffer *m_avfRingBuffer               {nullptr};
 
     struct SwsContext *m_swsCtx                       {nullptr};

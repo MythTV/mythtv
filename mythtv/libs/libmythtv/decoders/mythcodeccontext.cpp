@@ -311,7 +311,7 @@ void MythCodecContext::InitVideoCodec(AVCodecContext *Context,
 int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, int Flags)
 {
     auto *avfd = static_cast<AvFormatDecoder*>(Context->opaque);
-    VideoFrame *videoframe = avfd->GetPlayer()->GetNextVideoFrame();
+    MythVideoFrame *videoframe = avfd->GetPlayer()->GetNextVideoFrame();
 
     // set fields required for directrendering
     for (int i = 0; i < 4; i++)
@@ -359,7 +359,7 @@ int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
 
 
 /// \brief A generic hardware buffer initialisation method when AVHWFramesContext is NOT used.
-bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, VideoFrame* Frame,
+bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, MythVideoFrame* Frame,
                                  AVFrame *AvFrame, int /*Flags*/)
 {
     if (!AvFrame || !Context || !Frame)
@@ -402,7 +402,7 @@ bool MythCodecContext::GetBuffer2(struct AVCodecContext *Context, VideoFrame* Fr
 void MythCodecContext::ReleaseBuffer(void *Opaque, uint8_t *Data)
 {
     auto *decoder = static_cast<AvFormatDecoder*>(Opaque);
-    auto *frame = reinterpret_cast<VideoFrame*>(Data);
+    auto *frame = reinterpret_cast<MythVideoFrame*>(Data);
     if (decoder && decoder->GetPlayer())
         decoder->GetPlayer()->DeLimboFrame(frame);
 }
@@ -598,7 +598,7 @@ int MythCodecContext::FilteredReceiveFrame(AVCodecContext *Context, AVFrame *Fra
     return avcodec_receive_frame(Context, Frame);
 }
 
-bool MythCodecContext::RetrieveHWFrame(VideoFrame *Frame, AVFrame *AvFrame)
+bool MythCodecContext::RetrieveHWFrame(MythVideoFrame *Frame, AVFrame *AvFrame)
 {
     if (!Frame || !AvFrame)
         return false;

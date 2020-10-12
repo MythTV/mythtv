@@ -77,7 +77,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
         return &m_state[MAXOUTBUFFERS - 1].m_output;
     }
 
-    VideoFrame *last = nullptr;
+    MythVideoFrame *last = nullptr;
     if (m_parent->GetVideoOutput())
         last = m_parent->GetVideoOutput()->GetLastShownFrame();
 

@@ -259,7 +259,7 @@ HistogramAnalyzer::setLogoState(TemplateFinder *finder)
 }
 
 enum FrameAnalyzer::analyzeFrameResult
-HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
+HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
 {
     /*
      * Various statistical computations over pixel values: mean, median,

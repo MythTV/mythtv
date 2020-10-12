@@ -14,7 +14,7 @@ class MythDVDPlayer : public MythPlayerUI
   public:
     MythDVDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context,PlayerFlags Flags = kNoFlags);
 
-    void     ReleaseNextVideoFrame(VideoFrame *Buffer, int64_t Timecode, bool Wrap = true) override;
+    void     ReleaseNextVideoFrame(MythVideoFrame *Buffer, int64_t Timecode, bool Wrap = true) override;
     bool     HasReachedEof(void) const override;
     bool     PrepareAudioSample(int64_t &Timecode) override;
     uint64_t GetBookmark(void) override;
@@ -49,7 +49,7 @@ class MythDVDPlayer : public MythPlayerUI
     void     EventStart(void) override;
     virtual void EventEnd(void);
     void     InitialSeek(void) override;
-    void     AutoDeint(VideoFrame* Frame, MythVideoOutput* VideoOutput,
+    void     AutoDeint(MythVideoFrame* Frame, MythVideoOutput* VideoOutput,
                        int FrameInterval, bool AllowLock = true) override;
     long long CalcMaxFFTime(long long FastFwd, bool Setjump = true) const override;
     bool     FastForward(float Seconds) override;

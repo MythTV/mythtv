@@ -14,7 +14,7 @@ MythVAAPIInteropGLX::~MythVAAPIInteropGLX()
     delete [] m_vaapiPictureAttributes;
 }
 
-uint MythVAAPIInteropGLX::GetFlagsForFrame(VideoFrame *Frame, FrameScanType Scan)
+uint MythVAAPIInteropGLX::GetFlagsForFrame(MythVideoFrame *Frame, FrameScanType Scan)
 {
     uint flags = VA_FRAME_PICTURE;
     if (!Frame)
@@ -244,7 +244,7 @@ MythVAAPIInteropGLXCopy::~MythVAAPIInteropGLXCopy()
 
 vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Context,
                                                            MythVideoColourSpace *ColourSpace,
-                                                           VideoFrame *Frame,
+                                                           MythVideoFrame *Frame,
                                                            FrameScanType Scan)
 {
     std::vector<MythVideoTexture*> result;
@@ -340,7 +340,7 @@ MythVAAPIInteropGLXPixmap::~MythVAAPIInteropGLXPixmap()
 
 vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *Context,
                                                              MythVideoColourSpace *ColourSpace,
-                                                             VideoFrame *Frame,
+                                                             MythVideoFrame *Frame,
                                                              FrameScanType Scan)
 {
     std::vector<MythVideoTexture*> result;

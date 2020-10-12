@@ -20,7 +20,7 @@ class MythMediaCodecContext : public MythCodecContext
     MythMediaCodecContext(DecoderBase *Parent, MythCodecID CodecID);
     void InitVideoCodec(AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     int HwDecoderInit(AVCodecContext *Context) override;
-    bool RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
+    bool RetrieveFrame(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame) override;
 
     static MythCodecID GetBestSupportedCodec(AVCodecContext **Context,
                                              AVCodec       **Codec,
@@ -28,7 +28,7 @@ class MythMediaCodecContext : public MythCodecContext
                                              AVStream       *Stream,
                                              uint            StreamType);
     static AVPixelFormat GetFormat          (AVCodecContext*, const AVPixelFormat *PixFmt);
-    void   PostProcessFrame                 (AVCodecContext*, VideoFrame*) override;
+    void   PostProcessFrame                 (AVCodecContext*, MythVideoFrame*) override;
     bool   IsDeinterlacing                  (bool &DoubleRate, bool = false) override;
     static void GetDecoderList              (QStringList &Decoders);
     static bool HaveMediaCodec              (void);

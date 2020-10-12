@@ -102,7 +102,7 @@ class VideoPerformanceTest
 
         int ms = m_secondsToRun * 1000;
         QTime start = QTime::currentTime();
-        VideoFrame *frame = nullptr;
+        MythVideoFrame *frame = nullptr;
         while (true)
         {
             mp->ProcessCallbacks();

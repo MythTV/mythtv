@@ -62,15 +62,73 @@ enum VideoFrameType
     FMT_DRMPRIME
 };
 
+enum MythDeintType
+{
+    DEINT_NONE   = 0x0000,
+    DEINT_BASIC  = 0x0001,
+    DEINT_MEDIUM = 0x0002,
+    DEINT_HIGH   = 0x0004,
+    DEINT_CPU    = 0x0010,
+    DEINT_SHADER = 0x0020,
+    DEINT_DRIVER = 0x0040,
+    DEINT_ALL    = 0x0077
+};
+
+inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) | static_cast<int>(b)); }
+inline MythDeintType operator& (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) & static_cast<int>(b)); }
+inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintType>(~(static_cast<int>(a))); }
+
 using VideoFrameTypes = std::vector<VideoFrameType>;
 using FramePitches = std::array<int,3>;
 using FrameOffsets = std::array<int,3>;
 
-class VideoFrame;
 class MTV_PUBLIC MythVideoFrame
 {
   public:
-    static bool       CopyFrame(VideoFrame* To, VideoFrame* From);
+    void Clear();
+
+    VideoFrameType codec { FMT_NONE };
+    uint8_t*       buf   { nullptr  };
+    int            width { 0 };
+    int            height { 0 };
+    float          aspect { -1.0F };
+    double         frame_rate { -1.0 };
+    int            bpp        { 0 };
+    int            size       { 0 };
+    long long      frameNumber  { 0 };
+    long long      frameCounter { 0 }; ///< raw frame counter/ticker for discontinuity checks
+    long long      timecode     { 0 };
+    int64_t        disp_timecode { 0 };
+    std::array<uint8_t*,4> priv  { nullptr }; ///< random empty storage
+    int            interlaced_frame { 0    }; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
+    bool           top_field_first  { true }; ///< true if top field is first.
+    bool           interlaced_reversed { false }; /// true for user override of scan
+    bool           new_gop             { false }; /// used to unlock the scan type
+    bool           repeat_pict         { false };
+    bool           forcekey            { false }; ///< hardware encoded .nuv
+    bool           dummy               { false };
+    bool           pause_frame         { false };
+    FramePitches   pitches             { 0 }; ///< Y, U, & V pitches
+    FrameOffsets   offsets             { 0 }; ///< Y, U, & V offsets
+    int            pix_fmt             { 0 };
+    int            sw_pix_fmt          { 0 };
+    bool           directrendering     { true }; ///< true if managed by FFmpeg
+    int            colorspace          { 1 };
+    int            colorrange          { 1 };
+    int            colorprimaries      { 1 };
+    int            colortransfer       { 1 };
+    int            chromalocation      { 1 };
+    bool           colorshifted        { false }; ///< false for software decoded 10/12/16bit frames. true for hardware decoders.
+    bool           already_deinterlaced { false }; ///< temporary? TODO move scan detection/tracking into decoder
+    int            rotation            { 0 };
+    uint           stereo3D            { 0 };
+    MythDeintType  deinterlace_single  { DEINT_NONE };
+    MythDeintType  deinterlace_double  { DEINT_NONE };
+    MythDeintType  deinterlace_allowed { DEINT_NONE };
+    MythDeintType  deinterlace_inuse   { DEINT_NONE };
+    bool           deinterlace_inuse2x { DEINT_NONE };
+
+    static bool       CopyFrame(MythVideoFrame* To, MythVideoFrame* From);
     static void       CopyPlane(uint8_t* To, int ToPitch,
                                 const uint8_t* From, int FromPitch,
                                 int PlaneWidth, int PlaneHeight);
@@ -79,7 +137,6 @@ class MTV_PUBLIC MythVideoFrame
     static uint8_t*   GetAlignedBufferZero(size_t Size);
     static uint8_t*   CreateBuffer(VideoFrameType Type, int Width, int Height);
     static size_t     GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
-    static void       Clear(VideoFrame *Frame);
     static inline int BitsPerPixel(VideoFrameType Type)
     {
         switch (Type)
@@ -364,7 +421,6 @@ class MTV_PUBLIC MythVideoFrame
     {
         return (Type == FMT_YUV444P)   || (Type == FMT_YUV444P9) || (Type == FMT_YUV444P10) ||
                (Type == FMT_YUV444P12) || (Type == FMT_YUV444P14) || (Type == FMT_YUV444P16);
-
     }
 
     static inline bool FormatIsNV12(VideoFrameType Type)
@@ -384,78 +440,14 @@ class MTV_PUBLIC MythVideoFrame
     }
 
   private:
-    Q_DISABLE_COPY(MythVideoFrame)
+    //Q_DISABLE_COPY(MythVideoFrame)
 };
 
-enum MythDeintType
-{
-    DEINT_NONE   = 0x0000,
-    DEINT_BASIC  = 0x0001,
-    DEINT_MEDIUM = 0x0002,
-    DEINT_HIGH   = 0x0004,
-    DEINT_CPU    = 0x0010,
-    DEINT_SHADER = 0x0020,
-    DEINT_DRIVER = 0x0040,
-    DEINT_ALL    = 0x0077
-};
-
-inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) | static_cast<int>(b)); }
-inline MythDeintType operator& (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) & static_cast<int>(b)); }
-inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintType>(~(static_cast<int>(a))); }
-
-struct VideoFrame
-{
-    VideoFrameType codec;
-    unsigned char *buf;
-
-    int width;
-    int height;
-    float aspect;
-    double frame_rate;
-    int bpp;
-    int size;
-    long long frameNumber;
-    long long frameCounter; ///< raw frame counter/ticker for discontinuity checks
-    long long timecode;
-    int64_t   disp_timecode;
-    std::array<uint8_t*,4> priv; ///< random empty storage
-    int interlaced_frame; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
-    bool top_field_first; ///< true if top field is first.
-    bool interlaced_reversed; /// true for user override of scan
-    bool new_gop; /// used to unlock the scan type
-    bool repeat_pict;
-    bool forcekey; ///< hardware encoded .nuv
-    bool dummy;
-    bool pause_frame;
-    FramePitches pitches; ///< Y, U, & V pitches
-    FrameOffsets offsets; ///< Y, U, & V offsets
-    int pix_fmt;
-    int sw_pix_fmt;
-    bool directrendering; ///< true if managed by FFmpeg
-    int colorspace;
-    int colorrange;
-    int colorprimaries;
-    int colortransfer;
-    int chromalocation;
-    bool colorshifted; ///< false for software decoded 10/12/16bit frames. true for hardware decoders.
-    bool already_deinterlaced; ///< temporary? TODO move scan detection/tracking into decoder
-    int rotation;
-    uint stereo3D;
-    MythDeintType deinterlace_single;
-    MythDeintType deinterlace_double;
-    MythDeintType deinterlace_allowed;
-    MythDeintType deinterlace_inuse;
-    bool          deinterlace_inuse2x;
-};
-
-MythDeintType MTV_PUBLIC GetSingleRateOption(const VideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
-MythDeintType MTV_PUBLIC GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
+MythDeintType MTV_PUBLIC GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
+MythDeintType MTV_PUBLIC GetDoubleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
 MythDeintType MTV_PUBLIC GetDeinterlacer(MythDeintType Option);
 
-using mavtriplet = std::array<int,3>;
-using mavtripletptr = mavtriplet::const_pointer;
-
-static inline void init(VideoFrame *vf, VideoFrameType _codec,
+static inline void init(MythVideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height,
                         int _size,
                         const FramePitches p,
@@ -573,7 +565,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     }
 }
 
-static inline void init(VideoFrame *vf, VideoFrameType _codec,
+static inline void init(MythVideoFrame *vf, VideoFrameType _codec,
                         unsigned char *_buf, int _width, int _height, int _size,
                         float _aspect = -1.0F, double _rate = -1.0F,
                         int _aligned = MYTH_WIDTH_ALIGNMENT)

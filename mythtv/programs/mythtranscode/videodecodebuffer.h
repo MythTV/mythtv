@@ -22,18 +22,18 @@ class VideoDecodeBuffer : public QRunnable
 
     void       stop     ();
     void       run      () override;
-    VideoFrame *GetFrame(int &DidFF, bool &Key);
+    MythVideoFrame *GetFrame(int &DidFF, bool &Key);
 
   private:
     struct DecodedFrameInfo
     {
-        VideoFrame *frame;
+        MythVideoFrame *frame;
         int         didFF;
         bool        isKey;
     };
 
     MythTranscodePlayer* const m_player   { nullptr };
-    MythVideoOutput* const m_videoOutput  { nullptr };
+    MythVideoOutput* const  m_videoOutput  { nullptr };
     bool const              m_honorCutlist;
     int const               m_maxFrames;
     bool volatile           m_runThread   { true  };

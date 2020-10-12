@@ -26,7 +26,7 @@ public:
             MythPlayer *player, long long nframes);
     void setLogoState(TemplateFinder *finder);
     static const long long kUncached = -1;
-    enum FrameAnalyzer::analyzeFrameResult analyzeFrame(const VideoFrame *frame,
+    enum FrameAnalyzer::analyzeFrameResult analyzeFrame(const MythVideoFrame *frame,
             long long frameno);
     int finished(long long nframes, bool final);
     int reportTime(void) const;

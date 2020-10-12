@@ -128,7 +128,7 @@ class MTV_PUBLIC MythCodecContext
     static MythCodecID FindDecoder         (const QString &Decoder, AVStream *Stream,
                                             AVCodecContext **Context, AVCodec **Codec);
     static int  GetBuffer                  (struct AVCodecContext *Context, AVFrame *Frame, int Flags);
-    static bool GetBuffer2                 (struct AVCodecContext *Context, VideoFrame *Frame,
+    static bool GetBuffer2                 (struct AVCodecContext *Context, MythVideoFrame *Frame,
                                             AVFrame *AvFrame, int Flags);
     static int  InitialiseDecoder          (AVCodecContext *Context, CreateHWDecoder Callback, const QString &Debug);
     static int  InitialiseDecoder2         (AVCodecContext *Context, CreateHWDecoder Callback, const QString &Debug);
@@ -145,10 +145,10 @@ class MTV_PUBLIC MythCodecContext
     virtual void   InitVideoCodec          (AVCodecContext *Context,
                                             bool SelectedStream, bool &DirectRendering);
     virtual int    HwDecoderInit           (AVCodecContext */*Context*/) { return 0; }
-    virtual bool   RetrieveFrame           (AVCodecContext */*Context*/, VideoFrame */*Frame*/, AVFrame */*AvFrame*/) { return false; }
+    virtual bool   RetrieveFrame           (AVCodecContext */*Context*/, MythVideoFrame */*Frame*/, AVFrame */*AvFrame*/) { return false; }
     virtual int    FilteredReceiveFrame    (AVCodecContext *Context, AVFrame *Frame);
     virtual void   SetDeinterlacing        (AVCodecContext */*Context*/, VideoDisplayProfile */*Profile*/, bool /*DoubleRate*/) {}
-    virtual void   PostProcessFrame        (AVCodecContext */*Context*/, VideoFrame */*Frame*/) {}
+    virtual void   PostProcessFrame        (AVCodecContext */*Context*/, MythVideoFrame */*Frame*/) {}
     virtual bool   IsDeinterlacing         (bool &/*DoubleRate*/, bool /*StreamChange*/ = false) { return false; }
     virtual void   SetDecoderOptions       (AVCodecContext */*Context*/, AVCodec */*Codec*/) { }
     virtual bool   DecoderWillResetOnFlush (void) { return false; }
@@ -156,7 +156,7 @@ class MTV_PUBLIC MythCodecContext
     virtual bool   DecoderNeedsReset       (AVCodecContext */*Context*/) { return m_resetRequired; }
 
   protected:
-    virtual bool   RetrieveHWFrame         (VideoFrame* Frame, AVFrame* AvFrame);
+    virtual bool   RetrieveHWFrame         (MythVideoFrame* Frame, AVFrame* AvFrame);
     static void    DestroyInterop          (MythOpenGLInterop *Interop);
     static void    NewHardwareFramesContext(void);
     static QAtomicInt s_hwFramesContextCount;

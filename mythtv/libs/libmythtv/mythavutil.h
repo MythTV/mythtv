@@ -110,7 +110,7 @@ class MTV_PUBLIC MythAVCopy
     MythAVCopy();
     virtual ~MythAVCopy();
 
-    int Copy(VideoFrame *dst, const VideoFrame *src);
+    int Copy(MythVideoFrame *dst, const MythVideoFrame *src);
     /**
      * Copy
      * Initialise AVFrame pic, create buffer if required and copy content of
@@ -119,7 +119,7 @@ class MTV_PUBLIC MythAVCopy
      * Data would have to be deleted once finished with object with:
      * av_freep(pic->data[0])
      */
-    int Copy(AVFrame *pic, const VideoFrame *frame,
+    int Copy(AVFrame *pic, const MythVideoFrame *frame,
              unsigned char *buffer = nullptr,
              AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
     /**
@@ -127,7 +127,7 @@ class MTV_PUBLIC MythAVCopy
      * Copy AVFrame pic into VideoFrame frame, performing the required conversion
      * Returns size of frame data
      */
-    int Copy(VideoFrame *frame, const AVFrame *pic,
+    int Copy(MythVideoFrame *frame, const AVFrame *pic,
              AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
     int Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
              const AVFrame *src, AVPixelFormat pix_fmt,
@@ -135,7 +135,7 @@ class MTV_PUBLIC MythAVCopy
 
   private:
     Q_DISABLE_COPY(MythAVCopy)
-    static void FillFrame(VideoFrame *frame, const AVFrame *pic, int pitch,
+    static void FillFrame(MythVideoFrame *frame, const AVFrame *pic, int pitch,
                           int width, int height, AVPixelFormat pix_fmt);
     MythAVCopyPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
@@ -144,7 +144,7 @@ class MTV_PUBLIC MythAVCopy
  * AVPictureFill
  * Initialise AVFrame pic with content from VideoFrame frame
  */
-int MTV_PUBLIC AVPictureFill(AVFrame *pic, const VideoFrame *frame,
+int MTV_PUBLIC AVPictureFill(AVFrame *pic, const MythVideoFrame *frame,
                              AVPixelFormat fmt = AV_PIX_FMT_NONE);
 
 /**

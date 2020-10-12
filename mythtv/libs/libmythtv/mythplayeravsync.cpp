@@ -73,7 +73,7 @@ void MythPlayerAVSync::GetAVSyncData(InfoMap& Map) const
 }
 
 #define AVSYNC_MAX_LATE 10000000
-int64_t MythPlayerAVSync::AVSync(AudioPlayer *Audio, VideoFrame *Frame,
+int64_t MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideoFrame *Frame,
                                  int FrameInterval, float PlaySpeed,
                                  bool HaveVideo, bool Force)
 {

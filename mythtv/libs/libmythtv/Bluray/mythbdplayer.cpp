@@ -32,7 +32,7 @@ bool MythBDPlayer::GoToMenu(const QString& Menu)
         return false;
 
     int64_t pts = 0;
-    VideoFrame *frame = m_videoOutput->GetLastShownFrame();
+    MythVideoFrame *frame = m_videoOutput->GetLastShownFrame();
     if (frame)
         pts = static_cast<int64_t>(frame->timecode  * 90);
     return m_playerCtx->m_buffer->BD()->GoToMenu(Menu, pts);

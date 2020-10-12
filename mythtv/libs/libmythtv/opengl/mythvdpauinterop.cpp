@@ -220,7 +220,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
 */
 vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
                                                     MythVideoColourSpace *ColourSpace,
-                                                    VideoFrame *Frame,
+                                                    MythVideoFrame *Frame,
                                                     FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;

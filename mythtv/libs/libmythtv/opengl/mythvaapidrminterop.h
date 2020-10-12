@@ -15,7 +15,7 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
     ~MythVAAPIInteropDRM() override;
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                       MythVideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame, FrameScanType Scan) override;
+                                      MythVideoFrame *Frame, FrameScanType Scan) override;
     static bool    IsSupported(MythRenderOpenGL *Context);
     void           DeleteTextures(void) override;
 
@@ -34,9 +34,9 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
     QVector<AVBufferRef*> m_referenceFrames { };
 
     vector<MythVideoTexture*> AcquireVAAPI(VASurfaceID Id, MythRenderOpenGL *Context,
-                                           VideoFrame *Frame);
+                                           MythVideoFrame *Frame);
     vector<MythVideoTexture*> AcquirePrime(VASurfaceID Id, MythRenderOpenGL *Context,
-                                           VideoFrame *Frame);
+                                           MythVideoFrame *Frame);
     void                      CleanupDRMPRIME(void);
     bool                      TestPrimeInterop(void);
     bool                      m_usePrime { false };

@@ -92,12 +92,12 @@ bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDi
     return true;
 }
 
-void MythVideoOutputVulkan::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
+void MythVideoOutputVulkan::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
     MythVideoOutputGPU::PrepareFrame(Frame, Scan);
 }
 
-void MythVideoOutputVulkan::RenderFrame(VideoFrame* Frame, FrameScanType Scan)
+void MythVideoOutputVulkan::RenderFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
     if (!(IsValidVulkan() && m_video))
         return;

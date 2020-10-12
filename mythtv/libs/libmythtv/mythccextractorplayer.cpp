@@ -81,7 +81,7 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
     m_myFramesPlayed = m_decoder->GetFramesRead();
     m_videoOutput->StartDisplayingFrame();
     {
-        VideoFrame *frame = m_videoOutput->GetLastShownFrame();
+        MythVideoFrame *frame = m_videoOutput->GetLastShownFrame();
         double fps = frame->frame_rate;
         if (fps <= 0)
             fps = GetDecoder()->GetFPS();

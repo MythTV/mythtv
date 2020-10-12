@@ -42,8 +42,8 @@ class MythOpenGLVideo : public MythVideoGPU
     ~MythOpenGLVideo() override;
 
     void    StartFrame       () override {}
-    void    PrepareFrame     (VideoFrame* Frame, FrameScanType Scan = kScan_Progressive) override;
-    void    RenderFrame      (VideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
+    void    PrepareFrame     (MythVideoFrame* Frame, FrameScanType Scan = kScan_Progressive) override;
+    void    RenderFrame      (MythVideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
                               StereoscopicMode StereoOverride, bool DrawBorder = false) override;
     void    EndFrame         () override {}
     QString GetProfile       () const override;
@@ -62,7 +62,7 @@ class MythOpenGLVideo : public MythVideoGPU
     bool    CreateVideoShader(VideoShaderType Type, MythDeintType Deint = DEINT_NONE);
     void    BindTextures     (bool Deinterlacing, vector<MythVideoTexture*>& Current,
                               vector<MythGLTexture*>& Textures);
-    bool    AddDeinterlacer  (const VideoFrame* Frame,  FrameScanType Scan,
+    bool    AddDeinterlacer  (const MythVideoFrame* Frame,  FrameScanType Scan,
                               MythDeintType Filter = DEINT_SHADER, bool CreateReferences = true);
     QOpenGLFramebufferObject* CreateVideoFrameBuffer(VideoFrameType OutputType, QSize Size);
     void    CleanupDeinterlacers();

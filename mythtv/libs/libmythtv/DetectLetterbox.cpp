@@ -27,7 +27,7 @@ DetectLetterbox::DetectLetterbox(MythPlayer* Player)
  *  If a change is detected detectLetterboxSwitchFrame and
  *  detectLetterboxDetectedMode are set.
  */
-void DetectLetterbox::Detect(VideoFrame *Frame)
+void DetectLetterbox::Detect(MythVideoFrame *Frame)
 {
     if (!Frame || !GetDetectLetterbox())
         return;
@@ -322,7 +322,7 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
  *
  *  Switch fill mode if a switch was detected for this frame.
  */
-void DetectLetterbox::SwitchTo(VideoFrame *Frame)
+void DetectLetterbox::SwitchTo(MythVideoFrame *Frame)
 {
     if (!GetDetectLetterbox())
         return;

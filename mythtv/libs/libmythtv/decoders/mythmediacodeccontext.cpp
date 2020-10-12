@@ -294,7 +294,7 @@ int MythMediaCodecContext::HwDecoderInit(AVCodecContext *Context)
     return -1;
 }
 
-bool MythMediaCodecContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
+bool MythMediaCodecContext::RetrieveFrame(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame)
 {
     if (AvFrame->format != AV_PIX_FMT_MEDIACODEC)
         return false;
@@ -318,7 +318,7 @@ AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext*, const AVPixelFor
  *
  * \note This may not be appropriate for all devices
 */
-void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, VideoFrame* Frame)
+void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, MythVideoFrame* Frame)
 {
     if (!Frame)
         return;

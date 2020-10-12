@@ -2750,7 +2750,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
     }
 
     decoder->m_directRendering = true;
-    VideoFrame *frame = decoder->GetPlayer()->GetNextVideoFrame();
+    MythVideoFrame *frame = decoder->GetPlayer()->GetNextVideoFrame();
     if (!frame)
         return -1;
 
@@ -2791,7 +2791,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
                             [](void* Opaque, uint8_t* Data)
                                 {
                                     auto *avfd = static_cast<AvFormatDecoder*>(Opaque);
-                                    auto *vf = reinterpret_cast<VideoFrame*>(Data);
+                                    auto *vf = reinterpret_cast<MythVideoFrame*>(Data);
                                     if (avfd && avfd->GetPlayer())
                                         avfd->GetPlayer()->DeLimboFrame(vf);
                                 }
@@ -3593,7 +3593,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         }
     }
 
-    auto *frame = static_cast<VideoFrame*>(AvFrame->opaque);
+    auto *frame = static_cast<MythVideoFrame*>(AvFrame->opaque);
     if (frame)
         frame->directrendering = m_directRendering;
 
@@ -3607,7 +3607,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     }
     else if (!m_directRendering)
     {
-        VideoFrame *oldframe = frame;
+        MythVideoFrame *oldframe = frame;
         frame = m_parent->GetNextVideoFrame();
         frame->directrendering = false;
 
@@ -5133,11 +5133,11 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
     while (m_needDummyVideoFrames && m_parent &&
            m_parent->GetFreeVideoFrames())
     {
-        VideoFrame *frame = m_parent->GetNextVideoFrame();
+        MythVideoFrame *frame = m_parent->GetNextVideoFrame();
         if (!frame)
             return false;
 
-        MythVideoFrame::Clear(frame);
+        frame->Clear();
         frame->dummy = true;
         m_parent->ReleaseNextVideoFrame(frame, m_lastVPts);
         m_parent->DeLimboFrame(frame);

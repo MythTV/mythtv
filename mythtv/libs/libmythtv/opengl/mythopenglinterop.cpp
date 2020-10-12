@@ -163,7 +163,7 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format,
 
 vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
                                                       MythVideoColourSpace *ColourSpace,
-                                                      VideoFrame       *Frame,
+                                                      MythVideoFrame       *Frame,
                                                       FrameScanType     Scan)
 {
     vector<MythVideoTexture*> result;
@@ -238,7 +238,7 @@ MythOpenGLInterop* MythOpenGLInterop::CreateDummy(void)
 
 vector<MythVideoTexture*> MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
                                                      MythVideoColourSpace* /*ColourSpace*/,
-                                                     VideoFrame* /*Frame*/, FrameScanType /*Scan*/)
+                                                     MythVideoFrame* /*Frame*/, FrameScanType /*Scan*/)
 {
     return vector<MythVideoTexture*>();
 }

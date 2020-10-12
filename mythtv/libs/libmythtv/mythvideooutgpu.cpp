@@ -300,18 +300,18 @@ void MythVideoOutputGPU::DiscardFrames(bool KeyFrame, bool Flushed)
  * without a frame so retain the most recent frame by removing
  * it from the 'used' queue and adding it to the 'pause' queue.
 */
-void MythVideoOutputGPU::DoneDisplayingFrame(VideoFrame* Frame)
+void MythVideoOutputGPU::DoneDisplayingFrame(MythVideoFrame* Frame)
 {
     if (!Frame)
         return;
 
     bool retain = MythVideoFrame::HardwareFormat(Frame->codec);
-    QVector<VideoFrame*> release;
+    QVector<MythVideoFrame*> release;
 
     m_videoBuffers.BeginLock(kVideoBuffer_pause);
     while (m_videoBuffers.Size(kVideoBuffer_pause))
     {
-        VideoFrame* frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
+        MythVideoFrame* frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
         if (!retain || (frame != Frame))
             release.append(frame);
     }
@@ -521,7 +521,7 @@ void MythVideoOutputGPU::InitDisplayMeasurements()
     SetDisplayAspect(static_cast<float>(displayaspect));
 }
 
-void MythVideoOutputGPU::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
+void MythVideoOutputGPU::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
     // Process input changes
     if (!ProcessInputChange())
@@ -542,7 +542,7 @@ void MythVideoOutputGPU::PrepareFrame(VideoFrame* Frame, FrameScanType Scan)
     }
 }
 
-void MythVideoOutputGPU::RenderFrame(VideoFrame *Frame, FrameScanType Scan)
+void MythVideoOutputGPU::RenderFrame(MythVideoFrame *Frame, FrameScanType Scan)
 {
     bool dummy = false;
     bool topfieldfirst = false;
@@ -592,9 +592,9 @@ void MythVideoOutputGPU::RenderOverlays(OSD *Osd)
 
 void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan)
 {
-    VideoFrame* release = nullptr;
+    MythVideoFrame* release = nullptr;
     m_videoBuffers.BeginLock(kVideoBuffer_used);
-    VideoFrame* used = m_videoBuffers.Head(kVideoBuffer_used);
+    MythVideoFrame* used = m_videoBuffers.Head(kVideoBuffer_used);
     if (used)
     {
         if (MythVideoFrame::HardwareFormat(used->codec))

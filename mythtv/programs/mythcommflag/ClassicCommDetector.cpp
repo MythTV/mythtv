@@ -418,7 +418,7 @@ bool ClassicCommDetector::go()
         if (m_stillRecording)
             gettimeofday(&startTime, nullptr);
 
-        VideoFrame* currentFrame = m_player->GetRawVideoFrame();
+        MythVideoFrame* currentFrame = m_player->GetRawVideoFrame();
         long long currentFrameNumber = currentFrame->frameNumber;
 
         //Lucas: maybe we should make the nuppelvideoplayer send out a signal
@@ -746,7 +746,7 @@ void ClassicCommDetector::SetVideoParams(float aspect)
     }
 }
 
-void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
+void ClassicCommDetector::ProcessFrame(MythVideoFrame *frame,
                                        long long frame_number)
 {
     int max = 0;

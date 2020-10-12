@@ -21,8 +21,8 @@ class VideoOutputD3D : public MythVideoOutput
 
     bool Init(const QSize &video_dim_buf, const QSize &video_dim_disp, float aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
-    void RenderFrame(VideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
-    void PrepareFrame(VideoFrame *frame, const PIPMap &pipPlayers, FrameScanType scan) override; // VideoOutput
+    void RenderFrame(MythVideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
+    void PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayers, FrameScanType scan) override; // VideoOutput
     void EndFrame() override;
     void WindowResized(const QSize &new_size) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
@@ -62,10 +62,10 @@ class VideoOutputD3D : public MythVideoOutput
     bool CreatePauseFrame(void);
     void SetProfile(void);
     void DestroyContext(void);
-    void UpdateFrame(VideoFrame *frame, D3D9Image *img);
+    void UpdateFrame(MythVideoFrame *frame, D3D9Image *img);
 
   private:
-    VideoFrame              m_pauseFrame;
+    MythVideoFrame              m_pauseFrame;
     QMutex                  m_lock           {QMutex::Recursive};
     HWND                    m_hWnd           {nullptr};
     HWND                    m_hEmbedWnd      {nullptr};

@@ -23,7 +23,7 @@ class MythVTBContext : public MythCodecContext
     // Shared decode only and direct rendering
     void   InitVideoCodec                (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     bool   RetrieveFrame                 (AVCodecContext* Context,
-                                          VideoFrame* Frame,
+                                          MythVideoFrame* Frame,
                                           AVFrame* AvFrame) override;
     int    HwDecoderInit                 (AVCodecContext *Context) override;
     static MythCodecID GetSupportedCodec (AVCodecContext **Context,

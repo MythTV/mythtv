@@ -101,7 +101,7 @@ MythOpenGLInterop::Type MythNVDECInterop::GetInteropType(VideoFrameType Format)
 */
 vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
                                                     MythVideoColourSpace *ColourSpace,
-                                                    VideoFrame *Frame,
+                                                    MythVideoFrame *Frame,
                                                     FrameScanType Scan)
 {
     vector<MythVideoTexture*> result;

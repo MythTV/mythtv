@@ -36,8 +36,8 @@ class MythVideoGPU : public QObject
    ~MythVideoGPU() override;
 
     virtual void StartFrame        () = 0;
-    virtual void PrepareFrame      (VideoFrame* Frame, FrameScanType Scan = kScan_Progressive) = 0;
-    virtual void RenderFrame       (VideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
+    virtual void PrepareFrame      (MythVideoFrame* Frame, FrameScanType Scan = kScan_Progressive) = 0;
+    virtual void RenderFrame       (MythVideoFrame* Frame, bool TopFieldFirst, FrameScanType Scan,
                                     StereoscopicMode StereoOverride, bool DrawBorder = false) = 0;
     virtual void EndFrame          () = 0;
     virtual void ResetFrameFormat  ();

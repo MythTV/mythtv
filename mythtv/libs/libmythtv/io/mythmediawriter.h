@@ -17,7 +17,7 @@ class MTV_PUBLIC MythMediaWriter
     virtual bool Init              (void) = 0;
     virtual bool OpenFile          (void) = 0;
     virtual bool CloseFile         (void) = 0;
-    virtual int  WriteVideoFrame   (VideoFrame *Frame) = 0;
+    virtual int  WriteVideoFrame   (MythVideoFrame *Frame) = 0;
     virtual int  WriteAudioFrame   (unsigned char *Buffer, int FrameNumber, long long &Timecode) = 0;
     virtual int  WriteTextFrame    (int VBIMode, unsigned char *Buffer, int Length,
                                     long long Timecode, int PageNumber) = 0;

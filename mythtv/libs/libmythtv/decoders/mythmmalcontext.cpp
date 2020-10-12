@@ -132,7 +132,7 @@ void MythMMALContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStrea
     MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
-bool MythMMALContext::RetrieveFrame(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame)
+bool MythMMALContext::RetrieveFrame(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame)
 {
     if (codec_is_mmal_dec(m_codecID))
         return GetBuffer(Context, Frame, AvFrame, 0);
@@ -170,7 +170,7 @@ void MythMMALContext::SetDecoderOptions(AVCodecContext *Context, AVCodec *Codec)
     av_opt_set(Context->priv_data, "extra_buffers", "8", 0);
 }
 
-bool MythMMALContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int)
+bool MythMMALContext::GetBuffer(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame, int)
 {
     // Sanity checks
     if (!Context || !AvFrame || !Frame)
@@ -204,7 +204,7 @@ bool MythMMALContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, AVFr
     return true;
 }
 
-bool MythMMALContext::GetBuffer2(AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int)
+bool MythMMALContext::GetBuffer2(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame, int)
 {
     // Sanity checks
     if (!Context || !AvFrame || !Frame || !m_interop)

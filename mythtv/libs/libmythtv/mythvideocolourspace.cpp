@@ -344,7 +344,7 @@ int MythVideoColourSpace::ChangePictureAttribute(PictureAttribute AttributeType,
  * that no colourspace is found we use sensible defaults for standard and high
  * definition content (BT470BG/BT601 and BT709 respectively).
 */
-bool MythVideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
+bool MythVideoColourSpace::UpdateColourSpace(const MythVideoFrame *Frame)
 {
     if (!Frame)
         return false;

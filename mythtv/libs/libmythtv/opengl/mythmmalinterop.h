@@ -18,7 +18,7 @@ class MythMMALInterop : public MythOpenGLInterop
     static MythMMALInterop* Create(MythRenderOpenGL *Context, Type InteropType);
     virtual vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
                                               MythVideoColourSpace *ColourSpace,
-                                              VideoFrame *Frame, FrameScanType Scan) override;
+                                              MythVideoFrame *Frame, FrameScanType Scan) override;
 
   protected:
     static Type GetInteropType(VideoFrameType Format);
@@ -27,7 +27,7 @@ class MythMMALInterop : public MythOpenGLInterop
     virtual ~MythMMALInterop() override;
 
   private:
-    MMAL_BUFFER_HEADER_T* VerifyBuffer(MythRenderOpenGL *Context, VideoFrame *Frame);
+    MMAL_BUFFER_HEADER_T* VerifyBuffer(MythRenderOpenGL *Context, MythVideoFrame *Frame);
 };
 
 #endif // MYTHMMALINTEROP_H

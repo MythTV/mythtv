@@ -134,7 +134,7 @@ void MythVAAPIInterop::DestroyDeinterlacer(void)
     av_buffer_unref(&m_vppFramesContext);
 }
 
-VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, VideoFrame *Frame)
+VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, MythVideoFrame *Frame)
 {
     VASurfaceID result = 0;
     if (!Frame)
@@ -293,7 +293,7 @@ end:
     return ret >= 0;
 }
 
-VASurfaceID MythVAAPIInterop::Deinterlace(VideoFrame *Frame, VASurfaceID Current, FrameScanType Scan)
+VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Current, FrameScanType Scan)
 {
     VASurfaceID result = Current;
     if (!Frame)

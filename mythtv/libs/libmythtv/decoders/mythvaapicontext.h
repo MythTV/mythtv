@@ -27,9 +27,9 @@ class MTV_PUBLIC MythVAAPIContext : public MythCodecContext
    ~MythVAAPIContext() override;
 
     void   InitVideoCodec                (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
-    bool   RetrieveFrame                 (AVCodecContext *Context, VideoFrame* Frame, AVFrame* AvFrame) override;
+    bool   RetrieveFrame                 (AVCodecContext *Context, MythVideoFrame* Frame, AVFrame* AvFrame) override;
     int    FilteredReceiveFrame          (AVCodecContext *Context, AVFrame *Frame) override;
-    void   PostProcessFrame              (AVCodecContext *Context, VideoFrame *Frame) override;
+    void   PostProcessFrame              (AVCodecContext *Context, MythVideoFrame *Frame) override;
     bool   IsDeinterlacing               (bool &DoubleRate, bool StreamChange = false) override;
     bool   DecoderWillResetOnFlush       (void) override;
     bool   DecoderWillResetOnAspect      (void) override;

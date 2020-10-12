@@ -227,7 +227,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
     m_player->DiscardVideoFrame(m_player->GetRawVideoFrame(0));
 
     long long tmpStartFrame = startFrame;
-    VideoFrame* f = m_player->GetRawVideoFrame(tmpStartFrame);
+    MythVideoFrame* f = m_player->GetRawVideoFrame(tmpStartFrame);
     float aspect = m_player->GetVideoAspect();
     long long currentFrameNumber = f->frameNumber;
     LOG(VB_COMMFLAG, LOG_INFO, QString("Starting with frame %1")
@@ -242,7 +242,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
         if (m_stillRecording)
             gettimeofday(&startTime, nullptr);
 
-        VideoFrame* currentFrame = m_player->GetRawVideoFrame();
+        MythVideoFrame* currentFrame = m_player->GetRawVideoFrame();
         currentFrameNumber = currentFrame->frameNumber;
 
         if(currentFrameNumber % 1000 == 0)

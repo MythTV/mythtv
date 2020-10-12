@@ -5,7 +5,7 @@
 
 #include "mythframe.h"
 
-void Histogram::generateFromImage(VideoFrame* frame, unsigned int frameWidth,
+void Histogram::generateFromImage(MythVideoFrame* frame, unsigned int frameWidth,
          unsigned int frameHeight, unsigned int minScanX, unsigned int maxScanX,
          unsigned int minScanY, unsigned int maxScanY, unsigned int XSpacing,
          unsigned int YSpacing)

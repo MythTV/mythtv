@@ -26,7 +26,7 @@ class MythVideoTexture : public MythGLTexture
                                                     std::vector<QSize> Sizes,
                                                     GLenum Target = QOpenGLTexture::Target2D);
     static MythVideoTexture* CreateHelperTexture(MythRenderOpenGL *Context);
-    static void UpdateTextures(MythRenderOpenGL* Context, const VideoFrame *Frame,
+    static void UpdateTextures(MythRenderOpenGL* Context, const MythVideoFrame *Frame,
                                const std::vector<MythVideoTexture*> &Textures);
     static void DeleteTexture (MythRenderOpenGL* Context, MythVideoTexture *Texture);
     static void DeleteTextures(MythRenderOpenGL* Context, std::vector<MythVideoTexture*> &Textures);
@@ -67,9 +67,9 @@ class MythVideoTexture : public MythGLTexture
                                                             std::vector<QSize> Sizes, GLenum Target);
 
     Q_DISABLE_COPY(MythVideoTexture)
-    static void YV12ToYV12   (MythRenderOpenGL *Context, const VideoFrame *Frame, MythVideoTexture* Texture, uint Plane);
-    static void YV12ToYUYV   (const VideoFrame *Frame, MythVideoTexture* Texture);
-    static void NV12ToNV12   (MythRenderOpenGL *Context, const VideoFrame *Frame, MythVideoTexture* Texture, uint Plane);
+    static void YV12ToYV12   (MythRenderOpenGL *Context, const MythVideoFrame *Frame, MythVideoTexture* Texture, uint Plane);
+    static void YV12ToYUYV   (const MythVideoFrame *Frame, MythVideoTexture* Texture);
+    static void NV12ToNV12   (MythRenderOpenGL *Context, const MythVideoFrame *Frame, MythVideoTexture* Texture, uint Plane);
     static bool CreateBuffer (MythVideoTexture* Texture, int Size);
     static void StoreBicubicWeights(float X, float *Dest);
 };

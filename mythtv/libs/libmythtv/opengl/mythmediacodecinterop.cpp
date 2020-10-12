@@ -111,7 +111,7 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
 
 vector<MythVideoTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
                                                          MythVideoColourSpace *ColourSpace,
-                                                         VideoFrame *Frame,
+                                                         MythVideoFrame *Frame,
                                                          FrameScanType)
 {
     vector<MythVideoTexture*> result;

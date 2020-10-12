@@ -31,7 +31,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
   public:
     static MythVDPAUInterop* Create(MythRenderOpenGL *Context, MythCodecID CodecId);
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context, MythVideoColourSpace *ColourSpace,
-                                      VideoFrame *Frame, FrameScanType Scan) override;
+                                      MythVideoFrame *Frame, FrameScanType Scan) override;
 
   public slots:
     void  UpdateColourSpace(bool PrimariesChanged);

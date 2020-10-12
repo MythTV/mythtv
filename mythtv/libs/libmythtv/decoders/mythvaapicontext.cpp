@@ -649,7 +649,7 @@ void MythVAAPIContext::InitVideoCodec(AVCodecContext *Context, bool SelectedStre
     MythCodecContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
-bool MythVAAPIContext::RetrieveFrame(AVCodecContext* /*unused*/, VideoFrame *Frame, AVFrame *AvFrame)
+bool MythVAAPIContext::RetrieveFrame(AVCodecContext* /*unused*/, MythVideoFrame *Frame, AVFrame *AvFrame)
 {
     if (AvFrame->format != AV_PIX_FMT_VAAPI)
         return false;
@@ -731,7 +731,7 @@ int MythVAAPIContext::FilteredReceiveFrame(AVCodecContext *Context, AVFrame *Fra
     return ret;
 }
 
-void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, VideoFrame *Frame)
+void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, MythVideoFrame *Frame)
 {
     if (!Frame || !codec_is_vaapi_dec(m_codecID) || !Context->hw_frames_ctx)
         return;

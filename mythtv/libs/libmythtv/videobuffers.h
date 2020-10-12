@@ -16,11 +16,11 @@
 #include <vector>
 #include <map>
 
-using frame_queue_t  = MythDeque<VideoFrame*> ;
-using frame_vector_t = std::vector<VideoFrame>;
-using vbuffer_map_t  = std::map<const VideoFrame*, uint>;
+using frame_queue_t  = MythDeque<MythVideoFrame*> ;
+using frame_vector_t = std::vector<MythVideoFrame>;
+using vbuffer_map_t  = std::map<const MythVideoFrame*, uint>;
 
-const QString& DebugString(const VideoFrame *Frame, bool Short = false);
+const QString& DebugString(const MythVideoFrame *Frame, bool Short = false);
 const QString& DebugString(uint  FrameNum, bool Short = false);
 
 enum BufferType
@@ -49,7 +49,7 @@ class MTV_PUBLIC VideoBuffers
                        uint NeedFree, uint NeedprebufferNormal,
                        uint NeedPrebufferSmall, int MaxReferenceFrames = 16);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
-    static bool ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID, int Width, int Height);
+    static bool ReinitBuffer(MythVideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID, int Width, int Height);
     void DeleteBuffers(void);
     void SetDeinterlacing(MythDeintType Single, MythDeintType Double, MythCodecID CodecID);
 
@@ -59,32 +59,32 @@ class MTV_PUBLIC VideoBuffers
 
     void SetPrebuffering(bool Normal);
 
-    VideoFrame *GetNextFreeFrame(BufferType EnqueueTo = kVideoBuffer_limbo);
-    void ReleaseFrame(VideoFrame *Frame);
-    void DeLimboFrame(VideoFrame *Frame);
+    MythVideoFrame *GetNextFreeFrame(BufferType EnqueueTo = kVideoBuffer_limbo);
+    void ReleaseFrame(MythVideoFrame *Frame);
+    void DeLimboFrame(MythVideoFrame *Frame);
     void StartDisplayingFrame(void);
-    void DoneDisplayingFrame(VideoFrame *Frame);
-    void DiscardFrame(VideoFrame *Frame);
+    void DoneDisplayingFrame(MythVideoFrame *Frame);
+    void DiscardFrame(MythVideoFrame *Frame);
     void DiscardPauseFrames(void);
     bool DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int References);
 
-    VideoFrame *At(uint FrameNum);
-    VideoFrame *Dequeue(BufferType Type);
-    VideoFrame *Head(BufferType Type);
-    VideoFrame *Tail(BufferType Type);
+    MythVideoFrame *At(uint FrameNum);
+    MythVideoFrame *Dequeue(BufferType Type);
+    MythVideoFrame *Head(BufferType Type);
+    MythVideoFrame *Tail(BufferType Type);
     void Requeue(BufferType Dest, BufferType Source, int Count = 1);
-    void Enqueue(BufferType Type, VideoFrame* Frame);
-    void SafeEnqueue(BufferType Type, VideoFrame* Frame);
-    void Remove(BufferType Type, VideoFrame *Frame);
+    void Enqueue(BufferType Type, MythVideoFrame* Frame);
+    void SafeEnqueue(BufferType Type, MythVideoFrame* Frame);
+    void Remove(BufferType Type, MythVideoFrame *Frame);
     frame_queue_t::iterator BeginLock(BufferType Type);
     frame_queue_t::iterator End(BufferType Type);
     void EndLock();
     uint Size(BufferType Type) const;
-    bool Contains(BufferType Type, VideoFrame* Frame) const;
+    bool Contains(BufferType Type, MythVideoFrame* Frame) const;
 
-    VideoFrame *GetScratchFrame(void);
-    VideoFrame *GetLastDecodedFrame(void);
-    VideoFrame *GetLastShownFrame(void);
+    MythVideoFrame *GetScratchFrame(void);
+    MythVideoFrame *GetLastDecodedFrame(void);
+    MythVideoFrame *GetLastShownFrame(void);
     void SetLastShownFrameToScratch(void);
 
     uint ValidVideoFrames(void) const;
@@ -92,9 +92,9 @@ class MTV_PUBLIC VideoBuffers
     bool EnoughFreeFrames(void) const;
     bool EnoughDecodedFrames(void) const;
 
-    const VideoFrame *At(uint FrameNum) const;
-    const VideoFrame *GetLastDecodedFrame(void) const;
-    const VideoFrame *GetLastShownFrame(void) const;
+    const MythVideoFrame *At(uint FrameNum) const;
+    const MythVideoFrame *GetLastDecodedFrame(void) const;
+    const MythVideoFrame *GetLastShownFrame(void) const;
     uint  Size(void) const;
     void Clear(uint FrameNum);
     void Clear(void);
@@ -105,8 +105,8 @@ class MTV_PUBLIC VideoBuffers
   private:
     frame_queue_t       *Queue(BufferType Type);
     const frame_queue_t *Queue(BufferType Type) const;
-    VideoFrame          *GetNextFreeFrameInternal(BufferType EnqueueTo);
-    static void          SetDeinterlacingFlags(VideoFrame &Frame, MythDeintType Single,
+    MythVideoFrame      *GetNextFreeFrameInternal(BufferType EnqueueTo);
+    static void          SetDeinterlacingFlags(MythVideoFrame &Frame, MythDeintType Single,
                                                MythDeintType Double, MythCodecID CodecID);
 
     frame_queue_t        m_available;

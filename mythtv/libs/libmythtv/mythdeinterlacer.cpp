@@ -66,7 +66,7 @@ MythDeinterlacer::~MythDeinterlacer()
  * \param Force Set to true to ensure a deinterlaced frame is always returned.
  * Used for preview images.
 */
-void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
+void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
                               VideoDisplayProfile *Profile, bool Force)
 {
     // nothing to see here
@@ -295,7 +295,7 @@ void MythDeinterlacer::Cleanup(void)
 }
 
 ///\brief Initialise deinterlacing using the given MythDeintType
-bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
+bool MythDeinterlacer::Initialise(MythVideoFrame *Frame, MythDeintType Deinterlacer,
                                   bool DoubleRate, bool TopFieldFirst, VideoDisplayProfile *Profile)
 {
     auto autofieldorder = m_autoFieldOrder;
@@ -389,14 +389,14 @@ bool MythDeinterlacer::Initialise(VideoFrame *Frame, MythDeintType Deinterlacer,
     return false;
 }
 
-bool MythDeinterlacer::SetUpCache(VideoFrame *Frame)
+bool MythDeinterlacer::SetUpCache(MythVideoFrame *Frame)
 {
     if (!Frame)
         return false;
 
     if (!m_bobFrame)
     {
-        m_bobFrame = new VideoFrame;
+        m_bobFrame = new MythVideoFrame;
         if (!m_bobFrame)
             return false;
         init(m_bobFrame, Frame->codec, nullptr, Frame->width, Frame->height, 0);
@@ -406,7 +406,7 @@ bool MythDeinterlacer::SetUpCache(VideoFrame *Frame)
     // copy Frame metadata, preserving any existing buffer allocation
     unsigned char *buf = m_bobFrame->buf;
     int size = m_bobFrame->size;
-    memcpy(m_bobFrame, Frame, sizeof(VideoFrame));
+    memcpy(m_bobFrame, Frame, sizeof(MythVideoFrame));
     m_bobFrame->priv[0] = m_bobFrame->priv[1] = m_bobFrame->priv[2] = m_bobFrame->priv[3] = nullptr;
     m_bobFrame->buf = buf;
     m_bobFrame->size = size;
@@ -421,7 +421,7 @@ bool MythDeinterlacer::SetUpCache(VideoFrame *Frame)
     return m_bobFrame->buf != nullptr;
 }
 
-void MythDeinterlacer::OneField(VideoFrame *Frame, FrameScanType Scan)
+void MythDeinterlacer::OneField(MythVideoFrame *Frame, FrameScanType Scan)
 {
     if (!m_swsContext)
         return;
@@ -637,13 +637,13 @@ static inline void BlendSIMD8x4(unsigned char *Src, int Width, int FirstRow, int
 }
 #endif
 
-void MythDeinterlacer::Blend(VideoFrame *Frame, FrameScanType Scan)
+void MythDeinterlacer::Blend(MythVideoFrame *Frame, FrameScanType Scan)
 {
     if (Frame->height < 16 || Frame->width < 16)
         return;
 
     bool second = false;
-    VideoFrame *src = Frame;
+    MythVideoFrame *src = Frame;
 
     if (m_doubleRate)
     {

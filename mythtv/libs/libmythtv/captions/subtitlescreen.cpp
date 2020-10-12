@@ -1717,7 +1717,7 @@ void SubtitleScreen::Pulse(void)
     QList<MythUIType *>::iterator itNext;
 
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
-    VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
+    MythVideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
     long long now = currentFrame ? currentFrame->timecode : LLONG_MAX;
     bool needRescale = (m_textFontZoom != m_textFontZoomPrev);
 
@@ -1835,7 +1835,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
         return;
 
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
-    VideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
+    MythVideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
 
     if (!currentFrame || !videoOut)
         return;
@@ -2126,7 +2126,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         return;
     m_safeArea = vo->GetSafeRect();
 
-    VideoFrame *currentFrame = vo->GetLastShownFrame();
+    MythVideoFrame *currentFrame = vo->GetLastShownFrame();
     if (!currentFrame)
         return;
 
@@ -2201,7 +2201,7 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
     if (!vo)
         return;
 
-    VideoFrame *currentFrame = vo->GetLastShownFrame();
+    MythVideoFrame *currentFrame = vo->GetLastShownFrame();
     if (!currentFrame)
         return;
 

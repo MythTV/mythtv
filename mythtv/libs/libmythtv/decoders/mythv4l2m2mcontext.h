@@ -17,11 +17,11 @@ class MythV4L2M2MContext : public MythDRMPRIMEContext
                                           AVStream       *Stream,
                                           uint            StreamType);
     void        InitVideoCodec           (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
-    bool        RetrieveFrame            (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame) override;
+    bool        RetrieveFrame            (AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame) override;
     void        SetDecoderOptions        (AVCodecContext* Context, AVCodec* Codec) override;
     int         HwDecoderInit            (AVCodecContext *Context) override;
     bool        DecoderWillResetOnFlush  (void) override;
-    static bool GetBuffer                (AVCodecContext *Context, VideoFrame *Frame, AVFrame *AvFrame, int/*Flags*/);
+    static bool GetBuffer                (AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame, int/*Flags*/);
     static bool HaveV4L2Codecs           (void);
     static void GetDecoderList           (QStringList &Decoders);
 
