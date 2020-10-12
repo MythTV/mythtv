@@ -875,7 +875,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             newSize = GetBufferSize(FMT_YV12, newWidth, newHeight);
         }
-        unsigned char *newFrame = GetAlignedBuffer(newSize);
+        unsigned char *newFrame = MythVideoFrame::GetAlignedBuffer(newSize);
         if (!newFrame)
         {
             // OOM

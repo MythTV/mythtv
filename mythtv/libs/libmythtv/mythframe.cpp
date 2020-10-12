@@ -239,3 +239,19 @@ QString MythVideoFrame::FormatDescription(VideoFrameType Type)
     }
     return "?";
 }
+
+uint8_t *MythVideoFrame::GetAlignedBuffer(size_t Size)
+{
+    return static_cast<uint8_t*>(av_malloc(Size + 64));
+}
+
+uint8_t* MythVideoFrame::GetAlignedBufferZero(size_t Size)
+{
+    return static_cast<uint8_t*>(av_mallocz(Size + 64));
+}
+
+uint8_t *MythVideoFrame::CreateBuffer(VideoFrameType Type, int Width, int Height)
+{
+    size_t size = GetBufferSize(Type, Width, Height);
+    return GetAlignedBuffer(size);
+}

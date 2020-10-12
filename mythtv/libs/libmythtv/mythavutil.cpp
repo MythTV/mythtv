@@ -323,7 +323,7 @@ int MythAVCopy::Copy(AVFrame *pic, const VideoFrame *frame,
                  unsigned char *buffer, AVPixelFormat fmt)
 {
     VideoFrameType type = PixelFormatToFrameType(fmt);
-    unsigned char *sbuf = buffer ? buffer : CreateBuffer(type, frame->width, frame->height);
+    unsigned char *sbuf = buffer ? buffer : MythVideoFrame::CreateBuffer(type, frame->width, frame->height);
 
     if (!sbuf)
     {

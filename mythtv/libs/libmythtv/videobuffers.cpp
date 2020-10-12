@@ -1028,7 +1028,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     size_t bufsize = GetBufferSize(Type, Width, Height);
     for (uint i = 0; i < Size(); i++)
     {
-        unsigned char *data = GetAlignedBuffer(bufsize);
+        unsigned char *data = MythVideoFrame::GetAlignedBuffer(bufsize);
         if (!data)
             LOG(VB_GENERAL, LOG_CRIT, "Failed to allocate video buffer memory");
         init(&m_buffers[i], Type, data, Width, Height, static_cast<int>(bufsize));
@@ -1080,7 +1080,7 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCode
         Frame->buf = nullptr;
 
         // Initialise new
-        buf = GetAlignedBuffer(size);
+        buf = MythVideoFrame::GetAlignedBuffer(size);
         if (!buf)
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");

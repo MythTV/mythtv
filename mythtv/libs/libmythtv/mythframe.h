@@ -638,36 +638,17 @@ static inline size_t GetBufferSize(VideoFrameType Type, int Width, int Height,
     return static_cast<uint>((adj_w * adj_h * bpp) / bpb + (remainder ? 1 : 0));
 }
 
-static inline unsigned char* GetAlignedBuffer(size_t Size)
-{
-    return static_cast<unsigned char*>(av_malloc(Size + 64));
-}
-
-static inline unsigned char* GetAlignedBufferZero(size_t Size)
-{
-    return static_cast<unsigned char*>(av_mallocz(Size + 64));
-}
-
-static inline unsigned char* CreateBuffer(VideoFrameType Type, int Width, int Height)
-{
-    size_t size = GetBufferSize(Type, Width, Height);
-    return GetAlignedBuffer(size);
-}
-
-static inline unsigned char* CreateBufferZero(VideoFrameType Type, int Width, int Height)
-{
-    size_t size = GetBufferSize(Type, Width, Height);
-    return GetAlignedBufferZero(size);
-}
-
 class MTV_PUBLIC MythVideoFrame
 {
   public:
-    static bool CopyFrame(VideoFrame* To, VideoFrame* From);
-    static void CopyPlane(uint8_t* To, int ToPitch,
-                          const uint8_t* From, int FromPitch,
-                          int PlaneWidth, int PlaneHeight);
-    static QString FormatDescription(VideoFrameType Type);
+    static bool     CopyFrame(VideoFrame* To, VideoFrame* From);
+    static void     CopyPlane(uint8_t* To, int ToPitch,
+                              const uint8_t* From, int FromPitch,
+                              int PlaneWidth, int PlaneHeight);
+    static QString  FormatDescription(VideoFrameType Type);
+    static uint8_t* GetAlignedBuffer(size_t Size);
+    static uint8_t* GetAlignedBufferZero(size_t Size);
+    static uint8_t* CreateBuffer(VideoFrameType Type, int Width, int Height);
 };
 
 #endif

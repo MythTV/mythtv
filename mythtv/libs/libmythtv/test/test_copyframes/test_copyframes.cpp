@@ -205,7 +205,7 @@ void TestCopyFrames::TestCopy()
     auto gettestframe = [](VideoFrameType T, const frametest& P)
     {
         VideoFrame* frame = new VideoFrame;
-        init(frame, T, GetAlignedBufferZero(std::get<3>(P)), std::get<1>(P), std::get<2>(P),
+        init(frame, T, MythVideoFrame::GetAlignedBufferZero(std::get<3>(P)), std::get<1>(P), std::get<2>(P),
              static_cast<int>(std::get<3>(P)), std::get<4>(P), std::get<5>(P), true, 1.0, 1.0, std::get<0>(P));
         return frame;
     };
@@ -214,7 +214,7 @@ void TestCopyFrames::TestCopy()
     {
         size_t size = GetBufferSize(T, W, H, A);
         VideoFrame* frame = new VideoFrame;
-        init(frame, T, GetAlignedBufferZero(size), W, H, static_cast<int>(size), 1.0, 1.0, A);
+        init(frame, T, MythVideoFrame::GetAlignedBufferZero(size), W, H, static_cast<int>(size), 1.0, 1.0, A);
         return frame;
     };
 
