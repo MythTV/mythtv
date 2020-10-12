@@ -257,8 +257,12 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
     // Copy AVFrame back to VideoFrame
     uint count = planes(Frame->codec);
     for (uint plane = 0; plane < count; ++plane)
-        copyplane(Frame->buf + Frame->offsets[plane], Frame->pitches[plane], m_frame->data[plane], m_frame->linesize[plane],
-                  pitch_for_plane(m_inputType, m_frame->width, plane), height_for_plane(m_inputType, m_frame->height, plane));
+    {
+        MythVideoFrame::CopyPlane(Frame->buf + Frame->offsets[plane], Frame->pitches[plane],
+                                  m_frame->data[plane], m_frame->linesize[plane],
+                                  pitch_for_plane(m_inputType, m_frame->width, plane),
+                                  height_for_plane(m_inputType, m_frame->height, plane));
+    }
 
     Frame->timecode = m_frame->pts;
     Frame->already_deinterlaced = true;

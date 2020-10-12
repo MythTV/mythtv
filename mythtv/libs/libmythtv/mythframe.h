@@ -568,24 +568,6 @@ static inline void clear_vf(VideoFrame *vf)
     }
 }
 
-static inline void copyplane(uint8_t* dst, int dst_pitch,
-                             const uint8_t* src, int src_pitch,
-                             int width, int height)
-{
-    if ((dst_pitch == width) && (src_pitch == width))
-    {
-        memcpy(dst, src, static_cast<size_t>(width * height));
-        return;
-    }
-
-    for (int y = 0; y < height; y++)
-    {
-        memcpy(dst, src, static_cast<size_t>(width));
-        src += src_pitch;
-        dst += dst_pitch;
-    }
-}
-
 static inline uint planes(VideoFrameType Type)
 {
     switch (Type)

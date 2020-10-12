@@ -199,8 +199,12 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, VideoFrame *Frame, A
     // Copy data
     uint count = planes(Frame->codec);
     for (uint plane = 0; plane < count; ++plane)
-        copyplane(Frame->buf + Frame->offsets[plane], Frame->pitches[plane], AvFrame->data[plane], AvFrame->linesize[plane],
-                  pitch_for_plane(Frame->codec, AvFrame->width, plane), height_for_plane(Frame->codec, AvFrame->height, plane));
+    {
+        MythVideoFrame::CopyPlane(Frame->buf + Frame->offsets[plane],Frame->pitches[plane],
+                                  AvFrame->data[plane], AvFrame->linesize[plane],
+                                  pitch_for_plane(Frame->codec, AvFrame->width, plane),
+                                  height_for_plane(Frame->codec, AvFrame->height, plane));
+    }
 
     return true;
 }
