@@ -184,36 +184,6 @@ MythDeintType MTV_PUBLIC GetSingleRateOption(const VideoFrame* Frame, MythDeintT
 MythDeintType MTV_PUBLIC GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
 MythDeintType MTV_PUBLIC GetDeinterlacer(MythDeintType Option);
 
-enum class uswcState {
-    Detect,
-    Use_SSE,
-    Use_SW
-};
-
-class MTV_PUBLIC MythUSWCCopy
-{
-public:
-    explicit MythUSWCCopy(int width, bool nocache = false);
-    virtual ~MythUSWCCopy();
-
-    void copy(VideoFrame *dst, const VideoFrame *src);
-    void reset(int width);
-    void resetUSWCDetection(void);
-    void setUSWC(bool uswc);
-
-private:
-    // This function is needed on ARCH_X86
-    // cppcheck-suppress unusedPrivateFunction
-    void allocateCache(int width);
-
-    uint8_t*  m_cache {nullptr};
-    int       m_size  {0};
-    uswcState m_uswc  {uswcState::Detect};
-};
-
-void MTV_PUBLIC framecopy(VideoFrame *dst, const VideoFrame *src,
-                          bool useSSE = true);
-
 static inline int  bitsperpixel(VideoFrameType type);
 static inline int  pitch_for_plane(VideoFrameType Type, int Width, uint Plane);
 static inline int  height_for_plane(VideoFrameType Type, int Height, uint Plane);
@@ -561,18 +531,6 @@ static inline void copyplane(uint8_t* dst, int dst_pitch,
     }
 }
 
-/**
- * copy: copy one frame into another
- * copy only works with the following assumptions:
- * frames are of the same resolution
- * destination frame is in YV12 format
- * source frame is either YV12 or NV12 format
- */
-static inline void copy(VideoFrame *dst, const VideoFrame *src)
-{
-    framecopy(dst, src, true);
-}
-
 static inline uint planes(VideoFrameType Type)
 {
     switch (Type)
@@ -703,4 +661,15 @@ static inline unsigned char* CreateBufferZero(VideoFrameType Type, int Width, in
     size_t size = GetBufferSize(Type, Width, Height);
     return GetAlignedBufferZero(size);
 }
-#endif /* MYTHFRAME_H */
+
+class MTV_PUBLIC MythVideoFrame
+{
+  public:
+    static bool CopyFrame(VideoFrame* To, VideoFrame* From);
+    static void CopyPlane(uint8_t* To, int ToPitch,
+                          const uint8_t* From, int FromPitch,
+                          int PlaneWidth, int PlaneHeight);
+    static QString FormatDescription(VideoFrameType Type);
+};
+
+#endif

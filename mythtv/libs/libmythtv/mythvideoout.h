@@ -98,7 +98,6 @@ class MythVideoOutput : public MythVideoBounds
     MythVideoOutput();
     QRect        GetVisibleOSDBounds(float& VisibleAspect, float& FontScaling, float ThemeAspect) const;
     QRect        GetTotalOSDBounds() const;
-    static void  CopyFrame(VideoFrame* To, const VideoFrame* From);
 
     MythVideoColourSpace m_videoColourSpace;
     LetterBoxColour      m_dbLetterboxColour  { kLetterBoxColour_Black };

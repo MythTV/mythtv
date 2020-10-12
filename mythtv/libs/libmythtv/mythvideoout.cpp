@@ -407,26 +407,6 @@ VideoFrame* MythVideoOutput::GetLastShownFrame()
     return m_videoBuffers.GetLastShownFrame();
 }
 
-/**
- * \fn VideoOutput::CopyFrame(VideoFrame*, const VideoFrame*)
- * \brief Copies frame data from one VideoFrame to another.
- *
- *  Note: The frames must have the same width, height, and format.
- * \param To   The destination frame.
- * \param From The source frame
- */
-void MythVideoOutput::CopyFrame(VideoFrame* To, const VideoFrame* From)
-{
-    if (To == nullptr || From == nullptr)
-        return;
-
-    To->frameNumber = From->frameNumber;
-    To->disp_timecode = From->disp_timecode;
-    To->frameCounter = From->frameCounter;
-
-    copy(To, From);
-}
-
 /// \brief translates caption/dvd button rectangle into 'screen' space
 QRect MythVideoOutput::GetImageRect(const QRect& Rect, QRect* DisplayRect)
 {

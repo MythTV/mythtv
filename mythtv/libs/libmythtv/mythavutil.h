@@ -106,11 +106,9 @@ class MythAVCopyPrivate;
  */
 class MTV_PUBLIC MythAVCopy
 {
-public:
-    explicit MythAVCopy(bool USWC=true);
+  public:
+    MythAVCopy();
     virtual ~MythAVCopy();
-    MythAVCopy(const MythAVCopy &) = delete;            // not copyable
-    MythAVCopy &operator=(const MythAVCopy &) = delete; // not copyable
 
     int Copy(VideoFrame *dst, const VideoFrame *src);
     /**
@@ -135,7 +133,8 @@ public:
              const AVFrame *src, AVPixelFormat pix_fmt,
              int width, int height);
 
-private:
+  private:
+    Q_DISABLE_COPY(MythAVCopy)
     static void FillFrame(VideoFrame *frame, const AVFrame *pic, int pitch,
                           int width, int height, AVPixelFormat pix_fmt);
     MythAVCopyPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)

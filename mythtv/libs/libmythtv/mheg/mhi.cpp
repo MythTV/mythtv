@@ -1797,7 +1797,7 @@ void MHIDLA::DrawPoly(bool isFilled, const MHPointVec& xArray, const MHPointVec&
 
 MHIBitmap::MHIBitmap(MHIContext *parent, bool tiled)
     : m_parent(parent), m_tiled(tiled),
-      m_copyCtx(new MythAVCopy(false))
+      m_copyCtx(new MythAVCopy())
 {
 }
 

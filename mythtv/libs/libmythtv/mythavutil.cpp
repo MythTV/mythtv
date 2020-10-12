@@ -213,21 +213,12 @@ int AVPictureFill(AVFrame *pic, const VideoFrame *frame, AVPixelFormat fmt)
 
 class MythAVCopyPrivate
 {
-public:
-    explicit MythAVCopyPrivate(bool uswc)
-        : m_copyctx(new MythUSWCCopy(4096, !uswc)) {}
-
+  public:
+    MythAVCopyPrivate() {}
     ~MythAVCopyPrivate()
     {
-        if (m_swsctx)
-        {
-            sws_freeContext(m_swsctx);
-        }
-        delete m_copyctx;
+        sws_freeContext(m_swsctx);
     }
-
-    MythAVCopyPrivate(const MythAVCopyPrivate &) = delete;            // not copyable
-    MythAVCopyPrivate &operator=(const MythAVCopyPrivate &) = delete; // not copyable
 
     int SizeData(int _width, int _height, AVPixelFormat _fmt)
     {
@@ -243,14 +234,16 @@ public:
     }
 
     SwsContext   *m_swsctx  {nullptr};
-    MythUSWCCopy *m_copyctx {nullptr};
     int           m_width   {0};
     int           m_height  {0};
     int           m_size    {0};
     AVPixelFormat m_format  {AV_PIX_FMT_NONE};
+
+  private:
+    Q_DISABLE_COPY(MythAVCopyPrivate)
 };
 
-MythAVCopy::MythAVCopy(bool uswc) : d(new MythAVCopyPrivate(uswc))
+MythAVCopy::MythAVCopy() : d(new MythAVCopyPrivate())
 {
 }
 
@@ -289,19 +282,6 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
                  const AVFrame *src, AVPixelFormat pix_fmt,
                  int width, int height)
 {
-    if ((pix_fmt == AV_PIX_FMT_YUV420P || pix_fmt == AV_PIX_FMT_NV12) &&
-        (dst_pix_fmt == AV_PIX_FMT_YUV420P))
-    {
-        VideoFrame framein  {};
-        VideoFrame frameout {};
-
-        FillFrame(&framein, src, width, width, height, pix_fmt);
-        FillFrame(&frameout, dst, width, width, height, dst_pix_fmt);
-
-        d->m_copyctx->copy(&frameout, &framein);
-        return frameout.size;
-    }
-
     int new_width = width;
 #if ARCH_ARM
     // The ARM build of FFMPEG has a bug that if sws_scale is
@@ -330,19 +310,10 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
 
 int MythAVCopy::Copy(VideoFrame *dst, const VideoFrame *src)
 {
-    if ((src->codec == FMT_YV12 || src->codec == FMT_NV12) &&
-        (dst->codec == FMT_YV12))
-    {
-        d->m_copyctx->copy(dst, src);
-        return dst->size;
-    }
-
     AVFrame srcpic;
     AVFrame dstpic;
-
     AVPictureFill(&srcpic, src);
     AVPictureFill(&dstpic, dst);
-
     return Copy(&dstpic, FrameTypeToPixelFormat(dst->codec),
                 &srcpic, FrameTypeToPixelFormat(src->codec),
                 src->width, src->height);
