@@ -75,13 +75,13 @@ void DetectLetterbox::Detect(VideoFrame *Frame)
             {
                 m_firstFrameChecked = Frame->frameNumber;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("'%1' frame format detected")
-                    .arg(format_description(Frame->codec)));
+                    .arg(MythVideoFrame::FormatDescription(Frame->codec)));
             }
             m_frameType = Frame->codec;
             break;
         default:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("'%1' frame format is not supported")
-                    .arg(format_description(Frame->codec)));
+                    .arg(MythVideoFrame::FormatDescription(Frame->codec)));
             m_isDetectLetterbox = false;
             return;
     }

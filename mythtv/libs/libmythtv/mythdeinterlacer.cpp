@@ -161,9 +161,10 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Deinterlacer change: %1x%2 %3 dr:%4 tff:%5 -> %6x%7 %8 dr:%9 tff:%10")
-            .arg(m_width).arg(m_height).arg(format_description(m_inputType))
+            .arg(m_width).arg(m_height).arg(MythVideoFrame::FormatDescription(m_inputType))
             .arg(m_doubleRate).arg(m_topFirst)
-            .arg(Frame->width).arg(Frame->height).arg(format_description(Frame->codec))
+            .arg(Frame->width).arg(Frame->height)
+            .arg(MythVideoFrame::FormatDescription(Frame->codec))
             .arg(doublerate).arg(topfieldfirst));
         if (!Initialise(Frame, deinterlacer, doublerate, topfieldfirst, Profile))
         {

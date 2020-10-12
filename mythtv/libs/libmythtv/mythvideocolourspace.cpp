@@ -397,7 +397,7 @@ bool MythVideoColourSpace::UpdateColourSpace(const VideoFrame *Frame)
 
     if (forced)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
-            .arg(format_description(Frame->codec)));
+            .arg(MythVideoFrame::FormatDescription(Frame->codec)));
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Input : %1(%2) Depth:%3 %4Range:%5")
         .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))

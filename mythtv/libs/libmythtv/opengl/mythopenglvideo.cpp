@@ -278,7 +278,8 @@ bool MythOpenGLVideo::AddDeinterlacer(const VideoFrame* Frame, FrameScanType Sca
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created deinterlacer '%1' (%2->%3)")
         .arg(DeinterlacerName(m_deinterlacer | DEINT_SHADER, m_deinterlacer2x))
-        .arg(format_description(m_inputType)).arg(format_description(m_outputType)));
+        .arg(MythVideoFrame::FormatDescription(m_inputType))
+        .arg(MythVideoFrame::FormatDescription(m_outputType)));
     return true;
 }
 
@@ -470,9 +471,11 @@ bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
                      (m_textureTarget == GL_TEXTURE_EXTERNAL_OES) ? "OES" : "2D";
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New frame format: %1:%2 %3x%4 (Tex: %5) -> %6:%7 %8x%9 (Tex: %10)")
-        .arg(format_description(m_inputType)).arg(format_description(m_outputType))
+        .arg(MythVideoFrame::FormatDescription(m_inputType))
+        .arg(MythVideoFrame::FormatDescription(m_outputType))
         .arg(m_videoDim.width()).arg(m_videoDim.height()).arg(texold)
-        .arg(format_description(InputType)).arg(format_description(OutputType))
+        .arg(MythVideoFrame::FormatDescription(InputType))
+        .arg(MythVideoFrame::FormatDescription(OutputType))
         .arg(Size.width()).arg(Size.height()).arg(texnew));
 
     ResetFrameFormat();

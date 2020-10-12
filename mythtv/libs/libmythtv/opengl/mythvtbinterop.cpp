@@ -246,7 +246,7 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
     {
         IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, nullptr);
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported frame format %1")
-            .arg(format_description(frameformat)));
+            .arg(MythVideoFrame::FormatDescription(frameformat)));
         return result;
     }
 

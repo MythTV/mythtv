@@ -62,8 +62,6 @@ enum VideoFrameType
     FMT_DRMPRIME
 };
 
-const char* format_description(VideoFrameType Type);
-
 static inline bool format_is_hw(VideoFrameType Type)
 {
     return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||

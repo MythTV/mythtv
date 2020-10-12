@@ -66,7 +66,7 @@ MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, V
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid MMAL buffer %1 %2 %3 %4")
             .arg(Frame->buf != nullptr).arg(Frame->priv[0] != nullptr)
-            .arg(format_description(Frame->codec))
+            .arg(MythVideoFrame::FormatDescription(Frame->codec))
             .arg(av_get_pix_fmt_name(static_cast<AVPixelFormat>(Frame->pix_fmt))));
         return result;
     }

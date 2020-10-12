@@ -833,7 +833,7 @@ QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size
         return profile;
 
     return QObject::tr("%1%2%3 (Max size: %4x%5)")
-            .arg(profile).arg(Format != FMT_NONE ? QString(" %1").arg(format_description(Format)) : "")
+            .arg(profile).arg(Format != FMT_NONE ? QString(" %1").arg(MythVideoFrame::FormatDescription(Format)) : "")
             .arg(ColorDepth > 8 ? QString(" %1Bit").arg(ColorDepth) : "")
             .arg(Size.width()).arg(Size.height());
 }

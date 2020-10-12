@@ -1020,7 +1020,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
         for (uint i = 0; i < Size(); i++)
             success &= CreateBuffer(Width, Height, i, nullptr, Type);
         LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 empty %2 (%3x%4) video buffers")
-           .arg(Size()).arg(format_description(Type)).arg(Width).arg(Height));
+           .arg(Size()).arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
         return success;
     }
 
@@ -1037,7 +1037,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
 
     Clear();
     LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 %2 (%3x%4) video buffers")
-       .arg(Size()).arg(format_description(Type)).arg(Width).arg(Height));
+       .arg(Size()).arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
     return success;
 }
 
@@ -1090,8 +1090,8 @@ bool VideoBuffers::ReinitBuffer(VideoFrame *Frame, VideoFrameType Type, MythCode
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocated frame %1 %2x%3->%4 %5x%6 (New buffer: %7)")
-        .arg(format_description(old)).arg(Frame->width).arg(Frame->height)
-        .arg(format_description(Type)).arg(Width).arg(Height)
+        .arg(MythVideoFrame::FormatDescription(old)).arg(Frame->width).arg(Frame->height)
+        .arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height)
         .arg(newbuf));
     MythDeintType singler = Frame->deinterlace_single;
     MythDeintType doubler = Frame->deinterlace_double;

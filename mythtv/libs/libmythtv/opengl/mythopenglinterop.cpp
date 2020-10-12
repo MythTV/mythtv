@@ -112,7 +112,7 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format,
         }
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Checking interop support for %1")
-            .arg(format_description(Format)));
+            .arg(MythVideoFrame::FormatDescription(Format)));
 
 #ifdef USING_VTB
         if (FMT_VTB == Format)
@@ -151,12 +151,12 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format,
     if (Unsupported == supported)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No render support for frame type '%1'")
-            .arg(format_description(Format)));
+            .arg(MythVideoFrame::FormatDescription(Format)));
     }
     else
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rendering supported for frame type '%1' with %2")
-            .arg(format_description(Format)).arg(TypeToString(supported)));
+            .arg(MythVideoFrame::FormatDescription(Format)).arg(TypeToString(supported)));
     }
     return supported;
 }

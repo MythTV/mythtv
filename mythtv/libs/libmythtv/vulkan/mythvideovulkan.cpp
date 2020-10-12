@@ -39,9 +39,11 @@ bool MythVideoVulkan::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
 {
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("New frame format: %1:%2 %3x%4 -> %6:%7 %8x%9")
-        .arg(format_description(m_inputType)).arg(format_description(m_outputType))
+        .arg(MythVideoFrame::FormatDescription(m_inputType))
+        .arg(MythVideoFrame::FormatDescription(m_outputType))
         .arg(m_videoDim.width()).arg(m_videoDim.height())
-        .arg(format_description(InputType)).arg(format_description(OutputType))
+        .arg(MythVideoFrame::FormatDescription(InputType))
+        .arg(MythVideoFrame::FormatDescription(OutputType))
         .arg(Size.width()).arg(Size.height()));
 
     ResetFrameFormat();
