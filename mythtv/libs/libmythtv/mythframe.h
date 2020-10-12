@@ -62,6 +62,64 @@ enum VideoFrameType
     FMT_DRMPRIME
 };
 
+class VideoFrame;
+class MTV_PUBLIC MythVideoFrame
+{
+  public:
+    static bool       CopyFrame(VideoFrame* To, VideoFrame* From);
+    static void       CopyPlane(uint8_t* To, int ToPitch,
+                                const uint8_t* From, int FromPitch,
+                                int PlaneWidth, int PlaneHeight);
+    static QString    FormatDescription(VideoFrameType Type);
+    static uint8_t*   GetAlignedBuffer(size_t Size);
+    static uint8_t*   GetAlignedBufferZero(size_t Size);
+    static uint8_t*   CreateBuffer(VideoFrameType Type, int Width, int Height);
+    static size_t     GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
+    static inline int BitsPerPixel(VideoFrameType Type)
+    {
+        switch (Type)
+        {
+            case FMT_BGRA:
+            case FMT_RGBA32:
+            case FMT_ARGB32:
+            case FMT_RGB32:
+            case FMT_YUV422P9:
+            case FMT_YUV422P10:
+            case FMT_YUV422P12:
+            case FMT_YUV422P14:
+            case FMT_YUV422P16: return 32;
+            case FMT_RGB24:     return 24;
+            case FMT_YUV422P:
+            case FMT_YUY2:      return 16;
+            case FMT_YV12:
+            case FMT_NV12:      return 12;
+            case FMT_YUV444P:
+            case FMT_P010:
+            case FMT_P016:
+            case FMT_YUV420P9:
+            case FMT_YUV420P10:
+            case FMT_YUV420P12:
+            case FMT_YUV420P14:
+            case FMT_YUV420P16:  return 24;
+            case FMT_YUV444P9:
+            case FMT_YUV444P10:
+            case FMT_YUV444P12:
+            case FMT_YUV444P14:
+            case FMT_YUV444P16:  return 48;
+            case FMT_NONE:
+            case FMT_VDPAU:
+            case FMT_VAAPI:
+            case FMT_DXVA2:
+            case FMT_MMAL:
+            case FMT_MEDIACODEC:
+            case FMT_NVDEC:
+            case FMT_DRMPRIME:
+            case FMT_VTB: break;
+        }
+        return 8;
+    }
+};
+
 static inline bool format_is_hw(VideoFrameType Type)
 {
     return (Type == FMT_VDPAU) || (Type == FMT_VAAPI) ||
@@ -182,7 +240,6 @@ MythDeintType MTV_PUBLIC GetSingleRateOption(const VideoFrame* Frame, MythDeintT
 MythDeintType MTV_PUBLIC GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
 MythDeintType MTV_PUBLIC GetDeinterlacer(MythDeintType Option);
 
-static inline int  bitsperpixel(VideoFrameType type);
 static inline int  pitch_for_plane(VideoFrameType Type, int Width, uint Plane);
 static inline int  height_for_plane(VideoFrameType Type, int Height, uint Plane);
 
@@ -198,7 +255,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
                         float _aspect = -1.0F, double _rate = -1.0F,
                         int _aligned = MYTH_WIDTH_ALIGNMENT)
 {
-    vf->bpp    = bitsperpixel(_codec);
+    vf->bpp    = MythVideoFrame::BitsPerPixel(_codec);
     vf->codec  = _codec;
     vf->buf    = _buf;
     vf->width  = _width;
@@ -359,7 +416,7 @@ static inline int pitch_for_plane(VideoFrameType Type, int Width, uint Plane)
         case FMT_RGBA32:
         case FMT_BGRA:
         case FMT_RGB32:
-            if (Plane == 0) return (bitsperpixel(Type) * Width) >> 3;
+            if (Plane == 0) return (MythVideoFrame::BitsPerPixel(Type) * Width) >> 3;
             break;
         default: break; // None and hardware formats
     }
@@ -572,63 +629,5 @@ static inline uint planes(VideoFrameType Type)
     }
     return 0;
 }
-
-static inline int bitsperpixel(VideoFrameType Type)
-{
-    switch (Type)
-    {
-        case FMT_BGRA:
-        case FMT_RGBA32:
-        case FMT_ARGB32:
-        case FMT_RGB32:
-        case FMT_YUV422P9:
-        case FMT_YUV422P10:
-        case FMT_YUV422P12:
-        case FMT_YUV422P14:
-        case FMT_YUV422P16: return 32;
-        case FMT_RGB24:     return 24;
-        case FMT_YUV422P:
-        case FMT_YUY2:      return 16;
-        case FMT_YV12:
-        case FMT_NV12:      return 12;
-        case FMT_YUV444P:
-        case FMT_P010:
-        case FMT_P016:
-        case FMT_YUV420P9:
-        case FMT_YUV420P10:
-        case FMT_YUV420P12:
-        case FMT_YUV420P14:
-        case FMT_YUV420P16:  return 24;
-        case FMT_YUV444P9:
-        case FMT_YUV444P10:
-        case FMT_YUV444P12:
-        case FMT_YUV444P14:
-        case FMT_YUV444P16:  return 48;
-        case FMT_NONE:
-        case FMT_VDPAU:
-        case FMT_VAAPI:
-        case FMT_DXVA2:
-        case FMT_MMAL:
-        case FMT_MEDIACODEC:
-        case FMT_NVDEC:
-        case FMT_DRMPRIME:
-        case FMT_VTB: break;
-    }
-    return 8;
-}
-
-class MTV_PUBLIC MythVideoFrame
-{
-  public:
-    static bool     CopyFrame(VideoFrame* To, VideoFrame* From);
-    static void     CopyPlane(uint8_t* To, int ToPitch,
-                              const uint8_t* From, int FromPitch,
-                              int PlaneWidth, int PlaneHeight);
-    static QString  FormatDescription(VideoFrameType Type);
-    static uint8_t* GetAlignedBuffer(size_t Size);
-    static uint8_t* GetAlignedBufferZero(size_t Size);
-    static uint8_t* CreateBuffer(VideoFrameType Type, int Width, int Height);
-    static size_t   GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
-};
 
 #endif

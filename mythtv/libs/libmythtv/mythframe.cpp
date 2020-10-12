@@ -243,7 +243,7 @@ QString MythVideoFrame::FormatDescription(VideoFrameType Type)
 size_t MythVideoFrame::GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned)
 {
     // bits per pixel div common factor
-    int bpp = bitsperpixel(Type) / 4;
+    int bpp = BitsPerPixel(Type) / 4;
     // bits per byte div common factor
     int bpb =  8 / 4;
 
