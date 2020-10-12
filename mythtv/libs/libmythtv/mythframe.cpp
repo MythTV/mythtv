@@ -153,8 +153,8 @@ bool MythVideoFrame::CopyFrame(VideoFrame *To, VideoFrame *From)
     {
         CopyPlane(To->buf + To->offsets[plane], To->pitches[plane],
                   From->buf + From->offsets[plane], From->pitches[plane],
-                  pitch_for_plane(From->codec, From->width, plane),
-                  height_for_plane(From->codec, From->height, plane));
+                  GetPitchForPlane(From->codec, From->width, plane),
+                  GetHeightForPlane(From->codec, From->height, plane));
     }
 
     // Copy metadata

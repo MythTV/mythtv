@@ -260,8 +260,8 @@ void MythDeinterlacer::Filter(VideoFrame *Frame, FrameScanType Scan,
     {
         MythVideoFrame::CopyPlane(Frame->buf + Frame->offsets[plane], Frame->pitches[plane],
                                   m_frame->data[plane], m_frame->linesize[plane],
-                                  pitch_for_plane(m_inputType, m_frame->width, plane),
-                                  height_for_plane(m_inputType, m_frame->height, plane));
+                                  MythVideoFrame::GetPitchForPlane(m_inputType, m_frame->width, plane),
+                                  MythVideoFrame::GetHeightForPlane(m_inputType, m_frame->height, plane));
     }
 
     Frame->timecode = m_frame->pts;
@@ -662,7 +662,7 @@ void MythDeinterlacer::Blend(VideoFrame *Frame, FrameScanType Scan)
     uint count = MythVideoFrame::GetNumPlanes(src->codec);
     for (uint plane = 0; plane < count; plane++)
     {
-        int  height  = height_for_plane(src->codec, src->height, plane);
+        int  height  = MythVideoFrame::GetHeightForPlane(src->codec, src->height, plane);
         int firstrow = top ? 1 : 2;
         bool height4 = (height % 4) == 0;
         bool width4  = (src->pitches[plane] % 4) == 0;
@@ -676,7 +676,7 @@ void MythDeinterlacer::Blend(VideoFrame *Frame, FrameScanType Scan)
             if (hidepth)
             {
                 BlendSIMD8x4(src->buf + src->offsets[plane],
-                             pitch_for_plane(src->codec, src->width, plane),
+                             MythVideoFrame::GetPitchForPlane(src->codec, src->width, plane),
                              firstrow, height, src->pitches[plane],
                              Frame->buf + Frame->offsets[plane], Frame->pitches[plane],
                              second);
@@ -684,7 +684,7 @@ void MythDeinterlacer::Blend(VideoFrame *Frame, FrameScanType Scan)
             else
             {
                 BlendSIMD16x4(src->buf + src->offsets[plane],
-                              width_for_plane(src->codec, src->width, plane),
+                              MythVideoFrame::GetWidthForPlan(src->codec, src->width, plane),
                               firstrow, height, src->pitches[plane],
                               Frame->buf + Frame->offsets[plane], Frame->pitches[plane],
                               second);
@@ -698,7 +698,7 @@ void MythDeinterlacer::Blend(VideoFrame *Frame, FrameScanType Scan)
         if (width4 && height4 && !hidepth)
         {
             BlendC4x4(src->buf + src->offsets[plane],
-                      width_for_plane(src->codec, src->width, plane),
+                      MythVideoFrame::GetWidthForPlan(src->codec, src->width, plane),
                       firstrow, height, src->pitches[plane],
                       Frame->buf + Frame->offsets[plane], Frame->pitches[plane],
                       second);

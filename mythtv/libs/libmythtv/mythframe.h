@@ -162,6 +162,148 @@ class MTV_PUBLIC MythVideoFrame
         }
         return 0;
     }
+
+    static inline int GetHeightForPlane(VideoFrameType Type, int Height, uint Plane)
+    {
+        switch (Type)
+        {
+            case FMT_YV12:
+            case FMT_YUV420P9:
+            case FMT_YUV420P10:
+            case FMT_YUV420P12:
+            case FMT_YUV420P14:
+            case FMT_YUV420P16:
+                if (Plane == 0) return Height;
+                if (Plane < 3)  return Height >> 1;
+                break;
+            case FMT_YUV422P:
+            case FMT_YUV422P9:
+            case FMT_YUV422P10:
+            case FMT_YUV422P12:
+            case FMT_YUV422P14:
+            case FMT_YUV422P16:
+            case FMT_YUV444P:
+            case FMT_YUV444P9:
+            case FMT_YUV444P10:
+            case FMT_YUV444P12:
+            case FMT_YUV444P14:
+            case FMT_YUV444P16:
+                if (Plane < 3)  return Height;
+                break;
+            case FMT_NV12:
+            case FMT_P010:
+            case FMT_P016:
+                if (Plane == 0) return Height;
+                if (Plane < 2) return Height >> 1;
+                break;
+            case FMT_YUY2:
+            case FMT_RGB24:
+            case FMT_ARGB32:
+            case FMT_RGBA32:
+            case FMT_BGRA:
+            case FMT_RGB32:
+                if (Plane == 0) return Height;
+                break;
+            default: break; // None and hardware formats
+        }
+        return 0;
+    }
+
+    static inline int GetPitchForPlane(VideoFrameType Type, int Width, uint Plane)
+    {
+        switch (Type)
+        {
+            case FMT_YV12:
+            case FMT_YUV422P:
+                if (Plane == 0) return Width;
+                if (Plane < 3)  return (Width + 1) >> 1;
+                break;
+            case FMT_YUV420P9:
+            case FMT_YUV420P10:
+            case FMT_YUV420P12:
+            case FMT_YUV420P14:
+            case FMT_YUV420P16:
+            case FMT_YUV422P9:
+            case FMT_YUV422P10:
+            case FMT_YUV422P12:
+            case FMT_YUV422P14:
+            case FMT_YUV422P16:
+                if (Plane == 0) return Width << 1;
+                if (Plane < 3)  return Width;
+                break;
+            case FMT_YUV444P:
+            case FMT_YUV444P9:
+            case FMT_YUV444P10:
+            case FMT_YUV444P12:
+            case FMT_YUV444P14:
+            case FMT_YUV444P16:
+                if (Plane < 3)  return Width;
+                break;
+            case FMT_NV12:
+                if (Plane < 2) return Width;
+                break;
+            case FMT_P010:
+            case FMT_P016:
+                if (Plane < 2) return Width << 1;
+                break;
+            case FMT_YUY2:
+            case FMT_RGB24:
+            case FMT_ARGB32:
+            case FMT_RGBA32:
+            case FMT_BGRA:
+            case FMT_RGB32:
+                if (Plane == 0) return (MythVideoFrame::BitsPerPixel(Type) * Width) >> 3;
+                break;
+            default: break; // None and hardware formats
+        }
+        return 0;
+    }
+
+    static inline int GetWidthForPlan(VideoFrameType Type, int Width, uint Plane)
+    {
+        switch (Type)
+        {
+            case FMT_YV12:
+            case FMT_YUV420P9:
+            case FMT_YUV420P10:
+            case FMT_YUV420P12:
+            case FMT_YUV420P14:
+            case FMT_YUV420P16:
+            case FMT_YUV422P:
+            case FMT_YUV422P9:
+            case FMT_YUV422P10:
+            case FMT_YUV422P12:
+            case FMT_YUV422P14:
+            case FMT_YUV422P16:
+                if (Plane == 0) return Width;
+                if (Plane < 3)  return (Width + 1) >> 1;
+                break;
+            case FMT_YUV444P:
+            case FMT_YUV444P9:
+            case FMT_YUV444P10:
+            case FMT_YUV444P12:
+            case FMT_YUV444P14:
+            case FMT_YUV444P16:
+                if (Plane < 3)  return Width;
+                break;
+            case FMT_NV12:
+            case FMT_P010:
+            case FMT_P016:
+                if (Plane < 2) return Width;
+                break;
+            case FMT_YUY2:
+            case FMT_RGB24:
+            case FMT_ARGB32:
+            case FMT_RGBA32:
+            case FMT_BGRA:
+            case FMT_RGB32:
+                if (Plane == 0) return Width;
+                break;
+            default: break; // None and hardware formats
+        }
+        return 0;
+    }
+
 };
 
 static inline bool format_is_hw(VideoFrameType Type)
@@ -284,9 +426,6 @@ MythDeintType MTV_PUBLIC GetSingleRateOption(const VideoFrame* Frame, MythDeintT
 MythDeintType MTV_PUBLIC GetDoubleRateOption(const VideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
 MythDeintType MTV_PUBLIC GetDeinterlacer(MythDeintType Option);
 
-static inline int  pitch_for_plane(VideoFrameType Type, int Width, uint Plane);
-static inline int  height_for_plane(VideoFrameType Type, int Height, uint Plane);
-
 using mavtriplet = std::array<int,3>;
 using mavtripletptr = mavtriplet::const_pointer;
 
@@ -351,7 +490,7 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
     else
     {
         for (uint i = 0; i < 3; ++i)
-            vf->pitches[i] = pitch_for_plane(_codec, width_aligned, i);
+            vf->pitches[i] = MythVideoFrame::GetPitchForPlane(_codec, width_aligned, i);
     }
 
     if (arrays_valid)
@@ -417,153 +556,13 @@ static inline void init(VideoFrame *vf, VideoFrameType _codec,
          _aspect, _rate, _aligned);
 }
 
-static inline int pitch_for_plane(VideoFrameType Type, int Width, uint Plane)
-{
-    switch (Type)
-    {
-        case FMT_YV12:
-        case FMT_YUV422P:
-            if (Plane == 0) return Width;
-            if (Plane < 3)  return (Width + 1) >> 1;
-            break;
-        case FMT_YUV420P9:
-        case FMT_YUV420P10:
-        case FMT_YUV420P12:
-        case FMT_YUV420P14:
-        case FMT_YUV420P16:
-        case FMT_YUV422P9:
-        case FMT_YUV422P10:
-        case FMT_YUV422P12:
-        case FMT_YUV422P14:
-        case FMT_YUV422P16:
-            if (Plane == 0) return Width << 1;
-            if (Plane < 3)  return Width;
-            break;
-        case FMT_YUV444P:
-        case FMT_YUV444P9:
-        case FMT_YUV444P10:
-        case FMT_YUV444P12:
-        case FMT_YUV444P14:
-        case FMT_YUV444P16:
-            if (Plane < 3)  return Width;
-            break;
-        case FMT_NV12:
-            if (Plane < 2) return Width;
-            break;
-        case FMT_P010:
-        case FMT_P016:
-            if (Plane < 2) return Width << 1;
-            break;
-        case FMT_YUY2:
-        case FMT_RGB24:
-        case FMT_ARGB32:
-        case FMT_RGBA32:
-        case FMT_BGRA:
-        case FMT_RGB32:
-            if (Plane == 0) return (MythVideoFrame::BitsPerPixel(Type) * Width) >> 3;
-            break;
-        default: break; // None and hardware formats
-    }
-    return 0;
-}
-
-static inline int width_for_plane(VideoFrameType Type, int Width, uint Plane)
-{
-    switch (Type)
-    {
-        case FMT_YV12:
-        case FMT_YUV420P9:
-        case FMT_YUV420P10:
-        case FMT_YUV420P12:
-        case FMT_YUV420P14:
-        case FMT_YUV420P16:
-        case FMT_YUV422P:
-        case FMT_YUV422P9:
-        case FMT_YUV422P10:
-        case FMT_YUV422P12:
-        case FMT_YUV422P14:
-        case FMT_YUV422P16:
-            if (Plane == 0) return Width;
-            if (Plane < 3)  return (Width + 1) >> 1;
-            break;
-        case FMT_YUV444P:
-        case FMT_YUV444P9:
-        case FMT_YUV444P10:
-        case FMT_YUV444P12:
-        case FMT_YUV444P14:
-        case FMT_YUV444P16:
-            if (Plane < 3)  return Width;
-            break;
-        case FMT_NV12:
-        case FMT_P010:
-        case FMT_P016:
-            if (Plane < 2) return Width;
-            break;
-        case FMT_YUY2:
-        case FMT_RGB24:
-        case FMT_ARGB32:
-        case FMT_RGBA32:
-        case FMT_BGRA:
-        case FMT_RGB32:
-            if (Plane == 0) return Width;
-            break;
-        default: break; // None and hardware formats
-    }
-    return 0;
-}
-
-static inline int height_for_plane(VideoFrameType Type, int Height, uint Plane)
-{
-    switch (Type)
-    {
-        case FMT_YV12:
-        case FMT_YUV420P9:
-        case FMT_YUV420P10:
-        case FMT_YUV420P12:
-        case FMT_YUV420P14:
-        case FMT_YUV420P16:
-            if (Plane == 0) return Height;
-            if (Plane < 3)  return Height >> 1;
-            break;
-        case FMT_YUV422P:
-        case FMT_YUV422P9:
-        case FMT_YUV422P10:
-        case FMT_YUV422P12:
-        case FMT_YUV422P14:
-        case FMT_YUV422P16:
-        case FMT_YUV444P:
-        case FMT_YUV444P9:
-        case FMT_YUV444P10:
-        case FMT_YUV444P12:
-        case FMT_YUV444P14:
-        case FMT_YUV444P16:
-            if (Plane < 3)  return Height;
-            break;
-        case FMT_NV12:
-        case FMT_P010:
-        case FMT_P016:
-            if (Plane == 0) return Height;
-            if (Plane < 2) return Height >> 1;
-            break;
-        case FMT_YUY2:
-        case FMT_RGB24:
-        case FMT_ARGB32:
-        case FMT_RGBA32:
-        case FMT_BGRA:
-        case FMT_RGB32:
-            if (Plane == 0) return Height;
-            break;
-        default: break; // None and hardware formats
-    }
-    return 0;
-}
 static inline void clear_vf(VideoFrame *vf)
 {
     if (!vf || !vf->buf)
         return;
 
     // luma (or RGBA)
-    int uv_height = height_for_plane(vf->codec, vf->height, 1);
+    int uv_height = MythVideoFrame::GetHeightForPlane(vf->codec, vf->height, 1);
     int uv = (1 << (ColorDepth(vf->codec) - 1)) - 1;
     if (FMT_YV12 == vf->codec || FMT_YUV422P == vf->codec || FMT_YUV444P == vf->codec)
     {
