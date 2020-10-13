@@ -1,13 +1,5 @@
-//
-//  mythavutil.h
-//  MythTV
-//
-//  Created by Jean-Yves Avenard on 7/06/2014.
-//  Copyright (c) 2014 Bubblestuff Pty Ltd. All rights reserved.
-//
-
-#ifndef MythTV_mythavutil_h
-#define MythTV_mythavutil_h
+#ifndef MYTHAVUTIL_H
+#define MYTHAVUTIL_H
 
 // Qt
 #include <QMap>
@@ -75,35 +67,26 @@ class MTV_PUBLIC MythAVUtil
     static VideoFrameType PixelFormatToFrameType(AVPixelFormat Fmt);
 };
 
-/**
- * MythPictureDeinterlacer
- * simple deinterlacer based on FFmpeg's yadif filter.
- * Yadif requires 3 frames before starting to return a deinterlaced frame.
- */
 class MTV_PUBLIC MythPictureDeinterlacer
 {
-public:
-    MythPictureDeinterlacer(AVPixelFormat pixfmt, int width, int height, float ar = 1.0F);
-    ~MythPictureDeinterlacer();
-    // Will deinterlace src into dst. If EAGAIN is returned, more frames
-    // are needed to output a frame.
-    // To drain the deinterlacer, call Deinterlace with src = nullptr until you
-    // get no more frames. Once drained, you must call Flush() to start
-    // deinterlacing again.
-    int Deinterlace(AVFrame *dst, const AVFrame *src);
-    int DeinterlaceSingle(AVFrame *dst, const AVFrame *src);
-    // Flush and reset the deinterlacer.
+  public:
+    MythPictureDeinterlacer(AVPixelFormat Fmt, int Width, int Height, float Aspect = 1.0F);
+   ~MythPictureDeinterlacer();
+
+    int Deinterlace(AVFrame* To, const AVFrame* From);
+    int DeinterlaceSingle(AVFrame* To, const AVFrame* From);
     int Flush();
-private:
-    AVFilterGraph*      m_filterGraph   {nullptr};
-    MythAVFrame         m_filterFrame;
-    AVFilterContext*    m_bufferSinkCtx {nullptr};
-    AVFilterContext*    m_bufferSrcCtx  {nullptr};
-    AVPixelFormat       m_pixfmt        {AV_PIX_FMT_NONE};
-    int                 m_width         {0};
-    int                 m_height        {0};
-    float               m_ar;
-    bool                m_errored       {false};
+
+  private:
+    AVFilterGraph*   m_filterGraph   { nullptr };
+    MythAVFrame      m_filterFrame;
+    AVFilterContext* m_bufferSinkCtx { nullptr };
+    AVFilterContext* m_bufferSrcCtx  { nullptr };
+    AVPixelFormat    m_pixfmt        { AV_PIX_FMT_NONE };
+    int              m_width         { 0 };
+    int              m_height        { 0} ;
+    float            m_aspect        { -1.0F };
+    bool             m_errored       { false };
 };
 
 
