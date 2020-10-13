@@ -131,7 +131,7 @@ char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, 
         MythDeinterlacer deinterlacer;
         deinterlacer.Filter(frame, kScan_Interlaced, nullptr, true);
     }
-    unsigned char *result = MythVideoFrame::CreateBuffer(FMT_RGB32, m_videoDim.width(), m_videoDim.height());
+    uint8_t* result = MythVideoFrame::CreateBuffer(FMT_RGB32, m_videoDim.width(), m_videoDim.height());
     MythAVCopy copyCtx;
     AVFrame retbuf;
     memset(&retbuf, 0, sizeof(AVFrame));

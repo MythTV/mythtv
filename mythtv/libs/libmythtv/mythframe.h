@@ -9,13 +9,9 @@
 #include <array>
 #include <vector>
 
-// FFmpeg
-extern "C" {
-#include "libavcodec/avcodec.h"
-}
-
 #define MYTH_WIDTH_ALIGNMENT 64
 #define MYTH_HEIGHT_ALIGNMENT 16
+
 enum VideoFrameType
 {
     FMT_NONE = -1,

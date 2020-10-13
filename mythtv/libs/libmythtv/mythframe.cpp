@@ -2,6 +2,12 @@
 #include "mythlogging.h"
 #include "mythframe.h"
 
+
+// FFmpeg - for av_malloc/av_free
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
+
 #define LOC QString("VideoFrame: ")
 
 MythDeintType GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Type,
@@ -122,8 +128,8 @@ MythVideoFrame::~MythVideoFrame()
 {
     if (buf && HardwareFormat(codec))
         LOG(VB_GENERAL, LOG_ERR, LOC + "Frame still contains a hardware buffer!");
-    else
-        av_free(buf);
+    else if (buf)
+        av_freep(&buf);
 }
 
 MythVideoFrame::MythVideoFrame(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
@@ -156,8 +162,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
     if (buf && (buf != Buffer))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting old frame buffer");
-        delete [] buf;
-        buf = nullptr;
+        av_freep(&buf);
     }
 
     codec  = Type;
