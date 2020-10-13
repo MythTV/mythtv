@@ -1604,7 +1604,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
     }
 
     // get the codec context for the video stream
-    AVCodecContext *codecCtx = codecmap.getCodecContext(inputFC->streams[videostream]);
+    AVCodecContext *codecCtx = codecmap.GetCodecContext(inputFC->streams[videostream]);
 
     // get decoder for video stream
     AVCodec * codec = avcodec_find_decoder(codecCtx->codec_id);
@@ -1758,7 +1758,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
     delete[] outputbuf;
 
     // close the codec
-    codecmap.freeCodecContext(inputFC->streams[videostream]);
+    codecmap.FreeCodecContext(inputFC->streams[videostream]);
 
     return 0;
 }
@@ -1948,7 +1948,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
     {
         AVStream *st = inputFC->streams[i];
         std::string buf (256,'\0');
-        AVCodecContext *avctx = codecmap.getCodecContext(st);
+        AVCodecContext *avctx = codecmap.GetCodecContext(st);
         AVCodecParameters *par = st->codecpar;
 
         if (avctx)
@@ -2180,7 +2180,7 @@ static int getFileInfo(const QString& inFile, const QString& outFile, int lenMet
                         .arg(inputFC->streams[i]->codecpar->codec_type).arg(i));
                 break;
         }
-        codecmap.freeCodecContext(st);
+        codecmap.FreeCodecContext(st);
     }
 
     // finally save the xml to the file

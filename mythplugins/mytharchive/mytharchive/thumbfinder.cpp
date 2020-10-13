@@ -581,7 +581,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     }
 
     // get the codec context for the video stream
-    m_codecCtx = m_codecMap.getCodecContext(m_inputFC->streams[m_videostream]);
+    m_codecCtx = m_codecMap.GetCodecContext(m_inputFC->streams[m_videostream]);
     m_codecCtx->debug_mv = 0;
     m_codecCtx->debug = 0;
     m_codecCtx->workaround_bugs = 1;
@@ -844,7 +844,7 @@ void ThumbFinder::closeAVCodec()
     delete[] m_outputbuf;
 
     // close the codec
-    m_codecMap.freeCodecContext(m_inputFC->streams[m_videostream]);
+    m_codecMap.FreeCodecContext(m_inputFC->streams[m_videostream]);
 
     // close the video file
     m_inputFC.Close();
