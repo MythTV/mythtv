@@ -616,7 +616,7 @@ bool MythCodecContext::RetrieveHWFrame(MythVideoFrame *Frame, AVFrame *AvFrame)
         AVPixelFormat best = m_parent->GetBestVideoFormat(pixelformats);
         if (best != AV_PIX_FMT_NONE)
         {
-            VideoFrameType type = PixelFormatToFrameType(best);
+            VideoFrameType type = MythAVUtil::PixelFormatToFrameType(best);
             bool valid = Frame->m_type == type;
             if (!valid || (Frame->m_width != AvFrame->width) || (Frame->m_height != AvFrame->height))
                 valid = VideoBuffers::ReinitBuffer(Frame, type, m_parent->GetVideoCodecID(),

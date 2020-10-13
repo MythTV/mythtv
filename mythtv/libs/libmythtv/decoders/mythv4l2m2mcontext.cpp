@@ -184,7 +184,7 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, MythVideoFrame *Fram
 
     // Ensure we can render this format
     auto *decoder = static_cast<AvFormatDecoder*>(Context->opaque);
-    VideoFrameType type = PixelFormatToFrameType(static_cast<AVPixelFormat>(AvFrame->format));
+    VideoFrameType type = MythAVUtil::PixelFormatToFrameType(static_cast<AVPixelFormat>(AvFrame->format));
     const VideoFrameTypes* supported = decoder->GetPlayer()->DirectRenderFormats();
     auto foundIt = std::find(supported->cbegin(), supported->cend(), type);
     // No fallback currently (unlikely)

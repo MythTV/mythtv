@@ -189,7 +189,7 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDe
         sizes.emplace_back(QSize(width, height));
     }
 
-    VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
+    VideoFrameType format = MythAVUtil::PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
     std::vector<MythVideoTexture*> result =
             MythVideoTexture::CreateTextures(Context, Frame->m_type, format, sizes,
                                              QOpenGLTexture::Target2D);

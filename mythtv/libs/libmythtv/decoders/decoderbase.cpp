@@ -1447,7 +1447,7 @@ AVPixelFormat DecoderBase::GetBestVideoFormat(AVPixelFormat* Formats)
         for (AVPixelFormat *format = Formats; *format != AV_PIX_FMT_NONE; format++)
         {
             for (auto fmt : *mythfmts)
-                if (FrameTypeToPixelFormat(fmt) == *format)
+                if (MythAVUtil::FrameTypeToPixelFormat(fmt) == *format)
                     return *format;
         }
     }

@@ -1065,12 +1065,12 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         if (m_fifow)
         {
-            AVPictureFill(&imageIn, lastDecode);
-            AVPictureFill(&imageOut, &frame);
+            MythAVUtil::FillAVFrame(&imageIn, lastDecode);
+            MythAVUtil::FillAVFrame(&imageOut, &frame);
 
             scontext = sws_getCachedContext(scontext,
-                           lastDecode->m_width, lastDecode->m_height, FrameTypeToPixelFormat(lastDecode->m_type),
-                           frame.m_width, frame.m_height, FrameTypeToPixelFormat(frame.m_type),
+                           lastDecode->m_width, lastDecode->m_height, MythAVUtil::FrameTypeToPixelFormat(lastDecode->m_type),
+                           frame.m_width, frame.m_height, MythAVUtil::FrameTypeToPixelFormat(frame.m_type),
                            SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
             // Typically, wee aren't rescaling per say, we're just correcting the stride set by the decoder.
             // However, it allows to properly handle recordings that see their resolution change half-way.
@@ -1268,13 +1268,13 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 if (rescale)
                 {
-                    AVPictureFill(&imageIn, lastDecode);
-                    AVPictureFill(&imageOut, &frame);
+                    MythAVUtil::FillAVFrame(&imageIn, lastDecode);
+                    MythAVUtil::FillAVFrame(&imageOut, &frame);
 
                     int bottomBand = (lastDecode->m_height == 1088) ? 8 : 0;
                     scontext = sws_getCachedContext(scontext,
-                                   lastDecode->m_width, lastDecode->m_height, FrameTypeToPixelFormat(lastDecode->m_type),
-                                   frame.m_width, frame.m_height, FrameTypeToPixelFormat(frame.m_type),
+                                   lastDecode->m_width, lastDecode->m_height, MythAVUtil::FrameTypeToPixelFormat(lastDecode->m_type),
+                                   frame.m_width, frame.m_height, MythAVUtil::FrameTypeToPixelFormat(frame.m_type),
                                    SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
 
                     sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
@@ -1326,13 +1326,13 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             if (rescale)
             {
-                AVPictureFill(&imageIn, lastDecode);
-                AVPictureFill(&imageOut, &frame);
+                MythAVUtil::FillAVFrame(&imageIn, lastDecode);
+                MythAVUtil::FillAVFrame(&imageOut, &frame);
 
                 int bottomBand = (lastDecode->m_height == 1088) ? 8 : 0;
                 scontext = sws_getCachedContext(scontext,
-                               lastDecode->m_width, lastDecode->m_height, FrameTypeToPixelFormat(lastDecode->m_type),
-                               frame.m_width, frame.m_height, FrameTypeToPixelFormat(frame.m_type),
+                               lastDecode->m_width, lastDecode->m_height, MythAVUtil::FrameTypeToPixelFormat(lastDecode->m_type),
+                               frame.m_width, frame.m_height, MythAVUtil::FrameTypeToPixelFormat(frame.m_type),
                                SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
 
                 sws_scale(scontext, imageIn.data, imageIn.linesize, 0,

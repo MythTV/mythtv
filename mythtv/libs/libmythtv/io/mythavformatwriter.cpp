@@ -202,7 +202,7 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     long long framesEncoded = m_framesWritten + m_bufferedVideoFrameTimes.size();
 
     av_frame_unref(m_picture);
-    AVPictureFill(m_picture, Frame);
+    MythAVUtil::FillAVFrame(m_picture, Frame);
     m_picture->pts = framesEncoded + 1;
     m_picture->pict_type = ((framesEncoded % m_keyFrameDist) == 0) ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_NONE;
 

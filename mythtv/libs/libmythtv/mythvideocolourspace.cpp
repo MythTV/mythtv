@@ -356,7 +356,7 @@ bool MythVideoColourSpace::UpdateColourSpace(const MythVideoFrame *Frame)
     int raw      = csp;
     int rawchroma = chroma;
     VideoFrameType frametype = Frame->m_type;
-    VideoFrameType softwaretype = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
+    VideoFrameType softwaretype = MythAVUtil::PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
 
     // workaround for NVDEC. NVDEC defaults to a colorspace of 0 - which happens
     // to equate to RGB. In testing, NVDEC reports the same colourspace as FFmpeg

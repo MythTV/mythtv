@@ -208,7 +208,7 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
         return;
 
     // Convert VideoFrame to AVFrame - no copy
-    if (AVPictureFill(m_frame, Frame, m_inputFmt) < 1)
+    if (MythAVUtil::FillAVFrame(m_frame, Frame, m_inputFmt) < 1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error converting frame");
         return;
@@ -309,7 +309,7 @@ bool MythDeinterlacer::Initialise(MythVideoFrame *Frame, MythDeintType Deinterla
     m_width     = Frame->m_width;
     m_height    = Frame->m_height;
     m_inputType = Frame->m_type;
-    m_inputFmt  = FrameTypeToPixelFormat(Frame->m_type);
+    m_inputFmt  = MythAVUtil::FrameTypeToPixelFormat(Frame->m_type);
     QString name = MythVideoFrame::DeinterlacerName(Deinterlacer | DEINT_CPU, DoubleRate);
 
     // simple onefield/bob?
@@ -331,7 +331,7 @@ bool MythDeinterlacer::Initialise(MythVideoFrame *Frame, MythDeintType Deinterla
     }
 
     // Sanity check the frame formats
-    if (PixelFormatToFrameType(m_inputFmt) != m_inputType)
+    if (MythAVUtil::PixelFormatToFrameType(m_inputFmt) != m_inputType)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Inconsistent frame formats");
         return false;
@@ -426,8 +426,8 @@ void MythDeinterlacer::OneField(MythVideoFrame *Frame, FrameScanType Scan)
 
     // Convert VideoFrame to AVFrame - no copy
     AVFrame dstframe;
-    if ((AVPictureFill(m_frame, m_bobFrame, m_inputFmt) < 1) ||
-        (AVPictureFill(&dstframe, Frame, m_inputFmt) < 1))
+    if ((MythAVUtil::FillAVFrame(m_frame, m_bobFrame, m_inputFmt) < 1) ||
+        (MythAVUtil::FillAVFrame(&dstframe, Frame, m_inputFmt) < 1))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error converting frame");
         return;

@@ -241,7 +241,7 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
     // NB P010 support is untested
     // NB P010 support was added to FFmpeg in https://github.com/FFmpeg/FFmpeg/commit/036b4b0f85933f49a709
     // which has not yet been merged into the MythTV FFmpeg version (as of 22/6/19)
-    VideoFrameType frameformat = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
+    VideoFrameType frameformat = MythAVUtil::PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
     if ((frameformat != FMT_NV12) && (frameformat != FMT_P010))
     {
         IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, nullptr);

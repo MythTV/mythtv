@@ -119,19 +119,14 @@ class MTV_PUBLIC MythAVCopy
     int           m_size    { 0 };
 };
 
-/**
- * AVPictureFill
- * Initialise AVFrame pic with content from VideoFrame frame
- */
-int MTV_PUBLIC AVPictureFill(AVFrame *pic, const MythVideoFrame *frame,
-                             AVPixelFormat fmt = AV_PIX_FMT_NONE);
-
-/**
- * Convert VideoFrameType into FFmpeg's PixelFormat equivalent and
- * vice-versa.
- */
-MTV_PUBLIC AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type);
-MTV_PUBLIC VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt);
+class MTV_PUBLIC MythAVUtil
+{
+  public:
+    static int FillAVFrame(AVFrame* Frame, const MythVideoFrame* From,
+                           AVPixelFormat Fmt = AV_PIX_FMT_NONE);
+    static AVPixelFormat  FrameTypeToPixelFormat(VideoFrameType Type);
+    static VideoFrameType PixelFormatToFrameType(AVPixelFormat Fmt);
+};
 
 /**
  * MythPictureDeinterlacer

@@ -22,9 +22,9 @@ extern "C" {
 #include <QMutexLocker>
 #include <QFile>
 
-AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
+AVPixelFormat MythAVUtil::FrameTypeToPixelFormat(VideoFrameType Type)
 {
-    switch (type)
+    switch (Type)
     {
         case FMT_YV12:       return AV_PIX_FMT_YUV420P;
         case FMT_YUV420P9:   return AV_PIX_FMT_YUV420P9;
@@ -66,9 +66,9 @@ AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type)
     return AV_PIX_FMT_NONE;
 }
 
-VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
+VideoFrameType MythAVUtil::PixelFormatToFrameType(AVPixelFormat Fmt)
 {
-    switch (fmt)
+    switch (Fmt)
     {
         case AV_PIX_FMT_YUVJ420P:
         case AV_PIX_FMT_YUV420P:   return FMT_YV12;
@@ -112,19 +112,20 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
     return FMT_NONE;
 }
 
-int AVPictureFill(AVFrame *pic, const MythVideoFrame *frame, AVPixelFormat fmt)
+/// \brief Initialise AVFrame with content from MythVideoFrame
+int MythAVUtil::FillAVFrame(AVFrame *Frame, const MythVideoFrame *From, AVPixelFormat Fmt)
 {
-    if (fmt == AV_PIX_FMT_NONE)
-        fmt = FrameTypeToPixelFormat(frame->m_type);
+    if (Fmt == AV_PIX_FMT_NONE)
+        Fmt = FrameTypeToPixelFormat(From->m_type);
 
-    av_image_fill_arrays(pic->data, pic->linesize, frame->m_buffer,
-        fmt, frame->m_width, frame->m_height, IMAGE_ALIGN);
-    pic->data[1] = frame->m_buffer + frame->m_offsets[1];
-    pic->data[2] = frame->m_buffer + frame->m_offsets[2];
-    pic->linesize[0] = frame->m_pitches[0];
-    pic->linesize[1] = frame->m_pitches[1];
-    pic->linesize[2] = frame->m_pitches[2];
-    return static_cast<int>(MythVideoFrame::GetBufferSize(frame->m_type, frame->m_width, frame->m_height));
+    av_image_fill_arrays(Frame->data, Frame->linesize, From->m_buffer,
+        Fmt, From->m_width, From->m_height, IMAGE_ALIGN);
+    Frame->data[1] = From->m_buffer + From->m_offsets[1];
+    Frame->data[2] = From->m_buffer + From->m_offsets[2];
+    Frame->linesize[0] = From->m_pitches[0];
+    Frame->linesize[1] = From->m_pitches[1];
+    Frame->linesize[2] = From->m_pitches[2];
+    return static_cast<int>(MythVideoFrame::GetBufferSize(From->m_type, From->m_width, From->m_height));
 }
 
 /*! \class MythAVCopy
@@ -182,8 +183,8 @@ int MythAVCopy::Copy(AVFrame* To, const MythVideoFrame* From,
     if (!Buffer)
         return 0;
     AVFrame frame;
-    AVPixelFormat fromfmt = FrameTypeToPixelFormat(From->m_type);
-    AVPictureFill(&frame, From, fromfmt);
+    AVPixelFormat fromfmt = MythAVUtil::FrameTypeToPixelFormat(From->m_type);
+    MythAVUtil::FillAVFrame(&frame, From, fromfmt);
     av_image_fill_arrays(To->data, To->linesize, Buffer, Fmt, From->m_width, From->m_height, IMAGE_ALIGN);
     return Copy(To, Fmt, &frame, fromfmt, From->m_width, From->m_height);
 }

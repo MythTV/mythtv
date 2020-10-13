@@ -2740,7 +2740,7 @@ void AvFormatDecoder::RemoveAudioStreams()
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     auto *decoder = static_cast<AvFormatDecoder*>(c->opaque);
-    VideoFrameType type = PixelFormatToFrameType(c->pix_fmt);
+    VideoFrameType type = MythAVUtil::PixelFormatToFrameType(c->pix_fmt);
     const VideoFrameTypes* supported = decoder->GetPlayer()->DirectRenderFormats();
     auto foundIt = std::find(supported->cbegin(), supported->cend(), type);
     if (foundIt == supported->end())

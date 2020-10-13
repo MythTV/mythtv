@@ -157,7 +157,7 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
     QString pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
 
     // VDPAU only supports 8bit 420p:(
-    VideoFrameType type = PixelFormatToFrameType((*Context)->pix_fmt);
+    VideoFrameType type = MythAVUtil::PixelFormatToFrameType((*Context)->pix_fmt);
     bool vdpau = (type == FMT_YV12) && MythVDPAUHelper::HaveVDPAU() &&
                  (decodeonly ? codec_is_vdpau_dechw(success) : codec_is_vdpau_hw(success));
 

@@ -74,7 +74,7 @@ FrameScanType MythVideoScanTracker::GetScanForDisplay(MythVideoFrame *Frame, boo
     m_lastDeinterlacer2x = Frame->m_deinterlaceInuse2x;
     // We use the underlying pix_fmt as it retains the distinction between hardware
     // and software frames for decode only decoders.
-    m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_pixFmt));
+    m_lastFrameCodec = MythAVUtil::PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_pixFmt));
 
     // Decide on type and rate
     FrameScanType result = m_scan;

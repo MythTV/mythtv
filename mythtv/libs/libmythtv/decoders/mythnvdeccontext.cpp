@@ -64,7 +64,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     }
 
     cudaVideoChromaFormat cudaformat = cudaVideoChromaFormat_Monochrome;
-    VideoFrameType type = PixelFormatToFrameType((*Context)->pix_fmt);
+    VideoFrameType type = MythAVUtil::PixelFormatToFrameType((*Context)->pix_fmt);
     uint depth = static_cast<uint>(MythVideoFrame::ColorDepth(type) - 8);
     QString desc = QString("'%1 %2 %3 Depth:%4 %5x%6'")
             .arg(codecstr).arg(profile).arg(pixfmt).arg(depth + 8)

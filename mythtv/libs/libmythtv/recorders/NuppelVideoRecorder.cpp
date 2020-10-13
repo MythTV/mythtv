@@ -2722,7 +2722,7 @@ void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
     if (m_useAvCodec)
     {
         MythAVFrame mpa_picture;
-        AVPictureFill(mpa_picture, frame);
+        MythAVUtil::FillAVFrame(mpa_picture, frame);
 
         if (wantkeyframe)
             mpa_picture->pict_type = AV_PICTURE_TYPE_I;
