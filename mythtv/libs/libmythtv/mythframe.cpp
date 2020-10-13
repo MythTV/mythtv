@@ -149,8 +149,10 @@ void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height)
     uint8_t* newbuffer = nullptr;
     if (!((Type == FMT_NONE) || HardwareFormat(Type)))
     {
-        newsize   = GetBufferSize(Type, Width, Height);
-        newbuffer = GetAlignedBuffer(newsize);
+        newsize = GetBufferSize(Type, Width, Height);
+        bool reallocate = !((Width == width) && (Height == height) && (newsize == size) && (Type == codec));
+        newbuffer = reallocate ? GetAlignedBuffer(newsize) : buf;
+        newsize   = reallocate ? newsize : size;
     }
     Init(Type, newbuffer, newsize, Width, Height);
 }

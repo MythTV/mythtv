@@ -1030,36 +1030,23 @@ bool VideoBuffers::ReinitBuffer(MythVideoFrame *Frame, VideoFrameType Type, Myth
 {
     if (!Frame)
         return false;
+
     if (MythVideoFrame::HardwareFormat(Type) || MythVideoFrame::HardwareFormat(Frame->codec))
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot re-initialise a hardware buffer");
         return false;
     }
 
-    // Find the frame
     VideoFrameType old = Frame->codec;
-    size_t size = MythVideoFrame::GetBufferSize(Type, Width, Height);
-    uint8_t* oldbuffer = Frame->buf;
-    uint8_t* newbuffer = nullptr;
-    if ((Frame->size != size) || !oldbuffer)
-    {
-        // Initialise new
-        newbuffer = MythVideoFrame::GetAlignedBuffer(size);
-        if (!newbuffer)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");
-            return false;
-        }
-    }
-
-    LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocated frame %1 %2x%3->%4 %5x%6 (New buffer: %7)")
+    LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocating frame %1 %2x%3->%4 %5x%6")
         .arg(MythVideoFrame::FormatDescription(old)).arg(Frame->width).arg(Frame->height)
-        .arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height)
-        .arg(newbuffer != nullptr));
+        .arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
+
     MythDeintType singler = Frame->deinterlace_single;
     MythDeintType doubler = Frame->deinterlace_double;
-    Frame->Init(Type, newbuffer ? newbuffer : oldbuffer, size, Width, Height);
+    Frame->Init(Type, Width, Height);
     Frame->ClearBufferToBlank();
+
     // retain deinterlacer settings and update restrictions based on new frame type
     SetDeinterlacingFlags(*Frame, singler, doubler, CodecID);
     return true;
