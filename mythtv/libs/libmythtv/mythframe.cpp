@@ -267,13 +267,13 @@ void MythVideoFrame::ClearBufferToBlank()
     }
 }
 
-bool MythVideoFrame::CopyFrame(MythVideoFrame *To, MythVideoFrame *From)
+bool MythVideoFrame::CopyFrame(MythVideoFrame *From)
 {
     // Sanity checks
-    if (!(To && From) || (To == From))
+    if (!From || (this == From))
         return false;
 
-    if (To->codec != From->codec)
+    if (codec != From->codec)
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot copy frames of differing types");
         return false;
@@ -285,22 +285,22 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *To, MythVideoFrame *From)
         return false;
     }
 
-    if (!((To->width > 0) && (To->height > 0) &&
-          (To->width == From->width) && (To->height == From->height)))
+    if (!((width > 0) && (height > 0) &&
+          (width == From->width) && (height == From->height)))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid frame sizes");
         return false;
     }
 
-    if (!(To->buf && From->buf && (To->buf != From->buf)))
+    if (!(buf && From->buf && (buf != From->buf)))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid frames for copying");
         return false;
     }
 
     // N.B. Minimum based on zero width alignment but will apply height alignment
-    size_t minsize = GetBufferSize(To->codec, To->width, To->height, 0);
-    if ((To->size < minsize) || (From->size < minsize))
+    size_t minsize = GetBufferSize(codec, width, height, 0);
+    if ((size < minsize) || (From->size < minsize))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid buffer size");
         return false;
@@ -313,7 +313,7 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *To, MythVideoFrame *From)
     uint count = GetNumPlanes(From->codec);
     for (uint plane = 0; plane < count; plane++)
     {
-        CopyPlane(To->buf + To->offsets[plane], To->pitches[plane],
+        CopyPlane(buf + offsets[plane], pitches[plane],
                   From->buf + From->offsets[plane], From->pitches[plane],
                   GetPitchForPlane(From->codec, From->width, plane),
                   GetHeightForPlane(From->codec, From->height, plane));
@@ -323,37 +323,37 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *To, MythVideoFrame *From)
     // Not copied: codec, width, height - should already be the same
     // Not copied: buf, size, pitches, offsets - should/could be different
     // Not copied: priv - hardware frames only
-    To->aspect               = From->aspect;
-    To->frame_rate           = From->frame_rate;
-    To->bpp                  = From->bpp;
-    To->frameNumber          = From->frameNumber;
-    To->frameCounter         = From->frameCounter;
-    To->timecode             = From->timecode;
-    To->disp_timecode        = From->disp_timecode;
-    To->interlaced_frame     = From->interlaced_frame;
-    To->top_field_first      = From->top_field_first;
-    To->interlaced_reversed  = From->interlaced_reversed;
-    To->new_gop              = From->new_gop;
-    To->repeat_pict          = From->repeat_pict;
-    To->forcekey             = From->forcekey;
-    To->dummy                = From->dummy;
-    To->pause_frame          = From->pause_frame;
-    To->pix_fmt              = From->pix_fmt;
-    To->sw_pix_fmt           = From->sw_pix_fmt;
-    To->directrendering      = From->directrendering;
-    To->colorspace           = From->colorspace;
-    To->colorrange           = From->colorrange;
-    To->colorprimaries       = From->colorprimaries;
-    To->colortransfer        = From->colortransfer;
-    To->chromalocation       = From->chromalocation;
-    To->colorshifted         = From->colorshifted;
-    To->already_deinterlaced = From->already_deinterlaced;
-    To->rotation             = From->rotation;
-    To->deinterlace_single   = From->deinterlace_single;
-    To->deinterlace_double   = From->deinterlace_double;
-    To->deinterlace_allowed  = From->deinterlace_allowed;
-    To->deinterlace_inuse    = From->deinterlace_inuse;
-    To->deinterlace_inuse2x  = From->deinterlace_inuse2x;
+    aspect               = From->aspect;
+    frame_rate           = From->frame_rate;
+    bpp                  = From->bpp;
+    frameNumber          = From->frameNumber;
+    frameCounter         = From->frameCounter;
+    timecode             = From->timecode;
+    disp_timecode        = From->disp_timecode;
+    interlaced_frame     = From->interlaced_frame;
+    top_field_first      = From->top_field_first;
+    interlaced_reversed  = From->interlaced_reversed;
+    new_gop              = From->new_gop;
+    repeat_pict          = From->repeat_pict;
+    forcekey             = From->forcekey;
+    dummy                = From->dummy;
+    pause_frame          = From->pause_frame;
+    pix_fmt              = From->pix_fmt;
+    sw_pix_fmt           = From->sw_pix_fmt;
+    directrendering      = From->directrendering;
+    colorspace           = From->colorspace;
+    colorrange           = From->colorrange;
+    colorprimaries       = From->colorprimaries;
+    colortransfer        = From->colortransfer;
+    chromalocation       = From->chromalocation;
+    colorshifted         = From->colorshifted;
+    already_deinterlaced = From->already_deinterlaced;
+    rotation             = From->rotation;
+    deinterlace_single   = From->deinterlace_single;
+    deinterlace_double   = From->deinterlace_double;
+    deinterlace_allowed  = From->deinterlace_allowed;
+    deinterlace_inuse    = From->deinterlace_inuse;
+    deinterlace_inuse2x  = From->deinterlace_inuse2x;
 
     return true;
 }

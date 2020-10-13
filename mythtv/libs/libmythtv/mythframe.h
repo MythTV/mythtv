@@ -100,6 +100,7 @@ class MTV_PUBLIC MythVideoFrame
 
     void ClearMetadata();
     void ClearBufferToBlank();
+    bool CopyFrame(MythVideoFrame* From);
 
     VideoFrameType codec               { FMT_NONE };
     uint8_t*       buf                 { nullptr  };
@@ -144,7 +145,6 @@ class MTV_PUBLIC MythVideoFrame
     MythDeintType  deinterlace_inuse   { DEINT_NONE };
     bool           deinterlace_inuse2x { false };
 
-    static bool       CopyFrame(MythVideoFrame* To, MythVideoFrame* From);
     static void       CopyPlane(uint8_t* To, int ToPitch,
                                 const uint8_t* From, int FromPitch,
                                 int PlaneWidth, int PlaneHeight);

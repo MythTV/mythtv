@@ -9,10 +9,8 @@ void TestCopyFrames::initTestCase(void)
 void TestCopyFrames::TestInvalidFrames()
 {
     MythVideoFrame dummy;
-    QVERIFY(!MythVideoFrame::CopyFrame(nullptr, nullptr));
-    QVERIFY(!MythVideoFrame::CopyFrame(nullptr, &dummy));
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy,  nullptr));
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy,  &dummy));
+    QVERIFY(!dummy.CopyFrame(nullptr));
+    QVERIFY(!dummy.CopyFrame(&dummy));
 }
 
 void TestCopyFrames::TestInvalidFormats()
@@ -21,13 +19,13 @@ void TestCopyFrames::TestInvalidFormats()
     MythVideoFrame dummy2;
     dummy1.codec = FMT_YV12;
     dummy2.codec = FMT_NV12;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
     dummy1.codec = FMT_NONE;
     dummy2.codec = FMT_NONE;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
     dummy1.codec = FMT_VAAPI;
     dummy2.codec = FMT_VAAPI;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
 }
 
 void TestCopyFrames::TestInvalidSizes()
@@ -41,19 +39,19 @@ void TestCopyFrames::TestInvalidSizes()
     dummy1.height = 576;
     dummy2.height = 500;
     // Different heights
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Different widths
     dummy2.height = 576;
     dummy2.width  = 1024;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Invalid height
     dummy2.width = 720;
     dummy1.height = 0;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Invalid width
     dummy1.height = 576;
     dummy2.width  = 0;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
 }
 
 void TestCopyFrames::TestInvalidBuffers()
@@ -61,7 +59,7 @@ void TestCopyFrames::TestInvalidBuffers()
     // Both null buffers
     MythVideoFrame dummy1(FMT_YV12, nullptr, 0, 720, 576);
     MythVideoFrame dummy2(FMT_YV12, nullptr, 0, 720, 576);
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
 
     size_t size1 = MythVideoFrame::GetBufferSize(FMT_YV12, 720, 576);
     unsigned char dummy = '0';
@@ -70,18 +68,18 @@ void TestCopyFrames::TestInvalidBuffers()
 
     // One null buffer
     dummy1.buf = buf1;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Two buffers, both zero sized
     dummy2.buf = buf2;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Same buffer
     dummy2.buf = buf1;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Invalid size
     dummy2.buf = buf2;
     dummy1.size = 16;
     dummy2.size = size1;
-    QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    QVERIFY(!dummy1.CopyFrame(&dummy2));
     dummy1.buf = nullptr;
     dummy2.buf = nullptr;
 }
@@ -233,7 +231,7 @@ void TestCopyFrames::TestCopy()
             for (auto alignment : alignments)
             {
                 auto * to = getdefaultframe(type, width, height, alignment);
-                QVERIFY(MythVideoFrame::CopyFrame(to, frame));
+                QVERIFY(to->CopyFrame(frame));
                 QCOMPARE(sum, GetSum(to));
                 delete to;
             }
@@ -243,7 +241,7 @@ void TestCopyFrames::TestCopy()
             {
                 auto * from = getdefaultframe(type, width, height, alignment);
                 auto newsum = FillRandom(from);
-                QVERIFY(MythVideoFrame::CopyFrame(frame, from));
+                QVERIFY(frame->CopyFrame(from));
                 QCOMPARE(newsum, GetSum(frame));
                 delete from;
             }

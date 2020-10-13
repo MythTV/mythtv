@@ -191,13 +191,13 @@ void MythVideoOutputNull::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTy
         used = m_videoBuffers.Head(kVideoBuffer_used);
 
     if (used)
-        MythVideoFrame::CopyFrame(&m_avPauseFrame, used);
+        m_avPauseFrame.CopyFrame(used);
     m_videoBuffers.EndLock();
 
     if (!used)
     {
         m_videoBuffers.GetScratchFrame()->frameNumber = m_framesPlayed - 1;
-        MythVideoFrame::CopyFrame(m_videoBuffers.GetScratchFrame(), &m_avPauseFrame);
+        m_videoBuffers.GetScratchFrame()->CopyFrame(&m_avPauseFrame);
     }
 
     DisplayTimecode = m_avPauseFrame.disp_timecode;
