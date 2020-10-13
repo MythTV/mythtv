@@ -55,7 +55,7 @@ bool MythTranscodePlayer::TranscodeGetNextFrame(int &DidFF, bool &KeyFrame, bool
         m_playerCtx->m_playingInfo->UpdateInUseMark();
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    int64_t lastDecodedFrameNumber = m_videoOutput->GetLastDecodedFrame()->frameNumber;
+    int64_t lastDecodedFrameNumber = m_videoOutput->GetLastDecodedFrame()->m_frameNumber;
 
     if ((lastDecodedFrameNumber == 0) && HonorCutList)
         m_deleteMap.TrackerReset(0);

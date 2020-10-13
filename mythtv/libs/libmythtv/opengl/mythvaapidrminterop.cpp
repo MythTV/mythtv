@@ -184,12 +184,12 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     // Deinterlacing
     bool needreferenceframes = false;
-    auto discontinuity = abs(Frame->frameCounter - m_discontinuityCounter) > 1;
+    auto discontinuity = abs(Frame->m_frameCounter - m_discontinuityCounter) > 1;
 
     if (is_interlaced(Scan))
     {
         // allow GLSL deinterlacers
-        Frame->deinterlace_allowed = Frame->deinterlace_allowed | DEINT_SHADER;
+        Frame->m_deinterlaceAllowed = Frame->m_deinterlaceAllowed | DEINT_SHADER;
 
         // is GLSL preferred - and if so do we need reference frames
         bool glsldeint = false;
@@ -205,7 +205,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
         {
             glsldeint = true;
             needreferenceframes = shader == DEINT_HIGH;
-            Frame->deinterlace_double = Frame->deinterlace_double | DEINT_SHADER;
+            Frame->m_deinterlaceDouble = Frame->m_deinterlaceDouble | DEINT_SHADER;
         }
         else if (!shader && !driver) // singlerate
         {
@@ -217,7 +217,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
             {
                 glsldeint = true;
                 needreferenceframes = shader == DEINT_HIGH;
-                Frame->deinterlace_single = Frame->deinterlace_single | DEINT_SHADER;
+                Frame->m_deinterlaceSingle = Frame->m_deinterlaceSingle | DEINT_SHADER;
             }
         }
 
@@ -231,7 +231,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
         // fallback to shaders if VAAPI deints fail
         if (m_filterError)
-            Frame->deinterlace_allowed = Frame->deinterlace_allowed & ~DEINT_DRIVER;
+            Frame->m_deinterlaceAllowed = Frame->m_deinterlaceAllowed & ~DEINT_DRIVER;
     }
     else if (m_deinterlacer)
     {
@@ -242,13 +242,13 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
     {
         if (discontinuity)
             CleanupReferenceFrames();
-        RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
+        RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->m_priv[0]));
     }
     else
     {
         CleanupReferenceFrames();
     }
-    m_discontinuityCounter = Frame->frameCounter;
+    m_discontinuityCounter = Frame->m_frameCounter;
 
     // return cached texture if available
     if (m_openglTextures.contains(id))
@@ -475,7 +475,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
         if (status == VA_STATUS_SUCCESS)
         {
             MythVideoFrame frame(FMT_DRMPRIME, nullptr, 0, 1920, 1080);
-            frame.sw_pix_fmt = AV_PIX_FMT_NV12;
+            frame.m_swPixFmt = AV_PIX_FMT_NV12;
             AVDRMFrameDescriptor drmdesc;
             memset(&drmdesc, 0, sizeof(drmdesc));
             VADRMtoPRIME(&vadesc, &drmdesc);

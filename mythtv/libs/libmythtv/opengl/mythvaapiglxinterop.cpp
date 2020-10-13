@@ -45,17 +45,17 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(MythVideoFrame *Frame, FrameScanType 
                     .arg(DeinterlacerName(driverdeint | DEINT_DRIVER, doublerate, FMT_VAAPI)));
             }
 
-            bool top = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
+            bool top = Frame->m_interlacedReverse ? !Frame->m_topFieldFirst : Frame->m_topFieldFirst;
             if (Scan == kScan_Interlaced)
             {
-                Frame->deinterlace_inuse = driverdeint | DEINT_DRIVER;
-                Frame->deinterlace_inuse2x = doublerate;
+                Frame->m_deinterlaceInuse = driverdeint | DEINT_DRIVER;
+                Frame->m_deinterlaceInuse2x = doublerate;
                 flags = top ? VA_TOP_FIELD : VA_BOTTOM_FIELD;
             }
             else if (Scan == kScan_Intr2ndField)
             {
-                Frame->deinterlace_inuse = driverdeint | DEINT_DRIVER;
-                Frame->deinterlace_inuse2x = doublerate;
+                Frame->m_deinterlaceInuse = driverdeint | DEINT_DRIVER;
+                Frame->m_deinterlaceInuse2x = doublerate;
                 flags = top ? VA_BOTTOM_FIELD : VA_TOP_FIELD;
             }
             m_basicDeinterlacer = driverdeint;
@@ -70,14 +70,14 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(MythVideoFrame *Frame, FrameScanType 
     // Update colourspace
     if (!m_vaapiColourSpace)
     {
-        switch (Frame->colorspace)
+        switch (Frame->m_colorspace)
         {
             case AVCOL_SPC_BT709:     m_vaapiColourSpace = VA_SRC_BT709; break;
             case AVCOL_SPC_SMPTE170M:
             case AVCOL_SPC_BT470BG:   m_vaapiColourSpace = VA_SRC_BT601; break;
             case AVCOL_SPC_SMPTE240M: m_vaapiColourSpace = VA_SRC_SMPTE_240; break;
             default:
-            m_vaapiColourSpace = ((Frame->width < 1280) ? VA_SRC_BT601 : VA_SRC_BT709); break;
+            m_vaapiColourSpace = ((Frame->m_width < 1280) ? VA_SRC_BT601 : VA_SRC_BT709); break;
         }
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using '%1' VAAPI colourspace")
             .arg((m_vaapiColourSpace == VA_SRC_BT709) ? "bt709" : ((m_vaapiColourSpace == VA_SRC_BT601) ? "bt601" : "smpte240")));

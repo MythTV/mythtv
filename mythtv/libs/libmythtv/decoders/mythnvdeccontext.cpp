@@ -335,12 +335,12 @@ void MythNVDECContext::PostProcessFrame(AVCodecContext* /*Context*/, MythVideoFr
     // Remove interlacing flags and set deinterlacer if necessary
     if (Frame && m_deinterlacer)
     {
-        Frame->interlaced_frame = 0;
-        Frame->interlaced_reversed = false;
-        Frame->top_field_first = false;
-        Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
-        Frame->deinterlace_inuse2x = m_deinterlacer2x;
-        Frame->already_deinterlaced = true;
+        Frame->m_interlaced = 0;
+        Frame->m_interlacedReverse = false;
+        Frame->m_topFieldFirst = false;
+        Frame->m_deinterlaceInuse = m_deinterlacer | DEINT_DRIVER;
+        Frame->m_deinterlaceInuse2x = m_deinterlacer2x;
+        Frame->m_alreadyDeinterlaced = true;
     }
 }
 
@@ -412,15 +412,15 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, MythVideoFrame 
 
     for (int i = 0; i < 3; i++)
     {
-        Frame->pitches[i] = AvFrame->linesize[i];
-        Frame->offsets[i] = AvFrame->data[i] ? (static_cast<int>(AvFrame->data[i] - AvFrame->data[0])) : 0;
-        Frame->priv[i] = nullptr;
+        Frame->m_pitches[i] = AvFrame->linesize[i];
+        Frame->m_offsets[i] = AvFrame->data[i] ? (static_cast<int>(AvFrame->data[i] - AvFrame->data[0])) : 0;
+        Frame->m_priv[i] = nullptr;
     }
 
-    Frame->width = AvFrame->width;
-    Frame->height = AvFrame->height;
-    Frame->pix_fmt = Context->pix_fmt;
-    Frame->directrendering = true;
+    Frame->m_width = AvFrame->width;
+    Frame->m_height = AvFrame->height;
+    Frame->m_pixFmt = Context->pix_fmt;
+    Frame->m_directRendering = true;
 
     AvFrame->opaque = Frame;
     AvFrame->reordered_opaque = Context->reordered_opaque;
@@ -430,21 +430,21 @@ bool MythNVDECContext::GetBuffer(struct AVCodecContext *Context, MythVideoFrame 
     {
         auto *context = reinterpret_cast<AVHWFramesContext*>(AvFrame->hw_frames_ctx->data);
         if (context)
-            Frame->sw_pix_fmt = context->sw_format;
+            Frame->m_swPixFmt = context->sw_format;
     }
 
     // NVDEC 'fixes' 10/12/16bit colour values
-    Frame->colorshifted = true;
+    Frame->m_colorshifted = true;
 
     // Frame->data[0] holds CUdeviceptr for the frame data - offsets calculated above
-    Frame->buf = AvFrame->data[0];
+    Frame->m_buffer = AvFrame->data[0];
 
     // Retain the buffer so it is not released before we display it
-    Frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
+    Frame->m_priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
 
     // We need the CUDA device context in the interop class and it also holds the reference
     // to the interop class itself
-    Frame->priv[1] = reinterpret_cast<unsigned char*>(av_buffer_ref(Context->hw_device_ctx));
+    Frame->m_priv[1] = reinterpret_cast<unsigned char*>(av_buffer_ref(Context->hw_device_ctx));
 
     // Set the release method
     AvFrame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0,

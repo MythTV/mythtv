@@ -116,17 +116,17 @@ int AVPictureFill(AVFrame *pic, const MythVideoFrame *frame, AVPixelFormat fmt)
 {
     if (fmt == AV_PIX_FMT_NONE)
     {
-        fmt = FrameTypeToPixelFormat(frame->codec);
+        fmt = FrameTypeToPixelFormat(frame->m_type);
     }
 
-    av_image_fill_arrays(pic->data, pic->linesize, frame->buf,
-        fmt, frame->width, frame->height, IMAGE_ALIGN);
-    pic->data[1] = frame->buf + frame->offsets[1];
-    pic->data[2] = frame->buf + frame->offsets[2];
-    pic->linesize[0] = frame->pitches[0];
-    pic->linesize[1] = frame->pitches[1];
-    pic->linesize[2] = frame->pitches[2];
-    return static_cast<int>(MythVideoFrame::GetBufferSize(frame->codec, frame->width, frame->height));
+    av_image_fill_arrays(pic->data, pic->linesize, frame->m_buffer,
+        fmt, frame->m_width, frame->m_height, IMAGE_ALIGN);
+    pic->data[1] = frame->m_buffer + frame->m_offsets[1];
+    pic->data[2] = frame->m_buffer + frame->m_offsets[2];
+    pic->linesize[0] = frame->m_pitches[0];
+    pic->linesize[1] = frame->m_pitches[1];
+    pic->linesize[2] = frame->m_pitches[2];
+    return static_cast<int>(MythVideoFrame::GetBufferSize(frame->m_type, frame->m_width, frame->m_height));
 }
 
 class MythAVCopyPrivate
@@ -206,16 +206,16 @@ int MythAVCopy::Copy(MythVideoFrame *dst, const MythVideoFrame *src)
     AVFrame dstpic;
     AVPictureFill(&srcpic, src);
     AVPictureFill(&dstpic, dst);
-    return Copy(&dstpic, FrameTypeToPixelFormat(dst->codec),
-                &srcpic, FrameTypeToPixelFormat(src->codec),
-                src->width, src->height);
+    return Copy(&dstpic, FrameTypeToPixelFormat(dst->m_type),
+                &srcpic, FrameTypeToPixelFormat(src->m_type),
+                src->m_width, src->m_height);
 }
 
 int MythAVCopy::Copy(AVFrame *pic, const MythVideoFrame *frame,
                  unsigned char *buffer, AVPixelFormat fmt)
 {
     VideoFrameType type = PixelFormatToFrameType(fmt);
-    unsigned char *sbuf = buffer ? buffer : MythVideoFrame::CreateBuffer(type, frame->width, frame->height);
+    unsigned char *sbuf = buffer ? buffer : MythVideoFrame::CreateBuffer(type, frame->m_width, frame->m_height);
 
     if (!sbuf)
     {
@@ -223,11 +223,11 @@ int MythAVCopy::Copy(AVFrame *pic, const MythVideoFrame *frame,
     }
 
     AVFrame pic_in;
-    AVPixelFormat fmt_in = FrameTypeToPixelFormat(frame->codec);
+    AVPixelFormat fmt_in = FrameTypeToPixelFormat(frame->m_type);
 
     AVPictureFill(&pic_in, frame, fmt_in);
-    av_image_fill_arrays(pic->data, pic->linesize, sbuf, fmt, frame->width, frame->height, IMAGE_ALIGN);
-    return Copy(pic, fmt, &pic_in, fmt_in, frame->width, frame->height);
+    av_image_fill_arrays(pic->data, pic->linesize, sbuf, fmt, frame->m_width, frame->m_height, IMAGE_ALIGN);
+    return Copy(pic, fmt, &pic_in, fmt_in, frame->m_width, frame->m_height);
 }
 
 MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat pixfmt,

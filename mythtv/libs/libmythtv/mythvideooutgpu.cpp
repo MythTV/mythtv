@@ -305,7 +305,7 @@ void MythVideoOutputGPU::DoneDisplayingFrame(MythVideoFrame* Frame)
     if (!Frame)
         return;
 
-    bool retain = MythVideoFrame::HardwareFormat(Frame->codec);
+    bool retain = MythVideoFrame::HardwareFormat(Frame->m_type);
     QVector<MythVideoFrame*> release;
 
     m_videoBuffers.BeginLock(kVideoBuffer_pause);
@@ -528,8 +528,8 @@ void MythVideoOutputGPU::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 
     if (Frame)
     {
-        SetRotation(Frame->rotation);
-        if (MythVideoFrame::HardwareFormat(Frame->codec) || Frame->dummy)
+        SetRotation(Frame->m_rotation);
+        if (MythVideoFrame::HardwareFormat(Frame->m_type) || Frame->m_dummy)
             return;
 
         // software deinterlacing
@@ -547,9 +547,9 @@ void MythVideoOutputGPU::RenderFrame(MythVideoFrame *Frame, FrameScanType Scan)
     bool topfieldfirst = false;
     if (Frame)
     {
-        m_framesPlayed = Frame->frameNumber + 1;
-        topfieldfirst = Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first;
-        dummy = Frame->dummy;
+        m_framesPlayed = Frame->m_frameNumber + 1;
+        topfieldfirst = Frame->m_interlacedReverse ? !Frame->m_topFieldFirst : Frame->m_topFieldFirst;
+        dummy = Frame->m_dummy;
     }
     else
     {
@@ -596,18 +596,18 @@ void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTyp
     MythVideoFrame* used = m_videoBuffers.Head(kVideoBuffer_used);
     if (used)
     {
-        if (MythVideoFrame::HardwareFormat(used->codec))
+        if (MythVideoFrame::HardwareFormat(used->m_type))
         {
             release = m_videoBuffers.Dequeue(kVideoBuffer_used);
         }
         else
         {
-            Scan = (is_interlaced(Scan) && !used->already_deinterlaced) ? kScan_Interlaced : kScan_Progressive;
+            Scan = (is_interlaced(Scan) && !used->m_alreadyDeinterlaced) ? kScan_Interlaced : kScan_Progressive;
             m_deinterlacer.Filter(used, Scan, m_dbDisplayProfile, true);
             if (m_video)
                 m_video->PrepareFrame(used, Scan);
         }
-        DisplayTimecode = used->disp_timecode;
+        DisplayTimecode = used->m_displayTimecode;
     }
     else
     {

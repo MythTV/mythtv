@@ -96,9 +96,9 @@ int64_t MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideoFrame *Frame,
     {
         if (Frame)
         {
-            videotimecode = Frame->timecode & 0x0000ffffffffffff;
+            videotimecode = Frame->m_timecode & 0x0000ffffffffffff;
             // Detect bogus timecodes from DVD and ignore them.
-            if (videotimecode != Frame->timecode)
+            if (videotimecode != Frame->m_timecode)
                 videotimecode = m_maxTcVal;
         }
 

@@ -53,14 +53,14 @@ CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, MythVideoColo
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Mismatched OpenGL contexts");
 
     // Check size
-    QSize surfacesize(Frame->width, Frame->height);
+    QSize surfacesize(Frame->m_width, Frame->m_height);
     if (m_openglTextureSize != surfacesize)
     {
         if (!m_openglTextureSize.isEmpty())
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Video texture size changed! %1x%2->%3x%4")
                 .arg(m_openglTextureSize.width()).arg(m_openglTextureSize.height())
-                .arg(Frame->width).arg(Frame->height));
+                .arg(Frame->m_width).arg(Frame->m_height));
         }
         DeleteTextures();
         m_openglTextureSize = surfacesize;
@@ -76,7 +76,7 @@ CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, MythVideoColo
 
     // Retrieve pixel buffer
     // N.B. Buffer was retained in MythVTBContext and will be released in VideoBuffers
-    return reinterpret_cast<CVPixelBufferRef>(Frame->buf);
+    return reinterpret_cast<CVPixelBufferRef>(Frame->m_buffer);
 }
 
 vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
@@ -95,7 +95,7 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
     // Hence we cannot use reference frames without significant additional work here -
     // but MythVTBSurfaceInterop will almost certainly always be used - so just drop back
     // to Linearblend
-    Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_HIGH) | DEINT_MEDIUM;
+    Frame->m_deinterlaceAllowed = (Frame->m_deinterlaceAllowed & ~DEINT_HIGH) | DEINT_MEDIUM;
 
     int planes = CVPixelBufferGetPlaneCount(buffer);
     CVPixelBufferLockBaseAddress(buffer, kCVPixelBufferLock_ReadOnly);
@@ -208,7 +208,7 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
 
     if (needreferences)
     {
-        if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
+        if (abs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
             m_referenceFrames.clear();
         RotateReferenceFrames(surfaceid);
     }
@@ -216,7 +216,7 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
     {
         m_referenceFrames.clear();
     }
-    m_discontinuityCounter = Frame->frameCounter;
+    m_discontinuityCounter = Frame->m_frameCounter;
 
     // return cached textures if available
     if (m_openglTextures.contains(surfaceid))
@@ -241,7 +241,7 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
     // NB P010 support is untested
     // NB P010 support was added to FFmpeg in https://github.com/FFmpeg/FFmpeg/commit/036b4b0f85933f49a709
     // which has not yet been merged into the MythTV FFmpeg version (as of 22/6/19)
-    VideoFrameType frameformat = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
+    VideoFrameType frameformat = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
     if ((frameformat != FMT_NV12) && (frameformat != FMT_P010))
     {
         IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, nullptr);

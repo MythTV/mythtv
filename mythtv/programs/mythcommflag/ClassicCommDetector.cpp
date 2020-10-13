@@ -419,13 +419,13 @@ bool ClassicCommDetector::go()
             gettimeofday(&startTime, nullptr);
 
         MythVideoFrame* currentFrame = m_player->GetRawVideoFrame();
-        long long currentFrameNumber = currentFrame->frameNumber;
+        long long currentFrameNumber = currentFrame->m_frameNumber;
 
         //Lucas: maybe we should make the nuppelvideoplayer send out a signal
         //when the aspect ratio changes.
         //In order to not change too many things at a time, I"m using basic
         //polling for now.
-        float newAspect = currentFrame->aspect;
+        float newAspect = currentFrame->m_aspect;
         if (newAspect != aspect)
         {
             SetVideoParams(aspect);
@@ -763,8 +763,8 @@ void ClassicCommDetector::ProcessFrame(MythVideoFrame *frame,
     int rightDarkCol = m_width - m_commDetectBorder - 1;
     FrameInfoEntry fInfo {};
 
-    if (!frame || !(frame->buf) || frame_number == -1 ||
-        frame->codec != FMT_YV12)
+    if (!frame || !(frame->m_buffer) || frame_number == -1 ||
+        frame->m_type != FMT_YV12)
     {
         LOG(VB_COMMFLAG, LOG_ERR, "CommDetect: Invalid video frame or codec, "
                                   "unable to process frame.");
@@ -783,8 +783,8 @@ void ClassicCommDetector::ProcessFrame(MythVideoFrame *frame,
     }
 
     m_curFrameNumber = frame_number;
-    unsigned char* framePtr = frame->buf;
-    int bytesPerLine = frame->pitches[0];
+    unsigned char* framePtr = frame->m_buffer;
+    int bytesPerLine = frame->m_pitches[0];
 
     fInfo.minBrightness = -1;
     fInfo.maxBrightness = -1;

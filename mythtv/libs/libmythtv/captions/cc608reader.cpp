@@ -82,7 +82,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
         last = m_parent->GetVideoOutput()->GetLastShownFrame();
 
     if (NumInputBuffers() && m_inputBuffers[m_writePosition].timecode &&
-       (last && m_inputBuffers[m_writePosition].timecode <= last->timecode))
+       (last && m_inputBuffers[m_writePosition].timecode <= last->m_timecode))
     {
         if (m_inputBuffers[m_writePosition].type == 'T')
         {

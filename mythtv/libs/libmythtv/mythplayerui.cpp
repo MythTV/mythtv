@@ -458,9 +458,9 @@ void MythPlayerUI::DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due)
         bool secondprepare = GetDoubleRateOption(Frame, DEINT_CPU) && !GetDoubleRateOption(Frame, DEINT_SHADER);
         // and the first deinterlacing pass will have marked the frame as already deinterlaced
         // which will break GetScanForDisplay below and subsequent deinterlacing
-        bool olddeinterlaced = Frame->already_deinterlaced;
+        bool olddeinterlaced = Frame->m_alreadyDeinterlaced;
         if (secondprepare)
-            Frame->already_deinterlaced = false;
+            Frame->m_alreadyDeinterlaced = false;
         // Update scan settings now that deinterlacer has been set and we know
         // whether we need a second field
         ps = GetScanForDisplay(Frame, showsecondfield);
@@ -468,7 +468,7 @@ void MythPlayerUI::DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due)
         // Reset olddeinterlaced if necessary (pause frame etc)
         if (!showsecondfield && secondprepare)
         {
-            Frame->already_deinterlaced = olddeinterlaced;
+            Frame->m_alreadyDeinterlaced = olddeinterlaced;
         }
         else if (showsecondfield)
         {

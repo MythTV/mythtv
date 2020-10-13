@@ -323,13 +323,13 @@ void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, MythVideoFrame* Fr
     if (!Frame)
         return;
 
-    Frame->deinterlace_inuse = DEINT_BASIC | DEINT_DRIVER;
-    Frame->deinterlace_inuse2x = false;
-    Frame->interlaced_frame = 0;
-    Frame->interlaced_reversed = false;
-    Frame->top_field_first = false;
-    Frame->deinterlace_allowed = DEINT_NONE;
-    Frame->already_deinterlaced = true;
+    Frame->m_deinterlaceInuse = DEINT_BASIC | DEINT_DRIVER;
+    Frame->m_deinterlaceInuse2x = false;
+    Frame->m_interlaced = 0;
+    Frame->m_interlacedReverse = false;
+    Frame->m_topFieldFirst = false;
+    Frame->m_deinterlaceAllowed = DEINT_NONE;
+    Frame->m_alreadyDeinterlaced = true;
 }
 
 /*! /brief Say yes

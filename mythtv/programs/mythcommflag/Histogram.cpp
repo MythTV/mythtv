@@ -19,8 +19,8 @@ void Histogram::generateFromImage(MythVideoFrame* frame, unsigned int frameWidth
     if (maxScanY > frameHeight-1)
         maxScanY = frameHeight-1;
 
-    unsigned char* framePtr = frame->buf;
-    int bytesPerLine = frame->pitches[0];
+    unsigned char* framePtr = frame->m_buffer;
+    int bytesPerLine = frame->m_pitches[0];
     for(unsigned int y = minScanY; y < maxScanY; y += YSpacing)
     {
         for(unsigned int x = minScanX; x < maxScanX; x += XSpacing)

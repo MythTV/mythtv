@@ -112,14 +112,14 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Mismatched OpenGL contexts");
 
     // Check size
-    QSize surfacesize(Frame->width, Frame->height);
+    QSize surfacesize(Frame->m_width, Frame->m_height);
     if (m_openglTextureSize != surfacesize)
     {
         if (!m_openglTextureSize.isEmpty())
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Video texture size changed! %1x%2->%3x%4")
                 .arg(m_openglTextureSize.width()).arg(m_openglTextureSize.height())
-                .arg(Frame->width).arg(Frame->height));
+                .arg(Frame->m_width).arg(Frame->m_height));
         }
         DeleteTextures();
         m_openglTextureSize = surfacesize;
@@ -137,13 +137,13 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     }
 
     // Retrieve hardware frames context and AVCUDADeviceContext
-    if ((Frame->pix_fmt != AV_PIX_FMT_CUDA) || (Frame->codec != FMT_NVDEC) ||
-        !Frame->buf || !Frame->priv[0] || !Frame->priv[1])
+    if ((Frame->m_pixFmt != AV_PIX_FMT_CUDA) || (Frame->m_type != FMT_NVDEC) ||
+        !Frame->m_buffer || !Frame->m_priv[0] || !Frame->m_priv[1])
     {
         return result;
     }
 
-    auto cudabuffer = reinterpret_cast<CUdeviceptr>(Frame->buf);
+    auto cudabuffer = reinterpret_cast<CUdeviceptr>(Frame->m_buffer);
     if (!cudabuffer)
         return result;
 
@@ -152,14 +152,14 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     CUDA_CHECK(m_cudaFuncs, cuCtxPushCurrent(m_cudaContext));
 
     // create and map textures for a new buffer
-    VideoFrameType type = (Frame->sw_pix_fmt == AV_PIX_FMT_NONE) ? FMT_NV12 :
-                PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
+    VideoFrameType type = (Frame->m_swPixFmt == AV_PIX_FMT_NONE) ? FMT_NV12 :
+                PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
     bool p010 = MythVideoFrame::ColorDepth(type) > 8;
     if (!m_openglTextures.contains(cudabuffer))
     {
         vector<QSize> sizes;
-        sizes.emplace_back(QSize(Frame->width, Frame->height));
-        sizes.emplace_back(QSize(Frame->width, Frame->height >> 1));
+        sizes.emplace_back(QSize(Frame->m_width, Frame->m_height));
+        sizes.emplace_back(QSize(Frame->m_width, Frame->m_height >> 1));
         vector<MythVideoTexture*> textures =
                 MythVideoTexture::CreateTextures(m_context, FMT_NVDEC, type, sizes);
         if (textures.empty())
@@ -246,8 +246,8 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         CUDA_MEMCPY2D cpy;
         memset(&cpy, 0, sizeof(cpy));
         cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;
-        cpy.srcDevice     = cudabuffer + static_cast<CUdeviceptr>(Frame->offsets[i]);
-        cpy.srcPitch      = static_cast<size_t>(Frame->pitches[i]);
+        cpy.srcDevice     = cudabuffer + static_cast<CUdeviceptr>(Frame->m_offsets[i]);
+        cpy.srcPitch      = static_cast<size_t>(Frame->m_pitches[i]);
         cpy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
         cpy.dstArray      = data->first;
         cpy.WidthInBytes  = static_cast<size_t>(result[i]->m_size.width()) * (p010 ? 2 : 1);
@@ -261,7 +261,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     // GLSL deinterlacing. The decoder will pick up any CPU or driver preference
     // and return a stream of deinterlaced frames. Just check for GLSL here.
     bool needreferences = false;
-    if (is_interlaced(Scan) && !Frame->already_deinterlaced)
+    if (is_interlaced(Scan) && !Frame->m_alreadyDeinterlaced)
     {
         MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
         if (shader)
@@ -272,7 +272,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
 
     if (needreferences)
     {
-        if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
+        if (abs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
             m_referenceFrames.clear();
 
         RotateReferenceFrames(cudabuffer);
@@ -295,7 +295,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         return result;
     }
     m_referenceFrames.clear();
-    m_discontinuityCounter = Frame->frameCounter;
+    m_discontinuityCounter = Frame->m_frameCounter;
 
     return result;
 }

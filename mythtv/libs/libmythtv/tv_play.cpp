@@ -3919,7 +3919,7 @@ bool TV::DiscMenuHandleAction(const QStringList& Actions) const
         MythVideoFrame *frame = output->GetLastShownFrame();
         // convert timecode (msec) to pts (90kHz)
         if (frame)
-            pts = static_cast<int64_t>(frame->timecode  * 90);
+            pts = static_cast<int64_t>(frame->m_timecode  * 90);
     }
     return m_playerContext.m_buffer->HandleAction(Actions, pts);
 }

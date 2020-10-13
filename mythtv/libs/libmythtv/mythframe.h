@@ -102,48 +102,48 @@ class MTV_PUBLIC MythVideoFrame
     void ClearBufferToBlank();
     bool CopyFrame(MythVideoFrame* From);
 
-    VideoFrameType codec               { FMT_NONE };
-    uint8_t*       buf                 { nullptr  };
-    int            width               { 0 };
-    int            height              { 0 };
-    int            bpp                 { 0 };
-    size_t         size                { 0 };
+    VideoFrameType m_type              { FMT_NONE };
+    uint8_t*       m_buffer            { nullptr  };
+    int            m_width             { 0 };
+    int            m_height            { 0 };
+    int            m_bitsPerPixel      { 0 };
+    size_t         m_bufferSize        { 0 };
 
     // everthing below is considered metadata by ClearMetadata
-    float          aspect              { -1.0F };
-    double         frame_rate          { -1.0 };
-    long long      frameNumber         { 0 };
-    long long      frameCounter        { 0 }; ///< raw frame counter/ticker for discontinuity checks
-    long long      timecode            { 0 };
-    int64_t        disp_timecode       { 0 };
-    std::array<uint8_t*,4> priv        { nullptr }; ///< random empty storage
-    int            interlaced_frame    { 0    }; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
-    bool           top_field_first     { true }; ///< true if top field is first.
-    bool           interlaced_reversed { false }; /// true for user override of scan
-    bool           new_gop             { false }; /// used to unlock the scan type
-    bool           repeat_pict         { false };
-    bool           forcekey            { false }; ///< hardware encoded .nuv
-    bool           dummy               { false };
-    bool           pause_frame         { false };
-    FramePitches   pitches             { 0 }; ///< Y, U, & V pitches
-    FrameOffsets   offsets             { 0 }; ///< Y, U, & V offsets
-    int            pix_fmt             { 0 };
-    int            sw_pix_fmt          { 0 };
-    bool           directrendering     { true }; ///< true if managed by FFmpeg
-    int            colorspace          { 1 };
-    int            colorrange          { 1 };
-    int            colorprimaries      { 1 };
-    int            colortransfer       { 1 };
-    int            chromalocation      { 1 };
-    bool           colorshifted        { false }; ///< false for software decoded 10/12/16bit frames. true for hardware decoders.
-    bool           already_deinterlaced { false }; ///< temporary? TODO move scan detection/tracking into decoder
-    int            rotation            { 0 };
-    uint           stereo3D            { 0 };
-    MythDeintType  deinterlace_single  { DEINT_NONE };
-    MythDeintType  deinterlace_double  { DEINT_NONE };
-    MythDeintType  deinterlace_allowed { DEINT_NONE };
-    MythDeintType  deinterlace_inuse   { DEINT_NONE };
-    bool           deinterlace_inuse2x { false };
+    float          m_aspect            { -1.0F };
+    double         m_frameRate         { -1.0 };
+    long long      m_frameNumber       { 0 };
+    long long      m_frameCounter      { 0 }; ///< raw frame counter/ticker for discontinuity checks
+    long long      m_timecode          { 0 };
+    int64_t        m_displayTimecode   { 0 };
+    std::array<uint8_t*,4> m_priv      { nullptr }; ///< random empty storage
+    int            m_interlaced        { 0    }; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
+    bool           m_topFieldFirst     { true }; ///< true if top field is first.
+    bool           m_interlacedReverse { false }; /// true for user override of scan
+    bool           m_newGOP            { false }; /// used to unlock the scan type
+    bool           m_repeatPic         { false };
+    bool           m_forceKey          { false }; ///< hardware encoded .nuv
+    bool           m_dummy             { false };
+    bool           m_pauseFrame        { false };
+    FramePitches   m_pitches           { 0 }; ///< Y, U, & V pitches
+    FrameOffsets   m_offsets           { 0 }; ///< Y, U, & V offsets
+    int            m_pixFmt            { 0 };
+    int            m_swPixFmt          { 0 };
+    bool           m_directRendering   { true }; ///< true if managed by FFmpeg
+    int            m_colorspace        { 1 };
+    int            m_colorrange        { 1 };
+    int            m_colorprimaries    { 1 };
+    int            m_colortransfer     { 1 };
+    int            m_chromalocation    { 1 };
+    bool           m_colorshifted      { false }; ///< false for software decoded 10/12/16bit frames. true for hardware decoders.
+    bool           m_alreadyDeinterlaced { false }; ///< temporary? TODO move scan detection/tracking into decoder
+    int            m_rotation          { 0 };
+    uint           m_stereo3D          { 0 };
+    MythDeintType  m_deinterlaceSingle { DEINT_NONE };
+    MythDeintType  m_deinterlaceDouble { DEINT_NONE };
+    MythDeintType  m_deinterlaceAllowed { DEINT_NONE };
+    MythDeintType  m_deinterlaceInuse  { DEINT_NONE };
+    bool           m_deinterlaceInuse2x { false };
 
     static void       CopyPlane(uint8_t* To, int ToPitch,
                                 const uint8_t* From, int FromPitch,

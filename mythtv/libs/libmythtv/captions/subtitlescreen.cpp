@@ -1718,7 +1718,7 @@ void SubtitleScreen::Pulse(void)
 
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
     MythVideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
-    long long now = currentFrame ? currentFrame->timecode : LLONG_MAX;
+    long long now = currentFrame ? currentFrame->m_timecode : LLONG_MAX;
     bool needRescale = (m_textFontZoom != m_textFontZoomPrev);
 
     for (it = m_childrenList.begin(); it != m_childrenList.end(); it = itNext)
@@ -1847,7 +1847,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
     while (!subs->m_buffers.empty())
     {
         AVSubtitle subtitle = subs->m_buffers.front();
-        if (subtitle.start_display_time > currentFrame->timecode)
+        if (subtitle.start_display_time > currentFrame->m_timecode)
             break;
 
         long long displayfor = subtitle.end_display_time -
@@ -1855,7 +1855,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
         if (displayfor == 0)
             displayfor = 60000;
         displayfor = (displayfor < 50) ? 50 : displayfor;
-        long long late = currentFrame->timecode -
+        long long late = currentFrame->m_timecode -
                          subtitle.start_display_time;
 
         ClearDisplayedSubtitles();
@@ -1867,7 +1867,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
             bool displaysub = true;
             if (!subs->m_buffers.empty() &&
                 subs->m_buffers.front().end_display_time <
-                currentFrame->timecode)
+                currentFrame->m_timecode)
             {
                 displaysub = false;
             }
@@ -1883,21 +1883,21 @@ void SubtitleScreen::DisplayAVSubtitles(void)
 
                 int right  = rect->x + rect->w;
                 int bottom = rect->y + rect->h;
-                if (subs->m_fixPosition || (currentFrame->height < bottom) ||
-                    (currentFrame->width  < right) ||
+                if (subs->m_fixPosition || (currentFrame->m_height < bottom) ||
+                    (currentFrame->m_width  < right) ||
                     !display.width() || !display.height())
                 {
                     int sd_height = 576;
                     if ((m_player->GetFrameRate() > 26.0F ||
                          m_player->GetFrameRate() < 24.0F) && bottom <= 480)
                         sd_height = 480;
-                    int height = ((currentFrame->height <= sd_height) &&
+                    int height = ((currentFrame->m_height <= sd_height) &&
                                   (bottom <= sd_height)) ? sd_height :
-                                 ((currentFrame->height <= 720) && bottom <= 720)
+                                 ((currentFrame->m_height <= 720) && bottom <= 720)
                                    ? 720 : 1080;
-                    int width  = ((currentFrame->width  <= 720) &&
+                    int width  = ((currentFrame->m_width  <= 720) &&
                                   (right <= 720)) ? 720 :
-                                 ((currentFrame->width  <= 1280) &&
+                                 ((currentFrame->m_width  <= 1280) &&
                                   (right <= 1280)) ? 1280 : 1920;
                     display = QRect(0, 0, width, height);
                 }
@@ -1905,7 +1905,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 // split into upper/lower to allow zooming
                 QRect bbox;
                 int uh = display.height() / 2 - rect->y;
-                long long displayuntil = currentFrame->timecode + displayfor;
+                long long displayuntil = currentFrame->m_timecode + displayfor;
                 if (uh > 0)
                 {
                     bbox = QRect(0, 0, rect->w, uh);
@@ -1937,7 +1937,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
         SubtitleReader::FreeAVSubtitle(subtitle);
     }
 #ifdef USING_LIBASS
-    RenderAssTrack(currentFrame->timecode);
+    RenderAssTrack(currentFrame->m_timecode);
 #endif
 }
 
@@ -2139,7 +2139,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         // frame based subtitles get out of synch after running mythcommflag
         // for the file, i.e., the following number is wrong and does not
         // match the subtitle frame numbers:
-        playPos = currentFrame->frameNumber;
+        playPos = currentFrame->m_frameNumber;
         playPosAdj /= m_player->GetFrameRate();
     }
     else
@@ -2156,7 +2156,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         //    playPos = (uint64_t)
         //        ((currentFrame->frameNumber / video_frame_rate) * 1000);
         //else
-        playPos = m_player->GetDecoder()->NormalizeVideoTimecode(currentFrame->timecode);
+        playPos = m_player->GetDecoder()->NormalizeVideoTimecode(currentFrame->m_timecode);
     }
     playPos -= playPosAdj;
     if (playPos != 0)
@@ -2210,7 +2210,7 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
     // delete old subs that may still be on screen
     DeleteAllChildren();
     SetElementDeleted();
-    DrawTextSubtitles(subs, currentFrame->timecode, duration);
+    DrawTextSubtitles(subs, currentFrame->m_timecode, duration);
 }
 
 void SubtitleScreen::DrawTextSubtitles(const QStringList &subs,

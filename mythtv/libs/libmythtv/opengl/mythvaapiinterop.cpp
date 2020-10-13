@@ -140,8 +140,8 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, MythVideo
     if (!Frame)
         return result;
 
-    if ((Frame->pix_fmt != AV_PIX_FMT_VAAPI) || (Frame->codec != FMT_VAAPI) ||
-        !Frame->buf || !Frame->priv[1])
+    if ((Frame->m_pixFmt != AV_PIX_FMT_VAAPI) || (Frame->m_type != FMT_VAAPI) ||
+        !Frame->m_buffer || !Frame->m_priv[1])
         return result;
 
     // Sanity check the context
@@ -152,7 +152,7 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, MythVideo
     }
 
     // Check size
-    QSize surfacesize(Frame->width, Frame->height);
+    QSize surfacesize(Frame->m_width, Frame->m_height);
     if (m_openglTextureSize != surfacesize)
     {
         if (!m_openglTextureSize.isEmpty())
@@ -161,7 +161,7 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, MythVideo
     }
 
     // Retrieve surface
-    auto id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->buf));
+    auto id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->m_buffer));
     if (id)
         result = id;
     return result;
@@ -326,7 +326,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Cur
 
         if (deinterlacer != DEINT_NONE)
         {
-            auto* frames = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+            auto* frames = reinterpret_cast<AVBufferRef*>(Frame->m_priv[1]);
             if (!frames)
                 break;
 
@@ -410,11 +410,11 @@ VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Cur
         // buffering in the VAAPI frames context, causes the image to 'jiggle' when using
         // double rate deinterlacing. If we are confident this is a pause frame we have seen,
         // return the last deinterlaced frame.
-        if (Frame->pause_frame && m_lastFilteredFrame && (m_lastFilteredFrameCount == Frame->frameCounter))
+        if (Frame->m_pauseFrame && m_lastFilteredFrame && (m_lastFilteredFrameCount == Frame->m_frameCounter))
             return m_lastFilteredFrame;
 
-        Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
-        Frame->deinterlace_inuse2x = m_deinterlacer2x;
+        Frame->m_deinterlaceInuse = m_deinterlacer | DEINT_DRIVER;
+        Frame->m_deinterlaceInuse2x = m_deinterlacer2x;
 
         // 'pump' the filter with frames until it starts returning usefull output.
         // This minimises discontinuities at start up (where we would otherwise
@@ -438,7 +438,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Cur
                     {
                         // we have a filtered frame
                         result = m_lastFilteredFrame = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
-                        m_lastFilteredFrameCount = Frame->frameCounter;
+                        m_lastFilteredFrameCount = Frame->m_frameCounter;
                         m_firstField = true;
                         break;
                     }
@@ -449,10 +449,10 @@ VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Cur
                 // add another frame
                 MythAVFrame sourceframe;
                 sourceframe->top_field_first =
-                    static_cast<int>(Frame->interlaced_reversed ? !Frame->top_field_first : Frame->top_field_first);
+                    static_cast<int>(Frame->m_interlacedReverse ? !Frame->m_topFieldFirst : Frame->m_topFieldFirst);
                 sourceframe->interlaced_frame = 1;
-                sourceframe->data[3] = Frame->buf;
-                auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
+                sourceframe->data[3] = Frame->m_buffer;
+                auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->m_priv[0]);
                 sourceframe->buf[0] = buffer ? av_buffer_ref(buffer) : nullptr;
                 sourceframe->width  = m_filterWidth;
                 sourceframe->height = m_filterHeight;
@@ -473,7 +473,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Cur
                 {
                     // we have a filtered frame
                     result = m_lastFilteredFrame = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(sinkframe->data[3]));
-                    m_lastFilteredFrameCount = Frame->frameCounter;
+                    m_lastFilteredFrameCount = Frame->m_frameCounter;
                     m_firstField = false;
                     break;
                 }

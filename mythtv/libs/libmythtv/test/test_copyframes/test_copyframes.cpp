@@ -17,14 +17,14 @@ void TestCopyFrames::TestInvalidFormats()
 {
     MythVideoFrame dummy1;
     MythVideoFrame dummy2;
-    dummy1.codec = FMT_YV12;
-    dummy2.codec = FMT_NV12;
+    dummy1.m_type = FMT_YV12;
+    dummy2.m_type = FMT_NV12;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
-    dummy1.codec = FMT_NONE;
-    dummy2.codec = FMT_NONE;
+    dummy1.m_type = FMT_NONE;
+    dummy2.m_type = FMT_NONE;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
-    dummy1.codec = FMT_VAAPI;
-    dummy2.codec = FMT_VAAPI;
+    dummy1.m_type = FMT_VAAPI;
+    dummy2.m_type = FMT_VAAPI;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
 }
 
@@ -32,25 +32,25 @@ void TestCopyFrames::TestInvalidSizes()
 {
     MythVideoFrame dummy1;
     MythVideoFrame dummy2;
-    dummy1.codec = FMT_YV12;
-    dummy2.codec = FMT_YV12;
-    dummy1.width  = 720;
-    dummy2.width  = 720;
-    dummy1.height = 576;
-    dummy2.height = 500;
+    dummy1.m_type = FMT_YV12;
+    dummy2.m_type = FMT_YV12;
+    dummy1.m_width  = 720;
+    dummy2.m_width  = 720;
+    dummy1.m_height = 576;
+    dummy2.m_height = 500;
     // Different heights
     QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Different widths
-    dummy2.height = 576;
-    dummy2.width  = 1024;
+    dummy2.m_height = 576;
+    dummy2.m_width  = 1024;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Invalid height
-    dummy2.width = 720;
-    dummy1.height = 0;
+    dummy2.m_width = 720;
+    dummy1.m_height = 0;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Invalid width
-    dummy1.height = 576;
-    dummy2.width  = 0;
+    dummy1.m_height = 576;
+    dummy2.m_width  = 0;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
 }
 
@@ -67,21 +67,21 @@ void TestCopyFrames::TestInvalidBuffers()
     unsigned char * buf2 = &dummy;
 
     // One null buffer
-    dummy1.buf = buf1;
+    dummy1.m_buffer = buf1;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Two buffers, both zero sized
-    dummy2.buf = buf2;
+    dummy2.m_buffer = buf2;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Same buffer
-    dummy2.buf = buf1;
+    dummy2.m_buffer = buf1;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
     // Invalid size
-    dummy2.buf = buf2;
-    dummy1.size = 16;
-    dummy2.size = size1;
+    dummy2.m_buffer = buf2;
+    dummy1.m_bufferSize = 16;
+    dummy2.m_bufferSize = size1;
     QVERIFY(!dummy1.CopyFrame(&dummy2));
-    dummy1.buf = nullptr;
-    dummy2.buf = nullptr;
+    dummy1.m_buffer = nullptr;
+    dummy2.m_buffer = nullptr;
 }
 
 #include "mythmiscutil.h"
@@ -90,15 +90,15 @@ static uint64_t FillRandom(MythVideoFrame* Frame)
 {
     uint64_t sum = 0;
     uint64_t counts = 0;
-    uint count = MythVideoFrame::GetNumPlanes(Frame->codec);
+    uint count = MythVideoFrame::GetNumPlanes(Frame->m_type);
     for (uint plane = 0; plane < count; ++plane)
     {
-        int width = MythVideoFrame::GetPitchForPlane(Frame->codec, Frame->width, plane);
-        int offset = Frame->offsets[plane];
+        int width = MythVideoFrame::GetPitchForPlane(Frame->m_type, Frame->m_width, plane);
+        int offset = Frame->m_offsets[plane];
         for (int i = 0; i < width; ++i)
         {
             unsigned char val = MythRandom() & 0xFF;
-            Frame->buf[offset++] = val;
+            Frame->m_buffer[offset++] = val;
             sum += val;
             counts++;
         }
@@ -110,14 +110,14 @@ static uint64_t GetSum(const MythVideoFrame* Frame)
 {
     uint64_t sum = 0;
     uint64_t counts = 0;
-    uint count = MythVideoFrame::GetNumPlanes(Frame->codec);
+    uint count = MythVideoFrame::GetNumPlanes(Frame->m_type);
     for (uint plane = 0; plane < count; ++plane)
     {
-        int width = MythVideoFrame::GetPitchForPlane(Frame->codec, Frame->width, plane);
-        int offset = Frame->offsets[plane];
+        int width = MythVideoFrame::GetPitchForPlane(Frame->m_type, Frame->m_width, plane);
+        int offset = Frame->m_offsets[plane];
         for (int i = 0; i < width; ++i)
         {
-            sum += Frame->buf[offset++];
+            sum += Frame->m_buffer[offset++];
             counts++;
         }
     }
@@ -203,8 +203,8 @@ void TestCopyFrames::TestCopy()
         MythVideoFrame* res =
                 new MythVideoFrame(T,MythVideoFrame::GetAlignedBuffer(std::get<3>(P)),
                                    std::get<3>(P), std::get<1>(P), std::get<2>(P));
-        res->pitches = std::get<4>(P);
-        res->offsets = std::get<5>(P);
+        res->m_pitches = std::get<4>(P);
+        res->m_offsets = std::get<5>(P);
         return res;
     };
 

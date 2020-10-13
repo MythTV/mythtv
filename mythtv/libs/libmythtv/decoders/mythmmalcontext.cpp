@@ -186,18 +186,18 @@ bool MythMMALContext::GetBuffer(AVCodecContext *Context, MythVideoFrame *Frame, 
         return false;
 
     // Re-allocate if necessary
-    if ((Frame->codec != type) || (Frame->width != AvFrame->width) || (Frame->height != AvFrame->height))
+    if ((Frame->m_type != type) || (Frame->m_width != AvFrame->width) || (Frame->m_height != AvFrame->height))
         if (!VideoBuffers::ReinitBuffer(Frame, type, decoder->GetVideoCodecID(), AvFrame->width, AvFrame->height))
             return false;
 
     // Copy data
-    uint count = MythVideoFrame::GetNumPlanes(Frame->codec);
+    uint count = MythVideoFrame::GetNumPlanes(Frame->m_type);
     for (uint plane = 0; plane < count; ++plane)
     {
-        MythVideoFrame::CopyPlane(Frame->buf + Frame->offsets[plane], Frame->pitches[plane],
+        MythVideoFrame::CopyPlane(Frame->m_buffer + Frame->m_offsets[plane], Frame->m_pitches[plane],
                                   AvFrame->data[plane], AvFrame->linesize[plane],
-                                  MythVideoFrame::GetPitchForPlane(Frame->codec, AvFrame->width, plane),
-                                  MythVideoFrame::GetHeightForPlane(Frame->codec, AvFrame->height, plane));
+                                  MythVideoFrame::GetPitchForPlane(Frame->m_type, AvFrame->width, plane),
+                                  MythVideoFrame::GetHeightForPlane(Frame->m_type, AvFrame->height, plane));
     }
 
     AvFrame->reordered_opaque = Context->reordered_opaque;
@@ -214,26 +214,26 @@ bool MythMMALContext::GetBuffer2(AVCodecContext *Context, MythVideoFrame *Frame,
     }
 
     // MMAL?
-    if (Frame->codec != FMT_MMAL || static_cast<AVPixelFormat>(AvFrame->format) != AV_PIX_FMT_MMAL)
+    if (Frame->m_type != FMT_MMAL || static_cast<AVPixelFormat>(AvFrame->format) != AV_PIX_FMT_MMAL)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Not an MMAL frame");
         return false;
     }
 
-    Frame->width = AvFrame->width;
-    Frame->height = AvFrame->height;
-    Frame->pix_fmt = Context->pix_fmt;
-    Frame->sw_pix_fmt = Context->sw_pix_fmt;
-    Frame->directrendering = 1;
+    Frame->m_width = AvFrame->width;
+    Frame->m_height = AvFrame->height;
+    Frame->m_pixFmt = Context->pix_fmt;
+    Frame->m_swPixFmt = Context->sw_pix_fmt;
+    Frame->m_directRendering = 1;
     AvFrame->opaque = Frame;
     AvFrame->reordered_opaque = Context->reordered_opaque;
 
     // Frame->data[3] holds MMAL_BUFFER_HEADER_T
-    Frame->buf = AvFrame->data[3];
+    Frame->m_buffer = AvFrame->data[3];
     // Retain the buffer so it is not released before we display it
-    Frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
+    Frame->m_priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
     // Add interop
-    Frame->priv[1] = reinterpret_cast<unsigned char*>(m_interop);
+    Frame->m_priv[1] = reinterpret_cast<unsigned char*>(m_interop);
     // Set the release method
     AvFrame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0, MythCodecContext::ReleaseBuffer,
                                        static_cast<AvFormatDecoder*>(Context->opaque), 0);

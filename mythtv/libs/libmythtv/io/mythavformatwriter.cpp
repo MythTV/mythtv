@@ -206,7 +206,7 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     m_picture->pts = framesEncoded + 1;
     m_picture->pict_type = ((framesEncoded % m_keyFrameDist) == 0) ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_NONE;
 
-    m_bufferedVideoFrameTimes.push_back(Frame->timecode);
+    m_bufferedVideoFrameTimes.push_back(Frame->m_timecode);
     m_bufferedVideoFrameTypes.push_back(m_picture->pict_type);
 
     AVPacket pkt;
@@ -226,7 +226,7 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     if (!got_pkt)
         return ret;
 
-    long long tc = Frame->timecode;
+    long long tc = Frame->m_timecode;
 
     if (!m_bufferedVideoFrameTimes.isEmpty())
         tc = m_bufferedVideoFrameTimes.takeFirst();
@@ -250,7 +250,7 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     if (ret != 0)
         LOG(VB_RECORD, LOG_ERR, LOC + "WriteVideoFrame(): av_interleaved_write_frame couldn't write Video");
 
-    Frame->timecode = tc + m_startingTimecodeOffset;
+    Frame->m_timecode = tc + m_startingTimecodeOffset;
     m_framesWritten++;
     av_packet_unref(&pkt);
     return 1;

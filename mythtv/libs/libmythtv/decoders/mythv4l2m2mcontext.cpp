@@ -192,18 +192,18 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, MythVideoFrame *Fram
         return false;
 
     // Re-allocate if necessary
-    if ((Frame->codec != type) || (Frame->width != AvFrame->width) || (Frame->height != AvFrame->height))
+    if ((Frame->m_type != type) || (Frame->m_width != AvFrame->width) || (Frame->m_height != AvFrame->height))
         if (!VideoBuffers::ReinitBuffer(Frame, type, decoder->GetVideoCodecID(), AvFrame->width, AvFrame->height))
             return false;
 
     // Copy data
-    uint count = MythVideoFrame::GetNumPlanes(Frame->codec);
+    uint count = MythVideoFrame::GetNumPlanes(Frame->m_type);
     for (uint plane = 0; plane < count; ++plane)
     {
-        MythVideoFrame::CopyPlane(Frame->buf + Frame->offsets[plane],Frame->pitches[plane],
+        MythVideoFrame::CopyPlane(Frame->m_buffer + Frame->m_offsets[plane],Frame->m_pitches[plane],
                                   AvFrame->data[plane], AvFrame->linesize[plane],
-                                  MythVideoFrame::GetPitchForPlane(Frame->codec, AvFrame->width, plane),
-                                  MythVideoFrame::GetHeightForPlane(Frame->codec, AvFrame->height, plane));
+                                  MythVideoFrame::GetPitchForPlane(Frame->m_type, AvFrame->width, plane),
+                                  MythVideoFrame::GetHeightForPlane(Frame->m_type, AvFrame->height, plane));
     }
 
     return true;

@@ -36,19 +36,19 @@ int next_dbg_str = 0;
 */
 static inline void ReleaseDecoderResources(MythVideoFrame *Frame, std::vector<AVBufferRef *> &Discards)
 {
-    if (MythVideoFrame::HardwareFormat(Frame->codec))
+    if (MythVideoFrame::HardwareFormat(Frame->m_type))
     {
-        auto* ref = reinterpret_cast<AVBufferRef*>(Frame->priv[0]);
+        auto* ref = reinterpret_cast<AVBufferRef*>(Frame->m_priv[0]);
         if (ref != nullptr)
             Discards.push_back(ref);
-        Frame->buf = Frame->priv[0] = nullptr;
+        Frame->m_buffer = Frame->m_priv[0] = nullptr;
 
-        if (MythVideoFrame::HardwareFramesFormat(Frame->codec))
+        if (MythVideoFrame::HardwareFramesFormat(Frame->m_type))
         {
-            ref = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+            ref = reinterpret_cast<AVBufferRef*>(Frame->m_priv[1]);
             if (ref != nullptr)
                 Discards.push_back(ref);
-            Frame->priv[1] = nullptr;
+            Frame->m_priv[1] = nullptr;
         }
     }
 }
@@ -232,43 +232,43 @@ void VideoBuffers::SetDeinterlacingFlags(MythVideoFrame &Frame, MythDeintType Si
     static const MythDeintType kDriver   = DEINT_ALL & ~(DEINT_CPU | DEINT_SHADER);
     static const MythDeintType kShader   = DEINT_ALL & ~(DEINT_CPU | DEINT_DRIVER);
     static const MythDeintType kSoftware = DEINT_ALL & ~(DEINT_SHADER | DEINT_DRIVER);
-    Frame.deinterlace_single  = Single;
-    Frame.deinterlace_double  = Double;
+    Frame.m_deinterlaceSingle  = Single;
+    Frame.m_deinterlaceDouble  = Double;
 
     if (codec_is_copyback(CodecID))
     {
         if (codec_is_vaapi_dec(CodecID) || codec_is_nvdec_dec(CodecID))
-            Frame.deinterlace_allowed = kSoftware | kShader | kDriver;
+            Frame.m_deinterlaceAllowed = kSoftware | kShader | kDriver;
         else // VideoToolBox, MediaCodec and VDPAU copyback
-            Frame.deinterlace_allowed = kSoftware | kShader;
+            Frame.m_deinterlaceAllowed = kSoftware | kShader;
     }
-    else if (FMT_DRMPRIME == Frame.codec)
+    else if (FMT_DRMPRIME == Frame.m_type)
     {   // NOLINT(bugprone-branch-clone)
-        Frame.deinterlace_allowed = kShader; // No driver deint - if RGBA frames are returned, shaders will be disabled
+        Frame.m_deinterlaceAllowed = kShader; // No driver deint - if RGBA frames are returned, shaders will be disabled
     }
-    else if (FMT_MMAL == Frame.codec)
+    else if (FMT_MMAL == Frame.m_type)
     {
-        Frame.deinterlace_allowed = kShader; // No driver deint yet (TODO) and YUV frames returned
+        Frame.m_deinterlaceAllowed = kShader; // No driver deint yet (TODO) and YUV frames returned
     }
-    else if (FMT_VTB == Frame.codec)
+    else if (FMT_VTB == Frame.m_type)
     {
-        Frame.deinterlace_allowed = kShader; // No driver deint and YUV frames returned
+        Frame.m_deinterlaceAllowed = kShader; // No driver deint and YUV frames returned
     }
-    else if (FMT_NVDEC == Frame.codec)
+    else if (FMT_NVDEC == Frame.m_type)
     {
-        Frame.deinterlace_allowed = kShader | kDriver; // YUV frames and decoder deint
+        Frame.m_deinterlaceAllowed = kShader | kDriver; // YUV frames and decoder deint
     }
-    else if (FMT_VDPAU == Frame.codec)
+    else if (FMT_VDPAU == Frame.m_type)
     {   // NOLINT(bugprone-branch-clone)
-        Frame.deinterlace_allowed = kDriver; // No YUV frames for shaders
+        Frame.m_deinterlaceAllowed = kDriver; // No YUV frames for shaders
     }
-    else if (FMT_VAAPI == Frame.codec)
+    else if (FMT_VAAPI == Frame.m_type)
     {
-        Frame.deinterlace_allowed = kDriver; // DRM will allow shader if no VPP
+        Frame.m_deinterlaceAllowed = kDriver; // DRM will allow shader if no VPP
     }
     else
     {
-        Frame.deinterlace_allowed = kSoftware | kShader;
+        Frame.m_deinterlaceAllowed = kSoftware | kShader;
     }
 }
 
@@ -379,7 +379,7 @@ void VideoBuffers::ReleaseFrame(MythVideoFrame *Frame)
     m_vpos = m_vbufferMap[Frame];
     m_limbo.remove(Frame);
     //non directrendering frames are ffmpeg handled
-    if (Frame->directrendering)
+    if (Frame->m_directRendering)
         m_decode.enqueue(Frame);
     m_used.enqueue(Frame);
 }
@@ -692,7 +692,7 @@ void VideoBuffers::Enqueue(BufferType Type, MythVideoFrame *Frame)
     queue->remove(Frame);
     queue->enqueue(Frame);
     if (Type == kVideoBuffer_pause)
-        Frame->pause_frame = true;
+        Frame->m_pauseFrame = true;
     m_globalLock.unlock();
 }
 
@@ -951,7 +951,7 @@ void VideoBuffers::ClearAfterSeek(void)
         QMutexLocker locker(&m_globalLock);
 
         for (uint i = 0; i < Size(); i++)
-            At(i)->timecode = 0;
+            At(i)->m_timecode = 0;
 
         for (uint i = 0; (i < Size()) && (m_used.count() > 1); i++)
         {
@@ -1017,7 +1017,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     {
         m_buffers[i].Init(Type, Width, Height);
         m_buffers[i].ClearBufferToBlank();
-        success &= (m_buffers[i].buf != nullptr);
+        success &= (m_buffers[i].m_buffer != nullptr);
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 %2 (%3x%4) video buffers")
@@ -1031,19 +1031,19 @@ bool VideoBuffers::ReinitBuffer(MythVideoFrame *Frame, VideoFrameType Type, Myth
     if (!Frame)
         return false;
 
-    if (MythVideoFrame::HardwareFormat(Type) || MythVideoFrame::HardwareFormat(Frame->codec))
+    if (MythVideoFrame::HardwareFormat(Type) || MythVideoFrame::HardwareFormat(Frame->m_type))
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot re-initialise a hardware buffer");
         return false;
     }
 
-    VideoFrameType old = Frame->codec;
+    VideoFrameType old = Frame->m_type;
     LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocating frame %1 %2x%3->%4 %5x%6")
-        .arg(MythVideoFrame::FormatDescription(old)).arg(Frame->width).arg(Frame->height)
+        .arg(MythVideoFrame::FormatDescription(old)).arg(Frame->m_width).arg(Frame->m_height)
         .arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
 
-    MythDeintType singler = Frame->deinterlace_single;
-    MythDeintType doubler = Frame->deinterlace_double;
+    MythDeintType singler = Frame->m_deinterlaceSingle;
+    MythDeintType doubler = Frame->m_deinterlaceDouble;
     Frame->Init(Type, Width, Height);
     Frame->ClearBufferToBlank();
 

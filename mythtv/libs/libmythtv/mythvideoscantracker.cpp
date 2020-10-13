@@ -70,22 +70,22 @@ FrameScanType MythVideoScanTracker::GetScanForDisplay(MythVideoFrame *Frame, boo
         return kScan_Progressive;
 
     // Update details for debug OSD
-    m_lastDeinterlacer   = Frame->deinterlace_inuse;
-    m_lastDeinterlacer2x = Frame->deinterlace_inuse2x;
+    m_lastDeinterlacer   = Frame->m_deinterlaceInuse;
+    m_lastDeinterlacer2x = Frame->m_deinterlaceInuse2x;
     // We use the underlying pix_fmt as it retains the distinction between hardware
     // and software frames for decode only decoders.
-    m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->pix_fmt));
+    m_lastFrameCodec = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_pixFmt));
 
     // Decide on type and rate
     FrameScanType result = m_scan;
-    if ((kScan_Detect == m_scan) || (kScan_Ignore == m_scan) || Frame->already_deinterlaced)
+    if ((kScan_Detect == m_scan) || (kScan_Ignore == m_scan) || Frame->m_alreadyDeinterlaced)
     {
         result = kScan_Progressive;
     }
     else if (is_interlaced(m_scan))
     {
         result = kScan_Interlaced;
-        Frame->interlaced_reversed = (m_scan == kScan_Intr2ndField);
+        Frame->m_interlacedReverse = (m_scan == kScan_Intr2ndField);
     }
 
     // Only display the second field if needed.
@@ -187,11 +187,11 @@ void MythVideoScanTracker::AutoDeint(MythVideoFrame* Frame, MythVideoOutput* Vid
     }
 
     // This is currently only signalled for H264 content
-    if (Frame->new_gop)
+    if (Frame->m_newGOP)
     {
         if (m_scanOverride < kScan_Interlaced &&
-            ((Frame->interlaced_frame && !is_interlaced(m_scan)) ||
-            (!Frame->interlaced_frame && is_interlaced(m_scan))))
+            ((Frame->m_interlaced && !is_interlaced(m_scan)) ||
+            (!Frame->m_interlaced && is_interlaced(m_scan))))
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Unlocking frame scan");
             m_scanLocked = false;
@@ -201,7 +201,7 @@ void MythVideoScanTracker::AutoDeint(MythVideoFrame* Frame, MythVideoOutput* Vid
     if (m_scanLocked)
         return;
 
-    if (Frame->interlaced_frame)
+    if (Frame->m_interlaced)
     {
         if (m_scanTracker < 0)
         {

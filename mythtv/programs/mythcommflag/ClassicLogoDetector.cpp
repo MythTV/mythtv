@@ -371,8 +371,8 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
     int testEdges = 0;
     int testNotEdges = 0;
 
-    unsigned char* framePtr = frame->buf;
-    int bytesPerLine = frame->pitches[0];
+    unsigned char* framePtr = frame->m_buffer;
+    int bytesPerLine = frame->m_pitches[0];
 
     for (uint y = m_logoMinY; y <= m_logoMaxY; y++ )
     {
@@ -439,8 +439,8 @@ void ClassicLogoDetector::DetectEdges(MythVideoFrame *frame, EdgeMaskEntry *edge
                                       int edgeDiff)
 {
     int r = 2;
-    unsigned char *buf = frame->buf;
-    int bytesPerLine = frame->pitches[0];
+    unsigned char *buf = frame->m_buffer;
+    int bytesPerLine = frame->m_pitches[0];
 
     for (uint y = m_commDetectBorder + r; y < (m_height - m_commDetectBorder - r); y++)
     {

@@ -62,11 +62,11 @@ MythVideoOutputNull* MythVideoOutputNull::Create(QSize VideoDim, QSize VideoDisp
 
 void MythVideoOutputNull::CreatePauseFrame(void)
 {
-    m_avPauseFrame.Init(FMT_YV12, MythVideoFrame::GetAlignedBuffer(m_videoBuffers.GetScratchFrame()->size),
-                        m_videoBuffers.GetScratchFrame()->size, m_videoBuffers.GetScratchFrame()->width,
-                        m_videoBuffers.GetScratchFrame()->height);
-    m_avPauseFrame.frameNumber  = m_videoBuffers.GetScratchFrame()->frameNumber;
-    m_avPauseFrame.frameCounter = m_videoBuffers.GetScratchFrame()->frameCounter;
+    m_avPauseFrame.Init(FMT_YV12, MythVideoFrame::GetAlignedBuffer(m_videoBuffers.GetScratchFrame()->m_bufferSize),
+                        m_videoBuffers.GetScratchFrame()->m_bufferSize, m_videoBuffers.GetScratchFrame()->m_width,
+                        m_videoBuffers.GetScratchFrame()->m_height);
+    m_avPauseFrame.m_frameNumber  = m_videoBuffers.GetScratchFrame()->m_frameNumber;
+    m_avPauseFrame.m_frameCounter = m_videoBuffers.GetScratchFrame()->m_frameCounter;
     m_avPauseFrame.ClearBufferToBlank();
 }
 
@@ -175,7 +175,7 @@ void MythVideoOutputNull::RenderFrame(MythVideoFrame* Frame, FrameScanType /*Sca
     if (!Frame)
         Frame = m_videoBuffers.GetScratchFrame();
     if (Frame)
-        m_framesPlayed = Frame->frameNumber + 1;
+        m_framesPlayed = Frame->m_frameNumber + 1;
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "No frame in PrepareFrame!");
 }
@@ -196,15 +196,15 @@ void MythVideoOutputNull::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTy
 
     if (!used)
     {
-        m_videoBuffers.GetScratchFrame()->frameNumber = m_framesPlayed - 1;
+        m_videoBuffers.GetScratchFrame()->m_frameNumber = m_framesPlayed - 1;
         m_videoBuffers.GetScratchFrame()->CopyFrame(&m_avPauseFrame);
     }
 
-    DisplayTimecode = m_avPauseFrame.disp_timecode;
+    DisplayTimecode = m_avPauseFrame.m_displayTimecode;
 }
 
 void MythVideoOutputNull::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
-    if (Frame && !Frame->dummy)
+    if (Frame && !Frame->m_dummy)
         m_deinterlacer.Filter(Frame, Scan, nullptr);
 }

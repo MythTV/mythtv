@@ -162,7 +162,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
     // N.B. there should in theory be no situation in which shader deinterlacing is not
     // available for software formats, hence there should be no need to fallback to cpu
 
-    if (!is_interlaced(Scan) || Frame->already_deinterlaced)
+    if (!is_interlaced(Scan) || Frame->m_alreadyDeinterlaced)
     {
         CleanupDeinterlacers();
         return false;
@@ -542,12 +542,12 @@ void MythOpenGLVideo::ResetFrameFormat()
 /// \brief Update the current input texture using the data from the given video frame.
 void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
-    if (Frame->codec == FMT_NONE)
+    if (Frame->m_type == FMT_NONE)
         return;
 
     // Hardware frames are retrieved/updated in PrepareFrame but we need to
     // reset software frames now if necessary
-    if (MythVideoFrame::HardwareFormat(Frame->codec))
+    if (MythVideoFrame::HardwareFormat(Frame->m_type))
     {
         if ((!MythVideoFrame::HardwareFormat(m_inputType)) && (m_inputType != FMT_NONE))
         {
@@ -558,14 +558,14 @@ void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
     }
 
     // Sanitise frame
-    if ((Frame->width < 1) || (Frame->height < 1) || !Frame->buf)
+    if ((Frame->m_width < 1) || (Frame->m_height < 1) || !Frame->m_buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid software frame");
         return;
     }
 
     // Can we render this frame format
-    if (!MythVideoFrame::YUVFormat(Frame->codec))
+    if (!MythVideoFrame::YUVFormat(Frame->m_type))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Frame format is not supported");
         return;
@@ -575,15 +575,15 @@ void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
     OpenGLLocker ctx_lock(m_openglRender);
 
     // check for input changes
-    if ((Frame->width  != m_videoDim.width()) ||
-        (Frame->height != m_videoDim.height()) ||
-        (Frame->codec  != m_inputType))
+    if ((Frame->m_width  != m_videoDim.width()) ||
+        (Frame->m_height != m_videoDim.height()) ||
+        (Frame->m_type  != m_inputType))
     {
-        VideoFrameType frametype = Frame->codec;
+        VideoFrameType frametype = Frame->m_type;
         if ((frametype == FMT_YV12) && (m_profile == "opengl"))
             frametype = FMT_YUY2;
-        QSize size(Frame->width, Frame->height);
-        if (!SetupFrameFormat(Frame->codec, frametype, size, QOpenGLTexture::Target2D))
+        QSize size(Frame->m_width, Frame->m_height);
+        if (!SetupFrameFormat(Frame->m_type, frametype, size, QOpenGLTexture::Target2D))
             return;
     }
 
@@ -601,7 +601,7 @@ void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
     {
         if (!m_nextTextures.empty() && !m_prevTextures.empty())
         {
-            if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
+            if (abs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
                 ResetTextures();
             vector<MythVideoTexture*> temp = m_prevTextures;
             m_prevTextures = m_inputTextures;
@@ -611,24 +611,24 @@ void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
         }
     }
 
-    m_discontinuityCounter = Frame->frameCounter;
+    m_discontinuityCounter = Frame->m_frameCounter;
 
     if (m_deinterlacer == DEINT_BASIC)
     {
         // first field. Fake the pitches
-        FramePitches pitches = Frame->pitches;
-        Frame->pitches[0] = Frame->pitches[0] << 1;
-        Frame->pitches[1] = Frame->pitches[1] << 1;
-        Frame->pitches[2] = Frame->pitches[2] << 1;
+        FramePitches pitches = Frame->m_pitches;
+        Frame->m_pitches[0] = Frame->m_pitches[0] << 1;
+        Frame->m_pitches[1] = Frame->m_pitches[1] << 1;
+        Frame->m_pitches[2] = Frame->m_pitches[2] << 1;
         MythVideoTexture::UpdateTextures(m_openglRender, Frame, m_inputTextures);
         // second field. Fake the offsets as well.
-        FrameOffsets offsets = Frame->offsets;
-        Frame->offsets[0] = Frame->offsets[0] + pitches[0];
-        Frame->offsets[1] = Frame->offsets[1] + pitches[1];
-        Frame->offsets[2] = Frame->offsets[2] + pitches[2];
+        FrameOffsets offsets = Frame->m_offsets;
+        Frame->m_offsets[0] = Frame->m_offsets[0] + pitches[0];
+        Frame->m_offsets[1] = Frame->m_offsets[1] + pitches[1];
+        Frame->m_offsets[2] = Frame->m_offsets[2] + pitches[2];
         MythVideoTexture::UpdateTextures(m_openglRender, Frame, m_nextTextures);
-        Frame->pitches = pitches;
-        Frame->offsets = offsets;
+        Frame->m_pitches = pitches;
+        Frame->m_offsets = offsets;
     }
     else
     {
@@ -666,7 +666,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // nothing to display, then fallback to this framebuffer.
     // N.B. this is now strictly necessary with v4l2 and DRM PRIME direct rendering
     // but ignore now for performance reasons
-    VideoResizing resize = Frame ? (MythVideoFrame::HardwareFramesFormat(Frame->codec) ? Framebuffer : None) :
+    VideoResizing resize = Frame ? (MythVideoFrame::HardwareFramesFormat(Frame->m_type) ? Framebuffer : None) :
                                    (MythVideoFrame::HardwareFramesFormat(m_inputType)  ? Framebuffer : None);
 
     vector<MythVideoTexture*> inputtextures = m_inputTextures;
@@ -749,8 +749,8 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // Set deinterlacer type for debug OSD
     if (deinterlacing && Frame)
     {
-        Frame->deinterlace_inuse = m_deinterlacer | DEINT_SHADER;
-        Frame->deinterlace_inuse2x = m_deinterlacer2x;
+        Frame->m_deinterlaceInuse = m_deinterlacer | DEINT_SHADER;
+        Frame->m_deinterlaceInuse2x = m_deinterlacer2x;
     }
 
     // Tonemapping can only render to a texture
@@ -921,11 +921,11 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // N.B. kStereoscopicModeSideBySideDiscard is a proxy here for discard of all types
     if ((stereo == kStereoscopicModeAuto) &&
         (m_stereoMode == kStereoscopicModeSideBySideDiscard) &&
-        Frame && (Frame->stereo3D != AV_STEREO3D_2D))
+        Frame && (Frame->m_stereo3D != AV_STEREO3D_2D))
     {
-        if (Frame->stereo3D == AV_STEREO3D_SIDEBYSIDE)
+        if (Frame->m_stereo3D == AV_STEREO3D_SIDEBYSIDE)
             stereo = kStereoscopicModeSideBySideDiscard;
-        else if (Frame->stereo3D == AV_STEREO3D_TOPBOTTOM)
+        else if (Frame->m_stereo3D == AV_STEREO3D_TOPBOTTOM)
             stereo = kStereoscopicModeTopAndBottomDiscard;
     }
 
@@ -953,7 +953,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
 
     // rotation
     if (Frame)
-        m_lastRotation = Frame->rotation;
+        m_lastRotation = Frame->m_rotation;
 
     // apply scissoring
     if (tiled)

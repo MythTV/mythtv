@@ -164,26 +164,26 @@ bool MythDRMPRIMEContext::GetDRMBuffer(AVCodecContext *Context, MythVideoFrame *
     if (!Context || !AvFrame || !Frame)
         return false;
 
-    if (Frame->codec != FMT_DRMPRIME || static_cast<AVPixelFormat>(AvFrame->format) != AV_PIX_FMT_DRM_PRIME)
+    if (Frame->m_type != FMT_DRMPRIME || static_cast<AVPixelFormat>(AvFrame->format) != AV_PIX_FMT_DRM_PRIME)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Not a DRM PRIME buffer");
         return false;
     }
 
-    Frame->width = AvFrame->width;
-    Frame->height = AvFrame->height;
-    Frame->pix_fmt = Context->pix_fmt;
-    Frame->sw_pix_fmt = Context->sw_pix_fmt;
-    Frame->directrendering = true;
+    Frame->m_width = AvFrame->width;
+    Frame->m_height = AvFrame->height;
+    Frame->m_pixFmt = Context->pix_fmt;
+    Frame->m_swPixFmt = Context->sw_pix_fmt;
+    Frame->m_directRendering = true;
     AvFrame->opaque = Frame;
     AvFrame->reordered_opaque = Context->reordered_opaque;
 
     // Frame->data[0] holds AVDRMFrameDescriptor
-    Frame->buf = AvFrame->data[0];
+    Frame->m_buffer = AvFrame->data[0];
     // Retain the buffer so it is not released before we display it
-    Frame->priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
+    Frame->m_priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(AvFrame->buf[0]));
     // Add interop
-    Frame->priv[1] = reinterpret_cast<unsigned char*>(m_interop);
+    Frame->m_priv[1] = reinterpret_cast<unsigned char*>(m_interop);
     // Set the release method
     AvFrame->buf[1] = av_buffer_create(reinterpret_cast<uint8_t*>(Frame), 0, MythCodecContext::ReleaseBuffer,
                                        static_cast<AvFormatDecoder*>(Context->opaque), 0);

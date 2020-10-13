@@ -15,8 +15,8 @@ MythDeintType GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Typ
 {
     if (Frame)
     {
-        MythDeintType options = Frame->deinterlace_single &
-                (Override ? Override : Frame->deinterlace_allowed);
+        MythDeintType options = Frame->m_deinterlaceSingle &
+                (Override ? Override : Frame->m_deinterlaceAllowed);
         if (options & Type)
             return GetDeinterlacer(options);
     }
@@ -28,8 +28,8 @@ MythDeintType GetDoubleRateOption(const MythVideoFrame* Frame, MythDeintType Typ
 {
     if (Frame)
     {
-        MythDeintType options = Frame->deinterlace_double &
-                (Override ? Override : Frame->deinterlace_allowed);
+        MythDeintType options = Frame->m_deinterlaceDouble &
+                (Override ? Override : Frame->m_deinterlaceAllowed);
         if (options & Type)
             return GetDeinterlacer(options);
     }
@@ -126,10 +126,10 @@ QString DeinterlacerPref(MythDeintType Deint)
 
 MythVideoFrame::~MythVideoFrame()
 {
-    if (buf && HardwareFormat(codec))
+    if (m_buffer && HardwareFormat(m_type))
         LOG(VB_GENERAL, LOG_ERR, LOC + "Frame still contains a hardware buffer!");
-    else if (buf)
-        av_freep(&buf);
+    else if (m_buffer)
+        av_freep(&m_buffer);
 }
 
 MythVideoFrame::MythVideoFrame(VideoFrameType Type, int Width, int Height)
@@ -150,9 +150,9 @@ void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height)
     if (!((Type == FMT_NONE) || HardwareFormat(Type)))
     {
         newsize = GetBufferSize(Type, Width, Height);
-        bool reallocate = !((Width == width) && (Height == height) && (newsize == size) && (Type == codec));
-        newbuffer = reallocate ? GetAlignedBuffer(newsize) : buf;
-        newsize   = reallocate ? newsize : size;
+        bool reallocate = !((Width == m_width) && (Height == m_height) && (newsize == m_bufferSize) && (Type == m_type));
+        newbuffer = reallocate ? GetAlignedBuffer(newsize) : m_buffer;
+        newsize   = reallocate ? newsize : m_bufferSize;
     }
     Init(Type, newbuffer, newsize, Width, Height);
 }
@@ -160,13 +160,13 @@ void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height)
 void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSize,
                           int Width, int Height, int Alignment)
 {
-    if (HardwareFormat(codec) && buf)
+    if (HardwareFormat(m_type) && m_buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Trying to reinitialise a hardware frame. Ignoring");
         return;
     }
 
-    if (std::any_of(priv.cbegin(), priv.cend(), [](uint8_t* P) { return P != nullptr; }))
+    if (std::any_of(m_priv.cbegin(), m_priv.cend(), [](uint8_t* P) { return P != nullptr; }))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Priv buffers are set (hardware frame?). Ignoring Init");
         return;
@@ -178,113 +178,113 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
         return;
     }
 
-    if (buf && (buf != Buffer))
+    if (m_buffer && (m_buffer != Buffer))
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting old frame buffer");
-        av_freep(&buf);
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "Deleting old frame buffer");
+        av_freep(&m_buffer);
     }
 
-    codec  = Type;
-    bpp    = BitsPerPixel(codec);
-    buf    = Buffer;
-    size   = BufferSize;
-    width  = Width;
-    height = Height;
+    m_type  = Type;
+    m_bitsPerPixel    = BitsPerPixel(m_type);
+    m_buffer    = Buffer;
+    m_bufferSize   = BufferSize;
+    m_width  = Width;
+    m_height = Height;
 
     ClearMetadata();
 
-    if ((codec == FMT_NONE) || HardwareFormat(codec) || !buf || !size)
+    if ((m_type == FMT_NONE) || HardwareFormat(m_type) || !m_buffer || !m_bufferSize)
         return;
 
-    int alignedwidth = Alignment > 0 ? (width + Alignment - 1) & ~(Alignment - 1) : width;
-    int alignedheight = (height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT -1);
+    int alignedwidth = Alignment > 0 ? (m_width + Alignment - 1) & ~(Alignment - 1) : m_width;
+    int alignedheight = (m_height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT -1);
 
     for (uint i = 0; i < 3; ++i)
-        pitches[i] = MythVideoFrame::GetPitchForPlane(codec, alignedwidth, i);
+        m_pitches[i] = MythVideoFrame::GetPitchForPlane(m_type, alignedwidth, i);
 
-    offsets[0] = 0;
-    if (FMT_YV12 == codec)
+    m_offsets[0] = 0;
+    if (FMT_YV12 == m_type)
     {
-        offsets[1] = alignedwidth * alignedheight;
-        offsets[2] = offsets[1] + ((alignedwidth + 1) >> 1) * ((alignedheight+1) >> 1);
+        m_offsets[1] = alignedwidth * alignedheight;
+        m_offsets[2] = m_offsets[1] + ((alignedwidth + 1) >> 1) * ((alignedheight+1) >> 1);
     }
-    else if (MythVideoFrame::FormatIs420(codec))
+    else if (MythVideoFrame::FormatIs420(m_type))
     {
-        offsets[1] = (alignedwidth << 1) * alignedheight;
-        offsets[2] = offsets[1] + (alignedwidth * (alignedheight >> 1));
+        m_offsets[1] = (alignedwidth << 1) * alignedheight;
+        m_offsets[2] = m_offsets[1] + (alignedwidth * (alignedheight >> 1));
     }
-    else if (FMT_YUV422P == codec)
+    else if (FMT_YUV422P == m_type)
     {
-        offsets[1] = alignedwidth * alignedheight;
-        offsets[2] = offsets[1] + ((alignedwidth + 1) >> 1) * alignedheight;
+        m_offsets[1] = alignedwidth * alignedheight;
+        m_offsets[2] = m_offsets[1] + ((alignedwidth + 1) >> 1) * alignedheight;
     }
-    else if (MythVideoFrame::FormatIs422(codec))
+    else if (MythVideoFrame::FormatIs422(m_type))
     {
-        offsets[1] = (alignedwidth << 1) * alignedheight;
-        offsets[2] = offsets[1] + (alignedwidth * alignedheight);
+        m_offsets[1] = (alignedwidth << 1) * alignedheight;
+        m_offsets[2] = m_offsets[1] + (alignedwidth * alignedheight);
     }
-    else if (FMT_YUV444P == codec)
+    else if (FMT_YUV444P == m_type)
     {
-        offsets[1] = alignedwidth * alignedheight;
-        offsets[2] = offsets[1] + (alignedwidth * alignedheight);
+        m_offsets[1] = alignedwidth * alignedheight;
+        m_offsets[2] = m_offsets[1] + (alignedwidth * alignedheight);
     }
-    else if (MythVideoFrame::FormatIs444(codec))
+    else if (MythVideoFrame::FormatIs444(m_type))
     {
-        offsets[1] = (alignedwidth << 1) * alignedheight;
-        offsets[2] = offsets[1] + ((alignedwidth << 1) * alignedheight);
+        m_offsets[1] = (alignedwidth << 1) * alignedheight;
+        m_offsets[2] = m_offsets[1] + ((alignedwidth << 1) * alignedheight);
     }
-    else if (FMT_NV12 == codec)
+    else if (FMT_NV12 == m_type)
     {
-        offsets[1] = alignedwidth * alignedheight;
-        offsets[2] = 0;
+        m_offsets[1] = alignedwidth * alignedheight;
+        m_offsets[2] = 0;
     }
-    else if (MythVideoFrame::FormatIsNV12(codec))
+    else if (MythVideoFrame::FormatIsNV12(m_type))
     {
-        offsets[1] = (alignedwidth << 1) * alignedheight;
-        offsets[2] = 0;
+        m_offsets[1] = (alignedwidth << 1) * alignedheight;
+        m_offsets[2] = 0;
     }
     else
     {
-        offsets[1] = offsets[2] = 0;
+        m_offsets[1] = m_offsets[2] = 0;
     }
 }
 
 void MythVideoFrame::ClearMetadata()
 {
-    aspect               = -1.0F;
-    frame_rate           = -1.0 ;
-    frameNumber          = 0;
-    frameCounter         = 0;
-    timecode             = 0;
-    disp_timecode        = 0;
-    priv                 = { nullptr };
-    interlaced_frame     = 0;
-    top_field_first      = true;
-    interlaced_reversed  = false;
-    new_gop              = false;
-    repeat_pict          = false;
-    forcekey             = false;
-    dummy                = false;
-    pause_frame          = false;
-    pitches              = { 0 };
-    offsets              = { 0 };
-    pix_fmt              = 0;
-    sw_pix_fmt           = 0;
-    directrendering      = true;
-    colorspace           = 1;
-    colorrange           = 1;
-    colorprimaries       = 1;
-    colortransfer        = 1;
-    chromalocation       = 1;
-    colorshifted         = false;
-    already_deinterlaced = false;
-    rotation             = 0;
-    stereo3D             = 0;
-    deinterlace_single   = DEINT_NONE;
-    deinterlace_double   = DEINT_NONE;
-    deinterlace_allowed  = DEINT_NONE;
-    deinterlace_inuse    = DEINT_NONE;
-    deinterlace_inuse2x  = false;
+    m_aspect               = -1.0F;
+    m_frameRate           = -1.0 ;
+    m_frameNumber          = 0;
+    m_frameCounter         = 0;
+    m_timecode             = 0;
+    m_displayTimecode        = 0;
+    m_priv                 = { nullptr };
+    m_interlaced     = 0;
+    m_topFieldFirst      = true;
+    m_interlacedReverse  = false;
+    m_newGOP              = false;
+    m_repeatPic          = false;
+    m_forceKey             = false;
+    m_dummy                = false;
+    m_pauseFrame          = false;
+    m_pitches              = { 0 };
+    m_offsets              = { 0 };
+    m_pixFmt              = 0;
+    m_swPixFmt           = 0;
+    m_directRendering      = true;
+    m_colorspace           = 1;
+    m_colorrange           = 1;
+    m_colorprimaries       = 1;
+    m_colortransfer        = 1;
+    m_chromalocation       = 1;
+    m_colorshifted         = false;
+    m_alreadyDeinterlaced = false;
+    m_rotation             = 0;
+    m_stereo3D             = 0;
+    m_deinterlaceSingle   = DEINT_NONE;
+    m_deinterlaceDouble   = DEINT_NONE;
+    m_deinterlaceAllowed  = DEINT_NONE;
+    m_deinterlaceInuse    = DEINT_NONE;
+    m_deinterlaceInuse2x  = false;
 }
 
 void MythVideoFrame::CopyPlane(uint8_t *To, int ToPitch, const uint8_t *From, int FromPitch,
@@ -306,71 +306,71 @@ void MythVideoFrame::CopyPlane(uint8_t *To, int ToPitch, const uint8_t *From, in
 
 void MythVideoFrame::ClearBufferToBlank()
 {
-    if (!buf)
+    if (!m_buffer)
         return;
 
-    if (HardwareFormat(codec))
+    if (HardwareFormat(m_type))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot clear a hardware frame");
         return;
     }
 
     // luma (or RGBA)
-    int uv_height = GetHeightForPlane(codec, height, 1);
-    int uv = (1 << (ColorDepth(codec) - 1)) - 1;
-    if (FMT_YV12 == codec || FMT_YUV422P == codec || FMT_YUV444P == codec)
+    int uv_height = GetHeightForPlane(m_type, m_height, 1);
+    int uv = (1 << (ColorDepth(m_type) - 1)) - 1;
+    if (FMT_YV12 == m_type || FMT_YUV422P == m_type || FMT_YUV444P == m_type)
     {
-        memset(buf + offsets[0], 0, static_cast<size_t>(pitches[0] * height));
-        memset(buf + offsets[1], uv & 0xff, static_cast<size_t>(pitches[1] * uv_height));
-        memset(buf + offsets[2], uv & 0xff, static_cast<size_t>(pitches[2] * uv_height));
+        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0] * m_height));
+        memset(m_buffer + m_offsets[1], uv & 0xff, static_cast<size_t>(m_pitches[1] * uv_height));
+        memset(m_buffer + m_offsets[2], uv & 0xff, static_cast<size_t>(m_pitches[2] * uv_height));
     }
-    else if ((FormatIs420(codec) || FormatIs422(codec) || FormatIs444(codec)) &&
-             (pitches[1] == pitches[2]))
+    else if ((FormatIs420(m_type) || FormatIs422(m_type) || FormatIs444(m_type)) &&
+             (m_pitches[1] == m_pitches[2]))
     {
-        memset(buf + offsets[0], 0, static_cast<size_t>(pitches[0] * height));
+        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0] * m_height));
         unsigned char uv1 = (uv & 0xff00) >> 8;
         unsigned char uv2 = (uv & 0x00ff);
-        unsigned char* buf1 = buf + offsets[1];
-        unsigned char* buf2 = buf + offsets[2];
+        unsigned char* buf1 = m_buffer + m_offsets[1];
+        unsigned char* buf2 = m_buffer + m_offsets[2];
         for (int row = 0; row < uv_height; ++row)
         {
-            for (int col = 0; col < pitches[1]; col += 2)
+            for (int col = 0; col < m_pitches[1]; col += 2)
             {
                 buf1[col]     = buf2[col]     = uv1;
                 buf1[col + 1] = buf2[col + 1] = uv2;
             }
-            buf1 += pitches[1];
-            buf2 += pitches[2];
+            buf1 += m_pitches[1];
+            buf2 += m_pitches[2];
         }
     }
-    else if (FMT_NV12 == codec)
+    else if (FMT_NV12 == m_type)
     {
-        memset(buf + offsets[0], 0, static_cast<size_t>(pitches[0] * height));
-        memset(buf + offsets[1], uv & 0xff, static_cast<size_t>(pitches[1] * uv_height));
+        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0] * m_height));
+        memset(m_buffer + m_offsets[1], uv & 0xff, static_cast<size_t>(m_pitches[1] * uv_height));
     }
-    else if (FormatIsNV12(codec))
+    else if (FormatIsNV12(m_type))
     {
-        memset(buf + offsets[0], 0, static_cast<size_t>(pitches[0] * height));
+        memset(m_buffer + m_offsets[0], 0, static_cast<size_t>(m_pitches[0] * m_height));
         unsigned char uv1 = (uv & 0xff00) >> 8;
         unsigned char uv2 = (uv & 0x00ff);
-        unsigned char* buf3 = buf + offsets[1];
+        unsigned char* buf3 = m_buffer + m_offsets[1];
         for (int row = 0; row < uv_height; ++row)
         {
-            for (int col = 0; col < pitches[1]; col += 4)
+            for (int col = 0; col < m_pitches[1]; col += 4)
             {
                 buf3[col]     = buf3[col + 2] = uv1;
                 buf3[col + 1] = buf3[col + 3] = uv2;
             }
-            buf3 += pitches[1];
+            buf3 += m_pitches[1];
         }
     }
-    else if (PackedFormat(codec))
+    else if (PackedFormat(m_type))
     {
         // TODO
     }
     else
     {
-        memset(buf, 0, size);
+        memset(m_buffer, 0, m_bufferSize);
     }
 }
 
@@ -380,34 +380,34 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *From)
     if (!From || (this == From))
         return false;
 
-    if (codec != From->codec)
+    if (m_type != From->m_type)
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot copy frames of differing types");
         return false;
     }
 
-    if (From->codec == FMT_NONE || HardwareFormat(From->codec))
+    if (From->m_type == FMT_NONE || HardwareFormat(From->m_type))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid frame format");
         return false;
     }
 
-    if (!((width > 0) && (height > 0) &&
-          (width == From->width) && (height == From->height)))
+    if (!((m_width > 0) && (m_height > 0) &&
+          (m_width == From->m_width) && (m_height == From->m_height)))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid frame sizes");
         return false;
     }
 
-    if (!(buf && From->buf && (buf != From->buf)))
+    if (!(m_buffer && From->m_buffer && (m_buffer != From->m_buffer)))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid frames for copying");
         return false;
     }
 
     // N.B. Minimum based on zero width alignment but will apply height alignment
-    size_t minsize = GetBufferSize(codec, width, height, 0);
-    if ((size < minsize) || (From->size < minsize))
+    size_t minsize = GetBufferSize(m_type, m_width, m_height, 0);
+    if ((m_bufferSize < minsize) || (From->m_bufferSize < minsize))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid buffer size");
         return false;
@@ -417,50 +417,50 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *From)
     // and both have buffers reported to satisfy a minimal size.
 
     // Copy data
-    uint count = GetNumPlanes(From->codec);
+    uint count = GetNumPlanes(From->m_type);
     for (uint plane = 0; plane < count; plane++)
     {
-        CopyPlane(buf + offsets[plane], pitches[plane],
-                  From->buf + From->offsets[plane], From->pitches[plane],
-                  GetPitchForPlane(From->codec, From->width, plane),
-                  GetHeightForPlane(From->codec, From->height, plane));
+        CopyPlane(m_buffer + m_offsets[plane], m_pitches[plane],
+                  From->m_buffer + From->m_offsets[plane], From->m_pitches[plane],
+                  GetPitchForPlane(From->m_type, From->m_width, plane),
+                  GetHeightForPlane(From->m_type, From->m_height, plane));
     }
 
     // Copy metadata
     // Not copied: codec, width, height - should already be the same
     // Not copied: buf, size, pitches, offsets - should/could be different
     // Not copied: priv - hardware frames only
-    aspect               = From->aspect;
-    frame_rate           = From->frame_rate;
-    bpp                  = From->bpp;
-    frameNumber          = From->frameNumber;
-    frameCounter         = From->frameCounter;
-    timecode             = From->timecode;
-    disp_timecode        = From->disp_timecode;
-    interlaced_frame     = From->interlaced_frame;
-    top_field_first      = From->top_field_first;
-    interlaced_reversed  = From->interlaced_reversed;
-    new_gop              = From->new_gop;
-    repeat_pict          = From->repeat_pict;
-    forcekey             = From->forcekey;
-    dummy                = From->dummy;
-    pause_frame          = From->pause_frame;
-    pix_fmt              = From->pix_fmt;
-    sw_pix_fmt           = From->sw_pix_fmt;
-    directrendering      = From->directrendering;
-    colorspace           = From->colorspace;
-    colorrange           = From->colorrange;
-    colorprimaries       = From->colorprimaries;
-    colortransfer        = From->colortransfer;
-    chromalocation       = From->chromalocation;
-    colorshifted         = From->colorshifted;
-    already_deinterlaced = From->already_deinterlaced;
-    rotation             = From->rotation;
-    deinterlace_single   = From->deinterlace_single;
-    deinterlace_double   = From->deinterlace_double;
-    deinterlace_allowed  = From->deinterlace_allowed;
-    deinterlace_inuse    = From->deinterlace_inuse;
-    deinterlace_inuse2x  = From->deinterlace_inuse2x;
+    m_aspect               = From->m_aspect;
+    m_frameRate           = From->m_frameRate;
+    m_bitsPerPixel                  = From->m_bitsPerPixel;
+    m_frameNumber          = From->m_frameNumber;
+    m_frameCounter         = From->m_frameCounter;
+    m_timecode             = From->m_timecode;
+    m_displayTimecode        = From->m_displayTimecode;
+    m_interlaced     = From->m_interlaced;
+    m_topFieldFirst      = From->m_topFieldFirst;
+    m_interlacedReverse  = From->m_interlacedReverse;
+    m_newGOP              = From->m_newGOP;
+    m_repeatPic          = From->m_repeatPic;
+    m_forceKey             = From->m_forceKey;
+    m_dummy                = From->m_dummy;
+    m_pauseFrame          = From->m_pauseFrame;
+    m_pixFmt              = From->m_pixFmt;
+    m_swPixFmt           = From->m_swPixFmt;
+    m_directRendering      = From->m_directRendering;
+    m_colorspace           = From->m_colorspace;
+    m_colorrange           = From->m_colorrange;
+    m_colorprimaries       = From->m_colorprimaries;
+    m_colortransfer        = From->m_colortransfer;
+    m_chromalocation       = From->m_chromalocation;
+    m_colorshifted         = From->m_colorshifted;
+    m_alreadyDeinterlaced = From->m_alreadyDeinterlaced;
+    m_rotation             = From->m_rotation;
+    m_deinterlaceSingle   = From->m_deinterlaceSingle;
+    m_deinterlaceDouble   = From->m_deinterlaceDouble;
+    m_deinterlaceAllowed  = From->m_deinterlaceAllowed;
+    m_deinterlaceInuse    = From->m_deinterlaceInuse;
+    m_deinterlaceInuse2x  = From->m_deinterlaceInuse2x;
 
     return true;
 }

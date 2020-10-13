@@ -47,7 +47,7 @@ void VideoOutputD3D::GetRenderOptions(RenderOptions &Options)
 VideoOutputD3D::VideoOutputD3D(void)
   : MythVideoOutput(),
 {
-    m_pauseFrame.buf = nullptr;
+    m_pauseFrame.m_buffer = nullptr;
 }
 
 VideoOutputD3D::~VideoOutputD3D()
@@ -61,10 +61,10 @@ void VideoOutputD3D::TearDown(void)
     m_videoBuffers.DiscardFrames(true);
     m_videoBuffers.Reset();
     m_videoBuffers.DeleteBuffers();
-    if (m_pauseFrame.buf)
+    if (m_pauseFrame.m_buffer)
     {
-        delete [] m_pauseFrame.buf;
-        m_pauseFrame.buf = nullptr;
+        delete [] m_pauseFrame.m_buffer;
+        m_pauseFrame.m_buffer = nullptr;
     }
 
     if (m_osdPainter)
@@ -295,12 +295,12 @@ bool VideoOutputD3D::CreatePauseFrame(void)
         return true;
 
     init(&m_pauseFrame, FMT_YV12,
-         new unsigned char[m_videoBuffers.GetScratchFrame()->size + 128],
-         m_videoBuffers.GetScratchFrame()->width,
-         m_videoBuffers.GetScratchFrame()->height,
-         m_videoBuffers.GetScratchFrame()->size);
+         new unsigned char[m_videoBuffers.GetScratchFrame()->m_bufferSize + 128],
+         m_videoBuffers.GetScratchFrame()->m_width,
+         m_videoBuffers.GetScratchFrame()->m_height,
+         m_videoBuffers.GetScratchFrame()->m_bufferSize);
 
-    m_pauseFrame.frameNumber = m_videoBuffers.GetScratchFrame()->frameNumber;
+    m_pauseFrame.m_frameNumber = m_videoBuffers.GetScratchFrame()->m_frameNumber;
     return true;
 }
 
@@ -320,8 +320,8 @@ void VideoOutputD3D::RenderFrame(MythVideoFrame *buffer, FrameScanType t, OSD *o
     bool dummy = false;
     if (buffer)
     {
-        dummy = buffer->dummy;
-        m_framesPlayed = buffer->frameNumber + 1;
+        dummy = buffer->m_dummy;
+        m_framesPlayed = buffer->m_frameNumber + 1;
     }
 
     if (!m_render || !m_video)
@@ -419,14 +419,14 @@ void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode, FrameScanType)
         if (!used_frame)
             used_frame = m_videoBuffers.GetScratchFrame();
         CopyFrame(&m_pauseFrame, used_frame);
-        disp_timecode = m_pauseFrame.disp_timecode;
+        disp_timecode = m_pauseFrame.m_displayTimecode;
     }
     else if (codec_is_dxva2(m_videoCodecID))
     {
         if (used_frame)
         {
-            m_pauseSurface = used_frame->buf;
-            disp_timecode = used_frame->disp_timecode;
+            m_pauseSurface = used_frame->m_buffer;
+            disp_timecode = used_frame->m_displayTimecode;
         }
         else
             LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Failed to update pause frame");
@@ -451,7 +451,7 @@ void VideoOutputD3D::UpdateFrame(MythVideoFrame *frame, D3D9Image *img)
         AVFrame image_out;
         av_image_fill_arrays(image_out.data, image_out.linesize,
             (uint8_t*)buf,
-            AV_PIX_FMT_RGB32, frame->width, frame->height, IMAGE_ALIGN);
+            AV_PIX_FMT_RGB32, frame->m_width, frame->m_height, IMAGE_ALIGN);
         image_out.linesize[0] = pitch;
         m_copyFrame.Copy(&image_out, frame,(uint8_t*)buf, AV_PIX_FMT_RGB32);
     }
@@ -474,7 +474,7 @@ void VideoOutputD3D::PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayer
 
     bool gpu = codec_is_dxva2(m_videoCodecID);
 
-    if (gpu && frame && frame->codec != FMT_DXVA2)
+    if (gpu && frame && frame->m_type != FMT_DXVA2)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Wrong frame format");
         return;
@@ -493,7 +493,7 @@ void VideoOutputD3D::PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayer
     }
 
     if (frame)
-        dummy = frame->dummy;
+        dummy = frame->m_dummy;
 
     bool safepauseframe = pauseframe && !gpu;
 
@@ -518,7 +518,7 @@ void VideoOutputD3D::PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayer
 
         if (m_renderValid && frame)
         {
-            m_render->CopyFrame(frame->buf, m_video);
+            m_render->CopyFrame(frame->m_buffer, m_video);
         }
         else if (m_renderValid && pauseframe)
         {
@@ -542,7 +542,7 @@ void VideoOutputD3D::ShowPIP(MythPlayer *pipplayer, PIPLocation loc)
     const uint  pipVideoHeight = pipVideoDim.height();
 
     if ((pipVideoAspect <= 0) || !pipimage ||
-        !pipimage->buf || (pipimage->codec != FMT_YV12) || !pipVisible)
+        !pipimage->m_buffer || (pipimage->m_type != FMT_YV12) || !pipVisible)
     {
         pipplayer->ReleaseCurrentFrame(pipimage);
         return;

@@ -551,7 +551,7 @@ bool CommDetector2::go(void)
             MythVideoFrame *currentFrame =
                 m_player->GetRawVideoFrame(fetchNext ? -1 : nextFrame);
             long long lastFrameNumber = m_currentFrameNumber;
-            m_currentFrameNumber = currentFrame->frameNumber + 1;
+            m_currentFrameNumber = currentFrame->m_frameNumber + 1;
             (void)gettimeofday(&end, nullptr);
             timersub(&end, &start, &elapsedtv);
             timeradd(&getframetime, &elapsedtv, &getframetime);

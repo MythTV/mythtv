@@ -289,7 +289,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
         return;
     }
 
-    if (Frame->codec != Textures[0]->m_frameType)
+    if (Frame->m_type != Textures[0]->m_frameType)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Inconsistent video and texture frame types");
         return;
@@ -487,11 +487,11 @@ inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const MythVi
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)
     {
-        int pitch = (Frame->codec == FMT_YV12 || Frame->codec == FMT_YUV422P || Frame->codec == FMT_YUV444P) ?
-                     Frame->pitches[Plane] : Frame->pitches[Plane] >> 1;
+        int pitch = (Frame->m_type == FMT_YV12 || Frame->m_type == FMT_YUV422P || Frame->m_type == FMT_YUV444P) ?
+                     Frame->m_pitches[Plane] : Frame->m_pitches[Plane] >> 1;
         Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch);
         Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
-                                    static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
+                                    static_cast<uint8_t*>(Frame->m_buffer) + Frame->m_offsets[Plane]);
         Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     }
     else
@@ -499,10 +499,10 @@ inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const MythVi
         if (!Texture->m_data)
             if (!CreateBuffer(Texture, Texture->m_bufferSize))
                 return;
-        int pitch = (Frame->codec == FMT_YV12 || Frame->codec == FMT_YUV422P || Frame->codec == FMT_YUV444P) ?
+        int pitch = (Frame->m_type == FMT_YV12 || Frame->m_type == FMT_YUV422P || Frame->m_type == FMT_YUV444P) ?
                      Texture->m_size.width() : Texture->m_size.width() << 1;
-        MythVideoFrame::CopyPlane(Texture->m_data, pitch, Frame->buf + Frame->offsets[Plane],
-                                  Frame->pitches[Plane], pitch, Texture->m_size.height());
+        MythVideoFrame::CopyPlane(Texture->m_data, pitch, Frame->m_buffer + Frame->m_offsets[Plane],
+                                  Frame->m_pitches[Plane], pitch, Texture->m_size.height());
         Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, Texture->m_data);
     }
     Texture->m_valid = true;
@@ -541,10 +541,10 @@ inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const MythVi
     if (Context->GetExtraFeatures() & kGLExtSubimage)
     {
         bool hdr = Texture->m_frameFormat != FMT_NV12;
-        Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, Plane ? Frame->pitches[Plane] >> (hdr ? 2 : 1) :
-                                                             Frame->pitches[Plane] >> (hdr ? 1 : 0));
+        Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, Plane ? Frame->m_pitches[Plane] >> (hdr ? 2 : 1) :
+                                                             Frame->m_pitches[Plane] >> (hdr ? 1 : 0));
         Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType,
-                                    static_cast<uint8_t*>(Frame->buf) + Frame->offsets[Plane]);
+                                    static_cast<uint8_t*>(Frame->m_buffer) + Frame->m_offsets[Plane]);
         Context->glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     }
     else
@@ -552,8 +552,8 @@ inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const MythVi
         if (!Texture->m_data)
             if (!CreateBuffer(Texture, Texture->m_bufferSize))
                 return;
-        MythVideoFrame::CopyPlane(Texture->m_data, Frame->pitches[Plane], Frame->buf + Frame->offsets[Plane],
-                                  Frame->pitches[Plane], Frame->pitches[Plane], Texture->m_size.height());
+        MythVideoFrame::CopyPlane(Texture->m_data, Frame->m_pitches[Plane], Frame->m_buffer + Frame->m_offsets[Plane],
+                                  Frame->m_pitches[Plane], Frame->m_pitches[Plane], Texture->m_size.height());
         Texture->m_texture->setData(Texture->m_pixelFormat, Texture->m_pixelType, Texture->m_data);
     }
     Texture->m_valid = true;

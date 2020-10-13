@@ -63,15 +63,15 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDe
                                                                MythRenderOpenGL *Context,
                                                                MythVideoFrame *Frame, FrameScanType Scan) const
 {
-    Frame->already_deinterlaced = true;
+    Frame->m_alreadyDeinterlaced = true;
     std::vector<MythVideoTexture*> result;
     for (int i = 0; i < (Scan == kScan_Progressive ? 1 : 2); ++i)
     {
         std::vector<QSize> sizes;
-        int frameheight = Scan == kScan_Progressive ? Frame->height : Frame->height >> 1;
-        sizes.emplace_back(QSize(Frame->width, frameheight));
+        int frameheight = Scan == kScan_Progressive ? Frame->m_height : Frame->m_height >> 1;
+        sizes.emplace_back(QSize(Frame->m_width, frameheight));
         std::vector<MythVideoTexture*> textures =
-                MythVideoTexture::CreateTextures(Context, Frame->codec, FMT_RGBA32, sizes,
+                MythVideoTexture::CreateTextures(Context, Frame->m_type, FMT_RGBA32, sizes,
                                                  GL_TEXTURE_EXTERNAL_OES);
         if (textures.empty())
         {
@@ -82,7 +82,7 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDe
         textures[0]->m_allowGLSLDeint = false;
 
         EGLint colourspace = EGL_ITU_REC709_EXT;
-        switch (Frame->colorspace)
+        switch (Frame->m_colorspace)
         {
             case AVCOL_SPC_BT470BG:
             case AVCOL_SPC_SMPTE170M:
@@ -94,7 +94,7 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDe
                 colourspace = EGL_ITU_REC2020_EXT;
                 break;
             default:
-                if (Frame->width < 1280)
+                if (Frame->m_width < 1280)
                     colourspace = EGL_ITU_REC601_EXT;
                 break;
         }
@@ -119,10 +119,10 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateComposed(AVDRMFrameDe
 
         QVector<EGLint> attribs = {
             EGL_LINUX_DRM_FOURCC_EXT,      static_cast<EGLint>(layer->format),
-            EGL_WIDTH,                     Frame->width,
+            EGL_WIDTH,                     Frame->m_width,
             EGL_HEIGHT,                    frameheight,
             EGL_YUV_COLOR_SPACE_HINT_EXT,  colourspace,
-            EGL_SAMPLE_RANGE_HINT_EXT,     Frame->colorrange == AVCOL_RANGE_JPEG ? EGL_YUV_FULL_RANGE_EXT : EGL_YUV_NARROW_RANGE_EXT,
+            EGL_SAMPLE_RANGE_HINT_EXT,     Frame->m_colorrange == AVCOL_RANGE_JPEG ? EGL_YUV_FULL_RANGE_EXT : EGL_YUV_NARROW_RANGE_EXT,
             EGL_YUV_CHROMA_VERTICAL_SITING_HINT_EXT,   EGL_YUV_CHROMA_SITING_0_EXT,
             EGL_YUV_CHROMA_HORIZONTAL_SITING_HINT_EXT, EGL_YUV_CHROMA_SITING_0_EXT
         };
@@ -184,14 +184,14 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate(AVDRMFrameDe
     std::vector<QSize> sizes;
     for (int plane = 0 ; plane < Desc->nb_layers; ++plane)
     {
-        int width = Frame->width >> ((plane > 0) ? 1 : 0);
-        int height = Frame->height >> ((plane > 0) ? 1 : 0);
+        int width = Frame->m_width >> ((plane > 0) ? 1 : 0);
+        int height = Frame->m_height >> ((plane > 0) ? 1 : 0);
         sizes.emplace_back(QSize(width, height));
     }
 
-    VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
+    VideoFrameType format = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
     std::vector<MythVideoTexture*> result =
-            MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
+            MythVideoTexture::CreateTextures(Context, Frame->m_type, format, sizes,
                                              QOpenGLTexture::Target2D);
     if (result.empty())
         return result;
@@ -275,8 +275,8 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameD
     std::vector<QSize> sizes;
     for (int plane = 0 ; plane < layer->nb_planes; ++plane)
     {
-        int width = Frame->width >> ((plane > 0) ? 1 : 0);
-        int height = Frame->height >> ((plane > 0) ? 1 : 0);
+        int width = Frame->m_width >> ((plane > 0) ? 1 : 0);
+        int height = Frame->m_height >> ((plane > 0) ? 1 : 0);
         sizes.emplace_back(QSize(width, height));
     }
 
@@ -298,7 +298,7 @@ inline std::vector<MythVideoTexture*> MythEGLDMABUF::CreateSeparate2(AVDRMFrameD
     }
 
     std::vector<MythVideoTexture*> result =
-            MythVideoTexture::CreateTextures(Context, Frame->codec, format, sizes,
+            MythVideoTexture::CreateTextures(Context, Frame->m_type, format, sizes,
                                              QOpenGLTexture::Target2D);
     if (result.empty())
         return result;

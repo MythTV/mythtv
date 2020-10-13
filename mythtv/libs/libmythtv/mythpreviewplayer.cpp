@@ -120,14 +120,14 @@ char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, 
     MythVideoFrame *frame = nullptr;
     if (!(frame = m_videoOutput->GetLastDecodedFrame()))
         return nullptr;
-    if (!frame->buf)
+    if (!frame->m_buffer)
         return nullptr;
 
-    if (frame->interlaced_frame)
+    if (frame->m_interlaced)
     {
         // Use high quality - which is currently yadif
-        frame->deinterlace_double = DEINT_NONE;
-        frame->deinterlace_allowed = frame->deinterlace_single = DEINT_CPU | DEINT_HIGH;
+        frame->m_deinterlaceDouble = DEINT_NONE;
+        frame->m_deinterlaceAllowed = frame->m_deinterlaceSingle = DEINT_CPU | DEINT_HIGH;
         MythDeinterlacer deinterlacer;
         deinterlacer.Filter(frame, kScan_Interlaced, nullptr, true);
     }
@@ -138,7 +138,7 @@ char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, 
     copyCtx.Copy(&retbuf, frame, result, AV_PIX_FMT_RGB32);
     FrameWidth = m_videoDispDim.width();
     FrameHeight = m_videoDispDim.height();
-    AspectRatio = frame->aspect;
+    AspectRatio = frame->m_aspect;
 
     DiscardVideoFrame(frame);
     return reinterpret_cast<char*>(result);

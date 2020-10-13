@@ -256,8 +256,8 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
 
 bool VBI608Extractor::ExtractCC(const MythVideoFrame *picframe, uint max_lines)
 {
-    int ypitch = picframe->pitches[0];
-    int ywidth = picframe->width;
+    int ypitch = picframe->m_pitches[0];
+    int ywidth = picframe->m_width;
 
     m_code[0] = UINT16_MAX;
     m_code[1] = UINT16_MAX;
@@ -266,8 +266,8 @@ bool VBI608Extractor::ExtractCC(const MythVideoFrame *picframe, uint max_lines)
     uint found_cnt = 0;
     for (uint i = 0; i < max_lines; i++)
     {
-        const unsigned char *y = picframe->buf +
-            picframe->offsets[0] + (i * ypitch);
+        const unsigned char *y = picframe->m_buffer +
+            picframe->m_offsets[0] + (i * ypitch);
         if (FindClocks(y, ywidth))
         {
             uint maxv = 0;

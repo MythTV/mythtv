@@ -740,7 +740,7 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, MythVideoFrame 
     // allow CPU/GLSL
     if (m_filterError)
     {
-        Frame->deinterlace_allowed = Frame->deinterlace_allowed & ~DEINT_DRIVER;
+        Frame->m_deinterlaceAllowed = Frame->m_deinterlaceAllowed & ~DEINT_DRIVER;
         return;
     }
     if (kCodec_HEVC_VAAPI_DEC == m_codecID || kCodec_VP9_VAAPI_DEC == m_codecID ||
@@ -762,11 +762,11 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, MythVideoFrame 
     // interlaced flags to ensure auto deinterlacing continues to work
     if (m_deinterlacer)
     {
-        Frame->interlaced_frame = m_lastInterlaced;
-        Frame->top_field_first = m_lastTopFieldFirst;
-        Frame->deinterlace_inuse = m_deinterlacer | DEINT_DRIVER;
-        Frame->deinterlace_inuse2x = m_deinterlacer2x;
-        Frame->already_deinterlaced = true;
+        Frame->m_interlaced = m_lastInterlaced;
+        Frame->m_topFieldFirst = m_lastTopFieldFirst;
+        Frame->m_deinterlaceInuse = m_deinterlacer | DEINT_DRIVER;
+        Frame->m_deinterlaceInuse2x = m_deinterlacer2x;
+        Frame->m_alreadyDeinterlaced = true;
     }
 
     // N.B. this picks up the scan tracking in MythPlayer. So we can

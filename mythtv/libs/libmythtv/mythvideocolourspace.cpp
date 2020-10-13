@@ -349,14 +349,14 @@ bool MythVideoColourSpace::UpdateColourSpace(const MythVideoFrame *Frame)
     if (!Frame)
         return false;
 
-    int csp      = Frame->colorspace;
-    int primary  = Frame->colorprimaries;
-    int transfer = Frame->colortransfer;
-    int chroma   = Frame->chromalocation;
+    int csp      = Frame->m_colorspace;
+    int primary  = Frame->m_colorprimaries;
+    int transfer = Frame->m_colortransfer;
+    int chroma   = Frame->m_chromalocation;
     int raw      = csp;
     int rawchroma = chroma;
-    VideoFrameType frametype = Frame->codec;
-    VideoFrameType softwaretype = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->sw_pix_fmt));
+    VideoFrameType frametype = Frame->m_type;
+    VideoFrameType softwaretype = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_swPixFmt));
 
     // workaround for NVDEC. NVDEC defaults to a colorspace of 0 - which happens
     // to equate to RGB. In testing, NVDEC reports the same colourspace as FFmpeg
@@ -367,21 +367,21 @@ bool MythVideoColourSpace::UpdateColourSpace(const MythVideoFrame *Frame)
         forced = true;
         csp = AVCOL_SPC_UNSPECIFIED;
     }
-    int range = Frame->colorrange;
+    int range = Frame->m_colorrange;
     if (range ==  AVCOL_RANGE_UNSPECIFIED)
         range = AVCOL_RANGE_MPEG;
     int depth = MythVideoFrame::ColorDepth(MythVideoFrame::HardwareFormat(frametype) ? softwaretype : frametype);
     if (csp == AVCOL_SPC_UNSPECIFIED)
-        csp = (Frame->width < 1280) ? AVCOL_SPC_BT470BG : AVCOL_SPC_BT709;
+        csp = (Frame->m_width < 1280) ? AVCOL_SPC_BT470BG : AVCOL_SPC_BT709;
     if (primary == AVCOL_PRI_UNSPECIFIED)
-        primary = (Frame->width < 1280) ? AVCOL_PRI_BT470BG : AVCOL_PRI_BT709;
+        primary = (Frame->m_width < 1280) ? AVCOL_PRI_BT470BG : AVCOL_PRI_BT709;
     if (transfer == AVCOL_TRC_UNSPECIFIED)
-        transfer = (Frame->width < 1280) ? AVCOL_TRC_GAMMA28 : AVCOL_TRC_BT709;
+        transfer = (Frame->m_width < 1280) ? AVCOL_TRC_GAMMA28 : AVCOL_TRC_BT709;
     if (chroma == AVCHROMA_LOC_UNSPECIFIED)
         chroma = AVCHROMA_LOC_LEFT;
 
     if ((csp == m_colourSpace) && (m_colourSpaceDepth == depth) &&
-        (m_range == range) && (m_colourShifted == Frame->colorshifted) &&
+        (m_range == range) && (m_colourShifted == Frame->m_colorshifted) &&
         (primary == m_colourPrimaries) && (chroma == m_chromaLocation))
     {
         return false;
@@ -390,14 +390,14 @@ bool MythVideoColourSpace::UpdateColourSpace(const MythVideoFrame *Frame)
     m_colourSpace      = csp;
     m_colourSpaceDepth = depth;
     m_range            = range;
-    m_colourShifted    = Frame->colorshifted;
+    m_colourShifted    = Frame->m_colorshifted;
     m_colourPrimaries  = primary;
     m_colourTransfer   = transfer;
     m_chromaLocation   = chroma;
 
     if (forced)
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Forcing inconsistent colourspace - frame format %1")
-            .arg(MythVideoFrame::FormatDescription(Frame->codec)));
+            .arg(MythVideoFrame::FormatDescription(Frame->m_type)));
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Input : %1(%2) Depth:%3 %4Range:%5")
         .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))

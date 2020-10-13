@@ -35,10 +35,10 @@ void DetectLetterbox::Detect(MythVideoFrame *Frame)
     if (!m_player->GetVideoOutput())
         return;
 
-    unsigned char *buf = Frame->buf;
-    const FramePitches pitches = Frame->pitches;
-    const FrameOffsets offsets = Frame->offsets;
-    const int height = Frame->height;
+    unsigned char *buf = Frame->m_buffer;
+    const FramePitches pitches = Frame->m_pitches;
+    const FrameOffsets offsets = Frame->m_offsets;
+    const int height = Frame->m_height;
 
     // If the black bars is larger than this limit we switch to Half or Full Mode
     //    const int fullLimit = static_cast<int>(((height - width * 9 / 16) / 2) * m_detectLetterboxLimit / 100);
@@ -50,7 +50,7 @@ void DetectLetterbox::Detect(MythVideoFrame *Frame)
 
     // Lines to scan for black letterbox edge
     const std::array<int,3> xPos
-        { Frame->width / 4, Frame->width / 2, Frame->width * 3 / 4} ;
+        { Frame->m_width / 4, Frame->m_width / 2, Frame->m_width * 3 / 4} ;
     int topHits     = 0;
     int bottomHits  = 0;
     int minTop      = 0;
@@ -60,7 +60,7 @@ void DetectLetterbox::Detect(MythVideoFrame *Frame)
     std::array<int,3> topHit    = { 0, 0, 0 };
     std::array<int,3> bottomHit = { 0, 0, 0 };
 
-    switch (Frame->codec)
+    switch (Frame->m_type)
     {
         case FMT_YV12:
         case FMT_YUV420P9:
@@ -71,25 +71,25 @@ void DetectLetterbox::Detect(MythVideoFrame *Frame)
         case FMT_NV12:
         case FMT_P010:
         case FMT_P016:
-            if (!m_firstFrameChecked || m_frameType != Frame->codec)
+            if (!m_firstFrameChecked || m_frameType != Frame->m_type)
             {
-                m_firstFrameChecked = Frame->frameNumber;
+                m_firstFrameChecked = Frame->m_frameNumber;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("'%1' frame format detected")
-                    .arg(MythVideoFrame::FormatDescription(Frame->codec)));
+                    .arg(MythVideoFrame::FormatDescription(Frame->m_type)));
             }
-            m_frameType = Frame->codec;
+            m_frameType = Frame->m_type;
             break;
         default:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("'%1' frame format is not supported")
-                    .arg(MythVideoFrame::FormatDescription(Frame->codec)));
+                    .arg(MythVideoFrame::FormatDescription(Frame->m_type)));
             m_isDetectLetterbox = false;
             return;
     }
 
-    if (Frame->frameNumber < 0)
+    if (Frame->m_frameNumber < 0)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Strange frame number %1")
-                 .arg(Frame->frameNumber));
+                 .arg(Frame->m_frameNumber));
         return;
     }
 
@@ -102,7 +102,7 @@ void DetectLetterbox::Detect(MythVideoFrame *Frame)
             m_detectLetterboxLock.lock();
             m_detectLetterboxConsecutiveCounter = 0;
             m_detectLetterboxDetectedMode = m_detectLetterboxDefaultMode;
-            m_detectLetterboxSwitchFrame = Frame->frameNumber;
+            m_detectLetterboxSwitchFrame = Frame->m_frameNumber;
             m_detectLetterboxLock.unlock();
         }
         else
@@ -207,7 +207,7 @@ void DetectLetterbox::Detect(MythVideoFrame *Frame)
     bool horizontal = (((minTop != 0) && (maxTop - minTop < HORIZONTAL_THRESHOLD)) &&
                        ((minBottom != 0) && (maxBottom - minBottom < HORIZONTAL_THRESHOLD)));
 
-    if (m_detectLetterboxSwitchFrame > Frame->frameNumber) // user is reversing
+    if (m_detectLetterboxSwitchFrame > Frame->m_frameNumber) // user is reversing
     {
         m_detectLetterboxLock.lock();
         m_detectLetterboxDetectedMode = m_player->GetAdjustFill();
@@ -227,7 +227,7 @@ void DetectLetterbox::Detect(MythVideoFrame *Frame)
         if (m_detectLetterboxPossibleHalfFrame == -1 &&
             minTop > halfLimit && minBottom > halfLimit)
         {
-            m_detectLetterboxPossibleHalfFrame = Frame->frameNumber;
+            m_detectLetterboxPossibleHalfFrame = Frame->m_frameNumber;
         }
     }
     else
@@ -235,13 +235,13 @@ void DetectLetterbox::Detect(MythVideoFrame *Frame)
         if (m_detectLetterboxPossibleHalfFrame == -1 &&
             minTop < fullLimit && minBottom < fullLimit)
         {
-            m_detectLetterboxPossibleHalfFrame = Frame->frameNumber;
+            m_detectLetterboxPossibleHalfFrame = Frame->m_frameNumber;
         }
     }
     if (m_detectLetterboxPossibleFullFrame == -1 &&
         minTop > fullLimit && minBottom > fullLimit)
     {
-        m_detectLetterboxPossibleFullFrame = Frame->frameNumber;
+        m_detectLetterboxPossibleFullFrame = Frame->m_frameNumber;
     }
 
     if (maxTop < halfLimit || maxBottom < halfLimit) // Not too restrictive when switching to off
@@ -254,7 +254,7 @@ void DetectLetterbox::Detect(MythVideoFrame *Frame)
             m_detectLetterboxLock.lock();
             m_detectLetterboxConsecutiveCounter = 0;
             m_detectLetterboxDetectedMode = m_detectLetterboxDefaultMode;
-            m_detectLetterboxSwitchFrame = Frame->frameNumber;
+            m_detectLetterboxSwitchFrame = Frame->m_frameNumber;
             m_detectLetterboxLock.unlock();
         }
         else
@@ -331,27 +331,27 @@ void DetectLetterbox::SwitchTo(MythVideoFrame *Frame)
         return;
 
     m_detectLetterboxLock.lock();
-    if (m_detectLetterboxSwitchFrame <= Frame->frameNumber &&
+    if (m_detectLetterboxSwitchFrame <= Frame->m_frameNumber &&
         m_detectLetterboxConsecutiveCounter > 3)
     {
         if (m_player->GetAdjustFill() != m_detectLetterboxDetectedMode)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Switched to '%1' on frame %2 (%3)")
                     .arg(toString(m_detectLetterboxDetectedMode))
-                    .arg(Frame->frameNumber)
+                    .arg(Frame->m_frameNumber)
                     .arg(m_detectLetterboxSwitchFrame));
             m_player->GetVideoOutput()->ToggleAdjustFill(m_detectLetterboxDetectedMode);
             m_player->ReinitOSD();
         }
         m_detectLetterboxSwitchFrame = -1;
     }
-    else if (m_detectLetterboxSwitchFrame <= Frame->frameNumber)
+    else if (m_detectLetterboxSwitchFrame <= Frame->m_frameNumber)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Not Switched to '%1' on frame %2 "
                     "(%3) Not enough consecutive detections (%4)")
                 .arg(toString(m_detectLetterboxDetectedMode))
-                .arg(Frame->frameNumber).arg(m_detectLetterboxSwitchFrame)
+                .arg(Frame->m_frameNumber).arg(m_detectLetterboxSwitchFrame)
                 .arg(m_detectLetterboxConsecutiveCounter));
     }
 

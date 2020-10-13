@@ -80,25 +80,25 @@ void MythVideoVulkan::StartFrame()
 
 void MythVideoVulkan::PrepareFrame(MythVideoFrame* Frame, FrameScanType /*Scan*/)
 {
-    if (!(m_valid && IsValidVulkan() && (Frame->codec == FMT_NONE)))
+    if (!(m_valid && IsValidVulkan() && (Frame->m_type == FMT_NONE)))
         return;
 
     // No hardware frame support yet
-    if (MythVideoFrame::HardwareFormat(Frame->codec))
+    if (MythVideoFrame::HardwareFormat(Frame->m_type))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid hardware video frame");
         return;
     }
 
     // Sanitise frame
-    if ((Frame->width < 1) || (Frame->height < 1) || !Frame->buf)
+    if ((Frame->m_width < 1) || (Frame->m_height < 1) || !Frame->m_buffer)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid video frame");
         return;
     }
 
     // Can we render this frame format
-    if (!MythVideoFrame::YUVFormat(Frame->codec))
+    if (!MythVideoFrame::YUVFormat(Frame->m_type))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Frame format is not supported");
         return;
@@ -107,13 +107,13 @@ void MythVideoVulkan::PrepareFrame(MythVideoFrame* Frame, FrameScanType /*Scan*/
     VkCommandBuffer cmdbuffer = nullptr;
 
     // check for input changes
-    if ((Frame->width  != m_videoDim.width()) || (Frame->height != m_videoDim.height()) ||
-        (Frame->codec  != m_inputType))
+    if ((Frame->m_width  != m_videoDim.width()) || (Frame->m_height != m_videoDim.height()) ||
+        (Frame->m_type  != m_inputType))
     {
-        VideoFrameType frametype = Frame->codec;
-        QSize size(Frame->width, Frame->height);
+        VideoFrameType frametype = Frame->m_type;
+        QSize size(Frame->m_width, Frame->m_height);
         cmdbuffer = m_vulkanRender->CreateSingleUseCommandBuffer();
-        if (!SetupFrameFormat(Frame->codec, frametype, size, cmdbuffer))
+        if (!SetupFrameFormat(Frame->m_type, frametype, size, cmdbuffer))
         {
             m_vulkanRender->FinishSingleUseCommandBuffer(cmdbuffer);
             return;
@@ -121,7 +121,7 @@ void MythVideoVulkan::PrepareFrame(MythVideoFrame* Frame, FrameScanType /*Scan*/
     }
 
     m_videoColourSpace->UpdateColourSpace(Frame);
-    m_discontinuityCounter = Frame->frameCounter;
+    m_discontinuityCounter = Frame->m_frameCounter;
 
     if (!cmdbuffer)
         cmdbuffer = m_vulkanRender->CreateSingleUseCommandBuffer();

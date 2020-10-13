@@ -81,7 +81,7 @@ PGMConverter::getImage(const MythVideoFrame *frame, long long _frameno,
     if (m_frameNo == _frameno)
         goto out;
 
-    if (!frame->buf)
+    if (!frame->m_buffer)
     {
         LOG(VB_COMMFLAG, LOG_ERR, "PGMConverter::getImage no buf");
         goto error;

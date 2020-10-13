@@ -577,7 +577,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
 
     if (dvdSubtitle &&
         (dvdSubtitle->end_display_time > dvdSubtitle->start_display_time) &&
-        (dvdSubtitle->end_display_time < currentFrame->timecode))
+        (dvdSubtitle->end_display_time < currentFrame->m_timecode))
     {
         expired = true;
     }
@@ -601,7 +601,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
         return;
     }
 
-    if (currentFrame->timecode && (dvdSubtitle->start_display_time > currentFrame->timecode))
+    if (currentFrame->m_timecode && (dvdSubtitle->start_display_time > currentFrame->m_timecode))
     {
         m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
         return;

@@ -240,7 +240,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Mismatched OpenGL contexts");
 
     // Check size
-    QSize surfacesize(Frame->width, Frame->height);
+    QSize surfacesize(Frame->m_width, Frame->m_height);
     if (m_openglTextureSize != surfacesize)
     {
         if (!m_openglTextureSize.isEmpty())
@@ -252,11 +252,11 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     OpenGLLocker locker(m_context);
 
     // Retrieve hardware frames context and AVVDPAUDeviceContext
-    if ((Frame->pix_fmt != AV_PIX_FMT_VDPAU) || (Frame->codec != FMT_VDPAU) ||
-        !Frame->buf || !Frame->priv[1])
+    if ((Frame->m_pixFmt != AV_PIX_FMT_VDPAU) || (Frame->m_type != FMT_VDPAU) ||
+        !Frame->m_buffer || !Frame->m_priv[1])
         return result;
 
-    auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+    auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->m_priv[1]);
     if (!buffer || !buffer->data)
         return result;
     auto* frames = reinterpret_cast<AVHWFramesContext*>(buffer->data);
@@ -271,7 +271,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
         return result;
 
     // Retrieve surface - we need its size to create the mixer and output surface
-    auto surface = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frame->buf));
+    auto surface = static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Frame->m_buffer));
     if (!surface)
         return result;
 
@@ -280,7 +280,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     // FFmpeg clearly currently has issues with interlaced HEVC (https://trac.ffmpeg.org/ticket/4141).
     // Streams are always return with the field height.
     // Deinterlacing does work with (some?) HEVC material flagged as interlaced.
-    if ((kCodec_HEVC_VDPAU == m_codec) && is_interlaced(Scan) && !Frame->interlaced_frame)
+    if ((kCodec_HEVC_VDPAU == m_codec) && is_interlaced(Scan) && !Frame->m_interlaced)
     {
         // This should only be logged a couple of times before the scan is detected as progressive
         LOG(VB_GENERAL, LOG_INFO, LOC + "Ignoring scan for non-interlaced HEVC frame");
@@ -305,23 +305,23 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
 
         if (driverdeint)
         {
-            Frame->deinterlace_inuse = driverdeint | DEINT_DRIVER;
-            Frame->deinterlace_inuse2x = doublerate;
+            Frame->m_deinterlaceInuse = driverdeint | DEINT_DRIVER;
+            Frame->m_deinterlaceInuse2x = doublerate;
             deinterlacer = driverdeint;
         }
     }
 
     if ((deinterlacer == DEINT_HIGH) || (deinterlacer == DEINT_MEDIUM))
     {
-        if (abs(Frame->frameCounter - m_discontinuityCounter) > 1)
+        if (abs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
             CleanupDeinterlacer();
-        RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->priv[0]));
+        RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->m_priv[0]));
     }
     else
     {
         CleanupDeinterlacer();
     }
-    m_discontinuityCounter = Frame->frameCounter;
+    m_discontinuityCounter = Frame->m_frameCounter;
 
     // We need a mixer, an output surface and mapped texture
     if (!InitVDPAU(devicecontext, surface, deinterlacer, doublerate))
@@ -353,8 +353,8 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     // Render surface
     m_unmapNV(1, &m_outputSurfaceReg);
     m_helper->MixerRender(m_mixer, surface, m_outputSurface, Scan,
-                          static_cast<int>(Frame->interlaced_reversed ? !Frame->top_field_first :
-                          Frame->top_field_first), m_referenceFrames);
+                          static_cast<int>(Frame->m_interlacedReverse ? !Frame->m_topFieldFirst :
+                          Frame->m_topFieldFirst), m_referenceFrames);
     m_mapNV(1, &m_outputSurfaceReg);
     return m_openglTextures[DUMMY_INTEROP_ID];
 }

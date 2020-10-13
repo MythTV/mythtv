@@ -963,7 +963,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             LOG(VB_GENERAL, LOG_INFO, "Enforcing sync on fifos");
         m_fifow = new MythFIFOWriter(2, framecontrol);
 
-        if (!m_fifow->FIFOInit(0, QString("video"), vidfifo, frame.size, 50) ||
+        if (!m_fifow->FIFOInit(0, QString("video"), vidfifo, frame.m_bufferSize, 50) ||
             !m_fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -992,7 +992,7 @@ int Transcode::TranscodeFile(const QString &inputname,
     int did_ff = 0;
 
     long curFrameNum = 0;
-    frame.frameNumber = 1;
+    frame.m_frameNumber = 1;
     long totalAudio = 0;
     int dropvideo = 0;
     // timecode of the last read video frame in input time
@@ -1051,17 +1051,17 @@ int Transcode::TranscodeFile(const QString &inputname,
             first_loop = false;
         }
 
-        float new_aspect = lastDecode->aspect;
+        float new_aspect = lastDecode->m_aspect;
 
         if (cutter)
-            cutter->NewFrame(lastDecode->frameNumber);
+            cutter->NewFrame(lastDecode->m_frameNumber);
 
 // frame timecode is on input time base
-        frame.timecode = lastDecode->timecode;
+        frame.m_timecode = lastDecode->m_timecode;
 
         // if the timecode jumps backwards just use the last frame's timecode plus the duration of a frame
-        if (frame.timecode < lasttimecode)
-            frame.timecode = (long long)(lasttimecode + vidFrameTime);
+        if (frame.m_timecode < lasttimecode)
+            frame.m_timecode = (long long)(lasttimecode + vidFrameTime);
 
         if (m_fifow)
         {
@@ -1069,19 +1069,19 @@ int Transcode::TranscodeFile(const QString &inputname,
             AVPictureFill(&imageOut, &frame);
 
             scontext = sws_getCachedContext(scontext,
-                           lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
-                           frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
+                           lastDecode->m_width, lastDecode->m_height, FrameTypeToPixelFormat(lastDecode->m_type),
+                           frame.m_width, frame.m_height, FrameTypeToPixelFormat(frame.m_type),
                            SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
             // Typically, wee aren't rescaling per say, we're just correcting the stride set by the decoder.
             // However, it allows to properly handle recordings that see their resolution change half-way.
             sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
-                      lastDecode->height, imageOut.data, imageOut.linesize);
+                      lastDecode->m_height, imageOut.data, imageOut.linesize);
 
-            totalAudio += arb->GetSamples(frame.timecode);
+            totalAudio += arb->GetSamples(frame.m_timecode);
             int audbufTime = (int)(totalAudio / rateTimeConv);
-            int auddelta = frame.timecode - audbufTime;
+            int auddelta = frame.m_timecode - audbufTime;
             int vidTime = lroundf(curFrameNum * vidFrameTime);
-            int viddelta = frame.timecode - vidTime;
+            int viddelta = frame.m_timecode - vidTime;
             int delta = viddelta - auddelta;
             int absdelta = delta < 0 ? -delta : delta;
             if (absdelta < 500 && absdelta >= vidFrameTime)
@@ -1111,7 +1111,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     while (delta > vidFrameTime)
                     {
                         if (!cutter || !cutter->InhibitDummyFrame())
-                            m_fifow->FIFOWrite(0, frame.buf, frame.size);
+                            m_fifow->FIFOWrite(0, frame.m_buffer, frame.m_bufferSize);
 
                         count++;
                         delta -= (int)vidFrameTime;
@@ -1142,7 +1142,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     .arg(delta));
 #endif
             AudioBuffer *ab = nullptr;
-            while ((ab = arb->GetData(frame.timecode)) != nullptr)
+            while ((ab = arb->GetData(frame.m_timecode)) != nullptr)
             {
                 if (!cutter ||
                     !cutter->InhibitUseAudioFrames(ab->m_frames, &totalAudio))
@@ -1154,7 +1154,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (dropvideo < 0)
             {
                 if (cutter && cutter->InhibitDropFrame())
-                    m_fifow->FIFOWrite(0, frame.buf, frame.size);
+                    m_fifow->FIFOWrite(0, frame.m_buffer, frame.m_bufferSize);
 
                 LOG(VB_GENERAL, LOG_INFO, "Dropping video frame");
                 dropvideo++;
@@ -1163,12 +1163,12 @@ int Transcode::TranscodeFile(const QString &inputname,
             else
             {
                 if (!cutter || !cutter->InhibitUseVideoFrame())
-                    m_fifow->FIFOWrite(0, frame.buf, frame.size);
+                    m_fifow->FIFOWrite(0, frame.m_buffer, frame.m_bufferSize);
 
                 if (dropvideo)
                 {
                     if (!cutter || !cutter->InhibitDummyFrame())
-                        m_fifow->FIFOWrite(0, frame.buf, frame.size);
+                        m_fifow->FIFOWrite(0, frame.m_buffer, frame.m_bufferSize);
 
                     curFrameNum++;
                     dropvideo--;
@@ -1176,7 +1176,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
             videoOutput->DoneDisplayingFrame(lastDecode);
             player->GetCC608Reader()->FlushTxtBuffers();
-            lasttimecode = frame.timecode;
+            lasttimecode = frame.m_timecode;
         }
         else if (copyaudio)
         {
@@ -1230,11 +1230,11 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (did_ff == 1)
             {
                 timecodeOffset +=
-                    (frame.timecode - lasttimecode - (int)vidFrameTime);
+                    (frame.m_timecode - lasttimecode - (int)vidFrameTime);
             }
-            lasttimecode = frame.timecode;
+            lasttimecode = frame.m_timecode;
 // from here on the timecode is on the output time base
-            frame.timecode -= timecodeOffset;
+            frame.m_timecode -= timecodeOffset;
 
             if (!player->WriteStoredData(m_outBuffer, (did_ff == 0), timecodeOffset))
             {
@@ -1271,14 +1271,14 @@ int Transcode::TranscodeFile(const QString &inputname,
                     AVPictureFill(&imageIn, lastDecode);
                     AVPictureFill(&imageOut, &frame);
 
-                    int bottomBand = (lastDecode->height == 1088) ? 8 : 0;
+                    int bottomBand = (lastDecode->m_height == 1088) ? 8 : 0;
                     scontext = sws_getCachedContext(scontext,
-                                   lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
-                                   frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
+                                   lastDecode->m_width, lastDecode->m_height, FrameTypeToPixelFormat(lastDecode->m_type),
+                                   frame.m_width, frame.m_height, FrameTypeToPixelFormat(frame.m_type),
                                    SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
 
                     sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
-                              lastDecode->height - bottomBand,
+                              lastDecode->m_height - bottomBand,
                               imageOut.data, imageOut.linesize);
                 }
 
@@ -1297,7 +1297,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             {
                 did_ff = 2;
                 timecodeOffset +=
-                    (frame.timecode - lasttimecode - (int)vidFrameTime);
+                    (frame.m_timecode - lasttimecode - (int)vidFrameTime);
             }
 
             if (video_aspect != new_aspect)
@@ -1329,14 +1329,14 @@ int Transcode::TranscodeFile(const QString &inputname,
                 AVPictureFill(&imageIn, lastDecode);
                 AVPictureFill(&imageOut, &frame);
 
-                int bottomBand = (lastDecode->height == 1088) ? 8 : 0;
+                int bottomBand = (lastDecode->m_height == 1088) ? 8 : 0;
                 scontext = sws_getCachedContext(scontext,
-                               lastDecode->width, lastDecode->height, FrameTypeToPixelFormat(lastDecode->codec),
-                               frame.width, frame.height, FrameTypeToPixelFormat(frame.codec),
+                               lastDecode->m_width, lastDecode->m_height, FrameTypeToPixelFormat(lastDecode->m_type),
+                               frame.m_width, frame.m_height, FrameTypeToPixelFormat(frame.m_type),
                                SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
 
                 sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
-                          lastDecode->height - bottomBand,
+                          lastDecode->m_height - bottomBand,
                           imageOut.data, imageOut.linesize);
             }
 
@@ -1401,8 +1401,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                 return REENCODE_ERROR;
 #endif
             }
-            lasttimecode = frame.timecode;
-            frame.timecode -= timecodeOffset;
+            lasttimecode = frame.m_timecode;
+            frame.m_timecode -= timecodeOffset;
 
             if (m_avfMode)
             {
@@ -1430,7 +1430,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                     if (avfw->WriteVideoFrame(rescale ? &frame : lastDecode) > 0)
                     {
-                        lastWrittenTime = frame.timecode + timecodeOffset;
+                        lastWrittenTime = frame.m_timecode + timecodeOffset;
                         if (hls)
                             ++hlsSegmentFrames;
                     }
@@ -1444,7 +1444,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     m_nvr->WriteVideo(rescale ? &frame : lastDecode, true, true);
                 else
                     m_nvr->WriteVideo(rescale ? &frame : lastDecode);
-                lastWrittenTime = frame.timecode + timecodeOffset;
+                lastWrittenTime = frame.m_timecode + timecodeOffset;
             }
 #endif
         }
@@ -1529,7 +1529,7 @@ int Transcode::TranscodeFile(const QString &inputname,
         }
 
         curFrameNum++;
-        frame.frameNumber = 1 + (curFrameNum << 1);
+        frame.m_frameNumber = 1 + (curFrameNum << 1);
 
         player->DiscardVideoFrame(lastDecode);
     }

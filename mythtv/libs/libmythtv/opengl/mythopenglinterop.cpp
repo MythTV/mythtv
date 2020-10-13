@@ -170,26 +170,26 @@ vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
     if (!(Context && Frame))
         return result;
 
-    if (!(Frame->priv[1] && MythVideoFrame::HardwareFormat(Frame->codec) &&
-         (Frame->codec == PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->pix_fmt)))))
+    if (!(Frame->m_priv[1] && MythVideoFrame::HardwareFormat(Frame->m_type) &&
+         (Frame->m_type == PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->m_pixFmt)))))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Not a valid hardware frame");
         return result;
     }
 
     MythOpenGLInterop* interop = nullptr;
-    if ((Frame->codec == FMT_VTB)  || (Frame->codec == FMT_MEDIACODEC) ||
-        (Frame->codec == FMT_MMAL) || (Frame->codec == FMT_DRMPRIME))
+    if ((Frame->m_type == FMT_VTB)  || (Frame->m_type == FMT_MEDIACODEC) ||
+        (Frame->m_type == FMT_MMAL) || (Frame->m_type == FMT_DRMPRIME))
     {
-        interop = reinterpret_cast<MythOpenGLInterop*>(Frame->priv[1]);
+        interop = reinterpret_cast<MythOpenGLInterop*>(Frame->m_priv[1]);
     }
     else
     {
         // Unpick
-        auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->priv[1]);
+        auto* buffer = reinterpret_cast<AVBufferRef*>(Frame->m_priv[1]);
         if (!buffer || !buffer->data)
             return result;
-        if (Frame->codec == FMT_NVDEC)
+        if (Frame->m_type == FMT_NVDEC)
         {
             auto* context = reinterpret_cast<AVHWDeviceContext*>(buffer->data);
             if (!context || !context->user_opaque)

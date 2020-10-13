@@ -61,13 +61,13 @@ MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, M
 {
     MMAL_BUFFER_HEADER_T* result = nullptr;
 
-    if ((Frame->pix_fmt != AV_PIX_FMT_MMAL) || (Frame->codec != FMT_MMAL) ||
-        !Frame->buf || !Frame->priv[0])
+    if ((Frame->m_pixFmt != AV_PIX_FMT_MMAL) || (Frame->m_type != FMT_MMAL) ||
+        !Frame->m_buffer || !Frame->m_priv[0])
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid MMAL buffer %1 %2 %3 %4")
-            .arg(Frame->buf != nullptr).arg(Frame->priv[0] != nullptr)
-            .arg(MythVideoFrame::FormatDescription(Frame->codec))
-            .arg(av_get_pix_fmt_name(static_cast<AVPixelFormat>(Frame->pix_fmt))));
+            .arg(Frame->m_buffer != nullptr).arg(Frame->m_priv[0] != nullptr)
+            .arg(MythVideoFrame::FormatDescription(Frame->m_type))
+            .arg(av_get_pix_fmt_name(static_cast<AVPixelFormat>(Frame->m_pixFmt))));
         return result;
     }
 
@@ -79,7 +79,7 @@ MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, M
     }
 
     // Check size
-    QSize surfacesize(Frame->width, Frame->height);
+    QSize surfacesize(Frame->m_width, Frame->m_height);
     if (m_openglTextureSize != surfacesize)
     {
         if (!m_openglTextureSize.isEmpty())
@@ -87,7 +87,7 @@ MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, M
         m_openglTextureSize = surfacesize;
     }
 
-    result = reinterpret_cast<MMAL_BUFFER_HEADER_T*>(Frame->buf);
+    result = reinterpret_cast<MMAL_BUFFER_HEADER_T*>(Frame->m_buffer);
     return result;
 }
 
@@ -106,7 +106,7 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
 
     // Disallow kernel GLSL deint. There are not enough texture units with the
     // Broadcom driver and we don't retain references
-    Frame->deinterlace_allowed = (Frame->deinterlace_allowed & ~DEINT_HIGH) | DEINT_MEDIUM;
+    Frame->m_deinterlaceAllowed = (Frame->m_deinterlaceAllowed & ~DEINT_HIGH) | DEINT_MEDIUM;
 
     // Update frame colourspace and initialise on first frame
     if (ColourSpace)
@@ -123,13 +123,13 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
         MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
         if (shader)
         {
-            Frame->deinterlace_double = Frame->deinterlace_double | DEINT_SHADER;
+            Frame->m_deinterlaceDouble = Frame->m_deinterlaceDouble | DEINT_SHADER;
         }
         else
         {
             shader = GetSingleRateOption(Frame, DEINT_SHADER);
             if (shader)
-                Frame->deinterlace_single = Frame->deinterlace_single | DEINT_SHADER;
+                Frame->m_deinterlaceSingle = Frame->m_deinterlaceSingle | DEINT_SHADER;
         }
     }
 
@@ -143,8 +143,8 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
         vector<QSize> sizes;
         for (uint plane = 0 ; plane < count; ++plane)
         {
-            QSize size(MythVideoFrame::GetWidthForPlan(format, Frame->width, plane),
-                       MythVideoFrame::GetHeightForPlane(format, Frame->height, plane));
+            QSize size(MythVideoFrame::GetWidthForPlan(format, Frame->m_width, plane),
+                       MythVideoFrame::GetHeightForPlane(format, Frame->m_height, plane));
             sizes.push_back(size);
         }
 

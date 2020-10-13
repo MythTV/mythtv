@@ -706,7 +706,7 @@ void MythPlayer::ReleaseNextVideoFrame(MythVideoFrame *buffer,
 {
     if (wrap)
         WrapTimecode(timecode, TC_VIDEO);
-    buffer->timecode = timecode;
+    buffer->m_timecode = timecode;
     m_latestVideoTimecode = timecode;
 
     if (m_videoOutput)
@@ -1406,12 +1406,12 @@ void MythPlayer::CheckAspectRatio(MythVideoFrame* frame)
     if (!frame)
         return;
 
-    if (!qFuzzyCompare(frame->aspect, m_videoAspect) && frame->aspect > 0.0F)
+    if (!qFuzzyCompare(frame->m_aspect, m_videoAspect) && frame->m_aspect > 0.0F)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Video Aspect ratio changed from %1 to %2")
-            .arg(m_videoAspect).arg(frame->aspect));
-        m_videoAspect = frame->aspect;
+            .arg(m_videoAspect).arg(frame->m_aspect));
+        m_videoAspect = frame->m_aspect;
         if (m_videoOutput)
         {
             m_videoOutput->VideoAspectRatioChanged(m_videoAspect);
