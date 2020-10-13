@@ -255,8 +255,8 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
             *Codec = newCodec;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HW device type '%1' supports decoding '%2' (%3)")
                     .arg(av_hwdevice_get_type_name(AV_HWDEVICE_TYPE_MEDIACODEC)).arg((*Codec)->name).arg(profilestr));
-            decoder->CodecMap()->freeCodecContext(Stream);
-            *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
+            decoder->CodecMap()->FreeCodecContext(Stream);
+            *Context = decoder->CodecMap()->GetCodecContext(Stream, *Codec);
             (*Context)->pix_fmt = AV_PIX_FMT_MEDIACODEC;
             return success;
         }

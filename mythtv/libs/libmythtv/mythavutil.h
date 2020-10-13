@@ -76,24 +76,19 @@ private:
     AVFrame *m_frame {nullptr};
 };
 
-/**
- * MythCodecMap
- * Utility class that keeps pointers to
- * an AVStream and its AVCodecContext. The codec member
- * of AVStream was previously used for this but is now
- * deprecated.
- */
 class MTV_PUBLIC MythCodecMap
 {
   public:
     MythCodecMap() = default;
-    ~MythCodecMap();
-    AVCodecContext *getCodecContext(const AVStream *stream,
-        const AVCodec *pCodec = nullptr, bool nullCodec = false);
-    AVCodecContext *hasCodecContext(const AVStream *stream);
-    void freeCodecContext(const AVStream *stream);
-    void freeAllCodecContexts();
-  protected:
+   ~MythCodecMap();
+    AVCodecContext* GetCodecContext(const AVStream* Stream,
+                                    const AVCodec* Codec = nullptr,
+                                    bool NullCodec = false);
+    AVCodecContext* FindCodecContext(const AVStream* Stream);
+    void FreeCodecContext(const AVStream* Stream);
+    void FreeAllContexts();
+
+  private:
     QMap<const AVStream*, AVCodecContext*> m_streamMap;
     QMutex m_mapLock {QMutex::Recursive};
 };

@@ -203,7 +203,7 @@ class MPEG2fixup
     {
         if (id >= m_inputFC->nb_streams)
             return nullptr;
-        return m_codecMap.getCodecContext(m_inputFC->streams[id]);
+        return m_codecMap.GetCodecContext(m_inputFC->streams[id]);
     }
     AVCodecParserContext *getCodecParserContext(uint id)
     {

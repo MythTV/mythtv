@@ -116,8 +116,8 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NVDEC supports decoding %1").arg(desc));
                 *Codec = codec;
-                decoder->CodecMap()->freeCodecContext(Stream);
-                *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
+                decoder->CodecMap()->FreeCodecContext(Stream);
+                *Context = decoder->CodecMap()->GetCodecContext(Stream, *Codec);
                 return success;
             }
             break;

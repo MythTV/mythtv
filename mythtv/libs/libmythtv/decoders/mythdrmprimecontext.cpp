@@ -59,8 +59,8 @@ MythCodecID MythDRMPRIMEContext::GetPrimeCodec(AVCodecContext **Context,
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Found FFmpeg decoder '%1'").arg(name));
     *Codec = codec;
-    decoder->CodecMap()->freeCodecContext(Stream);
-    *Context = decoder->CodecMap()->getCodecContext(Stream, *Codec);
+    decoder->CodecMap()->FreeCodecContext(Stream);
+    *Context = decoder->CodecMap()->GetCodecContext(Stream, *Codec);
     (*Context)->pix_fmt = Format;
     return Successs;
 }

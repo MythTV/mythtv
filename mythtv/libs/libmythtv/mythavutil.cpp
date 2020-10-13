@@ -352,57 +352,67 @@ MythPictureDeinterlacer::~MythPictureDeinterlacer()
     }
 }
 
+/*! \class MythCodecMap
+ * Utility class that keeps pointers to an AVStream and its AVCodecContext. The
+ * codec member of AVStream was previously used for this but is now deprecated.
+*/
 MythCodecMap::~MythCodecMap()
 {
-    freeAllCodecContexts();
+    FreeAllContexts();
 }
 
-AVCodecContext *MythCodecMap::getCodecContext(const AVStream *stream,
-    const AVCodec *pCodec, bool nullCodec)
+AVCodecContext *MythCodecMap::GetCodecContext(const AVStream* Stream,
+                                              const AVCodec* Codec,
+                                              bool NullCodec)
 {
     QMutexLocker lock(&m_mapLock);
-    AVCodecContext *avctx = m_streamMap.value(stream, nullptr);
+    AVCodecContext* avctx = m_streamMap.value(Stream, nullptr);
     if (!avctx)
     {
-        if (stream == nullptr || stream->codecpar == nullptr)
+        if (Stream == nullptr || Stream->codecpar == nullptr)
             return nullptr;
-        if (nullCodec)
-            pCodec = nullptr;
+
+        if (NullCodec)
+        {
+            Codec = nullptr;
+        }
         else
         {
-            if (!pCodec)
-                pCodec = avcodec_find_decoder(stream->codecpar->codec_id);
-            if (!pCodec)
+            if (!Codec)
+                Codec = avcodec_find_decoder(Stream->codecpar->codec_id);
+
+            if (!Codec)
             {
-                LOG(VB_GENERAL, LOG_WARNING,
-                    QString("avcodec_find_decoder fail for %1").arg(stream->codecpar->codec_id));
+                LOG(VB_GENERAL, LOG_WARNING, QString("avcodec_find_decoder fail for %1")
+                    .arg(Stream->codecpar->codec_id));
                 return nullptr;
             }
         }
-        avctx = avcodec_alloc_context3(pCodec);
-        if (avcodec_parameters_to_context(avctx, stream->codecpar) < 0)
+        avctx = avcodec_alloc_context3(Codec);
+        if (avcodec_parameters_to_context(avctx, Stream->codecpar) < 0)
             avcodec_free_context(&avctx);
+
         if (avctx)
         {
-            avctx->pkt_timebase =  stream->time_base;
-            m_streamMap.insert(stream, avctx);
+            avctx->pkt_timebase = Stream->time_base;
+            m_streamMap.insert(Stream, avctx);
         }
     }
     return avctx;
 }
 
-AVCodecContext *MythCodecMap::hasCodecContext(const AVStream *stream)
+AVCodecContext *MythCodecMap::FindCodecContext(const AVStream* Stream)
 {
-    return m_streamMap.value(stream, nullptr);
+    return m_streamMap.value(Stream, nullptr);
 }
 
 /// \note This will not free a hardware or frames context that is in anyway referenced outside
 /// of the decoder. Probably need to force the VideoOutput class to discard buffers
 /// as well. Leaking hardware contexts is a very bad idea.
-void MythCodecMap::freeCodecContext(const AVStream *stream)
+void MythCodecMap::FreeCodecContext(const AVStream* Stream)
 {
     QMutexLocker lock(&m_mapLock);
-    AVCodecContext *avctx = m_streamMap.take(stream);
+    AVCodecContext* avctx = m_streamMap.take(Stream);
     if (avctx)
     {
         if (avctx->internal)
@@ -411,14 +421,15 @@ void MythCodecMap::freeCodecContext(const AVStream *stream)
     }
 }
 
-void MythCodecMap::freeAllCodecContexts()
+void MythCodecMap::FreeAllContexts()
 {
     QMutexLocker lock(&m_mapLock);
     QMap<const AVStream*, AVCodecContext*>::iterator i = m_streamMap.begin();
-    while (i != m_streamMap.end()) {
+    while (i != m_streamMap.end())
+    {
         const AVStream *stream = i.key();
         ++i;
-        freeCodecContext(stream);
+        FreeCodecContext(stream);
     }
 }
 
