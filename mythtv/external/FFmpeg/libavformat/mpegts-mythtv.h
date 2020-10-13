@@ -114,6 +114,7 @@ typedef struct
     int sub_id;
     int txt_type;
     int vbi_data;
+    int disposition;
     /* DSMCC data */
     int data_id;
     int carousel_id;

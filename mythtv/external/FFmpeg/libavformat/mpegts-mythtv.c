@@ -1509,6 +1509,11 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
     language = dvbci->language;
 
     switch(desc_tag) {
+    case 0x02: /* video stream descriptor */
+        if (get8(pp, desc_end) & 0x1) {
+            dvbci->disposition |= AV_DISPOSITION_STILL_IMAGE;
+        }
+        break;
 #if 0
     case 0x1E: /* SL descriptor */
         desc_es_id = get16(pp, desc_end);
@@ -2154,6 +2159,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                 st->carousel_id = item->dvbci.sub_id;
 
             st->component_tag = item->dvbci.component_tag;
+            st->disposition   = item->dvbci.disposition;
 
             av_log(NULL, AV_LOG_DEBUG, "mpegts_add_stream: "
                    "stream #%d, has id 0x%x and codec %s, type %s at 0x%x\n",
