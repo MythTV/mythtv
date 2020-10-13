@@ -770,13 +770,8 @@ QStringList VideoDisplayProfile::GetDecoders(void)
 QStringList VideoDisplayProfile::GetDecoderNames(void)
 {
     InitStatics();
-    QStringList list;
-
-    const QStringList decs = GetDecoders();
-    for (const auto& dec : qAsConst(decs))
-        list += GetDecoderName(dec);
-
-    return list;
+    return std::accumulate(s_safe_decoders.cbegin(), s_safe_decoders.cend(), QStringList{},
+        [](QStringList Res, const QString& Dec) { return Res << GetDecoderName(Dec); });
 }
 
 QString VideoDisplayProfile::GetDecoderName(const QString &Decoder)
