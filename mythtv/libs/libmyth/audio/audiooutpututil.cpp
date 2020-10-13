@@ -7,7 +7,7 @@
 #include "audiooutpututil.h"
 #include "audioconvert.h"
 #include "bswap.h"
-#include "libmythtv/mythavutil.h"
+#include "mythaverror.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
