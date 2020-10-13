@@ -60,41 +60,14 @@ MythVideoOutputNull* MythVideoOutputNull::Create(QSize VideoDim, QSize VideoDisp
     return nullptr;
 }
 
-MythVideoOutputNull::MythVideoOutputNull()
-{
-    init(&m_avPauseFrame, FMT_NONE, nullptr, 0, 0, 0);
-}
-
-MythVideoOutputNull::~MythVideoOutputNull()
-{
-    QMutexLocker locker(&m_globalLock);
-
-    if (m_avPauseFrame.buf)
-    {
-        delete [] m_avPauseFrame.buf;
-        init(&m_avPauseFrame, FMT_NONE, nullptr, 0, 0, 0);
-    }
-
-    m_videoBuffers.DeleteBuffers();
-}
-
 void MythVideoOutputNull::CreatePauseFrame(void)
 {
-    if (m_avPauseFrame.buf)
-    {
-        delete [] m_avPauseFrame.buf;
-        m_avPauseFrame.buf = nullptr;
-    }
-
-    init(&m_avPauseFrame, FMT_YV12,
-         new unsigned char[static_cast<unsigned long>(m_videoBuffers.GetScratchFrame()->size + 128)],
-         m_videoBuffers.GetScratchFrame()->width,
-         m_videoBuffers.GetScratchFrame()->height,
-         m_videoBuffers.GetScratchFrame()->size);
-
-    m_avPauseFrame.frameNumber = m_videoBuffers.GetScratchFrame()->frameNumber;
+    m_avPauseFrame.Init(FMT_YV12, MythVideoFrame::GetAlignedBuffer(m_videoBuffers.GetScratchFrame()->size),
+                        m_videoBuffers.GetScratchFrame()->size, m_videoBuffers.GetScratchFrame()->width,
+                        m_videoBuffers.GetScratchFrame()->height);
+    m_avPauseFrame.frameNumber  = m_videoBuffers.GetScratchFrame()->frameNumber;
     m_avPauseFrame.frameCounter = m_videoBuffers.GetScratchFrame()->frameCounter;
-    m_avPauseFrame.Clear();
+    m_avPauseFrame.ClearBufferToBlank();
 }
 
 bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
@@ -120,7 +93,6 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
 
     if (VideoDispDim == GetVideoDim())
     {
-        m_videoBuffers.Clear();
         MoveResize();
         return true;
     }
@@ -128,8 +100,6 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
     MythVideoOutput::InputChanged(VideoDim, VideoDispDim,
                                   Aspect, CodecID, AspectOnly,
                                   ReferenceFrames, ForceChange);
-    m_videoBuffers.DeleteBuffers();
-
     MoveResize();
 
     const QSize video_dim = GetVideoDim();

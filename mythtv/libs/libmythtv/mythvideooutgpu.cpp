@@ -364,7 +364,6 @@ bool MythVideoOutputGPU::CreateBuffers(MythCodecID CodecID, QSize Size)
 void MythVideoOutputGPU::DestroyBuffers()
 {
     MythVideoOutputGPU::DiscardFrames(true, true);
-    m_videoBuffers.DeleteBuffers();
     m_videoBuffers.Reset();
     m_buffersCreated = false;
 }

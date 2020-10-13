@@ -2554,16 +2554,15 @@ void NuppelVideoRecorder::doWriteThread(void)
         {
             case ACTION_VIDEO:
             {
-                MythVideoFrame frame {};
-                init(&frame,
-                     FMT_YV12, m_videoBuffer[m_actVideoEncode]->buffer,
-                     m_width, m_height, m_videoBuffer[m_actVideoEncode]->bufferlen);
-
+                MythVideoFrame frame(FMT_YV12, m_videoBuffer[m_actVideoEncode]->buffer,
+                                     m_videoBuffer[m_actVideoEncode]->bufferlen,
+                                     m_width, m_height);
                 frame.frameNumber = m_videoBuffer[m_actVideoEncode]->sample;
                 frame.timecode = m_videoBuffer[m_actVideoEncode]->timecode;
                 frame.forcekey = m_videoBuffer[m_actVideoEncode]->forcekey;
-
                 WriteVideo(&frame);
+                // Ensure buffer isn't deleted
+                frame.buf = nullptr;
 
                 m_videoBuffer[m_actVideoEncode]->sample = 0;
                 m_videoBuffer[m_actVideoEncode]->freeToEncode = 0;

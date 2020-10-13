@@ -122,21 +122,12 @@ class MTV_PUBLIC MythAVCopy
     int Copy(AVFrame *pic, const MythVideoFrame *frame,
              unsigned char *buffer = nullptr,
              AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
-    /**
-     * Copy
-     * Copy AVFrame pic into VideoFrame frame, performing the required conversion
-     * Returns size of frame data
-     */
-    int Copy(MythVideoFrame *frame, const AVFrame *pic,
-             AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
     int Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
              const AVFrame *src, AVPixelFormat pix_fmt,
              int width, int height);
 
   private:
     Q_DISABLE_COPY(MythAVCopy)
-    static void FillFrame(MythVideoFrame *frame, const AVFrame *pic, int pitch,
-                          int width, int height, AVPixelFormat pix_fmt);
     MythAVCopyPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 };
 

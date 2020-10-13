@@ -849,15 +849,13 @@ int Transcode::TranscodeFile(const QString &inputname,
     if (m_hlsMode)
         player->ForceDeinterlacer(false, DEINT_CPU | DEINT_MEDIUM);
 
-    MythVideoFrame frame {};
+    MythVideoFrame frame;
     // Do not use padding when compressing to RTjpeg or when in fifomode.
     // The RTjpeg compressor doesn't know how to handle strides different to
     // video width.
     // cppcheck-suppress knownConditionTrueFalse
     bool nonAligned = vidsetting == "RTjpeg" || !fifodir.isEmpty(); 
-    bool rescale =
-        (video_width != newWidth) || (video_height != newHeight)
-        || nonAligned;
+    bool rescale = (video_width != newWidth) || (video_height != newHeight) || nonAligned;
 
     if (rescale)
     {
@@ -874,8 +872,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         {
             newSize = MythVideoFrame::GetBufferSize(FMT_YV12, newWidth, newHeight);
         }
-        unsigned char *newFrame = MythVideoFrame::GetAlignedBuffer(newSize);
-        if (!newFrame)
+        uint8_t* newbuffer = MythVideoFrame::GetAlignedBuffer(newSize);
+        if (!newbuffer)
         {
             // OOM
             return REENCODE_ERROR;
@@ -883,13 +881,12 @@ int Transcode::TranscodeFile(const QString &inputname,
         if (nonAligned)
         {
             // Set a stride identical to actual width, to ease fifo post-conversion process.
-            init(&frame, FMT_YV12, newFrame, video_width, video_height,
-                 static_cast<int>(newSize), {}, {}, -1, -1, 0 /* aligned */);
+            frame.Init(FMT_YV12, newbuffer, newSize, video_width, video_height);
         }
         else
         {
             // use default stride size.
-            init(&frame, FMT_YV12, newFrame, newWidth, newHeight, static_cast<int>(newSize));
+            frame.Init(FMT_YV12, newbuffer, newSize, newWidth, newHeight);
         }
     }
 
@@ -967,10 +964,6 @@ int Transcode::TranscodeFile(const QString &inputname,
             // the actual transcode, so stop here.
             unlink(outputname.toLocal8Bit().constData());
             SetPlayerContext(nullptr);
-            if (rescale)
-            {
-                av_freep(&frame.buf);
-            }
             return REENCODE_OK;
         }
 
@@ -989,10 +982,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                 "Error initializing fifo writer.  Aborting");
             unlink(outputname.toLocal8Bit().constData());
             SetPlayerContext(nullptr);
-            if (rescale)
-            {
-                av_freep(&frame.buf);
-            }
             return REENCODE_ERROR;
         }
         LOG(VB_GENERAL, LOG_INFO,
@@ -1213,10 +1202,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                                          "is not in raw audio mode.");
 
                 unlink(outputname.toLocal8Bit().constData());
-                if (rescale)
-                {
-                    av_freep(&frame.buf);
-                }
                 SetPlayerContext(nullptr);
                 if (videoBuffer)
                     videoBuffer->stop();
@@ -1406,11 +1391,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                         LOG(VB_GENERAL, LOG_ERR,
                             "Transcode: Encountered irrecoverable error in "
                             "NVR::WriteAudio");
-
-                        if (rescale)
-                        {
-                            av_freep(&frame.buf);
-                        }
                         SetPlayerContext(nullptr);
                         if (videoBuffer)
                             videoBuffer->stop();
@@ -1507,10 +1487,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                     "Transcoding aborted, cutlist updated");
 
                 unlink(outputname.toLocal8Bit().constData());
-                if (rescale)
-                {
-                    av_freep(&frame.buf);
-                }
                 SetPlayerContext(nullptr);
                 if (videoBuffer)
                     videoBuffer->stop();
@@ -1525,10 +1501,6 @@ int Transcode::TranscodeFile(const QString &inputname,
                         "Transcoding STOPped by JobQueue");
 
                     unlink(outputname.toLocal8Bit().constData());
-                    if (rescale)
-                    {
-                        av_freep(&frame.buf);
-                    }
                     SetPlayerContext(nullptr);
                     if (videoBuffer)
                         videoBuffer->stop();
@@ -1620,14 +1592,8 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 
     if (videoBuffer)
-    {
         videoBuffer->stop();
-    }
 
-    if (rescale)
-    {
-        av_freep(&frame.buf);
-    }
     SetPlayerContext(nullptr);
 
     return REENCODE_OK;

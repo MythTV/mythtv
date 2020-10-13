@@ -474,8 +474,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop(void)
                                        &vadesc);
         if (status == VA_STATUS_SUCCESS)
         {
-            MythVideoFrame frame {};
-            init(&frame, FMT_DRMPRIME, nullptr, 1920, 1080, 0);
+            MythVideoFrame frame(FMT_DRMPRIME, nullptr, 0, 1920, 1080);
             frame.sw_pix_fmt = AV_PIX_FMT_NV12;
             AVDRMFrameDescriptor drmdesc;
             memset(&drmdesc, 0, sizeof(drmdesc));

@@ -286,7 +286,6 @@ void MythDeinterlacer::Cleanup(void)
     if (m_bobFrame)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Removing 'bob' cache frame");
-        av_free(m_bobFrame->buf);
         delete m_bobFrame;
         m_bobFrame = nullptr;
     }
@@ -394,31 +393,21 @@ bool MythDeinterlacer::SetUpCache(MythVideoFrame *Frame)
     if (!Frame)
         return false;
 
+    if (m_bobFrame && !((m_bobFrame->size == Frame->size)) && (m_bobFrame->width == Frame->width) &&
+                        (m_bobFrame->height == Frame->height) && (m_bobFrame->codec == Frame->codec))
+    {
+        delete m_bobFrame;
+        m_bobFrame = nullptr;
+    }
+
     if (!m_bobFrame)
     {
-        m_bobFrame = new MythVideoFrame;
-        if (!m_bobFrame)
-            return false;
-        init(m_bobFrame, Frame->codec, nullptr, Frame->width, Frame->height, 0);
+        m_bobFrame = new MythVideoFrame(Frame->codec, MythVideoFrame::GetAlignedBuffer(Frame->size),
+                                        Frame->size, Frame->width, Frame->height);
         LOG(VB_PLAYBACK, LOG_INFO, "Created new 'bob' cache frame");
     }
 
-    // copy Frame metadata, preserving any existing buffer allocation
-    unsigned char *buf = m_bobFrame->buf;
-    int size = m_bobFrame->size;
-    memcpy(m_bobFrame, Frame, sizeof(MythVideoFrame));
-    m_bobFrame->priv[0] = m_bobFrame->priv[1] = m_bobFrame->priv[2] = m_bobFrame->priv[3] = nullptr;
-    m_bobFrame->buf = buf;
-    m_bobFrame->size = size;
-
-    if (!m_bobFrame->buf || (m_bobFrame->size != Frame->size))
-    {
-        av_free(m_bobFrame->buf);
-        m_bobFrame->buf = static_cast<unsigned char*>(av_malloc(static_cast<size_t>(Frame->size + 64)));
-        m_bobFrame->size = Frame->size;
-    }
-
-    return m_bobFrame->buf != nullptr;
+    return m_bobFrame && m_bobFrame->buf != nullptr;
 }
 
 void MythDeinterlacer::OneField(MythVideoFrame *Frame, FrameScanType Scan)
@@ -433,7 +422,7 @@ void MythDeinterlacer::OneField(MythVideoFrame *Frame, FrameScanType Scan)
 
     // copy/cache on first pass
     if (kScan_Interlaced == Scan)
-        memcpy(m_bobFrame->buf, Frame->buf, static_cast<size_t>(m_bobFrame->size));
+        memcpy(m_bobFrame->buf, Frame->buf, m_bobFrame->size);
 
     // Convert VideoFrame to AVFrame - no copy
     AVFrame dstframe;
@@ -651,7 +640,7 @@ void MythDeinterlacer::Blend(MythVideoFrame *Frame, FrameScanType Scan)
             return;
         // copy/cache on first pass.
         if (kScan_Interlaced == Scan)
-            memcpy(m_bobFrame->buf, Frame->buf, static_cast<size_t>(m_bobFrame->size));
+            memcpy(m_bobFrame->buf, Frame->buf, m_bobFrame->size);
         else
             second = true;
         src = m_bobFrame;

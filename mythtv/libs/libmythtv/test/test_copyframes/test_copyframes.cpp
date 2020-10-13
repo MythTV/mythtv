@@ -58,11 +58,9 @@ void TestCopyFrames::TestInvalidSizes()
 
 void TestCopyFrames::TestInvalidBuffers()
 {
-    MythVideoFrame dummy1;
-    MythVideoFrame dummy2;
     // Both null buffers
-    init(&dummy1, FMT_YV12, nullptr, 720, 576, 0);
-    init(&dummy2, FMT_YV12, nullptr, 720, 576, 0);
+    MythVideoFrame dummy1(FMT_YV12, nullptr, 0, 720, 576);
+    MythVideoFrame dummy2(FMT_YV12, nullptr, 0, 720, 576);
     QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
 
     size_t size1 = MythVideoFrame::GetBufferSize(FMT_YV12, 720, 576);
@@ -82,8 +80,10 @@ void TestCopyFrames::TestInvalidBuffers()
     // Invalid size
     dummy2.buf = buf2;
     dummy1.size = 16;
-    dummy2.size = static_cast<int>(size1);
+    dummy2.size = size1;
     QVERIFY(!MythVideoFrame::CopyFrame(&dummy1, &dummy2));
+    dummy1.buf = nullptr;
+    dummy2.buf = nullptr;
 }
 
 #include "mythmiscutil.h"
@@ -200,22 +200,20 @@ void TestCopyFrames::TestCopy()
     }
     };
 
-    auto freeframe = [](MythVideoFrame* F) { av_free(F->buf); delete F; };
-
     auto gettestframe = [](VideoFrameType T, const frametest& P)
     {
-        MythVideoFrame* frame = new MythVideoFrame;
-        init(frame, T, MythVideoFrame::GetAlignedBufferZero(std::get<3>(P)), std::get<1>(P), std::get<2>(P),
-             static_cast<int>(std::get<3>(P)), std::get<4>(P), std::get<5>(P), true, 1.0, 1.0, std::get<0>(P));
-        return frame;
+        MythVideoFrame* res =
+                new MythVideoFrame(T,MythVideoFrame::GetAlignedBuffer(std::get<3>(P)),
+                                   std::get<3>(P), std::get<1>(P), std::get<2>(P));
+        res->pitches = std::get<4>(P);
+        res->offsets = std::get<5>(P);
+        return res;
     };
 
     auto getdefaultframe = [](VideoFrameType T, int W, int H, int A)
     {
         size_t size = MythVideoFrame::GetBufferSize(T, W, H, A);
-        MythVideoFrame* frame = new MythVideoFrame;
-        init(frame, T, MythVideoFrame::GetAlignedBufferZero(size), W, H, static_cast<int>(size), 1.0, 1.0, A);
-        return frame;
+        return new MythVideoFrame(T, MythVideoFrame::GetAlignedBuffer(size), size, W, H, A);
     };
 
     for (auto & tests : s_tests)
@@ -237,7 +235,7 @@ void TestCopyFrames::TestCopy()
                 auto * to = getdefaultframe(type, width, height, alignment);
                 QVERIFY(MythVideoFrame::CopyFrame(to, frame));
                 QCOMPARE(sum, GetSum(to));
-                freeframe(to);
+                delete to;
             }
 
             // Test as destination from default created buffers...
@@ -247,9 +245,9 @@ void TestCopyFrames::TestCopy()
                 auto newsum = FillRandom(from);
                 QVERIFY(MythVideoFrame::CopyFrame(frame, from));
                 QCOMPARE(newsum, GetSum(frame));
-                freeframe(from);
+                delete from;
             }
-            freeframe(frame);
+            delete frame;
         }
     }
 }

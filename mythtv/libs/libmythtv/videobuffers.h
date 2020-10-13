@@ -39,7 +39,7 @@ class MTV_PUBLIC VideoBuffers
 {
   public:
     VideoBuffers() = default;
-    virtual ~VideoBuffers();
+   ~VideoBuffers() = default;
 
     static uint GetNumBuffers(int PixelFormat, int MaxReferenceFrames = 16, bool Decoder = false);
     void Init(uint NumDecode, bool ExtraForPause,
@@ -50,7 +50,6 @@ class MTV_PUBLIC VideoBuffers
                        uint NeedPrebufferSmall, int MaxReferenceFrames = 16);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
     static bool ReinitBuffer(MythVideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID, int Width, int Height);
-    void DeleteBuffers(void);
     void SetDeinterlacing(MythDeintType Single, MythDeintType Double, MythCodecID CodecID);
 
     void Reset(void);
@@ -96,9 +95,6 @@ class MTV_PUBLIC VideoBuffers
     const MythVideoFrame *GetLastDecodedFrame(void) const;
     const MythVideoFrame *GetLastShownFrame(void) const;
     uint  Size(void) const;
-    void Clear(uint FrameNum);
-    void Clear(void);
-    bool CreateBuffer(int Width, int Height, uint Number, void *Data, VideoFrameType Format);
 
     QString GetStatus(uint Num = 0) const;
 

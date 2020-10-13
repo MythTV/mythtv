@@ -9,7 +9,7 @@ class MythVideoOutputNull : public MythVideoOutput
   public:
     static MythVideoOutputNull* Create(QSize VideoDim, QSize VideoDispDim, float VideoAspect, MythCodecID CodecID);
     static void GetRenderOptions(RenderOptions& Options);
-   ~MythVideoOutputNull() override;
+   ~MythVideoOutputNull() override = default;
 
     bool Init(const QSize& VideoDim, const QSize& VideoDispDim,
               float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecID) override;
@@ -28,11 +28,11 @@ class MythVideoOutputNull : public MythVideoOutput
     void CreatePauseFrame(void);
 
   protected:
-    MythVideoOutputNull();
+    MythVideoOutputNull() = default;
 
   private:
     Q_DISABLE_COPY(MythVideoOutputNull)
     QMutex     m_globalLock   { QMutex::Recursive };
-    MythVideoFrame m_avPauseFrame { };
+    MythVideoFrame m_avPauseFrame;
 };
 #endif

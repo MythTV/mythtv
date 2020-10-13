@@ -163,11 +163,6 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool D
     return 30;
 }
 
-VideoBuffers::~VideoBuffers()
-{
-    DeleteBuffers();
-}
-
 /*! \brief Creates buffers and sets various buffer management parameters.
  *
  *  This normally creates numdecode buffers, but it creates
@@ -200,12 +195,7 @@ void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
     m_buffers.reserve(std::max(numcreate, 128U));
     m_buffers.resize(numcreate);
     for (uint i = 0; i < numcreate; i++)
-    {
-        init(At(i), FMT_NONE, nullptr, 0, 0, 0);
-        At(i)->interlaced_frame = -1;
-        At(i)->top_field_first  = true;
         m_vbufferMap[At(i)]     = i;
-    }
 
     m_needFreeFrames            = NeedFree;
     m_needPrebufferFrames       = NeedPrebufferNormal;
@@ -559,7 +549,6 @@ bool VideoBuffers::DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int R
         m_available.enqueue(it);
     m_decode.clear();
 
-    DeleteBuffers();
     Reset();
 
     // Recreate - see MythVideoOutputOpenGL::CreateBuffers
@@ -1017,43 +1006,27 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     if (MythVideoFrame::HardwareFormat(Type))
     {
         for (uint i = 0; i < Size(); i++)
-            success &= CreateBuffer(Width, Height, i, nullptr, Type);
+            m_buffers[i].Init(Type, nullptr, 0, Width, Height);
         LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 empty %2 (%3x%4) video buffers")
            .arg(Size()).arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
-        return success;
+        return true;
     }
 
     // Software buffers
     size_t bufsize = MythVideoFrame::GetBufferSize(Type, Width, Height);
     for (uint i = 0; i < Size(); i++)
     {
-        unsigned char *data = MythVideoFrame::GetAlignedBuffer(bufsize);
+        uint8_t* data = MythVideoFrame::GetAlignedBuffer(bufsize);
         if (!data)
             LOG(VB_GENERAL, LOG_CRIT, "Failed to allocate video buffer memory");
-        init(&m_buffers[i], Type, data, Width, Height, static_cast<int>(bufsize));
+        m_buffers[i].Init(Type, data, bufsize, Width, Height);
+        m_buffers[i].ClearBufferToBlank();
         success &= (m_buffers[i].buf != nullptr);
     }
 
-    Clear();
     LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 %2 (%3x%4) video buffers")
        .arg(Size()).arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
     return success;
-}
-
-bool VideoBuffers::CreateBuffer(int Width, int Height, uint Number,
-                                void* Data, VideoFrameType Format)
-{
-    if (Number >= Size())
-        return false;
-    init(&m_buffers[Number], Format, (unsigned char*)Data, Width, Height, 0);
-    return true;
-}
-
-void VideoBuffers::DeleteBuffers(void)
-{
-    next_dbg_str = 0;
-    for (uint i = 0; i < Size(); i++)
-        av_freep(&(m_buffers[i].buf));
 }
 
 bool VideoBuffers::ReinitBuffer(MythVideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID,
@@ -1070,34 +1043,29 @@ bool VideoBuffers::ReinitBuffer(MythVideoFrame *Frame, VideoFrameType Type, Myth
     // Find the frame
     VideoFrameType old = Frame->codec;
     size_t size = MythVideoFrame::GetBufferSize(Type, Width, Height);
-    unsigned char *buf = Frame->buf;
-    bool newbuf = false;
-    if ((Frame->size != static_cast<int>(size)) || !buf)
+    uint8_t* oldbuffer = Frame->buf;
+    uint8_t* newbuffer = nullptr;
+    if ((Frame->size != size) || !oldbuffer)
     {
-        // Free existing buffer
-        av_freep(&buf);
-        Frame->buf = nullptr;
-
         // Initialise new
-        buf = MythVideoFrame::GetAlignedBuffer(size);
-        if (!buf)
+        newbuffer = MythVideoFrame::GetAlignedBuffer(size);
+        if (!newbuffer)
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to reallocate frame buffer");
             return false;
         }
-        newbuf = true;
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocated frame %1 %2x%3->%4 %5x%6 (New buffer: %7)")
         .arg(MythVideoFrame::FormatDescription(old)).arg(Frame->width).arg(Frame->height)
         .arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height)
-        .arg(newbuf));
+        .arg(newbuffer != nullptr));
     MythDeintType singler = Frame->deinterlace_single;
     MythDeintType doubler = Frame->deinterlace_double;
-    init(Frame, Type, buf, Width, Height, static_cast<int>(size));
+    Frame->Init(Type, newbuffer ? newbuffer : oldbuffer, size, Width, Height);
+    Frame->ClearBufferToBlank();
     // retain deinterlacer settings and update restrictions based on new frame type
     SetDeinterlacingFlags(*Frame, singler, doubler, CodecID);
-    Frame->Clear();
     return true;
 }
 
@@ -1150,17 +1118,6 @@ QString VideoBuffers::GetStatus(uint Num) const
             str += " ";
     }
     return str;
-}
-
-void VideoBuffers::Clear(uint FrameNum)
-{
-    At(FrameNum)->Clear();
-}
-
-void VideoBuffers::Clear(void)
-{
-    for (uint i = 0; i < Size(); i++)
-        Clear(i);
 }
 
 /*******************************

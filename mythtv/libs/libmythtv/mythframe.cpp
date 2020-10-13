@@ -2,6 +2,8 @@
 #include "mythlogging.h"
 #include "mythframe.h"
 
+#define LOC QString("VideoFrame: ")
+
 MythDeintType GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Type,
                                   MythDeintType Override)
 {
@@ -33,6 +35,151 @@ MythDeintType GetDeinterlacer(MythDeintType Option)
     return Option & (DEINT_BASIC | DEINT_MEDIUM | DEINT_HIGH);
 }
 
+MythVideoFrame::~MythVideoFrame()
+{
+    if (buf && HardwareFormat(codec))
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Frame still contains a hardware buffer!");
+    else
+        av_free(buf);
+}
+
+MythVideoFrame::MythVideoFrame(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
+                               int Width, int Height, int Alignment)
+{
+    Init(Type, Buffer, BufferSize, Width, Height, Alignment);
+}
+
+void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSize,
+                          int Width, int Height, int Alignment)
+{
+    if (HardwareFormat(codec) && buf)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Trying to reinitialise a hardware frame. Ignoring");
+        return;
+    }
+
+    if (std::any_of(priv.cbegin(), priv.cend(), [](uint8_t* P) { return P != nullptr; }))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Priv buffers are set (hardware frame?). Ignoring Init");
+        return;
+    }
+
+    if ((Buffer && !BufferSize) || (!Buffer && BufferSize))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Inconsistent frame buffer data");
+        return;
+    }
+
+    if (buf && (buf != Buffer))
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting old frame buffer");
+        delete [] buf;
+        buf = nullptr;
+    }
+
+    codec  = Type;
+    bpp    = BitsPerPixel(codec);
+    buf    = Buffer;
+    size   = BufferSize;
+    width  = Width;
+    height = Height;
+
+    ClearMetadata();
+
+    if ((codec == FMT_NONE) || HardwareFormat(codec) || !buf || !size)
+        return;
+
+    int alignedwidth = Alignment > 0 ? (width + Alignment - 1) & ~(Alignment - 1) : width;
+    int alignedheight = (height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT -1);
+
+    for (uint i = 0; i < 3; ++i)
+        pitches[i] = MythVideoFrame::GetPitchForPlane(codec, alignedwidth, i);
+
+    offsets[0] = 0;
+    if (FMT_YV12 == codec)
+    {
+        offsets[1] = alignedwidth * alignedheight;
+        offsets[2] = offsets[1] + ((alignedwidth + 1) >> 1) * ((alignedheight+1) >> 1);
+    }
+    else if (MythVideoFrame::FormatIs420(codec))
+    {
+        offsets[1] = (alignedwidth << 1) * alignedheight;
+        offsets[2] = offsets[1] + (alignedwidth * (alignedheight >> 1));
+    }
+    else if (FMT_YUV422P == codec)
+    {
+        offsets[1] = alignedwidth * alignedheight;
+        offsets[2] = offsets[1] + ((alignedwidth + 1) >> 1) * alignedheight;
+    }
+    else if (MythVideoFrame::FormatIs422(codec))
+    {
+        offsets[1] = (alignedwidth << 1) * alignedheight;
+        offsets[2] = offsets[1] + (alignedwidth * alignedheight);
+    }
+    else if (FMT_YUV444P == codec)
+    {
+        offsets[1] = alignedwidth * alignedheight;
+        offsets[2] = offsets[1] + (alignedwidth * alignedheight);
+    }
+    else if (MythVideoFrame::FormatIs444(codec))
+    {
+        offsets[1] = (alignedwidth << 1) * alignedheight;
+        offsets[2] = offsets[1] + ((alignedwidth << 1) * alignedheight);
+    }
+    else if (FMT_NV12 == codec)
+    {
+        offsets[1] = alignedwidth * alignedheight;
+        offsets[2] = 0;
+    }
+    else if (MythVideoFrame::FormatIsNV12(codec))
+    {
+        offsets[1] = (alignedwidth << 1) * alignedheight;
+        offsets[2] = 0;
+    }
+    else
+    {
+        offsets[1] = offsets[2] = 0;
+    }
+}
+
+void MythVideoFrame::ClearMetadata()
+{
+    aspect               = -1.0F;
+    frame_rate           = -1.0 ;
+    frameNumber          = 0;
+    frameCounter         = 0;
+    timecode             = 0;
+    disp_timecode        = 0;
+    priv                 = { nullptr };
+    interlaced_frame     = 0;
+    top_field_first      = true;
+    interlaced_reversed  = false;
+    new_gop              = false;
+    repeat_pict          = false;
+    forcekey             = false;
+    dummy                = false;
+    pause_frame          = false;
+    pitches              = { 0 };
+    offsets              = { 0 };
+    pix_fmt              = 0;
+    sw_pix_fmt           = 0;
+    directrendering      = true;
+    colorspace           = 1;
+    colorrange           = 1;
+    colorprimaries       = 1;
+    colortransfer        = 1;
+    chromalocation       = 1;
+    colorshifted         = false;
+    already_deinterlaced = false;
+    rotation             = 0;
+    stereo3D             = 0;
+    deinterlace_single   = DEINT_NONE;
+    deinterlace_double   = DEINT_NONE;
+    deinterlace_allowed  = DEINT_NONE;
+    deinterlace_inuse    = DEINT_NONE;
+    deinterlace_inuse2x  = false;
+}
+
 void MythVideoFrame::CopyPlane(uint8_t *To, int ToPitch, const uint8_t *From, int FromPitch,
                                int PlaneWidth, int PlaneHeight)
 {
@@ -50,10 +197,16 @@ void MythVideoFrame::CopyPlane(uint8_t *To, int ToPitch, const uint8_t *From, in
     }
 }
 
-void MythVideoFrame::Clear()
+void MythVideoFrame::ClearBufferToBlank()
 {
     if (!buf)
         return;
+
+    if (HardwareFormat(codec))
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot clear a hardware frame");
+        return;
+    }
 
     // luma (or RGBA)
     int uv_height = GetHeightForPlane(codec, height, 1);
@@ -104,6 +257,14 @@ void MythVideoFrame::Clear()
             buf3 += pitches[1];
         }
     }
+    else if (PackedFormat(codec))
+    {
+        // TODO
+    }
+    else
+    {
+        memset(buf, 0, size);
+    }
 }
 
 bool MythVideoFrame::CopyFrame(MythVideoFrame *To, MythVideoFrame *From)
@@ -138,7 +299,7 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *To, MythVideoFrame *From)
     }
 
     // N.B. Minimum based on zero width alignment but will apply height alignment
-    int minsize = static_cast<int>(GetBufferSize(To->codec, To->width, To->height, 0));
+    size_t minsize = GetBufferSize(To->codec, To->width, To->height, 0);
     if ((To->size < minsize) || (From->size < minsize))
     {
         LOG(VB_GENERAL, LOG_ERR, "Invalid buffer size");
@@ -262,11 +423,6 @@ size_t MythVideoFrame::GetBufferSize(VideoFrameType Type, int Width, int Height,
 uint8_t *MythVideoFrame::GetAlignedBuffer(size_t Size)
 {
     return static_cast<uint8_t*>(av_malloc(Size + 64));
-}
-
-uint8_t* MythVideoFrame::GetAlignedBufferZero(size_t Size)
-{
-    return static_cast<uint8_t*>(av_mallocz(Size + 64));
 }
 
 uint8_t *MythVideoFrame::CreateBuffer(VideoFrameType Type, int Width, int Height)

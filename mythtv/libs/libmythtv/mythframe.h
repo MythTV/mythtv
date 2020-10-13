@@ -1,14 +1,15 @@
 #ifndef MYTHFRAME_H
 #define MYTHFRAME_H
 
-#include <array>
-#include <cstdint>
-#include <cstring>
-#include <vector>
-
+// MythTV
 #include "mythtvexp.h"
 #include "mythaverror.h"
 
+// Std
+#include <array>
+#include <vector>
+
+// FFmpeg
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
@@ -78,6 +79,11 @@ inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return stati
 inline MythDeintType operator& (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) & static_cast<int>(b)); }
 inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintType>(~(static_cast<int>(a))); }
 
+class MythVideoFrame;
+MythDeintType MTV_PUBLIC GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
+MythDeintType MTV_PUBLIC GetDoubleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
+MythDeintType MTV_PUBLIC GetDeinterlacer(MythDeintType Option);
+
 using VideoFrameTypes = std::vector<VideoFrameType>;
 using FramePitches = std::array<int,3>;
 using FrameOffsets = std::array<int,3>;
@@ -85,23 +91,33 @@ using FrameOffsets = std::array<int,3>;
 class MTV_PUBLIC MythVideoFrame
 {
   public:
-    void Clear();
+    MythVideoFrame() = default;
+    MythVideoFrame(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
+                   int Width, int Height, int Alignment = MYTH_WIDTH_ALIGNMENT);
+   ~MythVideoFrame();
+    void Init(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
+              int Width, int Height, int Alignment = MYTH_WIDTH_ALIGNMENT);
 
-    VideoFrameType codec { FMT_NONE };
-    uint8_t*       buf   { nullptr  };
-    int            width { 0 };
-    int            height { 0 };
-    float          aspect { -1.0F };
-    double         frame_rate { -1.0 };
-    int            bpp        { 0 };
-    int            size       { 0 };
-    long long      frameNumber  { 0 };
-    long long      frameCounter { 0 }; ///< raw frame counter/ticker for discontinuity checks
-    long long      timecode     { 0 };
-    int64_t        disp_timecode { 0 };
-    std::array<uint8_t*,4> priv  { nullptr }; ///< random empty storage
-    int            interlaced_frame { 0    }; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
-    bool           top_field_first  { true }; ///< true if top field is first.
+    void ClearMetadata();
+    void ClearBufferToBlank();
+
+    VideoFrameType codec               { FMT_NONE };
+    uint8_t*       buf                 { nullptr  };
+    int            width               { 0 };
+    int            height              { 0 };
+    int            bpp                 { 0 };
+    size_t         size                { 0 };
+
+    // everthing below is considered metadata by ClearMetadata
+    float          aspect              { -1.0F };
+    double         frame_rate          { -1.0 };
+    long long      frameNumber         { 0 };
+    long long      frameCounter        { 0 }; ///< raw frame counter/ticker for discontinuity checks
+    long long      timecode            { 0 };
+    int64_t        disp_timecode       { 0 };
+    std::array<uint8_t*,4> priv        { nullptr }; ///< random empty storage
+    int            interlaced_frame    { 0    }; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
+    bool           top_field_first     { true }; ///< true if top field is first.
     bool           interlaced_reversed { false }; /// true for user override of scan
     bool           new_gop             { false }; /// used to unlock the scan type
     bool           repeat_pict         { false };
@@ -126,7 +142,7 @@ class MTV_PUBLIC MythVideoFrame
     MythDeintType  deinterlace_double  { DEINT_NONE };
     MythDeintType  deinterlace_allowed { DEINT_NONE };
     MythDeintType  deinterlace_inuse   { DEINT_NONE };
-    bool           deinterlace_inuse2x { DEINT_NONE };
+    bool           deinterlace_inuse2x { false };
 
     static bool       CopyFrame(MythVideoFrame* To, MythVideoFrame* From);
     static void       CopyPlane(uint8_t* To, int ToPitch,
@@ -134,9 +150,9 @@ class MTV_PUBLIC MythVideoFrame
                                 int PlaneWidth, int PlaneHeight);
     static QString    FormatDescription(VideoFrameType Type);
     static uint8_t*   GetAlignedBuffer(size_t Size);
-    static uint8_t*   GetAlignedBufferZero(size_t Size);
     static uint8_t*   CreateBuffer(VideoFrameType Type, int Width, int Height);
     static size_t     GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
+
     static inline int BitsPerPixel(VideoFrameType Type)
     {
         switch (Type)
@@ -442,136 +458,5 @@ class MTV_PUBLIC MythVideoFrame
   private:
     //Q_DISABLE_COPY(MythVideoFrame)
 };
-
-MythDeintType MTV_PUBLIC GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
-MythDeintType MTV_PUBLIC GetDoubleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
-MythDeintType MTV_PUBLIC GetDeinterlacer(MythDeintType Option);
-
-static inline void init(MythVideoFrame *vf, VideoFrameType _codec,
-                        unsigned char *_buf, int _width, int _height,
-                        int _size,
-                        const FramePitches p,
-                        const FrameOffsets o,
-                        bool arrays_valid = true,
-                        float _aspect = -1.0F, double _rate = -1.0F,
-                        int _aligned = MYTH_WIDTH_ALIGNMENT)
-{
-    vf->bpp    = MythVideoFrame::BitsPerPixel(_codec);
-    vf->codec  = _codec;
-    vf->buf    = _buf;
-    vf->width  = _width;
-    vf->height = _height;
-    vf->aspect = _aspect;
-    vf->frame_rate = _rate;
-    vf->size         = _size;
-    vf->frameNumber  = 0;
-    vf->frameCounter = 0;
-    vf->timecode     = 0;
-    vf->interlaced_frame = 1;
-    vf->interlaced_reversed = false;
-    vf->new_gop          = false;
-    vf->top_field_first  = true;
-    vf->repeat_pict      = false;
-    vf->forcekey         = false;
-    vf->dummy            = false;
-    vf->pause_frame      = false;
-    vf->pix_fmt          = 0;
-    vf->sw_pix_fmt       = -1; // AV_PIX_FMT_NONE
-    vf->directrendering  = true;
-    vf->colorspace       = 1; // BT.709
-    vf->colorrange       = 1; // normal/mpeg
-    vf->colorprimaries   = 1; // BT.709
-    vf->colortransfer    = 1; // BT.709
-    vf->chromalocation   = 1; // default 4:2:0
-    vf->colorshifted     = false;
-    vf->already_deinterlaced = false;
-    vf->rotation         = 0;
-    vf->stereo3D         = 0;
-    vf->deinterlace_single = DEINT_NONE;
-    vf->deinterlace_double = DEINT_NONE;
-    vf->deinterlace_allowed = DEINT_NONE;
-    vf->deinterlace_inuse = DEINT_NONE;
-    vf->deinterlace_inuse2x = false;
-    vf->priv.fill(nullptr);
-
-    int width_aligned = 0;
-    int height_aligned = (_height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT -1);
-    if (!_aligned)
-        width_aligned = _width;
-    else
-        width_aligned = (_width + _aligned - 1) & ~(_aligned - 1);
-
-    if (arrays_valid)
-    {
-        vf->pitches = p;
-    }
-    else
-    {
-        for (uint i = 0; i < 3; ++i)
-            vf->pitches[i] = MythVideoFrame::GetPitchForPlane(_codec, width_aligned, i);
-    }
-
-    if (arrays_valid)
-    {
-        vf->offsets = o;
-    }
-    else
-    {
-        vf->offsets[0] = 0;
-        if (FMT_YV12 == _codec)
-        {
-            vf->offsets[1] = width_aligned * height_aligned;
-            vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * ((height_aligned+1) >> 1);
-        }
-        else if (MythVideoFrame::FormatIs420(_codec))
-        {
-            vf->offsets[1] = (width_aligned << 1) * height_aligned;
-            vf->offsets[2] = vf->offsets[1] + (width_aligned * (height_aligned >> 1));
-        }
-        else if (FMT_YUV422P == _codec)
-        {
-            vf->offsets[1] = width_aligned * height_aligned;
-            vf->offsets[2] = vf->offsets[1] + ((width_aligned + 1) >> 1) * height_aligned;
-        }
-        else if (MythVideoFrame::FormatIs422(_codec))
-        {
-            vf->offsets[1] = (width_aligned << 1) * height_aligned;
-            vf->offsets[2] = vf->offsets[1] + (width_aligned * height_aligned);
-        }
-        else if (FMT_YUV444P == _codec)
-        {
-            vf->offsets[1] = width_aligned * height_aligned;
-            vf->offsets[2] = vf->offsets[1] + (width_aligned * height_aligned);
-        }
-        else if (MythVideoFrame::FormatIs444(_codec))
-        {
-            vf->offsets[1] = (width_aligned << 1) * height_aligned;
-            vf->offsets[2] = vf->offsets[1] + ((width_aligned << 1) * height_aligned);
-        }
-        else if (FMT_NV12 == _codec)
-        {
-            vf->offsets[1] = width_aligned * height_aligned;
-            vf->offsets[2] = 0;
-        }
-        else if (MythVideoFrame::FormatIsNV12(_codec))
-        {
-            vf->offsets[1] = (width_aligned << 1) * height_aligned;
-            vf->offsets[2] = 0;
-        }
-        else
-        {
-            vf->offsets[1] = vf->offsets[2] = 0;
-        }
-    }
-}
-
-static inline void init(MythVideoFrame *vf, VideoFrameType _codec,
-                        unsigned char *_buf, int _width, int _height, int _size,
-                        float _aspect = -1.0F, double _rate = -1.0F,
-                        int _aligned = MYTH_WIDTH_ALIGNMENT)
-{
-    init(vf, _codec, _buf, _width, _height, _size, {}, {}, false,
-         _aspect, _rate, _aligned);
-}
 
 #endif

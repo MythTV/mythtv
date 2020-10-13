@@ -252,32 +252,6 @@ MythAVCopy::~MythAVCopy()
     delete d;
 }
 
-void MythAVCopy::FillFrame(MythVideoFrame *frame, const AVFrame *pic, int pitch,
-                           int width, int height, AVPixelFormat pix_fmt)
-{
-    int size = av_image_get_buffer_size(pix_fmt, width, height, IMAGE_ALIGN);
-
-    if (pix_fmt == AV_PIX_FMT_YUV420P)
-    {
-        int chroma_pitch  = pitch >> 1;
-        int chroma_height = height >> 1;
-        FrameOffsets offsets
-            { 0,
-              pitch * height,
-              pitch * height + chroma_pitch * chroma_height };
-        FramePitches pitches { pitch, chroma_pitch, chroma_pitch };
-
-        init(frame, FMT_YV12, pic->data[0], width, height, size, pitches, offsets);
-    }
-    else if (pix_fmt == AV_PIX_FMT_NV12)
-    {
-        FrameOffsets offsets { 0, pitch * height, 0 };
-        FramePitches pitches { pitch, pitch, 0 };
-
-        init(frame, FMT_NV12, pic->data[0], width, height, size, pitches, offsets);
-    }
-}
-
 int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
                  const AVFrame *src, AVPixelFormat pix_fmt,
                  int width, int height)
@@ -336,22 +310,6 @@ int MythAVCopy::Copy(AVFrame *pic, const MythVideoFrame *frame,
     AVPictureFill(&pic_in, frame, fmt_in);
     av_image_fill_arrays(pic->data, pic->linesize, sbuf, fmt, frame->width, frame->height, IMAGE_ALIGN);
     return Copy(pic, fmt, &pic_in, fmt_in, frame->width, frame->height);
-}
-
-int MythAVCopy::Copy(MythVideoFrame *frame, const AVFrame *pic, AVPixelFormat fmt)
-{
-    if (fmt == AV_PIX_FMT_NV12 || fmt == AV_PIX_FMT_YUV420P)
-    {
-        MythVideoFrame framein {};
-        FillFrame(&framein, pic, frame->width, frame->width, frame->height, fmt);
-        return Copy(frame, &framein);
-    }
-
-    AVFrame frame_out;
-    AVPixelFormat fmt_out = FrameTypeToPixelFormat(frame->codec);
-
-    AVPictureFill(&frame_out, frame, fmt_out);
-    return Copy(&frame_out, fmt_out, pic, fmt, frame->width, frame->height);
 }
 
 MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat pixfmt,
