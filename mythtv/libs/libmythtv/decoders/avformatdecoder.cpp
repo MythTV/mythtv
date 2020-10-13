@@ -5130,37 +5130,21 @@ bool AvFormatDecoder::HasVideo(const AVFormatContext *ic)
 
 bool AvFormatDecoder::GenerateDummyVideoFrames(void)
 {
-    while (m_needDummyVideoFrames && m_parent &&
-           m_parent->GetFreeVideoFrames())
+    while (m_needDummyVideoFrames && m_parent && m_parent->GetFreeVideoFrames())
     {
         MythVideoFrame *frame = m_parent->GetNextVideoFrame();
         if (!frame)
             return false;
 
+        frame->ClearMetadata();
         frame->ClearBufferToBlank();
+
         frame->dummy = true;
+        frame->frameNumber = m_framesPlayed;
+        frame->frameCounter = static_cast<long long>(m_frameCounter++);
+
         m_parent->ReleaseNextVideoFrame(frame, m_lastVPts);
         m_parent->DeLimboFrame(frame);
-
-        frame->interlaced_frame = 0; // not interlaced
-        frame->top_field_first  = true; // top field first
-        frame->interlaced_reversed = false;
-        frame->new_gop          = false;
-        frame->repeat_pict      = false; // not a repeated picture
-        frame->frameNumber      = m_framesPlayed;
-        frame->frameCounter     = m_frameCounter++;
-        frame->dummy            = true;
-        frame->pause_frame      = false;
-        frame->colorspace       = AVCOL_SPC_BT709;
-        frame->colorrange       = AVCOL_RANGE_MPEG;
-        frame->colorprimaries   = AVCOL_PRI_BT709;
-        frame->colortransfer    = AVCOL_TRC_BT709;
-        frame->chromalocation   = AVCHROMA_LOC_LEFT;
-        frame->deinterlace_inuse = DEINT_NONE;
-        frame->deinterlace_inuse2x = false;
-        frame->already_deinterlaced = false;
-        frame->rotation         = 0;
-        frame->stereo3D         = 0;
 
         m_decodedVideoFrame = frame;
         m_framesPlayed++;
