@@ -75,13 +75,6 @@ inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return stati
 inline MythDeintType operator& (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) & static_cast<int>(b)); }
 inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintType>(~(static_cast<int>(a))); }
 
-class MythVideoFrame;
-MythDeintType MTV_PUBLIC GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
-MythDeintType MTV_PUBLIC GetDoubleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
-MythDeintType MTV_PUBLIC GetDeinterlacer(MythDeintType Option);
-QString MTV_PUBLIC DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format = FMT_NONE);
-QString MTV_PUBLIC DeinterlacerPref(MythDeintType Deint);
-
 using VideoFrameTypes = std::vector<VideoFrameType>;
 using FramePitches = std::array<int,3>;
 using FrameOffsets = std::array<int,3>;
@@ -101,6 +94,8 @@ class MTV_PUBLIC MythVideoFrame
     void ClearMetadata();
     void ClearBufferToBlank();
     bool CopyFrame(MythVideoFrame* From);
+    MythDeintType GetSingleRateOption(MythDeintType Type, MythDeintType Override = DEINT_NONE) const;
+    MythDeintType GetDoubleRateOption(MythDeintType Type, MythDeintType Override = DEINT_NONE) const;
 
     VideoFrameType m_type              { FMT_NONE };
     uint8_t*       m_buffer            { nullptr  };
@@ -152,6 +147,8 @@ class MTV_PUBLIC MythVideoFrame
     static uint8_t*   GetAlignedBuffer(size_t Size);
     static uint8_t*   CreateBuffer(VideoFrameType Type, int Width, int Height);
     static size_t     GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
+    static QString    DeinterlacerPref(MythDeintType Deint);
+    static QString    DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format = FMT_NONE);
 
     static inline int BitsPerPixel(VideoFrameType Type)
     {
@@ -456,6 +453,7 @@ class MTV_PUBLIC MythVideoFrame
     }
 
   private:
+    static MythDeintType GetDeinterlacer(MythDeintType Option);
     //Q_DISABLE_COPY(MythVideoFrame)
 };
 

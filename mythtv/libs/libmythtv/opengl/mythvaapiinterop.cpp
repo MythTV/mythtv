@@ -280,7 +280,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created deinterlacer '%1'")
-        .arg(DeinterlacerName(Deinterlacer | DEINT_DRIVER, DoubleRate, FMT_VAAPI)));
+        .arg(MythVideoFrame::DeinterlacerName(Deinterlacer | DEINT_DRIVER, DoubleRate, FMT_VAAPI)));
 
 end:
     if (ret < 0)
@@ -306,8 +306,8 @@ VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Cur
         bool doublerate = true;
         // no CPU or GLSL deinterlacing so pick up these options as well
         // N.B. Override deinterlacer_allowed to pick up any preference
-        MythDeintType doublepref = GetDoubleRateOption(Frame, DEINT_DRIVER | DEINT_SHADER | DEINT_CPU, DEINT_ALL);
-        MythDeintType singlepref = GetSingleRateOption(Frame, DEINT_DRIVER | DEINT_SHADER | DEINT_CPU, DEINT_ALL);
+        MythDeintType doublepref = Frame->GetDoubleRateOption(DEINT_DRIVER | DEINT_SHADER | DEINT_CPU, DEINT_ALL);
+        MythDeintType singlepref = Frame->GetSingleRateOption(DEINT_DRIVER | DEINT_SHADER | DEINT_CPU, DEINT_ALL);
 
         if (doublepref)
         {
@@ -386,7 +386,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Cur
                                                      m_filterGraph, m_filterSource, m_filterSink))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create VAAPI deinterlacer %1 - disabling")
-                    .arg(DeinterlacerName(deinterlacer | DEINT_DRIVER, doublerate, FMT_VAAPI)));
+                    .arg(MythVideoFrame::DeinterlacerName(deinterlacer | DEINT_DRIVER, doublerate, FMT_VAAPI)));
                 DestroyDeinterlacer();
                 m_filterError = true;
             }

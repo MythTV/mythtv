@@ -91,8 +91,8 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
     bool doublerate = true;
     bool topfieldfirst = Frame->m_interlacedReverse ? !Frame->m_topFieldFirst : Frame->m_topFieldFirst;
 
-    MythDeintType deinterlacer = GetDoubleRateOption(Frame, DEINT_CPU);
-    MythDeintType other        = GetDoubleRateOption(Frame, DEINT_SHADER);
+    MythDeintType deinterlacer = Frame->GetDoubleRateOption(DEINT_CPU);
+    MythDeintType other        = Frame->GetDoubleRateOption(DEINT_SHADER);
     if (other)
     {
         Cleanup();
@@ -102,8 +102,8 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
     if (!deinterlacer)
     {
         doublerate   = false;
-        deinterlacer = GetSingleRateOption(Frame, DEINT_CPU);
-        other        = GetSingleRateOption(Frame, DEINT_SHADER);
+        deinterlacer = Frame->GetSingleRateOption(DEINT_CPU);
+        other        = Frame->GetSingleRateOption(DEINT_SHADER);
         if (!deinterlacer || other)
         {
             Cleanup();
@@ -310,7 +310,7 @@ bool MythDeinterlacer::Initialise(MythVideoFrame *Frame, MythDeintType Deinterla
     m_height    = Frame->m_height;
     m_inputType = Frame->m_type;
     m_inputFmt  = FrameTypeToPixelFormat(Frame->m_type);
-    QString name = DeinterlacerName(Deinterlacer | DEINT_CPU, DoubleRate);
+    QString name = MythVideoFrame::DeinterlacerName(Deinterlacer | DEINT_CPU, DoubleRate);
 
     // simple onefield/bob?
     if (Deinterlacer == DEINT_BASIC || Deinterlacer == DEINT_MEDIUM)

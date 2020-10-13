@@ -169,8 +169,8 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
     }
 
     m_deinterlacer2x = true;
-    MythDeintType deinterlacer = GetDoubleRateOption(Frame, Filter);
-    MythDeintType other        = GetDoubleRateOption(Frame, DEINT_DRIVER);
+    MythDeintType deinterlacer = Frame->GetDoubleRateOption(Filter);
+    MythDeintType other        = Frame->GetDoubleRateOption(DEINT_DRIVER);
     if (other) // another double rate deinterlacer is enabled
     {
         CleanupDeinterlacers();
@@ -180,8 +180,8 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
     if (!deinterlacer)
     {
         m_deinterlacer2x = false;
-        deinterlacer = GetSingleRateOption(Frame, Filter);
-        other        = GetSingleRateOption(Frame, DEINT_DRIVER);
+        deinterlacer = Frame->GetSingleRateOption(Filter);
+        other        = Frame->GetSingleRateOption(DEINT_DRIVER);
         if (!deinterlacer || other) // no shader deinterlacer needed
         {
             CleanupDeinterlacers();
@@ -246,10 +246,10 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
     {
         m_fallbackDeinterlacer = deinterlacer;
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Insufficent texture units for deinterlacer '%1' (%2 < %3)")
-            .arg(DeinterlacerName(deinterlacer | DEINT_SHADER, m_deinterlacer2x)).arg(max).arg(totaltextures));
+            .arg(MythVideoFrame::DeinterlacerName(deinterlacer | DEINT_SHADER, m_deinterlacer2x)).arg(max).arg(totaltextures));
         deinterlacer = DEINT_BASIC;
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Falling back to '%1'")
-            .arg(DeinterlacerName(deinterlacer | DEINT_SHADER, m_deinterlacer2x)));
+            .arg(MythVideoFrame::DeinterlacerName(deinterlacer | DEINT_SHADER, m_deinterlacer2x)));
     }
 
     // create new deinterlacers - the old ones will be deleted
@@ -277,7 +277,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
     m_deinterlacer = deinterlacer;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created deinterlacer '%1' (%2->%3)")
-        .arg(DeinterlacerName(m_deinterlacer | DEINT_SHADER, m_deinterlacer2x))
+        .arg(MythVideoFrame::DeinterlacerName(m_deinterlacer | DEINT_SHADER, m_deinterlacer2x))
         .arg(MythVideoFrame::FormatDescription(m_inputType))
         .arg(MythVideoFrame::FormatDescription(m_outputType)));
     return true;

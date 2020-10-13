@@ -197,10 +197,10 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
         // we explicitly use a shader if preferred over driver. If CPU only
         // is preferred, the default will be to use the driver instead and if that
         // fails we fall back to GLSL
-        MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
-        MythDeintType driver = GetDoubleRateOption(Frame, DEINT_DRIVER);
+        MythDeintType shader = Frame->GetDoubleRateOption(DEINT_SHADER);
+        MythDeintType driver = Frame->GetDoubleRateOption(DEINT_DRIVER);
         if (m_filterError)
-            shader = GetDoubleRateOption(Frame, DEINT_SHADER | DEINT_CPU | DEINT_DRIVER, DEINT_ALL);
+            shader = Frame->GetDoubleRateOption(DEINT_SHADER | DEINT_CPU | DEINT_DRIVER, DEINT_ALL);
         if (shader && !driver)
         {
             glsldeint = true;
@@ -209,10 +209,10 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
         }
         else if (!shader && !driver) // singlerate
         {
-            shader = GetSingleRateOption(Frame, DEINT_SHADER);
-            driver = GetSingleRateOption(Frame, DEINT_DRIVER);
+            shader = Frame->GetSingleRateOption(DEINT_SHADER);
+            driver = Frame->GetSingleRateOption(DEINT_DRIVER);
             if (m_filterError)
-                shader = GetSingleRateOption(Frame, DEINT_SHADER | DEINT_CPU | DEINT_DRIVER, DEINT_ALL);
+                shader = Frame->GetSingleRateOption(DEINT_SHADER | DEINT_CPU | DEINT_DRIVER, DEINT_ALL);
             if (shader && !driver)
             {
                 glsldeint = true;

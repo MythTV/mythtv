@@ -773,15 +773,15 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, MythVideoFrame 
     // auto enable deinterlacing etc and override Progressive/Interlaced - but
     // no reversed interlaced.
     MythDeintType vaapideint = DEINT_NONE;
-    MythDeintType singlepref = GetSingleRateOption(Frame, DEINT_DRIVER);
-    MythDeintType doublepref = GetDoubleRateOption(Frame, DEINT_DRIVER);
+    MythDeintType singlepref = Frame->GetSingleRateOption(DEINT_DRIVER);
+    MythDeintType doublepref = Frame->GetDoubleRateOption(DEINT_DRIVER);
     bool doublerate = true;
     bool other = false;
 
     // For decode only, a CPU or shader deint may also be used/preferred
     if (doublepref)
         vaapideint = doublepref;
-    else if (GetDoubleRateOption(Frame, DEINT_CPU | DEINT_SHADER))
+    else if (Frame->GetDoubleRateOption(DEINT_CPU | DEINT_SHADER))
         other = true;
 
     if (!vaapideint && !other && singlepref)
@@ -810,7 +810,7 @@ void MythVAAPIContext::PostProcessFrame(AVCodecContext* Context, MythVideoFrame 
                                              m_filterGraph, m_filterSource, m_filterSink))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create deinterlacer %1 - disabling")
-            .arg(DeinterlacerName(vaapideint | DEINT_DRIVER, doublerate, FMT_VAAPI)));
+            .arg(MythVideoFrame::DeinterlacerName(vaapideint | DEINT_DRIVER, doublerate, FMT_VAAPI)));
         DestroyDeinterlacer();
         m_filterError = true;
     }

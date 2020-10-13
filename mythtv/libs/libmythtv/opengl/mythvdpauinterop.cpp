@@ -165,7 +165,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
         m_mixerSize = size;
         if (DEINT_NONE != m_deinterlacer)
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setup deinterlacer '%1'")
-                .arg(DeinterlacerName(m_deinterlacer | DEINT_DRIVER, DoubleRate, FMT_VDPAU)));
+                .arg(MythVideoFrame::DeinterlacerName(m_deinterlacer | DEINT_DRIVER, DoubleRate, FMT_VDPAU)));
     }
 
     if (!m_outputSurface)
@@ -295,12 +295,12 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     MythDeintType deinterlacer = DEINT_BASIC;
     if (is_interlaced(Scan))
     {
-        MythDeintType driverdeint = GetDoubleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER,
+        MythDeintType driverdeint = Frame->GetDoubleRateOption(DEINT_DRIVER | DEINT_CPU | DEINT_SHADER,
                                                         DEINT_ALL);
         if (!driverdeint)
         {
             doublerate = false;
-            driverdeint = GetSingleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER, DEINT_ALL);
+            driverdeint = Frame->GetSingleRateOption(DEINT_DRIVER | DEINT_CPU | DEINT_SHADER, DEINT_ALL);
         }
 
         if (driverdeint)

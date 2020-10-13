@@ -233,7 +233,7 @@ void MythVideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintTy
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("SetDeinterlacing (Doublerate %1): Single %2 Double %3")
-        .arg(DoubleRate).arg(DeinterlacerPref(singlerate)).arg(DeinterlacerPref(doublerate)));
+        .arg(DoubleRate).arg(MythVideoFrame::DeinterlacerPref(singlerate)).arg(MythVideoFrame::DeinterlacerPref(doublerate)));
     m_videoBuffers.SetDeinterlacing(singlerate, doublerate, m_videoCodecID);
 }
 

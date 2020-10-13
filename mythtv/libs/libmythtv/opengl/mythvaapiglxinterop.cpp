@@ -29,11 +29,11 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(MythVideoFrame *Frame, FrameScanType 
     {
         // As for VDPAU, only VAAPI can deinterlace these frames - so accept any deinterlacer
         bool doublerate = true;
-        MythDeintType driverdeint = GetDoubleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
+        MythDeintType driverdeint = Frame->GetDoubleRateOption(DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
         if (!driverdeint)
         {
             doublerate = false;
-            driverdeint = GetSingleRateOption(Frame, DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
+            driverdeint = Frame->GetSingleRateOption(DEINT_DRIVER | DEINT_CPU | DEINT_SHADER);
         }
 
         if (driverdeint)
@@ -42,7 +42,7 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(MythVideoFrame *Frame, FrameScanType 
             if (m_basicDeinterlacer != driverdeint)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Enabled deinterlacer '%1'")
-                    .arg(DeinterlacerName(driverdeint | DEINT_DRIVER, doublerate, FMT_VAAPI)));
+                    .arg(MythVideoFrame::DeinterlacerName(driverdeint | DEINT_DRIVER, doublerate, FMT_VAAPI)));
             }
 
             bool top = Frame->m_interlacedReverse ? !Frame->m_topFieldFirst : Frame->m_topFieldFirst;

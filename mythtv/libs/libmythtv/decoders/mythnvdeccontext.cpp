@@ -323,7 +323,7 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
         if (av_opt_set_int(Context->priv_data, "drop_second_field", static_cast<int>(!DoubleRate), 0) == 0)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setup decoder deinterlacer '%1'")
-                .arg(DeinterlacerName(deinterlacer | DEINT_DRIVER, DoubleRate, FMT_NVDEC)));
+                .arg(MythVideoFrame::DeinterlacerName(deinterlacer | DEINT_DRIVER, DoubleRate, FMT_NVDEC)));
             m_deinterlacer = deinterlacer;
             m_deinterlacer2x = DoubleRate;
         }

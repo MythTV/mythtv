@@ -120,14 +120,14 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
     if (is_interlaced(Scan))
     {
         // only shader support for now
-        MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
+        MythDeintType shader = Frame->GetDoubleRateOption(DEINT_SHADER);
         if (shader)
         {
             Frame->m_deinterlaceDouble = Frame->m_deinterlaceDouble | DEINT_SHADER;
         }
         else
         {
-            shader = GetSingleRateOption(Frame, DEINT_SHADER);
+            shader = Frame->GetSingleRateOption(DEINT_SHADER);
             if (shader)
                 Frame->m_deinterlaceSingle = Frame->m_deinterlaceSingle | DEINT_SHADER;
         }

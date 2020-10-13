@@ -455,7 +455,7 @@ void MythPlayerUI::DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due)
         RenderVideoFrame(Frame, ps, true, Due);
 
         // Only double rate CPU deinterlacers require an extra call to PrepareFrame
-        bool secondprepare = GetDoubleRateOption(Frame, DEINT_CPU) && !GetDoubleRateOption(Frame, DEINT_SHADER);
+        bool secondprepare = Frame->GetDoubleRateOption(DEINT_CPU) && !Frame->GetDoubleRateOption(DEINT_SHADER);
         // and the first deinterlacing pass will have marked the frame as already deinterlaced
         // which will break GetScanForDisplay below and subsequent deinterlacing
         bool olddeinterlaced = Frame->m_alreadyDeinterlaced;

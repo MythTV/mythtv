@@ -2,127 +2,12 @@
 #include "mythlogging.h"
 #include "mythframe.h"
 
-
 // FFmpeg - for av_malloc/av_free
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
 #define LOC QString("VideoFrame: ")
-
-MythDeintType GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Type,
-                                  MythDeintType Override)
-{
-    if (Frame)
-    {
-        MythDeintType options = Frame->m_deinterlaceSingle &
-                (Override ? Override : Frame->m_deinterlaceAllowed);
-        if (options & Type)
-            return GetDeinterlacer(options);
-    }
-    return DEINT_NONE;
-}
-
-MythDeintType GetDoubleRateOption(const MythVideoFrame* Frame, MythDeintType Type,
-                                  MythDeintType Override)
-{
-    if (Frame)
-    {
-        MythDeintType options = Frame->m_deinterlaceDouble &
-                (Override ? Override : Frame->m_deinterlaceAllowed);
-        if (options & Type)
-            return GetDeinterlacer(options);
-    }
-    return DEINT_NONE;
-}
-
-MythDeintType GetDeinterlacer(MythDeintType Option)
-{
-    return Option & (DEINT_BASIC | DEINT_MEDIUM | DEINT_HIGH);
-}
-
-QString DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format)
-{
-    MythDeintType deint = GetDeinterlacer(Deint);
-    QString result = DoubleRate ? "2x " : "";
-    if (Deint & DEINT_CPU)
-    {
-        result += "CPU ";
-        switch (deint)
-        {
-            case DEINT_HIGH:   return result + "Yadif";
-            case DEINT_MEDIUM: return result + "Linearblend";
-            case DEINT_BASIC:  return result + "Onefield";
-            default: break;
-        }
-    }
-    else if (Deint & DEINT_SHADER)
-    {
-        result += "GLSL ";
-        switch (deint)
-        {
-            case DEINT_HIGH:   return result + "Kernel";
-            case DEINT_MEDIUM: return result + "Linearblend";
-            case DEINT_BASIC:  return result + "Onefield";
-            default: break;
-        }
-    }
-    else if (Deint & DEINT_DRIVER)
-    {
-        switch (Format)
-        {
-            case FMT_MEDIACODEC: return "MediaCodec";
-            case FMT_DRMPRIME: return result + "EGL Onefield";
-            case FMT_VDPAU:
-                result += "VDPAU ";
-                switch (deint)
-                {
-                    case DEINT_HIGH:   return result + "Advanced";
-                    case DEINT_MEDIUM: return result + "Temporal";
-                    case DEINT_BASIC:  return result + "Basic";
-                    default: break;
-                }
-                break;
-            case FMT_NVDEC:
-                result += "NVDec ";
-                switch (deint)
-                {
-                    case DEINT_HIGH:
-                    case DEINT_MEDIUM: return result + "Adaptive";
-                    case DEINT_BASIC:  return result + "Basic";
-                    default: break;
-                }
-                break;
-            case FMT_VAAPI:
-                result += "VAAPI ";
-                switch (deint)
-                {
-                    case DEINT_HIGH:   return result + "Compensated";
-                    case DEINT_MEDIUM: return result + "Adaptive";
-                    case DEINT_BASIC:  return result + "Basic";
-                    default: break;
-                }
-                break;
-            default: break;
-        }
-    }
-    return "None";
-}
-
-QString DeinterlacerPref(MythDeintType Deint)
-{
-    if (DEINT_NONE == Deint)
-        return QString("None");
-    QString result;
-    if (Deint & DEINT_BASIC)       result = "Basic";
-    else if (Deint & DEINT_MEDIUM) result = "Medium";
-    else if (Deint & DEINT_HIGH)   result = "High";
-    if (Deint & DEINT_CPU)         result += "|CPU";
-    if (Deint & DEINT_SHADER)      result += "|GLSL";
-    if (Deint & DEINT_DRIVER)      result += "|DRIVER";
-    return result;
-}
-
 
 MythVideoFrame::~MythVideoFrame()
 {
@@ -200,7 +85,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
     int alignedheight = (m_height + MYTH_HEIGHT_ALIGNMENT - 1) & ~(MYTH_HEIGHT_ALIGNMENT -1);
 
     for (uint i = 0; i < 3; ++i)
-        m_pitches[i] = MythVideoFrame::GetPitchForPlane(m_type, alignedwidth, i);
+        m_pitches[i] = GetPitchForPlane(m_type, alignedwidth, i);
 
     m_offsets[0] = 0;
     if (FMT_YV12 == m_type)
@@ -208,7 +93,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
         m_offsets[1] = alignedwidth * alignedheight;
         m_offsets[2] = m_offsets[1] + ((alignedwidth + 1) >> 1) * ((alignedheight+1) >> 1);
     }
-    else if (MythVideoFrame::FormatIs420(m_type))
+    else if (FormatIs420(m_type))
     {
         m_offsets[1] = (alignedwidth << 1) * alignedheight;
         m_offsets[2] = m_offsets[1] + (alignedwidth * (alignedheight >> 1));
@@ -218,7 +103,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
         m_offsets[1] = alignedwidth * alignedheight;
         m_offsets[2] = m_offsets[1] + ((alignedwidth + 1) >> 1) * alignedheight;
     }
-    else if (MythVideoFrame::FormatIs422(m_type))
+    else if (FormatIs422(m_type))
     {
         m_offsets[1] = (alignedwidth << 1) * alignedheight;
         m_offsets[2] = m_offsets[1] + (alignedwidth * alignedheight);
@@ -228,7 +113,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
         m_offsets[1] = alignedwidth * alignedheight;
         m_offsets[2] = m_offsets[1] + (alignedwidth * alignedheight);
     }
-    else if (MythVideoFrame::FormatIs444(m_type))
+    else if (FormatIs444(m_type))
     {
         m_offsets[1] = (alignedwidth << 1) * alignedheight;
         m_offsets[2] = m_offsets[1] + ((alignedwidth << 1) * alignedheight);
@@ -238,7 +123,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
         m_offsets[1] = alignedwidth * alignedheight;
         m_offsets[2] = 0;
     }
-    else if (MythVideoFrame::FormatIsNV12(m_type))
+    else if (FormatIsNV12(m_type))
     {
         m_offsets[1] = (alignedwidth << 1) * alignedheight;
         m_offsets[2] = 0;
@@ -536,4 +421,107 @@ uint8_t *MythVideoFrame::CreateBuffer(VideoFrameType Type, int Width, int Height
 {
     size_t size = GetBufferSize(Type, Width, Height);
     return GetAlignedBuffer(size);
+}
+
+MythDeintType MythVideoFrame::GetSingleRateOption(MythDeintType Type, MythDeintType Override) const
+{
+    MythDeintType options = m_deinterlaceSingle & (Override ? Override : m_deinterlaceAllowed);
+    if (options & Type)
+        return GetDeinterlacer(options);
+    return DEINT_NONE;
+}
+
+MythDeintType MythVideoFrame::GetDoubleRateOption(MythDeintType Type, MythDeintType Override) const
+{
+    MythDeintType options = m_deinterlaceDouble & (Override ? Override : m_deinterlaceAllowed);
+    if (options & Type)
+        return GetDeinterlacer(options);
+    return DEINT_NONE;
+}
+
+MythDeintType MythVideoFrame::GetDeinterlacer(MythDeintType Option)
+{
+    return Option & (DEINT_BASIC | DEINT_MEDIUM | DEINT_HIGH);
+}
+
+QString MythVideoFrame::DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format)
+{
+    MythDeintType deint = GetDeinterlacer(Deint);
+    QString result = DoubleRate ? "2x " : "";
+    if (Deint & DEINT_CPU)
+    {
+        result += "CPU ";
+        switch (deint)
+        {
+            case DEINT_HIGH:   return result + "Yadif";
+            case DEINT_MEDIUM: return result + "Linearblend";
+            case DEINT_BASIC:  return result + "Onefield";
+            default: break;
+        }
+    }
+    else if (Deint & DEINT_SHADER)
+    {
+        result += "GLSL ";
+        switch (deint)
+        {
+            case DEINT_HIGH:   return result + "Kernel";
+            case DEINT_MEDIUM: return result + "Linearblend";
+            case DEINT_BASIC:  return result + "Onefield";
+            default: break;
+        }
+    }
+    else if (Deint & DEINT_DRIVER)
+    {
+        switch (Format)
+        {
+            case FMT_MEDIACODEC: return "MediaCodec";
+            case FMT_DRMPRIME: return result + "EGL Onefield";
+            case FMT_VDPAU:
+                result += "VDPAU ";
+                switch (deint)
+                {
+                    case DEINT_HIGH:   return result + "Advanced";
+                    case DEINT_MEDIUM: return result + "Temporal";
+                    case DEINT_BASIC:  return result + "Basic";
+                    default: break;
+                }
+                break;
+            case FMT_NVDEC:
+                result += "NVDec ";
+                switch (deint)
+                {
+                    case DEINT_HIGH:
+                    case DEINT_MEDIUM: return result + "Adaptive";
+                    case DEINT_BASIC:  return result + "Basic";
+                    default: break;
+                }
+                break;
+            case FMT_VAAPI:
+                result += "VAAPI ";
+                switch (deint)
+                {
+                    case DEINT_HIGH:   return result + "Compensated";
+                    case DEINT_MEDIUM: return result + "Adaptive";
+                    case DEINT_BASIC:  return result + "Basic";
+                    default: break;
+                }
+                break;
+            default: break;
+        }
+    }
+    return "None";
+}
+
+QString MythVideoFrame::DeinterlacerPref(MythDeintType Deint)
+{
+    if (DEINT_NONE == Deint)
+        return QString("None");
+    QString result;
+    if (Deint & DEINT_BASIC)       result = "Basic";
+    else if (Deint & DEINT_MEDIUM) result = "Medium";
+    else if (Deint & DEINT_HIGH)   result = "High";
+    if (Deint & DEINT_CPU)         result += "|CPU";
+    if (Deint & DEINT_SHADER)      result += "|GLSL";
+    if (Deint & DEINT_DRIVER)      result += "|DRIVER";
+    return result;
 }

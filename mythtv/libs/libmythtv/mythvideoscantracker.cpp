@@ -116,7 +116,7 @@ void MythVideoScanTracker::CheckScanUpdate(MythVideoOutput* VideoOutput, int Fra
 
 QString MythVideoScanTracker::GetDeinterlacerName()
 {
-    return DeinterlacerName(m_lastDeinterlacer, m_lastDeinterlacer2x, m_lastFrameCodec);
+    return MythVideoFrame::DeinterlacerName(m_lastDeinterlacer, m_lastDeinterlacer2x, m_lastFrameCodec);
 }
 
 void MythVideoScanTracker::SetScanType(FrameScanType Scan, MythVideoOutput* VideoOutput, int FrameInterval)

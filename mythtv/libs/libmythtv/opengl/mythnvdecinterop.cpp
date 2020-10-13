@@ -263,11 +263,11 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
     bool needreferences = false;
     if (is_interlaced(Scan) && !Frame->m_alreadyDeinterlaced)
     {
-        MythDeintType shader = GetDoubleRateOption(Frame, DEINT_SHADER);
+        MythDeintType shader = Frame->GetDoubleRateOption(DEINT_SHADER);
         if (shader)
             needreferences = shader == DEINT_HIGH;
         else
-            needreferences = GetSingleRateOption(Frame, DEINT_SHADER) == DEINT_HIGH;
+            needreferences = Frame->GetSingleRateOption(DEINT_SHADER) == DEINT_HIGH;
     }
 
     if (needreferences)
