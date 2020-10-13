@@ -132,10 +132,27 @@ MythVideoFrame::~MythVideoFrame()
         av_freep(&buf);
 }
 
+MythVideoFrame::MythVideoFrame(VideoFrameType Type, int Width, int Height)
+{
+    Init(Type, Width, Height);
+}
+
 MythVideoFrame::MythVideoFrame(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
                                int Width, int Height, int Alignment)
 {
     Init(Type, Buffer, BufferSize, Width, Height, Alignment);
+}
+
+void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height)
+{
+    size_t   newsize   = 0;
+    uint8_t* newbuffer = nullptr;
+    if (!((Type == FMT_NONE) || HardwareFormat(Type)))
+    {
+        newsize   = GetBufferSize(Type, Width, Height);
+        newbuffer = GetAlignedBuffer(newsize);
+    }
+    Init(Type, newbuffer, newsize, Width, Height);
 }
 
 void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSize,

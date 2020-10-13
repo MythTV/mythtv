@@ -1006,20 +1006,16 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     if (MythVideoFrame::HardwareFormat(Type))
     {
         for (uint i = 0; i < Size(); i++)
-            m_buffers[i].Init(Type, nullptr, 0, Width, Height);
+            m_buffers[i].Init(Type, Width, Height);
         LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 empty %2 (%3x%4) video buffers")
            .arg(Size()).arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
         return true;
     }
 
     // Software buffers
-    size_t bufsize = MythVideoFrame::GetBufferSize(Type, Width, Height);
     for (uint i = 0; i < Size(); i++)
     {
-        uint8_t* data = MythVideoFrame::GetAlignedBuffer(bufsize);
-        if (!data)
-            LOG(VB_GENERAL, LOG_CRIT, "Failed to allocate video buffer memory");
-        m_buffers[i].Init(Type, data, bufsize, Width, Height);
+        m_buffers[i].Init(Type, Width, Height);
         m_buffers[i].ClearBufferToBlank();
         success &= (m_buffers[i].buf != nullptr);
     }

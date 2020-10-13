@@ -90,9 +90,11 @@ class MTV_PUBLIC MythVideoFrame
 {
   public:
     MythVideoFrame() = default;
+    MythVideoFrame(VideoFrameType Type, int Width, int Height);
     MythVideoFrame(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
                    int Width, int Height, int Alignment = MYTH_WIDTH_ALIGNMENT);
    ~MythVideoFrame();
+    void Init(VideoFrameType Type, int Width, int Height);
     void Init(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
               int Width, int Height, int Alignment = MYTH_WIDTH_ALIGNMENT);
 
