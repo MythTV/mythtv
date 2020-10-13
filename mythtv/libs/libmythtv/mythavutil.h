@@ -145,12 +145,6 @@ int MTV_PUBLIC AVPictureFill(AVFrame *pic, const MythVideoFrame *frame,
 MTV_PUBLIC AVPixelFormat FrameTypeToPixelFormat(VideoFrameType type);
 MTV_PUBLIC VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt);
 
-/*! \brief Return a user friendly description of the given deinterlacer
-*/
-MTV_PUBLIC QString DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format = FMT_NONE);
-
-MTV_PUBLIC QString DeinterlacerPref(MythDeintType Deint);
-
 /**
  * MythPictureDeinterlacer
  * simple deinterlacer based on FFmpeg's yadif filter.

@@ -83,6 +83,8 @@ class MythVideoFrame;
 MythDeintType MTV_PUBLIC GetSingleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
 MythDeintType MTV_PUBLIC GetDoubleRateOption(const MythVideoFrame* Frame, MythDeintType Type, MythDeintType Override = DEINT_NONE);
 MythDeintType MTV_PUBLIC GetDeinterlacer(MythDeintType Option);
+QString MTV_PUBLIC DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format = FMT_NONE);
+QString MTV_PUBLIC DeinterlacerPref(MythDeintType Deint);
 
 using VideoFrameTypes = std::vector<VideoFrameType>;
 using FramePitches = std::array<int,3>;

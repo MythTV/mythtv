@@ -35,6 +35,89 @@ MythDeintType GetDeinterlacer(MythDeintType Option)
     return Option & (DEINT_BASIC | DEINT_MEDIUM | DEINT_HIGH);
 }
 
+QString DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format)
+{
+    MythDeintType deint = GetDeinterlacer(Deint);
+    QString result = DoubleRate ? "2x " : "";
+    if (Deint & DEINT_CPU)
+    {
+        result += "CPU ";
+        switch (deint)
+        {
+            case DEINT_HIGH:   return result + "Yadif";
+            case DEINT_MEDIUM: return result + "Linearblend";
+            case DEINT_BASIC:  return result + "Onefield";
+            default: break;
+        }
+    }
+    else if (Deint & DEINT_SHADER)
+    {
+        result += "GLSL ";
+        switch (deint)
+        {
+            case DEINT_HIGH:   return result + "Kernel";
+            case DEINT_MEDIUM: return result + "Linearblend";
+            case DEINT_BASIC:  return result + "Onefield";
+            default: break;
+        }
+    }
+    else if (Deint & DEINT_DRIVER)
+    {
+        switch (Format)
+        {
+            case FMT_MEDIACODEC: return "MediaCodec";
+            case FMT_DRMPRIME: return result + "EGL Onefield";
+            case FMT_VDPAU:
+                result += "VDPAU ";
+                switch (deint)
+                {
+                    case DEINT_HIGH:   return result + "Advanced";
+                    case DEINT_MEDIUM: return result + "Temporal";
+                    case DEINT_BASIC:  return result + "Basic";
+                    default: break;
+                }
+                break;
+            case FMT_NVDEC:
+                result += "NVDec ";
+                switch (deint)
+                {
+                    case DEINT_HIGH:
+                    case DEINT_MEDIUM: return result + "Adaptive";
+                    case DEINT_BASIC:  return result + "Basic";
+                    default: break;
+                }
+                break;
+            case FMT_VAAPI:
+                result += "VAAPI ";
+                switch (deint)
+                {
+                    case DEINT_HIGH:   return result + "Compensated";
+                    case DEINT_MEDIUM: return result + "Adaptive";
+                    case DEINT_BASIC:  return result + "Basic";
+                    default: break;
+                }
+                break;
+            default: break;
+        }
+    }
+    return "None";
+}
+
+QString DeinterlacerPref(MythDeintType Deint)
+{
+    if (DEINT_NONE == Deint)
+        return QString("None");
+    QString result;
+    if (Deint & DEINT_BASIC)       result = "Basic";
+    else if (Deint & DEINT_MEDIUM) result = "Medium";
+    else if (Deint & DEINT_HIGH)   result = "High";
+    if (Deint & DEINT_CPU)         result += "|CPU";
+    if (Deint & DEINT_SHADER)      result += "|GLSL";
+    if (Deint & DEINT_DRIVER)      result += "|DRIVER";
+    return result;
+}
+
+
 MythVideoFrame::~MythVideoFrame()
 {
     if (buf && HardwareFormat(codec))
