@@ -9,15 +9,20 @@
 #ifndef MythTV_mythavutil_h
 #define MythTV_mythavutil_h
 
-#include "mythframe.h"
-extern "C" {
-#include "libavcodec/avcodec.h"
-}
-
+// Qt
 #include <QMap>
 #include <QMutex>
 #include <QVector>
 
+// MythTV
+#include "mythframe.h"
+
+// FFmpeg
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
+
+struct SwsContext;
 struct AVFilterGraph;
 struct AVFilterContext;
 struct AVStream;
@@ -93,37 +98,25 @@ class MTV_PUBLIC MythCodecMap
     QMutex m_mapLock {QMutex::Recursive};
 };
 
-class MythAVCopyPrivate;
-
-/**
- * MythAVCopy
- * Copy AVFrame<->frame, performing the required conversion if any
- */
 class MTV_PUBLIC MythAVCopy
 {
   public:
-    MythAVCopy();
-    virtual ~MythAVCopy();
-
-    int Copy(MythVideoFrame *dst, const MythVideoFrame *src);
-    /**
-     * Copy
-     * Initialise AVFrame pic, create buffer if required and copy content of
-     * VideoFrame frame into it, performing the required conversion if any
-     * Returns size of buffer allocated
-     * Data would have to be deleted once finished with object with:
-     * av_freep(pic->data[0])
-     */
-    int Copy(AVFrame *pic, const MythVideoFrame *frame,
-             unsigned char *buffer = nullptr,
-             AVPixelFormat fmt = AV_PIX_FMT_YUV420P);
-    int Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
-             const AVFrame *src, AVPixelFormat pix_fmt,
-             int width, int height);
+    MythAVCopy() = default;
+   ~MythAVCopy();
+    int Copy(AVFrame* To, const MythVideoFrame* From, unsigned char* Buffer,
+             AVPixelFormat Fmt = AV_PIX_FMT_YUV420P);
+    int Copy(AVFrame* To, AVPixelFormat ToFmt, const AVFrame* From, AVPixelFormat FromFmt,
+             int Width, int Height);
 
   private:
     Q_DISABLE_COPY(MythAVCopy)
-    MythAVCopyPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
+    int SizeData(int Width, int Height, AVPixelFormat Fmt);
+
+    AVPixelFormat m_format  { AV_PIX_FMT_NONE };
+    SwsContext*   m_swsctx  { nullptr };
+    int           m_width   { 0 };
+    int           m_height  { 0 };
+    int           m_size    { 0 };
 };
 
 /**

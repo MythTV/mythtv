@@ -115,9 +115,7 @@ VideoFrameType PixelFormatToFrameType(AVPixelFormat fmt)
 int AVPictureFill(AVFrame *pic, const MythVideoFrame *frame, AVPixelFormat fmt)
 {
     if (fmt == AV_PIX_FMT_NONE)
-    {
         fmt = FrameTypeToPixelFormat(frame->m_type);
-    }
 
     av_image_fill_arrays(pic->data, pic->linesize, frame->m_buffer,
         fmt, frame->m_width, frame->m_height, IMAGE_ALIGN);
@@ -129,52 +127,30 @@ int AVPictureFill(AVFrame *pic, const MythVideoFrame *frame, AVPixelFormat fmt)
     return static_cast<int>(MythVideoFrame::GetBufferSize(frame->m_type, frame->m_width, frame->m_height));
 }
 
-class MythAVCopyPrivate
-{
-  public:
-    MythAVCopyPrivate() {}
-    ~MythAVCopyPrivate()
-    {
-        sws_freeContext(m_swsctx);
-    }
-
-    int SizeData(int _width, int _height, AVPixelFormat _fmt)
-    {
-        if (_width == m_width && _height == m_height && _fmt == m_format)
-        {
-            return m_size;
-        }
-        m_size    = av_image_get_buffer_size(_fmt, _width, _height, IMAGE_ALIGN);
-        m_width   = _width;
-        m_height  = _height;
-        m_format  = _fmt;
-        return m_size;
-    }
-
-    SwsContext   *m_swsctx  {nullptr};
-    int           m_width   {0};
-    int           m_height  {0};
-    int           m_size    {0};
-    AVPixelFormat m_format  {AV_PIX_FMT_NONE};
-
-  private:
-    Q_DISABLE_COPY(MythAVCopyPrivate)
-};
-
-MythAVCopy::MythAVCopy() : d(new MythAVCopyPrivate())
-{
-}
-
+/*! \class MythAVCopy
+ * Copy AVFrame<->frame, performing the required conversion if any
+ */
 MythAVCopy::~MythAVCopy()
 {
-    delete d;
+    sws_freeContext(m_swsctx);
 }
 
-int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
-                 const AVFrame *src, AVPixelFormat pix_fmt,
-                 int width, int height)
+int MythAVCopy::SizeData(int Width, int Height, AVPixelFormat Fmt)
 {
-    int new_width = width;
+    if (Width == m_width && Height == m_height && Fmt == m_format)
+        return m_size;
+
+    m_size    = av_image_get_buffer_size(Fmt, Width, Height, IMAGE_ALIGN);
+    m_width   = Width;
+    m_height  = Height;
+    m_format  = Fmt;
+    return m_size;
+}
+
+int MythAVCopy::Copy(AVFrame* To, AVPixelFormat ToFmt, const AVFrame* From, AVPixelFormat FromFmt,
+                     int Width, int Height)
+{
+    int newwidth = Width;
 #if ARCH_ARM
     // The ARM build of FFMPEG has a bug that if sws_scale is
     // called with source and dest sizes the same, and
@@ -182,52 +158,34 @@ int MythAVCopy::Copy(AVFrame *dst, AVPixelFormat dst_pix_fmt,
     // application core dumps. To avoid this I make a -1
     // difference in the new width, causing it to bypass
     // the code optimization which is failing.
-    if (pix_fmt == AV_PIX_FMT_YUV420P
-      && dst_pix_fmt == AV_PIX_FMT_BGRA)
-        new_width = width - 1;
+    if (FromFmt == AV_PIX_FMT_YUV420P && ToFmt == AV_PIX_FMT_BGRA)
+        newwidth = Width - 1;
 #endif
-    d->m_swsctx = sws_getCachedContext(d->m_swsctx, width, height, pix_fmt,
-                                     new_width, height, dst_pix_fmt,
-                                     SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
-    if (d->m_swsctx == nullptr)
-    {
+    m_swsctx = sws_getCachedContext(m_swsctx, Width, Height, FromFmt,
+                                    newwidth, Height, ToFmt, SWS_FAST_BILINEAR,
+                                    nullptr, nullptr, nullptr);
+    if (m_swsctx == nullptr)
         return -1;
-    }
-
-    sws_scale(d->m_swsctx, src->data, src->linesize,
-              0, height, dst->data, dst->linesize);
-
-    return d->SizeData(width, height, dst_pix_fmt);
+    sws_scale(m_swsctx, From->data, From->linesize, 0, Height, To->data, To->linesize);
+    return SizeData(Width, Height, ToFmt);
 }
 
-int MythAVCopy::Copy(MythVideoFrame *dst, const MythVideoFrame *src)
+/*! \brief Initialise AVFrame and copy contents of VideoFrame frame into it, performing
+ * any required conversion.
+ *
+ * \returns Size of buffer allocated
+ * \note AVFrame buffers must be deleted manually by the caller (av_freep(pic->data[0]))
+ */
+int MythAVCopy::Copy(AVFrame* To, const MythVideoFrame* From,
+                     unsigned char* Buffer, AVPixelFormat Fmt)
 {
-    AVFrame srcpic;
-    AVFrame dstpic;
-    AVPictureFill(&srcpic, src);
-    AVPictureFill(&dstpic, dst);
-    return Copy(&dstpic, FrameTypeToPixelFormat(dst->m_type),
-                &srcpic, FrameTypeToPixelFormat(src->m_type),
-                src->m_width, src->m_height);
-}
-
-int MythAVCopy::Copy(AVFrame *pic, const MythVideoFrame *frame,
-                 unsigned char *buffer, AVPixelFormat fmt)
-{
-    VideoFrameType type = PixelFormatToFrameType(fmt);
-    unsigned char *sbuf = buffer ? buffer : MythVideoFrame::CreateBuffer(type, frame->m_width, frame->m_height);
-
-    if (!sbuf)
-    {
+    if (!Buffer)
         return 0;
-    }
-
-    AVFrame pic_in;
-    AVPixelFormat fmt_in = FrameTypeToPixelFormat(frame->m_type);
-
-    AVPictureFill(&pic_in, frame, fmt_in);
-    av_image_fill_arrays(pic->data, pic->linesize, sbuf, fmt, frame->m_width, frame->m_height, IMAGE_ALIGN);
-    return Copy(pic, fmt, &pic_in, fmt_in, frame->m_width, frame->m_height);
+    AVFrame frame;
+    AVPixelFormat fromfmt = FrameTypeToPixelFormat(From->m_type);
+    AVPictureFill(&frame, From, fromfmt);
+    av_image_fill_arrays(To->data, To->linesize, Buffer, Fmt, From->m_width, From->m_height, IMAGE_ALIGN);
+    return Copy(To, Fmt, &frame, fromfmt, From->m_width, From->m_height);
 }
 
 MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat pixfmt,
