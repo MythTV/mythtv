@@ -32,7 +32,7 @@ void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height)
 {
     size_t   newsize   = 0;
     uint8_t* newbuffer = nullptr;
-    if (!((Type == FMT_NONE) || HardwareFormat(Type)))
+    if ((Width > 0 && Height > 0) && !((Type == FMT_NONE) || HardwareFormat(Type)))
     {
         newsize = GetBufferSize(Type, Width, Height);
         bool reallocate = !((Width == m_width) && (Height == m_height) && (newsize == m_bufferSize) && (Type == m_type));
