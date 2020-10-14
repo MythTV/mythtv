@@ -3644,24 +3644,27 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         {
             // Set the frame flags, but then discard it
             // since we are not using it for display.
-            oldframe->m_pauseFrame = false;
-            oldframe->m_interlaced = AvFrame->interlaced_frame;
-            oldframe->m_topFieldFirst = (AvFrame->top_field_first != 0);
-            oldframe->m_interlacedReverse = false;
-            oldframe->m_newGOP = false;
-            oldframe->m_colorspace = AvFrame->colorspace;
-            oldframe->m_colorrange = AvFrame->color_range;
+            oldframe->m_interlaced     = AvFrame->interlaced_frame;
+            oldframe->m_topFieldFirst  = AvFrame->top_field_first != 0;
+            oldframe->m_colorspace     = AvFrame->colorspace;
+            oldframe->m_colorrange     = AvFrame->color_range;
             oldframe->m_colorprimaries = AvFrame->color_primaries;
-            oldframe->m_colortransfer = AvFrame->color_trc;
+            oldframe->m_colortransfer  = AvFrame->color_trc;
             oldframe->m_chromalocation = AvFrame->chroma_location;
-            oldframe->m_frameNumber = m_framesPlayed;
-            oldframe->m_frameCounter = m_frameCounter++;
-            oldframe->m_aspect = m_currentAspect;
-            oldframe->m_deinterlaceInuse = DEINT_NONE;
-            oldframe->m_deinterlaceInuse2x = false;
+            oldframe->m_frameNumber    = m_framesPlayed;
+            oldframe->m_frameCounter   = m_frameCounter++;
+            oldframe->m_aspect         = m_currentAspect;
+            oldframe->m_rotation       = m_videoRotation;
+            oldframe->m_stereo3D       = m_stereo3D;
+
+            oldframe->m_dummy               = false;
+            oldframe->m_pauseFrame          = false;
+            oldframe->m_interlacedReverse   = false;
+            oldframe->m_newGOP              = false;
+            oldframe->m_deinterlaceInuse    = DEINT_NONE;
+            oldframe->m_deinterlaceInuse2x  = false;
             oldframe->m_alreadyDeinterlaced = false;
-            oldframe->m_rotation = m_videoRotation;
-            oldframe->m_stereo3D = m_stereo3D;
+
             m_parent->DiscardVideoFrame(oldframe);
         }
     }
@@ -3728,28 +3731,30 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
             .arg(temppts).arg(m_lastVPts)
             .arg((pts != temppts) ? " fixup" : ""));
 
-    frame->m_interlaced     = AvFrame->interlaced_frame;
-    frame->m_topFieldFirst      = (AvFrame->top_field_first != 0);
-    frame->m_interlacedReverse  = false;
+    frame->m_interlaced          = AvFrame->interlaced_frame;
+    frame->m_topFieldFirst       = AvFrame->top_field_first != 0;
     frame->m_newGOP              = m_nextDecodedFrameIsKeyFrame;
-    frame->m_repeatPic          = (AvFrame->repeat_pict != 0);
-    frame->m_displayTimecode        = NormalizeVideoTimecode(Stream, temppts);
-    frame->m_frameNumber          = m_framesPlayed;
-    frame->m_frameCounter         = m_frameCounter++;
-    frame->m_aspect               = m_currentAspect;
-    frame->m_dummy                = false;
-    frame->m_pauseFrame          = false;
-    frame->m_colorspace           = AvFrame->colorspace;
-    frame->m_colorrange           = AvFrame->color_range;
-    frame->m_colorprimaries       = AvFrame->color_primaries;
-    frame->m_colortransfer        = AvFrame->color_trc;
-    frame->m_chromalocation       = AvFrame->chroma_location;
+    frame->m_repeatPic           = AvFrame->repeat_pict != 0;
+    frame->m_displayTimecode     = NormalizeVideoTimecode(Stream, temppts);
+    frame->m_frameNumber         = m_framesPlayed;
+    frame->m_frameCounter        = m_frameCounter++;
+    frame->m_aspect              = m_currentAspect;
+    frame->m_colorspace          = AvFrame->colorspace;
+    frame->m_colorrange          = AvFrame->color_range;
+    frame->m_colorprimaries      = AvFrame->color_primaries;
+    frame->m_colortransfer       = AvFrame->color_trc;
+    frame->m_chromalocation      = AvFrame->chroma_location;
     frame->m_pixFmt              = AvFrame->format;
     frame->m_deinterlaceInuse    = DEINT_NONE;
+    frame->m_rotation            = m_videoRotation;
+    frame->m_stereo3D            = m_stereo3D;
+
+    frame->m_dummy               = false;
+    frame->m_pauseFrame          = false;
     frame->m_deinterlaceInuse2x  = false;
     frame->m_alreadyDeinterlaced = false;
-    frame->m_rotation             = m_videoRotation;
-    frame->m_stereo3D             = m_stereo3D;
+    frame->m_interlacedReverse   = false;
+
     m_parent->ReleaseNextVideoFrame(frame, temppts);
     m_mythCodecCtx->PostProcessFrame(context, frame);
 
@@ -5139,8 +5144,8 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->ClearMetadata();
         frame->ClearBufferToBlank();
 
-        frame->m_dummy = true;
-        frame->m_frameNumber = m_framesPlayed;
+        frame->m_dummy        = true;
+        frame->m_frameNumber  = m_framesPlayed;
         frame->m_frameCounter = static_cast<long long>(m_frameCounter++);
 
         m_parent->ReleaseNextVideoFrame(frame, m_lastVPts);
