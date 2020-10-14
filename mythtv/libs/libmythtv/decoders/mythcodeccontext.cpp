@@ -509,10 +509,7 @@ int MythCodecContext::InitialiseDecoder(AVCodecContext *Context, CreateHWDecoder
         return Callback(Context);
 
     // Callback to MythPlayer (which will fail without a MythPlayer instance)
-    MythPlayer *player = nullptr;
-    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
-    if (decoder)
-        player = decoder->GetPlayer();
+    MythPlayerUI* player = GetPlayerUI(Context);
     if (player)
         player->HandleDecoderCallback(Debug, MythCodecContext::CreateDecoderCallback,
                                       Context, reinterpret_cast<void*>(Callback));
@@ -529,10 +526,7 @@ int MythCodecContext::InitialiseDecoder2(AVCodecContext *Context, CreateHWDecode
         return Callback(Context);
 
     // Callback to MythPlayer (which will fail without a MythPlayer instance)
-    MythPlayer *player = nullptr;
-    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
-    if (decoder)
-        player = decoder->GetPlayer();
+    MythPlayerUI* player = GetPlayerUI(Context);
     if (player)
         player->HandleDecoderCallback(Debug, MythCodecContext::CreateDecoderCallback,
                                       Context, reinterpret_cast<void*>(Callback));
