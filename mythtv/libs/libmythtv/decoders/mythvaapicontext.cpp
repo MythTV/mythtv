@@ -10,6 +10,7 @@
 #include "opengl/mythrenderopengl.h"
 #include "videobuffers.h"
 #include "mythvaapiinterop.h"
+#include "mythplayerui.h"
 #include "mythvaapicontext.h"
 
 extern "C" {
@@ -164,18 +165,8 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     }
     else
     {
-        // If called from outside of the main thread, we need a MythPlayer instance to
-        // process the interop check callback - which may fail otherwise (depending
-        // on whether the result is cached).
-        MythPlayer* player = nullptr;
-        if (!gCoreContext->IsUIThread())
-        {
-            auto *decoder = reinterpret_cast<AvFormatDecoder*>((*Context)->opaque);
-            if (decoder)
-                player = decoder->GetPlayer();
-        }
-
         // Direct rendering needs interop support
+        MythPlayerUI* player = GetPlayerUI(*Context);
         if (MythOpenGLInterop::GetInteropType(FMT_VAAPI, player) == MythOpenGLInterop::Unsupported)
             return failure;
     }
@@ -254,12 +245,9 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
     if (!render)
         return -1;
 
-    // The interop must have a reference to the player so it can be deleted
+    // The interop must have a reference to the ui player so it can be deleted
     // from the main thread.
-    MythPlayer *player = nullptr;
-    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
-    if (decoder)
-        player = decoder->GetPlayer();
+    MythPlayerUI* player = GetPlayerUI(Context);
     if (!player)
         return -1;
 

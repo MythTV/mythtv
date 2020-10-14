@@ -4,6 +4,7 @@
 #include "avformatdecoder.h"
 #include "mythnvdecinterop.h"
 #include "mythvideoout.h"
+#include "mythplayerui.h"
 #include "mythnvdeccontext.h"
 
 extern "C" {
@@ -27,9 +28,6 @@ MythNVDECContext::~MythNVDECContext()
  *
  * The objective here is, as for other decoders, to fail fast so that we can fallback
  * to another decoder as soon as possible if necessary.
- *
- * \note Interop support for rendering is implicitly assumed as it only
- * requires an OpenGL context which is checked in HaveNVDEC()
 */
 MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
                                                 AVCodec       **Codec,
@@ -44,6 +42,14 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     // no brainers
     if (!Decoder.startsWith("nvdec") || getenv("NO_NVDEC") || !HaveNVDEC() || IsUnsupportedProfile(*Context))
         return failure;
+
+    if (!decodeonly)
+    {
+        // check for the correct player type and interop supprt
+        MythPlayerUI* player = GetPlayerUI(*Context);
+        if (MythOpenGLInterop::GetInteropType(FMT_NVDEC, player) == MythOpenGLInterop::Unsupported)
+            return failure;
+    }
 
     QString codecstr = ff_codec_id_string((*Context)->codec_id);
     QString profile  = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
@@ -133,11 +139,9 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
     if (!gCoreContext->IsUIThread() || !Context)
         return -1;
 
-    // We need a player to release the interop
-    MythPlayer *player = nullptr;
-    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
-    if (decoder)
-        player = decoder->GetPlayer();
+    // We need a player to release the interop. As we are using direct rendering
+    // it must be a MythPlayerUI instance
+    MythPlayerUI* player = GetPlayerUI(Context);
     if (!player)
         return -1;
 

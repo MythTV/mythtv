@@ -1,5 +1,6 @@
 // MythTV
 #include "decoders/avformatdecoder.h"
+#include "mythplayerui.h"
 #include "mythmmalcontext.h"
 
 // FFmpeg
@@ -80,17 +81,8 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
 
     if (!decodeonly)
     {
-        // If called from outside of the main thread, we need a MythPlayer instance to
-        // process the callback interop check callback - which may fail otherwise
-        MythPlayer* player = nullptr;
-        if (!gCoreContext->IsUIThread())
-        {
-            AvFormatDecoder* decoder = reinterpret_cast<AvFormatDecoder*>((*Context)->opaque);
-            if (decoder)
-                player = decoder->GetPlayer();
-        }
-
-        // direct rendering needs interop support
+        // Direct rendering needs interop support
+        MythPlayerUI* player = GetPlayerUI(*Context);
         if (MythOpenGLInterop::GetInteropType(FMT_MMAL, player) == MythOpenGLInterop::Unsupported)
             return failure;
     }

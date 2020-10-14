@@ -6,6 +6,7 @@
 #include "v4l2util.h"
 #include "fourcc.h"
 #include "avformatdecoder.h"
+#include "mythplayerui.h"
 #include "opengl/mythrenderopengl.h"
 #ifdef USING_EGL
 #include "opengl/mythdrmprimeinterop.h"
@@ -58,6 +59,14 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
     // not us
     if (!Decoder.startsWith("v4l2"))
         return failure;
+
+    if (!decodeonly)
+    {
+        // check for the correct player type and interop supprt
+        MythPlayerUI* player = GetPlayerUI(*Context);
+        if (MythOpenGLInterop::GetInteropType(FMT_DRMPRIME, player) == MythOpenGLInterop::Unsupported)
+            return failure;
+    }
 
     // supported by device driver?
     MythCodecContext::CodecProfile mythprofile = MythCodecContext::NoProfile;
@@ -415,12 +424,9 @@ int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
     if (!render)
         return -1;
 
-    // The interop must have a reference to the player so it can be deleted
+    // The interop must have a reference to the ui player so it can be deleted
     // from the main thread.
-    MythPlayer *player = nullptr;
-    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
-    if (decoder)
-        player = decoder->GetPlayer();
+    MythPlayerUI* player = GetPlayerUI(Context);
     if (!player)
         return -1;
 

@@ -8,6 +8,7 @@
 #include "mythmainwindow.h"
 #include "avformatdecoder.h"
 #include "mythmediacodecinterop.h"
+#include "mythplayerui.h"
 #include "mythmediacodeccontext.h"
 
 // FFmpeg
@@ -164,11 +165,9 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
     if (!Context || !gCoreContext->IsUIThread())
         return -1;
 
-    // We need a player to release the interop
-    MythPlayer *player = nullptr;
-    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
-    if (decoder)
-        player = decoder->GetPlayer();
+    // The interop must have a reference to the ui player so it can be deleted
+    // from the main thread.
+    MythPlayerUI* player = GetPlayerUI(Context);
     if (!player)
         return -1;
 
@@ -226,6 +225,14 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
 
     if (!HaveMediaCodec())
         return failure;
+
+    if (!decodeonly)
+    {
+        // check for the correct player type and interop supprt
+        MythPlayerUI* player = GetPlayerUI(*Context);
+        if (MythOpenGLInterop::GetInteropType(FMT_MEDIACODEC, player) == MythOpenGLInterop::Unsupported)
+            return failure;
+    }
 
     bool found = false;
     MCProfiles& profiles = MythMediaCodecContext::GetProfiles();

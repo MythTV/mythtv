@@ -2,7 +2,7 @@
 #include <QWaitCondition>
 
 // MythTV
-#include "mythplayer.h"
+#include "mythplayerui.h"
 #include "mythcorecontext.h"
 #include "mythvideocolourspace.h"
 #include "opengl/mythrenderopengl.h"
@@ -70,11 +70,8 @@ void MythOpenGLInterop::GetInteropTypeCallback(void *Wait, void *Format, void *R
 }
 
 /*! \brief Check whether we support direct rendering for the given VideoFrameType.
- *
- * \note GetInteropType is protected in all subclasses to ensure thread safety.
- * The subclasses will fail this check if not called from the UI thread.
 */
-MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format, MythPlayer *Player)
+MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format, MythPlayerUI *Player)
 {
     // cache supported formats to avoid potentially expensive callbacks
     static QMutex s_lock(QMutex::Recursive);
@@ -104,6 +101,7 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format,
             }
             else
             {
+                // Note - this is a callback into the same function from the main thread
                 Player->HandleDecoderCallback("interop check",
                                               MythOpenGLInterop::GetInteropTypeCallback,
                                               &Format, &supported);
@@ -272,12 +270,12 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetType(void)
     return m_type;
 }
 
-MythPlayer* MythOpenGLInterop::GetPlayer(void)
+MythPlayerUI* MythOpenGLInterop::GetPlayer(void)
 {
     return m_player;
 }
 
-void MythOpenGLInterop::SetPlayer(MythPlayer *Player)
+void MythOpenGLInterop::SetPlayer(MythPlayerUI* Player)
 {
     m_player = Player;
 }

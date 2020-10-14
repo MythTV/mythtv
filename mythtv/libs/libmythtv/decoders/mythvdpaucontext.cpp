@@ -4,6 +4,7 @@
 #include "mythvdpauinterop.h"
 #include "mythvdpauhelper.h"
 #include "mythvdpaucontext.h"
+#include "mythplayerui.h"
 
 // FFmpeg
 extern "C" {
@@ -31,11 +32,9 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     if (!gCoreContext->IsUIThread() || !Context)
         return -1;
 
-    // We need a player to release the interop
-    MythPlayer *player = nullptr;
-    auto *decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
-    if (decoder)
-        player = decoder->GetPlayer();
+    // The interop must have a reference to the ui player so it can be deleted
+    // from the main thread.
+    MythPlayerUI* player = GetPlayerUI(Context);
     if (!player)
         return -1;
 
@@ -137,17 +136,8 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
 
     if (!decodeonly)
     {
-        // If called from outside of the main thread, we need a MythPlayer instance to
-        // process the callback interop check callback - which may fail otherwise
-        MythPlayer* player = nullptr;
-        if (!gCoreContext->IsUIThread())
-        {
-            auto* decoder = reinterpret_cast<AvFormatDecoder*>((*Context)->opaque);
-            if (decoder)
-                player = decoder->GetPlayer();
-        }
-
-        // direct rendering needs interop support
+        // check for the correct player type and interop supprt
+        MythPlayerUI* player = GetPlayerUI(*Context);
         if (MythOpenGLInterop::GetInteropType(FMT_VDPAU, player) == MythOpenGLInterop::Unsupported)
             return failure;
     }

@@ -321,7 +321,7 @@ int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
         Frame->linesize[i] = 0;
     }
     Frame->opaque           = videoframe;
-    videoframe->m_pixFmt     = Context->pix_fmt;
+    videoframe->m_pixFmt    = Context->pix_fmt;
     Frame->reordered_opaque = Context->reordered_opaque;
 
     int ret = avcodec_default_get_buffer2(Context, Frame, Flags);

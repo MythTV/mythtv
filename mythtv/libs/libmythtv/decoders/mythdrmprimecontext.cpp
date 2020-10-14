@@ -78,15 +78,8 @@ MythCodecID MythDRMPRIMEContext::GetSupportedCodec(AVCodecContext **Context,
     if (Decoder != "drmprime")
         return failure;
 
-    // direct rendering needs interop support
-    MythPlayer* player = nullptr;
-    if (!gCoreContext->IsUIThread())
-    {
-        auto* decoder = reinterpret_cast<AvFormatDecoder*>((*Context)->opaque);
-        if (decoder)
-            player = decoder->GetPlayer();
-    }
-
+    // Direct rendering needs interop support
+    MythPlayerUI* player = GetPlayerUI(*Context);
     if (MythOpenGLInterop::GetInteropType(FMT_DRMPRIME, player) == MythOpenGLInterop::Unsupported)
         return failure;
 
