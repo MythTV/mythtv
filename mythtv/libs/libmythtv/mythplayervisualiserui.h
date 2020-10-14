@@ -3,9 +3,9 @@
 
 // MythTV
 #include "visualisations/videovisual.h"
-#include "mythplayeruibase.h"
+#include "mythplayervideoui.h"
 
-class MythPlayerVisualiserUI : public MythPlayerUIBase
+class MythPlayerVisualiserUI : public MythPlayerVideoUI
 {
     Q_OBJECT
 
@@ -14,7 +14,7 @@ class MythPlayerVisualiserUI : public MythPlayerUIBase
     void        EmbedVisualiser(bool Embed, const QRect& Rect = {});
 
   public:
-    explicit MythPlayerVisualiserUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
+    MythPlayerVisualiserUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerVisualiserUI() override;
 
     void        PrepareVisualiser();

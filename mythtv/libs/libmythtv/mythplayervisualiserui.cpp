@@ -7,7 +7,7 @@
 
 MythPlayerVisualiserUI::MythPlayerVisualiserUI(MythMainWindow *MainWindow, TV *Tv,
                                            PlayerContext *Context, PlayerFlags Flags)
-  : MythPlayerUIBase(MainWindow, Tv, Context, Flags)
+  : MythPlayerVideoUI(MainWindow, Tv, Context, Flags)
 {
     m_uiScreenRect = m_mainWindow->GetUIScreenRect();
     connect(m_mainWindow, &MythMainWindow::UIScreenRectChanged, this, &MythPlayerVisualiserUI::UIScreenRectChanged);

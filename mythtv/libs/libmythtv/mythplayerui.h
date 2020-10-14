@@ -4,12 +4,11 @@
 // MythTV
 #include "mythplayervisualiserui.h"
 #include "mythvideoscantracker.h"
-#include "mythplayeraudioui.h"
 #include "DetectLetterbox.h"
 #include "jitterometer.h"
 #include "mythplayer.h"
 
-class MythPlayerUI : public MythPlayerAudioUI, public MythVideoScanTracker
+class MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoScanTracker
 {
     Q_OBJECT
 

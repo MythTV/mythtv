@@ -4,9 +4,9 @@
 // MythTV
 #include "volumebase.h"
 #include "audiooutputgraph.h"
-#include "mythplayervisualiserui.h"
+#include "mythplayeroverlayui.h"
 
-class MythPlayerAudioUI : public MythPlayerVisualiserUI
+class MythPlayerAudioUI : public MythPlayerOverlayUI
 {
   public:
     MythPlayerAudioUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);

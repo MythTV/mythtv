@@ -378,6 +378,8 @@ using_frontend {
     HEADERS += mythplayer.h
     HEADERS += mythplayeruibase.h
     HEADERS += mythplayerui.h
+    HEADERS += mythplayervideoui.h
+    HEADERS += mythplayeroverlayui.h
     HEADERS += mythvideoscantracker.h
     HEADERS += mythplayervisualiserui.h
     HEADERS += mythplayeravsync.h
@@ -395,6 +397,8 @@ using_frontend {
     SOURCES += mythplayer.cpp
     SOURCES += mythplayeruibase.cpp
     SOURCES += mythplayerui.cpp
+    SOURCES += mythplayervideoui.cpp
+    SOURCES += mythplayeroverlayui.cpp
     SOURCES += mythvideoscantracker.cpp
     SOURCES += mythplayervisualiserui.cpp
     SOURCES += mythplayeravsync.cpp

@@ -92,30 +92,6 @@ enum PlayerFlags
 
 #define FlagIsSet(arg) (m_playerFlags & (arg))
 
-class DecoderCallback
-{
-  public:
-    using Callback = void (*)(void*, void*, void*);
-    DecoderCallback() = default;
-    DecoderCallback(QString Debug, Callback Function, QAtomicInt *Ready,
-                    void *Opaque1, void *Opaque2, void *Opaque3)
-      : m_debug(std::move(Debug)),
-        m_function(Function),
-        m_ready(Ready),
-        m_opaque1(Opaque1),
-        m_opaque2(Opaque2),
-        m_opaque3(Opaque3)
-    {
-    }
-
-    QString m_debug;
-    Callback m_function { nullptr };
-    QAtomicInt *m_ready { nullptr };
-    void* m_opaque1     { nullptr };
-    void* m_opaque2     { nullptr };
-    void* m_opaque3     { nullptr };
-};
-
 // Padding between class members reduced from 113 to 73 bytes, but its
 // still higher than the default warning threshhold of 24 bytes.
 //
@@ -241,9 +217,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual bool HasReachedEof(void) const;
     void SetDisablePassThrough(bool disabled);
     void ForceSetupAudioStream(void);
-    void HandleDecoderCallback(const QString &Debug, DecoderCallback::Callback Function,
-                               void *Opaque1, void *Opaque2);
-    void ProcessCallbacks(void);
+    // need to refactor away calls to this from MythPlayer
+    virtual void ProcessCallbacks(void) {}
 
     // Add data
     virtual bool PrepareAudioSample(int64_t &timecode);
@@ -525,8 +500,6 @@ class MTV_PUBLIC MythPlayer : public QObject
 
   protected:
     DecoderBase     *m_decoder            {nullptr};
-    QMutex           m_decoderCallbackLock;
-    QVector<DecoderCallback> m_decoderCallbacks;
     mutable QMutex   m_decoderChangeLock  {QMutex::Recursive};
     MythVideoOutput *m_videoOutput        {nullptr};
     PlayerContext   *m_playerCtx          {nullptr};

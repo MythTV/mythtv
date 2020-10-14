@@ -5,8 +5,8 @@
 #include "mythplayeraudioui.h"
 
 MythPlayerAudioUI::MythPlayerAudioUI(MythMainWindow* MainWindow, TV *Tv,
-                                                   PlayerContext *Context, PlayerFlags Flags)
-  : MythPlayerVisualiserUI(MainWindow, Tv, Context, Flags)
+                                     PlayerContext *Context, PlayerFlags Flags)
+  : MythPlayerOverlayUI(MainWindow, Tv, Context, Flags)
 {
     m_audioGraph.SetPainter(m_painter);
 }

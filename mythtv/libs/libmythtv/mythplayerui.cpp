@@ -12,7 +12,7 @@
 
 MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
                                          PlayerContext *Context, PlayerFlags Flags)
-  : MythPlayerAudioUI(MainWindow, Tv, Context, Flags),
+  : MythPlayerVisualiserUI(MainWindow, Tv, Context, Flags),
     MythVideoScanTracker(this)
 {
 }
