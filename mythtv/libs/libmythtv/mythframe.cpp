@@ -51,7 +51,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
         return;
     }
 
-    if (std::any_of(m_priv.cbegin(), m_priv.cend(), [](uint8_t* P) { return P != nullptr; }))
+    if (std::any_of(m_priv.cbegin(), m_priv.cend(), [](const uint8_t* P) { return P != nullptr; }))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Priv buffers are set (hardware frame?). Ignoring Init");
         return;
