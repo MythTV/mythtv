@@ -5146,7 +5146,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
 
         frame->m_dummy        = true;
         frame->m_frameNumber  = m_framesPlayed;
-        frame->m_frameCounter = static_cast<long long>(m_frameCounter++);
+        frame->m_frameCounter = m_frameCounter++;
 
         m_parent->ReleaseNextVideoFrame(frame, m_lastVPts);
         m_parent->DeLimboFrame(frame);

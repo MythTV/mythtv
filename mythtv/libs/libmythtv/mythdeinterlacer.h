@@ -45,9 +45,9 @@ class MythDeinterlacer
     AVFilterContext* m_sink       { nullptr };
     MythVideoFrame*      m_bobFrame   { nullptr };
     SwsContext*      m_swsContext { nullptr };
-    long long        m_discontinuityCounter { 0 };
+    uint64_t         m_discontinuityCounter { 0 };
     bool             m_autoFieldOrder  { false };
-    long long        m_lastFieldChange { 0 };
+    uint64_t         m_lastFieldChange { 0 };
     static bool      s_haveSIMD;
 };
 

@@ -108,7 +108,7 @@ class MTV_PUBLIC MythVideoFrame
     float          m_aspect            { -1.0F };
     double         m_frameRate         { -1.0 };
     long long      m_frameNumber       { 0 };
-    long long      m_frameCounter      { 0 }; ///< raw frame counter/ticker for discontinuity checks
+    uint64_t       m_frameCounter      { 0 }; ///< raw frame counter/ticker for discontinuity checks
     long long      m_timecode          { 0 };
     int64_t        m_displayTimecode   { 0 };
     std::array<uint8_t*,4> m_priv      { nullptr }; ///< random empty storage

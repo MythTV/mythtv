@@ -173,7 +173,7 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
         }
         Force = true;
     }
-    else if ((m_deintType == DEINT_HIGH) && (abs(Frame->m_frameCounter - m_discontinuityCounter) > 1))
+    else if ((m_deintType == DEINT_HIGH) && (qAbs(Frame->m_frameCounter - m_discontinuityCounter) > 1))
     {
         if (!Initialise(Frame, deinterlacer, doublerate, topfieldfirst, Profile))
         {

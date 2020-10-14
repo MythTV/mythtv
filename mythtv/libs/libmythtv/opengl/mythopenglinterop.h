@@ -74,7 +74,7 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     Type                m_type;
     QHash<unsigned long long, vector<MythVideoTexture*> > m_openglTextures;
     QSize               m_openglTextureSize    { };
-    long long           m_discontinuityCounter { 0 };
+    uint64_t            m_discontinuityCounter { 0 };
     FreeAVHWDeviceContext m_defaultFree        { nullptr };
     void               *m_defaultUserOpaque    { nullptr };
     MythPlayer         *m_player               { nullptr };

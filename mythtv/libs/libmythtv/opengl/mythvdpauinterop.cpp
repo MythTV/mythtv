@@ -313,7 +313,7 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
 
     if ((deinterlacer == DEINT_HIGH) || (deinterlacer == DEINT_MEDIUM))
     {
-        if (abs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
+        if (qAbs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
             CleanupDeinterlacer();
         RotateReferenceFrames(reinterpret_cast<AVBufferRef*>(Frame->m_priv[0]));
     }

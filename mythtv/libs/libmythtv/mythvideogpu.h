@@ -62,7 +62,7 @@ class MythVideoGPU : public QObject
     virtual void ColourSpaceUpdate (bool PrimariesChanged) = 0;
 
     MythRender*       m_render               { nullptr };
-    long long         m_discontinuityCounter { 0 };
+    uint64_t          m_discontinuityCounter { 0 };
     QString           m_profile;
     VideoFrameType    m_inputType            { FMT_NONE };
     VideoFrameType    m_outputType           { FMT_NONE };
@@ -71,7 +71,7 @@ class MythVideoGPU : public QObject
     QSize             m_masterViewportSize;
     QRect             m_displayVideoRect;
     QRect             m_videoRect;
-    MythVideoColourSpace* m_videoColourSpace     { nullptr };
+    MythVideoColourSpace* m_videoColourSpace { nullptr };
     QSize             m_inputTextureSize;
     VideoResizing     m_resizing             { None };
     int               m_lastRotation         { 0 };

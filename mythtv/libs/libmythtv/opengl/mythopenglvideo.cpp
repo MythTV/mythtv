@@ -601,7 +601,7 @@ void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
     {
         if (!m_nextTextures.empty() && !m_prevTextures.empty())
         {
-            if (abs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
+            if (qAbs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
                 ResetTextures();
             vector<MythVideoTexture*> temp = m_prevTextures;
             m_prevTextures = m_inputTextures;

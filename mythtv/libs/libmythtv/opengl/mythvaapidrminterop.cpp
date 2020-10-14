@@ -184,7 +184,7 @@ vector<MythVideoTexture*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL *Context
 
     // Deinterlacing
     bool needreferenceframes = false;
-    auto discontinuity = abs(Frame->m_frameCounter - m_discontinuityCounter) > 1;
+    auto discontinuity = qAbs(Frame->m_frameCounter - m_discontinuityCounter) > 1;
 
     if (is_interlaced(Scan))
     {

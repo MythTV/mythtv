@@ -74,7 +74,7 @@ class MythVAAPIInterop : public MythOpenGLInterop
     int              m_filterWidth       { 0 };
     int              m_filterHeight      { 0 };
     VASurfaceID      m_lastFilteredFrame { 0 };
-    long long        m_lastFilteredFrameCount { 0 };
+    uint64_t         m_lastFilteredFrameCount { 0 };
 };
 
 #endif // MYTHVAAPIINTEROP_H

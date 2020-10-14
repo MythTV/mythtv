@@ -208,7 +208,7 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
 
     if (needreferences)
     {
-        if (abs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
+        if (qAbs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
             m_referenceFrames.clear();
         RotateReferenceFrames(surfaceid);
     }

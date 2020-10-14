@@ -298,7 +298,7 @@ class DecoderBase
 
     long long            m_framesPlayed            {0};
     long long            m_framesRead              {0};
-    unsigned long long   m_frameCounter            {0};
+    uint64_t             m_frameCounter            {0};
     AVRational           m_totalDuration;
     int                  m_keyframeDist            {-1};
     long long            m_lastKey                 {0};
