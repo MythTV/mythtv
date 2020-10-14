@@ -27,6 +27,7 @@
 #include "mythmainwindow.h"
 #include "mythopenglinterop.h"
 #include "avformatdecoder.h"
+#include "mythplayerui.h"
 
 #ifdef USING_VAAPI
 #include "mythvaapicontext.h"
@@ -487,6 +488,15 @@ void MythCodecContext::CreateDecoderCallback(void *Wait, void *Context, void *Ca
         (void)callback(context);
     if (wait)
         wait->wakeAll();
+}
+
+MythPlayerUI* MythCodecContext::GetPlayerUI(AVCodecContext *Context)
+{
+    MythPlayerUI* result = nullptr;
+    auto* decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
+    if (decoder)
+        result = dynamic_cast<MythPlayerUI*>(decoder->GetPlayer());
+    return result;
 }
 
 /// \brief Initialise a hardware decoder that is expected to use AVHWFramesContext

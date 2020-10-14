@@ -44,6 +44,7 @@ extern "C" {
 
 using CreateHWDecoder = int (*)(AVCodecContext *Context);
 
+class MythPlayerUI;
 class MythOpenGLInterop;
 class VideoDisplayProfile;
 
@@ -136,6 +137,7 @@ class MTV_PUBLIC MythCodecContext
     static void FramesContextFinished      (AVHWFramesContext *Context);
     static void DeviceContextFinished      (AVHWDeviceContext *Context);
     static void CreateDecoderCallback      (void *Wait, void *Context, void *Callback);
+    static MythPlayerUI* GetPlayerUI       (AVCodecContext* Context);
     static AVBufferRef* CreateDevice       (AVHWDeviceType Type, MythOpenGLInterop *Interop, const QString &Device = QString());
     static bool IsUnsupportedProfile       (AVCodecContext *Context);
     static QString GetProfileDescription   (CodecProfile Profile, QSize Size,
