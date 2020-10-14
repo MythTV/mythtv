@@ -8,7 +8,7 @@
 #include "jitterometer.h"
 #include "mythplayer.h"
 
-class MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoScanTracker
+class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoScanTracker
 {
     Q_OBJECT
 
