@@ -1017,8 +1017,12 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     {
         m_buffers[i].Init(Type, Width, Height);
         m_buffers[i].ClearBufferToBlank();
-        success &= (m_buffers[i].m_buffer != nullptr);
+        success &= m_buffers[i].m_dummy || (m_buffers[i].m_buffer != nullptr);
     }
+
+    // workaround null buffers for audio only (remove when these buffers aren't used)
+    if (!success && (Width < 1 || Height < 1))
+        success = true;
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 %2 (%3x%4) video buffers")
        .arg(Size()).arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
