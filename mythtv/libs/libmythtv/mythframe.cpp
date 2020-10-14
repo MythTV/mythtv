@@ -69,12 +69,12 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
         av_freep(&m_buffer);
     }
 
-    m_type  = Type;
-    m_bitsPerPixel    = BitsPerPixel(m_type);
-    m_buffer    = Buffer;
+    m_type         = Type;
+    m_bitsPerPixel = BitsPerPixel(m_type);
+    m_buffer       = Buffer;
     m_bufferSize   = BufferSize;
-    m_width  = Width;
-    m_height = Height;
+    m_width        = Width;
+    m_height       = Height;
 
     ClearMetadata();
 
@@ -136,35 +136,35 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
 
 void MythVideoFrame::ClearMetadata()
 {
-    m_aspect               = -1.0F;
+    m_aspect              = -1.0F;
     m_frameRate           = -1.0 ;
-    m_frameNumber          = 0;
-    m_frameCounter         = 0;
-    m_timecode             = 0;
-    m_displayTimecode        = 0;
-    m_priv                 = { nullptr };
-    m_interlaced     = 0;
-    m_topFieldFirst      = true;
-    m_interlacedReverse  = false;
+    m_frameNumber         = 0;
+    m_frameCounter        = 0;
+    m_timecode            = 0;
+    m_displayTimecode     = 0;
+    m_priv                = { nullptr };
+    m_interlaced          = 0;
+    m_topFieldFirst       = true;
+    m_interlacedReverse   = false;
     m_newGOP              = false;
-    m_repeatPic          = false;
-    m_forceKey             = false;
-    m_dummy                = false;
+    m_repeatPic           = false;
+    m_forceKey            = false;
+    m_dummy               = false;
     m_pauseFrame          = false;
-    m_pitches              = { 0 };
-    m_offsets              = { 0 };
+    m_pitches             = { 0 };
+    m_offsets             = { 0 };
     m_pixFmt              = 0;
-    m_swPixFmt           = 0;
-    m_directRendering      = true;
-    m_colorspace           = 1;
-    m_colorrange           = 1;
-    m_colorprimaries       = 1;
-    m_colortransfer        = 1;
-    m_chromalocation       = 1;
-    m_colorshifted         = false;
+    m_swPixFmt            = 0;
+    m_directRendering     = true;
+    m_colorspace          = 1;
+    m_colorrange          = 1;
+    m_colorprimaries      = 1;
+    m_colortransfer       = 1;
+    m_chromalocation      = 1;
+    m_colorshifted        = false;
     m_alreadyDeinterlaced = false;
-    m_rotation             = 0;
-    m_stereo3D             = 0;
+    m_rotation            = 0;
+    m_stereo3D            = 0;
     m_deinterlaceSingle   = DEINT_NONE;
     m_deinterlaceDouble   = DEINT_NONE;
     m_deinterlaceAllowed  = DEINT_NONE;
@@ -315,32 +315,32 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *From)
     // Not copied: codec, width, height - should already be the same
     // Not copied: buf, size, pitches, offsets - should/could be different
     // Not copied: priv - hardware frames only
-    m_aspect               = From->m_aspect;
+    m_aspect              = From->m_aspect;
     m_frameRate           = From->m_frameRate;
-    m_bitsPerPixel                  = From->m_bitsPerPixel;
-    m_frameNumber          = From->m_frameNumber;
-    m_frameCounter         = From->m_frameCounter;
-    m_timecode             = From->m_timecode;
-    m_displayTimecode        = From->m_displayTimecode;
-    m_interlaced     = From->m_interlaced;
-    m_topFieldFirst      = From->m_topFieldFirst;
-    m_interlacedReverse  = From->m_interlacedReverse;
+    m_bitsPerPixel        = From->m_bitsPerPixel;
+    m_frameNumber         = From->m_frameNumber;
+    m_frameCounter        = From->m_frameCounter;
+    m_timecode            = From->m_timecode;
+    m_displayTimecode     = From->m_displayTimecode;
+    m_interlaced          = From->m_interlaced;
+    m_topFieldFirst       = From->m_topFieldFirst;
+    m_interlacedReverse   = From->m_interlacedReverse;
     m_newGOP              = From->m_newGOP;
-    m_repeatPic          = From->m_repeatPic;
-    m_forceKey             = From->m_forceKey;
-    m_dummy                = From->m_dummy;
+    m_repeatPic           = From->m_repeatPic;
+    m_forceKey            = From->m_forceKey;
+    m_dummy               = From->m_dummy;
     m_pauseFrame          = From->m_pauseFrame;
     m_pixFmt              = From->m_pixFmt;
-    m_swPixFmt           = From->m_swPixFmt;
-    m_directRendering      = From->m_directRendering;
-    m_colorspace           = From->m_colorspace;
-    m_colorrange           = From->m_colorrange;
-    m_colorprimaries       = From->m_colorprimaries;
-    m_colortransfer        = From->m_colortransfer;
-    m_chromalocation       = From->m_chromalocation;
-    m_colorshifted         = From->m_colorshifted;
+    m_swPixFmt            = From->m_swPixFmt;
+    m_directRendering     = From->m_directRendering;
+    m_colorspace          = From->m_colorspace;
+    m_colorrange          = From->m_colorrange;
+    m_colorprimaries      = From->m_colorprimaries;
+    m_colortransfer       = From->m_colortransfer;
+    m_chromalocation      = From->m_chromalocation;
+    m_colorshifted        = From->m_colorshifted;
     m_alreadyDeinterlaced = From->m_alreadyDeinterlaced;
-    m_rotation             = From->m_rotation;
+    m_rotation            = From->m_rotation;
     m_deinterlaceSingle   = From->m_deinterlaceSingle;
     m_deinterlaceDouble   = From->m_deinterlaceDouble;
     m_deinterlaceAllowed  = From->m_deinterlaceAllowed;
