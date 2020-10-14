@@ -200,7 +200,7 @@ void TestCopyFrames::TestCopy()
 
     auto gettestframe = [](VideoFrameType T, const frametest& P)
     {
-        MythVideoFrame* res =
+        auto * res =
                 new MythVideoFrame(T,MythVideoFrame::GetAlignedBuffer(std::get<3>(P)),
                                    std::get<3>(P), std::get<1>(P), std::get<2>(P));
         res->m_pitches = std::get<4>(P);
@@ -214,10 +214,10 @@ void TestCopyFrames::TestCopy()
         return new MythVideoFrame(T, MythVideoFrame::GetAlignedBuffer(size), size, W, H, A);
     };
 
-    for (auto & tests : s_tests)
+    for (const auto & tests : s_tests)
     {
         VideoFrameType type = tests.first;
-        for (auto & test : tests.second)
+        for (const auto & test : tests.second)
         {
             auto * frame = gettestframe(type, test);
             auto sum     = FillRandom(frame);
