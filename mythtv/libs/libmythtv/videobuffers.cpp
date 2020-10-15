@@ -165,46 +165,31 @@ uint VideoBuffers::GetNumBuffers(int PixelFormat, int MaxReferenceFrames, bool D
 
 /*! \brief Creates buffers and sets various buffer management parameters.
  *
- *  This normally creates numdecode buffers, but it creates
- *  one more buffer if extra_for_pause is true. Only numdecode
- *  buffers are added to available and hence into the buffer
- *  management handled by VideoBuffers. The availability of
- *  any scratch frame must be managed by the video output
- *  class itself.
- *
  * \param NumDecode           number of buffers to allocate for normal use
- * \param ExtraForPause       allocate an extra buffer, a scratch a frame for pause
  * \param NeedFree            maximum number of buffers needed in display
  *                            and pause
  * \param NeedPrebufferNormal number buffers you can put in used or limbo normally
  * \param NeedPrebufferSmall  number of buffers you can put in used or limbo
  *                            after SetPrebuffering(false) has been called.
  */
-void VideoBuffers::Init(uint NumDecode, bool ExtraForPause,
-                        uint NeedFree,  uint NeedPrebufferNormal,
-                        uint NeedPrebufferSmall)
+void VideoBuffers::Init(uint NumDecode, uint NeedFree,
+                        uint NeedPrebufferNormal, uint NeedPrebufferSmall)
 {
     QMutexLocker locker(&m_globalLock);
 
     Reset();
 
-    uint numcreate = NumDecode + ((ExtraForPause) ? 1 : 0);
-
     // make a big reservation, so that things that depend on
     // pointer to VideoFrames work even after a few push_backs
-    m_buffers.reserve(std::max(numcreate, 128U));
-    m_buffers.resize(numcreate);
-    for (uint i = 0; i < numcreate; i++)
+    m_buffers.reserve(std::max(NumDecode, 128U));
+    m_buffers.resize(NumDecode);
+    for (uint i = 0; i < NumDecode; i++)
         m_vbufferMap[At(i)]     = i;
 
     m_needFreeFrames            = NeedFree;
     m_needPrebufferFrames       = NeedPrebufferNormal;
     m_needPrebufferFramesNormal = NeedPrebufferNormal;
     m_needPrebufferFramesSmall  = NeedPrebufferSmall;
-    m_createdPauseFrame         = ExtraForPause;
-
-    if (m_createdPauseFrame)
-        Enqueue(kVideoBuffer_pause, At(numcreate - 1));
 
     for (uint i = 0; i < NumDecode; i++)
         Enqueue(kVideoBuffer_avail, At(i));
@@ -554,40 +539,40 @@ bool VideoBuffers::DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int R
     // Recreate - see MythVideoOutputOpenGL::CreateBuffers
     if (codec_is_copyback(CodecID))
     {
-        Init(VideoBuffers::GetNumBuffers(FMT_NONE), false, 1, 4, 2);
+        Init(VideoBuffers::GetNumBuffers(FMT_NONE), 1, 4, 2);
         result = CreateBuffers(FMT_YV12, VideoDim.width(), VideoDim.height());
     }
     else if (codec_is_mediacodec(CodecID))
     {
-        result = CreateBuffers(FMT_MEDIACODEC, VideoDim, false, 1, 2, 2);
+        result = CreateBuffers(FMT_MEDIACODEC, VideoDim, 1, 2, 2);
     }
     else if (codec_is_vaapi(CodecID))
     {
-        result = CreateBuffers(FMT_VAAPI, VideoDim, false, 2, 1, 4, References);
+        result = CreateBuffers(FMT_VAAPI, VideoDim, 2, 1, 4, References);
     }
     else if (codec_is_vtb(CodecID))
     {
-        result = CreateBuffers(FMT_VTB, VideoDim, false, 1, 4, 2);
+        result = CreateBuffers(FMT_VTB, VideoDim, 1, 4, 2);
     }
     else if (codec_is_vdpau(CodecID))
     {
-        result = CreateBuffers(FMT_VDPAU, VideoDim, false, 2, 1, 4, References);
+        result = CreateBuffers(FMT_VDPAU, VideoDim, 2, 1, 4, References);
     }
     else if (codec_is_nvdec(CodecID))
     {
-        result = CreateBuffers(FMT_NVDEC, VideoDim, false, 2, 1, 4);
+        result = CreateBuffers(FMT_NVDEC, VideoDim, 2, 1, 4);
     }
     else if (codec_is_mmal(CodecID))
     {
-        result = CreateBuffers(FMT_MMAL, VideoDim, false, 2, 1, 4);
+        result = CreateBuffers(FMT_MMAL, VideoDim, 2, 1, 4);
     }
     else if (codec_is_v4l2(CodecID) || codec_is_drmprime(CodecID))
     {
-        result = CreateBuffers(FMT_DRMPRIME, VideoDim, false, 2, 1, 4);
+        result = CreateBuffers(FMT_DRMPRIME, VideoDim, 2, 1, 4);
     }
     else
     {
-        result = CreateBuffers(FMT_YV12, VideoDim, false, 1, 8, 4, References);
+        result = CreateBuffers(FMT_YV12, VideoDim, 1, 8, 4, References);
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("DiscardAndRecreate: %1").arg(GetStatus()));
@@ -783,18 +768,6 @@ bool VideoBuffers::Contains(BufferType Type, MythVideoFrame *Frame) const
     return false;
 }
 
-MythVideoFrame *VideoBuffers::GetScratchFrame(void)
-{
-    if (!m_createdPauseFrame || !Head(kVideoBuffer_pause))
-    {
-        LOG(VB_GENERAL, LOG_ERR, "GetScratchFrame() called, but not allocated");
-        return nullptr;
-    }
-
-    QMutexLocker locker(&m_globalLock);
-    return Head(kVideoBuffer_pause);
-}
-
 MythVideoFrame* VideoBuffers::GetLastDecodedFrame(void)
 {
     return At(m_vpos);
@@ -803,19 +776,6 @@ MythVideoFrame* VideoBuffers::GetLastDecodedFrame(void)
 MythVideoFrame* VideoBuffers::GetLastShownFrame(void)
 {
     return At(m_rpos);
-}
-
-void VideoBuffers::SetLastShownFrameToScratch(void)
-{
-    if (!m_createdPauseFrame || !Head(kVideoBuffer_pause))
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "SetLastShownFrameToScratch() called but no pause frame");
-        return;
-    }
-
-    MythVideoFrame *pause = Head(kVideoBuffer_pause);
-    m_rpos = m_vbufferMap[pause];
 }
 
 uint VideoBuffers::ValidVideoFrames(void) const
@@ -989,12 +949,11 @@ void VideoBuffers::ClearAfterSeek(void)
     DoDiscard(discards);
 }
 
-bool VideoBuffers::CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,
+bool VideoBuffers::CreateBuffers(VideoFrameType Type, QSize Size,
                                  uint NeedFree, uint NeedprebufferNormal,
                                  uint NeedPrebufferSmall, int MaxReferenceFrames)
 {
-    Init(GetNumBuffers(Type, MaxReferenceFrames), ExtraForPause, NeedFree, NeedprebufferNormal,
-         NeedPrebufferSmall);
+    Init(GetNumBuffers(Type, MaxReferenceFrames), NeedFree, NeedprebufferNormal, NeedPrebufferSmall);
     return CreateBuffers(Type, Size.width(), Size.height());
 }
 

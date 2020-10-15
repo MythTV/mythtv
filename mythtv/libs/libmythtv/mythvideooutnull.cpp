@@ -120,7 +120,7 @@ bool MythVideoOutputNull::Init(const QSize& VideoDim, const QSize& VideoDispDim,
     }
 
     MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecID);
-    m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), false, kNeedFreeFrames,
+    m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), kNeedFreeFrames,
                         kPrebufferFramesNormal, kPrebufferFramesSmall);
 
     const QSize videodim = GetVideoDim();

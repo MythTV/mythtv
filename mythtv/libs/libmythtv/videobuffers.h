@@ -42,10 +42,10 @@ class MTV_PUBLIC VideoBuffers
    ~VideoBuffers() = default;
 
     static uint GetNumBuffers(int PixelFormat, int MaxReferenceFrames = 16, bool Decoder = false);
-    void Init(uint NumDecode, bool ExtraForPause,
+    void Init(uint NumDecode,
               uint NeedFree, uint NeedprebufferNormal,
               uint NeedPrebufferSmall);
-    bool CreateBuffers(VideoFrameType Type, QSize Size, bool ExtraForPause,
+    bool CreateBuffers(VideoFrameType Type, QSize Size,
                        uint NeedFree, uint NeedprebufferNormal,
                        uint NeedPrebufferSmall, int MaxReferenceFrames = 16);
     bool CreateBuffers(VideoFrameType Type, int Width, int Height);
@@ -80,11 +80,8 @@ class MTV_PUBLIC VideoBuffers
     void EndLock();
     uint Size(BufferType Type) const;
     bool Contains(BufferType Type, MythVideoFrame* Frame) const;
-
-    MythVideoFrame *GetScratchFrame(void);
     MythVideoFrame *GetLastDecodedFrame(void);
     MythVideoFrame *GetLastShownFrame(void);
-    void SetLastShownFrameToScratch(void);
 
     uint ValidVideoFrames(void) const;
     uint FreeVideoFrames(void) const;
@@ -119,7 +116,6 @@ class MTV_PUBLIC VideoBuffers
     uint                 m_needPrebufferFrames       { 0 };
     uint                 m_needPrebufferFramesNormal { 0 };
     uint                 m_needPrebufferFramesSmall  { 0 };
-    bool                 m_createdPauseFrame         { false };
     uint                 m_rpos                      { 0 };
     uint                 m_vpos                      { 0 };
     mutable QMutex       m_globalLock                { QMutex::Recursive };
