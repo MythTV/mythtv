@@ -16,7 +16,6 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     MythPlayerUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
     virtual void EventLoop();
-    bool InitVideo() override;
     void ReinitVideo(bool ForceUpdate) override;
     void VideoStart() override;
     virtual bool VideoLoop();
@@ -26,7 +25,6 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
                         bool ForceUpdate, int ReferenceFrames,
                         FrameScanType Scan = kScan_Ignore,
                         const QString& CodecName = QString()) override;
-    void WindowResized(const QSize& Size);
     void GetPlaybackData(InfoMap& Map);
     void GetCodecDescription(InfoMap& Map);
     void ToggleAdjustFill(AdjustFillMode Mode = kAdjustFill_Toggle);

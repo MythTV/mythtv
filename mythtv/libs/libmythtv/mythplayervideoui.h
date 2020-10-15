@@ -32,6 +32,9 @@ class MythPlayerVideoUI : public MythPlayerAudioUI
 {
     Q_OBJECT
 
+  public slots:
+    void WindowResized(const QSize& /*Size*/);
+
   public:
     MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerVideoUI() override = default;
@@ -39,6 +42,9 @@ class MythPlayerVideoUI : public MythPlayerAudioUI
     void HandleDecoderCallback(const QString& Debug, DecoderCallback::Callback Function,
                                void* Opaque1, void* Opaque2);
     void ProcessCallbacks() override;
+
+  protected:
+    bool InitVideo() override;
 
   private:
     Q_DISABLE_COPY(MythPlayerVideoUI)

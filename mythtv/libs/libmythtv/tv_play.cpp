@@ -3128,8 +3128,11 @@ bool TV::event(QEvent* Event)
         GetPlayerReadLock();
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
         const auto *qre = dynamic_cast<const QResizeEvent*>(Event);
-        if (qre && m_player)
-            m_player->WindowResized(qre->size());
+        if (qre)
+        {
+            QSize size = qre->size();
+            emit WindowResized(size);
+        }
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
         ReturnPlayerLock();
         return false;
@@ -3927,8 +3930,7 @@ bool TV::DiscMenuHandleAction(const QStringList& Actions) const
 bool TV::Handle3D(const QString& Action)
 {
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player && m_player->GetVideoOutput() &&
-        m_player->GetVideoOutput()->StereoscopicModesAllowed())
+    if (m_player && m_player->GetVideoOutput())
     {
         StereoscopicMode mode = kStereoscopicModeAuto;
         if (ACTION_3DSIDEBYSIDEDISCARD == Action)
@@ -9608,17 +9610,14 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
     }
     else if (matchesGroup(actionName, "3D", category, prefix))
     {
-        if (m_tvmStereoAllowed)
-        {
-            active = (m_tvmStereoMode == kStereoscopicModeAuto);
-            BUTTON(ACTION_3DNONE, tr("Auto"));
-            active = (m_tvmStereoMode == kStereoscopicModeIgnore3D);
-            BUTTON(ACTION_3DIGNORE, tr("Ignore"));
-            active = (m_tvmStereoMode == kStereoscopicModeSideBySideDiscard);
-            BUTTON(ACTION_3DSIDEBYSIDEDISCARD, tr("Discard Side by Side"));
-            active = (m_tvmStereoMode == kStereoscopicModeTopAndBottomDiscard);
-            BUTTON(ACTION_3DTOPANDBOTTOMDISCARD, tr("Discard Top and Bottom"));
-        }
+        active = (m_tvmStereoMode == kStereoscopicModeAuto);
+        BUTTON(ACTION_3DNONE, tr("Auto"));
+        active = (m_tvmStereoMode == kStereoscopicModeIgnore3D);
+        BUTTON(ACTION_3DIGNORE, tr("Ignore"));
+        active = (m_tvmStereoMode == kStereoscopicModeSideBySideDiscard);
+        BUTTON(ACTION_3DSIDEBYSIDEDISCARD, tr("Discard Side by Side"));
+        active = (m_tvmStereoMode == kStereoscopicModeTopAndBottomDiscard);
+        BUTTON(ACTION_3DTOPANDBOTTOMDISCARD, tr("Discard Top and Bottom"));
     }
     else if (matchesGroup(actionName, "SELECTSCAN_", category, prefix) && m_player)
     {
@@ -10133,7 +10132,6 @@ void TV::PlaybackMenuInit(const MenuBase &Menu)
     m_tvmAdjustFill        = kAdjustFill_Off;
     m_tvmFillAutoDetect    = false;
     m_tvmSup               = kPictureAttributeSupported_None;
-    m_tvmStereoAllowed     = false;
     m_tvmStereoMode        = kStereoscopicModeAuto;
 
     m_tvmSpeedX100         = static_cast<int>(round(m_playerContext.m_tsNormal * 100));
@@ -10218,7 +10216,6 @@ void TV::PlaybackMenuInit(const MenuBase &Menu)
         if (vo)
         {
             m_tvmSup            = vo->GetSupportedPictureAttributes();
-            m_tvmStereoAllowed  = vo->StereoscopicModesAllowed();
             m_tvmStereoMode     = vo->GetStereoscopicMode();
             m_tvmFillAutoDetect = vo->HasSoftwareFrames();  
         }

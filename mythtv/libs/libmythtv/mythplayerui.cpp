@@ -5,7 +5,6 @@
 #include "osd.h"
 #include "tv_play.h"
 #include "livetvchain.h"
-#include "mythvideooutgpu.h"
 #include "mythplayerui.h"
 
 #define LOC QString("PlayerUI: ")
@@ -283,28 +282,6 @@ void MythPlayerUI::ChangeSpeed()
     UnlockScan();
 }
 
-bool MythPlayerUI::InitVideo()
-{
-    if (!(m_playerCtx && m_decoder))
-        return false;
-
-    m_videoOutput = MythVideoOutputGPU::Create(m_mainWindow,
-                    m_decoder->GetCodecDecoderName(), m_decoder->GetVideoCodecID(),
-                    m_videoDim, m_videoDispDim, m_videoAspect,
-                    static_cast<float>(m_videoFrameRate),
-                    static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames);
-
-    if (m_videoOutput)
-    {
-        connect(m_tv, &TV::EmbedPlayback, m_videoOutput, &MythVideoBounds::EmbedPlayback);
-        return true;
-    }
-
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't create VideoOutput instance. Exiting..");
-    SetErrored(tr("Failed to initialize video output"));
-    return false;
-}
-
 void MythPlayerUI::ReinitVideo(bool ForceUpdate)
 {
     MythPlayer::ReinitVideo(ForceUpdate);
@@ -561,13 +538,6 @@ void MythPlayerUI::SetVideoParams(int Width, int Height, double FrameRate, float
     FrameScanType newscan = DetectInterlace(Scan, static_cast<float>(m_videoFrameRate), m_videoDispDim.height());
     SetScanType(newscan, m_videoOutput, m_frameInterval);
     ResetTracker();
-}
-
-void MythPlayerUI::WindowResized(const QSize& Size)
-{
-    if (m_videoOutput)
-        m_videoOutput->WindowResized(Size);
-    ReinitOSD();
 }
 
 bool MythPlayerUI::CanSupportDoubleRate()

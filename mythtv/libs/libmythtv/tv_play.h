@@ -310,6 +310,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void PlaybackExiting(TV* Player);
     void RequestEmbedding(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
     void EmbedPlayback(bool Embed, const QRect& Rect = {});
+    void WindowResized(QSize& Size);
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
@@ -853,7 +854,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     AdjustFillMode   m_tvmAdjustFill          {kAdjustFill_Off};
     bool             m_tvmFillAutoDetect      {false};
     uint             m_tvmSup                 {kPictureAttributeSupported_None};
-    bool             m_tvmStereoAllowed       {false};
     StereoscopicMode m_tvmStereoMode          {kStereoscopicModeAuto};
     QStringList      m_tvmDeinterlacers       {};
     QString          m_tvmCurrentDeinterlacer {};

@@ -1,5 +1,7 @@
 // MythTV
 #include "mythlogging.h"
+#include "tv_play.h"
+#include "mythvideooutgpu.h"
 #include "mythplayervideoui.h"
 
 #define LOC QString("PlayerVideo: ")
@@ -7,6 +9,36 @@
 MythPlayerVideoUI::MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerAudioUI(MainWindow, Tv, Context, Flags)
 {
+}
+
+void MythPlayerVideoUI::WindowResized(const QSize& /*Size*/)
+{
+    ReinitOSD();
+}
+
+bool MythPlayerVideoUI::InitVideo()
+{
+    if (!(m_playerCtx && m_decoder))
+        return false;
+
+    auto * gpuvideo = MythVideoOutputGPU::Create(m_mainWindow,
+                    m_decoder->GetCodecDecoderName(), m_decoder->GetVideoCodecID(),
+                    m_videoDim, m_videoDispDim, m_videoAspect,
+                    static_cast<float>(m_videoFrameRate),
+                    static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames);
+
+    if (gpuvideo)
+    {
+        m_videoOutput = gpuvideo;
+        connect(m_tv, &TV::WindowResized, this,     &MythPlayerVideoUI::WindowResized);
+        connect(m_tv, &TV::WindowResized, gpuvideo, &MythVideoOutputGPU::WindowResized);
+        connect(m_tv, &TV::EmbedPlayback, gpuvideo, &MythVideoBounds::EmbedPlayback);
+        return true;
+    }
+
+    LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't create VideoOutput instance. Exiting..");
+    SetErrored(tr("Failed to initialize video output"));
+    return false;
 }
 
 /*! \brief Convenience function to request and wait for a callback into the main thread.

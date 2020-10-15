@@ -35,7 +35,6 @@ class MythVideoOutputGPU : public MythVideoOutput
                                            int ReferenceFrames, bool ForceChange) override;
     void            EndFrame              () override;
     void            ClearAfterSeek        () override;
-    bool            StereoscopicModesAllowed() const override;
     void            ResizeForVideo        (QSize Size = QSize()) override;
 
   protected:

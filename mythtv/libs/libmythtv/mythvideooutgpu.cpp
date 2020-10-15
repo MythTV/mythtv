@@ -633,11 +633,6 @@ void MythVideoOutputGPU::ClearAfterSeek()
     MythVideoOutput::ClearAfterSeek();
 }
 
-bool MythVideoOutputGPU::StereoscopicModesAllowed() const
-{
-    return true;
-}
-
 /**
  * \fn VideoOutput::ResizeForVideo(uint width, uint height)
  * Sets display parameters based on video resolution.

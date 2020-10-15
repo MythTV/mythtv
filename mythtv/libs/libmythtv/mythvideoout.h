@@ -1,4 +1,4 @@
-#ifndef MYTH_VIDEOOUT_H_
+﻿#ifndef MYTH_VIDEOOUT_H_
 #define MYTH_VIDEOOUT_H_
 
 // Qt
@@ -43,25 +43,14 @@ class MythVideoOutput : public MythVideoBounds
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
     virtual void PrepareFrame (MythVideoFrame* Frame, FrameScanType Scan = kScan_Ignore) = 0;
     virtual void RenderFrame  (MythVideoFrame* Frame, FrameScanType) = 0;
-    virtual void RenderOverlays (OSD* Osd) = 0;
     virtual void RenderEnd    () = 0;
     virtual void EndFrame     () = 0;
-    void         SetReferenceFrames(int ReferenceFrames);
-    VideoDisplayProfile* GetProfile() { return m_dbDisplayProfile; }
-    virtual void WindowResized(const QSize& /*size*/) {}
     virtual bool InputChanged(const QSize& VideoDim, const QSize& VideoDispDim,
                               float VideoAspect, MythCodecID  CodecID,
                               bool& AspectChanged, int ReferenceFrames, bool ForceChange);
-    virtual void ResizeForVideo(QSize /*Size*/ = QSize()) { }
     virtual void GetOSDBounds(QRect& Total, QRect& Visible,
                               float& VisibleAspect, float& FontScaling,
                               float ThemeAspect) const;
-    PictureAttributeSupported GetSupportedPictureAttributes();
-    int          ChangePictureAttribute(PictureAttribute AttributeType, bool Direction);
-    virtual int  SetPictureAttribute(PictureAttribute Attribute, int NewValue);
-    int          GetPictureAttribute(PictureAttribute AttributeType);
-    virtual void InitPictureAttributes() { }
-    bool         HasSoftwareFrames() const { return codec_sw_copy(m_videoCodecID); }
     virtual void SetFramesPlayed(long long FramesPlayed);
     virtual long long GetFramesPlayed();
     bool         IsErrored() const;
@@ -85,14 +74,23 @@ class MythVideoOutput : public MythVideoBounds
     virtual MythVideoFrame* GetLastDecodedFrame();
     virtual MythVideoFrame* GetLastShownFrame();
     QString      GetFrameStatus() const;
-    virtual void UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) = 0;
-
     QRect        GetImageRect(const QRect& Rect, QRect* DisplayRect = nullptr);
     QRect        GetSafeRect();
     static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
 
-    virtual MythPainter* GetOSDPainter       () { return nullptr; }
-    virtual bool         StereoscopicModesAllowed() const { return false; }
+    // These methods are only required by MythPlayerUI
+    virtual void ResizeForVideo(QSize /*Size*/ = QSize()) { }
+    virtual MythPainter* GetOSDPainter () { return nullptr; }
+    void         SetReferenceFrames    (int ReferenceFrames);
+    PictureAttributeSupported GetSupportedPictureAttributes();
+    int          ChangePictureAttribute(PictureAttribute AttributeType, bool Direction);
+    virtual int  SetPictureAttribute   (PictureAttribute Attribute, int NewValue);
+    int          GetPictureAttribute   (PictureAttribute AttributeType);
+    virtual void InitPictureAttributes () { }
+    bool         HasSoftwareFrames     () const { return codec_sw_copy(m_videoCodecID); }
+    virtual void RenderOverlays        (OSD* /*Osd*/) {}
+    virtual void UpdatePauseFrame      (int64_t& /*DisplayTimecode*/,
+                                        FrameScanType /*Scan*/ = kScan_Progressive) {}
 
   protected:
     MythVideoOutput();
