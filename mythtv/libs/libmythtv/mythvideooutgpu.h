@@ -20,9 +20,12 @@ class MythVideoOutputGPU : public MythVideoOutput
                                       const QString& Codec,      int ReferenceFrames);
    ~MythVideoOutputGPU() override;
 
+  public slots:
+    void            WindowResized         (const QSize& Size);
+
+  public:
     MythPainter*    GetOSDPainter         () override;
     void            InitPictureAttributes () override;
-    void            WindowResized         (const QSize& Size) override;
     void            SetVideoFrameRate     (float NewRate) override;
     void            DiscardFrames         (bool KeyFrame, bool Flushed) override;
     void            DoneDisplayingFrame   (MythVideoFrame* Frame) override;
