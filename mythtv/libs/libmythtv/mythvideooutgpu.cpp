@@ -578,7 +578,7 @@ void MythVideoOutputGPU::RenderFrame(MythVideoFrame *Frame, FrameScanType Scan)
     // Video
     // N.B. dummy streams need the viewport updated in case we have resized the window (i.e. LiveTV)
     if (m_video && !dummy)
-        m_video->RenderFrame(Frame, topfieldfirst, Scan, GetStereoscopicMode());
+        m_video->RenderFrame(Frame, topfieldfirst, Scan, GetStereoOverride());
     else if (dummy)
         m_render->SetViewPort(GetWindowRect());
 }

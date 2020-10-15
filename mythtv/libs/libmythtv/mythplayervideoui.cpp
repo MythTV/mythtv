@@ -27,18 +27,20 @@ bool MythPlayerVideoUI::InitVideo()
                     static_cast<float>(m_videoFrameRate),
                     static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames);
 
-    if (gpuvideo)
+    if (!gpuvideo)
     {
-        m_videoOutput = gpuvideo;
-        connect(m_tv, &TV::WindowResized, this,     &MythPlayerVideoUI::WindowResized);
-        connect(m_tv, &TV::WindowResized, gpuvideo, &MythVideoOutputGPU::WindowResized);
-        connect(m_tv, &TV::EmbedPlayback, gpuvideo, &MythVideoBounds::EmbedPlayback);
-        return true;
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't create VideoOutput instance. Exiting..");
+        SetErrored(tr("Failed to initialize video output"));
+        return false;
     }
 
-    LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't create VideoOutput instance. Exiting..");
-    SetErrored(tr("Failed to initialize video output"));
-    return false;
+    m_videoOutput = gpuvideo;
+    connect(gpuvideo, &MythVideoBounds::UpdateOSDMessage, this, &MythPlayerVideoUI::UpdateOSDMessage);
+    connect(m_tv, &TV::ChangeStereoOverride, gpuvideo, &MythVideoBounds::SetStereoOverride);
+    connect(m_tv, &TV::WindowResized, this,     &MythPlayerVideoUI::WindowResized);
+    connect(m_tv, &TV::WindowResized, gpuvideo, &MythVideoOutputGPU::WindowResized);
+    connect(m_tv, &TV::EmbedPlayback, gpuvideo, &MythVideoBounds::EmbedPlayback);
+    return true;
 }
 
 /*! \brief Convenience function to request and wait for a callback into the main thread.

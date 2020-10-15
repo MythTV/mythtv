@@ -3929,20 +3929,14 @@ bool TV::DiscMenuHandleAction(const QStringList& Actions) const
 
 bool TV::Handle3D(const QString& Action)
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player && m_player->GetVideoOutput())
-    {
-        StereoscopicMode mode = kStereoscopicModeAuto;
-        if (ACTION_3DSIDEBYSIDEDISCARD == Action)
-            mode = kStereoscopicModeSideBySideDiscard;
-        else if (ACTION_3DTOPANDBOTTOMDISCARD == Action)
-            mode = kStereoscopicModeTopAndBottomDiscard;
-        else if (ACTION_3DIGNORE == Action)
-            mode = kStereoscopicModeIgnore3D;
-        m_player->GetVideoOutput()->SetStereoscopicMode(mode);
-        SetOSDMessage(StereoscopictoString(mode));
-    }
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    StereoscopicMode mode = kStereoscopicModeAuto;
+    if (ACTION_3DSIDEBYSIDEDISCARD == Action)
+        mode = kStereoscopicModeSideBySideDiscard;
+    else if (ACTION_3DTOPANDBOTTOMDISCARD == Action)
+        mode = kStereoscopicModeTopAndBottomDiscard;
+    else if (ACTION_3DIGNORE == Action)
+        mode = kStereoscopicModeIgnore3D;
+    emit ChangeStereoOverride(mode);
     return true;
 }
 
@@ -10216,7 +10210,7 @@ void TV::PlaybackMenuInit(const MenuBase &Menu)
         if (vo)
         {
             m_tvmSup            = vo->GetSupportedPictureAttributes();
-            m_tvmStereoMode     = vo->GetStereoscopicMode();
+            m_tvmStereoMode     = vo->GetStereoOverride();
             m_tvmFillAutoDetect = vo->HasSoftwareFrames();  
         }
     }

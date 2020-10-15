@@ -32,6 +32,7 @@ class MythVideoBounds : public QObject
     void SetDisplay(MythDisplay* mDisplay);
 
   signals:
+    void UpdateOSDMessage       (const QString& Message);
     // Note These are emitted from MoveResize - which must be called after any call
     // that changes the current video dimensions or video rectangles.
     void VideoSizeChanged       (const QSize &VideoDim, const QSize &VideoDispDim);
@@ -42,8 +43,6 @@ class MythVideoBounds : public QObject
   public slots:
     void ScreenChanged          (QScreen *screen);
     void PhysicalDPIChanged     (qreal  /*DPI*/);
-
-    // Sets
     void SourceChanged          (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);
     void VideoAspectRatioChanged(float Aspect);
     virtual void EmbedPlayback  (bool Embed, const QRect& Rect);
@@ -59,7 +58,7 @@ class MythVideoBounds : public QObject
     void SetWindowSize          (QSize Size);
     void SetITVResize           (QRect Rect);
     void SetRotation            (int Rotation);
-    void SetStereoscopicMode    (StereoscopicMode Mode);
+    void SetStereoOverride      (StereoscopicMode Mode);
 
   public:
     // Gets
@@ -80,9 +79,10 @@ class MythVideoBounds : public QObject
     AdjustFillMode GetAdjustFill(void)     const { return m_adjustFill;      }
     float    GetVideoAspect(void)          const { return m_videoAspect; }
     float    GetDisplayAspect(void)        const { return m_displayAspect;  }
+    StereoscopicMode GetStereoOverride()   const { return m_stereoOverride; }
     bool     VideoIsFullScreen(void) const;
     QRegion  GetBoundingRegion(void) const;
-    StereoscopicMode GetStereoscopicMode() const;
+
 
   private:
     void PopulateGeometry        (void);
@@ -128,7 +128,7 @@ class MythVideoBounds : public QObject
     /// Zoom mode
     AdjustFillMode m_adjustFill {kAdjustFill_Off};
     int     m_rotation {0};
-    StereoscopicMode m_stereo { kStereoscopicModeAuto };
+    StereoscopicMode m_stereoOverride { kStereoscopicModeAuto };
 
     /// Pixel rectangle in video frame to display
     QRect   m_videoRect {0,0,0,0};

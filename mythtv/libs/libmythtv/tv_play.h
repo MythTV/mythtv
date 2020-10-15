@@ -311,6 +311,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void RequestEmbedding(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
     void EmbedPlayback(bool Embed, const QRect& Rect = {});
     void WindowResized(QSize& Size);
+    void ChangeStereoOverride(StereoscopicMode Mode);
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);

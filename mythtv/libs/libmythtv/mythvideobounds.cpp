@@ -914,12 +914,11 @@ static float snap(float value, float snapto, float diff)
     return value;
 }
 
-void MythVideoBounds::SetStereoscopicMode(StereoscopicMode Mode)
+void MythVideoBounds::SetStereoOverride(StereoscopicMode Mode)
 {
-    m_stereo = Mode;
-}
-
-StereoscopicMode MythVideoBounds::GetStereoscopicMode() const
-{
-    return m_stereo;
+    if (Mode != m_stereoOverride)
+    {
+        m_stereoOverride = Mode;
+        emit UpdateOSDMessage(StereoscopictoString(Mode));
+    }
 }
