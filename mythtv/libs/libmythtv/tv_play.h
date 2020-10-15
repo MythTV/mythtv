@@ -312,6 +312,8 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void EmbedPlayback(bool Embed, const QRect& Rect = {});
     void WindowResized(QSize& Size);
     void ChangeStereoOverride(StereoscopicMode Mode);
+    void ChangePictureAttribute(PictureAttribute Attribute, bool Direction, int Value);
+    void ChangeOSDPositionUpdates(bool Enable);
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
@@ -559,7 +561,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void UpdateOSDInput();
     void UpdateOSDSignal(const QStringList &List);
     void UpdateOSDTimeoutMessage();
-    void SetUpdateOSDPosition(bool Set);
 
     // Captions/subtitles
     bool SubtitleZoomHandleAction(const QStringList& Actions);
@@ -572,9 +573,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void SaveBottomLine();
     void ToggleAspectOverride(AspectOverrideMode AspectMode = kAspect_Toggle);
     void ToggleAdjustFill(AdjustFillMode AdjustfillMode = kAdjustFill_Toggle);
-    void DoToggleNightMode();
     void DoTogglePictureAttribute(PictureAdjustType Type);
-    void DoChangePictureAttribute(PictureAdjustType Type, PictureAttribute Attr, bool Up, int NewValue = -1);
     bool PictureAttributeHandleAction(const QStringList &Actions);
     PictureAttribute NextPictureAdjustType(PictureAdjustType Type, PictureAttribute Attr);
     void OverrideScan(FrameScanType Scan);
@@ -820,7 +819,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     volatile int         m_ccInputTimerId          {0};
     volatile int         m_asInputTimerId          {0};
     volatile int         m_queueInputTimerId       {0};
-    volatile int         m_updateOSDPosTimerId     {0};
     volatile int         m_updateOSDDebugTimerId   {0};
     volatile int         m_endOfPlaybackTimerId    {0};
     volatile int         m_endOfRecPromptTimerId   {0};

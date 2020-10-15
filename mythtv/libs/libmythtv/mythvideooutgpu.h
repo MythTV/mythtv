@@ -20,6 +20,10 @@ class MythVideoOutputGPU : public MythVideoOutput
                                       const QString& Codec,      int ReferenceFrames);
    ~MythVideoOutputGPU() override;
 
+  signals:
+    void            ChangePictureAttribute(PictureAttribute Attribute, bool Direction, int Value);
+    void            PictureAttributeChanged(PictureAttribute Attribute, int Value);
+
   public slots:
     void            WindowResized         (const QSize& Size);
 

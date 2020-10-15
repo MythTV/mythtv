@@ -286,9 +286,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     void LockOSD(void)    { m_osdLock.lock();   }
     void UnlockOSD(void)  { m_osdLock.unlock(); }
 
-    // Public picture controls
-    void ToggleNightMode(void);
-
     void SaveTotalDuration(void);
     void ResetTotalDuration(void);
 
@@ -403,8 +400,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     void ReinitOSD(void);
 
     // OSD conveniences
-    void SetOSDMessage(const QString &msg, OSDTimeout timeout);
-    void SetOSDStatus(const QString &title, OSDTimeout timeout);
+    virtual void UpdateOSDMessage(const QString& /*Message*/, OSDTimeout /*Timeout*/) {}
 
     // Closed caption and teletext stuff
     void ResetCaptions(void);

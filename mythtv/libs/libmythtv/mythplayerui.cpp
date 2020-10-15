@@ -707,7 +707,7 @@ bool MythPlayerUI::EnableEdit()
 
     bool loadedAutoSave = m_deleteMap.LoadAutoSaveMap();
     if (loadedAutoSave)
-        SetOSDMessage(tr("Using previously auto-saved cuts"), kOSDTimeout_Short);
+        UpdateOSDMessage(tr("Using previously auto-saved cuts"), kOSDTimeout_Short);
 
     m_deleteMap.UpdateSeekAmount(0);
     m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, m_osd);
@@ -846,7 +846,7 @@ bool MythPlayerUI::HandleProgramEditorActions(QStringList& Actions)
         else if (action == ACTION_SELECT)
         {
             m_deleteMap.NewCut(frame);
-            SetOSDMessage(tr("New cut added."), kOSDTimeout_Short);
+            UpdateOSDMessage(tr("New cut added."), kOSDTimeout_Short);
             refresh = true;
         }
         else if (action == "DELETE")
@@ -880,11 +880,11 @@ bool MythPlayerUI::HandleProgramEditorActions(QStringList& Actions)
             QString redoMessage = m_deleteMap.GetRedoMessage();
             handled = m_deleteMap.HandleAction(action, frame);
             if (handled && (action == "CUTTOBEGINNING" || action == "CUTTOEND" || action == "NEWCUT"))
-                SetOSDMessage(tr("New cut added."), kOSDTimeout_Short);
+                UpdateOSDMessage(tr("New cut added."), kOSDTimeout_Short);
             else if (handled && action == "UNDO")
-                SetOSDMessage(tr("Undo - %1").arg(undoMessage), kOSDTimeout_Short);
+                UpdateOSDMessage(tr("Undo - %1").arg(undoMessage), kOSDTimeout_Short);
             else if (handled && action == "REDO")
-                SetOSDMessage(tr("Redo - %1").arg(redoMessage), kOSDTimeout_Short);
+                UpdateOSDMessage(tr("Redo - %1").arg(redoMessage), kOSDTimeout_Short);
         }
     }
 

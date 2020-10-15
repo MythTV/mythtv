@@ -626,7 +626,7 @@ bool MythDVDPlayer::GoToMenu(const QString& Menu)
 
     if (!ret)
     {
-        SetOSDMessage(tr("DVD Menu Not Available"), kOSDTimeout_Med);
+        UpdateOSDMessage(tr("DVD Menu Not Available"), kOSDTimeout_Med);
         LOG(VB_GENERAL, LOG_ERR, "No DVD Menu available.");
         return false;
     }

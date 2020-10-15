@@ -795,8 +795,6 @@ void TV::InitKeys()
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS",
             QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
              "F");
-    REG_KEY("TV Playback", ACTION_TOGGLENIGHTMODE,
-            QT_TRANSLATE_NOOP("MythControls", "Toggle night mode"), "Ctrl+F");
     REG_KEY("TV Playback", ACTION_SETBRIGHTNESS,
             QT_TRANSLATE_NOOP("MythControls", "Set the picture brightness"), "");
     REG_KEY("TV Playback", ACTION_SETCONTRAST,
@@ -1240,7 +1238,7 @@ bool TV::Init()
 
     m_sleepIndex = 0;
 
-    SetUpdateOSDPosition(false);
+    emit ChangeOSDPositionUpdates(false);
 
     GetPlayerReadLock();
     ClearInputQueues(false);
@@ -2667,26 +2665,6 @@ void TV::timerEvent(QTimerEvent *Event)
         ReturnPlayerLock();
         handled = true;
     }
-    if (timer_id == m_updateOSDPosTimerId)
-    {
-        GetPlayerReadLock();
-        OSD *osd = GetOSDL();
-        if (osd && osd->IsWindowVisible("osd_status") &&
-            (StateIsLiveTV(m_playerContext.GetState()) || StateIsPlaying(m_playerContext.GetState())))
-        {
-            osdInfo info;
-            if (m_playerContext.CalcPlayerSliderPosition(info))
-            {
-                osd->SetText("osd_status", info.text, kOSDTimeout_Ignore);
-                osd->SetValues("osd_status", info.values, kOSDTimeout_Ignore);
-            }
-        }
-        else
-            SetUpdateOSDPosition(false);
-        ReturnOSDLock();
-        ReturnPlayerLock();
-        handled = true;
-    }
 
     if (handled)
         return;
@@ -2911,24 +2889,8 @@ void TV::SetExitPlayer(bool SetIt, bool WantsTo)
     }
 }
 
-void TV::SetUpdateOSDPosition(bool Set)
-{
-    if (Set)
-    {
-        if (!m_updateOSDPosTimerId)
-            m_updateOSDPosTimerId = StartTimer(500, __LINE__);
-    }
-    else
-    {
-        if (m_updateOSDPosTimerId)
-            KillTimer(m_updateOSDPosTimerId);
-        m_updateOSDPosTimerId = 0;
-    }
-}
-
 void TV::HandleEndOfPlaybackTimerEvent()
 {
-
     if (m_endOfPlaybackTimerId)
         KillTimer(m_endOfPlaybackTimerId);
     m_endOfPlaybackTimerId = 0;
@@ -3286,10 +3248,8 @@ static bool has_action(const QString& action, const QStringList &actions)
 {
     QStringList::const_iterator it;
     for (it = actions.begin(); it != actions.end(); ++it)
-    {
         if (action == *it)
             return true;
-    }
     return false;
 }
 
@@ -3807,14 +3767,28 @@ bool TV::PictureAttributeHandleAction(const QStringList &Actions)
     if (!m_adjustingPicture)
         return false;
 
-    bool handled = true;
-    if (has_action(ACTION_LEFT, Actions))
-        DoChangePictureAttribute(m_adjustingPicture, m_adjustingPictureAttribute, false);
-    else if (has_action(ACTION_RIGHT, Actions))
-        DoChangePictureAttribute(m_adjustingPicture, m_adjustingPictureAttribute, true);
-    else
-        handled = false;
-    return handled;
+    bool up = has_action(ACTION_RIGHT, Actions);
+    bool down = up ? false : has_action(ACTION_LEFT, Actions);
+    if (!(up || down))
+        return false;
+
+    if (m_adjustingPicture == kAdjustingPicture_Playback)
+    {
+        if (kPictureAttribute_Volume == m_adjustingPictureAttribute)
+            ChangeVolume(up);
+        else
+            emit ChangePictureAttribute(m_adjustingPictureAttribute, up, -1);
+        return true;
+    }
+
+    int value = 99;
+    if (m_playerContext.m_recorder)
+        value = m_playerContext.m_recorder->ChangePictureAttribute(m_adjustingPicture, m_adjustingPictureAttribute, up);
+    QString text = toString(m_adjustingPictureAttribute) + " " + toTypeString(m_adjustingPicture);
+    UpdateOSDStatus(toTitleString(m_adjustingPicture), text, QString::number(value),
+                    kOSDFunctionalType_PictureAdjust, "%", value * 10, kOSDTimeout_Med);
+    emit ChangeOSDPositionUpdates(false);
+    return true;
 }
 
 bool TV::TimeStretchHandleAction(const QStringList &Actions)
@@ -4244,8 +4218,6 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
         EnableVisualisation(false);
     else if (has_action("TOGGLEPICCONTROLS", Actions))
         DoTogglePictureAttribute(kAdjustingPicture_Playback);
-    else if (has_action(ACTION_TOGGLENIGHTMODE, Actions))
-        DoToggleNightMode();
     else if (has_action("TOGGLESTRETCH", Actions))
         ToggleTimeStretch();
     else if (has_action(ACTION_TOGGLEUPMIX, Actions))
@@ -4750,7 +4722,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
                 {
                     UpdateOSDStatus(tr("Adjust Volume"), tr("Volume"), QString::number(vol),
                                     kOSDFunctionalType_PictureAdjust, "%", vol * 10, kOSDTimeout_Med);
-                    SetUpdateOSDPosition(false);
+                    emit ChangeOSDPositionUpdates(false);
                 }
             }
         }
@@ -5610,7 +5582,7 @@ void TV::DoJumpChapter(int Chapter)
     PauseAudioUntilBuffered();
 
     UpdateOSDSeekMessage(tr("Jump Chapter"), kOSDTimeout_Med);
-    SetUpdateOSDPosition(true);
+    emit ChangeOSDPositionUpdates(true);
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
@@ -5697,7 +5669,7 @@ void TV::DoSwitchTitle(int Title)
     PauseAudioUntilBuffered();
 
     UpdateOSDSeekMessage(tr("Switch Title"), kOSDTimeout_Med);
-    SetUpdateOSDPosition(true);
+    emit ChangeOSDPositionUpdates(true);
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
@@ -5713,7 +5685,7 @@ void TV::DoSwitchAngle(int Angle)
     PauseAudioUntilBuffered();
 
     UpdateOSDSeekMessage(tr("Switch Angle"), kOSDTimeout_Med);
-    SetUpdateOSDPosition(true);
+    emit ChangeOSDPositionUpdates(true);
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
@@ -5736,7 +5708,7 @@ void TV::DoSkipCommercials(int Direction)
     info.text["title"] = tr("Skip");
     info.text["description"] = tr("Searching");
     UpdateOSDStatus(info, kOSDFunctionalType_Default, kOSDTimeout_Med);
-    SetUpdateOSDPosition(true);
+    emit ChangeOSDPositionUpdates(true);
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
@@ -6574,16 +6546,16 @@ void TV::ToggleOSD(bool IncludeStatusOSD)
             info.text["title"] = (paused ? tr("Paused") : tr("Position"));
             UpdateOSDStatus(info, kOSDFunctionalType_Default,
                             paused ? kOSDTimeout_None : kOSDTimeout_Med);
-            SetUpdateOSDPosition(true);
+            emit ChangeOSDPositionUpdates(true);
         }
         else
         {
-            SetUpdateOSDPosition(false);
+            emit ChangeOSDPositionUpdates(false);
         }
     }
     else
     {
-        SetUpdateOSDPosition(false);
+        emit ChangeOSDPositionUpdates(false);
     }
 }
 
@@ -6637,9 +6609,6 @@ void TV::UpdateOSDProgInfo(const char *WhichInfo)
     if (m_player)
         m_player->GetCodecDescription(infoMap);
 
-    QString nightmode = gCoreContext->GetBoolSetting("NightModeEnabled", false) ? "yes" : "no";
-    infoMap["nightmode"] = nightmode;
-
     // Clear previous osd and add new info
     OSD *osd = GetOSDL();
     if (osd)
@@ -6656,8 +6625,6 @@ void TV::UpdateOSDStatus(osdInfo &Info, int Type, OSDTimeout Timeout)
     if (osd)
     {
         osd->ResetWindow("osd_status");
-        QString nightmode = gCoreContext->GetBoolSetting("NightModeEnabled", false) ? "yes" : "no";
-        Info.text.insert("nightmode", nightmode);
         osd->SetValues("osd_status", Info.values, Timeout);
         osd->SetText("osd_status",   Info.text, Timeout);
         if (Type != kOSDFunctionalType_Default)
@@ -6690,7 +6657,7 @@ void TV::UpdateOSDSeekMessage(const QString &Msg, enum OSDTimeout Timeout)
         int osdtype = (m_doSmartForward) ? kOSDFunctionalType_SmartForward : kOSDFunctionalType_Default;
         info.text["title"] = Msg;
         UpdateOSDStatus(info, osdtype, Timeout);
-        SetUpdateOSDPosition(true);
+        emit ChangeOSDPositionUpdates(true);
     }
 }
 
@@ -7280,7 +7247,7 @@ void TV::ChangeVolume(bool Up, int NewVolume)
         UpdateOSDStatus(tr("Adjust Volume"), tr("Volume"), QString::number(curvol),
                         kOSDFunctionalType_PictureAdjust, "%", static_cast<int>(curvol * 10),
                         kOSDTimeout_Med);
-        SetUpdateOSDPosition(false);
+        emit ChangeOSDPositionUpdates(false);
 
         if (LCD *lcd = LCD::Get())
         {
@@ -7362,7 +7329,7 @@ void TV::ChangeTimeStretch(int Dir, bool AllowEdit)
                             kOSDFunctionalType_TimeStretchAdjust, "X",
                             static_cast<int>(m_playerContext.m_tsNormal * (1000 / kTimeStretchMax)),
                             kOSDTimeout_None);
-            SetUpdateOSDPosition(false);
+            emit ChangeOSDPositionUpdates(false);
         }
     }
 
@@ -7416,7 +7383,7 @@ void TV::ChangeSubtitleZoom(int Dir)
                         QString::number(newval),
                         kOSDFunctionalType_SubtitleZoomAdjust,
                         "%", newval * 1000 / 200, kOSDTimeout_None);
-        SetUpdateOSDPosition(false);
+        emit ChangeOSDPositionUpdates(false);
         if (subs)
             subs->SetZoom(newval);
     }
@@ -7453,7 +7420,7 @@ void TV::ChangeSubtitleDelay(int Dir)
                         QString::number(newval),
                         kOSDFunctionalType_SubtitleDelayAdjust,
                         "ms", newval / 10 + 500, kOSDTimeout_None);
-        SetUpdateOSDPosition(false);
+        emit ChangeOSDPositionUpdates(false);
         if (subs)
             subs->SetDelay(newval);
     }
@@ -7478,7 +7445,7 @@ void TV::ChangeAudioSync(int Dir, int NewSync)
         UpdateOSDStatus(tr("Adjust Audio Sync"), tr("Audio Sync"),
                         QString::number(newval), kOSDFunctionalType_AudioSyncAdjust,
                         "ms", (static_cast<int>(newval) / 2) + 500, kOSDTimeout_None);
-        SetUpdateOSDPosition(false);
+        emit ChangeOSDPositionUpdates(false);
     }
 }
 
@@ -7879,45 +7846,21 @@ void TV::customEvent(QEvent *Event)
         else if (message == ACTION_SETAUDIOSYNC)
             ChangeAudioSync(0, value);
         else if (message == ACTION_SETBRIGHTNESS)
-        {
-            DoChangePictureAttribute(kAdjustingPicture_Playback,
-                                     kPictureAttribute_Brightness,
-                                     false, value);
-        }
+            emit ChangePictureAttribute(kPictureAttribute_Brightness, false, value);
         else if (message == ACTION_SETCONTRAST)
-        {
-            DoChangePictureAttribute(kAdjustingPicture_Playback,
-                                     kPictureAttribute_Contrast,
-                                     false, value);
-        }
+            emit ChangePictureAttribute(kPictureAttribute_Contrast, false, value);
         else if (message == ACTION_SETCOLOUR)
-        {
-            DoChangePictureAttribute(kAdjustingPicture_Playback,
-                                     kPictureAttribute_Colour,
-                                     false, value);
-        }
+            emit ChangePictureAttribute(kPictureAttribute_Colour, false, value);
         else if (message == ACTION_SETHUE)
-        {
-            DoChangePictureAttribute(kAdjustingPicture_Playback,
-                                     kPictureAttribute_Hue,
-                                     false, value);
-        }
+            emit ChangePictureAttribute(kPictureAttribute_Hue, false, value);
         else if (message == ACTION_JUMPCHAPTER)
-        {
             DoJumpChapter(value);
-        }
         else if (message == ACTION_SWITCHTITLE)
-        {
             DoSwitchTitle(value - 1);
-        }
         else if (message == ACTION_SWITCHANGLE)
-        {
             DoSwitchAngle(value);
-        }
         else if (message == ACTION_SEEKABSOLUTE)
-        {
             DoSeekAbsolute(value, /*honorCutlist*/true);
-        }
         ReturnPlayerLock();
     }
 
@@ -8329,15 +8272,16 @@ PictureAttribute TV::NextPictureAdjustType(PictureAdjustType Type, PictureAttrib
     if (!m_player)
         return kPictureAttribute_None;
 
-    uint sup = kPictureAttributeSupported_None;
+    int sup = kPictureAttributeSupported_None;
     if ((kAdjustingPicture_Playback == Type) && m_player->GetVideoOutput())
     {
         sup = m_player->GetVideoOutput()->GetSupportedPictureAttributes();
         if (m_player->HasAudioOut() && m_player->PlayerControlsVolume())
             sup |= kPictureAttributeSupported_Volume;
+        // Filter out range
+        sup &= ~kPictureAttributeSupported_Range;
     }
-    else if ((kAdjustingPicture_Channel == Type) ||
-             (kAdjustingPicture_Recording == Type))
+    else if ((kAdjustingPicture_Channel == Type) || (kAdjustingPicture_Recording == Type))
     {
         sup = (kPictureAttributeSupported_Brightness |
                kPictureAttributeSupported_Contrast |
@@ -8346,13 +8290,6 @@ PictureAttribute TV::NextPictureAdjustType(PictureAdjustType Type, PictureAttrib
     }
 
     return ::next_picattr(static_cast<PictureAttributeSupported>(sup), Attr);
-}
-
-void TV::DoToggleNightMode()
-{
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    m_player->ToggleNightMode();
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
 void TV::DoTogglePictureAttribute(PictureAdjustType Type)
@@ -8400,51 +8337,7 @@ void TV::DoTogglePictureAttribute(PictureAdjustType Type)
     UpdateOSDStatus(title, text, QString::number(value),
                     kOSDFunctionalType_PictureAdjust, "%",
                     value * 10, kOSDTimeout_Med);
-    SetUpdateOSDPosition(false);
-}
-
-void TV::DoChangePictureAttribute(PictureAdjustType Type, PictureAttribute Attr,
-                                  bool Up, int NewValue)
-{
-    int value = 99;
-
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (kAdjustingPicture_Playback == Type)
-    {
-        if (kPictureAttribute_Volume == Attr)
-        {
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-            ChangeVolume(Up, NewValue);
-            return;
-        }
-        if (!m_player)
-        {
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-            return;
-        }
-
-        if (m_player->GetVideoOutput())
-        {
-            MythVideoOutput *vo = m_player->GetVideoOutput();
-            if ((NewValue >= 0) && (NewValue <= 100))
-                value = vo->SetPictureAttribute(Attr, NewValue);
-            else
-                value = vo->ChangePictureAttribute(Attr, Up);
-        }
-    }
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    if (m_playerContext.m_recorder && (kAdjustingPicture_Playback != Type))
-    {
-        value = m_playerContext.m_recorder->ChangePictureAttribute(Type, Attr, Up);
-    }
-
-    QString text = toString(Attr) + " " + toTypeString(Type);
-
-    UpdateOSDStatus(toTitleString(Type), text, QString::number(value),
-                    kOSDFunctionalType_PictureAdjust, "%",
-                    value * 10, kOSDTimeout_Med);
-    SetUpdateOSDPosition(false);
+    emit ChangeOSDPositionUpdates(false);
 }
 
 void TV::ShowOSDCutpoint(const QString &Type)
@@ -8886,8 +8779,6 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         m_adjustingPictureAttribute = static_cast<PictureAttribute>(Action.rightRef(1).toInt() - 1);
         DoTogglePictureAttribute(kAdjustingPicture_Playback);
     }
-    else if (Action == ACTION_TOGGLENIGHTMODE)
-        DoToggleNightMode();
     else if (Action == "TOGGLEASPECT")
         ToggleAspectOverride();
     else if (Action.startsWith("TOGGLEASPECT"))
@@ -9856,15 +9747,6 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
         else if (actionName == "TOGGLEMANUALZOOM")
         {
             BUTTON(actionName, tr("Manual Zoom Mode"));
-        }
-        else if (actionName == "TOGGLENIGHTMODE")
-        {
-            if (m_tvmSup != kPictureAttributeSupported_None)
-            {
-                active = gCoreContext->GetBoolSetting("NightModeEnabled", false);
-                BUTTON2(actionName,
-                        tr("Disable Night Mode"), tr("Enable Night Mode"));
-            }
         }
         else if (actionName == "DISABLESUBS")
         {

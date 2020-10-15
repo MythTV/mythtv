@@ -83,8 +83,6 @@ class MythVideoOutput : public MythVideoBounds
     virtual MythPainter* GetOSDPainter () { return nullptr; }
     void         SetReferenceFrames    (int ReferenceFrames);
     PictureAttributeSupported GetSupportedPictureAttributes();
-    int          ChangePictureAttribute(PictureAttribute AttributeType, bool Direction);
-    virtual int  SetPictureAttribute   (PictureAttribute Attribute, int NewValue);
     int          GetPictureAttribute   (PictureAttribute AttributeType);
     virtual void InitPictureAttributes () { }
     bool         HasSoftwareFrames     () const { return codec_sw_copy(m_videoCodecID); }

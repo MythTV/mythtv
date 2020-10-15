@@ -309,23 +309,6 @@ PictureAttributeSupported MythVideoOutput::GetSupportedPictureAttributes()
     return m_videoColourSpace.SupportedAttributes();
 }
 
-int MythVideoOutput::ChangePictureAttribute(PictureAttribute AttributeType, bool Direction)
-{
-    return m_videoColourSpace.ChangePictureAttribute(AttributeType, Direction);
-}
-
-/**
- * \fn VideoOutput::SetPictureAttribute(PictureAttribute, int)
- * \brief Sets a specified picture attribute.
- * \param attribute Picture attribute to set.
- * \param newValue  Value to set attribute to.
- * \return Set value if it succeeds, -1 if it does not.
- */
-int MythVideoOutput::SetPictureAttribute(PictureAttribute Attribute, int NewValue)
-{
-    return m_videoColourSpace.SetPictureAttribute(Attribute, NewValue);
-}
-
 int MythVideoOutput::GetPictureAttribute(PictureAttribute AttributeType)
 {
     return m_videoColourSpace.GetPictureAttribute(AttributeType);

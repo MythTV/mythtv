@@ -9,6 +9,46 @@
 MythPlayerVideoUI::MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerAudioUI(MainWindow, Tv, Context, Flags)
 {
+    m_positionUpdateTimer.setInterval(999);
+    connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerVideoUI::UpdateOSDPosition);
+}
+
+void MythPlayerVideoUI::ChangeOSDPositionUpdates(bool Enable)
+{
+    if (Enable)
+        m_positionUpdateTimer.start();
+    else
+        m_positionUpdateTimer.stop();
+}
+
+/*! \brief Update the OSD status/position window.
+ *
+ * This is triggered (roughly) once a second to update the osd_status window
+ * for the latest position, duration, time etc (when visible).
+ *
+ * \todo This may be better located either in MythPlayerOverlayUI (if the call
+ * to CalcSliderPos does not require any higher level data) or into the top
+ * MythPlayerUI class - in which case the status window could pick up state
+ * from all interface classes.
+*/
+void MythPlayerVideoUI::UpdateOSDPosition()
+{
+    m_osdLock.lock();
+    if (m_osd)
+    {
+        if (m_osd->IsWindowVisible("osd_status"))
+        {
+            osdInfo info;
+            calcSliderPos(info);
+            m_osd->SetText("osd_status", info.text, kOSDTimeout_Ignore);
+            m_osd->SetValues("osd_status", info.values, kOSDTimeout_Ignore);
+        }
+        else
+        {
+            ChangeOSDPositionUpdates(false);
+        }
+    }
+    m_osdLock.unlock();
 }
 
 void MythPlayerVideoUI::WindowResized(const QSize& /*Size*/)
@@ -21,25 +61,41 @@ bool MythPlayerVideoUI::InitVideo()
     if (!(m_playerCtx && m_decoder))
         return false;
 
-    auto * gpuvideo = MythVideoOutputGPU::Create(m_mainWindow,
+    auto * video = MythVideoOutputGPU::Create(m_mainWindow,
                     m_decoder->GetCodecDecoderName(), m_decoder->GetVideoCodecID(),
                     m_videoDim, m_videoDispDim, m_videoAspect,
                     static_cast<float>(m_videoFrameRate),
                     static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames);
 
-    if (!gpuvideo)
+    if (!video)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Couldn't create VideoOutput instance. Exiting..");
         SetErrored(tr("Failed to initialize video output"));
         return false;
     }
 
-    m_videoOutput = gpuvideo;
-    connect(gpuvideo, &MythVideoBounds::UpdateOSDMessage, this, &MythPlayerVideoUI::UpdateOSDMessage);
-    connect(m_tv, &TV::ChangeStereoOverride, gpuvideo, &MythVideoBounds::SetStereoOverride);
-    connect(m_tv, &TV::WindowResized, this,     &MythPlayerVideoUI::WindowResized);
-    connect(m_tv, &TV::WindowResized, gpuvideo, &MythVideoOutputGPU::WindowResized);
-    connect(m_tv, &TV::EmbedPlayback, gpuvideo, &MythVideoBounds::EmbedPlayback);
+    // Simple lambda to update the OSD for picture attribute updates
+    auto updateOsdPicAttr = [&](PictureAttribute Attribute, int Value)
+    {
+        QString text = toString(Attribute) + " " + toTypeString(kAdjustingPicture_Playback);
+        UpdateOSDStatus(toTitleString(kAdjustingPicture_Playback), text, QString::number(Value),
+                        kOSDFunctionalType_PictureAdjust, "%", Value * 10, kOSDTimeout_Med);
+        ChangeOSDPositionUpdates(false);
+    };
+
+    m_videoOutput = video;
+
+    // Inbound connections
+    connect(video, &MythVideoOutputGPU::PictureAttributeChanged, updateOsdPicAttr);
+    connect(video, &MythVideoBounds::UpdateOSDMessage, this,     QOverload<const QString&>::of(&MythPlayerVideoUI::UpdateOSDMessage));
+    connect(m_tv,     &TV::ChangeOSDPositionUpdates,   this,     &MythPlayerVideoUI::ChangeOSDPositionUpdates);
+    connect(m_tv,     &TV::WindowResized,              this,     &MythPlayerVideoUI::WindowResized);
+
+    // Passthrough signals
+    connect(m_tv,     &TV::ChangePictureAttribute,     video, &MythVideoOutputGPU::ChangePictureAttribute);
+    connect(m_tv,     &TV::ChangeStereoOverride,       video, &MythVideoOutputGPU::SetStereoOverride);
+    connect(m_tv,     &TV::WindowResized,              video, &MythVideoOutputGPU::WindowResized);
+    connect(m_tv,     &TV::EmbedPlayback,              video, &MythVideoOutputGPU::EmbedPlayback);
     return true;
 }
 

@@ -919,7 +919,7 @@ void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
     if (!msg.isEmpty() && osd_msg)
     {
         msg += " " + tr("Off");
-        SetOSDMessage(msg, kOSDTimeout_Med);
+        UpdateOSDMessage(msg, kOSDTimeout_Med);
     }
 }
 
@@ -970,7 +970,7 @@ void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
     if (m_textDisplayMode)
         m_prevNonzeroTextDisplayMode = m_textDisplayMode;
     if (osd_msg)
-        SetOSDMessage(msg, kOSDTimeout_Med);
+        UpdateOSDMessage(msg, kOSDTimeout_Med);
 }
 
 bool MythPlayer::ToggleCaptions(void)
@@ -1019,7 +1019,7 @@ void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
         {
             if (osd_msg)
             {
-                SetOSDMessage(tr("No captions",
+                UpdateOSDMessage(tr("No captions",
                                  "CC/Teletext/Subtitle text not available"),
                               kOSDTimeout_Med);
             }
@@ -1070,7 +1070,7 @@ int MythPlayer::SetTrack(uint type, int trackNo)
     if (kTrackTypeAudio == type)
     {
         if (m_decoder)
-            SetOSDMessage(m_decoder->GetTrackDesc(type, GetTrack(type)),
+            UpdateOSDMessage(m_decoder->GetTrackDesc(type, GetTrack(type)),
                           kOSDTimeout_Med);
         return ret;
     }
@@ -1126,7 +1126,7 @@ void MythPlayer::EnableForcedSubtitles(bool enable)
 void MythPlayer::SetAllowForcedSubtitles(bool allow)
 {
     m_allowForcedSubtitles = allow;
-    SetOSDMessage(m_allowForcedSubtitles ?
+    UpdateOSDMessage(m_allowForcedSubtitles ?
                       tr("Forced Subtitles On") :
                       tr("Forced Subtitles Off"),
                   kOSDTimeout_Med);
@@ -1168,7 +1168,7 @@ int MythPlayer::ChangeTrack(uint type, int dir)
     int retval = m_decoder->ChangeTrack(type, dir);
     if (retval >= 0)
     {
-        SetOSDMessage(m_decoder->GetTrackDesc(type, GetTrack(type)),
+        UpdateOSDMessage(m_decoder->GetTrackDesc(type, GetTrack(type)),
                       kOSDTimeout_Med);
         return retval;
     }
@@ -2713,7 +2713,7 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
         if (!(count % 3) && !m_hasFullPositionMap)
         {
             int num = count % 3;
-            SetOSDMessage(tr("Searching") + QString().fill('.', num),
+            UpdateOSDMessage(tr("Searching") + QString().fill('.', num),
                           kOSDTimeout_Short);
             DisplayPauseFrame();
             need_clear = true;
@@ -3491,71 +3491,6 @@ QString MythPlayer::GetError(void) const
 {
     QMutexLocker locker(&m_errorLock);
     return m_errorMsg;
-}
-
-void MythPlayer::ToggleNightMode(void)
-{
-    if (!m_videoOutput)
-        return;
-
-    if (!(m_videoOutput->GetSupportedPictureAttributes() &
-          kPictureAttributeSupported_Brightness))
-        return;
-
-    int b = m_videoOutput->GetPictureAttribute(kPictureAttribute_Brightness);
-    int c = 0;
-    bool has_contrast = (m_videoOutput->GetSupportedPictureAttributes() &
-                         kPictureAttributeSupported_Contrast) != 0;
-    if (has_contrast)
-        c = m_videoOutput->GetPictureAttribute(kPictureAttribute_Contrast);
-
-    int nm = gCoreContext->GetNumSetting("NightModeEnabled", 0);
-    QString msg;
-    if (!nm)
-    {
-        msg = tr("Enabled Night Mode");
-        b -= kNightModeBrightenssAdjustment;
-        c -= kNightModeContrastAdjustment;
-    }
-    else
-    {
-        msg = tr("Disabled Night Mode");
-        b += kNightModeBrightenssAdjustment;
-        c += kNightModeContrastAdjustment;
-    }
-    b = clamp(b, 0, 100);
-    c = clamp(c, 0, 100);
-
-    gCoreContext->SaveSetting("NightModeEnabled", nm ? "0" : "1");
-    m_videoOutput->SetPictureAttribute(kPictureAttribute_Brightness, b);
-    if (has_contrast)
-        m_videoOutput->SetPictureAttribute(kPictureAttribute_Contrast, c);
-
-    SetOSDMessage(msg, kOSDTimeout_Med);
-}
-
-void MythPlayer::SetOSDMessage(const QString &msg, OSDTimeout timeout)
-{
-    QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    InfoMap info;
-    info.insert("message_text", msg);
-    m_osd->SetText("osd_message", info, timeout);
-}
-
-void MythPlayer::SetOSDStatus(const QString &title, OSDTimeout timeout)
-{
-    QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    osdInfo info;
-    calcSliderPos(info);
-    info.text.insert("title", title);
-    m_osd->SetText("osd_status", info.text, timeout);
-    m_osd->SetValues("osd_status", info.values, timeout);
 }
 
 void MythPlayer::SaveTotalDuration(void)

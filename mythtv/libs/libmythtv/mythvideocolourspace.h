@@ -23,10 +23,16 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
 
     friend class MythVideoOutput;
 
-  public:
-    explicit MythVideoColourSpace(MythVideoColourSpace *Parent = nullptr);
+  public slots:
+    int   ChangePictureAttribute(PictureAttribute Attribute, bool Direction, int Value);
+    void  SetPrimariesMode(PrimariesMode Mode);
 
-    int           ChangePictureAttribute(PictureAttribute AttributeType, bool Direction);
+  signals:
+    void  Updated(bool PrimariesChanged);
+    void  PictureAttributeChanged(PictureAttribute Attribute, int Value);
+
+  public:
+    MythVideoColourSpace();
     bool          UpdateColourSpace(const MythVideoFrame *Frame);
     PictureAttributeSupported SupportedAttributes(void) const;
     void          SetSupportedAttributes(PictureAttributeSupported Supported);
@@ -50,14 +56,6 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     static const ColourPrimaries kBT2020;
     static bool  Similar(const ColourPrimaries &First, const ColourPrimaries &Second,
                          float Fuzz);
-
-  public slots:
-    int   SetPictureAttribute(PictureAttribute Attribute, int Value);
-    void  SetPrimariesMode(PrimariesMode Mode);
-
-  signals:
-    void  Updated(bool PrimariesChanged);
-    void  PictureAttributeChanged(PictureAttribute Attribute, int Value);
 
   protected:
     ~MythVideoColourSpace() override;
@@ -99,8 +97,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     float             m_displayGamma           { 2.2F };
     QMatrix4x4        m_primaryMatrix          { };
     float             m_customDisplayGamma     { 0.0F };
-    ColourPrimaries  *m_customDisplayPrimaries { nullptr };
-    MythVideoColourSpace *m_parent             { nullptr };
+    ColourPrimaries*  m_customDisplayPrimaries { nullptr };
 };
 
 #endif
