@@ -24,15 +24,11 @@ class MythVideoOutputNull : public MythVideoOutput
                       float        Aspect,     MythCodecID  CodecID,
                       bool&        AspectOnly,
                       int          ReferenceFrames, bool ForceChange) override;
-    void UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
-    void CreatePauseFrame(void);
 
   protected:
     MythVideoOutputNull() = default;
 
   private:
     Q_DISABLE_COPY(MythVideoOutputNull)
-    QMutex     m_globalLock   { QMutex::Recursive };
-    MythVideoFrame m_avPauseFrame;
 };
 #endif

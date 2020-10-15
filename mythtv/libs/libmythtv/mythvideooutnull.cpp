@@ -60,16 +60,6 @@ MythVideoOutputNull* MythVideoOutputNull::Create(QSize VideoDim, QSize VideoDisp
     return nullptr;
 }
 
-void MythVideoOutputNull::CreatePauseFrame(void)
-{
-    m_avPauseFrame.Init(FMT_YV12, MythVideoFrame::GetAlignedBuffer(m_videoBuffers.GetScratchFrame()->m_bufferSize),
-                        m_videoBuffers.GetScratchFrame()->m_bufferSize, m_videoBuffers.GetScratchFrame()->m_width,
-                        m_videoBuffers.GetScratchFrame()->m_height);
-    m_avPauseFrame.m_frameNumber  = m_videoBuffers.GetScratchFrame()->m_frameNumber;
-    m_avPauseFrame.m_frameCounter = m_videoBuffers.GetScratchFrame()->m_frameCounter;
-    m_avPauseFrame.ClearBufferToBlank();
-}
-
 bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
                                        const QSize& VideoDispDim,
                                        float        Aspect,
@@ -88,8 +78,6 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
         m_errorState = kError_Unknown;
         return false;
     }
-
-    QMutexLocker locker(&m_globalLock);
 
     if (VideoDispDim == GetVideoDim())
     {
@@ -111,10 +99,6 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
             "VideoOutputNull::InputChanged(): Failed to recreate buffers");
         m_errorState = kError_Unknown;
     }
-    else
-    {
-        CreatePauseFrame();
-    }
 
     if (m_dbDisplayProfile)
         m_dbDisplayProfile->SetVideoRenderer("null");
@@ -135,18 +119,14 @@ bool MythVideoOutputNull::Init(const QSize& VideoDim, const QSize& VideoDispDim,
         return false;
     }
 
-    QMutexLocker locker(&m_globalLock);
-
     MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecID);
-    m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), true, kNeedFreeFrames,
+    m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), false, kNeedFreeFrames,
                         kPrebufferFramesNormal, kPrebufferFramesSmall);
 
     const QSize videodim = GetVideoDim();
 
     if (!m_videoBuffers.CreateBuffers(FMT_YV12, videodim.width(), videodim.height()))
         return false;
-
-    CreatePauseFrame();
 
     if (m_dbDisplayProfile)
         m_dbDisplayProfile->SetVideoRenderer("null");
@@ -172,36 +152,12 @@ void MythVideoOutputNull::SetDeinterlacing(bool Enable, bool DoubleRate, MythDei
 
 void MythVideoOutputNull::RenderFrame(MythVideoFrame* Frame, FrameScanType /*Scan*/)
 {
-    if (!Frame)
-        Frame = m_videoBuffers.GetScratchFrame();
     if (Frame)
         m_framesPlayed = Frame->m_frameNumber + 1;
     else
         LOG(VB_GENERAL, LOG_ERR, LOC + "No frame in PrepareFrame!");
 }
 
-void MythVideoOutputNull::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType /*Scan*/)
-{
-    QMutexLocker locker(&m_globalLock);
-
-    // Try used frame first, then fall back to scratch frame.
-    m_videoBuffers.BeginLock(kVideoBuffer_used);
-    MythVideoFrame *used = nullptr;
-    if (m_videoBuffers.Size(kVideoBuffer_used) > 0)
-        used = m_videoBuffers.Head(kVideoBuffer_used);
-
-    if (used)
-        m_avPauseFrame.CopyFrame(used);
-    m_videoBuffers.EndLock();
-
-    if (!used)
-    {
-        m_videoBuffers.GetScratchFrame()->m_frameNumber = m_framesPlayed - 1;
-        m_videoBuffers.GetScratchFrame()->CopyFrame(&m_avPauseFrame);
-    }
-
-    DisplayTimecode = m_avPauseFrame.m_displayTimecode;
-}
 
 void MythVideoOutputNull::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
