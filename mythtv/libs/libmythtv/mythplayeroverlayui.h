@@ -12,6 +12,9 @@ class MythPlayerOverlayUI : public MythPlayerUIBase
     MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerOverlayUI() override = default;
 
+  protected slots:
+    void UpdateOSDMessage (const QString& Message);
+
   private:
     Q_DISABLE_COPY(MythPlayerOverlayUI)
 };
