@@ -20,9 +20,13 @@ class MythPlayerOverlayUI : public MythPlayerUIBase
     void UpdateOSDStatus  (const QString& Title, const QString& Desc,
                            const QString& Value, int Type, const QString& Units,
                            int Position, OSDTimeout Timeout);
+    void ChangeOSDPositionUpdates(bool Enable);
+    void UpdateOSDPosition();
 
   private:
     Q_DISABLE_COPY(MythPlayerOverlayUI)
+
+    QTimer  m_positionUpdateTimer;
 };
 
 #endif

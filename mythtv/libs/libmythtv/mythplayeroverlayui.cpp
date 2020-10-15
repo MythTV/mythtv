@@ -4,6 +4,44 @@
 MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerUIBase(MainWindow, Tv, Context, Flags)
 {
+    m_positionUpdateTimer.setInterval(999);
+    connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerOverlayUI::UpdateOSDPosition);
+}
+
+void MythPlayerOverlayUI::ChangeOSDPositionUpdates(bool Enable)
+{
+    if (Enable)
+        m_positionUpdateTimer.start();
+    else
+        m_positionUpdateTimer.stop();
+}
+
+/*! \brief Update the OSD status/position window.
+ *
+ * This is triggered (roughly) once a second to update the osd_status window
+ * for the latest position, duration, time etc (when visible).
+ *
+ * \note If data/state from a higher interface class is needed, then just re-implement
+ * calcSliderPos
+*/
+void MythPlayerOverlayUI::UpdateOSDPosition()
+{
+    m_osdLock.lock();
+    if (m_osd)
+    {
+        if (m_osd->IsWindowVisible("osd_status"))
+        {
+            osdInfo info;
+            calcSliderPos(info);
+            m_osd->SetText("osd_status", info.text, kOSDTimeout_Ignore);
+            m_osd->SetValues("osd_status", info.values, kOSDTimeout_Ignore);
+        }
+        else
+        {
+            ChangeOSDPositionUpdates(false);
+        }
+    }
+    m_osdLock.unlock();
 }
 
 void MythPlayerOverlayUI::UpdateOSDMessage(const QString& Message)

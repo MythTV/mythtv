@@ -9,46 +9,6 @@
 MythPlayerVideoUI::MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerAudioUI(MainWindow, Tv, Context, Flags)
 {
-    m_positionUpdateTimer.setInterval(999);
-    connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerVideoUI::UpdateOSDPosition);
-}
-
-void MythPlayerVideoUI::ChangeOSDPositionUpdates(bool Enable)
-{
-    if (Enable)
-        m_positionUpdateTimer.start();
-    else
-        m_positionUpdateTimer.stop();
-}
-
-/*! \brief Update the OSD status/position window.
- *
- * This is triggered (roughly) once a second to update the osd_status window
- * for the latest position, duration, time etc (when visible).
- *
- * \todo This may be better located either in MythPlayerOverlayUI (if the call
- * to CalcSliderPos does not require any higher level data) or into the top
- * MythPlayerUI class - in which case the status window could pick up state
- * from all interface classes.
-*/
-void MythPlayerVideoUI::UpdateOSDPosition()
-{
-    m_osdLock.lock();
-    if (m_osd)
-    {
-        if (m_osd->IsWindowVisible("osd_status"))
-        {
-            osdInfo info;
-            calcSliderPos(info);
-            m_osd->SetText("osd_status", info.text, kOSDTimeout_Ignore);
-            m_osd->SetValues("osd_status", info.values, kOSDTimeout_Ignore);
-        }
-        else
-        {
-            ChangeOSDPositionUpdates(false);
-        }
-    }
-    m_osdLock.unlock();
 }
 
 void MythPlayerVideoUI::WindowResized(const QSize& /*Size*/)

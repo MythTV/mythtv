@@ -41,8 +41,6 @@ class MythPlayerVideoUI : public MythPlayerAudioUI
     void ProcessCallbacks() override;
 
   protected slots:
-    void ChangeOSDPositionUpdates(bool Enable);
-    void UpdateOSDPosition();
     void WindowResized(const QSize& /*Size*/);
 
   protected:
@@ -51,7 +49,6 @@ class MythPlayerVideoUI : public MythPlayerAudioUI
   private:
     Q_DISABLE_COPY(MythPlayerVideoUI)
 
-    QTimer  m_positionUpdateTimer;
     QMutex  m_decoderCallbackLock;
     QVector<DecoderCallback> m_decoderCallbacks;
 };
