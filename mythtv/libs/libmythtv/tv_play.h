@@ -314,10 +314,14 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void ChangeStereoOverride(StereoscopicMode Mode);
     void ChangePictureAttribute(PictureAttribute Attribute, bool Direction, int Value);
     void ChangeOSDPositionUpdates(bool Enable);
+    void ChangeMuteState(bool CycleChannels);
+    void ChangeVolume(bool Direction, int Volume, bool UpdateOSD);
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
     void customEvent(QEvent* Event) override;
+    void ChangeVolume(bool Up, int NewVolume = -1);
+    void ToggleMute(bool MuteIndividualChannels = false);
 
   private slots:
     void Embed(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
@@ -392,8 +396,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void ChangeChannel(const ChannelInfoList& Options);
     void DoEditSchedule(int EditType = kScheduleProgramGuide);
     QString GetRecordingGroup() const;
-    void ChangeVolume(bool Up, int NewVolume = -1);
-    void ToggleMute(bool MuteIndividualChannels = false);
     void UpdateChannelList(int GroupID);
 
     // Lock handling

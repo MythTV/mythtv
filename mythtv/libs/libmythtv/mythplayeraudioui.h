@@ -8,6 +8,12 @@
 
 class MythPlayerAudioUI : public MythPlayerOverlayUI
 {
+    Q_OBJECT
+
+  protected slots:
+    void      ChangeMuteState(bool CycleChannels);
+    void      ChangeVolume(bool Direction, int Volume, bool UpdateOSD);
+
   public:
     MythPlayerAudioUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
@@ -19,13 +25,11 @@ class MythPlayerAudioUI : public MythPlayerOverlayUI
     uint      GetVolume();
     uint      AdjustVolume(int Change);
     uint      SetVolume(int Volume);
-    bool      SetMuted(bool Mute);
     bool      HasAudioOut() const;
     bool      IsMuted();
     bool      PlayerControlsVolume() const;
     MuteState GetMuteState();
-    MuteState SetMuteState(MuteState State);
-    MuteState IncrMuteState();
+
     bool      CanUpmix();
     bool      IsUpmixing();
     bool      EnableUpmix(bool Enable, bool Toggle = false);

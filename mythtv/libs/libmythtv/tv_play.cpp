@@ -7232,23 +7232,14 @@ void TV::ChangeVolume(bool Up, int NewVolume)
         return;
     }
 
-    bool setabsolute = (NewVolume >= 0 && NewVolume <= 100);
-
-    if (m_player->IsMuted() && (Up || setabsolute))
+    if (m_player->IsMuted() && (Up || NewVolume >= 0))
         ToggleMute();
-
-    uint curvol = setabsolute ? m_player->SetVolume(NewVolume) :
-                                m_player->AdjustVolume((Up) ? +2 : -2);
-
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    bool browsing = IsBrowsing();
+    emit ChangeVolume(Up, NewVolume, !browsing);
 
-    if (!IsBrowsing())
+    if (!browsing)
     {
-        UpdateOSDStatus(tr("Adjust Volume"), tr("Volume"), QString::number(curvol),
-                        kOSDFunctionalType_PictureAdjust, "%", static_cast<int>(curvol * 10),
-                        kOSDTimeout_Med);
-        emit ChangeOSDPositionUpdates(false);
-
         if (LCD *lcd = LCD::Get())
         {
             QString appName = tr("Video");
@@ -7259,12 +7250,14 @@ void TV::ChangeVolume(bool Up, int NewVolume)
             if (m_playerContext.m_buffer && m_playerContext.m_buffer->IsDVD())
                 appName = tr("DVD");
 
+
             lcd->switchToVolume(appName);
-            lcd->setVolumeLevel(static_cast<float>(curvol) / 100);
+            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
+            lcd->setVolumeLevel(static_cast<float>(m_player->GetVolume()) / 100);
+            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
             if (m_lcdVolumeTimerId)
                 KillTimer(m_lcdVolumeTimerId);
-
             m_lcdVolumeTimerId = StartTimer(2000, __LINE__);
         }
     }
@@ -7451,39 +7444,8 @@ void TV::ChangeAudioSync(int Dir, int NewSync)
 
 void TV::ToggleMute(const bool MuteIndividualChannels)
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player || !m_player->HasAudioOut() ||
-        !m_player->PlayerControlsVolume())
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return;
-    }
-
-    MuteState mute_status = kMuteOff;
-
-    if (!MuteIndividualChannels)
-    {
-        m_player->SetMuted(!m_player->IsMuted());
-        mute_status = (m_player->IsMuted()) ? kMuteAll : kMuteOff;
-    }
-    else
-    {
-        mute_status = m_player->IncrMuteState();
-    }
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    QString text;
-
-    switch (mute_status)
-    {
-        case kMuteOff:   text = tr("Mute Off"); break;
-        case kMuteAll:   text = tr("Mute On"); break;
-        case kMuteLeft:  text = tr("Left Channel Muted"); break;
-        case kMuteRight: text = tr("Right Channel Muted"); break;
-    }
-
+    emit ChangeMuteState(MuteIndividualChannels);
     UpdateNavDialog();
-    SetOSDMessage(text);
 }
 
 void TV::ToggleSleepTimer()

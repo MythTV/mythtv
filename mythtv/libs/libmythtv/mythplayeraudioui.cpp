@@ -1,5 +1,6 @@
 // MythTV
 #include "mythcorecontext.h"
+#include "tv_play.h"
 #include "audioplayer.h"
 #include "mythmainwindow.h"
 #include "mythplayeraudioui.h"
@@ -9,6 +10,8 @@ MythPlayerAudioUI::MythPlayerAudioUI(MythMainWindow* MainWindow, TV *Tv,
   : MythPlayerOverlayUI(MainWindow, Tv, Context, Flags)
 {
     m_audioGraph.SetPainter(m_painter);
+    connect(m_tv, &TV::ChangeMuteState, this, &MythPlayerAudioUI::ChangeMuteState);
+    connect(m_tv, QOverload<bool,int,bool>::of(&TV::ChangeVolume), this, &MythPlayerAudioUI::ChangeVolume);
 }
 
 void MythPlayerAudioUI::ResetAudio()
@@ -45,6 +48,23 @@ uint MythPlayerAudioUI::GetVolume()
     return m_audio.GetVolume();
 }
 
+void MythPlayerAudioUI::ChangeVolume(bool Direction, int Volume, bool UpdateOSD)
+{
+    if (Volume < 0)
+        m_audio.AdjustVolume(Direction ? 2 : -2);
+    else
+        m_audio.SetVolume(Volume);
+
+    if (UpdateOSD)
+    {
+        uint volume = m_audio.GetVolume();
+        UpdateOSDStatus(tr("Adjust Volume"), tr("Volume"), QString::number(volume),
+                        kOSDFunctionalType_PictureAdjust, "%", static_cast<int>(volume * 10),
+                        kOSDTimeout_Med);
+        ChangeOSDPositionUpdates(false);
+    }
+}
+
 uint MythPlayerAudioUI::AdjustVolume(int Change)
 {
     return m_audio.AdjustVolume(Change);
@@ -55,24 +75,31 @@ uint MythPlayerAudioUI::SetVolume(int Volume)
     return m_audio.SetVolume(Volume);
 }
 
-bool MythPlayerAudioUI::SetMuted(bool Mute)
+void MythPlayerAudioUI::ChangeMuteState(bool CycleChannels)
 {
-    return m_audio.SetMuted(Mute);
+    if (!(m_audio.HasAudioOut() && m_audio.ControlsVolume()))
+        return;
+
+    if (CycleChannels)
+        m_audio.IncrMuteState();
+    else
+        m_audio.SetMuted(!m_audio.IsMuted());
+
+    QString text;
+    switch (m_audio.GetMuteState())
+    {
+        case kMuteOff:   text = tr("Mute Off"); break;
+        case kMuteAll:   text = tr("Mute On"); break;
+        case kMuteLeft:  text = tr("Left Channel Muted"); break;
+        case kMuteRight: text = tr("Right Channel Muted"); break;
+    }
+
+    UpdateOSDMessage(text);
 }
 
 MuteState MythPlayerAudioUI::GetMuteState()
 {
     return m_audio.GetMuteState();
-}
-
-MuteState MythPlayerAudioUI::SetMuteState(MuteState State)
-{
-    return m_audio.SetMuteState(State);
-}
-
-MuteState MythPlayerAudioUI::IncrMuteState()
-{
-    return m_audio.IncrMuteState();
 }
 
 bool MythPlayerAudioUI::HasAudioOut() const

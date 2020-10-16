@@ -135,6 +135,10 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
   public slots:
     void PlayerExiting(TV* Player);
 
+  signals:
+    void ChangeVolume(bool Up, int NewVolume = -1);
+    void ToggleMute(bool CycleChannels);
+
   protected slots:
     void cursorLeft();
     void cursorRight();
@@ -150,8 +154,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void showProgFinder();
     void channelUpdate();
-    void volumeUpdate(bool up);
-    void toggleMute(bool muteIndividualChannels = false);
 
     void deleteRule();
 

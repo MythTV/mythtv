@@ -512,6 +512,8 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     {
         m_player->IncrRef();
         connect(m_player, &TV::PlaybackExiting, this, &GuideGrid::PlayerExiting);
+        connect(this, &GuideGrid::ChangeVolume, m_player, QOverload<bool,int>::of(&TV::ChangeVolume));
+        connect(this, &GuideGrid::ToggleMute,   m_player, &TV::ToggleMute);
     }
 }
 
@@ -823,13 +825,13 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == "CHANUPDATE")
             channelUpdate();
         else if (action == ACTION_VOLUMEUP)
-            volumeUpdate(true);
+            emit ChangeVolume(true);
         else if (action == ACTION_VOLUMEDOWN)
-            volumeUpdate(false);
+            emit ChangeVolume(false);
         else if (action == "CYCLEAUDIOCHAN")
-            toggleMute(true);
+            emit ToggleMute(true);
         else if (action == ACTION_MUTEAUDIO)
-            toggleMute();
+            emit ToggleMute(false);
         else if (action == ACTION_TOGGLEPGORDER)
         {
             m_sortReverse = !m_sortReverse;
@@ -2569,26 +2571,6 @@ void GuideGrid::channelUpdate(void)
     {
         m_player->GetPlayerReadLock();
         m_player->ChangeChannel(sel);
-        m_player->ReturnPlayerLock();
-    }
-}
-
-void GuideGrid::volumeUpdate(bool up)
-{
-    if (m_player)
-    {
-        m_player->GetPlayerReadLock();
-        m_player->ChangeVolume(up);
-        m_player->ReturnPlayerLock();
-    }
-}
-
-void GuideGrid::toggleMute(const bool muteIndividualChannels)
-{
-    if (m_player)
-    {
-        m_player->GetPlayerReadLock();
-        m_player->ToggleMute(muteIndividualChannels);
         m_player->ReturnPlayerLock();
     }
 }
