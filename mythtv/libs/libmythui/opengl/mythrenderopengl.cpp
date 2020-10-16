@@ -373,9 +373,11 @@ bool MythRenderOpenGL::Init(void)
     // Check 16 bit FBOs
     Check16BitFBO();
 
-    // Check for compute shaders
+    // Check for compute and geometry shaders
     if (QOpenGLShader::hasOpenGLShaders(QOpenGLShader::Compute))
         m_extraFeatures |= kGLComputeShaders;
+    if (QOpenGLShader::hasOpenGLShaders(QOpenGLShader::Geometry))
+        m_extraFeatures |= kGLGeometryShaders;
 
     DebugFeatures();
 
@@ -409,6 +411,15 @@ void MythRenderOpenGL::DebugFeatures(void)
             .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize())
             .arg(fmt.greenBufferSize()).arg(fmt.alphaBufferSize())
             .arg(fmt.depthBufferSize()).arg(fmt.stencilBufferSize());
+    QStringList shaders {"None"};
+    if (m_features & Shaders)
+    {
+        shaders = QStringList { "Vertex", "Fragment" };
+        if (m_extraFeatures & kGLGeometryShaders)
+            shaders << "Geometry";
+        if (m_extraFeatures & kGLComputeShaders)
+            shaders << "Compute";
+    }
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
@@ -422,7 +433,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL surface    : %1").arg(qtglsurface));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size     : %1").arg(m_maxTextureSize));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture units    : %1").arg(m_maxTextureUnits));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Shaders              : %1").arg(GLYesNo(m_features & Shaders)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Shaders              : %1").arg(shaders.join(",")));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Multitexturing       : %1").arg(GLYesNo(m_features & Multitexture)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rectangular textures : %1").arg(GLYesNo(m_extraFeatures & kGLExtRects)));
@@ -432,7 +443,6 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("16bit framebuffers   : %1").arg(GLYesNo(m_extraFeatures & kGL16BitFBO)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("GL_RED/GL_R8         : %1").arg(GLYesNo(!(m_extraFeatures & kGLLegacyTextures))));
-    //LOG(VB_GENERAL, LOG_INFO, LOC + QString("Compute shaders      : %1").arg(GLYesNo(m_extraFeatures & kGLComputeShaders)));
 
     // warnings
     if (m_maxTextureUnits < 3)
