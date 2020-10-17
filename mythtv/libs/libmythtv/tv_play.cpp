@@ -2679,35 +2679,6 @@ void TV::timerEvent(QTimerEvent *Event)
     if (handled)
         return;
 
-    if (timer_id == m_updateOSDDebugTimerId)
-    {
-        bool update = false;
-        GetPlayerReadLock();
-        OSD *osd = GetOSDL();
-        if (osd && osd->IsWindowVisible("osd_debug") &&
-            (StateIsLiveTV(m_playerContext.GetState()) || StateIsPlaying(m_playerContext.GetState())))
-        {
-            update = true;
-        }
-        else
-        {
-            KillTimer(m_updateOSDDebugTimerId);
-            m_updateOSDDebugTimerId = 0;
-            if (m_playerContext.m_buffer)
-                m_playerContext.m_buffer->EnableBitrateMonitor(false);
-            if (m_player)
-                m_player->EnableFrameRateMonitor(false);
-        }
-        ReturnOSDLock();
-        if (update)
-            UpdateOSDDebug();
-        ReturnPlayerLock();
-        handled = true;
-    }
-
-    if (handled)
-        return;
-
     if (timer_id == m_errorRecoveryTimerId)
     {
         GetPlayerReadLock();
@@ -4179,7 +4150,7 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
             ToggleOSD(true);
     }
     else if (has_action(ACTION_TOGGLEOSDDEBUG, Actions))
-        ToggleOSDDebug();
+        emit ChangeOSDDebug();
     else if (!IsDVDStillFrame && SeekHandleAction(Actions, IsDVD))
     {
     }
@@ -6598,46 +6569,6 @@ void TV::ToggleOSD(bool IncludeStatusOSD)
     }
 }
 
-void TV::ToggleOSDDebug()
-{
-    bool show = false;
-    OSD *osd = GetOSDL();
-    if (osd && osd->IsWindowVisible("osd_debug"))
-    {
-        if (m_playerContext.m_buffer)
-            m_playerContext.m_buffer->EnableBitrateMonitor(false);
-        if (m_player)
-            m_player->EnableFrameRateMonitor(false);
-        osd->HideWindow("osd_debug");
-    }
-    else if (osd)
-    {
-        if (m_playerContext.m_buffer)
-            m_playerContext.m_buffer->EnableBitrateMonitor(true);
-        if (m_player)
-            m_player->EnableFrameRateMonitor(true);
-        show = true;
-        if (!m_updateOSDDebugTimerId)
-            m_updateOSDDebugTimerId = StartTimer(250, __LINE__);
-    }
-    ReturnOSDLock();
-    if (show)
-        UpdateOSDDebug();
-}
-
-void TV::UpdateOSDDebug()
-{
-    OSD *osd = GetOSDL();
-    if (osd && m_player)
-    {
-        InfoMap infoMap;
-        m_player->GetPlaybackData(infoMap);
-        osd->ResetWindow("osd_debug");
-        osd->SetText("osd_debug", infoMap, kOSDTimeout_None);
-    }
-    ReturnOSDLock();
-}
-
 /** \fn TV::UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo)
  *  \brief Update and display the passed OSD set with programinfo
  */
@@ -8734,7 +8665,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action == ACTION_SEEKRWND)
         DoSeekRWND();
     else if (Action == ACTION_TOGGLEOSDDEBUG)
-        ToggleOSDDebug();
+        emit ChangeOSDDebug();
     else if (Action == "TOGGLEMANUALZOOM")
         SetManualZoom(true, tr("Zoom Mode ON"));
     else if (Action == ACTION_BOTTOMLINEMOVE)

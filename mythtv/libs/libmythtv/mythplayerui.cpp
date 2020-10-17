@@ -23,6 +23,7 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
         DisplayPauseFrame();
     });
 
+    // Seeking has finished
     connect(this, &MythPlayerUI::SeekingComplete, [=]()
     {
         m_osdLock.lock();
@@ -30,6 +31,11 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
             m_osd->HideWindow("osd_message");
         m_osdLock.unlock();
     });
+
+    // Setup OSD debug
+    m_osdDebugTimer.setInterval(1000);
+    connect(&m_osdDebugTimer, &QTimer::timeout, this, &MythPlayerUI::UpdateOSDDebug);
+    connect(m_tv, &TV::ChangeOSDDebug, this, &MythPlayerUI::ChangeOSDDebug);
 }
 
 bool MythPlayerUI::StartPlaying()
@@ -832,6 +838,42 @@ void MythPlayerUI::GetCodecDescription(InfoMap& Map)
         Map["videodescrip"] = "HD";
     else
         Map["videodescrip"] = "SD";
+}
+
+void MythPlayerUI::UpdateOSDDebug()
+{
+    m_osdLock.lock();
+    if (m_osd)
+    {
+        InfoMap infoMap;
+        GetPlaybackData(infoMap);
+        m_osd->ResetWindow("osd_debug");
+        m_osd->SetText("osd_debug", infoMap, kOSDTimeout_None);
+    }
+    m_osdLock.unlock();
+}
+
+void MythPlayerUI::ChangeOSDDebug()
+{
+    m_osdLock.lock();
+    if (m_osd)
+    {
+        bool enable = !m_osd->IsWindowVisible("osd_debug");
+        if (m_playerCtx->m_buffer)
+            m_playerCtx->m_buffer->EnableBitrateMonitor(enable);
+        EnableFrameRateMonitor(enable);
+        if (enable)
+        {
+            UpdateOSDDebug();
+            m_osdDebugTimer.start();
+        }
+        else
+        {
+            m_osdDebugTimer.stop();
+            m_osd->HideWindow("osd_debug");
+        }
+    }
+    m_osdLock.unlock();
 }
 
 void MythPlayerUI::EnableFrameRateMonitor(bool Enable)

@@ -12,6 +12,12 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
 {
     Q_OBJECT
 
+  public slots:
+    void ChangeOSDDebug();
+
+  protected slots:
+    void UpdateOSDDebug();
+
   public:
     MythPlayerUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
@@ -34,7 +40,6 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     void GetPlaybackData(InfoMap& Map);
     void GetCodecDescription(InfoMap& Map);
     void ToggleAdjustFill(AdjustFillMode Mode = kAdjustFill_Toggle);
-    void EnableFrameRateMonitor(bool Enable = false);
     bool CanSupportDoubleRate();
     void SetWatched(bool ForceWatched = false);
     virtual void SetBookmark(bool Clear = false);
@@ -66,6 +71,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     void RefreshPauseFrame();
     void RenderVideoFrame(MythVideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
     void DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due);
+    void EnableFrameRateMonitor(bool Enable = false);
 
     Jitterometer    m_outputJmeter { "Player" };
 
@@ -73,6 +79,11 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     QElapsedTimer   m_editUpdateTimer;
     float           m_speedBeforeEdit  { 1.0   };
     bool            m_pausedBeforeEdit { false };
+
+  private:
+    Q_DISABLE_COPY(MythPlayerUI)
+
+    QTimer  m_osdDebugTimer;
 };
 
 #endif

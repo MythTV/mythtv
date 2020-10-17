@@ -317,6 +317,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void ChangeOSDPositionUpdates(bool Enable);
     void ChangeMuteState(bool CycleChannels);
     void ChangeVolume(bool Direction, int Volume, bool UpdateOSD);
+    void ChangeOSDDebug();
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
@@ -553,8 +554,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     // OSD
     bool ClearOSD();
     void ToggleOSD( bool IncludeStatusOSD);
-    void ToggleOSDDebug();
-    void UpdateOSDDebug();
     void UpdateOSDProgInfo(const char *WhichInfo);
     void UpdateOSDStatus(const QString& Title, const QString& Desc,
                          const QString& Value, int Type, const QString& Units,
@@ -823,7 +822,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     volatile int         m_ccInputTimerId          {0};
     volatile int         m_asInputTimerId          {0};
     volatile int         m_queueInputTimerId       {0};
-    volatile int         m_updateOSDDebugTimerId   {0};
     volatile int         m_endOfPlaybackTimerId    {0};
     volatile int         m_endOfRecPromptTimerId   {0};
     volatile int         m_videoExitDialogTimerId  {0};
