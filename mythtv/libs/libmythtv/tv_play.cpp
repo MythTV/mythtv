@@ -7800,13 +7800,6 @@ void TV::customEvent(QEvent *Event)
         return;
     }
 
-    if (Event->type() == OSDHideEvent::kEventType)
-    {
-        auto *ce = reinterpret_cast<OSDHideEvent*>(Event);
-        HandleOSDClosed(ce->GetFunctionalType());
-        return;
-    }
-
     // Stop DVD playback cleanly when the DVD is ejected
     if (Event->type() == MythMediaEvent::kEventType)
     {

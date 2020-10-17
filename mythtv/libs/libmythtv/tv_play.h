@@ -305,6 +305,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     bool eventFilter(QObject* Object, QEvent* Event) override;
     void timerEvent(QTimerEvent* Event) override;
     void StopPlayback();
+    void HandleOSDClosed(int OSDType);
 
   signals:
     void PlaybackExiting(TV* Player);
@@ -325,7 +326,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
 
   private slots:
     void Embed(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
-    void HandleOSDClosed(int OSDType);
 
   private:
     static QStringList lastProgramStringList;

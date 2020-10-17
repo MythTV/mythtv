@@ -65,21 +65,6 @@ enum OSDTimeout
     kOSDTimeout_Long   = 3,
 };
 
-class MTV_PUBLIC OSDHideEvent : public QEvent
-{
-  public:
-    explicit OSDHideEvent(enum OSDFunctionalType OsdFunctionalType)
-      : QEvent(kEventType),
-        m_osdFunctionalType(OsdFunctionalType) { }
-
-    int GetFunctionalType() { return m_osdFunctionalType; }
-
-    static Type kEventType;
-
-  private:
-    OSDFunctionalType m_osdFunctionalType;
-};
-
 class MythOSDWindow : public MythScreenType
 {
     Q_OBJECT
@@ -102,9 +87,12 @@ class MythOSDWindow : public MythScreenType
     bool m_themed { false };
 };
 
-class OSD
+class OSD : public QObject
 {
-    Q_DECLARE_TR_FUNCTIONS(OSD)
+    Q_OBJECT
+
+  signals:
+    void HideOSD(OSDFunctionalType Type);
 
   public:
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
@@ -166,7 +154,6 @@ class OSD
     void TearDown();
     void LoadWindows();
     void CheckExpiry();
-    void SendHideEvent();
     void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout);
 
   private:

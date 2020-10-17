@@ -31,8 +31,6 @@
 
 #define LOC     QString("OSD: ")
 
-QEvent::Type OSDHideEvent::kEventType = static_cast<QEvent::Type>(QEvent::registerEventType());
-
 ChannelEditor::ChannelEditor(MythMainWindow* MainWindow, TV* Tv, const QString& Name)
   : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
     m_mainWindow(MainWindow),
@@ -154,6 +152,7 @@ OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* 
     m_player(Player),
     m_painter(Painter)
 {
+    connect(this, &OSD::HideOSD, m_tv, &TV::HandleOSDClosed);
 }
 
 OSD::~OSD()
@@ -910,10 +909,8 @@ MythScreenType *OSD::GetWindow(const QString &Window)
 
 void OSD::SetFunctionalWindow(const QString &window, enum OSDFunctionalType Type)
 {
-    if (m_functionalType != kOSDFunctionalType_Default &&
-        m_functionalType != Type)
-        SendHideEvent();
-
+    if (m_functionalType != kOSDFunctionalType_Default && m_functionalType != Type)
+        emit HideOSD(m_functionalType);
     m_functionalWindow = window;
     m_functionalType   = Type;
 }
@@ -938,17 +935,11 @@ void OSD::HideWindow(const QString &Window)
         bool visible = valid && screen && screen->IsVisible(false);
         if (!valid || !visible)
         {
-            SendHideEvent();
+            emit HideOSD(m_functionalType);
             m_functionalType = kOSDFunctionalType_Default;
             m_functionalWindow = QString();
         }
     }
-}
-
-void OSD::SendHideEvent()
-{
-    auto *event = new OSDHideEvent(m_functionalType);
-    QCoreApplication::postEvent(m_tv, event);
 }
 
 bool OSD::HasWindow(const QString &Window)
