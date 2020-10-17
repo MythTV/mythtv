@@ -814,7 +814,7 @@ void OSD::DialogAddButton(const QString& Text, QVariant Data, bool Menu, bool Cu
 {
     auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
     if (dialog)
-        dialog->AddButton(Text, std::move(Data), Menu, Current);
+        dialog->AddButtonV(Text, std::move(Data), Menu, Current);
 }
 
 void OSD::DialogGetText(InfoMap &Map)

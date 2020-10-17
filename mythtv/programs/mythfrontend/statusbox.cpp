@@ -328,11 +328,11 @@ void StatusBox::clicked(MythUIButtonListItem *item)
             QVariant data = QVariant::fromValue(logline.m_data);
 
             if (jobStatus == JOB_PAUSED)
-                menuPopup->AddButton(tr("Resume"), data);
+                menuPopup->AddButtonV(tr("Resume"), data);
             else
-                menuPopup->AddButton(tr("Pause"), data);
-            menuPopup->AddButton(tr("Stop"), data);
-            menuPopup->AddButton(tr("No Change"), data);
+                menuPopup->AddButtonV(tr("Pause"), data);
+            menuPopup->AddButtonV(tr("Stop"), data);
+            menuPopup->AddButtonV(tr("No Change"), data);
         }
         else if (jobStatus & JOB_DONE)
         {
@@ -364,18 +364,18 @@ void StatusBox::clicked(MythUIButtonListItem *item)
 
             menuPopup->SetReturnEvent(this, "AutoExpireManage");
 
-            menuPopup->AddButton(tr("Delete Now"), QVariant::fromValue(rec));
+            menuPopup->AddButtonV(tr("Delete Now"), QVariant::fromValue(rec));
             if ((rec)->GetRecordingGroup() == "LiveTV")
             {
-                menuPopup->AddButton(tr("Move to Default group"),
+                menuPopup->AddButtonV(tr("Move to Default group"),
                                                        QVariant::fromValue(rec));
             }
             else if ((rec)->GetRecordingGroup() == "Deleted")
-                menuPopup->AddButton(tr("Undelete"), QVariant::fromValue(rec));
+                menuPopup->AddButtonV(tr("Undelete"), QVariant::fromValue(rec));
             else
-                menuPopup->AddButton(tr("Disable AutoExpire"),
+                menuPopup->AddButtonV(tr("Disable AutoExpire"),
                                                         QVariant::fromValue(rec));
-            menuPopup->AddButton(tr("No Change"), QVariant::fromValue(rec));
+            menuPopup->AddButtonV(tr("No Change"), QVariant::fromValue(rec));
 
         }
     }

@@ -69,15 +69,13 @@ using MythUIButtonCallback = std::function<void(void)>;
 class MUI_PUBLIC MythMenuItem
 {
   public:
-    explicit MythMenuItem(QString text, QVariant data = 0, bool checked = false, MythMenu *subMenu = nullptr) :
-        m_text(std::move(text)), m_data(std::move(data)),
-        m_checked(checked), m_subMenu(subMenu), m_useSlot(false) { Init(); }
     MythMenuItem(QString text, const char *slot, bool checked = false, MythMenu *subMenu = nullptr) :
         m_text(std::move(text)), m_data(QVariant::fromValue(slot)),
         m_checked(checked), m_subMenu(subMenu) { Init(); }
     MythMenuItem(QString text, const MythUIButtonCallback &slot, bool checked = false, MythMenu *subMenu = nullptr) :
         m_text(std::move(text)), m_data(QVariant::fromValue(slot)),
         m_checked(checked), m_subMenu(subMenu) { Init(); }
+    void SetData(QVariant data) { m_data = std::move(data); }
 
     QString   m_text;
     QVariant  m_data    {0};
@@ -98,8 +96,9 @@ class MUI_PUBLIC MythMenu
     MythMenu(QString title, QString text, QObject *retobject, QString resultid);
     ~MythMenu(void);
 
-    void AddItem(const QString &title, QVariant data = 0, MythMenu *subMenu = nullptr,
+    void AddItemV(const QString &title, QVariant data = 0, MythMenu *subMenu = nullptr,
                  bool selected = false, bool checked = false);
+    void AddItem(const QString &title) { AddItemV(title, 0, nullptr, false, false); };
     void AddItem(const QString &title, const char *slot, MythMenu *subMenu = nullptr,
                  bool selected = false, bool checked = false);
     void AddItem(const QString &title, const MythUIButtonCallback &slot,
@@ -163,14 +162,15 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
     void SetExitAction(const QString &text, QVariant data);
     void SetText(const QString &text);
 
-    void AddButton(const QString &title, QVariant data = 0,
+    void AddButtonV(const QString &title, QVariant data = 0,
                    bool newMenu = false, bool setCurrent = false);
+    void AddButton(const QString &title) { AddButtonV(title, 0,false, false); };
     void AddButton(const QString &title, const char *slot,
                    bool newMenu = false, bool setCurrent = false);
     void AddButton(const QString &title, const MythUIButtonCallback &slot,
                    bool newMenu = false, bool setCurrent = false)
     {
-        AddButton(title, QVariant::fromValue(slot), newMenu, setCurrent);
+        AddButtonV(title, QVariant::fromValue(slot), newMenu, setCurrent);
         m_useSlots = true;
     }
 

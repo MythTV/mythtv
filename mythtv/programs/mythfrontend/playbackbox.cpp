@@ -3211,8 +3211,8 @@ MythMenu* PlaybackBox::createTranscodingProfilesMenu()
 
     auto *menu = new MythMenu(label, this, "transcode");
 
-    menu->AddItem(tr("Default"), QVariant::fromValue(-1));
-    menu->AddItem(tr("Autodetect"), QVariant::fromValue(0));
+    menu->AddItemV(tr("Default"), QVariant::fromValue(-1));
+    menu->AddItemV(tr("Autodetect"), QVariant::fromValue(0));
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT r.name, r.id "
@@ -3241,7 +3241,7 @@ MythMenu* PlaybackBox::createTranscodingProfilesMenu()
         else if (transcoder_name == "Low Quality")
             transcoder_name = tr("Low Quality");
 
-        menu->AddItem(transcoder_name, QVariant::fromValue(transcoder_id));
+        menu->AddItemV(transcoder_name, QVariant::fromValue(transcoder_id));
     }
 
     return menu;

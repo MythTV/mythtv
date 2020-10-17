@@ -239,8 +239,8 @@ void GameHandler::promptForRemoval(const GameScan& scan)
 
         removalPopup->AddButton(tr("No"));
         removalPopup->AddButton(tr("No to all"));
-        removalPopup->AddButton(tr("Yes"), QVariant::fromValue(scan));
-        removalPopup->AddButton(tr("Yes to all"), QVariant::fromValue(scan));
+        removalPopup->AddButtonV(tr("Yes"), QVariant::fromValue(scan));
+        removalPopup->AddButtonV(tr("Yes to all"), QVariant::fromValue(scan));
         popupStack->AddScreen(removalPopup);
 }
     else

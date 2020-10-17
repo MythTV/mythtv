@@ -2322,9 +2322,9 @@ MythMenu* MusicCommon::createRepeatMenu(void)
 
     auto *menu = new MythMenu(label, this, "repeatmenu");
 
-    menu->AddItem(tr("None"),  QVariant::fromValue((int)MusicPlayer::REPEAT_OFF));
-    menu->AddItem(tr("Track"), QVariant::fromValue((int)MusicPlayer::REPEAT_TRACK));
-    menu->AddItem(tr("All"),   QVariant::fromValue((int)MusicPlayer::REPEAT_ALL));
+    menu->AddItemV(tr("None"),  QVariant::fromValue((int)MusicPlayer::REPEAT_OFF));
+    menu->AddItemV(tr("Track"), QVariant::fromValue((int)MusicPlayer::REPEAT_TRACK));
+    menu->AddItemV(tr("All"),   QVariant::fromValue((int)MusicPlayer::REPEAT_ALL));
 
     menu->SetSelectedByData(static_cast<int>(gPlayer->getRepeatMode()));
 
@@ -2337,11 +2337,11 @@ MythMenu* MusicCommon::createShuffleMenu(void)
 
     auto *menu = new MythMenu(label, this, "shufflemenu");
 
-    menu->AddItem(tr("None"),   QVariant::fromValue((int)MusicPlayer::SHUFFLE_OFF));
-    menu->AddItem(tr("Random"), QVariant::fromValue((int)MusicPlayer::SHUFFLE_RANDOM));
-    menu->AddItem(tr("Smart"),  QVariant::fromValue((int)MusicPlayer::SHUFFLE_INTELLIGENT));
-    menu->AddItem(tr("Album"),  QVariant::fromValue((int)MusicPlayer::SHUFFLE_ALBUM));
-    menu->AddItem(tr("Artist"), QVariant::fromValue((int)MusicPlayer::SHUFFLE_ARTIST));
+    menu->AddItemV(tr("None"),   QVariant::fromValue((int)MusicPlayer::SHUFFLE_OFF));
+    menu->AddItemV(tr("Random"), QVariant::fromValue((int)MusicPlayer::SHUFFLE_RANDOM));
+    menu->AddItemV(tr("Smart"),  QVariant::fromValue((int)MusicPlayer::SHUFFLE_INTELLIGENT));
+    menu->AddItemV(tr("Album"),  QVariant::fromValue((int)MusicPlayer::SHUFFLE_ALBUM));
+    menu->AddItemV(tr("Artist"), QVariant::fromValue((int)MusicPlayer::SHUFFLE_ARTIST));
 
     menu->SetSelectedByData(static_cast<int>(gPlayer->getShuffleMode()));
 
@@ -2378,7 +2378,7 @@ MythMenu* MusicCommon::createVisualizerMenu(void)
     auto *menu = new MythMenu(label, this, "visualizermenu");
 
     for (uint x = 0; x < static_cast<uint>(m_visualModes.count()); x++)
-        menu->AddItem(m_visualModes.at(x), QVariant::fromValue(x));
+        menu->AddItemV(m_visualModes.at(x), QVariant::fromValue(x));
 
     menu->SetSelectedByData(m_currentVisual);
 

@@ -310,28 +310,28 @@ void MythThemedMenu::ShowMenu()
 
     // HACK Implement a better check for this
     if (QCoreApplication::applicationName() == MYTH_APPNAME_MYTHFRONTEND)
-        m_menuPopup->AddButton(tr("Enter standby mode"), QVariant("standby"));
+        m_menuPopup->AddButtonV(tr("Enter standby mode"), QVariant("standby"));
 
     // don't show the exit application option if standby option is enabled
     if (override_menu != 7)
-        m_menuPopup->AddButton(tr("Exit application"), QVariant("exit"));
+        m_menuPopup->AddButtonV(tr("Exit application"), QVariant("exit"));
 
     switch (override_menu)
     {
         case 2:
         case 4:
             // shutdown
-            m_menuPopup->AddButton(tr("Shutdown"), QVariant("shutdown"));
+            m_menuPopup->AddButtonV(tr("Shutdown"), QVariant("shutdown"));
             break;
         case 5:
             // reboot
-            m_menuPopup->AddButton(tr("Reboot"), QVariant("reboot"));
+            m_menuPopup->AddButtonV(tr("Reboot"), QVariant("reboot"));
             break;
         case 3:
         case 6:
             // both
-            m_menuPopup->AddButton(tr("Shutdown"), QVariant("shutdown"));
-            m_menuPopup->AddButton(tr("Reboot"), QVariant("reboot"));
+            m_menuPopup->AddButtonV(tr("Shutdown"), QVariant("shutdown"));
+            m_menuPopup->AddButtonV(tr("Reboot"), QVariant("reboot"));
             break;
         case 0:
         case 7:
@@ -339,7 +339,7 @@ void MythThemedMenu::ShowMenu()
             break;
     }
 
-    m_menuPopup->AddButton(tr("About"), QVariant("about"));
+    m_menuPopup->AddButtonV(tr("About"), QVariant("about"));
 }
 
 void MythThemedMenu::aboutScreen()

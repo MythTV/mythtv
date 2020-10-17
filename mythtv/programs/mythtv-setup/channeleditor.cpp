@@ -684,8 +684,8 @@ void ChannelEditor::channelIconImport(void)
         menu->AddButton(tr("Download all icons..."));
         menu->AddButton(tr("Rescan for missing icons..."));
         if (!channelname.isEmpty())
-            menu->AddButton(tr("Download icon for %1").arg(channelname),
-                            channelname);
+            menu->AddButtonV(tr("Download icon for %1").arg(channelname),
+                             channelname);
 
         popupStack->AddScreen(menu);
     }

@@ -63,9 +63,10 @@ void MythMenu::AddItem(const QString& title, const char* slot, MythMenu *subMenu
     AddItem(item, selected, subMenu);
 }
 
-void MythMenu::AddItem(const QString &title, QVariant data, MythMenu *subMenu, bool selected, bool checked)
+void MythMenu::AddItemV(const QString &title, QVariant data, MythMenu *subMenu, bool selected, bool checked)
 {
-    auto *item = new MythMenuItem(title, std::move(data), checked, subMenu);
+    auto *item = new MythMenuItem(title, "", checked, subMenu);
+    item->SetData(std::move(data));
     AddItem(item, selected, subMenu);
 }
 
@@ -298,7 +299,7 @@ void MythDialogBox::SetText(const QString &text)
         m_textarea->SetText(text);
 }
 
-void MythDialogBox::AddButton(const QString &title, QVariant data, bool newMenu,
+void MythDialogBox::AddButtonV(const QString &title, QVariant data, bool newMenu,
                               bool setCurrent)
 {
     auto *button = new MythUIButtonListItem(m_buttonList, title);

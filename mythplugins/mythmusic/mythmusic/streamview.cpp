@@ -84,8 +84,8 @@ void StreamView::ShowMenu(void)
         menu->AddItem(tr("Remove Stream"));
     }
 
-    menu->AddItem(MusicCommon::tr("Fullscreen Visualizer"), QVariant::fromValue((int)MV_VISUALIZER));
-    menu->AddItem(MusicCommon::tr("Lyrics"), QVariant::fromValue((int)MV_LYRICS));
+    menu->AddItemV(MusicCommon::tr("Fullscreen Visualizer"), QVariant::fromValue((int)MV_VISUALIZER));
+    menu->AddItemV(MusicCommon::tr("Lyrics"), QVariant::fromValue((int)MV_LYRICS));
 
     menu->AddItem(tr("More Options"), nullptr, createSubMenu());
 

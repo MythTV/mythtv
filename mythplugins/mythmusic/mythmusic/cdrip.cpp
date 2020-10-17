@@ -1403,7 +1403,7 @@ void Ripper::ShowConflictMenu(RipTrack* track)
 
     menu->SetReturnEvent(this, "conflictmenu");
     menu->AddButton(tr("No, Cancel"));
-    menu->AddButton(tr("Yes, Delete"), QVariant::fromValue(track));
+    menu->AddButtonV(tr("Yes, Delete"), QVariant::fromValue(track));
     menu->AddButton(tr("Yes, Delete All"));
 }
 

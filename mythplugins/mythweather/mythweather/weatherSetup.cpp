@@ -470,13 +470,13 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
 
             menuPopup->SetReturnEvent(this, "options");
 
-            menuPopup->AddButton(tr("Move Up"), QVariant::fromValue(selected));
-            menuPopup->AddButton(tr("Move Down"), QVariant::fromValue(selected));
-            menuPopup->AddButton(tr("Remove"), QVariant::fromValue(selected));
-            menuPopup->AddButton(tr("Change Location"), QVariant::fromValue(selected));
+            menuPopup->AddButtonV(tr("Move Up"), QVariant::fromValue(selected));
+            menuPopup->AddButtonV(tr("Move Down"), QVariant::fromValue(selected));
+            menuPopup->AddButtonV(tr("Remove"), QVariant::fromValue(selected));
+            menuPopup->AddButtonV(tr("Change Location"), QVariant::fromValue(selected));
             if (si->m_hasUnits)
-                menuPopup->AddButton(tr("Change Units"), QVariant::fromValue(selected));
-            menuPopup->AddButton(tr("Cancel"), QVariant::fromValue(selected));
+                menuPopup->AddButtonV(tr("Change Units"), QVariant::fromValue(selected));
+            menuPopup->AddButtonV(tr("Cancel"), QVariant::fromValue(selected));
         }
         else
         {
@@ -548,8 +548,8 @@ void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
 
         menuPopup->SetReturnEvent(this, "units");
 
-        menuPopup->AddButton(tr("English Units"), QVariant::fromValue(si));
-        menuPopup->AddButton(tr("SI Units"), QVariant::fromValue(si));
+        menuPopup->AddButtonV(tr("English Units"), QVariant::fromValue(si));
+        menuPopup->AddButtonV(tr("SI Units"), QVariant::fromValue(si));
     }
     else
     {

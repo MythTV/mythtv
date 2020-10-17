@@ -532,18 +532,18 @@ void MythUIComboBoxSetting::edit(MythScreenType * screen)
 
         if (m_rewrite)
         {
-            menuPopup->AddButton(QObject::tr("New entry"),
-                                 QString("NEWENTRY"),
-                                 false,
-                                 m_settingValue == "");
+            menuPopup->AddButtonV(QObject::tr("New entry"),
+                                  QString("NEWENTRY"),
+                                  false,
+                                  m_settingValue == "");
         }
         for (int i = 0; i < m_labels.size() && !m_values.empty(); ++i)
         {
             QString value = m_values.at(i);
-            menuPopup->AddButton(m_labels.at(i),
-                                 value,
-                                 false,
-                                 value == m_settingValue);
+            menuPopup->AddButtonV(m_labels.at(i),
+                                  value,
+                                  false,
+                                  value == m_settingValue);
         }
     }
     else
