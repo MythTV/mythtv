@@ -385,7 +385,7 @@ void MythPlayerUI::VideoStart()
     float scaling = NAN;
 
     m_osdLock.lock();
-    m_osd = new OSD(this, m_tv, m_painter);
+    m_osd = new OSD(m_mainWindow, m_tv, this, m_painter);
     m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
     m_osd->Init(visible, aspect);
     m_osd->EnableSubtitles(kDisplayNone);

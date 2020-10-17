@@ -14,7 +14,7 @@ class TeletextScreen: public MythScreenType
     static bool  InitialiseFont(void);
 
   public:
-    TeletextScreen(MythPlayer *player, const char * name, int fontStretch);
+    TeletextScreen(MythPlayer* Player, const QString& Name, int FontStretch);
     ~TeletextScreen() override;
 
     // MythScreenType methods
@@ -42,7 +42,7 @@ class TeletextScreen: public MythScreenType
     void DrawStatus(void);
     void DrawPage(void);
 
-    MythPlayer     *m_player         {nullptr};
+    MythPlayer*     m_player         {nullptr};
     TeletextReader *m_teletextReader {nullptr};
     QRect           m_safeArea;
     int             m_colWidth       {10};

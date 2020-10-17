@@ -170,11 +170,6 @@ void MythVideoOutput::SetVideoFrameRate(float playback_fps)
         m_dbDisplayProfile->SetOutput(playback_fps);
 }
 
-void MythVideoOutput::SetReferenceFrames(int ReferenceFrames)
-{
-    m_maxReferenceFrames = ReferenceFrames;
-}
-
 MythDeintType MythVideoOutput::ParseDeinterlacer(const QString& Deinterlacer)
 {
     MythDeintType result = DEINT_NONE;

@@ -39,11 +39,10 @@ static QChar cvt_char(char ch, int lang)
     return QLatin1Char(ch);
 }
 
-TeletextScreen::TeletextScreen(MythPlayer *player, const char * name,
-                               int fontStretch) :
-    MythScreenType((MythScreenType*)nullptr, name),
-    m_player(player),
-    m_fontStretch(fontStretch)
+TeletextScreen::TeletextScreen(MythPlayer* Player, const QString& Name, int FontStretch)
+  : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
+    m_player(Player),
+    m_fontStretch(FontStretch)
 {
 }
 
@@ -89,18 +88,11 @@ QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
 
 void TeletextScreen::OptimiseDisplayedArea(void)
 {
-    MythVideoOutput *vo = m_player->GetVideoOutput();
-    if (!vo)
-        return;
-    MythPainter *osd_painter = vo->GetOSDPainter();
-    if (!osd_painter)
-        return;
-
     QHashIterator<int, QImage*> it(m_rowImages);
     while (it.hasNext())
     {
         it.next();
-        MythImage *image = osd_painter->GetFormatImage();
+        MythImage *image = m_painter->GetFormatImage();
         if (!image || !it.value())
             continue;
 
@@ -110,8 +102,7 @@ void TeletextScreen::OptimiseDisplayedArea(void)
         if (uiimage)
         {
             uiimage->SetImage(image);
-            uiimage->SetArea(MythRect(0, row * m_rowHeight,
-                                      m_safeArea.width(), m_rowHeight * 2));
+            uiimage->SetArea(MythRect(0, row * m_rowHeight, m_safeArea.width(), m_rowHeight * 2));
         }
         image->DecrRef();
     }

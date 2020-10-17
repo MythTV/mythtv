@@ -37,11 +37,13 @@
 
 #define kOSDFadeTime 1000
 
+class TV;
+class MythMainWindow;
 class MythPlayerUI;
 class TeletextScreen;
 class SubtitleScreen;
-struct AVSubtitle;
 class MythBDOverlay;
+struct AVSubtitle;
 
 enum OSDFunctionalType
 {
@@ -78,34 +80,6 @@ class MTV_PUBLIC OSDHideEvent : public QEvent
     OSDFunctionalType m_osdFunctionalType;
 };
 
-class ChannelEditor : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    ChannelEditor(QObject *RetObject, const char * Name)
-        : MythScreenType((MythScreenType*)nullptr, Name),
-          m_retObject(RetObject) {}
-
-    bool Create(void) override;
-    bool keyPressEvent(QKeyEvent *Event) override;
-    void SetText(const InfoMap &Map);
-    void GetText(InfoMap &Map);
-
-  public slots:
-    void Confirm();
-    void Probe();
-
-  protected:
-    void SendResult(int result);
-
-    MythUITextEdit *m_callsignEdit { nullptr };
-    MythUITextEdit *m_channumEdit  { nullptr };
-    MythUITextEdit *m_channameEdit { nullptr };
-    MythUITextEdit *m_xmltvidEdit  { nullptr };
-    QObject        *m_retObject    { nullptr };
-};
-
 class MythOSDWindow : public MythScreenType
 {
     Q_OBJECT
@@ -117,7 +91,7 @@ class MythOSDWindow : public MythScreenType
     {
     }
 
-    bool Create(void) override
+    bool Create() override
     {
         if (m_themed)
             return XMLParseBase::LoadWindowFromXML("osd.xml", objectName(), this);
@@ -133,20 +107,19 @@ class OSD
     Q_DECLARE_TR_FUNCTIONS(OSD)
 
   public:
-    OSD(MythPlayerUI *Player, QObject *Parent, MythPainter *Painter)
-        : m_parent(Player), m_parentObject(Parent), m_currentPainter(Painter) {}
+    OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
    ~OSD();
 
     bool    Init(const QRect &Rect, float FontAspect);
     void    SetPainter(MythPainter *Painter);
-    QRect   Bounds(void) const { return m_rect; }
-    int     GetFontStretch(void) const { return m_fontStretch; }
+    QRect   Bounds() const { return m_rect; }
+    int     GetFontStretch() const { return m_fontStretch; }
     void    OverrideUIScale(bool Log = true);
-    void    RevertUIScale(void);
+    void    RevertUIScale();
     bool    Reinit(const QRect &Rect, float FontAspect);
     void    SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);
     void    SetTimeouts(int Short, int Medium, int Long);
-    bool    IsVisible(void);
+    bool    IsVisible();
     void    HideAll(bool KeepSubs = true, MythScreenType *Except = nullptr, bool DropNotification = false);
     MythScreenType *GetWindow(const QString &Window);
     void    SetExpiry(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout = 0);
@@ -167,40 +140,40 @@ class OSD
     bool DialogVisible(const QString& Window = QString());
     bool DialogHandleKeypress(QKeyEvent *Event);
     bool DialogHandleGesture(MythGestureEvent *Event);
-    void DialogQuit(void);
+    void DialogQuit();
     void DialogShow(const QString &Window, const QString &Text = "", int UpdateFor = 0);
     void DialogSetText(const QString &Text);
     void DialogBack(const QString& Text = "", const QVariant& Data = 0, bool Exit = false);
     void DialogAddButton(const QString& Text, QVariant Data, bool Menu = false, bool Current = false);
     void DialogGetText(InfoMap &Map);
 
-    TeletextScreen* InitTeletext(void);
+    TeletextScreen* InitTeletext();
     void EnableTeletext(bool Enable, int Page);
     bool TeletextAction(const QString &Action);
-    void TeletextReset(void);
-    void TeletextClear(void);
+    void TeletextReset();
+    void TeletextClear();
 
-    SubtitleScreen* InitSubtitles(void);
+    SubtitleScreen* InitSubtitles();
     void EnableSubtitles(int Type, bool ForcedOnly = false);
-    void DisableForcedSubtitles(void);
-    void ClearSubtitles(void);
+    void DisableForcedSubtitles();
+    void ClearSubtitles();
     void DisplayDVDButton(AVSubtitle* DVDButton, QRect &Pos);
 
     void DisplayBDOverlay(MythBDOverlay *Overlay);
-    MythPlayerUI *GetPlayer(void) { return m_parent; }
+    MythPlayerUI *GetPlayer() { return m_player; }
 
   private:
-    void TearDown(void);
-    void LoadWindows(void);
-
-    void CheckExpiry(void);
-    void SendHideEvent(void);
+    void TearDown();
+    void LoadWindows();
+    void CheckExpiry();
+    void SendHideEvent();
     void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout);
 
   private:
-    MythPlayerUI*   m_parent            { nullptr };
-    QObject*        m_parentObject      { nullptr };
-    MythPainter*    m_currentPainter    { nullptr };
+    MythMainWindow* m_mainWindow        { nullptr };
+    TV*             m_tv                { nullptr };
+    MythPlayerUI*   m_player            { nullptr };
+    MythPainter*    m_painter           { nullptr };
     QRect           m_rect              { };
     int             m_fadeTime          { kOSDFadeTime };
     MythScreenType* m_dialog            { nullptr };
@@ -208,7 +181,7 @@ class OSD
     QDateTime       m_nextPulseUpdate   { };
     bool            m_refresh           { false };
     bool            m_visible           { false };
-    std::array<int,4> m_timeouts        { -1,3000,5000,13000 };
+    std::array<int,4> m_timeouts        { -1, 3000, 5000, 13000 };
     bool            m_uiScaleOverride   { false };
     float           m_savedWMult        { 1.0F };
     float           m_savedHMult        { 1.0F };
@@ -221,34 +194,59 @@ class OSD
     QHash<MythScreenType*, QDateTime> m_expireTimes { };
 };
 
+class ChannelEditor : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    ChannelEditor(MythMainWindow* MainWindow, TV* Tv, const QString& Name);
+    bool Create() override;
+    bool keyPressEvent(QKeyEvent* Event) override;
+    void SetText(const InfoMap& Map);
+    void GetText(InfoMap& Map);
+
+  public slots:
+    void Confirm();
+    void Probe();
+
+  protected:
+    void SendResult(int result);
+
+    MythUITextEdit* m_callsignEdit { nullptr };
+    MythUITextEdit* m_channumEdit  { nullptr };
+    MythUITextEdit* m_channameEdit { nullptr };
+    MythUITextEdit* m_xmltvidEdit  { nullptr };
+    MythMainWindow* m_mainWindow   { nullptr };
+    TV*             m_tv           { nullptr };
+};
+
 class OsdNavigation : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    OsdNavigation(QObject *RetObject, const QString &Name, OSD *Osd)
-        : MythScreenType((MythScreenType*)nullptr, Name),
-          m_retObject(RetObject), m_osd(Osd) {}
-    bool Create(void) override;
+    OsdNavigation(MythMainWindow* MainWindow, TV* Tv, const QString& Name, OSD* Osd);
+    bool Create() override;
     bool keyPressEvent(QKeyEvent *Event) override;
     void SetTextFromMap(const InfoMap &Map) override;
-    void ShowMenu(void) override;
+    void ShowMenu() override;
 
     int getVisibleGroup() const { return m_visibleGroup; }
 
   public slots:
-    void GeneralAction(void);
-    void More(void);
+    void GeneralAction();
+    void More();
 
   protected:
     void SendResult(int Result, const QString& Action);
 
-    QObject      *m_retObject       { nullptr };
-    OSD          *m_osd             { nullptr };
-    MythUIButton *m_playButton      { nullptr };
-    MythUIButton *m_pauseButton     { nullptr };
-    MythUIButton *m_muteButton      { nullptr };
-    MythUIButton *m_unMuteButton    { nullptr };
+    MythMainWindow* m_mainWindow    { nullptr };
+    TV*           m_tv              { nullptr };
+    OSD*          m_osd             { nullptr };
+    MythUIButton* m_playButton      { nullptr };
+    MythUIButton* m_pauseButton     { nullptr };
+    MythUIButton* m_muteButton      { nullptr };
+    MythUIButton* m_unMuteButton    { nullptr };
     char          m_paused          { 'X' };
     char          m_muted           { 'X' };
     int           m_visibleGroup    { 0 };

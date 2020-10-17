@@ -2056,15 +2056,12 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
     QRect scaled = videoOut->GetImageRect(bbox, &display);
 
     if (scaled.size() != orig_rect.size())
-        qImage = qImage.scaled(scaled.width(), scaled.height(),
-                               Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        qImage = qImage.scaled(scaled.width(), scaled.height(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     int hsize = m_safeArea.width();
     int vsize = m_safeArea.height();
 
-    scaled.moveLeft(((100 - m_textFontZoom) * hsize / 2 +
-                     m_textFontZoom * scaled.left()) /
-                    100);
+    scaled.moveLeft(((100 - m_textFontZoom) * hsize / 2 + m_textFontZoom * scaled.left()) / 100);
     if (top)
     {
         // anchor up
@@ -2073,22 +2070,16 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
     else
     {
         // anchor down
-        scaled.moveTop(((100 - m_textFontZoom) * vsize +
-                        m_textFontZoom * scaled.top()) / 100);
+        scaled.moveTop(((100 - m_textFontZoom) * vsize + m_textFontZoom * scaled.top()) / 100);
     }
 
-
-    MythPainter *osd_painter = videoOut->GetOSDPainter();
-    MythImage *image = nullptr;
-    if (osd_painter)
-       image = osd_painter->GetFormatImage();
-
+    MythImage* image = m_painter->GetFormatImage();
     SubImage *uiimage = nullptr;
+
     if (image)
     {
         image->Assign(qImage);
-        uiimage = new SubImage(this, imagename,
-                               MythRect(scaled), displayuntil);
+        uiimage = new SubImage(this, imagename, MythRect(scaled), displayuntil);
         if (uiimage)
         {
             uiimage->SetImage(image);
@@ -2098,15 +2089,13 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
         image->DecrRef();
         image = nullptr;
     }
+
     if (uiimage)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Display %1AV sub until %2ms")
-           .arg(forced ? "FORCED " : "")
-           .arg(displayuntil));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Display %1AV sub until %2ms")
+           .arg(forced ? "FORCED " : "").arg(displayuntil));
         if (late > 50)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("AV Sub was %1ms late").arg(late));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AV Sub was %1ms late").arg(late));
     }
 
     return (ysplit + 1);
@@ -2314,11 +2303,7 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
                          Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
 
-    MythPainter *osd_painter = vo->GetOSDPainter();
-    MythImage* image = nullptr;
-    if (osd_painter)
-         image = osd_painter->GetFormatImage();
-
+    MythImage* image = m_painter->GetFormatImage();
     if (image)
     {
         image->Assign(img);
@@ -2513,13 +2498,8 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
         ResizeAssRenderer();
 
     int changed = 0;
-    ASS_Image *images = ass_render_frame(m_assRenderer, m_assTrack,
-                                         timecode, &changed);
+    ASS_Image *images = ass_render_frame(m_assRenderer, m_assTrack, timecode, &changed);
     if (!changed)
-        return;
-
-    MythPainter *osd_painter = vo->GetOSDPainter();
-    if (!osd_painter)
         return;
 
     int count = 0;
@@ -2566,11 +2546,8 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
             src += images->stride;
         }
 
-        MythImage* image = nullptr;
+        MythImage* image = m_painter->GetFormatImage();
         SubImage *uiimage = nullptr;
-
-        if (osd_painter)
-            image = osd_painter->GetFormatImage();
 
         if (image)
         {
@@ -2585,6 +2562,7 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
             }
             image->DecrRef();
         }
+
         images = images->next;
         count++;
     }

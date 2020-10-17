@@ -351,7 +351,6 @@ void MythPlayer::ReinitOSD(void)
         m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
         if (m_osd)
         {
-            m_osd->SetPainter(m_videoOutput->GetOSDPainter());
             int stretch = lroundf(aspect * 100);
             if ((m_osd->Bounds() != visible) ||
                 (m_osd->GetFontStretch() != stretch))
@@ -403,8 +402,6 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
             return;
         }
 
-        if (m_osd)
-            m_osd->SetPainter(m_videoOutput->GetOSDPainter());
         ReinitOSD();
     }
 

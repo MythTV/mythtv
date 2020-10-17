@@ -197,11 +197,6 @@ MythVideoOutputGPU::~MythVideoOutputGPU()
         m_render->DecrRef();
 }
 
-MythPainter* MythVideoOutputGPU::GetOSDPainter()
-{
-    return m_painter;
-}
-
 QRect MythVideoOutputGPU::GetDisplayVisibleRectAdj()
 {
     return GetDisplayVisibleRect();
@@ -371,6 +366,11 @@ void MythVideoOutputGPU::DestroyBuffers()
     MythVideoOutputGPU::DiscardFrames(true, true);
     m_videoBuffers.Reset();
     m_buffersCreated = false;
+}
+
+void MythVideoOutputGPU::SetReferenceFrames(int ReferenceFrames)
+{
+    m_maxReferenceFrames = ReferenceFrames;
 }
 
 bool MythVideoOutputGPU::InputChanged(const QSize& VideoDim, const QSize& VideoDispDim,

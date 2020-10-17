@@ -28,7 +28,6 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            WindowResized         (const QSize& Size);
 
   public:
-    MythPainter*    GetOSDPainter         () override;
     void            InitPictureAttributes () override;
     void            SetVideoFrameRate     (float NewRate) override;
     void            DiscardFrames         (bool KeyFrame, bool Flushed) override;
@@ -53,6 +52,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            DestroyBuffers        ();
     bool            ProcessInputChange    ();
     void            InitDisplayMeasurements();
+    void            SetReferenceFrames    (int ReferenceFrames);
 
     MythRender*     m_render              { nullptr };
     MythVideoGPU*   m_video               { nullptr };
