@@ -5,7 +5,7 @@
 #include "visualisations/videovisual.h"
 #include "mythplayervideoui.h"
 
-class MythPlayerVisualiserUI : public MythPlayerVideoUI
+class MTV_PUBLIC MythPlayerVisualiserUI : public MythPlayerVideoUI
 {
     Q_OBJECT
 

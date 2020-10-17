@@ -1,8 +1,10 @@
 // MythTV
 #include "audiooutput.h"
 #include "mythmainwindow.h"
+#include "decoders/avformatdecoder.h"
 #include "interactivetv.h"
 #include "osd.h"
+#include "interactivescreen.h"
 #include "tv_play.h"
 #include "livetvchain.h"
 #include "mythplayerui.h"
@@ -14,6 +16,69 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
   : MythPlayerVisualiserUI(MainWindow, Tv, Context, Flags),
     MythVideoScanTracker(this)
 {
+    // User feedback during slow seeks
+    connect(this, &MythPlayerUI::SeekingSlow, [&](int Count)
+    {
+        UpdateOSDMessage(tr("Searching") + QString().fill('.', Count % 3), kOSDTimeout_Short);
+        DisplayPauseFrame();
+    });
+
+    connect(this, &MythPlayerUI::SeekingComplete, [=]()
+    {
+        m_osdLock.lock();
+        if (m_osd)
+            m_osd->HideWindow("osd_message");
+        m_osdLock.unlock();
+    });
+}
+
+bool MythPlayerUI::StartPlaying()
+{
+    if (OpenFile() < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to open video file.");
+        return false;
+    }
+
+    m_framesPlayed = 0;
+    m_rewindTime = m_ffTime = 0;
+    m_nextPlaySpeed = m_audio.GetStretchFactor();
+    m_jumpChapter = 0;
+    m_commBreakMap.SkipCommercials(0);
+    m_bufferingCounter = 0;
+
+    if (!InitVideo())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to initialize video.");
+        m_audio.DeleteOutput();
+        return false;
+    }
+
+    bool seek = m_bookmarkSeek > 30;
+    EventStart();
+    DecoderStart(true);
+    if (seek)
+        InitialSeek();
+    VideoStart();
+
+    m_playerThread->setPriority(QThread::TimeCriticalPriority);
+#ifdef Q_OS_ANDROID
+    setpriority(PRIO_PROCESS, m_playerThreadId, -20);
+#endif
+    ProcessCallbacks();
+    UnpauseDecoder();
+    return !IsErrored();
+}
+
+void MythPlayerUI::InitialSeek()
+{
+    // TODO handle initial commskip and/or cutlist skip as well
+    if (m_bookmarkSeek > 30)
+    {
+        DoJumpToFrame(m_bookmarkSeek, kInaccuracyNone);
+        if (m_clearSavedPosition)
+            SetBookmark(true);
+    }
 }
 
 void MythPlayerUI::EventLoop()
@@ -275,6 +340,30 @@ void MythPlayerUI::EventLoop()
     }
 }
 
+void MythPlayerUI::PreProcessNormalFrame()
+{
+#ifdef USING_MHEG
+    // handle Interactive TV
+    if (GetInteractiveTV())
+    {
+        m_osdLock.lock();
+        m_itvLock.lock();
+        if (m_osd)
+        {
+            auto *window =
+                qobject_cast<InteractiveScreen *>(m_osd->GetWindow(OSD_WIN_INTERACT));
+            if ((m_interactiveTV->ImageHasChanged() || !m_itvVisible) && window)
+            {
+                m_interactiveTV->UpdateOSD(window, m_painter);
+                m_itvVisible = true;
+            }
+        }
+        m_itvLock.unlock();
+        m_osdLock.unlock();
+    }
+#endif // USING_MHEG
+}
+
 void MythPlayerUI::ChangeSpeed()
 {
     MythPlayer::ChangeSpeed();
@@ -296,7 +385,7 @@ void MythPlayerUI::VideoStart()
     float scaling = NAN;
 
     m_osdLock.lock();
-    m_osd = new OSD(this, m_tv, m_videoOutput->GetOSDPainter());
+    m_osd = new OSD(this, m_tv, m_painter);
     m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
     m_osd->Init(visible, aspect);
     m_osd->EnableSubtitles(kDisplayNone);
@@ -337,10 +426,32 @@ void MythPlayerUI::VideoStart()
 
     m_osdLock.unlock();
 
-    MythPlayer::VideoStart();
+    SetPlaying(true);
+    ClearAfterSeek(false);
+    m_avSync.InitAVSync();
+    InitFrameInterval();
+
     InitialiseScan(m_videoOutput);
     EnableFrameRateMonitor();
     AutoVisualise(!m_videoDim.isEmpty());
+}
+
+void MythPlayerUI::EventStart()
+{
+    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+    {
+        if (m_playerCtx->m_playingInfo)
+        {
+            // When initial playback gets underway, we override the ProgramInfo
+            // flags such that future calls to GetBookmark() will consider only
+            // an actual bookmark and not progstart or lastplaypos information.
+            m_playerCtx->m_playingInfo->SetIgnoreBookmark(false);
+            m_playerCtx->m_playingInfo->SetIgnoreProgStart(true);
+            m_playerCtx->m_playingInfo->SetAllowLastPlayPos(false);
+        }
+    }
+    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
+    m_commBreakMap.LoadMap(m_playerCtx, m_framesPlayed);
 }
 
 bool MythPlayerUI::VideoLoop()
@@ -391,6 +502,32 @@ void MythPlayerUI::RenderVideoFrame(MythVideoFrame *Frame, FrameScanType Scan, b
     m_videoOutput->EndFrame();
 }
 
+void MythPlayerUI::FileChanged()
+{
+    m_fileChanged = false;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "FileChanged");
+
+    Pause();
+    ChangeSpeed();
+    if (dynamic_cast<AvFormatDecoder *>(m_decoder))
+        m_playerCtx->m_buffer->Reset(false, true);
+    else
+        m_playerCtx->m_buffer->Reset(false, true, true);
+    SetEof(kEofStateNone);
+    Play();
+
+    m_playerCtx->SetPlayerChangingBuffers(false);
+
+    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+    m_playerCtx->m_tvchain->SetProgram(*m_playerCtx->m_playingInfo);
+    if (m_decoder)
+        m_decoder->SetProgramInfo(*m_playerCtx->m_playingInfo);
+    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
+
+    CheckTVChain();
+    m_forcePositionMapSync = true;
+}
+
 void MythPlayerUI::RefreshPauseFrame()
 {
     if (m_needNewPauseFrame)
@@ -404,7 +541,7 @@ void MythPlayerUI::RefreshPauseFrame()
             {
                 m_osdLock.lock();
                 if (m_osd)
-                    DeleteMap::UpdateOSD(GetLatestVideoTimecode(), m_osd);
+                    DeleteMap::UpdateOSD(m_latestVideoTimecode, m_osd);
                 m_osdLock.unlock();
             }
         }
@@ -538,6 +675,88 @@ void MythPlayerUI::SetVideoParams(int Width, int Height, double FrameRate, float
     FrameScanType newscan = DetectInterlace(Scan, static_cast<float>(m_videoFrameRate), m_videoDispDim.height());
     SetScanType(newscan, m_videoOutput, m_frameInterval);
     ResetTracker();
+}
+
+bool MythPlayerUI::DoFastForwardSecs(float Seconds, double Inaccuracy, bool UseCutlist)
+{
+    float current = ComputeSecs(m_framesPlayed, UseCutlist);
+    uint64_t targetFrame = FindFrame(current + Seconds, UseCutlist);
+    return DoFastForward(targetFrame - m_framesPlayed, Inaccuracy);
+}
+
+bool MythPlayerUI::DoRewindSecs(float Seconds, double Inaccuracy, bool UseCutlist)
+{
+    float target = qMax(0.0F, ComputeSecs(m_framesPlayed, UseCutlist) - Seconds);
+    uint64_t targetFrame = FindFrame(target, UseCutlist);
+    return DoRewind(m_framesPlayed - targetFrame, Inaccuracy);
+}
+
+/**
+ *  \brief Determines if the recording should be considered watched
+ *
+ *   By comparing the number of framesPlayed to the total number of
+ *   frames in the video minus an offset (14%) we determine if the
+ *   recording is likely to have been watched to the end, ignoring
+ *   end credits and trailing adverts.
+ *
+ *   PlaybackInfo::SetWatchedFlag is then called with the argument TRUE
+ *   or FALSE accordingly.
+ *
+ *   \param forceWatched Forces a recording watched ignoring the amount
+ *                       actually played (Optional)
+ */
+void MythPlayerUI::SetWatched(bool ForceWatched)
+{
+    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+    if (!m_playerCtx->m_playingInfo)
+    {
+        m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
+        return;
+    }
+
+    uint64_t numFrames = GetCurrentFrameCount();
+
+    // For recordings we want to ignore the post-roll and account for
+    // in-progress recordings where totalFrames doesn't represent
+    // the full length of the recording. For videos we can only rely on
+    // totalFrames as duration metadata can be wrong
+    if (m_playerCtx->m_playingInfo->IsRecording() &&
+        m_playerCtx->m_playingInfo->QueryTranscodeStatus() != TRANSCODING_COMPLETE)
+    {
+
+        // If the recording is stopped early we need to use the recording end
+        // time, not the programme end time
+        ProgramInfo* pi  = m_playerCtx->m_playingInfo;
+        qint64 starttime = pi->GetRecordingStartTime().toSecsSinceEpoch();
+        qint64 endactual = pi->GetRecordingEndTime().toSecsSinceEpoch();
+        qint64 endsched  = pi->GetScheduledEndTime().toSecsSinceEpoch();
+        qint64 endtime   = std::min(endactual, endsched);
+        numFrames = static_cast<uint64_t>((endtime - starttime) * m_videoFrameRate);
+    }
+
+    auto offset = static_cast<int>(round(0.14 * (numFrames / m_videoFrameRate)));
+
+    if (offset < 240)
+        offset = 240; // 4 Minutes Min
+    else if (offset > 720)
+        offset = 720; // 12 Minutes Max
+
+    if (ForceWatched || (m_framesPlayed > (numFrames - (offset * m_videoFrameRate))))
+    {
+        m_playerCtx->m_playingInfo->SaveWatched(true);
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Marking recording as watched using offset %1 minutes")
+            .arg(offset/60));
+    }
+
+    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
+}
+
+void MythPlayerUI::SetBookmark(bool Clear)
+{
+    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
+    if (m_playerCtx->m_playingInfo)
+        m_playerCtx->m_playingInfo->SaveBookmark(Clear ? 0 : m_framesPlayed);
+    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
 bool MythPlayerUI::CanSupportDoubleRate()
@@ -753,6 +972,25 @@ void MythPlayerUI::DisableEdit(int HowToSave)
         Play(m_speedBeforeEdit);
     else
         SetOSDStatus(tr("Paused"), kOSDTimeout_None);
+}
+
+void MythPlayerUI::HandleArbSeek(bool Direction)
+{
+    if (qFuzzyCompare(m_deleteMap.GetSeekAmount() + 1000.0F, 1000.0F -2.0F))
+    {
+        uint64_t framenum = m_deleteMap.GetNearestMark(m_framesPlayed, Direction);
+        if (Direction && (framenum > m_framesPlayed))
+            DoFastForward(framenum - m_framesPlayed, kInaccuracyNone);
+        else if (!Direction && (m_framesPlayed > framenum))
+            DoRewind(m_framesPlayed - framenum, kInaccuracyNone);
+    }
+    else
+    {
+        if (Direction)
+            DoFastForward(2, kInaccuracyFull);
+        else
+            DoRewind(2, kInaccuracyFull);
+    }
 }
 
 bool MythPlayerUI::HandleProgramEditorActions(QStringList& Actions)

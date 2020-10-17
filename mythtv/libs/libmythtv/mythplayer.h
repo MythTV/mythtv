@@ -1,4 +1,4 @@
-#ifndef MYTHPLAYER_H
+﻿#ifndef MYTHPLAYER_H
 #define MYTHPLAYER_H
 
 // Std
@@ -115,6 +115,11 @@ class MTV_PUBLIC MythPlayer : public QObject
     friend class TV;
     friend class Transcode;
 
+  signals:
+    void CheckCallbacks();
+    void SeekingSlow(int Count);
+    void SeekingComplete();
+
   public:
     explicit MythPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
    ~MythPlayer() override;
@@ -130,7 +135,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     void SetFramesPlayed(uint64_t played);
     void SetEof(EofState eof);
     void SetWatchingRecording(bool mode);
-    void SetWatched(bool forceWatched = false);
     void SetKeyframeDistance(int keyframedistance);
     virtual void SetVideoParams(int w, int h, double fps, float aspect,
                         bool ForceUpdate, int ReferenceFrames,
@@ -139,7 +143,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     void SetFileLength(int total, int frames);
     void SetDuration(int duration);
     void SetVideoResize(const QRect &videoRect);
-    void ForceDeinterlacer(bool DoubleRate, MythDeintType Deinterlacer);
     void SetFrameRate(double fps);
 
     // Gets
@@ -160,15 +163,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     uint64_t GetTotalFrameCount(void) const   { return m_totalFrames; }
     uint64_t GetCurrentFrameCount(void) const;
     uint64_t GetFramesPlayed(void) const      { return m_framesPlayed; }
-    // GetSecondsPlayed() and GetTotalSeconds() internally calculate
-    // in terms of milliseconds and divide the result by 1000.  This
-    // divisor can be passed in as an argument, e.g. pass divisor=1 to
-    // return the time in milliseconds.
-    virtual  int64_t GetSecondsPlayed(bool honorCutList,
-                                      int divisor = 1000);
-    virtual  int64_t GetTotalSeconds(bool honorCutList,
-                                     int divisor = 1000) const;
-    int64_t  GetLatestVideoTimecode() const   { return m_latestVideoTimecode; }
     virtual  uint64_t GetBookmark(void);
     QString   GetError(void) const;
     QString   GetEncodingType(void) const;
@@ -184,13 +178,11 @@ class MTV_PUBLIC MythPlayer : public QObject
     bool    AtNormalSpeed(void) const         { return m_nextNormalSpeed; }
     bool    IsReallyNearEnd(void) const;
     bool    IsNearEnd(void);
-    bool    UsingNullVideo(void) const { return FlagIsSet(kVideoIsNull); }
     bool    HasTVChainNext(void) const;
     bool    IsWatchingInprogress(void) const;
 
     InteractiveTV *GetInteractiveTV(void);
     MythVideoOutput *GetVideoOutput(void)       { return m_videoOutput; }
-    MythCodecContext *GetMythCodecContext(void) { return m_decoder->GetMythCodecContext(); }
 
     // Title stuff
     virtual bool SwitchTitle(int /*title*/) { return false; }
@@ -205,11 +197,9 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Decoder stuff..
     const VideoFrameTypes* DirectRenderFormats(void);
     MythVideoFrame *GetNextVideoFrame(void);
-    MythVideoFrame *GetCurrentFrame(int &w, int &h);
     void DeLimboFrame(MythVideoFrame *frame);
     virtual void ReleaseNextVideoFrame(MythVideoFrame *buffer, int64_t timecode,
                                        bool wrap = true);
-    void ReleaseCurrentFrame(MythVideoFrame *frame);
     void DiscardVideoFrame(MythVideoFrame *buffer);
     void DiscardVideoFrames(bool KeyFrame, bool Flushed);
     /// Returns the stream decoder currently in use.
@@ -217,8 +207,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual bool HasReachedEof(void) const;
     void SetDisablePassThrough(bool disabled);
     void ForceSetupAudioStream(void);
-    // need to refactor away calls to this from MythPlayer
-    virtual void ProcessCallbacks(void) {}
 
     // Add data
     virtual bool PrepareAudioSample(int64_t &timecode);
@@ -302,14 +290,9 @@ class MTV_PUBLIC MythPlayer : public QObject
   protected:
     // Initialization
     void OpenDummy(void);
-
-    // Non-public sets
-    virtual void SetBookmark(bool clear = false);
-
     void Zoom(ZoomDirection direction);
     void ToggleMoveBottomLine(void);
     void SaveBottomLine(void);
-    void FileChanged(void);
 
     // Non-const gets
     OSD         *GetOSD(void)               { return m_osd;       }
@@ -317,7 +300,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Complicated gets
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
-    virtual void calcSliderPos(osdInfo &info, bool paddedFields = false);
     uint64_t TranslatePositionFrameToMs(uint64_t position,
                                         bool use_cutlist) const;
     uint64_t TranslatePositionMsToFrame(uint64_t position,
@@ -353,9 +335,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
 
     // Start/Reset/Stop playing
-    virtual bool StartPlaying(void);
     virtual void ResetPlaying(bool resetframes = true);
-    virtual void EndPlaying(void) { }
     virtual void StopPlaying(void);
 
     // Pause stuff
@@ -376,17 +356,12 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual bool PrebufferEnoughFrames(int min_buffers = 0);
     void         SetBuffering(bool new_buffering);
     void         CheckAspectRatio(MythVideoFrame* frame);
-    virtual void DisplayPauseFrame(void) { } // FIXME
-    virtual void PreProcessNormalFrame(void);
-    virtual void VideoStart(void);
     virtual void VideoEnd(void);
     virtual void DecoderStart(bool start_paused);
     virtual void DecoderLoop(bool pause);
     virtual void DecoderEnd(void);
     virtual void DecoderPauseCheck(void);
     virtual void AudioEnd(void);
-    virtual void EventStart(void);
-    virtual void InitialSeek(void);
 
     // Protected MHEG/MHI stuff
     bool ITVHandleAction(const QString &action);
@@ -433,19 +408,11 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Teletext NUV Captions
     void SetTeletextPage(uint page);
 
-    // Time Code adjustment stuff
-    int64_t AdjustAudioTimecodeOffset(int64_t v, int newsync = -9999);
-    int64_t GetAudioTimecodeOffset(void) const
-        { return m_tcWrap[TC_AUDIO]; }
-
   protected:
     // Private Sets
     void SetPlayingInfo(const ProgramInfo &pginfo);
     void SetPlaying(bool is_playing);
     void ResetErrored(void);
-
-    // Private Gets
-    int  GetStatusbarPos(void) const;
 
     // Private pausing stuff
     void PauseVideo(void);
@@ -469,8 +436,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // The "inaccuracy" argument is generally one of the kInaccuracy* values.
     bool DoFastForward(uint64_t frames, double inaccuracy);
     bool DoRewind(uint64_t frames, double inaccuracy);
-    bool DoFastForwardSecs(float secs, double inaccuracy, bool use_cutlist);
-    bool DoRewindSecs(float secs, double inaccuracy, bool use_cutlist);
     void DoJumpToFrame(uint64_t frame, double inaccuracy);
 
     // Private seeking stuff
@@ -481,9 +446,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Private chapter stuff
     virtual bool DoJumpChapter(int chapter);
     virtual int64_t GetChapter(int chapter);
-
-    // Private edit stuff
-    void HandleArbSeek(bool right);
 
     // Private A/V Sync Stuff
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);

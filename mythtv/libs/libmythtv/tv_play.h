@@ -339,6 +339,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
    ~TV() override;
     PlayerContext*  GetPlayerContext();
     bool CreatePlayer(TVState State, bool Muted = false);
+    bool StartPlaying(int MaxWait = -1);
 
     // Private initialisation
     static TV* AcquireRelease(int& RefCount, bool Acquire, bool Create = false);
@@ -563,6 +564,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void UpdateOSDInput();
     void UpdateOSDSignal(const QStringList &List);
     void UpdateOSDTimeoutMessage();
+    bool CalcPlayerSliderPosition(osdInfo &info, bool paddedFields = false) const;
 
     // Captions/subtitles
     bool SubtitleZoomHandleAction(const QStringList& Actions);

@@ -53,7 +53,6 @@ class MTV_PUBLIC PlayerContext
 
     // Actions
     void TeardownPlayer(void);
-    bool StartPlaying(int maxWait = -1);
     void StopPlaying(void) const;
     void UpdateTVChain(const QStringList &data = QStringList());
     bool ReloadTVChain(void);
@@ -93,8 +92,6 @@ class MTV_PUBLIC PlayerContext
 
     // Gets
     QString  GetPreviousChannel(void) const;
-    bool     CalcPlayerSliderPosition(osdInfo &info,
-                                   bool paddedFields = false) const;
     uint     GetCardID(void) const { return m_lastCardid; }
     QString  GetFilters(const QString &baseFilters) const;
     QString  GetPlayMessage(void) const;
@@ -111,8 +108,6 @@ class MTV_PUBLIC PlayerContext
     /// This is set if the player encountered some irrecoverable error.
     bool IsErrored(void) const { return m_errored; }
     bool IsSameProgram(const ProgramInfo &p) const;
-    bool IsValidLiveTV(void) const
-        { return m_player && m_tvchain && m_recorder && m_buffer; }
 
   public:
     QString             m_recUsage;

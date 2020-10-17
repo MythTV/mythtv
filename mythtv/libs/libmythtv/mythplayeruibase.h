@@ -4,7 +4,7 @@
 // MythTV
 #include "mythplayer.h"
 
-class MythPlayerUIBase : public MythPlayer
+class MTV_PUBLIC MythPlayerUIBase : public MythPlayer
 {
     Q_OBJECT
 

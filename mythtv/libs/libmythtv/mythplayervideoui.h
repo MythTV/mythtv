@@ -28,7 +28,7 @@ class DecoderCallback
     void* m_opaque3     { nullptr };
 };
 
-class MythPlayerVideoUI : public MythPlayerAudioUI
+class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerAudioUI
 {
     Q_OBJECT
 
@@ -38,7 +38,9 @@ class MythPlayerVideoUI : public MythPlayerAudioUI
 
     void HandleDecoderCallback(const QString& Debug, DecoderCallback::Callback Function,
                                void* Opaque1, void* Opaque2);
-    void ProcessCallbacks() override;
+
+  public slots:
+    void ProcessCallbacks();
 
   protected slots:
     void WindowResized(const QSize& /*Size*/);

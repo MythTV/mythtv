@@ -198,12 +198,12 @@ class OSD
     void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout);
 
   private:
-    MythPlayerUI *m_parent       { nullptr };
-    QObject        *m_parentObject      { nullptr };
-    MythPainter    *m_currentPainter    { nullptr };
+    MythPlayerUI*   m_parent            { nullptr };
+    QObject*        m_parentObject      { nullptr };
+    MythPainter*    m_currentPainter    { nullptr };
     QRect           m_rect              { };
     int             m_fadeTime          { kOSDFadeTime };
-    MythScreenType *m_dialog            { nullptr };
+    MythScreenType* m_dialog            { nullptr };
     QString         m_pulsedDialogText  { };
     QDateTime       m_nextPulseUpdate   { };
     bool            m_refresh           { false };

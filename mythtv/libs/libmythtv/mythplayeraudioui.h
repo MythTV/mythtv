@@ -6,7 +6,7 @@
 #include "audiooutputgraph.h"
 #include "mythplayeroverlayui.h"
 
-class MythPlayerAudioUI : public MythPlayerOverlayUI
+class MTV_PUBLIC MythPlayerAudioUI : public MythPlayerOverlayUI
 {
     Q_OBJECT
 
@@ -35,6 +35,8 @@ class MythPlayerAudioUI : public MythPlayerOverlayUI
     bool      EnableUpmix(bool Enable, bool Toggle = false);
     void      PauseAudioUntilBuffered();
     void      SetupAudioOutput(float TimeStretch);
+    int64_t   AdjustAudioTimecodeOffset(int64_t Delta, int Value = -9999);
+    int64_t   GetAudioTimecodeOffset() const;
 
   private:
     Q_DISABLE_COPY(MythPlayerAudioUI)

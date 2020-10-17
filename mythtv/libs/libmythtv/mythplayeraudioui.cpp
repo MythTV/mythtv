@@ -146,3 +146,18 @@ void MythPlayerAudioUI::SetupAudioOutput(float TimeStretch)
     m_audio.SetStretchFactor(TimeStretch);
 }
 
+int64_t MythPlayerAudioUI::AdjustAudioTimecodeOffset(int64_t Delta, int Value)
+{
+    if ((Value >= -1000) && (Value <= 1000))
+        m_tcWrap[TC_AUDIO] = Value;
+    else
+        m_tcWrap[TC_AUDIO] += Delta;
+    return m_tcWrap[TC_AUDIO];
+}
+
+int64_t MythPlayerAudioUI::GetAudioTimecodeOffset() const
+{
+    return m_tcWrap[TC_AUDIO];
+}
+
+

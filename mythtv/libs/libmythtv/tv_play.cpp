@@ -298,7 +298,46 @@ bool TV::CreatePlayer(TVState State, bool Muted)
     m_playerContext.SetPlayer(player);
     player->ReinitAudio();
     m_player = player;
-    return m_playerContext.StartPlaying(-1);
+    return StartPlaying(-1);
+}
+
+/** \fn PlayerContext::StartPlaying(int)
+ *  \brief Starts player, must be called after StartRecorder().
+ *  \param maxWait How long to wait for MythPlayer to start playing.
+ *  \return true when successful, false otherwise.
+ */
+bool TV::StartPlaying(int MaxWait)
+{
+    if (!m_player)
+        return false;
+
+    if (!m_player->StartPlaying())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "StartPlaying() Failed to start player");
+        // no need to call StopPlaying here as the player context will be deleted
+        // later following the error
+        return false;
+    }
+    MaxWait = (MaxWait <= 0) ? 20000 : MaxWait;
+#ifdef USING_VALGRIND
+    maxWait = (1<<30);
+#endif // USING_VALGRIND
+    MythTimer t;
+    t.start();
+
+    while (!m_player->IsPlaying(50, true) && (t.elapsed() < MaxWait))
+        m_playerContext.ReloadTVChain();
+
+    if (m_player->IsPlaying())
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("StartPlaying(): took %1 ms to start player.")
+                .arg(t.elapsed()));
+        return true;
+    }
+    LOG(VB_GENERAL, LOG_ERR, LOC + "StartPlaying() Failed to start player");
+    m_playerContext.StopPlaying();
+    return false;
 }
 
 void TV::StopPlayback()
@@ -1411,7 +1450,7 @@ void TV::GetStatus()
     }
     m_playerContext.UnlockPlayingInfo(__FILE__, __LINE__);
     osdInfo info;
-    m_playerContext.CalcPlayerSliderPosition(info);
+    CalcPlayerSliderPosition(info);
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
     {
@@ -2711,7 +2750,7 @@ bool TV::HandleLCDTimerEvent()
         if (showProgress)
         {
             osdInfo info;
-            if (m_playerContext.CalcPlayerSliderPosition(info)) {
+            if (CalcPlayerSliderPosition(info)) {
                 progress = info.values["position"] * 0.001F;
 
                 lcd_time_string = info.text["playedtime"] + " / " + info.text["totaltime"];
@@ -4294,7 +4333,7 @@ void TV::SetBookmark(bool Clear)
         {
             m_player->SetBookmark();
             osdInfo info;
-            m_playerContext.CalcPlayerSliderPosition(info);
+            CalcPlayerSliderPosition(info);
             info.text["title"] = tr("Position");
             UpdateOSDStatus(info, kOSDFunctionalType_Default, kOSDTimeout_Med);
             SetOSDMessage(tr("Bookmark Saved"));
@@ -4758,7 +4797,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             }
 
             osdInfo info;
-            m_playerContext.CalcPlayerSliderPosition(info, true);
+            CalcPlayerSliderPosition(info, true);
 
             QDateTime respDate = MythDate::current(true);
             QString infoStr = "";
@@ -5704,7 +5743,7 @@ void TV::DoSkipCommercials(int Direction)
     PauseAudioUntilBuffered();
 
     osdInfo info;
-    m_playerContext.CalcPlayerSliderPosition(info);
+    CalcPlayerSliderPosition(info);
     info.text["title"] = tr("Skip");
     info.text["description"] = tr("Searching");
     UpdateOSDStatus(info, kOSDFunctionalType_Default, kOSDTimeout_Med);
@@ -6541,7 +6580,7 @@ void TV::ToggleOSD(bool IncludeStatusOSD)
     if (showStatus)
     {
         osdInfo info;
-        if (m_playerContext.CalcPlayerSliderPosition(info))
+        if (CalcPlayerSliderPosition(info))
         {
             info.text["title"] = (paused ? tr("Paused") : tr("Position"));
             UpdateOSDStatus(info, kOSDFunctionalType_Default,
@@ -6652,7 +6691,7 @@ void TV::UpdateOSDSeekMessage(const QString &Msg, enum OSDTimeout Timeout)
     LOG(VB_PLAYBACK, LOG_INFO, QString("UpdateOSDSeekMessage(%1, %2)").arg(Msg).arg(Timeout));
 
     osdInfo info;
-    if (m_playerContext.CalcPlayerSliderPosition(info))
+    if (CalcPlayerSliderPosition(info))
     {
         int osdtype = (m_doSmartForward) ? kOSDFunctionalType_SmartForward : kOSDFunctionalType_Default;
         info.text["title"] = Msg;
@@ -6892,6 +6931,19 @@ void TV::UpdateOSDTimeoutMessage()
     osd->DialogBack("", action, true);
 
     ReturnOSDLock();
+}
+
+bool TV::CalcPlayerSliderPosition(osdInfo &info, bool paddedFields) const
+{
+    bool result = false;
+    GetPlayerReadLock();
+    if (m_player)
+    {
+        m_player->UpdateSliderInfo(info, paddedFields);
+        result = true;
+    }
+    ReturnPlayerLock();
+    return result;
 }
 
 void TV::UpdateLCD()

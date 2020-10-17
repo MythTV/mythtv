@@ -846,8 +846,8 @@ int Transcode::TranscodeFile(const QString &inputname,
     }
 
     // must come after InitForTranscode - which creates the VideoOutput instance
-    if (m_hlsMode)
-        player->ForceDeinterlacer(false, DEINT_CPU | DEINT_MEDIUM);
+    if (m_hlsMode && player->GetVideoOutput())
+        player->GetVideoOutput()->SetDeinterlacing(true, false, DEINT_CPU | DEINT_MEDIUM);
 
     MythVideoFrame frame;
     // Do not use padding when compressing to RTjpeg or when in fifomode.

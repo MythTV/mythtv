@@ -4,13 +4,15 @@
 // MythTV
 #include "mythplayeruibase.h"
 
-class MythPlayerOverlayUI : public MythPlayerUIBase
+class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
 {
     Q_OBJECT
 
   public:
     MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerOverlayUI() override = default;
+
+    virtual void UpdateSliderInfo(osdInfo& Info, bool PaddedFields = false);
 
   protected slots:
     void UpdateOSDMessage (const QString& Message);
@@ -22,6 +24,10 @@ class MythPlayerOverlayUI : public MythPlayerUIBase
                            int Position, OSDTimeout Timeout);
     void ChangeOSDPositionUpdates(bool Enable);
     void UpdateOSDPosition();
+
+  protected:
+    virtual int64_t GetSecondsPlayed(bool HonorCutList, int Divisor = 1000);
+    virtual int64_t GetTotalSeconds(bool HonorCutList, int Divisor = 1000) const;
 
   private:
     Q_DISABLE_COPY(MythPlayerOverlayUI)

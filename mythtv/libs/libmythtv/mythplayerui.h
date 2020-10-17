@@ -15,21 +15,29 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
   public:
     MythPlayerUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
+    bool StartPlaying();
+    virtual void InitialSeek();
     virtual void EventLoop();
-    void ReinitVideo(bool ForceUpdate) override;
-    void VideoStart() override;
+    void         ReinitVideo(bool ForceUpdate) override;
+    virtual void VideoStart();
+    virtual void EventStart();
     virtual bool VideoLoop();
+    virtual void PreProcessNormalFrame();
     void ChangeSpeed() override;
     void ReleaseNextVideoFrame(MythVideoFrame* Frame, int64_t Timecode, bool Wrap = true) override;
     void SetVideoParams(int Width, int Height, double FrameRate, float Aspect,
                         bool ForceUpdate, int ReferenceFrames,
                         FrameScanType Scan = kScan_Ignore,
                         const QString& CodecName = QString()) override;
+    bool DoFastForwardSecs(float Seconds, double Inaccuracy, bool UseCutlist);
+    bool DoRewindSecs(float Seconds, double Inaccuracy, bool UseCutlist);
     void GetPlaybackData(InfoMap& Map);
     void GetCodecDescription(InfoMap& Map);
     void ToggleAdjustFill(AdjustFillMode Mode = kAdjustFill_Toggle);
     void EnableFrameRateMonitor(bool Enable = false);
     bool CanSupportDoubleRate();
+    void SetWatched(bool ForceWatched = false);
+    virtual void SetBookmark(bool Clear = false);
 
     // FIXME - should be private
     DetectLetterbox m_detectLetterBox { this };
@@ -46,13 +54,15 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     bool DeleteMapHasRedo();
     QString DeleteMapGetUndoMessage();
     QString DeleteMapGetRedoMessage();
+    void HandleArbSeek(bool Direction);
     // End editor stuff
 
   protected:
     void InitFrameInterval() override;
-    void DisplayPauseFrame() override;
+    virtual void DisplayPauseFrame();
     virtual void DisplayNormalFrame(bool CheckPrebuffer = true);
 
+    void FileChanged();
     void RefreshPauseFrame();
     void RenderVideoFrame(MythVideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
     void DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due);

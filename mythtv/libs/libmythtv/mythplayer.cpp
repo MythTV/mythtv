@@ -26,7 +26,6 @@
 #include "mythplayer.h"
 #include "DetectLetterbox.h"
 #include "audioplayer.h"
-#include "interactivescreen.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"
 #include "livetvchain.h"
@@ -171,8 +170,7 @@ void MythPlayer::SetWatchingRecording(bool mode)
 
 bool MythPlayer::IsWatchingInprogress(void) const
 {
-    return m_watchingRecording && m_playerCtx->m_recorder &&
-        m_playerCtx->m_recorder->IsValidRecorder();
+    return m_watchingRecording && m_playerCtx->m_recorder && m_playerCtx->m_recorder->IsValidRecorder();
 }
 
 void MythPlayer::PauseBuffer(void)
@@ -758,33 +756,10 @@ bool MythPlayer::HasReachedEof(void) const
     return false;
 }
 
-MythVideoFrame *MythPlayer::GetCurrentFrame(int &w, int &h)
-{
-    w = m_videoDim.width();
-    h = m_videoDim.height();
-
-    MythVideoFrame *retval = nullptr;
-
-    m_vidExitLock.lock();
-    if (m_videoOutput)
-        retval = m_videoOutput->GetLastShownFrame();
-
-    if (!retval)
-        m_vidExitLock.unlock();
-
-    return retval;
-}
-
 void MythPlayer::DeLimboFrame(MythVideoFrame *frame)
 {
     if (m_videoOutput)
         m_videoOutput->DeLimboFrame(frame);
-}
-
-void MythPlayer::ReleaseCurrentFrame(MythVideoFrame *frame)
-{
-    if (frame)
-        m_vidExitLock.unlock();
 }
 
 void MythPlayer::EnableTeletext(int page)
@@ -1420,44 +1395,6 @@ void MythPlayer::CheckAspectRatio(MythVideoFrame* frame)
     }
 }
 
-void MythPlayer::PreProcessNormalFrame(void)
-{
-#ifdef USING_MHEG
-    // handle Interactive TV
-    if (GetInteractiveTV())
-    {
-        m_osdLock.lock();
-        m_itvLock.lock();
-        if (m_osd && m_videoOutput->GetOSDPainter())
-        {
-            auto *window =
-                qobject_cast<InteractiveScreen *>(m_osd->GetWindow(OSD_WIN_INTERACT));
-            if ((m_interactiveTV->ImageHasChanged() || !m_itvVisible) && window)
-            {
-                m_interactiveTV->UpdateOSD(window, m_videoOutput->GetOSDPainter());
-                m_itvVisible = true;
-            }
-        }
-        m_itvLock.unlock();
-        m_osdLock.unlock();
-    }
-#endif // USING_MHEG
-}
-
-void MythPlayer::ForceDeinterlacer(bool DoubleRate, MythDeintType Deinterlacer)
-{
-    if (m_videoOutput)
-        m_videoOutput->SetDeinterlacing(true, DoubleRate, Deinterlacer);
-}
-
-void MythPlayer::VideoStart(void)
-{
-    SetPlaying(true);
-    ClearAfterSeek(false);
-    m_avSync.InitAVSync();
-    InitFrameInterval();
-}
-
 void MythPlayer::VideoEnd(void)
 {
     m_osdLock.lock();
@@ -1688,33 +1625,6 @@ void MythPlayer::FileChangedCallback(void)
     m_fileChanged = true;
 }
 
-// Called from the player thread.
-void MythPlayer::FileChanged(void)
-{
-    m_fileChanged = false;
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "FileChanged");
-
-    Pause();
-    ChangeSpeed();
-    if (dynamic_cast<AvFormatDecoder *>(m_decoder))
-        m_playerCtx->m_buffer->Reset(false, true);
-    else
-        m_playerCtx->m_buffer->Reset(false, true, true);
-    SetEof(kEofStateNone);
-    Play();
-
-    m_playerCtx->SetPlayerChangingBuffers(false);
-
-    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
-    m_playerCtx->m_tvchain->SetProgram(*m_playerCtx->m_playingInfo);
-    if (m_decoder)
-        m_decoder->SetProgramInfo(*m_playerCtx->m_playingInfo);
-    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
-
-    CheckTVChain();
-    m_forcePositionMapSync = true;
-}
-
 void MythPlayer::JumpToProgram(void)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - start");
@@ -1849,56 +1759,6 @@ void MythPlayer::JumpToProgram(void)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - end");
 }
 
-bool MythPlayer::StartPlaying(void)
-{
-    if (OpenFile() < 0)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to open video file.");
-        return false;
-    }
-
-    m_framesPlayed = 0;
-    m_rewindTime = m_ffTime = 0;
-    m_nextPlaySpeed = m_audio.GetStretchFactor();
-    m_jumpChapter = 0;
-    m_commBreakMap.SkipCommercials(0);
-    m_bufferingCounter=0;
-
-    if (!InitVideo())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Unable to initialize video.");
-        m_audio.DeleteOutput();
-        return false;
-    }
-
-    bool seek = m_bookmarkSeek > 30;
-    EventStart();
-    DecoderStart(true);
-    if (seek)
-        InitialSeek();
-    VideoStart();
-
-    m_playerThread->setPriority(QThread::TimeCriticalPriority);
-#ifdef Q_OS_ANDROID
-    setpriority(PRIO_PROCESS, m_playerThreadId, -20);
-#endif
-    ProcessCallbacks();
-    UnpauseDecoder();
-    return !IsErrored();
-}
-
-void MythPlayer::InitialSeek(void)
-{
-    // TODO handle initial commskip and/or cutlist skip as well
-    if (m_bookmarkSeek > 30)
-    {
-        DoJumpToFrame(m_bookmarkSeek, kInaccuracyNone);
-        if (m_clearSavedPosition)
-            SetBookmark(true);
-    }
-}
-
-
 void MythPlayer::StopPlaying()
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("StopPlaying - begin"));
@@ -1907,30 +1767,12 @@ void MythPlayer::StopPlaying()
     setpriority(PRIO_PROCESS, m_playerThreadId, 0);
 #endif
 
-    ProcessCallbacks();
+    emit CheckCallbacks();
     DecoderEnd();
     VideoEnd();
     AudioEnd();
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("StopPlaying - end"));
-}
-
-void MythPlayer::EventStart(void)
-{
-    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
-    {
-        if (m_playerCtx->m_playingInfo)
-        {
-            // When initial playback gets underway, we override the ProgramInfo
-            // flags such that future calls to GetBookmark() will consider only
-            // an actual bookmark and not progstart or lastplaypos information.
-            m_playerCtx->m_playingInfo->SetIgnoreBookmark(false);
-            m_playerCtx->m_playingInfo->SetIgnoreProgStart(true);
-            m_playerCtx->m_playingInfo->SetAllowLastPlayPos(false);
-        }
-    }
-    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
-    m_commBreakMap.LoadMap(m_playerCtx, m_framesPlayed);
 }
 
 void MythPlayer::AudioEnd(void)
@@ -1954,7 +1796,7 @@ bool MythPlayer::PauseDecoder(void)
     while (m_decoderThread && !m_killDecoder && (tries++ < 100) &&
            !m_decoderThreadPause.wait(&m_decoderPauseLock, 100))
     {
-        ProcessCallbacks();
+        emit CheckCallbacks();
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Waited 100ms for decoder to pause");
     }
     m_pauseDecoder = false;
@@ -1981,7 +1823,7 @@ void MythPlayer::UnpauseDecoder(void)
         while (m_decoderThread && !m_killDecoder && (tries++ < 100) &&
                !m_decoderThreadUnpause.wait(&m_decoderPauseLock, 100))
         {
-            ProcessCallbacks();
+            emit CheckCallbacks();
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Waited 100ms for decoder to unpause");
         }
         m_unpauseDecoder = false;
@@ -2255,15 +2097,6 @@ bool MythPlayer::DoGetFrame(DecodeType Type)
     return ret;
 }
 
-int64_t MythPlayer::AdjustAudioTimecodeOffset(int64_t v, int newsync)
-{
-    if ((newsync >= -1000) && (newsync <= 1000))
-        m_tcWrap[TC_AUDIO] = newsync;
-    else
-        m_tcWrap[TC_AUDIO] += v;
-    return m_tcWrap[TC_AUDIO];
-}
-
 void MythPlayer::WrapTimecode(int64_t &timecode, TCTypes tc_type)
 {
     timecode += m_tcWrap[tc_type];
@@ -2273,76 +2106,6 @@ bool MythPlayer::PrepareAudioSample(int64_t &timecode)
 {
     WrapTimecode(timecode, TC_AUDIO);
     return false;
-}
-
-/**
- *  \brief Determines if the recording should be considered watched
- *
- *   By comparing the number of framesPlayed to the total number of
- *   frames in the video minus an offset (14%) we determine if the
- *   recording is likely to have been watched to the end, ignoring
- *   end credits and trailing adverts.
- *
- *   PlaybackInfo::SetWatchedFlag is then called with the argument TRUE
- *   or FALSE accordingly.
- *
- *   \param forceWatched Forces a recording watched ignoring the amount
- *                       actually played (Optional)
- */
-void MythPlayer::SetWatched(bool forceWatched)
-{
-    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
-    if (!m_playerCtx->m_playingInfo)
-    {
-        m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
-        return;
-    }
-
-    uint64_t numFrames = GetCurrentFrameCount();
-
-    // For recordings we want to ignore the post-roll and account for
-    // in-progress recordings where totalFrames doesn't represent
-    // the full length of the recording. For videos we can only rely on
-    // totalFrames as duration metadata can be wrong
-    if (m_playerCtx->m_playingInfo->IsRecording() &&
-        m_playerCtx->m_playingInfo->QueryTranscodeStatus() !=
-        TRANSCODING_COMPLETE)
-    {
-
-        // If the recording is stopped early we need to use the recording end
-        // time, not the programme end time
-        ProgramInfo *pi = m_playerCtx->m_playingInfo;
-        qint64 starttime = pi->GetRecordingStartTime().toSecsSinceEpoch();
-        qint64 endactual = pi->GetRecordingEndTime().toSecsSinceEpoch();
-        qint64 endsched = pi->GetScheduledEndTime().toSecsSinceEpoch();
-        qint64 endtime = std::min(endactual, endsched);
-        numFrames = (long long) ((endtime - starttime) * m_videoFrameRate);
-    }
-
-    int offset = (int) round(0.14 * (numFrames / m_videoFrameRate));
-
-    if (offset < 240)
-        offset = 240; // 4 Minutes Min
-    else if (offset > 720)
-        offset = 720; // 12 Minutes Max
-
-    if (forceWatched || m_framesPlayed > numFrames - (offset * m_videoFrameRate))
-    {
-        m_playerCtx->m_playingInfo->SaveWatched(true);
-        LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Marking recording as watched using offset %1 minutes")
-            .arg(offset/60));
-    }
-
-    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
-}
-
-void MythPlayer::SetBookmark(bool clear)
-{
-    m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
-    if (m_playerCtx->m_playingInfo)
-        m_playerCtx->m_playingInfo->SaveBookmark(clear ? 0 : m_framesPlayed);
-    m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
 uint64_t MythPlayer::GetBookmark(void)
@@ -2460,16 +2223,6 @@ bool MythPlayer::DoRewind(uint64_t frames, double inaccuracy)
     m_rewindTime = 0;
     ClearAfterSeek();
     return true;
-}
-
-bool MythPlayer::DoRewindSecs(float secs, double inaccuracy, bool use_cutlist)
-{
-    float current = ComputeSecs(m_framesPlayed, use_cutlist);
-    float target = current - secs;
-    if (target < 0)
-        target = 0;
-    uint64_t targetFrame = FindFrame(target, use_cutlist);
-    return DoRewind(m_framesPlayed - targetFrame, inaccuracy);
 }
 
 /**
@@ -2655,15 +2408,6 @@ bool MythPlayer::DoFastForward(uint64_t frames, double inaccuracy)
     return true;
 }
 
-bool MythPlayer::DoFastForwardSecs(float secs, double inaccuracy,
-                                   bool use_cutlist)
-{
-    float current = ComputeSecs(m_framesPlayed, use_cutlist);
-    float target = current + secs;
-    uint64_t targetFrame = FindFrame(target, use_cutlist);
-    return DoFastForward(targetFrame - m_framesPlayed, inaccuracy);
-}
-
 void MythPlayer::DoJumpToFrame(uint64_t frame, double inaccuracy)
 {
     if (frame > m_framesPlayed)
@@ -2696,7 +2440,7 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
     m_decoderSeekLock.unlock();
 
     int count = 0;
-    bool need_clear = false;
+    bool needclear = false;
     while (m_decoderSeek >= 0)
     {
         // Waiting blocks the main UI thread but the decoder may
@@ -2704,28 +2448,21 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
         // certain resources. Ensure the callback is processed.
         // Ideally MythPlayer should be fully event driven and these
         // calls wouldn't be necessary.
-        ProcessCallbacks();
+        emit CheckCallbacks();
 
+        // Wait a little
         usleep(50 * 1000);
 
         // provide some on screen feedback if seeking is slow
         count++;
         if (!(count % 3) && !m_hasFullPositionMap)
         {
-            int num = count % 3;
-            UpdateOSDMessage(tr("Searching") + QString().fill('.', num),
-                          kOSDTimeout_Short);
-            DisplayPauseFrame();
-            need_clear = true;
+            emit SeekingSlow(count);
+            needclear = true;
         }
     }
-    if (need_clear)
-    {
-        m_osdLock.lock();
-        if (m_osd)
-            m_osd->HideWindow("osd_message");
-        m_osdLock.unlock();
-    }
+    if (needclear)
+        emit SeekingComplete();
 }
 
 /** \fn MythPlayer::ClearAfterSeek(bool)
@@ -2797,25 +2534,6 @@ void MythPlayer::ClearBeforeSeek(uint64_t Frames)
 bool MythPlayer::IsInDelete(uint64_t frame)
 {
     return m_deleteMap.IsInDelete(frame);
-}
-
-void MythPlayer::HandleArbSeek(bool right)
-{
-    if (m_deleteMap.GetSeekAmount() == -2)
-    {
-        uint64_t framenum = m_deleteMap.GetNearestMark(m_framesPlayed, right);
-        if (right && (framenum > m_framesPlayed))
-            DoFastForward(framenum - m_framesPlayed, kInaccuracyNone);
-        else if (!right && (m_framesPlayed > framenum))
-            DoRewind(m_framesPlayed - framenum, kInaccuracyNone);
-    }
-    else
-    {
-        if (right)
-            DoFastForward(2, kInaccuracyFull);
-        else
-            DoRewind(2, kInaccuracyFull);
-    }
 }
 
 AspectOverrideMode MythPlayer::GetAspectOverride(void) const
@@ -2897,41 +2615,6 @@ void MythPlayer::SetCommBreakMap(frm_dir_map_t &newMap)
     m_forcePositionMapSync = true;
 }
 
-int MythPlayer::GetStatusbarPos(void) const
-{
-    double spos = 0.0;
-
-    if (m_liveTV || IsWatchingInprogress())
-    {
-        spos = 1000.0 * m_framesPlayed / m_playerCtx->m_recorder->GetFramesWritten();
-    }
-    else if (m_totalFrames)
-    {
-        spos = 1000.0 * m_framesPlayed / m_totalFrames;
-    }
-
-    return((int)spos);
-}
-
-int64_t MythPlayer::GetSecondsPlayed(bool honorCutList, int divisor)
-{
-    int64_t pos = TranslatePositionFrameToMs(m_framesPlayed, honorCutList);
-    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-        QString("GetSecondsPlayed: framesPlayed %1, honorCutList %2, divisor %3, pos %4")
-        .arg(m_framesPlayed).arg(honorCutList).arg(divisor).arg(pos));
-    return TranslatePositionFrameToMs(m_framesPlayed, honorCutList) / divisor;
-}
-
-int64_t MythPlayer::GetTotalSeconds(bool honorCutList, int divisor) const
-{
-    uint64_t pos = m_totalFrames;
-
-    if (IsWatchingInprogress())
-        pos = UINT64_MAX;
-
-    return TranslatePositionFrameToMs(pos, honorCutList) / divisor;
-}
-
 // Returns the total frame count, as totalFrames for a completed
 // recording, or the most recent frame count from the recorder for
 // live TV or an in-progress recording.
@@ -2991,128 +2674,6 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
         }
     }
     return TranslatePositionMsToFrame(position_ms, use_cutlist);
-}
-
-void MythPlayer::calcSliderPos(osdInfo &info, bool paddedFields)
-{
-    if (!m_decoder)
-        return;
-
-    bool islive = false;
-    info.text.insert("chapteridx",    QString());
-    info.text.insert("totalchapters", QString());
-    info.text.insert("titleidx",      QString());
-    info.text.insert("totaltitles",   QString());
-    info.text.insert("angleidx",      QString());
-    info.text.insert("totalangles",   QString());
-    info.values.insert("position",   0);
-    info.values.insert("progbefore", 0);
-    info.values.insert("progafter",  0);
-
-    int playbackLen = 0;
-    bool fixed_playbacklen = false;
-
-    if (m_liveTV && m_playerCtx->m_tvchain)
-    {
-        info.values["progbefore"] = (int)m_playerCtx->m_tvchain->HasPrev();
-        info.values["progafter"]  = (int)m_playerCtx->m_tvchain->HasNext();
-        playbackLen = m_playerCtx->m_tvchain->GetLengthAtCurPos();
-        islive = true;
-        fixed_playbacklen = true;
-    }
-    else if (IsWatchingInprogress())
-    {
-        islive = true;
-    }
-    else
-    {
-        int chapter  = GetCurrentChapter();
-        int chapters = GetNumChapters();
-        if (chapter && chapters > 1)
-        {
-            info.text["chapteridx"] = QString::number(chapter + 1);
-            info.text["totalchapters"] =  QString::number(chapters);
-        }
-
-        int title  = GetCurrentTitle();
-        int titles = GetNumTitles();
-        if (title && titles > 1)
-        {
-            info.text["titleidx"] = QString::number(title + 1);
-            info.text["totaltitles"] = QString::number(titles);
-        }
-
-        int angle  = GetCurrentAngle();
-        int angles = GetNumAngles();
-        if (angle && angles > 1)
-        {
-            info.text["angleidx"] = QString::number(angle + 1);
-            info.text["totalangles"] = QString::number(angles);
-        }
-    }
-
-    // Set the raw values, followed by the translated values.
-    for (int i = 0; i < 2 ; ++i)
-    {
-        bool honorCutList = (i > 0);
-        bool stillFrame = false;
-        int  pos = 0;
-
-        QString relPrefix = (honorCutList ? "rel" : "");
-        if (!fixed_playbacklen)
-            playbackLen = GetTotalSeconds(honorCutList);
-        int secsplayed = GetSecondsPlayed(honorCutList);
-
-        stillFrame = (secsplayed < 0);
-        playbackLen = std::max(playbackLen, 0);
-        secsplayed = std::min(playbackLen, std::max(secsplayed, 0));
-        int secsbehind = std::max((playbackLen - secsplayed), 0);
-
-        if (playbackLen > 0)
-            pos = (int)(1000.0F * (secsplayed / (float)playbackLen));
-
-        info.values.insert(relPrefix + "secondsplayed", secsplayed);
-        info.values.insert(relPrefix + "totalseconds", playbackLen);
-        info.values[relPrefix + "position"] = pos;
-
-        QString text1;
-        QString text2;
-        QString text3;
-        if (paddedFields)
-        {
-            text1 = MythFormatTime(secsplayed, "HH:mm:ss");
-            text2 = MythFormatTime(playbackLen, "HH:mm:ss");
-            text3 = MythFormatTime(secsbehind, "HH:mm:ss");
-        }
-        else
-        {
-            QString fmt = (playbackLen >= ONEHOURINSEC) ? "H:mm:ss" : "m:ss";
-            text1 = MythFormatTime(secsplayed, fmt);
-            text2 = MythFormatTime(playbackLen, fmt);
-
-            if (secsbehind >= ONEHOURINSEC)
-            {
-                text3 = MythFormatTime(secsbehind, "H:mm:ss");
-            }
-            else if (secsbehind >= ONEMININSEC)
-            {
-                text3 = MythFormatTime(secsbehind, "m:ss");
-            }
-            else
-            {
-                text3 = tr("%n second(s)", "", secsbehind);
-            }
-        }
-
-        QString desc = stillFrame ? tr("Still Frame") :
-                                    tr("%1 of %2").arg(text1).arg(text2);
-
-        info.text[relPrefix + "description"] = desc;
-        info.text[relPrefix + "playedtime"] = text1;
-        info.text[relPrefix + "totaltime"] = text2;
-        info.text[relPrefix + "remainingtime"] = islive ? QString() : text3;
-        info.text[relPrefix + "behindtime"] = islive ? text3 : QString();
-    }
 }
 
 // If position == -1, it signifies that we are computing the current

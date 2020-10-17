@@ -140,60 +140,9 @@ bool PlayerContext::HandlePlayerSpeedChangeEOF(void)
     return false;
 }
 
-bool PlayerContext::CalcPlayerSliderPosition(osdInfo &info,
-                                             bool paddedFields) const
-{
-    QMutexLocker locker(&m_deletePlayerLock);
-    if (m_player)
-    {
-        m_player->calcSliderPos(info, paddedFields);
-        return true;
-    }
-    return false;
-}
-
 bool PlayerContext::IsRecorderErrored(void) const
 {
     return m_recorder && m_recorder->GetErrorStatus();
-}
-
-/** \fn PlayerContext::StartPlaying(int)
- *  \brief Starts player, must be called after StartRecorder().
- *  \param maxWait How long to wait for MythPlayer to start playing.
- *  \return true when successful, false otherwise.
- */
-bool PlayerContext::StartPlaying(int maxWait)
-{
-    if (!m_player)
-        return false;
-
-    if (!m_player->StartPlaying())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "StartPlaying() Failed to start player");
-        // no need to call StopPlaying here as the player context will be deleted
-        // later following the error
-        return false;
-    }
-    maxWait = (maxWait <= 0) ? 20000 : maxWait;
-#ifdef USING_VALGRIND
-    maxWait = (1<<30);
-#endif // USING_VALGRIND
-    MythTimer t;
-    t.start();
-
-    while (!m_player->IsPlaying(50, true) && (t.elapsed() < maxWait))
-        ReloadTVChain();
-
-    if (m_player->IsPlaying())
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("StartPlaying(): took %1 ms to start player.")
-                .arg(t.elapsed()));
-        return true;
-    }
-    LOG(VB_GENERAL, LOG_ERR, LOC + "StartPlaying() Failed to start player");
-    StopPlaying();
-    return false;
 }
 
 void PlayerContext::StopPlaying(void) const

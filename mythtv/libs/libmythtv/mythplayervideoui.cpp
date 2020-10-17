@@ -9,6 +9,7 @@
 MythPlayerVideoUI::MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerAudioUI(MainWindow, Tv, Context, Flags)
 {
+    connect(this, &MythPlayerVideoUI::CheckCallbacks, this, &MythPlayerVideoUI::ProcessCallbacks);
 }
 
 void MythPlayerVideoUI::WindowResized(const QSize& /*Size*/)
