@@ -64,15 +64,13 @@ class MUI_PUBLIC DialogCompletionEvent : public QEvent
 };
 
 
-using MythUIButtonCallback = std::function<void(void)>;
-
 class MUI_PUBLIC MythMenuItem
 {
   public:
     MythMenuItem(QString text, const char *slot, bool checked = false, MythMenu *subMenu = nullptr) :
         m_text(std::move(text)), m_data(QVariant::fromValue(slot)),
         m_checked(checked), m_subMenu(subMenu) { Init(); }
-    MythMenuItem(QString text, const MythUIButtonCallback &slot, bool checked = false, MythMenu *subMenu = nullptr) :
+    MythMenuItem(QString text, const MythUICallbackNMF &slot, bool checked = false, MythMenu *subMenu = nullptr) :
         m_text(std::move(text)), m_data(QVariant::fromValue(slot)),
         m_checked(checked), m_subMenu(subMenu) { Init(); }
     void SetData(QVariant data) { m_data = std::move(data); }
@@ -101,7 +99,7 @@ class MUI_PUBLIC MythMenu
     void AddItem(const QString &title) { AddItemV(title, 0, nullptr, false, false); };
     void AddItem(const QString &title, const char *slot, MythMenu *subMenu = nullptr,
                  bool selected = false, bool checked = false);
-    void AddItem(const QString &title, const MythUIButtonCallback &slot,
+    void AddItem(const QString &title, const MythUICallbackNMF &slot,
                  MythMenu *subMenu = nullptr, bool selected = false,
                  bool checked = false);
 
@@ -167,7 +165,7 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
     void AddButton(const QString &title) { AddButtonV(title, 0,false, false); };
     void AddButton(const QString &title, const char *slot,
                    bool newMenu = false, bool setCurrent = false);
-    void AddButton(const QString &title, const MythUIButtonCallback &slot,
+    void AddButton(const QString &title, const MythUICallbackNMF &slot,
                    bool newMenu = false, bool setCurrent = false)
     {
         AddButtonV(title, QVariant::fromValue(slot), newMenu, setCurrent);
@@ -490,6 +488,5 @@ bool MUI_PUBLIC WaitFor(MythConfirmationDialog* dialog);
 
 Q_DECLARE_METATYPE(MythMenuItem*)
 Q_DECLARE_METATYPE(const char*)
-Q_DECLARE_METATYPE(MythUIButtonCallback)
 
 #endif

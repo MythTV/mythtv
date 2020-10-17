@@ -37,6 +37,16 @@ class MythUIProgressBar;
 
 using FocusInfoType = QMultiMap<int, MythUIType *>;
 
+// For non-class, static class, or lambda function callbacks.
+using MythUICallbackNMF = std::function<void(void)>;
+// For class member function callbacks.
+using MythUICallbackMF  = void (QObject::*)(void);
+using MythUICallbackMFc = void (QObject::*)(void) const;
+
+Q_DECLARE_METATYPE(MythUICallbackNMF)
+Q_DECLARE_METATYPE(MythUICallbackMF)
+Q_DECLARE_METATYPE(MythUICallbackMFc)
+
 /**
  * \defgroup MythUI MythTV User Interface Library
  *
