@@ -3910,7 +3910,7 @@ bool TV::Handle3D(const QString& Action)
         mode = kStereoscopicModeTopAndBottomDiscard;
     else if (ACTION_3DIGNORE == Action)
         mode = kStereoscopicModeIgnore3D;
-    emit ChangeStereoOverride(mode);
+    emit ChangeStereoOverride(mode); // NOLINT readability-misleading-indentation
     return true;
 }
 
