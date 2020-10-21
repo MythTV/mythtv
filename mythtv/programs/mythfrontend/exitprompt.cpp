@@ -36,7 +36,7 @@ void ExitPrompter::ConfirmHalt() const
     Confirm(MythPower::FeatureShutdown);
 }
 
-void ExitPrompter::DoHalt(bool Confirmed)
+void ExitPrompter::DoHalt(const bool Confirmed)
 {
     if (!Confirmed)
         return;
@@ -67,7 +67,7 @@ void ExitPrompter::ConfirmReboot() const
     Confirm(MythPower::FeatureRestart);
 }
 
-void ExitPrompter::DoReboot(bool Confirmed)
+void ExitPrompter::DoReboot(const bool Confirmed)
 {
     if (!Confirmed)
         return;
@@ -97,7 +97,7 @@ void ExitPrompter::ConfirmSuspend(void) const
     Confirm(MythPower::FeatureSuspend);
 }
 
-void ExitPrompter::DoSuspend(bool Confirmed)
+void ExitPrompter::DoSuspend(const bool Confirmed)
 {
     if (!Confirmed)
         return;
@@ -264,14 +264,12 @@ void ExitPrompter::Confirm(MythPower::Feature Action) const
     {
       // no prompts required, take a specific action required
       // calling these exitprompter functions with (true) fails build
-      bool isTrue;
-      isTrue=true;
       if (Action == MythPower::FeatureShutdown)
-          DoHalt(isTrue);
+          DoHalt(true);
       else if (Action == MythPower::FeatureRestart)
-          DoReboot(isTrue);
+          DoReboot(true);
       else if (Action == MythPower::FeatureSuspend)
-          DoSuspend(isTrue);
+          DoSuspend(true);
     }
 
     gContext->SetDisableEventPopup(false);
