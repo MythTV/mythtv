@@ -36,7 +36,7 @@ void ExitPrompter::ConfirmHalt() const
     Confirm(MythPower::FeatureShutdown);
 }
 
-void ExitPrompter::DoHalt(const bool Confirmed)
+void ExitPrompter::DoHalt(const bool Confirmed) const
 {
     if (!Confirmed)
         return;
@@ -67,7 +67,7 @@ void ExitPrompter::ConfirmReboot() const
     Confirm(MythPower::FeatureRestart);
 }
 
-void ExitPrompter::DoReboot(const bool Confirmed)
+void ExitPrompter::DoReboot(const bool Confirmed) const
 {
     if (!Confirmed)
         return;
@@ -97,7 +97,7 @@ void ExitPrompter::ConfirmSuspend(void) const
     Confirm(MythPower::FeatureSuspend);
 }
 
-void ExitPrompter::DoSuspend(const bool Confirmed)
+void ExitPrompter::DoSuspend(const bool Confirmed) const
 {
     if (!Confirmed)
         return;
