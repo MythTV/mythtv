@@ -235,34 +235,42 @@ void ExitPrompter::Confirm(MythPower::Feature Action) const
     MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
 
     QString msg;
-    switch (Action)
-    {
-        case MythPower::FeatureShutdown: msg = tr("Are you sure you want to shutdown?"); break;
-        case MythPower::FeatureRestart:  msg = tr("Are you sure you want to reboot?");   break;
-        case MythPower::FeatureSuspend:  msg = tr("Are you sure you want to suspend?");  break;
-        default: break;
-    }
 
     gContext->SetDisableEventPopup(true);
     if (!gCoreContext->IsFrontendOnly())
-        msg.prepend(tr("Mythbackend is running on this system. "));
-    gContext->SetDisableEventPopup(false);
-
-    auto *dlg = new MythConfirmationDialog(ss, msg);
-
-    if (!dlg->Create())
     {
-        delete dlg;
-        DoQuit();
-        return;
+      // this is the only case where a prompt should be shown
+      msg.prepend(tr("Mythbackend is running on this system. "));
+
+      auto *dlg = new MythConfirmationDialog(ss, msg);
+
+      if (!dlg->Create())
+      {
+          delete dlg;
+          DoQuit();
+          return;
+      }
+
+      if (Action == MythPower::FeatureShutdown)
+          connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoHalt);
+      else if (Action == MythPower::FeatureRestart)
+          connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoReboot);
+      else if (Action == MythPower::FeatureSuspend)
+          connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoSuspend);
+
+      ss->AddScreen(dlg);
+    }
+    else 
+    {
+      // no prompts required, take a specific action required
+      if (Action == MythPower::FeatureShutdown)
+          ExitPrompter::DoHalt;
+      else if (Action == MythPower::FeatureRestart)
+          ExitPrompter::DoReboot;
+      else if (Action == MythPower::FeatureSuspend)
+          ExitPrompter::DoSuspend;
     }
 
-    if (Action == MythPower::FeatureShutdown)
-        connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoHalt);
-    else if (Action == MythPower::FeatureRestart)
-        connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoReboot);
-    else if (Action == MythPower::FeatureSuspend)
-        connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoSuspend);
+    gContext->SetDisableEventPopup(false);
 
-    ss->AddScreen(dlg);
 }
