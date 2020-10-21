@@ -263,12 +263,15 @@ void ExitPrompter::Confirm(MythPower::Feature Action) const
     else 
     {
       // no prompts required, take a specific action required
+      // calling these exitprompter functions with (true) fails build
+      bool isTrue;
+      isTrue=true;
       if (Action == MythPower::FeatureShutdown)
-          DoHalt(true);
+          DoHalt(isTrue);
       else if (Action == MythPower::FeatureRestart)
-          DoReboot(true);
+          DoReboot(isTrue);
       else if (Action == MythPower::FeatureSuspend)
-          DoSuspend(true);
+          DoSuspend(isTrue);
     }
 
     gContext->SetDisableEventPopup(false);
