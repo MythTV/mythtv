@@ -138,9 +138,15 @@ bool XmlConfiguration::Save( void )
     {
         ok = file.rename(config_filepath);
         if (ok)
-            QFile::remove(config_origpath);
+        {
+            if (!QFile::remove(config_origpath))
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to remove '%1'").arg(config_origpath));
+        }
         else if (QFile::exists(config_origpath))
-            QFile::rename(config_origpath, config_filepath);
+        {
+            if (!QFile::rename(config_origpath, config_filepath))
+                LOG(VB_GENERAL, LOG_WARNING, QString("Failed to rename '%1").arg(config_origpath));
+        }
     }
 
     if (!ok)
