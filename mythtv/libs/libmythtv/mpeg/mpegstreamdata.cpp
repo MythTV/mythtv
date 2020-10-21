@@ -328,7 +328,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     // There might be another section after this one in the
     // current packet. We need room before the end of the
     // packet, and it must not be packet stuffing.
-    if ((offset + psip->SectionLength() < TSPacket::kSize) &&
+    if ((offset + psip->SectionLength() + 1 < TSPacket::kSize) &&
         (pesdata[psip->SectionLength() + 1] != 0xff))
     {
         // This isn't stuffing, so we need to put this
