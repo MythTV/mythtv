@@ -11,10 +11,10 @@ class ExitPrompter : public QObject
 
   public slots:
     static void DoQuit(void);
-    void DoHalt(bool Confirmed = true);
-    void DoReboot(bool Confirmed = true);
+    void DoHalt(bool Confirmed = true) const;
+    void DoReboot(bool Confirmed = true) const;
     static void DoStandby(void);
-    void DoSuspend(bool Confirmed = true);
+    void DoSuspend(bool Confirmed = true) const;
     void HandleExit(void);
     void ConfirmHalt(void) const;
     void ConfirmReboot(void) const;
