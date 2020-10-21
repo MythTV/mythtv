@@ -87,15 +87,25 @@ class MTV_PUBLIC MythVideoFrame
     MythVideoFrame(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
                    int Width, int Height, int Alignment = MYTH_WIDTH_ALIGNMENT);
    ~MythVideoFrame();
+
     void Init(VideoFrameType Type, int Width, int Height);
     void Init(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
               int Width, int Height, int Alignment = MYTH_WIDTH_ALIGNMENT);
-
     void ClearMetadata();
     void ClearBufferToBlank();
     bool CopyFrame(MythVideoFrame* From);
     MythDeintType GetSingleRateOption(MythDeintType Type, MythDeintType Override = DEINT_NONE) const;
     MythDeintType GetDoubleRateOption(MythDeintType Type, MythDeintType Override = DEINT_NONE) const;
+
+    static void     CopyPlane(uint8_t* To, int ToPitch, const uint8_t* From, int FromPitch,
+                              int PlaneWidth, int PlaneHeight);
+    static QString  FormatDescription(VideoFrameType Type);
+    static uint8_t* GetAlignedBuffer(size_t Size);
+    static uint8_t* CreateBuffer(VideoFrameType Type, int Width, int Height);
+    static size_t   GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
+    static QString  DeinterlacerPref(MythDeintType Deint);
+    static QString  DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format = FMT_NONE);
+    static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
 
     VideoFrameType m_type              { FMT_NONE };
     uint8_t*       m_buffer            { nullptr  };
@@ -108,30 +118,30 @@ class MTV_PUBLIC MythVideoFrame
     float          m_aspect            { -1.0F };
     double         m_frameRate         { -1.0 };
     long long      m_frameNumber       { 0 };
-    uint64_t       m_frameCounter      { 0 }; ///< raw frame counter/ticker for discontinuity checks
+    uint64_t       m_frameCounter      { 0 };
     long long      m_timecode          { 0 };
     int64_t        m_displayTimecode   { 0 };
-    std::array<uint8_t*,4> m_priv      { nullptr }; ///< random empty storage
-    int            m_interlaced        { 0    }; ///< 1 if interlaced. 0 if not interlaced. -1 if unknown.
-    bool           m_topFieldFirst     { true }; ///< true if top field is first.
-    bool           m_interlacedReverse { false }; /// true for user override of scan
-    bool           m_newGOP            { false }; /// used to unlock the scan type
+    std::array<uint8_t*,4> m_priv      { nullptr };
+    int            m_interlaced        { 0    };
+    bool           m_topFieldFirst     { true };
+    bool           m_interlacedReverse { false };
+    bool           m_newGOP            { false };
     bool           m_repeatPic         { false };
-    bool           m_forceKey          { false }; ///< hardware encoded .nuv
+    bool           m_forceKey          { false };
     bool           m_dummy             { false };
     bool           m_pauseFrame        { false };
-    FramePitches   m_pitches           { 0 }; ///< Y, U, & V pitches
-    FrameOffsets   m_offsets           { 0 }; ///< Y, U, & V offsets
+    FramePitches   m_pitches           { 0 };
+    FrameOffsets   m_offsets           { 0 };
     int            m_pixFmt            { 0 };
     int            m_swPixFmt          { 0 };
-    bool           m_directRendering   { true }; ///< true if managed by FFmpeg
+    bool           m_directRendering   { true };
     int            m_colorspace        { 1 };
     int            m_colorrange        { 1 };
     int            m_colorprimaries    { 1 };
     int            m_colortransfer     { 1 };
     int            m_chromalocation    { 1 };
-    bool           m_colorshifted      { false }; ///< false for software decoded 10/12/16bit frames. true for hardware decoders.
-    bool           m_alreadyDeinterlaced { false }; ///< temporary? TODO move scan detection/tracking into decoder
+    bool           m_colorshifted      { false };
+    bool           m_alreadyDeinterlaced { false };
     int            m_rotation          { 0 };
     uint           m_stereo3D          { 0 };
     MythDeintType  m_deinterlaceSingle { DEINT_NONE };
@@ -139,17 +149,6 @@ class MTV_PUBLIC MythVideoFrame
     MythDeintType  m_deinterlaceAllowed { DEINT_NONE };
     MythDeintType  m_deinterlaceInuse  { DEINT_NONE };
     bool           m_deinterlaceInuse2x { false };
-
-    static void       CopyPlane(uint8_t* To, int ToPitch,
-                                const uint8_t* From, int FromPitch,
-                                int PlaneWidth, int PlaneHeight);
-    static QString    FormatDescription(VideoFrameType Type);
-    static uint8_t*   GetAlignedBuffer(size_t Size);
-    static uint8_t*   CreateBuffer(VideoFrameType Type, int Width, int Height);
-    static size_t     GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
-    static QString    DeinterlacerPref(MythDeintType Deint);
-    static QString    DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format = FMT_NONE);
-    static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
 
     static inline int BitsPerPixel(VideoFrameType Type)
     {
@@ -455,7 +454,6 @@ class MTV_PUBLIC MythVideoFrame
 
   private:
     static MythDeintType GetDeinterlacer(MythDeintType Option);
-    //Q_DISABLE_COPY(MythVideoFrame)
 };
 
 #endif

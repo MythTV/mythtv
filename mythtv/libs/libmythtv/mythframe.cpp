@@ -10,6 +10,15 @@ extern "C" {
 
 #define LOC QString("VideoFrame: ")
 
+/*! \class MythVideoFrame
+ *
+ * \var m_frameCounter Raw frame counter/ticker for discontinuity checks in the player.
+ * \var m_newGOP       Signals to the player that the scan can be unlocked.
+ * \var m_colorshifted Hardware decoded 10/12bit frames are already bit-shifted.
+ * \var m_alreadyDeinterlaced The frame has already been deinterlaced (either in the
+ * decoder or on the first pass of multi-pass display).
+ *
+*/
 MythVideoFrame::~MythVideoFrame()
 {
     if (m_buffer && HardwareFormat(m_type))
