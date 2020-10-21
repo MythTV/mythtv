@@ -1,5 +1,6 @@
 // MythTV
 #include "mythlogging.h"
+#include "videodisplayprofile.h"
 #include "mythframe.h"
 
 // FFmpeg - for av_malloc/av_free
@@ -523,5 +524,28 @@ QString MythVideoFrame::DeinterlacerPref(MythDeintType Deint)
     if (Deint & DEINT_CPU)         result += "|CPU";
     if (Deint & DEINT_SHADER)      result += "|GLSL";
     if (Deint & DEINT_DRIVER)      result += "|DRIVER";
+    return result;
+}
+
+MythDeintType MythVideoFrame::ParseDeinterlacer(const QString& Deinterlacer)
+{
+    MythDeintType result = DEINT_NONE;
+
+    if (Deinterlacer.contains(DEINT_QUALITY_HIGH))
+        result = DEINT_HIGH;
+    else if (Deinterlacer.contains(DEINT_QUALITY_MEDIUM))
+        result = DEINT_MEDIUM;
+    else if (Deinterlacer.contains(DEINT_QUALITY_LOW))
+        result = DEINT_BASIC;
+
+    if (result != DEINT_NONE)
+    {
+        result = result | DEINT_CPU; // NB always assumed
+        if (Deinterlacer.contains(DEINT_QUALITY_SHADER))
+            result = result | DEINT_SHADER;
+        if (Deinterlacer.contains(DEINT_QUALITY_DRIVER))
+            result = result | DEINT_DRIVER;
+    }
+
     return result;
 }

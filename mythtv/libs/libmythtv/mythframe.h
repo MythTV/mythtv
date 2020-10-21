@@ -149,6 +149,7 @@ class MTV_PUBLIC MythVideoFrame
     static size_t     GetBufferSize(VideoFrameType Type, int Width, int Height, int Aligned = MYTH_WIDTH_ALIGNMENT);
     static QString    DeinterlacerPref(MythDeintType Deint);
     static QString    DeinterlacerName(MythDeintType Deint, bool DoubleRate, VideoFrameType Format = FMT_NONE);
+    static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
 
     static inline int BitsPerPixel(VideoFrameType Type)
     {

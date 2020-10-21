@@ -76,7 +76,6 @@ class MythVideoOutput : public MythVideoBounds
     QString      GetFrameStatus() const;
     QRect        GetImageRect(const QRect& Rect, QRect* DisplayRect = nullptr);
     QRect        GetSafeRect();
-    static MythDeintType ParseDeinterlacer(const QString& Deinterlacer);
 
     // These methods are only required by MythPlayerUI
     virtual void ResizeForVideo(QSize /*Size*/ = QSize()) { }

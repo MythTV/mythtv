@@ -170,29 +170,6 @@ void MythVideoOutput::SetVideoFrameRate(float playback_fps)
         m_dbDisplayProfile->SetOutput(playback_fps);
 }
 
-MythDeintType MythVideoOutput::ParseDeinterlacer(const QString& Deinterlacer)
-{
-    MythDeintType result = DEINT_NONE;
-
-    if (Deinterlacer.contains(DEINT_QUALITY_HIGH))
-        result = DEINT_HIGH;
-    else if (Deinterlacer.contains(DEINT_QUALITY_MEDIUM))
-        result = DEINT_MEDIUM;
-    else if (Deinterlacer.contains(DEINT_QUALITY_LOW))
-        result = DEINT_BASIC;
-
-    if (result != DEINT_NONE)
-    {
-        result = result | DEINT_CPU; // NB always assumed
-        if (Deinterlacer.contains(DEINT_QUALITY_SHADER))
-            result = result | DEINT_SHADER;
-        if (Deinterlacer.contains(DEINT_QUALITY_DRIVER))
-            result = result | DEINT_DRIVER;
-    }
-
-    return result;
-}
-
 void MythVideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force /*=DEINT_NONE*/)
 {
 
@@ -222,9 +199,9 @@ void MythVideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintTy
     }
     else if (m_dbDisplayProfile)
     {
-        singlerate = ParseDeinterlacer(m_dbDisplayProfile->GetSingleRatePreferences());
+        singlerate = MythVideoFrame::ParseDeinterlacer(m_dbDisplayProfile->GetSingleRatePreferences());
         if (DoubleRate)
-            doublerate = ParseDeinterlacer(m_dbDisplayProfile->GetDoubleRatePreferences());
+            doublerate = MythVideoFrame::ParseDeinterlacer(m_dbDisplayProfile->GetDoubleRatePreferences());
     }
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("SetDeinterlacing (Doublerate %1): Single %2 Double %3")

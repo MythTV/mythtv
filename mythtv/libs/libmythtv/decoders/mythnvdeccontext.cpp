@@ -253,9 +253,9 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
     MythDeintType doublepref = DEINT_NONE;
     if (Profile)
     {
-        singlepref = MythVideoOutput::ParseDeinterlacer(Profile->GetSingleRatePreferences());
+        singlepref = MythVideoFrame::ParseDeinterlacer(Profile->GetSingleRatePreferences());
         if (DoubleRate)
-            doublepref = MythVideoOutput::ParseDeinterlacer(Profile->GetDoubleRatePreferences());
+            doublepref = MythVideoFrame::ParseDeinterlacer(Profile->GetDoubleRatePreferences());
     }
 
     // Deinterlacers are not filtered (as we have no frame) - so mask appropriately
