@@ -1075,7 +1075,7 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, ZipEntryP& entry
 		return UnZip::SeekFailed;
 
 	// Encryption keys
-	keyset keys;
+    keyset keys { 0 };
 
 	if (entry.isEncrypted())
 	{
