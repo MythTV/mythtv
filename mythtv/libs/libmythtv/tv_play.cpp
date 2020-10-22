@@ -4882,7 +4882,6 @@ void TV::DoPlay()
 
     SetSpeedChangeTimer(0, __LINE__);
     gCoreContext->emitTVPlaybackPlaying();
-    UpdateNavDialog();
 }
 
 float TV::DoTogglePauseStart()
@@ -4991,27 +4990,7 @@ void TV::DoTogglePause(bool ShowOSD)
     if (!ignore)
         DoTogglePauseFinish(DoTogglePauseStart(), ShowOSD);
     // Emit Pause or Unpaused signal
-    paused ? gCoreContext->emitTVPlaybackUnpaused() : gCoreContext->emitTVPlaybackPaused();
-    UpdateNavDialog();
-}
-
-void TV::UpdateNavDialog()
-{
-    OSD *osd = GetOSDL();
-    if (osd && osd->DialogVisible(OSD_DLG_NAVIGATE))
-    {
-        osdInfo info;
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        bool paused = (m_player
-            && ((m_playerContext.m_ffRewState != 0) || (m_playerContext.m_ffRewSpeed != 0)
-                || m_player->IsPaused()));
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        info.text["paused"] = (paused ? "Y" : "N");
-        bool muted = m_player && m_player->IsMuted();
-        info.text["muted"] = (muted ? "Y" : "N");
-        emit ChangeOSDText(OSD_DLG_NAVIGATE, info.text, paused ? kOSDTimeout_None : kOSDTimeout_Long);
-    }
-    ReturnOSDLock();
+    paused ? gCoreContext->emitTVPlaybackUnpaused() : gCoreContext->emitTVPlaybackPaused();;
 }
 
 bool TV::DoPlayerSeek(float Time)
@@ -5161,7 +5140,6 @@ bool TV::SeekHandleAction(const QStringList& Actions, const bool IsDVD)
             DoSeek(m_playerContext.m_fftime, tr("Skip Ahead"), /*timeIsOffset*/true, /*honorCutlist*/(flags & kIgnoreCutlist) == 0);
         }
     }
-    UpdateNavDialog();
     return true;
 }
 
@@ -7330,7 +7308,6 @@ void TV::ChangeAudioSync(int Dir, int NewSync)
 void TV::ToggleMute(const bool MuteIndividualChannels)
 {
     emit ChangeMuteState(MuteIndividualChannels);
-    UpdateNavDialog();
 }
 
 void TV::ToggleSleepTimer()
@@ -8314,13 +8291,11 @@ void TV::StartOsdNavigation()
     OSD *osd = GetOSDL();
     if (osd)
     {
-        osd->DialogQuit();
         osd->HideAll();
         ToggleOSD(true);
         emit ChangeOSDDialog({ OSD_DLG_NAVIGATE });
     }
     ReturnOSDLock();
-    UpdateNavDialog();
 }
 
 /**

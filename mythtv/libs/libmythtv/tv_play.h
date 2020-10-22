@@ -501,7 +501,6 @@ class MTV_PUBLIC TV : public QObject, public MythTVMenuItemDisplayer, public Ref
 
     // Navigation Dialog
     void StartOsdNavigation();
-    void UpdateNavDialog();
 
     // Menu dialog
     void ShowOSDMenu(bool isCompact = false);

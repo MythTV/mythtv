@@ -179,7 +179,6 @@ class OSD : public QObject
     void DisplayDVDButton(AVSubtitle* DVDButton, QRect &Pos);
 
     void DisplayBDOverlay(MythBDOverlay *Overlay);
-    MythPlayerUI *GetPlayer() { return m_player; }
 
   private:
     void TearDown();
@@ -238,20 +237,21 @@ class ChannelEditor : public MythScreenType
     TV*             m_tv           { nullptr };
 };
 
+#include "volumebase.h"
+
 class OsdNavigation : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    OsdNavigation(MythMainWindow* MainWindow, TV* Tv, const QString& Name, OSD* Osd);
+    OsdNavigation(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, const QString& Name, OSD* Osd);
     bool Create() override;
-    bool keyPressEvent(QKeyEvent *Event) override;
-    void SetTextFromMap(const InfoMap &Map) override;
+    bool keyPressEvent(QKeyEvent* Event) override;
     void ShowMenu() override;
 
-    int getVisibleGroup() const { return m_visibleGroup; }
-
   public slots:
+    void MuteChanged(MuteState Mute);
+    void PauseChanged(bool Paused);
     void GeneralAction();
     void More();
 
@@ -260,13 +260,14 @@ class OsdNavigation : public MythScreenType
 
     MythMainWindow* m_mainWindow    { nullptr };
     TV*           m_tv              { nullptr };
+    MythPlayerUI* m_player          { nullptr };
     OSD*          m_osd             { nullptr };
     MythUIButton* m_playButton      { nullptr };
     MythUIButton* m_pauseButton     { nullptr };
     MythUIButton* m_muteButton      { nullptr };
     MythUIButton* m_unMuteButton    { nullptr };
-    char          m_paused          { 'X' };
-    char          m_muted           { 'X' };
+    bool          m_paused          { false   };
+    MuteState     m_muteState       { MuteState::kMuteOff };
     int           m_visibleGroup    { 0 };
     int           m_maxGroupNum     { -1 };
     bool          m_isVolumeControl { true };

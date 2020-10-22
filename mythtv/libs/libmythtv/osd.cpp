@@ -1016,7 +1016,7 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
         else if (Window == OSD_DLG_CONFIRM)
             dialog = new MythConfirmationDialog(nullptr, Text, false);
         else if (Window == OSD_DLG_NAVIGATE)
-            dialog = new OsdNavigation(m_mainWindow, m_tv, Window, this);
+            dialog = new OsdNavigation(m_mainWindow, m_tv, m_player, Window, this);
         else
             dialog = new MythDialogBox(Text, nullptr, Window.toLatin1(), false, true);
 
@@ -1249,12 +1249,15 @@ void OSD::DisplayBDOverlay(MythBDOverlay* Overlay)
         bd->DisplayBDOverlay(Overlay);
 }
 
-OsdNavigation::OsdNavigation(MythMainWindow *MainWindow, TV* Tv, const QString& Name, OSD* Osd)
+OsdNavigation::OsdNavigation(MythMainWindow *MainWindow, TV* Tv, MythPlayerUI *Player, const QString& Name, OSD* Osd)
   : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
     m_mainWindow(MainWindow),
     m_tv(Tv),
+    m_player(Player),
     m_osd(Osd)
 {
+    connect(m_player, &MythPlayerUI::PauseChanged, this, &OsdNavigation::PauseChanged);
+    connect(m_player, &MythPlayerUI::MuteChanged, this, &OsdNavigation::MuteChanged);
 }
 
 bool OsdNavigation::Create()
@@ -1262,18 +1265,16 @@ bool OsdNavigation::Create()
     if (!XMLParseBase::LoadWindowFromXML("osd.xml", "osd_navigation", this))
         return false;
 
-    MythUIButton *moreButton = nullptr;
-    UIUtilW::Assign(this, moreButton, "more");
-    if (moreButton)
-        connect(moreButton, &MythUIButton::Clicked, this, &OsdNavigation::More);
+    MythUIButton* more = nullptr;
+    UIUtilW::Assign(this, more, "more");
+    if (more)
+        connect(more, &MythUIButton::Clicked, this, &OsdNavigation::More);
     UIUtilW::Assign(this, m_pauseButton, "PAUSE");
     UIUtilW::Assign(this, m_playButton, "PLAY");
     UIUtilW::Assign(this, m_muteButton, "MUTE");
     UIUtilW::Assign(this, m_unMuteButton, "unmute");
 
-    MythPlayerUI *player = m_osd->GetPlayer();
-
-    if (!player || !player->HasAudioOut() || !player->PlayerControlsVolume())
+    if (!m_player->HasAudioOut() || !m_player->PlayerControlsVolume())
     {
         m_isVolumeControl = false;
         if (m_muteButton)
@@ -1281,6 +1282,17 @@ bool OsdNavigation::Create()
         if (m_unMuteButton)
             m_unMuteButton->Hide();
     }
+    else
+    {
+        MuteState state = m_player->GetMuteState();
+        // Fudge to ensure we start with the correct mute state
+        m_muteState = VolumeBase::NextMuteState(state);
+        MuteChanged(state);
+    }
+
+    bool paused = m_player->IsPaused();
+    m_paused = !paused;
+    PauseChanged(paused);
 
     // find number of groups and make sure only corrrect one is visible
     MythUIGroup *group = nullptr;
@@ -1296,7 +1308,7 @@ bool OsdNavigation::Create()
         QList<MythUIType *> * children = group->GetAllChildren();
         for (auto * child : *children)
         {
-            if (child != moreButton)
+            if (child != more)
             {
                 auto * button = dynamic_cast<MythUIButton*>(child);
                 if (button)
@@ -1310,14 +1322,13 @@ bool OsdNavigation::Create()
     return true;
 }
 
-bool OsdNavigation::keyPressEvent(QKeyEvent *Event)
+bool OsdNavigation::keyPressEvent(QKeyEvent* Event)
 {
-    // bool extendTimeout = (m_paused != 'Y');
-    bool extendTimeout = true;
+    bool extendtimeout = true;
     bool handled = false;
 
-    MythUIType *focus = GetFocusWidget();
-    if (focus && focus->keyPressEvent(Event))
+    MythUIType* current = GetFocusWidget();
+    if (current && current->keyPressEvent(Event))
         handled = true;
 
     if (!handled)
@@ -1330,54 +1341,89 @@ bool OsdNavigation::keyPressEvent(QKeyEvent *Event)
             QString action = actions[i];
             if (action == "ESCAPE" )
             {
-                SendResult(-1,action);
+                SendResult(-1, action);
                 handled = true;
-                extendTimeout = false;
+                extendtimeout = false;
             }
         }
     }
+
     if (!handled && MythScreenType::keyPressEvent(Event))
         handled = true;
 
-    if (extendTimeout)
-    {
+    if (extendtimeout)
         m_osd->SetExpiry(OSD_DLG_NAVIGATE, kOSDTimeout_Long);
-        // m_osd->SetExpiry("osd_status", kOSDTimeout_Long);
-    }
 
     return handled;
 }
 
-// Virtual
 void OsdNavigation::ShowMenu()
 {
-    SendResult(100,"MENU");
+    SendResult(100, "MENU");
 }
 
 void OsdNavigation::SendResult(int Result, const QString& Action)
 {
-    if (m_tv)
+    auto * dce = new DialogCompletionEvent("", Result, "", Action);
+    QCoreApplication::postEvent(m_tv, dce);
+}
+
+void OsdNavigation::PauseChanged(bool Paused)
+{
+    if (!(m_playButton && m_pauseButton))
+        return;
+
+    if (m_paused == Paused)
+        return;
+
+    m_paused = Paused;
+    MythUIType* current = GetFocusWidget();
+    m_playButton->SetVisible(m_paused);
+    m_pauseButton->SetVisible(!m_paused);
+
+    if (current && (current == m_playButton || current == m_pauseButton))
     {
-        auto * dce = new DialogCompletionEvent("", Result, "", Action);
-        QCoreApplication::postEvent(m_tv, dce);
+        current->LoseFocus();
+        SetFocusWidget(m_paused ? m_playButton : m_pauseButton);
+    }
+}
+
+void OsdNavigation::MuteChanged(MuteState Mute)
+{
+    if (!(m_isVolumeControl && m_muteButton && m_unMuteButton))
+        return;
+
+    if (Mute != m_muteState)
+    {
+        m_muteState = Mute;
+        bool muted = m_muteState == kMuteAll;
+        MythUIType* current = GetFocusWidget();
+        m_muteButton->SetVisible(!muted);
+        m_unMuteButton->SetVisible(muted);
+
+        if (current && (current == m_muteButton || current == m_unMuteButton))
+        {
+            current->LoseFocus();
+            SetFocusWidget(muted ? m_unMuteButton : m_muteButton);
+        }
     }
 }
 
 void OsdNavigation::GeneralAction()
 {
-    MythUIType *fw = GetFocusWidget();
-    if (fw)
+    MythUIType* current = GetFocusWidget();
+    if (current)
     {
-        QString nameClicked = fw->objectName();
+        QString name = current->objectName();
         int result = 100;
-        int hashPos = nameClicked.indexOf('#');
+        int hashPos = name.indexOf('#');
         if (hashPos > -1)
-            nameClicked.truncate(hashPos);
-        if (nameClicked == "INFO")
-            result=0;
-        if (nameClicked == "unmute")
-            nameClicked = "MUTE";
-        SendResult(result, nameClicked);
+            name.truncate(hashPos);
+        if (name == "INFO")
+            result = 0;
+        if (name == "unmute")
+            name = "MUTE";
+        SendResult(result, name);
     }
 }
 
@@ -1388,10 +1434,10 @@ void OsdNavigation::More()
     if (m_maxGroupNum <= 0)
         return;
 
-    MythUIGroup *group = nullptr;
+    MythUIGroup* group = nullptr;
     UIUtilW::Assign(this, group, QString("grp%1").arg(m_visibleGroup));
     if (group != nullptr)
-        group->SetVisible (false);
+        group->SetVisible(false);
 
     // wrap around after last group displayed
     if (++m_visibleGroup > m_maxGroupNum)
@@ -1399,48 +1445,5 @@ void OsdNavigation::More()
 
     UIUtilW::Assign(this, group, QString("grp%1").arg(m_visibleGroup));
     if (group != nullptr)
-        group->SetVisible (true);
-}
-
-void OsdNavigation::SetTextFromMap(const InfoMap &Map)
-{
-
-    char paused = Map.value("paused", "X").toLocal8Bit().at(0);
-    if (paused != 'X')
-    {
-        if (m_playButton && m_pauseButton && paused != m_paused)
-        {
-            MythUIType *fw = GetFocusWidget();
-            m_playButton->SetVisible(paused=='Y');
-            m_pauseButton->SetVisible(paused!='Y');
-            if (fw && (fw == m_playButton || fw == m_pauseButton))
-            {
-                fw->LoseFocus();
-                MythUIType *newfw = (paused=='Y' ? m_playButton : m_pauseButton);
-                SetFocusWidget(newfw);
-                if (m_paused == 'X')
-                     newfw->TakeFocus();
-            }
-            m_paused = paused;
-        }
-    }
-
-    char muted = Map.value("muted","X").toLocal8Bit().at(0);
-    if (m_isVolumeControl && muted != 'X')
-    {
-        if (m_muteButton && m_unMuteButton && muted != m_muted)
-        {
-            MythUIType *fw = GetFocusWidget();
-            m_muteButton->SetVisible(muted!='Y');
-            m_unMuteButton->SetVisible(muted=='Y');
-            m_muted = muted;
-            if (fw && (fw == m_muteButton || fw == m_unMuteButton))
-            {
-                fw->LoseFocus();
-                SetFocusWidget(muted=='Y' ? m_unMuteButton : m_muteButton);
-            }
-        }
-    }
-
-    MythScreenType::SetTextFromMap(Map);
+        group->SetVisible(true);
 }
