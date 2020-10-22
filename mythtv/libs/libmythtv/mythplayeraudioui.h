@@ -10,6 +10,9 @@ class MTV_PUBLIC MythPlayerAudioUI : public MythPlayerOverlayUI
 {
     Q_OBJECT
 
+  signals:
+    void      MuteChanged(MuteState Mute);
+
   protected slots:
     void      ChangeMuteState(bool CycleChannels);
     void      ChangeVolume(bool Direction, int Volume, bool UpdateOSD);

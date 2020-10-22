@@ -86,7 +86,8 @@ void MythPlayerAudioUI::ChangeMuteState(bool CycleChannels)
         m_audio.SetMuted(!m_audio.IsMuted());
 
     QString text;
-    switch (m_audio.GetMuteState())
+    MuteState mute = m_audio.GetMuteState();
+    switch (mute)
     {
         case kMuteOff:   text = tr("Mute Off"); break;
         case kMuteAll:   text = tr("Mute On"); break;
@@ -95,6 +96,7 @@ void MythPlayerAudioUI::ChangeMuteState(bool CycleChannels)
     }
 
     UpdateOSDMessage(text);
+    emit MuteChanged(mute);
 }
 
 MuteState MythPlayerAudioUI::GetMuteState()
