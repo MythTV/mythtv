@@ -34,6 +34,7 @@
 #include "decoders/decoderbase.h"
 #include "mythmiscutil.h"
 #include "tvbrowsehelper.h"
+#include "mythtvmenu.h"
 #include "referencecounter.h"
 
 class QEvent;
@@ -128,138 +129,6 @@ class AskProgramInfo
     bool         m_isInSameInputGroup {false};
     bool         m_isConflicting      {false};
     ProgramInfo *m_info               {nullptr};
-};
-
-enum MenuCategory {
-    kMenuCategoryItem,
-    kMenuCategoryItemlist,
-    kMenuCategoryMenu
-};
-enum MenuShowContext {
-    kMenuShowActive,
-    kMenuShowInactive,
-    kMenuShowAlways
-};
-
-enum MenuCurrentContext {
-    kMenuCurrentDefault,
-    kMenuCurrentActive,
-    kMenuCurrentAlways
-};
-
-class MenuBase;
-
-class MenuItemContext
-{
-public:
-    // Constructor for a menu element.
-    MenuItemContext(const MenuBase &menu,
-                    const QDomNode &node,
-                    QString menuName,
-                    MenuCurrentContext current,
-                    bool doDisplay) :
-        m_menu(menu),
-        m_node(node),
-        m_category(kMenuCategoryMenu),
-        m_menuName(std::move(menuName)),
-        m_showContext(kMenuShowAlways),
-        m_currentContext(current),
-        m_action(""),
-        m_actionText(""),
-        m_doDisplay(doDisplay) {}
-    // Constructor for an item element.
-    MenuItemContext(const MenuBase &menu,
-                    const QDomNode &node,
-                    MenuShowContext showContext,
-                    MenuCurrentContext current,
-                    QString action,
-                    QString actionText,
-                    bool doDisplay) :
-        m_menu(menu),
-        m_node(node),
-        m_category(kMenuCategoryItem),
-        m_menuName(""),
-        m_showContext(showContext),
-        m_currentContext(current),
-        m_action(std::move(action)),
-        m_actionText(std::move(actionText)),
-        m_doDisplay(doDisplay) {}
-    // Constructor for an itemlist element.
-    MenuItemContext(const MenuBase &menu,
-                    const QDomNode &node,
-                    MenuShowContext showContext,
-                    MenuCurrentContext current,
-                    QString action,
-                    bool doDisplay) :
-        m_menu(menu),
-        m_node(node),
-        m_category(kMenuCategoryItemlist),
-        m_menuName(""),
-        m_showContext(showContext),
-        m_currentContext(current),
-        m_action(std::move(action)),
-        m_actionText(""),
-        m_doDisplay(doDisplay) {}
-    const MenuBase    &m_menu;
-    const QDomNode    &m_node;
-    MenuCategory       m_category;
-    const QString      m_menuName;
-    MenuShowContext    m_showContext;
-    MenuCurrentContext m_currentContext;
-    const QString      m_action;
-    const QString      m_actionText;
-    bool               m_doDisplay;
-};
-
-class MenuItemDisplayer
-{
-  public:
-    virtual ~MenuItemDisplayer() = default;
-    virtual bool MenuItemDisplay(const MenuItemContext &c) = 0;
-};
-
-class MenuBase
-{
-public:
-    MenuBase() = default;
-    ~MenuBase();
-    bool        LoadFromFile(const QString &filename,
-                             const QString &menuname,
-                             const char *translationContext,
-                             const QString &keyBindingContext);
-    bool        LoadFromString(const QString &text,
-                               const QString &menuname,
-                               const char *translationContext,
-                               const QString &keyBindingContext);
-    bool        IsLoaded() const { return (m_document != nullptr); }
-    QDomElement GetRoot() const;
-    QString     Translate(const QString &text) const;
-    bool        Show(const QDomNode &node, const QDomNode &selected,
-                     MenuItemDisplayer &displayer,
-                     bool doDisplay = true) const;
-    QString     GetName() const { return m_menuName; }
-    const char *GetTranslationContext() const {
-        return m_translationContext;
-    }
-    const QString &GetKeyBindingContext() const {
-        return m_keyBindingContext;
-    }
-private:
-    bool LoadFileHelper(const QString &filename,
-                        const QString &menuname,
-                        const char *translationContext,
-                        const QString &keyBindingContext,
-                        int includeLevel);
-    bool LoadStringHelper(const QString &text,
-                          const QString &menuname,
-                          const char *translationContext,
-                          const QString &keyBindingContext,
-                          int includeLevel);
-    void ProcessIncludes(QDomElement &root, int includeLevel);
-    QDomDocument *m_document           {nullptr};
-    const char   *m_translationContext {""};
-    QString       m_menuName;
-    QString       m_keyBindingContext;
 };
 
 /**

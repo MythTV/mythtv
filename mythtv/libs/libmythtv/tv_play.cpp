@@ -8218,35 +8218,25 @@ void TV::ShowOSDCutpoint(const QString &Type)
     {
         if (!m_cutlistMenu.IsLoaded())
         {
-            m_cutlistMenu.LoadFromFile("menu_cutlist.xml",
-                                       tr("Edit Cut Points"),
-                                       // XXX which translation context to use?
-                                       metaObject()->className(),
-                                       "TV Editing");
+            // TODO which translation context to use?
+            m_cutlistMenu.LoadFromFile("menu_cutlist.xml", tr("Edit Cut Points"),
+                                       metaObject()->className(), "TV Editing");
         }
+
         if (m_cutlistMenu.IsLoaded())
-        {
-            PlaybackMenuShow(m_cutlistMenu,
-                             m_cutlistMenu.GetRoot(),
-                             QDomNode());
-        }
+            PlaybackMenuShow(m_cutlistMenu, m_cutlistMenu.GetRoot(), QDomNode());
     }
     else if (Type == "EDIT_CUT_POINTS_COMPACT")
     {
         if (!m_cutlistCompactMenu.IsLoaded())
         {
-            m_cutlistCompactMenu.LoadFromFile("menu_cutlist_compact.xml",
-                                              tr("Edit Cut Points"),
-                                              // XXX which translation context to use?
-                                              metaObject()->className(),
-                                              "TV Editing");
+            // TODO which translation context to use?
+            m_cutlistCompactMenu.LoadFromFile("menu_cutlist_compact.xml", tr("Edit Cut Points"),
+                                              metaObject()->className(), "TV Editing");
         }
+
         if (m_cutlistCompactMenu.IsLoaded())
-        {
-            PlaybackMenuShow(m_cutlistCompactMenu,
-                             m_cutlistCompactMenu.GetRoot(),
-                             QDomNode());
-        }
+            PlaybackMenuShow(m_cutlistCompactMenu, m_cutlistCompactMenu.GetRoot(), QDomNode());
     }
     else if (Type == "EXIT_EDIT_MODE")
     {
@@ -8256,16 +8246,11 @@ void TV::ShowOSDCutpoint(const QString &Type)
             ReturnOSDLock();
             return;
         }
-        osd->DialogShow(OSD_DLG_CUTPOINT,
-                        tr("Exit Recording Editor"));
-        osd->DialogAddButton(tr("Save Cuts and Exit"),
-                             "DIALOG_CUTPOINT_SAVEEXIT_0");
-        osd->DialogAddButton(tr("Exit Without Saving"),
-                             "DIALOG_CUTPOINT_REVERTEXIT_0");
-        osd->DialogAddButton(tr("Save Cuts"),
-                             "DIALOG_CUTPOINT_SAVEMAP_0");
-        osd->DialogAddButton(tr("Undo Changes"),
-                             "DIALOG_CUTPOINT_REVERT_0");
+        osd->DialogShow(OSD_DLG_CUTPOINT, tr("Exit Recording Editor"));
+        osd->DialogAddButton(tr("Save Cuts and Exit"), "DIALOG_CUTPOINT_SAVEEXIT_0");
+        osd->DialogAddButton(tr("Exit Without Saving"), "DIALOG_CUTPOINT_REVERTEXIT_0");
+        osd->DialogAddButton(tr("Save Cuts"), "DIALOG_CUTPOINT_SAVEMAP_0");
+        osd->DialogAddButton(tr("Undo Changes"), "DIALOG_CUTPOINT_REVERT_0");
         osd->DialogBack("", "DIALOG_CUTPOINT_DONOTHING_0", true);
         InfoMap map;
         map.insert("title", tr("Edit"));
@@ -8880,216 +8865,6 @@ void TV::HandleOSDInfo(const QString& Action)
 
     if (Action == "CHANNELLOCK")
         m_lockTimerOn = false;
-}
-
-bool MenuBase::LoadFromFile(const QString &filename,
-                            const QString &menuname,
-                            const char *translationContext,
-                            const QString &keyBindingContext)
-{
-    return LoadFileHelper(filename, menuname, translationContext,
-                          keyBindingContext, 0);
-}
-
-bool MenuBase::LoadFromString(const QString &text,
-                              const QString &menuname,
-                              const char *translationContext,
-                              const QString &keyBindingContext)
-{
-    return LoadStringHelper(text, menuname, translationContext,
-                            keyBindingContext, 0);
-}
-
-bool MenuBase::LoadFileHelper(const QString &filename,
-                              const QString &menuname,
-                              const char *translationContext,
-                              const QString &keyBindingContext,
-                              int includeLevel)
-{
-    bool result = false;
-
-    m_translationContext = translationContext;
-    m_keyBindingContext = keyBindingContext;
-    QStringList searchpath = GetMythUI()->GetThemeSearchPath();
-    searchpath.prepend(GetConfDir() + '/');
-    for (auto it = searchpath.cbegin(); !result && it != searchpath.cend(); ++it)
-    {
-        QString themefile = *it + filename;
-        LOG(VB_PLAYBACK, LOG_INFO,
-            LOC + QString("Loading menu %1").arg(themefile));
-        QFile file(themefile);
-        if (file.open(QIODevice::ReadOnly))
-        {
-            m_document = new QDomDocument();
-            if (m_document->setContent(&file))
-            {
-                result = true;
-                QDomElement root = GetRoot();
-                m_menuName = Translate(root.attribute("text", menuname));
-                ProcessIncludes(root, includeLevel);
-            }
-            else
-            {
-                delete m_document;
-                m_document = nullptr;
-            }
-            file.close();
-        }
-        if (!result)
-        {
-            LOG(VB_FILE, LOG_ERR, LOC + "No theme file " + themefile);
-        }
-    }
-
-    return result;
-}
-
-bool MenuBase::LoadStringHelper(const QString &text,
-                                const QString &menuname,
-                                const char *translationContext,
-                                const QString &keyBindingContext,
-                                int includeLevel)
-{
-    bool result = false;
-
-    m_translationContext = translationContext;
-    m_keyBindingContext = keyBindingContext;
-    m_document = new QDomDocument();
-    if (m_document->setContent(text))
-    {
-        result = true;
-        QDomElement root = GetRoot();
-        m_menuName = Translate(root.attribute("text", menuname));
-        ProcessIncludes(root, includeLevel);
-    }
-    else
-    {
-        delete m_document;
-        m_document = nullptr;
-    }
-    return result;
-}
-
-void MenuBase::ProcessIncludes(QDomElement &root, int includeLevel)
-{
-    const int maxInclude = 10;
-    for (QDomNode n = root.firstChild(); !n.isNull(); n = n.nextSibling())
-    {
-        if (n.isElement())
-        {
-            QDomElement e = n.toElement();
-            if (e.tagName() == "include")
-            {
-                QString include = e.attribute("file", "");
-                if (include.isEmpty())
-                    continue;
-                if (includeLevel >= maxInclude)
-                {
-                    LOG(VB_GENERAL, LOG_ERR,
-                        QString("Maximum include depth (%1) "
-                                "exceeded for %2")
-                        .arg(maxInclude).arg(include));
-                    return;
-                }
-                MenuBase menu;
-                if (menu.LoadFileHelper(include,
-                                        include, // fallback menu name
-                                                 // is filename
-                                        m_translationContext,
-                                        m_keyBindingContext,
-                                        includeLevel + 1))
-                {
-                    QDomNode newChild = menu.GetRoot();
-                    newChild = m_document->importNode(newChild, true);
-                    root.replaceChild(newChild, n);
-                    n = newChild;
-                }
-            }
-            else if (e.tagName() == "menu")
-            {
-                ProcessIncludes(e, includeLevel + 1);
-            }
-        }
-    }
-}
-
-MenuBase::~MenuBase()
-{
-    if (m_document)
-    {
-        delete m_document;
-        m_document = nullptr;
-    }
-}
-
-QDomElement MenuBase::GetRoot() const
-{
-    return m_document->documentElement();
-}
-
-QString MenuBase::Translate(const QString &text) const
-{
-    return QCoreApplication::translate(m_translationContext, text.toUtf8(), nullptr);
-}
-
-bool MenuBase::Show(const QDomNode &node,
-                    const QDomNode &selected,
-                    MenuItemDisplayer &displayer,
-                    bool doDisplay) const
-{
-    bool hasSelected = false;
-    bool displayed = false;
-    for (QDomNode n = node.firstChild(); !n.isNull(); n = n.nextSibling())
-    {
-        if (n == selected)
-            hasSelected = true;
-    }
-    for (QDomNode n = node.firstChild(); !n.isNull(); n = n.nextSibling())
-    {
-        if (n.isElement())
-        {
-            QDomElement e = n.toElement();
-            QString text  = Translate(e.attribute("text", ""));
-            QString show = e.attribute("show", "");
-            MenuShowContext showContext =
-                (show == "active" ? kMenuShowActive :
-                 show == "inactive" ? kMenuShowInactive : kMenuShowAlways);
-            QString current = e.attribute("current", "");
-            MenuCurrentContext currentContext = kMenuCurrentDefault;
-            if ((current == "active") && !hasSelected)
-                currentContext = kMenuCurrentActive;
-            else if (((current.startsWith("y") ||
-                       current.startsWith("t") ||
-                       current == "1")) && !hasSelected)
-                currentContext = kMenuCurrentAlways;
-            if (e.tagName() == "menu")
-            {
-                if (hasSelected && n == selected)
-                    currentContext = kMenuCurrentAlways;
-                MenuItemContext c(*this, n, text,
-                                  currentContext,
-                                  doDisplay);
-                displayed |= displayer.MenuItemDisplay(c);
-            }
-            else if (e.tagName() == "item")
-            {
-                QString action = e.attribute("action", "");
-                MenuItemContext c(*this, n, showContext, currentContext,
-                                  action, text, doDisplay);
-                displayed |= displayer.MenuItemDisplay(c);
-            }
-            else if (e.tagName() == "itemlist")
-            {
-                QString actiongroup = e.attribute("actiongroup", "");
-                MenuItemContext c(*this, n, showContext, currentContext,
-                                  actiongroup, doDisplay);
-                displayed |= displayer.MenuItemDisplay(c);
-            }
-        }
-        if (!doDisplay && displayed)
-            break; // early exit optimization
-    }
-    return displayed;
 }
 
 static bool matchesGroup(const QString &name, const QString &inPrefix,
@@ -10063,27 +9838,16 @@ void TV::ShowOSDMenu(bool isCompact)
 {
     if (!m_playbackMenu.IsLoaded())
     {
-        m_playbackMenu.LoadFromFile("menu_playback.xml",
-                                    tr("Playback Menu"),
-                                    metaObject()->className(),
-                                    "TV Playback");
-        m_playbackCompactMenu.LoadFromFile("menu_playback_compact.xml",
-                                           tr("Playback Compact Menu"),
-                                           metaObject()->className(),
-                                           "TV Playback");
+        m_playbackMenu.LoadFromFile("menu_playback.xml", tr("Playback Menu"),
+                                    metaObject()->className(), "TV Playback");
+        m_playbackCompactMenu.LoadFromFile("menu_playback_compact.xml", tr("Playback Compact Menu"),
+                                           metaObject()->className(), "TV Playback");
     }
+
     if (isCompact && m_playbackCompactMenu.IsLoaded())
-    {
-        PlaybackMenuShow(m_playbackCompactMenu,
-                         m_playbackCompactMenu.GetRoot(),
-                         QDomNode());
-    }
+        PlaybackMenuShow(m_playbackCompactMenu, m_playbackCompactMenu.GetRoot(), QDomNode());
     else if (m_playbackMenu.IsLoaded())
-    {
-        PlaybackMenuShow(m_playbackMenu,
-                         m_playbackMenu.GetRoot(),
-                         QDomNode());
-    }
+        PlaybackMenuShow(m_playbackMenu, m_playbackMenu.GetRoot(), QDomNode());
 }
 
 void TV::FillOSDMenuJumpRec(const QString &Category, int Level, const QString &Selected)
