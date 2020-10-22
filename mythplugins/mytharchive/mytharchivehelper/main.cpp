@@ -1639,7 +1639,6 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
     memset(&orig, 0, sizeof(AVFrame));
     memset(&retbuf, 0, sizeof(AVFrame));
     MythAVCopy copyframe;
-    MythPictureDeinterlacer deinterlacer(codecCtx->pix_fmt, width, height);
 
     int bufflen = width * height * 4;
     auto *outputbuf = new unsigned char[bufflen];
@@ -1706,7 +1705,7 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
                             AV_PIX_FMT_RGB32, width, height, IMAGE_ALIGN);
 
                         AVFrame *tmp = frame;
-                        deinterlacer.DeinterlaceSingle(tmp, tmp);
+                        MythAVUtil::DeinterlaceAVFrame(tmp);
 
                         copyframe.Copy(&retbuf, AV_PIX_FMT_RGB32, tmp,
                                        codecCtx->pix_fmt, width, height);

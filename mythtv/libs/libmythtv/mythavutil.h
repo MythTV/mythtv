@@ -34,7 +34,7 @@ class MTV_PUBLIC MythCodecMap
 
   private:
     QMap<const AVStream*, AVCodecContext*> m_streamMap;
-    QMutex m_mapLock {QMutex::Recursive};
+    QMutex m_mapLock { QMutex::Recursive };
 };
 
 class MTV_PUBLIC MythAVCopy
@@ -61,34 +61,11 @@ class MTV_PUBLIC MythAVCopy
 class MTV_PUBLIC MythAVUtil
 {
   public:
-    static int FillAVFrame(AVFrame* Frame, const MythVideoFrame* From,
-                           AVPixelFormat Fmt = AV_PIX_FMT_NONE);
+    static void DeinterlaceAVFrame(AVFrame* Frame);
+    static int  FillAVFrame(AVFrame* Frame, const MythVideoFrame* From, AVPixelFormat Fmt = AV_PIX_FMT_NONE);
     static AVPixelFormat  FrameTypeToPixelFormat(VideoFrameType Type);
     static VideoFrameType PixelFormatToFrameType(AVPixelFormat Fmt);
 };
-
-class MTV_PUBLIC MythPictureDeinterlacer
-{
-  public:
-    MythPictureDeinterlacer(AVPixelFormat Fmt, int Width, int Height, float Aspect = 1.0F);
-   ~MythPictureDeinterlacer();
-
-    int Deinterlace(AVFrame* To, const AVFrame* From);
-    int DeinterlaceSingle(AVFrame* To, const AVFrame* From);
-    int Flush();
-
-  private:
-    AVFilterGraph*   m_filterGraph   { nullptr };
-    MythAVFrame      m_filterFrame;
-    AVFilterContext* m_bufferSinkCtx { nullptr };
-    AVFilterContext* m_bufferSrcCtx  { nullptr };
-    AVPixelFormat    m_pixfmt        { AV_PIX_FMT_NONE };
-    int              m_width         { 0 };
-    int              m_height        { 0} ;
-    float            m_aspect        { -1.0F };
-    bool             m_errored       { false };
-};
-
 
 class MTV_PUBLIC MythStreamInfo {
 public:

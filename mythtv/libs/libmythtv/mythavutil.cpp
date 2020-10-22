@@ -13,6 +13,7 @@
 // MythTV
 #include "mythcorecontext.h"
 #include "mythconfig.h"
+#include "mythdeinterlacer.h"
 #include "mythavutil.h"
 
 // FFmpeg
@@ -116,6 +117,41 @@ VideoFrameType MythAVUtil::PixelFormatToFrameType(AVPixelFormat Fmt)
     return FMT_NONE;
 }
 
+/*! \brief Deinterlace an AVFrame
+ *
+ * This is only used by the mytharchive plugin and can be removed if MythArchive
+ * becomes obsolete.
+*/
+void MythAVUtil::DeinterlaceAVFrame(AVFrame *Frame)
+{
+    if (!Frame)
+        return;
+
+    // Create a wrapper frame and set it up
+    // (yes - this will end up being a wrapper around a wrapper!)
+    MythVideoFrame mythframe;
+    VideoFrameType type = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->format));
+    if (MythVideoFrame::YUVFormat(type))
+    {
+        mythframe.Init(type, Frame->data[0], MythVideoFrame::GetBufferSize(type, Frame->width, Frame->height),
+                       Frame->width, Frame->height);
+        mythframe.m_offsets[0] = 0;
+        mythframe.m_offsets[1] = static_cast<int>(Frame->data[1] - Frame->data[0]);
+        mythframe.m_offsets[2] = static_cast<int>(Frame->data[2] - Frame->data[0]);
+        mythframe.m_pitches[0] = Frame->linesize[0];
+        mythframe.m_pitches[1] = Frame->linesize[1];
+        mythframe.m_pitches[2] = Frame->linesize[2];
+
+        mythframe.m_deinterlaceSingle = DEINT_CPU | DEINT_MEDIUM;
+        mythframe.m_deinterlaceAllowed = DEINT_ALL;
+        MythDeinterlacer deinterlacer;
+        deinterlacer.Filter(&mythframe, kScan_Interlaced, nullptr, true);
+    }
+
+    // Must remove buffer before mythframe is deleted
+    mythframe.m_buffer = nullptr;
+}
+
 /// \brief Initialise AVFrame with content from MythVideoFrame
 int MythAVUtil::FillAVFrame(AVFrame *Frame, const MythVideoFrame *From, AVPixelFormat Fmt)
 {
@@ -191,121 +227,6 @@ int MythAVCopy::Copy(AVFrame* To, const MythVideoFrame* From,
     MythAVUtil::FillAVFrame(&frame, From, fromfmt);
     av_image_fill_arrays(To->data, To->linesize, Buffer, Fmt, From->m_width, From->m_height, IMAGE_ALIGN);
     return Copy(To, Fmt, &frame, fromfmt, From->m_width, From->m_height);
-}
-
-/*! \class MythPictureDeinterlacer
- * Simple deinterlacer based on FFmpeg's yadif filter.
- * Yadif requires 3 frames before starting to return a deinterlaced frame.
- */
-MythPictureDeinterlacer::MythPictureDeinterlacer(AVPixelFormat Fmt,
-                                                 int Width, int Height, float Aspect)
-  : m_pixfmt(Fmt),
-    m_width(Width),
-    m_height(Height),
-    m_aspect(Aspect)
-{
-    if (Flush() < 0)
-        m_errored = true;
-}
-
-// Will deinterlace src into dst. If EAGAIN is returned, more frames
-// are needed to output a frame.
-// To drain the deinterlacer, call Deinterlace with src = nullptr until you
-// get no more frames. Once drained, you must call Flush() to start
-// deinterlacing again.
-int MythPictureDeinterlacer::Deinterlace(AVFrame* To, const AVFrame* From)
-{
-    if (m_errored)
-        return -1;
-
-    if (From)
-    {
-        memcpy(m_filterFrame->data, From->data, sizeof(From->data));
-        memcpy(m_filterFrame->linesize, From->linesize, sizeof(From->linesize));
-        m_filterFrame->width = m_width;
-        m_filterFrame->height = m_height;
-        m_filterFrame->format = m_pixfmt;
-    }
-
-    int res = av_buffersrc_add_frame(m_bufferSrcCtx, m_filterFrame);
-    if (res < 0)
-        return res;
-
-    res = av_buffersink_get_frame(m_bufferSinkCtx, m_filterFrame);
-    if (res < 0)
-        return res;
-
-    uint8_t** data = static_cast<AVFrame*>(m_filterFrame)->data;
-    av_image_copy(To->data, To->linesize, const_cast<const uint8_t **>(data),
-        static_cast<const int*>((static_cast<AVFrame*>(m_filterFrame))->linesize),
-        m_pixfmt, m_width, m_height);
-
-    av_frame_unref(m_filterFrame);
-    return 0;
-}
-
-int MythPictureDeinterlacer::DeinterlaceSingle(AVFrame* To, const AVFrame* From)
-{
-    if (m_errored)
-        return -1;
-
-    if (!m_filterGraph && Flush() < 0)
-        return -1;
-
-    int res = Deinterlace(To, From);
-    if (res == AVERROR(EAGAIN))
-    {
-        res = Deinterlace(To, nullptr);
-        // We have drained the filter, we need to recreate it on the next run.
-        avfilter_graph_free(&m_filterGraph);
-    }
-
-    return res;
-}
-
-// Flush and reset the deinterlacer.
-int MythPictureDeinterlacer::Flush()
-{
-    if (m_filterGraph)
-        avfilter_graph_free(&m_filterGraph);
-
-    m_filterGraph = avfilter_graph_alloc();
-    if (!m_filterGraph)
-        return -1;
-
-    AVFilterInOut *inputs = nullptr;
-    AVFilterInOut *outputs = nullptr;
-    AVRational ar = av_d2q(static_cast<double>(m_aspect), 100000);
-    QString args = QString("buffer=video_size=%1x%2:pix_fmt=%3:time_base=1/1:pixel_aspect=%4/%5[in];"
-                           "[in]yadif[out];[out] buffersink")
-                       .arg(m_width).arg(m_height).arg(m_pixfmt).arg(ar.num).arg(ar.den);
-    int res = avfilter_graph_parse2(m_filterGraph, args.toLatin1().data(), &inputs, &outputs);
-    while (true)
-    {
-        if (res < 0 || inputs || outputs)
-            break;
-
-        res = avfilter_graph_config(m_filterGraph, nullptr);
-        if (res < 0)
-            break;
-
-        if (!(m_bufferSrcCtx = avfilter_graph_get_filter(m_filterGraph, "Parsed_buffer_0")))
-            break;
-
-        if (!(m_bufferSinkCtx = avfilter_graph_get_filter(m_filterGraph, "Parsed_buffersink_2")))
-            break;
-
-        return 0;
-    }
-    avfilter_inout_free(&inputs);
-    avfilter_inout_free(&outputs);
-    return -1;
-}
-
-MythPictureDeinterlacer::~MythPictureDeinterlacer()
-{
-    if (m_filterGraph)
-        avfilter_graph_free(&m_filterGraph);
 }
 
 /*! \class MythCodecMap

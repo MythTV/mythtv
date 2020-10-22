@@ -614,11 +614,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     // allocate temp buffer
     int bufflen = m_frameWidth * m_frameHeight * 4;
     m_outputbuf = new unsigned char[bufflen];
-
     m_frameFile = getTempDirectory() + "work/frame.jpg";
-
-    m_deinterlacer.reset(new MythPictureDeinterlacer(m_codecCtx->pix_fmt,
-                                                     m_frameWidth, m_frameHeight));
     return true;
 }
 
@@ -809,9 +805,7 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         av_image_fill_arrays(retbuf.data, retbuf.linesize, m_outputbuf,
             AV_PIX_FMT_RGB32, m_frameWidth, m_frameHeight, IMAGE_ALIGN);
         AVFrame *tmp = m_frame;
-
-        m_deinterlacer->DeinterlaceSingle(tmp, tmp);
-
+        MythAVUtil::DeinterlaceAVFrame(m_frame);
         m_copy.Copy(&retbuf, AV_PIX_FMT_RGB32, tmp, m_codecCtx->pix_fmt,
                     m_frameWidth, m_frameHeight);
 
