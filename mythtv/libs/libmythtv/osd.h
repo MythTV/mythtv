@@ -87,12 +87,44 @@ class MythOSDWindow : public MythScreenType
     bool m_themed { false };
 };
 
+class MythOSDDialogData
+{
+  public:
+    class MythOSDDialogButton
+    {
+      public:
+        QString  m_text    { };
+        QVariant m_data    { };
+        bool     m_menu    { false };
+        bool     m_current { false };
+    };
+
+    class MythOSDBackButton
+    {
+      public:
+        QString  m_text { };
+        QVariant m_data { 0 };
+        bool     m_exit { false };
+    };
+
+    QString m_dialogName;
+    QString m_message { };
+    int     m_timeout { kOSDTimeout_None };
+    std::vector<MythOSDDialogButton> m_buttons { };
+    MythOSDBackButton m_back { };
+};
+
+Q_DECLARE_METATYPE(MythOSDDialogData)
+
 class OSD : public QObject
 {
     Q_OBJECT
 
   signals:
     void HideOSD(OSDFunctionalType Type);
+
+  public slots:
+    void ShowDialog(MythOSDDialogData Data);
 
   public:
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
@@ -130,7 +162,6 @@ class OSD : public QObject
     bool DialogHandleGesture(MythGestureEvent *Event);
     void DialogQuit();
     void DialogShow(const QString &Window, const QString &Text = "", int UpdateFor = 0);
-    void DialogSetText(const QString &Text);
     void DialogBack(const QString& Text = "", const QVariant& Data = 0, bool Exit = false);
     void DialogAddButton(const QString& Text, QVariant Data, bool Menu = false, bool Current = false);
     void DialogGetText(InfoMap &Map);

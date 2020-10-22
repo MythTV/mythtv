@@ -182,11 +182,11 @@ bool OSD::Init(const QRect &Rect, float FontAspect)
         return false;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Loaded OSD: size %1x%2 offset %3+%4")
-            .arg(m_rect.width()).arg(m_rect.height())
-            .arg(m_rect.left()).arg(m_rect.top()));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded OSD: size %1x%2 offset %3+%4")
+        .arg(m_rect.width()).arg(m_rect.height()).arg(m_rect.left()).arg(m_rect.top()));
     HideAll(false);
+
+    connect(m_tv, &TV::ShowOSDDialog, this, &OSD::ShowDialog);
     return true;
 }
 
@@ -978,6 +978,14 @@ void OSD::DialogQuit()
     m_pulsedDialogText = QString();
 }
 
+void OSD::ShowDialog(MythOSDDialogData Data)
+{
+    DialogShow(Data.m_dialogName, Data.m_message, Data.m_timeout);
+    std::for_each(Data.m_buttons.cbegin(), Data.m_buttons.cend(),
+        [this](const MythOSDDialogData::MythOSDDialogButton B) {
+            DialogAddButton(B.m_text, B.m_data, B.m_menu, B.m_current); });
+}
+
 void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
 {
     if (m_dialog)
@@ -991,9 +999,10 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
         {
             auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
             if (dialog)
+            {
                 dialog->Reset();
-
-            DialogSetText(Text);
+                dialog->SetText(Text);
+            }
         }
     }
 
@@ -1047,13 +1056,6 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
     DialogBack();
     HideAll(true, m_dialog);
     m_dialog->SetVisible(true);
-}
-
-void OSD::DialogSetText(const QString &Text)
-{
-    auto *dialog = qobject_cast<MythDialogBox*>(m_dialog);
-    if (dialog)
-        dialog->SetText(Text);
 }
 
 void OSD::DialogBack(const QString& Text, const QVariant& Data, bool Exit)

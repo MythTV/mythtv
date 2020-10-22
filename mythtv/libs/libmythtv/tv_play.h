@@ -187,6 +187,7 @@ class MTV_PUBLIC TV : public QObject, public MythTVMenuItemDisplayer, public Ref
     void ChangeMuteState(bool CycleChannels);
     void ChangeVolume(bool Direction, int Volume, bool UpdateOSD);
     void ChangeOSDDebug();
+    void ShowOSDDialog(MythOSDDialogData Data);
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);

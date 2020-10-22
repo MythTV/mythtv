@@ -1827,18 +1827,14 @@ void TV::ShowOSDAskAllow()
 
         message = single_rec.arg((*it).m_info->GetTitle()).arg(channel);
 
-        OSD *osd = GetOSDL();
-        if (osd)
-        {
-            BrowseEnd(false);
-            timeuntil = static_cast<int>(MythDate::current().secsTo((*it).m_expiry) * 1000);
-            osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
-            osd->DialogAddButton(record_watch, "DIALOG_ASKALLOW_WATCH_0", false, !((*it).m_hasRec));
-            osd->DialogAddButton(let_record1, "DIALOG_ASKALLOW_EXIT_0");
-            osd->DialogAddButton(((*it).m_hasLater) ? record_later1 : do_not_record1, "DIALOG_ASKALLOW_CANCELRECORDING_0",
-                                 false, ((*it).m_hasRec));
-        }
-        ReturnOSDLock();
+        BrowseEnd(false);
+        timeuntil = static_cast<int>(MythDate::current().secsTo((*it).m_expiry) * 1000);
+        MythOSDDialogData dialog { OSD_DLG_ASKALLOW, message, timeuntil };
+        dialog.m_buttons.push_back({ record_watch, "DIALOG_ASKALLOW_WATCH_0", false, !((*it).m_hasRec)} );
+        dialog.m_buttons.push_back({ let_record1, "DIALOG_ASKALLOW_EXIT_0" });
+        dialog.m_buttons.push_back({ ((*it).m_hasLater) ? record_later1 : do_not_record1,
+                                     "DIALOG_ASKALLOW_CANCELRECORDING_0", false, ((*it).m_hasRec) });
+        emit ShowOSDDialog(dialog);
     }
     else
     {
@@ -1899,27 +1895,22 @@ void TV::ShowOSDAskAllow()
         }
         timeuntil = (9999999 == timeuntil) ? 0 : timeuntil;
 
-        OSD *osd = GetOSDL();
-        if (osd && conflict_count > 1)
+        if (conflict_count > 1)
         {
             BrowseEnd(false);
-            osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
-            osd->DialogAddButton(let_recordm, "DIALOG_ASKALLOW_EXIT_0",
-                                 false, true);
-            osd->DialogAddButton((all_have_later) ? record_laterm : do_not_recordm,
-                                 "DIALOG_ASKALLOW_CANCELCONFLICTING_0");
+            emit ShowOSDDialog( { OSD_DLG_ASKALLOW, message, timeuntil, {
+                { let_recordm, "DIALOG_ASKALLOW_EXIT_0", false, true },
+                { all_have_later ? record_laterm : do_not_recordm, "DIALOG_ASKALLOW_CANCELCONFLICTING_0" }
+            }});
         }
-        else if (osd)
+        else
         {
             BrowseEnd(false);
-            osd->DialogShow(OSD_DLG_ASKALLOW, message, timeuntil);
-            osd->DialogAddButton(let_record1, "DIALOG_ASKALLOW_EXIT_0",
-                                 false, !has_rec);
-            osd->DialogAddButton((all_have_later) ? record_later1 : do_not_record1,
-                                 "DIALOG_ASKALLOW_CANCELRECORDING_0",
-                                 false, has_rec);
+            emit ShowOSDDialog( {OSD_DLG_ASKALLOW, message, timeuntil, {
+                { let_record1, "DIALOG_ASKALLOW_EXIT_0", false, !has_rec},
+                { all_have_later ? record_later1 : do_not_record1, "DIALOG_ASKALLOW_CANCELRECORDING_0", false, has_rec}
+            }});
         }
-        ReturnOSDLock();
     }
 }
 
@@ -6760,6 +6751,8 @@ void TV::UpdateOSDTimeoutMessage()
         return;
     }
 
+    ReturnOSDLock();
+
     // create dialog...
     static QString s_chanUp   = GET_KEY("TV Playback", ACTION_CHANNELUP);
     static QString s_chanDown = GET_KEY("TV Playback", ACTION_CHANNELDOWN);
@@ -6773,12 +6766,9 @@ void TV::UpdateOSDTimeoutMessage()
         "video source (%3), inputs (%4), etc.")
         .arg(s_chanUp).arg(s_chanDown).arg(s_nextSrc).arg(s_togCards);
 
-    osd->DialogShow(OSD_DLG_INFO, message);
-    QString action = "DIALOG_INFO_CHANNELLOCK_0";
-    osd->DialogAddButton(tr("OK"), action);
-    osd->DialogBack("", action, true);
-
-    ReturnOSDLock();
+    emit ShowOSDDialog({ OSD_DLG_INFO, message, 0,
+                       { {tr("OK"), "DIALOG_INFO_CHANNELLOCK_0" } },
+                       { "", "DIALOG_INFO_CHANNELLOCK_0", true } });
 }
 
 bool TV::CalcPlayerSliderPosition(osdInfo &info, bool paddedFields) const
@@ -7381,21 +7371,13 @@ void TV::ShowOSDSleep()
     KillTimer(m_sleepTimerId);
     m_sleepTimerId = 0;
 
-    GetPlayerReadLock();
-    OSD *osd = GetOSDL();
-    if (osd)
-    {
-        QString message = tr("MythTV was set to sleep after %1 minutes and "
-                             "will exit in %d seconds.\n"
-                             "Do you wish to continue watching?")
-                             .arg(static_cast<double>(m_sleepTimerTimeout * (1.0F / 60000.0F)));
+    QString message = tr("MythTV was set to sleep after %1 minutes and will exit in %d seconds.\n"
+                         "Do you wish to continue watching?")
+            .arg(static_cast<double>(m_sleepTimerTimeout * (1.0F / 60000.0F)));
 
-        osd->DialogShow(OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout);
-        osd->DialogAddButton(tr("Yes"), "DIALOG_SLEEP_YES_0");
-        osd->DialogAddButton(tr("No"),  "DIALOG_SLEEP_NO_0");
-    }
-    ReturnOSDLock();
-    ReturnPlayerLock();
+    emit ShowOSDDialog( { OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout,
+                        { { tr("Yes"), "DIALOG_SLEEP_YES_0" },
+                          { tr("No"),  "DIALOG_SLEEP_NO_0" } }});
 
     m_sleepDialogTimerId = StartTimer(kSleepTimerDialogTimeout, __LINE__);
 }
@@ -7444,20 +7426,13 @@ void TV::ShowOSDIdle()
     KillTimer(m_idleTimerId);
     m_idleTimerId = 0;
 
-    GetPlayerReadLock();
-    OSD *osd = GetOSDL();
-    if (osd)
-    {
-        QString message = tr("MythTV has been idle for %1 minutes and "
-                             "will exit in %d seconds. Are you still watching?")
-                             .arg(static_cast<double>(m_dbIdleTimeout * (1.0F / 60000.0F)));
+    QString message = tr("MythTV has been idle for %1 minutes and "
+                         "will exit in %d seconds. Are you still watching?")
+                         .arg(static_cast<double>(m_dbIdleTimeout * (1.0F / 60000.0F)));
 
-        osd->DialogShow(OSD_DLG_IDLE, message, kIdleTimerDialogTimeout);
-        osd->DialogAddButton(tr("Yes"), "DIALOG_IDLE_YES_0");
-        osd->DialogAddButton(tr("No"),  "DIALOG_IDLE_NO_0");
-    }
-    ReturnOSDLock();
-    ReturnPlayerLock();
+    emit ShowOSDDialog( { OSD_DLG_IDLE, message, kIdleTimerDialogTimeout,
+                        { { tr("Yes"), "DIALOG_IDLE_YES_0" },
+                          { tr("No"),  "DIALOG_IDLE_NO_0" }}});
 
     m_idleDialogTimerId = StartTimer(kIdleTimerDialogTimeout, __LINE__);
 }
@@ -7600,13 +7575,7 @@ void TV::customEvent(QEvent *Event)
         if (timeout > 0)
             message += " (%d)";
 
-        GetPlayerReadLock();
-        OSD *osd = GetOSDL();
-        if (osd)
-            osd->DialogShow(OSD_DLG_CONFIRM, message, timeout);
-        ReturnOSDLock();
-        ReturnPlayerLock();
-
+        emit ShowOSDDialog( { OSD_DLG_CONFIRM, message, timeout });
         return;
     }
 
@@ -7632,14 +7601,9 @@ void TV::customEvent(QEvent *Event)
         {
             auto data = dce->GetData().value<MythTVMenuNodeTuple>();
             if (dce->GetResult() == -1) // menu exit/back
-            {
-                PlaybackMenuShow(data.m_menu, data.m_node.parentNode(),
-                                 data.m_node);
-            }
+                PlaybackMenuShow(data.m_menu, data.m_node.parentNode(), data.m_node);
             else
-            {
                 PlaybackMenuShow(data.m_menu, data.m_node, QDomNode());
-            }
         }
         else
         {
@@ -8229,12 +8193,15 @@ void TV::ShowOSDCutpoint(const QString &Type)
             ReturnOSDLock();
             return;
         }
-        osd->DialogShow(OSD_DLG_CUTPOINT, tr("Exit Recording Editor"));
-        osd->DialogAddButton(tr("Save Cuts and Exit"), "DIALOG_CUTPOINT_SAVEEXIT_0");
-        osd->DialogAddButton(tr("Exit Without Saving"), "DIALOG_CUTPOINT_REVERTEXIT_0");
-        osd->DialogAddButton(tr("Save Cuts"), "DIALOG_CUTPOINT_SAVEMAP_0");
-        osd->DialogAddButton(tr("Undo Changes"), "DIALOG_CUTPOINT_REVERT_0");
-        osd->DialogBack("", "DIALOG_CUTPOINT_DONOTHING_0", true);
+
+        MythOSDDialogData dialog { OSD_DLG_CUTPOINT, tr("Exit Recording Editor") };
+        dialog.m_buttons.push_back( { tr("Save Cuts and Exit"), "DIALOG_CUTPOINT_SAVEEXIT_0" } );
+        dialog.m_buttons.push_back( { tr("Exit Without Saving"), "DIALOG_CUTPOINT_REVERTEXIT_0" } );
+        dialog.m_buttons.push_back( { tr("Save Cuts"), "DIALOG_CUTPOINT_SAVEMAP_0" } );
+        dialog.m_buttons.push_back( { tr("Undo Changes"), "DIALOG_CUTPOINT_REVERT_0" } );
+        dialog.m_back = { "", "DIALOG_CUTPOINT_DONOTHING_0", true };
+        emit ShowOSDDialog(dialog);
+
         InfoMap map;
         map.insert("title", tr("Edit"));
         osd->SetText("osd_program_editor", map, kOSDTimeout_None);
@@ -8287,23 +8254,16 @@ void TV::StartProgramEditMode()
 
 void TV::ShowOSDAlreadyEditing()
 {
-    OSD *osd = GetOSDL();
-    if (osd)
-    {
-        osd->DialogQuit();
-        bool was_paused = ContextIsPaused(__FILE__, __LINE__);
-        if (!was_paused)
-            DoTogglePause(true);
+    bool paused = ContextIsPaused(__FILE__, __LINE__);
+    if (!paused)
+        DoTogglePause(true);
 
-        QString message = tr("This program is currently being edited");
-        osd->DialogShow(OSD_DLG_EDITING, message);
-        QString def = QString("DIALOG_EDITING_CONTINUE_%1").arg(static_cast<int>(was_paused));
-        osd->DialogAddButton(tr("Continue Editing"), def, false, true);
-        osd->DialogAddButton(tr("Do not edit"),
-                             QString("DIALOG_EDITING_STOP_%1").arg(static_cast<int>(was_paused)));
-        osd->DialogBack("", def, true);
-    }
-    ReturnOSDLock();
+    QString message = tr("This program is currently being edited");
+    QString def = QString("DIALOG_EDITING_CONTINUE_%1").arg(static_cast<int>(paused));
+    emit ShowOSDDialog( { OSD_DLG_EDITING, message, 0,
+                        { { tr("Continue Editing"), def, false, true },
+                          { tr("Do not edit"), QString("DIALOG_EDITING_STOP_%1").arg(static_cast<int>(paused)) }},
+                        { "", def, true} });
 }
 
 void TV::HandleOSDAlreadyEditing(const QString& Action, bool WasPaused)
@@ -8369,8 +8329,7 @@ void TV::StartChannelEditMode()
     osd = GetOSDL();
     if (osd)
     {
-        osd->DialogQuit();
-        osd->DialogShow(OSD_DLG_EDITOR);
+        emit ShowOSDDialog({ OSD_DLG_EDITOR });
         osd->SetText(OSD_DLG_EDITOR, m_chanEditMap, kOSDTimeout_None);
     }
     ReturnOSDLock();
@@ -8384,7 +8343,7 @@ void TV::StartOsdNavigation()
         osd->DialogQuit();
         osd->HideAll();
         ToggleOSD(true);
-        osd->DialogShow(OSD_DLG_NAVIGATE);
+        emit ShowOSDDialog({ OSD_DLG_NAVIGATE });
     }
     ReturnOSDLock();
     UpdateNavDialog();
@@ -9030,8 +8989,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context)
         {
             QVariant v;
             v.setValue(MythTVMenuNodeTuple(Context.m_menu, Context.m_node));
-            osd->DialogAddButton(Context.m_menuName, v, true,
-                                 Context.m_currentContext != kMenuCurrentDefault);
+            osd->DialogAddButton(Context.m_menuName, v, true, Context.m_currentContext != kMenuCurrentDefault);
         }
         return result;
     }
@@ -9707,10 +9665,9 @@ void TV::PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QD
     {
         bool isPlayback = (&Menu == &m_playbackMenu || &Menu == &m_playbackCompactMenu);
         bool isCutlist = (&Menu == &m_cutlistMenu || &Menu == &m_cutlistCompactMenu);
-        m_tvmOsd->DialogShow(isPlayback ? OSD_DLG_MENU : isCutlist ? OSD_DLG_CUTPOINT : "???", Menu.GetName());
-        Menu.Show(Node, Selected, *this);
         QString text = Menu.Translate(Node.toElement().attribute("text", Menu.GetName()));
-        m_tvmOsd->DialogSetText(text);
+        m_tvmOsd->DialogShow(isPlayback ? OSD_DLG_MENU : isCutlist ? OSD_DLG_CUTPOINT : "???", text);
+        Menu.Show(Node, Selected, *this);
         QDomNode parent = Node.parentNode();
         if (!parent.parentNode().isNull())
         {
@@ -9800,110 +9757,102 @@ void TV::FillOSDMenuJumpRec(const QString &Category, int Level, const QString &S
         // in_recgroup = false;
     }
 
-    OSD *osd = GetOSDL();
-    if (osd)
+    MythOSDDialogData dialog { "osd_jumprec", tr("Recorded Program") };
+
+    QMutexLocker locker(&m_progListsLock);
+    m_progLists.clear();
+    std::vector<ProgramInfo*> *infoList = RemoteGetRecordedList(0);
+    bool LiveTVInAllPrograms = gCoreContext->GetBoolSetting("LiveTVInAllPrograms",false);
+    if (infoList)
     {
-        QString title = tr("Recorded Program");
-        osd->DialogShow("osd_jumprec", title);
+        QList<QString> titles_seen;
 
-        QMutexLocker locker(&m_progListsLock);
-        m_progLists.clear();
-        std::vector<ProgramInfo*> *infoList = RemoteGetRecordedList(0);
-        bool LiveTVInAllPrograms = gCoreContext->GetBoolSetting("LiveTVInAllPrograms",false);
-        if (infoList)
+        m_playerContext.LockPlayingInfo(__FILE__, __LINE__);
+        QString currecgroup = m_playerContext.m_playingInfo->GetRecordingGroup();
+        m_playerContext.UnlockPlayingInfo(__FILE__, __LINE__);
+
+        for (auto *pi : *infoList)
         {
-            QList<QString> titles_seen;
-
-            m_playerContext.LockPlayingInfo(__FILE__, __LINE__);
-            QString currecgroup = m_playerContext.m_playingInfo->GetRecordingGroup();
-            m_playerContext.UnlockPlayingInfo(__FILE__, __LINE__);
-
-            for (auto *pi : *infoList)
+            if (pi->GetRecordingGroup() != "LiveTV" || LiveTVInAllPrograms ||
+                 pi->GetRecordingGroup() == currecgroup)
             {
-                if (pi->GetRecordingGroup() != "LiveTV" || LiveTVInAllPrograms ||
-                     pi->GetRecordingGroup() == currecgroup)
-                {
-                    m_progLists[pi->GetRecordingGroup()].push_front(
-                        new ProgramInfo(*pi));
-                }
+                m_progLists[pi->GetRecordingGroup()].push_front(
+                    new ProgramInfo(*pi));
             }
+        }
 
-            ProgramInfo *lastprog = GetLastProgram();
-            QMap<QString,ProgramList>::const_iterator Iprog;
-            for (Iprog = m_progLists.cbegin(); Iprog != m_progLists.cend(); ++Iprog)
+        ProgramInfo *lastprog = GetLastProgram();
+        QMap<QString,ProgramList>::const_iterator Iprog;
+        for (Iprog = m_progLists.cbegin(); Iprog != m_progLists.cend(); ++Iprog)
+        {
+            const ProgramList &plist = *Iprog;
+            auto progIndex = static_cast<uint>(plist.size());
+            const QString& group = Iprog.key();
+
+            if (plist[0]->GetRecordingGroup() != currecgroup)
+                SetLastProgram(plist[0]);
+
+            if (progIndex == 1 && Level == 0)
             {
-                const ProgramList &plist = *Iprog;
-                auto progIndex = static_cast<uint>(plist.size());
-                const QString& group = Iprog.key();
+                dialog.m_buttons.push_back( {Iprog.key(), QString("JUMPPROG %1 0").arg(group) });
+            }
+            else if (progIndex > 1 && Level == 0)
+            {
+                QString act = QString("DIALOG_%1_%2_1")
+                                .arg(ACTION_JUMPREC).arg(group);
+                dialog.m_buttons.push_back( {group, act, true, Selected == group });
+            }
+            else if (Level == 1 && Iprog.key() == Category)
+            {
+                for (auto pit = plist.begin(); pit != plist.end(); ++pit)
+                {
+                    const ProgramInfo *p = *pit;
 
-                if (plist[0]->GetRecordingGroup() != currecgroup)
-                    SetLastProgram(plist[0]);
+                    if (titles_seen.contains(p->GetTitle()))
+                        continue;
 
-                if (progIndex == 1 && Level == 0)
-                {
-                    osd->DialogAddButton(Iprog.key(),
-                                         QString("JUMPPROG %1 0").arg(group));
-                }
-                else if (progIndex > 1 && Level == 0)
-                {
-                    QString act = QString("DIALOG_%1_%2_1")
-                                    .arg(ACTION_JUMPREC).arg(group);
-                    osd->DialogAddButton(group, act,
-                                         true, Selected == group);
-                }
-                else if (Level == 1 && Iprog.key() == Category)
-                {
-                    for (auto pit = plist.begin(); pit != plist.end(); ++pit)
+                    titles_seen.push_back(p->GetTitle());
+
+                    int j = -1;
+                    for (auto *q : plist)
                     {
-                        const ProgramInfo *p = *pit;
+                        j++;
 
-                        if (titles_seen.contains(p->GetTitle()))
+                        if (q->GetTitle() != p->GetTitle())
                             continue;
 
-                        titles_seen.push_back(p->GetTitle());
-
-                        int j = -1;
-                        for (auto *q : plist)
-                        {
-                            j++;
-
-                            if (q->GetTitle() != p->GetTitle())
-                                continue;
-
-                            osd->DialogAddButton(q->GetSubtitle().isEmpty() ?
-                                    q->GetTitle() : q->GetSubtitle(),
-                                    QString("JUMPPROG %1 %2")
-                                        .arg(Iprog.key()).arg(j));
-                        }
+                        dialog.m_buttons.push_back( { q->GetSubtitle().isEmpty() ?
+                                q->GetTitle() : q->GetSubtitle(),
+                                QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(j) });
                     }
                 }
             }
-            SetLastProgram(lastprog);
-            delete lastprog;
-
-            while (!infoList->empty())
-            {
-                delete infoList->back();
-                infoList->pop_back();
-            }
-            delete infoList;
         }
+        SetLastProgram(lastprog);
+        delete lastprog;
 
-        if (!Category.isEmpty())
+        while (!infoList->empty())
         {
-            if (Level == 1)
-                osd->DialogBack(Category, "DIALOG_" + ACTION_JUMPREC + "_X_0");
-            else if (Level == 0)
-            {
-                if (m_tvmJumprecBackHack.isValid())
-                    osd->DialogBack("", m_tvmJumprecBackHack);
-                else
-                    osd->DialogBack(ACTION_JUMPREC,
-                                    "DIALOG_MENU_" + ACTION_JUMPREC +"_0");
-            }
+            delete infoList->back();
+            infoList->pop_back();
+        }
+        delete infoList;
+    }
+
+    if (!Category.isEmpty())
+    {
+        if (Level == 1)
+            dialog.m_back = { Category, "DIALOG_" + ACTION_JUMPREC + "_X_0" };
+        else if (Level == 0)
+        {
+            if (m_tvmJumprecBackHack.isValid())
+                dialog.m_back = { "", m_tvmJumprecBackHack };
+            else
+                dialog.m_back = { ACTION_JUMPREC, "DIALOG_MENU_" + ACTION_JUMPREC +"_0" };
         }
     }
-    ReturnOSDLock();
+
+    emit ShowOSDDialog(dialog);
 }
 
 void TV::OverrideScan(FrameScanType Scan)
@@ -10134,17 +10083,7 @@ void TV::ShowNoRecorderDialog(NoRecorderMsg MsgType)
             break;
     }
 
-    OSD *osd = GetOSDL();
-    if (osd)
-    {
-        osd->DialogShow(OSD_DLG_INFO, errorText);
-        osd->DialogAddButton(tr("OK"), "DIALOG_INFO_X_X");
-    }
-    else
-    {
-        ShowOkPopup(errorText);
-    }
-    ReturnOSDLock();
+    emit ShowOSDDialog({ OSD_DLG_INFO, errorText, 0, {{ tr("OK"), "DIALOG_INFO_X_X" }}});
 }
 
 /**
@@ -10412,29 +10351,24 @@ void TV::ShowOSDStopWatchingRecording()
     if (videotype.isEmpty())
         videotype = tr("this recording");
 
-    OSD *osd = GetOSDL();
-    if (osd)
+    MythOSDDialogData dialog { OSD_DLG_VIDEOEXIT, tr("You are exiting %1").arg(videotype) };
+
+    if (IsBookmarkAllowed())
     {
-        osd->DialogShow(OSD_DLG_VIDEOEXIT,
-                        tr("You are exiting %1").arg(videotype));
-
-        if (IsBookmarkAllowed())
-        {
-            osd->DialogAddButton(tr("Save this position and go to the menu"), "DIALOG_VIDEOEXIT_SAVEPOSITIONANDEXIT_0");
-            osd->DialogAddButton(tr("Do not save, just exit to the menu"), ACTION_STOP);
-        }
-        else
-        {
-            osd->DialogAddButton(tr("Exit %1").arg(videotype), ACTION_STOP);
-        }
-
-        if (IsDeleteAllowed())
-            osd->DialogAddButton(tr("Delete this recording"), "DIALOG_VIDEOEXIT_CONFIRMDELETE_0");
-
-        osd->DialogAddButton(tr("Keep watching"), "DIALOG_VIDEOEXIT_KEEPWATCHING_0");
-        osd->DialogBack("", "DIALOG_VIDEOEXIT_KEEPWATCHING_0", true);
+        dialog.m_buttons.push_back({tr("Save this position and go to the menu"), "DIALOG_VIDEOEXIT_SAVEPOSITIONANDEXIT_0"});
+        dialog.m_buttons.push_back({tr("Do not save, just exit to the menu"), ACTION_STOP});
     }
-    ReturnOSDLock();
+    else
+    {
+        dialog.m_buttons.push_back({tr("Exit %1").arg(videotype), ACTION_STOP});
+    }
+
+    if (IsDeleteAllowed())
+        dialog.m_buttons.push_back({tr("Delete this recording"), "DIALOG_VIDEOEXIT_CONFIRMDELETE_0"});
+
+    dialog.m_buttons.push_back({tr("Keep watching"), "DIALOG_VIDEOEXIT_KEEPWATCHING_0"});
+    dialog.m_back = { "", "DIALOG_VIDEOEXIT_KEEPWATCHING_0", true };
+    emit ShowOSDDialog(dialog);
 
     if (m_videoExitDialogTimerId)
         KillTimer(m_videoExitDialogTimerId);
@@ -10486,10 +10420,9 @@ void TV::ShowOSDPromptDeleteRecording(const QString& Title, bool Force)
                     message += " " + byWho[i+2];
                 }
             }
-            osd->DialogShow(OSD_DLG_DELETE, message);
-            QString action = "DIALOG_DELETE_OK_0";
-            osd->DialogAddButton(tr("OK"), action);
-            osd->DialogBack("", action, true);
+            emit ShowOSDDialog({OSD_DLG_DELETE, message, 0,
+                                {{ tr("OK"), "DIALOG_DELETE_OK_0" }},
+                                { "", "DIALOG_DELETE_OK_0", true }});
         }
         ReturnOSDLock();
         // If the delete prompt is to be displayed at the end of a
@@ -10518,27 +10451,23 @@ void TV::ShowOSDPromptDeleteRecording(const QString& Title, bool Force)
     OSD *osd = GetOSDL();
     if (osd && (!osd->DialogVisible() || Force))
     {
-        osd->DialogShow(OSD_DLG_VIDEOEXIT, message);
+        MythOSDDialogData dialog { OSD_DLG_VIDEOEXIT, message };
         if (Title == "End Of Recording")
         {
-            osd->DialogAddButton(tr("Delete it, but allow it to re-record"),
-                                 "DIALOG_VIDEOEXIT_DELETEANDRERECORD_0");
-            osd->DialogAddButton(tr("Delete it"),
-                                 "DIALOG_VIDEOEXIT_JUSTDELETE_0");
-            osd->DialogAddButton(tr("Save it so I can watch it again"),
-                                 ACTION_STOP, false, true);
+            dialog.m_buttons.push_back({tr("Delete it, but allow it to re-record"), "DIALOG_VIDEOEXIT_DELETEANDRERECORD_0"});
+            dialog.m_buttons.push_back({tr("Delete it"), "DIALOG_VIDEOEXIT_JUSTDELETE_0"});
+            dialog.m_buttons.push_back({tr("Save it so I can watch it again"), ACTION_STOP, false, true});
         }
         else
         {
-            osd->DialogAddButton(tr("Yes, and allow re-record"),
-                                 "DIALOG_VIDEOEXIT_DELETEANDRERECORD_0");
-            osd->DialogAddButton(tr("Yes, delete it"),
-                                 "DIALOG_VIDEOEXIT_JUSTDELETE_0");
-            osd->DialogAddButton(tr("No, keep it"),
-                                 ACTION_STOP, false, true);
+            dialog.m_buttons.push_back({tr("Yes, and allow re-record"), "DIALOG_VIDEOEXIT_DELETEANDRERECORD_0"});
+            dialog.m_buttons.push_back({tr("Yes, delete it"), "DIALOG_VIDEOEXIT_JUSTDELETE_0"});
+            dialog.m_buttons.push_back({tr("No, keep it"), ACTION_STOP, false, true});
             if (!paused)
-                osd->DialogBack("", "DIALOG_PLAY_0_0", true);
+                dialog.m_back = { "", "DIALOG_PLAY_0_0", true };
         }
+
+        emit ShowOSDDialog(dialog);
 
         if (m_videoExitDialogTimerId)
             KillTimer(m_videoExitDialogTimerId);
