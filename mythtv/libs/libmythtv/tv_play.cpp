@@ -64,7 +64,7 @@
 #include "playercontext.h"
 #include "programtypes.h"
 #include "io/mythmediabuffer.h"
-#include "tv_actions.h"
+#include "mythtvactionutils.h"
 #include "mythcodeccontext.h"
 #include "tv_play.h"
 
@@ -3097,16 +3097,9 @@ bool TV::event(QEvent* Event)
 
     if (QEvent::Resize == Event->type())
     {
-        GetPlayerReadLock();
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
         const auto *qre = dynamic_cast<const QResizeEvent*>(Event);
         if (qre)
-        {
-            QSize size = qre->size();
-            emit WindowResized(size);
-        }
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        ReturnPlayerLock();
+            emit WindowResized(qre->size());
         return false;
     }
 
@@ -3254,15 +3247,6 @@ bool TV::HandleTrackAction(const QString &Action)
     return handled;
 }
 
-static bool has_action(const QString& action, const QStringList &actions)
-{
-    QStringList::const_iterator it;
-    for (it = actions.begin(); it != actions.end(); ++it)
-        if (action == *it)
-            return true;
-    return false;
-}
-
 // Make a special check for global system-related events.
 //
 // This check needs to be done early in the keypress event processing,
@@ -3397,8 +3381,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
             if (keycode > 0)
             {
-                auto *key = new QKeyEvent(QEvent::KeyPress, keycode,
-                                          eKeyEvent->modifiers());
+                auto *key = new QKeyEvent(QEvent::KeyPress, keycode, eKeyEvent->modifiers());
                 QCoreApplication::postEvent(this, key);
             }
         }
@@ -3420,10 +3403,9 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
         if (handled || actions.isEmpty())
             return handled;
 
-        bool esc   = has_action("ESCAPE", actions) ||
-                     has_action("BACK", actions);
-        bool pause = has_action(ACTION_PAUSE, actions);
-        bool play  = has_action(ACTION_PLAY,  actions);
+        bool esc   = IsActionable({ "ESCAPE", "BACK" }, actions);
+        bool pause = IsActionable(ACTION_PAUSE, actions);
+        bool play  = IsActionable(ACTION_PLAY,  actions);
 
         if ((!esc || IsBrowsing()) && !pause && !play)
             return false;
@@ -3452,17 +3434,17 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
         if (!handled && m_player)
         {
-            if (has_action("MENU", actions))
+            if (IsActionable("MENU", actions))
             {
                 ShowOSDCutpoint("EDIT_CUT_POINTS");
                 handled = true;
             }
-            if (has_action(ACTION_MENUCOMPACT, actions))
+            if (IsActionable(ACTION_MENUCOMPACT, actions))
             {
                 ShowOSDCutpoint("EDIT_CUT_POINTS_COMPACT");
                 handled = true;
             }
-            if (has_action("ESCAPE", actions))
+            if (IsActionable("ESCAPE", actions))
             {
                 if (!m_player->IsCutListSaved())
                     ShowOSDCutpoint("EXIT_EDIT_MODE");
@@ -3479,7 +3461,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
                 m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
                 auto current_frame = m_player->GetFramesPlayed();
                 m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-                if ((has_action(ACTION_SELECT, actions)) && (m_player->IsInDelete(current_frame)) &&
+                if ((IsActionable(ACTION_SELECT, actions)) && (m_player->IsInDelete(current_frame)) &&
                     (!(m_player->HasTemporaryMark())))
                 {
                     ShowOSDCutpoint("EDIT_CUT_POINTS");
@@ -3625,28 +3607,21 @@ bool TV::BrowseHandleAction(const QStringList &Actions)
 
     bool handled = true;
 
-    if (has_action(ACTION_UP, Actions) || has_action(ACTION_CHANNELUP, Actions))
+    if (IsActionable({ ACTION_UP, ACTION_CHANNELUP }, Actions))
         BrowseDispInfo(BROWSE_UP);
-    else if (has_action(ACTION_DOWN, Actions) || has_action(ACTION_CHANNELDOWN, Actions))
+    else if (IsActionable( { ACTION_DOWN, ACTION_CHANNELDOWN }, Actions))
         BrowseDispInfo(BROWSE_DOWN);
-    else if (has_action(ACTION_LEFT, Actions))
+    else if (IsActionable(ACTION_LEFT, Actions))
         BrowseDispInfo(BROWSE_LEFT);
-    else if (has_action(ACTION_RIGHT, Actions))
+    else if (IsActionable(ACTION_RIGHT, Actions))
         BrowseDispInfo(BROWSE_RIGHT);
-    else if (has_action("NEXTFAV", Actions))
+    else if (IsActionable("NEXTFAV", Actions))
         BrowseDispInfo(BROWSE_FAVORITE);
-    else if (has_action(ACTION_SELECT, Actions))
-    {
+    else if (IsActionable(ACTION_SELECT, Actions))
         BrowseEnd(true);
-    }
-    else if (has_action(ACTION_CLEAROSD, Actions) ||
-             has_action("ESCAPE",       Actions) ||
-             has_action("BACK",         Actions) ||
-             has_action("TOGGLEBROWSE", Actions))
-    {
+    else if (IsActionable({ ACTION_CLEAROSD, "ESCAPE", "BACK", "TOGGLEBROWSE" }, Actions))
         BrowseEnd(false);
-    }
-    else if (has_action(ACTION_TOGGLERECORD, Actions))
+    else if (IsActionable(ACTION_TOGGLERECORD, Actions))
         QuickRecord();
     else
     {
@@ -3662,16 +3637,12 @@ bool TV::BrowseHandleAction(const QStringList &Actions)
     }
 
     // only pass-through actions listed below
-    return handled ||
-        !(has_action(ACTION_VOLUMEDOWN, Actions) ||
-          has_action(ACTION_VOLUMEUP,   Actions) ||
-          has_action("STRETCHINC",      Actions) ||
-          has_action("STRETCHDEC",      Actions) ||
-          has_action(ACTION_MUTEAUDIO,  Actions) ||
-          has_action("CYCLEAUDIOCHAN",  Actions) ||
-          has_action("BOTTOMLINEMOVE",  Actions) ||
-          has_action("BOTTOMLINESAVE",  Actions) ||
-          has_action("TOGGLEASPECT",    Actions));
+    static const QStringList passthrough =
+    {
+        ACTION_VOLUMEUP, ACTION_VOLUMEDOWN, "STRETCHINC", "STRETCHDEC",
+        ACTION_MUTEAUDIO, "CYCLEAUDIOCHAN", "BOTTOMLINEMOVE", "BOTTOMLINESAVE", "TOGGLEASPECT"
+    };
+    return handled || !IsActionable(passthrough, Actions);
 }
 
 bool TV::ManualZoomHandleAction(const QStringList &Actions)
@@ -3690,53 +3661,36 @@ bool TV::ManualZoomHandleAction(const QStringList &Actions)
     bool handled = true;
     bool updateOSD = true;
     ZoomDirection zoom = kZoom_END;
-    if (has_action(ACTION_ZOOMUP, Actions) ||
-        has_action(ACTION_UP, Actions)     ||
-        has_action(ACTION_CHANNELUP, Actions))
-    {
+    if (IsActionable({ ACTION_ZOOMUP, ACTION_UP, ACTION_CHANNELUP }, Actions))
         zoom = kZoomUp;
-    }
-    else if (has_action(ACTION_ZOOMDOWN, Actions) ||
-             has_action(ACTION_DOWN, Actions)     ||
-             has_action(ACTION_CHANNELDOWN, Actions))
-    {
+    else if (IsActionable({ ACTION_ZOOMDOWN, ACTION_DOWN, ACTION_CHANNELDOWN }, Actions))
         zoom = kZoomDown;
-    }
-    else if (has_action(ACTION_ZOOMLEFT, Actions) ||
-             has_action(ACTION_LEFT, Actions))
+    else if (IsActionable({ ACTION_ZOOMLEFT, ACTION_LEFT }, Actions))
         zoom = kZoomLeft;
-    else if (has_action(ACTION_ZOOMRIGHT, Actions) ||
-             has_action(ACTION_RIGHT, Actions))
+    else if (IsActionable({ ACTION_ZOOMRIGHT, ACTION_RIGHT }, Actions))
         zoom = kZoomRight;
-    else if (has_action(ACTION_ZOOMASPECTUP, Actions) ||
-             has_action(ACTION_VOLUMEUP, Actions))
+    else if (IsActionable({ ACTION_ZOOMASPECTUP, ACTION_VOLUMEUP }, Actions))
         zoom = kZoomAspectUp;
-    else if (has_action(ACTION_ZOOMASPECTDOWN, Actions) ||
-             has_action(ACTION_VOLUMEDOWN, Actions))
+    else if (IsActionable({ ACTION_ZOOMASPECTDOWN, ACTION_VOLUMEDOWN }, Actions))
         zoom = kZoomAspectDown;
-    else if (has_action(ACTION_ZOOMIN, Actions) ||
-             has_action(ACTION_JUMPFFWD, Actions))
+    else if (IsActionable({ ACTION_ZOOMIN, ACTION_JUMPFFWD }, Actions))
         zoom = kZoomIn;
-    else if (has_action(ACTION_ZOOMOUT, Actions) ||
-             has_action(ACTION_JUMPRWND, Actions))
+    else if (IsActionable({ ACTION_ZOOMOUT, ACTION_JUMPRWND }, Actions))
         zoom = kZoomOut;
-    else if (has_action(ACTION_ZOOMVERTICALIN, Actions))
+    else if (IsActionable(ACTION_ZOOMVERTICALIN, Actions))
         zoom = kZoomVerticalIn;
-    else if (has_action(ACTION_ZOOMVERTICALOUT, Actions))
+    else if (IsActionable(ACTION_ZOOMVERTICALOUT, Actions))
         zoom = kZoomVerticalOut;
-    else if (has_action(ACTION_ZOOMHORIZONTALIN, Actions))
+    else if (IsActionable(ACTION_ZOOMHORIZONTALIN, Actions))
         zoom = kZoomHorizontalIn;
-    else if (has_action(ACTION_ZOOMHORIZONTALOUT, Actions))
+    else if (IsActionable(ACTION_ZOOMHORIZONTALOUT, Actions))
         zoom = kZoomHorizontalOut;
-    else if (has_action(ACTION_ZOOMQUIT, Actions) ||
-             has_action("ESCAPE", Actions)        ||
-             has_action("BACK", Actions))
+    else if (IsActionable({ ACTION_ZOOMQUIT, "ESCAPE", "BACK" }, Actions))
     {
         zoom = kZoomHome;
         end_manual_zoom = true;
     }
-    else if (has_action(ACTION_ZOOMCOMMIT, Actions) ||
-             has_action(ACTION_SELECT, Actions))
+    else if (IsActionable({ ACTION_ZOOMCOMMIT, ACTION_SELECT }, Actions))
     {
         end_manual_zoom = true;
         SetManualZoom(false, tr("Zoom Committed"));
@@ -3745,12 +3699,12 @@ bool TV::ManualZoomHandleAction(const QStringList &Actions)
     {
         updateOSD = false;
         // only pass-through actions listed below
-        handled = !(has_action("STRETCHINC",     Actions) ||
-                    has_action("STRETCHDEC",     Actions) ||
-                    has_action(ACTION_MUTEAUDIO, Actions) ||
-                    has_action("CYCLEAUDIOCHAN", Actions) ||
-                    has_action(ACTION_PAUSE,     Actions) ||
-                    has_action(ACTION_CLEAROSD,  Actions));
+        static const QStringList passthrough =
+        {
+            "STRETCHINC", "STRETCHDEC", ACTION_MUTEAUDIO,
+            "CYCLEAUDIOCHAN", ACTION_PAUSE, ACTION_CLEAROSD
+        };
+        handled = !IsActionable(passthrough,  Actions);
     }
     QString msg = tr("Zoom Committed");
     if (zoom != kZoom_END)
@@ -3762,8 +3716,7 @@ bool TV::ManualZoomHandleAction(const QStringList &Actions)
             msg = m_player->GetVideoOutput()->GetZoomString();
     }
     else if (end_manual_zoom)
-        msg = tr("%1 Committed")
-            .arg(m_player->GetVideoOutput()->GetZoomString());
+        msg = tr("%1 Committed").arg(m_player->GetVideoOutput()->GetZoomString());
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (updateOSD)
@@ -3777,8 +3730,8 @@ bool TV::PictureAttributeHandleAction(const QStringList &Actions)
     if (!m_adjustingPicture)
         return false;
 
-    bool up = has_action(ACTION_RIGHT, Actions);
-    bool down = up ? false : has_action(ACTION_LEFT, Actions);
+    bool up = IsActionable(ACTION_RIGHT, Actions);
+    bool down = up ? false : IsActionable(ACTION_LEFT, Actions);
     if (!(up || down))
         return false;
 
@@ -3808,17 +3761,17 @@ bool TV::TimeStretchHandleAction(const QStringList &Actions)
 
     bool handled = true;
 
-    if (has_action(ACTION_LEFT, Actions))
+    if (IsActionable(ACTION_LEFT, Actions))
         ChangeTimeStretch(-1);
-    else if (has_action(ACTION_RIGHT, Actions))
+    else if (IsActionable(ACTION_RIGHT, Actions))
         ChangeTimeStretch(1);
-    else if (has_action(ACTION_DOWN, Actions))
+    else if (IsActionable(ACTION_DOWN, Actions))
         ChangeTimeStretch(-5);
-    else if (has_action(ACTION_UP, Actions))
+    else if (IsActionable(ACTION_UP, Actions))
         ChangeTimeStretch(5);
-    else if (has_action("ADJUSTSTRETCH", Actions))
+    else if (IsActionable("ADJUSTSTRETCH", Actions))
         ToggleTimeStretch();
-    else if (has_action(ACTION_SELECT, Actions))
+    else if (IsActionable(ACTION_SELECT, Actions))
         ClearOSD();
     else
         handled = false;
@@ -3833,16 +3786,15 @@ bool TV::AudioSyncHandleAction(const QStringList& Actions)
 
     bool handled = true;
 
-    if (has_action(ACTION_LEFT, Actions))
+    if (IsActionable(ACTION_LEFT, Actions))
         ChangeAudioSync(-1);
-    else if (has_action(ACTION_RIGHT, Actions))
+    else if (IsActionable(ACTION_RIGHT, Actions))
         ChangeAudioSync(1);
-    else if (has_action(ACTION_UP, Actions))
+    else if (IsActionable(ACTION_UP, Actions))
         ChangeAudioSync(10);
-    else if (has_action(ACTION_DOWN, Actions))
+    else if (IsActionable(ACTION_DOWN, Actions))
         ChangeAudioSync(-10);
-    else if (has_action(ACTION_TOGGELAUDIOSYNC, Actions) ||
-             has_action(ACTION_SELECT, Actions))
+    else if (IsActionable({ ACTION_TOGGELAUDIOSYNC, ACTION_SELECT }, Actions))
         ClearOSD();
     else
         handled = false;
@@ -3857,16 +3809,15 @@ bool TV::SubtitleZoomHandleAction(const QStringList &Actions)
 
     bool handled = true;
 
-    if (has_action(ACTION_LEFT, Actions))
+    if (IsActionable(ACTION_LEFT, Actions))
         ChangeSubtitleZoom(-1);
-    else if (has_action(ACTION_RIGHT, Actions))
+    else if (IsActionable(ACTION_RIGHT, Actions))
         ChangeSubtitleZoom(1);
-    else if (has_action(ACTION_UP, Actions))
+    else if (IsActionable(ACTION_UP, Actions))
         ChangeSubtitleZoom(10);
-    else if (has_action(ACTION_DOWN, Actions))
+    else if (IsActionable(ACTION_DOWN, Actions))
         ChangeSubtitleZoom(-10);
-    else if (has_action(ACTION_TOGGLESUBTITLEZOOM, Actions) ||
-             has_action(ACTION_SELECT, Actions))
+    else if (IsActionable({ ACTION_TOGGLESUBTITLEZOOM, ACTION_SELECT }, Actions))
         ClearOSD();
     else
         handled = false;
@@ -3881,15 +3832,15 @@ bool TV::SubtitleDelayHandleAction(const QStringList &Actions)
 
     bool handled = true;
 
-    if (has_action(ACTION_LEFT, Actions))
+    if (IsActionable(ACTION_LEFT, Actions))
         ChangeSubtitleDelay(-5);
-    else if (has_action(ACTION_RIGHT, Actions))
+    else if (IsActionable(ACTION_RIGHT, Actions))
         ChangeSubtitleDelay(5);
-    else if (has_action(ACTION_UP, Actions))
+    else if (IsActionable(ACTION_UP, Actions))
         ChangeSubtitleDelay(25);
-    else if (has_action(ACTION_DOWN, Actions))
+    else if (IsActionable(ACTION_DOWN, Actions))
         ChangeSubtitleDelay(-25);
-    else if (has_action(ACTION_TOGGLESUBTITLEDELAY, Actions) || has_action(ACTION_SELECT, Actions))
+    else if (IsActionable({ ACTION_TOGGLESUBTITLEDELAY, ACTION_SELECT }, Actions))
         ClearOSD();
     else
         handled = false;
@@ -3911,58 +3862,45 @@ bool TV::DiscMenuHandleAction(const QStringList& Actions) const
     return m_playerContext.m_buffer->HandleAction(Actions, pts);
 }
 
-bool TV::Handle3D(const QString& Action)
-{
-    StereoscopicMode mode = kStereoscopicModeAuto;
-    if (ACTION_3DSIDEBYSIDEDISCARD == Action)
-        mode = kStereoscopicModeSideBySideDiscard;
-    else if (ACTION_3DTOPANDBOTTOMDISCARD == Action)
-        mode = kStereoscopicModeTopAndBottomDiscard;
-    else if (ACTION_3DIGNORE == Action)
-        mode = kStereoscopicModeIgnore3D;
-    emit ChangeStereoOverride(mode); // NOLINT readability-misleading-indentation
-    return true;
-}
-
 bool TV::ActiveHandleAction(const QStringList &Actions,
                             bool IsDVD, bool IsDVDStillFrame)
 {
     bool handled = true;
 
-    if (has_action("SKIPCOMMERCIAL", Actions) && !IsDVD)
+    if (IsActionable("SKIPCOMMERCIAL", Actions) && !IsDVD)
         DoSkipCommercials(1);
-    else if (has_action("SKIPCOMMBACK", Actions) && !IsDVD)
+    else if (IsActionable("SKIPCOMMBACK", Actions) && !IsDVD)
         DoSkipCommercials(-1);
-    else if (has_action("QUEUETRANSCODE", Actions) && !IsDVD)
+    else if (IsActionable("QUEUETRANSCODE", Actions) && !IsDVD)
         DoQueueTranscode("Default");
-    else if (has_action("QUEUETRANSCODE_AUTO", Actions) && !IsDVD)
+    else if (IsActionable("QUEUETRANSCODE_AUTO", Actions) && !IsDVD)
         DoQueueTranscode("Autodetect");
-    else if (has_action("QUEUETRANSCODE_HIGH", Actions)  && !IsDVD)
+    else if (IsActionable("QUEUETRANSCODE_HIGH", Actions)  && !IsDVD)
         DoQueueTranscode("High Quality");
-    else if (has_action("QUEUETRANSCODE_MEDIUM", Actions) && !IsDVD)
+    else if (IsActionable("QUEUETRANSCODE_MEDIUM", Actions) && !IsDVD)
         DoQueueTranscode("Medium Quality");
-    else if (has_action("QUEUETRANSCODE_LOW", Actions) && !IsDVD)
+    else if (IsActionable("QUEUETRANSCODE_LOW", Actions) && !IsDVD)
         DoQueueTranscode("Low Quality");
-    else if (has_action(ACTION_PLAY, Actions))
+    else if (IsActionable(ACTION_PLAY, Actions))
         DoPlay();
-    else if (has_action(ACTION_PAUSE, Actions))
+    else if (IsActionable(ACTION_PAUSE, Actions))
         DoTogglePause(true);
-    else if (has_action("SPEEDINC", Actions) && !IsDVDStillFrame)
+    else if (IsActionable("SPEEDINC", Actions) && !IsDVDStillFrame)
         ChangeSpeed(1);
-    else if (has_action("SPEEDDEC", Actions) && !IsDVDStillFrame)
+    else if (IsActionable("SPEEDDEC", Actions) && !IsDVDStillFrame)
         ChangeSpeed(-1);
-    else if (has_action("ADJUSTSTRETCH", Actions))
+    else if (IsActionable("ADJUSTSTRETCH", Actions))
         ChangeTimeStretch(0);   // just display
-    else if (has_action("CYCLECOMMSKIPMODE",Actions) && !IsDVD)
+    else if (IsActionable("CYCLECOMMSKIPMODE",Actions) && !IsDVD)
         SetAutoCommercialSkip(kCommSkipIncr);
-    else if (has_action("NEXTSCAN", Actions))
+    else if (IsActionable("NEXTSCAN", Actions))
     {
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
         FrameScanType scan = m_player->NextScanOverride();
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
         OverrideScan(scan);
     }
-    else if (has_action(ACTION_SEEKARB, Actions) && !IsDVD)
+    else if (IsActionable(ACTION_SEEKARB, Actions) && !IsDVD)
     {
         if (m_asInputMode)
         {
@@ -3989,11 +3927,11 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
             }
         }
     }
-    else if (has_action(ACTION_JUMPRWND, Actions))
+    else if (IsActionable(ACTION_JUMPRWND, Actions))
         DoJumpRWND();
-    else if (has_action(ACTION_JUMPFFWD, Actions))
+    else if (IsActionable(ACTION_JUMPFFWD, Actions))
         DoJumpFFWD();
-    else if (has_action(ACTION_JUMPBKMRK, Actions))
+    else if (IsActionable(ACTION_JUMPBKMRK, Actions))
     {
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
         uint64_t bookmark  = m_player->GetBookmark();
@@ -4007,20 +3945,20 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
             m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
         }
     }
-    else if (has_action(ACTION_JUMPSTART,Actions))
+    else if (IsActionable(ACTION_JUMPSTART,Actions))
     {
         DoSeek(0, tr("Jump to Beginning"), /*timeIsOffset*/false, /*honorCutlist*/true);
     }
-    else if (has_action(ACTION_CLEAROSD, Actions))
+    else if (IsActionable(ACTION_CLEAROSD, Actions))
     {
         ClearOSD();
     }
-    else if (has_action(ACTION_VIEWSCHEDULED, Actions))
+    else if (IsActionable(ACTION_VIEWSCHEDULED, Actions))
         EditSchedule(kViewSchedule);
     else if (HandleJumpToProgramAction(Actions))
     { // NOLINT(bugprone-branch-clone)
     }
-    else if (has_action(ACTION_SIGNALMON, Actions))
+    else if (IsActionable(ACTION_SIGNALMON, Actions))
     {
         if ((GetState() == kState_WatchingLiveTV) && m_playerContext.m_recorder)
         {
@@ -4044,23 +3982,22 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
             m_sigMonMode  = !m_sigMonMode;
         }
     }
-    else if (has_action(ACTION_SCREENSHOT, Actions))
+    else if (IsActionable(ACTION_SCREENSHOT, Actions))
     {
         MythMainWindow::ScreenShot();
     }
-    else if (has_action(ACTION_STOP, Actions))
+    else if (IsActionable(ACTION_STOP, Actions))
     {
         PrepareToExitPlayer(__LINE__);
         SetExitPlayer(true, true);
     }
-    else if (has_action(ACTION_EXITSHOWNOPROMPTS, Actions))
+    else if (IsActionable(ACTION_EXITSHOWNOPROMPTS, Actions))
     {
         m_requestDelete = false;
         PrepareToExitPlayer(__LINE__);
         SetExitPlayer(true, true);
     }
-    else if (has_action("ESCAPE", Actions) ||
-             has_action("BACK", Actions))
+    else if (IsActionable({ "ESCAPE", "BACK" }, Actions))
     {
         if (StateIsLiveTV(m_playerContext.GetState()) &&
             (m_playerContext.m_lastSignalMsgTime.elapsed() < static_cast<int>(PlayerContext::kSMExitTimeout)))
@@ -4111,7 +4048,7 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         {
             // If it's a DVD, and we're not trying to execute a
             // jumppoint, try to back up.
-            if (IsDVD && !m_mainWindow->IsExitingToMain() && has_action("BACK", Actions) &&
+            if (IsDVD && !m_mainWindow->IsExitingToMain() && IsActionable("BACK", Actions) &&
                 m_playerContext.m_buffer && m_playerContext.m_buffer->DVD()->GoBack())
             {
                 return handled;
@@ -4119,37 +4056,34 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
             SetExitPlayer(true, true);
         }
     }
-    else if (has_action(ACTION_ENABLEUPMIX, Actions))
+    else if (IsActionable(ACTION_ENABLEUPMIX, Actions))
         EnableUpmix(true);
-    else if (has_action(ACTION_DISABLEUPMIX, Actions))
+    else if (IsActionable(ACTION_DISABLEUPMIX, Actions))
         EnableUpmix(false);
-    else if (has_action(ACTION_VOLUMEDOWN, Actions))
+    else if (IsActionable(ACTION_VOLUMEDOWN, Actions))
         ChangeVolume(false);
-    else if (has_action(ACTION_VOLUMEUP, Actions))
+    else if (IsActionable(ACTION_VOLUMEUP, Actions))
         ChangeVolume(true);
-    else if (has_action("CYCLEAUDIOCHAN", Actions))
+    else if (IsActionable("CYCLEAUDIOCHAN", Actions))
         ToggleMute(true);
-    else if (has_action(ACTION_MUTEAUDIO, Actions))
+    else if (IsActionable(ACTION_MUTEAUDIO, Actions))
         ToggleMute();
-    else if (has_action("STRETCHINC", Actions))
+    else if (IsActionable("STRETCHINC", Actions))
         ChangeTimeStretch(1);
-    else if (has_action("STRETCHDEC", Actions))
+    else if (IsActionable("STRETCHDEC", Actions))
         ChangeTimeStretch(-1);
-    else if (has_action("MENU", Actions))
+    else if (IsActionable("MENU", Actions))
         ShowOSDMenu();
-    else if (has_action(ACTION_MENUCOMPACT, Actions))
+    else if (IsActionable(ACTION_MENUCOMPACT, Actions))
         ShowOSDMenu(true);
-    else if (has_action("INFO", Actions) ||
-             has_action("INFOWITHCUTLIST", Actions))
+    else if (IsActionable({ "INFO", "INFOWITHCUTLIST" }, Actions))
     {
         if (HasQueuedInput())
-        {
-            DoArbSeek(ARBSEEK_SET, has_action("INFOWITHCUTLIST", Actions));
-        }
+            DoArbSeek(ARBSEEK_SET, IsActionable("INFOWITHCUTLIST", Actions));
         else
             ToggleOSD(true);
     }
-    else if (has_action(ACTION_TOGGLEOSDDEBUG, Actions))
+    else if (IsActionable(ACTION_TOGGLEOSDDEBUG, Actions))
         emit ChangeOSDDebug();
     else if (!IsDVDStillFrame && SeekHandleAction(Actions, IsDVD))
     {
@@ -4206,43 +4140,43 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     bool handled = true;
     bool islivetv = StateIsLiveTV(GetState());
 
-    if (has_action(ACTION_BOTTOMLINEMOVE, Actions))
+    if (IsActionable(ACTION_BOTTOMLINEMOVE, Actions))
         ToggleMoveBottomLine();
-    else if (has_action(ACTION_BOTTOMLINESAVE, Actions))
+    else if (IsActionable(ACTION_BOTTOMLINESAVE, Actions))
         SaveBottomLine();
-    else if (has_action("TOGGLEASPECT", Actions))
+    else if (IsActionable("TOGGLEASPECT", Actions))
         ToggleAspectOverride();
-    else if (has_action("TOGGLEFILL", Actions))
+    else if (IsActionable("TOGGLEFILL", Actions))
         ToggleAdjustFill();
-    else if (has_action(ACTION_TOGGELAUDIOSYNC, Actions))
+    else if (IsActionable(ACTION_TOGGELAUDIOSYNC, Actions))
         ChangeAudioSync(0);   // just display
-    else if (has_action(ACTION_TOGGLESUBTITLEZOOM, Actions))
+    else if (IsActionable(ACTION_TOGGLESUBTITLEZOOM, Actions))
         ChangeSubtitleZoom(0);   // just display
-    else if (has_action(ACTION_TOGGLESUBTITLEDELAY, Actions))
+    else if (IsActionable(ACTION_TOGGLESUBTITLEDELAY, Actions))
         ChangeSubtitleDelay(0);   // just display
-    else if (has_action(ACTION_TOGGLEVISUALISATION, Actions))
+    else if (IsActionable(ACTION_TOGGLEVISUALISATION, Actions))
         EnableVisualisation(false, true);
-    else if (has_action(ACTION_ENABLEVISUALISATION, Actions))
+    else if (IsActionable(ACTION_ENABLEVISUALISATION, Actions))
         EnableVisualisation(true);
-    else if (has_action(ACTION_DISABLEVISUALISATION, Actions))
+    else if (IsActionable(ACTION_DISABLEVISUALISATION, Actions))
         EnableVisualisation(false);
-    else if (has_action("TOGGLEPICCONTROLS", Actions))
+    else if (IsActionable("TOGGLEPICCONTROLS", Actions))
         DoTogglePictureAttribute(kAdjustingPicture_Playback);
-    else if (has_action("TOGGLESTRETCH", Actions))
+    else if (IsActionable("TOGGLESTRETCH", Actions))
         ToggleTimeStretch();
-    else if (has_action(ACTION_TOGGLEUPMIX, Actions))
+    else if (IsActionable(ACTION_TOGGLEUPMIX, Actions))
         EnableUpmix(false, true);
-    else if (has_action(ACTION_TOGGLESLEEP, Actions))
+    else if (IsActionable(ACTION_TOGGLESLEEP, Actions))
         ToggleSleepTimer();
-    else if (has_action(ACTION_TOGGLERECORD, Actions) && islivetv)
+    else if (IsActionable(ACTION_TOGGLERECORD, Actions) && islivetv)
         QuickRecord();
-    else if (has_action(ACTION_TOGGLEFAV, Actions) && islivetv)
+    else if (IsActionable(ACTION_TOGGLEFAV, Actions) && islivetv)
         ToggleChannelFavorite();
-    else if (has_action(ACTION_TOGGLECHANCONTROLS, Actions) && islivetv)
+    else if (IsActionable(ACTION_TOGGLECHANCONTROLS, Actions) && islivetv)
         DoTogglePictureAttribute(kAdjustingPicture_Channel);
-    else if (has_action(ACTION_TOGGLERECCONTROLS, Actions) && islivetv)
+    else if (IsActionable(ACTION_TOGGLERECCONTROLS, Actions) && islivetv)
         DoTogglePictureAttribute(kAdjustingPicture_Recording);
-    else if (has_action("TOGGLEBROWSE", Actions))
+    else if (IsActionable("TOGGLEBROWSE", Actions))
     {
         if (islivetv)
             BrowseStart();
@@ -4251,14 +4185,14 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
         else
             handled = false;
     }
-    else if (has_action("EDIT", Actions))
+    else if (IsActionable("EDIT", Actions))
     {
         if (islivetv)
             StartChannelEditMode();
         else if (!IsDVD)
             StartProgramEditMode();
     }
-    else if (has_action(ACTION_OSDNAVIGATION, Actions))
+    else if (IsActionable(ACTION_OSDNAVIGATION, Actions))
     {
         StartOsdNavigation();
     }
@@ -4321,7 +4255,7 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
     bool isdvd  = state == kState_WatchingDVD;
     bool isdisc = isdvd || state == kState_WatchingBD;
 
-    if (has_action(ACTION_SETBOOKMARK, Actions))
+    if (IsActionable(ACTION_SETBOOKMARK, Actions))
     {
         if (!CommitQueuedInput())
         {
@@ -4330,7 +4264,7 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
             m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
         }
     }
-    if (has_action(ACTION_TOGGLEBOOKMARK, Actions))
+    if (IsActionable(ACTION_TOGGLEBOOKMARK, Actions))
     {
         if (!CommitQueuedInput())
         {
@@ -4339,19 +4273,19 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
             m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
         }
     }
-    else if (has_action("NEXTFAV", Actions) && islivetv)
+    else if (IsActionable("NEXTFAV", Actions) && islivetv)
         ChangeChannel(CHANNEL_DIRECTION_FAVORITE);
-    else if (has_action("NEXTSOURCE", Actions) && islivetv)
+    else if (IsActionable("NEXTSOURCE", Actions) && islivetv)
         SwitchSource(kNextSource);
-    else if (has_action("PREVSOURCE", Actions) && islivetv)
+    else if (IsActionable("PREVSOURCE", Actions) && islivetv)
         SwitchSource(kPreviousSource);
-    else if (has_action("NEXTINPUT", Actions) && islivetv)
+    else if (IsActionable("NEXTINPUT", Actions) && islivetv)
         SwitchInputs();
-    else if (has_action(ACTION_GUIDE, Actions))
+    else if (IsActionable(ACTION_GUIDE, Actions))
         EditSchedule(kScheduleProgramGuide);
-    else if (has_action("PREVCHAN", Actions) && islivetv)
+    else if (IsActionable("PREVCHAN", Actions) && islivetv)
         PopPreviousChannel(false);
-    else if (has_action(ACTION_CHANNELUP, Actions))
+    else if (IsActionable(ACTION_CHANNELUP, Actions))
     {
         if (islivetv)
         {
@@ -4363,7 +4297,7 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
         else
             DoJumpRWND();
     }
-    else if (has_action(ACTION_CHANNELDOWN, Actions))
+    else if (IsActionable(ACTION_CHANNELDOWN, Actions))
     {
         if (islivetv)
         {
@@ -4375,42 +4309,42 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
         else
             DoJumpFFWD();
     }
-    else if (has_action("DELETE", Actions) && !islivetv)
+    else if (IsActionable("DELETE", Actions) && !islivetv)
     {
         NormalSpeed();
         StopFFRew();
         SetBookmark();
         ShowOSDPromptDeleteRecording(tr("Are you sure you want to delete:"));
     }
-    else if (has_action(ACTION_JUMPTODVDROOTMENU, Actions) && isdisc)
+    else if (IsActionable(ACTION_JUMPTODVDROOTMENU, Actions) && isdisc)
     {
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
         if (m_player)
             m_player->GoToMenu("root");
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
-    else if (has_action(ACTION_JUMPTODVDCHAPTERMENU, Actions) && isdisc)
+    else if (IsActionable(ACTION_JUMPTODVDCHAPTERMENU, Actions) && isdisc)
     {
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
         if (m_player)
             m_player->GoToMenu("chapter");
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
-    else if (has_action(ACTION_JUMPTODVDTITLEMENU, Actions) && isdisc)
+    else if (IsActionable(ACTION_JUMPTODVDTITLEMENU, Actions) && isdisc)
     {
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
         if (m_player)
             m_player->GoToMenu("title");
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
-    else if (has_action(ACTION_JUMPTOPOPUPMENU, Actions) && isdisc)
+    else if (IsActionable(ACTION_JUMPTOPOPUPMENU, Actions) && isdisc)
     {
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
         if (m_player)
             m_player->GoToMenu("popup");
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
-    else if (has_action(ACTION_FINDER, Actions))
+    else if (IsActionable(ACTION_FINDER, Actions))
         EditSchedule(kScheduleProgramFinder);
     else
         handled = false;
@@ -5182,17 +5116,17 @@ bool TV::SeekHandleAction(const QStringList& Actions, const bool IsDVD)
     const int kIgnoreCutlist = 256;
     const int kWhenceMask = 3;
     int flags = 0;
-    if (has_action(ACTION_SEEKFFWD, Actions))
+    if (IsActionable(ACTION_SEEKFFWD, Actions))
         flags = ARBSEEK_FORWARD | kForward | kSlippery | kRelative;
-    else if (has_action("FFWDSTICKY", Actions))
+    else if (IsActionable("FFWDSTICKY", Actions))
         flags = ARBSEEK_END     | kForward | kSticky   | kAbsolute;
-    else if (has_action(ACTION_RIGHT, Actions))
+    else if (IsActionable(ACTION_RIGHT, Actions))
         flags = ARBSEEK_FORWARD | kForward | kSticky   | kRelative;
-    else if (has_action(ACTION_SEEKRWND, Actions))
+    else if (IsActionable(ACTION_SEEKRWND, Actions))
         flags = ARBSEEK_REWIND  | kRewind  | kSlippery | kRelative;
-    else if (has_action("RWNDSTICKY", Actions))
+    else if (IsActionable("RWNDSTICKY", Actions))
         flags = ARBSEEK_SET     | kRewind  | kSticky   | kAbsolute;
-    else if (has_action(ACTION_LEFT, Actions))
+    else if (IsActionable(ACTION_LEFT, Actions))
         flags = ARBSEEK_REWIND  | kRewind  | kSticky   | kRelative;
     else
         return false;
@@ -8806,7 +8740,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action.startsWith("VISUALISER"))
         EnableVisualisation(true, false, Action);
     else if (Action.startsWith("3D"))
-        Handle3D(Action);
+        emit ChangeStereoOverride(ActionToStereoscopic(Action));
     else if (HandleJumpToProgramAction(QStringList(Action)))
     {
     }
@@ -8834,10 +8768,8 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     if (!handled && StateIsPlaying(m_playerContext.GetState()))
     {
         handled = true;
-        if (Action == ACTION_JUMPTODVDROOTMENU ||
-            Action == ACTION_JUMPTODVDCHAPTERMENU ||
-            Action == ACTION_JUMPTOPOPUPMENU ||
-            Action == ACTION_JUMPTODVDTITLEMENU)
+        if (IsActionable(Action, { ACTION_JUMPTODVDROOTMENU, ACTION_JUMPTODVDCHAPTERMENU,
+                                   ACTION_JUMPTOPOPUPMENU, ACTION_JUMPTODVDTITLEMENU}))
         {
             QString menu = "root";
             if (Action == ACTION_JUMPTODVDCHAPTERMENU)
@@ -10336,7 +10268,7 @@ void TV::SetManualZoom(bool ZoomON, const QString& Desc)
 bool TV::HandleJumpToProgramAction(const QStringList &Actions)
 {
     TVState state = GetState();
-    if (has_action(ACTION_JUMPPREV, Actions) || (has_action("PREVCHAN", Actions) && !StateIsLiveTV(state)))
+    if (IsActionable({ ACTION_JUMPPREV, "PREVCHAN" }, Actions) && !StateIsLiveTV(state))
     {
         PrepareToExitPlayer(__LINE__);
         m_jumpToProgram = true;
@@ -10379,8 +10311,7 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
         return true;
     }
 
-    bool wants_jump = has_action(ACTION_JUMPREC, Actions);
-    if (!wants_jump)
+    if (!IsActionable(ACTION_JUMPREC, Actions))
         return false;
 
     if (m_dbJumpPreferOsd && (StateIsPlaying(state) || StateIsLiveTV(state)))

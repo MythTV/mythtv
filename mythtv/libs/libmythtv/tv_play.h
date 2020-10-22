@@ -311,7 +311,7 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     void PlaybackExiting(TV* Player);
     void RequestEmbedding(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
     void EmbedPlayback(bool Embed, const QRect& Rect = {});
-    void WindowResized(QSize& Size);
+    void WindowResized(const QSize Size);
     void ChangeStereoOverride(StereoscopicMode Mode);
     void ChangePictureAttribute(PictureAttribute Attribute, bool Direction, int Value);
     void ChangeOSDPositionUpdates(bool Enable);
@@ -373,7 +373,6 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     bool SeekHandleAction(const QStringList& Actions, bool IsDVD);
     bool TimeStretchHandleAction(const QStringList& Actions);
     bool DiscMenuHandleAction(const QStringList& Actions) const;
-    bool Handle3D(const QString& Action);
 
     // Timers and timer events
     int  StartTimer(int Interval, int Line);
