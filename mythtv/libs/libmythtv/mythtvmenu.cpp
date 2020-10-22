@@ -6,13 +6,47 @@
 #include "mythlogging.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
+#include "osd.h"
 #include "mythtvmenu.h"
 
 #define LOC QString("TVMenu: ")
 
+bool MythTVMenuItemContext::AddButton(OSD* Osd, bool Active, const QString& Action,
+                                      const QString& DefaultTextActive,
+                                      const QString& DefaultTextInactive,
+                                      bool IsMenu, const QString& TextArg) const
+{
+    bool result = false;
+    if (m_category == kMenuCategoryItemlist || Action == m_action)
+    {
+        if ((m_showContext != kMenuShowInactive && Active) || (m_showContext != kMenuShowActive && !Active))
+        {
+            result = true;
+            if (m_doDisplay)
+            {
+                QString text = m_actionText;
+                if (text.isEmpty())
+                    text = (Active || DefaultTextInactive.isEmpty()) ? DefaultTextActive : DefaultTextInactive;
+
+                if (!TextArg.isEmpty())
+                    text = text.arg(TextArg);
+
+                bool current = false;
+                if (m_currentContext == kMenuCurrentActive)
+                    current = Active;
+                else if (m_currentContext == kMenuCurrentAlways)
+                    current = true;
+
+                Osd->DialogAddButton(text, Action, IsMenu, current);
+            }
+        }
+    }
+    return result;
+}
+
 // Constructor for a menu element.
-MenuItemContext::MenuItemContext(const MenuBase& Menu, const QDomNode& Node,
-                                 QString Name, MenuCurrentContext Current, bool Display)
+MythTVMenuItemContext::MythTVMenuItemContext(const MythTVMenu& Menu, const QDomNode& Node,
+                                             QString Name, MenuCurrentContext Current, bool Display)
   : m_menu(Menu),
     m_node(Node),
     m_category(kMenuCategoryMenu),
@@ -24,9 +58,9 @@ MenuItemContext::MenuItemContext(const MenuBase& Menu, const QDomNode& Node,
 }
 
 // Constructor for an item element.
-MenuItemContext::MenuItemContext(const MenuBase& Menu, const QDomNode& Node,
-                                 MenuShowContext Context, MenuCurrentContext Current,
-                                 QString Action, QString ActionText, bool Display)
+MythTVMenuItemContext::MythTVMenuItemContext(const MythTVMenu& Menu, const QDomNode& Node,
+                                             MenuShowContext Context, MenuCurrentContext Current,
+                                             QString Action, QString ActionText, bool Display)
   : m_menu(Menu),
     m_node(Node),
     m_category(kMenuCategoryItem),
@@ -39,9 +73,9 @@ MenuItemContext::MenuItemContext(const MenuBase& Menu, const QDomNode& Node,
 }
 
 // Constructor for an itemlist element.
-MenuItemContext::MenuItemContext(const MenuBase& Menu, const QDomNode& Node,
-                                 MenuShowContext Context, MenuCurrentContext Current,
-                                 QString Action, bool Display)
+MythTVMenuItemContext::MythTVMenuItemContext(const MythTVMenu& Menu, const QDomNode& Node,
+                                             MenuShowContext Context, MenuCurrentContext Current,
+                                             QString Action, bool Display)
   : m_menu(Menu),
     m_node(Node),
     m_category(kMenuCategoryItemlist),
@@ -52,44 +86,52 @@ MenuItemContext::MenuItemContext(const MenuBase& Menu, const QDomNode& Node,
 {
 }
 
-MenuBase::~MenuBase()
+MythTVMenu::~MythTVMenu()
 {
     delete m_document;
 }
 
-QString MenuBase::GetName() const
+QString MythTVMenu::GetName() const
 {
     return m_menuName;
 }
 
-bool MenuBase::IsLoaded() const
+bool MythTVMenu::IsLoaded() const
 {
     return m_document != nullptr;
 }
 
-QDomElement MenuBase::GetRoot() const
+QDomElement MythTVMenu::GetRoot() const
 {
     return m_document->documentElement();
 }
 
-const char * MenuBase::GetTranslationContext() const
+const char * MythTVMenu::GetTranslationContext() const
 {
     return m_translationContext;
 }
 
-const QString& MenuBase::GetKeyBindingContext() const
+const QString& MythTVMenu::GetKeyBindingContext() const
 {
        return m_keyBindingContext;
 }
 
-QString MenuBase::Translate(const QString& Text) const
+QString MythTVMenu::Translate(const QString& Text) const
 {
     return QCoreApplication::translate(m_translationContext, Text.toUtf8(), nullptr);
 }
 
-bool MenuBase::LoadFromFile(const QString& Filename, const QString& Menuname,
-                            const char * TranslationContext, const QString& KeyBindingContext,
-                            int IncludeLevel)
+bool MythTVMenu::MatchesGroup(const QString &Name, const QString &Prefix,
+                              MenuCategory Category, QString &OutPrefix)
+{
+    OutPrefix = Name;
+    return ((Category == kMenuCategoryItem && Name.startsWith(Prefix)) ||
+            (Category == kMenuCategoryItemlist && Name == Prefix));
+}
+
+bool MythTVMenu::LoadFromFile(const QString& Filename, const QString& Menuname,
+                              const char * TranslationContext, const QString& KeyBindingContext,
+                              int IncludeLevel)
 {
     bool result = false;
 
@@ -127,9 +169,9 @@ bool MenuBase::LoadFromFile(const QString& Filename, const QString& Menuname,
     return result;
 }
 
-bool MenuBase::LoadFromString(const QString& Text, const QString& Menuname,
-                              const char * TranslationContext, const QString& KeyBindingContext,
-                              int IncludeLevel)
+bool MythTVMenu::LoadFromString(const QString& Text, const QString& Menuname,
+                                const char * TranslationContext, const QString& KeyBindingContext,
+                                int IncludeLevel)
 {
     bool result = false;
 
@@ -151,7 +193,7 @@ bool MenuBase::LoadFromString(const QString& Text, const QString& Menuname,
     return result;
 }
 
-void MenuBase::ProcessIncludes(QDomElement& Root, int IncludeLevel)
+void MythTVMenu::ProcessIncludes(QDomElement& Root, int IncludeLevel)
 {
     const int maxInclude = 10;
     for (QDomNode node = Root.firstChild(); !node.isNull(); node = node.nextSibling())
@@ -172,7 +214,7 @@ void MenuBase::ProcessIncludes(QDomElement& Root, int IncludeLevel)
                     return;
                 }
 
-                MenuBase menu;
+                MythTVMenu menu;
                 if (menu.LoadFromFile(include, include, m_translationContext,
                                       m_keyBindingContext, IncludeLevel + 1))
                 {
@@ -190,8 +232,8 @@ void MenuBase::ProcessIncludes(QDomElement& Root, int IncludeLevel)
     }
 }
 
-bool MenuBase::Show(const QDomNode& Node, const QDomNode& Selected,
-                    MenuItemDisplayer& Displayer, bool Display) const
+bool MythTVMenu::Show(const QDomNode& Node, const QDomNode& Selected,
+                      MythTVMenuItemDisplayer& Displayer, bool Display) const
 {
     bool hasSelected = false;
     bool displayed = false;
@@ -222,19 +264,19 @@ bool MenuBase::Show(const QDomNode& Node, const QDomNode& Selected,
             {
                 if (hasSelected && node == Selected)
                     currentContext = kMenuCurrentAlways;
-                MenuItemContext context(*this, node, text, currentContext, Display);
+                MythTVMenuItemContext context(*this, node, text, currentContext, Display);
                 displayed |= Displayer.MenuItemDisplay(context);
             }
             else if (element.tagName() == "item")
             {
                 QString action = element.attribute("action", "");
-                MenuItemContext context(*this, node, showContext, currentContext, action, text, Display);
+                MythTVMenuItemContext context(*this, node, showContext, currentContext, action, text, Display);
                 displayed |= Displayer.MenuItemDisplay(context);
             }
             else if (element.tagName() == "itemlist")
             {
                 QString actiongroup = element.attribute("actiongroup", "");
-                MenuItemContext context(*this, node, showContext, currentContext, actiongroup, Display);
+                MythTVMenuItemContext context(*this, node, showContext, currentContext, actiongroup, Display);
                 displayed |= Displayer.MenuItemDisplay(context);
             }
         }
@@ -244,6 +286,17 @@ bool MenuBase::Show(const QDomNode& Node, const QDomNode& Selected,
             break;
     }
     return displayed;
+}
+
+MythTVMenuNodeTuple::MythTVMenuNodeTuple(const MythTVMenu& Menu, const QDomNode& Node)
+  : m_menu(Menu),
+    m_node(Node)
+{
+}
+
+MythTVMenuNodeTuple::MythTVMenuNodeTuple()
+  : m_menu(dummy_menubase)
+{
 }
 
 

@@ -149,7 +149,7 @@ class AskProgramInfo
  * \qmlsignal TVPlaybackSought(qint position_seconds)
  * Absolute seek has completed to position_seconds
  */
-class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public ReferenceCounter, protected TVBrowseHelper
+class MTV_PUBLIC TV : public QObject, public MythTVMenuItemDisplayer, public ReferenceCounter, protected TVBrowseHelper
 {
     friend class PlaybackBox;
     friend class GuideGrid;
@@ -504,12 +504,12 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     // Menu dialog
     void ShowOSDMenu(bool isCompact = false);
     void FillOSDMenuJumpRec(const QString &Category = "", int Level = 0, const QString &Selected = "");
-    void PlaybackMenuShow(const MenuBase &Menu, const QDomNode &Node, const QDomNode &Selected);
-    bool MenuItemDisplay(const MenuItemContext &Context) override;
-    bool MenuItemDisplayPlayback(const MenuItemContext &Context);
-    bool MenuItemDisplayCutlist(const MenuItemContext &Context);
-    void PlaybackMenuInit(const MenuBase &Menu);
-    void PlaybackMenuDeinit(const MenuBase &Menu);
+    void PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QDomNode &Selected);
+    bool MenuItemDisplay(const MythTVMenuItemContext& Context) override;
+    bool MenuItemDisplayPlayback(const MythTVMenuItemContext& Context);
+    bool MenuItemDisplayCutlist(const MythTVMenuItemContext& Context);
+    void PlaybackMenuInit(const MythTVMenu& Menu);
+    void PlaybackMenuDeinit(const MythTVMenu& Menu);
     static void MenuStrings();
     void MenuLazyInit(void* Field);
 
@@ -763,10 +763,10 @@ class MTV_PUBLIC TV : public QObject, public MenuItemDisplayer, public Reference
     QVariant         m_tvmJumprecBackHack;
     // End of playback menu state caching
 
-    MenuBase m_playbackMenu;
-    MenuBase m_playbackCompactMenu;
-    MenuBase m_cutlistMenu;
-    MenuBase m_cutlistCompactMenu;
+    MythTVMenu m_playbackMenu;
+    MythTVMenu m_playbackCompactMenu;
+    MythTVMenu m_cutlistMenu;
+    MythTVMenu m_cutlistCompactMenu;
 
   public:
     // Constants

@@ -163,23 +163,6 @@ EMBEDRETURNVOIDEPG TV::RunProgramGuidePtr = nullptr;
  */
 EMBEDRETURNVOIDFINDER TV::RunProgramFinderPtr = nullptr;
 
-static const MenuBase dummy_menubase;
-
-class MenuNodeTuple
-{
-public:
-    MenuNodeTuple(const MenuBase &menu, const QDomNode &node) :
-        m_menu(menu), m_node(node) {}
-    MenuNodeTuple() : m_menu(dummy_menubase)
-        {
-            assert("Should never be reached.");
-        }
-    const MenuBase &m_menu;
-    const QDomNode  m_node;
-};
-
-Q_DECLARE_METATYPE(MenuNodeTuple)
-
 /**
  * \brief If any cards are configured, return the number.
  */
@@ -7645,9 +7628,9 @@ void TV::customEvent(QEvent *Event)
     if (Event->type() == DialogCompletionEvent::kEventType)
     {
         auto *dce = reinterpret_cast<DialogCompletionEvent*>(Event);
-        if (dce->GetData().userType() == qMetaTypeId<MenuNodeTuple>())
+        if (dce->GetData().userType() == qMetaTypeId<MythTVMenuNodeTuple>())
         {
-            auto data = dce->GetData().value<MenuNodeTuple>();
+            auto data = dce->GetData().value<MythTVMenuNodeTuple>();
             if (dce->GetResult() == -1) // menu exit/back
             {
                 PlaybackMenuShow(data.m_menu, data.m_node.parentNode(),
@@ -8867,56 +8850,14 @@ void TV::HandleOSDInfo(const QString& Action)
         m_lockTimerOn = false;
 }
 
-static bool matchesGroup(const QString &name, const QString &inPrefix,
-                         MenuCategory category, QString &outPrefix)
-{
-    outPrefix = name;
-    return ((category == kMenuCategoryItem && name.startsWith(inPrefix)) ||
-            (category == kMenuCategoryItemlist && name == inPrefix));
-}
-
-static void addButton(const MenuItemContext &c, OSD *osd, bool active,
-                      bool &result, const QString &action,
-                      const QString &defaultTextActive,
-                      const QString &defaultTextInactive,
-                      bool isMenu,
-                      const QString &textArg)
-{
-    if (c.m_category == kMenuCategoryItemlist || action == c.m_action)
-    {
-        if ((c.m_showContext != kMenuShowInactive && active) ||
-            (c.m_showContext != kMenuShowActive && !active))
-        {
-            result = true;
-            if (c.m_doDisplay)
-            {
-                QString text = c.m_actionText;
-                if (text.isEmpty())
-                    text = (active || defaultTextInactive.isEmpty()) ?
-                        defaultTextActive : defaultTextInactive;
-                if (!textArg.isEmpty())
-                    text = text.arg(textArg);
-                bool current = false;
-                if (c.m_currentContext == kMenuCurrentActive)
-                    current = active;
-                else if (c.m_currentContext == kMenuCurrentAlways)
-                    current = true;
-                osd->DialogAddButton(text, action, isMenu, current);
-            }
-        }
-    }
-}
-
 #define BUTTON(action, text) \
-    addButton(Context, osd, active, result, (action), (text), "", false, "")
+    result = Context.AddButton(osd, active, (action), (text), "", false, "")
 #define BUTTON2(action, textActive, textInactive) \
-    addButton(Context, osd, active, result, (action), (textActive), \
-              (textInactive), false, "")
-#define BUTTON3(action, textActive, textInactive, isMenu)     \
-    addButton(Context, osd, active, result, (action), (textActive), \
-              (textInactive), (isMenu), "")
+    result = Context.AddButton(osd, active, (action), (textActive), (textInactive), false, "")
+#define BUTTON3(action, textActive, textInactive, isMenu) \
+    result = Context.AddButton(osd, active, (action), (textActive), (textInactive), (isMenu), "")
 
-bool TV::MenuItemDisplay(const MenuItemContext &Context)
+bool TV::MenuItemDisplay(const MythTVMenuItemContext& Context)
 {
     if (&Context.m_menu == &m_playbackMenu || &Context.m_menu == &m_playbackCompactMenu)
         return MenuItemDisplayPlayback(Context);
@@ -8925,7 +8866,7 @@ bool TV::MenuItemDisplay(const MenuItemContext &Context)
     return false;
 }
 
-bool TV::MenuItemDisplayCutlist(const MenuItemContext &Context)
+bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context)
 {
     MenuCategory category = Context.m_category;
     const QString &actionName = Context.m_action;
@@ -8940,7 +8881,7 @@ bool TV::MenuItemDisplayCutlist(const MenuItemContext &Context)
         if (result && Context.m_doDisplay)
         {
             QVariant v;
-            v.setValue(MenuNodeTuple(Context.m_menu, Context.m_node));
+            v.setValue(MythTVMenuNodeTuple(Context.m_menu, Context.m_node));
             osd->DialogAddButton(Context.m_menuName, v, true,
                                  Context.m_currentContext != kMenuCurrentDefault);
         }
@@ -9012,16 +8953,16 @@ bool TV::MenuItemDisplayCutlist(const MenuItemContext &Context)
             active = m_player->DeleteMapHasUndo();
             //: %1 is the undo message
             QString text = tr("Undo - %1");
-            addButton(Context, osd, active, result, actionName, text, "", false,
-                      m_player->DeleteMapGetUndoMessage());
+            result = Context.AddButton(osd, active, actionName, text, "", false,
+                                       m_player->DeleteMapGetUndoMessage());
         }
         else if (actionName == "DIALOG_CUTPOINT_REDO_0")
         {
             active = m_player->DeleteMapHasRedo();
             //: %1 is the redo message
             QString text = tr("Redo - %1");
-            addButton(Context, osd, active, result, actionName, text, "", false,
-                      m_player->DeleteMapGetRedoMessage());
+            result = Context.AddButton(osd, active, actionName, text, "", false,
+                                       m_player->DeleteMapGetRedoMessage());
         }
         else if (actionName == "DIALOG_CUTPOINT_CLEARMAP_0")
         {
@@ -9072,7 +9013,7 @@ bool TV::MenuItemDisplayCutlist(const MenuItemContext &Context)
 }
 
 // Returns true if at least one item should be displayed.
-bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
+bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context)
 {
     MenuCategory category = Context.m_category;
     const QString &actionName = Context.m_action;
@@ -9088,7 +9029,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
         if (result && Context.m_doDisplay)
         {
             QVariant v;
-            v.setValue(MenuNodeTuple(Context.m_menu, Context.m_node));
+            v.setValue(MythTVMenuNodeTuple(Context.m_menu, Context.m_node));
             osd->DialogAddButton(Context.m_menuName, v, true,
                                  Context.m_currentContext != kMenuCurrentDefault);
         }
@@ -9096,7 +9037,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
     }
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     QString prefix;
-    if (matchesGroup(actionName, "VISUALISER_", category, prefix))
+    if (MythTVMenu::MatchesGroup(actionName, "VISUALISER_", category, prefix))
     {
         for (int i = 0; i < m_tvmVisualisers.size(); i++)
         {
@@ -9105,7 +9046,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             BUTTON(action, m_tvmVisualisers[i]);
         }
     }
-    else if (matchesGroup(actionName, "TOGGLEASPECT", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "TOGGLEASPECT", category, prefix))
     {
         for (int j = kAspect_Off; j < kAspect_END; j++)
         {
@@ -9117,7 +9058,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             BUTTON(action, toString(static_cast<AspectOverrideMode>(i)));
         }
     }
-    else if (matchesGroup(actionName, "TOGGLEFILL", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "TOGGLEFILL", category, prefix))
     {
         for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
         {
@@ -9126,7 +9067,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             BUTTON(action, toString(static_cast<AdjustFillMode>(i)));
         }
     }
-    else if (matchesGroup(actionName, "TOGGLEPICCONTROLS", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "TOGGLEPICCONTROLS", category, prefix))
     {
         for (int i = kPictureAttribute_MIN; i < kPictureAttribute_MAX; i++)
         {
@@ -9138,7 +9079,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             }
         }
     }
-    else if (matchesGroup(actionName, "3D", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "3D", category, prefix))
     {
         active = (m_tvmStereoMode == kStereoscopicModeAuto);
         BUTTON(ACTION_3DNONE, tr("Auto"));
@@ -9149,7 +9090,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
         active = (m_tvmStereoMode == kStereoscopicModeTopAndBottomDiscard);
         BUTTON(ACTION_3DTOPANDBOTTOMDISCARD, tr("Discard Top and Bottom"));
     }
-    else if (matchesGroup(actionName, "SELECTSCAN_", category, prefix) && m_player)
+    else if (MythTVMenu::MatchesGroup(actionName, "SELECTSCAN_", category, prefix) && m_player)
     {
         FrameScanType scan = m_player->GetScanTypeWithOverride();
         active = (scan == kScan_Detect);
@@ -9161,12 +9102,12 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
         active = (scan == kScan_Intr2ndField);
         BUTTON("SELECTSCAN_2", ScanTypeToUserString(kScan_Intr2ndField));
     }
-    else if (matchesGroup(actionName, "SELECTSUBTITLE_", category, prefix) ||
-             matchesGroup(actionName, "SELECTRAWTEXT_",  category, prefix) ||
-             matchesGroup(actionName, "SELECTCC708_",    category, prefix) ||
-             matchesGroup(actionName, "SELECTCC608_",    category, prefix) ||
-             matchesGroup(actionName, "SELECTTTC_",      category, prefix) ||
-             matchesGroup(actionName, "SELECTAUDIO_",    category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "SELECTSUBTITLE_", category, prefix) ||
+             MythTVMenu::MatchesGroup(actionName, "SELECTRAWTEXT_",  category, prefix) ||
+             MythTVMenu::MatchesGroup(actionName, "SELECTCC708_",    category, prefix) ||
+             MythTVMenu::MatchesGroup(actionName, "SELECTCC608_",    category, prefix) ||
+             MythTVMenu::MatchesGroup(actionName, "SELECTTTC_",      category, prefix) ||
+             MythTVMenu::MatchesGroup(actionName, "SELECTAUDIO_",    category, prefix))
     {
         int i = 0;
         TrackType type = kTrackTypeUnknown;
@@ -9194,7 +9135,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             BUTTON(action, m_tvmTracks[type][i]);
         }
     }
-    else if (matchesGroup(actionName, "ADJUSTSTRETCH", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "ADJUSTSTRETCH", category, prefix))
     {
         struct speed
         {
@@ -9222,7 +9163,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             BUTTON(action, speed.m_trans);
         }
     }
-    else if (matchesGroup(actionName, "TOGGLESLEEP", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "TOGGLESLEEP", category, prefix))
     {
         active = false;
         if (m_sleepTimerId)
@@ -9232,7 +9173,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
         BUTTON(ACTION_TOGGLESLEEP + "90", tr("%n minute(s)", "", 90));
         BUTTON(ACTION_TOGGLESLEEP + "120", tr("%n minute(s)", "", 120));
     }
-    else if (matchesGroup(actionName, "CHANGROUP_", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "CHANGROUP_", category, prefix))
     {
         if (m_dbUseChannelGroups)
         {
@@ -9248,7 +9189,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             }
         }
     }
-    else if (matchesGroup(actionName, "TOGGLECOMMSKIP", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "TOGGLECOMMSKIP", category, prefix))
     {
         if (m_tvmIsRecording || m_tvmIsRecorded)
         {
@@ -9262,7 +9203,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             }
         }
     }
-    else if (matchesGroup(actionName, "JUMPTOCHAPTER", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "JUMPTOCHAPTER", category, prefix))
     {
         if (m_tvmNumChapters &&
             m_tvmNumChapters == m_tvmChapterTimes.size())
@@ -9280,7 +9221,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             }
         }
     }
-    else if (matchesGroup(actionName, "SWITCHTOANGLE", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "SWITCHTOANGLE", category, prefix))
     {
         if (m_tvmNumAngles > 1)
         {
@@ -9294,7 +9235,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             }
         }
     }
-    else if (matchesGroup(actionName, "JUMPTOTITLE", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "JUMPTOTITLE", category, prefix))
     {
         for (int i = 0; i < m_tvmNumTitles; i++)
         {
@@ -9308,7 +9249,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             BUTTON(action, desc);
         }
     }
-    else if (matchesGroup(actionName, "SWITCHTOINPUT_", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "SWITCHTOINPUT_", category, prefix))
     {
         if (m_playerContext.m_recorder)
         {
@@ -9329,7 +9270,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
             }
         }
     }
-    else if (matchesGroup(actionName, "SWITCHTOSOURCE_", category, prefix))
+    else if (MythTVMenu::MatchesGroup(actionName, "SWITCHTOSOURCE_", category, prefix))
     {
         if (m_playerContext.m_recorder)
         {
@@ -9535,7 +9476,7 @@ bool TV::MenuItemDisplayPlayback(const MenuItemContext &Context)
         {
             BUTTON3(actionName, tr("Recorded Program"), "", true);
             QVariant v;
-            v.setValue(MenuNodeTuple(Context.m_menu, Context.m_node));
+            v.setValue(MythTVMenuNodeTuple(Context.m_menu, Context.m_node));
             m_tvmJumprecBackHack = v;
         }
         else if (actionName == "JUMPPREV")
@@ -9636,7 +9577,7 @@ void TV::MenuLazyInit(void *Field)
             m_tvmFreeRecorderCount = RemoteGetFreeRecorderCount();
 }
 
-void TV::PlaybackMenuInit(const MenuBase &Menu)
+void TV::PlaybackMenuInit(const MythTVMenu &Menu)
 {
     GetPlayerReadLock();
     m_tvmOsd = GetOSDL();
@@ -9751,7 +9692,7 @@ void TV::PlaybackMenuInit(const MenuBase &Menu)
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-void TV::PlaybackMenuDeinit(const MenuBase& /*Menu*/)
+void TV::PlaybackMenuDeinit(const MythTVMenu& /*Menu*/)
 {
     ReturnOSDLock();
     ReturnPlayerLock();
@@ -9759,7 +9700,7 @@ void TV::PlaybackMenuDeinit(const MenuBase& /*Menu*/)
     m_tvmOsd = nullptr;
 }
 
-void TV::PlaybackMenuShow(const MenuBase &Menu, const QDomNode &Node, const QDomNode &Selected)
+void TV::PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QDomNode &Selected)
 {
     PlaybackMenuInit(Menu);
     if (m_tvmOsd)
@@ -9774,7 +9715,7 @@ void TV::PlaybackMenuShow(const MenuBase &Menu, const QDomNode &Node, const QDom
         if (!parent.parentNode().isNull())
         {
             QVariant v;
-            v.setValue(MenuNodeTuple(Menu, Node));
+            v.setValue(MythTVMenuNodeTuple(Menu, Node));
             m_tvmOsd->DialogBack("", v);
         }
         if (isCutlist)
