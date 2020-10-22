@@ -1834,7 +1834,7 @@ void TV::ShowOSDAskAllow()
         dialog.m_buttons.push_back({ let_record1, "DIALOG_ASKALLOW_EXIT_0" });
         dialog.m_buttons.push_back({ ((*it).m_hasLater) ? record_later1 : do_not_record1,
                                      "DIALOG_ASKALLOW_CANCELRECORDING_0", false, ((*it).m_hasRec) });
-        emit ShowOSDDialog(dialog);
+        emit ChangeOSDDialog(dialog);
     }
     else
     {
@@ -1898,7 +1898,7 @@ void TV::ShowOSDAskAllow()
         if (conflict_count > 1)
         {
             BrowseEnd(false);
-            emit ShowOSDDialog( { OSD_DLG_ASKALLOW, message, timeuntil, {
+            emit ChangeOSDDialog( { OSD_DLG_ASKALLOW, message, timeuntil, {
                 { let_recordm, "DIALOG_ASKALLOW_EXIT_0", false, true },
                 { all_have_later ? record_laterm : do_not_recordm, "DIALOG_ASKALLOW_CANCELCONFLICTING_0" }
             }});
@@ -1906,7 +1906,7 @@ void TV::ShowOSDAskAllow()
         else
         {
             BrowseEnd(false);
-            emit ShowOSDDialog( {OSD_DLG_ASKALLOW, message, timeuntil, {
+            emit ChangeOSDDialog( {OSD_DLG_ASKALLOW, message, timeuntil, {
                 { let_record1, "DIALOG_ASKALLOW_EXIT_0", false, !has_rec},
                 { all_have_later ? record_later1 : do_not_record1, "DIALOG_ASKALLOW_CANCELRECORDING_0", false, has_rec}
             }});
@@ -6761,7 +6761,7 @@ void TV::UpdateOSDTimeoutMessage()
         "video source (%3), inputs (%4), etc.")
         .arg(s_chanUp).arg(s_chanDown).arg(s_nextSrc).arg(s_togCards);
 
-    emit ShowOSDDialog({ OSD_DLG_INFO, message, 0,
+    emit ChangeOSDDialog({ OSD_DLG_INFO, message, 0,
                        { {tr("OK"), "DIALOG_INFO_CHANNELLOCK_0" } },
                        { "", "DIALOG_INFO_CHANNELLOCK_0", true } });
 }
@@ -7370,7 +7370,7 @@ void TV::ShowOSDSleep()
                          "Do you wish to continue watching?")
             .arg(static_cast<double>(m_sleepTimerTimeout * (1.0F / 60000.0F)));
 
-    emit ShowOSDDialog( { OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout,
+    emit ChangeOSDDialog( { OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout,
                         { { tr("Yes"), "DIALOG_SLEEP_YES_0" },
                           { tr("No"),  "DIALOG_SLEEP_NO_0" } }});
 
@@ -7425,7 +7425,7 @@ void TV::ShowOSDIdle()
                          "will exit in %d seconds. Are you still watching?")
                          .arg(static_cast<double>(m_dbIdleTimeout * (1.0F / 60000.0F)));
 
-    emit ShowOSDDialog( { OSD_DLG_IDLE, message, kIdleTimerDialogTimeout,
+    emit ChangeOSDDialog( { OSD_DLG_IDLE, message, kIdleTimerDialogTimeout,
                         { { tr("Yes"), "DIALOG_IDLE_YES_0" },
                           { tr("No"),  "DIALOG_IDLE_NO_0" }}});
 
@@ -7570,7 +7570,7 @@ void TV::customEvent(QEvent *Event)
         if (timeout > 0)
             message += " (%d)";
 
-        emit ShowOSDDialog( { OSD_DLG_CONFIRM, message, timeout });
+        emit ChangeOSDDialog( { OSD_DLG_CONFIRM, message, timeout });
         return;
     }
 
@@ -8175,7 +8175,7 @@ void TV::ShowOSDCutpoint(const QString &Type)
         dialog.m_buttons.push_back( { tr("Save Cuts"), "DIALOG_CUTPOINT_SAVEMAP_0" } );
         dialog.m_buttons.push_back( { tr("Undo Changes"), "DIALOG_CUTPOINT_REVERT_0" } );
         dialog.m_back = { "", "DIALOG_CUTPOINT_DONOTHING_0", true };
-        emit ShowOSDDialog(dialog);
+        emit ChangeOSDDialog(dialog);
 
         InfoMap map;
         map.insert("title", tr("Edit"));
@@ -8234,7 +8234,7 @@ void TV::ShowOSDAlreadyEditing()
 
     QString message = tr("This program is currently being edited");
     QString def = QString("DIALOG_EDITING_CONTINUE_%1").arg(static_cast<int>(paused));
-    emit ShowOSDDialog( { OSD_DLG_EDITING, message, 0,
+    emit ChangeOSDDialog( { OSD_DLG_EDITING, message, 0,
                         { { tr("Continue Editing"), def, false, true },
                           { tr("Do not edit"), QString("DIALOG_EDITING_STOP_%1").arg(static_cast<int>(paused)) }},
                         { "", def, true} });
@@ -8303,7 +8303,7 @@ void TV::StartChannelEditMode()
     osd = GetOSDL();
     if (osd)
     {
-        emit ShowOSDDialog({ OSD_DLG_EDITOR });
+        emit ChangeOSDDialog({ OSD_DLG_EDITOR });
         emit ChangeOSDText(OSD_DLG_EDITOR, m_chanEditMap, kOSDTimeout_None);
     }
     ReturnOSDLock();
@@ -8317,7 +8317,7 @@ void TV::StartOsdNavigation()
         osd->DialogQuit();
         osd->HideAll();
         ToggleOSD(true);
-        emit ShowOSDDialog({ OSD_DLG_NAVIGATE });
+        emit ChangeOSDDialog({ OSD_DLG_NAVIGATE });
     }
     ReturnOSDLock();
     UpdateNavDialog();
@@ -9826,7 +9826,7 @@ void TV::FillOSDMenuJumpRec(const QString &Category, int Level, const QString &S
         }
     }
 
-    emit ShowOSDDialog(dialog);
+    emit ChangeOSDDialog(dialog);
 }
 
 void TV::OverrideScan(FrameScanType Scan)
@@ -10057,7 +10057,7 @@ void TV::ShowNoRecorderDialog(NoRecorderMsg MsgType)
             break;
     }
 
-    emit ShowOSDDialog({ OSD_DLG_INFO, errorText, 0, {{ tr("OK"), "DIALOG_INFO_X_X" }}});
+    emit ChangeOSDDialog({ OSD_DLG_INFO, errorText, 0, {{ tr("OK"), "DIALOG_INFO_X_X" }}});
 }
 
 /**
@@ -10342,7 +10342,7 @@ void TV::ShowOSDStopWatchingRecording()
 
     dialog.m_buttons.push_back({tr("Keep watching"), "DIALOG_VIDEOEXIT_KEEPWATCHING_0"});
     dialog.m_back = { "", "DIALOG_VIDEOEXIT_KEEPWATCHING_0", true };
-    emit ShowOSDDialog(dialog);
+    emit ChangeOSDDialog(dialog);
 
     if (m_videoExitDialogTimerId)
         KillTimer(m_videoExitDialogTimerId);
@@ -10394,7 +10394,7 @@ void TV::ShowOSDPromptDeleteRecording(const QString& Title, bool Force)
                     message += " " + byWho[i+2];
                 }
             }
-            emit ShowOSDDialog({OSD_DLG_DELETE, message, 0,
+            emit ChangeOSDDialog({OSD_DLG_DELETE, message, 0,
                                 {{ tr("OK"), "DIALOG_DELETE_OK_0" }},
                                 { "", "DIALOG_DELETE_OK_0", true }});
         }
@@ -10441,7 +10441,7 @@ void TV::ShowOSDPromptDeleteRecording(const QString& Title, bool Force)
                 dialog.m_back = { "", "DIALOG_PLAY_0_0", true };
         }
 
-        emit ShowOSDDialog(dialog);
+        emit ChangeOSDDialog(dialog);
 
         if (m_videoExitDialogTimerId)
             KillTimer(m_videoExitDialogTimerId);

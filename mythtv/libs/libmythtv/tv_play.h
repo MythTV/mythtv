@@ -188,7 +188,7 @@ class MTV_PUBLIC TV : public QObject, public MythTVMenuItemDisplayer, public Ref
     void ChangeVolume(bool Direction, int Volume, bool UpdateOSD);
     void ChangeOSDDebug();
     void ChangeOSDText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);
-    void ShowOSDDialog(MythOSDDialogData Data);
+    void ChangeOSDDialog(MythOSDDialogData Data);
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);

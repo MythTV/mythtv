@@ -153,7 +153,7 @@ OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* 
     m_painter(Painter)
 {
     connect(this, &OSD::HideOSD, m_tv, &TV::HandleOSDClosed);
-    connect(m_tv, &TV::ShowOSDDialog, this, &OSD::ShowDialog);
+    connect(m_tv, &TV::ChangeOSDDialog, this, &OSD::ShowDialog);
     connect(m_tv, &TV::ChangeOSDText, this, &OSD::SetText);
 }
 
