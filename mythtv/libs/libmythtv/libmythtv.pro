@@ -375,6 +375,7 @@ using_frontend {
 
     # Video playback
     HEADERS += tv_play.h
+    HEADERS += mythtvactionutils.h
     HEADERS += mythplayer.h
     HEADERS += mythplayeruibase.h
     HEADERS += mythplayerui.h
