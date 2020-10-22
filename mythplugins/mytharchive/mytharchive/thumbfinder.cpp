@@ -838,7 +838,8 @@ void ThumbFinder::closeAVCodec()
     delete[] m_outputbuf;
 
     // close the codec
-    m_codecMap.FreeCodecContext(m_inputFC->streams[m_videostream]);
+    if (m_inputFC.isOpen() && m_inputFC->streams)
+        m_codecMap.FreeCodecContext(m_inputFC->streams[m_videostream]);
 
     // close the video file
     m_inputFC.Close();
