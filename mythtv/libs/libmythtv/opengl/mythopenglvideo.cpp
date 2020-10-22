@@ -918,14 +918,15 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
 
     // discard stereoscopic fields
     StereoscopicMode stereo = StereoOverride;
+    m_lastStereo = Frame ? Frame->m_stereo3D : m_lastStereo;
     // N.B. kStereoscopicModeSideBySideDiscard is a proxy here for discard of all types
     if ((stereo == kStereoscopicModeAuto) &&
         (m_stereoMode == kStereoscopicModeSideBySideDiscard) &&
-        Frame && (Frame->m_stereo3D != AV_STEREO3D_2D))
+        (m_lastStereo != AV_STEREO3D_2D))
     {
-        if (Frame->m_stereo3D == AV_STEREO3D_SIDEBYSIDE)
+        if (m_lastStereo == AV_STEREO3D_SIDEBYSIDE)
             stereo = kStereoscopicModeSideBySideDiscard;
-        else if (Frame->m_stereo3D == AV_STEREO3D_TOPBOTTOM)
+        else if (m_lastStereo == AV_STEREO3D_TOPBOTTOM)
             stereo = kStereoscopicModeTopAndBottomDiscard;
     }
 

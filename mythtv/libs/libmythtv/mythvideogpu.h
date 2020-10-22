@@ -79,6 +79,7 @@ class MythVideoGPU : public QObject
     bool              m_deinterlacer2x       { false };
     bool              m_valid                { false };
     bool              m_viewportControl      { true };
+    uint              m_lastStereo           { 0 }; // AV_STEREO3D_2D
     StereoscopicMode  m_stereoMode           { kStereoscopicModeSideBySideDiscard };
 };
 
