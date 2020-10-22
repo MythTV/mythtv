@@ -223,6 +223,7 @@ bool MythPlayer::Pause(void)
             m_framesPlayed = m_videoOutput->GetFramesPlayed();
     }
     m_pauseLock.unlock();
+    emit PauseChanged(m_allPaused);
     return already_paused;
 }
 
@@ -252,6 +253,7 @@ bool MythPlayer::Play(float speed, bool normal, bool unpauseaudio)
     m_nextPlaySpeed   = speed;
     m_nextNormalSpeed = normal;
     m_pauseLock.unlock();
+    emit PauseChanged(m_allPaused);
     return true;
 }
 

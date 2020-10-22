@@ -119,6 +119,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     void CheckCallbacks();
     void SeekingSlow(int Count);
     void SeekingComplete();
+    void PauseChanged(bool Paused);
 
   public:
     explicit MythPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
