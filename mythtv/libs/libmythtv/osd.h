@@ -125,6 +125,7 @@ class OSD : public QObject
 
   public slots:
     void ShowDialog(MythOSDDialogData Data);
+    void SetText(const QString& Window, const InfoMap& Map, OSDTimeout Timeout);
 
   public:
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
@@ -152,7 +153,6 @@ class OSD : public QObject
 
     void SetValues(const QString &Window, const QHash<QString,int> &Map, OSDTimeout Timeout);
     void SetValues(const QString &Window, const QHash<QString,float> &Map, OSDTimeout Timeout);
-    void SetText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);
     void SetRegions(const QString &Window, frm_dir_map_t &Map, long long Total);
     void SetGraph(const QString &Window, const QString &Graph, int64_t Timecode);
     bool IsWindowVisible(const QString &Window);

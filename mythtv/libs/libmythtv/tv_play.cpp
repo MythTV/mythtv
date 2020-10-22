@@ -5009,7 +5009,7 @@ void TV::UpdateNavDialog()
         info.text["paused"] = (paused ? "Y" : "N");
         bool muted = m_player && m_player->IsMuted();
         info.text["muted"] = (muted ? "Y" : "N");
-        osd->SetText(OSD_DLG_NAVIGATE, info.text, paused ? kOSDTimeout_None : kOSDTimeout_Long);
+        emit ChangeOSDText(OSD_DLG_NAVIGATE, info.text, paused ? kOSDTimeout_None : kOSDTimeout_Long);
     }
     ReturnOSDLock();
 }
@@ -6492,7 +6492,7 @@ void TV::UpdateOSDProgInfo(const char *WhichInfo)
     if (osd)
     {
         osd->HideAll();
-        osd->SetText(WhichInfo, infoMap, kOSDTimeout_Long);
+        emit ChangeOSDText(WhichInfo, infoMap, kOSDTimeout_Long);
     }
     ReturnOSDLock();
 }
@@ -6504,7 +6504,7 @@ void TV::UpdateOSDStatus(osdInfo &Info, int Type, OSDTimeout Timeout)
     {
         osd->ResetWindow("osd_status");
         osd->SetValues("osd_status", Info.values, Timeout);
-        osd->SetText("osd_status",   Info.text, Timeout);
+        emit ChangeOSDText("osd_status",   Info.text, Timeout);
         if (Type != kOSDFunctionalType_Default)
             osd->SetFunctionalWindow("osd_status", static_cast<OSDFunctionalType>(Type));
     }
@@ -6693,13 +6693,8 @@ void TV::UpdateOSDSignal(const QStringList &List)
     else if (!msg.isEmpty())
         sigDesc = msg;
 
-    osd = GetOSDL();
-    if (osd)
-    {
-        infoMap["description"] = sigDesc;
-        osd->SetText("program_info", infoMap, kOSDTimeout_Med);
-    }
-    ReturnOSDLock();
+    infoMap["description"] = sigDesc;
+    emit ChangeOSDText("program_info", infoMap, kOSDTimeout_Med);
 
     m_playerContext.m_lastSignalMsg.clear();
     m_playerContext.m_lastSignalMsgTime.start();
@@ -7582,15 +7577,7 @@ void TV::customEvent(QEvent *Event)
     if (Event->type() == MythEvent::kUpdateBrowseInfoEventType)
     {
         auto *b = reinterpret_cast<UpdateBrowseInfoEvent*>(Event);
-        GetPlayerReadLock();
-        OSD *osd = GetOSDL();
-        if (osd)
-        {
-            osd->SetText("browse_info", b->m_im, kOSDTimeout_None);
-            osd->SetExpiry("browse_info", kOSDTimeout_None);
-        }
-        ReturnOSDLock();
-        ReturnPlayerLock();
+        emit ChangeOSDText("browse_info", b->m_im, kOSDTimeout_None);
         return;
     }
 
@@ -7994,15 +7981,10 @@ void TV::QuickRecord()
                 recinfo.GetPathname(), "Screenshots");
         }
 
-        OSD *osd = GetOSDL();
-        if (osd)
-        {
-            osd->SetText("browse_info", infoMap, kOSDTimeout_Med);
-            InfoMap map;
-            map.insert("message_text", tr("Record"));
-            osd->SetText("osd_message", map, kOSDTimeout_Med);
-        }
-        ReturnOSDLock();
+        emit ChangeOSDText("browse_info", infoMap, kOSDTimeout_Med);
+        InfoMap map;
+        map.insert("message_text", tr("Record"));
+        emit ChangeOSDText("osd_message", map, kOSDTimeout_Med);
         return;
     }
 
@@ -8187,13 +8169,6 @@ void TV::ShowOSDCutpoint(const QString &Type)
     }
     else if (Type == "EXIT_EDIT_MODE")
     {
-        OSD *osd = GetOSDL();
-        if (!osd)
-        {
-            ReturnOSDLock();
-            return;
-        }
-
         MythOSDDialogData dialog { OSD_DLG_CUTPOINT, tr("Exit Recording Editor") };
         dialog.m_buttons.push_back( { tr("Save Cuts and Exit"), "DIALOG_CUTPOINT_SAVEEXIT_0" } );
         dialog.m_buttons.push_back( { tr("Exit Without Saving"), "DIALOG_CUTPOINT_REVERTEXIT_0" } );
@@ -8204,8 +8179,7 @@ void TV::ShowOSDCutpoint(const QString &Type)
 
         InfoMap map;
         map.insert("title", tr("Edit"));
-        osd->SetText("osd_program_editor", map, kOSDTimeout_None);
-        ReturnOSDLock();
+        emit ChangeOSDText("osd_program_editor", map, kOSDTimeout_None);
     }
 }
 
@@ -8330,7 +8304,7 @@ void TV::StartChannelEditMode()
     if (osd)
     {
         emit ShowOSDDialog({ OSD_DLG_EDITOR });
-        osd->SetText(OSD_DLG_EDITOR, m_chanEditMap, kOSDTimeout_None);
+        emit ChangeOSDText(OSD_DLG_EDITOR, m_chanEditMap, kOSDTimeout_None);
     }
     ReturnOSDLock();
 }
@@ -8367,7 +8341,7 @@ bool TV::HandleOSDChannelEdit(const QString& Action)
         osd->DialogGetText(infoMap);
         ChannelEditAutoFill(infoMap);
         insert_map(m_chanEditMap, infoMap);
-        osd->SetText(OSD_DLG_EDITOR, m_chanEditMap, kOSDTimeout_None);
+        emit ChangeOSDText(OSD_DLG_EDITOR, m_chanEditMap, kOSDTimeout_None);
     }
     else if (osd && Action == "OK")
     {
@@ -9680,7 +9654,7 @@ void TV::PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QD
             // hack to unhide the editbar
             InfoMap map;
             map.insert("title", tr("Edit"));
-            m_tvmOsd->SetText("osd_program_editor", map, kOSDTimeout_None);
+            emit ChangeOSDText("osd_program_editor", map, kOSDTimeout_None);
         }
     }
     PlaybackMenuDeinit(Menu);

@@ -153,6 +153,8 @@ OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* 
     m_painter(Painter)
 {
     connect(this, &OSD::HideOSD, m_tv, &TV::HandleOSDClosed);
+    connect(m_tv, &TV::ShowOSDDialog, this, &OSD::ShowDialog);
+    connect(m_tv, &TV::ChangeOSDText, this, &OSD::SetText);
 }
 
 OSD::~OSD()
@@ -185,8 +187,6 @@ bool OSD::Init(const QRect &Rect, float FontAspect)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded OSD: size %1x%2 offset %3+%4")
         .arg(m_rect.width()).arg(m_rect.height()).arg(m_rect.left()).arg(m_rect.top()));
     HideAll(false);
-
-    connect(m_tv, &TV::ShowOSDDialog, this, &OSD::ShowDialog);
     return true;
 }
 
