@@ -198,6 +198,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void RequestRegionUpdate(const QRect &);
     void TakingFocus();
     void LosingFocus();
+    void VisibilityChanged(bool Visible);
     void Showing();
     void Hiding();
     void Enabling();

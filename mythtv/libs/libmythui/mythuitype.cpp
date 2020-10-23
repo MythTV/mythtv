@@ -1098,6 +1098,7 @@ void MythUIType::SetVisible(bool visible)
         emit Showing();
     else
         emit Hiding();
+    emit VisibilityChanged(m_visible);
 }
 
 void MythUIType::SetDependIsDefault(bool isDefault)
