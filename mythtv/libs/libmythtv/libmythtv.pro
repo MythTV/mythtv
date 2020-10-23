@@ -375,9 +375,11 @@ using_frontend {
 
     # Video playback
     HEADERS += tv_play.h
+    HEADERS += tvplaybackstate.h
     HEADERS += mythtvmenu.h
     HEADERS += mythtvactionutils.h
     HEADERS += mythplayer.h
+    HEADERS += mythplayerstate.h
     HEADERS += mythplayeruibase.h
     HEADERS += mythplayerui.h
     HEADERS += mythplayervideoui.h
@@ -396,8 +398,10 @@ using_frontend {
     HEADERS += tvbrowsehelper.h
     HEADERS += mheg/netstream.h
     SOURCES += tv_play.cpp
+    SOURCES += tvplaybackstate.cpp
     SOURCES += mythtvmenu.cpp
     SOURCES += mythplayer.cpp
+    SOURCES += mythplayerstate.cpp
     SOURCES += mythplayeruibase.cpp
     SOURCES += mythplayerui.cpp
     SOURCES += mythplayervideoui.cpp

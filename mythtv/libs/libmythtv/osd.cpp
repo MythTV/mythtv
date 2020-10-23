@@ -1256,12 +1256,11 @@ OsdNavigation::OsdNavigation(MythMainWindow *MainWindow, TV* Tv, MythPlayerUI *P
     m_player(Player),
     m_osd(Osd)
 {
-    connect(m_player, &MythPlayerUI::PauseChanged, this, &OsdNavigation::PauseChanged);
-    connect(m_player, &MythPlayerUI::MuteChanged, this, &OsdNavigation::MuteChanged);
 }
 
 bool OsdNavigation::Create()
 {
+    // Setup screen
     if (!XMLParseBase::LoadWindowFromXML("osd.xml", "osd_navigation", this))
         return false;
 
@@ -1269,14 +1268,18 @@ bool OsdNavigation::Create()
     UIUtilW::Assign(this, more, "more");
     if (more)
         connect(more, &MythUIButton::Clicked, this, &OsdNavigation::More);
-    UIUtilW::Assign(this, m_pauseButton, "PAUSE");
-    UIUtilW::Assign(this, m_playButton, "PLAY");
-    UIUtilW::Assign(this, m_muteButton, "MUTE");
+    UIUtilW::Assign(this, m_pauseButton,  "PAUSE");
+    UIUtilW::Assign(this, m_playButton,   "PLAY");
+    UIUtilW::Assign(this, m_muteButton,   "MUTE");
     UIUtilW::Assign(this, m_unMuteButton, "unmute");
 
-    if (!m_player->HasAudioOut() || !m_player->PlayerControlsVolume())
+    // Listen for player state changes
+    connect(m_player, &MythPlayerUI::PauseChanged,      this, &OsdNavigation::PauseChanged);
+    connect(m_player, &MythPlayerUI::AudioStateChanged, this, &OsdNavigation::AudioStateChanged);
+
+    // Set initial player state
+    if (!(m_audioState.m_hasAudioOut && m_audioState.m_volumeControl))
     {
-        m_isVolumeControl = false;
         if (m_muteButton)
             m_muteButton->Hide();
         if (m_unMuteButton)
@@ -1284,17 +1287,17 @@ bool OsdNavigation::Create()
     }
     else
     {
-        MuteState state = m_player->GetMuteState();
         // Fudge to ensure we start with the correct mute state
-        m_muteState = VolumeBase::NextMuteState(state);
-        MuteChanged(state);
+        MythAudioState state = m_player->GetAudioState();
+        m_audioState.m_muteState = VolumeBase::NextMuteState(state.m_muteState);
+        AudioStateChanged(state);
     }
 
     bool paused = m_player->IsPaused();
     m_paused = !paused;
     PauseChanged(paused);
 
-    // find number of groups and make sure only corrrect one is visible
+    // Find number of groups and make sure only corrrect one is visible
     MythUIGroup *group = nullptr;
     for (int i = 0; i < 100 ; i++)
     {
@@ -1388,15 +1391,19 @@ void OsdNavigation::PauseChanged(bool Paused)
     }
 }
 
-void OsdNavigation::MuteChanged(MuteState Mute)
-{
-    if (!(m_isVolumeControl && m_muteButton && m_unMuteButton))
+void OsdNavigation::AudioStateChanged(MythAudioState AudioState)
+{   
+    if (!(m_muteButton && m_unMuteButton))
         return;
 
-    if (Mute != m_muteState)
+    if (!(AudioState.m_volumeControl && AudioState.m_hasAudioOut))
     {
-        m_muteState = Mute;
-        bool muted = m_muteState == kMuteAll;
+        m_muteButton->Hide();
+        m_unMuteButton->Hide();
+    }
+    else if (m_audioState.m_muteState != AudioState.m_muteState)
+    {
+        bool muted = AudioState.m_muteState == kMuteAll;
         MythUIType* current = GetFocusWidget();
         m_muteButton->SetVisible(!muted);
         m_unMuteButton->SetVisible(muted);
@@ -1407,6 +1414,8 @@ void OsdNavigation::MuteChanged(MuteState Mute)
             SetFocusWidget(muted ? m_unMuteButton : m_muteButton);
         }
     }
+
+    m_audioState = AudioState;
 }
 
 void OsdNavigation::GeneralAction()

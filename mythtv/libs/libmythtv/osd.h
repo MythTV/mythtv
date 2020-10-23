@@ -10,6 +10,7 @@
 #include "programtypes.h"
 #include "mythscreentype.h"
 #include "mythtypes.h"
+#include "mythplayerstate.h"
 
 // Screen names are prepended with alphanumerics to force the correct ordering
 // when displayed. This is slightly complicated by the default windows
@@ -129,7 +130,7 @@ class OSD : public QObject
 
   public:
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
-   ~OSD();
+   ~OSD() override;
 
     bool    Init(const QRect &Rect, float FontAspect);
     void    SetPainter(MythPainter *Painter);
@@ -237,8 +238,6 @@ class ChannelEditor : public MythScreenType
     TV*             m_tv           { nullptr };
 };
 
-#include "volumebase.h"
-
 class OsdNavigation : public MythScreenType
 {
     Q_OBJECT
@@ -250,7 +249,7 @@ class OsdNavigation : public MythScreenType
     void ShowMenu() override;
 
   public slots:
-    void MuteChanged(MuteState Mute);
+    void AudioStateChanged(MythAudioState AudioState);
     void PauseChanged(bool Paused);
     void GeneralAction();
     void More();
@@ -267,10 +266,9 @@ class OsdNavigation : public MythScreenType
     MythUIButton* m_muteButton      { nullptr };
     MythUIButton* m_unMuteButton    { nullptr };
     bool          m_paused          { false   };
-    MuteState     m_muteState       { MuteState::kMuteOff };
+    MythAudioState m_audioState     { };
     int           m_visibleGroup    { 0 };
     int           m_maxGroupNum     { -1 };
-    bool          m_isVolumeControl { true };
 };
 
 #endif

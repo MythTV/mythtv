@@ -35,6 +35,7 @@
 #include "mythmiscutil.h"
 #include "tvbrowsehelper.h"
 #include "mythtvmenu.h"
+#include "tvplaybackstate.h"
 #include "referencecounter.h"
 
 class QEvent;
@@ -149,7 +150,7 @@ class AskProgramInfo
  * \qmlsignal TVPlaybackSought(qint position_seconds)
  * Absolute seek has completed to position_seconds
  */
-class MTV_PUBLIC TV : public QObject, public MythTVMenuItemDisplayer, public ReferenceCounter, protected TVBrowseHelper
+class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, public ReferenceCounter, protected TVBrowseHelper
 {
     friend class PlaybackBox;
     friend class GuideGrid;
@@ -178,14 +179,7 @@ class MTV_PUBLIC TV : public QObject, public MythTVMenuItemDisplayer, public Ref
 
   signals:
     void PlaybackExiting(TV* Player);
-    void RequestEmbedding(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
-    void EmbedPlayback(bool Embed, const QRect& Rect = {});
-    void WindowResized(const QSize Size);
-    void ChangeStereoOverride(StereoscopicMode Mode);
-    void ChangePictureAttribute(PictureAttribute Attribute, bool Direction, int Value);
     void ChangeOSDPositionUpdates(bool Enable);
-    void ChangeMuteState(bool CycleChannels);
-    void ChangeVolume(bool Direction, int Volume, bool UpdateOSD);
     void ChangeOSDDebug();
     void ChangeOSDText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);
     void ChangeOSDDialog(MythOSDDialogData Data);
@@ -193,7 +187,7 @@ class MTV_PUBLIC TV : public QObject, public MythTVMenuItemDisplayer, public Ref
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
     void customEvent(QEvent* Event) override;
-    void ChangeVolume(bool Up, int NewVolume = -1);
+    void VolumeChange(bool Up, int NewVolume = -1);
     void ToggleMute(bool MuteIndividualChannels = false);
 
   private slots:

@@ -266,9 +266,7 @@ bool TV::CreatePlayer(TVState State, bool Muted)
     else
         player = new MythPlayerUI(m_mainWindow, this, &m_playerContext, flags);
 
-    player->SetupAudioOutput(m_playerContext.m_tsNormal);
     player->SetLength(static_cast<int>(m_playerContext.m_playingLen));
-    player->AdjustAudioTimecodeOffset(0, gCoreContext->GetNumSetting("AudioSyncOffset", 0));
 
     bool isWatchingRecording = (State == kState_WatchingRecording);
     player->SetWatchingRecording(isWatchingRecording);
@@ -279,7 +277,7 @@ bool TV::CreatePlayer(TVState State, bool Muted)
         player->GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
 
     m_playerContext.SetPlayer(player);
-    player->ReinitAudio();
+    emit ReinitAudio();
     m_player = player;
     return StartPlaying(-1);
 }
@@ -1531,12 +1529,12 @@ void TV::GetStatus()
             status.insert("audiotracks", tracks);
 
         status.insert("playspeed", m_player->GetPlaySpeed());
-        status.insert("audiosyncoffset", static_cast<long long>(m_player->GetAudioTimecodeOffset()));
+        status.insert("audiosyncoffset", static_cast<long long>(m_audioState.m_audioOffset));
 
-        if (m_player->PlayerControlsVolume())
+        if (m_audioState.m_volumeControl)
         {
-            status.insert("volume", m_player->GetVolume());
-            status.insert("mute",   m_player->GetMuteState());
+            status.insert("volume", m_audioState.m_volume);
+            status.insert("mute",   m_audioState.m_muteState);
         }
 
         if (m_player->GetVideoOutput())
@@ -3712,7 +3710,7 @@ bool TV::PictureAttributeHandleAction(const QStringList &Actions)
     if (m_adjustingPicture == kAdjustingPicture_Playback)
     {
         if (kPictureAttribute_Volume == m_adjustingPictureAttribute)
-            ChangeVolume(up);
+            VolumeChange(up);
         else
             emit ChangePictureAttribute(m_adjustingPictureAttribute, up, -1);
         return true;
@@ -4035,9 +4033,9 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
     else if (IsActionable(ACTION_DISABLEUPMIX, Actions))
         EnableUpmix(false);
     else if (IsActionable(ACTION_VOLUMEDOWN, Actions))
-        ChangeVolume(false);
+        VolumeChange(false);
     else if (IsActionable(ACTION_VOLUMEUP, Actions))
-        ChangeVolume(true);
+        VolumeChange(true);
     else if (IsActionable("CYCLEAUDIOCHAN", Actions))
         ToggleMute(true);
     else if (IsActionable(ACTION_MUTEAUDIO, Actions))
@@ -4613,36 +4611,15 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
         {
             QStringList matches = match.capturedTexts();
 
-            LOG(VB_GENERAL, LOG_INFO, QString("Set Volume to %1%")
-                    .arg(matches[1]));
+            LOG(VB_GENERAL, LOG_INFO, QString("Set Volume to %1%").arg(matches[1]));
 
             bool ok = false;
-
             int vol = matches[1].toInt(&ok);
-
             if (!ok)
                 return;
 
             if (0 <= vol && vol <= 100)
-            {
-                m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-                if (!m_player)
-                {
-                    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-                    return;
-                }
-
-                vol -= m_player->GetVolume();
-                vol = static_cast<int>(m_player->AdjustVolume(vol));
-                m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-                if (!IsBrowsing() && !m_editMode)
-                {
-                    UpdateOSDStatus(tr("Adjust Volume"), tr("Volume"), QString::number(vol),
-                                    kOSDFunctionalType_PictureAdjust, "%", vol * 10, kOSDTimeout_Med);
-                    emit ChangeOSDPositionUpdates(false);
-                }
-            }
+                emit ChangeVolume(true, vol, !IsBrowsing() && !m_editMode);
         }
     }
     else if (tokens.size() >= 3 && tokens[1] == "QUERY")
@@ -4815,9 +4792,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
         }
         else if (tokens[2] == "VOLUME")
         {
-            if (!m_player)
-                return;
-            QString infoStr = QString("%1%").arg(m_player->GetVolume());
+            QString infoStr = QString("%1%").arg(m_audioState.m_volume);
             QString message = QString("NETWORK_CONTROL ANSWER %1").arg(infoStr);
             MythEvent me(message);
             gCoreContext->dispatch(me);
@@ -5724,11 +5699,7 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
     {
         // Switching inputs so clear the pseudoLiveTVState.
         m_playerContext.SetPseudoLiveTV(nullptr, kPseudoNormalLiveTV);
-        bool muted = false;
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        if (m_player && m_player->IsMuted())
-            muted = true;
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+        bool muted = m_audioState.m_muteState == kMuteAll;
 
         // pause the decoder first, so we're not reading too close to the end.
         if (m_playerContext.m_buffer)
@@ -6126,8 +6097,7 @@ void TV::ChangeChannel(ChannelChangeDirection Direction)
     m_playerContext.m_recorder->ChangeChannel(Direction);
     ClearInputQueues(false);
 
-    if (m_player)
-        m_player->ResetAudio();
+    emit ResetAudio();
 
     UnpauseLiveTV();
 
@@ -6289,8 +6259,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
 
     m_playerContext.m_recorder->SetChannel(channum);
 
-    if (m_player)
-        m_player->ResetAudio();
+    emit ResetAudio();
 
     UnpauseLiveTV((Chanid != 0U) && (GetQueuedChanID() != 0U));
 
@@ -7086,18 +7055,14 @@ void TV::EditSchedule(int EditType)
     QCoreApplication::postEvent(this, me);
 }
 
-void TV::ChangeVolume(bool Up, int NewVolume)
+void TV::VolumeChange(bool Up, int NewVolume)
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player || !m_player->PlayerControlsVolume())
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    if (!m_audioState.m_volumeControl)
         return;
-    }
 
-    if (m_player->IsMuted() && (Up || NewVolume >= 0))
+    if ((m_audioState.m_muteState == kMuteAll) && (Up || NewVolume >= 0))
         ToggleMute();
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+
     bool browsing = IsBrowsing();
     emit ChangeVolume(Up, NewVolume, !browsing);
 
@@ -7113,11 +7078,8 @@ void TV::ChangeVolume(bool Up, int NewVolume)
             if (m_playerContext.m_buffer && m_playerContext.m_buffer->IsDVD())
                 appName = tr("DVD");
 
-
             lcd->switchToVolume(appName);
-            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-            lcd->setVolumeLevel(static_cast<float>(m_player->GetVolume()) / 100);
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+            lcd->setVolumeLevel(static_cast<float>(m_audioState.m_volume) / 100);
 
             if (m_lcdVolumeTimerId)
                 KillTimer(m_lcdVolumeTimerId);
@@ -7194,22 +7156,7 @@ void TV::ChangeTimeStretch(int Dir, bool AllowEdit)
 
 void TV::EnableUpmix(bool Enable, bool Toggle)
 {
-    if (!m_player || !m_player->HasAudioOut())
-        return;
-
-    bool enabled = false;
-
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (Toggle)
-        enabled = m_player->EnableUpmix(false, true);
-    else
-        enabled = m_player->EnableUpmix(Enable);
-    // May have to disable digital passthrough
-    m_player->ForceSetupAudioStream();
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    if (!IsBrowsing())
-        SetOSDMessage(enabled ? tr("Upmixer On") : tr("Upmixer Off"));
+    emit ChangeUpmix(Enable, Toggle);
 }
 
 void TV::ChangeSubtitleZoom(int Dir)
@@ -7285,24 +7232,8 @@ void TV::ChangeSubtitleDelay(int Dir)
 // dir in 10ms jumps
 void TV::ChangeAudioSync(int Dir, int NewSync)
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return;
-    }
-
     m_audiosyncAdjustment = true;
-    long long newval = m_player->AdjustAudioTimecodeOffset(Dir * 10, NewSync);
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    if (!IsBrowsing())
-    {
-        UpdateOSDStatus(tr("Adjust Audio Sync"), tr("Audio Sync"),
-                        QString::number(newval), kOSDFunctionalType_AudioSyncAdjust,
-                        "ms", (static_cast<int>(newval) / 2) + 500, kOSDTimeout_None);
-        emit ChangeOSDPositionUpdates(false);
-    }
+    emit ChangeAudioOffset(Dir * 10, NewSync, !IsBrowsing());
 }
 
 void TV::ToggleMute(const bool MuteIndividualChannels)
@@ -7511,10 +7442,7 @@ void TV::ToggleAdjustFill(AdjustFillMode AdjustfillMode)
 
 void TV::PauseAudioUntilBuffered()
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player)
-        m_player->PauseAudioUntilBuffered();
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    emit PauseAudioUntilReady();
 }
 
 /// This handles all custom events
@@ -7625,7 +7553,7 @@ void TV::customEvent(QEvent *Event)
         GetPlayerReadLock();
         int value = me->ExtraData(0).toInt();
         if (message == ACTION_SETVOLUME)
-            ChangeVolume(false, value);
+            VolumeChange(false, value);
         else if (message == ACTION_SETAUDIOSYNC)
             ChangeAudioSync(0, value);
         else if (message == ACTION_SETBRIGHTNESS)
@@ -8022,17 +7950,7 @@ void TV::HandleOSDClosed(int OSDType)
             break;
         case kOSDFunctionalType_AudioSyncAdjust:
             m_audiosyncAdjustment = false;
-            {
-            GetPlayerReadLock();
-            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-            if (m_player)
-            {
-                int64_t aoff = m_player->GetAudioTimecodeOffset();
-                gCoreContext->SaveSetting("AudioSyncOffset", QString::number(aoff));
-            }
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-            ReturnPlayerLock();
-            }
+            gCoreContext->SaveSetting("AudioSyncOffset", QString::number(m_audioState.m_audioOffset));
             break;
         case kOSDFunctionalType_SubtitleZoomAdjust:
             m_subtitleZoomAdjustment = false;
@@ -8051,10 +7969,11 @@ PictureAttribute TV::NextPictureAdjustType(PictureAdjustType Type, PictureAttrib
         return kPictureAttribute_None;
 
     int sup = kPictureAttributeSupported_None;
-    if ((kAdjustingPicture_Playback == Type) && m_player->GetVideoOutput())
+    if ((kAdjustingPicture_Playback == Type))
     {
-        sup = m_player->GetVideoOutput()->GetSupportedPictureAttributes();
-        if (m_player->HasAudioOut() && m_player->PlayerControlsVolume())
+        if (m_player->GetVideoOutput())
+            sup = m_player->GetVideoOutput()->GetSupportedPictureAttributes();
+        if (m_audioState.m_hasAudioOut && m_audioState.m_volumeControl)
             sup |= kPictureAttributeSupported_Volume;
         // Filter out range
         sup &= ~kPictureAttributeSupported_Range;
@@ -8097,18 +8016,16 @@ void TV::DoTogglePictureAttribute(PictureAdjustType Type)
         {
             value = m_player->GetVideoOutput()->GetPictureAttribute(attr);
         }
-        else if (m_player->HasAudioOut())
+        else if (m_audioState.m_hasAudioOut && m_audioState.m_volumeControl)
         {
-            value = static_cast<int>(m_player->GetVolume());
+            value = static_cast<int>(m_audioState.m_volume);
             title = tr("Adjust Volume");
         }
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (m_playerContext.m_recorder && (kAdjustingPicture_Playback != Type))
-    {
         value = m_playerContext.m_recorder->GetPictureAttribute(attr);
-    }
 
     QString text = toString(attr) + " " + toTypeString(Type);
 
@@ -9569,8 +9486,8 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
             !m_tvmTracks[kTrackTypeAudio].empty();
         m_tvmVisual           = m_player->CanVisualise();
         m_tvmActive           = m_player->GetVisualiserName();
-        m_tvmUpmixing         = m_player->IsUpmixing();
-        m_tvmCanUpmix         = m_player->CanUpmix();
+        m_tvmUpmixing         = m_audioState.m_isUpmixing;
+        m_tvmCanUpmix         = m_audioState.m_canUpmix;
         m_tvmAspectOverride   = m_player->GetAspectOverride();
         m_tvmAdjustFill       = m_player->GetAdjustFill();
         m_tvmCurSkip          = m_player->GetAutoCommercialSkip();

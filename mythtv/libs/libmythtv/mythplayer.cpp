@@ -3094,17 +3094,13 @@ void MythPlayer::syncWithAudioStretch()
 void MythPlayer::SetDisablePassThrough(bool disabled)
 {
     if (m_decoder && m_audio.HasAudioOut())
-    {
         m_decoder->SetDisablePassThrough(m_disablePassthrough || disabled);
-    }
 }
 
 void MythPlayer::ForceSetupAudioStream(void)
 {
     if (m_decoder && m_audio.HasAudioOut())
-    {
         m_decoder->ForceSetupAudioStream();
-    }
 }
 
 static unsigned dbg_ident(const MythPlayer *player)
