@@ -489,6 +489,11 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
             if (eErrorCode == UPnPResult_Success)
             {
+                while (pResult->m_List.size() > request.m_nRequestedCount)
+                {
+                    pResult->m_List.takeLast()->DecrRef();
+                }
+
                 nNumberReturned = pResult->m_List.count();
                 nTotalMatches   = pResult->m_nTotalMatches;
                 nUpdateID       = pResult->m_nUpdateID;
