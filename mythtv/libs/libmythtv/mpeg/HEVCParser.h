@@ -142,7 +142,7 @@ class HEVCParser : public H2645Parser
         UNSPEC63   = 63
     };
 
-    using SPS = struct {
+    struct SPS {
         uint8_t log2_min_luma_coding_block_size;
         uint8_t log2_diff_max_min_luma_coding_block_size;
         uint8_t log2_max_pic_order_cnt_lsb;
@@ -151,18 +151,18 @@ class HEVCParser : public H2645Parser
 
     };
 
-    using VPS = struct {
+    struct VPS {
         uint8_t max_sub_layers; // range 0 to 3
     };
 
-    using PPS = struct {
+    struct PPS {
         bool    dependent_slice_segments_enabled_flag;
         bool    output_flag_present_flag;
         uint8_t num_extra_slice_header_bits;
         int     sps_id;
     };
 
-    using ShortTermRefPicSet = struct {
+    struct ShortTermRefPicSet {
         /* calculated values */
         std::array<int32_t,16> DeltaPocS0;
         std::array<int32_t,16> DeltaPocS1;
@@ -190,7 +190,7 @@ class HEVCParser : public H2645Parser
        scaling_lists_16x16: 16x16 scaling list
        scaling_lists_32x32: 32x32 scaling list
      */
-    using ScalingList = struct {
+    struct ScalingList {
         std::vector<int16_t> scaling_list_dc_coef_minus8_16x16 {6,0};
         std::vector<int16_t> scaling_list_dc_coef_minus8_32x32 {2,0};
 
@@ -200,7 +200,7 @@ class HEVCParser : public H2645Parser
         std::array<std::array<uint8_t,64>,2> scaling_lists_32x32 {};
     };
 
-    using QuantMatrixSize = enum
+    enum QuantMatrixSize
     {
         QUANT_MATIX_4X4   = 0,
         QUANT_MATIX_8X8   = 1,
