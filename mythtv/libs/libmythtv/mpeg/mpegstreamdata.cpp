@@ -199,7 +199,7 @@ void MPEGStreamData::DeletePartialPSIP(uint pid)
  *  \note This method makes the assumption that AddTSPacket
  *        correctly handles duplicate packets.
  *
- *  \param tspacket Pointer the the TS packet data.
+ *  \param tspacket Pointer to the TS packet data.
  *  \param moreTablePackets returns true if we need more packets
  */
 PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
@@ -209,6 +209,8 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     moreTablePackets = true;
 
     PSIPTable* partial = GetPartialPSIP(tspacket->PID());
+
+    // Second and subsequent transport stream packets of PSIP packet
     if (partial && partial->AddTSPacket(tspacket, m_cardId, broken) && !broken)
     {
         // check if it's safe to read pespacket's Length()
@@ -229,7 +231,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
          (TableID::PAT == partial->StreamID()));
         if (!buggy && !partial->IsGood())
         {
-            LOG(VB_SIPARSER, LOG_ERR, LOC + "Discarding broken PSIP packet");
+            LOG(VB_RECORD, LOG_ERR, LOC + "Discarding broken PSIP packet");
             DeletePartialPSIP(tspacket->PID());
             return nullptr;
         }
@@ -292,6 +294,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         return nullptr; // partial packet is not yet complete.
     }
 
+    // First transport stream packet of PSIP packet after here
     if (!tspacket->PayloadStart())
     {
         // We didn't see this PSIP packet's start, so this must be the
@@ -303,27 +306,26 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     // table_id (8 bits) and section_length(12), syntax(1), priv(1), res(2)
     // pointer_field (+8 bits), since payload start is true if we are here.
     const unsigned int extra_offset = 4;
-
     const unsigned int offset = tspacket->AFCOffset() + tspacket->StartOfFieldPointer();
-    if (offset + extra_offset > TSPacket::kSize)
+    const unsigned char* pesdata = tspacket->data() + offset;
+
+    // Get the table length if it is in this packet
+    int pes_length = 0;
+    if (offset + 3  < TSPacket::kSize)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error: "
-                "AFCOffset(%1)+StartOfFieldPointer(%2)>184, "
-                "pes length & current cannot be queried")
-                .arg(tspacket->AFCOffset()).arg(tspacket->StartOfFieldPointer()));
-        return nullptr;
+        pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
     }
 
-    const unsigned char* pesdata = tspacket->data() + offset;
-    const unsigned int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
-    if ((pes_length + offset + extra_offset) > TSPacket::kSize)
+    // If the table is not completely in this packet we need another packet.
+    if (pes_length == 0 || (pes_length + offset + extra_offset) > TSPacket::kSize)
     {
         SavePartialPSIP(tspacket->PID(), new PSIPTable(*tspacket));
         moreTablePackets = false;
         return nullptr;
     }
 
-    auto *psip = new PSIPTable(*tspacket); // must be complete packet
+    // Complete table in one packet after here
+    auto *psip = new PSIPTable(*tspacket);
 
     // There might be another section after this one in the
     // current packet. We need room before the end of the

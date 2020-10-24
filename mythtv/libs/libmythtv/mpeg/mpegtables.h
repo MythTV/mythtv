@@ -411,7 +411,7 @@ class MTV_PUBLIC PSIPTable : public PESPacket
 
         m_badPacket = true;
         // first check if Length() will return something useful and
-        // than check if the packet ends in the first TSPacket
+        // then check if the packet ends in the first TSPacket
         if ((m_pesData - tspacket.data()) <= (188-3) &&
             (m_pesData + Length() - tspacket.data()) <= (188-3))
         {
