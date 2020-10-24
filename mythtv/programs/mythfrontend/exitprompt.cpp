@@ -256,15 +256,18 @@ void ExitPrompter::HandleExit()
 
     dlg->AddButton(QCoreApplication::translate("(Common)", "No"));
     if (allowExit)
-        dlg->AddButton(tr("Yes, Exit now"), SLOT(DoQuit()));
+        dlg->AddButton(tr("Yes, Exit now"), &ExitPrompter::DoQuit);
     if (allowReboot)
-        dlg->AddButton(tr("Yes, Exit and Reboot"), confirm ? SLOT(ConfirmReboot()) : SLOT(DoReboot()));
+        dlg->AddButton(tr("Yes, Exit and Reboot"),
+                       confirm ? &ExitPrompter::ConfirmReboot : qOverload<>(&ExitPrompter::DoReboot));
     if (allowShutdown)
-        dlg->AddButton(tr("Yes, Exit and Shutdown"), confirm ? SLOT(ConfirmHalt()) : SLOT(DoHalt()));
+        dlg->AddButton(tr("Yes, Exit and Shutdown"),
+                        confirm ? &ExitPrompter::ConfirmHalt : qOverload<>(&ExitPrompter::DoHalt));
     if (allowStandby)
-        dlg->AddButton(tr("Yes, Enter Standby Mode"), SLOT(DoStandby()));
+        dlg->AddButton(tr("Yes, Enter Standby Mode"), &ExitPrompter::DoStandby);
     if (allowSuspend)
-        dlg->AddButton(tr("Yes, Suspend"), confirm ? SLOT(ConfirmSuspend()) : SLOT(DoSuspend()));
+        dlg->AddButton(tr("Yes, Suspend"),
+                        confirm ? &ExitPrompter::ConfirmSuspend : qOverload<>(&ExitPrompter::DoSuspend));
 
     // This is a hack so that the button clicks target the correct slot:
     dlg->SetReturnEvent(this, QString());
@@ -300,11 +303,11 @@ void ExitPrompter::Confirm(MythPower::Feature Action)
     }
 
     if (Action == MythPower::FeatureShutdown)
-        connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoHalt);
+        connect(dlg, &MythConfirmationDialog::haveResult, this, qOverload<bool>(&ExitPrompter::DoHalt));
     else if (Action == MythPower::FeatureRestart)
-        connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoReboot);
+        connect(dlg, &MythConfirmationDialog::haveResult, this, qOverload<bool>(&ExitPrompter::DoReboot));
     else if (Action == MythPower::FeatureSuspend)
-        connect(dlg, &MythConfirmationDialog::haveResult, this, &ExitPrompter::DoSuspend);
+        connect(dlg, &MythConfirmationDialog::haveResult, this, qOverload<bool>(&ExitPrompter::DoSuspend));
 
     ss->AddScreen(dlg);
 }

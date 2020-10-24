@@ -1029,9 +1029,9 @@ void StandardSettingDialog::ShowMenu()
         return;
     // m_title->GetText() for screen title
     auto *menu = new MythMenu(source->getLabel(), this, "mainmenu");
-    menu->AddItem(tr("Edit"), SLOT(editEntry()));
+    menu->AddItem(tr("Edit"), &StandardSettingDialog::editEntry);
     if (source->canDelete())
-        menu->AddItem(tr("Delete"), SLOT(deleteSelected()));
+        menu->AddItem(tr("Delete"), &StandardSettingDialog::deleteSelected);
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

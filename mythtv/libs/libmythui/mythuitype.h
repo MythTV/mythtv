@@ -47,6 +47,15 @@ Q_DECLARE_METATYPE(MythUICallbackNMF)
 Q_DECLARE_METATYPE(MythUICallbackMF)
 Q_DECLARE_METATYPE(MythUICallbackMFc)
 
+// Templates for determining if an argument is a "Pointer to a
+// Member Function"
+template<typename Func> struct FunctionPointerTest
+{ enum {MemberFunction = false, MemberConstFunction = false}; };
+template<class Obj, typename Ret, typename... Args> struct FunctionPointerTest<Ret (Obj::*) (Args...)>
+{ enum {MemberFunction = true, MemberConstFunction = false}; };
+template<class Obj, typename Ret, typename... Args> struct FunctionPointerTest<Ret (Obj::*) (Args...) const>
+{ enum {MemberFunction = false, MemberConstFunction = true}; };
+
 /**
  * \defgroup MythUI MythTV User Interface Library
  *

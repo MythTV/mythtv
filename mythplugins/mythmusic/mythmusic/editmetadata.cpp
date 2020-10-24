@@ -175,11 +175,11 @@ void EditMetadataCommon::showSaveMenu()
     menu->SetReturnEvent(this, "savechangesmenu");
 
     if (s_metadataOnly)
-        menu->AddButton(tr("Save Changes"), SLOT(saveToMetadata()));
+        menu->AddButton(tr("Save Changes"), &EditMetadataCommon::saveToMetadata);
     else
-        menu->AddButton(tr("Save Changes"), SLOT(saveAll()));
+        menu->AddButton(tr("Save Changes"), &EditMetadataCommon::saveAll);
 
-    menu->AddButton(tr("Exit/Do Not Save"), SLOT(cleanupAndClose()));
+    menu->AddButton(tr("Exit/Do Not Save"), &EditMetadataCommon::cleanupAndClose);
 
     popupStack->AddScreen(menu);
 }

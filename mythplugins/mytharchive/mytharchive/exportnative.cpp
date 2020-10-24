@@ -346,7 +346,7 @@ void ExportNative::ShowMenu()
 
     menuPopup->SetReturnEvent(this, "action");
 
-    menuPopup->AddButton(tr("Remove Item"), SLOT(removeItem()));
+    menuPopup->AddButton(tr("Remove Item"), &ExportNative::removeItem);
 }
 
 void ExportNative::removeItem()

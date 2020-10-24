@@ -184,8 +184,8 @@ void NetSearch::ShowMenu(void)
             {
                 if (item->GetDownloadable())
                     menuPopup->AddButton(tr("Stream Video"),
-                                         SLOT(StreamWebVideo()));
-                menuPopup->AddButton(tr("Open Web Link"), SLOT(ShowWebVideo()));
+                                         &NetSearch::StreamWebVideo);
+                menuPopup->AddButton(tr("Open Web Link"), &NetSearch::ShowWebVideo);
 
                 QString filename = GetDownloadFilename(item->GetTitle(),
                                                        item->GetMediaURL());
@@ -202,12 +202,12 @@ void NetSearch::ShowMenu(void)
                     if (exists)
                     {
                         menuPopup->AddButton(tr("Play"),
-                                             SLOT(DoPlayVideo(filename)));
+                                             qOverload<>(&NetSearch::DoPlayVideo));
                     }
                     else
                     {
                         menuPopup->AddButton(tr("Save This Video"),
-                                             SLOT(DoDownloadAndPlay()));
+                                             &NetSearch::DoDownloadAndPlay);
                     }
                 }
 
@@ -215,25 +215,25 @@ void NetSearch::ShowMenu(void)
                     GetFocusWidget() == m_searchResultList &&
                     exists)
                 {
-                    menuPopup->AddButton(tr("Delete"), SLOT(SlotDeleteVideo()));
+                    menuPopup->AddButton(tr("Delete"), &NetSearch::SlotDeleteVideo);
                 }
             }
         }
 
         if (m_pagenum > 1)
-            menuPopup->AddButton(tr("Previous Page"), SLOT(GetLastResults()));
+            menuPopup->AddButton(tr("Previous Page"), &NetSearch::GetLastResults);
         if (m_searchResultList->GetCount() > 0 && m_pagenum < m_maxpage)
-            menuPopup->AddButton(tr("Next Page"), SLOT(GetMoreResults()));
+            menuPopup->AddButton(tr("Next Page"), &NetSearch::GetMoreResults);
         if (m_pagenum > 1 && m_prevPageToken.isEmpty())
             menuPopup->AddButton(tr("Skip 10 Pages Back"),
-                                 SLOT(SkipPagesBack()));
+                                 &NetSearch::SkipPagesBack);
         if (m_searchResultList->GetCount() > 0 && m_pagenum < m_maxpage &&
             m_nextPageToken.isEmpty())
             menuPopup->AddButton(tr("Skip 10 Pages Forward"),
-                                 SLOT(SkipPagesForward()));
+                                 &NetSearch::SkipPagesForward);
 
         menuPopup->AddButton(tr("Manage Search Scripts"),
-                             SLOT(RunSearchEditor()));
+                             &NetSearch::RunSearchEditor);
     }
     else
         delete menuPopup;

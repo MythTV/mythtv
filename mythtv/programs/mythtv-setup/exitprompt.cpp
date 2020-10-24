@@ -83,7 +83,7 @@ void ExitPrompter::handleExit()
         
         dia->AddButton(tr("Yes please"));
         dia->AddButton(tr("No, I know what I am doing"),
-                SLOT(masterPromptExit()));
+                       &ExitPrompter::masterPromptExit);
                 
         m_d->m_stk->AddScreen(dia);
     }

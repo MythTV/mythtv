@@ -315,3 +315,15 @@ void NetBase::DoPlayVideo(const QString &filename)
 
     GetMythMainWindow()->HandleMedia("Internal", filename);
 }
+
+void NetBase::DoPlayVideo(void)
+{
+    ResultItem *item = GetStreamItem();
+    if (!item)
+        return;
+
+    QString filename = GetDownloadFilename(item->GetTitle(),
+                                           item->GetMediaURL());
+
+    DoPlayVideo(filename);
+}

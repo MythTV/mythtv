@@ -639,19 +639,19 @@ void ImportMusicDialog::ShowMenu()
     }
 
     menu->SetReturnEvent(this, "menu");
-    menu->AddButton(tr("Select Where To Save Tracks"), SLOT(chooseBackend()));
-    menu->AddButton(tr("Save Defaults"), SLOT(saveDefaults()));
+    menu->AddButton(tr("Select Where To Save Tracks"), &ImportMusicDialog::chooseBackend);
+    menu->AddButton(tr("Save Defaults"), &ImportMusicDialog::saveDefaults);
 
     if (m_haveDefaults)
     {
-        menu->AddButton(tr("Change Compilation Flag"), SLOT(setCompilation()));
+        menu->AddButton(tr("Change Compilation Flag"), &ImportMusicDialog::setCompilation);
         menu->AddButton(tr("Change Compilation Artist"),
-                                SLOT(setCompilationArtist()));
-        menu->AddButton(tr("Change Artist"), SLOT(setArtist()));
-        menu->AddButton(tr("Change Album"), SLOT(setAlbum()));
-        menu->AddButton(tr("Change Genre"), SLOT(setGenre()));
-        menu->AddButton(tr("Change Year"), SLOT(setYear()));
-        menu->AddButton(tr("Change Rating"), SLOT(setRating()));
+                                &ImportMusicDialog::setCompilationArtist);
+        menu->AddButton(tr("Change Artist"), &ImportMusicDialog::setArtist);
+        menu->AddButton(tr("Change Album"), &ImportMusicDialog::setAlbum);
+        menu->AddButton(tr("Change Genre"), &ImportMusicDialog::setGenre);
+        menu->AddButton(tr("Change Year"), &ImportMusicDialog::setYear);
+        menu->AddButton(tr("Change Rating"), &ImportMusicDialog::setRating);
     }
 }
 

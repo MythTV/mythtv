@@ -434,15 +434,15 @@ void ZMEvents::ShowMenu()
 
     m_menuPopup->SetReturnEvent(this, "action");
 
-    m_menuPopup->AddButton(tr("Refresh"), SLOT(getEventList()));
+    m_menuPopup->AddButton(tr("Refresh"), &ZMEvents::getEventList);
 
     if (m_showContinuous)
-        m_menuPopup->AddButton(tr("Hide Continuous Events"), SLOT(toggleShowContinuous()));
+        m_menuPopup->AddButton(tr("Hide Continuous Events"), &ZMEvents::toggleShowContinuous);
     else
-        m_menuPopup->AddButton(tr("Show Continuous Events"), SLOT(toggleShowContinuous()));
+        m_menuPopup->AddButton(tr("Show Continuous Events"), &ZMEvents::toggleShowContinuous);
 
-    m_menuPopup->AddButton(tr("Change View"), SLOT(changeView()));
-    m_menuPopup->AddButton(tr("Delete All"), SLOT(deleteAll()));
+    m_menuPopup->AddButton(tr("Change View"), &ZMEvents::changeView);
+    m_menuPopup->AddButton(tr("Delete All"), &ZMEvents::deleteAll);
 }
 
 void ZMEvents::changeView(void)

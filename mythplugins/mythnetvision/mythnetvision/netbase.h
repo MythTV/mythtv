@@ -37,6 +37,7 @@ class NetBase : public MythScreenType
     void ShowWebVideo(void);
     void DoDownloadAndPlay(void);
     void DoPlayVideo(const QString &filename);
+    void DoPlayVideo();
     void SlotDeleteVideo(void);
     void DoDeleteVideo(bool remove);
     void customEvent(QEvent *event) override; // MythUIType

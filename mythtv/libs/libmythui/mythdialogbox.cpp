@@ -57,19 +57,14 @@ MythMenu::~MythMenu(void)
     }
 }
 
-void MythMenu::AddItem(const QString& title, const char* slot, MythMenu *subMenu, bool selected, bool checked)
-{
-    auto *item = new MythMenuItem(title, slot, checked, subMenu);
-    AddItem(item, selected, subMenu);
-}
-
 void MythMenu::AddItemV(const QString &title, QVariant data, MythMenu *subMenu, bool selected, bool checked)
 {
-    auto *item = new MythMenuItem(title, "", checked, subMenu);
+    auto *item = new MythMenuItem(title, checked, subMenu);
     item->SetData(std::move(data));
     AddItem(item, selected, subMenu);
 }
 
+// For non-class, static class, or lambda functions.
 void MythMenu::AddItem(const QString &title, const MythUICallbackNMF &slot,
                        MythMenu *subMenu, bool selected, bool checked)
 {
@@ -243,6 +238,20 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
                         Qt::QueuedConnection);
                 emit Selected();
             }
+            else if (menuItem->m_data.value<MythUICallbackMF>())
+            {
+                connect(this, &MythDialogBox::Selected, m_currentMenu->m_retObject,
+                        menuItem->m_data.value<MythUICallbackMF>(),
+                        Qt::QueuedConnection);
+                emit Selected();
+            }
+            else if (menuItem->m_data.value<MythUICallbackMFc>())
+            {
+                connect(this, &MythDialogBox::Selected, m_currentMenu->m_retObject,
+                        menuItem->m_data.value<MythUICallbackMFc>(),
+                        Qt::QueuedConnection);
+                emit Selected();
+            }
         }
 
         SendEvent(m_buttonList->GetItemPos(item), item->GetText(), menuItem->m_data);
@@ -262,6 +271,20 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
             {
                 connect(this, &MythDialogBox::Selected, m_retObject,
                         item->GetData().value<MythUICallbackNMF>(),
+                        Qt::QueuedConnection);
+                emit Selected();
+            }
+            else if (item->GetData().value<MythUICallbackMF>())
+            {
+                connect(this, &MythDialogBox::Selected, m_retObject,
+                        item->GetData().value<MythUICallbackMF>(),
+                        Qt::QueuedConnection);
+                emit Selected();
+            }
+            else if (item->GetData().value<MythUICallbackMFc>())
+            {
+                connect(this, &MythDialogBox::Selected, m_retObject,
+                        item->GetData().value<MythUICallbackMFc>(),
                         Qt::QueuedConnection);
                 emit Selected();
             }
@@ -304,24 +327,6 @@ void MythDialogBox::AddButtonV(const QString &title, QVariant data, bool newMenu
 {
     auto *button = new MythUIButtonListItem(m_buttonList, title);
     button->SetData(std::move(data));
-    button->setDrawArrow(newMenu);
-
-    if (setCurrent)
-        m_buttonList->SetItemCurrent(button);
-    // GetVisibleCount here makes sure that the dialog size is
-    // calculated correctly
-    m_buttonList->GetVisibleCount();
-}
-
-void MythDialogBox::AddButton(const QString &title, const char *slot,
-                              bool newMenu, bool setCurrent)
-{
-    auto *button = new MythUIButtonListItem(m_buttonList, title);
-
-    m_useSlots = true;
-
-    if (slot)
-        button->SetData(QVariant::fromValue(slot));
     button->setDrawArrow(newMenu);
 
     if (setCurrent)

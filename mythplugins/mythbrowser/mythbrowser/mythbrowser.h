@@ -47,7 +47,8 @@ class MythBrowser : public MythScreenType
 
     void slotEnterURL(void) const;
 
-    void slotAddTab(const QString &url = "", bool doSwitch = true);
+    void slotAddTab(const QString &url, bool doSwitch = true);
+    void slotAddTab() { slotAddTab(""); }
     void slotDeleteTab(void);
 
     void slotAddBookmark(void);

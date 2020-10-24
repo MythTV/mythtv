@@ -80,38 +80,48 @@ private slots:
     void    FlipHorizontalMarked() { TransformMarked(kFlipHorizontal); }
     void    FlipVerticalMarked()   { TransformMarked(kFlipVertical); }
     void    ResetExifMarked()      { TransformMarked(kResetToExif); }
-    void    MarkItem(bool mark = true);
-    void    UnmarkItem()           { MarkItem(false); }
-    void    MarkAll(bool mark = true);
-    void    UnmarkAll()            { MarkAll(false); }
+    void    DoMarkItem(bool mark);
+    void    MarkItem()             { DoMarkItem(true); }
+    void    UnmarkItem()           { DoMarkItem(false); }
+    void    DoMarkAll(bool mark = true);
+    void    MarkAll()              { DoMarkAll(true); }
+    void    UnmarkAll()            { DoMarkAll(false); }
     void    MarkInvertAll();
-    void    HideItem(bool hide = true);
-    void    Unhide()               { HideItem(false); }
-    void    HideMarked(bool hide = true);
-    void    UnhideMarked()         { HideMarked(false); }
+    void    DoHideItem(bool hide = true);
+    void    HideItem()             { DoHideItem(true); }
+    void    Unhide()               { DoHideItem(false); }
+    void    DoHideMarked(bool hide = true);
+    void    HideMarked()           { DoHideMarked(true); }
+    void    UnhideMarked()         { DoHideMarked(false); }
     void    ShowRenameInput();
-    void    ShowHidden(bool show = true);
-    void    HideHidden()           { ShowHidden(false); }
-    void    SetCover(bool reset = false);
-    void    ResetCover()           { SetCover(true); }
-    void    ShowType(int type = kPicAndVideo);
-    void    HidePictures()         { ShowType(kVideoOnly); }
-    void    HideVideos()           { ShowType(kPicOnly); }
+    void    DoShowHidden(bool show = true);
+    void    ShowHidden()           { DoShowHidden(true); }
+    void    HideHidden()           { DoShowHidden(false); }
+    void    DoSetCover(bool reset = false);
+    void    SetCover()             { DoSetCover(false); }
+    void    ResetCover()           { DoSetCover(true); }
+    void    DoShowType(int type);
+    void    ShowType()             { DoShowType(kPicAndVideo); }
+    void    HidePictures()         { DoShowType(kVideoOnly); }
+    void    HideVideos()           { DoShowType(kPicOnly); }
     void    ZoomIn();
     void    ZoomOut();
     void    ShowSettings();
-    void    StartScan(bool start = true);
-    void    StopScan()             { StartScan(false); }
+    void    DoScanAction(bool start);
+    void    StartScan()            { DoScanAction(true); }
+    void    StopScan()             { DoScanAction(false); }
     void    DeleteItem();
     void    DeleteMarked();
     void    Import();
     void    MakeDir();
     void    Eject();
-    void    Copy(bool deleteAfter = false);
+    void    Copy(bool deleteAfter);
+    void    Copy()                     { Copy(false); }
     void    Move();
     void    ShowPassword();
-    static void RepeatOn(int on = 1)   { gCoreContext->SaveSetting("GalleryRepeat", on); }
-    static void RepeatOff()            { RepeatOn(0); }
+    static void DoRepeat(int on)       { gCoreContext->SaveSetting("GalleryRepeat", on); }
+    static void RepeatOn()             { DoRepeat(1); }
+    static void RepeatOff()            { DoRepeat(0); }
 
 private:
     using IntPair = QPair<int,int>;

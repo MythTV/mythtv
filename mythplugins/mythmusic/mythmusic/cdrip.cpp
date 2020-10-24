@@ -680,8 +680,9 @@ void Ripper::ShowMenu()
     }
 
     menu->SetReturnEvent(this, "menu");
-    menu->AddButton(tr("Select Where To Save Tracks"), SLOT(chooseBackend()));
-    menu->AddButton(tr("Edit Track Metadata"), SLOT(showEditMetadataDialog()));
+    menu->AddButton(tr("Select Where To Save Tracks"), &Ripper::chooseBackend);
+    menu->AddButton(tr("Edit Track Metadata"),
+                    qOverload<>(&Ripper::showEditMetadataDialog));
 }
 
 void Ripper::showEditMetadataDialog(void)

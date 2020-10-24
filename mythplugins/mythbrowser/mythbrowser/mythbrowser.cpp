@@ -348,22 +348,22 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
 
             m_menuPopup->SetReturnEvent(this, "action");
 
-            m_menuPopup->AddButton(tr("Enter URL"), SLOT(slotEnterURL()));
+            m_menuPopup->AddButton(tr("Enter URL"), &MythBrowser::slotEnterURL);
 
             if (activeBrowser()->CanGoBack())
-                m_menuPopup->AddButton(tr("Back"), SLOT(slotBack()));
+                m_menuPopup->AddButton(tr("Back"), &MythBrowser::slotBack);
 
             if (activeBrowser()->CanGoForward())
-                m_menuPopup->AddButton(tr("Forward"), SLOT(slotForward()));
+                m_menuPopup->AddButton(tr("Forward"), &MythBrowser::slotForward);
 
-            m_menuPopup->AddButton(tr("Zoom In"), SLOT(slotZoomIn()));
-            m_menuPopup->AddButton(tr("Zoom Out"), SLOT(slotZoomOut()));
-            m_menuPopup->AddButton(tr("New Tab"), SLOT(slotAddTab()));
+            m_menuPopup->AddButton(tr("Zoom In"), &MythBrowser::slotZoomIn);
+            m_menuPopup->AddButton(tr("Zoom Out"), &MythBrowser::slotZoomOut);
+            m_menuPopup->AddButton(tr("New Tab"), qOverload<>(&MythBrowser::slotAddTab));
 
             if (m_browserList.size() > 1)
-                m_menuPopup->AddButton(tr("Delete Tab"), SLOT(slotDeleteTab()));
+                m_menuPopup->AddButton(tr("Delete Tab"), &MythBrowser::slotDeleteTab);
 
-            m_menuPopup->AddButton(tr("Add Bookmark"), SLOT(slotAddBookmark()));
+            m_menuPopup->AddButton(tr("Add Bookmark"), &MythBrowser::slotAddBookmark);
         }
         else if (action == "INFO")
         {

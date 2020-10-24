@@ -535,17 +535,17 @@ void ThemeChooser::showPopupMenu(void)
         if (m_fullPreviewShowing)
         {
             m_popupMenu->AddButton(tr("Hide Fullscreen Preview"),
-                                   SLOT(toggleFullscreenPreview()));
+                                   &ThemeChooser::toggleFullscreenPreview);
         }
         else
         {
             m_popupMenu->AddButton(tr("Show Fullscreen Preview"),
-                                   SLOT(toggleFullscreenPreview()));
+                                   &ThemeChooser::toggleFullscreenPreview);
         }
     }
 
     m_popupMenu->AddButton(tr("Refresh Downloadable Themes"),
-                           SLOT(refreshDownloadableThemes()));
+                           &ThemeChooser::refreshDownloadableThemes);
 
     MythUIButtonListItem *current = m_themes->GetItemCurrent();
     if (current)
@@ -555,23 +555,23 @@ void ThemeChooser::showPopupMenu(void)
         if (info)
         {
             m_popupMenu->AddButton(tr("Select Theme"),
-                                   SLOT(saveAndReload()));
+                                   qOverload<>(&ThemeChooser::saveAndReload));
 
             if (info->GetPreviewPath().startsWith(m_userThemeDir))
                 m_popupMenu->AddButton(tr("Delete Theme"),
-                                       SLOT(removeTheme()));
+                                       &ThemeChooser::removeTheme);
         }
     }
 
     if (gCoreContext->GetBoolSetting("ThemeUpdateNofications", true))
     {
         m_popupMenu->AddButton(tr("Disable Theme Update Notifications"),
-                               SLOT(toggleThemeUpdateNotifications()));
+                               &ThemeChooser::toggleThemeUpdateNotifications);
     }
     else
     {
         m_popupMenu->AddButton(tr("Enable Theme Update Notifications"),
-                               SLOT(toggleThemeUpdateNotifications()));
+                               &ThemeChooser::toggleThemeUpdateNotifications);
     }
 }
 

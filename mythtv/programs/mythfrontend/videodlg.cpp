@@ -2427,21 +2427,21 @@ void VideoDialog::VideoMenu()
                 m_d->m_altPlayerEnabled)
             menu->AddItem(tr("Play..."), nullptr, CreatePlayMenu());
         else
-            menu->AddItem(tr("Play"), SLOT(playVideo()));
+            menu->AddItem(tr("Play"), &VideoDialog::playVideo);
         if (metadata->GetWatched())
-            menu->AddItem(tr("Mark as Unwatched"), SLOT(ToggleWatched()));
+            menu->AddItem(tr("Mark as Unwatched"), &VideoDialog::ToggleWatched);
         else
-            menu->AddItem(tr("Mark as Watched"), SLOT(ToggleWatched()));
+            menu->AddItem(tr("Mark as Watched"), &VideoDialog::ToggleWatched);
         menu->AddItem(tr("Video Info"), nullptr, CreateInfoMenu());
         if (!m_d->m_notifications.contains(metadata->GetHash()))
         {
             menu->AddItem(tr("Change Video Details"), nullptr, CreateManageMenu());
         }
-        menu->AddItem(tr("Delete"), SLOT(RemoveVideo()));
+        menu->AddItem(tr("Delete"), &VideoDialog::RemoveVideo);
     }
     else if (node && node->getInt() != kUpFolder)
     {
-        menu->AddItem(tr("Play Folder"), SLOT(playFolder()));
+        menu->AddItem(tr("Play Folder"), &VideoDialog::playFolder);
     }
 
 
@@ -2473,23 +2473,23 @@ MythMenu* VideoDialog::CreatePlayMenu()
 
     auto *menu = new MythMenu(label, this, "actions");
 
-    menu->AddItem(tr("Play"), SLOT(playVideo()));
+    menu->AddItem(tr("Play"), &VideoDialog::playVideo);
 
     if (m_d->m_altPlayerEnabled)
     {
-        menu->AddItem(tr("Play in Alternate Player"), SLOT(playVideoAlt()));
+        menu->AddItem(tr("Play in Alternate Player"), &VideoDialog::playVideoAlt);
     }
 
     if (gCoreContext->GetBoolSetting("mythvideo.TrailersRandomEnabled", false))
     {
-         menu->AddItem(tr("Play With Trailers"), SLOT(playVideoWithTrailers()));
+         menu->AddItem(tr("Play With Trailers"), &VideoDialog::playVideoWithTrailers);
     }
 
     QString trailerFile = metadata->GetTrailer();
     if (QFile::exists(trailerFile) ||
         (!metadata->GetHost().isEmpty() && !trailerFile.isEmpty()))
     {
-        menu->AddItem(tr("Play Trailer"), SLOT(playTrailer()));
+        menu->AddItem(tr("Play Trailer"), &VideoDialog::playTrailer);
     }
 
     return menu;
@@ -2505,9 +2505,9 @@ void VideoDialog::DisplayMenu()
 
     auto *menu = new MythMenu(label, this, "display");
 
-    menu->AddItem(tr("Scan For Changes"), SLOT(doVideoScan()));
-    menu->AddItem(tr("Retrieve All Details"), SLOT(VideoAutoSearch()));
-    menu->AddItem(tr("Filter Display"), SLOT(ChangeFilter()));
+    menu->AddItem(tr("Scan For Changes"), &VideoDialog::doVideoScan);
+    menu->AddItem(tr("Retrieve All Details"), qOverload<>(&VideoDialog::VideoAutoSearch));
+    menu->AddItem(tr("Filter Display"), &VideoDialog::ChangeFilter);
     menu->AddItem(tr("Browse By..."), nullptr, CreateMetadataBrowseMenu());
     menu->AddItem(tr("Change View"), nullptr, CreateViewMenu());
     menu->AddItem(tr("Settings"), nullptr, CreateSettingsMenu());
@@ -2548,26 +2548,26 @@ MythMenu* VideoDialog::CreateViewMenu()
     auto *menu = new MythMenu(label, this, "view");
 
     if (!(m_d->m_type & DLG_BROWSER))
-        menu->AddItem(tr("Switch to Browse View"), SLOT(SwitchBrowse()));
+        menu->AddItem(tr("Switch to Browse View"), &VideoDialog::SwitchBrowse);
 
     if (!(m_d->m_type & DLG_GALLERY))
-        menu->AddItem(tr("Switch to Gallery View"), SLOT(SwitchGallery()));
+        menu->AddItem(tr("Switch to Gallery View"), &VideoDialog::SwitchGallery);
 
     if (!(m_d->m_type & DLG_TREE))
-        menu->AddItem(tr("Switch to List View"), SLOT(SwitchTree()));
+        menu->AddItem(tr("Switch to List View"), &VideoDialog::SwitchTree);
 
     if (!(m_d->m_type & DLG_MANAGER))
-        menu->AddItem(tr("Switch to Manage View"), SLOT(SwitchManager()));
+        menu->AddItem(tr("Switch to Manage View"), &VideoDialog::SwitchManager);
 
     if (m_d->m_isFlatList)
-        menu->AddItem(tr("Show Directory Structure"), SLOT(ToggleFlatView()));
+        menu->AddItem(tr("Show Directory Structure"), &VideoDialog::ToggleFlatView);
     else
-        menu->AddItem(tr("Hide Directory Structure"), SLOT(ToggleFlatView()));
+        menu->AddItem(tr("Hide Directory Structure"), &VideoDialog::ToggleFlatView);
 
     if (m_d->m_isFileBrowser)
-        menu->AddItem(tr("Browse Library (recommended)"), SLOT(ToggleBrowseMode()));
+        menu->AddItem(tr("Browse Library (recommended)"), &VideoDialog::ToggleBrowseMode);
     else
-        menu->AddItem(tr("Browse Filesystem (slow)"), SLOT(ToggleBrowseMode()));
+        menu->AddItem(tr("Browse Filesystem (slow)"), &VideoDialog::ToggleBrowseMode);
 
 
     return menu;
@@ -2583,9 +2583,9 @@ MythMenu* VideoDialog::CreateSettingsMenu()
 
     auto *menu = new MythMenu(label, this, "settings");
 
-    menu->AddItem(tr("Player Settings"), SLOT(ShowPlayerSettings()));
-    menu->AddItem(tr("Metadata Settings"), SLOT(ShowMetadataSettings()));
-    menu->AddItem(tr("File Type Settings"), SLOT(ShowExtensionSettings()));
+    menu->AddItem(tr("Player Settings"), &VideoDialog::ShowPlayerSettings);
+    menu->AddItem(tr("Metadata Settings"), &VideoDialog::ShowMetadataSettings);
+    menu->AddItem(tr("File Type Settings"), &VideoDialog::ShowExtensionSettings);
 
     return menu;
 }
@@ -2643,34 +2643,34 @@ MythMenu* VideoDialog::CreateMetadataBrowseMenu()
     auto *menu = new MythMenu(label, this, "metadata");
 
     if (m_d->m_groupType != BRS_CAST)
-        menu->AddItem(tr("Cast"), SLOT(SwitchVideoCastGroup()));
+        menu->AddItem(tr("Cast"), &VideoDialog::SwitchVideoCastGroup);
 
     if (m_d->m_groupType != BRS_CATEGORY)
-        menu->AddItem(tr("Category"), SLOT(SwitchVideoCategoryGroup()));
+        menu->AddItem(tr("Category"), &VideoDialog::SwitchVideoCategoryGroup);
 
     if (m_d->m_groupType != BRS_INSERTDATE)
-        menu->AddItem(tr("Date Added"), SLOT(SwitchVideoInsertDateGroup()));
+        menu->AddItem(tr("Date Added"), &VideoDialog::SwitchVideoInsertDateGroup);
 
     if (m_d->m_groupType != BRS_DIRECTOR)
-        menu->AddItem(tr("Director"), SLOT(SwitchVideoDirectorGroup()));
+        menu->AddItem(tr("Director"), &VideoDialog::SwitchVideoDirectorGroup);
 
     if (m_d->m_groupType != BRS_STUDIO)
-        menu->AddItem(tr("Studio"), SLOT(SwitchVideoStudioGroup()));
+        menu->AddItem(tr("Studio"), &VideoDialog::SwitchVideoStudioGroup);
 
     if (m_d->m_groupType != BRS_FOLDER)
-        menu->AddItem(tr("Folder"), SLOT(SwitchVideoFolderGroup()));
+        menu->AddItem(tr("Folder"), &VideoDialog::SwitchVideoFolderGroup);
 
     if (m_d->m_groupType != BRS_GENRE)
-        menu->AddItem(tr("Genre"), SLOT(SwitchVideoGenreGroup()));
+        menu->AddItem(tr("Genre"), &VideoDialog::SwitchVideoGenreGroup);
 
     if (m_d->m_groupType != BRS_TVMOVIE)
-        menu->AddItem(tr("TV/Movies"),SLOT(SwitchVideoTVMovieGroup()));
+        menu->AddItem(tr("TV/Movies"), &VideoDialog::SwitchVideoTVMovieGroup);
 
     if (m_d->m_groupType != BRS_USERRATING)
-        menu->AddItem(tr("User Rating"), SLOT(SwitchVideoUserRatingGroup()));
+        menu->AddItem(tr("User Rating"), &VideoDialog::SwitchVideoUserRatingGroup);
 
     if (m_d->m_groupType != BRS_YEAR)
-        menu->AddItem(tr("Year"), SLOT(SwitchVideoYearGroup()));
+        menu->AddItem(tr("Year"), &VideoDialog::SwitchVideoYearGroup);
 
     return menu;
 }
@@ -2686,17 +2686,17 @@ MythMenu *VideoDialog::CreateInfoMenu()
     auto *menu = new MythMenu(label, this, "info");
 
     if (ItemDetailPopup::Exists())
-        menu->AddItem(tr("View Details"), SLOT(DoItemDetailShow()));
+        menu->AddItem(tr("View Details"), &VideoDialog::DoItemDetailShow2);
 
-    menu->AddItem(tr("View Full Plot"), SLOT(ViewPlot()));
+    menu->AddItem(tr("View Full Plot"), &VideoDialog::ViewPlot);
 
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
         if (!metadata->GetCast().empty())
-            menu->AddItem(tr("View Cast"), SLOT(ShowCastDialog()));
+            menu->AddItem(tr("View Cast"), &VideoDialog::ShowCastDialog);
         if (!metadata->GetHomepage().isEmpty())
-            menu->AddItem(tr("View Homepage"), SLOT(ShowHomepage()));
+            menu->AddItem(tr("View Homepage"), &VideoDialog::ShowHomepage);
     }
 
     return menu;
@@ -2714,13 +2714,13 @@ MythMenu *VideoDialog::CreateManageMenu()
 
     VideoMetadata *metadata = GetMetadata(GetItemCurrent());
 
-    menu->AddItem(tr("Edit Details"), SLOT(EditMetadata()));
-    menu->AddItem(tr("Retrieve Details"), SLOT(VideoSearch()));
+    menu->AddItem(tr("Edit Details"), &VideoDialog::EditMetadata);
+    menu->AddItem(tr("Retrieve Details"), qOverload<>(&VideoDialog::VideoSearch));
     if (metadata->GetProcessed())
-        menu->AddItem(tr("Allow Updates"), SLOT(ToggleProcess()));
+        menu->AddItem(tr("Allow Updates"), &VideoDialog::ToggleProcess);
     else
-        menu->AddItem(tr("Disable Updates"), SLOT(ToggleProcess()));
-    menu->AddItem(tr("Reset Details"), SLOT(ResetMetadata()));
+        menu->AddItem(tr("Disable Updates"), &VideoDialog::ToggleProcess);
+    menu->AddItem(tr("Reset Details"), &VideoDialog::ResetMetadata);
 
     return menu;
 }

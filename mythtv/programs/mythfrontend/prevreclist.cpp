@@ -558,13 +558,13 @@ void PrevRecordedList::ShowMenu(void)
     ProgramInfo *pi = GetCurrentProgram();
     if (pi)
     {
-        menu->AddItem(tr("Edit Schedule"),   SLOT(EditScheduled()));
-        menu->AddItem(tr("Custom Edit"),     SLOT(EditCustom()));
-        menu->AddItem(tr("Program Details"), SLOT(ShowDetails()));
-        menu->AddItem(tr("Upcoming"), SLOT(ShowUpcoming()));
-        menu->AddItem(tr("Channel Search"), SLOT(ShowChannelSearch()));
+        menu->AddItem(tr("Edit Schedule"),   qOverload<>(&PrevRecordedList::EditScheduled));
+        menu->AddItem(tr("Custom Edit"),     &PrevRecordedList::EditCustom);
+        menu->AddItem(tr("Program Details"), &PrevRecordedList::ShowDetails);
+        menu->AddItem(tr("Upcoming"),        qOverload<>(&PrevRecordedList::ShowUpcoming));
+        menu->AddItem(tr("Channel Search"),  &PrevRecordedList::ShowChannelSearch);
     }
-    menu->AddItem(tr("Program Guide"),   SLOT(ShowGuide()));
+    menu->AddItem(tr("Program Guide"),   &PrevRecordedList::ShowGuide);
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     auto *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");
 
@@ -585,13 +585,13 @@ void PrevRecordedList::ShowItemMenu(void)
     if (pi)
     {
         if (pi->IsDuplicate())
-            menu->AddItem(tr("Allow this episode to re-record"),   SLOT(AllowRecord()));
+            menu->AddItem(tr("Allow this episode to re-record"), &PrevRecordedList::AllowRecord);
         else
-            menu->AddItem(tr("Never record this episode"), SLOT(PreventRecord()));
+            menu->AddItem(tr("Never record this episode"), &PrevRecordedList::PreventRecord);
         menu->AddItem(tr("Remove this episode from the list"),
-            SLOT(ShowDeleteOldEpisodeMenu()));
+            &PrevRecordedList::ShowDeleteOldEpisodeMenu);
         menu->AddItem(tr("Remove all episodes for this title"),
-            SLOT(ShowDeleteOldSeriesMenu()));
+            &PrevRecordedList::ShowDeleteOldSeriesMenu);
     }
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     auto *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");

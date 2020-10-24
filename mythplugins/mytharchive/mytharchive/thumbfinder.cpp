@@ -855,8 +855,8 @@ void ThumbFinder::ShowMenu()
 
     menuPopup->SetReturnEvent(this, "action");
 
-    menuPopup->AddButton(tr("Exit, Save Thumbnails"), SLOT(savePressed()));
-    menuPopup->AddButton(tr("Exit, Don't Save Thumbnails"), SLOT(cancelPressed()));
+    menuPopup->AddButton(tr("Exit, Save Thumbnails"), &ThumbFinder::savePressed);
+    menuPopup->AddButton(tr("Exit, Don't Save Thumbnails"), &ThumbFinder::cancelPressed);
 }
 
 void ThumbFinder::updatePositionBar(int64_t frame)

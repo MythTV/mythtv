@@ -589,13 +589,13 @@ void WelcomeDialog::ShowMenu(void)
     uint statusCode = myth_system(mythshutdown_status + logPropagateArgs, kMSDontBlockInputDevs);
 
     if (!(statusCode & 0xFF00) && statusCode & 16)
-        m_menuPopup->AddButton(tr("Unlock Shutdown"), SLOT(unlockShutdown()));
+        m_menuPopup->AddButton(tr("Unlock Shutdown"), &WelcomeDialog::unlockShutdown);
     else
-        m_menuPopup->AddButton(tr("Lock Shutdown"), SLOT(lockShutdown()));
+        m_menuPopup->AddButton(tr("Lock Shutdown"), &WelcomeDialog::lockShutdown);
 
-    m_menuPopup->AddButton(tr("Run mythfilldatabase"), SLOT(runEPGGrabber()));
-    m_menuPopup->AddButton(tr("Shutdown Now"), SLOT(shutdownNow()));
-    m_menuPopup->AddButton(tr("Exit"), SLOT(closeDialog()));
+    m_menuPopup->AddButton(tr("Run mythfilldatabase"), &WelcomeDialog::runEPGGrabber);
+    m_menuPopup->AddButton(tr("Shutdown Now"), &WelcomeDialog::shutdownNow);
+    m_menuPopup->AddButton(tr("Exit"), &WelcomeDialog::closeDialog);
     m_menuPopup->AddButton(tr("Cancel"));
 }
 

@@ -774,19 +774,19 @@ void MythBurn::ShowMenu()
         if (curItem->useCutlist)
         {
             menuPopup->AddButton(tr("Don't Use Cut List"),
-                                 SLOT(toggleUseCutlist()));
+                                 &MythBurn::toggleUseCutlist);
         }
         else
         {
             menuPopup->AddButton(tr("Use Cut List"),
-                                 SLOT(toggleUseCutlist()));
+                                 &MythBurn::toggleUseCutlist);
         }
     }
 
-    menuPopup->AddButton(tr("Remove Item"), SLOT(removeItem()));
-    menuPopup->AddButton(tr("Edit Details"), SLOT(editDetails()));
-    menuPopup->AddButton(tr("Change Encoding Profile"), SLOT(changeProfile()));
-    menuPopup->AddButton(tr("Edit Thumbnails"), SLOT(editThumbnails()));
+    menuPopup->AddButton(tr("Remove Item"), &MythBurn::removeItem);
+    menuPopup->AddButton(tr("Edit Details"), &MythBurn::editDetails);
+    menuPopup->AddButton(tr("Change Encoding Profile"), &MythBurn::changeProfile);
+    menuPopup->AddButton(tr("Edit Thumbnails"), &MythBurn::editThumbnails);
 }
 
 void MythBurn::removeItem()

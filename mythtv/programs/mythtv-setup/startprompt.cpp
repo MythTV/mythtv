@@ -101,10 +101,10 @@ void StartPrompter::backendRunningPrompt(void)
     if (!commandString.isEmpty())
     {
         // Only show option to stop backend if command is defined.
-        dia->AddButton(tr("Stop Backend and Continue"), SLOT(stopBackend()));
+        dia->AddButton(tr("Stop Backend and Continue"), &StartPrompter::stopBackend);
     }
-    dia->AddButton(tr("Continue"), SLOT(leaveBackendRunning()));
-    dia->AddButton(tr("Exit"), SLOT(quit()));
+    dia->AddButton(tr("Continue"), &StartPrompter::leaveBackendRunning);
+    dia->AddButton(tr("Exit"), &StartPrompter::quit);
 }
 
 void StartPrompter::quit()

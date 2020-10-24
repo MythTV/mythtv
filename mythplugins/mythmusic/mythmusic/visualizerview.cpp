@@ -94,7 +94,7 @@ void VisualizerView::ShowMenu(void)
     auto *menu = new MythMenu(label, this, "menu");
 
     menu->AddItem(tr("Change Visualizer"), nullptr, createVisualizerMenu());
-    menu->AddItem(tr("Show Track Info"), SLOT(showTrackInfoPopup()));
+    menu->AddItem(tr("Show Track Info"), &VisualizerView::showTrackInfoPopup);
     menu->AddItem(tr("Other Options"), nullptr, createMainMenu());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");

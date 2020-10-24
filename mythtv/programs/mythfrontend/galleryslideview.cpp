@@ -273,26 +273,26 @@ void GallerySlideView::MenuMain()
 
     ImagePtrK im = m_slides.GetCurrent().GetImageData();
     if (im && im->m_type == kVideoFile)
-        menu->AddItem(tr("Play Video"), SLOT(PlayVideo()));
+        menu->AddItem(tr("Play Video"), qOverload<>(&GallerySlideView::PlayVideo));
 
     if (m_playing)
-        menu->AddItem(tr("Stop"), SLOT(Stop()));
+        menu->AddItem(tr("Stop"), &GallerySlideView::Stop);
     else
-        menu->AddItem(tr("Start SlideShow"), SLOT(Play()));
+        menu->AddItem(tr("Start SlideShow"), qOverload<>(&GallerySlideView::Play));
 
     if (gCoreContext->GetBoolSetting("GalleryRepeat", false))
-        menu->AddItem(tr("Turn Repeat Off"), SLOT(RepeatOff()));
+        menu->AddItem(tr("Turn Repeat Off"), &GallerySlideView::RepeatOff);
     else
-        menu->AddItem(tr("Turn Repeat On"), SLOT(RepeatOn()));
+        menu->AddItem(tr("Turn Repeat On"), qOverload<>(&GallerySlideView::RepeatOn));
 
     MenuTransforms(*menu);
 
     if (m_uiHideCaptions)
     {
         if (m_showCaptions)
-            menu->AddItem(tr("Hide Captions"), SLOT(HideCaptions()));
+            menu->AddItem(tr("Hide Captions"), &GallerySlideView::HideCaptions);
         else
-            menu->AddItem(tr("Show Captions"), SLOT(ShowCaptions()));
+            menu->AddItem(tr("Show Captions"), &GallerySlideView::ShowCaptions);
     }
 
     QString details;
@@ -303,10 +303,10 @@ void GallerySlideView::MenuMain()
     default:
     case kNoInfo:    details = tr("Show Details"); break;
     }
-    menu->AddItem(details, SLOT(ShowInfo()));
+    menu->AddItem(details, &GallerySlideView::ShowInfo);
 
     if (m_infoList.GetState() != kNoInfo)
-        menu->AddItem(tr("Hide Details"), SLOT(HideInfo()));
+        menu->AddItem(tr("Hide Details"), &GallerySlideView::HideInfo);
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     auto *menuPopup = new MythDialogBox(menu, popupStack, "menuPopup");

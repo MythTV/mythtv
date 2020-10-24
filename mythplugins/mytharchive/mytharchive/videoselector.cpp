@@ -143,8 +143,8 @@ void VideoSelector::ShowMenu()
 
     menuPopup->SetReturnEvent(this, "action");
 
-    menuPopup->AddButton(tr("Clear All"), SLOT(clearAll()));
-    menuPopup->AddButton(tr("Select All"), SLOT(selectAll()));
+    menuPopup->AddButton(tr("Clear All"), &VideoSelector::clearAll);
+    menuPopup->AddButton(tr("Select All"), &VideoSelector::selectAll);
 }
 
 void VideoSelector::selectAll()

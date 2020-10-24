@@ -277,35 +277,35 @@ void ProgLister::ShowMenu(void)
 
     if (m_allowViewDialog && m_type != plPreviouslyRecorded)
     {
-        menu->AddItem(tr("Choose Search Phrase..."), SLOT(ShowChooseViewMenu()));
+        menu->AddItem(tr("Choose Search Phrase..."), &ProgLister::ShowChooseViewMenu);
     }
 
     menu->AddItem(tr("Sort"), nullptr, sortMenu);
 
     if (m_type != plPreviouslyRecorded)
-        menu->AddItem(tr("Record"), SLOT(QuickRecord()));
+        menu->AddItem(tr("Record"), &ProgLister::QuickRecord);
 
-    menu->AddItem(tr("Edit Schedule"),   SLOT(EditScheduled()));
-    menu->AddItem(tr("Program Details"), SLOT(ShowDetails()));
-    menu->AddItem(tr("Program Guide"),   SLOT(ShowGuide()));
+    menu->AddItem(tr("Edit Schedule"),   qOverload<>(&ProgLister::EditScheduled));
+    menu->AddItem(tr("Program Details"), &ProgLister::ShowDetails);
+    menu->AddItem(tr("Program Guide"),   &ProgLister::ShowGuide);
     if (m_type != plChannel)
-        menu->AddItem(tr("Channel Search"),    SLOT(ShowChannelSearch()));
+        menu->AddItem(tr("Channel Search"), &ProgLister::ShowChannelSearch);
     if (m_type != plTitle)
-        menu->AddItem(tr("Upcoming"),    SLOT(ShowUpcoming()));
+        menu->AddItem(tr("Upcoming"),    qOverload<>(&ProgLister::ShowUpcoming));
     if (m_type != plPreviouslyRecorded)
-        menu->AddItem(tr("Previously Recorded"),SLOT(ShowPrevious()));
-    menu->AddItem(tr("Custom Edit"),     SLOT(EditCustom()));
+        menu->AddItem(tr("Previously Recorded"), qOverload<>(&ProgLister::ShowPrevious));
+    menu->AddItem(tr("Custom Edit"),     &ProgLister::EditCustom);
 
     ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
     if (m_type != plPreviouslyRecorded)
     {
         if (pi && pi->GetRecordingRuleID())
-            menu->AddItem(tr("Delete Rule"), SLOT(ShowDeleteRuleMenu()));
+            menu->AddItem(tr("Delete Rule"), &ProgLister::ShowDeleteRuleMenu);
     }
     else
     {
         menu->AddItem(
-            tr("Delete Episode"), SLOT(ShowDeleteOldEpisodeMenu()));
+            tr("Delete Episode"), &ProgLister::ShowDeleteOldEpisodeMenu);
     }
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");

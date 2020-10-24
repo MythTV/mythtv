@@ -93,9 +93,11 @@ class VideoDialog : public MythScreenType
     void SwitchVideoTVMovieGroup();
 
     void EditMetadata();
-    void VideoSearch(MythGenericTree *node = nullptr,
+    void VideoSearch(MythGenericTree *node,
                      bool automode = false);
-    void VideoAutoSearch(MythGenericTree *node = nullptr);
+    void VideoSearch() { VideoSearch(nullptr, false); }
+    void VideoAutoSearch(MythGenericTree *node);
+    void VideoAutoSearch() { VideoAutoSearch(nullptr); }
     void ResetMetadata();
     void ToggleWatched();
     void ToggleProcess();
@@ -124,6 +126,7 @@ class VideoDialog : public MythScreenType
     void ShowCastDialog();
     void ShowHomepage();
     bool DoItemDetailShow();
+    void DoItemDetailShow2() { static_cast<void>(DoItemDetailShow()); }
     void ShowPlayerSettings();
     void ShowExtensionSettings();
     void ShowMetadataSettings();

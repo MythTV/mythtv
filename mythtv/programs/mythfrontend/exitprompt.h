@@ -14,10 +14,13 @@ class ExitPrompter : public QObject
 
   protected slots:
     void DoQuit();
-    void DoHalt(bool Confirmed = true);
-    void DoReboot(bool Confirmed = true);
+    void DoHalt(bool Confirmed);
+    void DoHalt() { DoHalt(true); }
+    void DoReboot(bool Confirmed);
+    void DoReboot() { DoReboot(true); }
     void DoStandby();
-    void DoSuspend(bool Confirmed = true);
+    void DoSuspend(bool Confirmed);
+    void DoSuspend() { DoSuspend(true); }
     void ConfirmHalt();
     void ConfirmReboot();
     void ConfirmSuspend();

@@ -318,7 +318,7 @@ bool GalleryThumbView::keyPressEvent(QKeyEvent *event)
         {
             ImagePtrK im = m_view->GetSelected();
             if (m_editsAllowed && im && im != m_view->GetParent())
-                MarkItem(!m_view->IsMarked(im->m_id));
+                DoMarkItem(!m_view->IsMarked(im->m_id));
         }
         else if (action == "ESCAPE" && !GetMythMainWindow()->IsExitingToMain())
         {
@@ -1043,16 +1043,16 @@ void GalleryThumbView::MenuMain()
         MenuSlideshow(menu);
         MenuShow(menu);
         if (!m_editsAllowed)
-            menu->AddItem(tr("Enable Edits"), SLOT(ShowPassword()));
+            menu->AddItem(tr("Enable Edits"), &GalleryThumbView::ShowPassword);
     }
 
     // Depends on current status of backend scanner - string(number(isBackend()))
     if (m_scanActive.contains("1"))
-        menu->AddItem(tr("Stop Scan"), SLOT(StopScan()));
+        menu->AddItem(tr("Stop Scan"), &GalleryThumbView::StopScan);
     else
-        menu->AddItem(tr("Scan Storage Group"), SLOT(StartScan()));
+        menu->AddItem(tr("Scan Storage Group"), &GalleryThumbView::StartScan);
 
-    menu->AddItem(tr("Settings"), SLOT(ShowSettings()));
+    menu->AddItem(tr("Settings"), &GalleryThumbView::ShowSettings);
 
     auto *popup = new MythDialogBox(menu, &m_popupStack, "menuPopup");
     if (popup->Create())
@@ -1080,31 +1080,31 @@ void GalleryThumbView::MenuMarked(MythMenu *mainMenu)
     if (m_menuState.m_selected->IsFile())
     {
         if (m_menuState.m_selectedMarked)
-            menu->AddItem(tr("Unmark File"), SLOT(UnmarkItem()));
+            menu->AddItem(tr("Unmark File"), &GalleryThumbView::UnmarkItem);
         else
-            menu->AddItem(tr("Mark File"), SLOT(MarkItem()));
+            menu->AddItem(tr("Mark File"), &GalleryThumbView::MarkItem);
     }
     // Cannot mark/unmark parent dir from this level
     else if (!m_menuState.m_selected->IsDevice()
              && m_menuState.m_selected != parent)
     {
         if (m_menuState.m_selectedMarked)
-            menu->AddItem(tr("Unmark Directory"), SLOT(UnmarkItem()));
+            menu->AddItem(tr("Unmark Directory"), &GalleryThumbView::UnmarkItem);
         else
-            menu->AddItem(tr("Mark Directory"), SLOT(MarkItem()));
+            menu->AddItem(tr("Mark Directory"), &GalleryThumbView::MarkItem);
     }
 
     if (parent->m_id != GALLERY_DB_ID)
     {
         // Mark All if unmarked files exist
         if (m_menuState.m_markedId.size() < m_menuState.m_childCount)
-            menu->AddItem(tr("Mark All"), SLOT(MarkAll()));
+            menu->AddItem(tr("Mark All"), &GalleryThumbView::MarkAll);
 
         // Unmark All if marked files exist
         if (!m_menuState.m_markedId.isEmpty())
         {
-            menu->AddItem(tr("Unmark All"), SLOT(UnmarkAll()));
-            menu->AddItem(tr("Invert Marked"), SLOT(MarkInvertAll()));
+            menu->AddItem(tr("Unmark All"), &GalleryThumbView::UnmarkAll);
+            menu->AddItem(tr("Invert Marked"), &GalleryThumbView::MarkInvertAll);
         }
     }
 
@@ -1136,8 +1136,8 @@ void GalleryThumbView::MenuPaste(MythMenu *mainMenu)
 
         auto *menu = new MythMenu(title, this, "pastemenu");
 
-        menu->AddItem(tr("Move Marked Into"), SLOT(Move()));
-        menu->AddItem(tr("Copy Marked Into"), SLOT(Copy()));
+        menu->AddItem(tr("Move Marked Into"), &GalleryThumbView::Move);
+        menu->AddItem(tr("Copy Marked Into"), qOverload<>(&GalleryThumbView::Copy));
 
         mainMenu->AddItem(tr("Paste"), nullptr, menu);
     }
@@ -1157,11 +1157,11 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
 
         auto *menu = new MythMenu(title, this, "");
 
-        menu->AddItem(tr("Rotate Marked CW"), SLOT(RotateCWMarked()));
-        menu->AddItem(tr("Rotate Marked CCW"), SLOT(RotateCCWMarked()));
-        menu->AddItem(tr("Flip Marked Horizontal"), SLOT(FlipHorizontalMarked()));
-        menu->AddItem(tr("Flip Marked Vertical"), SLOT(FlipVerticalMarked()));
-        menu->AddItem(tr("Reset Marked to Exif"), SLOT(ResetExifMarked()));
+        menu->AddItem(tr("Rotate Marked CW"), &GalleryThumbView::RotateCWMarked);
+        menu->AddItem(tr("Rotate Marked CCW"), &GalleryThumbView::RotateCCWMarked);
+        menu->AddItem(tr("Flip Marked Horizontal"), &GalleryThumbView::FlipHorizontalMarked);
+        menu->AddItem(tr("Flip Marked Vertical"), &GalleryThumbView::FlipVerticalMarked);
+        menu->AddItem(tr("Reset Marked to Exif"), &GalleryThumbView::ResetExifMarked);
 
         mainMenu->AddItem(tr("Transforms"), nullptr, menu);
     }
@@ -1169,11 +1169,11 @@ void GalleryThumbView::MenuTransform(MythMenu *mainMenu)
     {
         auto *menu = new MythMenu(m_menuState.m_selected->m_baseName, this, "");
 
-        menu->AddItem(tr("Rotate CW"), SLOT(RotateCW()));
-        menu->AddItem(tr("Rotate CCW"), SLOT(RotateCCW()));
-        menu->AddItem(tr("Flip Horizontal"), SLOT(FlipHorizontal()));
-        menu->AddItem(tr("Flip Vertical"), SLOT(FlipVertical()));
-        menu->AddItem(tr("Reset to Exif"), SLOT(ResetExif()));
+        menu->AddItem(tr("Rotate CW"), &GalleryThumbView::RotateCW);
+        menu->AddItem(tr("Rotate CCW"), &GalleryThumbView::RotateCCW);
+        menu->AddItem(tr("Flip Horizontal"), &GalleryThumbView::FlipHorizontal);
+        menu->AddItem(tr("Flip Vertical"), &GalleryThumbView::FlipVertical);
+        menu->AddItem(tr("Reset to Exif"), &GalleryThumbView::ResetExif);
 
         mainMenu->AddItem(tr("Transforms"), nullptr, menu);
     }
@@ -1198,11 +1198,11 @@ void GalleryThumbView::MenuAction(MythMenu *mainMenu)
 
         // Only offer Hide/Unhide if relevant
         if (m_menuState.m_unhiddenMarked)
-            menu->AddItem(tr("Hide Marked"), SLOT(HideMarked()));
+            menu->AddItem(tr("Hide Marked"), &GalleryThumbView::HideMarked);
         if (m_menuState.m_hiddenMarked)
-            menu->AddItem(tr("Unhide Marked"), SLOT(UnhideMarked()));
+            menu->AddItem(tr("Unhide Marked"), &GalleryThumbView::UnhideMarked);
 
-        menu->AddItem(tr("Delete Marked"), SLOT(DeleteMarked()));
+        menu->AddItem(tr("Delete Marked"), &GalleryThumbView::DeleteMarked);
     }
     else
     {
@@ -1213,31 +1213,31 @@ void GalleryThumbView::MenuAction(MythMenu *mainMenu)
         if (!selected->IsDevice() && selected != m_view->GetParent())
         {
             if (selected->m_isHidden)
-                menu->AddItem(tr("Unhide"), SLOT(Unhide()));
+                menu->AddItem(tr("Unhide"), &GalleryThumbView::Unhide);
             else
-                menu->AddItem(tr("Hide"), SLOT(HideItem()));
+                menu->AddItem(tr("Hide"), &GalleryThumbView::HideItem);
 
-            menu->AddItem(tr("Use as Cover"), SLOT(SetCover()));
-            menu->AddItem(tr("Delete"),       SLOT(DeleteItem()));
-            menu->AddItem(tr("Rename"),       SLOT(ShowRenameInput()));
+            menu->AddItem(tr("Use as Cover"), &GalleryThumbView::SetCover);
+            menu->AddItem(tr("Delete"),       &GalleryThumbView::DeleteItem);
+            menu->AddItem(tr("Rename"),       &GalleryThumbView::ShowRenameInput);
         }
         else if (selected->m_userThumbnail)
-            menu->AddItem(tr("Reset Cover"), SLOT(ResetCover()));
+            menu->AddItem(tr("Reset Cover"), &GalleryThumbView::ResetCover);
     }
 
     // Can only mkdir in a non-root dir
     if (selected->IsDirectory()
             && selected->m_id != GALLERY_DB_ID)
-        menu->AddItem(tr("Create Directory"), SLOT(MakeDir()));
+        menu->AddItem(tr("Create Directory"), &GalleryThumbView::MakeDir);
 
     // Only show import command on root, when defined
     if (selected->m_id == GALLERY_DB_ID
             && !gCoreContext->GetSetting("GalleryImportCmd").isEmpty())
-        menu->AddItem(tr("Import"), SLOT(Import()));
+        menu->AddItem(tr("Import"), &GalleryThumbView::Import);
 
     // Only show eject when devices (excluding import) exist
     if (selected->IsDevice() && selected->IsLocal())
-        menu->AddItem(tr("Eject media"), SLOT(Eject()));
+        menu->AddItem(tr("Eject media"), &GalleryThumbView::Eject);
 
     if (menu->IsEmpty())
         delete menu;
@@ -1271,13 +1271,13 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     if (m_menuState.m_selected->IsDirectory())
     {
         if (m_menuState.m_selected->m_fileCount > 0)
-            menu->AddItem(tr("Directory"), SLOT(Slideshow()));
+            menu->AddItem(tr("Directory"), &GalleryThumbView::Slideshow);
 
         if (m_menuState.m_selected->m_dirCount > 0)
-            menu->AddItem(tr("Recursive"), SLOT(RecursiveSlideshow()));
+            menu->AddItem(tr("Recursive"), &GalleryThumbView::RecursiveSlideshow);
     }
     else
-        menu->AddItem(tr("Current Directory"), SLOT(Slideshow()));
+        menu->AddItem(tr("Current Directory"), &GalleryThumbView::Slideshow);
 
     auto *orderMenu = new MythMenu(tr("Slideshow Order"), this, "SlideOrderMenu");
 
@@ -1289,9 +1289,9 @@ void GalleryThumbView::MenuSlideshow(MythMenu *mainMenu)
     menu->AddItem(tr("Change Order"), nullptr, orderMenu);
 
     if (gCoreContext->GetBoolSetting("GalleryRepeat", false))
-        menu->AddItem(tr("Turn Repeat Off"), SLOT(RepeatOff()));
+        menu->AddItem(tr("Turn Repeat Off"), &GalleryThumbView::RepeatOff);
     else
-        menu->AddItem(tr("Turn Repeat On"), SLOT(RepeatOn()));
+        menu->AddItem(tr("Turn Repeat On"), &GalleryThumbView::RepeatOn);
 
     mainMenu->AddItem(tr("Slideshow"), nullptr, menu);
 }
@@ -1308,12 +1308,12 @@ void GalleryThumbView::MenuShow(MythMenu *mainMenu)
     int type = m_mgr.GetType();
     if (type == kPicAndVideo)
     {
-        menu->AddItem(tr("Hide Pictures"), SLOT(HidePictures()));
-        menu->AddItem(tr("Hide Videos"), SLOT(HideVideos()));
+        menu->AddItem(tr("Hide Pictures"), &GalleryThumbView::HidePictures);
+        menu->AddItem(tr("Hide Videos"), &GalleryThumbView::HideVideos);
     }
     else
         menu->AddItem(type == kPicOnly ? tr("Show Videos") : tr("Show Pictures"),
-                      SLOT(ShowType()));
+                      &GalleryThumbView::ShowType);
 
     int show = gCoreContext->GetNumSetting("GalleryImageCaption");
     auto *captionMenu = new MythMenu(tr("Image Captions"), this,
@@ -1338,20 +1338,20 @@ void GalleryThumbView::MenuShow(MythMenu *mainMenu)
     if (m_editsAllowed)
     {
         if (m_mgr.GetVisibility())
-            menu->AddItem(tr("Hide Hidden Items"), SLOT(HideHidden()));
+            menu->AddItem(tr("Hide Hidden Items"), &GalleryThumbView::HideHidden);
         else
-            menu->AddItem(tr("Show Hidden Items"), SLOT(ShowHidden()));
+            menu->AddItem(tr("Show Hidden Items"), &GalleryThumbView::ShowHidden);
     }
 
     if (m_zoomLevel > 0)
-        menu->AddItem(tr("Zoom Out"), SLOT(ZoomOut()));
+        menu->AddItem(tr("Zoom Out"), &GalleryThumbView::ZoomOut);
     if (m_zoomLevel < m_zoomWidgets.size() - 1)
-        menu->AddItem(tr("Zoom In"), SLOT(ZoomIn()));
+        menu->AddItem(tr("Zoom In"), &GalleryThumbView::ZoomIn);
 
     QString details = m_infoList.GetState() == kNoInfo
             ? tr("Show Details") : tr("Hide Details");
 
-    menu->AddItem(details, SLOT(ShowDetails()));
+    menu->AddItem(details, &GalleryThumbView::ShowDetails);
 
     mainMenu->AddItem(tr("Show"), nullptr, menu);
 }
@@ -1404,7 +1404,7 @@ void GalleryThumbView::ItemClicked(MythUIButtonListItem *item)
  \brief Action scan request
  \param start Start scan, if true. Otherwise stop scan
 */
-void GalleryThumbView::StartScan(bool start)
+void GalleryThumbView::DoScanAction(bool start)
 {
     QString err = m_mgr.ScanImagesAction(start);
     if (!err.isEmpty())
@@ -1491,7 +1491,7 @@ void GalleryThumbView::DirSelectDown()
  \brief Mark or unmark a single item
  \param mark Mark if true, otherwise unmark
 */
-void GalleryThumbView::MarkItem(bool mark)
+void GalleryThumbView::DoMarkItem(bool mark)
 {
     ImagePtrK im = m_view->GetSelected();
     if (im)
@@ -1509,7 +1509,7 @@ void GalleryThumbView::MarkItem(bool mark)
  \brief Mark or unmark all items
  \param mark Mark if true, otherwise unmark
 */
-void GalleryThumbView::MarkAll(bool mark)
+void GalleryThumbView::DoMarkAll(bool mark)
 {
     if (mark)
         m_view->MarkAll();
@@ -1567,7 +1567,7 @@ void GalleryThumbView::TransformMarked(ImageFileTransform transform)
  \brief Hide or unhide item
  \param hide Hide if true; otherwise unhide
 */
-void GalleryThumbView::HideItem(bool hide)
+void GalleryThumbView::DoHideItem(bool hide)
 {
     if (m_menuState.m_selected)
     {
@@ -1592,7 +1592,7 @@ void GalleryThumbView::HideItem(bool hide)
  \brief Hide or unhide marked items
  \param hide Hide if true; otherwise unhide
 */
-void GalleryThumbView::HideMarked(bool hide)
+void GalleryThumbView::DoHideMarked(bool hide)
 {
     QString err = m_mgr.HideFiles(hide, m_menuState.m_markedId);
     if (!err.isEmpty())
@@ -1685,7 +1685,7 @@ void GalleryThumbView::ShowSettings()
  \brief Show or hide hidden files
  \param show Show hidden, if true. Otherwise hide hidden
 */
-void GalleryThumbView::ShowHidden(bool show)
+void GalleryThumbView::DoShowHidden(bool show)
 {
     gCoreContext->SaveBoolSetting("GalleryShowHidden", show);
 
@@ -1769,7 +1769,7 @@ void GalleryThumbView::ShowPassword()
 /*!
  \brief Show/hide pictures or videos
 */
-void GalleryThumbView::ShowType(int type)
+void GalleryThumbView::DoShowType(int type)
 {
     gCoreContext->SaveSetting("GalleryShowType", type);
 
@@ -1787,7 +1787,7 @@ void GalleryThumbView::ShowType(int type)
  \brief Set or reset thumbnails to use for a directory cover
  \param reset Reset cover if true, otherwise assign selected item as cover of parent
 */
-void GalleryThumbView::SetCover(bool reset)
+void GalleryThumbView::DoSetCover(bool reset)
 {
     if (m_menuState.m_selected)
     {

@@ -532,7 +532,7 @@ bool PlaybackBox::Create()
     connect(m_recordingList, &MythUIButtonList::itemSelected,
             this, &PlaybackBox::ItemSelected);
     connect(m_recordingList, &MythUIButtonList::itemClicked,
-            this, &PlaybackBox::PlayFromBookmarkOrProgStart);
+            this, qOverload<>(&PlaybackBox::PlayFromBookmarkOrProgStart));
     connect(m_recordingList, &MythUIButtonList::itemVisible,
             this, &PlaybackBox::ItemVisible);
     connect(m_recordingList, &MythUIButtonList::itemLoaded,
@@ -2505,14 +2505,14 @@ void PlaybackBox::ShowGroupPopup()
     m_popupMenu = new MythMenu(label, this, "groupmenu");
 
     m_popupMenu->AddItem(tr("Change Group Filter"),
-                         SLOT(showGroupFilter()));
+                         &PlaybackBox::showGroupFilter);
 
     m_popupMenu->AddItem(tr("Change Group View"),
-                         SLOT(showViewChanger()));
+                         &PlaybackBox::showViewChanger);
 
     if (m_recGroupType[m_recGroup] == "recgroup")
         m_popupMenu->AddItem(tr("Change Group Password"),
-                             SLOT(showRecGroupPasswordChanger()));
+                             &PlaybackBox::showRecGroupPasswordChanger);
 
     if (!m_playList.isEmpty())
     {
@@ -2523,16 +2523,16 @@ void PlaybackBox::ShowGroupPopup()
         if (GetFocusWidget() == m_groupList)
         {
             m_popupMenu->AddItem(tr("Add this Group to Playlist"),
-                                 SLOT(togglePlayListTitle()));
+                                 &PlaybackBox::togglePlayListTitle);
         }
         else if (pginfo)
         {
             m_popupMenu->AddItem(tr("Add this recording to Playlist"),
-                                 SLOT(togglePlayListItem()));
+                                 qOverload<>(&PlaybackBox::togglePlayListItem));
         }
     }
 
-    m_popupMenu->AddItem(tr("Help (Status Icons)"), SLOT(showIconHelp()));
+    m_popupMenu->AddItem(tr("Help (Status Icons)"), &PlaybackBox::showIconHelp);
 
     DisplayPopupMenu();
 }
@@ -2685,32 +2685,12 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
 
     m_popupMenu = new MythMenu(label, this, "deletemenu");
 
-    QString tmpmessage;
-    const char *tmpslot = nullptr;
-
     if ((kDeleteRecording == type) &&
         delItem->GetRecordingGroup() != "Deleted" &&
         delItem->GetRecordingGroup() != "LiveTV")
     {
-        tmpmessage = tr("Yes, and allow re-record");
-        tmpslot = SLOT(DeleteForgetHistory());
-        m_popupMenu->AddItem(tmpmessage, tmpslot);
-    }
-
-    switch (type)
-    {
-        case kDeleteRecording:
-            tmpmessage = tr("Yes, delete it");
-            tmpslot = SLOT(Delete());
-            break;
-        case kForceDeleteRecording:
-            tmpmessage = tr("Yes, delete it");
-            tmpslot = SLOT(DeleteForce());
-            break;
-        case kStopRecording:
-            tmpmessage = tr("Yes, stop recording");
-            tmpslot = SLOT(StopSelected());
-            break;
+        m_popupMenu->AddItem(tr("Yes, and allow re-record"),
+                             &PlaybackBox::DeleteForgetHistory);
     }
 
     bool defaultIsYes =
@@ -2718,36 +2698,49 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
          (kForceDeleteRecording != type) &&
          (delItem->QueryAutoExpire() != kDisableAutoExpire));
 
-    m_popupMenu->AddItem(tmpmessage, tmpslot, nullptr, defaultIsYes);
+    switch (type)
+    {
+        case kDeleteRecording:
+            m_popupMenu->AddItem(tr("Yes, delete it"),
+                                 qOverload<>(&PlaybackBox::Delete), nullptr, defaultIsYes);
+            break;
+        case kForceDeleteRecording:
+            m_popupMenu->AddItem(tr("Yes, delete it"),
+                                 &PlaybackBox::DeleteForce, nullptr, defaultIsYes);
+            break;
+        case kStopRecording:
+            m_popupMenu->AddItem(tr("Yes, stop recording"),
+                                 &PlaybackBox::StopSelected, nullptr, defaultIsYes);
+            break;
+    }
+
 
     if ((kForceDeleteRecording == type) && other_delete_cnt)
     {
-        tmpmessage = tr("Yes, delete it and the remaining %1 list items")
-            .arg(other_delete_cnt);
-        tmpslot = SLOT(DeleteForceAllRemaining());
-        m_popupMenu->AddItem(tmpmessage, tmpslot);
+        m_popupMenu->AddItem(
+            tr("Yes, delete it and the remaining %1 list items")
+            .arg(other_delete_cnt), &PlaybackBox::DeleteForceAllRemaining);
     }
 
     switch (type)
     {
         case kDeleteRecording:
         case kForceDeleteRecording:
-            tmpmessage = tr("No, keep it");
-            tmpslot = SLOT(DeleteIgnore());
+            m_popupMenu->AddItem(tr("No, keep it"), &PlaybackBox::DeleteIgnore,
+                                 nullptr, !defaultIsYes);
             break;
         case kStopRecording:
-            tmpmessage = tr("No, continue recording");
-            tmpslot = SLOT(DeleteIgnore());
+            m_popupMenu->AddItem(tr("No, continue recording"), &PlaybackBox::DeleteIgnore,
+                                 nullptr, !defaultIsYes);
             break;
     }
-    m_popupMenu->AddItem(tmpmessage, tmpslot, nullptr, !defaultIsYes);
 
     if ((type == kForceDeleteRecording) && other_delete_cnt)
     {
-        tmpmessage = tr("No, and keep the remaining %1 list items")
-            .arg(other_delete_cnt);
-        tmpslot = SLOT(DeleteIgnoreAllRemaining());
-        m_popupMenu->AddItem(tmpmessage, tmpslot);
+        m_popupMenu->AddItem(
+            tr("No, and keep the remaining %1 list items")
+            .arg(other_delete_cnt),
+            &PlaybackBox::DeleteIgnoreAllRemaining);
     }
 
     DisplayPopupMenu();
@@ -2816,32 +2809,32 @@ MythMenu* PlaybackBox::createPlaylistMenu(void)
 
     auto *menu = new MythMenu(label, this, "slotmenu");
 
-    menu->AddItem(tr("Play"), SLOT(doPlayList()));
-    menu->AddItem(tr("Shuffle Play"), SLOT(doPlayListRandom()));
-    menu->AddItem(tr("Clear Playlist"), SLOT(doClearPlaylist()));
+    menu->AddItem(tr("Play"), &PlaybackBox::doPlayList);
+    menu->AddItem(tr("Shuffle Play"), &PlaybackBox::doPlayListRandom);
+    menu->AddItem(tr("Clear Playlist"), &PlaybackBox::doClearPlaylist);
 
     if (GetFocusWidget() == m_groupList)
     {
         if ((m_viewMask & VIEW_TITLES))
         {
             menu->AddItem(tr("Toggle playlist for this Category/Title"),
-                          SLOT(togglePlayListTitle()));
+                          &PlaybackBox::togglePlayListTitle);
         }
         else
         {
             menu->AddItem(tr("Toggle playlist for this Group"),
-                          SLOT(togglePlayListTitle()));
+                          &PlaybackBox::togglePlayListTitle);
         }
     }
     else
         menu->AddItem(tr("Toggle playlist for this recording"),
-                      SLOT(togglePlayListItem()));
+                      qOverload<>(&PlaybackBox::togglePlayListItem));
 
     menu->AddItem(tr("Storage Options"), nullptr, createPlaylistStorageMenu());
     menu->AddItem(tr("Job Options"), nullptr, createPlaylistJobMenu());
-    menu->AddItem(tr("Delete"), SLOT(PlaylistDelete()));
+    menu->AddItem(tr("Delete"), &PlaybackBox::PlaylistDeleteKeepHistory);
     menu->AddItem(tr("Delete, and allow re-record"),
-                  SLOT(PlaylistDeleteForgetHistory()));
+                  &PlaybackBox::PlaylistDeleteForgetHistory);
 
     return menu;
 }
@@ -2853,13 +2846,13 @@ MythMenu* PlaybackBox::createPlaylistStorageMenu()
 
     auto *menu = new MythMenu(label, this, "slotmenu");
 
-    menu->AddItem(tr("Change Recording Group"), SLOT(ShowRecGroupChangerUsePlaylist()));
-    menu->AddItem(tr("Change Playback Group"), SLOT(ShowPlayGroupChangerUsePlaylist()));
-    menu->AddItem(tr("Disable Auto Expire"), SLOT(doPlaylistExpireSetOff()));
-    menu->AddItem(tr("Enable Auto Expire"), SLOT(doPlaylistExpireSetOn()));
-    menu->AddItem(tr("Mark as Watched"), SLOT(doPlaylistWatchedSetOn()));
-    menu->AddItem(tr("Mark as Unwatched"), SLOT(doPlaylistWatchedSetOff()));
-    menu->AddItem(tr("Allow Re-record"), SLOT(doPlaylistAllowRerecord()));
+    menu->AddItem(tr("Change Recording Group"), &PlaybackBox::ShowRecGroupChangerUsePlaylist);
+    menu->AddItem(tr("Change Playback Group"), &PlaybackBox::ShowPlayGroupChangerUsePlaylist);
+    menu->AddItem(tr("Disable Auto Expire"), &PlaybackBox::doPlaylistExpireSetOff);
+    menu->AddItem(tr("Enable Auto Expire"), &PlaybackBox::doPlaylistExpireSetOn);
+    menu->AddItem(tr("Mark as Watched"), &PlaybackBox::doPlaylistWatchedSetOn);
+    menu->AddItem(tr("Mark as Unwatched"), &PlaybackBox::doPlaylistWatchedSetOff);
+    menu->AddItem(tr("Allow Re-record"), &PlaybackBox::doPlaylistAllowRerecord);
 
     return menu;
 }
@@ -2922,19 +2915,19 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
     }
 
     if (!isTranscoding)
-        menu->AddItem(tr("Begin Transcoding"), SLOT(doPlaylistBeginTranscoding()));
+        menu->AddItem(tr("Begin Transcoding"), &PlaybackBox::doPlaylistBeginTranscoding);
     else
-        menu->AddItem(tr("Stop Transcoding"), SLOT(stopPlaylistTranscoding()));
+        menu->AddItem(tr("Stop Transcoding"), &PlaybackBox::stopPlaylistTranscoding);
 
     if (!isFlagging)
-        menu->AddItem(tr("Begin Commercial Detection"), SLOT(doPlaylistBeginFlagging()));
+        menu->AddItem(tr("Begin Commercial Detection"), &PlaybackBox::doPlaylistBeginFlagging);
     else
-        menu->AddItem(tr("Stop Commercial Detection"), SLOT(stopPlaylistFlagging()));
+        menu->AddItem(tr("Stop Commercial Detection"), &PlaybackBox::stopPlaylistFlagging);
 
     if (!isMetadataLookup)
-        menu->AddItem(tr("Begin Metadata Lookup"), SLOT(doPlaylistBeginLookup()));
+        menu->AddItem(tr("Begin Metadata Lookup"), &PlaybackBox::doPlaylistBeginLookup);
     else
-        menu->AddItem(tr("Stop Metadata Lookup"), SLOT(stopPlaylistLookup()));
+        menu->AddItem(tr("Stop Metadata Lookup"), &PlaybackBox::stopPlaylistLookup);
 
     command = gCoreContext->GetSetting("UserJob1", "");
     if (!command.isEmpty())
@@ -2944,12 +2937,12 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
         if (!isRunningUserJob1)
         {
             menu->AddItem(tr("Begin") + ' ' + jobTitle,
-                          SLOT(doPlaylistBeginUserJob1()));
+                          &PlaybackBox::doPlaylistBeginUserJob1);
         }
         else
         {
             menu->AddItem(tr("Stop") + ' ' + jobTitle,
-                          SLOT(stopPlaylistUserJob1()));
+                          &PlaybackBox::stopPlaylistUserJob1);
         }
     }
 
@@ -2961,12 +2954,12 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
         if (!isRunningUserJob2)
         {
             menu->AddItem(tr("Begin") + ' ' + jobTitle,
-                          SLOT(doPlaylistBeginUserJob2()));
+                          &PlaybackBox::doPlaylistBeginUserJob2);
         }
         else
         {
             menu->AddItem(tr("Stop") + ' ' + jobTitle,
-                          SLOT(stopPlaylistUserJob2()));
+                          &PlaybackBox::stopPlaylistUserJob2);
         }
     }
 
@@ -2978,12 +2971,12 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
         if (!isRunningUserJob3)
         {
             menu->AddItem(tr("Begin") + ' ' + jobTitle,
-                          SLOT(doPlaylistBeginUserJob3()));
+                          &PlaybackBox::doPlaylistBeginUserJob3);
         }
         else
         {
             menu->AddItem(tr("Stop") + ' ' + jobTitle,
-                          SLOT(stopPlaylistUserJob3()));
+                          &PlaybackBox::stopPlaylistUserJob3);
         }
     }
 
@@ -2995,12 +2988,12 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
         if (!isRunningUserJob4)
         {
             menu->AddItem(QString("%1 %2").arg(tr("Begin")).arg(jobTitle),
-                          SLOT(doPlaylistBeginUserJob4()));
+                          &PlaybackBox::doPlaylistBeginUserJob4);
         }
         else
         {
             menu->AddItem(QString("%1 %2").arg(tr("Stop")).arg(jobTitle),
-                          SLOT(stopPlaylistUserJob4()));
+                          &PlaybackBox::stopPlaylistUserJob4);
         }
     }
 
@@ -3065,16 +3058,18 @@ MythMenu* PlaybackBox::createPlayFromMenu()
     auto *menu = new MythMenu(title, this, "slotmenu");
 
     if (pginfo->IsBookmarkSet())
-        menu->AddItem(tr("Play from bookmark"), SLOT(PlayFromBookmark()));
+        menu->AddItem(tr("Play from bookmark"),
+                      qOverload<>(&PlaybackBox::PlayFromBookmark));
 
     if (pginfo->QueryLastPlayPos())
         menu->AddItem(tr("Play from last played position"),
-                      SLOT(PlayFromLastPlayPos()));
+                      qOverload<>(&PlaybackBox::PlayFromLastPlayPos));
 
-    menu->AddItem(tr("Play from beginning"), SLOT(PlayFromBeginning()));
+    menu->AddItem(tr("Play from beginning"),
+                  qOverload<>(&PlaybackBox::PlayFromBeginning));
 
     if (pginfo->IsBookmarkSet())
-        menu->AddItem(tr("Clear bookmark"), SLOT(ClearBookmark()));
+        menu->AddItem(tr("Clear bookmark"), &PlaybackBox::ClearBookmark);
 
     return menu;
 }
@@ -3092,10 +3087,10 @@ MythMenu* PlaybackBox::createStorageMenu()
         tr("Do not preserve this episode") : tr("Preserve this episode");
 
     auto *menu = new MythMenu(title, this, "slotmenu");
-    menu->AddItem(tr("Change Recording Group"), SLOT(ShowRecGroupChanger()));
-    menu->AddItem(tr("Change Playback Group"), SLOT(ShowPlayGroupChanger()));
-    menu->AddItem(autoExpireText, SLOT(toggleAutoExpire()));
-    menu->AddItem(preserveText, SLOT(togglePreserveEpisode()));
+    menu->AddItem(tr("Change Recording Group"), &PlaybackBox::ShowRecGroupChangerNoPlaylist);
+    menu->AddItem(tr("Change Playback Group"), &PlaybackBox::ShowPlayGroupChangerNoPlaylist);
+    menu->AddItem(autoExpireText, &PlaybackBox::toggleAutoExpire);
+    menu->AddItem(preserveText, &PlaybackBox::togglePreserveEpisode);
 
     return menu;
 }
@@ -3110,20 +3105,20 @@ MythMenu* PlaybackBox::createRecordingMenu(void)
 
     auto *menu = new MythMenu(title, this, "slotmenu");
 
-    menu->AddItem(tr("Edit Recording Schedule"), SLOT(EditScheduled()));
+    menu->AddItem(tr("Edit Recording Schedule"),
+                  qOverload<>(&PlaybackBox::EditScheduled));
 
-    menu->AddItem(tr("Allow this episode to re-record"), SLOT(doAllowRerecord()));
+    menu->AddItem(tr("Allow this episode to re-record"), &PlaybackBox::doAllowRerecord);
 
-    menu->AddItem(tr("Show Recording Details"), SLOT(ShowDetails()));
+    menu->AddItem(tr("Show Recording Details"), &PlaybackBox::ShowDetails);
 
-    menu->AddItem(tr("Change Recording Metadata"), SLOT(showMetadataEditor()));
+    menu->AddItem(tr("Change Recording Metadata"), &PlaybackBox::showMetadataEditor);
 
-    menu->AddItem(tr("Custom Edit"), SLOT(EditCustom()));
+    menu->AddItem(tr("Custom Edit"), &PlaybackBox::EditCustom);
 
     return menu;
 }
 
-static constexpr int kMaxJobs {7};
 static const std::array<const int,kMaxJobs> kJobs
 {
     JOB_TRANSCODE,
@@ -3134,15 +3129,15 @@ static const std::array<const int,kMaxJobs> kJobs
     JOB_USERJOB3,
     JOB_USERJOB4,
 };
-static const std::array<const char *,kMaxJobs*2> kMySlots
-{   // stop                         start
-    SLOT(doBeginTranscoding()),     SLOT(createTranscodingProfilesMenu()),
-    SLOT(doBeginFlagging()),        SLOT(doBeginFlagging()),
-    SLOT(doBeginLookup()),          SLOT(doBeginLookup()),
-    SLOT(doBeginUserJob1()),        SLOT(doBeginUserJob1()),
-    SLOT(doBeginUserJob2()),        SLOT(doBeginUserJob2()),
-    SLOT(doBeginUserJob3()),        SLOT(doBeginUserJob3()),
-    SLOT(doBeginUserJob4()),        SLOT(doBeginUserJob4()),
+std::array<PlaybackBoxCb,kMaxJobs*2> PlaybackBox::kMySlots
+{   // stop                           start
+    &PlaybackBox::doBeginTranscoding, &PlaybackBox::doCreateTranscodingProfilesMenu,
+    &PlaybackBox::doBeginFlagging,    &PlaybackBox::doBeginFlagging,
+    &PlaybackBox::doBeginLookup,      &PlaybackBox::doBeginLookup,
+    &PlaybackBox::doBeginUserJob1,    &PlaybackBox::doBeginUserJob1,
+    &PlaybackBox::doBeginUserJob2,    &PlaybackBox::doBeginUserJob2,
+    &PlaybackBox::doBeginUserJob3,    &PlaybackBox::doBeginUserJob3,
+    &PlaybackBox::doBeginUserJob4,    &PlaybackBox::doBeginUserJob4,
 };
 
 MythMenu* PlaybackBox::createJobMenu()
@@ -3196,10 +3191,10 @@ MythMenu* PlaybackBox::createJobMenu()
         bool running = JobQueue::IsJobQueuedOrRunning(
             kJobs[i], pginfo->GetChanID(), pginfo->GetRecordingStartTime());
 
-        const char *slot = kMySlots[i * 2 + (running ? 0 : 1)];
-        MythMenu *submenu = (slot == kMySlots[1] ? createTranscodingProfilesMenu() : nullptr);
-
-        menu->AddItem((running) ? stop_desc : start_desc, slot, submenu);
+        MythMenu *submenu = ((kJobs[i] == JOB_TRANSCODE) && running)
+            ? createTranscodingProfilesMenu() : nullptr;
+        menu->AddItem((running) ? stop_desc : start_desc,
+                      kMySlots[i * 2 + (running ? 0 : 1)], submenu);
     }
 
     return menu;
@@ -3277,9 +3272,15 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         (asZeroByte      == pginfo.GetAvailableStatus()))
     {
         if (m_playList.contains(pginfo.GetRecordingID()))
-            m_popupMenu->AddItem(tr("Remove from Playlist"), SLOT(togglePlayListItem()));
+        {
+            m_popupMenu->AddItem(tr("Remove from Playlist"),
+                                 qOverload<>(&PlaybackBox::togglePlayListItem));
+        }
         else
-            m_popupMenu->AddItem(tr("Add to Playlist"), SLOT(togglePlayListItem()));
+        {
+            m_popupMenu->AddItem(tr("Add to Playlist"),
+                                 qOverload<>(&PlaybackBox::togglePlayListItem));
+        }
 
         if (!m_playList.isEmpty())
             m_popupMenu->AddItem(tr("Playlist Options"), nullptr, createPlaylistMenu());
@@ -3289,15 +3290,15 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
         {
             m_popupMenu->AddItem(tr("List Recorded Episodes"),
-                                 SLOT(ShowRecordedEpisodes()));
+                                 &PlaybackBox::ShowRecordedEpisodes);
         }
         else
         {
             m_popupMenu->AddItem(tr("List All Recordings"),
-                                 SLOT(ShowAllRecordings()));
+                                 &PlaybackBox::ShowAllRecordings);
         }
 
-        m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
+        m_popupMenu->AddItem(tr("Delete"), &PlaybackBox::askDelete);
 
         DisplayPopupMenu();
 
@@ -3317,7 +3318,7 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
             m_popupMenu->AddItem(tr("Play from..."), nullptr, createPlayFromMenu());
         else
             m_popupMenu->AddItem(tr("Play"),
-                                 SLOT(PlayFromBookmarkOrProgStart()));
+                                 qOverload<>(&PlaybackBox::PlayFromBookmarkOrProgStart));
     }
 
     if (!m_player)
@@ -3325,12 +3326,12 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         if (m_playList.contains(pginfo.GetRecordingID()))
         {
             m_popupMenu->AddItem(tr("Remove from Playlist"),
-                                 SLOT(togglePlayListItem()));
+                                 qOverload<>(&PlaybackBox::togglePlayListItem));
         }
         else
         {
             m_popupMenu->AddItem(tr("Add to Playlist"),
-                                 SLOT(togglePlayListItem()));
+                                 qOverload<>(&PlaybackBox::togglePlayListItem));
         }
         if (!m_playList.isEmpty())
         {
@@ -3345,13 +3346,13 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
            (tvstate == kState_WatchingLiveTV ||
             tvstate == kState_WatchingRecording))))
     {
-        m_popupMenu->AddItem(tr("Stop Recording"), SLOT(askStop()));
+        m_popupMenu->AddItem(tr("Stop Recording"), &PlaybackBox::askStop);
     }
 
     if (pginfo.IsWatched())
-        m_popupMenu->AddItem(tr("Mark as Unwatched"), SLOT(toggleWatched()));
+        m_popupMenu->AddItem(tr("Mark as Unwatched"), &PlaybackBox::toggleWatched);
     else
-        m_popupMenu->AddItem(tr("Mark as Watched"), SLOT(toggleWatched()));
+        m_popupMenu->AddItem(tr("Mark as Watched"), &PlaybackBox::toggleWatched);
 
     m_popupMenu->AddItem(tr("Storage Options"), nullptr, createStorageMenu());
     m_popupMenu->AddItem(tr("Recording Options"), nullptr, createRecordingMenu());
@@ -3360,12 +3361,12 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     if (m_groupList->GetItemPos(m_groupList->GetItemCurrent()) == 0)
     {
         m_popupMenu->AddItem(tr("List Recorded Episodes"),
-                             SLOT(ShowRecordedEpisodes()));
+                             &PlaybackBox::ShowRecordedEpisodes);
     }
     else
     {
         m_popupMenu->AddItem(tr("List All Recordings"),
-                             SLOT(ShowAllRecordings()));
+                             &PlaybackBox::ShowAllRecordings);
     }
 
     if (!sameProgram)
@@ -3373,12 +3374,12 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         if (pginfo.GetRecordingGroup() == "Deleted")
         {
             push_onto_del(m_delList, pginfo);
-            m_popupMenu->AddItem(tr("Undelete"), SLOT(Undelete()));
-            m_popupMenu->AddItem(tr("Delete Forever"), SLOT(Delete()));
+            m_popupMenu->AddItem(tr("Undelete"), &PlaybackBox::Undelete);
+            m_popupMenu->AddItem(tr("Delete Forever"), qOverload<>(&PlaybackBox::Delete));
         }
         else
         {
-            m_popupMenu->AddItem(tr("Delete"), SLOT(askDelete()));
+            m_popupMenu->AddItem(tr("Delete"), &PlaybackBox::askDelete);
         }
     }
 

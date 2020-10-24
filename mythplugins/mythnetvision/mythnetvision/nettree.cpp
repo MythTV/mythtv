@@ -419,11 +419,11 @@ void NetTree::ShowMenu(void)
     if (item)
     {
         if (item->GetDownloadable())
-            menu->AddItem(tr("Stream Video"), SLOT(StreamWebVideo()));
-        menu->AddItem(tr("Open Web Link"), SLOT(ShowWebVideo()));
+            menu->AddItem(tr("Stream Video"), &NetTree::StreamWebVideo);
+        menu->AddItem(tr("Open Web Link"), &NetTree::ShowWebVideo);
 
         if (item->GetDownloadable())
-            menu->AddItem(tr("Save This Video"), SLOT(DoDownloadAndPlay()));
+            menu->AddItem(tr("Save This Video"), &NetTree::DoDownloadAndPlay);
     }
 
     menu->AddItem(tr("Scan/Manage Subscriptions"), nullptr, CreateShowManageMenu());
@@ -445,11 +445,11 @@ MythMenu* NetTree::CreateShowViewMenu()
     auto *menu = new MythMenu(label, this, "options");
 
     if (m_type != DLG_TREE)
-        menu->AddItem(tr("Switch to List View"), SLOT(SwitchTreeView()));
+        menu->AddItem(tr("Switch to List View"), &NetTree::SwitchTreeView);
     if (m_type != DLG_GALLERY)
-        menu->AddItem(tr("Switch to Gallery View"), SLOT(SwitchGalleryView()));
+        menu->AddItem(tr("Switch to Gallery View"), &NetTree::SwitchGalleryView);
     if (m_type != DLG_BROWSER)
-        menu->AddItem(tr("Switch to Browse View"), SLOT(SwitchBrowseView()));
+        menu->AddItem(tr("Switch to Browse View"), &NetTree::SwitchBrowseView);
 
     return menu;
 }
@@ -460,24 +460,24 @@ MythMenu* NetTree::CreateShowManageMenu()
 
     auto *menu = new MythMenu(label, this, "options");
 
-    menu->AddItem(tr("Update Site Maps"), SLOT(UpdateTrees()));
-    menu->AddItem(tr("Update RSS"), SLOT(UpdateRSS()));
-    menu->AddItem(tr("Manage Site Subscriptions"), SLOT(RunTreeEditor()));
-    menu->AddItem(tr("Manage RSS Subscriptions"), SLOT(RunRSSEditor()));
+    menu->AddItem(tr("Update Site Maps"), &NetTree::UpdateTrees);
+    menu->AddItem(tr("Update RSS"), &NetTree::UpdateRSS);
+    menu->AddItem(tr("Manage Site Subscriptions"), &NetTree::RunTreeEditor);
+    menu->AddItem(tr("Manage RSS Subscriptions"), &NetTree::RunRSSEditor);
     if (!m_treeAutoUpdate)
     {
         menu->AddItem(tr("Enable Automatic Site Updates"),
-                      SLOT(ToggleTreeUpdates()));
+                      &NetTree::ToggleTreeUpdates);
     }
     else
     {
         menu->AddItem(tr("Disable Automatic Site Updates"),
-                      SLOT(ToggleTreeUpdates()));
+                      &NetTree::ToggleTreeUpdates);
     }
 //    if (!m_rssAutoUpdate)
-//        menu->AddItem(tr("Enable Automatic RSS Updates"), SLOT(ToggleRSSUpdates()));
+//        menu->AddItem(tr("Enable Automatic RSS Updates"), &NetTree::ToggleRSSUpdates);
 //    else
-//        menu->AddItem(tr("Disable Automatic RSS Updates"), SLOT(ToggleRSSUpdates()));
+//        menu->AddItem(tr("Disable Automatic RSS Updates"), &NetTree::ToggleRSSUpdates);
 
     return menu;
 }

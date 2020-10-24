@@ -267,24 +267,24 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
 
             m_menuPopup->SetReturnEvent(this, "action");
 
-            m_menuPopup->AddButton(tr("Set Homepage"), SLOT(slotSetHomepage()));
-            m_menuPopup->AddButton(tr("Add Bookmark"), SLOT(slotAddBookmark()));
+            m_menuPopup->AddButton(tr("Set Homepage"), &BookmarkManager::slotSetHomepage);
+            m_menuPopup->AddButton(tr("Add Bookmark"), &BookmarkManager::slotAddBookmark);
 
             if (m_bookmarkList->GetItemCurrent())
             {
-                m_menuPopup->AddButton(tr("Edit Bookmark"), SLOT(slotEditBookmark()));
-                m_menuPopup->AddButton(tr("Delete Bookmark"), SLOT(slotDeleteCurrent()));
-                m_menuPopup->AddButton(tr("Show Bookmark"), SLOT(slotShowCurrent()));
+                m_menuPopup->AddButton(tr("Edit Bookmark"), &BookmarkManager::slotEditBookmark);
+                m_menuPopup->AddButton(tr("Delete Bookmark"), &BookmarkManager::slotDeleteCurrent);
+                m_menuPopup->AddButton(tr("Show Bookmark"), &BookmarkManager::slotShowCurrent);
             }
 
             if (GetMarkedCount() > 0)
             {
-                m_menuPopup->AddButton(tr("Delete Marked"), SLOT(slotDeleteMarked()));
-                m_menuPopup->AddButton(tr("Show Marked"), SLOT(slotShowMarked()));
-                m_menuPopup->AddButton(tr("Clear Marked"), SLOT(slotClearMarked()));
+                m_menuPopup->AddButton(tr("Delete Marked"), &BookmarkManager::slotDeleteMarked);
+                m_menuPopup->AddButton(tr("Show Marked"), &BookmarkManager::slotShowMarked);
+                m_menuPopup->AddButton(tr("Clear Marked"), &BookmarkManager::slotClearMarked);
             }
             
-            m_menuPopup->AddButton(tr("Settings"), SLOT(slotSettings()));
+            m_menuPopup->AddButton(tr("Settings"), &BookmarkManager::slotSettings);
 
             popupStack->AddScreen(m_menuPopup);
         }

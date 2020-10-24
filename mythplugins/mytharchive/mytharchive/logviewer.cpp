@@ -341,10 +341,10 @@ void LogViewer::ShowMenu()
     menuPopup->SetReturnEvent(this, "action");
 
     if (m_autoUpdate)
-        menuPopup->AddButton(tr("Don't Auto Update"), SLOT(toggleAutoUpdate()));
+        menuPopup->AddButton(tr("Don't Auto Update"), &LogViewer::toggleAutoUpdate);
     else
-        menuPopup->AddButton(tr("Auto Update"), SLOT(toggleAutoUpdate()));
+        menuPopup->AddButton(tr("Auto Update"), &LogViewer::toggleAutoUpdate);
 
-    menuPopup->AddButton(tr("Show Progress Log"), SLOT(showProgressLog()));
-    menuPopup->AddButton(tr("Show Full Log"), SLOT(showFullLog()));
+    menuPopup->AddButton(tr("Show Progress Log"), &LogViewer::showProgressLog);
+    menuPopup->AddButton(tr("Show Full Log"), &LogViewer::showFullLog);
 }

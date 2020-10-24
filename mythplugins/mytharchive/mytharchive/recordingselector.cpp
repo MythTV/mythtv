@@ -185,8 +185,8 @@ void RecordingSelector::ShowMenu()
 
     menuPopup->SetReturnEvent(this, "action");
 
-    menuPopup->AddButton(tr("Clear All"), SLOT(clearAll()));
-    menuPopup->AddButton(tr("Select All"), SLOT(selectAll()));
+    menuPopup->AddButton(tr("Clear All"), &RecordingSelector::clearAll);
+    menuPopup->AddButton(tr("Select All"), &RecordingSelector::selectAll);
 }
 
 void RecordingSelector::selectAll()

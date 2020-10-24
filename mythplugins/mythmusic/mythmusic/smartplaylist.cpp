@@ -669,12 +669,12 @@ void SmartPlaylistEditor::showCriteriaMenu(void)
     MythUIButtonListItem *item = m_criteriaList->GetItemCurrent();
 
     if (item)
-        menu->AddButton(tr("Edit Criteria"), SLOT(editCriteria()));
+        menu->AddButton(tr("Edit Criteria"), &SmartPlaylistEditor::editCriteria);
 
-    menu->AddButton(tr("Add Criteria"), SLOT(addCriteria()));
+    menu->AddButton(tr("Add Criteria"), &SmartPlaylistEditor::addCriteria);
 
     if (item)
-        menu->AddButton(tr("Delete Criteria"), SLOT(deleteCriteria()));
+        menu->AddButton(tr("Delete Criteria"), &SmartPlaylistEditor::deleteCriteria);
 
     popupStack->AddScreen(menu);
 }

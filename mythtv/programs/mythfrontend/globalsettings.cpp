@@ -4243,11 +4243,11 @@ void PlaybackSettingsDialog::ShowPlaybackProfileMenu(MythUIButtonListItem *item)
     auto *menu = new MythMenu(tr("Playback Profile Menu"), this, "mainmenu");
 
     if (m_buttonList->GetItemPos(item) > 2)
-        menu->AddItem(tr("Move Up"), SLOT(MoveProfileItemUp()));
+        menu->AddItem(tr("Move Up"), &PlaybackSettingsDialog::MoveProfileItemUp);
     if (m_buttonList->GetItemPos(item) + 1 < m_buttonList->GetCount())
-        menu->AddItem(tr("Move Down"), SLOT(MoveProfileItemDown()));
+        menu->AddItem(tr("Move Down"), &PlaybackSettingsDialog::MoveProfileItemDown);
 
-    menu->AddItem(tr("Delete"), SLOT(DeleteProfileItem()));
+    menu->AddItem(tr("Delete"), &PlaybackSettingsDialog::DeleteProfileItem);
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
