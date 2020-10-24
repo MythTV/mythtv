@@ -222,7 +222,7 @@ void MythRAOPDevice::newConnection(QTcpSocket *client)
     {
         m_clients.append(obj);
         connect(client, &QAbstractSocket::disconnected, this, &MythRAOPDevice::deleteClient);
-        gCoreContext->RegisterForPlayback(this, SLOT(TVPlaybackStarting()));
+        gCoreContext->RegisterForPlayback(this, &MythRAOPDevice::TVPlaybackStarting);
         return;
     }
 

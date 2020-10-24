@@ -227,7 +227,24 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void ResetLanguage(void);
     void ResetSockets(void);
 
-    void RegisterForPlayback(QObject *sender, const char *method);
+    using PlaybackStartCb = void (QObject::*)(void);
+
+    /**
+     * \fn void MythCoreContext::RegisterForPlayback(QObject *sender, void (QObject::*method)(void) )
+     * Register sender for TVPlaybackAboutToStart signal. Method will be called upon
+     * the signal being emitted.
+     * sender must call MythCoreContext::UnregisterForPlayback upon deletion
+     */
+    void RegisterForPlayback(QObject *sender, PlaybackStartCb method);
+
+    template <class OBJ, typename SLOT>
+    typename std::enable_if_t<std::is_member_function_pointer_v<SLOT>, void>
+    RegisterForPlayback(OBJ *sender, SLOT method)
+    {
+        RegisterForPlayback(qobject_cast<QObject*>(sender),
+                            static_cast<PlaybackStartCb>(method));
+    }
+
     void UnregisterForPlayback(QObject *sender);
     void WantingPlayback(QObject *sender);
     bool InWantingPlayback(void);

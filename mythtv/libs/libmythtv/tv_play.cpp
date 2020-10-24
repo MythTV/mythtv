@@ -1175,7 +1175,7 @@ void TV::InitFromDB()
     m_vbimode = VBIMode::Parse(!feVBI.isEmpty() ? feVBI : beVBI);
 
     gCoreContext->addListener(this);
-    gCoreContext->RegisterForPlayback(this, SLOT(StopPlayback()));
+    gCoreContext->RegisterForPlayback(this, &TV::StopPlayback);
 }
 
 /** \fn TV::Init(bool)

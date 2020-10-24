@@ -100,7 +100,7 @@ class MythCoreContextPrivate : public QObject
 
     bool m_blockingClient;
 
-    QMap<QObject *, QByteArray> m_playbackClients;
+    QMap<QObject *, MythCoreContext::PlaybackStartCb> m_playbackClients;
     QMutex m_playbackLock;
     bool m_inwanting;
     bool m_intvwanting;
@@ -1906,12 +1906,12 @@ void MythCoreContext::WaitUntilSignals(std::vector<CoreWaitInfo> & sigs) const
 }
 
 /**
- * \fn void MythCoreContext::RegisterForPlayback(QObject *sender, const char *method)
+ * \fn void MythCoreContext::RegisterForPlayback(QObject *sender, void (QObject::*method)(void) )
  * Register sender for TVPlaybackAboutToStart signal. Method will be called upon
  * the signal being emitted.
  * sender must call MythCoreContext::UnregisterForPlayback upon deletion
  */
-void MythCoreContext::RegisterForPlayback(QObject *sender, const char *method)
+void MythCoreContext::RegisterForPlayback(QObject *sender, PlaybackStartCb method)
 {
     if (!sender || !method)
         return;
@@ -1920,8 +1920,8 @@ void MythCoreContext::RegisterForPlayback(QObject *sender, const char *method)
 
     if (!d->m_playbackClients.contains(sender))
     {
-        d->m_playbackClients.insert(sender, QByteArray(method));
-        connect(this, SIGNAL(TVPlaybackAboutToStart()),
+        d->m_playbackClients.insert(sender, method);
+        connect(this, &MythCoreContext::TVPlaybackAboutToStart,
                 sender, method,
                 Qt::BlockingQueuedConnection);
     }
@@ -1938,9 +1938,8 @@ void MythCoreContext::UnregisterForPlayback(QObject *sender)
 
     if (d->m_playbackClients.contains(sender))
     {
-        QByteArray ba = d->m_playbackClients.value(sender);
-        const char *method = ba.constData();
-        disconnect(this, SIGNAL(TVPlaybackAboutToStart()),
+        PlaybackStartCb method = d->m_playbackClients.value(sender);
+        disconnect(this, &MythCoreContext::TVPlaybackAboutToStart,
                    sender, method);
         d->m_playbackClients.remove(sender);
     }
@@ -1955,15 +1954,14 @@ void MythCoreContext::UnregisterForPlayback(QObject *sender)
 void MythCoreContext::WantingPlayback(QObject *sender)
 {
     QMutexLocker lock(&d->m_playbackLock);
-    QByteArray ba;
-    const char *method = nullptr;
+    PlaybackStartCb method { nullptr };
     d->m_inwanting = true;
 
     // If any registered client are in the same thread, they will deadlock, so rebuild
     // connections for any clients in the same thread as non-blocking connection
     QThread *currentThread = QThread::currentThread();
 
-    QMap<QObject *, QByteArray>::iterator it = d->m_playbackClients.begin();
+    QMap<QObject *, PlaybackStartCb>::iterator it = d->m_playbackClients.begin();
     for (; it != d->m_playbackClients.end(); ++it)
     {
         if (it.key() == sender)
@@ -1974,16 +1972,15 @@ void MythCoreContext::WantingPlayback(QObject *sender)
         if (thread != currentThread)
             continue;
 
-        disconnect(this, SIGNAL(TVPlaybackAboutToStart()), it.key(), it.value());
-        connect(this, SIGNAL(TVPlaybackAboutToStart()), it.key(), it.value());
+        disconnect(this, &MythCoreContext::TVPlaybackAboutToStart, it.key(), it.value());
+        connect(this, &MythCoreContext::TVPlaybackAboutToStart, it.key(), it.value());
     }
 
     // disconnect sender so it won't receive the message
     if (d->m_playbackClients.contains(sender))
     {
-        ba = d->m_playbackClients.value(sender);
-        method = ba.constData();
-        disconnect(this, SIGNAL(TVPlaybackAboutToStart()), sender, method);
+        method = d->m_playbackClients.value(sender);
+        disconnect(this, &MythCoreContext::TVPlaybackAboutToStart, sender, method);
     }
 
     // emit signal
@@ -1992,7 +1989,7 @@ void MythCoreContext::WantingPlayback(QObject *sender)
     // reconnect sender
     if (method)
     {
-        connect(this, SIGNAL(TVPlaybackAboutToStart()),
+        connect(this, &MythCoreContext::TVPlaybackAboutToStart,
                 sender, method,
                 Qt::BlockingQueuedConnection);
     }
@@ -2007,8 +2004,9 @@ void MythCoreContext::WantingPlayback(QObject *sender)
         if (thread != currentThread)
             continue;
 
-        disconnect(this, SIGNAL(TVPlaybackAboutToStart()), it.key(), it.value());
-        connect(this, SIGNAL(TVPlaybackAboutToStart()),
+        disconnect(this, &MythCoreContext::TVPlaybackAboutToStart,
+                   it.key(), it.value());
+        connect(this, &MythCoreContext::TVPlaybackAboutToStart,
                 it.key(), it.value(), Qt::BlockingQueuedConnection);
     }
     d->m_inwanting = false;
