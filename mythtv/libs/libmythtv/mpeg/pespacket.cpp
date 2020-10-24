@@ -44,6 +44,16 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, int cardid, bool &broken)
         payloadSize--;
         payloadStart++;
     }
+    else
+    {
+        // Skip past the adaptation field if present
+        if (packet->HasAdaptationField())
+        {
+            uint delta = packet->AdaptationFieldSize() + 1;
+            payloadSize -= delta;
+            payloadStart += delta;
+        }
+    }
 
     if (ccExp == cc)
     {
