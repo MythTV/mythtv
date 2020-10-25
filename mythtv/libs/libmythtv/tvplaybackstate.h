@@ -29,7 +29,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     // Video
     void RequestEmbedding(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
     void EmbedPlayback(bool Embed, const QRect& Rect = {});
-    void WindowResized(const QSize Size);
+    void WindowResized(const QSize& Size);
     void ChangeStereoOverride(StereoscopicMode Mode);
     void ChangePictureAttribute(PictureAttribute Attribute, bool Direction, int Value);
 
