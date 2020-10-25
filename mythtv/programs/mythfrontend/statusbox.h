@@ -62,7 +62,8 @@ class StatusBox : public MythScreenType
     void doLogEntries();
     void doJobQueueStatus();
     void doMachineStatus();
-    void doAutoExpireList(bool updateExpList = true);
+    void doAutoExpireList(bool updateExpList);
+    void doAutoExpireList() { doAutoExpireList(true); }
     void doDisplayStatus();
     void doDecoderStatus();
 

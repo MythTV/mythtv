@@ -110,35 +110,35 @@ bool StatusBox::Create()
 void StatusBox::Init()
 {
     auto *item = new MythUIButtonListItem(m_categoryList, tr("Listings Status"),
-                            QVariant::fromValue((void*)SLOT(doListingsStatus())));
+                                          &StatusBox::doListingsStatus);
     item->DisplayState("listings", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Schedule Status"),
-                            QVariant::fromValue((void*)SLOT(doScheduleStatus())));
+                                    &StatusBox::doScheduleStatus);
     item->DisplayState("schedule", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Input Status"),
-                            QVariant::fromValue((void*)SLOT(doTunerStatus())));
+                                    &StatusBox::doTunerStatus);
     item->DisplayState("tuner", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Job Queue"),
-                            QVariant::fromValue((void*)SLOT(doJobQueueStatus())));
+                                    &StatusBox::doJobQueueStatus);
     item->DisplayState("jobqueue", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Video decoders"),
-                            QVariant::fromValue((void*)SLOT(doDecoderStatus())));
+                                    &StatusBox::doDecoderStatus);
     item->DisplayState("decoders", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Display"),
-                            QVariant::fromValue((void*)SLOT(doDisplayStatus())));
+                                    &StatusBox::doDisplayStatus);
     item->DisplayState("display", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("Machine Status"),
-                            QVariant::fromValue((void*)SLOT(doMachineStatus())));
+                                    &StatusBox::doMachineStatus);
     item->DisplayState("machine", "icon");
 
     item = new MythUIButtonListItem(m_categoryList, tr("AutoExpire List"),
-                            QVariant::fromValue((void*)SLOT(doAutoExpireList())));
+                                    qOverload<>(&StatusBox::doAutoExpireList));
     item->DisplayState("autoexpire", "icon");
 
     int itemCurrent = gCoreContext->GetNumSetting("StatusBoxItemCurrent", 0);
@@ -258,12 +258,20 @@ void StatusBox::updateLogList(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    disconnect(this, SIGNAL(updateLog()),nullptr,nullptr);
+    disconnect(this, &StatusBox::updateLog,nullptr,nullptr);
 
-    const char *slot = (const char *)item->GetData().value<void*>();
-
-    connect(this, SIGNAL(updateLog()), slot);
-    emit updateLog();
+    if (item->GetData().value<MythUICallbackMF>())
+    {
+        connect(this, &StatusBox::updateLog,
+                item->GetData().value<MythUICallbackMF>());
+        emit updateLog();
+    }
+    else if (item->GetData().value<MythUICallbackMFc>())
+    {
+        connect(this, &StatusBox::updateLog,
+                item->GetData().value<MythUICallbackMFc>());
+        emit updateLog();
+    }
 }
 
 void StatusBox::clicked(MythUIButtonListItem *item)
