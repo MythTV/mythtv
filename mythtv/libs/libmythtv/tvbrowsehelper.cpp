@@ -131,7 +131,7 @@ void TVBrowseHelper::BrowseEnd(bool ChangeChannel)
 
     OSD* osd = m_parent->GetOSDL();
     if (osd)
-        osd->HideWindow("browse_info");
+        osd->HideWindow(OSD_WIN_BROWSE);
     m_parent->ReturnOSDLock();
 
     if (ChangeChannel)

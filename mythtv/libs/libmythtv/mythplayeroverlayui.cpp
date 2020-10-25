@@ -46,12 +46,12 @@ void MythPlayerOverlayUI::UpdateOSDPosition()
     m_osdLock.lock();
     if (m_osd)
     {
-        if (m_osd->IsWindowVisible("osd_status"))
+        if (m_osd->IsWindowVisible(OSD_WIN_STATUS))
         {
             osdInfo info;
             UpdateSliderInfo(info);
-            m_osd->SetText("osd_status", info.text, kOSDTimeout_Ignore);
-            m_osd->SetValues("osd_status", info.values, kOSDTimeout_Ignore);
+            m_osd->SetText(OSD_WIN_STATUS, info.text, kOSDTimeout_Ignore);
+            m_osd->SetValues(OSD_WIN_STATUS, info.values, kOSDTimeout_Ignore);
         }
         else
         {
@@ -73,7 +73,7 @@ void MythPlayerOverlayUI::UpdateOSDMessage(const QString& Message, OSDTimeout Ti
     {
         InfoMap map;
         map.insert("message_text", Message);
-        m_osd->SetText("osd_message", map, Timeout);
+        m_osd->SetText(OSD_WIN_MESSAGE, map, Timeout);
     }
     m_osdLock.unlock();
 }
@@ -86,8 +86,8 @@ void MythPlayerOverlayUI::SetOSDStatus(const QString& title, OSDTimeout timeout)
         osdInfo info;
         UpdateSliderInfo(info);
         info.text.insert("title", title);
-        m_osd->SetText("osd_status", info.text, timeout);
-        m_osd->SetValues("osd_status", info.values, timeout);
+        m_osd->SetText(OSD_WIN_STATUS, info.text, timeout);
+        m_osd->SetValues(OSD_WIN_STATUS, info.values, timeout);
     }
     m_osdLock.unlock();
 }
@@ -97,11 +97,11 @@ void MythPlayerOverlayUI::UpdateOSDStatus(osdInfo &Info, int Type, OSDTimeout Ti
     m_osdLock.lock();
     if (m_osd)
     {
-        m_osd->ResetWindow("osd_status");
-        m_osd->SetValues("osd_status", Info.values, Timeout);
-        m_osd->SetText("osd_status",   Info.text, Timeout);
+        m_osd->ResetWindow(OSD_WIN_STATUS);
+        m_osd->SetValues(OSD_WIN_STATUS, Info.values, Timeout);
+        m_osd->SetText(OSD_WIN_STATUS,   Info.text, Timeout);
         if (Type != kOSDFunctionalType_Default)
-            m_osd->SetFunctionalWindow("osd_status", static_cast<OSDFunctionalType>(Type));
+            m_osd->SetFunctionalWindow(OSD_WIN_STATUS, static_cast<OSDFunctionalType>(Type));
     }
     m_osdLock.unlock();
 }

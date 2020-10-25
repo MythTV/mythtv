@@ -296,7 +296,7 @@ void OSD::HideAll(bool KeepSubs, MythScreenType* Except, bool DropNotification)
     {
         it.next();
         if (Except && Except->objectName() == OSD_DLG_NAVIGATE
-            && it.value()->objectName() == "osd_status")
+            && it.value()->objectName() == OSD_WIN_STATUS)
             continue;
         bool match1 = KeepSubs &&
                      (it.key() == OSD_WIN_SUBTITLE  ||
@@ -312,8 +312,8 @@ void OSD::HideAll(bool KeepSubs, MythScreenType* Except, bool DropNotification)
 void OSD::LoadWindows()
 {
     static const std::array<const QString,7> s_defaultWindows {
-        "osd_message", "osd_input", "program_info", "browse_info", "osd_status",
-        "osd_program_editor", "osd_debug"};
+        OSD_WIN_MESSAGE, OSD_WIN_INPUT, OSD_WIN_PROGINFO, OSD_WIN_BROWSE,
+        OSD_WIN_STATUS, OSD_WIN_PROGEDIT, OSD_WIN_DEBUG };
 
     for (const auto & window : s_defaultWindows)
     {
@@ -325,11 +325,11 @@ void OSD::LoadWindows()
             m_children.insert(window, win);
 
             // Update player for window visibility
-            if (window == "browse_info")
+            if (window == OSD_WIN_BROWSE)
                 connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::BrowsingChanged);
-            if (window == "osd_program_editor")
+            if (window == OSD_WIN_PROGEDIT)
                 connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::EditingChanged);
-            if (window == "osd_debug")
+            if (window == OSD_WIN_DEBUG)
                 connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::OSDDebugVisibilityChanged);
         }
         else
@@ -804,8 +804,8 @@ void OSD::SetExpiry(const QString &Window, enum OSDTimeout Timeout,
     {
         // Keep status and nav timeouts in sync
         if (Window == OSD_DLG_NAVIGATE)
-            SetExpiryPriv("osd_status", Timeout, CustomTimeout);
-        else if (Window == "osd_status" && IsWindowVisible(OSD_DLG_NAVIGATE))
+            SetExpiryPriv(OSD_WIN_STATUS, Timeout, CustomTimeout);
+        else if (Window == OSD_WIN_STATUS && IsWindowVisible(OSD_DLG_NAVIGATE))
             SetExpiryPriv(OSD_DLG_NAVIGATE, Timeout, CustomTimeout);
     }
 }

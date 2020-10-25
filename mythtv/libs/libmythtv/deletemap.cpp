@@ -209,24 +209,24 @@ void DeleteMap::UpdateOSD(uint64_t frame, double frame_rate, OSD *osd)
 
     QHash<QString,float> posMap;
     posMap.insert("position", (float)((double)frame/(double)total));
-    osd->SetValues("osd_program_editor", posMap, kOSDTimeout_None);
-    osd->SetText("osd_program_editor", infoMap,  kOSDTimeout_None);
+    osd->SetValues(OSD_WIN_PROGEDIT, posMap, kOSDTimeout_None);
+    osd->SetText(OSD_WIN_PROGEDIT, infoMap,  kOSDTimeout_None);
     if (m_changed || total != m_cachedTotalForOSD)
-        osd->SetRegions("osd_program_editor", m_deleteMap, total);
+        osd->SetRegions(OSD_WIN_PROGEDIT, m_deleteMap, total);
     m_changed = false;
     m_cachedTotalForOSD = total;
 }
 
 void DeleteMap::UpdateOSD(int64_t timecode, OSD *osd)
 {
-    osd->SetGraph("osd_program_editor", "audiograph", timecode);
+    osd->SetGraph(OSD_WIN_PROGEDIT, "audiograph", timecode);
 }
 
 /// Set the edit mode and optionally hide the edit mode OSD.
 void DeleteMap::SetEditing(bool edit, OSD *osd)
 {
     if (osd && !edit)
-        osd->HideWindow("osd_program_editor");
+        osd->HideWindow(OSD_WIN_PROGEDIT);
     m_editing = edit;
 }
 

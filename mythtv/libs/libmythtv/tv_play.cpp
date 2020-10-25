@@ -98,7 +98,7 @@
     ReturnOSDLock(); }
 
 #define SetOSDMessage(MESSAGE) \
-    SetOSDText("osd_message", "message_text", MESSAGE, kOSDTimeout_Med)
+    SetOSDText(OSD_WIN_MESSAGE, "message_text", MESSAGE, kOSDTimeout_Med)
 
 #define HideOSDWindow(WINDOW) { \
     OSD *osd = GetOSDL(); \
@@ -2617,7 +2617,7 @@ void TV::timerEvent(QTimerEvent *Event)
         if (HasQueuedChannel())
         {
             OSD *osd = GetOSDL();
-            if (osd && !osd->IsWindowVisible("osd_input"))
+            if (osd && !osd->IsWindowVisible(OSD_WIN_INPUT))
             {
                 ReturnOSDLock();
                 CommitQueuedInput();
@@ -3877,7 +3877,7 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         if (m_asInputMode)
         {
             ClearInputQueues(true);
-            SetOSDText("osd_input", "osd_number_entry", tr("Seek:"), kOSDTimeout_Med);
+            SetOSDText(OSD_WIN_INPUT, "osd_number_entry", tr("Seek:"), kOSDTimeout_Med);
             m_asInputMode = false;
             if (m_asInputTimerId)
             {
@@ -5852,7 +5852,7 @@ QString TV::GetQueuedChanNum() const
 void TV::ClearInputQueues(bool Hideosd)
 {
     if (Hideosd)
-        HideOSDWindow("osd_input");
+        HideOSDWindow(OSD_WIN_INPUT);
 
     m_queuedInput   = "";
     m_queuedChanNum = "";
@@ -5896,7 +5896,7 @@ void TV::AddKeyToInputQueue(char Key)
     {
         inputStr = tr("Seek:", "seek to location") + " " + inputStr;
     }
-    SetOSDText("osd_input", "osd_number_entry", inputStr, kOSDTimeout_Med);
+    SetOSDText(OSD_WIN_INPUT, "osd_number_entry", inputStr, kOSDTimeout_Med);
 
     // Commit the channel if it is complete and smart changing is enabled.
     if (commitSmart)
@@ -6018,7 +6018,7 @@ bool TV::CommitQueuedInput()
             if (chanid)
                 BrowseChannel(channum);
 
-            HideOSDWindow("osd_input");
+            HideOSDWindow(OSD_WIN_INPUT);
         }
         else if (GetQueuedChanID() || !channum.isEmpty())
         {
@@ -6073,7 +6073,7 @@ void TV::ChangeChannel(ChannelChangeDirection Direction)
 
     if (ContextIsPaused(__FILE__, __LINE__))
     {
-        HideOSDWindow("osd_status");
+        HideOSDWindow(OSD_WIN_STATUS);
         MythMainWindow::DisableScreensaver();
     }
 
@@ -6236,7 +6236,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
 
     if (ContextIsPaused(__FILE__, __LINE__))
     {
-        HideOSDWindow("osd_status");
+        HideOSDWindow(OSD_WIN_STATUS);
         MythMainWindow::DisableScreensaver();
     }
 
@@ -6275,7 +6275,7 @@ void TV::ChangeChannel(const ChannelInfoList &Options)
         if (chanid && !channum.isEmpty() && IsTunablePriv(chanid))
         {
             // hide the channel number, activated by certain signal monitors
-            HideOSDWindow("osd_input");
+            HideOSDWindow(OSD_WIN_INPUT);
             m_queuedInput   = channum;
             m_queuedChanNum = channum;
             m_queuedChanID  = chanid;
@@ -6292,7 +6292,7 @@ void TV::ShowPreviousChannel()
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Previous channel number '%1'").arg(channum));
     if (channum.isEmpty())
         return;
-    SetOSDText("osd_input", "osd_number_entry", channum, kOSDTimeout_Med);
+    SetOSDText(OSD_WIN_INPUT, "osd_number_entry", channum, kOSDTimeout_Med);
 }
 
 void TV::PopPreviousChannel(bool ImmediateChange)
@@ -6322,7 +6322,7 @@ void TV::PopPreviousChannel(bool ImmediateChange)
     if (ImmediateChange)
     {
         // Turn off OSD Channel Num so the channel changes right away
-        HideOSDWindow("osd_input");
+        HideOSDWindow(OSD_WIN_INPUT);
     }
 }
 
@@ -6366,16 +6366,16 @@ void TV::ToggleOSD(bool IncludeStatusOSD)
     bool hideAll    = false;
     bool showStatus = false;
     bool paused     = ContextIsPaused(__FILE__, __LINE__);
-    bool is_status_disp    = osd->IsWindowVisible("osd_status");
-    bool has_prog_info     = osd->HasWindow("program_info");
-    bool is_prog_info_disp = osd->IsWindowVisible("program_info");
+    bool is_status_disp    = osd->IsWindowVisible(OSD_WIN_STATUS);
+    bool has_prog_info     = osd->HasWindow(OSD_WIN_PROGINFO);
+    bool is_prog_info_disp = osd->IsWindowVisible(OSD_WIN_PROGINFO);
 
     ReturnOSDLock();
 
     if (is_status_disp)
     {
         if (has_prog_info)
-            UpdateOSDProgInfo("program_info");
+            UpdateOSDProgInfo(OSD_WIN_PROGINFO);
         else
             hideAll = true;
     }
@@ -6390,7 +6390,7 @@ void TV::ToggleOSD(bool IncludeStatusOSD)
     else
     {
         if (has_prog_info)
-            UpdateOSDProgInfo("program_info");
+            UpdateOSDProgInfo(OSD_WIN_PROGINFO);
     }
 
     if (hideAll || showStatus)
@@ -6447,11 +6447,11 @@ void TV::UpdateOSDStatus(osdInfo &Info, int Type, OSDTimeout Timeout)
     OSD *osd = GetOSDL();
     if (osd)
     {
-        osd->ResetWindow("osd_status");
-        osd->SetValues("osd_status", Info.values, Timeout);
-        emit ChangeOSDText("osd_status",   Info.text, Timeout);
+        osd->ResetWindow(OSD_WIN_STATUS);
+        osd->SetValues(OSD_WIN_STATUS, Info.values, Timeout);
+        emit ChangeOSDText(OSD_WIN_STATUS,   Info.text, Timeout);
         if (Type != kOSDFunctionalType_Default)
-            osd->SetFunctionalWindow("osd_status", static_cast<OSDFunctionalType>(Type));
+            osd->SetFunctionalWindow(OSD_WIN_STATUS, static_cast<OSDFunctionalType>(Type));
     }
     ReturnOSDLock();
 }
@@ -6639,7 +6639,7 @@ void TV::UpdateOSDSignal(const QStringList &List)
         sigDesc = msg;
 
     infoMap["description"] = sigDesc;
-    emit ChangeOSDText("program_info", infoMap, kOSDTimeout_Med);
+    emit ChangeOSDText(OSD_WIN_PROGINFO, infoMap, kOSDTimeout_Med);
 
     m_playerContext.m_lastSignalMsg.clear();
     m_playerContext.m_lastSignalMsgTime.start();
@@ -7477,7 +7477,7 @@ void TV::customEvent(QEvent *Event)
     if (Event->type() == MythEvent::kUpdateBrowseInfoEventType)
     {
         auto *b = reinterpret_cast<UpdateBrowseInfoEvent*>(Event);
-        emit ChangeOSDText("browse_info", b->m_im, kOSDTimeout_None);
+        emit ChangeOSDText(OSD_WIN_BROWSE, b->m_im, kOSDTimeout_None);
         return;
     }
 
@@ -7881,10 +7881,10 @@ void TV::QuickRecord()
                 recinfo.GetPathname(), "Screenshots");
         }
 
-        emit ChangeOSDText("browse_info", infoMap, kOSDTimeout_Med);
+        emit ChangeOSDText(OSD_WIN_BROWSE, infoMap, kOSDTimeout_Med);
         InfoMap map;
         map.insert("message_text", tr("Record"));
-        emit ChangeOSDText("osd_message", map, kOSDTimeout_Med);
+        emit ChangeOSDText(OSD_WIN_MESSAGE, map, kOSDTimeout_Med);
         return;
     }
 
@@ -8068,7 +8068,7 @@ void TV::ShowOSDCutpoint(const QString &Type)
 
         InfoMap map;
         map.insert("title", tr("Edit"));
-        emit ChangeOSDText("osd_program_editor", map, kOSDTimeout_None);
+        emit ChangeOSDText(OSD_WIN_PROGEDIT, map, kOSDTimeout_None);
     }
 }
 
@@ -8513,7 +8513,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
 
                 // Turn off OSD Channel Num so the channel
                 // changes right away
-                HideOSDWindow("osd_input");
+                HideOSDWindow(OSD_WIN_INPUT);
             }
         }
     }
@@ -9539,7 +9539,7 @@ void TV::PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QD
             // hack to unhide the editbar
             InfoMap map;
             map.insert("title", tr("Edit"));
-            emit ChangeOSDText("osd_program_editor", map, kOSDTimeout_None);
+            emit ChangeOSDText(OSD_WIN_PROGEDIT, map, kOSDTimeout_None);
         }
     }
     PlaybackMenuDeinit(Menu);
@@ -10004,7 +10004,7 @@ void TV::UnpauseLiveTV(bool Quietly)
 
     if (m_playerContext.HasPlayer() && !Quietly)
     {
-        UpdateOSDProgInfo("program_info");
+        UpdateOSDProgInfo(OSD_WIN_PROGINFO);
         UpdateLCD();
         m_playerContext.PushPreviousChannel();
     }

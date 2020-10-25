@@ -28,7 +28,7 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     {
         m_osdLock.lock();
         if (m_osd)
-            m_osd->HideWindow("osd_message");
+            m_osd->HideWindow(OSD_WIN_MESSAGE);
         m_osdLock.unlock();
     });
 
@@ -856,8 +856,8 @@ void MythPlayerUI::UpdateOSDDebug()
     {
         InfoMap infoMap;
         GetPlaybackData(infoMap);
-        m_osd->ResetWindow("osd_debug");
-        m_osd->SetText("osd_debug", infoMap, kOSDTimeout_None);
+        m_osd->ResetWindow(OSD_WIN_DEBUG);
+        m_osd->SetText(OSD_WIN_DEBUG, infoMap, kOSDTimeout_None);
     }
     m_osdLock.unlock();
 }
@@ -874,7 +874,7 @@ void MythPlayerUI::ChangeOSDDebug()
         if (enable)
             UpdateOSDDebug();
         else
-            m_osd->HideWindow("osd_debug");
+            m_osd->HideWindow(OSD_WIN_DEBUG);
         m_osdDebug = enable;
     }
     m_osdLock.unlock();

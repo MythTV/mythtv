@@ -36,6 +36,14 @@
 #define OSD_WIN_INTERACT  "bb_OSD_INTERACTIVE"
 #define OSD_WIN_BDOVERLAY "bb_OSD_BDOVERLAY"
 
+#define OSD_WIN_MESSAGE  "osd_message"
+#define OSD_WIN_INPUT    "osd_input"
+#define OSD_WIN_PROGINFO "program_info"
+#define OSD_WIN_STATUS   "osd_status"
+#define OSD_WIN_DEBUG    "osd_debug"
+#define OSD_WIN_BROWSE   "browse_info"
+#define OSD_WIN_PROGEDIT "osd_program_editor"
+
 #define kOSDFadeTime 1000
 
 class TV;
