@@ -1918,6 +1918,17 @@ static HostSpinBoxSetting *FrontendIdleTimeout()
     return gs;
 }
 
+static HostCheckBoxSetting* ConfirmPowerEvent()
+{
+    auto * checkbox = new HostCheckBoxSetting("ConfirmPowerEvent");
+    checkbox->setValue(true);
+    checkbox->setLabel(MainGeneralSettings::tr("Confirm before suspending/shutting down"));
+    checkbox->setHelpText(MainGeneralSettings::tr(
+        "If enabled (the default) then the user will always be asked to confirm before the system "
+        "is shutdown, suspended or rebooted."));
+    return checkbox;
+}
+
 static HostComboBoxSetting *OverrideExitMenu(MythPower *Power)
 {
     auto *gc = new HostComboBoxSetting("OverrideExitMenu");
@@ -1928,8 +1939,8 @@ static HostComboBoxSetting *OverrideExitMenu(MythPower *Power)
     gc->addSelection(MainGeneralSettings::tr("Show quit"), "1");
     gc->addSelection(MainGeneralSettings::tr("Show quit and suspend"), "9");
     gc->addSelection(MainGeneralSettings::tr("Show quit and shutdown"), "2");
-    gc->addSelection(MainGeneralSettings::tr("Show quit, reboot and shutdown"),
-                     "3");
+    gc->addSelection(MainGeneralSettings::tr("Show quit, reboot and shutdown"), "3");
+    gc->addSelection(MainGeneralSettings::tr("Show quit, reboot, shutdown and suspend"), "10");
     gc->addSelection(MainGeneralSettings::tr("Show shutdown"), "4");
     gc->addSelection(MainGeneralSettings::tr("Show reboot"), "5");
     gc->addSelection(MainGeneralSettings::tr("Show reboot and shutdown"), "6");
@@ -3964,19 +3975,21 @@ class ShutDownRebootSetting : public GroupSetting
     StandardSetting *m_haltCommand      { nullptr };
     StandardSetting *m_rebootCommand    { nullptr };
     StandardSetting *m_suspendCommand   { nullptr };
+    StandardSetting *m_confirmCommand   { nullptr };
 };
 
 ShutDownRebootSetting::ShutDownRebootSetting()
 {
     setLabel(MainGeneralSettings::tr("Shutdown/Reboot Settings"));
-    addChild(FrontendIdleTimeout());
     auto *power = MythPower::AcquireRelease(this, true);
     addChild(m_overrideExitMenu = OverrideExitMenu(power));
+    addChild(m_confirmCommand   = ConfirmPowerEvent());
 #ifndef Q_OS_ANDROID
     addChild(m_haltCommand      = HaltCommand(power));
     addChild(m_rebootCommand    = RebootCommand(power));
     addChild(m_suspendCommand   = SuspendCommand(power));
 #endif
+    addChild(FrontendIdleTimeout());
     if (power)
         MythPower::AcquireRelease(this, false);
     connect(m_overrideExitMenu, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
@@ -3985,41 +3998,65 @@ ShutDownRebootSetting::ShutDownRebootSetting()
 
 void ShutDownRebootSetting::childChanged(StandardSetting* /*unused*/)
 {
-    if (!m_haltCommand || !m_suspendCommand || !m_rebootCommand)
+    if (!m_haltCommand || !m_suspendCommand || !m_rebootCommand || !m_confirmCommand)
         return;
+
+    bool confirmold = m_confirmCommand->isVisible();
+    bool haltold    = m_haltCommand->isVisible();
+    bool rebootold  = m_rebootCommand->isVisible();
+    bool suspendold = m_suspendCommand->isVisible();
 
     switch (m_overrideExitMenu->getValue().toInt())
     {
         case 2:
         case 4:
-            m_haltCommand->setEnabled(true);
-            m_rebootCommand->setEnabled(false);
-            m_suspendCommand->setEnabled(false);
+            m_haltCommand->setVisible(true);
+            m_rebootCommand->setVisible(false);
+            m_suspendCommand->setVisible(false);
+            m_confirmCommand->setVisible(true);
             break;
         case 3:
         case 6:
-            m_haltCommand->setEnabled(true);
-            m_rebootCommand->setEnabled(true);
-            m_suspendCommand->setEnabled(false);
+            m_haltCommand->setVisible(true);
+            m_rebootCommand->setVisible(true);
+            m_suspendCommand->setVisible(false);
+            m_confirmCommand->setVisible(true);
             break;
         case 5:
-            m_haltCommand->setEnabled(false);
-            m_rebootCommand->setEnabled(true);
-            m_suspendCommand->setEnabled(false);
+            m_haltCommand->setVisible(false);
+            m_rebootCommand->setVisible(true);
+            m_suspendCommand->setVisible(false);
+            m_confirmCommand->setVisible(true);
             break;
         case 8:
         case 9:
-            m_suspendCommand->setEnabled(true);
-            m_haltCommand->setEnabled(false);
-            m_rebootCommand->setEnabled(false);
+            m_haltCommand->setVisible(false);
+            m_rebootCommand->setVisible(false);
+            m_suspendCommand->setVisible(true);
+            m_confirmCommand->setVisible(true);
             break;
+        case 10:
+            m_haltCommand->setVisible(true);
+            m_rebootCommand->setVisible(true);
+            m_suspendCommand->setVisible(true);
+            m_confirmCommand->setVisible(true);
+        break;
         case 0:
         case 1:
         default:
-            m_haltCommand->setEnabled(false);
-            m_rebootCommand->setEnabled(false);
-            m_suspendCommand->setEnabled(false);
+            m_haltCommand->setVisible(false);
+            m_rebootCommand->setVisible(false);
+            m_suspendCommand->setVisible(false);
+            m_confirmCommand->setVisible(false);
             break;
+    }
+
+    if (confirmold != m_confirmCommand->isVisible() ||
+        haltold    != m_haltCommand->isVisible() ||
+        rebootold  != m_rebootCommand->isVisible() ||
+        suspendold != m_suspendCommand->isVisible())
+    {
+        emit settingsChanged();
     }
 }
 
