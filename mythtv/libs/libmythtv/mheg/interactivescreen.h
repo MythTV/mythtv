@@ -8,22 +8,22 @@ class InteractiveScreen : public MythScreenType
 {
     Q_OBJECT
   public:
-    InteractiveScreen(MythPlayer *player, const QString &name);
+    InteractiveScreen(MythPlayer* Player, MythPainter* Painter, const QString& Name);
     ~InteractiveScreen() override = default;
-    bool Create(void) override // MythScreenType
+    bool Create() override
     {
         SetArea(MythRect());
         return true;
     }
-    void UpdateArea(void);
-    void OptimiseDisplayedArea(void);
+    void UpdateArea();
+    void OptimiseDisplayedArea();
 
   public slots:
-    void Close() override; // MythScreenType
+    void Close() override;
 
   private:
-    MythPlayer *m_player {nullptr};
+    MythPlayer* m_player { nullptr };
     QRect       m_safeArea;
 };
 
-#endif // INTERACTIVESCREEN_H
+#endif

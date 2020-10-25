@@ -39,11 +39,12 @@ static QChar cvt_char(char ch, int lang)
     return QLatin1Char(ch);
 }
 
-TeletextScreen::TeletextScreen(MythPlayer* Player, const QString& Name, int FontStretch)
+TeletextScreen::TeletextScreen(MythPlayer* Player, MythPainter *Painter, const QString& Name, int FontStretch)
   : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
     m_player(Player),
     m_fontStretch(FontStretch)
 {
+    m_painter = Painter;
 }
 
 TeletextScreen::~TeletextScreen()
@@ -51,14 +52,14 @@ TeletextScreen::~TeletextScreen()
     ClearScreen();
 }
 
-bool TeletextScreen::Create(void)
+bool TeletextScreen::Create()
 {
     if (m_player)
         m_teletextReader = m_player->GetTeletextReader();
     return m_player && m_teletextReader;
 }
 
-void TeletextScreen::ClearScreen(void)
+void TeletextScreen::ClearScreen()
 {
     DeleteAllChildren();
     for (const auto & img : qAsConst(m_rowImages))
@@ -86,7 +87,7 @@ QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
     return m_rowImages.value(y);
 }
 
-void TeletextScreen::OptimiseDisplayedArea(void)
+void TeletextScreen::OptimiseDisplayedArea()
 {
     QHashIterator<int, QImage*> it(m_rowImages);
     while (it.hasNext())
@@ -133,7 +134,7 @@ void TeletextScreen::OptimiseDisplayedArea(void)
     }
 }
 
-void TeletextScreen::Pulse(void)
+void TeletextScreen::Pulse()
 {
     if (!InitialiseFont() || !m_displaying)
         return;
@@ -238,7 +239,7 @@ void TeletextScreen::SetDisplaying(bool display)
         ClearScreen();
 }
 
-void TeletextScreen::Reset(void)
+void TeletextScreen::Reset()
 {
     if (m_teletextReader)
         m_teletextReader->Reset();
@@ -600,7 +601,7 @@ void TeletextScreen::DrawMosaic(int x, int y, int code, bool doubleheight)
         DrawRect(row, QRect(x + dx, y + dy,   dx, dy));
 }
 
-void TeletextScreen::DrawStatus(void)
+void TeletextScreen::DrawStatus()
 {
     SetForegroundColor(kTTColorWhite);
     SetBackgroundColor(kTTColorBlack);

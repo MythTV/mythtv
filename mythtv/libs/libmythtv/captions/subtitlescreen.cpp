@@ -1363,13 +1363,14 @@ void FormattedTextSubtitle708::Init(const CC708Window &win,
 
 ////////////////////////////////////////////////////////////////////////////
 
-SubtitleScreen::SubtitleScreen(MythPlayer *player, const char * name,
-                               int fontStretch) :
-    MythScreenType((MythScreenType*)nullptr, name),
-    m_player(player),
-    m_fontStretch(fontStretch),
+SubtitleScreen::SubtitleScreen(MythPlayer *Player, MythPainter *Painter,
+                               const QString &Name, int FontStretch)
+  : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
+    m_player(Player),
+    m_fontStretch(FontStretch),
     m_format(new SubtitleFormat)
 {
+    m_painter = Painter;
     m_removeHTML.setMinimal(true);
 }
 

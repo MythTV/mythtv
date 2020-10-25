@@ -11,25 +11,24 @@ class TeletextScreen: public MythScreenType
 {
     Q_OBJECT
 
-    static bool  InitialiseFont(void);
+    static bool  InitialiseFont();
 
   public:
-    TeletextScreen(MythPlayer* Player, const QString& Name, int FontStretch);
+    TeletextScreen(MythPlayer* Player, MythPainter* Painter, const QString& Name, int FontStretch);
     ~TeletextScreen() override;
 
-    // MythScreenType methods
-    bool Create(void) override; // MythScreenType
-    void Pulse(void) override; // MythUIType
+    bool Create() override;
+    void Pulse() override;
 
     // TeletextViewer interface methods
     bool KeyPress(const QString &key);
     void SetPage(int page, int subpage);
     void SetDisplaying(bool display);
-    void Reset(void) override; // MythUIType
-    void ClearScreen(void);
+    void Reset() override;
+    void ClearScreen();
 
   private:
-    void OptimiseDisplayedArea(void);
+    void OptimiseDisplayedArea();
     QImage* GetRowImage(int row, QRect &rect);
     static void SetForegroundColor(int color);
     void SetBackgroundColor(int color);
@@ -39,8 +38,8 @@ class TeletextScreen: public MythScreenType
     void DrawMosaic(int x, int y, int code, bool doubleheight);
     void DrawLine(const tt_line_array& page, uint row, int lang);
     void DrawHeader(const tt_line_array &page, int lang);
-    void DrawStatus(void);
-    void DrawPage(void);
+    void DrawStatus();
+    void DrawPage();
 
     MythPlayer*     m_player         {nullptr};
     TeletextReader *m_teletextReader {nullptr};

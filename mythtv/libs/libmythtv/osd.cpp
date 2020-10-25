@@ -145,6 +145,20 @@ void ChannelEditor::SendResult(int result)
     QCoreApplication::postEvent(m_tv, dce);
 }
 
+MythOSDWindow::MythOSDWindow(MythScreenStack* Parent, MythPainter* Painter,
+                             const QString& Name, bool Themed)
+  : MythScreenType(Parent, Name, true),
+    m_themed(Themed)
+{
+    m_painter = Painter;
+}
+
+bool MythOSDWindow::Create()
+{
+    if (m_themed)
+        return XMLParseBase::LoadWindowFromXML("osd.xml", objectName(), this);
+    return false;
+}
 
 OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* Painter)
   : m_mainWindow(MainWindow),
@@ -188,20 +202,6 @@ bool OSD::Init(const QRect &Rect, float FontAspect)
         .arg(m_rect.width()).arg(m_rect.height()).arg(m_rect.left()).arg(m_rect.top()));
     HideAll(false);
     return true;
-}
-
-void OSD::SetPainter(MythPainter *Painter)
-{
-    if (Painter == m_painter)
-        return;
-
-    m_painter = Painter;
-    QMapIterator<QString, MythScreenType*> it(m_children);
-    while (it.hasNext())
-    {
-        it.next();
-        it.value()->SetPainter(m_painter);
-    }
 }
 
 void OSD::OverrideUIScale(bool Log)
@@ -317,9 +317,7 @@ void OSD::LoadWindows()
 
     for (const auto & window : s_defaultWindows)
     {
-        auto *win = new MythOSDWindow(nullptr, window, true);
-
-        win->SetPainter(m_painter);
+        auto * win = new MythOSDWindow(nullptr, m_painter, window, true);
         if (win->Create())
         {
             PositionWindow(win);
@@ -883,33 +881,24 @@ MythScreenType *OSD::GetWindow(const QString &Window)
     if (m_children.contains(Window))
         return m_children.value(Window);
 
-    MythScreenType *new_window = nullptr;
+    MythScreenType* newwindow = nullptr;
 
     if (Window == OSD_WIN_INTERACT)
-    {
-        new_window = new InteractiveScreen(m_player, Window);
-    }
+        newwindow = new InteractiveScreen(m_player, m_painter, Window);
     else if (Window == OSD_WIN_BDOVERLAY)
-    {
-        new_window = new MythBDOverlayScreen(m_player, Window);
-    }
+        newwindow = new MythBDOverlayScreen(m_player, m_painter, Window);
     else
+        newwindow = new MythOSDWindow(nullptr, m_painter, Window, false);
+
+    if (newwindow->Create())
     {
-        new_window = new MythOSDWindow(nullptr, Window, false);
+        m_children.insert(Window, newwindow);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created window %1").arg(Window));
+        return newwindow;
     }
 
-    new_window->SetPainter(m_painter);
-    if (new_window->Create())
-    {
-        m_children.insert(Window, new_window);
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Created window %1").arg(Window));
-        return new_window;
-    }
-
-    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create window %1")
-            .arg(Window));
-    delete new_window;
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create window %1").arg(Window));
+    delete newwindow;
     return nullptr;
 }
 
@@ -1091,38 +1080,37 @@ void OSD::DialogGetText(InfoMap &Map)
 
 TeletextScreen* OSD::InitTeletext()
 {
-    TeletextScreen *tt = nullptr;
+    TeletextScreen* teletext = nullptr;
     if (m_children.contains(OSD_WIN_TELETEXT))
     {
-        tt = qobject_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
+        teletext = qobject_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
     }
     else
     {
         OverrideUIScale();
-        tt = new TeletextScreen(m_player, OSD_WIN_TELETEXT, m_fontStretch);
-        tt->SetPainter(m_painter);
-        if (tt->Create())
+        teletext = new TeletextScreen(m_player, m_painter, OSD_WIN_TELETEXT, m_fontStretch);
+        if (teletext->Create())
         {
-            m_children.insert(OSD_WIN_TELETEXT, tt);
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created window %1")
-                .arg(OSD_WIN_TELETEXT));
+            m_children.insert(OSD_WIN_TELETEXT, teletext);
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created window %1").arg(OSD_WIN_TELETEXT));
         }
         else
         {
-            delete tt;
-            tt = nullptr;
+            delete teletext;
+            teletext = nullptr;
         }
         RevertUIScale();
     }
-    if (!tt)
+
+    if (!teletext)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Teletext window");
         return nullptr;
     }
 
     HideWindow(OSD_WIN_TELETEXT);
-    tt->SetDisplaying(false);
-    return tt;
+    teletext->SetDisplaying(false);
+    return teletext;
 }
 
 void OSD::EnableTeletext(bool Enable, int Page)
@@ -1184,8 +1172,7 @@ SubtitleScreen* OSD::InitSubtitles()
     else
     {
         OverrideUIScale();
-        sub = new SubtitleScreen(m_player, OSD_WIN_SUBTITLE, m_fontStretch);
-        sub->SetPainter(m_painter);
+        sub = new SubtitleScreen(m_player, m_painter, OSD_WIN_SUBTITLE, m_fontStretch);
         if (sub->Create())
         {
             m_children.insert(OSD_WIN_SUBTITLE, sub);

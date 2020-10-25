@@ -71,18 +71,8 @@ class MythOSDWindow : public MythScreenType
     Q_OBJECT
 
   public:
-    MythOSDWindow(MythScreenStack *Parent, const QString &Name, bool Themed)
-      : MythScreenType(Parent, Name, true),
-        m_themed(Themed)
-    {
-    }
-
-    bool Create() override
-    {
-        if (m_themed)
-            return XMLParseBase::LoadWindowFromXML("osd.xml", objectName(), this);
-        return false;
-    }
+    MythOSDWindow(MythScreenStack* Parent, MythPainter* Painter, const QString& Name, bool Themed);
+    bool Create() override;
 
   private:
     bool m_themed { false };
@@ -133,7 +123,6 @@ class OSD : public QObject
    ~OSD() override;
 
     bool    Init(const QRect &Rect, float FontAspect);
-    void    SetPainter(MythPainter *Painter);
     QRect   Bounds() const { return m_rect; }
     int     GetFontStretch() const { return m_fontStretch; }
     void    OverrideUIScale(bool Log = true);

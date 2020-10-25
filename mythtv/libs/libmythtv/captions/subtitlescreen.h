@@ -173,8 +173,8 @@ class SubtitleScreen : public MythScreenType
 {
     Q_OBJECT
 public:
-    SubtitleScreen(MythPlayer *player, const char * name, int fontStretch);
-    ~SubtitleScreen() override;
+    SubtitleScreen(MythPlayer* Player, MythPainter* Painter, const QString& Name, int FontStretch);
+   ~SubtitleScreen() override;
 
     void EnableSubtitles(int type, bool forced_only = false);
     void DisableForcedSubtitles(void);

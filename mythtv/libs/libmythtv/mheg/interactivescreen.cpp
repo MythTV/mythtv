@@ -1,24 +1,24 @@
 #include "mheg/interactivescreen.h"
 
-InteractiveScreen::InteractiveScreen(MythPlayer *player,
-                                     const QString &name) :
-    MythScreenType((MythScreenType*)nullptr, name),
-    m_player(player)
+InteractiveScreen::InteractiveScreen(MythPlayer *Player, MythPainter *Painter, const QString &Name)
+  : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
+    m_player(Player)
 {
+    m_painter = Painter;
     UpdateArea();
 }
 
-void InteractiveScreen::Close(void)
+void InteractiveScreen::Close()
 {
     if (m_player)
         m_player->SetVideoResize(QRect());
 }
 
-void InteractiveScreen::UpdateArea(void)
+void InteractiveScreen::UpdateArea()
 {
     if (m_childrenList.isEmpty())
     {
-        m_safeArea = QRect();
+        m_safeArea = {};
     }
     else if (m_player && m_player->GetVideoOutput())
     {
@@ -29,7 +29,7 @@ void InteractiveScreen::UpdateArea(void)
     SetArea(MythRect(m_safeArea));
 }
 
-void InteractiveScreen::OptimiseDisplayedArea(void)
+void InteractiveScreen::OptimiseDisplayedArea()
 {
     UpdateArea();
 

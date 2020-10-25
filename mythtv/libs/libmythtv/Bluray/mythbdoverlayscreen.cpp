@@ -9,10 +9,11 @@
 
 #define LOC QString("BDScreen: ")
 
-MythBDOverlayScreen::MythBDOverlayScreen(MythPlayer *Player, const QString &Name)
+MythBDOverlayScreen::MythBDOverlayScreen(MythPlayer *Player, MythPainter *Painter, const QString &Name)
   : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
     m_player(Player)
 {
+    m_painter = Painter;
 }
 
 void MythBDOverlayScreen::DisplayBDOverlay(MythBDOverlay *Overlay)
