@@ -22,7 +22,7 @@ class ExitPrompter : public QObject
     void ConfirmReboot();
     void ConfirmSuspend();
     void Confirm(MythPower::Feature Action);
-    void MainDialogClosed(QString /*unused*/, int Id);
+    void MainDialogClosed(const QString& /*unused*/, int Id);
 
   private:
     MythPower* m_power { nullptr };

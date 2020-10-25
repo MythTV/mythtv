@@ -146,7 +146,7 @@ void ExitPrompter::DoStandby()
     deleteLater();
 }
 
-void ExitPrompter::MainDialogClosed(QString /*unused*/, int Id)
+void ExitPrompter::MainDialogClosed(const QString& /*unused*/, int Id)
 {
     // If the dialog box was closed without a result - or the result was no, then
     // delete
