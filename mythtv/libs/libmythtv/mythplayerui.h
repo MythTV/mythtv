@@ -14,6 +14,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
 
   public slots:
     void ChangeOSDDebug();
+    void OSDDebugVisibilityChanged(bool Visible);
 
   protected slots:
     void UpdateOSDDebug();
@@ -83,6 +84,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
   private:
     Q_DISABLE_COPY(MythPlayerUI)
 
+    bool    m_osdDebug { false };
     QTimer  m_osdDebugTimer;
 };
 

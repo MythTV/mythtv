@@ -840,6 +840,15 @@ void MythPlayerUI::GetCodecDescription(InfoMap& Map)
         Map["videodescrip"] = "SD";
 }
 
+void MythPlayerUI::OSDDebugVisibilityChanged(bool Visible)
+{
+    m_osdDebug = Visible;
+    if (Visible)
+        m_osdDebugTimer.start();
+    else
+        m_osdDebugTimer.stop();
+}
+
 void MythPlayerUI::UpdateOSDDebug()
 {
     m_osdLock.lock();
@@ -858,20 +867,15 @@ void MythPlayerUI::ChangeOSDDebug()
     m_osdLock.lock();
     if (m_osd)
     {
-        bool enable = !m_osd->IsWindowVisible("osd_debug");
+        bool enable = !m_osdDebug;
         if (m_playerCtx->m_buffer)
             m_playerCtx->m_buffer->EnableBitrateMonitor(enable);
         EnableFrameRateMonitor(enable);
         if (enable)
-        {
             UpdateOSDDebug();
-            m_osdDebugTimer.start();
-        }
         else
-        {
-            m_osdDebugTimer.stop();
             m_osd->HideWindow("osd_debug");
-        }
+        m_osdDebug = enable;
     }
     m_osdLock.unlock();
 }

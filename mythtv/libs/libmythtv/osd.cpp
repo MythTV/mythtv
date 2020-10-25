@@ -331,6 +331,8 @@ void OSD::LoadWindows()
                 connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::BrowsingChanged);
             if (window == "osd_program_editor")
                 connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::EditingChanged);
+            if (window == "osd_debug")
+                connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::OSDDebugVisibilityChanged);
         }
         else
         {
