@@ -973,11 +973,11 @@ void OSD::DialogQuit()
     m_pulsedDialogText = QString();
 }
 
-void OSD::ShowDialog(MythOSDDialogData Data)
+void OSD::ShowDialog(const MythOSDDialogData& Data)
 {
     DialogShow(Data.m_dialogName, Data.m_message, Data.m_timeout);
     std::for_each(Data.m_buttons.cbegin(), Data.m_buttons.cend(),
-        [this](const MythOSDDialogData::MythOSDDialogButton B) {
+        [this](const MythOSDDialogData::MythOSDDialogButton& B) {
             DialogAddButton(B.m_text, B.m_data, B.m_menu, B.m_current); });
 }
 

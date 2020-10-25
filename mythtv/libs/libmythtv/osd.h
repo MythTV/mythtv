@@ -115,7 +115,7 @@ class OSD : public QObject
     void HideOSD(OSDFunctionalType Type);
 
   public slots:
-    void ShowDialog(MythOSDDialogData Data);
+    void ShowDialog(const MythOSDDialogData& Data);
     void SetText(const QString& Window, const InfoMap& Map, OSDTimeout Timeout);
 
   public:
