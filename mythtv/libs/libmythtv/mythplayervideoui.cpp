@@ -48,15 +48,15 @@ bool MythPlayerVideoUI::InitVideo()
 
     // Inbound connections
     connect(video, &MythVideoOutputGPU::PictureAttributeChanged, updateOsdPicAttr);
-    connect(video, &MythVideoBounds::UpdateOSDMessage, this,     QOverload<const QString&>::of(&MythPlayerVideoUI::UpdateOSDMessage));
-    connect(m_tv,     &TV::ChangeOSDPositionUpdates,   this,     &MythPlayerVideoUI::ChangeOSDPositionUpdates);
-    connect(m_tv,     &TV::WindowResized,              this,     &MythPlayerVideoUI::WindowResized);
+    connect(video, &MythVideoBounds::UpdateOSDMessage, this,  QOverload<const QString&>::of(&MythPlayerVideoUI::UpdateOSDMessage));
+    connect(m_tv,  &TV::ChangeOSDPositionUpdates, this,  &MythPlayerVideoUI::ChangeOSDPositionUpdates);
+    connect(m_tv,  &TV::WindowResized,            this,  &MythPlayerVideoUI::WindowResized);
 
     // Passthrough signals
-    connect(m_tv,     &TV::ChangePictureAttribute,     video, &MythVideoOutputGPU::ChangePictureAttribute);
-    connect(m_tv,     &TV::ChangeStereoOverride,       video, &MythVideoOutputGPU::SetStereoOverride);
-    connect(m_tv,     &TV::WindowResized,              video, &MythVideoOutputGPU::WindowResized);
-    connect(m_tv,     &TV::EmbedPlayback,              video, &MythVideoOutputGPU::EmbedPlayback);
+    connect(m_tv,  &TV::ChangePictureAttribute,   video, &MythVideoOutputGPU::ChangePictureAttribute);
+    connect(m_tv,  &TV::ChangeStereoOverride,     video, &MythVideoOutputGPU::SetStereoOverride);
+    connect(m_tv,  &TV::WindowResized,            video, &MythVideoOutputGPU::WindowResized);
+    connect(m_tv,  &TV::EmbedPlayback,            video, &MythVideoOutputGPU::EmbedPlayback);
     return true;
 }
 

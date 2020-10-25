@@ -48,7 +48,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     DetectLetterbox m_detectLetterBox { this };
 
     // N.B. Editor - keep ringfenced and move into subclass
-    bool EnableEdit();
+    void EnableEdit();
     void DisableEdit(int HowToSave);
     bool HandleProgramEditorActions(QStringList& Actions);
     uint64_t GetNearestMark(uint64_t Frame, bool Right);

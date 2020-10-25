@@ -15,12 +15,12 @@ class MTV_PUBLIC MythPlayerAudioUI : public MythPlayerOverlayUI
 
   protected slots:
     void      ChangeMuteState(bool CycleChannels);
-    void      ChangeVolume(bool Direction, int Volume, bool UpdateOSD);
+    void      ChangeVolume(bool Direction, int Volume);
     void      ResetAudio();
     void      ReinitAudio();
     void      EnableUpmix(bool Enable, bool Toggle = false);
     void      PauseAudioUntilBuffered();
-    void      AdjustAudioTimecodeOffset(int64_t Delta, int Value, bool UpdateOSD);
+    void      AdjustAudioTimecodeOffset(int64_t Delta, int Value);
 
   public:
     MythPlayerAudioUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);

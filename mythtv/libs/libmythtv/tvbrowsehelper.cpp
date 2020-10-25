@@ -203,17 +203,6 @@ BrowseInfo TVBrowseHelper::GetBrowsedInfo() const
     return bi;
 }
 
-/**
- *  \note This may only be called from the UI thread.
- */
-bool TVBrowseHelper::IsBrowsing() const
-{
-    if (!gCoreContext->IsUIThread())
-        return true;
-
-    return m_browseTimerId != 0;
-}
-
 /** \brief Returns a chanid for the channum, or 0 if none is available.
  *
  *  This will prefer a given sourceid first, and then a given card id,

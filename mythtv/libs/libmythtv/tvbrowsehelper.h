@@ -60,7 +60,6 @@ class TVBrowseHelper : public MThread
     void BrowseDispInfo(BrowseDirection Direction);
     void BrowseChannel(const QString& Channum);
     BrowseInfo GetBrowsedInfo() const;
-    bool IsBrowsing() const;
     uint GetBrowseChanId(const QString& Channum, uint PrefCardid, uint PrefSourceid) const;
 
     int                     m_browseTimerId         { 0 };

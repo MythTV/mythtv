@@ -1,4 +1,5 @@
 // MythTV
+#include "tv_play.h"
 #include "livetvchain.h"
 #include "mythplayeroverlayui.h"
 
@@ -9,6 +10,19 @@ MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, Pla
 {
     m_positionUpdateTimer.setInterval(999);
     connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerOverlayUI::UpdateOSDPosition);
+    connect(this, &MythPlayerOverlayUI::OverlayStateChanged, m_tv, &TV::OverlayStateChanged);
+}
+
+void MythPlayerOverlayUI::BrowsingChanged(bool Browsing)
+{
+    m_browsing = Browsing;
+    emit OverlayStateChanged({ m_browsing, m_editing });
+}
+
+void MythPlayerOverlayUI::EditingChanged(bool Editing)
+{
+    m_editing = Editing;
+    emit OverlayStateChanged({ m_browsing, m_editing });
 }
 
 void MythPlayerOverlayUI::ChangeOSDPositionUpdates(bool Enable)

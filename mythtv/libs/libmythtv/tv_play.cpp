@@ -2904,8 +2904,8 @@ void TV::HandleEndOfPlaybackTimerEvent()
 
 void TV::HandleEndOfRecordingExitPromptTimerEvent()
 {
-    if (m_endOfRecording || m_inPlaylist || m_editMode || m_underNetworkControl ||
-        m_exitPlayerTimerId)
+    if (m_endOfRecording || m_inPlaylist || m_overlayState.m_editing ||
+        m_underNetworkControl || m_exitPlayerTimerId)
     {
         return;
     }
@@ -3142,7 +3142,7 @@ bool TV::HandleTrackAction(const QString &Action)
         m_player->SetCaptionsEnabled(true, true);
     else if (Action == ACTION_DISABLESUBS)
         m_player->SetCaptionsEnabled(false, true);
-    else if (Action == ACTION_TOGGLESUBS && !IsBrowsing())
+    else if (Action == ACTION_TOGGLESUBS && !m_overlayState.m_browsing)
     {
         if (m_ccInputMode)
         {
@@ -3379,7 +3379,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
         bool pause = IsActionable(ACTION_PAUSE, actions);
         bool play  = IsActionable(ACTION_PLAY,  actions);
 
-        if ((!esc || IsBrowsing()) && !pause && !play)
+        if ((!esc || m_overlayState.m_browsing) && !pause && !play)
             return false;
     }
 
@@ -3399,10 +3399,9 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
     }
     ReturnOSDLock();
 
-    if (m_editMode && !handled)
+    if (m_overlayState.m_editing && !handled)
     {
-        handled |= TranslateKeyPressOrGesture(
-                   "TV Editing", Event, actions, isLiveTV);
+        handled |= TranslateKeyPressOrGesture("TV Editing", Event, actions, isLiveTV);
 
         if (!handled && m_player)
         {
@@ -3445,8 +3444,6 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
                 }
             }
         }
-        if (handled)
-            m_editMode = (m_player && m_player->GetEditMode());
     }
 
     if (handled)
@@ -3574,7 +3571,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
 bool TV::BrowseHandleAction(const QStringList &Actions)
 {
-    if (!IsBrowsing())
+    if (!m_overlayState.m_browsing)
         return false;
 
     bool handled = true;
@@ -4619,7 +4616,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
                 return;
 
             if (0 <= vol && vol <= 100)
-                emit ChangeVolume(true, vol, !IsBrowsing() && !m_editMode);
+                emit ChangeVolume(true, vol);
         }
     }
     else if (tokens.size() >= 3 && tokens[1] == "QUERY")
@@ -5453,7 +5450,6 @@ void TV::DoJumpChapter(int Chapter)
     PauseAudioUntilBuffered();
 
     UpdateOSDSeekMessage(tr("Jump Chapter"), kOSDTimeout_Med);
-    emit ChangeOSDPositionUpdates(true);
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
@@ -5881,8 +5877,7 @@ void TV::AddKeyToInputQueue(char Key)
     // Always use immediate channel change when channel numbers are entered
     // in browse mode because in browse mode space/enter exit browse
     // mode and change to the currently browsed channel.
-    if (StateIsLiveTV(GetState()) && !m_ccInputMode && !m_asInputMode &&
-        IsBrowsing())
+    if (StateIsLiveTV(GetState()) && !m_ccInputMode && !m_asInputMode && m_overlayState.m_browsing)
     {
         commitSmart = ProcessSmartChannel(inputStr);
     }
@@ -6005,7 +6000,7 @@ bool TV::CommitQueuedInput()
     else if (StateIsLiveTV(GetState()))
     {
         QString channum = GetQueuedChanNum();
-        if (IsBrowsing())
+        if (m_overlayState.m_browsing)
         {
             uint sourceid = 0;
             m_playerContext.LockPlayingInfo(__FILE__, __LINE__);
@@ -6347,7 +6342,7 @@ bool TV::ClearOSD()
     }
     ReturnOSDLock();
 
-    if (IsBrowsing())
+    if (m_overlayState.m_browsing)
         BrowseEnd(false);
 
     return res;
@@ -6500,7 +6495,7 @@ void TV::UpdateOSDInput()
 void TV::UpdateOSDSignal(const QStringList &List)
 {
     OSD *osd = GetOSDL();
-    if (!osd || IsBrowsing() || !m_queuedChanNum.isEmpty())
+    if (!osd || m_overlayState.m_browsing || !m_queuedChanNum.isEmpty())
     {
         if (&m_playerContext.m_lastSignalMsg != &List)
             m_playerContext.m_lastSignalMsg = List;
@@ -7063,10 +7058,9 @@ void TV::VolumeChange(bool Up, int NewVolume)
     if ((m_audioState.m_muteState == kMuteAll) && (Up || NewVolume >= 0))
         ToggleMute();
 
-    bool browsing = IsBrowsing();
-    emit ChangeVolume(Up, NewVolume, !browsing);
+    emit ChangeVolume(Up, NewVolume);
 
-    if (!browsing)
+    if (!m_overlayState.m_browsing)
     {
         if (LCD *lcd = LCD::Get())
         {
@@ -7134,7 +7128,7 @@ void TV::ChangeTimeStretch(int Dir, bool AllowEdit)
             m_player->Play(m_playerContext.m_tsNormal, true);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (!IsBrowsing())
+    if (!m_overlayState.m_browsing)
     {
         if (!AllowEdit)
         {
@@ -7180,7 +7174,7 @@ void TV::ChangeSubtitleZoom(int Dir)
     newval = std::min(200, newval);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (showing && !IsBrowsing())
+    if (showing && !m_overlayState.m_browsing)
     {
         UpdateOSDStatus(tr("Adjust Subtitle Zoom"), tr("Subtitle Zoom"),
                         QString::number(newval),
@@ -7216,7 +7210,7 @@ void TV::ChangeSubtitleDelay(int Dir)
     newval = std::min(5000, newval);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    if (showing && !IsBrowsing())
+    if (showing && !m_overlayState.m_browsing)
     {
         // range of -5000ms..+5000ms, scale to 0..1000
         UpdateOSDStatus(tr("Adjust Subtitle Delay"), tr("Subtitle Delay"),
@@ -7233,7 +7227,7 @@ void TV::ChangeSubtitleDelay(int Dir)
 void TV::ChangeAudioSync(int Dir, int NewSync)
 {
     m_audiosyncAdjustment = true;
-    emit ChangeAudioOffset(Dir * 10, NewSync, !IsBrowsing());
+    emit ChangeAudioOffset(Dir * 10, NewSync);
 }
 
 void TV::ToggleMute(const bool MuteIndividualChannels)
@@ -7264,9 +7258,7 @@ void TV::ToggleSleepTimer()
     }
 
     text = tr("Sleep ") + " " + s_sleepTimes[m_sleepIndex].dispString;
-
-    if (!IsBrowsing())
-        SetOSDMessage(text);
+    SetOSDMessage(text);
 }
 
 void TV::ShowOSDSleep()
@@ -8092,8 +8084,6 @@ bool TV::HandleOSDCutpoint(const QString& Action)
         QStringList actions(Action);
         if (!m_player->HandleProgramEditorActions(actions))
             LOG(VB_GENERAL, LOG_ERR, LOC + "Unrecognised cutpoint action");
-        else
-            m_editMode = m_player->GetEditMode();
     }
     ReturnOSDLock();
     return res;
@@ -8116,7 +8106,7 @@ void TV::StartProgramEditMode()
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
-        m_editMode = m_player->EnableEdit();
+        m_player->EnableEdit();
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
@@ -8156,8 +8146,8 @@ void TV::HandleOSDAlreadyEditing(const QString& Action, bool WasPaused)
         if (m_player)
         {
             m_playerContext.m_playingInfo->SaveEditing(false);
-            m_editMode = m_player->EnableEdit();
-            if (!m_editMode && !WasPaused && paused)
+            m_player->EnableEdit();
+            if (!m_overlayState.m_editing && !WasPaused && paused)
                 DoTogglePause(false);
         }
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);

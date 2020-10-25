@@ -8,6 +8,13 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
 {
     Q_OBJECT
 
+  signals:
+    void OverlayStateChanged(MythOverlayState OverlayState);
+
+  public slots:
+    void BrowsingChanged(bool Browsing);
+    void EditingChanged(bool Editing);
+
   public:
     MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerOverlayUI() override = default;
@@ -29,10 +36,13 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
     virtual int64_t GetSecondsPlayed(bool HonorCutList, int Divisor = 1000);
     virtual int64_t GetTotalSeconds(bool HonorCutList, int Divisor = 1000) const;
 
+    bool   m_browsing { false };
+    bool   m_editing  { false };
+
   private:
     Q_DISABLE_COPY(MythPlayerOverlayUI)
 
-    QTimer  m_positionUpdateTimer;
+    QTimer m_positionUpdateTimer;
 };
 
 #endif

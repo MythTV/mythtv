@@ -18,3 +18,8 @@ void TVPlaybackState::AudioStateChanged(MythAudioState AudioState)
 {
     m_audioState = AudioState;
 }
+
+void TVPlaybackState::OverlayStateChanged(MythOverlayState OverlayState)
+{
+    m_overlayState = OverlayState;
+}

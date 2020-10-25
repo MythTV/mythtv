@@ -46,7 +46,7 @@ MythPlayerAudioUI::MythPlayerAudioUI(MythMainWindow* MainWindow, TV *Tv,
 
     // Setup
     MythPlayerAudioUI::SetupAudioOutput(Context->m_tsNormal);
-    MythPlayerAudioUI::AdjustAudioTimecodeOffset(0, gCoreContext->GetNumSetting("AudioSyncOffset", 0), false);
+    MythPlayerAudioUI::AdjustAudioTimecodeOffset(0, gCoreContext->GetNumSetting("AudioSyncOffset", 0));
 
     // Signal initial state
     emit MythPlayerAudioUI::AudioStateChanged(MythAudioState(&m_audio, m_tcWrap[TC_AUDIO]));
@@ -88,7 +88,7 @@ void MythPlayerAudioUI::ClearAudioGraph()
     m_audioGraph.Reset();
 }
 
-void MythPlayerAudioUI::ChangeVolume(bool Direction, int Volume, bool UpdateOSD)
+void MythPlayerAudioUI::ChangeVolume(bool Direction, int Volume)
 {
     uint oldvolume = m_audio.GetVolume();
 
@@ -97,7 +97,7 @@ void MythPlayerAudioUI::ChangeVolume(bool Direction, int Volume, bool UpdateOSD)
     else
         m_audio.SetVolume(Volume);
 
-    if (UpdateOSD)
+    if (!(m_browsing || m_editing))
     {
         uint volume = m_audio.GetVolume();
         UpdateOSDStatus(tr("Adjust Volume"), tr("Volume"), QString::number(volume),
@@ -168,7 +168,7 @@ void MythPlayerAudioUI::SetupAudioOutput(float TimeStretch)
     m_audio.SetStretchFactor(TimeStretch);
 }
 
-void MythPlayerAudioUI::AdjustAudioTimecodeOffset(int64_t Delta, int Value, bool UpdateOSD)
+void MythPlayerAudioUI::AdjustAudioTimecodeOffset(int64_t Delta, int Value)
 {
     int64_t oldwrap = m_tcWrap[TC_AUDIO];
 
@@ -178,9 +178,8 @@ void MythPlayerAudioUI::AdjustAudioTimecodeOffset(int64_t Delta, int Value, bool
         m_tcWrap[TC_AUDIO] += Delta;
 
     int64_t newwrap = m_tcWrap[TC_AUDIO];
-    if (UpdateOSD)
+    if (!(m_browsing || m_editing))
     {
-
         UpdateOSDStatus(tr("Adjust Audio Sync"), tr("Audio Sync"),
                         QString::number(newwrap), kOSDFunctionalType_AudioSyncAdjust,
                         "ms", (static_cast<int>(newwrap) / 2) + 500, kOSDTimeout_None);

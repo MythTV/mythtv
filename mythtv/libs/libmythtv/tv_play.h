@@ -179,10 +179,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
   signals:
     void PlaybackExiting(TV* Player);
-    void ChangeOSDPositionUpdates(bool Enable);
-    void ChangeOSDDebug();
-    void ChangeOSDText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);
-    void ChangeOSDDialog(MythOSDDialogData Data);
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
@@ -556,7 +552,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool              m_audiosyncAdjustment {false}; ///< True if audiosync is turned on
     bool              m_subtitleZoomAdjustment {false}; ///< True if subtitle zoom is turned on
     bool              m_subtitleDelayAdjustment {false}; ///< True if subtitle delay is turned on
-    bool              m_editMode {false};          ///< Are we in video editing mode
     bool              m_zoomMode {false};
     bool              m_sigMonMode {false};     ///< Are we in signal monitoring mode?
     bool              m_endOfRecording {false}; ///< !player->IsPlaying() && StateIsPlaying()

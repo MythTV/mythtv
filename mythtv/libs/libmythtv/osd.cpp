@@ -323,14 +323,18 @@ void OSD::LoadWindows()
         if (win->Create())
         {
             PositionWindow(win);
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +
-                QString("Loaded window %1").arg(window));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded window %1").arg(window));
             m_children.insert(window, win);
+
+            // Update player for window visibility
+            if (window == "browse_info")
+                connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::BrowsingChanged);
+            if (window == "osd_program_editor")
+                connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::EditingChanged);
         }
         else
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to load window %1")
-                .arg(window));
+            LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to load window %1").arg(window));
             delete win;
         }
     }

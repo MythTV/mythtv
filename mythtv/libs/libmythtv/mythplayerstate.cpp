@@ -1,5 +1,6 @@
 // MythTV
 #include "audioplayer.h"
+#include "osd.h"
 #include "mythplayerstate.h"
 
 /*! \class MythAudioState
@@ -15,6 +16,15 @@ MythAudioState::MythAudioState(AudioPlayer* Player, int64_t Offset)
     m_isUpmixing(Player->IsUpmixing()),
     m_paused(Player->IsPaused()),
     m_audioOffset(Offset)
+{
+}
+
+/*! \class MythOverlayState
+ * \brief A simpler than simple wrapper around OSD state.
+*/
+MythOverlayState::MythOverlayState(bool Browsing, bool Editing)
+  : m_browsing(Browsing),
+    m_editing(Editing)
 {
 }
 

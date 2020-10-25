@@ -936,7 +936,7 @@ QString MythPlayerUI::DeleteMapGetRedoMessage()
     return m_deleteMap.GetRedoMessage();
 }
 
-bool MythPlayerUI::EnableEdit()
+void MythPlayerUI::EnableEdit()
 {
     m_deleteMap.SetEditing(false);
 
@@ -944,15 +944,15 @@ bool MythPlayerUI::EnableEdit()
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot edit - no full position map");
         SetOSDStatus(tr("No Seektable"), kOSDTimeout_Med);
-        return false;
+        return;
     }
 
     if (m_deleteMap.IsFileEditing())
-        return false;
+        return;
 
     QMutexLocker locker(&m_osdLock);
     if (!m_osd)
-        return false;
+        return;
 
     SetupAudioGraph(m_videoFrameRate);
 
@@ -978,8 +978,6 @@ bool MythPlayerUI::EnableEdit()
         m_playerCtx->m_playingInfo->SaveEditing(true);
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
     m_editUpdateTimer.start();
-
-    return m_deleteMap.IsEditing();
 }
 
 /*! \brief Leave cutlist edit mode, saving work in 1 of 3 ways.

@@ -6,6 +6,7 @@
 #include "volumebase.h"
 #include "videoouttypes.h"
 
+class OSD;
 class AudioPlayer;
 
 class MTV_PUBLIC MythAudioState
@@ -22,6 +23,16 @@ class MTV_PUBLIC MythAudioState
     bool m_isUpmixing     { false };
     bool m_paused         { false };
     int64_t m_audioOffset { 0     };
+};
+
+class MTV_PUBLIC MythOverlayState
+{
+  public:
+    MythOverlayState() = default;
+    MythOverlayState(bool Browsing, bool Editing);
+
+    bool m_browsing { false };
+    bool m_editing  { false };
 };
 
 #endif
