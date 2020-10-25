@@ -63,7 +63,6 @@ MythTVMenuItemContext::MythTVMenuItemContext(const MythTVMenu& Menu, const QDomN
                                              QString Action, QString ActionText, bool Display)
   : m_menu(Menu),
     m_node(Node),
-    m_category(kMenuCategoryItem),
     m_showContext(Context),
     m_currentContext(Current),
     m_action(std::move(Action)),
