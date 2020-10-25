@@ -125,7 +125,6 @@
 #define fe_sd_notify(x)
 #endif
 
-static ExitPrompter   *g_exitPopup = nullptr;
 static MythThemedMenu *g_menu;
 
 static MediaRenderer  *g_pUPnp   = nullptr;
@@ -280,9 +279,6 @@ namespace
         MythRAOPDevice::Cleanup();
         MythAirplayServer::Cleanup();
 #endif
-
-        delete g_exitPopup;
-        g_exitPopup = nullptr;
 
         AudioOutput::Cleanup();
 
@@ -1201,12 +1197,13 @@ static void handleExit(bool prompt)
 {
     if (prompt)
     {
-        if (!g_exitPopup)
-            g_exitPopup = new ExitPrompter();
-        g_exitPopup->HandleExit();
+        auto * prompter = new ExitPrompter();
+        prompter->HandleExit();
     }
     else
+    {
         QCoreApplication::quit();
+    }
 }
 
 static bool RunMenu(const QString& themedir, const QString& themename)

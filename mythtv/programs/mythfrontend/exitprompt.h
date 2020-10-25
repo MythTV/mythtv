@@ -10,19 +10,23 @@ class ExitPrompter : public QObject
    ~ExitPrompter() override;
 
   public slots:
-    static void DoQuit(void);
+    void HandleExit();
+
+  protected slots:
+    void DoQuit();
     void DoHalt(bool Confirmed = true);
     void DoReboot(bool Confirmed = true);
-    static void DoStandby(void);
+    void DoStandby();
     void DoSuspend(bool Confirmed = true);
-    void HandleExit(void);
-    void ConfirmHalt(void) const;
-    void ConfirmReboot(void) const;
-    void ConfirmSuspend(void) const;
-    void Confirm(MythPower::Feature Action) const;
+    void ConfirmHalt();
+    void ConfirmReboot();
+    void ConfirmSuspend();
+    void Confirm(MythPower::Feature Action);
+    void MainDialogClosed(QString /*unused*/, int Id);
 
   private:
     MythPower* m_power { nullptr };
+    bool       m_confirm { true };
     QString    m_haltCommand;
     QString    m_rebootCommand;
     QString    m_suspendCommand;
