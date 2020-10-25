@@ -568,7 +568,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     QMap<QString,AskProgramInfo> m_askAllowPrograms;
     QMutex                       m_askAllowLock {QMutex::Recursive};
 
-    MythDeque<QString>        m_changePxP;
     QMutex                    m_progListsLock;
     QMap<QString,ProgramList> m_progLists;
 
