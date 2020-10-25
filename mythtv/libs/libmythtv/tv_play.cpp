@@ -3075,24 +3075,27 @@ bool TV::event(QEvent* Event)
         return false;
     }
 
-    if (QEvent::KeyPress == Event->type() ||
-        MythGestureEvent::kEventType == Event->type())
+    if (QEvent::KeyPress == Event->type() || MythGestureEvent::kEventType == Event->type())
     {
 #if DEBUG_ACTIONS
-        if (QEvent::KeyPress == e->type())
+        if (QEvent::KeyPress == Event->type())
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("keypress: %1 '%2'")
-                    .arg(((QKeyEvent*)e)->key())
-                    .arg(((QKeyEvent*)e)->text()));
+            const auto * ke = dynamic_cast<QKeyEvent*>(Event);
+            if (ke)
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("keypress: %1 '%2'")
+                    .arg(ke->key()).arg(ke->text()));
+            }
         }
         else
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("mythgesture: g:%1 pos:%2,%3 b:%4")
-                    .arg(((MythGestureEvent*)e)->gesture())
-                    .arg(((MythGestureEvent*)e)->GetPosition().x())
-                    .arg(((MythGestureEvent*)e)->GetPosition().y())
-                    .arg(((MythGestureEvent*)e)->GetButton())
-                    );
+            const auto * ge = dynamic_cast<MythGestureEvent*>(Event);
+            if (ge)
+            {
+                LOG(VB_GENERAL, LOG_INFO, LOC + QString("mythgesture: g:%1 pos:%2,%3 b:%4")
+                    .arg(ge->GetGesture()).arg(ge->GetPosition().x())
+                    .arg(ge->GetPosition().y()).arg(ge->GetButton()));
+            }
         }
 #endif
         bool handled = false;
