@@ -8,10 +8,19 @@
 MythPlayerVisualiserUI::MythPlayerVisualiserUI(MythMainWindow *MainWindow, TV *Tv,
                                            PlayerContext *Context, PlayerFlags Flags)
   : MythPlayerVideoUI(MainWindow, Tv, Context, Flags)
-{
-    m_uiScreenRect = m_mainWindow->GetUIScreenRect();
+{   
+    // Connect signals and slots
+    connect(&m_audio, &AudioPlayer::AudioPlayerStateChanged, this, &MythPlayerVisualiserUI::AudioPlayerStateChanged);
     connect(m_mainWindow, &MythMainWindow::UIScreenRectChanged, this, &MythPlayerVisualiserUI::UIScreenRectChanged);
+    connect(m_tv, &TV::EnableVisualiser, this, &MythPlayerVisualiserUI::EnableVisualiser);
     connect(m_tv, &TV::EmbedPlayback, this, &MythPlayerVisualiserUI::EmbedVisualiser);
+    connect(this, &MythPlayerVisualiserUI::VisualiserStateChanged, m_tv, &TV::VisualiserStateChanged);
+
+    // Set initial state and update player
+    m_defaultVisualiser = gCoreContext->GetSetting("AudioVisualiser", "");
+    m_uiScreenRect = m_mainWindow->GetUIScreenRect();
+    m_visualiserState.m_visualiserList = VideoVisual::GetVisualiserList(m_render->Type());
+    emit VisualiserStateChanged(m_visualiserState);
 }
 
 MythPlayerVisualiserUI::~MythPlayerVisualiserUI()
@@ -19,9 +28,83 @@ MythPlayerVisualiserUI::~MythPlayerVisualiserUI()
     MythPlayerVisualiserUI::DestroyVisualiser();
 }
 
+void MythPlayerVisualiserUI::AudioPlayerStateChanged(MythAudioPlayerState State)
+{
+    m_visualiserState.m_canVisualise = State.m_channels == 1 || State.m_channels == 2;
+    emit VisualiserStateChanged(m_visualiserState);
+}
+
 void MythPlayerVisualiserUI::UIScreenRectChanged(const QRect& Rect)
 {
     m_uiScreenRect = Rect;
+}
+
+void MythPlayerVisualiserUI::DestroyVisualiser()
+{
+    delete m_visual;
+    m_visual = nullptr;
+    m_visualiserState.m_visualiserName = QString();
+    m_visualiserState.m_visualising = false;
+}
+
+void MythPlayerVisualiserUI::EnableVisualiser(bool Enable, bool Toggle, const QString &Name)
+{
+    bool osd = true;
+    QString visualiser = Name;
+    if (visualiser.startsWith("_AUTO_"))
+    {
+        visualiser = visualiser.mid(6);
+        osd = false;
+    }
+
+    bool want = Enable || !visualiser.isEmpty();
+    if (Toggle)
+        want = !m_visualiserState.m_visualising;
+
+    if (!want || !m_visualiserState.m_canVisualise)
+    {
+        DestroyVisualiser();
+    }
+    else if (m_visualiserState.m_canVisualise)
+    {
+        if (visualiser.isEmpty())
+            visualiser = m_defaultVisualiser;
+
+        if (m_visualiserState.m_visualiserName != visualiser)
+        {
+            DestroyVisualiser();
+            m_visual = VideoVisual::Create(visualiser, &m_audio, m_render);
+            if (m_visual)
+            {
+                m_visualiserState.m_visualiserName = m_visual->Name();
+                m_visualiserState.m_visualising = true;
+            }
+        }
+    }
+
+    if (osd)
+        UpdateOSDMessage(m_visual ? m_visualiserState.m_visualiserName : tr("Visualisation Off"));
+    emit VisualiserStateChanged(m_visualiserState);
+}
+
+/*! \brief Enable visualisation if possible, there is no video and user has requested.
+*/
+void MythPlayerVisualiserUI::AutoVisualise(bool HaveVideo)
+{
+    if (HaveVideo || !m_audio.HasAudioIn() || m_defaultVisualiser.isEmpty())
+        return;
+
+    if (!m_visualiserState.m_canVisualise || m_visualiserState.m_visualising)
+        return;
+
+    EnableVisualiser(true, false, "_AUTO_" + m_defaultVisualiser);
+}
+
+void MythPlayerVisualiserUI::EmbedVisualiser(bool Embed, const QRect &Rect)
+{
+    m_embedRect = Rect;
+    m_visualiserState.m_embedding = Embed;
+    emit VisualiserStateChanged(m_visualiserState);
 }
 
 void MythPlayerVisualiserUI::PrepareVisualiser()
@@ -32,7 +115,7 @@ void MythPlayerVisualiserUI::PrepareVisualiser()
     if (!m_visual)
         return;
     if (m_visual->NeedsPrepare())
-        m_visual->Prepare(m_embedding ? m_embedRect : m_uiScreenRect);
+        m_visual->Prepare(m_visualiserState.m_embedding ? m_embedRect : m_uiScreenRect);
 }
 
 void MythPlayerVisualiserUI::RenderVisualiser()
@@ -40,71 +123,5 @@ void MythPlayerVisualiserUI::RenderVisualiser()
     // As for PrepareVisualiser - always call the visualiser if it is present
     if (!m_visual)
         return;
-    m_visual->Draw(m_embedding ? m_embedRect : m_uiScreenRect, m_painter, nullptr);
-}
-
-void MythPlayerVisualiserUI::DestroyVisualiser()
-{
-    delete m_visual;
-    m_visual = nullptr;
-}
-
-bool MythPlayerVisualiserUI::CanVisualise()
-{
-    return VideoVisual::CanVisualise(&m_audio, m_render);
-}
-
-bool MythPlayerVisualiserUI::IsVisualising()
-{
-    return m_visual != nullptr;
-}
-
-QString MythPlayerVisualiserUI::GetVisualiserName()
-{
-    if (m_visual)
-        return m_visual->Name();
-    return QString();
-}
-
-QStringList MythPlayerVisualiserUI::GetVisualiserList()
-{
-    return VideoVisual::GetVisualiserList(m_render->Type());
-}
-
-bool MythPlayerVisualiserUI::EnableVisualiser(bool Enable, const QString &Name)
-{
-    if (!Enable)
-    {
-        DestroyVisualiser();
-        return false;
-    }
-    DestroyVisualiser();
-    m_visual = VideoVisual::Create(Name, &m_audio, m_render);
-    return m_visual != nullptr;
-}
-
-/*! \brief Enable visualisation if possible, there is no video and user has requested.
-*/
-void MythPlayerVisualiserUI::AutoVisualise(bool HaveVideo)
-{
-    if (!m_audio.HasAudioIn() || HaveVideo)
-        return;
-
-    if (!CanVisualise() || IsVisualising())
-        return;
-
-    auto visualiser = gCoreContext->GetSetting("AudioVisualiser", "");
-    if (!visualiser.isEmpty())
-        EnableVisualiser(true, visualiser);
-}
-
-void MythPlayerVisualiserUI::EmbedVisualiser(bool Embed, const QRect &Rect)
-{
-    m_embedRect = Rect;
-    m_embedding = Embed;
-}
-
-bool MythPlayerVisualiserUI::IsEmbedding() const
-{
-    return m_embedding;
+    m_visual->Draw(m_visualiserState.m_embedding ? m_embedRect : m_uiScreenRect, m_painter, nullptr);
 }

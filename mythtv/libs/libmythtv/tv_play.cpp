@@ -2922,7 +2922,7 @@ void TV::HandleEndOfRecordingExitPromptTimerEvent()
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     bool do_prompt = (m_playerContext.GetState() == kState_WatchingPreRecorded &&
-                      m_player && !m_player->IsEmbedding() &&
+                      m_player && !m_visualiserState.m_embedding &&
                       !m_player->IsPlaying());
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -4127,11 +4127,11 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     else if (IsActionable(ACTION_TOGGLESUBTITLEDELAY, Actions))
         ChangeSubtitleDelay(0);   // just display
     else if (IsActionable(ACTION_TOGGLEVISUALISATION, Actions))
-        EnableVisualisation(false, true);
+        emit EnableVisualiser(false, true);
     else if (IsActionable(ACTION_ENABLEVISUALISATION, Actions))
-        EnableVisualisation(true);
+        emit EnableVisualiser(true);
     else if (IsActionable(ACTION_DISABLEVISUALISATION, Actions))
-        EnableVisualisation(false);
+        emit EnableVisualiser(false);
     else if (IsActionable("TOGGLEPICCONTROLS", Actions))
         DoTogglePictureAttribute(kAdjustingPicture_Playback);
     else if (IsActionable("TOGGLESTRETCH", Actions))
@@ -4174,26 +4174,6 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     }
 
     return handled;
-}
-
-void TV::EnableVisualisation(bool Enable, bool Toggle, const QString &Action)
-{
-    QString visualiser = QString("");
-    if (Action.startsWith("VISUALISER"))
-        visualiser = Action.mid(11);
-
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player && m_player->CanVisualise())
-    {
-        bool want = Enable || !visualiser.isEmpty();
-        if (Toggle)
-            want = !m_player->IsVisualising();
-        if (want && visualiser.isEmpty())
-            visualiser = gCoreContext->GetSetting("AudioVisualiser", "");
-        bool on = m_player->EnableVisualiser(want, visualiser);
-        SetOSDMessage(on ? m_player->GetVisualiserName() : tr("Visualisation Off"));
-    }
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
 void TV::SetBookmark(bool Clear)
@@ -8425,11 +8405,11 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action == ACTION_TOGGLESUBTITLEDELAY)
         ChangeSubtitleDelay(0);
     else if (Action == ACTION_TOGGLEVISUALISATION)
-        EnableVisualisation(false, true /*toggle*/);
+        emit EnableVisualiser(false, true);
     else if (Action == ACTION_ENABLEVISUALISATION)
-        EnableVisualisation(true);
+        emit EnableVisualiser(true);
     else if (Action == ACTION_DISABLEVISUALISATION)
-        EnableVisualisation(false);
+        emit EnableVisualiser(false);
     else if (Action.startsWith(ACTION_TOGGLESLEEP))
         ToggleSleepTimer(Action.left(13));
     else if (Action.startsWith("TOGGLEPICCONTROLS"))
@@ -8524,7 +8504,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action == ACTION_VIEWSCHEDULED)
         EditSchedule(kViewSchedule);
     else if (Action.startsWith("VISUALISER"))
-        EnableVisualisation(true, false, Action);
+        emit EnableVisualiser(true, false, Action.mid(11));
     else if (Action.startsWith("3D"))
         emit ChangeStereoOverride(ActionToStereoscopic(Action));
     else if (HandleJumpToProgramAction(QStringList(Action)))
@@ -8854,13 +8834,13 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context)
     }
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     QString prefix;
-    if (MythTVMenu::MatchesGroup(actionName, "VISUALISER_", category, prefix))
+    if (MythTVMenu::MatchesGroup(actionName, "VISUALISER_", category, prefix) &&
+        m_visualiserState.m_canVisualise)
     {
-        for (int i = 0; i < m_tvmVisualisers.size(); i++)
+        for (auto & visualiser : m_visualiserState.m_visualiserList)
         {
-            QString action = prefix + m_tvmVisualisers[i];
-            active = (m_tvmActive == m_tvmVisualisers[i]);
-            BUTTON(action, m_tvmVisualisers[i]);
+            active = m_visualiserState.m_visualiserName == visualiser;
+            BUTTON(prefix + visualiser, visualiser);
         }
     }
     else if (MythTVMenu::MatchesGroup(actionName, "TOGGLEASPECT", category, prefix))
@@ -9116,10 +9096,9 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context)
         {
             BUTTON(actionName, tr("Adjust Audio Sync"));
         }
-        else if (actionName == "DISABLEVISUALISATION")
+        else if (m_visualiserState.m_canVisualise && (actionName == "DISABLEVISUALISATION"))
         {
-            if (m_tvmVisual)
-                BUTTON(actionName, tr("None"));
+            BUTTON(actionName, tr("None"));
         }
         else if (actionName == "DISABLEUPMIX")
         {
@@ -9402,8 +9381,6 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         return;
 
     m_tvmAvsync   = true;
-    m_tvmVisual   = false;
-    m_tvmActive   = "";
     m_tvmUpmixing = false;
     m_tvmCanUpmix = false;
 
@@ -9477,8 +9454,6 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
             !m_tvmTracks[kTrackTypeRawText].empty();
         m_tvmAvsync = (m_player->GetTrackCount(kTrackTypeVideo) > 0) &&
             !m_tvmTracks[kTrackTypeAudio].empty();
-        m_tvmVisual           = m_player->CanVisualise();
-        m_tvmActive           = m_player->GetVisualiserName();
         m_tvmUpmixing         = m_audioState.m_isUpmixing;
         m_tvmCanUpmix         = m_audioState.m_canUpmix;
         m_tvmAspectOverride   = m_player->GetAspectOverride();
@@ -9489,8 +9464,6 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         m_tvmSubsEnabled      = m_player->GetCaptionsEnabled();
         m_tvmSubsHaveText     = m_player->HasTextSubtitles();
         m_tvmSubsForcedOn     = m_player->GetAllowForcedSubtitles();
-        if (m_tvmVisual)
-            m_tvmVisualisers = m_player->GetVisualiserList();
         MythVideoOutput *vo = m_player->GetVideoOutput();
         if (vo)
         {

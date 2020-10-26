@@ -40,7 +40,6 @@ class VisualNode
 class MTV_PUBLIC VideoVisual : public MythTV::Visual
 {
   public:
-    static bool CanVisualise(AudioPlayer *audio, MythRender *render);
     static VideoVisual* Create(const QString &name,
                                AudioPlayer *audio, MythRender *render);
     static QStringList GetVisualiserList(RenderType type);

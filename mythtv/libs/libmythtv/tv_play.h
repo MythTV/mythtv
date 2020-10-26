@@ -443,7 +443,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Sundry on screen
     void ITVRestart(bool IsLive);
-    void EnableVisualisation(bool Enable, bool Toggle = false, const QString &Action = QString(""));
 
     // Manual zoom mode
     void SetManualZoom(bool ZoomON, const QString& Desc);
@@ -701,11 +700,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Audio
     bool    m_tvmAvsync {true};
-    bool    m_tvmVisual {false};
-    QString m_tvmActive;
     bool    m_tvmUpmixing {false};
     bool    m_tvmCanUpmix {false};
-    QStringList m_tvmVisualisers;
 
     // Video
     AspectOverrideMode m_tvmAspectOverride    {kAspect_Off};
@@ -713,8 +709,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool             m_tvmFillAutoDetect      {false};
     uint             m_tvmSup                 {kPictureAttributeSupported_None};
     StereoscopicMode m_tvmStereoMode          {kStereoscopicModeAuto};
-    QStringList      m_tvmDeinterlacers       {};
-    QString          m_tvmCurrentDeinterlacer {};
 
     // Playback
     int          m_tvmSpeedX100         {100};

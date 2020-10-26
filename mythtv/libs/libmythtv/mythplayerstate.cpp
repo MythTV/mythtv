@@ -28,3 +28,11 @@ MythOverlayState::MythOverlayState(bool Browsing, bool Editing)
 {
 }
 
+MythVisualiserState::MythVisualiserState(bool Embedding, bool Visualising,
+                                         QString Name, const QStringList& Visualisers)
+  : m_embedding(Embedding),
+    m_visualising(Visualising),
+    m_visualiserName(Name),
+    m_visualiserList(Visualisers)
+{
+}

@@ -43,30 +43,31 @@ MythPlayerAudioUI::MythPlayerAudioUI(MythMainWindow* MainWindow, TV *Tv,
 
     // Connect outgoing signals
     connect(this, &MythPlayerAudioUI::AudioStateChanged, m_tv, &TV::AudioStateChanged);
+    connect(&m_audio, &AudioPlayer::AudioPlayerStateChanged, m_tv, &TV::AudioPlayerStateChanged);
 
     // Setup
     MythPlayerAudioUI::SetupAudioOutput(Context->m_tsNormal);
     MythPlayerAudioUI::AdjustAudioTimecodeOffset(0, gCoreContext->GetNumSetting("AudioSyncOffset", 0));
 
     // Signal initial state
-    emit MythPlayerAudioUI::AudioStateChanged(MythAudioState(&m_audio, m_tcWrap[TC_AUDIO]));
+    emit MythPlayerAudioUI::AudioStateChanged({ &m_audio, m_tcWrap[TC_AUDIO] });
 }
 
 MythAudioState MythPlayerAudioUI::GetAudioState()
 {
-    return MythAudioState(&m_audio, m_tcWrap[TC_AUDIO]);
+    return { &m_audio, m_tcWrap[TC_AUDIO] };
 }
 
 void MythPlayerAudioUI::ResetAudio()
 {
     m_audio.Reset();
-    emit AudioStateChanged(MythAudioState(&m_audio, m_tcWrap[TC_AUDIO]));
+    emit AudioStateChanged({ &m_audio, m_tcWrap[TC_AUDIO] });
 }
 
 void MythPlayerAudioUI::ReinitAudio()
 {
     (void)m_audio.ReinitAudio();
-    emit AudioStateChanged(MythAudioState(&m_audio, m_tcWrap[TC_AUDIO]));
+    emit AudioStateChanged({ &m_audio, m_tcWrap[TC_AUDIO] });
 }
 
 const AudioOutputGraph& MythPlayerAudioUI::GetAudioGraph() const
@@ -107,7 +108,7 @@ void MythPlayerAudioUI::ChangeVolume(bool Direction, int Volume)
     }
 
     if (m_audio.GetVolume() != oldvolume)
-        emit AudioStateChanged(MythAudioState(&m_audio, m_tcWrap[TC_AUDIO]));
+        emit AudioStateChanged({ &m_audio, m_tcWrap[TC_AUDIO] });
 }
 
 void MythPlayerAudioUI::ChangeMuteState(bool CycleChannels)
@@ -135,7 +136,7 @@ void MythPlayerAudioUI::ChangeMuteState(bool CycleChannels)
     UpdateOSDMessage(text);
 
     if (m_audio.GetMuteState() != oldstate)
-        emit AudioStateChanged(MythAudioState(&m_audio, m_tcWrap[TC_AUDIO]));
+        emit AudioStateChanged({ &m_audio, m_tcWrap[TC_AUDIO] });
 }
 
 void MythPlayerAudioUI::EnableUpmix(bool Enable, bool Toggle)
@@ -151,7 +152,7 @@ void MythPlayerAudioUI::EnableUpmix(bool Enable, bool Toggle)
     UpdateOSDMessage(newupmixing ? tr("Upmixer On") : tr("Upmixer Off"));
 
     if (newupmixing != oldupmixing)
-        emit AudioStateChanged(MythAudioState(&m_audio, m_tcWrap[TC_AUDIO]));
+        emit AudioStateChanged({ &m_audio, m_tcWrap[TC_AUDIO] });
 }
 
 void MythPlayerAudioUI::PauseAudioUntilBuffered()
@@ -187,6 +188,6 @@ void MythPlayerAudioUI::AdjustAudioTimecodeOffset(int64_t Delta, int Value)
     }
 
     if (newwrap != oldwrap)
-        emit AudioStateChanged(MythAudioState(&m_audio, newwrap));
+        emit AudioStateChanged({ &m_audio, newwrap });
 }
 

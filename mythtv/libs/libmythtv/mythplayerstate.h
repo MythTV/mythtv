@@ -5,9 +5,29 @@
 #include "mythtvexp.h"
 #include "volumebase.h"
 #include "videoouttypes.h"
+#include "audiooutputsettings.h"
+
+// FFmpeg
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
 
 class OSD;
 class AudioPlayer;
+
+class MTV_PUBLIC MythAudioPlayerState
+{
+  public:
+    MythAudioPlayerState() = default;
+
+    int          m_channels     { -1 };
+    int          m_origChannels { -1 };
+    AVCodecID    m_codec        { AV_CODEC_ID_NONE };
+    AudioFormat  m_format       { FORMAT_NONE };
+    int          m_sampleRate   { 44100 };
+    int          m_codecProfile { 0 };
+    bool         m_passthru     { false };
+};
 
 class MTV_PUBLIC MythAudioState
 {
@@ -33,6 +53,20 @@ class MTV_PUBLIC MythOverlayState
 
     bool m_browsing { false };
     bool m_editing  { false };
+};
+
+class MTV_PUBLIC MythVisualiserState
+{
+  public:
+    MythVisualiserState() = default;
+    MythVisualiserState(bool Embedding, bool Visualising, QString Name,
+                        const QStringList& Visualisers);
+
+    bool        m_canVisualise   { false };
+    bool        m_embedding      { false };
+    bool        m_visualising    { false };
+    QString     m_visualiserName { };
+    QStringList m_visualiserList { };
 };
 
 #endif

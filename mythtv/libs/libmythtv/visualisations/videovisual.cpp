@@ -4,13 +4,6 @@
 
 VideoVisualFactory* VideoVisualFactory::g_videoVisualFactory = nullptr;
 
-bool VideoVisual::CanVisualise(AudioPlayer *audio, MythRender *render)
-{
-    if (!audio)
-        return false;
-    return render && (audio->GetNumChannels() == 2 || audio->GetNumChannels() == 1);
-}
-
 QStringList VideoVisual::GetVisualiserList(RenderType type)
 {
     QStringList result;

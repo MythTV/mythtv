@@ -9,31 +9,32 @@ class MTV_PUBLIC MythPlayerVisualiserUI : public MythPlayerVideoUI
 {
     Q_OBJECT
 
-  public slots:
+  signals:
+    void        VisualiserStateChanged(MythVisualiserState VisualiserState);
+
+  protected slots:
     void        UIScreenRectChanged(const QRect& Rect);
     void        EmbedVisualiser(bool Embed, const QRect& Rect = {});
+    void        EnableVisualiser(bool Enable, bool Toggle, const QString& Name);
+    void        AudioPlayerStateChanged(MythAudioPlayerState State);
 
   public:
     MythPlayerVisualiserUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerVisualiserUI() override;
 
+  protected:
     void        PrepareVisualiser();
     void        RenderVisualiser();
-    bool        CanVisualise();
-    bool        IsVisualising();
-    QString     GetVisualiserName();
-    QStringList GetVisualiserList();
-    bool        EnableVisualiser(bool Enable, const QString& Name = QString(""));
     void        AutoVisualise(bool HaveVideo);
-    bool        IsEmbedding() const;
 
   private:
     void        DestroyVisualiser();
 
+    QString      m_defaultVisualiser { };
+    MythVisualiserState m_visualiserState { };
     VideoVisual* m_visual      { nullptr };
     QRect        m_uiScreenRect{ };
     QRect        m_embedRect   { };
-    bool         m_embedding   { false   };
 };
 
 #endif

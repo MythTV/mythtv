@@ -39,13 +39,20 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeOSDText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);
     void ChangeOSDDialog(MythOSDDialogData Data);
 
+    // Visualiser
+    void EnableVisualiser(bool Enable, bool Toggle = false, const QString& Name = QString());
+
   public slots:
+    void AudioPlayerStateChanged(MythAudioPlayerState AudioPlayerState);
     void AudioStateChanged(MythAudioState AudioState);
     void OverlayStateChanged(MythOverlayState OverlayState);
+    void VisualiserStateChanged(MythVisualiserState VisualiserState);
 
   protected:
-    MythAudioState   m_audioState   { };
-    MythOverlayState m_overlayState { };
+    MythAudioPlayerState m_audioPlayerState { };
+    MythAudioState       m_audioState       { };
+    MythOverlayState     m_overlayState     { };
+    MythVisualiserState  m_visualiserState  { };
 };
 
 #endif
