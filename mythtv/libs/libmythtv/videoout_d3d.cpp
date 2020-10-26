@@ -495,8 +495,6 @@ void VideoOutputD3D::PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayer
     if (frame)
         dummy = frame->m_dummy;
 
-    bool safepauseframe = pauseframe && !gpu;
-
     if (!m_window.IsEmbedding())
         ShowPIPs(pipPlayers);
 
