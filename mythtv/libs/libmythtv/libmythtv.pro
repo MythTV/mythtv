@@ -455,6 +455,7 @@ using_frontend {
     HEADERS += captions/teletextscreen.h
     HEADERS += captions/subtitlescreen.h
     HEADERS += overlays/mythnavigationoverlay.h
+    HEADERS += overlays/mythchanneloverlay.h
     HEADERS += mheg/interactivescreen.h
     SOURCES += osd.cpp
     SOURCES += mythmediaoverlay.cpp
@@ -462,6 +463,7 @@ using_frontend {
     SOURCES += captions/teletextscreen.cpp
     SOURCES += captions/subtitlescreen.cpp
     SOURCES += overlays/mythnavigationoverlay.cpp
+    SOURCES += overlays/mythchanneloverlay.cpp
     SOURCES += mheg/interactivescreen.cpp
 
     # Video output

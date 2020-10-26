@@ -19,126 +19,13 @@
 
 // libmythtv
 #include "overlays/mythnavigationoverlay.h"
+#include "overlays/mythchanneloverlay.h"
 #include "channelutil.h"
 #include "osd.h"
 #include "tv_play.h"
 #include "mythplayerui.h"
 
 #define LOC     QString("OSD: ")
-
-ChannelEditor::ChannelEditor(MythMainWindow* MainWindow, TV* Tv, const QString& Name)
-  : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
-    m_mainWindow(MainWindow),
-    m_tv(Tv)
-{
-}
-
-bool ChannelEditor::Create()
-{
-    if (!XMLParseBase::LoadWindowFromXML("osd.xml", "ChannelEditor", this))
-        return false;
-
-    MythUIButton *probeButton = nullptr;
-    MythUIButton *okButton    = nullptr;
-
-    bool err = false;
-    UIUtilE::Assign(this, m_callsignEdit, "callsign", &err);
-    UIUtilE::Assign(this, m_channumEdit,  "channum",  &err);
-    UIUtilE::Assign(this, m_channameEdit, "channame", &err);
-    UIUtilE::Assign(this, m_xmltvidEdit,  "XMLTV",    &err);
-    UIUtilE::Assign(this, probeButton,    "probe",    &err);
-    UIUtilE::Assign(this, okButton,       "ok",       &err);
-
-    if (err)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Cannot load screen 'ChannelEditor'");
-        return false;
-    }
-
-    BuildFocusList();
-    connect(okButton,    &MythUIButton::Clicked, this, &ChannelEditor::Confirm);
-    connect(probeButton, &MythUIButton::Clicked, this, &ChannelEditor::Probe);
-    SetFocusWidget(okButton);
-
-    return true;
-}
-
-void ChannelEditor::Confirm()
-{
-    SendResult(1);
-}
-
-void ChannelEditor::Probe()
-{
-    SendResult(2);
-}
-
-void ChannelEditor::SetText(const InfoMap &Map)
-{
-    if (Map.contains("callsign"))
-        m_callsignEdit->SetText(Map.value("callsign"));
-    if (Map.contains("channum"))
-        m_channumEdit->SetText(Map.value("channum"));
-    if (Map.contains("channame"))
-        m_channameEdit->SetText(Map.value("channame"));
-    if (Map.contains("XMLTV"))
-        m_xmltvidEdit->SetText(Map.value("XMLTV"));
-}
-
-void ChannelEditor::GetText(InfoMap &Map)
-{
-    Map["callsign"] = m_callsignEdit->GetText();
-    Map["channum"]  = m_channumEdit->GetText();
-    Map["channame"] = m_channameEdit->GetText();
-    Map["XMLTV"]    = m_xmltvidEdit->GetText();
-}
-
-bool ChannelEditor::keyPressEvent(QKeyEvent *Event)
-{
-    if (GetFocusWidget()->keyPressEvent(Event))
-        return true;
-
-    QStringList actions;
-    bool handled = m_mainWindow->TranslateKeyPress("qt", Event, actions);
-
-    for (int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-        if (action == "ESCAPE" )
-        {
-            SendResult(3);
-            handled = true;
-        }
-    }
-
-    if (!handled && MythScreenType::keyPressEvent(Event))
-        handled = true;
-
-    return handled;
-}
-
-void ChannelEditor::SendResult(int result)
-{
-    if (!m_tv)
-        return;
-
-    QString  message = "";
-    switch (result)
-    {
-        case 1:
-            message = "DIALOG_EDITOR_OK_0";
-            break;
-        case 2:
-            message = "DIALOG_EDITOR_PROBE_0";
-            break;
-        case 3:
-            message = "DIALOG_EDITOR_QUIT_0";
-            break;
-    }
-
-    auto *dce = new DialogCompletionEvent("", result, "", message);
-    QCoreApplication::postEvent(m_tv, dce);
-}
 
 OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* Painter)
   : MythCaptionsOverlay(MainWindow, Tv, Player, Painter)
@@ -454,7 +341,7 @@ void OSD::SetText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout)
 
     if (win == m_dialog)
     {
-        auto *edit = qobject_cast<ChannelEditor*>(m_dialog);
+        auto *edit = qobject_cast<MythChannelOverlay*>(m_dialog);
         if (edit)
             edit->SetText(Map);
         else
@@ -853,7 +740,7 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
         MythScreenType *dialog = nullptr;
 
         if (Window == OSD_DLG_EDITOR)
-            dialog = new ChannelEditor(m_mainWindow, m_tv, Window.toLatin1());
+            dialog = new MythChannelOverlay(m_mainWindow, m_tv, Window.toLatin1());
         else if (Window == OSD_DLG_CONFIRM)
             dialog = new MythConfirmationDialog(nullptr, Text, false);
         else if (Window == OSD_DLG_NAVIGATE)
@@ -919,7 +806,7 @@ void OSD::DialogAddButton(const QString& Text, QVariant Data, bool Menu, bool Cu
 
 void OSD::DialogGetText(InfoMap &Map)
 {
-    auto *edit = qobject_cast<ChannelEditor*>(m_dialog);
+    auto *edit = qobject_cast<MythChannelOverlay*>(m_dialog);
     if (edit)
         edit->GetText(Map);
 }
