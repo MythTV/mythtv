@@ -430,9 +430,6 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 			if ((!curGState->m_drawIfs) && (s_ifsIncr>0) && (s_decayIfs<=0))
 				s_decayIfs = 100;
 
-			if (!curGState->m_drawScope)
-				s_stopLines = 0xf000 & 5;
-			
 			if (!curGState->m_drawScope) {
 				s_stopLines = 0;
 				s_lineMode = DRAWLINES;
