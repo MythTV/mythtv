@@ -449,10 +449,14 @@ using_frontend {
 
     # On screen display (video output overlay)
     HEADERS += osd.h
+    HEADERS += mythmediaoverlay.h
+    HEADERS += mythcaptionsoverlay.h
     HEADERS += captions/teletextscreen.h
     HEADERS += captions/subtitlescreen.h
     HEADERS += mheg/interactivescreen.h
     SOURCES += osd.cpp
+    SOURCES += mythmediaoverlay.cpp
+    SOURCES += mythcaptionsoverlay.cpp
     SOURCES += captions/teletextscreen.cpp
     SOURCES += captions/subtitlescreen.cpp
     SOURCES += mheg/interactivescreen.cpp

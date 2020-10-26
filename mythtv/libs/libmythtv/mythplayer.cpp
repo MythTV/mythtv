@@ -359,7 +359,7 @@ void MythPlayer::ReinitOSD(void)
             {
                 uint old = m_textDisplayMode;
                 ToggleCaptions(old);
-                m_osd->Reinit(visible, aspect);
+                m_osd->Init(visible, aspect);
                 EnableCaptions(old, false);
                 if (m_deleteMap.IsEditing())
                 {

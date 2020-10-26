@@ -1,16 +1,13 @@
 #ifndef OSD_H
 #define OSD_H
 
-// Qt
-#include <QCoreApplication>
-#include <QHash>
-
 // MythTV
 #include "mythtvexp.h"
 #include "programtypes.h"
 #include "mythscreentype.h"
 #include "mythtypes.h"
 #include "mythplayerstate.h"
+#include "mythcaptionsoverlay.h"
 
 // Screen names are prepended with alphanumerics to force the correct ordering
 // when displayed. This is slightly complicated by the default windows
@@ -29,12 +26,6 @@
 #define OSD_DLG_DELETE    "xx_OSD_DELETE"
 #define OSD_DLG_NAVIGATE  "xx_OSD_NAVIGATE"
 #define OSD_DLG_CONFIRM   "mythconfirmpopup"
-// subtitles are always painted first
-#define OSD_WIN_TELETEXT  "aa_OSD_TELETEXT"
-#define OSD_WIN_SUBTITLE  "aa_OSD_SUBTITLES"
-// MHEG and blu-ray overlay should cover subtitles
-#define OSD_WIN_INTERACT  "bb_OSD_INTERACTIVE"
-#define OSD_WIN_BDOVERLAY "bb_OSD_BDOVERLAY"
 
 #define OSD_WIN_MESSAGE  "osd_message"
 #define OSD_WIN_INPUT    "osd_input"
@@ -49,10 +40,7 @@
 class TV;
 class MythMainWindow;
 class MythPlayerUI;
-class TeletextScreen;
-class SubtitleScreen;
-class MythBDOverlay;
-struct AVSubtitle;
+
 
 enum OSDFunctionalType
 {
@@ -72,18 +60,6 @@ enum OSDTimeout
     kOSDTimeout_Short  = 1,
     kOSDTimeout_Med    = 2,
     kOSDTimeout_Long   = 3,
-};
-
-class MythOSDWindow : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    MythOSDWindow(MythScreenStack* Parent, MythPainter* Painter, const QString& Name, bool Themed);
-    bool Create() override;
-
-  private:
-    bool m_themed { false };
 };
 
 class MythOSDDialogData
@@ -115,7 +91,7 @@ class MythOSDDialogData
 
 Q_DECLARE_METATYPE(MythOSDDialogData)
 
-class OSD : public QObject
+class OSD : public MythCaptionsOverlay
 {
     Q_OBJECT
 
@@ -132,19 +108,13 @@ class OSD : public QObject
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
    ~OSD() override;
 
-    bool    Init(const QRect &Rect, float FontAspect);
-    QRect   Bounds() const { return m_rect; }
-    int     GetFontStretch() const { return m_fontStretch; }
-    bool    Reinit(const QRect &Rect, float FontAspect);
-    void    SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);
-    void    HideAll(bool KeepSubs = true, MythScreenType *Except = nullptr, bool DropNotification = false);
-    MythScreenType *GetWindow(const QString &Window);
-    void    SetExpiry(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout = 0);
-    void    HideWindow(const QString &Window);
-    bool    HasWindow(const QString &Window);
-    void    ResetWindow(const QString &Window);
-    void    PositionWindow(MythScreenType *Window);
-    void    Draw(const QRect& Rect);
+    bool Init(const QRect &Rect, float FontAspect) override;
+    void HideWindow(const QString &Window) override;
+    void SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);
+    void HideAll(bool KeepSubs = true, MythScreenType *Except = nullptr, bool DropNotification = false);
+    void SetExpiry(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout = 0);
+    void ResetWindow(const QString &Window);
+    void Draw(const QRect& Rect);
 
     void SetValues(const QString &Window, const QHash<QString,int> &Map, OSDTimeout Timeout);
     void SetValues(const QString &Window, const QHash<QString,float> &Map, OSDTimeout Timeout);
@@ -158,53 +128,25 @@ class OSD : public QObject
     void DialogQuit();
     void DialogGetText(InfoMap &Map);
 
-    TeletextScreen* InitTeletext();
-    void EnableTeletext(bool Enable, int Page);
-    bool TeletextAction(const QString &Action);
-    void TeletextReset();
-    void TeletextClear();
-
-    SubtitleScreen* InitSubtitles();
-    void EnableSubtitles(int Type, bool ForcedOnly = false);
-    void DisableForcedSubtitles();
-    void ClearSubtitles();
-    void DisplayDVDButton(AVSubtitle* DVDButton, QRect &Pos);
-
-    void DisplayBDOverlay(MythBDOverlay *Overlay);
-
   private:
-    void OverrideUIScale(bool Log = true);
-    void RevertUIScale();
-    void RemoveWindow(const QString &Window);
-    void DialogShow(const QString &Window, const QString &Text = "", int UpdateFor = 0);
+    void PositionWindow(MythScreenType* Window);
+    void RemoveWindow(const QString& Window);
+    void DialogShow(const QString& Window, const QString& Text = "", int UpdateFor = 0);
     void DialogAddButton(const QString& Text, QVariant Data, bool Menu = false, bool Current = false);
     void DialogBack(const QString& Text = "", const QVariant& Data = 0, bool Exit = false);
-    void TearDown();
+    void TearDown() override;
     void LoadWindows();
     void CheckExpiry();
     void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout);
 
   private:
-    MythMainWindow* m_mainWindow        { nullptr };
-    TV*             m_tv                { nullptr };
-    MythPlayerUI*   m_player            { nullptr };
-    MythPainter*    m_painter           { nullptr };
-    QRect           m_rect              { };
     int             m_fadeTime          { kOSDFadeTime };
     MythScreenType* m_dialog            { nullptr };
     QString         m_pulsedDialogText  { };
     QDateTime       m_nextPulseUpdate   { };
-    bool            m_visible           { false };
     std::array<int,4> m_timeouts        { -1, 3000, 5000, 13000 };
-    bool            m_uiScaleOverride   { false };
-    float           m_savedWMult        { 1.0F };
-    float           m_savedHMult        { 1.0F };
-    QRect           m_savedUIRect       { };
-    int             m_fontStretch       { 100 };
-    int             m_savedFontStretch  { 100 };
     enum OSDFunctionalType m_functionalType { kOSDFunctionalType_Default };
     QString                m_functionalWindow { };
-    QMap<QString, MythScreenType*>    m_children { };
     QHash<MythScreenType*, QDateTime> m_expireTimes { };
 };
 

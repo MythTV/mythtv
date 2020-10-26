@@ -1,5 +1,4 @@
 // Qt
-#include <QCoreApplication>
 #include <utility>
 
 // libmyth
@@ -20,12 +19,7 @@
 
 // libmythtv
 #include "channelutil.h"
-#include "captions/teletextscreen.h"
-#include "captions/subtitlescreen.h"
-#include "interactivescreen.h"
 #include "osd.h"
-#include "Bluray/mythbdbuffer.h"
-#include "Bluray/mythbdoverlayscreen.h"
 #include "tv_play.h"
 #include "mythplayerui.h"
 
@@ -145,26 +139,8 @@ void ChannelEditor::SendResult(int result)
     QCoreApplication::postEvent(m_tv, dce);
 }
 
-MythOSDWindow::MythOSDWindow(MythScreenStack* Parent, MythPainter* Painter,
-                             const QString& Name, bool Themed)
-  : MythScreenType(Parent, Name, true),
-    m_themed(Themed)
-{
-    m_painter = Painter;
-}
-
-bool MythOSDWindow::Create()
-{
-    if (m_themed)
-        return XMLParseBase::LoadWindowFromXML("osd.xml", objectName(), this);
-    return false;
-}
-
 OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* Painter)
-  : m_mainWindow(MainWindow),
-    m_tv(Tv),
-    m_player(Player),
-    m_painter(Painter)
+  : MythCaptionsOverlay(MainWindow, Tv, Player, Painter)
 {
     connect(this, &OSD::HideOSD, m_tv, &TV::HandleOSDClosed);
     connect(m_tv, &TV::ChangeOSDDialog, this, &OSD::ShowDialog);
@@ -173,21 +149,26 @@ OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* 
 
 OSD::~OSD()
 {
-    TearDown();
+    OSD::TearDown();
 }
 
 void OSD::TearDown()
 {
-    for (MythScreenType* screen : qAsConst(m_children))
-        delete screen;
-    m_children.clear();
+    MythCaptionsOverlay::TearDown();
     m_dialog = nullptr;
 }
 
 bool OSD::Init(const QRect &Rect, float FontAspect)
 {
+    int newstretch = static_cast<int>(lroundf(FontAspect * 100));
+    if ((Rect == m_rect) && (newstretch == m_fontStretch))
+        return true;
+
+    HideAll(false);
+    TearDown();
     m_rect = Rect;
-    m_fontStretch = static_cast<int>(lroundf(FontAspect * 100));
+    m_fontStretch = newstretch;
+
     OverrideUIScale();
     LoadWindows();
     RevertUIScale();
@@ -201,71 +182,6 @@ bool OSD::Init(const QRect &Rect, float FontAspect)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Loaded OSD: size %1x%2 offset %3+%4")
         .arg(m_rect.width()).arg(m_rect.height()).arg(m_rect.left()).arg(m_rect.top()));
     HideAll(false);
-    return true;
-}
-
-void OSD::OverrideUIScale(bool Log)
-{
-    // Avoid unnecessary switches
-    QRect uirect = m_mainWindow->GetUIScreenRect();
-    if (uirect == m_rect)
-        return;
-
-    // Save current data
-    m_savedUIRect = uirect;
-    m_savedFontStretch = m_mainWindow->GetFontStretch();
-    m_mainWindow->GetScalingFactors(m_savedWMult, m_savedHMult);
-
-    // Calculate new
-    QSize themesize = m_mainWindow->GetThemeSize();
-    float wmult = static_cast<float>(m_rect.size().width()) / static_cast<float>(themesize.width());
-    float mult = static_cast<float>(m_rect.size().height()) / static_cast<float>(themesize.height());
-    if (Log)
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Base theme size: %1x%2")
-            .arg(themesize.width()).arg(themesize.height()));
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Scaling factors: %1x%2")
-            .arg(static_cast<double>(wmult)).arg(static_cast<double>(mult)));
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Font stretch: saved %1 new %2")
-            .arg(m_savedFontStretch).arg(m_fontStretch));
-    }
-    m_uiScaleOverride = true;
-
-    // Apply new
-    m_mainWindow->SetFontStretch(m_fontStretch);
-    m_mainWindow->SetScalingFactors(wmult, mult);
-    m_mainWindow->SetUIScreenRect(m_rect);
-}
-
-void OSD::RevertUIScale()
-{
-    if (m_uiScaleOverride)
-    {
-        m_mainWindow->SetFontStretch(m_savedFontStretch);
-        m_mainWindow->SetScalingFactors(m_savedWMult, m_savedHMult);
-        m_mainWindow->SetUIScreenRect(m_savedUIRect);
-    }
-    m_uiScaleOverride = false;
-}
-
-bool OSD::Reinit(const QRect &Rect, float FontAspect)
-{
-    int new_stretch = static_cast<int>(lroundf(FontAspect * 100));
-    if ((Rect == m_rect) && (new_stretch == m_fontStretch))
-        return true;
-    if (m_dialog && m_dialog->objectName() == OSD_DLG_NAVIGATE
-        && m_dialog->IsVisible())
-    {
-        return true;
-    }
-
-    HideAll(false);
-    TearDown();
-    if (!Init(Rect, FontAspect))
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to re-init OSD."));
-        return false;
-    }
     return true;
 }
 
@@ -716,8 +632,6 @@ void OSD::Draw(const QRect &Rect)
         }
         m_painter->End();
     }
-
-    m_visible = visible;
 }
 
 void OSD::CheckExpiry()
@@ -833,32 +747,6 @@ void OSD::RemoveWindow(const QString &Window)
     delete child;
 }
 
-MythScreenType *OSD::GetWindow(const QString &Window)
-{
-    if (m_children.contains(Window))
-        return m_children.value(Window);
-
-    MythScreenType* newwindow = nullptr;
-
-    if (Window == OSD_WIN_INTERACT)
-        newwindow = new InteractiveScreen(m_player, m_painter, Window);
-    else if (Window == OSD_WIN_BDOVERLAY)
-        newwindow = new MythBDOverlayScreen(m_player, m_painter, Window);
-    else
-        newwindow = new MythOSDWindow(nullptr, m_painter, Window, false);
-
-    if (newwindow->Create())
-    {
-        m_children.insert(Window, newwindow);
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created window %1").arg(Window));
-        return newwindow;
-    }
-
-    LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to create window %1").arg(Window));
-    delete newwindow;
-    return nullptr;
-}
-
 void OSD::SetFunctionalWindow(const QString &window, enum OSDFunctionalType Type)
 {
     if (m_functionalType != kOSDFunctionalType_Default && m_functionalType != Type)
@@ -871,15 +759,13 @@ void OSD::HideWindow(const QString &Window)
 {
     if (!m_children.contains(Window))
         return;
-    MythScreenType *screen = m_children.value(Window);
-    if (screen != nullptr)
-    {
-        screen->SetVisible(false);
-        screen->Close(); // for InteractiveScreen
-    }
+
+    MythCaptionsOverlay::HideWindow(Window);
+
     SetExpiry(Window, kOSDTimeout_None);
 
-    if (m_functionalType != kOSDFunctionalType_Default)
+    MythScreenType* screen = m_children.value(Window);
+    if ((m_functionalType != kOSDFunctionalType_Default) && screen)
     {
         bool valid   = m_children.contains(m_functionalWindow);
         screen = m_children.value(m_functionalWindow);
@@ -891,11 +777,6 @@ void OSD::HideWindow(const QString &Window)
             m_functionalWindow = QString();
         }
     }
-}
-
-bool OSD::HasWindow(const QString &Window)
-{
-    return m_children.contains(Window);
 }
 
 bool OSD::DialogVisible(const QString& Window)
@@ -1040,170 +921,6 @@ void OSD::DialogGetText(InfoMap &Map)
     auto *edit = qobject_cast<ChannelEditor*>(m_dialog);
     if (edit)
         edit->GetText(Map);
-}
-
-TeletextScreen* OSD::InitTeletext()
-{
-    TeletextScreen* teletext = nullptr;
-    if (m_children.contains(OSD_WIN_TELETEXT))
-    {
-        teletext = qobject_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
-    }
-    else
-    {
-        OverrideUIScale();
-        teletext = new TeletextScreen(m_player, m_painter, OSD_WIN_TELETEXT, m_fontStretch);
-        if (teletext->Create())
-        {
-            m_children.insert(OSD_WIN_TELETEXT, teletext);
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created window %1").arg(OSD_WIN_TELETEXT));
-        }
-        else
-        {
-            delete teletext;
-            teletext = nullptr;
-        }
-        RevertUIScale();
-    }
-
-    if (!teletext)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Teletext window");
-        return nullptr;
-    }
-
-    HideWindow(OSD_WIN_TELETEXT);
-    teletext->SetDisplaying(false);
-    return teletext;
-}
-
-void OSD::EnableTeletext(bool Enable, int Page)
-{
-    TeletextScreen *tt = InitTeletext();
-    if (!tt)
-        return;
-
-    tt->SetVisible(Enable);
-    tt->SetDisplaying(Enable);
-    if (Enable)
-    {
-        tt->SetPage(Page, -1);
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Enabled teletext page %1")
-                                   .arg(Page));
-    }
-    else
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled teletext");
-}
-
-bool OSD::TeletextAction(const QString &Action)
-{
-    if (!HasWindow(OSD_WIN_TELETEXT))
-        return false;
-
-    auto* tt = qobject_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
-    if (tt)
-        return tt->KeyPress(Action);
-    return false;
-}
-
-void OSD::TeletextReset()
-{
-    if (!HasWindow(OSD_WIN_TELETEXT))
-        return;
-
-    TeletextScreen* tt = InitTeletext();
-    if (tt)
-        tt->Reset();
-}
-
-void OSD::TeletextClear()
-{
-    if (!HasWindow(OSD_WIN_TELETEXT))
-        return;
-
-    auto* tt = qobject_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
-    if (tt)
-        tt->ClearScreen();
-}
-
-SubtitleScreen* OSD::InitSubtitles()
-{
-    SubtitleScreen *sub = nullptr;
-    if (m_children.contains(OSD_WIN_SUBTITLE))
-    {
-        sub = qobject_cast<SubtitleScreen*>(m_children.value(OSD_WIN_SUBTITLE));
-    }
-    else
-    {
-        OverrideUIScale();
-        sub = new SubtitleScreen(m_player, m_painter, OSD_WIN_SUBTITLE, m_fontStretch);
-        if (sub->Create())
-        {
-            m_children.insert(OSD_WIN_SUBTITLE, sub);
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created window %1").arg(OSD_WIN_SUBTITLE));
-        }
-        else
-        {
-            delete sub;
-            sub = nullptr;
-        }
-        RevertUIScale();
-    }
-    if (!sub)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create subtitle window");
-        return nullptr;
-    }
-    return sub;
-}
-
-void OSD::EnableSubtitles(int Type, bool ForcedOnly)
-{
-    SubtitleScreen *sub = InitSubtitles();
-    if (sub)
-        sub->EnableSubtitles(Type, ForcedOnly);
-}
-
-void OSD::DisableForcedSubtitles()
-{
-    if (!HasWindow(OSD_WIN_SUBTITLE))
-        return;
-
-    SubtitleScreen *sub = InitSubtitles();
-    sub->DisableForcedSubtitles();
-}
-
-void OSD::ClearSubtitles()
-{
-    if (!HasWindow(OSD_WIN_SUBTITLE))
-        return;
-
-    SubtitleScreen* sub = InitSubtitles();
-    if (sub)
-        sub->ClearAllSubtitles();
-}
-
-void OSD::DisplayDVDButton(AVSubtitle* DVDButton, QRect &Pos)
-{
-    if (!DVDButton)
-        return;
-
-    SubtitleScreen* sub = InitSubtitles();
-    if (sub)
-    {
-        EnableSubtitles(kDisplayDVDButton);
-        sub->DisplayDVDButton(DVDButton, Pos);
-    }
-}
-
-void OSD::DisplayBDOverlay(MythBDOverlay* Overlay)
-{
-    if (!Overlay)
-        return;
-
-    auto* bd = qobject_cast<MythBDOverlayScreen*>(GetWindow(OSD_WIN_BDOVERLAY));
-    if (bd)
-        bd->DisplayBDOverlay(Overlay);
 }
 
 OsdNavigation::OsdNavigation(MythMainWindow *MainWindow, TV* Tv, MythPlayerUI *Player, const QString& Name, OSD* Osd)
