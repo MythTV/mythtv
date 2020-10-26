@@ -979,6 +979,7 @@ void OSD::ShowDialog(const MythOSDDialogData& Data)
     std::for_each(Data.m_buttons.cbegin(), Data.m_buttons.cend(),
         [this](const MythOSDDialogData::MythOSDDialogButton& B) {
             DialogAddButton(B.m_text, B.m_data, B.m_menu, B.m_current); });
+    DialogBack(Data.m_back.m_text, Data.m_back.m_data, Data.m_back.m_exit);
 }
 
 void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
