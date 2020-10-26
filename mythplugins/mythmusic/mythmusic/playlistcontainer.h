@@ -36,7 +36,9 @@ class PlaylistContainer
 
   public:
     explicit PlaylistContainer(AllMusic *all_music);
+    PlaylistContainer(const PlaylistContainer &rhs) = delete;
    ~PlaylistContainer();
+    PlaylistContainer& operator=(const PlaylistContainer &rhs) = delete;
 
     void            load();
     void            resync(void);
