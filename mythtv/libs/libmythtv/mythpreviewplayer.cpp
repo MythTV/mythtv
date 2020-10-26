@@ -109,8 +109,9 @@ char *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, 
     uint64_t dummy = 0;
     SeekForScreenGrab(dummy, FrameNum, Absolute);
     int tries = 0;
-    while (!m_videoOutput->ValidVideoFrames() && ((tries++) < 500))
+    while (!m_videoOutput->ValidVideoFrames() && (tries < 500))
     {
+        tries += 1;
         m_decodeOneFrame = true;
         QThread::usleep(10000);
         if ((tries % 10) == 0)
