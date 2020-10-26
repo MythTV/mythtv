@@ -250,7 +250,6 @@ void OSD::RevertUIScale()
 
 bool OSD::Reinit(const QRect &Rect, float FontAspect)
 {
-    m_refresh = true;
     int new_stretch = static_cast<int>(lroundf(FontAspect * 100));
     if ((Rect == m_rect) && (new_stretch == m_fontStretch))
         return true;
@@ -644,14 +643,9 @@ void OSD::SetGraph(const QString &Window, const QString &Graph, int64_t Timecode
         image->SetImage(mi);
 }
 
-bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
+void OSD::Draw()
 {
-    if (!Painter)
-        return false;
-
     bool visible = false;
-    bool redraw  = m_refresh;
-    m_refresh    = false;
     QTime now = MythDate::current().time();
 
     CheckExpiry();
@@ -668,14 +662,11 @@ bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
                 if (left < m_fadeTime)
                     screen->SetAlpha((255 * left) / m_fadeTime);
             }
-            if (screen->NeedsRedraw())
-                redraw = true;
         }
     }
 
-    MythNotificationCenter *nc = GetNotificationCenter();
     QList<MythScreenType*> notifications;
-    nc->GetNotificationScreens(notifications);
+    m_mainWindow->GetCurrentNotificationCenter()->GetNotificationScreens(notifications);
     QList<MythScreenType*>::iterator it2 = notifications.begin();
     while (it2 != notifications.end())
     {
@@ -684,9 +675,7 @@ bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
             LOG(VB_GUI, LOG_DEBUG, LOC + "Creating OSD Notification");
 
             if (!m_uiScaleOverride)
-            {
                 OverrideUIScale(false);
-            }
             (*it2)->SetPainter(m_painter);
             if (!(*it2)->Create())
             {
@@ -694,12 +683,11 @@ bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
                 continue;
             }
         }
+
         if ((*it2)->IsVisible())
         {
             if (!m_uiScaleOverride)
-            {
                 OverrideUIScale(false);
-            }
 
             (*it2)->SetPainter(m_painter);
 
@@ -713,24 +701,19 @@ bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
                 left = 0;
             if (expires.isValid() && left < m_fadeTime)
                 (*it2)->SetAlpha((255 * left) / m_fadeTime);
-            if ((*it2)->NeedsRedraw())
-                redraw = true;
         }
         ++it2;
     }
     RevertUIScale();
 
-    redraw |= Repaint;
-
-    if (redraw && visible)
+    if (visible)
     {
-        QRect cliprect = QRect(QPoint(0, 0), Size);
-        Painter->Begin(nullptr);
+        m_painter->Begin(nullptr);
         for (auto * screen : qAsConst(m_children))
         {
             if (screen->IsVisible())
             {
-                screen->Draw(Painter, 0, 0, 255, cliprect);
+                screen->Draw(m_painter, 0, 0, 255);
                 screen->SetAlpha(255);
                 screen->ResetNeedsRedraw();
             }
@@ -739,20 +722,15 @@ bool OSD::Draw(MythPainter* Painter, QSize Size, bool Repaint)
         {
             if (notif->IsVisible())
             {
-                notif->Draw(Painter, 0, 0, 255, cliprect);
+                notif->Draw(m_painter, 0, 0, 255);
                 notif->SetAlpha(255);
                 notif->ResetNeedsRedraw();
             }
         }
-        Painter->End();
+        m_painter->End();
     }
 
-    // Force a redraw if it just became invisible
-    if (m_visible && !visible)
-        redraw=true;
     m_visible = visible;
-
-    return redraw;
 }
 
 void OSD::CheckExpiry()
@@ -827,14 +805,6 @@ void OSD::SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, int Cust
         if (m_expireTimes.contains(win))
             m_expireTimes.remove(win);
     }
-}
-
-void OSD::SetTimeouts(int Short, int Medium, int Long)
-{
-    m_timeouts[kOSDTimeout_None]  = -1;
-    m_timeouts[kOSDTimeout_Short] = Short;
-    m_timeouts[kOSDTimeout_Med]   = Medium;
-    m_timeouts[kOSDTimeout_Long]  = Long;
 }
 
 bool OSD::IsWindowVisible(const QString &Window)
@@ -921,7 +891,6 @@ void OSD::HideWindow(const QString &Window)
         screen->Close(); // for InteractiveScreen
     }
     SetExpiry(Window, kOSDTimeout_None);
-    m_refresh = true;
 
     if (m_functionalType != kOSDFunctionalType_Default)
     {

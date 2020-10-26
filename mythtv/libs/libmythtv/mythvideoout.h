@@ -90,7 +90,6 @@ class MythVideoOutput : public MythVideoBounds
   protected:
     MythVideoOutput();
     QRect        GetVisibleOSDBounds(float& VisibleAspect, float& FontScaling, float ThemeAspect) const;
-    QRect        GetTotalOSDBounds() const;
 
     MythVideoColourSpace m_videoColourSpace;
     LetterBoxColour      m_dbLetterboxColour  { kLetterBoxColour_Black };
@@ -102,7 +101,7 @@ class MythVideoOutput : public MythVideoBounds
     long long            m_framesPlayed       { 0 };
     MythAVCopy           m_copyFrame;
     MythDeinterlacer     m_deinterlacer;
-    VideoFrameTypes*   m_renderFrameTypes   { &s_defaultFrameTypes };
+    VideoFrameTypes*     m_renderFrameTypes   { &s_defaultFrameTypes };
     bool                 m_deinterlacing      { false };
     bool                 m_deinterlacing2X    { false };
     MythDeintType        m_forcedDeinterlacer { DEINT_NONE };

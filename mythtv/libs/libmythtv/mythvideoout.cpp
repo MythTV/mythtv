@@ -239,7 +239,7 @@ void MythVideoOutput::GetOSDBounds(QRect& Total, QRect& Visible,
                                    float& FontScaling,
                                    float ThemeAspect) const
 {
-    Total = GetTotalOSDBounds();
+    Total   = GetDisplayVisibleRect();
     Visible = GetVisibleOSDBounds(VisibleAspect, FontScaling, ThemeAspect);
 }
 
@@ -265,15 +265,6 @@ QRect MythVideoOutput::GetVisibleOSDBounds(float& VisibleAspect,
 
     FontScaling = 1.0F;
     return { QPoint(0,0), dvr.size() };
-}
-
-/**
- * \fn VideoOutput::GetTotalOSDBounds() const
- * \brief Returns total OSD bounds
- */
-QRect MythVideoOutput::GetTotalOSDBounds() const
-{
-    return GetDisplayVisibleRect();
 }
 
 PictureAttributeSupported MythVideoOutput::GetSupportedPictureAttributes()

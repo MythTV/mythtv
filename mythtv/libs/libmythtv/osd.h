@@ -135,11 +135,8 @@ class OSD : public QObject
     bool    Init(const QRect &Rect, float FontAspect);
     QRect   Bounds() const { return m_rect; }
     int     GetFontStretch() const { return m_fontStretch; }
-    void    OverrideUIScale(bool Log = true);
-    void    RevertUIScale();
     bool    Reinit(const QRect &Rect, float FontAspect);
     void    SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);
-    void    SetTimeouts(int Short, int Medium, int Long);
     bool    IsVisible();
     void    HideAll(bool KeepSubs = true, MythScreenType *Except = nullptr, bool DropNotification = false);
     MythScreenType *GetWindow(const QString &Window);
@@ -148,8 +145,7 @@ class OSD : public QObject
     bool    HasWindow(const QString &Window);
     void    ResetWindow(const QString &Window);
     void    PositionWindow(MythScreenType *Window);
-    void    RemoveWindow(const QString &Window);
-    bool    Draw(MythPainter* Painter, QSize Size, bool Repaint = false);
+    void    Draw();
 
     void SetValues(const QString &Window, const QHash<QString,int> &Map, OSDTimeout Timeout);
     void SetValues(const QString &Window, const QHash<QString,float> &Map, OSDTimeout Timeout);
@@ -178,6 +174,9 @@ class OSD : public QObject
     void DisplayBDOverlay(MythBDOverlay *Overlay);
 
   private:
+    void OverrideUIScale(bool Log = true);
+    void RevertUIScale();
+    void RemoveWindow(const QString &Window);
     void DialogShow(const QString &Window, const QString &Text = "", int UpdateFor = 0);
     void DialogAddButton(const QString& Text, QVariant Data, bool Menu = false, bool Current = false);
     void DialogBack(const QString& Text = "", const QVariant& Data = 0, bool Exit = false);
@@ -196,7 +195,6 @@ class OSD : public QObject
     MythScreenType* m_dialog            { nullptr };
     QString         m_pulsedDialogText  { };
     QDateTime       m_nextPulseUpdate   { };
-    bool            m_refresh           { false };
     bool            m_visible           { false };
     std::array<int,4> m_timeouts        { -1, 3000, 5000, 13000 };
     bool            m_uiScaleOverride   { false };
