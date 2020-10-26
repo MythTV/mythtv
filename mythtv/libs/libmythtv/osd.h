@@ -123,8 +123,10 @@ class OSD : public QObject
     void HideOSD(OSDFunctionalType Type);
 
   public slots:
-    void ShowDialog(const MythOSDDialogData& Data);
     void SetText(const QString& Window, const InfoMap& Map, OSDTimeout Timeout);
+
+  protected slots:
+    void ShowDialog(const MythOSDDialogData& Data);
 
   public:
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
@@ -159,9 +161,6 @@ class OSD : public QObject
     bool DialogHandleKeypress(QKeyEvent *Event);
     bool DialogHandleGesture(MythGestureEvent *Event);
     void DialogQuit();
-    void DialogShow(const QString &Window, const QString &Text = "", int UpdateFor = 0);
-    void DialogBack(const QString& Text = "", const QVariant& Data = 0, bool Exit = false);
-    void DialogAddButton(const QString& Text, QVariant Data, bool Menu = false, bool Current = false);
     void DialogGetText(InfoMap &Map);
 
     TeletextScreen* InitTeletext();
@@ -179,6 +178,9 @@ class OSD : public QObject
     void DisplayBDOverlay(MythBDOverlay *Overlay);
 
   private:
+    void DialogShow(const QString &Window, const QString &Text = "", int UpdateFor = 0);
+    void DialogAddButton(const QString& Text, QVariant Data, bool Menu = false, bool Current = false);
+    void DialogBack(const QString& Text = "", const QVariant& Data = 0, bool Exit = false);
     void TearDown();
     void LoadWindows();
     void CheckExpiry();

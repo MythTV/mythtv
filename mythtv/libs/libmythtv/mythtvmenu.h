@@ -30,12 +30,13 @@ enum MenuCurrentContext
 };
 
 class OSD;
+class MythOSDDialogData;
 class MythTVMenu;
 
 class MythTVMenuItemContext
 {
   public:
-    bool AddButton(OSD* Osd, bool Active,const QString& Action,
+    bool AddButton(MythOSDDialogData* Menu, bool Active,const QString& Action,
                    const QString& DefaultTextActive, const QString& DefaultTextInactive,
                    bool IsMenu, const QString& TextArg) const;
 
@@ -63,7 +64,7 @@ class MythTVMenuItemDisplayer
 {
   public:
     virtual ~MythTVMenuItemDisplayer() = default;
-    virtual bool MenuItemDisplay(const MythTVMenuItemContext& Context) = 0;
+    virtual bool MenuItemDisplay(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu) = 0;
 };
 
 class MTV_PUBLIC MythTVMenu
@@ -83,7 +84,8 @@ class MTV_PUBLIC MythTVMenu
     QDomElement GetRoot() const;
     QString     Translate(const QString& Text) const;
     bool        Show(const QDomNode& Node, const QDomNode& Selected,
-                     MythTVMenuItemDisplayer& Displayer, bool Display = true) const;
+                     MythTVMenuItemDisplayer& Displayer, MythOSDDialogData* Menu,
+                     bool Display = true) const;
     QString     GetName() const;
     const char* GetTranslationContext() const;
     const QString& GetKeyBindingContext() const;

@@ -495,9 +495,9 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void ShowOSDMenu(bool isCompact = false);
     void FillOSDMenuJumpRec(const QString &Category = "", int Level = 0, const QString &Selected = "");
     void PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QDomNode &Selected);
-    bool MenuItemDisplay(const MythTVMenuItemContext& Context) override;
-    bool MenuItemDisplayPlayback(const MythTVMenuItemContext& Context);
-    bool MenuItemDisplayCutlist(const MythTVMenuItemContext& Context);
+    bool MenuItemDisplay(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu) override;
+    bool MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu);
+    bool MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu);
     void PlaybackMenuInit(const MythTVMenu& Menu);
     void PlaybackMenuDeinit(const MythTVMenu& Menu);
     static void MenuStrings();
@@ -687,9 +687,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     mutable volatile int m_exitPlayerTimerId       {0};
     volatile int         m_saveLastPlayPosTimerId  {0};
     volatile int         m_signalMonitorTimerId    {0};
-
-    // Playback menu state caching
-    OSD           *m_tvmOsd {nullptr};
 
     // Various tracks
     // XXX This ignores kTrackTypeTextSubtitle which is greater than

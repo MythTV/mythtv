@@ -8649,39 +8649,36 @@ void TV::HandleOSDInfo(const QString& Action)
 }
 
 #define BUTTON(action, text) \
-    result = Context.AddButton(osd, active, (action), (text), "", false, "")
+    result = Context.AddButton(Menu, active, (action), (text), "", false, "")
 #define BUTTON2(action, textActive, textInactive) \
-    result = Context.AddButton(osd, active, (action), (textActive), (textInactive), false, "")
+    result = Context.AddButton(Menu, active, (action), (textActive), (textInactive), false, "")
 #define BUTTON3(action, textActive, textInactive, isMenu) \
-    result = Context.AddButton(osd, active, (action), (textActive), (textInactive), (isMenu), "")
+    result = Context.AddButton(Menu, active, (action), (textActive), (textInactive), (isMenu), "")
 
-bool TV::MenuItemDisplay(const MythTVMenuItemContext& Context)
+bool TV::MenuItemDisplay(const MythTVMenuItemContext& Context, MythOSDDialogData *Menu)
 {
     if (&Context.m_menu == &m_playbackMenu || &Context.m_menu == &m_playbackCompactMenu)
-        return MenuItemDisplayPlayback(Context);
+        return MenuItemDisplayPlayback(Context, Menu);
     if (&Context.m_menu == &m_cutlistMenu || &Context.m_menu == &m_cutlistCompactMenu)
-        return MenuItemDisplayCutlist(Context);
+        return MenuItemDisplayCutlist(Context, Menu);
     return false;
 }
 
-bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context)
+bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDialogData *Menu)
 {
     MenuCategory category = Context.m_category;
     const QString &actionName = Context.m_action;
 
     bool result = false;
-    OSD *osd = m_tvmOsd;
-    if (!osd)
-        return result;
     if (category == kMenuCategoryMenu)
     {
-        result = Context.m_menu.Show(Context.m_node, QDomNode(), *this, false);
+        result = Context.m_menu.Show(Context.m_node, QDomNode(), *this, Menu, false);
         if (result && Context.m_doDisplay)
         {
             QVariant v;
             v.setValue(MythTVMenuNodeTuple(Context.m_menu, Context.m_node));
-            osd->DialogAddButton(Context.m_menuName, v, true,
-                                 Context.m_currentContext != kMenuCurrentDefault);
+            Menu->m_buttons.push_back( { Context.m_menuName, v, true,
+                                         Context.m_currentContext != kMenuCurrentDefault });
         }
         return result;
     }
@@ -8751,7 +8748,7 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context)
             active = m_player->DeleteMapHasUndo();
             //: %1 is the undo message
             QString text = tr("Undo - %1");
-            result = Context.AddButton(osd, active, actionName, text, "", false,
+            result = Context.AddButton(Menu, active, actionName, text, "", false,
                                        m_player->DeleteMapGetUndoMessage());
         }
         else if (actionName == "DIALOG_CUTPOINT_REDO_0")
@@ -8759,7 +8756,7 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context)
             active = m_player->DeleteMapHasRedo();
             //: %1 is the redo message
             QString text = tr("Redo - %1");
-            result = Context.AddButton(osd, active, actionName, text, "", false,
+            result = Context.AddButton(Menu, active, actionName, text, "", false,
                                        m_player->DeleteMapGetRedoMessage());
         }
         else if (actionName == "DIALOG_CUTPOINT_CLEARMAP_0")
@@ -8811,24 +8808,23 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context)
 }
 
 // Returns true if at least one item should be displayed.
-bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context)
+bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDialogData *Menu)
 {
     MenuCategory category = Context.m_category;
     const QString &actionName = Context.m_action;
 
     bool result = false;
     bool active = true;
-    OSD *osd = m_tvmOsd;
-    if (!osd)
-        return result;
+
     if (category == kMenuCategoryMenu)
     {
-        result = Context.m_menu.Show(Context.m_node, QDomNode(), *this, false);
+        result = Context.m_menu.Show(Context.m_node, QDomNode(), *this, Menu, false);
         if (result && Context.m_doDisplay)
         {
             QVariant v;
             v.setValue(MythTVMenuNodeTuple(Context.m_menu, Context.m_node));
-            osd->DialogAddButton(Context.m_menuName, v, true, Context.m_currentContext != kMenuCurrentDefault);
+            Menu->m_buttons.push_back( { Context.m_menuName, v, true,
+                                         Context.m_currentContext != kMenuCurrentDefault } );
         }
         return result;
     }
@@ -9376,7 +9372,6 @@ void TV::MenuLazyInit(void *Field)
 void TV::PlaybackMenuInit(const MythTVMenu &Menu)
 {
     GetPlayerReadLock();
-    m_tvmOsd = GetOSDL();
     if (&Menu != &m_playbackMenu && &Menu != &m_playbackCompactMenu)
         return;
 
@@ -9484,36 +9479,33 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
 
 void TV::PlaybackMenuDeinit(const MythTVMenu& /*Menu*/)
 {
-    ReturnOSDLock();
     ReturnPlayerLock();
-    m_tvmOsd = nullptr;
-    m_tvmOsd = nullptr;
 }
 
 void TV::PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QDomNode &Selected)
 {
     PlaybackMenuInit(Menu);
-    if (m_tvmOsd)
+    bool isPlayback = (&Menu == &m_playbackMenu || &Menu == &m_playbackCompactMenu);
+    bool isCutlist = (&Menu == &m_cutlistMenu || &Menu == &m_cutlistCompactMenu);
+    QString text = Menu.Translate(Node.toElement().attribute("text", Menu.GetName()));
+    MythOSDDialogData menu { isPlayback ? OSD_DLG_MENU : isCutlist ? OSD_DLG_CUTPOINT : "???", text };
+    Menu.Show(Node, Selected, *this, &menu);
+    QDomNode parent = Node.parentNode();
+    if (!parent.parentNode().isNull())
     {
-        bool isPlayback = (&Menu == &m_playbackMenu || &Menu == &m_playbackCompactMenu);
-        bool isCutlist = (&Menu == &m_cutlistMenu || &Menu == &m_cutlistCompactMenu);
-        QString text = Menu.Translate(Node.toElement().attribute("text", Menu.GetName()));
-        m_tvmOsd->DialogShow(isPlayback ? OSD_DLG_MENU : isCutlist ? OSD_DLG_CUTPOINT : "???", text);
-        Menu.Show(Node, Selected, *this);
-        QDomNode parent = Node.parentNode();
-        if (!parent.parentNode().isNull())
-        {
-            QVariant v;
-            v.setValue(MythTVMenuNodeTuple(Menu, Node));
-            m_tvmOsd->DialogBack("", v);
-        }
-        if (isCutlist)
-        {
-            // hack to unhide the editbar
-            InfoMap map;
-            map.insert("title", tr("Edit"));
-            emit ChangeOSDText(OSD_WIN_PROGEDIT, map, kOSDTimeout_None);
-        }
+        QVariant v;
+        v.setValue(MythTVMenuNodeTuple(Menu, Node));
+        menu.m_back = { "", v };
+    }
+
+    emit ChangeOSDDialog(menu);
+
+    if (isCutlist)
+    {
+        // hack to unhide the editbar
+        InfoMap map;
+        map.insert("title", tr("Edit"));
+        emit ChangeOSDText(OSD_WIN_PROGEDIT, map, kOSDTimeout_None);
     }
     PlaybackMenuDeinit(Menu);
 }

@@ -11,7 +11,7 @@
 
 #define LOC QString("TVMenu: ")
 
-bool MythTVMenuItemContext::AddButton(OSD* Osd, bool Active, const QString& Action,
+bool MythTVMenuItemContext::AddButton(MythOSDDialogData *Menu, bool Active, const QString& Action,
                                       const QString& DefaultTextActive,
                                       const QString& DefaultTextInactive,
                                       bool IsMenu, const QString& TextArg) const
@@ -37,7 +37,7 @@ bool MythTVMenuItemContext::AddButton(OSD* Osd, bool Active, const QString& Acti
                 else if (m_currentContext == kMenuCurrentAlways)
                     current = true;
 
-                Osd->DialogAddButton(text, Action, IsMenu, current);
+                Menu->m_buttons.push_back( { text, Action, IsMenu, current });
             }
         }
     }
@@ -232,7 +232,8 @@ void MythTVMenu::ProcessIncludes(QDomElement& Root, int IncludeLevel)
 }
 
 bool MythTVMenu::Show(const QDomNode& Node, const QDomNode& Selected,
-                      MythTVMenuItemDisplayer& Displayer, bool Display) const
+                      MythTVMenuItemDisplayer& Displayer, MythOSDDialogData* Menu,
+                      bool Display) const
 {
     bool hasSelected = false;
     bool displayed = false;
@@ -264,19 +265,19 @@ bool MythTVMenu::Show(const QDomNode& Node, const QDomNode& Selected,
                 if (hasSelected && node == Selected)
                     currentContext = kMenuCurrentAlways;
                 MythTVMenuItemContext context(*this, node, text, currentContext, Display);
-                displayed |= Displayer.MenuItemDisplay(context);
+                displayed |= Displayer.MenuItemDisplay(context, Menu);
             }
             else if (element.tagName() == "item")
             {
                 QString action = element.attribute("action", "");
                 MythTVMenuItemContext context(*this, node, showContext, currentContext, action, text, Display);
-                displayed |= Displayer.MenuItemDisplay(context);
+                displayed |= Displayer.MenuItemDisplay(context, Menu);
             }
             else if (element.tagName() == "itemlist")
             {
                 QString actiongroup = element.attribute("actiongroup", "");
                 MythTVMenuItemContext context(*this, node, showContext, currentContext, actiongroup, Display);
-                displayed |= Displayer.MenuItemDisplay(context);
+                displayed |= Displayer.MenuItemDisplay(context, Menu);
             }
         }
 
