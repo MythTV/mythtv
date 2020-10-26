@@ -34,6 +34,7 @@ DEPENDPATH  += ../libmythbase
 DEPENDPATH  += ./mpeg ./channelscan ./mheg ./decoders ./opengl ./io ./captions
 DEPENDPATH  += ./visualisations ./visualisations/opengl ./visualisations/vulkan
 DEPENDPATH  += ./vulkan
+DEPENDPATH  += ./overlays
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
@@ -453,12 +454,14 @@ using_frontend {
     HEADERS += mythcaptionsoverlay.h
     HEADERS += captions/teletextscreen.h
     HEADERS += captions/subtitlescreen.h
+    HEADERS += overlays/mythnavigationoverlay.h
     HEADERS += mheg/interactivescreen.h
     SOURCES += osd.cpp
     SOURCES += mythmediaoverlay.cpp
     SOURCES += mythcaptionsoverlay.cpp
     SOURCES += captions/teletextscreen.cpp
     SOURCES += captions/subtitlescreen.cpp
+    SOURCES += overlays/mythnavigationoverlay.cpp
     SOURCES += mheg/interactivescreen.cpp
 
     # Video output

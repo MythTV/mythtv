@@ -176,37 +176,4 @@ class ChannelEditor : public MythScreenType
     TV*             m_tv           { nullptr };
 };
 
-class OsdNavigation : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    OsdNavigation(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, const QString& Name, OSD* Osd);
-    bool Create() override;
-    bool keyPressEvent(QKeyEvent* Event) override;
-    void ShowMenu() override;
-
-  public slots:
-    void AudioStateChanged(MythAudioState AudioState);
-    void PauseChanged(bool Paused);
-    void GeneralAction();
-    void More();
-
-  protected:
-    void SendResult(int Result, const QString& Action);
-
-    MythMainWindow* m_mainWindow    { nullptr };
-    TV*           m_tv              { nullptr };
-    MythPlayerUI* m_player          { nullptr };
-    OSD*          m_osd             { nullptr };
-    MythUIButton* m_playButton      { nullptr };
-    MythUIButton* m_pauseButton     { nullptr };
-    MythUIButton* m_muteButton      { nullptr };
-    MythUIButton* m_unMuteButton    { nullptr };
-    bool          m_paused          { false   };
-    MythAudioState m_audioState     { };
-    int           m_visibleGroup    { 0 };
-    int           m_maxGroupNum     { -1 };
-};
-
 #endif
