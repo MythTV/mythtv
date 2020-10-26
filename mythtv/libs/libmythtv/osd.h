@@ -137,7 +137,6 @@ class OSD : public QObject
     int     GetFontStretch() const { return m_fontStretch; }
     bool    Reinit(const QRect &Rect, float FontAspect);
     void    SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);
-    bool    IsVisible();
     void    HideAll(bool KeepSubs = true, MythScreenType *Except = nullptr, bool DropNotification = false);
     MythScreenType *GetWindow(const QString &Window);
     void    SetExpiry(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout = 0);

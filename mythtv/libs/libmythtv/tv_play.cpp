@@ -2947,8 +2947,6 @@ void TV::HandleVideoExitDialogTimerEvent()
         ReturnPlayerLock();
         return;
     }
-    if (osd)
-        osd->DialogQuit();
     ReturnOSDLock();
     DoTogglePause(true);
     ClearOSD();
@@ -3971,29 +3969,10 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
     }
     else if (IsActionable({ "ESCAPE", "BACK" }, Actions))
     {
-        if (StateIsLiveTV(m_playerContext.GetState()) &&
-            (m_playerContext.m_lastSignalMsgTime.elapsed() < static_cast<int>(PlayerContext::kSMExitTimeout)))
-        {
-            ClearOSD();
-        }
-        else
-        {
-            OSD *osd = GetOSDL();
-            if (osd && osd->IsVisible())
-            {
-                ClearOSD();
-                ReturnOSDLock();
-                return handled;
-            }
-            ReturnOSDLock();
-        }
-
+        ClearOSD();
         NormalSpeed();
-
         StopFFRew();
-
-        bool do_exit = false;
-
+        bool exit = false;
         if (StateIsLiveTV(GetState()))
         {
             if (m_playerContext.HasPlayer() && (12 & m_dbPlaybackExitPrompt))
@@ -4001,7 +3980,7 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
                 ShowOSDStopWatchingRecording();
                 return handled;
             }
-            do_exit = true;
+            exit = true;
         }
         else
         {
@@ -4013,10 +3992,10 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
             }
             PrepareToExitPlayer(__LINE__);
             m_requestDelete = false;
-            do_exit = true;
+            exit = true;
         }
 
-        if (do_exit)
+        if (exit)
         {
             // If it's a DVD, and we're not trying to execute a
             // jumppoint, try to back up.

@@ -269,27 +269,14 @@ bool OSD::Reinit(const QRect &Rect, float FontAspect)
     return true;
 }
 
-bool OSD::IsVisible()
-{
-    if (GetNotificationCenter()->DisplayedNotifications() > 0)
-        return true;
-
-    return std::any_of(m_children.cbegin(), m_children.cend(),
-                       [](MythScreenType* child)
-                           { return child->IsVisible() &&
-                                    child->objectName() != OSD_WIN_SUBTITLE &&
-                                    child->objectName() != OSD_WIN_TELETEXT &&
-                                    child->objectName() != OSD_WIN_BDOVERLAY &&
-                                    child->objectName() != OSD_WIN_INTERACT; } );
-}
-
 void OSD::HideAll(bool KeepSubs, MythScreenType* Except, bool DropNotification)
 {
     if (DropNotification)
     {
-        if (GetNotificationCenter()->RemoveFirst())
+        if (m_mainWindow->GetCurrentNotificationCenter()->RemoveFirst())
             return; // we've removed the top window, don't process any further
     }
+
     QMutableMapIterator<QString, MythScreenType*> it(m_children);
     while (it.hasNext())
     {
