@@ -34,14 +34,14 @@
 #define PRINT_BITS_ADVISED_BUFSIZE               16
 #define PRINT_CHANNEL_ALLOCATION_ADVISED_BUFSIZE 80
 
-class MPUBLIC ELD
+class MPUBLIC eld
 {
   public:
-    ELD(const char *buf, int size);
-    ELD(const ELD& /*rhs*/);
-    ELD();
-    ~ELD()= default;
-    ELD& operator=(const ELD& /*rhs*/);
+    eld(const char *buf, int size);
+    eld(const eld& /*rhs*/);
+    eld();
+    ~eld()= default;
+    eld& operator=(const eld& /*rhs*/);
     void show();
     QString eld_version_name() const;
     QString edid_version_name() const;

@@ -173,7 +173,7 @@ class MPUBLIC AudioOutputSettings
             /**
              * retrieve ELD data
              */
-        ELD &getELD(void)             { return m_eld; };
+        eld &getELD(void)             { return m_eld; };
             /**
              * Reports best supported channel number, restricted to ELD range
              */
@@ -203,7 +203,7 @@ class MPUBLIC AudioOutputSettings
              * ELD is usually retrieved from EDID CEA-861-E extension.
              */
         bool         m_hasEld      {false};
-        ELD          m_eld;
+        eld          m_eld;
 
         std::vector<int>          m_rates;
         std::vector<int>          m_channels;

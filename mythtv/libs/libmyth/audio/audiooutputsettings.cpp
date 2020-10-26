@@ -539,7 +539,7 @@ bool AudioOutputSettings::hasELD() const
 void AudioOutputSettings::setELD(QByteArray *ba)
 {
     m_hasEld = true;
-    m_eld = ELD(ba->constData(), ba->size());
+    m_eld = eld(ba->constData(), ba->size());
     m_eld.show();
 }
 
