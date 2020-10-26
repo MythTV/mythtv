@@ -165,6 +165,9 @@ Checks: '-*,
 
     readability-*,
 
+        # Need to decide on an appropriate value. ,
+       -readability-function-cognitive-complexity,
+
         # Not investigated yet. ,
        -readability-function-size,
 
