@@ -144,7 +144,7 @@ class OSD : public QObject
     bool    HasWindow(const QString &Window);
     void    ResetWindow(const QString &Window);
     void    PositionWindow(MythScreenType *Window);
-    void    Draw();
+    void    Draw(const QRect& Rect);
 
     void SetValues(const QString &Window, const QHash<QString,int> &Map, OSDTimeout Timeout);
     void SetValues(const QString &Window, const QHash<QString,float> &Map, OSDTimeout Timeout);

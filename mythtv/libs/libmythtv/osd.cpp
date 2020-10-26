@@ -630,7 +630,7 @@ void OSD::SetGraph(const QString &Window, const QString &Graph, int64_t Timecode
         image->SetImage(mi);
 }
 
-void OSD::Draw()
+void OSD::Draw(const QRect &Rect)
 {
     bool visible = false;
     QTime now = MythDate::current().time();
@@ -700,7 +700,7 @@ void OSD::Draw()
         {
             if (screen->IsVisible())
             {
-                screen->Draw(m_painter, 0, 0, 255);
+                screen->Draw(m_painter, 0, 0, 255, Rect);
                 screen->SetAlpha(255);
                 screen->ResetNeedsRedraw();
             }
@@ -709,7 +709,7 @@ void OSD::Draw()
         {
             if (notif->IsVisible())
             {
-                notif->Draw(m_painter, 0, 0, 255);
+                notif->Draw(m_painter, 0, 0, 255, Rect);
                 notif->SetAlpha(255);
                 notif->ResetNeedsRedraw();
             }
