@@ -18,7 +18,7 @@ class SceneChangeDetector : public FrameAnalyzer
 {
 public:
     SceneChangeDetector(std::shared_ptr<HistogramAnalyzer> ha, const QString& debugdir);
-    virtual void deleteLater(void);
+    virtual void deleteLater(void) {};
 
     /* FrameAnalyzer interface. */
     const char *name(void) const override // FrameAnalyzer
@@ -49,8 +49,8 @@ public:
     float                   m_fps                {0.0F};
 
     /* per-frame info */
-    SceneChangeData         *m_scData            {nullptr};
-    unsigned short          *m_scDiff            {nullptr};
+    std::vector<SceneChangeData> m_scData        {};
+    std::vector<uint16_t>        m_scDiff        {};
 
     FrameAnalyzer::FrameMap m_changeMap;
 

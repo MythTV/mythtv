@@ -45,7 +45,7 @@ scenechange_data_init(SceneChangeDetector::SceneChangeData *scdata,
             scenechange_data_sort_desc_frequency);
 }
 
-unsigned short
+uint16_t
 scenechange_data_diff(const SceneChangeDetector::SceneChangeData *sc1,
         const SceneChangeDetector::SceneChangeData *sc2)
 {
@@ -53,7 +53,7 @@ scenechange_data_diff(const SceneChangeDetector::SceneChangeData *sc1,
      * Compute a notion of "difference" that takes into account the difference
      * in relative frequencies of the dominant colors.
      */
-    unsigned short diff = 0;
+    uint16_t diff = 0;
     for (size_t ii = 0; ii < sizeof(*sc1)/sizeof((*sc1)[0]); ii++)
         diff += abs((*sc1)[ii].frequency - (*sc2)[ii].frequency) +
             abs((*sc1)[ii].color - (*sc2)[ii].color);
@@ -61,14 +61,14 @@ scenechange_data_diff(const SceneChangeDetector::SceneChangeData *sc1,
 }
 
 bool
-writeData(const QString& filename, const unsigned short *scdiff, long long nframes)
+writeData(const QString& filename, const std::vector<uint16_t>& scdiff)
 {
     QByteArray fname = filename.toLocal8Bit();
     FILE *fp = fopen(fname.constData(), "w");
     if (fp == nullptr)
         return false;
-    for (long long frameno = 0; frameno < nframes; frameno++)
-        (void)fprintf(fp, "%5u\n", scdiff[frameno]);
+    for (auto value : scdiff)
+        (void)fprintf(fp, "%5u\n", value);
     if (fclose(fp))
         LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
                 .arg(filename).arg(strerror(errno)));
@@ -76,14 +76,14 @@ writeData(const QString& filename, const unsigned short *scdiff, long long nfram
 }
 
 void
-computeChangeMap(FrameAnalyzer::FrameMap *changeMap, long long nframes,
-        const unsigned short *scdiff, unsigned short mindiff)
+computeChangeMap(FrameAnalyzer::FrameMap *changeMap,
+        const std::vector<uint16_t>& scdiff, uint16_t mindiff)
 {
     /*
      * Look for sudden changes in histogram.
      */
     changeMap->clear();
-    for (long long frameno = 0; frameno < nframes; frameno++)
+    for (size_t frameno = 0; frameno < scdiff.size(); frameno++)
     {
         if (scdiff[frameno] > mindiff)
             changeMap->insert(frameno, 0);
@@ -114,11 +114,6 @@ SceneChangeDetector::SceneChangeDetector(std::shared_ptr<HistogramAnalyzer> ha,
     }
 }
 
-void SceneChangeDetector::deleteLater(void)
-{
-    delete []m_scData;
-    delete []m_scDiff;
-}
 
 enum FrameAnalyzer::analyzeFrameResult
 SceneChangeDetector::MythPlayerInited(MythPlayer *player,
@@ -129,11 +124,8 @@ SceneChangeDetector::MythPlayerInited(MythPlayer *player,
 
     m_fps = player->GetFrameRate();
 
-    m_scData = new SceneChangeData[nframes];
-    memset(m_scData, 0, nframes * sizeof(*m_scData));
-
-    m_scDiff = new unsigned short[nframes];
-    memset(m_scDiff, 0, nframes * sizeof(*m_scDiff));
+    m_scData.resize(nframes);
+    m_scDiff.resize(nframes);
 
     QSize video_disp_dim = player->GetVideoSize();
 
@@ -181,7 +173,7 @@ SceneChangeDetector::finished(long long nframes, bool final)
 
     if (!m_sceneChangeDone && m_debugSceneChange)
     {
-        if (final && writeData(m_debugData, m_scDiff, nframes))
+        if (final && writeData(m_debugData, m_scDiff))
         {
             LOG(VB_COMMFLAG, LOG_INFO, 
                 QString("SceneChangeDetector::finished wrote %1")
@@ -191,15 +183,13 @@ SceneChangeDetector::finished(long long nframes, bool final)
     }
 
     /* Identify all scene-change frames (changeMap). */
-    auto *scdiffsort = new unsigned short[nframes];
-    memcpy(scdiffsort, m_scDiff, nframes * sizeof(*m_scDiff));
-    unsigned short mindiff = quick_select_ushort(scdiffsort, nframes,
+    std::vector<uint16_t> scdiffsort = m_scDiff;
+    uint16_t mindiff = quick_select_ushort(scdiffsort.data(), nframes,
                                                  (int)(0.979472 * nframes));
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("SceneChangeDetector::finished applying threshold value %1")
             .arg(mindiff));
-    computeChangeMap(&m_changeMap, nframes, m_scDiff, mindiff);
-    delete []scdiffsort;
+    computeChangeMap(&m_changeMap, m_scDiff, mindiff);
     if (m_debugLevel >= 2)
         frameAnalyzerReportMapms(&m_changeMap, m_fps, "SC frame");
 
