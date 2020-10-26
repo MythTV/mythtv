@@ -220,7 +220,7 @@ void OSD::LoadWindows()
 
     for (const auto & window : s_defaultWindows)
     {
-        auto * win = new MythOSDWindow(nullptr, m_painter, window, true);
+        auto * win = new MythOverlayWindow(nullptr, m_painter, window, true);
         if (win->Create())
         {
             PositionWindow(win);
@@ -229,11 +229,11 @@ void OSD::LoadWindows()
 
             // Update player for window visibility
             if (window == OSD_WIN_BROWSE)
-                connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::BrowsingChanged);
+                connect(win, &MythOverlayWindow::VisibilityChanged, m_player, &MythPlayerUI::BrowsingChanged);
             if (window == OSD_WIN_PROGEDIT)
-                connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::EditingChanged);
+                connect(win, &MythOverlayWindow::VisibilityChanged, m_player, &MythPlayerUI::EditingChanged);
             if (window == OSD_WIN_DEBUG)
-                connect(win, &MythOSDWindow::VisibilityChanged, m_player, &MythPlayerUI::OSDDebugVisibilityChanged);
+                connect(win, &MythOverlayWindow::VisibilityChanged, m_player, &MythPlayerUI::OSDDebugVisibilityChanged);
         }
         else
         {

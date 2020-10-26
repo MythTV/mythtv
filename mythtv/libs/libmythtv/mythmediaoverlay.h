@@ -15,12 +15,12 @@ class MythMainWindow;
 class MythPlayerUI;
 class MythPainter;
 
-class MythOSDWindow : public MythScreenType
+class MythOverlayWindow : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    MythOSDWindow(MythScreenStack* Parent, MythPainter* Painter, const QString& Name, bool Themed);
+    MythOverlayWindow(MythScreenStack* Parent, MythPainter* Painter, const QString& Name, bool Themed);
     bool Create() override;
 
   private:

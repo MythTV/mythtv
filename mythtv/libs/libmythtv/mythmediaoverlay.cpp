@@ -9,7 +9,7 @@
 
 #define LOC QString("Overlay: ")
 
-MythOSDWindow::MythOSDWindow(MythScreenStack* Parent, MythPainter* Painter,
+MythOverlayWindow::MythOverlayWindow(MythScreenStack* Parent, MythPainter* Painter,
                              const QString& Name, bool Themed)
   : MythScreenType(Parent, Name, true),
     m_themed(Themed)
@@ -17,7 +17,7 @@ MythOSDWindow::MythOSDWindow(MythScreenStack* Parent, MythPainter* Painter,
     m_painter = Painter;
 }
 
-bool MythOSDWindow::Create()
+bool MythOverlayWindow::Create()
 {
     if (m_themed)
         return XMLParseBase::LoadWindowFromXML("osd.xml", objectName(), this);
@@ -89,7 +89,7 @@ MythScreenType* MythMediaOverlay::GetWindow(const QString &Window)
     if (m_children.contains(Window))
         return m_children.value(Window);
 
-    return InitWindow(Window, new MythOSDWindow(nullptr, m_painter, Window, false));
+    return InitWindow(Window, new MythOverlayWindow(nullptr, m_painter, Window, false));
 }
 
 MythScreenType *MythMediaOverlay::InitWindow(const QString& Window, MythScreenType* Screen)
