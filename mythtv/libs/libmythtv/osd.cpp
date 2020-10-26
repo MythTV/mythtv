@@ -973,6 +973,13 @@ void OSD::DialogQuit()
     m_pulsedDialogText = QString();
 }
 
+/*! \brief Show a dialog menu, removing any existing dialog
+ *
+ * This slot deliberately uses a const reference despite the minor
+ * performance penalty. This simplifies memory management (e.g. if the signal
+ * is not delivered when there is no OSD) and allows for possible future changes
+ * where the OSD and TV objects do not reside in the same thread.
+*/
 void OSD::ShowDialog(const MythOSDDialogData& Data)
 {
     DialogShow(Data.m_dialogName, Data.m_message, Data.m_timeout);
