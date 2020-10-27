@@ -1,14 +1,16 @@
 #ifndef INTERACTIVESCREEN_H
 #define INTERACTIVESCREEN_H
 
+// MythTV
 #include "mythscreentype.h"
-#include "mythplayer.h"
+
+class MythPlayerUI;
 
 class InteractiveScreen : public MythScreenType
 {
     Q_OBJECT
   public:
-    InteractiveScreen(MythPlayer* Player, MythPainter* Painter, const QString& Name);
+    InteractiveScreen(MythPlayerUI* Player, MythPainter* Painter, const QString& Name);
     ~InteractiveScreen() override = default;
     bool Create() override
     {
@@ -22,8 +24,8 @@ class InteractiveScreen : public MythScreenType
     void Close() override;
 
   private:
-    MythPlayer* m_player { nullptr };
-    QRect       m_safeArea;
+    MythPlayerUI* m_player { nullptr };
+    QRect         m_safeArea;
 };
 
 #endif

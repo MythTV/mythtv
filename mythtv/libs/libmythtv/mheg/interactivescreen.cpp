@@ -1,6 +1,8 @@
+// MythTV
+#include "mythplayerui.h"
 #include "mheg/interactivescreen.h"
 
-InteractiveScreen::InteractiveScreen(MythPlayer *Player, MythPainter *Painter, const QString &Name)
+InteractiveScreen::InteractiveScreen(MythPlayerUI *Player, MythPainter *Painter, const QString &Name)
   : MythScreenType(static_cast<MythScreenType*>(nullptr), Name),
     m_player(Player)
 {

@@ -7,7 +7,7 @@
 class InteractiveScreen;
 class MythPainter;
 class MHIContext;
-class MythPlayer;
+class MythPlayerCaptionsUI;
 
 /** \class InteractiveTV
  *  \brief This is the interface between an MHEG engine and a MythTV TV object.
@@ -17,7 +17,7 @@ class InteractiveTV
 #ifdef USING_MHEG
   public:
     // Interface to Myth
-    explicit InteractiveTV(MythPlayer *nvp);
+    explicit InteractiveTV(MythPlayerCaptionsUI* Player);
     virtual ~InteractiveTV();
 
     InteractiveTV(const InteractiveTV&) = delete;
@@ -48,11 +48,11 @@ class InteractiveTV
     // Called when a stream starts or stops. Returns true if event is handled
     bool StreamStarted(bool bStarted = true);
 
-    MythPlayer *GetNVP(void) { return m_nvp; }
+    MythPlayerCaptionsUI* GetPlayer(void) { return m_player; }
 
   protected:
-    MHIContext *m_context {nullptr};
-    MythPlayer *m_nvp     {nullptr};
+    MHIContext* m_context { nullptr };
+    MythPlayerCaptionsUI* m_player { nullptr };
 #endif
 };
 

@@ -13,8 +13,9 @@
 #include "mhi.h"
 #include "mythlogging.h"
 
-InteractiveTV::InteractiveTV(MythPlayer *nvp)
-    : m_context(new MHIContext(this)), m_nvp(nvp)
+InteractiveTV::InteractiveTV(MythPlayerCaptionsUI *Player)
+  : m_context(new MHIContext(this)),
+    m_player(Player)
 {
     Restart(0, 0, false);
 

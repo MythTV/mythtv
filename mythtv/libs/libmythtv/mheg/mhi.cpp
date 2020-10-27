@@ -32,7 +32,7 @@
 #include "mythdb.h"                     // for MythDB
 #include "mythdbcon.h"                  // for MSqlQuery
 #include "mythevent.h"                  // for MythEvent
-#include "mythplayer.h"                 // for MythPlayer
+#include "mythplayerui.h"
 #include "mythrect.h"                   // for MythRect
 #include "mythuiactions.h"              // for ACTION_0, ACTION_1, etc
 #include "tv_actions.h"                 // for ACTION_MENUTEXT, etc
@@ -841,7 +841,7 @@ inline int Roundup(int n, int r)
 void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
 {
     // tell the video player to resize the video stream
-    if (m_parent->GetNVP())
+    if (m_parent->GetPlayer())
     {
         QRect vidRect;
         if (videoRect != QRect(QPoint(0,0),QSize(kStdDisplayWidth,kStdDisplayHeight)))
@@ -850,7 +850,7 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
             vidRect.setWidth(Roundup(vidRect.width(), 2));
             vidRect.setHeight(Roundup(vidRect.height(), 2));
         }
-        m_parent->GetNVP()->SetVideoResize(vidRect);
+        m_parent->GetPlayer()->SetVideoResize(vidRect);
     }
 
     m_videoDisplayRect = Scale(dispRect);
@@ -1049,7 +1049,7 @@ bool MHIContext::BeginStream(const QString &stream, MHStream *notify)
         if (QUrl(stream).authority().isEmpty())
             return false;
 
-        return m_parent->GetNVP()->SetStream(stream);
+        return m_parent->GetPlayer()->SetStream(stream);
     }
 
     int chan = GetChannelIndex(stream);
@@ -1082,7 +1082,7 @@ void MHIContext::EndStream()
         .arg((quintptr)m_notify,0,16) );
 
     m_notify = nullptr;
-    (void)m_parent->GetNVP()->SetStream(QString());
+    (void)m_parent->GetPlayer()->SetStream(QString());
 }
 
 // Callback from MythPlayer when a stream starts or stops
@@ -1110,8 +1110,8 @@ bool MHIContext::BeginAudio(int tag)
         return true; // Leave it at the default.
 
     m_audioTag = tag;
-    if (m_parent->GetNVP())
-        return m_parent->GetNVP()->SetAudioByComponentTag(tag);
+    if (m_parent->GetPlayer())
+        return m_parent->GetPlayer()->SetAudioByComponentTag(tag);
     return false;
  }
 
@@ -1130,8 +1130,8 @@ bool MHIContext::BeginVideo(int tag)
         return true; // Leave it at the default.
 
     m_videoTag = tag;
-    if (m_parent->GetNVP())
-        return m_parent->GetNVP()->SetVideoByComponentTag(tag);
+    if (m_parent->GetPlayer())
+        return m_parent->GetPlayer()->SetVideoByComponentTag(tag);
     return false;
 }
 
@@ -1144,26 +1144,26 @@ void MHIContext::StopVideo()
 // Get current stream position, -1 if unknown
 long MHIContext::GetStreamPos()
 {
-    return m_parent->GetNVP() ? m_parent->GetNVP()->GetStreamPos() : -1;
+    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamPos() : -1;
 }
 
 // Get current stream size, -1 if unknown
 long MHIContext::GetStreamMaxPos()
 {
-    return m_parent->GetNVP() ? m_parent->GetNVP()->GetStreamMaxPos() : -1;
+    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamMaxPos() : -1;
 }
 
 // Set current stream position
 long MHIContext::SetStreamPos(long pos)
 {
-    return m_parent->GetNVP() ? m_parent->GetNVP()->SetStreamPos(pos) : -1;
+    return m_parent->GetPlayer() ? m_parent->GetPlayer()->SetStreamPos(pos) : -1;
 }
 
 // Play or pause a stream
 void MHIContext::StreamPlay(bool play)
 {
-    if (m_parent->GetNVP())
-        m_parent->GetNVP()->StreamPlay(play);
+    if (m_parent->GetPlayer())
+        m_parent->GetPlayer()->StreamPlay(play);
 }
 
 // Create a new object to draw dynamic line art.
