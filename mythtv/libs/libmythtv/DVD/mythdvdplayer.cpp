@@ -558,7 +558,7 @@ bool MythDVDPlayer::DoJumpChapter(int Chapter)
 
 void MythDVDPlayer::DisplayDVDButton(void)
 {
-    if (!m_osd || !m_playerCtx->m_buffer->IsDVD())
+    if (!m_playerCtx->m_buffer->IsDVD())
         return;
 
     uint buttonversion = 0;
@@ -593,8 +593,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
     if (!numbuttons || !dvdSubtitle || (buttonversion == 0) || expired)
     {
         m_osdLock.lock();
-        if (m_osd)
-            m_osd->ClearSubtitles();
+        m_osd.ClearSubtitles();
         m_osdLock.unlock();
         m_buttonVersion = 0;
         m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
@@ -610,8 +609,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
     m_buttonVersion = static_cast<int>(buttonversion);
     QRect buttonPos = m_playerCtx->m_buffer->DVD()->GetButtonCoords();
     m_osdLock.lock();
-    if (m_osd)
-        m_osd->DisplayDVDButton(dvdSubtitle, buttonPos);
+    m_osd.DisplayDVDButton(dvdSubtitle, buttonPos);
     m_osdLock.unlock();
     m_textDisplayMode = kDisplayDVDButton;
     m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();

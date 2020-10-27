@@ -30,14 +30,19 @@
 OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* Painter)
   : MythCaptionsOverlay(MainWindow, Tv, Player, Painter)
 {
-    connect(this, &OSD::HideOSD, m_tv, &TV::HandleOSDClosed);
+    connect(this, &OSD::HideOSD,        m_tv, &TV::HandleOSDClosed);
     connect(m_tv, &TV::ChangeOSDDialog, this, &OSD::ShowDialog);
-    connect(m_tv, &TV::ChangeOSDText, this, &OSD::SetText);
+    connect(m_tv, &TV::ChangeOSDText,   this, &OSD::SetText);
 }
 
 OSD::~OSD()
 {
     OSD::TearDown();
+}
+
+void OSD::SetPlayer(MythPlayerUI *Player)
+{
+    m_player = Player;
 }
 
 void OSD::TearDown()

@@ -152,23 +152,20 @@ void MythPlayerVideoUI::ReinitOSD()
         float aspect = NAN;
         float scaling = NAN;
         m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
-        if (m_osd)
+        int stretch = static_cast<int>(lroundf(aspect * 100));
+        if ((m_osd.Bounds() != visible) ||
+            (m_osd.GetFontStretch() != stretch))
         {
-            int stretch = static_cast<int>(lroundf(aspect * 100));
-            if ((m_osd->Bounds() != visible) ||
-                (m_osd->GetFontStretch() != stretch))
+            uint old = m_textDisplayMode;
+            ToggleCaptions(old);
+            m_osd.Init(visible, aspect);
+            EnableCaptions(old, false);
+            if (m_deleteMap.IsEditing())
             {
-                uint old = m_textDisplayMode;
-                ToggleCaptions(old);
-                m_osd->Init(visible, aspect);
-                EnableCaptions(old, false);
-                if (m_deleteMap.IsEditing())
-                {
-                    bool const changed = m_deleteMap.IsChanged();
-                    m_deleteMap.SetChanged(true);
-                    m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, m_osd);
-                    m_deleteMap.SetChanged(changed);
-                }
+                bool const changed = m_deleteMap.IsChanged();
+                m_deleteMap.SetChanged(true);
+                m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, &m_osd);
+                m_deleteMap.SetChanged(changed);
             }
         }
 

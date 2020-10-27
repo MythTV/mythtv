@@ -588,10 +588,10 @@ void MythVideoOutputGPU::RenderFrame(MythVideoFrame *Frame, FrameScanType Scan)
         m_render->SetViewPort(GetWindowRect());
 }
 
-void MythVideoOutputGPU::RenderOverlays(OSD *Osd)
+void MythVideoOutputGPU::RenderOverlays(OSD& Osd)
 {
-    if (Osd && !IsEmbedding())
-        Osd->Draw(GetDisplayVisibleRect());
+    if (!IsEmbedding())
+        Osd.Draw(GetDisplayVisibleRect());
 }
 
 void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan)

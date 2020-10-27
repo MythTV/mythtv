@@ -5,8 +5,10 @@
 
 #define LOC QString("PlayerOverlay: ")
 
+// N.B. Overlay is initialised without a player - it must be set before it can be used
 MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
-  : MythPlayerUIBase(MainWindow, Tv, Context, Flags)
+  : MythPlayerUIBase(MainWindow, Tv, Context, Flags),
+    m_osd(MainWindow, Tv, nullptr, m_painter)
 {
     m_positionUpdateTimer.setInterval(999);
     connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerOverlayUI::UpdateOSDPosition);
@@ -17,7 +19,6 @@ MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, Pla
 
 MythPlayerOverlayUI::~MythPlayerOverlayUI()
 {
-    delete m_osd;
 }
 
 void MythPlayerOverlayUI::BrowsingChanged(bool Browsing)
@@ -51,19 +52,16 @@ void MythPlayerOverlayUI::ChangeOSDPositionUpdates(bool Enable)
 void MythPlayerOverlayUI::UpdateOSDPosition()
 {
     m_osdLock.lock();
-    if (m_osd)
+    if (m_osd.IsWindowVisible(OSD_WIN_STATUS))
     {
-        if (m_osd->IsWindowVisible(OSD_WIN_STATUS))
-        {
-            osdInfo info;
-            UpdateSliderInfo(info);
-            m_osd->SetText(OSD_WIN_STATUS, info.text, kOSDTimeout_Ignore);
-            m_osd->SetValues(OSD_WIN_STATUS, info.values, kOSDTimeout_Ignore);
-        }
-        else
-        {
-            ChangeOSDPositionUpdates(false);
-        }
+        osdInfo info;
+        UpdateSliderInfo(info);
+        m_osd.SetText(OSD_WIN_STATUS, info.text, kOSDTimeout_Ignore);
+        m_osd.SetValues(OSD_WIN_STATUS, info.values, kOSDTimeout_Ignore);
+    }
+    else
+    {
+        ChangeOSDPositionUpdates(false);
     }
     m_osdLock.unlock();
 }
@@ -76,40 +74,31 @@ void MythPlayerOverlayUI::UpdateOSDMessage(const QString& Message)
 void MythPlayerOverlayUI::UpdateOSDMessage(const QString& Message, OSDTimeout Timeout)
 {
     m_osdLock.lock();
-    if (m_osd)
-    {
-        InfoMap map;
-        map.insert("message_text", Message);
-        m_osd->SetText(OSD_WIN_MESSAGE, map, Timeout);
-    }
+    InfoMap map;
+    map.insert("message_text", Message);
+    m_osd.SetText(OSD_WIN_MESSAGE, map, Timeout);
     m_osdLock.unlock();
 }
 
 void MythPlayerOverlayUI::SetOSDStatus(const QString& title, OSDTimeout timeout)
 {
     m_osdLock.lock();
-    if (m_osd)
-    {
-        osdInfo info;
-        UpdateSliderInfo(info);
-        info.text.insert("title", title);
-        m_osd->SetText(OSD_WIN_STATUS, info.text, timeout);
-        m_osd->SetValues(OSD_WIN_STATUS, info.values, timeout);
-    }
+    osdInfo info;
+    UpdateSliderInfo(info);
+    info.text.insert("title", title);
+    m_osd.SetText(OSD_WIN_STATUS, info.text, timeout);
+    m_osd.SetValues(OSD_WIN_STATUS, info.values, timeout);
     m_osdLock.unlock();
 }
 
 void MythPlayerOverlayUI::UpdateOSDStatus(osdInfo &Info, int Type, OSDTimeout Timeout)
 {
     m_osdLock.lock();
-    if (m_osd)
-    {
-        m_osd->ResetWindow(OSD_WIN_STATUS);
-        m_osd->SetValues(OSD_WIN_STATUS, Info.values, Timeout);
-        m_osd->SetText(OSD_WIN_STATUS,   Info.text, Timeout);
-        if (Type != kOSDFunctionalType_Default)
-            m_osd->SetFunctionalWindow(OSD_WIN_STATUS, static_cast<OSDFunctionalType>(Type));
-    }
+    m_osd.ResetWindow(OSD_WIN_STATUS);
+    m_osd.SetValues(OSD_WIN_STATUS, Info.values, Timeout);
+    m_osd.SetText(OSD_WIN_STATUS,   Info.text, Timeout);
+    if (Type != kOSDFunctionalType_Default)
+        m_osd.SetFunctionalWindow(OSD_WIN_STATUS, static_cast<OSDFunctionalType>(Type));
     m_osdLock.unlock();
 }
 

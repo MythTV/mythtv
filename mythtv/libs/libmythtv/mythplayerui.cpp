@@ -18,6 +18,9 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
   : MythPlayerVisualiserUI(MainWindow, Tv, Context, Flags),
     MythVideoScanTracker(this)
 {
+    // Finish setting up the overlay
+    m_osd.SetPlayer(this);
+
     // User feedback during slow seeks
     connect(this, &MythPlayerUI::SeekingSlow, [&](int Count)
     {
@@ -29,8 +32,7 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     connect(this, &MythPlayerUI::SeekingComplete, [=]()
     {
         m_osdLock.lock();
-        if (m_osd)
-            m_osd->HideWindow(OSD_WIN_MESSAGE);
+        m_osd.HideWindow(OSD_WIN_MESSAGE);
         m_osdLock.unlock();
     });
 
@@ -125,7 +127,7 @@ void MythPlayerUI::EventLoop()
             // N.B. the positionmap update and osd refresh are asynchronous
             m_forcePositionMapSync = true;
             m_osdLock.lock();
-            m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, m_osd);
+            m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, &m_osd);
             m_osdLock.unlock();
             m_editUpdateTimer.start();
         }
@@ -358,15 +360,11 @@ void MythPlayerUI::PreProcessNormalFrame()
     {
         m_osdLock.lock();
         m_itvLock.lock();
-        if (m_osd)
+        auto *window = qobject_cast<InteractiveScreen *>(m_osd.GetWindow(OSD_WIN_INTERACT));
+        if ((m_interactiveTV->ImageHasChanged() || !m_itvVisible) && window)
         {
-            auto *window =
-                qobject_cast<InteractiveScreen *>(m_osd->GetWindow(OSD_WIN_INTERACT));
-            if ((m_interactiveTV->ImageHasChanged() || !m_itvVisible) && window)
-            {
-                m_interactiveTV->UpdateOSD(window, m_painter);
-                m_itvVisible = true;
-            }
+            m_interactiveTV->UpdateOSD(window, m_painter);
+            m_itvVisible = true;
         }
         m_itvLock.unlock();
         m_osdLock.unlock();
@@ -395,10 +393,9 @@ void MythPlayerUI::VideoStart()
     float scaling = NAN;
 
     m_osdLock.lock();
-    m_osd = new OSD(m_mainWindow, m_tv, this, m_painter);
     m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
-    m_osd->Init(visible, aspect);
-    m_osd->EnableSubtitles(kDisplayNone);
+    m_osd.Init(visible, aspect);
+    m_osd.EnableSubtitles(kDisplayNone);
 
 #ifdef USING_MHEG
     if (GetInteractiveTV())
@@ -430,7 +427,7 @@ void MythPlayerUI::VideoStart()
         }
     }
     if (hasForcedTextTrack)
-        SetTrack(kTrackTypeRawText, static_cast<int>(forcedTrackNumber));
+        SetTrack(kTrackTypeRawText, static_cast<uint>(forcedTrackNumber));
     else
         SetCaptionsEnabled(m_captionsEnabledbyDefault, false);
 
@@ -550,8 +547,7 @@ void MythPlayerUI::RefreshPauseFrame()
             if (m_deleteMap.IsEditing())
             {
                 m_osdLock.lock();
-                if (m_osd)
-                    DeleteMap::UpdateOSD(m_latestVideoTimecode, m_osd);
+                DeleteMap::UpdateOSD(m_latestVideoTimecode, &m_osd);
                 m_osdLock.unlock();
             }
         }
@@ -862,31 +858,25 @@ void MythPlayerUI::OSDDebugVisibilityChanged(bool Visible)
 void MythPlayerUI::UpdateOSDDebug()
 {
     m_osdLock.lock();
-    if (m_osd)
-    {
-        InfoMap infoMap;
-        GetPlaybackData(infoMap);
-        m_osd->ResetWindow(OSD_WIN_DEBUG);
-        m_osd->SetText(OSD_WIN_DEBUG, infoMap, kOSDTimeout_None);
-    }
+    InfoMap infoMap;
+    GetPlaybackData(infoMap);
+    m_osd.ResetWindow(OSD_WIN_DEBUG);
+    m_osd.SetText(OSD_WIN_DEBUG, infoMap, kOSDTimeout_None);
     m_osdLock.unlock();
 }
 
 void MythPlayerUI::ChangeOSDDebug()
 {
     m_osdLock.lock();
-    if (m_osd)
-    {
-        bool enable = !m_osdDebug;
-        if (m_playerCtx->m_buffer)
-            m_playerCtx->m_buffer->EnableBitrateMonitor(enable);
-        EnableFrameRateMonitor(enable);
-        if (enable)
-            UpdateOSDDebug();
-        else
-            m_osd->HideWindow(OSD_WIN_DEBUG);
-        m_osdDebug = enable;
-    }
+    bool enable = !m_osdDebug;
+    if (m_playerCtx->m_buffer)
+        m_playerCtx->m_buffer->EnableBitrateMonitor(enable);
+    EnableFrameRateMonitor(enable);
+    if (enable)
+        UpdateOSDDebug();
+    else
+        m_osd.HideWindow(OSD_WIN_DEBUG);
+    m_osdDebug = enable;
     m_osdLock.unlock();
 }
 
@@ -1271,9 +1261,6 @@ void MythPlayerUI::EnableEdit()
         return;
 
     QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
     SetupAudioGraph(m_videoFrameRate);
 
     m_savedAudioTimecodeOffset = m_tcWrap[TC_AUDIO];
@@ -1282,16 +1269,16 @@ void MythPlayerUI::EnableEdit()
     m_speedBeforeEdit = m_playSpeed;
     m_pausedBeforeEdit = Pause();
     m_deleteMap.SetEditing(true);
-    m_osd->DialogQuit();
+    m_osd.DialogQuit();
     ResetCaptions();
-    m_osd->HideAll();
+    m_osd.HideAll();
 
     bool loadedAutoSave = m_deleteMap.LoadAutoSaveMap();
     if (loadedAutoSave)
         UpdateOSDMessage(tr("Using previously auto-saved cuts"), kOSDTimeout_Short);
 
     m_deleteMap.UpdateSeekAmount(0);
-    m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, m_osd);
+    m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, &m_osd);
     m_deleteMap.SetFileEditing(true);
     m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
     if (m_playerCtx->m_playingInfo)
@@ -1309,10 +1296,7 @@ void MythPlayerUI::EnableEdit()
 void MythPlayerUI::DisableEdit(int HowToSave)
 {
     QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    m_deleteMap.SetEditing(false, m_osd);
+    m_deleteMap.SetEditing(false, &m_osd);
     if (HowToSave == 0)
         m_deleteMap.LoadMap();
     // Unconditionally save to remove temporary marks from the DB.
@@ -1489,8 +1473,7 @@ bool MythPlayerUI::HandleProgramEditorActions(QStringList& Actions)
     if (handled && refresh)
     {
         m_osdLock.lock();
-        if (m_osd)
-            m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, m_osd);
+        m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, &m_osd);
         m_osdLock.unlock();
     }
 

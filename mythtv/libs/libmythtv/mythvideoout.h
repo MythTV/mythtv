@@ -83,7 +83,7 @@ class MythVideoOutput : public MythVideoBounds
     int          GetPictureAttribute   (PictureAttribute AttributeType);
     virtual void InitPictureAttributes () { }
     bool         HasSoftwareFrames     () const { return codec_sw_copy(m_videoCodecID); }
-    virtual void RenderOverlays        (OSD* /*Osd*/) {}
+    virtual void RenderOverlays        (OSD& /*Osd*/) {}
     virtual void UpdatePauseFrame      (int64_t& /*DisplayTimecode*/,
                                         FrameScanType /*Scan*/ = kScan_Progressive) {}
 

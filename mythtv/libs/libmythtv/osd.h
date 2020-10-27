@@ -108,6 +108,7 @@ class OSD : public MythCaptionsOverlay
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
    ~OSD() override;
 
+    void SetPlayer(MythPlayerUI* Player);
     bool Init(const QRect &Rect, float FontAspect) override;
     void HideWindow(const QString &Window) override;
     void SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);

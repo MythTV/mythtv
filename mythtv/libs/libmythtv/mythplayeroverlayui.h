@@ -21,7 +21,7 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
 
     virtual void UpdateSliderInfo(osdInfo& Info, bool PaddedFields = false);
 
-    OSD* GetOSD()    { return m_osd; }
+    OSD* GetOSD()    { return &m_osd; }
     void LockOSD()   { m_osdLock.lock(); }
     void UnlockOSD() { m_osdLock.unlock(); }
 
@@ -40,7 +40,7 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
     virtual int64_t GetSecondsPlayed(bool HonorCutList, int Divisor = 1000);
     virtual int64_t GetTotalSeconds(bool HonorCutList, int Divisor = 1000) const;
 
-    OSD*   m_osd      { nullptr };
+    OSD    m_osd;
     QMutex m_osdLock  { QMutex::Recursive };
     bool   m_browsing { false };
     bool   m_editing  { false };

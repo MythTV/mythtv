@@ -17,7 +17,7 @@ class MythVideoOutputNull : public MythVideoOutput
 
     void PrepareFrame (MythVideoFrame* Frame, FrameScanType Scan) override;
     void RenderFrame  (MythVideoFrame* Frame, FrameScanType Scan) override;
-    void RenderOverlays (OSD* /*Osd*/) override { }
+    void RenderOverlays (OSD& /*Osd*/) override { }
     void RenderEnd    () override { }
     void EndFrame     () override { }
     bool InputChanged(const QSize& VideoDim,   const QSize& VideoDispDim,

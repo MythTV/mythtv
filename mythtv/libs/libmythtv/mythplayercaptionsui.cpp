@@ -19,8 +19,6 @@ MythPlayerCaptionsUI::~MythPlayerCaptionsUI()
 void MythPlayerCaptionsUI::ResetCaptions()
 {
     QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
 
     if (((m_textDisplayMode & kDisplayAVSubtitle)      ||
          (m_textDisplayMode & kDisplayTextSubtitle)    ||
@@ -29,12 +27,12 @@ void MythPlayerCaptionsUI::ResetCaptions()
          (m_textDisplayMode & kDisplayCC608)           ||
          (m_textDisplayMode & kDisplayCC708)))
     {
-        m_osd->ClearSubtitles();
+        m_osd.ClearSubtitles();
     }
     else if ((m_textDisplayMode & kDisplayTeletextCaptions) ||
              (m_textDisplayMode & kDisplayNUVTeletextCaptions))
     {
-        m_osd->TeletextClear();
+        m_osd.TeletextClear();
     }
 }
 
@@ -101,15 +99,13 @@ void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD)
             if (track > -1)
                 msg += m_decoder->GetTrackDesc(type, static_cast<uint>(track));
         }
-        if (m_osd)
-            m_osd->EnableSubtitles(preserve);
+        m_osd.EnableSubtitles(preserve);
     }
 
     if (kDisplayTextSubtitle & Mode)
     {
         msg += tr("Text subtitles");
-        if (m_osd)
-            m_osd->EnableSubtitles(preserve);
+        m_osd.EnableSubtitles(preserve);
     }
 
     if (!msg.isEmpty() && UpdateOSD)
@@ -138,13 +134,11 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
                 msg += m_decoder->GetTrackDesc(type, static_cast<uint>(track));
         }
 
-        if (m_osd)
-            m_osd->EnableSubtitles(static_cast<int>(Mode));
+        m_osd.EnableSubtitles(static_cast<int>(Mode));
     }
     if (kDisplayTextSubtitle & Mode)
     {
-        if (m_osd)
-            m_osd->EnableSubtitles(kDisplayTextSubtitle);
+        m_osd.EnableSubtitles(kDisplayTextSubtitle);
         msg += tr("Text subtitles");
     }
     if (kDisplayNUVTeletextCaptions & Mode)
@@ -302,8 +296,7 @@ void MythPlayerCaptionsUI::DoDisableForcedSubtitles()
 {
     m_disableForcedSubtitles = false;
     m_osdLock.lock();
-    if (m_osd)
-        m_osd->DisableForcedSubtitles();
+    m_osd.DisableForcedSubtitles();
     m_osdLock.unlock();
 }
 
@@ -314,8 +307,7 @@ void MythPlayerCaptionsUI::DoEnableForcedSubtitles()
         return;
 
     m_osdLock.lock();
-    if (m_osd)
-        m_osd->EnableSubtitles(kDisplayAVSubtitle, true /*forced only*/);
+    m_osd.EnableSubtitles(kDisplayAVSubtitle, true /*forced only*/);
     m_osdLock.unlock();
 }
 
@@ -425,10 +417,7 @@ uint MythPlayerCaptionsUI::NextCaptionTrack(uint Mode)
 void MythPlayerCaptionsUI::EnableTeletext(int Page)
 {
     QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    m_osd->EnableTeletext(true, Page);
+    m_osd.EnableTeletext(true, Page);
     m_prevTextDisplayMode = m_textDisplayMode;
     m_textDisplayMode = kDisplayTeletextMenu;
 }
@@ -436,10 +425,7 @@ void MythPlayerCaptionsUI::EnableTeletext(int Page)
 void MythPlayerCaptionsUI::DisableTeletext()
 {
     QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    m_osd->EnableTeletext(false, 0);
+    m_osd.EnableTeletext(false, 0);
     m_textDisplayMode = kDisplayNone;
 
     // If subtitles were enabled before the teletext menu was displayed then re-enable them
@@ -450,10 +436,7 @@ void MythPlayerCaptionsUI::DisableTeletext()
 void MythPlayerCaptionsUI::ResetTeletext()
 {
     QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    m_osd->TeletextReset();
+    m_osd.TeletextReset();
 }
 
 /*! \brief Set Teletext NUV Caption page
@@ -473,7 +456,7 @@ void MythPlayerCaptionsUI::SetTeletextPage(uint Page)
 #include "tv_actions.h"
 bool MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action)
 {
-    if (!(m_textDisplayMode & kDisplayTeletextMenu) || !m_osd)
+    if (!(m_textDisplayMode & kDisplayTeletextMenu))
         return false;
 
     bool handled = true;
@@ -481,8 +464,8 @@ bool MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action)
     m_osdLock.lock();
     if (Action == "MENU" || Action == ACTION_TOGGLETT || Action == "ESCAPE")
         DisableTeletext();
-    else if (m_osd)
-        handled = m_osd->TeletextAction(Action);
+    else
+        handled = m_osd.TeletextAction(Action);
     m_osdLock.unlock();
 
     return handled;
@@ -519,7 +502,7 @@ InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()
     {
         QMutexLocker lock1(&m_osdLock);
         QMutexLocker lock2(&m_itvLock);
-        if (!m_interactiveTV && m_osd)
+        if (!m_interactiveTV)
             m_interactiveTV = new InteractiveTV(this);
     }
 #endif
