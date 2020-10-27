@@ -181,8 +181,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     bool    HasTVChainNext(void) const;
     bool    IsWatchingInprogress(void) const;
 
-    InteractiveTV *GetInteractiveTV(void);
-    MythVideoOutput *GetVideoOutput(void)       { return m_videoOutput; }
+    virtual InteractiveTV *GetInteractiveTV() { return nullptr; }
+    MythVideoOutput *GetVideoOutput(void)     { return m_videoOutput; }
 
     // Title stuff
     virtual bool SwitchTitle(int /*title*/) { return false; }
@@ -356,10 +356,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual void DecoderPauseCheck(void);
     virtual void AudioEnd(void);
 
-    // Protected MHEG/MHI stuff
-    bool ITVHandleAction(const QString &action);
-    void ITVRestart(uint chanid, uint cardid, bool isLiveTV);
-
     // Edit mode stuff
     bool GetEditMode(void) const { return m_deleteMap.IsEditing(); }
     bool IsInDelete(uint64_t frame);
@@ -525,12 +521,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     CC708Reader m_cc708;
 
     // Support for MHEG/MHI
-    InteractiveTV *m_interactiveTV        {nullptr};
-    QMutex     m_itvLock;
     QMutex     m_streamLock;
     QString    m_newStream; // Guarded by streamLock
-    bool       m_itvVisible               {false};
-    bool       m_itvEnabled               {false};
 
     // OSD stuff
     OSD    *m_osd                         {nullptr};

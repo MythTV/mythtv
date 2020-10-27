@@ -43,7 +43,7 @@ class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerAudioUI
     // Workaround inheritance chicken and egg in ReinitOSD
     virtual bool ToggleCaptions(uint /*Type*/) { return false; }
     virtual void EnableCaptions(uint /*Mode*/, bool /*UpdateOSD*/ = true) { }
-    void ReinitOSD();
+    virtual void ReinitOSD();
     void CheckAspectRatio(MythVideoFrame* Frame);
 
     void Zoom(ZoomDirection Direction);

@@ -1,9 +1,16 @@
 // MythTV
+#include "interactivetv.h"
 #include "mythplayercaptionsui.h"
 
 MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerVideoUI (MainWindow, Tv, Context, Flags)
 {
+    m_itvEnabled = gCoreContext->GetBoolSetting("EnableMHEG", false);
+}
+
+MythPlayerCaptionsUI::~MythPlayerCaptionsUI()
+{
+    delete m_interactiveTV;
 }
 
 void MythPlayerCaptionsUI::ResetCaptions()
@@ -476,4 +483,78 @@ bool MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action)
     m_osdLock.unlock();
 
     return handled;
+}
+
+void MythPlayerCaptionsUI::ReinitOSD()
+{
+    MythPlayerVideoUI::ReinitOSD();
+
+#ifdef USING_MHEG
+    if (m_videoOutput)
+    {
+        m_osdLock.lock();
+        QRect visible;
+        QRect total;
+        float aspect = NAN;
+        float scaling = NAN;
+        m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
+        if (GetInteractiveTV())
+        {
+            QMutexLocker locker(&m_itvLock);
+            m_interactiveTV->Reinit(total, visible, aspect);
+            m_itvVisible = false;
+        }
+        m_osdLock.unlock();
+    }
+#endif
+}
+
+InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()
+{
+#ifdef USING_MHEG
+    if (!m_interactiveTV && m_itvEnabled && !FlagIsSet(kNoITV))
+    {
+        QMutexLocker lock1(&m_osdLock);
+        QMutexLocker lock2(&m_itvLock);
+        if (!m_interactiveTV && m_osd)
+            m_interactiveTV = new InteractiveTV(this);
+    }
+#endif
+    return m_interactiveTV;
+}
+
+bool MythPlayerCaptionsUI::ITVHandleAction(const QString &Action)
+{
+    bool result = false;
+
+#ifdef USING_MHEG
+    if (!GetInteractiveTV())
+        return result;
+
+    QMutexLocker locker(&m_itvLock);
+    result = m_interactiveTV->OfferKey(Action);
+#else
+    Q_UNUSED(Action);
+#endif
+
+    return result;
+}
+
+/** \fn MythPlayerCaptionsUI::ITVRestart(uint chanid, uint cardid, bool isLive)
+ *  \brief Restart the MHEG/MHP engine.
+ */
+void MythPlayerCaptionsUI::ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV)
+{
+#ifdef USING_MHEG
+    if (!GetInteractiveTV())
+        return;
+
+    QMutexLocker locker(&m_itvLock);
+    m_interactiveTV->Restart(static_cast<int>(Chanid), static_cast<int>(Cardid), IsLiveTV);
+    m_itvVisible = false;
+#else
+    Q_UNUSED(chanid);
+    Q_UNUSED(cardid);
+    Q_UNUSED(isLiveTV);
+#endif
 }

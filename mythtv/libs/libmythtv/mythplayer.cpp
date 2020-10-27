@@ -32,7 +32,6 @@
 #include "avformatdecoder.h"
 #include "dummydecoder.h"
 #include "tv_play.h"
-#include "interactivetv.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
 #include "audiooutput.h"
@@ -100,7 +99,6 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
 
     m_vbiMode = VBIMode::Parse(gCoreContext->GetSetting("VbiFormat"));
     m_captionsEnabledbyDefault = gCoreContext->GetBoolSetting("DefaultCCMode");
-    m_itvEnabled         = gCoreContext->GetBoolSetting("EnableMHEG", false);
     m_clearSavedPosition = gCoreContext->GetNumSetting("ClearSavedPosition", 1);
     m_endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
 
@@ -114,14 +112,6 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
 
 MythPlayer::~MythPlayer(void)
 {
-    // NB the interactiveTV thread is a client of OSD so must be deleted
-    // before locking and deleting the OSD
-    {
-        QMutexLocker lk0(&m_itvLock);
-        delete m_interactiveTV;
-        m_interactiveTV = nullptr;
-    }
-
     QMutexLocker lock1(&m_osdLock);
     QMutexLocker lock2(&m_vidExitLock);
 
@@ -1935,56 +1925,6 @@ int64_t MythPlayer::GetChapter(int chapter)
     if (m_decoder)
         return m_decoder->GetChapter(chapter);
     return 0;
-}
-
-InteractiveTV *MythPlayer::GetInteractiveTV(void)
-{
-#ifdef USING_MHEG
-    if (!m_interactiveTV && m_itvEnabled && !FlagIsSet(kNoITV))
-    {
-        QMutexLocker lock1(&m_osdLock);
-        QMutexLocker lock2(&m_itvLock);
-        if (!m_interactiveTV && m_osd)
-            m_interactiveTV = new InteractiveTV(this);
-    }
-#endif // USING_MHEG
-    return m_interactiveTV;
-}
-
-bool MythPlayer::ITVHandleAction(const QString &action)
-{
-    bool result = false;
-
-#ifdef USING_MHEG
-    if (!GetInteractiveTV())
-        return result;
-
-    QMutexLocker locker(&m_itvLock);
-    result = m_interactiveTV->OfferKey(action);
-#else
-    Q_UNUSED(action);
-#endif // USING_MHEG
-
-    return result;
-}
-
-/** \fn MythPlayer::ITVRestart(uint chanid, uint cardid, bool isLive)
- *  \brief Restart the MHEG/MHP engine.
- */
-void MythPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
-{
-#ifdef USING_MHEG
-    if (!GetInteractiveTV())
-        return;
-
-    QMutexLocker locker(&m_itvLock);
-    m_interactiveTV->Restart(chanid, cardid, isLiveTV);
-    m_itvVisible = false;
-#else
-    Q_UNUSED(chanid);
-    Q_UNUSED(cardid);
-    Q_UNUSED(isLiveTV);
-#endif // USING_MHEG
 }
 
 // Called from the interactiveTV (MHIContext) thread

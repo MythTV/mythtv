@@ -172,15 +172,6 @@ void MythPlayerVideoUI::ReinitOSD()
             }
         }
 
-#ifdef USING_MHEG
-        if (GetInteractiveTV())
-        {
-            QMutexLocker locker(&m_itvLock);
-            m_interactiveTV->Reinit(total, visible, aspect);
-            m_itvVisible = false;
-        }
-#endif // USING_MHEG
-
         m_reinitOsd = false;
         m_osdLock.unlock();
     }

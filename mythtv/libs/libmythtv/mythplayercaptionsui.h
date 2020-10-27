@@ -8,7 +8,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
 {
   public:
     MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
-   ~MythPlayerCaptionsUI() override = default;
+   ~MythPlayerCaptionsUI() override;
 
     void ResetCaptions();
     bool ToggleCaptions();
@@ -37,6 +37,17 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
     void ResetTeletext();
     bool HandleTeletextAction(const QString &Action);
     void SetTeletextPage(uint Page);
+
+    void ReinitOSD() override;
+    InteractiveTV* GetInteractiveTV() override;
+    bool ITVHandleAction(const QString& Action);
+    void ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV);
+
+  protected:
+    InteractiveTV *m_interactiveTV { nullptr };
+    QMutex m_itvLock  { };
+    bool m_itvEnabled { false };
+    bool m_itvVisible { false };
 };
 
 #endif

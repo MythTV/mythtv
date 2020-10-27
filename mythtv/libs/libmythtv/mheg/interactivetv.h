@@ -1,6 +1,9 @@
 #ifndef INTERACTIVE_TV_H_
 #define INTERACTIVE_TV_H_
 
+// Qt
+#include <QRect>
+
 class InteractiveScreen;
 class MythPainter;
 class MHIContext;
