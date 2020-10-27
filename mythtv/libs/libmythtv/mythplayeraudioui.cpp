@@ -53,9 +53,9 @@ MythPlayerAudioUI::MythPlayerAudioUI(MythMainWindow* MainWindow, TV *Tv,
     emit MythPlayerAudioUI::AudioStateChanged({ &m_audio, m_tcWrap[TC_AUDIO] });
 }
 
-MythAudioState MythPlayerAudioUI::GetAudioState()
+void MythPlayerAudioUI::RefreshAudioState()
 {
-    return { &m_audio, m_tcWrap[TC_AUDIO] };
+    emit AudioStateChanged({ &m_audio, m_tcWrap[TC_AUDIO] });
 }
 
 void MythPlayerAudioUI::ResetAudio()

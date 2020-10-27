@@ -13,6 +13,9 @@ class MTV_PUBLIC MythPlayerAudioUI : public MythPlayerOverlayUI
   signals:
     void      AudioStateChanged(MythAudioState State);
 
+  public slots:
+    void      RefreshAudioState();
+
   protected slots:
     void      ChangeMuteState(bool CycleChannels);
     void      ChangeVolume(bool Direction, int Volume);
@@ -25,7 +28,6 @@ class MTV_PUBLIC MythPlayerAudioUI : public MythPlayerOverlayUI
   public:
     MythPlayerAudioUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
-    MythAudioState GetAudioState();
     const AudioOutputGraph& GetAudioGraph() const;
     void      SetupAudioGraph (double VideoFrameRate);
     void      ClearAudioGraph ();

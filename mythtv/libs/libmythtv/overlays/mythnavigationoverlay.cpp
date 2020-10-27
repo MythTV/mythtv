@@ -36,22 +36,15 @@ bool MythNavigationOverlay::Create()
     connect(m_player, &MythPlayerUI::PauseChanged,      this, &MythNavigationOverlay::PauseChanged);
     connect(m_player, &MythPlayerUI::AudioStateChanged, this, &MythNavigationOverlay::AudioStateChanged);
 
-    // Set initial player state
-    if (!(m_audioState.m_hasAudioOut && m_audioState.m_volumeControl))
-    {
-        if (m_muteButton)
-            m_muteButton->Hide();
-        if (m_unMuteButton)
-            m_unMuteButton->Hide();
-    }
-    else
-    {
-        // Fudge to ensure we start with the correct mute state
-        MythAudioState state = m_player->GetAudioState();
-        m_audioState.m_muteState = VolumeBase::NextMuteState(state.m_muteState);
-        AudioStateChanged(state);
-    }
+    // Default constructor uses kMuteOff. Set initial mute button state accordingly
+    // and then request latest state.
+    if (m_muteButton)
+        m_muteButton->Show();
+    if (m_unMuteButton)
+        m_unMuteButton->Hide();
+    m_player->RefreshAudioState();
 
+    // TODO convert to video state when ready
     bool paused = m_player->IsPaused();
     m_paused = !paused;
     PauseChanged(paused);
