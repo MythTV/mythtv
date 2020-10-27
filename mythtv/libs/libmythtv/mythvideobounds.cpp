@@ -59,6 +59,16 @@ MythVideoBounds::MythVideoBounds()
     m_dbAdjustFill = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
 }
 
+/*! \brief Send out latest state to listeners.
+ *
+ * \note This should be used sparingly when first connecting to MythVideoBounds
+ * to retrieve the initial state.
+*/
+void MythVideoBounds::RefreshVideoBoundsState()
+{
+    emit VideoBoundsStateChanged({ m_adjustFill, m_videoAspectOverrideMode });
+}
+
 void MythVideoBounds::SetDisplay(MythDisplay *mDisplay)
 {
     if (m_display)
@@ -558,7 +568,7 @@ void MythVideoBounds::ToggleAdjustFill(AdjustFillMode AdjustFill)
         m_adjustFill = AdjustFill;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New fill mode: '%1'").arg(toString(m_adjustFill)));
         MoveResize();
-        emit VideoBoundsStateChanged({ m_adjustFill, m_videoAspectOverrideMode });
+        RefreshVideoBoundsState();
     }
 }
 
@@ -718,7 +728,7 @@ void MythVideoBounds::ToggleAspectOverride(AspectOverrideMode AspectMode)
             .arg(toString(m_videoAspectOverrideMode)));
         SetVideoAspectRatio(m_videoAspect);
         MoveResize();
-        emit VideoBoundsStateChanged({ m_adjustFill, m_videoAspectOverrideMode });
+        RefreshVideoBoundsState();
     }
 }
 

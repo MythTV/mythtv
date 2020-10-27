@@ -71,6 +71,11 @@ bool MythPlayerVideoUI::InitVideo()
     connect(m_tv,  &TV::ChangeStereoOverride,     video, &MythVideoOutputGPU::SetStereoOverride);
     connect(m_tv,  &TV::WindowResized,            video, &MythVideoOutputGPU::WindowResized);
     connect(m_tv,  &TV::EmbedPlayback,            video, &MythVideoOutputGPU::EmbedPlayback);
+
+    // Update initial state. MythVideoOutput will have potentially adjusted state
+    // at startup that we need to know about.
+    m_videoOutput->RefreshVideoBoundsState();
+
     return true;
 }
 

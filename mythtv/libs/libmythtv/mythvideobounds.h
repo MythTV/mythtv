@@ -43,6 +43,7 @@ class MythVideoBounds : public QObject
     void VideoBoundsStateChanged(MythVideoBoundsState VideoState);
 
   public slots:
+    void RefreshVideoBoundsState();
     void ScreenChanged          (QScreen *screen);
     void PhysicalDPIChanged     (qreal  /*DPI*/);
     void SourceChanged          (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);
