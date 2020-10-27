@@ -643,7 +643,7 @@ void MythVideoBounds::SetITVResize(QRect Rect)
     }
     if (m_rawItvDisplayVideoRect != oldrect)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New ITV display rect: %1x%2+%3+%4 (Scale: %1)")
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New ITV display rect: %1x%2+%3+%4 (Scale: %5)")
             .arg(m_itvDisplayVideoRect.width()).arg(m_itvDisplayVideoRect.height())
             .arg(m_itvDisplayVideoRect.left()).arg(m_itvDisplayVideoRect.right())
             .arg(m_devicePixelRatio));
