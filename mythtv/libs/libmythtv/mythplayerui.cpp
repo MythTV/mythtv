@@ -1,6 +1,8 @@
 // MythTV
+#include "mythsystemevent.h"
 #include "audiooutput.h"
 #include "mythmainwindow.h"
+#include "io/mythinteractivebuffer.h"
 #include "decoders/avformatdecoder.h"
 #include "interactivetv.h"
 #include "osd.h"
@@ -891,6 +893,330 @@ void MythPlayerUI::EnableFrameRateMonitor(bool Enable)
     bool verbose = VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_ANY);
     double rate = Enable ? m_videoFrameRate : verbose ? (m_videoFrameRate * 4) : 0.0;
     m_outputJmeter.SetNumCycles(static_cast<int>(rate));
+}
+
+static inline double SafeFPS(DecoderBase* Decoder)
+{
+    if (!Decoder)
+        return 25;
+    double fps = Decoder->GetFPS();
+    return fps > 0 ? fps : 25.0;
+}
+
+/* JumpToStream, JumpToProgram and SwitchToProgram all need to be moved into the
+ * parent object and hopefully simplified. The fairly involved logic does not
+ * sit well with the new design objectives for the player classes and are better
+ * suited to the high level logic in TV.
+ */
+void MythPlayerUI::JumpToStream(const QString &stream)
+{
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToStream - begin");
+
+    // Shouldn't happen
+    if (stream.isEmpty())
+        return;
+
+    Pause();
+    ResetCaptions();
+
+    ProgramInfo pginfo(stream);
+    SetPlayingInfo(pginfo);
+
+    if (m_playerCtx->m_buffer->GetType() != kMythBufferMHEG)
+        m_playerCtx->m_buffer = new MythInteractiveBuffer(stream, m_playerCtx->m_buffer);
+    else
+        m_playerCtx->m_buffer->OpenFile(stream);
+
+    if (!m_playerCtx->m_buffer->IsOpen())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToStream buffer OpenFile failed");
+        SetEof(kEofStateImmediate);
+        SetErrored(tr("Error opening remote stream buffer"));
+        return;
+    }
+
+    m_watchingRecording = false;
+    m_totalLength = 0;
+    m_totalFrames = 0;
+    m_totalDuration = 0;
+
+    // 120 retries ~= 60 seconds
+    if (OpenFile(120) < 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToStream OpenFile failed.");
+        SetEof(kEofStateImmediate);
+        SetErrored(tr("Error opening remote stream"));
+        return;
+    }
+
+    if (m_totalLength == 0)
+    {
+        long long len = m_playerCtx->m_buffer->GetRealFileSize();
+        m_totalLength = static_cast<int>(len / ((m_decoder->GetRawBitrate() * 1000) / 8));
+        m_totalFrames = static_cast<uint64_t>(m_totalLength * SafeFPS(m_decoder));
+    }
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("JumpToStream length %1 bytes @ %2 Kbps = %3 Secs, %4 frames @ %5 fps")
+        .arg(m_playerCtx->m_buffer->GetRealFileSize()).arg(m_decoder->GetRawBitrate())
+        .arg(m_totalLength).arg(m_totalFrames).arg(m_decoder->GetFPS()) );
+
+    SetEof(kEofStateNone);
+
+    // the bitrate is reset by m_playerCtx->m_buffer->OpenFile()...
+    m_playerCtx->m_buffer->UpdateRawBitrate(m_decoder->GetRawBitrate());
+    m_decoder->SetProgramInfo(pginfo);
+
+    Play();
+    ChangeSpeed();
+
+    m_playerCtx->SetPlayerChangingBuffers(false);
+#ifdef USING_MHEG
+    if (m_interactiveTV) m_interactiveTV->StreamStarted();
+#endif
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToStream - end");
+}
+
+void MythPlayerUI::SwitchToProgram()
+{
+    if (!IsReallyNearEnd())
+        return;
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchToProgram - start");
+    bool discontinuity = false;
+    bool newtype = false;
+    int newid = -1;
+    ProgramInfo *pginfo = m_playerCtx->m_tvchain->GetSwitchProgram(discontinuity, newtype, newid);
+    if (!pginfo)
+        return;
+
+    bool newIsDummy = m_playerCtx->m_tvchain->GetInputType(newid) == "DUMMY";
+
+    SetPlayingInfo(*pginfo);
+    Pause();
+    ChangeSpeed();
+
+    // Release all frames to ensure the current decoder resources are released
+    DiscardVideoFrames(true, true);
+
+    if (newIsDummy)
+    {
+        OpenDummy();
+        ResetPlaying();
+        SetEof(kEofStateNone);
+        delete pginfo;
+        return;
+    }
+
+    if (m_playerCtx->m_buffer->GetType() == kMythBufferMHEG)
+    {
+        // Restore original ringbuffer
+        auto *ic = dynamic_cast<MythInteractiveBuffer*>(m_playerCtx->m_buffer);
+        if (ic)
+            m_playerCtx->m_buffer = ic->TakeBuffer();
+        delete ic;
+    }
+
+    m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), static_cast<uint>(MythMediaBuffer::kLiveTVOpenTimeout));
+
+    if (!m_playerCtx->m_buffer->IsOpen())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("SwitchToProgram's OpenFile failed (input type: %1)")
+            .arg(m_playerCtx->m_tvchain->GetInputType(newid)));
+        LOG(VB_GENERAL, LOG_ERR, m_playerCtx->m_tvchain->toString());
+        SetEof(kEofStateImmediate);
+        SetErrored(tr("Error opening switch program buffer"));
+        delete pginfo;
+        return;
+    }
+
+    if (GetEof() != kEofStateNone)
+    {
+        discontinuity = true;
+        ResetCaptions();
+    }
+
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SwitchToProgram(void) "
+        "discont: %1 newtype: %2 newid: %3 decoderEof: %4")
+        .arg(discontinuity).arg(newtype).arg(newid).arg(GetEof()));
+
+    if (discontinuity || newtype)
+    {
+        m_playerCtx->m_tvchain->SetProgram(*pginfo);
+        if (m_decoder)
+            m_decoder->SetProgramInfo(*pginfo);
+
+        m_playerCtx->m_buffer->Reset(true);
+        if (newtype)
+        {
+            if (OpenFile() < 0)
+                SetErrored(tr("Error opening switch program file"));
+        }
+        else
+            ResetPlaying();
+    }
+    else
+    {
+        m_playerCtx->SetPlayerChangingBuffers(true);
+        if (m_decoder)
+        {
+            m_decoder->SetReadAdjust(m_playerCtx->m_buffer->SetAdjustFilesize());
+            m_decoder->SetWaitForChange();
+        }
+    }
+    delete pginfo;
+
+    if (IsErrored())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "SwitchToProgram failed.");
+        SetEof(kEofStateDelayed);
+        return;
+    }
+
+    SetEof(kEofStateNone);
+
+    // the bitrate is reset by m_playerCtx->m_buffer->OpenFile()...
+    if (m_decoder)
+        m_playerCtx->m_buffer->UpdateRawBitrate(m_decoder->GetRawBitrate());
+    m_playerCtx->m_buffer->Unpause();
+
+    if (discontinuity || newtype)
+    {
+        CheckTVChain();
+        m_forcePositionMapSync = true;
+    }
+
+    Play();
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "SwitchToProgram - end");
+}
+
+void MythPlayerUI::JumpToProgram()
+{
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - start");
+    bool discontinuity = false;
+    bool newtype = false;
+    int newid = -1;
+    long long nextpos = m_playerCtx->m_tvchain->GetJumpPos();
+    ProgramInfo *pginfo = m_playerCtx->m_tvchain->GetSwitchProgram(discontinuity, newtype, newid);
+    if (!pginfo)
+        return;
+
+    m_inJumpToProgramPause = true;
+
+    bool newIsDummy = m_playerCtx->m_tvchain->GetInputType(newid) == "DUMMY";
+    SetPlayingInfo(*pginfo);
+
+    Pause();
+    ChangeSpeed();
+    ResetCaptions();
+
+    // Release all frames to ensure the current decoder resources are released
+    DiscardVideoFrames(true, true);
+
+    m_playerCtx->m_tvchain->SetProgram(*pginfo);
+    m_playerCtx->m_buffer->Reset(true);
+
+    if (newIsDummy)
+    {
+        OpenDummy();
+        ResetPlaying();
+        SetEof(kEofStateNone);
+        delete pginfo;
+        m_inJumpToProgramPause = false;
+        return;
+    }
+
+    SendMythSystemPlayEvent("PLAY_CHANGED", pginfo);
+
+    if (m_playerCtx->m_buffer->GetType() == kMythBufferMHEG)
+    {
+        // Restore original ringbuffer
+        auto *ic = dynamic_cast<MythInteractiveBuffer*>(m_playerCtx->m_buffer);
+        if (ic)
+            m_playerCtx->m_buffer = ic->TakeBuffer();
+        delete ic;
+    }
+
+    m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), static_cast<uint>(MythMediaBuffer::kLiveTVOpenTimeout));
+    QString subfn = m_playerCtx->m_buffer->GetSubtitleFilename();
+    TVState desiredState = m_playerCtx->GetState();
+    bool isInProgress = (desiredState == kState_WatchingRecording ||
+                         desiredState == kState_WatchingLiveTV);
+    if (GetSubReader())
+        GetSubReader()->LoadExternalSubtitles(subfn, isInProgress && !subfn.isEmpty());
+
+    if (!m_playerCtx->m_buffer->IsOpen())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("JumpToProgram's OpenFile failed (input type: %1)")
+                .arg(m_playerCtx->m_tvchain->GetInputType(newid)));
+        LOG(VB_GENERAL, LOG_ERR, m_playerCtx->m_tvchain->toString());
+        SetEof(kEofStateImmediate);
+        SetErrored(tr("Error opening jump program file buffer"));
+        delete pginfo;
+        m_inJumpToProgramPause = false;
+        return;
+    }
+
+    bool wasDummy = m_isDummy;
+    if (newtype || wasDummy)
+    {
+        if (OpenFile() < 0)
+            SetErrored(tr("Error opening jump program file"));
+    }
+    else
+        ResetPlaying();
+
+    if (IsErrored() || !m_decoder)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "JumpToProgram failed.");
+        if (!IsErrored())
+            SetErrored(tr("Error reopening video decoder"));
+        delete pginfo;
+        m_inJumpToProgramPause = false;
+        return;
+    }
+
+    SetEof(kEofStateNone);
+
+    // the bitrate is reset by m_playerCtx->m_buffer->OpenFile()...
+    m_playerCtx->m_buffer->UpdateRawBitrate(m_decoder->GetRawBitrate());
+    m_playerCtx->m_buffer->IgnoreLiveEOF(false);
+
+    m_decoder->SetProgramInfo(*pginfo);
+    delete pginfo;
+
+    CheckTVChain();
+    m_forcePositionMapSync = true;
+    m_inJumpToProgramPause = false;
+    Play();
+    ChangeSpeed();
+
+    // check that we aren't too close to the end of program.
+    // and if so set it to 10s from the end if completed recordings
+    // or 3s if live
+    long long duration = m_playerCtx->m_tvchain->GetLengthAtCurPos();
+    int maxpos = m_playerCtx->m_tvchain->HasNext() ? 10 : 3;
+
+    if (nextpos > (duration - maxpos))
+    {
+        nextpos = duration - maxpos;
+        if (nextpos < 0)
+            nextpos = 0;
+    }
+    else if (nextpos < 0)
+    {
+        // it's a relative position to the end
+        nextpos += duration;
+    }
+
+    // nextpos is the new position to use in seconds
+    nextpos = static_cast<int64_t>(TranslatePositionMsToFrame(static_cast<uint64_t>(nextpos) * 1000, true));
+
+    if (nextpos > 10)
+        DoJumpToFrame(static_cast<uint64_t>(nextpos), kInaccuracyNone);
+
+    m_playerCtx->SetPlayerChangingBuffers(false);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - end");
 }
 
 // Only edit stuff below here - to be moved

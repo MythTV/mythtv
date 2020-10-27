@@ -447,11 +447,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
 
-    // Private LiveTV stuff
-    void  SwitchToProgram(void);
-    void  JumpToProgram(void);
-    void  JumpToStream(const QString &stream);
-
   protected:
     DecoderBase     *m_decoder            {nullptr};
     mutable QMutex   m_decoderChangeLock  {QMutex::Recursive};

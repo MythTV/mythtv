@@ -78,6 +78,10 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
   private:
     Q_DISABLE_COPY(MythPlayerUI)
 
+    void  SwitchToProgram();
+    void  JumpToProgram();
+    void  JumpToStream(const QString &stream);
+
     bool    m_osdDebug { false };
     QTimer  m_osdDebugTimer;
 };
