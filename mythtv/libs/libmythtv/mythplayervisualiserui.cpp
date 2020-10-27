@@ -6,8 +6,8 @@
 #include "mythplayervisualiserui.h"
 
 MythPlayerVisualiserUI::MythPlayerVisualiserUI(MythMainWindow *MainWindow, TV *Tv,
-                                           PlayerContext *Context, PlayerFlags Flags)
-  : MythPlayerVideoUI(MainWindow, Tv, Context, Flags)
+                                               PlayerContext *Context, PlayerFlags Flags)
+  : MythPlayerCaptionsUI(MainWindow, Tv, Context, Flags)
 {   
     // Connect signals and slots
     connect(&m_audio, &AudioPlayer::AudioPlayerStateChanged, this, &MythPlayerVisualiserUI::AudioPlayerStateChanged);

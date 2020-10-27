@@ -57,7 +57,7 @@ class MythDVDPlayer : public MythPlayerUI
     bool     JumpToFrame(uint64_t Frame) override;
     void     DisableCaptions(uint Mode, bool OSDMsg = true) override;
     void     EnableCaptions(uint Mode, bool OSDMsg = true) override;
-    int      SetTrack(uint Type, int TrackNo) override;
+    int      SetTrack(uint Type, uint TrackNo) override;
     void     CreateDecoder(TestBufferVec & Testbuf) override;
     bool     DoJumpChapter(int Chapter) override;
 

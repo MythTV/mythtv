@@ -11,6 +11,8 @@ MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, Pla
     m_positionUpdateTimer.setInterval(999);
     connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerOverlayUI::UpdateOSDPosition);
     connect(this, &MythPlayerOverlayUI::OverlayStateChanged, m_tv, &TV::OverlayStateChanged);
+    connect(this, &MythPlayerOverlayUI::SignalOSDMessage,
+            this, QOverload<const QString&>::of(&MythPlayerOverlayUI::UpdateOSDMessage));
 }
 
 void MythPlayerOverlayUI::BrowsingChanged(bool Browsing)

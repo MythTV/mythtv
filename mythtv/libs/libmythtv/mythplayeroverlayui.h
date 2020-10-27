@@ -23,7 +23,7 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
 
   protected slots:
     void UpdateOSDMessage (const QString& Message);
-    void UpdateOSDMessage (const QString& Message, OSDTimeout Timeout) override;
+    void UpdateOSDMessage (const QString& Message, OSDTimeout Timeout);
     void SetOSDStatus     (const QString &Title, OSDTimeout Timeout);
     void UpdateOSDStatus  (osdInfo &Info, int Type, enum OSDTimeout Timeout);
     void UpdateOSDStatus  (const QString& Title, const QString& Desc,

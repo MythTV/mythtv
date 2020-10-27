@@ -83,28 +83,6 @@ const double MythPlayer::kInaccuracyEditor = 0.5;
 // keyframe that is closest to the target.
 const double MythPlayer::kInaccuracyFull = -1.0;
 
-static int toCaptionType(int type)
-{
-    if (kTrackTypeCC608 == type)            return kDisplayCC608;
-    if (kTrackTypeCC708 == type)            return kDisplayCC708;
-    if (kTrackTypeSubtitle == type)         return kDisplayAVSubtitle;
-    if (kTrackTypeTeletextCaptions == type) return kDisplayTeletextCaptions;
-    if (kTrackTypeTextSubtitle == type)     return kDisplayTextSubtitle;
-    if (kTrackTypeRawText == type)          return kDisplayRawTextSubtitle;
-    return 0;
-}
-
-static int toTrackType(int type)
-{
-    if (kDisplayCC608 == type)            return kTrackTypeCC608;
-    if (kDisplayCC708 == type)            return kTrackTypeCC708;
-    if (kDisplayAVSubtitle == type)       return kTrackTypeSubtitle;
-    if (kDisplayTeletextCaptions == type) return kTrackTypeTeletextCaptions;
-    if (kDisplayTextSubtitle == type)     return kTrackTypeTextSubtitle;
-    if (kDisplayRawTextSubtitle == type)  return kTrackTypeRawText;
-    return kTrackTypeUnknown;
-}
-
 MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
   : m_playerCtx(Context),
     m_playerFlags(Flags),
@@ -333,55 +311,6 @@ bool MythPlayer::InitVideo(void)
     return true;
 }
 
-void MythPlayer::ReinitOSD(void)
-{
-    if (m_videoOutput && !FlagIsSet(kVideoIsNull))
-    {
-        m_osdLock.lock();
-        if (!is_current_thread(m_playerThread))
-        {
-            m_reinitOsd = true;
-            m_osdLock.unlock();
-            return;
-        }
-        QRect visible;
-        QRect total;
-        float aspect = NAN;
-        float scaling = NAN;
-        m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
-        if (m_osd)
-        {
-            int stretch = lroundf(aspect * 100);
-            if ((m_osd->Bounds() != visible) ||
-                (m_osd->GetFontStretch() != stretch))
-            {
-                uint old = m_textDisplayMode;
-                ToggleCaptions(old);
-                m_osd->Init(visible, aspect);
-                EnableCaptions(old, false);
-                if (m_deleteMap.IsEditing())
-                {
-                    bool const changed = m_deleteMap.IsChanged();
-                    m_deleteMap.SetChanged(true);
-                    m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, m_osd);
-                    m_deleteMap.SetChanged(changed);
-                }
-            }
-        }
-
-#ifdef USING_MHEG
-        if (GetInteractiveTV())
-        {
-            QMutexLocker locker(&m_itvLock);
-            m_interactiveTV->Reinit(total, visible, aspect);
-            m_itvVisible = false;
-        }
-#endif // USING_MHEG
-        m_reinitOsd = false;
-        m_osdLock.unlock();
-    }
-}
-
 void MythPlayer::ReinitVideo(bool ForceUpdate)
 {
 
@@ -402,12 +331,14 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
             return;
         }
 
-        ReinitOSD();
+        // Signal to the main thread to reinit OSD
+        m_reinitOsd = true;
     }
 
     if (!aspect_only)
         ClearAfterSeek();
 
+    // Signal to main thread to reinit subtitles
     if (m_textDisplayMode)
         EnableSubtitles(true);
 }
@@ -707,8 +638,9 @@ void MythPlayer::ReleaseNextVideoFrame(MythVideoFrame *buffer,
     if (m_videoOutput)
         m_videoOutput->ReleaseFrame(buffer);
 
-    if (m_allPaused)
-        CheckAspectRatio(buffer);
+    // FIXME need to handle this in the correct place in the main thread (DVD stills?)
+    //if (m_allPaused)
+    //    CheckAspectRatio(buffer);
 }
 
 /** \fn MythPlayer::DiscardVideoFrame(VideoFrame*)
@@ -759,312 +691,6 @@ void MythPlayer::DeLimboFrame(MythVideoFrame *frame)
         m_videoOutput->DeLimboFrame(frame);
 }
 
-void MythPlayer::EnableTeletext(int page)
-{
-    QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    m_osd->EnableTeletext(true, page);
-    m_prevTextDisplayMode = m_textDisplayMode;
-    m_textDisplayMode = kDisplayTeletextMenu;
-}
-
-void MythPlayer::DisableTeletext(void)
-{
-    QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    m_osd->EnableTeletext(false, 0);
-    m_textDisplayMode = kDisplayNone;
-
-    /* If subtitles are enabled before the teletext menu was displayed,
-       re-enabled them. */
-    if (m_prevTextDisplayMode & kDisplayAllCaptions)
-        EnableCaptions(m_prevTextDisplayMode, false);
-}
-
-void MythPlayer::ResetTeletext(void)
-{
-    QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    m_osd->TeletextReset();
-}
-
-/** \fn MythPlayer::SetTeletextPage(uint)
- *  \brief Set Teletext NUV Caption page
- */
-void MythPlayer::SetTeletextPage(uint page)
-{
-    m_osdLock.lock();
-    DisableCaptions(m_textDisplayMode);
-    m_ttPageNum = page;
-    m_cc608.SetTTPageNum(m_ttPageNum);
-    m_textDisplayMode &= ~kDisplayAllCaptions;
-    m_textDisplayMode |= kDisplayNUVTeletextCaptions;
-    m_osdLock.unlock();
-}
-
-bool MythPlayer::HandleTeletextAction(const QString &action)
-{
-    if (!(m_textDisplayMode & kDisplayTeletextMenu) || !m_osd)
-        return false;
-
-    bool handled = true;
-
-    m_osdLock.lock();
-    if (action == "MENU" || action == ACTION_TOGGLETT || action == "ESCAPE")
-        DisableTeletext();
-    else if (m_osd)
-        handled = m_osd->TeletextAction(action);
-    m_osdLock.unlock();
-
-    return handled;
-}
-
-void MythPlayer::ResetCaptions(void)
-{
-    QMutexLocker locker(&m_osdLock);
-    if (!m_osd)
-        return;
-
-    if (((m_textDisplayMode & kDisplayAVSubtitle)      ||
-         (m_textDisplayMode & kDisplayTextSubtitle)    ||
-         (m_textDisplayMode & kDisplayRawTextSubtitle) ||
-         (m_textDisplayMode & kDisplayDVDButton)       ||
-         (m_textDisplayMode & kDisplayCC608)           ||
-         (m_textDisplayMode & kDisplayCC708)))
-    {
-        m_osd->ClearSubtitles();
-    }
-    else if ((m_textDisplayMode & kDisplayTeletextCaptions) ||
-             (m_textDisplayMode & kDisplayNUVTeletextCaptions))
-    {
-        m_osd->TeletextClear();
-    }
-}
-
-void MythPlayer::DisableCaptions(uint mode, bool osd_msg)
-{
-    if (m_textDisplayMode)
-        m_prevNonzeroTextDisplayMode = m_textDisplayMode;
-    m_textDisplayMode &= ~mode;
-    ResetCaptions();
-
-    QMutexLocker locker(&m_osdLock);
-
-    bool newTextDesired = (m_textDisplayMode & kDisplayAllTextCaptions) != 0U;
-    // Only turn off textDesired if the Operator requested it.
-    if (osd_msg || newTextDesired)
-        m_textDesired = newTextDesired;
-    QString msg = "";
-    if (kDisplayNUVTeletextCaptions & mode)
-        msg += tr("TXT CAP");
-    if (kDisplayTeletextCaptions & mode)
-    {
-        if (m_decoder != nullptr)
-            msg += m_decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
-                                       GetTrack(kTrackTypeTeletextCaptions));
-        DisableTeletext();
-    }
-    int preserve = m_textDisplayMode & (kDisplayCC608 | kDisplayTextSubtitle |
-                                        kDisplayAVSubtitle | kDisplayCC708 |
-                                        kDisplayRawTextSubtitle);
-    if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
-        (kDisplayAVSubtitle & mode) || (kDisplayRawTextSubtitle & mode))
-    {
-        int type = toTrackType(mode);
-        if (m_decoder != nullptr)
-            msg += m_decoder->GetTrackDesc(type, GetTrack(type));
-        if (m_osd)
-            m_osd->EnableSubtitles(preserve);
-    }
-    if (kDisplayTextSubtitle & mode)
-    {
-        msg += tr("Text subtitles");
-        if (m_osd)
-            m_osd->EnableSubtitles(preserve);
-    }
-    if (!msg.isEmpty() && osd_msg)
-    {
-        msg += " " + tr("Off");
-        UpdateOSDMessage(msg, kOSDTimeout_Med);
-    }
-}
-
-void MythPlayer::EnableCaptions(uint mode, bool osd_msg)
-{
-    QMutexLocker locker(&m_osdLock);
-    bool newTextDesired = (mode & kDisplayAllTextCaptions) != 0U;
-    // Only turn off textDesired if the Operator requested it.
-    if (osd_msg || newTextDesired)
-        m_textDesired = newTextDesired;
-    QString msg = "";
-    if ((kDisplayCC608 & mode) || (kDisplayCC708 & mode) ||
-        (kDisplayAVSubtitle & mode) || kDisplayRawTextSubtitle & mode)
-    {
-        int type = toTrackType(mode);
-        if (m_decoder != nullptr)
-            msg += m_decoder->GetTrackDesc(type, GetTrack(type));
-        if (m_osd)
-            m_osd->EnableSubtitles(mode);
-    }
-    if (kDisplayTextSubtitle & mode)
-    {
-        if (m_osd)
-            m_osd->EnableSubtitles(kDisplayTextSubtitle);
-        msg += tr("Text subtitles");
-    }
-    if (kDisplayNUVTeletextCaptions & mode)
-        msg += tr("TXT %1").arg(m_ttPageNum, 3, 16);
-    if ((kDisplayTeletextCaptions & mode) && (m_decoder != nullptr))
-    {
-        msg += m_decoder->GetTrackDesc(kTrackTypeTeletextCaptions,
-                                       GetTrack(kTrackTypeTeletextCaptions));
-
-        int page = m_decoder->GetTrackLanguageIndex(
-            kTrackTypeTeletextCaptions,
-            GetTrack(kTrackTypeTeletextCaptions));
-
-        EnableTeletext(page);
-        m_textDisplayMode = kDisplayTeletextCaptions;
-    }
-
-    msg += " " + tr("On");
-
-    LOG(VB_PLAYBACK, LOG_INFO, QString("EnableCaptions(%1) msg: %2")
-        .arg(mode).arg(msg));
-
-    m_textDisplayMode = mode;
-    if (m_textDisplayMode)
-        m_prevNonzeroTextDisplayMode = m_textDisplayMode;
-    if (osd_msg)
-        UpdateOSDMessage(msg, kOSDTimeout_Med);
-}
-
-bool MythPlayer::ToggleCaptions(void)
-{
-    SetCaptionsEnabled(!((bool)m_textDisplayMode));
-    return m_textDisplayMode != 0U;
-}
-
-bool MythPlayer::ToggleCaptions(uint type)
-{
-    QMutexLocker locker(&m_osdLock);
-    uint mode = toCaptionType(type);
-    uint origMode = m_textDisplayMode;
-
-    if (m_textDisplayMode)
-        DisableCaptions(m_textDisplayMode, (origMode & mode) != 0U);
-    if (origMode & mode)
-        return m_textDisplayMode != 0U;
-    if (mode)
-        EnableCaptions(mode);
-    return m_textDisplayMode != 0U;
-}
-
-void MythPlayer::SetCaptionsEnabled(bool enable, bool osd_msg)
-{
-    QMutexLocker locker(&m_osdLock);
-    m_enableCaptions = m_disableCaptions = false;
-    uint origMode = m_textDisplayMode;
-
-    // Only turn off textDesired if the Operator requested it.
-    if (osd_msg || enable)
-        m_textDesired = enable;
-
-    if (!enable)
-    {
-        DisableCaptions(origMode, osd_msg);
-        return;
-    }
-    int mode = HasCaptionTrack(m_prevNonzeroTextDisplayMode) ?
-        m_prevNonzeroTextDisplayMode : NextCaptionTrack(kDisplayNone);
-    if (origMode != (uint)mode)
-    {
-        DisableCaptions(origMode, false);
-
-        if (kDisplayNone == mode)
-        {
-            if (osd_msg)
-            {
-                UpdateOSDMessage(tr("No captions",
-                                 "CC/Teletext/Subtitle text not available"),
-                              kOSDTimeout_Med);
-            }
-            LOG(VB_PLAYBACK, LOG_INFO,
-                "No captions available yet to enable.");
-        }
-        else if (mode)
-        {
-            EnableCaptions(mode, osd_msg);
-        }
-    }
-    ResetCaptions();
-}
-
-bool MythPlayer::GetCaptionsEnabled(void) const
-{
-    return (kDisplayNUVTeletextCaptions == m_textDisplayMode) ||
-           (kDisplayTeletextCaptions    == m_textDisplayMode) ||
-           (kDisplayAVSubtitle          == m_textDisplayMode) ||
-           (kDisplayCC608               == m_textDisplayMode) ||
-           (kDisplayCC708               == m_textDisplayMode) ||
-           (kDisplayTextSubtitle        == m_textDisplayMode) ||
-           (kDisplayRawTextSubtitle     == m_textDisplayMode) ||
-           (kDisplayTeletextMenu        == m_textDisplayMode);
-}
-
-QStringList MythPlayer::GetTracks(uint type)
-{
-    if (m_decoder)
-        return m_decoder->GetTracks(type);
-    return QStringList();
-}
-
-uint MythPlayer::GetTrackCount(uint type)
-{
-    if (m_decoder)
-        return m_decoder->GetTrackCount(type);
-    return 0;
-}
-
-int MythPlayer::SetTrack(uint type, int trackNo)
-{
-    int ret = -1;
-    if (!m_decoder)
-        return ret;
-
-    ret = m_decoder->SetTrack(type, trackNo);
-    if (kTrackTypeAudio == type)
-    {
-        if (m_decoder)
-            UpdateOSDMessage(m_decoder->GetTrackDesc(type, GetTrack(type)),
-                          kOSDTimeout_Med);
-        return ret;
-    }
-
-    uint subtype = toCaptionType(type);
-    if (subtype)
-    {
-        DisableCaptions(m_textDisplayMode, false);
-        EnableCaptions(subtype, true);
-        if ((kDisplayCC708 == subtype || kDisplayCC608 == subtype) && m_decoder)
-        {
-            int sid = m_decoder->GetTrackInfo(type, trackNo).m_stream_id;
-            if (sid >= 0)
-            {
-                (kDisplayCC708 == subtype) ? m_cc708.SetCurrentService(sid) :
-                                             m_cc608.SetMode(sid);
-            }
-        }
-    }
-    return ret;
-}
-
 /** \fn MythPlayer::TracksChanged(uint)
  *  \brief This tries to re-enable captions/subtitles if the user
  *         wants them and one of the captions/subtitles tracks has
@@ -1098,137 +724,7 @@ void MythPlayer::EnableForcedSubtitles(bool enable)
 void MythPlayer::SetAllowForcedSubtitles(bool allow)
 {
     m_allowForcedSubtitles = allow;
-    UpdateOSDMessage(m_allowForcedSubtitles ?
-                      tr("Forced Subtitles On") :
-                      tr("Forced Subtitles Off"),
-                  kOSDTimeout_Med);
-}
-
-void MythPlayer::DoDisableForcedSubtitles(void)
-{
-    m_disableForcedSubtitles = false;
-    m_osdLock.lock();
-    if (m_osd)
-        m_osd->DisableForcedSubtitles();
-    m_osdLock.unlock();
-}
-
-void MythPlayer::DoEnableForcedSubtitles(void)
-{
-    m_enableForcedSubtitles = false;
-    if (!m_allowForcedSubtitles)
-        return;
-
-    m_osdLock.lock();
-    if (m_osd)
-        m_osd->EnableSubtitles(kDisplayAVSubtitle, true /*forced only*/);
-    m_osdLock.unlock();
-}
-
-int MythPlayer::GetTrack(uint type)
-{
-    if (m_decoder)
-        return m_decoder->GetTrack(type);
-    return -1;
-}
-
-int MythPlayer::ChangeTrack(uint type, int dir)
-{
-    if (!m_decoder)
-        return -1;
-
-    int retval = m_decoder->ChangeTrack(type, dir);
-    if (retval >= 0)
-    {
-        UpdateOSDMessage(m_decoder->GetTrackDesc(type, GetTrack(type)),
-                      kOSDTimeout_Med);
-        return retval;
-    }
-    return -1;
-}
-
-void MythPlayer::ChangeCaptionTrack(int dir)
-{
-    if (!m_decoder || (dir < 0))
-        return;
-
-    if (!((m_textDisplayMode == kDisplayTextSubtitle) ||
-          (m_textDisplayMode == kDisplayNUVTeletextCaptions) ||
-          (m_textDisplayMode == kDisplayNone)))
-    {
-        int tracktype = toTrackType(m_textDisplayMode);
-        if (GetTrack(tracktype) < m_decoder->NextTrack(tracktype))
-        {
-            SetTrack(tracktype, m_decoder->NextTrack(tracktype));
-            return;
-        }
-    }
-    int nextmode = NextCaptionTrack(m_textDisplayMode);
-    if ((nextmode == kDisplayTextSubtitle) ||
-        (nextmode == kDisplayNUVTeletextCaptions) ||
-        (nextmode == kDisplayNone))
-    {
-        DisableCaptions(m_textDisplayMode, true);
-        if (nextmode != kDisplayNone)
-            EnableCaptions(nextmode, true);
-    }
-    else
-    {
-        int tracktype = toTrackType(nextmode);
-        int tracks = m_decoder->GetTrackCount(tracktype);
-        if (tracks)
-        {
-            DisableCaptions(m_textDisplayMode, true);
-            SetTrack(tracktype, 0);
-        }
-    }
-}
-
-bool MythPlayer::HasCaptionTrack(int mode)
-{
-    if (mode == kDisplayNone)
-        return false;
-    if (((mode == kDisplayTextSubtitle) && HasTextSubtitles()) ||
-         (mode == kDisplayNUVTeletextCaptions))
-    {
-        return true;
-    }
-    if (!(mode == kDisplayTextSubtitle) &&
-               m_decoder->GetTrackCount(toTrackType(mode)))
-    {
-        return true;
-    }
-    return false;
-}
-
-int MythPlayer::NextCaptionTrack(int mode)
-{
-    // Text->TextStream->708->608->AVSubs->Teletext->NUV->None
-    // NUV only offerred if PAL
-    bool pal      = (m_vbiMode == VBIMode::PAL_TT);
-    int  nextmode = kDisplayNone;
-
-    if (kDisplayTextSubtitle == mode)
-        nextmode = kDisplayRawTextSubtitle;
-    else if (kDisplayRawTextSubtitle == mode)
-        nextmode = kDisplayCC708;
-    else if (kDisplayCC708 == mode)
-        nextmode = kDisplayCC608;
-    else if (kDisplayCC608 == mode)
-        nextmode = kDisplayAVSubtitle;
-    else if (kDisplayAVSubtitle == mode)
-        nextmode = kDisplayTeletextCaptions;
-    else if (kDisplayTeletextCaptions == mode)
-        nextmode = pal ? kDisplayNUVTeletextCaptions : kDisplayNone;
-    else if ((kDisplayNUVTeletextCaptions == mode) && pal)
-        nextmode = kDisplayNone;
-    else if (kDisplayNone == mode)
-        nextmode = kDisplayTextSubtitle;
-
-    if (nextmode == kDisplayNone || HasCaptionTrack(nextmode))
-        return nextmode;
-
-    return NextCaptionTrack(nextmode);
+    emit SignalOSDMessage(m_allowForcedSubtitles ? tr("Forced Subtitles On") : tr("Forced Subtitles Off"));
 }
 
 void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
@@ -1371,25 +867,6 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         m_audio.Pause(false);
     SetBuffering(false);
     return true;
-}
-
-void MythPlayer::CheckAspectRatio(MythVideoFrame* frame)
-{
-    if (!frame)
-        return;
-
-    if (!qFuzzyCompare(frame->m_aspect, m_videoAspect) && frame->m_aspect > 0.0F)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Video Aspect ratio changed from %1 to %2")
-            .arg(m_videoAspect).arg(frame->m_aspect));
-        m_videoAspect = frame->m_aspect;
-        if (m_videoOutput)
-        {
-            m_videoOutput->VideoAspectRatioChanged(m_videoAspect);
-            ReinitOSD();
-        }
-    }
 }
 
 void MythPlayer::VideoEnd(void)
@@ -2281,30 +1758,6 @@ void MythPlayer::ClearBeforeSeek(uint64_t Frames)
 bool MythPlayer::IsInDelete(uint64_t frame)
 {
     return m_deleteMap.IsInDelete(frame);
-}
-
-void MythPlayer::Zoom(ZoomDirection direction)
-{
-    if (m_videoOutput)
-    {
-        m_videoOutput->Zoom(direction);
-        ReinitOSD();
-    }
-}
-
-void MythPlayer::ToggleMoveBottomLine(void)
-{
-    if (m_videoOutput)
-    {
-        m_videoOutput->ToggleMoveBottomLine();
-        ReinitOSD();
-    }
-}
-
-void MythPlayer::SaveBottomLine(void)
-{
-    if (m_videoOutput)
-        m_videoOutput->SaveBottomLine();
 }
 
 bool MythPlayer::HasTVChainNext(void) const

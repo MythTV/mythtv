@@ -116,6 +116,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     friend class Transcode;
 
   signals:
+    void SignalOSDMessage(const QString& Message);
     void CheckCallbacks();
     void SeekingSlow(int Count);
     void SeekingComplete();
@@ -289,9 +290,6 @@ class MTV_PUBLIC MythPlayer : public QObject
   protected:
     // Initialization
     void OpenDummy(void);
-    void Zoom(ZoomDirection direction);
-    void ToggleMoveBottomLine(void);
-    void SaveBottomLine(void);
 
     // Non-const gets
     OSD         *GetOSD(void)               { return m_osd;       }
@@ -351,7 +349,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Playback
     virtual bool PrebufferEnoughFrames(int min_buffers = 0);
     void         SetBuffering(bool new_buffering);
-    void         CheckAspectRatio(MythVideoFrame* frame);
     virtual void VideoEnd(void);
     virtual void DecoderStart(bool start_paused);
     virtual void DecoderLoop(bool pause);
@@ -366,43 +363,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Edit mode stuff
     bool GetEditMode(void) const { return m_deleteMap.IsEditing(); }
     bool IsInDelete(uint64_t frame);
-
-    // Reinit
-    void ReinitOSD(void);
-
-    // OSD conveniences
-    virtual void UpdateOSDMessage(const QString& /*Message*/, OSDTimeout /*Timeout*/) {}
-
-    // Closed caption and teletext stuff
-    void ResetCaptions(void);
-    bool ToggleCaptions(void);
-    bool ToggleCaptions(uint type);
-    bool HasTextSubtitles(void)        { return m_subReader.HasTextSubtitles(); }
-    void SetCaptionsEnabled(bool enable, bool osd_msg=true);
-    bool GetCaptionsEnabled(void) const;
-    virtual void DisableCaptions(uint mode, bool osd_msg=true);
-    virtual void EnableCaptions(uint mode, bool osd_msg=true);
-
-    // Audio/Subtitle/EIA-608/EIA-708 stream selection
-    QStringList GetTracks(uint type);
-    uint GetTrackCount(uint type);
-    virtual int SetTrack(uint type, int trackNo);
-    int  GetTrack(uint type);
-    int  ChangeTrack(uint type, int dir);
-    void ChangeCaptionTrack(int dir);
-    bool HasCaptionTrack(int mode);
-    int  NextCaptionTrack(int mode);
-    void DoDisableForcedSubtitles(void);
-    void DoEnableForcedSubtitles(void);
-
-    // Teletext Menu and non-NUV teletext decoder
-    void EnableTeletext(int page = 0x100);
-    void DisableTeletext(void);
-    void ResetTeletext(void);
-    bool HandleTeletextAction(const QString &action);
-
-    // Teletext NUV Captions
-    void SetTeletextPage(uint page);
 
   protected:
     // Private Sets

@@ -1,6 +1,7 @@
 // MythTV
 #include "mythlogging.h"
 #include "tv_play.h"
+#include "interactivetv.h"
 #include "mythvideooutgpu.h"
 #include "mythplayervideoui.h"
 
@@ -140,3 +141,90 @@ void MythPlayerVideoUI::ToggleAspectOverride(AspectOverrideMode AspectMode)
         UpdateOSDMessage(text);
     }
 }
+
+void MythPlayerVideoUI::ReinitOSD()
+{
+    if (m_videoOutput)
+    {
+        m_osdLock.lock();
+        QRect visible;
+        QRect total;
+        float aspect = NAN;
+        float scaling = NAN;
+        m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
+        if (m_osd)
+        {
+            int stretch = static_cast<int>(lroundf(aspect * 100));
+            if ((m_osd->Bounds() != visible) ||
+                (m_osd->GetFontStretch() != stretch))
+            {
+                uint old = m_textDisplayMode;
+                ToggleCaptions(old);
+                m_osd->Init(visible, aspect);
+                EnableCaptions(old, false);
+                if (m_deleteMap.IsEditing())
+                {
+                    bool const changed = m_deleteMap.IsChanged();
+                    m_deleteMap.SetChanged(true);
+                    m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, m_osd);
+                    m_deleteMap.SetChanged(changed);
+                }
+            }
+        }
+
+#ifdef USING_MHEG
+        if (GetInteractiveTV())
+        {
+            QMutexLocker locker(&m_itvLock);
+            m_interactiveTV->Reinit(total, visible, aspect);
+            m_itvVisible = false;
+        }
+#endif // USING_MHEG
+
+        m_reinitOsd = false;
+        m_osdLock.unlock();
+    }
+}
+
+void MythPlayerVideoUI::CheckAspectRatio(MythVideoFrame* Frame)
+{
+    if (!Frame)
+        return;
+
+    if (!qFuzzyCompare(Frame->m_aspect, m_videoAspect) && Frame->m_aspect > 0.0F)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video Aspect ratio changed from %1 to %2")
+            .arg(static_cast<qreal>(m_videoAspect)).arg(static_cast<qreal>(Frame->m_aspect)));
+        m_videoAspect = Frame->m_aspect;
+        if (m_videoOutput)
+        {
+            m_videoOutput->VideoAspectRatioChanged(m_videoAspect);
+            ReinitOSD();
+        }
+    }
+}
+
+void MythPlayerVideoUI::Zoom(ZoomDirection Direction)
+{
+    if (m_videoOutput)
+    {
+        m_videoOutput->Zoom(Direction);
+        ReinitOSD();
+    }
+}
+
+void MythPlayerVideoUI::ToggleMoveBottomLine()
+{
+    if (m_videoOutput)
+    {
+        m_videoOutput->ToggleMoveBottomLine();
+        ReinitOSD();
+    }
+}
+
+void MythPlayerVideoUI::SaveBottomLine()
+{
+    if (m_videoOutput)
+        m_videoOutput->SaveBottomLine();
+}
+
