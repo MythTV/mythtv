@@ -6,6 +6,11 @@
 
 class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
 {
+    Q_OBJECT
+
+  signals:
+    void ResizeForInteractiveTV(const QRect& Rect);
+
   public:
     MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerCaptionsUI() override;
@@ -39,7 +44,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
     void SetTeletextPage(uint Page);
 
     void ReinitOSD() override;
-    void SetVideoResize(const QRect &Rect);
+
     bool SetAudioByComponentTag(int Tag);
     bool SetVideoByComponentTag(int Tag);
     bool SetStream(const QString& Stream);
@@ -50,6 +55,9 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
     InteractiveTV* GetInteractiveTV() override;
     bool ITVHandleAction(const QString& Action);
     void ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV);
+
+  protected slots:
+    void SetVideoResize(const QRect& Rect);
 
   protected:
     double SafeFPS(DecoderBase* Decoder);

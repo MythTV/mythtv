@@ -6,9 +6,10 @@
 #define LOC QString("CaptionsUI: ")
 
 MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
-  : MythPlayerVideoUI (MainWindow, Tv, Context, Flags)
+  : MythPlayerVideoUI(MainWindow, Tv, Context, Flags)
 {
     m_itvEnabled = gCoreContext->GetBoolSetting("EnableMHEG", false);
+    connect(this, &MythPlayerCaptionsUI::ResizeForInteractiveTV, this, &MythPlayerCaptionsUI::SetVideoResize);
 }
 
 MythPlayerCaptionsUI::~MythPlayerCaptionsUI()
@@ -543,10 +544,8 @@ void MythPlayerCaptionsUI::ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV)
 #endif
 }
 
-// Called from the interactiveTV (MHIContext) thread
 void MythPlayerCaptionsUI::SetVideoResize(const QRect &Rect)
 {
-    QMutexLocker locker(&m_osdLock);
     if (m_videoOutput)
         m_videoOutput->SetITVResize(Rect);
 }

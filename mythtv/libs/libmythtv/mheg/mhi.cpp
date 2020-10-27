@@ -850,7 +850,7 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
             vidRect.setWidth(Roundup(vidRect.width(), 2));
             vidRect.setHeight(Roundup(vidRect.height(), 2));
         }
-        m_parent->GetPlayer()->SetVideoResize(vidRect);
+        emit m_parent->GetPlayer()->ResizeForInteractiveTV(vidRect);
     }
 
     m_videoDisplayRect = Scale(dispRect);

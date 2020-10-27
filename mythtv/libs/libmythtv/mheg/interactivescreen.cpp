@@ -13,7 +13,7 @@ InteractiveScreen::InteractiveScreen(MythPlayerUI *Player, MythPainter *Painter,
 void InteractiveScreen::Close()
 {
     if (m_player)
-        m_player->SetVideoResize(QRect());
+        emit m_player->ResizeForInteractiveTV(QRect());
 }
 
 void InteractiveScreen::UpdateArea()
