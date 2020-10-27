@@ -48,7 +48,6 @@ class OSD;
 class RemoteEncoder;
 class MythPlayer;
 class MythPlayerUI;
-class DetectLetterbox;
 class MythMediaBuffer;
 class ProgramInfo;
 class TvPlayWindow;
@@ -434,8 +433,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     // Video controls
     void ToggleMoveBottomLine();
     void SaveBottomLine();
-    void ToggleAspectOverride(AspectOverrideMode AspectMode = kAspect_Toggle);
-    void ToggleAdjustFill(AdjustFillMode AdjustfillMode = kAdjustFill_Toggle);
     void DoTogglePictureAttribute(PictureAdjustType Type);
     bool PictureAttributeHandleAction(const QStringList &Actions);
     PictureAttribute NextPictureAdjustType(PictureAdjustType Type, PictureAttribute Attr);
@@ -701,8 +698,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool    m_tvmCanUpmix {false};
 
     // Video
-    AspectOverrideMode m_tvmAspectOverride    {kAspect_Off};
-    AdjustFillMode   m_tvmAdjustFill          {kAdjustFill_Off};
     bool             m_tvmFillAutoDetect      {false};
     uint             m_tvmSup                 {kPictureAttributeSupported_None};
     StereoscopicMode m_tvmStereoMode          {kStereoscopicModeAuto};

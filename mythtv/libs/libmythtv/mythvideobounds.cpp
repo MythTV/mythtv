@@ -544,10 +544,9 @@ QSize MythVideoBounds::Fix1088(QSize Dimensions)
     return result;
 }
 
-/**
- * \brief Sets up letterboxing for various standard video frame and
- *        monitor dimensions, then calls MoveResize()
- *        to apply them.
+/*! \brief Sets up letterboxing for various standard video frame and
+ * monitor dimensions, then calls MoveResize() to apply them.
+ *
  * \sa Zoom(ZoomDirection), ToggleAspectOverride(AspectOverrideMode)
  */
 void MythVideoBounds::ToggleAdjustFill(AdjustFillMode AdjustFill)
@@ -559,6 +558,7 @@ void MythVideoBounds::ToggleAdjustFill(AdjustFillMode AdjustFill)
         m_adjustFill = AdjustFill;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New fill mode: '%1'").arg(toString(m_adjustFill)));
         MoveResize();
+        emit VideoBoundsStateChanged({ m_adjustFill, m_videoAspectOverrideMode });
     }
 }
 
@@ -718,6 +718,7 @@ void MythVideoBounds::ToggleAspectOverride(AspectOverrideMode AspectMode)
             .arg(toString(m_videoAspectOverrideMode)));
         SetVideoAspectRatio(m_videoAspect);
         MoveResize();
+        emit VideoBoundsStateChanged({ m_adjustFill, m_videoAspectOverrideMode });
     }
 }
 

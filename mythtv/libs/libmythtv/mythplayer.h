@@ -153,8 +153,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     float   GetFrameRate(void) const          { return m_videoFrameRate; }
     bool    IsAudioNeeded(void) { return ((FlagIsSet(kVideoIsNull)) == 0); }
     int     GetFreeVideoFrames(void) const;
-    AspectOverrideMode GetAspectOverride(void) const;
-    AdjustFillMode     GetAdjustFill(void) const;
 
     int     GetFFRewSkip(void) const          { return m_ffrewSkip; }
     float   GetPlaySpeed(void) const          { return m_playSpeed; }
@@ -331,9 +329,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     void SetCommBreakMap(frm_dir_map_t &newMap);
     CommSkipMode GetAutoCommercialSkip(void)
         { return m_commBreakMap.GetAutoCommercialSkip(); }
-
-    // Toggle Sets
-    void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
 
     // Start/Reset/Stop playing
     virtual void ResetPlaying(bool resetframes = true);

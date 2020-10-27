@@ -19,6 +19,12 @@ MythAudioState::MythAudioState(AudioPlayer* Player, int64_t Offset)
 {
 }
 
+MythVideoBoundsState::MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride)
+  : m_adjustFillMode(AdjustFill),
+    m_aspectOverrideMode(AspectOverride)
+{
+}
+
 /*! \class MythOverlayState
  * \brief A simpler than simple wrapper around OSD state.
 */

@@ -2,6 +2,7 @@
 #define MYTHPLAYERVIDEOUI_H
 
 // MythTV
+#include "DetectLetterbox.h"
 #include "mythplayeraudioui.h"
 
 class DecoderCallback
@@ -44,9 +45,13 @@ class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerAudioUI
 
   protected slots:
     void WindowResized(const QSize& /*Size*/);
+    void ToggleAdjustFill(AdjustFillMode Mode = kAdjustFill_Toggle);
+    void ToggleAspectOverride(AspectOverrideMode AspectMode = kAspect_Toggle);
 
   protected:
     bool InitVideo() override;
+
+    DetectLetterbox m_detectLetterBox { };
 
   private:
     Q_DISABLE_COPY(MythPlayerVideoUI)

@@ -25,6 +25,11 @@ void TVPlaybackState::AudioStateChanged(MythAudioState AudioState)
     m_audioState = AudioState;
 }
 
+void TVPlaybackState::VideoBoundsStateChanged(MythVideoBoundsState VideoBoundsState)
+{
+    m_videoBoundsState = VideoBoundsState;
+}
+
 void TVPlaybackState::OverlayStateChanged(MythOverlayState OverlayState)
 {
     m_overlayState = OverlayState;

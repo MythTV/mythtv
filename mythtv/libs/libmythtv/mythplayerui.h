@@ -4,7 +4,6 @@
 // MythTV
 #include "mythplayervisualiserui.h"
 #include "mythvideoscantracker.h"
-#include "DetectLetterbox.h"
 #include "jitterometer.h"
 #include "mythplayer.h"
 
@@ -31,7 +30,6 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     virtual bool VideoLoop();
     virtual void PreProcessNormalFrame();
     void ChangeSpeed() override;
-    void ReleaseNextVideoFrame(MythVideoFrame* Frame, int64_t Timecode, bool Wrap = true) override;
     void SetVideoParams(int Width, int Height, double FrameRate, float Aspect,
                         bool ForceUpdate, int ReferenceFrames,
                         FrameScanType Scan = kScan_Ignore,
@@ -40,13 +38,9 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     bool DoRewindSecs(float Seconds, double Inaccuracy, bool UseCutlist);
     void GetPlaybackData(InfoMap& Map);
     void GetCodecDescription(InfoMap& Map);
-    void ToggleAdjustFill(AdjustFillMode Mode = kAdjustFill_Toggle);
     bool CanSupportDoubleRate();
     void SetWatched(bool ForceWatched = false);
     virtual void SetBookmark(bool Clear = false);
-
-    // FIXME - should be private
-    DetectLetterbox m_detectLetterBox { this };
 
     // N.B. Editor - keep ringfenced and move into subclass
     void EnableEdit();

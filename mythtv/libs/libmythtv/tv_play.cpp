@@ -4096,9 +4096,9 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     else if (IsActionable(ACTION_BOTTOMLINESAVE, Actions))
         SaveBottomLine();
     else if (IsActionable("TOGGLEASPECT", Actions))
-        ToggleAspectOverride();
+        emit ChangeAspectOverride();
     else if (IsActionable("TOGGLEFILL", Actions))
-        ToggleAdjustFill();
+        emit ChangeAdjustFill();
     else if (IsActionable(ACTION_TOGGELAUDIOSYNC, Actions))
         ChangeAudioSync(0);   // just display
     else if (IsActionable(ACTION_TOGGLESUBTITLEZOOM, Actions))
@@ -7087,7 +7087,7 @@ void TV::ChangeTimeStretch(int Dir, bool AllowEdit)
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player && !m_player->IsPaused())
-            m_player->Play(m_playerContext.m_tsNormal, true);
+        m_player->Play(m_playerContext.m_tsNormal, true);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!m_overlayState.m_browsing)
@@ -7362,36 +7362,6 @@ void TV::SaveBottomLine()
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     SetOSDMessage("Current 'Manual Zoom' saved for 'BottomLine'.");
-}
-
-void TV::ToggleAspectOverride(AspectOverrideMode AspectMode)
-{
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return;
-    }
-    m_player->ToggleAspectOverride(AspectMode);
-    QString text = toString(m_player->GetAspectOverride());
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    SetOSDMessage(text);
-}
-
-void TV::ToggleAdjustFill(AdjustFillMode AdjustfillMode)
-{
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return;
-    }
-    m_player->ToggleAdjustFill(AdjustfillMode);
-    QString text = toString(m_player->GetAdjustFill());
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    SetOSDMessage(text);
 }
 
 void TV::PauseAudioUntilBuffered()
@@ -8397,19 +8367,17 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         DoTogglePictureAttribute(kAdjustingPicture_Playback);
     }
     else if (Action == "TOGGLEASPECT")
-        ToggleAspectOverride();
+        emit ChangeAspectOverride();
     else if (Action.startsWith("TOGGLEASPECT"))
-        ToggleAspectOverride(static_cast<AspectOverrideMode>(Action.rightRef(1).toInt()));
+        emit ChangeAspectOverride(static_cast<AspectOverrideMode>(Action.rightRef(1).toInt()));
     else if (Action == "TOGGLEFILL")
-        ToggleAdjustFill();
+        emit ChangeAdjustFill();
     else if (Action.startsWith("TOGGLEFILL"))
-        ToggleAdjustFill(static_cast<AdjustFillMode>(Action.rightRef(1).toInt()));
+        emit ChangeAdjustFill(static_cast<AdjustFillMode>(Action.rightRef(1).toInt()));
     else if (Action == "MENU")
          ShowOSDMenu();
     else if (Action == "AUTODETECT_FILL")
-    {
-        m_player->m_detectLetterBox.SetDetectLetterbox(!m_player->m_detectLetterBox.GetDetectLetterbox());
-    }
+        emit ToggleDetectLetterBox();
     else if (Action == ACTION_GUIDE)
         EditSchedule(kScheduleProgramGuide);
     else if (Action.startsWith("CHANGROUP_") && m_dbUseChannelGroups)
@@ -8826,7 +8794,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
             int i = ((kAspect_14_9 == j) ? kAspect_16_9 :
                      ((kAspect_16_9 == j) ? kAspect_14_9 : j));
             QString action = prefix + QString::number(i);
-            active = (m_tvmAspectOverride == i);
+            active = (m_videoBoundsState.m_aspectOverrideMode == i);
             BUTTON(action, toString(static_cast<AspectOverrideMode>(i)));
         }
     }
@@ -8835,7 +8803,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
         {
             QString action = prefix + QString::number(i);
-            active = (m_tvmAdjustFill == i);
+            active = (m_videoBoundsState.m_adjustFillMode == i);
             BUTTON(action, toString(static_cast<AdjustFillMode>(i)));
         }
     }
@@ -9096,8 +9064,8 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
             if (m_tvmFillAutoDetect)
             {
                 active =
-                    (m_tvmAdjustFill == kAdjustFill_AutoDetect_DefaultHalf) ||
-                    (m_tvmAdjustFill == kAdjustFill_AutoDetect_DefaultOff);
+                    (m_videoBoundsState.m_adjustFillMode == kAdjustFill_AutoDetect_DefaultHalf) ||
+                    (m_videoBoundsState.m_adjustFillMode == kAdjustFill_AutoDetect_DefaultOff);
                 BUTTON(actionName, tr("Auto Detect"));
             }
         }
@@ -9358,8 +9326,6 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
     m_tvmUpmixing = false;
     m_tvmCanUpmix = false;
 
-    m_tvmAspectOverride    = kAspect_Off;
-    m_tvmAdjustFill        = kAdjustFill_Off;
     m_tvmFillAutoDetect    = false;
     m_tvmSup               = kPictureAttributeSupported_None;
     m_tvmStereoMode        = kStereoscopicModeAuto;
@@ -9430,8 +9396,6 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
             !m_tvmTracks[kTrackTypeAudio].empty();
         m_tvmUpmixing         = m_audioState.m_isUpmixing;
         m_tvmCanUpmix         = m_audioState.m_canUpmix;
-        m_tvmAspectOverride   = m_player->GetAspectOverride();
-        m_tvmAdjustFill       = m_player->GetAdjustFill();
         m_tvmCurSkip          = m_player->GetAutoCommercialSkip();
         m_tvmIsPaused         = m_player->IsPaused();
         m_tvmSubsCapMode      = m_player->GetCaptionMode();

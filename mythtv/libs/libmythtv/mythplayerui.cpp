@@ -652,7 +652,19 @@ void MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
 
     // handle scan type changes
     AutoDeint(frame, m_videoOutput, m_frameInterval);
-    m_detectLetterBox.SwitchTo(frame);
+
+    // Detect letter boxing
+    // FIXME this is temporarily moved entirely into the main thread as there are
+    // too many threading issues and the decoder thread is not yet ready to handle
+    // QObject signals and slots.
+    // When refactoring is complete, move it into the decoder thread and
+    // signal switches via a new field in MythVideoFrame
+    AdjustFillMode current = m_videoOutput->GetAdjustFill();
+    if (m_detectLetterBox.Detect(frame, m_videoAspect, current))
+    {
+        m_videoOutput->ToggleAdjustFill(current);
+        ReinitOSD();
+    }
 
     // When is the next frame due
     int64_t due = m_avSync.AVSync(&m_audio, frame, m_frameInterval, m_playSpeed, !m_videoDim.isEmpty(),
@@ -661,12 +673,6 @@ void MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
     DoDisplayVideoFrame(frame, due);
     m_videoOutput->DoneDisplayingFrame(frame);
     m_outputJmeter.RecordCycleTime();
-}
-
-void MythPlayerUI::ReleaseNextVideoFrame(MythVideoFrame* Frame, int64_t Timecode, bool Wrap)
-{
-    MythPlayer::ReleaseNextVideoFrame(Frame, Timecode, Wrap);
-    m_detectLetterBox.Detect(Frame);
 }
 
 void MythPlayerUI::SetVideoParams(int Width, int Height, double FrameRate, float Aspect,
@@ -885,16 +891,6 @@ void MythPlayerUI::EnableFrameRateMonitor(bool Enable)
     bool verbose = VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_ANY);
     double rate = Enable ? m_videoFrameRate : verbose ? (m_videoFrameRate * 4) : 0.0;
     m_outputJmeter.SetNumCycles(static_cast<int>(rate));
-}
-
-void MythPlayerUI::ToggleAdjustFill(AdjustFillMode Mode)
-{
-    if (m_videoOutput)
-    {
-        m_detectLetterBox.SetDetectLetterbox(false);
-        m_videoOutput->ToggleAdjustFill(Mode);
-        ReinitOSD();
-    }
 }
 
 // Only edit stuff below here - to be moved

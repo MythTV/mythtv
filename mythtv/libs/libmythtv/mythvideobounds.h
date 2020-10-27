@@ -13,6 +13,7 @@
 #include <QCoreApplication>
 
 // MythTV
+#include "mythplayerstate.h"
 #include "videoouttypes.h"
 
 class QScreen;
@@ -39,6 +40,7 @@ class MythVideoBounds : public QObject
     void VideoRectsChanged      (const QRect &DisplayVideoRect, const QRect &VideoRect);
     void VisibleRectChanged     (const QRect &DisplayVisibleRect);
     void WindowRectChanged      (const QRect &WindowRect);
+    void VideoBoundsStateChanged(MythVideoBoundsState VideoState);
 
   public slots:
     void ScreenChanged          (QScreen *screen);

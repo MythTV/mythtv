@@ -2535,29 +2535,6 @@ bool MythPlayer::IsInDelete(uint64_t frame)
     return m_deleteMap.IsInDelete(frame);
 }
 
-AspectOverrideMode MythPlayer::GetAspectOverride(void) const
-{
-    if (m_videoOutput)
-        return m_videoOutput->GetAspectOverride();
-    return kAspect_Off;
-}
-
-AdjustFillMode MythPlayer::GetAdjustFill(void) const
-{
-    if (m_videoOutput)
-        return m_videoOutput->GetAdjustFill();
-    return kAdjustFill_Off;
-}
-
-void MythPlayer::ToggleAspectOverride(AspectOverrideMode aspectMode)
-{
-    if (m_videoOutput)
-    {
-        m_videoOutput->ToggleAspectOverride(aspectMode);
-        ReinitOSD();
-    }
-}
-
 void MythPlayer::Zoom(ZoomDirection direction)
 {
     if (m_videoOutput)

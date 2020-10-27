@@ -45,6 +45,16 @@ class MTV_PUBLIC MythAudioState
     int64_t m_audioOffset { 0     };
 };
 
+class MTV_PUBLIC MythVideoBoundsState
+{
+  public:
+    MythVideoBoundsState() = default;
+    MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride);
+
+    AdjustFillMode     m_adjustFillMode     { kAdjustFill_Off };
+    AspectOverrideMode m_aspectOverrideMode { kAspect_Off     };
+};
+
 class MTV_PUBLIC MythOverlayState
 {
   public:

@@ -44,13 +44,27 @@ bool MythPlayerVideoUI::InitVideo()
         ChangeOSDPositionUpdates(false);
     };
 
+    // Toggle detect letter box
+    auto toggleDetectLetterbox = [&]()
+    {
+        if (m_videoOutput)
+        {
+            m_detectLetterBox.SetDetectLetterbox(!m_detectLetterBox.GetDetectLetterbox(),
+                                                  m_videoOutput->GetAdjustFill());
+        }
+    };
+
     m_videoOutput = video;
 
     // Inbound connections
     connect(video, &MythVideoOutputGPU::PictureAttributeChanged, updateOsdPicAttr);
     connect(video, &MythVideoBounds::UpdateOSDMessage, this,  QOverload<const QString&>::of(&MythPlayerVideoUI::UpdateOSDMessage));
+    connect(video, &MythVideoBounds::VideoBoundsStateChanged, m_tv, &TV::VideoBoundsStateChanged);
     connect(m_tv,  &TV::ChangeOSDPositionUpdates, this,  &MythPlayerVideoUI::ChangeOSDPositionUpdates);
     connect(m_tv,  &TV::WindowResized,            this,  &MythPlayerVideoUI::WindowResized);
+    connect(m_tv,  &TV::ChangeAdjustFill,         this,  &MythPlayerVideoUI::ToggleAdjustFill);
+    connect(m_tv,  &TV::ChangeAspectOverride,     this,  &MythPlayerVideoUI::ToggleAspectOverride);
+    connect(m_tv,  &TV::ToggleDetectLetterBox, toggleDetectLetterbox);
 
     // Passthrough signals
     connect(m_tv,  &TV::ChangePictureAttribute,   video, &MythVideoOutputGPU::ChangePictureAttribute);
@@ -97,4 +111,27 @@ void MythPlayerVideoUI::ProcessCallbacks()
     }
     m_decoderCallbacks.clear();
     m_decoderCallbackLock.unlock();
+}
+
+void MythPlayerVideoUI::ToggleAdjustFill(AdjustFillMode Mode)
+{
+    if (m_videoOutput)
+    {
+        m_detectLetterBox.SetDetectLetterbox(false, m_videoOutput->GetAdjustFill());
+        m_videoOutput->ToggleAdjustFill(Mode);
+        ReinitOSD();
+        QString text = toString(m_videoOutput->GetAdjustFill());
+        UpdateOSDMessage(text);
+    }
+}
+
+void MythPlayerVideoUI::ToggleAspectOverride(AspectOverrideMode AspectMode)
+{
+    if (m_videoOutput)
+    {
+        m_videoOutput->ToggleAspectOverride(AspectMode);
+        ReinitOSD();
+        QString text = toString(m_videoOutput->GetAspectOverride());
+        UpdateOSDMessage(text);
+    }
 }
