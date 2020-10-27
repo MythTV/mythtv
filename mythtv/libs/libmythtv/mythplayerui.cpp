@@ -897,14 +897,6 @@ void MythPlayerUI::EnableFrameRateMonitor(bool Enable)
     m_outputJmeter.SetNumCycles(static_cast<int>(rate));
 }
 
-static inline double SafeFPS(DecoderBase* Decoder)
-{
-    if (!Decoder)
-        return 25;
-    double fps = Decoder->GetFPS();
-    return fps > 0 ? fps : 25.0;
-}
-
 /* JumpToStream, JumpToProgram and SwitchToProgram all need to be moved into the
  * parent object and hopefully simplified. The fairly involved logic does not
  * sit well with the new design objectives for the player classes and are better

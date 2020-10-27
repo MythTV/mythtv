@@ -39,15 +39,27 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
     void SetTeletextPage(uint Page);
 
     void ReinitOSD() override;
+    void SetVideoResize(const QRect &Rect);
+    bool SetAudioByComponentTag(int Tag);
+    bool SetVideoByComponentTag(int Tag);
+    bool SetStream(const QString& Stream);
+    long GetStreamPos();
+    long GetStreamMaxPos();
+    long SetStreamPos(long Ms);
+    void StreamPlay(bool play = true);
     InteractiveTV* GetInteractiveTV() override;
     bool ITVHandleAction(const QString& Action);
     void ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV);
 
   protected:
+    double SafeFPS(DecoderBase* Decoder);
+
     InteractiveTV *m_interactiveTV { nullptr };
     QMutex m_itvLock  { };
     bool m_itvEnabled { false };
     bool m_itvVisible { false };
+    QMutex  m_streamLock { };
+    QString m_newStream  { };
 };
 
 #endif

@@ -1,6 +1,9 @@
 // MythTV
+#include "livetvchain.h"
 #include "interactivetv.h"
 #include "mythplayercaptionsui.h"
+
+#define LOC QString("CaptionsUI: ")
 
 MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerVideoUI (MainWindow, Tv, Context, Flags)
@@ -540,9 +543,7 @@ bool MythPlayerCaptionsUI::ITVHandleAction(const QString &Action)
     return result;
 }
 
-/** \fn MythPlayerCaptionsUI::ITVRestart(uint chanid, uint cardid, bool isLive)
- *  \brief Restart the MHEG/MHP engine.
- */
+/// \brief Restart the MHEG/MHP engine.
 void MythPlayerCaptionsUI::ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV)
 {
 #ifdef USING_MHEG
@@ -557,4 +558,97 @@ void MythPlayerCaptionsUI::ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV)
     Q_UNUSED(cardid);
     Q_UNUSED(isLiveTV);
 #endif
+}
+
+// Called from the interactiveTV (MHIContext) thread
+void MythPlayerCaptionsUI::SetVideoResize(const QRect &Rect)
+{
+    QMutexLocker locker(&m_osdLock);
+    if (m_videoOutput)
+        m_videoOutput->SetITVResize(Rect);
+}
+
+/// \brief Selects the audio stream using the DVB component tag.
+// Called from the interactiveTV (MHIContext) thread
+bool MythPlayerCaptionsUI::SetAudioByComponentTag(int Tag)
+{
+    QMutexLocker locker(&m_decoderChangeLock);
+    if (m_decoder)
+        return m_decoder->SetAudioByComponentTag(Tag);
+    return false;
+}
+
+/// \brief Selects the video stream using the DVB component tag.
+// Called from the interactiveTV (MHIContext) thread
+bool MythPlayerCaptionsUI::SetVideoByComponentTag(int Tag)
+{
+    QMutexLocker locker(&m_decoderChangeLock);
+    if (m_decoder)
+        return m_decoder->SetVideoByComponentTag(Tag);
+    return false;
+}
+
+double MythPlayerCaptionsUI::SafeFPS(DecoderBase *Decoder)
+{
+    if (!Decoder)
+        return 25;
+    double fps = Decoder->GetFPS();
+    return fps > 0 ? fps : 25.0;
+}
+
+// Called from the interactiveTV (MHIContext) thread
+bool MythPlayerCaptionsUI::SetStream(const QString& Stream)
+{
+    // The stream name is empty if the stream is closing
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetStream '%1'").arg(Stream));
+
+    QMutexLocker locker(&m_streamLock);
+    m_newStream = Stream;
+    locker.unlock();
+    // Stream will be changed by JumpToStream called from EventLoop
+    // If successful will call m_interactiveTV->StreamStarted();
+
+    if (Stream.isEmpty() && m_playerCtx->m_tvchain &&
+        m_playerCtx->m_buffer->GetType() == kMythBufferMHEG)
+    {
+        // Restore livetv
+        SetEof(kEofStateDelayed);
+        m_playerCtx->m_tvchain->JumpToNext(false, 0);
+        m_playerCtx->m_tvchain->JumpToNext(true, 0);
+    }
+
+    return !Stream.isEmpty();
+}
+
+// Called from the interactiveTV (MHIContext) thread
+long MythPlayerCaptionsUI::GetStreamPos()
+{
+    return static_cast<long>((1000 * GetFramesPlayed()) / SafeFPS(m_decoder));
+}
+
+// Called from the interactiveTV (MHIContext) thread
+long MythPlayerCaptionsUI::GetStreamMaxPos()
+{
+    long maxpos = static_cast<long>(1000 * (m_totalDuration > 0 ? m_totalDuration : m_totalLength));
+    long pos = GetStreamPos();
+    return maxpos > pos ? maxpos : pos;
+}
+
+// Called from the interactiveTV (MHIContext) thread
+long MythPlayerCaptionsUI::SetStreamPos(long Ms)
+{
+    auto frameNum = static_cast<uint64_t>((Ms * SafeFPS(m_decoder)) / 1000);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetStreamPos %1 mS = frame %2, now=%3")
+        .arg(Ms).arg(frameNum).arg(GetFramesPlayed()) );
+    JumpToFrame(frameNum);
+    return Ms;
+}
+
+// Called from the interactiveTV (MHIContext) thread
+void MythPlayerCaptionsUI::StreamPlay(bool play)
+{
+    if (play)
+        Play();
+    else
+        Pause();
 }

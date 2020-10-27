@@ -144,7 +144,6 @@ class MTV_PUBLIC MythPlayer : public QObject
                         const QString& codecName = QString());
     void SetFileLength(int total, int frames);
     void SetDuration(int duration);
-    void SetVideoResize(const QRect &videoRect);
     void SetFrameRate(double fps);
 
     // Gets
@@ -231,15 +230,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // These two functions are not thread-safe (UI thread use only).
     void SetAllowForcedSubtitles(bool allow);
     bool GetAllowForcedSubtitles(void) const { return m_allowForcedSubtitles; }
-
-    // Public MHEG/MHI stream selection
-    bool SetAudioByComponentTag(int tag);
-    bool SetVideoByComponentTag(int tag);
-    bool SetStream(const QString &stream);
-    long GetStreamPos(); // mS
-    long GetStreamMaxPos(); // mS
-    long SetStreamPos(long ms); // mS
-    void StreamPlay(bool play = true);
 
     // LiveTV public stuff
     void CheckTVChain();
@@ -519,10 +509,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // CC608/708
     CC608Reader m_cc608;
     CC708Reader m_cc708;
-
-    // Support for MHEG/MHI
-    QMutex     m_streamLock;
-    QString    m_newStream; // Guarded by streamLock
 
     // OSD stuff
     OSD    *m_osd                         {nullptr};
