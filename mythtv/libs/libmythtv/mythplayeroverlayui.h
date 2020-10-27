@@ -17,9 +17,13 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
 
   public:
     MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
-   ~MythPlayerOverlayUI() override = default;
+   ~MythPlayerOverlayUI() override;
 
     virtual void UpdateSliderInfo(osdInfo& Info, bool PaddedFields = false);
+
+    OSD* GetOSD()    { return m_osd; }
+    void LockOSD()   { m_osdLock.lock(); }
+    void UnlockOSD() { m_osdLock.unlock(); }
 
   protected slots:
     void UpdateOSDMessage (const QString& Message);
@@ -36,6 +40,8 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
     virtual int64_t GetSecondsPlayed(bool HonorCutList, int Divisor = 1000);
     virtual int64_t GetTotalSeconds(bool HonorCutList, int Divisor = 1000) const;
 
+    OSD*   m_osd      { nullptr };
+    QMutex m_osdLock  { QMutex::Recursive };
     bool   m_browsing { false };
     bool   m_editing  { false };
 

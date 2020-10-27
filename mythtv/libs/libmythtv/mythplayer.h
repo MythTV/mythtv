@@ -259,11 +259,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Position Map Stuff
     bool PosMapFromEnc(uint64_t start, frm_pos_map_t &posMap, frm_pos_map_t &durMap);
 
-    // OSD locking for TV class
-    bool TryLockOSD(void) { return m_osdLock.tryLock(50); }
-    void LockOSD(void)    { m_osdLock.lock();   }
-    void UnlockOSD(void)  { m_osdLock.unlock(); }
-
     void SaveTotalDuration(void);
     void ResetTotalDuration(void);
 
@@ -280,9 +275,6 @@ class MTV_PUBLIC MythPlayer : public QObject
   protected:
     // Initialization
     void OpenDummy(void);
-
-    // Non-const gets
-    OSD         *GetOSD(void)               { return m_osd;       }
 
     // Complicated gets
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
@@ -511,9 +503,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     CC708Reader m_cc708;
 
     // OSD stuff
-    OSD    *m_osd                         {nullptr};
     bool    m_reinitOsd                   {false};
-    QMutex  m_osdLock                     {QMutex::Recursive};
 
     // Audio stuff
     AudioPlayer      m_audio;

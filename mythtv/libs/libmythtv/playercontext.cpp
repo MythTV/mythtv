@@ -299,16 +299,6 @@ void PlayerContext::UnlockState(void) const
     m_stateLock.unlock();
 }
 
-void PlayerContext::LockOSD() const
-{
-    m_player->LockOSD();
-}
-
-void PlayerContext::UnlockOSD(void) const
-{
-    m_player->UnlockOSD();
-}
-
 bool PlayerContext::InStateChange(void) const
 {
     if (!m_stateLock.tryLock())

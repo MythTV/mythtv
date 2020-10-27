@@ -10391,11 +10391,11 @@ OSD *TV::GetOSDL()
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
     {
-        m_playerContext.LockOSD();
+        m_player->LockOSD();
         OSD *osd = m_player->GetOSD();
         if (!osd)
         {
-            m_playerContext.UnlockOSD();
+            m_player->UnlockOSD();
             m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
         }
         return osd;
@@ -10406,7 +10406,8 @@ OSD *TV::GetOSDL()
 
 void TV::ReturnOSDLock()
 {
-    m_playerContext.UnlockOSD();
+    if (m_player)
+        m_player->UnlockOSD();
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 }
 

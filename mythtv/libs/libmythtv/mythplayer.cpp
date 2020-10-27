@@ -112,11 +112,7 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
 
 MythPlayer::~MythPlayer(void)
 {
-    QMutexLocker lock1(&m_osdLock);
     QMutexLocker lock2(&m_vidExitLock);
-
-    delete m_osd;
-    m_osd = nullptr;
 
     SetDecoder(nullptr);
 
@@ -306,17 +302,14 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
 
     bool aspect_only = false;
     {
-        QMutexLocker lock1(&m_osdLock);
-        QMutexLocker lock2(&m_vidExitLock);
-
+        QMutexLocker locker(&m_vidExitLock);
         m_videoOutput->SetVideoFrameRate(static_cast<float>(m_videoFrameRate));
         float aspect = (m_forcedVideoAspect > 0) ? m_forcedVideoAspect : m_videoAspect;
         if (!m_videoOutput->InputChanged(m_videoDim, m_videoDispDim, aspect,
                                          m_decoder->GetVideoCodecID(), aspect_only,
                                          m_maxReferenceFrames, ForceUpdate))
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                "Failed to Reinitialize Video. Exiting..");
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to Reinitialize Video. Exiting..");
             SetErrored(tr("Failed to reinitialize video output"));
             return;
         }
@@ -861,14 +854,10 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
 
 void MythPlayer::VideoEnd(void)
 {
-    m_osdLock.lock();
     m_vidExitLock.lock();
-    delete m_osd;
     delete m_videoOutput;
-    m_osd         = nullptr;
     m_videoOutput = nullptr;
     m_vidExitLock.unlock();
-    m_osdLock.unlock();
 }
 
 bool MythPlayer::FastForward(float seconds)

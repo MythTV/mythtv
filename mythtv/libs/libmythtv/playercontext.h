@@ -76,9 +76,6 @@ class MTV_PUBLIC PlayerContext
     void LockDeletePlayer(const char *file, int line) const;
     void UnlockDeletePlayer(const char *file, int line) const;
 
-    void LockOSD(void) const;
-    void UnlockOSD(void) const;
-
     // Sets
     void SetInitialTVState(bool islivetv);
     void SetPlayer(MythPlayer *newplayer);

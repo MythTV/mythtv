@@ -15,6 +15,11 @@ MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, Pla
             this, QOverload<const QString&>::of(&MythPlayerOverlayUI::UpdateOSDMessage));
 }
 
+MythPlayerOverlayUI::~MythPlayerOverlayUI()
+{
+    delete m_osd;
+}
+
 void MythPlayerOverlayUI::BrowsingChanged(bool Browsing)
 {
     m_browsing = Browsing;
