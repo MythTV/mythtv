@@ -3,7 +3,7 @@
 
 // MythTV
 #include "DetectLetterbox.h"
-#include "mythplayeraudioui.h"
+#include "mythplayercaptionsui.h"
 
 class DecoderCallback
 {
@@ -29,7 +29,7 @@ class DecoderCallback
     void* m_opaque3     { nullptr };
 };
 
-class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerAudioUI
+class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerCaptionsUI
 {
     Q_OBJECT
 
@@ -40,10 +40,7 @@ class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerAudioUI
     void HandleDecoderCallback(const QString& Debug, DecoderCallback::Callback Function,
                                void* Opaque1, void* Opaque2);
 
-    // Workaround inheritance chicken and egg in ReinitOSD
-    virtual bool ToggleCaptions(uint /*Type*/) { return false; }
-    virtual void EnableCaptions(uint /*Mode*/, bool /*UpdateOSD*/ = true) { }
-    virtual void ReinitOSD();
+    void ReinitOSD();
     void CheckAspectRatio(MythVideoFrame* Frame);
 
     void Zoom(ZoomDirection Direction);

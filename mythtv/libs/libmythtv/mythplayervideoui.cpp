@@ -8,7 +8,7 @@
 #define LOC QString("PlayerVideo: ")
 
 MythPlayerVideoUI::MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
-  : MythPlayerAudioUI(MainWindow, Tv, Context, Flags)
+  : MythPlayerCaptionsUI(MainWindow, Tv, Context, Flags)
 {
     connect(this, &MythPlayerVideoUI::CheckCallbacks, this, &MythPlayerVideoUI::ProcessCallbacks);
 }
@@ -72,6 +72,8 @@ bool MythPlayerVideoUI::InitVideo()
     connect(m_tv,  &TV::ChangeStereoOverride,     video, &MythVideoOutputGPU::SetStereoOverride);
     connect(m_tv,  &TV::WindowResized,            video, &MythVideoOutputGPU::WindowResized);
     connect(m_tv,  &TV::EmbedPlayback,            video, &MythVideoOutputGPU::EmbedPlayback);
+    connect(this,  &MythPlayerVideoUI::ResizeForInteractiveTV,
+                                                  video, &MythVideoOutputGPU::SetITVResize);
 
     // Update initial state. MythVideoOutput will have potentially adjusted state
     // at startup that we need to know about.
@@ -153,8 +155,7 @@ void MythPlayerVideoUI::ReinitOSD()
         float scaling = NAN;
         m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
         int stretch = static_cast<int>(lroundf(aspect * 100));
-        if ((m_osd.Bounds() != visible) ||
-            (m_osd.GetFontStretch() != stretch))
+        if ((m_osd.Bounds() != visible) || (m_osd.GetFontStretch() != stretch))
         {
             uint old = m_textDisplayMode;
             ToggleCaptions(old);
@@ -172,6 +173,25 @@ void MythPlayerVideoUI::ReinitOSD()
         m_reinitOsd = false;
         m_osdLock.unlock();
     }
+
+#ifdef USING_MHEG
+    if (m_videoOutput)
+    {
+        m_osdLock.lock();
+        QRect visible;
+        QRect total;
+        float aspect = NAN;
+        float scaling = NAN;
+        m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
+        if (GetInteractiveTV())
+        {
+            QMutexLocker locker(&m_itvLock);
+            m_interactiveTV->Reinit(total, visible, aspect);
+            m_itvVisible = false;
+        }
+        m_osdLock.unlock();
+    }
+#endif
 }
 
 void MythPlayerVideoUI::CheckAspectRatio(MythVideoFrame* Frame)

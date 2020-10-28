@@ -6,10 +6,9 @@
 #define LOC QString("CaptionsUI: ")
 
 MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
-  : MythPlayerVideoUI(MainWindow, Tv, Context, Flags)
+  : MythPlayerAudioUI(MainWindow, Tv, Context, Flags)
 {
     m_itvEnabled = gCoreContext->GetBoolSetting("EnableMHEG", false);
-    connect(this, &MythPlayerCaptionsUI::ResizeForInteractiveTV, this, &MythPlayerCaptionsUI::SetVideoResize);
 }
 
 MythPlayerCaptionsUI::~MythPlayerCaptionsUI()
@@ -472,30 +471,6 @@ bool MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action)
     return handled;
 }
 
-void MythPlayerCaptionsUI::ReinitOSD()
-{
-    MythPlayerVideoUI::ReinitOSD();
-
-#ifdef USING_MHEG
-    if (m_videoOutput)
-    {
-        m_osdLock.lock();
-        QRect visible;
-        QRect total;
-        float aspect = NAN;
-        float scaling = NAN;
-        m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
-        if (GetInteractiveTV())
-        {
-            QMutexLocker locker(&m_itvLock);
-            m_interactiveTV->Reinit(total, visible, aspect);
-            m_itvVisible = false;
-        }
-        m_osdLock.unlock();
-    }
-#endif
-}
-
 InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()
 {
 #ifdef USING_MHEG
@@ -541,12 +516,6 @@ void MythPlayerCaptionsUI::ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV)
     Q_UNUSED(Cardid);
     Q_UNUSED(IsLiveTV);
 #endif
-}
-
-void MythPlayerCaptionsUI::SetVideoResize(const QRect &Rect)
-{
-    if (m_videoOutput)
-        m_videoOutput->SetITVResize(Rect);
 }
 
 /// \brief Selects the audio stream using the DVB component tag.

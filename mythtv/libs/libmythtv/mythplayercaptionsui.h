@@ -2,9 +2,9 @@
 #define MYTHPLAYERCAPTIONSUI_H
 
 // MythTV
-#include "mythplayervideoui.h"
+#include "mythplayeraudioui.h"
 
-class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
+class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
 {
     Q_OBJECT
 
@@ -17,12 +17,12 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
 
     void ResetCaptions();
     bool ToggleCaptions();
-    bool ToggleCaptions(uint Type) override;
+    bool ToggleCaptions(uint Type);
     bool HasTextSubtitles();
     void SetCaptionsEnabled(bool Enable, bool UpdateOSD = true);
     bool GetCaptionsEnabled() const;
     virtual void DisableCaptions(uint Mode, bool UpdateOSD = true);
-    void EnableCaptions(uint Mode, bool UpdateOSD = true) override;
+    virtual void EnableCaptions(uint Mode, bool UpdateOSD = true);
 
     // N.B. These methods handle audio tracks as well. Fix.
     QStringList GetTracks(uint Type);
@@ -43,8 +43,6 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
     bool HandleTeletextAction(const QString &Action);
     void SetTeletextPage(uint Page);
 
-    void ReinitOSD() override;
-
     bool SetAudioByComponentTag(int Tag);
     bool SetVideoByComponentTag(int Tag);
     bool SetStream(const QString& Stream);
@@ -55,9 +53,6 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
     InteractiveTV* GetInteractiveTV() override;
     bool ITVHandleAction(const QString& Action);
     void ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV);
-
-  protected slots:
-    void SetVideoResize(const QRect& Rect);
 
   protected:
     double SafeFPS();

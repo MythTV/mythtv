@@ -3,9 +3,9 @@
 
 // MythTV
 #include "visualisations/videovisual.h"
-#include "mythplayercaptionsui.h"
+#include "mythplayervideoui.h"
 
-class MTV_PUBLIC MythPlayerVisualiserUI : public MythPlayerCaptionsUI
+class MTV_PUBLIC MythPlayerVisualiserUI : public MythPlayerVideoUI
 {
     Q_OBJECT
 
