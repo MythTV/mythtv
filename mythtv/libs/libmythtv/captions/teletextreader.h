@@ -80,7 +80,7 @@ class TeletextReader
 
     // OSD/Player methods
     void Reset(void);
-    bool KeyPress(const QString &key);
+    bool KeyPress(const QString& Key, bool& Exit);
     QString GetPage(void);
     void SetPage(int page, int subpage);
     void SetSubPage(int subpage)        { m_cursubpage = subpage;      }

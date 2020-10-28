@@ -24,7 +24,7 @@ class MythCaptionsOverlay : public MythMediaOverlay
 
     TeletextScreen* InitTeletext();
     void EnableTeletext(bool Enable, int Page);
-    bool TeletextAction(const QString& Action);
+    bool TeletextAction(const QString& Action, bool& Exit);
     void TeletextReset();
     void TeletextClear();
 

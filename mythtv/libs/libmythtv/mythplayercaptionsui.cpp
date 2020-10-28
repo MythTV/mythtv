@@ -476,21 +476,17 @@ void MythPlayerCaptionsUI::SetTeletextPage(uint Page)
     m_osdLock.unlock();
 }
 
-// TODO When captions state is complete, process action in TV
-#include "tv_actions.h"
 void MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action, bool &Handled)
 {
     if (!(m_textDisplayMode & kDisplayTeletextMenu))
         return;
 
-    Handled = true;
-
+    bool exit = false;
     m_osdLock.lock();
-    if (Action == "MENU" || Action == ACTION_TOGGLETT || Action == "ESCAPE")
-        DisableTeletext();
-    else
-        Handled = m_osd.TeletextAction(Action);
+    Handled = m_osd.TeletextAction(Action, exit);
     m_osdLock.unlock();
+    if (exit)
+        DisableTeletext();
 }
 
 InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()

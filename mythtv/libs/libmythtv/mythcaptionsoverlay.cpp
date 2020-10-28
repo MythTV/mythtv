@@ -96,13 +96,13 @@ void MythCaptionsOverlay::EnableTeletext(bool Enable, int Page)
     }
 }
 
-bool MythCaptionsOverlay::TeletextAction(const QString &Action)
+bool MythCaptionsOverlay::TeletextAction(const QString &Action, bool& Exit)
 {
     if (HasWindow(OSD_WIN_TELETEXT))
     {
         auto* tt = qobject_cast<TeletextScreen*>(m_children.value(OSD_WIN_TELETEXT));
         if (tt)
-            return tt->KeyPress(Action);
+            return tt->KeyPress(Action, Exit);
     }
     return false;
 }

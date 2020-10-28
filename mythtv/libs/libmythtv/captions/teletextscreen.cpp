@@ -219,10 +219,10 @@ void TeletextScreen::Pulse()
     OptimiseDisplayedArea();
 }
 
-bool TeletextScreen::KeyPress(const QString &key)
+bool TeletextScreen::KeyPress(const QString& Key, bool& Exit)
 {
     if (m_teletextReader)
-        return m_teletextReader->KeyPress(key);
+        return m_teletextReader->KeyPress(Key, Exit);
     return false;
 }
 
