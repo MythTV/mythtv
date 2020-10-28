@@ -3475,8 +3475,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
     if (m_player && (m_player->GetCaptionMode() == kDisplayTeletextMenu))
     {
         QStringList tt_actions;
-        handled = TranslateKeyPressOrGesture(
-                  "Teletext Menu", Event, tt_actions, isLiveTV);
+        handled = TranslateKeyPressOrGesture("Teletext Menu", Event, tt_actions, isLiveTV);
 
         if (!handled && !tt_actions.isEmpty())
         {
@@ -3492,19 +3491,20 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
     }
 
     // Interactive television
-    if (m_player && m_player->GetInteractiveTV())
+    if (m_captionsState.m_haveITV)
     {
         if (!alreadyTranslatedPlayback)
         {
-            handled = TranslateKeyPressOrGesture(
-                      "TV Playback", Event, actions, isLiveTV);
+            handled = TranslateKeyPressOrGesture("TV Playback", Event, actions, isLiveTV);
             alreadyTranslatedPlayback = true;
         }
+
         if (!handled && !actions.isEmpty())
         {
             for (int i = 0; i < actions.size(); i++)
             {
-                if (m_player->ITVHandleAction(actions[i]))
+                emit HandleITVAction(actions[i], handled);
+                if (handled)
                 {
                     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
                     return true;
@@ -3515,10 +3515,8 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!alreadyTranslatedPlayback)
-    {
-        handled = TranslateKeyPressOrGesture(
-                  "TV Playback", Event, actions, isLiveTV);
-    }
+        handled = TranslateKeyPressOrGesture("TV Playback", Event, actions, isLiveTV);
+
     if (handled || actions.isEmpty())
         return handled;
 
@@ -9901,10 +9899,7 @@ void TV::ITVRestart(bool IsLive)
     }
     m_playerContext.UnlockPlayingInfo(__FILE__, __LINE__);
 
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player)
-        m_player->ITVRestart(static_cast<uint>(chanid), static_cast<uint>(sourceid), IsLive);
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    emit RestartITV(static_cast<uint>(chanid), static_cast<uint>(sourceid), IsLive);
 }
 
 void TV::DoJumpFFWD()

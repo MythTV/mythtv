@@ -83,4 +83,13 @@ class MTV_PUBLIC MythVisualiserState
     QStringList m_visualiserList { };
 };
 
+class MTV_PUBLIC MythCaptionsState
+{
+  public:
+    MythCaptionsState() = default;
+    MythCaptionsState(bool ITV);
+
+    bool m_haveITV { false };
+};
+
 #endif

@@ -20,9 +20,14 @@ void TVPlaybackState::AudioPlayerStateChanged(const MythAudioPlayerState& AudioP
     m_audioPlayerState = AudioPlayerState;
 }
 
-void TVPlaybackState::AudioStateChanged(const MythAudioState &AudioState)
+void TVPlaybackState::AudioStateChanged(const MythAudioState& AudioState)
 {
     m_audioState = AudioState;
+}
+
+void TVPlaybackState::CaptionsStateChanged(const MythCaptionsState& CaptionsState)
+{
+    m_captionsState = CaptionsState;
 }
 
 void TVPlaybackState::VideoBoundsStateChanged(const MythVideoBoundsState& VideoBoundsState)

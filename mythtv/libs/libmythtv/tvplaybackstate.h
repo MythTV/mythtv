@@ -26,6 +26,10 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeUpmix(bool Enable, bool Toggle = false);
     void ChangeAudioOffset(int64_t Delta, int Value);
 
+    // Captions/Interactive
+    void RestartITV(uint Chanid, uint Cardid, bool IsLiveTV);
+    void HandleITVAction(const QString& Action, bool& Handled);
+
     // Video
     void RequestEmbedding(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
     void EmbedPlayback(bool Embed, const QRect& Rect = {});
@@ -49,17 +53,19 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void EnableVisualiser(bool Enable, bool Toggle = false, const QString& Name = QString());
 
   public slots:
+    void OverlayStateChanged(const MythOverlayState& OverlayState);
     void AudioPlayerStateChanged(const MythAudioPlayerState& AudioPlayerState);
     void AudioStateChanged(const MythAudioState& AudioState);
+    void CaptionsStateChanged(const MythCaptionsState& CaptionsState);
     void VideoBoundsStateChanged(const MythVideoBoundsState& VideoBoundsState);
-    void OverlayStateChanged(const MythOverlayState& OverlayState);
     void VisualiserStateChanged(const MythVisualiserState& VisualiserState);
 
   protected:
+    MythOverlayState     m_overlayState     { };
     MythAudioPlayerState m_audioPlayerState { };
     MythAudioState       m_audioState       { };
+    MythCaptionsState    m_captionsState    { };
     MythVideoBoundsState m_videoBoundsState { };
-    MythOverlayState     m_overlayState     { };
     MythVisualiserState  m_visualiserState  { };
 };
 

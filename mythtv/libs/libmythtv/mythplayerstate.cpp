@@ -46,3 +46,8 @@ MythVisualiserState::MythVisualiserState(bool Embedding, bool Visualising,
     m_visualiserList(Visualisers)
 {
 }
+
+MythCaptionsState::MythCaptionsState(bool ITV)
+  : m_haveITV(ITV)
+{
+}

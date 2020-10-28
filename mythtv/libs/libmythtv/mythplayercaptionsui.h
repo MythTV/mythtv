@@ -9,7 +9,11 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     Q_OBJECT
 
   signals:
+    void CaptionsStateChanged(MythCaptionsState CaptionsState);
     void ResizeForInteractiveTV(const QRect& Rect);
+    void SetInteractiveStream(const QString& Stream);
+    void SetInteractiveStreamPos(long Position);
+    void PlayInteractiveStream(bool Play);
 
   public:
     MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
@@ -45,24 +49,28 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
 
     bool SetAudioByComponentTag(int Tag);
     bool SetVideoByComponentTag(int Tag);
-    bool SetStream(const QString& Stream);
     long GetStreamPos();
     long GetStreamMaxPos();
-    long SetStreamPos(long Ms);
-    void StreamPlay(bool play = true);
     InteractiveTV* GetInteractiveTV() override;
-    bool ITVHandleAction(const QString& Action);
+
+  protected slots:
+    void ITVHandleAction(const QString& Action, bool& Handled);
     void ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV);
+
+  private slots:
+    void SetStream(const QString& Stream);
+    long SetStreamPos(long Position);
+    void StreamPlay(bool Playing = true);
 
   protected:
     double SafeFPS();
 
+    MythCaptionsState m_captionsState { };
     InteractiveTV *m_interactiveTV { nullptr };
-    QMutex m_itvLock  { };
-    bool m_itvEnabled { false };
-    bool m_itvVisible { false };
-    QMutex  m_streamLock { };
-    QString m_newStream  { };
+    QMutex m_itvLock    { };
+    bool m_itvEnabled   { false };
+    bool m_itvVisible   { false };
+    QString m_newStream { };
 };
 
 #endif

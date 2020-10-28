@@ -168,15 +168,10 @@ void MythPlayerUI::EventLoop()
     }
 
     // Change interactive stream if requested
+    if (!m_newStream.isEmpty())
     {
-        QMutexLocker locker(&m_streamLock);
-        if (!m_newStream.isEmpty())
-        {
-            QString stream = m_newStream;
-            m_newStream.clear();
-            locker.unlock();
-            JumpToStream(stream);
-        }
+        JumpToStream(m_newStream);
+        m_newStream = QString();
     }
 
     // Disable fastforward if we are too close to the end of the buffer

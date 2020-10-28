@@ -1,5 +1,6 @@
 // MythTV
 #include "livetvchain.h"
+#include "tv_play.h"
 #include "interactivetv.h"
 #include "mythplayercaptionsui.h"
 
@@ -9,6 +10,18 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
   : MythPlayerAudioUI(MainWindow, Tv, Context, Flags)
 {
     m_itvEnabled = gCoreContext->GetBoolSetting("EnableMHEG", false);
+
+    // Connect outgoing
+    connect(this, &MythPlayerCaptionsUI::CaptionsStateChanged, m_tv, &TV::CaptionsStateChanged);
+
+    // Inbound connections
+    connect(m_tv, &TV::RestartITV,      this, &MythPlayerCaptionsUI::ITVRestart);
+    connect(m_tv, &TV::HandleITVAction, this, &MythPlayerCaptionsUI::ITVHandleAction);
+
+    // Signalled connections (from MHIContext)
+    connect(this, &MythPlayerCaptionsUI::SetInteractiveStream,    this, &MythPlayerCaptionsUI::SetStream);
+    connect(this, &MythPlayerCaptionsUI::SetInteractiveStreamPos, this, &MythPlayerCaptionsUI::SetStreamPos);
+    connect(this, &MythPlayerCaptionsUI::PlayInteractiveStream,   this, &MythPlayerCaptionsUI::StreamPlay);
 }
 
 MythPlayerCaptionsUI::~MythPlayerCaptionsUI()
@@ -474,31 +487,44 @@ bool MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action)
 InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()
 {
 #ifdef USING_MHEG
-    if (!m_interactiveTV && m_itvEnabled && !FlagIsSet(kNoITV))
+    bool update = false;
     {
         QMutexLocker lock1(&m_osdLock);
         QMutexLocker lock2(&m_itvLock);
-        m_interactiveTV = new InteractiveTV(this);
+        if (!m_interactiveTV && m_itvEnabled && !FlagIsSet(kNoITV))
+        {
+            m_interactiveTV = new InteractiveTV(this);
+            m_captionsState.m_haveITV = true;
+            update = true;
+        }
     }
+    if (update)
+        emit CaptionsStateChanged(m_captionsState);
 #endif
     return m_interactiveTV;
 }
 
-bool MythPlayerCaptionsUI::ITVHandleAction(const QString &Action)
+/*! \brief Submit Action to the interactiveTV object
+ *
+ * This is a little contrived as this method is signalled from the parent object. Rather
+ * than return a value (which is not possible with a signal) we update the Handled
+ * parameter. This is fine as long as there is only one signal/slot connection but
+ * I'm guessing won't work as well if signalled across threads.
+*/
+void MythPlayerCaptionsUI::ITVHandleAction(const QString &Action, bool& Handled)
 {
-    bool result = false;
-
 #ifdef USING_MHEG
     if (!GetInteractiveTV())
-        return result;
+    {
+        Handled = false;
+        return;
+    }
 
     QMutexLocker locker(&m_itvLock);
-    result = m_interactiveTV->OfferKey(Action);
+    Handled = m_interactiveTV->OfferKey(Action);
 #else
     Q_UNUSED(Action);
 #endif
-
-    return result;
 }
 
 /// \brief Restart the MHEG/MHP engine.
@@ -518,8 +544,13 @@ void MythPlayerCaptionsUI::ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV)
 #endif
 }
 
-/// \brief Selects the audio stream using the DVB component tag.
-// Called from the interactiveTV (MHIContext) thread
+/*! \brief Selects the audio stream using the DVB component tag.
+ *
+ * This is called from the InteractiveTV thread and really needs to be processed
+ * in the decoder thread. So for the time being do not convert this to a signal/slot
+ * (as there are no slots in the decoder classes yet) and just pass through with
+ * the protection of the decoder change lock.
+*/
 bool MythPlayerCaptionsUI::SetAudioByComponentTag(int Tag)
 {
     QMutexLocker locker(&m_decoderChangeLock);
@@ -528,8 +559,10 @@ bool MythPlayerCaptionsUI::SetAudioByComponentTag(int Tag)
     return false;
 }
 
-/// \brief Selects the video stream using the DVB component tag.
-// Called from the interactiveTV (MHIContext) thread
+/*! \brief Selects the video stream using the DVB component tag.
+ *
+ * See SetAudioByComponentTag comments
+*/
 bool MythPlayerCaptionsUI::SetVideoByComponentTag(int Tag)
 {
     QMutexLocker locker(&m_decoderChangeLock);
@@ -540,23 +573,21 @@ bool MythPlayerCaptionsUI::SetVideoByComponentTag(int Tag)
 
 double MythPlayerCaptionsUI::SafeFPS()
 {
+    QMutexLocker locker(&m_decoderChangeLock);
     if (!m_decoder)
         return 25;
     double fps = m_decoder->GetFPS();
     return fps > 0 ? fps : 25.0;
 }
 
-// Called from the interactiveTV (MHIContext) thread
-bool MythPlayerCaptionsUI::SetStream(const QString& Stream)
+void MythPlayerCaptionsUI::SetStream(const QString& Stream)
 {
     // The stream name is empty if the stream is closing
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetStream '%1'").arg(Stream));
 
-    QMutexLocker locker(&m_streamLock);
-    m_newStream = Stream;
-    locker.unlock();
     // Stream will be changed by JumpToStream called from EventLoop
     // If successful will call m_interactiveTV->StreamStarted();
+    m_newStream = Stream;
 
     if (Stream.isEmpty() && m_playerCtx->m_tvchain &&
         m_playerCtx->m_buffer->GetType() == kMythBufferMHEG)
@@ -566,8 +597,6 @@ bool MythPlayerCaptionsUI::SetStream(const QString& Stream)
         m_playerCtx->m_tvchain->JumpToNext(false, 0);
         m_playerCtx->m_tvchain->JumpToNext(true, 0);
     }
-
-    return !Stream.isEmpty();
 }
 
 // Called from the interactiveTV (MHIContext) thread
@@ -584,20 +613,18 @@ long MythPlayerCaptionsUI::GetStreamMaxPos()
     return maxpos > pos ? maxpos : pos;
 }
 
-// Called from the interactiveTV (MHIContext) thread
-long MythPlayerCaptionsUI::SetStreamPos(long Ms)
+long MythPlayerCaptionsUI::SetStreamPos(long Position)
 {
-    auto frameNum = static_cast<uint64_t>((Ms * SafeFPS()) / 1000);
+    auto frameNum = static_cast<uint64_t>((Position * SafeFPS()) / 1000);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetStreamPos %1 mS = frame %2, now=%3")
-        .arg(Ms).arg(frameNum).arg(GetFramesPlayed()) );
+        .arg(Position).arg(frameNum).arg(GetFramesPlayed()) );
     JumpToFrame(frameNum);
-    return Ms;
+    return Position;
 }
 
-// Called from the interactiveTV (MHIContext) thread
-void MythPlayerCaptionsUI::StreamPlay(bool play)
+void MythPlayerCaptionsUI::StreamPlay(bool Playing)
 {
-    if (play)
+    if (Playing)
         Play();
     else
         Pause();

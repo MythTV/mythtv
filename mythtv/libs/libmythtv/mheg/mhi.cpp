@@ -1049,7 +1049,8 @@ bool MHIContext::BeginStream(const QString &stream, MHStream *notify)
         if (QUrl(stream).authority().isEmpty())
             return false;
 
-        return m_parent->GetPlayer()->SetStream(stream);
+        emit m_parent->GetPlayer()->SetInteractiveStream(stream);
+        return !stream.isEmpty();
     }
 
     int chan = GetChannelIndex(stream);
@@ -1082,7 +1083,7 @@ void MHIContext::EndStream()
         .arg((quintptr)m_notify,0,16) );
 
     m_notify = nullptr;
-    (void)m_parent->GetPlayer()->SetStream(QString());
+    emit m_parent->GetPlayer()->SetInteractiveStream(QString());
 }
 
 // Callback from MythPlayer when a stream starts or stops
@@ -1156,14 +1157,17 @@ long MHIContext::GetStreamMaxPos()
 // Set current stream position
 long MHIContext::SetStreamPos(long pos)
 {
-    return m_parent->GetPlayer() ? m_parent->GetPlayer()->SetStreamPos(pos) : -1;
+    if (m_parent->GetPlayer())
+        emit m_parent->GetPlayer()->SetInteractiveStreamPos(pos);
+    // Note: return value is never used
+    return 0;
 }
 
 // Play or pause a stream
 void MHIContext::StreamPlay(bool play)
 {
     if (m_parent->GetPlayer())
-        m_parent->GetPlayer()->StreamPlay(play);
+        emit m_parent->GetPlayer()->PlayInteractiveStream(play);
 }
 
 // Create a new object to draw dynamic line art.
