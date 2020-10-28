@@ -27,6 +27,17 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeAudioOffset(int64_t Delta, int Value);
 
     // Captions/Interactive
+    void ToggleCaptions();
+    void ToggleCaptionsByType(uint Type);
+    void SetCaptionsEnabled(bool Enable, bool UpdateOSD = true);
+    void DisableCaptions(uint Mode, bool UpdateOSD = true);
+    void EnableCaptions(uint Mode, bool UpdateOSD = true);
+    void ChangeCaptionTrack(int Direction);
+    void ResetCaptions();
+    void EnableTeletext(int Page = 0x100);
+    void ResetTeletext();
+    void SetTeletextPage(uint Page);
+    void HandleTeletextAction(const QString &Action, bool& Handled);
     void RestartITV(uint Chanid, uint Cardid, bool IsLiveTV);
     void HandleITVAction(const QString& Action, bool& Handled);
 

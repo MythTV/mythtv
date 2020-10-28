@@ -55,11 +55,13 @@ class MythDVDPlayer : public MythPlayerUI
     bool     FastForward(float Seconds) override;
     bool     Rewind(float Seconds) override;
     bool     JumpToFrame(uint64_t Frame) override;
-    void     DisableCaptions(uint Mode, bool OSDMsg = true) override;
-    void     EnableCaptions(uint Mode, bool OSDMsg = true) override;
     int      SetTrack(uint Type, uint TrackNo) override;
     void     CreateDecoder(TestBufferVec & Testbuf) override;
     bool     DoJumpChapter(int Chapter) override;
+
+  protected slots:
+    void     DisableCaptions(uint Mode, bool OSDMsg = true) override;
+    void     EnableCaptions(uint Mode, bool OSDMsg = true) override;
 
   private:
     void     DisplayDVDButton(void);

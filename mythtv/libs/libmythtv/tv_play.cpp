@@ -3130,19 +3130,19 @@ bool TV::HandleTrackAction(const QString &Action)
     bool handled = true;
 
     if (Action == ACTION_TOGGLEEXTTEXT)
-        m_player->ToggleCaptions(kTrackTypeTextSubtitle);
+        emit ToggleCaptionsByType(kTrackTypeTextSubtitle);
     else if (ACTION_ENABLEEXTTEXT == Action)
-        m_player->EnableCaptions(kDisplayTextSubtitle);
+        emit EnableCaptions(kDisplayTextSubtitle);
     else if (ACTION_DISABLEEXTTEXT == Action)
-        m_player->DisableCaptions(kDisplayTextSubtitle);
+        emit DisableCaptions(kDisplayTextSubtitle);
     else if (ACTION_ENABLEFORCEDSUBS == Action)
         m_player->SetAllowForcedSubtitles(true);
     else if (ACTION_DISABLEFORCEDSUBS == Action)
         m_player->SetAllowForcedSubtitles(false);
     else if (Action == ACTION_ENABLESUBS)
-        m_player->SetCaptionsEnabled(true, true);
+        emit SetCaptionsEnabled(true, true);
     else if (Action == ACTION_DISABLESUBS)
-        m_player->SetCaptionsEnabled(false, true);
+        emit SetCaptionsEnabled(false, true);
     else if (Action == ACTION_TOGGLESUBS && !m_overlayState.m_browsing)
     {
         if (m_ccInputMode)
@@ -3150,7 +3150,7 @@ bool TV::HandleTrackAction(const QString &Action)
             bool valid = false;
             int page = GetQueuedInputAsInt(&valid, 16);
             if (m_vbimode == VBIMode::PAL_TT && valid)
-                m_player->SetTeletextPage(static_cast<uint>(page));
+                emit SetTeletextPage(static_cast<uint>(page));
             else if (m_vbimode == VBIMode::NTSC_CC)
                 m_player->SetTrack(kTrackTypeCC608,std::max(std::min(page - 1, 1), 0));
 
@@ -3179,16 +3179,16 @@ bool TV::HandleTrackAction(const QString &Action)
         }
         else
         {
-            m_player->ToggleCaptions();
+            emit ToggleCaptions();
         }
     }
     else if (Action.startsWith("TOGGLE"))
     {
         int type = to_track_type(Action.mid(6));
         if (type == kTrackTypeTeletextMenu)
-            m_player->EnableTeletext();
+            emit EnableTeletext();
         else if (type >= kTrackTypeSubtitle)
-            m_player->ToggleCaptions(static_cast<uint>(type));
+            emit ToggleCaptionsByType(static_cast<uint>(type));
         else
             handled = false;
     }
@@ -3208,7 +3208,7 @@ bool TV::HandleTrackAction(const QString &Action)
         if (type >= kTrackTypeAudio)
             m_player->ChangeTrack(static_cast<uint>(type), dir);
         else if (Action.endsWith("CC"))
-            m_player->ChangeCaptionTrack(dir);
+            emit ChangeCaptionTrack(dir);
         else
             handled = false;
     }
@@ -3481,7 +3481,8 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
         {
             for (int i = 0; i < tt_actions.size(); i++)
             {
-                if (m_player->HandleTeletextAction(tt_actions[i]))
+                emit HandleTeletextAction(tt_actions[i], handled);
+                if (handled)
                 {
                     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
                     return true;
@@ -4491,7 +4492,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
 
         if (track == 0)
         {
-            m_player->SetCaptionsEnabled(false, true);
+            emit SetCaptionsEnabled(false, true);
         }
         else
         {
@@ -4502,7 +4503,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             if (track >= start && track < finish)
             {
                 m_player->SetTrack(kTrackTypeSubtitle, static_cast<int>(track - start));
-                m_player->EnableCaptions(kDisplayAVSubtitle);
+                emit EnableCaptions(kDisplayAVSubtitle);
                 return;
             }
 
@@ -4512,7 +4513,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             if (track >= start && track < finish)
             {
                 m_player->SetTrack(kTrackTypeCC708, static_cast<int>(track - start));
-                m_player->EnableCaptions(kDisplayCC708);
+                emit EnableCaptions(kDisplayCC708);
                 return;
             }
 
@@ -4522,7 +4523,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             if (track >= start && track < finish)
             {
                 m_player->SetTrack(kTrackTypeCC608, static_cast<int>(track - start));
-                m_player->EnableCaptions(kDisplayCC608);
+                emit EnableCaptions(kDisplayCC608);
                 return;
             }
 
@@ -4532,7 +4533,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             if (track >= start && track < finish)
             {
                 m_player->SetTrack(kTrackTypeTeletextCaptions, static_cast<int>(track - start));
-                m_player->EnableCaptions(kDisplayTeletextCaptions);
+                emit EnableCaptions(kDisplayTeletextCaptions);
                 return;
             }
 
@@ -4542,7 +4543,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             if (track >= start && track < finish)
             {
                 m_player->SetTrack(kTrackTypeTeletextMenu, static_cast<int>(track - start));
-                m_player->EnableCaptions(kDisplayTeletextMenu);
+                emit EnableCaptions(kDisplayTeletextMenu);
                 return;
             }
 
@@ -4552,7 +4553,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             if (track >= start && track < finish)
             {
                 m_player->SetTrack(kTrackTypeRawText, static_cast<int>(track - start));
-                m_player->EnableCaptions(kDisplayRawTextSubtitle);
+                emit EnableCaptions(kDisplayRawTextSubtitle);
                 return;
             }
         }
@@ -6041,8 +6042,8 @@ void TV::ChangeChannel(ChannelChangeDirection Direction)
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
     {
-        m_player->ResetCaptions();
-        m_player->ResetTeletext();
+        emit ResetCaptions();
+        emit ResetTeletext();
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
@@ -6204,8 +6205,8 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
     {
-        m_player->ResetCaptions();
-        m_player->ResetTeletext();
+        emit ResetCaptions();
+        emit ResetTeletext();
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 

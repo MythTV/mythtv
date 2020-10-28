@@ -148,7 +148,7 @@ void MythPlayerVideoUI::ReinitOSD()
         if ((m_osd.Bounds() != visible) || (m_osd.GetFontStretch() != stretch))
         {
             uint old = m_textDisplayMode;
-            ToggleCaptions(old);
+            ToggleCaptionsByType(old);
             m_osd.Init(visible, aspect);
             EnableCaptions(old, false);
             if (m_deleteMap.IsEditing())

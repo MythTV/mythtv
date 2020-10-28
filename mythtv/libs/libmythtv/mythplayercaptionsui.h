@@ -19,14 +19,8 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerCaptionsUI() override;
 
-    void ResetCaptions();
-    bool ToggleCaptions();
-    bool ToggleCaptions(uint Type);
     bool HasTextSubtitles();
-    void SetCaptionsEnabled(bool Enable, bool UpdateOSD = true);
     bool GetCaptionsEnabled() const;
-    virtual void DisableCaptions(uint Mode, bool UpdateOSD = true);
-    virtual void EnableCaptions(uint Mode, bool UpdateOSD = true);
 
     // N.B. These methods handle audio tracks as well. Fix.
     QStringList GetTracks(uint Type);
@@ -35,18 +29,6 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     int  GetTrack(uint Type);
     int  ChangeTrack(uint Type, int Direction);
 
-    void ChangeCaptionTrack(int Direction);
-    bool HasCaptionTrack(uint Mode);
-    uint NextCaptionTrack(uint Mode);
-    void DoDisableForcedSubtitles();
-    void DoEnableForcedSubtitles();
-
-    void EnableTeletext(int Page = 0x100);
-    void DisableTeletext();
-    void ResetTeletext();
-    bool HandleTeletextAction(const QString &Action);
-    void SetTeletextPage(uint Page);
-
     bool SetAudioByComponentTag(int Tag);
     bool SetVideoByComponentTag(int Tag);
     long GetStreamPos();
@@ -54,6 +36,17 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     InteractiveTV* GetInteractiveTV() override;
 
   protected slots:
+    void ToggleCaptions();
+    void ToggleCaptionsByType(uint Type);
+    void SetCaptionsEnabled(bool Enable, bool UpdateOSD = true);
+    virtual void DisableCaptions(uint Mode, bool UpdateOSD = true);
+    virtual void EnableCaptions(uint Mode, bool UpdateOSD = true);
+    void ChangeCaptionTrack(int Direction);
+    void ResetCaptions();
+    void EnableTeletext(int Page = 0x100);
+    void ResetTeletext();
+    void SetTeletextPage(uint Page);
+    void HandleTeletextAction(const QString &Action, bool& Handled);
     void ITVHandleAction(const QString& Action, bool& Handled);
     void ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV);
 
@@ -64,6 +57,8 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
 
   protected:
     double SafeFPS();
+    void DoDisableForcedSubtitles();
+    void DoEnableForcedSubtitles();
 
     MythCaptionsState m_captionsState { };
     InteractiveTV *m_interactiveTV { nullptr };
@@ -71,6 +66,11 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     bool m_itvEnabled   { false };
     bool m_itvVisible   { false };
     QString m_newStream { };
+
+  private:
+    void DisableTeletext();
+    bool HasCaptionTrack(uint Mode);
+    uint NextCaptionTrack(uint Mode);
 };
 
 #endif

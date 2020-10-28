@@ -15,7 +15,18 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
     connect(this, &MythPlayerCaptionsUI::CaptionsStateChanged, m_tv, &TV::CaptionsStateChanged);
 
     // Inbound connections
+    connect(m_tv, &TV::ToggleCaptions,  this, &MythPlayerCaptionsUI::ToggleCaptions);
+    connect(m_tv, &TV::ToggleCaptionsByType, this, &MythPlayerCaptionsUI::ToggleCaptionsByType);
+    connect(m_tv, &TV::SetCaptionsEnabled, this, &MythPlayerCaptionsUI::SetCaptionsEnabled);
+    connect(m_tv, &TV::DisableCaptions, this, &MythPlayerCaptionsUI::DisableCaptions);
+    connect(m_tv, &TV::EnableCaptions, this, &MythPlayerCaptionsUI::EnableCaptions);
+    connect(m_tv, &TV::ChangeCaptionTrack, this, &MythPlayerCaptionsUI::ChangeCaptionTrack);
+    connect(m_tv, &TV::ResetCaptions,   this, &MythPlayerCaptionsUI::ResetCaptions);
+    connect(m_tv, &TV::EnableTeletext,  this, &MythPlayerCaptionsUI::EnableTeletext);
+    connect(m_tv, &TV::ResetTeletext,   this, &MythPlayerCaptionsUI::ResetTeletext);
+    connect(m_tv, &TV::SetTeletextPage, this, &MythPlayerCaptionsUI::SetTeletextPage);
     connect(m_tv, &TV::RestartITV,      this, &MythPlayerCaptionsUI::ITVRestart);
+    connect(m_tv, &TV::HandleTeletextAction, this, &MythPlayerCaptionsUI::HandleTeletextAction);
     connect(m_tv, &TV::HandleITVAction, this, &MythPlayerCaptionsUI::ITVHandleAction);
 
     // Signalled connections (from MHIContext)
@@ -180,10 +191,9 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
         UpdateOSDMessage(msg, kOSDTimeout_Med);
 }
 
-bool MythPlayerCaptionsUI::ToggleCaptions()
+void MythPlayerCaptionsUI::ToggleCaptions()
 {
     SetCaptionsEnabled(!(static_cast<bool>(m_textDisplayMode)));
-    return m_textDisplayMode != 0U;
 }
 
 bool MythPlayerCaptionsUI::HasTextSubtitles()
@@ -191,7 +201,7 @@ bool MythPlayerCaptionsUI::HasTextSubtitles()
     return m_subReader.HasTextSubtitles();
 }
 
-bool MythPlayerCaptionsUI::ToggleCaptions(uint Type)
+void MythPlayerCaptionsUI::ToggleCaptionsByType(uint Type)
 {
     QMutexLocker locker(&m_osdLock);
     uint mode = toCaptionType(Type);
@@ -199,11 +209,12 @@ bool MythPlayerCaptionsUI::ToggleCaptions(uint Type)
 
     if (m_textDisplayMode)
         DisableCaptions(m_textDisplayMode, (origMode & mode) != 0U);
+
     if (origMode & mode)
-        return m_textDisplayMode != 0U;
+        return;
+
     if (mode)
         EnableCaptions(mode);
-    return m_textDisplayMode != 0U;
 }
 
 void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
@@ -467,21 +478,19 @@ void MythPlayerCaptionsUI::SetTeletextPage(uint Page)
 
 // TODO When captions state is complete, process action in TV
 #include "tv_actions.h"
-bool MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action)
+void MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action, bool &Handled)
 {
     if (!(m_textDisplayMode & kDisplayTeletextMenu))
-        return false;
+        return;
 
-    bool handled = true;
+    Handled = true;
 
     m_osdLock.lock();
     if (Action == "MENU" || Action == ACTION_TOGGLETT || Action == "ESCAPE")
         DisableTeletext();
     else
-        handled = m_osd.TeletextAction(Action);
+        Handled = m_osd.TeletextAction(Action);
     m_osdLock.unlock();
-
-    return handled;
 }
 
 InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()
