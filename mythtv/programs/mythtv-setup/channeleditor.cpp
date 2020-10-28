@@ -61,7 +61,7 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
 
 ChannelEditor::ChannelEditor(MythScreenStack *parent)
               : MythScreenType(parent, "channeleditor"),
-    m_currentSortMode(QCoreApplication::translate("(Common)", "Channel Name"))
+    m_currentSortMode(QCoreApplication::translate("(Common)", "Channel Number"))
 {
 }
 
@@ -81,6 +81,8 @@ bool ChannelEditor::Create()
     m_callsign = dynamic_cast<MythUIText *>(GetChild("callsign"));
     m_chanid = dynamic_cast<MythUIText *>(GetChild("chanid"));
     m_sourcename = dynamic_cast<MythUIText *>(GetChild("sourcename"));
+    m_frequency = dynamic_cast<MythUIText *>(GetChild("frequency"));
+    m_transportid = dynamic_cast<MythUIText *>(GetChild("transportid"));
     m_compoundname = dynamic_cast<MythUIText *>(GetChild("compoundname"));
 
     MythUIButton *deleteButton = dynamic_cast<MythUIButton *>(GetChild("delete"));
@@ -99,16 +101,18 @@ bool ChannelEditor::Create()
     }
 
     // Delete button help text
-    deleteButton->SetHelpText(tr("Delete all channels on currently selected source(s)."));
+    deleteButton->SetHelpText(tr("Delete all channels on currently selected video source."));
 
     // Sort List
-    new MythUIButtonListItem(sortList, tr("Channel Name"));
     new MythUIButtonListItem(sortList, tr("Channel Number"));
-    new MythUIButtonListItem(sortList, tr("Multiplex Frequency"));
+    new MythUIButtonListItem(sortList, tr("Channel Name"));
+    new MythUIButtonListItem(sortList, tr("Service ID"));
+    new MythUIButtonListItem(sortList, tr("Frequency"));
+    new MythUIButtonListItem(sortList, tr("Transport ID"));
+    new MythUIButtonListItem(sortList, tr("Video Source"));
     connect(m_sourceList, &MythUIButtonList::itemSelected,
             this, &ChannelEditor::setSourceID);
     sortList->SetValue(m_currentSortMode);
-
 
     // Source List
     new MythUIButtonListItem(m_sourceList,tr("All"),
@@ -206,7 +210,7 @@ void ChannelEditor::itemChanged(MythUIButtonListItem *item)
         if (!iconpath.isEmpty())
         {
             // mythtv-setup needs direct access to channel icon dir to import.  We
-            // also can't rely on the backend to be running, so access the file directly
+            // also can't rely on the backend to be running, so access the file directly.
             QString tmpIcon = GetConfDir() + "/channels/" + iconpath;
             m_preview->SetFilename(tmpIcon);
             m_preview->Load();
@@ -224,6 +228,15 @@ void ChannelEditor::itemChanged(MythUIButtonListItem *item)
 
     if (m_chanid)
         m_chanid->SetText(item->GetText("chanid"));
+
+    if (m_serviceid)
+        m_serviceid->SetText(item->GetText("serviceid"));
+
+    if (m_frequency)
+        m_frequency->SetText(item->GetText("frequency"));
+
+    if (m_transportid)
+        m_transportid->SetText(item->GetText("transportid"));
 
     if (m_sourcename)
         m_sourcename->SetText(item->GetText("sourcename"));
@@ -244,9 +257,10 @@ void ChannelEditor::fillList(void)
 
     bool fAllSources = true;
 
-    QString querystr = "SELECT channel.name,channum,chanid,callsign,icon,"
-                       "channel.visible ,videosource.name, serviceid, "
-                       "dtv_multiplex.frequency FROM channel "
+    QString querystr = "SELECT channel.name, channum, chanid, callsign, icon, "
+                       "channel.visible, videosource.name, serviceid, "
+                       "dtv_multiplex.frequency, dtv_multiplex.polarity, "
+                       "dtv_multiplex.transportid, dtv_multiplex.mod_sys FROM channel "
                        "LEFT JOIN videosource ON "
                        "(channel.sourceid = videosource.sourceid) "
                        "LEFT JOIN dtv_multiplex ON "
@@ -272,9 +286,21 @@ void ChannelEditor::fillList(void)
     {
         querystr += " ORDER BY channum + 0, SUBSTRING_INDEX(channum, '_', -1) + 0";
     }
-    else if (m_currentSortMode == tr("Multiplex Frequency"))
+    else if (m_currentSortMode == tr("Service ID"))
+    {
+        querystr += " ORDER BY serviceid";
+    }
+    else if (m_currentSortMode == tr("Frequency"))
     {
         querystr += " ORDER BY dtv_multiplex.frequency, serviceid";
+    }
+    else if (m_currentSortMode == tr("Transport ID"))
+    {
+        querystr += " ORDER BY dtv_multiplex.transportid, serviceid";
+    }
+    else if (m_currentSortMode == tr("Video Source"))
+    {
+        querystr += " ORDER BY videosource.name, dtv_multiplex.transportid";
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -292,7 +318,18 @@ void ChannelEditor::fillList(void)
             QString callsign = query.value(3).toString();
             QString icon = query.value(4).toString();
             bool visible =  query.value(5).toBool();
+            QString serviceid = query.value(7).toString();
+            QString frequency = query.value(8).toString();
+            QString polarity = query.value(9).toString().toUpper();
+            QString transportid = query.value(10).toString();
+            QString mod_sys = query.value(11).toString();
             QString sourceid = "Unassigned";
+
+            // Add polarity for satellite frequencies
+            if (mod_sys.startsWith("DVB-S"))
+            {
+                frequency += polarity;
+            }
 
             QString state = "normal";
 
@@ -338,14 +375,17 @@ void ChannelEditor::fillList(void)
             item = new MythUIButtonListItem(m_channelList, "",
                                                      QVariant::fromValue(chanid));
             item->SetText(compoundname, "compoundname");
-            item->SetText(name, "name");
-            item->SetText(channum, "channum");
             item->SetText(chanid, "chanid");
+            item->SetText(channum, "channum");
+            item->SetText(name, "name");
             item->SetText(callsign, "callsign");
+            item->SetText(serviceid, "serviceid");
+            item->SetText(frequency, "frequency");
+            item->SetText(transportid, "transportid");
             item->SetText(sourceid, "sourcename");
 
             // mythtv-setup needs direct access to channel icon dir to import.  We
-            // also can't rely on the backend to be running, so access the file directly
+            // also can't rely on the backend to be running, so access the file directly.
             QString tmpIcon = GetConfDir() + "/channels/" + icon;
             item->SetImage(tmpIcon);
             item->SetImage(tmpIcon, "icon");

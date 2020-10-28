@@ -56,6 +56,9 @@ class ChannelEditor : public MythScreenType
     MythUIText       *m_callsign     {nullptr};
     MythUIText       *m_chanid       {nullptr};
     MythUIText       *m_sourcename   {nullptr};
+    MythUIText       *m_serviceid    {nullptr};
+    MythUIText       *m_frequency    {nullptr};
+    MythUIText       *m_transportid  {nullptr};
     MythUIText       *m_compoundname {nullptr};
 };
 
