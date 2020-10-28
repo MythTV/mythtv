@@ -17,7 +17,7 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
 
   public:
     MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
-   ~MythPlayerOverlayUI() override;
+   ~MythPlayerOverlayUI() override = default;
 
     virtual void UpdateSliderInfo(osdInfo& Info, bool PaddedFields = false);
 
