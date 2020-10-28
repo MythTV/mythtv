@@ -15,6 +15,7 @@
 
 #include <QTextCodec>
 #include <QVariant>
+#include <QRegularExpression>
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -232,24 +233,16 @@ QString JSONSerializer::Encode(const QString &sIn)
 
     QString sStr = sIn;
 
-    // -=>TODO: Would it be better to just loop through string once and build 
-    // new string with encoded chars instead of calling replace multiple times?
-    // It might perform better.
-
     sStr.replace( '\\', "\\\\" ); // This must be first
     sStr.replace( '"' , "\\\"" ); 
-
-    sStr.replace( '\b', "\\b"  );
-    sStr.replace( '\f', "\\f"  );
-    sStr.replace( '\n', "\\n"  );
-    sStr.replace( "\r", "\\r"  );
-    sStr.replace( "\t", "\\t"  );
     sStr.replace(  "/", "\\/"  );
 
-    // we don't handle hex values yet...
-    /*
-    if(ch>='\u0000' && ch<='\u001F')
-        sb.append("\\u####"); 
-    */
+    // Officially we need to handle \u0000 - \u001F, but only a limited
+    // number are actually used in the wild.
+    QRegularExpression control_chars("([\b\f\n\r\t])");
+    sStr.replace(control_chars, "\\\\1");
+    sStr.replace(QChar('\u0011'), "\\u0011"); // XON  ^Q
+    sStr.replace(QChar('\u0013'), "\\u0013"); // XOFF ^S
+
     return sStr;
 }
