@@ -30,7 +30,7 @@ class MTV_PUBLIC AudioPlayer : public QObject
 
   public:
     AudioPlayer(MythPlayer *parent, bool muted);
-   ~AudioPlayer();
+   ~AudioPlayer() override;
 
     void addVisual(MythTV::Visual *vis);
     void removeVisual(MythTV::Visual *vis);
