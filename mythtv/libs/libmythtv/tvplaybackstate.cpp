@@ -15,27 +15,27 @@
  * may lead to a feedback loop and/or recursion.
 */
 
-void TVPlaybackState::AudioPlayerStateChanged(MythAudioPlayerState AudioPlayerState)
+void TVPlaybackState::AudioPlayerStateChanged(const MythAudioPlayerState& AudioPlayerState)
 {
     m_audioPlayerState = AudioPlayerState;
 }
 
-void TVPlaybackState::AudioStateChanged(MythAudioState AudioState)
+void TVPlaybackState::AudioStateChanged(const MythAudioState &AudioState)
 {
     m_audioState = AudioState;
 }
 
-void TVPlaybackState::VideoBoundsStateChanged(MythVideoBoundsState VideoBoundsState)
+void TVPlaybackState::VideoBoundsStateChanged(const MythVideoBoundsState& VideoBoundsState)
 {
     m_videoBoundsState = VideoBoundsState;
 }
 
-void TVPlaybackState::OverlayStateChanged(MythOverlayState OverlayState)
+void TVPlaybackState::OverlayStateChanged(const MythOverlayState& OverlayState)
 {
     m_overlayState = OverlayState;
 }
 
-void TVPlaybackState::VisualiserStateChanged(MythVisualiserState VisualiserState)
+void TVPlaybackState::VisualiserStateChanged(const MythVisualiserState& VisualiserState)
 {
     m_visualiserState = VisualiserState;
 }
