@@ -537,9 +537,9 @@ void MythPlayerCaptionsUI::ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV)
     m_interactiveTV->Restart(static_cast<int>(Chanid), static_cast<int>(Cardid), IsLiveTV);
     m_itvVisible = false;
 #else
-    Q_UNUSED(chanid);
-    Q_UNUSED(cardid);
-    Q_UNUSED(isLiveTV);
+    Q_UNUSED(Chanid);
+    Q_UNUSED(Cardid);
+    Q_UNUSED(IsLiveTV);
 #endif
 }
 
