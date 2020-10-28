@@ -19,9 +19,13 @@ MythAudioState::MythAudioState(AudioPlayer* Player, int64_t Offset)
 {
 }
 
-MythVideoBoundsState::MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride)
+MythVideoBoundsState::MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride,
+                                           float HorizScale, float VertScale, const QPoint& Move)
   : m_adjustFillMode(AdjustFill),
-    m_aspectOverrideMode(AspectOverride)
+    m_aspectOverrideMode(AspectOverride),
+    m_manualHorizScale(HorizScale),
+    m_manualVertScale(VertScale),
+    m_manualMove(Move)
 {
 }
 

@@ -431,8 +431,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void ChangeSubtitleDelay(int Dir);
 
     // Video controls
-    void ToggleMoveBottomLine();
-    void SaveBottomLine();
     void DoTogglePictureAttribute(PictureAdjustType Type);
     bool PictureAttributeHandleAction(const QStringList &Actions);
     PictureAttribute NextPictureAdjustType(PictureAdjustType Type, PictureAttribute Attr);

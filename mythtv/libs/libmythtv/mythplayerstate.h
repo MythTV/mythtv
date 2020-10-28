@@ -49,10 +49,14 @@ class MTV_PUBLIC MythVideoBoundsState
 {
   public:
     MythVideoBoundsState() = default;
-    MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride);
+    MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride,
+                         float HorizScale, float VertScale, const QPoint& Move);
 
     AdjustFillMode     m_adjustFillMode     { kAdjustFill_Off };
     AspectOverrideMode m_aspectOverrideMode { kAspect_Off     };
+    float              m_manualHorizScale   { 1.0F };
+    float              m_manualVertScale    { 1.0F };
+    QPoint             m_manualMove         { 0, 0 };
 };
 
 class MTV_PUBLIC MythOverlayState

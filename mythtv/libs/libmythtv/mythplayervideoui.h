@@ -40,20 +40,14 @@ class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerCaptionsUI
     void HandleDecoderCallback(const QString& Debug, DecoderCallback::Callback Function,
                                void* Opaque1, void* Opaque2);
 
-    void ReinitOSD();
     void CheckAspectRatio(MythVideoFrame* Frame);
-
-    void Zoom(ZoomDirection Direction);
-    void ToggleMoveBottomLine();
-    void SaveBottomLine();
 
   public slots:
     void ProcessCallbacks();
 
   protected slots:
-    void WindowResized(const QSize& /*Size*/);
+    void ReinitOSD();
     void ToggleAdjustFill(AdjustFillMode Mode = kAdjustFill_Toggle);
-    void ToggleAspectOverride(AspectOverrideMode AspectMode = kAspect_Toggle);
 
   protected:
     bool InitVideo() override;

@@ -77,8 +77,6 @@ class MythVideoBounds : public QObject
     QRect    GetDisplayVideoRect(void)     const { return m_displayVideoRect; }
     QRect    GetEmbeddingRect(void)        const { return m_rawEmbeddingRect; }
     bool     UsingGuiSize(void)            const { return m_dbUseGUISize; }
-    QString  GetZoomString(void)           const;
-    AspectOverrideMode GetAspectOverride(void) const { return m_videoAspectOverrideMode; }
     AdjustFillMode GetAdjustFill(void)     const { return m_adjustFill;      }
     float    GetVideoAspect(void)          const { return m_videoAspect; }
     float    GetDisplayAspect(void)        const { return m_displayAspect;  }

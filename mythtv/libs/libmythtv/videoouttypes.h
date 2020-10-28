@@ -2,6 +2,7 @@
 #define VIDEOOUT_TYPES_H_
 
 // Qt
+#include <QPoint>
 #include <QString>
 #include <QObject>
 
@@ -322,4 +323,12 @@ inline PictureAttribute next_picattr(PictureAttributeSupported Supported, Pictur
     return kPictureAttribute_None;
 }
 
-#endif // VIDEOOUT_TYPES_H_
+inline QString GetZoomString(float HorizScale, float VertScale, QPoint Move)
+{
+    return QObject::tr("Zoom %1x%2 @ (%3,%4)")
+            .arg(static_cast<double>(HorizScale), 0, 'f', 2)
+            .arg(static_cast<double>(VertScale), 0, 'f', 2)
+            .arg(Move.x()).arg(Move.y());
+}
+
+#endif

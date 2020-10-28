@@ -13,11 +13,6 @@ MythPlayerVideoUI::MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerC
     connect(this, &MythPlayerVideoUI::CheckCallbacks, this, &MythPlayerVideoUI::ProcessCallbacks);
 }
 
-void MythPlayerVideoUI::WindowResized(const QSize& /*Size*/)
-{
-    ReinitOSD();
-}
-
 bool MythPlayerVideoUI::InitVideo()
 {
     if (!(m_playerCtx && m_decoder))
@@ -62,9 +57,11 @@ bool MythPlayerVideoUI::InitVideo()
     connect(video, &MythVideoBounds::UpdateOSDMessage, this,  QOverload<const QString&>::of(&MythPlayerVideoUI::UpdateOSDMessage));
     connect(video, &MythVideoBounds::VideoBoundsStateChanged, m_tv, &TV::VideoBoundsStateChanged);
     connect(m_tv,  &TV::ChangeOSDPositionUpdates, this,  &MythPlayerVideoUI::ChangeOSDPositionUpdates);
-    connect(m_tv,  &TV::WindowResized,            this,  &MythPlayerVideoUI::WindowResized);
+    connect(m_tv,  &TV::WindowResized,            this,  &MythPlayerVideoUI::ReinitOSD);
     connect(m_tv,  &TV::ChangeAdjustFill,         this,  &MythPlayerVideoUI::ToggleAdjustFill);
-    connect(m_tv,  &TV::ChangeAspectOverride,     this,  &MythPlayerVideoUI::ToggleAspectOverride);
+    connect(m_tv,  &TV::ChangeAspectOverride,     this,  &MythPlayerVideoUI::ReinitOSD);
+    connect(m_tv,  &TV::ChangeZoom,               this,  &MythPlayerVideoUI::ReinitOSD);
+    connect(m_tv,  &TV::ToggleMoveBottomLine,     this,  &MythPlayerVideoUI::ReinitOSD);
     connect(m_tv,  &TV::ToggleDetectLetterBox, toggleDetectLetterbox);
 
     // Passthrough signals
@@ -72,6 +69,10 @@ bool MythPlayerVideoUI::InitVideo()
     connect(m_tv,  &TV::ChangeStereoOverride,     video, &MythVideoOutputGPU::SetStereoOverride);
     connect(m_tv,  &TV::WindowResized,            video, &MythVideoOutputGPU::WindowResized);
     connect(m_tv,  &TV::EmbedPlayback,            video, &MythVideoOutputGPU::EmbedPlayback);
+    connect(m_tv,  &TV::ChangeZoom,               video, &MythVideoOutputGPU::Zoom);
+    connect(m_tv,  &TV::ToggleMoveBottomLine,     video, &MythVideoOutputGPU::ToggleMoveBottomLine);
+    connect(m_tv,  &TV::SaveBottomLine,           video, &MythVideoOutputGPU::SaveBottomLine);
+    connect(m_tv,  &TV::ChangeAspectOverride,     video, &MythVideoOutputGPU::ToggleAspectOverride);
     connect(this,  &MythPlayerVideoUI::ResizeForInteractiveTV,
                                                   video, &MythVideoOutputGPU::SetITVResize);
 
@@ -129,17 +130,6 @@ void MythPlayerVideoUI::ToggleAdjustFill(AdjustFillMode Mode)
         m_videoOutput->ToggleAdjustFill(Mode);
         ReinitOSD();
         QString text = toString(m_videoOutput->GetAdjustFill());
-        UpdateOSDMessage(text);
-    }
-}
-
-void MythPlayerVideoUI::ToggleAspectOverride(AspectOverrideMode AspectMode)
-{
-    if (m_videoOutput)
-    {
-        m_videoOutput->ToggleAspectOverride(AspectMode);
-        ReinitOSD();
-        QString text = toString(m_videoOutput->GetAspectOverride());
         UpdateOSDMessage(text);
     }
 }
@@ -210,29 +200,5 @@ void MythPlayerVideoUI::CheckAspectRatio(MythVideoFrame* Frame)
             ReinitOSD();
         }
     }
-}
-
-void MythPlayerVideoUI::Zoom(ZoomDirection Direction)
-{
-    if (m_videoOutput)
-    {
-        m_videoOutput->Zoom(Direction);
-        ReinitOSD();
-    }
-}
-
-void MythPlayerVideoUI::ToggleMoveBottomLine()
-{
-    if (m_videoOutput)
-    {
-        m_videoOutput->ToggleMoveBottomLine();
-        ReinitOSD();
-    }
-}
-
-void MythPlayerVideoUI::SaveBottomLine()
-{
-    if (m_videoOutput)
-        m_videoOutput->SaveBottomLine();
 }
 

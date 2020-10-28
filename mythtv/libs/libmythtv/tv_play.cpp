@@ -3620,14 +3620,7 @@ bool TV::ManualZoomHandleAction(const QStringList &Actions)
     if (!m_zoomMode)
         return false;
 
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return false;
-    }
-
-    bool end_manual_zoom = false;
+    bool endmanualzoom = false;
     bool handled = true;
     bool updateOSD = true;
     ZoomDirection zoom = kZoom_END;
@@ -3658,11 +3651,11 @@ bool TV::ManualZoomHandleAction(const QStringList &Actions)
     else if (IsActionable({ ACTION_ZOOMQUIT, "ESCAPE", "BACK" }, Actions))
     {
         zoom = kZoomHome;
-        end_manual_zoom = true;
+        endmanualzoom = true;
     }
     else if (IsActionable({ ACTION_ZOOMCOMMIT, ACTION_SELECT }, Actions))
     {
-        end_manual_zoom = true;
+        endmanualzoom = true;
         SetManualZoom(false, tr("Zoom Committed"));
     }
     else
@@ -3676,21 +3669,25 @@ bool TV::ManualZoomHandleAction(const QStringList &Actions)
         };
         handled = !IsActionable(passthrough,  Actions);
     }
+
     QString msg = tr("Zoom Committed");
     if (zoom != kZoom_END)
     {
-        m_player->Zoom(zoom);
-        if (end_manual_zoom)
-            msg = tr("Zoom Ignored");
-        else
-            msg = m_player->GetVideoOutput()->GetZoomString();
+        emit ChangeZoom(zoom);
+        msg = endmanualzoom ? tr("Zoom Ignored") :
+                              GetZoomString(m_videoBoundsState.m_manualHorizScale,
+                                            m_videoBoundsState.m_manualVertScale,
+                                            m_videoBoundsState.m_manualMove);
     }
-    else if (end_manual_zoom)
-        msg = tr("%1 Committed").arg(m_player->GetVideoOutput()->GetZoomString());
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    else if (endmanualzoom)
+    {
+        msg = tr("%1 Committed").arg(GetZoomString(m_videoBoundsState.m_manualHorizScale,
+                                                   m_videoBoundsState.m_manualVertScale,
+                                                   m_videoBoundsState.m_manualMove));
+    }
 
     if (updateOSD)
-        SetManualZoom(!end_manual_zoom, msg);
+        SetManualZoom(!endmanualzoom, msg);
 
     return handled;
 }
@@ -4092,9 +4089,9 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     bool islivetv = StateIsLiveTV(GetState());
 
     if (IsActionable(ACTION_BOTTOMLINEMOVE, Actions))
-        ToggleMoveBottomLine();
+        emit ToggleMoveBottomLine();
     else if (IsActionable(ACTION_BOTTOMLINESAVE, Actions))
-        SaveBottomLine();
+        emit SaveBottomLine();
     else if (IsActionable("TOGGLEASPECT", Actions))
         emit ChangeAspectOverride();
     else if (IsActionable("TOGGLEFILL", Actions))
@@ -7331,39 +7328,6 @@ void TV::IdleDialogTimeout()
     ReturnPlayerLock();
 }
 
-void TV::ToggleMoveBottomLine()
-{
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return;
-    }
-
-    m_player->ToggleMoveBottomLine();
-    QString msg = m_player->GetVideoOutput()->GetZoomString();
-
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    SetOSDMessage(msg);
-}
-
-void TV::SaveBottomLine()
-{
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return;
-    }
-
-    m_player->SaveBottomLine();
-
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    SetOSDMessage("Current 'Manual Zoom' saved for 'BottomLine'.");
-}
-
 void TV::PauseAudioUntilBuffered()
 {
     emit PauseAudioUntilReady();
@@ -8318,9 +8282,9 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action == "TOGGLEMANUALZOOM")
         SetManualZoom(true, tr("Zoom Mode ON"));
     else if (Action == ACTION_BOTTOMLINEMOVE)
-        ToggleMoveBottomLine();
+        emit ToggleMoveBottomLine();
     else if (Action == ACTION_BOTTOMLINESAVE)
-        SaveBottomLine();
+        emit SaveBottomLine();
     else if (Action == "TOGGLESTRETCH")
         ToggleTimeStretch();
     else if (Action == ACTION_ENABLEUPMIX)

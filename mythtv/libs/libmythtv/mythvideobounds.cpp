@@ -66,7 +66,8 @@ MythVideoBounds::MythVideoBounds()
 */
 void MythVideoBounds::RefreshVideoBoundsState()
 {
-    emit VideoBoundsStateChanged({ m_adjustFill, m_videoAspectOverrideMode });
+    emit VideoBoundsStateChanged({ m_adjustFill, m_videoAspectOverrideMode, m_manualHorizScale,
+                                   m_manualVertScale, m_manualMove });
 }
 
 void MythVideoBounds::SetDisplay(MythDisplay *mDisplay)
@@ -166,6 +167,8 @@ void MythVideoBounds::MoveResize(void)
     emit VideoRectsChanged(m_displayVideoRect, m_videoRect);
     emit VisibleRectChanged(m_displayVisibleRect);
     emit WindowRectChanged(m_windowRect);
+
+    RefreshVideoBoundsState();
 }
 
 /*! \brief Adjust various settings to facilitate portrait mode calculations.
@@ -568,7 +571,6 @@ void MythVideoBounds::ToggleAdjustFill(AdjustFillMode AdjustFill)
         m_adjustFill = AdjustFill;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New fill mode: '%1'").arg(toString(m_adjustFill)));
         MoveResize();
-        RefreshVideoBoundsState();
     }
 }
 
@@ -728,8 +730,9 @@ void MythVideoBounds::ToggleAspectOverride(AspectOverrideMode AspectMode)
             .arg(toString(m_videoAspectOverrideMode)));
         SetVideoAspectRatio(m_videoAspect);
         MoveResize();
-        RefreshVideoBoundsState();
     }
+
+    emit UpdateOSDMessage(toString(m_videoAspectOverrideMode));
 }
 
 /*! \brief Check whether the video display rect covers the entire window/framebuffer
@@ -886,6 +889,8 @@ void MythVideoBounds::ToggleMoveBottomLine(void)
             .arg(static_cast<double>(m_manualVertScale)));
         MoveResize();
     }
+
+    emit UpdateOSDMessage(GetZoomString(m_manualHorizScale, m_manualVertScale, m_manualMove));
 }
 
 void MythVideoBounds::SaveBottomLine(void)
@@ -894,14 +899,8 @@ void MythVideoBounds::SaveBottomLine(void)
     gCoreContext->SaveSetting("OSDMoveYBottomLine", m_manualMove.y());
     gCoreContext->SaveSetting("OSDScaleHBottomLine", static_cast<int>(m_manualHorizScale * 100.0F));
     gCoreContext->SaveSetting("OSDScaleVBottomLine", static_cast<int>(m_manualVertScale * 100.0F));
-}
 
-QString MythVideoBounds::GetZoomString(void) const
-{
-    return tr("Zoom %1x%2 @ (%3,%4)")
-            .arg(static_cast<double>(m_manualHorizScale), 0, 'f', 2)
-            .arg(static_cast<double>(m_manualVertScale), 0, 'f', 2)
-            .arg(m_manualMove.x()).arg(m_manualMove.y());
+    emit UpdateOSDMessage("Current 'Manual Zoom' saved for 'BottomLine'.");
 }
 
 /// Correct for rounding errors

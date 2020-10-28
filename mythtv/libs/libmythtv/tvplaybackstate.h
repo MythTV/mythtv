@@ -35,6 +35,9 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ToggleDetectLetterBox();
     void ChangeAdjustFill(AdjustFillMode FillMode = kAdjustFill_Toggle);
     void ChangeAspectOverride(AspectOverrideMode AspectMode = kAspect_Toggle);
+    void ChangeZoom(ZoomDirection Zoom);
+    void ToggleMoveBottomLine();
+    void SaveBottomLine();
 
     // Overlays
     void ChangeOSDPositionUpdates(bool Enable);
