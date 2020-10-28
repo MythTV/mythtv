@@ -69,7 +69,7 @@ class MTV_PUBLIC MythVisualiserState
 {
   public:
     MythVisualiserState() = default;
-    MythVisualiserState(bool Embedding, bool Visualising, QString Name,
+    MythVisualiserState(bool Embedding, bool Visualising, const QString& Name,
                         const QStringList& Visualisers);
 
     bool        m_canVisualise   { false };
