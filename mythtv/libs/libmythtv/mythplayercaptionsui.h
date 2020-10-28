@@ -60,7 +60,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerVideoUI
     void SetVideoResize(const QRect& Rect);
 
   protected:
-    double SafeFPS(DecoderBase* Decoder);
+    double SafeFPS();
 
     InteractiveTV *m_interactiveTV { nullptr };
     QMutex m_itvLock  { };

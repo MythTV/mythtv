@@ -569,11 +569,11 @@ bool MythPlayerCaptionsUI::SetVideoByComponentTag(int Tag)
     return false;
 }
 
-double MythPlayerCaptionsUI::SafeFPS(DecoderBase *Decoder)
+double MythPlayerCaptionsUI::SafeFPS()
 {
-    if (!Decoder)
+    if (!m_decoder)
         return 25;
-    double fps = Decoder->GetFPS();
+    double fps = m_decoder->GetFPS();
     return fps > 0 ? fps : 25.0;
 }
 
@@ -604,7 +604,7 @@ bool MythPlayerCaptionsUI::SetStream(const QString& Stream)
 // Called from the interactiveTV (MHIContext) thread
 long MythPlayerCaptionsUI::GetStreamPos()
 {
-    return static_cast<long>((1000 * GetFramesPlayed()) / SafeFPS(m_decoder));
+    return static_cast<long>((1000 * GetFramesPlayed()) / SafeFPS());
 }
 
 // Called from the interactiveTV (MHIContext) thread
@@ -618,7 +618,7 @@ long MythPlayerCaptionsUI::GetStreamMaxPos()
 // Called from the interactiveTV (MHIContext) thread
 long MythPlayerCaptionsUI::SetStreamPos(long Ms)
 {
-    auto frameNum = static_cast<uint64_t>((Ms * SafeFPS(m_decoder)) / 1000);
+    auto frameNum = static_cast<uint64_t>((Ms * SafeFPS()) / 1000);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetStreamPos %1 mS = frame %2, now=%3")
         .arg(Ms).arg(frameNum).arg(GetFramesPlayed()) );
     JumpToFrame(frameNum);

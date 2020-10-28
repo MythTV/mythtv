@@ -937,7 +937,7 @@ void MythPlayerUI::JumpToStream(const QString &stream)
     {
         long long len = m_playerCtx->m_buffer->GetRealFileSize();
         m_totalLength = static_cast<int>(len / ((m_decoder->GetRawBitrate() * 1000) / 8));
-        m_totalFrames = static_cast<uint64_t>(m_totalLength * SafeFPS(m_decoder));
+        m_totalFrames = static_cast<uint64_t>(m_totalLength * SafeFPS());
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("JumpToStream length %1 bytes @ %2 Kbps = %3 Secs, %4 frames @ %5 fps")
