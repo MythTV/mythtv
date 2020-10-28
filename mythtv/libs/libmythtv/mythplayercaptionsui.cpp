@@ -503,8 +503,7 @@ InteractiveTV* MythPlayerCaptionsUI::GetInteractiveTV()
     {
         QMutexLocker lock1(&m_osdLock);
         QMutexLocker lock2(&m_itvLock);
-        if (!m_interactiveTV)
-            m_interactiveTV = new InteractiveTV(this);
+        m_interactiveTV = new InteractiveTV(this);
     }
 #endif
     return m_interactiveTV;
