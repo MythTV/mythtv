@@ -503,7 +503,7 @@ class HEVCVideoDescriptor : public MPEGDescriptor
 {
   public:
     explicit HEVCVideoDescriptor(const unsigned char *data, int len = 300) :
-        MPEGDescriptor(data, len, DescriptorID::avc_video) { }
+        MPEGDescriptor(data, len, DescriptorID::hevc_video) { }
     //       Name                      bits  loc  expected value
     // descriptor_tag                    8   0.0       0x38
     // descriptor_length                 8   1.0
