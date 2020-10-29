@@ -25,6 +25,7 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
     connect(m_tv, &TV::DisableCaptions, this, &MythPlayerCaptionsUI::DisableCaptions);
     connect(m_tv, &TV::EnableCaptions, this, &MythPlayerCaptionsUI::EnableCaptions);
     connect(m_tv, &TV::ChangeCaptionTrack, this, &MythPlayerCaptionsUI::ChangeCaptionTrack);
+    connect(m_tv, &TV::ChangeTrack,     this, &MythPlayerCaptionsUI::ChangeTrack);
     connect(m_tv, &TV::ResetCaptions,   this, &MythPlayerCaptionsUI::ResetCaptions);
     connect(m_tv, &TV::EnableTeletext,  this, &MythPlayerCaptionsUI::EnableTeletext);
     connect(m_tv, &TV::ResetTeletext,   this, &MythPlayerCaptionsUI::ResetTeletext);
@@ -389,19 +390,17 @@ int MythPlayerCaptionsUI::GetTrack(uint Type)
     return -1;
 }
 
-int MythPlayerCaptionsUI::ChangeTrack(uint Type, int Direction)
+void MythPlayerCaptionsUI::ChangeTrack(uint Type, int Direction)
 {
     if (!m_decoder)
-        return -1;
+        return;
 
     int retval = m_decoder->ChangeTrack(Type, Direction);
     if (retval >= 0)
     {
         UpdateOSDMessage(m_decoder->GetTrackDesc(Type, static_cast<uint>(GetTrack(Type))),
                          kOSDTimeout_Med);
-        return retval;
     }
-    return -1;
 }
 
 void MythPlayerCaptionsUI::ChangeCaptionTrack(int Direction)

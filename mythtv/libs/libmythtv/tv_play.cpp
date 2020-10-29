@@ -3196,7 +3196,7 @@ bool TV::HandleTrackAction(const QString &Action)
         int dir = (Action.startsWith("NEXT")) ? +1 : -1;
         int type = to_track_type(Action.mid(4));
         if (type >= kTrackTypeAudio)
-            m_player->ChangeTrack(static_cast<uint>(type), dir);
+            emit ChangeTrack(static_cast<uint>(type), dir);
         else if (Action.endsWith("CC"))
             emit ChangeCaptionTrack(dir);
         else

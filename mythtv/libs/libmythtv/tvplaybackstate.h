@@ -28,7 +28,10 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeVolume(bool Direction, int Volume);
     void ChangeUpmix(bool Enable, bool Toggle = false);
     void ChangeAudioOffset(int64_t Delta, int Value = -9999);
-    void SetTrack(uint Type, uint TrackNo); // NOTE Captions as well
+
+    // Audio and captions
+    void SetTrack(uint Type, uint TrackNo);
+    void ChangeTrack(uint Type, int Direction);
 
     // Captions/Interactive
     void ChangeAllowForcedSubtitles(bool Allow);
@@ -38,6 +41,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void DisableCaptions(uint Mode, bool UpdateOSD = true);
     void EnableCaptions(uint Mode, bool UpdateOSD = true);
     void ChangeCaptionTrack(int Direction);
+
     void ResetCaptions();
     void EnableTeletext(int Page = 0x100);
     void ResetTeletext();
