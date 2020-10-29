@@ -15,6 +15,11 @@
  * may lead to a feedback loop and/or recursion.
 */
 
+void TVPlaybackState::OverlayStateChanged(const MythOverlayState& OverlayState)
+{
+    m_overlayState = OverlayState;
+}
+
 void TVPlaybackState::AudioPlayerStateChanged(const MythAudioPlayerState& AudioPlayerState)
 {
     m_audioPlayerState = AudioPlayerState;
@@ -33,11 +38,6 @@ void TVPlaybackState::CaptionsStateChanged(const MythCaptionsState& CaptionsStat
 void TVPlaybackState::VideoBoundsStateChanged(const MythVideoBoundsState& VideoBoundsState)
 {
     m_videoBoundsState = VideoBoundsState;
-}
-
-void TVPlaybackState::OverlayStateChanged(const MythOverlayState& OverlayState)
-{
-    m_overlayState = OverlayState;
 }
 
 void TVPlaybackState::VisualiserStateChanged(const MythVisualiserState& VisualiserState)

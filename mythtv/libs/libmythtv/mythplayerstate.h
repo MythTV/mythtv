@@ -15,6 +15,16 @@ extern "C" {
 class OSD;
 class AudioPlayer;
 
+class MTV_PUBLIC MythOverlayState
+{
+  public:
+    MythOverlayState() = default;
+    MythOverlayState(bool Browsing, bool Editing);
+
+    bool m_browsing { false };
+    bool m_editing  { false };
+};
+
 class MTV_PUBLIC MythAudioPlayerState
 {
   public:
@@ -45,6 +55,15 @@ class MTV_PUBLIC MythAudioState
     int64_t m_audioOffset { 0     };
 };
 
+class MTV_PUBLIC MythCaptionsState
+{
+  public:
+    MythCaptionsState() = default;
+    MythCaptionsState(bool ITV);
+
+    bool m_haveITV { false };
+};
+
 class MTV_PUBLIC MythVideoBoundsState
 {
   public:
@@ -59,16 +78,6 @@ class MTV_PUBLIC MythVideoBoundsState
     QPoint             m_manualMove         { 0, 0 };
 };
 
-class MTV_PUBLIC MythOverlayState
-{
-  public:
-    MythOverlayState() = default;
-    MythOverlayState(bool Browsing, bool Editing);
-
-    bool m_browsing { false };
-    bool m_editing  { false };
-};
-
 class MTV_PUBLIC MythVisualiserState
 {
   public:
@@ -81,15 +90,6 @@ class MTV_PUBLIC MythVisualiserState
     bool        m_visualising    { false };
     QString     m_visualiserName { };
     QStringList m_visualiserList { };
-};
-
-class MTV_PUBLIC MythCaptionsState
-{
-  public:
-    MythCaptionsState() = default;
-    MythCaptionsState(bool ITV);
-
-    bool m_haveITV { false };
 };
 
 #endif

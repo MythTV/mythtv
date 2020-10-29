@@ -3,6 +3,15 @@
 #include "osd.h"
 #include "mythplayerstate.h"
 
+/*! \class MythOverlayState
+ * \brief A simpler than simple wrapper around OSD state.
+*/
+MythOverlayState::MythOverlayState(bool Browsing, bool Editing)
+  : m_browsing(Browsing),
+    m_editing(Editing)
+{
+}
+
 /*! \class MythAudioState
  * \brief A simple wrapper around audio state used to signal changes
  * in the current state.
@@ -19,6 +28,11 @@ MythAudioState::MythAudioState(AudioPlayer* Player, int64_t Offset)
 {
 }
 
+MythCaptionsState::MythCaptionsState(bool ITV)
+  : m_haveITV(ITV)
+{
+}
+
 MythVideoBoundsState::MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride,
                                            float HorizScale, float VertScale, const QPoint& Move)
   : m_adjustFillMode(AdjustFill),
@@ -29,25 +43,11 @@ MythVideoBoundsState::MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOver
 {
 }
 
-/*! \class MythOverlayState
- * \brief A simpler than simple wrapper around OSD state.
-*/
-MythOverlayState::MythOverlayState(bool Browsing, bool Editing)
-  : m_browsing(Browsing),
-    m_editing(Editing)
-{
-}
-
 MythVisualiserState::MythVisualiserState(bool Embedding, bool Visualising,
                                          QString Name, QStringList Visualisers)
   : m_embedding(Embedding),
     m_visualising(Visualising),
     m_visualiserName(std::move(Name)),
     m_visualiserList(std::move(Visualisers))
-{
-}
-
-MythCaptionsState::MythCaptionsState(bool ITV)
-  : m_haveITV(ITV)
 {
 }

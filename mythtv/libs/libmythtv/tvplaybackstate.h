@@ -20,6 +20,14 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     // General
     void UpdateBookmark(bool Clear = false);
 
+    // Overlays
+    void IsOSDVisible(bool& Visible);
+    void ChangeOSDPositionUpdates(bool Enable);
+    void ChangeOSDDebug();
+    void ChangeOSDText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);
+    void ChangeOSDDialog(const MythOSDDialogData& Data);
+    void ChangeOSDMessage(const QString& Message);
+
     // Audio
     void ReinitAudio();
     void ResetAudio();
@@ -64,14 +72,6 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeZoom(ZoomDirection Zoom);
     void ToggleMoveBottomLine();
     void SaveBottomLine();
-
-    // Overlays
-    void IsOSDVisible(bool& Visible);
-    void ChangeOSDPositionUpdates(bool Enable);
-    void ChangeOSDDebug();
-    void ChangeOSDText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);
-    void ChangeOSDDialog(const MythOSDDialogData& Data);
-    void ChangeOSDMessage(const QString& Message);
 
     // Visualiser
     void EnableVisualiser(bool Enable, bool Toggle = false, const QString& Name = QString());
