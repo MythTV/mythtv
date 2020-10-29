@@ -39,11 +39,11 @@ MythOverlayState::MythOverlayState(bool Browsing, bool Editing)
 }
 
 MythVisualiserState::MythVisualiserState(bool Embedding, bool Visualising,
-                                         const QString& Name, const QStringList& Visualisers)
+                                         QString Name, QStringList Visualisers)
   : m_embedding(Embedding),
     m_visualising(Visualising),
-    m_visualiserName(Name),
-    m_visualiserList(Visualisers)
+    m_visualiserName(std::move(Name)),
+    m_visualiserList(std::move(Visualisers))
 {
 }
 
