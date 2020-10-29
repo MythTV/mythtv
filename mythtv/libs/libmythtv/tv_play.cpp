@@ -4002,9 +4002,9 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
     else if (IsActionable(ACTION_VOLUMEUP, Actions))
         VolumeChange(true);
     else if (IsActionable("CYCLEAUDIOCHAN", Actions))
-        ToggleMute(true);
+        emit ChangeMuteState(true);
     else if (IsActionable(ACTION_MUTEAUDIO, Actions))
-        ToggleMute();
+        emit ChangeMuteState();
     else if (IsActionable("STRETCHINC", Actions))
         ChangeTimeStretch(1);
     else if (IsActionable("STRETCHDEC", Actions))
@@ -7004,7 +7004,7 @@ void TV::VolumeChange(bool Up, int NewVolume)
         return;
 
     if ((m_audioState.m_muteState == kMuteAll) && (Up || NewVolume >= 0))
-        ToggleMute();
+        emit ChangeMuteState();
 
     emit ChangeVolume(Up, NewVolume);
 
@@ -7094,11 +7094,6 @@ void TV::ChangeTimeStretch(int Dir, bool AllowEdit)
     }
 
     SetSpeedChangeTimer(0, __LINE__);
-}
-
-void TV::ToggleMute(const bool MuteIndividualChannels)
-{
-    emit ChangeMuteState(MuteIndividualChannels);
 }
 
 void TV::ToggleSleepTimer()

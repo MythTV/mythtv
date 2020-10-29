@@ -513,7 +513,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
         m_player->IncrRef();
         connect(m_player, &TV::PlaybackExiting, this, &GuideGrid::PlayerExiting);
         connect(this, &GuideGrid::ChangeVolume, m_player, &TV::VolumeChange);
-        connect(this, &GuideGrid::ToggleMute,   m_player, &TV::ToggleMute);
+        connect(this, &GuideGrid::ToggleMute,   m_player, &TV::ChangeMuteState);
     }
 }
 

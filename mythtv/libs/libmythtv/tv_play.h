@@ -183,7 +183,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void onApplicationStateChange(Qt::ApplicationState State);
     void customEvent(QEvent* Event) override;
     void VolumeChange(bool Up, int NewVolume = -1);
-    void ToggleMute(bool MuteIndividualChannels = false);
 
   private slots:
     void Embed(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});

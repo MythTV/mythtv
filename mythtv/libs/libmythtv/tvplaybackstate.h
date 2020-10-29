@@ -21,7 +21,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ReinitAudio();
     void ResetAudio();
     void PauseAudioUntilReady();
-    void ChangeMuteState(bool CycleChannels);
+    void ChangeMuteState(bool CycleChannels = false);
     void ChangeVolume(bool Direction, int Volume);
     void ChangeUpmix(bool Enable, bool Toggle = false);
     void ChangeAudioOffset(int64_t Delta, int Value = -9999);
