@@ -40,6 +40,9 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
     connect(this, &MythPlayerCaptionsUI::SetInteractiveStream,    this, &MythPlayerCaptionsUI::SetStream);
     connect(this, &MythPlayerCaptionsUI::SetInteractiveStreamPos, this, &MythPlayerCaptionsUI::SetStreamPos);
     connect(this, &MythPlayerCaptionsUI::PlayInteractiveStream,   this, &MythPlayerCaptionsUI::StreamPlay);
+
+    // Signalled from the base class
+    connect(this, &MythPlayerCaptionsUI::RequestResetCaptions, this, &MythPlayerCaptionsUI::ResetCaptions);
 }
 
 MythPlayerCaptionsUI::~MythPlayerCaptionsUI()
@@ -86,22 +89,8 @@ void MythPlayerCaptionsUI::AdjustSubtitleDelay(int Delta)
 
 void MythPlayerCaptionsUI::ResetCaptions()
 {
-    QMutexLocker locker(&m_osdLock);
-
-    if (((m_textDisplayMode & kDisplayAVSubtitle)      ||
-         (m_textDisplayMode & kDisplayTextSubtitle)    ||
-         (m_textDisplayMode & kDisplayRawTextSubtitle) ||
-         (m_textDisplayMode & kDisplayDVDButton)       ||
-         (m_textDisplayMode & kDisplayCC608)           ||
-         (m_textDisplayMode & kDisplayCC708)))
-    {
-        m_captionsOverlay.ClearSubtitles();
-    }
-    else if ((m_textDisplayMode & kDisplayTeletextCaptions) ||
-             (m_textDisplayMode & kDisplayNUVTeletextCaptions))
-    {
-        m_captionsOverlay.TeletextClear();
-    }
+    m_captionsOverlay.ClearSubtitles();
+    m_captionsOverlay.TeletextClear();
 }
 
 static uint toCaptionType(uint Type)
