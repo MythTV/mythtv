@@ -51,12 +51,12 @@ const float MythVideoBounds::kManualZoomMinVerticalZoom   = 0.25F;
 const int   MythVideoBounds::kManualZoomMaxMove           = 50;
 
 MythVideoBounds::MythVideoBounds()
+  : m_dbMove( { gCoreContext->GetNumSetting("xScanDisplacement", 0),
+                gCoreContext->GetNumSetting("yScanDisplacement", 0) }),
+    m_dbUseGUISize(gCoreContext->GetBoolSetting("GuiSizeForTV", false)),
+    m_dbAspectOverride(static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0))),
+    m_dbAdjustFill(static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0)))
 {
-    m_dbMove = QPoint(gCoreContext->GetNumSetting("xScanDisplacement", 0),
-                     gCoreContext->GetNumSetting("yScanDisplacement", 0));
-    m_dbUseGUISize = gCoreContext->GetBoolSetting("GuiSizeForTV", false);
-    m_dbAspectOverride = static_cast<AspectOverrideMode>(gCoreContext->GetNumSetting("AspectOverride", 0));
-    m_dbAdjustFill = static_cast<AdjustFillMode>(gCoreContext->GetNumSetting("AdjustFill", 0));
 }
 
 /*! \brief Send out latest state to listeners.
