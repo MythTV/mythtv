@@ -486,7 +486,7 @@ int64_t MythDVDPlayer::GetTotalSeconds(bool /*HonorCutList*/, int Divisor) const
     return total * 1000 / Divisor;
 }
 
-int MythDVDPlayer::SetTrack(uint Type, uint TrackNo)
+void MythDVDPlayer::SetTrack(uint Type, uint TrackNo)
 {
     if (kTrackTypeAudio == Type)
     {
@@ -494,7 +494,7 @@ int MythDVDPlayer::SetTrack(uint Type, uint TrackNo)
         m_playerCtx->m_buffer->DVD()->SetTrack(Type, stream.m_stream_id);
     }
 
-    return MythPlayerUI::SetTrack(Type, TrackNo);
+    MythPlayerUI::SetTrack(Type, TrackNo);
 }
 
 int MythDVDPlayer::GetNumChapters(void)

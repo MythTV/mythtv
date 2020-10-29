@@ -28,6 +28,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeVolume(bool Direction, int Volume);
     void ChangeUpmix(bool Enable, bool Toggle = false);
     void ChangeAudioOffset(int64_t Delta, int Value = -9999);
+    void SetTrack(uint Type, uint TrackNo); // NOTE Captions as well
 
     // Captions/Interactive
     void ToggleCaptions();

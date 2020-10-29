@@ -17,6 +17,7 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
     connect(this, &MythPlayerCaptionsUI::CaptionsStateChanged, m_tv, &TV::CaptionsStateChanged);
 
     // Inbound connections
+    connect(m_tv, &TV::SetTrack, this, &MythPlayerCaptionsUI::SetTrack);
     connect(m_tv, &TV::ToggleCaptions,  this, &MythPlayerCaptionsUI::ToggleCaptions);
     connect(m_tv, &TV::ToggleCaptionsByType, this, &MythPlayerCaptionsUI::ToggleCaptionsByType);
     connect(m_tv, &TV::SetCaptionsEnabled, this, &MythPlayerCaptionsUI::SetCaptionsEnabled);
@@ -322,13 +323,12 @@ uint MythPlayerCaptionsUI::GetTrackCount(uint Type)
     return 0;
 }
 
-int MythPlayerCaptionsUI::SetTrack(uint Type, uint TrackNo)
+void MythPlayerCaptionsUI::SetTrack(uint Type, uint TrackNo)
 {
-    int ret = -1;
     if (!m_decoder)
-        return ret;
+        return;
 
-    ret = m_decoder->SetTrack(Type, static_cast<int>(TrackNo));
+    m_decoder->SetTrack(Type, static_cast<int>(TrackNo));
     if (kTrackTypeAudio == Type)
     {
         if (m_decoder)
@@ -336,7 +336,7 @@ int MythPlayerCaptionsUI::SetTrack(uint Type, uint TrackNo)
             UpdateOSDMessage(m_decoder->GetTrackDesc(Type,
                 static_cast<uint>(GetTrack(Type))), kOSDTimeout_Med);
         }
-        return ret;
+        return;
     }
 
     uint subtype = toCaptionType(Type);
@@ -354,7 +354,6 @@ int MythPlayerCaptionsUI::SetTrack(uint Type, uint TrackNo)
             }
         }
     }
-    return ret;
 }
 
 void MythPlayerCaptionsUI::DoDisableForcedSubtitles()

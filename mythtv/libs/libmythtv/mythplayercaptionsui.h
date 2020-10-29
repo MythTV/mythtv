@@ -26,7 +26,6 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     // N.B. These methods handle audio tracks as well. Fix.
     QStringList GetTracks(uint Type);
     uint GetTrackCount(uint Type);
-    virtual int SetTrack(uint Type, uint TrackNo);
     int  GetTrack(uint Type);
     int  ChangeTrack(uint Type, int Direction);
 
@@ -42,6 +41,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void SetCaptionsEnabled(bool Enable, bool UpdateOSD = true);
     virtual void DisableCaptions(uint Mode, bool UpdateOSD = true);
     virtual void EnableCaptions(uint Mode, bool UpdateOSD = true);
+    virtual void SetTrack(uint Type, uint TrackNo);
     void ChangeCaptionTrack(int Direction);
     void ResetCaptions();
     void EnableTeletext(int Page = 0x100);

@@ -3142,7 +3142,7 @@ bool TV::HandleTrackAction(const QString &Action)
             if (m_vbimode == VBIMode::PAL_TT && valid)
                 emit SetTeletextPage(static_cast<uint>(page));
             else if (m_vbimode == VBIMode::NTSC_CC)
-                m_player->SetTrack(kTrackTypeCC608,std::max(std::min(page - 1, 1), 0));
+                emit SetTrack(kTrackTypeCC608, static_cast<uint>(std::max(std::min(page - 1, 1), 0)));
 
             ClearInputQueues(true);
 
@@ -3185,9 +3185,9 @@ bool TV::HandleTrackAction(const QString &Action)
     else if (Action.startsWith("SELECT"))
     {
         int type = to_track_type(Action.mid(6));
-        int num = Action.section("_", -1).toInt();
+        uint num = Action.section("_", -1).toUInt();
         if (type >= kTrackTypeAudio)
-            m_player->SetTrack(static_cast<uint>(type), num);
+            emit SetTrack(static_cast<uint>(type), num);
         else
             handled = false;
     }
@@ -4487,7 +4487,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             uint finish = start + size;
             if (track >= start && track < finish)
             {
-                m_player->SetTrack(kTrackTypeSubtitle, static_cast<int>(track - start));
+                emit SetTrack(kTrackTypeSubtitle, track - start);
                 emit EnableCaptions(kDisplayAVSubtitle);
                 return;
             }
@@ -4497,7 +4497,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             finish = start + size;
             if (track >= start && track < finish)
             {
-                m_player->SetTrack(kTrackTypeCC708, static_cast<int>(track - start));
+                emit SetTrack(kTrackTypeCC708, track - start);
                 emit EnableCaptions(kDisplayCC708);
                 return;
             }
@@ -4507,7 +4507,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             finish = start + size;
             if (track >= start && track < finish)
             {
-                m_player->SetTrack(kTrackTypeCC608, static_cast<int>(track - start));
+                emit SetTrack(kTrackTypeCC608, track - start);
                 emit EnableCaptions(kDisplayCC608);
                 return;
             }
@@ -4517,7 +4517,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             finish = start + size;
             if (track >= start && track < finish)
             {
-                m_player->SetTrack(kTrackTypeTeletextCaptions, static_cast<int>(track - start));
+                emit SetTrack(kTrackTypeTeletextCaptions, track - start);
                 emit EnableCaptions(kDisplayTeletextCaptions);
                 return;
             }
@@ -4527,7 +4527,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             finish = start + size;
             if (track >= start && track < finish)
             {
-                m_player->SetTrack(kTrackTypeTeletextMenu, static_cast<int>(track - start));
+                emit SetTrack(kTrackTypeTeletextMenu, track - start);
                 emit EnableCaptions(kDisplayTeletextMenu);
                 return;
             }
@@ -4537,7 +4537,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             finish = start + size;
             if (track >= start && track < finish)
             {
-                m_player->SetTrack(kTrackTypeRawText, static_cast<int>(track - start));
+                emit SetTrack(kTrackTypeRawText, track - start);
                 emit EnableCaptions(kDisplayRawTextSubtitle);
                 return;
             }
