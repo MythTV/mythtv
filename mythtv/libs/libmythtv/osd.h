@@ -7,7 +7,7 @@
 #include "mythscreentype.h"
 #include "mythtypes.h"
 #include "mythplayerstate.h"
-#include "mythcaptionsoverlay.h"
+#include "mythmediaoverlay.h"
 
 // Screen names are prepended with alphanumerics to force the correct ordering
 // when displayed. This is slightly complicated by the default windows
@@ -91,7 +91,7 @@ class MythOSDDialogData
 
 Q_DECLARE_METATYPE(MythOSDDialogData)
 
-class OSD : public MythCaptionsOverlay
+class OSD : public MythMediaOverlay
 {
     Q_OBJECT
 
@@ -108,7 +108,6 @@ class OSD : public MythCaptionsOverlay
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
    ~OSD() override;
 
-    void SetPlayer(MythPlayerUI* Player);
     bool Init(const QRect &Rect, float FontAspect) override;
     void HideWindow(const QString &Window) override;
     void SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);

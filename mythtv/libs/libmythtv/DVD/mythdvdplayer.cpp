@@ -592,9 +592,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
     // clear any buttons
     if (!numbuttons || !dvdSubtitle || (buttonversion == 0) || expired)
     {
-        m_osdLock.lock();
-        m_osd.ClearSubtitles();
-        m_osdLock.unlock();
+        m_captionsOverlay.ClearSubtitles();
         m_buttonVersion = 0;
         m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
         return;
@@ -608,9 +606,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
 
     m_buttonVersion = static_cast<int>(buttonversion);
     QRect buttonPos = m_playerCtx->m_buffer->DVD()->GetButtonCoords();
-    m_osdLock.lock();
-    m_osd.DisplayDVDButton(dvdSubtitle, buttonPos);
-    m_osdLock.unlock();
+    m_captionsOverlay.DisplayDVDButton(dvdSubtitle, buttonPos);
     m_textDisplayMode = kDisplayDVDButton;
     m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
 }

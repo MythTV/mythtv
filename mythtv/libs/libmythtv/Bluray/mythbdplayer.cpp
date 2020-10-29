@@ -43,11 +43,9 @@ void MythBDPlayer::DisplayMenu(void)
     if (!m_playerCtx->m_buffer->IsBD())
         return;
 
-    m_osdLock.lock();
     MythBDOverlay *overlay = nullptr;
     while (nullptr != (overlay = m_playerCtx->m_buffer->BD()->GetOverlay()))
-        m_osd.DisplayBDOverlay(overlay);
-    m_osdLock.unlock();
+        m_captionsOverlay.DisplayBDOverlay(overlay);
 }
 
 void MythBDPlayer::DisplayPauseFrame(void)

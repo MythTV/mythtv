@@ -40,6 +40,8 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void HandleTeletextAction(const QString &Action, bool& Handled);
     void RestartITV(uint Chanid, uint Cardid, bool IsLiveTV);
     void HandleITVAction(const QString& Action, bool& Handled);
+    void AdjustSubtitleZoom(int Delta);
+    void AdjustSubtitleDelay(int Delta);
 
     // Video
     void RequestEmbedding(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});

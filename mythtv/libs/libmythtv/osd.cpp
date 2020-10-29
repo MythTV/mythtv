@@ -28,7 +28,7 @@
 #define LOC     QString("OSD: ")
 
 OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* Painter)
-  : MythCaptionsOverlay(MainWindow, Tv, Player, Painter)
+  : MythMediaOverlay(MainWindow, Tv, Player, Painter)
 {
     connect(this, &OSD::HideOSD,        m_tv, &TV::HandleOSDClosed);
     connect(m_tv, &TV::ChangeOSDDialog, this, &OSD::ShowDialog);
@@ -40,14 +40,9 @@ OSD::~OSD()
     OSD::TearDown();
 }
 
-void OSD::SetPlayer(MythPlayerUI *Player)
-{
-    m_player = Player;
-}
-
 void OSD::TearDown()
 {
-    MythCaptionsOverlay::TearDown();
+    MythMediaOverlay::TearDown();
     m_dialog = nullptr;
 }
 
@@ -653,7 +648,7 @@ void OSD::HideWindow(const QString &Window)
     if (!m_children.contains(Window))
         return;
 
-    MythCaptionsOverlay::HideWindow(Window);
+    MythMediaOverlay::HideWindow(Window);
 
     SetExpiry(Window, kOSDTimeout_None);
 

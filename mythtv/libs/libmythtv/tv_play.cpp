@@ -47,8 +47,6 @@
 #include "remoteencoder.h"
 #include "tvremoteutil.h"
 #include "mythplayerui.h"
-#include "captions/subtitlescreen.h"
-#include "DetectLetterbox.h"
 #include "jobqueue.h"
 #include "livetvchain.h"
 #include "playgroup.h"
@@ -7113,72 +7111,15 @@ void TV::EnableUpmix(bool Enable, bool Toggle)
 
 void TV::ChangeSubtitleZoom(int Dir)
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return;
-    }
-
-    OSD *osd = GetOSDL();
-    SubtitleScreen *subs = nullptr;
-    if (osd)
-        subs = osd->InitSubtitles();
-    ReturnOSDLock();
     m_subtitleZoomAdjustment = true;
-    bool showing = m_player->GetCaptionsEnabled();
-    int newval = (subs ? subs->GetZoom() : 100) + Dir;
-    newval = std::max(50, newval);
-    newval = std::min(200, newval);
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    if (showing && !m_overlayState.m_browsing)
-    {
-        UpdateOSDStatus(tr("Adjust Subtitle Zoom"), tr("Subtitle Zoom"),
-                        QString::number(newval),
-                        kOSDFunctionalType_SubtitleZoomAdjust,
-                        "%", newval * 1000 / 200, kOSDTimeout_None);
-        emit ChangeOSDPositionUpdates(false);
-        if (subs)
-            subs->SetZoom(newval);
-    }
+    emit AdjustSubtitleZoom(Dir);
 }
 
 // dir in 10ms jumps
 void TV::ChangeSubtitleDelay(int Dir)
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return;
-    }
-
-    OSD *osd = GetOSDL();
-    SubtitleScreen *subs = nullptr;
-    if (osd)
-        subs = osd->InitSubtitles();
-    ReturnOSDLock();
     m_subtitleDelayAdjustment = true;
-    uint capmode = m_player->GetCaptionMode();
-    bool showing = m_player->GetCaptionsEnabled() &&
-                       (capmode == kDisplayRawTextSubtitle || capmode == kDisplayTextSubtitle);
-    int newval = (subs ? subs->GetDelay() : 100) + Dir * 10;
-    newval = std::max(-5000, newval);
-    newval = std::min(5000, newval);
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
-    if (showing && !m_overlayState.m_browsing)
-    {
-        // range of -5000ms..+5000ms, scale to 0..1000
-        UpdateOSDStatus(tr("Adjust Subtitle Delay"), tr("Subtitle Delay"),
-                        QString::number(newval),
-                        kOSDFunctionalType_SubtitleDelayAdjust,
-                        "ms", newval / 10 + 500, kOSDTimeout_None);
-        emit ChangeOSDPositionUpdates(false);
-        if (subs)
-            subs->SetDelay(newval);
-    }
+    emit AdjustSubtitleDelay(Dir);
 }
 
 // dir in 10ms jumps

@@ -2,12 +2,14 @@
 #include "livetvchain.h"
 #include "tv_play.h"
 #include "interactivetv.h"
+#include "captions/subtitlescreen.h"
 #include "mythplayercaptionsui.h"
 
 #define LOC QString("CaptionsUI: ")
 
 MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
-  : MythPlayerAudioUI(MainWindow, Tv, Context, Flags)
+  : MythPlayerAudioUI(MainWindow, Tv, Context, Flags),
+    m_captionsOverlay(MainWindow, Tv, nullptr, m_painter)
 {
     m_itvEnabled = gCoreContext->GetBoolSetting("EnableMHEG", false);
 
@@ -28,6 +30,8 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
     connect(m_tv, &TV::RestartITV,      this, &MythPlayerCaptionsUI::ITVRestart);
     connect(m_tv, &TV::HandleTeletextAction, this, &MythPlayerCaptionsUI::HandleTeletextAction);
     connect(m_tv, &TV::HandleITVAction, this, &MythPlayerCaptionsUI::ITVHandleAction);
+    connect(m_tv, &TV::AdjustSubtitleZoom, this, &MythPlayerCaptionsUI::AdjustSubtitleZoom);
+    connect(m_tv, &TV::AdjustSubtitleDelay, this, &MythPlayerCaptionsUI::AdjustSubtitleDelay);
 
     // Signalled connections (from MHIContext)
     connect(this, &MythPlayerCaptionsUI::SetInteractiveStream,    this, &MythPlayerCaptionsUI::SetStream);
@@ -38,6 +42,43 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
 MythPlayerCaptionsUI::~MythPlayerCaptionsUI()
 {
     delete m_interactiveTV;
+}
+
+void MythPlayerCaptionsUI::AdjustSubtitleZoom(int Delta)
+{
+    if (!(GetCaptionsEnabled() && !(m_browsing || m_editing)))
+        return;
+
+    auto * subs = m_captionsOverlay.InitSubtitles();
+    if (subs)
+    {
+        int newval = std::clamp(subs->GetZoom() + Delta, 50, 200);
+        UpdateOSDStatus(tr("Adjust Subtitle Zoom"), tr("Subtitle Zoom"),
+                        QString::number(newval), kOSDFunctionalType_SubtitleZoomAdjust,
+                        "%", newval * 1000 / 200, kOSDTimeout_None);
+        ChangeOSDPositionUpdates(false);
+        subs->SetZoom(newval);
+    }
+}
+
+void MythPlayerCaptionsUI::AdjustSubtitleDelay(int Delta)
+{
+    bool showing = (m_textDisplayMode == kDisplayRawTextSubtitle) || (m_textDisplayMode == kDisplayTextSubtitle);
+    if (!(showing && !(m_browsing || m_editing)))
+        return;
+
+    auto * subs = m_captionsOverlay.InitSubtitles();
+    if (subs)
+    {
+        int newval = std::clamp(subs->GetDelay() + (Delta * 10), -5000, 5000);
+        // range of -5000ms..+5000ms, scale to 0..1000
+        UpdateOSDStatus(tr("Adjust Subtitle Delay"), tr("Subtitle Delay"),
+                        QString::number(newval), kOSDFunctionalType_SubtitleDelayAdjust,
+                        "ms", (newval / 10) + 500, kOSDTimeout_None);
+        ChangeOSDPositionUpdates(false);
+        subs->SetDelay(newval);
+    }
+
 }
 
 void MythPlayerCaptionsUI::ResetCaptions()
@@ -51,12 +92,12 @@ void MythPlayerCaptionsUI::ResetCaptions()
          (m_textDisplayMode & kDisplayCC608)           ||
          (m_textDisplayMode & kDisplayCC708)))
     {
-        m_osd.ClearSubtitles();
+        m_captionsOverlay.ClearSubtitles();
     }
     else if ((m_textDisplayMode & kDisplayTeletextCaptions) ||
              (m_textDisplayMode & kDisplayNUVTeletextCaptions))
     {
-        m_osd.TeletextClear();
+        m_captionsOverlay.TeletextClear();
     }
 }
 
@@ -123,13 +164,13 @@ void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD)
             if (track > -1)
                 msg += m_decoder->GetTrackDesc(type, static_cast<uint>(track));
         }
-        m_osd.EnableSubtitles(preserve);
+        m_captionsOverlay.EnableSubtitles(preserve);
     }
 
     if (kDisplayTextSubtitle & Mode)
     {
         msg += tr("Text subtitles");
-        m_osd.EnableSubtitles(preserve);
+        m_captionsOverlay.EnableSubtitles(preserve);
     }
 
     if (!msg.isEmpty() && UpdateOSD)
@@ -158,11 +199,11 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
                 msg += m_decoder->GetTrackDesc(type, static_cast<uint>(track));
         }
 
-        m_osd.EnableSubtitles(static_cast<int>(Mode));
+        m_captionsOverlay.EnableSubtitles(static_cast<int>(Mode));
     }
     if (kDisplayTextSubtitle & Mode)
     {
-        m_osd.EnableSubtitles(kDisplayTextSubtitle);
+        m_captionsOverlay.EnableSubtitles(kDisplayTextSubtitle);
         msg += tr("Text subtitles");
     }
     if (kDisplayNUVTeletextCaptions & Mode)
@@ -320,7 +361,7 @@ void MythPlayerCaptionsUI::DoDisableForcedSubtitles()
 {
     m_disableForcedSubtitles = false;
     m_osdLock.lock();
-    m_osd.DisableForcedSubtitles();
+    m_captionsOverlay.DisableForcedSubtitles();
     m_osdLock.unlock();
 }
 
@@ -331,7 +372,7 @@ void MythPlayerCaptionsUI::DoEnableForcedSubtitles()
         return;
 
     m_osdLock.lock();
-    m_osd.EnableSubtitles(kDisplayAVSubtitle, true /*forced only*/);
+    m_captionsOverlay.EnableSubtitles(kDisplayAVSubtitle, true /*forced only*/);
     m_osdLock.unlock();
 }
 
@@ -441,7 +482,7 @@ uint MythPlayerCaptionsUI::NextCaptionTrack(uint Mode)
 void MythPlayerCaptionsUI::EnableTeletext(int Page)
 {
     QMutexLocker locker(&m_osdLock);
-    m_osd.EnableTeletext(true, Page);
+    m_captionsOverlay.EnableTeletext(true, Page);
     m_prevTextDisplayMode = m_textDisplayMode;
     m_textDisplayMode = kDisplayTeletextMenu;
 }
@@ -449,7 +490,7 @@ void MythPlayerCaptionsUI::EnableTeletext(int Page)
 void MythPlayerCaptionsUI::DisableTeletext()
 {
     QMutexLocker locker(&m_osdLock);
-    m_osd.EnableTeletext(false, 0);
+    m_captionsOverlay.EnableTeletext(false, 0);
     m_textDisplayMode = kDisplayNone;
 
     // If subtitles were enabled before the teletext menu was displayed then re-enable them
@@ -460,7 +501,7 @@ void MythPlayerCaptionsUI::DisableTeletext()
 void MythPlayerCaptionsUI::ResetTeletext()
 {
     QMutexLocker locker(&m_osdLock);
-    m_osd.TeletextReset();
+    m_captionsOverlay.TeletextReset();
 }
 
 /*! \brief Set Teletext NUV Caption page
@@ -483,7 +524,7 @@ void MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action, bool &Han
 
     bool exit = false;
     m_osdLock.lock();
-    Handled = m_osd.TeletextAction(Action, exit);
+    Handled = m_captionsOverlay.TeletextAction(Action, exit);
     m_osdLock.unlock();
     if (exit)
         DisableTeletext();

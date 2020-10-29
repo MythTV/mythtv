@@ -26,6 +26,34 @@ void MythCaptionsOverlay::TearDown()
     MythMediaOverlay::TearDown();
 }
 
+void MythCaptionsOverlay::Draw(const QRect &Rect)
+{
+    bool visible = false;
+    for (auto * screen : qAsConst(m_children))
+    {
+        if (screen->IsVisible())
+        {
+            visible = true;
+            screen->Pulse();
+        }
+    }
+
+    if (visible)
+    {
+        m_painter->Begin(nullptr);
+        for (auto * screen : qAsConst(m_children))
+        {
+            if (screen->IsVisible())
+            {
+                screen->Draw(m_painter, 0, 0, 255, Rect);
+                screen->SetAlpha(255);
+                screen->ResetNeedsRedraw();
+            }
+        }
+        m_painter->End();
+    }
+}
+
 MythScreenType* MythCaptionsOverlay::GetWindow(const QString& Window)
 {
     if (m_children.contains(Window))
@@ -150,11 +178,9 @@ SubtitleScreen* MythCaptionsOverlay::InitSubtitles()
         }
         RevertUIScale();
     }
+
     if (!sub)
-    {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create subtitle window");
-        return nullptr;
-    }
     return sub;
 }
 

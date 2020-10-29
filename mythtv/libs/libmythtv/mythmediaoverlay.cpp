@@ -37,6 +37,11 @@ MythMediaOverlay::~MythMediaOverlay()
     MythMediaOverlay::TearDown();
 }
 
+void MythMediaOverlay::SetPlayer(MythPlayerUI *Player)
+{
+    m_player = Player;
+}
+
 void MythMediaOverlay::TearDown()
 {
     for (MythScreenType * screen : qAsConst(m_children))

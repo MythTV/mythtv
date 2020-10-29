@@ -2,6 +2,7 @@
 #define MYTHPLAYERCAPTIONSUI_H
 
 // MythTV
+#include "mythcaptionsoverlay.h"
 #include "mythplayeraudioui.h"
 
 class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
@@ -49,6 +50,8 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void HandleTeletextAction(const QString &Action, bool& Handled);
     void ITVHandleAction(const QString& Action, bool& Handled);
     void ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV);
+    void AdjustSubtitleZoom(int Delta);
+    void AdjustSubtitleDelay(int Delta);
 
   private slots:
     void SetStream(const QString& Stream);
@@ -60,6 +63,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void DoDisableForcedSubtitles();
     void DoEnableForcedSubtitles();
 
+    MythCaptionsOverlay m_captionsOverlay;
     MythCaptionsState m_captionsState { };
     InteractiveTV *m_interactiveTV { nullptr };
     QMutex m_itvLock    { };

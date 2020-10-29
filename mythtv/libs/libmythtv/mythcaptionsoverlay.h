@@ -16,9 +16,13 @@ struct AVSubtitle;
 
 class MythCaptionsOverlay : public MythMediaOverlay
 {
+    Q_OBJECT
+
   public:
     MythCaptionsOverlay(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
    ~MythCaptionsOverlay() override;
+
+    void Draw(const QRect& Rect);
 
     MythScreenType* GetWindow(const QString& Window) override;
 

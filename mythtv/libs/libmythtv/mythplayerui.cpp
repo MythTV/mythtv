@@ -18,8 +18,9 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
   : MythPlayerVisualiserUI(MainWindow, Tv, Context, Flags),
     MythVideoScanTracker(this)
 {
-    // Finish setting up the overlay
+    // Finish setting up the overlays
     m_osd.SetPlayer(this);
+    m_captionsOverlay.SetPlayer(this);
 
     // User feedback during slow seeks
     connect(this, &MythPlayerUI::SeekingSlow, [&](int Count)
@@ -355,7 +356,7 @@ void MythPlayerUI::PreProcessNormalFrame()
     {
         m_osdLock.lock();
         m_itvLock.lock();
-        auto *window = qobject_cast<InteractiveScreen *>(m_osd.GetWindow(OSD_WIN_INTERACT));
+        auto *window = qobject_cast<InteractiveScreen *>(m_captionsOverlay.GetWindow(OSD_WIN_INTERACT));
         if ((m_interactiveTV->ImageHasChanged() || !m_itvVisible) && window)
         {
             m_interactiveTV->UpdateOSD(window, m_painter);
@@ -390,7 +391,8 @@ void MythPlayerUI::VideoStart()
     m_osdLock.lock();
     m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
     m_osd.Init(visible, aspect);
-    m_osd.EnableSubtitles(kDisplayNone);
+    m_captionsOverlay.Init(visible, aspect);
+    m_captionsOverlay.EnableSubtitles(kDisplayNone);
 
 #ifdef USING_MHEG
     if (GetInteractiveTV())
@@ -493,9 +495,8 @@ void MythPlayerUI::RenderVideoFrame(MythVideoFrame *Frame, FrameScanType Scan, b
     PrepareVisualiser();
     m_videoOutput->RenderFrame(Frame, Scan);
     RenderVisualiser();
-    m_osdLock.lock();
+    m_captionsOverlay.Draw(m_videoOutput->GetDisplayVisibleRect());
     m_videoOutput->RenderOverlays(m_osd);
-    m_osdLock.unlock();
     m_videoOutput->RenderEnd();
 
     if (Wait > 0)
