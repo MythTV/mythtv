@@ -3955,7 +3955,22 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
     }
     else if (IsActionable({ "ESCAPE", "BACK" }, Actions))
     {
-        ClearOSD();
+        if (StateIsLiveTV(m_playerContext.GetState()) &&
+            (m_playerContext.m_lastSignalMsgTime.elapsed() < static_cast<int>(PlayerContext::kSMExitTimeout)))
+        {
+            ClearOSD();
+        }
+        else
+        {
+            bool visible = false;
+            emit IsOSDVisible(visible);
+            if (visible)
+            {
+                ClearOSD();
+                return handled;
+            }
+        }
+
         NormalSpeed();
         StopFFRew();
         bool exit = false;

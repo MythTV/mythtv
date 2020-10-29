@@ -31,6 +31,7 @@ OSD::OSD(MythMainWindow *MainWindow, TV *Tv, MythPlayerUI* Player, MythPainter* 
   : MythMediaOverlay(MainWindow, Tv, Player, Painter)
 {
     connect(this, &OSD::HideOSD,        m_tv, &TV::HandleOSDClosed);
+    connect(m_tv, &TV::IsOSDVisible,    this, &OSD::IsOSDVisible);
     connect(m_tv, &TV::ChangeOSDDialog, this, &OSD::ShowDialog);
     connect(m_tv, &TV::ChangeOSDText,   this, &OSD::SetText);
 }
@@ -71,6 +72,18 @@ bool OSD::Init(const QRect &Rect, float FontAspect)
         .arg(m_rect.width()).arg(m_rect.height()).arg(m_rect.left()).arg(m_rect.top()));
     HideAll(false);
     return true;
+}
+
+void OSD::IsOSDVisible(bool& Visible)
+{
+    if (m_mainWindow->GetCurrentNotificationCenter()->DisplayedNotifications() > 0)
+    {
+        Visible = true;
+        return;
+    }
+
+    Visible = std::any_of(m_children.cbegin(), m_children.cend(),
+                [](MythScreenType* child) { return child->IsVisible(); });
 }
 
 void OSD::HideAll(bool KeepSubs, MythScreenType* Except, bool DropNotification)

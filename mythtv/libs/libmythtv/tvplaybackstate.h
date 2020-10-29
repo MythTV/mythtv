@@ -66,6 +66,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void SaveBottomLine();
 
     // Overlays
+    void IsOSDVisible(bool& Visible);
     void ChangeOSDPositionUpdates(bool Enable);
     void ChangeOSDDebug();
     void ChangeOSDText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);

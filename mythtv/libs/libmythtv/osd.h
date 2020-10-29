@@ -103,6 +103,7 @@ class OSD : public MythMediaOverlay
 
   protected slots:
     void ShowDialog(const MythOSDDialogData& Data);
+    void IsOSDVisible(bool& Visible);
 
   public:
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
