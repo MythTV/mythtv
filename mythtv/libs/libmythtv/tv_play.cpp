@@ -85,19 +85,6 @@
 
 #define LOC      QString("TV::%1(): ").arg(__func__)
 
-#define SetOSDText(GROUP, FIELD, TEXT, TIMEOUT) { \
-    OSD *osd_m = GetOSDL(); \
-    if (osd_m) \
-    { \
-        InfoMap map; \
-        map.insert(FIELD,TEXT); \
-        osd_m->SetText(GROUP, map, TIMEOUT); \
-    } \
-    ReturnOSDLock(); }
-
-#define SetOSDMessage(MESSAGE) \
-    SetOSDText(OSD_WIN_MESSAGE, "message_text", MESSAGE, kOSDTimeout_Med)
-
 #define HideOSDWindow(WINDOW) { \
     OSD *osd = GetOSDL(); \
     if (osd) \
@@ -2299,7 +2286,7 @@ void TV::HandleStateChange()
                 .arg(tv_i18n(m_playerContext.m_playingInfo->GetPlaybackGroup()));
         m_playerContext.UnlockPlayingInfo(__FILE__, __LINE__);
         if (count > 0)
-            SetOSDMessage(msg);
+            emit ChangeOSDMessage(msg);
         ITVRestart(false);
     }
 
@@ -2547,7 +2534,7 @@ void TV::timerEvent(QTimerEvent *Event)
         {
             if (!m_lastProgram->IsFileReadable())
             {
-                SetOSDMessage(tr("Last Program: %1 Doesn't Exist").arg(m_lastProgram->GetTitle()));
+                emit ChangeOSDMessage(tr("Last Program: %1 Doesn't Exist").arg(m_lastProgram->GetTitle()));
                 lastProgramStringList.clear();
                 SetLastProgram(nullptr);
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
@@ -3869,7 +3856,7 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         if (m_asInputMode)
         {
             ClearInputQueues(true);
-            SetOSDText(OSD_WIN_INPUT, "osd_number_entry", tr("Seek:"), kOSDTimeout_Med);
+            emit ChangeOSDText(OSD_WIN_INPUT, {{"osd_number_entry", tr("Seek:")}}, kOSDTimeout_Med);
             m_asInputMode = false;
             if (m_asInputTimerId)
             {
@@ -3931,7 +3918,7 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
 
             if (timeout == 0xffffffff)
             {
-                SetOSDMessage("No Signal Monitor");
+                emit ChangeOSDMessage("No Signal Monitor");
                 return false;
             }
 
@@ -4157,7 +4144,7 @@ void TV::SetBookmark(bool Clear)
         if (Clear)
         {
             m_player->SetBookmark(true);
-            SetOSDMessage(tr("Bookmark Cleared"));
+            emit ChangeOSDMessage(tr("Bookmark Cleared"));
         }
         else // if (IsBookmarkAllowed(ctx))
         {
@@ -4166,7 +4153,7 @@ void TV::SetBookmark(bool Clear)
             CalcPlayerSliderPosition(info);
             info.text["title"] = tr("Position");
             UpdateOSDStatus(info, kOSDFunctionalType_Default, kOSDTimeout_Med);
-            SetOSDMessage(tr("Bookmark Saved"));
+            emit ChangeOSDMessage(tr("Bookmark Saved"));
         }
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
@@ -5344,7 +5331,7 @@ void TV::DoQueueTranscode(const QString& Profile)
                 m_playerContext.m_playingInfo->GetChanID(),
                 m_playerContext.m_playingInfo->GetRecordingStartTime(), JOB_STOP);
             m_queuedTranscode = false;
-            SetOSDMessage(tr("Stopping Transcode"));
+            emit ChangeOSDMessage(tr("Stopping Transcode"));
         }
         else
         {
@@ -5364,7 +5351,7 @@ void TV::DoQueueTranscode(const QString& Profile)
                 m_queuedTranscode = true;
                 msg = tr("Transcoding");
             }
-            SetOSDMessage(msg);
+            emit ChangeOSDMessage(msg);
         }
     }
     m_playerContext.UnlockPlayingInfo(__FILE__, __LINE__);
@@ -5849,7 +5836,7 @@ void TV::AddKeyToInputQueue(char Key)
     {
         inputStr = tr("Seek:", "seek to location") + " " + inputStr;
     }
-    SetOSDText(OSD_WIN_INPUT, "osd_number_entry", inputStr, kOSDTimeout_Med);
+    emit ChangeOSDText(OSD_WIN_INPUT, {{ "osd_number_entry", inputStr}}, kOSDTimeout_Med);
 
     // Commit the channel if it is complete and smart changing is enabled.
     if (commitSmart)
@@ -6245,7 +6232,7 @@ void TV::ShowPreviousChannel()
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Previous channel number '%1'").arg(channum));
     if (channum.isEmpty())
         return;
-    SetOSDText(OSD_WIN_INPUT, "osd_number_entry", channum, kOSDTimeout_Med);
+    emit ChangeOSDText(OSD_WIN_INPUT, {{ "osd_number_entry", channum }}, kOSDTimeout_Med);
 }
 
 void TV::PopPreviousChannel(bool ImmediateChange)
@@ -6442,7 +6429,7 @@ void TV::UpdateOSDInput()
     if (!m_playerContext.m_recorder || !m_playerContext.m_tvchain)
         return;
     QString displayName = CardUtil::GetDisplayName(m_playerContext.GetCardID());
-    SetOSDMessage(displayName);
+    emit ChangeOSDMessage(displayName);
 }
 
 /** \fn TV::UpdateOSDSignal(const PlayerContext*, const QStringList&)
@@ -7157,7 +7144,7 @@ void TV::ToggleSleepTimer()
     }
 
     text = tr("Sleep ") + " " + s_sleepTimes[m_sleepIndex].dispString;
-    SetOSDMessage(text);
+    emit ChangeOSDMessage(text);
 }
 
 void TV::ShowOSDSleep()
@@ -7759,7 +7746,7 @@ void TV::QuickRecord()
 
     m_playerContext.UnlockPlayingInfo(__FILE__, __LINE__);
 
-    SetOSDMessage(msg);
+    emit ChangeOSDMessage(msg);
 }
 
 void TV::HandleOSDClosed(int OSDType)
@@ -9539,7 +9526,7 @@ void TV::OverrideScan(FrameScanType Scan)
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!message.isEmpty())
-        SetOSDMessage(message);
+        emit ChangeOSDMessage(message);
 }
 
 void TV::ToggleAutoExpire()
@@ -9726,7 +9713,7 @@ void TV::ToggleSleepTimer(const QString& Time)
         out = tr("Sleep") + " " + QString::number(mins);
     else
         out = tr("Sleep") + " " + s_sleepTimes[0].dispString;
-    SetOSDMessage(out);
+    emit ChangeOSDMessage(out);
 }
 
 void TV::ShowNoRecorderDialog(NoRecorderMsg MsgType)

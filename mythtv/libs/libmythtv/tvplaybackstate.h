@@ -61,6 +61,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeOSDDebug();
     void ChangeOSDText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);
     void ChangeOSDDialog(const MythOSDDialogData& Data);
+    void ChangeOSDMessage(const QString& Message);
 
     // Visualiser
     void EnableVisualiser(bool Enable, bool Toggle = false, const QString& Name = QString());
