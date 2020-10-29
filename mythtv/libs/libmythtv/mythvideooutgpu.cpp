@@ -255,7 +255,8 @@ bool MythVideoOutputGPU::Init(const QSize& VideoDim, const QSize& VideoDispDim,
     InitDisplayMeasurements();
 
     // Create buffers
-    if (!CreateBuffers(CodecId, GetVideoDim()))
+    m_buffersCreated = CreateBuffers(CodecId, GetVideoDim());
+    if (!m_buffersCreated)
         return false;
 
     // Adjust visible rect for embedding
