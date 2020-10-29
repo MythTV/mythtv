@@ -24,7 +24,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeMuteState(bool CycleChannels);
     void ChangeVolume(bool Direction, int Volume);
     void ChangeUpmix(bool Enable, bool Toggle = false);
-    void ChangeAudioOffset(int64_t Delta, int Value);
+    void ChangeAudioOffset(int64_t Delta, int Value = -9999);
 
     // Captions/Interactive
     void ToggleCaptions();

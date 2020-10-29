@@ -1060,6 +1060,11 @@ TV::TV(MythMainWindow* MainWindow)
     if (m_mainWindow)
         m_mainWindow->PauseIdleTimer(true);
 
+    // Setup various state signals
+    connect(this, &TV::ChangeAudioOffset,   [&]() { m_audiosyncAdjustment = true; });
+    connect(this, &TV::AdjustSubtitleZoom,  [&]() { m_subtitleZoomAdjustment = true; });
+    connect(this, &TV::AdjustSubtitleDelay, [&]() { m_subtitleDelayAdjustment = true; });
+
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Finished creating TV object");
 }
 
@@ -3738,13 +3743,13 @@ bool TV::AudioSyncHandleAction(const QStringList& Actions)
     bool handled = true;
 
     if (IsActionable(ACTION_LEFT, Actions))
-        ChangeAudioSync(-1);
+        emit ChangeAudioOffset(-1);
     else if (IsActionable(ACTION_RIGHT, Actions))
-        ChangeAudioSync(1);
+        emit ChangeAudioOffset(1);
     else if (IsActionable(ACTION_UP, Actions))
-        ChangeAudioSync(10);
+        emit ChangeAudioOffset(10);
     else if (IsActionable(ACTION_DOWN, Actions))
-        ChangeAudioSync(-10);
+        emit ChangeAudioOffset(-10);
     else if (IsActionable({ ACTION_TOGGELAUDIOSYNC, ACTION_SELECT }, Actions))
         ClearOSD();
     else
@@ -3761,13 +3766,13 @@ bool TV::SubtitleZoomHandleAction(const QStringList &Actions)
     bool handled = true;
 
     if (IsActionable(ACTION_LEFT, Actions))
-        ChangeSubtitleZoom(-1);
+        emit AdjustSubtitleZoom(-1);
     else if (IsActionable(ACTION_RIGHT, Actions))
-        ChangeSubtitleZoom(1);
+        emit AdjustSubtitleZoom(1);
     else if (IsActionable(ACTION_UP, Actions))
-        ChangeSubtitleZoom(10);
+        emit AdjustSubtitleZoom(10);
     else if (IsActionable(ACTION_DOWN, Actions))
-        ChangeSubtitleZoom(-10);
+        emit AdjustSubtitleZoom(-10);
     else if (IsActionable({ ACTION_TOGGLESUBTITLEZOOM, ACTION_SELECT }, Actions))
         ClearOSD();
     else
@@ -3784,13 +3789,13 @@ bool TV::SubtitleDelayHandleAction(const QStringList &Actions)
     bool handled = true;
 
     if (IsActionable(ACTION_LEFT, Actions))
-        ChangeSubtitleDelay(-5);
+        emit AdjustSubtitleDelay(-5);
     else if (IsActionable(ACTION_RIGHT, Actions))
-        ChangeSubtitleDelay(5);
+        emit AdjustSubtitleDelay(5);
     else if (IsActionable(ACTION_UP, Actions))
-        ChangeSubtitleDelay(25);
+        emit AdjustSubtitleDelay(25);
     else if (IsActionable(ACTION_DOWN, Actions))
-        ChangeSubtitleDelay(-25);
+        emit AdjustSubtitleDelay(-25);
     else if (IsActionable({ ACTION_TOGGLESUBTITLEDELAY, ACTION_SELECT }, Actions))
         ClearOSD();
     else
@@ -3989,9 +3994,9 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
         }
     }
     else if (IsActionable(ACTION_ENABLEUPMIX, Actions))
-        EnableUpmix(true);
+        emit ChangeUpmix(true);
     else if (IsActionable(ACTION_DISABLEUPMIX, Actions))
-        EnableUpmix(false);
+        emit ChangeUpmix(false);
     else if (IsActionable(ACTION_VOLUMEDOWN, Actions))
         VolumeChange(false);
     else if (IsActionable(ACTION_VOLUMEUP, Actions))
@@ -4081,11 +4086,11 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     else if (IsActionable("TOGGLEFILL", Actions))
         emit ChangeAdjustFill();
     else if (IsActionable(ACTION_TOGGELAUDIOSYNC, Actions))
-        ChangeAudioSync(0);   // just display
+        emit ChangeAudioOffset(0);   // just display
     else if (IsActionable(ACTION_TOGGLESUBTITLEZOOM, Actions))
-        ChangeSubtitleZoom(0);   // just display
+        emit AdjustSubtitleZoom(0);   // just display
     else if (IsActionable(ACTION_TOGGLESUBTITLEDELAY, Actions))
-        ChangeSubtitleDelay(0);   // just display
+        emit AdjustSubtitleDelay(0);   // just display
     else if (IsActionable(ACTION_TOGGLEVISUALISATION, Actions))
         emit EnableVisualiser(false, true);
     else if (IsActionable(ACTION_ENABLEVISUALISATION, Actions))
@@ -4097,7 +4102,7 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     else if (IsActionable("TOGGLESTRETCH", Actions))
         ToggleTimeStretch();
     else if (IsActionable(ACTION_TOGGLEUPMIX, Actions))
-        EnableUpmix(false, true);
+        emit ChangeUpmix(false, true);
     else if (IsActionable(ACTION_TOGGLESLEEP, Actions))
         ToggleSleepTimer();
     else if (IsActionable(ACTION_TOGGLERECORD, Actions) && islivetv)
@@ -7091,31 +7096,6 @@ void TV::ChangeTimeStretch(int Dir, bool AllowEdit)
     SetSpeedChangeTimer(0, __LINE__);
 }
 
-void TV::EnableUpmix(bool Enable, bool Toggle)
-{
-    emit ChangeUpmix(Enable, Toggle);
-}
-
-void TV::ChangeSubtitleZoom(int Dir)
-{
-    m_subtitleZoomAdjustment = true;
-    emit AdjustSubtitleZoom(Dir);
-}
-
-// dir in 10ms jumps
-void TV::ChangeSubtitleDelay(int Dir)
-{
-    m_subtitleDelayAdjustment = true;
-    emit AdjustSubtitleDelay(Dir);
-}
-
-// dir in 10ms jumps
-void TV::ChangeAudioSync(int Dir, int NewSync)
-{
-    m_audiosyncAdjustment = true;
-    emit ChangeAudioOffset(Dir * 10, NewSync);
-}
-
 void TV::ToggleMute(const bool MuteIndividualChannels)
 {
     emit ChangeMuteState(MuteIndividualChannels);
@@ -7370,7 +7350,7 @@ void TV::customEvent(QEvent *Event)
         if (message == ACTION_SETVOLUME)
             VolumeChange(false, value);
         else if (message == ACTION_SETAUDIOSYNC)
-            ChangeAudioSync(0, value);
+            emit ChangeAudioOffset(0, value);
         else if (message == ACTION_SETBRIGHTNESS)
             emit ChangePictureAttribute(kPictureAttribute_Brightness, false, value);
         else if (message == ACTION_SETCONTRAST)
@@ -8215,9 +8195,9 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action == "TOGGLESTRETCH")
         ToggleTimeStretch();
     else if (Action == ACTION_ENABLEUPMIX)
-        EnableUpmix(true);
+        emit ChangeUpmix(true);
     else if (Action == ACTION_DISABLEUPMIX)
-        EnableUpmix(false);
+        emit ChangeUpmix(false);
     else if (Action.startsWith("ADJUSTSTRETCH"))
     {
         bool floatRead = false;
@@ -8239,11 +8219,11 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action.startsWith("SELECTSCAN_"))
         OverrideScan(static_cast<FrameScanType>(Action.rightRef(1).toInt()));
     else if (Action.startsWith(ACTION_TOGGELAUDIOSYNC))
-        ChangeAudioSync(0);
+        emit ChangeAudioOffset(0);
     else if (Action == ACTION_TOGGLESUBTITLEZOOM)
-        ChangeSubtitleZoom(0);
+        emit AdjustSubtitleZoom(0);
     else if (Action == ACTION_TOGGLESUBTITLEDELAY)
-        ChangeSubtitleDelay(0);
+        emit AdjustSubtitleDelay(0);
     else if (Action == ACTION_TOGGLEVISUALISATION)
         emit EnableVisualiser(false, true);
     else if (Action == ACTION_ENABLEVISUALISATION)

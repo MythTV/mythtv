@@ -379,8 +379,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void SetFFRew(int Index);
 
     // Private audio methods
-    void EnableUpmix(bool Enable, bool Toggle = false);
-    void ChangeAudioSync(int Dir, int NewSync = -9999);
     bool AudioSyncHandleAction(const QStringList& Actions);
     void PauseAudioUntilBuffered();
 
@@ -426,9 +424,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Captions/subtitles
     bool SubtitleZoomHandleAction(const QStringList& Actions);
-    void ChangeSubtitleZoom(int Dir);
     bool SubtitleDelayHandleAction(const QStringList &Actions);
-    void ChangeSubtitleDelay(int Dir);
 
     // Video controls
     void DoTogglePictureAttribute(PictureAdjustType Type);
