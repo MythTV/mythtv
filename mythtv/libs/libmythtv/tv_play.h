@@ -379,7 +379,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Private audio methods
     bool AudioSyncHandleAction(const QStringList& Actions);
-    void PauseAudioUntilBuffered();
 
     // Chapters, titles and angles
     int  GetNumChapters();

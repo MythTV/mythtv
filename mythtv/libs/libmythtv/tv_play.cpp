@@ -4946,7 +4946,7 @@ bool TV::DoPlayerSeek(float Time)
         return false;
     }
 
-    PauseAudioUntilBuffered();
+    emit PauseAudioUntilReady();
 
     bool res = false;
 
@@ -4979,7 +4979,7 @@ bool TV::DoPlayerSeekToFrame(uint64_t FrameNum)
         return false;
     }
 
-    PauseAudioUntilBuffered();
+    emit PauseAudioUntilReady();
 
     bool res = m_player->JumpToFrame(FrameNum);
 
@@ -5405,7 +5405,7 @@ void TV::DoJumpChapter(int Chapter)
     NormalSpeed();
     StopFFRew();
 
-    PauseAudioUntilBuffered();
+    emit PauseAudioUntilReady();
 
     UpdateOSDSeekMessage(tr("Jump Chapter"), kOSDTimeout_Med);
 
@@ -5491,7 +5491,7 @@ void TV::DoSwitchTitle(int Title)
     NormalSpeed();
     StopFFRew();
 
-    PauseAudioUntilBuffered();
+    emit PauseAudioUntilReady();
 
     UpdateOSDSeekMessage(tr("Switch Title"), kOSDTimeout_Med);
     emit ChangeOSDPositionUpdates(true);
@@ -5507,7 +5507,7 @@ void TV::DoSwitchAngle(int Angle)
     NormalSpeed();
     StopFFRew();
 
-    PauseAudioUntilBuffered();
+    emit PauseAudioUntilReady();
 
     UpdateOSDSeekMessage(tr("Switch Angle"), kOSDTimeout_Med);
     emit ChangeOSDPositionUpdates(true);
@@ -5526,7 +5526,7 @@ void TV::DoSkipCommercials(int Direction)
     if (StateIsLiveTV(GetState()))
         return;
 
-    PauseAudioUntilBuffered();
+    emit PauseAudioUntilReady();
 
     osdInfo info;
     CalcPlayerSliderPosition(info);
@@ -6036,7 +6036,7 @@ void TV::ChangeChannel(ChannelChangeDirection Direction)
     if (m_playerContext.m_prevChan.empty())
         m_playerContext.PushPreviousChannel();
 
-    PauseAudioUntilBuffered();
+    emit PauseAudioUntilReady();
     PauseLiveTV();
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
@@ -6199,7 +6199,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
     if (m_playerContext.m_prevChan.empty())
         m_playerContext.PushPreviousChannel();
 
-    PauseAudioUntilBuffered();
+    emit PauseAudioUntilReady();
     PauseLiveTV();
 
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
@@ -7238,11 +7238,6 @@ void TV::IdleDialogTimeout()
         SetExitPlayer(true, true);
     }
     ReturnPlayerLock();
-}
-
-void TV::PauseAudioUntilBuffered()
-{
-    emit PauseAudioUntilReady();
 }
 
 /// This handles all custom events
