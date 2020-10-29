@@ -104,6 +104,10 @@ void MythPlayerUI::EventLoop()
     if (m_fileChanged)
         FileChanged();
 
+    // Check if visualiser is wanted on first start and after video change
+    if (m_checkAutoVisualise)
+        AutoVisualise(!m_videoDim.isEmpty());
+
     // recreate the osd if a reinit was triggered by another thread
     if (m_reinitOsd)
         ReinitOSD();
@@ -381,7 +385,16 @@ void MythPlayerUI::ChangeSpeed()
 void MythPlayerUI::ReinitVideo(bool ForceUpdate)
 {
     MythPlayer::ReinitVideo(ForceUpdate);
-    AutoVisualise(!m_videoDim.isEmpty());
+
+    // Signal to the main thread to reinit OSD
+    m_reinitOsd = true;
+
+    // Signal to main thread to reinit subtitles
+    if (m_textDisplayMode)
+        EnableSubtitles(true);
+
+    // Signal to the main thread to check auto visualise
+    m_checkAutoVisualise = true;
 }
 
 void MythPlayerUI::VideoStart()

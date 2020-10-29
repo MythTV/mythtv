@@ -91,6 +91,8 @@ void MythPlayerVisualiserUI::EnableVisualiser(bool Enable, bool Toggle, const QS
 */
 void MythPlayerVisualiserUI::AutoVisualise(bool HaveVideo)
 {
+    m_checkAutoVisualise = false;
+
     if (HaveVideo || !m_audio.HasAudioIn() || m_defaultVisualiser.isEmpty())
         return;
 

@@ -41,9 +41,10 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
     virtual int64_t GetTotalSeconds(bool HonorCutList, int Divisor = 1000) const;
 
     OSD    m_osd;
-    QMutex m_osdLock  { QMutex::Recursive };
-    bool   m_browsing { false };
-    bool   m_editing  { false };
+    QMutex m_osdLock   { QMutex::Recursive };
+    bool   m_browsing  { false };
+    bool   m_editing   { false };
+    bool   m_reinitOsd { false }; // Set in the decoder thread
 
   private:
     Q_DISABLE_COPY(MythPlayerOverlayUI)

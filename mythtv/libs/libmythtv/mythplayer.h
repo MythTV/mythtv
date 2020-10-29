@@ -500,9 +500,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     CC608Reader m_cc608;
     CC708Reader m_cc708;
 
-    // OSD stuff
-    bool    m_reinitOsd                   {false};
-
     // Audio stuff
     AudioPlayer      m_audio;
 

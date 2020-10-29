@@ -313,17 +313,10 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
             SetErrored(tr("Failed to reinitialize video output"));
             return;
         }
-
-        // Signal to the main thread to reinit OSD
-        m_reinitOsd = true;
     }
 
     if (!aspect_only)
         ClearAfterSeek();
-
-    // Signal to main thread to reinit subtitles
-    if (m_textDisplayMode)
-        EnableSubtitles(true);
 }
 
 void MythPlayer::SetKeyframeDistance(int keyframedistance)

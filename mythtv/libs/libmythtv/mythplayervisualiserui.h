@@ -27,6 +27,8 @@ class MTV_PUBLIC MythPlayerVisualiserUI : public MythPlayerVideoUI
     void        RenderVisualiser();
     void        AutoVisualise(bool HaveVideo);
 
+    bool        m_checkAutoVisualise { false };
+
   private:
     void        DestroyVisualiser();
 
