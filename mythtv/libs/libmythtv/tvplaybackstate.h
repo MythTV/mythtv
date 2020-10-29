@@ -17,6 +17,9 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     TVPlaybackState() = default;
 
   signals:
+    // General
+    void UpdateBookmark(bool Clear = false);
+
     // Audio
     void ReinitAudio();
     void ResetAudio();

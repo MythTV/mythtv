@@ -41,6 +41,9 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     m_osdDebugTimer.setInterval(1000);
     connect(&m_osdDebugTimer, &QTimer::timeout, this, &MythPlayerUI::UpdateOSDDebug);
     connect(m_tv, &TV::ChangeOSDDebug, this, &MythPlayerUI::ChangeOSDDebug);
+
+    // Other connections
+    connect(m_tv, &TV::UpdateBookmark, this, &MythPlayerUI::SetBookmark);
 }
 
 bool MythPlayerUI::StartPlaying()

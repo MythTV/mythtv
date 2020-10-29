@@ -32,8 +32,10 @@ class MythBDPlayer : public MythPlayerUI
     bool     SwitchAngle       (int Angle) override;
     bool     PrevAngle         (void) override;
     bool     NextAngle         (void) override;
-    void     SetBookmark       (bool Clear) override;
     uint64_t GetBookmark       (void) override;
+
+  protected slots:
+    void     SetBookmark       (bool Clear) override;
 
   protected:
     void     VideoStart        (void) override;

@@ -4143,25 +4143,20 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
 
 void TV::SetBookmark(bool Clear)
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player)
+    if (Clear)
     {
-        if (Clear)
-        {
-            m_player->SetBookmark(true);
-            emit ChangeOSDMessage(tr("Bookmark Cleared"));
-        }
-        else // if (IsBookmarkAllowed(ctx))
-        {
-            m_player->SetBookmark();
-            osdInfo info;
-            CalcPlayerSliderPosition(info);
-            info.text["title"] = tr("Position");
-            UpdateOSDStatus(info, kOSDFunctionalType_Default, kOSDTimeout_Med);
-            emit ChangeOSDMessage(tr("Bookmark Saved"));
-        }
+        emit UpdateBookmark(true);
+        emit ChangeOSDMessage(tr("Bookmark Cleared"));
     }
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    else // if (IsBookmarkAllowed(ctx))
+    {
+        emit UpdateBookmark();
+        osdInfo info;
+        CalcPlayerSliderPosition(info);
+        info.text["title"] = tr("Position");
+        UpdateOSDStatus(info, kOSDFunctionalType_Default, kOSDTimeout_Med);
+        emit ChangeOSDMessage(tr("Bookmark Saved"));
+    }
 }
 
 bool TV::ActivePostQHandleAction(const QStringList &Actions)

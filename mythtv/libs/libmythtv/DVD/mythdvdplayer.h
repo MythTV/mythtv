@@ -35,7 +35,6 @@ class MythDVDPlayer : public MythPlayerUI
     void     StillFrameCheck(void);
 
   protected:
-    void     SetBookmark(bool Clear = false) override;
     void     ResetPlaying(bool ResetFrames = true) override;
     bool     PrebufferEnoughFrames(int MinBuffers = 0) override;
     void     DecoderPauseCheck(void) override;
@@ -60,6 +59,7 @@ class MythDVDPlayer : public MythPlayerUI
     bool     DoJumpChapter(int Chapter) override;
 
   protected slots:
+    void     SetBookmark(bool Clear = false) override;
     void     DisableCaptions(uint Mode, bool OSDMsg = true) override;
     void     EnableCaptions(uint Mode, bool OSDMsg = true) override;
 

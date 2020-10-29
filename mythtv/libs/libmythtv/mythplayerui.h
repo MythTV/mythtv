@@ -12,11 +12,12 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     Q_OBJECT
 
   public slots:
-    void ChangeOSDDebug();
     void OSDDebugVisibilityChanged(bool Visible);
 
   protected slots:
+    void ChangeOSDDebug();
     void UpdateOSDDebug();
+    virtual void SetBookmark(bool Clear = false);
 
   public:
     MythPlayerUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
@@ -40,7 +41,6 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     void GetCodecDescription(InfoMap& Map);
     bool CanSupportDoubleRate();
     void SetWatched(bool ForceWatched = false);
-    virtual void SetBookmark(bool Clear = false);
 
     // N.B. Editor - keep ringfenced and move into subclass
     void EnableEdit();
