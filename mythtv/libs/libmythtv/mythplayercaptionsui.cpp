@@ -564,6 +564,7 @@ void MythPlayerCaptionsUI::ITVHandleAction(const QString &Action, bool& Handled)
     Handled = m_interactiveTV->OfferKey(Action);
 #else
     Q_UNUSED(Action);
+    Q_UNUSED(Handled);
 #endif
 }
 
