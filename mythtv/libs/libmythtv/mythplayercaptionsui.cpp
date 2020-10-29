@@ -235,6 +235,11 @@ void MythPlayerCaptionsUI::ToggleCaptions()
     SetCaptionsEnabled(!(static_cast<bool>(m_textDisplayMode)));
 }
 
+uint MythPlayerCaptionsUI::GetCaptionMode() const
+{
+    return m_textDisplayMode;
+}
+
 bool MythPlayerCaptionsUI::HasTextSubtitles()
 {
     return m_subReader.HasTextSubtitles();
