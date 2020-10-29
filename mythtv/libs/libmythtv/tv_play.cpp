@@ -3126,9 +3126,9 @@ bool TV::HandleTrackAction(const QString &Action)
     else if (ACTION_DISABLEEXTTEXT == Action)
         emit DisableCaptions(kDisplayTextSubtitle);
     else if (ACTION_ENABLEFORCEDSUBS == Action)
-        m_player->SetAllowForcedSubtitles(true);
+        emit ChangeAllowForcedSubtitles(true);
     else if (ACTION_DISABLEFORCEDSUBS == Action)
-        m_player->SetAllowForcedSubtitles(false);
+        emit ChangeAllowForcedSubtitles(false);
     else if (Action == ACTION_ENABLESUBS)
         emit SetCaptionsEnabled(true, true);
     else if (Action == ACTION_DISABLESUBS)

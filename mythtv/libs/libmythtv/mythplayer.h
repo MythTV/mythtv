@@ -116,7 +116,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     friend class Transcode;
 
   signals:
-    void SignalOSDMessage(const QString& Message);
     void CheckCallbacks();
     void SeekingSlow(int Count);
     void SeekingComplete();
@@ -228,7 +227,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     // in a different language than the rest of the movie, subtitles are
     // forced on even if the user doesn't have them turned on.)
     // These two functions are not thread-safe (UI thread use only).
-    void SetAllowForcedSubtitles(bool allow);
     bool GetAllowForcedSubtitles(void) const { return m_allowForcedSubtitles; }
 
     // LiveTV public stuff

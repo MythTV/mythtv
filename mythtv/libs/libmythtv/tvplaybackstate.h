@@ -31,6 +31,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void SetTrack(uint Type, uint TrackNo); // NOTE Captions as well
 
     // Captions/Interactive
+    void ChangeAllowForcedSubtitles(bool Allow);
     void ToggleCaptions();
     void ToggleCaptionsByType(uint Type);
     void SetCaptionsEnabled(bool Enable, bool UpdateOSD = true);

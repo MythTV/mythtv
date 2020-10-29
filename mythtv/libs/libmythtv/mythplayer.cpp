@@ -704,12 +704,6 @@ void MythPlayer::EnableForcedSubtitles(bool enable)
         m_disableForcedSubtitles = true;
 }
 
-void MythPlayer::SetAllowForcedSubtitles(bool allow)
-{
-    m_allowForcedSubtitles = allow;
-    emit SignalOSDMessage(m_allowForcedSubtitles ? tr("Forced Subtitles On") : tr("Forced Subtitles Off"));
-}
-
 void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
 {
     if (m_decoder)

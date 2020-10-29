@@ -18,6 +18,7 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
 
     // Inbound connections
     connect(m_tv, &TV::SetTrack, this, &MythPlayerCaptionsUI::SetTrack);
+    connect(m_tv, &TV::ChangeAllowForcedSubtitles, this, &MythPlayerCaptionsUI::SetAllowForcedSubtitles);
     connect(m_tv, &TV::ToggleCaptions,  this, &MythPlayerCaptionsUI::ToggleCaptions);
     connect(m_tv, &TV::ToggleCaptionsByType, this, &MythPlayerCaptionsUI::ToggleCaptionsByType);
     connect(m_tv, &TV::SetCaptionsEnabled, this, &MythPlayerCaptionsUI::SetCaptionsEnabled);
@@ -231,6 +232,12 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
         m_prevNonzeroTextDisplayMode = m_textDisplayMode;
     if (UpdateOSD)
         UpdateOSDMessage(msg, kOSDTimeout_Med);
+}
+
+void MythPlayerCaptionsUI::SetAllowForcedSubtitles(bool Allow)
+{
+    m_allowForcedSubtitles = Allow;
+    UpdateOSDMessage(m_allowForcedSubtitles ? tr("Forced Subtitles On") : tr("Forced Subtitles Off"));
 }
 
 void MythPlayerCaptionsUI::ToggleCaptions()
