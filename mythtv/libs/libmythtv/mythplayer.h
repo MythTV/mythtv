@@ -469,11 +469,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     QTime    m_bufferingStart;
     QTime    m_bufferingLastMsg;
 
-    // General Caption/Teletext/Subtitle support
-    uint     m_textDisplayMode            {kDisplayNone};
-    uint     m_prevTextDisplayMode        {kDisplayNone};
-    uint     m_prevNonzeroTextDisplayMode {kDisplayNone};
-
     // Support for analog captions and teletext
     // (i.e. Vertical Blanking Interval (VBI) encoded data.)
     uint     m_vbiMode                    {VBIMode::None}; ///< VBI decoder to use

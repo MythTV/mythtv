@@ -118,7 +118,7 @@ static uint toTrackType(uint Type)
 void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD)
 {
     if (m_textDisplayMode)
-        m_prevNonzeroTextDisplayMode = m_textDisplayMode;
+        m_lastValidTextDisplayMode = m_textDisplayMode;
     m_textDisplayMode &= ~Mode;
     ResetCaptions();
 
@@ -219,7 +219,7 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
 
     m_textDisplayMode = Mode;
     if (m_textDisplayMode)
-        m_prevNonzeroTextDisplayMode = m_textDisplayMode;
+        m_lastValidTextDisplayMode = m_textDisplayMode;
     if (UpdateOSD)
         UpdateOSDMessage(msg, kOSDTimeout_Med);
 }
@@ -276,8 +276,8 @@ void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
         DisableCaptions(origMode, UpdateOSD);
         return;
     }
-    uint mode = HasCaptionTrack(m_prevNonzeroTextDisplayMode) ?
-        m_prevNonzeroTextDisplayMode : NextCaptionTrack(kDisplayNone);
+    uint mode = HasCaptionTrack(m_lastValidTextDisplayMode) ?
+        m_lastValidTextDisplayMode : NextCaptionTrack(kDisplayNone);
     if (origMode != mode)
     {
         DisableCaptions(origMode, false);
@@ -482,7 +482,7 @@ void MythPlayerCaptionsUI::EnableTeletext(int Page)
 {
     QMutexLocker locker(&m_osdLock);
     m_captionsOverlay.EnableTeletext(true, Page);
-    m_prevTextDisplayMode = m_textDisplayMode;
+    m_lastTextDisplayMode = m_textDisplayMode;
     m_textDisplayMode = kDisplayTeletextMenu;
 }
 
@@ -493,8 +493,8 @@ void MythPlayerCaptionsUI::DisableTeletext()
     m_textDisplayMode = kDisplayNone;
 
     // If subtitles were enabled before the teletext menu was displayed then re-enable them
-    if (m_prevTextDisplayMode & kDisplayAllCaptions)
-        EnableCaptions(m_prevTextDisplayMode, false);
+    if (m_lastTextDisplayMode & kDisplayAllCaptions)
+        EnableCaptions(m_lastTextDisplayMode, false);
 }
 
 void MythPlayerCaptionsUI::ResetTeletext()
