@@ -143,9 +143,9 @@ class MythExternControl : public QObject
     void Close(void);
     void StartStreaming(const QString & serial);
     void StopStreaming(const QString & serial, bool silent);
-    void LockTimeout(const QString & serial) const;
-    void HasTuner(const QString & serial) const;
-    void HasPictureAttributes(const QString & serial) const;
+    void LockTimeout(const QString & serial);
+    void HasTuner(const QString & serial);
+    void HasPictureAttributes(const QString & serial);
     void SetBlockSize(const QString & serial, int blksz);
     void TuneChannel(const QString & serial, const QString & channum);
     void TuneStatus(const QString & serial);
