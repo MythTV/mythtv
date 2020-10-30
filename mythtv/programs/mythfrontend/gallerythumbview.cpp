@@ -938,7 +938,7 @@ void GalleryThumbView::UpdateScanProgress(const QString &scanner,
     // Aggregate all running scans
     int currentAgg = 0;
     int totalAgg = 0;
-    for (IntPair scan : m_scanProgress)
+    for (IntPair scan : qAsConst(m_scanProgress))
     {
         currentAgg += scan.first;
         totalAgg   += scan.second;

@@ -138,19 +138,19 @@ MythScreenSaverDBus::MythScreenSaverDBus(QObject *Parent)
 MythScreenSaverDBus::~MythScreenSaverDBus()
 {
     MythScreenSaverDBus::Restore();
-    for (auto * interface : m_dbusPrivateInterfaces)
+    for (auto * interface : qAsConst(m_dbusPrivateInterfaces))
         delete interface;
 }
 
 void MythScreenSaverDBus::Disable()
 {
-    for (auto * interface : m_dbusPrivateInterfaces)
+    for (auto * interface : qAsConst(m_dbusPrivateInterfaces))
         interface->Inhibit();
 }
 
 void MythScreenSaverDBus::Restore()
 {
-    for (auto * interface : m_dbusPrivateInterfaces)
+    for (auto * interface : qAsConst(m_dbusPrivateInterfaces))
         interface->UnInhibit();
 }
 

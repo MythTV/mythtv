@@ -313,7 +313,8 @@ ImageAdapterBase::ImageAdapterBase() :
 {
     // Generate glob list from supported extensions
     QStringList glob;
-    for (const auto& ext : (m_imageFileExt + m_videoFileExt))
+    QStringList allExt = m_imageFileExt + m_videoFileExt;
+    for (const auto& ext : qAsConst(allExt))
         glob << "*." + ext;
 
     // Apply filters to only detect image files
