@@ -202,8 +202,7 @@ void MythUIThemeCache::PruneCacheDir(const QString& dirname)
                 deleted += 1;
                 LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC + QString("%1 Delete %2")
                     .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate)).arg(fi.fileName()));
-                const char * fullname8 = fullname.toLocal8Bit().constData();
-                unlink(fullname8);
+                unlink(qPrintable(fullname));
             }
             else
             {
