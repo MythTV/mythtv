@@ -836,6 +836,9 @@ QString AVCVideoDescriptor::toString() const
 
 QString HEVCVideoDescriptor::toString() const
 {
-    return QString("HEVC Video: ProfileSpace(%1) Tier(%2) ProfileIDC(%3)")
+    QString str = QString("HEVC Video: ProfileSpace(%1) Tier(%2) ProfileIDC(%3)")
         .arg(ProfileSpace()).arg(Tier()).arg(ProfileIDC());
+    str.append(" Dumping\n");
+    str.append(hexdump());
+    return str;
 }
