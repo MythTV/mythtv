@@ -36,6 +36,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     InteractiveTV* GetInteractiveTV() override;
 
   protected slots:
+    void TracksChanged(uint TrackType);
     void SetAllowForcedSubtitles(bool Allow);
     void ToggleCaptions();
     void ToggleCaptionsByType(uint Type);
@@ -67,6 +68,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
 
     MythCaptionsOverlay m_captionsOverlay;
     MythCaptionsState m_captionsState { };
+    bool m_textDesired                { false };
     uint m_textDisplayMode            { kDisplayNone };
     uint m_lastTextDisplayMode        { kDisplayNone };
     uint m_lastValidTextDisplayMode   { kDisplayNone };

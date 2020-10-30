@@ -1025,7 +1025,7 @@ bool DecoderBase::InsertTrack(uint Type, const StreamInfo &Info)
     m_tracks[Type].push_back(Info);
 
     if (m_parent)
-        m_parent->TracksChanged(Type);
+        emit m_parent->SignalTracksChanged(Type);
 
     return true;
 }
@@ -1131,7 +1131,7 @@ int DecoderBase::AutoSelectTrack(uint Type)
             .arg(m_currentTrack[Type]+1).arg(Type).arg(iso639_key_toName(lang)).arg(lang));
 
     if (m_parent && (oldTrack != m_currentTrack[Type]))
-        m_parent->TracksChanged(Type);
+        emit m_parent->SignalTracksChanged(Type);
 
     return selTrack;
 }

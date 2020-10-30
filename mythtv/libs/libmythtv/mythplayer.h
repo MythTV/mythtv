@@ -116,6 +116,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     void SeekingComplete();
     void PauseChanged(bool Paused);
     void RequestResetCaptions();
+    void SignalTracksChanged(uint Type);
 
   public:
     explicit MythPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
@@ -213,7 +214,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual TeletextReader *GetTeletextReader(uint /*id*/=0) { return &m_ttxReader; }
 
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
-    void TracksChanged(uint trackType);
     void EnableSubtitles(bool enable);
     void EnableForcedSubtitles(bool enable);
     bool ForcedSubtitlesFavored(void) const {
@@ -480,7 +480,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
     bool      m_captionsEnabledbyDefault  {false};
-    bool      m_textDesired               {false};
     bool      m_enableCaptions            {false};
     bool      m_disableCaptions           {false};
     bool      m_enableForcedSubtitles     {false};

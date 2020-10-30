@@ -667,20 +667,6 @@ void MythPlayer::DeLimboFrame(MythVideoFrame *frame)
         m_videoOutput->DeLimboFrame(frame);
 }
 
-/** \fn MythPlayer::TracksChanged(uint)
- *  \brief This tries to re-enable captions/subtitles if the user
- *         wants them and one of the captions/subtitles tracks has
- *         changed.
- */
-void MythPlayer::TracksChanged(uint trackType)
-{
-    if (trackType >= kTrackTypeSubtitle &&
-        trackType <= kTrackTypeTeletextCaptions && m_textDesired)
-    {
-        m_enableCaptions = true;
-    }
-}
-
 void MythPlayer::EnableSubtitles(bool enable)
 {
     if (enable)
