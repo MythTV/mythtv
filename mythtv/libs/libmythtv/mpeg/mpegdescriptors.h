@@ -510,11 +510,11 @@ class HEVCVideoDescriptor : public MPEGDescriptor
 
     // the encoding of the following is specified in Rec. ITU-T H.265 | ISO/IEC 23008-2
     // profile_space                     2   2.0
-    uint ProfileSpace(void)       const { return m_data[2]&0xC0 >> 6; }
+    uint ProfileSpace(void)       const { return (m_data[2]&0xC0) >> 6; }
     // tier_flag                         1   2.2
-    bool Tier(void)               const { return ( m_data[2]&0x20 ) != 0; }
+    bool Tier(void)               const { return (m_data[2]&0x20) != 0; }
     // profile_idc                       5   2.3
-    uint ProfileIDC(void)         const { return m_data[2] >> 3; }
+    uint ProfileIDC(void)         const { return m_data[2]&0x1F; }
     // profile_compatibility_indication 32   3.0
     // progressive_source_flag           1   7.0
     // interlaced_source_flag            1   7.1
