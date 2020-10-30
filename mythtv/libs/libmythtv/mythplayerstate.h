@@ -59,7 +59,7 @@ class MTV_PUBLIC MythCaptionsState
 {
   public:
     MythCaptionsState() = default;
-    MythCaptionsState(bool ITV);
+    explicit MythCaptionsState(bool ITV);
 
     bool m_haveITV { false };
 };
