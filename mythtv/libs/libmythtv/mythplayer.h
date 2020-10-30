@@ -105,11 +105,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     friend class CC708Reader;
     friend class CC608Reader;
     friend class MythDecoderThread;
-    friend class DetectLetterbox;
-    friend class TeletextScreen;
-    friend class SubtitleScreen;
-    friend class InteractiveScreen;
-    friend class BDOverlayScreen;
     friend class VideoPerformanceTest;
     // TODO remove these
     friend class TV;
