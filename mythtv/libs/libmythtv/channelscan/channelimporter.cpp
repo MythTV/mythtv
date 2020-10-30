@@ -1768,7 +1768,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
                 QObject::connect(deleteDialog, &MythDialogBox::Closed,
                                  [&](const QString & /*resultId*/, int result)
                                  {
-                                     ret = result;
+                                     ret = result; // clazy:exclude=lambda-in-connect
                                      m_eventLoop.quit();
                                  });
                 popupStack->AddScreen(deleteDialog);
@@ -1843,7 +1843,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
                 QObject::connect(insertDialog, &MythDialogBox::Closed,
                                  [&](const QString & /*resultId*/, int result)
                                  {
-                                     ret = result;
+                                     ret = result; // clazy:exclude=lambda-in-connect
                                      m_eventLoop.quit();
                                  });
 
@@ -1915,7 +1915,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 QObject::connect(updateDialog, &MythDialogBox::Closed,
                                  [&](const QString& /*resultId*/, int result)
                                  {
-                                     ret = result;
+                                     ret = result; // clazy:exclude=lambda-in-connect
                                      m_eventLoop.quit();
                                  });
 
@@ -1982,7 +1982,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         QObject::connect(popup, &MythDialogBox::Closed,
                          [&](const QString & /*resultId*/, int result)
                          {
-                             dc = result;
+                             dc = result; // clazy:exclude=lambda-in-connect
                              m_eventLoop.quit();
                          });
         popupStack->AddScreen(popup);
@@ -2006,7 +2006,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
             QObject::connect(textEdit, &MythTextInputDialog::haveResult,
                              [&](QString result)
                              {
-                                 dc = 0;
+                                 dc = 0; // clazy:exclude=lambda-in-connect
                                  text = std::move(result);
                              });
             QObject::connect(textEdit, &MythTextInputDialog::Exiting,
@@ -2052,7 +2052,7 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
         QObject::connect(popup, &MythDialogBox::Closed,
                          [&](const QString & /*resultId*/, int result)
                          {
-                             dc = result;
+                             dc = result; // clazy:exclude=lambda-in-connect
                              m_eventLoop.quit();
                          });
         popupStack->AddScreen(popup);
@@ -2076,7 +2076,7 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
             QObject::connect(textEdit, &MythTextInputDialog::haveResult,
                              [&](QString result)
                              {
-                                 dc = 0;
+                                 dc = 0; // clazy:exclude=lambda-in-connect
                                  text = std::move(result);
                              });
             QObject::connect(textEdit, &MythTextInputDialog::Exiting,
