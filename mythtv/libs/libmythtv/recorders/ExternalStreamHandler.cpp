@@ -10,6 +10,7 @@
 #include <poll.h>
 #include <sys/ioctl.h>
 #endif
+#include <QtGlobal>
 #ifdef Q_OS_ANDROID
 #include <sys/wait.h>
 #endif

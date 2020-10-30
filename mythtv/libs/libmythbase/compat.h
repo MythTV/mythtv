@@ -7,6 +7,7 @@
 
 #ifdef __cplusplus
 #    include <cstdio>         // for snprintf(), used by inline dlerror()
+#    include <QtGlobal>       // for Q_OS_XXX
 #else
 #    include <stdio.h>        // for snprintf(), used by inline dlerror()
 #endif
