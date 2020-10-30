@@ -33,6 +33,19 @@ MythCaptionsState::MythCaptionsState(bool ITV)
 {
 }
 
+MythNavigationState::MythNavigationState(int CurrentChapter, std::vector<int64_t> ChapterTimes,
+                                         int CurrentTitle,   std::vector<int64_t> TitleDurations, std::vector<QString> TitleNames,
+                                         int CurrentAngle,   std::vector<QString> AngleNames)
+  : m_currentChapter(CurrentChapter),
+    m_chapterTimes(std::move(ChapterTimes)),
+    m_currentTitle(CurrentTitle),
+    m_titleDurations(std::move(TitleDurations)),
+    m_titleNames(std::move(TitleNames)),
+    m_currentAngle(CurrentAngle),
+    m_angleNames(std::move(AngleNames))
+{
+}
+
 MythVideoBoundsState::MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride,
                                            float HorizScale, float VertScale, const QPoint& Move)
   : m_adjustFillMode(AdjustFill),

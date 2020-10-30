@@ -64,6 +64,23 @@ class MTV_PUBLIC MythCaptionsState
     bool m_haveITV { false };
 };
 
+class MTV_PUBLIC MythNavigationState
+{
+  public:
+    MythNavigationState() = default;
+    MythNavigationState(int CurrentChapter, std::vector<int64_t> ChapterTimes,
+                        int CurrentTitle,   std::vector<int64_t> TitleDurations, std::vector<QString> TitleNames,
+                        int CurrentAngle,   std::vector<QString> AngleNames);
+
+    int                  m_currentChapter { 0 };
+    std::vector<int64_t> m_chapterTimes   {   };
+    int                  m_currentTitle   { 0 };
+    std::vector<int64_t> m_titleDurations {   };
+    std::vector<QString> m_titleNames     {   };
+    int                  m_currentAngle   { 0 };
+    std::vector<QString> m_angleNames     {   };
+};
+
 class MTV_PUBLIC MythVideoBoundsState
 {
   public:
