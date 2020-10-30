@@ -29,11 +29,11 @@ class MPUBLIC MythTerminal : public MythScreenType
         { TeardownAll(); MythScreenType::deleteLater(); }
     void Init(void) override; // MythScreenType
     bool Create(void) override; // MythScreenType
+    bool IsDone(void) const;
 
   public slots:
     void Start(void);
     void Kill(void);
-    bool IsDone(void) const;
     void AddText(const QString& _str);
 
   protected slots:

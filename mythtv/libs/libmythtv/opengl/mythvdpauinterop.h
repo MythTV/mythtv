@@ -32,11 +32,11 @@ class MythVDPAUInterop : public MythOpenGLInterop
     static MythVDPAUInterop* Create(MythRenderOpenGL *Context, MythCodecID CodecId);
     vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context, MythVideoColourSpace *ColourSpace,
                                       MythVideoFrame *Frame, FrameScanType Scan) override;
+    bool  IsPreempted(void) const;
 
   public slots:
     void  UpdateColourSpace(bool PrimariesChanged);
     void  DisplayPreempted(void);
-    bool  IsPreempted(void) const;
 
   protected:
     static Type GetInteropType(VideoFrameType Format);
