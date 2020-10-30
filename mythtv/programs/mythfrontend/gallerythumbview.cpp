@@ -76,8 +76,23 @@ public:
         int total = std::accumulate(keys.cbegin(), keys.cend(), 0, add_size);
 
         int progressSize = 0;
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         for (const ImagePtrK & im : m_files.keys())
         {
+            QString newPath = m_files.value(im);
+#elif QT_VERSION < QT_VERSION_CHECK(5,15,0)
+        for (auto it = m_files.constKeyValueBegin();
+             it != m_files.constKeyValueEnd(); it++)
+        {
+            const ImagePtrK & im = (*it).first;
+            QString newPath = (*it).second;
+#else
+        for (auto it = m_files.constKeyValueBegin();
+             it != m_files.constKeyValueEnd(); it++)
+        {
+            const ImagePtrK & im = it->first;
+            QString newPath = it->second;
+#endif
             // Update progress dialog
             if (m_dialog)
             {
@@ -89,7 +104,6 @@ public:
                 QApplication::postEvent(m_dialog, pue);
             }
 
-            QString newPath = m_files.value(im);
             LOG(VB_FILE, LOG_INFO, QString("%2 %3 -> %4")
                 .arg(action, im->m_url, newPath));
 
@@ -924,7 +938,7 @@ void GalleryThumbView::UpdateScanProgress(const QString &scanner,
     // Aggregate all running scans
     int currentAgg = 0;
     int totalAgg = 0;
-    for (IntPair scan : m_scanProgress.values())
+    for (IntPair scan : m_scanProgress)
     {
         currentAgg += scan.first;
         totalAgg   += scan.second;
