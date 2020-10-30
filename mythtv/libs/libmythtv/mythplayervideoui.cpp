@@ -162,27 +162,17 @@ void MythPlayerVideoUI::ReinitOSD()
         }
 
         m_reinitOsd = false;
-        m_osdLock.unlock();
-    }
 
 #ifdef USING_MHEG
-    if (m_videoOutput)
-    {
-        m_osdLock.lock();
-        QRect visible;
-        QRect total;
-        float aspect = NAN;
-        float scaling = NAN;
-        m_videoOutput->GetOSDBounds(total, visible, aspect, scaling, 1.0F);
         if (GetInteractiveTV())
         {
             QMutexLocker locker(&m_itvLock);
             m_interactiveTV->Reinit(total, visible, aspect);
             m_itvVisible = false;
         }
+#endif
         m_osdLock.unlock();
     }
-#endif
 }
 
 void MythPlayerVideoUI::CheckAspectRatio(MythVideoFrame* Frame)
