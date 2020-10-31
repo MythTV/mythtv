@@ -23,8 +23,8 @@ class DescriptorID
     enum
     {
         // MPEG
-        video                       = 0x02,
-        audio                       = 0x03,
+        video_stream                = 0x02,
+        audio_stream                = 0x03,
         hierarchy                   = 0x04,
         registration                = 0x05, /* implemented */
         data_stream_alignment       = 0x06,
@@ -32,10 +32,10 @@ class DescriptorID
         video_window                = 0x08,
         conditional_access          = 0x09, /* implemented */
         iso_639_language            = 0x0A, /* implemented */
-        system_clock                = 0x0B,
+        system_clock                = 0x0B, /* implemented */
         multiplex_buffer_utilization= 0x0C,
         copyright                   = 0x0D,
-        maximum_bitrate             = 0x0E,
+        maximum_bitrate             = 0x0E, /* implemented */
         private_data_indicator      = 0x0F,
         smoothing_buffer            = 0x10,
         std                         = 0x11,
@@ -372,6 +372,35 @@ class MTV_PUBLIC MPEGDescriptor
     QString descrDump(const QString &name) const;
 };
 
+// ISO 13181-1:2019 page 75
+class VideoStreamDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit VideoStreamDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::video_stream) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x02
+    // descriptor_length        8   1.0
+    // multiple_frame_rate_flag 1   2.0
+    bool MultipleFrameRateFlag(void) const { return (m_data[2] & 0x80) != 0; }
+    // frame_rate_code          4   2.1
+    uint FrameRateCode(void) const { return (m_data[2]>>3) & 0x0F; }
+    // MPEG_1_only_flag         1   2.5
+    bool MPEG1OnlyFlag(void) const { return (m_data[2] & 0x04) != 0; }
+    // constrained_parameterflag 1   2.6
+    bool ConstrainedParameterFlag(void) const { return (m_data[2] & 0x02) != 0; }
+    // still_picture_flag        1   2.7
+    bool StillPictureFlag(void) const { return (m_data[2] & 0x01) != 0; }
+    // profile_and_level_indication 8   3.0
+    uint ProfileAndLevelIndication(void) const { return MPEG1OnlyFlag() ? 0 : m_data[3]; }
+    // chroma_format                2   4.0
+    uint ChromaFormat(void) const { return MPEG1OnlyFlag() ? 0 : (m_data[4] >> 6) & 0x03; }
+    // frame_rate_extension_flag    1   4.2
+    bool FrameRateExtensionFlag(void) const { return MPEG1OnlyFlag() ? 0 : (m_data[4] & 0x20) != 0; }
+
+    QString toString() const override; // MPEGDescriptor
+};
+
 // a_52a.pdf p119, Table A1
 class RegistrationDescriptor : public MPEGDescriptor
 {
@@ -438,6 +467,43 @@ class ISO639LanguageDescriptor : public MPEGDescriptor
     QString toString() const override; // MPEGDescriptor
 };
 
+// ISO 13181-1:2019 page 84
+class SystemClockDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit SystemClockDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::system_clock) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x0B
+    // descriptor_length        8   1.0
+    // external_clock_reference_indicator   2   2.0
+    bool ExternalClockReferenceIndicator(void) const { return ( m_data[2]&0x80 ) != 0; }
+    // reserved                 1   2.1
+    // clock_accuracy_integer   6   2.2
+    uint ClockAccuracyInteger(void) const { return m_data[2]&0x3F; }
+    // clock_accuracy_exponent  3   3.0
+    uint ClockAccuracyExponent(void) const { return m_data[3]>>5; }
+    // reserved                 5   3.3
+
+    QString toString() const override; // MPEGDescriptor
+};
+
+// ISO 13181-1:2019 page 86
+class MaximumBitrateDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit MaximumBitrateDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::maximum_bitrate) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x0E
+    // descriptor_length        8   1.0
+    // reserved                 2   2.0
+    // maximum_bitrate         22   2.2
+    uint MaximumBitrate(void) const { return (m_data[2]<<16 | m_data[3]<<8 | m_data[4]) & 0x3FFFFF; }
+
+    QString toString() const override; // MPEGDescriptor
+};
+
 /// ISO 13818-1:2000/Amd.3:2004 page 11
 class AVCVideoDescriptor : public MPEGDescriptor
 {
@@ -445,16 +511,16 @@ class AVCVideoDescriptor : public MPEGDescriptor
     explicit AVCVideoDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::avc_video) { }
     //       Name             bits  loc  expected value
-    // descriptor_tag           8   0.0       0x
+    // descriptor_tag           8   0.0       0x28
     // descriptor_length        8   1.0
     // profile_idc              8   2.0
     uint ProfileIDC(void)         const { return m_data[2]; }
     // constraint_set0_flag     1   3.0
-    bool ConstaintSet0(void)      const { return ( m_data[3]&0x80 ) != 0; }
+    bool ConstraintSet0(void)     const { return ( m_data[3]&0x80 ) != 0; }
     // constraint_set1_flag     1   3.1
-    bool ConstaintSet1(void)      const { return ( m_data[3]&0x40 ) != 0; }
+    bool ConstraintSet1(void)     const { return ( m_data[3]&0x40 ) != 0; }
     // constraint_set2_flag     1   3.2
-    bool ConstaintSet2(void)      const { return ( m_data[3]&0x20 ) != 0; }
+    bool ConstraintSet2(void)     const { return ( m_data[3]&0x20 ) != 0; }
     // AVC_compatible_flags     5   3.3
     uint AVCCompatible(void)      const { return m_data[3]&0x1f; }
     // level_idc                8   4.0

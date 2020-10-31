@@ -420,6 +420,10 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     {
         str = "Invalid Descriptor";
     }
+    else if (DescriptorID::video_stream == DescriptorTag())
+    {
+        SET_STRING(VideoStreamDescriptor);
+    }
     else if (DescriptorID::registration == DescriptorTag())
     {
         SET_STRING(RegistrationDescriptor);
@@ -431,6 +435,14 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     else if (DescriptorID::iso_639_language == DescriptorTag())
     {
         SET_STRING(ISO639LanguageDescriptor);
+    }
+    else if (DescriptorID::system_clock == DescriptorTag())
+    {
+        SET_STRING(SystemClockDescriptor);
+    }
+    else if (DescriptorID::maximum_bitrate == DescriptorTag())
+    {
+        SET_STRING(MaximumBitrateDescriptor);
     }
     else if (DescriptorID::avc_video == DescriptorTag())
     {
@@ -487,6 +499,10 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     else if (DescriptorID::frequency_list == DescriptorTag())
     {
         SET_STRING(FrequencyListDescriptor);
+    }
+    else if (DescriptorID::scrambling == DescriptorTag())
+    {
+        SET_STRING(ScramblingDescriptor);
     }
     //else if (DescriptorID::ancillary_data == DescriptorTag())
     //{
@@ -724,6 +740,15 @@ QString MPEGDescriptor::hexdump(void) const
     return str;
 }
 
+QString VideoStreamDescriptor::toString() const
+{
+    return QString("Video Stream Descriptor: frame_rate(%1) MPEG-1(%2) still_picture(%3) profile(%4)")
+        .arg(FrameRateCode())
+        .arg(MPEG1OnlyFlag())
+        .arg(StillPictureFlag())
+        .arg(ProfileAndLevelIndication());
+}
+
 void RegistrationDescriptor::InitializeDescriptionMap(void)
 {
     QMutexLocker locker(&description_map_lock);
@@ -820,14 +845,29 @@ QString ISO639LanguageDescriptor::toString() const
         .arg(iso639_key_toName(CanonicalLanguageKey()));
 }
 
+QString SystemClockDescriptor::toString() const
+{
+    return QString("System Clock Descriptor: extref(%1) accuracy(%2e-%3 ppm)")
+        .arg(ExternalClockReferenceIndicator())
+        .arg(ClockAccuracyInteger())
+        .arg(ClockAccuracyExponent());
+}
+
+QString MaximumBitrateDescriptor::toString() const
+{
+    return QString("Maximum Bitrate Descriptor: maximum_bitrate(0x%1) %2 Mbits/second")
+        .arg(MaximumBitrate(),6,16,QChar('0'))
+        .arg(MaximumBitrate() * 1.0 * 50 * 8 / 1e6);
+}
+
 QString AVCVideoDescriptor::toString() const
 {
     return QString("AVC Video: IDC prof(%1) IDC level(%2) sets(%3%4%5) "
                    "compat(%6) still(%7) 24hr(%8) FramePacking(%9)")
         .arg(ProfileIDC()).arg(LevelIDC())
-        .arg(static_cast<int>(ConstaintSet0()))
-        .arg(static_cast<int>(ConstaintSet1()))
-        .arg(static_cast<int>(ConstaintSet2()))
+        .arg(static_cast<int>(ConstraintSet0()))
+        .arg(static_cast<int>(ConstraintSet1()))
+        .arg(static_cast<int>(ConstraintSet2()))
         .arg(AVCCompatible())
         .arg(static_cast<int>(AVCStill()))
         .arg(static_cast<int>(AVC24HourPicture()))
