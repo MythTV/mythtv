@@ -172,6 +172,9 @@ void DTVRecorder::ResetForNewFile(void)
     m_durationMap.clear();
     m_durationMapDelta.clear();
 
+    m_primaryVideoCodec = AV_CODEC_ID_NONE;
+    m_primaryAudioCodec = AV_CODEC_ID_NONE;
+
     locker.unlock();
     DTVRecorder::ClearStatistics();
 }
