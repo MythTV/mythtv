@@ -424,9 +424,17 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     {
         SET_STRING(VideoStreamDescriptor);
     }
+    else if (DescriptorID::audio_stream == DescriptorTag())
+    {
+        SET_STRING(AudioStreamDescriptor);
+    }
     else if (DescriptorID::registration == DescriptorTag())
     {
         SET_STRING(RegistrationDescriptor);
+    }
+    else if (DescriptorID::data_stream_alignment == DescriptorTag())
+    {
+        SET_STRING(DataStreamAlignmentDescriptor);
     }
     else if (DescriptorID::conditional_access == DescriptorTag())
     {
@@ -644,7 +652,7 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     // ATSC/SCTE descriptors, range 0x80-0xFE
     else if (DescriptorID::ac3_audio_stream == DescriptorTag())
     {
-        SET_STRING(AudioStreamDescriptor);
+        SET_STRING(AC3AudioStreamDescriptor);
     }
     else if (DescriptorID::caption_service == DescriptorTag())
     {
@@ -742,11 +750,25 @@ QString MPEGDescriptor::hexdump(void) const
 
 QString VideoStreamDescriptor::toString() const
 {
-    return QString("Video Stream Descriptor: frame_rate(%1) MPEG-1(%2) still_picture(%3) profile(%4)")
+    QString str = QString("Video Stream Descriptor: frame_rate(%1) MPEG-1(%2)")
         .arg(FrameRateCode())
-        .arg(MPEG1OnlyFlag())
-        .arg(StillPictureFlag())
-        .arg(ProfileAndLevelIndication());
+        .arg(MPEG1OnlyFlag());
+    if (!MPEG1OnlyFlag())
+    {
+        str.append(QString(" still_picture(%1) profile(%2)")
+            .arg(StillPictureFlag())
+            .arg(ProfileAndLevelIndication()));
+    }
+    return str;
+}
+
+QString AudioStreamDescriptor::toString() const
+{
+    return QString("Audio Stream Descriptor: free_format(%1) ID(%2) layer(%3) variable_rate(%4)")
+        .arg(FreeFormatFlag())
+        .arg(ID())
+        .arg(Layer())
+        .arg(VariableRateAudioIndicator());
 }
 
 void RegistrationDescriptor::InitializeDescriptionMap(void)
@@ -830,6 +852,12 @@ QString RegistrationDescriptor::toString() const
         msg2 = "Unknown, see http://www.smpte-ra.org/mpegreg/mpegreg.html";
 
     return msg + msg2;
+}
+
+QString DataStreamAlignmentDescriptor::toString() const
+{
+    return QString("Data Stream Alignment Descriptor: alignment_type(%1)")
+        .arg(AlignmentType());
 }
 
 QString ConditionalAccessDescriptor::toString() const

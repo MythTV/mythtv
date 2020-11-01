@@ -203,10 +203,10 @@ class ComponentNameDescriptor : public MPEGDescriptor
 
 
 // a_52a.pdf p120, Table A2
-class AudioStreamDescriptor : public MPEGDescriptor
+class AC3AudioStreamDescriptor : public MPEGDescriptor
 {
   public:
-    explicit AudioStreamDescriptor(const unsigned char *data, int len = 300) :
+    explicit AC3AudioStreamDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::ac3_audio_stream) { }
     // descriptor_tag                        8   0.0   0x81
     // sample_rate_code                      3   2.0
@@ -305,7 +305,7 @@ class AudioStreamDescriptor : public MPEGDescriptor
         return QString("TODO");
     }
     // for(i=0; i<N; i++) {
-    //   additional_info[i] N×8 bslbf
+    //   additional_info[i] Nx8 bslbf
     // }
 
     QString toString() const override; // MPEGDescriptor

@@ -401,6 +401,28 @@ class VideoStreamDescriptor : public MPEGDescriptor
     QString toString() const override; // MPEGDescriptor
 };
 
+// ISO 13181-1:2019 page 77
+class AudioStreamDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit AudioStreamDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::audio_stream) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x03
+    // descriptor_length        8   1.0
+    // free_format_flag         1   2.0
+    bool FreeFormatFlag(void) const { return (m_data[2] & 0x80) != 0; }
+    // ID                       1   2.1
+    bool ID(void) const { return (m_data[2] & 0x40) != 0; }
+    // layer                    2   2.2
+    uint Layer(void) const { return (m_data[2] >> 4) & 0x03; }
+    // variable_rate_audio_indicator 1   2.4
+    bool VariableRateAudioIndicator(void) const { return (m_data[2] & 0x08) != 0; }
+    // reserved                      3   2.5
+
+    QString toString() const override; // MPEGDescriptor
+};
+
 // a_52a.pdf p119, Table A1
 class RegistrationDescriptor : public MPEGDescriptor
 {
@@ -431,6 +453,21 @@ class RegistrationDescriptor : public MPEGDescriptor
     static QMutex                description_map_lock;
     static bool                  description_map_initialized;
     static QMap<QString,QString> description_map;
+};
+
+// ISO 13181-1:2019 page 79
+class DataStreamAlignmentDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit DataStreamAlignmentDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::data_stream_alignment) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x06
+    // descriptor_length        8   1.0
+    // alignment_type           2   2.0
+    uint AlignmentType(void) const { return m_data[2]; }
+
+    QString toString() const override; // MPEGDescriptor
 };
 
 class ConditionalAccessDescriptor : public MPEGDescriptor
