@@ -3984,6 +3984,7 @@ void DVBConfigurationGroup::Save(void)
 // -----------------------
 // SAT>IP configuration
 // -----------------------
+#ifdef USING_SATIP
 SatIPConfigurationGroup::SatIPConfigurationGroup
         (CaptureCard& a_parent, CardType &a_cardtype) :
     m_parent(a_parent)
@@ -4164,3 +4165,4 @@ SatIPDeviceAttribute::SatIPDeviceAttribute(const QString& label, const QString& 
     setLabel(label);
     setHelpText(helptext);
 };
+#endif // USING_SATIP

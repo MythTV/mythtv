@@ -221,7 +221,7 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
     {
         nCardType = SatIP::toDVBInputType(CardUtil::GetVideoDevice(cardid));
     }
-#endif
+#endif // USING_SATIP
 
     clearSelections();
 

@@ -117,12 +117,13 @@ static CardUtil::INPUT_TYPES get_cardtype(uint sourceid)
             else if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
                 nType = CardUtil::DVBT2;
         }
-
+#if USING_SATIP
         if (nType == CardUtil::SATIP)
         {
             QString deviceid = CardUtil::GetVideoDevice(cardid);
             nType = SatIP::toDVBInputType(deviceid);
         }
+#endif // USING_SATIP
 
         if ((CardUtil::ERROR_OPEN    == nType) ||
             (CardUtil::ERROR_UNKNOWN == nType) ||
