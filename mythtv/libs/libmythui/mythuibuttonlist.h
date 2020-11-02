@@ -43,11 +43,11 @@ class MUI_PUBLIC MythUIButtonListItem
     template <typename SLOT>
     MythUIButtonListItem(typename std::enable_if<FunctionPointerTest<SLOT>::MemberFunction, MythUIButtonList *>::type lbtype,
                          const QString& text, SLOT slot, int listPosition = -1)
-        : MythUIButtonListItem(lbtype, text, QVariant::fromValue(static_cast<MythUICallbackMF>(slot)), listPosition) { };
+        : MythUIButtonListItem(lbtype, text, QVariant::fromValue(static_cast<MythUICallbackMF>(slot)), listPosition) { }
     template <typename SLOT>
     MythUIButtonListItem(typename std::enable_if<FunctionPointerTest<SLOT>::MemberConstFunction, MythUIButtonList *>::type lbtype,
                          const QString& text, SLOT slot, int listPosition = -1)
-        : MythUIButtonListItem(lbtype, text, QVariant::fromValue(static_cast<MythUICallbackMFc>(slot)), listPosition) { };
+        : MythUIButtonListItem(lbtype, text, QVariant::fromValue(static_cast<MythUICallbackMFc>(slot)), listPosition) { }
     virtual ~MythUIButtonListItem();
 
     MythUIButtonList *parent() const;
@@ -123,8 +123,8 @@ class MUI_PUBLIC MythUIButtonListItem
     QString         m_fontState;
     MythImage      *m_image         {nullptr};
     QString         m_imageFilename;
-    bool            m_checkable;
-    CheckState      m_state;
+    bool            m_checkable     {false};
+    CheckState      m_state         {CantCheck};
     QVariant        m_data          {0};
     bool            m_showArrow     {false};
     bool            m_isVisible     {false};
