@@ -3815,7 +3815,9 @@ bool TV::DiscMenuHandleAction(const QStringList& Actions) const
         if (frame)
             pts = static_cast<int64_t>(frame->m_timecode  * 90);
     }
-    return m_playerContext.m_buffer->HandleAction(Actions, pts);
+    if (m_playerContext.m_buffer)
+        return m_playerContext.m_buffer->HandleAction(Actions, pts);
+    return false;
 }
 
 bool TV::ActiveHandleAction(const QStringList &Actions,
