@@ -703,18 +703,6 @@ void VideoBuffers::Remove(BufferType Type, MythVideoFrame *Frame)
         m_finished.remove(Frame);
 }
 
-void VideoBuffers::Requeue(BufferType Dest, BufferType Source, int Count)
-{
-    QMutexLocker locker(&m_globalLock);
-    Count = (Count <= 0) ? Size(Source) : Count;
-    for (uint i=0; i<(uint)Count; i++)
-    {
-        MythVideoFrame *frame = Dequeue(Source);
-        if (frame)
-            Enqueue(Dest, frame);
-    }
-}
-
 void VideoBuffers::SafeEnqueue(BufferType Type, MythVideoFrame* Frame)
 {
     if (!Frame)

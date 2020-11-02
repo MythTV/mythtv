@@ -71,7 +71,6 @@ class MTV_PUBLIC VideoBuffers
     MythVideoFrame *Dequeue(BufferType Type);
     MythVideoFrame *Head(BufferType Type);
     MythVideoFrame *Tail(BufferType Type);
-    void Requeue(BufferType Dest, BufferType Source, int Count = 1);
     void Enqueue(BufferType Type, MythVideoFrame* Frame);
     void SafeEnqueue(BufferType Type, MythVideoFrame* Frame);
     void Remove(BufferType Type, MythVideoFrame *Frame);
