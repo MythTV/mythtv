@@ -1038,6 +1038,10 @@ void MythDisplay::DebugModes() const
 */
 void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
 {
+#ifdef USING_QTWEBENGINE
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+#endif
+
     // Set the default surface format. Explicitly required on some platforms.
     QSurfaceFormat format;
     format.setAlphaBufferSize(0);
@@ -1097,9 +1101,6 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
             setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
         }
     }
-#endif
-#ifdef Q_OS_ANDROID
-    //QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
 
     // Ignore desktop scaling
