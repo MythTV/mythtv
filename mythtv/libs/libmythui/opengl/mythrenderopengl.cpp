@@ -552,6 +552,15 @@ void MythRenderOpenGL::SetWidget(QWidget *Widget)
         native->windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
 #endif
 
+#ifdef USING_QTWEBENGINE
+    auto * globalcontext = QOpenGLContext::globalShareContext();
+    if (globalcontext)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Using global shared OpenGL context");
+        setShareContext(globalcontext);
+    }
+#endif
+
     if (!create())
         LOG(VB_GENERAL, LOG_CRIT, LOC + "Failed to create OpenGLContext!");
     else
