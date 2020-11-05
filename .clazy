@@ -1,0 +1,10 @@
+// Base level
+level1
+
+// Disable these level0 checks
+no-overloaded-signal
+no-qstring-arg
+ 
+// Disable these level1 checks
+no-qproperty-without-notify
+no-non-pod-global-static
