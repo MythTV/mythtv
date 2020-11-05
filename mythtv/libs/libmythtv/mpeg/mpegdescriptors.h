@@ -396,7 +396,7 @@ class VideoStreamDescriptor : public MPEGDescriptor
     // chroma_format                2   4.0
     uint ChromaFormat(void) const { return MPEG1OnlyFlag() ? 0 : (m_data[4] >> 6) & 0x03; }
     // frame_rate_extension_flag    1   4.2
-    bool FrameRateExtensionFlag(void) const { return MPEG1OnlyFlag() ? 0 : (m_data[4] & 0x20) != 0; }
+    bool FrameRateExtensionFlag(void) const { return MPEG1OnlyFlag() ? false : (m_data[4] & 0x20) != 0; }
 
     QString toString() const override; // MPEGDescriptor
 };
