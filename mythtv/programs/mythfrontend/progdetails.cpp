@@ -621,7 +621,7 @@ void ProgDetails::loadPage(void)
 
     query.prepare("SELECT genre FROM programgenres "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
-                  "AND relevance > 0 ORDER BY relevance;");
+                  "AND relevance <> '0' ORDER BY relevance;");
     query.bindValue(":CHANID",    m_progInfo.GetChanID());
     query.bindValue(":STARTTIME", m_progInfo.GetScheduledStartTime());
 
