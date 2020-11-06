@@ -302,7 +302,6 @@ bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
         Close();
 
     QString keyfile = QString("%1/KEYDB.cfg").arg(GetConfDir());
-    const char *keyfilepath = keyfile.toLatin1().data();
 
     if (filename.startsWith("myth:") && MythCDROM::inspectImage(filename) != MythCDROM::kUnknown)
     {
@@ -322,7 +321,7 @@ bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     }
     else
     {
-        m_bdnav = bd_open(filename.toLocal8Bit().data(), keyfilepath);
+        m_bdnav = bd_open(filename.toLocal8Bit().data(), qPrintable(keyfile));
     }
 
     if (!m_bdnav)
@@ -397,7 +396,7 @@ bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
     if (regioncode > 0)
         bd_set_player_setting(m_bdnav, BLURAY_PLAYER_SETTING_REGION_CODE, regioncode);
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 as keyfile...").arg(QString(keyfilepath)));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using %1 as keyfile...").arg(keyfile));
 
     // Return an index of relevant titles (excludes dupe clips + titles)
     LOG(VB_GENERAL, LOG_INFO, LOC + "Retrieving title list (please wait).");
