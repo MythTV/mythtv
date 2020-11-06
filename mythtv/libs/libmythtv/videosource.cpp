@@ -3994,7 +3994,7 @@ SatIPConfigurationGroup::SatIPConfigurationGroup
     FillDeviceList();
 
     m_friendlyName = new SatIPDeviceAttribute(tr("Friendly name"), tr("Friendly name of the Sat>IP server"));
-    m_tunerType    = new SatIPDeviceAttribute(tr("Tuner type"),    tr("Tuner type of the selected tuner"));
+    m_tunerType    = new SatIPDeviceAttribute(tr("Tuner type"),    tr("Type of the selected tuner"));
     m_tunerIndex   = new SatIPDeviceAttribute(tr("Tuner index"),   tr("Index of the tuner on the Sat>IP server"));
     m_deviceId     = new SatIPDeviceID(m_parent);
 
@@ -4025,11 +4025,11 @@ void SatIPConfigurationGroup::FillDeviceList(void)
     for (const auto & dev : qAsConst(devs))
     {
         QStringList devparts = dev.split(" ");
-        const QString& id = devparts.at(0);
-        const QString& name = devparts.at(1);
-        const QString& ip = devparts.at(2);
-        const QString& tunerno = devparts.at(3);
-        const QString& tunertype = devparts.at(4);
+        const QString& id = devparts.value(0);
+        const QString& name = devparts.value(1);
+        const QString& ip = devparts.value(2);
+        const QString& tunerno = devparts.value(3);
+        const QString& tunertype = devparts.value(4);
 
         SatIPDevice device;
         device.m_deviceId = id;

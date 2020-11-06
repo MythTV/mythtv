@@ -220,6 +220,7 @@ void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
 
     if (m_tunerType == DTVTunerType::kTunerTypeDVBC)
     {
+        qry.append(QString("fe=%1").arg(m_frontend+1));
         qry.append(QString("freq=%1").arg(SatIP::freq(tuning.m_frequency)));
         qry.append(QString("sr=%1").arg(tuning.m_symbolRate / 1000)); // symbolrate in ksymb/s
         qry.append("msys=dvbc");
@@ -227,6 +228,7 @@ void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
     }
     else if (m_tunerType == DTVTunerType::kTunerTypeDVBT || m_tunerType == DTVTunerType::kTunerTypeDVBT2)
     {
+        qry.append(QString("fe=%1").arg(m_frontend+1));
         qry.append(QString("freq=%1").arg(SatIP::freq(tuning.m_frequency)));
         qry.append(QString("bw=%1").arg(SatIP::bw(tuning.m_bandwidth)));
         qry.append(QString("msys=%1").arg(SatIP::msys(tuning.m_modSys)));
@@ -237,6 +239,7 @@ void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
     }
     else if (m_tunerType == DTVTunerType::kTunerTypeDVBS1 || m_tunerType == DTVTunerType::kTunerTypeDVBS2)
     {
+        qry.append(QString("fe=%1").arg(m_frontend+1));
         qry.append(QString("freq=%1").arg(SatIP::freq(tuning.m_frequency*1000)));   // frequency in Hz
         qry.append(QString("pol=%1").arg(SatIP::pol(tuning.m_polarity)));
         qry.append(QString("ro=%1").arg(SatIP::ro(tuning.m_rolloff)));
@@ -289,9 +292,10 @@ bool SatIPStreamHandler::Open(void)
 
     // Discover the device using SSDP
     QStringList devinfo = m_device.split(":");
-    if (devinfo.at(0).toUpper() == "UUID")
+    if (devinfo.value(0).toUpper() == "UUID")
     {
-        QString deviceId = QString("uuid:%1").arg(devinfo.at(1));
+        QString deviceId = QString("uuid:%1").arg(devinfo.value(1));
+        m_frontend = devinfo.value(3).toUInt();
 
         QString ip = SatIP::findDeviceIP(deviceId);
         if (ip != nullptr)
