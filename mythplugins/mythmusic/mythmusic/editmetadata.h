@@ -151,9 +151,6 @@ class EditAlbumartDialog : public EditMetadataCommon
     bool keyPressEvent(QKeyEvent *event) override; // EditMetadataCommon
     void customEvent(QEvent *event) override; // MythUIType
 
-  signals:
-    void metadataChanged(void);
-
   protected slots:
     void switchToMetadata(void);
     void showMenu(void);
