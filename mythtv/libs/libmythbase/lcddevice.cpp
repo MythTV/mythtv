@@ -518,8 +518,8 @@ void LCD::setVolumeLevel(float value)
     else if (value > 1.0F)
         value = 1.0F;
 
-    emit
-    sendToServer("SET_VOLUME_LEVEL " + QString().setNum(value));
+    // NOLINTNEXTLINE(readability-misleading-indentation)
+    emit sendToServer("SET_VOLUME_LEVEL " + QString().setNum(value));
 }
 
 void LCD::setupLEDs(int(*LedMaskFunc)(void))
