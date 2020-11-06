@@ -65,7 +65,7 @@ MFileInfo::MFileInfo(const MFileInfo& other)
     QString sgDir = other.storageGroupDir();
     bool isDir    = other.isDir();
     qint64 size   = other.size();
-    init(other.fileName(), sgDir, isDir, size);
+    init(other.filePath(), sgDir, isDir, size);
 }
 
 MFileInfo &MFileInfo::operator=(const MFileInfo &other)
