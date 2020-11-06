@@ -2756,7 +2756,7 @@ void TV::ScheduleStateChange()
         ReturnPlayerLock();
     };
 
-    QTimer::singleShot(0, StateChange);
+    QTimer::singleShot(0, this, StateChange);
 }
 
 void TV::ScheduleInputChange()
@@ -2773,7 +2773,7 @@ void TV::ScheduleInputChange()
         ReturnPlayerLock();
     };
 
-    QTimer::singleShot(0, InputChange);
+    QTimer::singleShot(0, this, InputChange);
 }
 
 void TV::SetErrored()
@@ -9617,7 +9617,7 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
             FillOSDMenuJumpRec();
             ReturnPlayerLock();
         };
-        QTimer::singleShot(0, Jump);
+        QTimer::singleShot(0, this, Jump);
     }
     else if (RunPlaybackBoxPtr)
     {
