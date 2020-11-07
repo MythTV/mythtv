@@ -227,11 +227,12 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
 
         // Discard broken packets
         bool buggy = m_haveCrcBug &&
-        ((TableID::PMT == partial->StreamID()) ||
-         (TableID::PAT == partial->StreamID()));
+            ((TableID::PMT == partial->StreamID()) ||
+             (TableID::PAT == partial->StreamID()));
         if (!buggy && !partial->IsGood())
         {
-            LOG(VB_RECORD, LOG_ERR, LOC + "Discarding broken PSIP packet");
+            LOG(VB_RECORD, LOG_ERR, LOC + QString("Discarding broken PSIP packet on PID 0x%1")
+                .arg(tspacket->PID(),2,16,QChar('0')));
             DeletePartialPSIP(tspacket->PID());
             return nullptr;
         }
@@ -273,9 +274,9 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         if (packetStart > partial->TSSizeInBuffer())
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
+                QString("TSPacket pid(0x%3) ").arg(tspacket->PID(),2,16,QChar('0')) +
                 QString("Discarding broken PSIP packet. ") +
-                QString("Packet with %1 bytes doesn't fit "
-                        "into a buffer of %2 bytes.")
+                QString("Packet with %1 bytes doesn't fit into a buffer of %2 bytes.")
                     .arg(packetStart).arg(partial->TSSizeInBuffer()));
             delete psip;
             psip = nullptr;
@@ -288,7 +289,9 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
     if (partial)
     {
         if (broken)
+        {
             DeletePartialPSIP(tspacket->PID());
+        }
 
         moreTablePackets = false;
         return nullptr; // partial packet is not yet complete.
@@ -1058,7 +1061,7 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
         IsListeningPID(tspacket.PID()) &&
         !IsConditionalAccessPID(tspacket.PID()))
     {
-        HandleTSTables(&tspacket);
+        HandleTSTables(&tspacket);          // Table handling starts here....
     }
 
     return true;
