@@ -98,7 +98,7 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, int cardid, bool &broken)
 
         if (m_pesDataSize >= tlen)
         {
-            m_badPacket = !VerifyCRC();
+            m_badPacket = !VerifyCRC(cardid, packet->PID());
             return true;
         }
     }
@@ -166,6 +166,19 @@ bool PESPacket::VerifyCRC(void) const
         LOG(VB_SIPARSER, LOG_INFO,
             QString("PESPacket: Failed CRC check 0x%1 != 0x%2 "
                     "for StreamID = 0x%3")
+                .arg(CRC(),8,16,QLatin1Char('0')).arg(CalcCRC(),8,16,QLatin1Char('0')).arg(StreamID(),0,16));
+    }
+    return ret;
+}
+
+bool PESPacket::VerifyCRC(int cardid, int pid) const
+{
+    bool ret = !HasCRC() || (CalcCRC() == CRC());
+    if (!ret)
+    {
+        LOG(VB_RECORD, LOG_INFO,
+            QString("PESPacket[%1] pid(0x%2): ").arg(cardid).arg(pid,0,16) +
+            QString("Failed CRC check 0x%1 != 0x%2 for ID = 0x%3")
                 .arg(CRC(),8,16,QLatin1Char('0')).arg(CalcCRC(),8,16,QLatin1Char('0')).arg(StreamID(),0,16));
     }
     return ret;

@@ -239,8 +239,8 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
     {
         LOG(VB_SIPARSER, LOG_ERR,
             QString("PSIPTable: Failed CRC check 0x%1 != 0x%2 "
-                    "for StreamID = 0x%3")
-                .arg(CRC(),0,16).arg(CalcCRC(),0,16).arg(StreamID(),0,16));
+                    "for TableID = 0x%3")
+                .arg(CRC(),0,16).arg(CalcCRC(),0,16).arg(TableID(),0,16));
         return false;
     }
 

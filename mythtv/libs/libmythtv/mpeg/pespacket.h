@@ -212,6 +212,7 @@ class MTV_PUBLIC PESPacket
 
     uint CalcCRC(void) const;
     bool VerifyCRC(void) const;
+    bool VerifyCRC(int cardid, int pid) const;
 
   protected:
     void Finalize() { SetCRC(CalcCRC()); }
