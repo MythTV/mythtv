@@ -1751,7 +1751,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
     DeleteAction action = kDeleteAll;
     if (m_useGui)
     {
-        int ret = -1;
+        m_functorRetval = -1;
         do
         {
             MythScreenStack *popupStack =
@@ -1766,18 +1766,18 @@ ChannelImporter::QueryUserDelete(const QString &msg)
 //                  deleteDialog->AddButton(tr("Handle manually"));
                 deleteDialog->AddButton(tr("Ignore All"));
                 QObject::connect(deleteDialog, &MythDialogBox::Closed, this,
-                                 [&](const QString & /*resultId*/, int result)
+                                 [this](const QString & /*resultId*/, int result)
                                  {
-                                     ret = result; // clazy:exclude=lambda-in-connect
+                                     m_functorRetval = result;
                                      m_eventLoop.quit();
                                  });
                 popupStack->AddScreen(deleteDialog);
 
                 m_eventLoop.exec();
             }
-        } while (ret < 0);
+        } while (m_functorRetval < 0);
 
-        switch (ret)
+        switch (m_functorRetval)
         {
           case 0: action = kDeleteAll;          break;
           case 1: action = kDeleteInvisibleAll; break;
@@ -1827,7 +1827,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
     InsertAction action = kInsertAll;
     if (m_useGui)
     {
-        int ret = -1;
+        m_functorRetval = -1;
         do
         {
             MythScreenStack *popupStack =
@@ -1841,18 +1841,18 @@ ChannelImporter::QueryUserInsert(const QString &msg)
                 insertDialog->AddButton(tr("Insert Manually"));
                 insertDialog->AddButton(tr("Ignore All"));
                 QObject::connect(insertDialog, &MythDialogBox::Closed, this,
-                                 [&](const QString & /*resultId*/, int result)
+                                 [this](const QString & /*resultId*/, int result)
                                  {
-                                     ret = result; // clazy:exclude=lambda-in-connect
+                                     m_functorRetval = result;
                                      m_eventLoop.quit();
                                  });
 
                 popupStack->AddScreen(insertDialog);
                 m_eventLoop.exec();
             }
-        } while (ret < 0);
+        } while (m_functorRetval < 0);
 
-        switch (ret)
+        switch (m_functorRetval)
         {
           case 0: action = kInsertAll;       break;
           case 1: action = kInsertManual;    break;
@@ -1900,7 +1900,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
 
     if (m_useGui)
     {
-        int ret = -1;
+        m_functorRetval = -1;
         do
         {
             MythScreenStack *popupStack =
@@ -1913,18 +1913,18 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 updateDialog->AddButton(tr("Update All"));
                 updateDialog->AddButton(tr("Ignore All"));
                 QObject::connect(updateDialog, &MythDialogBox::Closed, this,
-                                 [&](const QString& /*resultId*/, int result)
+                                 [this](const QString& /*resultId*/, int result)
                                  {
-                                     ret = result; // clazy:exclude=lambda-in-connect
+                                     m_functorRetval = result;
                                      m_eventLoop.quit();
                                  });
 
                 popupStack->AddScreen(updateDialog);
                 m_eventLoop.exec();
             }
-        } while (ret < 0);
+        } while (m_functorRetval < 0);
 
-        switch (ret)
+        switch (m_functorRetval)
         {
           case 0: action = kUpdateAll;       break;
           case 1: action = kUpdateIgnoreAll; break;
@@ -1968,7 +1968,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     MythMainWindow *parent, const QString& title,
     const QString& message, QString &text)
 {
-    int dc = -1;
+    m_functorRetval = -1;
     MythScreenStack *popupStack = parent->GetStack("popup stack");
     auto *popup = new MythDialogBox(title, message, popupStack,
                                     "manualchannelpopup");
@@ -1980,9 +1980,9 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
         QObject::connect(popup, &MythDialogBox::Closed, this,
-                         [&](const QString & /*resultId*/, int result)
+                         [this](const QString & /*resultId*/, int result)
                          {
-                             dc = result; // clazy:exclude=lambda-in-connect
+                             m_functorRetval = result;
                              m_eventLoop.quit();
                          });
         popupStack->AddScreen(popup);
@@ -1995,7 +1995,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     }
 
     // Choice "Edit"
-    if (1 == dc)
+    if (1 == m_functorRetval)
     {
         auto *textEdit =
             new MythTextInputDialog(popupStack,
@@ -2004,13 +2004,13 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         if (textEdit->Create())
         {
             QObject::connect(textEdit, &MythTextInputDialog::haveResult, this,
-                             [&](QString result)
+                             [this,&text](QString result)
                              {
-                                 dc = 0; // clazy:exclude=lambda-in-connect
+                                 m_functorRetval = 0;
                                  text = std::move(result);
                              });
             QObject::connect(textEdit, &MythTextInputDialog::Exiting, this,
-                             [&]()
+                             [this]()
                              {
                                  m_eventLoop.quit();
                              });
@@ -2023,7 +2023,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     }
 
     OkCancelType rval = kOCTCancel;
-    switch (dc) {
+    switch (m_functorRetval) {
         case 0: rval = kOCTOk;        break;
         // NOLINTNEXTLINE(bugprone-branch-clone)
         case 1: rval = kOCTCancel;    break;    // "Edit" is done already
@@ -2037,7 +2037,7 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
     MythMainWindow *parent, const QString& title,
     const QString& message, QString &text)
 {
-    int dc = -1;
+    m_functorRetval = -1;
     MythScreenStack *popupStack = parent->GetStack("popup stack");
     auto *popup = new MythDialogBox(title, message, popupStack,
                                     "resolvechannelpopup");
@@ -2050,9 +2050,9 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
         QObject::connect(popup, &MythDialogBox::Closed, this,
-                         [&](const QString & /*resultId*/, int result)
+                         [this](const QString & /*resultId*/, int result)
                          {
-                             dc = result; // clazy:exclude=lambda-in-connect
+                             m_functorRetval = result;
                              m_eventLoop.quit();
                          });
         popupStack->AddScreen(popup);
@@ -2065,7 +2065,7 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
     }
 
     // Choice "Edit"
-    if (2 == dc)
+    if (2 == m_functorRetval)
     {
         auto *textEdit =
             new MythTextInputDialog(popupStack,
@@ -2074,13 +2074,13 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
         if (textEdit->Create())
         {
             QObject::connect(textEdit, &MythTextInputDialog::haveResult, this,
-                             [&](QString result)
+                             [this,&text](QString result)
                              {
-                                 dc = 0; // clazy:exclude=lambda-in-connect
+                                 m_functorRetval = 0;
                                  text = std::move(result);
                              });
             QObject::connect(textEdit, &MythTextInputDialog::Exiting, this,
-                             [&]()
+                             [this]()
                              {
                                  m_eventLoop.quit();
                              });
@@ -2093,7 +2093,7 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
     }
 
     OkCancelType rval = kOCTCancel;
-    switch (dc) {
+    switch (m_functorRetval) {
         case 0: rval = kOCTOk;        break;
         case 1: rval = kOCTOkAll;     break;
         // NOLINTNEXTLINE(bugprone-branch-clone)
