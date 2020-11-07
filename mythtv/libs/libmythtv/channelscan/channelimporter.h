@@ -14,6 +14,7 @@
 
 // Qt headers
 #include <QMap>
+#include <QObject>
 #include <QString>
 #include <QCoreApplication>
 
@@ -65,9 +66,9 @@ class ChannelImporterUniquenessStats
     uint m_maxAtscMajCnt {0};
 };
 
-class MTV_PUBLIC ChannelImporter
+class MTV_PUBLIC ChannelImporter : public QObject
 {
-    Q_DECLARE_TR_FUNCTIONS(ChannelImporter)
+    Q_OBJECT
 
   public:
     ChannelImporter(bool gui, bool interactive,

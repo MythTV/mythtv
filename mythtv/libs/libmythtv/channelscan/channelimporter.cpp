@@ -1765,7 +1765,7 @@ ChannelImporter::QueryUserDelete(const QString &msg)
                 deleteDialog->AddButton(tr("Set all invisible"));
 //                  deleteDialog->AddButton(tr("Handle manually"));
                 deleteDialog->AddButton(tr("Ignore All"));
-                QObject::connect(deleteDialog, &MythDialogBox::Closed,
+                QObject::connect(deleteDialog, &MythDialogBox::Closed, this,
                                  [&](const QString & /*resultId*/, int result)
                                  {
                                      ret = result; // clazy:exclude=lambda-in-connect
@@ -1840,7 +1840,7 @@ ChannelImporter::QueryUserInsert(const QString &msg)
                 insertDialog->AddButton(tr("Insert All"));
                 insertDialog->AddButton(tr("Insert Manually"));
                 insertDialog->AddButton(tr("Ignore All"));
-                QObject::connect(insertDialog, &MythDialogBox::Closed,
+                QObject::connect(insertDialog, &MythDialogBox::Closed, this,
                                  [&](const QString & /*resultId*/, int result)
                                  {
                                      ret = result; // clazy:exclude=lambda-in-connect
@@ -1912,7 +1912,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
             {
                 updateDialog->AddButton(tr("Update All"));
                 updateDialog->AddButton(tr("Ignore All"));
-                QObject::connect(updateDialog, &MythDialogBox::Closed,
+                QObject::connect(updateDialog, &MythDialogBox::Closed, this,
                                  [&](const QString& /*resultId*/, int result)
                                  {
                                      ret = result; // clazy:exclude=lambda-in-connect
@@ -1979,7 +1979,7 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
         popup->AddButton(tr("Edit"));
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
-        QObject::connect(popup, &MythDialogBox::Closed,
+        QObject::connect(popup, &MythDialogBox::Closed, this,
                          [&](const QString & /*resultId*/, int result)
                          {
                              dc = result; // clazy:exclude=lambda-in-connect
@@ -2003,13 +2003,13 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
                                     FilterNone, false, text);
         if (textEdit->Create())
         {
-            QObject::connect(textEdit, &MythTextInputDialog::haveResult,
+            QObject::connect(textEdit, &MythTextInputDialog::haveResult, this,
                              [&](QString result)
                              {
                                  dc = 0; // clazy:exclude=lambda-in-connect
                                  text = std::move(result);
                              });
-            QObject::connect(textEdit, &MythTextInputDialog::Exiting,
+            QObject::connect(textEdit, &MythTextInputDialog::Exiting, this,
                              [&]()
                              {
                                  m_eventLoop.quit();
@@ -2049,7 +2049,7 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
         popup->AddButton(tr("Edit"));
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
         popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
-        QObject::connect(popup, &MythDialogBox::Closed,
+        QObject::connect(popup, &MythDialogBox::Closed, this,
                          [&](const QString & /*resultId*/, int result)
                          {
                              dc = result; // clazy:exclude=lambda-in-connect
@@ -2073,13 +2073,13 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
                                     FilterNone, false, text);
         if (textEdit->Create())
         {
-            QObject::connect(textEdit, &MythTextInputDialog::haveResult,
+            QObject::connect(textEdit, &MythTextInputDialog::haveResult, this,
                              [&](QString result)
                              {
                                  dc = 0; // clazy:exclude=lambda-in-connect
                                  text = std::move(result);
                              });
-            QObject::connect(textEdit, &MythTextInputDialog::Exiting,
+            QObject::connect(textEdit, &MythTextInputDialog::Exiting, this,
                              [&]()
                              {
                                  m_eventLoop.quit();
