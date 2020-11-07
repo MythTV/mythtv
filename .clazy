@@ -1,3 +1,7 @@
+// For the full list of available checks:
+//
+//   https://github.com/KDE/clazy#list-of-checks
+
 // Base level
 level1
 
