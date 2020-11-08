@@ -237,7 +237,7 @@ NetworkControl::NetworkControl() :
     gCoreContext->addListener(this);
 
     connect(this, &ServerPool::newConnection,
-            this, &NetworkControl::newConnection);
+            this, &NetworkControl::newControlConnection);
 }
 
 NetworkControl::~NetworkControl(void)
@@ -362,7 +362,7 @@ void NetworkControl::deleteClient(NetworkControlClient *ncc)
                 "locate specified NetworkControlClient").arg((long long)ncc));
 }
 
-void NetworkControl::newConnection(QTcpSocket *client)
+void NetworkControl::newControlConnection(QTcpSocket *client)
 {
     QString welcomeStr;
 
