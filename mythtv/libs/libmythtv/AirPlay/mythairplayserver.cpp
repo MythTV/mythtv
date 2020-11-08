@@ -453,7 +453,7 @@ void MythAirplayServer::Start(void)
 
     // join the dots
     connect(this, &ServerPool::newConnection,
-            this, &MythAirplayServer::newConnection);
+            this, &MythAirplayServer::newAirplayConnection);
 
     // start listening for connections
     // try a few ports in case the default is in use
@@ -518,7 +518,7 @@ void MythAirplayServer::Stop(void)
     Teardown();
 }
 
-void MythAirplayServer::newConnection(QTcpSocket *client)
+void MythAirplayServer::newAirplayConnection(QTcpSocket *client)
 {
     QMutexLocker locker(m_lock);
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")

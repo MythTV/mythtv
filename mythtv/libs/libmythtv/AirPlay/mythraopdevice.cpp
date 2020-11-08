@@ -121,7 +121,7 @@ void MythRAOPDevice::Start(void)
 
     // join the dots
     connect(this, &ServerPool::newConnection,
-            this, &MythRAOPDevice::newConnection);
+            this, &MythRAOPDevice::newRaopConnection);
 
     m_basePort = m_setupPort;
     m_setupPort = tryListeningPort(m_setupPort, RAOP_PORT_RANGE);
@@ -203,7 +203,7 @@ void MythRAOPDevice::TVPlaybackStarting(void)
     DeleteAllClients(nullptr);
 }
 
-void MythRAOPDevice::newConnection(QTcpSocket *client)
+void MythRAOPDevice::newRaopConnection(QTcpSocket *client)
 {
     QMutexLocker locker(m_lock);
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New connection from %1:%2")

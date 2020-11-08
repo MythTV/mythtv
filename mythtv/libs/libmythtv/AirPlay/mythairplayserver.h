@@ -80,7 +80,7 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
   private slots:
     void Start();
     void Stop();
-    void newConnection(QTcpSocket *client);
+    void newAirplayConnection(QTcpSocket *client);
     void deleteConnection();
     void read(void);
     void timeout(void);
