@@ -5853,6 +5853,7 @@ void TV::AddKeyToInputQueue(char Key)
     {
         inputStr = tr("Seek:", "seek to location") + " " + inputStr;
     }
+    // NOLINTNEXTLINE(readability-misleading-indentation)
     emit ChangeOSDText(OSD_WIN_INPUT, {{ "osd_number_entry", inputStr}}, kOSDTimeout_Med);
 
     // Commit the channel if it is complete and smart changing is enabled.
