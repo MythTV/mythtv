@@ -64,7 +64,7 @@ class SatIPStreamHandler : public StreamHandler
   private:
     DTVTunerType m_tunerType;
     QString      m_device;
-    uint         m_frontend;
+    uint         m_frontend       {UINT_MAX};
     QUrl         m_baseurl;
     QUrl         m_tuningurl;
     QUrl         m_oldtuningurl;
