@@ -505,7 +505,7 @@ public:
     uint m_id;
 };
 
-void RotorPosMap::valueChanged(StandardSetting *setting)
+void RotorPosMap::newValue(StandardSetting *setting)
 {
     auto *posEdit = dynamic_cast<RotorPosTextEdit*>(setting);
     if (posEdit == nullptr)
@@ -532,7 +532,7 @@ void RotorPosMap::PopulateList(void)
                                  pos,
                                  posval);
         connect(posEdit, qOverload<StandardSetting*>(&StandardSetting::valueChanged),
-                this,    &RotorPosMap::valueChanged);
+                this,    &RotorPosMap::newValue);
         addChild(posEdit);
     }
 }

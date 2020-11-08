@@ -61,7 +61,7 @@ class RotorPosMap : public GroupSetting
     void Save(void) override; // StandardSetting
 
   private slots:
-    void valueChanged(StandardSetting *setting);
+    void newValue(StandardSetting *setting);
 
   protected:
     void PopulateList(void);
