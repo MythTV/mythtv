@@ -10,6 +10,8 @@
 #include <thread> // for sleep_for
 #include <utility>
 
+using namespace std::chrono_literals;
+
 #define LOC QString("UPnPScan: ")
 #define ERR QString("UPnPScan error: ")
 
@@ -429,7 +431,7 @@ void UPNPScanner::Start()
     // create our watchdog timer (checks for stale servers)
     m_watchdogTimer = new QTimer(this);
     connect(m_watchdogTimer, &QTimer::timeout, this, &UPNPScanner::CheckStatus);
-    m_watchdogTimer->start(1000 * 10); // every 10s
+    m_watchdogTimer->start(10s);
 
     // avoid connecting to the master backend
     m_masterHost = gCoreContext->GetMasterServerIP();
@@ -756,7 +758,7 @@ void UPNPScanner::ScheduleUpdate(void)
 {
     m_lock.lock();
     if (m_updateTimer && !m_updateTimer->isActive())
-        m_updateTimer->start(200);
+        m_updateTimer->start(200ms);
     m_lock.unlock();
 }
 

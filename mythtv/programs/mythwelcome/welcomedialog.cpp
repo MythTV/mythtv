@@ -4,6 +4,9 @@
 // POSIX
 #include <unistd.h>
 
+// C++
+#include <chrono>
+
 // qt
 #include <QCoreApplication>
 #include <QKeyEvent>
@@ -108,7 +111,7 @@ void WelcomeDialog::startFrontendClick(void)
     m_frontendIsRunning = true;
 
     // this makes sure the button appears to click properly
-    QTimer::singleShot(500, this, &WelcomeDialog::startFrontend);
+    QTimer::singleShot(500ms, this, &WelcomeDialog::startFrontend);
 }
 
 void WelcomeDialog::checkAutoStart(void)
@@ -155,7 +158,7 @@ void WelcomeDialog::customEvent(QEvent *e)
             else
             {
                 // we can't query the backend from inside a customEvent
-                QTimer::singleShot(500, this, &WelcomeDialog::updateRecordingList);
+                QTimer::singleShot(500ms, this, &WelcomeDialog::updateRecordingList);
                 setPendingRecListUpdate(true);
             }
         }
@@ -173,7 +176,7 @@ void WelcomeDialog::customEvent(QEvent *e)
             }
             else
             {
-                QTimer::singleShot(500, this, &WelcomeDialog::updateScheduledList);
+                QTimer::singleShot(500ms, this, &WelcomeDialog::updateScheduledList);
                 setPendingSchedUpdate(true);
             }
         }
@@ -571,7 +574,7 @@ bool WelcomeDialog::checkConnectionToServer(void)
     if (bRes)
         m_updateStatusTimer->start(UPDATE_STATUS_INTERVAL);
     else
-        m_updateStatusTimer->start(5000);
+        m_updateStatusTimer->start(5s);
 
     return bRes;
 }

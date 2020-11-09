@@ -18,6 +18,9 @@
         - ?/7/2010 - Add streaming support
 */
 
+// C++ headers
+#include <chrono>
+
 // QT headers
 #include <QObject>
 #include <QIODevice>
@@ -49,6 +52,8 @@ extern "C" {
 #include "libavformat/avio.h"
 #include "libavutil/opt.h"
 }
+
+using namespace std::chrono_literals;
 
 /****************************************************************************/
 
@@ -294,7 +299,7 @@ bool avfDecoder::initialize()
         m_mdataTimer->setSingleShot(false);
         connect(m_mdataTimer, &QTimer::timeout, this, &avfDecoder::checkMetatdata);
 
-        m_mdataTimer->start(500);
+        m_mdataTimer->start(500ms);
 
         // we don't get metadata updates for MMS streams so grab the metadata from the headers
         if (getURL().startsWith("mmsh://"))

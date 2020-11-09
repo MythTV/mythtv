@@ -1,3 +1,4 @@
+#include <chrono>
 
 // Own header
 #include "websocket.h"
@@ -10,12 +11,14 @@
 #include "websocket_extensions/websocket_mythevent.h"
 
 // QT headers
-#include <QThread>
-#include <QTcpSocket>
-#include <QSslCipher>
 #include <QCryptographicHash>
+#include <QSslCipher>
+#include <QTcpSocket>
+#include <QThread>
 #include <QtCore>
 #include <QtGlobal>
+
+using namespace std::chrono_literals;
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -214,7 +217,7 @@ void WebSocketWorker::SetupSocket()
     connect(m_socket, &QAbstractSocket::disconnected, this, &WebSocketWorker::CloseConnection);
 
     // Setup heartbeat
-    m_heartBeat->setInterval(20000); // 20 second
+    m_heartBeat->setInterval(20s);
     m_heartBeat->setSingleShot(false);
     connect(m_heartBeat, &QTimer::timeout, this, &WebSocketWorker::SendHeartBeat);
 }

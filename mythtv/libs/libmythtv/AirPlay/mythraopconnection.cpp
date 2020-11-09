@@ -1,3 +1,5 @@
+#include <unistd.h> // for usleep()
+
 #include <chrono>
 #include <utility>
 
@@ -20,7 +22,7 @@
 
 #include "mythmainwindow.h"
 
-#include <unistd.h> // for usleep()
+using namespace std::chrono_literals;
 
 #define LOC QString("RAOP Conn: ")
 #define MAX_PACKET_SIZE  2048
@@ -37,8 +39,6 @@ QString MythRAOPConnection::g_rsaLastError;
 #define AUDIO_RESEND     0x56
 #define AUDIO_DATA       0x60
 #define FIRSTAUDIO_DATA  (0x60 | 0x80)
-
-using namespace std::chrono_literals;
 
 // Size (in ms) of audio buffered in audio card
 #define AUDIOCARD_BUFFER 500
@@ -216,7 +216,7 @@ bool MythRAOPConnection::Init(void)
     // start the watchdog timer to auto delete the client after a period of inactivity
     m_watchdogTimer = new QTimer();
     connect(m_watchdogTimer, &QTimer::timeout, this, &MythRAOPConnection::timeout);
-    m_watchdogTimer->start(10000);
+    m_watchdogTimer->start(10s);
 
     m_dequeueAudioTimer = new QTimer();
     connect(m_dequeueAudioTimer, &QTimer::timeout, this, &MythRAOPConnection::ProcessAudio);
@@ -233,7 +233,7 @@ void MythRAOPConnection::udpDataReady(QByteArray buf, const QHostAddress& /*peer
 {
     // restart the idle timer
     if (m_watchdogTimer)
-        m_watchdogTimer->start(10000);
+        m_watchdogTimer->start(10s);
 
     if (!m_audio || !m_codec || !m_codecContext)
         return;
@@ -925,7 +925,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         if (!tags.contains("Authorization"))
         {
             // 60 seconds to enter password.
-            m_watchdogTimer->start(60000);
+            m_watchdogTimer->start(1min);
             FinishAuthenticationResponse(m_textStream, m_socket, tags["CSeq"]);
             return;
         }
@@ -1707,7 +1707,7 @@ void MythRAOPConnection::StartAudioTimer(void)
 
     m_audioTimer = new QTimer();
     connect(m_audioTimer, &QTimer::timeout, this, &MythRAOPConnection::audioRetry);
-    m_audioTimer->start(5000);
+    m_audioTimer->start(5s);
 }
 
 void MythRAOPConnection::StopAudioTimer(void)

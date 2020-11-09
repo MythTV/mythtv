@@ -3,6 +3,7 @@
 // race on startup?
 // http date format and locale
 
+#include <chrono>
 #include <vector>
 
 #include <QTcpSocket>
@@ -26,6 +27,8 @@
 
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
+
+using namespace std::chrono_literals;
 
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = nullptr;
 MThread*           MythAirplayServer::gMythAirplayServerThread = nullptr;
@@ -502,7 +505,7 @@ void MythAirplayServer::Start(void)
             connect(m_serviceRefresh, &QTimer::timeout, this, &MythAirplayServer::timeout);
         }
         // Will force a Bonjour refresh in two seconds
-        m_serviceRefresh->start(2000);
+        m_serviceRefresh->start(2s);
     }
     m_valid = true;
 }
@@ -510,7 +513,7 @@ void MythAirplayServer::Start(void)
 void MythAirplayServer::timeout(void)
 {
     m_bonjour->ReAnnounceService();
-    m_serviceRefresh->start(10000);
+    m_serviceRefresh->start(10s);
 }
 
 void MythAirplayServer::Stop(void)

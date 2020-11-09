@@ -9,6 +9,7 @@
 #include "config.h"
 
 // C++ includes
+#include <chrono>
 #include <iostream>
 #include <memory>
 
@@ -52,14 +53,16 @@
 #ifdef HAVE_CDIO
 #include "cddecoder.h"
 #endif // HAVE_CDIO
+#include "editmetadata.h"
 #include "encoder.h"
-#include "vorbisencoder.h"
-#include "lameencoder.h"
 #include "flacencoder.h"
 #include "genres.h"
-#include "editmetadata.h"
-#include "mythlogging.h"
+#include "lameencoder.h"
 #include "musicutils.h"
+#include "mythlogging.h"
+#include "vorbisencoder.h"
+
+using namespace std::chrono_literals;
 
 #ifdef HAVE_CDIO
 // libparanoia compatibility
@@ -630,7 +633,7 @@ bool Ripper::Create(void)
     m_qualityList->SetValueByData(QVariant::fromValue(
                         gCoreContext->GetNumSetting("DefaultRipQuality", 1)));
 
-    QTimer::singleShot(500, this, &Ripper::startScanCD);
+    QTimer::singleShot(500ms, this, &Ripper::startScanCD);
 
     return true;
 }

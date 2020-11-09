@@ -12,9 +12,10 @@
  *
  * ============================================================ */
 
+#include <chrono>
+#include <cstdlib>
 #include <iostream>
 #include <unistd.h>
-#include <cstdlib>
 
 // qt
 #include <QTimer>
@@ -27,11 +28,13 @@
 #include <mythuitext.h>
 
 // zoneminder
-#include "zmconsole.h"
 #include "zmclient.h"
+#include "zmconsole.h"
 
-const int STATUS_UPDATE_TIME = 1000 * 10; // update the status every 10 seconds
-const int TIME_UPDATE_TIME = 1000 * 1;    // update the time every 1 second
+using namespace std::chrono_literals;
+
+constexpr std::chrono::milliseconds STATUS_UPDATE_TIME { 10s }; // update the status every 10 seconds
+constexpr std::chrono::milliseconds TIME_UPDATE_TIME   {  1s }; // update the time every 1 second
 
 bool FunctionDialog::Create()
 {
@@ -160,7 +163,7 @@ bool ZMConsole::Create(void)
     SetFocusWidget(m_monitorList);
 
     m_timeTimer->start(TIME_UPDATE_TIME);
-    m_updateTimer->start(100);
+    m_updateTimer->start(100ms);
 
     updateTime();
 

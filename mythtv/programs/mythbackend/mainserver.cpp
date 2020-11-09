@@ -83,6 +83,8 @@
 // mythbackend headers
 #include "backendcontext.h"
 
+using namespace std::chrono_literals;
+
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
  */
@@ -310,7 +312,7 @@ MainServer::MainServer(bool master, int port,
     m_deferredDeleteTimer = new QTimer(this);
     connect(m_deferredDeleteTimer, &QTimer::timeout,
             this, &MainServer::deferredDeleteSlot);
-    m_deferredDeleteTimer->start(30 * 1000);
+    m_deferredDeleteTimer->start(30s);
 
     if (sched)
     {
@@ -1915,7 +1917,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         pbs->setBlockShutdown(false);
 
-        m_autoexpireUpdateTimer->start(1000);
+        m_autoexpireUpdateTimer->start(1s);
 
         gCoreContext->SendSystemEvent(
             QString("SLAVE_CONNECTED HOSTNAME %1").arg(commands[2]));
@@ -8216,7 +8218,7 @@ void MainServer::reconnectTimeout(void)
     m_playbackList.push_back(m_masterServer);
     m_sockListLock.unlock();
 
-    m_autoexpireUpdateTimer->start(1000);
+    m_autoexpireUpdateTimer->start(1s);
 }
 
 // returns true, if a client (slavebackends are not counted!)

@@ -1,6 +1,8 @@
 
 #include "miniplayer.h"
 
+#include <chrono>
+
 // mythtv
 #include <mythcontext.h>
 #include <mythmainwindow.h>
@@ -11,6 +13,9 @@
 #include "decoder.h"
 
 #include <QTimer>
+
+using namespace std::chrono_literals;
+
 
 MiniPlayer::MiniPlayer(MythScreenStack *parent)
           : MusicCommon(parent, nullptr, "music_miniplayer")
@@ -55,7 +60,7 @@ bool MiniPlayer::Create(void)
         return false;
     }
 
-    m_displayTimer->start(10000);
+    m_displayTimer->start(10s);
 
     BuildFocusList();
 

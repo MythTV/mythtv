@@ -1,9 +1,8 @@
-#include <memory>
-
-#include <set>
-#include <map>
+#include <chrono>
 #include <functional>   //binary_negate
+#include <map>
 #include <memory>
+#include <set>
 
 #include <QApplication>
 #include <QTimer>
@@ -52,6 +51,8 @@
 #include "videometadatasettings.h"
 // for ImageDLFailureEvent
 #include "metadataimagedownload.h"
+
+using namespace std::chrono_literals;
 
 #define LOC_MML QString("Manual Metadata Lookup: ")
 
@@ -332,7 +333,7 @@ namespace
 
                     m_fanart->SetFilename(filename);
                     m_fanartTimer.setSingleShot(true);
-                    m_fanartTimer.start(300);
+                    m_fanartTimer.start(300ms);
 
                     if (wasActive)
                         m_itemsPast++;

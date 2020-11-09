@@ -1,4 +1,5 @@
 // c
+#include <chrono>
 #include <cstdlib>
 #include <unistd.h>
 
@@ -19,8 +20,10 @@
 #include <remotefile.h>
 
 // mytharchive
-#include "videoselector.h"
 #include "archiveutil.h"
+#include "videoselector.h"
+
+using namespace std::chrono_literals;
 
 VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
               :MythScreenType(parent, "VideoSelector"),
@@ -483,7 +486,7 @@ void VideoSelector::getVideoList(void)
     }
     else
     {
-        QTimer::singleShot(100, this, &VideoSelector::cancelPressed);
+        QTimer::singleShot(100ms, this, &VideoSelector::cancelPressed);
         return;
     }
 

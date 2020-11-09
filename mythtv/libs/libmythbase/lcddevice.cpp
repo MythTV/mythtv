@@ -9,6 +9,7 @@
 
 // C++ headers
 #include <cerrno>
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <fcntl.h>
@@ -32,6 +33,8 @@
 #include "mythsocket.h"
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
+
+using namespace std::chrono_literals;
 
 
 #define LOC QString("LCDdevice: ")
@@ -201,7 +204,7 @@ void LCD::sendToServerSlot(const QString &someText)
         // Ack, connection to server has been severed try to re-establish the
         // connection
         m_retryTimer->setSingleShot(false);
-        m_retryTimer->start(10000);
+        m_retryTimer->start(10s);
         LOG(VB_GENERAL, LOG_ERR,
             "Connection to LCDServer died unexpectedly. "
             "Trying to reconnect every 10 seconds...");
@@ -527,7 +530,7 @@ void LCD::setupLEDs(int(*LedMaskFunc)(void))
     m_getLEDMask = LedMaskFunc;
     // update LED status every 10 seconds
     m_ledTimer->setSingleShot(false);
-    m_ledTimer->start(10000);
+    m_ledTimer->start(10s);
 }
 
 void LCD::outputLEDs()

@@ -49,14 +49,17 @@
  *  tasks and long duration tasks, without any special knowledge of behavior.
  */
 
+#include <chrono>
+#include <utility>
 
 #include <QMutexLocker>
-#include <utility>
 
 #include "mythevent.h"
 #include "mythdbcon.h"
 #include "housekeeper.h"
 #include "mythcorecontext.h"
+
+using namespace std::chrono_literals;
 
 /** \class HouseKeeperTask
  *  \ingroup housekeeper
@@ -574,7 +577,7 @@ HouseKeeper::HouseKeeper(void)
 {
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &HouseKeeper::Run);
-    m_timer->setInterval(60000);
+    m_timer->setInterval(1min);
     m_timer->setSingleShot(false);
 }
 

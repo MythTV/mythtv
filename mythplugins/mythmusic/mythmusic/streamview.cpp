@@ -1,3 +1,5 @@
+// C++ headers
+#include <chrono>
 #include <iostream>
 #include <cstdlib>
 
@@ -24,10 +26,12 @@
 #include <mythcoreutil.h>
 
 // mythmusic
-#include "musicdata.h"
 #include "musiccommon.h"
-#include "streamview.h"
+#include "musicdata.h"
 #include "musicplayer.h"
+#include "streamview.h"
+
+using namespace std::chrono_literals;
 
 StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
     : MusicCommon(parent, parentScreen, "streamview")
@@ -986,7 +990,7 @@ void SearchStream::updateStreams(void)
     if (m_updateTimer.isActive())
         m_updateTimer.stop();
 
-    m_updateTimer.start(500);
+    m_updateTimer.start(500ms);
 }
 
 void SearchStream::doUpdateStreams(void)

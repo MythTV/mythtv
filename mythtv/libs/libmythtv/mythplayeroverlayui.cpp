@@ -1,7 +1,11 @@
+#include <chrono>
+
 // MythTV
 #include "tv_play.h"
 #include "livetvchain.h"
 #include "mythplayeroverlayui.h"
+
+using namespace std::chrono_literals;
 
 #define LOC QString("PlayerOverlay: ")
 
@@ -13,7 +17,7 @@ MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, Pla
     // Register our state type for signalling
     qRegisterMetaType<MythOverlayState>();
 
-    m_positionUpdateTimer.setInterval(999);
+    m_positionUpdateTimer.setInterval(999ms);
     connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerOverlayUI::UpdateOSDPosition);
     connect(this, &MythPlayerOverlayUI::OverlayStateChanged, m_tv, &TV::OverlayStateChanged);
     connect(m_tv, &TV::ChangeOSDMessage, this, QOverload<const QString&>::of(&MythPlayerOverlayUI::UpdateOSDMessage));

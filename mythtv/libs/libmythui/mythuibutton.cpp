@@ -1,3 +1,4 @@
+#include <chrono>
 
 #include "mythuibutton.h"
 
@@ -10,11 +11,13 @@
 #include "mythlogging.h"
 
 // MythUI headers
+#include "mythgesture.h"
 #include "mythmainwindow.h"
 #include "mythuigroup.h"
 #include "mythuistatetype.h"
 #include "mythuitext.h"
-#include "mythgesture.h"
+
+using namespace std::chrono_literals;
 
 MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
@@ -175,7 +178,7 @@ void MythUIButton::Push(bool lock)
     SetState("pushed");
 
     if (!lock && !m_lockable)
-        m_clickTimer->start(500);
+        m_clickTimer->start(500ms);
 
     emit Clicked();
 }

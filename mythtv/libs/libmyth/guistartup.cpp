@@ -25,6 +25,9 @@
 
 #include "langsettings.h"
 
+// C++
+#include <chrono>
+
 // qt
 #include <QEventLoop>
 #include <QDir>
@@ -51,6 +54,8 @@
 #include "mythdialogbox.h"
 
 #include "guistartup.h"
+
+using namespace std::chrono_literals;
 
 GUIStartup::GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop)
                  :MythScreenType(parent, "GUIStartup"),
@@ -129,7 +134,7 @@ void GUIStartup::setTotal(int total)
 {
     delete m_progressTimer;
     m_progressTimer = new MythTimer(MythTimer::kStartRunning);
-    m_timer.start(500);
+    m_timer.start(500ms);
     m_total = total*1000;
     m_progressBar->SetTotal(m_total);
     SetFocusWidget(m_dummyButton);

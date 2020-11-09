@@ -1,8 +1,12 @@
+#include <chrono>
+
 #include "galleryinfo.h"
 
+#include "imagemetadata.h"
 #include "mythcoreutil.h"
 #include "mythdate.h"
-#include "imagemetadata.h"
+
+using namespace std::chrono_literals;
 
 
 //! The exif/video tags comprising the Basic file info
@@ -49,7 +53,7 @@ InfoList::InfoList(MythScreenType &screen)
     : m_screen(screen), m_mgr(ImageManagerFe::getInstance())
 {
     m_timer.setSingleShot(true);
-    m_timer.setInterval(1000);
+    m_timer.setInterval(1s);
     connect(&m_timer, &QTimer::timeout, this, &InfoList::Clear);
 }
 

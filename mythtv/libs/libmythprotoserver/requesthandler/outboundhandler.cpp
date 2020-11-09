@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include <QTimer>
 #include <QString>
 #include <QStringList>
@@ -12,6 +14,8 @@
 
 #include "requesthandler/outboundhandler.h"
 
+using namespace std::chrono_literals;
+
 OutboundRequestHandler::OutboundRequestHandler(void) 
 {
     m_timer.setSingleShot(true);
@@ -22,7 +26,7 @@ void OutboundRequestHandler::ConnectToMaster(void)
 {
     m_timer.stop();
     if (!DoConnectToMaster())
-        m_timer.start(5000);
+        m_timer.start(5s);
 }
 
 bool OutboundRequestHandler::DoConnectToMaster(void)

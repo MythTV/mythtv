@@ -6,6 +6,7 @@
 
 // C++ headers
 #include <algorithm>
+#include <chrono>
 #include <utility>
 #include <vector>
 
@@ -172,7 +173,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     connect(d->m_gestureTimer, &QTimer::timeout, this, &MythMainWindow::mouseTimeout);
     d->m_hideMouseTimer = new QTimer(this);
     d->m_hideMouseTimer->setSingleShot(true);
-    d->m_hideMouseTimer->setInterval(3000); // 3 seconds
+    d->m_hideMouseTimer->setInterval(3s);
     connect(d->m_hideMouseTimer, &QTimer::timeout, this, &MythMainWindow::HideMouseTimeout);
 
     // MythSignalingTimer is scheduled for the scrap heap (it
@@ -714,7 +715,7 @@ void MythMainWindow::Init(bool mayReInit)
 
     // SetWidget may move the widget into a new screen.
     m_display->SetWidget(this);
-    QTimer::singleShot(1000, this, &MythMainWindow::DelayedAction);
+    QTimer::singleShot(1s, this, &MythMainWindow::DelayedAction);
 
     // Ensure we have latest screen bounds if we have moved
     UpdateScreenSettings(m_display);

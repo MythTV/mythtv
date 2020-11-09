@@ -1,3 +1,5 @@
+#include <chrono>
+
 // MythTV
 #include "mythsystemevent.h"
 #include "audiooutput.h"
@@ -10,6 +12,8 @@
 #include "tv_play.h"
 #include "livetvchain.h"
 #include "mythplayerui.h"
+
+using namespace std::chrono_literals;
 
 #define LOC QString("PlayerUI: ")
 
@@ -38,7 +42,7 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     });
 
     // Setup OSD debug
-    m_osdDebugTimer.setInterval(1000);
+    m_osdDebugTimer.setInterval(1s);
     connect(&m_osdDebugTimer, &QTimer::timeout, this, &MythPlayerUI::UpdateOSDDebug);
     connect(m_tv, &TV::ChangeOSDDebug, this, &MythPlayerUI::ChangeOSDDebug);
 

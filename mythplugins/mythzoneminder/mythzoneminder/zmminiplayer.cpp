@@ -1,6 +1,12 @@
 
 #include "zmminiplayer.h"
 
+// C++
+#include <chrono>
+
+// Qt
+#include <QTimer>
+
 // mythtv
 #include <mythcontext.h>
 #include <lcddevice.h>
@@ -10,7 +16,7 @@
 // mythzoneminder
 #include "zmclient.h"
 
-#include <QTimer>
+using namespace std::chrono_literals;
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -46,7 +52,7 @@ void ZMMiniPlayer::timerTimeout(void)
         Monitor *mon = ZMClient::get()->getMonitorByID(m_alarmMonitor);
         if (mon && (mon->state == ALARM || mon->state == ALERT))
         {
-            m_displayTimer->start(10000);
+            m_displayTimer->start(10s);
             return;
         }
     }
@@ -59,7 +65,7 @@ bool ZMMiniPlayer::Create(void)
     if (!ZMLivePlayer::Create())
         return false;
 
-    m_displayTimer->start(10000);
+    m_displayTimer->start(10s);
 
     gCoreContext->addListener(this);
 
@@ -101,7 +107,7 @@ void ZMMiniPlayer::customEvent (QEvent* event)
 
             // restart the display timer on any notification messages if it is active
             if (m_displayTimer->isActive())
-                m_displayTimer->start(10000);
+                m_displayTimer->start(10s);
         }
     }
 

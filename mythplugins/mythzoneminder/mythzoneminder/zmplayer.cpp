@@ -16,6 +16,7 @@
 #include <cstdlib>
 
 // C++
+#include <chrono>
 #include <iostream>
 
 // Qt
@@ -30,8 +31,10 @@
 #include <mythdate.h>
 
 // zoneminder
-#include "zmplayer.h"
 #include "zmclient.h"
+#include "zmplayer.h"
+
+using namespace std::chrono_literals;
 
 ZMPlayer::ZMPlayer(MythScreenStack *parent, const char *name,
                    std::vector<Event *> *eventList, size_t *currentEvent)
@@ -246,7 +249,7 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
                 }
 
                 if (!m_paused)
-                    m_frameTimer->start(1000 / 100);
+                    m_frameTimer->start(10ms);
 
             }
         }
@@ -267,7 +270,7 @@ void ZMPlayer::playPressed()
 
     if (m_paused)
     {
-        m_frameTimer->start(1000/25);
+        m_frameTimer->start(40ms);
         m_paused = false;
         if (m_playButton)
             m_playButton->SetText(tr("Pause"));
@@ -302,7 +305,7 @@ void ZMPlayer::deletePressed()
 
         if (!m_eventList->empty())
         {
-            m_frameTimer->start(1000 / 25);
+            m_frameTimer->start(40ms);
             m_paused = false;
         }
     }
@@ -394,7 +397,7 @@ void ZMPlayer::getFrame(void)
                 m_frameTimer->start((int) (1000 * delta));
             }
             else
-                m_frameTimer->start(1000 / 100);
+                m_frameTimer->start(10ms);
         }
     }
 }

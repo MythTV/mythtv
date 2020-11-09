@@ -1,6 +1,7 @@
-#include <unistd.h>
-#include <iostream>
+#include <chrono>
 #include <cstdlib>
+#include <iostream>
+#include <unistd.h>
 
 // qt
 #include <QKeyEvent>
@@ -20,6 +21,8 @@
 // mytharchive
 #include "archiveutil.h"
 #include "logviewer.h"
+
+using namespace std::chrono_literals;
 
 void showLogViewer(void)
 {
@@ -231,7 +234,7 @@ void LogViewer::updateClicked(void)
         if (m_logList->GetCount() > 0)
             m_updateTimer->start(m_updateTime * 1000);
         else
-            m_updateTimer->start(500);
+            m_updateTimer->start(500ms);
     }
 }
 

@@ -1,6 +1,8 @@
 
 #include "idlescreen.h"
 
+#include <chrono>
+
 #include <QTimer>
 
 #include <mythcontext.h>
@@ -94,7 +96,7 @@ bool IdleScreen::CheckConnectionToServer(void)
     if (bRes)
         m_updateScreenTimer->start(UPDATE_INTERVAL);
     else
-        m_updateScreenTimer->start(5000);
+        m_updateScreenTimer->start(5s);
 
     return bRes;
 }
@@ -286,7 +288,7 @@ void IdleScreen::customEvent(QEvent* event)
 
             if (!PendingSchedUpdate())
             {
-                QTimer::singleShot(50, this, &IdleScreen::UpdateScheduledList);
+                QTimer::singleShot(50ms, this, &IdleScreen::UpdateScheduledList);
                 SetPendingSchedUpdate(true);
             }
         }

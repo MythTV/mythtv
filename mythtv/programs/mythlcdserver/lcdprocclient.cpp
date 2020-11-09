@@ -105,7 +105,7 @@ LCDProcClient::LCDProcClient(LCDServer *lparent)
 
     connect( m_checkConnectionsTimer, &QTimer::timeout, this,
             &LCDProcClient::checkConnections);
-    m_checkConnectionsTimer->start(10000);
+    m_checkConnectionsTimer->start(10s);
 
     connect( m_recStatusTimer, &QTimer::timeout, this, &LCDProcClient::outputRecStatus);
 
@@ -803,7 +803,7 @@ void LCDProcClient::startTime()
     setPriority("Time", MEDIUM);
     setPriority("RecStatus", LOW);
 
-    m_timeTimer->start(1000);
+    m_timeTimer->start(1s);
     outputTime();
     m_activeScreen = "Time";
     m_isTimeVisible = true;
@@ -987,14 +987,14 @@ void LCDProcClient::formatScrollingWidgets()
         // We're done, no scrolling
         return;
 
-    m_preScrollWTimer->start(2000);
+    m_preScrollWTimer->start(2s);
 }
 
 void LCDProcClient::beginScrollingWidgets()
 {
     m_scrollPosition = m_lcdWidth;
     m_preScrollWTimer->stop();
-    m_scrollWTimer->start(400);
+    m_scrollWTimer->start(400ms);
 }
 
 void LCDProcClient::scrollWidgets()
@@ -1260,7 +1260,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
                 if (curItem->ItemName().length()  > (int)( m_lcdWidth -lcdStartCol))
                 {
                     m_menuPreScrollTimer->setSingleShot(true);
-                    m_menuPreScrollTimer->start(2000);
+                    m_menuPreScrollTimer->start(2s);
                     curItem->setScroll(true);
                 }
                 else
@@ -1367,7 +1367,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
     }
 
     m_menuPreScrollTimer->setSingleShot(true);
-    m_menuPreScrollTimer->start(2000);
+    m_menuPreScrollTimer->start(2s);
 }
 
 void LCDProcClient::beginScrollingMenuText()
@@ -1405,7 +1405,7 @@ void LCDProcClient::beginScrollingMenuText()
 
     // Can get segfaults if we try to start a timer thats already running. . .
     m_menuScrollTimer->stop();
-    m_menuScrollTimer->start(250);
+    m_menuScrollTimer->start(250ms);
 }
 
 void LCDProcClient::scrollMenuText()
@@ -1452,7 +1452,7 @@ void LCDProcClient::scrollMenuText()
                 {
                     // Scroll slower second and subsequent times through
                     m_menuScrollTimer->stop();
-                    m_menuScrollTimer->start(500);
+                    m_menuScrollTimer->start(500ms);
                     curItem->setScrollPos(curItem->getIndent());
                 }
 
@@ -1528,7 +1528,7 @@ void LCDProcClient::scrollMenuText()
     {
         // Scroll slower second and subsequent times through
         m_menuScrollTimer->stop();
-        m_menuScrollTimer->start(500);
+        m_menuScrollTimer->start(500ms);
         m_menuScrollPosition = 0;
 
         it = m_lcdMenuItems->begin();
@@ -1929,7 +1929,7 @@ void LCDProcClient::outputRecStatus(void)
         setPriority("Time", MEDIUM);
         setPriority("RecStatus", LOW);
 
-        m_timeTimer->start(1000);
+        m_timeTimer->start(1s);
         m_scrollWTimer->stop();
         m_scrollListTimer->stop();
         m_recStatusTimer->start(LCD_TIME_TIME);
@@ -2402,7 +2402,7 @@ void LCDProcClient::customEvent(QEvent *e)
 
                 // we can't query the backend from inside the customEvent
                 // so fire the recording list update from a timer
-                m_updateRecInfoTimer->start(500);
+                m_updateRecInfoTimer->start(500ms);
             }
         }
     }
@@ -2421,7 +2421,7 @@ void LCDProcClient::updateRecordingList(void)
                 "LCDProcClient: Cannot get recording status "
                 "- is the master server running?\n\t\t\t"
                 "Will retry in 30 seconds");
-            QTimer::singleShot(30 * 1000, this, &LCDProcClient::updateRecordingList);
+            QTimer::singleShot(30s, this, &LCDProcClient::updateRecordingList);
 
             // If we can't get the recording status and we're showing
             // it, switch back to time. Maybe it would be even better

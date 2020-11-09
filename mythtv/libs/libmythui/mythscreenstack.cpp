@@ -5,10 +5,13 @@
 #include "mythevent.h"
 
 #include <cassert>
+#include <chrono>
 
 #include <QCoreApplication>
-#include <QTimer>
 #include <QString>
+#include <QTimer>
+
+using namespace std::chrono_literals;
 
 const int kFadeVal = 20;
 
@@ -210,7 +213,7 @@ void MythScreenStack::ScheduleInitIfNeeded(void)
         !m_topScreen->IsLoading())
     {
         m_initTimerStarted = true;
-        QTimer::singleShot(100, this, &MythScreenStack::doInit);
+        QTimer::singleShot(100ms, this, &MythScreenStack::doInit);
     }
 }
 

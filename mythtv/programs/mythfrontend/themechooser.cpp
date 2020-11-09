@@ -2,6 +2,9 @@
 // Theme Chooser headers
 #include "themechooser.h"
 
+// C++ headers
+#include <chrono>
+
 // Qt headers
 #include <QCoreApplication>
 #include <QRegExp>
@@ -21,16 +24,18 @@
 #include "storagegroup.h"
 
 // LibMythUI headers
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
-#include "mythuiprogressbar.h"
 #include "mythdialogbox.h"
-#include "mythuibuttonlist.h"
+#include "mythmainwindow.h"
 #include "mythscreenstack.h"
-#include "mythuistatetype.h"
+#include "mythuibuttonlist.h"
 #include "mythuigroup.h"
+#include "mythuihelper.h"
 #include "mythuiimage.h"
+#include "mythuiprogressbar.h"
+#include "mythuistatetype.h"
 #include "mythuitext.h"
+
+using namespace std::chrono_literals;
 
 #define LOC      QString("ThemeChooser: ")
 #define LOC_WARN QString("ThemeChooser, Warning: ")
@@ -1033,16 +1038,16 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
     if (qEnvironmentVariableIsSet("MYTHTV_DEBUGMDM"))
     {
         LOG(VB_GENERAL, LOG_INFO, "Checking for theme updates every minute");
-        m_updateTimer->start(60 * 1000); // Run once a minute
+        m_updateTimer->start(1min);
     }
     else
     {
         LOG(VB_GENERAL, LOG_INFO, "Checking for theme updates every hour");
-        m_updateTimer->start(60 * 60 * 1000); // Run once an hour
+        m_updateTimer->start(1h);
     }
 
     // Run once 15 seconds from now
-    QTimer::singleShot(15 * 1000, this, &ThemeUpdateChecker::checkForUpdate);
+    QTimer::singleShot(15s, this, &ThemeUpdateChecker::checkForUpdate);
 }
 
 ThemeUpdateChecker::~ThemeUpdateChecker()

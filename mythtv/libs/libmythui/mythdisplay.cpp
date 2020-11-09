@@ -1,3 +1,5 @@
+#include <chrono>
+
 //Qt
 #include <QTimer>
 #include <QThread>
@@ -13,6 +15,8 @@
 #include "mythdisplay.h"
 #include "mythegl.h"
 #include "mythmainwindow.h"
+
+using namespace std::chrono_literals;
 
 #ifdef USING_DBUS
 #include "platforms/mythdisplaymutter.h"
@@ -971,7 +975,7 @@ void MythDisplay::WaitForScreenChange()
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(m_screen, &QScreen::geometryChanged, &loop, &QEventLoop::quit);
     // 500ms maximum wait
-    timer.start(500);
+    timer.start(500ms);
     loop.exec();
 }
 
@@ -991,7 +995,7 @@ void MythDisplay::WaitForNewScreen()
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(m_widget->windowHandle(), &QWindow::screenChanged, &loop, &QEventLoop::quit);
     // 500ms maximum wait
-    timer.start(500);
+    timer.start(500ms);
     loop.exec();
 }
 

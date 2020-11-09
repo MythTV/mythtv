@@ -5,6 +5,8 @@
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
+using namespace std::chrono_literals;
+
 #define LOC QString("HTTPTSSH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 // BUFFER_SIZE is a multiple of TS_SIZE
@@ -156,7 +158,7 @@ bool HTTPReader::DownloadStream(const QUrl& url)
 
     // Configure timeout and size limit
     m_timer.setSingleShot(true);
-    m_timer.start(10000);
+    m_timer.start(10s);
 
     event_loop.exec(); // blocks stack until quit() is called
 

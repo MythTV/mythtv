@@ -1,3 +1,6 @@
+#include <chrono>
+#include <utility>
+
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QImageReader>
@@ -5,21 +8,22 @@
 #include <QStringList>
 #include <QTimer>
 #include <QUrl>
-#include <utility>
 
 #include "mythlogging.h"
 
-#include "mythdialogbox.h"
-#include "mythmainwindow.h"
-#include "mythfontproperties.h"
-#include "mythuiutils.h"
-#include "mythuitext.h"
-#include "mythuiimage.h"
-#include "mythuibuttonlist.h"
-#include "mythuibutton.h"
-#include "mythuistatetype.h"
-#include "mythuifilebrowser.h"
 #include "mythcorecontext.h"
+#include "mythdialogbox.h"
+#include "mythfontproperties.h"
+#include "mythmainwindow.h"
+#include "mythuibutton.h"
+#include "mythuibuttonlist.h"
+#include "mythuifilebrowser.h"
+#include "mythuiimage.h"
+#include "mythuistatetype.h"
+#include "mythuitext.h"
+#include "mythuiutils.h"
+
+using namespace std::chrono_literals;
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #define qEnvironmentVariable getenv
@@ -282,7 +286,7 @@ void MythUIFileBrowser::PathSelected(MythUIButtonListItem *item)
         if (IsImage(finfo.suffix()) && m_previewImage)
         {
             m_previewImage->SetFilename(finfo.absoluteFilePath());
-            m_previewTimer->start(250);
+            m_previewTimer->start(250ms);
         }
 
         if (m_infoText)
