@@ -30,7 +30,7 @@ extern "C" {
 */
 MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(VideoFrameType Format)
 {
-    if ((FMT_VAAPI != Format) || getenv("NO_VAAPI"))
+    if ((FMT_VAAPI != Format) || qEnvironmentVariableIsSet("NO_VAAPI"))
         return Unsupported;
 
     MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();

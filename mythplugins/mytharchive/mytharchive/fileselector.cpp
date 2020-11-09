@@ -22,6 +22,10 @@
 #include "fileselector.h"
 #include "archiveutil.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
+
 ////////////////////////////////////////////////////////////////
 
 FileSelector::~FileSelector()
@@ -195,8 +199,7 @@ void FileSelector::backPressed()
 
 void FileSelector::homePressed()
 {
-    char *home = getenv("HOME");
-    m_curDirectory = home;
+    m_curDirectory = qEnvironmentVariable("HOME");
 
     updateFileList();
 }

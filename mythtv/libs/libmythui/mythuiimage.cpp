@@ -986,7 +986,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
         return false;
     }
 
-    if (getenv("DISABLETHREADEDMYTHUIIMAGE"))
+    if (qEnvironmentVariableIsSet("DISABLETHREADEDMYTHUIIMAGE"))
         allowLoadInBackground = false;
 
     // Don't clear the widget before we need to, otherwise it causes

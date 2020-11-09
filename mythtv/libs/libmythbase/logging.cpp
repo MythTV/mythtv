@@ -257,8 +257,7 @@ LoggerThread::LoggerThread(QString filename, bool progress, bool quiet,
     m_filename(std::move(filename)), m_progress(progress), m_quiet(quiet),
     m_tablename(std::move(table)), m_facility(facility), m_pid(getpid())
 {
-    char *debug = getenv("VERBOSE_THREADS");
-    if (debug != nullptr)
+    if (qEnvironmentVariableIsSet("VERBOSE_THREADS"))
     {
         LOG(VB_GENERAL, LOG_NOTICE,
             "Logging thread registration/deregistration enabled!");

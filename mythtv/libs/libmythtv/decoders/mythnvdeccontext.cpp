@@ -40,7 +40,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     // no brainers
-    if (!Decoder.startsWith("nvdec") || getenv("NO_NVDEC") || !HaveNVDEC() || IsUnsupportedProfile(*Context))
+    if (!Decoder.startsWith("nvdec") || qEnvironmentVariableIsSet("NO_NVDEC") || !HaveNVDEC() || IsUnsupportedProfile(*Context))
         return failure;
 
     if (!decodeonly)

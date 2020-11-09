@@ -33,6 +33,7 @@
 
 #include "lirc_client.h"
 
+// clazy:excludeall=raw-environment-function
 
 /* internal defines */
 #define MAX_INCLUDES 10

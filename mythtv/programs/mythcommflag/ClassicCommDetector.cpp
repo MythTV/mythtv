@@ -195,7 +195,7 @@ void ClassicCommDetector::Init()
 
     m_lastFrameNumber = -2;
     m_curFrameNumber = -1;
-    m_verboseDebugging = (getenv("DEBUGCOMMFLAG") != nullptr);
+    m_verboseDebugging = qEnvironmentVariableIsSet("DEBUGCOMMFLAG");
 
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("Commercial Detection initialized: "

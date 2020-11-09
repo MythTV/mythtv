@@ -63,8 +63,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     m_doRun(runthread),
     m_openEnd(openEndNever)
 {
-    char *debug = getenv("DEBUG_CONFLICTS");
-    debugConflicts = (debug != nullptr);
+    debugConflicts = qEnvironmentVariableIsSet("DEBUG_CONFLICTS");
 
     if (master_sched)
         master_sched->GetAllPending(m_recList);

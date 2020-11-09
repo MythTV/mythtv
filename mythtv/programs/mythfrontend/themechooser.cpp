@@ -1030,7 +1030,7 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
 
     connect(m_updateTimer, &QTimer::timeout, this, &ThemeUpdateChecker::checkForUpdate);
 
-    if (getenv("MYTHTV_DEBUGMDM"))
+    if (qEnvironmentVariableIsSet("MYTHTV_DEBUGMDM"))
     {
         LOG(VB_GENERAL, LOG_INFO, "Checking for theme updates every minute");
         m_updateTimer->start(60 * 1000); // Run once a minute

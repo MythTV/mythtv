@@ -4,8 +4,10 @@
 #include "netstream.h"
 
 // C/C++ lib
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #include <cstdlib>
 using std::getenv;
+#endif
 #include <cstddef>
 #include <cstdio>
 #include <cinttypes>
@@ -40,6 +42,9 @@ using std::getenv;
 #include "mythcorecontext.h"
 #include "mythdirs.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
 
 /*
  * Constants
@@ -777,7 +782,7 @@ void NAMThread::run()
 
     // Setup a network proxy e.g. for TOR: socks://localhost:9050
     // TODO get this from mythdb
-    QString proxy(getenv("MYTHMHEG_PROXY"));
+    QString proxy(qEnvironmentVariable("MYTHMHEG_PROXY"));
     if (!proxy.isEmpty())
     {
         QUrl url(proxy, QUrl::TolerantMode);

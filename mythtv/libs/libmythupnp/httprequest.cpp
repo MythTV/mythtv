@@ -285,7 +285,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     for (const auto & value : values)
         AddCORSHeaders(value);
 
-    if (getenv("HTTPREQUEST_DEBUG"))
+    if (qEnvironmentVariableIsSet("HTTPREQUEST_DEBUG"))
     {
         // Dump response header
         QMap<QString, QString>::iterator it;
@@ -400,7 +400,7 @@ qint64 HTTPRequest::SendResponse( void )
 
     // ----------------------------------------------------------------------
     // DEBUGGING
-    if (getenv("HTTPREQUEST_DEBUG"))
+    if (qEnvironmentVariableIsSet("HTTPREQUEST_DEBUG"))
         std::cout << m_response.buffer().constData() << std::endl;
     // ----------------------------------------------------------------------
 

@@ -53,6 +53,10 @@
 
 #define LOC      QString("MythCoreContext::%1(): ").arg(__func__)
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
+
 MythCoreContext *gCoreContext = nullptr;
 
 class MythCoreContextPrivate : public QObject
@@ -263,13 +267,13 @@ bool MythCoreContext::Init(void)
     {
         // try fallback to environment variables for non-glibc systems
         // LC_ALL, then LC_CTYPE
-        lc_value = getenv("LC_ALL");
+        lc_value = qEnvironmentVariable("LC_ALL");
         if (lc_value.isEmpty())
-            lc_value = getenv("LC_CTYPE");
+            lc_value = qEnvironmentVariable("LC_CTYPE");
     }
     if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
         lang_variables.append("LC_ALL or LC_CTYPE");
-    lc_value = getenv("LANG");
+    lc_value = qEnvironmentVariable("LANG");
     if (!lc_value.contains("UTF-8", Qt::CaseInsensitive))
     {
         if (!lang_variables.isEmpty())

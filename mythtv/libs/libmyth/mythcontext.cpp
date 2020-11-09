@@ -57,6 +57,10 @@
 
 #define LOC      QString("MythContext: ")
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
+
 MythContext *gContext = nullptr;
 
 static const QString sLocation = "MythContext";
@@ -1609,7 +1613,7 @@ bool MythContext::Init(const bool gui,
     // If HOME isn't defined, we won't be able to use default confdir of
     // $HOME/.mythtv nor can we rely on a MYTHCONFDIR that references $HOME
     QString homedir = QDir::homePath();
-    QString confdir = getenv("MYTHCONFDIR");
+    QString confdir = qEnvironmentVariable("MYTHCONFDIR");
     if ((homedir.isEmpty() || homedir == "/") &&
         (confdir.isEmpty() || confdir.contains("$HOME")))
     {

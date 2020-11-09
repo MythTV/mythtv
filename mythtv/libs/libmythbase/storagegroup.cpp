@@ -51,7 +51,7 @@ StorageGroup::StorageGroup(QString group, QString hostname,
 {
     m_dirlist.clear();
 
-    if (getenv("MYTHTV_NOSGFALLBACK"))
+    if (qEnvironmentVariableIsSet("MYTHTV_NOSGFALLBACK"))
         m_allowFallback = false;
 
     Init(m_groupname, m_hostname, m_allowFallback);

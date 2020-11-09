@@ -40,6 +40,10 @@
 #define O_LARGEFILE 0
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
+
 #define LOC     QString("JobQueue: ")
 
 JobQueue::JobQueue(bool master) :
@@ -2473,7 +2477,7 @@ void JobQueue::DoUserJobThread(int jobID)
                       .arg(command);
         LOG(VB_GENERAL, LOG_ERR, LOC + msg);
         LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Current PATH: '%1'")
-                                            .arg(getenv("PATH")));
+                                            .arg(qEnvironmentVariable("PATH")));
 
         ChangeJobStatus(jobID, JOB_ERRORED,
             tr("ERROR: Unable to find executable, check backend logs."));

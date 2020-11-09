@@ -48,6 +48,10 @@
 #include "serviceUtil.h"
 #include "scheduler.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -1046,11 +1050,11 @@ DTC::BackendInfo* Myth::GetBackendInfo( void )
     pBuild->setVersion     ( MYTH_SOURCE_VERSION   );
     pBuild->setLibX264     ( CONFIG_LIBX264        );
     pBuild->setLibDNS_SD   ( CONFIG_LIBDNS_SD      );
-    pEnv->setLANG          ( getenv("LANG")        );
-    pEnv->setLCALL         ( getenv("LC_ALL")      );
-    pEnv->setLCCTYPE       ( getenv("LC_CTYPE")    );
-    pEnv->setHOME          ( getenv("HOME")        );
-    pEnv->setMYTHCONFDIR   ( getenv("MYTHCONFDIR") );
+    pEnv->setLANG          ( qEnvironmentVariable("LANG")        );
+    pEnv->setLCALL         ( qEnvironmentVariable("LC_ALL")      );
+    pEnv->setLCCTYPE       ( qEnvironmentVariable("LC_CTYPE")    );
+    pEnv->setHOME          ( qEnvironmentVariable("HOME")        );
+    pEnv->setMYTHCONFDIR   ( qEnvironmentVariable("MYTHCONFDIR") );
     pLog->setLogArgs       ( logPropagateArgs      );
 
     // ----------------------------------------------------------------------

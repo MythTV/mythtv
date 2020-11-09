@@ -14,6 +14,10 @@
 #include "mythlogging.h"
 #include "mythdate.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
+
 namespace MythTZ
 {
 
@@ -55,7 +59,7 @@ QString getTimeZoneID(void)
 #ifndef _WIN32
     // First, try the TZ environment variable to check for environment-specific
     // overrides
-    QString tz = getenv("TZ");
+    QString tz = qEnvironmentVariable("TZ");
     if (tz.isEmpty())
     {
         // No TZ, so attempt to determine the system-configured time zone ID

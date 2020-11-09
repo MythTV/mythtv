@@ -955,11 +955,12 @@ void MpegRecorder::run(void)
     MythTimer elapsedTimer;
     float elapsed = NAN;
     long long bytesRead = 0;
-    int dummyBPS = 0;  // Bytes per second, but env var is BITS PER SECOND
 
-    if (getenv("DUMMYBPS"))
+    bool ok { false };
+    // Bytes per second, but env var is BITS PER SECOND
+    int dummyBPS = qEnvironmentVariableIntValue("DUMMYBPS", &ok) / 8;
+    if (ok)
     {
-        dummyBPS = atoi(getenv("DUMMYBPS")) / 8;
         LOG(VB_GENERAL, LOG_INFO,
             LOC + QString("Throttling dummy recorder to %1 bits per second")
                 .arg(dummyBPS * 8));

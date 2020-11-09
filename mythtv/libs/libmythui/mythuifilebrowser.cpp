@@ -21,6 +21,10 @@
 #include "mythuifilebrowser.h"
 #include "mythcorecontext.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
+
 /////////////////////////////////////////////////////////////////////
 MFileInfo::MFileInfo(const QString& fileName, QString sgDir, bool isDir, qint64 size)
 {
@@ -396,8 +400,7 @@ void MythUIFileBrowser::homePressed()
     }
     else
     {
-        char *home = getenv("HOME");
-        m_subDirectory = home;
+        m_subDirectory = qEnvironmentVariable("HOME");
     }
 
     updateFileList();

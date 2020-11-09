@@ -717,7 +717,7 @@ void MythPlayer::SetBuffering(bool new_buffering)
 // For debugging playback set this to increase the timeout so that
 // playback does not fail if stepping through code.
 // Set PREBUFFERDEBUG to any value and you will get 30 minutes.
-static char *preBufferDebug = getenv("PREBUFFERDEBUG");
+static bool preBufferDebug = qEnvironmentVariableIsSet("PREBUFFERDEBUG");
 
 bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
 {

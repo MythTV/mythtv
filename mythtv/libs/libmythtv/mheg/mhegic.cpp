@@ -3,9 +3,11 @@
  */
 #include "mhegic.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 // C/C++ lib
 #include <cstdlib>
 using std::getenv;
+#endif
 
 // Qt
 #include <QByteArray>
@@ -52,7 +54,11 @@ MHInteractionChannel::EStatus MHInteractionChannel::status()
     if (!gCoreContext->GetBoolSetting("EnableMHEG", false))
         return kDisabled;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     QStringList opts = QString(getenv("MYTHMHEG")).split(':');
+#else
+    QStringList opts = qEnvironmentVariable("MYTHMHEG").split(':');
+#endif
     if (opts.contains("noice", Qt::CaseInsensitive))
         return kDisabled;
     if (opts.contains("ice", Qt::CaseInsensitive))

@@ -57,6 +57,10 @@
 
 #include "mythconfig.h" // for CONFIG_DARWIN
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
+
 /** \fn getUptime(time_t&)
  *  \brief Returns uptime statistics.
  *  \return true if successful, false otherwise.
@@ -850,9 +854,9 @@ void setHttpProxy(void)
     QString       LOC = "setHttpProxy() - ";
 
     // Set http proxy for the application if specified in environment variable
-    QString var(getenv("http_proxy"));
+    QString var(qEnvironmentVariable("http_proxy"));
     if (var.isEmpty())
-        var = getenv("HTTP_PROXY");  // Sadly, some OS envs are case sensitive
+        var = qEnvironmentVariable("HTTP_PROXY");  // Sadly, some OS envs are case sensitive
     if (!var.isEmpty())
     {
         if (!var.startsWith("http://"))   // i.e. just a host name

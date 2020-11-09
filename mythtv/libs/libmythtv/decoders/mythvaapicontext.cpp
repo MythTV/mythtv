@@ -137,7 +137,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext **Context,
     auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VAAPI_DEC : kCodec_MPEG1_VAAPI) + (StreamType - 1));
     auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
     QString vendor = HaveVAAPI();
-    if (!Decoder.startsWith("vaapi") || vendor.isEmpty() || getenv("NO_VAAPI"))
+    if (!Decoder.startsWith("vaapi") || vendor.isEmpty() || qEnvironmentVariableIsSet("NO_VAAPI"))
         return failure;
 
     QString codec   = ff_codec_id_string((*Context)->codec_id);

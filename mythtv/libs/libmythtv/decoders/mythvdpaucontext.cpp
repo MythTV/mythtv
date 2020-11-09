@@ -131,7 +131,7 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
     auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_VDPAU_DEC : kCodec_MPEG1_VDPAU) + (StreamType - 1));
     auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
-    if (!Decoder.startsWith("vdpau") || getenv("NO_VDPAU") || IsUnsupportedProfile(*Context))
+    if (!Decoder.startsWith("vdpau") || qEnvironmentVariableIsSet("NO_VDPAU") || IsUnsupportedProfile(*Context))
         return failure;
 
     if (!decodeonly)
