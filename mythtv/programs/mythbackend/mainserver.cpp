@@ -7751,6 +7751,7 @@ void MainServer::connectionClosed(MythSocket *socket)
     // make sure these are not actually deleted in the callback
     socket->IncrRef();
     m_decrRefSocketList.push_back(socket);
+    QList<uint> disconnectedSlaves;
 
     for (auto it = m_playbackList.begin(); it != m_playbackList.end(); ++it)
     {
@@ -7768,7 +7769,7 @@ void MainServer::connectionClosed(MythSocket *socket)
         }
         if (sock == socket)
         {
-            QList<uint> disconnectedSlaves;
+            disconnectedSlaves.clear();
             bool needsReschedule = false;
 
             if (m_ismaster && pbs->isSlaveBackend())

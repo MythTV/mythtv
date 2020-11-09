@@ -81,9 +81,9 @@ bool CetonRTSP::ProcessRequest(
     {
         // empty socket's waiting data just in case
         m_socket->waitForReadyRead(30);
+        QVector<char> trash;
         do
         {
-            QVector<char> trash;
             uint avail = m_socket->bytesAvailable();
             trash.resize(std::max((uint)trash.size(), avail));
             m_socket->read(trash.data(), avail);

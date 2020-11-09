@@ -1420,13 +1420,15 @@ void MythUIType::SetReverseDependence(MythUIType *dependee, bool reverse)
 void MythUIType::ConnectDependants(bool recurse)
 {
     QMapIterator<QString, QString> it(m_dependsMap);
+    QStringList dependees;
+    QList<int> operators;
     while(it.hasNext())
     {
         it.next();
 
         // build list of operators and dependeees.
-        QStringList dependees;
-        QList<int> operators;
+        dependees.clear();
+        operators.clear();
         QString name = it.value();
         QStringList tmp1 = name.split("&");
         for (int i = 0; i < tmp1.size(); i++)
