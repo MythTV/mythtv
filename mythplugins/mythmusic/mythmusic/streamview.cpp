@@ -105,7 +105,7 @@ void StreamView::customEvent(QEvent *event)
 
     if (event->type() == MusicPlayerEvent::PlayedTracksChangedEvent)
     {
-        if (gPlayer->getPlayedTracksList().count())
+        if (!gPlayer->getPlayedTracksList().isEmpty())
             updateTrackInfo(gPlayer->getCurrentMetadata());
 
         // add the new track to the list

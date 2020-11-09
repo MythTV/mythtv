@@ -574,7 +574,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
         return false;
 
     QString path = pDevice->getDevicePath();
-    if (!path.length())
+    if (path.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ALERT,
                 "MediaMonitorUnix::AddDevice() - empty device path.");

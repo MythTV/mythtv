@@ -110,7 +110,7 @@ void BackendSelection::Accept(MythUIButtonListItem *item)
     {
         if (m_pConfig)
         {
-            if (m_pinCode.length())
+            if (!m_pinCode.isEmpty())
                 m_pConfig->SetValue(kDefaultPIN, m_pinCode);
             m_pConfig->SetValue(kDefaultUSN, m_usn);
             m_pConfig->Save();
