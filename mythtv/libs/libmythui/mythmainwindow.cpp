@@ -61,7 +61,9 @@
 #include <QtAndroid>
 #endif
 
-#define GESTURE_TIMEOUT 1000
+using namespace std::chrono_literals;
+
+static constexpr std::chrono::milliseconds GESTURE_TIMEOUT { 1s };
 #define STANDBY_TIMEOUT 90 // Minutes
 #define LONGPRESS_INTERVAL 1000
 

@@ -1,8 +1,10 @@
+#include <chrono>
+#include <utility>
+
 #include <QTcpSocket>
 #include <QTextStream>
 #include <QTimer>
 #include <QtEndian>
-#include <utility>
 
 #include "mythlogging.h"
 #include "mythcorecontext.h"
@@ -36,13 +38,14 @@ QString MythRAOPConnection::g_rsaLastError;
 #define AUDIO_DATA       0x60
 #define FIRSTAUDIO_DATA  (0x60 | 0x80)
 
+using namespace std::chrono_literals;
 
 // Size (in ms) of audio buffered in audio card
 #define AUDIOCARD_BUFFER 500
 // How frequently we may call ProcessAudio (via QTimer)
 // ideally 20ms, but according to documentation
 // anything lower than 50ms on windows, isn't reliable
-#define AUDIO_BUFFER     100
+static constexpr std::chrono::milliseconds AUDIO_BUFFER { 100ms };
 
 class RaopNetStream : public QTextStream
 {

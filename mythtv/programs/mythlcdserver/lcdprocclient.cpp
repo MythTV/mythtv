@@ -36,9 +36,10 @@
 #define LCD_VERSION_4 1
 #define LCD_VERSION_5 2
 
-#define LCD_RECSTATUS_TIME  10000
-#define LCD_TIME_TIME       3000
-#define LCD_SCROLLLIST_TIME 2000
+using namespace std::chrono_literals;
+
+static constexpr std::chrono::milliseconds LCD_TIME_TIME       { 3s };
+static constexpr std::chrono::milliseconds LCD_SCROLLLIST_TIME { 2s };
 
 int lcdStartCol = LCD_START_COL;
 
@@ -1943,7 +1944,7 @@ void LCDProcClient::outputRecStatus(void)
     QString aString;
     QString status;
     QStringList list;
-    int listTime = 0;
+    std::chrono::milliseconds listTime { 1 };
 
     TunerStatus tuner = m_tunerList[m_lcdTunerNo];
 

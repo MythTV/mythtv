@@ -23,8 +23,10 @@
 #include "welcomedialog.h"
 #include "welcomesettings.h"
 
-#define UPDATE_STATUS_INTERVAL   30000
-#define UPDATE_SCREEN_INTERVAL   15000
+using namespace std::chrono_literals;
+
+static constexpr std::chrono::milliseconds UPDATE_STATUS_INTERVAL { 30s };
+static constexpr std::chrono::milliseconds UPDATE_SCREEN_INTERVAL { 15s };
 
 
 WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
