@@ -979,12 +979,12 @@ bool AudioTest::event(QEvent *event)
 
     auto *cce = dynamic_cast<ChannelChangedEvent*>(event);
     if (cce == nullptr)
-        return false;
+        return GroupSetting::event(event);
 
     QString channel = cce->m_channel;
 
     if (!cce->m_fulltest)
-        return false;
+        return  GroupSetting::event(event);
 
     bool fl = false;
     bool fr = false;
@@ -1043,7 +1043,7 @@ bool AudioTest::event(QEvent *event)
         m_rearright->setEnabled(rr);
     if (m_lfe)
         m_lfe->setEnabled(lfe);
-    return false;
+    return  GroupSetting::event(event);
 }
 
 

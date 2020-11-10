@@ -423,7 +423,7 @@ bool PreviewGenerator::event(QEvent *e)
 
     auto *me = dynamic_cast<MythEvent*>(e);
     if (me == nullptr)
-        return false;
+        return QObject::event(e);
     if (me->Message() != "GENERATED_PIXMAP" || me->ExtraDataCount() < 3)
         return QObject::event(e);
 
@@ -433,7 +433,7 @@ bool PreviewGenerator::event(QEvent *e)
     for (; i < (uint) me->ExtraDataCount() && !ours; i++)
         ours |= me->ExtraData(i) == m_token;
     if (!ours)
-        return false;
+        return QObject::event(e);
 
     const QString& pginfokey = me->ExtraData(1);
 
@@ -460,7 +460,7 @@ bool PreviewGenerator::event(QEvent *e)
         m_pixmapOk = false;
         LOG(VB_GENERAL, LOG_ERR, LOC + pginfokey + "Got invalid date");
         m_previewWaitCondition.wakeAll();
-        return false;
+        return QObject::event(e);
     }
 
     size_t     length     = me->ExtraData(4).toULongLong();

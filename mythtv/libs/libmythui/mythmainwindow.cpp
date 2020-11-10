@@ -1675,7 +1675,7 @@ bool MythMainWindow::keyLongPressFilter(QEvent **e,
     return false;
 }
 
-bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
+bool MythMainWindow::eventFilter(QObject *watched, QEvent *e)
 {
     /* Don't let anything through if input is disallowed. */
     if (!d->m_allowInput)
@@ -1751,7 +1751,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                 d->m_gesture.Start();
                 auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                 if (!mouseEvent)
-                    return false;
+                    return MythUIScreenBounds::eventFilter(watched, e);
                 d->m_gesture.Record(mouseEvent->pos(), mouseEvent->button());
 
                 /* start a single shot timer */
@@ -1785,7 +1785,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
                 if (ge->GetGesture() == MythGestureEvent::Click)
                 {
                     if (!mouseEvent)
-                        return false;
+                        return MythUIScreenBounds::eventFilter(watched, e);
 
                     for (auto *it = d->m_stackList.end()-1; it != d->m_stackList.begin()-1; --it)
                     {
@@ -1866,7 +1866,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
 
                 auto *mouseEvent = dynamic_cast<QMouseEvent*>(e);
                 if (!mouseEvent)
-                    return false;
+                    return MythUIScreenBounds::eventFilter(watched, e);
                 d->m_gesture.Record(mouseEvent->pos(), mouseEvent->button());
                 return true;
             }
@@ -1878,7 +1878,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
             ShowMouseCursor(true);
             auto* qmw = dynamic_cast<QWheelEvent*>(e);
             if (qmw == nullptr)
-                return false;
+                return MythUIScreenBounds::eventFilter(watched, e);
             int delta = qmw->angleDelta().y();
             if (delta>0)
             {
@@ -1908,7 +1908,7 @@ bool MythMainWindow::eventFilter(QObject * /*watched*/, QEvent *e)
             break;
     }
 
-    return false;
+    return MythUIScreenBounds::eventFilter(watched, e);
 }
 
 void MythMainWindow::customEvent(QEvent *ce)

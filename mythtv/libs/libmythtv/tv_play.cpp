@@ -3005,7 +3005,7 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
 
     if ( (QEvent::KeyPress == Event->type() || QEvent::KeyRelease == Event->type())
         && m_ignoreKeyPresses )
-        return false;
+        return TVPlaybackState::eventFilter(Object, Event);
 
     QScopedPointer<QEvent> sNewEvent(nullptr);
     if (m_mainWindow->keyLongPressFilter(&Event, sNewEvent))
@@ -3033,10 +3033,10 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
         case QEvent::Enter:
         {
             event(Event);
-            return false;
+            return TVPlaybackState::eventFilter(Object, Event);
         }
         default:
-            return false;
+            return TVPlaybackState::eventFilter(Object, Event);
     }
 }
 
@@ -3044,14 +3044,14 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
 bool TV::event(QEvent* Event)
 {
     if (Event == nullptr)
-        return false;
+        return TVPlaybackState::event(Event);
 
     if (QEvent::Resize == Event->type())
     {
         const auto *qre = dynamic_cast<const QResizeEvent*>(Event);
         if (qre)
             emit WindowResized(qre->size());
-        return false;
+        return TVPlaybackState::event(Event);
     }
 
     if (QEvent::KeyPress == Event->type() || MythGestureEvent::kEventType == Event->type())

@@ -156,7 +156,7 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
     static void LoadQtConfig();
     void InitKeys(void);
 
-    bool eventFilter(QObject *o, QEvent *e) override; // QWidget
+    bool eventFilter(QObject *watched, QEvent *e) override; // QWidget
     void customEvent(QEvent *ce) override; // QWidget
     void closeEvent(QCloseEvent *e) override; // QWidget
     void drawScreen(QPaintEvent* Event = nullptr);

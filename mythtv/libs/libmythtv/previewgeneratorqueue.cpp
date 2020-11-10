@@ -227,7 +227,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
 
     auto *me = dynamic_cast<MythEvent*>(e);
     if (me == nullptr)
-        return false;
+        return QObject::event(e);
     if (me->Message() == "GET_PREVIEW")
     {
         const QStringList &list = me->ExtraDataList();
@@ -329,7 +329,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
 
         return true;
     }
-    return false;
+    return QObject::event(e);
 }
 
 /**
