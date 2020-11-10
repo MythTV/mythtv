@@ -2,13 +2,67 @@
 //
 //   https://github.com/KDE/clazy#list-of-checks
 
-// Base level
+// BASE LEVEL
 level1
 
 // Disable these level0 checks
-no-overloaded-signal
-no-qstring-arg
+   no-overloaded-signal
+   no-qstring-arg
  
 // Disable these level1 checks
-no-qproperty-without-notify
-no-non-pod-global-static
+   no-qproperty-without-notify
+   no-non-pod-global-static
+   // This appears to have been broken in the latest clazy update.
+   // no-incorrect-emit
+
+//
+// LEVEL2 CHECKS
+//
+   base-class-event
+   function-args-by-ref
+   function-args-by-value
+   global-const-char-pointer
+   old-style-connect
+   returning-void-expression
+
+// Not investigated yet
+//   copyable-polymorphic
+//   ctor-missing-parent-argument
+//   implicit-casts
+//   missing-qobject-macro
+//   missing-typeinfo
+//   qstring-allocations
+//   rule-of-three
+//   static-pmf
+//   virtual-call-ctor
+
+//
+// MANUAL CHECKS
+//
+   assert-with-side-effects
+   container-inside-loop
+   isempty-vs-count
+   qhash-with-char-pointer-key
+   raw-environment-function
+   use-chrono-in-qtimer
+
+// Only three or four instances, but produce ~90 warnings.
+//   signal-with-return-value
+
+// Not investigated yet
+//   detaching-member
+//   heap-allocated-small-trivial-type
+//   ifndef-define-typo
+//   inefficient-qlist
+//   jni-signatures
+//   qproperty-type-mismatch
+//   qrequiredresult-candidates
+//   qt6-header-fixes
+//   qt6-qdir-fixes
+//   qt6-qhash-signature
+//   qt6-qlatin1stringchar-to-u
+//   qvariant-template-instantiation
+//   reserve-candidates
+//   thread-with-slots
+//   tr-non-literal
+//   unneeded-cast
