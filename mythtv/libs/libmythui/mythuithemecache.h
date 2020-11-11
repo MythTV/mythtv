@@ -25,7 +25,7 @@ class MUI_PUBLIC MythUIThemeCache
    ~MythUIThemeCache();
 
     void        UpdateImageCache();
-    void        SetScreenSize(const QSize& Size);
+    void        SetScreenSize(QSize Size);
     void        ClearThemeCacheDir();
     QString     GetThemeCacheDir();
     MythImage*  LoadCacheImage(QString File, const QString& Label,

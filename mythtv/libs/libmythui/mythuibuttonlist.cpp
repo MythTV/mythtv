@@ -37,7 +37,7 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
 }
 
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
-                                   const QRect &area, bool showArrow,
+                                   const QRect area, bool showArrow,
                                    bool showScrollBar)
     : MythUIType(parent, name),
       m_showArrow(showArrow), m_showScrollBar(showScrollBar)

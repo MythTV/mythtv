@@ -74,7 +74,7 @@ MythVertexBufferVulkan::MythVertexBufferVulkan(MythVulkanObject *Vulkan, VkDevic
 {
 }
 
-void MythVertexBufferVulkan::Update(const QRect &Source, const QRect &Dest,
+void MythVertexBufferVulkan::Update(const QRect Source, const QRect Dest,
                                     int Alpha, int Rotation, VkCommandBuffer CommandBuffer)
 {
     m_vulkanRender->CopyBuffer(m_stagingBuffer, m_buffer, m_bufferSize, CommandBuffer);
@@ -84,7 +84,7 @@ void MythVertexBufferVulkan::Update(const QRect &Source, const QRect &Dest,
     m_rotation = Rotation;
 }
 
-bool MythVertexBufferVulkan::NeedsUpdate(const QRect &Source, const QRect &Dest, int Alpha, int Rotation)
+bool MythVertexBufferVulkan::NeedsUpdate(const QRect Source, const QRect Dest, int Alpha, int Rotation)
 {
     return !((m_source == Source) && (m_dest == Dest) && (m_alpha == Alpha) && (m_rotation == Rotation));
 }

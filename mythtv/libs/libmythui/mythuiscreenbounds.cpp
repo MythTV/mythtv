@@ -194,7 +194,7 @@ QRect MythUIScreenBounds::GetUIScreenRect()
     return m_uiScreenRect;
 }
 
-void MythUIScreenBounds::SetUIScreenRect(const QRect& Rect)
+void MythUIScreenBounds::SetUIScreenRect(const QRect Rect)
 {
     if (Rect == m_uiScreenRect)
         return;
@@ -210,7 +210,7 @@ QRect MythUIScreenBounds::GetScreenRect()
     return m_screenRect;
 }
 
-QSize MythUIScreenBounds::NormSize(const QSize& Size) const
+QSize MythUIScreenBounds::NormSize(const QSize Size) const
 {
     QSize result;
     result.setWidth(static_cast<int>(Size.width() * m_screenHorizScale));

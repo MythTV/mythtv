@@ -57,10 +57,10 @@ class MythCECAdapter
   protected:
     void        HandleActions (MythCECActions Actions);
     int         HandleCommand (const cec_command &Command);
-    int         HandleKeyPress(const cec_keypress &Key) const;
+    int         HandleKeyPress(cec_keypress Key) const;
     static void HandleSource  (cec_logical_address Address, uint8_t Activated);
     static int  LogMessage    (const cec_log_message &Message);
-    static int  HandleAlert   (libcec_alert Alert, const libcec_parameter &Data);
+    static int  HandleAlert   (libcec_alert Alert, libcec_parameter Data);
 
   protected:
     ICECAdapter   *m_adapter            { nullptr };

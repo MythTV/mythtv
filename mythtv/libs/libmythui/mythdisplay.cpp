@@ -410,7 +410,7 @@ void MythDisplay::ScreenRemoved(QScreen* qScreen)
     emit ScreenCountChanged(QGuiApplication::screens().size());
 }
 
-void MythDisplay::GeometryChanged(const QRect &Geo)
+void MythDisplay::GeometryChanged(const QRect Geo)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New screen geometry: %1x%2+%3+%4")
         .arg(Geo.width()).arg(Geo.height()).arg(Geo.left()).arg(Geo.top()));

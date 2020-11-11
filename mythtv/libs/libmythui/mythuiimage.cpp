@@ -898,7 +898,7 @@ void MythUIImage::SetAnimationFrames(const AnimationFrames& frames)
 /**
  *  \brief Force the dimensions of the widget and image to the given size.
  */
-void MythUIImage::ForceSize(const QSize &size)
+void MythUIImage::ForceSize(const QSize size)
 {
     if (m_imageProperties.m_forceSize == size)
         return;
@@ -935,7 +935,7 @@ void MythUIImage::SetSize(int width, int height)
 /**
  *  \brief Set the size of the widget
  */
-void MythUIImage::SetSize(const QSize &size)
+void MythUIImage::SetSize(const QSize size)
 {
     QWriteLocker updateLocker(&d->m_updateLock);
     MythUIType::SetSize(size);

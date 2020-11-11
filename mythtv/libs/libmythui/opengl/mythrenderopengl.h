@@ -119,7 +119,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int   GetExtraFeatures(void) const;
     QOpenGLFunctions::OpenGLFeatures GetFeatures(void) const;
     bool  IsRecommendedRenderer(void);
-    void  SetViewPort(const QRect &Rect, bool ViewportOnly = false) override;
+    void  SetViewPort(QRect Rect, bool ViewportOnly = false) override;
     QRect GetViewPort(void) { return m_viewport; }
     void  PushTransformation(const UIEffects &Fx, QPointF &Center);
     void  PopTransformation(void);
@@ -132,7 +132,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
 
     MythGLTexture* CreateTextureFromQImage(QImage *Image);
-    QSize GetTextureSize(const QSize &Size, bool Normalised);
+    QSize GetTextureSize(QSize Size, bool Normalised);
     static int GetTextureDataSize(MythGLTexture *Texture);
     void  SetTextureFilters(MythGLTexture *Texture, QOpenGLTexture::Filter Filter,
                             QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
@@ -154,19 +154,19 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  SetShaderProjection(QOpenGLShaderProgram* Program);
 
     void  DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
-                     const QRect &Source, const QRect &Destination,
+                     QRect Source, QRect Destination,
                      QOpenGLShaderProgram *Program, int Alpha = 255, qreal Scale = 1.0);
     void  DrawBitmap(std::vector<MythGLTexture *> &Textures,
                      QOpenGLFramebufferObject *Target,
-                     const QRect &Source, const QRect &Destination,
+                     QRect Source, QRect Destination,
                      QOpenGLShaderProgram *Program, int Rotation);
     void  DrawRect(QOpenGLFramebufferObject *Target,
-                   const QRect &Area, const QBrush &FillBrush,
+                   QRect Area, const QBrush &FillBrush,
                    const QPen &LinePen, int Alpha);
     void  DrawRoundRect(QOpenGLFramebufferObject *Target,
-                        const QRect &Area, int CornerRadius,
+                        QRect Area, int CornerRadius,
                         const QBrush &FillBrush, const QPen &LinePen, int Alpha);
-    void  ClearRect(QOpenGLFramebufferObject *Target, const QRect &Area, int Color);
+    void  ClearRect(QOpenGLFramebufferObject *Target, QRect Area, int Color);
 
     bool  GetGPUMemory(int &Available, int &Total);
 
@@ -182,11 +182,11 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  Init2DState(void);
     void  SetMatrixView(void);
     void  DeleteFramebuffers(void);
-    static bool UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
-                                      const QRect &Destination, int Rotation, qreal Scale = 1.0);
-    GLfloat* GetCachedVertices(GLuint Type, const QRect &Area);
+    static bool UpdateTextureVertices(MythGLTexture *Texture, QRect Source,
+                                      QRect Destination, int Rotation, qreal Scale = 1.0);
+    GLfloat* GetCachedVertices(GLuint Type, QRect Area);
     void  ExpireVertices(int Max = 0);
-    void  GetCachedVBO(GLuint Type, const QRect &Area);
+    void  GetCachedVBO(GLuint Type, QRect Area);
     void  ExpireVBOS(int Max = 0);
     bool  CreateDefaultShaders(void);
     void  DeleteDefaultShaders(void);

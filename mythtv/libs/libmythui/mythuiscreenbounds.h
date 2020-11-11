@@ -24,9 +24,9 @@ class MUI_PUBLIC MythUIScreenBounds : public QWidget
 
     void  UpdateScreenSettings(MythDisplay* mDisplay);
     QRect GetUIScreenRect();
-    void  SetUIScreenRect(const QRect& Rect);
+    void  SetUIScreenRect(QRect Rect);
     QRect GetScreenRect();
-    QSize NormSize(const QSize& Size) const;
+    QSize NormSize(QSize Size) const;
     int   NormX(int X) const;
     int   NormY(int Y) const;
     void  GetScalingFactors(float& Horizontal, float& Vertical) const;

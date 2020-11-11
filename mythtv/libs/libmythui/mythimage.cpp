@@ -142,7 +142,7 @@ void MythImage::Orientation(int orientation)
     }
 }
 
-void MythImage::Resize(const QSize &newSize, bool preserveAspect)
+void MythImage::Resize(QSize newSize, bool preserveAspect)
 {
     if ((size() == newSize) && !isNull())
         return;
@@ -416,7 +416,7 @@ void MythImage::MakeGradient(QImage &image, const QColor &begin,
 }
 
 MythImage *MythImage::Gradient(MythPainter *painter,
-                               const QSize & size, const QColor &begin,
+                               QSize size, const QColor &begin,
                                const QColor &end, uint alpha,
                                FillDirection direction)
 {

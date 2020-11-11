@@ -19,7 +19,7 @@
 
 MythUISimpleText::MythUISimpleText(const QString &text,
                                    const MythFontProperties &font,
-                                   const QRect & rect, Qt::Alignment align,
+                                   const QRect rect, Qt::Alignment align,
                                    MythUIType *parent, const QString &name)
     : MythUIType(parent, name),
       m_justification(align),

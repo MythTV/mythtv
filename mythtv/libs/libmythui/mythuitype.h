@@ -92,7 +92,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
     void AddChild(MythUIType *child);
     MythUIType *GetChild(const QString &name) const;
-    MythUIType *GetChildAt(const QPoint &p, bool recursive=true,
+    MythUIType *GetChildAt(QPoint p, bool recursive=true,
                            bool focusable=true) const;
     QList<MythUIType *> *GetAllChildren(void);
 
@@ -133,7 +133,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void SetPosition(QPoint point);
     virtual void SetPosition(const MythPoint &point);
     virtual MythPoint GetPosition(void) const;
-    virtual void SetSize(const QSize &size);
+    virtual void SetSize(QSize size);
     virtual void SetMinSize(const MythPoint &size);
     virtual QSize GetMinSize(void) const;
     virtual void SetArea(const MythRect &rect);
@@ -146,7 +146,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     virtual MythRect GetArea(void) const;
     virtual MythRect GetFullArea(void) const;
     virtual void RecalculateArea(bool recurse = true);
-    void ExpandArea(const QRect &rect);
+    void ExpandArea(QRect rect);
 
     virtual QRegion GetDirtyArea(void) const;
 
@@ -183,7 +183,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     void SetDeferLoad(bool defer) { m_deferload = defer; }
     virtual void LoadNow(void);
 
-    bool ContainsPoint(const QPoint &point) const;
+    bool ContainsPoint(QPoint point) const;
 
     virtual MythPainter *GetPainter(void);
     void SetPainter(MythPainter *painter) { m_painter = painter; }

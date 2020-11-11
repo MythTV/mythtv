@@ -31,7 +31,7 @@ class MUI_PUBLIC MythPainterVulkan : public MythPainterGPU
     void    FreeResources     () override;
     void    Begin             (QPaintDevice* /*Parent*/) override;
     void    End               () override;
-    void    DrawImage         (const QRect &Dest, MythImage *Image, const QRect &Source, int Alpha) override;
+    void    DrawImage         (QRect Dest, MythImage *Image, QRect Source, int Alpha) override;
     void    PushTransformation(const UIEffects &Fx, QPointF Center = QPointF()) override;
     void    PopTransformation () override;
 

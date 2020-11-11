@@ -107,7 +107,7 @@ class MythGesture
     void Stop(bool Timeout = false);
     bool Recording();
     MythGestureEvent* GetGesture() const;
-    bool Record(const QPoint& Point, Qt::MouseButton Button);
+    bool Record(QPoint Point, Qt::MouseButton Button);
 
   private:
     Q_DISABLE_COPY(MythGesture)

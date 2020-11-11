@@ -310,7 +310,7 @@ int MythCECAdapter::HandleCommand(const cec_command &Command)
     return 1;
 }
 
-int MythCECAdapter::HandleKeyPress(const cec_keypress &Key) const
+int MythCECAdapter::HandleKeyPress(const cec_keypress Key) const
 {
     // Ignore key down events and wait for the key 'up'
     if (Key.duration < 1 || m_ignoreKeys)
@@ -645,7 +645,7 @@ int MythCECAdapter::HandleKeyPress(const cec_keypress &Key) const
     return 1;
 }
 
-int MythCECAdapter::HandleAlert(const libcec_alert Alert, const libcec_parameter &Data)
+int MythCECAdapter::HandleAlert(const libcec_alert Alert, const libcec_parameter Data)
 {
     // These aren't handled yet
     // Note that we *DON'T* want to just show these

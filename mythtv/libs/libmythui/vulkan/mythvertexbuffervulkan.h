@@ -33,8 +33,8 @@ class MUI_PUBLIC MythVertexBufferVulkan : public MythBufferVulkan
   public:
     static MythVertexBufferVulkan* Create(MythVulkanObject* Vulkan, VkDeviceSize Size);
 
-    bool     NeedsUpdate (const QRect& Source, const QRect& Dest, int Alpha, int Rotation);
-    void     Update      (const QRect& Source, const QRect& Dest, int Alpha, int Rotation,
+    bool     NeedsUpdate (QRect Source, QRect Dest, int Alpha, int Rotation);
+    void     Update      (QRect Source, QRect Dest, int Alpha, int Rotation,
                           VkCommandBuffer CommandBuffer = nullptr);
 
   protected:

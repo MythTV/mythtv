@@ -585,7 +585,7 @@ void MythRenderOpenGL::doneCurrent()
     m_lock.unlock();
 }
 
-void MythRenderOpenGL::SetViewPort(const QRect &Rect, bool ViewportOnly)
+void MythRenderOpenGL::SetViewPort(QRect Rect, bool ViewportOnly)
 {
     if (Rect == m_viewport)
         return;
@@ -659,7 +659,7 @@ MythGLTexture* MythRenderOpenGL::CreateTextureFromQImage(QImage *Image)
     return result;
 }
 
-QSize MythRenderOpenGL::GetTextureSize(const QSize &Size, bool Normalised)
+QSize MythRenderOpenGL::GetTextureSize(const QSize Size, bool Normalised)
 {
     if (((m_features & NPOTTextures) != 0U) || !Normalised)
         return Size;
@@ -813,7 +813,7 @@ void MythRenderOpenGL::ClearFramebuffer(void)
 }
 
 void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
-                                  const QRect &Source, const QRect &Destination,
+                                  const QRect Source, const QRect Destination,
                                   QOpenGLShaderProgram *Program, int Alpha, qreal Scale)
 {
     makeCurrent();
@@ -870,7 +870,7 @@ void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObje
 
 void MythRenderOpenGL::DrawBitmap(std::vector<MythGLTexture *> &Textures,
                                   QOpenGLFramebufferObject *Target,
-                                  const QRect &Source, const QRect &Destination,
+                                  const QRect Source, const QRect Destination,
                                   QOpenGLShaderProgram *Program,
                                   int Rotation)
 {
@@ -938,7 +938,7 @@ static const float kLimitedRangeOffset = (16.0F / 255.0F);
 static const float kLimitedRangeScale  = (219.0F / 255.0F);
 
 /// \brief An optimised method to clear a QRect to the given color
-void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect &Area, int Color)
+void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect Area, int Color)
 {
     makeCurrent();
     BindFramebuffer(Target);
@@ -959,14 +959,14 @@ void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect &
 }
 
 void MythRenderOpenGL::DrawRect(QOpenGLFramebufferObject *Target,
-                                const QRect &Area, const QBrush &FillBrush,
+                                const QRect Area, const QBrush &FillBrush,
                                 const QPen &LinePen, int Alpha)
 {
     DrawRoundRect(Target, Area, 1, FillBrush, LinePen, Alpha);
 }
 
 void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
-                                     const QRect &Area, int CornerRadius,
+                                     const QRect Area, int CornerRadius,
                                      const QBrush &FillBrush,
                                      const QPen &LinePen, int Alpha)
 {
@@ -1279,8 +1279,8 @@ QStringList MythRenderOpenGL::GetDescription(void)
     return result;
 }
 
-bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect &Source,
-                                             const QRect &Destination, int Rotation, qreal Scale)
+bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect Source,
+                                             const QRect Destination, int Rotation, qreal Scale)
 {
     if (!Texture || Texture->m_size.isEmpty())
         return false;
@@ -1363,7 +1363,7 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     return true;
 }
 
-GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint Type, const QRect &Area)
+GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint Type, const QRect Area)
 {
     uint64_t ref = (static_cast<uint64_t>(Area.left()) & 0xfff) +
                   ((static_cast<uint64_t>(Area.top()) & 0xfff) << 12) +
@@ -1412,7 +1412,7 @@ void MythRenderOpenGL::ExpireVertices(int Max)
     }
 }
 
-void MythRenderOpenGL::GetCachedVBO(GLuint Type, const QRect &Area)
+void MythRenderOpenGL::GetCachedVBO(GLuint Type, const QRect Area)
 {
     uint64_t ref = (static_cast<uint64_t>(Area.left()) & 0xfff) +
                   ((static_cast<uint64_t>(Area.top()) & 0xfff) << 12) +

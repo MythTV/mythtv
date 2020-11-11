@@ -43,7 +43,7 @@ void MythPainter::Teardown(void)
     m_allocatedImages.clear();
 }
 
-void MythPainter::SetClipRect(const QRect & /*clipRect*/)
+void MythPainter::SetClipRect(const QRect /*clipRect*/)
 {
 }
 
@@ -68,14 +68,14 @@ void MythPainter::DrawImage(int x, int y, MythImage *im, int alpha)
     DrawImage(dest, im, src, alpha);
 }
 
-void MythPainter::DrawImage(const QPoint &topLeft, MythImage *im, int alpha)
+void MythPainter::DrawImage(const QPoint topLeft, MythImage *im, int alpha)
 {
     DrawImage(topLeft.x(), topLeft.y(), im, alpha);
 }
 
-void MythPainter::DrawText(const QRect &r, const QString &msg,
+void MythPainter::DrawText(const QRect r, const QString &msg,
                            int flags, const MythFontProperties &font,
-                           int alpha, const QRect &boundRect)
+                           int alpha, const QRect boundRect)
 {
     MythImage *im = GetImageFromString(msg, flags, r, font);
     if (!im)
@@ -120,11 +120,11 @@ void MythPainter::DrawText(const QRect &r, const QString &msg,
     im->DecrRef();
 }
 
-void MythPainter::DrawTextLayout(const QRect & canvasRect,
+void MythPainter::DrawTextLayout(const QRect canvasRect,
                                  const LayoutVector & layouts,
                                  const FormatVector & formats,
                                  const MythFontProperties & font, int alpha,
-                                 const QRect & destRect)
+                                 const QRect destRect)
 {
     if (canvasRect.isNull())
         return;
@@ -154,7 +154,7 @@ void MythPainter::DrawTextLayout(const QRect & canvasRect,
     im->DecrRef();
 }
 
-void MythPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
+void MythPainter::DrawRect(const QRect area, const QBrush &fillBrush,
                            const QPen &linePen, int alpha)
 {
     MythImage *im = GetImageFromRect(area, 0, 0, fillBrush, linePen);
@@ -165,7 +165,7 @@ void MythPainter::DrawRect(const QRect &area, const QBrush &fillBrush,
     }
 }
 
-void MythPainter::DrawRoundRect(const QRect &area, int cornerRadius,
+void MythPainter::DrawRoundRect(const QRect area, int cornerRadius,
                                 const QBrush &fillBrush, const QPen &linePen,
                                 int alpha)
 {
@@ -177,7 +177,7 @@ void MythPainter::DrawRoundRect(const QRect &area, int cornerRadius,
     }
 }
 
-void MythPainter::DrawEllipse(const QRect &area, const QBrush &fillBrush,
+void MythPainter::DrawEllipse(const QRect area, const QBrush &fillBrush,
                               const QPen &linePen, int alpha)
 {
     MythImage *im = GetImageFromRect(area, 0, 1, fillBrush, linePen);
@@ -195,7 +195,7 @@ void MythPainter::PushTransformation(const UIEffects &zoom, QPointF center)
 }
 
 void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
-                               const QRect &r, const MythFontProperties &font)
+                               const QRect r, const MythFontProperties &font)
 {
     if (!im)
         return;
@@ -309,7 +309,7 @@ void MythPainter::DrawTextPriv(MythImage *im, const QString &msg, int flags,
     im->Assign(pm);
 }
 
-void MythPainter::DrawRectPriv(MythImage *im, const QRect &area, int radius,
+void MythPainter::DrawRectPriv(MythImage *im, const QRect area, int radius,
                                int ellipse,
                                const QBrush &fillBrush, const QPen &linePen)
 {
@@ -345,7 +345,7 @@ void MythPainter::DrawRectPriv(MythImage *im, const QRect &area, int radius,
 }
 
 MythImage *MythPainter::GetImageFromString(const QString &msg,
-                                           int flags, const QRect &r,
+                                           int flags, const QRect r,
                                            const MythFontProperties &font)
 {
     QString incoming = font.GetHash() + QString::number(r.width()) +
@@ -469,7 +469,7 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
     return im;
 }
 
-MythImage* MythPainter::GetImageFromRect(const QRect &area, int radius,
+MythImage* MythPainter::GetImageFromRect(const QRect area, int radius,
                                          int ellipse,
                                          const QBrush &fillBrush,
                                          const QPen &linePen)

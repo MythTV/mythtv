@@ -50,7 +50,7 @@ void MythFontProperties::SetColor(const QColor &color)
     CalcHash();
 }
 
-void MythFontProperties::SetShadow(bool on, const QPoint &offset,
+void MythFontProperties::SetShadow(bool on, const QPoint offset,
                                    const QColor &color, int alpha)
 {
     m_hasShadow = on;

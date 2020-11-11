@@ -234,8 +234,8 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
 #define DEST Dest
 #endif
 
-void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
-                                  const QRect &Source, int Alpha)
+void MythOpenGLPainter::DrawImage(const QRect Dest, MythImage *Image,
+                                  const QRect Source, int Alpha)
 {
     if (m_render)
     {
@@ -280,7 +280,7 @@ void MythOpenGLPainter::DrawImage(const QRect &Dest, MythImage *Image,
  * \note If high DPI scaling is in use, just use Qt painting rather than
  * handling all of the adjustments required for pen width etc etc.
 */
-void MythOpenGLPainter::DrawRect(const QRect &Area, const QBrush &FillBrush,
+void MythOpenGLPainter::DrawRect(const QRect Area, const QBrush &FillBrush,
                                  const QPen &LinePen, int Alpha)
 {
     if ((FillBrush.style() == Qt::SolidPattern ||
@@ -292,7 +292,7 @@ void MythOpenGLPainter::DrawRect(const QRect &Area, const QBrush &FillBrush,
     MythPainterGPU::DrawRect(Area, FillBrush, LinePen, Alpha);
 }
 
-void MythOpenGLPainter::DrawRoundRect(const QRect &Area, int CornerRadius,
+void MythOpenGLPainter::DrawRoundRect(const QRect Area, int CornerRadius,
                                       const QBrush &FillBrush,
                                       const QPen &LinePen, int Alpha)
 {

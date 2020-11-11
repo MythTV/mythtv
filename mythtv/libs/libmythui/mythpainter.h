@@ -52,30 +52,29 @@ class MUI_PUBLIC MythPainter : public QObject
     virtual void Begin(QPaintDevice* /*Parent*/) { }
     virtual void End() { }
 
-    virtual void SetClipRect(const QRect &clipRect);
+    virtual void SetClipRect(QRect clipRect);
     virtual void SetClipRegion(const QRegion &clipRegion);
     virtual void Clear(QPaintDevice *device, const QRegion &region);
 
-    virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
-                           int alpha) = 0;
+    virtual void DrawImage(QRect dest, MythImage *im, QRect src, int alpha) = 0;
 
     void DrawImage(int x, int y, MythImage *im, int alpha);
-    void DrawImage(const QPoint &topLeft, MythImage *im, int alph);
+    void DrawImage(QPoint topLeft, MythImage *im, int alph);
 
-    virtual void DrawText(const QRect &r, const QString &msg, int flags,
+    virtual void DrawText(QRect r, const QString &msg, int flags,
                           const MythFontProperties &font, int alpha,
-                          const QRect &boundRect);
-    virtual void DrawTextLayout(const QRect &canvasRect,
+                          QRect boundRect);
+    virtual void DrawTextLayout(QRect canvasRect,
                                 const LayoutVector & layouts,
                                 const FormatVector & formats,
                                 const MythFontProperties &font, int alpha,
-                                const QRect &destRect);
-    virtual void DrawRect(const QRect &area, const QBrush &fillBrush,
+                                QRect destRect);
+    virtual void DrawRect(QRect area, const QBrush &fillBrush,
                           const QPen &linePen, int alpha);
-    virtual void DrawRoundRect(const QRect &area, int cornerRadius,
+    virtual void DrawRoundRect(QRect area, int cornerRadius,
                                const QBrush &fillBrush, const QPen &linePen,
                                int alpha);
-    virtual void DrawEllipse(const QRect &area, const QBrush &fillBrush,
+    virtual void DrawEllipse(QRect area, const QBrush &fillBrush,
                              const QPen &linePen, int alpha);
 
     virtual void PushTransformation(const UIEffects &zoom, QPointF center = QPointF());
@@ -100,17 +99,17 @@ class MUI_PUBLIC MythPainter : public QObject
 
   protected:
     static void DrawTextPriv(MythImage *im, const QString &msg, int flags,
-                             const QRect &r, const MythFontProperties &font);
-    static void DrawRectPriv(MythImage *im, const QRect &area, int radius, int ellipse,
+                             QRect r, const MythFontProperties &font);
+    static void DrawRectPriv(MythImage *im, QRect area, int radius, int ellipse,
                              const QBrush &fillBrush, const QPen &linePen);
 
-    MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
+    MythImage *GetImageFromString(const QString &msg, int flags, QRect r,
                                   const MythFontProperties &font);
     MythImage *GetImageFromTextLayout(const LayoutVector & layouts,
                                       const FormatVector & formats,
                                       const MythFontProperties &font,
                                       QRect &canvas, QRect &dest);
-    MythImage *GetImageFromRect(const QRect &area, int radius, int ellipse,
+    MythImage *GetImageFromRect(QRect area, int radius, int ellipse,
                                 const QBrush &fillBrush,
                                 const QPen &linePen);
 

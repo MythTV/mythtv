@@ -219,7 +219,7 @@ void MythUIType::DeleteAllChildren(void)
  *
  *  \return The widget at these coordinates
  */
-MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
+MythUIType *MythUIType::GetChildAt(const QPoint p, bool recursive,
                                    bool focusable) const
 {
     if (GetArea().contains(p))
@@ -551,7 +551,7 @@ MythPoint MythUIType::GetPosition(void) const
     return m_area.topLeft();
 }
 
-void MythUIType::SetSize(const QSize &size)
+void MythUIType::SetSize(const QSize size)
 {
     if (size == m_area.size())
         return;
@@ -851,7 +851,7 @@ void MythUIType::SetMinArea(const MythRect &rect)
         m_parent->SetMinAreaParent(m_minArea, m_area, this);
 }
 
-void MythUIType::ExpandArea(const QRect &rect)
+void MythUIType::ExpandArea(const QRect rect)
 {
     QSize childSize = rect.size();
     QSize size = m_area.size();
@@ -1391,7 +1391,7 @@ void MythUIType::LoadNow(void)
  *
  *  Largely used For correctly handling mouse clicks
  */
-bool MythUIType::ContainsPoint(const QPoint &point) const
+bool MythUIType::ContainsPoint(const QPoint point) const
 {
     return m_area.contains(point);
 }

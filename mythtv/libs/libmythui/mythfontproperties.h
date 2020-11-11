@@ -19,7 +19,7 @@ class MUI_PUBLIC MythFontProperties: public XMLParseBase
 
     void SetFace(const QFont &face);
     void SetColor(const QColor &color);
-    void SetShadow(bool on, const QPoint &offset, const QColor &color, int alpha);
+    void SetShadow(bool on, QPoint offset, const QColor &color, int alpha);
     void SetOutline(bool on, const QColor &color, int size, int alpha);
 
     QFont face(void) const;

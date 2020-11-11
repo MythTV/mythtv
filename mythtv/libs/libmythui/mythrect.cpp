@@ -17,7 +17,7 @@ MythRect::MythRect(const QString &sX, const QString &sY, const QString &sWidth,
  * MythRect and then calling the compiler generated default
  * assignment operator.
  */
-MythRect& MythRect::operator= (const QRect& other)
+MythRect& MythRect::operator= (const QRect other)
 {
     if (this == &other)
         return *this;
@@ -61,7 +61,7 @@ void MythRect::Reset(void)
     m_parentArea.setRect(0, 0, 0, 0);
 }
 
-void MythRect::CalculateArea(const QRect & parentArea)
+void MythRect::CalculateArea(const QRect parentArea)
 {
     if ((m_parentArea == parentArea && !m_needsUpdate) || !parentArea.isValid())
         return;
@@ -293,7 +293,7 @@ MythPoint MythRect::topLeft(void) const
     return point;
 }
 
-void MythRect::moveTopLeft(const QPoint &point)
+void MythRect::moveTopLeft(const QPoint point)
 {
     // No need to convert coordinates to strings and back since there
     // is no percent scaling on a raw QPoint.
@@ -422,7 +422,7 @@ MythPoint::MythPoint(const QString &sX, const QString &sY)
  * MythPoint and then calling the compiler generated default
  * assignment operator.
  */
-MythPoint& MythPoint::operator= (const QPoint& other)
+MythPoint& MythPoint::operator= (const QPoint other)
 {
     if (this == &other)
         return *this;
@@ -442,7 +442,7 @@ MythPoint& MythPoint::operator= (const QPoint& other)
     return *this;
 };
 
-void MythPoint::CalculatePoint(const QRect & parentArea)
+void MythPoint::CalculatePoint(const QRect parentArea)
 {
     if ((m_parentArea == parentArea && !m_needsUpdate) || !parentArea.isValid())
         return;

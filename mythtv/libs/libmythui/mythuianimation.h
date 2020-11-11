@@ -15,7 +15,7 @@ class UIEffects
 
     UIEffects() = default;
 
-    QPointF GetCentre(const QRect &rect, int xoff, int yoff) const
+    QPointF GetCentre(const QRect rect, int xoff, int yoff) const
     {
         float x = static_cast<float>(xoff) + static_cast<float>(rect.left());
         float y = static_cast<float>(yoff) + static_cast<float>(rect.top());
@@ -30,7 +30,7 @@ class UIEffects
         return {x, y};
     }
 
-    QRect GetExtent(const QSize &size) const;
+    QRect GetExtent(QSize size) const;
 
     int    m_alpha  {255};
     float  m_hzoom  {1.0F};

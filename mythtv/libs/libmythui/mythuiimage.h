@@ -45,7 +45,7 @@ class ImageProperties
             rect = m_maskImage->rect();
         return rect;
     }
-    QImage GetMaskImageSubset(const QRect &imageArea)
+    QImage GetMaskImageSubset(QRect imageArea)
     {
         if (m_maskImage)
             return m_maskImage->copy(imageArea);
@@ -156,8 +156,8 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     void Finalize(void) override; // MythUIType
 
     void SetSize(int width, int height);
-    void SetSize(const QSize &size) override; // MythUIType
-    void ForceSize(const QSize &size);
+    void SetSize(QSize size) override; // MythUIType
+    void ForceSize(QSize size);
 
     void SetCropRect(int x, int y, int width, int height);
     void SetCropRect(const MythRect &rect);

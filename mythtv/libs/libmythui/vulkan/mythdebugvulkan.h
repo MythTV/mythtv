@@ -16,7 +16,7 @@ class MUI_PUBLIC MythDebugVulkan : protected MythVulkanObject
 
     static MythDebugVulkan* Create(MythVulkanObject* Vulkan);
 
-    void BeginRegion (VkCommandBuffer CmdBuffer, const char* Name, const MythVulkan4F& Color);
+    void BeginRegion (VkCommandBuffer CmdBuffer, const char* Name, MythVulkan4F Color);
     void EndRegion   (VkCommandBuffer CmdBuffer);
     void NameObject  (uint64_t Object, VkDebugReportObjectTypeEXT Type, const char *Name);
 

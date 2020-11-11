@@ -29,8 +29,8 @@ class MUI_PUBLIC MythComboBufferVulkan
     MythComboBufferVulkan(float Width, float Height);
 
     const void* Data(void) const;
-    void        PushData(const QMatrix4x4 &Transform, const QRect& Source,
-                         const QRect& Destination, int Alpha);
+    void        PushData(const QMatrix4x4 &Transform, QRect Source,
+                         QRect Destination, int Alpha);
     void        PopData(void);
 
     std::vector<VulkanComboBuffer> m_data;

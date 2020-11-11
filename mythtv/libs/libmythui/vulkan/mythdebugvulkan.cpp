@@ -48,7 +48,7 @@ MythDebugVulkan::MythDebugVulkan(MythVulkanObject* Vulkan)
     }
 }
 
-void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, const MythVulkan4F& Color)
+void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, const MythVulkan4F Color)
 {
     VkDebugMarkerMarkerInfoEXT begin =
         { VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT, nullptr, Name,

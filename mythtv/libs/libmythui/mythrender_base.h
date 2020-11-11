@@ -33,7 +33,7 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
     bool  IsErrored(void) const { return m_errored; }
     QSize GetSize(void) const   { return m_size;    }
     virtual QStringList GetDescription(void) { return QStringList(); }
-    virtual void SetViewPort(const QRect&, bool = false) {}
+    virtual void SetViewPort(const QRect, bool = false) {}
 
   protected:
    ~MythRender() override = default;

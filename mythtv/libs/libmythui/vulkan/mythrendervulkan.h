@@ -79,7 +79,7 @@ class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer
     void logicalDeviceLost         (void) override;
 
     void            BeginDebugRegion(VkCommandBuffer CommandBuffer, const char *Name,
-                                     const MythVulkan4F& Color);
+                                     MythVulkan4F Color);
     void            EndDebugRegion(VkCommandBuffer CommandBuffer);
     bool            CreateImage(QSize Size, VkFormat Format, VkImageTiling Tiling,
                                 VkImageUsageFlags Usage, VkMemoryPropertyFlags Properties,
@@ -94,7 +94,7 @@ class MUI_PUBLIC MythRenderVulkan : public QObject, public QVulkanWindowRenderer
                                  VkDeviceMemory& Memory);
     void            CopyBuffer(VkBuffer Src, VkBuffer Dst, VkDeviceSize Size,
                                VkCommandBuffer CommandBuffer = nullptr);
-    VkPipeline      CreatePipeline(MythShaderVulkan* Shader, const QRect& Viewport,
+    VkPipeline      CreatePipeline(MythShaderVulkan* Shader, QRect Viewport,
                                    std::vector<VkDynamicState> Dynamic = { });
     VkCommandBuffer CreateSingleUseCommandBuffer(void);
     void            FinishSingleUseCommandBuffer(VkCommandBuffer &Buffer);

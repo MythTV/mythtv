@@ -47,7 +47,7 @@ MythUIThemeCache::~MythUIThemeCache()
     delete m_imageThreadPool;
 }
 
-void MythUIThemeCache::SetScreenSize(const QSize &Size)
+void MythUIThemeCache::SetScreenSize(QSize Size)
 {
     m_cacheScreenSize = Size;
 }

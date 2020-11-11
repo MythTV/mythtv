@@ -676,7 +676,7 @@ QPoint MythUIGuideGrid::GetRowAndColumn(QPoint position)
     return {-1,-1};
 }
 
-void MythUIGuideGrid::SetProgramInfo(int row, int col, const QRect &area,
+void MythUIGuideGrid::SetProgramInfo(int row, int col, const QRect area,
                                      const QString &title, const QString &genre,
                                      int arrow, int recType, int recStat,
                                      bool selected)

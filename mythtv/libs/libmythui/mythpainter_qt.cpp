@@ -94,7 +94,7 @@ void MythQtPainter::End(void)
     MythPainter::End();
 }
 
-void MythQtPainter::SetClipRect(const QRect &clipRect)
+void MythQtPainter::SetClipRect(const QRect clipRect)
 {
     m_painter->setClipRect(clipRect);
     if (!clipRect.isEmpty())
@@ -109,8 +109,8 @@ void MythQtPainter::SetClipRect(const QRect &clipRect)
         m_painter->setClipping(false);
 }
 
-void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
-                              const QRect &src, int alpha)
+void MythQtPainter::DrawImage(const QRect r, MythImage *im,
+                              const QRect src, int alpha)
 {
     if (!m_painter)
     {

@@ -54,7 +54,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     void         ScreenAdded           (QScreen *qScreen);
     void         ScreenRemoved         (QScreen *qScreen);
     void         PhysicalDPIChanged    (qreal    DPI);
-    static void  GeometryChanged       (const QRect &Geometry);
+    static void  GeometryChanged       (QRect Geometry);
 
   signals:
     void         CurrentScreenChanged  (QScreen *qScreen);

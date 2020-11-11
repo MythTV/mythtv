@@ -61,7 +61,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     bool Load(const QString &filename);
 
     void Orientation(int orientation);
-    void Resize(const QSize &newSize, bool preserveAspect = false);
+    void Resize(QSize newSize, bool preserveAspect = false);
     void Reflect(ReflectAxis axis, int shear, int scale, int length,
                  int spacing = 0);
     void ToGreyscale();
@@ -77,7 +77,7 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
      * @return A reference counted image, call DecrRef() to delete.
      */
     static MythImage *Gradient(MythPainter *painter,
-                               const QSize & size, const QColor &begin,
+                               QSize size, const QColor &begin,
                                const QColor &end, uint alpha,
                                FillDirection direction = FillDirection::TopToBottom);
 

@@ -193,7 +193,7 @@ MythGestureEvent *MythGesture::GetGesture(void) const
 }
 
 /* comments in header */
-static int determineBin (const QPoint & p, int x1, int x2, int y1, int y2)
+static int determineBin (QPoint p, int x1, int x2, int y1, int y2)
 {
     int bin_num = 1;
     if (p.x() > x1)
@@ -328,7 +328,7 @@ bool MythGesture::HasMinimumPoints() const
  * \param Point The point to record.
  * \return True if the point was recorded, otherwise, false.
  */
-bool MythGesture::Record(const QPoint& Point, Qt::MouseButton Button)
+bool MythGesture::Record(QPoint Point, Qt::MouseButton Button)
 {
     /* only record if we haven't exceeded the maximum points */
     if ((static_cast<size_t>(m_points.size()) >= m_maxPoints) || !Recording())

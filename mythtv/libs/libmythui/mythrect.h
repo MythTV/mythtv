@@ -25,11 +25,11 @@ class MUI_PUBLIC MythRect : public QRect
              const QString &sHeight, const QString &baseRes = QString());
     explicit MythRect(QRect rect)
         : QRect(rect) {}
-    MythRect& operator= (const QRect& other);
+    MythRect& operator= (QRect other);
     bool operator== (const MythRect &other) const;
 
     void Reset(void);
-    void CalculateArea(const QRect & parentArea);
+    void CalculateArea(QRect parentArea);
     void CalculateArea(const MythRect & parentArea);
 
     void NormRect(void);
@@ -52,7 +52,7 @@ class MUI_PUBLIC MythRect : public QRect
     QString getHeight(void) const;
 
     MythPoint topLeft(void) const;
-    void moveTopLeft(const QPoint &point);
+    void moveTopLeft(QPoint point);
     void moveTopLeft(const MythPoint &point);
     void moveLeft(const QString &sX);
     void moveLeft(int X) { QRect::moveLeft(X); }
@@ -97,10 +97,10 @@ class MUI_PUBLIC MythPoint : public QPoint
     explicit MythPoint(QPoint point)
         : QPoint(point) {}
 
-    MythPoint& operator= (const QPoint& other);
+    MythPoint& operator= (QPoint other);
 
     bool isValid(void) const { return m_valid; }
-    void CalculatePoint(const QRect & parentArea);
+    void CalculatePoint(QRect parentArea);
     void CalculatePoint(const MythRect & parentArea);
 
     void NormPoint(void);

@@ -524,7 +524,7 @@ VkPhysicalDeviceLimits MythRenderVulkan::GetPhysicalDeviceLimits() const
 }
 
 void MythRenderVulkan::BeginDebugRegion(VkCommandBuffer CommandBuffer, const char *Name,
-                                        const MythVulkan4F &Color)
+                                        const MythVulkan4F Color)
 {
     if (m_debugMarker && CommandBuffer)
         m_debugMarker->BeginRegion(CommandBuffer, Name, Color);
@@ -637,7 +637,7 @@ void MythRenderVulkan::FinishSingleUseCommandBuffer(VkCommandBuffer &Buffer)
 }
 
 VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan* Shader,
-                                            const QRect& Viewport,
+                                            const QRect Viewport,
                                             std::vector<VkDynamicState> Dynamic)
 {
     if (!(Shader && Viewport.isValid()))

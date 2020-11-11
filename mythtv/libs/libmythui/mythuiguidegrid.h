@@ -56,10 +56,10 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 
     void SetCategoryColors(const QMap<QString, QString> &catColors);
 
-    void SetTextOffset(const QPoint &to) { m_textOffset = to; }
+    void SetTextOffset(const QPoint to) { m_textOffset = to; }
     void SetArrow(int direction, const QString &file);
     void LoadImage(int recType, const QString &file);
-    void SetProgramInfo(int row, int col, const QRect &area,
+    void SetProgramInfo(int row, int col, QRect area,
                         const QString &title, const QString &genre,
                         int arrow, int recType, int recStat, bool selected);
     void ResetData();
@@ -84,7 +84,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     {
       public:
         UIGTCon() { m_arrow = GridTimeNormal; m_recType = m_recStat = 0; };
-        UIGTCon(const QRect &drawArea, QString title,
+        UIGTCon(const QRect drawArea, QString title,
                 const QString &category, int arrow, int recType, int recStat) :
                 m_drawArea(drawArea),               m_title(std::move(title)),
                 m_category(category.trimmed()),     m_arrow(arrow),

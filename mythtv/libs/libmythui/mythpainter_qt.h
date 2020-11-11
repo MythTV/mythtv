@@ -28,9 +28,9 @@ class MythQtPainter : public MythPainter
     void Begin(QPaintDevice *parent) override; // MythPainter
     void End() override; // MythPainter
 
-    void SetClipRect(const QRect &clipRect) override; // MythPainter
+    void SetClipRect(QRect clipRect) override; // MythPainter
 
-    void DrawImage(const QRect &r, MythImage *im, const QRect &src,
+    void DrawImage(QRect r, MythImage *im, QRect src,
                    int alpha) override; // MythPainter
 
   protected:

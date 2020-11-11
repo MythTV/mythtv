@@ -17,8 +17,8 @@ void MythComboBufferVulkan::PopData(void)
     m_data.pop_back();
 }
 
-void MythComboBufferVulkan::PushData(const QMatrix4x4 &Transform, const QRect& Source,
-                                     const QRect& Destination, int Alpha)
+void MythComboBufferVulkan::PushData(const QMatrix4x4 &Transform, const QRect Source,
+                                     const QRect Destination, int Alpha)
 {
     m_data.push_back({});
     VulkanComboBuffer* data = &m_data.back();

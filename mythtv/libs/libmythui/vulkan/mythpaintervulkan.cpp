@@ -363,7 +363,7 @@ void MythPainterVulkan::End()
         m_vulkan->Render()->EndFrame();
 }
 
-void MythPainterVulkan::DrawImage(const QRect &Dest, MythImage *Image, const QRect &Source, int Alpha)
+void MythPainterVulkan::DrawImage(const QRect Dest, MythImage *Image, const QRect Source, int Alpha)
 {
     if (!m_frameStarted)
         return;
