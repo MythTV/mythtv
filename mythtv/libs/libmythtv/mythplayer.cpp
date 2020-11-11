@@ -1837,7 +1837,7 @@ int MythPlayer::GetCurrentChapter()
 void MythPlayer::GetChapterTimes(QList<long long> &times)
 {
     if (m_decoder)
-        return m_decoder->GetChapterTimes(times);
+        m_decoder->GetChapterTimes(times);
 }
 
 bool MythPlayer::DoJumpChapter(int chapter)

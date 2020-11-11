@@ -5667,7 +5667,7 @@ void MainServer::HandleCommBreakQuery(const QString &chanid,
 // Return structure is [number of rows] followed by a triplet of values:
 //   each triplet : [type] [long portion 1] [long portion 2]
 // type is the value in the map, right now 4 = commbreak start, 5= end
-    return HandleCutMapQuery(chanid, starttime, pbs, true);
+    HandleCutMapQuery(chanid, starttime, pbs, true);
 }
 
 void MainServer::HandleCutlistQuery(const QString &chanid,
@@ -5682,7 +5682,7 @@ void MainServer::HandleCutlistQuery(const QString &chanid,
 // Return structure is [number of rows] followed by a triplet of values:
 //   each triplet : [type] [long portion 1] [long portion 2]
 // type is the value in the map, right now 0 = commbreak start, 1 = end
-    return HandleCutMapQuery(chanid, starttime, pbs, false);
+    HandleCutMapQuery(chanid, starttime, pbs, false);
 }
 
 

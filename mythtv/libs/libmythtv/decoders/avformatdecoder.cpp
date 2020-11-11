@@ -2545,7 +2545,7 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
 
 void AvFormatDecoder::UpdateFramesPlayed(void)
 {
-    return DecoderBase::UpdateFramesPlayed();
+    DecoderBase::UpdateFramesPlayed();
 }
 
 bool AvFormatDecoder::DoRewindSeek(long long desiredFrame)

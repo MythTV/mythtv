@@ -809,7 +809,7 @@ const FileAssociations::association_list &FileAssociations::getList() const
 
 void FileAssociations::getExtensionIgnoreList(ext_ignore_list &ext_ignore) const
 {
-    return m_imp->getExtensionIgnoreList(ext_ignore);
+    m_imp->getExtensionIgnoreList(ext_ignore);
 }
 
 void FileAssociations::load_data()

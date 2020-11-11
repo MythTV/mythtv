@@ -527,7 +527,7 @@ MythGenericTree *VideoList::GetTreeRoot(void)
 
 void VideoList::InvalidateCache(void)
 {
-    return m_imp->InvalidateCache();
+    m_imp->InvalidateCache();
 }
 
 //////////////////////////////

@@ -1621,7 +1621,7 @@ const QString &VideoMetadata::GetHash() const
 
 void VideoMetadata::SetHash(const QString &hash)
 {
-    return m_imp->SetHash(hash);
+    m_imp->SetHash(hash);
 }
 
 const QString &VideoMetadata::GetHost() const

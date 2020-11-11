@@ -77,8 +77,8 @@ class Decoder : public MThread, public MythObservable
     void setOutput(AudioOutput *o);
     void setURL(const QString &url) { m_url = url; }
 
-    virtual void lock(void) { return m_mtx.lock(); }
-    virtual void unlock(void) { return m_mtx.unlock(); }
+    virtual void lock(void) { m_mtx.lock(); }
+    virtual void unlock(void) { m_mtx.unlock(); }
     virtual bool tryLock(void) { return m_mtx.tryLock(); }
 
     QWaitCondition *cond() { return &m_cnd; }

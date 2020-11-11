@@ -144,7 +144,7 @@ void MythV4L2M2MContext::InitVideoCodec(AVCodecContext *Context, bool SelectedSt
         DirectRendering = false;
         return;
     }
-    return MythDRMPRIMEContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
+    MythDRMPRIMEContext::InitVideoCodec(Context, SelectedStream, DirectRendering);
 }
 
 bool MythV4L2M2MContext::RetrieveFrame(AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame)

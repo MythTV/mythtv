@@ -211,7 +211,8 @@ void DecoderHandler::customEvent(QEvent *event)
     if (auto *dhe = dynamic_cast<DecoderHandlerEvent*>(event))
     {
         // Proxy all DecoderHandlerEvents
-        return dispatch(*dhe);
+        dispatch(*dhe);
+        return;
     }
     if (event->type() == MythEvent::MythEventMessage)
     {

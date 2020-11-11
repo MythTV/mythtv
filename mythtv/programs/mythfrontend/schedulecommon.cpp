@@ -78,7 +78,10 @@ void ScheduleCommon::ShowUpcoming(void) const
 
     if (pginfo->GetChanID() == 0 &&
         pginfo->GetRecordingRuleID() > 0)
-        return ShowUpcomingScheduled();
+    {
+        ShowUpcomingScheduled();
+        return;
+    }
 
     ShowUpcoming(pginfo->GetTitle(), pginfo->GetSeriesID());
 }
@@ -96,7 +99,10 @@ void ScheduleCommon::ShowUpcomingScheduled(void) const
 
     uint id = ri.GetRecordingRuleID();
     if (id == 0)
-        return ShowUpcoming(pginfo->GetTitle(), pginfo->GetSeriesID());
+    {
+        ShowUpcoming(pginfo->GetTitle(), pginfo->GetSeriesID());
+        return;
+    }
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     auto *pl = new ProgLister(mainStack, plRecordid, QString::number(id), "");

@@ -192,7 +192,8 @@ void MythPowerDBus::DBusSuspending(bool Stopping)
         if (UpdateStatus())
             return;
 
-        return FeatureHappening(FeatureSuspend);
+        FeatureHappening(FeatureSuspend);
+        return;
     }
     DidWakeUp();
 }
@@ -207,7 +208,8 @@ void MythPowerDBus::DBusShuttingDown(bool Stopping)
         if (UpdateStatus())
             return;
 
-        return FeatureHappening(FeatureShutdown);
+        FeatureHappening(FeatureShutdown);
+        return;
     }
     DidWakeUp(); // after hibernate?
 }
