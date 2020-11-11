@@ -37,15 +37,15 @@ class MythVideoOutput : public MythVideoBounds
 
     ~MythVideoOutput() override;
 
-    virtual bool Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                      float VideoAspect, const QRect& WindowRect, MythCodecID CodecID);
+    virtual bool Init(QSize VideoDim, QSize VideoDispDim,
+                      float VideoAspect, QRect WindowRect, MythCodecID CodecID);
     virtual void SetVideoFrameRate(float playback_fps);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
     virtual void PrepareFrame (MythVideoFrame* Frame, FrameScanType Scan = kScan_Ignore) = 0;
     virtual void RenderFrame  (MythVideoFrame* Frame, FrameScanType) = 0;
     virtual void RenderEnd    () = 0;
     virtual void EndFrame     () = 0;
-    virtual bool InputChanged(const QSize& VideoDim, const QSize& VideoDispDim,
+    virtual bool InputChanged(QSize VideoDim, QSize VideoDispDim,
                               float VideoAspect, MythCodecID  CodecID,
                               bool& AspectChanged, int ReferenceFrames, bool ForceChange);
     virtual void GetOSDBounds(QRect& Total, QRect& Visible,
@@ -74,7 +74,7 @@ class MythVideoOutput : public MythVideoBounds
     virtual MythVideoFrame* GetLastDecodedFrame();
     virtual MythVideoFrame* GetLastShownFrame();
     QString      GetFrameStatus() const;
-    QRect        GetImageRect(const QRect& Rect, QRect* DisplayRect = nullptr);
+    QRect        GetImageRect(QRect Rect, QRect* DisplayRect = nullptr);
     QRect        GetSafeRect();
 
     // These methods are only required by MythPlayerUI

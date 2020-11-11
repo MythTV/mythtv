@@ -2149,7 +2149,7 @@ void ChannelScanSM::HandleActiveScan(void)
     }
 }
 
-bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
+bool ChannelScanSM::Tune(const transport_scan_items_it_t transport)
 {
     const TransportScanItem &item = *transport;
 
@@ -2192,7 +2192,7 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t &transport)
     return channel->Tune(tuning);
 }
 
-void ChannelScanSM::ScanTransport(const transport_scan_items_it_t &transport)
+void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
 {
     QString offset_str = (transport.offset()) ?
         QObject::tr(" offset %2").arg(transport.offset()) : "";

@@ -16,7 +16,7 @@ class VideoVisualMonoScope : public VideoVisual
 
   protected:
     Q_DISABLE_COPY(VideoVisualMonoScope)
-    void                  InitCommon      (const QRect& Area);
+    void                  InitCommon      (QRect Area);
     bool                  UpdateVertices  (float* Buffer);
     void                  UpdateTime      ();
 

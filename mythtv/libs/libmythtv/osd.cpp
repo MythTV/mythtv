@@ -47,7 +47,7 @@ void OSD::TearDown()
     m_dialog = nullptr;
 }
 
-bool OSD::Init(const QRect &Rect, float FontAspect)
+bool OSD::Init(QRect Rect, float FontAspect)
 {
     int newstretch = static_cast<int>(lroundf(FontAspect * 100));
     if ((Rect == m_rect) && (newstretch == m_fontStretch))
@@ -447,7 +447,7 @@ void OSD::SetGraph(const QString &Window, const QString &Graph, int64_t Timecode
         image->SetImage(mi);
 }
 
-void OSD::Draw(const QRect &Rect)
+void OSD::Draw(QRect Rect)
 {
     bool visible = false;
     QTime now = MythDate::current().time();

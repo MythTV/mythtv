@@ -76,7 +76,7 @@ class MTV_PUBLIC V4L2util
   protected:
     // VBI
     static bool OpenVBI(const QString& vbi_dev_name);
-    bool SetSlicedVBI(const VBIMode::vbimode_t& vbimode);
+    bool SetSlicedVBI(VBIMode::vbimode_t vbimode);
 
     int  GetExtControl(int request, const QString& ctrl_desc = "") const;
     bool SetExtControl(int request, int value, const QString& ctrl_desc,

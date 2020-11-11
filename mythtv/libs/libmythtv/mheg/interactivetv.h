@@ -37,7 +37,7 @@ class InteractiveTV
     // Draw the (updated) image.
     void UpdateOSD(InteractiveScreen *osdWindow, MythPainter *osdPainter);
     // Called when the visible display area has changed.
-    void Reinit(const QRect &videoRect, const QRect &dispRect, float aspect);
+    void Reinit(QRect videoRect, QRect dispRect, float aspect);
 
     // Offer a key press.  Returns true if it accepts it.
     // This will depend on the current profile.

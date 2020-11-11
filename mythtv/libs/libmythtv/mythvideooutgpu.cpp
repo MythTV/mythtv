@@ -16,8 +16,8 @@
 #define LOC QString("VidOutGPU: ")
 
 MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const QString& Decoder,
-                                               MythCodecID CodecID, const QSize& VideoDim,
-                                               const QSize& VideoDispDim, float VideoAspect,
+                                               MythCodecID CodecID,       const QSize VideoDim,
+                                               const QSize VideoDispDim,  float VideoAspect,
                                                float FrameRate,           uint  PlayerFlags,
                                                const QString& Codec,      int ReferenceFrames)
 {
@@ -207,7 +207,7 @@ void MythVideoOutputGPU::InitPictureAttributes()
     m_videoColourSpace.SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
 }
 
-void MythVideoOutputGPU::WindowResized(const QSize& Size)
+void MythVideoOutputGPU::WindowResized(const QSize Size)
 {
     SetWindowSize(Size);
     InitDisplayMeasurements();
@@ -227,8 +227,8 @@ void MythVideoOutputGPU::SetVideoFrameRate(float NewRate)
     m_newFrameRate = true;
 }
 
-bool MythVideoOutputGPU::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                              float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecId)
+bool MythVideoOutputGPU::Init(const QSize VideoDim, const QSize VideoDispDim,
+                              float Aspect, const QRect DisplayVisibleRect, MythCodecID CodecId)
 {
     // if we are the main video player then free up as much video memory
     // as possible at startup
@@ -374,7 +374,7 @@ void MythVideoOutputGPU::SetReferenceFrames(int ReferenceFrames)
     m_maxReferenceFrames = ReferenceFrames;
 }
 
-bool MythVideoOutputGPU::InputChanged(const QSize& VideoDim, const QSize& VideoDispDim,
+bool MythVideoOutputGPU::InputChanged(QSize VideoDim, QSize VideoDispDim,
                                       float Aspect, MythCodecID CodecId, bool& AspectOnly, int ReferenceFrames,
                                       bool ForceChange)
 {

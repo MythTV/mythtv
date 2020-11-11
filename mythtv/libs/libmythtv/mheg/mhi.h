@@ -64,7 +64,7 @@ class MHIContext : public MHContext, public QRunnable
     /// Update the display
     void UpdateOSD(InteractiveScreen *osdWindow, MythPainter *osdPainter);
     /// The display area has changed.
-    void Reinit(const QRect &videoRect, const QRect &dispRect, float aspect);
+    void Reinit(QRect videoRect, QRect dispRect, float aspect);
 
     /// Stop the MHEG engine if it's running and waits until it has.
     void StopEngine(void);
@@ -107,7 +107,7 @@ class MHIContext : public MHContext, public QRunnable
     void DrawBackground(const QRegion &reg) override; // MHContext
     void DrawVideo(const QRect &videoRect, const QRect &dispRect) override; // MHContext
 
-    void DrawImage(int x, int y, const QRect &rect, const QImage &image,
+    void DrawImage(int x, int y, QRect rect, const QImage &image,
         bool bScaled = false, bool bUnder = false);
 
     int GetChannelIndex(const QString &str) override; // MHContext
@@ -151,13 +151,13 @@ class MHIContext : public MHContext, public QRunnable
 
     // Operations used by the display classes
     // Add an item to the display vector
-    void AddToDisplay(const QImage &image, const QRect &rect, bool bUnder = false);
+    void AddToDisplay(const QImage &image, QRect rect, bool bUnder = false);
     int ScaleX(int n, bool roundup = false) const;
     int ScaleY(int n, bool roundup = false) const;
-    QRect Scale(const QRect &r) const;
+    QRect Scale(QRect r) const;
     int ScaleVideoX(int n, bool roundup = false) const;
     int ScaleVideoY(int n, bool roundup = false) const;
-    QRect ScaleVideo(const QRect &r) const;
+    QRect ScaleVideo(QRect r) const;
 
     FT_Face GetFontFace(void) { return m_face; }
     bool IsFaceLoaded(void) const { return m_faceLoaded; }

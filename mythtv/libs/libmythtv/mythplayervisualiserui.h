@@ -14,8 +14,8 @@ class MTV_PUBLIC MythPlayerVisualiserUI : public MythPlayerVideoUI
 
   protected slots:
     void        InitialiseState() override;
-    void        UIScreenRectChanged(const QRect& Rect);
-    void        EmbedVisualiser(bool Embed, const QRect& Rect = {});
+    void        UIScreenRectChanged(QRect Rect);
+    void        EmbedVisualiser(bool Embed, QRect Rect = {});
     void        EnableVisualiser(bool Enable, bool Toggle, const QString& Name);
     void        AudioPlayerStateChanged(MythAudioPlayerState State);
 

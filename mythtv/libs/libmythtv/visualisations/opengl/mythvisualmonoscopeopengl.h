@@ -16,10 +16,10 @@ class MythVisualMonoScopeOpenGL : public VideoVisualMonoScope
     MythVisualMonoScopeOpenGL(AudioPlayer* Audio, MythRender* Render, bool Fade);
    ~MythVisualMonoScopeOpenGL() override;
 
-    void Draw(const QRect& Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/) override;
+    void Draw(QRect Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/) override;
 
   private:
-    MythRenderOpenGL* Initialise (const QRect& Area);
+    MythRenderOpenGL* Initialise (QRect Area);
     void              TearDown   ();
 
     bool                  m_bufferMaps   { false };

@@ -1218,7 +1218,7 @@ bool V4L2util::OpenVBI(const QString& /*vbi_dev_name*/)
     return false;
 }
 
-bool V4L2util::SetSlicedVBI(const VBIMode::vbimode_t& vbimode)
+bool V4L2util::SetSlicedVBI(VBIMode::vbimode_t vbimode)
 {
     struct v4l2_format vbifmt {};
 

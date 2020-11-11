@@ -300,7 +300,7 @@ void MythVisualCirclesVulkan::DrawPriv(MythPainter* /*Painter*/, QPaintDevice* /
 
 }
 
-MythRenderVulkan* MythVisualCirclesVulkan::InitialiseVulkan(const QRect& Area)
+MythRenderVulkan* MythVisualCirclesVulkan::InitialiseVulkan(const QRect Area)
 {
     if (m_disabled)
         return nullptr;

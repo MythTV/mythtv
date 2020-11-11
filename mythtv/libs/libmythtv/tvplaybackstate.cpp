@@ -15,7 +15,7 @@
  * may lead to a feedback loop and/or recursion.
 */
 
-void TVPlaybackState::OverlayStateChanged(const MythOverlayState& OverlayState)
+void TVPlaybackState::OverlayStateChanged(const MythOverlayState OverlayState)
 {
     m_overlayState = OverlayState;
 }
@@ -30,7 +30,7 @@ void TVPlaybackState::AudioStateChanged(const MythAudioState& AudioState)
     m_audioState = AudioState;
 }
 
-void TVPlaybackState::CaptionsStateChanged(const MythCaptionsState& CaptionsState)
+void TVPlaybackState::CaptionsStateChanged(const MythCaptionsState CaptionsState)
 {
     m_captionsState = CaptionsState;
 }

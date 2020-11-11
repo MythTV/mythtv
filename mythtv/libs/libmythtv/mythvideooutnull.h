@@ -11,8 +11,8 @@ class MythVideoOutputNull : public MythVideoOutput
     static void GetRenderOptions(RenderOptions& Options);
    ~MythVideoOutputNull() override = default;
 
-    bool Init(const QSize& VideoDim, const QSize& VideoDispDim,
-              float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecID) override;
+    bool Init(QSize VideoDim, QSize VideoDispDim,
+              float Aspect, QRect DisplayVisibleRect, MythCodecID CodecID) override;
     void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE) override;
 
     void PrepareFrame (MythVideoFrame* Frame, FrameScanType Scan) override;
@@ -20,7 +20,7 @@ class MythVideoOutputNull : public MythVideoOutput
     void RenderOverlays (OSD& /*Osd*/) override { }
     void RenderEnd    () override { }
     void EndFrame     () override { }
-    bool InputChanged(const QSize& VideoDim,   const QSize& VideoDispDim,
+    bool InputChanged(QSize VideoDim,          QSize VideoDispDim,
                       float        Aspect,     MythCodecID  CodecID,
                       bool&        AspectOnly,
                       int          ReferenceFrames, bool ForceChange) override;

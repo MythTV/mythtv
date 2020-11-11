@@ -24,7 +24,7 @@ MythVisualVulkan::~MythVisualVulkan()
     MythVisualVulkan::TearDownVulkan();
 }
 
-MythRenderVulkan* MythVisualVulkan::InitialiseVulkan(const QRect& /*Area*/)
+MythRenderVulkan* MythVisualVulkan::InitialiseVulkan(const QRect /*Area*/)
 {
     if (!IsValidVulkan())
         return nullptr;

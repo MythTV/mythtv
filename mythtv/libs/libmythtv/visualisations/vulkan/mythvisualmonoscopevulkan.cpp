@@ -198,7 +198,7 @@ MythVisualMonoScopeVulkan::~MythVisualMonoScopeVulkan()
     MythVisualMonoScopeVulkan::TearDownVulkan();
 }
 
-void MythVisualMonoScopeVulkan::Prepare(const QRect &Area)
+void MythVisualMonoScopeVulkan::Prepare(const QRect Area)
 {
     if (!InitialiseVulkan(Area))
         return;
@@ -234,7 +234,7 @@ void MythVisualMonoScopeVulkan::Prepare(const QRect &Area)
     vertex.first->Update(nullptr);
 }
 
-void MythVisualMonoScopeVulkan::Draw(const QRect& Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/)
+void MythVisualMonoScopeVulkan::Draw(const QRect Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/)
 {
     if (!InitialiseVulkan(Area))
         return;
@@ -295,7 +295,7 @@ void MythVisualMonoScopeVulkan::Draw(const QRect& Area, MythPainter* /*Painter*/
     }
 }
 
-MythRenderVulkan* MythVisualMonoScopeVulkan::InitialiseVulkan(const QRect& Area)
+MythRenderVulkan* MythVisualMonoScopeVulkan::InitialiseVulkan(const QRect Area)
 {
     if (m_disabled)
         return nullptr;

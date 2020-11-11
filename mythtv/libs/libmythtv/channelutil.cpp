@@ -842,7 +842,7 @@ QStringList ChannelUtil::GetInputTypes(uint chanid)
 }
 
 static bool lt_pidcache(
-    const pid_cache_item_t &a, const pid_cache_item_t &b)
+    const pid_cache_item_t a, const pid_cache_item_t b)
 {
     return a.GetPID() < b.GetPID();
 }

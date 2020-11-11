@@ -142,8 +142,8 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     static uint GetNibble       (const uint8_t *Buffer, int NibbleOffset);
     static int DecodeRLE        (uint8_t *Bitmap, int Linesize, int Width, int Height,
                                  const uint8_t *Buffer, int NibbleOffset, int BufferSize);
-    void       GuessPalette     (uint32_t *RGBAPalette, const PaletteArray& Palette,
-                                 const AlphaArray& Alpha);
+    void       GuessPalette     (uint32_t *RGBAPalette, PaletteArray Palette,
+                                 AlphaArray Alpha);
     static int IsTransparent    (const uint8_t *Buffer, int Pitch, int Num,
                                  const ColorArray& Colors);
     static int FindSmallestBoundingRectangle(AVSubtitle *Subtitle);

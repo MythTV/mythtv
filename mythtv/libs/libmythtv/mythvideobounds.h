@@ -28,8 +28,8 @@ class MythVideoBounds : public QObject
     MythVideoBounds();
    ~MythVideoBounds() override = default;
 
-    bool InitBounds(const QSize &VideoDim, const QSize &VideoDispDim,
-                    float Aspect, const QRect &WindowRect);
+    bool InitBounds(QSize VideoDim, QSize VideoDispDim,
+                    float Aspect, QRect WindowRect);
     void SetDisplay(MythDisplay* mDisplay);
 
   signals:
@@ -46,12 +46,12 @@ class MythVideoBounds : public QObject
     void RefreshVideoBoundsState();
     void ScreenChanged          (QScreen *screen);
     void PhysicalDPIChanged     (qreal  /*DPI*/);
-    void SourceChanged          (const QSize &VideoDim, const QSize &VideoDispDim, float Aspect);
+    void SourceChanged          (QSize VideoDim, QSize VideoDispDim, float Aspect);
     void VideoAspectRatioChanged(float Aspect);
-    virtual void EmbedPlayback  (bool Embed, const QRect& Rect);
+    virtual void EmbedPlayback  (bool Embed, QRect Rect);
     void ToggleAdjustFill       (AdjustFillMode AdjustFillMode = kAdjustFill_Toggle);
     void ToggleAspectOverride   (AspectOverrideMode AspectMode = kAspect_Toggle);
-    void ResizeDisplayWindow    (const QRect &Rect, bool SaveVisibleRect);
+    void ResizeDisplayWindow    (QRect Rect, bool SaveVisibleRect);
     void MoveResize             (void);
     void Zoom                   (ZoomDirection Direction);
     void ToggleMoveBottomLine   (void);

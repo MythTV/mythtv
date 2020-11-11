@@ -42,7 +42,7 @@ MythNavigationState::MythNavigationState(int CurrentChapter, std::vector<int64_t
 }
 
 MythVideoBoundsState::MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride,
-                                           float HorizScale, float VertScale, const QPoint& Move)
+                                           float HorizScale, float VertScale, QPoint Move)
   : m_adjustFillMode(AdjustFill),
     m_aspectOverrideMode(AspectOverride),
     m_manualHorizScale(HorizScale),

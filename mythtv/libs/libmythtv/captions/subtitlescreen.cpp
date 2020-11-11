@@ -46,7 +46,7 @@ class SubSimpleText : public MythUISimpleText, public SubWrapper
 {
 public:
     SubSimpleText(const QString &text, const MythFontProperties &font,
-                  const QRect &rect, Qt::Alignment align,
+                  QRect rect, Qt::Alignment align,
                   MythUIType *parent, const QString &name,
                   int whichImageCache, long long expireTime) :
         MythUISimpleText(text, font, rect, align, parent, name),

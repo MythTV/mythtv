@@ -169,8 +169,8 @@ class ChannelScanSM : public MPEGStreamListener,
 
     bool HasTimedOut(void);
     void HandleActiveScan(void);
-    bool Tune(const transport_scan_items_it_t &transport);
-    void ScanTransport(const transport_scan_items_it_t &transport);
+    bool Tune(transport_scan_items_it_t transport);
+    void ScanTransport(transport_scan_items_it_t transport);
     DTVTunerType GuessDTVTunerType(DTVTunerType type) const;
     static void LogLines(const QString& string);
 

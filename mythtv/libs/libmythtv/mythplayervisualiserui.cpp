@@ -46,7 +46,7 @@ void MythPlayerVisualiserUI::AudioPlayerStateChanged(MythAudioPlayerState State)
     emit VisualiserStateChanged(m_visualiserState);
 }
 
-void MythPlayerVisualiserUI::UIScreenRectChanged(const QRect& Rect)
+void MythPlayerVisualiserUI::UIScreenRectChanged(QRect Rect)
 {
     m_uiScreenRect = Rect;
 }
@@ -114,7 +114,7 @@ void MythPlayerVisualiserUI::AutoVisualise(bool HaveVideo)
     EnableVisualiser(true, false, "_AUTO_" + m_defaultVisualiser);
 }
 
-void MythPlayerVisualiserUI::EmbedVisualiser(bool Embed, const QRect &Rect)
+void MythPlayerVisualiserUI::EmbedVisualiser(bool Embed, QRect Rect)
 {
     m_embedRect = Rect;
     m_visualiserState.m_embedding = Embed;

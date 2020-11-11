@@ -26,7 +26,7 @@ void MythCaptionsOverlay::TearDown()
     MythMediaOverlay::TearDown();
 }
 
-void MythCaptionsOverlay::Draw(const QRect &Rect)
+void MythCaptionsOverlay::Draw(QRect Rect)
 {
     bool visible = false;
     for (auto * screen : qAsConst(m_children))

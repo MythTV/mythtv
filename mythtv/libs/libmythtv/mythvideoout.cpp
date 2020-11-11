@@ -139,8 +139,8 @@ MythVideoOutput::~MythVideoOutput()
  * \brief Performs most of the initialization for VideoOutput.
  * \return true if successful, false otherwise.
  */
-bool MythVideoOutput::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                           float VideoAspect, const QRect& WindowRect, MythCodecID CodecID)
+bool MythVideoOutput::Init(const QSize VideoDim, const QSize VideoDispDim,
+                           float VideoAspect, const QRect WindowRect, MythCodecID CodecID)
 {
     m_videoCodecID = CodecID;
     bool wasembedding = IsEmbedding();
@@ -214,7 +214,7 @@ void MythVideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintTy
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
  */
-bool MythVideoOutput::InputChanged(const QSize& VideoDim, const QSize& VideoDispDim,
+bool MythVideoOutput::InputChanged(const QSize VideoDim, const QSize VideoDispDim,
                                    float VideoAspect, MythCodecID  CodecID,
                                    bool& /*AspectOnly*/, int ReferenceFrames, bool /*ForceChange*/)
 {
@@ -354,7 +354,7 @@ MythVideoFrame* MythVideoOutput::GetLastShownFrame()
 }
 
 /// \brief translates caption/dvd button rectangle into 'screen' space
-QRect MythVideoOutput::GetImageRect(const QRect& Rect, QRect* DisplayRect)
+QRect MythVideoOutput::GetImageRect(const QRect Rect, QRect* DisplayRect)
 {
     qreal hscale = 0.0;
     QSize video_size   = GetVideoDispDim();

@@ -27,7 +27,7 @@ void MythVisualMonoScopeOpenGL::TearDown()
     m_vertices.clear();
 }
 
-void MythVisualMonoScopeOpenGL::Draw(const QRect& Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/)
+void MythVisualMonoScopeOpenGL::Draw(const QRect Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/)
 {
     MythRenderOpenGL* render = Initialise(Area);
     if (!render)
@@ -122,7 +122,7 @@ void MythVisualMonoScopeOpenGL::Draw(const QRect& Area, MythPainter* /*Painter*/
     render->doneCurrent();
 }
 
-MythRenderOpenGL* MythVisualMonoScopeOpenGL::Initialise(const QRect& Area)
+MythRenderOpenGL* MythVisualMonoScopeOpenGL::Initialise(QRect Area)
 {
     auto * render = dynamic_cast<MythRenderOpenGL*>(m_render);
     if (!render)

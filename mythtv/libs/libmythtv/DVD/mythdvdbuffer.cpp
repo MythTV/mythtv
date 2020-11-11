@@ -1983,7 +1983,7 @@ int64_t MythDVDBuffer::GetCurrentTime(void) const
 }
 
 /// \brief converts palette values from YUV to RGB
-void MythDVDBuffer::GuessPalette(uint32_t *RGBAPalette, const PaletteArray& Palette, const AlphaArray& Alpha)
+void MythDVDBuffer::GuessPalette(uint32_t *RGBAPalette, const PaletteArray Palette, const AlphaArray Alpha)
 {
     memset(RGBAPalette, 0, 16);
     for (int i = 0 ; i < 4 ; i++)

@@ -260,29 +260,29 @@ class transport_scan_items_it_t
     std::list<TransportScanItem>::iterator m_it;
     int m_offset {0};
 
-    friend bool operator==(const transport_scan_items_it_t&A,
-                           const transport_scan_items_it_t&B);
-    friend bool operator!=(const transport_scan_items_it_t&A,
-                           const transport_scan_items_it_t&B);
+    friend bool operator==(transport_scan_items_it_t A,
+                           transport_scan_items_it_t B);
+    friend bool operator!=(transport_scan_items_it_t A,
+                           transport_scan_items_it_t B);
 
-    friend bool operator==(const transport_scan_items_it_t&A,
-                           const std::list<TransportScanItem>::iterator&B);
+    friend bool operator==(transport_scan_items_it_t A,
+                           std::list<TransportScanItem>::iterator B);
 };
 
-inline bool operator==(const transport_scan_items_it_t& A,
-                       const transport_scan_items_it_t& B)
+inline bool operator==(const transport_scan_items_it_t A,
+                       const transport_scan_items_it_t B)
 {
     return (A.m_it == B.m_it) && (A.m_offset == B.m_offset);
 }
 
-inline bool operator!=(const transport_scan_items_it_t &A,
-                       const transport_scan_items_it_t &B)
+inline bool operator!=(const transport_scan_items_it_t A,
+                       const transport_scan_items_it_t B)
 {
     return (A.m_it != B.m_it) || (A.m_offset != B.m_offset);
 }
 
-inline bool operator==(const transport_scan_items_it_t& A,
-                       const std::list<TransportScanItem>::iterator& B)
+inline bool operator==(const transport_scan_items_it_t A,
+                       const std::list<TransportScanItem>::iterator B)
 {
     return (A.m_it == B) && (0 == A.offset());
 }

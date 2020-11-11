@@ -16,7 +16,7 @@ class MythVisualVulkan : public MythVulkanObject
                      const MythBindingMap* Bindings);
     virtual ~MythVisualVulkan();
 
-    virtual MythRenderVulkan* InitialiseVulkan(const QRect& /*Area*/);
+    virtual MythRenderVulkan* InitialiseVulkan(QRect /*Area*/);
     virtual void              TearDownVulkan  ();
 
   protected:

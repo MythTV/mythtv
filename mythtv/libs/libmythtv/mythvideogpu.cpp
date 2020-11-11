@@ -97,19 +97,19 @@ QString MythVideoGPU::VideoResizeToString(VideoResizing Resize)
     return reasons.join(",");
 }
 
-void MythVideoGPU::SetVideoDimensions(const QSize& VideoDim, const QSize& VideoDispDim)
+void MythVideoGPU::SetVideoDimensions(QSize VideoDim, QSize VideoDispDim)
 {
     m_videoDim = VideoDim;
     m_videoDispDim = VideoDispDim;
 }
 
-void MythVideoGPU::SetVideoRects(const QRect& DisplayVideoRect, const QRect& VideoRect)
+void MythVideoGPU::SetVideoRects(QRect DisplayVideoRect, QRect VideoRect)
 {
     m_displayVideoRect = DisplayVideoRect;
     m_videoRect = VideoRect;
 }
 
-void MythVideoGPU::SetViewportRect(const QRect& DisplayVisibleRect)
+void MythVideoGPU::SetViewportRect(QRect DisplayVisibleRect)
 {
     SetMasterViewport(DisplayVisibleRect.size());
 }

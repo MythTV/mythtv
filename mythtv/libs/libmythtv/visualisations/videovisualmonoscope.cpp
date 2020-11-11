@@ -19,7 +19,7 @@ QString VideoVisualMonoScope::Name()
     return m_fade ? FADE_NAME : SIMPLE_NAME;
 }
 
-void VideoVisualMonoScope::InitCommon(const QRect& Area)
+void VideoVisualMonoScope::InitCommon(QRect Area)
 {
     m_hue = 0.0;
     m_area = Area;

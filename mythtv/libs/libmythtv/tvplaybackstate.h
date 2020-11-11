@@ -78,10 +78,10 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void EnableVisualiser(bool Enable, bool Toggle = false, const QString& Name = QString());
 
   public slots:
-    void OverlayStateChanged(const MythOverlayState& OverlayState);
+    void OverlayStateChanged(MythOverlayState OverlayState);
     void AudioPlayerStateChanged(const MythAudioPlayerState& AudioPlayerState);
     void AudioStateChanged(const MythAudioState& AudioState);
-    void CaptionsStateChanged(const MythCaptionsState& CaptionsState);
+    void CaptionsStateChanged(MythCaptionsState CaptionsState);
     void VideoBoundsStateChanged(const MythVideoBoundsState& VideoBoundsState);
     void VisualiserStateChanged(const MythVisualiserState& VisualiserState);
 

@@ -14,7 +14,7 @@ class VideoVisualGoom : public VideoVisual
     VideoVisualGoom(AudioPlayer* Audio, MythRender* Render, bool HD);
     ~VideoVisualGoom() override;
 
-    void Draw(const QRect& Area, MythPainter* Painter, QPaintDevice* Device) override;
+    void Draw(QRect Area, MythPainter* Painter, QPaintDevice* Device) override;
     QString Name(void) override { return m_hd ? GOOMHD_NAME : GOOM_NAME; }
 
   private:

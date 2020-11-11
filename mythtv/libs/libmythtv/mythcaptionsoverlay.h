@@ -22,7 +22,7 @@ class MythCaptionsOverlay : public MythMediaOverlay
     MythCaptionsOverlay(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
    ~MythCaptionsOverlay() override;
 
-    void Draw(const QRect& Rect);
+    void Draw(QRect Rect);
 
     MythScreenType* GetWindow(const QString& Window) override;
 

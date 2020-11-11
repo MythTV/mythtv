@@ -171,8 +171,8 @@ MythVideoOutputOpenGL::~MythVideoOutputOpenGL()
     }
 }
 
-bool MythVideoOutputOpenGL::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                                 float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecId)
+bool MythVideoOutputOpenGL::Init(const QSize VideoDim, const QSize VideoDispDim,
+                                 float Aspect, const QRect DisplayVisibleRect, MythCodecID CodecId)
 {
     if (!(m_openglRender && m_painter && m_video))
     {
@@ -365,7 +365,7 @@ void MythVideoOutputOpenGL::EndFrame()
 
 /*! \brief Generate a list of supported OpenGL profiles.
 */
-QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, const QSize& /*VideoDim*/)
+QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, QSize /*VideoDim*/)
 {
     QStringList allowed;
 

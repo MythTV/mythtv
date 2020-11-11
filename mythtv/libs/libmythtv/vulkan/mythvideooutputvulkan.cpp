@@ -71,8 +71,8 @@ MythVideoOutputVulkan::MythVideoOutputVulkan(QString &Profile)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise Vulkan video output");
 }
 
-bool MythVideoOutputVulkan::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                                 float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecId)
+bool MythVideoOutputVulkan::Init(const QSize VideoDim, const QSize VideoDispDim,
+                                 float Aspect, const QRect DisplayVisibleRect, MythCodecID CodecId)
 {
     if (!(IsValidVulkan() && m_painter && m_video))
     {

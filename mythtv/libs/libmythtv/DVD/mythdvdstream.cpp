@@ -35,7 +35,7 @@ class MythDVDStream::BlockRange
     {
     }
 
-    bool operator < (const BlockRange& rhs) const
+    bool operator < (const BlockRange rhs) const
     {
         return m_end <= rhs.m_start;
     }

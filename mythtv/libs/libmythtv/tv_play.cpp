@@ -6809,7 +6809,7 @@ QSet<uint> TV::IsTunableOn(PlayerContext* Context, uint ChanId)
     return tunable_cards;
 }
 
-void TV::Embed(bool Embed, const QRect& Rect, const QStringList& Data)
+void TV::Embed(bool Embed, QRect Rect, const QStringList& Data)
 {
     emit EmbedPlayback(Embed, Rect);
     if (Embed)
@@ -6847,7 +6847,7 @@ void TV::Embed(bool Embed, const QRect& Rect, const QStringList& Data)
     }
 }
 
-bool TV::DoSetPauseState(const bool& Pause)
+bool TV::DoSetPauseState(bool Pause)
 {
     bool waspaused = ContextIsPaused(__FILE__, __LINE__);
     float time = 0.0F;

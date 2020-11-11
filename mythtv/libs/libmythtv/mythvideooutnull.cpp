@@ -60,8 +60,8 @@ MythVideoOutputNull* MythVideoOutputNull::Create(QSize VideoDim, QSize VideoDisp
     return nullptr;
 }
 
-bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
-                                       const QSize& VideoDispDim,
+bool MythVideoOutputNull::InputChanged(QSize        VideoDim,
+                                       QSize        VideoDispDim,
                                        float        Aspect,
                                        MythCodecID  CodecID,
                                        bool&        AspectOnly,
@@ -106,8 +106,8 @@ bool MythVideoOutputNull::InputChanged(const QSize& VideoDim,
     return ok;
 }
 
-bool MythVideoOutputNull::Init(const QSize& VideoDim, const QSize& VideoDispDim,
-                               float Aspect, const QRect& DisplayVisibleRect, MythCodecID CodecID)
+bool MythVideoOutputNull::Init(const QSize VideoDim, const QSize VideoDispDim,
+                               float Aspect, const QRect DisplayVisibleRect, MythCodecID CodecID)
 {
     if (VideoDispDim.isEmpty())
         return false;

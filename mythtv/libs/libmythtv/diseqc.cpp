@@ -636,11 +636,8 @@ void DiSEqCDevTree::SetRoot(DiSEqCDevDevice *root)
 }
 
 #ifdef USING_DVB
-static bool send_diseqc(int fd, const dvb_diseqc_master_cmd &cmd)
+static bool send_diseqc(int fd, const dvb_diseqc_master_cmd cmd)
 {
-    (void) fd;
-    (void) cmd;
-
     bool success = false;
 
     for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)

@@ -59,7 +59,7 @@ void InteractiveTV::ProcessDSMCCSection(
                                 carouselId, dataBroadcastId);
 }
 
-void InteractiveTV::Reinit(const QRect &videoRect, const QRect &dispRect, float aspect)
+void InteractiveTV::Reinit(QRect videoRect, QRect dispRect, float aspect)
 {
     m_context->Reinit(videoRect, dispRect, aspect);
 }

@@ -47,7 +47,7 @@ class MTV_PUBLIC ChannelInfo
     bool Load(uint lchanid = -1);
 
     enum ChannelFormat { kChannelShort, kChannelLong };
-    QString GetFormatted(const ChannelFormat &format) const;
+    QString GetFormatted(ChannelFormat format) const;
     void ToMap(InfoMap &infoMap);
 
     QString GetSourceName();

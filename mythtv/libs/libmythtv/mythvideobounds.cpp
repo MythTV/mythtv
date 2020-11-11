@@ -448,8 +448,8 @@ void MythVideoBounds::ApplyLetterboxing(void)
     }
 }
 
-bool MythVideoBounds::InitBounds(const QSize &VideoDim, const QSize &VideoDispDim,
-                                 float Aspect, const QRect &WindowRect)
+bool MythVideoBounds::InitBounds(QSize VideoDim, QSize VideoDispDim,
+                                 float Aspect, QRect WindowRect)
 {
     if (m_display)
     {
@@ -521,7 +521,7 @@ void MythVideoBounds::VideoAspectRatioChanged(float Aspect)
 }
 
 /// \brief Update for new source video dimensions and aspect ratio
-void MythVideoBounds::SourceChanged(const QSize &VideoDim, const QSize &VideoDispDim, float Aspect)
+void MythVideoBounds::SourceChanged(QSize VideoDim, QSize VideoDispDim, float Aspect)
 {
     if (Aspect < 0.0F)
         Aspect = m_videoAspect;
@@ -672,7 +672,7 @@ void MythVideoBounds::SetRotation(int Rotation)
 /**
  * \brief Resize Display Window
  */
-void MythVideoBounds::ResizeDisplayWindow(const QRect &Rect, bool SaveVisibleRect)
+void MythVideoBounds::ResizeDisplayWindow(QRect Rect, bool SaveVisibleRect)
 {
     if (SaveVisibleRect)
         m_tmpDisplayVisibleRect = m_displayVisibleRect;
@@ -680,7 +680,7 @@ void MythVideoBounds::ResizeDisplayWindow(const QRect &Rect, bool SaveVisibleRec
     MoveResize();
 }
 
-void MythVideoBounds::EmbedPlayback(bool Embed, const QRect& Rect)
+void MythVideoBounds::EmbedPlayback(bool Embed, QRect Rect)
 {
     if (Embed)
     {

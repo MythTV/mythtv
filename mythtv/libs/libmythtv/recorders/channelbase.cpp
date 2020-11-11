@@ -695,7 +695,7 @@ bool ChannelBase::CheckChannel(const QString &channum) const
 ChannelBase *ChannelBase::CreateChannel(
     TVRec                    *tvrec,
     const GeneralDBOptions   &genOpt,
-    const DVBDBOptions       &dvbOpt,
+    DVBDBOptions             dvbOpt,
     const FireWireDBOptions  &fwOpt,
     const QString            &startchannel,
     bool                      enter_power_save_mode,

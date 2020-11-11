@@ -197,7 +197,7 @@ bool ProfileItem::CheckRange(const QString& Key,
     return match;
 }
 
-bool ProfileItem::IsMatch(const QSize &Size, float Framerate, const QString &CodecName,
+bool ProfileItem::IsMatch(QSize Size, float Framerate, const QString &CodecName,
                           const QStringList &DisallowedDecoders) const
 {
     bool match = true;
@@ -356,7 +356,7 @@ VideoDisplayProfile::VideoDisplayProfile()
     }
 }
 
-void VideoDisplayProfile::SetInput(const QSize &Size, float Framerate, const QString &CodecName,
+void VideoDisplayProfile::SetInput(QSize Size, float Framerate, const QString &CodecName,
                                    const QStringList &DisallowedDecoders)
 {
     QMutexLocker locker(&m_lock);
@@ -502,7 +502,7 @@ void VideoDisplayProfile::SetPreference(const QString &Key, const QString &Value
 }
 
 vector<ProfileItem>::const_iterator VideoDisplayProfile::FindMatch
-    (const QSize &Size, float Framerate, const QString &CodecName, const QStringList& DisallowedDecoders)
+    (const QSize Size, float Framerate, const QString &CodecName, const QStringList& DisallowedDecoders)
 {
     for (auto it = m_allowedPreferences.cbegin(); it != m_allowedPreferences.cend(); ++it)
         if ((*it).IsMatch(Size, Framerate, CodecName, DisallowedDecoders))
@@ -511,7 +511,7 @@ vector<ProfileItem>::const_iterator VideoDisplayProfile::FindMatch
 }
 
 void VideoDisplayProfile::LoadBestPreferences
-    (const QSize &Size, float Framerate, const QString &CodecName, const QStringList &DisallowedDecoders)
+    (const QSize Size, float Framerate, const QString &CodecName, const QStringList &DisallowedDecoders)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences(%1x%2, %3, %4)")
         .arg(Size.width()).arg(Size.height())

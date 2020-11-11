@@ -37,7 +37,7 @@ VideoVisualSpectrum::~VideoVisualSpectrum()
 
 template<typename T> T sq(T a) { return a*a; };
 
-void VideoVisualSpectrum::Draw(const QRect& Area, MythPainter* Painter, QPaintDevice* Device)
+void VideoVisualSpectrum::Draw(const QRect Area, MythPainter* Painter, QPaintDevice* Device)
 {
     if (m_disabled)
         return;
@@ -137,7 +137,7 @@ void VideoVisualSpectrum::DrawPriv(MythPainter* Painter, QPaintDevice* Device)
     Painter->End();
 }
 
-bool VideoVisualSpectrum::Initialise(const QRect& Area)
+bool VideoVisualSpectrum::Initialise(const QRect Area)
 {
     if (Area == m_area)
         return true;

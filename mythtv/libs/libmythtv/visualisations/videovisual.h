@@ -48,8 +48,8 @@ class MTV_PUBLIC VideoVisual : public MythTV::Visual
    ~VideoVisual() override;
 
     bool NeedsPrepare() const { return m_needsPrepare; }
-    virtual void Prepare(const QRect& /*Area*/) { }
-    virtual void Draw(const QRect &area, MythPainter *painter,
+    virtual void Prepare(const QRect /*Area*/) { }
+    virtual void Draw(QRect area, MythPainter *painter,
                       QPaintDevice* device) = 0;
     virtual QString Name(void) = 0;
 

@@ -70,7 +70,7 @@ RecordingInfo::RecordingInfo(
     const QDateTime &_recendts,
 
     float _stars,
-    const QDate &_originalAirDate,
+    QDate _originalAirDate,
 
     bool _repeat,
 

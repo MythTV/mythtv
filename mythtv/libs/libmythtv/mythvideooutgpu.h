@@ -14,8 +14,8 @@ class MythVideoOutputGPU : public MythVideoOutput
 
   public:
     static MythVideoOutputGPU* Create(MythMainWindow* MainWindow, const QString& Decoder,
-                                      MythCodecID CodecID, const QSize& VideoDim,
-                                      const QSize& VideoDispDim, float VideoAspect,
+                                      MythCodecID CodecID,       QSize VideoDim,
+                                      QSize VideoDispDim,        float VideoAspect,
                                       float FrameRate,           uint  PlayerFlags,
                                       const QString& Codec,      int ReferenceFrames);
    ~MythVideoOutputGPU() override;
@@ -25,7 +25,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            PictureAttributeChanged(PictureAttribute Attribute, int Value);
 
   public slots:
-    void            WindowResized         (const QSize& Size);
+    void            WindowResized         (QSize Size);
 
   public:
     void            InitPictureAttributes () override;
@@ -33,7 +33,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            DiscardFrames         (bool KeyFrame, bool Flushed) override;
     void            DoneDisplayingFrame   (MythVideoFrame* Frame) override;
     void            UpdatePauseFrame      (int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
-    bool            InputChanged          (const QSize& VideoDim, const QSize& VideoDispDim,
+    bool            InputChanged          (QSize VideoDim, QSize VideoDispDim,
                                            float Aspect, MythCodecID CodecId, bool& AspectOnly,
                                            int ReferenceFrames, bool ForceChange) override;
     void            EndFrame              () override;
@@ -43,8 +43,8 @@ class MythVideoOutputGPU : public MythVideoOutput
   protected:
     MythVideoOutputGPU(MythRender* Render, QString &Profile);
     virtual QRect   GetDisplayVisibleRectAdj();
-    bool            Init                  (const QSize& VideoDim, const QSize& VideoDispDim, float Aspect,
-                                           const QRect& DisplayVisibleRect, MythCodecID CodecId) override;
+    bool            Init                  (QSize VideoDim, QSize VideoDispDim, float Aspect,
+                                           QRect DisplayVisibleRect, MythCodecID CodecId) override;
     void            PrepareFrame          (MythVideoFrame* Frame, FrameScanType Scan) override;
     void            RenderFrame           (MythVideoFrame* Frame, FrameScanType Scan) override;
     void            RenderOverlays        (OSD& Osd) override;

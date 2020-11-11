@@ -42,7 +42,7 @@ VideoVisualGoom::~VideoVisualGoom()
     goom_close();
 }
 
-void VideoVisualGoom::Draw(const QRect& Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/)
+void VideoVisualGoom::Draw(const QRect Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/)
 {
     if (m_disabled || !m_render || Area.isEmpty())
         return;

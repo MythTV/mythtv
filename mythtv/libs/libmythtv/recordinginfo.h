@@ -104,7 +104,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         const QDateTime &recendts,
 
         float stars,
-        const QDate &originalAirDate,
+        QDate originalAirDate,
 
         bool repeat,
 

@@ -305,7 +305,7 @@ public:
         return RET_OK;
     }
 
-    int DecodeData(const aesiv_array &IV, bool iv_valid)
+    int DecodeData(const aesiv_array IV, bool iv_valid)
     {
         /* Decrypt data using AES-128 */
         int aeslen = m_data.size() & ~0xf;

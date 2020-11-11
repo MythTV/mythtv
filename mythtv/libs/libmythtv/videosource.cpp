@@ -688,7 +688,7 @@ void VideoSource::deleteEntry(void)
     SourceUtil::DeleteSource(getSourceID());
 }
 
-bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
+bool VideoSourceEditor::cardTypesInclude(int sourceID,
                                          const QString &thecardtype)
 {
     MSqlQuery query(MSqlQuery::InitCon());

@@ -74,7 +74,7 @@ public:
 class FormattedTextSubtitle
 {
 protected:
-    FormattedTextSubtitle(QString base, const QRect &safearea,
+    FormattedTextSubtitle(QString base, QRect safearea,
                           uint64_t start, uint64_t duration,
                           SubtitleScreen *p) :
         m_base(std::move(base)), m_safeArea(safearea),
@@ -110,7 +110,7 @@ class FormattedTextSubtitleSRT : public FormattedTextSubtitle
 {
 public:
     FormattedTextSubtitleSRT(const QString &base,
-                             const QRect &safearea,
+                             QRect safearea,
                              uint64_t start,
                              uint64_t duration,
                              SubtitleScreen *p,
@@ -129,7 +129,7 @@ class FormattedTextSubtitle608 : public FormattedTextSubtitle
 public:
     explicit FormattedTextSubtitle608(const vector<CC608Text*> &buffers,
                              const QString &base = "",
-                             const QRect &safearea = QRect(),
+                             QRect safearea = QRect(),
                              SubtitleScreen *p = nullptr) :
         FormattedTextSubtitle(base, safearea, 0, 0, p)
     {
@@ -147,7 +147,7 @@ public:
                              int num,
                              const vector<CC708String*> &list,
                              const QString &base = "",
-                             const QRect &safearea = QRect(),
+                             QRect safearea = QRect(),
                              SubtitleScreen *p = nullptr,
                              float aspect = 1.77777F) :
         FormattedTextSubtitle(base, safearea, 0, 0, p),

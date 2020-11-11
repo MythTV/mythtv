@@ -846,7 +846,7 @@ class MTV_PUBLIC VideoSourceEditor : public GroupSetting
   public:
     VideoSourceEditor();
 
-    static bool cardTypesInclude(const int& SourceID,
+    static bool cardTypesInclude(int SourceID,
                                  const QString& thecardtype);
 
     void Load(void) override; // StandardSetting

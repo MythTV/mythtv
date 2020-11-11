@@ -630,7 +630,7 @@ bool MHIContext::OfferKey(const QString& key)
 }
 
 // Called from MythPlayer::VideoStart and MythPlayer::ReinitOSD
-void MHIContext::Reinit(const QRect &videoRect, const QRect &dispRect, float aspect)
+void MHIContext::Reinit(const QRect videoRect, const QRect dispRect, float aspect)
 {
     LOG(VB_MHEG, LOG_INFO,
          QString("[mhi] Reinit video(y:%1 x:%2 w:%3 h:%4) "
@@ -772,7 +772,7 @@ inline int MHIContext::ScaleY(int n, bool roundup) const
     return (n * m_displayRect.height() + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
 }
 
-inline QRect MHIContext::Scale(const QRect &r) const
+inline QRect MHIContext::Scale(const QRect r) const
 {
     return { m_displayRect.topLeft() + QPoint(ScaleX(r.x()), ScaleY(r.y())),
              QSize(ScaleX(r.width(), true), ScaleY(r.height(), true)) };
@@ -788,13 +788,13 @@ inline int MHIContext::ScaleVideoY(int n, bool roundup) const
     return (n * m_videoRect.height() + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
 }
 
-inline QRect MHIContext::ScaleVideo(const QRect &r) const
+inline QRect MHIContext::ScaleVideo(const QRect r) const
 {
     return { m_videoRect.topLeft() + QPoint(ScaleVideoX(r.x()), ScaleVideoY(r.y())),
              QSize(ScaleVideoX(r.width(), true), ScaleVideoY(r.height(), true)) };
 }
 
-void MHIContext::AddToDisplay(const QImage &image, const QRect &displayRect, bool bUnder /*=false*/)
+void MHIContext::AddToDisplay(const QImage &image, const QRect displayRect, bool bUnder /*=false*/)
 {
     const QRect scaledRect = Scale(displayRect);
 
@@ -1207,7 +1207,7 @@ void MHIContext::DrawRect(int xPos, int yPos, int width, int height,
 // image may be clipped. x and y define the origin of the bitmap
 // and usually that will be the same as the origin of the bounding
 // box (clipRect).
-void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
+void MHIContext::DrawImage(int x, int y, const QRect clipRect,
                            const QImage &qImage, bool bScaled, bool bUnder)
 {
     if (qImage.isNull())

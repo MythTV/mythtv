@@ -25,7 +25,7 @@ class MythVisualCirclesVulkan : public VideoVisualCircles, public MythVisualVulk
     void DrawPriv(MythPainter* /*Painter*/, QPaintDevice* /*Device*/) override;
 
   private:
-    MythRenderVulkan* InitialiseVulkan (const QRect& Area) override;
+    MythRenderVulkan* InitialiseVulkan (QRect Area) override;
     void              TearDownVulkan   () override;
 
     CirclesBuffer m_pushBuffer { };

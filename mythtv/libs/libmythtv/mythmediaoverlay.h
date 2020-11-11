@@ -34,7 +34,7 @@ class MythMediaOverlay : public QObject
    ~MythMediaOverlay() override;
 
     void    SetPlayer(MythPlayerUI* Player);
-    virtual bool Init(const QRect &Rect, float FontAspect);
+    virtual bool Init(QRect Rect, float FontAspect);
     QRect   Bounds() const;
     int     GetFontStretch() const;
     bool    HasWindow(const QString& Window);

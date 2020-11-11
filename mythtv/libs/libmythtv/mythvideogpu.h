@@ -54,9 +54,9 @@ class MythVideoGPU : public QObject
 
   public slots:
     void         UpdateColourSpace (bool PrimariesChanged);
-    void         SetVideoDimensions(const QSize& VideoDim, const QSize& VideoDispDim);
-    void         SetVideoRects     (const QRect& DisplayVideoRect, const QRect& VideoRect);
-    void         SetViewportRect   (const QRect& DisplayVisibleRect);
+    void         SetVideoDimensions(QSize VideoDim, QSize VideoDispDim);
+    void         SetVideoRects     (QRect DisplayVideoRect, QRect VideoRect);
+    void         SetViewportRect   (QRect DisplayVisibleRect);
 
   protected:
     virtual void ColourSpaceUpdate (bool PrimariesChanged) = 0;

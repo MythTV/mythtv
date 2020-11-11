@@ -143,7 +143,7 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
  */
 void PreviewGeneratorQueue::GetPreviewImage(
     const ProgramInfo &pginfo,
-    const QSize &outputsize,
+    const QSize outputsize,
     const QString &outputfile,
     long long time, bool in_seconds,
     const QString& token)
@@ -411,7 +411,7 @@ void PreviewGeneratorQueue::SendEvent(
  */
 QString PreviewGeneratorQueue::GeneratePreviewImage(
     ProgramInfo &pginfo,
-    const QSize &size,
+    const QSize size,
     const QString &outputfile,
     long long time, bool in_seconds,
     const QString& token)

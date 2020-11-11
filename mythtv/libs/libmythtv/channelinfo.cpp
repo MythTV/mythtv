@@ -187,7 +187,7 @@ bool ChannelInfo::Load(uint lchanid)
     return true;
 }
 
-QString ChannelInfo::GetFormatted(const ChannelFormat &format) const
+QString ChannelInfo::GetFormatted(ChannelFormat format) const
 {
     QString tmp;
 

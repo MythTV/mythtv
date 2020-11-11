@@ -185,7 +185,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void VolumeChange(bool Up, int NewVolume = -1);
 
   private slots:
-    void Embed(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
+    void Embed(bool Embed, QRect Rect = {}, const QStringList& Data = {});
 
   private:
     static QStringList lastProgramStringList;
@@ -349,7 +349,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     float DoTogglePauseStart();
     void DoTogglePauseFinish(float Time, bool ShowOSD);
     void DoTogglePause(bool ShowOSD);
-    bool DoSetPauseState(const bool& Pause);
+    bool DoSetPauseState(bool Pause);
     bool ContextIsPaused(const char* File, int Location);
 
     // Program jumping stuff

@@ -109,13 +109,13 @@ class OSD : public MythMediaOverlay
     OSD(MythMainWindow* MainWindow, TV* Tv, MythPlayerUI* Player, MythPainter* Painter);
    ~OSD() override;
 
-    bool Init(const QRect &Rect, float FontAspect) override;
+    bool Init(QRect Rect, float FontAspect) override;
     void HideWindow(const QString &Window) override;
     void SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);
     void HideAll(bool KeepSubs = true, MythScreenType *Except = nullptr, bool DropNotification = false);
     void SetExpiry(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout = 0);
     void ResetWindow(const QString &Window);
-    void Draw(const QRect& Rect);
+    void Draw(QRect Rect);
 
     void SetValues(const QString &Window, const QHash<QString,int> &Map, OSDTimeout Timeout);
     void SetValues(const QString &Window, const QHash<QString,float> &Map, OSDTimeout Timeout);
