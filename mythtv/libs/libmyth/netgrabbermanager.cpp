@@ -21,10 +21,10 @@
 // ---------------------------------------------------
 
 GrabberScript::GrabberScript(const QString& title, const QString& image,
-              const ArticleType &type, const QString& author,
-              const bool& search, const bool& tree,
+              const ArticleType type, const QString& author,
+              const bool search, const bool tree,
               const QString& description, const QString& commandline,
-              const double& version) :
+              const double version) :
     MThread("GrabberScript")
 {
     m_title = title;
@@ -99,7 +99,7 @@ void GrabberScript::run()
 
 void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
                                 const QString &pathThumb, QDomElement& domElem,
-                                const ArticleType &type)
+                                const ArticleType type)
 {
     QMutexLocker locker(&m_lock);
 

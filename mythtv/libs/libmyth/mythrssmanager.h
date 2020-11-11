@@ -39,11 +39,11 @@ class MPUBLIC RSSSite : public QObject
     RSSSite(QString title,
             QString sortTitle,
             QString image,
-            const ArticleType& type,
+            ArticleType type,
             QString description,
             QString url,
             QString author,
-            const bool& download,
+            bool download,
             QDateTime updated);
 
     ~RSSSite() override = default;

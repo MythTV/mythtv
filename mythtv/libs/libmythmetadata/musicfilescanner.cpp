@@ -170,7 +170,7 @@ bool MusicFileScanner::IsMusicFile(const QString &filename)
  *
  * \returns Directory id
  */
-int MusicFileScanner::GetDirectoryId(const QString &directory, const int &parentid)
+int MusicFileScanner::GetDirectoryId(const QString &directory, int parentid)
 {
     if (directory.isEmpty())
         return 0;

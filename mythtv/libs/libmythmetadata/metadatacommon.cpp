@@ -66,7 +66,7 @@ MetadataLookup::MetadataLookup(
     uint tracknum,
     QString system,
     const uint year,
-    const QDate &releasedate,
+    const QDate releasedate,
     QDateTime lastupdated,
     const uint runtime,
     const uint runtimesecs,
@@ -189,7 +189,7 @@ MetadataLookup::MetadataLookup(
     uint videoproperties,
     uint subtitletype,
     const uint year,
-    const QDate &releasedate,
+    const QDate releasedate,
     QDateTime lastupdated,
     const uint runtime,
     const uint runtimesecs) :

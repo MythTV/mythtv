@@ -580,7 +580,7 @@ QString MetaIOID3::getExtFromMimeType(const QString &mimeType)
  * \returns Pointer to frame
  */
 AttachedPictureFrame* MetaIOID3::findAPIC(TagLib::ID3v2::Tag *tag,
-                                        const AttachedPictureFrame::Type &type,
+                                        AttachedPictureFrame::Type type,
                                         const String &description)
 {
   TagLib::ID3v2::FrameList l = tag->frameList("APIC");

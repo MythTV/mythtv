@@ -36,12 +36,12 @@ MPUBLIC bool insertSearchInDB(GrabberScript *script, ArticleType type);
 MPUBLIC bool insertGrabberInDB(const QString &name, const QString &thumbnail,
                 ArticleType type, const QString &author,
                 const QString &description, const QString &commandline,
-                const double &version, bool search, bool tree,
+                double version, bool search, bool tree,
                 bool podcast);
 
 MPUBLIC bool removeTreeFromDB(GrabberScript *script);
 MPUBLIC bool removeSearchFromDB(GrabberScript *script);
-MPUBLIC bool removeGrabberFromDB(const QString &commandline, const bool &search);
+MPUBLIC bool removeGrabberFromDB(const QString &commandline, bool search);
 
 // RSS DB Utils
 
@@ -53,7 +53,7 @@ MPUBLIC bool insertInDB(RSSSite *site);
 MPUBLIC bool insertInDB(const QString &name, const QString &sortname,
                 const QString &thumbnail,
                 const QString &description, const QString &url,
-                const QString &author, const bool &download,
+                const QString &author, bool download,
                 const QDateTime &updated, ArticleType type);
 
 MPUBLIC bool removeFromDB(RSSSite *site);

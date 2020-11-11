@@ -45,7 +45,7 @@ class UPNP_PUBLIC SSDPCacheEntries : public ReferenceCounter
         { QMutexLocker locker(&m_mutex); return m_mapEntries.size(); }
     void Insert(const QString &sUSN, DeviceLocation *pEntry);
     void Remove(const QString &sUSN);
-    uint RemoveStale(const TaskTime &ttNow);
+    uint RemoveStale(TaskTime ttNow);
 
     DeviceLocation *Find(const QString &sUSN);
 

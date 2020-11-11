@@ -21,13 +21,13 @@ ResultItem::ResultItem(const QString& title, const QString& sortTitle,
               const QString& thumbnail, const QString& mediaURL,
               const QString& author, const QDateTime& date,
               const QString& time, const QString& rating,
-              const off_t& filesize, const QString& player,
+              const off_t filesize, const QString& player,
               const QStringList& playerargs, const QString& download,
-              const QStringList& downloadargs, const uint& width,
-              const uint& height, const QString& language,
-              const bool& downloadable, const QStringList& countries,
-              const uint& season, const uint& episode,
-              const bool& customhtml)
+              const QStringList& downloadargs, const uint width,
+              const uint height, const QString& language,
+              const bool downloadable, const QStringList& countries,
+              const uint season, const uint episode,
+              const bool customhtml)
 {
     m_title = title;
     m_sorttitle = sortTitle;

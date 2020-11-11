@@ -241,7 +241,7 @@ bool insertTreeInDB(GrabberScript* script, ArticleType type)
 bool insertGrabberInDB(const QString &name, const QString &thumbnail,
                 ArticleType type, const QString &author,
                 const QString &description, const QString &commandline,
-                const double &version, bool search, bool tree,
+                const double version, bool search, bool tree,
                 bool podcast)
 {
     QFileInfo fi(thumbnail);
@@ -287,7 +287,7 @@ bool removeSearchFromDB(GrabberScript* script)
     return removeGrabberFromDB(script->GetCommandline(), true);
 }
 
-bool removeGrabberFromDB(const QString &commandline, const bool &search)
+bool removeGrabberFromDB(const QString &commandline, const bool search)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     if (search)
@@ -654,7 +654,7 @@ bool insertInDB(RSSSite* site)
 bool insertInDB(const QString &name, const QString &sortname,
                 const QString &thumbnail,
                 const QString &description, const QString &url,
-                const QString &author, const bool &download,
+                const QString &author, const bool download,
                 const QDateTime &updated, ArticleType type)
 {
     if (findInDB(name, type))

@@ -119,12 +119,12 @@ class MPUBLIC ResultItem
               const QString& desc, const QString& URL,
               const QString& thumbnail, const QString& mediaURL,
               const QString& author, const QDateTime& date, const QString& time,
-              const QString& rating, const off_t& filesize,
+              const QString& rating, off_t filesize,
               const QString& player, const QStringList& playerargs,
               const QString& download, const QStringList& downloadargs,
-              const uint& width, const uint& height, const QString& language,
-              const bool& downloadable, const QStringList& countries,
-              const uint& season, const uint& episode, const bool& customhtml);
+              uint width, uint height, const QString& language,
+              bool downloadable, const QStringList& countries,
+              uint season, uint episode, bool customhtml);
     ResultItem() = default;
     ~ResultItem() = default;
 

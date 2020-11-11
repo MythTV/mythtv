@@ -318,7 +318,7 @@ ProgramInfo::ProgramInfo(
     uint _year,
     uint _partnumber,
     uint _parttotal,
-    const QDate &_originalAirDate,
+    QDate _originalAirDate,
     QDateTime _lastmodified,
 
     RecStatus::Type _recstatus,
@@ -514,7 +514,7 @@ ProgramInfo::ProgramInfo(
     uint _partnumber,
     uint _parttotal,
 
-    const QDate &_originalAirDate,
+    QDate _originalAirDate,
     RecStatus::Type _recstatus,
     uint _recordid,
     RecordingType _rectype,
@@ -5361,8 +5361,8 @@ QStringList ProgramInfo::LoadFromScheduler(
 //       in any regressions in total speed of execution or adversely affect the
 //       results returned for any of it's users.
 static bool FromProgramQuery(const QString &sql, const MSqlBindings &bindings,
-                             MSqlQuery &query, const uint &start,
-                             const uint &limit, uint &count)
+                             MSqlQuery &query, const uint start,
+                             const uint limit, uint &count)
 {
     count = 0;
 
@@ -5529,7 +5529,7 @@ bool LoadFromProgram(ProgramList &destination,
 bool LoadFromProgram( ProgramList &destination,
                       const QString &sql, const MSqlBindings &bindings,
                       const ProgramList &schedList,
-                      const uint &start, const uint &limit, uint &count)
+                      const uint start, const uint limit, uint &count)
 {
     destination.clear();
 
@@ -5652,7 +5652,7 @@ bool LoadFromOldRecorded(
 
 bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
                          const MSqlBindings &bindings,
-                         const uint &start, const uint &limit, uint &count)
+                         const uint start, const uint limit, uint &count)
 {
     destination.clear();
 

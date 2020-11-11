@@ -130,7 +130,7 @@ class MPUBLIC ProgramInfo
                 uint partnumber,
                 uint parttotal,
 
-                const QDate &originalAirDate,
+                QDate originalAirDate,
                 QDateTime lastmodified,
 
                 RecStatus::Type recstatus,
@@ -211,7 +211,7 @@ class MPUBLIC ProgramInfo
                 uint year,
                 uint partnumber,
                 uint parttotal,
-                const QDate &originalAirDate,
+                QDate originalAirDate,
                 RecStatus::Type recstatus,
                 uint recordid,
                 RecordingType rectype,
@@ -849,8 +849,8 @@ MPUBLIC bool LoadFromProgram(
     const QString      &sql,
     const MSqlBindings &bindings,
     const ProgramList  &schedList,
-    const uint         &start,
-    const uint         &limit,
+    uint               start,
+    uint               limit,
     uint               &count);
 
 MPUBLIC ProgramInfo*  LoadProgramFromProgram(
@@ -865,8 +865,8 @@ MPUBLIC bool LoadFromOldRecorded(
     ProgramList        &destination,
     const QString      &sql,
     const MSqlBindings &bindings,
-    const uint         &start,
-    const uint         &limit,
+    uint               start,
+    uint               limit,
     uint               &count);
 
 MPUBLIC bool LoadFromRecorded(

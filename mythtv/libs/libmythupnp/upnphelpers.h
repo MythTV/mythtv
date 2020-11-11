@@ -73,7 +73,7 @@ namespace UPnPDateTime
      * UPnP ContentDirectory Service 2008, 2013
      * Appendix D.1 Date&Time Syntax
      */
-    UPNP_PUBLIC QString TimeFormat(const QTime &time);
+    UPNP_PUBLIC QString TimeFormat(QTime time);
 
     /**
      * Time Format
@@ -105,7 +105,7 @@ namespace UPnPDateTime
      * UPnP ContentDirectory Service 2008, 2013
      * Appendix D.1 Date&Time Syntax
      */
-    UPNP_PUBLIC QString NamedDayFormat(const QDate &date);
+    UPNP_PUBLIC QString NamedDayFormat(QDate date);
 };
 
 /**
@@ -156,7 +156,7 @@ namespace DLNA
      * Section 7.4.1.3.17
      */
     UPNP_PUBLIC QString DLNAProfileName( const QString &mimeType,
-                                         const QSize &resolution = QSize(),
+                                         QSize resolution = QSize(),
                                          double videoFrameRate = 0.0,
                                          const QString &container = "",
                                          const QString &vidCodec = "",
@@ -176,7 +176,7 @@ namespace DLNA
      */
     UPNP_PUBLIC QString DLNAFourthField( UPNPProtocol::TransferProtocol protocol,
                                          const QString &mimeType,
-                                         const QSize &resolution,
+                                         QSize resolution,
                                          double videoFrameRate,
                                          const QString &container,
                                          const QString &vidCodec,
@@ -196,7 +196,7 @@ namespace DLNA
      */
     UPNP_PUBLIC QString ProtocolInfoString( UPNPProtocol::TransferProtocol protocol,
                                             const QString &mimeType,
-                                            const QSize &resolution = QSize(),
+                                            QSize resolution = QSize(),
                                             double videoFrameRate = 0.0,
                                             const QString &container = "",
                                             const QString &vidCodec = "",

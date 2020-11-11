@@ -28,7 +28,7 @@ QString DurationFormat(uint32_t msec)
     return durationStr.arg(dayStr).arg(timeStr);
 }
 
-QString TimeFormat(const QTime &time)
+QString TimeFormat(const QTime time)
 {
     QString timeStr = time.toString("HH:mm:ss");
     return timeStr;
@@ -51,7 +51,7 @@ QString NamedDayFormat(const QDateTime &dateTime)
     return UPnPDateTime::NamedDayFormat(dateTime.date());
 }
 
-QString NamedDayFormat(const QDate &date)
+QString NamedDayFormat(const QDate date)
 {
     // Note QDate::toString() and QDate::shortDayName() return localized strings
     // which are of no use to us.
@@ -97,7 +97,7 @@ QString resDurationFormat(uint32_t msec)
 namespace DLNA
 {
 
-QString DLNAProfileName(const QString &mimeType, const QSize &resolution,
+QString DLNAProfileName(const QString &mimeType, const QSize resolution,
                         const double /*videoFrameRate*/, const QString &container,
                         const QString &vidCodec, const QString &audioCodec)
 {
@@ -234,7 +234,7 @@ QString DLNAProfileName(const QString &mimeType, const QSize &resolution,
 }
 
 QString DLNAFourthField(UPNPProtocol::TransferProtocol protocol,
-                        const QString &mimeType, const QSize &resolution,
+                        const QString &mimeType, const QSize resolution,
                         double videoFrameRate, const QString &container,
                         const QString &videoCodec, const QString &audioCodec,
                         bool isTranscoded)
@@ -313,7 +313,7 @@ QString DLNAFourthField(UPNPProtocol::TransferProtocol protocol,
 
 // NOTE The order of the DLNA args is mandatory - 7.4.1.3.17 MM protocolInfo values: 4th field
 QString ProtocolInfoString(UPNPProtocol::TransferProtocol protocol,
-                           const QString &mimeType, const QSize &resolution,
+                           const QString &mimeType, const QSize resolution,
                            double videoFrameRate, const QString &container,
                            const QString &videoCodec, const QString &audioCodec,
                            bool isTranscoded)

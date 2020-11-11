@@ -61,7 +61,7 @@ public:
         return {tc1, tc2};
     }
 
-    int Samples(const range_t &avail) const
+    int Samples(range_t avail) const
     {
         return MS2Samples(avail.second - avail.first);
     }
@@ -117,7 +117,7 @@ public:
         }
     }
 
-    const int16_t* Data16(const range_t &avail) const
+    const int16_t* Data16(range_t avail) const
     {
         unsigned start = MS2Samples(avail.first - m_tcFirst);
         return reinterpret_cast< const int16_t* >(constData() + start * BytesPerSample());

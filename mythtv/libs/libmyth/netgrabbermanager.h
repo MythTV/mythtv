@@ -22,13 +22,13 @@ class MPUBLIC GrabberScript : public QObject, public MThread
 
     GrabberScript(const QString& title,
                   const QString& image,
-                  const ArticleType& type,
+                  ArticleType type,
                   const QString& author,
-                  const bool& search,
-                  const bool& tree,
+                  bool search,
+                  bool tree,
                   const QString& description,
                   const QString& commandline,
-                  const double& version);
+                  double version);
     ~GrabberScript() override;
 
     const QString& GetTitle() const { return m_title; }
@@ -53,7 +53,7 @@ class MPUBLIC GrabberScript : public QObject, public MThread
 
     void parseDBTree(const QString &feedtitle, const QString &path,
                      const QString &pathThumb, QDomElement& domElem,
-                     const ArticleType &type);
+                     ArticleType type);
     mutable QMutex m_lock {QMutex::Recursive};
 
     QString     m_title;

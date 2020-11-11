@@ -129,7 +129,7 @@ QString toString(const QDateTime &raw_dt, uint format)
  *  \param date     The QDate object to use
  *  \param format   The format of the string to return
  */
-QString toString(const QDate &date, uint format)
+QString toString(const QDate date, uint format)
 {
     QString result;
 
@@ -179,7 +179,7 @@ QString toString(const QDate &date, uint format)
  *
  *  \param time     The QTime object to use
  */
-int toSeconds( const QTime &time )
+int toSeconds(QTime time)
 {
     if (!time.isValid())
         return 0;

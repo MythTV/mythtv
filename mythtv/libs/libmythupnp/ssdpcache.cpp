@@ -147,7 +147,7 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
 }
 
 /// Removes expired cache entries, returning the number removed.
-uint SSDPCacheEntries::RemoveStale(const TaskTime &ttNow)
+uint SSDPCacheEntries::RemoveStale(const TaskTime ttNow)
 {
     QMutexLocker locker(&m_mutex);
     uint nCount = 0;

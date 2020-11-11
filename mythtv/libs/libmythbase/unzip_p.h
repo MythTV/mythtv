@@ -108,7 +108,7 @@ public:
 	inline void updateKeys(keyset keys, int c) const;
 	inline void initKeys(const QString& pwd, keyset keys) const;
 
-	static inline QDateTime convertDateTime(const std::array<uint8_t,2> &date, const std::array<uint8_t,2> &time) ;
+	static inline QDateTime convertDateTime(std::array<uint8_t,2> date, std::array<uint8_t,2> time) ;
 };
 
 #endif // OSDAB_UNZIP_P_H

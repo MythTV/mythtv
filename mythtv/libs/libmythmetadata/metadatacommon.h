@@ -140,7 +140,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         uint tracknum,
         QString system,
         uint year,
-        const QDate &releasedate,
+        QDate releasedate,
         QDateTime lastupdated,
         uint runtime,
         uint runtimesecs,
@@ -192,7 +192,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
         uint videoproperties,
         uint subtitletype,
         uint year,
-        const QDate &releasedate,
+        QDate releasedate,
         QDateTime lastupdated,
         uint runtime,
         uint runtimesecs);

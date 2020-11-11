@@ -70,7 +70,7 @@ class META_PUBLIC MetaIOID3 : public MetaIOTagLib
                                       const String &description);
     static PopularimeterFrame* findPOPM(TagLib::ID3v2::Tag *tag, const String &email);
     static AttachedPictureFrame* findAPIC(TagLib::ID3v2::Tag *tag,
-                                   const AttachedPictureFrame::Type &type,
+                                   AttachedPictureFrame::Type type,
                                    const String &description = String::null);
     static QString getExtFromMimeType(const QString &mimeType);
 

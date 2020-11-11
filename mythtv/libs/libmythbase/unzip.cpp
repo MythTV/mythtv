@@ -1358,7 +1358,7 @@ void UnzipPrivate::decryptBytes(keyset keys, char* buffer, qint64 read) const
 /*!
 	\internal Converts date and time values from ZIP format to a QDateTime object.
 */
-QDateTime UnzipPrivate::convertDateTime(const std::array<uint8_t,2> &date, const std::array<uint8_t,2> &time)
+QDateTime UnzipPrivate::convertDateTime(const std::array<uint8_t,2> date, const std::array<uint8_t,2> time)
 {
 	QDateTime dt;
 

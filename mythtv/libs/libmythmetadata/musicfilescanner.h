@@ -38,7 +38,7 @@ class META_PUBLIC MusicFileScanner
 
     private:
         void BuildFileList(QString &directory, MusicLoadedMap &music_files, MusicLoadedMap &art_files, int parentid);
-        static int  GetDirectoryId(const QString &directory, const int &parentid);
+        static int  GetDirectoryId(const QString &directory, int parentid);
         static bool HasFileChanged(const QString &filename, const QString &date_modified);
         void AddFileToDB(const QString &filename, const QString &startDir);
         void RemoveFileFromDB (const QString &filename, const QString &startDir);

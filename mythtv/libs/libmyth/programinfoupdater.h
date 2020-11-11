@@ -31,7 +31,7 @@ class MPUBLIC PIKeyAction
     uint     m_recordedid;
     PIAction m_action;
 
-    bool operator==(const PIKeyAction &other) const
+    bool operator==(PIKeyAction other) const
     {
         return (m_recordedid == other.m_recordedid);
     }

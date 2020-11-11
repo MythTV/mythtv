@@ -106,11 +106,11 @@ void RSSManager::slotRSSRetrieved(RSSSite *site)
 RSSSite::RSSSite( QString  title,
                   QString  sortTitle,
                   QString  image,
-                  const ArticleType& type,
+                  ArticleType type,
                   QString  description,
                   QString  url,
                   QString  author,
-                  const bool& download,
+                  bool download,
                   QDateTime  updated) :
     m_title(std::move(title)), m_sortTitle(std::move(sortTitle)),
     m_image(std::move(image)), m_type(type),
