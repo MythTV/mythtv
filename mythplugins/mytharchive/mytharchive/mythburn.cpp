@@ -44,7 +44,7 @@
 MythBurn::MythBurn(MythScreenStack   *parent,
                    MythScreenType    *destinationScreen,
                    MythScreenType    *themeScreen,
-                   ArchiveDestination archiveDestination, const QString& name) :
+                   const ArchiveDestination &archiveDestination, const QString& name) :
     MythScreenType(parent, name),
     m_destinationScreen(destinationScreen),
     m_themeScreen(themeScreen),
