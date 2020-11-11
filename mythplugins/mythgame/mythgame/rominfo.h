@@ -53,7 +53,7 @@ class RomInfo
     static bool FindImage(QString BaseFileName, QString *result);
 
     int Id() const { return m_id; }
-    void setId(const int &lid) { m_id = lid; }
+    void setId(int lid) { m_id = lid; }
 
     QString Rompath() const { return m_rompath; }
     void setRompath(const QString &lrompath) { m_rompath = lrompath; }
@@ -86,13 +86,13 @@ class RomInfo
     void setGameType(const QString &lgametype) { m_gametype = lgametype; }
 
     int RomCount() const { return m_romcount; }
-    void setRomCount(const int &lromcount) { m_romcount = lromcount; }
+    void setRomCount(int lromcount) { m_romcount = lromcount; }
 
     QString AllSystems() const { return m_allsystems; }
     void setAllSystems(const QString &lallsystems) { m_allsystems = lallsystems; }
 
     int DiskCount() const { return m_diskcount; }
-    void setDiskCount(const int &ldiskcount) { m_diskcount = ldiskcount; }
+    void setDiskCount(int ldiskcount) { m_diskcount = ldiskcount; }
 
     QString CRC_VALUE() const { return m_crcValue; }
     void setCRC_VALUE(const QString &lcrc_value) { m_crcValue = lcrc_value; }

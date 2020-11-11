@@ -9,7 +9,7 @@ bool UpgradeBrowserDatabaseSchema(void);
 
 bool FindInDB(const QString &category, const QString& name);
 bool InsertInDB(Bookmark *site);
-bool InsertInDB(const QString &category, const QString &name, const QString &url, const bool &isHomepage);
+bool InsertInDB(const QString &category, const QString &name, const QString &url, bool isHomepage);
 
 bool ResetHomepageFromDB();
 bool UpdateHomepageInDB(Bookmark* site);

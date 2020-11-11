@@ -243,7 +243,7 @@ void MainVisual::timeout()
         m_updateTimer->start();
 }
 
-void MainVisual::resize(const QSize &size)
+void MainVisual::resize(const QSize size)
 {
     m_pixmap = QPixmap(size);
     m_pixmap.fill(m_visualizerVideo->GetBackgroundColor());

@@ -124,7 +124,7 @@ bool InsertInDB(Bookmark* site)
 bool InsertInDB(const QString &category,
                 const QString &name,
                 const QString &url,
-                const bool &isHomepage)
+                const bool isHomepage)
 {
     if (category.isEmpty() || name.isEmpty() || url.isEmpty())
         return false;
