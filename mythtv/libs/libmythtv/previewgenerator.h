@@ -29,7 +29,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
                               QDateTime      starttime,
                               long long      previewFrameNumber,
                               long long      previewSeconds,
-                              const QSize   &previewSize,
+                              QSize          previewSize,
                               const QString &infile,
                               const QString &outfile);
 
@@ -58,7 +58,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     void SetPreviewTimeAsFrameNumber(long long frame_number)
         { SetPreviewTime(frame_number, false); }
     void SetOutputFilename(const QString &fileName);
-    void SetOutputSize(const QSize &size) { m_outSize = size; }
+    void SetOutputSize(const QSize size) { m_outSize = size; }
 
     QString GetToken(void) const { return m_token; }
 

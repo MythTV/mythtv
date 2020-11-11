@@ -29,7 +29,7 @@ struct RecPriorityInfo
 class channelSort
 {
     public:
-        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             if (a.m_chan->m_chanNum.toInt() == b.m_chan->m_chanNum.toInt())
                 return(a.m_chan->m_sourceId > b.m_chan->m_sourceId);
@@ -40,7 +40,7 @@ class channelSort
 class channelRecPrioritySort
 {
     public:
-        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             if (a.m_chan->m_recPriority == b.m_chan->m_recPriority)
                 return (a.m_chan->m_chanNum.toInt() > b.m_chan->m_chanNum.toInt());

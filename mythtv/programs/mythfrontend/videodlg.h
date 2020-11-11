@@ -166,7 +166,7 @@ class VideoDialog : public MythScreenType
     void handleDirSelect(MythGenericTree *node);
     void handleDynamicDirSelect(MythGenericTree *node);
     bool goBack();
-    void setParentalLevel(const ParentalLevel::Level &level);
+    void setParentalLevel(ParentalLevel::Level level);
     void shiftParental(int amount);
     bool createPopup();
     void createBusyDialog(const QString &title);

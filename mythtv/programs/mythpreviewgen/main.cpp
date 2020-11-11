@@ -68,7 +68,7 @@ namespace
 
 int preview_helper(uint chanid, QDateTime starttime,
                    long long previewFrameNumber, long long previewSeconds,
-                   const QSize &previewSize,
+                   const QSize previewSize,
                    const QString &infile, const QString &outfile)
 {
     // Lower scheduling priority, to avoid problems with recordings.

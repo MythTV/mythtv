@@ -3046,7 +3046,7 @@ void Scheduler::DelayShutdown()
 void Scheduler::HandleIdleShutdown(
     bool &blockShutdown, QDateTime &idleSince,
     int prerollseconds, int idleTimeoutSecs, int idleWaitForRecordingTime,
-    const bool &statuschanged)
+    bool statuschanged)
 {
     // To ensure that one idle message is logged per 15 minutes
     uint logmask = VB_IDLE;

@@ -3236,7 +3236,7 @@ void VideoDialog::playTrailer()
  *  \brief Set the parental level for the library.
  *  \return void.
  */
-void VideoDialog::setParentalLevel(const ParentalLevel::Level &level)
+void VideoDialog::setParentalLevel(const ParentalLevel::Level level)
 {
     m_d->m_parentalLevel.SetLevel(level);
 }

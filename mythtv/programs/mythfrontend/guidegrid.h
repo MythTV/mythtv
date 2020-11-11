@@ -82,7 +82,7 @@ class JumpToChannel : public QObject
 // rendering.
 class GuideUIElement {
 public:
-    GuideUIElement(int row, int col, const QRect &area,
+    GuideUIElement(int row, int col, const QRect area,
                    QString title, QString category,
                    int arrow, int recType, int recStat, bool selected)
         : m_row(row), m_col(col), m_area(area), m_title(std::move(title)),

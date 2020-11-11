@@ -148,7 +148,7 @@ namespace
     };
 
 
-    bool operator<(const UIDToFAPair &lhs, const UIDToFAPair &rhs)
+    bool operator<(const UIDToFAPair lhs, const UIDToFAPair rhs)
     {
         if (lhs.m_fileAssoc && rhs.m_fileAssoc)
             return QString::localeAwareCompare(lhs.m_fileAssoc->GetExtension(),
@@ -258,7 +258,7 @@ class FileAssocDialogPrivate
     struct fa_col_ent_2_UIDFAPair
     {
         UIDToFAPair operator()(
-                const FileAssocDialogPrivate::FA_collection::value_type &from)
+                const FileAssocDialogPrivate::FA_collection::value_type from)
         {
             return {from.first, from.second};
         }
@@ -267,7 +267,7 @@ class FileAssocDialogPrivate
     template <FileAssociationWrap::FA_State against>
     struct test_fa_state
     {
-        bool operator()(const UIDToFAPair &item)
+        bool operator()(const UIDToFAPair item)
         {
             return item.m_fileAssoc && item.m_fileAssoc->GetState() == against;
         }

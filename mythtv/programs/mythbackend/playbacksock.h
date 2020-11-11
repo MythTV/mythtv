@@ -81,7 +81,7 @@ class PlaybackSock : public ReferenceCounter
                                  bool               time_fmt_sec,
                                  long long          time,
                                  const QString     &outputFile,
-                                 const QSize       &outputSize);
+                                 QSize              outputSize);
     QDateTime PixmapLastModified(const ProgramInfo *pginfo);
     bool CheckFile(ProgramInfo *pginfo);
 

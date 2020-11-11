@@ -215,7 +215,7 @@ class Scheduler : public MThread, public MythScheduler
     void HandleIdleShutdown(
         bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
         int idleTimeoutSecs, int idleWaitForRecordingTime,
-        const bool &statuschanged);
+        bool statuschanged);
 
     void EnqueueMatch(uint recordid, uint sourceid, uint mplexid,
                       const QDateTime &maxstarttime, const QString &why)
