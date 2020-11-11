@@ -96,7 +96,7 @@ class ClassicCommDetector : public CommDetectorBase
                                int64_t start_frame);
         frm_dir_map_t Combine2Maps(
             const frm_dir_map_t &a, const frm_dir_map_t &b) const;
-        static void UpdateFrameBlock(FrameBlock *fbp, FrameInfoEntry finfo,
+        static void UpdateFrameBlock(FrameBlock *fbp, const FrameInfoEntry& finfo,
                               int format, int aspect);
         void BuildAllMethodsCommList(void);
         void BuildBlankFrameCommList(void);

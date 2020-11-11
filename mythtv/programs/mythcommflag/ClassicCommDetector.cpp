@@ -1145,7 +1145,7 @@ frm_dir_map_t ClassicCommDetector::Combine2Maps(const frm_dir_map_t &a,
 }
 
 void ClassicCommDetector::UpdateFrameBlock(FrameBlock *fbp,
-                                           FrameInfoEntry finfo,
+                                           const FrameInfoEntry& finfo,
                                            int format, int aspect)
 {
     int value = 0;
