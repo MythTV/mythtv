@@ -143,7 +143,7 @@ void MythNavigationOverlay::PauseChanged(bool Paused)
     }
 }
 
-void MythNavigationOverlay::AudioStateChanged(MythAudioState AudioState)
+void MythNavigationOverlay::AudioStateChanged(const MythAudioState& AudioState)
 {
     if (!(m_muteButton && m_unMuteButton))
         return;

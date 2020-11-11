@@ -7,8 +7,8 @@
 #define LOC QString("VulkanVis: ")
 
 MythVisualVulkan::MythVisualVulkan(MythRenderVulkan *Render,
-                                   std::vector<VkDynamicState> Dynamic,
-                                   std::vector<int> Stages,
+                                   const std::vector<VkDynamicState>& Dynamic,
+                                   const std::vector<int>& Stages,
                                    const MythShaderMap *Sources,
                                    const MythBindingMap *Bindings)
   : MythVulkanObject(Render),

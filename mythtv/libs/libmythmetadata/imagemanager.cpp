@@ -597,7 +597,7 @@ int ImageDb<FS>::GetImages(const QString &ids, ImageList &files, ImageList &dirs
  \return int Number of items matching query, -1 on SQL error
 */
 template <class FS>
-int ImageDb<FS>::GetChildren(QString ids, ImageList &files, ImageList &dirs,
+int ImageDb<FS>::GetChildren(const QString &ids, ImageList &files, ImageList &dirs,
                 const QString &refine) const
 {
     QString select = QString("dir_id IN (%1) %2").arg(FS::DbIds(ids), refine);
@@ -924,7 +924,7 @@ QStringList ImageDb<FS>::RemoveFromDB(const ImageList &imList) const
  * \return bool False if db update failed
  */
 template <class FS>
-bool ImageDb<FS>::SetHidden(bool hide, QString ids) const
+bool ImageDb<FS>::SetHidden(bool hide, const QString &ids) const
 {
     if (ids.isEmpty())
         return false;

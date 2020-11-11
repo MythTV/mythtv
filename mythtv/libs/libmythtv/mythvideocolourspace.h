@@ -71,7 +71,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     void  Debug(void);
     QMatrix4x4 GetPrimaryConversion(int Source, int Dest);
     static ColourPrimaries GetPrimaries(int Primary, float &Gamma);
-    static QMatrix4x4 RGBtoXYZ(ColourPrimaries Primaries);
+    static QMatrix4x4 RGBtoXYZ(const ColourPrimaries& Primaries);
 
   private:
     PictureAttributeSupported  m_supportedAttributes { kPictureAttributeSupported_None };

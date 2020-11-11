@@ -52,7 +52,7 @@ class HDHRStreamHandler : public StreamHandler
     void AddListener(MPEGStreamData *data,
                      bool /*allow_section_reader*/ = false,
                      bool /*needs_drb*/            = false,
-                     QString output_file       = QString()) override // StreamHandler
+                     const QString& output_file    = QString()) override // StreamHandler
     {
         StreamHandler::AddListener(data, false, false, output_file);
     }

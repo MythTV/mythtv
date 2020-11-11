@@ -162,7 +162,7 @@ class MHRoot
         { InvalidAction("SetBoxSize"); }
     virtual void GetBoxSize(MHRoot * /*pWidthDest*/, MHRoot * /*HeightDest*/)
         { InvalidAction("GetBoxSize"); }
-    virtual void SetPaletteRef(const MHObjectRef /*newPalette*/, MHEngine */*engine*/)
+    virtual void SetPaletteRef(const MHObjectRef& /*newPalette*/, MHEngine */*engine*/)
         { InvalidAction("SetPaletteRef"); }
     virtual void BringToFront(MHEngine */*engine*/) { InvalidAction("BringToFront"); }
     virtual void SendToBack(MHEngine */*engine*/) { InvalidAction("SendToBack"); }

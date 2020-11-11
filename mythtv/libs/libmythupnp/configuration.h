@@ -28,11 +28,11 @@ class UPNP_PUBLIC Configuration
         virtual bool    Save    ( void ) = 0;
 
         virtual int     GetValue( const QString &sSetting, int     Default ) = 0; 
-        virtual QString GetValue( const QString &sSetting, QString Default ) = 0; 
+        virtual QString GetValue( const QString &sSetting, const QString &Default ) = 0;
         virtual bool    GetBoolValue( const QString &sSetting, bool Default ) = 0;
 
         virtual void    SetValue( const QString &sSetting, int     value   ) = 0; 
-        virtual void    SetValue( const QString &sSetting, QString value   ) = 0; 
+        virtual void    SetValue( const QString &sSetting, const QString &value ) = 0;
         virtual void    ClearValue( const QString &sSetting )                = 0;
         virtual void    SetBoolValue( const QString &sSetting, bool value   ) = 0;
 };
@@ -71,12 +71,12 @@ class UPNP_PUBLIC XmlConfiguration : public Configuration
         bool    Save    ( void ) override; // Configuration
 
         int     GetValue( const QString &sSetting, int     Default ) override; // Configuration
-        QString GetValue( const QString &sSetting, QString Default ) override; // Configuration
+        QString GetValue( const QString &sSetting, const QString &Default ) override; // Configuration
         bool    GetBoolValue( const QString &sSetting, bool Default ) override // Configuration
             {return static_cast<bool>(GetValue(sSetting, static_cast<int>(Default))); }
 
         void    SetValue( const QString &sSetting, int     value   ) override; // Configuration
-        void    SetValue( const QString &sSetting, QString value   ) override; // Configuration
+        void    SetValue( const QString &sSetting, const QString &value   ) override; // Configuration
         void    ClearValue( const QString &sSetting ) override; // Configuration
         void    SetBoolValue( const QString &sSetting, bool value ) override // Configuration
             {SetValue(sSetting, static_cast<int>(value)); }
@@ -98,12 +98,12 @@ class UPNP_PUBLIC DBConfiguration : public Configuration
         bool    Save    ( void ) override; // Configuration
 
         int     GetValue( const QString &sSetting, int     Default ) override; // Configuration
-        QString GetValue( const QString &sSetting, QString Default ) override; // Configuration
+        QString GetValue( const QString &sSetting, const QString &Default ) override; // Configuration
         bool    GetBoolValue( const QString &sSetting, bool Default ) override // Configuration
         {return static_cast<bool>(GetValue(sSetting, static_cast<int>(Default))); }
 
         void    SetValue( const QString &sSetting, int     value   ) override; // Configuration
-        void    SetValue( const QString &sSetting, QString value   ) override; // Configuration
+        void    SetValue( const QString &sSetting, const QString &value   ) override; // Configuration
         void    ClearValue( const QString &sSetting ) override; // Configuration
         void    SetBoolValue( const QString &sSetting, bool value ) override // Configuration
             {SetValue(sSetting, static_cast<int>(value)); }

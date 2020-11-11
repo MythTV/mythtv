@@ -237,7 +237,7 @@ void MHVisible::GetBoxSize(MHRoot *pWidthDest, MHRoot *pHeightDest)
     pHeightDest->SetVariableValue(m_nBoxHeight);
 }
 
-void MHVisible::SetPaletteRef(const MHObjectRef newPalette, MHEngine *engine)
+void MHVisible::SetPaletteRef(const MHObjectRef& newPalette, MHEngine *engine)
 {
     m_paletteRef.Copy(newPalette);
     engine->Redraw(GetVisibleArea());

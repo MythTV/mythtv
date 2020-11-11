@@ -110,7 +110,7 @@ class META_PUBLIC MusicMetadata
         checkEmptyFields();
     }
 
-    MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QString ldescription, UrlList lurls, QString llogourl,
+    MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QString ldescription, const UrlList &lurls, QString llogourl,
              QString lgenre, QString lmetaformat, QString lcountry, QString llanguage, QString lformat);
 
     ~MusicMetadata();

@@ -74,13 +74,13 @@ class MHIContext : public MHContext, public QRunnable
     // so a call to GetCarouselData will not block and will return the data.
     // Returns false if the object is not currently present because it has not
     // yet appeared and also if it is not present in the containing directory.
-    bool CheckCarouselObject(QString objectPath) override; // MHContext
+    bool CheckCarouselObject(const QString& objectPath) override; // MHContext
 
     // Get an object from the carousel.  Returns true and sets the data if
     // it was able to retrieve the named object.  Blocks if the object seems
     // to be present but has not yet appeared.  Returns false if the object
     // cannot be retrieved.
-    bool GetCarouselData(QString objectPath, QByteArray &result) override; // MHContext
+    bool GetCarouselData(const QString& objectPath, QByteArray &result) override; // MHContext
 
     // Set the input register.  This sets the keys that are to be handled
     // by MHEG.  Flushes the key queue.

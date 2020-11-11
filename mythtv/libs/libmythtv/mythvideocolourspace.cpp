@@ -575,7 +575,7 @@ bool MythVideoColourSpace::Similar(const ColourPrimaries &First, const ColourPri
            cmp(First.whitepoint[1],   Second.whitepoint[1]);
 }
 
-inline float CalcBy(const PrimarySpace p, const WhiteSpace w)
+inline float CalcBy(const PrimarySpace& p, const WhiteSpace w)
 {
     float val = ((1-w[0])/w[1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1]) -
     (w[0]/w[1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]);
@@ -584,7 +584,7 @@ inline float CalcBy(const PrimarySpace p, const WhiteSpace w)
     return val;
 }
 
-inline float CalcGy(const PrimarySpace p, const WhiteSpace w, const float By)
+inline float CalcGy(const PrimarySpace& p, const WhiteSpace w, const float By)
 {
     float val = w[0]/w[1] - p[0][0]/p[0][1] - By * (p[2][0]/p[2][1] - p[0][0]/p[0][1]);
     val /= p[1][0]/p[1][1] - p[0][0]/p[0][1];
@@ -603,7 +603,7 @@ inline float CalcRy(const float By, const float Gy)
  *
  * \note We use QMatrix4x4 because QMatrix3x3 has no inverted method.
  */
-QMatrix4x4 MythVideoColourSpace::RGBtoXYZ(ColourPrimaries Primaries)
+QMatrix4x4 MythVideoColourSpace::RGBtoXYZ(const ColourPrimaries& Primaries)
 {
     float By = CalcBy(Primaries.primaries, Primaries.whitepoint);
     float Gy = CalcGy(Primaries.primaries, Primaries.whitepoint, By);

@@ -21,7 +21,7 @@ class MythNavigationOverlay : public MythScreenType
     void ShowMenu() override;
 
   public slots:
-    void AudioStateChanged(MythAudioState AudioState);
+    void AudioStateChanged(const MythAudioState& AudioState);
     void PauseChanged(bool Paused);
     void GeneralAction();
     void More();

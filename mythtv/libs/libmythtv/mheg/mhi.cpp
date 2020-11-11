@@ -362,7 +362,7 @@ void MHIContext::NetworkBootRequested(void)
 }
 
 // Called by the engine to check for the presence of an object in the carousel.
-bool MHIContext::CheckCarouselObject(QString objectPath)
+bool MHIContext::CheckCarouselObject(const QString& objectPath)
 {
     if (objectPath.startsWith("http:") || objectPath.startsWith("https:"))
     {
@@ -438,7 +438,7 @@ bool MHIContext::CheckAccess(const QString &objectPath, QByteArray &cert)
 
 // Called by the engine to request data from the carousel.
 // Caller must hold m_runLock
-bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
+bool MHIContext::GetCarouselData(const QString& objectPath, QByteArray &result)
 {
     QByteArray cert;
     bool const isIC = objectPath.startsWith("http:") || objectPath.startsWith("https:");

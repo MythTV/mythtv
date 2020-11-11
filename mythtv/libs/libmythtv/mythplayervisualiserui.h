@@ -17,7 +17,7 @@ class MTV_PUBLIC MythPlayerVisualiserUI : public MythPlayerVideoUI
     void        UIScreenRectChanged(QRect Rect);
     void        EmbedVisualiser(bool Embed, QRect Rect = {});
     void        EnableVisualiser(bool Enable, bool Toggle, const QString& Name);
-    void        AudioPlayerStateChanged(MythAudioPlayerState State);
+    void        AudioPlayerStateChanged(const MythAudioPlayerState& State);
 
   public:
     MythPlayerVisualiserUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);

@@ -33,7 +33,7 @@ StreamHandler::~StreamHandler()
 void StreamHandler::AddListener(MPEGStreamData *data,
                                 bool allow_section_reader,
                                 bool needs_buffering,
-                                QString output_file)
+                                const QString& output_file)
 {
     QMutexLocker locker(&m_addRmLock);
 
@@ -65,7 +65,7 @@ void StreamHandler::AddListener(MPEGStreamData *data,
         m_needsBuffering     |= needs_buffering;
     }
 
-    m_streamDataList[data] = std::move(output_file);
+    m_streamDataList[data] = output_file;
 
     m_listenerLock.unlock();
 

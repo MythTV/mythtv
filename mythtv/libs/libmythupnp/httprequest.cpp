@@ -1169,7 +1169,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetRequestHeader( const QString &sKey, QString sDefault )
+QString HTTPRequest::GetRequestHeader( const QString &sKey, const QString &sDefault )
 {
     QStringMap::iterator it = m_mapHeaders.find( sKey.toLower() );
 

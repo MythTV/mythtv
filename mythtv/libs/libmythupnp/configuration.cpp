@@ -227,7 +227,7 @@ int XmlConfiguration::GetValue( const QString &sSetting, int nDefault )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-QString XmlConfiguration::GetValue( const QString &sSetting, QString sDefault ) 
+QString XmlConfiguration::GetValue( const QString &sSetting, const QString &sDefault )
 {
     QDomNode node = FindNode( sSetting );
 
@@ -274,7 +274,7 @@ void XmlConfiguration::SetValue( const QString &sSetting, int nValue )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void XmlConfiguration::SetValue( const QString &sSetting, QString sValue ) 
+void XmlConfiguration::SetValue( const QString &sSetting, const QString& sValue )
 {
     QDomNode node   = FindNode( sSetting, true );
 
@@ -351,7 +351,7 @@ int DBConfiguration::GetValue( const QString &sSetting, int nDefault )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-QString DBConfiguration::GetValue( const QString &sSetting, QString sDefault ) 
+QString DBConfiguration::GetValue( const QString &sSetting, const QString& sDefault )
 {
     return GetMythDB()->GetSetting( sSetting, sDefault );
 }
@@ -370,7 +370,7 @@ void DBConfiguration::SetValue( const QString &sSetting, int nValue )
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void DBConfiguration::SetValue( const QString &sSetting, QString sValue ) 
+void DBConfiguration::SetValue( const QString &sSetting, const QString& sValue )
 {
     GetMythDB()->SaveSetting( sSetting, sValue );
 }

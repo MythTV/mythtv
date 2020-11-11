@@ -53,7 +53,7 @@ class MHEG
   public:
     virtual ~MHEG() = default;
     virtual void SetBooting() = 0;
-    virtual void DrawDisplay(QRegion toDraw) = 0;
+    virtual void DrawDisplay(const QRegion& toDraw) = 0;
     // Run synchronous actions and process any asynchronous events until the queues are empty.
     // Returns the number of milliseconds until wake-up or 0 if none.
     virtual int RunAll(void) = 0;
@@ -102,13 +102,13 @@ class MHContext
     // so a call to GetCarouselData will not block and will return the data.
     // Returns false if the object is not currently present because it has not
     // yet appeared and also if it is not present in the containing directory.
-    virtual bool CheckCarouselObject(QString objectPath) = 0;
+    virtual bool CheckCarouselObject(const QString& objectPath) = 0;
 
     // Get an object from the carousel.  Returns true and sets the data if
     // it was able to retrieve the named object.  Blocks if the object seems
     // to be present but has not yet appeared.  Returns false if the object
     // cannot be retrieved.
-    virtual bool GetCarouselData(QString objectPath, QByteArray &result) = 0;
+    virtual bool GetCarouselData(const QString& objectPath, QByteArray &result) = 0;
 
     // Set the input register.  This sets the keys that are to be handled by MHEG.  Flushes the key queue.
     virtual void SetInputRegister(int nReg) = 0;

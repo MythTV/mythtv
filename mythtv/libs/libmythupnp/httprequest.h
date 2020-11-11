@@ -230,7 +230,7 @@ class UPNP_PUBLIC HTTPRequest
                                     const QDateTime &expiryDate,
                                     bool secure );
 
-        QString         GetRequestHeader  ( const QString &sKey, QString sDefault );
+        QString         GetRequestHeader  ( const QString &sKey, const QString &sDefault );
 
         bool            GetKeepAlive () const { return m_bKeepAlive; }
 

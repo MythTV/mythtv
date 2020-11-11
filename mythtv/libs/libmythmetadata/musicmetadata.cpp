@@ -56,7 +56,7 @@ bool operator!=(MusicMetadata& a, MusicMetadata& b)
 
 // this ctor is for radio streams
 MusicMetadata::MusicMetadata(int lid, QString lbroadcaster, QString lchannel, QString ldescription,
-                             UrlList lurls, QString llogourl, QString lgenre, QString lmetaformat,
+                             const UrlList &lurls, QString llogourl, QString lgenre, QString lmetaformat,
                              QString lcountry, QString llanguage, QString lformat)
          :  m_genre(std::move(lgenre)),
             m_format(std::move(lformat)),

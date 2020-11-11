@@ -882,7 +882,7 @@ void MHEngine::DrawRegion(const QRegion& toDraw, int nStackPos)
 }
 
 // Redraw an area of the display.  This will be called via the context from Redraw.
-void MHEngine::DrawDisplay(QRegion toDraw)
+void MHEngine::DrawDisplay(const QRegion& toDraw)
 {
     if (m_fBooting)
     {

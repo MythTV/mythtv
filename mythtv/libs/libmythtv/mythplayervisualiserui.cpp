@@ -40,7 +40,7 @@ MythPlayerVisualiserUI::~MythPlayerVisualiserUI()
     MythPlayerVisualiserUI::DestroyVisualiser();
 }
 
-void MythPlayerVisualiserUI::AudioPlayerStateChanged(MythAudioPlayerState State)
+void MythPlayerVisualiserUI::AudioPlayerStateChanged(const MythAudioPlayerState& State)
 {
     m_visualiserState.m_canVisualise = State.m_channels == 1 || State.m_channels == 2;
     emit VisualiserStateChanged(m_visualiserState);

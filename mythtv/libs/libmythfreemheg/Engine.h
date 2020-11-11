@@ -77,7 +77,7 @@ class MHEngine: public MHEG {
     void SetBooting() override // MHEG
         { m_fBooting = true; }
 
-    void DrawDisplay(QRegion toDraw) override; // MHEG
+    void DrawDisplay(const QRegion& toDraw) override; // MHEG
 
     void BootApplication(const char *fileName);
     void TransitionToScene(const MHObjectRef &target);
