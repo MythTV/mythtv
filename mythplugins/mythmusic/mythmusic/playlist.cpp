@@ -25,8 +25,6 @@
 #include <mythsystemlegacy.h>
 #include <exitcodes.h>
 
-const char *kID0err = "Song with ID of 0 in playlist, this shouldn't happen.";
-
 ///////////////////////////////////////////////////////////////////////////////
 // Playlist
 
