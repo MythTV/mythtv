@@ -31,10 +31,10 @@ class SERVICE_PUBLIC ArtworkInfo : public QObject
     Q_PROPERTY( QString StorageGroup READ StorageGroup WRITE setStorageGroup )
     Q_PROPERTY( QString Type         READ Type         WRITE setType         )
 
-    PROPERTYIMP    ( QString    , URL            )
-    PROPERTYIMP    ( QString    , FileName       )
-    PROPERTYIMP    ( QString    , StorageGroup   )
-    PROPERTYIMP    ( QString    , Type           )
+    PROPERTYIMP_REF( QString    , URL            )
+    PROPERTYIMP_REF( QString    , FileName       )
+    PROPERTYIMP_REF( QString    , StorageGroup   )
+    PROPERTYIMP_REF( QString    , Type           )
 
     public:
 

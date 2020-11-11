@@ -52,24 +52,24 @@ class SERVICE_PUBLIC RecordingInfo : public QObject
     PROPERTYIMP     ( uint                   , RecordedId  )
     PROPERTYIMP_ENUM( RecStatus::Type        , Status      )
     PROPERTYIMP     ( int                    , Priority    )
-    PROPERTYIMP     ( QDateTime              , StartTs     )
-    PROPERTYIMP     ( QDateTime              , EndTs       )
+    PROPERTYIMP_REF ( QDateTime              , StartTs     )
+    PROPERTYIMP_REF ( QDateTime              , EndTs       )
 
     PROPERTYIMP     ( qlonglong              , FileSize    ) // v1.3
-    PROPERTYIMP     ( QString                , FileName    ) // v1.3
-    PROPERTYIMP     ( QString                , HostName    ) // v1.3
-    PROPERTYIMP     ( QDateTime              , LastModified) // v1.3
+    PROPERTYIMP_REF ( QString                , FileName    ) // v1.3
+    PROPERTYIMP_REF ( QString                , HostName    ) // v1.3
+    PROPERTYIMP_REF ( QDateTime              , LastModified) // v1.3
 
     PROPERTYIMP     ( int                    , RecordId    )
-    PROPERTYIMP     ( QString                , RecGroup    )
-    PROPERTYIMP     ( QString                , StorageGroup)
-    PROPERTYIMP     ( QString                , PlayGroup   )
+    PROPERTYIMP_REF ( QString                , RecGroup    )
+    PROPERTYIMP_REF ( QString                , StorageGroup)
+    PROPERTYIMP_REF ( QString                , PlayGroup   )
     PROPERTYIMP_ENUM( RecordingType          , RecType     )
     PROPERTYIMP_ENUM( RecordingDupInType     , DupInType   )
     PROPERTYIMP_ENUM( RecordingDupMethodType , DupMethod   )
     PROPERTYIMP     ( int                    , EncoderId   )
-    PROPERTYIMP     ( QString                , EncoderName )
-    PROPERTYIMP     ( QString                , Profile     )
+    PROPERTYIMP_REF ( QString                , EncoderName )
+    PROPERTYIMP_REF ( QString                , Profile     )
 
     // Used only by Serializer
     PROPERTYIMP( bool, SerializeDetails );

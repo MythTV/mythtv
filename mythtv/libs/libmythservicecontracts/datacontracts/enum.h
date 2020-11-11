@@ -35,7 +35,7 @@ class SERVICE_PUBLIC Enum : public QObject
     Q_PROPERTY( QVariantList EnumItems READ EnumItems )
 
 
-    PROPERTYIMP       ( QString     , Type      )
+    PROPERTYIMP_REF   ( QString     , Type      )
     PROPERTYIMP_RO_REF( QVariantList, EnumItems )
 
     public:

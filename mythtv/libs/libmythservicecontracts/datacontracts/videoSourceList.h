@@ -29,9 +29,9 @@ class SERVICE_PUBLIC VideoSourceList : public QObject
 
     Q_PROPERTY( QVariantList VideoSources READ VideoSources )
 
-    PROPERTYIMP       ( QDateTime   , AsOf            )
-    PROPERTYIMP       ( QString     , Version         )
-    PROPERTYIMP       ( QString     , ProtoVer        )
+    PROPERTYIMP_REF   ( QDateTime   , AsOf            )
+    PROPERTYIMP_REF   ( QString     , Version         )
+    PROPERTYIMP_REF   ( QString     , ProtoVer        )
 
     PROPERTYIMP_RO_REF( QVariantList, VideoSources )
 

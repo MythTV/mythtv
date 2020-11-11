@@ -28,7 +28,7 @@ class SERVICE_PUBLIC LogInfo : public QObject
 
     Q_PROPERTY( QString  LogArgs      READ LogArgs   WRITE setLogArgs   )
 
-    PROPERTYIMP( QString,  LogArgs   );
+    PROPERTYIMP_REF( QString,  LogArgs   );
 
     public:
 

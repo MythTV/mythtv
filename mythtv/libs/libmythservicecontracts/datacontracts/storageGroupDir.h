@@ -25,9 +25,9 @@ class SERVICE_PUBLIC StorageGroupDir : public QObject
     Q_PROPERTY( uint            KiBFree         READ KiBFree          WRITE setKiBFree        )
 
     PROPERTYIMP    ( int        , Id             )
-    PROPERTYIMP    ( QString    , GroupName      )
-    PROPERTYIMP    ( QString    , HostName       )
-    PROPERTYIMP    ( QString    , DirName        )
+    PROPERTYIMP_REF( QString    , GroupName      )
+    PROPERTYIMP_REF( QString    , HostName       )
+    PROPERTYIMP_REF( QString    , DirName        )
     PROPERTYIMP    ( bool       , DirRead        )
     PROPERTYIMP    ( bool       , DirWrite       )
     PROPERTYIMP    ( uint       , KiBFree        );

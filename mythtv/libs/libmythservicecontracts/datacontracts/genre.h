@@ -28,7 +28,7 @@ class SERVICE_PUBLIC Genre : public QObject
 
     Q_PROPERTY( QString Name         READ Name         WRITE setName         )
 
-    PROPERTYIMP    ( QString    , Name           );
+    PROPERTYIMP_REF( QString    , Name           );
 
     public:
 

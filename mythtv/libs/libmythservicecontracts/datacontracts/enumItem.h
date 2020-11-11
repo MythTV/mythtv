@@ -26,9 +26,9 @@ class SERVICE_PUBLIC EnumItem : public QObject
     Q_PROPERTY( int             Value           READ Value       WRITE setValue  )
     Q_PROPERTY( QString         Desc            READ Desc        WRITE setDesc   )
 
-    PROPERTYIMP    ( QString    , Key       )
+    PROPERTYIMP_REF( QString    , Key       )
     PROPERTYIMP    ( int        , Value     )
-    PROPERTYIMP    ( QString    , Desc      );
+    PROPERTYIMP_REF( QString    , Desc      );
 
     public:
 

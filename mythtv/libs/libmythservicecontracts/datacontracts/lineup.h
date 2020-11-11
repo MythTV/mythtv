@@ -33,12 +33,12 @@ class SERVICE_PUBLIC Lineup : public QObject
     Q_PROPERTY( QString         Postal          READ Postal           WRITE setPostal         )
     Q_PROPERTY( QString         Device          READ Device           WRITE setDevice         )
 
-    PROPERTYIMP    ( QString    , LineupId       )
-    PROPERTYIMP    ( QString    , Name           )
-    PROPERTYIMP    ( QString    , DisplayName    )
-    PROPERTYIMP    ( QString    , Type           )
-    PROPERTYIMP    ( QString    , Postal         )
-    PROPERTYIMP    ( QString    , Device         )
+    PROPERTYIMP_REF( QString    , LineupId       )
+    PROPERTYIMP_REF( QString    , Name           )
+    PROPERTYIMP_REF( QString    , DisplayName    )
+    PROPERTYIMP_REF( QString    , Type           )
+    PROPERTYIMP_REF( QString    , Postal         )
+    PROPERTYIMP_REF( QString    , Device         )
 
     public:
 

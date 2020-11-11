@@ -22,9 +22,9 @@ class SERVICE_PUBLIC ImageMetadataInfo : public QObject
     Q_PROPERTY( QString         Value       READ Value          WRITE setValue      )
 
     PROPERTYIMP    ( int        , Number       )
-    PROPERTYIMP    ( QString    , Tag          )
-    PROPERTYIMP    ( QString    , Label        )
-    PROPERTYIMP    ( QString    , Value        );
+    PROPERTYIMP_REF( QString    , Tag          )
+    PROPERTYIMP_REF( QString    , Label        )
+    PROPERTYIMP_REF( QString    , Value        );
 
     public:
 

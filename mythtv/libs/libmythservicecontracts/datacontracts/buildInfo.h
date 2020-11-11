@@ -29,9 +29,9 @@ class SERVICE_PUBLIC BuildInfo : public QObject
     Q_PROPERTY( bool    LibX264      READ LibX264     WRITE setLibX264   )
     Q_PROPERTY( bool    LibDNS_SD    READ LibDNS_SD   WRITE setLibDNS_SD )
 
-    PROPERTYIMP( QString , Version   )
-    PROPERTYIMP( bool    , LibX264   )
-    PROPERTYIMP( bool    , LibDNS_SD );
+    PROPERTYIMP_REF( QString , Version   )
+    PROPERTYIMP    ( bool    , LibX264   )
+    PROPERTYIMP    ( bool    , LibDNS_SD );
 
     public:
 

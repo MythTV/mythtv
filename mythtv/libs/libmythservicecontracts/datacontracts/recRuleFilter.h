@@ -21,7 +21,7 @@ class SERVICE_PUBLIC RecRuleFilter : public QObject
     Q_PROPERTY( QString         Description     READ Description      WRITE setDescription    )
 
     PROPERTYIMP    ( int        , Id             )
-    PROPERTYIMP    ( QString    , Description    )
+    PROPERTYIMP_REF( QString    , Description    )
 
     public:
 

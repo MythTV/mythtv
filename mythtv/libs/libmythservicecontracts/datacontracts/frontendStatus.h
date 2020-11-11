@@ -23,8 +23,8 @@ namespace DTC
         Q_PROPERTY(QVariantMap SubtitleTracks READ SubtitleTracks)
         Q_PROPERTY(QVariantMap AudioTracks READ AudioTracks)
 
-        PROPERTYIMP(QString, Name)
-        PROPERTYIMP(QString, Version)
+        PROPERTYIMP_REF(QString, Name)
+        PROPERTYIMP_REF(QString, Version)
         PROPERTYIMP_RO_REF(QVariantMap, State)
         PROPERTYIMP_RO_REF(QVariantList, ChapterTimes)
         PROPERTYIMP_RO_REF(QVariantMap, SubtitleTracks)

@@ -30,10 +30,10 @@ class SERVICE_PUBLIC ImageMetadataInfoList : public QObject
     Q_PROPERTY( QVariantList ImageMetadataInfos READ ImageMetadataInfos )
 
     PROPERTYIMP       ( int         , Count           )
-    PROPERTYIMP       ( QString     , File            )
-    PROPERTYIMP       ( QString     , Path            )
+    PROPERTYIMP_REF   ( QString     , File            )
+    PROPERTYIMP_REF   ( QString     , Path            )
     PROPERTYIMP       ( int         , Size            )
-    PROPERTYIMP       ( QString     , Extension       )
+    PROPERTYIMP_REF   ( QString     , Extension       )
     PROPERTYIMP_RO_REF( QVariantList, ImageMetadataInfos )
 
     public:

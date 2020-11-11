@@ -56,16 +56,16 @@ class SERVICE_PUBLIC ProgramGuide : public QObject
 
     Q_PROPERTY( QVariantList Channels READ Channels )
 
-    PROPERTYIMP       ( QDateTime   , StartTime     )
-    PROPERTYIMP       ( QDateTime   , EndTime       )
+    PROPERTYIMP_REF   ( QDateTime   , StartTime     )
+    PROPERTYIMP_REF   ( QDateTime   , EndTime       )
     PROPERTYIMP       ( bool        , Details       )
 
     PROPERTYIMP       ( int         , StartIndex    )
     PROPERTYIMP       ( int         , Count         )
     PROPERTYIMP       ( int         , TotalAvailable)
-    PROPERTYIMP       ( QDateTime   , AsOf          )
-    PROPERTYIMP       ( QString     , Version       )
-    PROPERTYIMP       ( QString     , ProtoVer      )
+    PROPERTYIMP_REF   ( QDateTime   , AsOf          )
+    PROPERTYIMP_REF   ( QString     , Version       )
+    PROPERTYIMP_REF   ( QString     , ProtoVer      )
 
     PROPERTYIMP_RO_REF( QVariantList, Channels      )
 

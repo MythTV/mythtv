@@ -42,11 +42,11 @@ class SERVICE_PUBLIC VideoStreamInfoList : public QObject
     Q_PROPERTY( QVariantList VideoStreamInfos READ VideoStreamInfos )
 
     PROPERTYIMP       ( int         , Count           )
-    PROPERTYIMP       ( QDateTime   , AsOf            )
-    PROPERTYIMP       ( QString     , Version         )
-    PROPERTYIMP       ( QString     , ProtoVer        )
+    PROPERTYIMP_REF   ( QDateTime   , AsOf            )
+    PROPERTYIMP_REF   ( QString     , Version         )
+    PROPERTYIMP_REF   ( QString     , ProtoVer        )
     PROPERTYIMP       ( int         , ErrorCode       )
-    PROPERTYIMP       ( QString     , ErrorMsg        )
+    PROPERTYIMP_REF   ( QString     , ErrorMsg        )
 
     PROPERTYIMP_RO_REF( QVariantList, VideoStreamInfos );
 

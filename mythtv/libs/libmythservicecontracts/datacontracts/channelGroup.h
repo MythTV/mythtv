@@ -33,8 +33,8 @@ class SERVICE_PUBLIC ChannelGroup : public QObject
     Q_PROPERTY( QString   Password   READ Password  WRITE setPassword  )
 
     PROPERTYIMP       ( uint        , GroupId        )
-    PROPERTYIMP       ( QString     , Name           )
-    PROPERTYIMP       ( QString     , Password       );
+    PROPERTYIMP_REF   ( QString     , Name           )
+    PROPERTYIMP_REF   ( QString     , Password       );
 
     public:
 

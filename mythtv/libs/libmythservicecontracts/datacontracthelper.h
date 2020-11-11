@@ -67,6 +67,20 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+#define PROPERTYIMP_REF( type, name )   \
+    private: type m_##name;             \
+    public:                             \
+    type name() const                   \
+    {                                   \
+        return m_##name;                \
+    }                                   \
+    void set##name(const type& val)     \
+    {                                   \
+        m_##name = val;                 \
+    }
+
+//////////////////////////////////////////////////////////////////////////////
+
 #define PROPERTYIMP_ENUM( type, name )  \
     private: type m_##name;             \
     public:                             \

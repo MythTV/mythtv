@@ -33,10 +33,10 @@ class SERVICE_PUBLIC CastMember : public QObject
     Q_PROPERTY( QString   Role           READ Role           WRITE setRole           )
     Q_PROPERTY( QString   TranslatedRole READ TranslatedRole WRITE setTranslatedRole )
 
-    PROPERTYIMP ( QString     , Name           )
-    PROPERTYIMP ( QString     , CharacterName  )
-    PROPERTYIMP ( QString     , Role           )
-    PROPERTYIMP ( QString     , TranslatedRole )
+    PROPERTYIMP_REF ( QString     , Name           )
+    PROPERTYIMP_REF ( QString     , CharacterName  )
+    PROPERTYIMP_REF ( QString     , Role           )
+    PROPERTYIMP_REF ( QString     , TranslatedRole )
 
     public:
 

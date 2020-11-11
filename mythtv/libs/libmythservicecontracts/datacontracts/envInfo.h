@@ -31,11 +31,11 @@ class SERVICE_PUBLIC EnvInfo : public QObject
     Q_PROPERTY( QString HOME        READ HOME         WRITE setHOME        )
     Q_PROPERTY( QString MYTHCONFDIR READ MYTHCONFDIR  WRITE setMYTHCONFDIR )
 
-    PROPERTYIMP( QString, LANG        )
-    PROPERTYIMP( QString, LCALL       )
-    PROPERTYIMP( QString, LCCTYPE     )
-    PROPERTYIMP( QString, HOME        )
-    PROPERTYIMP( QString, MYTHCONFDIR );
+    PROPERTYIMP_REF( QString, LANG        )
+    PROPERTYIMP_REF( QString, LCALL       )
+    PROPERTYIMP_REF( QString, LCCTYPE     )
+    PROPERTYIMP_REF( QString, HOME        )
+    PROPERTYIMP_REF( QString, MYTHCONFDIR );
 
     public:
 

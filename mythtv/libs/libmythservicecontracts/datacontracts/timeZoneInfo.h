@@ -29,9 +29,9 @@ class SERVICE_PUBLIC TimeZoneInfo : public QObject
     Q_PROPERTY( QDateTime  CurrentDateTime READ CurrentDateTime
                                            WRITE setCurrentDateTime )
 
-    PROPERTYIMP( QString  , TimeZoneID      )
-    PROPERTYIMP( int      , UTCOffset       )
-    PROPERTYIMP( QDateTime, CurrentDateTime );
+    PROPERTYIMP_REF( QString  , TimeZoneID      )
+    PROPERTYIMP    ( int      , UTCOffset       )
+    PROPERTYIMP_REF( QDateTime, CurrentDateTime );
 
     public:
 

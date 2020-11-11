@@ -45,17 +45,17 @@ class SERVICE_PUBLIC LogMessage : public QObject
     Q_PROPERTY( QString    Message         READ Message
                                            WRITE setMessage     )
 
-    PROPERTYIMP( QString  , HostName    )
-    PROPERTYIMP( QString  , Application )
-    PROPERTYIMP( int      , PID         )
-    PROPERTYIMP( int      , TID         )
-    PROPERTYIMP( QString  , Thread      )
-    PROPERTYIMP( QString  , Filename    )
-    PROPERTYIMP( int      , Line        )
-    PROPERTYIMP( QString  , Function    )
-    PROPERTYIMP( QDateTime, Time        )
-    PROPERTYIMP( QString  , Level       )
-    PROPERTYIMP( QString  , Message     );
+    PROPERTYIMP_REF( QString  , HostName    )
+    PROPERTYIMP_REF( QString  , Application )
+    PROPERTYIMP    ( int      , PID         )
+    PROPERTYIMP    ( int      , TID         )
+    PROPERTYIMP_REF( QString  , Thread      )
+    PROPERTYIMP_REF( QString  , Filename    )
+    PROPERTYIMP    ( int      , Line        )
+    PROPERTYIMP_REF( QString  , Function    )
+    PROPERTYIMP_REF( QDateTime, Time        )
+    PROPERTYIMP_REF( QString  , Level       )
+    PROPERTYIMP_REF( QString  , Message     );
 
     public:
 

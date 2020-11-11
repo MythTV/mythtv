@@ -43,7 +43,7 @@ class SERVICE_PUBLIC Encoder : public QObject
     Q_PROPERTY( QObject*        Recording       READ Recording  )
 
     PROPERTYIMP    ( int        , Id             )
-    PROPERTYIMP    ( QString    , HostName       )
+    PROPERTYIMP_REF( QString    , HostName       )
     PROPERTYIMP    ( bool       , Local          )
     PROPERTYIMP    ( bool       , Connected      )
     PROPERTYIMP    ( int        , State          )

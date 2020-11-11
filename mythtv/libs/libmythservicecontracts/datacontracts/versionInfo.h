@@ -32,11 +32,11 @@ class SERVICE_PUBLIC VersionInfo : public QObject
     Q_PROPERTY( QString  Binary       READ Binary    WRITE setBinary    )
     Q_PROPERTY( QString  Schema       READ Schema    WRITE setSchema    )
 
-    PROPERTYIMP( QString,  Version   )
-    PROPERTYIMP( QString,  Branch    )
-    PROPERTYIMP( QString,  Protocol  )
-    PROPERTYIMP( QString,  Binary    )
-    PROPERTYIMP( QString,  Schema    );
+    PROPERTYIMP_REF( QString, Version   )
+    PROPERTYIMP_REF( QString, Branch    )
+    PROPERTYIMP_REF( QString, Protocol  )
+    PROPERTYIMP_REF( QString, Binary    )
+    PROPERTYIMP_REF( QString, Schema    );
 
     public:
 

@@ -31,10 +31,10 @@ class SERVICE_PUBLIC WOLInfo : public QObject
     Q_PROPERTY( int      Retry        READ Retry     WRITE setRetry     )
     Q_PROPERTY( QString  Command      READ Command   WRITE setCommand   )
 
-    PROPERTYIMP( bool   ,  Enabled   )
-    PROPERTYIMP( int    ,  Reconnect )
-    PROPERTYIMP( int    ,  Retry     )
-    PROPERTYIMP( QString,  Command   )
+    PROPERTYIMP    ( bool   ,  Enabled   )
+    PROPERTYIMP    ( int    ,  Reconnect )
+    PROPERTYIMP    ( int    ,  Retry     )
+    PROPERTYIMP_REF( QString, Command    )
 
     public:
 
