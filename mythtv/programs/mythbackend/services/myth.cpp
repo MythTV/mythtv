@@ -415,7 +415,7 @@ DTC::TimeZoneInfo *Myth::GetTimeZone(  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::GetFormatDate(const QDateTime Date, bool ShortDate)
+QString Myth::GetFormatDate(const QDateTime &Date, bool ShortDate)
 {
     uint dateFormat = MythDate::kDateFull | MythDate::kSimplify | MythDate::kAutoYear;
     if (ShortDate)
@@ -428,7 +428,7 @@ QString Myth::GetFormatDate(const QDateTime Date, bool ShortDate)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::GetFormatDateTime(const QDateTime DateTime, bool ShortDate)
+QString Myth::GetFormatDateTime(const QDateTime &DateTime, bool ShortDate)
 {
     uint dateFormat = MythDate::kDateTimeFull | MythDate::kSimplify | MythDate::kAutoYear;
     if (ShortDate)
@@ -441,7 +441,7 @@ QString Myth::GetFormatDateTime(const QDateTime DateTime, bool ShortDate)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::GetFormatTime(const QDateTime Time)
+QString Myth::GetFormatTime(const QDateTime &Time)
 {
     return MythDate::toString(Time, MythDate::kTime);
 }

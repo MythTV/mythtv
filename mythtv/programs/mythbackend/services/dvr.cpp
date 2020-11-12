@@ -1092,8 +1092,8 @@ uint Dvr::AddRecordSchedule   (
                                const QString&   sSubtitle,
                                const QString&   sDescription,
                                const QString&   sCategory,
-                               QDateTime recstarttsRaw,
-                               QDateTime recendtsRaw,
+                               const QDateTime& recstarttsRaw,
+                               const QDateTime& recendtsRaw,
                                const QString&   sSeriesId,
                                const QString&   sProgramId,
                                int       nChanId,
@@ -1111,7 +1111,7 @@ uint Dvr::AddRecordSchedule   (
                                uint      nPreferredInput,
                                int       nStartOffset,
                                int       nEndOffset,
-                               QDateTime lastrectsRaw,
+                               const QDateTime& lastrectsRaw,
                                QString   sDupMethod,
                                QString   sDupIn,
                                bool      bNewEpisOnly,
@@ -1242,16 +1242,16 @@ uint Dvr::AddRecordSchedule   (
 }
 
 bool Dvr::UpdateRecordSchedule ( uint      nRecordId,
-                                 QString   sTitle,
-                                 QString   sSubtitle,
-                                 QString   sDescription,
-                                 QString   sCategory,
-                                 QDateTime dStartTimeRaw,
-                                 QDateTime dEndTimeRaw,
-                                 QString   sSeriesId,
-                                 QString   sProgramId,
+                                 const QString&   sTitle,
+                                 const QString&   sSubtitle,
+                                 const QString&   sDescription,
+                                 const QString&   sCategory,
+                                 const QDateTime& dStartTimeRaw,
+                                 const QDateTime& dEndTimeRaw,
+                                 const QString&   sSeriesId,
+                                 const QString&   sProgramId,
                                  int       nChanId,
-                                 QString   sStation,
+                                 const QString&   sStation,
                                  int       nFindDay,
                                  QTime     tFindTime,
                                  bool      bInactive,
@@ -1514,10 +1514,10 @@ DTC::RecRuleList* Dvr::GetRecordScheduleList( int nStartIndex,
 }
 
 DTC::RecRule* Dvr::GetRecordSchedule( uint      nRecordId,
-                                      QString   sTemplate,
+                                      const QString&   sTemplate,
                                       int       nRecordedId,
                                       int       nChanId,
-                                      QDateTime dStartTimeRaw,
+                                      const QDateTime& dStartTimeRaw,
                                       bool      bMakeOverride )
 {
     RecordingRule rule;
@@ -1643,7 +1643,7 @@ QString Dvr::RecStatusToDescription(int RecStatus, int recType,
     return RecStatus::toDescription(rsType, recordingType, StartTime);
 }
 
-QString Dvr::RecTypeToString(QString recType)
+QString Dvr::RecTypeToString(const QString& recType)
 {
     bool ok = false;
     auto enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
@@ -1653,7 +1653,7 @@ QString Dvr::RecTypeToString(QString recType)
     return toString(recTypeFromString(recType));
 }
 
-QString Dvr::RecTypeToDescription(QString recType)
+QString Dvr::RecTypeToDescription(const QString& recType)
 {
     bool ok = false;
     auto enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
@@ -1663,27 +1663,27 @@ QString Dvr::RecTypeToDescription(QString recType)
     return toDescription(recTypeFromString(recType));
 }
 
-QString Dvr::DupInToString(QString DupIn)
+QString Dvr::DupInToString(const QString& DupIn)
 {
     // RecordingDupInType type= static_cast<RecordingDupInType>(DupIn);
     // return toString(type);
     return toString(dupInFromString(DupIn));
 }
 
-QString Dvr::DupInToDescription(QString DupIn)
+QString Dvr::DupInToDescription(const QString& DupIn)
 {
     // RecordingDupInType type= static_cast<RecordingDupInType>(DupIn);
     //return toDescription(type);
     return toDescription(dupInFromString(DupIn));
 }
 
-QString Dvr::DupMethodToString(QString DupMethod)
+QString Dvr::DupMethodToString(const QString& DupMethod)
 {
     // RecordingDupMethodType method = static_cast<RecordingDupMethodType>(DupMethod);
     return toString(dupMethodFromString(DupMethod));
 }
 
-QString Dvr::DupMethodToDescription(QString DupMethod)
+QString Dvr::DupMethodToDescription(const QString& DupMethod)
 {
     // RecordingDupMethodType method = static_cast<RecordingDupMethodType>(DupMethod);
     return toDescription(dupMethodFromString(DupMethod));

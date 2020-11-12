@@ -98,11 +98,11 @@ class SERVICE_PUBLIC MythServices : public Service  //, public QScriptable ???
 
         virtual DTC::TimeZoneInfo*  GetTimeZone         ( ) = 0;
 
-        virtual QString             GetFormatDate       ( QDateTime       Date,
-                                                          bool            ShortDate ) = 0;
-        virtual QString             GetFormatDateTime   ( QDateTime       DateTime,
-                                                          bool            ShortDate ) = 0;
-        virtual QString             GetFormatTime       ( QDateTime       Time ) = 0;
+        virtual QString             GetFormatDate       ( const QDateTime& Date,
+                                                          bool             ShortDate ) = 0;
+        virtual QString             GetFormatDateTime   ( const QDateTime& DateTime,
+                                                          bool             ShortDate ) = 0;
+        virtual QString             GetFormatTime       ( const QDateTime& Time ) = 0;
         virtual QDateTime           ParseISODateString  ( const QString   &DateTime ) = 0;
 
         virtual DTC::LogMessageList*  GetLogs ( const QString   &HostName,
