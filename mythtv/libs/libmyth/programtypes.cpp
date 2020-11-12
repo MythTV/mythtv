@@ -10,18 +10,18 @@
 #include <deque>
 using std::deque;
 
-const char *kPlayerInUseID           = "player";
-const char *kPIPPlayerInUseID        = "pipplayer";
-const char *kPBPPlayerInUseID        = "pbpplayer";
-const char *kImportRecorderInUseID   = "import_recorder";
-const char *kRecorderInUseID         = "recorder";
-const char *kFileTransferInUseID     = "filetransfer";
-const char *kTruncatingDeleteInUseID = "truncatingdelete";
-const char *kFlaggerInUseID          = "flagger";
-const char *kTranscoderInUseID       = "transcoder";
-const char *kPreviewGeneratorInUseID = "preview_generator";
-const char *kJobQueueInUseID         = "jobqueue";
-const char *kCCExtractorInUseID      = "ccextractor";
+const QString kPlayerInUseID           { QStringLiteral("player") };
+const QString kPIPPlayerInUseID        { QStringLiteral("pipplayer") };
+const QString kPBPPlayerInUseID        { QStringLiteral("pbpplayer") };
+const QString kImportRecorderInUseID   { QStringLiteral("import_recorder") };
+const QString kRecorderInUseID         { QStringLiteral("recorder") };
+const QString kFileTransferInUseID     { QStringLiteral("filetransfer") };
+const QString kTruncatingDeleteInUseID { QStringLiteral("truncatingdelete") };
+const QString kFlaggerInUseID          { QStringLiteral("flagger") };
+const QString kTranscoderInUseID       { QStringLiteral("transcoder") };
+const QString kPreviewGeneratorInUseID { QStringLiteral("preview_generator") };
+const QString kJobQueueInUseID         { QStringLiteral("jobqueue") };
+const QString kCCExtractorInUseID      { QStringLiteral("ccextractor") };
 
 QString toString(MarkTypes type)
 {

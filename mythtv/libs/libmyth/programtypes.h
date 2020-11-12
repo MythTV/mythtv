@@ -29,18 +29,18 @@
 class QDateTime;
 class QMutex;
 
-MPUBLIC extern const char *kPlayerInUseID;
-MPUBLIC extern const char *kPIPPlayerInUseID;
-MPUBLIC extern const char *kPBPPlayerInUseID;
-MPUBLIC extern const char *kImportRecorderInUseID;
-MPUBLIC extern const char *kRecorderInUseID;
-MPUBLIC extern const char *kFileTransferInUseID;
-MPUBLIC extern const char *kTruncatingDeleteInUseID;
-MPUBLIC extern const char *kFlaggerInUseID;
-MPUBLIC extern const char *kTranscoderInUseID;
-MPUBLIC extern const char *kPreviewGeneratorInUseID;
-MPUBLIC extern const char *kJobQueueInUseID;
-MPUBLIC extern const char *kCCExtractorInUseID;
+MPUBLIC extern const QString kPlayerInUseID;
+MPUBLIC extern const QString kPIPPlayerInUseID;
+MPUBLIC extern const QString kPBPPlayerInUseID;
+MPUBLIC extern const QString kImportRecorderInUseID;
+MPUBLIC extern const QString kRecorderInUseID;
+MPUBLIC extern const QString kFileTransferInUseID;
+MPUBLIC extern const QString kTruncatingDeleteInUseID;
+MPUBLIC extern const QString kFlaggerInUseID;
+MPUBLIC extern const QString kTranscoderInUseID;
+MPUBLIC extern const QString kPreviewGeneratorInUseID;
+MPUBLIC extern const QString kJobQueueInUseID;
+MPUBLIC extern const QString kCCExtractorInUseID;
 
 /// Frame # -> File offset map
 using frm_pos_map_t = QMap<long long, long long>;

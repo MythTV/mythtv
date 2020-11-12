@@ -97,14 +97,14 @@ LoglevelMap loglevelMap;
 QMutex loglevelMapMutex;
 
 const uint64_t verboseDefaultInt = VB_GENERAL;
-const char    *verboseDefaultStr = " general";
+const QString verboseDefaultStr { QStringLiteral(" general") };
 
 uint64_t verboseMask = verboseDefaultInt;
-QString verboseString = QString(verboseDefaultStr);
+QString verboseString = verboseDefaultStr;
 ComponentLogLevelMap componentLogLevel;
 
 uint64_t     userDefaultValueInt = verboseDefaultInt;
-QString      userDefaultValueStr = QString(verboseDefaultStr);
+QString      userDefaultValueStr = verboseDefaultStr;
 bool         haveUserDefaultValues = false;
 
 void verboseAdd(uint64_t mask, QString name, bool additive, QString helptext);
@@ -116,9 +116,9 @@ void verboseHelp(void);
 void resetLogging(void)
 {
     verboseMask = verboseDefaultInt;
-    verboseString = QString(verboseDefaultStr);
+    verboseString = verboseDefaultStr;
     userDefaultValueInt = verboseDefaultInt;
-    userDefaultValueStr = QString(verboseDefaultStr);
+    userDefaultValueStr = verboseDefaultStr;
     haveUserDefaultValues = false;
 
     verboseInit();
@@ -972,7 +972,7 @@ int verboseArgParse(const QString& arg)
     QMutexLocker locker(&verboseMapMutex);
 
     verboseMask = verboseDefaultInt;
-    verboseString = QString(verboseDefaultStr);
+    verboseString = verboseDefaultStr;
 
     if (arg.startsWith('-'))
     {
@@ -1023,7 +1023,7 @@ int verboseArgParse(const QString& arg)
             else
             {
                 verboseMask = verboseDefaultInt;
-                verboseString = QString(verboseDefaultStr);
+                verboseString = verboseDefaultStr;
             }
         }
         else

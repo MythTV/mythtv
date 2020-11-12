@@ -380,19 +380,19 @@ MythWebView::~MythWebView(void)
  *  \copydoc MythUIType::keyPressEvent()
  */
 
-const char *kgetType = "\
+const QString kgetType { QStringLiteral("\
 function activeElement()\
 {\
     var type;\
     type = document.activeElement.type;\
     return type;\
 }\
-activeElement();";
+activeElement();") };
 
 void MythWebView::keyPressEvent(QKeyEvent *event)
 {
     // does an edit have focus?
-    QString type = m_parentBrowser->evaluateJavaScript(QString(kgetType))
+    QString type = m_parentBrowser->evaluateJavaScript(kgetType)
                                                     .toString().toLower();
     bool editHasFocus = (type == "text" || type == "textarea" ||
                          type == "password");
