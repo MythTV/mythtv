@@ -42,7 +42,7 @@ QString SetupIconCacheDirectory(void)
 
     fileprefix += "/channels";
 
-    dir = QDir(fileprefix);
+    dir.setPath(fileprefix);;
     if (!dir.exists())
         dir.mkdir(fileprefix);
 

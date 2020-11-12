@@ -54,7 +54,7 @@ MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     if (!dir.exists())
         dir.mkdir(fileprefix);
     fileprefix += "/MythNews";
-    dir = QDir(fileprefix);
+    dir.setPath(fileprefix);;
     if (!dir.exists())
         dir.mkdir(fileprefix);
 

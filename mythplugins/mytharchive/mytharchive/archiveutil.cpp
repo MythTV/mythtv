@@ -106,7 +106,7 @@ void checkTempDirectory()
                 "Failed to change permissions on archive directory: " + ENO);
     }
 
-    dir = QDir(workDir);
+    dir.setPath(workDir);;
     if (!dir.exists())
     {
         dir.mkdir(workDir);
@@ -118,7 +118,7 @@ void checkTempDirectory()
         }
     }
 
-    dir = QDir(logDir);
+    dir.setPath(logDir);;
     if (!dir.exists())
     {
         dir.mkdir(logDir);
@@ -129,7 +129,7 @@ void checkTempDirectory()
                 ENO);
         }
     }
-    dir = QDir(configDir);
+    dir.setPath(configDir);;
     if (!dir.exists())
     {
         dir.mkdir(configDir);
