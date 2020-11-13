@@ -262,14 +262,14 @@ bool TV::CreatePlayer(TVState State, bool Muted)
         player->GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
 
     m_playerContext.SetPlayer(player);
-    emit ReinitAudio();
+    emit InitialisePlayerState();
     m_player = player;
     return StartPlaying(-1);
 }
 
 /** \fn PlayerContext::StartPlaying(int)
  *  \brief Starts player, must be called after StartRecorder().
- *  \param maxWait How long to wait for MythPlayer to start playing.
+ *  \param MaxWait How long to wait for MythPlayer to start playing.
  *  \return true when successful, false otherwise.
  */
 bool TV::StartPlaying(int MaxWait)
@@ -1178,10 +1178,8 @@ void TV::InitFromDB()
     gCoreContext->RegisterForPlayback(this, &TV::StopPlayback);
 }
 
-/** \fn TV::Init(bool)
- *  \brief Performs instance initialization, returns true on success.
+/*! \brief Performs instance initialization, returns true on success.
  *
- *  \param createWindow If true a MythDialog is created for display.
  *  \return Returns true on success, false on failure.
  */
 bool TV::Init()
@@ -1559,8 +1557,8 @@ void TV::GetStatus()
 
 /**
  *  \brief Starts LiveTV
- *  \param showDialogs if true error dialogs are shown, if false they are not
- *  \param selection What channel to tune.
+ *  \param ShowDialogs if true error dialogs are shown, if false they are not
+ *  \param Selection What channel to tune.
  */
 bool TV::LiveTV(bool ShowDialogs, const ChannelInfoList &Selection)
 {
@@ -2350,9 +2348,7 @@ void TV::HandleStateChange()
 #undef SET_NEXT
 #undef SET_LAST
 
-/**
- *  \brief Starts recorder, must be called before StartPlayer().
- *  \param ctx The player context requesting recording.
+/*! \brief Starts recorder, must be called before StartPlayer().
  *  \param MaxWait How long to wait for RecorderBase to start recording. If
  *                 not provided, this defaults to 40 seconds.
  *  \return true when successful, false otherwise.
@@ -2402,9 +2398,9 @@ bool TV::StartRecorder(int MaxWait)
  *   from within the same method. Also, shutting down things in the right
  *   order avoids spewing error messages...
  *
- *  \param stopRingBuffer Set to true if ringbuffer must be shut down.
- *  \param stopPlayer     Set to true if player must be shut down.
- *  \param stopRecorder   Set to true if recorder must be shut down.
+ *  \param StopRingBuffer Set to true if ringbuffer must be shut down.
+ *  \param StopPlayer     Set to true if player must be shut down.
+ *  \param StopRecorder   Set to true if recorder must be shut down.
  */
 void TV::StopStuff(bool StopRingBuffer, bool StopPlayer, bool StopRecorder)
 {
@@ -4922,7 +4918,7 @@ void TV::DoTogglePause(bool ShowOSD)
     if (!ignore)
         DoTogglePauseFinish(DoTogglePauseStart(), ShowOSD);
     // Emit Pause or Unpaused signal
-    paused ? gCoreContext->emitTVPlaybackUnpaused() : gCoreContext->emitTVPlaybackPaused();;
+    paused ? gCoreContext->emitTVPlaybackUnpaused() : gCoreContext->emitTVPlaybackPaused();
 }
 
 bool TV::DoPlayerSeek(float Time)
@@ -5803,13 +5799,12 @@ QString TV::GetQueuedChanNum() const
 
 /**
  *  \brief Clear channel key buffer of input keys.
- *  \param ctx     Current player context
- *  \param hideosd if true, hides "channel_number" OSDSet.
+ *  \param Hideosd if true, hides "channel_number" OSDSet.
  */
 void TV::ClearInputQueues(bool Hideosd)
 {
     if (Hideosd)
-        HideOSDWindow(OSD_WIN_INPUT);
+        HideOSDWindow(OSD_WIN_INPUT)
 
     m_queuedInput   = "";
     m_queuedChanNum = "";
@@ -5976,7 +5971,7 @@ bool TV::CommitQueuedInput()
             if (chanid)
                 BrowseChannel(channum);
 
-            HideOSDWindow(OSD_WIN_INPUT);
+            HideOSDWindow(OSD_WIN_INPUT)
         }
         else if (GetQueuedChanID() || !channum.isEmpty())
         {
@@ -6031,7 +6026,7 @@ void TV::ChangeChannel(ChannelChangeDirection Direction)
 
     if (ContextIsPaused(__FILE__, __LINE__))
     {
-        HideOSDWindow(OSD_WIN_STATUS);
+        HideOSDWindow(OSD_WIN_STATUS)
         MythMainWindow::DisableScreensaver();
     }
 
@@ -6194,7 +6189,7 @@ void TV::ChangeChannel(uint Chanid, const QString &Channum)
 
     if (ContextIsPaused(__FILE__, __LINE__))
     {
-        HideOSDWindow(OSD_WIN_STATUS);
+        HideOSDWindow(OSD_WIN_STATUS)
         MythMainWindow::DisableScreensaver();
     }
 
@@ -6233,7 +6228,7 @@ void TV::ChangeChannel(const ChannelInfoList &Options)
         if (chanid && !channum.isEmpty() && IsTunablePriv(chanid))
         {
             // hide the channel number, activated by certain signal monitors
-            HideOSDWindow(OSD_WIN_INPUT);
+            HideOSDWindow(OSD_WIN_INPUT)
             m_queuedInput   = channum;
             m_queuedChanNum = channum;
             m_queuedChanID  = chanid;
@@ -6280,7 +6275,7 @@ void TV::PopPreviousChannel(bool ImmediateChange)
     if (ImmediateChange)
     {
         // Turn off OSD Channel Num so the channel changes right away
-        HideOSDWindow(OSD_WIN_INPUT);
+        HideOSDWindow(OSD_WIN_INPUT)
     }
 }
 
@@ -8314,7 +8309,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
 
                 // Turn off OSD Channel Num so the channel
                 // changes right away
-                HideOSDWindow(OSD_WIN_INPUT);
+                HideOSDWindow(OSD_WIN_INPUT)
             }
         }
     }

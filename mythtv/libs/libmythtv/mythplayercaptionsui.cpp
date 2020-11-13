@@ -5,7 +5,7 @@
 #include "captions/subtitlescreen.h"
 #include "mythplayercaptionsui.h"
 
-#define LOC QString("CaptionsUI: ")
+#define LOC QString("PlayerCaptions: ")
 
 MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerAudioUI(MainWindow, Tv, Context, Flags),

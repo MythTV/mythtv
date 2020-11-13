@@ -15,6 +15,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     void OSDDebugVisibilityChanged(bool Visible);
 
   protected slots:
+    void InitialiseState() override;
     void ChangeOSDDebug();
     void UpdateOSDDebug();
     virtual void SetBookmark(bool Clear = false);

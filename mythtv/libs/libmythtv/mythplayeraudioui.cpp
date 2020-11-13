@@ -5,6 +5,8 @@
 #include "mythmainwindow.h"
 #include "mythplayeraudioui.h"
 
+#define LOC QString("PlayerAudio: ")
+
 /*! \class MythPlayerAudioUI
  * \brief Acts as the interface between the UI and the underlying AudioPlayer object.
  *
@@ -48,9 +50,14 @@ MythPlayerAudioUI::MythPlayerAudioUI(MythMainWindow* MainWindow, TV *Tv,
     // Setup
     MythPlayerAudioUI::SetupAudioOutput(Context->m_tsNormal);
     MythPlayerAudioUI::AdjustAudioTimecodeOffset(0, gCoreContext->GetNumSetting("AudioSyncOffset", 0));
+}
 
-    // Signal initial state
-    emit MythPlayerAudioUI::AudioStateChanged({ &m_audio, m_tcWrap[TC_AUDIO] });
+/// \brief Initialise audio and signal initial state
+void MythPlayerAudioUI::InitialiseState()
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Initialising audio");
+    ReinitAudio();
+    MythPlayerOverlayUI::InitialiseState();
 }
 
 void MythPlayerAudioUI::RefreshAudioState()

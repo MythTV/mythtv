@@ -5,6 +5,8 @@
 #include "tv_play.h"
 #include "mythplayervisualiserui.h"
 
+#define LOC QString("PlayerVis: ")
+
 MythPlayerVisualiserUI::MythPlayerVisualiserUI(MythMainWindow *MainWindow, TV *Tv,
                                                PlayerContext *Context, PlayerFlags Flags)
   : MythPlayerVideoUI(MainWindow, Tv, Context, Flags)
@@ -16,11 +18,18 @@ MythPlayerVisualiserUI::MythPlayerVisualiserUI(MythMainWindow *MainWindow, TV *T
     connect(m_tv, &TV::EmbedPlayback, this, &MythPlayerVisualiserUI::EmbedVisualiser);
     connect(this, &MythPlayerVisualiserUI::VisualiserStateChanged, m_tv, &TV::VisualiserStateChanged);
 
-    // Set initial state and update player
+
     m_defaultVisualiser = gCoreContext->GetSetting("AudioVisualiser", "");
     m_uiScreenRect = m_mainWindow->GetUIScreenRect();
     m_visualiserState.m_visualiserList = VideoVisual::GetVisualiserList(m_render->Type());
+}
+
+/// \brief Set initial state and update player
+void MythPlayerVisualiserUI::InitialiseState()
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Initialising visualiser");
     emit VisualiserStateChanged(m_visualiserState);
+    MythPlayerVideoUI::InitialiseState();
 }
 
 MythPlayerVisualiserUI::~MythPlayerVisualiserUI()

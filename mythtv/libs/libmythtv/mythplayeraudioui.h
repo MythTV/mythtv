@@ -17,6 +17,7 @@ class MTV_PUBLIC MythPlayerAudioUI : public MythPlayerOverlayUI
     void      RefreshAudioState();
 
   protected slots:
+    void      InitialiseState() override;
     void      ChangeMuteState(bool CycleChannels);
     void      ChangeVolume(bool Direction, int Volume);
     void      ResetAudio();

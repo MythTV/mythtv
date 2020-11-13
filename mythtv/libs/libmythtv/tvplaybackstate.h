@@ -18,6 +18,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
 
   signals:
     // General
+    void InitialisePlayerState();
     void UpdateBookmark(bool Clear = false);
 
     // Overlays

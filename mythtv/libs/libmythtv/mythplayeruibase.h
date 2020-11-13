@@ -16,6 +16,9 @@ class MTV_PUBLIC MythPlayerUIBase : public MythPlayer
     MythRender*     m_render     { nullptr };
     MythPainter*    m_painter    { nullptr };
     MythDisplay*    m_display    { nullptr };
+
+  protected slots:
+    virtual void InitialiseState();
 };
 
 #endif

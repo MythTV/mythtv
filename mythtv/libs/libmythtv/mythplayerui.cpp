@@ -44,6 +44,13 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
 
     // Other connections
     connect(m_tv, &TV::UpdateBookmark, this, &MythPlayerUI::SetBookmark);
+    connect(m_tv, &TV::InitialisePlayerState, this, &MythPlayerUI::InitialiseState);
+}
+
+void MythPlayerUI::InitialiseState()
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Initialising player state");
+    MythPlayerVisualiserUI::InitialiseState();
 }
 
 bool MythPlayerUI::StartPlaying()

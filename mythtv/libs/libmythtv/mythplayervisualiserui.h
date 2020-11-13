@@ -13,6 +13,7 @@ class MTV_PUBLIC MythPlayerVisualiserUI : public MythPlayerVideoUI
     void        VisualiserStateChanged(MythVisualiserState VisualiserState);
 
   protected slots:
+    void        InitialiseState() override;
     void        UIScreenRectChanged(const QRect& Rect);
     void        EmbedVisualiser(bool Embed, const QRect& Rect = {});
     void        EnableVisualiser(bool Enable, bool Toggle, const QString& Name);
