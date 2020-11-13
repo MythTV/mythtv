@@ -1668,9 +1668,16 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     if (m_storageGroup == "Default")
         progMap["storagegroup"] = QObject::tr("Default");
     else if (StorageGroup::kSpecialGroups.contains(m_storageGroup))
+    {
+        // This relies upon the translation established in the
+        // definition of StorageGroup::kSpecialGroups.
+        // clazy:exclude tr-non-literal
         progMap["storagegroup"] = QObject::tr(m_storageGroup.toUtf8().constData());
+    }
     else
+    {
         progMap["storagegroup"] = m_storageGroup;
+    }
 
     progMap["programflags"] = m_programFlags;
 
