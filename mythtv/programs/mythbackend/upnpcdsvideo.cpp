@@ -25,7 +25,7 @@
 #define LOC_ERR QString("UPnpCDSVideo, Error: ")
 
 UPnpCDSVideo::UPnpCDSVideo()
-             : UPnpCDSExtension( "Videos", "Videos",
+             : UPnpCDSExtension( QObject::tr("Videos"), "Videos",
                                  "object.item.videoItem" )
 {
     QString sServerIp   = gCoreContext->GetBackendServerIP();

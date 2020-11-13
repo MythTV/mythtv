@@ -56,7 +56,7 @@
  *
  */
 UPnpCDSMusic::UPnpCDSMusic()
-             : UPnpCDSExtension( "Music", "Music",
+             : UPnpCDSExtension( QObject::tr("Music"), "Music",
                                  "object.item.audioItem.musicTrack" )
 {
     QString sServerIp   = gCoreContext->GetBackendServerIP();

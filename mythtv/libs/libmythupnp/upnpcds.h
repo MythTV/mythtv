@@ -249,11 +249,11 @@ class UPNP_PUBLIC UPnpCDSExtension
 
     public:
 
-        UPnpCDSExtension( const QString& sName,
+        UPnpCDSExtension( QString sName,
                           QString sExtensionId, 
                           QString sClass )
         {
-            m_sName        = QObject::tr(sName.toLatin1().constData());
+            m_sName        = std::move(sName);
             m_sExtensionId = std::move(sExtensionId);
             m_sClass       = std::move(sClass);
         }

@@ -2020,11 +2020,11 @@ void VBoxConfigurationGroup::FillDeviceList(void)
 // -----------------------
 // Ceton Configuration
 // -----------------------
-
-CetonSetting::CetonSetting(const char* label, const char* helptext)
+#ifdef USING_CETON
+CetonSetting::CetonSetting(QString label, const QString& helptext)
 {
-    setLabel(QObject::tr(label));
-    setHelpText(tr(helptext));
+    setLabel(std::move(label));
+    setHelpText(helptext);
     connect(this, qOverload<const QString&>(&StandardSetting::valueChanged),
             this, &CetonSetting::UpdateDevices);
 }
@@ -2083,17 +2083,15 @@ void CetonDeviceID::UpdateValues(void)
     }
 }
 
-#ifdef USING_CETON
-static void CetonConfigurationGroup(CaptureCard& parent, CardType& cardtype)
+void CetonSetting::CetonConfigurationGroup(CaptureCard& parent, CardType& cardtype)
 {
     auto *deviceid = new CetonDeviceID(parent);
     auto *desc = new GroupSetting();
-    desc->setLabel(QCoreApplication::translate("CetonConfigurationGroup",
-                                               "Description"));
-    auto *ip = new CetonSetting("IP Address",
-        "IP Address of the Ceton device (192.168.200.1 by default)");
-    auto *tuner = new CetonSetting("Tuner",
-        "Number of the tuner on the Ceton device (first tuner is number 0)");
+    desc->setLabel(tr("CetonConfigurationGroup", "Description"));
+    auto *ip = new CetonSetting(tr("IP Address"),
+        tr("IP Address of the Ceton device (192.168.200.1 by default)"));
+    auto *tuner = new CetonSetting(tr("Tuner"),
+        tr("Number of the tuner on the Ceton device (first tuner is number 0)"));
 
     cardtype.addTargetedChild("CETON", ip);
     cardtype.addTargetedChild("CETON", tuner);
@@ -2469,7 +2467,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
 #endif // USING_FIREWIRE
 
 #ifdef USING_CETON
-    CetonConfigurationGroup(parent, *cardtype);
+    CetonSetting::CetonConfigurationGroup(parent, *cardtype);
 #endif // USING_CETON
 
 #ifdef USING_IPTV

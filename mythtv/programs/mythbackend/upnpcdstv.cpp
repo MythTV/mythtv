@@ -131,7 +131,7 @@
 // };
 
 UPnpCDSTv::UPnpCDSTv()
-          : UPnpCDSExtension( "Recordings", "Recordings",
+          : UPnpCDSExtension( QObject::tr("Recordings"), "Recordings",
                               "object.item.videoItem" )
 {
     QString sServerIp   = gCoreContext->GetBackendServerIP();

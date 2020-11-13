@@ -1033,12 +1033,14 @@ class VBoxDeviceID : public MythUITextEditSetting
     QString m_overrideDeviceId;
 };
 
+#ifdef USING_CETON
 class CetonSetting : public TransTextEditSetting
 {
     Q_OBJECT
 
   public:
-    CetonSetting(const char* label, const char* helptext);
+    CetonSetting(QString label, const QString& helptext);
+    static void CetonConfigurationGroup(CaptureCard& parent, CardType& cardtype);
 
   signals:
     void NewValue(const QString&);
@@ -1073,5 +1075,6 @@ class CetonDeviceID : public MythUITextEditSetting
     QString m_tuner;
     const CaptureCard &m_parent;
 };
+#endif // USING_CETON
 
 #endif
