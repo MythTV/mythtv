@@ -18,8 +18,8 @@ static MythDB *mythdb = nullptr;
 static QMutex dbLock;
 
 // For thread safety reasons this is not a QString
-const char *kSentinelValue = "<settings_sentinel_value>";
-const char *kClearSettingValue = "<clear_setting_value>";
+const char * const kSentinelValue     { "<settings_sentinel_value>" };
+const char * const kClearSettingValue { "<clear_setting_value>" };
 
 MythDB *MythDB::getMythDB(void)
 {
