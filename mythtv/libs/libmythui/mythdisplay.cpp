@@ -219,7 +219,8 @@ void MythDisplay::SetWidget(QWidget *MainWindow)
         QScreen *desired = GetDesiredScreen();
         // If we have changed the video mode for the old screen then reset
         // it to the default/desktop mode
-        SwitchToDesktop();
+        if (oldwindow)
+            SwitchToDesktop();
         // Ensure we completely re-initialise when the new screen is set
         m_initialised = false;
         if (desired != m_screen)
