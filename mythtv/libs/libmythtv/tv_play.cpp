@@ -1433,7 +1433,7 @@ void TV::GetStatus()
             status.insert("chaptertimes", var);
         }
 
-        uint capmode = m_player->GetCaptionMode();
+        uint capmode = m_captionsState.m_textDisplayMode;
         QVariantMap tracks;
 
         QStringList list = m_player->GetTracks(kTrackTypeSubtitle);
@@ -3106,13 +3106,6 @@ bool TV::event(QEvent* Event)
 
 bool TV::HandleTrackAction(const QString &Action)
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (!m_player)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-        return false;
-    }
-
     bool handled = true;
 
     if (Action == ACTION_TOGGLEEXTTEXT)
@@ -3149,7 +3142,7 @@ bool TV::HandleTrackAction(const QString &Action)
                 m_ccInputTimerId = 0;
             }
         }
-        else if (m_player->GetCaptionMode() & kDisplayNUVTeletextCaptions)
+        else if (m_captionsState.m_textDisplayMode & kDisplayNUVTeletextCaptions)
         {
             ClearInputQueues(false);
             AddKeyToInputQueue(0);
@@ -3200,9 +3193,6 @@ bool TV::HandleTrackAction(const QString &Action)
     }
     else
         handled = false;
-
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
     return handled;
 }
 
@@ -3457,8 +3447,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
     }
 
     // Teletext menu
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player && (m_player->GetCaptionMode() == kDisplayTeletextMenu))
+    if (m_captionsState.m_textDisplayMode == kDisplayTeletextMenu)
     {
         QStringList tt_actions;
         handled = TranslateKeyPressOrGesture("Teletext Menu", Event, tt_actions, isLiveTV);
@@ -3469,10 +3458,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
             {
                 emit HandleTeletextAction(tt_actions[i], handled);
                 if (handled)
-                {
-                    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
                     return true;
-                }
             }
         }
     }
@@ -3492,14 +3478,10 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
             {
                 emit HandleITVAction(actions[i], handled);
                 if (handled)
-                {
-                    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
                     return true;
-                }
             }
         }
     }
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (!alreadyTranslatedPlayback)
         handled = TranslateKeyPressOrGesture("TV Playback", Event, actions, isLiveTV);
@@ -4668,7 +4650,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
 
             infoStr += QString(" Subtitles:");
 
-            uint subtype = m_player->GetCaptionMode();
+            uint subtype = m_captionsState.m_textDisplayMode;
 
             if (subtype == kDisplayNone)
                 infoStr += QString(" *0:[None]*");
@@ -9267,7 +9249,7 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         m_tvmCanUpmix         = m_audioState.m_canUpmix;
         m_tvmCurSkip          = m_player->GetAutoCommercialSkip();
         m_tvmIsPaused         = m_player->IsPaused();
-        m_tvmSubsCapMode      = m_player->GetCaptionMode();
+        m_tvmSubsCapMode      = m_captionsState.m_textDisplayMode;
         m_tvmSubsEnabled      = m_player->GetCaptionsEnabled();
         m_tvmSubsHaveText     = m_player->HasTextSubtitles();
         m_tvmSubsForcedOn     = m_player->GetAllowForcedSubtitles();

@@ -397,7 +397,7 @@ void MythPlayerUI::ReinitVideo(bool ForceUpdate)
     m_reinitOsd = true;
 
     // Signal to main thread to reinit subtitles
-    if (m_textDisplayMode)
+    if (m_captionsState.m_textDisplayMode != kDisplayNone)
         EnableSubtitles(true);
 
     // Signal to the main thread to check auto visualise

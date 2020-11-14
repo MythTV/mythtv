@@ -607,7 +607,10 @@ void MythDVDPlayer::DisplayDVDButton(void)
     m_buttonVersion = static_cast<int>(buttonversion);
     QRect buttonPos = m_playerCtx->m_buffer->DVD()->GetButtonCoords();
     m_captionsOverlay.DisplayDVDButton(dvdSubtitle, buttonPos);
-    m_textDisplayMode = kDisplayDVDButton;
+    uint oldcaptions = m_captionsState.m_textDisplayMode;
+    m_captionsState.m_textDisplayMode = kDisplayDVDButton;
+    if (oldcaptions != m_captionsState.m_textDisplayMode)
+        emit CaptionsStateChanged(m_captionsState);
     m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
 }
 
@@ -615,7 +618,11 @@ bool MythDVDPlayer::GoToMenu(const QString& Menu)
 {
     if (!m_playerCtx->m_buffer->IsDVD())
         return false;
-    m_textDisplayMode = kDisplayNone;
+    uint oldcaptions = m_captionsState.m_textDisplayMode;
+    m_captionsState.m_textDisplayMode = kDisplayNone;
+    if (oldcaptions != m_captionsState.m_textDisplayMode)
+        emit CaptionsStateChanged(m_captionsState);
+
     bool ret = m_playerCtx->m_buffer->DVD()->GoToMenu(Menu);
 
     if (!ret)

@@ -10,7 +10,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     Q_OBJECT
 
   signals:
-    void CaptionsStateChanged(MythCaptionsState CaptionsState);
+    void CaptionsStateChanged(MythCaptionsState& CaptionsState);
     void ResizeForInteractiveTV(const QRect& Rect);
     void SetInteractiveStream(const QString& Stream);
     void SetInteractiveStreamPos(long Position);
@@ -69,7 +69,6 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     MythCaptionsOverlay m_captionsOverlay;
     MythCaptionsState m_captionsState { };
     bool m_textDesired                { false };
-    uint m_textDisplayMode            { kDisplayNone };
     uint m_lastTextDisplayMode        { kDisplayNone };
     uint m_lastValidTextDisplayMode   { kDisplayNone };
     InteractiveTV *m_interactiveTV    { nullptr };

@@ -58,23 +58,6 @@ enum TCTypes
 #define TCTYPESMAX 4
 using tctype_arr = std::array<int64_t,TCTYPESMAX>;
 
-// Caption Display modes
-enum
-{
-    kDisplayNone                = 0x000,
-    kDisplayNUVTeletextCaptions = 0x001,
-    kDisplayTeletextCaptions    = 0x002,
-    kDisplayAVSubtitle          = 0x004,
-    kDisplayCC608               = 0x008,
-    kDisplayCC708               = 0x010,
-    kDisplayTextSubtitle        = 0x020,
-    kDisplayDVDButton           = 0x040,
-    kDisplayRawTextSubtitle     = 0x080,
-    kDisplayAllCaptions         = 0x0FF,
-    kDisplayTeletextMenu        = 0x100,
-    kDisplayAllTextCaptions     = ~kDisplayDVDButton & kDisplayAllCaptions
-};
-
 enum PlayerFlags
 {
     kNoFlags              = 0x000000,

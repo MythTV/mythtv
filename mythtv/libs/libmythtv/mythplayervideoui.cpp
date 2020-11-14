@@ -147,7 +147,7 @@ void MythPlayerVideoUI::ReinitOSD()
         int stretch = static_cast<int>(lroundf(aspect * 100));
         if ((m_osd.Bounds() != visible) || (m_osd.GetFontStretch() != stretch))
         {
-            uint old = m_textDisplayMode;
+            uint old = m_captionsState.m_textDisplayMode;
             ToggleCaptionsByType(old);
             m_osd.Init(visible, aspect);
             m_captionsOverlay.Init(visible, aspect);

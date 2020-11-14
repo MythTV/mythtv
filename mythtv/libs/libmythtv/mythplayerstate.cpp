@@ -28,8 +28,9 @@ MythAudioState::MythAudioState(AudioPlayer* Player, int64_t Offset)
 {
 }
 
-MythCaptionsState::MythCaptionsState(bool ITV)
-  : m_haveITV(ITV)
+MythCaptionsState::MythCaptionsState(uint TextDisplayMode, bool ITV)
+  : m_textDisplayMode(TextDisplayMode),
+    m_haveITV(ITV)
 {
 }
 

@@ -72,7 +72,8 @@ void MythPlayerCaptionsUI::AdjustSubtitleZoom(int Delta)
 
 void MythPlayerCaptionsUI::AdjustSubtitleDelay(int Delta)
 {
-    bool showing = (m_textDisplayMode == kDisplayRawTextSubtitle) || (m_textDisplayMode == kDisplayTextSubtitle);
+    bool showing = (m_captionsState.m_textDisplayMode == kDisplayRawTextSubtitle) ||
+                   (m_captionsState.m_textDisplayMode == kDisplayTextSubtitle);
     if (!(showing && !(m_browsing || m_editing)))
         return;
 
@@ -120,14 +121,17 @@ static uint toTrackType(uint Type)
 
 void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD)
 {
-    if (m_textDisplayMode)
-        m_lastValidTextDisplayMode = m_textDisplayMode;
-    m_textDisplayMode &= ~Mode;
+    uint oldcaptions = m_captionsState.m_textDisplayMode;
+    if (m_captionsState.m_textDisplayMode != kDisplayNone)
+        m_lastValidTextDisplayMode = m_captionsState.m_textDisplayMode;
+    m_captionsState.m_textDisplayMode &= ~Mode;
+    if (oldcaptions != m_captionsState.m_textDisplayMode)
+        emit CaptionsStateChanged(m_captionsState);
     ResetCaptions();
 
     QMutexLocker locker(&m_osdLock);
 
-    bool newTextDesired = (m_textDisplayMode & kDisplayAllTextCaptions) != 0U;
+    bool newTextDesired = (m_captionsState.m_textDisplayMode & kDisplayAllTextCaptions) != 0U;
     // Only turn off textDesired if the Operator requested it.
     if (UpdateOSD || newTextDesired)
         m_textDesired = newTextDesired;
@@ -146,9 +150,9 @@ void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD)
         }
         DisableTeletext();
     }
-    int preserve = m_textDisplayMode & (kDisplayCC608 | kDisplayTextSubtitle |
-                                        kDisplayAVSubtitle | kDisplayCC708 |
-                                        kDisplayRawTextSubtitle);
+    int preserve = m_captionsState.m_textDisplayMode & (kDisplayCC608 | kDisplayTextSubtitle |
+                                                        kDisplayAVSubtitle | kDisplayCC708 |
+                                                        kDisplayRawTextSubtitle);
     if ((kDisplayCC608 & Mode) || (kDisplayCC708 & Mode) ||
         (kDisplayAVSubtitle & Mode) || (kDisplayRawTextSubtitle & Mode))
     {
@@ -212,7 +216,6 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
                                        static_cast<uint>(GetTrack(kTrackTypeTeletextCaptions)));
 
         EnableTeletext(page);
-        m_textDisplayMode = kDisplayTeletextCaptions;
     }
 
     msg += " " + tr("On");
@@ -220,9 +223,12 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
     LOG(VB_PLAYBACK, LOG_INFO, QString("EnableCaptions(%1) msg: %2")
         .arg(Mode).arg(msg));
 
-    m_textDisplayMode = Mode;
-    if (m_textDisplayMode)
-        m_lastValidTextDisplayMode = m_textDisplayMode;
+    uint oldcaptions = m_captionsState.m_textDisplayMode;
+    m_captionsState.m_textDisplayMode = Mode;
+    if (m_captionsState.m_textDisplayMode != kDisplayNone)
+        m_lastValidTextDisplayMode = m_captionsState.m_textDisplayMode;
+    if (oldcaptions != m_captionsState.m_textDisplayMode)
+        emit CaptionsStateChanged(m_captionsState);
     if (UpdateOSD)
         UpdateOSDMessage(msg, kOSDTimeout_Med);
 }
@@ -247,12 +253,12 @@ void MythPlayerCaptionsUI::SetAllowForcedSubtitles(bool Allow)
 
 void MythPlayerCaptionsUI::ToggleCaptions()
 {
-    SetCaptionsEnabled(!(static_cast<bool>(m_textDisplayMode)));
+    SetCaptionsEnabled(!(static_cast<bool>(m_captionsState.m_textDisplayMode)));
 }
 
 uint MythPlayerCaptionsUI::GetCaptionMode() const
 {
-    return m_textDisplayMode;
+    return m_captionsState.m_textDisplayMode;
 }
 
 bool MythPlayerCaptionsUI::HasTextSubtitles()
@@ -264,10 +270,10 @@ void MythPlayerCaptionsUI::ToggleCaptionsByType(uint Type)
 {
     QMutexLocker locker(&m_osdLock);
     uint mode = toCaptionType(Type);
-    uint origMode = m_textDisplayMode;
+    uint origMode = m_captionsState.m_textDisplayMode;
 
-    if (m_textDisplayMode)
-        DisableCaptions(m_textDisplayMode, (origMode & mode) != 0U);
+    if (m_captionsState.m_textDisplayMode)
+        DisableCaptions(m_captionsState.m_textDisplayMode, (origMode & mode) != 0U);
 
     if (origMode & mode)
         return;
@@ -280,7 +286,7 @@ void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
 {
     QMutexLocker locker(&m_osdLock);
     m_enableCaptions = m_disableCaptions = false;
-    uint origMode = m_textDisplayMode;
+    uint origMode = m_captionsState.m_textDisplayMode;
 
     // Only turn off textDesired if the Operator requested it.
     if (UpdateOSD || Enable)
@@ -314,16 +320,20 @@ void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
     ResetCaptions();
 }
 
+/*! \brief Return whether any *optional* captions are enabled
+ *
+ * Which currently means anything except DVD buttons.
+*/
 bool MythPlayerCaptionsUI::GetCaptionsEnabled() const
 {
-    return (kDisplayNUVTeletextCaptions == m_textDisplayMode) ||
-           (kDisplayTeletextCaptions    == m_textDisplayMode) ||
-           (kDisplayAVSubtitle          == m_textDisplayMode) ||
-           (kDisplayCC608               == m_textDisplayMode) ||
-           (kDisplayCC708               == m_textDisplayMode) ||
-           (kDisplayTextSubtitle        == m_textDisplayMode) ||
-           (kDisplayRawTextSubtitle     == m_textDisplayMode) ||
-           (kDisplayTeletextMenu        == m_textDisplayMode);
+    return (kDisplayNUVTeletextCaptions == m_captionsState.m_textDisplayMode) ||
+           (kDisplayTeletextCaptions    == m_captionsState.m_textDisplayMode) ||
+           (kDisplayAVSubtitle          == m_captionsState.m_textDisplayMode) ||
+           (kDisplayCC608               == m_captionsState.m_textDisplayMode) ||
+           (kDisplayCC708               == m_captionsState.m_textDisplayMode) ||
+           (kDisplayTextSubtitle        == m_captionsState.m_textDisplayMode) ||
+           (kDisplayRawTextSubtitle     == m_captionsState.m_textDisplayMode) ||
+           (kDisplayTeletextMenu        == m_captionsState.m_textDisplayMode);
 }
 
 QStringList MythPlayerCaptionsUI::GetTracks(uint Type)
@@ -359,7 +369,7 @@ void MythPlayerCaptionsUI::SetTrack(uint Type, uint TrackNo)
     uint subtype = toCaptionType(Type);
     if (subtype)
     {
-        DisableCaptions(m_textDisplayMode, false);
+        DisableCaptions(m_captionsState.m_textDisplayMode, false);
         EnableCaptions(subtype, true);
         if ((kDisplayCC708 == subtype || kDisplayCC608 == subtype) && m_decoder)
         {
@@ -417,23 +427,23 @@ void MythPlayerCaptionsUI::ChangeCaptionTrack(int Direction)
     if (!m_decoder || (Direction < 0))
         return;
 
-    if (!((m_textDisplayMode == kDisplayTextSubtitle) ||
-          (m_textDisplayMode == kDisplayNUVTeletextCaptions) ||
-          (m_textDisplayMode == kDisplayNone)))
+    if (!((m_captionsState.m_textDisplayMode == kDisplayTextSubtitle) ||
+          (m_captionsState.m_textDisplayMode == kDisplayNUVTeletextCaptions) ||
+          (m_captionsState.m_textDisplayMode == kDisplayNone)))
     {
-        uint tracktype = toTrackType(m_textDisplayMode);
+        uint tracktype = toTrackType(m_captionsState.m_textDisplayMode);
         if (GetTrack(tracktype) < m_decoder->NextTrack(tracktype))
         {
             SetTrack(tracktype, static_cast<uint>(m_decoder->NextTrack(tracktype)));
             return;
         }
     }
-    uint nextmode = NextCaptionTrack(m_textDisplayMode);
+    uint nextmode = NextCaptionTrack(m_captionsState.m_textDisplayMode);
     if ((nextmode == kDisplayTextSubtitle) ||
         (nextmode == kDisplayNUVTeletextCaptions) ||
         (nextmode == kDisplayNone))
     {
-        DisableCaptions(m_textDisplayMode, true);
+        DisableCaptions(m_captionsState.m_textDisplayMode, true);
         if (nextmode != kDisplayNone)
             EnableCaptions(nextmode, true);
     }
@@ -443,7 +453,7 @@ void MythPlayerCaptionsUI::ChangeCaptionTrack(int Direction)
         uint tracks = m_decoder->GetTrackCount(tracktype);
         if (tracks)
         {
-            DisableCaptions(m_textDisplayMode, true);
+            DisableCaptions(m_captionsState.m_textDisplayMode, true);
             SetTrack(tracktype, 0);
         }
     }
@@ -496,16 +506,22 @@ uint MythPlayerCaptionsUI::NextCaptionTrack(uint Mode)
 void MythPlayerCaptionsUI::EnableTeletext(int Page)
 {
     QMutexLocker locker(&m_osdLock);
+    uint oldcaptions = m_captionsState.m_textDisplayMode;
     m_captionsOverlay.EnableTeletext(true, Page);
-    m_lastTextDisplayMode = m_textDisplayMode;
-    m_textDisplayMode = kDisplayTeletextMenu;
+    m_lastTextDisplayMode = m_captionsState.m_textDisplayMode;
+    m_captionsState.m_textDisplayMode = kDisplayTeletextMenu;
+    if (oldcaptions != m_captionsState.m_textDisplayMode)
+        emit CaptionsStateChanged(m_captionsState);
 }
 
 void MythPlayerCaptionsUI::DisableTeletext()
 {
     QMutexLocker locker(&m_osdLock);
     m_captionsOverlay.EnableTeletext(false, 0);
-    m_textDisplayMode = kDisplayNone;
+    uint oldcaptions = m_captionsState.m_textDisplayMode;
+    m_captionsState.m_textDisplayMode = kDisplayNone;
+    if (oldcaptions != m_captionsState.m_textDisplayMode)
+        emit CaptionsStateChanged(m_captionsState);
 
     // If subtitles were enabled before the teletext menu was displayed then re-enable them
     if (m_lastTextDisplayMode & kDisplayAllCaptions)
@@ -523,17 +539,20 @@ void MythPlayerCaptionsUI::ResetTeletext()
 void MythPlayerCaptionsUI::SetTeletextPage(uint Page)
 {
     m_osdLock.lock();
-    DisableCaptions(m_textDisplayMode);
+    DisableCaptions(m_captionsState.m_textDisplayMode);
+    uint oldcaptions = m_captionsState.m_textDisplayMode;
     m_ttPageNum = static_cast<int>(Page);
     m_cc608.SetTTPageNum(m_ttPageNum);
-    m_textDisplayMode &= static_cast<uint>(~kDisplayAllCaptions);
-    m_textDisplayMode |= kDisplayNUVTeletextCaptions;
+    m_captionsState.m_textDisplayMode &= static_cast<uint>(~kDisplayAllCaptions);
+    m_captionsState.m_textDisplayMode |= kDisplayNUVTeletextCaptions;
+    if (oldcaptions != m_captionsState.m_textDisplayMode)
+        emit CaptionsStateChanged(m_captionsState);
     m_osdLock.unlock();
 }
 
 void MythPlayerCaptionsUI::HandleTeletextAction(const QString& Action, bool &Handled)
 {
-    if (!(m_textDisplayMode & kDisplayTeletextMenu))
+    if (!(m_captionsState.m_textDisplayMode & kDisplayTeletextMenu))
         return;
 
     bool exit = false;
