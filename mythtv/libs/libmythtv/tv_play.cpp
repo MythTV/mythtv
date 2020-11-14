@@ -9250,7 +9250,7 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         m_tvmCurSkip          = m_player->GetAutoCommercialSkip();
         m_tvmIsPaused         = m_player->IsPaused();
         m_tvmSubsCapMode      = m_captionsState.m_textDisplayMode;
-        m_tvmSubsEnabled      = m_player->GetCaptionsEnabled();
+        m_tvmSubsEnabled      = OptionalCaptionEnabled(m_captionsState.m_textDisplayMode);
         m_tvmSubsHaveText     = m_player->HasTextSubtitles();
         m_tvmSubsForcedOn     = m_player->GetAllowForcedSubtitles();
         MythVideoOutput *vo = m_player->GetVideoOutput();

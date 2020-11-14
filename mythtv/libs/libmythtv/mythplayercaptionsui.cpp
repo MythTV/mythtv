@@ -55,7 +55,7 @@ MythPlayerCaptionsUI::~MythPlayerCaptionsUI()
 
 void MythPlayerCaptionsUI::AdjustSubtitleZoom(int Delta)
 {
-    if (!(GetCaptionsEnabled() && !(m_browsing || m_editing)))
+    if (!(OptionalCaptionEnabled(m_captionsState.m_textDisplayMode) && !(m_browsing || m_editing)))
         return;
 
     auto * subs = m_captionsOverlay.InitSubtitles();
@@ -318,22 +318,6 @@ void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
         }
     }
     ResetCaptions();
-}
-
-/*! \brief Return whether any *optional* captions are enabled
- *
- * Which currently means anything except DVD buttons.
-*/
-bool MythPlayerCaptionsUI::GetCaptionsEnabled() const
-{
-    return (kDisplayNUVTeletextCaptions == m_captionsState.m_textDisplayMode) ||
-           (kDisplayTeletextCaptions    == m_captionsState.m_textDisplayMode) ||
-           (kDisplayAVSubtitle          == m_captionsState.m_textDisplayMode) ||
-           (kDisplayCC608               == m_captionsState.m_textDisplayMode) ||
-           (kDisplayCC708               == m_captionsState.m_textDisplayMode) ||
-           (kDisplayTextSubtitle        == m_captionsState.m_textDisplayMode) ||
-           (kDisplayRawTextSubtitle     == m_captionsState.m_textDisplayMode) ||
-           (kDisplayTeletextMenu        == m_captionsState.m_textDisplayMode);
 }
 
 QStringList MythPlayerCaptionsUI::GetTracks(uint Type)

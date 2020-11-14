@@ -22,7 +22,6 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
 
     uint GetCaptionMode() const override;
     bool HasTextSubtitles();
-    bool GetCaptionsEnabled() const;
 
     // N.B. These methods handle audio tracks as well. Fix.
     QStringList GetTracks(uint Type);

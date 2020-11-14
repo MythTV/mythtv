@@ -23,6 +23,22 @@ enum
     kDisplayAllTextCaptions     = ~kDisplayDVDButton & kDisplayAllCaptions
 };
 
+/*! \brief Return whether any *optional* captions are enabled
+ *
+ * Which currently means anything except DVD buttons.
+*/
+inline bool OptionalCaptionEnabled(uint Captions)
+{
+    return (kDisplayNUVTeletextCaptions == Captions) ||
+           (kDisplayTeletextCaptions    == Captions) ||
+           (kDisplayAVSubtitle          == Captions) ||
+           (kDisplayCC608               == Captions) ||
+           (kDisplayCC708               == Captions) ||
+           (kDisplayTextSubtitle        == Captions) ||
+           (kDisplayRawTextSubtitle     == Captions) ||
+           (kDisplayTeletextMenu        == Captions);
+}
+
 enum ZoomDirection
 {
     kZoomHome = 0,
