@@ -20,7 +20,10 @@ void MythWelcomeCommandLineParser::LoadArguments(void)
     addVersion();
     addLogging();
     addDisplay();
-
+    addPlatform();
+    addWindowed();
+    addGeometry();
+    addMouse();
     add(QStringList{"-s", "--setup"}, "setup", false,
             "Run setup for mythshutdown.", "");
 }

@@ -71,6 +71,9 @@ int main(int argc, char **argv)
     if (retval != GENERIC_EXIT_OK)
         return retval;
 
+    if (!cmdline.toString("geometry").isEmpty())
+        MythMainWindow::ParseGeometryOverride(cmdline.toString("geometry"));
+
     if (cmdline.toBool("setup"))
         bShowSettings = true;
 
@@ -119,7 +122,7 @@ int main(int argc, char **argv)
 
     initKeys();
     // Provide systemd ready notification (for type=notify units)
-    mw_sd_notify("READY=1");
+    mw_sd_notify("READY=1")
 
     MythScreenStack *mainStack = mainWindow->GetMainStack();
 
@@ -147,7 +150,7 @@ int main(int argc, char **argv)
         block.exec();
     }
 
-    mw_sd_notify("STOPPING=1\nSTATUS=Exiting");
+    mw_sd_notify("STOPPING=1\nSTATUS=Exiting")
     DestroyMythMainWindow();
 
     delete gContext;
