@@ -233,7 +233,11 @@ MythDisplayMutter* MythDisplayMutter::Create()
             }
 
             if (!s_available)
-                LOG(VB_GENERAL, LOG_INFO, LOC + "Mutter.DisplayConfig not useable");
+                LOG(VB_GENERAL, LOG_INFO, LOC + DISP_CONFIG_SERVICE + " not useable");
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Failed to find '%1'").arg(DISP_CONFIG_SERVICE));
         }
     }
 
