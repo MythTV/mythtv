@@ -10,6 +10,9 @@
 MythPlayerVideoUI::MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerCaptionsUI(MainWindow, Tv, Context, Flags)
 {
+    // Register our types for signalling
+    qRegisterMetaType<MythVideoBoundsState>();
+
     connect(this, &MythPlayerVideoUI::CheckCallbacks, this, &MythPlayerVideoUI::ProcessCallbacks);
 }
 

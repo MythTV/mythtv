@@ -11,6 +11,9 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
   : MythPlayerAudioUI(MainWindow, Tv, Context, Flags),
     m_captionsOverlay(MainWindow, Tv, nullptr, m_painter)
 {
+    // Register state type for signalling
+    qRegisterMetaType<MythCaptionsState>();
+
     m_itvEnabled = gCoreContext->GetBoolSetting("EnableMHEG", false);
 
     // Connect outgoing

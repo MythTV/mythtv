@@ -11,6 +11,9 @@ MythPlayerVisualiserUI::MythPlayerVisualiserUI(MythMainWindow *MainWindow, TV *T
                                                PlayerContext *Context, PlayerFlags Flags)
   : MythPlayerVideoUI(MainWindow, Tv, Context, Flags)
 {   
+    // Register our state type for signalling
+    qRegisterMetaType<MythVisualiserState>();
+
     // Connect signals and slots
     connect(&m_audio, &AudioPlayer::AudioPlayerStateChanged, this, &MythPlayerVisualiserUI::AudioPlayerStateChanged);
     connect(m_mainWindow, &MythMainWindow::UIScreenRectChanged, this, &MythPlayerVisualiserUI::UIScreenRectChanged);

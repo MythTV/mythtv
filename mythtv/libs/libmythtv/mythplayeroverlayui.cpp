@@ -10,6 +10,9 @@ MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, Pla
   : MythPlayerUIBase(MainWindow, Tv, Context, Flags),
     m_osd(MainWindow, Tv, nullptr, m_painter)
 {
+    // Register our state type for signalling
+    qRegisterMetaType<MythOverlayState>();
+
     m_positionUpdateTimer.setInterval(999);
     connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerOverlayUI::UpdateOSDPosition);
     connect(this, &MythPlayerOverlayUI::OverlayStateChanged, m_tv, &TV::OverlayStateChanged);

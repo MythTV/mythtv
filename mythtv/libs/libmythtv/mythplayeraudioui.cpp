@@ -31,6 +31,10 @@ MythPlayerAudioUI::MythPlayerAudioUI(MythMainWindow* MainWindow, TV *Tv,
                                      PlayerContext *Context, PlayerFlags Flags)
   : MythPlayerOverlayUI(MainWindow, Tv, Context, Flags)
 {
+    // Register our types for signal usage
+    qRegisterMetaType<MythAudioPlayerState>();
+    qRegisterMetaType<MythAudioState>();
+
     // Setup audio graph
     m_audioGraph.SetPainter(m_painter);
 

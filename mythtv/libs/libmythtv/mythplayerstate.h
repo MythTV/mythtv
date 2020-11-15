@@ -25,6 +25,8 @@ class MTV_PUBLIC MythOverlayState
     bool m_editing  { false };
 };
 
+Q_DECLARE_METATYPE(MythOverlayState)
+
 class MTV_PUBLIC MythAudioPlayerState
 {
   public:
@@ -38,6 +40,8 @@ class MTV_PUBLIC MythAudioPlayerState
     int          m_codecProfile { 0 };
     bool         m_passthru     { false };
 };
+
+Q_DECLARE_METATYPE(MythAudioPlayerState)
 
 class MTV_PUBLIC MythAudioState
 {
@@ -55,6 +59,8 @@ class MTV_PUBLIC MythAudioState
     int64_t m_audioOffset { 0     };
 };
 
+Q_DECLARE_METATYPE(MythAudioState)
+
 class MTV_PUBLIC MythCaptionsState
 {
   public:
@@ -64,6 +70,8 @@ class MTV_PUBLIC MythCaptionsState
     bool m_externalTextSubs { false };
     bool m_haveITV          { false };
 };
+
+Q_DECLARE_METATYPE(MythCaptionsState)
 
 class MTV_PUBLIC MythNavigationState
 {
@@ -82,6 +90,8 @@ class MTV_PUBLIC MythNavigationState
     std::vector<QString> m_angleNames     {   };
 };
 
+Q_DECLARE_METATYPE(MythNavigationState)
+
 class MTV_PUBLIC MythVideoBoundsState
 {
   public:
@@ -96,6 +106,8 @@ class MTV_PUBLIC MythVideoBoundsState
     QPoint             m_manualMove         { 0, 0 };
 };
 
+Q_DECLARE_METATYPE(MythVideoBoundsState)
+
 class MTV_PUBLIC MythVisualiserState
 {
   public:
@@ -109,5 +121,7 @@ class MTV_PUBLIC MythVisualiserState
     QString     m_visualiserName { };
     QStringList m_visualiserList { };
 };
+
+Q_DECLARE_METATYPE(MythVisualiserState)
 
 #endif
