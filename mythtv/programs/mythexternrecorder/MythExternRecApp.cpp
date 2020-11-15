@@ -55,7 +55,6 @@ MythExternRecApp::MythExternRecApp(QString command,
     m_desc.replace("%CHANNUM%", "");
     m_desc.replace("%CHANNAME%", "");
     m_desc.replace("%CALLSIGN%", "");
-    emit SetDescription(m_desc);
 }
 
 MythExternRecApp::~MythExternRecApp(void)
