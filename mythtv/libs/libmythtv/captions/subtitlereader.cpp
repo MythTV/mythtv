@@ -1,6 +1,12 @@
 #include "mythlogging.h"
 #include "captions/subtitlereader.h"
 
+SubtitleReader::SubtitleReader()
+{
+    connect(&m_textSubtitles, &TextSubtitles::TextSubtitlesUpdated,
+            this, &SubtitleReader::TextSubtitlesUpdated);
+}
+
 SubtitleReader::~SubtitleReader()
 {
     ClearAVSubtitles();

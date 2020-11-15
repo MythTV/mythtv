@@ -1141,13 +1141,6 @@ void MythPlayerUI::JumpToProgram()
     }
 
     m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), static_cast<uint>(MythMediaBuffer::kLiveTVOpenTimeout));
-    QString subfn = m_playerCtx->m_buffer->GetSubtitleFilename();
-    TVState desiredState = m_playerCtx->GetState();
-    bool isInProgress = (desiredState == kState_WatchingRecording ||
-                         desiredState == kState_WatchingLiveTV);
-    if (GetSubReader())
-        GetSubReader()->LoadExternalSubtitles(subfn, isInProgress && !subfn.isEmpty());
-
     if (!m_playerCtx->m_buffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("JumpToProgram's OpenFile failed (input type: %1)")
@@ -1159,6 +1152,8 @@ void MythPlayerUI::JumpToProgram()
         m_inJumpToProgramPause = false;
         return;
     }
+
+    LoadExternalSubtitles();
 
     bool wasDummy = m_isDummy;
     if (newtype || wasDummy)

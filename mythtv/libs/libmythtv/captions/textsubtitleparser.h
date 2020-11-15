@@ -12,6 +12,8 @@
 #include <vector>
 
 // Qt headers
+#include <QObject>
+#include <QMutexLocker>
 #include <QStringList>
 #include <QDateTime>
 
@@ -31,8 +33,13 @@ class text_subtitle_t
 
 using TextSubtitleList = std::vector<text_subtitle_t>;
 
-class TextSubtitles
+class TextSubtitles : public QObject
 {
+    Q_OBJECT
+
+  signals:
+    void TextSubtitlesUpdated();
+
   public:
     TextSubtitles()
     {
@@ -40,7 +47,7 @@ class TextSubtitles
         m_lastReturnedSubtitle.m_end   = 0;
     }
 
-    virtual ~TextSubtitles();
+    ~TextSubtitles() override;
 
     bool HasSubtitleChanged(uint64_t timecode) const;
     QStringList GetSubtitles(uint64_t timecode);

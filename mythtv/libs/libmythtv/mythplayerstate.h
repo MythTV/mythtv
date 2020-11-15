@@ -59,10 +59,10 @@ class MTV_PUBLIC MythCaptionsState
 {
   public:
     MythCaptionsState() = default;
-    MythCaptionsState(uint TextDisplayMode, bool ITV);
 
-    uint m_textDisplayMode { kDisplayNone };
-    bool m_haveITV { false };
+    uint m_textDisplayMode  { kDisplayNone };
+    bool m_externalTextSubs { false };
+    bool m_haveITV          { false };
 };
 
 class MTV_PUBLIC MythNavigationState

@@ -256,11 +256,6 @@ bool TV::CreatePlayer(TVState State, bool Muted)
     bool isWatchingRecording = (State == kState_WatchingRecording);
     player->SetWatchingRecording(isWatchingRecording);
 
-    QString subfn = m_playerContext.m_buffer->GetSubtitleFilename();
-    bool isInProgress = (State == kState_WatchingRecording || State == kState_WatchingLiveTV);
-    if (!subfn.isEmpty() && player->GetSubReader())
-        player->GetSubReader()->LoadExternalSubtitles(subfn, isInProgress);
-
     m_playerContext.SetPlayer(player);
     emit InitialisePlayerState();
     m_player = player;
@@ -1491,7 +1486,7 @@ void TV::GetStatus()
             tracks.insert("SELECTRAWTEXT_" + QString::number(i), list[i]);
         }
 
-        if (m_player->HasTextSubtitles())
+        if (m_captionsState.m_externalTextSubs)
         {
             if (kDisplayTextSubtitle == capmode)
                 status.insert("currentsubtitletrack", tr("External Subtitles"));
@@ -9251,7 +9246,7 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         m_tvmIsPaused         = m_player->IsPaused();
         m_tvmSubsCapMode      = m_captionsState.m_textDisplayMode;
         m_tvmSubsEnabled      = OptionalCaptionEnabled(m_captionsState.m_textDisplayMode);
-        m_tvmSubsHaveText     = m_player->HasTextSubtitles();
+        m_tvmSubsHaveText     = m_captionsState.m_externalTextSubs;
         m_tvmSubsForcedOn     = m_player->GetAllowForcedSubtitles();
         MythVideoOutput *vo = m_player->GetVideoOutput();
         if (vo)

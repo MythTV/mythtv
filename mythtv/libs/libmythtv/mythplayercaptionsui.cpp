@@ -35,6 +35,7 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
     connect(m_tv, &TV::HandleITVAction, this, &MythPlayerCaptionsUI::ITVHandleAction);
     connect(m_tv, &TV::AdjustSubtitleZoom, this, &MythPlayerCaptionsUI::AdjustSubtitleZoom);
     connect(m_tv, &TV::AdjustSubtitleDelay, this, &MythPlayerCaptionsUI::AdjustSubtitleDelay);
+    connect(&m_subReader, &SubtitleReader::TextSubtitlesUpdated, this, &MythPlayerCaptionsUI::ExternalSubtitlesUpdated);
 
     // Signalled connections (from MHIContext)
     connect(this, &MythPlayerCaptionsUI::SetInteractiveStream,    this, &MythPlayerCaptionsUI::SetStream);
@@ -51,6 +52,28 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
 MythPlayerCaptionsUI::~MythPlayerCaptionsUI()
 {
     delete m_interactiveTV;
+}
+
+void MythPlayerCaptionsUI::InitialiseState()
+{
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Initialising captions");
+    LoadExternalSubtitles();
+    emit CaptionsStateChanged(m_captionsState);
+}
+
+void MythPlayerCaptionsUI::LoadExternalSubtitles()
+{
+    QString filename = m_playerCtx->m_buffer->GetSubtitleFilename();
+    bool inprogress = (m_playerCtx->GetState() == kState_WatchingRecording ||
+                       m_playerCtx->GetState() == kState_WatchingLiveTV);
+    m_subReader.LoadExternalSubtitles(filename, inprogress);
+    m_captionsState.m_externalTextSubs = m_subReader.HasTextSubtitles();
+}
+
+void MythPlayerCaptionsUI::ExternalSubtitlesUpdated()
+{
+    m_captionsState.m_externalTextSubs = m_subReader.HasTextSubtitles();
+    emit CaptionsStateChanged(m_captionsState);
 }
 
 void MythPlayerCaptionsUI::AdjustSubtitleZoom(int Delta)
@@ -261,11 +284,6 @@ uint MythPlayerCaptionsUI::GetCaptionMode() const
     return m_captionsState.m_textDisplayMode;
 }
 
-bool MythPlayerCaptionsUI::HasTextSubtitles()
-{
-    return m_subReader.HasTextSubtitles();
-}
-
 void MythPlayerCaptionsUI::ToggleCaptionsByType(uint Type)
 {
     QMutexLocker locker(&m_osdLock);
@@ -448,7 +466,7 @@ bool MythPlayerCaptionsUI::HasCaptionTrack(uint Mode)
     if (Mode == kDisplayNone)
         return false;
 
-    if (((Mode == kDisplayTextSubtitle) && HasTextSubtitles()) || (Mode == kDisplayNUVTeletextCaptions))
+    if (((Mode == kDisplayTextSubtitle) && m_captionsState.m_externalTextSubs) || (Mode == kDisplayNUVTeletextCaptions))
         return true;
 
     if (!(Mode == kDisplayTextSubtitle) && m_decoder->GetTrackCount(toTrackType(Mode)))

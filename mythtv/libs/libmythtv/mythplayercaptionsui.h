@@ -21,7 +21,6 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
    ~MythPlayerCaptionsUI() override;
 
     uint GetCaptionMode() const override;
-    bool HasTextSubtitles();
 
     // N.B. These methods handle audio tracks as well. Fix.
     QStringList GetTracks(uint Type);
@@ -35,6 +34,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     InteractiveTV* GetInteractiveTV() override;
 
   protected slots:
+    void InitialiseState() override;
     void TracksChanged(uint TrackType);
     void SetAllowForcedSubtitles(bool Allow);
     void ToggleCaptions();
@@ -56,6 +56,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void AdjustSubtitleDelay(int Delta);
 
   private slots:
+    void ExternalSubtitlesUpdated();
     void SetStream(const QString& Stream);
     long SetStreamPos(long Position);
     void StreamPlay(bool Playing = true);
@@ -64,6 +65,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     double SafeFPS();
     void DoDisableForcedSubtitles();
     void DoEnableForcedSubtitles();
+    void LoadExternalSubtitles();
 
     MythCaptionsOverlay m_captionsOverlay;
     MythCaptionsState m_captionsState { };

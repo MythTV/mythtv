@@ -28,12 +28,6 @@ MythAudioState::MythAudioState(AudioPlayer* Player, int64_t Offset)
 {
 }
 
-MythCaptionsState::MythCaptionsState(uint TextDisplayMode, bool ITV)
-  : m_textDisplayMode(TextDisplayMode),
-    m_haveITV(ITV)
-{
-}
-
 MythNavigationState::MythNavigationState(int CurrentChapter, std::vector<int64_t> ChapterTimes,
                                          int CurrentTitle,   std::vector<int64_t> TitleDurations, std::vector<QString> TitleNames,
                                          int CurrentAngle,   std::vector<QString> AngleNames)

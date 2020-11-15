@@ -263,6 +263,7 @@ void TextSubtitles::Clear(void)
 
 void TextSubtitles::SetLastLoaded(void)
 {
+    emit TextSubtitlesUpdated();
     QMutexLocker locker(&m_lock);
     m_lastLoaded = QDateTime::currentDateTimeUtc();
 }
