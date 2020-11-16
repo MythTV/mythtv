@@ -62,6 +62,7 @@ void MythPlayerCaptionsUI::InitialiseState()
     LOG(VB_GENERAL, LOG_INFO, LOC + "Initialising captions");
     LoadExternalSubtitles();
     emit CaptionsStateChanged(m_captionsState);
+    MythPlayerAudioUI::InitialiseState();
 }
 
 void MythPlayerCaptionsUI::LoadExternalSubtitles()
