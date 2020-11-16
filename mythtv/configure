@@ -136,6 +136,7 @@ Advanced options (experts only):
   --disable-x11            disable X11 support
   --enable-opengles        link to OpenGL ES (auto)
   --enable-vulkan          enable Vulkan rendering
+  --enable-waylandextras   enable optional Wayland integrations (requires Qt private headers)
   --enable-libglslang      enable runtime GLSL compilation for Vulkan (development only)
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
@@ -1691,6 +1692,7 @@ HEADERS_LIST="
     vulkan_vulkan_core_h
     windows_h
     winsock2_h
+    wayland_client_h
 "
 
 INTRINSICS_LIST="
@@ -1790,6 +1792,7 @@ SYSTEM_FUNCS="
     VirtualAlloc
     wglGetProcAddress
     eglGetProcAddress
+    wl_surface_set_opaque_region
 "
 
 TOOLCHAIN_FEATURES="
@@ -2057,6 +2060,7 @@ USING_LIST='
     vulkan
     libglslang
     videotoolbox
+    waylandextras
 '
 
 CMDLINE_SELECT="
@@ -2626,6 +2630,7 @@ v4l2prime_deps="v4l2 drm"
 v4l1_deps="backend v4l2 linux_videodev_h"
 vulkan_deps="vulkan_vulkan_core_h"
 asi_deps="backend"
+waylandextras_deps="wayland_client_h"
 
 # default parameters
 
@@ -3017,6 +3022,8 @@ for opt do
         --enable-opengles) enable opengles && disable opengl
         ;;
         --enable-vulkan) enable vulkan
+        ;;
+        --enable-waylandextras) enable waylandextras
         ;;
         --enable-libglslang) enable libglslang
         ;;
@@ -6581,6 +6588,11 @@ esac
 
 enabled vulkan && enabled libglslang && require_cpp libglslang glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${EXTRA_GLSLANG_LIBS:-} -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread
 
+# TODO This only checks for Wayland support but we also need to check for Qt private
+# headers - but I can't see how to do that here (private headers are normally
+# enabled in the .pro)
+enabled waylandextras && use_pkg_config wayland_client wayland-client "wayland-client.h" wl_surface_set_opaque_region || disable waylandextras
+
 enable enforce_wshadow
 case $target_os in
     android)
@@ -7491,6 +7503,7 @@ fi
 echo "# Misc Features"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
+echo "Wayland extras            ${waylandextras-no}"
 echo "multi threaded libavcodec ${threads-no}"
 if enabled frontend; then
   echo "libxml2 support           ${libxml2-no} [$libxml2_path]"
