@@ -24,9 +24,6 @@ void FirewireTableMonitorThread::run(void)
     RunEpilog();
 }
 
-const uint FirewireSignalMonitor::kPowerTimeout  = 3000; /* ms */
-const uint FirewireSignalMonitor::kBufferTimeout = 5000; /* ms */
-
 QHash<void*,uint> FirewireSignalMonitor::s_patKeys;
 QMutex            FirewireSignalMonitor::s_patKeysLock;
 
@@ -96,7 +93,7 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
 
     bool crc_bogus = !fwchan->GetFirewireDevice()->IsSTBBufferCleared();
     if (crc_bogus && m_stbNeedsToWaitForPat &&
-        (m_stbWaitForPatTimer.elapsed() < (int)kBufferTimeout))
+        (m_stbWaitForPatTimer.elapsed() < kBufferTimeout))
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "HandlePAT() ignoring PAT");
         uint tsid = pat->TransportStreamID();
@@ -206,7 +203,7 @@ void FirewireSignalMonitor::UpdateValues(void)
     }
 
     if (m_stbNeedsToWaitForPower &&
-        (m_stbWaitForPowerTimer.elapsed() < (int)kPowerTimeout))
+        (m_stbWaitForPowerTimer.elapsed() < kPowerTimeout))
     {
         return;
     }

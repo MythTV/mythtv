@@ -58,8 +58,8 @@ namespace AVS
 #define LOC      QString("DFireDev(%1): ").arg(guid_to_string(m_guid))
 
 #define kAnyAvailableIsochChannel 0xFFFFFFFF
-#define kNoDataTimeout            300  /* msec */
-#define kResetTimeout             1500 /* msec */
+static constexpr std::chrono::milliseconds kNoDataTimeout {  300ms };
+static constexpr std::chrono::milliseconds kResetTimeout  { 1500ms };
 
 static IOReturn dfd_tspacket_handler_thunk(
     UInt32 tsPacketCount, UInt32 **ppBuf, void *callback_data);
@@ -356,7 +356,7 @@ bool DarwinFirewireDevice::OpenAVStream(void)
     }
 
     m_priv->m_avstream->registerNoDataNotificationCallback(
-        dfd_no_data_notification, this, kNoDataTimeout);
+        dfd_no_data_notification, this, kNoDataTimeout.count());
 
     return true;
 }
@@ -549,7 +549,7 @@ void DarwinFirewireDevice::ProcessNoDataMessage(void)
 {
     if (m_priv->m_no_data_timer_set)
     {
-        int short_interval = kNoDataTimeout + (kNoDataTimeout>>1);
+        std::chrono::milliseconds short_interval = kNoDataTimeout + (kNoDataTimeout/2);
         bool recent = m_priv->m_no_data_timer.elapsed() <= short_interval;
         m_priv->m_no_data_cnt = (recent) ? m_priv->m_no_data_cnt + 1 : 1;
     }
@@ -557,7 +557,7 @@ void DarwinFirewireDevice::ProcessNoDataMessage(void)
     m_priv->m_no_data_timer.start();
 
     LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No Input in %1 msecs")
-            .arg(m_priv->m_no_data_cnt * kNoDataTimeout));
+            .arg(m_priv->m_no_data_cnt * kNoDataTimeout.count()));
 
     if (m_priv->m_no_data_cnt > (kResetTimeout / kNoDataTimeout))
     {

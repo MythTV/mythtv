@@ -29,6 +29,7 @@
 #include <QString>
 
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 /** 
  * Small class to handle TCP port checking and finding link-local context.

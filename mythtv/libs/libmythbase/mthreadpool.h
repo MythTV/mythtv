@@ -6,6 +6,7 @@
 #include <QString>
 
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 class MThreadPoolPrivate;
 class MPoolThread;

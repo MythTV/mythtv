@@ -235,6 +235,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Timers and timer events
     int  StartTimer(int Interval, int Line);
+    int  StartTimer(std::chrono::milliseconds Interval, int Line)
+        { return StartTimer(Interval.count(), Line); }
     void KillTimer(int Id);
 
     void SetSpeedChangeTimer(int When, int Line);
@@ -743,21 +745,21 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     static const uint kPreviousSource;
 
     ///< Timeout for entry modes in msec
-    static const uint kInputModeTimeout;
+    static const std::chrono::milliseconds kInputModeTimeout;
     /// Timeout for updating LCD info in msec
-    static const uint kLCDTimeout;
+    static const std::chrono::milliseconds kLCDTimeout;
     /// Timeout for browse mode exit in msec
-    static const uint kBrowseTimeout;
+    static const std::chrono::milliseconds kBrowseTimeout;
     /// Seek key repeat timeout in msec
-    static const uint kKeyRepeatTimeout;
+    static const std::chrono::milliseconds kKeyRepeatTimeout;
     /// How long to wait before applying all previous channel keypresses in msec
-    static const uint kPrevChanTimeout;
+    static const std::chrono::milliseconds kPrevChanTimeout;
     /// How long to display sleep timer dialog in msec
-    static const uint kSleepTimerDialogTimeout;
+    static const std::chrono::milliseconds kSleepTimerDialogTimeout;
     /// How long to display idle timer dialog in seconds
-    static const uint kIdleTimerDialogTimeout;
+    static const std::chrono::milliseconds kIdleTimerDialogTimeout;
     /// How long to display idle timer dialog in msec
-    static const uint kVideoExitDialogTimeout;
+    static const std::chrono::milliseconds kVideoExitDialogTimeout;
 
     static const uint kEndOfPlaybackCheckFrequency;
     static const uint kEmbedCheckFrequency;

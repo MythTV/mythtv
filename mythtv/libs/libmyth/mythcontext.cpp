@@ -1165,12 +1165,14 @@ int MythContextPrivate::ChooseBackend(const QString &error)
  * This does <i>not</i> prompt for PIN entry. If the backend requires one,
  * it will fail, and the caller needs to put up a UI to ask for one.
  */
-int MythContextPrivate::UPnPautoconf(const int milliSeconds)
+int MythContextPrivate::UPnPautoconf(const int millis)
 {
+    auto milliSeconds = std::chrono::milliseconds(millis);
+    int seconds = std::chrono::duration_cast<std::chrono::seconds>(milliSeconds).count();
     LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
-        .arg(milliSeconds / 1000));
+        .arg(seconds));
 
-    SSDP::Instance()->PerformSearch(kBackendURI, milliSeconds / 1000);
+    SSDP::Instance()->PerformSearch(kBackendURI, seconds);
 
     // Search for a total of 'milliSeconds' ms, sending new search packet
     // about every 250 ms until less than one second remains.
@@ -1179,12 +1181,13 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
     while (totalTime.elapsed() < milliSeconds)
     {
         usleep(25000);
-        int ttl = milliSeconds - totalTime.elapsed();
-        if ((searchTime.elapsed() > 249) && (ttl > 1000))
+        auto ttl = milliSeconds - totalTime.elapsed();
+        if ((searchTime.elapsed() > 249ms) && (ttl > 1s))
         {
+            int ttlSeconds = std::chrono::duration_cast<std::chrono::seconds>(ttl).count();
             LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
-                .arg(ttl / 1000));
-            SSDP::Instance()->PerformSearch(kBackendURI, ttl / 1000);
+                .arg(ttlSeconds));
+            SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);
             searchTime.start();
         }
     }
@@ -1251,9 +1254,11 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
 
     // ----------------------------------------------------------------------
 
-    int timeout_ms = 2000;
-    LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs").arg(timeout_ms / 1000));
-    SSDP::Instance()->PerformSearch(kBackendURI, static_cast<uint>(timeout_ms / 1000));
+    std::chrono::milliseconds timeout_ms { 2s };
+    int timeout_s = std::chrono::duration_cast<std::chrono::seconds>(timeout_ms).count();
+    LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
+        .arg(timeout_s));
+    SSDP::Instance()->PerformSearch(kBackendURI, timeout_s);
 
     // ----------------------------------------------------------------------
     // We need to give the server time to respond...
@@ -1272,11 +1277,13 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
 
         usleep(25000);
 
-        int ttl = timeout_ms - totalTime.elapsed();
-        if ((searchTime.elapsed() > 249) && (ttl > 1000))
+        auto ttl = timeout_ms - totalTime.elapsed();
+        if ((searchTime.elapsed() > 249ms) && (ttl > 1s))
         {
-            LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs").arg(ttl / 1000));
-            SSDP::Instance()->PerformSearch(kBackendURI, static_cast<uint>(ttl / 1000));
+            int ttlSeconds = std::chrono::duration_cast<std::chrono::seconds>(ttl).count();
+            LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
+                .arg(ttlSeconds));
+            SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);
             searchTime.start();
         }
     }

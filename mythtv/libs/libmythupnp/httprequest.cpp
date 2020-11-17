@@ -2383,8 +2383,9 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-QString BufferedSocketDeviceRequest::ReadLine( int msecs )
+QString BufferedSocketDeviceRequest::ReadLine( int _msecs )
 {
+    auto msecs = std::chrono::milliseconds(_msecs);
     QString sLine;
 
     if (m_pSocket && m_pSocket->isValid() &&
@@ -2395,7 +2396,7 @@ QString BufferedSocketDeviceRequest::ReadLine( int msecs )
         timer.start();
         while (!m_pSocket->canReadLine() && !timeout)
         {
-            timeout = !(m_pSocket->waitForReadyRead( msecs ));
+            timeout = !(m_pSocket->waitForReadyRead( msecs.count() ));
 
             if ( timer.elapsed() >= msecs )
             {
@@ -2416,12 +2417,13 @@ QString BufferedSocketDeviceRequest::ReadLine( int msecs )
 /////////////////////////////////////////////////////////////////////////////
 
 qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
-                                              int msecs)
+                                              int _msecs)
 {
+    auto msecs = std::chrono::milliseconds(_msecs);
     if (m_pSocket && m_pSocket->isValid() &&
         m_pSocket->state() == QAbstractSocket::ConnectedState)
     {
-        if (msecs == 0)
+        if (msecs == 0ms)
             return( m_pSocket->read( pData, nMaxLen ));
 
         bool bTimeout = false;
@@ -2429,7 +2431,7 @@ qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
         timer.start();
         while ( (m_pSocket->bytesAvailable() < (int)nMaxLen) && !bTimeout ) // This can end up waiting far longer than msecs
         {
-            bTimeout = !(m_pSocket->waitForReadyRead( msecs ));
+            bTimeout = !(m_pSocket->waitForReadyRead( msecs.count() ));
 
             if ( timer.elapsed() >= msecs )
             {

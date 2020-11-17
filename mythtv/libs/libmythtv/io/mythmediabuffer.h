@@ -144,7 +144,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     int      ReadPriv              (void *Buffer, int Count, bool Peek);
     int      ReadDirect            (void *Buffer, int Count, bool Peek);
     bool     WaitForReadsAllowed   (void);
-    int      WaitForAvail          (int Count, int Timeout);
+    int      WaitForAvail          (int Count, std::chrono::milliseconds Timeout);
     int      ReadBufFree           (void) const;
     int      ReadBufAvail          (void) const;
     void     ResetReadAhead        (long long NewInternal);

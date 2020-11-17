@@ -44,8 +44,6 @@
 #define LOC QString("RecBase[%1](%2): ") \
             .arg(TVREC_CARDNUM).arg(m_videodevice)
 
-const uint RecorderBase::kTimeOfLatestDataIntervalTarget = 5000;
-
 RecorderBase::RecorderBase(TVRec *rec)
     : m_tvrec(rec)
 {
@@ -296,18 +294,19 @@ bool RecorderBase::IsPaused(bool holding_lock) const
  *  \param timeout number of milliseconds to wait defaults to 1000.
  *  \return true iff pause happened within timeout period.
  */
-bool RecorderBase::WaitForPause(int timeout)
+bool RecorderBase::WaitForPause(int _timeout)
 {
+    auto timeout = std::chrono::milliseconds(_timeout);
     MythTimer t;
     t.start();
 
     QMutexLocker locker(&m_pauseLock);
     while (!IsPaused(true) && m_requestPause)
     {
-        int wait = timeout - t.elapsed();
-        if (wait <= 0)
+        std::chrono::milliseconds wait = timeout - t.elapsed();
+        if (wait <= 0ms)
             return false;
-        m_pauseWait.wait(&m_pauseLock, wait);
+        m_pauseWait.wait(&m_pauseLock, wait.count());
     }
     return true;
 }
@@ -594,13 +593,13 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
 
     bool has_delta = !m_positionMapDelta.empty();
     // set pm_elapsed to a fake large value if the timer hasn't yet started
-    uint pm_elapsed = (m_positionMapTimer.isRunning()) ?
-        m_positionMapTimer.elapsed() : ~0;
+    std::chrono::milliseconds pm_elapsed = (m_positionMapTimer.isRunning()) ?
+        m_positionMapTimer.elapsed() : std::chrono::milliseconds::max();
     // save on every 1.5 seconds if in the first few frames of a recording
     needToSave |= (m_positionMap.size() < 30) &&
-        has_delta && (pm_elapsed >= 1500);
+        has_delta && (pm_elapsed >= 1.5s);
     // save every 10 seconds later on
-    needToSave |= has_delta && (pm_elapsed >= 10000);
+    needToSave |= has_delta && (pm_elapsed >= 10s);
     // Assume that m_durationMapDelta is the same size as
     // m_positionMapDelta and implicitly use the same logic about when
     // to same m_durationMapDelta.
@@ -645,7 +644,7 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
     // and if there is a problem with the input we may never see one
     // again, resulting in a wedged recording.
     if (!finished && m_ringBufferCheckTimer.isRunning() &&
-        m_ringBufferCheckTimer.elapsed() > 3000)
+        m_ringBufferCheckTimer.elapsed() > 3s)
     {
         if (CheckForRingBufferSwitch())
             LOG(VB_RECORD, LOG_WARNING, LOC +

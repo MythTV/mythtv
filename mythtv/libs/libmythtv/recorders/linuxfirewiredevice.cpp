@@ -593,7 +593,7 @@ void LinuxFirewireDevice::run(void)
         LFDPriv::s_lock.lock();
         bool reset_timer_on = m_priv->m_resetTimerOn;
         bool handle_reset = reset_timer_on &&
-            (m_priv->m_resetTimer.elapsed() > 100);
+            (m_priv->m_resetTimer.elapsed() > 100ms);
         if (handle_reset)
             m_priv->m_resetTimerOn = false;
         LFDPriv::s_lock.unlock();

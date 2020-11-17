@@ -1520,13 +1520,14 @@ void TVRec::run(void)
  *  You MUST HAVE the stateChange-lock locked when you call this method!
  */
 
-bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
+bool TVRec::WaitForEventThreadSleep(bool wake, ulong _time)
 {
+    auto time = std::chrono::milliseconds(_time);
     bool ok = false;
     MythTimer t;
     t.start();
 
-    while (!ok && ((unsigned long) t.elapsed()) < time)
+    while (!ok && (t.elapsed() < time))
     {
         MythTimer t2;
         t2.start();
@@ -1550,9 +1551,9 @@ bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
         // verify that we were triggered.
         ok = (m_tuningRequests.empty() && !m_changeState);
 
-        int te = t2.elapsed();
-        if (!ok && te < 10)
-            std::this_thread::sleep_for(std::chrono::microseconds(10-te));
+        std::chrono::milliseconds te = t2.elapsed();
+        if (!ok && te < 10ms)
+            std::this_thread::sleep_for(std::chrono::microseconds(10ms - te));
     }
     return ok;
 }

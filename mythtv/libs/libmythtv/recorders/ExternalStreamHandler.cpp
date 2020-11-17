@@ -656,7 +656,7 @@ void ExternalStreamHandler::run(void)
 
         if (m_xon)
         {
-            if (status_timer.elapsed() >= 2000)
+            if (status_timer.elapsed() >= 2s)
             {
                 // Since we may never need to send the XOFF
                 // command, occationally check to see if the
@@ -710,7 +710,7 @@ void ExternalStreamHandler::run(void)
                 nodata_timer.start();
             else
             {
-                if (nodata_timer.elapsed() >= 50000)
+                if (nodata_timer.elapsed() >= 50s)
                 {
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         "No data for 50 seconds, Restarting stream.");
@@ -728,7 +728,7 @@ void ExternalStreamHandler::run(void)
             std::this_thread::sleep_for(50ms);
 
             // HLS type streams may only produce data every ~10 seconds
-            if (nodata_timer.elapsed() < 12000 && buffer.size() < TS_PACKET_SIZE)
+            if (nodata_timer.elapsed() < 12s && buffer.size() < TS_PACKET_SIZE)
                 continue;
         }
         else
@@ -1240,9 +1240,10 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd,
 }
 
 bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
-                                        QString & result, int timeout,
+                                        QString & result, int _timeout,
                                         uint retry_cnt)
 {
+    auto timeout = std::chrono::milliseconds(_timeout);
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessVer1('%1')")
         .arg(cmd));
 
@@ -1276,7 +1277,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
         MythTimer timer(MythTimer::kStartRunning);
         while (timer.elapsed() < timeout)
         {
-            result = m_io->GetStatus(timeout);
+            result = m_io->GetStatus(timeout.count());
             if (m_io->Error())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1323,7 +1324,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
                 LOG(VB_RECORD, level,
                     LOC + QString("ProcessCommand('%1') = '%2' took %3ms %4")
                     .arg(cmd).arg(result)
-                    .arg(timer.elapsed())
+                    .arg(timer.elapsed().count())
                     .arg(okay ? "" : "<-- NOTE"));
 
                 return okay;
@@ -1345,9 +1346,10 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
 }
 
 bool ExternalStreamHandler::ProcessVer2(const QString & command,
-                                        QString & result, int timeout,
+                                        QString & result, int _timeout,
                                         uint retry_cnt)
 {
+    auto timeout = std::chrono::milliseconds(_timeout);
     QString status;
     QString raw;
 
@@ -1384,7 +1386,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
         MythTimer timer(MythTimer::kStartRunning);
         while (timer.elapsed() < timeout)
         {
-            result = m_io->GetStatus(timeout);
+            result = m_io->GetStatus(timeout.count());
             if (m_io->Error())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1468,7 +1470,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
 
                 LOG(VB_RECORD, level,
                     LOC + QString("ProcessV2('%1') = '%2' took %3ms %4")
-                    .arg(cmd).arg(result).arg(timer.elapsed())
+                    .arg(cmd).arg(result).arg(timer.elapsed().count())
                     .arg(okay ? "" : "<-- NOTE"));
 
                 return okay;

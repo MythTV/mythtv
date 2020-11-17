@@ -762,7 +762,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     // skipping would take longer than giveUpPredictionMs, and if so,
     // stop skipping right away.
     bool exactSeeks = GetSeekSnap() == 0U;
-    const int maxSeekTimeMs = 200;
+    static constexpr std::chrono::milliseconds maxSeekTimeMs { 200ms };
     int profileFrames = 0;
     MythTimer begin(MythTimer::kStartRunning);
     for (; (skipFrames > 0 && !m_atEof &&
@@ -791,7 +791,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         {
             const int giveUpPredictionMs = 400;
             int remainingTimeMs =
-                skipFrames * (float)begin.elapsed() / profileFrames;
+                skipFrames * (float)begin.elapsed().count() / profileFrames;
             if (remainingTimeMs > giveUpPredictionMs)
             {
               LOG(VB_PLAYBACK, LOG_DEBUG,

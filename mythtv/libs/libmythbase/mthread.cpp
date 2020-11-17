@@ -166,15 +166,15 @@ void MThread::Cleanup(void)
     }
     std::cerr<<std::endl;
 
-    static const int kTimeout = 5000;
+    static constexpr std::chrono::milliseconds kTimeout { 5s };
     MythTimer t;
     t.start();
     for (auto it = badGuys.cbegin();
          it != badGuys.cend() && t.elapsed() < kTimeout; ++it)
     {
-        int left = kTimeout - t.elapsed();
-        if (left > 0)
-            (*it)->wait(left);
+        auto left = kTimeout - t.elapsed();
+        if (left > 0ms)
+            (*it)->wait(left.count());
     }
 }
 

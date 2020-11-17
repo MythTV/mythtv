@@ -457,7 +457,7 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
 
             // we have to cycle within our priority level
 
-            if (m_cycleTimer.elapsed() < 1000)
+            if (m_cycleTimer.elapsed() < 1s)
                 break; // we don't want to cycle too often
 
             if (!m_pidInfo[*open]->IsOpen())

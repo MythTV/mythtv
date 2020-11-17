@@ -13,7 +13,7 @@
 
 #define LOC QString("RemoteEncoder(%1): ").arg(m_recordernum)
 
-#define MAX_SIZE_CHECK 500  // in ms
+static constexpr std::chrono::milliseconds MAX_SIZE_CHECK { 500ms };
 
 RemoteEncoder::~RemoteEncoder()
 {

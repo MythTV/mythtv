@@ -91,7 +91,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
 
     ClearAfterSeek();
 
-    int save_timeout = 1001;
+    std::chrono::milliseconds save_timeout { 1s + 1ms };
     MythTimer flagTime;
     MythTimer ui_timer;
     MythTimer inuse_timer;
@@ -110,7 +110,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
     bool usingIframes = false;
     while (GetEof() == kEofStateNone)
     {
-        if (inuse_timer.elapsed() > 2534)
+        if (inuse_timer.elapsed() > 2534ms)
         {
             inuse_timer.restart();
             m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
@@ -138,13 +138,13 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
             save_timer.restart();
         }
 
-        if (ui_timer.elapsed() > 98)
+        if (ui_timer.elapsed() > 98ms)
         {
             ui_timer.restart();
 
             if (m_totalFrames)
             {
-                float elapsed = flagTime.elapsed() * 0.001F;
+                float elapsed = flagTime.elapsed().count() * 0.001F;
                 auto flagFPS = (elapsed > 0.0F) ? static_cast<int>(myFramesPlayed / elapsed) : 0;
                 auto percentage = static_cast<int>(myFramesPlayed * 100 / m_totalFrames);
                 if (Callback)

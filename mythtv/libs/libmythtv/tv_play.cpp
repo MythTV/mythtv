@@ -76,6 +76,8 @@
 #include <cstdlib>
 #include <thread>
 
+using namespace std::chrono_literals;
+
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif
@@ -96,14 +98,14 @@ const uint TV::kInputKeysMax                 = 6;
 const uint TV::kNextSource                   = 1;
 const uint TV::kPreviousSource               = 2;
 
-const uint TV::kInputModeTimeout             = 5000;
-const uint TV::kLCDTimeout                   = 1000;
-const uint TV::kBrowseTimeout                = 30000;
-const uint TV::kKeyRepeatTimeout             = 300;
-const uint TV::kPrevChanTimeout              = 750;
-const uint TV::kSleepTimerDialogTimeout      = 45000;
-const uint TV::kIdleTimerDialogTimeout       = 45000;
-const uint TV::kVideoExitDialogTimeout       = 120000;
+const std::chrono::milliseconds TV::kInputModeTimeout             = 5s;
+const std::chrono::milliseconds TV::kLCDTimeout                   = 1s;
+const std::chrono::milliseconds TV::kBrowseTimeout                = 30s;
+const std::chrono::milliseconds TV::kKeyRepeatTimeout             = 300ms;
+const std::chrono::milliseconds TV::kPrevChanTimeout              = 750ms;
+const std::chrono::milliseconds TV::kSleepTimerDialogTimeout      = 45s;
+const std::chrono::milliseconds TV::kIdleTimerDialogTimeout       = 45s;
+const std::chrono::milliseconds TV::kVideoExitDialogTimeout       = 2min;
 
 const uint TV::kEndOfPlaybackCheckFrequency  = 250;
 const uint TV::kEndOfRecPromptCheckFrequency = 250;
@@ -267,8 +269,10 @@ bool TV::CreatePlayer(TVState State, bool Muted)
  *  \param MaxWait How long to wait for MythPlayer to start playing.
  *  \return true when successful, false otherwise.
  */
-bool TV::StartPlaying(int MaxWait)
+bool TV::StartPlaying(int _MaxWait)
 {
+    auto MaxWait = std::chrono::milliseconds(_MaxWait);
+
     if (!m_player)
         return false;
 
@@ -279,9 +283,9 @@ bool TV::StartPlaying(int MaxWait)
         // later following the error
         return false;
     }
-    MaxWait = (MaxWait <= 0) ? 20000 : MaxWait;
+    MaxWait = (MaxWait <= 0ms) ? 20s : MaxWait;
 #ifdef USING_VALGRIND
-    maxWait = (1<<30);
+    MaxWait = std::chrono::milliseconds::max();
 #endif // USING_VALGRIND
     MythTimer t;
     t.start();
@@ -293,7 +297,7 @@ bool TV::StartPlaying(int MaxWait)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("StartPlaying(): took %1 ms to start player.")
-                .arg(t.elapsed()));
+                .arg(t.elapsed().count()));
         return true;
     }
     LOG(VB_GENERAL, LOG_ERR, LOC + "StartPlaying() Failed to start player");
@@ -2344,10 +2348,11 @@ void TV::HandleStateChange()
  *                 not provided, this defaults to 40 seconds.
  *  \return true when successful, false otherwise.
  */
-bool TV::StartRecorder(int MaxWait)
+bool TV::StartRecorder(int _MaxWait)
 {
     RemoteEncoder *rec = m_playerContext.m_recorder;
-    MaxWait = (MaxWait <= 0) ? 40000 : MaxWait;
+    auto MaxWait = std::chrono::milliseconds(_MaxWait);
+    MaxWait = (MaxWait <= 0ms) ? 40s : MaxWait;
     MythTimer t;
     t.start();
     bool recording = false;
@@ -2376,7 +2381,8 @@ bool TV::StartRecorder(int MaxWait)
         return false;
     }
 
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Took %1 ms to start recorder.").arg(t.elapsed()));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Took %1 ms to start recorder.")
+        .arg(t.elapsed().count()));
     return true;
 }
 
@@ -3923,7 +3929,7 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
     else if (IsActionable({ "ESCAPE", "BACK" }, Actions))
     {
         if (StateIsLiveTV(m_playerContext.GetState()) &&
-            (m_playerContext.m_lastSignalMsgTime.elapsed() < static_cast<int>(PlayerContext::kSMExitTimeout)))
+            (m_playerContext.m_lastSignalMsgTime.elapsed() < PlayerContext::kSMExitTimeout))
         {
             ClearOSD();
         }
@@ -5051,7 +5057,7 @@ void TV::DoSeek(float Time, const QString &Msg, bool TimeIsOffset, bool HonorCut
     if (m_player->GetLimitKeyRepeat())
         limitkeys = true;
 
-    if (!limitkeys || (m_keyRepeatTimer.elapsed() > static_cast<int>(kKeyRepeatTimeout)))
+    if (!limitkeys || (m_keyRepeatTimer.elapsed() > kKeyRepeatTimeout))
     {
         m_keyRepeatTimer.start();
         NormalSpeed();
@@ -6411,7 +6417,7 @@ void TV::UpdateOSDSignal(const QStringList &List)
 
     InfoMap infoMap = m_playerContext.m_lastSignalUIInfo;
     if ((!m_playerContext.m_lastSignalUIInfoTime.isRunning() ||
-         (m_playerContext.m_lastSignalUIInfoTime.elapsed() > 5000)) ||
+         (m_playerContext.m_lastSignalUIInfoTime.elapsed() > 5s)) ||
         infoMap["callsign"].isEmpty())
     {
         m_playerContext.m_lastSignalUIInfo.clear();
@@ -7080,7 +7086,7 @@ void TV::ShowOSDSleep()
                          "Do you wish to continue watching?")
             .arg(static_cast<double>(m_sleepTimerTimeout * (1.0F / 60000.0F)));
 
-    emit ChangeOSDDialog( { OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout,
+    emit ChangeOSDDialog( { OSD_DLG_SLEEP, message, (int)kSleepTimerDialogTimeout.count(),
                         { { tr("Yes"), "DIALOG_SLEEP_YES_0" },
                           { tr("No"),  "DIALOG_SLEEP_NO_0" } }});
 
@@ -7135,7 +7141,7 @@ void TV::ShowOSDIdle()
                          "will exit in %d seconds. Are you still watching?")
                          .arg(static_cast<double>(m_dbIdleTimeout * (1.0F / 60000.0F)));
 
-    emit ChangeOSDDialog( { OSD_DLG_IDLE, message, kIdleTimerDialogTimeout,
+    emit ChangeOSDDialog( { OSD_DLG_IDLE, message, (int)kIdleTimerDialogTimeout.count(),
                         { { tr("Yes"), "DIALOG_IDLE_YES_0" },
                           { tr("No"),  "DIALOG_IDLE_NO_0" }}});
 

@@ -25,6 +25,8 @@
 #ifndef GUISTARTUP_H_
 #define GUISTARTUP_H_
 
+#include <chrono>
+
 // QT headers
 #include <QObject>
 #include <QTranslator>
@@ -92,7 +94,7 @@ class MPUBLIC GUIStartup : public MythScreenType
     MythTimer         *m_progressTimer {nullptr};
     QEventLoop        *m_loop          {nullptr};
     QEventLoop         m_dlgLoop;
-    int                m_total         {0};
+    std::chrono::milliseconds m_total  {0ms};
     QTimer             m_timer;
 };
 

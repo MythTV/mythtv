@@ -987,20 +987,20 @@ void MpegRecorder::run(void)
         {
             if (dummyBPS && bytesRead)
             {
-                elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                elapsed = (elapsedTimer.elapsed().count() / 1000.0) + 1;
                 while ((bytesRead / elapsed) > dummyBPS)
                 {
                     std::this_thread::sleep_for(50ms);
-                    elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                    elapsed = (elapsedTimer.elapsed().count() / 1000.0) + 1;
                 }
             }
             else if (GetFramesWritten())
             {
-                elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                elapsed = (elapsedTimer.elapsed().count() / 1000.0) + 1;
                 while ((GetFramesWritten() / elapsed) > 30)
                 {
                     std::this_thread::sleep_for(50ms);
-                    elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                    elapsed = (elapsedTimer.elapsed().count() / 1000.0) + 1;
                 }
             }
         }

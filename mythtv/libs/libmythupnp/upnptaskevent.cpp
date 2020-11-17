@@ -73,7 +73,7 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
             // Read first line to determine success/Fail
             // --------------------------------------------------------------
 
-            QString sResponseLine = sock.ReadLine( 3000 );
+            QString sResponseLine = sock.ReadLine( 3s );
 
             if ( sResponseLine.length() > 0)
             {

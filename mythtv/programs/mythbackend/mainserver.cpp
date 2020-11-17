@@ -194,7 +194,7 @@ class FreeSpaceUpdater : public QRunnable
                 m_parent.m_masterFreeSpaceList = list;
             }
             QMutexLocker locker(&m_lock);
-            int left = kRequeryTimeout - t.elapsed();
+            std::chrono::milliseconds left = kRequeryTimeout - t.elapsed();
             if (m_lastRequest.elapsed() + left > kExitTimeout)
                 m_dorun = false;
             if (!m_dorun)
@@ -202,8 +202,8 @@ class FreeSpaceUpdater : public QRunnable
                 m_running = false;
                 break;
             }
-            if (left > 50)
-                m_wait.wait(locker.mutex(), left);
+            if (left > 50ms)
+                m_wait.wait(locker.mutex(), left.count());
         }
     }
 
@@ -229,11 +229,9 @@ class FreeSpaceUpdater : public QRunnable
     bool m_running;
     MythTimer m_lastRequest;
     QWaitCondition m_wait;
-    const static int kRequeryTimeout;
-    const static int kExitTimeout;
+    static constexpr std::chrono::milliseconds kRequeryTimeout { 15s };
+    static constexpr std::chrono::milliseconds kExitTimeout { 61s };
 };
-const int FreeSpaceUpdater::kRequeryTimeout = 15000;
-const int FreeSpaceUpdater::kExitTimeout = 61000;
 
 MainServer::MainServer(bool master, int port,
                        QMap<int, EncoderLink *> *_tvList,

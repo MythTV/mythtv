@@ -92,7 +92,7 @@ void EITScanner::run(void)
         // Tell the scheduler to run if we are in passive scan
         // and there have been updated events since the last scheduler run
         // but not in the last 60 seconds
-        if (!m_activeScan && eitCount && (t.elapsed() > 60 * 1000))
+        if (!m_activeScan && eitCount && (t.elapsed() > 60s))
         {
             LOG(VB_EIT, LOG_INFO,
                 LOC_ID + QString("Added %1 EIT events in passive scan").arg(eitCount));

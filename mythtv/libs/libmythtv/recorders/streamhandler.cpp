@@ -328,7 +328,7 @@ bool StreamHandler::UpdateFiltersFromStreamData(void)
         ok &= AddPIDFilter(pid);
 
     // Cycle filters if it's been a while
-    if (m_cycleTimer.isRunning() && (m_cycleTimer.elapsed() > 1000))
+    if (m_cycleTimer.isRunning() && (m_cycleTimer.elapsed() > 1s))
         CycleFiltersByPriority();
 
     return ok;

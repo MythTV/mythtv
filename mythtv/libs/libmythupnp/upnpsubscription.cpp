@@ -21,7 +21,7 @@ QObject::customEvent to receive event notifications for subscribed services.
 // default requested time for subscription (actual is dictated by server)
 #define SUBSCRIPTION_TIME 1800
 // maximum time to wait for responses to subscription requests (UPnP spec. 30s)
-#define MAX_WAIT 30000
+static constexpr std::chrono::milliseconds MAX_WAIT { 30s };
 
 #define LOC QString("UPnPSub: ")
 

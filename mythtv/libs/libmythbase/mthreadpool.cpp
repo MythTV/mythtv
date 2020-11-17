@@ -358,19 +358,20 @@ void MThreadPool::start(QRunnable *runnable, const QString& debugName, int prior
 }
 
 void MThreadPool::startReserved(
-    QRunnable *runnable, const QString& debugName, int waitForAvailMS)
+    QRunnable *runnable, const QString& debugName, int waitForAvail)
 {
+    auto waitForAvailMS = std::chrono::milliseconds(waitForAvail);
     QMutexLocker locker(&m_priv->m_lock);
-    if (waitForAvailMS > 0 && m_priv->m_availThreads.empty() &&
+    if (waitForAvailMS > 0ms && m_priv->m_availThreads.empty() &&
         m_priv->m_runningThreads.size() >= m_priv->m_maxThreadCount)
     {
         MythTimer t;
         t.start();
-        int left = waitForAvailMS - t.elapsed();
-        while (left > 0 && m_priv->m_availThreads.empty() &&
+        auto left = waitForAvailMS - t.elapsed();
+        while (left > 0ms && m_priv->m_availThreads.empty() &&
                m_priv->m_runningThreads.size() >= m_priv->m_maxThreadCount)
         {
-            m_priv->m_wait.wait(locker.mutex(), left);
+            m_priv->m_wait.wait(locker.mutex(), left.count());
             left = waitForAvailMS - t.elapsed();
         }
     }

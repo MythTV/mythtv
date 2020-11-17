@@ -108,7 +108,7 @@ static QString progress_string(
     static const std::string kSpinChars { R"(/-\|)" };
     static uint s_spinCnt = 0;
 
-    double elapsed = flagTime.elapsed() * 0.001;
+    double elapsed = flagTime.elapsed().count() * 0.001;
     double flagFPS = (elapsed > 0.0) ? (m_myFramesPlayed / elapsed) : 0;
 
     double percentage = m_myFramesPlayed * 100.0 / totalFrames;
@@ -162,7 +162,7 @@ bool MythCCExtractorPlayer::run(void)
 
     while (!m_killDecoder && !IsErrored())
     {
-        if (inuse_timer.elapsed() > 2534)
+        if (inuse_timer.elapsed() > 2534ms)
         {
             inuse_timer.restart();
             m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
@@ -171,7 +171,7 @@ bool MythCCExtractorPlayer::run(void)
             m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 
-        if (m_showProgress && (ui_timer.elapsed() > 98 * 4))
+        if (m_showProgress && (ui_timer.elapsed() > 98ms * 4))
         {
             ui_timer.restart();
             QString str = progress_string(

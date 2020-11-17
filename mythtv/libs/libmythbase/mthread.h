@@ -6,6 +6,7 @@
 #include <QThread>
 
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 class MThreadInternal;
 class QStringList;

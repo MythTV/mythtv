@@ -159,8 +159,8 @@ class MTV_PUBLIC PlayerContext
     MythDeque<TVState>  m_nextState;
 
     /// Timeout after last Signal Monitor message for ignoring OSD when exiting.
-    static const uint kSMExitTimeout;
-    static const uint kMaxChannelHistory;
+    static constexpr std::chrono::milliseconds kSMExitTimeout { 2s };
+    static constexpr uint kMaxChannelHistory { 30 };
 };
 
 #endif // PLAYER_CONTEXT_H

@@ -82,7 +82,7 @@ void MythUITextEdit::Pulse(void)
 
     if (m_hasFocus)
     {
-        if (m_lastKeyPress.elapsed() < 500)
+        if (m_lastKeyPress.elapsed() < 500ms)
         {
             m_cursorImage->SetVisible(true);
             m_blinkInterval = 0;

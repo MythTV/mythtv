@@ -583,7 +583,7 @@ void ZMClient::deleteEventList(std::vector<Event*> *eventList)
 bool ZMClient::readData(unsigned char *data, int dataSize)
 {
     qint64 read = 0;
-    int errmsgtime = 0;
+    std::chrono::milliseconds errmsgtime { 0ms };
     MythTimer timer;
     timer.start();
 
@@ -615,10 +615,10 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
         }
         else
         {
-            int elapsed = timer.elapsed();
-            if (elapsed  > 10000)
+            std::chrono::milliseconds elapsed = timer.elapsed();
+            if (elapsed  > 10s)
             {
-                if ((elapsed - errmsgtime) > 10000)
+                if ((elapsed - errmsgtime) > 10s)
                 {
                     errmsgtime = elapsed;
                     LOG(VB_GENERAL, LOG_ERR,
@@ -627,7 +627,7 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
                 }
             }
 
-            if (elapsed > 100000)
+            if (elapsed > 100s)
             {
                 LOG(VB_GENERAL, LOG_ERR, "Error, readData timeout (readBlock)");
                 return false;

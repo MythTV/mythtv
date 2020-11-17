@@ -380,7 +380,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     MythTimer      m_timeOfLatestDataTimer;
     RecordingGaps  m_recordingGaps;
     /// timeOfLatest update interval target in milliseconds.
-    static const uint kTimeOfLatestDataIntervalTarget;
+    static constexpr std::chrono::milliseconds kTimeOfLatestDataIntervalTarget { 5s };
 };
 
 #endif

@@ -40,7 +40,7 @@ class V4L2encSignalMonitor: public DTVSignalMonitor
 
   private:
     int                   m_strength       {0};
-    int                   m_stableTime     {1500};
+    std::chrono::milliseconds m_stableTime {1500ms};
     int                   m_width          {0};
     int                   m_height         {0};
     uint                  m_lockCnt        {0};

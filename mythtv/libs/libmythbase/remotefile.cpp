@@ -34,7 +34,7 @@
 #include "threadedfilewriter.h"
 #include "storagegroup.h"
 
-#define MAX_FILE_CHECK 500  // in ms
+static constexpr std::chrono::milliseconds MAX_FILE_CHECK { 500ms };
 
 static bool RemoteSendReceiveStringList(const QString &host, QStringList &strlist)
 {
@@ -993,7 +993,7 @@ int RemoteFile::Read(void *data, int size)
     MythTimer mtimer;
     mtimer.start();
 
-    while (recv < sent && !error && mtimer.elapsed() < 10000)
+    while (recv < sent && !error && mtimer.elapsed() < 10s)
     {
         int ret = m_sock->Read(((char *)data) + recv, sent - recv, waitms);
 

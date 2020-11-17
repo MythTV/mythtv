@@ -170,10 +170,11 @@ static QString LocalSubtitleFilename(QFileInfo &FileInfo)
     return QString();
 }
 
-bool MythFileBuffer::OpenFile(const QString &Filename, uint Retry)
+bool MythFileBuffer::OpenFile(const QString &Filename, uint _Retry)
 {
+    auto Retry = std::chrono::milliseconds(_Retry);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("OpenFile(%1, %2 ms)")
-            .arg(Filename).arg(Retry));
+            .arg(Filename).arg(Retry.count()));
 
     m_rwLock.lockForWrite();
 
@@ -267,7 +268,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint Retry)
                     m_fd2 = -1;
                 }
             }
-        } while (static_cast<uint>(openTimer.elapsed()) < Retry);
+        } while (openTimer.elapsed() < Retry);
 
         switch (lasterror)
         {
@@ -303,7 +304,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint Retry)
             default: break;
         }
         LOG(VB_FILE, LOG_INFO, LOC + QString("OpenFile() made %1 attempts in %2 ms")
-                .arg(openAttempts).arg(openTimer.elapsed()));
+                .arg(openAttempts).arg(openTimer.elapsed().count()));
     }
     else
     {
@@ -333,7 +334,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint Retry)
             }
         }
 
-        m_remotefile = new RemoteFile(m_filename, false, true, static_cast<int>(Retry), &auxFiles);
+        m_remotefile = new RemoteFile(m_filename, false, true, Retry.count(), &auxFiles);
         if (!m_remotefile->isOpen())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("RingBuffer::RingBuffer(): Failed to open remote file (%1)")

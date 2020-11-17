@@ -254,20 +254,21 @@ void MythPlayer::SetPlaying(bool is_playing)
     m_playingWaitCond.wakeAll();
 }
 
-bool MythPlayer::IsPlaying(uint wait_in_msec, bool wait_for) const
+bool MythPlayer::IsPlaying(uint _wait_in_msec, bool wait_for) const
 {
+    auto wait_in_msec = std::chrono::milliseconds(_wait_in_msec);
     QMutexLocker locker(&m_playingLock);
 
-    if (!wait_in_msec)
+    if (wait_in_msec != 0ms)
         return m_playing;
 
     MythTimer t;
     t.start();
 
-    while ((wait_for != m_playing) && ((uint)t.elapsed() < wait_in_msec))
+    while ((wait_for != m_playing) && (t.elapsed() < wait_in_msec))
     {
         m_playingWaitCond.wait(
-            &m_playingLock, std::max(0,(int)wait_in_msec - t.elapsed()));
+            &m_playingLock, std::max(0ms,wait_in_msec - t.elapsed()).count());
     }
 
     return m_playing;
@@ -455,7 +456,8 @@ int MythPlayer::OpenFile(int Retries)
     // Test the incoming buffer and create a suitable decoder
     MythTimer bigTimer;
     bigTimer.start();
-    int timeout = std::max((Retries + 1) * 500, 30000);
+    std::chrono::milliseconds timeout =
+        std::max(500ms * (Retries + 1), 30000ms);
     while (testreadsize <= kDecoderProbeBufferSize)
     {
         testbuf.resize(testreadsize);
@@ -464,7 +466,7 @@ int MythPlayer::OpenFile(int Retries)
         while (m_playerCtx->m_buffer->Peek(testbuf) != testreadsize)
         {
             // NB need to allow for streams encountering network congestion
-            if (peekTimer.elapsed() > 30000 || bigTimer.elapsed() > timeout
+            if (peekTimer.elapsed() > 30s || bigTimer.elapsed() > timeout
                 || m_playerCtx->m_buffer->GetStopReads())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +

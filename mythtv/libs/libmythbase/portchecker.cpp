@@ -70,10 +70,11 @@
  * of linkLocalOnly, return true if it was link local and
  * was changed, false in other cases.
 */
-bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLocalOnly)
+bool PortChecker::checkPort(QString &host, int port, int timeLimitMS, bool linkLocalOnly)
 {
+    auto timeLimit = std::chrono::milliseconds(timeLimitMS);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("host %1 port %2 timeLimit %3 linkLocalOnly %4")
-        .arg(host).arg(port).arg(timeLimit).arg(linkLocalOnly));
+        .arg(host).arg(port).arg(timeLimit.count()).arg(linkLocalOnly));
     m_cancelCheck = false;
     QHostAddress addr;
     bool isIPAddress = addr.setAddress(host);

@@ -422,7 +422,8 @@ void MythDVDPlayer::ChangeSpeed(void)
         // it to what the unstretched value would have been
         // had we been playing with the new timestretch value
         // all along
-        int elapsed = static_cast<int>((m_stillFrameTimer.elapsed() * m_playSpeed / m_nextPlaySpeed));
+        auto elapsed = millisecondsFromFloat(m_stillFrameTimer.elapsed().count() *
+                                             m_playSpeed / m_nextPlaySpeed);
         m_stillFrameTimer.restart();
         m_stillFrameTimer.addMSecs(elapsed);
         m_stillFrameTimerLock.unlock();
@@ -461,7 +462,7 @@ int64_t MythDVDPlayer::GetSecondsPlayed(bool /*HonorCutList*/, int Divisor)
         if (m_stillFrameLength == 255)
             played = -1;
         else
-            played = static_cast<int64_t>(m_stillFrameTimer.elapsed() * m_playSpeed / Divisor);
+            played = static_cast<int64_t>(m_stillFrameTimer.elapsed().count() * m_playSpeed / Divisor);
     }
 
     return played;
@@ -699,7 +700,7 @@ void MythDVDPlayer::StillFrameCheck(void)
        (m_stillFrameLength > 0) && (m_stillFrameLength < 0xff))
     {
         m_stillFrameTimerLock.lock();
-        int elapsedTime = static_cast<int>(m_stillFrameTimer.elapsed() * m_playSpeed / 1000.0F);
+        int elapsedTime = static_cast<int>(m_stillFrameTimer.elapsed().count() * m_playSpeed / 1000.0F);
         m_stillFrameTimerLock.unlock();
         if (elapsedTime >= m_stillFrameLength)
         {

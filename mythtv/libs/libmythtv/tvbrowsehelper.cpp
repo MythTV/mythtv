@@ -147,7 +147,7 @@ void TVBrowseHelper::BrowseDispInfo(const BrowseInfo& Browseinfo)
         return;
 
     m_parent->KillTimer(m_browseTimerId);
-    m_browseTimerId = m_parent->StartTimer(static_cast<int>(TV::kBrowseTimeout), __LINE__);
+    m_browseTimerId = m_parent->StartTimer(TV::kBrowseTimeout, __LINE__);
 
     QMutexLocker locker(&m_browseLock);
     if (BROWSE_SAME == Browseinfo.m_dir)

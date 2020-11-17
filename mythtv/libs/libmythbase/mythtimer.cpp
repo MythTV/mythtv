@@ -47,7 +47,7 @@ MythTimer::MythTimer(StartState state)
 void MythTimer::start(void)
 {
     m_timer.start();
-    m_offset = 0;
+    m_offset = 0ms;
 }
 
 /** Returns milliseconds elapsed since last start() or restart()
@@ -59,15 +59,16 @@ void MythTimer::start(void)
  * \note If addMSecs() has been called and the total offset applied
  *       is negative then this can return a negative number.
  */
-int MythTimer::restart(void)
+std::chrono::milliseconds MythTimer::restart(void)
 {
     if (m_timer.isValid())
     {
-        int val = static_cast<int>(m_timer.restart() + m_offset);
-        m_offset = 0;
+        auto val = std::chrono::milliseconds(m_timer.restart()) + m_offset;
+        m_offset = 0ms;
         return val;
     }
-    return start(), 0;
+    start();
+    return 0ms;
 }
 
 /** Stops timer, next call to isRunning() will return false and
@@ -87,24 +88,24 @@ void MythTimer::stop(void)
  * \note If addMSecs() has been called and the total offset applied
  *       is negative then this can return a negative number.
  */
-int MythTimer::elapsed(void)
+std::chrono::milliseconds MythTimer::elapsed(void)
 {
     if (!m_timer.isValid())
     {
 #ifdef DEBUG_TIMER_API_USAGE
         assert(0 == "elapsed called without timer being started");
 #endif
-        return 0;
+        return 0ms;
     }
 
-    qint64 e = m_timer.elapsed();
-    if (!QElapsedTimer::isMonotonic() && (e > 86300000))
+    auto e = std::chrono::milliseconds(m_timer.elapsed());
+    if (!QElapsedTimer::isMonotonic() && (e > (24h - 100s)))
     {
         start();
-        e = 0;
+        e = 0ms;
     }
 
-    return static_cast<int>(e + m_offset);
+    return e + m_offset;
 }
 
 /** Returns nanoseconds elapsed since last start() or restart()
@@ -115,17 +116,17 @@ int MythTimer::elapsed(void)
  * \note If addMSecs() has been called and the total offset applied
  *       is negative then this can return a negative number.
  */
-int64_t MythTimer::nsecsElapsed(void) const
+std::chrono::nanoseconds MythTimer::nsecsElapsed(void) const
 {
     if (!m_timer.isValid())
     {
 #ifdef DEBUG_TIMER_API_USAGE
         assert(0 == "elapsed called without timer being started");
 #endif
-        return 0;
+        return 0ns;
     }
 
-    return m_timer.nsecsElapsed() + 1000000LL * m_offset;
+    return std::chrono::nanoseconds(m_timer.nsecsElapsed()) + m_offset;
 }
 
 /** Returns true if start() or restart() has been called at least
@@ -142,7 +143,7 @@ bool MythTimer::isRunning(void) const
  *  again. The offset may be positive or negative. This
  *  may be called multiple times to accrete various offsets.
  */
-void MythTimer::addMSecs(int ms)
+void MythTimer::addMSecs(std::chrono::milliseconds ms)
 {
     m_offset += ms;
 }
