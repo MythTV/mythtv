@@ -205,7 +205,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     if (m_idleTime > 0)
         m_idleTimer.start();
 
-    m_screensaver = new MythScreenSaverControl(m_display);
+    m_screensaver = new MythScreenSaverControl(this, m_display);
     if (m_screensaver)
     {
         connect(this, &MythMainWindow::signalRestoreScreensaver, m_screensaver, &MythScreenSaverControl::Restore);

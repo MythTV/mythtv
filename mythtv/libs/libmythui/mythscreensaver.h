@@ -8,6 +8,7 @@
 #include <vector>
 
 class MythDisplay;
+class MythMainWindow;
 
 /// Base Class for screensavers
 class MythScreenSaver : public QObject
@@ -34,7 +35,7 @@ class MythScreenSaverControl : public QObject
     Q_OBJECT
 
   public:
-    MythScreenSaverControl(MythDisplay* mDisplay);
+    MythScreenSaverControl(MythMainWindow* MainWin, MythDisplay* mDisplay);
    ~MythScreenSaverControl() override = default;
 
   signals:

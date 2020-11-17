@@ -141,8 +141,10 @@ using_waylandextras {
     DEFINES += USING_WAYLANDEXTRAS
     HEADERS += platforms/mythscreensaverwayland.h
     HEADERS += platforms/mythwaylandextras.h
+    HEADERS += platforms/waylandprotocols/idle_inhibit_unstable_v1.h
     SOURCES += platforms/mythscreensaverwayland.cpp
     SOURCES += platforms/mythwaylandextras.cpp
+    SOURCES += platforms/waylandprotocols/idle_inhibit_unstable_v1.c
 }
 
 # Use MMAL as a proxy for Raspberry Pi support

@@ -1,5 +1,9 @@
+// Qt
+#include <QGuiApplication>
+
 // MythTV
 #include "config.h"
+#include "mythmainwindow.h"
 #include "mythscreensaver.h"
 
 #ifdef USING_DRM
@@ -27,7 +31,13 @@
 #include "platforms/mythxdisplay.h"
 #endif
 
-MythScreenSaverControl::MythScreenSaverControl(MythDisplay* mDisplay)
+/*! \class MythScreenSaverControl
+ *
+ * \note This constructor is called from the MythMainWindow constructor. Do NOT
+ * use the MythMainWindow object here (or in any MythScreenSaver constructor) as
+ * it is not complete. Instead listen for the MythMainWindow::signalWindowReady signal.
+*/
+MythScreenSaverControl::MythScreenSaverControl(MythMainWindow* MainWin, MythDisplay* mDisplay)
 {
 #if defined(USING_DBUS)
     m_screenSavers.push_back(new MythScreenSaverDBus(this));
@@ -53,7 +63,10 @@ MythScreenSaverControl::MythScreenSaverControl(MythDisplay* mDisplay)
     (void)mDisplay;
 #endif
 #ifdef USING_WAYLANDEXTRAS
-    m_screenSavers.push_back(new MythScreenSaverWayland(this));
+    if (qGuiApp->platformName().toLower().contains("wayland"))
+        m_screenSavers.push_back(new MythScreenSaverWayland(this, MainWin));
+#else
+    (void)MainWin;
 #endif
 
     for (auto * screensaver : m_screenSavers)
