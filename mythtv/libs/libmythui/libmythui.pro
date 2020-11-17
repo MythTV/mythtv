@@ -136,11 +136,13 @@ using_drm {
     QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
 }
 
-# NOTE - there isn't a wayland define yet
 using_waylandextras {
+    QT += gui-private
     DEFINES += USING_WAYLANDEXTRAS
     HEADERS += platforms/mythscreensaverwayland.h
+    HEADERS += platforms/mythwaylandextras.h
     SOURCES += platforms/mythscreensaverwayland.cpp
+    SOURCES += platforms/mythwaylandextras.cpp
 }
 
 # Use MMAL as a proxy for Raspberry Pi support
