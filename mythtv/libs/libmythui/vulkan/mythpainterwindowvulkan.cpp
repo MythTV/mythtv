@@ -89,4 +89,5 @@ void MythPainterWindowVulkan::resizeEvent(QResizeEvent* ResizeEvent)
 {
     if (m_wrapper)
         m_wrapper->resize(ResizeEvent->size());
+    MythPainterWindow::resizeEvent(ResizeEvent);
 }

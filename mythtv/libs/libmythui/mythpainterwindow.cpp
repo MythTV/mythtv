@@ -15,6 +15,11 @@
 #include "vulkan/mythpaintervulkan.h"
 #endif
 
+#ifdef USING_WAYLANDEXTRAS
+#include <QGuiApplication>
+#include "platforms/mythwaylandextras.h"
+#endif
+
 #define MYTH_PAINTER_QT QString("Qt")
 
 using TryPainter = bool(*)(MythMainWindow*, MythPainterWindow*&, MythPainter*&, bool&);
@@ -132,6 +137,17 @@ void MythPainterWindow::DestroyPainters(MythPainterWindow *&PaintWin, MythPainte
 MythPainterWindow::MythPainterWindow(MythMainWindow *MainWin)
   : QWidget(MainWin)
 {
+#ifdef USING_WAYLANDEXTRAS
+    if (qGuiApp->platformName().toLower().contains("wayland"))
+        m_waylandDev = new MythWaylandDevice(MainWin);
+#endif
+}
+
+MythPainterWindow::~MythPainterWindow()
+{
+#ifdef USING_WAYLANDEXTRAS
+    delete m_waylandDev;
+#endif
 }
 
 MythRender* MythPainterWindow::GetRenderDevice()
@@ -143,3 +159,12 @@ bool MythPainterWindow::RenderIsShared()
 {
     return m_render && m_render->IsShared();
 }
+
+void MythPainterWindow::resizeEvent(QResizeEvent* /*ResizeEvent*/)
+{
+#ifdef USING_WAYLANDEXTRAS
+    if (m_waylandDev)
+        m_waylandDev->SetOpaqueRegion(rect());
+#endif
+}
+
