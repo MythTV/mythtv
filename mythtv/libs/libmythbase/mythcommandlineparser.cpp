@@ -98,7 +98,7 @@ int GetTermWidth(void)
     if (ioctl(0, TIOCGWINSZ, &ws) != 0)
         return TERMWIDTH;
 
-    return (int)ws.ws_col;
+    return static_cast<int>(ws.ws_col);
 #endif
 }
 
@@ -141,10 +141,8 @@ const char* MythCommandLineParser::NamedOptType(Result type)
 
       case Result::kInvalid:
         return "kInvalid";
-
-      default:
-        return "kUnknown";
     }
+    return "kUnknown";
 }
 
 /** \defgroup commandlineparser Command Line Processing
@@ -374,7 +372,7 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     }
 
     // print type and default for the stored value
-    msg << "Type:        " << QVariant::typeToName(m_type) << QT_ENDL;
+    msg << "Type:        " << QVariant::typeToName(static_cast<int>(m_type)) << QT_ENDL;
     if (m_default.canConvert(QVariant::String))
         msg << "Default:     " << m_default.toString() << QT_ENDL;
 
@@ -1249,7 +1247,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
             if (m_verbose)
             {
                 std::cerr << "Adding " << str.toLocal8Bit().constData()
-                          << " as taking type '" << QVariant::typeToName(type)
+                          << " as taking type '" << QVariant::typeToName(static_cast<int>(type))
                           << "'" << std::endl;
             }
             arg->IncrRef();
@@ -2496,7 +2494,7 @@ void MythCommandLineParser::addPlatform(void)
 {
     add(QStringList{"-platform", "--platform"}, "platform", "", "Qt (QPA) platform argument",
         "Qt platform argument that is passed through to Qt")
-        ->SetGroup("Qt");;
+        ->SetGroup("Qt");
 }
 
 /** \brief Helper utility for logging interface to pull path from --logpath
@@ -2599,11 +2597,11 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
             return err;
     }
     else if (toBool("verboseint"))
-        verboseMask = toLongLong("verboseint");
+        verboseMask = static_cast<uint64_t>(toLongLong("verboseint"));
 
     verboseMask |= VB_STDIO|VB_FLUSH;
 
-    int quiet = toUInt("quiet");
+    int quiet = toInt("quiet");
     if (std::max(quiet, static_cast<int>(progress)) > 1)
     {
         verboseMask = VB_NONE|VB_FLUSH;
