@@ -4145,7 +4145,8 @@ SatIPDeviceID::SatIPDeviceID(const CaptureCard &parent) :
 {
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of the Sat>IP tuner"));
-    setEnabled(false);
+    setEnabled(true);
+    setReadOnly(true);
 };
 
 void SatIPDeviceID::Load(void)
