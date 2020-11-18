@@ -61,7 +61,7 @@ void IPTVChannelFetcher::Stop(void)
     {
         m_stopNow = true;
         m_lock.unlock();
-        m_thread->wait(5);
+        m_thread->wait(5ms);
         m_lock.lock();
     }
 
@@ -73,7 +73,7 @@ void IPTVChannelFetcher::Stop(void)
 fbox_chan_map_t IPTVChannelFetcher::GetChannels(void)
 {
     while (!m_thread->isFinished())
-        m_thread->wait(500);
+        m_thread->wait(500ms);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Found %1 channels")
         .arg(m_channels.size()));

@@ -1,6 +1,8 @@
 #ifndef MYTHUIANIMATION_H
 #define MYTHUIANIMATION_H
 
+#include "mythchrono.h"
+#include "mythdate.h"
 #include "xmlparsebase.h"
 #include <QDateTime>
 #include <QVariantAnimation>
@@ -85,7 +87,7 @@ class MythUIAnimation : public QVariantAnimation, XMLParseBase
     bool        m_active       {false};
     bool        m_looped       {false};
     bool        m_reversible   {false};
-    int64_t     m_lastUpdate   { QDateTime::currentMSecsSinceEpoch() };
+    std::chrono::milliseconds m_lastUpdate { MythDate::currentMSecsSinceEpochAsDuration() };
 };
 
 #endif // MYTHUIANIMATION_H

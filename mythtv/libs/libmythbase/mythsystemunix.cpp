@@ -219,7 +219,7 @@ void MythSystemLegacyIOHandler::Wait(int fd)
     while (m_pMap.contains(fd))
     {
         locker.unlock();
-        usleep(10 * 1000);
+        usleep(10ms);
         locker.relock();
     }
 }

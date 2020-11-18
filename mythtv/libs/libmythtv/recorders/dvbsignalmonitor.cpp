@@ -118,8 +118,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
             QString("initial flags %1").arg(sm_flags_to_string(m_flags)));
 
     m_minimumUpdateRate = _channel->GetMinSignalMonitorDelay();
-    if (m_minimumUpdateRate > 30)
-        usleep(m_minimumUpdateRate * 1000);
+    if (m_minimumUpdateRate > 30ms)
+        usleep(m_minimumUpdateRate);
 
     m_streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(), m_inputid);
 }

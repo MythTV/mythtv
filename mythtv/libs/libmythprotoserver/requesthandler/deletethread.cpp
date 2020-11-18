@@ -42,7 +42,7 @@ void DeleteThread::run(void)
         // loop through any stored files every half second 
         ProcessNew();
         ProcessOld();
-        usleep(500000);
+        usleep(0.5s);
     }
 
     if (!m_files.empty())

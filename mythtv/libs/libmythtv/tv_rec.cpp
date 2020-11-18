@@ -46,9 +46,6 @@
 #define LOC QString("TVRec[%1]: ").arg(m_inputId)
 #define LOC2 QString("TVRec[%1]: ").arg(inputid) // for static functions
 
-/// How many milliseconds the signal monitor should wait between checks
-const uint TVRec::kSignalMonitoringRate = 50; /* msec */
-
 QReadWriteLock    TVRec::s_inputsLock;
 QMap<uint,TVRec*> TVRec::s_inputs;
 

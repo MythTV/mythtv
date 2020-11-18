@@ -86,7 +86,7 @@
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
  */
-#define PRT_TIMEOUT 10
+static constexpr std::chrono::milliseconds PRT_TIMEOUT { 10ms };
 /** Number of threads in process request thread pool at startup. */
 #define PRT_STARTUP_THREAD_COUNT 5
 

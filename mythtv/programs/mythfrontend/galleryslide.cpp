@@ -6,6 +6,7 @@
 
 #include "imagemetadata.h"
 
+using std::chrono::duration_cast;
 
 #define LOC QString("Slide: ")
 #define SBLOC QString("SlideBuffer: ")
@@ -42,13 +43,14 @@ void AbstractAnimation::Start(bool forwards, float speed)
  \param curve Easing curve governing animation
  \param centre Zoom centre
 */
-void Animation::Set(const QVariant& from, const QVariant& to, int duration,
+void Animation::Set(const QVariant& from, const QVariant& to,
+                    std::chrono::milliseconds duration,
                     const QEasingCurve& curve, UIEffects::Centre centre)
 {
     setStartValue(from);
     setEndValue(to);
     m_centre = centre;
-    setDuration(duration);
+    setDuration(duration.count());
     setEasingCurve(curve);
 }
 
@@ -60,11 +62,12 @@ void Animation::Set(const QVariant& from, const QVariant& to, int duration,
 */
 void Animation::Start(bool forwards, float speed)
 {
-    if (duration() == 0)
+    auto duration_ms = std::chrono::milliseconds(duration());
+    if (duration_ms == 0ms)
         return;
 
-    m_elapsed = forwards ? 0 : duration();
-    setCurrentTime(m_elapsed);
+    m_elapsed = forwards ? 0ms : duration_ms;
+    setCurrentTime(m_elapsed.count());
 
     AbstractAnimation::Start(forwards, speed);
 }
@@ -77,14 +80,14 @@ void Animation::Pulse()
     if (!m_running)
         return;
 
-    int64_t current = QDateTime::currentMSecsSinceEpoch();
-    int interval = std::min(static_cast<int>(current - m_lastUpdate), 50);
+    std::chrono::milliseconds current = MythDate::currentMSecsSinceEpochAsDuration();
+    std::chrono::milliseconds interval = std::min(current - m_lastUpdate, 50ms);
     m_lastUpdate = current;
     m_elapsed += (m_forwards ? interval : -interval) * static_cast<int>(m_speed);
-    setCurrentTime(m_elapsed);
+    setCurrentTime(m_elapsed.count());
 
     // Detect completion
-    if ((m_forwards && m_elapsed >= duration()) || (!m_forwards && m_elapsed <= 0))
+    if ((m_forwards && m_elapsed.count() >= duration()) || (!m_forwards && m_elapsed <= 0ms))
         Finished();
 }
 
@@ -454,7 +457,7 @@ void Slide::Zoom(int percentage)
     {
         if (m_zoomAnimation)
         {
-            m_zoomAnimation->Set(m_zoom, newZoom, 250, QEasingCurve::OutQuad);
+            m_zoomAnimation->Set(m_zoom, newZoom, 250ms, QEasingCurve::OutQuad);
             m_zoomAnimation->Start();
         }
         else
@@ -502,7 +505,7 @@ void Slide::Pan(QPoint offset)
 
         if (m_panAnimation)
         {
-            m_panAnimation->Set(start, dest, 250, QEasingCurve::Linear);
+            m_panAnimation->Set(start, dest, 250ms, QEasingCurve::Linear);
             m_panAnimation->Start();
         }
         else

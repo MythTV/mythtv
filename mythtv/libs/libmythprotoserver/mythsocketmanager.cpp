@@ -24,7 +24,7 @@
 
 #define LOC      QString("MythSocketManager: ")
 
-#define PRT_TIMEOUT 10
+static constexpr std::chrono::milliseconds PRT_TIMEOUT { 10ms };
 
 class ProcessRequestRunnable : public QRunnable
 {

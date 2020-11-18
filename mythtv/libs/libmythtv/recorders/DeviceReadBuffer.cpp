@@ -322,7 +322,7 @@ void DeviceReadBuffer::run(void)
 
         if (!IsOpen())
         {
-            usleep(5000);
+            usleep(5ms);
             continue;
         }
 
@@ -368,7 +368,7 @@ void DeviceReadBuffer::run(void)
 
         // Slow down reading if not under load
         if (errcnt == 0 && total < throttle)
-            usleep(1000);
+            usleep(1ms);
     }
 
     ClosePipes();
@@ -393,7 +393,7 @@ bool DeviceReadBuffer::HandlePausing(void)
         if (m_readerCB)
             m_readerCB->ReaderPaused(m_streamFd);
 
-        usleep(5000);
+        usleep(5ms);
         return false;
     }
     if (IsPaused())
@@ -485,7 +485,7 @@ bool DeviceReadBuffer::Poll(void) const
                 if ((EAGAIN == errno) || (EINTR  == errno))
                     continue; // errors that tell you to try again
 
-                usleep(2500 /*2.5 ms*/);
+                usleep(2.5ms);
             }
             else //  ret == 0
             {
@@ -562,7 +562,7 @@ bool DeviceReadBuffer::CheckForErrors(
             return false;
         if (EAGAIN == errno)
         {
-            usleep(2500);
+            usleep(2.5ms);
             return false;
         }
         if (EOVERFLOW == errno)
@@ -582,7 +582,7 @@ bool DeviceReadBuffer::CheckForErrors(
             return false;
         }
 
-        usleep(500);
+        usleep(500ms);
         return false;
     }
     if (len == 0)
@@ -598,7 +598,7 @@ bool DeviceReadBuffer::CheckForErrors(
 
             return false;
         }
-        usleep(500);
+        usleep(500ms);
         return false;
     }
     return true;
@@ -664,7 +664,7 @@ uint DeviceReadBuffer::WaitForUnused(uint needed) const
             unused = GetUnused();
             if (IsPauseRequested() || !IsOpen() || !m_doRun)
                 return 0;
-            usleep(5000);
+            usleep(5ms);
         }
         if (IsPauseRequested() || !IsOpen() || !m_doRun)
             return 0;

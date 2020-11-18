@@ -437,7 +437,7 @@ void CetonStreamHandler::ClearProgramNumber(void)
     {
         if (GetVar("mux", "ProgramNumber") == "0")
             return;
-        usleep(20000);
+        usleep(20ms);
     };
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Program number failed to clear");
@@ -456,7 +456,7 @@ uint CetonStreamHandler::GetProgramNumber(void) const
         if (prognum != 0)
             return prognum;
 
-        usleep(100000);
+        usleep(100ms);
     };
 
     LOG(VB_GENERAL, LOG_ERR, LOC +

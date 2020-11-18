@@ -529,7 +529,7 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
         if (written < 0)
         {
             failure_cnt++;
-            usleep(50000);
+            usleep(50ms);
             continue;
         }
 

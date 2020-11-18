@@ -27,7 +27,7 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
                        gCoreContext->GetNumSetting("GalleryTransitionType",
                                                    kBlendTransition))),
       m_infoList(*this),
-      m_slideShowTime(gCoreContext->GetNumSetting("GallerySlideShowTime", 3000)),
+      m_slideShowTime(gCoreContext->GetDurSetting<std::chrono::milliseconds>("GallerySlideShowTime", 3s)),
       m_showCaptions(gCoreContext->GetBoolSetting("GalleryShowSlideCaptions", true)),
       m_editsAllowed(editsAllowed)
 {
@@ -51,7 +51,7 @@ GallerySlideView::GallerySlideView(MythScreenStack *parent, const char *name,
 
     // Initialise status delay timer
     m_delay.setSingleShot(true);
-    m_delay.setInterval(gCoreContext->GetNumSetting("GalleryStatusDelay", 0));
+    m_delay.setInterval(gCoreContext->GetDurSetting<std::chrono::milliseconds>("GalleryStatusDelay", 0s));
     connect(&m_delay, &QTimer::timeout, this, &GallerySlideView::ShowStatus);
 }
 

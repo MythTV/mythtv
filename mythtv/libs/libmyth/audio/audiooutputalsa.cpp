@@ -598,7 +598,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
             case -ESTRPIPE:
                 VBAUDIO("WriteAudio: device is suspended");
                 while ((err = snd_pcm_resume(m_pcmHandle)) == -EAGAIN)
-                    usleep(200);
+                    usleep(200us);
 
                 if (err < 0)
                 {

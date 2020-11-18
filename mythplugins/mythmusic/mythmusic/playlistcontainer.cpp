@@ -10,13 +10,14 @@
 #include "playlist.h"
 #include "playlistcontainer.h"
 
+using namespace std::chrono_literals;
 
 void PlaylistLoadingThread::run()
 {
     RunProlog();
     while (!m_allMusic->doneLoading())
     {
-        msleep(250);
+        msleep(250ms);
     }
     m_parent->load();
     RunEpilog();

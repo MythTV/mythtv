@@ -1029,7 +1029,7 @@ void MythPlayer::DecoderEnd(void)
 
     m_killDecoder = true;
     int tries = 0;
-    while (m_decoderThread && !m_decoderThread->wait(100) && (tries++ < 50))
+    while (m_decoderThread && !m_decoderThread->wait(100ms) && (tries++ < 50))
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             "Waited 100ms for decoder loop to stop");
 

@@ -61,7 +61,7 @@ class DBPurgeHandler : public QObject
   public:
     DBPurgeHandler()
     {
-        m_purgeTimer = startTimer(5 * 60000);
+        m_purgeTimer = startTimer(5min);
     }
     void timerEvent(QTimerEvent *event) override // QObject
     {
@@ -87,9 +87,9 @@ class MThreadInternal : public QThread
     static void SetTerminationEnabled(bool enabled = true)
     { QThread::setTerminationEnabled(enabled); }
 
-    static void Sleep(unsigned long time) { QThread::sleep(time); }
-    static void MSleep(unsigned long time) { QThread::msleep(time); }
-    static void USleep(unsigned long time) { QThread::usleep(time); }
+    static void Sleep(std::chrono::seconds time) { QThread::sleep(time.count()); }
+    static void MSleep(std::chrono::milliseconds time) { QThread::msleep(time.count()); }
+    static void USleep(std::chrono::microseconds time) { QThread::usleep(time.count()); }
 
   private:
     MThread &m_parent;
@@ -174,7 +174,7 @@ void MThread::Cleanup(void)
     {
         auto left = kTimeout - t.elapsed();
         if (left > 0ms)
-            (*it)->wait(left.count());
+            (*it)->wait(left);
     }
 }
 
@@ -302,10 +302,10 @@ void MThread::quit(void)
     m_thread->quit();
 }
 
-bool MThread::wait(unsigned long time)
+bool MThread::wait(std::chrono::milliseconds time)
 {
     if (m_thread->isRunning())
-        return m_thread->wait(time);
+        return m_thread->wait(time.count());
     return true;
 }
 
@@ -329,17 +329,17 @@ void MThread::setTerminationEnabled(bool enabled)
     MThreadInternal::SetTerminationEnabled(enabled);
 }
 
-void MThread::sleep(unsigned long time)
+void MThread::sleep(std::chrono::seconds time)
 {
     MThreadInternal::Sleep(time);
 }
 
-void MThread::msleep(unsigned long time)
+void MThread::msleep(std::chrono::milliseconds time)
 {
     MThreadInternal::MSleep(time);
 }
 
-void MThread::usleep(unsigned long time)
+void MThread::usleep(std::chrono::microseconds time)
 {
     MThreadInternal::USleep(time);
 }

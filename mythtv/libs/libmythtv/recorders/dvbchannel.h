@@ -60,7 +60,7 @@ class DVBChannel : public DTVChannel
     bool IsMaster(void)                 const override; // DTVChannel
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return m_hasCrcBug; }
-    uint GetMinSignalMonitorDelay(void) const { return m_sigMonDelay; }
+    std::chrono::milliseconds GetMinSignalMonitorDelay(void) const { return m_sigMonDelay; }
     /// Returns rotor object if it exists, nullptr otherwise.
     const DiSEqCDevRotor *GetRotor(void) const;
 
@@ -162,7 +162,7 @@ class DVBChannel : public DTVChannel
     uint              m_lastLnbDevId        {(uint)~0x0};
 
     uint              m_tuningDelay         {0};      // Extra delay to add for broken drivers
-    uint              m_sigMonDelay         {25};     // Minimum delay between FE_LOCK checks
+    std::chrono::milliseconds m_sigMonDelay {25ms};   // Minimum delay between FE_LOCK checks
     bool              m_firstTune           {true};   // Used to force hardware reset
 
     // Other State

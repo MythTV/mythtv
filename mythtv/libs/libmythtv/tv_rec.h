@@ -427,7 +427,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     static QMap<uint,TVRec*> s_inputs;
 
   public:
-    static const uint kSignalMonitoringRate;
+    /// How many milliseconds the signal monitor should wait between checks
+    static constexpr std::chrono::milliseconds kSignalMonitoringRate { 50ms };
 
     // General State flags
     static const uint kFlagFrontendReady        = 0x00000001;

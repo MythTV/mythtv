@@ -1970,7 +1970,7 @@ void ChannelScanSM::StartScanner(void)
     while (m_scannerThread)
     {
         m_threadExit = true;
-        if (m_scannerThread->wait(1000))
+        if (m_scannerThread->wait(1s))
         {
             delete m_scannerThread;
             m_scannerThread = nullptr;
@@ -2264,7 +2264,7 @@ void ChannelScanSM::StopScanner(void)
     while (m_scannerThread)
     {
         m_threadExit = true;
-        if (m_scannerThread->wait(1000))
+        if (m_scannerThread->wait(1s))
         {
             delete m_scannerThread;
             m_scannerThread = nullptr;

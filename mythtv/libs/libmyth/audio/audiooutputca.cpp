@@ -280,7 +280,7 @@ bool AudioOutputCA::OpenDevice()
             if (result < 0)
             {
                 d->CloseAnalog();
-                usleep((1000 * 1000) - 1); // Argument to usleep must be less than 1 million
+                usleep(1s - 1us); // Argument to usleep must be less than 1 second
             }
         }
         deviceOpened = (result > 0);

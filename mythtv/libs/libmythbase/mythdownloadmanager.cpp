@@ -200,7 +200,7 @@ void MythDownloadManager::run(void)
     m_queueThread = QThread::currentThread();
 
     while (!m_runThread)
-        usleep(50000);
+        usleep(50ms);
 
     m_manager = new QNetworkAccessManager(this);
     m_diskCache = new QNetworkDiskCache(this);
@@ -1066,7 +1066,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 
     while (!m_cancellationQueue.isEmpty())
     {
-        usleep(50000); // re-test in another 50ms
+        usleep(50ms); // re-test in another 50ms
     }
 }
 
@@ -1526,7 +1526,7 @@ bool MythDownloadManager::saveFile(const QString &outFile,
         if (written < 0)
         {
             failure_cnt++;
-            usleep(50000);
+            usleep(50ms);
             continue;
         }
 

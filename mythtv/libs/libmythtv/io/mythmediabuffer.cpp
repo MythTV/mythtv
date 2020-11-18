@@ -655,7 +655,7 @@ void MythMediaBuffer::KillReadAheadThread(void)
         StopReads();
         m_generalWait.wakeAll();
         m_rwLock.unlock();
-        MThread::wait(5000);
+        MThread::wait(5s);
     }
 }
 

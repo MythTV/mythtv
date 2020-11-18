@@ -52,7 +52,7 @@ void ExternRecChannelScanner::Stop(void)
     {
         m_stopNow = true;
         m_lock.unlock();
-        m_thread->wait(5);
+        m_thread->wait(5ms);
         m_lock.lock();
     }
 

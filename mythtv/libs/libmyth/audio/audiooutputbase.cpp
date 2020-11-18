@@ -1683,7 +1683,7 @@ void AudioOutputBase::OutputAudioLoop(void)
                           .arg(ready).arg(m_fragmentSize));
             }
 
-            usleep(10000);
+            usleep(10ms);
             continue;
         }
 
@@ -1816,7 +1816,7 @@ int AudioOutputBase::GetAudioData(uchar *buffer, int size, bool full_buffer,
 void AudioOutputBase::Drain()
 {
     while (!m_pauseAudio && audioready() > m_fragmentSize)
-        usleep(1000);
+        usleep(1ms);
     if (m_pauseAudio)
     {
         // Audio is paused and can't be drained, clear ringbuffer

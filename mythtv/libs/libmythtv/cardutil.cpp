@@ -742,14 +742,14 @@ bool CardUtil::HasDVBCRCBug(const QString &device)
             (name == "ST STV0299 DVB-S"));         // munges PAT
 }
 
-uint CardUtil::GetMinSignalMonitoringDelay(const QString &device)
+std::chrono::milliseconds CardUtil::GetMinSignalMonitoringDelay(const QString &device)
 {
     QString name = ProbeDVBFrontendName(device);
     if (name.indexOf("DVB-S") >= 0)
-        return 300;
+        return 300ms;
     if (name == "DiBcom 3000P/M-C DVB-T")
-        return 100;
-    return 25;
+        return 100ms;
+    return 25ms;
 }
 
 DTVTunerType CardUtil::ConvertToTunerType(DTVModulationSystem delsys)

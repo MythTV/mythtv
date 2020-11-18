@@ -102,7 +102,7 @@ using MPoolQueues = QMap<int, MPoolQueue>;
 class MPoolThread : public MThread
 {
   public:
-    MPoolThread(MThreadPool &pool, int timeout) :
+    MPoolThread(MThreadPool &pool, std::chrono::milliseconds timeout) :
         MThread("PT"), m_pool(pool), m_expiryTimeout(timeout)
     {
         QMutexLocker locker(&s_lock);
@@ -120,7 +120,7 @@ class MPoolThread : public MThread
         while (true)
         {
             if (m_doRun && !m_runnable)
-                m_wait.wait(locker.mutex(), m_expiryTimeout+1);
+                m_wait.wait(locker.mutex(), m_expiryTimeout+1ms);
 
             if (!m_runnable)
             {
@@ -196,7 +196,7 @@ class MPoolThread : public MThread
     QMutex          m_lock;
     QWaitCondition  m_wait;
     MThreadPool    &m_pool;
-    int             m_expiryTimeout;
+    std::chrono::milliseconds m_expiryTimeout;
     bool            m_doRun          {true};
     QString         m_runnableName;
     bool            m_reserved       {false};
@@ -224,7 +224,7 @@ class MThreadPoolPrivate
     QString m_name;
     QWaitCondition m_wait;
     bool m_running          {true};
-    int  m_expiryTimeout    {120 * 1000};
+    std::chrono::milliseconds m_expiryTimeout {2min};
     int  m_maxThreadCount   {QThread::idealThreadCount()};
     int  m_reserveThread    {0};
 
@@ -358,9 +358,9 @@ void MThreadPool::start(QRunnable *runnable, const QString& debugName, int prior
 }
 
 void MThreadPool::startReserved(
-    QRunnable *runnable, const QString& debugName, int waitForAvail)
+    QRunnable *runnable, const QString& debugName,
+    std::chrono::milliseconds waitForAvailMS)
 {
-    auto waitForAvailMS = std::chrono::milliseconds(waitForAvail);
     QMutexLocker locker(&m_priv->m_lock);
     if (waitForAvailMS > 0ms && m_priv->m_availThreads.empty() &&
         m_priv->m_runningThreads.size() >= m_priv->m_maxThreadCount)
@@ -495,13 +495,13 @@ void MThreadPool::NotifyDone(MPoolThread *thread)
     m_priv->m_wait.wakeAll();
 }
 
-int MThreadPool::expiryTimeout(void) const
+std::chrono::milliseconds MThreadPool::expiryTimeout(void) const
 {
     QMutexLocker locker(&m_priv->m_lock);
     return m_priv->m_expiryTimeout;
 }
 
-void MThreadPool::setExpiryTimeout(int expiryTimeout)
+void MThreadPool::setExpiryTimeout(std::chrono::milliseconds expiryTimeout)
 {
     QMutexLocker locker(&m_priv->m_lock);
     m_priv->m_expiryTimeout = expiryTimeout;

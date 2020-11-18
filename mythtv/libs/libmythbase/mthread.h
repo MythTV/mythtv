@@ -108,7 +108,7 @@ class MBASE_PUBLIC MThread
   public:
     /// \brief Wait for the MThread to exit, with a maximum timeout
     /// \param time Maximum time to wait for MThread to exit, in ms
-    bool wait(unsigned long time = ULONG_MAX);
+    bool wait(std::chrono::milliseconds time = std::chrono::milliseconds::max());
 
     /// \brief This will print out all the running threads, call exit(1) on
     ///        each and then wait up to 5 seconds total for all the threads
@@ -116,8 +116,6 @@ class MBASE_PUBLIC MThread
     static void Cleanup(void);
     static void GetAllThreadNames(QStringList &list);
     static void GetAllRunningThreadNames(QStringList &list);
-
-    static const int kDefaultStartTimeout;
 
   protected:
     /// \brief Runs the Qt event loop unless we have a QRunnable,
@@ -130,9 +128,12 @@ class MBASE_PUBLIC MThread
     int exec(void);
 
     static void setTerminationEnabled(bool enabled = true);
-    static void sleep(unsigned long time);
-    static void msleep(unsigned long time);
-    static void usleep(unsigned long time);
+    static void sleep(std::chrono::seconds time);
+    static void msleep(std::chrono::milliseconds time);
+    static void usleep(std::chrono::microseconds time);
+    template<typename R, typename P>
+    static typename std::enable_if_t<std::chrono::treat_as_floating_point<R>::value, void>
+    usleep(std::chrono::duration<R,P> time) { usleep(duration_cast<std::chrono::microseconds>(time)); };
 
     MThreadInternal *m_thread {nullptr};
     QRunnable *m_runnable     {nullptr};

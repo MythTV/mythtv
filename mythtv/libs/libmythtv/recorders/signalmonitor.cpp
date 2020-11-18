@@ -363,7 +363,7 @@ void SignalMonitor::run(void)
         }
 
         locker.relock();
-        m_startStopWait.wait(locker.mutex(), m_updateRate);
+        m_startStopWait.wait(locker.mutex(), m_updateRate.count());
     }
 
     // We need to send a last informational message because a

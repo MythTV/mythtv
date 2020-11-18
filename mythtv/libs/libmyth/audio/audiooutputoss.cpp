@@ -124,7 +124,7 @@ bool AudioOutputOSS::OpenDevice()
                          .arg(m_mainDevice));
         }
         if (m_audioFd < 0)
-            usleep(50);
+            usleep(50us);
     }
 
     if (m_audioFd == -1)

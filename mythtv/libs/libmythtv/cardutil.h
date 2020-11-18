@@ -3,6 +3,7 @@
 #define CARDUTIL_H
 
 // C++ headers
+#include <chrono>
 #include <cstdint>
 #include <vector>
 
@@ -392,7 +393,7 @@ class MTV_PUBLIC CardUtil
     static QString      ProbeDVBType(const QString &device);
     static QString      ProbeDVBFrontendName(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);
-    static uint         GetMinSignalMonitoringDelay(const QString &device);
+    static std::chrono::milliseconds GetMinSignalMonitoringDelay(const QString &device);
     static DTVTunerType ConvertToTunerType(DTVModulationSystem delsys);
     static DTVTunerType GetTunerType(uint inputid);
     static DTVTunerType ProbeTunerType(int fd_frontend);

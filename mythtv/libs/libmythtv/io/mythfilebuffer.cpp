@@ -222,7 +222,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint _Retry)
                 }
 
                 lasterror = 1;
-                usleep(10 * 1000);
+                usleep(10ms);
             }
             else
             {
@@ -240,7 +240,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint _Retry)
 
                     if (m_oldfile)
                         break; // if it's an old file it won't grow..
-                    usleep(10 * 1000);
+                    usleep(10ms);
                 }
                 else
                 {
@@ -516,7 +516,7 @@ int MythFileBuffer::SafeRead(int /*fd*/, void *Buffer, uint Size)
         if (m_stopReads)
             break;
         if (tot < Size)
-            usleep(60000);
+            usleep(60ms);
     }
     return static_cast<int>(tot);
 }
