@@ -58,7 +58,7 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
 #else
     MythSingleDownload downloader;
     QString redir;
-    if (!downloader.DownloadURL(m3u, &buffer, 30000, 0, 0, &redir))
+    if (!downloader.DownloadURL(m3u, &buffer, 30s, 0, 0, &redir))
     {
         LOG(VB_GENERAL, LOG_ERR,
             LOC + "Open failed: " + downloader.ErrorString());
@@ -678,7 +678,7 @@ bool HLSReader::LoadMetaPlaylists(MythSingleDownload& downloader)
         return false;
 #else
     QString redir;
-    if (!downloader.DownloadURL(m_curstream->M3U8Url(), &buffer, 30000, 0, 0, &redir))
+    if (!downloader.DownloadURL(m_curstream->M3U8Url(), &buffer, 30s, 0, 0, &redir))
     {
         LOG(VB_GENERAL, LOG_WARNING,
             LOC + "Download failed: " + downloader.ErrorString());

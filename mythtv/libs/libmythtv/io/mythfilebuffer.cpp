@@ -334,7 +334,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint _Retry)
             }
         }
 
-        m_remotefile = new RemoteFile(m_filename, false, true, Retry.count(), &auxFiles);
+        m_remotefile = new RemoteFile(m_filename, false, true, Retry, &auxFiles);
         if (!m_remotefile->isOpen())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("RingBuffer::RingBuffer(): Failed to open remote file (%1)")

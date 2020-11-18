@@ -67,7 +67,7 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
         QDomNode wolNode = oNode.namedItem( "WOL" );
 
         pParams->m_wolEnabled   = GetNodeValue( wolNode, "Enabled"  , false    );
-        pParams->m_wolReconnect = GetNodeValue( wolNode, "Reconnect", 0        );
+        pParams->m_wolReconnect = std::chrono::seconds(GetNodeValue( wolNode, "Reconnect", 0 ));
         pParams->m_wolRetry     = GetNodeValue( wolNode, "Retry"    , 0        );
         pParams->m_wolCommand   = GetNodeValue( wolNode, "Command"  , QString());
 

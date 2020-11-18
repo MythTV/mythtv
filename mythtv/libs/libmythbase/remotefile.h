@@ -20,7 +20,7 @@ class MBASE_PUBLIC RemoteFile
     explicit RemoteFile(QString url = "",
                bool write = false,
                bool usereadahead = true,
-               int timeout_ms = 2000/*RingBuffer::kDefaultOpenTimeout*/,
+               std::chrono::milliseconds timeout = 2s/*RingBuffer::kDefaultOpenTimeout*/,
                const QStringList *possibleAuxiliaryFiles = nullptr);
    ~RemoteFile();
 
@@ -77,7 +77,7 @@ class MBASE_PUBLIC RemoteFile
 
     QString         m_path;
     bool            m_useReadAhead     {true};
-    int             m_timeoutMs        {2000};
+    std::chrono::milliseconds m_timeoutMs {2s};
     long long       m_fileSize         {-1};
     bool            m_timeoutIsFast    {false};
     long long       m_readPosition     {0LL};

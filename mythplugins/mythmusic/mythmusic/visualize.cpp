@@ -1481,7 +1481,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
 
         if (imageFilename.startsWith("myth://"))
         {
-            auto *rf = new RemoteFile(imageFilename, false, false, 0);
+            auto *rf = new RemoteFile(imageFilename, false, false, 0ms);
 
             QByteArray data;
             bool ret = rf->SaveAs(data);

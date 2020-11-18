@@ -110,7 +110,7 @@ class RemoteFileDownloadThread : public QRunnable
     {
         bool ok = false;
 
-        auto *rf = new RemoteFile(m_dlInfo->m_url, false, false, 0);
+        auto *rf = new RemoteFile(m_dlInfo->m_url, false, false, 0ms);
         ok = rf->SaveAs(m_dlInfo->m_privData);
         delete rf;
 
@@ -832,9 +832,9 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     while ((!dlInfo->IsDone()) &&
            (dlInfo->m_errorCode == QNetworkReply::NoError) &&
            (((!dlInfo->m_url.startsWith("myth://")) &&
-             (dlInfo->m_lastStat.secsTo(MythDate::current()) < 60)) ||
+             (MythDate::secsInPast(dlInfo->m_lastStat) < 60s)) ||
             ((dlInfo->m_url.startsWith("myth://")) &&
-             (startedAt.secsTo(MythDate::current()) < 20))))
+             (MythDate::secsInPast(startedAt) < 20s))))
     {
         m_infoLock->unlock();
         m_queueWaitLock.lock();

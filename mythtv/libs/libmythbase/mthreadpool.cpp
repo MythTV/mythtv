@@ -120,7 +120,7 @@ class MPoolThread : public MThread
         while (true)
         {
             if (m_doRun && !m_runnable)
-                m_wait.wait(locker.mutex(), m_expiryTimeout+1ms);
+                m_wait.wait(locker.mutex(), (m_expiryTimeout+1ms).count());
 
             if (!m_runnable)
             {

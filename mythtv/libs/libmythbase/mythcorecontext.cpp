@@ -66,7 +66,7 @@ class MythCoreContextPrivate : public QObject
                            QObject *guicontext);
    ~MythCoreContextPrivate() override;
 
-    bool WaitForWOL(int timeout_in_ms = INT_MAX);
+    bool WaitForWOL(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
   public:
     MythCoreContext *m_parent;
@@ -215,16 +215,15 @@ MythCoreContextPrivate::~MythCoreContextPrivate()
 /// If another thread has already started WOL process, wait on them...
 ///
 /// Note: Caller must be holding m_WOLInProgressLock.
-bool MythCoreContextPrivate::WaitForWOL(int timeout_in_ms)
+bool MythCoreContextPrivate::WaitForWOL(std::chrono::milliseconds timeout)
 {
-    int timeout_remaining = timeout_in_ms;
-    while (m_wolInProgress && (timeout_remaining > 0))
+    std::chrono::milliseconds timeout_remaining = timeout;
+    while (m_wolInProgress && (timeout_remaining > 0ms))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Wake-On-LAN in progress, waiting...");
 
-        int max_wait = std::min(1000, timeout_remaining);
-        m_wolInProgressWaitCondition.wait(
-            &m_wolInProgressLock, max_wait);
+        std::chrono::milliseconds max_wait = std::min(1000ms, timeout_remaining);
+        m_wolInProgressWaitCondition.wait(&m_wolInProgressLock, max_wait.count());
         timeout_remaining -= max_wait;
     }
 
@@ -319,19 +318,19 @@ void MythCoreContext::setTestStringSettings(QMap<QString,QString> &overrides)
 
 bool MythCoreContext::SetupCommandSocket(MythSocket *serverSock,
                                          const QString &announcement,
-                                         uint timeout_in_ms,
+                                         std::chrono::milliseconds timeout,
                                          bool &proto_mismatch)
 {
     proto_mismatch = false;
 
 #ifndef IGNORE_PROTO_VER_MISMATCH
-    if (!CheckProtoVersion(serverSock, timeout_in_ms, true))
+    if (!CheckProtoVersion(serverSock, timeout, true))
     {
         proto_mismatch = true;
         return false;
     }
 #else
-    Q_UNUSED(timeout_in_ms);
+    Q_UNUSED(timeout);
 #endif
 
     QStringList strlist(announcement);
@@ -447,7 +446,7 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
 
 MythSocket *MythCoreContext::ConnectCommandSocket(
     const QString &hostname, int port, const QString &announce,
-    bool *p_proto_mismatch, int maxConnTry, int setup_timeout)
+    bool *p_proto_mismatch, int maxConnTry, std::chrono::milliseconds setup_timeout)
 {
     MythSocket *serverSock = nullptr;
 
@@ -474,7 +473,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
 
     bool we_attempted_wol = false;
 
-    if (setup_timeout <= 0)
+    if (setup_timeout <= 0ms)
         setup_timeout = MythSocket::kShortTimeout;
 
     bool proto_mismatch = false;
@@ -505,7 +504,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
                 break;
             }
 
-            setup_timeout = (int)(setup_timeout * 1.5F);
+            setup_timeout += setup_timeout / 2;
         }
         else if (!WOLcmd.isEmpty() && (cnt < maxConnTry))
         {
@@ -1408,7 +1407,7 @@ bool MythCoreContext::SendReceiveStringList(
     if (d->m_serverSock)
     {
         QStringList sendstrlist = strlist;
-        uint timeout = quickTimeout ?
+        std::chrono::milliseconds timeout = quickTimeout ?
             MythSocket::kShortTimeout : MythSocket::kLongTimeout;
         ok = d->m_serverSock->SendReceiveStringList(strlist, 0, timeout);
 
@@ -1674,7 +1673,8 @@ void MythCoreContext::connectionClosed(MythSocket *sock)
     dispatch(MythEvent("BACKEND_SOCKETS_CLOSED"));
 }
 
-bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
+bool MythCoreContext::CheckProtoVersion(MythSocket *socket,
+                                        std::chrono::milliseconds timeout,
                                         bool error_dialog_desired)
 {
     if (!socket)
@@ -1685,7 +1685,7 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket, uint timeout_ms,
                         .arg(QString::fromUtf8(MYTH_PROTO_TOKEN)));
     socket->WriteStringList(strlist);
 
-    if (!socket->ReadStringList(strlist, timeout_ms) || strlist.empty())
+    if (!socket->ReadStringList(strlist, timeout) || strlist.empty())
     {
         LOG(VB_GENERAL, LOG_CRIT, "Protocol version check failure.\n\t\t\t"
                 "The response to MYTH_PROTO_VERSION was empty.\n\t\t\t"

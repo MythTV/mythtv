@@ -4,8 +4,10 @@
 
 #include "mythbaseexp.h"
 
-#define kMythSocketShortTimeout  7000
-#define kMythSocketLongTimeout  30000
+using namespace std::chrono_literals;
+
+static constexpr std::chrono::milliseconds kMythSocketShortTimeout {  7s };
+static constexpr std::chrono::milliseconds kMythSocketLongTimeout  { 30s };
 
 class MythSocket;
 class MBASE_PUBLIC MythSocketCBs

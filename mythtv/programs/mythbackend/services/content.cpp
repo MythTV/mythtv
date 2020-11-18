@@ -425,7 +425,7 @@ QFileInfo Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     QImage img;
     if (sFullFileName.startsWith("myth://"))
     {
-        RemoteFile rf(sFullFileName, false, false, 0);
+        RemoteFile rf(sFullFileName, false, false, 0s);
         QByteArray data;
         rf.SaveAs(data);
 

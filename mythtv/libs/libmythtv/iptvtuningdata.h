@@ -250,7 +250,7 @@ class MTV_PUBLIC IPTVTuningData
         QByteArray buffer;
 
         MythSingleDownload downloader;
-        downloader.DownloadURL(url, &buffer, 5000, 0, 10000);
+        downloader.DownloadURL(url, &buffer, 5s, 0, 10000);
         if (buffer.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, QString("IsHLSPlaylist - Open Failed: %1\n\t\t\t%2")

@@ -589,8 +589,7 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
 
     while (dataSize > 0)
     {
-        qint64 sret = m_socket->Read(
-            (char*) data + read, dataSize, 100 /*ms*/);
+        qint64 sret = m_socket->Read((char*) data + read, dataSize, 100ms);
         if (sret > 0)
         {
             read += sret;

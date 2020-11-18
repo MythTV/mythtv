@@ -20,7 +20,7 @@ void DatabaseParams::LoadDefaults(void)
     m_localHostName = "my-unique-identifier-goes-here";
 
     m_wolEnabled    = false;
-    m_wolReconnect  = 0;
+    m_wolReconnect  = 0s;
     m_wolRetry      = 5;
     m_wolCommand    = "echo 'WOLsqlServerCommand not set'";
 

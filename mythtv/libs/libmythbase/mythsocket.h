@@ -37,7 +37,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     bool ConnectToHost(const QHostAddress &address, quint16 port);
     void DisconnectFromHost(void);
 
-    bool Validate(uint timeout_ms = kMythSocketLongTimeout,
+    bool Validate(std::chrono::milliseconds timeout = kMythSocketLongTimeout,
                   bool error_dialog_desired = false);
     bool IsValidated(void) const { return m_isValidated; }
 
@@ -51,9 +51,9 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
 
     bool SendReceiveStringList(
         QStringList &list, uint min_reply_length = 0,
-        uint timeoutMS = kLongTimeout);
+        std::chrono::milliseconds timeoutMS = kLongTimeout);
 
-    bool ReadStringList(QStringList &list, uint timeoutMS = kShortTimeout);
+    bool ReadStringList(QStringList &list, std::chrono::milliseconds timeoutMS = kShortTimeout);
     bool WriteStringList(const QStringList &list);
 
     bool IsConnected(void) const;
@@ -65,11 +65,11 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
 
     // RemoteFile stuff
     int Write(const char *data, int size);
-    int Read(char *data, int size, int max_wait_ms);
+    int Read(char *data, int size,  std::chrono::milliseconds max_wait);
     void Reset(void);
 
-    static const uint kShortTimeout;
-    static const uint kLongTimeout;
+    static constexpr std::chrono::milliseconds kShortTimeout { kMythSocketShortTimeout };
+    static constexpr std::chrono::milliseconds kLongTimeout  { kMythSocketLongTimeout };
 
   signals:
     void CallReadyRead(void);
@@ -82,13 +82,13 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     void ReadyReadHandler(void);
     void CallReadyReadHandler(void);
 
-    void ReadStringListReal(QStringList *list, uint timeoutMS, bool *ret);
+    void ReadStringListReal(QStringList *list, std::chrono::milliseconds timeoutMS, bool *ret);
     void WriteStringListReal(const QStringList *list, bool *ret);
     void ConnectToHostReal(const QHostAddress& addr, quint16 port, bool *ret);
     void DisconnectFromHostReal(void);
 
     void WriteReal(const char *data, int size, int *ret);
-    void ReadReal(char *data, int size, int max_wait_ms, int *ret);
+    void ReadReal(char *data, int size, std::chrono::milliseconds max_wait_ms, int *ret);
     void ResetReal(void);
 
     void IsDataAvailableReal(bool *ret) const;

@@ -32,7 +32,7 @@
 #include <cstdlib>
 #endif
 
-static const uint kPurgeTimeout = 60 * 60;
+static constexpr std::chrono::seconds kPurgeTimeout { 1h };
 
 bool TestDatabase(const QString& dbHostName,
                   const QString& dbUserName,
@@ -58,7 +58,7 @@ bool TestDatabase(const QString& dbHostName,
 
     // Just use some sane defaults for these values
     dbparms.m_wolEnabled = false;
-    dbparms.m_wolReconnect = 1;
+    dbparms.m_wolReconnect = 1s;
     dbparms.m_wolRetry = 3;
     dbparms.m_wolCommand = QString();
 
@@ -185,7 +185,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                             .arg(m_dbparms.m_wolCommand));
                 }
 
-                sleep(m_dbparms.m_wolReconnect);
+                sleep(m_dbparms.m_wolReconnect.count());
                 connected = m_db.open();
             }
 
@@ -386,7 +386,7 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
     while (it != list.end())
     {
         totalConnections++;
-        if ((*it)->m_lastDBKick.secsTo(now) <= (int)kPurgeTimeout)
+        if ((*it)->m_lastDBKick.secsTo(now) <= kPurgeTimeout.count())
         {
             ++it;
             continue;

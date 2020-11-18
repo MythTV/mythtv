@@ -380,7 +380,7 @@ void SSDPCache::Add( const QString &sURI,
             else
             {
                 PortChecker checker;
-                if (checker.checkPort(host, url.port(80), 5000))
+                if (checker.checkPort(host, url.port(80), 5s))
                 {
                     m_goodUrlList.append(hostport);
                     isGoodUrl=true;

@@ -82,15 +82,15 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
                                      const QString &announcement,
                                      bool *proto_mismatch = nullptr,
                                      int maxConnTry = -1,
-                                     int setup_timeout = -1);
+                                     std::chrono::milliseconds setup_timeout = -1ms);
 
     MythSocket *ConnectEventSocket(const QString &hostname, int port);
 
     bool SetupCommandSocket(MythSocket *serverSock, const QString &announcement,
-                            uint timeout_in_ms, bool &proto_mismatch);
+                            std::chrono::milliseconds timeout, bool &proto_mismatch);
 
     bool CheckProtoVersion(MythSocket *socket,
-                           uint timeout_ms = kMythSocketLongTimeout,
+                           std::chrono::milliseconds timeout = kMythSocketLongTimeout,
                            bool error_dialog_desired = false);
 
     static QString GenMythURL(const QString& host = QString(), int port = 0,

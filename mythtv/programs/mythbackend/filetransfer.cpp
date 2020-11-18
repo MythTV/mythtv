@@ -176,7 +176,7 @@ int FileTransfer::WriteBlock(int size)
     while (tot < size)
     {
         int request = size - tot;
-        int received = m_sock->Read(buf, (uint)request, 200 /*ms */);
+        int received = m_sock->Read(buf, (uint)request, 200ms);
 
         if (received != request)
         {

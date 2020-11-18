@@ -37,9 +37,6 @@ using std::vector;
     .arg((a)->GetSocketDescriptor())
 #define LOC SLOC(this)
 
-const uint MythSocket::kShortTimeout = kMythSocketShortTimeout;
-const uint MythSocket::kLongTimeout  = kMythSocketLongTimeout;
-
 const int MythSocket::kSocketReceiveBufferSize = 128 * 1024;
 
 QMutex MythSocket::s_loopbackCacheLock;
@@ -326,7 +323,7 @@ bool MythSocket::WriteStringList(const QStringList &list)
     return ret;
 }
 
-bool MythSocket::ReadStringList(QStringList &list, uint timeoutMS)
+bool MythSocket::ReadStringList(QStringList &list, std::chrono::milliseconds timeoutMS)
 {
     bool ret = false;
     QMetaObject::invokeMethod(
@@ -334,13 +331,13 @@ bool MythSocket::ReadStringList(QStringList &list, uint timeoutMS)
         (QThread::currentThread() != m_thread->qthread()) ?
         Qt::BlockingQueuedConnection : Qt::DirectConnection,
         Q_ARG(QStringList*, &list),
-        Q_ARG(uint, timeoutMS),
+        Q_ARG(std::chrono::milliseconds, timeoutMS),
         Q_ARG(bool*, &ret));
     return ret;
 }
 
 bool MythSocket::SendReceiveStringList(
-    QStringList &strlist, uint min_reply_length, uint timeoutMS)
+    QStringList &strlist, uint min_reply_length, std::chrono::milliseconds timeoutMS)
 {
     if (m_callback && m_disableReadyReadCallback.testAndSetOrdered(0,0))
     {
@@ -416,7 +413,7 @@ bool MythSocket::ConnectToHost(const QString &host, quint16 port)
     return MythSocket::ConnectToHost(hadr, port);
 }
 
-bool MythSocket::Validate(uint timeout_ms, bool error_dialog_desired)
+bool MythSocket::Validate(std::chrono::milliseconds timeout, bool error_dialog_desired)
 {
     if (m_isValidated)
         return true;
@@ -427,7 +424,7 @@ bool MythSocket::Validate(uint timeout_ms, bool error_dialog_desired)
 
     WriteStringList(strlist);
 
-    if (!ReadStringList(strlist, timeout_ms) || strlist.empty())
+    if (!ReadStringList(strlist, timeout) || strlist.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, "Protocol version check failure.\n\t\t\t"
                 "The response to MYTH_PROTO_VERSION was empty.\n\t\t\t"
@@ -540,7 +537,7 @@ int MythSocket::Write(const char *data, int size)
     return ret;
 }
 
-int MythSocket::Read(char *data, int size, int max_wait_ms)
+int MythSocket::Read(char *data, int size,  std::chrono::milliseconds max_wait)
 {
     int ret = -1;
     QMetaObject::invokeMethod(
@@ -549,7 +546,7 @@ int MythSocket::Read(char *data, int size, int max_wait_ms)
         Qt::BlockingQueuedConnection : Qt::DirectConnection,
         Q_ARG(char*, data),
         Q_ARG(int, size),
-        Q_ARG(int, max_wait_ms),
+        Q_ARG(std::chrono::milliseconds, max_wait),
         Q_ARG(int*, &ret));
     return ret;
 }
@@ -804,7 +801,7 @@ void MythSocket::WriteStringListReal(const QStringList *list, bool *ret)
 }
 
 void MythSocket::ReadStringListReal(
-    QStringList *list, uint timeoutMS, bool *ret)
+    QStringList *list, std::chrono::milliseconds timeoutMS, bool *ret)
 {
     list->clear();
     *ret = false;
@@ -816,10 +813,10 @@ void MythSocket::ReadStringListReal(
     while (m_tcpSocket->bytesAvailable() < 8)
     {
         elapsed = timer.elapsed();
-        if (elapsed >= std::chrono::milliseconds(timeoutMS))
+        if (elapsed >= timeoutMS)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "ReadStringList: " +
-                QString("Error, timed out after %1 ms.").arg(timeoutMS));
+                QString("Error, timed out after %1 ms.").arg(timeoutMS.count()));
             m_tcpSocket->close();
             m_dataAvailable.fetchAndStoreOrdered(0);
             return;
@@ -967,9 +964,8 @@ void MythSocket::WriteReal(const char *data, int size, int *ret)
     *ret = m_tcpSocket->write(data, size);
 }
 
-void MythSocket::ReadReal(char *data, int size, int max_wait, int *ret)
+void MythSocket::ReadReal(char *data, int size, std::chrono::milliseconds max_wait_ms, int *ret)
 {
-    auto max_wait_ms = std::chrono::milliseconds(max_wait);
     MythTimer t; t.start();
     while ((m_tcpSocket->state() == QAbstractSocket::ConnectedState) &&
            (m_tcpSocket->bytesAvailable() < size) &&

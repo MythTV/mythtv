@@ -70,9 +70,8 @@
  * of linkLocalOnly, return true if it was link local and
  * was changed, false in other cases.
 */
-bool PortChecker::checkPort(QString &host, int port, int timeLimitMS, bool linkLocalOnly)
+bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds timeLimit, bool linkLocalOnly)
 {
-    auto timeLimit = std::chrono::milliseconds(timeLimitMS);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("host %1 port %2 timeLimit %3 linkLocalOnly %4")
         .arg(host).arg(port).arg(timeLimit.count()).arg(linkLocalOnly));
     m_cancelCheck = false;
@@ -226,7 +225,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimitMS, bool linkL
  * false in other cases.
 */
 // static method
-bool PortChecker::resolveLinkLocal(QString &host, int port, int timeLimit)
+bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::milliseconds timeLimit)
 {
     PortChecker checker;
     return checker.checkPort(host,port,timeLimit,true);

@@ -313,7 +313,7 @@ bool MythImage::Load(const QString &filename)
         QString mythUrl = RemoteFile::FindFile(fname, url.host(), url.userName());
         if (!mythUrl.isEmpty())
         {
-            auto *rf = new RemoteFile(mythUrl, false, false, 0);
+            auto *rf = new RemoteFile(mythUrl, false, false, 0ms);
 
             QByteArray data;
             bool ret = rf->SaveAs(data);
