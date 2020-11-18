@@ -50,6 +50,12 @@ void StandardSetting::setEnabled(bool enabled)
     emit ShouldRedraw(this);
 }
 
+void StandardSetting::setReadOnly(bool readonly)
+{
+    m_readonly = readonly;
+    emit ShouldRedraw(this);
+}
+
 void StandardSetting::setVisible(bool visible)
 {
     m_visible = visible;
@@ -289,6 +295,9 @@ void GroupSetting::edit(MythScreenType *screen)
     if (!isEnabled())
         return;
 
+    if (isReadOnly())
+        return;
+
     auto *dce = new DialogCompletionEvent("leveldown", 0, "", "");
     QCoreApplication::postEvent(screen, dce);
 }
@@ -381,6 +390,9 @@ void MythUITextEditSetting::edit(MythScreenType * screen)
     if (!isEnabled())
         return;
 
+    if (isReadOnly())
+        return;
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     auto *settingdialog =
@@ -417,6 +429,9 @@ void MythUITextEditSetting::updateButton(MythUIButtonListItem *item)
 void MythUIFileBrowserSetting::edit(MythScreenType * screen)
 {
     if (!isEnabled())
+        return;
+
+    if (isReadOnly())
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -515,6 +530,9 @@ void MythUIComboBoxSetting::updateButton(MythUIButtonListItem *item)
 void MythUIComboBoxSetting::edit(MythScreenType * screen)
 {
     if (!isEnabled())
+        return;
+
+    if (isReadOnly())
         return;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -660,6 +678,9 @@ void MythUISpinBoxSetting::edit(MythScreenType * screen)
     if (!isEnabled())
         return;
 
+    if (isReadOnly())
+        return;
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     auto *settingdialog = new MythSpinBoxDialog(popupStack, getLabel());
@@ -721,6 +742,9 @@ void MythUICheckBoxSetting::updateButton(MythUIButtonListItem *item)
 void MythUICheckBoxSetting::edit(MythScreenType * screen)
 {
     if (!isEnabled())
+        return;
+
+    if (isReadOnly())
         return;
 
     auto *dce = new DialogCompletionEvent("editsetting", 0, "", "");

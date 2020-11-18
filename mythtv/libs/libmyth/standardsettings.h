@@ -43,6 +43,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
 
     bool isVisible(void) const { return m_visible; }
     bool isEnabled() const { return m_enabled; }
+    bool isReadOnly() const { return m_readonly; }
     bool haveChanged();
     void setChanged(bool changed);
     StandardSetting *getParent() const {return m_parent;}
@@ -88,6 +89,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
 
   public slots:
     virtual void setEnabled(bool enabled);
+    virtual void setReadOnly(bool readonly);
     void setVisible(bool visible);
     virtual void setValue(const QString &newValue);
     virtual void setValue(int newValue);
@@ -108,6 +110,7 @@ class MPUBLIC StandardSetting : public QObject, public StorageUser
     void setParent(StandardSetting *parent);
     QString m_settingValue;
     bool    m_enabled         {true};
+    bool    m_readonly        {false};
     QString m_label;
     QString m_helptext;
     QString m_name;
