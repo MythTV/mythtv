@@ -225,8 +225,8 @@ static subtitle_t *sub_read_line_microdvd(demux_sputext_t *demuxstr, subtitle_t 
   current->end=-1;
   do {
     if (!read_line_from_input (demuxstr, line)) return nullptr;
-  } while ((sscanf (line.c_str(), "{%ld}{}%" LINE_LEN_QUOT "[^\r\n]", &(current->start), line2.data()) !=2) &&
-           (sscanf (line.c_str(), "{%ld}{%ld}%" LINE_LEN_QUOT "[^\r\n]", &(current->start), &(current->end),line2.data()) !=3)
+  } while ((sscanf (line.c_str(), "{%" SCNd64 "}{}%" LINE_LEN_QUOT "[^\r\n]", &(current->start), line2.data()) !=2) &&
+           (sscanf (line.c_str(), "{%" SCNd64 "}{%" SCNd64 "}%" LINE_LEN_QUOT "[^\r\n]", &(current->start), &(current->end),line2.data()) !=3)
           );
 
   char *next=line2.data();
@@ -516,7 +516,7 @@ static subtitle_t *sub_read_line_pjs (demux_sputext_t *demuxstr, subtitle_t *cur
       line.erase(0, mark);
   if (line.empty())
     return nullptr;
-  if (sscanf (line.data(), "%ld,%ld,", &(current->start),
+  if (sscanf (line.data(), "%" SCNd64 ",%" SCNd64 ",", &(current->start),
               &(current->end)) <2)
     return (subtitle_t *)ERR;
   /* the files I have are in tenths of second */
@@ -588,7 +588,7 @@ static subtitle_t *sub_read_line_aqt (demux_sputext_t *demuxstr, subtitle_t *cur
     /* try to locate next subtitle_t */
     if (!read_line_from_input(demuxstr, line))
       return nullptr;
-    if (!(sscanf (line.c_str(), "-->> %ld", &(current->start)) <1))
+    if (!(sscanf (line.c_str(), "-->> %" SCNd64, &(current->start)) <1))
       break;
   }
 
@@ -888,7 +888,7 @@ static subtitle_t *sub_read_line_mpl2(demux_sputext_t *demuxstr, subtitle_t *cur
   do {
      if (!read_line_from_input (demuxstr, line)) return nullptr;
   } while ((sscanf (line.data(),
-                      "[%ld][%ld]%" LINE_LEN_QUOT "[^\r\n]",
+                      "[%" SCNd64 "][%" SCNd64 "]%" LINE_LEN_QUOT "[^\r\n]",
                       &(current->start), &(current->end), line2.data()) < 3));
   current->start *= 10;
   current->end *= 10;
