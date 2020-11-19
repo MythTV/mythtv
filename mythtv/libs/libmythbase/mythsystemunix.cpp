@@ -374,7 +374,7 @@ void MythSystemLegacyManager::run(void)
         // loop through running processes for any that require action
         MSMap_t::iterator   i;
         MSMap_t::iterator   next;
-        time_t              now = time(nullptr);
+        auto now = SystemClock::now();
 
         m_mapLock.lock();
         m_jumpLock.lock();
@@ -387,7 +387,7 @@ void MythSystemLegacyManager::run(void)
                 continue;
 
             // handle processes beyond marked timeout
-            if( ms->m_timeout > 0 && ms->m_timeout < now )
+            if( ms->m_timeout.time_since_epoch() > 0s && ms->m_timeout < now )
             {
                 // issuing KILL signal after TERM failed in a timely manner
                 if( ms->GetStatus() == GENERIC_EXIT_TIMEOUT )
@@ -396,7 +396,7 @@ void MythSystemLegacyManager::run(void)
                         QString("Managed child (PID: %1) timed out"
                                 ", issuing KILL signal").arg(pid));
                     // Prevent constant attempts to kill an obstinate child
-                    ms->m_timeout = 0;
+                    ms->m_timeout = SystemTime(0s);
                     ms->Signal(SIGKILL);
                 }
 
@@ -407,7 +407,7 @@ void MythSystemLegacyManager::run(void)
                         QString("Managed child (PID: %1) timed out"
                                 ", issuing TERM signal").arg(pid));
                     ms->SetStatus( GENERIC_EXIT_TIMEOUT );
-                    ms->m_timeout = now + 1;
+                    ms->m_timeout = now + 1s;
                     ms->Term();
                 }
             }
@@ -750,7 +750,7 @@ void MythSystemLegacyUnix::Term(bool force)
     if( force )
     {
         // send KILL if it does not exit within one second
-        if( m_parent->Wait(1) == GENERIC_EXIT_RUNNING )
+        if( m_parent->Wait(1s) == GENERIC_EXIT_RUNNING )
             Signal(SIGKILL);
     }
 }
@@ -772,7 +772,7 @@ void MythSystemLegacyUnix::Signal( int sig )
 }
 
 #define MAX_BUFLEN 1024
-void MythSystemLegacyUnix::Fork(time_t timeout)
+void MythSystemLegacyUnix::Fork(std::chrono::seconds timeout)
 {
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(GetLogCmd());
 
@@ -916,9 +916,9 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
     int ioprioval = m_parent->GetIOPrio();
 
     /* Do this before forking in case the child miserably fails */
-    m_timeout = timeout;
-    if( timeout )
-        m_timeout += time(nullptr);
+    m_timeout = ( timeout != 0s )
+        ? SystemClock::now() + timeout
+        : SystemClock::time_point();
 
     listLock.lock();
     pid_t child = fork();
@@ -941,7 +941,7 @@ void MythSystemLegacyUnix::Fork(time_t timeout)
                             "%2%3 command=%4, timeout=%5")
                         .arg(m_pid) .arg(GetSetting("UseShell") ? "*" : "")
                         .arg(GetSetting("RunInBackground") ? "&" : "")
-                        .arg(GetLogCmd()) .arg(timeout));
+                        .arg(GetLogCmd()).arg(timeout.count()));
 
         /* close unused pipe ends */
         if (p_stdin[0] >= 0)

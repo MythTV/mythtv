@@ -60,8 +60,8 @@ QStringList WeatherSource::ProbeTypes(const QString& workingDirectory,
 
 bool WeatherSource::ProbeTimeouts(const QString&  workingDirectory,
                                   const QString&  program,
-                                  uint    &updateTimeout,
-                                  uint    &scriptTimeout)
+                                  std::chrono::seconds &updateTimeout,
+                                  std::chrono::seconds &scriptTimeout)
 {
     QStringList arguments("-T");
     const QString loc = QString("WeatherSource::ProbeTimeouts(%1 %2): ")
@@ -120,8 +120,8 @@ bool WeatherSource::ProbeTimeouts(const QString&  workingDirectory,
         return false;
     }
 
-    updateTimeout = ut * 1000;
-    scriptTimeout = st;
+    updateTimeout = std::chrono::seconds(ut);
+    scriptTimeout = std::chrono::seconds(st);
 
     return true;
 }
@@ -224,8 +224,8 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
     if (db.next())
     {
         info.id            = db.value(0).toInt();
-        info.updateTimeout = db.value(2).toUInt() * 1000;
-        info.scriptTimeout = db.value(3).toUInt();
+        info.updateTimeout = std::chrono::seconds(db.value(2).toUInt());
+        info.scriptTimeout = std::chrono::seconds(db.value(3).toUInt());
 
         // compare versions, if equal... be happy
         QString dbver = db.value(6).toString();
@@ -280,8 +280,8 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
         db.prepare(query);
         db.bindValue(":NAME", info.name);
         db.bindValue(":HOST", gCoreContext->GetHostName());
-        db.bindValue(":UPDATETO", QString::number(info.updateTimeout/1000));
-        db.bindValue(":RETTO", QString::number(info.scriptTimeout));
+        db.bindValue(":UPDATETO", QString::number(info.updateTimeout.count()));
+        db.bindValue(":RETTO", QString::number(info.scriptTimeout.count()));
         db.bindValue(":PATH", info.program);
         db.bindValue(":AUTHOR", info.author);
         db.bindValue(":VERSION", info.version);
@@ -347,7 +347,7 @@ WeatherSource::~WeatherSource()
     if (m_ms)
     {
         m_ms->Signal(kSignalKill);
-        m_ms->Wait(5);
+        m_ms->Wait(5s);
         delete m_ms;
     }
     delete m_updateTimer;

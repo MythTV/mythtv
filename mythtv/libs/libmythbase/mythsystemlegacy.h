@@ -88,9 +88,9 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
 
     // FIXME: Forks, should be called Start() for consistency with MThread.
     // FIXME: Do we need this call at all?
-    void Run(time_t timeout = 0);
+    void Run(std::chrono::seconds timeout = 0s);
     // FIXME: This should just return a bool telling us if we hit the timeout.
-    uint Wait(time_t timeout = 0);
+    uint Wait(std::chrono::seconds timeout = 0s);
 
     int Write(const QByteArray &ba);
     QByteArray Read(int size);
@@ -196,9 +196,9 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
 
 MBASE_PUBLIC uint myth_system(const QString &command,
                               uint flags = kMSNone,
-                              uint timeout = 0);
+                              std::chrono::seconds timeout = 0s);
 MBASE_PUBLIC uint myth_system(const QString &Command, const QStringList& Args,
-                              uint Flags = kMSNone, uint Timeout = 0);
+                              uint Flags = kMSNone, std::chrono::seconds Timeout = 0s);
 
 #endif // MYTHSYSTEMLEGACY_H
 /*

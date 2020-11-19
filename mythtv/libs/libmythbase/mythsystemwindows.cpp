@@ -310,7 +310,7 @@ void MythSystemLegacyManager::run(void)
 
         // loop through running processes for any that require action
         MSMap_t::iterator   i;
-        time_t              now = time(nullptr);
+        auto now = SystemClock::now();
 
         m_mapLock.lock();
         m_jumpLock.lock();
@@ -320,7 +320,7 @@ void MythSystemLegacyManager::run(void)
             ms    = i.value();
 
             // handle processes beyond marked timeout
-            if( ms->m_timeout > 0 && ms->m_timeout < now )
+            if( ms->m_timeout.time_since_epoch() > 0s && ms->m_timeout < now )
             {
                 // issuing KILL signal after TERM failed in a timely manner
                 if( ms->GetStatus() == GENERIC_EXIT_TIMEOUT )
@@ -329,7 +329,7 @@ void MythSystemLegacyManager::run(void)
                         QString("Managed child (Handle: %1) timed out, "
                                 "issuing KILL signal").arg((long long)child));
                     // Prevent constant attempts to kill an obstinate child
-                    ms->m_timeout = 0;
+                    ms->m_timeout = SystemTime(0s);
                     ms->Signal(SIGKILL);
                 }
 
@@ -340,7 +340,7 @@ void MythSystemLegacyManager::run(void)
                         QString("Managed child (Handle: %1) timed out"
                                 ", issuing TERM signal").arg((long long)child));
                     ms->SetStatus( GENERIC_EXIT_TIMEOUT );
-                    ms->m_timeout = now + 1;
+                    ms->m_timeout = now + 1s;
                     ms->Term();
                 }
             }
@@ -585,7 +585,7 @@ void MythSystemLegacyWindows::Signal( int sig )
 
 
 #define MAX_BUFLEN 1024
-void MythSystemLegacyWindows::Fork(time_t timeout)
+void MythSystemLegacyWindows::Fork(std::chrono::seconds timeout)
 {
     BOOL bInherit = FALSE;
 
@@ -699,9 +699,9 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
 
-    m_timeout = timeout;
-    if( timeout )
-        m_timeout += time(nullptr);
+    m_timeout = (timeout != 0s)
+        ? SystemClock::now() + timeout
+        : SystemClock::time_point();
 
     LPCWSTR pDir = nullptr;
     if (dir.length() > 0)
@@ -739,7 +739,7 @@ void MythSystemLegacyWindows::Fork(time_t timeout)
                     .arg((long long)m_child)
                     .arg(GetSetting("UseShell") ? "*" : "")
                     .arg(GetSetting("RunInBackground") ? "&" : "")
-                    .arg(GetLogCmd()) .arg(timeout));
+                    .arg(GetLogCmd()).arg(timeout.count()));
 
         /* close unused pipe ends */
         CLOSE(p_stdin[0]);

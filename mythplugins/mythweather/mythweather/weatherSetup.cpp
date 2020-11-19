@@ -15,6 +15,8 @@
 #include <QSqlError>
 #include <QVariant>
 
+using std::chrono::duration_cast;
+
 #define GLBL_SCREEN 0
 #define SCREEN_SETUP_SCREEN 1
 #define SRC_SCREEN 2
@@ -764,8 +766,8 @@ bool SourceSetup::loadData()
         auto *si = new SourceListInfo;
         si->id = db.value(0).toUInt();
         si->name = db.value(1).toString();
-        si->update_timeout = db.value(2).toUInt() / 60;
-        si->retrieve_timeout = db.value(3).toUInt();
+        si->update_timeout = std::chrono::minutes(db.value(2).toUInt() / 60);
+        si->retrieve_timeout = std::chrono::seconds(db.value(3).toUInt());
         si->author = db.value(4).toString();
         si->email = db.value(5).toString();
         si->version = db.value(6).toString();
@@ -783,8 +785,8 @@ void SourceSetup::saveData()
     if (curritem)
     {
         auto *si = curritem->GetData().value<SourceListInfo *>();
-        si->update_timeout = m_updateSpinbox->GetIntValue();
-        si->retrieve_timeout = m_retrieveSpinbox->GetIntValue();
+        si->update_timeout = m_updateSpinbox->GetDuration<std::chrono::minutes>();
+        si->retrieve_timeout = m_retrieveSpinbox->GetDuration<std::chrono::seconds>();
     }
 
     MSqlQuery db(MSqlQuery::InitCon());
@@ -798,8 +800,8 @@ void SourceSetup::saveData()
         MythUIButtonListItem *item = m_sourceList->GetItemAt(i);
         auto *si = item->GetData().value<SourceListInfo *>();
         db.bindValue(":ID", si->id);
-        db.bindValue(":UPDATE", si->update_timeout * 60);
-        db.bindValue(":RETRIEVE", si->retrieve_timeout);
+        db.bindValue(":UPDATE", (int)duration_cast<std::chrono::seconds>(si->update_timeout).count());
+        db.bindValue(":RETRIEVE", (int)si->retrieve_timeout.count());
         if (!db.exec())
         {
             LOG(VB_GENERAL, LOG_ERR, db.lastError().text());
@@ -815,7 +817,7 @@ void SourceSetup::updateSpinboxUpdate()
     if (m_sourceList->GetItemCurrent())
     {
         auto *si = m_sourceList->GetItemCurrent()->GetData().value<SourceListInfo *>();
-        si->update_timeout = m_updateSpinbox->GetIntValue();
+        si->update_timeout = m_updateSpinbox->GetDuration<std::chrono::minutes>();
     }
 }
 
@@ -824,7 +826,7 @@ void SourceSetup::retrieveSpinboxUpdate()
     if (m_sourceList->GetItemCurrent())
     {
         auto *si = m_sourceList->GetItemCurrent()->GetData().value<SourceListInfo *>();
-        si->retrieve_timeout = m_retrieveSpinbox->GetIntValue();
+        si->retrieve_timeout = m_retrieveSpinbox->GetDuration<std::chrono::seconds>();
     }
 }
 
@@ -840,8 +842,8 @@ void SourceSetup::sourceListItemSelected(MythUIButtonListItem *item)
     if (!si)
         return;
 
-    m_updateSpinbox->SetValue(si->update_timeout);
-    m_retrieveSpinbox->SetValue(si->retrieve_timeout);
+    m_updateSpinbox->SetDuration<std::chrono::minutes>(si->update_timeout);
+    m_retrieveSpinbox->SetDuration<std::chrono::seconds>(si->retrieve_timeout);
     QString txt = tr("Author: ");
     txt += si->author;
     txt += "\n" + tr("Email: ") + si->email;

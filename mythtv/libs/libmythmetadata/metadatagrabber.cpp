@@ -18,7 +18,7 @@
 #include "mythcorecontext.h"
 
 #define LOC QString("Metadata Grabber: ")
-#define kGrabberRefresh 60
+static constexpr std::chrono::seconds kGrabberRefresh { 60s };
 
 static GrabberList     s_grabberList;
 static QMutex          s_grabberLock;
@@ -80,7 +80,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
         // this might have to be revised, or made more intelligent if
         // the delay during refreshes is too great
         if (refresh || !s_grabberAge.isValid() ||
-            (s_grabberAge.secsTo(now) > kGrabberRefresh))
+            (s_grabberAge.secsTo(now) > kGrabberRefresh.count()))
         {
             s_grabberList.clear();
             LOG(VB_GENERAL, LOG_DEBUG, LOC + "Clearing grabber cache");
@@ -171,7 +171,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
         cmd = grabberTypes[type].m_def;
     }
 
-    if (s_grabberAge.isValid() && s_grabberAge.secsTo(MythDate::current()) <= kGrabberRefresh)
+    if (s_grabberAge.isValid() && MythDate::secsInPast(s_grabberAge) <= kGrabberRefresh)
     {
         // just pull it from the cache
         GrabberList list = GetList();
@@ -388,7 +388,7 @@ MetadataLookupList MetaGrabberScript::RunGrabber(const QStringList &args,
         .arg(m_fullcommand).arg(args.join(" ")));
 
     grabber.Run();
-    if (grabber.Wait(180) != GENERIC_EXIT_OK)
+    if (grabber.Wait(180s) != GENERIC_EXIT_OK)
         return list;
 
     QByteArray result = grabber.ReadAll();

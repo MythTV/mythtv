@@ -85,7 +85,7 @@ MBASE_PUBLIC QString xml_indent(uint level);
 MBASE_PUBLIC bool IsMACAddress(const QString& MAC);
 MBASE_PUBLIC bool WakeOnLAN(const QString& MAC);
 MBASE_PUBLIC bool MythWakeup(const QString &wakeUpCommand,
-    uint flags = kMSNone, uint timeout = 0);
+    uint flags = kMSNone, std::chrono::seconds timeout = 0s);
 
 MBASE_PUBLIC QString FileHash(const QString& filename);
 

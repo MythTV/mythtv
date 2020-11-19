@@ -14,10 +14,12 @@
 // MythTV headers
 #include <mythcontext.h>
 
+using namespace std::chrono_literals;
+
 #define SI_UNITS 0
 #define ENG_UNITS 1
-#define DEFAULT_UPDATE_TIMEOUT (5*60*1000)
-#define DEFAULT_SCRIPT_TIMEOUT (60)
+static constexpr std::chrono::minutes DEFAULT_UPDATE_TIMEOUT { 5min };
+static constexpr std::chrono::seconds DEFAULT_SCRIPT_TIMEOUT { 60s };
 
 class ScriptInfo;
 

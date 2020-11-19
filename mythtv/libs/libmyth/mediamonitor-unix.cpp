@@ -393,7 +393,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
 
     // TODO: change this to a MythSystemLegacy on the stack?
     MythSystemLegacy *udevinfo = new MythSystemLegacy("udevinfo", args, flags);
-    udevinfo->Run(4);
+    udevinfo->Run(4s);
     if( udevinfo->Wait() != GENERIC_EXIT_OK )
     {
         delete udevinfo;

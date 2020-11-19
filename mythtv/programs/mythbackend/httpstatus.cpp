@@ -567,7 +567,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
         uint flags = kMSRunShell | kMSStdOut;
         MythSystemLegacy ms(info_script, flags);
-        ms.Run(10);
+        ms.Run(10s);
         if (ms.Wait() != GENERIC_EXIT_OK)
         {
             LOG(VB_GENERAL, LOG_ERR,

@@ -106,7 +106,7 @@ class MythSystemLegacyWrapper : public MythSystem
     {
         timeout = (timeout >= 1s) ? timeout + 500ms :
             ((timeout == 0ms) ? 0ms : 1s);
-        uint legacy_wait_ret = m_legacy->Wait(duration_cast<std::chrono::seconds>(timeout).count());
+        uint legacy_wait_ret = m_legacy->Wait(duration_cast<std::chrono::seconds>(timeout));
         return GENERIC_EXIT_RUNNING != legacy_wait_ret;
     }
 

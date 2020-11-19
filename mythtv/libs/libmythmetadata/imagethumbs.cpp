@@ -278,7 +278,7 @@ QString ThumbThread<DBFS>::CreateThumbnail(ImagePtrK im, int thumbPriority)
                             kMSPropagateLogs);
         ms.SetNice(10);
         ms.SetIOPrio(7);
-        ms.Run(30);
+        ms.Run(30s);
         if (ms.Wait() != GENERIC_EXIT_OK)
         {
             LOG(VB_GENERAL, LOG_ERR,  QString("Failed to run %2 %3")

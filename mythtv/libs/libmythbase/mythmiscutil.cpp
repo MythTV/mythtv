@@ -673,7 +673,7 @@ bool WakeOnLAN(const QString& MAC)
 
 // Wake up either by command or by MAC address
 // return true = success
-bool MythWakeup(const QString &wakeUpCommand, uint flags, uint timeout)
+bool MythWakeup(const QString &wakeUpCommand, uint flags, std::chrono::seconds timeout)
 {
     if (!IsMACAddress(wakeUpCommand))
         return myth_system(wakeUpCommand, flags, timeout) == 0U;

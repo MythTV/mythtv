@@ -568,7 +568,7 @@ QStringList VideoMetaData::GetAllTags()
 
     MythSystemLegacy ffprobe(cmd, args, kMSRunShell | kMSStdOut);
 
-    ffprobe.Run(5);
+    ffprobe.Run(5s);
 
     if (ffprobe.Wait() != GENERIC_EXIT_OK)
     {

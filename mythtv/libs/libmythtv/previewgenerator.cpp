@@ -268,7 +268,7 @@ bool PreviewGenerator::Run(void)
         ms->SetNice(10);
         ms->SetIOPrio(7);
 
-        ms->Run(30);
+        ms->Run(30s);
         uint ret = ms->Wait();
         delete ms;
 

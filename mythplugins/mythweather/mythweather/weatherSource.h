@@ -25,8 +25,8 @@ class ScriptInfo
     QStringList types;
     QString program;
     QString path;
-    unsigned int scriptTimeout {DEFAULT_SCRIPT_TIMEOUT};
-    unsigned int updateTimeout {DEFAULT_UPDATE_TIMEOUT};
+    std::chrono::seconds scriptTimeout {DEFAULT_SCRIPT_TIMEOUT};
+    std::chrono::seconds updateTimeout {DEFAULT_UPDATE_TIMEOUT};
     int id                     {0};
 };
 
@@ -40,8 +40,8 @@ class WeatherSource : public QObject
                                   const QString&    program);
     static bool ProbeTimeouts(const QString&        workingDirectory,
                               const QString&        program,
-                              uint          &updateTimeout,
-                              uint          &scriptTimeout);
+                              std::chrono::seconds &updateTimeout,
+                              std::chrono::seconds &scriptTimeout);
     static bool ProbeInfo(ScriptInfo &scriptInfo);
 
     explicit WeatherSource(ScriptInfo *info);
@@ -60,11 +60,11 @@ class WeatherSource : public QObject
 
     void startUpdate(bool forceUpdate = false);
 
-    int getScriptTimeout() { return m_info->scriptTimeout; }
-    void setScriptTimeout(int timeout) { m_info->scriptTimeout = timeout; }
+    std::chrono::seconds getScriptTimeout() { return m_info->scriptTimeout; }
+    void setScriptTimeout(std::chrono::seconds timeout) { m_info->scriptTimeout = timeout; }
 
-    int getUpdateTimeout() { return m_info->updateTimeout; }
-    void setUpdateTimeout(int timeout) { m_info->updateTimeout = timeout; }
+    std::chrono::seconds getUpdateTimeout() { return m_info->updateTimeout; }
+    void setUpdateTimeout(std::chrono::seconds timeout) { m_info->updateTimeout = timeout; }
 
     void startUpdateTimer() { m_updateTimer->start(m_info->updateTimeout); }
     void stopUpdateTimer() { m_updateTimer->stop(); }
