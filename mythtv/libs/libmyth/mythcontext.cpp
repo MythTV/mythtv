@@ -91,7 +91,7 @@ class MythContextPrivate : public QObject
     void    ResetDatabase(void) const;
 
     int     ChooseBackend(const QString &error);
-    int     UPnPautoconf(int milliSeconds = 2000);
+    int     UPnPautoconf(std::chrono::milliseconds milliSeconds = 2s);
     bool    DefaultUPnP(QString& Error);
     bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
@@ -1166,9 +1166,8 @@ int MythContextPrivate::ChooseBackend(const QString &error)
  * This does <i>not</i> prompt for PIN entry. If the backend requires one,
  * it will fail, and the caller needs to put up a UI to ask for one.
  */
-int MythContextPrivate::UPnPautoconf(const int millis)
+int MythContextPrivate::UPnPautoconf(const std::chrono::milliseconds milliSeconds)
 {
-    auto milliSeconds = std::chrono::milliseconds(millis);
     int seconds = std::chrono::duration_cast<std::chrono::seconds>(milliSeconds).count();
     LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
         .arg(seconds));
