@@ -97,11 +97,12 @@ class ExternalStreamHandler : public StreamHandler
     void PurgeBuffer(void);
 
     bool ProcessCommand(const QString & cmd, QString & result,
-                        int timeout = 4000 /* ms */,uint retry_cnt = 3);
+                        std::chrono::milliseconds timeout = 4s,
+                        uint retry_cnt = 3);
     bool ProcessVer1(const QString & cmd, QString & result,
-                     int timeout /* ms */, uint retry_cnt);
+                     std::chrono::milliseconds timeout, uint retry_cnt);
     bool ProcessVer2(const QString & command, QString & result,
-                     int timeout /* ms */, uint retry_cnt);
+                     std::chrono::milliseconds timeout, uint retry_cnt);
 
   private:
     int  StreamingCount(void) const;

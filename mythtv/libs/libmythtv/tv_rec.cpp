@@ -1517,9 +1517,8 @@ void TVRec::run(void)
  *  You MUST HAVE the stateChange-lock locked when you call this method!
  */
 
-bool TVRec::WaitForEventThreadSleep(bool wake, ulong _time)
+bool TVRec::WaitForEventThreadSleep(bool wake, std::chrono::milliseconds time)
 {
-    auto time = std::chrono::milliseconds(_time);
     bool ok = false;
     MythTimer t;
     t.start();

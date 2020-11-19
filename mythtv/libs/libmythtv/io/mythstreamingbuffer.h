@@ -18,7 +18,7 @@ class MythStreamingBuffer : public MythMediaBuffer
 
     bool      IsOpen            (void) const override;
     long long GetReadPosition   (void) const override;
-    bool      OpenFile          (const QString &Filename, uint Retry = static_cast<uint>(kDefaultOpenTimeout)) override;
+    bool      OpenFile          (const QString &Filename, std::chrono::milliseconds Retry = kDefaultOpenTimeout) override;
     bool      IsStreamed        (void) override { return m_streamed;   }
     bool      IsSeekingAllowed  (void) override { return m_allowSeeks; }
     bool      IsBookmarkAllowed (void) override { return false;        }

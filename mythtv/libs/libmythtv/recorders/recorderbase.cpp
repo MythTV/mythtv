@@ -288,15 +288,15 @@ bool RecorderBase::IsPaused(bool holding_lock) const
     return ret;
 }
 
-/** \fn RecorderBase::WaitForPause(int)
+/**
+
  *  \brief WaitForPause blocks until recorder is actually paused,
  *         or timeout milliseconds elapse.
  *  \param timeout number of milliseconds to wait defaults to 1000.
  *  \return true iff pause happened within timeout period.
  */
-bool RecorderBase::WaitForPause(int _timeout)
+bool RecorderBase::WaitForPause(std::chrono::milliseconds timeout)
 {
-    auto timeout = std::chrono::milliseconds(_timeout);
     MythTimer t;
     t.start();
 
@@ -311,7 +311,7 @@ bool RecorderBase::WaitForPause(int _timeout)
     return true;
 }
 
-/** \fn RecorderBase::PauseAndWait(int)
+/**
  *  \brief If m_requestPause is true, sets pause and blocks up to
  *         timeout milliseconds or until unpaused, whichever is
  *         sooner.
@@ -323,7 +323,7 @@ bool RecorderBase::WaitForPause(int _timeout)
  *  \param timeout number of milliseconds to wait defaults to 100.
  *  \return true if recorder is paused.
  */
-bool RecorderBase::PauseAndWait(int timeout)
+bool RecorderBase::PauseAndWait(std::chrono::milliseconds timeout)
 {
     QMutexLocker locker(&m_pauseLock);
     if (m_requestPause)
@@ -336,7 +336,7 @@ bool RecorderBase::PauseAndWait(int timeout)
                 m_tvrec->RecorderPaused();
         }
 
-        m_unpauseWait.wait(&m_pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout.count());
     }
 
     if (!m_requestPause && IsPaused(true))

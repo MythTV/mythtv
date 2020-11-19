@@ -40,9 +40,6 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-const int  MythMediaBuffer::kDefaultOpenTimeout = 2000; // ms
-const int  MythMediaBuffer::kLiveTVOpenTimeout  = 10000;
-
 #define LOC      QString("RingBuf(%1): ").arg(m_filename)
 
 
@@ -98,7 +95,7 @@ const int  MythMediaBuffer::kLiveTVOpenTimeout  = 10000;
  *  \param StreamOnly   If true disallow DVD and Bluray (used by FileTransfer)
 */
 MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
-                               bool UseReadAhead, int Timeout, bool StreamOnly)
+                               bool UseReadAhead, std::chrono::milliseconds Timeout, bool StreamOnly)
 {
     QString filename = Filename;
     QString lower = filename.toLower();

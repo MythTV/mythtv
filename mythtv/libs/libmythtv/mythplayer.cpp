@@ -254,9 +254,8 @@ void MythPlayer::SetPlaying(bool is_playing)
     m_playingWaitCond.wakeAll();
 }
 
-bool MythPlayer::IsPlaying(uint _wait_in_msec, bool wait_for) const
+bool MythPlayer::IsPlaying(std::chrono::milliseconds wait_in_msec, bool wait_for) const
 {
-    auto wait_in_msec = std::chrono::milliseconds(_wait_in_msec);
     QMutexLocker locker(&m_playingLock);
 
     if (wait_in_msec != 0ms)

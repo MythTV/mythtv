@@ -38,7 +38,7 @@ bool MythInteractiveBuffer::IsOpen(void) const
  *  \param Url   Url of the stream to read.
  *  \return Returns true if the stream was opened.
  */
-bool MythInteractiveBuffer::OpenFile(const QString &Url, uint /*Retry*/)
+bool MythInteractiveBuffer::OpenFile(const QString &Url, std::chrono::milliseconds /*Retry*/)
 {
     if (!NetStream::IsSupported(Url))
     {

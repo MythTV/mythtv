@@ -226,7 +226,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
     virtual void Pause(bool clear = true);
     virtual void Unpause(void);
     virtual bool IsPaused(bool holding_lock = false) const;
-    virtual bool WaitForPause(int timeout = 1000);
+    virtual bool WaitForPause(std::chrono::milliseconds timeout = 1s);
 
     /** \brief Returns the latest frame rate.
      */
@@ -264,7 +264,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      *  \sa SetOption(const QString&, const QString&)
      */
     void SetStrOption(RecordingProfile *profile, const QString &name);
-    virtual bool PauseAndWait(int timeout = 100);
+    virtual bool PauseAndWait(std::chrono::milliseconds timeout = 100ms);
 
     virtual void ResetForNewFile(void) = 0;
     virtual void SetRecordingStatus(RecStatus::Type status,

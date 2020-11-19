@@ -47,7 +47,7 @@ static const QStringList kSubExt        {".ass", ".srt", ".ssa", ".sub", ".txt"}
 static const QStringList kSubExtNoCheck {".ass", ".srt", ".ssa", ".sub", ".txt", ".gif", ".png"};
 
 
-MythFileBuffer::MythFileBuffer(const QString &Filename, bool Write, bool UseReadAhead, int Timeout)
+MythFileBuffer::MythFileBuffer(const QString &Filename, bool Write, bool UseReadAhead, std::chrono::milliseconds Timeout)
   : MythMediaBuffer(kMythBufferFile)
 {
     m_startReadAhead = UseReadAhead;
@@ -84,9 +84,9 @@ MythFileBuffer::MythFileBuffer(const QString &Filename, bool Write, bool UseRead
             }
         }
     }
-    else if (Timeout >= 0)
+    else if (Timeout >= 0ms)
     {
-        MythFileBuffer::OpenFile(m_filename, static_cast<uint>(Timeout));
+        MythFileBuffer::OpenFile(m_filename, Timeout);
     }
 }
 
@@ -170,9 +170,8 @@ static QString LocalSubtitleFilename(QFileInfo &FileInfo)
     return QString();
 }
 
-bool MythFileBuffer::OpenFile(const QString &Filename, uint _Retry)
+bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds Retry)
 {
-    auto Retry = std::chrono::milliseconds(_Retry);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("OpenFile(%1, %2 ms)")
             .arg(Filename).arg(Retry.count()));
 
@@ -275,8 +274,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, uint _Retry)
             case 0:
             {
                 QFileInfo file(m_filename);
-                m_oldfile = file.lastModified().toUTC()
-                    .secsTo(MythDate::current()) > 60;
+                m_oldfile = MythDate::secsInPast(file.lastModified().toUTC()) > 60s;
                 QString extension = file.completeSuffix().toLower();
                 if (IsSubtitlePossible(extension))
                     m_subtitleFilename = LocalSubtitleFilename(file);

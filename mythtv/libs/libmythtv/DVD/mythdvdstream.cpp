@@ -84,7 +84,7 @@ MythDVDStream::~MythDVDStream()
  *  \param Filename   Path of the dvd device to read.
  *  \return Returns true if the dvd was opened.
  */
-bool MythDVDStream::OpenFile(const QString &Filename, uint /*Retry*/)
+bool MythDVDStream::OpenFile(const QString &Filename, std::chrono::milliseconds /*Retry*/)
 {
     m_rwLock.lockForWrite();
 

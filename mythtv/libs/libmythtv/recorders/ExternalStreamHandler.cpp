@@ -857,7 +857,7 @@ bool ExternalStreamHandler::SetAPIVersion(void)
 {
     QString result;
 
-    if (ProcessCommand("APIVersion?", result, 10000))
+    if (ProcessCommand("APIVersion?", result, 10s))
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         QStringList tokens = result.split(':', QString::SkipEmptyParts);
@@ -1001,7 +1001,7 @@ bool ExternalStreamHandler::IsAppOpen(void)
     }
 
     QString result;
-    return ProcessCommand("Version?", result, 10000);
+    return ProcessCommand("Version?", result, 10s);
 }
 
 bool ExternalStreamHandler::IsTSOpen(void)
@@ -1027,7 +1027,7 @@ void ExternalStreamHandler::CloseApp(void)
 
         LOG(VB_RECORD, LOG_INFO, LOC + "CloseRecorder");
         m_ioLock.unlock();
-        ProcessCommand("CloseRecorder", result, 10000);
+        ProcessCommand("CloseRecorder", result, 10s);
         m_ioLock.lock();
 
         if (!result.startsWith("OK"))
@@ -1136,7 +1136,7 @@ bool ExternalStreamHandler::StartStreaming(void)
 
     if (StreamingCount() == 0)
     {
-        if (!ProcessCommand("StartStreaming", result, 15000))
+        if (!ProcessCommand("StartStreaming", result, 15s))
         {
             LogLevel_t level = LOG_ERR;
             if (result.startsWith("warn", Qt::CaseInsensitive))
@@ -1203,7 +1203,7 @@ bool ExternalStreamHandler::StopStreaming(void)
     }
 
     QString result;
-    if (!ProcessCommand("StopStreaming", result, 10000))
+    if (!ProcessCommand("StopStreaming", result, 10s))
     {
         LogLevel_t level = LOG_ERR;
         if (result.startsWith("warn", Qt::CaseInsensitive))
@@ -1224,7 +1224,8 @@ bool ExternalStreamHandler::StopStreaming(void)
 }
 
 bool ExternalStreamHandler::ProcessCommand(const QString & cmd,
-                                           QString & result, int timeout,
+                                           QString & result,
+                                           std::chrono::milliseconds timeout,
                                            uint retry_cnt)
 {
     QMutexLocker locker(&m_processLock);
@@ -1240,10 +1241,10 @@ bool ExternalStreamHandler::ProcessCommand(const QString & cmd,
 }
 
 bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
-                                        QString & result, int _timeout,
+                                        QString & result,
+                                        std::chrono::milliseconds timeout,
                                         uint retry_cnt)
 {
-    auto timeout = std::chrono::milliseconds(_timeout);
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("ProcessVer1('%1')")
         .arg(cmd));
 
@@ -1346,10 +1347,10 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
 }
 
 bool ExternalStreamHandler::ProcessVer2(const QString & command,
-                                        QString & result, int _timeout,
+                                        QString & result,
+                                        std::chrono::milliseconds timeout,
                                         uint retry_cnt)
 {
-    auto timeout = std::chrono::milliseconds(_timeout);
     QString status;
     QString raw;
 

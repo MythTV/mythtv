@@ -980,7 +980,7 @@ void MpegRecorder::run(void)
     QByteArray vdevice = m_videodevice.toLatin1();
     while (IsRecordingRequested() && !IsErrored())
     {
-        if (PauseAndWait(100))
+        if (PauseAndWait(100ms))
             continue;
 
         if (m_deviceIsMpegFile)
@@ -1238,7 +1238,7 @@ void MpegRecorder::Pause(bool clear)
     m_requestPause = true;
 }
 
-bool MpegRecorder::PauseAndWait(int timeout)
+bool MpegRecorder::PauseAndWait(std::chrono::milliseconds timeout)
 {
     QMutexLocker locker(&m_pauseLock);
     if (m_requestPause)
@@ -1256,7 +1256,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
                 m_tvrec->RecorderPaused();
         }
 
-        m_unpauseWait.wait(&m_pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout.count());
     }
 
     if (!m_requestPause && IsPaused(true))

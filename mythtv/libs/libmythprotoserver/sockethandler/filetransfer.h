@@ -21,7 +21,7 @@ class FileTransfer : public SocketHandler
   public:
     FileTransfer(QString &filename, MythSocket *remote,
                  MythSocketManager *parent,
-                 bool usereadahead, int timeout_ms);
+                 bool usereadahead, std::chrono::milliseconds timeout);
     FileTransfer(QString &filename, MythSocket *remote,
                  MythSocketManager *parent, bool write);
 

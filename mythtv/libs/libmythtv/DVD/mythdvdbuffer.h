@@ -46,7 +46,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     int       BestBufferSize       (void) override { return 2048; }
     bool      IsInStillFrame       (void) const override;
     bool      OpenFile             (const QString &Filename,
-                                    uint Retry = static_cast<uint>(kDefaultOpenTimeout)) override;
+                                    std::chrono::milliseconds Retry = kDefaultOpenTimeout) override;
     bool      HandleAction         (const QStringList &Actions, int64_t Pts) override;
     void      IgnoreWaitStates     (bool Ignore) override;
     bool      StartFromBeginning   (void) override;

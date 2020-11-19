@@ -53,13 +53,13 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
   public:
     static MythMediaBuffer *Create(const QString &Filename, bool Write,
                                    bool UseReadAhead = true,
-                                   int  Timeout = kDefaultOpenTimeout,
+                                   std::chrono::milliseconds Timeout = kDefaultOpenTimeout,
                                    bool StreamOnly = false);
     ~MythMediaBuffer() override = 0;
     MythBufferType GetType() const;
 
-    static const int kDefaultOpenTimeout;
-    static const int kLiveTVOpenTimeout;
+    static constexpr std::chrono::milliseconds kDefaultOpenTimeout {  2s };
+    static constexpr std::chrono::milliseconds kLiveTVOpenTimeout  { 10s };
     static QString   BitrateToString     (uint64_t Rate, bool Hz = false);
     static void      AVFormatInitNetwork (void);
 
@@ -131,7 +131,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     virtual bool      IsInStillFrame    (void) const { return false; }
     virtual bool      IsInDiscMenuOrStillFrame(void) const { return IsInMenu() || IsInStillFrame(); }
     virtual bool      HandleAction      (const QStringList &/*Action*/, int64_t /*Frame*/) { return false; }
-    virtual bool      OpenFile          (const QString &Filename, uint Retry = static_cast<uint>(kDefaultOpenTimeout)) = 0;
+    virtual bool      OpenFile          (const QString &Filename, std::chrono::milliseconds Retry = kDefaultOpenTimeout) = 0;
     virtual bool      ReOpen            (const QString& /*Filename*/ = "") { return false; }
 
   protected:

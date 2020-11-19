@@ -199,7 +199,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
    ~TV() override;
     PlayerContext*  GetPlayerContext();
     bool CreatePlayer(TVState State, bool Muted = false);
-    bool StartPlaying(int MaxWait = -1);
+    bool StartPlaying(std::chrono::milliseconds MaxWait = -1ms);
 
     // Private initialisation
     static TV* AcquireRelease(int& RefCount, bool Acquire, bool Create = false);
@@ -299,7 +299,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool RequestNextRecorder(bool ShowDialogs, const ChannelInfoList &Selection = ChannelInfoList());
     void DeleteRecorder();
 
-    bool StartRecorder(int MaxWait = -1);
+    bool StartRecorder(std::chrono::milliseconds MaxWait = -1ms);
     void StopStuff(bool StopRingBuffer, bool StopPlayer, bool StopRecorder);
     bool StartPlayer(TVState desiredState);
 

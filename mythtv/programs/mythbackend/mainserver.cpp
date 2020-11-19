@@ -1945,7 +1945,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         FileTransfer *ft = nullptr;
         bool writemode = false;
         bool usereadahead = true;
-        int timeout_ms = 2000;
+        std::chrono::milliseconds timeout_ms = 2s;
         if (commands.size() > 3)
             writemode = (commands[3].toInt() != 0);
 
@@ -1953,7 +1953,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             usereadahead = (commands[4].toInt() != 0);
 
         if (commands.size() > 5)
-            timeout_ms = commands[5].toInt();
+            timeout_ms = std::chrono::milliseconds(commands[5].toInt());
 
         if (writemode)
         {

@@ -253,7 +253,8 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
   protected:
     void run(void) override; // QRunnable
-    bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
+    bool WaitForEventThreadSleep(bool wake = true,
+                                 std::chrono::milliseconds time = std::chrono::milliseconds::max());
 
   private:
     void SetRingBuffer(MythMediaBuffer* Buffer);

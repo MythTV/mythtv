@@ -33,7 +33,7 @@ class HDHRRecorder : public DTVRecorder
 
   private:
     void ReaderPaused(int fd);
-    bool PauseAndWait(int timeout = 100) override; // RecorderBase
+    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
   private:
     HDHRChannel       *m_channel        {nullptr};

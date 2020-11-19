@@ -153,7 +153,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     bool    GetLimitKeyRepeat(void) const     { return m_limitKeyRepeat; }
     EofState GetEof(void) const;
     bool    IsErrored(void) const;
-    bool    IsPlaying(uint wait_in_msec = 0, bool wait_for = true) const;
+    bool    IsPlaying(std::chrono::milliseconds wait_in_msec = 0ms,
+                      bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return m_nextNormalSpeed; }
     bool    IsReallyNearEnd(void) const;
     bool    IsNearEnd(void);

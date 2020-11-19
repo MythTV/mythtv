@@ -253,7 +253,7 @@ void MythDVDBuffer::GetDescForPos(QString &Description) const
  *  \param lfilename   Path of the dvd device to read.
  *  \return Returns true if the dvd was opened.
  */
-bool MythDVDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
+bool MythDVDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds /*Retry*/)
 {
     QMutexLocker contextLocker(&m_contextLock);
     m_rwLock.lockForWrite();

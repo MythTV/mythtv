@@ -15,11 +15,11 @@ class MTV_PUBLIC MythFileBuffer : public MythMediaBuffer
 
     bool      IsOpen          (void) const override;
     long long GetReadPosition (void) const override;
-    bool      OpenFile        (const QString &Filename, uint Retry = static_cast<uint>(kDefaultOpenTimeout)) override;
+    bool      OpenFile        (const QString &Filename, std::chrono::milliseconds Retry = kDefaultOpenTimeout) override;
     bool      ReOpen          (const QString& Filename = "") override;
 
   protected:
-    MythFileBuffer(const QString &Filename, bool Write, bool UseReadAhead, int Timeout);
+    MythFileBuffer(const QString &Filename, bool Write, bool UseReadAhead, std::chrono::milliseconds Timeout);
     int       SafeRead        (void *Buffer, uint Size) override;
     int       SafeRead        (int FD, void *Buffer, uint Size);
     int       SafeRead        (RemoteFile *Remote, void *Buffer, uint Size);

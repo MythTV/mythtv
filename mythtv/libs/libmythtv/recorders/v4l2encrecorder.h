@@ -38,7 +38,7 @@ class V4L2encRecorder : public V4LRecorder
     void Close(void);
     void StartNewFile(void) override; // RecorderBase
 
-    bool PauseAndWait(int timeout = 500) override; // RecorderBase
+    bool PauseAndWait(std::chrono::milliseconds timeout = 500ms) override; // RecorderBase
 
   protected:
     bool StartEncoding(void);

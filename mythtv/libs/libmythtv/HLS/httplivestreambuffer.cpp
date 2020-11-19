@@ -2508,7 +2508,7 @@ void HLSRingBuffer::SanitizeStreams(StreamsList *streams)
  *                     inherited from the parent class.
  *  \return Returns true if the live stream was opened.
  */
-bool HLSRingBuffer::OpenFile(const QString &lfilename, uint /*retry_ms*/)
+bool HLSRingBuffer::OpenFile(const QString &lfilename, std::chrono::milliseconds /*retry_ms*/)
 {
     QWriteLocker lock(&m_rwLock);
 

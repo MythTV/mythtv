@@ -261,7 +261,7 @@ bool TV::CreatePlayer(TVState State, bool Muted)
     m_playerContext.SetPlayer(player);
     emit InitialisePlayerState();
     m_player = player;
-    return StartPlaying(-1);
+    return StartPlaying(-1ms);
 }
 
 /** \fn PlayerContext::StartPlaying(int)
@@ -269,10 +269,8 @@ bool TV::CreatePlayer(TVState State, bool Muted)
  *  \param MaxWait How long to wait for MythPlayer to start playing.
  *  \return true when successful, false otherwise.
  */
-bool TV::StartPlaying(int _MaxWait)
+bool TV::StartPlaying(std::chrono::milliseconds MaxWait)
 {
-    auto MaxWait = std::chrono::milliseconds(_MaxWait);
-
     if (!m_player)
         return false;
 
@@ -290,7 +288,7 @@ bool TV::StartPlaying(int _MaxWait)
     MythTimer t;
     t.start();
 
-    while (!m_player->IsPlaying(50, true) && (t.elapsed() < MaxWait))
+    while (!m_player->IsPlaying(50ms, true) && (t.elapsed() < MaxWait))
         m_playerContext.ReloadTVChain();
 
     if (m_player->IsPlaying())
@@ -2123,7 +2121,7 @@ void TV::HandleStateChange()
             m_playerContext.SetRingBuffer(
                 MythMediaBuffer::Create(
                     playbackURL, false, true,
-                    opennow ? MythMediaBuffer::kLiveTVOpenTimeout : -1));
+                    opennow ? MythMediaBuffer::kLiveTVOpenTimeout : -1ms));
 
             if (m_playerContext.m_buffer)
                 m_playerContext.m_buffer->SetLiveMode(m_playerContext.m_tvchain);
@@ -2348,10 +2346,9 @@ void TV::HandleStateChange()
  *                 not provided, this defaults to 40 seconds.
  *  \return true when successful, false otherwise.
  */
-bool TV::StartRecorder(int _MaxWait)
+bool TV::StartRecorder(std::chrono::milliseconds MaxWait)
 {
     RemoteEncoder *rec = m_playerContext.m_recorder;
-    auto MaxWait = std::chrono::milliseconds(_MaxWait);
     MaxWait = (MaxWait <= 0ms) ? 40s : MaxWait;
     MythTimer t;
     t.start();
@@ -5679,7 +5676,7 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
             m_playerContext.SetRingBuffer(
                 MythMediaBuffer::Create(
                     playbackURL, false, true,
-                    opennow ? MythMediaBuffer::kLiveTVOpenTimeout : -1));
+                    opennow ? MythMediaBuffer::kLiveTVOpenTimeout : -1ms));
 
             m_playerContext.m_tvchain->SetProgram(*m_playerContext.m_playingInfo);
             if (m_playerContext.m_buffer)

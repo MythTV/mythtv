@@ -11,9 +11,9 @@
 #include "mythlogging.h"
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
-                           bool usereadahead, int timeout_ms) :
+                           bool usereadahead, std::chrono::milliseconds timeout) :
     ReferenceCounter(QString("FileTransfer:%1").arg(filename)),
-    m_rbuffer(MythMediaBuffer::Create(filename, false, usereadahead, timeout_ms, true)),
+    m_rbuffer(MythMediaBuffer::Create(filename, false, usereadahead, timeout, true)),
     m_sock(remote)
 {
     m_pginfo = new ProgramInfo(filename);

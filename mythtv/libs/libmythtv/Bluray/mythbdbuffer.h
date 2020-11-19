@@ -33,7 +33,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     bool      IsInStillFrame     (void) const override;
     bool      HandleAction       (const QStringList &Actions, int64_t Pts) override;
     bool      OpenFile           (const QString &Filename,
-                                  uint Retry = static_cast<uint>(kDefaultOpenTimeout)) override;
+                                  std::chrono::milliseconds Retry = kDefaultOpenTimeout) override;
 
     void      ProgressUpdate     (void);
     bool      BDWaitingForPlayer (void) const;

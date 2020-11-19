@@ -265,7 +265,7 @@ void MythBDBuffer::SkipBDWaitingForPlayer(void)
  *                     inherited from the parent class.
  *  \return Returns true if the bluray was opened.
  */
-bool MythBDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
+bool MythBDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds /*Retry*/)
 {
     m_safeFilename = Filename;
     m_filename = Filename;

@@ -131,7 +131,7 @@ int ExternalRecChannelFetcher::LoadChannels(void)
     QString result;
     int     cnt = -1;
 
-    if (!m_streamHandler->ProcessCommand("LoadChannels", result, 50000))
+    if (!m_streamHandler->ProcessCommand("LoadChannels", result, 50s))
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + "LoadChannels command failed.");
         return -1;

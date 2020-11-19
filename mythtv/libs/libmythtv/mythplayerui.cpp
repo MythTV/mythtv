@@ -1030,7 +1030,7 @@ void MythPlayerUI::SwitchToProgram()
         delete ic;
     }
 
-    m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), static_cast<uint>(MythMediaBuffer::kLiveTVOpenTimeout));
+    m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), MythMediaBuffer::kLiveTVOpenTimeout);
 
     if (!m_playerCtx->m_buffer->IsOpen())
     {
@@ -1150,7 +1150,7 @@ void MythPlayerUI::JumpToProgram()
         delete ic;
     }
 
-    m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), static_cast<uint>(MythMediaBuffer::kLiveTVOpenTimeout));
+    m_playerCtx->m_buffer->OpenFile(pginfo->GetPlaybackURL(), MythMediaBuffer::kLiveTVOpenTimeout);
     if (!m_playerCtx->m_buffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("JumpToProgram's OpenFile failed (input type: %1)")

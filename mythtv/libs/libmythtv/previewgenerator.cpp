@@ -814,7 +814,7 @@ char *PreviewGenerator::GetScreenGrab(
         }
     }
 
-    MythMediaBuffer* buffer = MythMediaBuffer::Create(filename, false, false, 0);
+    MythMediaBuffer* buffer = MythMediaBuffer::Create(filename, false, false, 0ms);
     if (!buffer || !buffer->IsOpen())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Previewer could not open file: " +

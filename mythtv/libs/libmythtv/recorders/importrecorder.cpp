@@ -120,7 +120,7 @@ void ImportRecorder::run(void)
     {
         auto *ctx = new PlayerContext(kImportRecorderInUseID);
         auto *cfp = new MythCommFlagPlayer(ctx, (PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV));
-        MythMediaBuffer *buffer = MythMediaBuffer::Create(m_ringBuffer->GetFilename(), false, true, 6000);
+        MythMediaBuffer *buffer = MythMediaBuffer::Create(m_ringBuffer->GetFilename(), false, true, 6s);
         //This does update the status but does not set the ultimate
         //recorded / failure status for the relevant recording
         SetRecordingStatus(RecStatus::Recording, __FILE__, __LINE__);
