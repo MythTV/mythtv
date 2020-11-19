@@ -29,8 +29,8 @@ void SRTWriter::AddSubtitle(const OneSubtitle &sub, int number)
 /**
  * Formats time to format appropriate to SubRip file.
  */
-QString SRTWriter::FormatTime(uint64_t time_in_msec)
+QString SRTWriter::FormatTime(std::chrono::milliseconds time_in_msec)
 {
-    QTime time = QTime::fromMSecsSinceStartOfDay(time_in_msec);
+    QTime time = QTime::fromMSecsSinceStartOfDay(time_in_msec.count());
     return time.toString("HH:mm:ss,zzz");
 }

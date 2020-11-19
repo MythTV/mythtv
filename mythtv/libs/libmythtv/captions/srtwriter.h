@@ -54,7 +54,7 @@ class MTV_PUBLIC SRTWriter
 
   private:
     /// Formats time to format appropriate to SubRip file.
-    static QString FormatTime(uint64_t time_in_msec);
+    static QString FormatTime(std::chrono::milliseconds time_in_msec);
     /// Output file.
     QFile m_outFile;
     /// Output stream associated with m_outFile.

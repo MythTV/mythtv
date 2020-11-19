@@ -30,9 +30,9 @@ class MTV_PUBLIC OneSubtitle
 {
   public:
     /// Time we have to start showing subtitle, msec.
-    int64_t m_startTime { 0 };
+    std::chrono::milliseconds m_startTime { 0 };
     /// Time we have to show subtitle, msec.
-    int m_length { -1 };
+    std::chrono::milliseconds m_length { -1ms };
     /// Is this a text subtitle.
     bool m_isText { true };
     /// Lines of text of subtitles.
@@ -44,7 +44,7 @@ class MTV_PUBLIC OneSubtitle
 
     OneSubtitle() = default;
 
-    static const int kDefaultLength;
+    static constexpr std::chrono::milliseconds kDefaultLength { 750ms };
 };
 
 /// Key is a CC number (1-4), values are the subtitles in chrono order.
@@ -166,7 +166,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     QHash<uint, WindowsOnService > m_cc708Windows;
 
     /// Keeps track for decoding time to make timestamps for subtitles.
-    double  m_curTime;
+    std::chrono::milliseconds  m_curTime;
     uint64_t m_myFramesPlayed;
     bool    m_showProgress;
     QString m_fileName;
