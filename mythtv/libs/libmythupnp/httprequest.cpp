@@ -1266,7 +1266,7 @@ bool HTTPRequest::ParseRequest()
     try
     {
         // Read first line to determine requestType
-        QString sRequestLine = ReadLine( 2000 );
+        QString sRequestLine = ReadLine( 2s );
 
         if ( sRequestLine.isEmpty() )
         {
@@ -1300,7 +1300,7 @@ bool HTTPRequest::ParseRequest()
 
         // Read Header
         bool    bDone = false;
-        QString sLine = ReadLine( 2000 );
+        QString sLine = ReadLine( 2s );
 
         while (( !sLine.isEmpty() ) && !bDone )
         {
@@ -1316,7 +1316,7 @@ bool HTTPRequest::ParseRequest()
                     m_mapHeaders.insert(sName.toLower(), sValue.trimmed());
                 }
 
-                sLine = ReadLine( 2000 );
+                sLine = ReadLine( 2s );
             }
             else
                 bDone = true;
@@ -1401,7 +1401,7 @@ bool HTTPRequest::ParseRequest()
             char *pszPayload = new char[ nPayloadSize + 2 ];
             long  nBytes     = 0;
 
-            nBytes = ReadBlock( pszPayload, nPayloadSize, 5000 );
+            nBytes = ReadBlock( pszPayload, nPayloadSize, 5s );
             if (nBytes == nPayloadSize )
             {
                 m_sPayload = QString::fromUtf8( pszPayload, nPayloadSize );
@@ -2383,9 +2383,8 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-QString BufferedSocketDeviceRequest::ReadLine( int _msecs )
+QString BufferedSocketDeviceRequest::ReadLine( std::chrono::milliseconds msecs )
 {
-    auto msecs = std::chrono::milliseconds(_msecs);
     QString sLine;
 
     if (m_pSocket && m_pSocket->isValid() &&
@@ -2417,9 +2416,8 @@ QString BufferedSocketDeviceRequest::ReadLine( int _msecs )
 /////////////////////////////////////////////////////////////////////////////
 
 qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
-                                              int _msecs)
+                                              std::chrono::milliseconds msecs)
 {
-    auto msecs = std::chrono::milliseconds(_msecs);
     if (m_pSocket && m_pSocket->isValid() &&
         m_pSocket->state() == QAbstractSocket::ConnectedState)
     {

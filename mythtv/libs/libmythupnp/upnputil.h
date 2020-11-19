@@ -21,7 +21,8 @@
 
 // MythTV headers
 #include "upnpexp.h"
-#include "compat.h"     // for suseconds_t
+#include "compat.h"     // for gettimeofday()
+#include "mythchrono.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
