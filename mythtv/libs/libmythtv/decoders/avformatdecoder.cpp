@@ -2923,7 +2923,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     CC608Seen seen_608;
     if (check_608)
     {
-        m_ccd608->GetServices(15/*seconds*/, seen_608);
+        m_ccd608->GetServices(15s, seen_608);
         for (uint i = 0; i < 4; i++)
         {
             need_change_608 |= (seen_608[i] && !m_ccX08InTracks[i]) ||
@@ -2935,14 +2935,14 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     cc708_seen_flags seen_708;
     if (check_708 || need_change_608)
     {
-        m_ccd708->services(15/*seconds*/, seen_708);
+        m_ccd708->services(15s, seen_708);
         for (uint i = 1; i < 64 && !need_change_608 && !need_change_708; i++)
         {
             need_change_708 |= (seen_708[i] && !m_ccX08InTracks[i+4]) ||
                 (!seen_708[i] && m_ccX08InTracks[i+4] && !m_ccX08InPmt[i+4]);
         }
         if (need_change_708 && !check_608)
-            m_ccd608->GetServices(15/*seconds*/, seen_608);
+            m_ccd608->GetServices(15s, seen_608);
     }
 
     if (!need_change_608 && !need_change_708)

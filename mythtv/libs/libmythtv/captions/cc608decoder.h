@@ -14,6 +14,7 @@
 #include <QChar>
 
 #include "format.h"
+#include "mythchrono.h"
 
 using CC608Seen        = std::array<bool,4>;
 using CC608ProgramType = std::array<QString,96>;
@@ -67,7 +68,7 @@ class CC608Decoder
     QString GetXDS(const QString &key) const;
 
     /// \return Services seen in last few seconds as specified.
-    void GetServices(uint seconds, CC608Seen& seen) const;
+    void GetServices(std::chrono::seconds seconds, CC608Seen& seen) const;
 
     static QString ToASCII(const QString &cc608, bool suppress_unknown);
 
@@ -91,7 +92,7 @@ class CC608Decoder
 
     bool            m_ignoreTimeCode        {false};
 
-    std::array<time_t,4> m_lastSeen         {0};
+    std::array<SystemTime,4> m_lastSeen     {};
 
     // per-field
     CC608PerField   m_badVbi                { 0,  0};

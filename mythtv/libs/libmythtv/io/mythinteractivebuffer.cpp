@@ -53,7 +53,7 @@ bool MythInteractiveBuffer::OpenFile(const QString &Url, std::chrono::millisecon
         return false;
     }
 
-    if (!stream->WaitTillReady(30000))
+    if (!stream->WaitTillReady(30s))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Stream not ready '%1'").arg(Url));
         return false;

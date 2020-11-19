@@ -51,8 +51,8 @@ public:
     const QUrl &Url() const { return m_url; }
 
     // Synchronous interface
-    bool WaitTillReady(unsigned long milliseconds);
-    bool WaitTillFinished(unsigned long milliseconds);
+    bool WaitTillReady(std::chrono::milliseconds timeout);
+    bool WaitTillFinished(std::chrono::milliseconds timeout);
     QNetworkReply::NetworkError GetError() const;
     QString GetErrorString() const;
     qlonglong BytesAvailable() const;

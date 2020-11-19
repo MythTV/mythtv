@@ -629,35 +629,35 @@ qlonglong NetStream::GetSize() const
 /**
  * Synchronous interface
  */
-bool NetStream::WaitTillReady(unsigned long milliseconds)
+bool NetStream::WaitTillReady(std::chrono::milliseconds timeout)
 {
     QMutexLocker locker(&m_mutex);
 
     QElapsedTimer t; t.start();
     while (m_state < kReady)
     {
-        unsigned elapsed = t.elapsed();
-        if (elapsed > milliseconds)
+        auto elapsed = std::chrono::milliseconds(t.elapsed());
+        if (elapsed > timeout)
             return false;
 
-        m_ready.wait(&m_mutex, milliseconds - elapsed);
+        m_ready.wait(&m_mutex, (timeout - elapsed).count());
     }
 
     return true;
 }
 
-bool NetStream::WaitTillFinished(unsigned long milliseconds)
+bool NetStream::WaitTillFinished(std::chrono::milliseconds timeout)
 {
     QMutexLocker locker(&m_mutex);
 
     QElapsedTimer t; t.start();
     while (m_state < kFinished)
     {
-        unsigned elapsed = t.elapsed();
-        if (elapsed > milliseconds)
+        auto elapsed = std::chrono::milliseconds(t.elapsed());
+        if (elapsed > timeout)
             return false;
 
-        m_finished.wait(&m_mutex, milliseconds - elapsed);
+        m_finished.wait(&m_mutex, (timeout - elapsed).count());
     }
 
     return true;

@@ -10,8 +10,10 @@
 #include "format.h"
 #include "compat.h"
 
+#include "mythchrono.h"
+
 using cc708_seen_flags = std::array<bool,64>;
-using cc708_seen_times = std::array<time_t,64>;
+using cc708_seen_times = std::array<SystemTime,64>;
 
 #ifndef __CC_CALLBACKS_H__
 /** EIA-708-A closed caption packet */
@@ -34,7 +36,7 @@ class CC708Decoder
     void decode_cc_null(void);
 
     /// \return Services seen in last few seconds as specified.
-    void services(uint seconds, cc708_seen_flags & seen) const;
+    void services(std::chrono::seconds seconds, cc708_seen_flags & seen) const;
 
   private:
     CaptionPacket  m_partialPacket {};

@@ -139,7 +139,7 @@ MHInteractionChannel::GetFile(const QString &csPath, QByteArray &data,
         locker.unlock();
 
         NetStream req(url, NetStream::kAlwaysCache);
-        if (req.WaitTillFinished(3000) && req.GetError() == QNetworkReply::NoError)
+        if (req.WaitTillFinished(3s) && req.GetError() == QNetworkReply::NoError)
         {
             data = req.ReadAll();
             LOG(VB_MHEG, LOG_DEBUG, LOC + QString("GetFile cache read %1 bytes %2")

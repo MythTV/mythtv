@@ -52,10 +52,9 @@ void CC608Decoder::FormatCC(int tc, int code1, int code2)
     FormatCCField(tc, 1, code2);
 }
 
-void CC608Decoder::GetServices(uint seconds, CC608Seen& seen) const
+void CC608Decoder::GetServices(std::chrono::seconds seconds, CC608Seen& seen) const
 {
-    time_t now = time(nullptr);
-    time_t then = now - seconds;
+    auto then = SystemClock::now() - seconds;
     for (uint i = 0; i < 4; i++)
         seen[i] = (m_lastSeen[i] >= then);
 }
@@ -714,7 +713,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
         case CC_CC4: stream = 3; break;
     }
     if (stream >= 0)
-        m_lastSeen[stream] = time(nullptr);
+        m_lastSeen[stream] = std::chrono::system_clock::now();
 
     m_resumeText[mode] = 0;
     if (clr && !len)

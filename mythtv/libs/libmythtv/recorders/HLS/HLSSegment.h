@@ -6,6 +6,8 @@
 #include <QString>
 #include <QUrl>
 
+#include "mythchrono.h"
+
 class HLSRecSegment
 {
   public:
@@ -13,9 +15,9 @@ class HLSRecSegment
 
     HLSRecSegment(void);
     HLSRecSegment(const HLSRecSegment& rhs);
-    HLSRecSegment(int seq, int duration, QString title,
+    HLSRecSegment(int seq, std::chrono::seconds duration, QString title,
 		  QUrl uri);
-    HLSRecSegment(int seq, int duration, QString title,
+    HLSRecSegment(int seq, std::chrono::seconds duration, QString title,
                   QUrl uri, const QString& current_key_path);
     ~HLSRecSegment();
 
@@ -26,7 +28,7 @@ class HLSRecSegment
     int64_t Sequence(void) const { return m_sequence; }
     QString Title(void)    const { return m_title; }
     QUrl    Url(void)      const { return m_url; }
-    int     Duration(void) const { return m_duration; }
+    std::chrono::seconds Duration(void) const { return m_duration; }
 
     QString toString(void) const;
 
@@ -40,7 +42,7 @@ class HLSRecSegment
 
   protected:
     int64_t     m_sequence {0};  // unique sequence number
-    int         m_duration {0};  // segment duration (seconds)
+    std::chrono::seconds m_duration {0s};  // segment duration
     uint64_t    m_bitrate  {0};  // bitrate of segment's content (bits per second)
     QString     m_title;         // human-readable informative title of
 			         // the media segment
