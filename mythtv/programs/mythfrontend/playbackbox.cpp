@@ -4255,7 +4255,7 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if (message == "AVAILABILITY" && me->ExtraDataCount() == 8)
         {
-            const uint kMaxUIWaitTime = 10000; // ms
+            static constexpr std::chrono::milliseconds kMaxUIWaitTime = 10s;
             QStringList list = me->ExtraDataList();
             uint recordingID = list[0].toUInt();
             auto cat = (CheckAvailabilityType) list[1].toInt();
@@ -4265,9 +4265,9 @@ void PlaybackBox::customEvent(QEvent *event)
             tm.setHMS(list[4].toUInt(), list[5].toUInt(),
                       list[6].toUInt(), list[7].toUInt());
             QTime now = QTime::currentTime();
-            int time_elapsed = tm.msecsTo(now);
-            if (time_elapsed < 0)
-                time_elapsed += 24 * 60 * 60 * 1000;
+            auto time_elapsed = std::chrono::milliseconds(tm.msecsTo(now));
+            if (time_elapsed < 0ms)
+                time_elapsed += 24h;
 
             AvailableStatusType old_avail = availableStatus;
             ProgramInfo *pginfo = FindProgramInUILists(recordingID);
@@ -4278,7 +4278,7 @@ void PlaybackBox::customEvent(QEvent *event)
                 pginfo->SetAvailableStatus(availableStatus, "AVAILABILITY");
             }
 
-            if ((uint)time_elapsed >= kMaxUIWaitTime)
+            if (time_elapsed >= kMaxUIWaitTime)
                 m_playListPlay.clear();
 
             bool playnext = ((kCheckForPlaylistAction == cat) &&
@@ -4287,7 +4287,7 @@ void PlaybackBox::customEvent(QEvent *event)
 
             if (((kCheckForPlayAction     == cat) ||
                  (kCheckForPlaylistAction == cat)) &&
-                ((uint)time_elapsed < kMaxUIWaitTime))
+                (time_elapsed < kMaxUIWaitTime))
             {
                 if (asAvailable != availableStatus)
                 {
