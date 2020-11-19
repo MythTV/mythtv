@@ -84,7 +84,7 @@ class ImageProperties
     QString m_maskImageFilename;
 };
 
-using AnimationFrame = QPair<MythImage *, int>;
+using AnimationFrame = QPair<MythImage *, std::chrono::milliseconds>;
 using AnimationFrames = QVector<AnimationFrame>;
 
 /**
@@ -99,7 +99,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     Q_OBJECT
 
   public:
-    MythUIImage(const QString &filepattern, int low, int high, int delayms,
+    MythUIImage(const QString &filepattern, int low, int high, std::chrono::milliseconds delay,
                 MythUIType *parent, const QString &name);
     MythUIImage(const QString &filename, MythUIType *parent, const QString &name);
     MythUIImage(MythUIType *parent, const QString &name);
@@ -125,8 +125,8 @@ class MUI_PUBLIC MythUIImage : public MythUIType
      */
     void SetImages(QVector<MythImage *> *images);
 
-    void SetDelay(int delayms);
-    void SetDelays(const QVector<int>& delays);
+    void SetDelay(std::chrono::milliseconds delayms);
+    void SetDelays(const QVector<std::chrono::milliseconds>& delays);
 
     void Reset(void) override; // MythUIType
     bool Load(bool allowLoadInBackground = true, bool forceStat = false);
@@ -168,12 +168,12 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     QString m_origFilename;
 
     QHash<int, MythImage *> m_images;
-    QHash<int, int>         m_delays;
+    QHash<int, std::chrono::milliseconds> m_delays;
     QMutex                  m_imagesLock;
 
-    int m_delay;
-    int m_lowNum;
-    int m_highNum;
+    std::chrono::milliseconds m_delay { -1ms };
+    int m_lowNum  {0};
+    int m_highNum {0};
 
     unsigned int    m_curPos             {0};
     QTime           m_lastDisplay        {QTime::currentTime()};
