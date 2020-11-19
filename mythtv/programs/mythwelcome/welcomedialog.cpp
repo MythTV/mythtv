@@ -8,7 +8,7 @@
 #include <chrono>
 
 // qt
-#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QKeyEvent>
 #include <QEvent>
 
@@ -98,7 +98,11 @@ void WelcomeDialog::startFrontend(void)
     QString startFECmd = gCoreContext->GetSetting("MythWelcomeStartFECmd",
                          m_appBinDir + "mythfrontend");
 
-    myth_system(startFECmd, kMSDisableUDPListener | kMSProcessEvents);
+    // Ensure we use the same platform for mythfrontend
+    QStringList args;
+    if (!startFECmd.contains("platform"))
+        args << QString("--platform %1").arg(qGuiApp->platformName());
+    myth_system(startFECmd, args, kMSDisableUDPListener | kMSProcessEvents);
     updateAll();
     m_frontendIsRunning = false;
 }
