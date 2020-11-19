@@ -1,4 +1,5 @@
 // Qt
+#include <QWindow>
 #include <QGuiApplication>
 
 // MythTV
