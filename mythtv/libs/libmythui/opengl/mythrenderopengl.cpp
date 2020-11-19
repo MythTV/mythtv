@@ -308,7 +308,6 @@ bool MythRenderOpenGL::Init(void)
     m_maxTextureUnits = maxunits;
     m_maxTextureSize  = (maxtexsz) ? maxtexsz : 512;
     QSurfaceFormat fmt = format();
-    m_colorDepth = qMin(fmt.redBufferSize(), qMin(fmt.greenBufferSize(), fmt.blueBufferSize()));
 
     // RGBA16 - available on ES via extension
     m_extraFeatures |= isOpenGLES() ? hasExtension("GL_EXT_texture_norm16") ? kGLExtRGBA16 : kGLFeatNone : kGLExtRGBA16;
@@ -447,11 +446,6 @@ void MythRenderOpenGL::DebugFeatures(void)
     // warnings
     if (m_maxTextureUnits < 3)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Warning: Insufficient texture units for some features.");
-}
-
-int MythRenderOpenGL::GetColorDepth(void) const
-{
-    return m_colorDepth;
 }
 
 int MythRenderOpenGL::GetMaxTextureSize(void) const
@@ -1275,7 +1269,9 @@ QStringList MythRenderOpenGL::GetDescription(void)
     result.append(tr("OpenGL vendor")   + "\t: " + reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
     result.append(tr("OpenGL renderer") + "\t: " + reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     result.append(tr("OpenGL version")  + "\t: " + reinterpret_cast<const char*>(glGetString(GL_VERSION)));
-    result.append(tr("Maximum depth")   + "\t: " + QString::number(GetColorDepth()));
+    QSurfaceFormat fmt = format();
+    result.append(tr("Color depth (RGBA)")   + "\t: " + QString("%1%2%3%4")
+                  .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize()).arg(fmt.blueBufferSize()).arg(fmt.alphaBufferSize()));
     return result;
 }
 

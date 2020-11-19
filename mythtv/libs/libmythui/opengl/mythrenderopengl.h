@@ -113,7 +113,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  swapBuffers();
 
     bool  Init(void);
-    int   GetColorDepth(void) const;
     int   GetMaxTextureSize(void) const;
     int   GetMaxTextureUnits(void) const;
     int   GetExtraFeatures(void) const;
@@ -226,7 +225,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int        m_extraFeaturesUsed { kGLFeatNone };
     int        m_maxTextureSize { 0 };
     int        m_maxTextureUnits { 0 };
-    int        m_colorDepth { 0 };
 
     // State
     QRect      m_viewport;
