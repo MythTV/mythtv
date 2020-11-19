@@ -147,6 +147,7 @@ MythPainterWindow::MythPainterWindow(MythMainWindow *MainWin)
 #endif
 }
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 MythPainterWindow::~MythPainterWindow()
 {
 #ifdef USING_WAYLAND_EXPOSE_HACK
