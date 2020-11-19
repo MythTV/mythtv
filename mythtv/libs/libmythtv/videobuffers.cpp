@@ -21,7 +21,7 @@ extern "C" {
 
 #define TRY_LOCK_SPINS                 2000
 #define TRY_LOCK_SPINS_BEFORE_WARNING  9999
-#define TRY_LOCK_SPIN_WAIT             1000 /* usec */
+static constexpr std::chrono::milliseconds TRY_LOCK_SPIN_WAIT { 1ms };
 
 int next_dbg_str = 0;
 
@@ -345,7 +345,7 @@ MythVideoFrame *VideoBuffers::GetNextFreeFrame(BufferType EnqueueTo)
                 QString("GetNextFreeFrame() TryLock has "
                         "spun %1 times, this is a lot.").arg(tries));
         }
-        std::this_thread::sleep_for(std::chrono::microseconds(TRY_LOCK_SPIN_WAIT));
+        std::this_thread::sleep_for(TRY_LOCK_SPIN_WAIT);
     }
 
     return nullptr;
