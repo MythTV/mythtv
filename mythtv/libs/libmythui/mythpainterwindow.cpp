@@ -1,3 +1,6 @@
+// Qt
+#include <QGuiApplication>
+
 // MythTV
 #include "mythcorecontext.h"
 #include "mythmainwindow.h"
@@ -16,10 +19,10 @@
 #endif
 
 #ifdef USING_WAYLANDEXTRAS
-#include <QGuiApplication>
 #include "platforms/mythwaylandextras.h"
 #endif
 
+using namespace std::chrono_literals;
 #define MYTH_PAINTER_QT QString("Qt")
 
 using TryPainter = bool(*)(MythMainWindow*, MythPainterWindow*&, MythPainter*&, bool&);
@@ -145,6 +148,9 @@ MythPainterWindow::MythPainterWindow(MythMainWindow *MainWin)
 
 MythPainterWindow::~MythPainterWindow()
 {
+#ifdef USING_WAYLAND_EXPOSE_HACK
+    delete m_exposureCheckTimer;
+#endif
 #ifdef USING_WAYLANDEXTRAS
     delete m_waylandDev;
 #endif
@@ -166,5 +172,35 @@ void MythPainterWindow::resizeEvent(QResizeEvent* /*ResizeEvent*/)
     if (m_waylandDev)
         m_waylandDev->SetOpaqueRegion(rect());
 #endif
+
+#ifdef USING_WAYLAND_EXPOSE_HACK
+    if (!m_exposureCheckTimer && (qGuiApp->platformName().toLower().contains("wayland")))
+    {
+        m_exposureCheckTimer = new QTimer();
+        connect(m_exposureCheckTimer, &QTimer::timeout, this, &MythPainterWindow::CheckWindowIsExposed);
+        m_exposureCheckTimer->start(100ms);
+    }
 }
 
+void MythPainterWindow::CheckWindowIsExposed()
+{
+    auto handle = windowHandle();
+    if (handle && handle->isVisible())
+    {
+        if (handle->isExposed())
+        {
+            // Not sure whether this might re-occur and we should continue checking...
+            LOG(VB_GENERAL, LOG_INFO, "Stopping exposure check timer");
+            m_exposureCheckTimer->stop();
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Trying to force window exposure");
+            setVisible(false);
+            setVisible(true);
+        }
+    }
+}
+#else
+}
+#endif
