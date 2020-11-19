@@ -66,7 +66,7 @@ void MBASE_PUBLIC ShutdownMythSystemLegacy(void);
 class MythSystemLegacyPrivate;
 class MBASE_PUBLIC MythSystemLegacy : public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 
   public:
     explicit MythSystemLegacy(QObject *parent = nullptr);
@@ -197,6 +197,8 @@ class MBASE_PUBLIC MythSystemLegacy : public QObject
 MBASE_PUBLIC uint myth_system(const QString &command,
                               uint flags = kMSNone,
                               uint timeout = 0);
+MBASE_PUBLIC uint myth_system(const QString &Command, const QStringList& Args,
+                              uint Flags = kMSNone, uint Timeout = 0);
 
 #endif // MYTHSYSTEMLEGACY_H
 /*

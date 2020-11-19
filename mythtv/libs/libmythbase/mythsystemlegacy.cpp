@@ -510,6 +510,18 @@ uint myth_system(const QString &command, uint flags, uint timeout)
     return result;
 }
 
+uint myth_system(const QString &Command, const QStringList& Args, uint Flags, uint Timeout)
+{
+    Flags |= kMSRunShell | kMSAutoCleanup;
+    auto *ms = new MythSystemLegacy(Command, Args, Flags);
+    ms->Run(Timeout);
+    uint result = ms->Wait(0);
+    if (!ms->GetSetting("RunInBackground"))
+        delete ms;
+
+    return result;
+}
+
 /*
  * vim:ts=4:sw=4:ai:et:si:sts=4
  */
