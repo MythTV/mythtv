@@ -747,9 +747,9 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
         }
 
         std::this_thread::sleep_for(std::chrono::microseconds(m_frameInterval >> 3));
-        int waited_for = m_bufferingStart.msecsTo(QTime::currentTime());
-        int last_msg = m_bufferingLastMsg.msecsTo(QTime::currentTime());
-        if (last_msg > 100 && !FlagIsSet(kMusicChoice))
+        auto waited_for = std::chrono::milliseconds(m_bufferingStart.msecsTo(QTime::currentTime()));
+        auto last_msg = std::chrono::milliseconds(m_bufferingLastMsg.msecsTo(QTime::currentTime()));
+        if (last_msg > 100ms && !FlagIsSet(kMusicChoice))
         {
             if (++m_bufferingCounter == 10)
                 LOG(VB_GENERAL, LOG_NOTICE, LOC +
@@ -758,13 +758,13 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             {
                 LOG(VB_PLAYBACK, LOG_NOTICE, LOC +
                     QString("Waited %1ms for video buffers %2")
-                    .arg(waited_for).arg(m_videoOutput->GetFrameStatus()));
+                    .arg(waited_for.count()).arg(m_videoOutput->GetFrameStatus()));
             }
             else
             {
                 LOG(VB_GENERAL, LOG_NOTICE, LOC +
                     QString("Waited %1ms for video buffers %2")
-                        .arg(waited_for).arg(m_videoOutput->GetFrameStatus()));
+                    .arg(waited_for.count()).arg(m_videoOutput->GetFrameStatus()));
             }
             m_bufferingLastMsg = QTime::currentTime();
             if (m_audio.IsBufferAlmostFull() && m_framesPlayed < 5
@@ -774,7 +774,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
                 LOG(VB_GENERAL, LOG_NOTICE, LOC + "Music Choice program detected - disabling AV Sync.");
                 m_avSync.SetAVSyncMusicChoice(&m_audio);
             }
-            if (waited_for > 7000 && m_audio.IsBufferAlmostFull()
+            if (waited_for > 7s && m_audio.IsBufferAlmostFull()
                 && !FlagIsSet(kMusicChoice))
             {
                 // We are likely to enter this condition
@@ -784,13 +784,13 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             }
             // Finish audio pause for sync after 1 second
             // in case of infrequent video frames (e.g. music choice)
-            if (m_avSync.GetAVSyncAudioPause() && waited_for > 1000)
+            if (m_avSync.GetAVSyncAudioPause() && waited_for > 1s)
                 m_avSync.SetAVSyncMusicChoice(&m_audio);
         }
-        int msecs = 500;
+        std::chrono::milliseconds msecs { 500ms };
         if (preBufferDebug)
-            msecs = 1800000;
-        if ((waited_for > msecs /*500*/) && !m_videoOutput->EnoughFreeFrames())
+            msecs = 30min;
+        if ((waited_for > msecs) && !m_videoOutput->EnoughFreeFrames())
         {
             LOG(VB_GENERAL, LOG_NOTICE, LOC +
                 "Timed out waiting for frames, and"
@@ -800,10 +800,10 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             // to recover from serious problems if frames get leaked.
             DiscardVideoFrames(true, true);
         }
-        msecs = 30000;
+        msecs = 30s;
         if (preBufferDebug)
-            msecs = 1800000;
-        if (waited_for > msecs /*30000*/) // 30 seconds for internet streamed media
+            msecs = 30min;
+        if (waited_for > msecs) // 30 seconds for internet streamed media
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "Waited too long for decoder to fill video buffers. Exiting..");
