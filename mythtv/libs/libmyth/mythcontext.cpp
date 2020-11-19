@@ -863,7 +863,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         if (wakeupTime < 5s)
             wakeupTime = 5s;
 
-        int progressTotal = wakeupTime.count() * attempts;
+        std::chrono::seconds progressTotal = wakeupTime * attempts;
 
         if (m_guiStartup && !m_guiStartup->m_Exit)
             m_guiStartup->setTotal(progressTotal);
@@ -955,7 +955,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                         useTimeout = wakeupTime;
                         if (m_gui && !m_guiStartup && attempt == 0)
                             useTimeout=1s;
-                        progressTotal = wakeupTime.count() * attempts;
+                        progressTotal = wakeupTime * attempts;
                         if (m_guiStartup && !m_guiStartup->m_Exit)
                             m_guiStartup->setTotal(progressTotal);
                         startupState = st_beWOL;

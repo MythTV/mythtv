@@ -25,13 +25,13 @@
 #ifndef GUISTARTUP_H_
 #define GUISTARTUP_H_
 
-#include <chrono>
-
 // QT headers
 #include <QObject>
 #include <QTranslator>
 #include <QEventLoop>
 #include <QTimer>
+
+#include "mythchrono.h"
 
 // MythDB headers
 #include "mythexp.h"
@@ -66,7 +66,7 @@ class MPUBLIC GUIStartup : public MythScreenType
     bool Create(void) override; // MythScreenType
     bool setStatusState(const QString &name);
     bool setMessageState(const QString &name);
-    void setTotal(int total);
+    void setTotal(std::chrono::seconds total);
 
   public slots:
     bool updateProgress(bool finished);

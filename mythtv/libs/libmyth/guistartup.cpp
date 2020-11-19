@@ -128,12 +128,12 @@ bool GUIStartup::setMessageState(const QString &name)
 }
 
 
-void GUIStartup::setTotal(int total)
+void GUIStartup::setTotal(std::chrono::seconds total)
 {
     delete m_progressTimer;
     m_progressTimer = new MythTimer(MythTimer::kStartRunning);
     m_timer.start(500ms);
-    m_total = std::chrono::milliseconds(total*1000);
+    m_total = total;
     m_progressBar->SetTotal(m_total.count());
     SetFocusWidget(m_dummyButton);
 
