@@ -76,8 +76,6 @@
 #include <cstdlib>
 #include <thread>
 
-using namespace std::chrono_literals;
-
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif

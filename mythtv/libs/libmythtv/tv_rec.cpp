@@ -1549,7 +1549,7 @@ bool TVRec::WaitForEventThreadSleep(bool wake, std::chrono::milliseconds time)
 
         std::chrono::milliseconds te = t2.elapsed();
         if (!ok && te < 10ms)
-            std::this_thread::sleep_for(std::chrono::microseconds(10ms - te));
+            std::this_thread::sleep_for(10ms - te);
     }
     return ok;
 }

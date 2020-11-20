@@ -35,8 +35,6 @@
 #include "mythsystem.h"
 #include "exitcodes.h"
 
-using std::chrono::duration_cast;
-
 class MythSystemLegacyWrapper : public MythSystem
 {
   public:

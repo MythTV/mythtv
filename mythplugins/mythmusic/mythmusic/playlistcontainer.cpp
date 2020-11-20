@@ -10,8 +10,6 @@
 #include "playlist.h"
 #include "playlistcontainer.h"
 
-using namespace std::chrono_literals;
-
 void PlaylistLoadingThread::run()
 {
     RunProlog();

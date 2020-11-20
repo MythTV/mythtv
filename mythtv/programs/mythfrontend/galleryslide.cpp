@@ -6,8 +6,6 @@
 
 #include "imagemetadata.h"
 
-using std::chrono::duration_cast;
-
 #define LOC QString("Slide: ")
 #define SBLOC QString("SlideBuffer: ")
 

@@ -14,8 +14,6 @@
 // MythTV headers
 #include <mythcontext.h>
 
-using namespace std::chrono_literals;
-
 #define SI_UNITS 0
 #define ENG_UNITS 1
 static constexpr std::chrono::minutes DEFAULT_UPDATE_TIMEOUT { 5min };

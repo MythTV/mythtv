@@ -1168,7 +1168,7 @@ int MythContextPrivate::ChooseBackend(const QString &error)
  */
 int MythContextPrivate::UPnPautoconf(const std::chrono::milliseconds milliSeconds)
 {
-    int seconds = std::chrono::duration_cast<std::chrono::seconds>(milliSeconds).count();
+    int seconds = duration_cast<std::chrono::seconds>(milliSeconds).count();
     LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
         .arg(seconds));
 
@@ -1184,7 +1184,7 @@ int MythContextPrivate::UPnPautoconf(const std::chrono::milliseconds milliSecond
         auto ttl = milliSeconds - totalTime.elapsed();
         if ((searchTime.elapsed() > 249ms) && (ttl > 1s))
         {
-            int ttlSeconds = std::chrono::duration_cast<std::chrono::seconds>(ttl).count();
+            int ttlSeconds = duration_cast<std::chrono::seconds>(ttl).count();
             LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
                 .arg(ttlSeconds));
             SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);
@@ -1255,7 +1255,7 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
     // ----------------------------------------------------------------------
 
     std::chrono::milliseconds timeout_ms { 2s };
-    int timeout_s = std::chrono::duration_cast<std::chrono::seconds>(timeout_ms).count();
+    int timeout_s = duration_cast<std::chrono::seconds>(timeout_ms).count();
     LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
         .arg(timeout_s));
     SSDP::Instance()->PerformSearch(kBackendURI, timeout_s);
@@ -1280,7 +1280,7 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
         auto ttl = timeout_ms - totalTime.elapsed();
         if ((searchTime.elapsed() > 249ms) && (ttl > 1s))
         {
-            int ttlSeconds = std::chrono::duration_cast<std::chrono::seconds>(ttl).count();
+            int ttlSeconds = duration_cast<std::chrono::seconds>(ttl).count();
             LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
                 .arg(ttlSeconds));
             SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);

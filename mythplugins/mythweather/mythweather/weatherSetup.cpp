@@ -15,8 +15,6 @@
 #include <QSqlError>
 #include <QVariant>
 
-using std::chrono::duration_cast;
-
 #define GLBL_SCREEN 0
 #define SCREEN_SETUP_SCREEN 1
 #define SRC_SCREEN 2

@@ -6,8 +6,6 @@
 #include "mythmainwindow.h"
 #include "mythgesture.h"
 
-using namespace std::chrono_literals;
-
 class MythScreenStack;
 class MythMediaDevice;
 

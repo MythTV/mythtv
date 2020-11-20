@@ -1204,7 +1204,7 @@ bool MythMediaBuffer::WaitForReadsAllowed(void)
     if (timer.elapsed() >= timeoutms)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Took more than %1 seconds to be allowed to read, aborting.")
-            .arg(std::chrono::duration_cast<std::chrono::seconds>(timeoutms).count()));
+            .arg(duration_cast<std::chrono::seconds>(timeoutms).count()));
         return false;
     }
     return check;
