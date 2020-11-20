@@ -59,7 +59,7 @@
 #define O_LARGEFILE 0
 #endif
 
-static std::array<const MIMETypes,63> g_MIMETypes
+static std::array<const MIMETypes,66> g_MIMETypes
 {{
     // Image Mime Types
     { "gif" , "image/gif"                  },
@@ -128,7 +128,11 @@ static std::array<const MIMETypes,63> g_MIMETypes
     { "ps"  , "video/mp2p"                 }, // RFC 3555
     { "ts"  , "video/mp2t"                 }, // RFC 3555
     { "vob" , "video/mpeg"                 }, // Also video/dvd
-    { "wmv" , "video/x-ms-wmv"             }
+    { "wmv" , "video/x-ms-wmv"             },
+    // Font Mime Types
+    { "ttf"  , "font/ttf"                  },
+    { "woff" , "font/woff"                 },
+    { "woff2", "font/woff2"                }
 }};
 
 // NOTE 1
