@@ -28,7 +28,7 @@ static constexpr std::chrono::milliseconds SEARCH_TIME { 3s };
 QStringList VBox::probeDevices(void)
 {
     const std::chrono::milliseconds milliSeconds { SEARCH_TIME };
-    int seconds = duration_cast<std::chrono::seconds>(milliSeconds).count();
+    auto seconds = duration_cast<std::chrono::seconds>(milliSeconds);
 
     // see if we have already found one or more vboxes
     QStringList result = VBox::doUPNPSearch();
@@ -38,7 +38,7 @@ QStringList VBox::probeDevices(void)
 
     // non found so start a new search
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using UPNP to search for Vboxes (%1 secs)")
-        .arg(seconds));
+        .arg(seconds.count()));
 
     SSDP::Instance()->PerformSearch(VBOX_URI, seconds);
 
@@ -54,7 +54,7 @@ QStringList VBox::probeDevices(void)
         {
             LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UPNP Search %1 secs")
                 .arg(ttl.count()));
-            SSDP::Instance()->PerformSearch(VBOX_URI, ttl.count());
+            SSDP::Instance()->PerformSearch(VBOX_URI, ttl);
             searchTime.start();
         }
     }

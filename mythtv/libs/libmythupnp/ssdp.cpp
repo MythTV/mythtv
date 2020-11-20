@@ -197,16 +197,16 @@ void SSDP::DisableNotifications()
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-void SSDP::PerformSearch(const QString &sST, uint timeout_secs)
+void SSDP::PerformSearch(const QString &sST, std::chrono::seconds timeout)
 {
-    timeout_secs = std::max(std::min(timeout_secs, 5U), 1U);
+    timeout = std::clamp(timeout, 1s, 5s);
     QString rRequest = QString("M-SEARCH * HTTP/1.1\r\n"
                                "HOST: 239.255.255.250:1900\r\n"
                                "MAN: \"ssdp:discover\"\r\n"
                                "MX: %1\r\n"
                                "ST: %2\r\n"
                                "\r\n")
-        .arg(timeout_secs).arg(sST);
+        .arg(timeout.count()).arg(sST);
 
     LOG(VB_UPNP, LOG_DEBUG, QString("\n\n%1\n").arg(rRequest));
 

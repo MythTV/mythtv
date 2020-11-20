@@ -21,10 +21,10 @@ static constexpr std::chrono::milliseconds SEARCH_TIME_MS { 3s };
 QStringList SatIP::probeDevices(void)
 {
     const std::chrono::milliseconds milliSeconds = SEARCH_TIME_MS;
-    int seconds = duration_cast<std::chrono::seconds>(milliSeconds).count();
+    auto seconds = duration_cast<std::chrono::seconds>(milliSeconds);
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using UPNP to search for Sat>IP servers (%1 secs)")
-        .arg(seconds));
+        .arg(seconds.count()));
 
     SSDP::Instance()->PerformSearch(SATIP_URI, seconds);
 
@@ -37,8 +37,9 @@ QStringList SatIP::probeDevices(void)
         std::chrono::milliseconds ttl = milliSeconds - totalTime.elapsed();
         if (searchTime.elapsed() > 249ms && ttl > 1s)
         {
-            int ttl_s = duration_cast<std::chrono::seconds>(ttl).count();
-            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UPNP search %1 ms").arg(ttl_s));
+            auto ttl_s = duration_cast<std::chrono::seconds>(ttl);
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UPNP search %1 ms")
+                .arg(ttl_s.count()));
             SSDP::Instance()->PerformSearch(SATIP_URI, ttl_s);
             searchTime.start();
         }
