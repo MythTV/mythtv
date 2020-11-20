@@ -142,7 +142,7 @@ MythPainterWindow::MythPainterWindow(MythMainWindow *MainWin)
   : QWidget(MainWin)
 {
 #ifdef USING_WAYLANDEXTRAS
-    if (qGuiApp->platformName().toLower().contains("wayland"))
+    if (QGuiApplication::platformName().toLower().contains("wayland"))
         m_waylandDev = new MythWaylandDevice(MainWin);
 #endif
 }
@@ -176,7 +176,7 @@ void MythPainterWindow::resizeEvent(QResizeEvent* /*ResizeEvent*/)
 #endif
 
 #ifdef USING_WAYLAND_EXPOSE_HACK
-    if (!m_exposureCheckTimer && (qGuiApp->platformName().toLower().contains("wayland")))
+    if (!m_exposureCheckTimer && (QGuiApplication::platformName().toLower().contains("wayland")))
     {
         m_exposureCheckTimer = new QTimer();
         connect(m_exposureCheckTimer, &QTimer::timeout, this, &MythPainterWindow::CheckWindowIsExposed);

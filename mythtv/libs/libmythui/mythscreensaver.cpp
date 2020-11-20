@@ -63,7 +63,7 @@ MythScreenSaverControl::MythScreenSaverControl(MythMainWindow* MainWin, MythDisp
     (void)mDisplay;
 #endif
 #ifdef USING_WAYLANDEXTRAS
-    if (qGuiApp->platformName().toLower().contains("wayland"))
+    if (QGuiApplication::platformName().toLower().contains("wayland"))
         m_screenSavers.push_back(new MythScreenSaverWayland(this, MainWin));
 #else
     (void)MainWin;

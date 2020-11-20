@@ -101,7 +101,7 @@ void WelcomeDialog::startFrontend(void)
     // Ensure we use the same platform for mythfrontend
     QStringList args;
     if (!startFECmd.contains("platform"))
-        args << QString("--platform %1").arg(qGuiApp->platformName());
+        args << QString("--platform %1").arg(QGuiApplication::platformName());
     myth_system(startFECmd, args, kMSDisableUDPListener | kMSProcessEvents);
     updateAll();
     m_frontendIsRunning = false;
