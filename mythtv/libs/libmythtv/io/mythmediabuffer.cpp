@@ -1108,7 +1108,7 @@ void MythMediaBuffer::run(void)
             // like us, yield (currently implemented with short usleep).
             m_generalWait.wakeAll();
             m_rwLock.unlock();
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(5ms);
             m_rwLock.lockForRead();
         }
         else
@@ -1125,7 +1125,7 @@ void MythMediaBuffer::run(void)
                 // reader gets a chance to read before the buffer is full.
                 m_generalWait.wakeAll();
                 m_rwLock.unlock();
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                std::this_thread::sleep_for(5ms);
                 m_rwLock.lockForRead();
             }
         }

@@ -140,7 +140,7 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, int timeout)
                 LOG(VB_RECORD, LOG_WARNING,
                     QString("External Recorder not ready. Will retry (%1/%2).")
                     .arg(m_errCnt).arg(kMaxErrorCnt));
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                std::this_thread::sleep_for(100ms);
             }
         }
         else
@@ -275,7 +275,7 @@ bool ExternIO::KillIfRunning(const QString & cmd)
         return true;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(50ms);
 
     kil = QString("pkill --signal 9 -x -f \"%1\" 2>&1 > /dev/null").arg(cmd);
     res_kil = system(kil.toUtf8().constData());
@@ -307,7 +307,7 @@ void ExternIO::Fork(void)
     if (!KillIfRunning(full_command))
     {
         // Give it one more chance.
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
         if (!KillIfRunning(full_command))
         {
             m_error = QString("Unable to kill existing '%1'.")
@@ -372,7 +372,7 @@ void ExternIO::Fork(void)
         {
             LOG(VB_GENERAL, LOG_WARNING,
                 "ExternIO::Fork(): Failed to set O_NONBLOCK for FD: " + ENO);
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::this_thread::sleep_for(2s);
             _exit(GENERIC_EXIT_PIPE_FAILURE);
         }
 
@@ -607,13 +607,13 @@ void ExternalStreamHandler::run(void)
         if (!IsTSOpen())
         {
             LOG(VB_RECORD, LOG_WARNING, LOC + "TS not open yet.");
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
             continue;
         }
 
         if (StreamingCount() == 0)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
             continue;
         }
 
@@ -641,7 +641,7 @@ void ExternalStreamHandler::run(void)
                     }
 
                     if (restart_cnt++)
-                        std::this_thread::sleep_for(std::chrono::seconds(20));
+                        std::this_thread::sleep_for(20s);
                     if (!RestartStream())
                     {
                         LOG(VB_RECORD, LOG_ERR, LOC +
@@ -664,7 +664,7 @@ void ExternalStreamHandler::run(void)
                 if (CheckForError())
                 {
                     if (restart_cnt++)
-                        std::this_thread::sleep_for(std::chrono::seconds(20));
+                        std::this_thread::sleep_for(20s);
                     if (!RestartStream())
                     {
                         LOG(VB_RECORD, LOG_ERR, LOC + "Failed to restart stream.");
@@ -725,7 +725,7 @@ void ExternalStreamHandler::run(void)
                 }
             }
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            std::this_thread::sleep_for(50ms);
 
             // HLS type streams may only produce data every ~10 seconds
             if (nodata_timer.elapsed() < 12000 && buffer.size() < TS_PACKET_SIZE)
@@ -762,7 +762,7 @@ void ExternalStreamHandler::run(void)
         {
             if (m_xon && data_short_err++ == 0)
                 LOG(VB_RECORD, LOG_INFO, LOC + "Waiting for a full TS packet.");
-            std::this_thread::sleep_for(std::chrono::microseconds(50));
+            std::this_thread::sleep_for(50us);
             continue;
         }
         if (data_short_err)
@@ -1040,7 +1040,7 @@ void ExternalStreamHandler::CloseApp(void)
             if (!m_io->KillIfRunning(full_command))
             {
                 // Give it one more chance.
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                std::this_thread::sleep_for(50ms);
                 if (!m_io->KillIfRunning(full_command))
                 {
                     LOG(VB_GENERAL, LOG_ERR,
@@ -1065,7 +1065,7 @@ bool ExternalStreamHandler::RestartStream(void)
     if (streaming)
         StopStreaming();
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(1s);
 
     if (streaming)
         return StartStreaming();

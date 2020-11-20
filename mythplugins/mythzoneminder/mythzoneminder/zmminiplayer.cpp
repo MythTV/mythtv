@@ -16,8 +16,6 @@
 // mythzoneminder
 #include "zmclient.h"
 
-using namespace std::chrono_literals;
-
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
 

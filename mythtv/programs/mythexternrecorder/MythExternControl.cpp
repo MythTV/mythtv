@@ -29,6 +29,8 @@
 
 #include <iostream>
 
+using namespace std::chrono_literals;
+
 const QString VERSION = "0.6";
 
 #define LOC Desc()
@@ -77,12 +79,12 @@ Q_SLOT void MythExternControl::Done(void)
         m_flowCond.notify_all();
         m_runCond.notify_all();
 
-        std::this_thread::sleep_for(std::chrono::microseconds(50));
+        std::this_thread::sleep_for(50us);
 
         while (m_commandsRunning || m_bufferRunning)
         {
             std::unique_lock<std::mutex> lk(m_flowMutex);
-            m_flowCond.wait_for(lk, std::chrono::milliseconds(1000));
+            m_flowCond.wait_for(lk, 1s);
         }
 
         LOG(VB_RECORD, LOG_CRIT, LOC + "Terminated.");
@@ -540,7 +542,7 @@ bool Buffer::Fill(const QByteArray & buffer)
             QString("Packet queue overrun. Dropped %1 packets, %2 bytes.")
             .arg(++s_dropped).arg(s_droppedBytes));
 
-        std::this_thread::sleep_for(std::chrono::microseconds(250));
+        std::this_thread::sleep_for(250us);
     }
 
     m_parent->m_flowMutex.unlock();
@@ -569,9 +571,7 @@ void Buffer::Run(void)
     {
         {
             std::unique_lock<std::mutex> lk(m_parent->m_flowMutex);
-            m_parent->m_flowCond.wait_for(lk,
-                                           std::chrono::milliseconds
-                                           (wait ? 5000 : 25));
+            m_parent->m_flowCond.wait_for(lk, wait ? 5s : 25ms);
             wait = false;
         }
 

@@ -53,8 +53,6 @@ extern "C" {
 #include "libavutil/opt.h"
 }
 
-using namespace std::chrono_literals;
-
 /****************************************************************************/
 
 using ShoutCastMetaMap = QMap<QString,QString>;

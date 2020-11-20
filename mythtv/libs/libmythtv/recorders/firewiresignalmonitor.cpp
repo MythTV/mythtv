@@ -145,7 +145,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
         // NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err");
         while (m_dtvMonitorRunning)
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err end");
         return;
@@ -157,7 +157,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->AddListener(this);
 
     while (m_dtvMonitorRunning && GetStreamData())
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- shutdown ");
 
@@ -165,7 +165,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->ClosePort();
 
     while (m_dtvMonitorRunning)
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- end");
 }
@@ -291,7 +291,7 @@ void FirewireSignalMonitor::UpdateValues(void)
                 "Waiting for table monitor to start");
 
         while (!m_dtvMonitorRunning)
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(5ms);
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues() -- "
                 "Table monitor started");

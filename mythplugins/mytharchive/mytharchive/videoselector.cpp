@@ -23,8 +23,6 @@
 #include "archiveutil.h"
 #include "videoselector.h"
 
-using namespace std::chrono_literals;
-
 VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
               :MythScreenType(parent, "VideoSelector"),
                m_archiveList(archiveList)

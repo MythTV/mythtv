@@ -28,6 +28,7 @@
 
 // MythTV headers
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 enum MythSystemFlag {
     kMSNone               = 0x00000000,

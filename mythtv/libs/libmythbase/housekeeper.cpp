@@ -59,8 +59,6 @@
 #include "housekeeper.h"
 #include "mythcorecontext.h"
 
-using namespace std::chrono_literals;
-
 /** \class HouseKeeperTask
  *  \ingroup housekeeper
  *  \brief Definition for a single task to be run by the HouseKeeper

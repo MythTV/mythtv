@@ -5,6 +5,7 @@
 #include <QObject>
 
 #include "mythuiexp.h"
+#include "mythchrono.h"
 
 class QString;
 

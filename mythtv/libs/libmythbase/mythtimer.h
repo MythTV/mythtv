@@ -4,6 +4,7 @@
 #include <cinttypes>
 #include <QElapsedTimer>
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 /** A QElapsedTimer based timer to replace use of QTime as a timer.
  *

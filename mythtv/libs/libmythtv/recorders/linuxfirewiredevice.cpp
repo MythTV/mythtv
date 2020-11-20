@@ -584,7 +584,7 @@ void LinuxFirewireDevice::run(void)
     m_priv->m_portHandlerWait.wakeAll();
     // we need to unlock & sleep to allow wakeAll to wake other threads.
     m_lock.unlock();
-    std::this_thread::sleep_for(std::chrono::microseconds(2500));
+    std::this_thread::sleep_for(2500us);
     m_lock.lock();
 
     m_priv->m_noDataCnt = 0;

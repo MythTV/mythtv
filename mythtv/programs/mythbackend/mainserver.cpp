@@ -83,8 +83,6 @@
 // mythbackend headers
 #include "backendcontext.h"
 
-using namespace std::chrono_literals;
-
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
  */
@@ -2374,7 +2372,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 {
     // sleep a little to let frontends reload the recordings list
     // after deleting a recording, then we can hammer the DB and filesystem
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(3s);
     std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom()%2));
 
     m_deletelock.lock();
@@ -2465,7 +2463,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     else
     {
         delete_file_immediately(ds->m_filename, followLinks, false);
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(2s);
         if (checkFile.exists())
             errmsg = true;
     }
@@ -2612,7 +2610,7 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
             QString("Error deleting recorded entry for %1.") .arg(logInfo));
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(1s);
 
     // Notify the frontend so it can requery for Free Space
     QString msg = QString("RECORDING_LIST_CHANGE DELETE %1")
@@ -2620,7 +2618,7 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     gCoreContext->SendEvent(MythEvent(msg));
 
     // sleep a little to let frontends reload the recordings list
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(3s);
 
     query.prepare("DELETE FROM recordedmarkup "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
@@ -2764,17 +2762,17 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     }
 
     // Time between truncation steps in milliseconds
-    const size_t sleep_time = 500;
+    constexpr std::chrono::milliseconds sleep_time = 500ms;
     const size_t min_tps    = 8 * 1024 * 1024;
     const auto calc_tps     = (size_t) (cards * 1.2 * (22200000LL / 8.0));
     const size_t tps        = std::max(min_tps, calc_tps);
-    const auto increment    = (size_t) (tps * (sleep_time * 0.001F));
+    const auto increment    = (size_t) (tps * (sleep_time.count() * 0.001F));
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("Truncating '%1' by %2 MB every %3 milliseconds")
             .arg(filename)
             .arg(increment / (1024.0 * 1024.0), 0, 'f', 2)
-            .arg(sleep_time));
+            .arg(sleep_time.count()));
 
     GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
 
@@ -2803,7 +2801,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
 
         count++;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+        std::this_thread::sleep_for(sleep_time);
     }
 
     bool ok = (0 == close(fd));
@@ -2953,7 +2951,7 @@ void MainServer::DoHandleStopRecording(
             while (elink->IsBusyRecording() ||
                    elink->GetState() == kState_ChangingState)
             {
-                std::this_thread::sleep_for(std::chrono::microseconds(100));
+                std::this_thread::sleep_for(100us);
             }
 
             if (m_ismaster)
@@ -7828,7 +7826,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                         if (enc->IsLocal())
                         {
                             while (enc->GetState() == kState_ChangingState)
-                                std::this_thread::sleep_for(std::chrono::microseconds(500));
+                                std::this_thread::sleep_for(500us);
 
                             if (enc->IsBusy() &&
                                 enc->GetChainID() == chain->GetID())

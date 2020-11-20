@@ -205,7 +205,7 @@ bool MythDVDPlayer::VideoLoop(void)
             if (nbframes == 0)
             {
                 LOG(VB_PLAYBACK, LOG_WARNING, LOC + "In DVD Menu: No video frames in queue");
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                std::this_thread::sleep_for(10ms);
                 return !IsErrored();
             }
 
@@ -291,7 +291,7 @@ void MythDVDPlayer::InitialSeek(void)
         m_decodeOneFrame = true;
         int count = 0;
         while (count++ < 100 && m_decodeOneFrame)
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            std::this_thread::sleep_for(50ms);
     }
     MythPlayerUI::InitialSeek();
     m_playerCtx->m_buffer->IgnoreWaitStates(false);

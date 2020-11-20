@@ -778,7 +778,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             retry = false;
             GetFrame(kDecodeVideo, retry);
             if (retry)
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                std::this_thread::sleep_for(1ms);
         }
 
         if (m_decodedVideoFrame)

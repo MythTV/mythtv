@@ -52,8 +52,6 @@
 // for ImageDLFailureEvent
 #include "metadataimagedownload.h"
 
-using namespace std::chrono_literals;
-
 #define LOC_MML QString("Manual Metadata Lookup: ")
 
 static const QString sLocation = "MythVideo";

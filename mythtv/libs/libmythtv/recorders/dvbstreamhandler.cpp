@@ -154,7 +154,7 @@ void DVBStreamHandler::RunTS(void)
             m_bError = true;
             return;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
     }
 
     int remainder = 0;
@@ -241,7 +241,7 @@ void DVBStreamHandler::RunTS(void)
 
             if ((0 == len) || (-1 == len))
             {
-                std::this_thread::sleep_for(std::chrono::microseconds(100));
+                std::this_thread::sleep_for(100us);
                 continue;
             }
         }
@@ -338,7 +338,7 @@ void DVBStreamHandler::RunSR(void)
         }
 
         if (!readSomething)
-            std::this_thread::sleep_for(std::chrono::milliseconds(3));
+            std::this_thread::sleep_for(3ms);
     }
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): " + "shutdown");
 

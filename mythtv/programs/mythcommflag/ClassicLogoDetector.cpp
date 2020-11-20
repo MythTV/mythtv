@@ -125,7 +125,7 @@ bool ClassicLogoDetector::searchForLogo(MythCommFlagPlayer *player)
             }
 
             if (!m_commDetector->m_fullSpeed)
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                std::this_thread::sleep_for(10ms);
 
             DetectEdges(vf, edgeCounts, edgediff);
 

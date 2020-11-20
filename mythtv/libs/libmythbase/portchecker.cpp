@@ -190,7 +190,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
         // Check if user got impatient and canceled
         if (m_cancelCheck)
             break;
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(500ms);
         state = socket.state();
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("socket state %1")
             .arg(state));

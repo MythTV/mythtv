@@ -23,7 +23,6 @@
 #include "platforms/mythwaylandextras.h"
 #endif
 
-using namespace std::chrono_literals;
 #define MYTH_PAINTER_QT QString("Qt")
 
 using TryPainter = bool(*)(MythMainWindow*, MythPainterWindow*&, MythPainter*&, bool&);

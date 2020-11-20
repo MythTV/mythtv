@@ -186,7 +186,7 @@ MythUDP::MythUDP()
 {
     m_listener->moveToThread(m_thread->qthread());
     m_thread->start();
-    do { std::this_thread::sleep_for(std::chrono::microseconds(5)); }
+    do { std::this_thread::sleep_for(5us); }
     while (!m_thread->qthread()->isRunning());
 }
 

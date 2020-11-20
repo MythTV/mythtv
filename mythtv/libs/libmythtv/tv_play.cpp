@@ -2366,7 +2366,7 @@ bool TV::StartRecorder(int MaxWait)
             SetErrored();
             return false;
         }
-        std::this_thread::sleep_for(std::chrono::microseconds(5));
+        std::this_thread::sleep_for(5us);
     }
 
     if (!recording || m_exitPlayerTimerId)

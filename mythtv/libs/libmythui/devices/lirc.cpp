@@ -408,7 +408,7 @@ void LIRC::run(void)
     while (IsDoRunSet())
     {
         if (m_eofCount && m_retryCount)
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(100ms);
 
         if ((m_eofCount >= 10) || (!d->m_lircState))
         {
@@ -430,7 +430,7 @@ void LIRC::run(void)
                 m_retryCount = 0;
             else
                 // wait a while before we retry..
-                std::this_thread::sleep_for(std::chrono::seconds(2));
+                std::this_thread::sleep_for(2s);
 
             continue;
         }

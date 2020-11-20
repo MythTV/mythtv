@@ -1078,7 +1078,7 @@ void MythBDBuffer::HandleBDEvent(BD_EVENT &Event)
         case BD_EVENT_STILL_TIME:
             // we use the clip information to determine the still frame status
             // sleep a little
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
             break;
         case BD_EVENT_SEEK:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_SEEK"));
@@ -1132,7 +1132,7 @@ void MythBDBuffer::HandleBDEvent(BD_EVENT &Event)
         case BD_EVENT_IDLE:
             /* Nothing to do. Playlist is not playing, but title applet is running.
              * Application should not call bd_read*() immediately again to avoid busy loop. */
-            std::this_thread::sleep_for(std::chrono::milliseconds(40));
+            std::this_thread::sleep_for(40ms);
             break;
 
         case BD_EVENT_MENU:
@@ -1227,7 +1227,7 @@ void MythBDBuffer::WaitForPlayer(void)
     m_playerWait = true;
     int count = 0;
     while (m_playerWait && count++ < 200)
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
     if (m_playerWait)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Player wait state was not cleared");

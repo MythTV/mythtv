@@ -22,8 +22,6 @@
 
 #include "mythmainwindow.h"
 
-using namespace std::chrono_literals;
-
 #define LOC QString("RAOP Conn: ")
 #define MAX_PACKET_SIZE  2048
 

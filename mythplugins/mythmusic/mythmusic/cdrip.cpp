@@ -62,8 +62,6 @@
 #include "mythlogging.h"
 #include "vorbisencoder.h"
 
-using namespace std::chrono_literals;
-
 #ifdef HAVE_CDIO
 // libparanoia compatibility
 #ifndef cdrom_paranoia

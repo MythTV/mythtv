@@ -47,7 +47,7 @@ class TestMythTimer: public QObject
     {
         MythTimer t;
         t.start();
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.elapsed() > 500);
     }
 
@@ -55,21 +55,21 @@ class TestMythTimer: public QObject
     {
         MythTimer t;
         t.restart();
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.elapsed() > 500);
     }
 
     static void TimeDoesNotElapseImmediatelyAfterConstructionByDefault(void)
     {
         MythTimer t;
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.elapsed() == 0);
     }
 
     static void TimeDoesNotElapsesImmediatelyAfterContructionIfIntended(void)
     {
         MythTimer t(MythTimer::kStartRunning);
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.elapsed() > 500);
     }
 
@@ -77,9 +77,9 @@ class TestMythTimer: public QObject
     {
         MythTimer t;
         t.start();
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.elapsed() > 500);
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(500ms);
         QVERIFY(t.elapsed() > 1000);
     }
 
@@ -87,9 +87,9 @@ class TestMythTimer: public QObject
     {
         MythTimer t;
         t.start();
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.restart() > 500);
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.elapsed() > 500 && t.elapsed() < 750);
     }
 
@@ -98,7 +98,7 @@ class TestMythTimer: public QObject
         MythTimer t;
         t.start();
         t.addMSecs(-250);
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.elapsed() > 250 && t.elapsed() < 500);
     }
 
@@ -107,7 +107,7 @@ class TestMythTimer: public QObject
         MythTimer t;
         t.addMSecs(-250);
         t.start();
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.elapsed() > 500);
     }
 
@@ -116,7 +116,7 @@ class TestMythTimer: public QObject
         MythTimer t;
         t.addMSecs(-250);
         t.restart();
-        std::this_thread::sleep_for(std::chrono::milliseconds(520));
+        std::this_thread::sleep_for(520ms);
         QVERIFY(t.elapsed() > 500);
     }
 };

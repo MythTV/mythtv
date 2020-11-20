@@ -748,7 +748,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
     {
         DatabaseParams params = m_parent->GetDatabaseParams();
         QString        response;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(1s);
         // give user chance to skip config
         std::cout << std::endl << error.toLocal8Bit().constData() << std::endl << std::endl;
         response = getResponse("Would you like to configure the database "
@@ -935,7 +935,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                     for (int temp = 0; temp < useTimeout * 2 ; temp++)
                     {
                         processEvents();
-                        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                        std::this_thread::sleep_for(500ms);
                     }
                     break;
                 }

@@ -22,8 +22,6 @@
 #include "archiveutil.h"
 #include "logviewer.h"
 
-using namespace std::chrono_literals;
-
 void showLogViewer(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();

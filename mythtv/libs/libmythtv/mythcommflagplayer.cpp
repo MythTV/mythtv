@@ -123,7 +123,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
         {
             // Give DB some breathing room if it gets far behind..
             if (myFramesPlayed - pmap_last > 5000)
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::this_thread::sleep_for(200ms);
 
             // If we're already saving, just save a larger block next time..
             if (MythRebuildSaver::GetCount(m_decoder) < 1)
@@ -243,7 +243,7 @@ MythVideoFrame* MythCommFlagPlayer::GetRawVideoFrame(long long FrameNumber)
     while (!m_videoOutput->ValidVideoFrames() && ((tries++) < 100))
     {
         m_decodeOneFrame = true;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
         if ((tries & 10) == 10)
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Waited 100ms for video frame");
     }

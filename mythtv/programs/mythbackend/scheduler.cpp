@@ -5086,7 +5086,7 @@ int Scheduler::FillRecordingDir(
     {
         if (cnt++ % 20 == 0)
             LOG(VB_SCHEDULE, LOG_WARNING, "Waiting for main server.");
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
     }
 
     int fsID = -1;

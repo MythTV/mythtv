@@ -46,7 +46,7 @@ bool PrePostRollFlagger::go()
         if (m_bStop)
             return false;
 
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(5s);
         secsSince = m_startedAt.secsTo(MythDate::current());
     }
 
@@ -155,7 +155,7 @@ bool PrePostRollFlagger::go()
                 return false;
             emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
                 "Waiting for recording to finish"));
-            std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::this_thread::sleep_for(5s);
         }
         m_stillRecording = false;
          m_myTotalFrames = m_player->GetTotalFrameCount();
@@ -279,12 +279,12 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
         while (m_bPaused)
         {
             emit breathe();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(1s);
         }
 
         // sleep a little so we don't use all cpu even if we're niced
         if (!m_fullSpeed && !m_stillRecording)
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
 
         if (((currentFrameNumber % 500) == 0) ||
             ((m_showProgress || m_stillRecording) &&

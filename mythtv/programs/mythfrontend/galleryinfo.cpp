@@ -6,8 +6,6 @@
 #include "mythcoreutil.h"
 #include "mythdate.h"
 
-using namespace std::chrono_literals;
-
 
 //! The exif/video tags comprising the Basic file info
 static QSet<QString> kBasicInfoSet {

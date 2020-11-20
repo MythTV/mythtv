@@ -263,7 +263,7 @@ bool DVBChannel::Open(DVBChannel *who)
                         "fatal error or too many attempts."));
             return false;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
     }
 
     // Get the basic information from the frontend

@@ -31,8 +31,6 @@
 #include "zmclient.h"
 #include "zmconsole.h"
 
-using namespace std::chrono_literals;
-
 constexpr std::chrono::milliseconds STATUS_UPDATE_TIME { 10s }; // update the status every 10 seconds
 constexpr std::chrono::milliseconds TIME_UPDATE_TIME   {  1s }; // update the time every 1 second
 

@@ -212,7 +212,7 @@ Q_SLOT void MythExternRecApp::Close(void)
         LOG(VB_RECORD, LOG_INFO, LOC + ": Closing application.");
         m_run = false;
         m_runCond.notify_all();
-        std::this_thread::sleep_for(std::chrono::microseconds(50));
+        std::this_thread::sleep_for(50us);
     }
 
     if (m_tuneProc.state() == QProcess::Running)
@@ -225,7 +225,7 @@ Q_SLOT void MythExternRecApp::Close(void)
     {
         m_proc.closeReadChannel(QProcess::StandardOutput);
         TerminateProcess(m_proc, "App");
-        std::this_thread::sleep_for(std::chrono::microseconds(50));
+        std::this_thread::sleep_for(50us);
     }
 
     emit Done();
@@ -713,7 +713,7 @@ Q_SLOT void MythExternRecApp::StartStreaming(const QString & serial)
         return;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(50ms);
 
     if (m_proc.state() != QProcess::Running)
     {

@@ -47,7 +47,7 @@ QStringList VBox::probeDevices(void)
     MythTimer searchTime; searchTime.start();
     while (totalTime.elapsed() < milliSeconds)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(25));
+        std::this_thread::sleep_for(25ms);
         int ttl = milliSeconds - totalTime.elapsed();
         if ((searchTime.elapsed() > 249) && (ttl > 1000))
         {

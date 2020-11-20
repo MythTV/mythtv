@@ -17,8 +17,6 @@
 
 #include <tvremoteutil.h>
 
-using namespace std::chrono_literals;
-
 static constexpr std::chrono::milliseconds UPDATE_INTERVAL { 15s };
 
 IdleScreen::IdleScreen(MythScreenStack *parent)

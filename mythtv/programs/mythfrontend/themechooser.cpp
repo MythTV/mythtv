@@ -35,8 +35,6 @@
 #include "mythuistatetype.h"
 #include "mythuitext.h"
 
-using namespace std::chrono_literals;
-
 #define LOC      QString("ThemeChooser: ")
 #define LOC_WARN QString("ThemeChooser, Warning: ")
 #define LOC_ERR  QString("ThemeChooser, Error: ")

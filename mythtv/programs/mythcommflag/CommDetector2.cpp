@@ -57,8 +57,8 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
     timersub(&now, framestart, &elapsed);
 
     // Sleep for one frame's worth of time.
-    long sleepus = usperframe - elapsed.tv_sec * 1000000 - elapsed.tv_usec;
-    if (sleepus <= 0)
+    auto sleepus = std::chrono::microseconds(usperframe - elapsed.tv_sec * 1000000 - elapsed.tv_usec);
+    if (sleepus <= 0us)
         return;
 
     if (flaglag > minlag)
@@ -73,7 +73,7 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
         // Slow down; increase sleep time
         sleepus = sleepus * 3 / 2;
     }
-    std::this_thread::sleep_for(std::chrono::microseconds(sleepus));
+    std::this_thread::sleep_for(sleepus);
 }
 
 bool MythPlayerInited(FrameAnalyzerItem &pass,
@@ -581,7 +581,7 @@ bool CommDetector2::go(void)
             while (m_bPaused)
             {
                 emit breathe();
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::this_thread::sleep_for(1s);
             }
 
             if (!searchingForLogo(m_logoFinder, *m_currentPass) &&
@@ -624,7 +624,7 @@ bool CommDetector2::go(void)
 
             // sleep a little so we don't use all cpu even if we're niced
             if (!m_fullSpeed && !m_isRecording)
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                std::this_thread::sleep_for(10ms);
 
             if (m_sendBreakMapUpdates && (m_breakMapUpdateRequested ||
                         !(m_currentFrameNumber % 500)))

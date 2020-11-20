@@ -4308,7 +4308,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     // Wait for recorder to start.
     m_stateChangeLock.unlock();
     while (!m_recorder->IsRecording() && !m_recorder->IsErrored())
-        std::this_thread::sleep_for(std::chrono::microseconds(5));
+        std::this_thread::sleep_for(5us);
     m_stateChangeLock.lock();
 
     if (GetV4LChannel())

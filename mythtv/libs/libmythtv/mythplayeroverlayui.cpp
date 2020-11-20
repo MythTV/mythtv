@@ -5,8 +5,6 @@
 #include "livetvchain.h"
 #include "mythplayeroverlayui.h"
 
-using namespace std::chrono_literals;
-
 #define LOC QString("PlayerOverlay: ")
 
 // N.B. Overlay is initialised without a player - it must be set before it can be used

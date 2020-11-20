@@ -990,7 +990,7 @@ void MpegRecorder::run(void)
                 elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
                 while ((bytesRead / elapsed) > dummyBPS)
                 {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                    std::this_thread::sleep_for(50ms);
                     elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
                 }
             }
@@ -999,7 +999,7 @@ void MpegRecorder::run(void)
                 elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
                 while ((GetFramesWritten() / elapsed) > 30)
                 {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                    std::this_thread::sleep_for(50ms);
                     elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
                 }
             }
@@ -1349,7 +1349,7 @@ bool MpegRecorder::StartEncoding(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "StartEncoding: read failing, re-opening device: " + ENO);
             close(m_readfd);
-            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            std::this_thread::sleep_for(2ms);
             m_readfd = open(m_videodevice.toLatin1().constData(),
                           O_RDWR | O_NONBLOCK);
             if (m_readfd < 0)
@@ -1365,7 +1365,7 @@ bool MpegRecorder::StartEncoding(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("StartEncoding: read failed, retry in %1 msec:")
                 .arg(100 * idx) + ENO);
-            std::this_thread::sleep_for(std::chrono::microseconds(idx * 100));
+            std::this_thread::sleep_for(idx * 100us);
         }
     }
     if (idx == 50)
@@ -1429,7 +1429,7 @@ void MpegRecorder::StopEncoding(void)
     if (m_deviceReadBuffer && m_deviceReadBuffer->IsRunning())
     {
         // allow last bits of data through..
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(20ms);
         m_deviceReadBuffer->Stop();
     }
 

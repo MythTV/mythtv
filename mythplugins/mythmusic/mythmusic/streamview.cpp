@@ -31,8 +31,6 @@
 #include "musicplayer.h"
 #include "streamview.h"
 
-using namespace std::chrono_literals;
-
 StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
     : MusicCommon(parent, parentScreen, "streamview")
 {

@@ -262,7 +262,7 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
     if (m_local)
     {
         while (kState_ChangingState == GetState())
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            std::this_thread::sleep_for(100us);
 
         if (IsBusyRecording())
             tvrec = m_tv->GetRecording();

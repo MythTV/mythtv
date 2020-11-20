@@ -55,8 +55,6 @@
 
 #include "guistartup.h"
 
-using namespace std::chrono_literals;
-
 GUIStartup::GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop)
                  :MythScreenType(parent, "GUIStartup"),
                   m_loop(eventLoop),

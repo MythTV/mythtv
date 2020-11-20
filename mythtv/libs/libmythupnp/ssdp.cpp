@@ -349,7 +349,7 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
                         break;
                     }
                     retries++;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    std::this_thread::sleep_for(10ms);
                     continue;
                 }
                 LOG(VB_GENERAL, LOG_ERR, QString("Socket readBlock error %1")

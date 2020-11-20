@@ -409,7 +409,7 @@ qulonglong BufferedSocketDevice::WaitForMore(
             // give up control
 
             // should be some multiple of msWait.
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(1ms);
 
         }
     }

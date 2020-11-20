@@ -190,7 +190,7 @@ void SatIPStreamHandler::run(void)
         }
 
         // Delay to avoid busy wait loop
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(20ms);
 
     }
     LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): " + "shutdown");

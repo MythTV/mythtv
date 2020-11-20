@@ -11,10 +11,6 @@
 #include "livetvchain.h"
 #include "mythplayerui.h"
 
-// Std
-#include <chrono>
-using namespace std::chrono_literals;
-
 #define LOC QString("PlayerUI: ")
 
 MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,

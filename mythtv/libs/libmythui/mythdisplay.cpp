@@ -14,10 +14,6 @@
 #include "mythegl.h"
 #include "mythmainwindow.h"
 
-// Std
-#include <chrono>
-using namespace std::chrono_literals;
-
 #ifdef USING_DBUS
 #include "platforms/mythdisplaymutter.h"
 #endif

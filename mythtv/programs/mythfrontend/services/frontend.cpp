@@ -153,7 +153,7 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
         timer.start();
         while (!timer.hasExpired(10000) &&
                (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
     }
 
     if (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox")
@@ -164,11 +164,11 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
         timer.start();
         while (!timer.hasExpired(10000) &&
                (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
 
         timer.start();
         while (!timer.hasExpired(10000) && (!MythMainWindow::IsTopScreenInitialized()))
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
     }
 
     if (GetMythUI()->GetCurrentLocation().toLower() == "playbackbox")

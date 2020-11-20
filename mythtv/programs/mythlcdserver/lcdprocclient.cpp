@@ -36,8 +36,6 @@
 #define LCD_VERSION_4 1
 #define LCD_VERSION_5 2
 
-using namespace std::chrono_literals;
-
 static constexpr std::chrono::milliseconds LCD_TIME_TIME       { 3s };
 static constexpr std::chrono::milliseconds LCD_SCROLLLIST_TIME { 2s };
 
@@ -157,7 +155,7 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
         while (--timeout && m_socket->state() != QAbstractSocket::ConnectedState)
         {
             qApp->processEvents();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(1ms);
 
             if (m_socket->state() == QAbstractSocket::ConnectedState)
             {

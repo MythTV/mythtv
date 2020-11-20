@@ -26,8 +26,6 @@
 #include "welcomedialog.h"
 #include "welcomesettings.h"
 
-using namespace std::chrono_literals;
-
 static constexpr std::chrono::milliseconds UPDATE_STATUS_INTERVAL { 30s };
 static constexpr std::chrono::milliseconds UPDATE_SCREEN_INTERVAL { 15s };
 

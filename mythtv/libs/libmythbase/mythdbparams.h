@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 /// Structure containing the basic Database parameters
 class MBASE_PUBLIC DatabaseParams

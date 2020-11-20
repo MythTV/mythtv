@@ -14,8 +14,6 @@
 
 #include <QTimer>
 
-using namespace std::chrono_literals;
-
 
 MiniPlayer::MiniPlayer(MythScreenStack *parent)
           : MusicCommon(parent, nullptr, "music_miniplayer")

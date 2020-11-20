@@ -299,7 +299,7 @@ bool ClassicCommDetector::go()
         if (m_bStop)
             return false;
 
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(2s);
         secsSince = m_recordingStartedAt.secsTo(MythDate::current());
     }
 
@@ -337,7 +337,7 @@ bool ClassicCommDetector::go()
             if (m_bStop)
                 return false;
 
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::this_thread::sleep_for(2s);
             secsSince = m_recordingStartedAt.secsTo(MythDate::current());
         }
     }
@@ -487,12 +487,12 @@ bool ClassicCommDetector::go()
         while (m_bPaused)
         {
             emit breathe();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(1s);
         }
 
         // sleep a little so we don't use all cpu even if we're niced
         if (!m_fullSpeed && !m_stillRecording)
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
 
         if (((currentFrameNumber % 500) == 0) ||
             ((m_showProgress || m_stillRecording) &&

@@ -757,7 +757,7 @@ void AudioTestThread::run()
                 }
                 m_audioOutput->Drain();
                 m_audioOutput->Pause(true);
-                std::this_thread::sleep_for(std::chrono::milliseconds(500)); // .5s pause
+                std::this_thread::sleep_for(500ms); // .5s pause
                 m_audioOutput->Pause(false);
             }
             if (m_channel >= 0)

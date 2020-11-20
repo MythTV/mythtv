@@ -54,7 +54,7 @@ BackendConnectionManager::BackendConnectionManager()
 BackendConnectionManager::~BackendConnectionManager()
 {
     while (m_reconnecting)
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        std::this_thread::sleep_for(250ms);
     gCoreContext->removeListener(this);
 }
 

@@ -475,7 +475,7 @@ int MythPlayer::OpenFile(int Retries)
                 return -1;
             }
             LOG(VB_GENERAL, LOG_WARNING, LOC + "OpenFile() waiting on data");
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            std::this_thread::sleep_for(50ms);
         }
 
         m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
@@ -1092,7 +1092,7 @@ void MythPlayer::DecoderLoop(bool pause)
 
         if (m_totalDecoderPause || m_inJumpToProgramPause)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(1ms);
             continue;
         }
 
@@ -1130,7 +1130,7 @@ void MythPlayer::DecoderLoop(bool pause)
         if (m_isDummy || ((m_decoderPaused || m_ffrewSkip == 0 || obey_eof) &&
                           !m_decodeOneFrame))
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(1ms);
             continue;
         }
 
@@ -1207,7 +1207,7 @@ bool MythPlayer::DecoderGetFrame(DecodeType decodetype, bool unsafe)
             }
             return false;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(1ms);
     }
     m_videobufRetries = 0;
 
@@ -1618,7 +1618,7 @@ void MythPlayer::WaitForSeek(uint64_t frame, uint64_t seeksnap_wanted)
         emit CheckCallbacks();
 
         // Wait a little
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
 
         // provide some on screen feedback if seeking is slow
         count++;

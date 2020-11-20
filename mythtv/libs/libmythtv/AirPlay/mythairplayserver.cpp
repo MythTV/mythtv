@@ -28,8 +28,6 @@
 #include "bonjourregister.h"
 #include "mythairplayserver.h"
 
-using namespace std::chrono_literals;
-
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = nullptr;
 MThread*           MythAirplayServer::gMythAirplayServerThread = nullptr;
 QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMutex::Recursive);

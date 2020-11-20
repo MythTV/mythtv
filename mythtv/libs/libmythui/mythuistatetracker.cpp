@@ -51,7 +51,7 @@ void MythUIStateTracker::GetFreshState(QVariantMap &State)
 
     int tries = 0;
     while ((tries++ < 100) && (MythUIStateTracker::TimeSinceLastUpdate() >= 500))
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
 
     MythUIStateTracker::GetState(State);
 }

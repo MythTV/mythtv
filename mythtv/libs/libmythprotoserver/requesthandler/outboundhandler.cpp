@@ -14,8 +14,6 @@
 
 #include "requesthandler/outboundhandler.h"
 
-using namespace std::chrono_literals;
-
 OutboundRequestHandler::OutboundRequestHandler(void) 
 {
     m_timer.setSingleShot(true);

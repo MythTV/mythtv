@@ -428,7 +428,7 @@ bool RemoteGetRecordingStatus(
 
             state = strlist[0].toInt();
             if (kState_ChangingState == state)
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                std::this_thread::sleep_for(5ms);
         }
 
         if (kState_RecordingOnly == state || kState_WatchingRecording == state)

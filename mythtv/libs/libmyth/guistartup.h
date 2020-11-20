@@ -34,6 +34,9 @@
 // MythDB headers
 #include "mythexp.h"
 
+// MythBase headers
+#include "mythchrono.h"
+
 // MythUI headers
 #include "mythscreentype.h"
 
