@@ -24,9 +24,9 @@ class ExternIO
     ExternIO(const QString & app, const QStringList & args);
     ~ExternIO(void);
 
-    bool Ready(int fd, int timeout, const QString & what);
-    int Read(QByteArray & buffer, int maxlen, int timeout = 2500);
-    QString GetStatus(int timeout = 2500);
+    bool Ready(int fd, std::chrono::milliseconds timeout, const QString & what);
+    int Read(QByteArray & buffer, int maxlen, std::chrono::milliseconds timeout = 2500ms);
+    QString GetStatus(std::chrono::milliseconds timeout = 2500ms);
     int Write(const QByteArray & buffer);
     bool Run(void);
     bool Error(void) const { return !m_error.isEmpty(); }

@@ -71,14 +71,14 @@ ExternIO::~ExternIO(void)
     delete[] m_buffer;
 }
 
-bool ExternIO::Ready(int fd, int timeout, const QString & what)
+bool ExternIO::Ready(int fd, std::chrono::milliseconds timeout, const QString & what)
 {
 #if !defined( USING_MINGW ) && !defined( _MSC_VER )
     std::array<struct pollfd,2> m_poll {};
 
     m_poll[0].fd = fd;
     m_poll[0].events = POLLIN | POLLPRI;
-    int ret = poll(m_poll.data(), 1, timeout);
+    int ret = poll(m_poll.data(), 1, timeout.count());
 
     if (m_poll[0].revents & POLLHUP)
     {
@@ -103,7 +103,7 @@ bool ExternIO::Ready(int fd, int timeout, const QString & what)
     return false;
 }
 
-int ExternIO::Read(QByteArray & buffer, int maxlen, int timeout)
+int ExternIO::Read(QByteArray & buffer, int maxlen, std::chrono::milliseconds timeout)
 {
     if (Error())
     {
@@ -164,7 +164,7 @@ int ExternIO::Read(QByteArray & buffer, int maxlen, int timeout)
     return len;
 }
 
-QString ExternIO::GetStatus(int timeout)
+QString ExternIO::GetStatus(std::chrono::milliseconds timeout)
 {
     if (Error())
     {
@@ -174,7 +174,7 @@ QString ExternIO::GetStatus(int timeout)
         return QByteArray();
     }
 
-    int waitfor = m_status.atEnd() ? timeout : 0;
+    std::chrono::milliseconds waitfor = m_status.atEnd() ? timeout : 0ms;
     if (Ready(m_appErr, waitfor, "status"))
     {
         std::array<char,2048> buffer {};
@@ -231,7 +231,7 @@ bool ExternIO::Run(void)
     LOG(VB_RECORD, LOG_INFO, QString("ExternIO::Run()"));
 
     Fork();
-    GetStatus(10);
+    GetStatus(10ms);
 
     return true;
 }
@@ -697,7 +697,7 @@ void ExternalStreamHandler::run(void)
             }
 
             if (m_io && (sz = PACKET_SIZE - remainder) > 0)
-                read_len = m_io->Read(buffer, sz, 100);
+                read_len = m_io->Read(buffer, sz, 100ms);
             else
                 read_len = 0;
         }
@@ -1270,7 +1270,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
 
         /* Try to keep in sync, if External app was too slow in responding
          * to previous query, consume the response before sending new query */
-        m_io->GetStatus(0);
+        m_io->GetStatus(0ms);
 
         /* Send new query */
         m_io->Write(buf);
@@ -1278,7 +1278,7 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
         MythTimer timer(MythTimer::kStartRunning);
         while (timer.elapsed() < timeout)
         {
-            result = m_io->GetStatus(timeout.count());
+            result = m_io->GetStatus(timeout);
             if (m_io->Error())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1387,7 +1387,7 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
         MythTimer timer(MythTimer::kStartRunning);
         while (timer.elapsed() < timeout)
         {
-            result = m_io->GetStatus(timeout.count());
+            result = m_io->GetStatus(timeout);
             if (m_io->Error())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -1514,7 +1514,7 @@ bool ExternalStreamHandler::CheckForError(void)
 
     do
     {
-        result = m_io->GetStatus(0);
+        result = m_io->GetStatus(0ms);
         if (!result.isEmpty())
         {
             if (m_apiVersion > 1)
@@ -1546,8 +1546,8 @@ void ExternalStreamHandler::PurgeBuffer(void)
     if (m_io)
     {
         QByteArray buffer;
-        m_io->Read(buffer, PACKET_SIZE, 1);
-        m_io->GetStatus(1);
+        m_io->Read(buffer, PACKET_SIZE, 1ms);
+        m_io->GetStatus(1ms);
     }
 }
 
