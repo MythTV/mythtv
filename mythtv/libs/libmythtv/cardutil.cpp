@@ -2322,6 +2322,9 @@ InputNames CardUtil::GetConfiguredDVBInputs(const QString &device)
 //
 QStringList CardUtil::CapabilitiesToString(uint64_t capabilities)
 {
+    QStringList caps;
+#ifdef USING_DVB
+
     struct fe_caps_name {
         unsigned  idx;
         const char *name;
@@ -2361,12 +2364,12 @@ QStringList CardUtil::CapabilitiesToString(uint64_t capabilities)
         { FE_NEEDS_BENDING,              "NEEDS_BENDING" },
     };
 
-    QStringList caps;
     for (uint i = 0; i < sizeof(fe_caps_name)/sizeof(fe_caps_name[0]); i++)
     {
         if (capabilities & fe_caps_name[i].idx)
             caps.append(fe_caps_name[i].name);
     }
+#endif  // USING_DVB
     return caps;
 }
 
