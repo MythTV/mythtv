@@ -1428,7 +1428,7 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
     MythCheckNotification n(QObject::tr("Backend is online"), sLocation);
     n.SetId(m_registration);
     n.SetParent(this);
-    n.SetDuration(5);
+    n.SetDuration(5s);
     GetNotificationCenter()->Queue(n);
     m_lastCheck = QDateTime();
 }

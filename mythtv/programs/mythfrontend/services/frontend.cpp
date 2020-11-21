@@ -79,7 +79,7 @@ bool  Frontend::SendNotification(bool  Error,
                      Message,
                      Origin.isNull() ? tr("FrontendServices") : Origin,
                      Description, Image, Extra,
-                     ProgressText, Progress, Timeout,
+                     ProgressText, Progress, std::chrono::seconds(Timeout),
                      Fullscreen, Visibility, (MythNotification::Priority)Priority);
     return true;
 }

@@ -3990,7 +3990,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
                             "Recording", title,
                             tr("See 'Tuning timeout' in mythtv-setup "
                                "for this input."));
-        mn.SetDuration(30);
+        mn.SetDuration(30s);
         gCoreContext->SendEvent(MythEvent(mn));
 
         LOG(VB_GENERAL, LOG_WARNING, LOC +

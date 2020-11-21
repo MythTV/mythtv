@@ -1635,7 +1635,7 @@ void MusicPlayer::sendNotification(int notificationID, const QString &title, con
 
     n->SetId(notificationID);
     n->SetParent(this);
-    n->SetDuration(5);
+    n->SetDuration(5s);
     n->SetFullScreen(false);
     GetNotificationCenter()->Queue(*n);
     delete n;

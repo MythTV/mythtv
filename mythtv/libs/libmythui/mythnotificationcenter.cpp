@@ -31,7 +31,7 @@
 #define LOC QString("NotificationCenter: ")
 
 #define HGAP 5
-#define DEFAULT_DURATION 5000  // in ms
+static constexpr std::chrono::milliseconds DEFAULT_DURATION { 5s };
 
 //// MythNotificationCenterEvent
 
@@ -700,20 +700,20 @@ void MythNotificationScreen::ProcessTimer(void)
     GetScreenStack()->PopScreen(this, true, true);
 }
 
-void MythNotificationScreen::SetSingleShotTimer(int s, bool update)
+void MythNotificationScreen::SetSingleShotTimer(std::chrono::seconds s, bool update)
 {
     // only registered application can display non-expiring notification
-    if (m_id > 0 && s < 0)
+    if (m_id > 0 && s < 0s)
         return;
 
-    int ms = s * 1000;
+    std::chrono::milliseconds ms = s;
     ms = ms <= DEFAULT_DURATION ? DEFAULT_DURATION : ms;
 
     if (!update)
     {
         m_creation = MythDate::current();
     }
-    m_expiry = MythDate::current().addMSecs(ms);
+    m_expiry = MythDate::current().addMSecs(ms.count());
 
     m_timer->stop();
     m_timer->setSingleShot(true);
@@ -1115,7 +1115,7 @@ void NCPrivate::DeleteUnregistered(void)
             if (screen != nullptr && !m_suspended.contains(id))
             {
                 // mark the screen for deletion if no timer is set
-                if (screen->m_duration <= 0 || closeimemdiately)
+                if (screen->m_duration <= 0s || closeimemdiately)
                 {
                     m_deletedScreens.append(screen);
                     needdelete = true;
@@ -1432,7 +1432,7 @@ void ShowNotificationError(const QString &msg,
                            const MythNotification::Priority priority)
 {
     ShowNotification(true, msg, from, detail,
-                     QString(), QString(), QString(), -1, -1, false,
+                     QString(), QString(), QString(), -1, -1s, false,
                      visibility, priority);
 }
 
@@ -1443,7 +1443,7 @@ void ShowNotification(const QString &msg,
                       const MythNotification::Priority priority)
 {
     ShowNotification(false, msg, from, detail,
-                     QString(), QString(), QString(), -1, -1, false,
+                     QString(), QString(), QString(), -1, -1s, false,
                      visibility, priority);
 }
 
@@ -1454,7 +1454,7 @@ void ShowNotification(bool  error,
                       const QString &image,
                       const QString &extra,
                       const QString &progress_text, float progress,
-                      int   duration,
+                      std::chrono::seconds   duration,
                       bool  fullscreen,
                       const VNMask visibility,
                       const MythNotification::Priority priority,
@@ -1472,7 +1472,7 @@ void ShowNotification(MythNotification::Type type,
                       const QString &image,
                       const QString &extra,
                       const QString &progress_text, float progress,
-                      int   duration,
+                      std::chrono::seconds duration,
                       bool  fullscreen,
                       const VNMask visibility,
                       const MythNotification::Priority priority,
@@ -1496,12 +1496,12 @@ void ShowNotification(MythNotification::Type type,
         type == MythNotification::Busy)
     {
         n = new MythNotification(type, data);
-        if (!duration &&
+        if (duration != 0s &&
             type != MythNotification::Check &&
             type != MythNotification::Busy)
         {
             // default duration for those type of notifications is 10s
-            duration = 10;
+            duration = 10s;
         }
     }
     else

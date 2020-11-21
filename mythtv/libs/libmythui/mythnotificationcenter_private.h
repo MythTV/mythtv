@@ -172,7 +172,7 @@ public:
     void UpdatePlayback(float progress, const QString &text);
     void UpdateFrom(const MythNotificationScreen &s);
 
-    void SetSingleShotTimer(int s, bool update = false);
+    void SetSingleShotTimer(std::chrono::seconds s, bool update = false);
     void SetErrorState(void) const;
 
     // UI methods
@@ -205,7 +205,7 @@ public:
     QString                     m_origin;
     QString                     m_description;
     QString                     m_extra;
-    int                         m_duration        {-1};
+    std::chrono::seconds        m_duration        {-1s};
     float                       m_progress        {-1.0F};
     QString                     m_progresstext;
     bool                        m_fullscreen      {false};

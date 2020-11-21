@@ -1750,8 +1750,8 @@ void MythRAOPConnection::deleteEventClient(void)
 void MythRAOPConnection::SendNotification(bool update)
 {
     QImage image = m_artwork.isEmpty() ? QImage() : QImage::fromData(m_artwork);
-    int duration  =
-        lroundf(static_cast<float>(m_progressEnd-m_progressStart) / m_frameRate);
+    auto duration = std::chrono::seconds(
+        lroundf(static_cast<float>(m_progressEnd-m_progressStart) / m_frameRate));
     int position =
         (m_progressCurrent-m_progressStart) / m_frameRate;
 
@@ -1769,7 +1769,7 @@ void MythRAOPConnection::SendNotification(bool update)
     }
     n->SetId(m_id);
     n->SetParent(this);
-    n->SetDuration(5);
+    n->SetDuration(5s);
     n->SetFullScreen(gCoreContext->GetBoolSetting("AirPlayFullScreen"));
     GetNotificationCenter()->Queue(*n);
     m_firstSend = true;
