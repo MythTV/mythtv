@@ -765,7 +765,6 @@ DTVTunerType CardUtil::ConvertToTunerType(DTVModulationSystem delsys)
             tunertype = DTVTunerType::kTunerTypeDVBS2;
             break;
         case DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A:
-        case DTVModulationSystem::kModulationSystem_DVBC_ANNEX_B:
         case DTVModulationSystem::kModulationSystem_DVBC_ANNEX_C:
             tunertype = DTVTunerType::kTunerTypeDVBC;
             break;
@@ -779,6 +778,7 @@ DTVTunerType CardUtil::ConvertToTunerType(DTVModulationSystem delsys)
             tunertype = DTVTunerType::kTunerTypeDVBT;
             break;
         case DTVModulationSystem::kModulationSystem_ATSC:
+        case DTVModulationSystem::kModulationSystem_DVBC_ANNEX_B:
             tunertype = DTVTunerType::kTunerTypeATSC;
             break;
         case DTVModulationSystem::kModulationSystem_UNDEFINED:
@@ -855,9 +855,9 @@ DTVTunerType CardUtil::GetTunerTypeFromMultiplex(uint mplexid)
 // Get the currently configured delivery system from the database
 DTVModulationSystem CardUtil::GetDeliverySystem(uint inputid)
 {
-    QString delsys_db = GetDeliverySystemFromDB(inputid);
+    QString ds = GetDeliverySystemFromDB(inputid);
     DTVModulationSystem delsys;
-    delsys.Parse(delsys_db);
+    delsys.Parse(ds);
     return delsys;
 }
 
@@ -917,7 +917,7 @@ DTVModulationSystem CardUtil::ProbeCurrentDeliverySystem(int fd_frontend)
         return delsys;
 	}
 
-    delsys.Parse(DTVModulationSystem::toString(prop.u.data));
+    delsys = prop.u.data;
 
 #else
     Q_UNUSED(fd_frontend);
@@ -1004,11 +1004,7 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
     // Get all supported delivery systems from the card
     QString msg = "Supported delivery systems:";
     QStringList delsyslist = ProbeDeliverySystems(fd);
-    for (const auto & it : qAsConst(delsyslist))
-    {
-        msg += " ";
-        msg += it;
-    }
+    msg.append(delsyslist.join(" "));
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 
     // If the current delivery system is DVB-T and DVB-T2 is supported then select DVB-T2
@@ -2320,6 +2316,60 @@ InputNames CardUtil::GetConfiguredDVBInputs(const QString &device)
     return list;
 }
 
+// Convert DVBv5 frontend capabilities from bitmask to string
+//
+// Source linuxtv.org v4l-utils/lib/libdvbv5/dvb-v5.c
+//
+QStringList CardUtil::CapabilitiesToString(uint64_t capabilities)
+{
+    struct fe_caps_name {
+        unsigned  idx;
+        const char *name;
+    };
+
+    struct fe_caps_name fe_caps_name[31] = {
+        { FE_CAN_2G_MODULATION,          "CAN_2G_MODULATION" },
+        { FE_CAN_8VSB,                   "CAN_8VSB" },
+        { FE_CAN_16VSB,                  "CAN_16VSB" },
+        { FE_CAN_BANDWIDTH_AUTO,         "CAN_BANDWIDTH_AUTO" },
+        { FE_CAN_FEC_1_2,                "CAN_FEC_1_2" },
+        { FE_CAN_FEC_2_3,                "CAN_FEC_2_3" },
+        { FE_CAN_FEC_3_4,                "CAN_FEC_3_4" },
+        { FE_CAN_FEC_4_5,                "CAN_FEC_4_5" },
+        { FE_CAN_FEC_5_6,                "CAN_FEC_5_6" },
+        { FE_CAN_FEC_6_7,                "CAN_FEC_6_7" },
+        { FE_CAN_FEC_7_8,                "CAN_FEC_7_8" },
+        { FE_CAN_FEC_8_9,                "CAN_FEC_8_9" },
+        { FE_CAN_FEC_AUTO,               "CAN_FEC_AUTO" },
+        { FE_CAN_GUARD_INTERVAL_AUTO,    "CAN_GUARD_INTERVAL_AUTO" },
+        { FE_CAN_HIERARCHY_AUTO,         "CAN_HIERARCHY_AUTO" },
+        { FE_CAN_INVERSION_AUTO,         "CAN_INVERSION_AUTO" },
+        { FE_CAN_MULTISTREAM,            "CAN_MULTISTREAM" },
+        { FE_CAN_MUTE_TS,                "CAN_MUTE_TS" },
+        { FE_CAN_QAM_16,                 "CAN_QAM_16" },
+        { FE_CAN_QAM_32,                 "CAN_QAM_32" },
+        { FE_CAN_QAM_64,                 "CAN_QAM_64" },
+        { FE_CAN_QAM_128,                "CAN_QAM_128" },
+        { FE_CAN_QAM_256,                "CAN_QAM_256" },
+        { FE_CAN_QAM_AUTO,               "CAN_QAM_AUTO" },
+        { FE_CAN_QPSK,                   "CAN_QPSK" },
+        { FE_CAN_RECOVER,                "CAN_RECOVER" },
+        { FE_CAN_TRANSMISSION_MODE_AUTO, "CAN_TRANSMISSION_MODE_AUTO" },
+        { FE_CAN_TURBO_FEC,              "CAN_TURBO_FEC" },
+        { FE_HAS_EXTENDED_CAPS,          "HAS_EXTENDED_CAPS" },
+        { FE_IS_STUPID,                  "IS_STUPID" },
+        { FE_NEEDS_BENDING,              "NEEDS_BENDING" },
+    };
+
+    QStringList caps;
+    for (uint i = 0; i < sizeof(fe_caps_name)/sizeof(fe_caps_name[0]); i++)
+    {
+        if (capabilities & fe_caps_name[i].idx)
+            caps.append(fe_caps_name[i].name);
+    }
+    return caps;
+}
+
 QStringList CardUtil::ProbeVideoInputs(const QString& device, const QString& inputtype)
 {
     QStringList ret;
@@ -2712,13 +2762,16 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 #if 0
     LOG(VB_RECORD, LOG_DEBUG, LOC + QString("DVB Device (%1)").arg(devname));
 #endif
-    QString tmp = devname;
 
     if (DVB_DEV_FRONTEND == type)
+    {
         return devname;
+    }
+
     if (DVB_DEV_DVR == type)
     {
-        tmp = tmp.replace(devname.indexOf("frontend"), 8, "dvr");
+        QString tmp = devname;
+        tmp = tmp.replace(tmp.indexOf("frontend"), 8, "dvr");
         if (QFile::exists(tmp))
         {
             LOG(VB_RECORD, LOG_DEBUG, LOC +
@@ -2726,15 +2779,25 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
             return tmp;
         }
 
-        // use dvr0, allows multi-standard frontends which only have one dvr
-        devname = devname.replace(devname.indexOf("frontend"), 9, "dvr0");
+        // Use dvr0, allows multi-standard frontends which only have one dvr
+        tmp = devname;
+        tmp = tmp.replace(tmp.indexOf("frontend"), 9, "dvr0");
+        if (QFile::exists(tmp))
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend dvr number not matching, using dvr0 instead (%1)").arg(tmp));
+            return tmp;
+        }
+
         LOG(VB_RECORD, LOG_DEBUG, LOC +
-            QString("Adapter Frontend dvr number not matching, using dvr0 instead (%1)").arg(devname));
-        return devname;
+            QString("Adapter Frontend no dvr device found for (%1)").arg(devname));
+        return "";
     }
+
     if (DVB_DEV_DEMUX == type)
     {
-        tmp = tmp.replace(devname.indexOf("frontend"), 8, "demux");
+        QString tmp = devname;
+        tmp = tmp.replace(tmp.indexOf("frontend"), 8, "demux");
         if (QFile::exists(tmp))
         {
             LOG(VB_RECORD, LOG_DEBUG, LOC +
@@ -2742,15 +2805,25 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
             return tmp;
         }
 
-        // use demux0, allows multi-standard frontends, which only have one demux
-        devname = devname.replace(devname.indexOf("frontend"), 9, "demux0");
+        // Use demux0, allows multi-standard frontends, which only have one demux
+        tmp = devname;
+        tmp = tmp.replace(tmp.indexOf("frontend"), 9, "demux0");
+        if (QFile::exists(tmp))
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend demux number not matching, using demux0 instead (%1)").arg(tmp));
+            return tmp;
+        }
+
         LOG(VB_RECORD, LOG_DEBUG, LOC +
-            QString("Adapter Frontend demux number not matching, using demux0 instead (%1)").arg(devname));
-        return devname;
+            QString("Adapter Frontend no demux device found for (%1)").arg(devname));
+        return "";
     }
+
     if (DVB_DEV_CA == type)
     {
-        tmp = tmp.replace(devname.indexOf("frontend"), 8, "ca");
+        QString tmp = devname;
+        tmp = tmp.replace(tmp.indexOf("frontend"), 8, "ca");
         if (QFile::exists(tmp))
         {
             LOG(VB_RECORD, LOG_DEBUG, LOC +
@@ -2758,16 +2831,30 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
             return tmp;
         }
 
-        // use ca0, allows multi-standard frontends, which only have one ca
-        devname = devname.replace(devname.indexOf("frontend"), 9, "ca0");
+        // Use ca0, allows multi-standard frontends, which only have one ca
+        tmp = devname;
+        tmp = tmp.replace(tmp.indexOf("frontend"), 9, "ca0");
+        if (QFile::exists(tmp))
+        {
+            LOG(VB_RECORD, LOG_DEBUG, LOC +
+                QString("Adapter Frontend ca number not matching, using ca0 instead (%1)").arg(tmp));
+            return tmp;
+        }
+
         LOG(VB_RECORD, LOG_DEBUG, LOC +
-            QString("Adapter Frontend ca number not matching, using ca0 instead (%1)").arg(devname));
-        return devname;
+            QString("Adapter Frontend no ca device found for (%1)").arg(devname));
+        return "";
     }
+
     if (DVB_DEV_AUDIO == type)
+    {
         return devname.replace(devname.indexOf("frontend"), 8, "audio");
+    }
+
     if (DVB_DEV_VIDEO == type)
+    {
         return devname.replace(devname.indexOf("frontend"), 8, "video");
+    }
 
     return "";
 }

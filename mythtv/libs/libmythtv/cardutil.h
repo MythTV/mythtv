@@ -412,6 +412,7 @@ class MTV_PUBLIC CardUtil
     static int          OpenVideoDevice(const QString &device);
     static QString      GetDeviceName(dvb_dev_type_t type, const QString &device);
     static InputNames   GetConfiguredDVBInputs(const QString &device);
+    static QStringList  CapabilitiesToString(uint64_t capabilities);
 
     // V4L info
     static bool         hasV4L2(int videofd);
