@@ -39,7 +39,7 @@
 #endif
 
 // The following are a set of helper classes to allow easy translation
-// between the different string representations of various tuning params.
+// between the different string representations of various tuning parameters.
 
 struct DTVParamHelperStruct
 {
@@ -51,7 +51,7 @@ using DTVParamStringVec = std::vector<std::string>;
 
 /** \class DTVParamHelper
  *  \brief Helper abstract template to do some of the mundane portions
- *         of translating and comparing the paramater strings.
+ *         of translating and comparing the parameter strings.
  */
 class DTVParamHelper
 {
@@ -694,14 +694,12 @@ class DTVModulationSystem : public DTVParamHelper
                   "Modulation System types don't match DVB includes.");
 #endif
 
-    explicit DTVModulationSystem(Types _default = kModulationSystem_UNDEFINED)
-        : DTVParamHelper(_default) { }
-    DTVModulationSystem& operator=(const Types _value)
+    explicit DTVModulationSystem(uint _value = kModulationSystem_UNDEFINED)
+        : DTVParamHelper(_value) { }
+
+    DTVModulationSystem& operator=(uint _value)
         { m_value = _value; return *this; }
-#ifdef USING_DVB
-    DTVModulationSystem& operator=(fe_delivery_system_t type)
-        { m_value = type; return *this; }
-#endif
+
     bool IsCompatible(const DTVModulationSystem other) const
         { return
             (m_value == other.m_value) ||
