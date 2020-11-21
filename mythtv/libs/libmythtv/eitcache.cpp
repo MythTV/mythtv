@@ -331,7 +331,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
 {
     m_accessCnt++;
 
-    if (m_accessCnt % 500000 == 50000)
+    if ((m_accessCnt == 10000) || (m_accessCnt == 100000) || (m_accessCnt % 1000000 == 0))
     {
         LOG(VB_EIT, LOG_INFO, GetStatistics());
         WriteToDB();
