@@ -36,7 +36,7 @@ TVBrowseHelper::~TVBrowseHelper()
     BrowseWait();
 }
 
-void TVBrowseHelper::BrowseInit(uint BrowseMaxForward, bool BrowseAllTuners,
+void TVBrowseHelper::BrowseInit(std::chrono::seconds BrowseMaxForward, bool BrowseAllTuners,
                                 bool UseChannelGroups, const QString &DBChannelOrdering)
 {
     m_dbBrowseMaxForward = BrowseMaxForward;
@@ -438,7 +438,7 @@ void TVBrowseHelper::run()
         if (lasttime < curtime)
             m_browseStartTime = curtime.toString(Qt::ISODate);
 
-        QDateTime maxtime  = curtime.addSecs(m_dbBrowseMaxForward);
+        QDateTime maxtime  = curtime.addSecs(m_dbBrowseMaxForward.count());
         if ((lasttime > maxtime) && (direction == BROWSE_RIGHT))
             continue;
 

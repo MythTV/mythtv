@@ -105,17 +105,17 @@ const std::chrono::milliseconds TV::kSleepTimerDialogTimeout      = 45s;
 const std::chrono::milliseconds TV::kIdleTimerDialogTimeout       = 45s;
 const std::chrono::milliseconds TV::kVideoExitDialogTimeout       = 2min;
 
-const uint TV::kEndOfPlaybackCheckFrequency  = 250;
-const uint TV::kEndOfRecPromptCheckFrequency = 250;
-const uint TV::kEmbedCheckFrequency          = 250;
-const uint TV::kSpeedChangeCheckFrequency    = 250;
-const uint TV::kErrorRecoveryCheckFrequency  = 250;
+const std::chrono::milliseconds TV::kEndOfPlaybackCheckFrequency  = 250ms;
+const std::chrono::milliseconds TV::kEndOfRecPromptCheckFrequency = 250ms;
+const std::chrono::milliseconds TV::kEmbedCheckFrequency          = 250ms;
+const std::chrono::milliseconds TV::kSpeedChangeCheckFrequency    = 250ms;
+const std::chrono::milliseconds TV::kErrorRecoveryCheckFrequency  = 250ms;
 #ifdef USING_VALGRIND
-const uint TV::kEndOfPlaybackFirstCheckTimer = 60000;
+const std::chrono::milliseconds TV::kEndOfPlaybackFirstCheckTimer = 1min;
 #else
-const uint TV::kEndOfPlaybackFirstCheckTimer = 5000;
+const std::chrono::milliseconds TV::kEndOfPlaybackFirstCheckTimer = 5s;
 #endif
-const uint TV::kSaveLastPlayPosTimeout       = 30000;
+const std::chrono::milliseconds TV::kSaveLastPlayPosTimeout       = 30s;
 
 /**
  * \brief stores last program info. maintains info so long as
@@ -1007,20 +1007,20 @@ void TV::ReloadKeys()
 class TV::SleepTimerInfo
 {
   public:
-    SleepTimerInfo(QString String, unsigned long Seconds)
+    SleepTimerInfo(QString String, std::chrono::milliseconds MilliSeconds)
       : dispString(std::move(String)),
-        seconds(Seconds) {}
+        milliseconds(MilliSeconds) {}
     QString   dispString;
-    unsigned long seconds;
+    std::chrono::milliseconds milliseconds;
 };
 
 const vector<TV::SleepTimerInfo> TV::s_sleepTimes =
 {
-    { tr("Off",   "Sleep timer"),      0 },
-    { tr("30m",   "Sleep timer"),  30*60 },
-    { tr("1h",    "Sleep timer"),  60*60 },
-    { tr("1h30m", "Sleep timer"),  90*60 },
-    { tr("2h",    "Sleep timer"), 120*60}
+    { tr("Off",   "Sleep timer"),   0min },
+    { tr("30m",   "Sleep timer"),  30min },
+    { tr("1h",    "Sleep timer"),  60min },
+    { tr("1h30m", "Sleep timer"),  90min },
+    { tr("2h",    "Sleep timer"), 120min }
 };
 
 /*!
@@ -1116,9 +1116,8 @@ void TV::InitFromDB()
 
     QString db_channel_ordering;
 
-    // convert from minutes to ms.
-    m_dbIdleTimeout        = kv["LiveTVIdleTimeout"].toUInt() * 60 * 1000;
-    uint db_browse_max_forward = kv["BrowseMaxForward"].toUInt() * 60;
+    m_dbIdleTimeout            = std::chrono::minutes(kv["LiveTVIdleTimeout"].toUInt());
+    auto db_browse_max_forward = std::chrono::minutes(kv["BrowseMaxForward"].toUInt());
     m_dbPlaybackExitPrompt = kv["PlaybackExitPrompt"].toInt();
     m_dbAutoSetWatched     = (kv["AutomaticSetWatched"].toInt() != 0);
     m_dbEndOfRecExitPrompt = (kv["EndOfRecordingExitPrompt"].toInt() != 0);
@@ -1251,7 +1250,7 @@ bool TV::Init()
     SetExitPlayer(false, false);
 
     m_errorRecoveryTimerId   = StartTimer(kErrorRecoveryCheckFrequency, __LINE__);
-    m_lcdTimerId             = StartTimer(1, __LINE__);
+    m_lcdTimerId             = StartTimer(1ms, __LINE__);
     m_speedChangeTimerId     = StartTimer(kSpeedChangeCheckFrequency, __LINE__);
     m_saveLastPlayPosTimerId = StartTimer(kSaveLastPlayPosTimeout, __LINE__);
 
@@ -1565,10 +1564,11 @@ bool TV::LiveTV(bool ShowDialogs, const ChannelInfoList &Selection)
         m_switchToRec = nullptr;
 
         // Start Idle Timer
-        if (m_dbIdleTimeout > 0)
+        if (m_dbIdleTimeout > 0ms)
         {
-            m_idleTimerId = StartTimer(static_cast<int>(m_dbIdleTimeout), __LINE__);
-            LOG(VB_GENERAL, LOG_INFO, QString("Using Idle Timer. %1 minutes").arg(m_dbIdleTimeout * (1.0 / 60000.0)));
+            m_idleTimerId = StartTimer(m_dbIdleTimeout, __LINE__);
+            LOG(VB_GENERAL, LOG_INFO, QString("Using Idle Timer. %1 minutes")
+                .arg(duration_cast<std::chrono::minutes>(m_dbIdleTimeout).count()));
         }
 
         ReturnPlayerLock();
@@ -2701,7 +2701,7 @@ void TV::HandleLCDVolumeTimerEvent()
     m_lcdVolumeTimerId = 0;
 }
 
-int TV::StartTimer(int Interval, int Line)
+int TV::StartTimer(std::chrono::milliseconds Interval, int Line)
 {
     int timer = startTimer(Interval);
     if (!timer)
@@ -2764,7 +2764,7 @@ void TV::SetErrored()
 {
     m_playerContext.m_errored = true;
     KillTimer(m_errorRecoveryTimerId);
-    m_errorRecoveryTimerId = StartTimer(1, __LINE__);
+    m_errorRecoveryTimerId = StartTimer(1ms, __LINE__);
 }
 
 void TV::PrepToSwitchToRecordedProgram(const ProgramInfo &ProgInfo)
@@ -2834,7 +2834,7 @@ void TV::SetExitPlayer(bool SetIt, bool WantsTo)
     {
         m_wantsToQuit = WantsTo;
         if (!m_exitPlayerTimerId)
-            m_exitPlayerTimerId = StartTimer(1, __LINE__);
+            m_exitPlayerTimerId = StartTimer(1ms, __LINE__);
     }
     else
     {
@@ -2962,10 +2962,10 @@ void TV::HandlePseudoLiveTVTimerEvent()
 
     if (restartTimer)
         if (!m_pseudoChangeChanTimerId)
-            m_pseudoChangeChanTimerId = StartTimer(25, __LINE__);
+            m_pseudoChangeChanTimerId = StartTimer(25ms, __LINE__);
 }
 
-void TV::SetSpeedChangeTimer(int When, int Line)
+void TV::SetSpeedChangeTimer(std::chrono::milliseconds When, int Line)
 {
     if (m_speedChangeTimerId)
         KillTimer(m_speedChangeTimerId);
@@ -3297,7 +3297,7 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
     if (m_idleTimerId)
     {
         KillTimer(m_idleTimerId);
-        m_idleTimerId = StartTimer(static_cast<int>(m_dbIdleTimeout), __LINE__);
+        m_idleTimerId = StartTimer(m_dbIdleTimeout, __LINE__);
     }
 
 #ifdef Q_OS_LINUX
@@ -4735,7 +4735,7 @@ bool TV::StartPlayer(TVState desiredState)
     if (ok)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created player."));
-        SetSpeedChangeTimer(25, __LINE__);
+        SetSpeedChangeTimer(25ms, __LINE__);
     }
     else
     {
@@ -4778,7 +4778,7 @@ void TV::DoPlay()
 
     MythMainWindow::DisableScreensaver();
 
-    SetSpeedChangeTimer(0, __LINE__);
+    SetSpeedChangeTimer(0ms, __LINE__);
     gCoreContext->emitTVPlaybackPlaying();
 }
 
@@ -4837,7 +4837,7 @@ void TV::DoTogglePauseFinish(float Time, bool ShowOSD)
         MythMainWindow::DisableScreensaver();
     }
 
-    SetSpeedChangeTimer(0, __LINE__);
+    SetSpeedChangeTimer(0ms, __LINE__);
 }
 
 /*! \brief Check whether playback is paused
@@ -5139,7 +5139,7 @@ void TV::NormalSpeed()
         m_player->Play(m_playerContext.m_tsNormal, true);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    SetSpeedChangeTimer(0, __LINE__);
+    SetSpeedChangeTimer(0ms, __LINE__);
 }
 
 void TV::ChangeSpeed(int Direction)
@@ -5185,7 +5185,7 @@ void TV::ChangeSpeed(int Direction)
     DoPlayerSeek(time);
     UpdateOSDSeekMessage(mesg, kOSDTimeout_Med);
 
-    SetSpeedChangeTimer(0, __LINE__);
+    SetSpeedChangeTimer(0ms, __LINE__);
 }
 
 float TV::StopFFRew()
@@ -5208,7 +5208,7 @@ float TV::StopFFRew()
         m_player->Play(m_playerContext.m_tsNormal, true);
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
-    SetSpeedChangeTimer(0, __LINE__);
+    SetSpeedChangeTimer(0ms, __LINE__);
 
     return time;
 }
@@ -5288,7 +5288,7 @@ void TV::SetFFRew(int Index)
 
     UpdateOSDSeekMessage(mesg, kOSDTimeout_None);
 
-    SetSpeedChangeTimer(0, __LINE__);
+    SetSpeedChangeTimer(0ms, __LINE__);
 }
 
 void TV::DoQueueTranscode(const QString& Profile)
@@ -5690,7 +5690,7 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
                 ScheduleStateChange();
                 ok = true;
                 m_playerContext.PushPreviousChannel();
-                SetSpeedChangeTimer(25, __LINE__);
+                SetSpeedChangeTimer(25ms, __LINE__);
             }
             else
             {
@@ -5793,7 +5793,7 @@ void TV::AddKeyToInputQueue(char Key)
         m_queuedInput   = m_queuedInput.append(Key).right(kInputKeysMax);
         m_queuedChanNum = m_queuedChanNum.append(Key).right(kInputKeysMax);
         if (!m_queueInputTimerId)
-            m_queueInputTimerId = StartTimer(10, __LINE__);
+            m_queueInputTimerId = StartTimer(10ms, __LINE__);
     }
 
     bool commitSmart = false;
@@ -5851,7 +5851,7 @@ bool TV::ProcessSmartChannel(QString &InputStr)
             chan = chan.left(chan.length()-1);
             m_queuedChanNum = chan;
             if (!m_queueInputTimerId)
-                m_queueInputTimerId = StartTimer(10, __LINE__);
+                m_queueInputTimerId = StartTimer(10ms, __LINE__);
         }
     }
 
@@ -5894,7 +5894,7 @@ bool TV::ProcessSmartChannel(QString &InputStr)
 
     InputStr = m_queuedChanNum;
     if (!m_queueInputTimerId)
-        m_queueInputTimerId = StartTimer(10, __LINE__);
+        m_queueInputTimerId = StartTimer(10ms, __LINE__);
 
     return !is_not_complete;
 }
@@ -6202,7 +6202,7 @@ void TV::ChangeChannel(const ChannelInfoList &Options)
             m_queuedChanNum = channum;
             m_queuedChanID  = chanid;
             if (!m_queueInputTimerId)
-                m_queueInputTimerId = StartTimer(10, __LINE__);
+                m_queueInputTimerId = StartTimer(10ms, __LINE__);
             break;
         }
     }
@@ -6238,7 +6238,7 @@ void TV::PopPreviousChannel(bool ImmediateChange)
         m_queuedChanNum = prev_channum;
         m_queuedChanID  = 0;
         if (!m_queueInputTimerId)
-            m_queueInputTimerId = StartTimer(10, __LINE__);
+            m_queueInputTimerId = StartTimer(10ms, __LINE__);
     }
 
     if (ImmediateChange)
@@ -6403,7 +6403,7 @@ void TV::UpdateOSDSignal(const QStringList &List)
         if (&m_playerContext.m_lastSignalMsg != &List)
             m_playerContext.m_lastSignalMsg = List;
         ReturnOSDLock();
-        m_signalMonitorTimerId = StartTimer(1, __LINE__);
+        m_signalMonitorTimerId = StartTimer(1ms, __LINE__);
         return;
     }
     ReturnOSDLock();
@@ -6629,7 +6629,7 @@ void TV::UpdateLCD()
     // Make sure the LCD information gets updated shortly
     if (m_lcdTimerId)
         KillTimer(m_lcdTimerId);
-    m_lcdTimerId = StartTimer(1, __LINE__);
+    m_lcdTimerId = StartTimer(1ms, __LINE__);
 }
 
 void TV::ShowLCDChannelInfo()
@@ -6975,7 +6975,7 @@ void TV::VolumeChange(bool Up, int NewVolume)
 
             if (m_lcdVolumeTimerId)
                 KillTimer(m_lcdVolumeTimerId);
-            m_lcdVolumeTimerId = StartTimer(2000, __LINE__);
+            m_lcdVolumeTimerId = StartTimer(2s, __LINE__);
         }
     }
 }
@@ -7043,7 +7043,7 @@ void TV::ChangeTimeStretch(int Dir, bool AllowEdit)
         }
     }
 
-    SetSpeedChangeTimer(0, __LINE__);
+    SetSpeedChangeTimer(0ms, __LINE__);
 }
 
 void TV::ToggleSleepTimer()
@@ -7059,13 +7059,13 @@ void TV::ToggleSleepTimer()
     {
         KillTimer(m_sleepTimerId);
         m_sleepTimerId = 0;
-        m_sleepTimerTimeout = 0;
+        m_sleepTimerTimeout = 0ms;
     }
 
-    if (s_sleepTimes[m_sleepIndex].seconds != 0)
+    if (s_sleepTimes[m_sleepIndex].milliseconds != 0ms)
     {
-        m_sleepTimerTimeout = static_cast<uint>(s_sleepTimes[m_sleepIndex].seconds * 1000);
-        m_sleepTimerId = StartTimer(static_cast<int>(m_sleepTimerTimeout), __LINE__);
+        m_sleepTimerTimeout = s_sleepTimes[m_sleepIndex].milliseconds;
+        m_sleepTimerId = StartTimer(m_sleepTimerTimeout, __LINE__);
     }
 
     text = tr("Sleep ") + " " + s_sleepTimes[m_sleepIndex].dispString;
@@ -7079,7 +7079,7 @@ void TV::ShowOSDSleep()
 
     QString message = tr("MythTV was set to sleep after %1 minutes and will exit in %d seconds.\n"
                          "Do you wish to continue watching?")
-            .arg(static_cast<double>(m_sleepTimerTimeout * (1.0F / 60000.0F)));
+            .arg(duration_cast<std::chrono::minutes>(m_sleepTimerTimeout).count());
 
     emit ChangeOSDDialog( { OSD_DLG_SLEEP, message, (int)kSleepTimerDialogTimeout.count(),
                         { { tr("Yes"), "DIALOG_SLEEP_YES_0" },
@@ -7100,7 +7100,7 @@ void TV::HandleOSDSleep(const QString& Action)
             KillTimer(m_sleepDialogTimerId);
             m_sleepDialogTimerId = 0;
         }
-        m_sleepTimerId = StartTimer(static_cast<int>(m_sleepTimerTimeout) * 1000, __LINE__);
+        m_sleepTimerId = StartTimer(m_sleepTimerTimeout, __LINE__);
     }
     else
     {
@@ -7134,7 +7134,7 @@ void TV::ShowOSDIdle()
 
     QString message = tr("MythTV has been idle for %1 minutes and "
                          "will exit in %d seconds. Are you still watching?")
-                         .arg(static_cast<double>(m_dbIdleTimeout * (1.0F / 60000.0F)));
+                         .arg(duration_cast<std::chrono::minutes>(m_dbIdleTimeout).count());
 
     emit ChangeOSDDialog( { OSD_DLG_IDLE, message, (int)kIdleTimerDialogTimeout.count(),
                         { { tr("Yes"), "DIALOG_IDLE_YES_0" },
@@ -7157,7 +7157,7 @@ void TV::HandleOSDIdle(const QString& Action)
         }
         if (m_idleTimerId)
             KillTimer(m_idleTimerId);
-        m_idleTimerId = StartTimer(static_cast<int>(m_dbIdleTimeout), __LINE__);
+        m_idleTimerId = StartTimer(m_dbIdleTimeout, __LINE__);
     }
     else
     {
@@ -7444,7 +7444,7 @@ void TV::customEvent(QEvent *Event)
                 {
                     m_playerContext.SetPseudoLiveTV(&pi, kPseudoChangeChannel);
                     if (!m_pseudoChangeChanTimerId)
-                        m_pseudoChangeChanTimerId = StartTimer(0, __LINE__);
+                        m_pseudoChangeChanTimerId = StartTimer(0ms, __LINE__);
                 }
             }
             else
@@ -7511,7 +7511,7 @@ void TV::customEvent(QEvent *Event)
             {
                 m_networkControlCommands.enqueue(message);
                 if (!m_networkControlTimerId)
-                    m_networkControlTimerId = StartTimer(1, __LINE__);
+                    m_networkControlTimerId = StartTimer(1ms, __LINE__);
             }
         }
     }
@@ -8232,7 +8232,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
                     m_queuedChanNum = new_channum;
                     m_queuedChanID  = 0;
                     if (!m_queueInputTimerId)
-                        m_queueInputTimerId = StartTimer(10, __LINE__);
+                        m_queueInputTimerId = StartTimer(10ms, __LINE__);
                 }
 
                 // Turn off OSD Channel Num so the channel
@@ -9549,11 +9549,9 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
     return true;
 }
 
-#define MINUTE (60*1000)
-
 void TV::ToggleSleepTimer(const QString& Time)
 {
-    uint mins = 0;
+    std::chrono::minutes mins { 0min };
 
     if (Time == ACTION_TOGGLESLEEP + "ON")
     {
@@ -9564,9 +9562,8 @@ void TV::ToggleSleepTimer(const QString& Time)
         }
         else
         {
-            mins = 60;
-            m_sleepTimerTimeout = mins * MINUTE;
-            m_sleepTimerId = StartTimer(static_cast<int>(m_sleepTimerTimeout), __LINE__);
+            m_sleepTimerTimeout = mins = 60min;
+            m_sleepTimerId = StartTimer(m_sleepTimerTimeout, __LINE__);
         }
     }
     else
@@ -9580,19 +9577,19 @@ void TV::ToggleSleepTimer(const QString& Time)
         if (Time.length() > 11)
         {
             bool intRead = false;
-            mins = Time.rightRef(Time.length() - 11).toUInt(&intRead);
+            mins = std::chrono::minutes(Time.rightRef(Time.length() - 11).toUInt(&intRead));
 
             if (intRead)
             {
                 // catch 120 -> 240 mins
-                if (mins < 30)
+                if (mins < 30min)
                 {
                     mins *= 10;
                 }
             }
             else
             {
-                mins = 0;
+                mins = 0min;
                 LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid time " + Time);
             }
         }
@@ -9601,16 +9598,16 @@ void TV::ToggleSleepTimer(const QString& Time)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid time string " + Time);
         }
 
-        if (mins)
+        if (mins > 0min)
         {
-            m_sleepTimerTimeout = mins * MINUTE;
-            m_sleepTimerId = StartTimer(static_cast<int>(m_sleepTimerTimeout), __LINE__);
+            m_sleepTimerTimeout = mins;
+            m_sleepTimerId = StartTimer(m_sleepTimerTimeout, __LINE__);
         }
     }
 
     QString out;
-    if (mins != 0)
-        out = tr("Sleep") + " " + QString::number(mins);
+    if (mins != 0min)
+        out = tr("Sleep") + " " + QString::number(mins.count());
     else
         out = tr("Sleep") + " " + s_sleepTimes[0].dispString;
     emit ChangeOSDMessage(out);
@@ -9678,7 +9675,7 @@ void TV::PauseLiveTV()
         m_lockTimerOn = true;
     }
 
-    SetSpeedChangeTimer(0, __LINE__);
+    SetSpeedChangeTimer(0ms, __LINE__);
 }
 
 /**
@@ -9696,7 +9693,7 @@ void TV::UnpauseLiveTV(bool Quietly)
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
         if (m_playerContext.m_buffer)
             m_playerContext.m_buffer->IgnoreLiveEOF(false);
-        SetSpeedChangeTimer(0, __LINE__);
+        SetSpeedChangeTimer(0ms, __LINE__);
     }
 
     ITVRestart(true);

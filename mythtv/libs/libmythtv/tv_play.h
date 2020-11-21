@@ -234,12 +234,10 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool DiscMenuHandleAction(const QStringList& Actions) const;
 
     // Timers and timer events
-    int  StartTimer(int Interval, int Line);
-    int  StartTimer(std::chrono::milliseconds Interval, int Line)
-        { return StartTimer(Interval.count(), Line); }
+    int  StartTimer(std::chrono::milliseconds Interval, int Line);
     void KillTimer(int Id);
 
-    void SetSpeedChangeTimer(int When, int Line);
+    void SetSpeedChangeTimer(std::chrono::milliseconds When, int Line);
     void HandleEndOfPlaybackTimerEvent();
     void HandleEndOfRecordingExitPromptTimerEvent();
     void HandleVideoExitDialogTimerEvent();
@@ -505,7 +503,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     // Configuration variables from database
     QString           m_baseFilters;
     QString           m_dbChannelFormat {"<num> <sign>"};
-    uint              m_dbIdleTimeout {0};
+    std::chrono::milliseconds m_dbIdleTimeout {0ms};
     int               m_dbPlaybackExitPrompt {0};
     uint              m_dbAutoexpireDefault {0};
     bool              m_dbAutoSetWatched {false};
@@ -567,7 +565,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     class SleepTimerInfo;
     static const std::vector<SleepTimerInfo> s_sleepTimes;
     uint                   m_sleepIndex {0};          ///< Index into sleep_times.
-    uint                   m_sleepTimerTimeout {0};   ///< Current sleep timeout in msec
+    std::chrono::milliseconds m_sleepTimerTimeout {0ms};   ///< Current sleep timeout in msec
     int                    m_sleepTimerId {0};        ///< Timer for turning off playback.
     int                    m_sleepDialogTimerId {0};  ///< Timer for sleep dialog.
     /// Timer for turning off playback after idle period.
@@ -761,13 +759,13 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     /// How long to display idle timer dialog in msec
     static const std::chrono::milliseconds kVideoExitDialogTimeout;
 
-    static const uint kEndOfPlaybackCheckFrequency;
-    static const uint kEmbedCheckFrequency;
-    static const uint kSpeedChangeCheckFrequency;
-    static const uint kErrorRecoveryCheckFrequency;
-    static const uint kEndOfRecPromptCheckFrequency;
-    static const uint kEndOfPlaybackFirstCheckTimer;
-    static const uint kSaveLastPlayPosTimeout;
+    static const std::chrono::milliseconds kEndOfPlaybackCheckFrequency;
+    static const std::chrono::milliseconds kEmbedCheckFrequency;
+    static const std::chrono::milliseconds kSpeedChangeCheckFrequency;
+    static const std::chrono::milliseconds kErrorRecoveryCheckFrequency;
+    static const std::chrono::milliseconds kEndOfRecPromptCheckFrequency;
+    static const std::chrono::milliseconds kEndOfPlaybackFirstCheckTimer;
+    static const std::chrono::milliseconds kSaveLastPlayPosTimeout;
 };
 
 #endif
