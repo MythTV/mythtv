@@ -102,7 +102,7 @@ bool TVRec::CreateChannel(const QString &startchannel,
     if (m_parentId)
     {
         TVRec *parentTV = GetTVRec(m_parentId);
-        if (parentTV && parentTV->GetState() == kState_Error)
+        if (parentTV && parentTV->GetState() != kState_Error)
             setchan = false;
     }
     m_channel = ChannelBase::CreateChannel(
@@ -1719,7 +1719,7 @@ QString TVRec::GetStartChannel(uint inputid)
 {
     QString startchan;
 
-    LOG(VB_RECORD, LOG_INFO, LOC2 + QString("GetStartChannel[%1]")
+    LOG(VB_RECORD, LOG_INFO, LOC2 + QString("GetStartChannel for input %1")
         .arg(inputid));
 
     // Get last tuned channel from database, to use as starting channel
