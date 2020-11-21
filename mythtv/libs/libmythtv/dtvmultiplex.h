@@ -91,20 +91,20 @@ class MTV_PUBLIC DTVMultiplex
 
   public:
     // Basic tuning
-    uint64_t         m_frequency  {0};
-    uint64_t         m_symbolRate {0};
-    DTVInversion     m_inversion;
-    DTVBandwidth     m_bandwidth;
-    DTVCodeRate      m_hpCodeRate;      ///< High Priority FEC rate
-    DTVCodeRate      m_lpCodeRate;      ///< Low Priority FEC rate
-    DTVModulation    m_modulation;
-    DTVTransmitMode  m_transMode;
-    DTVGuardInterval m_guardInterval;
-    DTVHierarchy     m_hierarchy;
-    DTVPolarity      m_polarity;
-    DTVCodeRate      m_fec;             ///< Inner Forward Error Correction rate
-    DTVModulationSystem m_modSys;       ///< Modulation system
-    DTVRollOff       m_rolloff;
+    uint64_t            m_frequency  {0};
+    uint64_t            m_symbolRate {0};
+    DTVInversion        m_inversion;
+    DTVBandwidth        m_bandwidth;
+    DTVCodeRate         m_hpCodeRate;       // High Priority FEC rate
+    DTVCodeRate         m_lpCodeRate;       // Low Priority FEC rate
+    DTVModulation       m_modulation;
+    DTVTransmitMode     m_transMode;
+    DTVGuardInterval    m_guardInterval;
+    DTVHierarchy        m_hierarchy;
+    DTVPolarity         m_polarity;
+    DTVCodeRate         m_fec;              // Inner Forward Error Correction rate
+    DTVModulationSystem m_modSys;           // Modulation system
+    DTVRollOff          m_rolloff;
 
     // Optional additional info
     uint             m_mplex      {0};

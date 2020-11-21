@@ -257,7 +257,6 @@ bool DTVMultiplex::ParseDVB_C(
 
     // Only DVB-C variants can be used with a DVB-C tuner.
     if ((DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A != m_modSys) &&
-        (DTVModulationSystem::kModulationSystem_DVBC_ANNEX_B != m_modSys) &&
         (DTVModulationSystem::kModulationSystem_DVBC_ANNEX_C != m_modSys))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unsupported DVB-C modulation system " +
