@@ -118,7 +118,7 @@ void LyricsView::customEvent(QEvent *event)
                 rs = gPlayer->getCurrentTrackTime() * 1000; 
             }
             else
-                rs = oe->elapsedSeconds() * 1000;
+                rs = oe->elapsedSeconds().count() * 1000;
 
             int pos = 0;
             for (int x = 0; x < m_lyricsList->GetCount(); x++)

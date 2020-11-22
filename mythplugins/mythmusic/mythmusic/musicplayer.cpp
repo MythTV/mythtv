@@ -870,9 +870,9 @@ void MusicPlayer::customEvent(QEvent *event)
             return;
 
         if (m_playMode != PLAYMODE_RADIO)
-            m_currentTime = oe->elapsedSeconds();
+            m_currentTime = oe->elapsedSeconds().count();
         else
-            m_currentTime = oe->elapsedSeconds() - m_lastTrackStart;
+            m_currentTime = oe->elapsedSeconds().count() - m_lastTrackStart;
 
         if (m_playMode != PLAYMODE_RADIO && !m_updatedLastplay)
         {

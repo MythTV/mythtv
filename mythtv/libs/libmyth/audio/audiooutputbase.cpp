@@ -1610,7 +1610,7 @@ void AudioOutputBase::Status()
     if (ct / 1000 != m_currentSeconds)
     {
         m_currentSeconds = ct / 1000;
-        OutputEvent e(m_currentSeconds, ct, m_sourceBitRate, m_sourceSampleRate,
+        OutputEvent e(std::chrono::seconds(m_currentSeconds), ct, m_sourceBitRate, m_sourceSampleRate,
                       AudioOutputSettings::FormatToBits(m_format), m_sourceChannels);
         dispatch(e);
     }

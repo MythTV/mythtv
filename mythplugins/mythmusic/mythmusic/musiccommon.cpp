@@ -1266,7 +1266,7 @@ void MusicCommon::customEvent(QEvent *event)
                 m_currentTime = 0;
         }
         else
-            m_currentTime = rs = oe->elapsedSeconds();
+            m_currentTime = rs = oe->elapsedSeconds().count();
 
         QString time_string = getTimeString(rs, m_maxTime);
 
