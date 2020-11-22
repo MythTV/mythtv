@@ -104,9 +104,9 @@ class ScreenSaverX11Private
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "ResetTimer -- begin");
         StopTimer();
         // To be clear - this setting has no UI
-        if (m_timeoutInterval == -1)
-            m_timeoutInterval = gCoreContext->GetNumSetting("xscreensaverInterval", 50) * 1000;
-        if (m_timeoutInterval > 0)
+        if (m_timeoutInterval == -1s)
+            m_timeoutInterval = gCoreContext->GetDurSetting<std::chrono::seconds>("xscreensaverInterval", 50s);
+        if (m_timeoutInterval > 0s)
             StartTimer();
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "ResetTimer -- end");
     }
@@ -207,7 +207,7 @@ class ScreenSaverX11Private
     bool m_xscreensaverRunning {false};
     BOOL m_dpmsenabled         {static_cast<BOOL>(false)};
 
-    int m_timeoutInterval      {-1};
+    std::chrono::seconds m_timeoutInterval {-1s};
     QTimer *m_resetTimer       {nullptr};
 
     QDateTime m_lastDeactivated;
