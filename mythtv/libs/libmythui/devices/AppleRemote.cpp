@@ -28,7 +28,6 @@ AppleRemote*    AppleRemote::_instance = nullptr;
 #define REMOTE_SWITCH_COOKIE 19
 #define REMOTE_COOKIE_STR    "19_"
 #define LONG_PRESS_COUNT     10
-#define KEY_RESPONSE_TIME    150  /* msecs before we send a key up event */
 
 #define LOC QString("AppleRemote::")
 
