@@ -40,6 +40,10 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+// C++ headers
+#include <chrono>
+#include <thread>
+
 // MythTV headers
 #include "mythconfig.h"
 #include "mythdb.h"
@@ -51,20 +55,21 @@
 #include "tv_rec.h"
 
 // Returned by drivers on unsupported DVBv3 ioctl calls
-#ifndef ENOTSUPP
-#define ENOTSUPP 524
-#endif
+// #ifndef ENOTSUPP
+// #define ENOTSUPP 524
+// #endif
 
 // Local functions
-static void drain_dvb_events(int fd);
-static bool wait_for_backend(int fd, int timeout_ms);
 static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
-    DTVTunerType /*tuner_type*/, const DTVMultiplex& /*tuning*/, int intermediate_freq, bool can_fec_auto);
+    DTVTunerType tuner_type, const DTVMultiplex& tuning, uint intermediate_freq, bool can_fec_auto);
 static DTVMultiplex dvbparams_to_dtvmultiplex(
-    DTVTunerType /*tuner_type*/, const dvb_frontend_parameters& /*params*/);
+    DTVTunerType tuner_type, const dvb_frontend_parameters& params);
+static struct dtv_properties *dtvmultiplex_to_dtvproperties(uint inputId,
+    DTVTunerType tuner_type, DTVModulationSystem current_sys, const DTVMultiplex &tuning,
+    uint intermediate_freq, bool can_fec_auto, bool do_tune = true);
 
-int64_t concurrent_tunings_delay = 1000;
-QDateTime DVBChannel::s_lastTuning = QDateTime::currentDateTime();
+static const int64_t concurrent_tunings_delay = 1000;
+int64_t DVBChannel::s_lastTuning = QDateTime::currentDateTime().currentMSecsSinceEpoch();
 
 #define LOC QString("DVBChan[%1](%2): ").arg(m_inputId).arg(DVBChannel::GetDevice())
 
@@ -101,7 +106,7 @@ DVBChannel::DVBChannel(QString aDevice, TVRec *parent)
 
 DVBChannel::~DVBChannel()
 {
-    // set a new master if there are other instances and we're the master
+    // Set a new master if there are other instances and we're the master
     // whether we are the master or not remove us from the map..
     s_master_map_lock.lockForWrite();
     auto *master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
@@ -126,7 +131,7 @@ DVBChannel::~DVBChannel()
 
     DVBChannel::Close();
 
-    // if we're the last one out delete dvbcam
+    // If we're the last one out delete dvbcam
     s_master_map_lock.lockForRead();
     MasterMap::iterator mit = s_master_map.find(m_key);
     if ((*mit).empty())
@@ -145,7 +150,7 @@ void DVBChannel::Close(DVBChannel *who)
 
     IsOpenMap::iterator it = m_isOpen.find(who);
     if (it == m_isOpen.end())
-        return; // this caller didn't have it open in the first place..
+        return; // This caller didn't have it open in the first place..
 
     m_isOpen.erase(it);
 
@@ -159,10 +164,10 @@ void DVBChannel::Close(DVBChannel *who)
         ReturnMasterLock(master);
         return;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
 
     if (!m_isOpen.empty())
-        return; // not all callers have closed the DVB channel yet..
+        return; // Not all callers have closed the DVB channel yet..
 
     if (m_diseqcTree)
         m_diseqcTree->Close();
@@ -178,13 +183,13 @@ void DVBChannel::Close(DVBChannel *who)
 
 bool DVBChannel::Open(DVBChannel *who)
 {
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "Opening DVB channel");
-
     if (!m_inputId)
     {
         if (!InitializeInput())
             return false;
     }
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Opening DVB channel");
 
     QMutexLocker locker(&m_hwLock);
 
@@ -212,6 +217,8 @@ bool DVBChannel::Open(DVBChannel *who)
         m_frequencyMaximum    = master->m_frequencyMaximum;
         m_symbolRateMinimum   = master->m_symbolRateMinimum;
         m_symbolRateMaximum   = master->m_symbolRateMaximum;
+        m_currentSys          = master->m_currentSys;
+        m_sysList             = master->m_sysList;
 
         m_isOpen[who] = true;
 
@@ -225,8 +232,10 @@ bool DVBChannel::Open(DVBChannel *who)
         ReturnMasterLock(master);
         return true;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
 
+    // Open the DVB device
+    //
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, m_device);
     QByteArray devn = dvbdev.toLatin1();
 
@@ -244,9 +253,11 @@ bool DVBChannel::Open(DVBChannel *who)
                         "fatal error or too many attempts."));
             return false;
         }
-        usleep(50000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 
+    // Get the basic information from the frontend
+    //
     dvb_frontend_info info {};
     if (ioctl(m_fdFrontend, FE_GET_INFO, &info) < 0)
     {
@@ -265,12 +276,214 @@ bool DVBChannel::Open(DVBChannel *who)
     m_symbolRateMinimum   = info.symbol_rate_min;
     m_symbolRateMaximum   = info.symbol_rate_max;
 
-    CardUtil::SetDefaultDeliverySystem(m_inputId, m_fdFrontend);
-    m_tunerType = CardUtil::ProbeTunerType(m_fdFrontend);
+    LOG(VB_CHANNEL, LOG_INFO, LOC +
+        QString("Frontend '%1' capabilities:").arg(m_frontendName));
+    for (auto & capstr : CardUtil::CapabilitiesToString(m_capabilities))
+    {
+        LOG(VB_CHANNEL, LOG_INFO, QString("    %1").arg(capstr));
+    }
 
-    LOG(VB_RECORD, LOG_INFO, LOC +
-        QString("Frontend '%2' tunertype: %3")
-            .arg(m_frontendName).arg(m_tunerType.toString()));
+    // Does this card use the DVBv5 or the legacy DVBv3 API?
+    {
+        struct dtv_property prop[2] = {};
+        struct dtv_properties cmd = {};
+
+        prop[0].cmd = DTV_API_VERSION;
+        prop[1].cmd = DTV_DELIVERY_SYSTEM;
+
+        cmd.num = 2;
+        cmd.props = prop;
+
+        if (ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd) == -1)
+        {
+            prop[0].u.data = 0x300;
+            prop[1].u.data = SYS_UNDEFINED;
+        }
+
+	    m_version = prop[0].u.data;
+	    m_currentSys = prop[1].u.data;
+
+        m_legacy_fe = m_version < 0x500 ? true : m_legacy_fe;
+        m_has_v5_stats = m_version >= 0x50a;
+    }
+
+    // Determine tuner capabilities and configured delivery system
+    //
+    m_sysList.clear();
+	if (m_legacy_fe || m_version < 0x505)
+    {
+        // Legacy DVBv3 API
+        //
+        DTVModulationSystem delsys;
+		m_legacy_fe = true;
+		switch (info.type) {
+		case FE_QPSK:
+			m_currentSys = SYS_DVBS;
+            m_sysList.append(m_currentSys);
+
+			if (m_version < 0x0500)
+				break;
+			if (info.caps & FE_CAN_2G_MODULATION)
+            {
+                delsys = SYS_DVBS2;
+                m_sysList.append(delsys);
+            }
+			if (info.caps & FE_CAN_TURBO_FEC)
+            {
+                delsys = SYS_TURBO;
+                m_sysList.append(delsys);
+            }
+			break;
+		case FE_QAM:
+			m_currentSys = SYS_DVBC_ANNEX_A;
+            m_sysList.append(m_currentSys);
+			break;
+		case FE_OFDM:
+			m_currentSys = SYS_DVBT;
+            m_sysList.append(m_currentSys);
+			if (m_version < 0x0500)
+				break;
+			if (info.caps & FE_CAN_2G_MODULATION)
+            {
+                delsys = SYS_DVBT2;
+                m_sysList.append(delsys);
+            }
+			break;
+		case FE_ATSC:
+			if (info.caps & (FE_CAN_8VSB | FE_CAN_16VSB))
+            {
+                delsys = SYS_ATSC;
+                m_sysList.append(delsys);
+            }
+			if (info.caps & (FE_CAN_QAM_64 | FE_CAN_QAM_256 | FE_CAN_QAM_AUTO))
+            {
+                delsys = SYS_DVBC_ANNEX_B;
+                m_sysList.append(delsys);
+            }
+            m_currentSys = m_sysList.value(0);
+			break;
+		}
+		if (m_sysList.isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Frontend '%1' delivery system not detected.").arg(m_frontendName));
+			close(m_fdFrontend);
+			return false;
+		}
+	}
+    else
+    {
+        // DVBv5 API
+        //
+        struct dtv_property prop[1] = {};
+        struct dtv_properties cmd = {};
+
+		prop[0].cmd = DTV_ENUM_DELSYS;
+
+        cmd.num = 1;
+        cmd.props = prop;
+
+		if (ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd) == -1)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Frontend '%1' FE_GET_PROPERTY failed.").arg(m_frontendName));
+			close(m_fdFrontend);
+			return false;
+		}
+
+		int p_num_systems = prop[0].u.buffer.len;
+		for (int i = 0; i < p_num_systems; i++)
+        {
+            DTVModulationSystem delsys(prop[0].u.buffer.data[i]);
+            m_sysList.append(delsys);
+        }
+
+		if (p_num_systems == 0) {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Frontend '%1' returned 0 supported delivery systems!").arg(m_frontendName));
+			close(m_fdFrontend);
+			return false;
+		}
+	}
+
+    // Frontend info
+    //
+    if (VERBOSE_LEVEL_CHECK(VB_CHANNEL, LOG_INFO))
+	{
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("Frontend '%1' ").arg(m_frontendName));
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("DVB version:0x%1 ").arg(m_version,3,16,QChar('0')) +
+            QString("Delivery system:%1 ").arg(m_currentSys.toString()) +
+            QString("Legacy FE:%1 ").arg(m_legacy_fe) +
+            QString("Has DVBv5 stats:%1").arg(m_has_v5_stats));
+
+        LOG(VB_CHANNEL, LOG_INFO, "Supported delivery systems: ");
+        for (auto & delsys : m_sysList)
+        {
+            if (delsys == m_currentSys)
+                LOG(VB_CHANNEL, LOG_INFO, QString("   [%1]")
+                    .arg(delsys.toString()));
+            else
+                LOG(VB_CHANNEL, LOG_INFO, QString("    %1")
+                    .arg(delsys.toString()));
+        }
+
+		uint32_t frq_min = info.frequency_min;
+		uint32_t frq_max = info.frequency_max;
+		uint32_t frq_stp = info.frequency_stepsize;
+		uint32_t frq_tol = info.frequency_tolerance;
+		if (info.type == FE_QPSK)   			// Satellite frequencies are in kHz
+        {
+			frq_min *= 1000;
+			frq_max *= 1000;
+			frq_stp *= 1000;
+			frq_tol *= 1000;
+		}
+
+		LOG(VB_CHANNEL, LOG_INFO, QString("Frequency range for the current standard:"));
+        LOG(VB_CHANNEL, LOG_INFO, QString("    From:  %1 Hz").arg(frq_min,11));
+        LOG(VB_CHANNEL, LOG_INFO, QString("    To:    %1 Hz").arg(frq_max,11));
+        LOG(VB_CHANNEL, LOG_INFO, QString("    Step:  %1 Hz").arg(frq_stp,11));
+
+		if (info.type == FE_QPSK || info.type == FE_QAM)
+        {
+            LOG(VB_CHANNEL, LOG_INFO, QString("Symbol rate ranges for the current standard:"));
+            LOG(VB_CHANNEL, LOG_INFO, QString("    From:  %1 Baud").arg(info.symbol_rate_min,11));
+            LOG(VB_CHANNEL, LOG_INFO, QString("    To:    %1 Baud").arg(info.symbol_rate_max,11));
+		}
+	}
+
+	if (m_currentSys == SYS_UNDEFINED)
+        m_currentSys = m_sysList.value(0);
+
+    // Get delivery system from database and configure the tuner if needed.
+    DTVModulationSystem delsys = CardUtil::GetDeliverySystem(m_inputId);
+    if (DTVModulationSystem::kModulationSystem_UNDEFINED != delsys)
+    {
+        if (delsys != m_currentSys)
+        {
+            LOG(VB_CHANNEL, LOG_INFO, LOC +
+                QString("Change delivery system from %1 to %2.")
+                .arg(m_currentSys.toString())
+                .arg(delsys.toString()));
+
+            CardUtil::SetDeliverySystem(m_inputId, delsys, m_fdFrontend);
+            m_currentSys = delsys;
+        }
+        else
+        {
+            LOG(VB_CHANNEL, LOG_INFO, LOC +
+                QString("Delivery system in database and in card equal, leave at %1.")
+                .arg(m_currentSys.toString()));
+        }
+    }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC +
+            QString("No delivery system in database, leave card at %1.").arg(m_currentSys.toString()));
+    }
+    m_tunerType = CardUtil::ConvertToTunerType(m_currentSys);
 
     // Turn on the power to the LNB
     if (m_tunerType.IsDiSEqCSupported())
@@ -285,11 +498,16 @@ bool DVBChannel::Open(DVBChannel *who)
             if (scr)
             {
                 is_SCR = true;
-                LOG(VB_CHANNEL, LOG_INFO, LOC + "Requested DVB channel is on SCR system");
+                LOG(VB_CHANNEL, LOG_INFO, LOC +
+                    QString("Requested %1 channel is on SCR system")
+                    .arg(m_tunerType.toString()));
             }
             else
-                LOG(VB_CHANNEL, LOG_INFO, LOC + "Requested DVB channel is on non-SCR system");
-
+            {
+                LOG(VB_CHANNEL, LOG_INFO, LOC +
+                    QString("Requested %1 channel is on non-SCR system")
+                    .arg(m_tunerType.toString()));
+            }
             m_diseqcTree->Open(m_fdFrontend, is_SCR);
         }
     }
@@ -310,7 +528,7 @@ bool DVBChannel::Open(DVBChannel *who)
 
 bool DVBChannel::IsOpen(void) const
 {
-    // Have to acquire the hw lock to prevent is_open being modified whilst we're searching it
+    // Have to acquire the hw lock to prevent m_isOpen being modified whilst we're searching it.
     QMutexLocker locker(&m_hwLock);
     IsOpenMap::const_iterator it = m_isOpen.find(this);
     return it != m_isOpen.end();
@@ -334,9 +552,8 @@ void DVBChannel::CheckFrequency(uint64_t frequency) const
         (frequency < m_frequencyMinimum || frequency > m_frequencyMaximum))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("Your frequency setting (%1) is out of range. "
-                    "(min/max:%2/%3)")
-                .arg(frequency).arg(m_frequencyMinimum).arg(m_frequencyMaximum));
+            QString("Frequency setting (%1) is out of range (min/max:%2/%3)")
+            .arg(frequency).arg(m_frequencyMinimum).arg(m_frequencyMaximum));
     }
 }
 
@@ -351,7 +568,7 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
         tuning.m_inversion = DTVInversion::kInversionOff;
     }
 
-    // DVB-S needs a fully initialized diseqc tree and is checked later in Tune
+    // DVB-S/S2 needs a fully initialized DiSEqC tree and is checked later in Tune
     if (!m_diseqcTree)
     {
         DVBChannel *master = GetMasterLock();
@@ -384,12 +601,14 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
            "Selected modulation parameter unsupported by this driver.");
     }
 
-    if (DTVTunerType::kTunerTypeDVBT != m_tunerType &&
+    if (DTVTunerType::kTunerTypeDVBT  != m_tunerType &&
         DTVTunerType::kTunerTypeDVBT2 != m_tunerType)
     {
-        LOG(VB_CHANNEL, LOG_INFO, LOC + tuning.toString());
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + tuning.toString());
         return;
     }
+
+    // ------ Below only DVB-T/T2 tuning parameters ------
 
     // Check OFDM Tuning params
 
@@ -439,7 +658,7 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
             "Selected modulation parameter unsupported by this driver.");
     }
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC + tuning.toString());
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC + tuning.toString());
 }
 
 /**
@@ -517,108 +736,6 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning)
     return Tune(tuning, false, false);
 }
 
-static struct dtv_properties *dtvmultiplex_to_dtvproperties(
-    DTVTunerType tuner_type, const DTVMultiplex &tuning, int intermediate_freq,
-    bool can_fec_auto, bool do_tune = true)
-{
-    uint c = 0;
-
-    if (tuner_type != DTVTunerType::kTunerTypeDVBT  &&
-        tuner_type != DTVTunerType::kTunerTypeDVBC  &&
-        tuner_type != DTVTunerType::kTunerTypeDVBS1 &&
-        tuner_type != DTVTunerType::kTunerTypeDVBS2 &&
-        tuner_type != DTVTunerType::kTunerTypeDVBT2)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "DVBChan: Unsupported tuner type " +
-            tuner_type.toString());
-        return nullptr;
-    }
-
-    LOG(VB_CHANNEL, LOG_DEBUG, "DVBChan: modsys " + tuning.m_modSys.toString());
-
-    auto *cmdseq = (struct dtv_properties*) calloc(1, sizeof(struct dtv_properties));
-    if (!cmdseq)
-        return nullptr;
-
-    cmdseq->props = (struct dtv_property*) calloc(20, sizeof(*(cmdseq->props)));
-    if (!(cmdseq->props))
-    {
-        free(cmdseq);
-        return nullptr;
-    }
-
-    // The cx24116 DVB-S2 demod anounce FE_CAN_FEC_AUTO but has apparently
-    // trouble with FEC_AUTO on DVB-S2 transponders
-    if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS2)
-        can_fec_auto = false;
-
-    if (tuner_type == DTVTunerType::kTunerTypeDVBS2 ||
-        tuner_type == DTVTunerType::kTunerTypeDVBT ||
-        tuner_type == DTVTunerType::kTunerTypeDVBT2)
-    {
-        cmdseq->props[c].cmd      = DTV_DELIVERY_SYSTEM;
-        cmdseq->props[c++].u.data = tuning.m_modSys;
-    }
-
-    cmdseq->props[c].cmd      = DTV_FREQUENCY;
-    cmdseq->props[c++].u.data = intermediate_freq ? intermediate_freq : tuning.m_frequency;
-    cmdseq->props[c].cmd      = DTV_MODULATION;
-    cmdseq->props[c++].u.data = tuning.m_modulation;
-    cmdseq->props[c].cmd      = DTV_INVERSION;
-    cmdseq->props[c++].u.data = tuning.m_inversion;
-
-    if (tuner_type == DTVTunerType::kTunerTypeDVBS1 ||
-        tuner_type == DTVTunerType::kTunerTypeDVBS2 ||
-        tuner_type == DTVTunerType::kTunerTypeDVBC)
-    {
-        cmdseq->props[c].cmd      = DTV_SYMBOL_RATE;
-        cmdseq->props[c++].u.data = tuning.m_symbolRate;
-    }
-
-    if (tuner_type.IsFECVariable())
-    {
-        cmdseq->props[c].cmd      = DTV_INNER_FEC;
-        cmdseq->props[c++].u.data = can_fec_auto ? FEC_AUTO
-            : (fe_code_rate_t) (int) tuning.m_fec;
-    }
-
-    if (tuner_type == DTVTunerType::kTunerTypeDVBT ||
-        tuner_type == DTVTunerType::kTunerTypeDVBT2)
-    {
-        cmdseq->props[c].cmd      = DTV_BANDWIDTH_HZ;
-        cmdseq->props[c++].u.data = (8-tuning.m_bandwidth) * 1000000;
-        cmdseq->props[c].cmd      = DTV_CODE_RATE_HP;
-        cmdseq->props[c++].u.data = tuning.m_hpCodeRate;
-        cmdseq->props[c].cmd      = DTV_CODE_RATE_LP;
-        cmdseq->props[c++].u.data = tuning.m_lpCodeRate;
-        cmdseq->props[c].cmd      = DTV_TRANSMISSION_MODE;
-        cmdseq->props[c++].u.data = tuning.m_transMode;
-        cmdseq->props[c].cmd      = DTV_GUARD_INTERVAL;
-        cmdseq->props[c++].u.data = tuning.m_guardInterval;
-        cmdseq->props[c].cmd      = DTV_HIERARCHY;
-        cmdseq->props[c++].u.data = tuning.m_hierarchy;
-    }
-
-    if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS2)
-    {
-        cmdseq->props[c].cmd      = DTV_PILOT;
-        cmdseq->props[c++].u.data = PILOT_AUTO;
-        cmdseq->props[c].cmd      = DTV_ROLLOFF;
-        cmdseq->props[c++].u.data = tuning.m_rolloff;
-    }
-    else if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS)
-    {
-        cmdseq->props[c].cmd      = DTV_ROLLOFF;
-        cmdseq->props[c++].u.data = DTVRollOff::kRollOff_35;
-    }
-
-    if (do_tune)
-        cmdseq->props[c++].cmd    = DTV_TUNE;
-
-    cmdseq->num = c;
-
-    return cmdseq;
-}
 
 /*****************************************************************************
            Tuning functions for each of the five types of cards.
@@ -651,10 +768,10 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         ReturnMasterLock(master);
         return ok;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
 
 
-    int intermediate_freq = 0;
+    uint intermediate_freq = 0;
     bool can_fec_auto = false;
     bool reset = (force_reset || m_firstTune);
 
@@ -674,13 +791,14 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         return false;
     }
 
-    // Remove any events in queue before tuning.
-    drain_dvb_events(m_fdFrontend);
+    // Remove all events in queue before tuning.
+    DrainDVBEvents();
 
-    LOG(VB_CHANNEL, LOG_INFO, LOC + "\nOld Params: " + m_prevTuning.toString() +
-            "\nNew Params: " + tuning.toString());
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning parameters:");
+    LOG(VB_CHANNEL, LOG_INFO, "    Old: " + m_prevTuning.toString());
+    LOG(VB_CHANNEL, LOG_INFO, "    New: " + tuning.toString());
 
-    // DVB-S is in kHz, other DVB is in Hz
+    // DVB-S/S2 is in kHz, other DVB is in Hz
     bool is_dvbs = ((DTVTunerType::kTunerTypeDVBS1 == m_tunerType) ||
                     (DTVTunerType::kTunerTypeDVBS2 == m_tunerType));
     int     freq_mult = (is_dvbs) ? 1 : 1000;
@@ -694,26 +812,26 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
         m_tuneDelayLock.lock();
 
-        if (QDateTime::currentDateTime() < s_lastTuning)
+        int64_t this_tuning = QDateTime::currentDateTime().currentMSecsSinceEpoch();
+        int64_t tuning_delay = s_lastTuning + concurrent_tunings_delay - this_tuning;
+        if (tuning_delay > 0)
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Next tuning after less than %1ms. Delaying by %1ms")
-                .arg(concurrent_tunings_delay));
-            usleep(concurrent_tunings_delay * 1000);
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Next tuning after less than %1ms, delaying by %2ms")
+                .arg(concurrent_tunings_delay).arg(tuning_delay));
+            std::this_thread::sleep_for(std::chrono::milliseconds(tuning_delay));
         }
-
-        s_lastTuning = QDateTime::currentDateTime();
-        s_lastTuning = s_lastTuning.addMSecs(concurrent_tunings_delay);
+        s_lastTuning = QDateTime::currentDateTime().currentMSecsSinceEpoch();
 
         m_tuneDelayLock.unlock();
 
-        // send DVB-S setup
+        // For DVB-S/S2 configure DiSEqC and determine intermediate frequency
         if (m_diseqcTree)
         {
-            // configure for new input
+            // Configure for new input
             if (!same_input)
                 m_diseqcSettings.Load(m_inputId);
 
-            // execute diseqc commands
+            // Execute DiSEqC commands
             if (!m_diseqcTree->Execute(m_diseqcSettings, tuning))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -721,7 +839,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
                 return false;
             }
 
-            // retrieve actual intermediate frequency
+            // Retrieve actual intermediate frequency
             DiSEqCDevLNB *lnb = m_diseqcTree->FindLNB(m_diseqcSettings);
             if (!lnb)
             {
@@ -733,21 +851,21 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             if (lnb->GetDeviceID() != m_lastLnbDevId)
             {
                 m_lastLnbDevId = lnb->GetDeviceID();
-                // make sure we tune to frequency, if the lnb has changed
+                // Make sure we tune to frequency, if the lnb has changed
                 m_firstTune = true;
             }
 
             intermediate_freq = lnb->GetIntermediateFrequency(
                 m_diseqcSettings, tuning);
 
-            // retrieve scr intermediate frequency
+            // Retrieve SCR intermediate frequency
             DiSEqCDevSCR *scr = m_diseqcTree->FindSCR(m_diseqcSettings);
             if (lnb && scr)
             {
                 intermediate_freq = scr->GetIntermediateFrequency(intermediate_freq);
             }
 
-            // if card can auto-FEC, use it -- sometimes NITs are inaccurate
+            // If card can auto-FEC, use it -- sometimes NITs are inaccurate
             if (m_capabilities & FE_CAN_FEC_AUTO)
                 can_fec_auto = true;
 
@@ -756,9 +874,10 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             CheckFrequency(intermediate_freq);
         }
 
-        if (DTVTunerType::kTunerTypeDVBS2 == m_tunerType ||
-            DTVTunerType::kTunerTypeDVBT2 == m_tunerType)
+        // DVBv5 or legacy DVBv3 API
+        if (!m_legacy_fe)
         {
+            // DVBv5 API
             struct dtv_property p_clear = {};
             struct dtv_properties cmdseq_clear = {};
 
@@ -773,8 +892,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
                 return false;
             }
 
-            struct dtv_properties *cmds = dtvmultiplex_to_dtvproperties(
-                m_tunerType, tuning, intermediate_freq, can_fec_auto);
+            struct dtv_properties *cmds = dtvmultiplex_to_dtvproperties(m_inputId,
+                m_tunerType, m_currentSys, tuning, intermediate_freq, can_fec_auto);
 
             if (!cmds) {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -807,6 +926,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         }
         else
         {
+            // Legacy DVBv3 API
             struct dvb_frontend_parameters params = dtvmultiplex_to_dvbparams(
                 m_tunerType, tuning, intermediate_freq, can_fec_auto);
 
@@ -820,13 +940,20 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
         // Extra delay to add for broken DVB drivers
         if (m_tuningDelay)
-            usleep(m_tuningDelay * 1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(m_tuningDelay));
 
-        wait_for_backend(m_fdFrontend, 50 /* msec */);
+        WaitForBackend(50);     // msec
 
         m_prevTuning = tuning;
         m_firstTune = false;
     }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Tune(): Tuning to %1%2 skipped, already tuned")
+            .arg(intermediate_freq ? intermediate_freq : tuning.m_frequency)
+            .arg(suffix));
+    }
+
 
     SetSIStandard(tuning.m_sistandard);
 
@@ -861,7 +988,7 @@ bool DVBChannel::IsTuningParamsProbeSupported(void) const
         ReturnMasterLock(master);
         return ok;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
 
     if (m_diseqcTree)
     {
@@ -876,7 +1003,7 @@ bool DVBChannel::IsTuningParamsProbeSupported(void) const
     int res = ioctl(m_fdFrontend, FE_GET_FRONTEND, &params);
     if (res < 0)
     {
-        LOG(VB_CHANNEL, LOG_ERR, LOC + "Getting device frontend failed." + ENO);
+        LOG(VB_CHANNEL, LOG_ERR, LOC + "FE_GET_FRONTEND failed." + ENO);
     }
 
     return (res >= 0);
@@ -907,7 +1034,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
         ReturnMasterLock(master);
         return ok;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
 
     if (m_diseqcTree)
     {
@@ -917,12 +1044,14 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
         return false;
     }
 
-    if (m_tunerType == DTVTunerType::kTunerTypeDVBS2)
+    // DVBv5 API
+    if (!m_legacy_fe)
     {
         // TODO implement probing of tuning parameters with FE_GET_PROPERTY
         return false;
     }
 
+    // Legacy DVBv3 API
     dvb_frontend_parameters params {};
     if (ioctl(m_fdFrontend, FE_GET_FRONTEND, &params) < 0)
     {
@@ -949,11 +1078,12 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
  */
 int DVBChannel::GetChanID() const
 {
-    int found = 0;
+    QList<int> idlist;
     int id = -1;
+
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT chanid,visible "
+    query.prepare("SELECT chanid, visible "
                   "FROM channel, capturecard "
                   "WHERE channel.deleted IS NULL AND "
                   "      capturecard.sourceid = channel.sourceid AND "
@@ -971,23 +1101,40 @@ int DVBChannel::GetChanID() const
 
     while (query.next())
     {
-        found += static_cast<int>(query.value(1).toInt() > 0);
-        if (id == -1 || found)
-            id = query.value(0).toInt();
+        bool visible = query.value(1).toInt() > 0;
+        if (visible)
+        {
+            int chanid = query.value(0).toInt();
+            idlist.append(chanid);
+        }
     }
 
-    if (!found)
+    if (idlist.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_INFO,
-            QString("No visible channel ids for %1")
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("No visible channel ID for %1")
             .arg(m_curChannelName));
     }
-
-    if (found > 1)
+    else
     {
-        LOG(VB_GENERAL, LOG_WARNING,
-            QString("Found multiple visible channel ids for %1")
-            .arg(m_curChannelName));
+        id = idlist.value(0);
+        if (idlist.count() > 1)
+        {
+            QStringList sl;
+            for (auto chanid : idlist)
+            {
+                sl.append(QString::number(chanid));
+            }
+            LOG(VB_CHANNEL, LOG_INFO, LOC +
+                QString("Found for '%1' multiple visible channel IDs: %2")
+                .arg(m_curChannelName).arg(sl.join(" ")));
+        }
+        else
+        {
+            LOG(VB_CHANNEL, LOG_INFO, LOC +
+                QString("Found visible channel ID %1 for '%2'")
+                .arg(id).arg(m_curChannelName));
+        }
     }
 
     return id;
@@ -1001,7 +1148,6 @@ const DiSEqCDevRotor *DVBChannel::GetRotor(void) const
     return nullptr;
 }
 
-// documented in dvbchannel.h
 bool DVBChannel::HasLock(bool *ok) const
 {
     DVBChannel *master = GetMasterLock();
@@ -1011,20 +1157,23 @@ bool DVBChannel::HasLock(bool *ok) const
         ReturnMasterLock(master);
         return haslock;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
 
 #if ((DVB_API_VERSION > 5) || ((DVB_API_VERSION == 5) && (DVB_API_VERSION_MINOR > 10)))
     fe_status_t status = FE_NONE;
 #else // debian9, centos7
     fe_status_t status = (fe_status_t)0;
 #endif
-    memset(&status, 0, sizeof(status));
 
     int ret = ioctl(m_fdFrontend, FE_READ_STATUS, &status);
     if (ret < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "FE_READ_STATUS failed" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC + "FE_READ_STATUS failed" + ENO);
+    }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("%1 status: 0x%2 %3")
+                .arg(__func__).arg(status,2,16,QChar('0')).arg(toString(status)));
     }
 
     if (ok)
@@ -1033,7 +1182,6 @@ bool DVBChannel::HasLock(bool *ok) const
     return (status & FE_HAS_LOCK) != 0;
 }
 
-// documented in dvbchannel.h
 double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
 {
     struct dtv_property prop = {};
@@ -1043,17 +1191,18 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
     cmd.num = 1;
     cmd.props = &prop;
     int ret = ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd);
-    LOG(VB_RECORD, LOG_DEBUG, LOC +
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
         QString("FE DTV signal strength ret=%1 res=%2 len=%3 scale=%4 val=%5")
         .arg(ret)
         .arg(cmd.props->result)
         .arg(cmd.props->u.st.len)
         .arg(cmd.props->u.st.stat[0].scale)
-        .arg(cmd.props->u.st.stat[0].svalue)
-        );
+        .arg(cmd.props->u.st.stat[0].svalue));
+
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
     if (ok)
         *ok = tmpOk;
+
     double value = 0;
     if (tmpOk)
     {
@@ -1080,15 +1229,14 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
             value = cmd.props->u.st.stat[0].uvalue / 65535.0;
         }
     }
-    else
-    {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            "Getting DVBv5 Frontend signal strength failed." + ENO);
-    }
+    // else
+    // {
+    //     LOG(VB_CHANNEL, LOG_ERR, LOC +
+    //         "Getting DVBv5 Frontend signal strength failed." + ENO);
+    // }
     return value;
 }
 
-// documented in dvbchannel.h
 double DVBChannel::GetSignalStrength(bool *ok) const
 {
     DVBChannel *master = GetMasterLock();
@@ -1098,7 +1246,14 @@ double DVBChannel::GetSignalStrength(bool *ok) const
         ReturnMasterLock(master);
         return val;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
+
+    if (!m_legacy_fe && m_has_v5_stats)
+    {
+        double value = GetSignalStrengthDVBv5(ok);
+        if (ok && *ok)
+            return value;
+    }
 
     // We use uint16_t for sig because this is correct for DVB API 4.0,
     // and works better than the correct int16_t for the 3.x API
@@ -1106,11 +1261,11 @@ double DVBChannel::GetSignalStrength(bool *ok) const
     int ret = ioctl(m_fdFrontend, FE_READ_SIGNAL_STRENGTH, &sig);
     if (ret < 0)
     {
-        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        {
-            return GetSignalStrengthDVBv5(ok);
-        }
-        LOG(VB_RECORD, LOG_ERR, LOC +
+        // if (errno == EOPNOTSUPP || errno == ENOTSUPP)
+        // {
+        //     return GetSignalStrengthDVBv5(ok);
+        // }
+        LOG(VB_CHANNEL, LOG_ERR, LOC +
             "Getting Frontend signal strength failed." + ENO);
     }
 
@@ -1120,7 +1275,6 @@ double DVBChannel::GetSignalStrength(bool *ok) const
     return sig * (1.0 / 65535.0);
 }
 
-// documented in dvbchannel.h
 double DVBChannel::GetSNRDVBv5(bool *ok) const
 {
     struct dtv_property prop = {};
@@ -1131,7 +1285,7 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
     cmd.num = 1;
     cmd.props = &prop;
     int ret = ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd);
-    LOG(VB_RECORD, LOG_DEBUG, LOC +
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
         QString("FE DTV cnr ret=%1 res=%2 len=%3 scale=%4 val=%5")
         .arg(ret)
         .arg(cmd.props->result)
@@ -1163,15 +1317,14 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
             value = cmd.props->u.st.stat[0].uvalue / 65535.0;
         }
     }
-    else
-    {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            "Getting DVBv5 Frontend signal/noise ratio failed." + ENO);
-    }
+    // else
+    // {
+    //     LOG(VB_CHANNEL, LOG_ERR, LOC +
+    //         "Getting DVBv5 Frontend signal/noise ratio failed." + ENO);
+    // }
     return value;
 }
 
-// documented in dvbchannel.h
 double DVBChannel::GetSNR(bool *ok) const
 {
     DVBChannel *master = GetMasterLock();
@@ -1181,7 +1334,14 @@ double DVBChannel::GetSNR(bool *ok) const
         ReturnMasterLock(master);
         return val;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
+
+    if (!m_legacy_fe && m_has_v5_stats)
+    {
+        double value = GetSNRDVBv5(ok);
+        if (ok && *ok)
+            return value;
+    }
 
     // We use uint16_t for sig because this is correct for DVB API 4.0,
     // and works better than the correct int16_t for the 3.x API
@@ -1189,10 +1349,10 @@ double DVBChannel::GetSNR(bool *ok) const
     int ret = ioctl(m_fdFrontend, FE_READ_SNR, &snr);
     if (ret < 0)
     {
-        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        {
-            return GetSNRDVBv5(ok);
-        }
+        // if (errno == EOPNOTSUPP || errno == ENOTSUPP)
+        // {
+        //     return GetSNRDVBv5(ok);
+        // }
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Getting Frontend signal/noise ratio failed." + ENO);
     }
@@ -1203,7 +1363,6 @@ double DVBChannel::GetSNR(bool *ok) const
     return snr * (1.0 / 65535.0);
 }
 
-// documented in dvbchannel.h
 double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
 {
     std::array<struct dtv_property,2> prop {};
@@ -1214,7 +1373,7 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
     cmd.num   = prop.size();
     cmd.props = prop.data();
     int ret = ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd);
-    LOG(VB_RECORD, LOG_DEBUG, LOC +
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
         QString("FE DTV bit error rate ret=%1 res=%2 len=%3 scale=%4 val=%5 res=%6 len=%7 scale=%8 val=%9")
         .arg(ret)
         .arg(cmd.props[0].result)
@@ -1243,11 +1402,11 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
                     cmd.props[1].u.st.stat[0].uvalue);
         }
     }
-    else
-    {
-        LOG(VB_RECORD, LOG_ERR, LOC +
-            "Getting DVBv5 Frontend bit error rate failed." + ENO);
-    }
+    // else
+    // {
+    //     LOG(VB_CHANNEL, LOG_ERR, LOC +
+    //         "Getting DVBv5 Frontend bit error rate failed." + ENO);
+    // }
     return value;
 }
 
@@ -1261,17 +1420,24 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
         ReturnMasterLock(master);
         return val;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
+
+    if (!m_legacy_fe && m_has_v5_stats)
+    {
+        double value = GetBitErrorRateDVBv5(ok);
+        if (ok && *ok)
+            return value;
+    }
 
     uint32_t ber = 0;
     int ret = ioctl(m_fdFrontend, FE_READ_BER, &ber);
     if (ret < 0)
     {
-        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        {
-            return GetBitErrorRateDVBv5(ok);
-        }
-        LOG(VB_RECORD, LOG_ERR, LOC +
+        // if (errno == EOPNOTSUPP || errno == ENOTSUPP)
+        // {
+        //     return GetBitErrorRateDVBv5(ok);
+        // }
+        LOG(VB_CHANNEL, LOG_ERR, LOC +
             "Getting Frontend bit error rate failed." + ENO);
     }
 
@@ -1281,7 +1447,6 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
     return (double) ber;
 }
 
-// documented in dvbchannel.h
 double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
 {
     struct dtv_property prop = {};
@@ -1291,7 +1456,7 @@ double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
     cmd.num = 1;
     cmd.props = &prop;
     int ret = ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd);
-    LOG(VB_RECORD, LOG_DEBUG, LOC +
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
         QString("FE DTV uncorrected block count ret=%1 res=%2 len=%3 scale=%4 val=%5")
         .arg(ret)
         .arg(cmd.props[0].result)
@@ -1308,11 +1473,11 @@ double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
         if (cmd.props->u.st.stat[0].scale == FE_SCALE_COUNTER)
             value = cmd.props->u.st.stat[0].uvalue;
     }
-    else
-    {
-        LOG(VB_RECORD, LOG_DEBUG, LOC +
-            "Getting DVBv5 Frontend uncorrected block count failed." + ENO);
-    }
+    // else
+    // {
+    //     LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+    //         "Getting DVBv5 Frontend uncorrected block count failed." + ENO);
+    // }
     return value;
 }
 
@@ -1326,16 +1491,23 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
         ReturnMasterLock(master);
         return val;
     }
-    ReturnMasterLock(master); // if we're the master we don't need this lock..
+    ReturnMasterLock(master); // If we're the master we don't need this lock.
+
+    if (!m_legacy_fe && m_has_v5_stats)
+    {
+        double value = GetUncorrectedBlockCountDVBv5(ok);
+        if (ok && *ok)
+            return value;
+    }
 
     uint32_t ublocks = 0;
     int ret = ioctl(m_fdFrontend, FE_READ_UNCORRECTED_BLOCKS, &ublocks);
     if (ret < 0)
     {
-        if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        {
-            return GetUncorrectedBlockCountDVBv5(ok);
-        }
+        // if (errno == EOPNOTSUPP || errno == ENOTSUPP)
+        // {
+        //     return GetUncorrectedBlockCountDVBv5(ok);
+        // }
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Getting Frontend uncorrected block count failed." + ENO);
     }
@@ -1370,22 +1542,24 @@ bool DVBChannel::IsMaster(void) const
     return is_master;
 }
 
-/** \fn drain_dvb_events(int)
- *  \brief Reads all the events off the queue, so we can use select
- *         in wait_for_backend(int,int).
- */
-static void drain_dvb_events(int fd)
+// Reads all the events off the queue, so we can use select in WaitForBackend.
+//
+// Note that FE_GET_EVENT is deprecated.
+//
+void DVBChannel::DrainDVBEvents(void)
 {
+    const int fd  = m_fdFrontend;
     struct dvb_frontend_event event {};
     int ret = 0;
     while ((ret = ioctl(fd, FE_GET_EVENT, &event)) == 0);
-    if ((ret < 0) && (EAGAIN != errno))
+    if ((ret < 0) && (EAGAIN != errno) && (EWOULDBLOCK != errno) && (EOVERFLOW != errno))
     {
-        LOG(VB_CHANNEL, LOG_DEBUG, "Draining DVB Event failed. " + ENO);
+        LOG(VB_CHANNEL, LOG_ERR, LOC +
+            QString("%1 FE_GET_EVENT failed: ").arg(__func__) + logStrerror(errno));
     }
 }
 
-/** \fn wait_for_backend(int,int)
+/** \fn WaitForBackend(int)
  *  \brief Waits for backend to get tune message.
  *
  *   With linux 2.6.12 or later this should block
@@ -1405,11 +1579,11 @@ static void drain_dvb_events(int fd)
  *   We do not block until we have a lock, the signal
  *   monitor does that.
  *
- *  \param fd         frontend file descriptor
  *  \param timeout_ms timeout before FE_READ_STATUS in milliseconds
  */
-static bool wait_for_backend(int fd, int timeout_ms)
+bool DVBChannel::WaitForBackend(int timeout_ms)
 {
+    const int fd  = m_fdFrontend;
     struct timeval select_timeout = { timeout_ms/1000, (timeout_ms % 1000) * 1000 /*usec*/};
     fd_set fd_select_set;
     FD_ZERO(    &fd_select_set); // NOLINT(readability-isolate-declaration)
@@ -1423,8 +1597,8 @@ static bool wait_for_backend(int fd, int timeout_ms)
 
     if (-1 == ret)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            "DVBChan: wait_for_backend: Failed to wait on output" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("%1: Failed to wait on output.").arg(__func__) + ENO);
 
         return false;
     }
@@ -1435,25 +1609,27 @@ static bool wait_for_backend(int fd, int timeout_ms)
 #else // debian9, centos7
     fe_status_t status = (fe_status_t)0;
 #endif
-    memset(&status, 0, sizeof(status));
 
     if (ioctl(fd, FE_READ_STATUS, &status) < 0)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            "DVBChan: wait_for_backend: Failed to get status" + ENO);
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("%1: FE_READ_STATUS failed.").arg(__func__) + ENO);
 
         return false;
     }
 
-    LOG(VB_CHANNEL, LOG_INFO, QString("DVBChan: wait_for_backend: Status: %1")
-            .arg(toString(status)));
+    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
+        QString("%1: status: 0x%2 %3") .arg(__func__)
+            .arg(status,2,16,QChar('0')).arg(toString(status)));
 
     return true;
 }
 
+// Create legacy DVBv3 frontend parameters from DTVMultiplex.
+//
 static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     DTVTunerType tuner_type, const DTVMultiplex &tuning,
-    int intermediate_freq, bool can_fec_auto)
+    uint intermediate_freq, bool can_fec_auto)
 {
     dvb_frontend_parameters params {};
 
@@ -1465,11 +1641,10 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
         if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS2)
         {
             LOG(VB_GENERAL, LOG_ERR,
-                "DVBChan: Error, Tuning of a DVB-S2 transport "
-                "with a DVB-S card will fail.");
+                "DVBChan: Cannot tune to DVB-S2 transport with DVB-S card.");
         }
 
-        params.frequency = intermediate_freq;
+        params.frequency          = intermediate_freq;
         params.u.qpsk.symbol_rate = tuning.m_symbolRate;
         params.u.qpsk.fec_inner   = can_fec_auto ? FEC_AUTO
             : (fe_code_rate_t) (int) tuning.m_fec;
@@ -1478,8 +1653,7 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     if (DTVTunerType::kTunerTypeDVBS2 == tuner_type)
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "DVBChan: Error, MythTV was compiled without "
-            "DVB-S2 headers being present so DVB-S2 tuning will fail.");
+            "DVBChan: Cannot tune DVB-S2 card with DVBv3 API.");
     }
 
     if (DTVTunerType::kTunerTypeDVBC == tuner_type)
@@ -1489,34 +1663,28 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
         params.u.qam.modulation   = (fe_modulation_t) (int) tuning.m_modulation;
     }
 
-    if (DTVTunerType::kTunerTypeDVBT == tuner_type ||
+    if (DTVTunerType::kTunerTypeDVBT  == tuner_type ||
         DTVTunerType::kTunerTypeDVBT2 == tuner_type)
     {
-        params.u.ofdm.bandwidth             =
-            (fe_bandwidth_t) (int) tuning.m_bandwidth;
-        params.u.ofdm.code_rate_HP          =
-            (fe_code_rate_t) (int) tuning.m_hpCodeRate;
-        params.u.ofdm.code_rate_LP          =
-            (fe_code_rate_t) (int) tuning.m_lpCodeRate;
-        params.u.ofdm.constellation         =
-            (fe_modulation_t) (int) tuning.m_modulation;
-        params.u.ofdm.transmission_mode     =
-            (fe_transmit_mode_t) (int) tuning.m_transMode;
-        params.u.ofdm.guard_interval        =
-            (fe_guard_interval_t) (int) tuning.m_guardInterval;
-        params.u.ofdm.hierarchy_information =
-            (fe_hierarchy_t) (int) tuning.m_hierarchy;
+        params.u.ofdm.bandwidth             = (fe_bandwidth_t) (int) tuning.m_bandwidth;
+        params.u.ofdm.code_rate_HP          = (fe_code_rate_t) (int) tuning.m_hpCodeRate;
+        params.u.ofdm.code_rate_LP          = (fe_code_rate_t) (int) tuning.m_lpCodeRate;
+        params.u.ofdm.constellation         = (fe_modulation_t) (int) tuning.m_modulation;
+        params.u.ofdm.transmission_mode     = (fe_transmit_mode_t) (int) tuning.m_transMode;
+        params.u.ofdm.guard_interval        = (fe_guard_interval_t) (int) tuning.m_guardInterval;
+        params.u.ofdm.hierarchy_information = (fe_hierarchy_t) (int) tuning.m_hierarchy;
     }
 
     if (DTVTunerType::kTunerTypeATSC == tuner_type)
     {
-        params.u.vsb.modulation   =
-            (fe_modulation_t) (int) tuning.m_modulation;
+        params.u.vsb.modulation = (fe_modulation_t) (int) tuning.m_modulation;
     }
 
     return params;
 }
 
+// Create DTVMultiplex from legacy DVBv3 frontend parameters.
+//
 static DTVMultiplex dvbparams_to_dtvmultiplex(
     DTVTunerType tuner_type, const dvb_frontend_parameters &params)
 {
@@ -1551,10 +1719,177 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
         tuning.m_hierarchy      = params.u.ofdm.hierarchy_information;
     }
 
-    if (DTVTunerType::kTunerTypeATSC    == tuner_type)
+    if (DTVTunerType::kTunerTypeATSC   == tuner_type)
     {
         tuning.m_modulation     = params.u.vsb.modulation;
     }
 
     return tuning;
+}
+
+// Create a DVBv5 property list from the dtv_multiplex
+//
+static struct dtv_properties *dtvmultiplex_to_dtvproperties(uint inputId,
+    DTVTunerType tuner_type, DTVModulationSystem current_sys, const DTVMultiplex &tuning,
+    uint intermediate_freq, bool can_fec_auto, bool do_tune)
+{
+    DTVModulationSystem delivery_system = current_sys;
+    uint c = 0;
+
+    LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]: m_modsys:%2  current_sys:%3")
+        .arg(inputId)
+        .arg(tuning.m_modSys.toString())
+        .arg(current_sys.toString()));
+
+    auto *cmdseq = (struct dtv_properties*) calloc(1, sizeof(struct dtv_properties));
+    if (!cmdseq)
+        return nullptr;
+
+    cmdseq->props = (struct dtv_property*) calloc(20, sizeof(*(cmdseq->props)));
+    if (!(cmdseq->props))
+    {
+        free(cmdseq);
+        return nullptr;
+    }
+
+    // 20201117 TODO do this only for cx24116 but not for all DVB-S2 demods
+    //
+    // The cx24116 DVB-S2 demod announces FE_CAN_FEC_AUTO but has apparently
+    // trouble with FEC_AUTO on DVB-S2 transponders
+    if (tuning.m_modSys == DTVModulationSystem::kModulationSystem_DVBS2)
+        can_fec_auto = false;
+
+    // Select delivery system in this order
+    // - from dtv_multiplex
+    // - modulation system in the card
+    // - default based on tuner type
+    //
+    if (tuning.m_modSys != DTVModulationSystem::kModulationSystem_UNDEFINED)
+    {
+        delivery_system = tuning.m_modSys;
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]:%2 set delivery_system to %3")
+            .arg(inputId).arg(__LINE__).arg(delivery_system.toString()));
+    }
+    else if (current_sys != DTVModulationSystem::kModulationSystem_UNDEFINED)
+    {
+        delivery_system = current_sys;
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]:%2 set delivery_system to %3")
+            .arg(inputId).arg(__LINE__).arg(delivery_system.toString()));
+    }
+    else if (tuner_type == DTVTunerType::kTunerTypeDVBC)
+    {
+        delivery_system = DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A;
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]:%2 set delivery_system to %3")
+            .arg(inputId).arg(__LINE__).arg(delivery_system.toString()));
+    }
+    else if (tuner_type == DTVTunerType::kTunerTypeATSC)
+    {
+        delivery_system  = DTVModulationSystem::kModulationSystem_ATSC;
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]:%2 set delivery_system to %3")
+            .arg(inputId).arg(__LINE__).arg(delivery_system.toString()));
+    }
+    else if (tuner_type == DTVTunerType::kTunerTypeDVBT)
+    {
+        delivery_system  = DTVModulationSystem::kModulationSystem_DVBT;
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]:%2 set delivery_system to %3")
+            .arg(inputId).arg(__LINE__).arg(delivery_system.toString()));
+    }
+    else if (tuner_type == DTVTunerType::kTunerTypeDVBT2)
+    {
+        delivery_system  = DTVModulationSystem::kModulationSystem_DVBT2;
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]:%2 set delivery_system to %3")
+            .arg(inputId).arg(__LINE__).arg(delivery_system.toString()));
+    }
+    else if (tuner_type == DTVTunerType::kTunerTypeDVBS1)
+    {
+        delivery_system  = DTVModulationSystem::kModulationSystem_DVBS;
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]:%2 set delivery_system to %3")
+            .arg(inputId).arg(__LINE__).arg(delivery_system.toString()));
+    }
+    else if (tuner_type == DTVTunerType::kTunerTypeDVBS2)
+    {
+        delivery_system = DTVModulationSystem::kModulationSystem_DVBS2;
+        LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]:%2 set delivery_system to %3")
+            .arg(inputId).arg(__LINE__).arg(delivery_system.toString()));
+    }
+
+    LOG(VB_CHANNEL, LOG_INFO, QString("DVBChan[%1]: Delivery system: %2")
+        .arg(inputId).arg(delivery_system.toString()));
+
+    if (delivery_system != DTVModulationSystem::kModulationSystem_UNDEFINED)
+    {
+        cmdseq->props[c].cmd      = DTV_DELIVERY_SYSTEM;
+        cmdseq->props[c++].u.data = delivery_system;
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("DVBChan[%1]: Delivery system: %2")
+            .arg(inputId).arg(delivery_system.toString()));
+    }
+
+    // Frequency, modulation and inversion
+    cmdseq->props[c].cmd      = DTV_FREQUENCY;
+    cmdseq->props[c++].u.data = intermediate_freq ? intermediate_freq : tuning.m_frequency;
+    cmdseq->props[c].cmd      = DTV_MODULATION;
+    cmdseq->props[c++].u.data = tuning.m_modulation;
+    cmdseq->props[c].cmd      = DTV_INVERSION;
+    cmdseq->props[c++].u.data = tuning.m_inversion;
+
+    // Symbol rate
+    if (tuner_type == DTVTunerType::kTunerTypeDVBS1 ||
+        tuner_type == DTVTunerType::kTunerTypeDVBS2 ||
+        tuner_type == DTVTunerType::kTunerTypeDVBC)
+    {
+        cmdseq->props[c].cmd      = DTV_SYMBOL_RATE;
+        cmdseq->props[c++].u.data = tuning.m_symbolRate;
+    }
+
+    // Forward error correction
+    if (tuner_type.IsFECVariable())
+    {
+        cmdseq->props[c].cmd      = DTV_INNER_FEC;
+        cmdseq->props[c++].u.data = can_fec_auto ? FEC_AUTO
+            : (fe_code_rate_t) (int) tuning.m_fec;
+    }
+
+    // DVB-T/T2 properties
+    if (tuner_type == DTVTunerType::kTunerTypeDVBT ||
+        tuner_type == DTVTunerType::kTunerTypeDVBT2)
+    {
+        cmdseq->props[c].cmd      = DTV_BANDWIDTH_HZ;
+        cmdseq->props[c++].u.data = (8-tuning.m_bandwidth) * 1000000;
+        cmdseq->props[c].cmd      = DTV_CODE_RATE_HP;
+        cmdseq->props[c++].u.data = tuning.m_hpCodeRate;
+        cmdseq->props[c].cmd      = DTV_CODE_RATE_LP;
+        cmdseq->props[c++].u.data = tuning.m_lpCodeRate;
+        cmdseq->props[c].cmd      = DTV_TRANSMISSION_MODE;
+        cmdseq->props[c++].u.data = tuning.m_transMode;
+        cmdseq->props[c].cmd      = DTV_GUARD_INTERVAL;
+        cmdseq->props[c++].u.data = tuning.m_guardInterval;
+        cmdseq->props[c].cmd      = DTV_HIERARCHY;
+        cmdseq->props[c++].u.data = tuning.m_hierarchy;
+    }
+
+    // DVB-S properties can be set on DVB-S2 tuner
+    if (delivery_system == DTVModulationSystem::kModulationSystem_DVBS)
+    {
+        cmdseq->props[c].cmd      = DTV_ROLLOFF;
+        cmdseq->props[c++].u.data = DTVRollOff::kRollOff_35;
+    }
+
+    // DVB-S2 properties
+    if (delivery_system == DTVModulationSystem::kModulationSystem_DVBS2)
+    {
+        cmdseq->props[c].cmd      = DTV_PILOT;
+        cmdseq->props[c++].u.data = PILOT_AUTO;
+        cmdseq->props[c].cmd      = DTV_ROLLOFF;
+        cmdseq->props[c++].u.data = tuning.m_rolloff;
+    }
+
+    if (do_tune)
+        cmdseq->props[c++].cmd    = DTV_TUNE;
+
+    cmdseq->num = c;
+
+    return cmdseq;
 }
