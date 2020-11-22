@@ -2369,6 +2369,8 @@ QStringList CardUtil::CapabilitiesToString(uint64_t capabilities)
         if (capabilities & fe_caps_name[i].idx)
             caps.append(fe_caps_name[i].name);
     }
+#else
+    Q_UNUSED(capabilities);
 #endif  // USING_DVB
     return caps;
 }
