@@ -2330,7 +2330,7 @@ QStringList CardUtil::CapabilitiesToString(uint64_t capabilities)
         const char *name;
     };
 
-    struct fe_caps_name fe_caps_name[31] = {
+    std::array<fe_caps_name,31> fe_caps_name {{
         { FE_CAN_2G_MODULATION,          "CAN_2G_MODULATION" },
         { FE_CAN_8VSB,                   "CAN_8VSB" },
         { FE_CAN_16VSB,                  "CAN_16VSB" },
@@ -2362,12 +2362,12 @@ QStringList CardUtil::CapabilitiesToString(uint64_t capabilities)
         { FE_HAS_EXTENDED_CAPS,          "HAS_EXTENDED_CAPS" },
         { FE_IS_STUPID,                  "IS_STUPID" },
         { FE_NEEDS_BENDING,              "NEEDS_BENDING" },
-    };
+    }};
 
-    for (uint i = 0; i < sizeof(fe_caps_name)/sizeof(fe_caps_name[0]); i++)
+    for (const auto & cap : fe_caps_name)
     {
-        if (capabilities & fe_caps_name[i].idx)
-            caps.append(fe_caps_name[i].name);
+        if (capabilities & cap.idx)
+            caps.append(cap.name);
     }
 #else
     Q_UNUSED(capabilities);

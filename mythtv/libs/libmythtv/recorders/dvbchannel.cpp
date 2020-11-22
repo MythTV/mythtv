@@ -64,7 +64,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(uint inputId,
     uint intermediate_freq, bool can_fec_auto, bool do_tune = true);
 
 static const int64_t concurrent_tunings_delay = 1000;
-int64_t DVBChannel::s_lastTuning = QDateTime::currentDateTime().currentMSecsSinceEpoch();
+int64_t DVBChannel::s_lastTuning = QDateTime::currentMSecsSinceEpoch();
 
 #define LOC QString("DVBChan[%1](%2): ").arg(m_inputId).arg(DVBChannel::GetDevice())
 
@@ -280,14 +280,14 @@ bool DVBChannel::Open(DVBChannel *who)
 
     // Does this card use the DVBv5 or the legacy DVBv3 API?
     {
-        struct dtv_property prop[2] = {};
+        std::array<struct dtv_property,2> prop = {};
         struct dtv_properties cmd = {};
 
         prop[0].cmd = DTV_API_VERSION;
         prop[1].cmd = DTV_DELIVERY_SYSTEM;
 
         cmd.num = 2;
-        cmd.props = prop;
+        cmd.props = prop.data();
 
         if (ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd) == -1)
         {
@@ -298,19 +298,19 @@ bool DVBChannel::Open(DVBChannel *who)
 	    m_version = prop[0].u.data;
 	    m_currentSys = prop[1].u.data;
 
-        m_legacy_fe = m_version < 0x500 ? true : m_legacy_fe;
-        m_has_v5_stats = m_version >= 0x50a;
+        m_legacyFe = m_version < 0x500 ? true : m_legacyFe;
+        m_hasV5Stats = m_version >= 0x50a;
     }
 
     // Determine tuner capabilities and configured delivery system
     //
     m_sysList.clear();
-	if (m_legacy_fe || m_version < 0x505)
+	if (m_legacyFe || m_version < 0x505)
     {
         // Legacy DVBv3 API
         //
         DTVModulationSystem delsys;
-		m_legacy_fe = true;
+		m_legacyFe = true;
 		switch (info.type) {
 		case FE_QPSK:
 			m_currentSys = SYS_DVBS;
@@ -370,13 +370,13 @@ bool DVBChannel::Open(DVBChannel *who)
     {
         // DVBv5 API
         //
-        struct dtv_property prop[1] = {};
+        std::array<struct dtv_property,1> prop = {};
         struct dtv_properties cmd = {};
 
 		prop[0].cmd = DTV_ENUM_DELSYS;
 
         cmd.num = 1;
-        cmd.props = prop;
+        cmd.props = prop.data();
 
 		if (ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd) == -1)
         {
@@ -410,30 +410,34 @@ bool DVBChannel::Open(DVBChannel *who)
         LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString("DVB version:0x%1 ").arg(m_version,3,16,QChar('0')) +
             QString("Delivery system:%1 ").arg(m_currentSys.toString()) +
-            QString("Legacy FE:%1 ").arg(m_legacy_fe) +
-            QString("Has DVBv5 stats:%1").arg(m_has_v5_stats));
+            QString("Legacy FE:%1 ").arg(m_legacyFe) +
+            QString("Has DVBv5 stats:%1").arg(m_hasV5Stats));
 
         LOG(VB_CHANNEL, LOG_INFO, "Supported delivery systems: ");
         for (auto & delsys : m_sysList)
         {
             if (delsys == m_currentSys)
+            {
                 LOG(VB_CHANNEL, LOG_INFO, QString("   [%1]")
                     .arg(delsys.toString()));
+            }
             else
+            {
                 LOG(VB_CHANNEL, LOG_INFO, QString("    %1")
                     .arg(delsys.toString()));
+            }
         }
 
 		uint32_t frq_min = info.frequency_min;
 		uint32_t frq_max = info.frequency_max;
 		uint32_t frq_stp = info.frequency_stepsize;
-		uint32_t frq_tol = info.frequency_tolerance;
+//		uint32_t frq_tol = info.frequency_tolerance;
 		if (info.type == FE_QPSK)   			// Satellite frequencies are in kHz
         {
 			frq_min *= 1000;
 			frq_max *= 1000;
 			frq_stp *= 1000;
-			frq_tol *= 1000;
+//			frq_tol *= 1000;
 		}
 
 		LOG(VB_CHANNEL, LOG_INFO, QString("Frequency range for the current standard:"));
@@ -807,7 +811,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
         m_tuneDelayLock.lock();
 
-        int64_t this_tuning = QDateTime::currentDateTime().currentMSecsSinceEpoch();
+        int64_t this_tuning = QDateTime::currentMSecsSinceEpoch();
         int64_t tuning_delay = s_lastTuning + concurrent_tunings_delay - this_tuning;
         if (tuning_delay > 0)
         {
@@ -815,7 +819,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
                 .arg(concurrent_tunings_delay).arg(tuning_delay));
             std::this_thread::sleep_for(std::chrono::milliseconds(tuning_delay));
         }
-        s_lastTuning = QDateTime::currentDateTime().currentMSecsSinceEpoch();
+        s_lastTuning = QDateTime::currentMSecsSinceEpoch();
 
         m_tuneDelayLock.unlock();
 
@@ -870,7 +874,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         }
 
         // DVBv5 or legacy DVBv3 API
-        if (!m_legacy_fe)
+        if (!m_legacyFe)
         {
             // DVBv5 API
             struct dtv_property p_clear = {};
@@ -1040,7 +1044,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
     }
 
     // DVBv5 API
-    if (!m_legacy_fe)
+    if (!m_legacyFe)
     {
         // TODO implement probing of tuning parameters with FE_GET_PROPERTY
         return false;
@@ -1244,7 +1248,7 @@ double DVBChannel::GetSignalStrength(bool *ok) const
     }
     ReturnMasterLock(master); // If we're the master we don't need this lock.
 
-    if (!m_legacy_fe && m_has_v5_stats)
+    if (!m_legacyFe && m_hasV5Stats)
     {
         double value = GetSignalStrengthDVBv5(ok);
         if (ok && *ok)
@@ -1322,7 +1326,7 @@ double DVBChannel::GetSNR(bool *ok) const
     }
     ReturnMasterLock(master); // If we're the master we don't need this lock.
 
-    if (!m_legacy_fe && m_has_v5_stats)
+    if (!m_legacyFe && m_hasV5Stats)
     {
         double value = GetSNRDVBv5(ok);
         if (ok && *ok)
@@ -1399,7 +1403,7 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
     }
     ReturnMasterLock(master); // If we're the master we don't need this lock.
 
-    if (!m_legacy_fe && m_has_v5_stats)
+    if (!m_legacyFe && m_hasV5Stats)
     {
         double value = GetBitErrorRateDVBv5(ok);
         if (ok && *ok)
@@ -1461,7 +1465,7 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
     }
     ReturnMasterLock(master); // If we're the master we don't need this lock.
 
-    if (!m_legacy_fe && m_has_v5_stats)
+    if (!m_legacyFe && m_hasV5Stats)
     {
         double value = GetUncorrectedBlockCountDVBv5(ok);
         if (ok && *ok)

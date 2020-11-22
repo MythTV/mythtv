@@ -146,8 +146,8 @@ class DVBChannel : public DTVChannel
     uint              m_symbolRateMaximum   {0};
 
     uint              m_version             {0};      // DVB API version
-    bool              m_legacy_fe           {false};  // Use legacy DVBv3 API
-    bool              m_has_v5_stats        {false};  // Use DVBv5 API for statistics
+    bool              m_legacyFe            {false};  // Use legacy DVBv3 API
+    bool              m_hasV5Stats          {false};  // Use DVBv5 API for statistics
 	  DTVModulationSystem        m_currentSys;          // Currently configured modulation system
     QList<DTVModulationSystem> m_sysList;             // List of supported modulation systems
 
