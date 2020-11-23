@@ -339,7 +339,7 @@ void LyricsView::setLyricTime(void)
             auto *lyric = item->GetData().value<LyricsLine*>();
             if (lyric)
             {
-                lyric->m_time = gPlayer->getOutput()->GetAudiotime() - 750;
+                lyric->m_time = gPlayer->getOutput()->GetAudiotime().count() - 750;
                 m_lyricData->setChanged(true);
                 m_lyricData->setSyncronized(true);
                 m_autoScroll = false;

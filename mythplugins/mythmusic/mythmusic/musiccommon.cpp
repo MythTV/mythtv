@@ -1132,7 +1132,7 @@ void MusicCommon::seek(int pos)
             decoder->unlock();
         }
 
-        gPlayer->getOutput()->SetTimecode(pos*1000);
+        gPlayer->getOutput()->SetTimecode(std::chrono::milliseconds(pos*1000));
 
         if (!gPlayer->isPlaying())
         {

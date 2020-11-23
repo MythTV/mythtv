@@ -211,10 +211,10 @@ void MainVisual::timeout()
     if (m_playing && gPlayer->getOutput())
     {
         QMutexLocker locker(mutex());
-        int64_t timestamp = gPlayer->getOutput()->GetAudiotime();
+        std::chrono::milliseconds timestamp = gPlayer->getOutput()->GetAudiotime();
         while (m_nodes.size() > 1)
         {
-            if ((int64_t)m_nodes.first()->m_offset > timestamp)
+            if ((int64_t)m_nodes.first()->m_offset > timestamp.count())
                 break;
 
             if (m_vis)

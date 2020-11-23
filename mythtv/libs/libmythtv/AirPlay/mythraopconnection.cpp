@@ -374,7 +374,7 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
         .arg(m_currentTimestamp).arg(m_nextTimestamp).arg(m_timeLastSync));
 
     int64_t delay = framesToMs((uint64_t)m_audioQueue.size() * m_framesPerPacket);
-    int64_t audiots = m_audio->GetAudiotime();
+    int64_t audiots = m_audio->GetAudiotime().count();
     int64_t currentLatency = 0LL;
 
     if (m_audioStarted)
@@ -387,7 +387,7 @@ void MythRAOPConnection::ProcessSync(const QByteArray &buf)
         .arg(audiots).arg(m_currentTimestamp)
         .arg(currentLatency));
 
-    delay += m_audio->GetAudioBufferedTime();
+    delay += m_audio->GetAudioBufferedTime().count();
     delay += currentLatency;
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
@@ -667,7 +667,7 @@ void MythRAOPConnection::ProcessAudio()
     gettimeofday(&t, nullptr);
     uint64_t dtime    = (t.tv_sec * 1000 + t.tv_usec / 1000) - m_timeLastSync;
     uint64_t rtp      = dtime + m_currentTimestamp;
-    uint64_t buffered = m_audioStarted ? m_audio->GetAudioBufferedTime() : 0;
+    uint64_t buffered = m_audioStarted ? m_audio->GetAudioBufferedTime().count() : 0;
 
     // Keep audio framework buffer as short as possible, keeping everything in
     // m_audioQueue, so we can easily reset the least amount possible
@@ -733,8 +733,8 @@ void MythRAOPConnection::ProcessAudio()
                 }
                 m_audio->AddData((char *)data.data + offset,
                                  data.length - offset,
-                                 timestamp, framecnt);
-                timestamp += m_audio->LengthLastData();
+                                 std::chrono::milliseconds(timestamp), framecnt);
+                timestamp += m_audio->LengthLastData().count();
             }
             i++;
             m_audioStarted = true;
@@ -1311,7 +1311,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
         }
         // determine RTP timestamp of last sample played
         uint64_t timestamp = m_audioStarted && m_audio ?
-            m_audio->GetAudiotime() : m_lastTimestamp;
+            m_audio->GetAudiotime().count() : m_lastTimestamp;
         *m_textStream << "RTP-Info: rtptime=" << QString::number(timestamp);
         m_streamingStarted = false;
         ResetAudio();
@@ -1713,11 +1713,11 @@ int64_t MythRAOPConnection::AudioCardLatency(void)
     int frames = AUDIOCARD_BUFFER * m_frameRate / 1000;
     m_audio->AddData((char *)samples,
                      frames * (m_sampleSize>>3) * m_channels,
-                     0,
+                     0ms,
                      frames);
     av_free(samples);
     usleep(AUDIOCARD_BUFFER * 1000);
-    uint64_t audiots = m_audio->GetAudiotime();
+    uint64_t audiots = m_audio->GetAudiotime().count();
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("AudioCardLatency: ts=%1ms")
         .arg(audiots));
     return AUDIOCARD_BUFFER - (int64_t)audiots;

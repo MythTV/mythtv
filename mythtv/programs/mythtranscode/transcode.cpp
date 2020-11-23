@@ -995,11 +995,11 @@ int Transcode::TranscodeFile(const QString &inputname,
     long totalAudio = 0;
     int dropvideo = 0;
     // timecode of the last read video frame in input time
-    long long lasttimecode = 0;
+    std::chrono::milliseconds lasttimecode = 0ms;
     // timecode of the last write video frame in input or output time
-    long long lastWrittenTime = 0;
+    std::chrono::milliseconds lastWrittenTime = 0ms;
     // delta between the same video frame in input and output due to applying the cut list
-    long long timecodeOffset = 0;
+    std::chrono::milliseconds timecodeOffset = 0ms;
 
     float rateTimeConv = arb->m_eff_audiorate / 1000.0F;
     float vidFrameTime = 1000.0F / video_frame_rate;
@@ -1059,8 +1059,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         frame.m_timecode = lastDecode->m_timecode;
 
         // if the timecode jumps backwards just use the last frame's timecode plus the duration of a frame
-        if (frame.m_timecode < lasttimecode)
-            frame.m_timecode = (long long)(lasttimecode + vidFrameTime);
+        if (frame.m_timecode < lasttimecode.count())
+            frame.m_timecode = (long long)(lasttimecode.count() + vidFrameTime);
 
         if (m_fifow)
         {
@@ -1076,7 +1076,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
                       lastDecode->m_height, imageOut.data, imageOut.linesize);
 
-            totalAudio += arb->GetSamples(frame.m_timecode);
+            totalAudio += arb->GetSamples(std::chrono::milliseconds(frame.m_timecode));
             int audbufTime = (int)(totalAudio / rateTimeConv);
             int auddelta = frame.m_timecode - audbufTime;
             int vidTime = lroundf(curFrameNum * vidFrameTime);
@@ -1141,7 +1141,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     .arg(delta));
 #endif
             AudioBuffer *ab = nullptr;
-            while ((ab = arb->GetData(frame.m_timecode)) != nullptr)
+            while ((ab = arb->GetData(std::chrono::milliseconds(frame.m_timecode))) != nullptr)
             {
                 if (!cutter ||
                     !cutter->InhibitUseAudioFrames(ab->m_frames, &totalAudio))
@@ -1175,7 +1175,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             }
             videoOutput->DoneDisplayingFrame(lastDecode);
             player->GetCC608Reader()->FlushTxtBuffers();
-            lasttimecode = frame.m_timecode;
+            lasttimecode = std::chrono::milliseconds(frame.m_timecode);
         }
         else if (copyaudio)
         {
@@ -1228,14 +1228,15 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             if (did_ff == 1)
             {
-                timecodeOffset +=
-                    (frame.m_timecode - lasttimecode - (int)vidFrameTime);
+                timecodeOffset += (std::chrono::milliseconds(frame.m_timecode) -
+                                   lasttimecode -
+                                   std::chrono::milliseconds((int)vidFrameTime));
             }
-            lasttimecode = frame.m_timecode;
+            lasttimecode = std::chrono::milliseconds(frame.m_timecode);
 // from here on the timecode is on the output time base
-            frame.m_timecode -= timecodeOffset;
+            frame.m_timecode -= timecodeOffset.count();
 
-            if (!player->WriteStoredData(m_outBuffer, (did_ff == 0), timecodeOffset))
+            if (!player->WriteStoredData(m_outBuffer, (did_ff == 0), timecodeOffset.count()))
             {
                 if (video_aspect != new_aspect)
                 {
@@ -1295,8 +1296,9 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (did_ff == 1)
             {
                 did_ff = 2;
-                timecodeOffset +=
-                    (frame.m_timecode - lasttimecode - (int)vidFrameTime);
+                timecodeOffset += (std::chrono::milliseconds(frame.m_timecode) -
+                                   lasttimecode -
+                                   std::chrono::milliseconds((int)vidFrameTime));
             }
 
             if (video_aspect != new_aspect)
@@ -1348,8 +1350,9 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     if (did_ff != 1)
                     {
-                        long long tc = ab->m_time - timecodeOffset;
-                        avfw->WriteAudioFrame(buf, audioFrame, tc);
+                        std::chrono::milliseconds tc = ab->m_time - timecodeOffset;
+                        long long tc_tmp = tc.count();
+                        avfw->WriteAudioFrame(buf, audioFrame, tc_tmp);
 
                         if (avfw2)
                         {
@@ -1361,7 +1364,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                             }
 
                             tc = ab->m_time - timecodeOffset;
-                            avfw2->WriteAudioFrame(buf, audioFrame, tc);
+                            avfw2->WriteAudioFrame(buf, audioFrame, tc_tmp);
                         }
 
                         ++audioFrame;
@@ -1372,7 +1375,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     m_nvr->SetOption("audioframesize", ab->size());
                     m_nvr->WriteAudio(buf, audioFrame++,
-                                    ab->m_time - timecodeOffset);
+                                      (ab->m_time - timecodeOffset).count());
                     if (m_nvr->IsErrored())
                     {
                         LOG(VB_GENERAL, LOG_ERR,
@@ -1400,8 +1403,8 @@ int Transcode::TranscodeFile(const QString &inputname,
                 return REENCODE_ERROR;
 #endif
             }
-            lasttimecode = frame.m_timecode;
-            frame.m_timecode -= timecodeOffset;
+            lasttimecode = std::chrono::milliseconds(frame.m_timecode);
+            frame.m_timecode -= timecodeOffset.count();
 
             if (m_avfMode)
             {
@@ -1429,7 +1432,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                     if (avfw->WriteVideoFrame(rescale ? &frame : lastDecode) > 0)
                     {
-                        lastWrittenTime = frame.m_timecode + timecodeOffset;
+                        lastWrittenTime = std::chrono::milliseconds(frame.m_timecode) + timecodeOffset;
                         if (hls)
                             ++hlsSegmentFrames;
                     }
@@ -1443,7 +1446,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     m_nvr->WriteVideo(rescale ? &frame : lastDecode, true, true);
                 else
                     m_nvr->WriteVideo(rescale ? &frame : lastDecode);
-                lastWrittenTime = frame.m_timecode + timecodeOffset;
+                lastWrittenTime = std::chrono::milliseconds(frame.m_timecode) + timecodeOffset;
             }
 #endif
         }

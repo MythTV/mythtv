@@ -497,7 +497,7 @@ void avfDecoder::run()
                 if (data_size <= 0)
                     continue;
 
-                output()->AddData(m_outputBuffer, data_size, -1, 0);
+                output()->AddData(m_outputBuffer, data_size, -1ms, 0);
             }
 
             av_packet_unref(&pkt);
@@ -505,12 +505,12 @@ void avfDecoder::run()
             // Wait until we need to decode or supply more samples
             while (!m_finish && !m_userStop && m_seekTime <= 0.0)
             {
-                int64_t buffered = output()->GetAudioBufferedTime();
+                std::chrono::milliseconds buffered = output()->GetAudioBufferedTime();
                 // never go below 1s buffered
-                if (buffered < 1000)
+                if (buffered < 1s)
                     break;
                 // wait
-                const struct timespec ns {0, (buffered - 1000) * 1000000};
+                const struct timespec ns {0, (buffered.count() - 1000) * 1000000};
                 nanosleep(&ns, nullptr);
             }
         }

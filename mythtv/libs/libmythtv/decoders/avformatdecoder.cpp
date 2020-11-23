@@ -4758,10 +4758,10 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         int samplesize = AudioOutputSettings::SampleSize(m_audio->GetFormat());
         int frames = (ctx->channels <= 0 || decoded_size < 0 || !samplesize) ? -1 :
             decoded_size / (ctx->channels * samplesize);
-        m_audio->AddAudioData((char *)m_audioSamples, data_size, temppts, frames);
+        m_audio->AddAudioData((char *)m_audioSamples, data_size, std::chrono::milliseconds(temppts), frames);
         if (m_audioOut.m_doPassthru && !m_audio->NeedDecodingBeforePassthrough())
         {
-            m_lastAPts += m_audio->LengthLastData();
+            m_lastAPts += m_audio->LengthLastData().count();
         }
         else
         {

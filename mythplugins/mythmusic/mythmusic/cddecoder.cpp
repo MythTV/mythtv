@@ -124,7 +124,7 @@ void CdDecoder::writeBlock()
 {
     while (m_seekTime <= +0.)
     {
-        if(output()->AddFrames(m_outputBuf, m_bksFrames, -1))
+        if(output()->AddFrames(m_outputBuf, m_bksFrames, -1ms))
         {
             if (m_outputAt >= m_bks)
             {
@@ -133,7 +133,7 @@ void CdDecoder::writeBlock()
             }
             break;
         }
-        ::usleep(output()->GetAudioBufferedTime()<<9);
+        ::usleep(output()->GetAudioBufferedTime().count()<<9);
     }
 }
 
@@ -384,7 +384,7 @@ void CdDecoder::run()
             if (fill < (thresh << 6))
                 break;
             // Wait for half of the buffer to drain
-            ::usleep(output()->GetAudioBufferedTime()<<9);
+            ::usleep(output()->GetAudioBufferedTime().count()<<9);
         }
 
         // write a block if there's sufficient space for it

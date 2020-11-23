@@ -115,7 +115,7 @@ int64_t MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideoFrame *Frame,
         {
             // cater for DVB radio
             if (videotimecode == 0)
-                videotimecode = Audio->GetAudioTime();;
+                videotimecode = Audio->GetAudioTime().count();
 
             // cater for data only streams (i.e. MHEG)
             bool dataonly = !Audio->HasAudioIn() && !HaveVideo;
@@ -211,7 +211,7 @@ int64_t MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideoFrame *Frame,
     }
 
     // get time codes for calculating difference next time
-    m_priorAudioTimecode = Audio->GetAudioTime();
+    m_priorAudioTimecode = Audio->GetAudioTime().count();
 
     if (dropframe)
     {

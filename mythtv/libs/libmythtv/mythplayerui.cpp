@@ -251,7 +251,7 @@ void MythPlayerUI::EventLoop()
         bool audioDrained =
             !m_audio.GetAudioOutput() ||
             m_audio.IsPaused() ||
-            m_audio.GetAudioOutput()->GetAudioBufferedTime() < 100;
+            m_audio.GetAudioOutput()->GetAudioBufferedTime() < 100ms;
         if (eof != kEofStateDelayed || (videoDrained && audioDrained))
         {
             if (eof == kEofStateDelayed)

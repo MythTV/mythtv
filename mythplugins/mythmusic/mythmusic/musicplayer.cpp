@@ -1111,7 +1111,7 @@ void MusicPlayer::seek(int pos)
         if (decoder && decoder->isRunning())
             decoder->seek(pos);
 
-        m_output->SetTimecode(pos*1000);
+        m_output->SetTimecode(std::chrono::seconds(pos));
     }
 }
 

@@ -12,6 +12,7 @@
 #include "compat.h"
 #include "audiosettings.h"
 #include "audiooutputsettings.h"
+#include "mythchrono.h"
 #include "mythcorecontext.h"
 #include "mythaverror.h"
 #include "volumebase.h"
@@ -98,7 +99,8 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
          * \return false if there wasn't enough space in audio buffer to
          *     process all the data
          */
-    virtual bool AddFrames(void *buffer, int frames, int64_t timecode) = 0;
+    virtual bool AddFrames(void *buffer, int frames,
+                           std::chrono::milliseconds timecode) = 0;
 
         /**
          * Add data to the audiobuffer for playback
@@ -112,7 +114,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
          *     process all the data
          */
     virtual bool AddData(void *buffer, int len,
-                         int64_t timecode, int frames) = 0;
+                         std::chrono::milliseconds timecode, int frames) = 0;
 
         /**
          * \return true if AudioOutput class can determine the length in
@@ -126,9 +128,9 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
          * This function must be implemented if NeedDecodingBeforePassthrough
          * returned false
          */
-    virtual int64_t LengthLastData(void) const { return -1; };
+    virtual std::chrono::milliseconds LengthLastData(void) const { return -1ms; };
 
-    virtual void SetTimecode(int64_t timecode) = 0;
+    virtual void SetTimecode(std::chrono::milliseconds timecode) = 0;
     virtual bool IsPaused(void) const = 0;
     virtual void Pause(bool paused) = 0;
     virtual void PauseUntilBuffered(void) = 0;
@@ -136,10 +138,10 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     // Wait for all data to finish playing
     virtual void Drain(void) = 0;
 
-    virtual int64_t GetAudiotime(void) = 0;
+    virtual std::chrono::milliseconds GetAudiotime(void) = 0;
 
     /// report amount of audio buffered in milliseconds.
-    virtual int64_t GetAudioBufferedTime(void) { return 0; }
+    virtual std::chrono::milliseconds GetAudioBufferedTime(void) { return 0ms; }
 
     virtual void SetSourceBitrate(int /*rate*/ ) { }
 

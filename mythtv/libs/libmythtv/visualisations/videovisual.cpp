@@ -81,7 +81,7 @@ void VideoVisual::prepare()
 // caller holds lock
 VisualNode* VideoVisual::GetNode(void)
 {
-    int64_t timestamp = m_audio->GetAudioTime();
+    int64_t timestamp = m_audio->GetAudioTime().count();
     while (m_nodes.size() > 1)
     {
         if (m_nodes.front()->m_offset > timestamp)
