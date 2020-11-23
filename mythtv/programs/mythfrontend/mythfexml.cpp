@@ -97,7 +97,7 @@ bool MythFEXML::ProcessRequest( HTTPRequest *pRequest )
             GetActionListTest(pRequest);
             break;
         case MFEXML_GetRemote:
-            GetRemote(pRequest);
+            pRequest->FormatFileResponse(m_sSharePath + "html/frontend_index.qsp");
             break;
         default:
             UPnp::FormatErrorResponse(pRequest, UPnPResult_InvalidAction);
