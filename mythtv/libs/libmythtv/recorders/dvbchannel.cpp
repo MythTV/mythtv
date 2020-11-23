@@ -305,67 +305,67 @@ bool DVBChannel::Open(DVBChannel *who)
     // Determine tuner capabilities and configured delivery system
     //
     m_sysList.clear();
-	if (m_legacyFe || m_version < 0x505)
+    if (m_legacyFe || m_version < 0x505)
     {
         // Legacy DVBv3 API
         //
         DTVModulationSystem delsys;
-		m_legacyFe = true;
-		switch (info.type) {
-		case FE_QPSK:
-			m_currentSys = SYS_DVBS;
+        m_legacyFe = true;
+        switch (info.type) {
+        case FE_QPSK:
+            m_currentSys = SYS_DVBS;
             m_sysList.append(m_currentSys);
 
-			if (m_version < 0x0500)
-				break;
-			if (info.caps & FE_CAN_2G_MODULATION)
+            if (m_version < 0x0500)
+                break;
+            if (info.caps & FE_CAN_2G_MODULATION)
             {
                 delsys = SYS_DVBS2;
                 m_sysList.append(delsys);
             }
-			if (info.caps & FE_CAN_TURBO_FEC)
+            if (info.caps & FE_CAN_TURBO_FEC)
             {
                 delsys = SYS_TURBO;
                 m_sysList.append(delsys);
             }
-			break;
-		case FE_QAM:
-			m_currentSys = SYS_DVBC_ANNEX_A;
+            break;
+        case FE_QAM:
+            m_currentSys = SYS_DVBC_ANNEX_A;
             m_sysList.append(m_currentSys);
-			break;
-		case FE_OFDM:
-			m_currentSys = SYS_DVBT;
+            break;
+        case FE_OFDM:
+            m_currentSys = SYS_DVBT;
             m_sysList.append(m_currentSys);
-			if (m_version < 0x0500)
-				break;
-			if (info.caps & FE_CAN_2G_MODULATION)
+            if (m_version < 0x0500)
+                break;
+            if (info.caps & FE_CAN_2G_MODULATION)
             {
                 delsys = SYS_DVBT2;
                 m_sysList.append(delsys);
             }
-			break;
-		case FE_ATSC:
-			if (info.caps & (FE_CAN_8VSB | FE_CAN_16VSB))
+            break;
+        case FE_ATSC:
+            if (info.caps & (FE_CAN_8VSB | FE_CAN_16VSB))
             {
                 delsys = SYS_ATSC;
                 m_sysList.append(delsys);
             }
-			if (info.caps & (FE_CAN_QAM_64 | FE_CAN_QAM_256 | FE_CAN_QAM_AUTO))
+            if (info.caps & (FE_CAN_QAM_64 | FE_CAN_QAM_256 | FE_CAN_QAM_AUTO))
             {
                 delsys = SYS_DVBC_ANNEX_B;
                 m_sysList.append(delsys);
             }
             m_currentSys = m_sysList.value(0);
-			break;
-		}
-		if (m_sysList.isEmpty())
+            break;
+        }
+        if (m_sysList.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Frontend '%1' delivery system not detected.").arg(m_frontendName));
 			close(m_fdFrontend);
 			return false;
-		}
-	}
+        }
+    }
     else
     {
         // DVBv5 API
@@ -373,38 +373,38 @@ bool DVBChannel::Open(DVBChannel *who)
         std::array<struct dtv_property,1> prop = {};
         struct dtv_properties cmd = {};
 
-		prop[0].cmd = DTV_ENUM_DELSYS;
+        prop[0].cmd = DTV_ENUM_DELSYS;
 
         cmd.num = 1;
         cmd.props = prop.data();
 
-		if (ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd) == -1)
+        if (ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd) == -1)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Frontend '%1' FE_GET_PROPERTY failed.").arg(m_frontendName));
-			close(m_fdFrontend);
-			return false;
-		}
+            close(m_fdFrontend);
+            return false;
+        }
 
-		int p_num_systems = prop[0].u.buffer.len;
-		for (int i = 0; i < p_num_systems; i++)
+        int p_num_systems = prop[0].u.buffer.len;
+        for (int i = 0; i < p_num_systems; i++)
         {
             DTVModulationSystem delsys(prop[0].u.buffer.data[i]);
             m_sysList.append(delsys);
         }
 
-		if (p_num_systems == 0) {
+        if (p_num_systems == 0) {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Frontend '%1' returned 0 supported delivery systems!").arg(m_frontendName));
-			close(m_fdFrontend);
-			return false;
-		}
-	}
+            close(m_fdFrontend);
+            return false;
+        }
+    }
 
     // Frontend info
     //
     if (VERBOSE_LEVEL_CHECK(VB_CHANNEL, LOG_INFO))
-	{
+    {
         LOG(VB_CHANNEL, LOG_INFO, LOC +
             QString("Frontend '%1' ").arg(m_frontendName));
         LOG(VB_CHANNEL, LOG_INFO, LOC +
@@ -428,32 +428,32 @@ bool DVBChannel::Open(DVBChannel *who)
             }
         }
 
-		uint32_t frq_min = info.frequency_min;
-		uint32_t frq_max = info.frequency_max;
-		uint32_t frq_stp = info.frequency_stepsize;
-//		uint32_t frq_tol = info.frequency_tolerance;
-		if (info.type == FE_QPSK)   			// Satellite frequencies are in kHz
+        uint32_t frq_min = info.frequency_min;
+        uint32_t frq_max = info.frequency_max;
+        uint32_t frq_stp = info.frequency_stepsize;
+//      uint32_t frq_tol = info.frequency_tolerance;
+        if (info.type == FE_QPSK)   			// Satellite frequencies are in kHz
         {
-			frq_min *= 1000;
-			frq_max *= 1000;
-			frq_stp *= 1000;
-//			frq_tol *= 1000;
-		}
+            frq_min *= 1000;
+            frq_max *= 1000;
+            frq_stp *= 1000;
+//          frq_tol *= 1000;
+        }
 
-		LOG(VB_CHANNEL, LOG_INFO, QString("Frequency range for the current standard:"));
+        LOG(VB_CHANNEL, LOG_INFO, QString("Frequency range for the current standard:"));
         LOG(VB_CHANNEL, LOG_INFO, QString("    From:  %1 Hz").arg(frq_min,11));
         LOG(VB_CHANNEL, LOG_INFO, QString("    To:    %1 Hz").arg(frq_max,11));
         LOG(VB_CHANNEL, LOG_INFO, QString("    Step:  %1 Hz").arg(frq_stp,11));
 
-		if (info.type == FE_QPSK || info.type == FE_QAM)
+        if (info.type == FE_QPSK || info.type == FE_QAM)
         {
             LOG(VB_CHANNEL, LOG_INFO, QString("Symbol rate ranges for the current standard:"));
             LOG(VB_CHANNEL, LOG_INFO, QString("    From:  %1 Baud").arg(info.symbol_rate_min,11));
             LOG(VB_CHANNEL, LOG_INFO, QString("    To:    %1 Baud").arg(info.symbol_rate_max,11));
-		}
-	}
+        }
+    }
 
-	if (m_currentSys == SYS_UNDEFINED)
+    if (m_currentSys == SYS_UNDEFINED)
         m_currentSys = m_sysList.value(0);
 
     // Get delivery system from database and configure the tuner if needed.
