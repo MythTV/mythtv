@@ -54,11 +54,6 @@
 #include "dvbcam.h"
 #include "tv_rec.h"
 
-// Returned by drivers on unsupported DVBv3 ioctl calls
-// #ifndef ENOTSUPP
-// #define ENOTSUPP 524
-// #endif
-
 // Local functions
 static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     DTVTunerType tuner_type, const DTVMultiplex& tuning, uint intermediate_freq, bool can_fec_auto);
@@ -1229,11 +1224,6 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
             value = cmd.props->u.st.stat[0].uvalue / 65535.0;
         }
     }
-    // else
-    // {
-    //     LOG(VB_CHANNEL, LOG_ERR, LOC +
-    //         "Getting DVBv5 Frontend signal strength failed." + ENO);
-    // }
     return value;
 }
 
@@ -1261,10 +1251,6 @@ double DVBChannel::GetSignalStrength(bool *ok) const
     int ret = ioctl(m_fdFrontend, FE_READ_SIGNAL_STRENGTH, &sig);
     if (ret < 0)
     {
-        // if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        // {
-        //     return GetSignalStrengthDVBv5(ok);
-        // }
         LOG(VB_CHANNEL, LOG_ERR, LOC +
             "Getting Frontend signal strength failed." + ENO);
     }
@@ -1291,8 +1277,8 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
         .arg(cmd.props->result)
         .arg(cmd.props->u.st.len)
         .arg(cmd.props->u.st.stat[0].scale)
-        .arg(cmd.props->u.st.stat[0].svalue)
-        );
+        .arg(cmd.props->u.st.stat[0].svalue));
+
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
     if (ok)
         *ok = tmpOk;
@@ -1317,11 +1303,6 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
             value = cmd.props->u.st.stat[0].uvalue / 65535.0;
         }
     }
-    // else
-    // {
-    //     LOG(VB_CHANNEL, LOG_ERR, LOC +
-    //         "Getting DVBv5 Frontend signal/noise ratio failed." + ENO);
-    // }
     return value;
 }
 
@@ -1349,10 +1330,6 @@ double DVBChannel::GetSNR(bool *ok) const
     int ret = ioctl(m_fdFrontend, FE_READ_SNR, &snr);
     if (ret < 0)
     {
-        // if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        // {
-        //     return GetSNRDVBv5(ok);
-        // }
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Getting Frontend signal/noise ratio failed." + ENO);
     }
@@ -1383,8 +1360,8 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
         .arg(cmd.props[1].result)
         .arg(cmd.props[1].u.st.len)
         .arg(cmd.props[1].u.st.stat[0].scale)
-        .arg(cmd.props[1].u.st.stat[0].uvalue)
-        );
+        .arg(cmd.props[1].u.st.stat[0].uvalue));
+
     bool tmpOk = (ret == 0) &&
             (cmd.props[0].u.st.len > 0) &&
             (cmd.props[1].u.st.len > 0);
@@ -1402,11 +1379,6 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
                     cmd.props[1].u.st.stat[0].uvalue);
         }
     }
-    // else
-    // {
-    //     LOG(VB_CHANNEL, LOG_ERR, LOC +
-    //         "Getting DVBv5 Frontend bit error rate failed." + ENO);
-    // }
     return value;
 }
 
@@ -1433,10 +1405,6 @@ double DVBChannel::GetBitErrorRate(bool *ok) const
     int ret = ioctl(m_fdFrontend, FE_READ_BER, &ber);
     if (ret < 0)
     {
-        // if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        // {
-        //     return GetBitErrorRateDVBv5(ok);
-        // }
         LOG(VB_CHANNEL, LOG_ERR, LOC +
             "Getting Frontend bit error rate failed." + ENO);
     }
@@ -1462,8 +1430,8 @@ double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
         .arg(cmd.props[0].result)
         .arg(cmd.props[0].u.st.len)
         .arg(cmd.props[0].u.st.stat[0].scale)
-        .arg(cmd.props[0].u.st.stat[0].svalue)
-        );
+        .arg(cmd.props[0].u.st.stat[0].svalue));
+
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
     if (ok)
         *ok = tmpOk;
@@ -1473,11 +1441,6 @@ double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
         if (cmd.props->u.st.stat[0].scale == FE_SCALE_COUNTER)
             value = cmd.props->u.st.stat[0].uvalue;
     }
-    // else
-    // {
-    //     LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-    //         "Getting DVBv5 Frontend uncorrected block count failed." + ENO);
-    // }
     return value;
 }
 
@@ -1504,10 +1467,6 @@ double DVBChannel::GetUncorrectedBlockCount(bool *ok) const
     int ret = ioctl(m_fdFrontend, FE_READ_UNCORRECTED_BLOCKS, &ublocks);
     if (ret < 0)
     {
-        // if (errno == EOPNOTSUPP || errno == ENOTSUPP)
-        // {
-        //     return GetUncorrectedBlockCountDVBv5(ok);
-        // }
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Getting Frontend uncorrected block count failed." + ENO);
     }
