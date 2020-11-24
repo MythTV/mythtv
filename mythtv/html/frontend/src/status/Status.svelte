@@ -1,6 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { Link } from "svelte-routing";
+    import DetailItem from "./DetailItem.svelte";
 
     let fe_status = getStatus();
     async function getStatus() {
@@ -32,20 +33,6 @@
         padding: 0px;
         box-sizing: border-box;
     }
-    detailbox {
-        width: 1000px;
-        border-top: 1px solid #002b36;
-        border-right: 1px solid #002b36;
-        border-bottom: 1px solid #002b36;
-        border-left: 10px solid #002b36;
-        padding: 10px;
-        border-radius: 8px 0px 0px 8px;
-        margin: auto;
-        margin-bottom: 20px;
-        color: #002b36;
-        background-color: #93a1a1;
-        display: flow-root;
-    }
     linktext {
         color: #002b36;
     }
@@ -53,32 +40,44 @@
 
 {#await fe_status}
     <status>
-        <p>loading...</p>
-    </status>
+        <h2 class="truncate">MythFrontend Status</h2>
+        <DetailItem title="This Frontend">
+            <p>loading...</p>
+        </DetailItem>
+        <DetailItem title="Services">
+            <div slot="action">
+                <div class="item left waves-effect waves-light btn-small">
+                    <Link to="/MythFE/GetRemote"><linktext>Switch to Remote Control</linktext></Link>
+                </div>
+            </div>
+        </DetailItem>
+        <DetailItem title="Machine Information">
+            <p>loading...</p>
+        </DetailItem>
+        </status>
 {:then Status}
     <status>
-        <h2 class="center">MythFrontend Status</h2>
-        <detailbox>
-            <h4>This frontend</h4>
+        <h2 class="truncate">MythFrontend Status</h2>
+        <DetailItem title="This Frontend">
             Name: {Status.Name}
             <br>
             Version: {Status.Version}
-        </detailbox>
-        <detailbox>
-            <h4>Services</h4>
-            <div class="item left waves-effect waves-light btn-small">
-                <Link to="/MythFE/GetRemote"><linktext>Remote Control</linktext></Link>
+        </DetailItem>
+        <DetailItem title="Services">
+            <div slot="action">
+                <div class="item left waves-effect waves-light btn-small">
+                    <Link to="/MythFE/GetRemote"><linktext>Switch to Remote Control</linktext></Link>
+                </div>
             </div>
-        </detailbox>
-        <detailbox>
-            <h4>Machine Information</h4>
+        </DetailItem>
+        <DetailItem title="Machine Information">
             <span>
                 The current frontend status is: {Status.State.state}
                 {#if Status.State.state == "WatchingPreRecorded"}
                     , Title: {Status.State.title}, Subtitle: {Status.State.subtitle}
                 {/if}
             </span>
-        </detailbox>
+        </DetailItem>
     </status>
 {/await}
 

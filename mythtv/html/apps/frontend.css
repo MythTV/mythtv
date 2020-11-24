@@ -1,7 +1,6 @@
 body{font:normal 13px Verdana, Geneva, sans-serif;background-color:#657b83;border:0px;margin:0px;padding:0px;max-width:100%;overflow-x:hidden;text-overflow:ellipsis}
 logo.svelte-vwmtlq{color:#26c}
-topbar.svelte-3k7qlu{background-color:#000000;background-image:linear-gradient(to bottom, #222222, #000000 60%);position:fixed;top:0px;right:0px;left:0px;height:34px;border-bottom:4px solid #004570;z-index:90}
 remote.svelte-1elvvux{background-color:#073642}remotelayout.svelte-1elvvux{grid-template-columns:repeat(3, 80px);grid-template-rows:repeat(4, 58px) 10px 58px 10px repeat(3, 58px) 10px repeat(2, 58px);width:auto;display:grid}linktext.svelte-1elvvux{color:#fdf6e3}
-status.svelte-zorg51{position:absolute;top:64px;right:0px;left:27px;width:calc(100% - 27px);height:calc(100% - 64px);padding:0px;box-sizing:border-box}detailbox.svelte-zorg51{width:1000px;border-top:1px solid #002b36;border-right:1px solid #002b36;border-bottom:1px solid #002b36;border-left:10px solid #002b36;padding:10px;border-radius:8px 0px 0px 8px;margin:auto;margin-bottom:20px;color:#002b36;background-color:#93a1a1;display:flow-root}linktext.svelte-zorg51{color:#002b36}
+status.svelte-6yj4bq{position:absolute;top:64px;right:0px;left:27px;width:calc(100% - 27px);height:calc(100% - 64px);padding:0px;box-sizing:border-box}linktext.svelte-6yj4bq{color:#002b36}
 
 /*# sourceMappingURL=frontend.css.map */

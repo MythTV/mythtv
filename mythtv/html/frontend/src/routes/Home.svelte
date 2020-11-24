@@ -4,4 +4,6 @@
 </script>
 
 <Navbar/>
-<Status/>
+<div class="container">
+    <Status/>
+</div>
