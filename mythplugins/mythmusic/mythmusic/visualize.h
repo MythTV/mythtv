@@ -50,8 +50,8 @@ class MainVisual;
 class VisualNode
 {
   public:
-    VisualNode(short *l, short *r, unsigned long n, unsigned long o)
-        : m_left(l), m_right(r), m_length(n), m_offset(o)
+    VisualNode(short *l, short *r, unsigned long n, std::chrono::milliseconds timecode)
+        : m_left(l), m_right(r), m_length(n), m_offset(timecode)
     {
         // left and right are allocated and then passed to this class
         // the code that allocated left and right should give up all ownership
@@ -66,7 +66,7 @@ class VisualNode
     short *m_left  {nullptr};
     short *m_right {nullptr};
     unsigned long m_length;
-    unsigned long m_offset;
+    std::chrono::milliseconds m_offset;
 };
 
 class VisualBase
@@ -287,7 +287,7 @@ struct piano_key_data {
     std::vector<QRect> m_rects         {};
     QSize           m_size;
 
-    unsigned long   m_offsetProcessed  {0};
+    std::chrono::milliseconds m_offsetProcessed  {0ms};
 
     piano_key_data *m_pianoData        {nullptr};
     piano_audio    *m_audioData        {nullptr};

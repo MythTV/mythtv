@@ -20,7 +20,7 @@ class VideoVisualMonoScope : public VideoVisual
     bool                  UpdateVertices  (float* Buffer);
     void                  UpdateTime      ();
 
-    int64_t               m_lastTime      { 0     };
+    std::chrono::milliseconds  m_lastTime { 0ms   };
     float                 m_hue           { 0.0   };
     float                 m_rate          { 1.0   };
     float                 m_lineWidth     { 1.0   };

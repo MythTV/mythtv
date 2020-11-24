@@ -432,7 +432,7 @@ void OSD::SetRegions(const QString &Window, frm_dir_map_t &Map, long long Total)
     bar->Display();
 }
 
-void OSD::SetGraph(const QString &Window, const QString &Graph, int64_t Timecode)
+void OSD::SetGraph(const QString &Window, const QString &Graph, std::chrono::milliseconds Timecode)
 {
     MythScreenType *win = GetWindow(Window);
     if (!win)

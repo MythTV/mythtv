@@ -563,7 +563,7 @@ void MythPlayerUI::RefreshPauseFrame()
             if (m_deleteMap.IsEditing())
             {
                 m_osdLock.lock();
-                DeleteMap::UpdateOSD(m_latestVideoTimecode, &m_osd);
+                DeleteMap::UpdateOSD(std::chrono::milliseconds(m_latestVideoTimecode), &m_osd);
                 m_osdLock.unlock();
             }
         }

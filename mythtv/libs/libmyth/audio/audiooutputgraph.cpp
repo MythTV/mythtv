@@ -15,6 +15,8 @@
 #include "mythimage.h"
 #include "compat.h"
 
+using namespace std::chrono_literals;
+
 #define LOC QString("AOG::%1").arg(__func__)
 
 const int kBufferMilliSecs = 500;
@@ -34,27 +36,27 @@ public:
     static inline int BitsPerChannel() { return sizeof(short) * CHAR_BIT; }
     inline int Channels() const { return m_channels; }
 
-    inline int64_t Next() const { return m_tcNext; }
-    inline int64_t First() const { return m_tcFirst; }
+    inline std::chrono::milliseconds Next() const { return m_tcNext; }
+    inline std::chrono::milliseconds First() const { return m_tcFirst; }
 
-    using range_t = QPair<int64_t, int64_t>;
-    range_t Avail(int64_t timecode) const
+    using range_t = QPair<std::chrono::milliseconds, std::chrono::milliseconds>;
+    range_t Avail(std::chrono::milliseconds timecode) const
     {
-        if (timecode == 0 || timecode == -1)
+        if (timecode == 0ms || timecode == -1ms)
             timecode = m_tcNext;
 
-        int64_t tc1 = timecode - Samples2MS(m_maxSamples / 2);
-        if (tc1 < (int64_t)m_tcFirst)
+        std::chrono::milliseconds tc1 = timecode - Samples2MS(m_maxSamples / 2);
+        if (tc1 < m_tcFirst)
             tc1 = m_tcFirst;
 
-        int64_t tc2 = tc1 + Samples2MS(m_maxSamples);
-        if (tc2 > (int64_t)m_tcNext)
+        std::chrono::milliseconds tc2 = tc1 + Samples2MS(m_maxSamples);
+        if (tc2 > m_tcNext)
         {
             tc2 = m_tcNext;
-            if (tc2 < tc1 + (int64_t)Samples2MS(m_maxSamples))
+            if (tc2 < tc1 + Samples2MS(m_maxSamples))
             {
                 tc1 = tc2 - Samples2MS(m_maxSamples);
-                if (tc1 < (int64_t)m_tcFirst)
+                if (tc1 < m_tcFirst)
                     tc1 = m_tcFirst;
             }
         }
@@ -69,26 +71,26 @@ public:
     // Operations
     void Empty()
     {
-        m_tcFirst = m_tcNext = 0;
+        m_tcFirst = m_tcNext = 0ms;
         m_bits = m_channels = 0;
         resize(0);
     }
 
-    void Append(const void *b, unsigned long len, unsigned long timecode, int channels, int bits)
+    void Append(const void *b, unsigned long len, std::chrono::milliseconds timecode, int channels, int bits)
     {
         if (m_bits != bits || m_channels != channels)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("(%1, %2 channels, %3 bits)")
-                .arg(timecode).arg(channels).arg(bits));
+                .arg(timecode.count()).arg(channels).arg(bits));
 
             Resize(channels, bits);
             m_tcNext = m_tcFirst = timecode;
         }
 
         unsigned samples = Bytes2Samples(len);
-        uint64_t tcNext = timecode + Samples2MS(samples);
+        std::chrono::milliseconds tcNext = timecode + Samples2MS(samples);
 
-        if (qAbs(timecode - m_tcNext) <= 1)
+        if (qAbs((timecode - m_tcNext).count()) <= 1)
         {
             Append(b, len, bits);
             m_tcNext = tcNext;
@@ -101,7 +103,7 @@ public:
         else
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString(" discontinuity %1 -> %2")
-                .arg(m_tcNext).arg(timecode));
+                .arg(m_tcNext.count()).arg(timecode.count()));
 
             Resize(channels, bits);
             Append(b, len, bits);
@@ -134,14 +136,14 @@ protected:
         return  (m_channels && m_bits) ? bytes / BytesPerSample() : 0;
     }
 
-    inline unsigned long Samples2MS(unsigned samples) const
+    inline std::chrono::milliseconds Samples2MS(unsigned samples) const
     {
-        return m_sampleRate ? (samples * 1000UL + m_sampleRate - 1) / m_sampleRate : 0; // round up
+        return m_sampleRate ? std::chrono::milliseconds((samples * 1000UL + m_sampleRate - 1) / m_sampleRate) : 0ms; // round up
     }
 
-    inline unsigned MS2Samples(int64_t ms) const
+    inline unsigned MS2Samples(std::chrono::milliseconds msec) const
     {
-        return ms > 0 ? (ms * m_sampleRate) / 1000 : 0; // NB round down
+        return msec > 0ms ? (msec.count() * m_sampleRate) / 1000 : 0; // NB round down
     }
 
     void Append(const void *b, unsigned long len, int bits)
@@ -197,7 +199,7 @@ private:
 private:
     unsigned m_maxSamples {0};
     unsigned m_sampleRate {44100};
-    unsigned long m_tcFirst {0}, m_tcNext {0};
+    std::chrono::milliseconds m_tcFirst {0ms}, m_tcNext {0ms};
     int m_bits {0};
     int m_channels {0};
     int m_sizeMax {0};
@@ -244,7 +246,8 @@ void AudioOutputGraph::prepare()
 {
 }
 
-void AudioOutputGraph::add(const void *buf, unsigned long len, unsigned long timecode, int channels, int bits)
+void AudioOutputGraph::add(const void *buf, unsigned long len,
+                           std::chrono::milliseconds timecode, int channels, int bits)
 {
     QMutexLocker lock(&m_mutex);
     m_buffer->Append(buf, len, timecode, channels, bits);
@@ -258,15 +261,15 @@ void AudioOutputGraph::Reset()
     m_buffer->Empty();
 }
 
-MythImage *AudioOutputGraph::GetImage(int64_t timecode) const
+MythImage *AudioOutputGraph::GetImage(std::chrono::milliseconds timecode) const
 {
     QMutexLocker lock(&m_mutex);
     Buffer::range_t avail = m_buffer->Avail(timecode);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("(%1) using [%2..%3] avail [%4..%5]")
-        .arg(timecode).arg(avail.first).arg(avail.second)
-        .arg(m_buffer->First()).arg(m_buffer->Next()) );
+        .arg(timecode.count()).arg(avail.first.count()).arg(avail.second.count())
+        .arg(m_buffer->First().count()).arg(m_buffer->Next().count()) );
 
     const int width = m_buffer->Samples(avail);
     if (width <= 0)

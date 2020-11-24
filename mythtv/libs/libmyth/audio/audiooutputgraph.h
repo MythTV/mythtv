@@ -27,12 +27,12 @@ public:
     void SetMaxLevel(int db = -6) { m_dbMax = db; }
 
     // Operations
-    MythImage *GetImage(int64_t timecode) const;
+    MythImage *GetImage(std::chrono::milliseconds timecode) const;
     void Reset();
 
     // MythTV::Visual implementation
 public:
-    void add(const void *b, unsigned long b_len, unsigned long timecode,
+    void add(const void *b, unsigned long b_len, std::chrono::milliseconds timecode,
              int channels, int bits) override; // Visual
     void prepare() override; // Visual
 

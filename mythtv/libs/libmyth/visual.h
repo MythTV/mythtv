@@ -19,7 +19,8 @@ public:
     Visual() { ; }
     virtual ~Visual() { ; }
 
-    virtual void add(const void *b, unsigned long b_len, unsigned long w, int c, int p) = 0;
+    virtual void add(const void *b, unsigned long b_len,
+                     std::chrono::milliseconds timecode, int c, int p) = 0;
     virtual void prepare() = 0;
 
     QMutex *mutex() { return &m_mtx; }

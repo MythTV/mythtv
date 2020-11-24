@@ -217,7 +217,7 @@ void DeleteMap::UpdateOSD(uint64_t frame, double frame_rate, OSD *osd)
     m_cachedTotalForOSD = total;
 }
 
-void DeleteMap::UpdateOSD(int64_t timecode, OSD *osd)
+void DeleteMap::UpdateOSD(std::chrono::milliseconds timecode, OSD *osd)
 {
     osd->SetGraph(OSD_WIN_PROGEDIT, "audiograph", timecode);
 }

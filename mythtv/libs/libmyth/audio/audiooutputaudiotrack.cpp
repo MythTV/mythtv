@@ -264,7 +264,7 @@ int AudioOutputAudioTrack::GetBufferedOnSoundcard(void) const
 }
 
 bool AudioOutputAudioTrack::AddData(void *in_buffer, int in_len,
-                              int64_t timecode, int in_frames)
+                              std::chrono::milliseconds timecode, int in_frames)
 {
     bool ret = AudioOutputBase::AddData
         (in_buffer, in_len, timecode,in_frames);

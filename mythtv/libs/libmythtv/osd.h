@@ -122,7 +122,7 @@ class OSD : public MythMediaOverlay
     void SetValues(const QString &Window, const QHash<QString,int> &Map, OSDTimeout Timeout);
     void SetValues(const QString &Window, const QHash<QString,float> &Map, OSDTimeout Timeout);
     void SetRegions(const QString &Window, frm_dir_map_t &Map, long long Total);
-    void SetGraph(const QString &Window, const QString &Graph, int64_t Timecode);
+    void SetGraph(const QString &Window, const QString &Graph, std::chrono::milliseconds Timecode);
     bool IsWindowVisible(const QString &Window);
 
     bool DialogVisible(const QString& Window = QString());

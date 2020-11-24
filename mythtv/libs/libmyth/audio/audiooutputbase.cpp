@@ -1389,7 +1389,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
     if (hasVisual())
     {
         // Send original samples to any attached visualisations
-        dispatchVisual((uchar *)in_buffer, len, timecode.count(), m_sourceChannels,
+        dispatchVisual((uchar *)in_buffer, len, timecode, m_sourceChannels,
                        AudioOutputSettings::FormatToBits(m_format));
     }
 

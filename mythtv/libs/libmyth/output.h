@@ -113,7 +113,7 @@ public:
 protected:
     void error(const QString &e);
     void dispatchVisual(uchar *b, unsigned long b_len,
-                       unsigned long written, int chan, int prec);
+                        std::chrono::milliseconds timecode, int chan, int prec);
     void prepareVisuals();
 
 private:

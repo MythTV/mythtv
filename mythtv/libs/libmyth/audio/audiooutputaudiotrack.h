@@ -19,7 +19,7 @@ class AudioOutputAudioTrack : public AudioOutputBase
     explicit AudioOutputAudioTrack(const AudioSettings &settings);
     ~AudioOutputAudioTrack() override;
 
-    bool AddData(void *buffer, int len, int64_t timecode, int frames) override; // AudioOutput
+    bool AddData(void *buffer, int len, std::chrono::milliseconds timecode, int frames) override; // AudioOutput
 
     // Volume control
     int GetVolumeChannel(int /* channel */) const override // VolumeBase

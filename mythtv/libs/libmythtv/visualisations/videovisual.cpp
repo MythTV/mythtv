@@ -54,10 +54,10 @@ VideoVisual::~VideoVisual()
     mutex()->unlock();
 }
 
-int64_t VideoVisual::SetLastUpdate(void)
+std::chrono::milliseconds VideoVisual::SetLastUpdate(void)
 {
     QDateTime now = QDateTime::currentDateTimeUtc();
-    int64_t result = m_lastUpdate.time().msecsTo(now.time());
+    auto result = std::chrono::milliseconds(m_lastUpdate.time().msecsTo(now.time()));
     m_lastUpdate = now;
     return result;
 }
@@ -81,7 +81,7 @@ void VideoVisual::prepare()
 // caller holds lock
 VisualNode* VideoVisual::GetNode(void)
 {
-    int64_t timestamp = m_audio->GetAudioTime().count();
+    std::chrono::milliseconds timestamp = m_audio->GetAudioTime();
     while (m_nodes.size() > 1)
     {
         if (m_nodes.front()->m_offset > timestamp)
@@ -118,8 +118,9 @@ static inline void mono16_from_monofloat32(
 }
 
 // caller holds lock
-void VideoVisual::add(const void *b, unsigned long b_len, unsigned long w, int c,
-                      int p)
+void VideoVisual::add(const void *b, unsigned long b_len,
+                      std::chrono::milliseconds timecode,
+                      int c, int p)
 {
     if (!m_disabled && m_nodes.size() > 500)
     {
@@ -174,5 +175,5 @@ void VideoVisual::add(const void *b, unsigned long b_len, unsigned long w, int c
     else
         len = 0;
 
-    m_nodes.append(new VisualNode(l, r, len, w));
+    m_nodes.append(new VisualNode(l, r, len, timecode));
 }

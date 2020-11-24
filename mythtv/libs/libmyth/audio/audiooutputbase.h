@@ -162,7 +162,8 @@ class AudioOutputBase : public AudioOutput, public MThread
     void SetStretchFactorLocked(float factor);
 
     // For audiooutputca
-    std::chrono::milliseconds GetBaseAudBufTimeCode() const { return m_audbufTimecode; }
+    std::chrono::milliseconds GetBaseAudBufTimeCode() const
+        { return m_audbufTimecode; }
 
     bool usesSpdif() const { return m_usesSpdif; }
 
