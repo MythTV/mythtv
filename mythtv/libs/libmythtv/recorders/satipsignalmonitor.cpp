@@ -9,8 +9,7 @@
 #include "satiprecorder.h"
 #include "satipchannel.h"
 
-#define LOC QString("SatIPSigMon[%1](%2): ") \
-            .arg(m_inputid).arg(m_channel->GetDevice())
+#define LOC QString("SatIPSigMon[%1]: ").arg(m_inputid)
 
 SatIPSignalMonitor::SatIPSignalMonitor(
     int db_cardnum,

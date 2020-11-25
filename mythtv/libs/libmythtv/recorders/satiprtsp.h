@@ -24,6 +24,8 @@ class SatIPRTSP;
 class SatIPStreamHandler;
 using Headers = QMap<QString, QString>;
 
+// --- SatIPRTSPReadHelper ---------------------------------------------------
+
 class SatIPRTSPReadHelper : public QObject
 {
     friend class SatIPRTSP;
@@ -42,6 +44,8 @@ class SatIPRTSPReadHelper : public QObject
   private:
     SatIPRTSP *m_parent   {nullptr};
 };
+
+// --- SatIPRTCPReadHelper ---------------------------------------------------
 
 class SatIPRTCPReadHelper : public QObject
 {
@@ -62,12 +66,14 @@ class SatIPRTCPReadHelper : public QObject
     SatIPRTSP *m_parent   {nullptr};
 };
 
+// --- SatIPRTSPWriteHelper --------------------------------------------------
+
 class SatIPRTSPWriteHelper : public QObject
 {
     Q_OBJECT
 
   public:
-    SatIPRTSPWriteHelper(SatIPRTSP* /*parent*/, SatIPStreamHandler* /*handler*/);
+    SatIPRTSPWriteHelper(SatIPRTSP* parent, SatIPStreamHandler* handler);
 
   protected:
     void timerEvent(QTimerEvent* /*event*/) override; // QObject
@@ -79,9 +85,9 @@ class SatIPRTSPWriteHelper : public QObject
     uint                m_lastSequenceNumber          {0};
     uint                m_lastTimeStamp               {0};
     uint                m_previousLastSequenceNumber  {0};
-    int                 m_lost                        {0};
-    int                 m_lostInterval                {0};
 };
+
+// --- SatIPRTSP -------------------------------------------------------------
 
 class SatIPRTSP : public QObject
 {
@@ -93,7 +99,7 @@ class SatIPRTSP : public QObject
     Q_OBJECT
 
   public:
-    explicit SatIPRTSP(SatIPStreamHandler* /*handler*/);
+    explicit SatIPRTSP(SatIPStreamHandler* handler);
     ~SatIPRTSP() override;
 
     bool Setup(const QUrl& url);
@@ -143,7 +149,7 @@ class SatIPRTSP : public QObject
 
     SatIPRTSPReadHelper  *m_readhelper        {nullptr};
     SatIPRTSPWriteHelper *m_writehelper       {nullptr};
-    SatIPRTCPReadHelper  *m_rtcpReadhelper   {nullptr};
+    SatIPRTCPReadHelper  *m_rtcpReadhelper    {nullptr};
 };
 
 #endif // SATIPRTSP_H

@@ -25,9 +25,15 @@
 #define LOC  QString("SatIPRTSP[%1]: ").arg(m_streamHandler->m_inputId)
 #define LOC2 QString("SatIPRTSP[%1](%2): ").arg(m_streamHandler->m_inputId).arg(m_requestUrl.toString())
 
+
+// Local functions
+static uint SetUDPReceiveBufferSize(QUdpSocket *socket, uint rcvbuffersize);
+
+
 SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
     : m_streamHandler(handler)
 {
+    uint port = 0;
     connect(this, &SatIPRTSP::startKeepAlive, this, &SatIPRTSP::startKeepAliveRequested);
     connect(this, &SatIPRTSP::stopKeepAlive, this, &SatIPRTSP::stopKeepAliveRequested);
 
@@ -42,8 +48,15 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to bind RTP socket"));
     }
+    else
+    {
+        port = m_readhelper->m_socket->localPort();
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RTP socket bound to port %1 (0x%2)")
+            .arg(port).arg(port,2,16,QChar('0')));
+    }
 
-    uint port = m_readhelper->m_socket->localPort() + 1;
+    // Control socket is next higher port
+    port++;
 
     m_rtcpReadhelper = new SatIPRTCPReadHelper(this);
     if (!m_rtcpReadhelper->m_socket->bind(QHostAddress::AnyIPv4,
@@ -51,6 +64,20 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
                                            QAbstractSocket::DefaultForPlatform))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to bind RTCP socket to port %1").arg(port));
+    }
+    else
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RTCP socket bound to port %1 (0x%2)")
+            .arg(port).arg(port,2,16,QChar('0')));
+    }
+
+    // Increase receive packet buffer size for the RTP data stream to prevent packet loss
+    uint desiredsize = 8000000;
+    uint newsize = SetUDPReceiveBufferSize(m_readhelper->m_socket, desiredsize);
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("RTP UDP socket receive buffer size set to %1").arg(newsize));
+    if (newsize < desiredsize)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + "Increase net.core.rmem_max in case of UDP packet loss");
     }
 }
 
@@ -114,6 +141,8 @@ bool SatIPRTSP::Setup(const QUrl& url)
         QStringList parts = sessionTimeoutRegex.capturedTexts();
         m_sessionid = parts.at(1);
         m_timeout = (parts.length() > 1 ? parts.at(2).toInt() / 2 : 30) * 1000;
+
+        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Sat>IP protocol timeout:%1 ms").arg(m_timeout));
     }
     else
     {
@@ -146,6 +175,9 @@ bool SatIPRTSP::Play(QStringList &pids)
     // Telestar Digibit R1 Sat>IP box cannot handle a lot of pids
     if (pids.size() > 32)
     {
+        LOG(VB_RECORD, LOG_INFO, LOC +
+            QString("Receive full TS, number of PIDs:%1 is more than 32").arg(pids.size()));
+        LOG(VB_RECORD, LOG_DEBUG, LOC + pids_str);
         pids_str = QString("pids=all");
     }
     url.setQuery(pids_str);
@@ -241,9 +273,9 @@ bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *ad
 
     if (additionalheaders != nullptr)
     {
-        for (int i = 0; i < additionalheaders->count(); i++)
+        for (auto& adhdr : *additionalheaders)
         {
-            headers.append(additionalheaders->at(i));
+            headers.append(adhdr);
         }
     }
 
@@ -258,19 +290,19 @@ bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *ad
     QString request = headers.join("\r\n");
     ctrl_socket.write(request.toLatin1());
 
-    QRegularExpression firstLineRE {  "^RTSP/1.0 (\\d+) ([^\r\n]+)" };
-    QRegularExpression headerRE    { R"(^([^:]+):\s*([^\r\n]+))"    };
-    QRegularExpression blankLineRE { R"(^[\r\n]*$)"                 };
+    QRegularExpression firstLineRE { "^RTSP/1.0 (\\d+) ([^\r\n]+)" };
+    QRegularExpression headerRE    { R"(^([^:]+):\s*([^\r\n]+))"   };
+    QRegularExpression blankLineRE { R"(^[\r\n]*$)"                };
 
     bool firstLine = true;
     while (true)
     {
         if (!ctrl_socket.canReadLine())
         {
-            bool ready = ctrl_socket.waitForReadyRead(30 * 1000);
+            bool ready = ctrl_socket.waitForReadyRead(10 * 1000);
             if (!ready)
             {
-                LOG(VB_RECORD, LOG_ERR, LOC + "RTSP server did not respond after 30s");
+                LOG(VB_RECORD, LOG_ERR, LOC + "RTSP server did not respond after 10s");
                 return false;
             }
             continue;
@@ -291,7 +323,10 @@ bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *ad
 
             QStringList parts = match.capturedTexts();
             int responseCode = parts.at(1).toInt();
-            //const QString& responseMsg = parts.at(2);
+            const QString& responseMsg = parts.at(2);
+
+            LOG(VB_RECORD, LOG_DEBUG, LOC + QString("response code:%1 message:%2")
+                .arg(responseCode).arg(responseMsg));
 
             if (responseCode != 200)
             {
@@ -364,12 +399,12 @@ void SatIPRTSP::timerEvent(QTimerEvent* timerEvent)
     sendMessage(url, "OPTIONS");
 }
 
-// RTSP RTP ReadHelper
+// --- RTSP RTP ReadHelper ---------------------------------------------------
 //
-// Receive RTP packets with stream data on UDP socket
-// Read packets when signalled via readyRead on QUdpSocket
+// Receive RTP packets with stream data on UDP socket.
+// Read packets when signalled via readyRead on QUdpSocket.
 //
-#define LOC_RH QString("SatIPRTSP_RH(%1): ").arg(m_parent->m_requestUrl.toString())
+#define LOC_RH QString("SatIPRTSP[%1]: ").arg(m_parent->m_streamHandler->m_inputId)
 
 SatIPRTSPReadHelper::SatIPRTSPReadHelper(SatIPRTSP* p)
     : QObject(p)
@@ -377,10 +412,10 @@ SatIPRTSPReadHelper::SatIPRTSPReadHelper(SatIPRTSP* p)
     , m_parent(p)
 {
     LOG(VB_RECORD, LOG_INFO, LOC_RH +
-        QString("Starting read helper for UDP (RTP) socket on port %1")
-            .arg(m_socket->localPort()));
+        QString("Starting read helper for UDP (RTP) socket"));
 
-    connect(m_socket, &QIODevice::readyRead, this, &SatIPRTSPReadHelper::ReadPending);
+    // Call ReadPending when there is a message received on m_socket
+    connect(m_socket, &QUdpSocket::readyRead, this, &SatIPRTSPReadHelper::ReadPending);
 }
 
 SatIPRTSPReadHelper::~SatIPRTSPReadHelper()
@@ -403,12 +438,12 @@ void SatIPRTSPReadHelper::ReadPending()
     }
 }
 
-// RTSP RTCP ReadHelper
+// --- RTSP RTCP ReadHelper --------------------------------------------------
 //
 // Receive RTCP packets with control messages on UDP socket
 // Receive tuner state: lock and signal strength
 //
-#define LOC_RTCP QString("SatIPRTCP_RH(%1): ").arg(m_parent->m_requestUrl.toString())
+#define LOC_RTCP QString("SatIPRTCP[%1]: ").arg(m_parent->m_streamHandler->m_inputId)
 
 SatIPRTCPReadHelper::SatIPRTCPReadHelper(SatIPRTSP* p)
     : QObject(p)
@@ -416,11 +451,10 @@ SatIPRTCPReadHelper::SatIPRTCPReadHelper(SatIPRTSP* p)
     , m_parent(p)
 {
     LOG(VB_RECORD, LOG_INFO, LOC_RTCP +
-        QString("Starting read helper for UDP (RTCP) socket on port %1")
-            .arg(m_socket->localPort()));
+        QString("Starting read helper for UDP (RTCP) socket"));
 
     // Call ReadPending when there is a message received on m_socket
-    connect(m_socket, &QIODevice::readyRead, this, &SatIPRTCPReadHelper::ReadPending);
+    connect(m_socket, &QUdpSocket::readyRead, this, &SatIPRTCPReadHelper::ReadPending);
 }
 
 SatIPRTCPReadHelper::~SatIPRTCPReadHelper()
@@ -470,7 +504,7 @@ void SatIPRTCPReadHelper::ReadPending()
                     int level = tuner.at(1).toInt();
                     bool lock = tuner.at(2).toInt() != 0;
 
-                    LOG(VB_RECORD, LOG_DEBUG, "SatIPRTCP_RH " + 
+                    LOG(VB_RECORD, LOG_DEBUG, LOC_RTCP +
                         QString("Tuner lock:%1 level:%2").arg(lock).arg(level));
 
                     m_parent->SetSigmonValues(lock, level);
@@ -481,15 +515,15 @@ void SatIPRTCPReadHelper::ReadPending()
     }
 }
 
-// SatIPRTSPWriteHelper
+// --- SatIPRTSPWriteHelper --------------------------------------------------
 //
-#define LOC_WH QString("SatIPRTSP_WH[%1]: ").arg(m_streamHandler->m_inputId)
+#define LOC_WH QString("SatIPRTSP[%1]: ").arg(m_streamHandler->m_inputId)
 
 SatIPRTSPWriteHelper::SatIPRTSPWriteHelper(SatIPRTSP* parent, SatIPStreamHandler* handler)
     : m_parent(parent)
     , m_streamHandler(handler)
 {
-    m_timer = startTimer(20);
+    m_timer = startTimer(100);
 }
 
 void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
@@ -508,24 +542,31 @@ void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
                 continue;
             }
 
+            // Check for sequence number
             uint exp_seq_num = m_lastSequenceNumber + 1;
             uint seq_num = ts_packet.GetSequenceNumber();
             if (m_lastSequenceNumber &&
                 ((exp_seq_num & 0xFFFF) != (seq_num & 0xFFFF)))
             {
-                LOG(VB_RECORD, LOG_INFO, LOC_WH +
-                    QString("Sequence number mismatch %1!=%2")
-                    .arg(seq_num).arg(exp_seq_num));
-                if (seq_num > exp_seq_num)
+                // Discard all pending packets to recover from buffer overflow
+                m_parent->m_buffer->FreePacket(pkt);
+                uint discarded = 1;
+                while (m_parent->m_buffer->HasAvailablePacket())
                 {
-                    m_lostInterval = seq_num - exp_seq_num;
-                    m_lost += m_lostInterval;
+                    RTPDataPacket pkt_next(m_parent->m_buffer->PopDataPacket());
+                    m_parent->m_buffer->FreePacket(pkt);
+                    discarded++;
                 }
-            }
-            m_lastSequenceNumber = seq_num;
-            m_lastTimeStamp = ts_packet.GetTimeStamp();
+                m_lastSequenceNumber = 0;
 
+                LOG(VB_RECORD, LOG_INFO, LOC_WH +
+                    QString("RTP Sequence number mismatch %1!=%2, discarded %3 packets")
+                    .arg(seq_num).arg(exp_seq_num).arg(discarded));
+                continue;
+            }
+            m_lastSequenceNumber = ts_packet.GetSequenceNumber();
 #if 0
+            m_lastTimeStamp = ts_packet.GetTimeStamp();
             LOG(VB_RECORD, LOG_INFO, LOC_WH +
                 QString("Processing RTP packet(seq:%1 ts:%2, ts_data_size:%3) %4")
                 .arg(m_lastSequenceNumber).arg(m_lastTimeStamp).arg(ts_packet.GetTSDataSize())
@@ -554,7 +595,7 @@ void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
                 if (remainder != 0)
                 {
                     LOG(VB_RECORD, LOG_INFO, LOC_WH +
-                        QString("data_length = %1 remainder = %2")
+                        QString("RTP data_length = %1 remainder = %2")
                         .arg(ts_packet.GetTSDataSize()).arg(remainder));
                 }
             }
@@ -562,4 +603,22 @@ void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
         m_parent->m_buffer->FreePacket(pkt);
     }
     m_parent->m_validOld = m_parent->m_valid;
+}
+
+// Set receive buffer size of UDP socket
+//
+// Note that the size returned by ReceiverBufferSizeSocketOption is
+// twice the actual buffer size.
+//
+static uint SetUDPReceiveBufferSize(QUdpSocket *socket, uint rcvbuffersize)
+{
+    QVariant ss = socket->socketOption(QAbstractSocket::ReceiveBufferSizeSocketOption);
+    uint oldsize = ss.toUInt();
+    if (oldsize < rcvbuffersize*2)
+    {
+        socket->setSocketOption(QAbstractSocket::ReceiveBufferSizeSocketOption, rcvbuffersize);
+    }
+    ss = socket->socketOption(QAbstractSocket::ReceiveBufferSizeSocketOption);
+    uint newsize = ss.toUInt()/2;
+    return newsize;
 }

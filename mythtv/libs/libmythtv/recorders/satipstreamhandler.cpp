@@ -20,7 +20,7 @@
 #include "satipchannel.h"
 #include "satipstreamhandler.h"
 
-#define LOC      QString("SatIPSH[%1](%2): ").arg(m_inputId).arg(m_device)
+#define LOC      QString("SatIPSH[%1]: ").arg(m_inputId)
 
 QMap<QString, SatIPStreamHandler*> SatIPStreamHandler::s_handlers;
 QMap<QString, uint>                SatIPStreamHandler::s_handlersRefCnt;
@@ -104,9 +104,9 @@ void SatIPStreamHandler::Return(SatIPStreamHandler * & ref, int inputid)
 
 SatIPStreamHandler::SatIPStreamHandler(const QString &device, int inputid)
     : StreamHandler(device, inputid)
-    , m_rtsp(new SatIPRTSP(this))
     , m_inputId(inputid)
     , m_device(device)
+    , m_rtsp(new SatIPRTSP(this))
 {
     setObjectName("SatIPStreamHandler");
 
