@@ -12,11 +12,9 @@
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_INFO, \
-    QString("DTVSigMon[%1](%2): %3 %4").arg(m_inputid) \
-    .arg(m_channel->GetDevice()).arg(FUNC).arg(MSG))
+    QString("DTVSigMon[%1]: %2 %3").arg(m_inputid).arg(FUNC).arg(MSG))
 
-#define LOC QString("DTVSigMon[%1](%2): ") \
-            .arg(m_inputid).arg(m_channel->GetDevice())
+#define LOC QString("DTVSigMon[%1]: ").arg(m_inputid)
 
 // inserts tid&crc value into an ordered list
 // returns true if item is inserted

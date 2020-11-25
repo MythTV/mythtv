@@ -80,7 +80,7 @@ static const uint kRegionUndefined = 0xFFFF;        // Not regional
 QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 {
     if (siscan && siscan->m_channel)
-        return QString("ChannelScanSM(%1)").arg(siscan->m_channel->GetDevice());
+        return QString("ChannelScanSM[%1]").arg(siscan->m_channel->GetInputID());
     return "ChannelScanSM(u)";
 }
 

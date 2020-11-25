@@ -10,7 +10,7 @@
 #define O_LARGEFILE 0
 #endif
 
-#define LOC      QString("SH[%1](%2): ").arg(m_inputId).arg(m_device)
+#define LOC      QString("SH[%1]: ").arg(m_inputId)
 
 StreamHandler::~StreamHandler()
 {
