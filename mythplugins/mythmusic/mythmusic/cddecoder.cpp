@@ -506,7 +506,7 @@ MusicMetadata *CdDecoder::getMetadata()
     QString title;
     QString genre;
     int year = 0;
-    unsigned long length = 0;
+    std::chrono::milliseconds length = 0s;
     track_t tracknum = 0;
 
     if (-1 == m_setTrackNum)
@@ -572,8 +572,8 @@ MusicMetadata *CdDecoder::getMetadata()
     const lsn_t start = cdio_get_track_lsn(cdio, tracknum);
     if (CDIO_INVALID_LSN != start && CDIO_INVALID_LSN != end)
     {
-        length = ((end - start + 1) * 1000 + CDIO_CD_FRAMES_PER_SEC/2) /
-            CDIO_CD_FRAMES_PER_SEC;
+        length = std::chrono::milliseconds(((end - start + 1) * 1000 + CDIO_CD_FRAMES_PER_SEC/2) /
+                                           CDIO_CD_FRAMES_PER_SEC);
     }
 
     bool isCompilation = false;

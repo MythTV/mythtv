@@ -73,7 +73,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     void next(void);
     void seekforward(void);
     void seekback(void);
-    void seek(int pos);
+    void seek(std::chrono::seconds pos);
     void stopAll(void);
     static void changeRating(bool increase);
 
@@ -106,7 +106,7 @@ class MPUBLIC MusicCommon : public MythScreenType
 
   protected:
     void init(bool startPlayback = true);
-    static QString getTimeString(int exTime, int maxTime);
+    static QString getTimeString(std::chrono::seconds exTime, std::chrono::seconds maxTime);
     void updateProgressBar(void);
     static void setTrackOnLCD(MusicMetadata *mdata);
     static void editTrackInfo(MusicMetadata *mdata);
@@ -153,12 +153,12 @@ class MPUBLIC MusicCommon : public MythScreenType
     bool                   m_controlVolume      {true};
 
     int                    m_currentTrack       {0};
-    int                    m_currentTime        {0};
-    int                    m_maxTime            {0};
+    std::chrono::seconds   m_currentTime        {0s};
+    std::chrono::seconds   m_maxTime            {0s};
 
     uint                   m_playlistTrackCount {0};
-    uint                   m_playlistPlayedTime {0};
-    uint                   m_playlistMaxTime    {0};
+    std::chrono::seconds   m_playlistPlayedTime {0s};
+    std::chrono::seconds   m_playlistMaxTime    {0s};
 
     // for quick playlists
     PlaylistOptions        m_playlistOptions    {PL_REPLACE, PL_CURRENT};

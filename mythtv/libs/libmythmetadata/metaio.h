@@ -176,7 +176,7 @@ class META_PUBLIC MetaIO
     void saveTimeStamps(void);
     void restoreTimeStamps(void);
 
-    virtual int getTrackLength(const QString &filename) = 0;
+    virtual std::chrono::milliseconds getTrackLength(const QString &filename) = 0;
 
     QString m_filename;
     QString m_filenameFormat;

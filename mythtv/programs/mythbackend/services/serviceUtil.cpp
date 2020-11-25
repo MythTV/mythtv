@@ -511,7 +511,7 @@ void FillMusicMetadataInfo (DTC::MusicMetadataInfo *pVideoMetadataInfo,
     pVideoMetadataInfo->setGenre(pMetadata->Genre());
     pVideoMetadataInfo->setYear(pMetadata->Year());
     pVideoMetadataInfo->setPlayCount(pMetadata->PlayCount());
-    pVideoMetadataInfo->setLength(pMetadata->Length());
+    pVideoMetadataInfo->setLength(pMetadata->Length().count());
     pVideoMetadataInfo->setRating(pMetadata->Rating());
     pVideoMetadataInfo->setFileName(pMetadata->Filename());
     pVideoMetadataInfo->setHostName(pMetadata->Hostname());

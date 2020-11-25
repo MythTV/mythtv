@@ -114,7 +114,7 @@ MusicMetadata* MetaIOWavPack::read(const QString &filename)
 
     metadata->setCompilation(compilation);
 
-    if (metadata->Length() <= 0)
+    if (metadata->Length() <= 0ms)
         metadata->setLength(getTrackLength(wpfile));
 
     delete wpfile;

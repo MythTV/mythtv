@@ -312,7 +312,7 @@ bool avfDecoder::initialize()
             mdata.setArtist(tag->value);
 
             mdata.setAlbum("");
-            mdata.setLength(-1);
+            mdata.setLength(-1ms);
 
             DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
             dispatch(ev);
@@ -563,7 +563,7 @@ void avfDecoder::checkMetatdata(void)
             mdata.setTitle(meta_map["title"]);
             mdata.setArtist(meta_map["artist"]);
             mdata.setAlbum(meta_map["album"]);
-            mdata.setLength(-1);
+            mdata.setLength(-1ms);
 
             DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
             dispatch(ev);

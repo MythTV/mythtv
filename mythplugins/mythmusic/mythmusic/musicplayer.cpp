@@ -215,7 +215,7 @@ void MusicPlayer::loadSettings(void)
     m_resumeModeEditor = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeEditor", MusicPlayer::RESUME_OFF);
     m_resumeModeRadio = (ResumeMode) gCoreContext->GetNumSetting("ResumeModeRadio", MusicPlayer::RESUME_TRACK);
 
-    m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
+    m_lastplayDelay = gCoreContext->GetDurSetting<std::chrono::seconds>("MusicLastPlayDelay", LASTPLAY_DELAY);
     m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
 }
 
@@ -870,16 +870,16 @@ void MusicPlayer::customEvent(QEvent *event)
             return;
 
         if (m_playMode != PLAYMODE_RADIO)
-            m_currentTime = oe->elapsedSeconds().count();
+            m_currentTime = oe->elapsedSeconds();
         else
-            m_currentTime = oe->elapsedSeconds().count() - m_lastTrackStart;
+            m_currentTime = oe->elapsedSeconds() - m_lastTrackStart;
 
         if (m_playMode != PLAYMODE_RADIO && !m_updatedLastplay)
         {
             // we update the lastplay and playcount after playing
             // for m_lastplayDelay seconds or half the total track time
-            if ((getCurrentMetadata() &&  m_currentTime >
-                 (getCurrentMetadata()->Length() / 1000) / 2) ||
+            if ((getCurrentMetadata() &&
+                 m_currentTime > duration_cast<std::chrono::seconds>(getCurrentMetadata()->Length()) / 2) ||
                  m_currentTime >= m_lastplayDelay)
             {
                 updateLastplay();
@@ -891,7 +891,7 @@ void MusicPlayer::customEvent(QEvent *event)
         {
             if (!m_playedList.isEmpty())
             {
-                m_playedList.last()->setLength(m_currentTime * 1000);
+                m_playedList.last()->setLength(m_currentTime);
                 // this will update any track lengths displayed on screen
                 gPlayer->sendMetadataChangedEvent(m_playedList.last()->ID());
             }
@@ -907,13 +907,14 @@ void MusicPlayer::customEvent(QEvent *event)
         }
         else
         {
+            auto metadataSecs = duration_cast<std::chrono::seconds>(getCurrentMetadata()->Length());
             if (m_playMode != PLAYMODE_RADIO && getCurrentMetadata() &&
-                m_currentTime != getCurrentMetadata()->Length() / 1000)
+                m_currentTime != metadataSecs)
             {
                 LOG(VB_GENERAL, LOG_NOTICE, QString("MusicPlayer: Updating track length was %1s, should be %2s")
-                    .arg(getCurrentMetadata()->Length() / 1000).arg(m_currentTime));
+                    .arg(metadataSecs.count()).arg(m_currentTime.count()));
 
-                getCurrentMetadata()->setLength(m_currentTime * 1000);
+                getCurrentMetadata()->setLength(m_currentTime);
                 getCurrentMetadata()->dumpToDatabase();
 
                 // this will update any track lengths displayed on screen
@@ -1059,7 +1060,7 @@ void MusicPlayer::savePosition(void)
     else
     {
         gCoreContext->SaveSetting("MusicBookmark", getCurrentMetadata()->ID());
-        gCoreContext->SaveSetting("MusicBookmarkPosition", m_currentTime);
+        gCoreContext->SaveDurSetting("MusicBookmarkPosition", m_currentTime);
     }
 }
 
@@ -1099,19 +1100,19 @@ void MusicPlayer::restorePosition(void)
             play();
 
         if (gPlayer->getResumeMode() == MusicPlayer::RESUME_EXACT && m_playMode != PLAYMODE_RADIO)
-            seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));
+            seek(gCoreContext->GetDurSetting<std::chrono::seconds>("MusicBookmarkPosition", 0s));
     }
 }
 
-void MusicPlayer::seek(int pos)
+void MusicPlayer::seek(std::chrono::seconds pos)
 {
     if (m_output)
     {
         Decoder *decoder = getDecoder();
         if (decoder && decoder->isRunning())
-            decoder->seek(pos);
+            decoder->seek(pos.count());
 
-        m_output->SetTimecode(std::chrono::seconds(pos));
+        m_output->SetTimecode(pos);
     }
 }
 
@@ -1537,8 +1538,8 @@ void MusicPlayer::decoderHandlerReady(void)
             decoder->addListener(*it);
     }
 
-    m_currentTime = 0;
-    m_lastTrackStart = 0;
+    m_currentTime = 0s;
+    m_lastTrackStart = 0s;
 
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
@@ -1556,10 +1557,10 @@ void MusicPlayer::decoderHandlerReady(void)
         decoder->start();
 
         if (!m_oneshotMetadata && getResumeMode() == RESUME_EXACT &&
-            gCoreContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
+            gCoreContext->GetDurSetting<std::chrono::seconds>("MusicBookmarkPosition", 0s) > 0s)
         {
-            seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));
-            gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
+            seek(gCoreContext->GetDurSetting<std::chrono::seconds>("MusicBookmarkPosition", 0s));
+            gCoreContext->SaveDurSetting("MusicBookmarkPosition", 0s);
         }
 
         m_isPlaying = true;

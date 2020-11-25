@@ -1,4 +1,9 @@
 
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+}
+
 // libmythmetadata
 #include "metaioavfcomment.h"
 #include "musicmetadata.h"
@@ -6,11 +11,6 @@
 // libmyth
 #include <mythconfig.h>
 #include <mythcontext.h>
-
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-}
 
 /*!
  * \copydoc MetaIO::write()
@@ -78,7 +78,7 @@ MusicMetadata* MetaIOAVFComment::read(const QString &filename)
             tracknum = atoi(tag->value);
     }
 
-    int length = getTrackLength(p_context);
+    std::chrono::milliseconds length = getTrackLength(p_context);
 
     auto *retdata = new MusicMetadata(filename, artist, compilation_artist, album,
                                      title, genre, year, tracknum, length);
@@ -91,12 +91,12 @@ MusicMetadata* MetaIOAVFComment::read(const QString &filename)
 }
 
 /*!
- * \brief Find the length of the track (in seconds)
+ * \brief Find the length of the track (in milliseconds)
  *
  * \param filename The filename for which we want to find the length.
- * \returns An integer (signed!) to represent the length in seconds.
+ * \returns An integer (signed!) to represent the length in milliseconds.
  */
-int MetaIOAVFComment::getTrackLength(const QString &filename)
+std::chrono::milliseconds MetaIOAVFComment::getTrackLength(const QString &filename)
 {
     AVFormatContext* p_context = nullptr;
     AVInputFormat* p_inputformat = nullptr;
@@ -106,13 +106,13 @@ int MetaIOAVFComment::getTrackLength(const QString &filename)
     if ((avformat_open_input(&p_context, local8bit.constData(),
                              p_inputformat, nullptr) < 0))
     {
-        return 0;
+        return 0ms;
     }
 
     if (avformat_find_stream_info(p_context, nullptr) < 0)
-        return 0;
+        return 0ms;
 
-    int rv = getTrackLength(p_context);
+    std::chrono::milliseconds rv = getTrackLength(p_context);
 
     avformat_close_input(&p_context);
 
@@ -120,15 +120,16 @@ int MetaIOAVFComment::getTrackLength(const QString &filename)
 }
 
 /*!
- * \brief Find the length of the track (in seconds)
+ * \brief Find the length of the track (in milliseconds)
  *
  * \param pContext The AV Format Context.
- * \returns An integer (signed!) to represent the length in seconds.
+ * \returns An integer (signed!) to represent the length in milliseconds.
  */
-int MetaIOAVFComment::getTrackLength(AVFormatContext* pContext)
+std::chrono::milliseconds MetaIOAVFComment::getTrackLength(AVFormatContext* pContext)
 {
     if (!pContext)
-        return 0;
+        return 0ms;
 
-    return (pContext->duration / AV_TIME_BASE) * 1000;
+    auto time = av_duration(pContext->duration);
+    return duration_cast<std::chrono::milliseconds>(time);
 }

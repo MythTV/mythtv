@@ -410,7 +410,7 @@ std::chrono::milliseconds AudioOutputCA::GetAudiotime(void)
 
     int totalbuffer = audioready() + GetBufferedOnSoundcard();
 
-    return audbuf_timecode - std::chrono::milliseconds(totalbuffer * 100000.0 /
+    return audbuf_timecode - millisecondsFromFloat(totalbuffer * 100000.0 /
                                    (m_outputBytesPerFrame *
                                     m_effDsp * m_stretchFactor));
 }

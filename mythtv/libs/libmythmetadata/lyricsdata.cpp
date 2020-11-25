@@ -7,6 +7,7 @@
 #include <QDomDocument>
 
 // mythtv
+#include "mythchrono.h"
 #include "mythcontext.h"
 
 // libmythmetadata
@@ -37,7 +38,7 @@ void LyricsData::clear(void)
 
 void LyricsData::clearLyrics(void)
 {
-    QMap<int, LyricsLine*>::iterator i = m_lyricsMap.begin();
+    auto i = m_lyricsMap.begin();
     while (i != m_lyricsMap.end()) 
     {
         delete i.value();
@@ -168,7 +169,7 @@ QString LyricsData::createLyricsXML(void)
     grabber.appendChild(doc.createTextNode(m_grabber));
 
     // lyrics
-    QMap<int, LyricsLine*>::iterator i = m_lyricsMap.begin();
+    auto i = m_lyricsMap.begin();
     while (i != m_lyricsMap.end())
     {
         LyricsLine *line = (*i);
@@ -313,8 +314,8 @@ void LyricsData::setLyrics(const QStringList &lyrics)
 {
     clearLyrics();
 
-    int lastTime = -1;
-    int offset = 0;  // offset in milliseconds
+    std::chrono::milliseconds lastTime = -1ms;
+    std::chrono::milliseconds offset = 0ms;
 
     for (int x = 0; x < lyrics.count(); x++)
     {
@@ -324,7 +325,7 @@ void LyricsData::setLyrics(const QStringList &lyrics)
 
         if (lyric.startsWith("[offset:"))
         {
-            offset = lyric.midRef(8,lyric.indexOf("]", 8)-8).toInt();
+            offset = std::chrono::milliseconds(lyric.midRef(8,lyric.indexOf("]", 8)-8).toInt());
         }
 
         if (m_syncronized)
@@ -347,10 +348,10 @@ void LyricsData::setLyrics(const QStringList &lyrics)
                     {
                         line->m_lyric = lyric.mid(7);
                     }
-                    line->m_time = (minutes * 60 * 1000) + (seconds * 1000) + (hundredths * 10);
-                    if (offset > 0)
+                    line->m_time = millisecondsFromParts(0, minutes, seconds, hundredths * 10);
+                    if (offset > 0ms)
                     {
-                        if (offset > line->m_time) line->m_time = 0;
+                        if (offset > line->m_time) line->m_time = 0ms;
                         else line->m_time -= offset;
                     }
                     else
@@ -371,7 +372,7 @@ void LyricsData::setLyrics(const QStringList &lyrics)
             // synthesize a time code from the track length and the number of lyrics lines
             if (m_parent && !m_parent->isRadio())
             {
-                line->m_time = (m_parent->Length() / lyrics.count()) * x;
+                line->m_time = std::chrono::milliseconds((m_parent->Length() / lyrics.count()) * x);
                 line->m_lyric = lyric;
                 lastTime = line->m_time;
             }

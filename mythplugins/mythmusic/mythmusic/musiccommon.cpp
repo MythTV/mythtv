@@ -274,7 +274,7 @@ void MusicCommon::init(bool startPlayback)
 
     if (m_playlistProgress)
     {
-        m_playlistProgress->SetTotal(m_playlistMaxTime);
+        m_playlistProgress->SetTotal(m_playlistMaxTime.count());
         m_playlistProgress->SetUsed(0);
     }
 
@@ -747,7 +747,7 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
                 m_stopButton->Push();
             else
                 stop();
-            m_currentTime = 0;
+            m_currentTime = 0s;
         }
         else if (action == "CYCLEVIS")
             cycleVisualizer();
@@ -939,8 +939,8 @@ void MusicCommon::updateProgressBar()
     {
         // show the track played time
         int percentplayed = 1;
-        if (m_maxTime)
-            percentplayed = (int)(((double)m_currentTime / (double)m_maxTime) * 100);
+        if (m_maxTime > 0s)
+            percentplayed = m_currentTime * 100 / m_maxTime;
         m_trackProgress->SetTotal(100);
         m_trackProgress->SetUsed(percentplayed);
     }
@@ -1071,7 +1071,7 @@ void MusicCommon::stop(void)
 {
     gPlayer->stop();
 
-    QString time_string = getTimeString(m_maxTime, 0);
+    QString time_string = getTimeString(m_maxTime, 0s);
 
     if (m_timeText)
         m_timeText->SetText(time_string);
@@ -1098,21 +1098,19 @@ void MusicCommon::previous()
 
 void MusicCommon::seekforward()
 {
-    int nextTime = m_currentTime + 5;
-    if (nextTime > m_maxTime)
-        nextTime = m_maxTime;
+    std::chrono::seconds nextTime = m_currentTime + 5s;
+    nextTime = std::clamp(nextTime, 0s, m_maxTime);
     seek(nextTime);
 }
 
 void MusicCommon::seekback()
 {
-    int nextTime = m_currentTime - 5;
-    if (nextTime < 0)
-        nextTime = 0;
+    std::chrono::seconds nextTime = m_currentTime - 5s;
+    nextTime = std::clamp(nextTime, 0s, m_maxTime);
     seek(nextTime);
 }
 
-void MusicCommon::seek(int pos)
+void MusicCommon::seek(std::chrono::seconds pos)
 {
     if (gPlayer->getOutput())
     {
@@ -1120,7 +1118,7 @@ void MusicCommon::seek(int pos)
         if (decoder && decoder->isRunning())
         {
             decoder->lock();
-            decoder->seek(pos);
+            decoder->seek(pos.count());
 
             if (m_mainvisual)
             {
@@ -1144,8 +1142,8 @@ void MusicCommon::seek(int pos)
 
             if (LCD *lcd = LCD::Get())
             {
-                float percent_heard = m_maxTime <= 0 ? 0.0F : ((float)pos /
-                                      (float)m_maxTime);
+                float percent_heard = m_maxTime <= 0s ? 0.0F : ((float)pos.count() /
+                                      (float)m_maxTime.count());
 
                 QString lcd_time_string = getTimeString(pos, m_maxTime);
 
@@ -1255,18 +1253,18 @@ void MusicCommon::customEvent(QEvent *event)
         if (!oe)
             return;
 
-        int rs = 0;
+        std::chrono::seconds rs = 0s;
         MusicMetadata *curMeta = gPlayer->getCurrentMetadata();
 
         if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
         {
             if (curMeta)
-                m_currentTime = rs = curMeta->Length() / 1000;
+                m_currentTime = rs = duration_cast<std::chrono::seconds>(curMeta->Length());
             else
-                m_currentTime = 0;
+                m_currentTime = 0s;
         }
         else
-            m_currentTime = rs = oe->elapsedSeconds().count();
+            m_currentTime = rs = oe->elapsedSeconds();
 
         QString time_string = getTimeString(rs, m_maxTime);
 
@@ -1276,8 +1274,8 @@ void MusicCommon::customEvent(QEvent *event)
         {
             if (LCD *lcd = LCD::Get())
             {
-                float percent_heard = m_maxTime <= 0 ?
-                    0.0F:((float)rs / (float)curMeta->Length()) * 1000.0F;
+                float percent_heard = m_maxTime <= 0s ?
+                    0.0F:((float)rs.count() / (float)curMeta->Length().count()) * 1000.0F;
 
                 QString lcd_time_string = time_string;
 
@@ -1604,7 +1602,7 @@ void MusicCommon::customEvent(QEvent *event)
                                                      m_currentTrack, &m_playlistPlayedTime);
         if (m_playlistProgress)
         {
-            m_playlistProgress->SetTotal(m_playlistMaxTime);
+            m_playlistProgress->SetTotal(m_playlistMaxTime.count());
             m_playlistProgress->SetUsed(0);
         }
 
@@ -1911,9 +1909,9 @@ void MusicCommon::updateTrackInfo(MusicMetadata *mdata)
     }
 
     if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
-        m_maxTime = 0;
+        m_maxTime = 0s;
     else
-        m_maxTime = mdata->Length() / 1000;
+        m_maxTime = duration_cast<std::chrono::seconds>(mdata->Length());
 
     // get map for current track
     InfoMap metadataMap;
@@ -2114,8 +2112,8 @@ void MusicCommon::updatePlaylistStats(void)
         map["playlistcurrent"] = playlistcurrent;
         map["playlistcount"] = playlisttotal;
         map["playlisttime"] = getTimeString(m_playlistPlayedTime + m_currentTime, m_playlistMaxTime);
-        map["playlistplayedtime"] = getTimeString(m_playlistPlayedTime + m_currentTime, 0);
-        map["playlisttotaltime"] = getTimeString(m_playlistMaxTime, 0);
+        map["playlistplayedtime"] = getTimeString(m_playlistPlayedTime + m_currentTime, 0s);
+        map["playlisttotaltime"] = getTimeString(m_playlistMaxTime, 0s);
         QString playlistName = gPlayer->getCurrentPlaylist() ? gPlayer->getCurrentPlaylist()->getName() : "";
         if (playlistName == "default_playlist_storage")
             playlistName = tr("Default Playlist");
@@ -2137,17 +2135,17 @@ void MusicCommon::updatePlaylistStats(void)
     SetTextFromMap(map);
 
     if (m_playlistProgress)
-        m_playlistProgress->SetUsed(m_playlistPlayedTime + m_currentTime);
+        m_playlistProgress->SetUsed((m_playlistPlayedTime + m_currentTime).count());
 }
 
-QString MusicCommon::getTimeString(int exTime, int maxTime)
+QString MusicCommon::getTimeString(std::chrono::seconds exTime, std::chrono::seconds maxTime)
 {
-    if (maxTime <= 0)
-        return MythFormatTime(exTime,
-                              (exTime >= ONEHOURINSEC) ? "H:mm:ss" : "mm:ss");
+    if (maxTime <= 0ms)
+        return MythFormatTime(exTime.count(),
+                              (exTime >= 1h) ? "H:mm:ss" : "mm:ss");
 
-    QString fmt = (maxTime >= ONEHOURINSEC) ? "H:mm:ss" : "mm:ss";
-    return MythFormatTime(exTime, fmt) + " / " + MythFormatTime(maxTime, fmt);
+    QString fmt = (maxTime >= 1h) ? "H:mm:ss" : "mm:ss";
+    return MythFormatTime(exTime.count(), fmt) + " / " + MythFormatTime(maxTime.count(), fmt);
 }
 
 void MusicCommon::searchButtonList(void)

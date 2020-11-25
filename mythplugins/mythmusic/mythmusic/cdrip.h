@@ -51,7 +51,7 @@ struct RipTrack
 {
     MusicMetadata *metadata;
     bool           active;
-    int            length;
+    std::chrono::milliseconds length;
     bool           isNew;
 };
 

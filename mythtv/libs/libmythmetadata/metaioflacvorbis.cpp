@@ -146,7 +146,7 @@ MusicMetadata* MetaIOFLACVorbis::read(const QString &filename)
 
     metadata->setCompilation(compilation);
 
-    if (metadata->Length() <= 0)
+    if (metadata->Length() <= 0ms)
         metadata->setLength(getTrackLength(flacfile));
 
     if (tag->contains("DISCNUMBER"))

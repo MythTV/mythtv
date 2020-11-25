@@ -353,7 +353,8 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     }
 
     LOG(VB_FILE, LOG_DEBUG,
-            QString("MetaIOID3::read: Length for '%1' from properties is '%2'\n").arg(filename).arg(metadata->Length()));
+        QString("MetaIOID3::read: Length for '%1' from properties is '%2'\n")
+        .arg(filename).arg(metadata->Length().count()));
 
     // Look for MythTVLastPlayed in TXXX Frame
     UserTextIdentificationFrame *lastplayed = find(tag, "MythTVLastPlayed");

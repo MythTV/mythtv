@@ -489,10 +489,11 @@ void Playlist::describeYourself(void) const
     LOG(VB_GENERAL, LOG_INFO, LOC + msg);
 }
 
-void Playlist::getStats(uint *trackCount, uint *totalLength, uint currenttrack, uint *playedLength) const
+void Playlist::getStats(uint *trackCount, std::chrono::seconds *totalLength,
+                        uint currenttrack, std::chrono::seconds *playedLength) const
 {
-    uint64_t total = 0;
-    uint64_t played = 0;
+    std::chrono::milliseconds total = 0ms;
+    std::chrono::milliseconds played = 0ms;
 
     *trackCount = m_shuffledSongs.size();
 
@@ -511,9 +512,9 @@ void Playlist::getStats(uint *trackCount, uint *totalLength, uint currenttrack, 
     }
 
     if (playedLength)
-        *playedLength = played / 1000;
+        *playedLength = duration_cast<std::chrono::seconds>(played);
 
-    *totalLength = total / 1000;
+    *totalLength = duration_cast<std::chrono::seconds>(total);
 }
 
 void Playlist::loadPlaylist(const QString& a_name, const QString& a_host)
@@ -1012,7 +1013,7 @@ void Playlist::savePlaylist(const QString& a_name, const QString& a_host)
 
     MSqlQuery query(MSqlQuery::InitCon());
     uint songcount = 0;
-    uint playtime = 0;
+    std::chrono::seconds playtime = 0s;
 
     getStats(&songcount, &playtime);
 
@@ -1048,7 +1049,7 @@ void Playlist::savePlaylist(const QString& a_name, const QString& a_host)
     query.bindValue(":LIST", rawSonglist);
     query.bindValue(":NAME", a_name);
     query.bindValue(":SONGCOUNT", songcount);
-    query.bindValue(":PLAYTIME", qlonglong(playtime));
+    query.bindValue(":PLAYTIME", qlonglong(playtime.count()));
     if (save_host)
         query.bindValue(":HOSTNAME", a_host);
 
