@@ -56,7 +56,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     uint32_t  GetNumChapters     (void);
     uint32_t  GetCurrentChapter  (void);
     uint64_t  GetNumAngles       (void) const;
-    uint64_t  GetChapterStartTimeMs(uint32_t Chapter);
+    std::chrono::milliseconds  GetChapterStartTimeMs(uint32_t Chapter);
     uint64_t  GetChapterStartTime  (uint32_t Chapter);
     uint64_t  GetChapterStartFrame (uint32_t Chapter);
     bool      IsHDMVNavigation   (void) const;

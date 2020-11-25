@@ -1180,7 +1180,7 @@ static QString uptimeStr(time_t uptime)
         return str + StatusBox::tr("unknown", "unknown uptime");
 
     int days = uptime/ONEDAYINSEC;
-    int secs = uptime - days*ONEDAYINSEC;
+    auto secs = std::chrono::seconds(uptime - days*ONEDAYINSEC);
 
     QString astext;
     if (days > 0)

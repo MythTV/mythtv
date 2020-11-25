@@ -561,12 +561,12 @@ uint32_t MythBDBuffer::GetCurrentChapter(void)
     return 0;
 }
 
-uint64_t MythBDBuffer::GetChapterStartTimeMs(uint32_t Chapter)
+std::chrono::milliseconds MythBDBuffer::GetChapterStartTimeMs(uint32_t Chapter)
 {
     if (Chapter >= GetNumChapters())
-        return 0;
+        return 0ms;
     QMutexLocker locker(&m_infoLock);
-    return m_currentTitleInfo->chapters[Chapter].start / 90;
+    return std::chrono::milliseconds(m_currentTitleInfo->chapters[Chapter].start / 90);
 }
 
 uint64_t MythBDBuffer::GetChapterStartTime(uint32_t Chapter)
@@ -715,8 +715,8 @@ bool MythBDBuffer::UpdateTitleInfo(void)
     m_timeDiff = 0;
     m_titlesize = bd_get_title_size(m_bdnav);
     uint32_t chapter_count = GetNumChapters();
-    uint64_t total_msecs = m_currentTitleLength / 90;
-    auto duration = MythFormatTimeMs(static_cast<int>(total_msecs), "HH:mm:ss.zzz");
+    auto total_msecs = std::chrono::milliseconds(m_currentTitleLength / 90);
+    auto duration = MythFormatTimeMs(total_msecs, "HH:mm:ss.zzz");
     duration.chop(2); // Chop 2 to show tenths
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New title info: Index %1 Playlist: %2 Duration: %3 ""Chapters: %5")
             .arg(m_currentTitle).arg(m_currentTitleInfo->playlist).arg(duration).arg(chapter_count));
@@ -729,7 +729,7 @@ bool MythBDBuffer::UpdateTitleInfo(void)
         uint64_t framenum   = GetChapterStartFrame(i);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chapter %1 found @ [%2]->%3")
             .arg(i + 1,   2, 10, QChar('0'))
-            .arg(MythFormatTimeMs(static_cast<int>(GetChapterStartTimeMs(i)), "HH:mm:ss.zzz"))
+            .arg(MythFormatTimeMs(GetChapterStartTimeMs(i), "HH:mm:ss.zzz"))
             .arg(framenum));
     }
 

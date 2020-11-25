@@ -1231,12 +1231,12 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         int64_t start = m_ic->chapters[i]->start;
         auto total_secs = static_cast<long double>(start) * static_cast<long double>(num) /
                           static_cast<long double>(den);
-        auto msec = static_cast<uint64_t>(total_secs * 1000);
+        auto msec = millisecondsFromFloat(total_secs * 1000);
         auto framenum = static_cast<long long>(total_secs * static_cast<long double>(m_fps));
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Chapter %1 found @ [%2]->%3")
                 .arg(i + 1,   2,10,QChar('0'))
-                .arg(MythFormatTimeMs(static_cast<int>(msec), "HH:mm:ss.zzz"))
+                .arg(MythFormatTimeMs(msec, "HH:mm:ss.zzz"))
                 .arg(framenum));
     }
 

@@ -1225,7 +1225,7 @@ void Ripper::updateTrackList(void)
 
             if (track->length >= 1s)
             {
-                item->SetText(MythFormatTimeMs(track->length.count(), "mm:ss"), "length");
+                item->SetText(MythFormatTimeMs(track->length, "mm:ss"), "length");
             }
             else
                 item->SetText("", "length");

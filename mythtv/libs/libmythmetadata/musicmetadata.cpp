@@ -1117,7 +1117,7 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
 
     QString fmt = (m_length >= 1h) ? "H:mm:ss" : "mm:ss";
-    metadataMap[prefix + "length"] = MythFormatTimeMs(m_length.count(), fmt);
+    metadataMap[prefix + "length"] = MythFormatTimeMs(m_length, fmt);
 
     if (m_lastPlay.isValid())
     {

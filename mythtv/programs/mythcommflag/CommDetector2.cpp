@@ -253,15 +253,14 @@ void createDebugDirectory(const QString& dirname, const QString& comment)
 
 QString frameToTimestamp(long long frameno, float fps)
 {
-    int ms = (int)roundf(frameno / fps * 1000);
-    if (ms % 1000 >= 500)
-        ms += 500; // Round up to next second
-    return MythFormatTimeMs(ms, "hh:mm:ss");
+    auto ms = millisecondsFromFloat(frameno / fps * 1000);
+    auto secs = std::chrono::ceil<std::chrono::seconds>(ms);
+    return MythFormatTime(secs, "hh:mm:ss");
 }
 
 QString frameToTimestampms(long long frameno, float fps)
 {
-    int ms = (int)roundf(frameno / fps * 1000);
+    auto ms = millisecondsFromFloat(frameno / fps * 1000);
     QString timestr = MythFormatTimeMs(ms, "mm:ss.zzz");
     timestr.chop(1); // Chop 1 to return hundredths
     return timestr;

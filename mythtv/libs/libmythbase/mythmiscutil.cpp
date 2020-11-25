@@ -1230,14 +1230,15 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
     return currA->isNull() ? -1 : + 1;
 }
 
-QString MythFormatTimeMs(int msecs, const QString& fmt)
+QString MythFormatTimeMs(std::chrono::milliseconds msecs, const QString& fmt)
 {
-    return QTime::fromMSecsSinceStartOfDay(msecs).toString(fmt);
+    return QTime::fromMSecsSinceStartOfDay(msecs.count()).toString(fmt);
 }
 
-QString MythFormatTime(int secs, const QString& fmt)
+QString MythFormatTime(std::chrono::seconds secs, const QString& fmt)
 {
-    return QTime::fromMSecsSinceStartOfDay(secs*1000).toString(fmt);
+    auto msec = duration_cast<std::chrono::milliseconds>(secs);
+    return QTime::fromMSecsSinceStartOfDay(msec.count()).toString(fmt);
 }
 
 /*
