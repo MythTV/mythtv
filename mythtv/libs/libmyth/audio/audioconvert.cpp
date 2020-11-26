@@ -142,6 +142,7 @@ static int toFloat8(float* out, const uchar* in, int len)
                           "jnz        1b                  \n\t"
                           :"+r"(out),"+r"(in)
                           :"c"(loops), "r"(a), "r"(f)
+                          :"xmm0","xmm1","xmm2","xmm3","xmm4","xmm5","xmm6","xmm7"
                           );
     }
 #endif //ARCH_x86
@@ -204,6 +205,7 @@ static int fromFloat8(uchar* out, const float* in, int len)
                           "jnz        1b                  \n\t"
                           :"+r"(out),"+r"(in)
                           :"c"(loops), "r"(a), "r"(f)
+                          :"xmm0","xmm1","xmm2","xmm3","xmm4","xmm7"
                           );
     }
 #endif //ARCH_x86
@@ -258,6 +260,7 @@ static int toFloat16(float* out, const short* in, int len)
                           "jnz        1b                  \n\t"
                           :"+r"(out),"+r"(in)
                           :"c"(loops), "r"(f)
+                          :"xmm1","xmm2","xmm3","xmm4","xmm5","xmm6","xmm7"
                           );
     }
 #endif //ARCH_x86
@@ -311,6 +314,7 @@ static int fromFloat16(short* out, const float* in, int len)
                           "jnz        1b                  \n\t"
                           :"+r"(out),"+r"(in)
                           :"c"(loops), "r"(f)
+                          :"xmm1","xmm2","xmm3","xmm4","xmm7"
                           );
     }
 #endif //ARCH_x86
@@ -367,6 +371,7 @@ static int toFloat32(AudioFormat format, float* out, const int* in, int len)
                           "jnz        1b                  \n\t"
                           :"+r"(out),"+r"(in)
                           :"c"(loops), "r"(f), "r"(shift)
+                          :"xmm1","xmm2","xmm3","xmm4","xmm6","xmm7"
                           );
     }
 #endif //ARCH_x86
@@ -439,6 +444,7 @@ static int fromFloat32(AudioFormat format, int* out, const float* in, int len)
                           "jnz        1b                  \n\t"
                           :"+r"(out), "+r"(in)
                           :"c"(loops), "r"(f), "m"(o), "m"(mo), "r"(shift)
+                          :"xmm0","xmm1","xmm2","xmm3","xmm4","xmm5","xmm6","xmm7"
                           );
     }
 #endif //ARCH_x86
@@ -504,6 +510,7 @@ static int fromFloatFLT(float* out, const float* in, int len)
                           "jnz        1b                  \n\t"
                           :"+r"(out), "+r"(in)
                           :"c"(loops), "m"(o), "m"(mo)
+                          :"xmm1","xmm2","xmm3","xmm4","xmm6","xmm7"
                           );
     }
 #endif //ARCH_x86
