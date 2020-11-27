@@ -40,7 +40,12 @@ jobs:
     - name: Install core dependencies (linux)
       run: |
         sudo apt update
-        sudo apt install ccache qt5-qmake qtscript5-dev nasm libsystemd-dev libfreetype6-dev libmp3lame-dev libx264-dev libx265-dev libxrandr-dev libxml2-dev libavahi-compat-libdnssd-dev libasound2-dev liblzo2-dev libhdhomerun-dev libsamplerate0-dev libva-dev libdrm-dev libvdpau-dev libass-dev libpulse-dev libcec-dev libfftw3-dev libssl-dev libtag1-dev libbluray-dev libbluray-bdj libgnutls28-dev libqt5webkit5-dev libvpx-dev python3-mysqldb python3-lxml python3-simplejson python3-future libdbi-perl libdbd-mysql-perl libnet-upnp-perl libio-socket-inet6-perl libxml-simple-perl libqt5sql5-mysql
+        sudo apt install ccache qt5-qmake qtscript5-dev nasm libsystemd-dev libfreetype6-dev libmp3lame-dev libx264-dev libx265-dev libxrandr-dev libxml2-dev
+        sudo apt install libavahi-compat-libdnssd-dev libasound2-dev liblzo2-dev libhdhomerun-dev libsamplerate0-dev libva-dev libdrm-dev libvdpau-dev
+        sudo apt install libass-dev libpulse-dev libcec-dev libfftw3-dev libssl-dev libtag1-dev libbluray-dev libbluray-bdj libgnutls28-dev libqt5webkit5-dev
+        sudo apt install libvpx-dev python3-mysqldb python3-lxml python3-simplejson python3-future libdbi-perl libdbd-mysql-perl libnet-upnp-perl
+        sudo apt install libio-socket-inet6-perl libxml-simple-perl libqt5sql5-mysql libwayland-dev qtbase5-private-dev
+        echo "MYTHTV_CONFIG=$MYTHTV_CONFIG --enable-waylandextras" >> $GITHUB_ENV
       if: runner.os == 'Linux'
       
     - name: Install core dependencies (macOS)
