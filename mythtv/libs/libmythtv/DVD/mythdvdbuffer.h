@@ -59,12 +59,12 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     int       GetCurrentAngle      (void) const;
     int       GetNumAngles         (void) const;
     long long GetTotalReadPosition (void) const;
-    uint      GetChapterLength     (void) const;
-    void      GetChapterTimes      (QList<long long> &Times);
-    uint64_t  GetChapterTimes      (int Title);
+    std::chrono::seconds  GetChapterLength     (void) const;
+    void                  GetChapterTimes      (QList<std::chrono::seconds> &Times);
+    std::chrono::seconds  GetChapterTimes      (int Title);
     void      GetDescForPos        (QString &Description) const;
     void      GetPartAndTitle      (int &Part, int &Title) const;
-    uint      GetTotalTimeOfTitle  (void) const;
+    std::chrono::seconds  GetTotalTimeOfTitle  (void) const;
     float     GetAspectOverride    (void) const;
     uint      GetCellStart         (void) const;
     bool      PGCLengthChanged     (void);
@@ -111,8 +111,8 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     void      GoToPreviousProgram  (void);
     bool      GoBack               (void);
     void      AudioStreamsChanged  (bool Change);
-    int64_t   GetCurrentTime       (void) const;
-    uint      TitleTimeLeft        (void) const;
+    std::chrono::seconds  GetCurrentTime       (void) const;
+    std::chrono::seconds  TitleTimeLeft        (void) const;
     void      SetTrack             (uint Type, int TrackNo);
     int       GetTrack             (uint Type) const;
     uint16_t  GetNumAudioChannels  (int Index);
@@ -170,8 +170,8 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     int            m_currentTitleAngleCount { 0       };
     int64_t        m_endPts                 { 0       };
     int64_t        m_timeDiff               { 0       };
-    int            m_still                  { 0       };
-    int            m_lastStill              { 0       };
+    std::chrono::seconds  m_still           { 0s      };
+    std::chrono::seconds  m_lastStill       { 0s      };
     bool           m_audioStreamsChanged    { false   };
     bool           m_dvdWaiting             { false   };
     long long      m_titleLength            { 0       };
@@ -193,7 +193,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     int64_t        m_seektime               { 0       };
     int64_t        m_currentTime            { 0       };
     static const QMap<int, int> kSeekSpeedMap;
-    QMap<int, QList<uint64_t> > m_chapterMap;
+    QMap<int, QList<std::chrono::seconds> > m_chapterMap;
     MythDVDPlayer  *m_parent                { nullptr };
     float           m_forcedAspect          { -1.0F   };
     QMutex          m_contextLock           { QMutex::Recursive };

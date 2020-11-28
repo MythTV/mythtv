@@ -151,7 +151,7 @@ class AvFormatDecoder : public DecoderBase
     int FindStreamInfo(void);
 
     int  GetNumChapters() override; // DecoderBase
-    void GetChapterTimes(QList<long long> &times) override; // DecoderBase
+    void GetChapterTimes(QList<std::chrono::seconds> &times) override; // DecoderBase
     int  GetCurrentChapter(long long framesPlayed) override; // DecoderBase
     long long GetChapter(int chapter) override; // DecoderBase
     bool DoRewind(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
@@ -365,7 +365,7 @@ class AvFormatDecoder : public DecoderBase
     bool               m_resetHardwareDecoders        { false };
 
     // Value in milliseconds, from setting AudioReadAhead
-    int                m_audioReadAhead               {100};
+    std::chrono::milliseconds  m_audioReadAhead       {100ms};
 
     QMutex             m_avCodecLock                  { QMutex::Recursive };
 };

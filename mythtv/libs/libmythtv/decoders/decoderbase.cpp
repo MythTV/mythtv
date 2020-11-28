@@ -108,7 +108,7 @@ bool DecoderBase::PosMapFromDb(void)
         if (m_fps < 26 && m_fps > 24)
            m_keyframeDist = 12;
         auto totframes =
-            (long long)(m_ringBuffer->DVD()->GetTotalTimeOfTitle() * m_fps);
+            (long long)(m_ringBuffer->DVD()->GetTotalTimeOfTitle().count() * m_fps);
         posMap[totframes] = m_ringBuffer->DVD()->GetTotalReadPosition();
     }
     else if (m_ringBuffer && m_ringBuffer->IsBD())
@@ -118,7 +118,7 @@ bool DecoderBase::PosMapFromDb(void)
         if (m_fps < 26 && m_fps > 24)
            m_keyframeDist = 12;
         auto totframes =
-            (long long)(m_ringBuffer->BD()->GetTotalTimeOfTitle() * m_fps);
+            (long long)(m_ringBuffer->BD()->GetTotalTimeOfTitle().count() * m_fps);
         posMap[totframes] = m_ringBuffer->BD()->GetTotalReadPosition();
 #if 0
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
@@ -376,7 +376,7 @@ bool DecoderBase::SyncPositionMap(void)
     if (ret_val && m_keyframeDist > 0)
     {
         long long totframes = 0;
-        int length = 0;
+        std::chrono::seconds length = 0s;
 
         if (m_ringBuffer && m_ringBuffer->IsDVD())
         {
@@ -395,7 +395,7 @@ bool DecoderBase::SyncPositionMap(void)
             QMutexLocker locker(&m_positionMapLock);
             totframes = m_positionMap.back().index * m_keyframeDist;
             if (m_fps != 0.0)
-                length = (int)((totframes * 1.0) / m_fps);
+                length = secondsFromFloat((totframes * 1.0) / m_fps);
         }
 
         m_parent->SetFileLength(length, totframes);
@@ -405,7 +405,7 @@ bool DecoderBase::SyncPositionMap(void)
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("SyncPositionMap, new totframes: %1, new length: %2, "
                     "posMap size: %3")
-                .arg(totframes).arg(length).arg(new_posmap_size));
+                .arg(totframes).arg(length.count()).arg(new_posmap_size));
     }
     m_recordingHasPositionMap |= (0 != new_posmap_size);
     {
@@ -722,7 +722,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 
     if (m_ringBuffer->IsDVD() &&
         !m_ringBuffer->IsInDiscMenuOrStillFrame() &&
-        m_ringBuffer->DVD()->TitleTimeLeft() < 5)
+        m_ringBuffer->DVD()->TitleTimeLeft() < 5s)
     {
         return false;
     }
@@ -1243,7 +1243,7 @@ void DecoderBase::SaveTotalDuration(void)
     if (!m_playbackInfo || av_q2d(m_totalDuration) == 0)
         return;
 
-    m_playbackInfo->SaveTotalDuration(1000000 * av_q2d(m_totalDuration));
+    m_playbackInfo->SaveTotalDuration(millisecondsFromFloat(1000 * av_q2d(m_totalDuration)));
 }
 
 void DecoderBase::SaveTotalFrames(void)
@@ -1308,7 +1308,7 @@ uint64_t DecoderBase::TranslatePosition(const frm_pos_map_t &map,
 
 // Convert from an absolute frame number (not cutlist adjusted) to its
 // cutlist-adjusted position in milliseconds.
-uint64_t DecoderBase::TranslatePositionFrameToMs(long long position,
+std::chrono::milliseconds DecoderBase::TranslatePositionFrameToMs(long long position,
                                                  float fallback_framerate,
                                                  const frm_dir_map_t &cutlist)
 {
@@ -1330,20 +1330,20 @@ uint64_t DecoderBase::TranslatePositionFrameToMs(long long position,
                 SyncPositionMap();
         }
     }
-    return TranslatePositionAbsToRel(cutlist, position, m_frameToDurMap,
-                                     1000 / fallback_framerate);
+    return std::chrono::milliseconds(TranslatePositionAbsToRel(cutlist, position, m_frameToDurMap,
+                                     1000 / fallback_framerate));
 }
 
 // Convert from a cutlist-adjusted position in milliseconds to its
 // absolute frame number (not cutlist-adjusted).
-uint64_t DecoderBase::TranslatePositionMsToFrame(uint64_t dur_ms,
+uint64_t DecoderBase::TranslatePositionMsToFrame(std::chrono::milliseconds dur_ms,
                                                  float fallback_framerate,
                                                  const frm_dir_map_t &cutlist)
 {
     QMutexLocker locker(&m_positionMapLock);
     // Convert relative position in milliseconds (cutlist-adjusted) to
     // its absolute position in milliseconds (not cutlist-adjusted).
-    uint64_t ms = TranslatePositionRelToAbs(cutlist, dur_ms, m_frameToDurMap,
+    uint64_t ms = TranslatePositionRelToAbs(cutlist, dur_ms.count(), m_frameToDurMap,
                                             1000 / fallback_framerate);
     // Convert absolute position in milliseconds to its absolute frame
     // number.

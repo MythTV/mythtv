@@ -13,7 +13,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void CaptionsStateChanged(MythCaptionsState& CaptionsState);
     void ResizeForInteractiveTV(const QRect& Rect);
     void SetInteractiveStream(const QString& Stream);
-    void SetInteractiveStreamPos(long Position);
+    void SetInteractiveStreamPos(std::chrono::seconds Position);
     void PlayInteractiveStream(bool Play);
 
   public:
@@ -29,8 +29,8 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
 
     bool SetAudioByComponentTag(int Tag);
     bool SetVideoByComponentTag(int Tag);
-    long GetStreamPos();
-    long GetStreamMaxPos();
+    std::chrono::milliseconds GetStreamPos();
+    std::chrono::milliseconds GetStreamMaxPos();
     InteractiveTV* GetInteractiveTV() override;
 
   protected slots:
@@ -58,7 +58,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
   private slots:
     void ExternalSubtitlesUpdated();
     void SetStream(const QString& Stream);
-    long SetStreamPos(long Position);
+    void SetStreamPos(std::chrono::milliseconds Position);
     void StreamPlay(bool Playing = true);
 
   protected:

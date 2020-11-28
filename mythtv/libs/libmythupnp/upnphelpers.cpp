@@ -7,7 +7,7 @@
 namespace UPnPDateTime
 {
 
-QString DurationFormat(uint32_t msec)
+QString DurationFormat(std::chrono::milliseconds msec)
 {
     // Appendix D. Date&Time Syntax - UPnP ContentDirectory Service 2008, 2013
     // duration ::= 'P' [n 'D'] time
@@ -19,11 +19,11 @@ QString DurationFormat(uint32_t msec)
 
     QString durationStr = "P%1%2";
     QString dayStr;
-    if ( msec > (1000 * 3600 * 24) )
+    if ( msec > 24h )
     {
-        dayStr = QString("D%1").arg(msec % (1000 * 3600 * 24)); // 24 Hours
+        dayStr = QString("D%1").arg((msec % 24h).count());
     }
-    QString timeStr = UPnPDateTime::TimeFormat(msec);
+    QString timeStr = UPnPDateTime::TimeFormat(msec.count());
 
     return durationStr.arg(dayStr).arg(timeStr);
 }
@@ -78,7 +78,7 @@ QString NamedDayFormat(const QDate date)
     }
 }
 
-QString resDurationFormat(uint32_t msec)
+QString resDurationFormat(std::chrono::milliseconds msec)
 {
     // Appendix B.2 Resource Encoding Characteristics Properties
     //          B.2.1.4 res@duration
@@ -88,7 +88,7 @@ QString resDurationFormat(uint32_t msec)
     // M = Minutes (2 digits, 0 prefix)
     // S = Seconds (2 digits, 0 prefix)
     // FS = Fractional Seconds (milliseconds)
-    QTime time = QTime::fromMSecsSinceStartOfDay(msec);
+    QTime time = QTime::fromMSecsSinceStartOfDay(msec.count());
     return time.toString("H:mm:ss:zzz");
 }
 

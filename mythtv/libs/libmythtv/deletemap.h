@@ -69,10 +69,10 @@ class MTV_PUBLIC DeleteMap
 
     // Provide translations between frame numbers and millisecond
     // durations, optionally taking the custlist into account.
-    uint64_t TranslatePositionFrameToMs(uint64_t position,
+    std::chrono::milliseconds TranslatePositionFrameToMs(uint64_t position,
                                         float fallback_framerate,
                                         bool use_cutlist) const;
-    uint64_t TranslatePositionMsToFrame(uint64_t dur_ms,
+    uint64_t TranslatePositionMsToFrame(std::chrono::milliseconds dur_ms,
                                         float fallback_framerate,
                                         bool use_cutlist) const;
     uint64_t TranslatePositionAbsToRel(uint64_t position) const;

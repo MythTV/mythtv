@@ -251,7 +251,7 @@ bool TV::CreatePlayer(TVState State, bool Muted)
     else
         player = new MythPlayerUI(m_mainWindow, this, &m_playerContext, flags);
 
-    player->SetLength(static_cast<int>(m_playerContext.m_playingLen));
+    player->SetLength(m_playerContext.m_playingLen);
 
     bool isWatchingRecording = (State == kState_WatchingRecording);
     player->SetWatchingRecording(isWatchingRecording);
@@ -1419,11 +1419,11 @@ void TV::GetStatus()
     {
         if (!info.text["totalchapters"].isEmpty())
         {
-            QList<long long> chapters;
+            QList<std::chrono::seconds> chapters;
             m_player->GetChapterTimes(chapters);
             QVariantList var;
-            for (long long chapter : qAsConst(chapters))
-                var << QVariant(chapter);
+            for (std::chrono::seconds chapter : qAsConst(chapters))
+                var << QVariant((long long)chapter.count());
             status.insert("chaptertimes", var);
         }
 
@@ -5064,8 +5064,8 @@ void TV::DoSeek(float Time, const QString &Msg, bool TimeIsOffset, bool HonorCut
         }
         else
         {
-            auto time = static_cast<uint64_t>(Time);
-            uint64_t desiredFrameRel = m_player->TranslatePositionMsToFrame(time * 1000, HonorCutlist);
+            auto time = duration_cast<std::chrono::milliseconds>(secondsFromFloat(Time));
+            uint64_t desiredFrameRel = m_player->TranslatePositionMsToFrame(time, HonorCutlist);
             m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
             DoPlayerSeekToFrame(desiredFrameRel);
         }
@@ -5350,7 +5350,7 @@ int TV::GetNumChapters()
     return num_chapters;
 }
 
-void TV::GetChapterTimes(QList<long long> &Times)
+void TV::GetChapterTimes(QList<std::chrono::seconds> &Times)
 {
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
@@ -6690,7 +6690,7 @@ void TV::ShowLCDDVDInfo()
         int totalParts = dvd->NumPartsInTitle();
 
         mainStatus = tr("Title: %1 (%2)").arg(playingTitle)
-            .arg(MythFormatTime(std::chrono::seconds(dvd->GetTotalTimeOfTitle()), "HH:mm"));
+            .arg(MythFormatTime(dvd->GetTotalTimeOfTitle(), "HH:mm"));
         subStatus = tr("Chapter: %1/%2").arg(playingPart).arg(totalParts);
     }
     if ((dvdName != m_lcdCallsign) || (mainStatus != m_lcdTitle) || (subStatus != m_lcdSubtitle))
@@ -7332,13 +7332,13 @@ void TV::customEvent(QEvent *Event)
     }
     else if (message.startsWith("DONE_RECORDING"))
     {
-        int seconds = 0;
+        std::chrono::seconds seconds = 0s;
         //long long frames = 0;
         int NUMTOKENS = 4; // Number of tokens expected
         if (tokens.size() == NUMTOKENS)
         {
             cardnum = tokens[1].toUInt();
-            seconds = tokens[2].toInt();
+            seconds = std::chrono::seconds(tokens[2].toInt());
             //frames = tokens[3].toLongLong();
         }
         else
@@ -7360,7 +7360,7 @@ void TV::customEvent(QEvent *Event)
                 if (m_player)
                 {
                     m_player->SetWatchingRecording(false);
-                    if (seconds > 0)
+                    if (seconds > 0s)
                         m_player->SetLength(seconds);
                 }
                 m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
@@ -7378,7 +7378,7 @@ void TV::customEvent(QEvent *Event)
                 if (m_player)
                 {
                     m_player->SetWatchingRecording(false);
-                    if (seconds > 0)
+                    if (seconds > 0s)
                         m_player->SetLength(seconds);
                 }
                 m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
@@ -8744,7 +8744,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
             {
                 QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
                 QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
-                QString timestr = MythFormatTime(std::chrono::seconds(m_tvmChapterTimes[i]), "HH:mm:ss");
+                QString timestr = MythFormatTime(m_tvmChapterTimes[i], "HH:mm:ss");
                 QString desc = chapter1 + QString(" (%1)").arg(timestr);
                 QString action = prefix + chapter2;
                 active = (m_tvmCurrentChapter == (i + 1));
@@ -9686,7 +9686,7 @@ void TV::UnpauseLiveTV(bool Quietly)
     if (m_playerContext.HasPlayer() && m_playerContext.m_tvchain)
     {
         m_playerContext.ReloadTVChain();
-        m_playerContext.m_tvchain->JumpTo(-1, 1);
+        m_playerContext.m_tvchain->JumpTo(-1, 1s);
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
         if (m_player)
             m_player->Play(m_playerContext.m_tsNormal, true, false);
@@ -9735,7 +9735,7 @@ void TV::DoJumpFFWD()
     else if (GetNumChapters() > 0)
         DoJumpChapter(9999);
     else
-        DoSeek(m_playerContext.m_jumptime * 60, tr("Jump Ahead"), /*timeIsOffset*/true, /*honorCutlist*/true);
+        DoSeek(m_playerContext.m_jumptime, tr("Jump Ahead"), /*timeIsOffset*/true, /*honorCutlist*/true);
 }
 
 void TV::DoSeekFFWD()
@@ -9750,7 +9750,7 @@ void TV::DoJumpRWND()
     else if (GetNumChapters() > 0)
         DoJumpChapter(-1);
     else
-        DoSeek(-m_playerContext.m_jumptime * 60, tr("Jump Back"), /*timeIsOffset*/true, /*honorCutlist*/true);
+        DoSeek(-m_playerContext.m_jumptime, tr("Jump Back"), /*timeIsOffset*/true, /*honorCutlist*/true);
 }
 
 void TV::DoSeekRWND()
@@ -9777,11 +9777,11 @@ void TV::DVDJumpBack()
     }
     else
     {
-        uint titleLength = dvd->GetTotalTimeOfTitle();
-        uint chapterLength = dvd->GetChapterLength();
-        if ((titleLength == chapterLength) && chapterLength > 300)
+        std::chrono::seconds titleLength = dvd->GetTotalTimeOfTitle();
+        std::chrono::seconds chapterLength = dvd->GetChapterLength();
+        if ((titleLength == chapterLength) && chapterLength > 5min)
         {
-            DoSeek(-m_playerContext.m_jumptime * 60, tr("Jump Back"), /*timeIsOffset*/true, /*honorCutlist*/true);
+            DoSeek(-m_playerContext.m_jumptime, tr("Jump Back"), /*timeIsOffset*/true, /*honorCutlist*/true);
         }
         else
         {
@@ -9817,13 +9817,13 @@ void TV::DVDJumpForward()
     }
     else if (!in_still && !in_menu)
     {
-        uint titleLength = dvd->GetTotalTimeOfTitle();
-        uint chapterLength = dvd->GetChapterLength();
-        uint currentTime = static_cast<uint>(dvd->GetCurrentTime());
-        if ((titleLength == chapterLength) && chapterLength > 300 &&
-             (currentTime < (chapterLength - (static_cast<uint>(m_playerContext.m_jumptime) * 60))))
+        std::chrono::seconds titleLength = dvd->GetTotalTimeOfTitle();
+        std::chrono::seconds chapterLength = dvd->GetChapterLength();
+        std::chrono::seconds currentTime = dvd->GetCurrentTime();
+        if ((titleLength == chapterLength) && (chapterLength > 5min) &&
+            (currentTime < (chapterLength - (duration_cast<std::chrono::seconds>(m_playerContext.m_jumptime)))))
         {
-            DoSeek(m_playerContext.m_jumptime * 60, tr("Jump Ahead"), /*timeIsOffset*/true, /*honorCutlist*/true);
+            DoSeek(m_playerContext.m_jumptime, tr("Jump Ahead"), /*timeIsOffset*/true, /*honorCutlist*/true);
         }
         else
         {

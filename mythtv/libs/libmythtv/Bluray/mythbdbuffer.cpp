@@ -569,12 +569,12 @@ std::chrono::milliseconds MythBDBuffer::GetChapterStartTimeMs(uint32_t Chapter)
     return std::chrono::milliseconds(m_currentTitleInfo->chapters[Chapter].start / 90);
 }
 
-uint64_t MythBDBuffer::GetChapterStartTime(uint32_t Chapter)
+std::chrono::seconds MythBDBuffer::GetChapterStartTime(uint32_t Chapter)
 {
     if (Chapter >= GetNumChapters())
-        return 0;
+        return 0s;
     QMutexLocker locker(&m_infoLock);
-    return static_cast<uint64_t>(static_cast<double>(m_currentTitleInfo->chapters[Chapter].start) / 90000.0);
+    return std::chrono::seconds(m_currentTitleInfo->chapters[Chapter].start / 90000);
 }
 
 uint64_t MythBDBuffer::GetChapterStartFrame(uint32_t Chapter)
@@ -620,14 +620,14 @@ uint64_t MythBDBuffer::GetTitleSize(void) const
     return m_titlesize;
 }
 
-uint64_t MythBDBuffer::GetTotalTimeOfTitle(void) const
+std::chrono::seconds MythBDBuffer::GetTotalTimeOfTitle(void) const
 {
-    return m_currentTitleLength / 90000;
+    return std::chrono::seconds(m_currentTitleLength / 90000);
 }
 
-uint64_t MythBDBuffer::GetCurrentTime(void) const
+std::chrono::seconds MythBDBuffer::GetCurrentTime(void) const
 {
-    return m_currentTime / 90000;
+    return std::chrono::seconds(m_currentTime / 90000);
 }
 
 bool MythBDBuffer::SwitchTitle(uint32_t Index)

@@ -1699,7 +1699,7 @@ bool TVRec::GetDevices(uint inputid,
     // DVB options
     uint dvboff = 9;
     dvb_opts.m_dvbOnDemand    = query.value(dvboff + 0).toBool();
-    dvb_opts.m_dvbTuningDelay = query.value(dvboff + 1).toUInt();
+    dvb_opts.m_dvbTuningDelay = std::chrono::milliseconds(query.value(dvboff + 1).toUInt());
     dvb_opts.m_dvbEitScan     = query.value(dvboff + 2).toBool();
 
     // Firewire options

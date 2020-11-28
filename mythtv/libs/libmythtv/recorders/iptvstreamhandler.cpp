@@ -521,7 +521,7 @@ void IPTVStreamHandlerWriteHelper::SendRTCPReport(void)
     }
     int seq_delta = m_lastSequenceNumber - m_previousLastSequenceNumber;
     RTCPDataPacket rtcp =
-        RTCPDataPacket(m_lastTimestamp, m_lastTimestamp + RTCP_TIMER * 1000,
+        RTCPDataPacket(m_lastTimestamp, m_lastTimestamp + RTCP_TIMER.count(),
                        m_lastSequenceNumber, m_lastSequenceNumber + seq_delta,
                        m_lost, m_lostInterval, m_parent->m_rtspSsrc);
     QByteArray buf = rtcp.GetData();

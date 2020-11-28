@@ -303,7 +303,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
 
     /** \brief Note the total duration in the recordedmark table
      */
-    void SetDuration(uint64_t duration);
+    void SetDuration(std::chrono::milliseconds duration);
 
     /** \brief Note the total frames in the recordedmark table
      */

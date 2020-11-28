@@ -62,7 +62,7 @@ void MythDVDDecoder::UpdateFramesPlayed(void)
     if (!m_ringBuffer->IsDVD())
         return;
 
-    auto currentpos = static_cast<long long>(m_ringBuffer->DVD()->GetCurrentTime() * m_fps);
+    auto currentpos = static_cast<long long>(m_ringBuffer->DVD()->GetCurrentTime().count() * m_fps);
     m_framesPlayed = m_framesRead = currentpos ;
     m_parent->SetFramesPlayed(static_cast<uint64_t>(currentpos + 1));
 }
@@ -615,17 +615,17 @@ long long MythDVDDecoder::DVDFindPosition(long long DesiredFrame)
 
     if (ffrewSkip == 1 || ffrewSkip == 0)
     {
-        int diffTime = static_cast<int>(ceil((DesiredFrame - m_framesPlayed) / m_fps));
-        long long desiredTimePos = m_ringBuffer->DVD()->GetCurrentTime() +
+        std::chrono::seconds diffTime = std::chrono::seconds(static_cast<int>(ceil((DesiredFrame - m_framesPlayed) / m_fps)));
+        std::chrono::seconds desiredTimePos = m_ringBuffer->DVD()->GetCurrentTime() +
                         diffTime;
-        if (diffTime <= 0)
+        if (diffTime <= 0s)
             desiredTimePos--;
         else
             desiredTimePos++;
 
-        if (desiredTimePos < 0)
-            desiredTimePos = 0;
-        return (desiredTimePos * 90000LL);
+        if (desiredTimePos < 0s)
+            desiredTimePos = 0s;
+        return (desiredTimePos.count() * 90000LL);
     }
     return current_speed;
 }

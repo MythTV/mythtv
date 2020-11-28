@@ -9,6 +9,28 @@
 #include <QTextCodec>
 #include <QFileInfo>
 
+#ifdef USING_MEDIACODEC
+extern "C" {
+#include "libavcodec/jni.h"
+}
+#include <QtAndroidExtras>
+#endif
+
+extern "C" {
+#include "libavutil/avutil.h"
+#include "libavutil/error.h"
+#include "libavutil/log.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavformat/avio.h"
+#include "libavformat/internal.h"
+#include "libswscale/swscale.h"
+#include "libavformat/isom.h"
+#include "ivtv_myth.h"
+#include "libavutil/imgutils.h"
+#include "libavutil/display.h"
+}
+
 // MythTV headers
 #include "mythtvexp.h"
 #include "mythconfig.h"
@@ -40,28 +62,6 @@
 #include "lcddevice.h"
 
 #include "audiooutput.h"
-
-#ifdef USING_MEDIACODEC
-extern "C" {
-#include "libavcodec/jni.h"
-}
-#include <QtAndroidExtras>
-#endif
-
-extern "C" {
-#include "libavutil/avutil.h"
-#include "libavutil/error.h"
-#include "libavutil/log.h"
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-#include "libavformat/avio.h"
-#include "libavformat/internal.h"
-#include "libswscale/swscale.h"
-#include "libavformat/isom.h"
-#include "ivtv_myth.h"
-#include "libavutil/imgutils.h"
-#include "libavutil/display.h"
-}
 
 #ifdef _MSC_VER
 // MSVC isn't C99 compliant...
@@ -331,10 +331,10 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     cc608_build_parity_table(m_cc608ParityTable);
 
     AvFormatDecoder::SetIdrOnlyKeyframes(true);
-    m_audioReadAhead = gCoreContext->GetNumSetting("AudioReadAhead", 100);
+    m_audioReadAhead = gCoreContext->GetDurSetting<std::chrono::milliseconds>("AudioReadAhead", 100ms);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PlayerFlags: 0x%1, AudioReadAhead: %2 msec")
-        .arg(m_playerFlags, 0, 16).arg(m_audioReadAhead));
+        .arg(m_playerFlags, 0, 16).arg(m_audioReadAhead.count()));
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -475,7 +475,7 @@ int AvFormatDecoder::GetNumChapters()
     return 0;
 }
 
-void AvFormatDecoder::GetChapterTimes(QList<long long> &times)
+void AvFormatDecoder::GetChapterTimes(QList<std::chrono::seconds> &times)
 {
     int total = GetNumChapters();
     if (!total)
@@ -488,7 +488,7 @@ void AvFormatDecoder::GetChapterTimes(QList<long long> &times)
         int64_t start = m_ic->chapters[i]->start;
         long double total_secs = (long double)start * (long double)num /
                                  (long double)den;
-        times.push_back((long long)total_secs);
+        times.push_back(std::chrono::seconds((long long)total_secs));
     }
 }
 
@@ -1152,26 +1152,25 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
 
     // If watching pre-recorded television or video use the marked duration
     // from the db if it exists, else ffmpeg duration
-    int64_t dur = 0;
+    std::chrono::seconds dur = 0s;
 
     if (m_playbackInfo)
     {
-        dur = m_playbackInfo->QueryTotalDuration();
-        dur /= 1000;
+        dur = duration_cast<std::chrono::seconds>(m_playbackInfo->QueryTotalDuration());
     }
 
-    if (dur == 0)
+    if (dur == 0s)
     {
         if ((m_ic->duration == AV_NOPTS_VALUE) &&
             (!m_livetv && !m_ringBuffer->IsDisc()))
             av_estimate_timings(m_ic, 0);
 
-        dur = m_ic->duration / (int64_t)AV_TIME_BASE;
+        dur = duration_cast<std::chrono::seconds>(av_duration(m_ic->duration));
     }
 
-    if (dur > 0 && !m_livetv && !m_watchingRecording)
+    if (dur > 0s && !m_livetv && !m_watchingRecording)
     {
-        m_parent->SetDuration((int)dur);
+        m_parent->SetDuration(dur);
     }
 
     // If we don't have a position map, set up ffmpeg for seeking
@@ -1180,16 +1179,16 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             "Recording has no position -- using libavformat seeking.");
 
-        if (dur > 0)
+        if (dur > 0s)
         {
-            m_parent->SetFileLength((int)(dur), (int)(dur * m_fps));
+            m_parent->SetFileLength(dur, (int)(dur.count() * m_fps));
         }
         else
         {
             // the pvr-250 seems to over report the bitrate by * 2
             float bytespersec = (float)m_bitrate / 8 / 2;
             float secs = m_ringBuffer->GetRealFileSize() * 1.0F / bytespersec;
-            m_parent->SetFileLength((int)(secs),
+            m_parent->SetFileLength(secondsFromFloat(secs),
                                     (int)(secs * static_cast<float>(m_fps)));
         }
 
@@ -4863,7 +4862,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                      // buffer audio to prevent audio buffer
                      // underruns in case you are setting negative values
                      // in Adjust Audio Sync.
-                     m_lastAPts < m_lastVPts + m_audioReadAhead &&
+                     m_lastAPts < m_lastVPts + m_audioReadAhead.count() &&
                      !m_ringBuffer->IsInStillFrame())
             {
                 storevideoframes = true;

@@ -209,7 +209,7 @@ class TestProgramInfo : public QObject
         QCOMPARE (program.GetSeason(), (unsigned int)1);
         QCOMPARE (program.GetEpisode(), (unsigned int)2);
         QCOMPARE (program.GetInetRef(), QString("inetref"));
-        QCOMPARE (program.GetSecondsInRecording(), (unsigned int)90*60);
+        QCOMPARE (program.GetSecondsInRecording(), 90 * 60s); // Ubuntu1804 has trouble with '90min'
         QCOMPARE (program.GetYearOfInitialRelease(), (unsigned int)1968);
         QCOMPARE (program.GetProgramID(), QString("MV000"));
     }

@@ -833,7 +833,7 @@ void RecorderBase::AudioCodecChange(AVCodecID aCodec)
     }
 }
 
-void RecorderBase::SetDuration(uint64_t duration)
+void RecorderBase::SetDuration(std::chrono::milliseconds duration)
 {
     if (m_curRecording)
         m_curRecording->SaveTotalDuration(duration);

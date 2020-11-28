@@ -147,9 +147,10 @@ bool SatIPRTSP::Setup(const QUrl& url)
 
         QStringList parts = sessionTimeoutRegex.capturedTexts();
         m_sessionid = parts.at(1);
-        m_timeout = (parts.length() > 1 ? parts.at(2).toInt() / 2 : 30) * 1000;
+        m_timeout = parts.length() > 1 ? std::chrono::seconds(parts.at(2).toInt() / 2) : 30s;
 
-        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Sat>IP protocol timeout:%1 ms").arg(m_timeout));
+        LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Sat>IP protocol timeout:%1 ms")
+            .arg(m_timeout.count()));
     }
     else
     {
@@ -159,7 +160,8 @@ bool SatIPRTSP::Setup(const QUrl& url)
 
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("Setup completed, sessionID = %1, streamID = %2, timeout = %3s")
-            .arg(m_sessionid).arg(m_streamid).arg(m_timeout / 1000));
+            .arg(m_sessionid).arg(m_streamid)
+            .arg(duration_cast<std::chrono::seconds>(m_timeout).count()));
     emit startKeepAlive(m_timeout);
 
     // Reset tuner lock status
@@ -377,12 +379,13 @@ bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *ad
     return true;
 }
 
-void SatIPRTSP::startKeepAliveRequested(int timeout)
+void SatIPRTSP::startKeepAliveRequested(std::chrono::milliseconds timeout)
 {
     if (m_timer)
         return;
     m_timer = startTimer(timeout);
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("startKeepAliveRequested(%1) m_timer:%2").arg(timeout).arg(m_timer));
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("startKeepAliveRequested(%1) m_timer:%2")
+        .arg(timeout.count()).arg(m_timer));
 }
 
 void SatIPRTSP::stopKeepAliveRequested()
@@ -532,7 +535,7 @@ SatIPRTSPWriteHelper::SatIPRTSPWriteHelper(SatIPRTSP* parent, SatIPStreamHandler
     : m_parent(parent)
     , m_streamHandler(handler)
 {
-    m_timer = startTimer(100);
+    m_timer = startTimer(100ms);
 }
 
 void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)

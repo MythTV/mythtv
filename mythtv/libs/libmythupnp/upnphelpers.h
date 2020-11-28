@@ -7,10 +7,13 @@
 #include <QTime>
 #include <QSize>
 
+#include <chrono>
 #include <cstdint>
 
 #include "upnpexp.h"
 #include "compat.h"
+
+using namespace std::chrono_literals;
 
 // NOTE These are for formatting to the UPnP related specs or extracting data
 //      from UPnP formatted strings ONLY.
@@ -52,7 +55,7 @@ namespace UPnPDateTime
      * res\@duration Format
      *  B.2.1.4 res\@duration - UPnP ContentDirectory Service 2008, 2013
      */
-    UPNP_PUBLIC QString resDurationFormat(uint32_t msec);
+    UPNP_PUBLIC QString resDurationFormat(std::chrono::milliseconds msec);
 
     //-----------------------------------------------------------------------
     //    Appendix D. EBNF Syntax Definitions
@@ -65,7 +68,7 @@ namespace UPnPDateTime
      * UPnP ContentDirectory Service 2008, 2013
      * Appendix D.1 Date&Time Syntax
      */
-    UPNP_PUBLIC QString DurationFormat(uint32_t msec);
+    UPNP_PUBLIC QString DurationFormat(std::chrono::milliseconds msec);
 
     /**
      * Time Format

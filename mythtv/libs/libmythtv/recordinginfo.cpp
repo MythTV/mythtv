@@ -1204,8 +1204,7 @@ void RecordingInfo::FinishedRecording(bool allowReRecord)
 
         qint64 starttime = m_recStartTs.toSecsSinceEpoch();
         qint64 endtime   = m_recEndTs.toSecsSinceEpoch();
-        int64_t duration = (endtime - starttime) * 1000000;
-        SaveTotalDuration(duration);
+        SaveTotalDuration(std::chrono::seconds(endtime - starttime));
 
         QString msg = "Finished recording";
         QString msg_subtitle = m_subtitle.isEmpty() ? "" :

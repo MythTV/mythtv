@@ -5,7 +5,6 @@
 
 // C++ includes
 #include <cstdint>
-#include <chrono>
 
 // Qt includes
 #include <QObject>
@@ -18,6 +17,7 @@
 #include <QTime>
 
 // MythTV includes
+#include "mythchrono.h"
 #include "packetbuffer.h"
 
 class SatIPRTSP;
@@ -114,11 +114,11 @@ class SatIPRTSP : public QObject
     void SetSigmonValues(bool lock, int level);
 
   signals:
-    void startKeepAlive(int timeout);
+    void startKeepAlive(std::chrono::milliseconds timeout);
     void stopKeepAlive(void);
 
   protected slots:
-    void startKeepAliveRequested(int timeout);
+    void startKeepAliveRequested(std::chrono::milliseconds timeout);
     void stopKeepAliveRequested(void);
 
   protected:
@@ -137,7 +137,7 @@ class SatIPRTSP : public QObject
     Headers m_headers;
 
     int   m_timer         {0};
-    int   m_timeout       {0};
+    std::chrono::milliseconds m_timeout {0ms};
 
     QMutex m_ctrlSocketLock;
     QMutex m_sigmonLock;

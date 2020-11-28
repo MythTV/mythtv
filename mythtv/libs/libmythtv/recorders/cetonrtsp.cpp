@@ -423,7 +423,7 @@ bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2,
 
     if (params.contains("timeout"))
     {
-        m_timeout = params["timeout"].toInt();
+        m_timeout = std::chrono::seconds(params["timeout"].toInt());
     }
 
     QString transport = readParameters("Transport", params);
@@ -472,10 +472,10 @@ void CetonRTSP::StartKeepAlive()
 {
     if (m_timer)
         return;
-    int timeout = std::max(m_timeout - 5, 5);
+    auto timeout = std::max(m_timeout - 5s, 5s);
     LOG(VB_RECORD, LOG_DEBUG, LOC +
-        QString("Start KeepAlive, every %1s").arg(timeout));
-    m_timer = startTimer(timeout * 1000);
+        QString("Start KeepAlive, every %1s").arg(timeout.count()));
+    m_timer = startTimer(timeout);
 }
 
 void CetonRTSP::StopKeepAlive()

@@ -358,6 +358,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Seek, skip, jump, speed
     void DoSeek(float Time, const QString &Msg, bool TimeIsOffset, bool HonorCutlist);
+    void DoSeek(std::chrono::seconds Time, const QString &Msg, bool TimeIsOffset, bool HonorCutlist) {
+        DoSeek(Time.count(), Msg, TimeIsOffset, HonorCutlist); };
     bool DoPlayerSeek(float Time);
     bool DoPlayerSeekToFrame(uint64_t FrameNum);
     enum ArbSeekWhence { ARBSEEK_SET = 0, ARBSEEK_REWIND, ARBSEEK_FORWARD, ARBSEEK_END };
@@ -382,7 +384,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Chapters, titles and angles
     int  GetNumChapters();
-    void GetChapterTimes(QList<long long> &Times);
+    void GetChapterTimes(QList<std::chrono::seconds> &Times);
     int  GetCurrentChapter();
     int  GetNumTitles();
     int  GetCurrentTitle();
@@ -712,7 +714,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     // Navigate
     int              m_tvmNumChapters {0};
     int              m_tvmCurrentChapter {0};
-    QList<long long> m_tvmChapterTimes;
+    QList<std::chrono::seconds> m_tvmChapterTimes;
     int              m_tvmNumAngles {0};
     int              m_tvmCurrentAngle {0};
     int              m_tvmNumTitles {0};

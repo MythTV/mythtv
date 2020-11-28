@@ -185,11 +185,11 @@ int64_t MythBDPlayer::GetChapter(int Chapter)
     return static_cast<int64_t>(m_playerCtx->m_buffer->BD()->GetChapterStartFrame(chapter));
 }
 
-void MythBDPlayer::GetChapterTimes(QList<long long> &ChapterTimes)
+void MythBDPlayer::GetChapterTimes(QList<std::chrono::seconds> &ChapterTimes)
 {
     uint total = static_cast<uint>(GetNumChapters());
     for (uint i = 0; i < total; i++)
-        ChapterTimes.push_back(static_cast<long long>(m_playerCtx->m_buffer->BD()->GetChapterStartTime(i)));
+        ChapterTimes.push_back(m_playerCtx->m_buffer->BD()->GetChapterStartTime(i));
 }
 
 int MythBDPlayer::GetNumTitles(void) const

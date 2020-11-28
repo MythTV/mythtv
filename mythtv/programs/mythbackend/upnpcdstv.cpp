@@ -1120,7 +1120,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
 
         pItem->SetPropValue( "scheduledStartTime"   , UPnPDateTime::DateTimeFormat(dtProgStart));
         pItem->SetPropValue( "scheduledEndTime"     , UPnPDateTime::DateTimeFormat(dtProgEnd));
-        int msecs = dtProgEnd.toMSecsSinceEpoch() - dtProgStart.toMSecsSinceEpoch();
+        auto msecs = std::chrono::milliseconds(dtProgEnd.toMSecsSinceEpoch() - dtProgStart.toMSecsSinceEpoch());
         pItem->SetPropValue( "scheduledDuration"    , UPnPDateTime::DurationFormat(msecs));
         pItem->SetPropValue( "recordedStartDateTime", UPnPDateTime::DateTimeFormat(dtStartTime));
         pItem->SetPropValue( "recordedDayOfWeek"    , UPnPDateTime::NamedDayFormat(dtStartTime));
@@ -1187,7 +1187,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
 //         if ( pRequest->m_eClient == CDS_ClientSonyDB )
 //             sMimeType = "video/avi";
 
-        uint32_t nDurationMS = 0;
+        std::chrono::milliseconds nDurationMS { 0ms };
 
         // NOTE We intentionally don't use the chanid, recstarttime constructor
         // to avoid an unnecessary db query. At least until the time that we're
@@ -1199,12 +1199,12 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         nDurationMS = recInfo.QueryTotalDuration();
         // Older recordings won't have their precise duration stored in
         // recordedmarkup
-        if (nDurationMS == 0)
+        if (nDurationMS == 0ms)
         {
-            qint64 uiStart = dtStartTime.toMSecsSinceEpoch();
-            qint64 uiEnd   = dtEndTime.toMSecsSinceEpoch();
+            auto uiStart = std::chrono::milliseconds(dtStartTime.toMSecsSinceEpoch());
+            auto uiEnd   = std::chrono::milliseconds(dtEndTime.toMSecsSinceEpoch());
             nDurationMS  = (uiEnd - uiStart);
-            nDurationMS  = (nDurationMS > 0) ? nDurationMS : 0;
+            nDurationMS  = std::max(0ms, nDurationMS);
         }
 
         pItem->SetPropValue( "recordedDuration", UPnPDateTime::DurationFormat(nDurationMS));
@@ -1264,7 +1264,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
         Resource *pRes = pItem->AddResource( sProtocol, resURI.toEncoded() );
         // Must be the duration of the entire video not the scheduled programme duration
         // Appendix B.2.1.4 - res@duration
-        if (nDurationMS > 0)
+        if (nDurationMS > 0ms)
             pRes->AddAttribute ( "duration"    , UPnPDateTime::resDurationFormat(nDurationMS) );
         if (nVideoHeight > 0 && nVideoWidth > 0)
             pRes->AddAttribute ( "resolution"  , QString("%1x%2").arg(nVideoWidth).arg(nVideoHeight) );

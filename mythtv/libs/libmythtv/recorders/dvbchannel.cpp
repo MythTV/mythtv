@@ -953,10 +953,10 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         }
 
         // Extra delay to add for broken DVB drivers
-        if (m_tuningDelay)
-            std::this_thread::sleep_for(std::chrono::milliseconds(m_tuningDelay));
+        if (m_tuningDelay > 0ms)
+            std::this_thread::sleep_for(m_tuningDelay);
 
-        WaitForBackend(50);     // msec
+        WaitForBackend(50ms);
 
         m_prevTuning = tuning;
         m_firstTune = false;
@@ -1561,7 +1561,7 @@ void DVBChannel::DrainDVBEvents(void)
     }
 }
 
-/** \fn WaitForBackend(int)
+/**
  *  \brief Waits for backend to get tune message.
  *
  *   With linux 2.6.12 or later this should block
@@ -1583,10 +1583,12 @@ void DVBChannel::DrainDVBEvents(void)
  *
  *  \param timeout_ms timeout before FE_READ_STATUS in milliseconds
  */
-bool DVBChannel::WaitForBackend(int timeout_ms)
+bool DVBChannel::WaitForBackend(std::chrono::milliseconds timeout_ms)
 {
     const int fd  = m_fdFrontend;
-    struct timeval select_timeout = { timeout_ms/1000, (timeout_ms % 1000) * 1000 /*usec*/};
+    auto seconds = duration_cast<std::chrono::seconds>(timeout_ms);
+    auto usecs = duration_cast<std::chrono::microseconds>(timeout_ms) - seconds;
+    struct timeval select_timeout = { seconds.count(), usecs.count()};
     fd_set fd_select_set;
     FD_ZERO(    &fd_select_set); // NOLINT(readability-isolate-declaration)
     FD_SET (fd, &fd_select_set);

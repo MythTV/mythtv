@@ -1787,11 +1787,11 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 }
 
 /// \brief Returns length of program/recording in seconds.
-uint ProgramInfo::GetSecondsInRecording(void) const
+std::chrono::seconds ProgramInfo::GetSecondsInRecording(void) const
 {
-    int64_t recsecs = m_recStartTs.secsTo(m_endTs);
-    int64_t duration = m_startTs.secsTo(m_endTs);
-    return (uint) ((recsecs>0) ? recsecs : max(duration,int64_t(0)));
+    auto recsecs  = std::chrono::seconds(m_recStartTs.secsTo(m_endTs));
+    auto duration = std::chrono::seconds(m_startTs.secsTo(m_endTs));
+    return (recsecs > 0s) ? recsecs : max(duration,0s);
 }
 
 /// \brief Returns catType as a string
@@ -4136,7 +4136,7 @@ void ProgramInfo::SaveVideoScanType(uint64_t frame, bool progressive)
 
 
 /// \brief Store the Total Duration at frame 0 in the recordedmarkup table
-void ProgramInfo::SaveTotalDuration(int64_t duration)
+void ProgramInfo::SaveTotalDuration(std::chrono::milliseconds duration)
 {
     if (!IsRecording())
         return;
@@ -4161,7 +4161,7 @@ void ProgramInfo::SaveTotalDuration(int64_t duration)
     query.bindValue(":CHANID", m_chanId);
     query.bindValue(":STARTTIME", m_recStartTs);
     query.bindValue(":TYPE", MARK_DURATION_MS);
-    query.bindValue(":DATA", (uint)(duration / 1000));
+    query.bindValue(":DATA", (uint)(duration.count()));
 
     if (!query.exec())
         MythDB::DBError("Duration insert", query);
@@ -4360,19 +4360,16 @@ bool ProgramInfo::QueryAverageScanProgressive(void) const
  *
  *  \returns Duration in milliseconds
  */
-uint32_t ProgramInfo::QueryTotalDuration(void) const
+std::chrono::milliseconds ProgramInfo::QueryTotalDuration(void) const
 {
     if (gCoreContext->IsDatabaseIgnored())
-        return 0;
+        return 0ms;
 
-    // 32Bits is more than sufficient. A recording would need to be almost a
-    // month long to wrap and this is impossible since we cap the maximum
-    // recording length to 6 hours.
-    uint32_t msec = load_markup_datum(MARK_DURATION_MS, m_chanId, m_recStartTs);
+    auto msec = std::chrono::milliseconds(load_markup_datum(MARK_DURATION_MS, m_chanId, m_recStartTs));
 
 // Impossible condition, load_markup_datum returns an unsigned int
-//     if (msec < 0)
-//         return 0;
+//     if (msec < 0ms)
+//         return 0ms;
 
     return msec;
 }
@@ -4720,7 +4717,7 @@ void ProgramInfo::UpdateInUseMark(bool force)
     if (m_inUseForWhat.isEmpty())
         return;
 
-    if (force || m_lastInUseTime.secsTo(MythDate::current()) > 15 * 60)
+    if (force || MythDate::secsInPast(m_lastInUseTime) > 15min)
         MarkAsInUse(true);
 }
 

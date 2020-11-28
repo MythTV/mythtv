@@ -113,7 +113,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual void InitFrameInterval();
 
     // Public Sets
-    void SetLength(int len)                   { m_totalLength = len; }
+    void SetLength(std::chrono::seconds len)  { m_totalLength = len; }
     void SetFramesPlayed(uint64_t played);
     void SetEof(EofState eof);
     void SetWatchingRecording(bool mode);
@@ -122,8 +122,8 @@ class MTV_PUBLIC MythPlayer : public QObject
                         bool ForceUpdate, int ReferenceFrames,
                         FrameScanType /*scan*/ = kScan_Ignore,
                         const QString& codecName = QString());
-    void SetFileLength(int total, int frames);
-    void SetDuration(int duration);
+    void SetFileLength(std::chrono::seconds total, int frames);
+    void SetDuration(std::chrono::seconds duration);
     void SetFrameRate(double fps);
 
     // Gets
@@ -138,7 +138,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     float   GetPlaySpeed(void) const          { return m_playSpeed; }
     AudioPlayer* GetAudio(void)               { return &m_audio; }
     float   GetNextPlaySpeed(void) const      { return m_nextPlaySpeed; }
-    int     GetLength(void) const             { return m_totalLength; }
+    std::chrono::seconds GetLength(void) const  { return m_totalLength; }
     uint64_t GetTotalFrameCount(void) const   { return m_totalFrames; }
     uint64_t GetCurrentFrameCount(void) const;
     uint64_t GetFramesPlayed(void) const      { return m_framesPlayed; }
@@ -216,7 +216,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Chapter public stuff
     virtual int  GetNumChapters(void);
     virtual int  GetCurrentChapter(void);
-    virtual void GetChapterTimes(QList<long long> &times);
+    virtual void GetChapterTimes(QList<std::chrono::seconds> &times);
 
     // Title public stuff
     virtual int GetNumTitles(void) const { return 0; }
@@ -257,9 +257,9 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Complicated gets
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
-    uint64_t TranslatePositionFrameToMs(uint64_t position,
+    std::chrono::milliseconds TranslatePositionFrameToMs(uint64_t position,
                                         bool use_cutlist) const;
-    uint64_t TranslatePositionMsToFrame(uint64_t position,
+    uint64_t TranslatePositionMsToFrame(std::chrono::milliseconds position,
                                         bool use_cutlist) const {
         return m_deleteMap.TranslatePositionMsToFrame(position,
                                                     GetFrameRate(),
@@ -275,7 +275,7 @@ class MTV_PUBLIC MythPlayer : public QObject
         return m_deleteMap.TranslatePositionRelToAbs(position);
     }
     float ComputeSecs(uint64_t position, bool use_cutlist) const {
-        return TranslatePositionFrameToMs(position, use_cutlist) / 1000.0;
+        return TranslatePositionFrameToMs(position, use_cutlist).count() / 1000.0;
     }
     uint64_t FindFrame(float offset, bool use_cutlist) const;
 
@@ -428,8 +428,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     int       m_videobufRetries           {0};
     uint64_t  m_framesPlayed              {0};
     uint64_t  m_totalFrames               {0};
-    long long m_totalLength               {0};
-    int64_t   m_totalDuration             {0};
+    std::chrono::seconds  m_totalLength   {0s};
+    std::chrono::seconds  m_totalDuration {0s};
     long long m_rewindTime                {0};
     int64_t   m_latestVideoTimecode       {-1};
     MythPlayerAVSync m_avSync;

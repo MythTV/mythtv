@@ -50,14 +50,14 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     uint64_t  GetCurrentAngle    (void) const;
     int       GetTitleDuration   (int Title);
     uint64_t  GetTitleSize       (void) const;
-    uint64_t  GetTotalTimeOfTitle(void) const;
-    uint64_t  GetCurrentTime     (void) const;
+    std::chrono::seconds  GetTotalTimeOfTitle(void) const;
+    std::chrono::seconds  GetCurrentTime     (void) const;
     uint64_t  GetTotalReadPosition(void);
     uint32_t  GetNumChapters     (void);
     uint32_t  GetCurrentChapter  (void);
     uint64_t  GetNumAngles       (void) const;
     std::chrono::milliseconds  GetChapterStartTimeMs(uint32_t Chapter);
-    uint64_t  GetChapterStartTime  (uint32_t Chapter);
+    std::chrono::seconds       GetChapterStartTime  (uint32_t Chapter);
     uint64_t  GetChapterStartFrame (uint32_t Chapter);
     bool      IsHDMVNavigation   (void) const;
     bool      TitleChanged       (void);
@@ -105,6 +105,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     BLURAY_TITLE_INFO *m_currentTitleInfo            { nullptr };
     uint64_t           m_titlesize                   { 0       };
     uint64_t           m_currentTitleAngleCount      { 0       };
+    // Current time in 1/90th of a millisecond
     uint64_t           m_currentTime                 { 0       };
     int                m_imgHandle                   { -1      };
     int                m_currentTitle                { -1      };

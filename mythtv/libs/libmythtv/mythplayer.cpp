@@ -384,13 +384,13 @@ void MythPlayer::SetFrameRate(double fps)
     SetFrameInterval(kScan_Progressive, 1.0 / (m_videoFrameRate * static_cast<double>(temp_speed)));
 }
 
-void MythPlayer::SetFileLength(int total, int frames)
+void MythPlayer::SetFileLength(std::chrono::seconds total, int frames)
 {
     m_totalLength = total;
     m_totalFrames = frames;
 }
 
-void MythPlayer::SetDuration(int duration)
+void MythPlayer::SetDuration(std::chrono::seconds duration)
 {
     m_totalDuration = duration;
 }
@@ -839,7 +839,8 @@ bool MythPlayer::FastForward(float seconds)
 
         if (dest > length)
         {
-            int64_t pos = TranslatePositionMsToFrame(seconds * 1000, false);
+            auto msec = millisecondsFromFloat(seconds * 1000);
+            int64_t pos = TranslatePositionMsToFrame(msec, false);
             if (CalcMaxFFTime(pos) < 0)
                 return true;
             // Reach end of recording, go to 1 or 3s before the end
@@ -862,7 +863,8 @@ bool MythPlayer::Rewind(float seconds)
         float dest = current - seconds;
         if (dest < 0)
         {
-            int64_t pos = TranslatePositionMsToFrame(seconds * 1000, false);
+            auto msec = millisecondsFromFloat(seconds * 1000);
+            int64_t pos = TranslatePositionMsToFrame(msec, false);
             if (CalcRWTime(pos) < 0)
                 return true;
             dest = 0;
@@ -1408,7 +1410,8 @@ long long MythPlayer::CalcRWTime(long long rw) const
         return rw;
     }
 
-    m_playerCtx->m_tvchain->JumpToNext(false, ((int64_t)m_framesPlayed - rw) / m_videoFrameRate);
+    auto seconds = secondsFromFloat((m_framesPlayed - rw) / m_videoFrameRate);
+    m_playerCtx->m_tvchain->JumpToNext(false, seconds);
 
     return -1;
 }
@@ -1440,7 +1443,9 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
         {
             ret = -1;
             // Number of frames to be skipped is from the end of the current segment
-            m_playerCtx->m_tvchain->JumpToNext(true, ((int64_t)m_totalFrames - (int64_t)m_framesPlayed - ffframes) / m_videoFrameRate);
+            auto seconds = secondsFromFloat((m_totalFrames - m_framesPlayed - ffframes)
+                                                          / m_videoFrameRate);
+            m_playerCtx->m_tvchain->JumpToNext(true, seconds);
         }
     }
     else if (islivetvcur || IsWatchingInprogress())
@@ -1459,8 +1464,10 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
         if (behind < maxtime) // if we're close, do nothing
             ret = 0;
         else if (behind - ff <= maxtime)
-            ret = TranslatePositionMsToFrame(1000 * (secsWritten - maxtime),
-                                             true) - m_framesPlayed;
+        {
+            auto msec = millisecondsFromFloat(1000 * (secsWritten - maxtime));
+            ret = TranslatePositionMsToFrame(msec, true) - m_framesPlayed;
+        }
 
         if (behind < maxtime * 3)
             m_limitKeyRepeat = true;
@@ -1478,8 +1485,10 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
         if (secsMax <= 0.F)
             ret = 0;
         else if (secsMax < secsPlayed + ff)
-            ret = TranslatePositionMsToFrame(1000 * secsMax, true)
-                    - m_framesPlayed;
+        {
+            auto msec = millisecondsFromFloat(1000 * secsMax);
+            ret = TranslatePositionMsToFrame(msec, true) - m_framesPlayed;
+        }
     }
 
     return ret;
@@ -1751,8 +1760,9 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
 {
     bool islivetvcur    = (m_liveTV && m_playerCtx->m_tvchain &&
                         !m_playerCtx->m_tvchain->HasNext());
-    uint64_t length_ms  = TranslatePositionFrameToMs(m_totalFrames, use_cutlist);
-    uint64_t position_ms = 0;
+    std::chrono::milliseconds length_ms = TranslatePositionFrameToMs(m_totalFrames, use_cutlist);
+    std::chrono::milliseconds position_ms = 0ms;
+    auto offset_ms = std::chrono::milliseconds(llroundf(fabsf(offset) * 1000));
 
     if (signbit(offset))
     {
@@ -1768,18 +1778,16 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
                     TranslatePositionFrameToMs(framesWritten, use_cutlist);
             }
         }
-        uint64_t offset_ms = llroundf(-offset * 1000);
-        position_ms = (offset_ms > length_ms) ? 0 : length_ms - offset_ms;
+        position_ms = (offset_ms > length_ms) ? 0ms : length_ms - offset_ms;
     }
     else
     {
-        position_ms = llroundf(offset * 1000);
-
-        if (offset > length_ms)
+        position_ms = offset_ms;
+        if (offset_ms > length_ms)
         {
             // Make sure we have an updated totalFrames
             if ((islivetvcur || IsWatchingInprogress()) &&
-                (length_ms < offset))
+                (length_ms < offset_ms))
             {
                 long long framesWritten =
                     m_playerCtx->m_recorder->GetFramesWritten();
@@ -1796,7 +1804,7 @@ uint64_t MythPlayer::FindFrame(float offset, bool use_cutlist) const
 // If position == -1, it signifies that we are computing the current
 // duration of an in-progress recording.  In this case, we fetch the
 // current frame rate and frame count from the recorder.
-uint64_t MythPlayer::TranslatePositionFrameToMs(uint64_t position,
+std::chrono::milliseconds MythPlayer::TranslatePositionFrameToMs(uint64_t position,
                                                 bool use_cutlist) const
 {
     float frameRate = GetFrameRate();
@@ -1826,7 +1834,7 @@ int MythPlayer::GetCurrentChapter()
     return 0;
 }
 
-void MythPlayer::GetChapterTimes(QList<long long> &times)
+void MythPlayer::GetChapterTimes(QList<std::chrono::seconds> &times)
 {
     if (m_decoder)
         m_decoder->GetChapterTimes(times);

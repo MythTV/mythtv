@@ -42,8 +42,8 @@ class DVBChannel : public DTVChannel
     // Sets
     void SetPMT(const ProgramMapTable *pmt);
     void SetTimeOffset(double offset);
-    void SetSlowTuning(uint how_slow_in_ms)
-        { m_tuningDelay = how_slow_in_ms; }
+    void SetSlowTuning(std::chrono::milliseconds how_slow)
+        { m_tuningDelay = how_slow; }
 
     // Gets
     bool IsOpen(void) const override; // ChannelBase
@@ -127,7 +127,7 @@ class DVBChannel : public DTVChannel
     double GetUncorrectedBlockCountDVBv5(bool *ok) const;
 
     void DrainDVBEvents(void);
-    bool WaitForBackend(int timeout_ms);
+    bool WaitForBackend(std::chrono::milliseconds timeout_ms);
 
   private:
     IsOpenMap         m_isOpen;
@@ -161,7 +161,7 @@ class DVBChannel : public DTVChannel
 
     uint              m_lastLnbDevId        {(uint)~0x0};
 
-    uint              m_tuningDelay         {0};      // Extra delay to add for broken drivers
+    std::chrono::milliseconds m_tuningDelay { 0ms};   // Extra delay to add for broken drivers
     std::chrono::milliseconds m_sigMonDelay {25ms};   // Minimum delay between FE_LOCK checks
     bool              m_firstTune           {true};   // Used to force hardware reset
 

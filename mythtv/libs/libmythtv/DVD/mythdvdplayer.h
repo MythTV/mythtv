@@ -18,8 +18,8 @@ class MythDVDPlayer : public MythPlayerUI
     bool     HasReachedEof(void) const override;
     bool     PrepareAudioSample(int64_t &Timecode) override;
     uint64_t GetBookmark(void) override;
-    int64_t  GetSecondsPlayed(bool HonorCutList, int Divisor = 1000) override;
-    int64_t  GetTotalSeconds(bool HonorCutList, int Divisor = 1000) const override;
+    std::chrono::milliseconds  GetMillisecondsPlayed(bool HonorCutList) override;
+    std::chrono::milliseconds  GetTotalMilliseconds(bool HonorCutList) const override;
     bool     GoToMenu(const QString& Menu) override;
     void     GoToDVDProgram(bool Direction) override;
     bool     IsInStillFrame() const override;
@@ -29,9 +29,9 @@ class MythDVDPlayer : public MythPlayerUI
     bool     SwitchAngle(int Angle) override;
     int      GetNumChapters(void) override;
     int      GetCurrentChapter(void) override;
-    void     GetChapterTimes(QList<long long> &Times) override;
+    void     GetChapterTimes(QList<std::chrono::seconds> &Times) override;
 
-    void     SetStillFrameTimeout(int Length);
+    void     SetStillFrameTimeout(std::chrono::seconds Length);
     void     StillFrameCheck(void);
 
   protected:
@@ -77,7 +77,7 @@ class MythDVDPlayer : public MythPlayerUI
 
     // still frame timing
     MythTimer m_stillFrameTimer       { };
-    int      m_stillFrameLength       { 0 };
+    std::chrono::seconds  m_stillFrameLength  { 0s };
     QMutex   m_stillFrameTimerLock    { QMutex::Recursive };
 };
 

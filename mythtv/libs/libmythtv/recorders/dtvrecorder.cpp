@@ -128,7 +128,7 @@ void DTVRecorder::FinishRecording(void)
 
     if (m_curRecording)
     {
-        SetDuration((int64_t)(m_totalDuration * 1000));
+        SetDuration(millisecondsFromFloat(m_totalDuration * 1000));
         SetTotalFrames(m_framesWrittenCount);
     }
 

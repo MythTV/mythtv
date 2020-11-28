@@ -162,7 +162,7 @@ void MythPlayerUI::EventLoop()
     if (m_isDummy && m_playerCtx->m_tvchain && m_playerCtx->m_tvchain->HasNext())
     {
         // Switch from the dummy recorder to the tuned program in livetv
-        m_playerCtx->m_tvchain->JumpToNext(true, 0);
+        m_playerCtx->m_tvchain->JumpToNext(true, 0s);
         JumpToProgram();
     }
     else if ((!m_allPaused || GetEof() != kEofStateNone) &&
@@ -242,7 +242,7 @@ void MythPlayerUI::EventLoop()
         if (m_playerCtx->m_tvchain && m_playerCtx->m_tvchain->HasNext())
         {
             LOG(VB_GENERAL, LOG_NOTICE, LOC + "LiveTV forcing JumpTo 1");
-            m_playerCtx->m_tvchain->JumpToNext(true, 0);
+            m_playerCtx->m_tvchain->JumpToNext(true, 0s);
             return;
         }
 
@@ -949,9 +949,9 @@ void MythPlayerUI::JumpToStream(const QString &stream)
     }
 
     m_watchingRecording = false;
-    m_totalLength = 0;
+    m_totalLength = 0s;
     m_totalFrames = 0;
-    m_totalDuration = 0;
+    m_totalDuration = 0s;
 
     // 120 retries ~= 60 seconds
     if (OpenFile(120) < 0)
@@ -962,16 +962,16 @@ void MythPlayerUI::JumpToStream(const QString &stream)
         return;
     }
 
-    if (m_totalLength == 0)
+    if (m_totalLength == 0s)
     {
         long long len = m_playerCtx->m_buffer->GetRealFileSize();
-        m_totalLength = static_cast<int>(len / ((m_decoder->GetRawBitrate() * 1000) / 8));
-        m_totalFrames = static_cast<uint64_t>(m_totalLength * SafeFPS());
+        m_totalLength = std::chrono::seconds(len / ((m_decoder->GetRawBitrate() * 1000) / 8));
+        m_totalFrames = static_cast<uint64_t>(m_totalLength.count() * SafeFPS());
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("JumpToStream length %1 bytes @ %2 Kbps = %3 Secs, %4 frames @ %5 fps")
         .arg(m_playerCtx->m_buffer->GetRealFileSize()).arg(m_decoder->GetRawBitrate())
-        .arg(m_totalLength).arg(m_totalFrames).arg(m_decoder->GetFPS()) );
+        .arg(m_totalLength.count()).arg(m_totalFrames).arg(m_decoder->GetFPS()) );
 
     SetEof(kEofStateNone);
 
@@ -1109,7 +1109,7 @@ void MythPlayerUI::JumpToProgram()
     bool discontinuity = false;
     bool newtype = false;
     int newid = -1;
-    long long nextpos = m_playerCtx->m_tvchain->GetJumpPos();
+    std::chrono::seconds nextpos = m_playerCtx->m_tvchain->GetJumpPos();
     ProgramInfo *pginfo = m_playerCtx->m_tvchain->GetSwitchProgram(discontinuity, newtype, newid);
     if (!pginfo)
         return;
@@ -1202,26 +1202,26 @@ void MythPlayerUI::JumpToProgram()
     // check that we aren't too close to the end of program.
     // and if so set it to 10s from the end if completed recordings
     // or 3s if live
-    long long duration = m_playerCtx->m_tvchain->GetLengthAtCurPos();
-    int maxpos = m_playerCtx->m_tvchain->HasNext() ? 10 : 3;
+    std::chrono::seconds duration = m_playerCtx->m_tvchain->GetLengthAtCurPos();
+    std::chrono::seconds maxpos = m_playerCtx->m_tvchain->HasNext() ? 10s : 3s;
 
     if (nextpos > (duration - maxpos))
     {
         nextpos = duration - maxpos;
-        if (nextpos < 0)
-            nextpos = 0;
+        if (nextpos < 0s)
+            nextpos = 0s;
     }
-    else if (nextpos < 0)
+    else if (nextpos < 0s)
     {
         // it's a relative position to the end
         nextpos += duration;
     }
 
     // nextpos is the new position to use in seconds
-    nextpos = static_cast<int64_t>(TranslatePositionMsToFrame(static_cast<uint64_t>(nextpos) * 1000, true));
+    uint64_t nextframe = TranslatePositionMsToFrame(nextpos, true);
 
-    if (nextpos > 10)
-        DoJumpToFrame(static_cast<uint64_t>(nextpos), kInaccuracyNone);
+    if (nextpos > 10s)
+        DoJumpToFrame(nextframe, kInaccuracyNone);
 
     m_playerCtx->SetPlayerChangingBuffers(false);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - end");

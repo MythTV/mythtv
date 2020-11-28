@@ -153,7 +153,7 @@ class DecoderBase
 
     virtual int GetNumChapters(void)                      { return 0; }
     virtual int GetCurrentChapter(long long /*framesPlayed*/) { return 0; }
-    virtual void GetChapterTimes(QList<long long> &/*times*/) { }
+    virtual void GetChapterTimes(QList<std::chrono::seconds> &/*times*/) { }
     virtual long long GetChapter(int /*chapter*/)             { return m_framesPlayed; }
     virtual bool DoRewind(long long desiredFrame, bool discardFrames = true);
     virtual bool DoFastForward(long long desiredFrame, bool discardFrames = true);
@@ -172,10 +172,10 @@ class DecoderBase
     static uint64_t TranslatePosition(const frm_pos_map_t &map,
                                       long long key,
                                       float fallback_ratio);
-    uint64_t TranslatePositionFrameToMs(long long position,
+    std::chrono::milliseconds TranslatePositionFrameToMs(long long position,
                                         float fallback_framerate,
                                         const frm_dir_map_t &cutlist);
-    uint64_t TranslatePositionMsToFrame(uint64_t dur_ms,
+    uint64_t TranslatePositionMsToFrame(std::chrono::milliseconds dur_ms,
                                         float fallback_framerate,
                                         const frm_dir_map_t &cutlist);
 

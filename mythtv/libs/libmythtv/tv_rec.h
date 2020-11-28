@@ -84,7 +84,7 @@ class DVBDBOptions
     DVBDBOptions() = default;
 
     bool m_dvbOnDemand    {false};
-    uint m_dvbTuningDelay {0};
+    std::chrono::milliseconds m_dvbTuningDelay {0ms};
     bool m_dvbEitScan     {true};
 };
 

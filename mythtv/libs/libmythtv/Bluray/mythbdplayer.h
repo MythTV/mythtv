@@ -17,7 +17,7 @@ class MythBDPlayer : public MythPlayerUI
     bool     GoToMenu          (const QString& Menu) override;
     int      GetNumChapters    (void) override;
     int      GetCurrentChapter (void) override;
-    void     GetChapterTimes   (QList<long long> &ChapterTimes) override;
+    void     GetChapterTimes   (QList<std::chrono::seconds> &ChapterTimes) override;
     int64_t  GetChapter        (int Chapter) override;
     int      GetNumTitles      (void) const override;
     int      GetNumAngles      (void) const override;

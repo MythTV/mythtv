@@ -632,32 +632,32 @@ void MythPlayerCaptionsUI::SetStream(const QString& Stream)
     {
         // Restore livetv
         SetEof(kEofStateDelayed);
-        m_playerCtx->m_tvchain->JumpToNext(false, 0);
-        m_playerCtx->m_tvchain->JumpToNext(true, 0);
+        m_playerCtx->m_tvchain->JumpToNext(false, 0s);
+        m_playerCtx->m_tvchain->JumpToNext(true, 0s);
     }
 }
 
 // Called from the interactiveTV (MHIContext) thread
-long MythPlayerCaptionsUI::GetStreamPos()
+std::chrono::milliseconds MythPlayerCaptionsUI::GetStreamPos()
 {
-    return static_cast<long>((1000 * GetFramesPlayed()) / SafeFPS());
+    return millisecondsFromFloat((1000 * GetFramesPlayed()) / SafeFPS());
 }
 
 // Called from the interactiveTV (MHIContext) thread
-long MythPlayerCaptionsUI::GetStreamMaxPos()
+std::chrono::milliseconds MythPlayerCaptionsUI::GetStreamMaxPos()
 {
-    auto maxpos = static_cast<long>(1000 * (m_totalDuration > 0 ? m_totalDuration : m_totalLength));
+    std::chrono::seconds maxsecs = m_totalDuration > 0s ? m_totalDuration : m_totalLength;
+    auto maxpos = duration_cast<std::chrono::milliseconds>(maxsecs);
     auto pos = GetStreamPos();
     return maxpos > pos ? maxpos : pos;
 }
 
-long MythPlayerCaptionsUI::SetStreamPos(long Position)
+void MythPlayerCaptionsUI::SetStreamPos(std::chrono::milliseconds Position)
 {
-    auto frameNum = static_cast<uint64_t>((Position * SafeFPS()) / 1000);
+    auto frameNum = static_cast<uint64_t>((Position.count() * SafeFPS()) / 1000);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetStreamPos %1 mS = frame %2, now=%3")
-        .arg(Position).arg(frameNum).arg(GetFramesPlayed()) );
+        .arg(Position.count()).arg(frameNum).arg(GetFramesPlayed()) );
     JumpToFrame(frameNum);
-    return Position;
 }
 
 void MythPlayerCaptionsUI::StreamPlay(bool Playing)
