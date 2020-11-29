@@ -202,8 +202,9 @@ void EITScanner::StartPassiveScan(ChannelBase *channel,
 
     m_eitSource->SetEITHelper(m_eitHelper);
     m_eitSource->SetEITRate(1.0F);
-    m_eitHelper->SetChannelID(m_channel->GetChanID());
-    m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(m_channel->GetChanID()));
+    int chanid = m_channel->GetChanID();
+    m_eitHelper->SetChannelID(chanid);
+    m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(chanid));
 
     LOG(VB_EIT, LOG_INFO, LOC_ID + "Started passive scan.");
 }
