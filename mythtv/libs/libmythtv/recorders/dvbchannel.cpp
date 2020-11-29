@@ -1266,7 +1266,6 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
     struct dtv_property prop = {};
     struct dtv_properties cmd = {};
 
-    memset(&prop, 0, sizeof(prop));
     prop.cmd = DTV_STAT_CNR;
     cmd.num = 1;
     cmd.props = &prop;
