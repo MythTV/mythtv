@@ -1186,13 +1186,19 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
     cmd.num = 1;
     cmd.props = &prop;
     int ret = ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd);
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-        QString("FE DTV signal strength ret=%1 res=%2 len=%3 scale=%4 val=%5")
-        .arg(ret)
-        .arg(cmd.props->result)
-        .arg(cmd.props->u.st.len)
-        .arg(cmd.props->u.st.stat[0].scale)
-        .arg(cmd.props->u.st.stat[0].svalue));
+    if (ret < 0)
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + "FE_GET_PROPERTY DTV_STAT_SIGNAL_STRENGTH failed" + ENO);
+    }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + "DTV_STAT_SIGNAL_STRENGTH " +
+            QString("res=%1 len=%2 scale=%3 val=%4")
+            .arg(cmd.props->result)
+            .arg(cmd.props->u.st.len)
+            .arg(cmd.props->u.st.stat[0].scale)
+            .arg(cmd.props->u.st.stat[0].svalue));
+    }
 
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
     if (ok)
@@ -1265,13 +1271,19 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
     cmd.num = 1;
     cmd.props = &prop;
     int ret = ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd);
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-        QString("FE DTV cnr ret=%1 res=%2 len=%3 scale=%4 val=%5")
-        .arg(ret)
-        .arg(cmd.props->result)
-        .arg(cmd.props->u.st.len)
-        .arg(cmd.props->u.st.stat[0].scale)
-        .arg(cmd.props->u.st.stat[0].svalue));
+    if (ret < 0)
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + "FE_GET_PROPERTY DTV_STAT_CNR failed" + ENO);
+    }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + "DTV_STAT_CNR " +
+            QString("res=%1 len=%2 scale=%3 val=%4")
+            .arg(cmd.props->result)
+            .arg(cmd.props->u.st.len)
+            .arg(cmd.props->u.st.stat[0].scale)
+            .arg(cmd.props->u.st.stat[0].svalue));
+    }
 
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
     if (ok)
@@ -1338,17 +1350,23 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
     cmd.num   = prop.size();
     cmd.props = prop.data();
     int ret = ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd);
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-        QString("FE DTV bit error rate ret=%1 res=%2 len=%3 scale=%4 val=%5 res=%6 len=%7 scale=%8 val=%9")
-        .arg(ret)
-        .arg(cmd.props[0].result)
-        .arg(cmd.props[0].u.st.len)
-        .arg(cmd.props[0].u.st.stat[0].scale)
-        .arg(cmd.props[0].u.st.stat[0].uvalue)
-        .arg(cmd.props[1].result)
-        .arg(cmd.props[1].u.st.len)
-        .arg(cmd.props[1].u.st.stat[0].scale)
-        .arg(cmd.props[1].u.st.stat[0].uvalue));
+    if (ret < 0)
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + "FE_GET_PROPERTY DTV_STAT_POST_ERROR_BIT_COUNT failed" + ENO);
+    }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + "DTV_STAT_POST_ERROR_BIT_COUNT " +
+            QString("res=%1 len=%2 scale=%3 val=%4 res=%5 len=%6 scale=%7 val=%8")
+            .arg(cmd.props[0].result)
+            .arg(cmd.props[0].u.st.len)
+            .arg(cmd.props[0].u.st.stat[0].scale)
+            .arg(cmd.props[0].u.st.stat[0].uvalue)
+            .arg(cmd.props[1].result)
+            .arg(cmd.props[1].u.st.len)
+            .arg(cmd.props[1].u.st.stat[0].scale)
+            .arg(cmd.props[1].u.st.stat[0].uvalue));
+    }
 
     bool tmpOk = (ret == 0) &&
             (cmd.props[0].u.st.len > 0) &&
@@ -1406,13 +1424,19 @@ double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
     cmd.num = 1;
     cmd.props = &prop;
     int ret = ioctl(m_fdFrontend, FE_GET_PROPERTY, &cmd);
-    LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-        QString("FE DTV uncorrected block count ret=%1 res=%2 len=%3 scale=%4 val=%5")
-        .arg(ret)
-        .arg(cmd.props[0].result)
-        .arg(cmd.props[0].u.st.len)
-        .arg(cmd.props[0].u.st.stat[0].scale)
-        .arg(cmd.props[0].u.st.stat[0].svalue));
+    if (ret < 0)
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + "FE_GET_PROPERTY DTV_STAT_ERROR_BLOCK_COUNT failed" + ENO);
+    }
+    else
+    {
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + "DTV_STAT_ERROR_BLOCK_COUNT " +
+            QString("res=%1 len=%2 scale=%3 val=%4")
+            .arg(cmd.props[0].result)
+            .arg(cmd.props[0].u.st.len)
+            .arg(cmd.props[0].u.st.stat[0].scale)
+            .arg(cmd.props[0].u.st.stat[0].svalue));
+    }
 
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
     if (ok)
