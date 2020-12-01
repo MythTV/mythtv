@@ -5006,7 +5006,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     else if (command == "RECORD_PENDING" &&
              (slist.size() >= 4 + NUMPROGRAMLINES))
     {
-        int secsleft = slist[2].toInt();
+        auto secsleft = std::chrono::seconds(slist[2].toInt());
         int haslater = slist[3].toInt();
         QStringList::const_iterator it = slist.cbegin() + 4;
         ProgramInfo pginfo(it, slist.cend());
@@ -7716,7 +7716,7 @@ void MainServer::deferredDeleteSlot(void)
         return;
 
     DeferredDeleteStruct dds = m_deferredDeleteList.front();
-    while (dds.ts.secsTo(MythDate::current()) > 30)
+    while (MythDate::secsInPast(dds.ts) > 30s)
     {
         dds.sock->DecrRef();
         m_deferredDeleteList.pop_front();

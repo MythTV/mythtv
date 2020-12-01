@@ -475,11 +475,11 @@ RecStatus::Type PlaybackSock::GetRecordingStatus(int capturecardnum)
 }
 
 void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
-                                 int secsleft, bool hasLater)
+                                 std::chrono::seconds secsleft, bool hasLater)
 {
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "RECORD_PENDING";
-    strlist << QString::number(secsleft);
+    strlist << QString::number(secsleft.count());
     strlist << QString::number(static_cast<int>(hasLater));
     pginfo->ToStringList(strlist);
 

@@ -96,7 +96,7 @@ class PlaybackSock : public ReferenceCounter
                                  ProgramInfo *pginfo);
     RecStatus::Type GetRecordingStatus(int capturecardnum);
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
-                       int secsleft, bool hasLater);
+                       std::chrono::seconds secsleft, bool hasLater);
     int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
     void SetNextLiveTVDir(int capturecardnum, const QString& dir);
     void CancelNextRecording(int capturecardnum, bool cancel);

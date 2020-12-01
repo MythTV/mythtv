@@ -152,7 +152,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     bool Init(void);
 
-    void RecordPending(const ProgramInfo *rcinfo, int secsleft, bool hasLater);
+    void RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsleft, bool hasLater);
     RecStatus::Type StartRecording(ProgramInfo *pginfo);
     RecStatus::Type GetRecordingStatus(void) const;
 

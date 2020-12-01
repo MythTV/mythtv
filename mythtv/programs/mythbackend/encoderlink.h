@@ -94,7 +94,7 @@ class EncoderLink
     bool IsRecording(const ProgramInfo *rec); // scheduler call only.
 
     bool MatchesRecording(const ProgramInfo *rec);
-    void RecordPending(const ProgramInfo *rec, int secsleft, bool hasLater);
+    void RecordPending(const ProgramInfo *rec, std::chrono::seconds secsleft, bool hasLater);
     RecStatus::Type StartRecording(ProgramInfo *rec);
     RecStatus::Type GetRecordingStatus(void);
     void StopRecording(bool killFile = false);

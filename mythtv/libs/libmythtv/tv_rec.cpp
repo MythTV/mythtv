@@ -252,7 +252,7 @@ ProgramInfo *TVRec::GetRecording(void)
     return tmppginfo;
 }
 
-/** \fn TVRec::RecordPending(const RecordingInfo*, int, bool)
+/**
  *  \brief Tells TVRec "rcinfo" is the next pending recording.
  *
  *   When there is a pending recording and the frontend is in "Live TV"
@@ -266,13 +266,13 @@ ProgramInfo *TVRec::GetRecording(void)
  *                  Set to -1 to revoke the current pending recording.
  *  \param hasLater If true, a later non-conflicting showing is available.
  */
-void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
+void TVRec::RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsleft,
                           bool hasLater)
 {
     QMutexLocker statelock(&m_stateChangeLock);
     QMutexLocker pendlock(&m_pendingRecLock);
 
-    if (secsleft < 0)
+    if (secsleft < 0s)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Pending recording revoked on " +
             QString("inputid [%1]").arg(rcinfo->GetInputID()));
@@ -291,7 +291,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
 
     PendingInfo pending;
     pending.m_info            = new ProgramInfo(*rcinfo);
-    pending.m_recordingStart  = MythDate::current().addSecs(secsleft);
+    pending.m_recordingStart  = MythDate::current().addSecs(secsleft.count());
     pending.m_hasLaterShowing = hasLater;
     pending.m_ask             = true;
     pending.m_doNotAsk        = false;
@@ -366,7 +366,7 @@ void TVRec::CancelNextRecording(bool cancel)
                     .arg((uint64_t)inputid,0,16));
 
             pendlock.unlock();
-            RemoteRecordPending(inputid, (*it).m_info, -1, false);
+            RemoteRecordPending(inputid, (*it).m_info, -1s, false);
             pendlock.relock();
         }
 
@@ -374,7 +374,7 @@ void TVRec::CancelNextRecording(bool cancel)
             QString("CancelNextRecording -- inputid [%1]")
                            .arg(m_inputId));
 
-        RecordPending((*it).m_info, -1, false);
+        RecordPending((*it).m_info, -1s, false);
     }
     else
     {
@@ -951,10 +951,9 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     SendMythSystemRecEvent("REC_FINISHED", curRec);
 
     // send out DONE_RECORDING message
-    int secsSince = curRec->GetRecordingStartTime()
-        .secsTo(MythDate::current());
+    auto secsSince = MythDate::secsInPast(curRec->GetRecordingStartTime());
     QString message = QString("DONE_RECORDING %1 %2 %3")
-        .arg(m_inputId).arg(secsSince).arg(GetFramesWritten());
+        .arg(m_inputId).arg(secsSince.count()).arg(GetFramesWritten());
     MythEvent me(message);
     gCoreContext->dispatch(me);
 
@@ -1608,15 +1607,15 @@ void TVRec::HandlePendingRecordings(void)
         if (!(*it).m_ask && !(*it).m_doNotAsk)
             continue;
 
-        int timeuntil = ((*it).m_doNotAsk) ?
-            -1: MythDate::current().secsTo((*it).m_recordingStart);
+        auto timeuntil = ((*it).m_doNotAsk) ?
+            -1s: MythDate::secsInFuture((*it).m_recordingStart);
 
         if (has_rec)
             (*it).m_canceled = true;
 
         QString query = QString("ASK_RECORDING %1 %2 %3 %4")
             .arg(m_inputId)
-            .arg(timeuntil)
+            .arg(timeuntil.count())
             .arg(has_rec ? 1 : 0)
             .arg((*it).m_hasLaterShowing ? 1 : 0);
 

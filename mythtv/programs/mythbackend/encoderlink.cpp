@@ -285,7 +285,7 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
     return retval;
 }
 
-/** \fn EncoderLink::RecordPending(const ProgramInfo*, int, bool)
+/**
  *  \brief Tells TVRec there is a pending recording "rec" in "secsleft" seconds.
  *
  *  \param rec      Recording to make.
@@ -293,7 +293,8 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
  *  \param hasLater If true, a later non-conflicting showing is available.
  *  \sa StartRecording(const ProgramInfo*), CancelNextRecording(bool)
  */
-void EncoderLink::RecordPending(const ProgramInfo *rec, int secsleft,
+void EncoderLink::RecordPending(const ProgramInfo *rec,
+                                std::chrono::seconds secsleft,
                                 bool hasLater)
 {
     if (m_local)
