@@ -180,7 +180,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     bool SetVideoFiltersForChannel(uint sourceid, const QString &channum);
 
-    bool IsBusy(InputInfo *busy_input = nullptr, int time_buffer = 5) const;
+    bool IsBusy(InputInfo *busy_input = nullptr, std::chrono::seconds time_buffer = 5s) const;
     bool IsReallyRecording(void);
 
     float GetFramerate(void);

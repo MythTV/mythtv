@@ -87,7 +87,7 @@ class PlaybackSock : public ReferenceCounter
 
     bool IsBusy(int        capturecardnum,
                 InputInfo *busy_input  = nullptr,
-                int        time_buffer = 5);
+                std::chrono::seconds time_buffer = 5s);
     int GetEncoderState(int capturecardnum);
     long long GetMaxBitrate(int capturecardnum);
     ProgramInfo *GetRecording(uint cardid);

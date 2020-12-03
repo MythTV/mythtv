@@ -144,12 +144,12 @@ void EncoderLink::SetSleepStatus(SleepStatus newStatus)
     m_sleepStatusTime = MythDate::current();
 }
 
-/** \fn EncoderLink::IsBusy(InputInfo*,int)
+/**
  *  \brief  Returns true if the recorder is busy, or will be within the
  *          next time_buffer seconds.
  *  \sa IsBusyRecording(void), TVRec::IsBusy(InputInfo*)
  */
-bool EncoderLink::IsBusy(InputInfo *busy_input, int time_buffer)
+bool EncoderLink::IsBusy(InputInfo *busy_input, std::chrono::seconds time_buffer)
 {
     if (m_local)
         return m_tv->IsBusy(busy_input, time_buffer);

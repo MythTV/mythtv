@@ -2477,12 +2477,12 @@ bool TVRec::IsReallyRecording(void)
             HasFlags(kFlagDummyRecorderRunning));
 }
 
-/** \fn TVRec::IsBusy(TunedInputInfo*,int) const
+/**
  *  \brief Returns true if the recorder is busy, or will be within
  *         the next time_buffer seconds.
  *  \sa EncoderLink::IsBusy(TunedInputInfo*, int time_buffer)
  */
-bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
+bool TVRec::IsBusy(InputInfo *busy_input, std::chrono::seconds time_buffer) const
 {
     InputInfo dummy;
     if (!busy_input)
@@ -2517,8 +2517,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
 
     if (!busy_input->m_inputId && has_pending)
     {
-        int timeLeft = MythDate::current()
-            .secsTo(pendinfo.m_recordingStart);
+        auto timeLeft = MythDate::secsInFuture(pendinfo.m_recordingStart);
 
         if (timeLeft <= time_buffer)
         {

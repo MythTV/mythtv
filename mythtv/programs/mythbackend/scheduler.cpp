@@ -1903,7 +1903,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 
     EncoderLink *rctv1 = (*m_tvList)[rcinfo->GetInputID()];
     // first check the input we will be recording on...
-    bool is_busy = rctv1->IsBusy(&busy_input, -1);
+    bool is_busy = rctv1->IsBusy(&busy_input, -1s);
     if (is_busy &&
         (rcinfo->GetRecordingStatus() == RecStatus::Pending ||
          !m_sinputInfoMap[rcinfo->GetInputID()].m_schedGroup ||
@@ -1930,7 +1930,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         }
 
         EncoderLink *rctv2 = (*m_tvList)[id];
-        if (rctv2->IsBusy(&busy_input, -1))
+        if (rctv2->IsBusy(&busy_input, -1s))
         {
             if ((!busy_input.m_mplexId ||
                  busy_input.m_mplexId != rcinfo->m_mplexId) &&
@@ -2995,7 +2995,7 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
         InputInfo busy_info;
         EncoderLink *rctv = (*m_tvList)[inputid];
         m_schedLock.unlock();
-        bool isbusy = rctv->IsBusy(&busy_info, -1);
+        bool isbusy = rctv->IsBusy(&busy_info, -1s);
         m_schedLock.lock();
         if (m_recListChanged)
             return false;

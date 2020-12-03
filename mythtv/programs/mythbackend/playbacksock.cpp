@@ -334,12 +334,12 @@ bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
 }
 
 bool PlaybackSock::IsBusy(int capturecardnum, InputInfo *busy_input,
-                          int time_buffer)
+                          std::chrono::seconds time_buffer)
 {
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
 
     strlist << "IS_BUSY";
-    strlist << QString::number(time_buffer);
+    strlist << QString::number(time_buffer.count());
 
     if (!SendReceiveStringList(strlist, 1))
     {

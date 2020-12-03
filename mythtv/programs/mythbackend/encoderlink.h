@@ -86,7 +86,7 @@ class EncoderLink
     long long GetMaxBitrate(void);
     int SetSignalMonitoringRate(int rate, int notifyFrontend);
 
-    bool IsBusy(InputInfo *busy_input = nullptr, int time_buffer = 5);
+    bool IsBusy(InputInfo *busy_input = nullptr, std::chrono::seconds time_buffer = 5s);
     bool IsBusyRecording(void);
 
     TVState GetState();
