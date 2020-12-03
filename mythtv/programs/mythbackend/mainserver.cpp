@@ -7367,7 +7367,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     }
 
     bool      time_fmt_sec   = true;
-    long long time           = -1;
+    std::chrono::seconds time  = std::chrono::seconds::max();
+    long long frame          = -1;
     QString   outputfile;
     int       width          = -1;
     int       height         = -1;
@@ -7405,7 +7406,12 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (it != slist.cend())
         (time_fmt_sec = ((*it).toLower() == "s")), ++it;
     if (it != slist.cend())
-        (time = (*it).toLongLong()), ++it;
+    {
+        if (time_fmt_sec)
+            time = std::chrono::seconds((*it).toLongLong()), ++it;
+        else
+            frame = (*it).toLongLong(), ++it;
+    }
     if (it != slist.cend())
         (outputfile = *it), ++it;
     outputfile = (outputfile == "<EMPTY>") ? QString() : outputfile;
@@ -7424,10 +7430,13 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (has_extra_data)
     {
+        auto pos_text = (time != std::chrono::seconds::max())
+            ? QString::number(time.count()) + "s"
+            : QString::number(frame) + "f";
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("HandleGenPreviewPixmap got extra data\n\t\t\t"
-                    "%1%2 %3x%4 '%5'")
-                .arg(time).arg(time_fmt_sec?"s":"f")
+                    "%1 %2x%3 '%4'")
+                .arg(pos_text)
                 .arg(width).arg(height).arg(outputfile));
     }
 
@@ -7446,8 +7455,16 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
             QStringList outputlist;
             if (has_extra_data)
             {
-                outputlist = slave->GenPreviewPixmap(
-                    token, &pginfo, time_fmt_sec, time, outputfile, outputsize);
+                if (time != std::chrono::seconds::max())
+                {
+                    outputlist = slave->GenPreviewPixmap(
+                        token, &pginfo, time, -1, outputfile, outputsize);
+                }
+                else
+                {
+                    outputlist = slave->GenPreviewPixmap(
+                        token, &pginfo, std::chrono::seconds::max(), frame, outputfile, outputsize);
+                }
             }
             else
             {
@@ -7481,8 +7498,13 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (has_extra_data)
     {
-        PreviewGeneratorQueue::GetPreviewImage(
-            pginfo, outputsize, outputfile, time, time_fmt_sec, token);
+        if (time != std::chrono::seconds::max()) {
+            PreviewGeneratorQueue::GetPreviewImage(
+                pginfo, outputsize, outputfile, time, -1, token);
+        } else {
+            PreviewGeneratorQueue::GetPreviewImage(
+                pginfo, outputsize, outputfile, -1s, frame, token);
+}
     }
     else
     {

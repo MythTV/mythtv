@@ -284,16 +284,24 @@ QStringList PlaybackSock::GenPreviewPixmap(const QString &token,
 
 QStringList PlaybackSock::GenPreviewPixmap(const QString &token,
                                            const ProgramInfo *pginfo,
-                                           bool               time_fmt_sec,
-                                           long long          time,
+                                           std::chrono::seconds time,
+                                           long long          frame,
                                            const QString     &outputFile,
                                            const QSize        outputSize)
 {
     QStringList strlist(QString("QUERY_GENPIXMAP2"));
     strlist += token;
     pginfo->ToStringList(strlist);
-    strlist.push_back(time_fmt_sec ? "s" : "f");
-    strlist.push_back(QString::number(time));
+    if (time != std::chrono::seconds::max())
+    {
+        strlist.push_back("s");
+        strlist.push_back(QString::number(time.count()));
+    }
+    else
+    {
+        strlist.push_back("f");
+        strlist.push_back(QString::number(frame));
+    }
     strlist.push_back((outputFile.isEmpty()) ? "<EMPTY>" : outputFile);
     strlist.push_back(QString::number(outputSize.width()));
     strlist.push_back(QString::number(outputSize.height()));

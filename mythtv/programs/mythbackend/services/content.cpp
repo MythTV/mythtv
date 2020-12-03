@@ -545,9 +545,10 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
 
     QString sPreviewFileName;
 
-    if (nSecsIn <= 0)
+    auto nSecs = std::chrono::seconds(nSecsIn);
+    if (nSecs <= 0s)
     {
-        nSecsIn = -1;
+        nSecs = -1s;
         sPreviewFileName = QString("%1.png").arg(sFileName);
     }
     else
@@ -568,7 +569,7 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
 
         auto *previewgen = new PreviewGenerator( &pginfo, QString(),
                                                  PreviewGenerator::kLocal);
-        previewgen->SetPreviewTimeAsSeconds( nSecsIn          );
+        previewgen->SetPreviewTimeAsSeconds( nSecs            );
         previewgen->SetOutputFilename      ( sPreviewFileName );
 
         bool ok = previewgen->Run();
@@ -638,7 +639,7 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
 
     auto *previewgen = new PreviewGenerator( &pginfo, QString(),
                                              PreviewGenerator::kLocal);
-    previewgen->SetPreviewTimeAsSeconds( nSecsIn             );
+    previewgen->SetPreviewTimeAsSeconds( nSecs               );
     previewgen->SetOutputFilename      ( sNewFileName        );
     previewgen->SetOutputSize          (QSize(nWidth,nHeight));
 

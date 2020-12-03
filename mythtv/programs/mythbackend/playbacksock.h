@@ -78,8 +78,8 @@ class PlaybackSock : public ReferenceCounter
                                  const ProgramInfo *pginfo);
     QStringList GenPreviewPixmap(const QString     &token,
                                  const ProgramInfo *pginfo,
-                                 bool               time_fmt_sec,
-                                 long long          time,
+                                 std::chrono::seconds time,
+                                 long long          frame,
                                  const QString     &outputFile,
                                  QSize              outputSize);
     QDateTime PixmapLastModified(const ProgramInfo *pginfo);
