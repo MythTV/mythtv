@@ -133,8 +133,7 @@ class DVBChannel : public DTVChannel
     // Data
     DiSEqCDevSettings m_diseqcSettings;
     DiSEqCDevTree    *m_diseqcTree          {nullptr};
-                      /// Used to decrypt encrypted streams
-    DVBCam           *m_dvbCam              {nullptr};
+    DVBCam           *m_dvbCam              {nullptr};  // Used to decrypt encrypted streams
 
     // Device info
     QString           m_frontendName;

@@ -212,6 +212,9 @@ bool DVBChannel::Open(DVBChannel *who)
         m_frequencyMaximum    = master->m_frequencyMaximum;
         m_symbolRateMinimum   = master->m_symbolRateMinimum;
         m_symbolRateMaximum   = master->m_symbolRateMaximum;
+        m_version             = master->m_version;
+        m_legacyFe            = master->m_legacyFe;
+        m_hasV5Stats          = master->m_hasV5Stats;
         m_currentSys          = master->m_currentSys;
         m_sysList             = master->m_sysList;
 
