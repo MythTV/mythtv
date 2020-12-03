@@ -208,7 +208,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void SetChannel(const QString& name, uint requestType = kFlagDetect);
     bool QueueEITChannelChange(const QString &name);
 
-    int SetSignalMonitoringRate(int rate, int notifyFrontend = 1);
+    std::chrono::milliseconds SetSignalMonitoringRate(std::chrono::milliseconds rate, int notifyFrontend = 1);
     int  GetPictureAttribute(PictureAttribute attr);
     int  ChangePictureAttribute(PictureAdjustType type, PictureAttribute attr,
                                 bool direction);

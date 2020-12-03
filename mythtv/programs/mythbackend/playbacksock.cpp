@@ -486,18 +486,18 @@ void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
     SendReceiveStringList(strlist);
 }
 
-int PlaybackSock::SetSignalMonitoringRate(int capturecardnum,
-                                          int rate, int notifyFrontend)
+std::chrono::milliseconds PlaybackSock::SetSignalMonitoringRate(int capturecardnum,
+                                          std::chrono::milliseconds rate, int notifyFrontend)
 {
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
     strlist << "SET_SIGNAL_MONITORING_RATE";
-    strlist << QString::number(rate);
+    strlist << QString::number(rate.count());
     strlist << QString::number(notifyFrontend);
 
     if (SendReceiveStringList(strlist, 1))
-        return strlist[0].toInt();
+        return std::chrono::milliseconds(strlist[0].toInt());
 
-    return -1;
+    return -1ms;
 }
 
 void PlaybackSock::SetNextLiveTVDir(int capturecardnum, const QString& dir)

@@ -4727,10 +4727,10 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "SET_SIGNAL_MONITORING_RATE")
     {
-        int rate = slist[2].toInt();
+        auto rate = std::chrono::milliseconds(slist[2].toInt());
         int notifyFrontend = slist[3].toInt();
-        int oldrate = enc->SetSignalMonitoringRate(rate, notifyFrontend);
-        retlist << QString::number(oldrate);
+        auto oldrate = enc->SetSignalMonitoringRate(rate, notifyFrontend);
+        retlist << QString::number(oldrate.count());
     }
     else if (command == "GET_COLOUR")
     {

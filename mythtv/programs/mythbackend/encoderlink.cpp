@@ -368,12 +368,12 @@ long long EncoderLink::GetMaxBitrate()
     return -1;
 }
 
-/** \fn EncoderLink::SetSignalMonitoringRate(int,int)
+/**
  *  \brief Sets the signal monitoring rate.
  *
  *   May be a local or remote query.
  *
- *  \sa TVRec::SetSignalMonitoringRate(int,int),
+ *  \sa TVRec::SetSignalMonitoringRate(milliseconds,int),
  *      RemoteEncoder::SetSignalMonitoringRate(int,int)
  *  \param rate           Milliseconds between each signal check,
  *                        0 to disable, -1 to preserve old value.
@@ -382,7 +382,7 @@ long long EncoderLink::GetMaxBitrate()
  *                        -1 the old value is preserved.
  *  \return Old rate if it succeeds, -1 if it fails.
  */
-int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
+std::chrono::milliseconds EncoderLink::SetSignalMonitoringRate(std::chrono::milliseconds rate, int notifyFrontend)
 {
     if (m_local)
         return m_tv->SetSignalMonitoringRate(rate, notifyFrontend);
@@ -392,7 +392,7 @@ int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
         return m_sock->SetSignalMonitoringRate(m_inputid, rate,
                                              notifyFrontend);
     }
-    return -1;
+    return -1ms;
 }
 
 /** \brief Tell a slave to go to sleep

@@ -473,7 +473,7 @@ void RemoteEncoder::SetChannel(const QString& channel)
     m_lastinput = "";
 }
 
-/** \fn RemoteEncoder::SetSignalMonitoringRate(int,bool)
+/**
  *  \brief Sets the signal monitoring rate.
  *
  *  This will actually call SetupSignalMonitor() and
@@ -481,25 +481,25 @@ void RemoteEncoder::SetChannel(const QString& channel)
  *  be used directly, without worrying about the
  *  SignalMonitor instance.
  *
- *  \sa TVRec::SetSignalMonitoringRate(int,int),
- *      EncoderLink::SetSignalMonitoringRate(int,bool)
+ *  \sa TVRec::SetSignalMonitoringRate(milliseconds,int),
+ *      EncoderLink::SetSignalMonitoringRate(milliseconds,int)
  *  \param rate           The update rate to use in milliseconds,
  *                        use 0 to disable.
  *  \param notifyFrontend If true, SIGNAL messages will be sent to
  *                        the frontend using this recorder.
  *  \return Previous update rate
  */
-int RemoteEncoder::SetSignalMonitoringRate(int rate, bool notifyFrontend)
+std::chrono::milliseconds RemoteEncoder::SetSignalMonitoringRate(std::chrono::milliseconds rate, int notifyFrontend)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(m_recordernum) );
     strlist << "SET_SIGNAL_MONITORING_RATE";
-    strlist << QString::number(rate);
+    strlist << QString::number(rate.count());
     strlist << QString::number((int)notifyFrontend);
 
     if (SendReceiveStringList(strlist, 1))
-        return strlist[0].toInt();
+        return std::chrono::milliseconds(strlist[0].toInt());
 
-    return 0;
+    return 0ms;
 }
 
 uint RemoteEncoder::GetSignalLockTimeout(const QString& input)

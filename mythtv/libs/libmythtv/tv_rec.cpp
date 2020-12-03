@@ -2115,22 +2115,22 @@ void TVRec::TeardownSignalMonitor()
     LOG(VB_RECORD, LOG_INFO, LOC + "TeardownSignalMonitor() -- end");
 }
 
-/** \fn TVRec::SetSignalMonitoringRate(int,int)
+/**
  *  \brief Sets the signal monitoring rate.
  *
- *  \sa EncoderLink::SetSignalMonitoringRate(int,int),
- *      RemoteEncoder::SetSignalMonitoringRate(int,int)
+ *  \sa EncoderLink::SetSignalMonitoringRate(milliseconds,int),
+ *      RemoteEncoder::SetSignalMonitoringRate(milliseconds,int)
  *  \param rate           The update rate to use in milliseconds,
  *                        use 0 to disable signal monitoring.
  *  \param notifyFrontend If 1, SIGNAL messages will be sent to
  *                        the frontend using this recorder.
  *  \return 1 if it signal monitoring is turned on, 0 otherwise.
  */
-int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
+std::chrono::milliseconds TVRec::SetSignalMonitoringRate(std::chrono::milliseconds rate, int notifyFrontend)
 {
     QString msg = "SetSignalMonitoringRate(%1, %2)";
     LOG(VB_RECORD, LOG_INFO, LOC +
-        msg.arg(rate).arg(notifyFrontend) + "-- start");
+        msg.arg(rate.count()).arg(notifyFrontend) + "-- start");
 
     QMutexLocker lock(&m_stateChangeLock);
 
@@ -2138,19 +2138,19 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Signal Monitoring is notsupported by your hardware.");
-        return 0;
+        return 0ms;
     }
 
     if (GetState() != kState_WatchingLiveTV)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Signal can only be monitored in LiveTV Mode.");
-        return 0;
+        return 0ms;
     }
 
     ClearFlags(kFlagRingBufferReady, __FILE__, __LINE__);
 
-    TuningRequest req = (rate > 0) ?
+    TuningRequest req = (rate > 0ms) ?
         TuningRequest(kFlagAntennaAdjust, m_channel->GetChannelName()) :
         TuningRequest(kFlagLiveTV);
 
@@ -2160,8 +2160,8 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
     while (!HasFlags(kFlagRingBufferReady))
         WaitForEventThreadSleep();
     LOG(VB_RECORD, LOG_INFO, LOC +
-        msg.arg(rate).arg(notifyFrontend) + " -- end");
-    return 1;
+        msg.arg(rate.count()).arg(notifyFrontend) + " -- end");
+    return 1ms;
 }
 
 DTVSignalMonitor *TVRec::GetDTVSignalMonitor(void)

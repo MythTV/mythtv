@@ -3895,7 +3895,7 @@ bool TV::ActiveHandleAction(const QStringList &Actions,
                 return false;
             }
 
-            int rate   = m_sigMonMode ? 0 : 100;
+            std::chrono::milliseconds rate = m_sigMonMode ? 0ms : 100ms;
             bool notify = !m_sigMonMode;
 
             PauseLiveTV();

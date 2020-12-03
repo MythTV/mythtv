@@ -84,7 +84,7 @@ class EncoderLink
     bool CheckFile(ProgramInfo *pginfo);
     void GetDiskSpace(QStringList &o_strlist);
     long long GetMaxBitrate(void);
-    int SetSignalMonitoringRate(int rate, int notifyFrontend);
+    std::chrono::milliseconds SetSignalMonitoringRate(std::chrono::milliseconds rate, int notifyFrontend);
 
     bool IsBusy(InputInfo *busy_input = nullptr, std::chrono::seconds time_buffer = 5s);
     bool IsBusyRecording(void);
