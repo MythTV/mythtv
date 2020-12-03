@@ -12,7 +12,7 @@
 #include "satiputils.h"
 #include "satipchannel.h"
 
-#define LOC  QString("SatIPChan[%1]: ").arg(m_inputId)
+#define LOC QString("SatIPChan[%1]: ").arg(m_inputId)
 
 SatIPChannel::SatIPChannel(TVRec *parent, QString  device) :
     DTVChannel(parent), m_device(std::move(device))
@@ -60,7 +60,7 @@ bool SatIPChannel::Open(void)
     return true;
 }
 
-void SatIPChannel::Close()
+void SatIPChannel::Close(void)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Close(%1)").arg(m_device));
 
@@ -96,5 +96,5 @@ bool SatIPChannel::Tune(const DTVMultiplex &tuning)
 bool SatIPChannel::IsOpen(void) const
 {
     QMutexLocker locker(&m_streamLock);
-    return m_streamHandler;
+    return m_streamHandler != nullptr;
 }

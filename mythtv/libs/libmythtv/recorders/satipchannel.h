@@ -16,12 +16,12 @@ class SatIPChannel : public DTVChannel
     ~SatIPChannel(void) override;
 
     // Commands
-    bool Open(void) override;   // ChannelBase
-    void Close(void) override;  // ChannelBase
+    bool Open(void) override;                       // ChannelBase
+    void Close(void) override;                      // ChannelBase
 
     using DTVChannel::Tune;
-    bool Tune(const DTVMultiplex& /*tuning*/) override;    // DTVChannel
-    bool Tune(const QString &channum) override; // DTVChannel
+    bool Tune(const DTVMultiplex& tuning) override; // DTVChannel
+    bool Tune(const QString &channum) override;     // DTVChannel
 
     // Gets
     bool IsOpen(void) const override;               // ChannelBase
@@ -38,8 +38,8 @@ class SatIPChannel : public DTVChannel
     QStringList         m_args;
     mutable QMutex      m_tuneLock;
     mutable QMutex      m_streamLock;
-    SatIPStreamHandler *m_streamHandler       {nullptr};
-    MPEGStreamData     *m_streamData          {nullptr};
+    SatIPStreamHandler *m_streamHandler {nullptr};
+    MPEGStreamData     *m_streamData    {nullptr};
     QString             m_videodev;
 };
 

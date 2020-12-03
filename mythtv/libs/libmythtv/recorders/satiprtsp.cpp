@@ -74,10 +74,17 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
     // Increase receive packet buffer size for the RTP data stream to prevent packet loss
     uint desiredsize = 8000000;
     uint newsize = SetUDPReceiveBufferSize(m_readhelper->m_socket, desiredsize);
-    LOG(VB_RECORD, LOG_INFO, LOC + QString("RTP UDP socket receive buffer size set to %1").arg(newsize));
-    if (newsize < desiredsize)
+    if (newsize >= desiredsize)
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + "Increase net.core.rmem_max in case of UDP packet loss");
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("RTP UDP socket receive buffer size set to %1").arg(newsize));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "RTP UDP socket receive buffer too small\n" +
+            QString("\tRTP UDP socket receive buffer size set to %1 but requested %2\n").arg(newsize).arg(desiredsize) +
+            QString("\tTo prevent UDP packet loss increase net.core.rmem_max e.g. with this command:\n") +
+            QString("\tsudo sysctl -w net.core.rmem_max=%1\n").arg(desiredsize) +
+            QString("\tand restart mythbackend."));
     }
 }
 
@@ -171,6 +178,7 @@ bool SatIPRTSP::Play(QStringList &pids)
     url.setPath(QString("/stream=%1").arg(m_streamid));
 
     QString pids_str = QString("pids=%1").arg(!pids.empty() ? pids.join(",") : "none");
+    LOG(VB_RECORD, LOG_INFO, LOC + "Play(pids) " + pids_str);
 
     // Telestar Digibit R1 Sat>IP box cannot handle a lot of pids
     if (pids.size() > 32)

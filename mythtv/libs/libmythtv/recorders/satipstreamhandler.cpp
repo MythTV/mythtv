@@ -20,7 +20,7 @@
 #include "satipchannel.h"
 #include "satipstreamhandler.h"
 
-#define LOC      QString("SatIPSH[%1]: ").arg(m_inputId)
+#define LOC QString("SatIPSH[%1]: ").arg(m_inputId)
 
 QMap<QString, SatIPStreamHandler*> SatIPStreamHandler::s_handlers;
 QMap<QString, uint>                SatIPStreamHandler::s_handlersRefCnt;
@@ -260,6 +260,12 @@ void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
     m_tuningurl = url;
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tune url:%1").arg(url.toString()));
+
+    if (m_tuningurl == m_oldtuningurl)
+    {
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Skip tuning, already tuned to this url."));
+        return;
+    }
 
     // Need SETUP and PLAY (with pids=none) to get RTSP packets with tuner lock info
     if (m_rtsp)
