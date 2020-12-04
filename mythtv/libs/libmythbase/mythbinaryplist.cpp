@@ -26,17 +26,20 @@
  *  Support for importing Xml formatted property lists will be added.
  */
 
-#include <cmath>
-
 // TODO
 // parse uid (and use QPair to differentiate?)
 
+// Qt
 #include <QDateTime>
 #include <QTextStream>
 #include <QBuffer>
 
+// MythTV
 #include "mythlogging.h"
-#include "plist.h"
+#include "mythbinaryplist.h"
+
+// Std
+#include <cmath>
 
 #define LOC QString("PList: ")
 
@@ -70,30 +73,30 @@ enum
     BPLIST_DICT    = 0xD0,
 };
 
-static void convert_float(quint8 *p, quint8 s)
+static void convert_float(uint8_t *p, uint8_t s)
 {
-#if HAVE_BIGENDIAN && !defined (__VFP_FP__)
+#if defined(HAVE_BIGENDIAN) && !defined (__VFP_FP__)
     return;
 #else
-    for (quint8 i = 0; i < (s / 2); i++)
+    for (uint8_t i = 0; i < (s / 2); i++)
     {
-        quint8 t = p[i];
-        quint8 j = ((s - 1) + 0) - i;
+        uint8_t t = p[i];
+        uint8_t j = ((s - 1) + 0) - i;
         p[i] = p[j];
         p[j] = t;
     }
 #endif
 }
 
-static quint8* convert_int(quint8 *p, quint8 s)
+static uint8_t* convert_int(uint8_t *p, uint8_t s)
 {
-#if HAVE_BIGENDIAN
+#if defined(HAVE_BIGENDIAN)
     return p;
 #else
-    for (quint8 i = 0; i < (s / 2); i++)
+    for (uint8_t i = 0; i < (s / 2); i++)
     {
-        quint8 t = p[i];
-        quint8 j = ((s - 1) + 0) - i;
+        uint8_t t = p[i];
+        uint8_t j = ((s - 1) + 0) - i;
         p[i] = p[j];
         p[j] = t;
     }
@@ -101,23 +104,24 @@ static quint8* convert_int(quint8 *p, quint8 s)
     return p;
 }
 
-QVariant PList::GetValue(const QString &key)
+MythBinaryPList::MythBinaryPList(const QByteArray& Data)
+{
+    ParseBinaryPList(Data);
+}
+
+QVariant MythBinaryPList::GetValue(const QString& Key)
 {
     if (m_result.type() != QVariant::Map)
         return QVariant();
 
     QVariantMap map = m_result.toMap();
-    QMapIterator<QString,QVariant> it(map);
-    while (it.hasNext())
-    {
-        it.next();
-        if (key == it.key())
+    for (auto it = map.cbegin(); it != map.cend(); ++it)
+        if (Key == it.key())
             return it.value();
-    }
     return QVariant();
 }
 
-QString PList::ToString(void)
+QString MythBinaryPList::ToString()
 {
     QByteArray res;
     QBuffer buf(&res);
@@ -127,9 +131,9 @@ QString PList::ToString(void)
     return QString(res.data());
 }
 
-bool PList::ToXML(QIODevice *device)
+bool MythBinaryPList::ToXML(QIODevice* Device)
 {
-    QXmlStreamWriter xml(device);
+    QXmlStreamWriter xml(Device);
     xml.setAutoFormatting(true);
     xml.setAutoFormattingIndent(4);
     xml.writeStartDocument();
@@ -144,38 +148,35 @@ bool PList::ToXML(QIODevice *device)
     return success;
 }
 
-bool PList::ToXML(const QVariant &data, QXmlStreamWriter &xml)
+bool MythBinaryPList::ToXML(const QVariant& Data, QXmlStreamWriter& Xml)
 {
-    switch (data.type())
+    switch (Data.type())
     {
         case QVariant::Map:
-            DictToXML(data, xml);
+            DictToXML(Data, Xml);
             break;
         case QVariant::List:
-            ArrayToXML(data, xml);
+            ArrayToXML(Data, Xml);
             break;
         case QVariant::Double:
-            xml.writeTextElement("real",
-                                 QString("%1").arg(data.toDouble(), 0, 'f', 6));
+            Xml.writeTextElement("real", QString("%1").arg(Data.toDouble(), 0, 'f', 6));
             break;
         case QVariant::ByteArray:
-            xml.writeTextElement("data",
-                                 data.toByteArray().toBase64().data());
+            Xml.writeTextElement("data", Data.toByteArray().toBase64().data());
             break;
         case QVariant::ULongLong:
-            xml.writeTextElement("integer",
-                                 QString("%1").arg(data.toULongLong()));
+            Xml.writeTextElement("integer", QString("%1").arg(Data.toULongLong()));
             break;
         case QVariant::String:
-            xml.writeTextElement("string", data.toString());
+            Xml.writeTextElement("string", Data.toString());
             break;
         case QVariant::DateTime:
-            xml.writeTextElement("date", data.toDateTime().toString(Qt::ISODate));
+            Xml.writeTextElement("date", Data.toDateTime().toString(Qt::ISODate));
             break;
         case QVariant::Bool:
             {
-                bool val = data.toBool();
-                xml.writeEmptyElement(val ? "true" : "false");
+                bool val = Data.toBool();
+                Xml.writeEmptyElement(val ? "true" : "false");
             }
             break;
         default:
@@ -185,66 +186,58 @@ bool PList::ToXML(const QVariant &data, QXmlStreamWriter &xml)
     return true;
 }
 
-void PList::DictToXML(const QVariant &data, QXmlStreamWriter &xml)
+void MythBinaryPList::DictToXML(const QVariant& Data, QXmlStreamWriter& Xml)
 {
-    xml.writeStartElement("dict");
-
-    QVariantMap map = data.toMap();
-    QMapIterator<QString,QVariant> it(map);
-    while (it.hasNext())
+    Xml.writeStartElement("dict");
+    QVariantMap map = Data.toMap();
+    for (auto it = map.cbegin(); it != map.cend(); ++it)
     {
-        it.next();
-        xml.writeStartElement("key");
-        xml.writeCharacters(it.key());
-        xml.writeEndElement();
-        ToXML(it.value(), xml);
+        Xml.writeStartElement("key");
+        Xml.writeCharacters(it.key());
+        Xml.writeEndElement();
+        ToXML(it.value(), Xml);
     }
-
-    xml.writeEndElement();
+    Xml.writeEndElement();
 }
 
-void PList::ArrayToXML(const QVariant &data, QXmlStreamWriter &xml)
+void MythBinaryPList::ArrayToXML(const QVariant& Data, QXmlStreamWriter& Xml)
 {
-    xml.writeStartElement("array");
-
-    QList list = data.toList();
-    for (const auto& item : qAsConst(list))
-        ToXML(item, xml);
-
-    xml.writeEndElement();
+    Xml.writeStartElement("array");
+    QSequentialIterable list = Data.value<QSequentialIterable>();
+    for (const auto & item : qAsConst(list))
+        ToXML(item, Xml);
+    Xml.writeEndElement();
 }
 
-void PList::ParseBinaryPList(const QByteArray &data)
+void MythBinaryPList::ParseBinaryPList(const QByteArray& Data)
 {
     // reset
     m_result = QVariant();
 
     // check minimum size
-    auto size = static_cast<quint32>(data.size());
+    auto size = static_cast<quint32>(Data.size());
     if (size < MIN_SIZE)
         return;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Binary: size %1, startswith '%2'")
-        .arg(size).arg(data.left(8).data()));
+        .arg(size).arg(Data.left(8).data()));
 
     // check plist type & version
-    if ((!data.startsWith(MAGIC)) ||
-        (data.mid(MAGIC_SIZE, VERSION_SIZE) != VERSION))
+    if ((!Data.startsWith(MAGIC)) || (Data.mid(MAGIC_SIZE, VERSION_SIZE) != VERSION))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Unrecognised start sequence. Corrupt?");
         return;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Parsing binary plist (%1 bytes)")
-        .arg(size));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Parsing binary plist (%1 bytes)").arg(size));
 
-    m_data = reinterpret_cast<quint8*>(const_cast<char*>(data.data()));
-    quint8* trailer = m_data + size - TRAILER_SIZE;
-    m_offsetSize   = *(trailer + TRAILER_OFFSIZE_INDEX);
-    m_parmSize = *(trailer + TRAILER_PARMSIZE_INDEX);
-    m_numObjs  = *(reinterpret_cast<quint64*>(convert_int(trailer + TRAILER_NUMOBJ_INDEX, 8)));
-    m_rootObj  = *(reinterpret_cast<quint64*>(convert_int(trailer + TRAILER_ROOTOBJ_INDEX, 8)));
-    quint64 offset_tindex = *(reinterpret_cast<quint64*>(convert_int(trailer + TRAILER_OFFTAB_INDEX, 8)));
+    m_data = reinterpret_cast<uint8_t*>(const_cast<char*>(Data.data()));
+    uint8_t* trailer = m_data + size - TRAILER_SIZE;
+    m_offsetSize = *(trailer + TRAILER_OFFSIZE_INDEX);
+    m_parmSize   = *(trailer + TRAILER_PARMSIZE_INDEX);
+    m_numObjs    = *(reinterpret_cast<uint64_t*>(convert_int(trailer + TRAILER_NUMOBJ_INDEX, 8)));
+    m_rootObj    = *(reinterpret_cast<uint64_t*>(convert_int(trailer + TRAILER_ROOTOBJ_INDEX, 8)));
+    uint64_t offset_tindex = *(reinterpret_cast<uint64_t*>(convert_int(trailer + TRAILER_OFFTAB_INDEX, 8)));
     m_offsetTable = m_data + offset_tindex;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
@@ -261,18 +254,17 @@ void PList::ParseBinaryPList(const QByteArray &data)
 
     // parse
     m_result = ParseBinaryNode(m_rootObj);
-
     LOG(VB_GENERAL, LOG_INFO, LOC + "Parse complete.");
 }
 
-QVariant PList::ParseBinaryNode(quint64 num)
+QVariant MythBinaryPList::ParseBinaryNode(uint64_t Num)
 {
-    quint8* data = GetBinaryObject(num);
+    uint8_t* data = GetBinaryObject(Num);
     if (!data)
         return QVariant();
 
     quint16 type = (*data) & 0xf0;
-    quint64 size = (*data) & 0x0f;
+    uint64_t size = (*data) & 0x0f;
 
     switch (type)
     {
@@ -302,57 +294,52 @@ QVariant PList::ParseBinaryNode(quint64 num)
     return QVariant();
 }
 
-quint64 PList::GetBinaryUInt(quint8 *p, quint64 size)
+uint64_t MythBinaryPList::GetBinaryUInt(uint8_t *Data, uint64_t Size)
 {
-    if (size == 1) return static_cast<quint64>(*p);
-    if (size == 2) return static_cast<quint64>(*(reinterpret_cast<quint16*>(convert_int(p, 2))));
-    if (size == 4) return static_cast<quint64>(*(reinterpret_cast<quint32*>(convert_int(p, 4))));
-    if (size == 8) return                     (*(reinterpret_cast<quint64*>(convert_int(p, 8))));
-
-    if (size == 3)
+    if (Size == 1) return static_cast<uint64_t>(*Data);
+    if (Size == 2) return static_cast<uint64_t>(*(reinterpret_cast<quint16*>(convert_int(Data, 2))));
+    if (Size == 4) return static_cast<uint64_t>(*(reinterpret_cast<quint32*>(convert_int(Data, 4))));
+    if (Size == 8) return                      (*(reinterpret_cast<uint64_t*>(convert_int(Data, 8))));
+    if (Size == 3)
     {
-#if HAVE_BIGENDIAN
-        return static_cast<quint64>(((*p) << 16) + (*(p + 1) << 8) + (*(p + 2)));
+#if defined(HAVE_BIGENDIAN)
+        return static_cast<uint64_t>(((*Data) << 16) + (*(Data + 1) << 8) + (*(Data + 2)));
 #else
-        return static_cast<quint64>((*p) + (*(p + 1) << 8) + ((*(p + 2)) << 16));
+        return static_cast<uint64_t>((*Data) + (*(Data + 1) << 8) + ((*(Data + 2)) << 16));
 #endif
     }
 
     return 0;
 }
 
-quint8* PList::GetBinaryObject(quint64 num)
+uint8_t* MythBinaryPList::GetBinaryObject(uint64_t Num)
 {
-    if (num > m_numObjs)
+    if (Num > m_numObjs)
         return nullptr;
 
-    quint8* p = m_offsetTable + (num * m_offsetSize);
-    quint64 offset = GetBinaryUInt(p, m_offsetSize);
-    LOG(VB_GENERAL, LOG_DEBUG, LOC +
-        QString("GetBinaryObject num %1, offsize %2 offset %3")
-        .arg(num).arg(m_offsetSize).arg(offset));
-
+    uint8_t* p = m_offsetTable + (Num * m_offsetSize);
+    uint64_t offset = GetBinaryUInt(p, m_offsetSize);
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("GetBinaryObject num %1, offsize %2 offset %3")
+        .arg(Num).arg(m_offsetSize).arg(offset));
     return m_data + offset;
 }
 
-QVariantMap PList::ParseBinaryDict(quint8 *data)
+QVariantMap MythBinaryPList::ParseBinaryDict(uint8_t *Data)
 {
     QVariantMap result;
-    if (((*data) & 0xf0) != BPLIST_DICT)
+    if (((*Data) & 0xf0) != BPLIST_DICT)
         return result;
 
-    quint64 count = GetBinaryCount(&data);
-
+    uint64_t count = GetBinaryCount(&Data);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Dict: Size %1").arg(count));
-
     if (!count)
         return result;
 
-    quint64 off = m_parmSize * count;
-    for (quint64 i = 0; i < count; i++, data += m_parmSize)
+    uint64_t off = m_parmSize * count;
+    for (uint64_t i = 0; i < count; i++, Data += m_parmSize)
     {
-        quint64 keyobj = GetBinaryUInt(data, m_parmSize);
-        quint64 valobj = GetBinaryUInt(data + off, m_parmSize);
+        uint64_t keyobj = GetBinaryUInt(Data, m_parmSize);
+        uint64_t valobj = GetBinaryUInt(Data + off, m_parmSize);
         QVariant key = ParseBinaryNode(keyobj);
         QVariant val = ParseBinaryNode(valobj);
         if (!key.canConvert<QString>())
@@ -360,143 +347,139 @@ QVariantMap PList::ParseBinaryDict(quint8 *data)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid dictionary key type.");
             return result;
         }
-
         result.insert(key.toString(), val);
     }
-
     return result;
 }
 
-QList<QVariant> PList::ParseBinaryArray(quint8 *data)
+QList<QVariant> MythBinaryPList::ParseBinaryArray(uint8_t* Data)
 {
     QList<QVariant> result;
-    if (((*data) & 0xf0) != BPLIST_ARRAY)
+    if (((*Data) & 0xf0) != BPLIST_ARRAY)
         return result;
 
-    quint64 count = GetBinaryCount(&data);
-
+    uint64_t count = GetBinaryCount(&Data);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Array: Size %1").arg(count));
-
     if (!count)
         return result;
 
-    for (quint64 i = 0; i < count; i++, data += m_parmSize)
+    for (uint64_t i = 0; i < count; i++, Data += m_parmSize)
     {
-        quint64 obj = GetBinaryUInt(data, m_parmSize);
+        uint64_t obj = GetBinaryUInt(Data, m_parmSize);
         QVariant val = ParseBinaryNode(obj);
         result.push_back(val);
     }
     return result;
 }
 
-QVariant PList::ParseBinaryUInt(quint8 **data)
+QVariant MythBinaryPList::ParseBinaryUInt(uint8_t** Data)
 {
-    quint64 result = 0;
-    if (((**data) & 0xf0) != BPLIST_UINT)
-        return QVariant(result);
+    uint64_t result = 0;
+    if (((**Data) & 0xf0) != BPLIST_UINT)
+        return QVariant(static_cast<quint64>(result));
 
-    quint64 size = 1 << ((**data) & 0x0f);
-    (*data)++;
-    result = GetBinaryUInt(*data, size);
-    (*data) += size;
+    uint64_t size = 1 << ((**Data) & 0x0f);
+    (*Data)++;
+    result = GetBinaryUInt(*Data, size);
+    (*Data) += size;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UInt: %1").arg(result));
-    return QVariant(result);
+    return QVariant(static_cast<quint64>(result));
 }
 
-QVariant PList::ParseBinaryString(quint8 *data)
+QVariant MythBinaryPList::ParseBinaryString(uint8_t* Data)
 {
     QString result;
-    if (((*data) & 0xf0) != BPLIST_STRING)
+    if (((*Data) & 0xf0) != BPLIST_STRING)
         return result;
 
-    quint64 count = GetBinaryCount(&data);
+    uint64_t count = GetBinaryCount(&Data);
     if (!count)
         return result;
 
-    result = QString::fromLatin1(reinterpret_cast<const char*>(data), static_cast<int>(count));
+    result = QString::fromLatin1(reinterpret_cast<const char*>(Data), static_cast<int>(count));
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("ASCII String: %1").arg(result));
     return QVariant(result);
 }
 
-QVariant PList::ParseBinaryReal(quint8 *data)
+QVariant MythBinaryPList::ParseBinaryReal(uint8_t* Data)
 {
     double result = 0.0;
-    if (((*data) & 0xf0) != BPLIST_REAL)
+    if (((*Data) & 0xf0) != BPLIST_REAL)
         return result;
 
-    quint64 count = GetBinaryCount(&data);
+    uint64_t count = GetBinaryCount(&Data);
     if (!count)
         return result;
 
     count = 1ULL << count;
     if (count == sizeof(float))
     {
-        convert_float(data, static_cast<quint8>(count));
+        convert_float(Data, static_cast<uint8_t>(count));
         float temp = NAN;
-        std::copy(data, data + sizeof(float), reinterpret_cast<quint8*>(&temp));
+        std::copy(Data, Data + sizeof(float), reinterpret_cast<uint8_t*>(&temp));
         result = static_cast<double>(temp);
     }
     else if (count == sizeof(double))
     {
-        convert_float(data, static_cast<quint8>(count));
-        std::copy(data, data + sizeof(double), reinterpret_cast<quint8*>(&result));
+        convert_float(Data, static_cast<uint8_t>(count));
+        std::copy(Data, Data + sizeof(double), reinterpret_cast<uint8_t*>(&result));
     }
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Real: %1").arg(result, 0, 'f', 6));
     return QVariant(result);
 }
 
-QVariant PList::ParseBinaryDate(quint8 *data)
+QVariant MythBinaryPList::ParseBinaryDate(uint8_t* Data)
 {
     QDateTime result;
-    if (((*data) & 0xf0) != BPLIST_DATE)
+    if (((*Data) & 0xf0) != BPLIST_DATE)
         return result;
 
-    quint64 count = GetBinaryCount(&data);
+    uint64_t count = GetBinaryCount(&Data);
     if (count != 3)
         return result;
 
-    convert_float(data, 8);
-    double temp = NAN;
-    std::copy(data, data + sizeof(double), reinterpret_cast<quint8*>(&temp));
-    auto msec = static_cast<quint64>(temp * 1000.0);
+    convert_float(Data, 8);
+    double temp = static_cast<double>(NAN);
+    std::copy(Data, Data + sizeof(double), reinterpret_cast<uint8_t*>(&temp));
+    auto msec = static_cast<uint64_t>(temp * 1000.0);
     result = QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(msec), Qt::UTC);
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Date: %1").arg(result.toString(Qt::ISODate)));
     return QVariant(result);
 }
 
-QVariant PList::ParseBinaryData(quint8 *data)
+QVariant MythBinaryPList::ParseBinaryData(uint8_t* Data)
 {
     QByteArray result;
-    if (((*data) & 0xf0) != BPLIST_DATA)
+    if (((*Data) & 0xf0) != BPLIST_DATA)
         return result;
 
-    quint64 count = GetBinaryCount(&data);
+    uint64_t count = GetBinaryCount(&Data);
     if (!count)
         return result;
 
-    result = QByteArray(reinterpret_cast<const char*>(data), static_cast<int>(count));
+    result = QByteArray(reinterpret_cast<const char*>(Data), static_cast<int>(count));
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Data: Size %1 (count %2)")
         .arg(result.size()).arg(count));
     return QVariant(result);
 }
 
-QVariant PList::ParseBinaryUnicode(quint8 *data)
+QVariant MythBinaryPList::ParseBinaryUnicode(uint8_t* Data)
 {
     QString result;
-    if (((*data) & 0xf0) != BPLIST_UNICODE)
+    if (((*Data) & 0xf0) != BPLIST_UNICODE)
         return result;
 
-    quint64 count = GetBinaryCount(&data);
+    uint64_t count = GetBinaryCount(&Data);
     if (!count)
         return result;
 
     // source is big endian (and no BOM?)
     QByteArray tmp;
-    for (quint64 i = 0; i < count; i++, data += 2)
+    for (uint64_t i = 0; i < count; i++, Data += 2)
     {
-        quint16 twobyte = *(reinterpret_cast<quint16*>(convert_int(data, 2)));
+        quint16 twobyte = *(reinterpret_cast<quint16*>(convert_int(Data, 2)));
         tmp.append(static_cast<char>(twobyte & 0xff));
         tmp.append(static_cast<char>((twobyte >> 8) & 0xff));
     }
@@ -505,14 +488,14 @@ QVariant PList::ParseBinaryUnicode(quint8 *data)
     return QVariant(result);
 }
 
-quint64 PList::GetBinaryCount(quint8 **data)
+uint64_t MythBinaryPList::GetBinaryCount(uint8_t** Data)
 {
-    quint64 count = (**data) & 0x0f;
-    (*data)++;
+    uint64_t count = (**Data) & 0x0f;
+    (*Data)++;
     if (count == 0x0f)
     {
-        QVariant newcount = ParseBinaryUInt(data);
-        if (!newcount.canConvert<quint64>())
+        QVariant newcount = ParseBinaryUInt(Data);
+        if (!newcount.canConvert<uint64_t>())
             return 0;
         count = newcount.toULongLong();
     }

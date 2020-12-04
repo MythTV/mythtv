@@ -20,7 +20,7 @@
 #include "mythcorecontext.h"
 #include "mythuiactions.h"
 #include "mythuistatetracker.h"
-#include "plist.h"
+#include "mythbinaryplist.h"
 #include "tv_play.h"
 #include "mythmainwindow.h"
 #include "tv_actions.h"
@@ -913,7 +913,7 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
         if (req->GetHeaders().contains("Content-Type") &&
             req->GetHeaders()["Content-Type"] == "application/x-apple-binary-plist")
         {
-            PList plist(req->GetBody());
+            MythBinaryPList plist(req->GetBody());
             LOG(VB_GENERAL, LOG_DEBUG, LOC + plist.ToString());
 
             QVariant start   = plist.GetValue("Start-Position");
