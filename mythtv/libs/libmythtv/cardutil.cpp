@@ -2050,9 +2050,6 @@ std::vector<uint> CardUtil::GetGroupInputIDs(uint inputgroupid)
 
 std::vector<uint> CardUtil::GetConflictingInputs(uint inputid)
 {
-    LOG(VB_RECORD, LOG_INFO,
-        QString("CardUtil[%1]: GetConflictingInputs() input %1").arg(inputid));
-
     std::vector<uint> inputids;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2081,11 +2078,19 @@ std::vector<uint> CardUtil::GetConflictingInputs(uint inputid)
     while (query.next())
     {
         inputids.push_back(query.value(0).toUInt());
-        LOG(VB_RECORD, LOG_INFO,
-            QString("CardUtil[%1]: GetConflictingInputs() got input %2")
-                .arg(inputid).arg(inputids.back()));
     }
 
+    if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_INFO))
+    {
+        QString msg = QString("CardUtil[%1]: GetConflictingInputs(%1) ").arg(inputid);
+        QStringList ids;
+        for (auto id : inputids)
+        {
+            ids.append(QString::number(id));
+        }
+        msg.append(ids.join(','));
+        LOG(VB_RECORD, LOG_INFO, msg);
+   }
     return inputids;
 }
 
