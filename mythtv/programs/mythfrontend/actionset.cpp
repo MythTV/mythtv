@@ -34,7 +34,7 @@ ActionSet::~ActionSet()
 {
     while (!m_contexts.empty())
     {
-        Context &ctx = *m_contexts.begin();
+        ActionContext &ctx = *m_contexts.begin();
         while (!ctx.empty())
         {
             delete *ctx.begin();
@@ -178,7 +178,7 @@ QStringList ActionSet::GetActionStrings(const QString &context_name) const
     if (cit == m_contexts.end())
         return action_strings;
 
-    Context::const_iterator it = (*cit).begin();
+    ActionContext::const_iterator it = (*cit).begin();
     for (; it != (*cit).end(); ++it)
         action_strings.append(it.key());
     return action_strings;
@@ -201,7 +201,7 @@ bool ActionSet::AddAction(const ActionID &id,
 {
     ContextMap::iterator cit = m_contexts.find(id.GetContext());
     if (cit == m_contexts.end())
-        cit = m_contexts.insert(id.GetContext(), Context());
+        cit = m_contexts.insert(id.GetContext(), ActionContext());
     else if ((*cit).find(id.GetAction()) != (*cit).end())
         return false;
 
@@ -225,7 +225,7 @@ QString ActionSet::GetKeyString(const ActionID &id) const
     if (cit == m_contexts.end())
         return QString();
 
-    Context::const_iterator it = (*cit).find(id.GetAction());
+    ActionContext::const_iterator it = (*cit).find(id.GetAction());
     if (it != (*cit).end())
         return (*it)->GetKeyString();
 
@@ -243,7 +243,7 @@ QStringList ActionSet::GetKeys(const ActionID &id) const
     if (cit == m_contexts.end())
         return keys;
 
-    Context::const_iterator it = (*cit).find(id.GetAction());
+    ActionContext::const_iterator it = (*cit).find(id.GetAction());
     if (it != (*cit).end())
         keys = (*it)->GetKeys();
     return keys;
@@ -285,7 +285,7 @@ QString ActionSet::GetDescription(const ActionID &id) const
     if (cit == m_contexts.end())
         return QString();
 
-    Context::const_iterator it = (*cit).find(id.GetAction());
+    ActionContext::const_iterator it = (*cit).find(id.GetAction());
     if (it != (*cit).end())
         return (*it)->GetDescription();
 
@@ -308,7 +308,7 @@ Action *ActionSet::GetAction(const ActionID &id)
         return nullptr;
     }
 
-    Context::iterator it = (*cit).find(id.GetAction());
+    ActionContext::iterator it = (*cit).find(id.GetAction());
 
     if (it == (*cit).end())
     {

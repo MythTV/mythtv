@@ -83,7 +83,7 @@ class ActionSet
 
   private:
     QMap<QString, ActionList> m_keyToActionMap;
-    using ContextMap = QHash<QString, Context>;
+    using ContextMap = QHash<QString, ActionContext>;
     ContextMap                m_contexts;
     ActionList                m_modified;
 };
