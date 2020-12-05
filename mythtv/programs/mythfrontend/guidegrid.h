@@ -238,7 +238,7 @@ private:
     void updateDateText(void);
 
   private:
-    int   m_selectRecThreshold      {16};
+    std::chrono::minutes  m_selectRecThreshold {16min};
 
     bool  m_allowFinder             {false};
     db_chan_list_list_t m_channelInfos;

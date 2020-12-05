@@ -62,7 +62,7 @@ QWaitCondition epgIsVisibleCond;
 
 const QString kUnknownTitle = "";
 //const QString kUnknownCategory = QObject::tr("Unknown");
-const unsigned long kUpdateMS = 60 * 1000UL; // Grid update interval (mS)
+static constexpr std::chrono::milliseconds kUpdateMS { 60s }; // Grid update interval
 static bool SelectionIsTunable(const ChannelInfoList &selection);
 
 JumpToChannel::JumpToChannel(
@@ -480,7 +480,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
                      TV *player, bool embedVideo,
                      bool allowFinder, int changrpid)
   : ScheduleCommon(parent, "guidegrid"),
-    m_selectRecThreshold(gCoreContext->GetNumSetting("SelChangeRecThreshold", 16)),
+    m_selectRecThreshold(gCoreContext->GetDurSetting<std::chrono::minutes>("SelChangeRecThreshold", 16min)),
     m_allowFinder(allowFinder),
     m_startChanID(chanid),
     m_startChanNum(std::move(channum)),
@@ -774,16 +774,15 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         {
             ProgramInfo *pginfo =
                 m_programInfos[m_currentRow][m_currentCol];
-            int secsTillStart =
-                (pginfo) ? MythDate::current().secsTo(
-                    pginfo->GetScheduledStartTime()) : 0;
+            auto secsTillStart = (pginfo)
+                ? MythDate::secsInFuture(pginfo->GetScheduledStartTime()) : 0s;
             if (m_player && (m_player->GetState() == kState_WatchingLiveTV))
             {
                 // See if this show is far enough into the future that it's
                 // probable that the user wanted to schedule it to record
                 // instead of changing the channel.
                 if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
-                    ((secsTillStart / 60) >= m_selectRecThreshold))
+                    (secsTillStart >= m_selectRecThreshold))
                 {
                     EditRecording();
                 }
@@ -798,7 +797,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 // is we selected a show that is current.
                 EditRecording(!m_player
                     && SelectionIsTunable(GetSelection())
-                    && (secsTillStart / 60) < m_selectRecThreshold);
+                    && (secsTillStart < m_selectRecThreshold));
             }
         }
         else if (action == "EDIT")
@@ -920,11 +919,10 @@ bool GuideGrid::gestureEvent(MythGestureEvent *event)
                                         // instead of changing the channel.
                                         ProgramInfo *pginfo =
                                             m_programInfos[m_currentRow][m_currentCol];
-                                        int secsTillStart =
-                                            (pginfo) ? MythDate::current().secsTo(
-                                                pginfo->GetScheduledStartTime()) : 0;
+                                        auto secsTillStart = (pginfo)
+                                            ? MythDate::secsInFuture(pginfo->GetScheduledStartTime()) : 0s;
                                         if (pginfo && (pginfo->GetTitle() != kUnknownTitle) &&
-                                            ((secsTillStart / 60) >= m_selectRecThreshold))
+                                            (secsTillStart >= m_selectRecThreshold))
                                         {
                                             //EditRecording();
                                             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Guide Gesture Click gg EditRec"));
