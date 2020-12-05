@@ -49,7 +49,7 @@ class MUI_PUBLIC MythUIScrollBar : public MythUIType
     int m_sliderPosition  {0};
     int m_maximum         {0};
 
-    int m_hideDelay       {0};
+    std::chrono::milliseconds m_hideDelay {0ms};
     int m_timerId         {0};
 };
 
