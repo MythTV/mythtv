@@ -554,8 +554,7 @@ void LCDProcClient::loadSettings()
     m_lcdShowRecstatus=(gCoreContext->GetSetting("LCDShowRecStatus", "1")=="1");
     m_lcdBacklightOn=(gCoreContext->GetSetting("LCDBacklightOn", "1")=="1");
     m_lcdHeartbeatOn=(gCoreContext->GetSetting("LCDHeartBeatOn", "1")=="1");
-    aString = gCoreContext->GetSetting("LCDPopupTime", "5");
-    m_lcdPopupTime = aString.toInt() * 1000;
+    m_lcdPopupTime = gCoreContext->GetDurSetting<std::chrono::seconds>("LCDPopupTime", 5s);
     m_lcdBigClock = (gCoreContext->GetSetting("LCDBigClock", "1")=="1");
     m_lcdKeyString = gCoreContext->GetSetting("LCDKeyString", "ABCDEF");
 
@@ -613,7 +612,7 @@ void LCDProcClient::showStartupMessage(void)
 
     switchToGeneric(&textItems);
 
-    m_showMessageTimer->start( m_startupShowTime * 1000);
+    m_showMessageTimer->start( m_startupShowTime );
 }
 
 void LCDProcClient::removeStartupMessage(void)
@@ -621,7 +620,7 @@ void LCDProcClient::removeStartupMessage(void)
     switchToTime();
 }
 
-void LCDProcClient::setStartupMessage(QString msg, uint messagetime)
+void LCDProcClient::setStartupMessage(QString msg, std::chrono::seconds messagetime)
 {
     m_startupMessage = std::move(msg);
     m_startupShowTime = messagetime;
@@ -736,7 +735,7 @@ void LCDProcClient::describeServer()
                 .arg( m_lcdHeartbeatOn ));
         LOG(VB_GENERAL, LOG_INFO,
             QString("LCDProcClient: - popuptime      : %1")
-                    .arg( m_lcdPopupTime ));
+                    .arg( m_lcdPopupTime.count() ));
     }
 }
 

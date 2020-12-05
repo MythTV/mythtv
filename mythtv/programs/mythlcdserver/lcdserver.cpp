@@ -76,7 +76,7 @@ int debug_level = 0;
 #define LOC_WARN QString("LCDServer, Warning: ")
 #define LOC_ERR  QString("LCDServer, Error: ")
 
-LCDServer::LCDServer(int port, QString message, int messageTime)
+LCDServer::LCDServer(int port, QString message, std::chrono::seconds messageTime)
     : m_lcd(new LCDProcClient(this)),
      m_serverPool(new ServerPool()),
      m_lastSocket(nullptr)

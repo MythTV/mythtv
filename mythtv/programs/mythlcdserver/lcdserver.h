@@ -31,7 +31,7 @@ class LCDServer : public QObject
 
   public:
 
-    LCDServer(int port, QString message, int messageTime);
+    LCDServer(int port, QString message, std::chrono::seconds messageTime);
 
     void sendKeyPress(const QString& key_pressed);
 
