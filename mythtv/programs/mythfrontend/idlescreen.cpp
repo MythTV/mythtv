@@ -105,7 +105,7 @@ void IdleScreen::UpdateStatus(void)
 
     if (CheckConnectionToServer())
     {
-        if (m_secondsToShutdown >= 0)
+        if (m_secondsToShutdown >= 0s)
             state = "shuttingdown";
         else if (RemoteGetRecordingStatus())
             state = "recording";
@@ -125,10 +125,10 @@ void IdleScreen::UpdateStatus(void)
 
         if (statusText)
         {
-            if (m_secondsToShutdown >= 0)
+            if (m_secondsToShutdown >= 0s)
             {
                 QString status = tr("Backend will shutdown in %n "
-                                    "second(s).", "", m_secondsToShutdown);
+                                    "second(s).", "", m_secondsToShutdown.count());
 
                 statusText->SetText(status);
             }
@@ -252,13 +252,13 @@ void IdleScreen::customEvent(QEvent* event)
 
         if (me->Message().startsWith("RECONNECT_"))
         {
-            m_secondsToShutdown = -1;
+            m_secondsToShutdown = -1s;
             UpdateStatus();
         }
         else if (me->Message().startsWith("SHUTDOWN_COUNTDOWN"))
         {
             QString secs = me->Message().mid(19);
-            m_secondsToShutdown = secs.toInt();
+            m_secondsToShutdown = std::chrono::seconds(secs.toInt());
             UpdateStatus();
         }
         else if (me->Message().startsWith("SHUTDOWN_NOW"))

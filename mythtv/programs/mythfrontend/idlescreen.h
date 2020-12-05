@@ -44,7 +44,7 @@ class IdleScreen : public MythScreenType
     MythUIButtonList *m_conflictingRecordings {nullptr};
     MythUIText       *m_conflictWarning       {nullptr};
 
-    int             m_secondsToShutdown       {-1};
+    std::chrono::seconds  m_secondsToShutdown {-1s};
 
     QMutex          m_schedUpdateMutex;
     bool            m_pendingSchedUpdate      {false};
