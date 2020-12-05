@@ -5659,14 +5659,14 @@ bool Scheduler::WasStartedAutomatically()
         // of the saved wakeup time assume we either started automatically
         // to record, to obtain guide data or or for a
         // daily wakeup/shutdown period
-        if (abs(startupTime.secsTo(MythDate::current())) < startupSecs.count())
+        if (abs(MythDate::secsInPast(startupTime)) < startupSecs)
         {
             LOG(VB_GENERAL, LOG_INFO,
                 "Close to auto-start time, AUTO-Startup assumed");
 
             QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
             QDateTime guideRunTime = MythDate::fromString(str);
-            if (guideRunTime.secsTo(MythDate::current()) < startupSecs.count())
+            if (MythDate::secsInPast(guideRunTime) < startupSecs)
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     "Close to MythFillDB suggested run time, AUTO-Startup to fetch guide data?");
