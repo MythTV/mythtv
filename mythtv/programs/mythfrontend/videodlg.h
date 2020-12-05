@@ -229,7 +229,7 @@ class VideoListDeathDelay : public QObject
     // When exiting MythVideo, we delay destroying the data for kDelayTimeMS
     // milliseconds, and reuse the data (possibly avoiding a rescan) if the user
     // restarts MythVideo within that time period.
-    static const int kDelayTimeMS = 3000;
+    static constexpr std::chrono::milliseconds kDelayTimeMS { 3s };
 
   private slots:
     void OnTimeUp();

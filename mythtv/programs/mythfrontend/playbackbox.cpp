@@ -5594,7 +5594,7 @@ void PlaybackBox::PbbJobQueue::Update()
 {
     QDateTime now = QDateTime::currentDateTime();
     if (!m_lastUpdated.isValid() ||
-        m_lastUpdated.msecsTo(now) >= kInvalidateTimeMs)
+        m_lastUpdated.msecsTo(now) >= kInvalidateTimeMs.count())
     {
         QMap<int, JobQueueEntry> jobs;
         JobQueue::GetJobsInQueue(jobs, JOB_LIST_ALL);

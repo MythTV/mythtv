@@ -48,12 +48,10 @@ class PBHEventHandler : public QObject
     PlaybackBoxHelper &m_pbh;
     int m_freeSpaceTimerId;
     int m_checkAvailabilityTimerId;
-    static const uint kUpdateFreeSpaceInterval;
+    static constexpr std::chrono::milliseconds kUpdateFreeSpaceInterval { 15s };
     QMap<QString, QStringList> m_fileListCache;
     QHash<uint, QStringList> m_checkAvailability;
 };
-
-const uint PBHEventHandler::kUpdateFreeSpaceInterval = 15000; // 15 seconds
 
 AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 {
@@ -270,10 +268,10 @@ bool PBHEventHandler::event(QEvent *e)
             {
                 if (m_checkAvailabilityTimerId)
                     killTimer(m_checkAvailabilityTimerId);
-                m_checkAvailabilityTimerId = startTimer(0);
+                m_checkAvailabilityTimerId = startTimer(0ms);
             }
             else if (!m_checkAvailabilityTimerId)
-                m_checkAvailabilityTimerId = startTimer(50);
+                m_checkAvailabilityTimerId = startTimer(50ms);
         }
         else if (me->Message() == "LOCATE_ARTWORK")
         {
