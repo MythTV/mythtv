@@ -22,6 +22,7 @@
 
 #define SEARCH_TIME 3000
 #define VBOX_URI "urn:schemas-upnp-org:device:MediaServer:1"
+#define VBOX_UDN "uuid:b7531642-0123-3210"
 
 VBox::VBox(const QString &url)
 {
@@ -102,11 +103,12 @@ QStringList VBox::doUPNPSearch(void)
 
         QString friendlyName = BE->GetDeviceDesc()->m_rootDevice.m_sFriendlyName;
         QString ip = BE->GetDeviceDesc()->m_hostUrl.host();
+        QString udn = BE->GetDeviceDesc()->m_rootDevice.m_sUDN;
         int port = BE->GetDeviceDesc()->m_hostUrl.port();
 
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Found possible VBox at %1 (%2:%3)").arg(friendlyName).arg(ip).arg(port));
 
-        if (friendlyName.startsWith("VBox"))
+        if (udn.startsWith(VBOX_UDN))
         {
             // we found one
             QString id;
