@@ -13,7 +13,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void CaptionsStateChanged(MythCaptionsState& CaptionsState);
     void ResizeForInteractiveTV(const QRect& Rect);
     void SetInteractiveStream(const QString& Stream);
-    void SetInteractiveStreamPos(std::chrono::seconds Position);
+    void SetInteractiveStreamPos(std::chrono::milliseconds Position);
     void PlayInteractiveStream(bool Play);
 
   public:

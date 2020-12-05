@@ -151,11 +151,11 @@ class MHContext
     // Stop displaying video
     virtual void StopVideo() = 0;
     // Get current stream position in mS, -1 if unknown
-    virtual long GetStreamPos() = 0;
+    virtual std::chrono::milliseconds GetStreamPos() = 0;
     // Get current stream size in mS, -1 if unknown
-    virtual long GetStreamMaxPos() = 0;
+    virtual std::chrono::milliseconds GetStreamMaxPos() = 0;
     // Set current stream position in mS
-    virtual long SetStreamPos(long) = 0;
+    virtual std::chrono::milliseconds SetStreamPos(std::chrono::milliseconds) = 0;
     // Play or pause a stream
     virtual void StreamPlay(bool play = true) = 0;
 

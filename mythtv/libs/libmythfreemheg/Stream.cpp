@@ -230,19 +230,19 @@ void MHStream::StopPlaying(MHEngine *engine)
 void MHStream::GetCounterPosition(MHRoot *pResult, MHEngine *engine)
 {
     // StreamCounterUnits (mS)
-    pResult->SetVariableValue((int)engine->GetContext()->GetStreamPos());
+    pResult->SetVariableValue((int)engine->GetContext()->GetStreamPos().count());
 }
 
 void MHStream::GetCounterMaxPosition(MHRoot *pResult, MHEngine *engine)
 {
     // StreamCounterUnits (mS)
-    pResult->SetVariableValue((int)engine->GetContext()->GetStreamMaxPos());
+    pResult->SetVariableValue((int)engine->GetContext()->GetStreamMaxPos().count());
 }
 
 void MHStream::SetCounterPosition(int pos, MHEngine *engine)
 {
     // StreamCounterUnits (mS)
-    engine->GetContext()->SetStreamPos(pos);
+    engine->GetContext()->SetStreamPos(std::chrono::milliseconds(pos));
 }
 
 void MHStream::SetSpeed(int speed, MHEngine *engine)

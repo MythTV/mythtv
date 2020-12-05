@@ -1143,24 +1143,24 @@ void MHIContext::StopVideo()
 }
 
 // Get current stream position, -1 if unknown
-long MHIContext::GetStreamPos()
+std::chrono::milliseconds MHIContext::GetStreamPos()
 {
-    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamPos().count() : -1;
+    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamPos() : -1ms;
 }
 
 // Get current stream size, -1 if unknown
-long MHIContext::GetStreamMaxPos()
+std::chrono::milliseconds MHIContext::GetStreamMaxPos()
 {
-    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamMaxPos().count() : -1;
+    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamMaxPos() : -1ms;
 }
 
 // Set current stream position
-long MHIContext::SetStreamPos(long pos)
+std::chrono::milliseconds MHIContext::SetStreamPos(std::chrono::milliseconds pos)
 {
     if (m_parent->GetPlayer())
-        emit m_parent->GetPlayer()->SetInteractiveStreamPos(std::chrono::seconds(pos));
+        emit m_parent->GetPlayer()->SetInteractiveStreamPos(pos);
     // Note: return value is never used
-    return 0;
+    return 0ms;
 }
 
 // Play or pause a stream
