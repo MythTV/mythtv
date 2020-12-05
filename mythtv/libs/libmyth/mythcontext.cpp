@@ -833,9 +833,8 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         {"start","dbAwake","dbStarted","dbConnects","beWOL","beAwake",
             "success" };
 
-    int msStartupScreenDelay = gCoreContext->GetNumSetting("StartupScreenDelay",2);
-    if (msStartupScreenDelay > 0)
-        msStartupScreenDelay *= 1000;
+    auto msStartupScreenDelay =
+        gCoreContext->GetDurSetting<std::chrono::milliseconds>("StartupScreenDelay",2s);
     do
     {
         QElapsedTimer timer;
@@ -883,7 +882,8 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
 
             LOG(VB_GENERAL, LOG_INFO,
                  QString("Start up testing connections. DB %1, BE %2, attempt %3, status %4, Delay: %5")
-                      .arg(host).arg(backendIP).arg(attempt).arg(kGuiStatuses[startupState]).arg(msStartupScreenDelay) );
+                      .arg(host).arg(backendIP).arg(attempt).arg(kGuiStatuses[startupState])
+                      .arg(msStartupScreenDelay.count()) );
 
             std::chrono::seconds useTimeout = wakeupTime;
             if (attempt == 0)
@@ -891,7 +891,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
 
             if (m_gui && !m_guiStartup)
             {
-                if (msStartupScreenDelay==0 || timer.hasExpired(msStartupScreenDelay))
+                if (msStartupScreenDelay==0ms || timer.hasExpired(msStartupScreenDelay.count()))
                 {
                     ShowGuiStartup();
                     if (m_guiStartup)
