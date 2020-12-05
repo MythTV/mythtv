@@ -462,7 +462,7 @@ void OSD::Draw(QRect Rect)
             if (m_expireTimes.contains(screen))
             {
                 QTime expires = m_expireTimes.value(screen).time();
-                int left = now.msecsTo(expires);
+                auto left = std::chrono::milliseconds(now.msecsTo(expires));
                 if (left < m_fadeTime)
                     screen->SetAlpha((255 * left) / m_fadeTime);
             }
@@ -500,9 +500,9 @@ void OSD::Draw(QRect Rect)
             visible = true;
             (*it2)->Pulse();
             QTime expires = MythNotificationCenter::ScreenExpiryTime(*it2).time();
-            int left = now.msecsTo(expires);
-            if (left < 0)
-                left = 0;
+            auto left = std::chrono::milliseconds(now.msecsTo(expires));
+            if (left < 0ms)
+                left = 0ms;
             if (expires.isValid() && left < m_fadeTime)
                 (*it2)->SetAlpha((255 * left) / m_fadeTime);
         }
@@ -577,7 +577,7 @@ void OSD::CheckExpiry()
 }
 
 void OSD::SetExpiry(const QString &Window, enum OSDTimeout Timeout,
-                    int CustomTimeout)
+                    std::chrono::milliseconds CustomTimeout)
 {
     SetExpiryPriv(Window, Timeout, CustomTimeout);
     if (IsWindowVisible(Window))
@@ -590,19 +590,21 @@ void OSD::SetExpiry(const QString &Window, enum OSDTimeout Timeout,
     }
 }
 
-void OSD::SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout)
+void OSD::SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout,
+                        std::chrono::milliseconds CustomTimeout)
 {
-    if (Timeout == kOSDTimeout_Ignore && !CustomTimeout)
+    if (Timeout == kOSDTimeout_Ignore && CustomTimeout == 0ms)
         return;
 
     MythScreenType *win = GetWindow(Window);
-    int time = CustomTimeout ? CustomTimeout : m_timeouts[static_cast<size_t>(Timeout)];
-    if ((time > 0) && win)
+    std::chrono::milliseconds time = (CustomTimeout != 0ms)
+        ? CustomTimeout : m_timeouts[static_cast<size_t>(Timeout)];
+    if ((time > 0ms) && win)
     {
-        QDateTime expires = MythDate::current().addMSecs(time);
+        QDateTime expires = MythDate::current().addMSecs(time.count());
             m_expireTimes.insert(win, expires);
     }
-    else if ((time < 0) && win)
+    else if ((time < 0ms) && win)
     {
         if (m_expireTimes.contains(win))
             m_expireTimes.remove(win);
@@ -727,7 +729,7 @@ void OSD::ShowDialog(const MythOSDDialogData& Data)
     DialogBack(Data.m_back.m_text, Data.m_back.m_data, Data.m_back.m_exit);
 }
 
-void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
+void OSD::DialogShow(const QString &Window, const QString &Text, std::chrono::milliseconds UpdateFor)
 {
     if (m_dialog)
     {
@@ -787,7 +789,7 @@ void OSD::DialogShow(const QString &Window, const QString &Text, int UpdateFor)
         RevertUIScale();
     }
 
-    if (UpdateFor)
+    if (UpdateFor > 0ms)
     {
         m_nextPulseUpdate  = MythDate::current();
         m_pulsedDialogText = Text;

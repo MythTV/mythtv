@@ -1708,7 +1708,7 @@ void TV::ShowOSDAskAllow()
         }
         it = next;
     }
-    int          timeuntil = 0;
+    std::chrono::milliseconds timeuntil = 0ms;
     QString      message;
     uint conflict_count = static_cast<uint>(m_askAllowPrograms.size());
 
@@ -1805,7 +1805,7 @@ void TV::ShowOSDAskAllow()
         message = single_rec.arg((*it).m_info->GetTitle()).arg(channel);
 
         BrowseEnd(false);
-        timeuntil = static_cast<int>(MythDate::current().secsTo((*it).m_expiry) * 1000);
+        timeuntil = MythDate::secsInFuture((*it).m_expiry);
         MythOSDDialogData dialog { OSD_DLG_ASKALLOW, message, timeuntil };
         dialog.m_buttons.push_back({ record_watch, "DIALOG_ASKALLOW_WATCH_0", false, !((*it).m_hasRec)} );
         dialog.m_buttons.push_back({ let_record1, "DIALOG_ASKALLOW_EXIT_0" });
@@ -1859,18 +1859,17 @@ void TV::ShowOSDAskAllow()
         }
 
         bool all_have_later = true;
-        timeuntil = 9999999;
+        timeuntil = 9999999ms;
         for (it = m_askAllowPrograms.begin(); it != m_askAllowPrograms.end(); ++it)
         {
             if ((*it).m_isConflicting)
             {
                 all_have_later &= (*it).m_hasLater;
-                int tmp = static_cast<int>(MythDate::current().secsTo((*it).m_expiry));
-                tmp *= 1000;
-                timeuntil = std::min(timeuntil, std::max(tmp, 0));
+                auto tmp = std::chrono::milliseconds(MythDate::secsInFuture((*it).m_expiry));
+                timeuntil = std::clamp(tmp, 0ms, timeuntil);
             }
         }
-        timeuntil = (9999999 == timeuntil) ? 0 : timeuntil;
+        timeuntil = (9999999ms == timeuntil) ? 0ms : timeuntil;
 
         if (conflict_count > 1)
         {
@@ -5064,7 +5063,7 @@ void TV::DoSeek(float Time, const QString &Msg, bool TimeIsOffset, bool HonorCut
         }
         else
         {
-            auto time = duration_cast<std::chrono::milliseconds>(secondsFromFloat(Time));
+            auto time = millisecondsFromFloat(Time * 1000);
             uint64_t desiredFrameRel = m_player->TranslatePositionMsToFrame(time, HonorCutlist);
             m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
             DoPlayerSeekToFrame(desiredFrameRel);
@@ -6606,7 +6605,7 @@ void TV::UpdateOSDTimeoutMessage()
         "video source (%3), inputs (%4), etc.")
         .arg(s_chanUp).arg(s_chanDown).arg(s_nextSrc).arg(s_togCards);
 
-    emit ChangeOSDDialog({ OSD_DLG_INFO, message, 0,
+    emit ChangeOSDDialog({ OSD_DLG_INFO, message, 0ms,
                        { {tr("OK"), "DIALOG_INFO_CHANNELLOCK_0" } },
                        { "", "DIALOG_INFO_CHANNELLOCK_0", true } });
 }
@@ -7081,7 +7080,7 @@ void TV::ShowOSDSleep()
                          "Do you wish to continue watching?")
             .arg(duration_cast<std::chrono::minutes>(m_sleepTimerTimeout).count());
 
-    emit ChangeOSDDialog( { OSD_DLG_SLEEP, message, (int)kSleepTimerDialogTimeout.count(),
+    emit ChangeOSDDialog( { OSD_DLG_SLEEP, message, kSleepTimerDialogTimeout,
                         { { tr("Yes"), "DIALOG_SLEEP_YES_0" },
                           { tr("No"),  "DIALOG_SLEEP_NO_0" } }});
 
@@ -7136,7 +7135,7 @@ void TV::ShowOSDIdle()
                          "will exit in %d seconds. Are you still watching?")
                          .arg(duration_cast<std::chrono::minutes>(m_dbIdleTimeout).count());
 
-    emit ChangeOSDDialog( { OSD_DLG_IDLE, message, (int)kIdleTimerDialogTimeout.count(),
+    emit ChangeOSDDialog( { OSD_DLG_IDLE, message, kIdleTimerDialogTimeout,
                         { { tr("Yes"), "DIALOG_IDLE_YES_0" },
                           { tr("No"),  "DIALOG_IDLE_NO_0" }}});
 
@@ -7199,15 +7198,15 @@ void TV::customEvent(QEvent *Event)
         if (message.isEmpty())
             return;
 
-        int timeout = 0;
+        std::chrono::milliseconds timeout = 0ms;
         if (me->ExtraDataCount() == 1)
         {
-            auto t = me->ExtraData(0).toInt();
-            if (t > 0 && t < 1000)
-                timeout = t * 1000;
+            auto t = std::chrono::seconds(me->ExtraData(0).toInt());
+            if (t > 0s && t < 1000s)
+                timeout = t;
         }
 
-        if (timeout > 0)
+        if (timeout > 0ms)
             message += " (%d)";
 
         emit ChangeOSDDialog( { OSD_DLG_CONFIRM, message, timeout });
@@ -7847,7 +7846,7 @@ void TV::ShowOSDAlreadyEditing()
 
     QString message = tr("This program is currently being edited");
     QString def = QString("DIALOG_EDITING_CONTINUE_%1").arg(static_cast<int>(paused));
-    emit ChangeOSDDialog( { OSD_DLG_EDITING, message, 0,
+    emit ChangeOSDDialog( { OSD_DLG_EDITING, message, 0ms,
                         { { tr("Continue Editing"), def, false, true },
                           { tr("Do not edit"), QString("DIALOG_EDITING_STOP_%1").arg(static_cast<int>(paused)) }},
                         { "", def, true} });
@@ -9638,7 +9637,7 @@ void TV::ShowNoRecorderDialog(NoRecorderMsg MsgType)
             break;
     }
 
-    emit ChangeOSDDialog({ OSD_DLG_INFO, errorText, 0, {{ tr("OK"), "DIALOG_INFO_X_X" }}});
+    emit ChangeOSDDialog({ OSD_DLG_INFO, errorText, 0ms, {{ tr("OK"), "DIALOG_INFO_X_X" }}});
 }
 
 /**
@@ -9972,7 +9971,7 @@ void TV::ShowOSDPromptDeleteRecording(const QString& Title, bool Force)
                     message += " " + byWho[i+2];
                 }
             }
-            emit ChangeOSDDialog({OSD_DLG_DELETE, message, 0,
+            emit ChangeOSDDialog({OSD_DLG_DELETE, message, 0ms,
                                 {{ tr("OK"), "DIALOG_DELETE_OK_0" }},
                                 { "", "DIALOG_DELETE_OK_0", true }});
         }
