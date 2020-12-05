@@ -81,7 +81,7 @@ class UPNPScanner : public QObject
     void SendBrowseRequest(const QUrl &url, const QString &objectid);
     void AddServer(const QString &usn, const QString &url);
     void RemoveServer(const QString &usn);
-    void ScheduleRenewal(const QString &usn, int timeout);
+    void ScheduleRenewal(const QString &usn, std::chrono::seconds timeout);
 
     // xml parsing of browse requests
     void ParseBrowse(const QUrl &url, QNetworkReply *reply);
