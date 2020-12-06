@@ -23,7 +23,7 @@ QString DurationFormat(std::chrono::milliseconds msec)
     {
         dayStr = QString("D%1").arg((msec % 24h).count());
     }
-    QString timeStr = UPnPDateTime::TimeFormat(msec.count());
+    QString timeStr = UPnPDateTime::TimeFormat(msec);
 
     return durationStr.arg(dayStr).arg(timeStr);
 }
@@ -34,9 +34,9 @@ QString TimeFormat(const QTime time)
     return timeStr;
 }
 
-QString TimeFormat(uint32_t msec)
+    QString TimeFormat(std::chrono::milliseconds msec)
 {
-    QTime time = QTime::fromMSecsSinceStartOfDay(msec);
+    QTime time = QTime::fromMSecsSinceStartOfDay(msec.count());
     return time.toString("HH:mm:ss");
 }
 

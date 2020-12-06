@@ -419,7 +419,7 @@ qulonglong BufferedSocketDevice::WaitForMore(
 
         msecs  = 1s;
 
-        nBytes = m_pSocket->waitForMore( msecs.count(), &bTimeout );
+        nBytes = m_pSocket->waitForMore( msecs, &bTimeout );
 
         if (pTimeout != nullptr)
             *pTimeout = bTimeout;

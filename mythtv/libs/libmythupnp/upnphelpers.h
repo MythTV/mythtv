@@ -84,7 +84,7 @@ namespace UPnPDateTime
      * UPnP ContentDirectory Service 2008, 2013
      * Appendix D.1 Date&Time Syntax
      */
-    UPNP_PUBLIC QString TimeFormat(uint32_t msec);
+    UPNP_PUBLIC QString TimeFormat(std::chrono::milliseconds msec);
 
     /**
      * Date-Time Format
