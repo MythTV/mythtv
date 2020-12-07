@@ -13,6 +13,8 @@
 #include "mythuitype.h"
 #include "mythmainwindow.h" // for MythMainWindow::drawRefresh
 
+#define DEFAULT_REFRESH_RATE 70 // Hz
+
 class MythFontProperties;
 
 /**
@@ -151,21 +153,22 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
     float  m_incB                 {0.0};
 
     // Default delay of 3 seconds before 'bouncing' the scrolling text
-    enum Constants {ScrollBounceDelay = MythMainWindow::drawRefresh * 3};
+    enum Constants {ScrollBounceDelay = DEFAULT_REFRESH_RATE * 3};
     enum ScrollDir {ScrollNone, ScrollLeft, ScrollRight, ScrollUp, ScrollDown,
                     ScrollHorizontal, ScrollVertical};
 
     int       m_scrollStartDelay  {ScrollBounceDelay};
     int       m_scrollReturnDelay {ScrollBounceDelay};
-    int       m_scrollPause       {0};
-    float     m_scrollForwardRate {70.0 / MythMainWindow::drawRefresh};
-    float     m_scrollReturnRate  {70.0 / MythMainWindow::drawRefresh};
+    float     m_scrollPause       {0.0};
+    float     m_scrollForwardRate {1.0};
+    float     m_scrollReturnRate  {1.0};
     bool      m_scrollBounce      {false};
     int       m_scrollOffset      {0};
     float     m_scrollPos         {0};
     int       m_scrollPosWhole    {0};
     ScrollDir m_scrollDirection   {ScrollNone};
     bool      m_scrolling         {false};
+    int64_t   m_lastUpdate        {QDateTime::currentMSecsSinceEpoch()};
 
     enum TextCase {CaseNormal, CaseUpper, CaseLower, CaseCapitaliseFirst,
                    CaseCapitaliseAll};

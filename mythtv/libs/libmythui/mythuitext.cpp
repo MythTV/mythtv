@@ -50,8 +50,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
 
     m_scrollStartDelay = m_scrollReturnDelay = ScrollBounceDelay;
     m_scrollPause = 0;
-    m_scrollForwardRate = m_scrollReturnRate =
-                          70.0 / MythMainWindow::drawRefresh;
+    m_scrollForwardRate = m_scrollReturnRate = 1.0;
     m_scrollBounce = false;
     m_scrollOffset = 0;
     m_scrollPos = 0;
@@ -1199,6 +1198,16 @@ void MythUIText::Pulse(void)
 
     MythUIType::Pulse();
 
+    // Calculate interval since last update in msecs - clamped to 50msecs (20Hz)
+    // in case of UI blocking/pauses
+    int64_t currentmsecs = QDateTime::currentMSecsSinceEpoch();
+    int64_t interval = std::min(currentmsecs - m_lastUpdate, 50L);
+    m_lastUpdate = currentmsecs;
+
+    // Rates are pixels per second (float) normalised to 70Hz for historical reasons.
+    // Convert interval accordingly.
+    float rate = (interval / 1000.0F) * DEFAULT_REFRESH_RATE;
+
     if (m_colorCycling)
     {
         m_curR += m_incR;
@@ -1215,8 +1224,9 @@ void MythUIText::Pulse(void)
             m_incB *= -1;
         }
 
-        QColor newColor = QColor((int)m_curR, (int)m_curG, (int)m_curB);
-
+        QColor newColor = QColor(static_cast<int>(m_curR),
+                                 static_cast<int>(m_curG),
+                                 static_cast<int>(m_curB));
         if (newColor != m_font->color())
         {
             m_font->SetColor(newColor);
@@ -1226,14 +1236,14 @@ void MythUIText::Pulse(void)
 
     if (m_scrolling)
     {
-        if (m_scrollPause > 0)
-            --m_scrollPause;
+        if (m_scrollPause > 0.0F)
+            m_scrollPause -= rate;
         else
         {
             if (m_scrollBounce)
-                m_scrollPos += m_scrollReturnRate;
+                m_scrollPos += m_scrollReturnRate * rate;
             else
-                m_scrollPos += m_scrollForwardRate;
+                m_scrollPos += m_scrollForwardRate * rate;
         }
 
         int whole = static_cast<int>(m_scrollPos);
@@ -1527,27 +1537,23 @@ bool MythUIText::ParseElement(
             if (!tmp.isEmpty())
             {
                 float seconds = tmp.toFloat();
-                m_scrollStartDelay = lroundf(seconds *
-                      static_cast<float>(MythMainWindow::drawRefresh));
+                m_scrollStartDelay = static_cast<int>(lroundf(seconds * DEFAULT_REFRESH_RATE));
             }
             tmp = element.attribute("returndelay");
             if (!tmp.isEmpty())
             {
                 float seconds = tmp.toFloat();
-                m_scrollReturnDelay = lroundf(seconds *
-                      static_cast<float>(MythMainWindow::drawRefresh));
+                m_scrollReturnDelay = static_cast<int>(lroundf(seconds * DEFAULT_REFRESH_RATE));
             }
             tmp = element.attribute("rate");
             if (!tmp.isEmpty())
             {
 #if 0 // scroll rate as a percentage of 70Hz
                 float percent = tmp.toFloat() / 100.0;
-                m_scrollForwardRate = percent *
-                      static_cast<float>(MythMainWindow::drawRefresh) / 70.0;
+                m_scrollForwardRate = percent;
 #else // scroll rate as pixels per second
                 int pixels = tmp.toInt();
-                m_scrollForwardRate =
-                    pixels / static_cast<float>(MythMainWindow::drawRefresh);
+                m_scrollForwardRate = pixels / DEFAULT_REFRESH_RATE;
 #endif
             }
             tmp = element.attribute("returnrate");
@@ -1555,12 +1561,10 @@ bool MythUIText::ParseElement(
             {
 #if 0 // scroll rate as a percentage of 70Hz
                 float percent = tmp.toFloat() / 100.0;
-                m_scrollReturnRate = percent *
-                      static_cast<float>(MythMainWindow::drawRefresh) / 70.0;
+                m_scrollReturnRate = percent;
 #else // scroll rate as pixels per second
                 int pixels = tmp.toInt();
-                m_scrollReturnRate =
-                    pixels / static_cast<float>(MythMainWindow::drawRefresh);
+                m_scrollReturnRate = pixels / DEFAULT_REFRESH_RATE;
 #endif
             }
 
