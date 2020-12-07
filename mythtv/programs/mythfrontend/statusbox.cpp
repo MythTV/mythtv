@@ -30,6 +30,7 @@
 #include "opengl/mythrenderopengl.h"
 #include "mythdisplay.h"
 #include "decoders/mythcodeccontext.h"
+#include "mythchrono.h"
 
 struct LogLine {
     QString m_line;
@@ -40,10 +41,10 @@ struct LogLine {
     QString m_state;
 };
 
-void StatusBoxItem::Start(int Interval)
+void StatusBoxItem::Start(std::chrono::seconds Interval)
 {
     connect(this, &QTimer::timeout, [=]() { emit UpdateRequired(this); });
-    start(Interval * 1000);
+    start(Interval);
 }
 
 /** \class StatusBox
@@ -1179,14 +1180,15 @@ static QString uptimeStr(time_t uptime)
     if (uptime == 0)
         return str + StatusBox::tr("unknown", "unknown uptime");
 
-    int days = uptime/ONEDAYINSEC;
-    auto secs = std::chrono::seconds(uptime - days*ONEDAYINSEC);
+    auto secs = std::chrono::seconds(uptime);
+    auto days = duration_cast<std::chrono::days>(secs);
+    secs = secs % 24h;
 
     QString astext;
-    if (days > 0)
+    if (days.count() > 0)
     {
         astext = QString("%1, %2")
-            .arg(StatusBox::tr("%n day(s)", "", days))
+            .arg(StatusBox::tr("%n day(s)", "", days.count()))
             .arg(MythFormatTime(secs, "H:mm"));
     } else {
         astext = MythFormatTime(secs, "H:mm:ss");
@@ -1333,7 +1335,7 @@ void StatusBox::doMachineStatus()
         };
         StatusBoxItem *uptimeitem = AddLogLine(uptimeStr(uptime));
         connect(uptimeitem, &StatusBoxItem::UpdateRequired, UpdateUptime);
-        uptimeitem->Start(60);
+        uptimeitem->Start(1min);
     }
 
     // weighted average loads
@@ -1382,8 +1384,8 @@ void StatusBox::doMachineStatus()
         UpdateSwap(swap);
         connect(mem,  &StatusBoxItem::UpdateRequired, UpdateMem);
         connect(swap, &StatusBoxItem::UpdateRequired, UpdateSwap);
-        mem->Start(3);
-        swap->Start(3);
+        mem->Start(3s);
+        swap->Start(3s);
     }
 
     if (!m_isBackendActive)
@@ -1407,7 +1409,7 @@ void StatusBox::doMachineStatus()
             };
             StatusBoxItem *remoteuptime = AddLogLine(uptimeStr(uptime));
             connect(remoteuptime, &StatusBoxItem::UpdateRequired, UpdateRemoteUptime);
-            remoteuptime->Start(60);
+            remoteuptime->Start(1min);
         }
 
         // weighted average loads
@@ -1455,8 +1457,8 @@ void StatusBox::doMachineStatus()
             UpdateRemoteSwap(rswap);
             connect(rmem,  &StatusBoxItem::UpdateRequired, UpdateRemoteMem);
             connect(rswap, &StatusBoxItem::UpdateRequired, UpdateRemoteSwap);
-            rmem->Start(10);
-            rswap->Start(11);
+            rmem->Start(10s);
+            rswap->Start(11s);
         }
     }
 
