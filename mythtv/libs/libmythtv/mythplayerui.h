@@ -68,6 +68,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
     void RenderVideoFrame(MythVideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
     void DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due);
     void EnableFrameRateMonitor(bool Enable = false);
+    void EnableBitrateMonitor(bool Enable = false);
 
     Jitterometer    m_outputJmeter { "Player" };
 

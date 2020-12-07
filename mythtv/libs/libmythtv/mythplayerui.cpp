@@ -871,9 +871,18 @@ void MythPlayerUI::OSDDebugVisibilityChanged(bool Visible)
 {
     m_osdDebug = Visible;
     if (Visible)
+    {
+        // This should already have enabled the required monitors
         m_osdDebugTimer.start();
+    }
     else
+    {
+        // If we have cleared/escaped the debug OSD screen, then ChangeOSDDebug
+        // is not called, so we need to ensure we turn off the monitors
         m_osdDebugTimer.stop();
+        EnableBitrateMonitor();
+        EnableFrameRateMonitor();
+    }
 }
 
 void MythPlayerUI::UpdateOSDDebug()
@@ -890,8 +899,7 @@ void MythPlayerUI::ChangeOSDDebug()
 {
     m_osdLock.lock();
     bool enable = !m_osdDebug;
-    if (m_playerCtx->m_buffer)
-        m_playerCtx->m_buffer->EnableBitrateMonitor(enable);
+    EnableBitrateMonitor(enable);
     EnableFrameRateMonitor(enable);
     if (enable)
         UpdateOSDDebug();
@@ -905,6 +913,12 @@ void MythPlayerUI::EnableFrameRateMonitor(bool Enable)
 {
     bool enable = VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_ANY) || Enable;
     m_outputJmeter.SetNumCycles(enable ? static_cast<int>(m_videoFrameRate) : 0);
+}
+
+void MythPlayerUI::EnableBitrateMonitor(bool Enable)
+{
+    if (m_playerCtx->m_buffer)
+        m_playerCtx->m_buffer->EnableBitrateMonitor(Enable);
 }
 
 /* JumpToStream, JumpToProgram and SwitchToProgram all need to be moved into the
