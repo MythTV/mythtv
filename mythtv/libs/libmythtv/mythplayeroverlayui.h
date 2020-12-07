@@ -44,7 +44,8 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
     QMutex m_osdLock   { QMutex::Recursive };
     bool   m_browsing  { false };
     bool   m_editing   { false };
-    bool   m_reinitOsd { false }; // Set in the decoder thread
+    // Set in the decoder thread
+    bool   m_reinitOsd { false };
 
   private:
     Q_DISABLE_COPY(MythPlayerOverlayUI)

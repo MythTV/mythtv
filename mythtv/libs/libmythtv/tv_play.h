@@ -407,7 +407,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void SetBookmark(bool Clear = false);
 
     // OSD
-    bool ClearOSD();
+    void ClearOSD();
     void ToggleOSD( bool IncludeStatusOSD);
     void UpdateOSDProgInfo(const char *WhichInfo);
     void UpdateOSDStatus(const QString& Title, const QString& Desc,

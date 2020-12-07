@@ -100,6 +100,8 @@ class OSD : public MythMediaOverlay
 
   public slots:
     void SetText(const QString& Window, const InfoMap& Map, OSDTimeout Timeout);
+    void DialogQuit();
+    void HideAll(bool KeepSubs = true, MythScreenType* Except = nullptr, bool DropNotification = false);
 
   protected slots:
     void ShowDialog(const MythOSDDialogData& Data);
@@ -112,7 +114,7 @@ class OSD : public MythMediaOverlay
     bool Init(QRect Rect, float FontAspect) override;
     void HideWindow(const QString &Window) override;
     void SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);
-    void HideAll(bool KeepSubs = true, MythScreenType *Except = nullptr, bool DropNotification = false);
+
     void SetExpiry(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout = 0);
     void ResetWindow(const QString &Window);
     void Draw(QRect Rect);
@@ -126,7 +128,6 @@ class OSD : public MythMediaOverlay
     bool DialogVisible(const QString& Window = QString());
     bool DialogHandleKeypress(QKeyEvent *Event);
     bool DialogHandleGesture(MythGestureEvent *Event);
-    void DialogQuit();
     void DialogGetText(InfoMap &Map);
 
   private:

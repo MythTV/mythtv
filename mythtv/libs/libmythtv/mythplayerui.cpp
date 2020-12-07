@@ -1,5 +1,3 @@
-#include <chrono>
-
 // MythTV
 #include "mythsystemevent.h"
 #include "audiooutput.h"
@@ -13,12 +11,14 @@
 #include "livetvchain.h"
 #include "mythplayerui.h"
 
+// Std
+#include <chrono>
 using namespace std::chrono_literals;
 
 #define LOC QString("PlayerUI: ")
 
 MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
-                                         PlayerContext *Context, PlayerFlags Flags)
+                           PlayerContext *Context, PlayerFlags Flags)
   : MythPlayerVisualiserUI(MainWindow, Tv, Context, Flags),
     MythVideoScanTracker(this)
 {
@@ -34,7 +34,7 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     });
 
     // Seeking has finished
-    connect(this, &MythPlayerUI::SeekingComplete, [=]()
+    connect(this, &MythPlayerUI::SeekingComplete, [&]()
     {
         m_osdLock.lock();
         m_osd.HideWindow(OSD_WIN_MESSAGE);
@@ -79,11 +79,9 @@ bool MythPlayerUI::StartPlaying()
         return false;
     }
 
-    bool seek = m_bookmarkSeek > 30;
     EventStart();
     DecoderStart(true);
-    if (seek)
-        InitialSeek();
+    InitialSeek();
     VideoStart();
 
     m_playerThread->setPriority(QThread::TimeCriticalPriority);

@@ -28,6 +28,8 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeOSDText(const QString &Window, const InfoMap &Map, OSDTimeout Timeout);
     void ChangeOSDDialog(const MythOSDDialogData& Data);
     void ChangeOSDMessage(const QString& Message);
+    void DialogQuit();
+    void HideAll(bool KeepSubs = true, MythScreenType* Except = nullptr, bool DropNotification = false);
 
     // Audio
     void ReinitAudio();
