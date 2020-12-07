@@ -210,6 +210,7 @@ static bool resetTheme(QString themedir, const QString &badtheme)
 
 static int reloadTheme(void)
 {
+    GetMythUI()->InitThemeHelper();
     QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
@@ -222,11 +223,8 @@ static int reloadTheme(void)
     MythTranslation::reload();
 
     GetMythMainWindow()->SetEffectsEnabled(false);
-
     if (menu)
-    {
         menu->Close();
-    }
     GetMythMainWindow()->Init();
     GetMythMainWindow()->ReinitDone();
     GetMythMainWindow()->SetEffectsEnabled(true);
