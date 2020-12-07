@@ -2120,11 +2120,6 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
     return key_target;
 }
 
-int MythMainWindow::GetDrawInterval() const
-{
-    return static_cast<int>((1000.0 / 60.0) + 0.5);
-}
-
 void MythMainWindow::RestartInputHandlers(void)
 {
     m_deviceHandler->Reset();

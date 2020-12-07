@@ -115,7 +115,6 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
     static bool IsTopScreenInitialized(void);
     void RemoteScreenShot(QString filename, int x, int y);
     void AllowInput(bool allow);
-    int  GetDrawInterval() const;
     void RestartInputHandlers(void);
     uint PushDrawDisabled(void);
     uint PopDrawDisabled(void);
