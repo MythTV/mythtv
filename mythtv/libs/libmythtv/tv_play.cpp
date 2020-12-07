@@ -3004,7 +3004,7 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
         return TVPlaybackState::eventFilter(Object, Event);
 
     QScopedPointer<QEvent> sNewEvent(nullptr);
-    if (m_mainWindow->keyLongPressFilter(&Event, sNewEvent))
+    if (m_mainWindow->KeyLongPressFilter(&Event, sNewEvent))
         return true;
 
     if (QEvent::KeyPress == Event->type())

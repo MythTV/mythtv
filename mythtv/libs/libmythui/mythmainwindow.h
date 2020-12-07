@@ -22,7 +22,7 @@ class MythMediaDevice;
 #define REG_JUMPEX(a, b, c, d, e) GetMythMainWindow()->RegisterJump(a, b, c, d, e)
 #define REG_MEDIAPLAYER(a,b,c) GetMythMainWindow()->RegisterMediaPlugin(a, b, c)
 
-using MediaPlayCallback = int (*)(const QString &, const QString &, const QString &, const QString &, const QString &, int, int, const QString &, int, const QString &, const QString &, bool);
+using MediaPlayCallback = int (*)(const QString& , const QString& , const QString& , const QString& , const QString& , int, int, const QString& , int, const QString& , const QString& , bool);
 
 class MythScreenSaverControl;
 class MythDisplay;
@@ -41,134 +41,126 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
 
   public:
     enum {drawRefresh = 70};
+    void Init(bool MayReInit = true);
+    void ReinitDone();
+    void Show();
+    void MoveResize(QRect& Geometry);
 
-    void Init(bool mayReInit = true);
-    void ReinitDone(void);
-    void Show(void);
-    void MoveResize(QRect &Geometry);
-
-    void AddScreenStack(MythScreenStack *stack, bool main = false);
+    void AddScreenStack(MythScreenStack* Stack, bool Main = false);
     void PopScreenStack();
-    int GetStackCount(void);
-    MythScreenStack *GetMainStack();
-    MythScreenStack *GetStack(const QString &stackname);
-    MythScreenStack *GetStackAt(int pos);
+    int GetStackCount();
+    MythScreenStack* GetMainStack();
+    MythScreenStack* GetStack(const QString& Stackname);
+    MythScreenStack* GetStackAt(int Position);
 
-    bool TranslateKeyPress(const QString &context, QKeyEvent *e,
-                           QStringList &actions, bool allowJumps = true);
-    bool keyLongPressFilter(QEvent **e,
-        QScopedPointer<QEvent> &sNewEvent);
+    bool TranslateKeyPress(const QString& Context, QKeyEvent* Event,
+                           QStringList& Actions, bool AllowJumps = true);
+    bool KeyLongPressFilter(QEvent** Event, QScopedPointer<QEvent>& NewEvent);
 
-    void ReloadKeys(void);
-    void ClearKey(const QString &context, const QString &action);
-    void ClearKeyContext(const QString &context);
-    void BindKey(const QString &context, const QString &action,
-                 const QString &key);
-    void RegisterKey(const QString &context, const QString &action,
-                     const QString &description, const QString &key);
-    static QString GetKey(const QString &context, const QString &action);
-    QObject *getTarget(QKeyEvent &key);
-    QString GetActionText(const QString &context, const QString &action) const;
+    void ReloadKeys();
+    void ClearKey(const QString& Context, const QString& Action);
+    void ClearKeyContext(const QString& Context);
+    void BindKey(const QString& Context, const QString& Action, const QString& Key);
+    void RegisterKey(const QString& Context, const QString& Action,
+                     const QString& Description, const QString& Key);
+    static QString GetKey(const QString& Context, const QString& Action);
+    QObject* GetTarget(QKeyEvent& Key);
+    QString GetActionText(const QString& Context, const QString& Action) const;
 
-    void ClearJump(const QString &destination);
-    void BindJump(const QString &destination, const QString &key);
-    void RegisterJump(const QString &destination, const QString &description,
-                      const QString &key, void (*callback)(void),
-                      bool exittomain = true, QString localAction = "");
+    void ClearJump(const QString& Destination);
+    void BindJump(const QString& Destination, const QString& Key);
+    void RegisterJump(const QString& Destination, const QString& Description,
+                      const QString& Key, void (*Callback)(void),
+                      bool Exittomain = true, QString LocalAction = "");
     void ClearAllJumps();
+    void RegisterMediaPlugin(const QString& Name, const QString& Desc,
+                             MediaPlayCallback Func);
+    bool HandleMedia(const QString& Handler, const QString& Mrl,
+                     const QString& Plot="", const QString& Title="",
+                     const QString& Subtitle="", const QString& Director="",
+                     int Season=0, int Episode=0, const QString& Inetref="",
+                     int LenMins=120, const QString& Year="1895",
+                     const QString& Id="", bool UseBookmarks = false);
+    void HandleTVAction(const QString& Action);
 
-    void RegisterMediaPlugin(const QString &name, const QString &desc,
-                             MediaPlayCallback fn);
+    void JumpTo(const QString& Destination, bool Pop = true);
+    bool DestinationExists(const QString& Destination) const;
+    QStringList EnumerateDestinations() const;
 
-    bool HandleMedia(const QString& handler, const QString& mrl,
-                     const QString& plot="", const QString& title="",
-                     const QString& subtitle="", const QString& director="",
-                     int season=0, int episode=0, const QString& inetref="",
-                     int lenMins=120, const QString& year="1895",
-                     const QString &id="", bool useBookmarks = false);
-    void HandleTVAction(const QString &Action);
+    bool IsExitingToMain() const;
 
-    void JumpTo(const QString &destination, bool pop = true);
-    bool DestinationExists(const QString &destination) const;
-    QStringList EnumerateDestinations(void) const;
-
-    bool IsExitingToMain(void) const;
-
-    static MythMainWindow *getMainWindow(bool useDB = true);
+    static MythMainWindow *getMainWindow(bool UseDB = true);
     static void destroyMainWindow();
 
     MythDisplay* GetDisplay();
-    MythPainter *GetPainter();
-    QWidget     *GetPaintWindow();
-    MythRender  *GetRenderDevice();
-    MythNotificationCenter *GetCurrentNotificationCenter();
+    MythPainter* GetPainter();
+    QWidget*     GetPaintWindow();
+    MythRender*  GetRenderDevice();
+    MythNotificationCenter* GetCurrentNotificationCenter();
     void         ShowPainterWindow();
     void         HidePainterWindow();
-
-    static void GrabWindow(QImage &image);
-    static bool SaveScreenShot(const QImage &image, QString filename = "");
-    static bool ScreenShot(int w = 0, int h = 0, QString filename = "");
-    static void RestoreScreensaver();
-    static void DisableScreensaver();
-    static void ResetScreensaver();
-    static bool IsScreensaverAsleep();
-    static bool IsTopScreenInitialized(void);
-    void RemoteScreenShot(QString filename, int x, int y);
-    void AllowInput(bool allow);
-    void RestartInputHandlers(void);
-    uint PushDrawDisabled(void);
-    uint PopDrawDisabled(void);
-    void SetEffectsEnabled(bool enable);
-    void Draw(MythPainter *Painter = nullptr);
-
+    static void  GrabWindow(QImage& Image);
+    static bool  SaveScreenShot(const QImage& Image, QString Filename = "");
+    static bool  ScreenShot(int Width = 0, int Height = 0, QString Filename = "");
+    static void  RestoreScreensaver();
+    static void  DisableScreensaver();
+    static void  ResetScreensaver();
+    static bool  IsScreensaverAsleep();
+    static bool  IsTopScreenInitialized();
+    void RemoteScreenShot(QString Filename, int Width, int Height);
+    void AllowInput(bool Allow);
+    void RestartInputHandlers();
+    uint PushDrawDisabled();
+    uint PopDrawDisabled();
+    void SetEffectsEnabled(bool Enable);
+    void Draw(MythPainter* Painter = nullptr);
     void ResetIdleTimer();
     void PauseIdleTimer(bool Pause);
     void DisableIdleTimer(bool DisableIdle = true);
-    void EnterStandby(bool manual = true);
-    void ExitStandby(bool manual = true);
+    void EnterStandby(bool Manual = true);
+    void ExitStandby(bool Manual = true);
 
-    QPaintEngine *paintEngine() const override; // QWidget
+    QPaintEngine* paintEngine() const override;
 
   public slots:
-    void mouseTimeout();
+    void MouseTimeout();
     void HideMouseTimeout();
     void IdleTimeout();
 
   protected slots:
-    void animate();
-    void doRemoteScreenShot(const QString& filename, int x, int y);
-    void SetDrawEnabled(bool enable);
-    void onApplicationStateChange(Qt::ApplicationState state);
+    void Animate();
+    void DoRemoteScreenShot(const QString& Filename, int Width, int Height);
+    void SetDrawEnabled(bool Enable);
+    void OnApplicationStateChange(Qt::ApplicationState State);
 
   signals:
-    void signalRemoteScreenShot(QString filename, int x, int y);
-    void signalSetDrawEnabled(bool enable);
-    void signalWindowReady(void);
-    void signalRestoreScreensaver();
-    void signalDisableScreensaver();
-    void signalResetScreensaver();
+    void SignalRemoteScreenShot(QString Filename, int Width, int Height);
+    void SignalSetDrawEnabled(bool Enable);
+    void SignalWindowReady();
+    void SignalRestoreScreensaver();
+    void SignalDisableScreensaver();
+    void SignalResetScreensaver();
 
   protected:
-    explicit MythMainWindow(bool useDB = true);
+    explicit MythMainWindow(bool UseDB = true);
     ~MythMainWindow() override;
 
     static void LoadQtConfig();
-    void InitKeys(void);
+    void InitKeys();
 
-    bool eventFilter(QObject *watched, QEvent *e) override; // QWidget
-    void customEvent(QEvent *ce) override; // QWidget
-    void closeEvent(QCloseEvent *e) override; // QWidget
+    bool eventFilter(QObject* Watched, QEvent* Event) override;
+    void customEvent(QEvent* Event) override;
+    void closeEvent(QCloseEvent* Event) override;
     void drawScreen(QPaintEvent* Event = nullptr);
-    bool event(QEvent* e) override; // QWidget
+    bool event(QEvent* Event) override;
     void ExitToMainMenu();
-    void ShowMouseCursor(bool show);
-
-    MythMainWindowPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
+    void ShowMouseCursor(bool Show);
 
   private slots:
-    void DelayedAction(void);
+    void DelayedAction();
 
   private:
+    MythMainWindowPrivate* m_priv      { nullptr };
     MythDisplay*       m_display       { nullptr };
     QRegion            m_repaintRegion;
     QTimer             m_refreshTimer;
@@ -178,17 +170,15 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
     MythPainterWindow* m_painterWin    { nullptr };
     MythPainterWindow* m_oldPainterWin { nullptr };
     MythInputDeviceHandler* m_deviceHandler { nullptr };
-    MythScreenSaverControl *m_screensaver { nullptr };
+    MythScreenSaverControl* m_screensaver   { nullptr };
     QTimer             m_idleTimer;
     int                m_idleTime      { 0 };
 };
 
-MUI_PUBLIC MythMainWindow *GetMythMainWindow();
+MUI_PUBLIC MythMainWindow* GetMythMainWindow();
 MUI_PUBLIC bool HasMythMainWindow();
 MUI_PUBLIC void DestroyMythMainWindow();
-
-MUI_PUBLIC MythPainter *GetMythPainter();
-
-MUI_PUBLIC MythNotificationCenter *GetNotificationCenter();
+MUI_PUBLIC MythPainter* GetMythPainter();
+MUI_PUBLIC MythNotificationCenter* GetNotificationCenter();
 
 #endif

@@ -113,7 +113,7 @@ void MythInputDeviceHandler::Start(void)
 
 void MythInputDeviceHandler::Stop(bool Finishing /* = true */)
 {
-    Q_UNUSED(Finishing); // depending on #ifdefs
+    Q_UNUSED(Finishing) // depending on #ifdefs
     LOG(VB_GENERAL, LOG_INFO, LOC + "Stopping");
 
 #ifdef USING_LIBCEC
@@ -209,7 +209,7 @@ void MythInputDeviceHandler::MainWindowReady(void)
 
 void MythInputDeviceHandler::customEvent(QEvent* Event)
 {
-    Q_UNUSED(Event); // depending on #ifdefs
+    Q_UNUSED(Event) // depending on #ifdefs
 
     if (m_ignoreKeys)
         return;
@@ -231,7 +231,7 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
             key = QKeyEvent(jke->isKeyDown() ? QEvent::KeyPress : QEvent::KeyRelease,
                             (keycode & static_cast<int>(~Qt::MODIFIER_MASK)),
                             Qt::KeyboardModifiers(keycode & static_cast<int>(Qt::MODIFIER_MASK)));
-            target = m_parent->getTarget(key);
+            target = m_parent->GetTarget(key);
         }
         else
         {
@@ -254,7 +254,7 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
         else
         {
             key = QKeyEvent(lke->keytype(), lke->key(), lke->modifiers(), lke->text());
-            target = m_parent->getTarget(key);
+            target = m_parent->GetTarget(key);
         }
     }
 #endif

@@ -11,7 +11,7 @@ MythScreenSaverWayland::MythScreenSaverWayland(QObject* Parent, MythMainWindow *
   : MythScreenSaver(Parent),
     m_window(MainWindow)
 {
-    connect(m_window, &MythMainWindow::signalWindowReady, this, &MythScreenSaverWayland::WindowReady);
+    connect(m_window, &MythMainWindow::SignalWindowReady, this, &MythScreenSaverWayland::WindowReady);
 }
 
 MythScreenSaverWayland::~MythScreenSaverWayland()
