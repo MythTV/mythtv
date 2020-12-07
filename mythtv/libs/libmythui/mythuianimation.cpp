@@ -99,13 +99,11 @@ void MythUIAnimation::IncrementCurrentTime(void)
     if (!m_active)
         return;
 
-    int time = currentTime();
-    if (direction() == Forward)
-        time += GetMythMainWindow()->GetDrawInterval();
-    else
-        time -= GetMythMainWindow()->GetDrawInterval();
+    int64_t current = QDateTime::currentMSecsSinceEpoch();
+    int interval = std::min(static_cast<int>(current - m_lastUpdate), 50);
+    m_lastUpdate = current;
 
-    setCurrentTime(time);
+    setCurrentTime(currentTime() + ((direction() == Forward) ? interval : -interval));
 
     if (endValue() == currentValue())
     {

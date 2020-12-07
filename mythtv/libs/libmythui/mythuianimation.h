@@ -2,6 +2,7 @@
 #define MYTHUIANIMATION_H
 
 #include "xmlparsebase.h"
+#include <QDateTime>
 #include <QVariantAnimation>
 
 class MythUIType;
@@ -84,6 +85,7 @@ class MythUIAnimation : public QVariantAnimation, XMLParseBase
     bool        m_active       {false};
     bool        m_looped       {false};
     bool        m_reversible   {false};
+    int64_t     m_lastUpdate   { QDateTime::currentMSecsSinceEpoch() };
 };
 
 #endif // MYTHUIANIMATION_H
