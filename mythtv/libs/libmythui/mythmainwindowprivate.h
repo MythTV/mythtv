@@ -7,7 +7,6 @@
 #include "mythgesture.h"
 
 class MythScreenStack;
-class MythSignalingTimer;
 class MythUDPListener;
 class MythMediaDevice;
 
@@ -71,8 +70,6 @@ class MythMainWindowPrivate
     MythMediaDevice * m_mediaDeviceForCallback { nullptr };
 
     int      m_escapekey                 { 0       };
-    int      m_drawInterval              { 1000 / MythMainWindow::drawRefresh };
-    MythSignalingTimer *m_drawTimer      { nullptr };
     QVector<MythScreenStack *> m_stackList;
     MythScreenStack *m_mainStack         { nullptr };
     MythGesture      m_gesture;
@@ -80,7 +77,6 @@ class MythMainWindowPrivate
     QTimer          *m_hideMouseTimer    { nullptr };
     QMutex           m_drawDisableLock;
     uint             m_drawDisabledDepth { 0       };
-    bool             m_drawEnabled       { true    };
     MythUDPListener *m_udpListener       { nullptr };
     MythNotificationCenter *m_nc         { nullptr };
     bool             m_standby           { false   };

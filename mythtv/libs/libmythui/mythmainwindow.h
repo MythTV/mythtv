@@ -172,7 +172,7 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
   private:
     MythDisplay*       m_display       { nullptr };
     QRegion            m_repaintRegion;
-
+    QTimer             m_refreshTimer;
     MythThemeBase*     m_themeBase     { nullptr };
     MythPainter*       m_painter       { nullptr };
     MythPainter*       m_oldPainter    { nullptr };

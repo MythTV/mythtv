@@ -31,7 +31,6 @@
 #include "mythevent.h"
 #include "mythdirs.h"
 #include "compat.h"
-#include "mythsignalingtimer.h"
 #include "mythcorecontext.h"
 #include "mythmedia.h"
 #include "mythmiscutil.h"
@@ -175,15 +174,11 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->m_hideMouseTimer->setSingleShot(true);
     d->m_hideMouseTimer->setInterval(3s);
     connect(d->m_hideMouseTimer, &QTimer::timeout, this, &MythMainWindow::HideMouseTimeout);
-
-    // MythSignalingTimer is scheduled for the scrap heap (it
-    // addresses a problem that no longer exists and we will move to
-    // the regular/builtin Qt timing)
-    d->m_drawTimer = new MythSignalingTimer(this, &MythMainWindow::animate);
-    d->m_drawTimer->start(d->m_drawInterval);
-
     d->m_allowInput = true;
-    d->m_drawEnabled = true;
+    connect(&m_refreshTimer, &QTimer::timeout, this, &MythMainWindow::animate);
+    m_refreshTimer.setInterval(17ms);
+    m_refreshTimer.start();
+    setUpdatesEnabled(true);
 
     connect(this, &MythMainWindow::signalRemoteScreenShot,this, &MythMainWindow::doRemoteScreenShot,
             Qt::BlockingQueuedConnection);
@@ -220,8 +215,6 @@ MythMainWindow::~MythMainWindow()
 
     if (gCoreContext != nullptr)
         gCoreContext->removeListener(this);
-
-    d->m_drawTimer->stop();
 
     while (!d->m_stackList.isEmpty())
     {
@@ -346,10 +339,8 @@ MythScreenStack* MythMainWindow::GetStackAt(int pos)
 
 void MythMainWindow::animate(void)
 {
-    if (!d->m_drawEnabled || !m_painterWin)
+    if (!(m_painterWin && updatesEnabled()))
         return;
-
-    d->m_drawTimer->blockSignals(true);
 
     bool redraw = false;
 
@@ -382,13 +373,11 @@ void MythMainWindow::animate(void)
 
     for (auto *widget : qAsConst(d->m_stackList))
         widget->ScheduleInitIfNeeded();
-
-    d->m_drawTimer->blockSignals(false);
 }
 
 void MythMainWindow::drawScreen(QPaintEvent* Event)
 {
-    if (!d->m_drawEnabled)
+    if (!(m_painterWin && updatesEnabled()))
         return;
 
     if (Event)
@@ -738,7 +727,6 @@ void MythMainWindow::Init(bool mayReInit)
     {
         m_oldPainterWin = m_painterWin;
         m_painterWin = nullptr;
-        d->m_drawTimer->stop();
     }
 
     if (m_painter)
@@ -981,7 +969,6 @@ void MythMainWindow::ReinitDone(void)
     MythPainterWindow::DestroyPainters(m_oldPainterWin, m_oldPainter);
     ShowPainterWindow();
     MoveResize(m_screenRect);
-    d->m_drawTimer->start(1000 / drawRefresh);
 }
 
 void MythMainWindow::Show(void)
@@ -1011,7 +998,7 @@ uint MythMainWindow::PushDrawDisabled(void)
 {
     QMutexLocker locker(&d->m_drawDisableLock);
     d->m_drawDisabledDepth++;
-    if (d->m_drawDisabledDepth && d->m_drawEnabled)
+    if (d->m_drawDisabledDepth && updatesEnabled())
         SetDrawEnabled(false);
     return d->m_drawDisabledDepth;
 }
@@ -1022,7 +1009,7 @@ uint MythMainWindow::PopDrawDisabled(void)
     if (d->m_drawDisabledDepth)
     {
         d->m_drawDisabledDepth--;
-        if (!d->m_drawDisabledDepth && !d->m_drawEnabled)
+        if (!d->m_drawDisabledDepth && !updatesEnabled())
             SetDrawEnabled(true);
     }
     return d->m_drawDisabledDepth;
@@ -1037,8 +1024,6 @@ void MythMainWindow::SetDrawEnabled(bool enable)
     }
 
     setUpdatesEnabled(enable);
-    d->m_drawEnabled = enable;
-
     if (enable)
     {
         if (d->m_pendingUpdate)
@@ -1046,13 +1031,11 @@ void MythMainWindow::SetDrawEnabled(bool enable)
             QApplication::postEvent(this, new QEvent(QEvent::UpdateRequest), Qt::LowEventPriority);
             d->m_pendingUpdate = false;
         }
-        d->m_drawTimer->start(1000 / drawRefresh);
         ShowPainterWindow();
     }
     else
     {
         HidePainterWindow();
-        d->m_drawTimer->stop();
     }
 }
 
@@ -2139,7 +2122,7 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
 
 int MythMainWindow::GetDrawInterval() const
 {
-    return d->m_drawInterval;
+    return static_cast<int>((1000.0 / 60.0) + 0.5);
 }
 
 void MythMainWindow::RestartInputHandlers(void)
