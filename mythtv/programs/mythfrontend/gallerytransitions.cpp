@@ -194,14 +194,12 @@ void GroupTransition::SetSpeed(float speed)
 }
 
 
-/*!
- \brief Update group transition
- \param interval Millisecs since last update
+/*! \brief Update group transition
 */
-void GroupTransition::Pulse(int interval)
+void GroupTransition::Pulse()
 {
     if (m_animation)
-        m_animation->Pulse(interval);
+        m_animation->Pulse();
 }
 
 

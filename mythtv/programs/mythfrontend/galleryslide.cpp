@@ -70,22 +70,21 @@ void Animation::Start(bool forwards, float speed)
 }
 
 
-/*!
- \brief Progress single animation
- \param interval Millisecs since last update
+/*! \brief Progress single animation
 */
-void Animation::Pulse(int interval)
+void Animation::Pulse()
 {
     if (!m_running)
         return;
 
-    m_elapsed += (m_forwards ? interval : -interval) * m_speed;
-
+    int64_t current = QDateTime::currentMSecsSinceEpoch();
+    int interval = std::max(static_cast<int>(current - m_lastUpdate), 50);
+    m_lastUpdate = current;
+    m_elapsed += (m_forwards ? interval : -interval) * static_cast<int>(m_speed);
     setCurrentTime(m_elapsed);
 
     // Detect completion
-    if ((m_forwards && m_elapsed >= duration())
-            || (!m_forwards && m_elapsed <= 0))
+    if ((m_forwards && m_elapsed >= duration()) || (!m_forwards && m_elapsed <= 0))
         Finished();
 }
 
@@ -136,17 +135,15 @@ void GroupAnimation::Clear()
 }
 
 
-/*!
- \brief Progress sequential animation
- \param interval Millisecs since last update
+/*! \brief Progress sequential animation
 */
-void SequentialAnimation::Pulse(int interval)
+void SequentialAnimation::Pulse()
 {
     if (!m_running || m_current < 0 || m_current >= m_group.size())
         return;
 
     // Pulse current running child
-    m_group.at(m_current)->Pulse(interval);
+    m_group.at(m_current)->Pulse();
 }
 
 
@@ -200,17 +197,15 @@ void SequentialAnimation::Finished()
 }
 
 
-/*!
- \brief Progress parallel animations
- \param interval Millisecs since last update
+/*! \brief Progress parallel animations
 */
-void ParallelAnimation::Pulse(int interval)
+void ParallelAnimation::Pulse()
 {
     if (m_running)
     {
         // Pulse all children
         for (AbstractAnimation *animation : qAsConst(m_group))
-            animation->Pulse(interval);
+            animation->Pulse();
     }
 }
 
@@ -563,10 +558,10 @@ void Slide::Pulse()
 {
     // Update zoom/pan animations
     if (m_zoomAnimation)
-        m_zoomAnimation->Pulse(GetMythMainWindow()->GetDrawInterval());
+        m_zoomAnimation->Pulse();
 
     if (m_panAnimation)
-        m_panAnimation->Pulse(GetMythMainWindow()->GetDrawInterval());
+        m_panAnimation->Pulse();
 }
 
 

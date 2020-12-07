@@ -32,7 +32,7 @@ public:
     virtual void Start(bool forwards, float speed = 1.0);
     virtual void Stop()                 { m_running = false; }
     virtual void SetSpeed(float speed) { m_speed = speed; }
-    virtual void Pulse(int interval)   = 0;
+    virtual void Pulse() = 0;
     virtual void Clear()                {}
 
 protected slots:
@@ -66,7 +66,7 @@ public:
     explicit Animation(Slide *image, Type type = Alpha)
         : m_parent(image), m_type(type) {}
     void Start(bool forwards = true, float speed = 1.0) override; // AbstractAnimation
-    void Pulse(int interval) override; // AbstractAnimation
+    void Pulse() override; // AbstractAnimation
     void Set(const QVariant& from, const QVariant& to,
              int duration = 500,
              const QEasingCurve& curve = QEasingCurve::InOutCubic,
@@ -83,6 +83,7 @@ protected:
     //! Current millisec position within animation, 0..duration.
     //! Decreases duration..0 when playing backwards
     int               m_elapsed {0};
+    int64_t           m_lastUpdate { QDateTime::currentMSecsSinceEpoch() };
 };
 
 
@@ -92,7 +93,7 @@ class GroupAnimation : public AbstractAnimation
 public:
     GroupAnimation() = default;
     ~GroupAnimation() override                        { GroupAnimation::Clear(); }
-    void Pulse(int interval) override                     = 0; // AbstractAnimation
+    void Pulse() override                     = 0; // AbstractAnimation
     void Start(bool forwards, float speed = 1.0) override      // AbstractAnimation
         { AbstractAnimation::Start(forwards, speed); }
     void SetSpeed(float speed) override                        // AbstractAnimation
@@ -112,7 +113,7 @@ class SequentialAnimation : public GroupAnimation
     Q_OBJECT
 public:
     SequentialAnimation() = default;
-    void Pulse(int interval) override; // GroupAnimation
+    void Pulse() override; // GroupAnimation
     void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
     void SetSpeed(float speed) override; // GroupAnimation
 
@@ -130,7 +131,7 @@ class ParallelAnimation : public GroupAnimation
     Q_OBJECT
 public:
     ParallelAnimation() = default;
-    void Pulse(int interval) override; // GroupAnimation
+    void Pulse() override; // GroupAnimation
     void Start(bool forwards, float speed = 1.0) override; // GroupAnimation
     void SetSpeed(float speed) override; // GroupAnimation
 

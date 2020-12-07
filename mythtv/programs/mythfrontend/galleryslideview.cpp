@@ -120,8 +120,7 @@ bool GallerySlideView::Create()
 void GallerySlideView::Pulse()
 {
     // Update transition animations
-    m_transition.Pulse(GetMythMainWindow()->GetDrawInterval());
-
+    m_transition.Pulse();
     MythScreenType::Pulse();
 }
 
