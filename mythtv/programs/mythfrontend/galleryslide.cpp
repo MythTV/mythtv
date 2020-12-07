@@ -78,7 +78,7 @@ void Animation::Pulse()
         return;
 
     int64_t current = QDateTime::currentMSecsSinceEpoch();
-    int interval = std::max(static_cast<int>(current - m_lastUpdate), 50);
+    int interval = std::min(static_cast<int>(current - m_lastUpdate), 50);
     m_lastUpdate = current;
     m_elapsed += (m_forwards ? interval : -interval) * static_cast<int>(m_speed);
     setCurrentTime(m_elapsed);
