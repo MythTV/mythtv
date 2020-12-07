@@ -1210,7 +1210,7 @@ static bool RunMenu(const QString& themedir, const QString& themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     g_menu = new MythThemedMenu(QString(tmp.constData()), "mainmenu.xml",
-                              GetMythMainWindow()->GetMainStack(), "mainmenu");
+                                GetMythMainWindow()->GetMainStack(), "mainmenu");
 
     if (g_menu->foundTheme())
     {
@@ -1221,11 +1221,10 @@ static bool RunMenu(const QString& themedir, const QString& themename)
         return true;
     }
 
-    LOG(VB_GENERAL, LOG_ERR,
-        QString("Couldn't find mainmenu.xml for theme '%1'") .arg(themename));
+    LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find mainmenu.xml for theme '%1'")
+        .arg(themename));
     delete g_menu;
     g_menu = nullptr;
-
     return false;
 }
 
@@ -1388,9 +1387,8 @@ static bool resetTheme(QString themedir, const QString &badtheme)
     if (badtheme == DEFAULT_UI_THEME)
         themename = FALLBACK_UI_THEME;
 
-    LOG(VB_GENERAL, LOG_WARNING,
-        QString("Overriding broken theme '%1' with '%2'")
-            .arg(badtheme).arg(themename));
+    LOG(VB_GENERAL, LOG_WARNING, QString("Overriding broken theme '%1' with '%2'")
+        .arg(badtheme).arg(themename));
 
     gCoreContext->OverrideSettingForSession("Theme", themename);
     themedir = GetMythUI()->FindThemeDir(themename);
@@ -1405,9 +1403,7 @@ static bool resetTheme(QString themedir, const QString &badtheme)
 
 static int reloadTheme(void)
 {
-
 #ifdef Q_OS_ANDROID
-
     // jni code to launch the application again
     // reinitializing the main windows causes a segfault
     // with android
@@ -1456,26 +1452,23 @@ static int reloadTheme(void)
     //     popupStack->AddScreen(okPopup);
     return 0;
 #else
-
+    GetMythUI()->InitThemeHelper();
     QString themename = gCoreContext->GetSetting("Theme", DEFAULT_UI_THEME);
-    QString themedir = GetMythUI()->FindThemeDir(themename);
+    QString themedir  = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find theme '%1'")
-                .arg(themename));
+        LOG(VB_GENERAL, LOG_ERR, QString("Couldn't find theme '%1'").arg(themename));
         return GENERIC_EXIT_NO_THEME;
     }
 
     gCoreContext->ReInitLocale();
     MythTranslation::reload();
-
     GetMythMainWindow()->SetEffectsEnabled(false);
     if (g_menu)
         g_menu->Close();
     GetMythMainWindow()->Init();
     GetMythMainWindow()->ReinitDone();
     GetMythMainWindow()->SetEffectsEnabled(true);
-
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
         return GENERIC_EXIT_NO_THEME;
 
@@ -1487,7 +1480,7 @@ static int reloadTheme(void)
     }
 
     return 0;
-#endif // Q_OS_ANDROID else
+#endif
 }
 
 static void reloadTheme_void(void)
@@ -2164,12 +2157,12 @@ int main(int argc, char **argv)
     }
 
     // Provide systemd ready notification (for type=notify units)
-    fe_sd_notify("STATUS=");
-    fe_sd_notify("READY=1");
+    fe_sd_notify("STATUS=")
+    fe_sd_notify("READY=1")
 
     int ret = QCoreApplication::exec();
 
-    fe_sd_notify("STOPPING=1\nSTATUS=Exiting");
+    fe_sd_notify("STOPPING=1\nSTATUS=Exiting")
     if (ret==0)
         gContext-> saveSettingsCache();
 
