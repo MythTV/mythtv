@@ -903,9 +903,8 @@ void MythPlayerUI::ChangeOSDDebug()
 
 void MythPlayerUI::EnableFrameRateMonitor(bool Enable)
 {
-    bool verbose = VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_ANY);
-    double rate = Enable ? m_videoFrameRate : verbose ? (m_videoFrameRate * 4) : 0.0;
-    m_outputJmeter.SetNumCycles(static_cast<int>(rate));
+    bool enable = VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_ANY) || Enable;
+    m_outputJmeter.SetNumCycles(enable ? static_cast<int>(m_videoFrameRate) : 0);
 }
 
 /* JumpToStream, JumpToProgram and SwitchToProgram all need to be moved into the
