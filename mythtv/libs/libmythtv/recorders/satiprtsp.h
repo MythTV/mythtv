@@ -147,9 +147,9 @@ class SatIPRTSP : public QObject
     bool m_hasLock          {false};
     int  m_signalStrength   {0};
 
-    SatIPRTSPReadHelper  *m_readhelper        {nullptr};
-    SatIPRTSPWriteHelper *m_writehelper       {nullptr};
-    SatIPRTCPReadHelper  *m_rtcpReadhelper    {nullptr};
+    SatIPRTSPReadHelper  *m_readHelper        {nullptr};
+    SatIPRTSPWriteHelper *m_writeHelper       {nullptr};
+    SatIPRTCPReadHelper  *m_rtcpReadHelper    {nullptr};
 };
 
 #endif // SATIPRTSP_H

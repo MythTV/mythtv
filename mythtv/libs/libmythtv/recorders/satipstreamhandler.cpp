@@ -22,6 +22,7 @@
 
 #define LOC QString("SatIPSH[%1]: ").arg(m_inputId)
 
+// For implementing Get & Return
 QMap<QString, SatIPStreamHandler*> SatIPStreamHandler::s_handlers;
 QMap<QString, uint>                SatIPStreamHandler::s_handlersRefCnt;
 QMutex                             SatIPStreamHandler::s_handlersLock;
@@ -34,14 +35,14 @@ SatIPStreamHandler *SatIPStreamHandler::Get(const QString &devname, int inputid)
 
     if (it == s_handlers.end())
     {
-        LOG(VB_RECORD, LOG_INFO,
-            QString("SatIPSH[%1]: Creating new stream handler for %2")
-            .arg(inputid).arg(devname));
-
         auto *newhandler = new SatIPStreamHandler(devname, inputid);
         newhandler->Open();
         s_handlers[devname] = newhandler;
         s_handlersRefCnt[devname] = 1;
+
+        LOG(VB_RECORD, LOG_INFO,
+            QString("SatIPSH[%1]: Creating new stream handler for %2")
+            .arg(inputid).arg(devname));
     }
     else
     {
@@ -51,7 +52,7 @@ SatIPStreamHandler *SatIPStreamHandler::Get(const QString &devname, int inputid)
 
         LOG(VB_RECORD, LOG_INFO,
             QString("SatIPSH[%1]: Using existing stream handler for %2").arg(inputid).arg(devname) +
-            QString(" (%1 in use)").arg(rcount));
+            QString(" (%1 users)").arg(rcount));
     }
 
     return s_handlers[devname];
@@ -71,7 +72,7 @@ void SatIPStreamHandler::Return(SatIPStreamHandler * & ref, int inputid)
         return;
     }
 
-    LOG(VB_RECORD, LOG_INFO, QString("SatIPSH[%1]: Return(%2) has %3 handlers")
+    LOG(VB_RECORD, LOG_INFO, QString("SatIPSH[%1]: Return stream handler for %2 (%3 users)")
         .arg(inputid).arg(devname).arg(*rit));
 
     if (*rit > 1)
@@ -110,9 +111,8 @@ SatIPStreamHandler::SatIPStreamHandler(const QString &device, int inputid)
 {
     setObjectName("SatIPStreamHandler");
 
-    LOG(VB_RECORD, LOG_DEBUG,
-        QString("SatIPSH[%1] ctor device:%2")
-            .arg(inputid).arg(device));
+    LOG(VB_RECORD, LOG_DEBUG, LOC +
+        QString("ctor for %2").arg(device));
 }
 
 bool SatIPStreamHandler::UpdateFilters(void)
@@ -138,13 +138,14 @@ bool SatIPStreamHandler::UpdateFilters(void)
     LOG(VB_RECORD, LOG_DEBUG, LOC + msg);
 #endif // DEBUG_PID_FILTERS
 
+    bool rval = true;
     if (m_rtsp && m_oldpids != pids)
     {
-        m_rtsp->Play(pids);
+        rval = m_rtsp->Play(pids);
         m_oldpids = pids;
     }
 
-    return true;
+    return rval;
 }
 
 void SatIPStreamHandler::run(void)
@@ -205,11 +206,12 @@ void SatIPStreamHandler::run(void)
         m_oldtuningurl = "";
     }
 
+    LOG(VB_RECORD, LOG_INFO, LOC + "RunTS(): end");
     SetRunning(false, false, false);
     RunEpilog();
 }
 
-void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
+bool SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Tune %1").arg(tuning.m_frequency));
 
@@ -252,6 +254,7 @@ void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
     else
     {
         LOG(VB_RECORD, LOG_ERR, LOC + QString("Unhandled m_tunerType %1 %2").arg(m_tunerType).arg(m_tunerType.toString()));
+        return false;
     }
 
     QUrl url = QUrl(m_baseurl);
@@ -263,30 +266,40 @@ void SatIPStreamHandler::Tune(const DTVMultiplex &tuning)
 
     if (m_tuningurl == m_oldtuningurl)
     {
-        LOG(VB_RECORD, LOG_INFO, LOC + QString("Skip tuning, already tuned to this url."));
-        return;
+        LOG(VB_RECORD, LOG_INFO, LOC + QString("Skip tuning, already tuned to this url"));
+        return true;
     }
 
     // Need SETUP and PLAY (with pids=none) to get RTSP packets with tuner lock info
     if (m_rtsp)
     {
+        bool rval = true;
+
         // TEARDOWN command
         if (m_setupinvoked)
         {
-            m_rtsp->Teardown();
+            rval = m_rtsp->Teardown();
             m_setupinvoked = false;
         }
 
         // SETUP command
-        m_rtsp->Setup(m_tuningurl);
-        m_oldtuningurl = m_tuningurl;
-        m_setupinvoked = true;
+        if (rval)
+        {
+            rval = m_rtsp->Setup(m_tuningurl);
+            m_oldtuningurl = m_tuningurl;
+            m_setupinvoked = true;
+        }
 
         // PLAY command
-        QStringList pids;
-        m_rtsp->Play(pids);
-        m_oldpids = pids;
+        if (rval)
+        {
+            QStringList pids;
+            m_rtsp->Play(pids);
+            m_oldpids = pids;
+        }
+        return rval;
     }
+    return true;
 }
 
 bool SatIPStreamHandler::Open(void)

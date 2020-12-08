@@ -40,17 +40,17 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
     // Use RTPPacketBuffer if buffering and re-ordering needed
     m_buffer = new UDPPacketBuffer(0);
 
-    m_readhelper = new SatIPRTSPReadHelper(this);
-    m_writehelper = new SatIPRTSPWriteHelper(this, handler);
+    m_readHelper = new SatIPRTSPReadHelper(this);
+    m_writeHelper = new SatIPRTSPWriteHelper(this, handler);
 
-    if (!m_readhelper->m_socket->bind(QHostAddress::AnyIPv4, 0,
+    if (!m_readHelper->m_socket->bind(QHostAddress::AnyIPv4, 0,
                                       QAbstractSocket::DefaultForPlatform))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to bind RTP socket"));
     }
     else
     {
-        port = m_readhelper->m_socket->localPort();
+        port = m_readHelper->m_socket->localPort();
         LOG(VB_RECORD, LOG_INFO, LOC + QString("RTP socket bound to port %1 (0x%2)")
             .arg(port).arg(port,2,16,QChar('0')));
     }
@@ -58,8 +58,8 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
     // Control socket is next higher port
     port++;
 
-    m_rtcpReadhelper = new SatIPRTCPReadHelper(this);
-    if (!m_rtcpReadhelper->m_socket->bind(QHostAddress::AnyIPv4,
+    m_rtcpReadHelper = new SatIPRTCPReadHelper(this);
+    if (!m_rtcpReadHelper->m_socket->bind(QHostAddress::AnyIPv4,
                                            port,
                                            QAbstractSocket::DefaultForPlatform))
     {
@@ -73,7 +73,7 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
 
     // Increase receive packet buffer size for the RTP data stream to prevent packet loss
     uint desiredsize = 8000000;
-    uint newsize = SetUDPReceiveBufferSize(m_readhelper->m_socket, desiredsize);
+    uint newsize = SetUDPReceiveBufferSize(m_readHelper->m_socket, desiredsize);
     if (newsize >= desiredsize)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString("RTP UDP socket receive buffer size set to %1").arg(newsize));
@@ -90,9 +90,9 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
 
 SatIPRTSP::~SatIPRTSP()
 {
-    delete m_rtcpReadhelper;
-    delete m_writehelper;
-    delete m_readhelper;
+    delete m_rtcpReadHelper;
+    delete m_writeHelper;
+    delete m_readHelper;
     delete m_buffer;
 }
 
@@ -115,7 +115,7 @@ bool SatIPRTSP::Setup(const QUrl& url)
     QStringList headers;
     headers.append(
         QString("Transport: RTP/AVP;unicast;client_port=%1-%2")
-        .arg(m_readhelper->m_socket->localPort()).arg(m_readhelper->m_socket->localPort() + 1));
+        .arg(m_readHelper->m_socket->localPort()).arg(m_readHelper->m_socket->localPort() + 1));
 
     if (!sendMessage(m_requestUrl, "SETUP", &headers))
     {
@@ -568,7 +568,7 @@ void SatIPRTSPWriteHelper::timerEvent(QTimerEvent* /*event*/)
                 m_lastSequenceNumber = 0;
 
                 LOG(VB_RECORD, LOG_INFO, LOC_WH +
-                    QString("RTP Sequence number mismatch %1!=%2, discarded %3 packets")
+                    QString("RTP Sequence number mismatch %1!=%2, discarded %3 RTP packets")
                     .arg(seq_num).arg(exp_seq_num).arg(discarded));
                 continue;
             }

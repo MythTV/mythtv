@@ -35,12 +35,10 @@ class SatIPChannel : public DTVChannel
 
   private:
     QString             m_device;
-    QStringList         m_args;
     mutable QMutex      m_tuneLock;
     mutable QMutex      m_streamLock;
     SatIPStreamHandler *m_streamHandler {nullptr};
     MPEGStreamData     *m_streamData    {nullptr};
-    QString             m_videodev;
 };
 
 #endif // _SATIP_CHANNEL_H_

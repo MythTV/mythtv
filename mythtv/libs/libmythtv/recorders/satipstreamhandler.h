@@ -40,7 +40,7 @@ class SatIPStreamHandler : public StreamHandler
     } // StreamHandler
 
     bool UpdateFilters() override;  // StreamHandler
-    void Tune(const DTVMultiplex &tuning);
+    bool Tune(const DTVMultiplex &tuning);
 
   private:
     explicit SatIPStreamHandler(const QString & device, int inputid);

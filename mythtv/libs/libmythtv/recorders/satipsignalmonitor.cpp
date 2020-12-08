@@ -11,11 +11,11 @@
 
 #define LOC QString("SatIPSigMon[%1]: ").arg(m_inputid)
 
-SatIPSignalMonitor::SatIPSignalMonitor(
-    int db_cardnum,
-    SatIPChannel* channel,
-    uint64_t flags) :
-    DTVSignalMonitor(db_cardnum, channel, true, flags)
+SatIPSignalMonitor::SatIPSignalMonitor(int db_cardnum,
+                                       SatIPChannel* channel,
+                                       bool release_stream,
+                                       uint64_t flags) :
+    DTVSignalMonitor(db_cardnum, channel, release_stream, flags)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 
