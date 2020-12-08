@@ -13,6 +13,7 @@
 #include <QMap>
 
 #include "mythcontext.h"
+#include "mythdate.h"
 #include "mythdbcon.h"
 #include "dtvchannel.h"
 #include "dtvconfparserhelpers.h" // for DTVTunerType
@@ -171,7 +172,7 @@ class DVBChannel : public DTVChannel
     QString           m_key;                          // master lock key
     bool              m_hasCrcBug           {false};  // true iff our driver munges PMT
 
-    static int64_t    s_lastTuning;                   // Time of last tuning [ms]
+    static std::chrono::milliseconds s_lastTuning;    // Time of last tuning
     QMutex            m_tuneDelayLock;
 };
 

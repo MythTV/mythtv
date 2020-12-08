@@ -64,8 +64,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(uint inputId,
     DTVTunerType tuner_type, DTVModulationSystem current_sys, const DTVMultiplex &tuning,
     uint intermediate_freq, bool can_fec_auto, bool do_tune = true);
 
-static const int64_t concurrent_tunings_delay = 1000;
-int64_t DVBChannel::s_lastTuning = QDateTime::currentMSecsSinceEpoch();
+static constexpr std::chrono::milliseconds concurrent_tunings_delay { 1s };
+std::chrono::milliseconds DVBChannel::s_lastTuning = MythDate::currentMSecsSinceEpochAsDuration();
 
 #define LOC QString("DVBChan[%1](%2): ").arg(m_inputId).arg(DVBChannel::GetDevice())
 
@@ -826,15 +826,15 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
         m_tuneDelayLock.lock();
 
-        int64_t this_tuning = QDateTime::currentMSecsSinceEpoch();
-        int64_t tuning_delay = s_lastTuning + concurrent_tunings_delay - this_tuning;
-        if (tuning_delay > 0)
+        std::chrono::milliseconds this_tuning = MythDate::currentMSecsSinceEpochAsDuration();
+        std::chrono::milliseconds tuning_delay = s_lastTuning + concurrent_tunings_delay - this_tuning;
+        if (tuning_delay > 0ms)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Next tuning after less than %1ms, delaying by %2ms")
-                .arg(concurrent_tunings_delay).arg(tuning_delay));
-            std::this_thread::sleep_for(std::chrono::milliseconds(tuning_delay));
+                .arg(concurrent_tunings_delay.count()).arg(tuning_delay.count()));
+            std::this_thread::sleep_for(tuning_delay);
         }
-        s_lastTuning = QDateTime::currentMSecsSinceEpoch();
+        s_lastTuning = MythDate::currentMSecsSinceEpochAsDuration();
 
         m_tuneDelayLock.unlock();
 
