@@ -410,7 +410,7 @@ template <class DBFS>
 template <class DBFS>
 void ImageScanThread<DBFS>::PopulateMetadata(
     const QString &path, int type, QString &comment,
-    qint64 &time,
+    std::chrono::seconds &time,
     int &orientation)
 {
     // Set orientation, date, comment from file meta data
@@ -421,7 +421,7 @@ void ImageScanThread<DBFS>::PopulateMetadata(
     orientation  = metadata->GetOrientation();
     comment      = metadata->GetComment().simplified();
     QDateTime dt = metadata->GetOriginalDateTime();
-    time         = (dt.isValid()) ? dt.toSecsSinceEpoch() : 0;
+    time         = (dt.isValid()) ? std::chrono::seconds(dt.toSecsSinceEpoch()) : 0s;
 
     delete metadata;
 }
