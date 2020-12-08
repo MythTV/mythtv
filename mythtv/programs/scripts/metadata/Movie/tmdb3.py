@@ -10,8 +10,8 @@
 #               http://help.themoviedb.org/kb/api/about-3
 #-----------------------
 __title__ = "TheMovieDB.org V3"
-__author__ = "Raymond Wagner"
-__version__ = "0.3.7"
+__author__ = "Raymond Wagner, Roland Ernst"
+__version__ = "0.3.8"
 # 0.1.0 Initial version
 # 0.2.0 Add language support, move cache to home directory
 # 0.3.0 Enable version detection to allow use in MythTV
@@ -27,6 +27,7 @@ __version__ = "0.3.7"
 # 0.3.7 Add handling for TMDB site returning insufficient results from a
 #       query
 # 0.3.7.a : Added compatibiliy to python3, tested with python 3.6 and 2.7
+# 0.3.8 Sort posters by system language or 'en', if not found for given language
 
 from optparse import OptionParser
 import sys
@@ -45,11 +46,13 @@ def timeouthandler(signal, frame):
 
 def buildSingle(inetref, opts):
     from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
-    from MythTV.tmdb3 import Movie
+    from MythTV.tmdb3 import Movie, get_locale
     from MythTV import VideoMetadata
     from lxml import etree
 
+    import locale as py_locale
     import re
+
     if re.match('^0[0-9]{6}$', inetref):
         movie = Movie.fromIMDB(inetref)
     else:
@@ -120,11 +123,42 @@ def buildSingle(inetref, opts):
                         'thumb':backdrop.geturl(backdrop.sizes()[0]),
                         'height':str(backdrop.height),
                         'width':str(backdrop.width)})
-    for poster in movie.posters:
+
+    # tmdb already sorts the posters by language
+    # if no poster of given language was found,
+    # try to sort by system language and then by language "en"
+    system_language = py_locale.getdefaultlocale()[0].split("_")[0]
+    locale_language = get_locale().language
+    if opts.debug:
+        print("system_language : ", system_language)
+        print("locale_language : ", locale_language)
+
+    loc_posters = movie.posters
+    if loc_posters[0].language != locale_language \
+                    and locale_language != system_language:
+        if opts.debug:
+            print("1: No poster found for language '%s', trying to sort posters by '%s' :"
+                    %(locale_language, system_language))
+        loc_posters = sorted(movie.posters,
+                    key = lambda x: x.language==system_language, reverse = True)
+
+    if loc_posters[0].language != system_language \
+                    and loc_posters[0].language != locale_language:
+        if opts.debug:
+            print("2: No poster found for language '%s', trying to sort posters by '%s' :"
+                    %(system_language, "en"))
+        loc_posters = sorted(movie.posters,
+                    key = lambda x: x.language=="en", reverse = True)
+
+    for poster in loc_posters:
+        if opts.debug:
+            print("Poster : ", poster.language, " | ", poster.userrating,
+                    "\t | ", poster.geturl())
         m.images.append({'type':'coverart', 'url':poster.geturl(),
                         'thumb':poster.geturl(poster.sizes()[0]),
                         'height':str(poster.height),
                         'width':str(poster.width)})
+
     tree.append(m.toXML())
     print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
                                     xml_declaration=True))
