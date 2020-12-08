@@ -2154,6 +2154,18 @@ def displaySeriesXML(tvdb_api, series_season_ep):
 
     tvdbQueryXslt = etree.XSLT(etree.parse(u'%s%s' % (tvdb_api.baseXsltDir, u'tvdbVideo.xsl')))
     items = tvdbQueryXslt(allDataElement)
+
+    # temporary fix for missing coverart: use global coverart from series
+    if len(items.xpath("//image[@type='coverart']")) == 0:
+        for el in allDataElement.iter("series"):
+            glob_poster = el.find("poster")
+            if glob_poster is not None:
+                glob_url = glob_poster.text
+                glob_thumb = glob_url.replace("posters", "_cache/posters")
+                glob_coverart = etree.Element("image", type = "coverart", url = glob_url, thumb = glob_thumb)
+                items.find("item").find("images").append(glob_coverart)
+                break
+
     if items.getroot() is not None:
         if len(items.xpath('//item')):
             sys.stdout.write(etree.tostring(items, encoding='UTF-8', method="xml", xml_declaration=True, pretty_print=True, ))
