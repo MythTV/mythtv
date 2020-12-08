@@ -39,8 +39,8 @@
 
 #define LOC      QString("LFireDev(%1): ").arg(guid_to_string(m_guid))
 
-#define kNoDataTimeout            50   /* msec */
-#define kResetTimeout             1000 /* msec */
+static constexpr std::chrono::milliseconds kNoDataTimeout { 50ms };
+static constexpr std::chrono::milliseconds kResetTimeout  {  1s };
 
 using handle_to_lfd_t = QHash<raw1394handle_t,LinuxFirewireDevice*>;
 
@@ -113,7 +113,7 @@ const uint LinuxFirewireDevice::kMaxBufferedPackets  = 4 * 1024 * 1024 / 188;
 int linux_firewire_device_tspacket_handler(
     unsigned char *tspacket, int len, uint dropped, void *callback_data);
 void *linux_firewire_device_port_handler_thunk(void *param);
-static bool has_data(int fd, int msec);
+static bool has_data(int fd, std::chrono::milliseconds msec);
 static QString speed_to_string(uint speed);
 static int linux_firewire_device_bus_reset_handler(
     raw1394handle_t handle, uint generation);
@@ -613,7 +613,7 @@ void LinuxFirewireDevice::run(void)
         {
             // We unlock here because this can take a long time
             // and we don't want to block other actions.
-            m_priv->m_portHandlerWait.wait(&m_lock, kNoDataTimeout);
+            m_priv->m_portHandlerWait.wait(&m_lock, kNoDataTimeout.count());
 
             m_priv->m_noDataCnt += (m_priv->m_isStreaming) ? 1 : 0;
             continue;
@@ -632,11 +632,11 @@ void LinuxFirewireDevice::run(void)
             m_priv->m_noDataCnt++;
 
             LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No Input in %1 msec...")
-                    .arg(m_priv->m_noDataCnt * kNoDataTimeout));
+                .arg(m_priv->m_noDataCnt * kNoDataTimeout.count()));
         }
 
         // Confirm that we won't block, now that we have the lock...
-        if (ready && has_data(fwfd, 1 /* msec */))
+        if (ready && has_data(fwfd, 1ms))
         {
             // Performs blocking read of next 4 bytes off bus and handles
             // them. Most firewire commands do their own loop_iterate
@@ -976,15 +976,15 @@ int linux_firewire_device_tspacket_handler(
     return 1;
 }
 
-static bool has_data(int fd, int msec)
+static bool has_data(int fd, std::chrono::milliseconds msec)
 {
     fd_set rfds;
     FD_ZERO(&rfds); // NOLINT(readability-isolate-declaration)
     FD_SET(fd, &rfds);
 
     struct timeval tv {};
-    tv.tv_sec  = msec / 1000;
-    tv.tv_usec = (msec % 1000) * 1000;
+    tv.tv_sec  = msec.count() / 1000;
+    tv.tv_usec = (msec.count() % 1000) * 1000;
 
     int ready = select(fd + 1, &rfds, nullptr, nullptr, &tv);
 
