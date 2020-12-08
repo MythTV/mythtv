@@ -241,7 +241,7 @@ void MHIContext::run(void)
 
     while (!m_stop)
     {
-        int toWait = 0;
+        std::chrono::milliseconds toWait = 0ms;
         // Dequeue and process any key presses.
         int key = 0;
         do
@@ -257,15 +257,15 @@ void MHIContext::run(void)
                 m_engine->GenerateUserAction(key);
 
             // Run the engine and find out how long to pause.
-            toWait = m_engine->RunAll().count();
-            if (toWait < 0)
+            toWait = m_engine->RunAll();
+            if (toWait < 0ms)
                 return;
         } while (key != 0);
 
-        toWait = (toWait > 1000 || toWait <= 0) ? 1000 : toWait;
+        toWait = (toWait > 1s || toWait <= 0ms) ? 1s : toWait;
 
-        if (!m_stop && (toWait > 0))
-            m_engineWait.wait(locker.mutex(), toWait);
+        if (!m_stop && (toWait > 0ms))
+            m_engineWait.wait(locker.mutex(), toWait.count());
     }
 }
 

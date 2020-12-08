@@ -9,11 +9,11 @@
 
 // MythTV
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 #include "referencecounter.h"
 
-// Seconds
-#define DEFAULT_SHUTDOWN_WAIT 5
-#define MAXIMUM_SHUTDOWN_WAIT 30
+static constexpr std::chrono::seconds DEFAULT_SHUTDOWN_WAIT { 5s };
+static constexpr std::chrono::seconds MAXIMUM_SHUTDOWN_WAIT { 30s };
 
 class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
 {
@@ -43,7 +43,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
 
     Q_DECLARE_FLAGS(Features, Feature)
 
-    static MythPower* AcquireRelease(void* Reference, bool Acquire, uint MinimumDelay = 0);
+    static MythPower* AcquireRelease(void* Reference, bool Acquire, std::chrono::seconds MinimumDelay = 0s);
     virtual bool RequestFeature    (Feature Request, bool Delay = true);
     Features     GetFeatures       (void);
     bool         IsFeatureSupported(Feature Supported);
@@ -59,12 +59,12 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     void Hibernating    (void);
     void Restarting     (void);
     void HybridSleeping (void);
-    void WillShutDown   (uint MilliSeconds = 0);
-    void WillSuspend    (uint MilliSeconds = 0);
-    void WillHibernate  (uint MilliSeconds = 0);
-    void WillRestart    (uint MilliSeconds = 0);
-    void WillHybridSleep(uint MilliSeconds = 0);
-    void WokeUp         (qint64 SecondsAsleep);
+    void WillShutDown   (std::chrono::milliseconds MilliSeconds = 0ms);
+    void WillSuspend    (std::chrono::milliseconds MilliSeconds = 0ms);
+    void WillHibernate  (std::chrono::milliseconds MilliSeconds = 0ms);
+    void WillRestart    (std::chrono::milliseconds MilliSeconds = 0ms);
+    void WillHybridSleep(std::chrono::milliseconds MilliSeconds = 0ms);
+    void WokeUp         (std::chrono::seconds SecondsAsleep);
     void LowBattery     (void);
 
   protected slots:
@@ -81,8 +81,8 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     virtual bool   DoFeature         (bool /*Delayed*/ = false) { return false; }
     virtual void   DidWakeUp         (void);
     virtual void   FeatureHappening  (Feature Spontaneous = FeatureNone);
-    virtual bool   ScheduleFeature   (enum Feature Type, uint Delay);
-    void           SetRequestedDelay (uint Delay);
+    virtual bool   ScheduleFeature   (enum Feature Type, std::chrono::seconds Delay);
+    void           SetRequestedDelay (std::chrono::seconds Delay);
     void           PowerLevelChanged (int Level);
     static QString FeatureToString   (enum Feature Type);
     static bool    FeatureIsEquivalent(Feature First, Feature Second);
@@ -90,8 +90,8 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     Features  m_features             { FeatureNone };
     Feature   m_scheduledFeature     { FeatureNone };
     bool      m_isSpontaneous        { false };
-    uint      m_maxRequestedDelay    { 0 };
-    uint      m_maxSupportedDelay    { MAXIMUM_SHUTDOWN_WAIT };
+    std::chrono::seconds  m_maxRequestedDelay    { 0s };
+    std::chrono::seconds  m_maxSupportedDelay    { MAXIMUM_SHUTDOWN_WAIT };
     QTimer    m_featureTimer         { };
     QDateTime m_sleepTime            { };
     int       m_powerLevel           { Unset };
