@@ -31,7 +31,7 @@ class ExternalSignalMonitor: public DTVSignalMonitor
 
     bool HasLock(void);
     int GetSignalStrengthPercent(void);
-    int GetLockTimeout(void);
+    std::chrono::seconds GetLockTimeout(void);
 
 //    void AddHandlerListener(MPEGStreamData *data)
 //        { m_streamHandler->AddListener(data); }
@@ -39,7 +39,7 @@ class ExternalSignalMonitor: public DTVSignalMonitor
   protected:
     ExternalStreamHandler *m_streamHandler          {nullptr};
     bool                   m_streamHandlerStarted   {false};
-    int                    m_lockTimeout            {0};
+    std::chrono::milliseconds m_lockTimeout         {0ms};
     QString                m_loc;
 };
 
