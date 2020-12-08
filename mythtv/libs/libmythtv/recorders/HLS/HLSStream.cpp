@@ -143,7 +143,7 @@ void HLSRecStream::AverageBandwidth(int64_t bandwidth)
     m_bandwidth = m_sumBandwidth / m_bandwidthSegs.size();
 }
 
-uint HLSRecStream::Duration(void) const
+std::chrono::seconds HLSRecStream::Duration(void) const
 {
     QMutexLocker lock(&m_lock);
     return m_duration;

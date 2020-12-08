@@ -72,8 +72,8 @@ class MTV_PUBLIC  HLSReader
     void Cancel(bool quiet = false);
     bool LoadSegments(MythSingleDownload& downloader);
     uint PercentBuffered(void) const;
-    int  TargetDuration(void) const
-    { return (m_curstream ? m_curstream->TargetDuration() : 0); }
+    std::chrono::seconds TargetDuration(void) const
+    { return (m_curstream ? m_curstream->TargetDuration() : 0s); }
 
     void AllowPlaylistSwitch(void) { m_bandwidthCheck = true; }
 

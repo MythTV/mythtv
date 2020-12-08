@@ -41,7 +41,7 @@ void HLSStreamWorker::run(void)
     m_downloader = new MythSingleDownload;
     m_downloaderLock.unlock();
 
-    uint64_t delay = 0;
+    std::chrono::milliseconds delay = 0ms;
     int retries = 0;
     while (!m_cancel)
     {
@@ -70,24 +70,24 @@ void HLSStreamWorker::run(void)
             if (retries == 10)
                 m_parent->ResetSequence();
 
-            delay = (uint64_t)500 * retries * retries;
-            if (delay > 20000)
-                delay = 20000;
+            delay = 500ms * retries * retries;
+            if (delay > 20s)
+                delay = 20s;
         }
         else
         {
             retries = 0;
-            delay = 11000;
+            delay = 11s;
         }
 
         m_lock.lock();
         if (!m_wokenup && !m_cancel)
         {
-            if (delay < 1000)
+            if (delay < 1s)
                 LOG(VB_RECORD, LOG_WARNING, LOC + "waiting to retry");
             else
                 LOG(VB_RECORD, LOG_DEBUG, LOC + "waiting for work");
-            m_waitCond.wait(&m_lock, delay);
+            m_waitCond.wait(&m_lock, delay.count());
         }
         m_wokenup = false;
         m_lock.unlock();

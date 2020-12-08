@@ -19,13 +19,6 @@ static QUrl RelativeURI (const QString& baseString, const QString& uriString)
     return base.resolved(uri);
 }
 
-static uint64_t MDate(void)
-{
-    timeval t {};
-    gettimeofday(&t, nullptr);
-    return t.tv_sec * 1000000ULL + t.tv_usec;
-}
-
 HLSReader::~HLSReader(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- start");
@@ -414,7 +407,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 if (!M3U::ParseTargetDuration(text.readLine(), StreamURL(),
                                               duration))
                     return false;
-                hls->SetTargetDuration(duration); /* seconds */
+                hls->SetTargetDuration(std::chrono::seconds(duration));
             }
             /* Store version */
             hls->SetVersion(version);
@@ -458,7 +451,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 int duration = 0;
                 if (!M3U::ParseTargetDuration(line, StreamURL(), duration))
                     return false;
-                hls->SetTargetDuration(duration); /* seconds */
+                hls->SetTargetDuration(std::chrono::seconds(duration));
             }
             else if (line.startsWith(QLatin1String("#EXT-X-MEDIA-SEQUENCE")))
             {
@@ -910,7 +903,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     }
 
     QByteArray buffer;
-    uint64_t   start = MDate();
+    auto start = nowAsDuration<std::chrono::milliseconds>();
 
 #ifdef HLS_USE_MYTHDOWNLOADMANAGER // MythDownloadManager leaks memory
                                    // and can only handle six download at a time
@@ -939,7 +932,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     }
 #endif
 
-    uint64_t downloadduration = (MDate() - start) / 1000;
+    auto downloadduration = nowAsDuration<std::chrono::milliseconds>() - start;
 
 #ifdef USING_LIBCRYPTO
     /* If the segment is encrypted, decode it */
@@ -990,11 +983,11 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
                                    ((double)segment.Duration().count())));
     }
 
-    if (downloadduration < 1)
-        downloadduration = 1;
+    if (downloadduration < 1ms)
+        downloadduration = 1ms;
 
     /* bits/sec */
-    bandwidth = segment_len * 8 * 1000ULL / downloadduration;
+    bandwidth = segment_len * 8 * 1000ULL / downloadduration.count();
     hls->AverageBandwidth(bandwidth);
     hls->SetCurrentByteRate(static_cast<uint64_t>
                             ((static_cast<double>(segment_len) /
@@ -1004,7 +997,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
         QString("%1 took %3ms for %4 bytes: "
                 "bandwidth:%5kiB/s")
         .arg(segment.Sequence())
-        .arg(downloadduration)
+        .arg(downloadduration.count())
         .arg(segment_len)
         .arg(bandwidth / 8192.0));
 

@@ -31,8 +31,8 @@ class HLSRecStream
     int Id(void) const              { return m_id; }
     int Version(void) const         { return m_version; }
     void SetVersion(int x)          { m_version = x; }
-    int TargetDuration(void) const  { return m_targetDuration; }
-    void SetTargetDuration(int x)   { m_targetDuration = x; }
+    std::chrono::seconds TargetDuration(void) const  { return m_targetDuration; }
+    void SetTargetDuration(std::chrono::seconds x)   { m_targetDuration = x; }
     uint64_t AverageBandwidth(void) const { return static_cast<uint64_t>(m_bandwidth); }
     uint64_t Bitrate(void) const    { return m_bitrate; }
     void SetBitrate(uint64_t bitrate) { m_bitrate = bitrate; }
@@ -46,7 +46,7 @@ class HLSRecStream
     QString SegmentBaseUrl(void) const { return m_segmentBaseUrl; }
     void SetSegmentBaseUrl(const QString &n) { m_segmentBaseUrl = n; }
 
-    uint Duration(void) const;
+    std::chrono::seconds Duration(void) const;
     uint NumCachedSegments(void) const;
     uint NumReleasedSegments(void) const;
     uint NumTotalSegments(void) const;
@@ -79,10 +79,10 @@ class HLSRecStream
   private:
     int         m_id;                     // program id
     int         m_version        {1};     // protocol version should be 1
-    int         m_targetDuration {-1};    // maximum duration per segment (s)
+    std::chrono::seconds m_targetDuration {-1s}; // maximum duration per segment
     uint64_t    m_curByteRate    {0};
     uint64_t    m_bitrate;                // bitrate of stream content (bits per second)
-    int64_t     m_duration       {0LL};   // duration of the stream in seconds
+    std::chrono::seconds m_duration {0s};   // duration of the stream
     bool        m_live           {true};
     int64_t     m_bandwidth      {0};     // measured average download bandwidth (bits/second)
     double      m_sumBandwidth   {0.0};

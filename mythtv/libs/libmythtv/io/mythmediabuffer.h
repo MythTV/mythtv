@@ -10,6 +10,7 @@
 
 // MythTV
 #include "mythtvexp.h"
+#include "mythchrono.h"
 #include "mythconfig.h"
 #include "mthread.h"
 

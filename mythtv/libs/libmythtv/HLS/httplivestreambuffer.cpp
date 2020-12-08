@@ -36,9 +36,6 @@
 using std::max;
 using std::min;
 
-// Posix
-#include <sys/time.h> // for gettimeofday
-
 // libmythbase
 #include "mthread.h"
 #include "mythdownloadmanager.h"
@@ -88,11 +85,9 @@ static QString relative_URI(const QString &surl, const QString &spath)
     return url.resolved(path).toString();
 }
 
-static uint64_t mdate(void)
+static std::chrono::microseconds mdate(void)
 {
-    timeval  t {};
-    gettimeofday(&t, nullptr);
-    return t.tv_sec * 1000000ULL + t.tv_usec;
+    return nowAsDuration<std::chrono::microseconds>();
 }
 
 static bool downloadURL(const QString &url, QByteArray *buffer, QString &finalURL)
@@ -124,7 +119,7 @@ static void cancelURL(const QStringList &urls)
 class HLSSegment
 {
 public:
-    HLSSegment(const int mduration, const int id, const QString &title,
+    HLSSegment(const std::chrono::seconds mduration, const int id, const QString &title,
                const QString &uri, const QString &current_key_path)
     {
         m_duration      = mduration; /* seconds */
@@ -166,7 +161,7 @@ public:
         return *this;
     }
 
-    int Duration(void) const
+    std::chrono::seconds Duration(void) const
     {
         return m_duration;
     }
@@ -385,7 +380,7 @@ private:
 
 private:
     int         m_id       {0}; // unique sequence number
-    int         m_duration {0}; // segment duration (seconds)
+    std::chrono::seconds m_duration {0s}; // segment duration
     uint64_t    m_bitrate {0};  // bitrate of segment's content (bits per second)
     QString     m_title;        // human-readable informative title of the media segment
 
@@ -492,7 +487,7 @@ public:
             }
             else
             {
-                size += segment->Duration() * Bitrate() / 8;
+                size += segment->Duration().count() * Bitrate() / 8;
             }
             segment->Unlock();
         }
@@ -500,7 +495,7 @@ public:
         return m_size;
     }
 
-    int64_t Duration(void)
+    std::chrono::seconds Duration(void)
     {
         QMutexLocker lock(&m_lock);
         return m_duration;
@@ -554,7 +549,7 @@ public:
         return nullptr;
     }
 
-    void AddSegment(const int duration, const QString &title, const QString &uri)
+    void AddSegment(const std::chrono::seconds duration, const QString &title, const QString &uri)
     {
         QMutexLocker lock(&m_lock);
         QString psz_uri = relative_URI(m_url, uri);
@@ -634,8 +629,8 @@ public:
         /* sanity check - can we download this segment on time? */
         if ((bandwidth > 0) && (m_bitrate > 0))
         {
-            uint64_t size = (segment->Duration() * m_bitrate); /* bits */
-            int estimated = (int)(size / bandwidth);
+            uint64_t size = (segment->Duration().count() * m_bitrate); /* bits */
+            auto estimated = std::chrono::seconds(size / bandwidth);
             if (estimated > segment->Duration())
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -643,13 +638,13 @@ public:
                             "which is longer than its playback (%4s) at %5bit/s")
                     .arg(segnum)
                     .arg(segment->Id())
-                    .arg(estimated)
-                    .arg(segment->Duration())
+                    .arg(estimated.count())
+                    .arg(segment->Duration().count())
                     .arg(bandwidth));
             }
         }
 
-        uint64_t start = mdate();
+        std::chrono::microseconds start = mdate();
         if (segment->Download() != RET_OK)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC +
@@ -659,12 +654,12 @@ public:
             return RET_ERROR;
         }
 
-        uint64_t downloadduration = mdate() - start;
-        if (m_bitrate == 0 && segment->Duration() > 0)
+        std::chrono::microseconds downloadduration = mdate() - start;
+        if (m_bitrate == 0 && segment->Duration() > 0s)
         {
             /* Try to estimate the bandwidth for this stream */
             m_bitrate = (uint64_t)(((double)segment->Size() * 8) /
-                                     ((double)segment->Duration()));
+                                   ((double)segment->Duration().count()));
         }
 
 #ifdef USING_LIBCRYPTO
@@ -691,13 +686,13 @@ public:
 #endif
         segment->Unlock();
 
-        downloadduration = downloadduration < 1 ? 1 : downloadduration;
-        bandwidth = segment->Size() * 8 * 1000000ULL / downloadduration; /* bits / s */
+        downloadduration = std::min(1us, downloadduration);
+        bandwidth = segment->Size() * 8 * 1000000ULL / downloadduration.count(); /* bits / s */
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("downloaded segment %1 [id:%2] took %3ms for %4 bytes: bandwidth:%5kiB/s")
             .arg(segnum)
             .arg(segment->Id())
-            .arg(downloadduration / 1000)
+            .arg(duration_cast<std::chrono::milliseconds>(downloadduration).count())
             .arg(segment->Size())
             .arg(bandwidth / 8192.0));
 
@@ -723,11 +718,11 @@ public:
     {
         m_startsequence = x;
     }
-    int TargetDuration(void) const
+    std::chrono::seconds TargetDuration(void) const
     {
         return m_targetduration;
     }
-    void SetTargetDuration(int x)
+    void SetTargetDuration(std::chrono::seconds x)
     {
         m_targetduration = x;
     }
@@ -766,7 +761,7 @@ public:
     void UpdateWith(const HLSStream &upd)
     {
         QMutexLocker lock(&m_lock);
-        m_targetduration    = upd.m_targetduration < 0 ?
+        m_targetduration    = upd.m_targetduration < 0s ?
             m_targetduration : upd.m_targetduration;
         m_cache             = upd.m_cache;
     }
@@ -858,11 +853,11 @@ private:
     int         m_id             {0};   // program id
     int         m_version        {1};   // protocol version should be 1
     int         m_startsequence  {0};   // media starting sequence number
-    int         m_targetduration {-1};  // maximum duration per segment (s)
+    std::chrono::seconds m_targetduration {-1s};  // maximum duration per segment
     uint64_t    m_bitrate        {0LL}; // bitrate of stream content (bits per second)
     uint64_t    m_size           {0LL}; // stream length is calculated by taking the sum
                                         // foreach segment of (segment->duration * hls->bitrate/8)
-    int64_t     m_duration       {0LL}; // duration of the stream in seconds
+    std::chrono::seconds m_duration       {0s}; // duration of the stream
     bool        m_live           {true};
 
     QList<HLSSegment*> m_segments;      // list of segments
@@ -1065,10 +1060,10 @@ public:
         // send a wake signal
         m_waitcond.wakeAll();
     }
-    void WaitForSignal(unsigned long time = ULONG_MAX)
+    void WaitForSignal(std::chrono::milliseconds time = std::chrono::milliseconds::max())
     {
         // must own lock
-        m_waitcond.wait(&m_lock, time);
+        m_waitcond.wait(&m_lock, time.count());
     }
     void Lock(void)
     {
@@ -1251,7 +1246,7 @@ private:
 class PlaylistWorker : public MThread
 {
 public:
-    PlaylistWorker(HLSRingBuffer *parent, int64_t wait) : MThread("HLSStream"),
+    PlaylistWorker(HLSRingBuffer *parent, std::chrono::milliseconds wait) : MThread("HLSStream"),
         m_parent(parent), m_wakeup(wait) {}
     void Cancel()
     {
@@ -1282,10 +1277,10 @@ public:
         // send a wake signal
         m_waitcond.wakeAll();
     }
-    void WaitForSignal(unsigned long time = ULONG_MAX)
+    void WaitForSignal(std::chrono::milliseconds time = std::chrono::milliseconds::max())
     {
         // must own lock
-        m_waitcond.wait(&m_lock, time);
+        m_waitcond.wait(&m_lock, time.count());
     }
     void Lock(void)
     {
@@ -1320,10 +1315,10 @@ protected:
             Lock();
             if (!m_wokenup)
             {
-                unsigned long waittime = m_wakeup < 100 ? 100 : m_wakeup;
+                std::chrono::milliseconds waittime = std::min(100ms, m_wakeup);
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                     QString("PlayListWorker refreshing in %1s")
-                    .arg(waittime / 1000));
+                    .arg(duration_cast<std::chrono::seconds>(waittime).count()));
                 WaitForSignal(waittime);
             }
             m_wokenup = false;
@@ -1376,8 +1371,7 @@ protected:
             }
 
             /* determine next time to update playlist */
-            m_wakeup = ((int64_t)(hls->TargetDuration() * wait * factor)
-                        * (int64_t)1000);
+            m_wakeup = duration_cast<std::chrono::seconds>(hls->TargetDuration() * wait * factor);
         }
 
         RunEpilog();
@@ -1461,7 +1455,7 @@ private:
                         .arg(p->Id()).arg(segment->Id()));
                     LOG(VB_PLAYBACK, LOG_WARNING, LOC +
                         QString("- duration: new=%1, old=%2")
-                        .arg(p->Duration()).arg(segment->Duration()));
+                        .arg(p->Duration().count()).arg(segment->Duration().count()));
                     LOG(VB_PLAYBACK, LOG_WARNING, LOC +
                         QString("-     file: new=%1 old=%2")
                         .arg(p->Url()).arg(segment->Url()));
@@ -1535,7 +1529,7 @@ private:
     // private variable members
     HLSRingBuffer * m_parent      {nullptr};
     bool            m_interrupted {false};
-    int64_t         m_wakeup;       // next reload time
+    std::chrono::milliseconds m_wakeup;       // next reload time
     int             m_retries     {0}; // number of consecutive failures
     bool            m_wokenup     {false};
     QMutex          m_lock;
@@ -1858,7 +1852,7 @@ int HLSRingBuffer::ParseTargetDuration(HLSStream *hls, const QString &line)
         LOG(VB_PLAYBACK, LOG_ERR, LOC + "expected #EXT-X-TARGETDURATION:<s>");
         return RET_ERROR;
     }
-    hls->SetTargetDuration(duration); /* seconds */
+    hls->SetTargetDuration(std::chrono::seconds(duration));
     return RET_OK;
 }
 
@@ -2242,7 +2236,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
         // rewind
         stream.seek(0);
         /* */
-        int segment_duration = -1;
+        std::chrono::seconds segment_duration = -1s;
         QString title;
         do
         {
@@ -2254,7 +2248,11 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
                 .arg(line));
 
             if (line.startsWith(QLatin1String("#EXTINF")))
-                err = ParseSegmentInformation(hls, line, segment_duration, title);
+            {
+                int tmp = -1;
+                err = ParseSegmentInformation(hls, line, tmp, title);
+                segment_duration = std::chrono::seconds(tmp);
+            }
             else if (line.startsWith(QLatin1String("#EXT-X-TARGETDURATION")))
                 err = ParseTargetDuration(hls, line);
             else if (line.startsWith(QLatin1String("#EXT-X-MEDIA-SEQUENCE")))
@@ -2278,7 +2276,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
             else if (!line.startsWith(QLatin1String("#")) && !line.isEmpty())
             {
                 hls->AddSegment(segment_duration, title, decoded_URI(line));
-                segment_duration = -1; /* reset duration */
+                segment_duration = -1s; /* reset duration */
                 title = "";
             }
         }
@@ -2294,7 +2292,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
 int HLSRingBuffer::Prefetch(int count)
 {
     int retries = 0;
-    int64_t starttime = mdate();
+    std::chrono::microseconds starttime = mdate();
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("Starting Prefetch for %2 segments")
         .arg(count));
@@ -2308,9 +2306,8 @@ int HLSRingBuffer::Prefetch(int count)
         retries++;
     }
     m_streamworker->Unlock();
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Finished Prefetch (%1s)")
-        .arg((mdate() - starttime) / 1000000.0));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Finished Prefetch (%1s)")
+        .arg(duration_cast<std::chrono::seconds>(mdate() - starttime).count()));
     // we waited more than 10s abort
     if (retries >= 10)
         return RET_ERROR;
@@ -2343,7 +2340,7 @@ void HLSRingBuffer::SanityCheck(const HLSStream *hls) const
  * Assure that the segment has been downloaded
  * Return nullptr if segment couldn't be retrieved after timeout (in ms)
  */
-HLSSegment *HLSRingBuffer::GetSegment(int segnum, int timeout)
+HLSSegment *HLSRingBuffer::GetSegment(int segnum, std::chrono::milliseconds timeout)
 {
     HLSSegment *segment = nullptr;
     int stream = m_streamworker->StreamForSegment(segnum);
@@ -2402,7 +2399,7 @@ int HLSRingBuffer::ChooseSegment(int stream) const
      */
     int wanted          = 0;
     int segid           = 0;
-    int wanted_duration = 0;
+    std::chrono::seconds wanted_duration = 0s;
     int count           = NumSegments();
     int i               = count - 1;
 
@@ -2417,7 +2414,7 @@ int HLSRingBuffer::ChooseSegment(int stream) const
         {
             LOG(VB_PLAYBACK, LOG_WARNING, LOC +
                 QString("EXTINF:%1 duration is larger than EXT-X-TARGETDURATION:%2")
-                .arg(segment->Duration()).arg(hls->TargetDuration()));
+                .arg(segment->Duration().count()).arg(hls->TargetDuration().count()));
         }
 
         wanted_duration += segment->Duration();
@@ -2589,7 +2586,7 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, std::chrono::milliseconds
     //if (m_live)   // commented out as some streams are marked as VOD, yet
     // aren't, they are updated over time
     {
-        m_playlistworker = new PlaylistWorker(this, 0);
+        m_playlistworker = new PlaylistWorker(this, 0ms);
         m_playlistworker->start();
     }
 
@@ -2634,7 +2631,7 @@ int64_t HLSRingBuffer::SizeMedia(void) const
         return -1;
 
     HLSStream *hls = GetCurrentStream();
-    int64_t size = hls->Duration() * m_bitrate / 8;
+    int64_t size = hls->Duration().count() * m_bitrate / 8;
 
     return size;
 }
@@ -2667,7 +2664,7 @@ void HLSRingBuffer::WaitUntilBuffered(void)
            (m_streamworker->CurrentPlaybackBuffer(false) < 2) &&
            (live || !m_streamworker->IsAtEnd()))
     {
-        m_streamworker->WaitForSignal(1000);
+        m_streamworker->WaitForSignal(1s);
         retries++;
     }
     m_streamworker->Unlock();
@@ -2777,7 +2774,7 @@ int HLSRingBuffer::DurationForBytes(uint size)
         return 0;
     }
     auto byterate = (uint64_t)(((double)segment->Size()) /
-                               ((double)segment->Duration()));
+                               ((double)segment->Duration().count()));
 
     return (int)((size * 1000.0) / byterate);
 }
@@ -2798,7 +2795,7 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
         return m_playback->Offset();
     }
 
-    int64_t starting = mdate();
+    std::chrono::microseconds starting = mdate();
 
     QWriteLocker lock(&m_posLock);
 
@@ -2824,7 +2821,7 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
     }
 
     // We determine the duration at which it was really attempting to seek to
-    int64_t postime = (where * 8.0) / m_bitrate;
+    auto postime    = secondsFromFloat((where * 8.0) / m_bitrate);
     int count       = NumSegments();
     int segnum      = m_playback->Segment();
     HLSStream  *hls = GetStreamForSegment(segnum);
@@ -2842,15 +2839,15 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
     {
         // we're at the end, never let seek after last 3 segments
         postime -= hls->TargetDuration() * 3;
-        if (postime < 0)
+        if (postime < 0s)
         {
-            postime = 0;
+            postime = 0s;
         }
     }
 
     // Find segment containing position
-    int64_t starttime   = 0LL;
-    int64_t endtime     = 0LL;
+    std::chrono::seconds starttime   = 0s;
+    std::chrono::seconds endtime     = 0s;
     for (int n = m_startup; n < count; n++)
     {
         hls = GetStreamForSegment(n);
@@ -2886,7 +2883,7 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
      * the segments in less than 5s
      */
     if (hls->Live() && (segnum >= count - 1 || segnum < m_playback->Segment()) &&
-        ((hls->TargetDuration() * hls->Bitrate() / m_streamworker->Bandwidth()) > 5))
+        ((hls->TargetDuration() * hls->Bitrate() / m_streamworker->Bandwidth()) > 5s))
     {
         return m_playback->Offset();
     }
@@ -2895,7 +2892,7 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
     m_playback->SetSegment(segnum);
 
     m_streamworker->Seek(segnum);
-    m_playback->SetOffset(postime * m_bitrate / 8);
+    m_playback->SetOffset(postime.count() * m_bitrate / 8);
 
     m_streamworker->Lock();
 
@@ -2911,7 +2908,7 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
             (m_streamworker->CurrentPlaybackBuffer(false) < 2) &&
             !m_streamworker->IsAtEnd()))
     {
-        m_streamworker->WaitForSignal(1000);
+        m_streamworker->WaitForSignal(1s);
         retries++;
     }
     if (m_interrupted)
@@ -2940,8 +2937,8 @@ long long HLSRingBuffer::SeekInternal(long long pos, int whence)
         int32_t skip = ((postime - starttime) * segment->Size()) / segment->Duration();
         segment->Read(nullptr, skip);
     }
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("seek completed in %1s").arg((mdate() - starting) / 1000000.0));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("seek completed in %1s")
+        .arg(duration_cast<std::chrono::seconds>(mdate() - starting).count()));
 
     return m_playback->Offset();
 }
