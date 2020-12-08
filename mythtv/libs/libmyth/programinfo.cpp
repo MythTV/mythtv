@@ -405,7 +405,7 @@ ProgramInfo::ProgramInfo(
     m_inputName(std::move(_inputname)),
     m_bookmarkUpdate(std::move(_bookmarkupdate))
 {
-    if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
+    if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1895, 12, 28))
         m_originalAirDate = QDate();
 
     SetPathname(_pathname);
@@ -586,7 +586,7 @@ ProgramInfo::ProgramInfo(
     m_programFlags |= (commfree) ? FL_CHANCOMMFREE : 0;
     m_programFlags |= (repeat)   ? FL_REPEAT       : 0;
 
-    if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
+    if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1895, 12, 28))
         m_originalAirDate = QDate();
 
     for (auto *it : schedList)
@@ -2064,7 +2064,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
                     (query.value(42).toUInt() << kAudioPropertyOffset));
     // ancillary data -- end
 
-    if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1940, 1, 1))
+    if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1895, 12, 28))
         m_originalAirDate = QDate();
 
     // Extra stuff which is not serialized and may get lost.
