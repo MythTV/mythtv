@@ -31,8 +31,8 @@
 #include "libavutil/opt.h"
 #include "libavcodec/avcodec.h"
 #include "libavcodec/decode.h"
-#include "libavcodec/hwconfig.h"
 #include "libavcodec/internal.h"
+#include "libavcodec/hwconfig.h"
 
 #include "v4l2_context.h"
 #include "v4l2_m2m.h"
@@ -44,7 +44,7 @@ static int v4l2_try_start(AVCodecContext *avctx)
     V4L2Context *const capture = &s->capture;
     V4L2Context *const output = &s->output;
     struct v4l2_selection selection = { 0 };
-    int ret, pix_fmt;
+    int ret;
 
     /* 1. start the output process */
     if (!output->streamon) {
@@ -67,13 +67,8 @@ static int v4l2_try_start(AVCodecContext *avctx)
     }
 
     /* 2.1 update the AVCodecContext */
-    pix_fmt = ff_v4l2_format_v4l2_to_avfmt(capture->format.fmt.pix_mp.pixelformat, AV_CODEC_ID_RAWVIDEO);
-    if (avctx->pix_fmt != AV_PIX_FMT_DRM_PRIME)
-        avctx->pix_fmt = pix_fmt;
-    else
-        avctx->sw_pix_fmt = pix_fmt;;
+    avctx->pix_fmt = ff_v4l2_format_v4l2_to_avfmt(capture->format.fmt.pix_mp.pixelformat, AV_CODEC_ID_RAWVIDEO);
     capture->av_pix_fmt = avctx->pix_fmt;
-    capture->sw_pix_fmt = avctx->sw_pix_fmt;
 
     /* 3. set the crop parameters */
     selection.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -214,44 +209,43 @@ static av_cold int v4l2_decode_init(AVCodecContext *avctx)
     output->av_codec_id = avctx->codec_id;
     output->av_pix_fmt  = AV_PIX_FMT_NONE;
 
-    /* negotiate drm vs software pixel formats */
-    avctx->pix_fmt = ff_get_format(avctx, avctx->codec->pix_fmts);
-    switch (avctx->pix_fmt) {
-    case AV_PIX_FMT_DRM_PRIME:
-        avctx->sw_pix_fmt = AV_PIX_FMT_NV12;
-        break;
+    capture->av_codec_id = AV_CODEC_ID_RAWVIDEO;
+    capture->av_pix_fmt = avctx->pix_fmt;
 
+    /* the client requests the codec to generate DRM frames:
+     *   - data[0] will therefore point to the returned AVDRMFrameDescriptor
+     *       check the ff_v4l2_buffer_to_avframe conversion function.
+     *   - the DRM frame format is passed in the DRM frame descriptor layer.
+     *       check the v4l2_get_drm_frame function.
+     */
+    switch (ff_get_format(avctx, avctx->codec->pix_fmts)) {
+    case AV_PIX_FMT_DRM_PRIME:
+        s->output_drm = 1;
+        break;
     case AV_PIX_FMT_NONE:
         return 0;
         break;
-
     default:
         break;
     }
 
-    capture->av_codec_id = AV_CODEC_ID_RAWVIDEO;
-    capture->av_pix_fmt = avctx->pix_fmt;
-    capture->sw_pix_fmt = avctx->sw_pix_fmt;
-
-    if (avctx->hw_device_ctx) {
-        s->device_ref = av_buffer_ref(avctx->hw_device_ctx);
-    } else {
-        s->device_ref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_DRM);
-        if (!s->device_ref)
-            return AVERROR(ENOMEM);
-
-        ret = av_hwdevice_ctx_init(s->device_ref);
-        if (ret < 0) {
-            av_buffer_unref(&s->device_ref);
-            return ret;
-        }
+    s->device_ref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_DRM);
+    if (!s->device_ref) {
+        ret = AVERROR(ENOMEM);
+        return ret;
     }
 
     s->avctx = avctx;
+    ret = av_hwdevice_ctx_init(s->device_ref);
+    if (ret < 0)
+        return ret;
 
     ret = ff_v4l2_m2m_codec_init(priv);
     if (ret) {
         av_log(avctx, AV_LOG_ERROR, "can't configure decoder\n");
+        s->self_ref = NULL;
+        av_buffer_unref(&priv->context_ref);
+
         return ret;
     }
 
@@ -287,15 +281,7 @@ static const AVOption options[] = {
 };
 
 static const AVCodecHWConfigInternal *v4l2_m2m_hw_configs[] = {
-    &(const AVCodecHWConfigInternal) {
-        .public = {
-            .pix_fmt     = AV_PIX_FMT_DRM_PRIME,
-            .methods     = AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX |
-                           AV_CODEC_HW_CONFIG_METHOD_INTERNAL,
-            .device_type = AV_HWDEVICE_TYPE_DRM
-        },
-        .hwaccel = NULL,
-    },
+    HW_CONFIG_INTERNAL(DRM_PRIME),
     NULL
 };
 
