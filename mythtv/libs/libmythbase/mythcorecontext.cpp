@@ -462,11 +462,11 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
     if (maxConnTry < 1)
         maxConnTry = std::max(GetNumSetting("BackendConnectRetry", 1), 1);
 
-    int WOLsleepTime = 0;
+    std::chrono::seconds WOLsleepTime = 0s;
     int WOLmaxConnTry = 0;
     if (!WOLcmd.isEmpty())
     {
-        WOLsleepTime  = GetNumSetting("WOLbackendReconnectWaitTime", 0);
+        WOLsleepTime  = GetDurSetting<std::chrono::seconds>("WOLbackendReconnectWaitTime", 0s);
         WOLmaxConnTry = std::max(GetNumSetting("WOLbackendConnectRetry", 1), 1);
         maxConnTry    = std::max(maxConnTry, WOLmaxConnTry);
     }
@@ -485,7 +485,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
 
         serverSock = new MythSocket();
 
-        int sleepms = 0;
+        std::chrono::microseconds sleepus = 0us;
         if (serverSock->ConnectToHost(hostname, port))
         {
             if (SetupCommandSocket(
@@ -522,7 +522,7 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
 
             MythWakeup(WOLcmd, kMSDontDisableDrawing | kMSDontBlockInputDevs |
                                 kMSProcessEvents);
-            sleepms = WOLsleepTime * 1000;
+            sleepus = WOLsleepTime;
         }
 
         serverSock->DecrRef();
@@ -534,8 +534,8 @@ MythSocket *MythCoreContext::ConnectCommandSocket(
                 d->m_guiContext, new MythEvent("CONNECTION_FAILURE"));
         }
 
-        if (sleepms)
-            usleep(sleepms * 1000);
+        if (sleepus != 0us)
+            usleep(sleepus.count());
     }
 
     if (we_attempted_wol)
