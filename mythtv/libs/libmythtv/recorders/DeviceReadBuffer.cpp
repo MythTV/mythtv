@@ -280,7 +280,7 @@ void DeviceReadBuffer::IncrWritePointer(uint len)
     m_writePtr += len;
     m_writePtr  = (m_writePtr >= m_endPtr) ? m_buffer + (m_writePtr - m_endPtr) : m_writePtr;
 #if REPORT_RING_STATS
-    m_maxUsed = max(m_used, m_maxUsed);
+    m_maxUsed = std::max(m_used, m_maxUsed);
     m_avgUsed = ((m_avgUsed * m_avgBufWriteCnt) + m_used) / (m_avgBufWriteCnt+1);
     ++m_avgBufWriteCnt;
 #endif
@@ -699,9 +699,9 @@ uint DeviceReadBuffer::WaitForUsed(uint needed, std::chrono::milliseconds max_wa
 void DeviceReadBuffer::ReportStats(void)
 {
 #if REPORT_RING_STATS
-    static const int secs = 20;
-    static const double d1_s = 1.0 / secs;
-    if (m_lastReport.elapsed() > secs * 1000 /* msg every 20 seconds */)
+    static constexpr std::chrono::seconds secs { 20s }; // msg every 20 seconds
+    static constexpr double d1_s = 1.0 / secs.count();
+    if (m_lastReport.elapsed() > duration_cast<std::chrono::milliseconds>(secs))
     {
         QMutexLocker locker(&m_lock);
         double rsize = 100.0 / m_size;
