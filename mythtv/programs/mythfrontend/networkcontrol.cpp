@@ -979,10 +979,10 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     else if (is_abbrev("uptime", nc->getArg(1)))
     {
         QString str;
-        time_t  uptime = 0;
+        std::chrono::seconds uptime = 0s;
 
         if (getUptime(uptime))
-            str = QString::number(uptime);
+            str = QString::number(uptime.count());
         else
             str = QString("Could not determine uptime.");
         return str;

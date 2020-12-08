@@ -1173,16 +1173,15 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     }
 }
 
-static QString uptimeStr(time_t uptime)
+static QString uptimeStr(std::chrono::seconds uptime)
 {
     QString str = "   " + StatusBox::tr("Uptime") + ": ";
 
-    if (uptime == 0)
+    if (uptime == 0s)
         return str + StatusBox::tr("unknown", "unknown uptime");
 
-    auto secs = std::chrono::seconds(uptime);
-    auto days = duration_cast<std::chrono::days>(secs);
-    secs = secs % 24h;
+    auto days = duration_cast<std::chrono::days>(uptime);
+    auto secs = uptime % 24h;
 
     QString astext;
     if (days.count() > 0)
@@ -1324,12 +1323,12 @@ void StatusBox::doMachineStatus()
     AddLogLine(line, machineStr);
 
     // uptime
-    time_t uptime = 0;
+    std::chrono::seconds uptime = 0s;
     if (getUptime(uptime))
     {
         auto UpdateUptime = [](StatusBoxItem* Item)
         {
-            time_t time = 0;
+            std::chrono::seconds time = 0s;
             getUptime(time);
             Item->SetText(uptimeStr(time));
         };
@@ -1403,7 +1402,7 @@ void StatusBox::doMachineStatus()
         {
             auto UpdateRemoteUptime = [](StatusBoxItem* Item)
             {
-                time_t time = 0;
+                std::chrono::seconds time = 0s;
                 RemoteGetUptime(time);
                 Item->SetText(uptimeStr(time));
             };

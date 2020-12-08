@@ -3519,10 +3519,10 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
 {
     MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
-    time_t      uptime = 0;
+    std::chrono::seconds uptime = 0s;
 
     if (getUptime(uptime))
-        strlist << QString::number(uptime);
+        strlist << QString::number(uptime.count());
     else
     {
         strlist << "ERROR";

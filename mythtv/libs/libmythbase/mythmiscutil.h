@@ -30,7 +30,7 @@ MBASE_PUBLIC inline uint32_t MythRandom()
 #endif
 }
 
-MBASE_PUBLIC bool getUptime(time_t &uptime);
+MBASE_PUBLIC bool getUptime(std::chrono::seconds &uptime);
 MBASE_PUBLIC bool getMemStats(
     int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 using loadArray = std::array<double,3>;

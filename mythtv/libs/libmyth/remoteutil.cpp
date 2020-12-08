@@ -51,7 +51,7 @@ bool RemoteGetLoad(system_load_array& load)
     return false;
 }
 
-bool RemoteGetUptime(time_t &uptime)
+bool RemoteGetUptime(std::chrono::seconds &uptime)
 {
     QStringList strlist(QString("QUERY_UPTIME"));
 
@@ -62,11 +62,11 @@ bool RemoteGetUptime(time_t &uptime)
         return false;
 
     if (sizeof(time_t) == sizeof(int))
-        uptime = strlist[0].toUInt();
+        uptime = std::chrono::seconds(strlist[0].toUInt());
     else if (sizeof(time_t) == sizeof(long))
-        uptime = strlist[0].toULong();
+        uptime = std::chrono::seconds(strlist[0].toULong());
     else if (sizeof(time_t) == sizeof(long long))
-        uptime = strlist[0].toULongLong();
+        uptime = std::chrono::seconds(strlist[0].toULongLong());
 
     return true;
 }

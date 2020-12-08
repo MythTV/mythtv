@@ -65,7 +65,7 @@
  *  \brief Returns uptime statistics.
  *  \return true if successful, false otherwise.
  */
-bool getUptime(time_t &uptime)
+bool getUptime(std::chrono::seconds &uptime)
 {
 #ifdef __linux__
     struct sysinfo sinfo {};
@@ -74,7 +74,7 @@ bool getUptime(time_t &uptime)
         LOG(VB_GENERAL, LOG_ERR, "sysinfo() error");
         return false;
     }
-    uptime = sinfo.uptime;
+    uptime = std::chrono::seconds(sinfo.uptime);
 
 #elif defined(__FreeBSD__) || CONFIG_DARWIN
 
@@ -90,9 +90,9 @@ bool getUptime(time_t &uptime)
         LOG(VB_GENERAL, LOG_ERR, "sysctl() error");
         return false;
     }
-    uptime = time(nullptr) - bootTime.tv_sec;
+    uptime = std::chrono::seconds(time(nullptr) - bootTime.tv_sec);
 #elif defined(_WIN32)
-    uptime = ::GetTickCount() / 1000;
+    uptime = std::chrono::seconds(::GetTickCount() / 1000);
 #else
     // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
     LOG(VB_GENERAL, LOG_NOTICE, "Unknown platform. How do I get the uptime?");

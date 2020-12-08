@@ -129,10 +129,10 @@ bool BaseRequestHandler::HandleQueryLoad(SocketHandler *sock)
 bool BaseRequestHandler::HandleQueryUptime(SocketHandler *sock)
 {
     QStringList strlist;
-    time_t      uptime = 0;
+    std::chrono::seconds uptime = 0s;
 
     if (getUptime(uptime))
-        strlist << QString::number(uptime);
+        strlist << QString::number(uptime.count());
     else
     {
         strlist << "ERROR";
