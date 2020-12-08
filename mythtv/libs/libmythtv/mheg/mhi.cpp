@@ -257,7 +257,7 @@ void MHIContext::run(void)
                 m_engine->GenerateUserAction(key);
 
             // Run the engine and find out how long to pause.
-            toWait = m_engine->RunAll();
+            toWait = m_engine->RunAll().count();
             if (toWait < 0)
                 return;
         } while (key != 0);

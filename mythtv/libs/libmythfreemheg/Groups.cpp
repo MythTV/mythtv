@@ -384,11 +384,11 @@ void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine * 
 }
 
 // Fire any timers that have passed.
-int MHGroup::CheckTimers(MHEngine *engine)
+std::chrono::milliseconds MHGroup::CheckTimers(MHEngine *engine)
 {
     QTime currentTime = QTime::currentTime(); // Get current time
     QList<MHTimer *>::iterator it = m_timers.begin();
-    int nMSecs = 0;
+    std::chrono::milliseconds nMSecs = 0ms;
 
     while (it != m_timers.end())
     {
@@ -404,9 +404,9 @@ int MHGroup::CheckTimers(MHEngine *engine)
         else
         {
             // This has not yet expired.  Set "nMSecs" to the earliest time we have.
-            int nMSecsToGo = currentTime.msecsTo(pTimer->m_Time);
+            auto nMSecsToGo = std::chrono::milliseconds(currentTime.msecsTo(pTimer->m_Time));
 
-            if (nMSecs == 0 || nMSecsToGo < nMSecs)
+            if (nMSecs == 0ms || nMSecsToGo < nMSecs)
             {
                 nMSecs = nMSecsToGo;
             }

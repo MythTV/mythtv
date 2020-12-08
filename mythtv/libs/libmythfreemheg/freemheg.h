@@ -29,9 +29,12 @@
 #include <QRect>
 #include <QSize>
 
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
+
+using namespace std::chrono_literals;
 
 using MHPointVec = std::vector<int>; // Duplicated in BaseClasses.h
 
@@ -56,7 +59,7 @@ class MHEG
     virtual void DrawDisplay(const QRegion& toDraw) = 0;
     // Run synchronous actions and process any asynchronous events until the queues are empty.
     // Returns the number of milliseconds until wake-up or 0 if none.
-    virtual int RunAll(void) = 0;
+    virtual std::chrono::milliseconds RunAll(void) = 0;
     // Generate a UserAction event i.e. a key press.
     virtual void GenerateUserAction(int nCode) = 0;
     virtual void EngineEvent(int) = 0;
