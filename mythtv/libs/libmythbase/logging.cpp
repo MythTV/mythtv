@@ -123,26 +123,6 @@ void resetLogging(void)
     verboseInit();
 }
 
-void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
-{
-#if HAVE_GETTIMEOFDAY
-    struct timeval tv {};
-    gettimeofday(&tv, nullptr);
-    *epoch = tv.tv_sec;
-    if (usec)
-        *usec  = tv.tv_usec;
-#else
-    /* Stupid system has no gettimeofday, use less precise QDateTime */
-    QDateTime date = MythDate::current();
-    *epoch = date.toTime_t();
-    if (usec)
-    {
-        QTime     time = date.time();
-        *usec  = time.msec() * 1000;
-    }
-#endif
-}
-
 LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
         ReferenceCounter("LoggingItem", false),
@@ -150,7 +130,7 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
         m_line(_line), m_type(_type), m_level(_level),
         m_file(_file), m_function(_function)
 {
-    loggingGetTimeStamp(&m_epoch, &m_usec);
+    m_epoch = nowAsDuration<std::chrono::microseconds>();
     setThreadTid();
 }
 
@@ -223,7 +203,8 @@ void LoggingItem::setThreadTid(void)
 /// \brief Convert numerical timestamp to a readable date and time.
 QString LoggingItem::getTimestamp (void) const
 {
-    QDateTime epoch = QDateTime::fromSecsSinceEpoch(m_epoch);
+    auto msec = duration_cast<std::chrono::milliseconds>(m_epoch);
+    QDateTime epoch = QDateTime::fromMSecsSinceEpoch(msec.count());
     QString timestamp = epoch.toString("yyyy-MM-dd HH:mm:ss");
     return timestamp;
 }
@@ -231,7 +212,7 @@ QString LoggingItem::getTimestamp (void) const
 QString LoggingItem::getTimestampUs (void) const
 {
     QString timestamp = getTimestamp();
-    timestamp += QString(".%1").arg(m_usec,6,10,QChar('0'));
+    timestamp += QString(".%1").arg((m_epoch % 1s).count(),6,10,QChar('0'));
     return timestamp;
 }
 

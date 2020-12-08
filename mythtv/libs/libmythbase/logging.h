@@ -16,6 +16,7 @@
 #include "mthread.h"
 #include "referencecounter.h"
 #include "compat.h"
+#include "mythchrono.h"
 
 #ifdef _MSC_VER
 #  include <unistd.h>	// pid_t
@@ -33,7 +34,6 @@ class LoggingItem;
 
 void loggingRegisterThread(const QString &name);
 void loggingDeregisterThread(void);
-void loggingGetTimeStamp(qlonglong *epoch, uint *usec);
 
 class QWaitCondition;
 
@@ -59,12 +59,11 @@ class LoggingItem: public QObject, public ReferenceCounter
     Q_PROPERTY(int pid READ pid WRITE setPid)
     Q_PROPERTY(qlonglong tid READ tid WRITE setTid)
     Q_PROPERTY(qulonglong threadId READ threadId WRITE setThreadId)
-    Q_PROPERTY(uint usec READ usec WRITE setUsec)
     Q_PROPERTY(int line READ line WRITE setLine)
     Q_PROPERTY(int type READ type WRITE setType)
     Q_PROPERTY(int level READ level WRITE setLevel)
     Q_PROPERTY(int facility READ facility WRITE setFacility)
-    Q_PROPERTY(qlonglong epoch READ epoch WRITE setEpoch)
+    Q_PROPERTY(std::chrono::microseconds epoch READ epoch WRITE setEpoch)
     Q_PROPERTY(QString file READ file WRITE setFile)
     Q_PROPERTY(QString function READ function WRITE setFunction)
     Q_PROPERTY(QString threadName READ threadName WRITE setThreadName)
@@ -92,12 +91,11 @@ class LoggingItem: public QObject, public ReferenceCounter
     int                 pid() const         { return m_pid; };
     qlonglong           tid() const         { return m_tid; };
     qulonglong          threadId() const    { return m_threadId; };
-    uint                usec() const        { return m_usec; };
     int                 line() const        { return m_line; };
     int                 type() const        { return (int)m_type; };
     int                 level() const       { return (int)m_level; };
     int                 facility() const    { return m_facility; };
-    qlonglong           epoch() const       { return m_epoch; };
+    std::chrono::microseconds epoch() const { return m_epoch; };
     QString             file() const        { return m_file; };
     QString             function() const    { return m_function; };
     QString             threadName() const  { return m_threadName; };
@@ -109,12 +107,11 @@ class LoggingItem: public QObject, public ReferenceCounter
     void setPid(const int val)              { m_pid = val; };
     void setTid(const qlonglong val)        { m_tid = val; };
     void setThreadId(const qulonglong val)  { m_threadId = val; };
-    void setUsec(const uint val)            { m_usec = val; };
     void setLine(const int val)             { m_line = val; };
     void setType(const int val)             { m_type = (LoggingType)val; };
     void setLevel(const int val)            { m_level = (LogLevel_t)val; };
     void setFacility(const int val)         { m_facility = val; };
-    void setEpoch(const qlonglong val)      { m_epoch = val; };
+    void setEpoch(std::chrono::microseconds val) { m_epoch = val; };
     void setFile(const QString &val)        { m_file = val; };
     void setFunction(const QString &val)    { m_function = val; };
     void setThreadName(const QString &val)  { m_threadName = val; };
@@ -127,12 +124,11 @@ class LoggingItem: public QObject, public ReferenceCounter
     int                 m_pid        {-1};
     qlonglong           m_tid        {-1};
     qulonglong          m_threadId   {UINT64_MAX};
-    uint                m_usec       {0};
     int                 m_line       {0};
     LoggingType         m_type       {kMessage};
     LogLevel_t          m_level      {LOG_INFO};
     int                 m_facility   {0};
-    qlonglong           m_epoch      {0};
+    std::chrono::microseconds m_epoch {0us};
     QString             m_file       {};
     QString             m_function   {};
     QString             m_threadName {};
