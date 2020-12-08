@@ -39,7 +39,7 @@ MBASE_PUBLIC loadArray getLoadAvgs(void);
 MBASE_PUBLIC bool hasUtf8(const char *str);
 #define M_QSTRING_UNICODE(str) hasUtf8(str) ? QString::fromUtf8(str) : str
 
-MBASE_PUBLIC bool ping(const QString &host, int timeout);
+MBASE_PUBLIC bool ping(const QString &host, std::chrono::milliseconds timeout);
 MBASE_PUBLIC bool telnet(const QString &host, int port);
 
 MBASE_PUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);

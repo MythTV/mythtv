@@ -281,8 +281,8 @@ int Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                       sVBIDevice, sCardType, nAudioRateLimit,
                       sHostName, nDVBSWFilter, nDVBSatType, bDVBWaitForSeqStart,
                       bSkipBTAudio, bDVBOnDemand, nDVBDiSEqCType, nFirewireSpeed,
-                      sFirewireModel, nFirewireConnection, nSignalTimeout,
-                      nChannelTimeout, nDVBTuningDelay, nContrast, nBrightness,
+                      sFirewireModel, nFirewireConnection, std::chrono::milliseconds(nSignalTimeout),
+                      std::chrono::milliseconds(nChannelTimeout), nDVBTuningDelay, nContrast, nBrightness,
                       nColour, nHue, nDiSEqCId, bDVBEITScan);
 
     if ( nResult < 1 )

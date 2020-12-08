@@ -93,7 +93,7 @@ class ChannelScanSM : public MPEGStreamListener,
   public:
     ChannelScanSM(ScanMonitor *_scan_monitor,
                   const QString &_cardtype, ChannelBase* _channel, int _sourceID,
-                  uint signal_timeout, uint channel_timeout,
+                  std::chrono::milliseconds signal_timeout, std::chrono::milliseconds channel_timeout,
                   QString _inputname, bool test_decryption);
     ~ChannelScanSM() override;
 
@@ -117,13 +117,13 @@ class ChannelScanSM : public MPEGStreamListener,
 
     void SetAnalog(bool is_analog);
     void SetSourceID(int SourceID)     { m_sourceID = SourceID; }
-    void SetSignalTimeout(uint val)    { m_signalTimeout = val; }
-    void SetChannelTimeout(uint val)   { m_channelTimeout = val; }
+    void SetSignalTimeout(std::chrono::milliseconds val)    { m_signalTimeout = val; }
+    void SetChannelTimeout(std::chrono::milliseconds val)   { m_channelTimeout = val; }
     void SetScanDTVTunerType(DTVTunerType t) { m_scanDTVTunerType = t; }
     void SetScanDTVTunerType(int t) { m_scanDTVTunerType = DTVTunerType(t); }
 
-    uint GetSignalTimeout(void)  const { return m_signalTimeout; }
-    uint GetChannelTimeout(void) const { return m_channelTimeout; }
+    std::chrono::milliseconds GetSignalTimeout(void)  const { return m_signalTimeout; }
+    std::chrono::milliseconds GetChannelTimeout(void) const { return m_channelTimeout; }
 
     SignalMonitor    *GetSignalMonitor(void) { return m_signalMonitor; }
     DTVSignalMonitor *GetDTVSignalMonitor(void);
@@ -198,9 +198,9 @@ class ChannelScanSM : public MPEGStreamListener,
 
     static QString loc(const ChannelScanSM *siscan);
 
-    static const uint kDVBTableTimeout;
-    static const uint kATSCTableTimeout;
-    static const uint kMPEGTableTimeout;
+    static const std::chrono::milliseconds kDVBTableTimeout;
+    static const std::chrono::milliseconds kATSCTableTimeout;
+    static const std::chrono::milliseconds kMPEGTableTimeout;
 
   private:
     // Set in constructor
@@ -208,10 +208,10 @@ class ChannelScanSM : public MPEGStreamListener,
     ChannelBase      *m_channel;
     SignalMonitor    *m_signalMonitor;
     int               m_sourceID;
-    uint              m_signalTimeout;
-    uint              m_channelTimeout;
-    uint              m_otherTableTimeout {0};
-    uint              m_otherTableTime    {0};
+    std::chrono::milliseconds m_signalTimeout;
+    std::chrono::milliseconds m_channelTimeout;
+    std::chrono::milliseconds m_otherTableTimeout {0ms};
+    std::chrono::milliseconds m_otherTableTime    {0ms};
     bool              m_setOtherTables    {false};
     QString           m_inputName;
     bool              m_testDecryption;

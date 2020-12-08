@@ -238,8 +238,8 @@ class MTV_PUBLIC CardUtil
                                           uint firewire_speed,
                                           const QString &firewire_model,
                                           uint firewire_connection,
-                                          uint signal_timeout,
-                                          uint channel_timeout,
+                                          std::chrono::milliseconds signal_timeout,
+                                          std::chrono::milliseconds channel_timeout,
                                           uint dvb_tuning_delay,
                                           uint contrast,
                                           uint brightness,
@@ -374,8 +374,8 @@ class MTV_PUBLIC CardUtil
 
     // DTV info
     static bool         GetTimeouts(uint inputid,
-                                    uint &signal_timeout,
-                                    uint &channel_timeout);
+                                    std::chrono::milliseconds &signal_timeout,
+                                    std::chrono::milliseconds &channel_timeout);
     static bool         IgnoreEncrypted(uint inputid,
                                         const QString &inputname);
     static bool         TVOnly(uint inputid, const QString &inputname);

@@ -244,11 +244,11 @@ bool hasUtf8(const char *str)
  * determine what parameter that platform's ping requires to specify
  * the timeout and add another case to the \#ifdef statement.
  */
-bool ping(const QString &host, int timeout)
+bool ping(const QString &host, std::chrono::milliseconds timeout)
 {
 #ifdef _WIN32
     QString cmd = QString("%systemroot%\\system32\\ping.exe -w %1 -n 1 %2>NUL")
-                  .arg(timeout*1000).arg(host);
+                  .arg(timeout.count()) .arg(host);
 
     return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) == GENERIC_EXIT_OK;
@@ -265,7 +265,9 @@ bool ping(const QString &host, int timeout)
     QString pingcmd =
         addr.protocol() == QAbstractSocket::IPv6Protocol ? "ping6" : "ping";
     QString cmd = QString("%1 %2 %3 -c 1  %4  >/dev/null 2>&1")
-                  .arg(pingcmd).arg(timeoutparam).arg(timeout).arg(host);
+                  .arg(pingcmd).arg(timeoutparam)
+                  .arg(duration_cast<std::chrono::seconds>(timeout).count())
+                  .arg(host);
 
     return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) == GENERIC_EXIT_OK;
@@ -881,7 +883,7 @@ void setHttpProxy(void)
                 QString("assuming port %1 on host %2") .arg(port).arg(host));
             url.setPort(port);
         }
-        else if (!ping(host, 1))
+        else if (!ping(host, 1s))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("cannot locate host %1").arg(host) +

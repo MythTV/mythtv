@@ -65,26 +65,26 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     // This value should probably come from the database...
     int threshold = 0; // signal strength threshold
 
-    // Tuning timeout time for channel lock from database, minimum is 3000 ms
-    uint wait = 3000;                       // Minimum timeout time
-    uint signal_timeout = 0;                // Not used
-    uint tuning_timeout = 0;                // Maximum time for channel lock from card
+    // Tuning timeout time for channel lock from database, minimum is 3s
+    std::chrono::milliseconds wait = 3s;             // Minimum timeout time
+    std::chrono::milliseconds signal_timeout = 0ms;  // Not used
+    std::chrono::milliseconds tuning_timeout = 0ms;  // Maximum time for channel lock from card
     CardUtil::GetTimeouts(db_cardnum, signal_timeout, tuning_timeout);
     if (tuning_timeout < wait)
     {
         LOG(VB_CHANNEL, LOG_DEBUG, LOC +
             QString("Tuning timeout from database: %1 ms is too small, using %2 ms")
-                .arg(tuning_timeout).arg(wait));
+                .arg(tuning_timeout.count()).arg(wait.count()));
     }
     else
     {
         wait = tuning_timeout;              // Use value from database
         LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-            QString("Tuning timeout: %1 ms").arg(wait));
+            QString("Tuning timeout: %1 ms").arg(wait.count()));
     }
 
-    m_signalLock.SetTimeout(wait);
-    m_signalStrength.SetTimeout(wait);
+    m_signalLock.SetTimeout(wait.count());
+    m_signalStrength.SetTimeout(wait.count());
     m_signalStrength.SetThreshold(threshold);
 
     // This is incorrect for API 3.x but works better than int16_t range
