@@ -820,13 +820,11 @@ void MythMediaBuffer::run(void)
     RunProlog();
 
     // These variables are used to adjust the read block size
-    struct timeval lastread {};
-    struct timeval now {};
-    long readTimeAvg = 300;
+    std::chrono::milliseconds readTimeAvg = 300ms;
     bool ignoreForReadTiming = true;
     int  eofreads = 0;
 
-    gettimeofday(&lastread, nullptr); // this is just to keep gcc happy
+    auto lastread = nowAsDuration<std::chrono::milliseconds>();
 
     CreateReadAheadBuffer();
     m_rwLock.lockForWrite();
@@ -909,14 +907,12 @@ void MythMediaBuffer::run(void)
                 totfree = m_readBlockSize;
 
             // adapt blocksize
-            gettimeofday(&now, nullptr);
+            auto now = nowAsDuration<std::chrono::milliseconds>();
             if (!ignoreForReadTiming)
             {
-                long readinterval = (now.tv_sec  - lastread.tv_sec ) * 1000 +
-                                    (now.tv_usec - lastread.tv_usec) / 1000;
-                readTimeAvg = (readTimeAvg * 9 + readinterval) / 10;
+                readTimeAvg = (readTimeAvg * 9 + (now - lastread)) / 10;
 
-                if (readTimeAvg < 150 &&
+                if (readTimeAvg < 150ms &&
                     static_cast<uint>(m_readBlockSize) < (BUFFER_SIZE_MINIMUM >>2) &&
                     m_readBlockSize >= DEFAULT_CHUNK_SIZE /* low_buffers */ &&
                     m_readBlockSize <= KB512)
@@ -928,18 +924,18 @@ void MythMediaBuffer::run(void)
                         m_readBlockSize = KB512;
                     LOG(VB_FILE, LOG_INFO, LOC + QString("Avg read interval was %1 msec. "
                                                          "%2K -> %3K block size")
-                            .arg(readTimeAvg).arg(old_block_size/1024).arg(m_readBlockSize/1024));
-                    readTimeAvg = 225;
+                        .arg(readTimeAvg.count()).arg(old_block_size/1024).arg(m_readBlockSize/1024));
+                    readTimeAvg = 225ms;
                 }
-                else if (readTimeAvg > 300 && m_readBlockSize > DEFAULT_CHUNK_SIZE)
+                else if (readTimeAvg > 300ms && m_readBlockSize > DEFAULT_CHUNK_SIZE)
                 {
                     m_readBlockSize -= DEFAULT_CHUNK_SIZE;
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("Avg read interval was %1 msec. %2K -> %3K block size")
-                            .arg(readTimeAvg)
+                            .arg(readTimeAvg.count())
                             .arg((m_readBlockSize+DEFAULT_CHUNK_SIZE)/1024)
                             .arg(m_readBlockSize/1024));
-                    readTimeAvg = 225;
+                    readTimeAvg = 225ms;
                 }
             }
             lastread = now;
@@ -978,7 +974,7 @@ void MythMediaBuffer::run(void)
                 QString("safe_read(...@%1, %2) -> %3, took %4 ms %5 avg %6 ms")
                 .arg(rbwposcopy).arg(totfree).arg(readResult).arg(sr_elapsed)
                 .arg(QString("(%1Mbps)").arg(static_cast<double>(bps) / 1000000.0))
-                .arg(readTimeAvg));
+                .arg(readTimeAvg.count()));
             UpdateStorageRate(bps);
 
             if (readResult >= 0)
@@ -1553,14 +1549,14 @@ uint64_t MythMediaBuffer::UpdateDecoderRate(uint64_t Latest)
     if (!m_bitrateMonitorEnabled)
         return 0;
 
-    qint64 current = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    qint64 expire = current - 1000;
+    auto current = std::chrono::milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    std::chrono::milliseconds expire = current - 1s;
 
     m_decoderReadLock.lock();
     if (Latest)
         m_decoderReads.insert(current, Latest);
     uint64_t total = 0;
-    QMutableMapIterator<qint64,uint64_t> it(m_decoderReads);
+    QMutableMapIterator<std::chrono::milliseconds,uint64_t> it(m_decoderReads);
     while (it.hasNext())
     {
         it.next();
@@ -1584,14 +1580,14 @@ uint64_t MythMediaBuffer::UpdateStorageRate(uint64_t Latest)
     if (!m_bitrateMonitorEnabled)
         return 0;
 
-    qint64 current = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    qint64 expire = current - 1000;
+    auto current = std::chrono::milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    auto expire = current - 1s;
 
     m_storageReadLock.lock();
     if (Latest)
         m_storageReads.insert(current, Latest);
     uint64_t total = 0;
-    QMutableMapIterator<qint64,uint64_t> it(m_storageReads);
+    QMutableMapIterator<std::chrono::milliseconds,uint64_t> it(m_storageReads);
     while (it.hasNext())
     {
         it.next();

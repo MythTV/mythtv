@@ -223,9 +223,9 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
 
     bool                   m_bitrateMonitorEnabled { false };
     QMutex                 m_decoderReadLock;
-    QMap<qint64, uint64_t> m_decoderReads;
+    QMap<std::chrono::milliseconds, uint64_t> m_decoderReads;
     QMutex                 m_storageReadLock;
-    QMap<qint64, uint64_t> m_storageReads;
+    QMap<std::chrono::milliseconds, uint64_t> m_storageReads;
 
     // note 1: numfailures is modified with only a read lock in the
     // read ahead thread, but this is safe since all other places
