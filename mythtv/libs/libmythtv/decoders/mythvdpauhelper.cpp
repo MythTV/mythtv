@@ -332,6 +332,9 @@ bool MythVDPAUHelper::HEVCSupported(void)
     if (!ok || !infostring)
         return false;
 
+    if (!QString(infostring).contains("NVIDIA", Qt::CaseInsensitive))
+        return true;
+
     int driver = 0;
     sscanf(infostring, "NVIDIA VDPAU Driver Shared Library  %d", &driver);
     return !(driver < 410);
