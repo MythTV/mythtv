@@ -188,7 +188,7 @@ void JobQueue::ProcessQueue(void)
         locker.unlock();
 
         bool startedJobAlready = false;
-        int sleepTime = gCoreContext->GetNumSetting("JobQueueCheckFrequency", 30);
+        auto sleepTime = gCoreContext->GetDurSetting<std::chrono::seconds>("JobQueueCheckFrequency", 30s);
         int maxJobs = gCoreContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
         LOG(VB_JOBQUEUE, LOG_INFO, LOC +
             QString("Currently set to run up to %1 job(s) max.")
@@ -491,9 +491,9 @@ void JobQueue::ProcessQueue(void)
         locker.relock();
         if (m_processQueue)
         {
-            int st = (startedJobAlready) ? (5 * 1000) : (sleepTime * 1000);
-            if (st > 0)
-                m_queueThreadCond.wait(locker.mutex(), st);
+            std::chrono::milliseconds st = (startedJobAlready) ? 5s : sleepTime;
+            if (st > 0ms)
+                m_queueThreadCond.wait(locker.mutex(), st.count());
         }
     }
 }
