@@ -19,6 +19,15 @@ class MythWaylandDevice;
 // but that was meant to be fixed in:-
 // https://github.com/qt/qtwayland/commit/7451faab740ec6294159be60d8a713f5e8070c09
 // Ringfence here to ensure the workaround does not live on forever.
+//
+// Note: There appears to be an additional, possibly related issue running Ubuntu under
+// Wayland (20.10, Qt 5.14.2) and using XCB (not Wayland directly). On startup
+// the UI is unresponsive and paint events are received roughly once per second.
+// Forcing an expose event (al-tab away and back) fixes it - otherwise it resolves
+// itself after 10-15seconds. The following define can be enabled to debug events
+// received by the window
+//#define DEBUG_PAINTERWIN_EVENTS
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5,12,0)) && (QT_VERSION < QT_VERSION_CHECK(5,15,0))
 #define USING_WAYLAND_EXPOSE_HACK 1
 #endif
@@ -42,6 +51,9 @@ class MythPainterWindow : public QWidget
     MythRender* GetRenderDevice();
     bool        RenderIsShared ();
     void        resizeEvent    (QResizeEvent* /*ResizeEvent*/) override;
+#if defined(DEBUG_PAINTERWIN_EVENTS)
+    bool        event(QEvent* Event) override;
+#endif
 
   protected:
     explicit MythPainterWindow(MythMainWindow* MainWin);

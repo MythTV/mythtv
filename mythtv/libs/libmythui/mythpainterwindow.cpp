@@ -168,6 +168,14 @@ bool MythPainterWindow::RenderIsShared()
     return m_render && m_render->IsShared();
 }
 
+#if defined(DEBUG_PAINTERWIN_EVENTS)
+bool MythPainterWindow::event(QEvent *Event)
+{
+    qInfo() << Event;
+    return QWidget::event(Event);
+}
+#endif
+
 void MythPainterWindow::resizeEvent(QResizeEvent* /*ResizeEvent*/)
 {
 #ifdef USING_WAYLANDEXTRAS
@@ -186,8 +194,7 @@ void MythPainterWindow::resizeEvent(QResizeEvent* /*ResizeEvent*/)
 
 void MythPainterWindow::CheckWindowIsExposed()
 {
-    auto handle = windowHandle();
-    if (handle && handle->isVisible())
+    if (auto handle = windowHandle(); handle && handle->isVisible())
     {
         if (handle->isExposed())
         {
