@@ -1,6 +1,8 @@
 // MythTV
 #include "mythpower.h"
 
+class MythDialogBox;
+
 class ExitPrompter : public QObject
 {
     Q_OBJECT
@@ -33,4 +35,5 @@ class ExitPrompter : public QObject
     QString    m_haltCommand;
     QString    m_rebootCommand;
     QString    m_suspendCommand;
+    MythDialogBox* m_dialog { nullptr };
 };

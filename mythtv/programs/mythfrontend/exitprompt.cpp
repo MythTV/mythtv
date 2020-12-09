@@ -25,6 +25,10 @@ ExitPrompter::ExitPrompter()
 
 ExitPrompter::~ExitPrompter()
 {
+    // Ensure additional actions are not processed after we are deleted
+    if (m_dialog)
+        m_dialog->SetReturnEvent(nullptr, QString());
+
     if (m_power)
         MythPower::AcquireRelease(this, false);
     LOG(VB_GENERAL, LOG_INFO, "Deleted ExitPrompter");
@@ -237,46 +241,49 @@ void ExitPrompter::HandleExit()
             break;
     }
 
+    delete m_dialog;
     MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
-    auto *dlg = new MythDialogBox(tr("Do you really want to exit MythTV?"), ss,
+    m_dialog = new MythDialogBox(tr("Do you really want to exit MythTV?"), ss,
                                   "exit prompt");
 
-    if (!dlg->Create())
+    if (!m_dialog->Create())
     {
         LOG(VB_GENERAL, LOG_ERR, "Can't create Exit Prompt dialog?");
-        delete dlg;
+        delete m_dialog;
         DoQuit();
         return;
     }
 
     // ensure ExitPrompt is deleted if the dialog is not actioned
-    connect(dlg, &MythDialogBox::Closed, this, &ExitPrompter::MainDialogClosed);
+    connect(m_dialog, &MythDialogBox::Closed, this, &ExitPrompter::MainDialogClosed);
 
     bool confirm = m_confirm || !frontendOnly;
 
-    dlg->AddButton(QCoreApplication::translate("(Common)", "No"));
+    m_dialog->AddButton(QCoreApplication::translate("(Common)", "No"));
     if (allowExit)
-        dlg->AddButton(tr("Yes, Exit now"), &ExitPrompter::DoQuit);
+        m_dialog->AddButton(tr("Yes, Exit now"), &ExitPrompter::DoQuit);
     if (allowReboot)
-        dlg->AddButton(tr("Yes, Exit and Reboot"),
+        m_dialog->AddButton(tr("Yes, Exit and Reboot"),
                        confirm ? &ExitPrompter::ConfirmReboot : qOverload<>(&ExitPrompter::DoReboot));
     if (allowShutdown)
-        dlg->AddButton(tr("Yes, Exit and Shutdown"),
+        m_dialog->AddButton(tr("Yes, Exit and Shutdown"),
                         confirm ? &ExitPrompter::ConfirmHalt : qOverload<>(&ExitPrompter::DoHalt));
     if (allowStandby)
-        dlg->AddButton(tr("Yes, Enter Standby Mode"), &ExitPrompter::DoStandby);
+        m_dialog->AddButton(tr("Yes, Enter Standby Mode"), &ExitPrompter::DoStandby);
     if (allowSuspend)
-        dlg->AddButton(tr("Yes, Suspend"),
+        m_dialog->AddButton(tr("Yes, Suspend"),
                         confirm ? &ExitPrompter::ConfirmSuspend : qOverload<>(&ExitPrompter::DoSuspend));
 
-    // This is a hack so that the button clicks target the correct slot:
-    dlg->SetReturnEvent(this, QString());
-
-    ss->AddScreen(dlg);
+    // This is a hack so that the button clicks target the correct slot
+    m_dialog->SetReturnEvent(this, QString());
+    ss->AddScreen(m_dialog);
 }
 
 void ExitPrompter::Confirm(MythPower::Feature Action)
 {
+    // Main dialog will now be deleted
+    m_dialog = nullptr;
+
     MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
 
     QString msg;
@@ -308,6 +315,5 @@ void ExitPrompter::Confirm(MythPower::Feature Action)
         connect(dlg, &MythConfirmationDialog::haveResult, this, qOverload<bool>(&ExitPrompter::DoReboot));
     else if (Action == MythPower::FeatureSuspend)
         connect(dlg, &MythConfirmationDialog::haveResult, this, qOverload<bool>(&ExitPrompter::DoSuspend));
-
     ss->AddScreen(dlg);
 }
