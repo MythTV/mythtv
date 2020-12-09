@@ -40,7 +40,6 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
     friend class MythPainterWindowQt;
 
   public:
-    enum {drawRefresh = 70};
     void Init(bool MayReInit = true);
     void ReinitDone();
     void Show();
