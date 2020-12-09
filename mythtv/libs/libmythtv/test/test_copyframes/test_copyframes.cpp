@@ -212,7 +212,7 @@ void TestCopyFrames::TestCopy()
     auto getdefaultframe = [](VideoFrameType T, int W, int H, int A)
     {
         size_t size = MythVideoFrame::GetBufferSize(T, W, H, A);
-        return new MythVideoFrame(T, MythVideoFrame::GetAlignedBuffer(size), size, W, H, A);
+        return new MythVideoFrame(T, MythVideoFrame::GetAlignedBuffer(size), size, W, H, nullptr, A);
     };
 
     for (const auto & tests : s_tests)
