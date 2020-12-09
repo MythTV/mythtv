@@ -275,7 +275,6 @@ namespace M3U
         return true;
     }
 
-    // cppcheck-suppress constParameter
     bool ParseKey(int version, const QString& line, bool& aesmsg,
                   const QString& loc, QString &path, QString &iv)
     {

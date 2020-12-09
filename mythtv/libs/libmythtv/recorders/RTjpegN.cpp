@@ -519,7 +519,7 @@ void RTjpeg::QuantInit(void)
  for (int i = 0; i < 64; i++)
      qtbl.m_int16[i] = static_cast<int16_t>(m_lqt[i]);
 
- // cppcheck-suppress [unreadVariable,redundantAssignment]
+ // cppcheck-suppress redundantAssignment
  qtbl.m_int32 = m_cqt.data();
  for (int i = 0; i < 64; i++)
     qtbl.m_int16[i] = static_cast<int16_t>(m_cqt[i]);
