@@ -14,7 +14,6 @@
 #include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
-#include "mythsignalingtimer.h"
 #include "mthread.h"
 
 #define LOGLINE_MAX (2048-120)

@@ -13,7 +13,6 @@
 #include "mythconfig.h"
 #include "mythbaseexp.h"  //  MBASE_PUBLIC , etc.
 #include "verbosedefs.h"
-#include "mythsignalingtimer.h"
 #include "mthread.h"
 #include "referencecounter.h"
 #include "compat.h"
