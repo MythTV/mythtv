@@ -1330,8 +1330,10 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     // last resort
     rates.emplace_back(30000.0 / 1001.0);
 
+    auto FuzzyEquals = [](double First, double Second) { return abs(First - Second) < 0.03; };
+
     // debug
-    if (!qFuzzyCompare(rates.front(), m_fps))
+    if (!FuzzyEquals(rates.front(), m_fps))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Selected FPS: %1 (Avg:%2 Mult:%3 Codec:%4 Container:%5 Estimated:%6)")
@@ -1339,12 +1341,12 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
                 .arg(m_fpsMultiplier).arg(codec_fps).arg(container_fps).arg(estimated_fps));
     }
 
-    auto IsStandard = [](double Rate)
+    auto IsStandard = [&FuzzyEquals](double Rate)
     {
         // List of known, standards based frame rates
         static const vector<double> s_normRates =
         {
-            24000.0 / 1001.0, 23.976, 25.0, 30000.0 / 1001.0,
+            24000.0 / 1001.0, 23.976, 24.0, 25.0, 30000.0 / 1001.0,
             29.97, 30.0, 50.0, 60000.0 / 1001.0, 59.94, 60.0, 100.0,
             120000.0 / 1001.0, 119.88, 120.0
         };
@@ -1352,7 +1354,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
         if (Rate > 1.0 && Rate < 121.0)
         {
             for (auto rate : s_normRates)
-                if (qFuzzyCompare(rate, Rate))
+                if (FuzzyEquals(rate, Rate))
                     return true;
         }
         return false;
