@@ -1258,7 +1258,6 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             if (formatCounts[i] > formatFrames)
             {
                 format = i;
-                // cppcheck-suppress unreadVariable
                 formatFrames = formatCounts[i];
             }
         }
@@ -1304,7 +1303,6 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         }
         else
         {
-            // cppcheck-suppress unreadVariable
             lastFrameWasBlank = false;
         }
 
@@ -1809,7 +1807,6 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         msg = FORMAT_MSG(curBlock, fbp);
         LOG(VB_COMMFLAG, LOG_DEBUG, msg);
 
-        // cppcheck-suppress unreadVariable
         lastScore = thisScore;
         curBlock++;
     }

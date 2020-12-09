@@ -300,7 +300,6 @@ volatile bool      DishContentDescriptor::s_dishCategoryDescExists = false;
 
 QString dish_theme_type_to_string(uint theme_type)
 {
-    // cppcheck-suppress variableScope
     static const std::array<const std::string,kThemeLast> s_themes =
     {
         "", "Movie", "Sports", "News/Business", "Family/Children", "Education",

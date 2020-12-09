@@ -30,7 +30,6 @@ ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
       m_commDetectBorder(commdetectborder_in),
       m_edgeMask(new EdgeMaskEntry[m_width * m_height]),
       // cppcheck doesn't understand deleteLater
-      // cppcheck-suppress noDestructor
       m_logoMaxValues(new unsigned char[m_width * m_height]),
       m_logoMinValues(new unsigned char[m_width * m_height]),
       m_logoFrame(new unsigned char[m_width * m_height]),

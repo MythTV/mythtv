@@ -97,7 +97,6 @@ void CetonSignalMonitor::UpdateValues(void)
         return;
     }
 
-    // cppcheck-suppress variableScope
     uint sig = 100;  // TODO find some way to actually monitor signal level
 
     // Set SignalMonitorValues from info from card.

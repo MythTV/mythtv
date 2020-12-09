@@ -5864,7 +5864,6 @@ bool TV::ProcessSmartChannel(QString &InputStr)
 
     // Look for channel in line-up
     QString needed_spacer;
-    // cppcheck-suppress variableScope
     uint    pref_cardid = 0;
     bool    is_not_complete = true;
 
@@ -10001,7 +10000,7 @@ void TV::ShowOSDPromptDeleteRecording(const QString& Title, bool Force)
     if (!m_playerContext.m_playingInfo->QueryIsDeleteCandidate(true))
     {
         LOG(VB_GENERAL, LOG_ERR, "This program cannot be deleted at this time.");
-        ProgramInfo pginfo(*m_playerContext.m_playingInfo); // cppcheck-suppress variableScope
+        ProgramInfo pginfo(*m_playerContext.m_playingInfo);
         m_playerContext.UnlockPlayingInfo(__FILE__, __LINE__);
 
         OSD *osd = GetOSDL();

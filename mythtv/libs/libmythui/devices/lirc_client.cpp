@@ -1821,7 +1821,6 @@ int lirc_nextcode(struct lirc_state *state, char **code)
         // only way for the loop to exit and execute the next line of
         // code is if end becomes non-null.
         //
-        // cppcheck-suppress nullPointerArithmeticRedundantCheck
 	end++;
 	s_endLen=strlen(end);
 	char c=end[0];

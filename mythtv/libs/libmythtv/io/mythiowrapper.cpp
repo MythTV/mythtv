@@ -484,7 +484,6 @@ char *MythDirRead(int DirID)
     {
         struct dirent *dir = nullptr;
         // glibc deprecated readdir_r in version 2.24,
-        // cppcheck-suppress readdirCalled
         if ((dir = readdir(s_localdirs[DirID])) != nullptr)
             return strdup(dir->d_name);
     }

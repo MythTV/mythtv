@@ -575,7 +575,6 @@ void ChannelScanner::PreScanCommon(
     bool using_rotor = false;
 
 #ifdef USING_DVB
-    // cppcheck-suppress redundantAssignment
     dvbm = m_sigmonScanner->GetDVBSignalMonitor();
     if (dvbm && mon)
         using_rotor = mon->HasFlags(SignalMonitor::kDVBSigMon_WaitForPos);

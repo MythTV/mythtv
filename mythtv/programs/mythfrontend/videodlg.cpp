@@ -1785,7 +1785,6 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, const QString& type,
     if (list_count > 0)
     {
         QList<MythGenericTree *> subDirs;
-        // cppcheck-suppress variableScope
         int maxRecurse = 1;
 
         for (int i = 0; i < list_count; i++)

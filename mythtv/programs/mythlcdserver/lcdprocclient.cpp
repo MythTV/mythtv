@@ -138,7 +138,6 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
     // Open communications
     // Store the hostname and port in case we need to reconnect.
 
-    // cppcheck-suppress variableScope
     int timeout = 1000;
     m_hostname = lhostname;
     m_port = lport;

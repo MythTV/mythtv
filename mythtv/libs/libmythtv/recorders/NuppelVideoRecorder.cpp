@@ -744,7 +744,6 @@ bool NuppelVideoRecorder::MJPEGInit(void)
 void NuppelVideoRecorder::InitBuffers(void)
 {
     int videomegs = 0;
-    // cppcheck-suppress variableScope
     int audiomegs = 2;
 
     if (!m_videoBufferSize)
@@ -2660,7 +2659,6 @@ void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
     struct rtframeheader frameheader {};
     int raw = 0;
     int compressthis = m_compression;
-    // cppcheck-suppress variableScope
     std::array<uint8_t*,3> planes {
         frame->m_buffer + frame->m_offsets[0],
         frame->m_buffer + frame->m_offsets[1],

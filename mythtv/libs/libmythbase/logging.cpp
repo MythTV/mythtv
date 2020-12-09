@@ -332,7 +332,6 @@ void LoggerThread::run(void)
 
     RunEpilog();
 
-    // cppcheck-suppress knownConditionTrueFalse
     if (dieNow)
     {
         qApp->processEvents();

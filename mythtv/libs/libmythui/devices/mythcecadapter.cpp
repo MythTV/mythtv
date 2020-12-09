@@ -21,13 +21,12 @@
 #define LOC QString("CECAdapter: ")
 
 #if CEC_LIB_VERSION_MAJOR <= 3
-// cppcheck-suppress passedByValue
+
 int MythCECAdapter::LogMessageCallback(void* /*unused*/, const cec_log_message Message)
 {
     return MythCECAdapter::LogMessage(Message);
 }
 
-// cppcheck-suppress passedByValue
 int MythCECAdapter::KeyPressCallback(void* Adapter, const cec_keypress Keypress)
 {
     MythCECAdapter* adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
@@ -36,7 +35,6 @@ int MythCECAdapter::KeyPressCallback(void* Adapter, const cec_keypress Keypress)
     return 1;
 }
 
-// cppcheck-suppress passedByValue
 int MythCECAdapter::CommandCallback(void* Adapter, const cec_command Command)
 {
     MythCECAdapter* adapter = reinterpret_cast<MythCECAdapter*>(Adapter);
@@ -45,7 +43,6 @@ int MythCECAdapter::CommandCallback(void* Adapter, const cec_command Command)
     return 1;
 }
 
-// cppcheck-suppress passedByValue
 int MythCECAdapter::AlertCallback(void* /*unused*/, const libcec_alert Alert, const libcec_parameter Data)
 {
     return MythCECAdapter::HandleAlert(Alert, Data);

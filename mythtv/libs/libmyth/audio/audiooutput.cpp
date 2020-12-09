@@ -366,7 +366,6 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
                 (static_cast<int>(aosettings.canLPCM()) << 0) |
                 (static_cast<int>(aosettings.canAC3())  << 1) |
                 (static_cast<int>(aosettings.canDTS())  << 2);
-            // cppcheck-suppress variableScope
             static const std::array<const std::string,3> s_typeNames { "LPCM", "AC3", "DTS" };
 
             if (mask != 0)

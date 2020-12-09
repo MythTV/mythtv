@@ -243,7 +243,6 @@ QString AC3AudioStreamDescriptor::SampleRateCodeString(void) const
 
 QString AC3AudioStreamDescriptor::BitRateCodeString(void) const
 {
-    // cppcheck-suppress variableScope
     static const std::array<const std::string,19> s_ebr
     {
         "=32kbps",  "=40kbps",  "=48kbps",  "=56kbps",  "=64kbps",
