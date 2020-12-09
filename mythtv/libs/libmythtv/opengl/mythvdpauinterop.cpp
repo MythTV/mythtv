@@ -72,7 +72,7 @@ void MythVDPAUInterop::Cleanup(void)
     m_deinterlacer = DEINT_NONE;
     m_mixerSize = QSize();
     m_mixerChroma = VDP_CHROMA_TYPE_420;
-
+    m_mapped = false;
     DeleteTextures();
 }
 
@@ -188,7 +188,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
         if (!m_outputSurfaceReg && !m_openglTextures.empty())
         {
             // This may fail if another interop is registered (but should not happen if
-            // decoder creataion is working properly). Subsequent surface
+            // decoder creation is working properly). Subsequent surface
             // registration will then fail and we will try again on the next pass
             m_initNV(reinterpret_cast<void*>(static_cast<uintptr_t>(DeviceContext->device)),
                      reinterpret_cast<const void*>(DeviceContext->get_proc_address));
@@ -351,11 +351,13 @@ vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
     }
 
     // Render surface
-    m_unmapNV(1, &m_outputSurfaceReg);
+    if (m_mapped)
+        m_unmapNV(1, &m_outputSurfaceReg);
     m_helper->MixerRender(m_mixer, surface, m_outputSurface, Scan,
                           static_cast<int>(Frame->m_interlacedReverse ? !Frame->m_topFieldFirst :
                           Frame->m_topFieldFirst), m_referenceFrames);
     m_mapNV(1, &m_outputSurfaceReg);
+    m_mapped = true;
     return m_openglTextures[DUMMY_INTEROP_ID];
 }
 

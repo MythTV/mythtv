@@ -69,6 +69,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
     MythCodecID         m_codec             { kCodec_NONE };
     bool                m_preempted         { false   };
     bool                m_preemptedWarning  { false   };
+    bool                m_mapped            { false   };
 };
 
-#endif // MYTHVDPAUINTEROP_H
+#endif
