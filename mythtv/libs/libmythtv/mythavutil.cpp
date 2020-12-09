@@ -129,12 +129,12 @@ void MythAVUtil::DeinterlaceAVFrame(AVFrame *Frame)
 
     // Create a wrapper frame and set it up
     // (yes - this will end up being a wrapper around a wrapper!)
-    MythVideoFrame mythframe;
-    VideoFrameType type = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->format));
-    if (MythVideoFrame::YUVFormat(type))
+    if (VideoFrameType type = PixelFormatToFrameType(static_cast<AVPixelFormat>(Frame->format));
+        MythVideoFrame::YUVFormat(type))
     {
-        mythframe.Init(type, Frame->data[0], MythVideoFrame::GetBufferSize(type, Frame->width, Frame->height),
-                       Frame->width, Frame->height);
+        MythVideoFrame mythframe(type, Frame->data[0],
+                                 MythVideoFrame::GetBufferSize(type, Frame->width, Frame->height),
+                                 Frame->width, Frame->height);
         mythframe.m_offsets[0] = 0;
         mythframe.m_offsets[1] = static_cast<int>(Frame->data[1] - Frame->data[0]);
         mythframe.m_offsets[2] = static_cast<int>(Frame->data[2] - Frame->data[0]);
@@ -146,10 +146,11 @@ void MythAVUtil::DeinterlaceAVFrame(AVFrame *Frame)
         mythframe.m_deinterlaceAllowed = DEINT_ALL;
         MythDeinterlacer deinterlacer;
         deinterlacer.Filter(&mythframe, kScan_Interlaced, nullptr, true);
+        // Must remove buffer before mythframe is deleted
+        mythframe.m_buffer = nullptr;
     }
 
-    // Must remove buffer before mythframe is deleted
-    mythframe.m_buffer = nullptr;
+
 }
 
 /// \brief Initialise AVFrame with content from MythVideoFrame

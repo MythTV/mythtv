@@ -19,7 +19,8 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
                                                MythCodecID CodecID,       const QSize VideoDim,
                                                const QSize VideoDispDim,  float VideoAspect,
                                                float FrameRate,           uint  PlayerFlags,
-                                               const QString& Codec,      int ReferenceFrames)
+                                               const QString& Codec,      int ReferenceFrames,
+                                               const VideoFrameTypes*& RenderFormats)
 {
     if (!MainWindow)
     {
@@ -135,6 +136,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
             if (video->Init(VideoDim, VideoDispDim, VideoAspect, MainWindow->GetUIScreenRect(), CodecID))
             {
                 video->SetVideoScalingAllowed(true);
+                RenderFormats = video->m_renderFormats;
                 return video;
             }
 
@@ -341,25 +343,25 @@ bool MythVideoOutputGPU::CreateBuffers(MythCodecID CodecID, QSize Size)
     if (codec_is_copyback(CodecID))
     {
         m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_NONE), 1, 4, 2);
-        return m_videoBuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height());
+        return m_videoBuffers.CreateBuffers(FMT_YV12, Size.width(), Size.height(), m_renderFormats);
     }
 
     if (codec_is_mediacodec(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_MEDIACODEC, Size, 1, 2, 2);
+        return m_videoBuffers.CreateBuffers(FMT_MEDIACODEC, m_renderFormats, Size, 1, 2, 2);
     if (codec_is_vaapi(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_VAAPI, Size, 2, 1, 4, m_maxReferenceFrames);
+        return m_videoBuffers.CreateBuffers(FMT_VAAPI, m_renderFormats, Size, 2, 1, 4, m_maxReferenceFrames);
     if (codec_is_vtb(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_VTB, Size, 1, 4, 2);
+        return m_videoBuffers.CreateBuffers(FMT_VTB, m_renderFormats, Size, 1, 4, 2);
     if (codec_is_vdpau(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_VDPAU, Size, 2, 1, 4, m_maxReferenceFrames);
+        return m_videoBuffers.CreateBuffers(FMT_VDPAU, m_renderFormats, Size, 2, 1, 4, m_maxReferenceFrames);
     if (codec_is_nvdec(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_NVDEC, Size, 2, 1, 4);
+        return m_videoBuffers.CreateBuffers(FMT_NVDEC, m_renderFormats, Size, 2, 1, 4);
     if (codec_is_mmal(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_MMAL, Size, 2, 1, 4);
+        return m_videoBuffers.CreateBuffers(FMT_MMAL, m_renderFormats, Size, 2, 1, 4);
     if (codec_is_v4l2(CodecID) || codec_is_drmprime(CodecID))
-        return m_videoBuffers.CreateBuffers(FMT_DRMPRIME, Size, 2, 1, 4);
+        return m_videoBuffers.CreateBuffers(FMT_DRMPRIME, m_renderFormats, Size, 2, 1, 4);
 
-    return m_videoBuffers.CreateBuffers(FMT_YV12, Size, 1, 8, 4, m_maxReferenceFrames);
+    return m_videoBuffers.CreateBuffers(FMT_YV12, m_renderFormats, Size, 1, 8, 4, m_maxReferenceFrames);
 }
 
 void MythVideoOutputGPU::DestroyBuffers()

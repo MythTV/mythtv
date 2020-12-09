@@ -27,18 +27,19 @@ MythVideoFrame::~MythVideoFrame()
         av_freep(&m_buffer);
 }
 
-MythVideoFrame::MythVideoFrame(VideoFrameType Type, int Width, int Height)
+MythVideoFrame::MythVideoFrame(VideoFrameType Type, int Width, int Height, const VideoFrameTypes* RenderFormats)
 {
-    Init(Type, Width, Height);
+    Init(Type, Width, Height, (RenderFormats == nullptr) ? &s_defaultRenderFormats : RenderFormats);
 }
 
 MythVideoFrame::MythVideoFrame(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
-                               int Width, int Height, int Alignment)
+                               int Width, int Height, const VideoFrameTypes* RenderFormats, int Alignment)
 {
-    Init(Type, Buffer, BufferSize, Width, Height, Alignment);
+    const VideoFrameTypes* formats = (RenderFormats == nullptr) ? &s_defaultRenderFormats : RenderFormats;
+    Init(Type, Buffer, BufferSize, Width, Height, formats, Alignment);
 }
 
-void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height)
+void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height, const VideoFrameTypes* RenderFormats)
 {
     size_t   newsize   = 0;
     uint8_t* newbuffer = nullptr;
@@ -49,11 +50,11 @@ void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height)
         newbuffer = reallocate ? GetAlignedBuffer(newsize) : m_buffer;
         newsize   = reallocate ? newsize : m_bufferSize;
     }
-    Init(Type, newbuffer, newsize, Width, Height);
+    Init(Type, newbuffer, newsize, Width, Height, (RenderFormats == nullptr) ? &s_defaultRenderFormats : RenderFormats);
 }
 
 void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSize,
-                          int Width, int Height, int Alignment)
+                          int Width, int Height, const VideoFrameTypes* RenderFormats, int Alignment)
 {
     if (HardwareFormat(m_type) && m_buffer)
     {
@@ -85,6 +86,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
     m_bufferSize   = BufferSize;
     m_width        = Width;
     m_height       = Height;
+    m_renderFormats = (RenderFormats == nullptr) ? &s_defaultRenderFormats : RenderFormats;
 
     ClearMetadata();
 

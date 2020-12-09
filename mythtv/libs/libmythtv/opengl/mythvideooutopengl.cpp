@@ -18,22 +18,6 @@
 
 #define LOC QString("VidOutGL: ")
 
-// Complete list of formats supported for OpenGL 2.0 and higher and OpenGL ES3.X
-VideoFrameTypes MythVideoOutputOpenGL::s_openglFrameTypes =
-{
-    FMT_YV12,     FMT_NV12,      FMT_YUV422P,   FMT_YUV444P,
-    FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
-    FMT_YUV422P9, FMT_YUV422P10, FMT_YUV422P12, FMT_YUV422P14, FMT_YUV422P16,
-    FMT_YUV444P9, FMT_YUV444P10, FMT_YUV444P12, FMT_YUV444P14, FMT_YUV444P16,
-    FMT_P010,     FMT_P016
-};
-
-// OpenGL ES 2.0 and OpenGL1.X only allow luminance textures
-VideoFrameTypes MythVideoOutputOpenGL::s_openglFrameTypesLegacy =
-{
-    FMT_YV12, FMT_YUV422P, FMT_YUV444P
-};
-
 /*! \brief Generate the list of available OpenGL profiles
  *
  * \note This could be improved by eliminating unsupported profiles at run time -
@@ -114,6 +98,22 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions& Options)
 MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
   : MythVideoOutputGPU(MythRenderOpenGL::GetOpenGLRender(), Profile)
 {
+    // Complete list of formats supported for OpenGL 2.0 and higher and OpenGL ES3.X
+    static VideoFrameTypes s_openglRenderFormats =
+    {
+        FMT_YV12,     FMT_NV12,      FMT_YUV422P,   FMT_YUV444P,
+        FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
+        FMT_YUV422P9, FMT_YUV422P10, FMT_YUV422P12, FMT_YUV422P14, FMT_YUV422P16,
+        FMT_YUV444P9, FMT_YUV444P10, FMT_YUV444P12, FMT_YUV444P14, FMT_YUV444P16,
+        FMT_P010,     FMT_P016
+    };
+
+    // OpenGL ES 2.0 and OpenGL1.X only allow luminance textures
+    static VideoFrameTypes s_openglRenderFormatsLegacy =
+    {
+        FMT_YV12, FMT_YUV422P, FMT_YUV444P
+    };
+
     // Retrieve render context
     m_openglRender = MythRenderOpenGL::GetOpenGLRender();
     if (!m_openglRender)
@@ -140,9 +140,9 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
 
     // Disallow unsupported video texturing on GLES2/GL1.X
     if (m_openglRender->GetExtraFeatures() & kGLLegacyTextures)
-        m_renderFrameTypes = &s_openglFrameTypesLegacy;
+        m_renderFormats = &s_openglRenderFormatsLegacy;
     else
-        m_renderFrameTypes = &s_openglFrameTypes;
+        m_renderFormats = &s_openglRenderFormats;
 
     if (!qobject_cast<MythOpenGLPainter*>(m_painter))
         LOG(VB_GENERAL, LOG_ERR, LOC + "No OpenGL painter");

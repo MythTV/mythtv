@@ -45,10 +45,10 @@ class MTV_PUBLIC VideoBuffers
     void Init(uint NumDecode,
               uint NeedFree, uint NeedprebufferNormal,
               uint NeedPrebufferSmall);
-    bool CreateBuffers(VideoFrameType Type, QSize Size,
+    bool CreateBuffers(VideoFrameType Type, const VideoFrameTypes* RenderFormats, QSize Size,
                        uint NeedFree, uint NeedprebufferNormal,
                        uint NeedPrebufferSmall, int MaxReferenceFrames = 16);
-    bool CreateBuffers(VideoFrameType Type, int Width, int Height);
+    bool CreateBuffers(VideoFrameType Type, int Width, int Height, const VideoFrameTypes* RenderFormats);
     static bool ReinitBuffer(MythVideoFrame *Frame, VideoFrameType Type, MythCodecID CodecID, int Width, int Height);
     void SetDeinterlacing(MythDeintType Single, MythDeintType Double, MythCodecID CodecID);
 
@@ -57,7 +57,6 @@ class MTV_PUBLIC VideoBuffers
     void ClearAfterSeek(void);
 
     void SetPrebuffering(bool Normal);
-
     MythVideoFrame *GetNextFreeFrame(BufferType EnqueueTo = kVideoBuffer_limbo);
     void ReleaseFrame(MythVideoFrame *Frame);
     void DeLimboFrame(MythVideoFrame *Frame);
@@ -110,6 +109,7 @@ class MTV_PUBLIC VideoBuffers
     frame_queue_t        m_finished;
     vbuffer_map_t        m_vbufferMap;
     frame_vector_t       m_buffers;
+    const VideoFrameTypes* m_renderFormats { nullptr };
 
     uint                 m_needFreeFrames            { 0 };
     uint                 m_needPrebufferFrames       { 0 };

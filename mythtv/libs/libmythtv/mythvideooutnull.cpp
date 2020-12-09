@@ -92,7 +92,7 @@ bool MythVideoOutputNull::InputChanged(QSize        VideoDim,
 
     const QSize video_dim = GetVideoDim();
 
-    bool ok = m_videoBuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height());
+    bool ok = m_videoBuffers.CreateBuffers(FMT_YV12, video_dim.width(), video_dim.height(), m_renderFormats);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -125,7 +125,7 @@ bool MythVideoOutputNull::Init(const QSize VideoDim, const QSize VideoDispDim,
 
     const QSize videodim = GetVideoDim();
 
-    if (!m_videoBuffers.CreateBuffers(FMT_YV12, videodim.width(), videodim.height()))
+    if (!m_videoBuffers.CreateBuffers(FMT_YV12, videodim.width(), videodim.height(), m_renderFormats))
         return false;
 
     if (m_dbDisplayProfile)

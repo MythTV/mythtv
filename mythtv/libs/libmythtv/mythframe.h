@@ -82,15 +82,18 @@ using FrameOffsets = std::array<int,3>;
 class MTV_PUBLIC MythVideoFrame
 {
   public:
+    static inline const VideoFrameTypes s_defaultRenderFormats { FMT_YV12 };
+
     MythVideoFrame() = default;
-    MythVideoFrame(VideoFrameType Type, int Width, int Height);
+    MythVideoFrame(VideoFrameType Type, int Width, int Height, const VideoFrameTypes* RenderFormats = nullptr);
     MythVideoFrame(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
-                   int Width, int Height, int Alignment = MYTH_WIDTH_ALIGNMENT);
+                   int Width, int Height, const VideoFrameTypes* RenderFormats = nullptr,
+                   int Alignment = MYTH_WIDTH_ALIGNMENT);
    ~MythVideoFrame();
 
-    void Init(VideoFrameType Type, int Width, int Height);
+    void Init(VideoFrameType Type, int Width, int Height, const VideoFrameTypes* RenderFormats = nullptr);
     void Init(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
-              int Width, int Height, int Alignment = MYTH_WIDTH_ALIGNMENT);
+              int Width, int Height, const VideoFrameTypes* RenderFormats = nullptr, int Alignment = MYTH_WIDTH_ALIGNMENT);
     void ClearMetadata();
     void ClearBufferToBlank();
     bool CopyFrame(MythVideoFrame* From);
@@ -135,6 +138,7 @@ class MTV_PUBLIC MythVideoFrame
     int            m_pixFmt            { 0 };
     int            m_swPixFmt          { 0 };
     bool           m_directRendering   { true };
+    const VideoFrameTypes* m_renderFormats { &s_defaultRenderFormats };
     int            m_colorspace        { 1 };
     int            m_colorrange        { 1 };
     int            m_colorprimaries    { 1 };

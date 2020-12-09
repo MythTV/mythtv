@@ -33,6 +33,12 @@ DecoderBase::~DecoderBase()
     delete m_playbackInfo;
 }
 
+void DecoderBase::SetRenderFormats(const VideoFrameTypes* RenderFormats)
+{
+    if (RenderFormats != nullptr)
+        m_renderFormats = RenderFormats;
+}
+
 void DecoderBase::SetProgramInfo(const ProgramInfo &pginfo)
 {
     delete m_playbackInfo;
@@ -1439,18 +1445,12 @@ DecoderBase::TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
  * \note Most hardware decoders will only provide one software frame format.
  * \note Currently only the OpenGL renderer supports anything other than FMT_YV12/AV_PIX_FMT_YUV420P
 */
-AVPixelFormat DecoderBase::GetBestVideoFormat(AVPixelFormat* Formats)
+AVPixelFormat DecoderBase::GetBestVideoFormat(AVPixelFormat* Formats, const VideoFrameTypes* RenderFormats)
 {
-    if (m_parent)
-    {
-        const VideoFrameTypes* mythfmts = m_parent->DirectRenderFormats();
-        for (AVPixelFormat *format = Formats; *format != AV_PIX_FMT_NONE; format++)
-        {
-            for (auto fmt : *mythfmts)
-                if (MythAVUtil::FrameTypeToPixelFormat(fmt) == *format)
-                    return *format;
-        }
-    }
+    for (AVPixelFormat *format = Formats; *format != AV_PIX_FMT_NONE; format++)
+        for (auto fmt : *RenderFormats)
+            if (MythAVUtil::FrameTypeToPixelFormat(fmt) == *format)
+                return *format;
     return AV_PIX_FMT_NONE;
 }
 

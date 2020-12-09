@@ -869,7 +869,7 @@ int Transcode::TranscodeFile(const QString &inputname,
             uint8_t* newbuffer = MythVideoFrame::GetAlignedBuffer(newSize);
             if (!newbuffer)
                 return REENCODE_ERROR;
-            frame.Init(FMT_YV12, newbuffer, newSize, video_width, video_height, 0);
+            frame.Init(FMT_YV12, newbuffer, newSize, video_width, video_height, nullptr, 0);
         }
         else
         {

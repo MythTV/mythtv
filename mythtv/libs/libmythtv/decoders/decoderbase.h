@@ -123,8 +123,8 @@ class DecoderBase
     DecoderBase(MythPlayer *parent, const ProgramInfo &pginfo);
     virtual ~DecoderBase();
 
+    void SetRenderFormats(const VideoFrameTypes* RenderFormats);
     virtual void Reset(bool reset_video_data, bool seek_reset, bool reset_file);
-
     virtual int OpenFile(MythMediaBuffer *Buffer, bool novideo,
                          TestBufferVec & testbuf) = 0;
 
@@ -261,7 +261,7 @@ class DecoderBase
     int GetfpsMultiplier(void) const { return m_fpsMultiplier; }
     MythCodecContext *GetMythCodecContext(void) { return m_mythCodecCtx; }
     VideoDisplayProfile * GetVideoDisplayProfile(void) { return &m_videoDisplayProfile; }
-    AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats);
+    static AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats, const VideoFrameTypes* RenderFormats);
 
   protected:
     virtual int  AutoSelectTrack(uint Type);
@@ -357,6 +357,7 @@ class DecoderBase
     std::vector<int>     m_languagePreference;
     MythCodecContext    *m_mythCodecCtx         { nullptr };
     VideoDisplayProfile  m_videoDisplayProfile;
+    const VideoFrameTypes* m_renderFormats { &MythVideoFrame::s_defaultRenderFormats };
 
   private:
     Q_DISABLE_COPY(DecoderBase)

@@ -184,7 +184,7 @@ void VideoBuffers::Init(uint NumDecode, uint NeedFree,
     m_buffers.reserve(std::max(NumDecode, 128U));
     m_buffers.resize(NumDecode);
     for (uint i = 0; i < NumDecode; i++)
-        m_vbufferMap[At(i)]     = i;
+        m_vbufferMap[At(i)] = i;
 
     m_needFreeFrames            = NeedFree;
     m_needPrebufferFrames       = NeedPrebufferNormal;
@@ -540,39 +540,39 @@ bool VideoBuffers::DiscardAndRecreate(MythCodecID CodecID, QSize VideoDim, int R
     if (codec_is_copyback(CodecID))
     {
         Init(VideoBuffers::GetNumBuffers(FMT_NONE), 1, 4, 2);
-        result = CreateBuffers(FMT_YV12, VideoDim.width(), VideoDim.height());
+        result = CreateBuffers(FMT_YV12, VideoDim.width(), VideoDim.height(), m_renderFormats);
     }
     else if (codec_is_mediacodec(CodecID))
     {
-        result = CreateBuffers(FMT_MEDIACODEC, VideoDim, 1, 2, 2);
+        result = CreateBuffers(FMT_MEDIACODEC, m_renderFormats, VideoDim, 1, 2, 2);
     }
     else if (codec_is_vaapi(CodecID))
     {
-        result = CreateBuffers(FMT_VAAPI, VideoDim, 2, 1, 4, References);
+        result = CreateBuffers(FMT_VAAPI, m_renderFormats, VideoDim, 2, 1, 4, References);
     }
     else if (codec_is_vtb(CodecID))
     {
-        result = CreateBuffers(FMT_VTB, VideoDim, 1, 4, 2);
+        result = CreateBuffers(FMT_VTB, m_renderFormats, VideoDim, 1, 4, 2);
     }
     else if (codec_is_vdpau(CodecID))
     {
-        result = CreateBuffers(FMT_VDPAU, VideoDim, 2, 1, 4, References);
+        result = CreateBuffers(FMT_VDPAU, m_renderFormats, VideoDim, 2, 1, 4, References);
     }
     else if (codec_is_nvdec(CodecID))
     {
-        result = CreateBuffers(FMT_NVDEC, VideoDim, 2, 1, 4);
+        result = CreateBuffers(FMT_NVDEC, m_renderFormats, VideoDim, 2, 1, 4);
     }
     else if (codec_is_mmal(CodecID))
     {
-        result = CreateBuffers(FMT_MMAL, VideoDim, 2, 1, 4);
+        result = CreateBuffers(FMT_MMAL, m_renderFormats, VideoDim, 2, 1, 4);
     }
     else if (codec_is_v4l2(CodecID) || codec_is_drmprime(CodecID))
     {
-        result = CreateBuffers(FMT_DRMPRIME, VideoDim, 2, 1, 4);
+        result = CreateBuffers(FMT_DRMPRIME, m_renderFormats, VideoDim, 2, 1, 4);
     }
     else
     {
-        result = CreateBuffers(FMT_YV12, VideoDim, 1, 8, 4, References);
+        result = CreateBuffers(FMT_YV12, m_renderFormats, VideoDim, 1, 8, 4, References);
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, QString("DiscardAndRecreate: %1").arg(GetStatus()));
@@ -937,23 +937,25 @@ void VideoBuffers::ClearAfterSeek(void)
     DoDiscard(discards);
 }
 
-bool VideoBuffers::CreateBuffers(VideoFrameType Type, QSize Size,
+bool VideoBuffers::CreateBuffers(VideoFrameType Type, const VideoFrameTypes* RenderFormats, QSize Size,
                                  uint NeedFree, uint NeedprebufferNormal,
                                  uint NeedPrebufferSmall, int MaxReferenceFrames)
 {
+    m_renderFormats = RenderFormats;
     Init(GetNumBuffers(Type, MaxReferenceFrames), NeedFree, NeedprebufferNormal, NeedPrebufferSmall);
-    return CreateBuffers(Type, Size.width(), Size.height());
+    return CreateBuffers(Type, Size.width(), Size.height(), m_renderFormats);
 }
 
-bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
+bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height, const VideoFrameTypes* RenderFormats)
 {
     bool success = true;
+    m_renderFormats = RenderFormats;
 
     // Hardware buffers with no allocated memory
     if (MythVideoFrame::HardwareFormat(Type))
     {
         for (uint i = 0; i < Size(); i++)
-            m_buffers[i].Init(Type, Width, Height);
+            m_buffers[i].Init(Type, Width, Height, m_renderFormats);
         LOG(VB_PLAYBACK, LOG_INFO, QString("Created %1 empty %2 (%3x%4) video buffers")
            .arg(Size()).arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
         return true;
@@ -962,7 +964,7 @@ bool VideoBuffers::CreateBuffers(VideoFrameType Type, int Width, int Height)
     // Software buffers
     for (uint i = 0; i < Size(); i++)
     {
-        m_buffers[i].Init(Type, Width, Height);
+        m_buffers[i].Init(Type, Width, Height, m_renderFormats);
         m_buffers[i].ClearBufferToBlank();
         success &= m_buffers[i].m_dummy || (m_buffers[i].m_buffer != nullptr);
     }
@@ -989,13 +991,14 @@ bool VideoBuffers::ReinitBuffer(MythVideoFrame *Frame, VideoFrameType Type, Myth
     }
 
     VideoFrameType old = Frame->m_type;
+    const auto * formats = Frame->m_renderFormats;
     LOG(VB_PLAYBACK, LOG_INFO, QString("Reallocating frame %1 %2x%3->%4 %5x%6")
         .arg(MythVideoFrame::FormatDescription(old)).arg(Frame->m_width).arg(Frame->m_height)
         .arg(MythVideoFrame::FormatDescription(Type)).arg(Width).arg(Height));
 
     MythDeintType singler = Frame->m_deinterlaceSingle;
     MythDeintType doubler = Frame->m_deinterlaceDouble;
-    Frame->Init(Type, Width, Height);
+    Frame->Init(Type, Width, Height, formats);
     Frame->ClearBufferToBlank();
 
     // retain deinterlacer settings and update restrictions based on new frame type

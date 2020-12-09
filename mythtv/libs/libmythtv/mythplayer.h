@@ -173,7 +173,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual bool PrevAngle(void) { return false; }
 
     // Decoder stuff..
-    const VideoFrameTypes* DirectRenderFormats(void);
     MythVideoFrame *GetNextVideoFrame(void);
     void DeLimboFrame(MythVideoFrame *frame);
     virtual void ReleaseNextVideoFrame(MythVideoFrame *buffer, int64_t timecode,
@@ -366,6 +365,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     DecoderBase     *m_decoder            {nullptr};
     mutable QMutex   m_decoderChangeLock  {QMutex::Recursive};
     MythVideoOutput *m_videoOutput        {nullptr};
+    const VideoFrameTypes* m_renderFormats { &MythVideoFrame::s_defaultRenderFormats };
     PlayerContext   *m_playerCtx          {nullptr};
     MythDecoderThread* m_decoderThread    {nullptr};
     QThread         *m_playerThread       {nullptr};

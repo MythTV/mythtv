@@ -17,7 +17,8 @@ class MythVideoOutputGPU : public MythVideoOutput
                                       MythCodecID CodecID,       QSize VideoDim,
                                       QSize VideoDispDim,        float VideoAspect,
                                       float FrameRate,           uint  PlayerFlags,
-                                      const QString& Codec,      int ReferenceFrames);
+                                      const QString& Codec,      int ReferenceFrames,
+                                      const VideoFrameTypes*& RenderFormats);
    ~MythVideoOutputGPU() override;
 
   signals:

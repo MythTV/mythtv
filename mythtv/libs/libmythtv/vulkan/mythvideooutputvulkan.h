@@ -17,7 +17,6 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU, public MythVulkanObject
   public:
     static void        GetRenderOptions    (RenderOptions& Options);
     static QStringList GetAllowedRenderers (MythCodecID CodecId);
-    static VideoFrameTypes s_vulkanFrameTypes;
 
     MythVideoOutputVulkan(QString& Profile);
    ~MythVideoOutputVulkan() override = default;

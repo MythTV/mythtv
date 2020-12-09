@@ -2741,9 +2741,8 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     auto *decoder = static_cast<AvFormatDecoder*>(c->opaque);
     VideoFrameType type = MythAVUtil::PixelFormatToFrameType(c->pix_fmt);
-    const VideoFrameTypes* supported = decoder->GetPlayer()->DirectRenderFormats();
-    auto foundIt = std::find(supported->cbegin(), supported->cend(), type);
-    if (foundIt == supported->end())
+    if (!std::any_of(decoder->m_renderFormats->cbegin(), decoder->m_renderFormats->cend(),
+                     [&type](auto Format) { return type == Format; }))
     {
         decoder->m_directRendering = false;
         return avcodec_default_get_buffer2(c, pic, flags);

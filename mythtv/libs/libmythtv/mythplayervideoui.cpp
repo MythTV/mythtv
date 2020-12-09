@@ -25,7 +25,8 @@ bool MythPlayerVideoUI::InitVideo()
                     m_decoder->GetCodecDecoderName(), m_decoder->GetVideoCodecID(),
                     m_videoDim, m_videoDispDim, m_videoAspect,
                     static_cast<float>(m_videoFrameRate),
-                    static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames);
+                    static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames,
+                    m_renderFormats);
 
     if (!video)
     {

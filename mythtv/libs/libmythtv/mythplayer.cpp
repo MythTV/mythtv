@@ -575,14 +575,6 @@ int MythPlayer::GetFreeVideoFrames(void) const
     return 0;
 }
 
-/// \brief Return a list of frame types that can be rendered directly.
-const VideoFrameTypes *MythPlayer::DirectRenderFormats(void)
-{
-    if (m_videoOutput)
-        return m_videoOutput->DirectRenderFormats();
-    return &MythVideoOutput::s_defaultFrameTypes;
-}
-
 /**
  *  \brief Removes a frame from the available queue for decoding onto.
  *
@@ -1898,6 +1890,8 @@ void MythPlayer::SetDecoder(DecoderBase *dec)
             LOG(VB_GENERAL, LOG_INFO, LOC + "Waited 10ms for decoder lock");
         delete m_decoder;
         m_decoder = dec;
+        if (m_decoder)
+            m_decoder->SetRenderFormats(m_renderFormats);
         m_decoderChangeLock.unlock();
     }
     // reset passthrough override
