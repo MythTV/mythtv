@@ -1201,7 +1201,7 @@ void MythUIText::Pulse(void)
     // Calculate interval since last update in msecs - clamped to 50msecs (20Hz)
     // in case of UI blocking/pauses
     int64_t currentmsecs = QDateTime::currentMSecsSinceEpoch();
-    int64_t interval = std::min(currentmsecs - m_lastUpdate, 50L);
+    int64_t interval = std::min(currentmsecs - m_lastUpdate, static_cast<int64_t>(50));
     m_lastUpdate = currentmsecs;
 
     // Rates are pixels per second (float) normalised to 70Hz for historical reasons.
