@@ -1678,7 +1678,7 @@ void MythRenderOpenGL::SetMatrixView(void)
     m_projection.ortho(m_viewport);
 }
 
-bool MythRenderOpenGL::GetGPUMemory(int &Available, int &Total)
+bool MythRenderOpenGL::GetGPUMemory(int &Available, int &Dedicated, int &Total)
 {
     OpenGLLocker locker(this);
     if (m_extraFeaturesUsed & kGLNVMemory)
@@ -1686,6 +1686,8 @@ bool MythRenderOpenGL::GetGPUMemory(int &Available, int &Total)
         GLint kb = 0;
         glGetIntegerv(GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &kb);
         Total = kb / 1024;
+        glGetIntegerv(GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &kb);
+        Dedicated = kb / 1024;
         glGetIntegerv(GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &kb);
         Available = kb / 1024;
         return true;

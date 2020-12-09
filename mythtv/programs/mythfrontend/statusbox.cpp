@@ -1569,16 +1569,17 @@ void StatusBox::doDisplayStatus()
         {
             auto UpdateGPUMem = [](StatusBoxItem *Item)
             {
+                int dedicated = 0;
                 int total = 0;
                 int available = 0;
                 MythRenderOpenGL* opengl = MythRenderOpenGL::GetOpenGLRender();
                 if (opengl)
-                  opengl->GetGPUMemory(available, total);
+                  opengl->GetGPUMemory(available, dedicated, total);
                 if (total > 0)
                 {
                     int percent = static_cast<int>((available / static_cast<float>(total) * 100.0F));
-                    Item->SetText(tr("GPU Memory: %1 MB total, %2 MB used, %3 MB (or %4%) free")
-                        .arg(total).arg(total - available).arg(available).arg(percent));
+                    Item->SetText(tr("GPU Memory: %1 MB total, %2 MB dedicated, %3 MB used, %4 MB (or %5%) free")
+                        .arg(total).arg(dedicated).arg(total - available).arg(available).arg(percent));
                 }
             };
             StatusBoxItem* gpumem = AddLogLine("");
