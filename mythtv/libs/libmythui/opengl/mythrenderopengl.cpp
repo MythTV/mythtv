@@ -956,225 +956,79 @@ void MythRenderOpenGL::DrawRect(QOpenGLFramebufferObject *Target,
                                 const QRect Area, const QBrush &FillBrush,
                                 const QPen &LinePen, int Alpha)
 {
-    DrawRoundRect(Target, Area, 1, FillBrush, LinePen, Alpha);
+    DrawRoundRect(Target, Area, 0, FillBrush, LinePen, Alpha);
 }
+
 
 void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
                                      const QRect Area, int CornerRadius,
                                      const QBrush &FillBrush,
                                      const QPen &LinePen, int Alpha)
 {
+    bool fill = FillBrush.style() != Qt::NoBrush;
+    bool edge = LinePen.style() != Qt::NoPen;
+    if (!(fill || edge))
+        return;
+
+    auto SetColor = [&](const QColor& Color)
+    {
+        if (m_fullRange)
+        {
+            glVertexAttrib4f(COLOR_INDEX, Color.red() / 255.0F, Color.green() / 255.0F,
+                             Color.blue() / 255.0F, (Color.alpha() / 255.0F) * (Alpha / 255.0F));
+            return;
+        }
+        glVertexAttrib4f(COLOR_INDEX, (Color.red() * kLimitedRangeScale) + kLimitedRangeOffset,
+                        (Color.blue() * kLimitedRangeScale) + kLimitedRangeOffset,
+                        (Color.green() * kLimitedRangeScale) + kLimitedRangeOffset,
+                        (Color.alpha() / 255.0F) * (Alpha / 255.0F));
+    };
+
+    float halfwidth = Area.width() / 2.0F;
+    float halfheight = Area.height() / 2.0F;
+    float radius = CornerRadius;
+    if (radius > halfwidth) radius = halfwidth;
+    if (radius > halfheight) radius = halfheight;
+    float innerradius = radius - LinePen.width();
+    if (innerradius < 0.0F) innerradius = 0.0F;
+
+    // Set shader parameters
+    // Centre of the rectangle
+    m_parameters(0,0) = Area.left() + halfwidth;
+    m_parameters(1,0) = Area.top() + halfheight;
+    m_parameters(2,0) = radius;
+    m_parameters(3,0) = innerradius;
+    // Rectangle 'size' - distances from the centre to the edge
+    m_parameters(0,1) = halfwidth;
+    m_parameters(1,1) = halfheight;
+    // Adjust the size for the inner radius (edge)
+    m_parameters(2,1) = halfwidth - LinePen.width();
+    m_parameters(3,1) = halfheight - LinePen.width();
+
     makeCurrent();
     BindFramebuffer(Target);
-
-    int lineWidth = LinePen.width();
-    int halfline  = lineWidth / 2;
-    int rad = CornerRadius - halfline;
-
-    if ((Area.width() / 2) < rad)
-        rad = Area.width() / 2;
-
-    if ((Area.height() / 2) < rad)
-        rad = Area.height() / 2;
-    int dia = rad * 2;
-
-    QRect r(Area.left(), Area.top(), Area.width(), Area.height());
-
-    QRect tl(r.left(),  r.top(), rad, rad);
-    QRect tr(r.left() + r.width() - rad, r.top(), rad, rad);
-    QRect bl(r.left(),  r.top() + r.height() - rad, rad, rad);
-    QRect br(r.left() + r.width() - rad, r.top() + r.height() - rad, rad, rad);
-
     glEnableVertexAttribArray(VERTEX_INDEX);
+    GetCachedVBO(GL_TRIANGLE_STRIP, Area);
+    glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
 
-    if (FillBrush.style() != Qt::NoBrush)
+    if (fill)
     {
-        // Get the shaders
-        QOpenGLShaderProgram* elip = m_defaultPrograms[kShaderCircle];
-        QOpenGLShaderProgram* fill = m_defaultPrograms[kShaderSimple];
-
-        // Set the fill color
-        if (m_fullRange)
-        {
-            glVertexAttrib4f(COLOR_INDEX,
-                               FillBrush.color().red() / 255.0F,
-                               FillBrush.color().green() / 255.0F,
-                               FillBrush.color().blue() / 255.0F,
-                              (FillBrush.color().alpha() / 255.0F) * (Alpha / 255.0F));
-        }
-        else
-        {
-            glVertexAttrib4f(COLOR_INDEX,
-                              (FillBrush.color().red() * kLimitedRangeScale) + kLimitedRangeOffset,
-                              (FillBrush.color().blue() * kLimitedRangeScale) + kLimitedRangeOffset,
-                              (FillBrush.color().green() * kLimitedRangeScale) + kLimitedRangeOffset,
-                              (FillBrush.color().alpha() / 255.0F) * (Alpha / 255.0F));
-        }
-
-        // Set the radius
-        m_parameters(2,0) = rad;
-        m_parameters(3,0) = rad - 1.0F;
-
-        // Enable the Circle shader
-        SetShaderProjection(elip);
-
-        // Draw the top left segment
-        m_parameters(0,0) = tl.left() + rad;
-        m_parameters(1,0) = tl.top() + rad;
-
-        SetShaderProgramParams(elip, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, tl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
+        SetColor(FillBrush.color());
+        SetShaderProjection(m_defaultPrograms[kShaderRect]);
+        SetShaderProgramParams(m_defaultPrograms[kShaderRect], m_parameters, "u_parameters");
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Draw the top right segment
-        m_parameters(0,0) = tr.left();
-        m_parameters(1,0) = tr.top() + rad;
-        SetShaderProgramParams(elip, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, tr);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Draw the bottom left segment
-        m_parameters(0,0) = bl.left() + rad;
-        m_parameters(1,0) = bl.top();
-        SetShaderProgramParams(elip, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, bl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Draw the bottom right segment
-        m_parameters(0,0) = br.left();
-        m_parameters(1,0) = br.top();
-        SetShaderProgramParams(elip, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, br);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Fill the remaining areas
-        QRect main(r.left() + rad, r.top(), r.width() - dia, r.height());
-        QRect left(r.left(), r.top() + rad, rad, r.height() - dia);
-        QRect right(r.left() + r.width() - rad, r.top() + rad, rad, r.height() - dia);
-
-        SetShaderProjection(fill);
-
-        GetCachedVBO(GL_TRIANGLE_STRIP, main);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        GetCachedVBO(GL_TRIANGLE_STRIP, left);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        GetCachedVBO(GL_TRIANGLE_STRIP, right);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     }
 
-    if (LinePen.style() != Qt::NoPen)
+    if (edge)
     {
-        // Get the shaders
-        QOpenGLShaderProgram* edge  = m_defaultPrograms[kShaderCircleEdge];
-        QOpenGLShaderProgram* vline = m_defaultPrograms[kShaderVertLine];
-        QOpenGLShaderProgram* hline = m_defaultPrograms[kShaderHorizLine];
-
-        // Set the line color
-        if (m_fullRange)
-        {
-            glVertexAttrib4f(COLOR_INDEX,
-                               LinePen.color().red() / 255.0F,
-                               LinePen.color().green() / 255.0F,
-                               LinePen.color().blue() / 255.0F,
-                              (LinePen.color().alpha() / 255.0F) * (Alpha / 255.0F));
-        }
-        else
-        {
-            glVertexAttrib4f(COLOR_INDEX,
-                              (LinePen.color().red() * kLimitedRangeScale) + kLimitedRangeOffset,
-                              (LinePen.color().blue() * kLimitedRangeScale) + kLimitedRangeOffset,
-                              (LinePen.color().green() * kLimitedRangeScale) + kLimitedRangeOffset,
-                              (FillBrush.color().alpha() / 255.0F) * (Alpha / 255.0F));
-        }
-
-        // Set the radius and width
-        m_parameters(2,0) = rad - lineWidth / 2.0F;
-        m_parameters(3,0) = lineWidth / 2.0F;
-
-        // Enable the edge shader
-        SetShaderProjection(edge);
-
-        // Draw the top left edge segment
-        m_parameters(0,0) = tl.left() + rad;
-        m_parameters(1,0) = tl.top() + rad;
-        SetShaderProgramParams(edge, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, tl);
+        SetColor(LinePen.color());
+        SetShaderProjection(m_defaultPrograms[kShaderEdge]);
+        SetShaderProgramParams(m_defaultPrograms[kShaderEdge], m_parameters, "u_parameters");
         glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Draw the top right edge segment
-        m_parameters(0,0) = tr.left();
-        m_parameters(1,0) = tr.top() + rad;
-        SetShaderProgramParams(edge, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, tr);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat),kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Draw the bottom left edge segment
-        m_parameters(0,0) = bl.left() + rad;
-        m_parameters(1,0) = bl.top();
-        SetShaderProgramParams(edge, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, bl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Draw the bottom right edge segment
-        m_parameters(0,0) = br.left();
-        m_parameters(1,0) = br.top();
-        SetShaderProgramParams(edge, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, br);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Vertical lines
-        SetShaderProjection(vline);
-
-        m_parameters(1,0) = lineWidth / 2.0F;
-        QRect vl(r.left(), r.top() + rad, lineWidth, r.height() - dia);
-
-        // Draw the left line segment
-        m_parameters(0,0) = vl.left() + lineWidth;
-        SetShaderProgramParams(vline, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, vl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Draw the right line segment
-        vl.translate(r.width() - lineWidth, 0);
-        m_parameters(0,0) = vl.left();
-        SetShaderProgramParams(vline, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, vl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Horizontal lines
-        SetShaderProjection(hline);
-        QRect hl(r.left() + rad, r.top(), r.width() - dia, lineWidth);
-
-        // Draw the top line segment
-        m_parameters(0,0) = hl.top() + lineWidth;
-        SetShaderProgramParams(hline, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, hl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        // Draw the bottom line segment
-        hl.translate(0, r.height() - lineWidth);
-        m_parameters(0,0) = hl.top();
-        SetShaderProgramParams(hline, m_parameters, "u_parameters");
-        GetCachedVBO(GL_TRIANGLE_STRIP, hl);
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     }
+
+    QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     glDisableVertexAttribArray(VERTEX_INDEX);
     doneCurrent();
 }
@@ -1654,13 +1508,10 @@ bool MythRenderOpenGL::CreateDefaultShaders(void)
 {
     m_defaultPrograms[kShaderSimple]     = CreateShaderProgram(kSimpleVertexShader, kSimpleFragmentShader);
     m_defaultPrograms[kShaderDefault]    = CreateShaderProgram(kDefaultVertexShader, m_fullRange ? kDefaultFragmentShader : kDefaultFragmentShaderLimited);
-    m_defaultPrograms[kShaderCircle]     = CreateShaderProgram(kDrawVertexShader, kCircleFragmentShader);
-    m_defaultPrograms[kShaderCircleEdge] = CreateShaderProgram(kDrawVertexShader, kCircleEdgeFragmentShader);
-    m_defaultPrograms[kShaderVertLine]   = CreateShaderProgram(kDrawVertexShader, kVertLineFragmentShader);
-    m_defaultPrograms[kShaderHorizLine]  = CreateShaderProgram(kDrawVertexShader, kHorizLineFragmentShader);
+    m_defaultPrograms[kShaderRect]       = CreateShaderProgram(kDrawVertexShader, kRoundedRectShader);
+    m_defaultPrograms[kShaderEdge]       = CreateShaderProgram(kDrawVertexShader, kRoundedEdgeShader);
     return m_defaultPrograms[kShaderSimple] && m_defaultPrograms[kShaderDefault] &&
-           m_defaultPrograms[kShaderCircle] && m_defaultPrograms[kShaderCircleEdge] &&
-           m_defaultPrograms[kShaderVertLine] &&m_defaultPrograms[kShaderHorizLine];
+           m_defaultPrograms[kShaderRect] && m_defaultPrograms[kShaderEdge];
 }
 
 void MythRenderOpenGL::DeleteDefaultShaders(void)

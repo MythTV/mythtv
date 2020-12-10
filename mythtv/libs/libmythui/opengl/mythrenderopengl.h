@@ -85,10 +85,8 @@ enum DefaultShaders
 {
     kShaderSimple  = 0,
     kShaderDefault,
-    kShaderCircle,
-    kShaderCircleEdge,
-    kShaderVertLine,
-    kShaderHorizLine,
+    kShaderRect,
+    kShaderEdge,
     kShaderCount,
 };
 

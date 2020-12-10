@@ -66,52 +66,36 @@ static const QString kDrawVertexShader =
 "    v_position  = a_position;\n"
 "}\n";
 
-static const QString kCircleFragmentShader =
+static const QString kSDF =
+"highp float SignedDistance(highp vec2 p, highp vec2 b, highp float r)\n"
+"{\n"
+"    return length(max(abs(p) - b + r, 0.0)) - r;"
+"}\n";
+
+static const QString kRoundedRectShader =
 "varying highp vec4 v_color;\n"
 "varying highp vec2 v_position;\n"
 "uniform highp mat4 u_parameters;\n"
++ kSDF +
 "void main(void)\n"
 "{\n"
-"    highp float dis = distance(v_position.xy, u_parameters[0].xy);\n"
-"    highp float mult = smoothstep(u_parameters[0].z, u_parameters[0].w, dis);\n"
-"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
+"    highp float dist = SignedDistance(v_position - u_parameters[0].xy,\n"
+"                                      u_parameters[1].xy, u_parameters[0].z);\n"
+"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, smoothstep(0.0, -1.0, dist));\n"
 "}\n";
 
-static const QString kCircleEdgeFragmentShader =
+static const QString kRoundedEdgeShader =
 "varying highp vec4 v_color;\n"
 "varying highp vec2 v_position;\n"
 "uniform highp mat4 u_parameters;\n"
++ kSDF +
 "void main(void)\n"
 "{\n"
-"    highp float dis = distance(v_position.xy, u_parameters[0].xy);\n"
-"    highp float rad = u_parameters[0].z;\n"
-"    highp float wid = u_parameters[0].w;\n"
-"    highp float mult = smoothstep(rad + wid, rad + (wid - 1.0), dis) * smoothstep(rad - (wid + 1.0), rad - wid, dis);\n"
-"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
+"    highp float outer = SignedDistance(v_position - u_parameters[0].xy,\n"
+"                                       u_parameters[1].xy, u_parameters[0].z);\n"
+"    highp float inner = SignedDistance(v_position - u_parameters[0].xy,\n"
+"                                       u_parameters[1].zw, u_parameters[0].w);\n"
+"    highp float both  = smoothstep(0.0, -1.0, outer) * smoothstep(-1.0, 0.0, inner);\n"
+"    gl_FragColor = vec4(v_color.rgb, v_color.a * both);\n"
 "}\n";
-
-static const QString kVertLineFragmentShader =
-"varying highp vec4 v_color;\n"
-"varying highp vec2 v_position;\n"
-"uniform highp mat4 u_parameters;\n"
-"void main(void)\n"
-"{\n"
-"    highp float dis = abs(u_parameters[0].x - v_position.x);\n"
-"    highp float y = u_parameters[0].y * 2.0;\n"
-"    highp float mult = smoothstep(y, y - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
-"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
-"}\n";
-
-static const QString kHorizLineFragmentShader =
-"varying highp vec4 v_color;\n"
-"varying highp vec2 v_position;\n"
-"uniform highp mat4 u_parameters;\n"
-"void main(void)\n"
-"{\n"
-"    highp float dis = abs(u_parameters[0].x - v_position.y);\n"
-"    highp float x = u_parameters[0].y * 2.0;\n"
-"    highp float mult = smoothstep(x, x - 0.1, dis) * smoothstep(-0.1, 0.0, dis);\n"
-"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, mult);\n"
-"}\n";
-
-#endif // MYTHRENDER_OPENGL_SHADERS_H
+#endif
