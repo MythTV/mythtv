@@ -559,7 +559,7 @@ void Buffer::Run(void)
 
     bool       is_empty = false;
     bool       wait = false;
-    time_t     send_time = time (nullptr) + (60 * 5);
+    auto       send_time = std::chrono::system_clock::now() + 5min;
     uint64_t   write_total = 0;
     uint64_t   written = 0;
     uint64_t   write_cnt = 0;
@@ -575,10 +575,10 @@ void Buffer::Run(void)
             wait = false;
         }
 
-        if (send_time < static_cast<double>(time (nullptr)))
+        if (send_time < std::chrono::system_clock::now())
         {
             // Every 5 minutes, write out some statistics.
-            send_time = time (nullptr) + (60 * 5);
+            send_time = std::chrono::system_clock::now() + 5min;
             write_total += written;
             if (m_parent->m_streaming)
             {
