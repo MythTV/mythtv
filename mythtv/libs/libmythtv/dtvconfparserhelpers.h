@@ -82,7 +82,7 @@ class DTVTunerType : public DTVParamHelper
     // because gcc 4.3.3 will reportedly promote an enum inconsistently
     // to int on IA-32 platforms. I don't know whether this is
     // correct or not, it comes down to interpretation of section
-    // 7.2.5 and whether 0x80000000 should be considered to big
+    // 7.2.5 and whether 0x80000000 should be considered too big
     // for a 32 bit integer or not. Using an enum to represent int
     // bitmasks is valid C code, but the C++03 standard was still a
     // bit loosey gosey on this point. It looks like the breakage

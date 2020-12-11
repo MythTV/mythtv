@@ -38,6 +38,7 @@ MTV_PUBLIC int get_closest_freqid(
 class FrequencyTable
 {
   public:
+    // ATSC -- VSB, QAM
     FrequencyTable(QString                 _name_format,
                    int                     _name_offset,
                    uint64_t                _frequencyStart,
@@ -48,6 +49,7 @@ class FrequencyTable
           m_frequencyStart(_frequencyStart), m_frequencyEnd(_frequencyEnd),
           m_frequencyStep(_frequencyStep),   m_modulation(_modulation) {}
 
+    // DVB-T/T2 -- OFDM
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
@@ -73,6 +75,7 @@ class FrequencyTable
           m_constellation(_constellation),   m_transMode(_trans_mode),
           m_guardInterval(_guard_interval),  m_hierarchy(_hierarchy) {}
 
+    // DVB-C -- QAM
     FrequencyTable(uint64_t                _frequencyStart,
                    uint64_t                _frequencyEnd,
                    uint                    _frequencyStep,
@@ -91,17 +94,17 @@ class FrequencyTable
 
     virtual ~FrequencyTable() { ; }
 
-    // Common Stuff
-    QString           m_nameFormat;     ///< pretty name format
-    int               m_nameOffset;    ///< Offset to add to the pretty name
-    uint64_t          m_frequencyStart; ///< The staring centre frequency
-    uint64_t          m_frequencyEnd;   ///< The ending centre frequency
-    uint              m_frequencyStep;  ///< The step in frequency
+    // Common
+    QString           m_nameFormat;     // Pretty name format
+    int               m_nameOffset;     // Offset to add to the pretty name
+    uint64_t          m_frequencyStart; // Starting centre frequency
+    uint64_t          m_frequencyEnd;   // Ending centre frequency
+    uint              m_frequencyStep;  // Frequency step
     DTVModulation     m_modulation;
-    int               m_offset1 {0};    ///< The first  offset from the centre freq
-    int               m_offset2 {0};    ///< The second offset from the centre freq
+    int               m_offset1 {0};    // First offset from the centre frequency
+    int               m_offset2 {0};    // Second offset from the centre frequency
 
-    // DVB OFDM stuff
+    // DVB-T/T2 -- OFDM
     DTVInversion      m_inversion;
     DTVBandwidth      m_bandwidth;
     DTVCodeRate       m_coderateHp;
@@ -111,7 +114,7 @@ class FrequencyTable
     DTVGuardInterval  m_guardInterval;
     DTVHierarchy      m_hierarchy;
 
-    // DVB-C/DVB-S stuff
+    // DVB-C
     uint              m_symbolRate {0};
     DTVCodeRate       m_fecInner;
 };
@@ -167,21 +170,20 @@ class TransportScanItem
     uint GetMultiplexIdFromDB(void) const;
 
   public:
-    uint               m_mplexid     {UINT_MAX}; ///< DB Mplexid
+    uint               m_mplexid     {UINT_MAX};    // DB mplexid in dtv_multiplex
 
-    QString            m_friendlyName;        ///< Name to display in scanner dialog
-    uint               m_friendlyNum {0};     ///< Frequency number (freqid w/freq table)
-    int                m_sourceID    {0};     ///< Associated SourceID
-    bool               m_useTimer    {false}; /**< Set if timer is used after
-                                              lock for getting PAT */
+    QString            m_friendlyName;          // Name to display in scanner dialog
+    uint               m_friendlyNum {0};       // Frequency number (freqid w/freq table)
+    int                m_sourceID    {0};       // DB sourceid in videosource
+    bool               m_useTimer    {false};   // Set if timer is used after lock for getting PAT
 
-    bool               m_scanning    {false}; ///< Probably Unnecessary
-    std::array<int,3>  m_freqOffsets {0,0,0}; ///< Frequency offsets
-    unsigned           m_timeoutTune {1000};  ///< Timeout to tune to a frequency
+    bool               m_scanning    {false};   // Probably unnecessary
+    std::array<int,3>  m_freqOffsets {0,0,0};   // Frequency offsets
+    unsigned           m_timeoutTune {1000};    // Timeout to tune to a frequency
 
-    DTVMultiplex       m_tuning;              ///< Tuning info
-    IPTVTuningData     m_iptvTuning;          ///< IPTV Tuning info
-    QString            m_iptvChannel;         ///< IPTV base channel
+    DTVMultiplex       m_tuning;                // Tuning info
+    IPTVTuningData     m_iptvTuning;            // IPTV Tuning info
+    QString            m_iptvChannel;           // IPTV base channel
 
     DTVChannelInfoList m_expectedChannels;
 

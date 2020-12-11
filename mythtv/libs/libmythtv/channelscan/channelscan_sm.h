@@ -157,7 +157,7 @@ class ChannelScanSM : public MPEGStreamListener,
     void HandleBAT(const BouquetAssociationTable *bat) override; // DVBOtherStreamListener
 
   private:
-    // some useful gets
+    // Gets
     DTVChannel       *GetDTVChannel(void);
     const DTVChannel *GetDTVChannel(void) const;
     V4LChannel       *GetV4LChannel(void);
@@ -174,7 +174,7 @@ class ChannelScanSM : public MPEGStreamListener,
     DTVTunerType GuessDTVTunerType(DTVTunerType type) const;
     static void LogLines(const QString& string);
 
-    /// \brief Updates Transport Scan progress bar
+    // Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
 
     bool CheckImportedList(const DTVChannelInfoList &channels,
@@ -256,10 +256,10 @@ class ChannelScanSM : public MPEGStreamListener,
     // Analog Info
     AnalogSignalHandler *m_analogSignalHandler {nullptr};
 
-    /// Scanner thread, runs ChannelScanSM::run()
+    // Scanner thread, runs ChannelScanSM::run()
     MThread             *m_scannerThread       {nullptr};
 
-    /// Protect UpdateChannelInfo
+    // Protect UpdateChannelInfo
     QMutex               m_mutex;
 };
 

@@ -90,7 +90,7 @@ TransportScanItem::TransportScanItem(uint sourceid,
 {
     m_tuning.Clear();
 
-    // setup tuning params
+    // Setup tuning parameters
     m_tuning.m_frequency  = freq;
     m_tuning.m_sistandard = "dvb";
     m_tuning.m_modulation = ft.m_modulation;
@@ -187,16 +187,16 @@ QString TransportScanItem::toString() const
     else
     {
         str += QString("constellation(%1) " ).arg(m_tuning.m_modulation.toString());
-        str += QString("inv(%1) "           ).arg(m_tuning.m_inversion);
-        str += QString("bandwidth(%1) "     ).arg(m_tuning.m_bandwidth);
-        str += QString("hp(%1) "            ).arg(m_tuning.m_hpCodeRate);
-        str += QString("lp(%1) "            ).arg(m_tuning.m_lpCodeRate);
+        str += QString("inv(%1) "           ).arg(m_tuning.m_inversion.toString());
+        str += QString("bandwidth(%1) "     ).arg(m_tuning.m_bandwidth.toString());
+        str += QString("hp(%1) "            ).arg(m_tuning.m_hpCodeRate.toString());
+        str += QString("lp(%1) "            ).arg(m_tuning.m_lpCodeRate.toString());
         str += "\n\t";
-        str += QString("trans_mode(%1) "    ).arg(m_tuning.m_transMode);
-        str += QString("guard_int(%1) "     ).arg(m_tuning.m_guardInterval);
-        str += QString("hierarchy(%1) "     ).arg(m_tuning.m_hierarchy);
+        str += QString("trans_mode(%1) "    ).arg(m_tuning.m_transMode.toString());
+        str += QString("guard_int(%1) "     ).arg(m_tuning.m_guardInterval.toString());
+        str += QString("hierarchy(%1) "     ).arg(m_tuning.m_hierarchy.toString());
         str += QString("symbol_rate(%1) "   ).arg(m_tuning.m_symbolRate);
-        str += QString("fec(%1) "           ).arg(m_tuning.m_fec);
+        str += QString("fec(%1) "           ).arg(m_tuning.m_fec.toString());
     }
     return str;
 }

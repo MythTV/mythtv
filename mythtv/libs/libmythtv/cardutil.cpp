@@ -839,7 +839,7 @@ DTVTunerType CardUtil::GetTunerTypeFromMultiplex(uint mplexid)
     if (!query.next())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Could not find mod_sys in dtv_multiplex for mplexid %1")
+            QString("Could not find entry in dtv_multiplex for mplexid %1")
                 .arg(mplexid));
 
         return tuner_type;
