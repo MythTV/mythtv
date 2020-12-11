@@ -38,7 +38,7 @@ class UPNP_PUBLIC SubscriberInfo
             m_sUUID = m_sUUID.mid( 1, m_sUUID.length() - 2);
         }
 
-        SubscriberInfo( const QString &url, unsigned long duration )
+        SubscriberInfo( const QString &url, std::chrono::seconds duration )
             : m_nDuration( duration )
         {
             memset( &m_ttExpires, 0, sizeof( m_ttExpires ) );
@@ -65,16 +65,16 @@ class UPNP_PUBLIC SubscriberInfo
         QString             m_sUUID;
         QUrl                m_qURL;
         unsigned short      m_nKey      {0};
-        unsigned long       m_nDuration {0};       // Seconds
+        std::chrono::seconds m_nDuration {0s};
 
     protected:
 
-        void SetExpireTime( unsigned long nSecs )
+        void SetExpireTime( std::chrono::seconds nSecs )
         {
             TaskTime tt;
             gettimeofday( (&tt), nullptr );
 
-            AddMicroSecToTaskTime( tt, (nSecs * 1000000) );
+            AddMicroSecToTaskTime( tt, nSecs );
 
             m_ttExpires = tt;
         }
@@ -260,7 +260,7 @@ class UPNP_PUBLIC  Eventing : public HttpServerExtension,
         QString             m_sEventMethodName;
         Subscribers         m_subscribers;
 
-        int                 m_nSubscriptionDuration {1800};
+        std::chrono::seconds m_nSubscriptionDuration {30min};
 
         short               m_nHoldCount            {0};
 

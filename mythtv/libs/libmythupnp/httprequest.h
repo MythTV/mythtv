@@ -162,7 +162,7 @@ class UPNP_PUBLIC HTTPRequest
     private:
 
         bool                m_bKeepAlive        {true};
-        uint                m_nKeepAliveTimeout {0};
+        std::chrono::seconds m_nKeepAliveTimeout {0s};
 
     protected:
 
@@ -252,7 +252,7 @@ class UPNP_PUBLIC HTTPRequest
         static QString  Decode          ( const QString &sIn );
         static QString  GetETagHash     ( const QByteArray &data );
 
-        void            SetKeepAliveTimeout ( int nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
+        void            SetKeepAliveTimeout ( std::chrono::seconds nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
 
         static bool            IsUrlProtected      ( const QString &sBaseUrl );
 

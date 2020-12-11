@@ -230,7 +230,7 @@ void WebSocketWorker::CleanupSocket()
                                    .arg(m_socket->error()));
     }
 
-    int writeTimeout = 5000; // 5 Seconds
+    std::chrono::milliseconds writeTimeout = 5s;
     // Make sure any data in the buffer is flushed before the socket is closed
     while (m_webSocketServer.IsRunning() &&
            m_socket->isValid() &&
@@ -251,13 +251,13 @@ void WebSocketWorker::CleanupSocket()
         // streaming. We should create a new server extension or adjust the
         // timeout according to the User-Agent, instead of increasing the
         // standard timeout. However we should ALWAYS have a timeout.
-        if (!m_socket->waitForBytesWritten(writeTimeout))
+        if (!m_socket->waitForBytesWritten(writeTimeout.count()))
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("WebSocketWorker(%1): "
                                          "Timed out waiting to write bytes to "
                                          "the socket, waited %2 seconds")
                                             .arg(m_socketFD)
-                                            .arg(writeTimeout / 1000));
+                                            .arg(writeTimeout.count() / 1000));
             break;
         }
     }

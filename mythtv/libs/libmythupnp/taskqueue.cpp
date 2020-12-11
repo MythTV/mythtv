@@ -167,12 +167,12 @@ void TaskQueue::Clear( )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void TaskQueue::AddTask( long msec, Task *pTask )
+void TaskQueue::AddTask( std::chrono::milliseconds msec, Task *pTask )
 {
     TaskTime tt;
     gettimeofday( (&tt), nullptr );
 
-    AddMicroSecToTaskTime( tt, (msec * 1000) );
+    AddMicroSecToTaskTime( tt, msec );
 
     AddTask( tt, pTask );
 }
@@ -212,11 +212,11 @@ void TaskQueue::AddTask( Task *pTask )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Task *TaskQueue::GetNextExpiredTask( TaskTime tt, long nWithinMilliSecs /*=50*/ )
+Task *TaskQueue::GetNextExpiredTask( TaskTime tt, std::chrono::milliseconds nWithinMilliSecs /*=50*/ )
 {
     Task *pTask = nullptr;
 
-    AddMicroSecToTaskTime( tt, nWithinMilliSecs * 1000 );
+    AddMicroSecToTaskTime( tt, nWithinMilliSecs );
 
     m_mutex.lock(); 
 

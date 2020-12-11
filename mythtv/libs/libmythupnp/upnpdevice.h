@@ -255,12 +255,12 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
 
         // ==================================================================
 
-        int ExpiresInSecs(void) const
+        std::chrono::seconds ExpiresInSecs(void) const
         {
             TaskTime ttNow;
             gettimeofday( (&ttNow), nullptr );
 
-            return m_ttExpires.tv_sec - ttNow.tv_sec;
+            return std::chrono::seconds(m_ttExpires.tv_sec - ttNow.tv_sec);
         }
 
         // ==================================================================
@@ -327,7 +327,7 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
             return QString("\nURI:%1\nUSN:%2\nDeviceXML:%3\n"
                            "Expires:%4\nMythTV PIN:%5")
                 .arg(m_sURI).arg(m_sUSN).arg(m_sLocation)
-                .arg(ExpiresInSecs()).arg(m_sSecurityPin);
+                .arg(ExpiresInSecs().count()).arg(m_sSecurityPin);
         }
 };
 

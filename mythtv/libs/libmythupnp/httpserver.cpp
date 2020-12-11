@@ -449,7 +449,7 @@ HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock,
 #endif
 )
            : m_httpServer(httpServer), m_socket(sock),
-             m_socketTimeout(5 * 1000), m_connectionType(type)
+             m_socketTimeout(5s), m_connectionType(type)
 #ifndef QT_NO_OPENSSL
              , m_sslConfig(sslConfig)
 #endif
@@ -537,7 +537,7 @@ void HttpWorker::run(void)
             // new clients from connecting - Default at time of writing was
             // 5 seconds for initial connection, then up to 10 seconds of idle
             // time between each subsequent request on the same connection
-            bTimeout = !(pSocket->waitForReadyRead(m_socketTimeout));
+            bTimeout = !(pSocket->waitForReadyRead(m_socketTimeout.count()));
 
             if (bTimeout) // Either client closed the socket or we timed out waiting for new data
                 break;
@@ -561,9 +561,9 @@ void HttpWorker::run(void)
                         bKeepAlive = pRequest->GetKeepAlive();
                         // The timeout is defined by the Server/Server Extension
                         // but must appear in the response headers
-                        uint nTimeout = m_httpServer.GetSocketTimeout(pRequest); // Seconds
+                        auto nTimeout = std::chrono::seconds(m_httpServer.GetSocketTimeout(pRequest));
                         pRequest->SetKeepAliveTimeout(nTimeout);
-                        m_socketTimeout = nTimeout * 1000; // Milliseconds
+                        m_socketTimeout = nTimeout; // Converts to milliseconds
 
                         // ------------------------------------------------------
                         // Request Parsed... Pass on to Main HttpServer class to 
@@ -637,7 +637,7 @@ void HttpWorker::run(void)
                                    .arg(pSocket->error()));
     }
 
-    int writeTimeout = 5000; // 5 Seconds
+    std::chrono::milliseconds writeTimeout = 5s;
     // Make sure any data in the buffer is flushed before the socket is closed
     while (m_httpServer.IsRunning() &&
            pSocket->isValid() &&
@@ -658,13 +658,13 @@ void HttpWorker::run(void)
         // streaming. We should create a new server extension or adjust the
         // timeout according to the User-Agent, instead of increasing the
         // standard timeout. However we should ALWAYS have a timeout.
-        if (!pSocket->waitForBytesWritten(writeTimeout))
+        if (!pSocket->waitForBytesWritten(writeTimeout.count()))
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("HttpWorker(%1): "
                                          "Timed out waiting to write bytes to "
                                          "the socket, waited %2 seconds")
                                             .arg(m_socket)
-                                            .arg(writeTimeout / 1000));
+                                            .arg(writeTimeout.count() / 1000));
             break;
         }
     }

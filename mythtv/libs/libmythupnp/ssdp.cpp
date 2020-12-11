@@ -515,7 +515,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     QString sMAN = GetHeaderValue( sHeaders, "MAN", "" );
     QString sST  = GetHeaderValue( sHeaders, "ST" , "" );
     QString sMX  = GetHeaderValue( sHeaders, "MX" , "" );
-    int     nMX  = 0;
+    std::chrono::seconds nMX  = 0s;
 
     LOG(VB_UPNP, LOG_DEBUG, QString("SSDP::ProcessSearchrequest : [%1] MX=%2")
              .arg(sST).arg(sMX));
@@ -532,16 +532,16 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     if ( sMAN                  != "\"ssdp:discover\"" ) return false;
     if ( sST.length()          == 0                   ) return false;
     if ( sMX.length()          == 0                   ) return false;
-    if ((nMX = sMX.toInt())    == 0                   ) return false;
-    if ( nMX                    < 0                   ) return false;
+    if ((nMX = std::chrono::seconds(sMX.toInt())) == 0s) return false;
+    if ( nMX                    < 0s                  ) return false;
 
     // ----------------------------------------------------------------------
     // Adjust timeout to be a random interval between 0 and MX (max of 120)
     // ----------------------------------------------------------------------
 
-    nMX = (nMX > 120) ? 120 : nMX;
+    nMX = std::clamp(nMX, 0s, 120s);
 
-    int nNewMX = (0 + static_cast<int>(MythRandom() % nMX)) * 1000;
+    auto nNewMX = std::chrono::milliseconds(MythRandom()) % nMX;
 
     // ----------------------------------------------------------------------
     // See what they are looking for...
@@ -619,7 +619,7 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     if ((nPos = sCache.indexOf("=", nPos)) < 0)
         return false;
 
-    int nSecs = sCache.midRef( nPos+1 ).toInt();
+    auto nSecs = std::chrono::seconds(sCache.midRef( nPos+1 ).toInt());
 
     SSDPCache::Instance()->Add( sST, sUSN, sDescURL, nSecs );
 
@@ -657,7 +657,7 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
         if ((nPos = sCache.indexOf("=", nPos)) < 0)
             return false;
 
-        int nSecs = sCache.midRef( nPos+1 ).toInt();
+        auto nSecs = std::chrono::seconds(sCache.midRef( nPos+1 ).toInt());
 
         SSDPCache::Instance()->Add( sNT, sUSN, sDescURL, nSecs );
 

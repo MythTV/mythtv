@@ -30,8 +30,8 @@ class SSDPCacheTask : public Task
 {
     protected:
 
-        int     m_nInterval;        // Number of ms between executing.
-        int     m_nExecuteCount;    // Used for debugging.
+        std::chrono::milliseconds m_nInterval     {30s}; // Number of ms between executing.
+        int                       m_nExecuteCount {0};   // Used for debugging.
 
         // Destructor protected to force use of Release Method
 
@@ -42,8 +42,8 @@ class SSDPCacheTask : public Task
         SSDPCacheTask() : Task("SSDPCacheTask")
         {
             m_nExecuteCount = 0;
-            m_nInterval     = 1000 *
-              UPnp::GetConfiguration()->GetValue("UPnP/SSDP/CacheInterval", 30);
+            m_nInterval     =
+                UPnp::GetConfiguration()->GetDuration<std::chrono::seconds>("UPnP/SSDP/CacheInterval", 30s);
         }
 
         QString Name() override // Task

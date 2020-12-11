@@ -104,12 +104,12 @@ bool operator== ( TaskTime t1, TaskTime t2 )
 //           
 /////////////////////////////////////////////////////////////////////////////
 
-void AddMicroSecToTaskTime( TaskTime &t, suseconds_t uSecs )
+void AddMicroSecToTaskTime( TaskTime &t, std::chrono::microseconds uSecs )
 {
-    uSecs += t.tv_usec;
+    uSecs += std::chrono::microseconds(t.tv_usec);
 
-    t.tv_sec  += (uSecs / 1000000);
-    t.tv_usec  = (uSecs % 1000000);
+    t.tv_sec  += (uSecs.count() / 1000000);
+    t.tv_usec  = (uSecs.count() % 1000000);
 }
 
 /////////////////////////////////////////////////////////////////////////////

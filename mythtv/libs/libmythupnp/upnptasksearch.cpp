@@ -53,7 +53,7 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
     m_sST         = std::move(sST);
     m_sUDN        = std::move(sUDN);
     m_nServicePort= nServicePort;
-    m_nMaxAge     = UPnp::GetConfiguration()->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
+    m_nMaxAge     = UPnp::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
 
 } 
 
@@ -81,7 +81,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                               "ST: %4\r\n"
                               "USN: %5\r\n"
                               "Content-Length: 0\r\n\r\n" )
-                              .arg( m_nMaxAge    )
+                              .arg( m_nMaxAge.count()    )
                               .arg( sDate )
                               .arg( HttpServer::GetServerVersion() )
                               .arg( sST )

@@ -45,7 +45,7 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
 {
     m_nServicePort = nServicePort;
 
-    m_nMaxAge      = UPnp::GetConfiguration()->GetValue( "UPnP/SSDP/MaxAge" , 3600 );
+    m_nMaxAge      = UPnp::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
 } 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                             .arg( GetNTSString()    )
                             .arg( sNT          )
                             .arg( sUSN         )
-                            .arg( m_nMaxAge    );
+                            .arg( m_nMaxAge.count()    );
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpNotifyTask::SendNotifyMsg : %1:%2 : %3 : %4")
@@ -164,7 +164,7 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
     m_mutex.lock();
 
     if (m_eNTS == NTS_alive) 
-        pQueue->AddTask( (m_nMaxAge / 2) * 1000, (Task *)this  );
+        pQueue->AddTask( (m_nMaxAge / 2), (Task *)this  );
 
     m_mutex.unlock();
 

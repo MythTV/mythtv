@@ -193,7 +193,7 @@ QTextStream &SSDPCacheEntries::OutputXML(
         // Note: IncrRef,DecrRef not required since SSDPCacheEntries
         // holds one reference to each entry and we are holding m_mutex.
         os << "<Service usn='" << entry->m_sUSN
-           << "' expiresInSecs='" << entry->ExpiresInSecs()
+           << "' expiresInSecs='" << entry->ExpiresInSecs().count()
            << "' url='" << entry->m_sLocation << "' />" << QT_ENDL;
 
         if (pnEntryCount != nullptr)
@@ -216,7 +216,7 @@ void SSDPCacheEntries::Dump(uint &nEntryCount) const
         // Note: IncrRef,DecrRef not required since SSDPCacheEntries
         // holds one reference to each entry and we are holding m_mutex.
         LOG(VB_UPNP, LOG_DEBUG, QString(" * \t\t%1\t | %2\t | %3 ")
-                .arg(entry->m_sUSN) .arg(entry->ExpiresInSecs())
+                .arg(entry->m_sUSN) .arg(entry->ExpiresInSecs().count())
                 .arg(entry->m_sLocation));
 
         nEntryCount++;
@@ -331,7 +331,7 @@ DeviceLocation *SSDPCache::Find(const QString &sURI, const QString &sUSN)
 void SSDPCache::Add( const QString &sURI,
                      const QString &sUSN,
                      const QString &sLocation,
-                     long           sExpiresInSecs )
+                     std::chrono::seconds sExpiresInSecs )
 {    
     // --------------------------------------------------------------
     // Calculate when this cache entry should expire.
@@ -339,7 +339,7 @@ void SSDPCache::Add( const QString &sURI,
 
     TaskTime ttExpires;
     gettimeofday        ( (&ttExpires), nullptr );
-    AddSecondsToTaskTime(  ttExpires, sExpiresInSecs );
+    AddSecondsToTaskTime(  ttExpires, sExpiresInSecs.count() );
 
     // --------------------------------------------------------------
     // Get a Pointer to a Entries QDict... (Create if not found)

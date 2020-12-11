@@ -220,9 +220,9 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     SetResponseHeader("Connection", m_bKeepAlive ? "Keep-Alive" : "Close" );
     if (m_bKeepAlive)
     {
-        if (m_nKeepAliveTimeout == 0) // Value wasn't passed in by the server, so go with the configured value
-            m_nKeepAliveTimeout = gCoreContext->GetNumSetting("HTTP/KeepAliveTimeoutSecs", 10);
-        SetResponseHeader("Keep-Alive", QString("timeout=%1").arg(m_nKeepAliveTimeout));
+        if (m_nKeepAliveTimeout == 0s) // Value wasn't passed in by the server, so go with the configured value
+            m_nKeepAliveTimeout = gCoreContext->GetDurSetting<std::chrono::seconds>("HTTP/KeepAliveTimeoutSecs", 10s);
+        SetResponseHeader("Keep-Alive", QString("timeout=%1").arg(m_nKeepAliveTimeout.count()));
     }
 
     //-----------------------------------------------------------------------
@@ -2050,7 +2050,7 @@ bool HTTPRequest::DigestAuthentication()
         return false;
     }
 
-    const int AUTH_TIMEOUT = 2 * 60; // 2 Minute timeout to login, to reduce replay attack window
+    constexpr std::chrono::seconds AUTH_TIMEOUT { 2min }; // 2 Minute timeout to login, to reduce replay attack window
     QDateTime nonceTimeStamp = MythDate::fromString(nonceTimeStampStr);
     if (!nonceTimeStamp.isValid())
     {
@@ -2059,7 +2059,7 @@ bool HTTPRequest::DigestAuthentication()
         return false;
     }
 
-    if (nonceTimeStamp.secsTo(MythDate::current()) > AUTH_TIMEOUT)
+    if (MythDate::secsInPast(nonceTimeStamp) > AUTH_TIMEOUT)
     {
         LOG(VB_HTTP, LOG_NOTICE, "Authorization nonce timestamp is invalid or too old.");
         // Tell the client that the submitted nonce has expired at which
