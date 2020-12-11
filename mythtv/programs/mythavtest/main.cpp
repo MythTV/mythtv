@@ -34,19 +34,14 @@ class VideoPerformanceTest
 {
   public:
     VideoPerformanceTest(QString filename, bool decodeno, bool onlydecode,
-                         int runfor, bool deint, bool gpu)
+                         std::chrono::seconds runfor, bool deint, bool gpu)
       : m_file(std::move(filename)),
         m_noDecode(decodeno),
         m_decodeOnly(onlydecode),
-        m_secondsToRun(runfor),
         m_deinterlace(deint),
-        m_allowGpu(gpu),
-        m_ctx(nullptr)
+        m_allowGpu(gpu)
     {
-        if (m_secondsToRun < 1)
-            m_secondsToRun = 1;
-        if (m_secondsToRun > 3600)
-            m_secondsToRun = 3600;
+        m_secondsToRun = std::clamp(runfor, 1s, 3600s);
     }
 
    ~VideoPerformanceTest()
@@ -88,7 +83,7 @@ class VideoPerformanceTest
         LOG(VB_GENERAL, LOG_INFO, QString("Starting video performance test for '%1'.")
             .arg(m_file));
         LOG(VB_GENERAL, LOG_INFO, QString("Test will run for %1 seconds.")
-            .arg(m_secondsToRun));
+            .arg(m_secondsToRun.count()));
 
         if (m_noDecode)
             LOG(VB_GENERAL, LOG_INFO, "No decode after startup - checking display performance");
@@ -100,14 +95,13 @@ class VideoPerformanceTest
 
         auto *jitter = new Jitterometer("Performance: ", static_cast<int>(mp->GetFrameRate()));
 
-        int ms = m_secondsToRun * 1000;
         QTime start = QTime::currentTime();
         MythVideoFrame *frame = nullptr;
         while (true)
         {
             mp->ProcessCallbacks();
-            int duration = start.msecsTo(QTime::currentTime());
-            if (duration < 0 || duration > ms)
+            auto duration = std::chrono::milliseconds(start.msecsTo(QTime::currentTime()));
+            if (duration < 0ms || duration >  m_secondsToRun)
             {
                 LOG(VB_GENERAL, LOG_INFO, "Complete.");
                 break;
@@ -160,13 +154,13 @@ class VideoPerformanceTest
     }
 
   private:
-    QString m_file;
-    bool    m_noDecode;
-    bool    m_decodeOnly;
-    int     m_secondsToRun;
-    bool    m_deinterlace;
-    bool    m_allowGpu;
-    PlayerContext *m_ctx;
+    QString               m_file;
+    bool                  m_noDecode     {false};
+    bool                  m_decodeOnly   {false};
+    std::chrono::seconds  m_secondsToRun {1s};
+    bool                  m_deinterlace  {false};
+    bool                  m_allowGpu     {false};
+    PlayerContext        *m_ctx          {nullptr};
 };
 
 int main(int argc, char *argv[])
@@ -268,9 +262,9 @@ int main(int argc, char *argv[])
 
     if (cmdline.toBool("test"))
     {
-        int seconds = 5;
+        std::chrono::seconds seconds = 5s;
         if (!cmdline.toString("seconds").isEmpty())
-            seconds = cmdline.toInt("seconds");
+            seconds = std::chrono::seconds(cmdline.toInt("seconds"));
         auto *test = new VideoPerformanceTest(filename,
                     cmdline.toBool("nodecode"),
                     cmdline.toBool("decodeonly"), seconds,
