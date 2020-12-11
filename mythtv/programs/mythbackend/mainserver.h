@@ -369,7 +369,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     bool m_stopped                           {false};
 
-    static const uint kMasterServerReconnectTimeout;
+    static const std::chrono::milliseconds kMasterServerReconnectTimeout;
 };
 
 #endif

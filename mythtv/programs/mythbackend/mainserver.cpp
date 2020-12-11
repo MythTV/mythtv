@@ -134,7 +134,7 @@ bool delete_file_immediately(const QString &filename,
 };
 
 QMutex MainServer::s_truncate_and_close_lock;
-const uint MainServer::kMasterServerReconnectTimeout = 1000; //ms
+const std::chrono::milliseconds MainServer::kMasterServerReconnectTimeout { 1s };
 
 class ProcessRequestRunnable : public QRunnable
 {
