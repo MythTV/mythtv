@@ -1058,6 +1058,13 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             item.m_networkID = dtv_sm->GetNetworkID();
             item.m_transportID = dtv_sm->GetTransportID();
 
+            if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBC)
+            {
+                if (item.m_tuning.m_modSys == DTVModulationSystem::kModulationSystem_UNDEFINED)
+                {
+                    item.m_tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBC_ANNEX_A;
+                }
+            }
             if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBT)
             {
                 item.m_tuning.m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
