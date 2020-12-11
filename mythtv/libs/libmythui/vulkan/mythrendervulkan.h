@@ -4,6 +4,7 @@
 // Qt
 #include <QVulkanWindowRenderer>
 #include <QVulkanDeviceFunctions>
+#include <optional>
 
 // MythTV
 #include "mythuiexp.h"
