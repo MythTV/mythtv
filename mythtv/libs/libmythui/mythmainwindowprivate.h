@@ -86,6 +86,6 @@ class MythMainWindowPrivate
     bool             m_firstinit         { true    };
     // Support for long press
     int              m_longPressKeyCode  { 0       };
-    ulong            m_longPressTime     { 0       };
+    std::chrono::milliseconds m_longPressTime { 0ms };
 };
 #endif

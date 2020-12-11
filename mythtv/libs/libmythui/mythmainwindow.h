@@ -5,6 +5,7 @@
 #include <QTimer>
 
 // MythTV
+#include "mythchrono.h"
 #include "mythscreenstack.h"
 #include "mythnotificationcenter.h"
 #include "mythuiactions.h"
@@ -171,7 +172,7 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
     MythInputDeviceHandler* m_deviceHandler { nullptr };
     MythScreenSaverControl* m_screensaver   { nullptr };
     QTimer             m_idleTimer;
-    int                m_idleTime      { 0 };
+    std::chrono::minutes m_idleTime    { 0min };
 };
 
 MUI_PUBLIC MythMainWindow* GetMythMainWindow();
