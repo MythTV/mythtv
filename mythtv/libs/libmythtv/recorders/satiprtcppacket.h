@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QString>
-#include <QtEndian>
 #include <QIODevice>
 #include <QDataStream>
 
