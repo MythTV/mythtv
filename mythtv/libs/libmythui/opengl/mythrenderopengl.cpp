@@ -1024,7 +1024,6 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
         SetColor(LinePen.color());
         SetShaderProjection(m_defaultPrograms[kShaderEdge]);
         SetShaderProgramParams(m_defaultPrograms[kShaderEdge], m_parameters, "u_parameters");
-        glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 
