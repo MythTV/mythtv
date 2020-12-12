@@ -82,7 +82,7 @@ using FrameOffsets = std::array<int,3>;
 class MTV_PUBLIC MythVideoFrame
 {
   public:
-    static inline const VideoFrameTypes s_defaultRenderFormats { FMT_YV12 };
+    static inline const VideoFrameTypes kDefaultRenderFormats { FMT_YV12 };
 
     MythVideoFrame() = default;
     MythVideoFrame(VideoFrameType Type, int Width, int Height, const VideoFrameTypes* RenderFormats = nullptr);
@@ -138,7 +138,7 @@ class MTV_PUBLIC MythVideoFrame
     int            m_pixFmt            { 0 };
     int            m_swPixFmt          { 0 };
     bool           m_directRendering   { true };
-    const VideoFrameTypes* m_renderFormats { &s_defaultRenderFormats };
+    const VideoFrameTypes* m_renderFormats { &kDefaultRenderFormats };
     int            m_colorspace        { 1 };
     int            m_colorrange        { 1 };
     int            m_colorprimaries    { 1 };

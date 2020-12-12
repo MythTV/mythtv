@@ -99,7 +99,7 @@ class MythVideoOutput : public MythVideoBounds
     long long            m_framesPlayed       { 0 };
     MythAVCopy           m_copyFrame;
     MythDeinterlacer     m_deinterlacer;
-    const VideoFrameTypes* m_renderFormats    { &MythVideoFrame::s_defaultRenderFormats };
+    const VideoFrameTypes* m_renderFormats    { &MythVideoFrame::kDefaultRenderFormats };
     bool                 m_deinterlacing      { false };
     bool                 m_deinterlacing2X    { false };
     MythDeintType        m_forcedDeinterlacer { DEINT_NONE };

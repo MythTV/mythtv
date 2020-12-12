@@ -356,7 +356,7 @@ class DecoderBase
     std::vector<int>     m_languagePreference;
     MythCodecContext    *m_mythCodecCtx         { nullptr };
     VideoDisplayProfile  m_videoDisplayProfile;
-    const VideoFrameTypes* m_renderFormats { &MythVideoFrame::s_defaultRenderFormats };
+    const VideoFrameTypes* m_renderFormats { &MythVideoFrame::kDefaultRenderFormats };
 
   private:
     Q_DISABLE_COPY(DecoderBase)

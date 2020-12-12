@@ -29,13 +29,13 @@ MythVideoFrame::~MythVideoFrame()
 
 MythVideoFrame::MythVideoFrame(VideoFrameType Type, int Width, int Height, const VideoFrameTypes* RenderFormats)
 {
-    Init(Type, Width, Height, (RenderFormats == nullptr) ? &s_defaultRenderFormats : RenderFormats);
+    Init(Type, Width, Height, (RenderFormats == nullptr) ? &kDefaultRenderFormats : RenderFormats);
 }
 
 MythVideoFrame::MythVideoFrame(VideoFrameType Type, uint8_t* Buffer, size_t BufferSize,
                                int Width, int Height, const VideoFrameTypes* RenderFormats, int Alignment)
 {
-    const VideoFrameTypes* formats = (RenderFormats == nullptr) ? &s_defaultRenderFormats : RenderFormats;
+    const VideoFrameTypes* formats = (RenderFormats == nullptr) ? &kDefaultRenderFormats : RenderFormats;
     Init(Type, Buffer, BufferSize, Width, Height, formats, Alignment);
 }
 
@@ -50,7 +50,7 @@ void MythVideoFrame::Init(VideoFrameType Type, int Width, int Height, const Vide
         newbuffer = reallocate ? GetAlignedBuffer(newsize) : m_buffer;
         newsize   = reallocate ? newsize : m_bufferSize;
     }
-    Init(Type, newbuffer, newsize, Width, Height, (RenderFormats == nullptr) ? &s_defaultRenderFormats : RenderFormats);
+    Init(Type, newbuffer, newsize, Width, Height, (RenderFormats == nullptr) ? &kDefaultRenderFormats : RenderFormats);
 }
 
 void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSize,
@@ -86,7 +86,7 @@ void MythVideoFrame::Init(VideoFrameType Type, uint8_t *Buffer, size_t BufferSiz
     m_bufferSize   = BufferSize;
     m_width        = Width;
     m_height       = Height;
-    m_renderFormats = (RenderFormats == nullptr) ? &s_defaultRenderFormats : RenderFormats;
+    m_renderFormats = (RenderFormats == nullptr) ? &kDefaultRenderFormats : RenderFormats;
 
     ClearMetadata();
 
