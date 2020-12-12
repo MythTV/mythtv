@@ -260,7 +260,6 @@ class DecoderBase
     void TrackTotalDuration(bool track) { m_trackTotalDuration = track; }
     int GetfpsMultiplier(void) const { return m_fpsMultiplier; }
     MythCodecContext *GetMythCodecContext(void) { return m_mythCodecCtx; }
-    VideoDisplayProfile * GetVideoDisplayProfile(void) { return &m_videoDisplayProfile; }
     static AVPixelFormat GetBestVideoFormat(AVPixelFormat* Formats, const VideoFrameTypes* RenderFormats);
 
   protected:
