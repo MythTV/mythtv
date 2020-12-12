@@ -181,7 +181,7 @@ MythMainWindow::MythMainWindow(const bool UseDB)
     connect(this, &MythMainWindow::SignalSetDrawEnabled, this, &MythMainWindow::SetDrawEnabled,
             Qt::BlockingQueuedConnection);
 #ifdef Q_OS_ANDROID
-    connect(qApp, &QApplication::applicationStateChanged, this, &MythMainWindow::onApplicationStateChange);
+    connect(qApp, &QApplication::applicationStateChanged, this, &MythMainWindow::OnApplicationStateChange);
 #endif
 
     // We need to listen for playback start/end events
