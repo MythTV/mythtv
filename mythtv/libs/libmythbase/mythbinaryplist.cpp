@@ -203,7 +203,7 @@ void MythBinaryPList::DictToXML(const QVariant& Data, QXmlStreamWriter& Xml)
 void MythBinaryPList::ArrayToXML(const QVariant& Data, QXmlStreamWriter& Xml)
 {
     Xml.writeStartElement("array");
-    QSequentialIterable list = Data.value<QSequentialIterable>();
+    auto list = Data.value<QSequentialIterable>();
     for (const auto & item : qAsConst(list))
         ToXML(item, Xml);
     Xml.writeEndElement();
@@ -441,7 +441,7 @@ QVariant MythBinaryPList::ParseBinaryDate(uint8_t* Data)
         return result;
 
     convert_float(Data, 8);
-    double temp = static_cast<double>(NAN);
+    auto temp = static_cast<double>(NAN);
     std::copy(Data, Data + sizeof(double), reinterpret_cast<uint8_t*>(&temp));
     auto msec = static_cast<uint64_t>(temp * 1000.0);
     result = QDateTime::fromMSecsSinceEpoch(static_cast<qint64>(msec), Qt::UTC);
