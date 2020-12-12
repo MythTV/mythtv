@@ -1553,7 +1553,7 @@ bool MythUIText::ParseElement(
                 m_scrollForwardRate = percent;
 #else // scroll rate as pixels per second
                 int pixels = tmp.toInt();
-                m_scrollForwardRate = pixels / DEFAULT_REFRESH_RATE;
+                m_scrollForwardRate = pixels / static_cast<float>(DEFAULT_REFRESH_RATE);
 #endif
             }
             tmp = element.attribute("returnrate");
@@ -1564,7 +1564,7 @@ bool MythUIText::ParseElement(
                 m_scrollReturnRate = percent;
 #else // scroll rate as pixels per second
                 int pixels = tmp.toInt();
-                m_scrollReturnRate = pixels / DEFAULT_REFRESH_RATE;
+                m_scrollReturnRate = pixels / static_cast<float>(DEFAULT_REFRESH_RATE);
 #endif
             }
 
