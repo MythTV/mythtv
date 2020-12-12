@@ -1448,9 +1448,11 @@ DecoderBase::TranslatePositionRelToAbs(const frm_dir_map_t &deleteMap,
 AVPixelFormat DecoderBase::GetBestVideoFormat(AVPixelFormat* Formats, const VideoFrameTypes* RenderFormats)
 {
     for (AVPixelFormat *format = Formats; *format != AV_PIX_FMT_NONE; format++)
+    {
         for (auto fmt : *RenderFormats)
             if (MythAVUtil::FrameTypeToPixelFormat(fmt) == *format)
                 return *format;
+    }
     return AV_PIX_FMT_NONE;
 }
 
