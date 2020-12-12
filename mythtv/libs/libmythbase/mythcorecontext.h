@@ -151,6 +151,12 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void SaveSetting(const QString &key, int newValue);
     void SaveSetting(const QString &key, const QString &newValue);
     QString GetSetting(const QString &key, const QString &defaultval = "");
+    // No conversion between duration ratios. Just extract the number.
+    template <typename T>
+        typename std::enable_if_t<std::chrono::__is_duration<T>::value, void>
+        SaveDurSetting(const QString &key, T newValue)
+        { SaveSetting(key, static_cast<int>(newValue.count())); }
+
     bool SaveSettingOnHost(const QString &key, const QString &newValue,
                            const QString &host);
     void SaveBoolSetting(const QString &key, bool newValue)
@@ -159,6 +165,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     // Convenience setting query methods
     bool GetBoolSetting(const QString &key, bool defaultval = false);
     int GetNumSetting(const QString &key, int defaultval = 0);
+    template <typename T>
+        typename std::enable_if_t<std::chrono::__is_duration<T>::value, T>
+        GetDurSetting(const QString &key, T defaultval = T::zero())
+    { return T(GetNumSetting(key, static_cast<int>(defaultval.count()))); }
     int GetBoolSetting(const QString &key, int defaultval) = delete;
     bool GetNumSetting(const QString &key, bool defaultvalue) = delete;
     double GetFloatSetting(const QString &key, double defaultval = 0.0);

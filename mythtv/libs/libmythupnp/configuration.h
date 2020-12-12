@@ -35,6 +35,15 @@ class UPNP_PUBLIC Configuration
         virtual void    SetValue( const QString &sSetting, const QString &value ) = 0;
         virtual void    ClearValue( const QString &sSetting )                = 0;
         virtual void    SetBoolValue( const QString &sSetting, bool value   ) = 0;
+
+        template <typename T>
+            typename std::enable_if<std::chrono::__is_duration<T>::value, T>::type
+            GetDuration(const QString &sSetting, T defaultval = T::zero())
+        { return T(GetValue(sSetting, static_cast<int>(defaultval.count()))); }
+        template <typename T>
+            typename std::enable_if<std::chrono::__is_duration<T>::value, void>::type
+            SetDuration(const QString &sSetting, T value)
+        { SetValue(sSetting, static_cast<int>(value.count())); }
 };
 
 
