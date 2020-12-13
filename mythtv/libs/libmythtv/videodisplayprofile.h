@@ -76,13 +76,11 @@ class MTV_PUBLIC VideoDisplayProfile
     void    SetOutput(float Framerate);
     float   GetOutput(void) const;
     void    SetVideoRenderer(const QString &VideoRenderer);
-    bool    CheckVideoRendererGroup(const QString &Renderer);
     QString GetDecoder(void) const;
     bool    IsDecoderCompatible(const QString &Decoder) const;
     uint    GetMaxCPUs(void) const ;
     bool    IsSkipLoopEnabled(void) const;
     QString GetVideoRenderer(void) const;
-    QString GetActualVideoRenderer(void) const;
     QString toString(void) const;
     QString GetSingleRatePreferences(void) const;
     QString GetDoubleRatePreferences(void) const;
@@ -109,7 +107,6 @@ class MTV_PUBLIC VideoDisplayProfile
     static QStringList GetVideoRenderers(const QString &Decoder);
     static QString     GetVideoRendererHelp(const QString &Renderer);
     static QString     GetPreferredVideoRenderer(const QString &Decoder);
-    static bool        IsFilterAllowed( const QString &VideoRenderer);
     static QStringList GetFilteredRenderers(const QString &Decoder, const QStringList &Renderers);
     static QString     GetBestVideoRenderer(const QStringList &Renderers);
     static std::vector<ProfileItem> LoadDB(uint GroupId);
@@ -130,9 +127,8 @@ class MTV_PUBLIC VideoDisplayProfile
     QSize                 m_lastSize            { 0, 0 };
     float                 m_lastRate            { 0.0F };
     QString               m_lastCodecName       { };
-    QString               m_lastVideoRenderer   { };
     QMap<QString,QString> m_currentPreferences  { };
-    std::vector<ProfileItem>   m_allowedPreferences  { };
+    std::vector<ProfileItem> m_allowedPreferences { };
 
     static QMutex                    s_safe_lock;
     static bool                      s_safe_initialized;
@@ -147,4 +143,4 @@ class MTV_PUBLIC VideoDisplayProfile
     static QList<QPair<QString,QString> > s_deinterlacer_options;
 };
 
-#endif // VIDEO_DISPLAY_PROFILE_H_
+#endif

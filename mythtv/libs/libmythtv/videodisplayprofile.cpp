@@ -426,47 +426,17 @@ QString VideoDisplayProfile::GetVideoRenderer(void) const
     return GetPreference("pref_videorenderer");
 }
 
-QString VideoDisplayProfile::GetActualVideoRenderer(void) const
-{
-    return m_lastVideoRenderer;
-}
-
 void VideoDisplayProfile::SetVideoRenderer(const QString &VideoRenderer)
 {
     QMutexLocker locker(&m_lock);
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("SetVideoRenderer(%1)").arg(VideoRenderer));
-
-    m_lastVideoRenderer = VideoRenderer;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetVideoRenderer: '%1'").arg(VideoRenderer));
     if (VideoRenderer == GetVideoRenderer())
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("SetVideoRender(%1) == GetVideoRenderer()").arg(VideoRenderer));
-        return; // already made preferences safe...
-    }
+        return;
 
     // Make preferences safe...
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Old preferences: " + toString());
-
     SetPreference("pref_videorenderer", VideoRenderer);
-
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "New preferences: " + toString());
-}
-
-bool VideoDisplayProfile::CheckVideoRendererGroup(const QString &Renderer)
-{
-    if (m_lastVideoRenderer == Renderer || m_lastVideoRenderer == "null")
-        return true;
-
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Preferred video renderer: %1 (current: %2)")
-                .arg(Renderer).arg(m_lastVideoRenderer));
-
-    return std::any_of(s_safe_renderer_group.cbegin(), s_safe_renderer_group.cend(),
-                       [this,Renderer](const auto& group)
-                           { return group.contains(m_lastVideoRenderer) &&
-                                    group.contains(Renderer); } );
 }
 
 bool VideoDisplayProfile::IsDecoderCompatible(const QString &Decoder) const
@@ -496,7 +466,6 @@ QString VideoDisplayProfile::GetPreference(const QString &Key) const
 void VideoDisplayProfile::SetPreference(const QString &Key, const QString &Value)
 {
     QMutexLocker locker(&m_lock);
-
     if (!Key.isEmpty())
         m_currentPreferences[Key] = Value;
 }
@@ -1317,13 +1286,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &Renderer)
 QString VideoDisplayProfile::GetPreferredVideoRenderer(const QString &Decoder)
 {
     return GetBestVideoRenderer(GetVideoRenderers(Decoder));
-}
-
-bool VideoDisplayProfile::IsFilterAllowed(const QString &VideoRenderer)
-{
-    QMutexLocker locker(&s_safe_lock);
-    InitStatics();
-    return s_safe_custom.contains(VideoRenderer);
 }
 
 QStringList VideoDisplayProfile::GetFilteredRenderers(const QString &Decoder, const QStringList &Renderers)
