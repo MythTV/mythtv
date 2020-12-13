@@ -32,7 +32,8 @@
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous
- *   signal monitoring. The timeout is set to 3 seconds,
+ *   signal monitoring. The timeout value is retrieved from
+ *   the database but is set to at least 3 seconds,
  *   and the signal threshold is initialized to 0%.
  *
  *  \param db_cardnum Recorder number to monitor,
