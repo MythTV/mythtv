@@ -990,21 +990,15 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
     if (radius < 1.0F) radius = 1.0F;
     if (radius > halfwidth) radius = halfwidth;
     if (radius > halfheight) radius = halfheight;
-    float innerradius = radius - LinePen.width();
-    if (innerradius < 0.0F) innerradius = 0.0F;
 
     // Set shader parameters
     // Centre of the rectangle
     m_parameters(0,0) = Area.left() + halfwidth;
     m_parameters(1,0) = Area.top() + halfheight;
     m_parameters(2,0) = radius;
-    m_parameters(3,0) = innerradius;
     // Rectangle 'size' - distances from the centre to the edge
     m_parameters(0,1) = halfwidth;
     m_parameters(1,1) = halfheight;
-    // Adjust the size for the inner radius (edge)
-    m_parameters(2,1) = halfwidth - LinePen.width();
-    m_parameters(3,1) = halfheight - LinePen.width();
 
     makeCurrent();
     BindFramebuffer(Target);
@@ -1022,6 +1016,12 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
 
     if (edge)
     {
+        float innerradius = radius - LinePen.width();
+        if (innerradius < 0.0F) innerradius = 0.0F;
+        m_parameters(3,0) = innerradius;
+        // Adjust the size for the inner radius (edge)
+        m_parameters(2,1) = halfwidth - LinePen.width();
+        m_parameters(3,1) = halfheight - LinePen.width();
         SetColor(LinePen.color());
         SetShaderProjection(m_defaultPrograms[kShaderEdge]);
         SetShaderProgramParams(m_defaultPrograms[kShaderEdge], m_parameters, "u_parameters");
