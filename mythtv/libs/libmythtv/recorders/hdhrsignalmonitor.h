@@ -18,6 +18,7 @@ class HDHRSignalMonitor: public DTVSignalMonitor
     ~HDHRSignalMonitor() override;
 
     void Stop(void) override; // SignalMonitor
+    void EmitStatus(void) override; // SignalMonitor
 
   protected:
     HDHRSignalMonitor(void);
@@ -27,6 +28,8 @@ class HDHRSignalMonitor: public DTVSignalMonitor
     HDHRChannel *GetHDHRChannel(void);
 
   protected:
+    SignalMonitorValue m_signalToNoise;
+
     bool               m_streamHandlerStarted {false};
     HDHRStreamHandler *m_streamHandler        {nullptr};
 };

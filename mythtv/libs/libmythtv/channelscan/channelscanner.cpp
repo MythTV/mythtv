@@ -414,6 +414,7 @@ void ChannelScanner::PreScanCommon(
     bool do_ignore_signal_timeout,
     bool do_test_decryption)
 {
+    bool monitor_snr = false;
     uint signal_timeout  = 1000;
     uint channel_timeout = 40000;
     CardUtil::GetTimeouts(cardid, signal_timeout, channel_timeout);
@@ -471,6 +472,7 @@ void ChannelScanner::PreScanCommon(
     if ("HDHOMERUN" == card_type)
     {
         m_channel = new HDHRChannel(nullptr, device);
+        monitor_snr = true;
     }
 #endif // USING_HDHOMERUN
 
@@ -516,7 +518,7 @@ void ChannelScanner::PreScanCommon(
         return;
     }
 
-    // explicitly set the cardid
+    // Explicitly set the cardid
     m_channel->SetInputID(cardid);
 
     // If the backend is running this may fail...
@@ -580,8 +582,13 @@ void ChannelScanner::PreScanCommon(
 #ifdef USING_DVB
     dvbm = m_sigmonScanner->GetDVBSignalMonitor();
     if (dvbm && mon)
+    {
+        monitor_snr = true;
         using_rotor = mon->HasFlags(SignalMonitor::kDVBSigMon_WaitForPos);
+    }
 #endif // USING_DVB
 
-    MonitorProgress(mon, mon, dvbm, using_rotor);
+    bool monitor_lock = mon != nullptr;
+    bool monitor_strength = mon != nullptr;
+    MonitorProgress(monitor_lock, monitor_strength, monitor_snr, using_rotor);
 }
