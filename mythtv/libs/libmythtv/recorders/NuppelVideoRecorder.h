@@ -241,7 +241,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     int                 m_lastBlock              {0};
     int                 m_firstTc                {0};
-    long int            m_oldTc                  {0};
+    std::chrono::milliseconds  m_oldTc           {0ms};
     int                 m_startNum               {0};
     int                 m_frameOfGop             {0};
     int                 m_lastTimecode           {0};

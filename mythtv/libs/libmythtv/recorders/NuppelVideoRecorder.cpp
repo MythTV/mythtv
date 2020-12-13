@@ -1792,7 +1792,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
 
     gettimeofday(&now, nullptr);
 
-    long tcres = (now.tv_sec-m_stm.tv_sec)*1000 + now.tv_usec/1000 - m_stm.tv_usec/1000;
+    auto tcres = durationFromTimevalDelta<std::chrono::milliseconds>(now, m_stm);
 
     m_useBttv = 0;
     // here is the non preferable timecode - drop algorithm - fallback
@@ -1802,7 +1802,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
             m_tf = 2;
         else
         {
-            int fn = tcres - m_oldTc;
+            int fn = (tcres - m_oldTc).count();
 
      // the difference should be less than 1,5*timeperframe or we have
      // missed at least one frame, this code might be inaccurate!
@@ -1830,7 +1830,8 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
 
     // record the time at the start of this frame.
     // 'tcres' is at the end of the frame, so subtract the right # of ms
-    m_videoBuffer[act]->timecode = (m_ntscFrameRate) ? (tcres - 33) : (tcres - 40);
+    m_videoBuffer[act]->timecode =
+        (m_ntscFrameRate) ? (tcres.count() - 33) : (tcres.count() - 40);
 
     memcpy(m_videoBuffer[act]->buffer, buf, len);
     m_videoBuffer[act]->bufferlen = len;
