@@ -32,7 +32,8 @@ class MythOpenGLVideo : public MythVideoGPU
         Progressive   = 1, // Progressive video frame
         InterlacedTop = 2, // Deinterlace with top field first
         InterlacedBot = 3, // Deinterlace with bottom field first
-        ShaderCount   = 4
+        BicubicUpsize = 4,
+        ShaderCount   = 5
     };
 
     static QString        TypeToProfile(VideoFrameType Type);
@@ -81,6 +82,7 @@ class MythOpenGLVideo : public MythVideoGPU
     int            m_extraFeatures                 { 0 };
     GLenum         m_textureTarget                 { QOpenGLTexture::Target2D };
     bool           m_chromaUpsamplingFilter        { false };
+    bool           m_bicubicUpsize                 { false };
     MythOpenGLTonemap* m_toneMap                   { nullptr };
 };
 #endif

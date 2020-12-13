@@ -32,8 +32,7 @@ extern "C" {
  * state. Its role is to render video frames on screen.
 */
 MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL* Render, MythVideoColourSpace* ColourSpace,
-                                 MythVideoBounds* Bounds,
-                                 const QString& Profile)
+                                 MythVideoBounds* Bounds, const QString& Profile)
   : MythVideoGPU(Render, ColourSpace, Bounds, Profile),
     m_openglRender(Render)
 {
@@ -116,6 +115,12 @@ void MythOpenGLVideo::UpdateShaderParameters()
         {
             m_openglRender->EnableShaderProgram(m_shaders[i]);
             m_shaders[i]->setUniformValue("m_frameData", parameters);
+            if (BicubicUpsize == i)
+            {
+                QVector2D size { rect ? 1.0F : static_cast<GLfloat>(m_videoDim.width()),
+                                 rect ? 1.0F : static_cast<GLfloat>(m_videoDim.height()) };
+                m_shaders[i]->setUniformValue("m_textureSize", size);
+            }
         }
     }
 }
@@ -308,12 +313,12 @@ bool MythOpenGLVideo::CreateVideoShader(VideoShaderType Type, MythDeintType Dein
     if (m_textureTarget == GL_TEXTURE_EXTERNAL_OES)
         defines << "EXTOES";
 
-    if ((Default == Type) || (!MythVideoFrame::YUVFormat(m_outputType)))
+    if ((Default == Type) || (BicubicUpsize == Type) || (!MythVideoFrame::YUVFormat(m_outputType)))
     {
         QString glsldefines;
         for (const QString& define : qAsConst(defines))
             glsldefines += QString("#define MYTHTV_%1\n").arg(define);
-        fragment = glsldefines + YUVFragmentExtensions + RGBFragmentShader;
+        fragment = glsldefines + YUVFragmentExtensions + ((BicubicUpsize == Type) ? BicubicShader : RGBFragmentShader);
 
 #ifdef USING_MEDIACODEC
         if (FMT_MEDIACODEC == m_inputType)
@@ -723,7 +728,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // Determine which shader to use. This helps optimise the resize check.
     bool deinterlacing = false;
     bool basicdeinterlacing = false;
-    VideoShaderType program = MythVideoFrame::YUVFormat(m_outputType) ? Progressive :  Default;
+    VideoShaderType program = MythVideoFrame::YUVFormat(m_outputType) ? Progressive : Default;
     if (m_deinterlacer != DEINT_NONE)
     {
         if (Scan == kScan_Interlaced)
@@ -757,6 +762,40 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     if (m_toneMap)
         resize |= ToneMap;
 
+    // Bicubic upsizing
+    if (m_bicubicUpsize)
+    {
+        if (((m_videoDispDim.width() < m_displayVideoRect.width()) ||
+             (m_videoDispDim.height() < m_displayVideoRect.height())))
+        {
+            if (!m_shaders[BicubicUpsize])
+            {
+                if (!CreateVideoShader(BicubicUpsize))
+                {
+                    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create bicubic shader. Disabling");
+                    m_bicubicUpsize = false;
+                }
+                else
+                {
+                    UpdateShaderParameters();
+                    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created bicubic sampler");
+                }
+            }
+
+            if (m_shaders[BicubicUpsize])
+                resize |= Bicubic;
+        }
+        else
+        {
+            if (m_shaders[BicubicUpsize] != nullptr)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabling bicubic sampler");
+                delete m_shaders[BicubicUpsize];
+                m_shaders[BicubicUpsize] = nullptr;
+            }
+        }
+    }
+
     // Decide whether to use render to texture - for performance or quality
     if (MythVideoFrame::YUVFormat(m_outputType) && !resize)
     {
@@ -778,7 +817,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
 
         // don't enable resizing if the cost of a framebuffer switch may be
         // prohibitive (e.g. Raspberry Pi/tiled renderers) or for basic deinterlacing,
-        // where we are trying to simplifiy/optimise rendering (and the framebuffer
+        // where we are trying to simplify/optimise rendering (and the framebuffer
         // sizing gets confused by the change to m_videoDispDim)
         if (!resize && !tiled && !basicdeinterlacing)
         {
@@ -900,15 +939,15 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
             BindTextures(deinterlacing, inputtextures, textures);
 
             // render
-            m_openglRender->DrawBitmap(textures, m_frameBuffer,
-                                 trect2, vrect, m_shaders[program], 0);
+            m_openglRender->DrawBitmap(textures, m_frameBuffer, trect2, vrect,
+                                       m_shaders[program], 0);
             nexttexture = m_frameBufferTexture;
         }
 
         // reset for next stage
         inputtextures.clear();
         inputtextures.push_back(nexttexture);
-        program = Default;
+        program = ((resize & Bicubic) == Bicubic) ? BicubicUpsize : Default;
         deinterlacing = false;
     }
 
@@ -962,12 +1001,12 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
         // N.B. It's not obvious whether this helps
         m_openglRender->glEnable(GL_SCISSOR_TEST);
         m_openglRender->glScissor(m_displayVideoRect.left() - 1, m_displayVideoRect.top() - 1,
-                            m_displayVideoRect.width() + 2, m_displayVideoRect.height() + 2);
+                                  m_displayVideoRect.width() + 2, m_displayVideoRect.height() + 2);
     }
 
     // draw
-    m_openglRender->DrawBitmap(textures, nullptr, trect,
-                         m_displayVideoRect, m_shaders[program], m_lastRotation);
+    m_openglRender->DrawBitmap(textures, nullptr, trect, m_displayVideoRect,
+                               m_shaders[program], m_lastRotation);
 
     // disable scissoring
     if (tiled)
