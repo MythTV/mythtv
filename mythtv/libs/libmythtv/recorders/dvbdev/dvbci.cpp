@@ -397,7 +397,7 @@ private:
   uint8_t         m_tcid          {0};
   eState          m_state         {stIDLE};
   cTPDU          *m_tpdu          {nullptr};
-  struct timeval  m_lastPoll      {0,0};
+  std::chrono::milliseconds  m_lastPoll {0ms};
   int             m_lastResponse  {ERROR};
   bool            m_dataAvailable {false};
   void Init(int Fd, uint8_t Slot, uint8_t Tcid);
@@ -565,24 +565,20 @@ int cCiTransportConnection::CreateConnection(void)
 }
 
 // Polls can be done with a 100ms interval (EN50221 - A.4.1.12)
-#define POLL_INTERVAL 100
+static constexpr std::chrono::milliseconds POLL_INTERVAL { 100ms };
 
 int cCiTransportConnection::Poll(void)
 {
-  struct timeval curr_time {};
-
   if (m_state != stACTIVE)
     return ERROR;
 
-  gettimeofday(&curr_time, nullptr);
-  uint64_t msdiff = (curr_time.tv_sec * 1000) + (curr_time.tv_usec / 1000) -
-                    (m_lastPoll.tv_sec * 1000) - (m_lastPoll.tv_usec / 1000);
+  auto curr_time = nowAsDuration<std::chrono::milliseconds>();
+  std::chrono::milliseconds msdiff = curr_time - m_lastPoll;
 
   if (msdiff < POLL_INTERVAL)
     return OK;
 
-  m_lastPoll.tv_sec = curr_time.tv_sec;
-  m_lastPoll.tv_usec = curr_time.tv_usec;
+  m_lastPoll = curr_time;
 
   if (SendTPDU(T_DATA_LAST) != OK)
     return ERROR;
