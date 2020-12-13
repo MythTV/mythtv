@@ -576,11 +576,10 @@ void ChannelScanner::PreScanCommon(
     if (mon)
         mon->AddListener(lis);
 
-    DVBSignalMonitor *dvbm = nullptr;
     bool using_rotor = false;
 
 #ifdef USING_DVB
-    dvbm = m_sigmonScanner->GetDVBSignalMonitor();
+    DVBSignalMonitor *dvbm = m_sigmonScanner->GetDVBSignalMonitor();
     if (dvbm && mon)
     {
         monitor_snr = true;
