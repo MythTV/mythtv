@@ -95,8 +95,8 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions& Options)
 #endif
 }
 
-MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
-  : MythVideoOutputGPU(MythRenderOpenGL::GetOpenGLRender(), Profile)
+MythVideoOutputOpenGL::MythVideoOutputOpenGL(MythVideoProfilePtr VideoProfile, QString &Profile)
+  : MythVideoOutputGPU(MythRenderOpenGL::GetOpenGLRender(), VideoProfile, Profile)
 {
     // Complete list of formats supported for OpenGL 2.0 and higher and OpenGL ES3.X
     static VideoFrameTypes s_openglRenderFormats =

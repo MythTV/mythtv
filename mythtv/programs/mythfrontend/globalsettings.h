@@ -239,6 +239,7 @@ class PlaybackProfileItemConfig : public GroupSetting
     TransMythUISpinBoxSetting  *m_maxCpus      {nullptr};
     TransMythUICheckBoxSetting *m_skipLoop     {nullptr};
     TransMythUIComboBoxSetting *m_vidRend      {nullptr};
+    TransMythUIComboBoxSetting *m_upscaler     {nullptr};
     TransMythUIComboBoxSetting *m_singleDeint  {nullptr};
     TransMythUICheckBoxSetting *m_singleShader {nullptr};
     TransMythUICheckBoxSetting *m_singleDriver {nullptr};

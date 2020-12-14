@@ -41,8 +41,8 @@ QStringList MythVideoOutputVulkan::GetAllowedRenderers(MythCodecID CodecId)
     return allowed;
 }
 
-MythVideoOutputVulkan::MythVideoOutputVulkan(QString &Profile)
-  : MythVideoOutputGPU(MythRenderVulkan::GetVulkanRender(), Profile),
+MythVideoOutputVulkan::MythVideoOutputVulkan(MythVideoProfilePtr VideoProfile, QString &Profile)
+  : MythVideoOutputGPU(MythRenderVulkan::GetVulkanRender(), VideoProfile, Profile),
     MythVulkanObject(MythRenderVulkan::GetVulkanRender())
 {
     static VideoFrameTypes s_vulkanRenderFormats =

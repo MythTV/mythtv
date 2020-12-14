@@ -713,9 +713,13 @@ QStringList MythVideoProfile::GetDecoderNames()
         [](QStringList Res, const QString& Dec) { return Res << GetDecoderName(Dec); });
 }
 
-QStringList MythVideoProfile::GetUpscalerNames()
+std::vector<std::pair<QString, QString> > MythVideoProfile::GetUpscalers()
 {
-    static QStringList s_upscalers = { tr("Bilinear"), tr("Bicubic") };
+    static vector<std::pair<QString,QString>> s_upscalers =
+    {
+        { tr("Default (Bilinear)"), UPSCALE_DEFAULT },
+        { tr("Bicubic"), UPSCALE_HQ1 }
+    };
     return s_upscalers;
 }
 

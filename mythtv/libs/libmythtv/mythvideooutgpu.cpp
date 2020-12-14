@@ -67,13 +67,13 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
 
     QString renderer;
 
-    auto vprof = std::shared_ptr<MythVideoProfile>(new MythVideoProfile());
+    auto videoprofile = std::shared_ptr<MythVideoProfile>(new MythVideoProfile());
 
     if (!renderers.empty())
     {
-        vprof->SetInput(VideoDispDim, FrameRate, Codec);
-        QString tmp = vprof->GetVideoRenderer();
-        if (vprof->IsDecoderCompatible(Decoder) && renderers.contains(tmp))
+        videoprofile->SetInput(VideoDispDim, FrameRate, Codec);
+        QString tmp = videoprofile->GetVideoRenderer();
+        if (videoprofile->IsDecoderCompatible(Decoder) && renderers.contains(tmp))
         {
             renderer = tmp;
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Preferred renderer: " + renderer);
@@ -121,16 +121,15 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
 #endif
 #ifdef USING_OPENGL
         if (renderer.contains("opengl"))
-            video = new MythVideoOutputOpenGL(renderer);
+            video = new MythVideoOutputOpenGL(videoprofile, renderer);
 #endif
 #ifdef USING_VULKAN
         if (renderer.contains(VULKAN_RENDERER))
-            video = new MythVideoOutputVulkan(renderer);
+            video = new MythVideoOutputVulkan(videoprofile, renderer);
 #endif
 
         if (video)
         {
-            video->m_videoProfile = vprof;
             video->SetVideoFrameRate(FrameRate);
             video->SetReferenceFrames(ReferenceFrames);
             if (video->Init(VideoDim, VideoDispDim, VideoAspect, MainWindow->GetUIScreenRect(), CodecID))
@@ -139,8 +138,6 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
                 RenderFormats = video->m_renderFormats;
                 return video;
             }
-
-            video->m_videoProfile = nullptr;
             delete video;
             video = nullptr;
         }
@@ -163,10 +160,12 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
  * \sa MythVideoOutputOpenGL
  * \sa MythVideoOutputVulkan
  */
-MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, QString& Profile)
+MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, MythVideoProfilePtr VideoProfile, QString& Profile)
   : m_render(Render),
     m_profile(std::move(Profile))
 {
+    m_videoProfile = VideoProfile;
+
     if (m_render)
         m_render->IncrRef();
 

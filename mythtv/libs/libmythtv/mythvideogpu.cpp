@@ -65,10 +65,7 @@ void MythVideoGPU::UpscalerChanged(const QString& Upscaler)
     auto oldbicubic = m_bicubicUpsize;
     m_bicubicUpsize = Upscaler == UPSCALE_HQ1;
     if (m_bicubicUpsize != oldbicubic)
-    {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Bicubic upscaling %1")
-            .arg(m_bicubicUpsize ? "on" : "off"));
-    }
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("New upscaler preference: '%1'").arg(Upscaler));
 }
 
 bool MythVideoGPU::IsValid() const

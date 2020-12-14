@@ -700,6 +700,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_maxCpus      = new TransMythUISpinBoxSetting(1, HAVE_THREADS ? VIDEO_MAX_CPUS : 1, 1, 1);
     m_skipLoop     = new TransMythUICheckBoxSetting();
     m_vidRend      = new TransMythUIComboBoxSetting();
+    m_upscaler     = new TransMythUIComboBoxSetting();
     m_singleDeint  = new TransMythUIComboBoxSetting();
     m_singleShader = new TransMythUICheckBoxSetting();
     m_singleDriver = new TransMythUICheckBoxSetting();
@@ -737,6 +738,10 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_maxCpus->setLabel(tr("Max CPUs"));
     m_skipLoop->setLabel(tr("Deblocking filter"));
     m_vidRend->setLabel(tr("Video renderer"));
+    m_upscaler->setLabel(tr("Video scaler"));
+    auto scalers = MythVideoProfile::GetUpscalers();
+    for (const auto & scaler : scalers)
+        m_upscaler->addSelection(scaler.first, scaler.second);
 
     QString shaderdesc = "\t" + tr("Prefer OpenGL deinterlacers");
     QString driverdesc = "\t" + tr("Prefer driver deinterlacers");
@@ -795,6 +800,11 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
         tr("Disabling will significantly reduce the load on the CPU for software decoding of "
            "H.264 and HEVC material but may significantly reduce video quality."));
 
+    m_upscaler->setHelpText(tr(
+            "The default scaler provides good quality in the majority of situations. "
+            "Higher quality scalers may offer some benefit when scaling very low "
+            "resolution material but may not be as fast."));
+
     addChild(m_widthRange);
     addChild(m_heightRange);
     addChild(m_codecs);
@@ -803,6 +813,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(m_maxCpus);
     addChild(m_skipLoop);
     addChild(m_vidRend);
+    addChild(m_upscaler);
 
     addChild(m_singleDeint);
     addChild(m_singleShader);
@@ -885,7 +896,10 @@ void PlaybackProfileItemConfig::Load(void)
     QString prenderer = m_item.Get(PREF_RENDER);
     QString psingledeint = m_item.Get(PREF_DEINT1X);
     QString pdoubledeint = m_item.Get(PREF_DEINT2X);
-    bool    found     = false;
+    auto upscale = m_item.Get(PREF_UPSCALE);
+    if (upscale.isEmpty())
+        upscale = UPSCALE_DEFAULT;
+    bool found = false;
 
     QString     dech = MythVideoProfile::GetDecoderHelp();
     QStringList decr = MythVideoProfile::GetDecoders();
@@ -907,6 +921,7 @@ void PlaybackProfileItemConfig::Load(void)
         m_maxCpus->setValue(pmax_cpus.toInt());
 
     m_skipLoop->setValue((!pskiploop.isEmpty()) ? (pskiploop.toInt() > 0) : true);
+    m_upscaler->setValue(upscale);
 
     if (!prenderer.isEmpty())
         m_vidRend->setValue(prenderer);
@@ -931,6 +946,7 @@ void PlaybackProfileItemConfig::Save(void)
     m_item.Set(PREF_RENDER,  m_vidRend->getValue());
     m_item.Set(PREF_DEINT1X, GetQuality(m_singleDeint, m_singleShader, m_singleDriver));
     m_item.Set(PREF_DEINT2X, GetQuality(m_doubleDeint, m_doubleShader, m_doubleDriver));
+    m_item.Set(PREF_UPSCALE, m_upscaler->getValue());
 }
 
 void PlaybackProfileItemConfig::widthChanged(const QString &val)
@@ -1227,9 +1243,7 @@ void PlaybackProfileConfig::DeleteProfileItem(
     PlaybackProfileItemConfig *profileToDelete)
 {
     for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
-    {
         profile->Save();
-    }
 
     uint i = profileToDelete->GetIndex();
     m_delItems.push_back(m_items[i]);
@@ -1241,14 +1255,8 @@ void PlaybackProfileConfig::DeleteProfileItem(
 void PlaybackProfileConfig::AddNewEntry(void)
 {
     for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
-    {
         profile->Save();
-    }
-
-    MythVideoProfileItem item;
-
-    m_items.push_back(item);
-
+    m_items.push_back(MythVideoProfileItem {});
     ReloadSettings();
 }
 
@@ -1258,18 +1266,12 @@ void PlaybackProfileConfig::ReloadSettings(void)
     getParent()->removeTargetedChild(m_profileName, m_addNewEntry);
 
     for (StandardSetting *setting : qAsConst(m_profiles))
-    {
         getParent()->removeTargetedChild(m_profileName, setting);
-    }
     m_profiles.clear();
 
     InitUI(getParent());
-
     for (StandardSetting *setting : qAsConst(m_profiles))
-    {
         setting->Load();
-    }
-
     emit getParent()->settingsChanged();
     setChanged(true);
 }
@@ -1277,9 +1279,7 @@ void PlaybackProfileConfig::ReloadSettings(void)
 void PlaybackProfileConfig::swap(int indexA, int indexB)
 {
     for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
-    {
         profile->Save();
-    }
 
     QString pri_i = QString::number(m_items[indexA].GetPriority());
     QString pri_j = QString::number(m_items[indexB].GetPriority());

@@ -112,7 +112,7 @@ class MTV_PUBLIC MythVideoProfile : public QObject
     static const QList<QPair<QString,QString> > GetDeinterlacers();
     static QStringList GetDecoders();
     static QStringList GetDecoderNames();
-    static QStringList GetUpscalerNames();
+    static std::vector<std::pair<QString,QString>> GetUpscalers();
     static QString     GetDecoderName(const QString &Decoder);
     static QString     GetDecoderHelp(const QString &Decoder = QString());
     static QString     GetVideoRendererName(const QString &Renderer);

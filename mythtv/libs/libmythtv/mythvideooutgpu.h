@@ -42,7 +42,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            ResizeForVideo        (QSize Size = QSize()) override;
 
   protected:
-    MythVideoOutputGPU(MythRender* Render, QString &Profile);
+    MythVideoOutputGPU(MythRender* Render, MythVideoProfilePtr VideoProfile, QString &Profile);
     virtual QRect   GetDisplayVisibleRectAdj();
     bool            Init                  (QSize VideoDim, QSize VideoDispDim, float Aspect,
                                            QRect DisplayVisibleRect, MythCodecID CodecId) override;
