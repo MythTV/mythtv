@@ -20,6 +20,8 @@
 #define DEINT_QUALITY_HIGH   QString("high")
 #define DEINT_QUALITY_SHADER QString("shader")
 #define DEINT_QUALITY_DRIVER QString("driver")
+#define UPSCALE_DEFAULT QString("bilinear")
+#define UPSCALE_HQ1     QString("bicubic")
 
 #define VIDEO_MAX_CPUS (16U)
 
@@ -86,12 +88,14 @@ class MTV_PUBLIC MythVideoProfile : public QObject
     QString toString(void) const;
     QString GetSingleRatePreferences(void) const;
     QString GetDoubleRatePreferences(void) const;
+    QString GetUpscaler() const;
 
     // Statics
     static void        InitStatics(bool Reinit = false);
     static QList<QPair<QString,QString> > GetDeinterlacers(void);
     static QStringList GetDecoders(void);
     static QStringList GetDecoderNames(void);
+    static QStringList GetUpscalerNames();
     static QString     GetDecoderName(const QString &Decoder);
     static QString     GetDecoderHelp(const QString &Decoder = QString());
     static QString     GetVideoRendererName(const QString &Renderer);
@@ -102,9 +106,11 @@ class MTV_PUBLIC MythVideoProfile : public QObject
     static bool        DeleteProfileGroup(const QString &GroupName, const QString &HostName);
     static uint        CreateProfileGroup(const QString &ProfileName, const QString &HostName);
     static void        CreateProfile(uint GroupId, uint Priority,
-                                     const QString& Width, const QString& Height, const QString& Codecs,
-                                     const QString& Decoder, uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
-                                     const QString& Deint1, const QString& Deint2);
+                                     const QString& Width, const QString& Height,
+                                     const QString& Codecs, const QString& Decoder,
+                                     uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
+                                     const QString& Deint1, const QString& Deint2,
+                                     const QString& Upscale = UPSCALE_DEFAULT);
     static void        CreateProfiles(const QString &HostName);
     static QStringList GetVideoRenderers(const QString &Decoder);
     static QString     GetVideoRendererHelp(const QString &Renderer);

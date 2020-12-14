@@ -21,6 +21,7 @@
 #define PREF_DEINT1X  "pref_deint0"
 #define PREF_DEINT2X  "pref_deint1"
 #define PREF_PRIORITY "pref_priority"
+#define PREF_UPSCALE  "pref_upscale"
 
 void MythVideoProfileItem::Clear(void)
 {
@@ -280,6 +281,7 @@ QString MythVideoProfileItem::toString(void) const
     QString renderer  = Get(PREF_RENDER);
     QString deint0    = Get(PREF_DEINT1X);
     QString deint1    = Get(PREF_DEINT2X);
+    QString upscale   = Get(PREF_UPSCALE);
 
     QString cond = QString("w(%1) h(%2) framerate(%3) codecs(%4)")
         .arg(width).arg(height).arg(framerate).arg(codecs);
@@ -287,8 +289,7 @@ QString MythVideoProfileItem::toString(void) const
         .arg(cmp0).arg(QString(cmp1.isEmpty() ? "" : ",") + cmp1)
         .arg(decoder).arg(max_cpus).arg((skiploop) ? "enabled" : "disabled").arg(renderer)
         .arg(cond);
-    str += QString("deint(%1,%2)").arg(deint0).arg(deint1);
-
+    str += QString("deint(%1,%2) upscale(%3)").arg(deint0).arg(deint1).arg(upscale);
     return str;
 }
 
@@ -371,6 +372,11 @@ QString MythVideoProfile::GetSingleRatePreferences(void) const
 QString MythVideoProfile::GetDoubleRatePreferences(void) const
 {
     return GetPreference(PREF_DEINT2X);
+}
+
+QString MythVideoProfile::GetUpscaler() const
+{
+    return GetPreference(PREF_UPSCALE);
 }
 
 uint MythVideoProfile::GetMaxCPUs(void) const
@@ -463,17 +469,21 @@ void MythVideoProfile::LoadBestPreferences
         SetPreference(PREF_RENDER, "opengl-yv12");
         SetPreference(PREF_DEINT1X, DEINT_QUALITY_LOW);
         SetPreference(PREF_DEINT2X, DEINT_QUALITY_LOW);
+        SetPreference(PREF_UPSCALE, UPSCALE_DEFAULT);
     }
+
+    if (auto upscale = GetPreference(PREF_UPSCALE); upscale.isEmpty())
+        SetPreference(PREF_UPSCALE, UPSCALE_DEFAULT);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences result: "
             "priority:%1 width:%2 height:%3 fps:%4 codecs:%5")
             .arg(GetPreference(PREF_PRIORITY)).arg(GetPreference(COND_WIDTH))
             .arg(GetPreference(COND_HEIGHT)).arg(GetPreference(COND_RATE))
             .arg(GetPreference(COND_CODECS)));
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("decoder:%1 renderer:%2 deint0:%3 deint1:%4 cpus:%5")
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("decoder:%1 renderer:%2 deint0:%3 deint1:%4 cpus:%5 upscale:%6")
             .arg(GetPreference(PREF_DEC)).arg(GetPreference(PREF_RENDER))
             .arg(GetPreference(PREF_DEINT1X)).arg(GetPreference(PREF_DEINT2X))
-            .arg(GetPreference(PREF_CPUS)));
+            .arg(GetPreference(PREF_CPUS)).arg(GetPreference(PREF_UPSCALE)));
 }
 
 vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)
@@ -703,6 +713,12 @@ QStringList MythVideoProfile::GetDecoderNames(void)
         [](QStringList Res, const QString& Dec) { return Res << GetDecoderName(Dec); });
 }
 
+QStringList MythVideoProfile::GetUpscalerNames()
+{
+    static QStringList s_upscalers = { tr("Bilinear"), tr("Bicubic") };
+    return s_upscalers;
+}
+
 QString MythVideoProfile::GetDecoderName(const QString &Decoder)
 {
     if (Decoder.isEmpty())
@@ -912,7 +928,7 @@ uint MythVideoProfile::GetProfileGroupID(const QString &ProfileName,
 void MythVideoProfile::CreateProfile(uint GroupId, uint Priority,
     const QString& Width, const QString& Height, const QString& Codecs,
     const QString& Decoder, uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
-    const QString& Deint1, const QString& Deint2)
+    const QString& Deint1, const QString& Deint2, const QString &Upscale)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -961,6 +977,9 @@ void MythVideoProfile::CreateProfile(uint GroupId, uint Priority,
 
     queryValue += PREF_DEINT2X;
     queryData  += Deint2;
+
+    queryValue += PREF_UPSCALE;
+    queryData  += Upscale;
 
     QStringList::const_iterator itV = queryValue.cbegin();
     QStringList::const_iterator itD = queryData.cbegin();
@@ -1285,12 +1304,13 @@ QString MythVideoProfile::GetBestVideoRenderer(const QStringList &Renderers)
 
 QString MythVideoProfile::toString(void) const
 {
-    QString renderer = GetPreference(PREF_RENDER);
-    QString deint0   = GetPreference(PREF_DEINT1X);
-    QString deint1   = GetPreference(PREF_DEINT2X);
-    QString cpus     = GetPreference(PREF_CPUS);
-    return QString("rend:%1 deint:%2/%3 CPUs: %4")
-        .arg(renderer).arg(deint0).arg(deint1).arg(cpus);
+    auto renderer = GetPreference(PREF_RENDER);
+    auto deint0   = GetPreference(PREF_DEINT1X);
+    auto deint1   = GetPreference(PREF_DEINT2X);
+    auto cpus     = GetPreference(PREF_CPUS);
+    auto upscale  = GetPreference(PREF_UPSCALE);
+    return QString("rend:%1 deint:%2/%3 CPUs: %4 Upscale: %5")
+        .arg(renderer).arg(deint0).arg(deint1).arg(cpus).arg(upscale);
 }
 
 QList<QPair<QString,QString> > MythVideoProfile::GetDeinterlacers(void)
