@@ -1295,10 +1295,17 @@ QString MythVideoProfile::toString() const
         .arg(renderer).arg(deint0).arg(deint1).arg(cpus).arg(upscale);
 }
 
-QList<QPair<QString,QString> > MythVideoProfile::GetDeinterlacers()
+const QList<QPair<QString, QString> > MythVideoProfile::GetDeinterlacers()
 {
-    InitStatics();
-    return kDeinterlacerOptions;
+    static QList<QPair<QString,QString> > s_deinterlacerOptions =
+    {
+        { DEINT_QUALITY_NONE,   tr("None") },
+        { DEINT_QUALITY_LOW,    tr("Low quality") },
+        { DEINT_QUALITY_MEDIUM, tr("Medium quality") },
+        { DEINT_QUALITY_HIGH,   tr("High quality") }
+    };
+
+    return s_deinterlacerOptions;
 }
 
 void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
@@ -1311,7 +1318,6 @@ void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
         kSafeRendererPriority.clear();
         kSafeDecoders.clear();
         kSafeEquivDec.clear();
-        kDeinterlacerOptions.clear();
     }
     else if (kSafeInitialized)
     {
@@ -1336,9 +1342,4 @@ void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("decoder<->render support: %1%2")
             .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
     }
-
-    kDeinterlacerOptions.append(QPair<QString,QString>(DEINT_QUALITY_NONE,   tr("None")));
-    kDeinterlacerOptions.append(QPair<QString,QString>(DEINT_QUALITY_LOW,    tr("Low quality")));
-    kDeinterlacerOptions.append(QPair<QString,QString>(DEINT_QUALITY_MEDIUM, tr("Medium quality")));
-    kDeinterlacerOptions.append(QPair<QString,QString>(DEINT_QUALITY_HIGH,   tr("High quality")));
 }

@@ -92,7 +92,7 @@ class MTV_PUBLIC MythVideoProfile : public QObject
 
     // Statics
     static void        InitStatics(bool Reinit = false);
-    static QList<QPair<QString,QString> > GetDeinterlacers();
+    static const QList<QPair<QString,QString> > GetDeinterlacers();
     static QStringList GetDecoders();
     static QStringList GetDecoderNames();
     static QStringList GetUpscalerNames();
@@ -148,7 +148,6 @@ class MTV_PUBLIC MythVideoProfile : public QObject
     static inline QMap<QString,QString>     kDecName = {};
     static inline QMap<QString,QString>     kRendName = {};
     static inline QStringList               kSafeDecoders = {};
-    static inline QList<QPair<QString,QString> > kDeinterlacerOptions = {};
 };
 
 #endif
