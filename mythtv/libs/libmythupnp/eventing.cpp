@@ -325,8 +325,7 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
 
 void Eventing::Notify()
 {
-    TaskTime tt;
-    gettimeofday( (&tt), nullptr );
+    auto tt = nowAsDuration<std::chrono::microseconds>();
 
     m_mutex.lock();
 
@@ -426,7 +425,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
         pInfo->IncrementKey();
 
-        gettimeofday( (&pInfo->m_ttLastNotified), nullptr );
+        pInfo->m_ttLastNotified = nowAsDuration<std::chrono::microseconds>();
     }
 }
 

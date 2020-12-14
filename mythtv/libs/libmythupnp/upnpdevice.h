@@ -257,10 +257,8 @@ class UPNP_PUBLIC DeviceLocation : public ReferenceCounter
 
         std::chrono::seconds ExpiresInSecs(void) const
         {
-            TaskTime ttNow;
-            gettimeofday( (&ttNow), nullptr );
-
-            return std::chrono::seconds(m_ttExpires.tv_sec - ttNow.tv_sec);
+            auto ttNow = nowAsDuration<std::chrono::microseconds>();
+            return duration_cast<std::chrono::seconds>(m_ttExpires - ttNow);
         }
 
         // ==================================================================

@@ -116,11 +116,12 @@ class UPNP_PUBLIC TaskQueue : public MThread
 
         void  Clear              ( );
         void  AddTask            ( std::chrono::milliseconds msec , Task *pTask );
-        void  AddTask            ( TaskTime tt, Task *pTask );
         void  AddTask            ( Task *pTask );
                                                           
         Task *GetNextExpiredTask ( TaskTime tt, std::chrono::milliseconds nWithinMilliSecs = 50ms );
                                                                 
+    private:
+        void  AddTaskAbsolute    ( TaskTime tt, Task *pTask );
 };
 
 #endif // TASKQUEUE_H

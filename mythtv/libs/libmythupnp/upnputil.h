@@ -21,7 +21,6 @@
 
 // MythTV headers
 #include "upnpexp.h"
-#include "compat.h"     // for gettimeofday()
 #include "mythchrono.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -41,7 +40,7 @@ template <class T> inline const T& Max( const T &x, const T &y )
 // Typedefs
 //////////////////////////////////////////////////////////////////////////////
 
-using TaskTime   = struct timeval;
+using TaskTime   = std::chrono::microseconds;
 using QStringMap = QMap< QString, QString >;
 using QStringMultiMap = QMultiMap< QString, QString >;
 
@@ -157,12 +156,6 @@ inline QString NameValue::toXML() const
 //////////////////////////////////////////////////////////////////////////////
 
 QString LookupUDN         ( const QString     &sDeviceType );
-
-bool operator<            ( TaskTime t1, TaskTime t2 );
-bool operator==           ( TaskTime t1, TaskTime t2 );
-
-void AddMicroSecToTaskTime( TaskTime &t, std::chrono::microseconds uSecs );
-void AddSecondsToTaskTime ( TaskTime &t, long nSecs );
 
 UPNP_PUBLIC QStringList GetSourceProtocolInfos ();
 UPNP_PUBLIC QStringList GetSinkProtocolInfos ();

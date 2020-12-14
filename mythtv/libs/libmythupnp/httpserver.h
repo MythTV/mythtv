@@ -42,8 +42,6 @@
 #include "upnputil.h"
 #include "compat.h"
 
-using TaskTime = struct timeval;
-
 class HttpWorkerThread;
 class QScriptEngine;
 class HttpServer;

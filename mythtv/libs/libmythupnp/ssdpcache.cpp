@@ -337,9 +337,7 @@ void SSDPCache::Add( const QString &sURI,
     // Calculate when this cache entry should expire.
     // --------------------------------------------------------------
 
-    TaskTime ttExpires;
-    gettimeofday        ( (&ttExpires), nullptr );
-    AddSecondsToTaskTime(  ttExpires, sExpiresInSecs.count() );
+    auto ttExpires = nowAsDuration<std::chrono::microseconds>() + sExpiresInSecs;
 
     // --------------------------------------------------------------
     // Get a Pointer to a Entries QDict... (Create if not found)
@@ -458,10 +456,9 @@ void SSDPCache::Remove( const QString &sURI, const QString &sUSN )
 int SSDPCache::RemoveStale()
 {
     int          nCount = 0;
-    TaskTime     ttNow;
     QStringList  lstKeys;
 
-    gettimeofday( (&ttNow), nullptr );
+    auto ttNow = nowAsDuration<std::chrono::microseconds>();
 
     Lock();
 
