@@ -446,9 +446,14 @@ vector<MythVideoProfileItem>::const_iterator MythVideoProfile::FindMatch
     return m_allowedPreferences.end();
 }
 
-void MythVideoProfile::LoadBestPreferences
-    (const QSize Size, float Framerate, const QString &CodecName, const QStringList &DisallowedDecoders)
+void MythVideoProfile::LoadBestPreferences(const QSize Size, float Framerate,
+                                           const QString &CodecName,
+                                           const QStringList &DisallowedDecoders)
 {
+    auto olddeint1x = GetPreference(PREF_DEINT1X);
+    auto olddeint2x = GetPreference(PREF_DEINT2X);
+    auto oldupscale = GetPreference(PREF_UPSCALE);
+
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences(%1x%2, %3, %4)")
         .arg(Size.width()).arg(Size.height())
         .arg(static_cast<double>(Framerate), 0, 'f', 3).arg(CodecName));
@@ -483,6 +488,15 @@ void MythVideoProfile::LoadBestPreferences
             .arg(GetPreference(PREF_DEC)).arg(GetPreference(PREF_RENDER))
             .arg(GetPreference(PREF_DEINT1X)).arg(GetPreference(PREF_DEINT2X))
             .arg(GetPreference(PREF_CPUS)).arg(GetPreference(PREF_UPSCALE)));
+
+    // Signal any changes
+    if (auto upscale = GetPreference(PREF_UPSCALE); oldupscale != upscale)
+        emit UpscalerChanged(upscale);
+
+    auto deint1x = GetPreference(PREF_DEINT1X);
+    auto deint2x = GetPreference(PREF_DEINT2X);
+    if ((deint1x != olddeint1x) || (deint2x != olddeint2x))
+        emit DeinterlacersChanged(deint1x, deint2x);
 }
 
 vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)

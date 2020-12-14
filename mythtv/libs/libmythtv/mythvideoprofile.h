@@ -71,6 +71,10 @@ class MTV_PUBLIC MythVideoProfile : public QObject
 {
     Q_OBJECT
 
+  signals:
+    void DeinterlacersChanged(const QString& Single, const QString& Double);
+    void UpscalerChanged(const QString& Upscaler);
+
   public:
     MythVideoProfile();
    ~MythVideoProfile() override = default;
