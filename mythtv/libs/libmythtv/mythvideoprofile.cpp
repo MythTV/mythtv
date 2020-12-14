@@ -238,62 +238,27 @@ bool MythVideoProfileItem::IsMatch(QSize Size, float Framerate, const QString &C
     return match;
 }
 
-bool MythVideoProfileItem::IsValid(QString *Reason) const
+auto MythVideoProfileItem::IsValid() const
 {
-
-    bool isOK = true;
-    CheckRange(COND_WIDTH, 1, &isOK);
-    if (!isOK)
-    {
-        if (Reason)
-            *Reason = QString("Invalid width condition");
-        return false;
-    }
-    CheckRange(COND_HEIGHT, 1, &isOK);
-    if (!isOK)
-    {
-        if (Reason)
-            *Reason = QString("Invalid height condition");
-        return false;
-    }
-    CheckRange(COND_RATE, 1.0F, &isOK);
-    if (!isOK)
-    {
-        if (Reason)
-            *Reason = QString("Invalid framerate condition");
-        return false;
-    }
+    using result = std::tuple<bool,QString>;
+    bool ok = true;
+    if (CheckRange(COND_WIDTH, 1, &ok); !ok)
+        return result { false, "Invalid width condition" };
+    if (CheckRange(COND_HEIGHT, 1, &ok); !ok)
+        return result { false, "Invalid height condition" };
+    if (CheckRange(COND_RATE, 1.0F, &ok); !ok)
+        return result { false, "Invalid framerate condition" };
 
     QString decoder  = Get(PREF_DEC);
     QString renderer = Get(PREF_RENDER);
     if (decoder.isEmpty() || renderer.isEmpty())
-    {
-        if (Reason)
-            *Reason = "Need a decoder and renderer";
-        return false;
-    }
+        return result { false, "Need a decoder and renderer" };
+    if (auto decoders = MythVideoProfile::GetDecoders(); !decoders.contains(decoder))
+        return result { false, QString("decoder %1 is not available").arg(decoder) };
+    if (auto renderers = MythVideoProfile::GetVideoRenderers(decoder); !renderers.contains(renderer))
+        return result { false, QString("renderer %1 is not supported with decoder %2") .arg(renderer).arg(decoder) };
 
-    QStringList decoders  = MythVideoProfile::GetDecoders();
-    if (!decoders.contains(decoder))
-    {
-        if (Reason)
-            *Reason = QString("decoder %1 is not available").arg(decoder);
-        return false;
-    }
-
-    QStringList renderers = MythVideoProfile::GetVideoRenderers(decoder);
-    if (!renderers.contains(renderer))
-    {
-        if (Reason)
-            *Reason = QString("renderer %1 is not supported with decoder %2")
-                .arg(renderer).arg(decoder);
-        return false;
-    }
-
-    if (Reason)
-        *Reason = QString();
-
-    return true;
+    return result { true, {}};
 }
 
 bool MythVideoProfileItem::operator< (const MythVideoProfileItem &Other) const
@@ -342,10 +307,9 @@ MythVideoProfile::MythVideoProfile()
     vector<MythVideoProfileItem>::const_iterator it;
     for (it = items.begin(); it != items.end(); ++it)
     {
-        QString err;
-        if (!(*it).IsValid(&err))
+        if (auto [valid, error] = (*it).IsValid(); !valid)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Rejecting: " + (*it).toString() + "\n\t\t\t" + err);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Rejecting: " + (*it).toString() + "\n\t\t\t" + error);
             continue;
         }
 
@@ -539,8 +503,7 @@ vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)
             if (profileid)
             {
                 tmp.SetProfileID(profileid);
-                QString error;
-                bool valid = tmp.IsValid(&error);
+                auto [valid, error] = tmp.IsValid();
                 if (valid)
                     list.push_back(tmp);
                 else
@@ -556,8 +519,7 @@ vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)
     if (profileid)
     {
         tmp.SetProfileID(profileid);
-        QString error;
-        bool valid = tmp.IsValid(&error);
+        auto [valid, error] =  tmp.IsValid();
         if (valid)
             list.push_back(tmp);
         else

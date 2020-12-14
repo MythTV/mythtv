@@ -56,7 +56,7 @@ class MTV_PUBLIC MythVideoProfileItem
     bool CheckRange(const QString& Key, float FValue, int IValue, bool IsFloat, bool *Ok = nullptr) const;
     bool IsMatch(QSize Size, float Framerate, const QString &CodecName,
                  const QStringList &DisallowedDecoders = QStringList()) const;
-    bool IsValid(QString *Reason = nullptr) const;
+    auto IsValid() const;
     bool operator<(const MythVideoProfileItem &Other) const;
     QString toString(void) const;
 
