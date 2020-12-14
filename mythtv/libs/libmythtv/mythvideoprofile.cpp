@@ -712,8 +712,8 @@ QString MythVideoProfile::GetDecoderName(const QString &Decoder)
     if (kDecName.empty())
     {
         kDecName["ffmpeg"]         = QObject::tr("Standard");
-        kDecName["vdpau"]          = QObject::tr("NVIDIA VDPAU acceleration");
-        kDecName["vdpau-dec"]      = QObject::tr("NVIDIA VDPAU acceleration (decode only)");
+        kDecName["vdpau"]          = QObject::tr("VDPAU acceleration");
+        kDecName["vdpau-dec"]      = QObject::tr("VDPAU acceleration (decode only)");
         kDecName["vaapi"]          = QObject::tr("VAAPI acceleration");
         kDecName["vaapi-dec"]      = QObject::tr("VAAPI acceleration (decode only)");
         kDecName["dxva2"]          = QObject::tr("Windows hardware acceleration");
