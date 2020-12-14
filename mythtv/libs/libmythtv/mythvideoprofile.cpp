@@ -10,6 +10,18 @@
 #include <algorithm>
 #include <utility>
 
+#define COND_WIDTH    "cond_width"
+#define COND_HEIGHT   "cond_height"
+#define COND_RATE     "cond_framerate"
+#define COND_CODECS   "cond_codecs"
+#define PREF_DEC      "pref_decoder"
+#define PREF_CPUS     "pref_max_cpus"
+#define PREF_LOOP     "pref_skiploop"
+#define PREF_RENDER   "pref_videorenderer"
+#define PREF_DEINT1X  "pref_deint0"
+#define PREF_DEINT2X  "pref_deint1"
+#define PREF_PRIORITY "pref_priority"
+
 void MythVideoProfileItem::Clear(void)
 {
     m_pref.clear();
@@ -45,7 +57,7 @@ QString MythVideoProfileItem::Get(const QString &Value) const
 
 uint MythVideoProfileItem::GetPriority(void) const
 {
-    QString tmp = Get("pref_priority");
+    QString tmp = Get(PREF_PRIORITY);
     return tmp.isEmpty() ? 0 : tmp.toUInt();
 }
 
@@ -198,17 +210,17 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
 }
 
 bool MythVideoProfileItem::IsMatch(QSize Size, float Framerate, const QString &CodecName,
-                          const QStringList &DisallowedDecoders) const
+                                   const QStringList &DisallowedDecoders) const
 {
     bool match = true;
 
     // cond_width, cond_height, cond_codecs, cond_framerate.
     // These replace old settings pref_cmp0 and pref_cmp1
-    match &= CheckRange("cond_width",Size.width());
-    match &= CheckRange("cond_height",Size.height());
-    match &= CheckRange("cond_framerate",Framerate);
+    match &= CheckRange(COND_WIDTH,  Size.width());
+    match &= CheckRange(COND_HEIGHT, Size.height());
+    match &= CheckRange(COND_RATE,   Framerate);
     // codec
-    QString cmp = Get(QString("cond_codecs"));
+    QString cmp = Get(QString(COND_CODECS));
     if (!cmp.isEmpty())
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -220,7 +232,7 @@ bool MythVideoProfileItem::IsMatch(QSize Size, float Framerate, const QString &C
             match &= clist.contains(CodecName,Qt::CaseInsensitive);
     }
 
-    QString decoder = Get("pref_decoder");
+    QString decoder = Get(PREF_DEC);
     if (DisallowedDecoders.contains(decoder))
         match = false;
     return match;
@@ -230,21 +242,21 @@ bool MythVideoProfileItem::IsValid(QString *Reason) const
 {
 
     bool isOK = true;
-    CheckRange("cond_width",1,&isOK);
+    CheckRange(COND_WIDTH, 1, &isOK);
     if (!isOK)
     {
         if (Reason)
             *Reason = QString("Invalid width condition");
         return false;
     }
-    CheckRange("cond_height",1,&isOK);
+    CheckRange(COND_HEIGHT, 1, &isOK);
     if (!isOK)
     {
         if (Reason)
             *Reason = QString("Invalid height condition");
         return false;
     }
-    CheckRange("cond_framerate",1.0F,&isOK);
+    CheckRange(COND_RATE, 1.0F, &isOK);
     if (!isOK)
     {
         if (Reason)
@@ -252,8 +264,8 @@ bool MythVideoProfileItem::IsValid(QString *Reason) const
         return false;
     }
 
-    QString     decoder   = Get("pref_decoder");
-    QString     renderer  = Get("pref_videorenderer");
+    QString decoder  = Get(PREF_DEC);
+    QString renderer = Get(PREF_RENDER);
     if (decoder.isEmpty() || renderer.isEmpty())
     {
         if (Reason)
@@ -293,16 +305,16 @@ QString MythVideoProfileItem::toString(void) const
 {
     QString cmp0      = Get("pref_cmp0");
     QString cmp1      = Get("pref_cmp1");
-    QString width     = Get("cond_width");
-    QString height    = Get("cond_height");
-    QString framerate = Get("cond_framerate");
-    QString codecs    = Get("cond_codecs");
-    QString decoder   = Get("pref_decoder");
-    uint    max_cpus  = Get("pref_max_cpus").toUInt();
-    bool    skiploop  = Get("pref_skiploop").toInt() != 0;
-    QString renderer  = Get("pref_videorenderer");
-    QString deint0    = Get("pref_deint0");
-    QString deint1    = Get("pref_deint1");
+    QString width     = Get(COND_WIDTH);
+    QString height    = Get(COND_HEIGHT);
+    QString framerate = Get(COND_RATE);
+    QString codecs    = Get(COND_CODECS);
+    QString decoder   = Get(PREF_DEC);
+    uint    max_cpus  = Get(PREF_CPUS).toUInt();
+    bool    skiploop  = Get(PREF_LOOP).toInt() != 0;
+    QString renderer  = Get(PREF_RENDER);
+    QString deint0    = Get(PREF_DEINT1X);
+    QString deint1    = Get(PREF_DEINT2X);
 
     QString cond = QString("w(%1) h(%2) framerate(%3) codecs(%4)")
         .arg(width).arg(height).arg(framerate).arg(codecs);
@@ -314,8 +326,6 @@ QString MythVideoProfileItem::toString(void) const
 
     return str;
 }
-
-//////////////////////////////////////////////////////////////////////////////
 
 #define LOC QString("VideoProfile: ")
 
@@ -386,32 +396,32 @@ float MythVideoProfile::GetOutput(void) const
 
 QString MythVideoProfile::GetDecoder(void) const
 {
-    return GetPreference("pref_decoder");
+    return GetPreference(PREF_DEC);
 }
 
 QString MythVideoProfile::GetSingleRatePreferences(void) const
 {
-    return GetPreference("pref_deint0");
+    return GetPreference(PREF_DEINT1X);
 }
 
 QString MythVideoProfile::GetDoubleRatePreferences(void) const
 {
-    return GetPreference("pref_deint1");
+    return GetPreference(PREF_DEINT2X);
 }
 
 uint MythVideoProfile::GetMaxCPUs(void) const
 {
-    return qBound(1U, GetPreference("pref_max_cpus").toUInt(), VIDEO_MAX_CPUS);
+    return qBound(1U, GetPreference(PREF_CPUS).toUInt(), VIDEO_MAX_CPUS);
 }
 
 bool MythVideoProfile::IsSkipLoopEnabled(void) const
 {
-    return GetPreference("pref_skiploop").toInt() != 0;
+    return GetPreference(PREF_LOOP).toInt() != 0;
 }
 
 QString MythVideoProfile::GetVideoRenderer(void) const
 {
-    return GetPreference("pref_videorenderer");
+    return GetPreference(PREF_RENDER);
 }
 
 void MythVideoProfile::SetVideoRenderer(const QString &VideoRenderer)
@@ -423,7 +433,7 @@ void MythVideoProfile::SetVideoRenderer(const QString &VideoRenderer)
 
     // Make preferences safe...
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Old preferences: " + toString());
-    SetPreference("pref_videorenderer", VideoRenderer);
+    SetPreference(PREF_RENDER, VideoRenderer);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "New preferences: " + toString());
 }
 
@@ -484,22 +494,22 @@ void MythVideoProfile::LoadBestPreferences
     {
         int threads = qBound(1, QThread::idealThreadCount(), 4);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "No useable profile. Using defaults.");
-        SetPreference("pref_decoder", "ffmpeg");
-        SetPreference("pref_max_cpus", QString::number(threads));
-        SetPreference("pref_videorenderer", "opengl-yv12");
-        SetPreference("pref_deint0", DEINT_QUALITY_LOW);
-        SetPreference("pref_deint1", DEINT_QUALITY_LOW);
+        SetPreference(PREF_DEC,    "ffmpeg");
+        SetPreference(PREF_CPUS,   QString::number(threads));
+        SetPreference(PREF_RENDER, "opengl-yv12");
+        SetPreference(PREF_DEINT1X, DEINT_QUALITY_LOW);
+        SetPreference(PREF_DEINT2X, DEINT_QUALITY_LOW);
     }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences result: "
             "priority:%1 width:%2 height:%3 fps:%4 codecs:%5")
-            .arg(GetPreference("pref_priority")).arg(GetPreference("cond_width"))
-            .arg(GetPreference("cond_height")).arg(GetPreference("cond_framerate"))
-            .arg(GetPreference("cond_codecs")));
+            .arg(GetPreference(PREF_PRIORITY)).arg(GetPreference(COND_WIDTH))
+            .arg(GetPreference(COND_HEIGHT)).arg(GetPreference(COND_RATE))
+            .arg(GetPreference(COND_CODECS)));
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("decoder:%1 renderer:%2 deint0:%3 deint1:%4 cpus:%5")
-            .arg(GetPreference("pref_decoder")).arg(GetPreference("pref_videorenderer"))
-            .arg(GetPreference("pref_deint0")).arg(GetPreference("pref_deint1"))
-            .arg(GetPreference("pref_max_cpus")));
+            .arg(GetPreference(PREF_DEC)).arg(GetPreference(PREF_RENDER))
+            .arg(GetPreference(PREF_DEINT1X)).arg(GetPreference(PREF_DEINT2X))
+            .arg(GetPreference(PREF_CPUS)));
 }
 
 vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)
@@ -853,10 +863,10 @@ QString MythVideoProfile::GetVideoRendererName(const QString &Renderer)
     QMutexLocker locker(&kSafeLock);
     if (kRendName.empty())
     {
-        kRendName["opengl"]         = QObject::tr("OpenGL");
-        kRendName["opengl-yv12"]    = QObject::tr("OpenGL YV12");
-        kRendName["opengl-hw"]      = QObject::tr("OpenGL Hardware");
-        kRendName["vulkan"]         = QObject::tr("Vulkan");
+        kRendName["opengl"]      = QObject::tr("OpenGL");
+        kRendName["opengl-yv12"] = QObject::tr("OpenGL YV12");
+        kRendName["opengl-hw"]   = QObject::tr("OpenGL Hardware");
+        kRendName["vulkan"]      = QObject::tr("Vulkan");
     }
 
     QString ret = Renderer;
@@ -963,31 +973,31 @@ void MythVideoProfile::CreateProfile(uint GroupId, uint Priority,
     QStringList queryValue;
     QStringList queryData;
 
-    queryValue += "cond_width";
+    queryValue += COND_WIDTH;
     queryData  += Width;
 
-    queryValue += "cond_height";
+    queryValue += COND_HEIGHT;
     queryData  += Height;
 
-    queryValue += "cond_codecs";
+    queryValue += COND_CODECS;
     queryData  += Codecs;
 
-    queryValue += "pref_decoder";
+    queryValue += PREF_DEC;
     queryData  += Decoder;
 
-    queryValue += "pref_max_cpus";
+    queryValue += PREF_CPUS;
     queryData  += QString::number(MaxCpus);
 
-    queryValue += "pref_skiploop";
+    queryValue += PREF_LOOP;
     queryData  += (SkipLoop) ? "1" : "0";
 
-    queryValue += "pref_videorenderer";
+    queryValue += PREF_RENDER;
     queryData  += VideoRenderer;
 
-    queryValue += "pref_deint0";
+    queryValue += PREF_DEINT1X;
     queryData  += Deint1;
 
-    queryValue += "pref_deint1";
+    queryValue += PREF_DEINT2X;
     queryData  += Deint2;
 
     QStringList::const_iterator itV = queryValue.cbegin();
@@ -1313,10 +1323,10 @@ QString MythVideoProfile::GetBestVideoRenderer(const QStringList &Renderers)
 
 QString MythVideoProfile::toString(void) const
 {
-    QString renderer = GetPreference("pref_videorenderer");
-    QString deint0   = GetPreference("pref_deint0");
-    QString deint1   = GetPreference("pref_deint1");
-    QString cpus     = GetPreference("pref_max_cpus");
+    QString renderer = GetPreference(PREF_RENDER);
+    QString deint0   = GetPreference(PREF_DEINT1X);
+    QString deint1   = GetPreference(PREF_DEINT2X);
+    QString cpus     = GetPreference(PREF_CPUS);
     return QString("rend:%1 deint:%2/%3 CPUs: %4")
         .arg(renderer).arg(deint0).arg(deint1).arg(cpus);
 }

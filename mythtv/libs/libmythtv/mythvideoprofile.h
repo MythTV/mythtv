@@ -65,11 +65,13 @@ class MTV_PUBLIC MythVideoProfileItem
     QMap<QString,QString> m_pref  { };
 };
 
-class MTV_PUBLIC MythVideoProfile
+class MTV_PUBLIC MythVideoProfile : public QObject
 {
+    Q_OBJECT
+
   public:
     MythVideoProfile();
-   ~MythVideoProfile() = default;
+   ~MythVideoProfile() override = default;
 
     void    SetInput(QSize Size, float Framerate = 0, const QString &CodecName = QString(),
                      const QStringList &DisallowedDecoders = QStringList());
