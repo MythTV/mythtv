@@ -42,15 +42,15 @@ class MTV_PUBLIC MythVideoProfileItem
    ~MythVideoProfileItem() = default;
 
     // Sets
-    void    Clear(void);
+    void    Clear();
     void    SetProfileID(uint Id);
     void    Set(const QString &Value, const QString &Data);
 
     // Gets
-    uint    GetProfileID(void) const;
+    uint    GetProfileID() const;
     QString Get(const QString &Value) const;
-    uint    GetPriority(void) const;
-    QMap<QString,QString> GetAll(void) const;
+    uint    GetPriority() const;
+    QMap<QString,QString> GetAll() const;
 
     // Other
     bool CheckRange(const QString& Key, float Value, bool *Ok = nullptr) const;
@@ -60,7 +60,7 @@ class MTV_PUBLIC MythVideoProfileItem
                  const QStringList &DisallowedDecoders = QStringList()) const;
     auto IsValid() const;
     bool operator<(const MythVideoProfileItem &Other) const;
-    QString toString(void) const;
+    QString toString() const;
 
   private:
     uint       m_profileid        { 0 };
@@ -78,23 +78,23 @@ class MTV_PUBLIC MythVideoProfile : public QObject
     void    SetInput(QSize Size, float Framerate = 0, const QString &CodecName = QString(),
                      const QStringList &DisallowedDecoders = QStringList());
     void    SetOutput(float Framerate);
-    float   GetOutput(void) const;
+    float   GetOutput() const;
     void    SetVideoRenderer(const QString &VideoRenderer);
-    QString GetDecoder(void) const;
+    QString GetDecoder() const;
     bool    IsDecoderCompatible(const QString &Decoder) const;
-    uint    GetMaxCPUs(void) const ;
-    bool    IsSkipLoopEnabled(void) const;
-    QString GetVideoRenderer(void) const;
-    QString toString(void) const;
-    QString GetSingleRatePreferences(void) const;
-    QString GetDoubleRatePreferences(void) const;
+    uint    GetMaxCPUs() const ;
+    bool    IsSkipLoopEnabled() const;
+    QString GetVideoRenderer() const;
+    QString toString() const;
+    QString GetSingleRatePreferences() const;
+    QString GetDoubleRatePreferences() const;
     QString GetUpscaler() const;
 
     // Statics
     static void        InitStatics(bool Reinit = false);
-    static QList<QPair<QString,QString> > GetDeinterlacers(void);
-    static QStringList GetDecoders(void);
-    static QStringList GetDecoderNames(void);
+    static QList<QPair<QString,QString> > GetDeinterlacers();
+    static QStringList GetDecoders();
+    static QStringList GetDecoderNames();
     static QStringList GetUpscalerNames();
     static QString     GetDecoderName(const QString &Decoder);
     static QString     GetDecoderHelp(const QString &Decoder = QString());

@@ -23,7 +23,7 @@
 #define PREF_PRIORITY "pref_priority"
 #define PREF_UPSCALE  "pref_upscale"
 
-void MythVideoProfileItem::Clear(void)
+void MythVideoProfileItem::Clear()
 {
     m_pref.clear();
 }
@@ -43,7 +43,7 @@ uint MythVideoProfileItem::GetProfileID() const
     return m_profileid;
 }
 
-QMap<QString,QString> MythVideoProfileItem::GetAll(void) const
+QMap<QString,QString> MythVideoProfileItem::GetAll() const
 {
     return m_pref;
 }
@@ -56,7 +56,7 @@ QString MythVideoProfileItem::Get(const QString &Value) const
     return QString();
 }
 
-uint MythVideoProfileItem::GetPriority(void) const
+uint MythVideoProfileItem::GetPriority() const
 {
     QString tmp = Get(PREF_PRIORITY);
     return tmp.isEmpty() ? 0 : tmp.toUInt();
@@ -267,7 +267,7 @@ bool MythVideoProfileItem::operator< (const MythVideoProfileItem &Other) const
     return GetPriority() < Other.GetPriority();
 }
 
-QString MythVideoProfileItem::toString(void) const
+QString MythVideoProfileItem::toString() const
 {
     QString cmp0      = Get("pref_cmp0");
     QString cmp1      = Get("pref_cmp1");
@@ -305,22 +305,21 @@ MythVideoProfile::MythVideoProfile()
     uint    groupid     = GetProfileGroupID(cur_profile, hostname);
 
     vector<MythVideoProfileItem> items = LoadDB(groupid);
-    vector<MythVideoProfileItem>::const_iterator it;
-    for (it = items.begin(); it != items.end(); ++it)
+    for (const auto & item : items)
     {
-        if (auto [valid, error] = (*it).IsValid(); !valid)
+        if (auto [valid, error] = item.IsValid(); !valid)
         {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Rejecting: " + (*it).toString() + "\n\t\t\t" + error);
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Rejecting: " + item.toString() + "\n\t\t\t" + error);
             continue;
         }
 
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Accepting: " + (*it).toString());
-        m_allowedPreferences.push_back(*it);
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Accepting: " + item.toString());
+        m_allowedPreferences.push_back(item);
     }
 }
 
 void MythVideoProfile::SetInput(QSize Size, float Framerate, const QString &CodecName,
-                                   const QStringList &DisallowedDecoders)
+                                const QStringList &DisallowedDecoders)
 {
     QMutexLocker locker(&m_lock);
     bool change = !DisallowedDecoders.isEmpty();
@@ -354,22 +353,22 @@ void MythVideoProfile::SetOutput(float Framerate)
     }
 }
 
-float MythVideoProfile::GetOutput(void) const
+float MythVideoProfile::GetOutput() const
 {
     return m_lastRate;
 }
 
-QString MythVideoProfile::GetDecoder(void) const
+QString MythVideoProfile::GetDecoder() const
 {
     return GetPreference(PREF_DEC);
 }
 
-QString MythVideoProfile::GetSingleRatePreferences(void) const
+QString MythVideoProfile::GetSingleRatePreferences() const
 {
     return GetPreference(PREF_DEINT1X);
 }
 
-QString MythVideoProfile::GetDoubleRatePreferences(void) const
+QString MythVideoProfile::GetDoubleRatePreferences() const
 {
     return GetPreference(PREF_DEINT2X);
 }
@@ -379,17 +378,17 @@ QString MythVideoProfile::GetUpscaler() const
     return GetPreference(PREF_UPSCALE);
 }
 
-uint MythVideoProfile::GetMaxCPUs(void) const
+uint MythVideoProfile::GetMaxCPUs() const
 {
     return qBound(1U, GetPreference(PREF_CPUS).toUInt(), VIDEO_MAX_CPUS);
 }
 
-bool MythVideoProfile::IsSkipLoopEnabled(void) const
+bool MythVideoProfile::IsSkipLoopEnabled() const
 {
     return GetPreference(PREF_LOOP).toInt() != 0;
 }
 
-QString MythVideoProfile::GetVideoRenderer(void) const
+QString MythVideoProfile::GetVideoRenderer() const
 {
     return GetPreference(PREF_RENDER);
 }
@@ -700,13 +699,13 @@ bool MythVideoProfile::SaveDB(uint GroupId, vector<MythVideoProfileItem> &Items)
     return ok;
 }
 
-QStringList MythVideoProfile::GetDecoders(void)
+QStringList MythVideoProfile::GetDecoders()
 {
     InitStatics();
     return kSafeDecoders;
 }
 
-QStringList MythVideoProfile::GetDecoderNames(void)
+QStringList MythVideoProfile::GetDecoderNames()
 {
     InitStatics();
     return std::accumulate(kSafeDecoders.cbegin(), kSafeDecoders.cend(), QStringList{},
@@ -1077,7 +1076,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 #ifdef USING_OPENGL
     if (!profiles.contains("OpenGL High Quality"))
     {
-        (void) tr("OpenGL High Quality",
+        (void)tr("OpenGL High Quality",
                            "Sample: OpenGL high quality");
         uint groupid = CreateProfileGroup("OpenGL High Quality", HostName);
         CreateProfile(groupid, 1, "", "", "",
@@ -1087,7 +1086,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 
     if (!profiles.contains("OpenGL Normal"))
     {
-        (void) tr("OpenGL Normal", "Sample: OpenGL medium quality");
+        (void)tr("OpenGL Normal", "Sample: OpenGL medium quality");
         uint groupid = CreateProfileGroup("OpenGL Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "ffmpeg", 2, true, "opengl-yv12",
@@ -1096,7 +1095,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 
     if (!profiles.contains("OpenGL Slim"))
     {
-        (void) tr("OpenGL Slim", "Sample: OpenGL low power GPU");
+        (void)tr("OpenGL Slim", "Sample: OpenGL low power GPU");
         uint groupid = CreateProfileGroup("OpenGL Slim", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "ffmpeg", 1, true, "opengl",
@@ -1107,7 +1106,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 #ifdef USING_VAAPI
     if (!profiles.contains("VAAPI Normal"))
     {
-        (void) tr("VAAPI Normal", "Sample: VAAPI average quality");
+        (void)tr("VAAPI Normal", "Sample: VAAPI average quality");
         uint groupid = CreateProfileGroup("VAAPI Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "vaapi", 2, true, "opengl-hw",
@@ -1121,7 +1120,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 #ifdef USING_VDPAU
     if (!profiles.contains("VDPAU Normal"))
     {
-        (void) tr("VDPAU Normal", "Sample: VDPAU medium quality");
+        (void)tr("VDPAU Normal", "Sample: VDPAU medium quality");
         uint groupid = CreateProfileGroup("VDPAU Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "vdpau", 1, true, "opengl-hw",
@@ -1135,7 +1134,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 #ifdef USING_MEDIACODEC
     if (!profiles.contains("MediaCodec Normal"))
     {
-        (void) tr("MediaCodec Normal",
+        (void)tr("MediaCodec Normal",
                            "Sample: MediaCodec Normal");
         uint groupid = CreateProfileGroup("MediaCodec Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
@@ -1151,7 +1150,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 #if defined(USING_NVDEC) && defined(USING_OPENGL)
     if (!profiles.contains("NVDEC Normal"))
     {
-        (void) tr("NVDEC Normal", "Sample: NVDEC Normal");
+        (void)tr("NVDEC Normal", "Sample: NVDEC Normal");
         uint groupid = CreateProfileGroup("NVDEC Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "nvdec", 1, true, "opengl-hw",
@@ -1164,7 +1163,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 
 #if defined(USING_VTB) && defined(USING_OPENGL)
     if (!profiles.contains("VideoToolBox Normal")) {
-        (void) tr("VideoToolBox Normal", "Sample: VideoToolBox Normal");
+        (void)tr("VideoToolBox Normal", "Sample: VideoToolBox Normal");
         uint groupid = CreateProfileGroup("VideoToolBox Normal", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "vtb", 1, true, "opengl-hw",
@@ -1178,7 +1177,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 #if defined(USING_MMAL) && defined(USING_OPENGL)
     if (!profiles.contains("MMAL"))
     {
-        (void) tr("MMAL", "Sample: MMAL");
+        (void)tr("MMAL", "Sample: MMAL");
         uint groupid = CreateProfileGroup("MMAL", HostName);
         CreateProfile(groupid, 1, "", "", "",
                       "mmal", 1, true, "opengl-hw",
@@ -1192,7 +1191,7 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 #if defined(USING_V4L2)
     if (!profiles.contains("V4L2 Codecs"))
     {
-        (void) tr("V4L2 Codecs", "Sample: V4L2");
+        (void)tr("V4L2 Codecs", "Sample: V4L2");
         uint groupid = CreateProfileGroup("V4L2 Codecs", HostName);
         CreateProfile(groupid, 2, "", "", "",
                       "v4l2", 1, true, "opengl-hw",
@@ -1210,56 +1209,42 @@ QStringList MythVideoProfile::GetVideoRenderers(const QString &Decoder)
     InitStatics();
 
     QMap<QString,QStringList>::const_iterator it = kSafeRenderer.constFind(Decoder);
-    QStringList tmp;
     if (it != kSafeRenderer.constEnd())
-        tmp = *it;
-    return tmp;
+        return *it;
+    return {};
 }
 
 QString MythVideoProfile::GetVideoRendererHelp(const QString &Renderer)
 {
-    QString msg = tr("Video rendering method");
-
-    if (Renderer.isEmpty())
-        return msg;
-
     if (Renderer == "null")
-        msg = tr(
-            "Render video offscreen. Used internally.");
+        return tr("Render video offscreen. Used internally.");
 
     if (Renderer == "direct3d")
     {
-        msg = tr(
-            "Windows video renderer based on Direct3D. Requires "
-            "video card compatible with Direct3D 9. This is the preferred "
-            "renderer for current Windows systems.");
+        return tr("Windows video renderer based on Direct3D. Requires "
+                  "video card compatible with Direct3D 9. This is the preferred "
+                  "renderer for current Windows systems.");
     }
 
     if (Renderer == "opengl")
     {
-        msg = tr(
-            "Video is converted to an intermediate format by the CPU (YUV2) "
-            "before OpenGL is used for color conversion, scaling, picture controls"
-            " and optionally deinterlacing. Processing is balanced between the CPU "
-            "and GPU.");
+        return tr("Video is converted to an intermediate format by the CPU (YUV2) "
+                  "before OpenGL is used for color conversion, scaling, picture controls"
+                  " and optionally deinterlacing. Processing is balanced between the CPU "
+                  "and GPU.");
     }
 
     if (Renderer == "opengl-yv12")
     {
-        msg = tr(
-            "OpenGL is used for all color conversion, scaling, picture "
-            "controls and optionally deinterlacing. CPU load is low but a slightly more "
-            "powerful GPU is needed for deinterlacing.");
+        return tr("OpenGL is used for all color conversion, scaling, picture "
+                  "controls and optionally deinterlacing. CPU load is low but a slightly more "
+                  "powerful GPU is needed for deinterlacing.");
     }
 
     if (Renderer == "opengl-hw")
-    {
-        msg = tr(
-             "This video renderer is used by hardware decoders to display "
-             "frames using OpenGL.");
-    }
+        return tr("This video renderer is used by hardware decoders to display frames using OpenGL.");
 
-    return msg;
+    return tr("Video rendering method");
 }
 
 QString MythVideoProfile::GetPreferredVideoRenderer(const QString &Decoder)
@@ -1269,16 +1254,15 @@ QString MythVideoProfile::GetPreferredVideoRenderer(const QString &Decoder)
 
 QStringList MythVideoProfile::GetFilteredRenderers(const QString &Decoder, const QStringList &Renderers)
 {
-    const QStringList dec_list = GetVideoRenderers(Decoder);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Safe renderers for '%1': %2")
-        .arg(Decoder).arg(dec_list.join(",")));
-    QStringList new_list;
+    const QStringList safe = GetVideoRenderers(Decoder);
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Safe renderers for '%1': %2").arg(Decoder).arg(safe.join(",")));
 
-    for (const auto& dec : qAsConst(dec_list))
+    QStringList filtered;
+    for (const auto& dec : qAsConst(safe))
         if (Renderers.contains(dec))
-            new_list.push_back(dec);
+            filtered.push_back(dec);
 
-    return new_list;
+    return filtered;
 }
 
 QString MythVideoProfile::GetBestVideoRenderer(const QStringList &Renderers)
@@ -1286,23 +1270,21 @@ QString MythVideoProfile::GetBestVideoRenderer(const QStringList &Renderers)
     QMutexLocker locker(&kSafeLock);
     InitStatics();
 
-    uint    top_priority = 0;
-    QString top_renderer;
-
+    uint    toppriority = 0;
+    QString toprenderer;
     for (const auto& renderer : qAsConst(Renderers))
     {
-        QMap<QString,uint>::const_iterator p = kSafeRendererPriority.constFind(renderer);
-        if ((p != kSafeRendererPriority.constEnd()) && (*p >= top_priority))
+        QMap<QString,uint>::const_iterator it = kSafeRendererPriority.constFind(renderer);
+        if ((it != kSafeRendererPriority.constEnd()) && (*it >= toppriority))
         {
-            top_priority = *p;
-            top_renderer = renderer;
+            toppriority = *it;
+            toprenderer = renderer;
         }
     }
-
-    return top_renderer;
+    return toprenderer;
 }
 
-QString MythVideoProfile::toString(void) const
+QString MythVideoProfile::toString() const
 {
     auto renderer = GetPreference(PREF_RENDER);
     auto deint0   = GetPreference(PREF_DEINT1X);
@@ -1313,7 +1295,7 @@ QString MythVideoProfile::toString(void) const
         .arg(renderer).arg(deint0).arg(deint1).arg(cpus).arg(upscale);
 }
 
-QList<QPair<QString,QString> > MythVideoProfile::GetDeinterlacers(void)
+QList<QPair<QString,QString> > MythVideoProfile::GetDeinterlacers()
 {
     InitStatics();
     return kDeinterlacerOptions;
