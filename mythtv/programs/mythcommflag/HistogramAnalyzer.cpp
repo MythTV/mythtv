@@ -1,6 +1,3 @@
-// POSIX headers
-#include <sys/time.h> // for gettimeofday
-
 // ANSI C headers
 #include <cmath>
 #include <utility>
@@ -300,9 +297,8 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
     int                 cc2 = 0;
     int                 rr3 = 0;
     int                 cc3 = 0;
-    struct timeval      start {};
-    struct timeval      end {};
-    struct timeval      elapsed {};
+    std::chrono::microseconds start {0us};
+    std::chrono::microseconds end   {0us};
 
     if (m_lastFrameNo != kUncached && m_lastFrameNo == frameno)
         return FrameAnalyzer::ANALYZE_OK;
@@ -314,7 +310,7 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
     ismonochromatic = m_borderDetector->getDimensions(pgm, pgmheight, frameno,
             &croprow, &cropcol, &cropwidth, &cropheight) != 0;
 
-    gettimeofday(&start, nullptr);
+    start = nowAsDuration<std::chrono::microseconds>();
 
     m_fRow[frameno] = croprow;
     m_fCol[frameno] = cropcol;
@@ -391,9 +387,8 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
         sqrt((sumsquares - (float)sumval * sumval / npixels) / (npixels - 1)) :
             0;
 
-    (void)gettimeofday(&end, nullptr);
-    timersub(&end, &start, &elapsed);
-    timeradd(&m_analyzeTime, &elapsed, &m_analyzeTime);
+    end = nowAsDuration<std::chrono::microseconds>();
+    m_analyzeTime += (end - start);
 
     m_lastFrameNo = frameno;
 
@@ -435,7 +430,7 @@ HistogramAnalyzer::reportTime(void) const
         return -1;
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("HA Time: analyze=%1s")
-            .arg(strftimeval(&m_analyzeTime)));
+            .arg(strftimeval(m_analyzeTime)));
     return 0;
 }
 

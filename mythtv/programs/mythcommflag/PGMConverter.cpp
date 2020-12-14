@@ -1,6 +1,3 @@
-// POSIX headers
-#include <sys/time.h> // for gettimeofday
-
 // Qt headers
 #include <QSize>
 
@@ -73,11 +70,9 @@ PGMConverter::getImage(const MythVideoFrame *frame, long long _frameno,
         int *pwidth, int *pheight)
 {
 #ifdef PGM_CONVERT_GREYSCALE
-    struct timeval      start {};
-    struct timeval      end {};
-    struct timeval      elapsed {};
+    std::chrono::microseconds start {0us};
+    std::chrono::microseconds end   {0us};
 #endif /* PGM_CONVERT_GREYSCALE */
-
     if (m_frameNo == _frameno)
         goto out;
 
@@ -88,12 +83,11 @@ PGMConverter::getImage(const MythVideoFrame *frame, long long _frameno,
     }
 
 #ifdef PGM_CONVERT_GREYSCALE
-    (void)gettimeofday(&start, nullptr);
+    start = nowAsDuration<std::chrono::microseconds>();
     if (m_copy->Copy(&m_pgm, frame, m_pgm.data[0], AV_PIX_FMT_GRAY8) < 0)
         goto error;
-    (void)gettimeofday(&end, nullptr);
-    timersub(&end, &start, &elapsed);
-    timeradd(&m_convertTime, &elapsed, &m_convertTime);
+    end = nowAsDuration<std::chrono::microseconds>();
+    m_convertTime += (end - start);
 #else  /* !PGM_CONVERT_GREYSCALE */
     if (av_image_fill_arrays(m_pgm.data, m_pgm.linesize,
         frame->buf, AV_PIX_FMT_GRAY8, m_width, m_height,IMAGE_ALIGN) < 0)
@@ -123,7 +117,7 @@ PGMConverter::reportTime(void)
     if (!m_timeReported)
     {
         LOG(VB_COMMFLAG, LOG_INFO, QString("PGM Time: convert=%1s")
-                .arg(strftimeval(&m_convertTime)));
+                .arg(strftimeval(m_convertTime)));
         m_timeReported = true;
     }
 #endif /* PGM_CONVERT_GREYSCALE */

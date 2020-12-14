@@ -1,6 +1,5 @@
 // ANSI C headers
 #include <cstdlib>
-#include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
 // MythTV headers

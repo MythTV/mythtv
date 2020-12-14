@@ -72,7 +72,7 @@ private:
     QString               m_debugdata;              /* filename */
     bool                  m_debugHistVal  {false};
     bool                  m_histValDone   {false};
-    struct timeval        m_analyzeTime   {0,0};
+    std::chrono::microseconds  m_analyzeTime  {0us};
 };
 
 #endif  /* !HISTOGRAMANALYZER_H */

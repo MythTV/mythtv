@@ -1,6 +1,3 @@
-// POSIX headers
-#include <sys/time.h>      /* gettimeofday */
-
 // ANSI C headers
 #include <cmath>
 #include <cstdlib>
@@ -699,7 +696,7 @@ writeTemplate(const QString& tmplfile, const AVFrame *tmpl, const QString& dataf
 TemplateFinder::TemplateFinder(std::shared_ptr<PGMConverter> pgmc,
                                std::shared_ptr<BorderDetector> bd,
                                std::shared_ptr<EdgeDetector> ed,
-                               MythPlayer *player, int proglen,
+                               MythPlayer *player, std::chrono::seconds proglen,
         const QString& debugdir)
     : m_pgmConverter(std::move(pgmc))
     , m_borderDetector(std::move(bd))
@@ -728,16 +725,16 @@ TemplateFinder::TemplateFinder(std::shared_ptr<PGMConverter> pgmc,
      *
      * Sample half of the program length or 20 minutes, whichever is less.
      */
-    m_sampleTime = std::min(proglen / 2, 20 * 60);
+    m_sampleTime = std::min(proglen / 2, 20 * 60s);
 
     const float fps = player->GetFrameRate();
 
-    m_frameInterval = (int)roundf(m_sampleTime * fps / samplesNeeded);
+    m_frameInterval = (int)roundf(m_sampleTime.count() * fps / samplesNeeded);
     m_endFrame = 0 + (long long)m_frameInterval * samplesNeeded - 1;
 
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("TemplateFinder: sampleTime=%1s, samplesNeeded=%2, endFrame=%3")
-            .arg(m_sampleTime).arg(samplesNeeded).arg(m_endFrame));
+            .arg(m_sampleTime.count()).arg(samplesNeeded).arg(m_endFrame));
 
     /*
      * debugLevel:
@@ -898,9 +895,6 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
     int            cropcol = 0;
     int            cropwidth = 0;
     int            cropheight = 0;
-    struct timeval start {};
-    struct timeval end {};
-    struct timeval elapsed {};
 
     if (frameno < m_nextFrame)
     {
@@ -920,7 +914,7 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
     {
         /* Not a blank frame. */
 
-        (void)gettimeofday(&start, nullptr);
+        auto start = nowAsDuration<std::chrono::microseconds>();
 
         if (croprow < m_minContentRow)
             m_minContentRow = croprow;
@@ -965,9 +959,8 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
                 goto error;
         }
 
-        (void)gettimeofday(&end, nullptr);
-        timersub(&end, &start, &elapsed);
-        timeradd(&m_analyzeTime, &elapsed, &m_analyzeTime);
+        auto end = nowAsDuration<std::chrono::microseconds>();
+        m_analyzeTime += (end - start);
     }
 
     if (m_nextFrame > m_endFrame)
@@ -1041,7 +1034,7 @@ TemplateFinder::reportTime(void) const
         return -1;
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("TF Time: analyze=%1s")
-            .arg(strftimeval(&m_analyzeTime)));
+            .arg(strftimeval(m_analyzeTime)));
     return 0;
 }
 

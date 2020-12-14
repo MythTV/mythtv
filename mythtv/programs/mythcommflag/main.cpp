@@ -7,7 +7,6 @@
 
 // POSIX headers
 #include <unistd.h>
-#include <sys/time.h> // for gettimeofday
 
 // ANSI C headers
 #include <cstdlib>

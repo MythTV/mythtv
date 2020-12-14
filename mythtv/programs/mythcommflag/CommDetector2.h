@@ -26,7 +26,7 @@ QString debugDirectory(int chanid, const QDateTime& recstartts);
 void createDebugDirectory(const QString& dirname, const QString& comment);
 QString frameToTimestamp(long long frameno, float fps);
 QString frameToTimestampms(long long frameno, float fps);
-QString strftimeval(const struct timeval *tv);
+QString strftimeval(std::chrono::microseconds usecs);
 
 };  /* namespace */
 
