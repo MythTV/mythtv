@@ -148,7 +148,7 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(QString &Profile)
         LOG(VB_GENERAL, LOG_ERR, LOC + "No OpenGL painter");
 
     // Create OpenGLVideo
-    m_video = new MythOpenGLVideo(m_openglRender, &m_videoColourSpace, this, m_profile);
+    m_video = new MythOpenGLVideo(m_openglRender, &m_videoColourSpace, this, m_videoProfile, m_profile);
     if (m_video)
     {
         m_video->SetViewportRect(MythVideoOutputOpenGL::GetDisplayVisibleRectAdj());

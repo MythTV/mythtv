@@ -58,7 +58,7 @@ MythVideoOutputVulkan::MythVideoOutputVulkan(QString &Profile)
     m_render = MythVulkanObject::Render();
     if (IsValidVulkan())
     {
-        m_video = new MythVideoVulkan(this, &m_videoColourSpace, this, QString {});
+        m_video = new MythVideoVulkan(this, &m_videoColourSpace, this, m_videoProfile, QString {});
         if (m_video && !m_video->IsValid())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create valid Vulkan video");

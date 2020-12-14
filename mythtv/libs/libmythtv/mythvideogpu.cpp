@@ -1,12 +1,14 @@
 // MythTV
 #include "mythcorecontext.h"
 #include "mythvideobounds.h"
+#include "mythvideoprofile.h"
 #include "mythvideogpu.h"
 
 #define LOC QString("VideoGPU: ")
 
 MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace,
-                           MythVideoBounds* Bounds, QString Profile)
+                           MythVideoBounds* Bounds, MythVideoProfilePtr VideoProfile,
+                           QString Profile)
   : m_render(Render),
     m_profile(std::move(Profile)),
     m_videoDispDim(Bounds->GetVideoDispDim()),
@@ -35,6 +37,12 @@ MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace
     connect(Bounds, &MythVideoBounds::VideoRectsChanged, this,   &MythVideoGPU::SetVideoRects);
     connect(Bounds, &MythVideoBounds::WindowRectChanged, this,   &MythVideoGPU::SetViewportRect);
     connect(this,   &MythVideoGPU::OutputChanged,        Bounds, &MythVideoBounds::SourceChanged);
+
+    if (VideoProfile)
+    {
+        UpscalerChanged(VideoProfile->GetUpscaler());
+        connect(VideoProfile.get(), &MythVideoProfile::UpscalerChanged, this, &MythVideoGPU::UpscalerChanged);
+    }
 }
 
 MythVideoGPU::~MythVideoGPU()
@@ -50,6 +58,17 @@ MythVideoGPU::~MythVideoGPU()
 void MythVideoGPU::UpdateColourSpace(bool PrimariesChanged)
 {
     ColourSpaceUpdate(PrimariesChanged);
+}
+
+void MythVideoGPU::UpscalerChanged(const QString& Upscaler)
+{
+    auto oldbicubic = m_bicubicUpsize;
+    m_bicubicUpsize = Upscaler == UPSCALE_HQ1;
+    if (m_bicubicUpsize != oldbicubic)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Bicubic upscaling %1")
+            .arg(m_bicubicUpsize ? "on" : "off"));
+    }
 }
 
 bool MythVideoGPU::IsValid() const

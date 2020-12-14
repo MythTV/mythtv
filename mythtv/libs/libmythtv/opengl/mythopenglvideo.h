@@ -39,7 +39,7 @@ class MythOpenGLVideo : public MythVideoGPU
     static QString        TypeToProfile(VideoFrameType Type);
 
     MythOpenGLVideo(MythRenderOpenGL* Render, MythVideoColourSpace* ColourSpace,
-                    MythVideoBounds* Bounds, const QString &Profile);
+                    MythVideoBounds* Bounds, MythVideoProfilePtr VideoProfile, const QString &Profile);
     ~MythOpenGLVideo() override;
 
     void    StartFrame       () override {}
@@ -82,7 +82,6 @@ class MythOpenGLVideo : public MythVideoGPU
     int            m_extraFeatures                 { 0 };
     GLenum         m_textureTarget                 { QOpenGLTexture::Target2D };
     bool           m_chromaUpsamplingFilter        { false };
-    bool           m_bicubicUpsize                 { false };
     MythOpenGLTonemap* m_toneMap                   { nullptr };
 };
 #endif

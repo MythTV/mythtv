@@ -21,7 +21,7 @@ class MythVideoVulkan : public MythVideoGPU, public MythVulkanObject
 
   public:
     MythVideoVulkan(MythVulkanObject* Vulkan, MythVideoColourSpace* ColourSpace,
-                    MythVideoBounds* Bounds, const QString &Profile);
+                    MythVideoBounds* Bounds, MythVideoProfilePtr VideoProfile, const QString &Profile);
    ~MythVideoVulkan() override;
 
     void    StartFrame       () override;
