@@ -1,4 +1,5 @@
 // MythTV
+#include "mythchrono.h"
 #include "mythlogging.h"
 #include "jitterometer.h"
 
@@ -83,42 +84,40 @@ bool Jitterometer::RecordEndTime()
         return false;
 
     int cycles = m_numCycles;
-    struct timeval timenow {};
-    gettimeofday(&timenow, nullptr);
+    auto timenow = nowAsDuration<std::chrono::microseconds>();
 
-    if (m_starttimeValid)
+    if (m_starttime > 0ms)
     {
-        m_times[m_count] = (timenow.tv_sec  - m_starttime.tv_sec ) * 1000000 +
-                           (timenow.tv_usec - m_starttime.tv_usec) ;
+        m_times[m_count] = timenow - m_starttime;
         m_count++;
     }
 
-    m_starttimeValid = false;
+    m_starttime = -1us;
 
     if (m_count >= cycles)
     {
         /* compute and display stuff, reset count to -1  */
-        double mean = 0;
-        double sum_of_squared_deviations=0;
 
         /* compute the mean */
-        for (int i = 0; i < cycles; i++)
-            mean += m_times[i];
+        std::chrono::microseconds tottime =
+            std::accumulate(m_times.cbegin(), m_times.cend(), 0us);
+        using doublemics = std::chrono::duration<double, std::micro>;
+        doublemics mean = duration_cast<doublemics>(tottime) / cycles;
 
-        double tottime = mean;
-        mean /= cycles;
-
-        if (tottime > 0)
-            m_lastFps = cycles / tottime * 1000000;
+        if (tottime > 0us)
+            m_lastFps = (1.0 * cycles) / duration_cast<std::chrono::seconds>(tottime).count();
 
         /* compute the sum of the squares of each deviation from the mean */
-        for (int i = 0; i < cycles; i++)
-            sum_of_squared_deviations += (mean - m_times[i]) * (mean - m_times[i]);
+        double sum_of_squared_deviations =
+            std::accumulate(m_times.cbegin(), m_times.cend(), 0.0,
+                            [mean](double sum, std::chrono::microseconds time)
+                                {double delta = (mean - duration_cast<doublemics>(time)).count();
+                                    return sum + (delta * delta); });
 
         /* compute standard deviation */
         double standard_deviation = sqrt(sum_of_squared_deviations / (cycles - 1));
-        if (mean > 0)
-            m_lastSd = standard_deviation / mean;
+        if (mean > 0us)
+            m_lastSd = standard_deviation / mean.count();
 
         /* retrieve load if available */
         QString extra;
@@ -128,7 +127,7 @@ bool Jitterometer::RecordEndTime()
 
         LOG(VB_GENERAL, LOG_INFO,
             m_name + QString("FPS: %1 Mean: %2 Std.Dev: %3 ")
-                .arg(m_lastFps, 7, 'f', 2).arg((int)mean, 5)
+                .arg(m_lastFps, 7, 'f', 2).arg((int)mean.count(), 5)
                 .arg((int)standard_deviation, 5) + extra);
 
         m_count = 0;
@@ -141,8 +140,7 @@ void Jitterometer::RecordStartTime()
 {
     if (!m_numCycles)
         return;
-    gettimeofday(&m_starttime, nullptr);
-    m_starttimeValid = true;
+    m_starttime = nowAsDuration<std::chrono::microseconds>();
 }
 
 QString Jitterometer::GetCPUStat(void)
