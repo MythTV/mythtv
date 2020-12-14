@@ -954,7 +954,7 @@ void NuppelVideoRecorder::run(void)
         m_vbiThread = new VBIThread(this);
 
     // save the start time
-    gettimeofday(&m_stm, &m_tzone);
+    gettimeofday(&m_stm, nullptr);
 
     // try to get run at higher scheduling priority, ignore failure
     myth_nice(-10);
@@ -1110,7 +1110,7 @@ void NuppelVideoRecorder::DoV4L1(void)
                 }
                 m_unpauseWait.wait(&m_pauseLock, 100);
                 if (m_clearTimeOnPause)
-                    gettimeofday(&m_stm, &m_tzone);
+                    gettimeofday(&m_stm, nullptr);
                 continue;
             }
 
@@ -1463,7 +1463,7 @@ again:
                 }
                 m_unpauseWait.wait(&m_pauseLock, 100);
                 if (m_clearTimeOnPause)
-                    gettimeofday(&m_stm, &m_tzone);
+                    gettimeofday(&m_stm, nullptr);
                 continue;
             }
 
@@ -1710,7 +1710,7 @@ void NuppelVideoRecorder::DoMJPEG(void)
                 }
                 m_unpauseWait.wait(&m_pauseLock, 100);
                 if (m_clearTimeOnPause)
-                    gettimeofday(&m_stm, &m_tzone);
+                    gettimeofday(&m_stm, nullptr);
                 continue;
             }
 
@@ -1790,7 +1790,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
         return;
     }
 
-    gettimeofday(&now, &m_tzone);
+    gettimeofday(&now, nullptr);
 
     long tcres = (now.tv_sec-m_stm.tv_sec)*1000 + now.tv_usec/1000 - m_stm.tv_usec/1000;
 
@@ -2245,7 +2245,7 @@ void NuppelVideoRecorder::doAudioThread(void)
         /* Don't assume that the sound device's record buffer is empty
            (like we used to.) Measure to see how much stuff is in there,
            and correct for it when calculating the timestamp */
-        gettimeofday(&anow, &m_tzone);
+        gettimeofday(&anow, nullptr);
         int bytes_read = std::max(m_audioDevice->GetNumReadyBytes(), 0);
 
         int act = m_actAudioBuffer;
@@ -2291,7 +2291,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
 {
     struct timeval tnow {};
-    gettimeofday(&tnow, &m_tzone);
+    gettimeofday(&tnow, nullptr);
 
     int act = m_actTextBuffer;
     if (!m_textBuffer[act]->freeToBuffer)
@@ -2455,7 +2455,7 @@ void NuppelVideoRecorder::FormatTT(struct VBIData*) {}
 void NuppelVideoRecorder::FormatCC(uint code1, uint code2)
 {
     struct timeval tnow {};
-    gettimeofday (&tnow, &m_tzone);
+    gettimeofday (&tnow, nullptr);
 
     // calculate timecode:
     // compute the difference  between now and stm (start time)

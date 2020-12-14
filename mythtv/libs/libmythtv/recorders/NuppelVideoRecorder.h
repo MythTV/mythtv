@@ -217,7 +217,6 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     long                m_textBufferSize         {0};
 
     struct timeval      m_stm                    {0,0};
-    struct timezone     m_tzone                  {0,0};
 
     NVRWriteThread     *m_writeThread            {nullptr};
     NVRAudioThread     *m_audioThread            {nullptr};
