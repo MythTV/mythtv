@@ -777,9 +777,9 @@ QString ChannelUtil::GetChanNum(int chan_id)
     return GetChannelStringField(chan_id, QString("channum"));
 }
 
-int ChannelUtil::GetTimeOffset(int chan_id)
+std::chrono::minutes ChannelUtil::GetTimeOffset(int chan_id)
 {
-    return GetChannelStringField(chan_id, QString("tmoffset")).toInt();
+    return std::chrono::minutes(GetChannelStringField(chan_id, QString("tmoffset")).toInt());
 }
 
 int ChannelUtil::GetSourceID(int db_mplexid)

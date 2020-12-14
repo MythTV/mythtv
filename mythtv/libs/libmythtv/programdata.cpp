@@ -1332,12 +1332,12 @@ bool ProgramData::ClearDataByChannel(
     uint chanid, const QDateTime &from, const QDateTime &to,
     bool use_channel_time_offset)
 {
-    int secs = 0;
+    std::chrono::seconds secs = 0s;
     if (use_channel_time_offset)
-        secs = ChannelUtil::GetTimeOffset(chanid) * 60;
+        secs = ChannelUtil::GetTimeOffset(chanid);
 
-    QDateTime newFrom = from.addSecs(secs);
-    QDateTime newTo   = to.addSecs(secs);
+    QDateTime newFrom = from.addSecs(secs.count());
+    QDateTime newTo   = to.addSecs(secs.count());
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM program "

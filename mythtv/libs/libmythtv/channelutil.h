@@ -305,7 +305,7 @@ class MTV_PUBLIC ChannelUtil
      * \brief Returns the listings time offset in minutes for given channel.
      * \param chanid primary key for channel record
      */
-    static int     GetTimeOffset(int chan_id);
+    static std::chrono::minutes GetTimeOffset(int chan_id);
     static int     GetSourceID(int mplexid);
     static uint    GetSourceIDForChannel(uint chanid);
 
