@@ -317,23 +317,11 @@ QString MythVideoProfileItem::toString(void) const
 
 //////////////////////////////////////////////////////////////////////////////
 
-#define LOC     QString("VDP: ")
-
-QMutex                    MythVideoProfile::s_safe_lock(QMutex::Recursive);
-bool                      MythVideoProfile::s_safe_initialized = false;
-QMap<QString,QStringList> MythVideoProfile::s_safe_renderer;
-QMap<QString,QStringList> MythVideoProfile::s_safe_renderer_group;
-QMap<QString,QStringList> MythVideoProfile::s_safe_equiv_dec;
-QStringList               MythVideoProfile::s_safe_custom;
-QMap<QString,uint>        MythVideoProfile::s_safe_renderer_priority;
-QMap<QString,QString>     MythVideoProfile::s_dec_name;
-QMap<QString,QString>     MythVideoProfile::s_rend_name;
-QStringList               MythVideoProfile::s_safe_decoders;
-QList<QPair<QString,QString> > MythVideoProfile::s_deinterlacer_options;
+#define LOC QString("VideoProfile: ")
 
 MythVideoProfile::MythVideoProfile()
 {
-    QMutexLocker locker(&s_safe_lock);
+    QMutexLocker locker(&kSafeLock);
     InitStatics();
 
     QString hostname    = gCoreContext->GetHostName();
@@ -445,8 +433,8 @@ bool MythVideoProfile::IsDecoderCompatible(const QString &Decoder) const
     if (dec == Decoder)
         return true;
 
-    QMutexLocker locker(&s_safe_lock);
-    return (s_safe_equiv_dec[dec].contains(Decoder));
+    QMutexLocker locker(&kSafeLock);
+    return (kSafeEquivDec[dec].contains(Decoder));
 }
 
 QString MythVideoProfile::GetPreference(const QString &Key) const
@@ -733,13 +721,13 @@ bool MythVideoProfile::SaveDB(uint GroupId, vector<MythVideoProfileItem> &Items)
 QStringList MythVideoProfile::GetDecoders(void)
 {
     InitStatics();
-    return s_safe_decoders;
+    return kSafeDecoders;
 }
 
 QStringList MythVideoProfile::GetDecoderNames(void)
 {
     InitStatics();
-    return std::accumulate(s_safe_decoders.cbegin(), s_safe_decoders.cend(), QStringList{},
+    return std::accumulate(kSafeDecoders.cbegin(), kSafeDecoders.cend(), QStringList{},
         [](QStringList Res, const QString& Dec) { return Res << GetDecoderName(Dec); });
 }
 
@@ -748,31 +736,31 @@ QString MythVideoProfile::GetDecoderName(const QString &Decoder)
     if (Decoder.isEmpty())
         return "";
 
-    QMutexLocker locker(&s_safe_lock);
-    if (s_dec_name.empty())
+    QMutexLocker locker(&kSafeLock);
+    if (kDecName.empty())
     {
-        s_dec_name["ffmpeg"]         = QObject::tr("Standard");
-        s_dec_name["vdpau"]          = QObject::tr("NVIDIA VDPAU acceleration");
-        s_dec_name["vdpau-dec"]      = QObject::tr("NVIDIA VDPAU acceleration (decode only)");
-        s_dec_name["vaapi"]          = QObject::tr("VAAPI acceleration");
-        s_dec_name["vaapi-dec"]      = QObject::tr("VAAPI acceleration (decode only)");
-        s_dec_name["dxva2"]          = QObject::tr("Windows hardware acceleration");
-        s_dec_name["mediacodec"]     = QObject::tr("Android MediaCodec acceleration");
-        s_dec_name["mediacodec-dec"] = QObject::tr("Android MediaCodec acceleration (decode only)");
-        s_dec_name["nvdec"]          = QObject::tr("NVIDIA NVDEC acceleration");
-        s_dec_name["nvdec-dec"]      = QObject::tr("NVIDIA NVDEC acceleration (decode only)");
-        s_dec_name["vtb"]            = QObject::tr("VideoToolbox acceleration");
-        s_dec_name["vtb-dec"]        = QObject::tr("VideoToolbox acceleration (decode only)");
-        s_dec_name["v4l2"]           = QObject::tr("V4L2 acceleration");
-        s_dec_name["v4l2-dec"]       = QObject::tr("V4L2 acceleration (decode only)");
-        s_dec_name["mmal"]           = QObject::tr("MMAL acceleration");
-        s_dec_name["mmal-dec"]       = QObject::tr("MMAL acceleration (decode only)");
-        s_dec_name["drmprime"]       = QObject::tr("DRM PRIME acceleration");
+        kDecName["ffmpeg"]         = QObject::tr("Standard");
+        kDecName["vdpau"]          = QObject::tr("NVIDIA VDPAU acceleration");
+        kDecName["vdpau-dec"]      = QObject::tr("NVIDIA VDPAU acceleration (decode only)");
+        kDecName["vaapi"]          = QObject::tr("VAAPI acceleration");
+        kDecName["vaapi-dec"]      = QObject::tr("VAAPI acceleration (decode only)");
+        kDecName["dxva2"]          = QObject::tr("Windows hardware acceleration");
+        kDecName["mediacodec"]     = QObject::tr("Android MediaCodec acceleration");
+        kDecName["mediacodec-dec"] = QObject::tr("Android MediaCodec acceleration (decode only)");
+        kDecName["nvdec"]          = QObject::tr("NVIDIA NVDEC acceleration");
+        kDecName["nvdec-dec"]      = QObject::tr("NVIDIA NVDEC acceleration (decode only)");
+        kDecName["vtb"]            = QObject::tr("VideoToolbox acceleration");
+        kDecName["vtb-dec"]        = QObject::tr("VideoToolbox acceleration (decode only)");
+        kDecName["v4l2"]           = QObject::tr("V4L2 acceleration");
+        kDecName["v4l2-dec"]       = QObject::tr("V4L2 acceleration (decode only)");
+        kDecName["mmal"]           = QObject::tr("MMAL acceleration");
+        kDecName["mmal-dec"]       = QObject::tr("MMAL acceleration (decode only)");
+        kDecName["drmprime"]       = QObject::tr("DRM PRIME acceleration");
     }
 
     QString ret = Decoder;
-    QMap<QString,QString>::const_iterator it = s_dec_name.constFind(Decoder);
-    if (it != s_dec_name.constEnd())
+    QMap<QString,QString>::const_iterator it = kDecName.constFind(Decoder);
+    if (it != kDecName.constEnd())
         ret = *it;
     return ret;
 }
@@ -862,18 +850,18 @@ QString MythVideoProfile::GetDecoderHelp(const QString& Decoder)
 
 QString MythVideoProfile::GetVideoRendererName(const QString &Renderer)
 {
-    QMutexLocker locker(&s_safe_lock);
-    if (s_rend_name.empty())
+    QMutexLocker locker(&kSafeLock);
+    if (kRendName.empty())
     {
-        s_rend_name["opengl"]         = QObject::tr("OpenGL");
-        s_rend_name["opengl-yv12"]    = QObject::tr("OpenGL YV12");
-        s_rend_name["opengl-hw"]      = QObject::tr("OpenGL Hardware");
-        s_rend_name["vulkan"]         = QObject::tr("Vulkan");
+        kRendName["opengl"]         = QObject::tr("OpenGL");
+        kRendName["opengl-yv12"]    = QObject::tr("OpenGL YV12");
+        kRendName["opengl-hw"]      = QObject::tr("OpenGL Hardware");
+        kRendName["vulkan"]         = QObject::tr("Vulkan");
     }
 
     QString ret = Renderer;
-    QMap<QString,QString>::const_iterator it = s_rend_name.constFind(Renderer);
-    if (it != s_rend_name.constEnd())
+    QMap<QString,QString>::const_iterator it = kRendName.constFind(Renderer);
+    if (it != kRendName.constEnd())
         ret = *it;
     return ret;
 }
@@ -1227,12 +1215,12 @@ void MythVideoProfile::CreateProfiles(const QString &HostName)
 
 QStringList MythVideoProfile::GetVideoRenderers(const QString &Decoder)
 {
-    QMutexLocker locker(&s_safe_lock);
+    QMutexLocker locker(&kSafeLock);
     InitStatics();
 
-    QMap<QString,QStringList>::const_iterator it = s_safe_renderer.constFind(Decoder);
+    QMap<QString,QStringList>::const_iterator it = kSafeRenderer.constFind(Decoder);
     QStringList tmp;
-    if (it != s_safe_renderer.constEnd())
+    if (it != kSafeRenderer.constEnd())
         tmp = *it;
     return tmp;
 }
@@ -1304,7 +1292,7 @@ QStringList MythVideoProfile::GetFilteredRenderers(const QString &Decoder, const
 
 QString MythVideoProfile::GetBestVideoRenderer(const QStringList &Renderers)
 {
-    QMutexLocker locker(&s_safe_lock);
+    QMutexLocker locker(&kSafeLock);
     InitStatics();
 
     uint    top_priority = 0;
@@ -1312,8 +1300,8 @@ QString MythVideoProfile::GetBestVideoRenderer(const QStringList &Renderers)
 
     for (const auto& renderer : qAsConst(Renderers))
     {
-        QMap<QString,uint>::const_iterator p = s_safe_renderer_priority.constFind(renderer);
-        if ((p != s_safe_renderer_priority.constEnd()) && (*p >= top_priority))
+        QMap<QString,uint>::const_iterator p = kSafeRendererPriority.constFind(renderer);
+        if ((p != kSafeRendererPriority.constEnd()) && (*p >= top_priority))
         {
             top_priority = *p;
             top_renderer = renderer;
@@ -1336,48 +1324,47 @@ QString MythVideoProfile::toString(void) const
 QList<QPair<QString,QString> > MythVideoProfile::GetDeinterlacers(void)
 {
     InitStatics();
-    return s_deinterlacer_options;
+    return kDeinterlacerOptions;
 }
 
 void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
 {
     if (Reinit)
     {
-        s_safe_custom.clear();
-        s_safe_renderer.clear();
-        s_safe_renderer_group.clear();
-        s_safe_renderer_priority.clear();
-        s_safe_decoders.clear();
-        s_safe_equiv_dec.clear();
-        s_deinterlacer_options.clear();
+        kSafeCustom.clear();
+        kSafeRenderer.clear();
+        kSafeRendererGroup.clear();
+        kSafeRendererPriority.clear();
+        kSafeDecoders.clear();
+        kSafeEquivDec.clear();
+        kDeinterlacerOptions.clear();
     }
-    else if (s_safe_initialized)
+    else if (kSafeInitialized)
     {
         return;
     }
-    s_safe_initialized = true;
+    kSafeInitialized = true;
 
     RenderOptions options {};
-    options.renderers      = &s_safe_custom;
-    options.safe_renderers = &s_safe_renderer;
-    options.render_group   = &s_safe_renderer_group;
-    options.priorities     = &s_safe_renderer_priority;
-    options.decoders       = &s_safe_decoders;
-    options.equiv_decoders = &s_safe_equiv_dec;
+    options.renderers      = &kSafeCustom;
+    options.safe_renderers = &kSafeRenderer;
+    options.render_group   = &kSafeRendererGroup;
+    options.priorities     = &kSafeRendererPriority;
+    options.decoders       = &kSafeDecoders;
+    options.equiv_decoders = &kSafeEquivDec;
 
     // N.B. assumes DummyDecoder always present
     AvFormatDecoder::GetDecoders(options);
     MythVideoOutput::GetRenderOptions(options);
 
-    for (const QString& decoder : qAsConst(s_safe_decoders))
+    for (const QString& decoder : qAsConst(kSafeDecoders))
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("decoder<->render support: %1%2")
-                .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("decoder<->render support: %1%2")
+            .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
     }
 
-    s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_NONE,   QObject::tr("None")));
-    s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_LOW,    QObject::tr("Low quality")));
-    s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_MEDIUM, QObject::tr("Medium quality")));
-    s_deinterlacer_options.append(QPair<QString,QString>(DEINT_QUALITY_HIGH,   QObject::tr("High quality")));
+    kDeinterlacerOptions.append(QPair<QString,QString>(DEINT_QUALITY_NONE,   QObject::tr("None")));
+    kDeinterlacerOptions.append(QPair<QString,QString>(DEINT_QUALITY_LOW,    QObject::tr("Low quality")));
+    kDeinterlacerOptions.append(QPair<QString,QString>(DEINT_QUALITY_MEDIUM, QObject::tr("Medium quality")));
+    kDeinterlacerOptions.append(QPair<QString,QString>(DEINT_QUALITY_HIGH,   QObject::tr("High quality")));
 }

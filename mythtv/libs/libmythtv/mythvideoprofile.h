@@ -130,17 +130,17 @@ class MTV_PUBLIC MythVideoProfile
     QMap<QString,QString> m_currentPreferences  { };
     std::vector<MythVideoProfileItem> m_allowedPreferences { };
 
-    static QMutex                    s_safe_lock;
-    static bool                      s_safe_initialized;
-    static QMap<QString,QStringList> s_safe_renderer;
-    static QMap<QString,QStringList> s_safe_renderer_group;
-    static QMap<QString,QStringList> s_safe_equiv_dec;
-    static QStringList               s_safe_custom;
-    static QMap<QString,uint>        s_safe_renderer_priority;
-    static QMap<QString,QString>     s_dec_name;
-    static QMap<QString,QString>     s_rend_name;
-    static QStringList               s_safe_decoders;
-    static QList<QPair<QString,QString> > s_deinterlacer_options;
+    static inline QMutex                    kSafeLock = QMutex(QMutex::Recursive);
+    static inline bool                      kSafeInitialized = false;
+    static inline QMap<QString,QStringList> kSafeRenderer = {};
+    static inline QMap<QString,QStringList> kSafeRendererGroup = {};
+    static inline QMap<QString,QStringList> kSafeEquivDec = {};
+    static inline QStringList               kSafeCustom = {};
+    static inline QMap<QString,uint>        kSafeRendererPriority = {};
+    static inline QMap<QString,QString>     kDecName = {};
+    static inline QMap<QString,QString>     kRendName = {};
+    static inline QStringList               kSafeDecoders = {};
+    static inline QList<QPair<QString,QString> > kDeinterlacerOptions = {};
 };
 
 #endif
