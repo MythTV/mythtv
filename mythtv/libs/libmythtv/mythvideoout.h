@@ -16,7 +16,7 @@
 #include "videoouttypes.h"
 #include "mythvideobounds.h"
 #include "mythdisplay.h"
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 #include "mythvideocolourspace.h"
 #include "mythavutil.h"
 #include "mythdeinterlacer.h"
@@ -93,7 +93,7 @@ class MythVideoOutput : public MythVideoBounds
     LetterBoxColour      m_dbLetterboxColour  { kLetterBoxColour_Black };
     MythCodecID          m_videoCodecID       { kCodec_NONE };
     int                  m_maxReferenceFrames { 16 };
-    VideoDisplayProfile* m_dbDisplayProfile   { nullptr };
+    MythVideoProfile*    m_dbDisplayProfile   { nullptr };
     VideoBuffers         m_videoBuffers;
     VideoErrorState      m_errorState         { kError_None };
     long long            m_framesPlayed       { 0 };

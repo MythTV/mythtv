@@ -8,7 +8,7 @@
 #include "videoout_d3d.h"
 #include "osd.h"
 #include "fourcc.h"
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 #include "mythmainwindow.h"
 #include "mythplayer.h"
 #include "mythavutil.h"

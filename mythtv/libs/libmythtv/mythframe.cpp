@@ -1,6 +1,6 @@
 // MythTV
 #include "mythlogging.h"
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 #include "mythframe.h"
 
 // FFmpeg - for av_malloc/av_free

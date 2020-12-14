@@ -46,7 +46,7 @@ using CreateHWDecoder = int (*)(AVCodecContext *Context);
 
 class MythPlayerUI;
 class MythOpenGLInterop;
-class VideoDisplayProfile;
+class MythVideoProfile;
 
 class MTV_PUBLIC MythCodecContext
 {
@@ -149,7 +149,7 @@ class MTV_PUBLIC MythCodecContext
     virtual int    HwDecoderInit           (AVCodecContext */*Context*/) { return 0; }
     virtual bool   RetrieveFrame           (AVCodecContext */*Context*/, MythVideoFrame */*Frame*/, AVFrame */*AvFrame*/) { return false; }
     virtual int    FilteredReceiveFrame    (AVCodecContext *Context, AVFrame *Frame);
-    virtual void   SetDeinterlacing        (AVCodecContext */*Context*/, VideoDisplayProfile */*Profile*/, bool /*DoubleRate*/) {}
+    virtual void   SetDeinterlacing        (AVCodecContext */*Context*/, MythVideoProfile */*Profile*/, bool /*DoubleRate*/) {}
     virtual void   PostProcessFrame        (AVCodecContext */*Context*/, MythVideoFrame */*Frame*/) {}
     virtual bool   IsDeinterlacing         (bool &/*DoubleRate*/, bool /*StreamChange*/ = false) { return false; }
     virtual void   SetDecoderOptions       (AVCodecContext */*Context*/, AVCodec */*Codec*/) { }
@@ -168,4 +168,4 @@ class MTV_PUBLIC MythCodecContext
     bool         m_resetRequired { false       };
 };
 
-#endif // MYTHCODECCONTEXT_H
+#endif

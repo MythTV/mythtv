@@ -1,5 +1,5 @@
 // MythTV
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 #include "mythcorecontext.h"
 #include "mythdb.h"
 #include "mythlogging.h"
@@ -10,32 +10,32 @@
 #include <algorithm>
 #include <utility>
 
-void ProfileItem::Clear(void)
+void MythVideoProfileItem::Clear(void)
 {
     m_pref.clear();
 }
 
-void ProfileItem::SetProfileID(uint Id)
+void MythVideoProfileItem::SetProfileID(uint Id)
 {
     m_profileid = Id;
 }
 
-void ProfileItem::Set(const QString &Value, const QString &Data)
+void MythVideoProfileItem::Set(const QString &Value, const QString &Data)
 {
     m_pref[Value] = Data;
 }
 
-uint ProfileItem::GetProfileID() const
+uint MythVideoProfileItem::GetProfileID() const
 {
     return m_profileid;
 }
 
-QMap<QString,QString> ProfileItem::GetAll(void) const
+QMap<QString,QString> MythVideoProfileItem::GetAll(void) const
 {
     return m_pref;
 }
 
-QString ProfileItem::Get(const QString &Value) const
+QString MythVideoProfileItem::Get(const QString &Value) const
 {
     QMap<QString,QString>::const_iterator it = m_pref.find(Value);
     if (it != m_pref.end())
@@ -43,7 +43,7 @@ QString ProfileItem::Get(const QString &Value) const
     return QString();
 }
 
-uint ProfileItem::GetPriority(void) const
+uint MythVideoProfileItem::GetPriority(void) const
 {
     QString tmp = Get("pref_priority");
     return tmp.isEmpty() ? 0 : tmp.toUInt();
@@ -53,17 +53,17 @@ uint ProfileItem::GetPriority(void) const
 // If string is blank then assumes a match.
 // If value is 0 or negative assume a match (i.e. value unknown assumes a match)
 // float values must be no more than 3 decimals.
-bool ProfileItem::CheckRange(const QString &Key, float Value, bool *Ok) const
+bool MythVideoProfileItem::CheckRange(const QString &Key, float Value, bool *Ok) const
 {
     return CheckRange(Key, Value, 0, true, Ok);
 }
 
-bool ProfileItem::CheckRange(const QString &Key, int Value, bool *Ok) const
+bool MythVideoProfileItem::CheckRange(const QString &Key, int Value, bool *Ok) const
 {
     return CheckRange(Key, 0.0, Value, false, Ok);
 }
 
-bool ProfileItem::CheckRange(const QString& Key,
+bool MythVideoProfileItem::CheckRange(const QString& Key,
     float FValue, int IValue, bool IsFloat, bool *Ok) const
 {
     bool match = true;
@@ -197,7 +197,7 @@ bool ProfileItem::CheckRange(const QString& Key,
     return match;
 }
 
-bool ProfileItem::IsMatch(QSize Size, float Framerate, const QString &CodecName,
+bool MythVideoProfileItem::IsMatch(QSize Size, float Framerate, const QString &CodecName,
                           const QStringList &DisallowedDecoders) const
 {
     bool match = true;
@@ -226,7 +226,7 @@ bool ProfileItem::IsMatch(QSize Size, float Framerate, const QString &CodecName,
     return match;
 }
 
-bool ProfileItem::IsValid(QString *Reason) const
+bool MythVideoProfileItem::IsValid(QString *Reason) const
 {
 
     bool isOK = true;
@@ -261,7 +261,7 @@ bool ProfileItem::IsValid(QString *Reason) const
         return false;
     }
 
-    QStringList decoders  = VideoDisplayProfile::GetDecoders();
+    QStringList decoders  = MythVideoProfile::GetDecoders();
     if (!decoders.contains(decoder))
     {
         if (Reason)
@@ -269,7 +269,7 @@ bool ProfileItem::IsValid(QString *Reason) const
         return false;
     }
 
-    QStringList renderers = VideoDisplayProfile::GetVideoRenderers(decoder);
+    QStringList renderers = MythVideoProfile::GetVideoRenderers(decoder);
     if (!renderers.contains(renderer))
     {
         if (Reason)
@@ -284,12 +284,12 @@ bool ProfileItem::IsValid(QString *Reason) const
     return true;
 }
 
-bool ProfileItem::operator< (const ProfileItem &Other) const
+bool MythVideoProfileItem::operator< (const MythVideoProfileItem &Other) const
 {
     return GetPriority() < Other.GetPriority();
 }
 
-QString ProfileItem::toString(void) const
+QString MythVideoProfileItem::toString(void) const
 {
     QString cmp0      = Get("pref_cmp0");
     QString cmp1      = Get("pref_cmp1");
@@ -319,19 +319,19 @@ QString ProfileItem::toString(void) const
 
 #define LOC     QString("VDP: ")
 
-QMutex                    VideoDisplayProfile::s_safe_lock(QMutex::Recursive);
-bool                      VideoDisplayProfile::s_safe_initialized = false;
-QMap<QString,QStringList> VideoDisplayProfile::s_safe_renderer;
-QMap<QString,QStringList> VideoDisplayProfile::s_safe_renderer_group;
-QMap<QString,QStringList> VideoDisplayProfile::s_safe_equiv_dec;
-QStringList               VideoDisplayProfile::s_safe_custom;
-QMap<QString,uint>        VideoDisplayProfile::s_safe_renderer_priority;
-QMap<QString,QString>     VideoDisplayProfile::s_dec_name;
-QMap<QString,QString>     VideoDisplayProfile::s_rend_name;
-QStringList               VideoDisplayProfile::s_safe_decoders;
-QList<QPair<QString,QString> > VideoDisplayProfile::s_deinterlacer_options;
+QMutex                    MythVideoProfile::s_safe_lock(QMutex::Recursive);
+bool                      MythVideoProfile::s_safe_initialized = false;
+QMap<QString,QStringList> MythVideoProfile::s_safe_renderer;
+QMap<QString,QStringList> MythVideoProfile::s_safe_renderer_group;
+QMap<QString,QStringList> MythVideoProfile::s_safe_equiv_dec;
+QStringList               MythVideoProfile::s_safe_custom;
+QMap<QString,uint>        MythVideoProfile::s_safe_renderer_priority;
+QMap<QString,QString>     MythVideoProfile::s_dec_name;
+QMap<QString,QString>     MythVideoProfile::s_rend_name;
+QStringList               MythVideoProfile::s_safe_decoders;
+QList<QPair<QString,QString> > MythVideoProfile::s_deinterlacer_options;
 
-VideoDisplayProfile::VideoDisplayProfile()
+MythVideoProfile::MythVideoProfile()
 {
     QMutexLocker locker(&s_safe_lock);
     InitStatics();
@@ -340,8 +340,8 @@ VideoDisplayProfile::VideoDisplayProfile()
     QString cur_profile = GetDefaultProfileName(hostname);
     uint    groupid     = GetProfileGroupID(cur_profile, hostname);
 
-    vector<ProfileItem> items = LoadDB(groupid);
-    vector<ProfileItem>::const_iterator it;
+    vector<MythVideoProfileItem> items = LoadDB(groupid);
+    vector<MythVideoProfileItem>::const_iterator it;
     for (it = items.begin(); it != items.end(); ++it)
     {
         QString err;
@@ -356,7 +356,7 @@ VideoDisplayProfile::VideoDisplayProfile()
     }
 }
 
-void VideoDisplayProfile::SetInput(QSize Size, float Framerate, const QString &CodecName,
+void MythVideoProfile::SetInput(QSize Size, float Framerate, const QString &CodecName,
                                    const QStringList &DisallowedDecoders)
 {
     QMutexLocker locker(&m_lock);
@@ -381,7 +381,7 @@ void VideoDisplayProfile::SetInput(QSize Size, float Framerate, const QString &C
         LoadBestPreferences(m_lastSize, m_lastRate, m_lastCodecName, DisallowedDecoders);
 }
 
-void VideoDisplayProfile::SetOutput(float Framerate)
+void MythVideoProfile::SetOutput(float Framerate)
 {
     QMutexLocker locker(&m_lock);
     if (!qFuzzyCompare(Framerate + 1.0F, m_lastRate + 1.0F))
@@ -391,42 +391,42 @@ void VideoDisplayProfile::SetOutput(float Framerate)
     }
 }
 
-float VideoDisplayProfile::GetOutput(void) const
+float MythVideoProfile::GetOutput(void) const
 {
     return m_lastRate;
 }
 
-QString VideoDisplayProfile::GetDecoder(void) const
+QString MythVideoProfile::GetDecoder(void) const
 {
     return GetPreference("pref_decoder");
 }
 
-QString VideoDisplayProfile::GetSingleRatePreferences(void) const
+QString MythVideoProfile::GetSingleRatePreferences(void) const
 {
     return GetPreference("pref_deint0");
 }
 
-QString VideoDisplayProfile::GetDoubleRatePreferences(void) const
+QString MythVideoProfile::GetDoubleRatePreferences(void) const
 {
     return GetPreference("pref_deint1");
 }
 
-uint VideoDisplayProfile::GetMaxCPUs(void) const
+uint MythVideoProfile::GetMaxCPUs(void) const
 {
     return qBound(1U, GetPreference("pref_max_cpus").toUInt(), VIDEO_MAX_CPUS);
 }
 
-bool VideoDisplayProfile::IsSkipLoopEnabled(void) const
+bool MythVideoProfile::IsSkipLoopEnabled(void) const
 {
     return GetPreference("pref_skiploop").toInt() != 0;
 }
 
-QString VideoDisplayProfile::GetVideoRenderer(void) const
+QString MythVideoProfile::GetVideoRenderer(void) const
 {
     return GetPreference("pref_videorenderer");
 }
 
-void VideoDisplayProfile::SetVideoRenderer(const QString &VideoRenderer)
+void MythVideoProfile::SetVideoRenderer(const QString &VideoRenderer)
 {
     QMutexLocker locker(&m_lock);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetVideoRenderer: '%1'").arg(VideoRenderer));
@@ -439,7 +439,7 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &VideoRenderer)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "New preferences: " + toString());
 }
 
-bool VideoDisplayProfile::IsDecoderCompatible(const QString &Decoder) const
+bool MythVideoProfile::IsDecoderCompatible(const QString &Decoder) const
 {
     const QString dec = GetDecoder();
     if (dec == Decoder)
@@ -449,7 +449,7 @@ bool VideoDisplayProfile::IsDecoderCompatible(const QString &Decoder) const
     return (s_safe_equiv_dec[dec].contains(Decoder));
 }
 
-QString VideoDisplayProfile::GetPreference(const QString &Key) const
+QString MythVideoProfile::GetPreference(const QString &Key) const
 {
     QMutexLocker locker(&m_lock);
 
@@ -463,14 +463,14 @@ QString VideoDisplayProfile::GetPreference(const QString &Key) const
     return *it;
 }
 
-void VideoDisplayProfile::SetPreference(const QString &Key, const QString &Value)
+void MythVideoProfile::SetPreference(const QString &Key, const QString &Value)
 {
     QMutexLocker locker(&m_lock);
     if (!Key.isEmpty())
         m_currentPreferences[Key] = Value;
 }
 
-vector<ProfileItem>::const_iterator VideoDisplayProfile::FindMatch
+vector<MythVideoProfileItem>::const_iterator MythVideoProfile::FindMatch
     (const QSize Size, float Framerate, const QString &CodecName, const QStringList& DisallowedDecoders)
 {
     for (auto it = m_allowedPreferences.cbegin(); it != m_allowedPreferences.cend(); ++it)
@@ -479,7 +479,7 @@ vector<ProfileItem>::const_iterator VideoDisplayProfile::FindMatch
     return m_allowedPreferences.end();
 }
 
-void VideoDisplayProfile::LoadBestPreferences
+void MythVideoProfile::LoadBestPreferences
     (const QSize Size, float Framerate, const QString &CodecName, const QStringList &DisallowedDecoders)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences(%1x%2, %3, %4)")
@@ -514,10 +514,10 @@ void VideoDisplayProfile::LoadBestPreferences
             .arg(GetPreference("pref_max_cpus")));
 }
 
-vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
+vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)
 {
-    ProfileItem tmp;
-    vector<ProfileItem> list;
+    MythVideoProfileItem tmp;
+    vector<MythVideoProfileItem> list;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -571,7 +571,7 @@ vector<ProfileItem> VideoDisplayProfile::LoadDB(uint GroupId)
     return list;
 }
 
-bool VideoDisplayProfile::DeleteDB(uint GroupId, const vector<ProfileItem> &Items)
+bool MythVideoProfile::DeleteDB(uint GroupId, const vector<MythVideoProfileItem> &Items)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -597,7 +597,7 @@ bool VideoDisplayProfile::DeleteDB(uint GroupId, const vector<ProfileItem> &Item
     return ok;
 }
 
-bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
+bool MythVideoProfile::SaveDB(uint GroupId, vector<MythVideoProfileItem> &Items)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -730,20 +730,20 @@ bool VideoDisplayProfile::SaveDB(uint GroupId, vector<ProfileItem> &Items)
     return ok;
 }
 
-QStringList VideoDisplayProfile::GetDecoders(void)
+QStringList MythVideoProfile::GetDecoders(void)
 {
     InitStatics();
     return s_safe_decoders;
 }
 
-QStringList VideoDisplayProfile::GetDecoderNames(void)
+QStringList MythVideoProfile::GetDecoderNames(void)
 {
     InitStatics();
     return std::accumulate(s_safe_decoders.cbegin(), s_safe_decoders.cend(), QStringList{},
         [](QStringList Res, const QString& Dec) { return Res << GetDecoderName(Dec); });
 }
 
-QString VideoDisplayProfile::GetDecoderName(const QString &Decoder)
+QString MythVideoProfile::GetDecoderName(const QString &Decoder)
 {
     if (Decoder.isEmpty())
         return "";
@@ -778,7 +778,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &Decoder)
 }
 
 
-QString VideoDisplayProfile::GetDecoderHelp(const QString& Decoder)
+QString MythVideoProfile::GetDecoderHelp(const QString& Decoder)
 {
     QString msg = QObject::tr("Processing method used to decode video.");
 
@@ -860,7 +860,7 @@ QString VideoDisplayProfile::GetDecoderHelp(const QString& Decoder)
     return msg;
 }
 
-QString VideoDisplayProfile::GetVideoRendererName(const QString &Renderer)
+QString MythVideoProfile::GetVideoRendererName(const QString &Renderer)
 {
     QMutexLocker locker(&s_safe_lock);
     if (s_rend_name.empty())
@@ -878,7 +878,7 @@ QString VideoDisplayProfile::GetVideoRendererName(const QString &Renderer)
     return ret;
 }
 
-QStringList VideoDisplayProfile::GetProfiles(const QString &HostName)
+QStringList MythVideoProfile::GetProfiles(const QString &HostName)
 {
     InitStatics();
     QStringList list;
@@ -898,7 +898,7 @@ QStringList VideoDisplayProfile::GetProfiles(const QString &HostName)
     return list;
 }
 
-QString VideoDisplayProfile::GetDefaultProfileName(const QString &HostName)
+QString MythVideoProfile::GetDefaultProfileName(const QString &HostName)
 {
     QString tmp =
         gCoreContext->GetSettingOnHost("DefaultVideoPlaybackProfile", HostName);
@@ -924,12 +924,12 @@ QString VideoDisplayProfile::GetDefaultProfileName(const QString &HostName)
     return tmp;
 }
 
-void VideoDisplayProfile::SetDefaultProfileName(const QString &ProfileName, const QString &HostName)
+void MythVideoProfile::SetDefaultProfileName(const QString &ProfileName, const QString &HostName)
 {
     gCoreContext->SaveSettingOnHost("DefaultVideoPlaybackProfile", ProfileName, HostName);
 }
 
-uint VideoDisplayProfile::GetProfileGroupID(const QString &ProfileName,
+uint MythVideoProfile::GetProfileGroupID(const QString &ProfileName,
                                             const QString &HostName)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -949,7 +949,7 @@ uint VideoDisplayProfile::GetProfileGroupID(const QString &ProfileName,
     return 0;
 }
 
-void VideoDisplayProfile::CreateProfile(uint GroupId, uint Priority,
+void MythVideoProfile::CreateProfile(uint GroupId, uint Priority,
     const QString& Width, const QString& Height, const QString& Codecs,
     const QString& Decoder, uint MaxCpus, bool SkipLoop, const QString& VideoRenderer,
     const QString& Deint1, const QString& Deint2)
@@ -1020,7 +1020,7 @@ void VideoDisplayProfile::CreateProfile(uint GroupId, uint Priority,
     }
 }
 
-uint VideoDisplayProfile::CreateProfileGroup(const QString &ProfileName, const QString &HostName)
+uint MythVideoProfile::CreateProfileGroup(const QString &ProfileName, const QString &HostName)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1039,7 +1039,7 @@ uint VideoDisplayProfile::CreateProfileGroup(const QString &ProfileName, const Q
     return GetProfileGroupID(ProfileName, HostName);
 }
 
-bool VideoDisplayProfile::DeleteProfileGroup(const QString &GroupName, const QString &HostName)
+bool MythVideoProfile::DeleteProfileGroup(const QString &GroupName, const QString &HostName)
 {
     bool ok = true;
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1091,7 +1091,7 @@ bool VideoDisplayProfile::DeleteProfileGroup(const QString &GroupName, const QSt
     return ok;
 }
 
-void VideoDisplayProfile::CreateProfiles(const QString &HostName)
+void MythVideoProfile::CreateProfiles(const QString &HostName)
 {
     QStringList profiles = GetProfiles(HostName);
 
@@ -1225,7 +1225,7 @@ void VideoDisplayProfile::CreateProfiles(const QString &HostName)
 #endif
 }
 
-QStringList VideoDisplayProfile::GetVideoRenderers(const QString &Decoder)
+QStringList MythVideoProfile::GetVideoRenderers(const QString &Decoder)
 {
     QMutexLocker locker(&s_safe_lock);
     InitStatics();
@@ -1237,7 +1237,7 @@ QStringList VideoDisplayProfile::GetVideoRenderers(const QString &Decoder)
     return tmp;
 }
 
-QString VideoDisplayProfile::GetVideoRendererHelp(const QString &Renderer)
+QString MythVideoProfile::GetVideoRendererHelp(const QString &Renderer)
 {
     QString msg = QObject::tr("Video rendering method");
 
@@ -1283,12 +1283,12 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &Renderer)
     return msg;
 }
 
-QString VideoDisplayProfile::GetPreferredVideoRenderer(const QString &Decoder)
+QString MythVideoProfile::GetPreferredVideoRenderer(const QString &Decoder)
 {
     return GetBestVideoRenderer(GetVideoRenderers(Decoder));
 }
 
-QStringList VideoDisplayProfile::GetFilteredRenderers(const QString &Decoder, const QStringList &Renderers)
+QStringList MythVideoProfile::GetFilteredRenderers(const QString &Decoder, const QStringList &Renderers)
 {
     const QStringList dec_list = GetVideoRenderers(Decoder);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Safe renderers for '%1': %2")
@@ -1302,7 +1302,7 @@ QStringList VideoDisplayProfile::GetFilteredRenderers(const QString &Decoder, co
     return new_list;
 }
 
-QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &Renderers)
+QString MythVideoProfile::GetBestVideoRenderer(const QStringList &Renderers)
 {
     QMutexLocker locker(&s_safe_lock);
     InitStatics();
@@ -1323,7 +1323,7 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &Renderers)
     return top_renderer;
 }
 
-QString VideoDisplayProfile::toString(void) const
+QString MythVideoProfile::toString(void) const
 {
     QString renderer = GetPreference("pref_videorenderer");
     QString deint0   = GetPreference("pref_deint0");
@@ -1333,13 +1333,13 @@ QString VideoDisplayProfile::toString(void) const
         .arg(renderer).arg(deint0).arg(deint1).arg(cpus);
 }
 
-QList<QPair<QString,QString> > VideoDisplayProfile::GetDeinterlacers(void)
+QList<QPair<QString,QString> > MythVideoProfile::GetDeinterlacers(void)
 {
     InitStatics();
     return s_deinterlacer_options;
 }
 
-void VideoDisplayProfile::InitStatics(bool Reinit /*= false*/)
+void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
 {
     if (Reinit)
     {

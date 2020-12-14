@@ -5,7 +5,7 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "mythplayer.h"
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 #include "osd.h"
 #include "mythuihelper.h"
 #include "decoders/mythcodeccontext.h"

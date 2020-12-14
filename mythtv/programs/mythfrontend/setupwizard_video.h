@@ -2,7 +2,7 @@
 #define VIDEOSETUPWIZARD_H
 
 // Utility headers
-#include <videodisplayprofile.h>
+#include <mythvideoprofile.h>
 
 // libmythui
 #include <mythuibutton.h>

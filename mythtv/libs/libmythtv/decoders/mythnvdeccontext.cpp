@@ -235,7 +235,7 @@ int MythNVDECContext::HwDecoderInit(AVCodecContext *Context)
  * and handle all deinterlacing.
 */
 void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
-                                        VideoDisplayProfile *Profile, bool DoubleRate)
+                                        MythVideoProfile *Profile, bool DoubleRate)
 {
     if (!Context)
         return;

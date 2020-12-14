@@ -61,13 +61,13 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers for %1 %2 (Decoder: %3): '%4'")
         .arg(get_encoding_type(CodecID)).arg(get_decoder_name(CodecID))
         .arg(Decoder).arg(renderers.join(",")));
-    renderers = VideoDisplayProfile::GetFilteredRenderers(Decoder, renderers);
+    renderers = MythVideoProfile::GetFilteredRenderers(Decoder, renderers);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers (filt: %1): %2")
         .arg(Decoder).arg(renderers.join(",")));
 
     QString renderer;
 
-    auto * vprof = new VideoDisplayProfile();
+    auto * vprof = new MythVideoProfile();
 
     if (!renderers.empty())
     {
@@ -86,7 +86,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
     }
 
     if (renderer.isEmpty())
-        renderer = VideoDisplayProfile::GetBestVideoRenderer(renderers);
+        renderer = MythVideoProfile::GetBestVideoRenderer(renderers);
 
     if (renderer.isEmpty())
     {
@@ -144,7 +144,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
             delete video;
             video = nullptr;
         }
-        renderer = VideoDisplayProfile::GetBestVideoRenderer(renderers);
+        renderer = MythVideoProfile::GetBestVideoRenderer(renderers);
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Not compiled with any useable video output method.");

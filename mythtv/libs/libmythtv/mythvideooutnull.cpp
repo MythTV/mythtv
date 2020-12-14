@@ -1,7 +1,6 @@
 // MythTV
 #include "mythlogging.h"
 #include "mythvideooutnull.h"
-#include "videodisplayprofile.h"
 
 // Std
 #include <map>

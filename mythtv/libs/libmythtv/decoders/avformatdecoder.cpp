@@ -30,7 +30,7 @@
 #include "captions/teletextdecoder.h"
 #include "captions/subtitlereader.h"
 #include "interactivetv.h"
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 #include "mythuihelper.h"
 #include "DVD/mythdvdbuffer.h"
 #include "Bluray/mythbdbuffer.h"

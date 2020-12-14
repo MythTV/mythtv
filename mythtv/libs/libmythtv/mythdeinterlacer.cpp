@@ -2,6 +2,7 @@
 #include "config.h"
 #include "mythlogging.h"
 #include "mythavutil.h"
+#include "mythvideoprofile.h"
 #include "mythdeinterlacer.h"
 
 extern "C" {
@@ -67,7 +68,7 @@ MythDeinterlacer::~MythDeinterlacer()
  * Used for preview images.
 */
 void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
-                              VideoDisplayProfile *Profile, bool Force)
+                              MythVideoProfile *Profile, bool Force)
 {
     // nothing to see here
 
@@ -295,7 +296,7 @@ void MythDeinterlacer::Cleanup(void)
 
 ///\brief Initialise deinterlacing using the given MythDeintType
 bool MythDeinterlacer::Initialise(MythVideoFrame *Frame, MythDeintType Deinterlacer,
-                                  bool DoubleRate, bool TopFieldFirst, VideoDisplayProfile *Profile)
+                                  bool DoubleRate, bool TopFieldFirst, MythVideoProfile *Profile)
 {
     auto autofieldorder = m_autoFieldOrder;
     auto lastfieldchange = m_lastFieldChange;

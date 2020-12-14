@@ -123,7 +123,7 @@ static HostTextEditSetting *VAAPIDevice()
             QString device = gCoreContext->GetSetting("VAAPIDevice");
             LOG(VB_GENERAL, LOG_INFO, QString("New VAAPI device (%1) - resetting profiles").arg(device));
             MythVAAPIContext::HaveVAAPI(true);
-            VideoDisplayProfile::InitStatics(true);
+            MythVideoProfile::InitStatics(true);
         });
     return ge;
 }
@@ -689,7 +689,7 @@ static GroupSetting *CategoryOverTimeSettings()
 }
 
 PlaybackProfileItemConfig::PlaybackProfileItemConfig(
-    PlaybackProfileConfig *parent, uint idx, ProfileItem &_item) :
+    PlaybackProfileConfig *parent, uint idx, MythVideoProfileItem &_item) :
     m_item(_item), m_parentConfig(parent), m_index(idx)
 {
     m_widthRange   = new TransTextEditSetting();
@@ -776,7 +776,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_doubleShader->setEnabled(false);
     m_doubleDriver->setEnabled(false);
 
-    QList<QPair<QString,QString> > options = VideoDisplayProfile::GetDeinterlacers();
+    QList<QPair<QString,QString> > options = MythVideoProfile::GetDeinterlacers();
     for (const auto & option : qAsConst(options))
     {
         m_singleDeint->addSelection(option.second, option.first);
@@ -887,9 +887,9 @@ void PlaybackProfileItemConfig::Load(void)
     QString pdoubledeint = m_item.Get("pref_deint1");
     bool    found     = false;
 
-    QString     dech = VideoDisplayProfile::GetDecoderHelp();
-    QStringList decr = VideoDisplayProfile::GetDecoders();
-    QStringList decn = VideoDisplayProfile::GetDecoderNames();
+    QString     dech = MythVideoProfile::GetDecoderHelp();
+    QStringList decr = MythVideoProfile::GetDecoders();
+    QStringList decn = MythVideoProfile::GetDecoderNames();
     QStringList::const_iterator itr = decr.cbegin();
     QStringList::const_iterator itn = decn.cbegin();
     m_decoder->clearSelections();
@@ -900,8 +900,8 @@ void PlaybackProfileItemConfig::Load(void)
         found |= (*itr == pdecoder);
     }
     if (!found && !pdecoder.isEmpty())
-        m_decoder->addSelection(VideoDisplayProfile::GetDecoderName(pdecoder), pdecoder, true);
-    m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(pdecoder));
+        m_decoder->addSelection(MythVideoProfile::GetDecoderName(pdecoder), pdecoder, true);
+    m_decoder->setHelpText(MythVideoProfile::GetDecoderHelp(pdecoder));
 
     if (!pmax_cpus.isEmpty())
         m_maxCpus->setValue(pmax_cpus.toInt());
@@ -978,31 +978,31 @@ void PlaybackProfileItemConfig::framerateChanged(const QString &val)
 void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
 {
     QString     vrenderer = m_vidRend->getValue();
-    QStringList renderers = VideoDisplayProfile::GetVideoRenderers(dec);
+    QStringList renderers = MythVideoProfile::GetVideoRenderers(dec);
 
     QString prenderer;
     for (const auto & rend : qAsConst(renderers))
         prenderer = (rend == vrenderer) ? vrenderer : prenderer;
     if (prenderer.isEmpty())
-        prenderer = VideoDisplayProfile::GetPreferredVideoRenderer(dec);
+        prenderer = MythVideoProfile::GetPreferredVideoRenderer(dec);
 
     m_vidRend->clearSelections();
     for (const auto & rend : qAsConst(renderers))
     {
         if ((!rend.contains("null")))
-            m_vidRend->addSelection(VideoDisplayProfile::GetVideoRendererName(rend),
+            m_vidRend->addSelection(MythVideoProfile::GetVideoRendererName(rend),
                                     rend, (rend == prenderer));
     }
     QString vrenderer2 = m_vidRend->getValue();
     vrenderChanged(vrenderer2);
 
-    m_decoder->setHelpText(VideoDisplayProfile::GetDecoderHelp(dec));
+    m_decoder->setHelpText(MythVideoProfile::GetDecoderHelp(dec));
     InitLabel();
 }
 
 void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
 {
-    m_vidRend->setHelpText(VideoDisplayProfile::GetVideoRendererHelp(renderer));
+    m_vidRend->setHelpText(MythVideoProfile::GetVideoRendererHelp(renderer));
     InitLabel();
 }
 
@@ -1132,9 +1132,9 @@ PlaybackProfileConfig::PlaybackProfileConfig(QString profilename,
     m_profileName(std::move(profilename))
 {
     setVisible(false);
-    m_groupId = VideoDisplayProfile::GetProfileGroupID(
+    m_groupId = MythVideoProfile::GetProfileGroupID(
         m_profileName, gCoreContext->GetHostName());
-    m_items = VideoDisplayProfile::LoadDB(m_groupId);
+    m_items = MythVideoProfile::LoadDB(m_groupId);
     InitUI(parent);
 }
 
@@ -1158,9 +1158,9 @@ void PlaybackProfileItemConfig::InitLabel(void)
         str += " " + tr("framerate") + " " + framerateval;
 
     str += " -> ";
-    str += VideoDisplayProfile::GetDecoderName(m_decoder->getValue());
+    str += MythVideoProfile::GetDecoderName(m_decoder->getValue());
     str += " " + andStr + ' ';
-    str += VideoDisplayProfile::GetVideoRendererName(m_vidRend->getValue());
+    str += MythVideoProfile::GetVideoRendererName(m_vidRend->getValue());
     setLabel(str);
 }
 
@@ -1196,7 +1196,7 @@ void PlaybackProfileConfig::Save(void)
 {
     if (m_markForDeletion->boolValue())
     {
-        VideoDisplayProfile::DeleteProfileGroup(m_profileName,
+        MythVideoProfile::DeleteProfileGroup(m_profileName,
                                                 gCoreContext->GetHostName());
         return;
     }
@@ -1206,7 +1206,7 @@ void PlaybackProfileConfig::Save(void)
         profile->Save();
     }
 
-    bool ok = VideoDisplayProfile::DeleteDB(m_groupId, m_delItems);
+    bool ok = MythVideoProfile::DeleteDB(m_groupId, m_delItems);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -1214,7 +1214,7 @@ void PlaybackProfileConfig::Save(void)
         return;
     }
 
-    ok = VideoDisplayProfile::SaveDB(m_groupId, m_items);
+    ok = MythVideoProfile::SaveDB(m_groupId, m_items);
     if (!ok)
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -1245,7 +1245,7 @@ void PlaybackProfileConfig::AddNewEntry(void)
         profile->Save();
     }
 
-    ProfileItem item;
+    MythVideoProfileItem item;
 
     m_items.push_back(item);
 
@@ -1284,7 +1284,7 @@ void PlaybackProfileConfig::swap(int indexA, int indexB)
     QString pri_i = QString::number(m_items[indexA].GetPriority());
     QString pri_j = QString::number(m_items[indexB].GetPriority());
 
-    ProfileItem item = m_items[indexB];
+    MythVideoProfileItem item = m_items[indexB];
     m_items[indexB] = m_items[indexA];
     m_items[indexA] = item;
 
@@ -1302,14 +1302,14 @@ static HostComboBoxSetting * CurrentPlaybackProfile()
                                     "Current Video Playback Profile"));
 
     QString host = gCoreContext->GetHostName();
-    VideoDisplayProfile::CreateProfiles(host);
-    QStringList profiles = VideoDisplayProfile::GetProfiles(host);
+    MythVideoProfile::CreateProfiles(host);
+    QStringList profiles = MythVideoProfile::GetProfiles(host);
 
-    QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
+    QString profile = MythVideoProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
     {
         profile = (profiles.contains("Normal")) ? "Normal" : profiles[0];
-        VideoDisplayProfile::SetDefaultProfileName(profile, host);
+        MythVideoProfile::SetDefaultProfileName(profile, host);
     }
 
     for (const auto & prof : qAsConst(profiles))
@@ -1344,7 +1344,7 @@ void PlaybackSettings::NewPlaybackProfileSlot() const
 void PlaybackSettings::CreateNewPlaybackProfileSlot(const QString &name)
 {
     QString host = gCoreContext->GetHostName();
-    QStringList not_ok_list = VideoDisplayProfile::GetProfiles(host);
+    QStringList not_ok_list = MythVideoProfile::GetProfiles(host);
 
     if (not_ok_list.contains(name) || name.isEmpty())
     {
@@ -1358,7 +1358,7 @@ void PlaybackSettings::CreateNewPlaybackProfileSlot(const QString &name)
         return;
     }
 
-    VideoDisplayProfile::CreateProfileGroup(name, gCoreContext->GetHostName());
+    MythVideoProfile::CreateProfileGroup(name, gCoreContext->GetHostName());
     m_playbackProfiles->addTargetedChild(name,
         new PlaybackProfileConfig(name, m_playbackProfiles));
 

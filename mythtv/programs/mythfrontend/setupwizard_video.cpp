@@ -90,7 +90,7 @@ VideoSetupWizard::~VideoSetupWizard()
 
 void VideoSetupWizard::loadData(void)
 {
-    QStringList profiles = VideoDisplayProfile::GetProfiles(gCoreContext->GetHostName());
+    QStringList profiles = MythVideoProfile::GetProfiles(gCoreContext->GetHostName());
 
     for (const auto & prof : qAsConst(profiles))
     {
@@ -98,7 +98,7 @@ void VideoSetupWizard::loadData(void)
         item->SetData(prof);
     }
 
-    QString currentpbp = VideoDisplayProfile::GetDefaultProfileName(gCoreContext->GetHostName());
+    QString currentpbp = MythVideoProfile::GetDefaultProfileName(gCoreContext->GetHostName());
     if (!currentpbp.isEmpty())
     {
         MythUIButtonListItem *set =
@@ -130,7 +130,7 @@ void VideoSetupWizard::save(void)
 {
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
-    VideoDisplayProfile::SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
+    MythVideoProfile::SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
 }
 
 void VideoSetupWizard::slotPrevious(void)
@@ -197,11 +197,11 @@ void VideoSetupWizard::playVideoTest(const QString& desc, const QString& title, 
 {
     QString desiredpbp =
         m_playbackProfileButtonList->GetItemCurrent()->GetText();
-    QString currentpbp = VideoDisplayProfile::GetDefaultProfileName(gCoreContext->GetHostName());
+    QString currentpbp = MythVideoProfile::GetDefaultProfileName(gCoreContext->GetHostName());
 
-    VideoDisplayProfile::SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
+    MythVideoProfile::SetDefaultProfileName(desiredpbp, gCoreContext->GetHostName());
     GetMythMainWindow()->HandleMedia("Internal", file, desc, title);
-    VideoDisplayProfile::SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
+    MythVideoProfile::SetDefaultProfileName(currentpbp, gCoreContext->GetHostName());
 }
 
 void VideoSetupWizard::DownloadSample(const QString& url, const QString& dest)

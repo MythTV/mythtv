@@ -21,7 +21,7 @@
 #include "recordingprofile.h"
 #include "recordinginfo.h"
 #include "cardutil.h"
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 
 // TODO convert all dates to UTC
 
@@ -3404,8 +3404,8 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1357")
     {
         // convert old VideoDisplayProfile settings to new format
-        ProfileItem temp;
-        std::vector<ProfileItem> profiles;
+        MythVideoProfileItem temp;
+        std::vector<MythVideoProfileItem> profiles;
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT profileid, value, data FROM displayprofiles "
@@ -3438,7 +3438,7 @@ static bool doUpgradeTVDatabaseSchema(void)
                 profiles.push_back(temp);
             }
 
-            for (const ProfileItem& profile : qAsConst(profiles))
+            for (const MythVideoProfileItem& profile : qAsConst(profiles))
             {
                 QString newdecoder;
                 QString newrender;
@@ -3594,8 +3594,8 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         // missed in 1357 - convert old vdpau and openglvaapi renderers to opengl
         // convert ancient quartz-blit to opengl as well
-        ProfileItem temp;
-        std::vector<ProfileItem> profiles;
+        MythVideoProfileItem temp;
+        std::vector<MythVideoProfileItem> profiles;
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT profileid, value, data FROM displayprofiles "
@@ -3628,7 +3628,7 @@ static bool doUpgradeTVDatabaseSchema(void)
                 profiles.push_back(temp);
             }
 
-            for (const ProfileItem& profile : qAsConst(profiles))
+            for (const MythVideoProfileItem& profile : qAsConst(profiles))
             {
                 // the old deinterlacers will have been converted already
                 QString oldrender  = profile.Get("pref_videorenderer");

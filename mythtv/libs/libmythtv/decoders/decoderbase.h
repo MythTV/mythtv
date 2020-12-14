@@ -12,7 +12,7 @@
 #include "programinfo.h"
 #include "mythcodecid.h"
 #include "mythavutil.h"
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 
 class TeletextViewer;
 class MythPlayer;
@@ -355,7 +355,7 @@ class DecoderBase
     /// language preferences for auto-selection of streams
     std::vector<int>     m_languagePreference;
     MythCodecContext    *m_mythCodecCtx         { nullptr };
-    VideoDisplayProfile  m_videoDisplayProfile;
+    MythVideoProfile     m_videoDisplayProfile;
     const VideoFrameTypes* m_renderFormats { &MythVideoFrame::kDefaultRenderFormats };
 
   private:

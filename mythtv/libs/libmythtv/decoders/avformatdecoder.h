@@ -16,7 +16,6 @@
 #include "spdifencoder.h"
 #include "vbilut.h"
 #include "AVCParser.h"
-#include "videodisplayprofile.h"
 #include "mythcodeccontext.h"
 #include "mythplayer.h"
 

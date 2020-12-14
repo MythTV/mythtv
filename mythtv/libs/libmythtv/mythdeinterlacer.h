@@ -4,12 +4,13 @@
 // MythTV
 #include "videoouttypes.h"
 #include "mythavutil.h"
-#include "videodisplayprofile.h"
 
 extern "C" {
 #include "libavfilter/avfilter.h"
 #include "libswscale/swscale.h"
 }
+
+class MythVideoProfile;
 
 class MythDeinterlacer
 {
@@ -18,12 +19,12 @@ class MythDeinterlacer
    ~MythDeinterlacer();
 
     void             Filter       (MythVideoFrame *Frame, FrameScanType Scan,
-                                   VideoDisplayProfile *Profile, bool Force = false);
+                                   MythVideoProfile *Profile, bool Force = false);
 
   private:
     bool             Initialise   (MythVideoFrame *Frame, MythDeintType Deinterlacer,
                                    bool DoubleRate, bool TopFieldFirst,
-                                   VideoDisplayProfile *Profile);
+                                   MythVideoProfile *Profile);
     inline void      Cleanup      (void);
     void             OneField     (MythVideoFrame *Frame, FrameScanType Scan);
     void             Blend        (MythVideoFrame *Frame, FrameScanType Scan);

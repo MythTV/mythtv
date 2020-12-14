@@ -1,7 +1,7 @@
 // MythTV
 #include "osd.h"
 #include "mythplayer.h"
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 #include "decoderbase.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"

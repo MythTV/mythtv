@@ -8,7 +8,7 @@
 #include "mythconfig.h"
 #include "standardsettings.h"
 #include "mythcontext.h"
-#include "videodisplayprofile.h"
+#include "mythvideoprofile.h"
 
 #include <QMutex>
 
@@ -200,7 +200,7 @@ class PlaybackProfileItemConfig : public GroupSetting
 
   public:
     PlaybackProfileItemConfig(PlaybackProfileConfig *parent, uint idx,
-                              ProfileItem &_item);
+                              MythVideoProfileItem &_item);
 
     void Load(void) override; // StandardSetting
     void Save(void) override; // StandardSetting
@@ -230,7 +230,7 @@ class PlaybackProfileItemConfig : public GroupSetting
     void DoDeleteSlot(bool doDelete);
 
   private:
-    ProfileItem                &m_item;
+    MythVideoProfileItem       &m_item;
     TransTextEditSetting       *m_widthRange   {nullptr};
     TransTextEditSetting       *m_heightRange  {nullptr};
     MythUIComboBoxSetting      *m_codecs       {nullptr};
@@ -272,8 +272,8 @@ class PlaybackProfileConfig : public GroupSetting
 
   private:
     void ReloadSettings(void);
-    std::vector<ProfileItem> m_items;
-    std::vector<ProfileItem> m_delItems;
+    std::vector<MythVideoProfileItem> m_items;
+    std::vector<MythVideoProfileItem> m_delItems;
     QString     m_profileName;
     uint        m_groupId {0};
 
