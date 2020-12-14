@@ -279,7 +279,7 @@ class Scheduler : public MThread, public MythScheduler
 
     QDateTime m_lastPrepareTime;
     // Delay shutdown util this time (ms since epoch);
-    int64_t m_delayShutdownTime        {0};
+    std::chrono::milliseconds m_delayShutdownTime        {0ms};
 
     OpenEndType m_openEnd;
 

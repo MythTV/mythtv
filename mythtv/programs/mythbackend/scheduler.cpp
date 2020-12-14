@@ -485,9 +485,6 @@ bool Scheduler::FillRecordList(void)
  */
 void Scheduler::FillRecordListFromDB(uint recordid)
 {
-    struct timeval fillstart {};
-    struct timeval fillend {};
-
     MSqlQuery query(m_dbConn);
     QString thequery;
     QString where = "";
@@ -529,27 +526,24 @@ void Scheduler::FillRecordListFromDB(uint recordid)
 
     QMutexLocker locker(&m_schedLock);
 
-    gettimeofday(&fillstart, nullptr);
+    auto fillstart = nowAsDuration<std::chrono::microseconds>();
     UpdateMatches(recordid, 0, 0, QDateTime());
-    gettimeofday(&fillend, nullptr);
-    float matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    auto fillend = nowAsDuration<std::chrono::microseconds>();
+    auto matchTime = fillend - fillstart;
 
     LOG(VB_SCHEDULE, LOG_INFO, "CreateTempTables...");
     CreateTempTables();
 
-    gettimeofday(&fillstart, nullptr);
+    fillstart = nowAsDuration<std::chrono::microseconds>();
     LOG(VB_SCHEDULE, LOG_INFO, "UpdateDuplicates...");
     UpdateDuplicates();
-    gettimeofday(&fillend, nullptr);
-    float checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    fillend = nowAsDuration<std::chrono::microseconds>();
+    auto checkTime = fillend - fillstart;
 
-    gettimeofday(&fillstart, nullptr);
+    fillstart = nowAsDuration<std::chrono::microseconds>();
     FillRecordList();
-    gettimeofday(&fillend, nullptr);
-    float placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    fillend = nowAsDuration<std::chrono::microseconds>();
+    auto placeTime = fillend - fillstart;
 
     LOG(VB_SCHEDULE, LOG_INFO, "DeleteTempTables...");
     DeleteTempTables();
@@ -565,10 +559,10 @@ void Scheduler::FillRecordListFromDB(uint recordid)
     QString msg = QString("Speculative scheduled %1 items in %2 "
                           "= %3 match + %4 check + %5 place")
         .arg(m_recList.size())
-        .arg(matchTime + checkTime + placeTime, 0, 'f', 1)
-        .arg(matchTime, 0, 'f', 2)
-        .arg(checkTime, 0, 'f', 2)
-        .arg(placeTime, 0, 'f', 2);
+        .arg(duration_cast<floatsecs>(matchTime + checkTime + placeTime).count(), 0, 'f', 1)
+        .arg(duration_cast<floatsecs>(matchTime).count(), 0, 'f', 2)
+        .arg(duration_cast<floatsecs>(checkTime).count(), 0, 'f', 2)
+        .arg(duration_cast<floatsecs>(placeTime).count(), 0, 'f', 2);
     LOG(VB_GENERAL, LOG_INFO, msg);
 }
 
@@ -2289,10 +2283,7 @@ bool Scheduler::HandleReschedule(void)
     // sure our DB connection is fresh before continuing.
     m_dbConn = MSqlQuery::SchedCon();
 
-    struct timeval fillstart {};
-    struct timeval fillend {};
-
-    gettimeofday(&fillstart, nullptr);
+    auto fillstart = nowAsDuration<std::chrono::microseconds>();
     QString msg;
     bool deleteFuture = false;
     bool runCheck = false;
@@ -2388,28 +2379,25 @@ bool Scheduler::HandleReschedule(void)
             MythDB::DBError("DeleteFuture", query);
     }
 
-    gettimeofday(&fillend, nullptr);
-    float matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    auto fillend = nowAsDuration<std::chrono::microseconds>();
+    auto matchTime = fillend - fillstart;
 
     LOG(VB_SCHEDULE, LOG_INFO, "CreateTempTables...");
     CreateTempTables();
 
-    gettimeofday(&fillstart, nullptr);
+    fillstart = nowAsDuration<std::chrono::microseconds>();
     if (runCheck)
     {
         LOG(VB_SCHEDULE, LOG_INFO, "UpdateDuplicates...");
         UpdateDuplicates();
     }
-    gettimeofday(&fillend, nullptr);
-    float checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    fillend = nowAsDuration<std::chrono::microseconds>();
+    auto checkTime = fillend - fillstart;
 
-    gettimeofday(&fillstart, nullptr);
+    fillstart = nowAsDuration<std::chrono::microseconds>();
     bool worklistused = FillRecordList();
-    gettimeofday(&fillend, nullptr);
-    float placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    fillend = nowAsDuration<std::chrono::microseconds>();
+    auto placeTime = fillend - fillstart;
 
     LOG(VB_SCHEDULE, LOG_INFO, "DeleteTempTables...");
     DeleteTempTables();
@@ -2429,10 +2417,10 @@ bool Scheduler::HandleReschedule(void)
     msg = QString("Scheduled %1 items in %2 "
                   "= %3 match + %4 check + %5 place")
         .arg(m_recList.size())
-        .arg(matchTime + checkTime + placeTime, 0, 'f', 1)
-        .arg(matchTime, 0, 'f', 2)
-        .arg(checkTime, 0, 'f', 2)
-        .arg(placeTime, 0, 'f', 2);
+        .arg(duration_cast<floatsecs>(matchTime + checkTime + placeTime).count(), 0, 'f', 1)
+        .arg(duration_cast<floatsecs>(matchTime).count(), 0, 'f', 2)
+        .arg(duration_cast<floatsecs>(checkTime).count(), 0, 'f', 2)
+        .arg(duration_cast<floatsecs>(placeTime).count(), 0, 'f', 2);
     LOG(VB_GENERAL, LOG_INFO, msg);
 
     // Write changed entries to oldrecorded.
@@ -3040,7 +3028,7 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
 // Called to delay shutdown for 5 minutes
 void Scheduler::DelayShutdown()
 {
-    m_delayShutdownTime = QDateTime::currentMSecsSinceEpoch() + 5*60*1000;
+    m_delayShutdownTime = nowAsDuration<std::chrono::milliseconds>() + 5min;
 }
 
 void Scheduler::HandleIdleShutdown(
@@ -3082,7 +3070,7 @@ void Scheduler::HandleIdleShutdown(
     else
     {
         // Check for delay shutdown request
-        bool delay = (m_delayShutdownTime > QDateTime::currentMSecsSinceEpoch());
+        bool delay = (m_delayShutdownTime > nowAsDuration<std::chrono::milliseconds>());
 
         QDateTime curtime = MythDate::current();
 
@@ -3957,9 +3945,6 @@ static QString progfindid = QString(
 void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
                               const QDateTime &maxstarttime)
 {
-    struct timeval dbstart {};
-    struct timeval dbend {};
-
     MSqlQuery query(m_dbConn);
     MSqlBindings bindings;
     QString deleteClause;
@@ -4098,7 +4083,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query %1...")
                 .arg(clause));
 
-        gettimeofday(&dbstart, nullptr);
+        auto dbstart = nowAsDuration<std::chrono::microseconds>();
         MSqlQuery result(m_dbConn);
         result.prepare(query2);
 
@@ -4109,7 +4094,8 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         }
 
         bool ok = result.exec();
-        gettimeofday(&dbend, nullptr);
+        auto dbend = nowAsDuration<std::chrono::microseconds>();
+        auto dbTime = dbend - dbstart;
 
         if (!ok)
         {
@@ -4119,8 +4105,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
 
         LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- %1 results in %2 sec.")
                 .arg(result.size())
-                .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
-                      (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
+                .arg(duration_cast<std::chrono::seconds>(dbTime).count()));
 
     }
 
@@ -4305,9 +4290,6 @@ void Scheduler::AddNewRecords(void)
     if (schedTmpRecord == "record")
         schedTmpRecord = "sched_temp_record";
 
-    struct timeval dbstart {};
-    struct timeval dbend {};
-
     RecList tmpList;
 
     QMap<int, bool> cardMap;
@@ -4491,20 +4473,20 @@ void Scheduler::AddNewRecords(void)
 
     LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query..."));
 
-    gettimeofday(&dbstart, nullptr);
+    auto dbstart = nowAsDuration<std::chrono::microseconds>();
     result.prepare(query);
     if (!result.exec())
     {
         MythDB::DBError("AddNewRecords", result);
         return;
     }
-    gettimeofday(&dbend, nullptr);
+    auto dbend = nowAsDuration<std::chrono::microseconds>();
+    auto dbTime = dbend - dbstart;
 
     LOG(VB_SCHEDULE, LOG_INFO,
         QString(" |-- %1 results in %2 sec. Processing...")
             .arg(result.size())
-            .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
-                  (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
+            .arg(duration_cast<std::chrono::seconds>(dbTime).count()));
 
     RecordingInfo *lastp = nullptr;
 
@@ -4725,8 +4707,6 @@ void Scheduler::AddNewRecords(void)
 
 void Scheduler::AddNotListed(void) {
 
-    struct timeval dbstart {};
-    struct timeval dbend {};
     RecList tmpList;
 
     QString query = QString(
@@ -4757,11 +4737,12 @@ void Scheduler::AddNotListed(void) {
 
     LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query..."));
 
-    gettimeofday(&dbstart, nullptr);
+    auto dbstart = nowAsDuration<std::chrono::microseconds>();
     MSqlQuery result(m_dbConn);
     result.prepare(query);
     bool ok = result.exec();
-    gettimeofday(&dbend, nullptr);
+    auto dbend = nowAsDuration<std::chrono::microseconds>();
+    auto dbTime = dbend - dbstart;
 
     if (!ok)
     {
@@ -4772,8 +4753,7 @@ void Scheduler::AddNotListed(void) {
     LOG(VB_SCHEDULE, LOG_INFO,
         QString(" |-- %1 results in %2 sec. Processing...")
             .arg(result.size())
-            .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
-                  (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
+            .arg(duration_cast<std::chrono::seconds>(dbTime).count()));
 
     while (result.next())
     {
@@ -5130,7 +5110,8 @@ int Scheduler::FillRecordingDir(
                                         : (int)(-1.99 * weightPerRecording));
     int remoteStartingWeight =
             gCoreContext->GetNumSetting("SGweightRemoteStarting", 0);
-    int maxOverlap = gCoreContext->GetNumSetting("SGmaxRecOverlapMins", 3) * 60;
+    std::chrono::seconds maxOverlap =
+        gCoreContext->GetDurSetting<std::chrono::minutes>("SGmaxRecOverlapMins", 3min);
 
     FillDirectoryInfoCache();
 
@@ -5229,7 +5210,7 @@ int Scheduler::FillRecordingDir(
 
                     if (recUsage == kRecorderInUseID)
                     {
-                        if (recEnd > recstartts.addSecs(maxOverlap))
+                        if (recEnd > recstartts.addSecs(maxOverlap.count()))
                         {
                             weightOffset += weightPerRecording;
                             recsCounted << QString::number(recChanid) + ":" +
