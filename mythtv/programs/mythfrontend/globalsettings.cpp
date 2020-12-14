@@ -812,21 +812,21 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     addChild(m_doubleDriver);
 
     connect(m_widthRange, qOverload<const QString&>(&StandardSetting::valueChanged),
-            this,    &PlaybackProfileItemConfig::widthChanged);
+            this, &PlaybackProfileItemConfig::widthChanged);
     connect(m_heightRange, qOverload<const QString&>(&StandardSetting::valueChanged),
-            this,    &PlaybackProfileItemConfig::heightChanged);
+            this, &PlaybackProfileItemConfig::heightChanged);
     connect(m_codecs, qOverload<const QString&>(&StandardSetting::valueChanged),
-            this,    &PlaybackProfileItemConfig::InitLabel);
+            this, &PlaybackProfileItemConfig::InitLabel);
     connect(m_framerate, qOverload<const QString&>(&StandardSetting::valueChanged),
-            this,    &PlaybackProfileItemConfig::framerateChanged);
+            this, &PlaybackProfileItemConfig::framerateChanged);
     connect(m_decoder, qOverload<const QString&>(&StandardSetting::valueChanged),
-            this,    &PlaybackProfileItemConfig::decoderChanged);
+            this, &PlaybackProfileItemConfig::decoderChanged);
     connect(m_vidRend, qOverload<const QString&>(&StandardSetting::valueChanged),
-            this,    &PlaybackProfileItemConfig::vrenderChanged);
+            this, &PlaybackProfileItemConfig::vrenderChanged);
     connect(m_singleDeint, qOverload<const QString&>(&StandardSetting::valueChanged),
-            this,    &PlaybackProfileItemConfig::SingleQualityChanged);
+            this, &PlaybackProfileItemConfig::SingleQualityChanged);
     connect(m_doubleDeint, qOverload<const QString&>(&StandardSetting::valueChanged),
-            this,    &PlaybackProfileItemConfig::DoubleQualityChanged);
+            this, &PlaybackProfileItemConfig::DoubleQualityChanged);
 }
 
 uint PlaybackProfileItemConfig::GetIndex(void) const
@@ -843,7 +843,7 @@ void PlaybackProfileItemConfig::Load(void)
     // and cond_height
     for (uint i = 0; i < 2; ++i)
     {
-        QString     pcmp  = m_item.Get(QString("pref_cmp%1").arg(i));
+        QString pcmp  = m_item.Get(QString("pref_cmp%1").arg(i));
         if (pcmp == "> 0 0")
             continue;
         QStringList clist = pcmp.split(" ");
@@ -859,14 +859,14 @@ void PlaybackProfileItemConfig::Load(void)
         height_value.append(clist[0]+clist[2]);
     }
 
-    QString tmp = m_item.Get("cond_width").trimmed();
+    QString tmp = m_item.Get(COND_WIDTH).trimmed();
     if (!tmp.isEmpty())
     {
         if (!width_value.isEmpty())
             width_value.append("&");
         width_value.append(tmp);
     }
-    tmp = m_item.Get("cond_height").trimmed();
+    tmp = m_item.Get(COND_HEIGHT).trimmed();
     if (!tmp.isEmpty())
     {
         if (!height_value.isEmpty())
@@ -876,15 +876,15 @@ void PlaybackProfileItemConfig::Load(void)
 
     m_widthRange->setValue(width_value);
     m_heightRange->setValue(height_value);
-    m_codecs->setValue(m_item.Get("cond_codecs"));
-    m_framerate->setValue(m_item.Get("cond_framerate"));
+    m_codecs->setValue(m_item.Get(COND_CODECS));
+    m_framerate->setValue(m_item.Get(COND_RATE));
 
-    QString pdecoder  = m_item.Get("pref_decoder");
-    QString pmax_cpus = m_item.Get("pref_max_cpus");
-    QString pskiploop = m_item.Get("pref_skiploop");
-    QString prenderer = m_item.Get("pref_videorenderer");
-    QString psingledeint = m_item.Get("pref_deint0");
-    QString pdoubledeint = m_item.Get("pref_deint1");
+    QString pdecoder  = m_item.Get(PREF_DEC);
+    QString pmax_cpus = m_item.Get(PREF_CPUS);
+    QString pskiploop = m_item.Get(PREF_LOOP);
+    QString prenderer = m_item.Get(PREF_RENDER);
+    QString psingledeint = m_item.Get(PREF_DEINT1X);
+    QString pdoubledeint = m_item.Get(PREF_DEINT2X);
     bool    found     = false;
 
     QString     dech = MythVideoProfile::GetDecoderHelp();
@@ -919,26 +919,26 @@ void PlaybackProfileItemConfig::Load(void)
 
 void PlaybackProfileItemConfig::Save(void)
 {
-    m_item.Set("pref_cmp0",          QString());
-    m_item.Set("pref_cmp1",          QString());
-    m_item.Set("cond_width",         m_widthRange->getValue());
-    m_item.Set("cond_height",        m_heightRange->getValue());
-    m_item.Set("cond_codecs",        m_codecs->getValue());
-    m_item.Set("cond_framerate",     m_framerate->getValue());
-    m_item.Set("pref_decoder",       m_decoder->getValue());
-    m_item.Set("pref_max_cpus",      m_maxCpus->getValue());
-    m_item.Set("pref_skiploop",      (m_skipLoop->boolValue()) ? "1" : "0");
-    m_item.Set("pref_videorenderer", m_vidRend->getValue());
-    m_item.Set("pref_deint0", GetQuality(m_singleDeint, m_singleShader, m_singleDriver));
-    m_item.Set("pref_deint1", GetQuality(m_doubleDeint, m_doubleShader, m_doubleDriver));
+    m_item.Set("pref_cmp0",  QString());
+    m_item.Set("pref_cmp1",  QString());
+    m_item.Set(COND_WIDTH,   m_widthRange->getValue());
+    m_item.Set(COND_HEIGHT,  m_heightRange->getValue());
+    m_item.Set(COND_CODECS,  m_codecs->getValue());
+    m_item.Set(COND_RATE,    m_framerate->getValue());
+    m_item.Set(PREF_DEC,     m_decoder->getValue());
+    m_item.Set(PREF_CPUS,    m_maxCpus->getValue());
+    m_item.Set(PREF_LOOP,   (m_skipLoop->boolValue()) ? "1" : "0");
+    m_item.Set(PREF_RENDER,  m_vidRend->getValue());
+    m_item.Set(PREF_DEINT1X, GetQuality(m_singleDeint, m_singleShader, m_singleDriver));
+    m_item.Set(PREF_DEINT2X, GetQuality(m_doubleDeint, m_doubleShader, m_doubleDriver));
 }
 
 void PlaybackProfileItemConfig::widthChanged(const QString &val)
 {
     bool ok = true;
-    QString oldvalue = m_item.Get("cond_width");
-    m_item.Set("cond_width",val);
-    m_item.CheckRange("cond_width", 640, &ok);
+    QString oldvalue = m_item.Get(COND_WIDTH);
+    m_item.Set(COND_WIDTH, val);
+    m_item.CheckRange(COND_WIDTH, 640, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid width specification(%1), discarded").arg(val));
@@ -950,9 +950,9 @@ void PlaybackProfileItemConfig::widthChanged(const QString &val)
 void PlaybackProfileItemConfig::heightChanged(const QString &val)
 {
     bool ok = true;
-    QString oldvalue = m_item.Get("cond_height");
-    m_item.Set("cond_height",val);
-    m_item.CheckRange("cond_height", 480, &ok);
+    QString oldvalue = m_item.Get(COND_HEIGHT);
+    m_item.Set(COND_HEIGHT,val);
+    m_item.CheckRange(COND_HEIGHT, 480, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid height specification(%1), discarded").arg(val));
@@ -964,9 +964,9 @@ void PlaybackProfileItemConfig::heightChanged(const QString &val)
 void PlaybackProfileItemConfig::framerateChanged(const QString &val)
 {
     bool ok = true;
-    QString oldvalue = m_item.Get("cond_framerate");
-    m_item.Set("cond_framerate",val);
-    m_item.CheckRange("cond_framerate", 25.0F, &ok);
+    QString oldvalue = m_item.Get(COND_RATE);
+    m_item.Set(COND_RATE,val);
+    m_item.CheckRange(COND_RATE, 25.0F, &ok);
     if (!ok)
     {
         ShowOkPopup(tr("Invalid frame rate specification(%1), discarded").arg(val));

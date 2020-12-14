@@ -23,6 +23,19 @@
 #define UPSCALE_DEFAULT QString("bilinear")
 #define UPSCALE_HQ1     QString("bicubic")
 
+#define COND_WIDTH    "cond_width"
+#define COND_HEIGHT   "cond_height"
+#define COND_RATE     "cond_framerate"
+#define COND_CODECS   "cond_codecs"
+#define PREF_DEC      "pref_decoder"
+#define PREF_CPUS     "pref_max_cpus"
+#define PREF_LOOP     "pref_skiploop"
+#define PREF_RENDER   "pref_videorenderer"
+#define PREF_DEINT1X  "pref_deint0"
+#define PREF_DEINT2X  "pref_deint1"
+#define PREF_PRIORITY "pref_priority"
+#define PREF_UPSCALE  "pref_upscale"
+
 #define VIDEO_MAX_CPUS (16U)
 
 struct RenderOptions
