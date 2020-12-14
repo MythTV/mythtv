@@ -67,7 +67,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
 
     QString renderer;
 
-    auto * vprof = new MythVideoProfile();
+    auto vprof = std::shared_ptr<MythVideoProfile>(new MythVideoProfile());
 
     if (!renderers.empty())
     {
@@ -130,7 +130,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
 
         if (video)
         {
-            video->m_dbDisplayProfile = vprof;
+            video->m_videoProfile = vprof;
             video->SetVideoFrameRate(FrameRate);
             video->SetReferenceFrames(ReferenceFrames);
             if (video->Init(VideoDim, VideoDispDim, VideoAspect, MainWindow->GetUIScreenRect(), CodecID))
@@ -140,7 +140,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
                 return video;
             }
 
-            video->m_dbDisplayProfile = nullptr;
+            video->m_videoProfile = nullptr;
             delete video;
             video = nullptr;
         }
@@ -148,7 +148,6 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
     }
 
     LOG(VB_GENERAL, LOG_ERR, LOC + "Not compiled with any useable video output method.");
-    delete vprof;
     return nullptr;
 }
 
@@ -217,15 +216,15 @@ void MythVideoOutputGPU::WindowResized(const QSize Size)
 
 void MythVideoOutputGPU::SetVideoFrameRate(float NewRate)
 {
-    if (!m_dbDisplayProfile)
+    if (!m_videoProfile)
         return;
 
-    if (qFuzzyCompare(m_dbDisplayProfile->GetOutput() + 1.0F, NewRate + 1.0F))
+    if (qFuzzyCompare(m_videoProfile->GetOutput() + 1.0F, NewRate + 1.0F))
         return;
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Video frame rate changed: %1->%2")
-        .arg(static_cast<double>(m_dbDisplayProfile->GetOutput())).arg(static_cast<double>(NewRate)));
-    m_dbDisplayProfile->SetOutput(NewRate);
+        .arg(static_cast<double>(m_videoProfile->GetOutput())).arg(static_cast<double>(NewRate)));
+    m_videoProfile->SetOutput(NewRate);
     m_newFrameRate = true;
 }
 
@@ -242,8 +241,8 @@ bool MythVideoOutputGPU::Init(const QSize VideoDim, const QSize VideoDispDim,
         return false;
 
     // Ensure any new profile preferences are handled after a stream change
-    if (m_dbDisplayProfile)
-        m_video->SetProfile(m_dbDisplayProfile->GetVideoRenderer());
+    if (m_videoProfile)
+        m_video->SetProfile(m_videoProfile->GetVideoRenderer());
 
     // Set default support for picture attributes
     InitPictureAttributes();
@@ -459,8 +458,8 @@ bool MythVideoOutputGPU::ProcessInputChange()
         QString codecName;
         if (codec)
             codecName = codec->name;
-        if (m_dbDisplayProfile)
-            m_dbDisplayProfile->SetInput(GetVideoDispDim(), 0 , codecName);
+        if (m_videoProfile)
+            m_videoProfile->SetInput(GetVideoDispDim(), 0 , codecName);
         bool ok = Init(m_newVideoDim, m_newVideoDispDim, m_newAspect, GetRawWindowRect(), m_newCodecId);
         m_newCodecId = kCodec_NONE;
         m_newVideoDim = QSize();
@@ -541,7 +540,7 @@ void MythVideoOutputGPU::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
             return;
 
         // software deinterlacing
-        m_deinterlacer.Filter(Frame, Scan, m_dbDisplayProfile);
+        m_deinterlacer.Filter(Frame, Scan, m_videoProfile.get());
 
         // update software textures
         if (m_video)
@@ -611,7 +610,7 @@ void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanTyp
         else
         {
             Scan = (is_interlaced(Scan) && !used->m_alreadyDeinterlaced) ? kScan_Interlaced : kScan_Progressive;
-            m_deinterlacer.Filter(used, Scan, m_dbDisplayProfile, true);
+            m_deinterlacer.Filter(used, Scan, m_videoProfile.get(), true);
             if (m_video)
                 m_video->PrepareFrame(used, Scan);
         }
@@ -666,7 +665,7 @@ void MythVideoOutputGPU::ResizeForVideo(QSize Size)
             return;
     }
 
-    float rate = m_dbDisplayProfile ? m_dbDisplayProfile->GetOutput() : 0.0F;
+    float rate = m_videoProfile ? m_videoProfile->GetOutput() : 0.0F;
 
     bool hide = m_display->NextModeIsLarger(Size);
     MythMainWindow* window = GetMythMainWindow();

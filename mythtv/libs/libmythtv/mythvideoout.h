@@ -27,6 +27,8 @@ class AudioPlayer;
 class MythRender;
 class MythPainter;
 
+using MythVideoProfilePtr = std::shared_ptr<MythVideoProfile>;
+
 class MythVideoOutput : public MythVideoBounds
 {
     Q_OBJECT
@@ -93,7 +95,7 @@ class MythVideoOutput : public MythVideoBounds
     LetterBoxColour      m_dbLetterboxColour  { kLetterBoxColour_Black };
     MythCodecID          m_videoCodecID       { kCodec_NONE };
     int                  m_maxReferenceFrames { 16 };
-    MythVideoProfile*    m_dbDisplayProfile   { nullptr };
+    MythVideoProfilePtr  m_videoProfile       { nullptr };
     VideoBuffers         m_videoBuffers;
     VideoErrorState      m_errorState         { kError_None };
     long long            m_framesPlayed       { 0 };
