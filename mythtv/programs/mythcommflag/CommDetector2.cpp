@@ -265,9 +265,10 @@ QString frameToTimestampms(long long frameno, float fps)
 
 QString strftimeval(std::chrono::microseconds usecs)
 {
+    auto msecs = duration_cast<std::chrono::milliseconds>(usecs);
     return QString("%1.%2")
         .arg(duration_cast<std::chrono::seconds>(usecs).count())
-        .arg((usecs % 1s).count(), 6, 10, QChar(QChar('0')));
+        .arg((msecs % 1s).count(), 3, 10, QChar(QChar('0')));
 }
 
 };  /* namespace */
