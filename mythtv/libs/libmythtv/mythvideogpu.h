@@ -10,6 +10,9 @@
 #include "mythframe.h"
 #include "mythvideocolourspace.h"
 
+// Std
+#include <memory>
+
 class MythVideoBounds;
 class MythVideoProfile;
 using MythVideoProfilePtr = std::shared_ptr<MythVideoProfile>;
