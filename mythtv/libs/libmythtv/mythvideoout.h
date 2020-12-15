@@ -21,6 +21,9 @@
 #include "mythavutil.h"
 #include "mythdeinterlacer.h"
 
+// Std
+#include <memory>
+
 class MythPlayer;
 class OSD;
 class AudioPlayer;
