@@ -124,14 +124,6 @@ MythVideoOutput::MythVideoOutput()
 }
 
 /**
- * \fn VideoOutput::~VideoOutput()
- * \brief Shuts down video output.
- */
-MythVideoOutput::~MythVideoOutput()
-{
-}
-
-/**
  * \fn VideoOutput::Init(int,int,float,WId,int,int,int,int,WId)
  * \brief Performs most of the initialization for VideoOutput.
  * \return true if successful, false otherwise.

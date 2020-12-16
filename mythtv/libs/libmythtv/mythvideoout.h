@@ -39,7 +39,7 @@ class MythVideoOutput : public MythVideoBounds
   public:
     static void GetRenderOptions(RenderOptions& Options);
 
-    ~MythVideoOutput() override;
+    ~MythVideoOutput() override = default;
 
     virtual bool Init(QSize VideoDim, QSize VideoDispDim,
                       float VideoAspect, QRect WindowRect, MythCodecID CodecID);
