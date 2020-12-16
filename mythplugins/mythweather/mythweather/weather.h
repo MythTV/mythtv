@@ -54,7 +54,7 @@ class Weather : public MythScreenType
     MythScreenStack *m_weatherStack {nullptr};
 
     bool    m_firstRun              {true};
-    int     m_nextpageInterval      {10};
+    std::chrono::seconds  m_nextpageInterval {10s};
 
     QTimer *m_nextPageTimer         {nullptr};
 
