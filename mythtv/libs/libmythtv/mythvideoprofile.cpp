@@ -1302,7 +1302,7 @@ QString MythVideoProfile::toString() const
 
 const QList<QPair<QString, QString> > MythVideoProfile::GetDeinterlacers()
 {
-    static QList<QPair<QString,QString> > s_deinterlacerOptions =
+    static const QList<QPair<QString,QString> > s_deinterlacerOptions =
     {
         { DEINT_QUALITY_NONE,   tr("None") },
         { DEINT_QUALITY_LOW,    tr("Low quality") },
