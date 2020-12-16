@@ -1383,7 +1383,7 @@ int Playlist::CreateCDMP3(void)
     m_proc->Run();
 
     while( m_procExitVal == GENERIC_EXIT_RUNNING )
-        usleep( 100000 );
+        usleep( 100ms );
 
     uint retval = m_procExitVal;
 
@@ -1432,7 +1432,7 @@ int Playlist::CreateCDMP3(void)
         m_proc->Run();
 
         while( m_procExitVal == GENERIC_EXIT_RUNNING )
-            usleep( 100000 );
+            usleep( 100ms );
 
         retval = m_procExitVal;
 

@@ -1130,7 +1130,7 @@ void MusicCommon::seek(std::chrono::seconds pos)
             decoder->unlock();
         }
 
-        gPlayer->getOutput()->SetTimecode(std::chrono::milliseconds(pos*1000));
+        gPlayer->getOutput()->SetTimecode(pos);
 
         if (!gPlayer->isPlaying())
         {
@@ -2646,7 +2646,7 @@ void MusicCommon::playFirstTrack()
 //---------------------------------------------------------
 // MythMusicVolumeDialog
 //---------------------------------------------------------
-#define MUSICVOLUMEPOPUPTIME (4 * 1000)
+static constexpr std::chrono::milliseconds MUSICVOLUMEPOPUPTIME { 4s };
 
 MythMusicVolumeDialog::~MythMusicVolumeDialog(void)
 {

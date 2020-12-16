@@ -125,7 +125,7 @@ void VisualizerView::showTrackInfoPopup(void)
 //---------------------------------------------------------
 // TrackInfoPopup
 //---------------------------------------------------------
-#define MUSICINFOPOPUPTIME (8 * 1000)
+static constexpr std::chrono::seconds MUSICINFOPOPUPTIME { 8s };
 
 TrackInfoPopup::~TrackInfoPopup(void)
 {
