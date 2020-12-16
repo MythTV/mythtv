@@ -38,7 +38,7 @@ class MythVideoGPU : public QObject
     static QString VideoResizeToString(VideoResizing Resize);
 
     MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,
-                 MythVideoBounds* Bounds, MythVideoProfilePtr VideoProfile, QString Profile);
+                 MythVideoBounds* Bounds, const MythVideoProfilePtr& VideoProfile, QString Profile);
    ~MythVideoGPU() override;
 
     virtual void StartFrame        () = 0;

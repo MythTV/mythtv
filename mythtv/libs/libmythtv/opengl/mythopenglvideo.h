@@ -39,7 +39,7 @@ class MythOpenGLVideo : public MythVideoGPU
     static QString        TypeToProfile(VideoFrameType Type);
 
     MythOpenGLVideo(MythRenderOpenGL* Render, MythVideoColourSpace* ColourSpace,
-                    MythVideoBounds* Bounds, MythVideoProfilePtr VideoProfile, const QString &Profile);
+                    MythVideoBounds* Bounds, const MythVideoProfilePtr& VideoProfile, const QString &Profile);
     ~MythOpenGLVideo() override;
 
     void    StartFrame       () override {}

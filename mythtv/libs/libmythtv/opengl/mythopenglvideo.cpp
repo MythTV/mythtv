@@ -32,7 +32,7 @@ extern "C" {
  * state. Its role is to render video frames on screen.
 */
 MythOpenGLVideo::MythOpenGLVideo(MythRenderOpenGL* Render, MythVideoColourSpace* ColourSpace,
-                                 MythVideoBounds* Bounds, MythVideoProfilePtr VideoProfile, const QString& Profile)
+                                 MythVideoBounds* Bounds, const MythVideoProfilePtr& VideoProfile, const QString& Profile)
   : MythVideoGPU(Render, ColourSpace, Bounds, VideoProfile, Profile),
     m_openglRender(Render)
 {

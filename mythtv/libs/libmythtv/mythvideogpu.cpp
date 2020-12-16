@@ -7,7 +7,7 @@
 #define LOC QString("VideoGPU: ")
 
 MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace,
-                           MythVideoBounds* Bounds, MythVideoProfilePtr VideoProfile,
+                           MythVideoBounds* Bounds, const MythVideoProfilePtr &VideoProfile,
                            QString Profile)
   : m_render(Render),
     m_profile(std::move(Profile)),

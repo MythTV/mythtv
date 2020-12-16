@@ -13,7 +13,7 @@
 #define LOC QString("VulkanVideo: ")
 
 MythVideoVulkan::MythVideoVulkan(MythVulkanObject *Vulkan, MythVideoColourSpace* ColourSpace,
-                                 MythVideoBounds* Bounds, MythVideoProfilePtr VideoProfile, const QString& Profile)
+                                 MythVideoBounds* Bounds, const MythVideoProfilePtr& VideoProfile, const QString& Profile)
   : MythVideoGPU(Vulkan->Render(), ColourSpace, Bounds, VideoProfile, Profile),
     MythVulkanObject(Vulkan)
 {

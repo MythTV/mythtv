@@ -41,7 +41,7 @@ QStringList MythVideoOutputVulkan::GetAllowedRenderers(MythCodecID CodecId)
     return allowed;
 }
 
-MythVideoOutputVulkan::MythVideoOutputVulkan(MythVideoProfilePtr VideoProfile, QString &Profile)
+MythVideoOutputVulkan::MythVideoOutputVulkan(const MythVideoProfilePtr& VideoProfile, QString &Profile)
   : MythVideoOutputGPU(MythRenderVulkan::GetVulkanRender(), VideoProfile, Profile),
     MythVulkanObject(MythRenderVulkan::GetVulkanRender())
 {
