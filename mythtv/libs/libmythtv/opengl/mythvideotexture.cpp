@@ -577,43 +577,6 @@ inline bool MythVideoTexture::CreateBuffer(MythVideoTexture *Texture, int Size)
     return false;
 }
 
-MythVideoTexture* MythVideoTexture::CreateHelperTexture(MythRenderOpenGL *Context)
-{
-    if (!Context)
-        return nullptr;
-
-    OpenGLLocker locker(Context);
-
-    int width = Context->GetMaxTextureSize();
-    MythVideoTexture *texture = CreateTexture(Context, QSize(width, 1),
-                                              QOpenGLTexture::Target2D,
-                                              QOpenGLTexture::Float32,
-                                              QOpenGLTexture::RGBA,
-                                              QOpenGLTexture::RGBA16_UNorm,
-                                              QOpenGLTexture::Linear,
-                                              QOpenGLTexture::Repeat);
-
-    float *buf = nullptr;
-    buf = new float[texture->m_bufferSize];
-    float *ref = buf;
-
-    for (int i = 0; i < width; i++)
-    {
-        float x = (i + 0.5F) / static_cast<float>(width);
-        StoreBicubicWeights(x, ref);
-        ref += 4;
-    }
-    StoreBicubicWeights(0, buf);
-    StoreBicubicWeights(1, &buf[(width - 1) << 2]);
-
-    texture->m_texture->bind();
-    texture->m_texture->setData(texture->m_pixelFormat, texture->m_pixelType, buf);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC +
-        QString("Created bicubic helper texture (%1 samples)") .arg(width));
-    delete [] buf;
-    return texture;
-}
-
 void MythVideoTexture::StoreBicubicWeights(float X, float *Dest)
 {
     float w0 = (((-1 * X + 3) * X - 3) * X + 1) / 6;

@@ -25,7 +25,6 @@ class MythVideoTexture : public MythGLTexture
                                                     VideoFrameType Format,
                                                     std::vector<QSize> Sizes,
                                                     GLenum Target = QOpenGLTexture::Target2D);
-    static MythVideoTexture* CreateHelperTexture(MythRenderOpenGL *Context);
     static void UpdateTextures(MythRenderOpenGL* Context, const MythVideoFrame *Frame,
                                const std::vector<MythVideoTexture*> &Textures);
     static void DeleteTexture (MythRenderOpenGL* Context, MythVideoTexture *Texture);
