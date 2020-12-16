@@ -67,7 +67,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
 
     QString renderer;
 
-    auto videoprofile = std::shared_ptr<MythVideoProfile>(new MythVideoProfile());
+    auto videoprofile = std::make_shared<MythVideoProfile>();
 
     if (!renderers.empty())
     {
@@ -164,7 +164,7 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, MythVideoProfilePtr V
   : m_render(Render),
     m_profile(std::move(Profile))
 {
-    m_videoProfile = VideoProfile;
+    m_videoProfile = std::move(VideoProfile);
 
     if (m_render)
         m_render->IncrRef();
