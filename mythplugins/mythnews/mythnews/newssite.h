@@ -88,7 +88,7 @@ class NewsSite : public QObject
     QDateTime lastUpdated(void) const;
     QString   imageURL(void) const;
     bool      podcast(void) const;
-    unsigned int timeSinceLastUpdate(void) const; // in minutes
+    std::chrono::minutes timeSinceLastUpdate(void) const;
 
     void insertNewsArticle(const NewsArticle &item);
     void clearNewsArticles(void);

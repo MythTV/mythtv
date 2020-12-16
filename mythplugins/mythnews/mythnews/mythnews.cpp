@@ -42,7 +42,7 @@
 MythNews::MythNews(MythScreenStack *parent, const QString &name) :
     MythScreenType(parent, name),
     m_retrieveTimer(new QTimer(this)),
-    m_updateFreq(gCoreContext->GetNumSetting("NewsUpdateFrequency", 30)),
+    m_updateFreq(gCoreContext->GetDurSetting<std::chrono::minutes>("NewsUpdateFrequency", 30min)),
     m_zoom(gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0")),
     m_browser(gCoreContext->GetSetting("WebBrowserCommand", ""))
 {
