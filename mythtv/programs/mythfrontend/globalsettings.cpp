@@ -1256,7 +1256,7 @@ void PlaybackProfileConfig::AddNewEntry(void)
 {
     for (PlaybackProfileItemConfig *profile : qAsConst(m_profiles))
         profile->Save();
-    m_items.push_back(MythVideoProfileItem {});
+    m_items.emplace_back(MythVideoProfileItem {});
     ReloadSettings();
 }
 
