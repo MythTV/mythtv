@@ -153,6 +153,8 @@ class DTVTunerType : public DTVParamHelper
 
     QString toString() const { return toString(m_value); }
 
+    uint toUInt() const { return static_cast<uint>(m_value); }
+
     static void initStr(void);
     static QString toString(int _value);
 };

@@ -117,7 +117,7 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
   public:
     ScanDTVTransport() = default;
     ScanDTVTransport(const DTVMultiplex &mplex, DTVTunerType tt, uint cid) :
-        DTVMultiplex(mplex), m_tuner_type(tt), m_cardid(cid) { }
+        DTVMultiplex(mplex), m_tunerType(tt), m_cardid(cid) { }
     ~ScanDTVTransport() override = default;
 
     bool FillFromDB(DTVTunerType type, uint mplexid) override; // DTVMultiplex
@@ -130,10 +130,10 @@ class MTV_PUBLIC ScanDTVTransport : public DTVMultiplex
         const QString& hp_code_rate, const QString& lp_code_rate,   const QString& ofdm_modulation,
         const QString& trans_mode,   const QString& guard_interval, const QString& hierarchy,
         const QString& modulation,   const QString& bandwidth,
-        const QString& mod_sys,      const QString& rolloff);
+        const QString& mod_sys,      const QString& rolloff,        const QString& signal_strength);
 
   public:
-    DTVTunerType          m_tuner_type     {DTVTunerType::kTunerTypeUnknown};
+    DTVTunerType          m_tunerType      {DTVTunerType::kTunerTypeUnknown};
     uint                  m_cardid         {0};
     ChannelInsertInfoList m_channels;
     uint                  m_networkID      {0};

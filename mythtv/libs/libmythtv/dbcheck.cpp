@@ -3780,6 +3780,16 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1366")
+    {
+        DBUpdates updates {
+            "ALTER TABLE channelscan_dtv_multiplex ADD COLUMN signal_strength INT NOT NULL DEFAULT 0;"
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1367", dbver))
+            return false;
+    }
+
     return true;
 }
 

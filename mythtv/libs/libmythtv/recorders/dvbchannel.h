@@ -80,8 +80,8 @@ class DVBChannel : public DTVChannel
     double GetBitErrorRate(bool *ok = nullptr) const;
     /// Returns # of uncorrected blocks since last call. First call undefined.
     double GetUncorrectedBlockCount(bool *ok = nullptr) const;
-    uint64_t GetCapabilities(void) const { return m_capabilities; }   // KdW test
-    bool CanDo(uint64_t capability) const { return (m_capabilities & capability) != 0; }  // KdW test
+    uint64_t GetCapabilities(void) const { return m_capabilities; }
+    bool CanDo(uint64_t capability) const { return (m_capabilities & capability) != 0; }
 
     // Commands
     bool SwitchToInput(int newcapchannel, bool setstarting);

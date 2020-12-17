@@ -899,7 +899,7 @@ void ChannelImporter::MergeSameFrequency(ScanDTVTransportList &transports)
 
     DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
     if (!transports.empty())
-        tuner_type = transports[0].m_tuner_type;
+        tuner_type = transports[0].m_tunerType;
 
     bool is_dvbs = ((DTVTunerType::kTunerTypeDVBS1 == tuner_type) ||
                     (DTVTunerType::kTunerTypeDVBS2 == tuner_type));
@@ -1149,7 +1149,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 
     DTVTunerType tuner_type(DTVTunerType::kTunerTypeATSC);
     if (!transports.empty())
-        tuner_type = transports[0].m_tuner_type;
+        tuner_type = transports[0].m_tunerType;
 
     bool is_dvbs =
         (DTVTunerType::kTunerTypeDVBS1 == tuner_type) ||

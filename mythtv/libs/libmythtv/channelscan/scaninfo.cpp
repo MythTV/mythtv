@@ -86,7 +86,7 @@ ScanDTVTransportList LoadScan(uint scanid)
         "       transmission_mode, guard_interval, hierarchy, "             // 8, 9, 10
         "       modulation,        bandwidth,      sistandard, "            // 11, 12, 13
         "       tuner_type,        transportid,    mod_sys, "               // 14, 15, 16
-        "       rolloff "                                                   // 17
+        "       rolloff,           signal_strength "                        // 17, 18
         "FROM channelscan_dtv_multiplex "
         "WHERE scanid = :SCANID");
     query.bindValue(":SCANID", scanid);
@@ -108,7 +108,7 @@ ScanDTVTransportList LoadScan(uint scanid)
             query.value(8).toString(),  query.value(9).toString(),          // transmission_mode    guard_interval
             query.value(10).toString(), query.value(11).toString(),         // hierarchy            modulation
             query.value(12).toString(), query.value(16).toString(),         // bandwidth            mod_sys
-            query.value(17).toString());                                    // roloff
+            query.value(17).toString(), query.value(18).toString());        // roloff               signal_strength
 
         mux.m_sistandard = query.value(13).toString();                      // sistandard
 
