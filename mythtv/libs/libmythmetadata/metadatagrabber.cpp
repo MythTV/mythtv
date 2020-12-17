@@ -20,9 +20,9 @@
 #define LOC QString("Metadata Grabber: ")
 #define kGrabberRefresh 60
 
-static GrabberList     grabberList;
-static QMutex          grabberLock;
-static QDateTime       grabberAge;
+static GrabberList     s_grabberList;
+static QMutex          s_grabberLock;
+static QDateTime       s_grabberAge;
 
 struct GrabberOpts {
     QString     m_path;
@@ -73,16 +73,16 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
     GrabberList tmpGrabberList;
     GrabberList retGrabberList;
     {
-        QMutexLocker listLock(&grabberLock);
+        QMutexLocker listLock(&s_grabberLock);
         QDateTime now = MythDate::current();
 
         // refresh grabber scripts every 60 seconds
         // this might have to be revised, or made more intelligent if
         // the delay during refreshes is too great
-        if (refresh || !grabberAge.isValid() ||
-            (grabberAge.secsTo(now) > kGrabberRefresh))
+        if (refresh || !s_grabberAge.isValid() ||
+            (s_grabberAge.secsTo(now) > kGrabberRefresh))
         {
-            grabberList.clear();
+            s_grabberList.clear();
             LOG(VB_GENERAL, LOG_DEBUG, LOC + "Clearing grabber cache");
 
             // loop through different types of grabber scripts and the 
@@ -104,15 +104,15 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
                     if (script.IsValid())
                     {
                         LOG(VB_GENERAL, LOG_DEBUG, LOC + "Adding " + script.m_command);
-                        grabberList.append(script);
+                        s_grabberList.append(script);
                     }
                  }
             }
 
-            grabberAge = now;
+            s_grabberAge = now;
         }
 
-        tmpGrabberList = grabberList;
+        tmpGrabberList = s_grabberList;
     }
 
     for (const auto& item : qAsConst(tmpGrabberList))
@@ -171,7 +171,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
         cmd = grabberTypes[type].m_def;
     }
 
-    if (grabberAge.isValid() && grabberAge.secsTo(MythDate::current()) <= kGrabberRefresh)
+    if (s_grabberAge.isValid() && s_grabberAge.secsTo(MythDate::current()) <= kGrabberRefresh)
     {
         // just pull it from the cache
         GrabberList list = GetList();
