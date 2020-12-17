@@ -576,15 +576,3 @@ inline bool MythVideoTexture::CreateBuffer(MythVideoTexture *Texture, int Size)
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate texture buffer");
     return false;
 }
-
-void MythVideoTexture::StoreBicubicWeights(float X, float *Dest)
-{
-    float w0 = (((-1 * X + 3) * X - 3) * X + 1) / 6;
-    float w1 = ((( 3 * X - 6) * X + 0) * X + 4) / 6;
-    float w2 = (((-3 * X + 3) * X + 3) * X + 1) / 6;
-    float w3 = ((( 1 * X + 0) * X + 0) * X + 0) / 6;
-    *Dest++ = 1 + X - w1 / (w0 + w1);
-    *Dest++ = 1 - X + w3 / (w2 + w3);
-    *Dest++ = w0 + w1;
-    *Dest++ = 0;
-}

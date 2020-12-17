@@ -70,7 +70,6 @@ class MythVideoTexture : public MythGLTexture
     static void YV12ToYUYV   (const MythVideoFrame *Frame, MythVideoTexture* Texture);
     static void NV12ToNV12   (MythRenderOpenGL *Context, const MythVideoFrame *Frame, MythVideoTexture* Texture, uint Plane);
     static bool CreateBuffer (MythVideoTexture* Texture, int Size);
-    static void StoreBicubicWeights(float X, float *Dest);
 };
 
-#endif // MYTHVIDEOTEXTURE_H
+#endif
