@@ -96,10 +96,11 @@ void NetBase::StreamWebVideo()
         return;
     }
 
+    auto seconds = std::chrono::seconds(item->GetTime().toInt());
     GetMythMainWindow()->HandleMedia("Internal", item->GetMediaURL(),
         item->GetDescription(), item->GetTitle(), item->GetSubtitle(),
         QString(), item->GetSeason(), item->GetEpisode(), QString(),
-        item->GetTime().toInt() / 60, item->GetDate().toString("yyyy"));
+        duration_cast<std::chrono::minutes>(seconds), item->GetDate().toString("yyyy"));
 }
 
 void NetBase::ShowWebVideo()

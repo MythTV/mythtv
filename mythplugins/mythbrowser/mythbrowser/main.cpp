@@ -20,7 +20,7 @@
 // Based on MediaPlayCallback.  Parameters only seem to have local significance.
 static int handleMedia(const QString &url, const QString &directory, const QString &filename,
                        const QString & /*unused*/, const QString & /*unused*/, int /*unused*/,
-                       int /*unused*/, const QString & /*unused*/, int /*unused*/,
+                       int /*unused*/, const QString & /*unused*/, std::chrono::minutes /*unused*/,
                        const QString & /*unused*/, const QString & /*unused*/, bool /*unused*/)
 {
     if (url.isEmpty())
@@ -86,7 +86,7 @@ static void runHomepage()
     if (query.size() > 0)
     {
         query.next();
-        handleMedia( query.value(0).toString(), "", "", "", "", 0, 0, "", 0, "", "", false);
+        handleMedia( query.value(0).toString(), "", "", "", "", 0, 0, "", 0min, "", "", false);
     }
     else
     {

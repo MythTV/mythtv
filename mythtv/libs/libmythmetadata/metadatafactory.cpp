@@ -426,7 +426,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
         metadata->SetUserRating(lookup->GetUserRating());
     if (metadata->GetRating() == VIDEO_RATING_DEFAULT)
         metadata->SetRating(lookup->GetCertification());
-    if (metadata->GetLength() == 0)
+    if (metadata->GetLength() == 0min)
         metadata->SetLength(lookup->GetRuntime());
     if (metadata->GetSeason() == 0)
         metadata->SetSeason(lookup->GetSeason());

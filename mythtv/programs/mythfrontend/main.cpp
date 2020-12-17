@@ -759,7 +759,7 @@ static void playDisc()
         QString filename = QString("bd:/%1").arg(bluray_mountpoint);
 
         GetMythMainWindow()->HandleMedia("Internal", filename, "", "", "", "",
-                                         0, 0, "", 0, "", "", true);
+                                         0, 0, "", 0min, "", "", true);
 
         GetMythUI()->RemoveCurrentLocation();
     }
@@ -787,7 +787,7 @@ static void playDisc()
 
             command_string = "Internal";
             GetMythMainWindow()->HandleMedia(command_string, filename, "", "",
-                                             "", "", 0, 0, "", 0, "", "", true);
+                                             "", "", 0, 0, "", 0min, "", "", true);
             GetMythUI()->RemoveCurrentLocation();
 
             return;
@@ -1263,7 +1263,8 @@ static void WriteDefaults()
 static int internal_play_media(const QString &mrl, const QString &plot,
                         const QString &title, const QString &subtitle,
                         const QString &director, int season, int episode,
-                        const QString &inetref, int lenMins, const QString &year,
+                        const QString &inetref, std::chrono::minutes lenMins,
+                        const QString &year,
                         const QString &id, const bool useBookmark)
 {
     int res = -1;

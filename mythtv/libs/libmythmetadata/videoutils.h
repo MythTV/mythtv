@@ -40,7 +40,7 @@ META_PUBLIC bool IsDefaultFanart(const QString &fanart);
 class VideoMetadata;
 
 META_PUBLIC QString GetDisplayUserRating(float userrating);
-META_PUBLIC QString GetDisplayLength(int length);
+META_PUBLIC QString GetDisplayLength(std::chrono::minutes length);
 META_PUBLIC QString GetDisplayBrowse(bool browse);
 META_PUBLIC QString GetDisplayWatched(bool watched);
 META_PUBLIC QString GetDisplayProcessed(bool processed);

@@ -261,11 +261,11 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
     {
         if (m_runtime == kRuntimeFilterUnknown)
         {
-            matches = (mdata.GetLength() == 0);
+            matches = (mdata.GetLength() == 0min);
         }
         else
         {
-            matches = (m_runtime == (mdata.GetLength() / 30));
+            matches = (m_runtime == (mdata.GetLength() / 30min));
         }
     }
 
@@ -546,11 +546,11 @@ void VideoFilterDialog::fillWidgets()
         else
             years.insert(year);
 
-        int runtime = md->GetLength();
-        if (runtime == 0)
+        std::chrono::minutes runtime = md->GetLength();
+        if (runtime == 0min)
             have_unknown_runtime = true;
         else
-            runtimes.insert(runtime / 30);
+            runtimes.insert(runtime.count() / 30);
 
         user_ratings.insert(static_cast<int>(md->GetUserRating()));
     }

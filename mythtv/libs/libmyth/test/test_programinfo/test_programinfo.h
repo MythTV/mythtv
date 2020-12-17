@@ -195,7 +195,7 @@ class TestProgramInfo : public QObject
              1,
              2,
              "inetref",
-             90,
+             90min,
              1968,
              "MV000"
         );

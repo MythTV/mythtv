@@ -22,7 +22,7 @@ class MythMediaDevice;
 #define REG_JUMPEX(a, b, c, d, e) GetMythMainWindow()->RegisterJump(a, b, c, d, e)
 #define REG_MEDIAPLAYER(a,b,c) GetMythMainWindow()->RegisterMediaPlugin(a, b, c)
 
-using MediaPlayCallback = int (*)(const QString& , const QString& , const QString& , const QString& , const QString& , int, int, const QString& , int, const QString& , const QString& , bool);
+using MediaPlayCallback = int (*)(const QString& , const QString& , const QString& , const QString& , const QString& , int, int, const QString& , std::chrono::minutes, const QString& , const QString& , bool);
 
 class MythScreenSaverControl;
 class MythDisplay;
@@ -78,7 +78,7 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
                      const QString& Plot="", const QString& Title="",
                      const QString& Subtitle="", const QString& Director="",
                      int Season=0, int Episode=0, const QString& Inetref="",
-                     int LenMins=120, const QString& Year="1895",
+                     std::chrono::minutes LenMins=2h, const QString& Year="1895",
                      const QString& Id="", bool UseBookmarks = false);
     void HandleTVAction(const QString& Action);
 

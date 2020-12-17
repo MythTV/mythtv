@@ -227,7 +227,7 @@ DTC::VideoLookupList* Video::LookupVideo( const QString    &Title,
                 QDateTime(lookup->GetReleaseDate(),
                           QTime(0,0),Qt::LocalTime).toUTC());
             pVideoLookup->setUserRating(lookup->GetUserRating());
-            pVideoLookup->setLength(lookup->GetRuntime());
+            pVideoLookup->setLength(lookup->GetRuntime().count());
             pVideoLookup->setLanguage(lookup->GetLanguage());
             pVideoLookup->setCountries(lookup->GetCountries());
             pVideoLookup->setPopularity(lookup->GetPopularity());
@@ -584,7 +584,7 @@ bool Video::UpdateVideoMetadata ( int           nId,
 
     if (m_parsedParams.contains("length"))
     {
-        metadata->SetLength(nLength);
+        metadata->SetLength(std::chrono::minutes(nLength));
         update_required = true;
     }
 
@@ -881,7 +881,7 @@ long Video::GetSavedBookmark( int  Id )
                          0, // int _season,
                          0, // int _episode,
                          nullptr, // const QString &_inetref,
-                         0, // uint _length_in_minutes,
+                         0min, // uint _length_in_minutes,
                          0, // uint _year,
                          nullptr); //const QString &_programid);
 
@@ -928,7 +928,7 @@ bool Video::SetSavedBookmark( int  Id, long Offset )
                          0, // int _season,
                          0, // int _episode,
                          nullptr, // const QString &_inetref,
-                         0, // uint _length_in_minutes,
+                         0min, // uint _length_in_minutes,
                          0, // uint _year,
                          nullptr); //const QString &_programid);
 

@@ -742,7 +742,7 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
                          const QString &_director,
                          int _season, int _episode,
                          const QString &_inetref,
-                         uint _length_in_minutes,
+                         std::chrono::minutes length_in_minutes,
                          uint _year,
                          const QString &_programid)
 {
@@ -761,10 +761,11 @@ ProgramInfo::ProgramInfo(const QString &_pathname,
     m_year = _year;
 
     QDateTime cur = MythDate::current();
-    m_recStartTs = cur.addSecs(((int)_length_in_minutes + 1) * -60);
-    m_recEndTs   = m_recStartTs.addSecs(_length_in_minutes * 60);
+    int64_t minutes = length_in_minutes.count();
+    m_recStartTs = cur.addSecs((minutes + 1) * -60);
+    m_recEndTs   = m_recStartTs.addSecs(minutes * 60);
     m_startTs    = QDateTime(QDate(m_year,1,1),QTime(0,0,0), Qt::UTC);
-    m_endTs      = m_startTs.addSecs(_length_in_minutes * 60);
+    m_endTs      = m_startTs.addSecs(minutes * 60);
 
     QString pn = _pathname;
     if (!_pathname.startsWith("myth://"))

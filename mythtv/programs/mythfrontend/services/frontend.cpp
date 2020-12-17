@@ -235,7 +235,7 @@ bool Frontend::PlayVideo(const QString &Id, bool UseBookmark)
          << metadata->GetSubtitle() << metadata->GetDirector()
          << QString::number(metadata->GetSeason())
          << QString::number(metadata->GetEpisode())
-         << metadata->GetInetRef() << QString::number(metadata->GetLength())
+         << metadata->GetInetRef() << QString::number(metadata->GetLength().count())
          << QString::number(metadata->GetYear())
          << QString::number(metadata->GetID())
          << QString::number(static_cast<int>(UseBookmark));

@@ -275,8 +275,8 @@ class VideoMetadataImp
     QDate getReleaseDate() const { return m_releasedate; }
     void SetReleaseDate(QDate releasedate) { m_releasedate = releasedate; }
 
-    int GetLength() const { return m_length; }
-    void SetLength(int length) { m_length = length; }
+    std::chrono::minutes GetLength() const { return m_length; }
+    void SetLength(std::chrono::minutes length) { m_length = length; }
 
     unsigned int GetPlayCount() const { return m_playcount; }
     void SetPlayCount(int playcount) { m_playcount = playcount; }
@@ -371,7 +371,7 @@ class VideoMetadataImp
     int                  m_childID       {-1};
     int                  m_year          {VIDEO_YEAR_DEFAULT};
     QDate                m_releasedate;
-    int                  m_length        {0};
+    std::chrono::minutes m_length        {0min};
     int                  m_playcount     {0};
     int                  m_season        {0};
     int                  m_episode       {0};
@@ -561,7 +561,7 @@ void VideoMetadataImp::fromDBRow(MSqlQuery &query)
         m_userrating = 0.0;
     if (m_userrating > 10.0F)
         m_userrating = 10.0F;
-    m_length = query.value(8).toInt();
+    m_length = std::chrono::minutes(query.value(8).toInt());
     m_playcount = query.value(9).toInt();
     m_filename = query.value(10).toString();
     m_hash = query.value(11).toString();
@@ -703,7 +703,7 @@ void VideoMetadataImp::saveToDatabase()
     query.bindValue(":YEAR", m_year);
     query.bindValue(":RELEASEDATE", m_releasedate);
     query.bindValue(":USERRATING", m_userrating);
-    query.bindValue(":LENGTH", m_length);
+    query.bindValue(":LENGTH", static_cast<qint64>(m_length.count()));
     query.bindValue(":PLAYCOUNT", m_playcount);
     query.bindValue(":SEASON", m_season);
     query.bindValue(":EPISODE", m_episode);
@@ -1474,12 +1474,12 @@ void VideoMetadata::SetRating(const QString &rating)
     m_imp->SetRating(rating);
 }
 
-int VideoMetadata::GetLength() const
+std::chrono::minutes VideoMetadata::GetLength() const
 {
     return m_imp->GetLength();
 }
 
-void VideoMetadata::SetLength(int length)
+void VideoMetadata::SetLength(std::chrono::minutes length)
 {
     m_imp->SetLength(length);
 }

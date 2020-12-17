@@ -1482,7 +1482,7 @@ bool MythMainWindow::HandleMedia(const QString& Handler, const QString& Mrl,
                                  const QString& Subtitle,
                                  const QString& Director, int Season,
                                  int Episode, const QString& Inetref,
-                                 int LenMins, const QString& Year,
+                                 std::chrono::minutes LenMins, const QString& Year,
                                  const QString& Id, bool UseBookmarks)
 {
     QString lhandler(Handler);
@@ -1952,7 +1952,7 @@ void MythMainWindow::customEvent(QEvent* Event)
                     event->ExtraData(1), event->ExtraData(2),
                     event->ExtraData(3), event->ExtraData(4),
                     event->ExtraData(5).toInt(), event->ExtraData(6).toInt(),
-                    event->ExtraData(7), event->ExtraData(8).toInt(),
+                    event->ExtraData(7), std::chrono::minutes(event->ExtraData(8).toInt()),
                     event->ExtraData(9), event->ExtraData(10),
                     usebookmark);
             }

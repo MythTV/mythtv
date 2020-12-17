@@ -270,7 +270,7 @@ class MPUBLIC ProgramInfo
                 const QString &director,
                 int season, int episode,
                 const QString &inetref,
-                uint length_in_minutes,
+                std::chrono::minutes length_in_minutes,
                 uint year,
                 const QString &programid);
     /// Constructs a manual record ProgramInfo.

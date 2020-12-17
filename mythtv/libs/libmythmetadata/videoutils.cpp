@@ -156,12 +156,12 @@ QString GetDisplayUserRating(float userrating)
     return QString::number(userrating, 'f', 1);
 }
 
-QString GetDisplayLength(int length)
+QString GetDisplayLength(std::chrono::minutes length)
 {
     // The disambiguation string must be an empty string and not a 
     // nullptr to get extracted by the Qt tools.
     return QCoreApplication::translate("(Common)", "%n minute(s)", "", 
-               length);
+               length.count());
 }
 
 QString GetDisplayBrowse(bool browse)
