@@ -42,7 +42,7 @@ class MythVideoTexture : public MythGLTexture
                                            QOpenGLTexture::Filter Filter = QOpenGLTexture::Linear,
                                            QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
     static VideoFramebuffer CreateVideoFrameBuffer(MythRenderOpenGL* Context, VideoFrameType OutputType,
-                                                   QSize Size, bool HighPrecision = false);
+                                                   QSize Size, bool HighPrecision = true);
    ~MythVideoTexture() = default;
 
   public:
