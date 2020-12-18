@@ -1546,7 +1546,7 @@ DTC::RecRule* Dvr::GetRecordSchedule( uint      nRecordId,
         // Despite the use of RecordingInfo, this only applies to programs in the
         // present or future, not to recordings? Confused yet?
         RecordingInfo::LoadStatus status = RecordingInfo::kNoProgram;
-        RecordingInfo info(nChanId, dStartTime, false, 0, &status);
+        RecordingInfo info(nChanId, dStartTime, false, 0h, &status);
         if (status != RecordingInfo::kFoundProgram)
             throw QString("Program does not exist.");
         RecordingRule *pRule = info.GetRecordingRule();

@@ -39,7 +39,7 @@ class EITScanner : public QRunnable
     void StartPassiveScan(ChannelBase *channel, EITSource *eitSource);
     void StopPassiveScan(void);
 
-    void StartActiveScan(TVRec *_rec, uint max_seconds_per_source);
+    void StartActiveScan(TVRec *_rec, std::chrono::seconds max_seconds_per_source);
 
     void StopActiveScan(void);
 
@@ -65,7 +65,7 @@ class EITScanner : public QRunnable
     volatile bool         m_activeScanStopped       {true};     // protected by lock
     QWaitCondition        m_activeScanCond;                     // protected by lock
     QDateTime             m_activeScanNextTrig;
-    uint                  m_activeScanTrigTime      {0};
+    std::chrono::seconds  m_activeScanTrigTime      {0s};
     QStringList           m_activeScanChannels;
     QStringList::iterator m_activeScanNextChan;
     uint                  m_activeScanNextChanIndex {MythRandom()};

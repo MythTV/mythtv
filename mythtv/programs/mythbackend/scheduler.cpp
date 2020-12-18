@@ -3103,7 +3103,7 @@ void Scheduler::HandleIdleShutdown(
             return;
 
         // If there are active jobs, then we're not idle
-        bool activeJobs = JobQueue::HasRunningOrPendingJobs(0);
+        bool activeJobs = JobQueue::HasRunningOrPendingJobs(0min);
 
         if (!blocking && !recording && !activeJobs && !delay)
         {
@@ -5613,7 +5613,7 @@ void Scheduler::SchedLiveTV(void)
         // Get the program that will be recording on this channel at
         // record start time and assume this LiveTV session continues
         // for at least another 30 minutes from now.
-        auto *dummy = new RecordingInfo(in.m_chanId, m_livetvTime, true, 4);
+        auto *dummy = new RecordingInfo(in.m_chanId, m_livetvTime, true, 4h);
         dummy->SetRecordingStartTime(m_schedTime);
         if (m_schedTime.secsTo(dummy->GetRecordingEndTime()) < 1800)
             dummy->SetRecordingEndTime(m_schedTime.addSecs(1800));

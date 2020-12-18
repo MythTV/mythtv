@@ -236,7 +236,7 @@ RecordingInfo::RecordingInfo(
  */
 RecordingInfo::RecordingInfo(
     uint _chanid, const QDateTime &desiredts,
-    bool genUnknown, uint maxHours, LoadStatus *status)
+    bool genUnknown, std::chrono::hours maxHours, LoadStatus *status)
 {
     ProgramList schedList;
     ProgramList progList;
@@ -257,12 +257,12 @@ RecordingInfo::RecordingInfo(
     {
         ProgramInfo *pginfo = progList[0];
 
-        if (maxHours > 0)
+        if (maxHours > 0h)
         {
-            if (desiredts.secsTo(
-                    pginfo->GetScheduledEndTime()) > (int)maxHours * 3600)
+            auto maxSecs = duration_cast<std::chrono::seconds>(maxHours);
+            if (desiredts.secsTo(pginfo->GetScheduledEndTime()) > maxSecs.count())
             {
-                pginfo->SetScheduledEndTime(desiredts.addSecs(maxHours * 3600));
+                pginfo->SetScheduledEndTime(desiredts.addSecs(maxSecs.count()));
                 pginfo->SetRecordingEndTime(pginfo->GetScheduledEndTime());
             }
         }

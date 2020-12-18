@@ -53,7 +53,7 @@ static bool is_dishnet_eit(uint inputid);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
 static void apply_broken_dvb_driver_crc_hack(ChannelBase* /*c*/, MPEGStreamData* /*s*/);
-static int eit_start_rand(uint inputId, int eitTransportTimeout);
+static std::chrono::seconds eit_start_rand(uint inputId, std::chrono::seconds eitTransportTimeout);
 
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
@@ -151,12 +151,13 @@ bool TVRec::Init(void)
         gCoreContext->GetBoolSetting("AutoTranscodeBeforeAutoCommflag", false);
     m_earlyCommFlag     = gCoreContext->GetBoolSetting("AutoCommflagWhileRecording", false);
     m_runJobOnHostOnly  = gCoreContext->GetBoolSetting("JobsRunOnRecordHost", false);
-    m_eitTransportTimeout =
-        std::max(gCoreContext->GetNumSetting("EITTransportTimeout", 5) * 60, 6);
-    m_eitCrawlIdleStart = gCoreContext->GetNumSetting("EITCrawIdleStart", 60);
+    m_eitTransportTimeout = gCoreContext->GetDurSetting<std::chrono::minutes>("EITTransportTimeout", 5min);
+    if (m_eitTransportTimeout < 6s)
+        m_eitTransportTimeout = 6s;
+    m_eitCrawlIdleStart = gCoreContext->GetDurSetting<std::chrono::seconds>("EITCrawIdleStart", 60s);
     m_audioSampleRateDB = gCoreContext->GetNumSetting("AudioSampleRate");
-    m_overRecordSecNrml = gCoreContext->GetNumSetting("RecordOverTime");
-    m_overRecordSecCat  = gCoreContext->GetNumSetting("CategoryOverTime") * 60;
+    m_overRecordSecNrml = gCoreContext->GetDurSetting<std::chrono::minutes>("RecordOverTime");
+    m_overRecordSecCat  = gCoreContext->GetDurSetting<std::chrono::minutes>("CategoryOverTime");
     m_overRecordCategory= gCoreContext->GetSetting("OverTimeCategory");
 
     m_eventThread->start();
@@ -332,8 +333,8 @@ QDateTime TVRec::GetRecordEndTime(const ProgramInfo *pi) const
 {
     bool spcat = (!m_overRecordCategory.isEmpty() &&
                   pi->GetCategory() == m_overRecordCategory);
-    int secs = (spcat) ? m_overRecordSecCat : m_overRecordSecNrml;
-    return pi->GetRecordingEndTime().addSecs(secs);
+    std::chrono::seconds secs = (spcat) ? m_overRecordSecCat : m_overRecordSecNrml;
+    return pi->GetRecordingEndTime().addSecs(secs.count());
 }
 
 /** \fn TVRec::CancelNextRecording(bool)
@@ -1019,8 +1020,8 @@ void TVRec::HandleStateChange(void)
     {
         m_scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-        m_eitScanStartTime = MythDate::current().addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
+        auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+        m_eitScanStartTime = MythDate::current().addSecs(secs.count());
     }
 
     // Handle different state transitions
@@ -1064,8 +1065,8 @@ void TVRec::HandleStateChange(void)
     m_eitScanStartTime = MythDate::current();
     if (m_scanner && (m_internalState == kState_None))
     {
-        m_eitScanStartTime = m_eitScanStartTime.addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
+        auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+        m_eitScanStartTime = m_eitScanStartTime.addSecs(secs.count());
     }
     else
     {
@@ -1249,10 +1250,10 @@ static int num_inputs(void)
     return -1;
 }
 
-static int eit_start_rand(uint inputId, int eitTransportTimeout)
+static std::chrono::seconds eit_start_rand(uint inputId, std::chrono::seconds eitTransportTimeout)
 {
     // Randomize start time a bit
-    int timeout = static_cast<int>(MythRandom() % (eitTransportTimeout / 3));
+    auto timeout = std::chrono::seconds(MythRandom()) % (eitTransportTimeout.count() / 3);
 
     // Get the number of inputs and the position of the current input
     // to distribute the scan start evenly over eitTransportTimeout
@@ -1278,8 +1279,8 @@ void TVRec::run(void)
         (m_dvbOpt.m_dvbEitScan || get_use_eit(m_inputId)))      // EIT is selected for card OR EIT is selected for video source
     {
         m_scanner = new EITScanner(m_inputId);
-        m_eitScanStartTime = m_eitScanStartTime.addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
+        auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+        m_eitScanStartTime = m_eitScanStartTime.addSecs(secs.count());
     }
     else
     {
@@ -3579,8 +3580,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
     {
         m_scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-        m_eitScanStartTime = MythDate::current().addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
+        auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+        m_eitScanStartTime = MythDate::current().addSecs(secs.count());
     }
 
     if (m_scanner && !request.IsOnSameMultiplex())
@@ -4573,9 +4574,10 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
         }
     }
 
-    int hoursMax = gCoreContext->GetNumSetting("MaxHoursPerLiveTVRecording", 8);
-    if (hoursMax <= 0)
-        hoursMax = 8;
+    auto hoursMax =
+        gCoreContext->GetDurSetting<std::chrono::hours>("MaxHoursPerLiveTVRecording", 8h);
+    if (hoursMax <= 0h)
+        hoursMax = 8h;
 
     RecordingInfo *prog = nullptr;
     if (m_pseudoLiveTVRecording)

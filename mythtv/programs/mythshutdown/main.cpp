@@ -277,7 +277,7 @@ static int getStatus(bool bWantRecStatus)
         res |= 16;
     }
 
-    if (JobQueue::HasRunningOrPendingJobs(15))
+    if (JobQueue::HasRunningOrPendingJobs(15min))
     {
         LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
             QObject::tr("Has queued or pending jobs", "mythshutdown") + "\n");

@@ -1,3 +1,5 @@
+#include <algorithm>
+
 // MythTV
 #include "mythsystemevent.h"
 #include "audiooutput.h"
@@ -762,18 +764,15 @@ void MythPlayerUI::SetWatched(bool ForceWatched)
         numFrames = static_cast<uint64_t>((endtime - starttime) * m_videoFrameRate);
     }
 
-    auto offset = static_cast<int>(round(0.14 * (numFrames / m_videoFrameRate)));
+    // 4 minutes min, 12 minutes max
+    auto offset = std::chrono::seconds(lround(0.14 * (numFrames / m_videoFrameRate)));
+    offset = std::clamp(offset, 240s, 720s);
 
-    if (offset < 240)
-        offset = 240; // 4 Minutes Min
-    else if (offset > 720)
-        offset = 720; // 12 Minutes Max
-
-    if (ForceWatched || (m_framesPlayed > (numFrames - (offset * m_videoFrameRate))))
+    if (ForceWatched || (m_framesPlayed > (numFrames - (offset.count() * m_videoFrameRate))))
     {
         m_playerCtx->m_playingInfo->SaveWatched(true);
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Marking recording as watched using offset %1 minutes")
-            .arg(offset/60));
+            .arg(offset.count()/60));
     }
 
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);

@@ -12,6 +12,7 @@
 #include <QMap>
 
 #include "mythtvexp.h"
+#include "mythchrono.h"
 
 class MThread;
 class ProgramInfo;
@@ -201,7 +202,7 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
     static QString JobText(int jobType);
     static QString StatusText(int status);
 
-    static bool HasRunningOrPendingJobs(int startingWithinMins = 0);
+    static bool HasRunningOrPendingJobs(std::chrono::minutes startingWithinMins = 0min);
 
     static int GetJobsInQueue(QMap<int, JobQueueEntry> &jobs,
                               int findJobs = JOB_LIST_NOT_DONE);
@@ -227,7 +228,7 @@ class MTV_PUBLIC JobQueue : public QObject, public QRunnable
 
     bool AllowedToRun(const JobQueueEntry& job);
 
-    static bool InJobRunWindow(int orStartsWithinMins = 0);
+    static bool InJobRunWindow(std::chrono::minutes orStartsWithinMins = 0min);
 
     void StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID);
 

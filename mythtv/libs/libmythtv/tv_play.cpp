@@ -7603,7 +7603,7 @@ void TV::QuickRecord()
         QDateTime startts = MythDate::fromString(bi.m_startTime);
 
         RecordingInfo::LoadStatus status = RecordingInfo::kNoProgram;
-        RecordingInfo recinfo(bi.m_chanId, startts, false, 0, &status);
+        RecordingInfo recinfo(bi.m_chanId, startts, false, 0h, &status);
         if (RecordingInfo::kFoundProgram == status)
             recinfo.QuickRecord();
         recinfo.ToMap(infoMap);

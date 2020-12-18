@@ -359,11 +359,11 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     bool               m_transcodeFirst           {false};
     bool               m_earlyCommFlag            {false};
     bool               m_runJobOnHostOnly         {false};
-    int                m_eitCrawlIdleStart        {60};
-    int                m_eitTransportTimeout      {5*60};
+    std::chrono::seconds m_eitCrawlIdleStart      {1min};
+    std::chrono::seconds m_eitTransportTimeout    {5min};
     int                m_audioSampleRateDB        {0};
-    int                m_overRecordSecNrml        {0};
-    int                m_overRecordSecCat         {0};
+    std::chrono::seconds m_overRecordSecNrml      {0s};
+    std::chrono::seconds m_overRecordSecCat       {0s};
     QString            m_overRecordCategory;
 
     // Configuration variables from setup routines

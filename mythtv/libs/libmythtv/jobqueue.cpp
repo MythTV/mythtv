@@ -790,8 +790,8 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
 
     // wait until running job(s) are done
     bool jobsAreRunning = true;
-    int totalSlept = 0;
-    int maxSleep = 90;
+    std::chrono::seconds totalSlept =  0s;
+    std::chrono::seconds maxSleep   = 90s;
     while (jobsAreRunning && totalSlept < maxSleep)
     {
         usleep(1000);
@@ -817,7 +817,7 @@ bool JobQueue::DeleteAllJobs(uint chanid, const QDateTime &recstartts)
             jobsAreRunning = false;
             continue;
         }
-        if ((totalSlept % 5) == 0)
+        if ((totalSlept % 5s) == 0s)
         {
             message = QString("Waiting on %1 jobs still running for "
                               "chanid %2 @ %3").arg(query.size())
@@ -1148,7 +1148,7 @@ QString JobQueue::StatusText(int status)
     return tr("Undefined");
 }
 
-bool JobQueue::InJobRunWindow(int orStartsWithinMins)
+bool JobQueue::InJobRunWindow(std::chrono::minutes orStartsWithinMins)
 {
     QString queueStartTimeStr;
     QString queueEndTimeStr;
@@ -1156,7 +1156,7 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
     QTime queueEndTime;
     QTime curTime = QTime::currentTime();
     bool inTimeWindow = false;
-    orStartsWithinMins = orStartsWithinMins < 0 ? 0 : orStartsWithinMins;
+    orStartsWithinMins = orStartsWithinMins < 0min ? 0min : orStartsWithinMins;
 
     queueStartTimeStr = gCoreContext->GetSetting("JobQueueWindowStart", "00:00");
     queueEndTimeStr = gCoreContext->GetSetting("JobQueueWindowEnd", "23:59");
@@ -1192,17 +1192,17 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
     {
         inTimeWindow = true;
     }
-    else if (orStartsWithinMins > 0)
+    else if (orStartsWithinMins > 0min)
     {
         // Check if the window starts soon
         if (curTime <= queueStartTime)
         {
             // Start time hasn't passed yet today
-            if (queueStartTime.secsTo(curTime) <= (orStartsWithinMins * 60))
+            if (queueStartTime.secsTo(curTime) <= duration_cast<std::chrono::seconds>(orStartsWithinMins).count())
             {
                 LOG(VB_JOBQUEUE, LOG_INFO, LOC +
                     QString("Job run window will start within %1 minutes")
-                            .arg(orStartsWithinMins));
+                            .arg(orStartsWithinMins.count()));
                 inTimeWindow = true;
             }
         }
@@ -1213,12 +1213,12 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
             QDateTime startDateTime = QDateTime(
                 curDateTime.date(), queueStartTime, Qt::UTC).addDays(1);
 
-            if (curDateTime.secsTo(startDateTime) <= (orStartsWithinMins * 60))
+            if (curDateTime.secsTo(startDateTime) <= duration_cast<std::chrono::seconds>(orStartsWithinMins).count())
             {
                 LOG(VB_JOBQUEUE, LOG_INFO, LOC +
                     QString("Job run window will start "
                             "within %1 minutes (tomorrow)")
-                        .arg(orStartsWithinMins));
+                        .arg(orStartsWithinMins.count()));
                 inTimeWindow = true;
             }
         }
@@ -1227,18 +1227,18 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
     return inTimeWindow;
 }
 
-bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
+bool JobQueue::HasRunningOrPendingJobs(std::chrono::minutes startingWithinMins)
 {
     /* startingWithinMins <= 0 - look for any pending jobs
            > 0 -  only consider pending starting within this time */
     QMap<int, JobQueueEntry> jobs;
     QMap<int, JobQueueEntry>::Iterator it;
     QDateTime maxSchedRunTime = MythDate::current();
-    bool checkForQueuedJobs = (startingWithinMins <= 0
+    bool checkForQueuedJobs = (startingWithinMins <= 0min
                                 || InJobRunWindow(startingWithinMins));
 
-    if (checkForQueuedJobs && startingWithinMins > 0) {
-        maxSchedRunTime = maxSchedRunTime.addSecs(startingWithinMins * 60);
+    if (checkForQueuedJobs && startingWithinMins > 0min) {
+        maxSchedRunTime = maxSchedRunTime.addSecs(duration_cast<std::chrono::seconds>(startingWithinMins).count());
         LOG(VB_JOBQUEUE, LOG_INFO, LOC +
             QString("HasRunningOrPendingJobs: checking for jobs "
                     "starting before: %1")
@@ -1259,7 +1259,7 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
 
             if (checkForQueuedJobs) {
                 if ((tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE))) {
-                    if (startingWithinMins <= 0) {
+                    if (startingWithinMins <= 0min) {
                         LOG(VB_JOBQUEUE, LOG_INFO, LOC +
                             "HasRunningOrPendingJobs: found pending job");
                         return true;
