@@ -15,6 +15,8 @@ extern "C" {
 #include <vector>
 
 class QMatrix4x4;
+class MythVideoTexture;
+using VideoFramebuffer = std::pair<QOpenGLFramebufferObject*, MythVideoTexture*>;
 
 class MythVideoTexture : public MythGLTexture
 {
@@ -39,6 +41,8 @@ class MythVideoTexture : public MythGLTexture
                                            QOpenGLTexture::TextureFormat Format = QOpenGLTexture::NoFormat,
                                            QOpenGLTexture::Filter Filter = QOpenGLTexture::Linear,
                                            QOpenGLTexture::WrapMode Wrap = QOpenGLTexture::ClampToEdge);
+    static VideoFramebuffer CreateVideoFrameBuffer(MythRenderOpenGL* Context, VideoFrameType OutputType,
+                                                   QSize Size, bool HighPrecision = false);
    ~MythVideoTexture() = default;
 
   public:

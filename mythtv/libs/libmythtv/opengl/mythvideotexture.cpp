@@ -576,3 +576,30 @@ inline bool MythVideoTexture::CreateBuffer(MythVideoTexture *Texture, int Size)
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to allocate texture buffer");
     return false;
 }
+
+VideoFramebuffer MythVideoTexture::CreateVideoFrameBuffer(MythRenderOpenGL* Context, VideoFrameType OutputType,
+                                                          QSize Size, bool HighPrecision)
+{
+    // Use a 16bit float framebuffer if requested/required and available (not GLES2) to maintain precision.
+    // The depth check will pick up all software formats as well as NVDEC, VideoToolBox and VAAPI DRM.
+    // VAAPI GLXPixmap and GLXCopy are currently not 10/12bit aware and VDPAU has no 10bit support -
+    // and all return RGB formats anyway. The MediaCodec texture format is an unknown but resizing will
+    // never be enabled as it returns an RGB frame - so if MediaCodec uses a 16bit texture, precision
+    // will be preserved.
+    bool sixteenbitfb  = Context->GetExtraFeatures() & kGL16BitFBO;
+    bool sixteenbitvid = HighPrecision ? true : MythVideoFrame::ColorDepth(OutputType) > 8;
+    if (sixteenbitfb && sixteenbitvid)
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Requesting 16bit framebuffer texture");
+    auto * framebuffer = Context->CreateFramebuffer(Size, sixteenbitfb && sixteenbitvid);
+    if (framebuffer == nullptr)
+        return { nullptr, nullptr };
+    auto * texture = new MythVideoTexture(framebuffer->texture());
+    texture->m_size = texture->m_totalSize = framebuffer->size();
+    texture->m_vbo  = Context->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
+    texture->m_flip = false;
+    texture->m_planeCount = 1;
+    texture->m_frameType = FMT_RGBA32;
+    texture->m_frameFormat = FMT_RGBA32;
+    texture->m_valid = true;
+    return { framebuffer, texture };
+}
