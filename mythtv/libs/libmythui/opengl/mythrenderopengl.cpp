@@ -757,6 +757,7 @@ QOpenGLFramebufferObject* MythRenderOpenGL::CreateFramebuffer(QSize &Size, bool 
     return nullptr;
 }
 
+/// This is no longer used but will probably be needed for future UI enhancements.
 MythGLTexture* MythRenderOpenGL::CreateFramebufferTexture(QOpenGLFramebufferObject *Framebuffer)
 {
     if (!Framebuffer)
