@@ -338,7 +338,7 @@ class MTV_PUBLIC MythVideoFrame
         return 0;
     }
 
-    static inline int GetWidthForPlan(VideoFrameType Type, int Width, uint Plane)
+    static inline int GetWidthForPlane(VideoFrameType Type, int Width, uint Plane)
     {
         switch (Type)
         {

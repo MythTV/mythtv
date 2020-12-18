@@ -143,7 +143,7 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
         vector<QSize> sizes;
         for (uint plane = 0 ; plane < count; ++plane)
         {
-            QSize size(MythVideoFrame::GetWidthForPlan(format, Frame->m_width, plane),
+            QSize size(MythVideoFrame::GetWidthForPlane(format, Frame->m_width, plane),
                        MythVideoFrame::GetHeightForPlane(format, Frame->m_height, plane));
             sizes.push_back(size);
         }
