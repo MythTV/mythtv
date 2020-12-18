@@ -781,7 +781,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_doubleShader->setEnabled(false);
     m_doubleDriver->setEnabled(false);
 
-    QList<QPair<QString,QString> > options = MythVideoProfile::GetDeinterlacers();
+    const QList<QPair<QString,QString> >& options = MythVideoProfile::GetDeinterlacers();
     for (const auto & option : qAsConst(options))
     {
         m_singleDeint->addSelection(option.second, option.first);

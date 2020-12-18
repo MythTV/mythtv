@@ -109,7 +109,7 @@ class MTV_PUBLIC MythVideoProfile : public QObject
 
     // Statics
     static void        InitStatics(bool Reinit = false);
-    static const QList<QPair<QString,QString> > GetDeinterlacers();
+    static const QList<QPair<QString,QString> >& GetDeinterlacers();
     static QStringList GetDecoders();
     static QStringList GetDecoderNames();
     static std::vector<std::pair<QString,QString>> GetUpscalers();

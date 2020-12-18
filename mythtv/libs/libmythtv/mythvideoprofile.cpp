@@ -1300,7 +1300,7 @@ QString MythVideoProfile::toString() const
         .arg(renderer).arg(deint0).arg(deint1).arg(cpus).arg(upscale);
 }
 
-const QList<QPair<QString, QString> > MythVideoProfile::GetDeinterlacers()
+const QList<QPair<QString, QString> >& MythVideoProfile::GetDeinterlacers()
 {
     static const QList<QPair<QString,QString> > s_deinterlacerOptions =
     {
