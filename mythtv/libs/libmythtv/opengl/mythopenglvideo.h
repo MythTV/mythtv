@@ -65,7 +65,6 @@ class MythOpenGLVideo : public MythVideoGPU
                               vector<MythGLTexture*>& Textures);
     bool    AddDeinterlacer  (const MythVideoFrame* Frame,  FrameScanType Scan,
                               MythDeintType Filter = DEINT_SHADER, bool CreateReferences = true);
-    QOpenGLFramebufferObject* CreateVideoFrameBuffer(VideoFrameType OutputType, QSize Size);
     void    CleanupDeinterlacers();
 
     MythRenderOpenGL* m_openglRender               { nullptr };

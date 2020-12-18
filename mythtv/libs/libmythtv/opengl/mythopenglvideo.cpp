@@ -1068,18 +1068,3 @@ QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
     }
     return "opengl";
 }
-
-QOpenGLFramebufferObject* MythOpenGLVideo::CreateVideoFrameBuffer(VideoFrameType OutputType, QSize Size)
-{
-    // Use a 16bit float framebuffer if necessary and available (not GLES2) to maintain precision.
-    // The depth check will pick up all software formats as well as NVDEC, VideoToolBox and VAAPI DRM.
-    // VAAPI GLXPixmap and GLXCopy are currently not 10/12bit aware and VDPAU has no 10bit support -
-    // and all return RGB formats anyway. The MediaCodec texture format is an unknown but resizing will
-    // never be enabled as it returns an RGB frame - so if MediaCodec uses a 16bit texture, precision
-    // will be preserved.
-    bool sixteenbitfb  = m_extraFeatures & kGL16BitFBO;
-    bool sixteenbitvid = MythVideoFrame::ColorDepth(OutputType) > 8;
-    if (sixteenbitfb && sixteenbitvid)
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Requesting 16bit framebuffer texture");
-    return m_openglRender->CreateFramebuffer(Size, sixteenbitfb && sixteenbitvid);
-}
