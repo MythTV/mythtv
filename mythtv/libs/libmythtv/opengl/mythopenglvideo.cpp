@@ -6,9 +6,9 @@
 #include "tv.h"
 #include "opengl/mythrenderopengl.h"
 #include "mythavutil.h"
-#include "mythopenglvideoshaders.h"
-#include "mythopengltonemap.h"
-#include "mythopenglvideo.h"
+#include "opengl/mythopenglvideoshaders.h"
+#include "opengl/mythopengltonemap.h"
+#include "opengl/mythopenglvideo.h"
 
 // std
 #include <utility>
@@ -907,22 +907,22 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
             if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
                 m_openglRender->logDebugMarker(LOC + "RENDER_TO_TEXTURE");
 
-            // we need a framebuffer
+            // we need a framebuffer and associated texture
             if (!m_frameBuffer)
             {
-                m_frameBuffer = CreateVideoFrameBuffer(m_outputType, m_videoDispDim);
-                if (!m_frameBuffer)
-                    return;
+                if (auto [fbo, tex] = MythVideoTexture::CreateVideoFrameBuffer(m_openglRender, m_outputType, m_videoDispDim);
+                    (fbo != nullptr) && (tex != nullptr))
+                {
+                    delete m_frameBuffer;
+                    delete m_frameBufferTexture;
+                    m_frameBuffer = fbo;
+                    m_frameBufferTexture = tex;
+                    m_openglRender->SetTextureFilters(m_frameBufferTexture, QOpenGLTexture::Linear);
+                }
             }
 
-            // and its associated texture
-            if (!m_frameBufferTexture)
-            {
-                m_frameBufferTexture = reinterpret_cast<MythVideoTexture*>(m_openglRender->CreateFramebufferTexture(m_frameBuffer));
-                if (!m_frameBufferTexture)
-                    return;
-                m_openglRender->SetTextureFilters(m_frameBufferTexture, QOpenGLTexture::Linear);
-            }
+            if (!(m_frameBuffer && m_frameBufferTexture))
+                return;
 
             // coordinates
             QRect vrect(QPoint(0, 0), m_videoDispDim);
