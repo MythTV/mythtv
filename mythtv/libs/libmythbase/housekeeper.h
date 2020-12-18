@@ -101,7 +101,7 @@ class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
     std::chrono::seconds        m_period;
     std::chrono::seconds        m_retry;
     QPair<float,float>          m_windowPercent;
-    QPair<int,int>              m_windowElapsed;
+    QPair<std::chrono::seconds,std::chrono::seconds> m_windowElapsed;
     float                       m_currentProb;
 };
 

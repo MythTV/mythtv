@@ -342,8 +342,8 @@ void PeriodicHouseKeeperTask::CalculateWindow(void)
         period = m_retry;
     }
 
-    m_windowElapsed.first = (uint32_t)((float)period.count() * m_windowPercent.first);
-    m_windowElapsed.second = (uint32_t)((float)period.count() * m_windowPercent.second);
+    m_windowElapsed.first  = chronomult(period, m_windowPercent.first);
+    m_windowElapsed.second = chronomult(period, m_windowPercent.second);
 }
 
 void PeriodicHouseKeeperTask::SetWindow(float min, float max)
@@ -371,9 +371,9 @@ void PeriodicHouseKeeperTask::SetLastRun(const QDateTime& last, bool successful)
 
 bool PeriodicHouseKeeperTask::DoCheckRun(const QDateTime& now)
 {
-    int elapsed = GetLastRun().secsTo(now);
+    auto elapsed = std::chrono::seconds(GetLastRun().secsTo(now));
 
-    if (elapsed < 0)
+    if (elapsed < 0s)
         // something bad has happened. let's just move along
         return false;
 
@@ -386,8 +386,8 @@ bool PeriodicHouseKeeperTask::DoCheckRun(const QDateTime& now)
 
     // calculate probability that task should not have yet run
     // it's backwards, but it makes the math simplier
-    float prob = 1.0F - ((float)(elapsed - m_windowElapsed.first) /
-                    (float)(m_windowElapsed.second - m_windowElapsed.first));
+    float prob = 1.0F - (duration_cast<floatsecs>(elapsed - m_windowElapsed.first) /
+                         duration_cast<floatsecs>(m_windowElapsed.second - m_windowElapsed.first));
     if (m_currentProb < prob)
         // more bad stuff
         return false;
@@ -415,9 +415,9 @@ bool PeriodicHouseKeeperTask::DoCheckRun(const QDateTime& now)
 
 bool PeriodicHouseKeeperTask::InWindow(const QDateTime& now)
 {
-    int elapsed = GetLastRun().secsTo(now);
+    auto elapsed = std::chrono::seconds(GetLastRun().secsTo(now));
 
-    if (elapsed < 0)
+    if (elapsed < 0s)
         // something bad has happened. let's just move along
         return false;
 
@@ -427,7 +427,7 @@ bool PeriodicHouseKeeperTask::InWindow(const QDateTime& now)
 
 bool PeriodicHouseKeeperTask::PastWindow(const QDateTime &now)
 {
-    return GetLastRun().secsTo(now) > m_windowElapsed.second;
+    return std::chrono::seconds(GetLastRun().secsTo(now)) > m_windowElapsed.second;
 }
 
 /** \class DailyHouseKeeperTask
@@ -466,17 +466,17 @@ void DailyHouseKeeperTask::CalculateWindow(void)
     QDate date = GetLastRun().addDays(1).date();
 
     QDateTime tmp = QDateTime(date, QTime(m_windowHour.first.count(), 0));
-    if (GetLastRun().addSecs(m_windowElapsed.first) < tmp)
-        m_windowElapsed.first = GetLastRun().secsTo(tmp);
+    if (GetLastRun().addSecs(m_windowElapsed.first.count()) < tmp)
+        m_windowElapsed.first = std::chrono::seconds(GetLastRun().secsTo(tmp));
 
     tmp = QDateTime(date, QTime(m_windowHour.second.count(), 30));
     // we want to make sure this gets run before the end of the day
     // so add a 30 minute buffer prior to the end of the window
-    if (GetLastRun().addSecs(m_windowElapsed.second) > tmp)
-        m_windowElapsed.second = GetLastRun().secsTo(tmp);
+    if (GetLastRun().addSecs(m_windowElapsed.second.count()) > tmp)
+        m_windowElapsed.second = std::chrono::seconds(GetLastRun().secsTo(tmp));
 
     LOG(VB_GENERAL, LOG_DEBUG, QString("%1 Run window between %2 - %3.")
-        .arg(GetTag()).arg(m_windowElapsed.first).arg(m_windowElapsed.second));
+        .arg(GetTag()).arg(m_windowElapsed.first.count()).arg(m_windowElapsed.second.count()));
 }
 
 void DailyHouseKeeperTask::SetHourWindow(std::chrono::hours min, std::chrono::hours max)
