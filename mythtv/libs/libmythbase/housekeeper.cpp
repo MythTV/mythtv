@@ -322,19 +322,19 @@ void HouseKeeperTask::SetLastRun(const QDateTime &last, bool successful)
  *
  */
 PeriodicHouseKeeperTask::PeriodicHouseKeeperTask(const QString &dbTag,
-            int period, float min, float max, int retry,
+            std::chrono::seconds period, float min, float max, std::chrono::seconds retry,
             HouseKeeperScope scope, HouseKeeperStartup startup) :
     HouseKeeperTask(dbTag, scope, startup), m_period(period), m_retry(retry),
     m_windowPercent(min, max), m_currentProb(1.0)
 {
     PeriodicHouseKeeperTask::CalculateWindow();
-    if (m_retry == 0)
+    if (m_retry == 0s)
         m_retry = m_period;
 }
 
 void PeriodicHouseKeeperTask::CalculateWindow(void)
 {
-    int period = m_period;
+    std::chrono::seconds period = m_period;
     if (GetLastRun() > GetLastSuccess())
     {
         // last attempt was not successful
@@ -342,10 +342,8 @@ void PeriodicHouseKeeperTask::CalculateWindow(void)
         period = m_retry;
     }
 
-    m_windowElapsed.first =
-                    (uint32_t)((float)period * m_windowPercent.first);
-    m_windowElapsed.second =
-                    (uint32_t)((float)period * m_windowPercent.second);
+    m_windowElapsed.first = (uint32_t)((float)period.count() * m_windowPercent.first);
+    m_windowElapsed.second = (uint32_t)((float)period.count() * m_windowPercent.second);
 }
 
 void PeriodicHouseKeeperTask::SetWindow(float min, float max)
@@ -447,15 +445,16 @@ bool PeriodicHouseKeeperTask::PastWindow(const QDateTime &now)
  */
 DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag,
         HouseKeeperScope scope, HouseKeeperStartup startup) :
-    PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, 0, scope, startup),
-    m_windowHour(0, 23)
+    PeriodicHouseKeeperTask(dbTag, 24h, .5, 1.5, 0s, scope, startup),
+    m_windowHour(0h, 23h)
 {
     DailyHouseKeeperTask::CalculateWindow();
 }
 
-DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag, int minhour,
-        int maxhour, HouseKeeperScope scope, HouseKeeperStartup startup) :
-    PeriodicHouseKeeperTask(dbTag, 86400, .5, 1.5, 0, scope, startup),
+DailyHouseKeeperTask::DailyHouseKeeperTask(const QString &dbTag,
+        std::chrono::hours minhour, std::chrono::hours maxhour,
+        HouseKeeperScope scope, HouseKeeperStartup startup) :
+    PeriodicHouseKeeperTask(dbTag, 24h, .5, 1.5, 0s, scope, startup),
     m_windowHour(minhour, maxhour)
 {
     DailyHouseKeeperTask::CalculateWindow();
@@ -466,11 +465,11 @@ void DailyHouseKeeperTask::CalculateWindow(void)
     PeriodicHouseKeeperTask::CalculateWindow();
     QDate date = GetLastRun().addDays(1).date();
 
-    QDateTime tmp = QDateTime(date, QTime(m_windowHour.first, 0));
+    QDateTime tmp = QDateTime(date, QTime(m_windowHour.first.count(), 0));
     if (GetLastRun().addSecs(m_windowElapsed.first) < tmp)
         m_windowElapsed.first = GetLastRun().secsTo(tmp);
 
-    tmp = QDateTime(date, QTime(m_windowHour.second, 30));
+    tmp = QDateTime(date, QTime(m_windowHour.second.count(), 30));
     // we want to make sure this gets run before the end of the day
     // so add a 30 minute buffer prior to the end of the window
     if (GetLastRun().addSecs(m_windowElapsed.second) > tmp)
@@ -480,7 +479,7 @@ void DailyHouseKeeperTask::CalculateWindow(void)
         .arg(GetTag()).arg(m_windowElapsed.first).arg(m_windowElapsed.second));
 }
 
-void DailyHouseKeeperTask::SetHourWindow(int min, int max)
+void DailyHouseKeeperTask::SetHourWindow(std::chrono::hours min, std::chrono::hours max)
 {
     m_windowHour.first = min;
     m_windowHour.second = max;
@@ -493,7 +492,7 @@ bool DailyHouseKeeperTask::InWindow(const QDateTime& now)
         // parent says we're in the window
         return true;
 
-    int hour = now.time().hour();
+    auto hour = std::chrono::hours(now.time().hour());
     // true if we've missed the window, but we're within our time constraints
     return PastWindow(now) && (m_windowHour.first <= hour)
                         && (m_windowHour.second > hour);

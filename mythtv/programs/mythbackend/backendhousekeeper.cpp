@@ -636,13 +636,13 @@ void MythFillDatabaseTask::SetHourWindowFromDB(void)
 {
     // we need to set the time window from database settings, so we cannot
     // initialize these values in. grab them and set them afterwards
-    int min = gCoreContext->GetNumSetting("MythFillMinHour", -1);
-    int max = gCoreContext->GetNumSetting("MythFillMaxHour", 23);
+    auto min = gCoreContext->GetDurSetting<std::chrono::hours>("MythFillMinHour", -1h);
+    auto max = gCoreContext->GetDurSetting<std::chrono::hours>("MythFillMaxHour", 23h);
 
-    if (min == -1)
+    if (min == -1h)
     {
-        min = 0;
-        max = 23;
+        min = 0h;
+        max = 23h;
     }
     else
     {
