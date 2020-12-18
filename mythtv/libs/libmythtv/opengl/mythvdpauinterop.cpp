@@ -176,7 +176,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
             vector<QSize> sizes;
             sizes.push_back(size);
             vector<MythVideoTexture*> textures =
-                    MythVideoTexture::CreateTextures(m_context, FMT_VDPAU, FMT_ARGB32, sizes);
+                    MythVideoTexture::CreateTextures(m_context, FMT_VDPAU, FMT_RGBA32, sizes);
             if (textures.empty())
                 return false;
             m_openglTextures.insert(DUMMY_INTEROP_ID, textures);
