@@ -1,7 +1,7 @@
 // MythTV
 #include "mythlogging.h"
-#include "mythopenglcomputeshaders.h"
-#include "mythopengltonemap.h"
+#include "opengl/mythopenglcomputeshaders.h"
+#include "opengl/mythopengltonemap.h"
 
 #define LOC QString("Tonemap: ")
 
@@ -21,7 +21,7 @@
 #define GL_WRITE_ONLY                     0x88B9
 #endif
 
-MythOpenGLTonemap::MythOpenGLTonemap(MythRenderOpenGL *Render, MythVideoColourSpace *ColourSpace)
+MythOpenGLTonemap::MythOpenGLTonemap(MythRenderOpenGL* Render, MythVideoColourSpace* ColourSpace)
 {
     if (Render)
     {
@@ -66,12 +66,12 @@ void MythOpenGLTonemap::UpdateColourSpace(bool PrimariesChanged)
     }
 }
 
-MythVideoTexture* MythOpenGLTonemap::GetTexture(void)
+MythVideoTextureOpenGL* MythOpenGLTonemap::GetTexture()
 {
     return m_texture;
 }
 
-MythVideoTexture* MythOpenGLTonemap::Map(std::vector<MythVideoTexture *> &Inputs, QSize DisplaySize)
+MythVideoTextureOpenGL* MythOpenGLTonemap::Map(std::vector<MythVideoTextureOpenGL*>& Inputs, QSize DisplaySize)
 {
     size_t size = Inputs.size();
     if (!size || !m_render || !m_extra)
@@ -166,7 +166,7 @@ bool MythOpenGLTonemap::CreateTexture(QSize Size)
     if (!textureid)
         return false;
 
-    m_texture = new MythVideoTexture(textureid);
+    m_texture = new MythVideoTextureOpenGL(textureid);
     if (!m_texture)
         return false;
 

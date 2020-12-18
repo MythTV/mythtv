@@ -14,9 +14,9 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop, public MythEGLDMABUF
   public:
     static MythDRMPRIMEInterop* Create(MythRenderOpenGL *Context, Type InteropType);
     void DeleteTextures(void) override;
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                      MythVideoColourSpace *ColourSpace,
-                                      MythVideoFrame *Frame, FrameScanType Scan) override;
+    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
+                                            MythVideoColourSpace *ColourSpace,
+                                            MythVideoFrame *Frame, FrameScanType Scan) override;
 
   protected:
     explicit MythDRMPRIMEInterop(MythRenderOpenGL *Context);
@@ -29,4 +29,4 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop, public MythEGLDMABUF
     bool m_composable    { true  };
 };
 
-#endif // MYTHDRMPRIMEINTEROP_H
+#endif

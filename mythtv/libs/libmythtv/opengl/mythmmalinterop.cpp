@@ -1,7 +1,7 @@
 // MythTV
 #include "mythvideocolourspace.h"
 #include "fourcc.h"
-#include "mythmmalinterop.h"
+#include "opengl/mythmmalinterop.h"
 
 extern "C" {
 #include "libavutil/pixdesc.h"
@@ -91,12 +91,12 @@ MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, M
     return result;
 }
 
-vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
-                                                   MythVideoColourSpace *ColourSpace,
-                                                   MythVideoFrame *Frame,
-                                                   FrameScanType Scan)
+vector<MythVideoTextureOpenGL*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
+                                                         MythVideoColourSpace *ColourSpace,
+                                                         MythVideoFrame *Frame,
+                                                         FrameScanType Scan)
 {
-    vector<MythVideoTexture*> result;
+    vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
         return result;
 
@@ -148,8 +148,8 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
             sizes.push_back(size);
         }
 
-        vector<MythVideoTexture*> textures =
-                MythVideoTexture::CreateTextures(m_context, FMT_MMAL, format, sizes,GL_TEXTURE_EXTERNAL_OES);
+        vector<MythVideoTextureOpenGL*> textures =
+            MythVideoTextureOpenGL::CreateTextures(m_context, FMT_MMAL, format, sizes,GL_TEXTURE_EXTERNAL_OES);
         if (textures.size() != count)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create all textures");
 
@@ -167,7 +167,7 @@ vector<MythVideoTexture*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
 
     for (uint plane = 0; plane < result.size(); ++plane)
     {
-        MythVideoTexture* texture = result[plane];
+        MythVideoTextureOpenGL* texture = result[plane];
         EGLenum target = EGL_IMAGE_BRCM_MULTIMEDIA_Y;
         if (plane == 1)
             target = EGL_IMAGE_BRCM_MULTIMEDIA_U;

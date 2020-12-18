@@ -1,20 +1,20 @@
 // MythTV
 #include "mythlogging.h"
-#include "mythvideotexture.h"
+#include "opengl/mythvideotextureopengl.h"
 
 #define LOC QString("MythVidTex: ")
 
-MythVideoTexture::MythVideoTexture(QOpenGLTexture* Texture)
+MythVideoTextureOpenGL::MythVideoTextureOpenGL(QOpenGLTexture* Texture)
   : MythGLTexture(Texture)
 {
 }
 
-MythVideoTexture::MythVideoTexture(GLuint Texture)
+MythVideoTextureOpenGL::MythVideoTextureOpenGL(GLuint Texture)
   : MythGLTexture(Texture)
 {
 }
 
-void MythVideoTexture::DeleteTexture(MythRenderOpenGL *Context, MythVideoTexture *Texture)
+void MythVideoTextureOpenGL::DeleteTexture(MythRenderOpenGL *Context, MythVideoTextureOpenGL *Texture)
 {
     if (!Context || !Texture)
         return;
@@ -28,7 +28,7 @@ void MythVideoTexture::DeleteTexture(MythRenderOpenGL *Context, MythVideoTexture
      delete Texture;
 }
 
-void MythVideoTexture::DeleteTextures(MythRenderOpenGL *Context, std::vector<MythVideoTexture *> &Textures)
+void MythVideoTextureOpenGL::DeleteTextures(MythRenderOpenGL *Context, std::vector<MythVideoTextureOpenGL *> &Textures)
 {
     if (!Context || Textures.empty())
         return;
@@ -37,10 +37,10 @@ void MythVideoTexture::DeleteTextures(MythRenderOpenGL *Context, std::vector<Myt
     Textures.clear();
 }
 
-void MythVideoTexture::SetTextureFilters(MythRenderOpenGL *Context,
-                                         const std::vector<MythVideoTexture *> &Textures,
-                                         QOpenGLTexture::Filter Filter,
-                                         QOpenGLTexture::WrapMode Wrap)
+void MythVideoTextureOpenGL::SetTextureFilters(MythRenderOpenGL *Context,
+                                               const std::vector<MythVideoTextureOpenGL *> &Textures,
+                                               QOpenGLTexture::Filter Filter,
+                                               QOpenGLTexture::WrapMode Wrap)
 {
     for (uint i = 0; (i < Textures.size()) && Context; i++)
     {
@@ -54,13 +54,13 @@ void MythVideoTexture::SetTextureFilters(MythRenderOpenGL *Context,
  * \param Type   Source video frame type.
  * \param Format Output frame type.
 */
-std::vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL *Context,
-                                                           VideoFrameType Type,
-                                                           VideoFrameType Format,
-                                                           std::vector<QSize> Sizes,
-                                                           GLenum Target)
+std::vector<MythVideoTextureOpenGL*> MythVideoTextureOpenGL::CreateTextures(MythRenderOpenGL *Context,
+                                                                            VideoFrameType Type,
+                                                                            VideoFrameType Format,
+                                                                            std::vector<QSize> Sizes,
+                                                                            GLenum Target)
 {
-    std::vector<MythVideoTexture*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     if (!Context || Sizes.empty())
         return result;
     if (Sizes[0].isEmpty())
@@ -82,13 +82,13 @@ std::vector<MythVideoTexture*> MythVideoTexture::CreateTextures(MythRenderOpenGL
  * specific handling.
  * \note Linear filtering is always set (except MediaCodec/MMAL which use OES)
 */
-std::vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRenderOpenGL *Context,
-                                                                   VideoFrameType Type,
-                                                                   VideoFrameType Format,
-                                                                   std::vector<QSize> Sizes,
-                                                                   GLenum Target)
+std::vector<MythVideoTextureOpenGL*> MythVideoTextureOpenGL::CreateHardwareTextures(MythRenderOpenGL *Context,
+                                                                                    VideoFrameType Type,
+                                                                                    VideoFrameType Format,
+                                                                                    std::vector<QSize> Sizes,
+                                                                                    GLenum Target)
 {
-    std::vector<MythVideoTexture*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
 
     uint count = MythVideoFrame::GetNumPlanes(Format);
     if (count < 1)
@@ -110,7 +110,7 @@ std::vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRend
         if (!textureid)
             continue;
 
-        auto* texture = new MythVideoTexture(textureid);
+        auto* texture = new MythVideoTextureOpenGL(textureid);
         texture->m_frameType   = Type;
         texture->m_frameFormat = Format;
         texture->m_plane       = plane;
@@ -130,13 +130,13 @@ std::vector<MythVideoTexture*> MythVideoTexture::CreateHardwareTextures(MythRend
  *
  * \note All textures are created with CreateTexture which defaults to Linear filtering.
 */
-std::vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRenderOpenGL *Context,
-                                                                   VideoFrameType Type,
-                                                                   VideoFrameType Format,
-                                                                   std::vector<QSize> Sizes,
-                                                                   GLenum Target)
+std::vector<MythVideoTextureOpenGL*> MythVideoTextureOpenGL::CreateSoftwareTextures(MythRenderOpenGL *Context,
+                                                                                    VideoFrameType Type,
+                                                                                    VideoFrameType Format,
+                                                                                    std::vector<QSize> Sizes,
+                                                                                    GLenum Target)
 {
-    std::vector<MythVideoTexture*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
 
     uint count = MythVideoFrame::GetNumPlanes(Format);
     if (count < 1)
@@ -180,7 +180,7 @@ std::vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRend
     for (uint plane = 0; plane < count; ++plane)
     {
         QSize size = Sizes[0];
-        MythVideoTexture* texture = nullptr;
+        MythVideoTextureOpenGL* texture = nullptr;
         switch (Format)
         {
             case FMT_YV12:
@@ -278,9 +278,9 @@ std::vector<MythVideoTexture*> MythVideoTexture::CreateSoftwareTextures(MythRend
 
 /*! \brief Update the contents of the given Textures for data held in Frame.
 */
-void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
-                                      const MythVideoFrame *Frame,
-                                      const std::vector<MythVideoTexture*> &Textures)
+void MythVideoTextureOpenGL::UpdateTextures(MythRenderOpenGL *Context,
+                                            const MythVideoFrame *Frame,
+                                            const std::vector<MythVideoTextureOpenGL*> &Textures)
 {
     if (!Context || !Frame || Textures.empty())
     {
@@ -306,7 +306,7 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
 
     for (uint i = 0; i < count; ++i)
     {
-        MythVideoTexture *texture = Textures[i];
+        MythVideoTextureOpenGL *texture = Textures[i];
         if (!texture)
             continue;
         if (!texture->m_texture)
@@ -429,14 +429,14 @@ void MythVideoTexture::UpdateTextures(MythRenderOpenGL *Context,
  * QOpenGLTexture abstracts much of the detail of handling textures but is not compatible
  * with a number of hardware decoder requirements.
 */
-MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
-                                                  QSize Size,
-                                                  GLenum Target,
-                                                  QOpenGLTexture::PixelType PixelType,
-                                                  QOpenGLTexture::PixelFormat PixelFormat,
-                                                  QOpenGLTexture::TextureFormat Format,
-                                                  QOpenGLTexture::Filter Filter,
-                                                  QOpenGLTexture::WrapMode Wrap)
+MythVideoTextureOpenGL* MythVideoTextureOpenGL::CreateTexture(MythRenderOpenGL *Context,
+                                                              QSize Size,
+                                                              GLenum Target,
+                                                              QOpenGLTexture::PixelType PixelType,
+                                                              QOpenGLTexture::PixelFormat PixelFormat,
+                                                              QOpenGLTexture::TextureFormat Format,
+                                                              QOpenGLTexture::Filter Filter,
+                                                              QOpenGLTexture::WrapMode Wrap)
 {
     if (!Context)
         return nullptr;
@@ -470,7 +470,7 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
     texture->setMinMagFilters(Filter, Filter);
     texture->setWrapMode(Wrap);
 
-    auto *result = new MythVideoTexture(texture);
+    auto *result = new MythVideoTextureOpenGL(texture);
     result->m_target      = Target;
     result->m_pixelFormat = PixelFormat;
     result->m_pixelType   = PixelType;
@@ -482,8 +482,8 @@ MythVideoTexture* MythVideoTexture::CreateTexture(MythRenderOpenGL *Context,
 }
 
 /// \brief Copy YV12 frame data to 'YV12' textures.
-inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const MythVideoFrame *Frame,
-                                         MythVideoTexture *Texture, uint Plane)
+inline void MythVideoTextureOpenGL::YV12ToYV12(MythRenderOpenGL *Context, const MythVideoFrame *Frame,
+                                               MythVideoTextureOpenGL *Texture, uint Plane)
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)
     {
@@ -509,7 +509,7 @@ inline void MythVideoTexture::YV12ToYV12(MythRenderOpenGL *Context, const MythVi
 }
 
 /// \brief Copy YV12 frame data to a YUYV texture.
-inline void MythVideoTexture::YV12ToYUYV(const MythVideoFrame *Frame, MythVideoTexture *Texture)
+inline void MythVideoTextureOpenGL::YV12ToYUYV(const MythVideoFrame *Frame, MythVideoTextureOpenGL *Texture)
 {
     // Create a buffer
     if (!Texture->m_data)
@@ -535,8 +535,8 @@ inline void MythVideoTexture::YV12ToYUYV(const MythVideoFrame *Frame, MythVideoT
 }
 
 /// \brief Copy NV12 video frame data to 'NV12' textures.
-inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const MythVideoFrame *Frame,
-                                         MythVideoTexture *Texture, uint Plane)
+inline void MythVideoTextureOpenGL::NV12ToNV12(MythRenderOpenGL *Context, const MythVideoFrame *Frame,
+                                               MythVideoTextureOpenGL *Texture, uint Plane)
 {
     if (Context->GetExtraFeatures() & kGLExtSubimage)
     {
@@ -560,7 +560,7 @@ inline void MythVideoTexture::NV12ToNV12(MythRenderOpenGL *Context, const MythVi
 }
 
 /// \brief Create a data buffer for holding CPU side texture data.
-inline bool MythVideoTexture::CreateBuffer(MythVideoTexture *Texture, int Size)
+inline bool MythVideoTextureOpenGL::CreateBuffer(MythVideoTextureOpenGL *Texture, int Size)
 {
     if (!Texture || Size < 1)
         return false;
@@ -577,8 +577,8 @@ inline bool MythVideoTexture::CreateBuffer(MythVideoTexture *Texture, int Size)
     return false;
 }
 
-VideoFramebuffer MythVideoTexture::CreateVideoFrameBuffer(MythRenderOpenGL* Context, VideoFrameType OutputType,
-                                                          QSize Size, bool HighPrecision)
+VideoFramebuffer MythVideoTextureOpenGL::CreateVideoFrameBuffer(MythRenderOpenGL* Context, VideoFrameType OutputType,
+                                                                QSize Size, bool HighPrecision)
 {
     // Use a 16bit float framebuffer if requested/required and available (not GLES2) to maintain precision.
     // The depth check will pick up all software formats as well as NVDEC, VideoToolBox and VAAPI DRM.
@@ -593,7 +593,7 @@ VideoFramebuffer MythVideoTexture::CreateVideoFrameBuffer(MythRenderOpenGL* Cont
     auto * framebuffer = Context->CreateFramebuffer(Size, sixteenbitfb && sixteenbitvid);
     if (framebuffer == nullptr)
         return { nullptr, nullptr };
-    auto * texture = new MythVideoTexture(framebuffer->texture());
+    auto * texture = new MythVideoTextureOpenGL(framebuffer->texture());
     texture->m_size = texture->m_totalSize = framebuffer->size();
     texture->m_vbo  = Context->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize));
     texture->m_flip = false;

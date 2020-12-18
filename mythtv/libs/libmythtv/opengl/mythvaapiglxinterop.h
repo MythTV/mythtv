@@ -9,18 +9,18 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
     Q_OBJECT
 
   public:
-    MythVAAPIInteropGLX(MythRenderOpenGL *Context, Type InteropType);
+    MythVAAPIInteropGLX(MythRenderOpenGL* Context, Type InteropType);
     ~MythVAAPIInteropGLX() override;
 
   public slots:
     int  SetPictureAttribute(PictureAttribute Attribute, int Value);
 
   protected:
-    uint GetFlagsForFrame(MythVideoFrame *Frame, FrameScanType Scan);
-    void InitPictureAttributes(MythVideoColourSpace *ColourSpace);
+    uint GetFlagsForFrame(MythVideoFrame* Frame, FrameScanType Scan);
+    void InitPictureAttributes(MythVideoColourSpace* ColourSpace);
 
   protected:
-    VADisplayAttribute *m_vaapiPictureAttributes     { nullptr };
+    VADisplayAttribute* m_vaapiPictureAttributes     { nullptr };
     int                 m_vaapiPictureAttributeCount { 0 };
     uint                m_vaapiColourSpace           { 0 };
     MythDeintType       m_basicDeinterlacer          { DEINT_NONE };
@@ -29,11 +29,11 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
 class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
 {
   public:
-    explicit MythVAAPIInteropGLXCopy(MythRenderOpenGL *Context);
+    explicit MythVAAPIInteropGLXCopy(MythRenderOpenGL* Context);
     ~MythVAAPIInteropGLXCopy() override;
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                      MythVideoColourSpace *ColourSpace,
-                                      MythVideoFrame *Frame, FrameScanType Scan) override;
+    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context,
+                                            MythVideoColourSpace* ColourSpace,
+                                            MythVideoFrame* Frame, FrameScanType Scan) override;
 
   private:
     void* m_glxSurface { nullptr };
@@ -47,15 +47,15 @@ using MYTH_GLXRELEASETEXIMAGEEXT = void (*)(Display*, GLXDrawable, int);
 class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
 {
   public:
-    explicit MythVAAPIInteropGLXPixmap(MythRenderOpenGL *Context);
+    explicit MythVAAPIInteropGLXPixmap(MythRenderOpenGL* Context);
     ~MythVAAPIInteropGLXPixmap() override;
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                      MythVideoColourSpace *ColourSpace,
-                                      MythVideoFrame *Frame, FrameScanType Scan) override;
-    static bool IsSupported(MythRenderOpenGL *Context);
+    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context,
+                                            MythVideoColourSpace* ColourSpace,
+                                            MythVideoFrame* Frame, FrameScanType Scan) override;
+    static bool IsSupported(MythRenderOpenGL* Context);
 
   private:
-    bool        InitPixmaps(void);
+    bool        InitPixmaps();
 
     // Texture from Pixmap
     Pixmap                     m_pixmap                { 0 };

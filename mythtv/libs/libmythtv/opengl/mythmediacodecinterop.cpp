@@ -1,7 +1,7 @@
 // MythTV
 #include "mythcorecontext.h"
 #include "mythvideocolourspace.h"
-#include "mythmediacodecinterop.h"
+#include "opengl/mythmediacodecinterop.h"
 
 // FFmpeg
 extern "C" {
@@ -73,8 +73,8 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     // Create texture
     vector<QSize> sizes;
     sizes.push_back(Size);
-    vector<MythVideoTexture*> textures =
-            MythVideoTexture::CreateTextures(m_context, FMT_MEDIACODEC, FMT_RGBA32, sizes, GL_TEXTURE_EXTERNAL_OES);
+    vector<MythVideoTextureOpenGL*> textures =
+        MythVideoTextureOpenGL::CreateTextures(m_context, FMT_MEDIACODEC, FMT_RGBA32, sizes, GL_TEXTURE_EXTERNAL_OES);
     if (textures.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create texture");
@@ -82,7 +82,7 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     }
 
     // Set the texture type
-    MythVideoTexture *texture = textures[0];
+    MythVideoTextureOpenGL *texture = textures[0];
     m_context->glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->m_textureId);
 
     // Create surface
@@ -105,16 +105,16 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Android Surface");
     }
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Android SurfaceTexture");
-    MythVideoTexture::DeleteTextures(m_context, textures);
+    MythVideoTextureOpenGL::DeleteTextures(m_context, textures);
     return false;
 }
 
-vector<MythVideoTexture*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
-                                                         MythVideoColourSpace *ColourSpace,
-                                                         MythVideoFrame *Frame,
-                                                         FrameScanType)
+vector<MythVideoTextureOpenGL*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
+                                                               MythVideoColourSpace *ColourSpace,
+                                                               MythVideoFrame *Frame,
+                                                               FrameScanType)
 {
-    vector<MythVideoTexture*> result;
+    vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
         return result;
 

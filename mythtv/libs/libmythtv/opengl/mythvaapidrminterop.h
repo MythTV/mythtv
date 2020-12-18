@@ -2,8 +2,8 @@
 #define MYTHVAAPIDRMINTEROP_H
 
 // MythTV
-#include "mythegldmabuf.h"
-#include "mythvaapiinterop.h"
+#include "opengl/mythegldmabuf.h"
+#include "opengl/mythvaapiinterop.h"
 
 class MythDRMPRIMEInterop;
 struct AVDRMFrameDescriptor;
@@ -11,36 +11,36 @@ struct AVDRMFrameDescriptor;
 class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
 {
   public:
-    explicit MythVAAPIInteropDRM(MythRenderOpenGL *Context);
+    explicit MythVAAPIInteropDRM(MythRenderOpenGL* Context);
     ~MythVAAPIInteropDRM() override;
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                      MythVideoColourSpace *ColourSpace,
-                                      MythVideoFrame *Frame, FrameScanType Scan) override;
-    static bool    IsSupported(MythRenderOpenGL *Context);
-    void           DeleteTextures(void) override;
+    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context,
+                                            MythVideoColourSpace* ColourSpace,
+                                            MythVideoFrame* Frame, FrameScanType Scan) override;
+    static bool    IsSupported(MythRenderOpenGL* Context);
+    void           DeleteTextures() override;
 
   protected:
-    void           DestroyDeinterlacer(void) override;
-    void           PostInitDeinterlacer(void) override;
+    void           DestroyDeinterlacer() override;
+    void           PostInitDeinterlacer() override;
 
   private:
     static VideoFrameType VATypeToMythType(uint32_t Fourcc);
-    void           CleanupReferenceFrames(void);
-    void           RotateReferenceFrames(AVBufferRef *Buffer);
-    vector<MythVideoTexture*> GetReferenceFrames(void);
+    void           CleanupReferenceFrames();
+    void           RotateReferenceFrames(AVBufferRef* Buffer);
+    vector<MythVideoTextureOpenGL*> GetReferenceFrames();
 
   private:
     QFile                 m_drmFile         { };
     QVector<AVBufferRef*> m_referenceFrames { };
 
-    vector<MythVideoTexture*> AcquireVAAPI(VASurfaceID Id, MythRenderOpenGL *Context,
-                                           MythVideoFrame *Frame);
-    vector<MythVideoTexture*> AcquirePrime(VASurfaceID Id, MythRenderOpenGL *Context,
-                                           MythVideoFrame *Frame);
-    void                      CleanupDRMPRIME(void);
-    bool                      TestPrimeInterop(void);
+    vector<MythVideoTextureOpenGL*> AcquireVAAPI(VASurfaceID Id, MythRenderOpenGL* Context,
+                                                 MythVideoFrame* Frame);
+    vector<MythVideoTextureOpenGL*> AcquirePrime(VASurfaceID Id, MythRenderOpenGL* Context,
+                                                 MythVideoFrame* Frame);
+    void                      CleanupDRMPRIME();
+    bool                      TestPrimeInterop();
     bool                      m_usePrime { false };
     QHash<unsigned long long, AVDRMFrameDescriptor*> m_drmFrames { };
 };
 
-#endif // MYTHVAAPIDRMINTEROP_H
+#endif

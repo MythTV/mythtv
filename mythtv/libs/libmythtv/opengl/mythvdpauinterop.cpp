@@ -1,12 +1,12 @@
 // MythTV
 #include "mythcorecontext.h"
 #include "mythvideocolourspace.h"
-#include "mythvdpauhelper.h"
-#include "mythvdpauinterop.h"
+#include "decoders/mythvdpauhelper.h"
+#include "opengl/mythvdpauinterop.h"
 
 #define LOC QString("VDPAUInterop: ")
 
-MythVDPAUInterop* MythVDPAUInterop::Create(MythRenderOpenGL *Context, MythCodecID CodecId)
+MythVDPAUInterop* MythVDPAUInterop::Create(MythRenderOpenGL* Context, MythCodecID CodecId)
 {
     if (Context)
         return new MythVDPAUInterop(Context, CodecId);
@@ -31,7 +31,7 @@ MythOpenGLInterop::Type MythVDPAUInterop::GetInteropType(VideoFrameType Format)
     return Unsupported;
 }
 
-MythVDPAUInterop::MythVDPAUInterop(MythRenderOpenGL *Context, MythCodecID CodecId)
+MythVDPAUInterop::MythVDPAUInterop(MythRenderOpenGL* Context, MythCodecID CodecId)
   : MythOpenGLInterop(Context, VDPAU),
     m_codec(CodecId)
 {
@@ -85,7 +85,7 @@ void MythVDPAUInterop::CleanupDeinterlacer(void)
     }
 }
 
-void MythVDPAUInterop::RotateReferenceFrames(AVBufferRef *Buffer)
+void MythVDPAUInterop::RotateReferenceFrames(AVBufferRef* Buffer)
 {
     if (!Buffer)
         return;
@@ -175,8 +175,8 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
         {
             vector<QSize> sizes;
             sizes.push_back(size);
-            vector<MythVideoTexture*> textures =
-                    MythVideoTexture::CreateTextures(m_context, FMT_VDPAU, FMT_RGBA32, sizes);
+            vector<MythVideoTextureOpenGL*> textures =
+                MythVideoTextureOpenGL::CreateTextures(m_context, FMT_VDPAU, FMT_RGBA32, sizes);
             if (textures.empty())
                 return false;
             m_openglTextures.insert(DUMMY_INTEROP_ID, textures);
@@ -218,12 +218,12 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
  * \note We use a VdpVideoMixer to complete the conversion from YUV to RGB. Hence the returned
  * texture is RGB... We could use GL_NV_vdpau_interop2 to return raw YUV frames.
 */
-vector<MythVideoTexture*> MythVDPAUInterop::Acquire(MythRenderOpenGL *Context,
-                                                    MythVideoColourSpace *ColourSpace,
-                                                    MythVideoFrame *Frame,
-                                                    FrameScanType Scan)
+vector<MythVideoTextureOpenGL*> MythVDPAUInterop::Acquire(MythRenderOpenGL* Context,
+                                                          MythVideoColourSpace* ColourSpace,
+                                                          MythVideoFrame* Frame,
+                                                          FrameScanType Scan)
 {
-    vector<MythVideoTexture*> result;
+    vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
         return result;
 

@@ -6,7 +6,7 @@
 #include "mythcorecontext.h"
 #include "mythvideocolourspace.h"
 #include "opengl/mythrenderopengl.h"
-#include "mythopenglinterop.h"
+#include "opengl/mythopenglinterop.h"
 
 #ifdef USING_VAAPI
 #include "mythvaapiinterop.h"
@@ -159,12 +159,12 @@ MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format,
     return supported;
 }
 
-vector<MythVideoTexture*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
-                                                      MythVideoColourSpace *ColourSpace,
-                                                      MythVideoFrame       *Frame,
-                                                      FrameScanType     Scan)
+vector<MythVideoTextureOpenGL*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
+                                                            MythVideoColourSpace *ColourSpace,
+                                                            MythVideoFrame       *Frame,
+                                                            FrameScanType     Scan)
 {
-    vector<MythVideoTexture*> result;
+    vector<MythVideoTextureOpenGL*> result;
     if (!(Context && Frame))
         return result;
 
@@ -225,7 +225,7 @@ MythOpenGLInterop::~MythOpenGLInterop()
         m_context->DecrRef();
 }
 
-MythOpenGLInterop* MythOpenGLInterop::CreateDummy(void)
+MythOpenGLInterop* MythOpenGLInterop::CreateDummy()
 {
     // This is used to store AVHWDeviceContext free and user_opaque when
     // set by the decoder in use. This usually applies to VAAPI and VDPAU
@@ -234,14 +234,14 @@ MythOpenGLInterop* MythOpenGLInterop::CreateDummy(void)
     return new MythOpenGLInterop(nullptr, DUMMY);
 }
 
-vector<MythVideoTexture*> MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
-                                                     MythVideoColourSpace* /*ColourSpace*/,
-                                                     MythVideoFrame* /*Frame*/, FrameScanType /*Scan*/)
+vector<MythVideoTextureOpenGL*> MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
+                                                           MythVideoColourSpace* /*ColourSpace*/,
+                                                           MythVideoFrame* /*Frame*/, FrameScanType /*Scan*/)
 {
-    return vector<MythVideoTexture*>();
+    return vector<MythVideoTextureOpenGL*>();
 }
 
-void MythOpenGLInterop::DeleteTextures(void)
+void MythOpenGLInterop::DeleteTextures()
 {
     if (m_context && !m_openglTextures.isEmpty())
     {
@@ -249,12 +249,12 @@ void MythOpenGLInterop::DeleteTextures(void)
         int count = 0;
         for (auto it = m_openglTextures.constBegin(); it != m_openglTextures.constEnd(); ++it)
         {
-            vector<MythVideoTexture*> textures = it.value();
+            vector<MythVideoTextureOpenGL*> textures = it.value();
             for (auto & texture : textures)
             {
                 if (texture->m_textureId)
                     m_context->glDeleteTextures(1, &texture->m_textureId);
-                MythVideoTexture::DeleteTexture(m_context, texture);
+                MythVideoTextureOpenGL::DeleteTexture(m_context, texture);
                 count++;
             }
             textures.clear();
@@ -265,12 +265,12 @@ void MythOpenGLInterop::DeleteTextures(void)
     }
 }
 
-MythOpenGLInterop::Type MythOpenGLInterop::GetType(void)
+MythOpenGLInterop::Type MythOpenGLInterop::GetType()
 {
     return m_type;
 }
 
-MythPlayerUI* MythOpenGLInterop::GetPlayer(void)
+MythPlayerUI* MythOpenGLInterop::GetPlayer()
 {
     return m_player;
 }
@@ -290,12 +290,12 @@ void MythOpenGLInterop::SetDefaultUserOpaque(void* UserOpaque)
     m_defaultUserOpaque = UserOpaque;
 }
 
-FreeAVHWDeviceContext MythOpenGLInterop::GetDefaultFree(void)
+FreeAVHWDeviceContext MythOpenGLInterop::GetDefaultFree()
 {
     return m_defaultFree;
 }
 
-void* MythOpenGLInterop::GetDefaultUserOpaque(void)
+void* MythOpenGLInterop::GetDefaultUserOpaque()
 {
     return m_defaultUserOpaque;
 }

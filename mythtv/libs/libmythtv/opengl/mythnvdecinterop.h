@@ -2,7 +2,7 @@
 #define MYTHNVDECINTEROP_H
 
 // MythTV
-#include "mythopenglinterop.h"
+#include "opengl/mythopenglinterop.h"
 
 // FFmpeg
 extern "C" {
@@ -15,31 +15,31 @@ class MythNVDECInterop : public MythOpenGLInterop
     friend class MythOpenGLInterop;
 
   public:
-    static MythNVDECInterop* Create(MythRenderOpenGL *Context);
-    static bool CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
-                                  CUcontext &CudaContext);
-    static void CleanupContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
-                               CUcontext &CudaContext);
+    static MythNVDECInterop* Create(MythRenderOpenGL* Context);
+    static bool CreateCUDAContext(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
+                                  CUcontext& CudaContext);
+    static void CleanupContext(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
+                               CUcontext& CudaContext);
 
-    bool IsValid(void);
-    CUcontext GetCUDAContext(void);
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context, MythVideoColourSpace *ColourSpace,
-                                      MythVideoFrame *Frame, FrameScanType Scan) override;
+    bool IsValid();
+    CUcontext GetCUDAContext();
+    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
+                                            MythVideoFrame* Frame, FrameScanType Scan) override;
 
   protected:
     static Type GetInteropType(VideoFrameType Format);
-    explicit MythNVDECInterop(MythRenderOpenGL *Context);
+    explicit MythNVDECInterop(MythRenderOpenGL* Context);
    ~MythNVDECInterop() override;
 
   private:
-    bool           InitialiseCuda(void);
-    void           DeleteTextures(void) override;
+    bool           InitialiseCuda();
+    void           DeleteTextures() override;
     void           RotateReferenceFrames(CUdeviceptr Buffer);
-    static bool    CreateCUDAPriv(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
-                                  CUcontext &CudaContext, bool &Retry);
+    static bool    CreateCUDAPriv(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
+                                  CUcontext& CudaContext, bool& Retry);
     CUcontext      m_cudaContext;
-    CudaFunctions *m_cudaFuncs { nullptr };
+    CudaFunctions* m_cudaFuncs { nullptr };
     QVector<CUdeviceptr> m_referenceFrames;
 };
 
-#endif // MYTHNVDECINTEROP_H
+#endif

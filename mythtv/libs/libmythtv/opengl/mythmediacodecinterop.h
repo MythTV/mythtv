@@ -16,9 +16,9 @@ class MythMediaCodecInterop : public MythOpenGLInterop
   public:
     static MythMediaCodecInterop* Create(MythRenderOpenGL *Context, QSize Size);
 
-    virtual vector<MythVideoTexture*> Acquire (MythRenderOpenGL *Context,
-                                               MythVideoColourSpace *ColourSpace,
-                                               MythVideoFrame *Frame, FrameScanType Scan) override;
+    virtual vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
+                                                    MythVideoColourSpace *ColourSpace,
+                                                    MythVideoFrame *Frame, FrameScanType Scan) override;
     void*   GetSurface(void);
 
   protected:

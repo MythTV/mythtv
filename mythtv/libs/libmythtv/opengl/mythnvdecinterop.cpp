@@ -2,7 +2,7 @@
 #include "mythconfig.h"
 #include "mythcorecontext.h"
 #include "mythvideocolourspace.h"
-#include "mythnvdecinterop.h"
+#include "opengl/mythnvdecinterop.h"
 
 // Std
 #include <chrono>
@@ -20,7 +20,7 @@
     } \
 }
 
-MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL *Context)
+MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL* Context)
   : MythOpenGLInterop(Context, NVDEC),
     m_cudaContext()
 {
@@ -34,7 +34,7 @@ MythNVDECInterop::~MythNVDECInterop()
     CleanupContext(m_context, m_cudaFuncs, m_cudaContext);
 }
 
-void MythNVDECInterop::DeleteTextures(void)
+void MythNVDECInterop::DeleteTextures()
 {
     if (!(m_cudaContext && m_cudaFuncs))
         return;
@@ -47,7 +47,7 @@ void MythNVDECInterop::DeleteTextures(void)
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting CUDA resources");
         for (auto it = m_openglTextures.constBegin(); it != m_openglTextures.constEnd(); ++it)
         {
-            vector<MythVideoTexture*> textures = it.value();
+            vector<MythVideoTextureOpenGL*> textures = it.value();
             for (auto & texture : textures)
             {
                 auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>(texture->m_data);
@@ -65,17 +65,17 @@ void MythNVDECInterop::DeleteTextures(void)
     MythOpenGLInterop::DeleteTextures();
 }
 
-bool MythNVDECInterop::IsValid(void)
+bool MythNVDECInterop::IsValid()
 {
     return m_cudaFuncs && m_cudaContext;
 }
 
-CUcontext MythNVDECInterop::GetCUDAContext(void)
+CUcontext MythNVDECInterop::GetCUDAContext()
 {
     return m_cudaContext;
 }
 
-MythNVDECInterop* MythNVDECInterop::Create(MythRenderOpenGL *Context)
+MythNVDECInterop* MythNVDECInterop::Create(MythRenderOpenGL* Context)
 {
     if (Context)
         return new MythNVDECInterop(Context);
@@ -99,12 +99,12 @@ MythOpenGLInterop::Type MythNVDECInterop::GetInteropType(VideoFrameType Format)
  * textures and maps the texture storage to a CUdeviceptr (if that is possible). Alternatively
  * EGL interopability may also be useful.
 */
-vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
-                                                    MythVideoColourSpace *ColourSpace,
-                                                    MythVideoFrame *Frame,
-                                                    FrameScanType Scan)
+vector<MythVideoTextureOpenGL*> MythNVDECInterop::Acquire(MythRenderOpenGL* Context,
+                                                          MythVideoColourSpace* ColourSpace,
+                                                          MythVideoFrame* Frame,
+                                                          FrameScanType Scan)
 {
-    vector<MythVideoTexture*> result;
+    vector<MythVideoTextureOpenGL*> result;
     if (!Frame || !m_cudaContext || !m_cudaFuncs)
         return result;
 
@@ -160,8 +160,8 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         vector<QSize> sizes;
         sizes.emplace_back(QSize(Frame->m_width, Frame->m_height));
         sizes.emplace_back(QSize(Frame->m_width, Frame->m_height >> 1));
-        vector<MythVideoTexture*> textures =
-                MythVideoTexture::CreateTextures(m_context, FMT_NVDEC, type, sizes);
+        vector<MythVideoTextureOpenGL*> textures =
+                MythVideoTextureOpenGL::CreateTextures(m_context, FMT_NVDEC, type, sizes);
         if (textures.empty())
         {
             CUDA_CHECK(m_cudaFuncs, cuCtxPopCurrent(&dummy));
@@ -173,7 +173,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
         {
             // N.B. I think the texture formats for P010 are not strictly compliant
             // with OpenGL ES 3.X but the Nvidia driver does not complain.
-            MythVideoTexture *tex = textures[plane];
+            MythVideoTextureOpenGL *tex = textures[plane];
             tex->m_allowGLSLDeint = true;
             m_context->glBindTexture(tex->m_target, tex->m_textureId);
             QOpenGLTexture::PixelFormat format     = QOpenGLTexture::Red;
@@ -224,7 +224,7 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
                 texture->m_data = nullptr;
                 if (texture->m_textureId)
                     m_context->glDeleteTextures(1, &texture->m_textureId);
-                MythVideoTexture::DeleteTexture(m_context, texture);
+                MythVideoTextureOpenGL::DeleteTexture(m_context, texture);
             }
         }
     }
@@ -304,13 +304,13 @@ vector<MythVideoTexture*> MythNVDECInterop::Acquire(MythRenderOpenGL *Context,
  * \note We do not use the FFmpeg internal context creation as the created context
  * is deleted before we have a chance to cleanup our own CUDA resources.
 */
-bool MythNVDECInterop::InitialiseCuda(void)
+bool MythNVDECInterop::InitialiseCuda()
 {
     return CreateCUDAContext(m_context, m_cudaFuncs, m_cudaContext);
 }
 
-bool MythNVDECInterop::CreateCUDAPriv(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
-                                      CUcontext &CudaContext, bool &Retry)
+bool MythNVDECInterop::CreateCUDAPriv(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
+                                      CUcontext& CudaContext, bool& Retry)
 {
     Retry = false;
     if (!GLContext)
@@ -364,8 +364,8 @@ bool MythNVDECInterop::CreateCUDAPriv(MythRenderOpenGL *GLContext, CudaFunctions
     return true;
 }
 
-bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
-                                         CUcontext &CudaContext)
+bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
+                                         CUcontext& CudaContext)
 {
     if (!gCoreContext->IsUIThread())
     {
@@ -388,8 +388,8 @@ bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL *GLContext, CudaFuncti
     return false;
 }
 
-void MythNVDECInterop::CleanupContext(MythRenderOpenGL *GLContext, CudaFunctions *&CudaFuncs,
-                                      CUcontext &CudaContext)
+void MythNVDECInterop::CleanupContext(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
+                                      CUcontext& CudaContext)
 {
     if (!GLContext)
         return;

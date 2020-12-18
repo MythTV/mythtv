@@ -204,8 +204,8 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
     OpenGLLocker ctx_lock(m_openglRender);
 
     // delete old reference textures
-    MythVideoTexture::DeleteTextures(m_openglRender, m_prevTextures);
-    MythVideoTexture::DeleteTextures(m_openglRender, m_nextTextures);
+    MythVideoTextureOpenGL::DeleteTextures(m_openglRender, m_prevTextures);
+    MythVideoTextureOpenGL::DeleteTextures(m_openglRender, m_nextTextures);
 
     // For basic deinterlacing of software frames, we now create 2 sets of field
     // based textures - which is the same approach taken by the CPU based onefield/bob
@@ -228,15 +228,15 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
             LOG(VB_GENERAL, LOG_INFO, LOC + "Forcing OpenGL YV12 for basic deinterlacer");
             m_outputType = FMT_YV12;
         }
-        MythVideoTexture::DeleteTextures(m_openglRender, m_inputTextures);
+        MythVideoTextureOpenGL::DeleteTextures(m_openglRender, m_inputTextures);
         QSize size(m_videoDim.width(), m_videoDim.height() >> 1);
         vector<QSize> sizes;
         sizes.emplace_back(size);
         // N.B. If we are currently resizing, it will be turned off for this
         // deinterlacer, so the default linear texture filtering is OK.
-        m_inputTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
+        m_inputTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         // nextTextures will hold the other field
-        m_nextTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
+        m_nextTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created %1 single field textures")
             .arg(m_inputTextures.size() * 2));
         // Con MythVideoBounds into display the field only
@@ -266,13 +266,13 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
     {
         vector<QSize> sizes;
         sizes.emplace_back(QSize(m_videoDim));
-        m_prevTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
-        m_nextTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
+        m_prevTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
+        m_nextTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         // ensure we use GL_NEAREST if resizing is already active and needed
         if ((m_resizing & Sampling) == Sampling)
         {
-            MythVideoTexture::SetTextureFilters(m_openglRender, m_prevTextures, QOpenGLTexture::Nearest);
-            MythVideoTexture::SetTextureFilters(m_openglRender, m_nextTextures, QOpenGLTexture::Nearest);
+            MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, m_prevTextures, QOpenGLTexture::Nearest);
+            MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, m_nextTextures, QOpenGLTexture::Nearest);
         }
     }
 
@@ -499,7 +499,7 @@ bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
     {
         vector<QSize> sizes;
         sizes.push_back(Size);
-        m_inputTextures = MythVideoTexture::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
+        m_inputTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         if (m_inputTextures.empty())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create input textures");
@@ -531,9 +531,9 @@ void MythOpenGLVideo::ResetFrameFormat()
             m_openglRender->DeleteShaderProgram(shader);
     m_shaders.fill(nullptr);
     m_shaderCost.fill(1);
-    MythVideoTexture::DeleteTextures(m_openglRender, m_inputTextures);
-    MythVideoTexture::DeleteTextures(m_openglRender, m_prevTextures);
-    MythVideoTexture::DeleteTextures(m_openglRender, m_nextTextures);
+    MythVideoTextureOpenGL::DeleteTextures(m_openglRender, m_inputTextures);
+    MythVideoTextureOpenGL::DeleteTextures(m_openglRender, m_prevTextures);
+    MythVideoTextureOpenGL::DeleteTextures(m_openglRender, m_nextTextures);
     m_textureTarget = QOpenGLTexture::Target2D;
     m_fallbackDeinterlacer = DEINT_NONE;
     m_openglRender->DeleteFramebuffer(m_frameBuffer);
@@ -608,7 +608,7 @@ void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
         {
             if (qAbs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
                 ResetTextures();
-            vector<MythVideoTexture*> temp = m_prevTextures;
+            vector<MythVideoTextureOpenGL*> temp = m_prevTextures;
             m_prevTextures = m_inputTextures;
             m_inputTextures = m_nextTextures;
             m_nextTextures = temp;
@@ -625,19 +625,19 @@ void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
         Frame->m_pitches[0] = Frame->m_pitches[0] << 1;
         Frame->m_pitches[1] = Frame->m_pitches[1] << 1;
         Frame->m_pitches[2] = Frame->m_pitches[2] << 1;
-        MythVideoTexture::UpdateTextures(m_openglRender, Frame, m_inputTextures);
+        MythVideoTextureOpenGL::UpdateTextures(m_openglRender, Frame, m_inputTextures);
         // second field. Fake the offsets as well.
         FrameOffsets offsets = Frame->m_offsets;
         Frame->m_offsets[0] = Frame->m_offsets[0] + pitches[0];
         Frame->m_offsets[1] = Frame->m_offsets[1] + pitches[1];
         Frame->m_offsets[2] = Frame->m_offsets[2] + pitches[2];
-        MythVideoTexture::UpdateTextures(m_openglRender, Frame, m_nextTextures);
+        MythVideoTextureOpenGL::UpdateTextures(m_openglRender, Frame, m_nextTextures);
         Frame->m_pitches = pitches;
         Frame->m_offsets = offsets;
     }
     else
     {
-        MythVideoTexture::UpdateTextures(m_openglRender, Frame, current ? m_inputTextures : m_nextTextures);
+        MythVideoTextureOpenGL::UpdateTextures(m_openglRender, Frame, current ? m_inputTextures : m_nextTextures);
     }
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
@@ -674,7 +674,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     VideoResizing resize = Frame ? (MythVideoFrame::HardwareFramesFormat(Frame->m_type) ? Framebuffer : None) :
                                    (MythVideoFrame::HardwareFramesFormat(m_inputType)  ? Framebuffer : None);
 
-    vector<MythVideoTexture*> inputtextures = m_inputTextures;
+    vector<MythVideoTextureOpenGL*> inputtextures = m_inputTextures;
     if (inputtextures.empty())
     {
         // Pull in any hardware frames
@@ -846,9 +846,9 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
             m_frameBuffer = nullptr;
         }
         // set filtering
-        MythVideoTexture::SetTextureFilters(m_openglRender, m_inputTextures, QOpenGLTexture::Linear);
-        MythVideoTexture::SetTextureFilters(m_openglRender, m_prevTextures, QOpenGLTexture::Linear);
-        MythVideoTexture::SetTextureFilters(m_openglRender, m_nextTextures, QOpenGLTexture::Linear);
+        MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, m_inputTextures, QOpenGLTexture::Linear);
+        MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, m_prevTextures, QOpenGLTexture::Linear);
+        MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, m_nextTextures, QOpenGLTexture::Linear);
         m_resizing = None;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled resizing");
     }
@@ -856,9 +856,9 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     {
         // framebuffer will be created as needed below
         QOpenGLTexture::Filter filter = ((resize & Sampling) == Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
-        MythVideoTexture::SetTextureFilters(m_openglRender, m_inputTextures, filter);
-        MythVideoTexture::SetTextureFilters(m_openglRender, m_prevTextures, filter);
-        MythVideoTexture::SetTextureFilters(m_openglRender, m_nextTextures, filter);
+        MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, m_inputTextures, filter);
+        MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, m_prevTextures, filter);
+        MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, m_nextTextures, filter);
         m_resizing = resize;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Resizing from %1x%2 to %3x%4 for %5")
             .arg(m_videoDispDim.width()).arg(m_videoDispDim.height())
@@ -871,7 +871,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     {
         QOpenGLTexture::Filter filter = ((resize & Sampling) == Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
         if (inputtextures[0]->m_filter != filter)
-            MythVideoTexture::SetTextureFilters(m_openglRender, inputtextures, filter);
+            MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, inputtextures, filter);
     }
 
     // texture coordinates
@@ -879,7 +879,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
 
     if (resize)
     {
-        MythVideoTexture* nexttexture = nullptr;
+        MythVideoTextureOpenGL* nexttexture = nullptr;
 
         // only render to the framebuffer if there is something to update
         if (useframebufferimage)
@@ -910,7 +910,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
             // we need a framebuffer and associated texture
             if (!m_frameBuffer)
             {
-                if (auto [fbo, tex] = MythVideoTexture::CreateVideoFrameBuffer(m_openglRender, m_outputType, m_videoDispDim);
+                if (auto [fbo, tex] = MythVideoTextureOpenGL::CreateVideoFrameBuffer(m_openglRender, m_outputType, m_videoDispDim);
                     (fbo != nullptr) && (tex != nullptr))
                 {
                     delete m_frameBuffer;
@@ -1027,7 +1027,7 @@ void MythOpenGLVideo::ResetTextures()
         texture->m_valid = false;
 }
 
-void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*>& Current,
+void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTextureOpenGL*>& Current,
                                    vector<MythGLTexture*>& Textures)
 {
     if (Deinterlacing && !MythVideoFrame::HardwareFormat(m_inputType))
@@ -1037,8 +1037,8 @@ void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*>
             // if we are using reference frames, we want the current frame in the middle
             // but next will be the first valid, followed by current...
             size_t count = Current.size();
-            vector<MythVideoTexture*>& current = Current[0]->m_valid ? Current : m_nextTextures;
-            vector<MythVideoTexture*>& prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
+            vector<MythVideoTextureOpenGL*>& current = Current[0]->m_valid ? Current : m_nextTextures;
+            vector<MythVideoTextureOpenGL*>& prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
 
             for (uint i = 0; i < count; ++i)
                 Textures.push_back(reinterpret_cast<MythGLTexture*>(prev[i]));
@@ -1051,7 +1051,7 @@ void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTexture*>
     }
 
     std::transform(Current.cbegin(), Current.cend(), std::back_inserter(Textures),
-                   [](MythVideoTexture* Tex) { return reinterpret_cast<MythGLTexture*>(Tex); });
+                   [](MythVideoTextureOpenGL* Tex) { return reinterpret_cast<MythGLTexture*>(Tex); });
 }
 
 QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)

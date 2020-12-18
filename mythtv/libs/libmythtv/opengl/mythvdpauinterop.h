@@ -6,7 +6,7 @@
 
 // MythTV
 #include "mythcodecid.h"
-#include "mythopenglinterop.h"
+#include "opengl/mythopenglinterop.h"
 
 // FFmpeg
 extern "C" {
@@ -29,9 +29,9 @@ class MythVDPAUInterop : public MythOpenGLInterop
     friend class MythOpenGLInterop;
 
   public:
-    static MythVDPAUInterop* Create(MythRenderOpenGL *Context, MythCodecID CodecId);
-    vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context, MythVideoColourSpace *ColourSpace,
-                                      MythVideoFrame *Frame, FrameScanType Scan) override;
+    static MythVDPAUInterop* Create(MythRenderOpenGL* Context, MythCodecID CodecId);
+    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
+                                            MythVideoFrame* Frame, FrameScanType Scan) override;
     bool  IsPreempted(void) const;
 
   public slots:
@@ -40,7 +40,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
 
   protected:
     static Type GetInteropType(VideoFrameType Format);
-    MythVDPAUInterop(MythRenderOpenGL *Context, MythCodecID CodecID);
+    MythVDPAUInterop(MythRenderOpenGL* Context, MythCodecID CodecID);
     ~MythVDPAUInterop() override;
 
   private:
@@ -49,10 +49,10 @@ class MythVDPAUInterop : public MythOpenGLInterop
                     MythDeintType Deint, bool DoubleRate);
     void  Cleanup(void);
     void  CleanupDeinterlacer(void);
-    void  RotateReferenceFrames(AVBufferRef *Buffer);
+    void  RotateReferenceFrames(AVBufferRef* Buffer);
 
-    MythVideoColourSpace   *m_colourSpace       { nullptr };
-    MythVDPAUHelper    *m_helper            { nullptr };
+    MythVideoColourSpace* m_colourSpace     { nullptr };
+    MythVDPAUHelper*    m_helper            { nullptr };
     VdpOutputSurface    m_outputSurface     { 0       };
     MythVDPAUSurfaceNV  m_outputSurfaceReg  { 0       };
     VdpVideoMixer       m_mixer             { 0       };

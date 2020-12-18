@@ -2,7 +2,7 @@
 #include "mythmainwindow.h"
 #include "mythcorecontext.h"
 #include "mythvideocolourspace.h"
-#include "mythvtbinterop.h"
+#include "opengl/mythvtbinterop.h"
 
 #define LOC QString("VTBInterop: ")
 
@@ -23,7 +23,7 @@ MythOpenGLInterop::Type MythVTBInterop::GetInteropType(VideoFrameType Format)
     return VTBOPENGL;
 }
 
-MythVTBInterop* MythVTBInterop::Create(MythRenderOpenGL *Context, MythOpenGLInterop::Type Type)
+MythVTBInterop* MythVTBInterop::Create(MythRenderOpenGL* Context, MythOpenGLInterop::Type Type)
 {
     if (Context)
     {
@@ -35,7 +35,7 @@ MythVTBInterop* MythVTBInterop::Create(MythRenderOpenGL *Context, MythOpenGLInte
     return nullptr;
 }
 
-MythVTBInterop::MythVTBInterop(MythRenderOpenGL *Context, MythOpenGLInterop::Type Type)
+MythVTBInterop::MythVTBInterop(MythRenderOpenGL* Context, MythOpenGLInterop::Type Type)
   : MythOpenGLInterop(Context, Type)
 {
 }
@@ -44,7 +44,7 @@ MythVTBInterop::~MythVTBInterop()
 {
 }
 
-CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, MythVideoColourSpace *ColourSpace, MythVideoFrame *Frame)
+CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace, MythVideoFrame* Frame)
 {
     if (!Frame)
         return nullptr;
@@ -79,12 +79,12 @@ CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL *Context, MythVideoColo
     return reinterpret_cast<CVPixelBufferRef>(Frame->m_buffer);
 }
 
-vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
-                                                  MythVideoColourSpace *ColourSpace,
-                                                  MythVideoFrame *Frame,
-                                                  FrameScanType)
+vector<MythVideoTextureOpenGL*> MythVTBInterop::Acquire(MythRenderOpenGL* Context,
+                                                        MythVideoColourSpace* ColourSpace,
+                                                        MythVideoFrame* Frame,
+                                                        FrameScanType)
 {
-    vector<MythVideoTexture*> result;
+    vector<MythVideoTextureOpenGL*> result;
     OpenGLLocker locker(m_context);
 
     CVPixelBufferRef buffer = Verify(Context, ColourSpace, Frame);
@@ -113,7 +113,7 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
             int width  = CVPixelBufferGetWidthOfPlane(buffer, plane);
             int height = CVPixelBufferGetHeightOfPlane(buffer, plane);
             QSize size(width, height);
-            MythVideoTexture *texture = MythVideoTexture::CreateTexture(m_context, size);
+            MythVideoTextureOpenGL* texture = MythVideoTextureOpenGL::CreateTexture(m_context, size);
             if (texture)
             {
                 texture->m_frameType = FMT_VTB;
@@ -163,7 +163,7 @@ vector<MythVideoTexture*> MythVTBInterop::Acquire(MythRenderOpenGL *Context,
     return result;
 }
 
-MythVTBSurfaceInterop::MythVTBSurfaceInterop(MythRenderOpenGL *Context)
+MythVTBSurfaceInterop::MythVTBSurfaceInterop(MythRenderOpenGL* Context)
   : MythVTBInterop(Context, VTBSURFACE)
 {
 }
@@ -172,12 +172,12 @@ MythVTBSurfaceInterop::~MythVTBSurfaceInterop()
 {
 }
 
-vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Context,
-                                                         MythVideoColourSpace *ColourSpace,
-                                                         MythVideoFrame *Frame,
-                                                         FrameScanType Scan)
+vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL* Context,
+                                                               MythVideoColourSpace* ColourSpace,
+                                                               MythVideoFrame* Frame,
+                                                               FrameScanType Scan)
 {
-    vector<MythVideoTexture*> result;
+    vector<MythVideoTextureOpenGL*> result;
     OpenGLLocker locker(m_context);
 
     CVPixelBufferRef buffer = Verify(Context, ColourSpace, Frame);
@@ -250,11 +250,11 @@ vector<MythVideoTexture*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL *Conte
         return result;
     }
 
-    result = MythVideoTexture::CreateTextures(m_context, FMT_VTB, frameformat, sizes, QOpenGLTexture::TargetRectangle);
+    result = MythVideoTextureOpenGL::CreateTextures(m_context, FMT_VTB, frameformat, sizes, QOpenGLTexture::TargetRectangle);
 
     for (uint plane = 0; plane < result.size(); ++plane)
     {
-       MythVideoTexture* texture = result[plane];
+       MythVideoTextureOpenGL* texture = result[plane];
         if (!texture)
             continue;
         texture->m_allowGLSLDeint = true;
@@ -296,9 +296,9 @@ void MythVTBSurfaceInterop::RotateReferenceFrames(IOSurfaceID Buffer)
         m_referenceFrames.pop_back();
 }
 
-vector<MythVideoTexture*> MythVTBSurfaceInterop::GetReferenceFrames(void)
+vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::GetReferenceFrames(void)
 {
-    vector<MythVideoTexture*> result;
+    vector<MythVideoTextureOpenGL*> result;
     int size = m_referenceFrames.size();
     if (size < 1)
         return result;

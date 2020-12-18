@@ -1,10 +1,10 @@
 // MythTV
 #include "mythvideoout.h"
-#include "mythvaapiglxinterop.h"
+#include "opengl/mythvaapiglxinterop.h"
 
 #define LOC QString("VAAPIGLX: ")
 
-MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythRenderOpenGL *Context, Type InteropType)
+MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythRenderOpenGL* Context, Type InteropType)
   : MythVAAPIInterop(Context, InteropType)
 {
 }
@@ -14,7 +14,7 @@ MythVAAPIInteropGLX::~MythVAAPIInteropGLX()
     delete [] m_vaapiPictureAttributes;
 }
 
-uint MythVAAPIInteropGLX::GetFlagsForFrame(MythVideoFrame *Frame, FrameScanType Scan)
+uint MythVAAPIInteropGLX::GetFlagsForFrame(MythVideoFrame* Frame, FrameScanType Scan)
 {
     uint flags = VA_FRAME_PICTURE;
     if (!Frame)
@@ -86,7 +86,7 @@ uint MythVAAPIInteropGLX::GetFlagsForFrame(MythVideoFrame *Frame, FrameScanType 
     return flags;
 }
 
-void MythVAAPIInteropGLX::InitPictureAttributes(MythVideoColourSpace *ColourSpace)
+void MythVAAPIInteropGLX::InitPictureAttributes(MythVideoColourSpace* ColourSpace)
 {
     m_vaapiColourSpace = 0;
     if (!ColourSpace || !m_vaDisplay)
@@ -211,7 +211,7 @@ int MythVAAPIInteropGLX::SetPictureAttribute(PictureAttribute Attribute, int Val
     return -1;
 }
 
-MythVAAPIInteropGLXCopy::MythVAAPIInteropGLXCopy(MythRenderOpenGL *Context)
+MythVAAPIInteropGLXCopy::MythVAAPIInteropGLXCopy(MythRenderOpenGL* Context)
   : MythVAAPIInteropGLX(Context, VAAPIGLXCOPY)
 {
     Display *display = glXGetCurrentDisplay();
@@ -242,12 +242,12 @@ MythVAAPIInteropGLXCopy::~MythVAAPIInteropGLXCopy()
     }
 }
 
-vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Context,
-                                                           MythVideoColourSpace *ColourSpace,
-                                                           MythVideoFrame *Frame,
-                                                           FrameScanType Scan)
+vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL* Context,
+                                                                 MythVideoColourSpace* ColourSpace,
+                                                                 MythVideoFrame* Frame,
+                                                                 FrameScanType Scan)
 {
-    std::vector<MythVideoTexture*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
         return result;
 
@@ -269,7 +269,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Con
         // create a texture
         // N.B. No apparent 10/12/16bit support here. Can't encourage vaCreateSurfaceGLX
         // to work with a 16bit texture
-        MythVideoTexture *texture = MythVideoTexture::CreateTexture(m_context, m_openglTextureSize);
+        MythVideoTextureOpenGL *texture = MythVideoTextureOpenGL::CreateTexture(m_context, m_openglTextureSize);
         if (!texture)
             return result;
 
@@ -286,7 +286,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Con
         if (!m_glxSurface)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create GLX surface.");
-            MythVideoTexture::DeleteTexture(m_context, texture);
+            MythVideoTextureOpenGL::DeleteTexture(m_context, texture);
             return result;
         }
 
@@ -308,7 +308,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL *Con
     return result;
 }
 
-MythVAAPIInteropGLXPixmap::MythVAAPIInteropGLXPixmap(MythRenderOpenGL *Context)
+MythVAAPIInteropGLXPixmap::MythVAAPIInteropGLXPixmap(MythRenderOpenGL* Context)
   : MythVAAPIInteropGLX(Context, VAAPIGLXPIX)
 {
     m_vaDisplay = vaGetDisplay(glXGetCurrentDisplay());
@@ -338,12 +338,12 @@ MythVAAPIInteropGLXPixmap::~MythVAAPIInteropGLXPixmap()
         XFreePixmap(display, m_pixmap);
 }
 
-vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *Context,
-                                                             MythVideoColourSpace *ColourSpace,
-                                                             MythVideoFrame *Frame,
-                                                             FrameScanType Scan)
+vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL* Context,
+                                                                   MythVideoColourSpace* ColourSpace,
+                                                                   MythVideoFrame* Frame,
+                                                                   FrameScanType Scan)
 {
-    std::vector<MythVideoTexture*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
         return result;
 
@@ -424,7 +424,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
         // too many unknowns in this pipeline
         std::vector<QSize> size;
         size.push_back(m_openglTextureSize);
-        std::vector<MythVideoTexture*> textures = MythVideoTexture::CreateTextures(m_context, FMT_VAAPI, FMT_RGBA32, size);
+        std::vector<MythVideoTextureOpenGL*> textures = MythVideoTextureOpenGL::CreateTextures(m_context, FMT_VAAPI, FMT_RGBA32, size);
         if (textures.empty())
             return result;
         result.push_back(textures[0]);
@@ -460,7 +460,7 @@ vector<MythVideoTexture*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL *C
     return result;
 }
 
-bool MythVAAPIInteropGLXPixmap::InitPixmaps(void)
+bool MythVAAPIInteropGLXPixmap::InitPixmaps()
 {
     if (m_glxBindTexImageEXT && m_glxReleaseTexImageEXT)
         return true;
@@ -476,7 +476,7 @@ bool MythVAAPIInteropGLXPixmap::InitPixmaps(void)
     return true;
 }
 
-bool MythVAAPIInteropGLXPixmap::IsSupported(MythRenderOpenGL *Context)
+bool MythVAAPIInteropGLXPixmap::IsSupported(MythRenderOpenGL* Context)
 {
     if (!Context)
         return false;

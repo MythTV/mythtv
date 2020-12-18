@@ -9,7 +9,7 @@
 #include "referencecounter.h"
 #include "videoouttypes.h"
 #include "mythframe.h"
-#include "mythvideotexture.h"
+#include "opengl/mythvideotextureopengl.h"
 
 // Std
 #include "vector"
@@ -45,34 +45,34 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     static QStringList GetAllowedRenderers   (VideoFrameType Format);
     static Type        GetInteropType        (VideoFrameType Format, MythPlayerUI *Player);
     static void        GetInteropTypeCallback(void *Wait, void *Format, void* Result);
-    static vector<MythVideoTexture*> Retrieve(MythRenderOpenGL *Context,
-                                              MythVideoColourSpace *ColourSpace,
-                                              MythVideoFrame *Frame,
-                                              FrameScanType Scan);
+    static vector<MythVideoTextureOpenGL*> Retrieve(MythRenderOpenGL *Context,
+                                                    MythVideoColourSpace *ColourSpace,
+                                                    MythVideoFrame *Frame,
+                                                    FrameScanType Scan);
     static QString     TypeToString          (Type InteropType);
-    static MythOpenGLInterop* CreateDummy    (void);
+    static MythOpenGLInterop* CreateDummy    ();
 
     ~MythOpenGLInterop() override;
-    virtual vector<MythVideoTexture*> Acquire(MythRenderOpenGL *Context,
-                                              MythVideoColourSpace *ColourSpace,
-                                              MythVideoFrame *Frame, FrameScanType Scan);
+    virtual vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
+                                                    MythVideoColourSpace *ColourSpace,
+                                                    MythVideoFrame *Frame, FrameScanType Scan);
 
-    Type               GetType               (void);
-    MythPlayerUI*      GetPlayer             (void);
+    Type               GetType               ();
+    MythPlayerUI*      GetPlayer             ();
     void               SetPlayer             (MythPlayerUI *Player);
     void               SetDefaultFree        (FreeAVHWDeviceContext FreeContext);
     void               SetDefaultUserOpaque  (void* UserOpaque);
-    FreeAVHWDeviceContext GetDefaultFree     (void);
-    void*              GetDefaultUserOpaque  (void);
+    FreeAVHWDeviceContext GetDefaultFree     ();
+    void*              GetDefaultUserOpaque  ();
 
   protected:
     explicit MythOpenGLInterop                (MythRenderOpenGL *Context, Type InteropType);
-    virtual void DeleteTextures               (void);
+    virtual void DeleteTextures               ();
 
   protected:
-    MythRenderOpenGL*   m_context;
-    Type                m_type;
-    QHash<unsigned long long, vector<MythVideoTexture*> > m_openglTextures;
+    MythRenderOpenGL*   m_context              { nullptr };
+    Type                m_type                 { Unsupported };
+    QHash<unsigned long long, vector<MythVideoTextureOpenGL*> > m_openglTextures;
     QSize               m_openglTextureSize    { };
     uint64_t            m_discontinuityCounter { 0 };
     FreeAVHWDeviceContext m_defaultFree        { nullptr };
@@ -80,4 +80,4 @@ class MythOpenGLInterop : public QObject, public ReferenceCounter
     MythPlayerUI*       m_player               { nullptr };
 };
 
-#endif // MYTHOPENGLINTEROP_H
+#endif
