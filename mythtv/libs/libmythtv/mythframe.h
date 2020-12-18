@@ -456,6 +456,12 @@ class MTV_PUBLIC MythVideoFrame
                FormatIsNV12(Type) || PackedFormat(Type);
     }
 
+    static inline bool FormatIsRGB(VideoFrameType Type)
+    {
+        return (FMT_RGB24  == Type) || (FMT_BGRA   == Type) || (FMT_RGB32 == Type) ||
+               (FMT_ARGB32 == Type) || (FMT_RGBA32 == Type);
+    }
+
   private:
     static MythDeintType GetDeinterlacer(MythDeintType Option);
 };
