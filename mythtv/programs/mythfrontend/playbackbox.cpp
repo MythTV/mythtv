@@ -412,7 +412,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, const QString& name,
 
     m_watchListAutoExpire= gCoreContext->GetBoolSetting("PlaybackWLAutoExpire", false);
     m_watchListMaxAge    = gCoreContext->GetNumSetting("PlaybackWLMaxAge", 60);
-    m_watchListBlackOut  = gCoreContext->GetNumSetting("PlaybackWLBlackOut", 2);
+    m_watchListBlackOut  = gCoreContext->GetNumSetting("PlaybackWLBlackOut", 2) * 24;
 
     bool displayCat  = gCoreContext->GetBoolSetting("DisplayRecGroupIsCategory", false);
 
@@ -2049,7 +2049,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (spanHours[recid] < 50 ||
                 recType[recid] == kDailyRecord)
             {
-                if (delHours[recid] < (m_watchListBlackOut * 24 / 6))
+                if (delHours[recid] < m_watchListBlackOut / 6)
                 {
                     (*pit)->SetRecordingPriority2(wlDeleted);
                     LOG(VB_FILE, LOG_INFO,
@@ -2080,7 +2080,7 @@ bool PlaybackBox::UpdateUILists(void)
                      recType[recid] == kWeeklyRecord)
 
             {
-                if (delHours[recid] < (m_watchListBlackOut * 24) - 4)
+                if (delHours[recid] < m_watchListBlackOut - 4)
                 {
                     (*pit)->SetRecordingPriority2(wlDeleted);
                     LOG(VB_FILE, LOG_INFO,
@@ -2109,7 +2109,7 @@ bool PlaybackBox::UpdateUILists(void)
             // Not recurring
             else
             {
-                if (delHours[recid] < (m_watchListBlackOut * 24 * 2) - 4)
+                if (delHours[recid] < (m_watchListBlackOut * 2) - 4)
                 {
                     (*pit)->SetRecordingPriority2(wlDeleted);
                     pit = m_progLists[m_watchGroupLabel].erase(pit);
