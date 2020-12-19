@@ -38,14 +38,13 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
     gCoreContext->addListener(this);
 
     m_appBinDir = GetAppBinDir();
-    m_preRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll");
+    m_preRollSeconds = gCoreContext->GetDurSetting<std::chrono::seconds>("RecordPreRoll");
     m_idleWaitForRecordingTime =
-                       gCoreContext->GetNumSetting("idleWaitForRecordingTime", 15);
+        gCoreContext->GetDurSetting<std::chrono::minutes>("idleWaitForRecordingTime", 15min);
+    m_idleTimeoutSecs = gCoreContext->GetDurSetting<std::chrono::seconds>("idleTimeoutSecs", 0s);
 
     // if idleTimeoutSecs is 0, the user disabled the auto-shutdown feature
-    m_willShutdown = (gCoreContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
-
-    m_idleTimeoutSecs = gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
+    m_willShutdown = (m_idleTimeoutSecs != 0s);
 
     connect(m_updateStatusTimer, &QTimer::timeout,
             this, &WelcomeDialog::updateStatus);
@@ -506,8 +505,8 @@ void WelcomeDialog::updateStatusMessage(void)
     QDateTime curtime = MythDate::current();
 
     if (!m_isRecording && !m_nextRecordingStart.isNull() &&
-        curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds <
-        (m_idleWaitForRecordingTime * 60) + m_idleTimeoutSecs)
+        std::chrono::seconds(curtime.secsTo(m_nextRecordingStart)) - m_preRollSeconds <
+        m_idleWaitForRecordingTime + m_idleTimeoutSecs)
     {
          m_statusList.append(tr("MythTV is about to start recording."));
     }
@@ -656,8 +655,8 @@ void WelcomeDialog::shutdownNow(void)
 
     // don't shutdown if we are about to start recording
     if (!m_nextRecordingStart.isNull() &&
-        curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds <
-        (m_idleWaitForRecordingTime * 60) + m_idleTimeoutSecs)
+        std::chrono::seconds(curtime.secsTo(m_nextRecordingStart)) - m_preRollSeconds <
+        m_idleWaitForRecordingTime + m_idleTimeoutSecs)
     {
         ShowOkPopup(tr("Cannot shutdown because MythTV is about to start recording"));
         return;
@@ -678,7 +677,7 @@ void WelcomeDialog::shutdownNow(void)
     // set the wakeup time for the next scheduled recording
     if (!m_nextRecordingStart.isNull())
     {
-        QDateTime restarttime = m_nextRecordingStart.addSecs((-1) * m_preRollSeconds);
+        QDateTime restarttime = m_nextRecordingStart.addSecs((-1) * m_preRollSeconds.count());
 
         int add = gCoreContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)
