@@ -241,7 +241,7 @@ MainServer::MainServer(bool master, int port,
     m_sched(sched), m_expirer(_expirer)
 {
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
-        PreviewGenerator::kLocalAndRemote, ~0, 0);
+        PreviewGenerator::kLocalAndRemote, ~0, 0s);
     PreviewGeneratorQueue::AddListener(this);
 
     m_threadPool.setMaxThreadCount(PRT_STARTUP_THREAD_COUNT);

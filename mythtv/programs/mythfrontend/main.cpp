@@ -2107,7 +2107,7 @@ int main(int argc, char **argv)
     BackendConnectionManager bcm;
 
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
-        PreviewGenerator::kRemote, 50, 60);
+        PreviewGenerator::kRemote, 50, 60s);
 
     fe_sd_notify("STATUS=Creating housekeeper");
     auto *housekeeping = new HouseKeeper();

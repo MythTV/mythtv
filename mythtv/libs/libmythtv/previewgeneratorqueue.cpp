@@ -42,7 +42,7 @@ PreviewGeneratorQueue *PreviewGeneratorQueue::s_pgq = nullptr;
  */
 void PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
     PreviewGenerator::Mode mode,
-    uint maxAttempts, uint minBlockSeconds)
+    uint maxAttempts, std::chrono::seconds minBlockSeconds)
 {
     s_pgq = new PreviewGeneratorQueue(mode, maxAttempts, minBlockSeconds);
 }
@@ -82,7 +82,7 @@ void PreviewGeneratorQueue::TeardownPreviewGeneratorQueue()
  */
 PreviewGeneratorQueue::PreviewGeneratorQueue(
     PreviewGenerator::Mode mode,
-    uint maxAttempts, uint minBlockSeconds) :
+    uint maxAttempts, std::chrono::seconds minBlockSeconds) :
     MThread("PreviewGeneratorQueue"),
     m_mode(mode),
     m_maxAttempts(maxAttempts), m_minBlockSeconds(minBlockSeconds)
@@ -304,7 +304,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             if (me->Message() == "PREVIEW_SUCCESS")
             {
                 (*it).m_attempts      = 0;
-                (*it).m_lastBlockTime = 0;
+                (*it).m_lastBlockTime = 0s;
                 (*it).m_blockRetryUntil = QDateTime();
             }
             else
@@ -312,7 +312,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                 (*it).m_lastBlockTime =
                     max(m_minBlockSeconds, (*it).m_lastBlockTime * 2);
                 (*it).m_blockRetryUntil =
-                    MythDate::current().addSecs((*it).m_lastBlockTime);
+                    MythDate::current().addSecs((*it).m_lastBlockTime.count());
             }
 
             QStringList list;
@@ -769,7 +769,7 @@ void PreviewGeneratorQueue::ClearPreviewGeneratorAttempts(const QString &key)
 {
     QMutexLocker locker(&m_lock);
     m_previewMap[key].m_attempts = 0;
-    m_previewMap[key].m_lastBlockTime = 0;
+    m_previewMap[key].m_lastBlockTime = 0s;
     m_previewMap[key].m_blockRetryUntil =
         MythDate::current().addSecs(-60);
 }
