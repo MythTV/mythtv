@@ -332,7 +332,7 @@ vector<MythVideoTextureOpenGL*> MythVDPAUInterop::Acquire(MythRenderOpenGL* Cont
     {
         if (!m_colourSpace)
         {
-            if (m_helper->IsFeatureAvailable(VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX))
+            if (m_helper->IsAttributeAvailable(VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX))
             {
                 ColourSpace->SetSupportedAttributes(ALL_PICTURE_ATTRIBUTES);
                 connect(ColourSpace, &MythVideoColourSpace::Updated, this, &MythVDPAUInterop::UpdateColourSpace);

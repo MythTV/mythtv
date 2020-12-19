@@ -301,6 +301,7 @@ bool MythVDPAUHelper::InitProcs(void)
     GET_PROC(VDP_FUNC_ID_VIDEO_MIXER_SET_ATTRIBUTE_VALUES, m_vdpVideoMixerSetAttributeValues)
     GET_PROC(VDP_FUNC_ID_VIDEO_MIXER_SET_FEATURE_ENABLES, m_vdpVideoMixerSetFeatureEnables)
     GET_PROC(VDP_FUNC_ID_VIDEO_MIXER_QUERY_FEATURE_SUPPORT, m_vdpVideoMixerQueryFeatureSupport)
+    GET_PROC(VDP_FUNC_ID_VIDEO_MIXER_QUERY_ATTRIBUTE_SUPPORT, m_vdpVideoMixerQueryAttributeSupport)
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_CREATE, m_vdpOutputSurfaceCreate)
     GET_PROC(VDP_FUNC_ID_OUTPUT_SURFACE_DESTROY, m_vdpOutputSurfaceDestroy)
     GET_PROC(VDP_FUNC_ID_VIDEO_SURFACE_GET_PARAMETERS, m_vdpVideoSurfaceGetParameters)
@@ -563,6 +564,18 @@ bool MythVDPAUHelper::IsFeatureAvailable(uint Feature)
     INIT_ST
     auto supported = static_cast<VdpBool>(false);
     status = m_vdpVideoMixerQueryFeatureSupport(m_device, Feature, &supported);
+    CHECK_ST
+    return ok && static_cast<bool>(supported);
+}
+
+bool MythVDPAUHelper::IsAttributeAvailable(uint Attribute)
+{
+    if (!m_valid)
+        return false;
+
+    INIT_ST
+    auto supported = static_cast<VdpBool>(false);
+    status = m_vdpVideoMixerQueryAttributeSupport(m_device, Attribute, &supported);
     CHECK_ST
     return ok && static_cast<bool>(supported);
 }
