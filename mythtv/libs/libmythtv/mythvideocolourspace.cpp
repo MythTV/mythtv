@@ -130,8 +130,8 @@ void MythVideoColourSpace::SetSupportedAttributes(PictureAttributeSupported Supp
 
 int MythVideoColourSpace::GetPictureAttribute(PictureAttribute Attribute)
 {
-    if (m_dbSettings.contains(Attribute))
-        return m_dbSettings.value(Attribute);
+    if (auto found = m_dbSettings.find(Attribute); found != m_dbSettings.end())
+        return found->second;
     return -1;
 }
 

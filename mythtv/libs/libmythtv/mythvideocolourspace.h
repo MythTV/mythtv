@@ -76,7 +76,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
 
   private:
     PictureAttributeSupported  m_supportedAttributes { kPictureAttributeSupported_None };
-    QMap<PictureAttribute,int> m_dbSettings;
+    std::map<PictureAttribute,int> m_dbSettings;
 
     bool              m_fullRange              { true };
     float             m_brightness             { 0.0F };
