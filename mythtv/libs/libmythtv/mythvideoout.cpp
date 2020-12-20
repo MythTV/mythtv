@@ -10,20 +10,8 @@
 #include "mythavutil.h"
 #include "mthreadpool.h"
 #include "mythcodeccontext.h"
-
-#ifdef _WIN32
-#include "videoout_d3d.h"
-#endif
-
-#ifdef USING_OPENGL
-#include "opengl/mythvideooutopengl.h"
-#endif
-
-#ifdef USING_VULKAN
-#include "vulkan/mythvideooutputvulkan.h"
-#endif
-
 #include "mythvideooutnull.h"
+#include "mythvideooutgpu.h"
 #include "mythvideoout.h"
 
 // std
@@ -35,18 +23,7 @@
 void MythVideoOutput::GetRenderOptions(RenderOptions& Options)
 {
     MythVideoOutputNull::GetRenderOptions(Options);
-
-#ifdef _WIN32
-    VideoOutputD3D::GetRenderOptions(Options);
-#endif
-
-#ifdef USING_OPENGL
-    MythVideoOutputOpenGL::GetRenderOptions(Options);
-#endif
-
-#ifdef USING_VULKAN
-    MythVideoOutputVulkan::GetRenderOptions(Options);
-#endif
+    MythVideoOutputGPU::GetRenderOptions(Options);
 }
 
 /**

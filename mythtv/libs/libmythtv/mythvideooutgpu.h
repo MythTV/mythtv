@@ -13,6 +13,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     Q_OBJECT
 
   public:
+    static void GetRenderOptions(RenderOptions& Options);
     static MythVideoOutputGPU* Create(MythMainWindow* MainWindow, const QString& Decoder,
                                       MythCodecID CodecID,       QSize VideoDim,
                                       QSize VideoDispDim,        float VideoAspect,

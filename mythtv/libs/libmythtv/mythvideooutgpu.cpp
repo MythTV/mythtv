@@ -15,6 +15,17 @@
 
 #define LOC QString("VidOutGPU: ")
 
+void MythVideoOutputGPU::GetRenderOptions(RenderOptions& Options)
+{
+#ifdef USING_OPENGL
+    MythVideoOutputOpenGL::GetRenderOptions(Options);
+#endif
+
+#ifdef USING_VULKAN
+    MythVideoOutputVulkan::GetRenderOptions(Options);
+#endif
+}
+
 MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const QString& Decoder,
                                                MythCodecID CodecID,       const QSize VideoDim,
                                                const QSize VideoDispDim,  float VideoAspect,
