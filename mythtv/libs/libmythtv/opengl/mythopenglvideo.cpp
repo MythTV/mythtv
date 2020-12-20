@@ -728,7 +728,8 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // Determine which shader to use. This helps optimise the resize check.
     bool deinterlacing = false;
     bool basicdeinterlacing = false;
-    VideoShaderType program = MythVideoFrame::YUVFormat(m_outputType) ? Progressive : Default;
+    bool yuvoutput = MythVideoFrame::YUVFormat(m_outputType);
+    VideoShaderType program = yuvoutput ? Progressive : Default;
     if (m_deinterlacer != DEINT_NONE)
     {
         if (Scan == kScan_Interlaced)
@@ -762,42 +763,8 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     if (m_toneMap)
         resize |= ToneMap;
 
-    // Bicubic upsizing
-    if (m_bicubicUpsize)
-    {
-        if (((m_videoDispDim.width() < m_displayVideoRect.width()) ||
-             (m_videoDispDim.height() < m_displayVideoRect.height())))
-        {
-            if (!m_shaders[BicubicUpsize])
-            {
-                if (!CreateVideoShader(BicubicUpsize))
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create bicubic shader. Disabling");
-                    m_bicubicUpsize = false;
-                }
-                else
-                {
-                    UpdateShaderParameters();
-                    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created bicubic sampler");
-                }
-            }
-
-            if (m_shaders[BicubicUpsize])
-                resize |= Bicubic;
-        }
-        else
-        {
-            if (m_shaders[BicubicUpsize] != nullptr)
-            {
-                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabling bicubic sampler");
-                delete m_shaders[BicubicUpsize];
-                m_shaders[BicubicUpsize] = nullptr;
-            }
-        }
-    }
-
     // Decide whether to use render to texture - for performance or quality
-    if (MythVideoFrame::YUVFormat(m_outputType) && !resize)
+    if (yuvoutput && !resize)
     {
         // ensure deinterlacing works correctly when down scaling in height
         // N.B. not needed for the basic deinterlacer
@@ -831,8 +798,17 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
         }
     }
 
+    // Bicubic upsizing - test this after all other resize options have been checked
+    // to ensure it is not the only flag set
+    if (m_bicubicUpsize)
+        SetupBicubic(resize);
+
+    // We don't need an extra stage prior to bicubic if the frame is already RGB (e.g. VDPAU, MediaCodec)
+    // So bypass if we only set resize for bicubic.
+    bool needresize = resize && !(MythVideoFrame::FormatIsRGB(m_outputType) && (resize == Bicubic));
+
     // set software frame filtering if resizing has changed
-    if (!resize && m_resizing)
+    if (!needresize && m_resizing)
     {
         // remove framebuffer
         if (m_frameBufferTexture)
@@ -852,7 +828,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
         m_resizing = None;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabled resizing");
     }
-    else if (!m_resizing && resize)
+    else if (!m_resizing && needresize)
     {
         // framebuffer will be created as needed below
         QOpenGLTexture::Filter filter = ((resize & Sampling) == Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
@@ -869,7 +845,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // check hardware frames have the correct filtering
     if (hwframes)
     {
-        QOpenGLTexture::Filter filter = ((resize & Sampling) == Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
+        QOpenGLTexture::Filter filter = (resize.testFlag(Sampling)) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
         if (inputtextures[0]->m_filter != filter)
             MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, inputtextures, filter);
     }
@@ -877,7 +853,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // texture coordinates
     QRect trect(m_videoRect);
 
-    if (resize)
+    if (needresize)
     {
         MythVideoTextureOpenGL* nexttexture = nullptr;
 
@@ -947,9 +923,13 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
         // reset for next stage
         inputtextures.clear();
         inputtextures.push_back(nexttexture);
-        program = ((resize & Bicubic) == Bicubic) ? BicubicUpsize : Default;
+        program = Default;
         deinterlacing = false;
     }
+
+    // Use the bicubic shader if necessary
+    if (resize.testFlag(Bicubic))
+        program = BicubicUpsize;
 
     // render to default framebuffer/screen
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
@@ -1067,4 +1047,37 @@ QString MythOpenGLVideo::TypeToProfile(VideoFrameType Type)
         default: break;
     }
     return "opengl";
+}
+
+void MythOpenGLVideo::SetupBicubic(VideoResizing& Resize)
+{
+    if (((m_videoDispDim.width() < m_displayVideoRect.width()) ||
+         (m_videoDispDim.height() < m_displayVideoRect.height())))
+    {
+        if (!m_shaders[BicubicUpsize])
+        {
+            if (!CreateVideoShader(BicubicUpsize))
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create bicubic shader. Disabling");
+                m_bicubicUpsize = false;
+            }
+            else
+            {
+                UpdateShaderParameters();
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + "Created bicubic sampler");
+            }
+        }
+
+        if (m_shaders[BicubicUpsize])
+            Resize |= Bicubic;
+    }
+    else
+    {
+        if (m_shaders[BicubicUpsize] != nullptr)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Disabling bicubic sampler");
+            delete m_shaders[BicubicUpsize];
+            m_shaders[BicubicUpsize] = nullptr;
+        }
+    }
 }

@@ -66,6 +66,7 @@ class MythOpenGLVideo : public MythVideoGPU
     bool    AddDeinterlacer  (const MythVideoFrame* Frame,  FrameScanType Scan,
                               MythDeintType Filter = DEINT_SHADER, bool CreateReferences = true);
     void    CleanupDeinterlacers();
+    void    SetupBicubic(VideoResizing& Resize);
 
     MythRenderOpenGL* m_openglRender               { nullptr };
     int            m_gles                          { 0 };
