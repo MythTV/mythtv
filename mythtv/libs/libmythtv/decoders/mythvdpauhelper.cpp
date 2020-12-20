@@ -431,18 +431,16 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
 
     VdpVideoMixer result = 0;
 
-    static const std::array<const VdpVideoMixerParameter,4> parameters {
+    static const std::array<const VdpVideoMixerParameter,3> parameters {
         VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_WIDTH,
         VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_HEIGHT,
-        VDP_VIDEO_MIXER_PARAMETER_CHROMA_TYPE,
-        VDP_VIDEO_MIXER_PARAMETER_LAYERS,
+        VDP_VIDEO_MIXER_PARAMETER_CHROMA_TYPE
     };
 
 
     uint width  = static_cast<uint>(Size.width());
     uint height = static_cast<uint>(Size.height());
-    uint layers = 0;
-    std::array<void const *,4> parametervalues { &width, &height, &ChromaType, &layers};
+    std::array<void const *,3> parametervalues { &width, &height, &ChromaType};
 
     uint32_t featurecount = 0;
     std::array<VdpVideoMixerFeature,2> features {};
@@ -463,7 +461,7 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
 
     INIT_ST
     status = m_vdpVideoMixerCreate(m_device, featurecount, featurecount ? features.data() : nullptr,
-                                   4, parameters.data(), parametervalues.data(), &result);
+                                   3, parameters.data(), parametervalues.data(), &result);
     CHECK_ST
 
     if (!ok || !result)
@@ -472,8 +470,11 @@ VdpVideoMixer MythVDPAUHelper::CreateMixer(QSize Size, VdpChromaType ChromaType,
         return result;
     }
 
-    status = m_vdpVideoMixerSetFeatureEnables(result, featurecount, features.data(), enables.data());
-    CHECK_ST
+    if (featurecount)
+    {
+        status = m_vdpVideoMixerSetFeatureEnables(result, featurecount, features.data(), enables.data());
+        CHECK_ST
+    }
     return result;
 }
 
