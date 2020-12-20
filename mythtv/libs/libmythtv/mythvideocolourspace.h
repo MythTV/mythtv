@@ -30,6 +30,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
   signals:
     void  Updated(bool PrimariesChanged);
     void  PictureAttributeChanged(PictureAttribute Attribute, int Value);
+    void  SupportedAttributesChanged(PictureAttributeSupported Supported);
 
   public:
     MythVideoColourSpace();

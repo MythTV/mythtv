@@ -121,8 +121,11 @@ PictureAttributeSupported MythVideoColourSpace::SupportedAttributes(void) const
 */
 void MythVideoColourSpace::SetSupportedAttributes(PictureAttributeSupported Supported)
 {
+    if (Supported == m_supportedAttributes)
+        return;
     m_supportedAttributes = Supported;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PictureAttributes: %1").arg(toString(m_supportedAttributes)));
+    emit SupportedAttributesChanged(m_supportedAttributes);
 }
 
 int MythVideoColourSpace::GetPictureAttribute(PictureAttribute Attribute)
