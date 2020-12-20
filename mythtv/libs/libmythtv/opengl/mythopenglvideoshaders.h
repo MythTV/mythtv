@@ -220,6 +220,54 @@ static const QString BicubicShader =
 "    gl_FragColor = mix(mix(sample3, sample2, sx), mix(sample1, sample0, sx), sy);\n"
 "}\n";
 
+// Adapted from the version in libplacebo (https://code.videolan.org/videolan/libplacebo)
+// with all due credit to the original author(S) (Niklas Haas)
+static const QString DebandFragmentShader =
+"uniform sampler2D   s_texture0;\n"
+"uniform highp float u_random;\n"      // 0.0 to 1.0
+"uniform highp vec2  m_textureSize;\n" // e.g. 1920x1080
+"uniform highp float m_depth;\n"       // e.g. 0.0 - 255.0
+"varying highp vec2  v_texcoord0;\n"
+"highp float Random(highp float Val)\n"
+"{\n"
+"    return fract(Val * 1.0 / 41.0);\n"
+"}\n"
+"highp float Mod289(highp float Val)\n"
+"{\n"
+"    return Val - floor(Val * 1.0 / 289.0) * 289.0;\n"
+"}\n"
+"highp float Permute(highp float Val)\n"
+"{\n"
+"    return Mod289(Mod289(34.0 * Val + 1.0) * (fract(Val) + 1.0));\n"
+"}\n"
+"highp vec4 Average(in sampler2D texture, in highp vec2 pos, in highp float range, inout highp float pseud)\n"
+"{\n"
+"    highp float dist = Random(pseud) * range; pseud = Permute(pseud);\n"
+"    highp float dir  = Random(pseud) * 6.2831853; pseud = Permute(pseud);\n"
+"    highp vec2 off = dist * vec2(cos(dir), sin(dir));\n"
+"    highp vec2 adj = 1.0 / m_textureSize;\n"
+"    highp vec4 ref = texture2D(texture, pos + (adj * vec2( off.x,  off.y)));\n"
+"    ref           += texture2D(texture, pos + (adj * vec2(-off.y,  off.x)));\n"
+"    ref           += texture2D(texture, pos + (adj * vec2(-off.x, -off.y)));\n"
+"    ref           += texture2D(texture, pos + (adj * vec2( off.y, -off.x)));\n"
+"    return ref * 0.25;\n"
+"}\n"
+"void main(void)\n"
+"{\n"
+"    highp vec4 color = texture2D(s_texture0, v_texcoord0);\n"
+"    highp vec3 pseudo = vec3(v_texcoord0, u_random) + 1.0;\n"
+"    highp float pseud = Permute(Permute(Permute(pseudo.x) + pseudo.y) + pseudo.z);\n"
+"    highp vec4 avg = Average(s_texture0, v_texcoord0, 16.0, pseud);\n"
+"    highp vec4 diff = abs(color - avg);\n"
+"    color = mix(color, avg, step(diff, vec4(1.0 / m_depth)));\n"
+"    vec3 noise;\n"
+"    noise.x = Random(pseud); pseud = Permute(pseud);\n"
+"    noise.y = Random(pseud); pseud = Permute(pseud);\n"
+"    noise.z = Random(pseud); pseud = Permute(pseud);\n"
+"    color.rgb += (1.0 / m_depth) * (noise - 0.5);\n"
+"    gl_FragColor = color;\n"
+"}\n";
+
 /* These are updated versions of the video shaders that use GLSL 3.30 / GLSL ES 3.00.
  * Used because OpenGL ES3.X requires unsigned integer texture formats for 16bit
  * software video textures - and unsigned samplers need GLSL ES 3.00.
