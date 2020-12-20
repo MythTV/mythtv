@@ -95,8 +95,14 @@ void MythVideoOutputOpenGL::GetRenderOptions(RenderOptions& Options)
 #endif
 }
 
-MythVideoOutputOpenGL::MythVideoOutputOpenGL(const MythVideoProfilePtr& VideoProfile, QString &Profile)
-  : MythVideoOutputGPU(MythRenderOpenGL::GetOpenGLRender(), VideoProfile, Profile)
+MythVideoOutputOpenGL::MythVideoOutputOpenGL(MythMainWindow* MainWindow,
+                                             MythRenderOpenGL* Render,
+                                             MythOpenGLPainter* Painter,
+                                             MythDisplay *Display,
+                                             const MythVideoProfilePtr& VideoProfile,
+                                             QString &Profile)
+  : MythVideoOutputGPU(MainWindow, Render, Painter, Display, VideoProfile, Profile),
+    m_openglRender(Render)
 {
     // Complete list of formats supported for OpenGL 2.0 and higher and OpenGL ES3.X
     static VideoFrameTypes s_openglRenderFormats =
@@ -115,10 +121,9 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(const MythVideoProfilePtr& VideoPro
     };
 
     // Retrieve render context
-    m_openglRender = MythRenderOpenGL::GetOpenGLRender();
     if (!m_openglRender)
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve OpenGL context");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No OpenGL context");
         return;
     }
 
@@ -201,11 +206,10 @@ bool MythVideoOutputOpenGL::Init(const QSize VideoDim, const QSize VideoDispDim,
 QRect MythVideoOutputOpenGL::GetDisplayVisibleRectAdj()
 {
     QRect dvr = GetDisplayVisibleRect();
-
-    MythMainWindow* mainwin = GetMythMainWindow();
-    if (!mainwin)
+    if (!m_mainWindow)
         return dvr;
-    QSize size = mainwin->size();
+
+    QSize size = m_mainWindow->size();
 
     // may be called before m_window is initialised fully
     if (dvr.isEmpty())

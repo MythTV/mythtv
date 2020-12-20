@@ -14,7 +14,9 @@ class MythVideoOutputGPU : public MythVideoOutput
 
   public:
     static void GetRenderOptions(RenderOptions& Options);
-    static MythVideoOutputGPU* Create(MythMainWindow* MainWindow, const QString& Decoder,
+    static MythVideoOutputGPU* Create(MythMainWindow* MainWindow, MythRender* Render,
+                                      MythPainter* Painter, MythDisplay* Display,
+                                      const QString& Decoder,
                                       MythCodecID CodecID,       QSize VideoDim,
                                       QSize VideoDispDim,        float VideoAspect,
                                       float FrameRate,           uint  PlayerFlags,
@@ -43,7 +45,9 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            ResizeForVideo        (QSize Size = QSize()) override;
 
   protected:
-    MythVideoOutputGPU(MythRender* Render, MythVideoProfilePtr VideoProfile, QString &Profile);
+    MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* Render,
+                       MythPainterGPU* Painter, MythDisplay* Display,
+                       MythVideoProfilePtr VideoProfile, QString& Profile);
     virtual QRect   GetDisplayVisibleRectAdj();
     bool            Init                  (QSize VideoDim, QSize VideoDispDim, float Aspect,
                                            QRect DisplayVisibleRect, MythCodecID CodecId) override;
@@ -56,6 +60,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            InitDisplayMeasurements();
     void            SetReferenceFrames    (int ReferenceFrames);
 
+    MythMainWindow* m_mainWindow          { nullptr };
     MythRender*     m_render              { nullptr };
     MythVideoGPU*   m_video               { nullptr };
     MythPainterGPU* m_painter             { nullptr };

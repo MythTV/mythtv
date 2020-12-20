@@ -7,9 +7,11 @@
 #include "mythvideooutgpu.h"
 
 #ifdef USING_OPENGL
+#include "opengl/mythpainteropengl.h"
 #include "opengl/mythvideooutopengl.h"
 #endif
 #ifdef USING_VULKAN
+#include "vulkan/mythpaintervulkan.h"
 #include "vulkan/mythvideooutputvulkan.h"
 #endif
 
@@ -26,29 +28,24 @@ void MythVideoOutputGPU::GetRenderOptions(RenderOptions& Options)
 #endif
 }
 
-MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const QString& Decoder,
+MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythRender* Render,
+                                               MythPainter* Painter, MythDisplay* Display,
+                                               const QString& Decoder,
                                                MythCodecID CodecID,       const QSize VideoDim,
                                                const QSize VideoDispDim,  float VideoAspect,
                                                float FrameRate,           uint  PlayerFlags,
                                                const QString& Codec,      int ReferenceFrames,
                                                const VideoFrameTypes*& RenderFormats)
 {
-    if (!MainWindow)
+    if (!(MainWindow && Render && Painter && Display))
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No main window");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
         return nullptr;
     }
 
     if (PlayerFlags & kVideoIsNull)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot create null video output here");
-        return nullptr;
-    }
-
-    MythRender* render = MainWindow->GetRenderDevice();
-    if (!render)
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve render device");
         return nullptr;
     }
 
@@ -60,12 +57,16 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
 #endif
 
 #ifdef USING_OPENGL
-    if (render->Type() == kRenderOpenGL)
+    auto * openglrender = dynamic_cast<MythRenderOpenGL*>(Render);
+    auto * openglpainter = dynamic_cast<MythOpenGLPainter*>(Painter);
+    if (openglrender && openglpainter && (Render->Type() == kRenderOpenGL))
         renderers += MythVideoOutputOpenGL::GetAllowedRenderers(CodecID, VideoDispDim);
 #endif
 
 #ifdef USING_VULKAN
-    if (render->Type() == kRenderVulkan)
+    auto * vulkanrender = dynamic_cast<MythRenderVulkan*>(Render);
+    auto * vulkanpainter = dynamic_cast<MythPainterVulkan*>(Painter);
+    if (vulkanrender && vulkanpainter && (Render->Type() == kRenderVulkan))
         renderers += MythVideoOutputVulkan::GetAllowedRenderers(CodecID);
 #endif
 
@@ -103,11 +104,11 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
     {
         QString fallback;
 #ifdef USING_OPENGL
-        if (render->Type() == kRenderOpenGL)
+        if (Render->Type() == kRenderOpenGL)
             fallback = "opengl";
 #endif
 #ifdef USING_VULKAN
-        if (render->Type() == kRenderVulkan)
+        if (Render->Type() == kRenderVulkan)
             fallback = VULKAN_RENDERER;
 #endif
         LOG(VB_GENERAL, LOG_WARNING, LOC + "No renderer found. This should not happen!.");
@@ -131,12 +132,16 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
             video = new VideoOutputD3D();
 #endif
 #ifdef USING_OPENGL
-        if (renderer.contains("opengl"))
-            video = new MythVideoOutputOpenGL(videoprofile, renderer);
+        if (renderer.contains("opengl") && openglrender)
+            video = new MythVideoOutputOpenGL(MainWindow, openglrender,
+                                              openglpainter, Display,
+                                              videoprofile, renderer);
 #endif
 #ifdef USING_VULKAN
         if (renderer.contains(VULKAN_RENDERER))
-            video = new MythVideoOutputVulkan(videoprofile, renderer);
+            video = new MythVideoOutputVulkan(MainWindow, vulkanrender,
+                                              vulkanpainter, Display,
+                                              videoprofile, renderer);
 #endif
 
         if (video)
@@ -171,26 +176,24 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, const
  * \sa MythVideoOutputOpenGL
  * \sa MythVideoOutputVulkan
  */
-MythVideoOutputGPU::MythVideoOutputGPU(MythRender* Render, MythVideoProfilePtr VideoProfile, QString& Profile)
-  : m_render(Render),
+MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* Render,
+                                       MythPainterGPU* Painter, MythDisplay* Display,
+                                       MythVideoProfilePtr VideoProfile, QString& Profile)
+  : m_mainWindow(MainWindow),
+    m_render(Render),
+    m_painter(Painter),
     m_profile(std::move(Profile))
 {
-    m_videoProfile = std::move(VideoProfile);
-
-    if (m_render)
-        m_render->IncrRef();
-
-    MythMainWindow* win = MythMainWindow::getMainWindow();
-    if (win)
+    if (!(m_mainWindow && m_render && m_painter && Display))
     {
-        SetDisplay(win->GetDisplay());
-        m_painter = dynamic_cast<MythPainterGPU*>(win->GetPainter());
-        if (m_painter)
-            m_painter->SetViewControl(MythPainterGPU::None);
+        LOG(VB_GENERAL, LOG_ERR, "Fatal error");
+        return;
     }
 
-    if (!(win && m_render && m_painter))
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Fatal error");
+    m_videoProfile = std::move(VideoProfile);
+    m_render->IncrRef();
+    SetDisplay(Display);
+    m_painter->SetViewControl(MythPainterGPU::None);
 
     connect(this, &MythVideoOutputGPU::ChangePictureAttribute,
             &m_videoColourSpace, &MythVideoColourSpace::ChangePictureAttribute);
@@ -583,11 +586,10 @@ void MythVideoOutputGPU::RenderFrame(MythVideoFrame *Frame, FrameScanType Scan)
         // viewport and enable scaling of its images
         m_painter->SetViewControl(MythPainterGPU::Viewport);
 
-        MythMainWindow* win = GetMythMainWindow();
-        if (win && win->GetPaintWindow())
+        if (m_mainWindow->GetPaintWindow())
         {
-            win->GetPaintWindow()->clearMask();
-            win->Draw(m_painter);
+            m_mainWindow->GetPaintWindow()->clearMask();
+            m_mainWindow->Draw(m_painter);
         }
         m_painter->SetViewControl(MythPainterGPU::None);
     }
@@ -678,9 +680,8 @@ void MythVideoOutputGPU::ResizeForVideo(QSize Size)
     float rate = m_videoProfile ? m_videoProfile->GetOutput() : 0.0F;
 
     bool hide = m_display->NextModeIsLarger(Size);
-    MythMainWindow* window = GetMythMainWindow();
     if (hide)
-        window->hide();
+        m_mainWindow->hide();
 
     if (m_display->SwitchToVideo(Size, static_cast<double>(rate)))
     {
@@ -706,19 +707,16 @@ void MythVideoOutputGPU::ResizeForVideo(QSize Size)
 
         if (fullscreen)
         {
-            QSize sz = m_display->GetResolution();
-            QRect display_visible_rect = QRect(GetMythMainWindow()->geometry().topLeft(), sz);
-            if (HasMythMainWindow())
+            QSize size = m_display->GetResolution();
+            QRect display_visible_rect = QRect(m_mainWindow->geometry().topLeft(), size);
+            if (hide)
             {
-                if (hide)
-                {
-                    window->Show();
-                    hide = false;
-                }
-                GetMythMainWindow()->MoveResize(display_visible_rect);
+                m_mainWindow->Show();
+                hide = false;
             }
+            m_mainWindow->MoveResize(display_visible_rect);
         }
     }
     if (hide)
-        window->Show();
+        m_mainWindow->Show();
 }

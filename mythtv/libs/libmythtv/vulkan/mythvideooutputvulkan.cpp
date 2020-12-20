@@ -41,9 +41,11 @@ QStringList MythVideoOutputVulkan::GetAllowedRenderers(MythCodecID CodecId)
     return allowed;
 }
 
-MythVideoOutputVulkan::MythVideoOutputVulkan(const MythVideoProfilePtr& VideoProfile, QString &Profile)
-  : MythVideoOutputGPU(MythRenderVulkan::GetVulkanRender(), VideoProfile, Profile),
-    MythVulkanObject(MythRenderVulkan::GetVulkanRender())
+MythVideoOutputVulkan::MythVideoOutputVulkan(MythMainWindow* MainWindow, MythRenderVulkan* Render,
+                                             MythPainterVulkan* Painter, MythDisplay* Display,
+                                             const MythVideoProfilePtr& VideoProfile, QString& Profile)
+  : MythVideoOutputGPU(MainWindow, Render, Painter, Display, VideoProfile, Profile),
+    MythVulkanObject(Render)
 {
     static VideoFrameTypes s_vulkanRenderFormats =
     {
@@ -55,7 +57,6 @@ MythVideoOutputVulkan::MythVideoOutputVulkan(const MythVideoProfilePtr& VideoPro
     };
 
     m_renderFormats = &s_vulkanRenderFormats;
-    m_render = MythVulkanObject::Render();
     if (IsValidVulkan())
     {
         m_video = new MythVideoVulkan(this, &m_videoColourSpace, this, m_videoProfile, QString {});

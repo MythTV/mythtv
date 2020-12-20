@@ -21,12 +21,14 @@ bool MythPlayerVideoUI::InitVideo()
     if (!(m_playerCtx && m_decoder))
         return false;
 
-    auto * video = MythVideoOutputGPU::Create(m_mainWindow,
-                    m_decoder->GetCodecDecoderName(), m_decoder->GetVideoCodecID(),
-                    m_videoDim, m_videoDispDim, m_videoAspect,
-                    static_cast<float>(m_videoFrameRate),
-                    static_cast<uint>(m_playerFlags), m_codecName, m_maxReferenceFrames,
-                    m_renderFormats);
+    auto * video = MythVideoOutputGPU::Create(m_mainWindow, m_render, m_painter, m_display,
+                                              m_decoder->GetCodecDecoderName(),
+                                              m_decoder->GetVideoCodecID(),
+                                              m_videoDim, m_videoDispDim, m_videoAspect,
+                                              static_cast<float>(m_videoFrameRate),
+                                              static_cast<uint>(m_playerFlags),
+                                              m_codecName, m_maxReferenceFrames,
+                                              m_renderFormats);
 
     if (!video)
     {

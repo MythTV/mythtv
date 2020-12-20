@@ -18,7 +18,9 @@ class MythVideoOutputVulkan : public MythVideoOutputGPU, public MythVulkanObject
     static void        GetRenderOptions    (RenderOptions& Options);
     static QStringList GetAllowedRenderers (MythCodecID CodecId);
 
-    MythVideoOutputVulkan(const MythVideoProfilePtr& VideoProfile, QString& Profile);
+    MythVideoOutputVulkan(MythMainWindow* MainWindow, MythRenderVulkan* Render,
+                          MythPainterVulkan* Painter, MythDisplay* Display,
+                          const MythVideoProfilePtr& VideoProfile, QString& Profile);
    ~MythVideoOutputVulkan() override = default;
 
     bool Init(QSize VideoDim, QSize VideoDispDim, float Aspect,
