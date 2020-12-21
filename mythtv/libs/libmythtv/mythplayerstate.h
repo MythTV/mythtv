@@ -97,13 +97,15 @@ class MTV_PUBLIC MythVideoBoundsState
   public:
     MythVideoBoundsState() = default;
     MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOverrideMode AspectOverride,
-                         float HorizScale, float VertScale, QPoint Move);
+                         float HorizScale, float VertScale, QPoint Move,
+                         StereoscopicMode StereoOverride);
 
     AdjustFillMode     m_adjustFillMode     { kAdjustFill_Off };
     AspectOverrideMode m_aspectOverrideMode { kAspect_Off     };
     float              m_manualHorizScale   { 1.0F };
     float              m_manualVertScale    { 1.0F };
     QPoint             m_manualMove         { 0, 0 };
+    StereoscopicMode   m_stereoOverride     { kStereoscopicModeAuto };
 };
 
 Q_DECLARE_METATYPE(MythVideoBoundsState)

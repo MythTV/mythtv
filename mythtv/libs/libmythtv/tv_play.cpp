@@ -9198,11 +9198,10 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         m_tvmSubsHaveText     = m_captionsState.m_externalTextSubs;
         m_tvmSubsForcedOn     = m_player->GetAllowForcedSubtitles();
         m_tvmSup              = m_videoColourState.m_supportedAttributes;
+        m_tvmStereoMode       = m_videoBoundsState.m_stereoOverride;
         MythVideoOutput *vo = m_player->GetVideoOutput();
         if (vo)
         {
-
-            m_tvmStereoMode     = vo->GetStereoOverride();
             m_tvmFillAutoDetect = vo->HasSoftwareFrames();  
         }
     }

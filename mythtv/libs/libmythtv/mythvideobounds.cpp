@@ -67,7 +67,7 @@ MythVideoBounds::MythVideoBounds()
 void MythVideoBounds::RefreshVideoBoundsState()
 {
     emit VideoBoundsStateChanged({ m_adjustFill, m_videoAspectOverrideMode, m_manualHorizScale,
-                                   m_manualVertScale, m_manualMove });
+                                   m_manualVertScale, m_manualMove, m_stereoOverride });
 }
 
 void MythVideoBounds::SetDisplay(MythDisplay *mDisplay)
@@ -929,6 +929,7 @@ void MythVideoBounds::SetStereoOverride(StereoscopicMode Mode)
     if (Mode != m_stereoOverride)
     {
         m_stereoOverride = Mode;
+        RefreshVideoBoundsState();
         emit UpdateOSDMessage(StereoscopictoString(Mode));
     }
 }
