@@ -720,11 +720,14 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(
     m_heightRange->setHelpText(tr("Optional setting to restrict this profile "
         "to videos with a selected height range. ") + rangeHelp);
     m_codecs->setLabel(tr("Video Formats"));
-    m_codecs->addSelection("","",true);
-    m_codecs->addSelection("mpeg2video");
-    m_codecs->addSelection("mpeg4");
-    m_codecs->addSelection("h264");
-    m_codecs->addSelection("hevc");
+    m_codecs->addSelection(tr("All formats"), " ", true);
+    m_codecs->addSelection("MPEG2", "mpeg2video");
+    m_codecs->addSelection("MPEG4", "mpeg4");
+    m_codecs->addSelection("H264",  "h264");
+    m_codecs->addSelection("HEVC",  "hevc");
+    m_codecs->addSelection("VP8",   "vp8");
+    m_codecs->addSelection("VP9",   "vp9");
+    m_codecs->addSelection("AV1",   "av1");
     m_codecs->setHelpText(tr("Optional setting to restrict this profile "
         "to a video format or formats. You can also type in a format "
         "or several formats separated by space. "
@@ -887,7 +890,10 @@ void PlaybackProfileItemConfig::Load(void)
 
     m_widthRange->setValue(width_value);
     m_heightRange->setValue(height_value);
-    m_codecs->setValue(m_item.Get(COND_CODECS));
+    auto codecs = m_item.Get(COND_CODECS);
+    if (codecs.isEmpty())
+        codecs = " ";
+    m_codecs->setValue(codecs);
     m_framerate->setValue(m_item.Get(COND_RATE));
 
     QString pdecoder  = m_item.Get(PREF_DEC);
@@ -1156,26 +1162,25 @@ PlaybackProfileConfig::PlaybackProfileConfig(QString profilename,
 
 void PlaybackProfileItemConfig::InitLabel(void)
 {
-    QString andStr = tr("&", "and");
-    QString str;
-
+    QStringList restrict;
     QString width = m_widthRange->getValue();
     if (!width.isEmpty())
-        str += " " + tr("width","video formats") + " " + width;
+        restrict << tr("Width", "video formats") + " " + width;
     QString height = m_heightRange->getValue();
     if (!height.isEmpty())
-        str += " " + tr("height","video formats") + " " + height;
-
-    QString codecsval = m_codecs->getValue();
+        restrict << tr("Height", "video formats") + " " + height;
+    QString codecsval = m_codecs->getValue().trimmed();
     if (!codecsval.isEmpty())
-        str += " " + tr("formats","video formats") + " " + codecsval;
+        restrict << tr("Formats", "video formats") + " " + codecsval.toUpper();
     QString framerateval = m_framerate->getValue();
     if (!framerateval.isEmpty())
-        str += " " + tr("framerate") + " " + framerateval;
+        restrict << tr("framerate") + " " + framerateval;
 
-    str += " -> ";
+    QString str;
+    if (!restrict.isEmpty())
+        str += restrict.join(" ") + " -> ";
     str += MythVideoProfile::GetDecoderName(m_decoder->getValue());
-    str += " " + andStr + ' ';
+    str += " " + tr("&", "and") + ' ';
     str += MythVideoProfile::GetVideoRendererName(m_vidRend->getValue());
     setLabel(str);
 }
