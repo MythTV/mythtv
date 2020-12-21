@@ -165,7 +165,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
                         const QBrush &FillBrush, const QPen &LinePen, int Alpha);
     void  ClearRect(QOpenGLFramebufferObject *Target, QRect Area, int Color);
 
-    bool  GetGPUMemory(int &Available, int& Dedicated, int &Total);
+    std::tuple<int,int,int> GetGPUMemory();
 
   public slots:
     void  MessageLogged  (const QOpenGLDebugMessage &Message);

@@ -1530,21 +1530,20 @@ void MythRenderOpenGL::SetMatrixView(void)
     m_projection.ortho(m_viewport);
 }
 
-bool MythRenderOpenGL::GetGPUMemory(int &Available, int &Dedicated, int &Total)
+std::tuple<int, int, int> MythRenderOpenGL::GetGPUMemory()
 {
     OpenGLLocker locker(this);
     if (m_extraFeaturesUsed & kGLNVMemory)
     {
-        GLint kb = 0;
-        glGetIntegerv(GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &kb);
-        Total = kb / 1024;
-        glGetIntegerv(GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &kb);
-        Dedicated = kb / 1024;
-        glGetIntegerv(GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &kb);
-        Available = kb / 1024;
-        return true;
+        GLint total = 0;
+        GLint dedicated = 0;
+        GLint available = 0;
+        glGetIntegerv(GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &total);
+        glGetIntegerv(GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &dedicated);
+        glGetIntegerv(GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &available);
+        return { total / 1024, dedicated / 1024, available / 1024 };
     }
-    return false;
+    return { 0, 0, 0 };
 }
 
 /*! \brief Check for 16bit framebufferobject support

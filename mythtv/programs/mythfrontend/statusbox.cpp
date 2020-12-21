@@ -1567,25 +1567,48 @@ void StatusBox::doDisplayStatus()
         MythRenderOpenGL* gl = MythRenderOpenGL::GetOpenGLRender();
         if (gl && (gl->GetExtraFeatures() & kGLNVMemory))
         {
-            auto UpdateGPUMem = [](StatusBoxItem *Item)
+            auto GetGPUMem = []()
             {
-                int dedicated = 0;
-                int total = 0;
-                int available = 0;
-                MythRenderOpenGL* opengl = MythRenderOpenGL::GetOpenGLRender();
-                if (opengl)
-                  opengl->GetGPUMemory(available, dedicated, total);
+                if (auto * opengl = MythRenderOpenGL::GetOpenGLRender(); opengl)
+                    return opengl->GetGPUMemory();
+                return std::tuple<int,int,int>{ 0, 0, 0 };
+            };
+
+            auto UpdateUsed = [&GetGPUMem](StatusBoxItem* Item)
+            {
+                auto mem = GetGPUMem();
+                int total = std::get<0>(mem);
                 if (total > 0)
                 {
-                    int percent = static_cast<int>((available / static_cast<float>(total) * 100.0F));
-                    Item->SetText(tr("GPU Memory: %1 MB total, %2 MB dedicated, %3 MB used, %4 MB (or %5%) free")
-                        .arg(total).arg(dedicated).arg(total - available).arg(available).arg(percent));
+                    int avail = std::get<2>(mem);
+                    Item->SetText(tr("GPU memory used     : %1MB").arg(total - avail));
                 }
             };
-            StatusBoxItem* gpumem = AddLogLine("");
-            UpdateGPUMem(gpumem);
-            connect(gpumem, &StatusBoxItem::UpdateRequired, UpdateGPUMem);
-            gpumem->Start();
+
+            auto UpdateFree = [&GetGPUMem](StatusBoxItem* Item)
+            {
+                auto mem = GetGPUMem();
+                int total = std::get<0>(mem);
+                if (total > 0)
+                {
+                    int avail = std::get<2>(mem);
+                    int percent = static_cast<int>((avail / static_cast<float>(total) * 100.0F));
+                    Item->SetText(tr("GPU memory free     : %1MB (or %2%)").arg(avail).arg(percent));
+                }
+            };
+
+            auto current = GetGPUMem();
+            // Total and dedicated will not change
+            AddLogLine(tr("GPU memory total    : %1MB").arg(std::get<0>(current)));
+            AddLogLine(tr("GPU memory dedicated: %1MB").arg(std::get<1>(current)));
+            auto * used = AddLogLine("");
+            auto * freemem = AddLogLine("");
+            UpdateUsed(used);
+            UpdateFree(freemem);
+            connect(used, &StatusBoxItem::UpdateRequired, UpdateUsed);
+            connect(freemem, &StatusBoxItem::UpdateRequired, UpdateFree);
+            used->Start();
+            freemem->Start();
         }
 
         desc = render->GetDescription();
