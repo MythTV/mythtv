@@ -51,6 +51,20 @@ MythVideoBoundsState::MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOver
 {
 }
 
+MythVideoColourState::MythVideoColourState(PictureAttributeSupported Supported,
+                                           const std::map<PictureAttribute,int>& AttributeValues)
+  : m_supportedAttributes(Supported),
+    m_attributeValues(AttributeValues)
+{
+}
+
+int MythVideoColourState::GetValue(PictureAttribute Attribute)
+{
+    if (auto attr = m_attributeValues.find(Attribute); attr != m_attributeValues.end())
+        return attr->second;
+    return -1;
+}
+
 MythVisualiserState::MythVisualiserState(bool Embedding, bool Visualising,
                                          QString Name, QStringList Visualisers)
   : m_embedding(Embedding),

@@ -238,11 +238,6 @@ PictureAttributeSupported MythVideoOutput::GetSupportedPictureAttributes()
     return m_videoColourSpace.SupportedAttributes();
 }
 
-int MythVideoOutput::GetPictureAttribute(PictureAttribute AttributeType)
-{
-    return m_videoColourSpace.GetPictureAttribute(AttributeType);
-}
-
 void MythVideoOutput::SetFramesPlayed(long long FramesPlayed)
 {
     m_framesPlayed = FramesPlayed;

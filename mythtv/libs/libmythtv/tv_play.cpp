@@ -1520,19 +1520,15 @@ void TV::GetStatus()
             status.insert("mute",   m_audioState.m_muteState);
         }
 
-        if (m_player->GetVideoOutput())
-        {
-            MythVideoOutput *vo = m_player->GetVideoOutput();
-            PictureAttributeSupported supp = vo->GetSupportedPictureAttributes();
-            if (supp & kPictureAttributeSupported_Brightness)
-                status.insert("brightness", vo->GetPictureAttribute(kPictureAttribute_Brightness));
-            if (supp & kPictureAttributeSupported_Contrast)
-                status.insert("contrast", vo->GetPictureAttribute(kPictureAttribute_Contrast));
-            if (supp & kPictureAttributeSupported_Colour)
-                status.insert("colour", vo->GetPictureAttribute(kPictureAttribute_Colour));
-            if (supp & kPictureAttributeSupported_Hue)
-                status.insert("hue", vo->GetPictureAttribute(kPictureAttribute_Hue));
-        }
+        PictureAttributeSupported supp = m_videoColourState.m_supportedAttributes;
+        if (supp & kPictureAttributeSupported_Brightness)
+            status.insert("brightness", m_videoColourState.GetValue(kPictureAttribute_Brightness));
+        if (supp & kPictureAttributeSupported_Contrast)
+            status.insert("contrast", m_videoColourState.GetValue(kPictureAttribute_Contrast));
+        if (supp & kPictureAttributeSupported_Colour)
+            status.insert("colour", m_videoColourState.GetValue(kPictureAttribute_Colour));
+        if (supp & kPictureAttributeSupported_Hue)
+            status.insert("hue", m_videoColourState.GetValue(kPictureAttribute_Hue));
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     ReturnPlayerLock();
@@ -7708,14 +7704,10 @@ void TV::HandleOSDClosed(int OSDType)
 
 PictureAttribute TV::NextPictureAdjustType(PictureAdjustType Type, PictureAttribute Attr)
 {
-    if (!m_player)
-        return kPictureAttribute_None;
-
     int sup = kPictureAttributeSupported_None;
     if ((kAdjustingPicture_Playback == Type))
     {
-        if (m_player->GetVideoOutput())
-            sup = m_player->GetVideoOutput()->GetSupportedPictureAttributes();
+        sup = m_videoColourState.m_supportedAttributes;
         if (m_audioState.m_hasAudioOut && m_audioState.m_volumeControl)
             sup |= kPictureAttributeSupported_Volume;
         // Filter out range
@@ -7734,13 +7726,9 @@ PictureAttribute TV::NextPictureAdjustType(PictureAdjustType Type, PictureAttrib
 
 void TV::DoTogglePictureAttribute(PictureAdjustType Type)
 {
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     PictureAttribute attr = NextPictureAdjustType(Type, m_adjustingPictureAttribute);
     if (kPictureAttribute_None == attr)
-    {
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
         return;
-    }
 
     m_adjustingPicture          = Type;
     m_adjustingPictureAttribute = attr;
@@ -7750,14 +7738,9 @@ void TV::DoTogglePictureAttribute(PictureAdjustType Type)
     int value = 99;
     if (kAdjustingPicture_Playback == Type)
     {
-        if (!m_player)
-        {
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-            return;
-        }
         if (kPictureAttribute_Volume != m_adjustingPictureAttribute)
         {
-            value = m_player->GetVideoOutput()->GetPictureAttribute(attr);
+            value = m_videoColourState.GetValue(attr);
         }
         else if (m_audioState.m_hasAudioOut && m_audioState.m_volumeControl)
         {
@@ -7765,7 +7748,6 @@ void TV::DoTogglePictureAttribute(PictureAdjustType Type)
             title = tr("Adjust Volume");
         }
     }
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 
     if (m_playerContext.m_recorder && (kAdjustingPicture_Playback != Type))
         value = m_playerContext.m_recorder->GetPictureAttribute(attr);
@@ -9215,10 +9197,11 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         m_tvmSubsEnabled      = OptionalCaptionEnabled(m_captionsState.m_textDisplayMode);
         m_tvmSubsHaveText     = m_captionsState.m_externalTextSubs;
         m_tvmSubsForcedOn     = m_player->GetAllowForcedSubtitles();
+        m_tvmSup              = m_videoColourState.m_supportedAttributes;
         MythVideoOutput *vo = m_player->GetVideoOutput();
         if (vo)
         {
-            m_tvmSup            = vo->GetSupportedPictureAttributes();
+
             m_tvmStereoMode     = vo->GetStereoOverride();
             m_tvmFillAutoDetect = vo->HasSoftwareFrames();  
         }

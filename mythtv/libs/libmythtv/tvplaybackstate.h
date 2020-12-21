@@ -85,6 +85,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void AudioStateChanged(const MythAudioState& AudioState);
     void CaptionsStateChanged(MythCaptionsState CaptionsState);
     void VideoBoundsStateChanged(const MythVideoBoundsState& VideoBoundsState);
+    void VideoColourStateChanged(const MythVideoColourState& ColourState);
     void VisualiserStateChanged(const MythVisualiserState& VisualiserState);
 
   protected:
@@ -93,6 +94,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     MythAudioState       m_audioState       { };
     MythCaptionsState    m_captionsState    { };
     MythVideoBoundsState m_videoBoundsState { };
+    MythVideoColourState m_videoColourState { };
     MythVisualiserState  m_visualiserState  { };
 };
 

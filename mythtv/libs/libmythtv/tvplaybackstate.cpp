@@ -40,6 +40,11 @@ void TVPlaybackState::VideoBoundsStateChanged(const MythVideoBoundsState& VideoB
     m_videoBoundsState = VideoBoundsState;
 }
 
+void TVPlaybackState::VideoColourStateChanged(const MythVideoColourState& ColourState)
+{
+    m_videoColourState = ColourState;
+}
+
 void TVPlaybackState::VisualiserStateChanged(const MythVisualiserState& VisualiserState)
 {
     m_visualiserState = VisualiserState;

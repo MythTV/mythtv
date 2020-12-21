@@ -109,6 +109,12 @@ MythVideoColourSpace::~MythVideoColourSpace()
     delete m_customDisplayPrimaries;
 }
 
+void MythVideoColourSpace::RefreshState()
+{
+    emit SupportedAttributesChanged(m_supportedAttributes);
+    emit PictureAttributesUpdated(m_dbSettings);
+}
+
 PictureAttributeSupported MythVideoColourSpace::SupportedAttributes(void) const
 {
     return m_supportedAttributes;

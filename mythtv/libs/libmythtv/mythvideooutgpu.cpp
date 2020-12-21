@@ -195,10 +195,18 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* R
     SetDisplay(Display);
     m_painter->SetViewControl(MythPainterGPU::None);
 
+    connect(this, &MythVideoOutputGPU::RefreshState,   this, &MythVideoOutputGPU::DoRefreshState);
+    connect(this, &MythVideoOutputGPU::DoRefreshState, this, &MythVideoOutputGPU::RefreshVideoBoundsState);
+    connect(this, &MythVideoOutputGPU::DoRefreshState,
+            &m_videoColourSpace, &MythVideoColourSpace::RefreshState);
     connect(this, &MythVideoOutputGPU::ChangePictureAttribute,
             &m_videoColourSpace, &MythVideoColourSpace::ChangePictureAttribute);
     connect(&m_videoColourSpace, &MythVideoColourSpace::PictureAttributeChanged,
             this, &MythVideoOutputGPU::PictureAttributeChanged);
+    connect(&m_videoColourSpace, &MythVideoColourSpace::SupportedAttributesChanged,
+            this, &MythVideoOutputGPU::SupportedAttributesChanged);
+    connect(&m_videoColourSpace, &MythVideoColourSpace::PictureAttributesUpdated,
+            this, &MythVideoOutputGPU::PictureAttributesUpdated);
 }
 
 MythVideoOutputGPU::~MythVideoOutputGPU()

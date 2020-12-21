@@ -108,6 +108,18 @@ class MTV_PUBLIC MythVideoBoundsState
 
 Q_DECLARE_METATYPE(MythVideoBoundsState)
 
+class MTV_PUBLIC MythVideoColourState
+{
+  public:
+    MythVideoColourState() = default;
+    MythVideoColourState(PictureAttributeSupported Supported,
+                         const std::map<PictureAttribute,int>& AttributeValues);
+    int GetValue(PictureAttribute Attribute);
+
+    PictureAttributeSupported  m_supportedAttributes { kPictureAttributeSupported_None };
+    std::map<PictureAttribute,int> m_attributeValues;
+};
+
 class MTV_PUBLIC MythVisualiserState
 {
   public:

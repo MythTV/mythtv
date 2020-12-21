@@ -37,15 +37,6 @@ bool MythPlayerVideoUI::InitVideo()
         return false;
     }
 
-    // Simple lambda to update the OSD for picture attribute updates
-    auto updateOsdPicAttr = [&](PictureAttribute Attribute, int Value)
-    {
-        QString text = toString(Attribute) + " " + toTypeString(kAdjustingPicture_Playback);
-        UpdateOSDStatus(toTitleString(kAdjustingPicture_Playback), text, QString::number(Value),
-                        kOSDFunctionalType_PictureAdjust, "%", Value * 10, kOSDTimeout_Med);
-        ChangeOSDPositionUpdates(false);
-    };
-
     // Toggle detect letter box
     auto toggleDetectLetterbox = [&]()
     {
@@ -59,9 +50,16 @@ bool MythPlayerVideoUI::InitVideo()
     m_videoOutput = video;
 
     // Inbound connections
-    connect(video, &MythVideoOutputGPU::PictureAttributeChanged, updateOsdPicAttr);
-    connect(video, &MythVideoBounds::UpdateOSDMessage, this,  QOverload<const QString&>::of(&MythPlayerVideoUI::UpdateOSDMessage));
-    connect(video, &MythVideoBounds::VideoBoundsStateChanged, m_tv, &TV::VideoBoundsStateChanged);
+    connect(video, &MythVideoOutputGPU::PictureAttributeChanged,
+                                                  this, &MythPlayerVideoUI::PictureAttributeChanged);
+    connect(video, &MythVideoOutputGPU::SupportedAttributesChanged,
+                                                  this, &MythPlayerVideoUI::SupportedAttributesChanged);
+    connect(video, &MythVideoOutputGPU::PictureAttributesUpdated,
+                                                  this, &MythPlayerVideoUI::PictureAttributesUpdated);
+    connect(video, &MythVideoBounds::UpdateOSDMessage,
+                                                  this, QOverload<const QString&>::of(&MythPlayerVideoUI::UpdateOSDMessage));
+    connect(video, &MythVideoBounds::VideoBoundsStateChanged,
+                                                  m_tv, &TV::VideoBoundsStateChanged);
     connect(m_tv,  &TV::ChangeOSDPositionUpdates, this,  &MythPlayerVideoUI::ChangeOSDPositionUpdates);
     connect(m_tv,  &TV::WindowResized,            this,  &MythPlayerVideoUI::ReinitOSD);
     connect(m_tv,  &TV::ChangeAdjustFill,         this,  &MythPlayerVideoUI::ToggleAdjustFill);
@@ -81,12 +79,39 @@ bool MythPlayerVideoUI::InitVideo()
     connect(m_tv,  &TV::ChangeAspectOverride,     video, &MythVideoOutputGPU::ToggleAspectOverride);
     connect(this,  &MythPlayerVideoUI::ResizeForInteractiveTV,
                                                   video, &MythVideoOutputGPU::SetITVResize);
+    connect(this, &MythPlayerVideoUI::VideoColourStateChanged,
+                                                  m_tv, &TV::VideoColourStateChanged);
+    connect(this, &MythPlayerVideoUI::RefreshVideoState, video, &MythVideoOutputGPU::RefreshState);
 
     // Update initial state. MythVideoOutput will have potentially adjusted state
     // at startup that we need to know about.
-    m_videoOutput->RefreshVideoBoundsState();
-
+    emit RefreshVideoState();
     return true;
+}
+
+void MythPlayerVideoUI::SupportedAttributesChanged(PictureAttributeSupported Supported)
+{
+    if (Supported != m_colourState.m_supportedAttributes)
+    {
+        m_colourState.m_supportedAttributes = Supported;
+        emit VideoColourStateChanged(m_colourState);
+    }
+}
+
+void MythPlayerVideoUI::PictureAttributeChanged(PictureAttribute Attribute, int Value)
+{
+    QString text = toString(Attribute) + " " + toTypeString(kAdjustingPicture_Playback);
+    UpdateOSDStatus(toTitleString(kAdjustingPicture_Playback), text, QString::number(Value),
+                    kOSDFunctionalType_PictureAdjust, "%", Value * 10, kOSDTimeout_Med);
+    ChangeOSDPositionUpdates(false);
+    m_colourState.m_attributeValues[Attribute] = Value;
+    emit VideoColourStateChanged(m_colourState);
+};
+
+void MythPlayerVideoUI::PictureAttributesUpdated(const std::map<PictureAttribute,int>& Values)
+{
+    m_colourState.m_attributeValues = Values;
+    emit VideoColourStateChanged(m_colourState);
 }
 
 /*! \brief Convenience function to request and wait for a callback into the main thread.

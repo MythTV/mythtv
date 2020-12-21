@@ -26,11 +26,13 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
   public slots:
     int   ChangePictureAttribute(PictureAttribute Attribute, bool Direction, int Value);
     void  SetPrimariesMode(PrimariesMode Mode);
+    void  RefreshState();
 
   signals:
     void  Updated(bool PrimariesChanged);
     void  PictureAttributeChanged(PictureAttribute Attribute, int Value);
     void  SupportedAttributesChanged(PictureAttributeSupported Supported);
+    void  PictureAttributesUpdated(const std::map<PictureAttribute,int>& Values);
 
   public:
     MythVideoColourSpace();

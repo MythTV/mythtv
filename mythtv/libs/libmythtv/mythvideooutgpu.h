@@ -27,6 +27,10 @@ class MythVideoOutputGPU : public MythVideoOutput
   signals:
     void            ChangePictureAttribute(PictureAttribute Attribute, bool Direction, int Value);
     void            PictureAttributeChanged(PictureAttribute Attribute, int Value);
+    void            SupportedAttributesChanged(PictureAttributeSupported Supported);
+    void            PictureAttributesUpdated(const std::map<PictureAttribute,int>& Values);
+    void            RefreshState();
+    void            DoRefreshState();
 
   public slots:
     void            WindowResized         (QSize Size);

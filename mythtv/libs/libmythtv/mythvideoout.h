@@ -83,7 +83,6 @@ class MythVideoOutput : public MythVideoBounds
     // These methods are only required by MythPlayerUI
     virtual void ResizeForVideo(QSize /*Size*/ = QSize()) { }
     PictureAttributeSupported GetSupportedPictureAttributes();
-    int          GetPictureAttribute   (PictureAttribute AttributeType);
     virtual void InitPictureAttributes () { }
     bool         HasSoftwareFrames     () const { return codec_sw_copy(m_videoCodecID); }
     virtual void RenderOverlays        (OSD& /*Osd*/) {}
