@@ -133,15 +133,19 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
 #endif
 #ifdef USING_OPENGL
         if (renderer.contains("opengl") && openglrender)
+        {
             video = new MythVideoOutputOpenGL(MainWindow, openglrender,
                                               openglpainter, Display,
                                               videoprofile, renderer);
+        }
 #endif
 #ifdef USING_VULKAN
         if (renderer.contains(VULKAN_RENDERER))
+        {
             video = new MythVideoOutputVulkan(MainWindow, vulkanrender,
                                               vulkanpainter, Display,
                                               videoprofile, renderer);
+        }
 #endif
 
         if (video)
