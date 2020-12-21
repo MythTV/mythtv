@@ -34,6 +34,7 @@ class MythVideoOutputGPU : public MythVideoOutput
 
   public slots:
     void            WindowResized         (QSize Size);
+    void            ResizeForVideo        (QSize Size = QSize());
 
   public:
     void            InitPictureAttributes () override;
@@ -46,7 +47,6 @@ class MythVideoOutputGPU : public MythVideoOutput
                                            int ReferenceFrames, bool ForceChange) override;
     void            EndFrame              () override;
     void            ClearAfterSeek        () override;
-    void            ResizeForVideo        (QSize Size = QSize()) override;
 
   protected:
     MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* Render,

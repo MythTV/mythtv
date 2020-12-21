@@ -69,15 +69,16 @@ bool MythPlayerVideoUI::InitVideo()
     connect(m_tv,  &TV::ToggleDetectLetterBox, toggleDetectLetterbox);
 
     // Passthrough signals
-    connect(m_tv,  &TV::ChangePictureAttribute,   video, &MythVideoOutputGPU::ChangePictureAttribute);
-    connect(m_tv,  &TV::ChangeStereoOverride,     video, &MythVideoOutputGPU::SetStereoOverride);
-    connect(m_tv,  &TV::WindowResized,            video, &MythVideoOutputGPU::WindowResized);
-    connect(m_tv,  &TV::EmbedPlayback,            video, &MythVideoOutputGPU::EmbedPlayback);
-    connect(m_tv,  &TV::ChangeZoom,               video, &MythVideoOutputGPU::Zoom);
-    connect(m_tv,  &TV::ToggleMoveBottomLine,     video, &MythVideoOutputGPU::ToggleMoveBottomLine);
-    connect(m_tv,  &TV::SaveBottomLine,           video, &MythVideoOutputGPU::SaveBottomLine);
-    connect(m_tv,  &TV::ChangeAspectOverride,     video, &MythVideoOutputGPU::ToggleAspectOverride);
-    connect(this,  &MythPlayerVideoUI::ResizeForInteractiveTV,
+    connect(m_tv, &TV::ResizeScreenForVideo,     video, &MythVideoOutputGPU::ResizeForVideo);
+    connect(m_tv, &TV::ChangePictureAttribute,   video, &MythVideoOutputGPU::ChangePictureAttribute);
+    connect(m_tv, &TV::ChangeStereoOverride,     video, &MythVideoOutputGPU::SetStereoOverride);
+    connect(m_tv, &TV::WindowResized,            video, &MythVideoOutputGPU::WindowResized);
+    connect(m_tv, &TV::EmbedPlayback,            video, &MythVideoOutputGPU::EmbedPlayback);
+    connect(m_tv, &TV::ChangeZoom,               video, &MythVideoOutputGPU::Zoom);
+    connect(m_tv, &TV::ToggleMoveBottomLine,     video, &MythVideoOutputGPU::ToggleMoveBottomLine);
+    connect(m_tv, &TV::SaveBottomLine,           video, &MythVideoOutputGPU::SaveBottomLine);
+    connect(m_tv, &TV::ChangeAspectOverride,     video, &MythVideoOutputGPU::ToggleAspectOverride);
+    connect(this, &MythPlayerVideoUI::ResizeForInteractiveTV,
                                                   video, &MythVideoOutputGPU::SetITVResize);
     connect(this, &MythPlayerVideoUI::VideoColourStateChanged,
                                                   m_tv, &TV::VideoColourStateChanged);

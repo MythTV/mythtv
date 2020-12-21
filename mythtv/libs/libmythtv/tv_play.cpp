@@ -6784,12 +6784,7 @@ void TV::Embed(bool Embed, QRect Rect, const QStringList& Data)
     if (Embed)
         return;
 
-    GetPlayerReadLock();
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player && m_player->GetVideoOutput())
-        m_player->GetVideoOutput()->ResizeForVideo();
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-    ReturnPlayerLock();
+    emit ResizeScreenForVideo();
 
     // m_playerBounds is not applicable when switching modes so
     // skip this logic in that case.
