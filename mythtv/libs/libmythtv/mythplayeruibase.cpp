@@ -23,3 +23,8 @@ void MythPlayerUIBase::InitialiseState()
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Player state ready");
 }
+
+MythRender* MythPlayerUIBase::GetRender() const
+{
+    return m_render;
+}

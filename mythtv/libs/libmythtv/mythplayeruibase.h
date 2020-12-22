@@ -11,6 +11,9 @@ class MTV_PUBLIC MythPlayerUIBase : public MythPlayer
   public:
     MythPlayerUIBase(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
 
+    MythRender* GetRender() const;
+
+  protected:
     MythMainWindow* m_mainWindow { nullptr };
     TV*             m_tv         { nullptr };
     MythRender*     m_render     { nullptr };
