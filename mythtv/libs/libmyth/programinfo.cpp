@@ -3252,18 +3252,15 @@ void ProgramInfo::UpdateLastDelete(bool setTime) const
     if (setTime)
     {
         QDateTime timeNow = MythDate::current();
-        qint64 delay = m_recStartTs.secsTo(timeNow) / 3600;
-
-        if (delay > 200)
-            delay = 200;
-        else if (delay < 1)
-            delay = 1;
+        auto delay_secs = std::chrono::seconds(m_recStartTs.secsTo(timeNow));
+        auto delay = duration_cast<std::chrono::hours>(delay_secs);
+        delay = std::clamp(delay, 1h, 200h);
 
         query.prepare("UPDATE record SET last_delete = :TIME, "
                       "avg_delay = (avg_delay * 3 + :DELAY) / 4 "
                       "WHERE recordid = :RECORDID");
         query.bindValue(":TIME", timeNow);
-        query.bindValue(":DELAY", delay);
+        query.bindValue(":DELAY", static_cast<qint64>(delay.count()));
     }
     else
     {
