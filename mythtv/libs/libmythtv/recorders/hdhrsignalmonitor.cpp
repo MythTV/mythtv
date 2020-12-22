@@ -139,13 +139,22 @@ void HDHRSignalMonitor::UpdateValues(void)
             .arg(sig).arg(snq).arg(seq));
 
     // Set SignalMonitorValues from info from card.
+    bool wasLocked = false;
     bool isLocked = false;
     {
         QMutexLocker locker(&m_statusLock);
         m_signalStrength.SetValue(sig);
         m_signalToNoise.SetValue(snq);
+        wasLocked = m_signalLock.IsGood();
         m_signalLock.SetValue(static_cast<int>(status.lock_supported));
         isLocked = m_signalLock.IsGood();
+    }
+
+    // Signal lock change
+    if (wasLocked != isLocked)
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues -- Signal " +
+                (isLocked ? "Locked" : "Lost"));
     }
 
     EmitStatus();
