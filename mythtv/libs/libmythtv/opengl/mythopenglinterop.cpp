@@ -39,7 +39,7 @@ void MythOpenGLInterop::GetTypes(MythRender* Render, InteropMap& Types)
         return;
 
 #ifdef USING_MEDIACODEC
-    Types.emplace_back(MEDIACODEC);
+    Types[FMT_MEDIACODEC] = { MEDIACODEC };
 #endif
 
 #ifdef USING_VDPAU
