@@ -92,7 +92,7 @@ class PremiereContentInformationTable;
 class EITHelper
 {
   public:
-    EITHelper(void);
+    EITHelper(uint cardnum);
     EITHelper &operator=(const EITHelper &) = delete;
     EITHelper(const EITHelper& rhs);
     virtual ~EITHelper(void);
@@ -149,6 +149,7 @@ class EITHelper
     int                     m_gpsOffset    {-1 * GPS_LEAP_SECONDS};
 
     /* carry some values to optimize channel lookup and reschedules */
+    uint                    m_cardnum      {0};
     uint                    m_sourceid     {0};    ///< id of the video source
     uint                    m_channelid    {0};    ///< id of the channel
     QDateTime               m_maxStarttime;        ///< latest starttime of changed events

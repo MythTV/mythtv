@@ -32,9 +32,11 @@ static uint get_chan_id_from_db_dtv(uint sourceid,
 static void init_fixup(FixupMap &fix);
 
 #define LOC QString("EITHelper: ")
+#define LOC_ID QString("EITHelper[%1]: ").arg(m_cardnum)
 
-EITHelper::EITHelper() :
-    m_eitFixup(new EITFixUp())
+EITHelper::EITHelper(uint cardnum) :
+    m_eitFixup(new EITFixUp()),
+    m_cardnum(cardnum)
 {
     init_fixup(m_fixup);
 }
@@ -87,15 +89,15 @@ uint EITHelper::ProcessEvents(void)
 
     if (!m_incompleteEvents.empty())
     {
-        LOG(VB_EIT, LOG_INFO,
-            LOC + QString("Added %1 events -- complete: %2 incomplete: %3")
+        LOG(VB_EIT, LOG_INFO, LOC_ID +
+            QString("Added %1 events -- complete: %2 incomplete: %3")
                 .arg(insertCount).arg(m_dbEvents.size())
                 .arg(m_incompleteEvents.size()));
     }
     else
     {
-        LOG(VB_EIT, LOG_INFO,
-            LOC + QString("Added %1 events").arg(insertCount));
+        LOG(VB_EIT, LOG_INFO, LOC_ID +
+            QString("Added %1 events").arg(insertCount));
     }
 
     return insertCount;
@@ -695,7 +697,7 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
 
         if (!chanid)
         {
-            LOG(VB_EIT, LOG_INFO, LOC +
+            LOG(VB_EIT, LOG_INFO, LOC_ID +
                 QString("Premiere EIT for NIT %1, TID %2, SID %3, "
                         "count %4, title: %5. Channel not found!")
                     .arg(networkid).arg(tsid).arg(serviceid)

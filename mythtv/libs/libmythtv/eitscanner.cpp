@@ -30,7 +30,8 @@
  */
 
 EITScanner::EITScanner(uint cardnum)
-    : m_eitHelper(new EITHelper()), m_eventThread(new MThread("EIT", this)),
+    : m_eitHelper(new EITHelper(cardnum)),
+      m_eventThread(new MThread("EIT", this)),
       m_cardnum(cardnum)
 {
     QStringList langPref = iso639_get_language_list();
@@ -114,7 +115,7 @@ void EITScanner::run(void)
         // Is it time to move to the next transport in active scan?
         if (m_activeScan && (MythDate::current() > m_activeScanNextTrig))
         {
-            // if there have been any new events, tell scheduler to run.
+            // If there have been any new events, tell scheduler to run.
             if (eitCount)
             {
                 LOG(VB_EIT, LOG_INFO,
@@ -136,10 +137,9 @@ void EITScanner::run(void)
                 {
                     m_eitHelper->SetChannelID(ChannelUtil::GetChanID(
                         m_rec->GetSourceID(), *m_activeScanNextChan));
-                    LOG(VB_EIT, LOG_INFO,
-                        LOC_ID + QString("Now looking for EIT data on "
-                                         "multiplex of channel %1")
-                        .arg(*m_activeScanNextChan));
+                    LOG(VB_EIT, LOG_INFO, LOC_ID +
+                        QString("Now looking for EIT data on multiplex of channel %1 of source %2")
+                        .arg(*m_activeScanNextChan).arg(m_rec->GetSourceID()));
                 }
             }
 
