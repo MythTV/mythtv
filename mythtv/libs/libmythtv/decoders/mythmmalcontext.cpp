@@ -142,7 +142,7 @@ int MythMMALContext::HwDecoderInit(AVCodecContext *Context)
         return -1;
 
     MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
-    m_interop = MythMMALInterop::CreateMMAL(context, MythOpenGLInterop::MMAL);
+    m_interop = MythMMALInterop::CreateMMAL(context);
     return m_interop ? 0 : -1;
 }
 
