@@ -48,20 +48,14 @@ void MythDRMPRIMEInterop::DeleteTextures(void)
     MythOpenGLInterop::DeleteTextures();
 }
 
+/*! \brief Create a DRM PRIME interop instance.
+ *
+ * \note This is called directly from the decoder - hence we do not attempt
+ * to retrieve the list of supported types again. Assume it has already been verified.
+*/
 MythDRMPRIMEInterop* MythDRMPRIMEInterop::CreateDRM(MythRenderOpenGL* Context)
 {
-    if (!Context)
-        return nullptr;
-
-    MythInteropGPU::InteropMap types;
-    GetDRMTypes(Context, types);
-    if (auto drm = types.find(FMT_DRMPRIME); drm != types.end())
-    {
-        for (auto type : drm->second)
-            if (type == DRMPRIME)
-                return new MythDRMPRIMEInterop(Context);
-    }
-    return nullptr;
+    return Context ? new MythDRMPRIMEInterop(Context) : nullptr;
 }
 
 void MythDRMPRIMEInterop::GetDRMTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types)
