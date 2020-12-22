@@ -1540,26 +1540,8 @@ QStringList MythRAOPConnection::splitLines(const QByteArray &lines)
  */
 QString MythRAOPConnection::stringFromSeconds(int timeInSeconds)
 {
-    int hour    = timeInSeconds / 3600;
-    int minute  = (timeInSeconds - hour * 3600) / 60;
-    int seconds = timeInSeconds - hour * 3600 - minute * 60;
-    QString str;
-
-    if (hour)
-    {
-        str += QString("%1:").arg(hour);
-    }
-    if (minute < 10)
-    {
-        str += "0";
-    }
-    str += QString("%1:").arg(minute);
-    if (seconds < 10)
-    {
-        str += "0";
-    }
-    str += QString::number(seconds);
-    return str;
+    QTime time = QTime(0,0).addSecs(timeInSeconds);
+    return time.toString(time.hour() > 0 ? "HH:mm:ss" : "mm:ss");
 }
 
 /**
