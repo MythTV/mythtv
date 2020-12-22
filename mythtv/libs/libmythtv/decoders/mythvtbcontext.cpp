@@ -85,12 +85,8 @@ MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     if (!decodeonly)
-    {
-        // check for the correct player type and interop supprt
-        MythPlayerUI* player = GetPlayerUI(*Context);
-        if (MythOpenGLInterop::GetInteropType(FMT_VTB, player) == MythOpenGLInterop::Unsupported)
+        if (!FrameTypeIsSupported(*Context, FMT_VTB))
             return failure;
-    }
 
     // Check decoder support
     MythCodecContext::CodecProfile mythprofile = MythCodecContext::NoProfile;
@@ -148,13 +144,8 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
     if (!player)
         return -1;
 
-    // Check interop support
-    MythVTBInterop::Type type = MythOpenGLInterop::GetInteropType(FMT_VTB, player);
-    if (type == MythOpenGLInterop::Unsupported)
-        return -1;
-
     // Create interop
-    MythVTBInterop* interop = MythVTBInterop::Create(render, type);
+    MythVTBInterop* interop = MythVTBInterop::CreateVTB(render);
     if (!interop)
         return -1;
 

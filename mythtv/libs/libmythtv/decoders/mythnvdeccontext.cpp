@@ -44,12 +44,8 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     if (!decodeonly)
-    {
-        // check for the correct player type and interop supprt
-        MythPlayerUI* player = GetPlayerUI(*Context);
-        if (MythOpenGLInterop::GetInteropType(FMT_NVDEC, player) == MythOpenGLInterop::Unsupported)
+        if (!FrameTypeIsSupported(*Context, FMT_NVDEC))
             return failure;
-    }
 
     QString codecstr = ff_codec_id_string((*Context)->codec_id);
     QString profile  = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
@@ -151,12 +147,8 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
         return -1;
     OpenGLLocker locker(render);
 
-    // Check interop type
-    if (MythOpenGLInterop::GetInteropType(FMT_NVDEC, player) == MythOpenGLInterop::Unsupported)
-        return -1;
-
     // Create interop (and CUDA context)
-    MythNVDECInterop *interop = MythNVDECInterop::Create(render);
+    auto * interop = MythNVDECInterop::CreateNVDEC(render);
     if (!interop)
         return -1;
     if (!interop->IsValid())

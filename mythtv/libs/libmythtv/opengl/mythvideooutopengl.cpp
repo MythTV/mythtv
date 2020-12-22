@@ -369,11 +369,10 @@ void MythVideoOutputOpenGL::EndFrame()
 
 /*! \brief Generate a list of supported OpenGL profiles.
 */
-QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, QSize /*VideoDim*/)
+QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythRenderOpenGL *Render, MythCodecID CodecId, QSize /*VideoDim*/)
 {
     QStringList allowed;
-
-    if (MythRenderOpenGL::GetOpenGLRender() == nullptr)
+    if (!Render)
         return allowed;
 
     if (codec_sw_copy(CodecId))
@@ -398,9 +397,11 @@ QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythCodecID CodecId, QSiz
     else if (codec_is_mediacodec(CodecId))
         format = FMT_MEDIACODEC;
 
-    if (FMT_NONE == format)
-        return allowed;
-
-    allowed += MythOpenGLInterop::GetAllowedRenderers(format);
+    if (FMT_NONE != format)
+    {
+        MythInteropGPU::InteropMap supported;
+        if (MythOpenGLInterop::GetTypes(Render, supported); supported.find(format) != supported.cend())
+            allowed << "opengl-hw";
+    }
     return allowed;
 }

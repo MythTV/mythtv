@@ -6,29 +6,32 @@
 
 #define LOC QString("VDPAUInterop: ")
 
-MythVDPAUInterop* MythVDPAUInterop::Create(MythRenderOpenGL* Context, MythCodecID CodecId)
+MythVDPAUInterop* MythVDPAUInterop::CreateVDPAU(MythRenderOpenGL* Context, MythCodecID CodecId)
 {
-    if (Context)
-        return new MythVDPAUInterop(Context, CodecId);
+    if (!Context)
+        return nullptr;
+
+    MythInteropGPU::InteropMap types;
+    GetVDPAUTypes(Context, types);
+    if (auto vdpau = types.find(FMT_VDPAU); vdpau != types.end())
+    {
+        for (auto type : vdpau->second)
+            if (type == VDPAU)
+                return new MythVDPAUInterop(Context, CodecId);
+    }
     return nullptr;
 }
 
-MythOpenGLInterop::Type MythVDPAUInterop::GetInteropType(VideoFrameType Format)
+void MythVDPAUInterop::GetVDPAUTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types)
 {
-    if ((FMT_VDPAU != Format) || !gCoreContext->IsUIThread())
-        return Unsupported;
-
-    MythRenderOpenGL* context = MythRenderOpenGL::GetOpenGLRender();
-    if (!context)
-        return Unsupported;
-
-    if (MythVDPAUHelper::HaveVDPAU())
+    if (!MythVDPAUHelper::HaveVDPAU())
+        return;
+    if (Render->hasExtension("GL_NV_vdpau_interop"))
     {
-        if (context->hasExtension("GL_NV_vdpau_interop"))
-            return VDPAU;
-        LOG(VB_GENERAL, LOG_WARNING, LOC + "GL_NV_vdpau_interop is not available");
+        Types[FMT_VDPAU] = { VDPAU };
+        return;
     }
-    return Unsupported;
+    LOG(VB_GENERAL, LOG_WARNING, LOC + "GL_NV_vdpau_interop is not available");
 }
 
 MythVDPAUInterop::MythVDPAUInterop(MythRenderOpenGL* Context, MythCodecID CodecId)
@@ -39,13 +42,13 @@ MythVDPAUInterop::MythVDPAUInterop(MythRenderOpenGL* Context, MythCodecID CodecI
 
 MythVDPAUInterop::~MythVDPAUInterop()
 {
-    if (!m_context)
+    if (!m_openglContext)
         return;
 
     if (m_colourSpace)
         m_colourSpace->DecrRef();
 
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
     CleanupDeinterlacer();
     Cleanup();
     delete m_helper;
@@ -53,7 +56,7 @@ MythVDPAUInterop::~MythVDPAUInterop()
 
 void MythVDPAUInterop::Cleanup(void)
 {
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
     // per the spec, this should automatically release any registered
     // and mapped surfaces
@@ -110,20 +113,20 @@ void MythVDPAUInterop::RotateReferenceFrames(AVBufferRef* Buffer)
 
 bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
 {
-    if (!DeviceContext || !m_context)
+    if (!DeviceContext || !m_openglContext)
         return false;
 
     if (m_initNV && m_finiNV && m_registerNV && m_accessNV && m_mapNV && m_unmapNV &&
         m_helper && m_helper->IsValid())
         return true;
 
-    OpenGLLocker locker(m_context);
-    m_initNV     = reinterpret_cast<MYTH_VDPAUINITNV>(m_context->GetProcAddress("glVDPAUInitNV"));
-    m_finiNV     = reinterpret_cast<MYTH_VDPAUFININV>(m_context->GetProcAddress("glVDPAUFiniNV"));
-    m_registerNV = reinterpret_cast<MYTH_VDPAUREGOUTSURFNV>(m_context->GetProcAddress("glVDPAURegisterOutputSurfaceNV"));
-    m_accessNV   = reinterpret_cast<MYTH_VDPAUSURFACCESSNV>(m_context->GetProcAddress("glVDPAUSurfaceAccessNV"));
-    m_mapNV      = reinterpret_cast<MYTH_VDPAUMAPSURFNV>(m_context->GetProcAddress("glVDPAUMapSurfacesNV"));
-    m_unmapNV    = reinterpret_cast<MYTH_VDPAUMAPSURFNV>(m_context->GetProcAddress("glVDPAUUnmapSurfacesNV"));
+    OpenGLLocker locker(m_openglContext);
+    m_initNV     = reinterpret_cast<MYTH_VDPAUINITNV>(m_openglContext->GetProcAddress("glVDPAUInitNV"));
+    m_finiNV     = reinterpret_cast<MYTH_VDPAUFININV>(m_openglContext->GetProcAddress("glVDPAUFiniNV"));
+    m_registerNV = reinterpret_cast<MYTH_VDPAUREGOUTSURFNV>(m_openglContext->GetProcAddress("glVDPAURegisterOutputSurfaceNV"));
+    m_accessNV   = reinterpret_cast<MYTH_VDPAUSURFACCESSNV>(m_openglContext->GetProcAddress("glVDPAUSurfaceAccessNV"));
+    m_mapNV      = reinterpret_cast<MYTH_VDPAUMAPSURFNV>(m_openglContext->GetProcAddress("glVDPAUMapSurfacesNV"));
+    m_unmapNV    = reinterpret_cast<MYTH_VDPAUMAPSURFNV>(m_openglContext->GetProcAddress("glVDPAUUnmapSurfacesNV"));
 
     delete m_helper;
     m_helper = nullptr;
@@ -148,7 +151,7 @@ bool MythVDPAUInterop::InitNV(AVVDPAUDeviceContext* DeviceContext)
 bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSurface Surface,
                                  MythDeintType Deint, bool DoubleRate)
 {
-    if (!m_helper || !m_context || !Surface || !DeviceContext)
+    if (!m_helper || !m_openglContext || !Surface || !DeviceContext)
         return false;
 
     VdpChromaType chroma = VDP_CHROMA_TYPE_420;
@@ -176,7 +179,7 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
             vector<QSize> sizes;
             sizes.push_back(size);
             vector<MythVideoTextureOpenGL*> textures =
-                MythVideoTextureOpenGL::CreateTextures(m_context, FMT_VDPAU, FMT_RGBA32, sizes);
+                MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_VDPAU, FMT_RGBA32, sizes);
             if (textures.empty())
                 return false;
             m_openglTextures.insert(DUMMY_INTEROP_ID, textures);
@@ -236,20 +239,20 @@ vector<MythVideoTextureOpenGL*> MythVDPAUInterop::Acquire(MythRenderOpenGL* Cont
         return result;
     }
 
-    if (Context && (Context != m_context))
+    if (Context && (Context != m_openglContext))
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Mismatched OpenGL contexts");
 
     // Check size
     QSize surfacesize(Frame->m_width, Frame->m_height);
-    if (m_openglTextureSize != surfacesize)
+    if (m_textureSize != surfacesize)
     {
-        if (!m_openglTextureSize.isEmpty())
+        if (!m_textureSize.isEmpty())
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Video texture size changed!");
-        m_openglTextureSize = surfacesize;
+        m_textureSize = surfacesize;
     }
 
     // Lock
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
     // Retrieve hardware frames context and AVVDPAUDeviceContext
     if ((Frame->m_pixFmt != AV_PIX_FMT_VDPAU) || (Frame->m_type != FMT_VDPAU) ||
@@ -363,10 +366,10 @@ vector<MythVideoTextureOpenGL*> MythVDPAUInterop::Acquire(MythRenderOpenGL* Cont
 
 void MythVDPAUInterop::UpdateColourSpace(bool /*PrimariesChanged*/)
 {
-    if (!m_mixer || !m_context || !m_colourSpace || !m_helper)
+    if (!m_mixer || !m_openglContext || !m_colourSpace || !m_helper)
         return;
 
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
     m_helper->SetCSCMatrix(m_mixer, m_colourSpace);
 }
 

@@ -12,10 +12,9 @@ extern "C" {
 
 class MythNVDECInterop : public MythOpenGLInterop
 {
-    friend class MythOpenGLInterop;
-
   public:
-    static MythNVDECInterop* Create(MythRenderOpenGL* Context);
+    static void GetNVDECTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types);
+    static MythNVDECInterop* CreateNVDEC(MythRenderOpenGL* Context);
     static bool CreateCUDAContext(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
                                   CUcontext& CudaContext);
     static void CleanupContext(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
@@ -27,7 +26,6 @@ class MythNVDECInterop : public MythOpenGLInterop
                                             MythVideoFrame* Frame, FrameScanType Scan) override;
 
   protected:
-    static Type GetInteropType(VideoFrameType Format);
     explicit MythNVDECInterop(MythRenderOpenGL* Context);
    ~MythNVDECInterop() override;
 

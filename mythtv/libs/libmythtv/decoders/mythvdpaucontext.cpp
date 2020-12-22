@@ -34,23 +34,19 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 
     // The interop must have a reference to the ui player so it can be deleted
     // from the main thread.
-    MythPlayerUI* player = GetPlayerUI(Context);
+    auto * player = GetPlayerUI(Context);
     if (!player)
         return -1;
 
     // Retrieve OpenGL render context
-    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
+    auto * render = dynamic_cast<MythRenderOpenGL*>(player->GetRender());
     if (!render)
         return -1;
     OpenGLLocker locker(render);
 
-    // Check interop support
-    if (MythOpenGLInterop::GetInteropType(FMT_VDPAU, player) == MythOpenGLInterop::Unsupported)
-        return -1;
-
     // Create interop
     auto vdpauid = static_cast<MythCodecID>(kCodec_MPEG1_VDPAU + (mpeg_version(Context->codec_id) - 1));
-    MythVDPAUInterop *interop = MythVDPAUInterop::Create(render, vdpauid);
+    auto * interop = MythVDPAUInterop::CreateVDPAU(render, vdpauid);
     if (!interop)
         return -1;
 
@@ -135,12 +131,8 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     if (!decodeonly)
-    {
-        // check for the correct player type and interop supprt
-        MythPlayerUI* player = GetPlayerUI(*Context);
-        if (MythOpenGLInterop::GetInteropType(FMT_VDPAU, player) == MythOpenGLInterop::Unsupported)
+        if (!FrameTypeIsSupported(*Context, FMT_VDPAU))
             return failure;
-    }
 
     QString codec   = ff_codec_id_string((*Context)->codec_id);
     QString profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);

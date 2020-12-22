@@ -3,6 +3,7 @@
 
 // MythTV
 #include "DetectLetterbox.h"
+#include "mythinteropgpu.h"
 #include "mythplayercaptionsui.h"
 
 class DecoderCallback
@@ -41,6 +42,7 @@ class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerCaptionsUI
     MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerVideoUI() override = default;
 
+    const MythInteropGPU::InteropMap& GetInteropTypes() const;
     void HandleDecoderCallback(const QString& Debug, DecoderCallback::Callback Function,
                                void* Opaque1, void* Opaque2);
 
@@ -67,6 +69,7 @@ class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerCaptionsUI
     QMutex                   m_decoderCallbackLock;
     QVector<DecoderCallback> m_decoderCallbacks;
     MythVideoColourState     m_colourState;
+    MythInteropGPU::InteropMap m_interopTypes;
 };
 
 #endif

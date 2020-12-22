@@ -48,7 +48,7 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythRenderOpenGL* Context)
 
 MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 {
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
     CleanupDRMPRIME();
     CleanupReferenceFrames();
     MythVAAPIInteropDRM::DestroyDeinterlacer();
@@ -59,9 +59,9 @@ MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 
 void MythVAAPIInteropDRM::DeleteTextures()
 {
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
-    if (!m_openglTextures.isEmpty() && m_context->IsEGL())
+    if (!m_openglTextures.isEmpty() && m_openglContext->IsEGL())
     {
         int count = 0;
         for (auto it = m_openglTextures.constBegin() ; it != m_openglTextures.constEnd(); ++it)
@@ -71,7 +71,7 @@ void MythVAAPIInteropDRM::DeleteTextures()
             {
                 if (texture->m_data)
                 {
-                    m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), texture->m_data);
+                    m_openglContext->eglDestroyImageKHR(m_openglContext->GetEGLDisplay(), texture->m_data);
                     texture->m_data = nullptr;
                     count++;
                 }
@@ -258,7 +258,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL* C
         return m_openglTextures[id];
     }
 
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
     result = m_usePrime ? AcquirePrime(id, Context, Frame): AcquireVAAPI(id, Context, Frame);
     m_openglTextures.insert(id, result);
     if (needreferenceframes)
@@ -455,7 +455,7 @@ bool MythVAAPIInteropDRM::TestPrimeInterop()
         return s_supported;
     s_checked = true;
 
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
     VASurfaceID surface = 0;
 
@@ -479,14 +479,15 @@ bool MythVAAPIInteropDRM::TestPrimeInterop()
             AVDRMFrameDescriptor drmdesc;
             memset(&drmdesc, 0, sizeof(drmdesc));
             VADRMtoPRIME(&vadesc, &drmdesc);
-            vector<MythVideoTextureOpenGL*> textures = CreateTextures(&drmdesc, m_context, &frame, false);
+            vector<MythVideoTextureOpenGL*> textures =
+                    CreateTextures(&drmdesc, m_openglContext, &frame, false);
 
             if (!textures.empty())
             {
                 s_supported = true;
                 for (auto & texture : textures)
                     s_supported &= texture->m_data && (texture->m_textureId != 0U);
-                ClearDMATextures(m_context, textures);
+                ClearDMATextures(m_openglContext, textures);
             }
             for (uint32_t i = 0; i < vadesc.num_objects; ++i)
                 close(vadesc.objects[i].fd);

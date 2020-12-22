@@ -9,7 +9,7 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
     Q_OBJECT
 
   public:
-    MythVAAPIInteropGLX(MythRenderOpenGL* Context, Type InteropType);
+    MythVAAPIInteropGLX(MythRenderOpenGL* Context, InteropType Type);
     ~MythVAAPIInteropGLX() override;
 
   public slots:

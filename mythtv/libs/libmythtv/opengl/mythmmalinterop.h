@@ -12,17 +12,14 @@ extern "C" {
 
 class MythMMALInterop : public MythOpenGLInterop
 {
-    friend class MythOpenGLInterop;
-
   public:
-    static MythMMALInterop* Create(MythRenderOpenGL *Context, Type InteropType);
+    static void GetMMALTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types);
+    static MythMMALInterop* CreateMMAL(MythRenderOpenGL *Context);
     virtual vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
                                                     MythVideoColourSpace *ColourSpace,
                                                     MythVideoFrame *Frame, FrameScanType Scan) override;
 
   protected:
-    static Type GetInteropType(VideoFrameType Format);
-
     MythMMALInterop(MythRenderOpenGL *Context);
     virtual ~MythMMALInterop() override;
 

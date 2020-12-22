@@ -14,7 +14,7 @@ extern "C" {
 
 #define LOC QString("VAAPIInterop: ")
 
-/*! \brief Return an 'interoperability' method that is supported by the current render device.
+/*! \brief Return a list of interops that are supported by the current render device.
  *
  * DRM interop is the preferred option as it is copy free but requires EGL.
  * DRM returns raw YUV frames which gives us full colourspace and deinterlacing control.
@@ -27,44 +27,55 @@ extern "C" {
  * under the hood, performs the same Pixmap copy as GLXPixmap support plus an
  * additional render to texture via a FramebufferObject. As it is less performant
  * and less widely available than GLX Pixmap, it may be removed in the future.
+ *
+ * \note The returned list is in priority order (i.e. most preferable first).
 */
-MythOpenGLInterop::Type MythVAAPIInterop::GetInteropType(VideoFrameType Format)
-{
-    if ((FMT_VAAPI != Format) || qEnvironmentVariableIsSet("NO_VAAPI"))
-        return Unsupported;
-
-    MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
-    if (!context)
-        return Unsupported;
-
-    OpenGLLocker locker(context);
-    bool egl = context->IsEGL();
-    bool opengles = context->isOpenGLES();
-    bool wayland = qgetenv("XDG_SESSION_TYPE").contains("wayland");
-    // best first
-#ifdef USING_EGL
-    if (egl && MythVAAPIInteropDRM::IsSupported(context)) // zero copy
-        return VAAPIEGLDRM;
-#endif
-    if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(context)) // copy
-        return VAAPIGLXPIX;
-    if (!egl && !opengles && !wayland) // 2 * copy
-        return VAAPIGLXCOPY;
-    return Unsupported;
-}
-
-MythVAAPIInterop* MythVAAPIInterop::Create(MythRenderOpenGL *Context, Type InteropType)
+void MythVAAPIInterop::GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::InteropMap& Types)
 {
     if (!Context)
-        return nullptr;
+        return;
+
+    OpenGLLocker locker(Context);
+    bool egl = Context->IsEGL();
+    bool opengles = Context->isOpenGLES();
+    bool wayland = qgetenv("XDG_SESSION_TYPE").contains("wayland");
+
+    // best first
+    MythInteropGPU::InteropTypes vaapitypes;
 #ifdef USING_EGL
-    if (InteropType == VAAPIEGLDRM)
-        return new MythVAAPIInteropDRM(Context);
+    // zero copy
+    if (egl && MythVAAPIInteropDRM::IsSupported(Context))
+        vaapitypes.emplace_back(VAAPIEGLDRM);
 #endif
-    if (InteropType == VAAPIGLXPIX)
-        return new MythVAAPIInteropGLXPixmap(Context);
-    if (InteropType == VAAPIGLXCOPY)
-        return new MythVAAPIInteropGLXCopy(Context);
+    // 1x copy
+    if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(Context))
+        vaapitypes.emplace_back(VAAPIGLXPIX);
+    // 2x copy
+    if (!egl && !opengles && !wayland)
+        vaapitypes.emplace_back(VAAPIGLXCOPY);
+
+    if (!vaapitypes.empty())
+        Types[FMT_VAAPI] = vaapitypes;
+}
+
+MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythRenderOpenGL* Context)
+{
+    MythInteropGPU::InteropMap types;
+    MythVAAPIInterop::GetVAAPITypes(Context, types);
+    if (auto vaapi = types.find(FMT_VAAPI); vaapi != types.end())
+    {
+        for (auto type : vaapi->second)
+        {
+#ifdef USING_EGL
+            if (type == VAAPIEGLDRM)
+                return new MythVAAPIInteropDRM(Context);
+#endif
+            if (type == VAAPIGLXPIX)
+                return new MythVAAPIInteropGLXPixmap(Context);
+            if (type == VAAPIGLXCOPY)
+                return new MythVAAPIInteropGLXCopy(Context);
+        }
+    }
     return nullptr;
 }
 
@@ -75,8 +86,8 @@ MythVAAPIInterop* MythVAAPIInterop::Create(MythRenderOpenGL *Context, Type Inter
  * \todo Scaling of some 1080 H.264 material (garbage line at bottom - presumably
  * scaling from 1088 to 1080 - but only some files). Same effect on all VAAPI interop types.
 */
-MythVAAPIInterop::MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType)
-  : MythOpenGLInterop(Context, InteropType)
+MythVAAPIInterop::MythVAAPIInterop(MythRenderOpenGL *Context, InteropType Type)
+  : MythOpenGLInterop(Context, Type)
 {
 }
 
@@ -145,7 +156,7 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, MythVideo
         return result;
 
     // Sanity check the context
-    if (m_context != Context)
+    if (m_openglContext != Context)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Mismatched OpenGL contexts!");
         return result;
@@ -153,11 +164,11 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, MythVideo
 
     // Check size
     QSize surfacesize(Frame->m_width, Frame->m_height);
-    if (m_openglTextureSize != surfacesize)
+    if (m_textureSize != surfacesize)
     {
-        if (!m_openglTextureSize.isEmpty())
+        if (!m_textureSize.isEmpty())
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Video texture size changed!");
-        m_openglTextureSize = surfacesize;
+        m_textureSize = surfacesize;
     }
 
     // Retrieve surface

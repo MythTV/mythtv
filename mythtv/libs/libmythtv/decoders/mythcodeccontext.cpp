@@ -25,7 +25,7 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "mythmainwindow.h"
-#include "mythopenglinterop.h"
+#include "mythinteropgpu.h"
 #include "avformatdecoder.h"
 #include "mythplayerui.h"
 
@@ -142,6 +142,12 @@ QStringList MythCodecContext::GetDecoderDescription(void)
 
 void MythCodecContext::GetDecoders(RenderOptions &Opts)
 {
+    if (!gCoreContext->IsUIThread())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Must be called from UI thread");
+        return;
+    }
+
     if (!HasMythMainWindow())
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "No window: Ignoring hardware decoders");
@@ -224,7 +230,8 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
     {
         Opts.decoders->append("mmal-dec");
         (*Opts.equiv_decoders)["mmal-dec"].append("dummy");
-        if (MythOpenGLInterop::GetInteropType(FMT_MMAL, nullptr) != MythOpenGLInterop::Unsupported)
+        auto types = MythInteropGPU::GetTypes(MythRenderOpenGL::GetOpenGLRender());
+        if (auto mmal = types.find(FMT_MMAL); (mmal != types.end()) && !mmal->second.empty())
         {
             Opts.decoders->append("mmal");
             (*Opts.equiv_decoders)["mmal"].append("dummy");
@@ -450,7 +457,7 @@ void MythCodecContext::DeviceContextFinished(AVHWDeviceContext* Context)
     }
 }
 
-void MythCodecContext::DestroyInterop(MythOpenGLInterop *Interop)
+void MythCodecContext::DestroyInterop(MythInteropGPU* Interop)
 {
     if (gCoreContext->IsUIThread())
     {
@@ -462,7 +469,7 @@ void MythCodecContext::DestroyInterop(MythOpenGLInterop *Interop)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Destroy interop callback");
         auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
-        auto *interop = reinterpret_cast<MythOpenGLInterop*>(Interop2);
+        auto *interop = reinterpret_cast<MythInteropGPU*>(Interop2);
         if (interop)
             interop->DecrRef();
         if (wait)
@@ -499,6 +506,16 @@ MythPlayerUI* MythCodecContext::GetPlayerUI(AVCodecContext *Context)
     return result;
 }
 
+bool MythCodecContext::FrameTypeIsSupported(AVCodecContext* Context, VideoFrameType Format)
+{
+    if (auto * player = GetPlayerUI(Context); player != nullptr)
+    {
+        const auto & supported = player->GetInteropTypes();
+        return supported.find(Format) != supported.cend();
+    }
+    return false;
+}
+
 /// \brief Initialise a hardware decoder that is expected to use AVHWFramesContext
 int MythCodecContext::InitialiseDecoder(AVCodecContext *Context, CreateHWDecoder Callback,
                                         const QString &Debug)
@@ -533,7 +550,7 @@ int MythCodecContext::InitialiseDecoder2(AVCodecContext *Context, CreateHWDecode
     return Context->hw_device_ctx ? 0 : -1;
 }
 
-AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, MythOpenGLInterop *Interop, const QString &Device)
+AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, MythInteropGPU* Interop, const QString& Device)
 {
     AVBufferRef* result = nullptr;
     int res = av_hwdevice_ctx_create(&result, Type, Device.isEmpty() ? nullptr :

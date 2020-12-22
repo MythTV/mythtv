@@ -32,137 +32,45 @@
 
 #define LOC QString("OpenGLInterop: ")
 
-QString MythOpenGLInterop::TypeToString(Type InteropType)
+void MythOpenGLInterop::GetTypes(MythRender* Render, InteropMap& Types)
 {
-    if (InteropType == VAAPIEGLDRM)  return "VAAPI DRM";
-    if (InteropType == VAAPIGLXPIX)  return "VAAPI GLX Pixmap";
-    if (InteropType == VAAPIGLXCOPY) return "VAAPI GLX Copy";
-    if (InteropType == VTBOPENGL)    return "VTB OpenGL";
-    if (InteropType == VTBSURFACE)   return "VTB IOSurface";
-    if (InteropType == MEDIACODEC)   return "MediaCodec Surface";
-    if (InteropType == VDPAU)        return "VDPAU";
-    if (InteropType == NVDEC)        return "NVDEC";
-    if (InteropType == MMAL)         return "MMAL";
-    if (InteropType == DRMPRIME)     return "DRM PRIME";
-    if (InteropType == DUMMY)        return "DUMMY";
-    return "Unsupported";
-}
+    auto * openglrender = dynamic_cast<MythRenderOpenGL*>(Render);
+    if (!openglrender)
+        return;
 
-QStringList MythOpenGLInterop::GetAllowedRenderers(VideoFrameType Format)
-{
-    QStringList result;
-    if (GetInteropType(Format, nullptr) != Unsupported)
-        result << "opengl-hw";
-    return result;
-}
+#ifdef USING_MEDIACODEC
+    Types.emplace_back(MEDIACODEC);
+#endif
 
-void MythOpenGLInterop::GetInteropTypeCallback(void *Wait, void *Format, void *Result)
-{
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + "Check interop callback");
-    auto *wait = reinterpret_cast<QWaitCondition*>(Wait);
-    auto *format = reinterpret_cast<VideoFrameType*>(Format);
-    auto *result = reinterpret_cast<MythOpenGLInterop::Type*>(Result);
+#ifdef USING_VDPAU
+    MythVDPAUInterop::GetVDPAUTypes(openglrender, Types);
+#endif
 
-    if (format && result)
-        *result = MythOpenGLInterop::GetInteropType(*format, nullptr);
-    if (wait)
-        wait->wakeAll();
-}
+#ifdef USING_VAAPI
+    MythVAAPIInterop::GetVAAPITypes(openglrender, Types);
+#endif
 
-/*! \brief Check whether we support direct rendering for the given VideoFrameType.
-*/
-MythOpenGLInterop::Type MythOpenGLInterop::GetInteropType(VideoFrameType Format, MythPlayerUI *Player)
-{
-    // cache supported formats to avoid potentially expensive callbacks
-    static QMutex s_lock(QMutex::Recursive);
-    static QHash<VideoFrameType,Type> s_supported;
+#ifdef USING_EGL
+    MythDRMPRIMEInterop::GetDRMTypes(openglrender, Types);
+#endif
 
-    Type supported = Unsupported;
-    bool alreadychecked = false;
-
-    // have we checked this format already
-    s_lock.lock();
-    if (s_supported.contains(Format))
-    {
-        supported = s_supported.value(Format);
-        alreadychecked = true;
-    }
-    s_lock.unlock();
-
-    // need to check
-    if (!alreadychecked)
-    {
-        if (!gCoreContext->IsUIThread())
-        {
-            if (!Player)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "GetInteropType called from another thread without player");
-            }
-            else
-            {
-                // Note - this is a callback into the same function from the main thread
-                Player->HandleDecoderCallback("interop check",
-                                              MythOpenGLInterop::GetInteropTypeCallback,
-                                              &Format, &supported);
-            }
-            return supported;
-        }
-
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Checking interop support for %1")
-            .arg(MythVideoFrame::FormatDescription(Format)));
+#ifdef USING_MMAL
+    MythMMALInterop::GetMMALTypes(openglrender, Types);
+#endif
 
 #ifdef USING_VTB
-        if (FMT_VTB == Format)
-            supported = MythVTBInterop::GetInteropType(Format);
+    MythVTBInterop::GetVTBTypes(openglrender, Types);
 #endif
-#ifdef USING_VAAPI
-        if (FMT_VAAPI == Format)
-            supported = MythVAAPIInterop::GetInteropType(Format);
-#endif
-#ifdef USING_MEDIACODEC
-        if (FMT_MEDIACODEC == Format)
-            supported = MEDIACODEC;
-#endif
-#ifdef USING_VDPAU
-        if (FMT_VDPAU == Format)
-            supported = MythVDPAUInterop::GetInteropType(Format);
-#endif
-#ifdef USING_NVDEC
-        if (FMT_NVDEC == Format)
-            supported = MythNVDECInterop::GetInteropType(Format);
-#endif
-#ifdef USING_MMAL
-        if (FMT_MMAL == Format)
-            supported = MythMMALInterop::GetInteropType(Format);
-#endif
-#ifdef USING_EGL
-        if (FMT_DRMPRIME == Format)
-            supported = MythDRMPRIMEInterop::GetInteropType(Format);
-#endif
-        // update supported formats
-        s_lock.lock();
-        s_supported.insert(Format, supported);
-        s_lock.unlock();
-    }
 
-    if (Unsupported == supported)
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("No render support for frame type '%1'")
-            .arg(MythVideoFrame::FormatDescription(Format)));
-    }
-    else
-    {
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rendering supported for frame type '%1' with %2")
-            .arg(MythVideoFrame::FormatDescription(Format)).arg(TypeToString(supported)));
-    }
-    return supported;
+#ifdef USING_NVDEC
+    MythNVDECInterop::GetNVDECTypes(openglrender, Types);
+#endif
 }
 
 vector<MythVideoTextureOpenGL*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
                                                             MythVideoColourSpace *ColourSpace,
-                                                            MythVideoFrame       *Frame,
-                                                            FrameScanType     Scan)
+                                                            MythVideoFrame *Frame,
+                                                            FrameScanType Scan)
 {
     vector<MythVideoTextureOpenGL*> result;
     if (!(Context && Frame))
@@ -209,29 +117,15 @@ vector<MythVideoTextureOpenGL*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Co
     return result;
 }
 
-MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, Type InteropType)
-  : ReferenceCounter("GLInterop", true),
-    m_context(Context),
-    m_type(InteropType)
+MythOpenGLInterop::MythOpenGLInterop(MythRenderOpenGL *Context, InteropType Type)
+  : MythInteropGPU(Context, Type),
+    m_openglContext(Context)
 {
-    if (m_context)
-        m_context->IncrRef();
 }
 
 MythOpenGLInterop::~MythOpenGLInterop()
 {
     MythOpenGLInterop::DeleteTextures();
-    if (m_context)
-        m_context->DecrRef();
-}
-
-MythOpenGLInterop* MythOpenGLInterop::CreateDummy()
-{
-    // This is used to store AVHWDeviceContext free and user_opaque when
-    // set by the decoder in use. This usually applies to VAAPI and VDPAU
-    // and we do not always want or need to use MythRenderOpenGL e.g. when
-    // checking functionality only.
-    return new MythOpenGLInterop(nullptr, DUMMY);
 }
 
 vector<MythVideoTextureOpenGL*> MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
@@ -243,9 +137,9 @@ vector<MythVideoTextureOpenGL*> MythOpenGLInterop::Acquire(MythRenderOpenGL* /*C
 
 void MythOpenGLInterop::DeleteTextures()
 {
-    if (m_context && !m_openglTextures.isEmpty())
+    if (m_openglContext && !m_openglTextures.isEmpty())
     {
-        OpenGLLocker locker(m_context);
+        OpenGLLocker locker(m_openglContext);
         int count = 0;
         for (auto it = m_openglTextures.constBegin(); it != m_openglTextures.constEnd(); ++it)
         {
@@ -253,8 +147,8 @@ void MythOpenGLInterop::DeleteTextures()
             for (auto & texture : textures)
             {
                 if (texture->m_textureId)
-                    m_context->glDeleteTextures(1, &texture->m_textureId);
-                MythVideoTextureOpenGL::DeleteTexture(m_context, texture);
+                    m_openglContext->glDeleteTextures(1, &texture->m_textureId);
+                MythVideoTextureOpenGL::DeleteTexture(m_openglContext, texture);
                 count++;
             }
             textures.clear();
@@ -263,39 +157,4 @@ void MythOpenGLInterop::DeleteTextures()
             .arg(count).arg(m_openglTextures.size()));
         m_openglTextures.clear();
     }
-}
-
-MythOpenGLInterop::Type MythOpenGLInterop::GetType()
-{
-    return m_type;
-}
-
-MythPlayerUI* MythOpenGLInterop::GetPlayer()
-{
-    return m_player;
-}
-
-void MythOpenGLInterop::SetPlayer(MythPlayerUI* Player)
-{
-    m_player = Player;
-}
-
-void MythOpenGLInterop::SetDefaultFree(FreeAVHWDeviceContext FreeContext)
-{
-    m_defaultFree = FreeContext;
-}
-
-void MythOpenGLInterop::SetDefaultUserOpaque(void* UserOpaque)
-{
-    m_defaultUserOpaque = UserOpaque;
-}
-
-FreeAVHWDeviceContext MythOpenGLInterop::GetDefaultFree()
-{
-    return m_defaultFree;
-}
-
-void* MythOpenGLInterop::GetDefaultUserOpaque()
-{
-    return m_defaultUserOpaque;
 }

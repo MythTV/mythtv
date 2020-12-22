@@ -35,10 +35,9 @@
 
 class MythVAAPIInterop : public MythOpenGLInterop
 {
-    friend class MythOpenGLInterop;
-
   public:
-    static MythVAAPIInterop* Create(MythRenderOpenGL *Context, Type InteropType);
+    static void GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::InteropMap& Types);
+    static MythVAAPIInterop* CreateVAAPI(MythRenderOpenGL* Context);
 
     VASurfaceID VerifySurface(MythRenderOpenGL *Context, MythVideoFrame *Frame);
     VADisplay   GetDisplay   (void);
@@ -50,10 +49,9 @@ class MythVAAPIInterop : public MythOpenGLInterop
                                    AVFilterContext *&Sink);
 
   protected:
-    MythVAAPIInterop(MythRenderOpenGL *Context, Type InteropType);
+    MythVAAPIInterop(MythRenderOpenGL *Context, InteropType Type);
     ~MythVAAPIInterop() override;
 
-    static Type GetInteropType       (VideoFrameType Format);
     void        InitaliseDisplay     (void);
     VASurfaceID Deinterlace          (MythVideoFrame *Frame, VASurfaceID Current, FrameScanType Scan);
     virtual void DestroyDeinterlacer (void);
@@ -77,4 +75,4 @@ class MythVAAPIInterop : public MythOpenGLInterop
     uint64_t         m_lastFilteredFrameCount { 0 };
 };
 
-#endif // MYTHVAAPIINTEROP_H
+#endif

@@ -6,36 +6,37 @@
 
 #define LOC QString("VTBInterop: ")
 
-MythOpenGLInterop::Type MythVTBInterop::GetInteropType(VideoFrameType Format)
+void MythVTBInterop::GetVTBTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types)
 {
-    if ((FMT_VTB != Format) || !gCoreContext->IsUIThread())
-        return Unsupported;
-
-    MythRenderOpenGL* context = MythRenderOpenGL::GetOpenGLRender();
-    if (!context)
-        return Unsupported;
-
-    if (context->isOpenGLES() || context->IsEGL())
-        return Unsupported;
-
-    if (context->hasExtension("GL_ARB_texture_rg"))
-        return VTBSURFACE;
-    return VTBOPENGL;
+    if (Render->isOpenGLES() || Render->IsEGL())
+        return;
+    MythInteropGPU::InteropTypes types;
+    if (Render->hasExtension("GL_ARB_texture_rg"))
+        types.emplace_back(VTBSURFACE);
+    types.emplace_back(VTBOPENGL);
+    Types[FMT_VTB] = types;
 }
 
-MythVTBInterop* MythVTBInterop::Create(MythRenderOpenGL* Context, MythOpenGLInterop::Type Type)
+MythVTBInterop* MythVTBInterop::CreateVTB(MythRenderOpenGL* Context)
 {
-    if (Context)
+    if (!Context)
+        return nullptr;
+    MythInteropGPU::InteropMap types;
+    GetVTBTypes(Context, types);
+    if (auto vtb = types.find(FMT_VTB); vtb != types.end())
     {
-        if (Type == VTBSURFACE)
-            return new MythVTBSurfaceInterop(Context);
-        else if (Type == VTBOPENGL)
-            return new MythVTBInterop(Context, VTBOPENGL);
+        for (auto type : vtb->second)
+        {
+            if (type == VTBSURFACE)
+                return new MythVTBSurfaceInterop(Context);
+            else if (type == VTBOPENGL)
+                return new MythVTBInterop(Context, VTBOPENGL);
+        }
     }
     return nullptr;
 }
 
-MythVTBInterop::MythVTBInterop(MythRenderOpenGL* Context, MythOpenGLInterop::Type Type)
+MythVTBInterop::MythVTBInterop(MythRenderOpenGL* Context, MythOpenGLInterop::InteropType Type)
   : MythOpenGLInterop(Context, Type)
 {
 }
@@ -49,21 +50,21 @@ CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL* Context, MythVideoColo
     if (!Frame)
         return nullptr;
 
-    if (Context && (Context != m_context))
+    if (Context && (Context != m_openglContext))
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Mismatched OpenGL contexts");
 
     // Check size
     QSize surfacesize(Frame->m_width, Frame->m_height);
-    if (m_openglTextureSize != surfacesize)
+    if (m_textureSize != surfacesize)
     {
-        if (!m_openglTextureSize.isEmpty())
+        if (!m_textureSize.isEmpty())
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Video texture size changed! %1x%2->%3x%4")
-                .arg(m_openglTextureSize.width()).arg(m_openglTextureSize.height())
+                .arg(m_textureSize.width()).arg(m_textureSize.height())
                 .arg(Frame->m_width).arg(Frame->m_height));
         }
         DeleteTextures();
-        m_openglTextureSize = surfacesize;
+        m_textureSize = surfacesize;
     }
 
     // Update colourspace and initialise on first frame
@@ -85,7 +86,7 @@ vector<MythVideoTextureOpenGL*> MythVTBInterop::Acquire(MythRenderOpenGL* Contex
                                                         FrameScanType)
 {
     vector<MythVideoTextureOpenGL*> result;
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
     CVPixelBufferRef buffer = Verify(Context, ColourSpace, Frame);
     if (!buffer)
@@ -113,7 +114,7 @@ vector<MythVideoTextureOpenGL*> MythVTBInterop::Acquire(MythRenderOpenGL* Contex
             int width  = CVPixelBufferGetWidthOfPlane(buffer, plane);
             int height = CVPixelBufferGetHeightOfPlane(buffer, plane);
             QSize size(width, height);
-            MythVideoTextureOpenGL* texture = MythVideoTextureOpenGL::CreateTexture(m_context, size);
+            MythVideoTextureOpenGL* texture = MythVideoTextureOpenGL::CreateTexture(m_openglContext, size);
             if (texture)
             {
                 texture->m_frameType = FMT_VTB;
@@ -133,7 +134,7 @@ vector<MythVideoTextureOpenGL*> MythVTBInterop::Acquire(MythRenderOpenGL* Contex
     if (m_openglTextures.contains(DUMMY_INTEROP_ID))
     {
         result = m_openglTextures[DUMMY_INTEROP_ID];
-        m_context->glEnable(QOpenGLTexture::Target2D);
+        m_openglContext->glEnable(QOpenGLTexture::Target2D);
         
         // Update textures
         for (int plane = 0; plane < planes; ++plane)
@@ -148,12 +149,12 @@ vector<MythVideoTextureOpenGL*> MythVTBInterop::Acquire(MythRenderOpenGL* Contex
             result[plane]->m_texture->bind();
             if ((bytes == 1) && buf)
             {
-                m_context->glTexImage2D(QOpenGLTexture::Target2D, 0, QOpenGLTexture::RGBA, width, height,
+                m_openglContext->glTexImage2D(QOpenGLTexture::Target2D, 0, QOpenGLTexture::RGBA, width, height,
                                         0, QOpenGLTexture::Red, QOpenGLTexture::UInt8, buf);
             }
             else if ((bytes == 2) && buf)
             {
-                m_context->glTexImage2D(QOpenGLTexture::Target2D, 0, QOpenGLTexture::RGBA, width, height,
+                m_openglContext->glTexImage2D(QOpenGLTexture::Target2D, 0, QOpenGLTexture::RGBA, width, height,
                                         0, QOpenGLTexture::RG, QOpenGLTexture::UInt8, buf);
             }
             result[plane]->m_texture->release();
@@ -178,7 +179,7 @@ vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL*
                                                                FrameScanType Scan)
 {
     vector<MythVideoTextureOpenGL*> result;
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
     CVPixelBufferRef buffer = Verify(Context, ColourSpace, Frame);
     if (!buffer)
@@ -250,7 +251,7 @@ vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL*
         return result;
     }
 
-    result = MythVideoTextureOpenGL::CreateTextures(m_context, FMT_VTB, frameformat, sizes, QOpenGLTexture::TargetRectangle);
+    result = MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_VTB, frameformat, sizes, QOpenGLTexture::TargetRectangle);
 
     for (uint plane = 0; plane < result.size(); ++plane)
     {
@@ -258,7 +259,7 @@ vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL*
         if (!texture)
             continue;
         texture->m_allowGLSLDeint = true;
-        m_context->glBindTexture(texture->m_target, texture->m_textureId);
+        m_openglContext->glBindTexture(texture->m_target, texture->m_textureId);
 
         GLenum format = (plane == 0) ? QOpenGLTexture::Red : QOpenGLTexture::RG;;
         GLenum dataformat = (frameformat == FMT_NV12) ? QOpenGLTexture::UInt8 : QOpenGLTexture::UInt16;
@@ -269,7 +270,7 @@ vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL*
                 format, dataformat, surface, plane);
         if (error != kCGLNoError)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("CGLTexImageIOSurface2D error %1").arg(error));
-        m_context->glBindTexture(QOpenGLTexture::TargetRectangle, 0);
+        m_openglContext->glBindTexture(QOpenGLTexture::TargetRectangle, 0);
     }
 
     IOSurfaceUnlock(surface, kIOSurfaceLockReadOnly, nullptr);

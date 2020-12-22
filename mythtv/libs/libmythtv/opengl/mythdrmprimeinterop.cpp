@@ -23,9 +23,9 @@ MythDRMPRIMEInterop::~MythDRMPRIMEInterop()
 
 void MythDRMPRIMEInterop::DeleteTextures(void)
 {
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
-    if (!m_openglTextures.isEmpty() && m_context->IsEGL())
+    if (!m_openglTextures.isEmpty() && m_openglContext->IsEGL())
     {
         int count = 0;
         for (auto it = m_openglTextures.constBegin(); it != m_openglTextures.constEnd(); ++it)
@@ -35,7 +35,7 @@ void MythDRMPRIMEInterop::DeleteTextures(void)
             {
                 if (texture->m_data)
                 {
-                    m_context->eglDestroyImageKHR(m_context->GetEGLDisplay(), texture->m_data);
+                    m_openglContext->eglDestroyImageKHR(m_openglContext->GetEGLDisplay(), texture->m_data);
                     texture->m_data = nullptr;
                     count++;
                 }
@@ -48,21 +48,26 @@ void MythDRMPRIMEInterop::DeleteTextures(void)
     MythOpenGLInterop::DeleteTextures();
 }
 
-MythDRMPRIMEInterop* MythDRMPRIMEInterop::Create(MythRenderOpenGL *Context, Type InteropType)
+MythDRMPRIMEInterop* MythDRMPRIMEInterop::CreateDRM(MythRenderOpenGL* Context)
 {
-    if (Context && (InteropType == DRMPRIME))
-        return new MythDRMPRIMEInterop(Context);
+    if (!Context)
+        return nullptr;
+
+    MythInteropGPU::InteropMap types;
+    GetDRMTypes(Context, types);
+    if (auto drm = types.find(FMT_DRMPRIME); drm != types.end())
+    {
+        for (auto type : drm->second)
+            if (type == DRMPRIME)
+                return new MythDRMPRIMEInterop(Context);
+    }
     return nullptr;
 }
 
-MythOpenGLInterop::Type MythDRMPRIMEInterop::GetInteropType(VideoFrameType Format)
+void MythDRMPRIMEInterop::GetDRMTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types)
 {
-    if (FMT_DRMPRIME != Format)
-        return Unsupported;
-    MythRenderOpenGL* context = MythRenderOpenGL::GetOpenGLRender();
-    if (!context)
-        return Unsupported;
-    return HaveDMABuf(context) ? DRMPRIME : Unsupported;
+    if (HaveDMABuf(Render))
+        Types[FMT_DRMPRIME] = { DRMPRIME };
 }
 
 AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Context, MythVideoFrame *Frame)
@@ -80,7 +85,7 @@ AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Contex
     }
 
     // Sanity check the context
-    if (m_context != Context)
+    if (m_openglContext != Context)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Mismatched OpenGL contexts!");
         return result;
@@ -88,11 +93,11 @@ AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Contex
 
     // Check size
     QSize surfacesize(Frame->m_width, Frame->m_height);
-    if (m_openglTextureSize != surfacesize)
+    if (m_textureSize != surfacesize)
     {
-        if (!m_openglTextureSize.isEmpty())
+        if (!m_textureSize.isEmpty())
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Video texture size changed!");
-        m_openglTextureSize = surfacesize;
+        m_textureSize = surfacesize;
     }
 
     return  reinterpret_cast<AVDRMFrameDescriptor*>(Frame->m_buffer);
@@ -121,7 +126,7 @@ vector<MythVideoTextureOpenGL*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *C
         vector<MythVideoTextureOpenGL*> textures;
         if (!m_openglTextures.contains(id))
         {
-            textures = CreateTextures(drmdesc, m_context, Frame, true);
+            textures = CreateTextures(drmdesc, m_openglContext, Frame, true);
             m_openglTextures.insert(id, textures);
         }
         else
@@ -176,7 +181,7 @@ vector<MythVideoTextureOpenGL*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *C
     {
         // This will create 2 half height textures representing the top and bottom fields
         // if deinterlacing
-        result = CreateTextures(drmdesc, m_context, Frame, false,
+        result = CreateTextures(drmdesc, m_openglContext, Frame, false,
                                 m_deinterlacing ? kScan_Interlaced : kScan_Progressive);
         // Fallback to separate textures if the driver does not support composition
         if (result.empty())

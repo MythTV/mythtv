@@ -60,7 +60,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
     auto * openglrender = dynamic_cast<MythRenderOpenGL*>(Render);
     auto * openglpainter = dynamic_cast<MythOpenGLPainter*>(Painter);
     if (openglrender && openglpainter && (Render->Type() == kRenderOpenGL))
-        renderers += MythVideoOutputOpenGL::GetAllowedRenderers(CodecID, VideoDispDim);
+        renderers += MythVideoOutputOpenGL::GetAllowedRenderers(openglrender, CodecID, VideoDispDim);
 #endif
 
 #ifdef USING_VULKAN

@@ -179,7 +179,7 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
 
     // Create interop - NB no interop check here or in MythMediaCodecInterop
     QSize size(Context->width, Context->height);
-    MythMediaCodecInterop *interop = MythMediaCodecInterop::Create(render, size);
+    auto * interop = MythMediaCodecInterop::CreateMediaCodec(render, size);
     if (!interop)
         return -1;
     if (!interop->GetSurface())
@@ -227,12 +227,8 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
         return failure;
 
     if (!decodeonly)
-    {
-        // check for the correct player type and interop supprt
-        MythPlayerUI* player = GetPlayerUI(*Context);
-        if (MythOpenGLInterop::GetInteropType(FMT_MEDIACODEC, player) == MythOpenGLInterop::Unsupported)
+        if (!FrameTypeIsSupported(*Context, FMT_MEDIACODEC))
             return failure;
-    }
 
     bool found = false;
     MCProfiles& profiles = MythMediaCodecContext::GetProfiles();

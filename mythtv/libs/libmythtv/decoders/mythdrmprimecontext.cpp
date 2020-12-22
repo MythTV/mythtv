@@ -79,8 +79,7 @@ MythCodecID MythDRMPRIMEContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     // Direct rendering needs interop support
-    MythPlayerUI* player = GetPlayerUI(*Context);
-    if (MythOpenGLInterop::GetInteropType(FMT_DRMPRIME, player) == MythOpenGLInterop::Unsupported)
+    if (!FrameTypeIsSupported(*Context, FMT_DRMPRIME))
         return failure;
 
     // check support
@@ -110,8 +109,8 @@ int MythDRMPRIMEContext::HwDecoderInit(AVCodecContext *Context)
         return -1;
 
 #ifdef USING_EGL
-    MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
-    m_interop = MythDRMPRIMEInterop::Create(context, MythOpenGLInterop::DRMPRIME);
+    auto * context = MythRenderOpenGL::GetOpenGLRender();
+    m_interop = MythDRMPRIMEInterop::CreateDRM(context);
 #endif
     return m_interop ? 0 : -1;
 }

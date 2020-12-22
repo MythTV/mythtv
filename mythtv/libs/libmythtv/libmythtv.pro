@@ -482,6 +482,7 @@ using_frontend {
     HEADERS += visualisations/videovisual.h
     HEADERS += visualisations/videovisualdefs.h
     HEADERS += mythdeinterlacer.h
+    HEADERS += mythinteropgpu.h
     SOURCES += mythvideoout.cpp
     SOURCES += mythvideooutnull.cpp
     SOURCES += mythvideooutgpu.cpp
@@ -493,6 +494,7 @@ using_frontend {
     SOURCES += mythvideocolourspace.cpp
     SOURCES += visualisations/videovisual.cpp
     SOURCES += mythdeinterlacer.cpp
+    SOURCES += mythinteropgpu.cpp
 
     # Note - all OpenGL/EGL interop files are added under using_opengl...
     # They are however referenced, without ifdef guards, from the relevant

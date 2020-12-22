@@ -36,6 +36,7 @@
 #include "mythcodecid.h"
 #include "mythframe.h"
 #include "decoderbase.h"
+#include "mythinteropgpu.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -45,7 +46,6 @@ extern "C" {
 using CreateHWDecoder = int (*)(AVCodecContext *Context);
 
 class MythPlayerUI;
-class MythOpenGLInterop;
 class MythVideoProfile;
 
 class MTV_PUBLIC MythCodecContext
@@ -138,7 +138,8 @@ class MTV_PUBLIC MythCodecContext
     static void DeviceContextFinished      (AVHWDeviceContext *Context);
     static void CreateDecoderCallback      (void *Wait, void *Context, void *Callback);
     static MythPlayerUI* GetPlayerUI       (AVCodecContext* Context);
-    static AVBufferRef* CreateDevice       (AVHWDeviceType Type, MythOpenGLInterop *Interop, const QString &Device = QString());
+    static bool FrameTypeIsSupported       (AVCodecContext* Context, VideoFrameType Format);
+    static AVBufferRef* CreateDevice       (AVHWDeviceType Type, MythInteropGPU* Interop, const QString& Device = QString());
     static bool IsUnsupportedProfile       (AVCodecContext *Context);
     static QString GetProfileDescription   (CodecProfile Profile, QSize Size,
                                             VideoFrameType Format = FMT_NONE, uint ColorDepth = 0);
@@ -159,7 +160,7 @@ class MTV_PUBLIC MythCodecContext
 
   protected:
     virtual bool   RetrieveHWFrame         (MythVideoFrame* Frame, AVFrame* AvFrame);
-    static void    DestroyInterop          (MythOpenGLInterop *Interop);
+    static void    DestroyInterop          (MythInteropGPU* Interop);
     static void    NewHardwareFramesContext(void);
     static QAtomicInt s_hwFramesContextCount;
 

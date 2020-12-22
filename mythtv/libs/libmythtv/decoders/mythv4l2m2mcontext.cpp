@@ -61,12 +61,8 @@ MythCodecID MythV4L2M2MContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     if (!decodeonly)
-    {
-        // check for the correct player type and interop supprt
-        MythPlayerUI* player = GetPlayerUI(*Context);
-        if (MythOpenGLInterop::GetInteropType(FMT_DRMPRIME, player) == MythOpenGLInterop::Unsupported)
+        if (!FrameTypeIsSupported(*Context, FMT_DRMPRIME))
             return failure;
-    }
 
     // supported by device driver?
     MythCodecContext::CodecProfile mythprofile = MythCodecContext::NoProfile;
@@ -430,15 +426,10 @@ int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
     if (!player)
         return -1;
 
-    // Check interop support
-    MythOpenGLInterop::Type type = MythOpenGLInterop::GetInteropType(FMT_DRMPRIME, player);
-    if (type == MythOpenGLInterop::Unsupported)
-        return -1;
-
     // Create interop
     MythOpenGLInterop *interop = nullptr;
 #ifdef USING_EGL
-    interop = MythDRMPRIMEInterop::Create(render, type);
+    interop = MythDRMPRIMEInterop::CreateDRM(render);
 #endif
     if (!interop)
         return -1;

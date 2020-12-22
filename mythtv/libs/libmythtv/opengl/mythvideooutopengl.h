@@ -25,8 +25,8 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
                           const MythVideoProfilePtr& VideoProfile, QString& Profile);
     ~MythVideoOutputOpenGL() override;
 
-    static void   GetRenderOptions (RenderOptions& Options);
-    static QStringList GetAllowedRenderers(MythCodecID CodecId, QSize VideoDim);
+    static void GetRenderOptions (RenderOptions& Options);
+    static QStringList GetAllowedRenderers(MythRenderOpenGL* Render, MythCodecID CodecId, QSize VideoDim);
 
     bool          Init             (QSize VideoDim, QSize VideoDispDim,
                                     float Aspect, QRect DisplayVisibleRect, MythCodecID CodecId) override;

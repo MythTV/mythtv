@@ -4,8 +4,8 @@
 
 #define LOC QString("VAAPIGLX: ")
 
-MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythRenderOpenGL* Context, Type InteropType)
-  : MythVAAPIInterop(Context, InteropType)
+MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythRenderOpenGL* Context, InteropType Type)
+  : MythVAAPIInterop(Context, Type)
 {
 }
 
@@ -92,7 +92,7 @@ void MythVAAPIInteropGLX::InitPictureAttributes(MythVideoColourSpace* ColourSpac
     if (!ColourSpace || !m_vaDisplay)
         return;
 
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
     delete [] m_vaapiPictureAttributes;
     m_vaapiPictureAttributeCount = 0;
@@ -199,13 +199,13 @@ int MythVAAPIInteropGLX::SetPictureAttribute(PictureAttribute Attribute, int Val
 
     if (found)
     {
-        m_context->makeCurrent();
+        m_openglContext->makeCurrent();
         INIT_ST;
         va_status = vaSetDisplayAttributes(m_vaDisplay,
                                            m_vaapiPictureAttributes,
                                            m_vaapiPictureAttributeCount);
         CHECK_ST;
-        m_context->doneCurrent();
+        m_openglContext->doneCurrent();
         return Value;
     }
     return -1;
@@ -235,7 +235,7 @@ MythVAAPIInteropGLXCopy::~MythVAAPIInteropGLXCopy()
     if (m_glxSurface && m_vaDisplay)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting GLX surface");
-        OpenGLLocker locker(m_context);
+        OpenGLLocker locker(m_openglContext);
         INIT_ST;
         va_status = vaDestroySurfaceGLX(m_vaDisplay, m_glxSurface);
         CHECK_ST;
@@ -261,7 +261,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenG
         InitPictureAttributes(ColourSpace);
 
     // Lock
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
     // we only ever use one glx surface which is updated on each call
     if (m_openglTextures.isEmpty())
@@ -269,7 +269,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenG
         // create a texture
         // N.B. No apparent 10/12/16bit support here. Can't encourage vaCreateSurfaceGLX
         // to work with a 16bit texture
-        MythVideoTextureOpenGL *texture = MythVideoTextureOpenGL::CreateTexture(m_context, m_openglTextureSize);
+        MythVideoTextureOpenGL *texture = MythVideoTextureOpenGL::CreateTexture(m_openglContext, m_textureSize);
         if (!texture)
             return result;
 
@@ -286,7 +286,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenG
         if (!m_glxSurface)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create GLX surface.");
-            MythVideoTextureOpenGL::DeleteTexture(m_context, texture);
+            MythVideoTextureOpenGL::DeleteTexture(m_openglContext, texture);
             return result;
         }
 
@@ -321,7 +321,7 @@ MythVAAPIInteropGLXPixmap::MythVAAPIInteropGLXPixmap(MythRenderOpenGL* Context)
 
 MythVAAPIInteropGLXPixmap::~MythVAAPIInteropGLXPixmap()
 {
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
     Display* display = glXGetCurrentDisplay();
     if (!InitPixmaps() || !display)
         return;
@@ -357,7 +357,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpe
         InitPictureAttributes(ColourSpace);
 
     // Lock
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
     if (!InitPixmaps())
         return result;
 
@@ -395,8 +395,8 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpe
         XFree(fbs);
 
         // create pixmaps
-        uint width  = static_cast<uint>(m_openglTextureSize.width());
-        uint height = static_cast<uint>(m_openglTextureSize.height());
+        uint width  = static_cast<uint>(m_textureSize.width());
+        uint height = static_cast<uint>(m_textureSize.height());
         XWindowAttributes xwattribs;
         XGetWindowAttributes(display, DefaultRootWindow(display), &xwattribs);
         m_pixmap = XCreatePixmap(display, DefaultRootWindow(display),
@@ -423,8 +423,8 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpe
         // N.B. as for GLX Copy there is no obvious 10/12/16bit support here.
         // too many unknowns in this pipeline
         std::vector<QSize> size;
-        size.push_back(m_openglTextureSize);
-        std::vector<MythVideoTextureOpenGL*> textures = MythVideoTextureOpenGL::CreateTextures(m_context, FMT_VAAPI, FMT_RGBA32, size);
+        size.push_back(m_textureSize);
+        std::vector<MythVideoTextureOpenGL*> textures = MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_VAAPI, FMT_RGBA32, size);
         if (textures.empty())
             return result;
         result.push_back(textures[0]);
@@ -442,8 +442,8 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpe
     INIT_ST;
     va_status = vaSyncSurface(m_vaDisplay, id);
     CHECK_ST;
-    auto width  = static_cast<unsigned short>(m_openglTextureSize.width());
-    auto height = static_cast<unsigned short>(m_openglTextureSize.height());
+    auto width  = static_cast<unsigned short>(m_textureSize.width());
+    auto height = static_cast<unsigned short>(m_textureSize.height());
     va_status = vaPutSurface(m_vaDisplay, id, m_pixmap,
                              0, 0, width, height, 0, 0, width, height,
                              nullptr, 0, GetFlagsForFrame(Frame, Scan));
@@ -453,9 +453,9 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpe
     if (glxdisplay)
     {
         XSync(glxdisplay, False);
-        m_context->glBindTexture(QOpenGLTexture::Target2D, result[0]->m_textureId);
+        m_openglContext->glBindTexture(QOpenGLTexture::Target2D, result[0]->m_textureId);
         m_glxBindTexImageEXT(glxdisplay, m_glxPixmap, GLX_FRONT_EXT, nullptr);
-        m_context->glBindTexture(QOpenGLTexture::Target2D, 0);
+        m_openglContext->glBindTexture(QOpenGLTexture::Target2D, 0);
     }
     return result;
 }
@@ -465,7 +465,7 @@ bool MythVAAPIInteropGLXPixmap::InitPixmaps()
     if (m_glxBindTexImageEXT && m_glxReleaseTexImageEXT)
         return true;
 
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
     m_glxBindTexImageEXT = reinterpret_cast<MYTH_GLXBINDTEXIMAGEEXT>(glXGetProcAddressARB(reinterpret_cast<const GLubyte*>("glXBindTexImageEXT")));
     m_glxReleaseTexImageEXT = reinterpret_cast<MYTH_GLXRELEASETEXIMAGEEXT>(glXGetProcAddressARB(reinterpret_cast<const GLubyte*>("glXReleaseTexImageEXT")));
     if (!m_glxBindTexImageEXT || !m_glxReleaseTexImageEXT)

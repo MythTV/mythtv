@@ -26,10 +26,9 @@ class MythVDPAUInterop : public MythOpenGLInterop
 {
     Q_OBJECT
 
-    friend class MythOpenGLInterop;
-
   public:
-    static MythVDPAUInterop* Create(MythRenderOpenGL* Context, MythCodecID CodecId);
+    static void GetVDPAUTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types);
+    static MythVDPAUInterop* CreateVDPAU(MythRenderOpenGL* Context, MythCodecID CodecId);
     vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
                                             MythVideoFrame* Frame, FrameScanType Scan) override;
     bool  IsPreempted(void) const;
@@ -39,7 +38,6 @@ class MythVDPAUInterop : public MythOpenGLInterop
     void  DisplayPreempted(void);
 
   protected:
-    static Type GetInteropType(VideoFrameType Format);
     MythVDPAUInterop(MythRenderOpenGL* Context, MythCodecID CodecID);
     ~MythVDPAUInterop() override;
 

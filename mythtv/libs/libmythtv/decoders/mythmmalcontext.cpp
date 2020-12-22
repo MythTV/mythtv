@@ -80,12 +80,8 @@ MythCodecID MythMMALContext::GetSupportedCodec(AVCodecContext **Context,
         return failure;
 
     if (!decodeonly)
-    {
-        // Direct rendering needs interop support
-        MythPlayerUI* player = GetPlayerUI(*Context);
-        if (MythOpenGLInterop::GetInteropType(FMT_MMAL, player) == MythOpenGLInterop::Unsupported)
+        if (!FrameTypeIsSupported(*Context, FMT_MMAL))
             return failure;
-    }
 
     // look for a decoder
     QString name = QString((*Codec)->name) + "_mmal";
@@ -146,7 +142,7 @@ int MythMMALContext::HwDecoderInit(AVCodecContext *Context)
         return -1;
 
     MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
-    m_interop = MythMMALInterop::Create(context, MythOpenGLInterop::MMAL);
+    m_interop = MythMMALInterop::CreateMMAL(context, MythOpenGLInterop::MMAL);
     return m_interop ? 0 : -1;
 }
 

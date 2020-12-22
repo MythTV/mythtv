@@ -11,10 +11,9 @@ extern "C" {
 
 #define LOC QString("MediaCodecInterop: ")
 
-MythMediaCodecInterop* MythMediaCodecInterop::Create(MythRenderOpenGL *Context, QSize Size)
+MythMediaCodecInterop* MythMediaCodecInterop::CreateMediaCodec(MythRenderOpenGL *Context, QSize Size)
 {
-    MythMediaCodecInterop* result = new MythMediaCodecInterop(Context);
-    if (result)
+    if (auto * result = new MythMediaCodecInterop(Context); result != nullptr)
     {
         if (result->Initialise(Size))
             return result;
@@ -58,7 +57,7 @@ void Java_org_mythtv_video_SurfaceTextureListener_frameAvailable(JNIEnv*, jobjec
 
 bool MythMediaCodecInterop::Initialise(QSize Size)
 {
-    if (!m_context)
+    if (!m_openglContext)
         return false;
 
     if (!gCoreContext->IsUIThread())
@@ -68,13 +67,13 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     }
 
     // Lock
-    OpenGLLocker locker(m_context);
+    OpenGLLocker locker(m_openglContext);
 
     // Create texture
     vector<QSize> sizes;
     sizes.push_back(Size);
     vector<MythVideoTextureOpenGL*> textures =
-        MythVideoTextureOpenGL::CreateTextures(m_context, FMT_MEDIACODEC, FMT_RGBA32, sizes, GL_TEXTURE_EXTERNAL_OES);
+        MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_MEDIACODEC, FMT_RGBA32, sizes, GL_TEXTURE_EXTERNAL_OES);
     if (textures.empty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create texture");
@@ -83,7 +82,7 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
 
     // Set the texture type
     MythVideoTextureOpenGL *texture = textures[0];
-    m_context->glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->m_textureId);
+    m_openglContext->glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture->m_textureId);
 
     // Create surface
     m_surfaceTexture = QAndroidJniObject("android/graphics/SurfaceTexture", "(I)V", texture->m_textureId);
@@ -105,7 +104,7 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Android Surface");
     }
     LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create Android SurfaceTexture");
-    MythVideoTextureOpenGL::DeleteTextures(m_context, textures);
+    MythVideoTextureOpenGL::DeleteTextures(m_openglContext, textures);
     return false;
 }
 
