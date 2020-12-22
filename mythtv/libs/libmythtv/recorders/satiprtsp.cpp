@@ -507,13 +507,14 @@ void SatIPRTCPReadHelper::ReadPending()
                 found = true;
                 QStringList tuner = item.split(",");
 
-                if (tuner.length() > 2)
+                if (tuner.length() > 3)
                 {
-                    int level = tuner.at(1).toInt();
-                    bool lock = tuner.at(2).toInt() != 0;
+                    int level = tuner.at(1).toInt();        // [0, 255]
+                    bool lock = tuner.at(2).toInt() != 0;   // [0 , 1]
+                    int quality = tuner.at(3).toInt();      // [0, 15]
 
                     LOG(VB_RECORD, LOG_DEBUG, LOC_RTCP +
-                        QString("Tuner lock:%1 level:%2").arg(lock).arg(level));
+                        QString("Tuner lock:%1 level:%2 quality:%3").arg(lock).arg(level).arg(quality));
 
                     m_parent->SetSigmonValues(lock, level);
                 }
