@@ -35,10 +35,10 @@ QString MythInteropGPU::TypeToString(InteropType Type)
     return "Unsupported";
 }
 
-QString MythInteropGPU::TypesToString(InteropMap Types)
+QString MythInteropGPU::TypesToString(const InteropMap &Types)
 {
     QStringList result;
-    for (auto types : Types)
+    for (const auto & types : Types)
         for (auto type : types.second)
             result << TypeToString(type);
     return result.join(",");

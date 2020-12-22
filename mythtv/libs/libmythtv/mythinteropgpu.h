@@ -44,7 +44,7 @@ class MythInteropGPU : public QObject, public ReferenceCounter
     using InteropMap   = std::map<VideoFrameType,InteropTypes>;
     static InteropMap      GetTypes(MythRender* Render);
     static QString         TypeToString(InteropType Type);
-    static QString         TypesToString(InteropMap Types);
+    static QString         TypesToString(const InteropMap& Types);
     static MythInteropGPU* CreateDummy();
 
     MythInteropGPU(MythRender* Context, InteropType Type);
