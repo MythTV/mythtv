@@ -41,20 +41,14 @@ void MythMMALInterop::GetMMALTypes(MythRenderOpenGL* Render, MythInteropGPU::Int
         Types[FMT_MMAL] = { MMAL };
 }
 
-MythMMALInterop* MythMMALInterop::CreateMMAL(MythRenderOpenGL *Context)
+/*! \brief Create an MMAL interop
+ *
+ * \note This is called directly from the decoder - hence we do not attempt
+ * to retrieve the list of supported types again. Assume it has already been verified.
+*/
+MythMMALInterop* MythMMALInterop::CreateMMAL(MythRenderOpenGL* Context)
 {
-    if (!Context)
-        return nullptr;
-
-    MythInteropGPU::InteropMap types;
-    GetMMALTypes(Context, types);
-    if (auto mmal = types.find(FMT_MMAL); mmal != types.end())
-    {
-        for (auto type : mmal->second)
-            if (type == MMAL)
-                return new MythMMALInterop(Context);
-    }
-    return nullptr;
+    return Context ? new MythMMALInterop(Context) : nullptr;
 }
 
 MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, MythVideoFrame *Frame)

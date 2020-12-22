@@ -141,8 +141,10 @@ int MythMMALContext::HwDecoderInit(AVCodecContext *Context)
     if (!codec_is_mmal(m_codecID) || Context->pix_fmt != AV_PIX_FMT_MMAL)
         return -1;
 
-    MythRenderOpenGL *context = MythRenderOpenGL::GetOpenGLRender();
-    m_interop = MythMMALInterop::CreateMMAL(context);
+    if (auto * player = GetPlayerUI(Context); player != nullptr)
+        if (FrameTypeIsSupported(Context, FMT_MMAL))
+            m_interop = MythMMALInterop::CreateMMAL(dynamic_cast<MythRenderOpenGL*>(player->GetRender()));
+
     return m_interop ? 0 : -1;
 }
 
