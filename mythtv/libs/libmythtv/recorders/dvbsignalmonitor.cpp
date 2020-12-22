@@ -332,7 +332,7 @@ void DVBSignalMonitor::UpdateValues(void)
             m_uncorrectedBlocks.SetValue(ublocks);
     }
 
-    // Debug output
+    // Signal lock change
     if (wasLocked != isLocked)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues -- Signal " +
@@ -351,7 +351,7 @@ void DVBSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        GetStreamData()->AddListeningPID(MPEG_PAT_PID);
+        GetStreamData()->AddListeningPID(PID::MPEG_PAT_PID);
         m_streamHandler->AddListener(GetStreamData(), true, false);
         m_streamHandlerStarted = true;
     }

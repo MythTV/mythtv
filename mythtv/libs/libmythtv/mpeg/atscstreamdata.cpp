@@ -37,8 +37,8 @@ ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
       m_desiredMajorChannel(desiredMajorChannel),
       m_desiredMinorChannel(desiredMinorChannel)
 {
-    AddListeningPID(ATSC_PSIP_PID);
-    AddListeningPID(SCTE_PSIP_PID);
+    AddListeningPID(PID::ATSC_PSIP_PID);
+    AddListeningPID(PID::SCTE_PSIP_PID);
 }
 
 ATSCStreamData::~ATSCStreamData()
@@ -110,8 +110,8 @@ void ATSCStreamData::SetDesiredChannel(int major, int minor)
 void ATSCStreamData::Reset(int desiredProgram)
 {
     MPEGStreamData::Reset(desiredProgram);
-    AddListeningPID(ATSC_PSIP_PID);
-    AddListeningPID(SCTE_PSIP_PID);
+    AddListeningPID(PID::ATSC_PSIP_PID);
+    AddListeningPID(PID::SCTE_PSIP_PID);
 }
 
 void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
@@ -144,8 +144,8 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
         m_cachedCvcts.clear();
     }
 
-    AddListeningPID(ATSC_PSIP_PID);
-    AddListeningPID(SCTE_PSIP_PID);
+    AddListeningPID(PID::ATSC_PSIP_PID);
+    AddListeningPID(PID::SCTE_PSIP_PID);
 }
 
 /** \fn ATSCStreamData::IsRedundant(uint pid, const PSIPTable&) const

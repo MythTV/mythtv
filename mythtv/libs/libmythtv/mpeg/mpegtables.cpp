@@ -736,20 +736,20 @@ uint ProgramMapTable::FindPIDs(uint           type,
 uint ProgramMapTable::FindUnusedPID(uint desired_pid) const
 {
     uint pid = desired_pid;
-    if (pid >= MPEG_NULL_PID)
+    if (pid >= PID::MPEG_NULL_PID)
         pid = 0x20;
 
     while (FindPID(pid) != -1)
         pid += 0x10;
 
-    if (pid < MPEG_NULL_PID)
+    if (pid < PID::MPEG_NULL_PID)
         return pid;
 
     pid = desired_pid;
     while (FindPID(pid) != -1)
         pid += 1;
 
-    if (pid < MPEG_NULL_PID)
+    if (pid < PID::MPEG_NULL_PID)
         return pid;
 
     pid = 0x20;

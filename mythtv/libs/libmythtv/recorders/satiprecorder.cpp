@@ -90,7 +90,7 @@ void SatIPRecorder::run(void)
 
     // Listen for time table on DVB standard streams
     if (m_channel && (m_channel->GetSIStandard() == "dvb"))
-        m_streamData->AddListeningPID(DVB_TDT_PID);
+        m_streamData->AddListeningPID(PID::DVB_TDT_PID);
     if (m_recordMptsOnly)
         m_streamData->AddListeningPID(0x2000);
 

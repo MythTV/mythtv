@@ -251,7 +251,7 @@ void DTVSignalMonitor::SetDVBService(uint network_id, uint transport_id, int ser
     {
         dvb->SetDesiredService(network_id, transport_id, m_programNumber);
         AddFlags(kDTVSigMon_WaitForPMT | kDTVSigMon_WaitForSDT);
-        dvb->AddListeningPID(DVB_SDT_PID);
+        dvb->AddListeningPID(PID::DVB_SDT_PID);
     }
 }
 

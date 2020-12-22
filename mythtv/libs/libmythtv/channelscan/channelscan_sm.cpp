@@ -1382,7 +1382,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             for (uint i = 0; i < pat->ProgramCount(); ++i)
             {
                 if ((pat->ProgramNumber(i) == 0) &&
-                    (pat->ProgramPID(i) == SCTE_PSIP_PID))
+                    (pat->ProgramPID(i) == PID::SCTE_PSIP_PID))
                 {
                     could_be_opencable = true;
                 }

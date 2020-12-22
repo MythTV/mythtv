@@ -43,8 +43,8 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, int cardnum,
       // Single program stuff
       m_desiredProgram(desiredProgram)
 {
-    MPEGStreamData::AddListeningPID(MPEG_PAT_PID);
-    MPEGStreamData::AddListeningPID(MPEG_CAT_PID);
+    MPEGStreamData::AddListeningPID(PID::MPEG_PAT_PID);
+    MPEGStreamData::AddListeningPID(PID::MPEG_CAT_PID);
 }
 
 MPEGStreamData::~MPEGStreamData()
@@ -165,8 +165,8 @@ void MPEGStreamData::Reset(int desiredProgram)
 
     ResetDecryptionMonitoringState();
 
-    AddListeningPID(MPEG_PAT_PID);
-    AddListeningPID(MPEG_CAT_PID);
+    AddListeningPID(PID::MPEG_PAT_PID);
+    AddListeningPID(PID::MPEG_CAT_PID);
 }
 
 void MPEGStreamData::DeletePartialPSIP(uint pid)

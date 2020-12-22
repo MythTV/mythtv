@@ -440,12 +440,12 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
         m_autopts(autopts), m_sd(sd), m_usePid(use_pid)
     {
         if (m_autopts)
-            m_sd->AddListeningPID(MPEG_PAT_PID);
+            m_sd->AddListeningPID(PID::MPEG_PAT_PID);
     }
 
     void HandlePAT(const ProgramAssociationTable *pat) override // MPEGStreamListener
     {
-        if (pat && (!m_autopts || m_usePid[MPEG_PAT_PID]))
+        if (pat && (!m_autopts || m_usePid[PID::MPEG_PAT_PID]))
             Output(pat);
         if (pat && m_autopts)
         {

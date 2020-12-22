@@ -200,46 +200,57 @@ class MTV_PUBLIC StreamID
     static QString GetDescription(uint stream_id);
 };
 
-enum
+/** \class PID
+ *  \brief Contains Packet Identifier numeric values.
+ */
+class MTV_PUBLIC PID
 {
-    MPEG_PAT_PID  = 0x0000,
-    MPEG_CAT_PID  = 0x0001,
-    MPEG_TSDT_PID = 0x0002,
+  public:
+    enum
+    {
+        MPEG_PAT_PID  = 0x0000,
+        MPEG_CAT_PID  = 0x0001,
+        MPEG_TSDT_PID = 0x0002,
 
-    DVB_NIT_PID   = 0x0010,
-    DVB_SDT_PID   = 0x0011,
-    DVB_EIT_PID   = 0x0012,
-    DVB_RST_PID   = 0x0013,
-    DVB_TDT_PID   = 0x0014,
+        DVB_NIT_PID   = 0x0010,
+        DVB_SDT_PID   = 0x0011,
+        DVB_EIT_PID   = 0x0012,
+        DVB_RST_PID   = 0x0013,
+        DVB_TDT_PID   = 0x0014,
 
-    // Dishnet longterm EIT is on pid 0x300
-    DVB_DNLONG_EIT_PID = 0x0300,
+        // Dishnet longterm EIT is on pid 0x300
+        DVB_DNLONG_EIT_PID = 0x0300,
 
-    // Bell longterm EIT is on pid 0x441
-    DVB_BVLONG_EIT_PID = 0x0441,
+        // Bell longterm EIT is on pid 0x441
+        DVB_BVLONG_EIT_PID = 0x0441,
 
-    // Premiere EIT for Direkt/Sport PPV
-    PREMIERE_EIT_DIREKT_PID = 0x0b11,
-    PREMIERE_EIT_SPORT_PID  = 0x0b12,
+        // MCA
+        MCA_EIT_PID        = 0x03fa,    // 1018
 
-    ATSC_PSIP_PID = 0x1ffb,
+        // Premiere EIT for Direkt/Sport PPV
+        PREMIERE_EIT_DIREKT_PID = 0x0b11,
+        PREMIERE_EIT_SPORT_PID  = 0x0b12,
 
-    SCTE_PSIP_PID = 0x1ffc,
 
-    // UK Freesat PIDs: SDTo/BAT, longterm EIT, shortterm EIT
-    FREESAT_SI_PID     = 0x0f01,
-    FREESAT_EIT_PID    = 0x0f02,
-    FREESAT_ST_EIT_PID = 0x0f03,
+        ATSC_PSIP_PID = 0x1ffb,
 
-    /// The all-ones PID value 0x1FFF indicates a Null TS Packet
-    /// introduced to maintain a constant bit rate of a TS Multiplex.
-    MPEG_NULL_PID      = 0x1fff,
+        SCTE_PSIP_PID = 0x1ffc,
 
-    // OpenTV EIT PIDs
-    OTV_EIT_TIT_PID_START  = 0x30,
-    OTV_EIT_TIT_PID_END    = 0x37,
-    OTV_EIT_SUP_PID_START  = 0x40,
-    OTV_EIT_SUP_PID_END    = 0x47,
+        // UK Freesat PIDs: SDTo/BAT, longterm EIT, shortterm EIT
+        FREESAT_SI_PID     = 0x0f01,
+        FREESAT_EIT_PID    = 0x0f02,    // 3842
+        FREESAT_ST_EIT_PID = 0x0f03,
+
+        /// The all-ones PID value 0x1FFF indicates a Null TS Packet
+        /// introduced to maintain a constant bit rate of a TS Multiplex.
+        MPEG_NULL_PID      = 0x1fff,
+
+        // OpenTV EIT PIDs
+        OTV_EIT_TIT_PID_START  = 0x30,
+        OTV_EIT_TIT_PID_END    = 0x37,
+        OTV_EIT_SUP_PID_START  = 0x40,
+        OTV_EIT_SUP_PID_END    = 0x47,
+    };
 };
 
 /** \class TableID

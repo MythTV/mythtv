@@ -38,21 +38,21 @@ bool ScanStreamData::HandleTables(uint pid, const PSIPTable &psip)
 void ScanStreamData::AddAllListeningPIDs(void)
 {
     // MPEG
-    AddListeningPID(MPEG_PAT_PID);
-    AddListeningPID(MPEG_CAT_PID);
+    AddListeningPID(PID::MPEG_PAT_PID);
+    AddListeningPID(PID::MPEG_CAT_PID);
 
     // ATSC
-    AddListeningPID(ATSC_PSIP_PID);
-    AddListeningPID(SCTE_PSIP_PID);
+    AddListeningPID(PID::ATSC_PSIP_PID);
+    AddListeningPID(PID::SCTE_PSIP_PID);
 
     // DVB
-    AddListeningPID(DVB_NIT_PID);
-    AddListeningPID(DVB_SDT_PID);
-    AddListeningPID(DVB_TDT_PID);
+    AddListeningPID(PID::DVB_NIT_PID);
+    AddListeningPID(PID::DVB_SDT_PID);
+    AddListeningPID(PID::DVB_TDT_PID);
 
     // Extra
     if (m_dvbUkFreesatSi)
-        AddListeningPID(FREESAT_SI_PID);
+        AddListeningPID(PID::FREESAT_SI_PID);
 }
 
 void ScanStreamData::Reset(void)

@@ -69,7 +69,7 @@ void ExternalRecorder::run(void)
         const ProgramAssociationTable *pat = m_channel->GetGeneratedPAT();
         const ProgramMapTable         *pmt = m_channel->GetGeneratedPMT();
         m_streamData->Reset(pat->ProgramNumber(0));
-        m_streamData->HandleTables(MPEG_PAT_PID, *pat);
+        m_streamData->HandleTables(PID::MPEG_PAT_PID, *pat);
         m_streamData->HandleTables(pat->ProgramPID(0), *pmt);
         LOG(VB_GENERAL, LOG_INFO, LOC + "PMT set");
     }

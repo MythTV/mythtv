@@ -94,7 +94,7 @@ void HDHRRecorder::run(void)
 
     // Listen for time table on DVB standard streams
     if (m_channel && (m_channel->GetSIStandard() == "dvb"))
-        m_streamData->AddListeningPID(DVB_TDT_PID);
+        m_streamData->AddListeningPID(PID::DVB_TDT_PID);
 
     // Gives errors about invalid PID but it does work...
     if (m_recordMptsOnly)
