@@ -115,7 +115,7 @@ class MTV_PUBLIC MythVideoColourState
   public:
     MythVideoColourState() = default;
     MythVideoColourState(PictureAttributeSupported Supported,
-                         const std::map<PictureAttribute,int>& AttributeValues);
+                         const std::map<PictureAttribute,int> AttributeValues);
     int GetValue(PictureAttribute Attribute);
 
     PictureAttributeSupported  m_supportedAttributes { kPictureAttributeSupported_None };
