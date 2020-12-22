@@ -1555,25 +1555,25 @@ void StatusBox::doDisplayStatus()
     if (m_justHelpText)
         m_justHelpText->SetText(displayhelp);
 
-    MythMainWindow* window = GetMythMainWindow();
+    auto * window = GetMythMainWindow();
     QStringList desc = window->GetDisplay()->GetDescription();
     for (const auto & line : qAsConst(desc))
         AddLogLine(line);
     AddLogLine("");
 
-    MythRender* render = window->GetRenderDevice();
-    if (render)
+    auto * render = window->GetRenderDevice();
+    if (render && render->Type() == kRenderOpenGL)
     {
-        MythRenderOpenGL* gl = MythRenderOpenGL::GetOpenGLRender();
-        if (gl && (gl->GetExtraFeatures() & kGLNVMemory))
+        auto * opengl = dynamic_cast<MythRenderOpenGL*>(render);
+        if (opengl && (opengl->GetExtraFeatures() & kGLNVMemory))
         {
             auto GetGPUMem = []()
             {
-                if (auto * opengl = MythRenderOpenGL::GetOpenGLRender(); opengl)
-                    return opengl->GetGPUMemory();
-                return std::tuple<int,int,int>{ 0, 0, 0 };
+                auto * rend = GetMythMainWindow()->GetRenderDevice();
+                if (auto * gl = dynamic_cast<MythRenderOpenGL*>(rend); gl != nullptr)
+                    return gl->GetGPUMemory();
+                return std::tuple<int,int,int> { 0, 0, 0 };
             };
-
             auto UpdateUsed = [&GetGPUMem](StatusBoxItem* Item)
             {
                 auto mem = GetGPUMem();

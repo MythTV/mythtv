@@ -25,8 +25,6 @@ MythEGLDMABUF::MythEGLDMABUF(MythRenderOpenGL *Context)
 bool MythEGLDMABUF::HaveDMABuf(MythRenderOpenGL *Context)
 {
     if (!Context)
-        Context = MythRenderOpenGL::GetOpenGLRender();
-    if (!Context)
         return false;
     OpenGLLocker locker(Context);
     return (Context->IsEGL() && Context->hasExtension("GL_OES_EGL_image") &&

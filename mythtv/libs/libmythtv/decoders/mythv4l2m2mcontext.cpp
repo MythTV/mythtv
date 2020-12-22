@@ -415,16 +415,17 @@ int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
     if (!Context || !gCoreContext->IsUIThread())
         return -1;
 
-    // We need a render device
-    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
-    if (!render)
-        return -1;
-
     // The interop must have a reference to the ui player so it can be deleted
     // from the main thread.
     MythPlayerUI* player = GetPlayerUI(Context);
     if (!player)
         return -1;
+
+    // Retrieve OpenGL render context
+    auto * render = dynamic_cast<MythRenderOpenGL*>(player->GetRender());
+    if (!render)
+        return -1;
+    OpenGLLocker locker(render);
 
     // Create interop
     MythOpenGLInterop *interop = nullptr;

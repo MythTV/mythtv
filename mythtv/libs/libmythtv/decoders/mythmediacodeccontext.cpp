@@ -167,12 +167,12 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
 
     // The interop must have a reference to the ui player so it can be deleted
     // from the main thread.
-    MythPlayerUI* player = GetPlayerUI(Context);
+    auto * player = GetPlayerUI(Context);
     if (!player)
         return -1;
 
     // Retrieve OpenGL render context
-    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
+    auto * render = dynamic_cast<MythRenderOpenGL*>(player->GetRender());
     if (!render)
         return -1;
     OpenGLLocker locker(render);

@@ -137,12 +137,12 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
 
     // We need a player to release the interop. As we are using direct rendering
     // it must be a MythPlayerUI instance
-    MythPlayerUI* player = GetPlayerUI(Context);
+    auto * player = GetPlayerUI(Context);
     if (!player)
         return -1;
 
     // Retrieve OpenGL render context
-    MythRenderOpenGL* render = MythRenderOpenGL::GetOpenGLRender();
+    auto * render = dynamic_cast<MythRenderOpenGL*>(player->GetRender());
     if (!render)
         return -1;
     OpenGLLocker locker(render);
