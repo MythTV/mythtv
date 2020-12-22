@@ -32,7 +32,7 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
     RenderType Type(void) const { return m_type;    }
     bool  IsErrored(void) const { return m_errored; }
     QSize GetSize(void) const   { return m_size;    }
-    virtual QStringList GetDescription(void) { return QStringList(); }
+    virtual QStringList GetDescription();
     virtual void SetViewPort(const QRect, bool = false) {}
 
   protected:

@@ -13,3 +13,8 @@ bool MythRender::IsShared() const
 {
     return const_cast<QAtomicInt&>(m_referenceCount).fetchAndAddOrdered(0) > 1;
 }
+
+QStringList MythRender::GetDescription()
+{
+    return QStringList();
+}
