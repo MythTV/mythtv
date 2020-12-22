@@ -356,7 +356,7 @@ int MythCodecContext::GetBuffer(struct AVCodecContext *Context, AVFrame *Frame, 
     videoframe->m_priv[0] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->buf[0]));
     // frame->hw_frames_ctx contains a reference to the AVHWFramesContext. Take an additional
     // reference to ensure AVHWFramesContext is not released until we are finished with it.
-    // This also contains the underlying MythOpenGLInterop class reference.
+    // This also contains the underlying MythInteropGPU class reference.
     videoframe->m_priv[1] = reinterpret_cast<unsigned char*>(av_buffer_ref(Frame->hw_frames_ctx));
 
     // Set release method
@@ -434,7 +434,7 @@ void MythCodecContext::FramesContextFinished(AVHWFramesContext *Context)
     s_hwFramesContextCount--;
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 frames context finished")
         .arg(av_hwdevice_get_type_name(Context->device_ctx->type)));
-    auto *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);
+    auto * interop = reinterpret_cast<MythInteropGPU*>(Context->user_opaque);
     if (interop)
         DestroyInterop(interop);
 }
@@ -443,7 +443,7 @@ void MythCodecContext::DeviceContextFinished(AVHWDeviceContext* Context)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 device context finished")
         .arg(av_hwdevice_get_type_name(Context->type)));
-    auto *interop = reinterpret_cast<MythOpenGLInterop*>(Context->user_opaque);
+    auto * interop = reinterpret_cast<MythInteropGPU*>(Context->user_opaque);
     if (interop)
     {
         DestroyInterop(interop);
@@ -565,7 +565,7 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, MythInteropGPU*
         if ((context->free || context->user_opaque) && !Interop)
         {
             LOG(VB_PLAYBACK, LOG_INFO, "Creating dummy interop");
-            Interop = MythOpenGLInterop::CreateDummy();
+            Interop = MythInteropGPU::CreateDummy();
         }
 
         if (Interop)
