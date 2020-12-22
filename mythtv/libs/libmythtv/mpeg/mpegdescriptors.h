@@ -289,11 +289,13 @@ class OriginalNetworkID
   public:
     enum
     {
-        SES2    = 0x0002,       // Société Européenne des Satellites
-        BBC     = 0x003B,       // BBC / Freesat
-        TELENOR = 0x0046,       // Telenor Norway
-        SKYNZ   = 0x00A9,       // Sky New Zealand / Sky Network Television Ltd (NDS)
-        NOZEMA  = 0x2210,       // Netherlands Digital Terrestrial Television
+        SES2     = 0x0002,      // Société Européenne des Satellites
+        BBC      = 0x003B,      // BBC / Freesat
+        TELENOR  = 0x0046,      // Telenor Norway
+        PREMIERE = 0x0085,      // Sky Deutschland Fernsehen GmbH & Co. KG
+        SKYNZ    = 0x00A9,      // Sky New Zealand / Sky Network Television Ltd (NDS)
+        MCA      = 0x1800,      // Not defined in DVB-SI Original Network ID tables
+        NOZEMA   = 0x2210,      // Netherlands Digital Terrestrial Television
     };
 };
 
