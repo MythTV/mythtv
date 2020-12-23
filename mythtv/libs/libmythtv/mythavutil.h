@@ -15,8 +15,6 @@ extern "C" {
 }
 
 struct SwsContext;
-struct AVFilterGraph;
-struct AVFilterContext;
 struct AVStream;
 struct AVCodecContext;
 

@@ -11,18 +11,14 @@
 #include <QFile>
 
 // MythTV
-#include "mythcorecontext.h"
 #include "mythconfig.h"
+#include "mythlogging.h"
 #include "mythdeinterlacer.h"
 #include "mythavutil.h"
 
 // FFmpeg
 extern "C" {
-#include "libswscale/swscale.h"
-#include "libavfilter/avfilter.h"
 #include "libavcodec/avcodec.h"
-#include "libavfilter/buffersrc.h"
-#include "libavfilter/buffersink.h"
 #include "libavutil/imgutils.h"
 #include "libavformat/avformat.h"
 }
