@@ -41,7 +41,7 @@ QString MythInteropGPU::TypesToString(const InteropMap &Types)
     for (const auto & types : Types)
         for (auto type : types.second)
             result << TypeToString(type);
-    return result.join(",");
+    return result.isEmpty() ? "None" : result.join(",");
 }
 
 MythInteropGPU* MythInteropGPU::CreateDummy()
