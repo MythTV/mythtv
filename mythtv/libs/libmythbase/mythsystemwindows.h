@@ -3,7 +3,7 @@
 #ifndef _MYTHSYSTEM_WINDOWS_H_
 #define _MYTHSYSTEM_WINDOWS_H_
 
-#include <Windows.h>
+#include <windows.h>
 #include <csignal>
 
 #include <QWaitCondition>

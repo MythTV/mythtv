@@ -12,7 +12,7 @@
 // setsockopt -- has to be after Qt includes for Q_OS_WIN definition
 #if defined(Q_OS_WIN)
 #include <winsock2.h>
-#include <Ws2tcpip.h>
+#include <ws2tcpip.h>
 #include <cstdio>
 #else
 #include <sys/socket.h>
