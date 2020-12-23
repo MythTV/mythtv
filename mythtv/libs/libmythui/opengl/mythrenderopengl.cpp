@@ -398,10 +398,6 @@ bool MythRenderOpenGL::Init(void)
 
 void MythRenderOpenGL::DebugFeatures(void)
 {
-    static bool s_debugged = false;
-    if (s_debugged)
-        return;
-    s_debugged = true;
     QSurfaceFormat fmt = format();
     QString qtglversion = QString("OpenGL%1 %2.%3")
             .arg(fmt.renderableType() == QSurfaceFormat::OpenGLES ? "ES" : "")
