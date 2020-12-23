@@ -96,7 +96,7 @@ void MythPlayerCaptionsUI::AdjustSubtitleZoom(int Delta)
     }
 }
 
-void MythPlayerCaptionsUI::AdjustSubtitleDelay(int Delta)
+void MythPlayerCaptionsUI::AdjustSubtitleDelay(std::chrono::milliseconds Delta)
 {
     bool showing = (m_captionsState.m_textDisplayMode == kDisplayRawTextSubtitle) ||
                    (m_captionsState.m_textDisplayMode == kDisplayTextSubtitle);
@@ -105,11 +105,11 @@ void MythPlayerCaptionsUI::AdjustSubtitleDelay(int Delta)
 
     if (auto * subs = m_captionsOverlay.InitSubtitles(); subs)
     {
-        auto newval = std::clamp(subs->GetDelay() + (Delta * 10), -5000, 5000);
+        auto newval = std::clamp(subs->GetDelay() + (Delta * 10), -5000ms, 5000ms);
         // range of -5000ms..+5000ms, scale to 0..1000
         UpdateOSDStatus(tr("Adjust Subtitle Delay"), tr("Subtitle Delay"),
-                        QString::number(newval), kOSDFunctionalType_SubtitleDelayAdjust,
-                        "ms", (newval / 10) + 500, kOSDTimeout_None);
+                        QString::number(newval.count()), kOSDFunctionalType_SubtitleDelayAdjust,
+                        "ms", (newval.count() / 10) + 500, kOSDTimeout_None);
         ChangeOSDPositionUpdates(false);
         subs->SetDelay(newval);
     }

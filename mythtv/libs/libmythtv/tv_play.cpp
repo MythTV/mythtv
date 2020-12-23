@@ -3754,13 +3754,13 @@ bool TV::SubtitleDelayHandleAction(const QStringList &Actions)
     bool handled = true;
 
     if (IsActionable(ACTION_LEFT, Actions))
-        emit AdjustSubtitleDelay(-5);
+        emit AdjustSubtitleDelay(-5ms);
     else if (IsActionable(ACTION_RIGHT, Actions))
-        emit AdjustSubtitleDelay(5);
+        emit AdjustSubtitleDelay(5ms);
     else if (IsActionable(ACTION_UP, Actions))
-        emit AdjustSubtitleDelay(25);
+        emit AdjustSubtitleDelay(25ms);
     else if (IsActionable(ACTION_DOWN, Actions))
-        emit AdjustSubtitleDelay(-25);
+        emit AdjustSubtitleDelay(-25ms);
     else if (IsActionable({ ACTION_TOGGLESUBTITLEDELAY, ACTION_SELECT }, Actions))
         ClearOSD();
     else
@@ -4072,7 +4072,7 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     else if (IsActionable(ACTION_TOGGLESUBTITLEZOOM, Actions))
         emit AdjustSubtitleZoom(0);   // just display
     else if (IsActionable(ACTION_TOGGLESUBTITLEDELAY, Actions))
-        emit AdjustSubtitleDelay(0);   // just display
+        emit AdjustSubtitleDelay(0ms);   // just display
     else if (IsActionable(ACTION_TOGGLEVISUALISATION, Actions))
         emit EnableVisualiser(false, true);
     else if (IsActionable(ACTION_ENABLEVISUALISATION, Actions))
@@ -8148,7 +8148,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action == ACTION_TOGGLESUBTITLEZOOM)
         emit AdjustSubtitleZoom(0);
     else if (Action == ACTION_TOGGLESUBTITLEDELAY)
-        emit AdjustSubtitleDelay(0);
+        emit AdjustSubtitleDelay(0ms);
     else if (Action == ACTION_TOGGLEVISUALISATION)
         emit EnableVisualiser(false, true);
     else if (Action == ACTION_ENABLEVISUALISATION)

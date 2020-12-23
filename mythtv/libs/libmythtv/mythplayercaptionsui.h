@@ -53,7 +53,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void ITVHandleAction(const QString& Action, bool& Handled);
     void ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV);
     void AdjustSubtitleZoom(int Delta);
-    void AdjustSubtitleDelay(int Delta);
+    void AdjustSubtitleDelay(std::chrono::milliseconds Delta);
 
   private slots:
     void ExternalSubtitlesUpdated();

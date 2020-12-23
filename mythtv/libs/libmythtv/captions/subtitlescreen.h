@@ -187,8 +187,8 @@ public:
 
     void SetZoom(int percent);
     int GetZoom(void) const;
-    void SetDelay(int ms);
-    int GetDelay(void) const;
+    void SetDelay(std::chrono::milliseconds ms);
+    std::chrono::milliseconds GetDelay(void) const;
 
     class SubtitleFormat *GetSubtitleFormat(void) { return m_format; }
     void Clear708Cache(uint64_t mask);
@@ -241,12 +241,12 @@ private:
     int             m_fontSize            {0};
     int             m_textFontZoom        {100}; // valid for 708 & text subs
     int             m_textFontZoomPrev    {100};
-    int             m_textFontDelayMs     {0}; // valid for text subs
-    int             m_textFontDelayMsPrev {0};
-    int             m_textFontMinDurationMs {50};
-    int             m_textFontMinDurationMsPrev {50};
-    int             m_textFontDurationExtensionMs {0};
-    int             m_textFontDurationExtensionMsPrev {0};
+    std::chrono::milliseconds m_textFontDelayMs     {0ms}; // valid for text subs
+    std::chrono::milliseconds m_textFontDelayMsPrev {0ms};
+    std::chrono::milliseconds m_textFontMinDurationMs           {50ms};
+    std::chrono::milliseconds m_textFontMinDurationMsPrev       {50ms};
+    std::chrono::milliseconds m_textFontDurationExtensionMs     {0ms};
+    std::chrono::milliseconds m_textFontDurationExtensionMsPrev {0ms};
     bool            m_refreshModified     {false};
     bool            m_refreshDeleted      {false};
     int             m_fontStretch;

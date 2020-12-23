@@ -1551,12 +1551,12 @@ int SubtitleScreen::GetZoom(void) const
     return m_textFontZoom;
 }
 
-void SubtitleScreen::SetDelay(int ms)
+void SubtitleScreen::SetDelay(std::chrono::milliseconds ms)
 {
     m_textFontDelayMs = ms;
 }
 
-int SubtitleScreen::GetDelay(void) const
+std::chrono::milliseconds SubtitleScreen::GetDelay(void) const
 {
     return m_textFontDelayMs;
 }
@@ -2123,7 +2123,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
     TextSubtitles *subs = m_subreader->GetTextSubtitles();
     subs->Lock();
     uint64_t playPos = 0;
-    int playPosAdj = m_textFontDelayMs;
+    int playPosAdj = m_textFontDelayMs.count();
     if (subs->IsFrameBasedTiming())
     {
         // frame based subtitles get out of synch after running mythcommflag
