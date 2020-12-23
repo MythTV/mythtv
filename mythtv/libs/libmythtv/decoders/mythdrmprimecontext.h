@@ -26,7 +26,7 @@ class MythDRMPRIMEContext : public MythCodecContext
     void InitVideoCodec          (AVCodecContext *Context, bool SelectedStream, bool &DirectRendering) override;
     bool RetrieveFrame           (AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame) override;
     bool DecoderWillResetOnFlush (void) override;
-    static bool  HavePrimeDecoders       (AVCodecID Codec = AV_CODEC_ID_NONE);
+    static bool  HavePrimeDecoders       (bool Reinit = false, AVCodecID Codec = AV_CODEC_ID_NONE);
     static enum  AVPixelFormat GetFormat (AVCodecContext *Context, const AVPixelFormat *PixFmt);
     bool         GetDRMBuffer            (AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame, int /*unused*/);
 

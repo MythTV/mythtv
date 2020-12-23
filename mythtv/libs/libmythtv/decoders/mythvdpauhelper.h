@@ -51,7 +51,7 @@ class MythVDPAUHelper : public QObject
 
     Q_DECLARE_FLAGS(VDPMixerFeatures, VDPMixerFeature)
 
-    static bool   HaveVDPAU(void);
+    static bool   HaveVDPAU(bool Reinit = false);
     static bool   CheckH264Decode(AVCodecContext *Context);
     static const VDPAUProfiles& GetProfiles(void);
     static void   GetDecoderList (QStringList &Decoders);

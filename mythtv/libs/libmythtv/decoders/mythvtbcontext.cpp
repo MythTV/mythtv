@@ -235,13 +235,13 @@ const VTBProfiles& MythVTBContext::GetProfiles(void)
     return s_profiles;
 }
 
-bool MythVTBContext::HaveVTB(void)
+bool MythVTBContext::HaveVTB(bool Reinit /*=false*/)
 {
     static QMutex lock(QMutex::Recursive);
     QMutexLocker locker(&lock);
     static bool s_checked = false;
     static bool s_available = false;
-    if (!s_checked)
+    if (!s_checked || Reinit)
     {
         const VTBProfiles& profiles = MythVTBContext::GetProfiles();
         if (profiles.empty())

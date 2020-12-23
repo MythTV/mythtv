@@ -241,14 +241,14 @@ AVPixelFormat MythMMALContext::GetFormat(AVCodecContext*, const AVPixelFormat *P
     return AV_PIX_FMT_NONE;
 }
 
-bool MythMMALContext::HaveMMAL(void)
+bool MythMMALContext::HaveMMAL(bool Reinit /*=false*/)
 {
     static QMutex lock(QMutex::Recursive);
     QMutexLocker locker(&lock);
     static bool s_checked = false;
     static bool s_available = false;
 
-    if (s_checked)
+    if (s_checked && !Reinit)
         return s_available;
     s_checked = true;
 

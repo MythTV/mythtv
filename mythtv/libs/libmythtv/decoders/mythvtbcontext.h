@@ -32,7 +32,7 @@ class MythVTBContext : public MythCodecContext
                                           uint            StreamType);
     static enum AVPixelFormat GetFormat  (AVCodecContext *Context,
                                           const enum AVPixelFormat *PixFmt);
-    static bool HaveVTB                  (void);
+    static bool HaveVTB                  (bool Reinit = false);
     static void GetDecoderList           (QStringList &Decoders);
 
   private:

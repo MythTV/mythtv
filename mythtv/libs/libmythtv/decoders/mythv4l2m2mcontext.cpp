@@ -369,14 +369,14 @@ void MythV4L2M2MContext::GetDecoderList(QStringList &Decoders)
         Decoders.append(MythCodecContext::GetProfileDescription(profile, size));
 }
 
-bool MythV4L2M2MContext::HaveV4L2Codecs(void)
+bool MythV4L2M2MContext::HaveV4L2Codecs(bool Reinit /*=false*/)
 {
     static QMutex lock(QMutex::Recursive);
     QMutexLocker locker(&lock);
     static bool s_checked = false;
     static bool s_available = false;
 
-    if (s_checked)
+    if (s_checked && !Reinit)
         return s_available;
     s_checked = true;
 

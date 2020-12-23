@@ -50,14 +50,14 @@ bool VDPAUCodec::Supported(int Width, int Height, int Level) const
     return result;
 }
 
-bool MythVDPAUHelper::HaveVDPAU(void)
+bool MythVDPAUHelper::HaveVDPAU(bool Reinit /*=false*/)
 {
     static QMutex s_mutex;
     static bool s_checked = false;
     static bool s_available = false;
 
     QMutexLocker locker(&s_mutex);
-    if (s_checked)
+    if (s_checked && !Reinit)
         return s_available;
 
     {

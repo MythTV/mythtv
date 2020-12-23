@@ -43,7 +43,7 @@ class MythNVDECContext : public MythCodecContext
     static bool GetBuffer                (AVCodecContext *Context, MythVideoFrame *Frame,
                                           AVFrame *AvFrame, int Flags);
     static int  InitialiseDecoder        (AVCodecContext *Context);
-    static bool HaveNVDEC                (void);
+    static bool HaveNVDEC                (bool Reinit = false);
     static void GetDecoderList           (QStringList &Decoders);
 
   private:

@@ -31,7 +31,7 @@ class MythMediaCodecContext : public MythCodecContext
     void   PostProcessFrame                 (AVCodecContext*, MythVideoFrame*) override;
     bool   IsDeinterlacing                  (bool &DoubleRate, bool = false) override;
     static void GetDecoderList              (QStringList &Decoders);
-    static bool HaveMediaCodec              (void);
+    static bool HaveMediaCodec              (bool Reinit = false);
 
   private:
     static MCProfiles& GetProfiles          (void);

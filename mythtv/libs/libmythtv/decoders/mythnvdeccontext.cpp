@@ -512,13 +512,13 @@ bool MythNVDECContext::MythNVDECCaps::Supports(cudaVideoCodec Codec, cudaVideoCh
     return result;
 }
 
-bool MythNVDECContext::HaveNVDEC(void)
+bool MythNVDECContext::HaveNVDEC(bool Reinit /*=false*/)
 {
     static QMutex lock(QMutex::Recursive);
     QMutexLocker locker(&lock);
     static bool s_checked = false;
     static bool s_available = false;
-    if (!s_checked)
+    if (!s_checked || Reinit)
     {
         if (gCoreContext->IsUIThread())
         {

@@ -184,14 +184,14 @@ bool MythDRMPRIMEContext::GetDRMBuffer(AVCodecContext *Context, MythVideoFrame *
     return true;
 }
 
-bool MythDRMPRIMEContext::HavePrimeDecoders(AVCodecID Codec)
+bool MythDRMPRIMEContext::HavePrimeDecoders(bool Reinit /*=false*/, AVCodecID Codec /*=AV_CODEC_ID_NONE*/)
 {
     static bool s_needscheck = true;
     static QVector<AVCodecID> s_supportedCodecs;
 
     QMutexLocker locker(&s_drmPrimeLock);
 
-    if (s_needscheck)
+    if (s_needscheck || Reinit)
     {
         s_needscheck = false;
         s_supportedCodecs.clear();
@@ -238,7 +238,7 @@ bool MythDRMPRIMEContext::HavePrimeDecoders(AVCodecID Codec)
 
         if (debugcodecs.isEmpty())
             debugcodecs.append("None");
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("DRM PRIME codecs supported: %1 %2")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("DRM PRIME codecs supported: %1 %2")
             .arg(debugcodecs.join(","))
             .arg(s_drmPrimeDecoders.isEmpty() ? "" : QString("using: %1").arg(s_drmPrimeDecoders.join(","))));
     }

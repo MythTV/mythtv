@@ -22,7 +22,7 @@ class MythV4L2M2MContext : public MythDRMPRIMEContext
     int         HwDecoderInit            (AVCodecContext *Context) override;
     bool        DecoderWillResetOnFlush  (void) override;
     static bool GetBuffer                (AVCodecContext *Context, MythVideoFrame *Frame, AVFrame *AvFrame, int/*Flags*/);
-    static bool HaveV4L2Codecs           (void);
+    static bool HaveV4L2Codecs           (bool Reinit = false);
     static void GetDecoderList           (QStringList &Decoders);
 
     static enum AVPixelFormat GetV4L2RequestFormat(AVCodecContext *Context, const AVPixelFormat *PixFmt);

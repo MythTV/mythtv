@@ -495,14 +495,14 @@ void MythMediaCodecContext::GetDecoderList(QStringList &Decoders)
         Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second));
 }
 
-bool MythMediaCodecContext::HaveMediaCodec(void)
+bool MythMediaCodecContext::HaveMediaCodec(bool Reinit /*=false*/)
 {
     static QMutex lock(QMutex::Recursive);
     static bool s_initialised = false;
     static bool s_available   = false;
 
     QMutexLocker locker(&lock);
-    if (!s_initialised)
+    if (!s_initialised || Reinit)
     {
         MCProfiles& profiles = MythMediaCodecContext::GetProfiles();
         if (profiles.isEmpty())
