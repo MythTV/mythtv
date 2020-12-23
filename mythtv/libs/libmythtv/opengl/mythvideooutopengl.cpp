@@ -381,23 +381,7 @@ QStringList MythVideoOutputOpenGL::GetAllowedRenderers(MythRenderOpenGL *Render,
         return allowed;
     }
 
-    VideoFrameType format = FMT_NONE;
-    if (codec_is_vaapi(CodecId))
-        format = FMT_VAAPI;
-    else if (codec_is_vdpau(CodecId))
-        format = FMT_VDPAU;
-    else if (codec_is_nvdec(CodecId))
-        format = FMT_NVDEC;
-    else if (codec_is_vtb(CodecId))
-        format = FMT_VTB;
-    else if (codec_is_mmal(CodecId))
-        format = FMT_MMAL;
-    else if (codec_is_v4l2(CodecId) || codec_is_drmprime(CodecId))
-        format = FMT_DRMPRIME;
-    else if (codec_is_mediacodec(CodecId))
-        format = FMT_MEDIACODEC;
-
-    if (FMT_NONE != format)
+    if (auto format = FrameTypeForCodec(CodecId); FMT_NONE != format)
     {
         MythInteropGPU::InteropMap supported;
         if (MythOpenGLInterop::GetTypes(Render, supported); supported.find(format) != supported.cend())

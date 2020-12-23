@@ -170,6 +170,18 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
     return nullptr;
 }
 
+VideoFrameType MythVideoOutputGPU::FrameTypeForCodec(MythCodecID CodecId)
+{
+    if (codec_is_vaapi(CodecId))      return FMT_VAAPI;
+    else if (codec_is_vdpau(CodecId)) return FMT_VDPAU;
+    else if (codec_is_nvdec(CodecId)) return FMT_NVDEC;
+    else if (codec_is_vtb(CodecId))   return FMT_VTB;
+    else if (codec_is_mmal(CodecId))  return FMT_MMAL;
+    else if (codec_is_v4l2(CodecId) || codec_is_drmprime(CodecId)) return FMT_DRMPRIME;
+    else if (codec_is_mediacodec(CodecId)) return FMT_MEDIACODEC;
+    return FMT_NONE;
+}
+
 /*! \class MythVideoOutputGPU
  * \brief Common code shared between GPU accelerated sub-classes (e.g. OpenGL)
  *
