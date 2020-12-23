@@ -54,7 +54,7 @@ MythVideoBoundsState::MythVideoBoundsState(AdjustFillMode AdjustFill, AspectOver
 }
 
 MythVideoColourState::MythVideoColourState(PictureAttributeSupported Supported,
-                                           const std::map<PictureAttribute,int> AttributeValues)
+                                           std::map<PictureAttribute, int> AttributeValues)
   : m_supportedAttributes(Supported),
     m_attributeValues(std::move(AttributeValues))
 {
