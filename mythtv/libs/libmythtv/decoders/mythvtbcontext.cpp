@@ -134,7 +134,7 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
 
     // The interop must have a reference to the ui player so it can be deleted
     // from the main thread.
-    MythPlayerUI* player = GetPlayerUI(Context);
+    auto * player = GetPlayerUI(Context);
     if (!player)
         return -1;
 
@@ -145,15 +145,12 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
     OpenGLLocker locker(render);
 
     // Create interop
-    MythVTBInterop* interop = MythVTBInterop::CreateVTB(render);
+    auto * interop = MythVTBInterop::CreateVTB(player, render);
     if (!interop)
         return -1;
 
-    // Set player
-    interop->SetPlayer(player);
-
     // Allocate the device context
-    AVBufferRef* deviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
+    auto * deviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
     if (!deviceref)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create device context");
@@ -162,7 +159,7 @@ int MythVTBContext::InitialiseDecoder(AVCodecContext *Context)
     }
 
     // Add our interop class and set the callback for its release
-    auto* devicectx = reinterpret_cast<AVHWDeviceContext*>(deviceref->data);
+    auto * devicectx = reinterpret_cast<AVHWDeviceContext*>(deviceref->data);
     devicectx->user_opaque = interop;
     devicectx->free        = MythCodecContext::DeviceContextFinished;
 

@@ -31,7 +31,7 @@ class MythOpenGLInterop : public MythInteropGPU
                                                     MythVideoFrame *Frame, FrameScanType Scan);
 
   protected:
-    explicit MythOpenGLInterop  (MythRenderOpenGL *Context, InteropType Type);
+    MythOpenGLInterop(MythRenderOpenGL *Context, InteropType Type, MythPlayerUI* Player = nullptr);
     virtual void DeleteTextures ();
 
   protected:

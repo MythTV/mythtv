@@ -148,7 +148,7 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
     OpenGLLocker locker(render);
 
     // Create interop (and CUDA context)
-    auto * interop = MythNVDECInterop::CreateNVDEC(render);
+    auto * interop = MythNVDECInterop::CreateNVDEC(player, render);
     if (!interop)
         return -1;
     if (!interop->IsValid())
@@ -156,9 +156,6 @@ int MythNVDECContext::InitialiseDecoder(AVCodecContext *Context)
         interop->DecrRef();
         return -1;
     }
-
-    // Set player
-    interop->SetPlayer(player);
 
     // Allocate the device context
     AVBufferRef* hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_CUDA);

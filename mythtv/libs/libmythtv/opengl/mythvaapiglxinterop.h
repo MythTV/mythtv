@@ -9,7 +9,7 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
     Q_OBJECT
 
   public:
-    MythVAAPIInteropGLX(MythRenderOpenGL* Context, InteropType Type);
+    MythVAAPIInteropGLX(MythPlayerUI *Player, MythRenderOpenGL* Context, InteropType Type);
     ~MythVAAPIInteropGLX() override;
 
   public slots:
@@ -29,7 +29,7 @@ class MythVAAPIInteropGLX : public MythVAAPIInterop
 class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
 {
   public:
-    explicit MythVAAPIInteropGLXCopy(MythRenderOpenGL* Context);
+    MythVAAPIInteropGLXCopy(MythPlayerUI* Player, MythRenderOpenGL* Context);
     ~MythVAAPIInteropGLXCopy() override;
     vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context,
                                             MythVideoColourSpace* ColourSpace,
@@ -47,7 +47,7 @@ using MYTH_GLXRELEASETEXIMAGEEXT = void (*)(Display*, GLXDrawable, int);
 class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
 {
   public:
-    explicit MythVAAPIInteropGLXPixmap(MythRenderOpenGL* Context);
+    MythVAAPIInteropGLXPixmap(MythPlayerUI* Player, MythRenderOpenGL* Context);
     ~MythVAAPIInteropGLXPixmap() override;
     vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context,
                                             MythVideoColourSpace* ColourSpace,

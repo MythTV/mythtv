@@ -53,9 +53,10 @@ MythInteropGPU* MythInteropGPU::CreateDummy()
     return new MythInteropGPU(nullptr, DUMMY);
 }
 
-MythInteropGPU::MythInteropGPU(MythRender *Context, InteropType Type)
+MythInteropGPU::MythInteropGPU(MythRender* Context, InteropType Type, MythPlayerUI* Player)
   : ReferenceCounter(TypeToString(Type), true),
     m_context(Context),
+    m_player(Player),
     m_type(Type)
 {
     if (m_context)
@@ -76,11 +77,6 @@ MythInteropGPU::InteropType MythInteropGPU::GetType()
 MythPlayerUI* MythInteropGPU::GetPlayer()
 {
     return m_player;
-}
-
-void MythInteropGPU::SetPlayer(MythPlayerUI* Player)
-{
-    m_player = Player;
 }
 
 void MythInteropGPU::SetDefaultFree(FreeAVHWDeviceContext FreeContext)

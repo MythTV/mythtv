@@ -6,9 +6,11 @@
 
 #define LOC QString("VDPAUInterop: ")
 
-MythVDPAUInterop* MythVDPAUInterop::CreateVDPAU(MythRenderOpenGL* Context, MythCodecID CodecId)
+MythVDPAUInterop* MythVDPAUInterop::CreateVDPAU(MythPlayerUI* Player,
+                                                MythRenderOpenGL* Context,
+                                                MythCodecID CodecId)
 {
-    if (!Context)
+    if (!(Context && Player))
         return nullptr;
 
     MythInteropGPU::InteropMap types;
@@ -17,7 +19,7 @@ MythVDPAUInterop* MythVDPAUInterop::CreateVDPAU(MythRenderOpenGL* Context, MythC
     {
         for (auto type : vdpau->second)
             if (type == VDPAU)
-                return new MythVDPAUInterop(Context, CodecId);
+                return new MythVDPAUInterop(Player, Context, CodecId);
     }
     return nullptr;
 }
@@ -34,8 +36,8 @@ void MythVDPAUInterop::GetVDPAUTypes(MythRenderOpenGL* Render, MythInteropGPU::I
     LOG(VB_GENERAL, LOG_WARNING, LOC + "GL_NV_vdpau_interop is not available");
 }
 
-MythVDPAUInterop::MythVDPAUInterop(MythRenderOpenGL* Context, MythCodecID CodecId)
-  : MythOpenGLInterop(Context, VDPAU),
+MythVDPAUInterop::MythVDPAUInterop(MythPlayerUI *Player, MythRenderOpenGL* Context, MythCodecID CodecId)
+  : MythOpenGLInterop(Context, VDPAU, Player),
     m_codec(CodecId)
 {
 }

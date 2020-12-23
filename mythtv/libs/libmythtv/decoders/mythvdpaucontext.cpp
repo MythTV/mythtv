@@ -46,19 +46,16 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
 
     // Create interop
     auto vdpauid = static_cast<MythCodecID>(kCodec_MPEG1_VDPAU + (mpeg_version(Context->codec_id) - 1));
-    auto * interop = MythVDPAUInterop::CreateVDPAU(render, vdpauid);
+    auto * interop = MythVDPAUInterop::CreateVDPAU(player, render, vdpauid);
     if (!interop)
         return -1;
 
-    // Set player
-    interop->SetPlayer(player);
-
     // Allocate the device context
-    AVBufferRef* hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU, interop);
+    auto * hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_VDPAU, interop);
     if (!hwdeviceref)
         return -1;
 
-    auto* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    auto * hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     if (!hwdevicecontext || !hwdevicecontext->hwctx)
         return -1;
 
@@ -82,7 +79,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
     }
 
     // Add our interop class and set the callback for its release
-    auto* hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
+    auto * hwframesctx = reinterpret_cast<AVHWFramesContext*>(Context->hw_frames_ctx->data);
     hwframesctx->user_opaque = interop;
     hwframesctx->free = &MythCodecContext::FramesContextFinished;
 
@@ -100,7 +97,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
         return res;
     }
 
-    auto* vdpaudevicectx = static_cast<AVVDPAUDeviceContext*>(hwdevicecontext->hwctx);
+    auto * vdpaudevicectx = static_cast<AVVDPAUDeviceContext*>(hwdevicecontext->hwctx);
     if (av_vdpau_bind_context(Context, vdpaudevicectx->device,
                               vdpaudevicectx->get_proc_address, AV_HWACCEL_FLAG_IGNORE_LEVEL) != 0)
     {

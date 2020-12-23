@@ -4,8 +4,8 @@
 
 #define LOC QString("VAAPIGLX: ")
 
-MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythRenderOpenGL* Context, InteropType Type)
-  : MythVAAPIInterop(Context, Type)
+MythVAAPIInteropGLX::MythVAAPIInteropGLX(MythPlayerUI* Player, MythRenderOpenGL* Context, InteropType Type)
+  : MythVAAPIInterop(Player, Context, Type)
 {
 }
 
@@ -211,8 +211,8 @@ int MythVAAPIInteropGLX::SetPictureAttribute(PictureAttribute Attribute, int Val
     return -1;
 }
 
-MythVAAPIInteropGLXCopy::MythVAAPIInteropGLXCopy(MythRenderOpenGL* Context)
-  : MythVAAPIInteropGLX(Context, VAAPIGLXCOPY)
+MythVAAPIInteropGLXCopy::MythVAAPIInteropGLXCopy(MythPlayerUI* Player, MythRenderOpenGL* Context)
+  : MythVAAPIInteropGLX(Player, Context, VAAPIGLXCOPY)
 {
     Display *display = glXGetCurrentDisplay();
     if (!display)
@@ -308,8 +308,8 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenG
     return result;
 }
 
-MythVAAPIInteropGLXPixmap::MythVAAPIInteropGLXPixmap(MythRenderOpenGL* Context)
-  : MythVAAPIInteropGLX(Context, VAAPIGLXPIX)
+MythVAAPIInteropGLXPixmap::MythVAAPIInteropGLXPixmap(MythPlayerUI* Player, MythRenderOpenGL* Context)
+  : MythVAAPIInteropGLX(Player, Context, VAAPIGLXPIX)
 {
     m_vaDisplay = vaGetDisplay(glXGetCurrentDisplay());
     if (!m_vaDisplay)

@@ -10,8 +10,8 @@ extern "C" {
 
 #define LOC QString("DRMInterop: ")
 
-MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL *Context)
-  : MythOpenGLInterop(Context, DRMPRIME),
+MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL* Context, MythPlayerUI* Player)
+  : MythOpenGLInterop(Context, DRMPRIME, Player),
     MythEGLDMABUF(Context)
 {
 }
@@ -53,9 +53,9 @@ void MythDRMPRIMEInterop::DeleteTextures(void)
  * \note This is called directly from the decoder - hence we do not attempt
  * to retrieve the list of supported types again. Assume it has already been verified.
 */
-MythDRMPRIMEInterop* MythDRMPRIMEInterop::CreateDRM(MythRenderOpenGL* Context)
+MythDRMPRIMEInterop* MythDRMPRIMEInterop::CreateDRM(MythRenderOpenGL* Context, MythPlayerUI* Player)
 {
-    return Context ? new MythDRMPRIMEInterop(Context) : nullptr;
+    return Context ? new MythDRMPRIMEInterop(Context, Player) : nullptr;
 }
 
 void MythDRMPRIMEInterop::GetDRMTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types)

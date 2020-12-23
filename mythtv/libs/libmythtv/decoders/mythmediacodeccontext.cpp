@@ -179,7 +179,7 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
 
     // Create interop - NB no interop check here or in MythMediaCodecInterop
     QSize size(Context->width, Context->height);
-    auto * interop = MythMediaCodecInterop::CreateMediaCodec(render, size);
+    auto * interop = MythMediaCodecInterop::CreateMediaCodec(player, render, size);
     if (!interop)
         return -1;
     if (!interop->GetSurface())
@@ -187,9 +187,6 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
         interop->DecrRef();
         return -1;
     }
-
-    // Set player
-    interop->SetPlayer(player);
 
     // Create the hardware context
     AVBufferRef *hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_MEDIACODEC);

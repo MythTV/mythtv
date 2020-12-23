@@ -7,6 +7,9 @@
 // MythTV
 #include "mythopenglinterop.h"
 
+struct AVFilterGraph;
+struct AVFilterContext;
+
 // VAAPI
 #include "va/va.h"
 #include "va/va_version.h"
@@ -37,7 +40,7 @@ class MythVAAPIInterop : public MythOpenGLInterop
 {
   public:
     static void GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::InteropMap& Types);
-    static MythVAAPIInterop* CreateVAAPI(MythRenderOpenGL* Context);
+    static MythVAAPIInterop* CreateVAAPI(MythPlayerUI* Player, MythRenderOpenGL* Context);
 
     VASurfaceID VerifySurface(MythRenderOpenGL *Context, MythVideoFrame *Frame);
     VADisplay   GetDisplay   (void);
@@ -49,8 +52,8 @@ class MythVAAPIInterop : public MythOpenGLInterop
                                    AVFilterContext *&Sink);
 
   protected:
-    MythVAAPIInterop(MythRenderOpenGL *Context, InteropType Type);
-    ~MythVAAPIInterop() override;
+    MythVAAPIInterop(MythPlayerUI* Player, MythRenderOpenGL *Context, InteropType Type);
+   ~MythVAAPIInterop() override;
 
     void        InitaliseDisplay     (void);
     VASurfaceID Deinterlace          (MythVideoFrame *Frame, VASurfaceID Current, FrameScanType Scan);
@@ -64,10 +67,10 @@ class MythVAAPIInterop : public MythOpenGLInterop
     MythDeintType    m_deinterlacer      { DEINT_NONE };
     bool             m_deinterlacer2x    { false      };
     bool             m_firstField        { true    };
-    AVBufferRef     *m_vppFramesContext  { nullptr };
-    AVFilterContext *m_filterSink        { nullptr };
-    AVFilterContext *m_filterSource      { nullptr };
-    AVFilterGraph   *m_filterGraph       { nullptr };
+    AVBufferRef*     m_vppFramesContext  { nullptr };
+    AVFilterContext* m_filterSink        { nullptr };
+    AVFilterContext* m_filterSource      { nullptr };
+    AVFilterGraph*   m_filterGraph       { nullptr };
     bool             m_filterError       { false   };
     int              m_filterWidth       { 0 };
     int              m_filterHeight      { 0 };

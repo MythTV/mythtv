@@ -28,7 +28,7 @@ class MythVDPAUInterop : public MythOpenGLInterop
 
   public:
     static void GetVDPAUTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types);
-    static MythVDPAUInterop* CreateVDPAU(MythRenderOpenGL* Context, MythCodecID CodecId);
+    static MythVDPAUInterop* CreateVDPAU(MythPlayerUI* Player, MythRenderOpenGL* Context, MythCodecID CodecId);
     vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
                                             MythVideoFrame* Frame, FrameScanType Scan) override;
     bool  IsPreempted(void) const;
@@ -38,8 +38,8 @@ class MythVDPAUInterop : public MythOpenGLInterop
     void  DisplayPreempted(void);
 
   protected:
-    MythVDPAUInterop(MythRenderOpenGL* Context, MythCodecID CodecID);
-    ~MythVDPAUInterop() override;
+    MythVDPAUInterop(MythPlayerUI* Player, MythRenderOpenGL* Context, MythCodecID CodecID);
+   ~MythVDPAUInterop() override;
 
   private:
     bool  InitNV(AVVDPAUDeviceContext* DeviceContext);

@@ -417,7 +417,7 @@ int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
 
     // The interop must have a reference to the ui player so it can be deleted
     // from the main thread.
-    MythPlayerUI* player = GetPlayerUI(Context);
+    auto * player = GetPlayerUI(Context);
     if (!player)
         return -1;
 
@@ -430,23 +430,20 @@ int MythV4L2M2MContext::InitialiseV4L2RequestContext(AVCodecContext *Context)
     // Create interop
     MythOpenGLInterop *interop = nullptr;
 #ifdef USING_EGL
-    interop = MythDRMPRIMEInterop::CreateDRM(render);
+    interop = MythDRMPRIMEInterop::CreateDRM(render, player);
 #endif
     if (!interop)
         return -1;
 
-    // Set the player required to process interop release
-    interop->SetPlayer(player);
-
     // Allocate the device context
-    AVBufferRef* hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_DRM, interop);
+    auto * hwdeviceref = MythCodecContext::CreateDevice(AV_HWDEVICE_TYPE_DRM, interop);
     if (!hwdeviceref)
     {
         interop->DecrRef();
         return -1;
     }
 
-    auto* hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    auto * hwdevicecontext = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     if (!hwdevicecontext || !hwdevicecontext->hwctx)
     {
         interop->DecrRef();

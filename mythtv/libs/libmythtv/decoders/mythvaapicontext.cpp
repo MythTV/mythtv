@@ -250,7 +250,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         return -1;
 
     // Create interop
-    auto * interop = MythVAAPIInterop::CreateVAAPI(render);
+    auto * interop = MythVAAPIInterop::CreateVAAPI(player, render);
     if (!interop)
         return -1;
     if (!interop->GetDisplay())
@@ -258,9 +258,6 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext *Context)
         interop->DecrRef();
         return -1;
     }
-
-    // Set the player required to process interop release
-    interop->SetPlayer(player);
 
     // Create hardware device context
     AVBufferRef* hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VAAPI);

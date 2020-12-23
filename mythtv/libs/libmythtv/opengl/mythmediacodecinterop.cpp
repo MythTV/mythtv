@@ -11,19 +11,24 @@ extern "C" {
 
 #define LOC QString("MediaCodecInterop: ")
 
-MythMediaCodecInterop* MythMediaCodecInterop::CreateMediaCodec(MythRenderOpenGL *Context, QSize Size)
+MythMediaCodecInterop* MythMediaCodecInterop::CreateMediaCodec(MythPlayerUI* Player,
+                                                               MythRenderOpenGL* Context,
+                                                               QSize Size)
 {
-    if (auto * result = new MythMediaCodecInterop(Context); result != nullptr)
+    if (Player && Context)
     {
-        if (result->Initialise(Size))
-            return result;
-        delete result;
+        if (auto * result = new MythMediaCodecInterop(Player, Context); result != nullptr)
+        {
+            if (result->Initialise(Size))
+                return result;
+            delete result;
+        }
     }
     return nullptr;
 }
 
-MythMediaCodecInterop::MythMediaCodecInterop(MythRenderOpenGL* Context)
-  : MythOpenGLInterop(Context, MEDIACODEC),
+MythMediaCodecInterop::MythMediaCodecInterop(MythPlayerUI* Player, MythRenderOpenGL* Context)
+  : MythOpenGLInterop(Context, MEDIACODEC, Player),
     m_frameWait(),
     m_frameWaitLock(),
     m_colourSpaceInitialised(false),

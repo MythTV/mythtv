@@ -58,8 +58,11 @@ void MythVAAPIInterop::GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::
         Types[FMT_VAAPI] = vaapitypes;
 }
 
-MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythRenderOpenGL* Context)
+MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythPlayerUI *Player, MythRenderOpenGL* Context)
 {
+    if (!(Player && Context))
+        return nullptr;
+
     MythInteropGPU::InteropMap types;
     MythVAAPIInterop::GetVAAPITypes(Context, types);
     if (auto vaapi = types.find(FMT_VAAPI); vaapi != types.end())
@@ -68,12 +71,12 @@ MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythRenderOpenGL* Context)
         {
 #ifdef USING_EGL
             if (type == VAAPIEGLDRM)
-                return new MythVAAPIInteropDRM(Context);
+                return new MythVAAPIInteropDRM(Player, Context);
 #endif
             if (type == VAAPIGLXPIX)
-                return new MythVAAPIInteropGLXPixmap(Context);
+                return new MythVAAPIInteropGLXPixmap(Player, Context);
             if (type == VAAPIGLXCOPY)
-                return new MythVAAPIInteropGLXCopy(Context);
+                return new MythVAAPIInteropGLXCopy(Player, Context);
         }
     }
     return nullptr;
@@ -86,8 +89,8 @@ MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythRenderOpenGL* Context)
  * \todo Scaling of some 1080 H.264 material (garbage line at bottom - presumably
  * scaling from 1088 to 1080 - but only some files). Same effect on all VAAPI interop types.
 */
-MythVAAPIInterop::MythVAAPIInterop(MythRenderOpenGL *Context, InteropType Type)
-  : MythOpenGLInterop(Context, Type)
+MythVAAPIInterop::MythVAAPIInterop(MythPlayerUI* Player, MythRenderOpenGL *Context, InteropType Type)
+  : MythOpenGLInterop(Context, Type, Player)
 {
 }
 

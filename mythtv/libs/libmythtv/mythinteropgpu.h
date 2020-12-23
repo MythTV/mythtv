@@ -47,12 +47,11 @@ class MythInteropGPU : public QObject, public ReferenceCounter
     static QString         TypesToString(const InteropMap& Types);
     static MythInteropGPU* CreateDummy();
 
-    MythInteropGPU(MythRender* Context, InteropType Type);
+    MythInteropGPU(MythRender* Context, InteropType Type, MythPlayerUI* Player = nullptr);
    ~MythInteropGPU() override;
 
     InteropType    GetType               ();
     MythPlayerUI*  GetPlayer             ();
-    void           SetPlayer             (MythPlayerUI *Player);
     void           SetDefaultFree        (FreeAVHWDeviceContext FreeContext);
     void           SetDefaultUserOpaque  (void* UserOpaque);
     FreeAVHWDeviceContext GetDefaultFree ();

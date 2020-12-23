@@ -20,8 +20,8 @@
     } \
 }
 
-MythNVDECInterop::MythNVDECInterop(MythRenderOpenGL* Context)
-  : MythOpenGLInterop(Context, NVDEC),
+MythNVDECInterop::MythNVDECInterop(MythPlayerUI* Player, MythRenderOpenGL* Context)
+  : MythOpenGLInterop(Context, NVDEC, Player),
     m_cudaContext()
 {
     InitialiseCuda();
@@ -75,9 +75,9 @@ CUcontext MythNVDECInterop::GetCUDAContext()
     return m_cudaContext;
 }
 
-MythNVDECInterop* MythNVDECInterop::CreateNVDEC(MythRenderOpenGL* Context)
+MythNVDECInterop* MythNVDECInterop::CreateNVDEC(MythPlayerUI* Player, MythRenderOpenGL* Context)
 {
-    if (!Context)
+    if (!(Context && Player))
         return nullptr;
 
     MythInteropGPU::InteropMap types;
@@ -86,7 +86,7 @@ MythNVDECInterop* MythNVDECInterop::CreateNVDEC(MythRenderOpenGL* Context)
     {
         for (auto type : nvdec->second)
             if (type == NVDEC)
-                return new MythNVDECInterop(Context);
+                return new MythNVDECInterop(Player, Context);
     }
     return nullptr;
 }

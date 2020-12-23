@@ -14,7 +14,7 @@ class MythNVDECInterop : public MythOpenGLInterop
 {
   public:
     static void GetNVDECTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types);
-    static MythNVDECInterop* CreateNVDEC(MythRenderOpenGL* Context);
+    static MythNVDECInterop* CreateNVDEC(MythPlayerUI* Player, MythRenderOpenGL* Context);
     static bool CreateCUDAContext(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
                                   CUcontext& CudaContext);
     static void CleanupContext(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
@@ -26,7 +26,7 @@ class MythNVDECInterop : public MythOpenGLInterop
                                             MythVideoFrame* Frame, FrameScanType Scan) override;
 
   protected:
-    explicit MythNVDECInterop(MythRenderOpenGL* Context);
+    MythNVDECInterop(MythPlayerUI* Player, MythRenderOpenGL* Context);
    ~MythNVDECInterop() override;
 
   private:

@@ -11,8 +11,8 @@ struct AVDRMFrameDescriptor;
 class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
 {
   public:
-    explicit MythVAAPIInteropDRM(MythRenderOpenGL* Context);
-    ~MythVAAPIInteropDRM() override;
+    MythVAAPIInteropDRM(MythPlayerUI* Player, MythRenderOpenGL* Context);
+   ~MythVAAPIInteropDRM() override;
     vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context,
                                             MythVideoColourSpace* ColourSpace,
                                             MythVideoFrame* Frame, FrameScanType Scan) override;
