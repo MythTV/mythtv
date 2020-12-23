@@ -14,8 +14,6 @@ MythPlayerVideoUI::MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerC
     qRegisterMetaType<MythVideoBoundsState>();
     connect(this, &MythPlayerVideoUI::CheckCallbacks, this, &MythPlayerVideoUI::ProcessCallbacks);
     m_interopTypes = MythInteropGPU::GetTypes(m_render);
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Available GPU interops: %1")
-        .arg(MythInteropGPU::TypesToString(m_interopTypes)));
 }
 
 /*! \brief Return a list of interop types supported by the current render device.

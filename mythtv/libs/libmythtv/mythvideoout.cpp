@@ -20,10 +20,10 @@
 
 #define LOC QString("VideoOutput: ")
 
-void MythVideoOutput::GetRenderOptions(RenderOptions& Options)
+void MythVideoOutput::GetRenderOptions(RenderOptions& Options, MythRender* Render)
 {
     MythVideoOutputNull::GetRenderOptions(Options);
-    MythVideoOutputGPU::GetRenderOptions(Options);
+    MythVideoOutputGPU::GetRenderOptions(Options, Render);
 }
 
 /**

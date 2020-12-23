@@ -2000,7 +2000,15 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_NO_THEME;
     }
 
-    MythMainWindow *mainWindow = GetMythMainWindow();
+    auto * mainWindow = GetMythMainWindow();
+
+    // Force an update of our hardware decoder/render support once the window is
+    // ready and we have a render device (and after each window re-initialisation
+    // when we may have a new render device). This also ensures the support checks
+    // are done immediately and are not reliant on semi-random settings initialisation.
+    QObject::connect(mainWindow, &MythMainWindow::SignalWindowReady,
+                     std::bind(&MythVideoProfile::InitStatics, true));
+
     mainWindow->Init(false);
     mainWindow->setWindowTitle(QCoreApplication::translate("(MythFrontendMain)",
                                                "MythTV Frontend",

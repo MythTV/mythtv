@@ -85,8 +85,8 @@ class AudioInfo
 class AvFormatDecoder : public DecoderBase
 {
     friend void HandleStreamChange(void *data);
+
   public:
-    static void GetDecoders(RenderOptions &opts);
     AvFormatDecoder(MythPlayer *parent, const ProgramInfo &pginfo,
                     PlayerFlags flags);
     ~AvFormatDecoder() override;

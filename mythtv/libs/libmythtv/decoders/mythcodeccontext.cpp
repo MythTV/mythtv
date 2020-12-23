@@ -140,7 +140,7 @@ QStringList MythCodecContext::GetDecoderDescription(void)
     return decoders;
 }
 
-void MythCodecContext::GetDecoders(RenderOptions &Opts)
+void MythCodecContext::GetDecoders(RenderOptions &Opts, bool Reinit /*=false*/)
 {
     if (!gCoreContext->IsUIThread())
     {
@@ -154,9 +154,12 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
         return;
     }
 
+    Opts.decoders->append("ffmpeg");
+    (*Opts.equiv_decoders)["ffmpeg"].append("dummy");
+
 #ifdef USING_VDPAU
     // Only enable VDPAU support if it is actually present
-    if (MythVDPAUHelper::HaveVDPAU())
+    if (MythVDPAUHelper::HaveVDPAU(Reinit))
     {
         Opts.decoders->append("vdpau");
         (*Opts.equiv_decoders)["vdpau"].append("dummy");
@@ -171,7 +174,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
 
 #ifdef USING_VAAPI
     // Only enable VAAPI if it is actually present and isn't actually VDPAU
-    if (!MythVAAPIContext::HaveVAAPI().isEmpty())
+    if (!MythVAAPIContext::HaveVAAPI(Reinit).isEmpty())
     {
         Opts.decoders->append("vaapi");
         (*Opts.equiv_decoders)["vaapi"].append("dummy");
@@ -181,7 +184,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
 #endif
 #ifdef USING_NVDEC
     // Only enable NVDec support if it is actually present
-    if (MythNVDECContext::HaveNVDEC())
+    if (MythNVDECContext::HaveNVDEC(Reinit))
     {
         Opts.decoders->append("nvdec");
         (*Opts.equiv_decoders)["nvdec"].append("dummy");
@@ -190,7 +193,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
     }
 #endif
 #ifdef USING_MEDIACODEC
-    if (MythMediaCodecContext::HaveMediaCodec())
+    if (MythMediaCodecContext::HaveMediaCodec(Reinit))
     {
         Opts.decoders->append("mediacodec");
         (*Opts.equiv_decoders)["mediacodec"].append("dummy");
@@ -199,7 +202,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
     }
 #endif
 #ifdef USING_VTB
-    if (MythVTBContext::HaveVTB())
+    if (MythVTBContext::HaveVTB(Reinit))
     {
         Opts.decoders->append("vtb");
         Opts.decoders->append("vtb-dec");
@@ -208,7 +211,7 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
     }
 #endif
 #ifdef USING_V4L2
-    if (MythV4L2M2MContext::HaveV4L2Codecs())
+    if (MythV4L2M2MContext::HaveV4L2Codecs(Reinit))
     {
 #ifdef USING_V4L2PRIME
         Opts.decoders->append("v4l2");
@@ -219,14 +222,14 @@ void MythCodecContext::GetDecoders(RenderOptions &Opts)
     }
 #endif
 #ifdef USING_EGL
-    if (MythDRMPRIMEContext::HavePrimeDecoders())
+    if (MythDRMPRIMEContext::HavePrimeDecoders(Reinit))
     {
         Opts.decoders->append("drmprime");
         (*Opts.equiv_decoders)["drmprime"].append("dummy");
     }
 #endif
 #ifdef USING_MMAL
-    if (MythMMALContext::HaveMMAL())
+    if (MythMMALContext::HaveMMAL(Reinit))
     {
         Opts.decoders->append("mmal-dec");
         (*Opts.equiv_decoders)["mmal-dec"].append("dummy");

@@ -37,7 +37,7 @@ class MythVideoOutput : public MythVideoBounds
     Q_OBJECT
 
   public:
-    static void GetRenderOptions(RenderOptions& Options);
+    static void GetRenderOptions(RenderOptions& Options, MythRender* Render);
 
     ~MythVideoOutput() override = default;
 

@@ -4,7 +4,8 @@
 #include "mythdb.h"
 #include "mythlogging.h"
 #include "mythvideoout.h"
-#include "avformatdecoder.h"
+#include "mythmainwindow.h"
+#include "mythcodeccontext.h"
 
 // Std
 #include <algorithm>
@@ -1315,8 +1316,21 @@ const QList<QPair<QString, QString> >& MythVideoProfile::GetDeinterlacers()
 
 void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
 {
+    if (!HasMythMainWindow())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No window!");
+        return;
+    }
+
+    if (!gCoreContext->IsUIThread())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Called from wrong thread");
+        return;
+    }
+
     if (Reinit)
     {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Resetting decoder/render support");
         kSafeCustom.clear();
         kSafeRenderer.clear();
         kSafeRendererGroup.clear();
@@ -1338,13 +1352,19 @@ void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
     options.decoders       = &kSafeDecoders;
     options.equiv_decoders = &kSafeEquivDec;
 
+    auto * render = GetMythMainWindow()->GetRenderDevice();
+
     // N.B. assumes DummyDecoder always present
-    AvFormatDecoder::GetDecoders(options);
-    MythVideoOutput::GetRenderOptions(options);
+    MythCodecContext::GetDecoders(options, Reinit);
+    MythVideoOutput::GetRenderOptions(options, render);
+
+    auto interops = MythInteropGPU::GetTypes(render);
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Available GPU interops: %1")
+        .arg(MythInteropGPU::TypesToString(interops)));
 
     for (const QString& decoder : qAsConst(kSafeDecoders))
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("decoder<->render support: %1%2")
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Decoder/render support: %1%2")
             .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
     }
 }

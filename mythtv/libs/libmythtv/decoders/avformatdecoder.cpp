@@ -304,13 +304,6 @@ static int get_canonical_lang(const char *lang_cstr)
     return iso639_key_to_canonical_key(lang);
 }
 
-void AvFormatDecoder::GetDecoders(RenderOptions &opts)
-{
-    opts.decoders->append("ffmpeg");
-    (*opts.equiv_decoders)["ffmpeg"].append("dummy");
-    MythCodecContext::GetDecoders(opts);
-}
-
 AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
                                  const ProgramInfo &pginfo,
                                  PlayerFlags flags)

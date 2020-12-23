@@ -13,7 +13,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     Q_OBJECT
 
   public:
-    static void GetRenderOptions(RenderOptions& Options);
+    static void GetRenderOptions(RenderOptions& Options, MythRender* Render);
     static MythVideoOutputGPU* Create(MythMainWindow* MainWindow, MythRender* Render,
                                       MythPainter* Painter, MythDisplay* Display,
                                       const QString& Decoder,

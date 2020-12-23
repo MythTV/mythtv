@@ -17,14 +17,16 @@
 
 #define LOC QString("VidOutGPU: ")
 
-void MythVideoOutputGPU::GetRenderOptions(RenderOptions& Options)
+void MythVideoOutputGPU::GetRenderOptions(RenderOptions& Options, MythRender* Render)
 {
 #ifdef USING_OPENGL
-    MythVideoOutputOpenGL::GetRenderOptions(Options);
+    if (dynamic_cast<MythRenderOpenGL*>(Render) != nullptr)
+        MythVideoOutputOpenGL::GetRenderOptions(Options);
 #endif
 
 #ifdef USING_VULKAN
-    MythVideoOutputVulkan::GetRenderOptions(Options);
+    if (dynamic_cast<MythRenderVulkan*>(Render) != nullptr)
+        MythVideoOutputVulkan::GetRenderOptions(Options);
 #endif
 }
 
