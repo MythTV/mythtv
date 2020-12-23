@@ -525,7 +525,7 @@ MythSystemLegacyWindows::MythSystemLegacyWindows(MythSystemLegacy *parent) :
 
     connect(this, &MythSystemLegacyPrivate::started, m_parent, &MythSystemLegacy::started);
     connect(this, &MythSystemLegacyPrivate::finished, m_parent, &MythSystemLegacy::finished);
-    connect(this, &MythSystemLegacyPrivate::error, m_parent,&MythSystemLegacy::error));
+    connect(this, &MythSystemLegacyPrivate::error, m_parent,&MythSystemLegacy::error);
     connect(this, &MythSystemLegacyPrivate::readDataReady,
             m_parent, &MythSystemLegacy::readDataReady);
 
