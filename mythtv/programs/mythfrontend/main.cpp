@@ -2007,7 +2007,7 @@ int main(int argc, char **argv)
     // when we may have a new render device). This also ensures the support checks
     // are done immediately and are not reliant on semi-random settings initialisation.
     QObject::connect(mainWindow, &MythMainWindow::SignalWindowReady,
-                     std::bind(&MythVideoProfile::InitStatics, true));
+                     []() { MythVideoProfile::InitStatics(true); } );
 
     mainWindow->Init(false);
     mainWindow->setWindowTitle(QCoreApplication::translate("(MythFrontendMain)",
