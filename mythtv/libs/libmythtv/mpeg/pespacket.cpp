@@ -50,6 +50,15 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, int cardid, bool &broken)
         if (packet->HasAdaptationField())
         {
             uint delta = packet->AdaptationFieldSize() + 1;
+
+            // Adaptation field size is max 182 (control is '11') or 183 (control is '10').
+            // Do not skip beyond end of packet when the adaptation field size is wrong.
+            if (delta > TSPacket::kPayloadSize)
+            {
+                delta = TSPacket::kPayloadSize;
+                LOG(VB_GENERAL, LOG_ERR, QString("PESPacket[%1] Invalid adaptation field size:%2  control:%3")
+                    .arg(cardid).arg(packet->AdaptationFieldSize()).arg(packet->AdaptationFieldControl()));
+            }
             payloadSize -= delta;
             payloadStart += delta;
         }
