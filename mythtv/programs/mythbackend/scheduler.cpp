@@ -4900,11 +4900,13 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
         "       channel.commmethod                      " // 25
         "FROM record "
         "LEFT JOIN channel ON channel.callsign = record.station "
-        "WHERE deleted IS NULL "
+	// Exclude deleted channels except when ...
+	// ... this is an 'always on any channel' or 'find one' recording without the 'This Channel' filter
+        "WHERE deleted IS NULL OR ((type = %3 OR type = %4) AND filter & (1 << 10) = 0) "
         "GROUP BY recordid "
         "ORDER BY %1 %2");
 
-    query = query.arg(sortColumn).arg(order);
+    query = query.arg(sortColumn).arg(order).arg(kAllRecord).arg(kOneRecord);
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);
