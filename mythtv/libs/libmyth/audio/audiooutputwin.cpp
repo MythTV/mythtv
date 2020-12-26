@@ -109,10 +109,10 @@ void CALLBACK AudioOutputWinPrivate::waveOutProc(HWAVEOUT hwo, UINT uMsg,
 AudioOutputWin::AudioOutputWin(const AudioSettings &settings) :
     AudioOutputBase(settings),
     m_priv(new AudioOutputWinPrivate()),
-    m_UseSPDIF(settings.use_passthru)
+    m_UseSPDIF(settings.m_usePassthru)
 {
     InitSettings(settings);
-    if (settings.init)
+    if (settings.m_init)
         Reconfigure(settings);
     m_OutPkts = (unsigned char**) calloc(kPacketCnt, sizeof(unsigned char*));
 }
@@ -173,30 +173,30 @@ bool AudioOutputWin::OpenDevice(void)
 {
     CloseDevice();
     // fragments are 50ms worth of samples
-    fragment_size = 50 * output_bytes_per_frame * samplerate / 1000;
+    m_fragmentSize = 50 * m_outputBytesPerFrame * m_sampleRate / 1000;
     // DirectSound buffer holds 4 fragments = 200ms worth of samples
-    soundcard_buffer_size = kPacketCnt * fragment_size;
+    m_soundcardBufferSize = kPacketCnt * m_fragmentSize;
 
     VBAUDIO(QString("Buffering %1 fragments of %2 bytes each, total: %3 bytes")
-            .arg(kPacketCnt).arg(fragment_size).arg(soundcard_buffer_size));
+            .arg(kPacketCnt).arg(m_fragmentSize).arg(m_soundcardBufferSize));
 
-    m_UseSPDIF = passthru || enc;
+    m_UseSPDIF = m_passthru || m_enc;
 
     WAVEFORMATEXTENSIBLE wf;
-    wf.Format.nChannels            = channels;
-    wf.Format.nSamplesPerSec       = samplerate;
-    wf.Format.nBlockAlign          = output_bytes_per_frame;
-    wf.Format.nAvgBytesPerSec      = samplerate * output_bytes_per_frame;
-    wf.Format.wBitsPerSample       = (output_bytes_per_frame << 3) / channels;
+    wf.Format.nChannels            = m_channels;
+    wf.Format.nSamplesPerSec       = m_sampleRate;
+    wf.Format.nBlockAlign          = m_outputBytesPerFrame;
+    wf.Format.nAvgBytesPerSec      = m_sampleRate * m_outputBytesPerFrame;
+    wf.Format.wBitsPerSample       = (m_outputBytesPerFrame << 3) / m_channels;
     wf.Samples.wValidBitsPerSample =
-        AudioOutputSettings::FormatToBits(output_format);
+        AudioOutputSettings::FormatToBits(m_outputFormat);
 
     if (m_UseSPDIF)
     {
         wf.Format.wFormatTag = WAVE_FORMAT_DOLBY_AC3_SPDIF;
         wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF;
     }
-    else if (output_format == FORMAT_FLT)
+    else if (m_outputFormat == FORMAT_FLT)
     {
         wf.Format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
         wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
@@ -208,11 +208,11 @@ bool AudioOutputWin::OpenDevice(void)
     }
 
     VBAUDIO(QString("New format: %1bits %2ch %3Hz %4")
-            .arg(wf.Samples.wValidBitsPerSample).arg(channels)
-            .arg(samplerate).arg(m_UseSPDIF ? "data" : "PCM"));
+            .arg(wf.Samples.wValidBitsPerSample).arg(m_channels)
+            .arg(m_sampleRate).arg(m_UseSPDIF ? "data" : "PCM"));
 
     /* Only use the new WAVE_FORMAT_EXTENSIBLE format for multichannel audio */
-    if (channels <= 2)
+    if (m_channels <= 2)
         wf.Format.cbSize = 0;
     else
     {
@@ -223,8 +223,8 @@ bool AudioOutputWin::OpenDevice(void)
 
     MMRESULT mmr = waveOutOpen(&m_priv->m_hWaveOut, WAVE_MAPPER,
                                (WAVEFORMATEX *)&wf,
-                               (DWORD)AudioOutputWinPrivate::waveOutProc,
-                               (DWORD)this, CALLBACK_FUNCTION);
+                               (intptr_t)AudioOutputWinPrivate::waveOutProc,
+                               (intptr_t)this, CALLBACK_FUNCTION);
 
     if (mmr == WAVERR_BADFORMAT)
     {
@@ -280,7 +280,7 @@ void AudioOutputWin::WriteAudio(unsigned char * buffer, int size)
 
 int AudioOutputWin::GetBufferedOnSoundcard(void) const
 {
-    return m_nPkts * fragment_size;
+    return m_nPkts * m_fragmentSize;
 }
 
 int AudioOutputWin::GetVolumeChannel(int channel) const
