@@ -59,6 +59,7 @@ class FileLogger : public LoggerBase
     int  m_fd     {-1};    ///< contains the file descriptor for the logfile
 };
 
+#ifndef _WIN32
 /// \brief Syslog-based logger (not available in Windows)
 class SyslogLogger : public LoggerBase
 {
@@ -70,11 +71,12 @@ class SyslogLogger : public LoggerBase
     ~SyslogLogger() override;
     bool logmsg(LoggingItem *item) override; // LoggerBase
     /// \brief Unused for this logger.
-    void reopen(void) override { }; // LoggerBase
+    void reopen(void) override { } // LoggerBase
     static SyslogLogger *create(QMutex *mutex, bool open = true);
   private:
     bool m_opened {false};  ///< true when syslog channel open.
 };
+#endif
 
 #if CONFIG_SYSTEMD_JOURNAL
 class JournalLogger : public LoggerBase
