@@ -219,7 +219,7 @@ MSocketDevice::Protocol MSocketDevice::getProtocol() const
         memset(&sa, 0, sizeof(sa));
         SOCKLEN_T sz = sizeof(sa);
 
-        if (!::getsockname(fd, (struct sockaddr *)&sa, &sz))
+        if (!::getsockname(m_fd, (struct sockaddr *)&sa, &sz))
         {
 #if !defined (QT_NO_IPV6)
 
@@ -262,15 +262,15 @@ int MSocketDevice::createNewSocket()
 
     if (initialized >= 0x20 && protocol() == IPv6)
     {
-        s = ::socket(AF_INET6, t == Datagram ? SOCK_DGRAM : SOCK_STREAM, 0);
+        s = ::socket(AF_INET6, m_t == Datagram ? SOCK_DGRAM : SOCK_STREAM, 0);
     }
     else
     {
-        s = ::socket(AF_INET, t == Datagram ? SOCK_DGRAM : SOCK_STREAM, 0);
+        s = ::socket(AF_INET, m_t == Datagram ? SOCK_DGRAM : SOCK_STREAM, 0);
     }
 
 #else
-    SOCKET s = ::socket(AF_INET, t == Datagram ? SOCK_DGRAM : SOCK_STREAM, 0);
+    SOCKET s = ::socket(AF_INET, m_t == Datagram ? SOCK_DGRAM : SOCK_STREAM, 0);
 
 #endif
     if (s == INVALID_SOCKET)
@@ -279,23 +279,23 @@ int MSocketDevice::createNewSocket()
         {
 
             case WSANOTINITIALISED:
-                e = Impossible;
+                m_e = Impossible;
                 break;
 
             case WSAENETDOWN:
                 // ### what to use here?
-                e = NetworkFailure;
-                //e = Inaccessible;
+                m_e = NetworkFailure;
+                //m_e = Inaccessible;
                 break;
 
             case WSAEMFILE:
-                e = NoFiles; // special case for this
+                m_e = NoFiles; // special case for this
                 break;
 
             case WSAEINPROGRESS:
 
             case WSAENOBUFS:
-                e = NoResources;
+                m_e = NoResources;
                 break;
 
             case WSAEAFNOSUPPORT:
@@ -305,11 +305,11 @@ int MSocketDevice::createNewSocket()
             case WSAEPROTONOSUPPORT:
 
             case WSAESOCKTNOSUPPORT:
-                e = InternalError;
+                m_e = InternalError;
                 break;
 
             default:
-                e = UnknownError;
+                m_e = UnknownError;
                 break;
         }
     }
@@ -324,18 +324,18 @@ int MSocketDevice::createNewSocket()
 
 void MSocketDevice::close()
 {
-    if (fd == -1 || !isOpen())    // already closed
+    if (m_fd == -1 || !isOpen())    // already closed
         return;
 
     setOpenMode(NotOpen);
 
-    ::closesocket(fd);
+    ::closesocket(m_fd);
 
 #if defined(QSOCKETDEVICE_DEBUG)
-    qDebug("MSocketDevice::close: Closed socket %x", fd);
+    qDebug("MSocketDevice::close: Closed socket %x", m_fd);
 
 #endif
-    fd = -1;
+    m_fd = -1;
 
     fetchConnectionParameters();
 
@@ -360,7 +360,7 @@ void MSocketDevice::setBlocking(bool enable)
 
     unsigned long dummy = enable ? 0 : 1;
 
-    ioctlsocket(fd, FIONBIO, &dummy);
+    ioctlsocket(m_fd, FIONBIO, &dummy);
 }
 
 
@@ -400,12 +400,12 @@ int MSocketDevice::option(Option opt) const
     if (n != -1)
     {
         SOCKLEN_T len = sizeof(v);
-        int r = ::getsockopt(fd, SOL_SOCKET, n, (char*) & v, &len);
+        int r = ::getsockopt(m_fd, SOL_SOCKET, n, (char*) & v, &len);
 
         if (r != SOCKET_ERROR)
             return v;
 
-        if (!e)
+        if (!m_e)
         {
             MSocketDevice *that = (MSocketDevice*)this; // mutable function
 
@@ -413,11 +413,11 @@ int MSocketDevice::option(Option opt) const
             {
 
                 case WSANOTINITIALISED:
-                    that->e = Impossible;
+                    that->m_e = Impossible;
                     break;
 
                 case WSAENETDOWN:
-                    that->e = NetworkFailure;
+                    that->m_e = NetworkFailure;
                     break;
 
                 case WSAEFAULT:
@@ -425,19 +425,19 @@ int MSocketDevice::option(Option opt) const
                 case WSAEINVAL:
 
                 case WSAENOPROTOOPT:
-                    that->e = InternalError;
+                    that->m_e = InternalError;
                     break;
 
                 case WSAEINPROGRESS:
-                    that->e = NoResources;
+                    that->m_e = NoResources;
                     break;
 
                 case WSAENOTSOCK:
-                    that->e = Impossible;
+                    that->m_e = Impossible;
                     break;
 
                 default:
-                    that->e = UnknownError;
+                    that->m_e = UnknownError;
                     break;
             }
         }
@@ -483,19 +483,19 @@ void MSocketDevice::setOption(Option opt, int v)
             return;
     }
 
-    int r = ::setsockopt(fd, SOL_SOCKET, n, (char*) & v, sizeof(v));
+    int r = ::setsockopt(m_fd, SOL_SOCKET, n, (char*) & v, sizeof(v));
 
-    if (r == SOCKET_ERROR && e == NoError)
+    if (r == SOCKET_ERROR && m_e == NoError)
     {
         switch (WSAGetLastError())
         {
 
             case WSANOTINITIALISED:
-                e = Impossible;
+                m_e = Impossible;
                 break;
 
             case WSAENETDOWN:
-                e = NetworkFailure;
+                m_e = NetworkFailure;
                 break;
 
             case WSAEFAULT:
@@ -503,25 +503,25 @@ void MSocketDevice::setOption(Option opt, int v)
             case WSAEINVAL:
 
             case WSAENOPROTOOPT:
-                e = InternalError;
+                m_e = InternalError;
                 break;
 
             case WSAEINPROGRESS:
-                e = NoResources;
+                m_e = NoResources;
                 break;
 
             case WSAENETRESET:
 
             case WSAENOTCONN:
-                e =  Impossible; // ### ?
+                m_e =  Impossible; // ### ?
                 break;
 
             case WSAENOTSOCK:
-                e = Impossible;
+                m_e = Impossible;
                 break;
 
             default:
-                e = UnknownError;
+                m_e = UnknownError;
                 break;
         }
     }
@@ -530,10 +530,10 @@ void MSocketDevice::setOption(Option opt, int v)
 
 bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
 {
-    if (isValid() && addr.protocol() != pa.protocol())
+    if (isValid() && addr.protocol() != m_pa.protocol())
     {
         close();
-        fd = -1;
+        m_fd = -1;
     }
 
     if (!isValid())
@@ -558,7 +558,7 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
         LOG(VB_SOCKET, LOG_INFO,
 
             "MSocketDevice::connect: attempting to create new socket");
-        MSocketDevice::setSocket(createNewSocket(), t);
+        MSocketDevice::setSocket(createNewSocket(), m_t);
 
         // If still not valid, give up.
 
@@ -566,9 +566,9 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
             return false;
     }
 
-    pa = addr;
+    m_pa = addr;
 
-    pp = port;
+    m_pp = port;
 
     struct sockaddr_in a4;
 
@@ -603,11 +603,11 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
         }
         else
         {
-            e = Impossible;
+            m_e = Impossible;
             return false;
         }
 
-    int r = ::connect(fd, aa, aalen);
+    int r = ::connect(m_fd, aa, aalen);
 
     if (r == SOCKET_ERROR)
     {
@@ -615,11 +615,11 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
         {
 
             case WSANOTINITIALISED:
-                e = Impossible;
+                m_e = Impossible;
                 break;
 
             case WSAENETDOWN:
-                e = NetworkFailure;
+                m_e = NetworkFailure;
                 break;
 
             case WSAEADDRINUSE:
@@ -627,11 +627,11 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
             case WSAEINPROGRESS:
 
             case WSAENOBUFS:
-                e = NoResources;
+                m_e = NoResources;
                 break;
 
             case WSAEINTR:
-                e = UnknownError; // ### ?
+                m_e = UnknownError; // ### ?
                 break;
 
             case WSAEALREADY:
@@ -639,20 +639,20 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
                 break;
 
             case WSAEADDRNOTAVAIL:
-                e = ConnectionRefused; // ### ?
+                m_e = ConnectionRefused; // ### ?
                 break;
 
             case WSAEAFNOSUPPORT:
 
             case WSAEFAULT:
-                e = InternalError;
+                m_e = InternalError;
                 break;
 
             case WSAEINVAL:
                 break;
 
             case WSAECONNREFUSED:
-                e = ConnectionRefused;
+                m_e = ConnectionRefused;
                 break;
 
             case WSAEISCONN:
@@ -661,18 +661,18 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
             case WSAENETUNREACH:
 
             case WSAETIMEDOUT:
-                e = NetworkFailure;
+                m_e = NetworkFailure;
                 break;
 
             case WSAENOTSOCK:
-                e = Impossible;
+                m_e = Impossible;
                 break;
 
             case WSAEWOULDBLOCK:
                 break;
 
             case WSAEACCES:
-                e = Inaccessible;
+                m_e = Inaccessible;
                 break;
 
             case 10107:
@@ -681,7 +681,7 @@ bool MSocketDevice::connect(const QHostAddress &addr, quint16 port)
                 goto successful;
 
             default:
-                e = UnknownError;
+                m_e = UnknownError;
                 break;
         }
 
@@ -715,7 +715,7 @@ bool MSocketDevice::bind(const QHostAddress &address, quint16 port)
         Q_IPV6ADDR tmp = address.toIPv6Address();
         memcpy(&a6.sin6_addr.qt_s6_addr, &tmp, sizeof(tmp));
 
-        r = ::bind(fd, (struct sockaddr *) & a6, sizeof(struct qt_sockaddr_storage));
+        r = ::bind(m_fd, (struct sockaddr *) & a6, sizeof(struct qt_sockaddr_storage));
     }
     else
 #endif
@@ -726,11 +726,11 @@ bool MSocketDevice::bind(const QHostAddress &address, quint16 port)
             a4.sin_port = htons(port);
             a4.sin_addr.s_addr = htonl(address.toIPv4Address());
 
-            r = ::bind(fd, (struct sockaddr*) & a4, sizeof(struct sockaddr_in));
+            r = ::bind(m_fd, (struct sockaddr*) & a4, sizeof(struct sockaddr_in));
         }
         else
         {
-            e = Impossible;
+            m_e = Impossible;
             return false;
         }
 
@@ -740,43 +740,43 @@ bool MSocketDevice::bind(const QHostAddress &address, quint16 port)
         {
 
             case WSANOTINITIALISED:
-                e = Impossible;
+                m_e = Impossible;
                 break;
 
             case WSAENETDOWN:
-                e = NetworkFailure;
+                m_e = NetworkFailure;
                 break;
 
             case WSAEACCES:
-                e = Inaccessible;
+                m_e = Inaccessible;
                 break;
 
             case WSAEADDRNOTAVAIL:
-                e = Inaccessible;
+                m_e = Inaccessible;
                 break;
 
             case WSAEFAULT:
-                e = InternalError;
+                m_e = InternalError;
                 break;
 
             case WSAEINPROGRESS:
 
             case WSAENOBUFS:
-                e = NoResources;
+                m_e = NoResources;
                 break;
 
             case WSAEADDRINUSE:
 
             case WSAEINVAL:
-                e = AlreadyBound;
+                m_e = AlreadyBound;
                 break;
 
             case WSAENOTSOCK:
-                e = Impossible;
+                m_e = Impossible;
                 break;
 
             default:
-                e = UnknownError;
+                m_e = UnknownError;
                 break;
         }
 
@@ -794,11 +794,11 @@ bool MSocketDevice::listen(int backlog)
     if (!isValid())
         return false;
 
-    if (::listen(fd, backlog) >= 0)
+    if (::listen(m_fd, backlog) >= 0)
         return true;
 
-    if (!e)
-        e = Impossible;
+    if (!m_e)
+        m_e = Impossible;
 
     return false;
 }
@@ -826,11 +826,11 @@ int MSocketDevice::accept()
 
     do
     {
-        s = ::accept(fd, (struct sockaddr*) & a, &l);
+        s = ::accept(m_fd, (struct sockaddr*) & a, &l);
         // we'll blithely throw away the stuff accept() wrote to a
         done = true;
 
-        if (s == INVALID_SOCKET && e == NoError)
+        if (s == INVALID_SOCKET && m_e == NoError)
         {
             switch (WSAGetLastError())
             {
@@ -840,7 +840,7 @@ int MSocketDevice::accept()
                     break;
 
                 case WSANOTINITIALISED:
-                    e = Impossible;
+                    m_e = Impossible;
                     break;
 
                 case WSAENETDOWN:
@@ -852,7 +852,7 @@ int MSocketDevice::accept()
                     break;
 
                 case WSAEFAULT:
-                    e = InternalError;
+                    m_e = InternalError;
                     break;
 
                 case WSAEMFILE:
@@ -860,20 +860,20 @@ int MSocketDevice::accept()
                 case WSAEINPROGRESS:
 
                 case WSAENOBUFS:
-                    e = NoResources;
+                    m_e = NoResources;
                     break;
 
                 case WSAEINVAL:
 
                 case WSAENOTSOCK:
-                    e = Impossible;
+                    m_e = Impossible;
                     break;
 
                 case WSAEWOULDBLOCK:
                     break;
 
                 default:
-                    e = UnknownError;
+                    m_e = UnknownError;
                     break;
             }
         }
@@ -891,7 +891,7 @@ qint64 MSocketDevice::bytesAvailable() const
 
     u_long nbytes = 0;
 
-    if (::ioctlsocket(fd, FIONREAD, &nbytes) < 0)
+    if (::ioctlsocket(m_fd, FIONREAD, &nbytes) < 0)
         return -1;
 
     // ioctlsocket sometimes reports 1 byte available for datagrams
@@ -899,11 +899,11 @@ qint64 MSocketDevice::bytesAvailable() const
     // was reset (udp is connectionless). so we peek one byte to
     // catch this case and return 0 bytes available if recvfrom
     // fails.
-    if (nbytes == 1 && t == Datagram)
+    if (nbytes == 1 && m_t == Datagram)
     {
         char c;
 
-        if (::recvfrom(fd, &c, sizeof(c), MSG_PEEK, 0, 0) == SOCKET_ERROR)
+        if (::recvfrom(m_fd, &c, sizeof(c), MSG_PEEK, 0, 0) == SOCKET_ERROR)
             return 0;
     }
 
@@ -922,7 +922,7 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
 
     fds.fd_count = 1;
 
-    fds.fd_array[0] = fd;
+    fds.fd_array[0] = m_fd;
 
     struct timeval tv;
 
@@ -930,7 +930,7 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
 
     tv.tv_usec = (msecs % 1000) * 1000;
 
-    int rv = select(fd + 1, &fds, nullptr, nullptr, msecs < 0 ? nullptr : &tv);
+    int rv = select(m_fd + 1, &fds, nullptr, nullptr, msecs < 0 ? nullptr : &tv);
 
     if (rv < 0)
         return -1;
@@ -982,7 +982,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
 #endif
     qint64 r = 0;
 
-    if (t == Datagram)
+    if (m_t == Datagram)
     {
 #if !defined(QT_NO_IPV6)
         // With IPv6 support, we must be prepared to receive both IPv4
@@ -997,15 +997,15 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
         memset(&a, 0, sizeof(a));
         SOCKLEN_T sz;
         sz = sizeof(a);
-        r = ::recvfrom(fd, data, maxlen, 0, (struct sockaddr *) & a, &sz);
-        qt_socket_getportaddr((struct sockaddr *)(&a), &pp, &pa);
+        r = ::recvfrom(m_fd, data, maxlen, 0, (struct sockaddr *) & a, &sz);
+        qt_socket_getportaddr((struct sockaddr *)(&a), &m_pp, &m_pa);
     }
     else
     {
-        r = ::recv(fd, data, maxlen, 0);
+        r = ::recv(m_fd, data, maxlen, 0);
     }
 
-    if (r == 0 && t == Stream && maxlen > 0)
+    if (r == 0 && m_t == Stream && maxlen > 0)
     {
         if (WSAGetLastError() != WSAEWOULDBLOCK)
         {
@@ -1013,13 +1013,13 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
             close();
         }
     }
-    else if (r == SOCKET_ERROR && e == NoError)
+    else if (r == SOCKET_ERROR && m_e == NoError)
     {
         switch (WSAGetLastError())
         {
 
             case WSANOTINITIALISED:
-                e = Impossible;
+                m_e = Impossible;
                 break;
 
             case WSAECONNABORTED:
@@ -1038,7 +1038,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
                 So we should not close this socket just because one sendto failed.
                 */
 
-                if (t != Datagram)
+                if (m_t != Datagram)
                     close(); // connection closed
 
                 r = 0;
@@ -1048,7 +1048,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
             case WSAENETDOWN:
 
             case WSAENETRESET:
-                e = NetworkFailure;
+                m_e = NetworkFailure;
 
                 break;
 
@@ -1059,7 +1059,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
             case WSAESHUTDOWN:
 
             case WSAEINVAL:
-                e = Impossible;
+                m_e = Impossible;
 
                 break;
 
@@ -1070,17 +1070,17 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
                 break;
 
             case WSAEINPROGRESS:
-                e = NoResources;
+                m_e = NoResources;
 
                 break;
 
             case WSAENOTSOCK:
-                e = Impossible;
+                m_e = Impossible;
 
                 break;
 
             case WSAEOPNOTSUPP:
-                e = InternalError; // ### ?
+                m_e = InternalError; // ### ?
 
                 break;
 
@@ -1088,7 +1088,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
                 break;
 
             case WSAEMSGSIZE:
-                e = NoResources; // ### ?
+                m_e = NoResources; // ### ?
 
                 break;
 
@@ -1099,7 +1099,7 @@ qint64 MSocketDevice::readData(char *data, qint64 maxlen)
                 break;
 
             default:
-                e = UnknownError;
+                m_e = UnknownError;
 
                 break;
         }
@@ -1153,16 +1153,16 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
     while (!done)
     {
         // Don't write more than 64K (see Knowledge Base Q201213).
-        r = ::send(fd, data, (len > 64 * 1024 ? 64 * 1024 : len), 0);
+        r = ::send(m_fd, data, (len > 64 * 1024 ? 64 * 1024 : len), 0);
         done = true;
 
-        if (r == SOCKET_ERROR && e == NoError)    //&& errno != WSAEAGAIN ) {
+        if (r == SOCKET_ERROR && m_e == NoError)    //&& errno != WSAEAGAIN ) {
         {
             switch (WSAGetLastError())
             {
 
                 case WSANOTINITIALISED:
-                    e = Impossible;
+                    m_e = Impossible;
                     break;
 
                 case WSAENETDOWN:
@@ -1174,7 +1174,7 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
                 case WSAESHUTDOWN:
 
                 case WSAEHOSTUNREACH:
-                    e = NetworkFailure;
+                    m_e = NetworkFailure;
                     break;
 
                 case WSAECONNABORTED:
@@ -1190,14 +1190,14 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
                     break;
 
                 case WSAEINPROGRESS:
-                    e = NoResources;
+                    m_e = NoResources;
                     // ### perhaps try it later?
                     break;
 
                 case WSAEFAULT:
 
                 case WSAEOPNOTSUPP:
-                    e = InternalError;
+                    m_e = InternalError;
                     break;
 
                 case WSAENOBUFS:
@@ -1205,7 +1205,7 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
                     break;
 
                 case WSAEMSGSIZE:
-                    e = NoResources;
+                    m_e = NoResources;
                     break;
 
                 case WSAENOTCONN:
@@ -1213,7 +1213,7 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
                 case WSAENOTSOCK:
 
                 case WSAEINVAL:
-                    e = Impossible;
+                    m_e = Impossible;
                     break;
 
                 case WSAEWOULDBLOCK:
@@ -1221,7 +1221,7 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
                     break;
 
                 default:
-                    e = UnknownError;
+                    m_e = UnknownError;
                     break;
             }
         }
@@ -1237,7 +1237,7 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
     if (len == 0)
         return 0;
 
-    if (t != Datagram)
+    if (m_t != Datagram)
     {
 #if defined(QT_CHECK_STATE) || defined(QSOCKETDEVICE_DEBUG)
         qWarning("MSocketDevice::sendBlock: Not datagram");
@@ -1311,7 +1311,7 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
         }
         else
         {
-            e = Impossible;
+            m_e = Impossible;
             return -1;
         }
 
@@ -1323,16 +1323,16 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
 
     while (!done)
     {
-        r = ::sendto(fd, data, len, 0, aa, slen);
+        r = ::sendto(m_fd, data, len, 0, aa, slen);
         done = true;
 
-        if (r == SOCKET_ERROR && e == NoError)    //&& e != EAGAIN ) {
+        if (r == SOCKET_ERROR && m_e == NoError)    //&& e != EAGAIN ) {
         {
             switch (WSAGetLastError())
             {
 
                 case WSANOTINITIALISED:
-                    e = Impossible;
+                    m_e = Impossible;
                     break;
 
                 case WSAENETDOWN:
@@ -1354,7 +1354,7 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
                 case WSAENETUNREACH:
 
                 case WSAETIMEDOUT:
-                    e = NetworkFailure;
+                    m_e = NetworkFailure;
                     break;
 
                 case WSAEINTR:
@@ -1362,7 +1362,7 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
                     break;
 
                 case WSAEINPROGRESS:
-                    e = NoResources;
+                    m_e = NoResources;
                     // ### perhaps try it later?
                     break;
 
@@ -1371,13 +1371,13 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
                 case WSAEOPNOTSUPP:
 
                 case WSAEAFNOSUPPORT:
-                    e = InternalError;
+                    m_e = InternalError;
                     break;
 
                 case WSAENOBUFS:
 
                 case WSAEMSGSIZE:
-                    e = NoResources;
+                    m_e = NoResources;
                     break;
 
                 case WSAENOTCONN:
@@ -1387,7 +1387,7 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
                 case WSAEINVAL:
 
                 case WSAEDESTADDRREQ:
-                    e = Impossible;
+                    m_e = Impossible;
                     break;
 
                 case WSAEWOULDBLOCK:
@@ -1395,7 +1395,7 @@ qint64 MSocketDevice::writeBlock(const char * data, quint64 len,
                     break;
 
                 default:
-                    e = UnknownError;
+                    m_e = UnknownError;
                     break;
             }
         }
@@ -1409,10 +1409,10 @@ void MSocketDevice::fetchConnectionParameters()
 {
     if (!isValid())
     {
-        p = 0;
-        a = QHostAddress();
-        pp = 0;
-        pa = QHostAddress();
+        m_p = 0;
+        m_a = QHostAddress();
+        m_pp = 0;
+        m_pa = QHostAddress();
         return;
     }
 
@@ -1431,12 +1431,12 @@ void MSocketDevice::fetchConnectionParameters()
 
     sz = sizeof(sa);
 
-    if (!::getsockname(fd, (struct sockaddr *)(&sa), &sz))
-        qt_socket_getportaddr((struct sockaddr *)(&sa), &p, &a);
+    if (!::getsockname(m_fd, (struct sockaddr *)(&sa), &sz))
+        qt_socket_getportaddr((struct sockaddr *)(&sa), &m_p, &m_a);
 
-    pp = 0;
+    m_pp = 0;
 
-    pa = QHostAddress();
+    m_pa = QHostAddress();
 }
 
 
@@ -1455,30 +1455,30 @@ void MSocketDevice::fetchPeerConnectionParameters()
     SOCKLEN_T sz;
     sz = sizeof(sa);
 
-    if (!::getpeername(fd, (struct sockaddr *)(&sa), &sz))
-        qt_socket_getportaddr((struct sockaddr *)(&sa), &pp, &pa);
+    if (!::getpeername(m_fd, (struct sockaddr *)(&sa), &sz))
+        qt_socket_getportaddr((struct sockaddr *)(&sa), &m_pp, &m_pa);
 }
 
 quint16 MSocketDevice::peerPort() const
 {
-    if (pp == 0 && isValid())
+    if (m_pp == 0 && isValid())
     {
         MSocketDevice *that = (MSocketDevice*)this; // mutable
         that->fetchPeerConnectionParameters();
     }
 
-    return pp;
+    return m_pp;
 }
 
 
 QHostAddress MSocketDevice::peerAddress() const
 {
-    if (pp == 0 && isValid())
+    if (m_pp == 0 && isValid())
     {
         MSocketDevice *that = (MSocketDevice*)this; // mutable
         that->fetchPeerConnectionParameters();
     }
 
-    return pa;
+    return m_pa;
 }
 
