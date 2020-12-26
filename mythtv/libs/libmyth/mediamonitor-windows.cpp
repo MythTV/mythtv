@@ -105,7 +105,7 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    for (const auto *device : qAsConst(m_Devices))
+    for (const auto *device : qAsConst(m_devices))
     {
         if (device->getDevicePath() == path)
         {
@@ -121,11 +121,11 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
     // TODO - either look up the model, or leave blank
     pDevice->setDeviceModel(path.toLocal8Bit().constData());
 
-    QMutexLocker locker(&m_DevicesLock);
+    QMutexLocker locker(&m_devicesLock);
     connect(pDevice, &MythMediaDevice::statusChanged,
             this, &MediaMonitorWindows::mediaStatusChanged);
-    m_Devices.push_back(pDevice);
-    m_UseCount[pDevice] = 0;
+    m_devices.push_back(pDevice);
+    m_useCount[pDevice] = 0;
 
     return true;
 }
