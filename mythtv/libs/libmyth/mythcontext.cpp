@@ -92,7 +92,7 @@ class MythContextPrivate : public QObject
 
     int     ChooseBackend(const QString &error);
     int     UPnPautoconf(int milliSeconds = 2000);
-    bool    DefaultUPnP(QString &error);
+    bool    DefaultUPnP(QString& Error);
     bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
     bool    checkPort(QString &host, int port, int timeLimit) const;
@@ -1234,40 +1234,40 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
  *
  * Sets a string if there any connection problems
  */
-bool MythContextPrivate::DefaultUPnP(QString &error)
+bool MythContextPrivate::DefaultUPnP(QString& Error)
 {
-    QString            loc = "DefaultUPnP() - ";
-    QString            PIN = m_pConfig->GetValue(kDefaultPIN, "");
-    QString            USN = m_pConfig->GetValue(kDefaultUSN, "");
+    static const QString loc = "DefaultUPnP() - ";
+    QString pin = m_pConfig->GetValue(kDefaultPIN, "");
+    QString usn = m_pConfig->GetValue(kDefaultUSN, "");
 
-    if (USN.isEmpty())
+    if (usn.isEmpty())
     {
         LOG(VB_UPNP, LOG_INFO, loc + "No default UPnP backend");
         return false;
     }
 
-    LOG(VB_UPNP, LOG_INFO, loc + "config.xml has default " +
-             QString("PIN '%1' and host USN: %2") .arg(PIN).arg(USN));
+    LOG(VB_UPNP, LOG_INFO, loc + QString("config.xml has default PIN '%1' and host USN: %2")
+        .arg(pin).arg(usn));
 
     // ----------------------------------------------------------------------
 
     int timeout_ms = 2000;
-    LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search up to %1 secs")
-        .arg(timeout_ms / 1000));
-    SSDP::Instance()->PerformSearch(kBackendURI, timeout_ms / 1000);
+    LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs").arg(timeout_ms / 1000));
+    SSDP::Instance()->PerformSearch(kBackendURI, static_cast<uint>(timeout_ms / 1000));
 
     // ----------------------------------------------------------------------
     // We need to give the server time to respond...
     // ----------------------------------------------------------------------
 
-    DeviceLocation *pDevLoc = nullptr;
-    MythTimer totalTime; totalTime.start();
-    MythTimer searchTime; searchTime.start();
+    DeviceLocation* devicelocation = nullptr;
+    MythTimer totalTime;
+    MythTimer searchTime;
+    totalTime.start();
+    searchTime.start();
     while (totalTime.elapsed() < timeout_ms)
     {
-        pDevLoc = SSDP::Find( kBackendURI, USN );
-
-        if (pDevLoc)
+        devicelocation = SSDP::Find(kBackendURI, usn);
+        if (devicelocation)
             break;
 
         usleep(25000);
@@ -1275,30 +1275,28 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
         int ttl = timeout_ms - totalTime.elapsed();
         if ((searchTime.elapsed() > 249) && (ttl > 1000))
         {
-            LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search up to %1 secs")
-                .arg(ttl / 1000));
-            SSDP::Instance()->PerformSearch(kBackendURI, ttl / 1000);
+            LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs").arg(ttl / 1000));
+            SSDP::Instance()->PerformSearch(kBackendURI, static_cast<uint>(ttl / 1000));
             searchTime.start();
         }
     }
 
     // ----------------------------------------------------------------------
 
-    if (!pDevLoc)
+    if (!devicelocation)
     {
-        error = "Cannot find default UPnP backend";
+        Error = "Cannot find default UPnP backend";
         return false;
     }
 
-    if (UPnPconnect(pDevLoc, PIN))
+    if (UPnPconnect(devicelocation, pin))
     {
-        pDevLoc->DecrRef();
+        devicelocation->DecrRef();
         return true;
     }
 
-    pDevLoc->DecrRef();
-
-    error = "Cannot connect to default backend via UPnP. Wrong saved PIN?";
+    devicelocation->DecrRef();
+    Error = "Cannot connect to default backend via UPnP. Wrong saved PIN?";
     return false;
 }
 
