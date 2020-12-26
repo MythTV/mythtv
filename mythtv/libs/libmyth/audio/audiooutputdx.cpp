@@ -100,15 +100,15 @@ class AudioOutputDXPrivate
 AudioOutputDX::AudioOutputDX(const AudioSettings &settings) :
     AudioOutputBase(settings),
     m_priv(new AudioOutputDXPrivate(this)),
-    m_UseSPDIF(settings.use_passthru)
+    m_UseSPDIF(settings.m_usePassthru)
 {
     timeBeginPeriod(1);
     InitSettings(settings);
-    if (passthru_device == "auto" || passthru_device.toLower() == "default")
-        passthru_device = main_device;
+    if (m_passthruDevice == "auto" || m_passthruDevice.toLower() == "default")
+        m_passthruDevice = m_mainDevice;
     else
-        m_discretedigital = true;
-    if (settings.init)
+        m_discreteDigital = true;
+    if (settings.m_init)
         Reconfigure(settings);
 }
 
@@ -135,9 +135,9 @@ int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID  lpGuid,
         QString enum_desc = QString::fromWCharArray( lpcstrDesc );
 #else
 int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid,
-                                                                                                  LPCSTR lpcstrDesc,
-                                                                                                  LPCSTR lpcstrModule,
-                                                                                                  LPVOID lpContext)
+                                                  LPCSTR lpcstrDesc,
+                                                  LPCSTR lpcstrModule,
+                                                  LPVOID lpContext)
 {
         QString enum_desc = QString::fromLocal8Bit( lpcstrDesc );
 
@@ -204,7 +204,7 @@ int AudioOutputDXPrivate::InitDirectSound(bool passthrough)
 
     if (m_parent)  // parent can be nullptr only when called from GetDXDevices()
         m_device_name = passthrough ?
-                      m_parent->passthru_device : m_parent->main_device;
+                      m_parent->m_passthruDevice : m_parent->m_mainDevice;
     m_device_name = m_device_name.section(':', 1);
     m_device_num  = m_device_name.toInt(&ok, 10);
 
@@ -313,13 +313,13 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
         {
             VBERROR("buffer underrun");
             m_writeCursor += size;
-            while (m_writeCursor >= (DWORD)m_parent->soundcard_buffer_size)
-                m_writeCursor -= m_parent->soundcard_buffer_size;
+            while (m_writeCursor >= (DWORD)m_parent->m_soundcardBufferSize)
+                m_writeCursor -= m_parent->m_soundcardBufferSize;
         }
 
         if ((m_writeCursor < play_pos  && m_writeCursor + size >= play_pos) ||
             (m_writeCursor >= play_pos &&
-             m_writeCursor + size >= play_pos + m_parent->soundcard_buffer_size))
+             m_writeCursor + size >= play_pos + m_parent->m_soundcardBufferSize))
         {
             usleep(50000);
             continue;
@@ -358,8 +358,8 @@ void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
 
     m_writeCursor += l_bytes1 + l_bytes2;
 
-    while (m_writeCursor >= (DWORD)m_parent->soundcard_buffer_size)
-        m_writeCursor -= m_parent->soundcard_buffer_size;
+    while (m_writeCursor >= (DWORD)m_parent->m_soundcardBufferSize)
+        m_writeCursor -= m_parent->m_soundcardBufferSize;
 
     IDirectSoundBuffer_Unlock(m_dsbuffer, p_write_position, l_bytes1,
                               p_wrap_around, l_bytes2);
@@ -443,7 +443,7 @@ bool AudioOutputDX::OpenDevice(void)
 
     CloseDevice();
 
-    m_UseSPDIF = passthru || enc;
+    m_UseSPDIF = m_passthru || m_enc;
     m_priv->InitDirectSound(m_UseSPDIF);
     if (!m_priv->m_dsobject || !m_priv->m_dsound_dll)
     {
@@ -452,26 +452,26 @@ bool AudioOutputDX::OpenDevice(void)
     }
 
     // fragments are 50ms worth of samples
-    fragment_size = 50 * output_bytes_per_frame * samplerate / 1000;
+    m_fragmentSize = 50 * m_outputBytesPerFrame * m_sampleRate / 1000;
     // DirectSound buffer holds 4 fragments = 200ms worth of samples
-    soundcard_buffer_size = fragment_size << 2;
+    m_soundcardBufferSize = m_fragmentSize << 2;
 
-    VBAUDIO(QString("DirectSound buffer size: %1").arg(soundcard_buffer_size));
+    VBAUDIO(QString("DirectSound buffer size: %1").arg(m_soundcardBufferSize));
 
-    wf.Format.nChannels            = channels;
-    wf.Format.nSamplesPerSec       = samplerate;
-    wf.Format.nBlockAlign          = output_bytes_per_frame;
-    wf.Format.nAvgBytesPerSec      = samplerate * output_bytes_per_frame;
-    wf.Format.wBitsPerSample       = (output_bytes_per_frame << 3) / channels;
+    wf.Format.nChannels            = m_channels;
+    wf.Format.nSamplesPerSec       = m_sampleRate;
+    wf.Format.nBlockAlign          = m_outputBytesPerFrame;
+    wf.Format.nAvgBytesPerSec      = m_sampleRate * m_outputBytesPerFrame;
+    wf.Format.wBitsPerSample       = (m_outputBytesPerFrame << 3) / m_channels;
     wf.Samples.wValidBitsPerSample =
-        AudioOutputSettings::FormatToBits(output_format);
+        AudioOutputSettings::FormatToBits(m_outputFormat);
 
     if (m_UseSPDIF)
     {
         wf.Format.wFormatTag = WAVE_FORMAT_DOLBY_AC3_SPDIF;
         wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF;
     }
-    else if (output_format == FORMAT_FLT)
+    else if (m_outputFormat == FORMAT_FLT)
     {
         wf.Format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
         wf.SubFormat         = _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
@@ -483,10 +483,10 @@ bool AudioOutputDX::OpenDevice(void)
     }
 
     VBAUDIO(QString("New format: %1bits %2ch %3Hz %4")
-            .arg(wf.Samples.wValidBitsPerSample).arg(channels)
-            .arg(samplerate).arg(m_UseSPDIF ? "data" : "PCM"));
+            .arg(wf.Samples.wValidBitsPerSample).arg(m_channels)
+            .arg(m_sampleRate).arg(m_UseSPDIF ? "data" : "PCM"));
 
-    if (channels <= 2)
+    if (m_channels <= 2)
         wf.Format.cbSize = 0;
     else
     {
@@ -504,7 +504,7 @@ bool AudioOutputDX::OpenDevice(void)
     if (!m_UseSPDIF)
         dsbdesc.dwFlags |= DSBCAPS_CTRLVOLUME;     // Allow volume control
 
-    dsbdesc.dwBufferBytes = soundcard_buffer_size; // buffer size
+    dsbdesc.dwBufferBytes = m_soundcardBufferSize; // buffer size
     dsbdesc.lpwfxFormat = (WAVEFORMATEX *)&wf;
 
     if (FAILED(IDirectSound_CreateSoundBuffer(m_priv->m_dsobject, &dsbdesc,
@@ -569,7 +569,7 @@ int AudioOutputDX::GetBufferedOnSoundcard(void) const
     buffered = (int)m_priv->m_writeCursor - (int)play_pos;
 
     if (buffered <= 0)
-        buffered += soundcard_buffer_size;
+        buffered += m_soundcardBufferSize;
 
     return buffered;
 }
@@ -602,7 +602,7 @@ void AudioOutputDX::SetVolumeChannel(int channel, int volume)
     long dxVolume { DSBVOLUME_MIN };
     if (volume > 0)
     {
-        float dbAtten = 20 * log10((float)volume/100F);
+        float dbAtten = 20 * log10((float)volume/100.F);
         dxVolume = (long)(100.0F * dbAtten);
     }
 
