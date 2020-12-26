@@ -135,15 +135,15 @@ void BackendSelection::AddItem(DeviceLocation *dev)
     if (!dev)
         return;
 
-    QString USN = dev->m_sUSN;
+    QString usn = dev->m_sUSN;
 
     m_mutex.lock();
 
     // The devices' USN should be unique. Don't add if it is already there:
-    if (m_devices.find(USN) == m_devices.end())
+    if (m_devices.find(usn) == m_devices.end())
     {
         dev->IncrRef();
-        m_devices.insert(USN, dev);
+        m_devices.insert(usn, dev);
 
         m_mutex.unlock();
 
@@ -266,11 +266,11 @@ void BackendSelection::Manual(void)
     CloseWithDecision(kManualConfigure);
 }
 
-void BackendSelection::RemoveItem(const QString& USN)
+void BackendSelection::RemoveItem(const QString& USN_)
 {
     m_mutex.lock();
 
-    ItemMap::iterator it = m_devices.find(USN);
+    ItemMap::iterator it = m_devices.find(USN_);
 
     if (it != m_devices.end())
     {
