@@ -194,7 +194,10 @@ class MUI_PUBLIC MythDialogBox : public MythScreenType
 
     void AddButtonV(const QString &title, QVariant data = 0,
                    bool newMenu = false, bool setCurrent = false);
-    void AddButton(const QString &title) { AddButtonV(title, 0,false, false); };
+    void AddButton(const QString &title, bool setCurrent = false)
+    {
+        AddButtonV(title, 0,false, setCurrent);
+    }
     // For non-class, static class, or lambda functions.
     void AddButton(const QString &title, const MythUICallbackNMF &slot,
                    bool newMenu = false, bool setCurrent = false)
