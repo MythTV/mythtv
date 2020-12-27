@@ -2146,7 +2146,8 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         //    playPos = (uint64_t)
         //        ((currentFrame->frameNumber / video_frame_rate) * 1000);
         //else
-        playPos = m_player->GetDecoder()->NormalizeVideoTimecode(currentFrame->m_timecode);
+        auto tc_ms = std::chrono::milliseconds(currentFrame->m_timecode);
+        playPos = m_player->GetDecoder()->NormalizeVideoTimecode(tc_ms).count();
     }
     playPos -= playPosAdj;
     if (playPos != 0)

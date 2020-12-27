@@ -409,7 +409,7 @@ void VideoOutputD3D::StopEmbedding(void)
     MythVideoOutput::StopEmbedding();
 }
 
-void VideoOutputD3D::UpdatePauseFrame(int64_t &disp_timecode, FrameScanType)
+void VideoOutputD3D::UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, FrameScanType)
 {
     QMutexLocker locker(&m_lock);
     MythVideoFrame *used_frame = m_videoBuffers.Head(kVideoBuffer_used);

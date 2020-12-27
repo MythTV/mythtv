@@ -489,7 +489,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     QMutex     m_decoderLock              {QMutex::Recursive};
     float      m_nextPlaySpeed            {1.0F};
     float      m_playSpeed                {1.0F};
-    int        m_frameInterval            {static_cast<int>((1000000.0F / 30))};///< always adjusted for play_speed
+    std::chrono::microseconds m_frameInterval
+        {microsecondsFromFloat(1000000.0F / 30)};///< always adjusted for play_speed
     int        m_fpsMultiplier            {1}; ///< used to detect changes
     int        m_ffrewSkip                {1};
     int        m_ffrewAdjust              {0};

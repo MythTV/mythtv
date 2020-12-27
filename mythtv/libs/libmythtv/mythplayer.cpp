@@ -680,10 +680,10 @@ void MythPlayer::SetFrameInterval(FrameScanType scan, double frame_period)
 {
     if (m_decoder)
         m_fpsMultiplier = m_decoder->GetfpsMultiplier();
-    m_frameInterval = static_cast<int>(lround(1000000.0 * frame_period) / m_fpsMultiplier);
+    m_frameInterval = microsecondsFromFloat(1000000.0 * frame_period / m_fpsMultiplier);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("SetFrameInterval Interval:%1 Speed:%2 Scan:%3 (Multiplier: %4)")
-        .arg(m_frameInterval).arg(static_cast<double>(m_playSpeed)).arg(ScanTypeToString(scan)).arg(m_fpsMultiplier));
+        .arg(m_frameInterval.count()).arg(static_cast<double>(m_playSpeed)).arg(ScanTypeToString(scan)).arg(m_fpsMultiplier));
 }
 
 void MythPlayer::InitFrameInterval()
@@ -746,7 +746,7 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::microseconds(m_frameInterval >> 3));
+        std::this_thread::sleep_for(m_frameInterval / 8);
         auto waited_for = std::chrono::milliseconds(m_bufferingStart.msecsTo(QTime::currentTime()));
         auto last_msg = std::chrono::milliseconds(m_bufferingLastMsg.msecsTo(QTime::currentTime()));
         if (last_msg > 100ms && !FlagIsSet(kMusicChoice))
@@ -1314,26 +1314,26 @@ bool MythPlayer::UpdateFFRewSkip(void)
         skip_changed = (m_ffrewSkip != 1);
         if (m_decoder)
             m_fpsMultiplier = m_decoder->GetfpsMultiplier();
-        m_frameInterval = (int) (1000000.0 / m_videoFrameRate / static_cast<double>(temp_speed))
-            / m_fpsMultiplier;
+        m_frameInterval = microsecondsFromFloat((1000000.0 / m_videoFrameRate / static_cast<double>(temp_speed))
+           / m_fpsMultiplier);
         m_ffrewSkip = static_cast<int>(m_playSpeed != 0.0F);
     }
     else
     {
         skip_changed = true;
-        m_frameInterval = 200000;
-        m_frameInterval = (fabs(m_playSpeed) >=   3.0F) ? 133466 : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=   5.0F) ? 133466 : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=   8.0F) ? 250250 : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  10.0F) ? 133466 : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  16.0F) ? 187687 : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  20.0F) ? 150150 : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  30.0F) ? 133466 : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  60.0F) ? 133466 : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >= 120.0F) ? 133466 : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >= 180.0F) ? 133466 : m_frameInterval;
+        m_frameInterval = 200000us;
+        m_frameInterval = (fabs(m_playSpeed) >=   3.0F) ? 133466us : m_frameInterval;
+        m_frameInterval = (fabs(m_playSpeed) >=   5.0F) ? 133466us : m_frameInterval;
+        m_frameInterval = (fabs(m_playSpeed) >=   8.0F) ? 250250us : m_frameInterval;
+        m_frameInterval = (fabs(m_playSpeed) >=  10.0F) ? 133466us : m_frameInterval;
+        m_frameInterval = (fabs(m_playSpeed) >=  16.0F) ? 187687us : m_frameInterval;
+        m_frameInterval = (fabs(m_playSpeed) >=  20.0F) ? 150150us : m_frameInterval;
+        m_frameInterval = (fabs(m_playSpeed) >=  30.0F) ? 133466us : m_frameInterval;
+        m_frameInterval = (fabs(m_playSpeed) >=  60.0F) ? 133466us : m_frameInterval;
+        m_frameInterval = (fabs(m_playSpeed) >= 120.0F) ? 133466us : m_frameInterval;
+        m_frameInterval = (fabs(m_playSpeed) >= 180.0F) ? 133466us : m_frameInterval;
         float ffw_fps = fabs(static_cast<double>(m_playSpeed)) * m_videoFrameRate;
-        float dis_fps = 1000000.0F / m_frameInterval;
+        float dis_fps = 1000000.0F / m_frameInterval.count();
         m_ffrewSkip = (int)ceil(ffw_fps / dis_fps);
         m_ffrewSkip = m_playSpeed < 0.0F ? -m_ffrewSkip : m_ffrewSkip;
         m_ffrewAdjust = 0;
@@ -1361,7 +1361,7 @@ void MythPlayer::ChangeSpeed(void)
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Play speed: " +
         QString("rate: %1 speed: %2 skip: %3 => new interval %4")
         .arg(m_videoFrameRate).arg(static_cast<double>(m_playSpeed))
-        .arg(m_ffrewSkip).arg(m_frameInterval));
+        .arg(m_ffrewSkip).arg(m_frameInterval.count()));
 
     if (m_videoOutput)
         m_videoOutput->SetVideoFrameRate(static_cast<float>(m_videoFrameRate));

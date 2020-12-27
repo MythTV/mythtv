@@ -65,8 +65,8 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
 
     void FileChanged();
     void RefreshPauseFrame();
-    void RenderVideoFrame(MythVideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
-    void DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due);
+    void RenderVideoFrame(MythVideoFrame* Frame, FrameScanType Scan, bool Prepare, std::chrono::microseconds Wait);
+    void DoDisplayVideoFrame(MythVideoFrame* Frame, std::chrono::microseconds Due);
     void EnableFrameRateMonitor(bool Enable = false);
     void EnableBitrateMonitor(bool Enable = false);
 

@@ -643,7 +643,7 @@ void MythVideoOutputGPU::RenderOverlays(OSD& Osd)
         Osd.Draw(GetDisplayVisibleRect());
 }
 
-void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan)
+void MythVideoOutputGPU::UpdatePauseFrame(std::chrono::milliseconds& DisplayTimecode, FrameScanType Scan)
 {
     MythVideoFrame* release = nullptr;
     m_videoBuffers.BeginLock(kVideoBuffer_used);

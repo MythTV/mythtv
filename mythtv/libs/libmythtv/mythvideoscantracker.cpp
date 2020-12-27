@@ -108,7 +108,7 @@ FrameScanType MythVideoScanTracker::GetScanTypeWithOverride() const
     return m_scan;
 }
 
-void MythVideoScanTracker::CheckScanUpdate(MythVideoOutput* VideoOutput, int FrameInterval)
+void MythVideoScanTracker::CheckScanUpdate(MythVideoOutput* VideoOutput, std::chrono::microseconds FrameInterval)
 {
     if (m_resetScan != kScan_Ignore)
         SetScanType(m_resetScan, VideoOutput, FrameInterval);
@@ -119,7 +119,8 @@ QString MythVideoScanTracker::GetDeinterlacerName()
     return MythVideoFrame::DeinterlacerName(m_lastDeinterlacer, m_lastDeinterlacer2x, m_lastFrameCodec);
 }
 
-void MythVideoScanTracker::SetScanType(FrameScanType Scan, MythVideoOutput* VideoOutput, int FrameInterval)
+void MythVideoScanTracker::SetScanType(FrameScanType Scan, MythVideoOutput* VideoOutput,
+                                       std::chrono::microseconds FrameInterval)
 {
     if (!is_current_thread(m_mainThread))
     {
@@ -174,7 +175,7 @@ void MythVideoScanTracker::SetScanType(FrameScanType Scan, MythVideoOutput* Vide
  * material that is not otherwise flagged correctly.
 */
 void MythVideoScanTracker::AutoDeint(MythVideoFrame* Frame, MythVideoOutput* VideoOutput,
-                                     int FrameInterval, bool AllowLock)
+                                     std::chrono::microseconds FrameInterval, bool AllowLock)
 {
     if (!Frame)
         return;

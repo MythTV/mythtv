@@ -11,7 +11,8 @@ MythDVDPlayer::MythDVDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* 
 {
 }
 
-void MythDVDPlayer::AutoDeint(MythVideoFrame *Frame, MythVideoOutput *VideoOutput, int FrameInterval, bool AllowLock)
+void MythDVDPlayer::AutoDeint(MythVideoFrame *Frame, MythVideoOutput *VideoOutput,
+                              std::chrono::microseconds FrameInterval, bool AllowLock)
 {
     bool dummy = false;
     if (m_decoder && m_decoder->GetMythCodecContext()->IsDeinterlacing(dummy))

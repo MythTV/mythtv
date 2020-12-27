@@ -503,11 +503,11 @@ void MythPlayerUI::InitFrameInterval()
     SetFrameInterval(GetScanType(), 1.0 / (m_videoFrameRate * static_cast<double>(m_playSpeed)));
     MythPlayer::InitFrameInterval();
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Display Refresh Rate: %1 Video Frame Rate: %2")
-        .arg(1000000.0 / m_display->GetRefreshInterval(m_frameInterval), 0, 'f', 3)
-        .arg(1000000.0 / m_frameInterval, 0, 'f', 3));
+        .arg(1000000.0 / m_display->GetRefreshInterval(m_frameInterval).count(), 0, 'f', 3)
+        .arg(1000000.0 / m_frameInterval.count(), 0, 'f', 3));
 }
 
-void MythPlayerUI::RenderVideoFrame(MythVideoFrame *Frame, FrameScanType Scan, bool Prepare, int64_t Wait)
+void MythPlayerUI::RenderVideoFrame(MythVideoFrame *Frame, FrameScanType Scan, bool Prepare, std::chrono::microseconds Wait)
 {
     if (!m_videoOutput)
         return;
@@ -521,7 +521,7 @@ void MythPlayerUI::RenderVideoFrame(MythVideoFrame *Frame, FrameScanType Scan, b
     m_videoOutput->RenderOverlays(m_osd);
     m_videoOutput->RenderEnd();
 
-    if (Wait > 0)
+    if (Wait > 0us)
         m_avSync.WaitForFrame(Wait);
 
     m_videoOutput->EndFrame();
@@ -576,9 +576,9 @@ void MythPlayerUI::RefreshPauseFrame()
     }
 }
 
-void MythPlayerUI::DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due)
+void MythPlayerUI::DoDisplayVideoFrame(MythVideoFrame* Frame, std::chrono::microseconds Due)
 {
-    if (Due < 0)
+    if (Due < 0us)
     {
         m_videoOutput->SetFramesPlayed(static_cast<long long>(++m_framesPlayed));
     }
@@ -641,7 +641,7 @@ void MythPlayerUI::DisplayPauseFrame()
 
     FrameScanType scan = GetScanType();
     scan = (kScan_Detect == scan || kScan_Ignore == scan) ? kScan_Progressive : scan;
-    RenderVideoFrame(nullptr, scan, true, 0);
+    RenderVideoFrame(nullptr, scan, true, 0ms);
 }
 
 void MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
@@ -685,7 +685,7 @@ void MythPlayerUI::DisplayNormalFrame(bool CheckPrebuffer)
     }
 
     // When is the next frame due
-    int64_t due = m_avSync.AVSync(&m_audio, frame, m_frameInterval, m_playSpeed, !m_videoDim.isEmpty(),
+    std::chrono::microseconds due = m_avSync.AVSync(&m_audio, frame, m_frameInterval, m_playSpeed, !m_videoDim.isEmpty(),
                                   !m_normalSpeed || FlagIsSet(kMusicChoice));
     // Display it
     DoDisplayVideoFrame(frame, due);
@@ -788,7 +788,7 @@ void MythPlayerUI::SetBookmark(bool Clear)
 
 bool MythPlayerUI::CanSupportDoubleRate()
 {
-    int refreshinterval = 1;
+    std::chrono::microseconds refreshinterval = 1us;
     if (m_display)
         refreshinterval = m_display->GetRefreshInterval(m_frameInterval);
 
@@ -796,10 +796,10 @@ bool MythPlayerUI::CanSupportDoubleRate()
     // Since interlaced is always at 25 or 30 fps, if the interval
     // is less than 30000 (33fps) it must be representing one
     // field and not one frame, so multiply by 2.
-    int realfi = m_frameInterval;
-    if (m_frameInterval < 30000)
+    std::chrono::microseconds realfi = m_frameInterval;
+    if (m_frameInterval < 30ms)
         realfi = m_frameInterval * 2;
-    return ((realfi / 2.0) > (refreshinterval * 0.995));
+    return (duration_cast<floatusecs>(realfi) / 2.0) > (duration_cast<floatusecs>(refreshinterval) * 0.995);
 }
 
 void MythPlayerUI::GetPlaybackData(InfoMap& Map)

@@ -31,7 +31,7 @@ class VideoOutputD3D : public MythVideoOutput
                       MythCodecID  av_codec_id,
                       bool        &aspect_only,
                       MythMultiLocker *Locks) override; // VideoOutput
-    void UpdatePauseFrame(int64_t &disp_timecode, FrameScanType Scan = kScan_Progressive) override; // VideoOutput
+    void UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, FrameScanType Scan = kScan_Progressive) override; // VideoOutput
     void EmbedInWidget(const QRect &rect) override; // VideoOutput
     void StopEmbedding(void) override; // VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,

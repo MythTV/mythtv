@@ -49,7 +49,7 @@ class MythDVDPlayer : public MythPlayerUI
     virtual void EventEnd(void);
     void     InitialSeek(void) override;
     void     AutoDeint(MythVideoFrame* Frame, MythVideoOutput* VideoOutput,
-                       int FrameInterval, bool AllowLock = true) override;
+                       std::chrono::microseconds FrameInterval, bool AllowLock = true) override;
     long long CalcMaxFFTime(long long FastFwd, bool Setjump = true) const override;
     bool     FastForward(float Seconds) override;
     bool     Rewind(float Seconds) override;

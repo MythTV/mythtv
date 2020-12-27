@@ -770,11 +770,11 @@ double MythDisplay::GetRefreshRate() const
     return m_refreshRate;
 }
 
-int MythDisplay::GetRefreshInterval(int Fallback) const
+std::chrono::microseconds MythDisplay::GetRefreshInterval(std::chrono::microseconds Fallback) const
 {
     if (m_refreshRate > 20.0 && m_refreshRate < 200.0)
-        return static_cast<int>(lround(1000000.0 / m_refreshRate));
-    if (Fallback > 33000) // ~30Hz
+        return microsecondsFromFloat(1000000.0 / m_refreshRate);
+    if (Fallback > 33ms) // ~30Hz
         Fallback /= 2;
     return Fallback;
 }

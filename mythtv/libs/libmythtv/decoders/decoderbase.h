@@ -181,7 +181,8 @@ class DecoderBase
 
     float GetVideoAspect(void) const { return m_currentAspect; }
 
-    virtual int64_t NormalizeVideoTimecode(int64_t timecode) { return timecode; }
+    virtual std::chrono::milliseconds NormalizeVideoTimecode(std::chrono::milliseconds timecode)
+        { return timecode; }
 
     virtual bool IsLastFrameKey(void) const = 0;
     virtual void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,

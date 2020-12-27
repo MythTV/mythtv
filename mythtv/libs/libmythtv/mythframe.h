@@ -7,6 +7,7 @@
 // MythTV
 #include "mythtvexp.h"
 #include "mythaverror.h"
+#include "mythchrono.h"
 
 // Std
 #include <array>
@@ -128,7 +129,7 @@ class MTV_PUBLIC MythVideoFrame
     long long      m_frameNumber       { 0 };
     uint64_t       m_frameCounter      { 0 };
     long long      m_timecode          { 0 };
-    int64_t        m_displayTimecode   { 0 };
+    std::chrono::milliseconds m_displayTimecode   { 0ms };
     std::array<uint8_t*,4> m_priv      { nullptr };
     int            m_interlaced        { 0    };
     bool           m_topFieldFirst     { true };

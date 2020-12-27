@@ -412,7 +412,7 @@ static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
     return  ((lsb - base_ts)&mask);
 }
 
-int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
+std::chrono::milliseconds AvFormatDecoder::NormalizeVideoTimecode(std::chrono::milliseconds timecode)
 {
     int64_t start_pts = 0;
 
@@ -427,7 +427,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
         }
     }
     if (!st)
-        return 0;
+        return 0ms;
 
     if (m_ic->start_time != AV_NOPTS_VALUE)
     {
@@ -436,18 +436,18 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
                                AV_TIME_BASE * (int64_t)st->time_base.num);
     }
 
-    int64_t pts = av_rescale(timecode / 1000.0,
+    int64_t pts = av_rescale(timecode.count() / 1000.0,
                      st->time_base.den,
                      st->time_base.num);
 
     // adjust for start time and wrap
     pts = lsb3full(pts, start_pts, st->pts_wrap_bits);
 
-    return (int64_t)(av_q2d(st->time_base) * pts * 1000);
+    return millisecondsFromFloat(av_q2d(st->time_base) * pts * 1000);
 }
 
-int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
-                                                int64_t timecode)
+std::chrono::milliseconds AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
+                                                std::chrono::milliseconds timecode)
 {
     int64_t start_pts = 0;
 
@@ -458,14 +458,14 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
     }
 
-    int64_t pts = av_rescale(timecode / 1000.0,
+    int64_t pts = av_rescale(timecode.count() / 1000.0,
                      st->time_base.den,
                      st->time_base.num);
 
     // adjust for start time and wrap
     pts = lsb3full(pts, start_pts, st->pts_wrap_bits);
 
-    return (int64_t)(av_q2d(st->time_base) * pts * 1000);
+    return millisecondsFromFloat(av_q2d(st->time_base) * pts * 1000);
 }
 
 int AvFormatDecoder::GetNumChapters()
@@ -3729,7 +3729,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     frame->m_topFieldFirst       = AvFrame->top_field_first != 0;
     frame->m_newGOP              = m_nextDecodedFrameIsKeyFrame;
     frame->m_repeatPic           = AvFrame->repeat_pict != 0;
-    frame->m_displayTimecode     = NormalizeVideoTimecode(Stream, temppts);
+    frame->m_displayTimecode     = NormalizeVideoTimecode(Stream, std::chrono::milliseconds(temppts));
     frame->m_frameNumber         = m_framesPlayed;
     frame->m_frameCounter        = m_frameCounter++;
     frame->m_aspect              = m_currentAspect;

@@ -159,8 +159,8 @@ class AvFormatDecoder : public DecoderBase
     void SetIdrOnlyKeyframes(bool value) override // DecoderBase
         { m_avcParser->use_I_forKeyframes(!value); }
 
-    int64_t NormalizeVideoTimecode(int64_t timecode) override; // DecoderBase
-    virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
+    std::chrono::milliseconds NormalizeVideoTimecode(std::chrono::milliseconds timecode) override; // DecoderBase
+    virtual std::chrono::milliseconds NormalizeVideoTimecode(AVStream *st, std::chrono::milliseconds timecode);
 
     int  GetTeletextDecoderType(void) const override; // DecoderBase
 
