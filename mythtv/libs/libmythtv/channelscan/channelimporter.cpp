@@ -1889,7 +1889,6 @@ ChannelImporter::QueryUserInsert(const QString &msg)
         }
     }
 
-    m_functorRetval = 0;    // Reset default menu choice to first item for next menu
     return action;
 }
 
@@ -1960,7 +1959,7 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
                 .toLatin1().constData() << std::endl;
         }
     }
-    m_functorRetval = 0;    // Reset default menu choice to first item for next menu
+
     return action;
 }
 
@@ -1968,7 +1967,6 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
     MythMainWindow *parent, const QString& title,
     const QString& message, QString &text)
 {
-    int dmc = m_functorRetval;      // Default menu choice
     m_functorRetval = -1;
     MythScreenStack *popupStack = parent->GetStack("popup stack");
     auto *popup = new MythDialogBox(title, message, popupStack,
@@ -1976,10 +1974,10 @@ OkCancelType ChannelImporter::ShowManualChannelPopup(
 
     if (popup->Create())
     {
-        popup->AddButton(QCoreApplication::translate("(Common)", "OK"), 0 == dmc);
-        popup->AddButton(tr("Edit"), 1 == dmc);
-        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"), 2 == dmc);
-        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"), 3 == dmc);
+        popup->AddButton(QCoreApplication::translate("(Common)", "OK"));
+        popup->AddButton(tr("Edit"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
         QObject::connect(popup, &MythDialogBox::Closed, this,
                          [this](const QString & /*resultId*/, int result)
                          {
@@ -2038,7 +2036,6 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
     MythMainWindow *parent, const QString& title,
     const QString& message, QString &text)
 {
-    int dmc = m_functorRetval;      // Default menu choice
     m_functorRetval = -1;
     MythScreenStack *popupStack = parent->GetStack("popup stack");
     auto *popup = new MythDialogBox(title, message, popupStack,
@@ -2046,11 +2043,11 @@ OkCancelType ChannelImporter::ShowResolveChannelPopup(
 
     if (popup->Create())
     {
-        popup->AddButton(QCoreApplication::translate("(Common)", "OK"), 0 == dmc);
-        popup->AddButton(QCoreApplication::translate("(Common)", "OK All"), 1 == dmc);
-        popup->AddButton(tr("Edit"), 2 == dmc);
-        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"), 3 == dmc);
-        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"), 4 == dmc);
+        popup->AddButton(QCoreApplication::translate("(Common)", "OK"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "OK All"));
+        popup->AddButton(tr("Edit"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel"));
+        popup->AddButton(QCoreApplication::translate("(Common)", "Cancel All"));
         QObject::connect(popup, &MythDialogBox::Closed, this,
                          [this](const QString & /*resultId*/, int result)
                          {
