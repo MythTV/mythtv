@@ -148,6 +148,7 @@ bool ExternalRecorder::Open(void)
         return true;
     }
 
+    Close();
     LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
     return false;
 }

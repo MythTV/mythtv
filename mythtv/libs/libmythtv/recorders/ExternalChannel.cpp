@@ -45,6 +45,7 @@ bool ExternalChannel::Open(void)
     if (!m_streamHandler || m_streamHandler->HasError())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
+        Close();
         return false;
     }
 

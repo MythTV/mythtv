@@ -36,6 +36,11 @@ ExternalRecChannelFetcher::ExternalRecChannelFetcher(int cardid,
     , m_command(std::move(cmd))
 {
     m_streamHandler = ExternalStreamHandler::Get(m_command, m_cardid, m_cardid);
+    if (!m_streamHandler || m_streamHandler->HasError())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
+        Close();
+    }
 }
 
 ExternalRecChannelFetcher::~ExternalRecChannelFetcher(void)

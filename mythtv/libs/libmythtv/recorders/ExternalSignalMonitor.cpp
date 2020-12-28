@@ -47,7 +47,11 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
                                                   m_channel->GetInputID(),
                                                   m_channel->GetMajorID());
     if (!m_streamHandler || m_streamHandler->HasError())
+    {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
+        if (m_streamHandler)
+            ExternalStreamHandler::Return(m_streamHandler, m_inputid);
+    }
     else
         m_lockTimeout = GetLockTimeout() * 1000;
 
@@ -63,7 +67,8 @@ ExternalSignalMonitor::~ExternalSignalMonitor()
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     ExternalSignalMonitor::Stop();
-    ExternalStreamHandler::Return(m_streamHandler, m_inputid);
+    if (m_streamHandler)
+        ExternalStreamHandler::Return(m_streamHandler, m_inputid);
 }
 
 /** \fn ExternalSignalMonitor::Stop(void)
