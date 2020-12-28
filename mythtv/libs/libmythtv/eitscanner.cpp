@@ -37,6 +37,7 @@ EITScanner::EITScanner(uint cardnum)
     QStringList langPref = iso639_get_language_list();
     m_eitHelper->SetLanguagePreferences(langPref);
 
+    LOG(VB_EIT, LOG_INFO, LOC_ID + "Start EIT thread");
     m_eventThread->start(QThread::IdlePriority);
 }
 
@@ -66,9 +67,6 @@ void EITScanner::TeardownAll(void)
  */
 void EITScanner::run(void)
 {
-    static constexpr std::array<const uint,5>  kSz { 2000, 1800, 1600, 1400, 1200, };
-    static constexpr std::array<const float,5> kRt { 0.0F, 0.2F, 0.4F, 0.6F, 0.8F, };
-
     m_lock.lock();
 
     MythTimer t;
@@ -79,19 +77,9 @@ void EITScanner::run(void)
         m_lock.unlock();
         uint list_size = m_eitHelper->GetListSize();
 
-        float rate = 1.0F;
-        for (uint i = 0; i < 5; i++)
-        {
-            if (list_size >= kSz[i])
-            {
-                rate = kRt[i];
-                break;
-            }
-        }
-
         m_lock.lock();
         if (m_eitSource)
-            m_eitSource->SetEITRate(rate);
+            m_eitSource->SetEITRate(1.0F);
         m_lock.unlock();
 
         if (list_size)
@@ -100,8 +88,7 @@ void EITScanner::run(void)
             t.start();
         }
 
-        // Tell the scheduler to run if
-        // we are in passive scan
+        // Tell the scheduler to run if we are in passive scan
         // and there have been updated events since the last scheduler run
         // but not in the last 60 seconds
         if (!m_activeScan && eitCount && (t.elapsed() > 60 * 1000))

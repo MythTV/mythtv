@@ -99,6 +99,7 @@ class EITHelper
 
     uint GetListSize(void) const;
     uint ProcessEvents(void);
+    bool EventQueueFull(void);
 
     uint GetGPSOffset(void) const { return (uint) (0 - m_gpsOffset); }
 

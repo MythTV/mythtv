@@ -13,12 +13,12 @@
 #include "premieretables.h"
 #include "dishdescriptors.h"
 #include "premieredescriptors.h"
-#include "channelutil.h"        // for ChannelUtil
+#include "channelutil.h"
 #include "mythdate.h"
 #include "programdata.h"
-#include "programinfo.h" // for subtitle types and audio and video properties
+#include "programinfo.h"        // for subtitle types and audio and video properties
 #include "scheduledrecording.h" // for ScheduledRecording
-#include "compat.h" // for gmtime_r on windows.
+#include "compat.h"             // for gmtime_r on windows.
 
 const uint EITHelper::kChunkSize = 20;
 EITCache *EITHelper::s_eitCache = new EITCache();
@@ -54,6 +54,14 @@ uint EITHelper::GetListSize(void) const
 {
     QMutexLocker locker(&m_eitListLock);
     return m_dbEvents.size();
+}
+
+bool EITHelper::EventQueueFull(void)
+{
+    const uint kMaxSize = 2000;
+    uint listsize = GetListSize();
+    bool full = listsize > kMaxSize;
+    return full;
 }
 
 /** \fn EITHelper::ProcessEvents(void)
@@ -310,6 +318,10 @@ static inline void parse_dvb_component_descriptors(const desc_list_t& list,
 
 void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 {
+    // Discard event if incoming event queue full
+    if (EventQueueFull())
+        return;
+
     uint chanid = 0;
     if ((eit->TableID() == TableID::PF_EIT) ||
         ((eit->TableID() >= TableID::SC_EITbeg) && (eit->TableID() <= TableID::SC_EITend)))
@@ -622,6 +634,10 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
 // for the option channels Premiere Sport and Premiere Direkt
 void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
 {
+    // Discard event if incoming event queue full
+    if (EventQueueFull())
+        return;
+
     // set fixup for Premiere
     FixupValue fix = m_fixup.value(133 << 16);
     fix |= EITFixUp::kFixGenericDVB;
@@ -755,6 +771,10 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
                               const ATSCEvent &event,
                               const QString   &ett)
 {
+    // Discard event if incoming event queue full
+    if (EventQueueFull())
+        return;
+
     uint chanid = GetChanID(atsc_major, atsc_minor);
     if (!chanid)
         return;
@@ -780,9 +800,9 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     QString title = event.m_title;
     const QString& subtitle = ett;
     m_dbEvents.enqueue(new DBEventEIT(chanid, title, subtitle,
-                                     starttime, endtime,
-                                     m_fixup.value(atsc_key), subtitle_type,
-                                     audio_properties, video_properties));
+                                      starttime, endtime,
+                                      m_fixup.value(atsc_key), subtitle_type,
+                                      audio_properties, video_properties));
 }
 
 uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
