@@ -66,10 +66,9 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
     if (ok)
         return true;
 
-    // try to find a valid channel if given start channel fails.
-    QString msg1 = QString("Setting start channel '%1' failed, ")
-        .arg(startchannel);
-    QString msg2 = "and we failed to find any suitable channels on any input.";
+    // Try to find a valid channel if given start channel fails.
+    QString msg1 = QString("Setting start channel '%1' failed ").arg(startchannel);
+    QString msg2 = "and no suitable channel found.";
     bool msg_error = true;
 
     // Attempt to find the requested startchannel
@@ -108,17 +107,14 @@ bool ChannelBase::Init(QString &startchannel, bool setchan)
 
             if (ok)
             {
-                if (mplexid_restriction || chanid_restriction)
-                    startchannel = (*cit).m_chanNum;
-                msg2 = QString("selected to '%1' instead.")
-                    .arg(startchannel);
+                startchannel = (*cit).m_chanNum;
+                msg2 = QString("selected '%1' instead.").arg(startchannel);
                 msg_error = false;
             }
         }
     }
 
-    LOG(VB_GENERAL, ((msg_error) ? LOG_ERR : LOG_WARNING), LOC +
-        msg1 + "\n\t\t\t" + msg2);
+    LOG(VB_GENERAL, ((msg_error) ? LOG_ERR : LOG_WARNING), LOC + msg1 + msg2);
 
     return ok;
 }

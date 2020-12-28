@@ -1964,8 +1964,7 @@ bool ChannelUtil::GetChannelData(
     if (!chanid)
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("GetChannelData() failed because it could not\n"
-                    "\t\t\tfind channel number '%1' in DB for source '%2'.")
+            QString("Could not find channel '%1' in DB for source '%2'.")
                 .arg(channum).arg(sourceid));
         return false;
     }
