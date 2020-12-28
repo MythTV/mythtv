@@ -4899,7 +4899,7 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
         "       channel.commmethod                      " // 25
         "FROM record "
         "LEFT JOIN channel ON channel.callsign = record.station "
-        "WHERE deleted IS NULL "
+        "                     AND deleted IS NULL "
         "GROUP BY recordid "
         "ORDER BY %1 %2");
 
