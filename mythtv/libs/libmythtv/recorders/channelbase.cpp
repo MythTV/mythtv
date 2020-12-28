@@ -817,6 +817,7 @@ ChannelBase *ChannelBase::CreateChannel(
         if (channel &&
             ((genOpt.m_inputType == "DVB" && dvbOpt.m_dvbOnDemand) ||
              genOpt.m_inputType == "HDHOMERUN" ||
+             genOpt.m_inputType == "EXTERNAL" ||
              CardUtil::IsV4L(genOpt.m_inputType)))
         {
             channel->Close();

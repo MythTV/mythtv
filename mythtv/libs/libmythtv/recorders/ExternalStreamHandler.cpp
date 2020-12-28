@@ -466,16 +466,18 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
         s_handlersRefCnt[majorid] = 1;
 
         LOG(VB_RECORD, LOG_INFO,
-            QString("ExternSH[%1]: Creating new stream handler %2 for %3")
+            QString("ExternSH[%1:%2]: Creating new stream handler for %3 "
+                    "(1 in use)")
             .arg(inputid).arg(majorid).arg(devname));
     }
     else
     {
-        s_handlersRefCnt[majorid]++;
+        ++s_handlersRefCnt[majorid];
         uint rcount = s_handlersRefCnt[majorid];
         LOG(VB_RECORD, LOG_INFO,
-            QString("ExternSH[%1]: Using existing stream handler for %2")
-            .arg(inputid).arg(majorid) + QString(" (%1 in use)").arg(rcount));
+            QString("ExternSH[%1:%2]: Using existing stream handler for %3")
+            .arg(inputid).arg(majorid).arg(devname) +
+            QString(" (%1 in use)").arg(rcount));
     }
 
     return s_handlers[majorid];
@@ -495,19 +497,22 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     QMap<int, ExternalStreamHandler*>::iterator it =
         s_handlers.find(majorid);
 
-    LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Return %2 in use %3")
-        .arg(inputid).arg(majorid).arg(*rit));
-
     if (*rit > 1)
     {
         ref = nullptr;
         --(*rit);
+
+        LOG(VB_RECORD, LOG_INFO,
+            QString("ExternSH[%1:%2]: Return handler (%3 still in use)")
+            .arg(inputid).arg(majorid).arg(*rit));
+
         return;
     }
 
     if ((it != s_handlers.end()) && (*it == ref))
     {
-        LOG(VB_RECORD, LOG_INFO, QString("ExternSH[%1]: Closing handler for %2")
+        LOG(VB_RECORD, LOG_INFO,
+            QString("ExternSH[%1:%2]: Closing handler (0 in use)")
             .arg(inputid).arg(majorid));
         delete *it;
         s_handlers.erase(it);
@@ -515,7 +520,7 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("ExternSH[%1]: Error: Couldn't find handler for %2")
+            QString("ExternSH[%1:%2]: Error: No handler to return!")
             .arg(inputid).arg(majorid));
     }
 

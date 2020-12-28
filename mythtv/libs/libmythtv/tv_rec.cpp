@@ -1168,6 +1168,7 @@ void TVRec::CloseChannel(void)
          m_genOpt.m_inputType == "FREEBOX" ||
          m_genOpt.m_inputType == "VBOX" ||
          m_genOpt.m_inputType == "HDHOMERUN" ||
+         m_genOpt.m_inputType == "EXTERNAL" ||
          CardUtil::IsV4L(m_genOpt.m_inputType)))
     {
         m_channel->Close();
