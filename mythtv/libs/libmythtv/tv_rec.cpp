@@ -1686,11 +1686,11 @@ bool TVRec::GetDevices(uint inputid,
     gen_opts.m_signalTimeout  = (uint) std::max(query.value(6).toInt(), 0);
     gen_opts.m_channelTimeout = (uint) std::max(query.value(7).toInt(), 0);
 
-    // We should have at least 100 ms to acquire tables...
+    // We should have at least 1000 ms to acquire tables...
     int table_timeout = ((int)gen_opts.m_channelTimeout -
                          (int)gen_opts.m_signalTimeout);
-    if (table_timeout < 100)
-        gen_opts.m_channelTimeout = gen_opts.m_signalTimeout + 2500;
+    if (table_timeout < 1000)
+        gen_opts.m_channelTimeout = gen_opts.m_signalTimeout + 1000;
 
     gen_opts.m_waitForSeqstart = query.value(8).toBool();
 
