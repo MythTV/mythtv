@@ -56,7 +56,7 @@ static bool is_dishnet_eit(uint inputid);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
 static void apply_broken_dvb_driver_crc_hack(ChannelBase* /*c*/, MPEGStreamData* /*s*/);
-static int eit_start_rand(int eitTransportTimeout);
+static int eit_start_rand(uint inputId, int eitTransportTimeout);
 
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
@@ -1023,7 +1023,7 @@ void TVRec::HandleStateChange(void)
         m_scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
         m_eitScanStartTime = MythDate::current().addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_eitTransportTimeout));
+            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
     }
 
     // Handle different state transitions
@@ -1068,7 +1068,7 @@ void TVRec::HandleStateChange(void)
     if (m_scanner && (m_internalState == kState_None))
     {
         m_eitScanStartTime = m_eitScanStartTime.addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_eitTransportTimeout));
+            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
     }
     else
     {
@@ -1251,15 +1251,17 @@ static int num_inputs(void)
     return -1;
 }
 
-static int eit_start_rand(int eitTransportTimeout)
+static int eit_start_rand(uint inputId, int eitTransportTimeout)
 {
-    // randomize start time a bit
-    int timeout = static_cast<int>(MythRandom()) % (eitTransportTimeout / 3);
-    // get the number of inputs and the position of the current input
-    // to distribute the the scan start evenly over eitTransportTimeout
+    // Randomize start time a bit
+    int timeout = static_cast<int>(MythRandom() % (eitTransportTimeout / 3));
+
+    // Get the number of inputs and the position of the current input
+    // to distribute the scan start evenly over eitTransportTimeout
     int no_inputs = num_inputs();
     if (no_inputs > 0)
-        timeout += eitTransportTimeout / no_inputs;
+        timeout += eitTransportTimeout * inputId / no_inputs;
+
     return timeout;
 }
 
@@ -1271,18 +1273,19 @@ void TVRec::run(void)
     ClearFlags(kFlagExitPlayer | kFlagFinishRecording, __FILE__, __LINE__);
 
     m_eitScanStartTime = MythDate::current();
-    // check whether we should use the EITScanner in this TVRec instance
-    if (CardUtil::IsEITCapable(m_genOpt.m_inputType) &&
-        (!GetDTVChannel() || GetDTVChannel()->IsMaster()) &&
-        (m_dvbOpt.m_dvbEitScan || get_use_eit(m_inputId)))
+
+    // Check whether we should use the EITScanner in this TVRec instance
+    if (CardUtil::IsEITCapable(m_genOpt.m_inputType) &&         // Card type capable of receiving EIT?
+        (!GetDTVChannel() || GetDTVChannel()->IsMaster()) &&    // Card is master and not a multirec instance
+        (m_dvbOpt.m_dvbEitScan || get_use_eit(m_inputId)))      // EIT is selected for card OR EIT is selected for video source
     {
         m_scanner = new EITScanner(m_inputId);
         m_eitScanStartTime = m_eitScanStartTime.addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_eitTransportTimeout));
+            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
     }
     else
     {
-        m_eitScanStartTime = m_eitScanStartTime.addYears(1);
+        m_eitScanStartTime = m_eitScanStartTime.addYears(10);
     }
 
     while (HasFlags(kFlagRunMainLoop))
@@ -1429,13 +1432,13 @@ void TVRec::run(void)
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
                     "EIT scanning disabled for this input.");
-                m_eitScanStartTime = m_eitScanStartTime.addYears(1);
+                m_eitScanStartTime = m_eitScanStartTime.addYears(10);
             }
             else if (!get_use_eit(GetInputId()))
             {
                 LOG(VB_EIT, LOG_INFO, LOC +
-                    "EIT scanning disabled for all sources on this input.");
-                m_eitScanStartTime = m_eitScanStartTime.addYears(1);
+                    "EIT scanning disabled for all channels on this input.");
+                m_eitScanStartTime = m_eitScanStartTime.addYears(10);
             }
             else
             {
@@ -3578,7 +3581,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         m_scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
         m_eitScanStartTime = MythDate::current().addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_eitTransportTimeout));
+            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
     }
 
     if (m_scanner && !request.IsOnSameMultiplex())
