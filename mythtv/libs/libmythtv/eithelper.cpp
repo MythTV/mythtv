@@ -56,7 +56,7 @@ uint EITHelper::GetListSize(void) const
     return m_dbEvents.size();
 }
 
-bool EITHelper::EventQueueFull(void)
+bool EITHelper::EventQueueFull(void) const
 {
     const uint kMaxSize = 2000;
     uint listsize = GetListSize();
