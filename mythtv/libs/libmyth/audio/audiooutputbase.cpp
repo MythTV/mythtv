@@ -989,7 +989,7 @@ inline int AudioOutputBase::audiolen() const
 int AudioOutputBase::audiofree() const
 {
     return kAudioRingBufferSize - audiolen() - 1;
-    /* There is one wasted byte in the buffer. The case where waud = raud is
+    /* There is one wasted byte in the buffer. The case where m_waud = m_raud is
        interpreted as an empty buffer, so the fullest the buffer can ever
        be is kAudioRingBufferSize - 1. */
 }
@@ -1029,17 +1029,17 @@ int64_t AudioOutputBase::GetAudiotime(void)
     else
         obpf = static_cast<int64_t>(m_outputBytesPerFrame) * 80;
 
-    /* We want to calculate 'audiotime', which is the timestamp of the audio
+    /* We want to calculate 'm_audioTime', which is the timestamp of the audio
        Which is leaving the sound card at this instant.
 
        We use these variables:
 
-       'effdsp' is 100 * frames/sec
+       'm_effDsp' is 100 * frames/sec
 
-       'audbuf_timecode' is the timecode in milliseconds of the
+       'm_audbufTimecode' is the timecode in milliseconds of the
        audio that has just been written into the buffer.
 
-       'eff_stretchfactor' is stretch factor * 100,000
+       'm_effStretchFactor' is stretch factor * 100,000
 
        'totalbuffer' is the total # of bytes in our audio buffer, and the
        sound card's buffer. */
