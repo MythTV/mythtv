@@ -1954,16 +1954,21 @@ void EITFixUp::FixFI(DBEventEIT &event) const
     }
 
     // Remove age limit in parenthesis at end of title
-    position = event.m_title.indexOf(m_fiAgeLimit);
+    position = m_fiAgeLimit.indexIn(event.m_title);
     if (position != -1)
     {
-        event.m_title = event.m_title.replace(m_fiAgeLimit, "");
+        EventRating prograting;
+        prograting.m_system="FI"; prograting.m_rating = m_fiAgeLimit.cap(1);
+        event.m_ratings.push_back(prograting);
+        event.m_title.remove(position, m_fiAgeLimit.matchedLength());
     }
 
     // Remove Film or Elokuva at start of title
     position = event.m_title.indexOf(m_fiFilm);
     if (position != -1)
     {
+        event.m_category = "Film";
+        event.m_categoryType = ProgramInfo::kCategoryMovie;
         event.m_title = event.m_title.replace(m_fiFilm, "");
     }
 
