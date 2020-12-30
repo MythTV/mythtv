@@ -68,6 +68,8 @@ int64_t DVBChannel::s_lastTuning = QDateTime::currentMSecsSinceEpoch();
 
 #define LOC QString("DVBChan[%1](%2): ").arg(m_inputId).arg(DVBChannel::GetDevice())
 
+#define DTV_STAT_FULL_DEBUG 0       // All DTV_STAT_xxx values
+
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
  *
@@ -242,9 +244,12 @@ bool DVBChannel::Open(DVBChannel *who)
         m_fdFrontend = open(devn.constData(), O_RDWR | O_NONBLOCK);
         if (m_fdFrontend >= 0)
             break;
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            "Opening DVB frontend device failed." + ENO);
-        if (tries >= 20 || (errno != EBUSY && errno != EAGAIN))
+        if (tries == 1)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC +
+                "Opening DVB frontend device failed." + ENO);
+        }
+        if (tries >= 5 || (errno != EBUSY && errno != EAGAIN))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Failed to open DVB frontend device due to "
@@ -1199,12 +1204,14 @@ double DVBChannel::GetSignalStrengthDVBv5(bool *ok) const
     }
     else
     {
+#if DTV_STAT_FULL_DEBUG
         LOG(VB_CHANNEL, LOG_DEBUG, LOC + "DTV_STAT_SIGNAL_STRENGTH " +
             QString("res=%1 len=%2 scale=%3 val=%4")
             .arg(cmd.props->result)
             .arg(cmd.props->u.st.len)
             .arg(cmd.props->u.st.stat[0].scale)
             .arg(cmd.props->u.st.stat[0].svalue));
+#endif
     }
 
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
@@ -1287,12 +1294,14 @@ double DVBChannel::GetSNRDVBv5(bool *ok) const
     }
     else
     {
+#if DTV_STAT_FULL_DEBUG
         LOG(VB_CHANNEL, LOG_DEBUG, LOC + "DTV_STAT_CNR " +
             QString("res=%1 len=%2 scale=%3 val=%4")
             .arg(cmd.props->result)
             .arg(cmd.props->u.st.len)
             .arg(cmd.props->u.st.stat[0].scale)
             .arg(cmd.props->u.st.stat[0].svalue));
+#endif
     }
 
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
@@ -1371,6 +1380,7 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
     }
     else
     {
+#if DTV_STAT_FULL_DEBUG
         LOG(VB_CHANNEL, LOG_DEBUG, LOC + "DTV_STAT_POST_ERROR_BIT_COUNT " +
             QString("res=%1 len=%2 scale=%3 val=%4 res=%5 len=%6 scale=%7 val=%8")
             .arg(cmd.props[0].result)
@@ -1381,6 +1391,7 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
             .arg(cmd.props[1].u.st.len)
             .arg(cmd.props[1].u.st.stat[0].scale)
             .arg(cmd.props[1].u.st.stat[0].uvalue));
+#endif
     }
 
     bool tmpOk = (ret == 0) &&
@@ -1449,12 +1460,14 @@ double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
     }
     else
     {
+#if DTV_STAT_FULL_DEBUG
         LOG(VB_CHANNEL, LOG_DEBUG, LOC + "DTV_STAT_ERROR_BLOCK_COUNT " +
             QString("res=%1 len=%2 scale=%3 val=%4")
             .arg(cmd.props[0].result)
             .arg(cmd.props[0].u.st.len)
             .arg(cmd.props[0].u.st.stat[0].scale)
             .arg(cmd.props[0].u.st.stat[0].svalue));
+#endif
     }
 
     bool tmpOk = (ret == 0) && (cmd.props->u.st.len > 0);
