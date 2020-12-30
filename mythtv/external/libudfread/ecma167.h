@@ -99,7 +99,7 @@ enum tag_identifier {
     ECMA_FileEntry                            = 261,
     ECMA_ExtendedFileEntry                    = 266,
 
-    ECMA_TAG_NONE                             = -1,
+    ECMA_TAG_INVALID                          = -1,  /* checksum failed */
 };
 
 enum tag_identifier decode_descriptor_tag(const uint8_t *buf);

@@ -34,6 +34,15 @@ extern "C" {
  * external API header
  */
 
+/*
+ * NOTE:
+ *
+ * UDF filesystem file identifiers may contain nul bytes (0x00).
+ *
+ * In libudfread API file and directory names are encoded as Modified UTF-8 (MUTF-8).
+ * The null character (U+0000) uses two-byte overlong encoding 11000000 10000000
+ * (hexadecimal C0 80) instead of 00000000 (hexadecimal 00).
+ */
 
 /*
  * UDF volume access
@@ -80,7 +89,7 @@ void udfread_close (udfread *);
  *  Get UDF Volume Identifier
  *
  * @param p  udfread object
- * @return Volume ID as null-terminated UTF-8 string, NULL if error
+ * @return Volume ID as null-terminated MUTF-8 string, NULL if error. Returned pointer is valid until udfread_close().
  */
 const char *udfread_get_volume_id (udfread *);
 
@@ -109,7 +118,7 @@ enum {
 /* Directory stream entry */
 struct udfread_dirent {
     unsigned int  d_type;    /* UDF_DT_* */
-    const char   *d_name;    /* UTF-8 */
+    const char   *d_name;    /* MUTF-8 */
 };
 
 /* opaque handle for directory stream */
@@ -119,10 +128,21 @@ typedef struct udfread_dir UDFDIR;
  *  Open directory stream
  *
  * @param p  udfread object
- * @param path  path to the directory
- * @return directory stream on the directory, or NULL if it could not be opened.
+ * @param path  path to the directory (MUTF-8)
+ * @return directory stream handle on the directory, or NULL if it could not be opened.
  */
 UDFDIR *udfread_opendir (udfread *, const char *path);
+
+/**
+ *  Open directory stream
+ *
+ *  Directory name may contain special chars (/, \, ...).
+ *
+ * @param dir  parent directory stream handle
+ * @param name  name of the directory to open from dir (MUTF-8)
+ * @return directory stream handle on the directory, or NULL if it could not be opened.
+ */
+UDFDIR *udfread_opendir_at(UDFDIR *dir, const char *name);
 
 /**
  *  Read directory stream
@@ -177,10 +197,21 @@ typedef struct udfread_file UDFFILE;
  *  Path may not contain "." or ".." directory components.
  *
  * @param p  udfread object
- * @param path  path to the file
+ * @param path  path to the file (MUTF-8)
  * @return file object, or NULL if it could not be opened.
  */
 UDFFILE *udfread_file_open (udfread *, const char *path);
+
+/**
+ *  Open a file from directory
+ *
+ *  File name may contain special chars (/, \, ...).
+ *
+ * @param dir  parent directory stream handle
+ * @param name  name of the file (MUTF-8)
+ * @return file object, or NULL if it could not be opened.
+ */
+UDFFILE *udfread_file_openat (UDFDIR *dir, const char *name);
 
 /**
  *  Close file object

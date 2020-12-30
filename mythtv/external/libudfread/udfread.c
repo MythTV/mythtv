@@ -140,9 +140,16 @@ static void *_safe_realloc(void *p, size_t s)
  * Decoding
  */
 
-#define utf16lo_to_utf8(out, out_pos, out_size, ch) \
+/*
+ * outputs Modified UTF-8 (MUTF-8).
+ * The null character (U+0000) uses the two-byte overlong encoding 11000000 10000000 (hexadecimal C0 80), instead of 00000000 (hexadecimal 00).
+ *
+ * - not strictly UTF-8 compilant, but works with C str*() functions and Java, while \0 bytes in middle of strings won't.
+ */
+
+#define utf16lo_to_mutf8(out, out_pos, out_size, ch)    \
   do {                                              \
-    if (ch < 0x80) {                                \
+    if (ch != 0 && ch < 0x80) {                     \
       out[out_pos++] = (uint8_t)ch;                 \
     } else {                                        \
       out_size++;                                   \
@@ -154,10 +161,10 @@ static void *_safe_realloc(void *p, size_t s)
     }                                               \
   } while (0)
 
-#define utf16_to_utf8(out, out_pos, out_size, ch)       \
+#define utf16_to_mutf8(out, out_pos, out_size, ch)      \
   do {                                                  \
     if (ch < 0x7ff) {                                   \
-      utf16lo_to_utf8(out, out_pos, out_size, ch);      \
+      utf16lo_to_mutf8(out, out_pos, out_size, ch);     \
     } else {                                            \
       out_size += 2;                                    \
       out = (uint8_t *)_safe_realloc(out, out_size);    \
@@ -171,7 +178,7 @@ static void *_safe_realloc(void *p, size_t s)
   } while (0)
 
 /* Strings, CS0 (UDF 2.1.1) */
-static char *_cs0_to_utf8(const uint8_t *cs0, size_t size)
+static char *_cs0_to_mutf8(const uint8_t *cs0, size_t size)
 {
     size_t   out_pos = 0;
     size_t   out_size = size;
@@ -193,13 +200,13 @@ static char *_cs0_to_utf8(const uint8_t *cs0, size_t size)
     case 8:
         /*udf_trace("string in utf-8\n");*/
         for (i = 1; i < size; i++) {
-            utf16lo_to_utf8(out, out_pos, out_size, cs0[i]);
+            utf16lo_to_mutf8(out, out_pos, out_size, cs0[i]);
         }
         break;
     case 16:
         for (i = 1; i < size - 1; i+=2) {
             uint16_t ch = cs0[i + 1] | (cs0[i] << 8);
-            utf16_to_utf8(out, out_pos, out_size, ch);
+            utf16_to_mutf8(out, out_pos, out_size, ch);
         }
         break;
     default:
@@ -666,8 +673,8 @@ static int _parse_udf_partition_maps(udfread_block_input *input,
  */
 
 struct udf_file_identifier {
-    char           *filename;
-    struct long_ad  icb;
+    char           *filename;       /* MUTF-8 */
+    struct long_ad  icb;            /* location of file entry */
     uint8_t         characteristic; /* CHAR_FLAG_* */
 };
 
@@ -954,7 +961,7 @@ static int _parse_dir(const uint8_t *data, uint32_t length, struct udf_dir *dir)
 
         dir->files[dir->num_entries].characteristic = fid.characteristic;
         dir->files[dir->num_entries].icb = fid.icb;
-        dir->files[dir->num_entries].filename = _cs0_to_utf8(fid.filename, fid.filename_len);
+        dir->files[dir->num_entries].filename = _cs0_to_mutf8(fid.filename, fid.filename_len);
 
         if (!dir->files[dir->num_entries].filename) {
             continue;
@@ -1128,7 +1135,7 @@ static int _scan_dir(const struct udf_dir *dir, const char *filename, uint32_t *
 }
 
 static int _find_file(udfread *udf, const char *path,
-                      const struct udf_dir **p_dir,
+                      struct udf_dir **p_dir,
                       const struct udf_file_identifier **p_fid)
 {
     const struct udf_file_identifier *fid = NULL;
@@ -1222,10 +1229,12 @@ int udfread_open_input(udfread *udf, udfread_block_input *input/*, int partition
     }
 
     /* Volume Identifier. CS0, UDF 2.1.1 */
-    udf->volume_identifier = _cs0_to_utf8(vds.pvd.volume_identifier, vds.pvd.volume_identifier_length);
+    udf->volume_identifier = _cs0_to_mutf8(vds.pvd.volume_identifier, vds.pvd.volume_identifier_length);
+    if (udf->volume_identifier) {
+        udf_log("Volume Identifier: %s\n", udf->volume_identifier);
+    }
 
     memcpy(udf->volume_set_identifier, vds.pvd.volume_set_identifier, 128);
-    udf_log("Volume Identifier: %s\n", udf->volume_identifier);
 
     /* map partitions */
     if (_parse_udf_partition_maps(input, &udf->part, &vds) < 0) {
@@ -1307,14 +1316,31 @@ size_t udfread_get_volume_set_id (udfread *udf, void *buffer, size_t size)
  */
 
 struct udfread_dir {
-    const struct udf_dir *dir;
+    udfread              *udf;
+    struct udf_dir       *dir;
     uint32_t              current_file;
 };
 
+static UDFDIR *_new_udfdir(udfread *udf, struct udf_dir *dir)
+{
+    UDFDIR *result;
+
+    if (!dir) {
+        return NULL;
+    }
+
+    result = (UDFDIR *)calloc(1, sizeof(UDFDIR));
+    if (result) {
+        result->dir = dir;
+        result->udf = udf;
+    }
+
+    return result;
+}
+
 UDFDIR *udfread_opendir(udfread *udf, const char *path)
 {
-    const struct udf_dir *dir = NULL;
-    UDFDIR *result;
+    struct udf_dir *dir = NULL;
 
     if (!udf || !udf->input || !path) {
         return NULL;
@@ -1324,16 +1350,26 @@ UDFDIR *udfread_opendir(udfread *udf, const char *path)
         return NULL;
     }
 
-    if (!dir) {
+    return _new_udfdir(udf, dir);
+}
+
+UDFDIR *udfread_opendir_at(UDFDIR *p, const char *name)
+{
+    struct udf_dir *dir = NULL;
+    uint32_t index;
+
+    if (!p || !name) {
         return NULL;
     }
 
-    result = (UDFDIR *)calloc(1, sizeof(UDFDIR));
-    if (result) {
-        result->dir = dir;
+    if (_scan_dir(p->dir, name, &index) < 0) {
+        udf_log("udfread_opendir_at: entry %s not found\n", name);
+        return NULL;
     }
 
-    return result;
+    dir = _read_subdir(p->udf, p->dir, index);
+
+    return _new_udfdir(p->udf, dir);
 }
 
 struct udfread_dirent *udfread_readdir(UDFDIR *p, struct udfread_dirent *entry)
@@ -1395,19 +1431,10 @@ struct udfread_file {
     void       *block_mem;
 };
 
-UDFFILE *udfread_file_open(udfread *udf, const char *path)
+static UDFFILE *_file_open(udfread *udf, const char *path, const struct udf_file_identifier *fi)
 {
-    const struct udf_file_identifier *fi = NULL;
     struct file_entry *fe;
     UDFFILE *result;
-
-    if (!udf || !udf->input || !path) {
-        return NULL;
-    }
-
-    if (_find_file(udf, path, NULL, &fi) < 0) {
-        return NULL;
-    }
 
     if (fi->characteristic & CHAR_FLAG_DIR) {
         udf_log("error opening file %s (is directory)\n", path);
@@ -1430,6 +1457,37 @@ UDFFILE *udfread_file_open(udfread *udf, const char *path)
     result->fe  = fe;
 
     return result;
+}
+
+UDFFILE *udfread_file_open(udfread *udf, const char *path)
+{
+    const struct udf_file_identifier *fi = NULL;
+
+    if (!udf || !udf->input || !path) {
+        return NULL;
+    }
+
+    if (_find_file(udf, path, NULL, &fi) < 0) {
+        return NULL;
+    }
+
+    return _file_open(udf, path, fi);
+}
+
+UDFFILE *udfread_file_openat(UDFDIR *dir, const char *name)
+{
+    uint32_t index;
+
+    if (!dir || !name) {
+        return NULL;
+    }
+
+    if (_scan_dir(dir->dir, name, &index) < 0) {
+        udf_log("udfread_file_openat: entry %s not found\n", name);
+        return NULL;
+    }
+
+    return _file_open(dir->udf, name, &dir->dir->files[index]);
 }
 
 int64_t udfread_file_size(UDFFILE *p)

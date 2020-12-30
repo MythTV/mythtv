@@ -92,7 +92,7 @@ enum tag_identifier decode_descriptor_tag(const uint8_t *buf)
   }
 
   if (checksum != buf[4]) {
-      return ECMA_TAG_NONE;
+      return ECMA_TAG_INVALID;
   }
 
   return (enum tag_identifier)id;
@@ -174,7 +174,7 @@ size_t decode_file_identifier(const uint8_t *p, size_t size, struct file_identif
     size_t l_iu; /* length of implementation use field */
 
     if (size < 38) {
-        ecma_error("not enough data\n");
+        ecma_error("decode_file_identifier: not enough data\n");
         return 0;
     }
 
@@ -185,7 +185,7 @@ size_t decode_file_identifier(const uint8_t *p, size_t size, struct file_identif
     l_iu = _get_u16(p + 36);
 
     if (size < 38 + l_iu + fi->filename_len) {
-        ecma_error("not enough data\n");
+        ecma_error("decode_file_identifier: not enough data\n");
         return 0;
     }
 
@@ -285,14 +285,15 @@ static struct file_entry *_decode_file_entry(const uint8_t *p, size_t size,
     int                content_inline = 0;
 
     if (p_ad + l_ad > size) {
-        ecma_error("not enough data in file entry\n");
+        ecma_error("decode_file_entry: not enough data\n");
         return NULL;
     }
 
     _decode_icb_tag(p + 16, &tag);
     if (tag.strategy_type != 4) {
         /* UDF (2.): only ICB strategy types 4 and 4096 shall be recorded */
-        ecma_error("unsupported icb strategy type %d\n", tag.strategy_type);
+        ecma_error("decode_file_entry: unsupported icb strategy type %d\n",
+                   tag.strategy_type);
         return NULL;
     }
 
@@ -305,7 +306,7 @@ static struct file_entry *_decode_file_entry(const uint8_t *p, size_t size,
             content_inline = 1;
             break;
         default:
-            ecma_error("unsupported icb flags: 0x%x\n", tag.flags);
+            ecma_error("decode_file_entry: unsupported icb flags: 0x%x\n", tag.flags);
             return NULL;
     }
 
@@ -401,7 +402,7 @@ struct file_entry *decode_ext_file_entry(const uint8_t *p, size_t size, uint16_t
 
     /* check for integer overflow */
     if ((uint64_t)l_ea + (uint64_t)l_ad + (uint64_t)216 >= (uint64_t)1<<32) {
-        ecma_error("invalid file entry\n");
+        ecma_error("invalid extended file entry\n");
         return NULL;
     }
 
