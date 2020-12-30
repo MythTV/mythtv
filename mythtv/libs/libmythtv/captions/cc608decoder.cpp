@@ -540,7 +540,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     m_lastTc[field] = tc;
 }
 
-int CC608Decoder::FalseDup(int tc, int field, int data)
+bool CC608Decoder::FalseDup(int tc, int field, int data)
 {
     int b1 = data & 0x7f;
     int b2 = (data >> 8) & 0x7f;
@@ -554,9 +554,9 @@ int CC608Decoder::FalseDup(int tc, int field, int data)
             ((b1 & 0x70) == 0x10))
         {
             m_lastCode[field] = -1;
-            return 1;
+            return true;
         }
-        return 0;
+        return false;
     }
 
     // bttv-0.9 VBI reads are pretty reliable (1 read/33367us).
@@ -591,19 +591,19 @@ int CC608Decoder::FalseDup(int tc, int field, int data)
         if ((b1 & 0x70) == 0x10)
         {
             if (tc > (m_lastCodeTc[field] + 67 + dup_ctrl_fudge))
-                return 0;
+                return false;
         }
         else if (b1)
         {
             // text, XDS
             if (tc > (m_lastCodeTc[field] + 33 + dup_text_fudge))
-                return 0;
+                return false;
         }
 
-        return 1;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 void CC608Decoder::ResetCC(int mode)

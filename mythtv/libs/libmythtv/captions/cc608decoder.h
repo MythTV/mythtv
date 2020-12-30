@@ -52,7 +52,7 @@ class CC608Decoder
 
     void FormatCC(int tc, int code1, int code2);
     void FormatCCField(int tc, int field, int data);
-    int FalseDup(int tc, int field, int data);
+    bool FalseDup(int tc, int field, int data);
 
     void DecodeVPS(const unsigned char *buf);
     void DecodeWSS(const unsigned char *buf);

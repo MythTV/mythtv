@@ -74,6 +74,8 @@ class CC608StateTracker
 
 class MythPlayer;
 
+using CC608WriteFn = void (*) (void *, unsigned char *, int, int, int);
+
 class MTV_PUBLIC CC608Reader : public CC608Input
 {
   public:
@@ -89,9 +91,7 @@ class MTV_PUBLIC CC608Reader : public CC608Input
     void ClearBuffers(bool input, bool output, int outputStreamIdx = -1);
     void AddTextData(unsigned char *buf, int len,
                      int64_t timecode, char type) override; // CC608Input
-    void TranscodeWriteText(void (*func)
-                           (void *, unsigned char *, int, int, int),
-                            void * ptr);
+    void TranscodeWriteText(CC608WriteFn func, void * ptr);
 
   private:
     int Update(unsigned char *inpos);

@@ -323,9 +323,7 @@ int CC608Reader::Update(unsigned char *inpos)
     return streamIdx;
 }
 
-void CC608Reader::TranscodeWriteText(void (*func)
-                                    (void *, unsigned char *, int, int, int),
-                                     void * ptr)
+void CC608Reader::TranscodeWriteText(CC608WriteFn func, void * ptr)
 {
     QMutexLocker locker(&m_inputBufLock);
     while (NumInputBuffers(false))
