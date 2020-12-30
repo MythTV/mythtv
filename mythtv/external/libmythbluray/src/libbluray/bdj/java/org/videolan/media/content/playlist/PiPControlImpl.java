@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2013-2019 Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,6 +29,7 @@ import org.bluray.media.PiPControl;
 import org.bluray.media.PiPStatusEvent;
 import org.bluray.media.PiPStatusListener;
 import org.bluray.media.StreamNotAvailableException;
+import org.bluray.system.RegisterAccess;
 import org.havi.ui.HScreenRectangle;
 
 import org.videolan.BDJListeners;
@@ -49,19 +51,19 @@ public class PiPControlImpl extends VideoControl implements PiPControl, Asynchro
     }
 
     protected void setStreamNumber(int num) {
-        Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, num << 8, 0x0000ff00);
+        Libbluray.writePSR(RegisterAccess.PSR_SECONDARY_AUDIO_STN, num << 8, 0x0000ff00);
     }
 
     public int getCurrentStreamNumber() {
-        return (Libbluray.readPSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO) & 0x0000FF00) >> 8;
+        return (RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_SECONDARY_AUDIO_STN) & 0x0000FF00) >> 8;
     }
 
     public void setDisplay(boolean value) {
-        Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, value ? 0x80000000 : 0, 0x80000000);
+        Libbluray.writePSR(RegisterAccess.PSR_SECONDARY_AUDIO_STN, value ? 0x80000000 : 0, 0x80000000);
     }
 
     public boolean getDisplay() {
-        return (Libbluray.readPSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO) & 0x80000000) != 0;
+        return (RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_SECONDARY_AUDIO_STN) & 0x80000000) != 0;
     }
 
     public void setFullScreen(boolean value) {

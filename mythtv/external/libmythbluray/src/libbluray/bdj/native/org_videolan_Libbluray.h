@@ -206,35 +206,19 @@ JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_selectRateN
 
 /*
  * Class:     org_videolan_Libbluray
- * Method:    writeGPRN
+ * Method:    writeRegN
+ * Signature: (JIIII)I
+ */
+JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_writeRegN
+(JNIEnv *, jclass, jlong, jint, jint, jint, jint);
+
+/*
+ * Class:     org_videolan_Libbluray
+ * Method:    readRegN
  * Signature: (JII)I
  */
-JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_writeGPRN
+JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_readRegN
   (JNIEnv *, jclass, jlong, jint, jint);
-
-/*
- * Class:     org_videolan_Libbluray
- * Method:    writePSRN
- * Signature: (JIII)I
- */
-JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_writePSRN
-  (JNIEnv *, jclass, jlong, jint, jint, jint);
-
-/*
- * Class:     org_videolan_Libbluray
- * Method:    readGPRN
- * Signature: (JI)I
- */
-JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_readGPRN
-  (JNIEnv *, jclass, jlong, jint);
-
-/*
- * Class:     org_videolan_Libbluray
- * Method:    readPSRN
- * Signature: (JI)I
- */
-JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_readPSRN
-  (JNIEnv *, jclass, jlong, jint);
 
 /*
  * Class:     org_videolan_Libbluray

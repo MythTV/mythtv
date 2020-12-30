@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2012  libbluray
+ * Copyright (C) 2020  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,12 +17,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package java.awt;
+package org.videolan;
 
-import sun.awt.image.BufferedImagePeer;
+/**
+ * Patch Xlet classes at runtime (modify bytecode)
+ */
 
-public class BDImage extends BDImageBase implements BufferedImagePeer {
-    BDImage(Component component, int width, int height, GraphicsConfiguration gc) {
-        super(component, width, height, gc);
-    }
+public interface BDJClassFilePatcher {
+    public abstract byte[] patch(byte[] b) throws ClassFormatError;
 }

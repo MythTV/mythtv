@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2019  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,6 +37,15 @@ import org.videolan.BDJXletContext;
 
 public class HScreenDevice implements ResourceProxy, ResourceServer {
     HScreenDevice() {
+    }
+
+    protected boolean isProfile5() {
+        String p = System.getProperty("bluray.profile.5");
+        return (p != null && p.equals("YES"));
+    }
+    protected boolean isProfile6() {
+        String p = System.getProperty("bluray.profile.6");
+        return (p != null && p.equals("YES"));
     }
 
     public String getIDstring() {

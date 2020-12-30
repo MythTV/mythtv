@@ -62,13 +62,15 @@ public abstract class FrameAccurateAnimation extends Component {
         this.params = new AnimationParameters(params);
     }
 
-    public synchronized void destroy() {
-        if (context != null) {
-            context.removeFAA(this);
-            context = null;
-        }
+    public void destroy() {
+        synchronized (lock) {
+            if (context != null) {
+                context.removeFAA(this);
+                context = null;
+            }
 
-        destroyImpl();
+            destroyImpl();
+        }
     }
 
     public long getCompletedFrameCount() {
@@ -99,8 +101,10 @@ public abstract class FrameAccurateAnimation extends Component {
         return params.threadPriority;
     }
 
-    public synchronized boolean isAnimated() {
-        return running;
+    public boolean isAnimated() {
+        synchronized (lock) {
+            return running;
+        }
     }
 
     public void paint(Graphics g) {
@@ -108,10 +112,11 @@ public abstract class FrameAccurateAnimation extends Component {
         logger.unimplemented("paint");
     }
 
-    public synchronized void resetStartStopTime(
-            FrameAccurateAnimationTimer newTimer) {
-        params.faaTimer = new FrameAccurateAnimationTimer(newTimer);
-        logger.unimplemented("resetStartStopTime");
+    public void resetStartStopTime(FrameAccurateAnimationTimer newTimer) {
+        synchronized (lock) {
+            params.faaTimer = new FrameAccurateAnimationTimer(newTimer);
+            logger.unimplemented("resetStartStopTime");
+        }
     }
 
     public void setBounds(int x, int y, int width, int height) {
@@ -141,23 +146,27 @@ public abstract class FrameAccurateAnimation extends Component {
         logger.unimplemented("destroyImpl");
     }
 
-    public synchronized void start() {
-        if (!running) {
-            running = true;
-            // TODO: compare timer against video
+    public void start() {
+        synchronized (lock) {
+            if (!running) {
+                running = true;
+                // TODO: compare timer against video
 
-            if (params.faaTimer != null) {
-                logger.unimplemented("start(faaTimer)");
+                if (params.faaTimer != null) {
+                    logger.unimplemented("start(faaTimer)");
+                }
+
+                startImpl();
             }
-
-            startImpl();
         }
     }
 
-    public synchronized void stop() {
-        if (running) {
-            running = false;
-            stopImpl();
+    public void stop() {
+        synchronized (lock) {
+            if (running) {
+                running = false;
+                stopImpl();
+            }
         }
     }
 
@@ -165,6 +174,7 @@ public abstract class FrameAccurateAnimation extends Component {
         return "FrameAccurateAnimation";
     }
 
+    private Object lock = new Object();
     private BDJXletContext context;
     protected boolean running;
     protected AnimationParameters params;

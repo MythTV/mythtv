@@ -31,12 +31,16 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Map;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import javax.tv.xlet.Xlet;
 
 import org.videolan.bdjo.AppCache;
 
-public class BDJClassLoader extends URLClassLoader {
-    public static BDJClassLoader newInstance(AppCache[] appCaches, String basePath, String classPathExt, String xletClass) {
+class BDJClassLoader extends URLClassLoader {
+    public static BDJClassLoader newInstance(AppCache[] appCaches, String basePath, String classPathExt, final String xletClass,
+                                             final BDJClassFilePatcher patcher) {
         ArrayList classPath = new ArrayList();
         URL url = translateClassPath(appCaches, basePath, null);
         if (url != null)
@@ -47,7 +51,14 @@ public class BDJClassLoader extends URLClassLoader {
             if ((url != null) && (classPath.indexOf(url) < 0))
                 classPath.add(url);
         }
-        return new BDJClassLoader((URL[])classPath.toArray(new URL[classPath.size()]) , xletClass);
+
+        final URL[] urls = (URL[])classPath.toArray(new URL[classPath.size()]);
+        return (BDJClassLoader)AccessController.doPrivileged(
+                new PrivilegedAction() {
+                    public Object run() {
+                        return new BDJClassLoader(urls, xletClass, patcher);
+                    }
+                });
     }
 
     private static URL translateClassPath(AppCache[] appCaches, String basePath, String classPath) {
@@ -105,16 +116,17 @@ public class BDJClassLoader extends URLClassLoader {
         }
     }
 
-    private BDJClassLoader(URL[] urls, String xletClass) {
+    private BDJClassLoader(URL[] urls, String xletClass, BDJClassFilePatcher patcher) {
         super(urls);
         this.xletClass = xletClass;
 
-        BDJClassLoaderAdapter a = Libbluray.getLoaderAdapter();
+        BDJClassLoaderAdapter a = Libbluray.getClassLoaderAdapter();
         if (a != null) {
             hideClasses = a.getHideClasses();
             bootClasses = a.getBootClasses();
             xletClasses = a.getXletClasses();
         }
+        this.patcher = patcher;
     }
 
     protected Xlet loadXlet() throws ClassNotFoundException,
@@ -240,6 +252,19 @@ public class BDJClassLoader extends URLClassLoader {
     }
 
     protected Class findClass(String name) throws ClassNotFoundException {
+
+        if (patcher != null) {
+            try {
+                byte[] b = loadClassCode(name);
+                b = patcher.patch(b);
+                return defineClass(b, 0, b.length);
+            } catch (ThreadDeath td) {
+                throw td;
+            } catch (Throwable t) {
+                logger.error("Class patching failed: " + t);
+            }
+        }
+
         try {
             return super.findClass(name);
 
@@ -270,8 +295,11 @@ public class BDJClassLoader extends URLClassLoader {
     }
 
     public URL getResource(String name) {
+        URL url;
         name = name.replace('\\', '/');
-        return super.getResource(name);
+        url = super.getResource(name);
+        logger.info("getResource(" + name + ") --> " + url);
+        return url;
     }
 
     /* final in J2ME
@@ -282,8 +310,11 @@ public class BDJClassLoader extends URLClassLoader {
     */
 
     public URL findResource(String name) {
+        URL url;
         name = name.replace('\\', '/');
-        return super.findResource(name);
+        url = super.findResource(name);
+        logger.info("findResource(" + name + ") --> " + url);
+        return url;
     }
 
     public Enumeration findResources(String name) throws IOException {
@@ -292,14 +323,20 @@ public class BDJClassLoader extends URLClassLoader {
     }
 
     public InputStream getResourceAsStream(String name) {
+        InputStream is;
         name = name.replace('\\', '/');
-        return super.getResourceAsStream(name);
+        is = super.getResourceAsStream(name);
+        if (is == null) {
+            logger.info("getResourceAsStream(" + name + ") failed");
+        }
+        return is;
     }
 
     private String xletClass;
 
+    private final BDJClassFilePatcher patcher;
     private Map hideClasses;  /* classes that should be hidden from Xlet */
-    private Map bootClasses;  /* additional bootstrap clases */
+    private Map bootClasses;  /* additional bootstrap classes */
     private Map xletClasses;  /* fallback for possibly missing classes */
 
     private static final Logger logger = Logger.getLogger(BDJClassLoader.class.getName());

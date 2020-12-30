@@ -101,14 +101,14 @@ static int _save_state(HDMV_VM *p, uint32_t *s)
         s[0] = (uint32_t)(p->playing_object - p->movie_objects->objects);
         s[1] = p->playing_pc;
     } else {
-        s[0] = UINT32_MAX;
+        s[0] = (uint32_t)-1;
     }
 
     if (p->suspended_object) {
         s[2] = (uint32_t)(p->suspended_object - p->movie_objects->objects);
         s[3] = p->suspended_pc;
     } else {
-        s[2] = UINT32_MAX;
+        s[2] = (uint32_t)-1;
     }
 
     /* nv timer ? */
@@ -118,7 +118,7 @@ static int _save_state(HDMV_VM *p, uint32_t *s)
 
 static int _restore_state(HDMV_VM *p, const uint32_t *s)
 {
-    if (s[0] == UINT32_MAX) {
+    if (s[0] == (uint32_t)-1) {
         p->playing_object = NULL;
     } else if (s[0] >= p->movie_objects->num_objects) {
         BD_DEBUG(DBG_HDMV | DBG_CRIT, "_restore_state() failed: invalid playing object index\n");
@@ -128,7 +128,7 @@ static int _restore_state(HDMV_VM *p, const uint32_t *s)
     }
     p->playing_pc = s[1];
 
-    if (s[2] == UINT32_MAX) {
+    if (s[2] == (uint32_t)-1) {
         p->suspended_object = NULL;
     } else if (s[2] >= p->movie_objects->num_objects) {
         BD_DEBUG(DBG_HDMV | DBG_CRIT, "_restore_state() failed: invalid suspended object index\n");
@@ -301,6 +301,28 @@ static void _fetch_operands(HDMV_VM *p, MOBJ_CMD *cmd, uint32_t *dst, uint32_t *
  * event queue
  */
 
+const char *hdmv_event_str(hdmv_event_e event)
+{
+    switch (event) {
+#define EVENT_ENTRY(e) case e : return #e
+        EVENT_ENTRY(HDMV_EVENT_NONE);
+        EVENT_ENTRY(HDMV_EVENT_END);
+        EVENT_ENTRY(HDMV_EVENT_IG_END);
+        EVENT_ENTRY(HDMV_EVENT_TITLE);
+        EVENT_ENTRY(HDMV_EVENT_PLAY_PL);
+        EVENT_ENTRY(HDMV_EVENT_PLAY_PI);
+        EVENT_ENTRY(HDMV_EVENT_PLAY_PM);
+        EVENT_ENTRY(HDMV_EVENT_PLAY_STOP);
+        EVENT_ENTRY(HDMV_EVENT_STILL);
+        EVENT_ENTRY(HDMV_EVENT_SET_BUTTON_PAGE);
+        EVENT_ENTRY(HDMV_EVENT_ENABLE_BUTTON);
+        EVENT_ENTRY(HDMV_EVENT_DISABLE_BUTTON);
+        EVENT_ENTRY(HDMV_EVENT_POPUP_OFF);
+#undef EVENT_ENTRY
+    }
+    return "???";
+}
+
 static int _get_event(HDMV_VM *p, HDMV_EVENT *ev)
 {
     if (p->event[0].event != HDMV_EVENT_NONE) {
@@ -325,7 +347,7 @@ static int _queue_event(HDMV_VM *p, hdmv_event_e event, uint32_t param)
         }
     }
 
-    BD_DEBUG(DBG_HDMV|DBG_CRIT, "_queue_event(%d, %d): queue overflow !\n", event, param);
+    BD_DEBUG(DBG_HDMV|DBG_CRIT, "_queue_event(%d:%s, %d): queue overflow !\n", event, hdmv_event_str(event), param);
     return -1;
 }
 

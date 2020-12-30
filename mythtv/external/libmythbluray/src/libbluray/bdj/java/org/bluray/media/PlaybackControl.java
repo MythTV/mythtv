@@ -28,9 +28,9 @@ public abstract interface PlaybackControl extends Control {
 
     public abstract void skipToMark(int mark) throws IllegalArgumentException;
 
-    public abstract boolean skipToNextMark(int mark) throws IllegalArgumentException;
+    public abstract boolean skipToNextMark(int type) throws IllegalArgumentException;
 
-    public abstract boolean skipToPreviousMark(int mark) throws IllegalArgumentException;
+    public abstract boolean skipToPreviousMark(int type) throws IllegalArgumentException;
 
     public abstract void skipToPlayItem(int item) throws IllegalArgumentException;
 

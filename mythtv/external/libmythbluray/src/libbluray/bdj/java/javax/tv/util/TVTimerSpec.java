@@ -20,11 +20,12 @@
 package javax.tv.util;
 
 import java.util.Enumeration;
+import java.io.Serializable;
 import java.util.Vector;
 
 import org.videolan.Logger;
 
-public class TVTimerSpec
+public class TVTimerSpec implements Serializable
 {
     private boolean absolute;
     private boolean regular;
@@ -101,4 +102,6 @@ public class TVTimerSpec
             throw new IllegalArgumentException();
         this.time = time;
     }
+
+    private static final long serialVersionUID = -4714470266350436478L;
 }

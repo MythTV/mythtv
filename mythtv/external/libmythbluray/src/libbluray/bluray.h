@@ -120,6 +120,9 @@ typedef struct {
     uint8_t  bdplus_gen;          /* BD+ content code generation */
     uint32_t bdplus_date;         /* BD+ content code relese date ((year<<16)|(month<<8)|day) */
 
+    /* disc application info (libbluray > 1.2.0) */
+    uint8_t initial_dynamic_range_type; /* bd_dynamic_range_type_e */
+
 } BLURAY_DISC_INFO;
 
 /*
@@ -212,6 +215,12 @@ typedef enum {
     BLURAY_MARK_LINK      = 0x02,  /* link point */
 } bd_mark_type_e;
 
+typedef enum {
+    BLURAY_DYNAMIC_RANGE_SDR          = 0,
+    BLURAY_DYNAMIC_RANGE_HDR10        = 1,
+    BLURAY_DYNAMIC_RANGE_DOLBY_VISION = 2
+} bd_dynamic_range_type_e;
+
 typedef struct bd_stream_info {
     uint8_t     coding_type;
     uint8_t     format;
@@ -274,6 +283,8 @@ typedef struct bd_title_info {
     BLURAY_CLIP_INFO     *clips;
     BLURAY_TITLE_CHAPTER *chapters;
     BLURAY_TITLE_MARK    *marks;
+
+    uint8_t              mvc_base_view_r_flag;
 } BLURAY_TITLE_INFO;
 
 /*
@@ -839,6 +850,7 @@ typedef struct {
  */
 int  bd_get_event(BLURAY *bd, BD_EVENT *event);
 
+const char *bd_event_name(uint32_t /* bd_event_e */ event);
 
 /*
  * On-screen display
@@ -1011,9 +1023,14 @@ int bd_set_rate(BLURAY *bd, uint32_t rate);
  *  Pass user input to graphics controller or BD-J.
  *  Keys are defined in libbluray/keys.h.
  *
+ *  Two user input models are supported:
+ *    - Single event when a key is typed once.
+ *    - Separate events when key is pressed and released.
+ *      VD_VK_KEY_PRESSED, BD_VK_TYPED and BD_VK_KEY_RELEASED are or'd with the key.
+ *
  * @param bd  BLURAY object
  * @param pts current playback position (1/90000s) or -1
- * @param key input key
+ * @param key input key (@see keys.h)
  * @return <0 on error, 0 on success, >0 if selection/activation changed
  */
 int bd_user_input(BLURAY *bd, int64_t pts, uint32_t key);
@@ -1091,6 +1108,26 @@ void bd_stop_bdj(BLURAY *bd); // shutdown BD-J and clean up resources
  * @return 1 on success, 0 on error
  */
 int bd_read_file(BLURAY *, const char *path, void **data, int64_t *size);
+
+/**
+ *
+ *  Open a file/dir from BluRay Virtual File System.
+ *
+ *  encrypted streams are decrypted, and because of how
+ *  decryption works, it can only seek to (N*6144) bytes,
+ *  and read 6144 bytes at a time.
+ *  DO NOT mix any play functionalities with these functions.
+ *  It might cause broken stream. In general, accessing
+ *  mutiple file on disk at the same time is a bad idea.
+ *  Caller must close with file_close()/dir_close().
+ *
+ * @param bd  BLURAY object
+ * @param dir  target directory (relative to disc root)
+ * @param path  path to the file (relative to disc root)
+ * @return BD_DIR_H * or BD_FILE_H *, NULL if failed
+ */
+struct bd_dir_s *bd_open_dir(BLURAY *, const char *dir);
+struct bd_file_s *bd_open_file_dec(BLURAY *, const char *path);
 
 
 #ifdef __cplusplus

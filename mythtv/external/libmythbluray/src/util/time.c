@@ -63,7 +63,7 @@ static uint64_t _bd_get_scr_impl(void)
 
 uint64_t bd_get_scr(void)
 {
-    static uint64_t t0 = UINT64_MAX;
+    static uint64_t t0 = (uint64_t)-1;
 
     uint64_t now = _bd_get_scr_impl();
 

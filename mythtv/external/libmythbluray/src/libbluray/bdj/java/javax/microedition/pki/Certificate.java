@@ -1,5 +1,6 @@
 /*
  * This file is part of libbluray
+ * Copyright (C) 2019  VideoLAN
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,18 +17,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package java.awt;
+package javax.microedition.pki;
 
-class BDGraphicsDevice extends BDGraphicsDeviceImpl {
-
-    BDGraphicsDevice(BDGraphicsEnvironment environment) {
-        super(environment);
-    }
-
-    /* J2SE java 7 */
-    /*
-    public boolean isWindowTranslucencySupported(GraphicsDevice.WindowTranslucency translucencyKind) {
-        return true;
-    }
-    */
+public interface Certificate {
+    public abstract String getIssuer();
+    public abstract long getNotAfter();
+    public abstract long getNotBefore();
+    public abstract String getSerialNumber();
+    public abstract String getSigAlgName();
+    public abstract String getSubject();
+    public abstract String getType();
+    public abstract String getVersion();
 }

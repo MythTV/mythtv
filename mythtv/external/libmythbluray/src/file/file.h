@@ -65,7 +65,7 @@ static inline BD_USED size_t file_read(BD_FILE_H *fp, uint8_t *buf, size_t size)
 
 BD_PRIVATE int64_t file_size(BD_FILE_H *fp);
 
-BD_PRIVATE extern BD_FILE_H* (*file_open)(const char* filename, const char *mode);
+BD_PRIVATE extern BD_FILE_H *(*file_open)(const char* filename, const char *mode);
 
 BD_PRIVATE BD_FILE_OPEN file_open_default(void);
 
@@ -77,7 +77,7 @@ BD_PRIVATE BD_FILE_OPEN file_open_default(void);
 #define dir_close(X) X->close(X)
 #define dir_read(X,Y) X->read(X,Y)
 
-BD_PRIVATE extern BD_DIR_H* (*dir_open)(const char* dirname);
+BD_PRIVATE extern BD_DIR_H *(*dir_open)(const char* dirname);
 
 BD_PRIVATE BD_DIR_OPEN dir_open_default(void);
 

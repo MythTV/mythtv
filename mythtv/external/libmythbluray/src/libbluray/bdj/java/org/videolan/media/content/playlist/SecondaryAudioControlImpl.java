@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2014-2019 Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,8 @@
 package org.videolan.media.content.playlist;
 
 import org.bluray.media.SecondaryAudioControl;
+import org.bluray.system.RegisterAccess;
+
 import org.videolan.Libbluray;
 import org.videolan.StreamInfo;
 import org.videolan.TIClip;
@@ -37,15 +40,15 @@ public class SecondaryAudioControlImpl extends StreamControl implements Secondar
     }
 
     protected String getDefaultLanguage() {
-        return languageFromInteger(Libbluray.readPSR(Libbluray.PSR_AUDIO_LANG));
+        return languageFromInteger(RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_LANG_CODE_AUDIO));
     }
 
     public int getCurrentStreamNumber() {
-        return Libbluray.readPSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO) & 0x000000FF;
+        return RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_SECONDARY_AUDIO_STN) & 0x000000FF;
     }
 
     protected void setStreamNumber(int num) {
-        Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, num, 0x000000ff);
+        Libbluray.writePSR(RegisterAccess.PSR_SECONDARY_AUDIO_STN, num, 0x000000ff);
     }
 
     private Handler player;

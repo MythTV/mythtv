@@ -116,6 +116,13 @@ public class DSMCCObject extends File {
         }
     }
 
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DSMCCObject)) {
+            return false;
+        }
+        return super.equals(obj);
+    }
+
     public void addObjectChangeEventListener(ObjectChangeEventListener listener)
             throws InsufficientResourcesException {
         org.videolan.Logger.unimplemented(DSMCCObject.class.getName(), "addObjectChangeEventListener");

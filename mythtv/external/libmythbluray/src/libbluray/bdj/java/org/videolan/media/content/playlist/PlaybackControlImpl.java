@@ -95,27 +95,6 @@ public class PlaybackControlImpl implements PlaybackControl {
         player.seekPlayItem(item);
     }
 
-    protected void onChapterReach(int chapter) {
-        if (chapter <= 0)
-            return;
-        chapter--;
-        PlaylistInfo pi = player.getPlaylistInfo();
-        if (pi == null)
-            return;
-        TIMark[] marks = pi.getMarks();
-        if (marks == null)
-            return;
-        for (int i = 0, j = 0; i < marks.length; i++) {
-            if (marks[i].getType() == TIMark.MARK_TYPE_ENTRY) {
-                if (j == chapter) {
-                    notifyListeners(new PlaybackMarkEvent(this, i));
-                    return;
-                }
-                j++;
-            }
-        }
-    }
-
     protected void onMarkReach(int mark) {
         if (mark < 0) {
             return;

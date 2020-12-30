@@ -1,7 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010      William Hahne
- * Copyright (C) 2012-2014 Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2012-2019 Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -138,18 +138,18 @@ public class Handler extends BDHandler {
                 int stream;
                 stream = sourceLocator.getPrimaryAudioStreamNumber();
                 if (stream > 0)
-                    Libbluray.writePSR(Libbluray.PSR_PRIMARY_AUDIO_ID, stream);
+                    Libbluray.writePSR(RegisterAccess.PSR_AUDIO_STN, stream);
                 stream = sourceLocator.getPGTextStreamNumber();
                 if (stream > 0) {
-                    Libbluray.writePSR(Libbluray.PSR_PG_STREAM, stream, 0x00000fff);
+                    Libbluray.writePSR(RegisterAccess.PSR_PG_TXTST_STN, stream, 0x00000fff);
                 }
                 stream = sourceLocator.getSecondaryVideoStreamNumber();
                 if (stream > 0) {
-                    Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, stream << 8, 0x0000ff00);
+                    Libbluray.writePSR(RegisterAccess.PSR_SECONDARY_AUDIO_STN, stream << 8, 0x0000ff00);
                 }
                 stream = sourceLocator.getSecondaryAudioStreamNumber();
                 if (stream > 0) {
-                    Libbluray.writePSR(Libbluray.PSR_SECONDARY_AUDIO_VIDEO, stream, 0x000000ff);
+                    Libbluray.writePSR(RegisterAccess.PSR_SECONDARY_AUDIO_STN, stream, 0x000000ff);
                 }
 
                 int plId = sourceLocator.getPlayListId();
@@ -253,15 +253,40 @@ public class Handler extends BDHandler {
         }
     }
 
-    protected void doChapterReached(int param) {
-        ((PlaybackControlImpl)controls[9]).onChapterReach(param);
+    BDLocator lastMarkLocator = null;
+    protected void doChapterReached(int chapter) {
+        if (chapter <= 0)
+            return;
+        chapter--;
+        synchronized (this) {
+            if (pi == null)
+                return;
+            org.videolan.TIMark[] marks = pi.getMarks();
+            if (marks == null)
+                return;
+            for (int i = 0, j = 0; i < marks.length; i++) {
+                if (marks[i].getType() == org.videolan.TIMark.MARK_TYPE_ENTRY) {
+                    if (j == chapter) {
+                        if (currentLocator == null || lastMarkLocator != currentLocator || i != currentLocator.getMarkId()) {
+                            ((PlaybackControlImpl)controls[9]).onMarkReach(i);
+                        }
+                        return;
+                    }
+                    j++;
+                }
+            }
+        }
     }
 
     protected void doMarkReached(int param) {
+        synchronized (this) {
         ((PlaybackControlImpl)controls[9]).onMarkReach(param);
 
         if (currentLocator != null)
             currentLocator.setMarkId(param);
+
+        lastMarkLocator = currentLocator;
+        }
     }
 
     protected void doPlaylistStarted(int param) {

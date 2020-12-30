@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2019  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,14 +20,26 @@
 
 package org.havi.ui;
 
+import org.blurayx.s3d.ui.HBackgroundConfigTemplateS3D;
+import org.blurayx.uhd.ui.HBackgroundConfigurationTemplateUHD;
+
 import java.awt.Color;
 
 public class HBackgroundDevice extends HScreenDevice {
     protected HBackgroundDevice() {
+        boolean is_p6 = isProfile6();
+        boolean is_p5 = isProfile5();
         int length = HScreenConfigTemplate.defaultConfig.length;
         hbcArray = new HBackgroundConfiguration[length];
         for (int i = 0; i < length; i++) {
-            HBackgroundConfigTemplate hbct = new HBackgroundConfigTemplate();
+            HBackgroundConfigTemplate hbct;
+            if (is_p6) {
+                hbct = new HBackgroundConfigurationTemplateUHD();
+            } else if (is_p5) {
+                hbct = new HBackgroundConfigTemplateS3D();
+            } else {
+                hbct = new HBackgroundConfigTemplate();
+            }
             HScreenConfigTemplate.initDefaultConfigTemplate(hbct, i);
             hbcArray[i] = new HStillImageBackgroundConfiguration(hbct, new Color(0, 0, 0, 0));
         }

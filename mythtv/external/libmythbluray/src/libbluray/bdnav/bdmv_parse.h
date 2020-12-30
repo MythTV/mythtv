@@ -27,6 +27,7 @@
 
 #define BDMV_VERSION_0100 ('0' << 24 | '1' << 16 | '0' << 8 | '0')
 #define BDMV_VERSION_0200 ('0' << 24 | '2' << 16 | '0' << 8 | '0')
+#define BDMV_VERSION_0240 ('0' << 24 | '2' << 16 | '4' << 8 | '0')
 #define BDMV_VERSION_0300 ('0' << 24 | '3' << 16 | '0' << 8 | '0')
 
 BD_PRIVATE int bdmv_parse_header(BITSTREAM *bs, uint32_t type, uint32_t *version);

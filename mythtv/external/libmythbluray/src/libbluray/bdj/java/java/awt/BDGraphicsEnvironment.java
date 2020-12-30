@@ -27,7 +27,7 @@ import org.videolan.Logger;
 class BDGraphicsEnvironment extends GraphicsEnvironment {
     private BDGraphicsDevice graphicsDevice;
 
-    BDGraphicsEnvironment() {
+    public BDGraphicsEnvironment() {
         graphicsDevice = new BDGraphicsDevice(this);
     }
 

@@ -5973,6 +5973,7 @@ if enabled libbluray_external; then
 fi
 
 antbin=""
+java_code_version=""
 if enabled bdjava; then
     enabled x86_64 && java_arch=amd64
     enabled x86_32 && java_arch=i386
@@ -5983,12 +5984,27 @@ if enabled bdjava; then
         die "ERROR: BD-J requires ANT, but ant was not found. Please install it."
     fi
 
-    if test "$bdj_type" = "j2me"; then
-        enable bdj_j2me
-    fi
-
     # Probably makes little sense to try to process Bluray menus without fontconfig
     enable fontconfig
+
+    if test "$bdj_type" = "j2me"; then
+        enable bdj_j2me
+    else
+        if test "x${JAVA_HOME}" = "x"; then
+            JAVAC=`which javac`
+        else
+            JAVAC=${JAVA_HOME}/bin/javac
+        fi
+
+        test -f ${JAVAC} -a -x ${JAVAC} || die "ERROR: javac not found but required by BD-J"
+
+        java_code_version=1.4
+
+        javac_version=`"${JAVAC}" -version 2>&1 | head -n 1`
+        
+        echo "${javac_version}" | grep -E -q '^javac\ (9|1[0-1])' && java_code_version=1.6
+        echo "${javac_version}" | grep -E -q '^javac\ (1[2-9])' && java_code_version=1.7
+    fi
 fi
 
 enabled pthreads &&
@@ -7720,6 +7736,7 @@ ANTBIN=$antbin
 BDJ_TYPE=$bdj_type
 JDK_HOME=$JDK_HOME
 JAVA_ARCH=$java_arch
+JAVA_CODE_VERSION=$java_code_version
 EOF
 
 get_version(){

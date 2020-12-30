@@ -77,7 +77,7 @@ public class PanningControlImpl implements PanningControl {
     private float clip(float val) {
         if (val != val) /* NaN */
             return 0.0f;
-        return Math.min(-1.0f, Math.max(1.0f, val));
+        return Math.max(-1.0f, Math.min(1.0f, val));
     }
 
     private BDHandler player;

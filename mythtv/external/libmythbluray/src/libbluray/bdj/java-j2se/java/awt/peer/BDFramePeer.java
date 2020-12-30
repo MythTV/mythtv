@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2012  Petri Hintukainen <phintuka@users.sourceforge.net>
+ * Copyright (C) 2012-2019  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,8 +30,8 @@ import org.videolan.Logger;
 
 public class BDFramePeer extends BDComponentPeer implements FramePeer
 {
-    public BDFramePeer(Frame frame, BDRootWindow rootWindow) {
-        super(frame.getToolkit(), frame);
+    public BDFramePeer(BDRootWindow rootWindow) {
+        super(rootWindow.getToolkit(), rootWindow);
         this.rootWindow = rootWindow;
     }
 
@@ -173,7 +173,20 @@ public class BDFramePeer extends BDComponentPeer implements FramePeer
         return ((BDToolkit)BDToolkit.getDefaultToolkit()).createImage((Component)null, width, height);
     }
 
+    /* Java >= 9 */
+    public boolean requestFocus(Component c/*lightweightChild*/, boolean a/*temporary*/,
+                                boolean b/*focusedWindowChangeAllowed*/, long l/*time*/,
+                                java.awt.event.FocusEvent.Cause cause
+                                ) {
+        return requestFocusHelper(c, a, b, l);
+    }
+
+    /* Java < 9 */
     public boolean requestFocus(Component c, boolean a, boolean b, long l, sun.awt.CausedFocusEvent.Cause d) {
+        return requestFocusHelper(c, a, b, l);
+    }
+
+    private boolean requestFocusHelper(Component c, boolean a, boolean b, long l) {
         if (c == null) {
             return true;
         }

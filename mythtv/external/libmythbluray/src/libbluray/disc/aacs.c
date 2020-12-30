@@ -94,6 +94,9 @@ static void *_open_libaacs(int *impl_id)
       getenv("LIBAACS_PATH"),
       "libaacs",
       "libmmbd",
+#ifdef _WIN64
+      "libmmbd64",
+#endif
     };
     unsigned ii;
 
@@ -101,6 +104,13 @@ static void *_open_libaacs(int *impl_id)
         if (libaacs[ii]) {
             void *handle = dl_dlopen(libaacs[ii], "0");
             if (handle) {
+                /* One more libmmbd check. This is needed if libaacs is just a link to libmmbd ... */
+                fptr_int32 fp;
+                *(void **)(&fp) = dl_dlsym(handle, "bdplus_get_code_date");
+                if (fp && fp(NULL) == 0) {
+                    ii = IMPL_LIBMMBD;
+                }
+
                 *impl_id = ii;
                 BD_DEBUG(DBG_BLURAY, "Using %s for AACS\n", libaacs[ii]);
                 return handle;

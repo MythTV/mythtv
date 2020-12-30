@@ -25,9 +25,10 @@
 
 #include "util/macro.h"
 #include "util/mutex.h"
+#include "util/logging.h"
 
 #include <string.h>
-
+#include <stdint.h>
 
 #define MAX_EVENTS 31  /* 2^n - 1 */
 
@@ -91,6 +92,15 @@ int event_queue_put(BD_EVENT_QUEUE *eq, const void *ev)
         unsigned new_in = (eq->in + 1) & MAX_EVENTS;
 
         if (new_in != eq->out) {
+            typedef struct {
+                uint32_t   event;  /* bd_event_e */
+                uint32_t   param;
+            } event_t;
+
+            event_t* event = (event_t*)ev;
+            if(event->event == 7)
+                BD_DEBUG(0x840, "event_queue_put(BD_EVENT_PLAYITEM:%d, %d)!\n", event->event, event->param);
+
             memcpy(&eq->ev[eq->in * eq->event_size], ev, eq->event_size);
             eq->in = new_in;
 

@@ -1,5 +1,6 @@
 /*
  * This file is part of libbluray
+ * Copyright (C) 2019  VideoLAN
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,8 +17,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package java.io;
+package javax.microedition.io;
 
-public interface Closeable {
-    public abstract void close() throws IOException;
+import java.io.IOException;
+
+public interface StreamConnectionNotifier extends Connection {
+    public abstract StreamConnection acceptAndOpen() throws IOException;
 }

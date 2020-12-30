@@ -20,9 +20,7 @@
 package org.videolan;
 
 import java.awt.BDRootWindow;
-import java.awt.AWTException;
 import java.awt.Component;
-import java.awt.image.BufferedImage;
 
 import org.havi.ui.HScene;
 
@@ -54,21 +52,11 @@ public class GUIManager extends BDRootWindow {
         }
     }
 
-    public BufferedImage createBufferedImage(int width, int height)
-            throws AWTException {
-        BufferedImage img = getGraphicsConfiguration().createCompatibleImage(width, height);
-
-        if (img == null)
-            throw new AWTException("Failed to create buffered image");
-
-        return img;
-    }
-
-    public HScene getFocusHScene() {
+    BDJXletContext getFocusHSceneContext() {
         Component component = getFocusOwner();
         while (component != null) {
             if (component instanceof HScene)
-                return (HScene)component;
+                return ((HScene)component).getXletContext();
             component = component.getParent();
         }
         return null;

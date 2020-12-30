@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2012-2019 Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +26,7 @@ import org.bluray.media.StreamNotAvailableException;
 import org.bluray.media.SubtitleStyleNotAvailableException;
 import org.bluray.media.SubtitlingControl;
 import org.bluray.media.TextSubtitleNotAvailableException;
+import org.bluray.system.RegisterAccess;
 import org.bluray.ti.CodingType;
 import org.dvb.media.SubtitleAvailableEvent;
 import org.dvb.media.SubtitleListener;
@@ -49,24 +51,24 @@ public class SubtitlingControlImpl extends StreamControl implements SubtitlingCo
     }
 
     protected String getDefaultLanguage() {
-        return languageFromInteger(Libbluray.readPSR(Libbluray.PSR_PG_AND_SUB_LANG));
+        return languageFromInteger(RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_LANG_CODE_PG_TXTST));
     }
 
     public int getCurrentStreamNumber() {
-        return Libbluray.readPSR(Libbluray.PSR_PG_STREAM) & 0x00000FFF;
+        return RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_PG_TXTST_STN) & 0x00000FFF;
     }
 
     protected void setStreamNumber(int num) {
-        Libbluray.writePSR(Libbluray.PSR_PG_STREAM, num, 0x00000fff);
+        Libbluray.writePSR(RegisterAccess.PSR_PG_TXTST_STN, num, 0x00000fff);
     }
 
     public boolean isSubtitlingOn() {
-        return (Libbluray.readPSR(Libbluray.PSR_PG_STREAM) & 0x80000000) != 0;
+        return (RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_PG_TXTST_STN) & 0x80000000) != 0;
     }
 
     public boolean setSubtitling(boolean mode) {
-        boolean oldMode = (Libbluray.readPSR(Libbluray.PSR_PG_STREAM) & 0x80000000) != 0;
-        Libbluray.writePSR(Libbluray.PSR_PG_STREAM, mode ? 0x80000000 : 0, 0x80000000);
+        boolean oldMode = (RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_PG_TXTST_STN) & 0x80000000) != 0;
+        Libbluray.writePSR(RegisterAccess.PSR_PG_TXTST_STN, mode ? 0x80000000 : 0, 0x80000000);
         return oldMode;
     }
 
@@ -75,12 +77,12 @@ public class SubtitlingControlImpl extends StreamControl implements SubtitlingCo
     }
 
     public boolean isPipSubtitleMode() {
-        return (Libbluray.readPSR(Libbluray.PSR_PG_STREAM) & 0x40000000) != 0;
+        return (RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_PG_TXTST_STN) & 0x40000000) != 0;
     }
 
     public boolean setPipSubtitleMode(boolean mode) {
-        boolean oldMode = (Libbluray.readPSR(Libbluray.PSR_PG_STREAM) & 0x40000000) != 0;
-        Libbluray.writePSR(Libbluray.PSR_PG_STREAM, mode ? 0x40000000 : 0, 0x40000000);
+        boolean oldMode = (RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_PG_TXTST_STN) & 0x40000000) != 0;
+        Libbluray.writePSR(RegisterAccess.PSR_PG_TXTST_STN, mode ? 0x40000000 : 0, 0x40000000);
         return oldMode;
     }
 
@@ -90,7 +92,7 @@ public class SubtitlingControlImpl extends StreamControl implements SubtitlingCo
             throw new SubtitleStyleNotAvailableException();
         if (getCurrentSubtitleType() != CodingType.TEXT_SUBTITLE)
             throw new TextSubtitleNotAvailableException();
-        Libbluray.writePSR(Libbluray.PSR_STYLE, style);
+        Libbluray.writePSR(RegisterAccess.PSR_USER_STYLE_NR, style);
     }
 
     public CodingType getCurrentSubtitleType() {
@@ -107,7 +109,7 @@ public class SubtitlingControlImpl extends StreamControl implements SubtitlingCo
         throws TextSubtitleNotAvailableException, SubtitleStyleNotAvailableException {
         if (getCurrentSubtitleType() != CodingType.TEXT_SUBTITLE)
             throw new TextSubtitleNotAvailableException();
-        int style = Libbluray.readPSR(Libbluray.PSR_STYLE);
+        int style = RegisterAccess.getInstance().getPSR(RegisterAccess.PSR_USER_STYLE_NR);
         if ((style <= 0) || ((style > 25) && (style != 255)))
             throw new SubtitleStyleNotAvailableException();
         return style;

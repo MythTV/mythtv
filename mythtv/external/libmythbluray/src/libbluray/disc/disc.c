@@ -539,7 +539,7 @@ int disc_cache_bdrom_file(BD_DISC *p, const char *rel_path, const char *cache_pa
 
     /* plain directory ? */
     size = strlen(rel_path);
-    if (rel_path[size - 1] == '/' || rel_path[size - 1] == '\\') {
+    if (size < 1 || rel_path[size - 1] == '/' || rel_path[size - 1] == '\\') {
         return 0;
     }
 
@@ -579,6 +579,26 @@ int disc_cache_bdrom_file(BD_DISC *p, const char *rel_path, const char *cache_pa
     return 0;
 }
 
+BD_FILE_H *disc_open_path_dec(BD_DISC *p, const char *rel_path)
+{
+    size_t size = strlen(rel_path);
+    const char *suf = (size > 5) ? rel_path + (size - 5) : rel_path;
+
+    /* check if it's a stream */
+    if (strncmp(rel_path, "BDMV" DIR_SEP "STREAM", 11)) { // not equal
+        return disc_open_path(p, rel_path);
+    } else if (!strcmp(suf, ".m2ts")) { // equal
+        return disc_open_stream(p, suf - 5);
+    } else if (!strcmp(suf+1, ".MTS")) { // equal
+        return disc_open_stream(p, suf - 4);
+    } else if (!strcmp(suf, ".ssif")) { // equal
+        BD_DEBUG(DBG_FILE | DBG_CRIT, "error opening file %s, ssif is not yet supported.\n", rel_path);
+    } else {
+        BD_DEBUG(DBG_FILE | DBG_CRIT, "error opening file %s\n", rel_path);
+    }
+    return NULL;
+}
+
 /*
  * persistent properties storage
  */
@@ -591,11 +611,6 @@ static char *_properties_file(BD_DISC *p)
     char    *cache_home;
     char    *properties_file;
 
-    cache_home = file_get_cache_home();
-    if (!cache_home) {
-        return NULL;
-    }
-
     /* get disc ID */
     if (p->dec) {
         id_type = 'A';
@@ -603,8 +618,17 @@ static char *_properties_file(BD_DISC *p)
     }
     if (!disc_id) {
         id_type = 'P';
-        disc_pseudo_id(p, pseudo_id);
-        disc_id = pseudo_id;
+        if (disc_pseudo_id(p, pseudo_id) > 0) {
+            disc_id = pseudo_id;
+        }
+    }
+    if (!disc_id) {
+        return NULL;
+    }
+
+    cache_home = file_get_cache_home();
+    if (!cache_home) {
+        return NULL;
     }
 
     properties_file = str_printf("%s" DIR_SEP "bluray" DIR_SEP "properties" DIR_SEP "%c%s",
@@ -682,6 +706,15 @@ const uint8_t *disc_get_data(BD_DISC *disc, int type)
 {
     if (disc->dec) {
         return dec_data(disc->dec, type);
+    }
+    if (type == 0x1000) {
+        /* this shouldn't cause any extra optical disc access */
+        BD_DIR_H *d = disc->pf_dir_open_bdrom(disc->fs_handle, "MAKEMKV");
+        if (d) {
+            dir_close(d);
+            BD_DEBUG(DBG_FILE, "Detected MakeMKV backup data\n");
+            return (const uint8_t *)"mmbd;backup";
+        }
     }
     return NULL;
 }
@@ -775,16 +808,18 @@ static int _hash_file(BD_DISC *p, const char *dir, const char *file, void *hash)
     return sz > 16;
 }
 
-BD_PRIVATE void disc_pseudo_id(BD_DISC *p, uint8_t *id/*[20]*/)
+int disc_pseudo_id(BD_DISC *p, uint8_t *id/*[20]*/)
 {
     uint8_t h[2][20];
-    int i;
+    int i, r = 0;
 
     memset(h, 0, sizeof(h));
-    _hash_file(p, "BDMV", "MovieObject.bdmv", h[0]);
-    _hash_file(p, "BDMV", "index.bdmv", h[1]);
+    r += _hash_file(p, "BDMV", "MovieObject.bdmv", h[0]);
+    r += _hash_file(p, "BDMV", "index.bdmv", h[1]);
 
     for (i = 0; i < 20; i++) {
         id[i] = h[0][i] ^ h[1][i];
     }
+
+    return r > 0;
 }

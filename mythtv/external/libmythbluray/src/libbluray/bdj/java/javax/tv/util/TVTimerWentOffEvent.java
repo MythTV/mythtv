@@ -33,4 +33,5 @@ public class TVTimerWentOffEvent extends EventObject
     }
 
     private TVTimerSpec spec = null;
+    private static final long serialVersionUID = -2429738748897860796L;
 }

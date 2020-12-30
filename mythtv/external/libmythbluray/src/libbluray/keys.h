@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010-2019  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -60,5 +60,14 @@ typedef enum {
     BD_VK_BLUE      = 406,
 
 } bd_vk_key_e;
+
+/*
+ * Application may optionally provide KEY_PRESSED, KEY_TYPED and KEY_RELEASED events.
+ * These masks are OR'd with the key code when calling bd_user_input().
+ */
+
+#define BD_VK_KEY_PRESSED   0x80000000   /* Key was pressed down */
+#define BD_VK_KEY_TYPED     0x40000000   /* Key was typed */
+#define BD_VK_KEY_RELEASED  0x20000000   /* Key was released */
 
 #endif // _BD_KEYS_H_

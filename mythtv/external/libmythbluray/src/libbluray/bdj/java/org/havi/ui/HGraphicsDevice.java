@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2019  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,9 @@
 
 package org.havi.ui;
 
+import org.blurayx.s3d.ui.HGraphicsConfigTemplateS3D;
+import org.blurayx.uhd.ui.HGraphicsConfigurationTemplateUHD;
+
 import java.awt.Dimension;
 
 import org.videolan.GUIManager;
@@ -26,10 +30,19 @@ import org.videolan.Logger;
 
 public class HGraphicsDevice extends HScreenDevice {
     protected HGraphicsDevice() {
+        boolean is_p6 = isProfile6();
+        boolean is_p5 = isProfile5();
         int length = HScreenConfigTemplate.defaultConfig.length;
         hgcArray = new HGraphicsConfiguration[length];
         for (int i = 0; i < length; i++) {
-            HGraphicsConfigTemplate hgct = new HGraphicsConfigTemplate();
+            HGraphicsConfigTemplate hgct;
+            if (is_p6) {
+                hgct = new HGraphicsConfigurationTemplateUHD();
+            } else if (is_p5) {
+                hgct = new HGraphicsConfigTemplateS3D();
+            } else {
+                hgct = new HGraphicsConfigTemplate();
+            }
             HScreenConfigTemplate.initDefaultConfigTemplate(hgct, i);
             hgcArray[i] = new HGraphicsConfiguration(hgct);
         }

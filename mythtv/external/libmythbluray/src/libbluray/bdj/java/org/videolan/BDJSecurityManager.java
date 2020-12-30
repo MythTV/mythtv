@@ -68,9 +68,28 @@ final class BDJSecurityManager extends SecurityManager {
      *
      */
 
+    private int classDepth0(String name) {
+        StackTraceElement e[] = new Exception("Stack trace").getStackTrace();
+        if (e != null && e.length > 1) {
+            for (int i = 1; i < e.length; i++) {
+                if (e[i].getClassName().equals(name)) {
+                    return i - 1;
+                }
+            }
+        }
+        return -1;
+    }
+
     private void deny(Permission perm) {
         logger.error("denied " + perm + "\n" + Logger.dumpStack());
         throw new SecurityException("denied " + perm);
+    }
+
+    private void checkNet(Permission perm) {
+        String enable = System.getProperty("bluray.network.connected");
+        if (enable != null && enable.equals("YES"))
+            return;
+        deny(perm);
     }
 
     public void checkPermission(Permission perm) {
@@ -78,14 +97,14 @@ final class BDJSecurityManager extends SecurityManager {
             if (perm.implies(new RuntimePermission("createSecurityManager"))) {
 
                 // allow initializing of javax.crypto.JceSecurityManager
-                if (classDepth("javax.crypto.JceSecurityManager") < 3) {
+                if (classDepth0("javax.crypto.JceSecurityManager") < 3) {
                     return;
                 }
 
                 deny(perm);
             }
             if (perm.implies(new RuntimePermission("setSecurityManager"))) {
-                if (classDepth("org.videolan.Libbluray") == 3) {
+                if (classDepth0("org.videolan.Libbluray") == 3) {
                     return;
                 }
                 deny(perm);
@@ -94,7 +113,7 @@ final class BDJSecurityManager extends SecurityManager {
             // work around bug in openjdk 7 / 8
             // sun.awt.AWTAutoShutdown.notifyThreadBusy is missing doPrivileged()
             // (fixed in jdk9 / http://hg.openjdk.java.net/jdk9/client/jdk/rev/5b613a3c04be )
-            if (classDepth("sun.awt.AWTAutoShutdown") > 0) {
+            if (classDepth0("sun.awt.AWTAutoShutdown") > 0) {
                 return;
             }
 
@@ -109,7 +128,9 @@ final class BDJSecurityManager extends SecurityManager {
             if (perm.getActions().equals("read")) {
                 String prop = perm.getName();
                 if (prop.startsWith("bluray.") || prop.startsWith("dvb.") || prop.startsWith("mhp.") || prop.startsWith("aacs.")) {
-                    //logger.info(perm + " granted");
+                    return;
+                }
+                if (prop.equals("dolbyvision.graphicspriority.available")) {
                     return;
                 }
                 if (prop.startsWith("user.dir")) {
@@ -150,6 +171,17 @@ final class BDJSecurityManager extends SecurityManager {
         /* Networking */
         else if (perm instanceof java.net.SocketPermission) {
             if (new java.net.SocketPermission("*", "connect,resolve").implies(perm)) {
+                checkNet(perm);
+                return;
+            }
+            if (new java.net.SocketPermission("*", "listen,resolve").implies(perm)) {
+                checkNet(perm);
+                return;
+            }
+        }
+        else if (perm instanceof java.net.NetPermission) {
+            if (new java.net.NetPermission("*", "getNetworkInformation").implies(perm)) {
+                checkNet(perm);
                 return;
             }
         }
@@ -203,6 +235,37 @@ final class BDJSecurityManager extends SecurityManager {
             System.err.println(" *** caught " + ex + " at\n" + Logger.dumpStack());
             throw ex;
         }
+    }
+
+    /*
+     * Allow package access (Java 11)
+     */
+
+    private static final String pkgPrefixes[] = {
+        "javax.media" ,
+        "javax.tv",
+        "javax.microedition",
+        "org.davic",
+        "org.dvb",
+        "org.havi",
+        "org.bluray",
+        "org.blurayx",
+        "com.aacsla.bluray",
+    };
+    private static final String pkgs[] = {
+        "org.videolan.backdoor",
+    };
+
+    public void checkPackageAccess(String pkg) {
+
+        for (int i = 0; i < pkgPrefixes.length; i++)
+            if (pkg.startsWith(pkgPrefixes[i]))
+                return;
+        for (int i = 0; i < pkgs.length; i++)
+            if (pkg.equals(pkgs[i]))
+                return;
+
+        super.checkPackageAccess(pkg);
     }
 
     /*

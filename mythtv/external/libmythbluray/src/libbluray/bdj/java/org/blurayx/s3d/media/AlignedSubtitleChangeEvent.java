@@ -33,4 +33,6 @@ public class AlignedSubtitleChangeEvent extends EventObject implements Serializa
     public int getAlignedSubtitle() {
         return subtitleAlignment;
     }
+
+    private static final long serialVersionUID = -5865844251150398766L;
 }

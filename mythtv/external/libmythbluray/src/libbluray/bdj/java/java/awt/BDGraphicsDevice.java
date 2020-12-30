@@ -18,11 +18,11 @@
 
 package java.awt;
 
-class BDGraphicsDeviceImpl extends GraphicsDevice {
+class BDGraphicsDevice extends GraphicsDevice {
     private BDGraphicsConfiguration configuration;
 
-    BDGraphicsDeviceImpl(BDGraphicsEnvironment environment) {
-        configuration = new BDGraphicsConfiguration((BDGraphicsDevice)this);
+    BDGraphicsDevice(BDGraphicsEnvironment environment) {
+        configuration = new BDGraphicsConfiguration(this);
     }
 
     public int getType() {

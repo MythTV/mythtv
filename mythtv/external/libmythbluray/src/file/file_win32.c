@@ -81,7 +81,7 @@ static int64_t _file_read(BD_FILE_H *file, uint8_t *buf, int64_t size)
         return (int64_t)fread(buf, 1, (size_t)size, (FILE *)file->internal);
     }
 
-    BD_DEBUG(DBG_FILE | DBG_CRIT, "Ignoring invalid read of size %"PRId64" (%p)\n", size, (void*)file);
+    BD_DEBUG(DBG_FILE | DBG_CRIT, "Ignoring invalid read of size %" PRId64 " (%p)\n", size, (void*)file);
     return 0;
 }
 
@@ -99,7 +99,7 @@ static int64_t _file_write(BD_FILE_H *file, const uint8_t *buf, int64_t size)
         return 0;
     }
 
-    BD_DEBUG(DBG_FILE | DBG_CRIT, "Ignoring invalid write of size %"PRId64" (%p)\n", size, (void*)file);
+    BD_DEBUG(DBG_FILE | DBG_CRIT, "Ignoring invalid write of size %" PRId64 " (%p)\n", size, (void*)file);
     return 0;
 }
 

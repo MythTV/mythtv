@@ -28,8 +28,13 @@
 #include "util/mutex.h"
 #include "util/logging.h"
 
+#ifdef HAVE_LIBUDFREAD
+#include <udfread/udfread.h>
+#include <udfread/blockinput.h>
+#else
 #include "udfread.h"
 #include "blockinput.h"
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>   // SEEK_SET
@@ -263,20 +268,20 @@ void *udf_image_open(const char *img_path,
         }
     } else {
 
-    /* app handles file I/O ? */
-    if (result < 0 && file_open != file_open_default()) {
-        struct udfread_block_input *bi = _block_input(img_path);
-        if (bi) {
-            result = udfread_open_input(udf, bi);
-            if (result < 0) {
-                bi->close(bi);
+        /* app handles file I/O ? */
+        if (result < 0 && file_open != file_open_default()) {
+            struct udfread_block_input *bi = _block_input(img_path);
+            if (bi) {
+                result = udfread_open_input(udf, bi);
+                if (result < 0) {
+                    bi->close(bi);
+                }
             }
         }
-    }
 
-    if (result < 0) {
-        result = udfread_open(udf, img_path);
-    }
+        if (result < 0) {
+            result = udfread_open(udf, img_path);
+        }
     }
 
     if (result < 0) {

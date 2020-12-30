@@ -30,7 +30,7 @@ public class HScreenPoint {
     }
 
     public int hashCode() {
-        return Float.hashCode(x) + 31 * Float.hashCode(y);
+        return (new Float(x).hashCode()) + 31 * (new Float(y).hashCode());
     }
 
     public boolean equals(Object obj)

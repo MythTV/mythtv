@@ -10,6 +10,8 @@
     <property name="src_asm" value="../../../contrib/asm/src/"/>
     <property name="bootclasspath" value=""/>
     <property name="version" value=""/>
+    <property name="java_version_asm" value="1.5"/>
+    <property name="java_version_bdj" value="1.4"/>
 
     <target name="init">
         <tstamp/>
@@ -21,22 +23,30 @@
             description="compile the source " >
         <javac srcdir="${src_asm}" destdir="${build}" debug="yes"
                bootclasspath="${bootclasspath}"
-               includeantruntime="false"
-               source="1.5" target="1.5">
+               source="${java_version_asm}" target="${java_version_asm}">
                <compilerarg value="-XDignore.symbol.file"/>
                <compilerarg value="-Xlint:-deprecation"/>
         </javac>
         <javac srcdir="${src}${src_awt}" destdir="${build}" debug="yes"
                bootclasspath="${bootclasspath}"
-               includeantruntime="false"
-               source="1.4" target="1.4">
+               source="${java_version_bdj}" target="${java_version_bdj}">
                <compilerarg value="-XDignore.symbol.file"/>
                <compilerarg value="-Xlint:-deprecation"/>
         </javac>
     </target>
     <target name="dist" depends="compile"
             description="generate the distribution" >
-        <jar jarfile="${dist}/libmythbluray-${version}.jar" basedir="${build}" />
+        <jar jarfile="${dist}/libmythbluray-${version}.jar" basedir="${build}">
+            <exclude name="java/awt/**" />
+            <exclude name="sun/**" />
+        </jar>
+        <jar jarfile="${dist}/libmythbluray-awt-${version}.jar" basedir="${build}">
+          <include name="java/awt/**" />
+          <include name="sun/**" />
+          <!-- following classes are used only at build time -->
+          <exclude name="sun/awt/CausedFocusEvent**" />
+          <exclude name="java/awt/event/FocusEvent**" />
+        </jar>
     </target>
 
     <target name="clean"

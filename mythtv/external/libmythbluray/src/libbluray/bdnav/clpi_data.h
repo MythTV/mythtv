@@ -90,6 +90,11 @@ typedef struct
     uint8_t           oc_flag;
     uint8_t           char_code;
     char              lang[4];
+    uint8_t           cr_flag;
+    uint8_t           dynamic_range_type;
+    uint8_t           color_space;
+    uint8_t           hdr_plus_flag;
+    uint8_t           isrc[12];     /* International Standard Recording Code (usually empty or all zeroes) */
 } CLPI_PROG_STREAM;
 
 typedef struct

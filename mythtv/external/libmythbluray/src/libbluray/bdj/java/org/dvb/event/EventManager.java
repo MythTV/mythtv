@@ -29,10 +29,8 @@ import org.davic.resources.ResourceClient;
 import org.davic.resources.ResourceServer;
 import org.davic.resources.ResourceStatusEvent;
 import org.davic.resources.ResourceStatusListener;
-import org.havi.ui.HScene;
 import org.videolan.BDJAction;
 import org.videolan.BDJXletContext;
-import org.videolan.GUIManager;
 import org.videolan.Logger;
 
 public class EventManager implements ResourceServer {
@@ -152,11 +150,10 @@ public class EventManager implements ResourceServer {
 
     public boolean receiveKeyEventN(int type, int modifiers, int keyCode) {
         UserEvent ue = new UserEvent(this, 1, type, keyCode, modifiers, System.currentTimeMillis());
-        HScene focusHScene = GUIManager.getInstance().getFocusHScene();
+        BDJXletContext context = BDJXletContext.getFocusContext();
         boolean result = false;
 
-        if (focusHScene != null) {
-            BDJXletContext context = focusHScene.getXletContext();
+        if (context != null) {
             for (Iterator it = exclusiveAWTEventListener.iterator(); it.hasNext(); ) {
                 UserEventItem item = (UserEventItem)it.next();
                 if (item.context == null || item.context.isReleased()) {

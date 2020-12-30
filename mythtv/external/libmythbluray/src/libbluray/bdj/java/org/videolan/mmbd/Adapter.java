@@ -34,6 +34,7 @@ import java.security.PrivilegedAction;
 
 import org.videolan.BDJClassFileTransformer;
 import org.videolan.BDJClassLoaderAdapter;
+import org.videolan.BDJXletContext;
 import org.videolan.Logger;
 
 import javax.media.ClockStartedError;
@@ -45,7 +46,7 @@ import javax.tv.xlet.XletContext;
 import javax.tv.xlet.XletStateChangeException;
 import org.bluray.bdplus.StatusListener;
 
-public class Adapter implements BDJClassLoaderAdapter {
+public class Adapter extends LoaderAdapter implements BDJClassLoaderAdapter {
 
     public Map getHideClasses() {
         return null;
@@ -60,14 +61,23 @@ public class Adapter implements BDJClassLoaderAdapter {
     }
 
     public Adapter() throws ClassNotFoundException {
+
+        if (BDJXletContext.getCurrentContext() != null)
+            throw new ClassNotFoundException();
+
         /* relocate classes to avoid runtime package collisions */
 
         final String s1 = "org/videolan/mmbd/Adapter$Xlet";
         final String s2 = "org/videolan/mmbd/Adapter$If";
         Map m = new HashMap();
         String d1, d2;
-        m.put(s1, d1 = (new String(b0) + new String(b1)));
-        m.put(s2, d2 = (new String(b0) + new String(b2)));
+
+        try {
+            m.put(s1, d1 = (new String(b0, "UTF-8") + new String(b1, "UTF-8")));
+            m.put(s2, d2 = (new String(b0, "UTF-8") + new String(b2, "UTF-8")));
+        } catch (java.io.UnsupportedEncodingException uee) {
+            throw new ClassNotFoundException();
+        }
 
         BDJClassFileTransformer t = new BDJClassFileTransformer();
         byte[] c1 = t.rename(loadBootClassCode(s1), m);

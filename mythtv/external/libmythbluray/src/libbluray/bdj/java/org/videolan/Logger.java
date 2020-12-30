@@ -30,8 +30,12 @@ public class Logger {
 
         // capture stdout and stderr from on-disc applets
         // (those produce useful debug information sometimes)
-        System.setOut(createCapture(System.out, false));
-        System.setErr(createCapture(System.err, true));
+        try {
+            System.setOut(createCapture(System.out, false));
+            System.setErr(createCapture(System.err, true));
+        } catch (java.io.UnsupportedEncodingException uee) {
+            System.err.println("Error capturing stdout/stderr: " + uee);
+        }
 
         prop = System.getProperty("debug.unimplemented.throw");
         if (prop != null && prop.equalsIgnoreCase("YES")) {
@@ -73,8 +77,10 @@ public class Logger {
         return new Location();
     }
 
-    private static PrintStream createCapture(final PrintStream printStream, final boolean error) {
-        return new PrintStream(printStream) {
+    private static PrintStream createCapture(final PrintStream printStream, final boolean error)
+        throws java.io.UnsupportedEncodingException {
+
+        return new PrintStream(printStream, false, "UTF-8") {
             public void print(final String string) {
                 Logger.log(error, string);
             }

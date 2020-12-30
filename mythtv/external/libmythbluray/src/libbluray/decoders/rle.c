@@ -37,7 +37,7 @@ static int _rle_ensure_size(RLE_ENC *p)
             return -1;
         }
         /* realloc to 2x */
-        BD_PG_RLE_ELEM *tmp = refcnt_realloc(start, p->num_elem * 2 * sizeof(BD_PG_RLE_ELEM));
+        void *tmp = refcnt_realloc(start, p->num_elem * 2 * sizeof(BD_PG_RLE_ELEM), NULL);
         if (!tmp) {
             p->error = 1;
             return -1;

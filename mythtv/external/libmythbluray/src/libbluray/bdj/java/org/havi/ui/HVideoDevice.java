@@ -1,6 +1,7 @@
 /*
  * This file is part of libbluray
  * Copyright (C) 2010  William Hahne
+ * Copyright (C) 2019  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,12 +20,24 @@
 
 package org.havi.ui;
 
+import org.blurayx.s3d.ui.HVideoConfigTemplateS3D;
+import org.blurayx.uhd.ui.HVideoConfigurationTemplateUHD;
+
 public class HVideoDevice extends HScreenDevice {
     protected HVideoDevice() {
+        boolean is_p6 = isProfile6();
+        boolean is_p5 = isProfile5();
         int length = HScreenConfigTemplate.defaultConfig.length;
         hvcArray = new HVideoConfiguration[length];
         for (int i = 0; i < length; i++) {
-            HVideoConfigTemplate hvct = new HVideoConfigTemplate();
+            HVideoConfigTemplate hvct;
+            if (is_p6) {
+                hvct = new HVideoConfigurationTemplateUHD();
+            } else if (is_p5) {
+                hvct = new HVideoConfigTemplateS3D();
+            } else {
+                hvct = new HVideoConfigTemplate();
+            }
             HScreenConfigTemplate.initDefaultConfigTemplate(hvct, i);
             hvcArray[i] = new HVideoConfiguration(hvct);
         }

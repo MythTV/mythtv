@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import org.videolan.Logger;
 
 import org.bluray.net.BDLocator;
+import org.bluray.system.RegisterAccess;
 import org.bluray.ti.TitleImpl;
 import org.davic.media.MediaLocator;
 import org.dvb.application.AppID;
@@ -240,6 +241,14 @@ public class BDJLoader {
                 vfsCache.add(bdjo.getAppCaches());
             }
 
+            try {
+                BDJLoaderAdapter a = Libbluray.getLoaderAdapter();
+                if (a != null)
+                    appTable = a.patchAppTable(appTable, title.getTitleNum());
+            } catch (Throwable t) {
+                logger.error("" + t);
+            }
+
             // initialize appProxys
             for (int i = 0; i < appTable.length; i++) {
                 if (proxys[i] == null) {
@@ -259,7 +268,7 @@ public class BDJLoader {
             }
 
             // change psr
-            Libbluray.writePSR(Libbluray.PSR_TITLE_NUMBER, title.getTitleNum());
+            Libbluray.writePSR(RegisterAccess.PSR_TITLE_NR, title.getTitleNum());
 
             // notify AppsDatabase
             ((BDJAppsDatabase)BDJAppsDatabase.getAppsDatabase()).newDatabase(bdjo, proxys);

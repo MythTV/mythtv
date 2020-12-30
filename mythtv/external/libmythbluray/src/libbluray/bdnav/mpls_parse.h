@@ -21,17 +21,15 @@
 #if !defined(_MPLS_PARSE_H_)
 #define _MPLS_PARSE_H_
 
-#include "mpls_data.h"
-#include "uo_mask_table.h"
-
 #include "util/attributes.h"
 
 #include <stdint.h>
 
 struct bd_disc;
+struct mpls_pl;
 
-BD_PRIVATE MPLS_PL* mpls_parse(const char *path) BD_ATTR_MALLOC;
-BD_PRIVATE MPLS_PL* mpls_get(struct bd_disc *disc, const char *file);
-BD_PRIVATE void mpls_free(MPLS_PL **pl);
+BD_PRIVATE struct mpls_pl *mpls_parse(const char *path);
+BD_PRIVATE struct mpls_pl *mpls_get(struct bd_disc *disc, const char *file);
+BD_PRIVATE void mpls_free(struct mpls_pl **pl);
 
 #endif // _MPLS_PARSE_H_

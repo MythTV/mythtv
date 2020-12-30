@@ -29,35 +29,53 @@
 
 #define _DARWIN_C_SOURCE
 #include <sys/stat.h>
-#include <sys/param.h>
-#include <sys/ucred.h>
-#include <sys/mount.h>
+
+#include <DiskArbitration/DADisk.h>
+
+static char *bsdname_get_mountpoint(const char *device_path)
+{
+    char *result = NULL;
+
+    DASessionRef session = DASessionCreate(kCFAllocatorDefault);
+    if (session) {
+        DADiskRef disk = DADiskCreateFromBSDName(kCFAllocatorDefault, session, device_path);
+        if (disk) {
+            CFDictionaryRef desc = DADiskCopyDescription(disk);
+            if (desc) {
+                // Get Volume path as CFURL
+                CFURLRef url = CFDictionaryGetValue(desc, kDADiskDescriptionVolumePathKey);
+                if (url) {
+                    // Copy Volume path as C char array
+                    char tmp_path[PATH_MAX];
+                    if (CFURLGetFileSystemRepresentation(url, true, (UInt8*)tmp_path, sizeof(tmp_path))) {
+                        result = str_dup(tmp_path);
+                    }
+                }
+                CFRelease(desc);
+            }
+            CFRelease(disk);
+        }
+        CFRelease(session);
+    }
+
+    return result;
+}
+
 
 char *mount_get_mountpoint(const char *device_path)
 {
     struct stat st;
-    if (stat (device_path, &st) ) {
-        return str_dup(device_path);
-    }
-
-    /* If it's a directory, all is good */
-    if (S_ISDIR(st.st_mode)) {
-        return str_dup(device_path);
-    }
-
-    struct statfs mbuf[128];
-    int fs_count;
-
-    if ( (fs_count = getfsstat (NULL, 0, MNT_NOWAIT)) != -1 ) {
-
-        getfsstat (mbuf, fs_count * sizeof(mbuf[0]), MNT_NOWAIT);
-
-        for ( int i = 0; i < fs_count; ++i) {
-            if (!strcmp (mbuf[i].f_mntfromname, device_path)) {
-                return str_dup (mbuf[i].f_mntonname);
-            }
+    if (stat(device_path, &st) == 0) {
+        // If it's a directory, all is good
+        if (S_ISDIR(st.st_mode)) {
+            return str_dup(device_path);
         }
     }
 
-    return str_dup (device_path);
+    char *mountpoint = bsdname_get_mountpoint(device_path);
+    if (mountpoint) {
+        return mountpoint;
+    }
+
+    return str_dup(device_path);
 }

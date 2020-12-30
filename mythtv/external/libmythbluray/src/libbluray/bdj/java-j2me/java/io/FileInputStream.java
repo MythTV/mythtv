@@ -27,12 +27,7 @@ public class FileInputStream extends InputStream
 {
     private FileDescriptor fd;
 
-    private final Object closeLock = new Object();
-    private volatile boolean closed = false;
-
     private static Logger logger = null;
-
-    private int available = 0;
 
     public FileInputStream(File file) throws FileNotFoundException {
         String name = file != null ? file.getPath() : null;
@@ -46,7 +41,6 @@ public class FileInputStream extends InputStream
         }
 
         fd = new FileDescriptor();
-        fd.incrementAndGetUseCount();
 
         if (file.isAbsolute()) {
             String cachedName = BDJLoader.getCachedFile(name);
@@ -59,7 +53,7 @@ public class FileInputStream extends InputStream
                 logger.info("Using cached " + cachedName + " for " + name);
                 name = cachedName;
             }
-            openImpl(name);
+            open(name);
         } else {
             /* relative paths are problematic ... */
             /* Those should be mapped to xlet home directory, which is inside .jar file. */
@@ -74,10 +68,8 @@ public class FileInputStream extends InputStream
                 logger.error("no home found for " + name + " at " + Logger.dumpStack());
                 throw new FileNotFoundException(name);
             }
-            openImpl(home + name);
+            open(home + name);
         }
-
-        available = 1024;
     }
 
     public FileInputStream(String name) throws FileNotFoundException {
@@ -92,45 +84,17 @@ public class FileInputStream extends InputStream
         if (security != null) {
             security.checkRead(fdObj);
         }
-        fdObj.incrementAndGetUseCount();
         fd = fdObj;
-        available = 1024;
-    }
-
-    /* open()/open0() wrapper to select correct native method at runtime */
-    private void openImpl(String name) throws FileNotFoundException {
-        try {
-            open(name);
-        } catch (UnsatisfiedLinkError e) {
-            /* OpenJDK 8 b40 */
-            open0(name);
-        }
     }
 
     private native int  readBytes(byte b[], int off, int len) throws IOException;
     private native int  close0();
     /* OpenJDK 6, OpenJDK 7, PhoneME, ... */
     private native void open(String name) throws FileNotFoundException;
-    /* OpenJDK 8 */
-    private native void open0(String name) throws FileNotFoundException;
 
-    //public  native int  read() throws IOException;
-    //public  native long skip(long n) throws IOException;
-    //public  native int  available() throws IOException;
-
-    public int available() throws IOException {
-        if (fd != null && fd.slave != null) {
-            return fd.slave.available();
-        }
-        return available;
-    }
-
-    public  int  read() throws IOException {
-        byte b[] = new byte[1];
-        if (read(b) == 1)
-            return b[0];
-        return -1;
-    }
+    public  native int  read() throws IOException;
+    public  native long skip(long n) throws IOException;
+    public  native int  available() throws IOException;
 
     public int read(byte b[]) throws IOException {
         return read(b, 0, b.length);
@@ -144,47 +108,10 @@ public class FileInputStream extends InputStream
             throw new IndexOutOfBoundsException();
         }
 
-        if (fd != null && fd.slave != null) {
-            return fd.slave.read(b, off, len);
-        }
-
-        int r = readBytes(b, off, len);
-        if (r != len) {
-            available = 0;
-        }
-        return r;
-    }
-
-    public long skip(long n) throws IOException {
-        return super.skip(n);
+        return readBytes(b, off, len);
     }
 
     public void close() throws IOException {
-        close(true);
-    }
-
-    public void close(boolean force) throws IOException {
-        synchronized (closeLock) {
-            if (closed) {
-                return;
-            }
-            closed = true;
-        }
-
-        available = 0;
-
-        if (fd != null) {
-            if (fd.slave != null) {
-                fd.slave.close();
-                return;
-            }
-
-            int n = fd.decrementAndGetUseCount();
-            if (n > 0 && !force) {
-                return;
-            }
-        }
-
         close0();
     }
 
@@ -195,7 +122,7 @@ public class FileInputStream extends InputStream
         return fd;
     }
 
-    /* not in J2SE
+    /* not in J2ME
     public FileChannel getChannel() {}
     */
 
@@ -208,7 +135,7 @@ public class FileInputStream extends InputStream
     protected void finalize() throws IOException {
         if (fd != null) {
             if (fd != FileDescriptor.in) {
-                close(false);
+                close();
             }
         }
     }

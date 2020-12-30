@@ -20,8 +20,8 @@ DEPENDPATH += ../libudfread
 DEFINES += ENABLE_UDF
 
 bluray_major = 1
-bluray_minor = 0
-bluray_micro = 2
+bluray_minor = 2
+bluray_micro = 1
 bluray_version = $$bluray_major"."$$bluray_minor"."$$bluray_micro
 
 DEFINES += BLURAY_VERSION_MAJOR=$$bluray_major
@@ -126,22 +126,27 @@ using_bdjava {
         INCLUDEPATH += $${JDK_HOME}/include $${JDK_HOME}/include/$$javaos
     }
 
-    bdjava.target = src/libbluray/bdj/.libs/libmythbluray-$${BDJ_TYPE}-"$$bluray_version".jar
     bdjava.depends = src/libbluray/bdj/build.xml
-    bdjava.commands = $${ANTBIN} -f $$bdjava.depends -Dbuild=\'build\' -Ddist=\'.libs\' -Dsrc_awt=:java-$${BDJ_TYPE} -Dversion='$${BDJ_TYPE}-$$bluray_version'
+    bdjava.versions = -Dversion='$${BDJ_TYPE}-$$bluray_version' -Djava_version_asm=$${JAVA_CODE_VERSION} -Djava_version_bdj=$${JAVA_CODE_VERSION}
+    bdjava.commands = $${ANTBIN} -f $$bdjava.depends -Dbuild=\'build\' -Ddist=\'.libs\' -Dsrc_awt=:java-$${BDJ_TYPE}:java-build-support $$bdjava.versions
 
     bdjava_clean.commands = $${ANTBIN} -f $$bdjava.depends -Dbuild=\'build\' -Ddist=\'.libs\' -Dversion='$${BDJ_TYPE}-$$bluray_version clean'
 
+    bdjmain.target  = src/libbluray/bdj/.libs/libmythbluray-$${BDJ_TYPE}-"$$bluray_version".jar
+    bdjmain.depends = bdjava
+    bdjawt.target   = src/libbluray/bdj/.libs/libmythbluray-awt-$${BDJ_TYPE}-"$$bluray_version".jar
+    bdjawt.depends  = bdjava
+
     installjar.path = $${PREFIX}/share/mythtv/jars
-    installjar.files = $$bdjava.target
+    installjar.files = $$bdjmain.target $$bdjawt.target
     installjar.CONFIG += no_check_exist directory
 
     INSTALLS += installjar
 
     CLEAN_DEPS += bdjava_clean
-    QMAKE_CLEAN += $$bdjava.target
-    PRE_TARGETDEPS += $$bdjava.target
-    QMAKE_EXTRA_TARGETS += bdjava bdjava_clean
+    QMAKE_CLEAN += $$bdjmain.target $$bdjawt.target
+    PRE_TARGETDEPS += $$bdjmain.target $$bdjawt.target
+    QMAKE_EXTRA_TARGETS += bdjava bdjmain bdjawt bdjava_clean
 } else {
     macx:javaos = darwin
     win32:javaos = win32

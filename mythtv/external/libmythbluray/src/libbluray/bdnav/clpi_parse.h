@@ -20,19 +20,21 @@
 #if !defined(_CLPI_PARSE_H_)
 #define _CLPI_PARSE_H_
 
-#include "clpi_data.h"
 #include "util/attributes.h"
 
 #include <stdint.h>
 
+struct clpi_cl;
 struct bd_disc;
 
-BD_PRIVATE uint32_t clpi_find_stc_spn(const CLPI_CL *cl, uint8_t stc_id);
-BD_PRIVATE uint32_t clpi_lookup_spn(const CLPI_CL *cl, uint32_t timestamp, int before, uint8_t stc_id);
-BD_PRIVATE uint32_t clpi_access_point(const CLPI_CL *cl, uint32_t pkt, int next, int angle_change, uint32_t *time);
-BD_PRIVATE CLPI_CL* clpi_parse(const char *path) BD_ATTR_MALLOC;
-BD_PRIVATE CLPI_CL* clpi_get(struct bd_disc *disc, const char *file);
-BD_PRIVATE CLPI_CL* clpi_copy(const CLPI_CL* src_cl);
-BD_PRIVATE void clpi_free(CLPI_CL **cl);
+BD_PRIVATE struct clpi_cl* clpi_parse(const char *path);
+BD_PRIVATE struct clpi_cl* clpi_get(struct bd_disc *disc, const char *file);
+BD_PRIVATE struct clpi_cl* clpi_copy(const struct clpi_cl* src_cl);
+BD_PRIVATE void clpi_free(struct clpi_cl **cl);
+
+BD_PRIVATE uint32_t clpi_find_stc_spn(const struct clpi_cl *cl, uint8_t stc_id);
+BD_PRIVATE uint32_t clpi_lookup_spn(const struct clpi_cl *cl, uint32_t timestamp, int before, uint8_t stc_id);
+BD_PRIVATE uint32_t clpi_access_point(const struct clpi_cl *cl, uint32_t pkt, int next, int angle_change, uint32_t *time);
+
 
 #endif // _CLPI_PARSE_H_

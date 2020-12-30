@@ -26,6 +26,7 @@
 
 #include "extdata_parse.h"
 #include "bdmv_parse.h"
+#include "mpls_data.h"
 #include "uo_mask.h"
 
 #include "disc/disc.h"
@@ -77,9 +78,11 @@ _parse_appinfo(BITSTREAM *bits, MPLS_AI *ai)
     ai->random_access_flag = bs_read(bits, 1);
     ai->audio_mix_flag = bs_read(bits, 1);
     ai->lossless_bypass_flag = bs_read(bits, 1);
+    ai->mvc_base_view_r_flag = bs_read(bits, 1);
+    ai->sdr_conversion_notification_flag = bs_read(bits, 1);
 #if 0
     // Reserved
-    bs_skip(bits, 13);
+    bs_skip(bits, 11);
     bs_seek_byte(bits, pos + len);
 #endif
     return 1;
@@ -128,13 +131,13 @@ _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
             break;
 
         case 2:
-        case 4:
             s->subpath_id = bs_read(bits, 8);
             s->subclip_id = bs_read(bits, 8);
             s->pid        = bs_read(bits, 16);
             break;
 
         case 3:
+        case 4:
             s->subpath_id = bs_read(bits, 8);
             s->pid        = bs_read(bits, 16);
             break;
@@ -161,6 +164,12 @@ _parse_stream(BITSTREAM *bits, MPLS_STREAM *s)
         case 0x24:
             s->format = bs_read(bits, 4);
             s->rate   = bs_read(bits, 4);
+            if (s->coding_type == 0x24) {
+                s->dynamic_range_type = bs_read(bits, 4);
+                s->color_space        = bs_read(bits, 4);
+                s->cr_flag            = bs_read(bits, 1);
+                s->hdr_plus_flag      = bs_read(bits, 1);
+            }
             break;
 
         case 0x03:
@@ -227,9 +236,10 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
     stn->num_secondary_audio = bs_read(bits, 8);
     stn->num_secondary_video = bs_read(bits, 8);
     stn->num_pip_pg          = bs_read(bits, 8);
+    stn->num_dv              = bs_read(bits, 8);
 
-    // 5 reserve bytes
-    bs_skip(bits, 5 * 8);
+    // 4 reserve bytes
+    bs_skip(bits, 4 * 8);
 
     // Primary Video Streams
     ss = NULL;
@@ -375,6 +385,23 @@ _parse_stn(BITSTREAM *bits, MPLS_STN *stn)
         }
     }
 
+    // Dolby Vision Enhancement Layer Streams
+    ss = NULL;
+    if (stn->num_dv) {
+        ss = calloc(stn->num_dv, sizeof(MPLS_STREAM));
+        if (!ss) {
+            return 0;
+        }
+        for (ii = 0; ii < stn->num_dv; ii++) {
+            if (!_parse_stream(bits, &ss[ii])) {
+                X_FREE(ss);
+                BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing dv entry\n");
+                return 0;
+            }
+        }
+    }
+    stn->dv = ss;
+
     if (bs_seek_byte(bits, pos + len) < 0) {
         return 0;
     }
@@ -436,7 +463,7 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
     bs_read_string(bits, clip_id, 5);
 
     bs_read_string(bits, codec_id, 4);
-    if (memcmp(codec_id, "M2TS", 4) != 0) {
+    if (memcmp(codec_id, "M2TS", 4) != 0 && memcmp(codec_id, "FMTS", 4) != 0) {
         BD_DEBUG(DBG_NAV | DBG_CRIT, "Incorrect CodecIdentifier (%s)\n", codec_id);
     }
 
@@ -489,7 +516,7 @@ _parse_playitem(BITSTREAM *bits, MPLS_PI *pi)
         bs_read_string(bits, pi->clip[ii].clip_id, 5);
 
         bs_read_string(bits, pi->clip[ii].codec_id, 4);
-        if (memcmp(pi->clip[ii].codec_id, "M2TS", 4) != 0) {
+        if (memcmp(pi->clip[ii].codec_id, "M2TS", 4) != 0 && memcmp(pi->clip[ii].codec_id, "FMTS", 4) != 0) {
             BD_DEBUG(DBG_NAV | DBG_CRIT, "Incorrect CodecIdentifier (%s)\n", pi->clip[ii].codec_id);
         }
         pi->clip[ii].stc_id   = bs_read(bits, 8);
@@ -543,7 +570,7 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
     bs_read_string(bits, clip_id, 5);
 
     bs_read_string(bits, codec_id, 4);
-    if (memcmp(codec_id, "M2TS", 4) != 0) {
+    if (memcmp(codec_id, "M2TS", 4) != 0 && memcmp(codec_id, "FMTS", 4) != 0) {
         BD_DEBUG(DBG_NAV | DBG_CRIT, "Incorrect CodecIdentifier (%s)\n", codec_id);
     }
 
@@ -583,7 +610,7 @@ _parse_subplayitem(BITSTREAM *bits, MPLS_SUB_PI *spi)
         bs_read_string(bits, spi->clip[ii].clip_id, 5);
 
         bs_read_string(bits, spi->clip[ii].codec_id, 4);
-        if (memcmp(spi->clip[ii].codec_id, "M2TS", 4) != 0) {
+        if (memcmp(spi->clip[ii].codec_id, "M2TS", 4) != 0 && memcmp(spi->clip[ii].codec_id, "FMTS", 4) != 0) {
             BD_DEBUG(DBG_NAV | DBG_CRIT, "Incorrect CodecIdentifier (%s)\n", spi->clip[ii].codec_id);
         }
         spi->clip[ii].stc_id = bs_read(bits, 8);
@@ -959,6 +986,77 @@ _parse_subpath_extension(BITSTREAM *bits, MPLS_PL *pl)
 }
 
 static int
+_parse_static_metadata(BITSTREAM *bits, MPLS_STATIC_METADATA *data)
+{
+    int ii;
+
+    if (bs_avail(bits) < 28 * 8) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_static_metadata: unexpected end of file\n");
+        return 0;
+    }
+
+    data->dynamic_range_type              = bs_read(bits, 4);
+    bs_skip(bits,4);
+    bs_skip(bits,24);
+    for(ii = 0; ii < 3; ii++){
+        data->display_primaries_x[ii]     = bs_read(bits, 16);
+        data->display_primaries_y[ii]     = bs_read(bits, 16);
+    }
+    data->white_point_x                   = bs_read(bits, 16);
+    data->white_point_y                   = bs_read(bits, 16);
+    data->max_display_mastering_luminance = bs_read(bits, 16);
+    data->min_display_mastering_luminance = bs_read(bits, 16);
+    data->max_CLL                         = bs_read(bits, 16);
+    data->max_FALL                        = bs_read(bits, 16);
+
+    return 1;
+}
+
+static int
+_parse_static_metadata_extension(BITSTREAM *bits, MPLS_PL *pl)
+{
+    MPLS_STATIC_METADATA *static_metadata;
+    uint32_t len;
+    int ii;
+
+    len = bs_read(bits, 32);
+    if (len < 32) {     // At least one static metadata entry
+        return 0;
+    }
+    if (bs_avail(bits) < len * 8) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_static_metadata_extension: unexpected end of file\n");
+        return 0;
+    }
+
+    uint8_t sm_count = bs_read(bits, 8);
+    if (sm_count < 1) {
+        return 0;
+    }
+    bs_skip(bits, 24);
+
+    static_metadata = calloc(sm_count,  sizeof(MPLS_STATIC_METADATA));
+    if (!static_metadata) {
+        BD_DEBUG(DBG_CRIT, "out of memory\n");
+        return 0;
+    }
+
+    for (ii = 0; ii < sm_count; ii++) {
+        if (!_parse_static_metadata(bits, &static_metadata[ii])) {
+            goto error;
+        }
+    }
+    pl->ext_static_metadata       = static_metadata;
+    pl->ext_static_metadata_count = sm_count;
+
+    return 1;
+
+ error:
+    BD_DEBUG(DBG_NAV | DBG_CRIT, "error parsing static metadata extension\n");
+    X_FREE(static_metadata);
+    return 0;
+}
+
+static int
 _parse_mpls_extension(BITSTREAM *bits, int id1, int id2, void *handle)
 {
     MPLS_PL *pl = (MPLS_PL*)handle;
@@ -977,6 +1075,13 @@ _parse_mpls_extension(BITSTREAM *bits, int id1, int id2, void *handle)
         if (id2 == 2) {
             // SubPath entries extension
             return _parse_subpath_extension(bits, pl);
+        }
+    }
+
+    if (id1 == 3) {
+        if (id2 == 5) {
+            // Static metadata extension
+            return _parse_static_metadata_extension(bits, pl);
         }
     }
 

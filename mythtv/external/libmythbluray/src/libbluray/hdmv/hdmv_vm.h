@@ -60,6 +60,8 @@ typedef struct hdmv_vm_event_s {
     uint32_t     param;
 } HDMV_EVENT;
 
+BD_PRIVATE const char *hdmv_event_str(hdmv_event_e event);
+
 /*
  *
  */

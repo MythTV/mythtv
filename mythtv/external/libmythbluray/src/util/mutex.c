@@ -68,18 +68,16 @@ static int _mutex_destroy(MUTEX_IMPL *p)
 
 #elif defined(HAVE_PTHREAD_H)
 
-typedef struct {
-    int             lock_count;
-    pthread_t       owner;
-    pthread_mutex_t mutex;
-} MUTEX_IMPL;
+typedef pthread_mutex_t MUTEX_IMPL;
 
 static int _mutex_init(MUTEX_IMPL *p)
 {
-    p->owner      = (pthread_t)-1;
-    p->lock_count = 0;
+    pthread_mutexattr_t attr;
 
-    if (pthread_mutex_init(&p->mutex, NULL)) {
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+
+    if (pthread_mutex_init(p, &attr)) {
         BD_DEBUG(DBG_BLURAY|DBG_CRIT, "pthread_mutex_init() failed !\n");
         return -1;
     }
@@ -89,40 +87,17 @@ static int _mutex_init(MUTEX_IMPL *p)
 
 static int _mutex_lock(MUTEX_IMPL *p)
 {
-    if (pthread_equal(p->owner, pthread_self())) {
-        /* recursive lock */
-        p->lock_count++;
-        return 0;
-    }
-
-    if (pthread_mutex_lock(&p->mutex)) {
+    if (pthread_mutex_lock(p)) {
         BD_DEBUG(DBG_BLURAY|DBG_CRIT, "pthread_mutex_lock() failed !\n");
         return -1;
     }
-
-    p->owner      = pthread_self();
-    p->lock_count = 1;
 
     return 0;
 }
 
 static int _mutex_unlock(MUTEX_IMPL *p)
 {
-    if (!pthread_equal(p->owner, pthread_self())) {
-        BD_DEBUG(DBG_BLURAY|DBG_CRIT, "bd_mutex_unlock(): not owner !\n");
-        return -1;
-    }
-
-    p->lock_count--;
-    if (p->lock_count > 0) {
-        return 0;
-    }
-
-    /* unlock */
-
-    p->owner = (pthread_t)-1;
-
-    if (pthread_mutex_unlock(&p->mutex)) {
+    if (pthread_mutex_unlock(p)) {
         BD_DEBUG(DBG_BLURAY|DBG_CRIT, "pthread_mutex_unlock() failed !\n");
         return -1;
     }
@@ -132,10 +107,7 @@ static int _mutex_unlock(MUTEX_IMPL *p)
 
 static int _mutex_destroy(MUTEX_IMPL *p)
 {
-    _mutex_lock(p);
-    _mutex_unlock(p);
-
-    if (pthread_mutex_destroy(&p->mutex)) {
+    if (pthread_mutex_destroy(p)) {
         BD_DEBUG(DBG_BLURAY|DBG_CRIT, "pthread_mutex_destroy() failed !\n");
         return -1;
     }
@@ -193,4 +165,3 @@ int bd_mutex_destroy(BD_MUTEX *p)
     X_FREE(p->impl);
     return 0;
 }
-

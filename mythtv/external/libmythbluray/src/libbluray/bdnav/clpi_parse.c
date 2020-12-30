@@ -23,6 +23,7 @@
 #endif
 
 #include "clpi_parse.h"
+#include "clpi_data.h"
 
 #include "extdata_parse.h"
 #include "bdmv_parse.h"
@@ -53,6 +54,7 @@ _parse_stream_attr(BITSTREAM *bits, CLPI_PROG_STREAM *ss)
     pos = bs_pos(bits) >> 3;
 
     ss->lang[0] = '\0';
+    memset(ss->isrc,'\0',12);
     ss->coding_type = bs_read(bits, 8);
     switch (ss->coding_type) {
         case 0x01:
@@ -66,7 +68,15 @@ _parse_stream_attr(BITSTREAM *bits, CLPI_PROG_STREAM *ss)
             ss->aspect = bs_read(bits, 4);
             bs_skip(bits, 2);
             ss->oc_flag = bs_read(bits, 1);
-            bs_skip(bits, 1);
+            if (ss->coding_type == 0x24) {
+                ss->cr_flag = bs_read(bits, 1);
+                ss->dynamic_range_type = bs_read(bits, 4);
+                ss->color_space = bs_read(bits, 4);
+                ss->hdr_plus_flag = bs_read(bits, 1);
+                bs_skip(bits, 7);
+            } else {
+                bs_skip(bits, 17);
+            }
             break;
 
         case 0x03:
@@ -89,6 +99,7 @@ _parse_stream_attr(BITSTREAM *bits, CLPI_PROG_STREAM *ss)
         case 0x91:
         case 0xa0:
             bs_read_string(bits, ss->lang, 3);
+            bs_skip(bits, 8);
             break;
 
         case 0x92:
@@ -101,6 +112,7 @@ _parse_stream_attr(BITSTREAM *bits, CLPI_PROG_STREAM *ss)
             break;
     };
     ss->lang[3] = '\0';
+    bs_read_bytes(bits, ss->isrc, 12);
 
     // Skip over any padding
     if (bs_seek_byte(bits, pos + len) < 0) {
@@ -898,8 +910,13 @@ clpi_copy(const CLPI_CL* src_cl)
                 dest_cl->program.progs[ii].streams[jj].rate = src_cl->program.progs[ii].streams[jj].rate;
                 dest_cl->program.progs[ii].streams[jj].aspect = src_cl->program.progs[ii].streams[jj].aspect;
                 dest_cl->program.progs[ii].streams[jj].oc_flag = src_cl->program.progs[ii].streams[jj].oc_flag;
+                dest_cl->program.progs[ii].streams[jj].cr_flag = src_cl->program.progs[ii].streams[jj].cr_flag;
+                dest_cl->program.progs[ii].streams[jj].dynamic_range_type = src_cl->program.progs[ii].streams[jj].dynamic_range_type;
+                dest_cl->program.progs[ii].streams[jj].color_space = src_cl->program.progs[ii].streams[jj].color_space;
+                dest_cl->program.progs[ii].streams[jj].hdr_plus_flag = src_cl->program.progs[ii].streams[jj].hdr_plus_flag;
                 dest_cl->program.progs[ii].streams[jj].char_code = src_cl->program.progs[ii].streams[jj].char_code;
                 memcpy(dest_cl->program.progs[ii].streams[jj].lang,src_cl->program.progs[ii].streams[jj].lang,4);
+                memcpy(dest_cl->program.progs[ii].streams[jj].isrc,src_cl->program.progs[ii].streams[jj].isrc,12);
             }
         }
 

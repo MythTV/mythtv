@@ -216,6 +216,15 @@ class BDJAppProxy implements DVBJProxy, Runnable {
                 if (!f.isDirectory() && !f.mkdirs()) {
                     logger.error("Error creating persistent storage " + persistent);
                 }
+
+                String buda = System.getProperty("bluray.bindingunit.root") + File.separator +
+                    (String)context.getXletProperty("dvb.org.id") + File.separator +
+                    org.bluray.ti.DiscManager.getDiscManager().getCurrentDisc().getId();
+                File fb = new File(buda);
+                if (!fb.isDirectory() && !fb.mkdirs()) {
+                    logger.error("Error creating BUDA storage " + buda);
+                }
+
                 xlet.initXlet(context);
                 state = PAUSED;
                 return true;

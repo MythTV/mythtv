@@ -22,7 +22,15 @@ package org.videolan;
 
 class BDJThreadGroup extends ThreadGroup {
 
-    protected BDJThreadGroup(String name, BDJXletContext context) {
+    protected static BDJThreadGroup create(String name, BDJXletContext context) {
+        if (context == null) {
+            logger.error("Missing context");
+            throw new NullPointerException();
+        }
+        return new BDJThreadGroup(name, context);
+    }
+
+    private BDJThreadGroup(String name, BDJXletContext context) {
         super(name);
         this.context = context;
     }

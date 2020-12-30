@@ -27,4 +27,6 @@ public class TVTimerScheduleFailedException extends Exception
     public TVTimerScheduleFailedException(String param) {
         super(param);
     }
+
+    private static final long serialVersionUID = -1590752404469571809L;
 }

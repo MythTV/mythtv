@@ -20,18 +20,6 @@
 #ifndef BLURAY_VERSION_H_
 #define BLURAY_VERSION_H_
 
-#define BLURAY_VERSION_CODE(major, minor, micro) \
-    (((major) * 10000) +                         \
-     ((minor) *   100) +                         \
-     ((micro) *     1))
-
-#define BLURAY_VERSION_MAJOR 1
-#define BLURAY_VERSION_MINOR 0
-#define BLURAY_VERSION_MICRO 2
-
-#define BLURAY_VERSION_STRING "1.0.2"
-
-#define BLURAY_VERSION \
-    BLURAY_VERSION_CODE(BLURAY_VERSION_MAJOR, BLURAY_VERSION_MINOR, BLURAY_VERSION_MICRO)
+// This file is required for building but the values are defined in libmythbluray.pro
 
 #endif /* BLURAY_VERSION_H_ */

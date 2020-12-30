@@ -94,7 +94,6 @@ static BD_DIR_H *_dir_open_posix(const char* dirname)
 {
     BD_DIR_H *dir = calloc(1, sizeof(BD_DIR_H));
 
-    BD_DEBUG(DBG_DIR, "Opening POSIX dir %s... (%p)\n", dirname, (void*)dir);
     if (!dir) {
         return NULL;
     }
@@ -103,10 +102,11 @@ static BD_DIR_H *_dir_open_posix(const char* dirname)
     dir->read = _dir_read_posix;
 
     if ((dir->internal = opendir(dirname))) {
+        BD_DEBUG(DBG_DIR, "Opened POSIX dir %s (%p)\n", dirname, (void*)dir);
         return dir;
     }
 
-    BD_DEBUG(DBG_DIR, "Error opening dir! (%p)\n", (void*)dir);
+    BD_DEBUG(DBG_DIR, "Error opening dir %s\n", dirname);
 
     X_FREE(dir);
 

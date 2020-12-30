@@ -21,7 +21,7 @@ package org.dvb.lang;
 
 import java.net.URL;
 
-public class DVBClassLoaderImpl extends DVBClassLoader {
+class DVBClassLoaderImpl extends DVBClassLoader {
     public DVBClassLoaderImpl(URL[] urls) {
         super(urls);
     }

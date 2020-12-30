@@ -278,7 +278,7 @@ JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_setVirtualPackageN(JNIEnv * e
         path = (*env)->GetStringUTFChars(env, vpPath, NULL);
     }
 
-    BD_DEBUG(DBG_JNI|DBG_CRIT, "setVirtualPackageN(%s,%d)\n", path, (int)psr_init_backup);
+    BD_DEBUG(DBG_JNI|DBG_CRIT, "setVirtualPackageN(%s,%d)\n", path ? path : "<null>", (int)psr_init_backup);
 
     result = bd_set_virtual_package(bd, path, (int)psr_init_backup);
 
@@ -293,7 +293,7 @@ JNIEXPORT jlong JNICALL Java_org_videolan_Libbluray_seekN(JNIEnv * env,
         jclass cls, jlong np, jint playitem, jint playmark, jlong tick) {
     BLURAY* bd = (BLURAY*)(intptr_t)np;
 
-    BD_DEBUG(DBG_JNI, "seekN(tick=%"PRId64", mark=%d, playitem=%d)\n", (int64_t)tick, (int)playmark, (int)playitem);
+    BD_DEBUG(DBG_JNI, "seekN(tick=%" PRId64 ", mark=%d, playitem=%d)\n", (int64_t)tick, (int)playmark, (int)playitem);
 
     return bd_bdj_seek(bd, playitem, playmark, tick);
 }
@@ -349,46 +349,29 @@ JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_selectRateN(JNIEnv * env,
     return 1;
 }
 
-JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_writeGPRN(JNIEnv * env,
-        jclass cls, jlong np, jint num, jint value) {
+JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_readRegN(JNIEnv * env,
+        jclass cls, jlong np, jint is_psr, jint num) {
     BLURAY* bd = (BLURAY*)(intptr_t)np;
+    int value = bd_reg_read(bd, is_psr, num);
 
-    BD_DEBUG(DBG_JNI, "writeGPRN(%d,%d)\n", (int)num, (int)value);
-
-    return bd_reg_write(bd, 0, num, value, ~0);
-}
-
-JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_readGPRN(JNIEnv * env,
-        jclass cls, jlong np, jint num) {
-    BLURAY* bd = (BLURAY*)(intptr_t)np;
-    int value = bd_reg_read(bd, 0, num);
-
-    BD_DEBUG(DBG_JNI, "readGPRN(%d) -> %d\n", (int)num, (int)value);
+    BD_DEBUG(DBG_JNI, "readRegN(%s_%d) -> %d\n", is_psr ? "PSR" : "GPR", (int)num, (int)value);
 
     return value;
 }
 
-JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_writePSRN(JNIEnv * env,
-        jclass cls, jlong np, jint num, jint value, jint mask) {
+JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_writeRegN(JNIEnv * env,
+        jclass cls, jlong np, jint is_psr, jint num, jint value, jint mask) {
     BLURAY* bd = (BLURAY*)(intptr_t)np;
 
     if ((uint32_t)mask == 0xffffffff) {
-        BD_DEBUG(DBG_JNI, "writePSRN(%d,%d)\n", (int)num, (int)value);
+        BD_DEBUG(DBG_JNI, "writeRegN(%s_%d,%d)\n",
+                 is_psr ? "PSR" : "GPR", (int)num, (int)value);
     } else {
-        BD_DEBUG(DBG_JNI, "writePSRN(%d,0x%x,0x%08x)\n", (int)num, (int)value, (int)mask);
+        BD_DEBUG(DBG_JNI, "writeRegN(%s_%d,0x%x,0x%08x)\n",
+                 is_psr ? "PSR" : "GPR", (int)num, (int)value, (int)mask);
     }
 
-    return bd_reg_write(bd, 1, num, value, mask);
-}
-
-JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_readPSRN(JNIEnv * env,
-        jclass cls, jlong np, jint num) {
-    BLURAY* bd = (BLURAY*)(intptr_t)np;
-    int value = bd_reg_read(bd, 1, num);
-
-    BD_DEBUG(DBG_JNI, "readPSRN(%d) -> %d\n", (int)num, (int)value);
-
-    return value;
+    return bd_reg_write(bd, is_psr, num, value, mask);
 }
 
 JNIEXPORT jint JNICALL Java_org_videolan_Libbluray_cacheBdRomFileN(JNIEnv * env,
@@ -724,24 +707,14 @@ Java_org_videolan_Libbluray_methods[] =
         VC(Java_org_videolan_Libbluray_selectRateN),
     },
     {
-        CC("writeGPRN"),
+        CC("writeRegN"),
+        CC("(JIIII)I"),
+        VC(Java_org_videolan_Libbluray_writeRegN),
+    },
+    {
+        CC("readRegN"),
         CC("(JII)I"),
-        VC(Java_org_videolan_Libbluray_writeGPRN),
-    },
-    {
-        CC("writePSRN"),
-        CC("(JIII)I"),
-        VC(Java_org_videolan_Libbluray_writePSRN),
-    },
-    {
-        CC("readGPRN"),
-        CC("(JI)I"),
-        VC(Java_org_videolan_Libbluray_readGPRN),
-    },
-    {
-        CC("readPSRN"),
-        CC("(JI)I"),
-        VC(Java_org_videolan_Libbluray_readPSRN),
+        VC(Java_org_videolan_Libbluray_readRegN),
     },
     {
         CC("cacheBdRomFileN"),

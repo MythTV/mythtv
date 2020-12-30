@@ -220,13 +220,13 @@ static int _filter_es_pts(M2TS_FILTER *p, const uint8_t *buf, uint16_t pid)
 
         int64_t pts = _es_timestamp(buf + 4 + payload_offset, 188 - payload_offset);
         if (pts >= p->in_pts && (p->out_pts < 0 || pts <= p->out_pts)) {
-            M2TS_TRACE("Pid 0x%04x pts %"PRId64" passed IN timestamp %"PRId64" (pts %"PRId64")\n",
+            M2TS_TRACE("Pid 0x%04x pts %" PRId64 " passed IN timestamp %" PRId64 " (pts %" PRId64 ")\n",
                        pid, pts, p->in_pts, pts);
             _remove_pid(p->wipe_pid, pid);
             _add_pid(p->pass_pid, pid);
 
         } else {
-            M2TS_TRACE("Pid 0x%04x pts %"PRId64" outside of clip (%"PRId64"-%"PRId64" -> keep wiping out\n",
+            M2TS_TRACE("Pid 0x%04x pts %" PRId64 " outside of clip (%" PRId64 "-%" PRId64 " -> keep wiping out\n",
                        pid, pts, p->in_pts, p->out_pts);
         }
     }
@@ -246,7 +246,7 @@ static int _filter_es_pts(M2TS_FILTER *p, const uint8_t *buf, uint16_t pid)
                 if (pts > p->out_pts ||
                     IS_HDMV_PID_PG(pid) ||
                     IS_HDMV_PID_IG(pid)) {
-                M2TS_TRACE("Pid 0x%04x passed OUT timestamp %"PRId64" (pts %"PRId64") -> start wiping\n", pid, p->out_pts, pts);
+                M2TS_TRACE("Pid 0x%04x passed OUT timestamp %" PRId64 " (pts %" PRId64 ") -> start wiping\n", pid, p->out_pts, pts);
                 _remove_pid(p->pass_pid, pid);
                 _add_pid(p->wipe_pid, pid);
                 }

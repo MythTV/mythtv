@@ -26,4 +26,6 @@ public class UnavailableContainerException extends Exception {
     public UnavailableContainerException(String s) {
         super(s);
     }
+
+    private static final long serialVersionUID = -1496745004714375188L;
 }

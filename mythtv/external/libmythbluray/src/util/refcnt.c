@@ -33,7 +33,9 @@
  *
  */
 
-typedef struct {
+typedef struct bd_refcnt {
+  struct bd_refcnt *me;
+  void    (*cleanup)(void *);
   BD_MUTEX mutex;   /* initialized only if counted == 1 */
   int      count;   /* reference count */
   unsigned counted; /* 1 if this object is ref-counted */
@@ -43,13 +45,19 @@ typedef struct {
  *
  */
 
-void bd_refcnt_inc(const void *obj)
+void refcnt_inc(const void *obj)
 {
+    BD_REFCNT *ref;
+
     if (!obj) {
         return;
     }
 
-    BD_REFCNT *ref = &(((BD_REFCNT *)(intptr_t)obj)[-1]);
+    ref = ((const BD_REFCNT *)obj)[-1].me;
+    if (obj != (const void *)&ref[1]) {
+        BD_DEBUG(DBG_CRIT, "refcnt_inc(): invalid object\n");
+        return;
+    }
 
     if (!ref->counted) {
         bd_mutex_init(&ref->mutex);
@@ -63,13 +71,19 @@ void bd_refcnt_inc(const void *obj)
     bd_mutex_unlock(&ref->mutex);
 }
 
-void bd_refcnt_dec(const void *obj)
+void refcnt_dec(const void *obj)
 {
+    BD_REFCNT *ref;
+
     if (!obj) {
         return;
     }
 
-    BD_REFCNT *ref = &((BD_REFCNT *)(intptr_t)obj)[-1];
+    ref = ((const BD_REFCNT *)obj)[-1].me;
+    if (obj != (const void *)&ref[1]) {
+        BD_DEBUG(DBG_CRIT, "refcnt_dec(): invalid object\n");
+        return;
+    }
 
     if (ref->counted) {
         int count;
@@ -85,24 +99,32 @@ void bd_refcnt_dec(const void *obj)
         bd_mutex_destroy(&ref->mutex);
     }
 
+    if (ref->cleanup)
+        ref->cleanup(&ref[1]);
+
+    memset(ref, 0, sizeof(*ref));
     free(ref);
 }
 
-void *refcnt_realloc(void *obj, size_t sz)
+void *refcnt_realloc(void *obj, size_t sz, void (*cleanup)(void *))
 {
     sz += sizeof(BD_REFCNT);
 
     if (obj) {
-        if (((BD_REFCNT *)obj)[-1].counted) {
-            bd_refcnt_dec(obj);
-            BD_DEBUG(DBG_CRIT, "refcnt_realloc(): realloc locked object !\n");
-            obj = NULL;
+        const BD_REFCNT *ref = ((const BD_REFCNT *)obj)[-1].me;
+        if (obj != (const void *)&ref[1]) {
+            BD_DEBUG(DBG_CRIT, "refcnt_realloc(): invalid object\n");
+            return NULL;
         }
-    }
 
-    if (obj) {
-        obj = realloc(&((BD_REFCNT *)obj)[-1], sz);
+        if (ref->counted) {
+            BD_DEBUG(DBG_CRIT, "refcnt_realloc(): realloc locked object !\n");
+            return NULL;
+        }
+
+        obj = realloc(((BD_REFCNT *)obj)[-1].me, sz);
         if (!obj) {
+            /* do not call cleanup() - nothing is free'd here */
             return NULL;
         }
     } else {
@@ -113,6 +135,8 @@ void *refcnt_realloc(void *obj, size_t sz)
         memset(obj, 0, sizeof(BD_REFCNT));
     }
 
+    ((BD_REFCNT *)obj)->cleanup = cleanup;
+    ((BD_REFCNT *)obj)->me = obj;
     return &((BD_REFCNT *)obj)[1];
 }
 

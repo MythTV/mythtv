@@ -1,5 +1,6 @@
 /*
  * This file is part of libbluray
+ * Copyright (C) 2019  VideoLAN
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,11 +17,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package java.awt;
+package javax.microedition.io;
 
-class BDGraphicsDevice extends BDGraphicsDeviceImpl {
-
-    BDGraphicsDevice(BDGraphicsEnvironment environment) {
-        super(environment);
-    }
+public interface StreamConnection extends InputConnection, OutputConnection {
 }

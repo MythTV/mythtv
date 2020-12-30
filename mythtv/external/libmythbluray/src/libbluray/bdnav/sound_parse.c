@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2010  hpi1
+ * Copyright (C) 2010-2019  Petri Hintukainen <phintuka@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@
 
 #include "sound_parse.h"
 
+#include "bdmv_parse.h"
+
 #include "disc/disc.h"
 
 #include "file/file.h"
@@ -33,26 +35,16 @@
 #include <stdlib.h>
 
 #define BCLK_SIG1  ('B' << 24 | 'C' << 16 | 'L' << 8 | 'K')
-#define BCLK_SIG2A ('0' << 24 | '2' << 16 | '0' << 8 | '0')
-#define BCLK_SIG2B ('0' << 24 | '1' << 16 | '0' << 8 | '0')
-
 
 static int _bclk_parse_header(BITSTREAM *bs, uint32_t *data_start, uint32_t *extension_data_start)
 {
-    uint32_t sig1, sig2;
-
-    if (bs_seek_byte(bs, 0) < 0) {
+    if (!bdmv_parse_header(bs, BCLK_SIG1, NULL)) {
         return 0;
     }
 
-    sig1 = bs_read(bs, 32);
-    sig2 = bs_read(bs, 32);
-
-    if (sig1 != BCLK_SIG1 ||
-       (sig2 != BCLK_SIG2A &&
-        sig2 != BCLK_SIG2B)) {
-     BD_DEBUG(DBG_NAV, "sound.bdmv failed signature match: expected BCLK0100 got %8.8s\n", bs->buf);
-     return 0;
+    if (bs_avail(bs) < 2 * 32) {
+        BD_DEBUG(DBG_NAV | DBG_CRIT, "_parse_header: unexpected end of file\n");
+        return 0;
     }
 
     *data_start           = bs_read(bs, 32);

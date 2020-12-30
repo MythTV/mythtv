@@ -69,10 +69,11 @@ void *dl_dlopen(const char *path, const char *version)
        @loader_path     - location of current library/binary (ex. libbluray.dylib)
        @executable_path - location of running binary (ex. /Applications/Some.app/Contents/MacOS)
        @rpath           - search rpaths of running binary (man install_name_path)
+       /usr/local/lib/  - explicitly added path, as runtime hardened programs ignore DYLD_FALLBACK_PATH now
     */
     static const char *search_paths[] = {"", "@loader_path/lib/", "@loader_path/", "@executable_path/",
                                          "@executable_path/lib/", "@executable_path/../lib/",
-                                         "@executable_path/../Resources/", "@rpath/", NULL};
+                                         "@executable_path/../Resources/", "@rpath/", "/usr/local/lib/", NULL};
     version = NULL;
 #else
     static const char ext[] = ".so";

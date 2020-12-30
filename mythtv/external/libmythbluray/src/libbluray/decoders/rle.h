@@ -52,7 +52,7 @@ static inline int rle_begin(RLE_ENC *p)
 {
     p->num_elem = 1024;
     p->free_elem = 1024;
-    p->elem = refcnt_realloc(NULL, p->num_elem * sizeof(BD_PG_RLE_ELEM));
+    p->elem = refcnt_realloc(NULL, p->num_elem * sizeof(BD_PG_RLE_ELEM), NULL);
     if (!p->elem) {
         return -1;
     }

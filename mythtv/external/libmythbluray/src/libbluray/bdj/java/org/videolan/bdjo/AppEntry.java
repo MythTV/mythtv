@@ -148,6 +148,28 @@ public class AppEntry implements AppAttributes {
         return ((binding & DISC_BOUND) != 0);
     }
 
+    public AppEntry(AppEntry a) {
+        try {
+            this.icon         = new AppIcon(new BDLocator(a.icon.getLocator().toExternalForm()),
+                                            (BitSet)a.icon.getIconFlags().clone());
+        } catch (Throwable t) {
+            /* may be null */
+        }
+        this.controlCode  = a.controlCode;
+        this.type         = a.type;
+        this.appid        = new AppID(a.appid.getOID(), a.appid.getAID());
+
+        this.profiles     = (AppProfile[])a.profiles.clone();
+        this.priority     = a.priority;
+        this.binding      = a.binding;
+        //this.visibility = visibility;
+        this.names        = (String[][])a.names.clone();
+        this.basePath     = a.basePath;
+        this.classpathExt = a.classpathExt;
+        this.initialClass = a.initialClass;
+        this.params       = (String[])a.params.clone();
+    }
+
     public AppEntry(int controlCode, int type, int orgId,
                     short appId, AppProfile[] profiles, short priority,
                     int binding, int visibility, String[][] names,

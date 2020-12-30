@@ -22,6 +22,9 @@ package java.awt;
 
 import java.awt.event.InvocationEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+
+import org.videolan.Logger;
 
 public class BDJHelper {
 
@@ -62,19 +65,59 @@ public class BDJHelper {
             } catch (InterruptedException e) {
             }
             if (t.isAlive()) {
-                org.videolan.Logger.getLogger("BDRootWindow").error("stopEventQueue() failed for " + t);
+                logger.error("stopEventQueue() failed for " + t);
                 org.videolan.PortingHelper.stopThread(t);
             }
         }
     }
 
+    /*
+     * Mouse events
+     */
+
+    private static int mouseX = 0, mouseY = 0, mouseMask = 0;
+
     public static boolean postMouseEvent(int x, int y) {
+        mouseX = x;
+        mouseY = y;
+        return postMouseEventImpl(MouseEvent.MOUSE_MOVED, MouseEvent.NOBUTTON);
+    }
+
+    public static boolean postMouseEvent(int id) {
+        boolean r;
+
+        if (id == MouseEvent.MOUSE_PRESSED)
+            mouseMask = MouseEvent.BUTTON1_MASK;
+
+        r = postMouseEventImpl(id, MouseEvent.BUTTON1);
+
+        if (id == MouseEvent.MOUSE_RELEASED)
+            mouseMask = 0;
+
+        return r;
+    }
+
+    private static boolean postMouseEventImpl(int id, int button) {
+        Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getGlobalFocusOwner();
+        if (focusOwner != null) {
+            EventQueue eq = BDToolkit.getEventQueue(focusOwner);
+            if (eq != null) {
+                long when = System.currentTimeMillis();
+                try {
+                    eq.postEvent(new MouseEvent(focusOwner, id, when, mouseMask, mouseX, mouseY,
+                                                (id == MouseEvent.MOUSE_CLICKED) ? 1 : 0, false, button));
+                    return true;
+                } catch (Exception e) {
+                    logger.error("postMouseEvent failed: " + e);
+                }
+            }
+        }
         return false;
     }
 
-    public static boolean postMouseEvent(int button) {
-        return false;
-    }
+    /*
+     * Key events
+     */
 
     public static boolean postKeyEvent(int id, int modifiers, int keyCode) {
         Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getGlobalFocusOwner();
@@ -93,12 +136,14 @@ public class BDJHelper {
                     return true;
                 }
             } catch (Exception e) {
-                org.videolan.Logger.getLogger("BDJHelper").error("postKeyEvent failed: " + e);
+                logger.error("postKeyEvent failed: " + e);
             }
         } else {
-            org.videolan.Logger.getLogger("BDJHelper").error("*** KEY event dropped ***");
+            logger.error("KEY event dropped (no focus owner)");
         }
 
         return false;
     }
+
+    private static final Logger logger = Logger.getLogger(BDJHelper.class.getName());
 }

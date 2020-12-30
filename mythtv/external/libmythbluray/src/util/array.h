@@ -35,7 +35,7 @@
  * @return     array of n pointers, each pointing to memory block of size sz.
  *
  */
-BD_PRIVATE void *array_alloc(size_t n, size_t sz) BD_ATTR_MALLOC;
+BD_PRIVATE void *array_alloc(size_t n, size_t sz);
 
 /*
  * array_free()

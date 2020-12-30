@@ -33,4 +33,6 @@ public class GraphicsOffsetSequenceChangeEvent extends EventObject implements Se
     public int getOffsetSequenceId() {
         return sequenceId;
     }
+
+    private static final long serialVersionUID = 1603263652183869628L;
 }

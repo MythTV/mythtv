@@ -29,7 +29,7 @@ public final class ManagedCopy {
         throw new MCException();
     }
 
-    /** @deprecated */
+    /** @Deprecated */
     public ManagedCopy() {
         logger.unimplemented("*");
     }
@@ -117,7 +117,7 @@ public final class ManagedCopy {
 
     }
 
-    /** @deprecated */
+    /** @Deprecated */
     public boolean IsMCMSupported() {
         return false;
     }

@@ -242,7 +242,7 @@ static int _libbdplus_init(BD_DEC *dec, struct dec_dev *dev,
 
     if (i->bdplus_date == 0) {
         // libmmbd -> no menu support
-        BD_DEBUG(DBG_BLURAY | DBG_CRIT, "WARNING: using libmmbd for BD+. On-disc menus will not work.\n");
+        //BD_DEBUG(DBG_BLURAY | DBG_CRIT, "WARNING: using libmmbd for BD+. On-disc menus won't work with all discs.\n");
         //i->no_menu_support = 1;
     }
 

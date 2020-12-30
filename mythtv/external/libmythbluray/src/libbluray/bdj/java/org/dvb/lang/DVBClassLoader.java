@@ -26,28 +26,51 @@ import java.security.PermissionCollection;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 public abstract class DVBClassLoader extends java.security.SecureClassLoader {
-    public static DVBClassLoader newInstance(URL[] urls) {
-        return new DVBClassLoaderImpl(urls);
+    public static DVBClassLoader newInstance(final URL[] urls) {
+        return (DVBClassLoader)AccessController.doPrivileged(
+            new PrivilegedAction() {
+                   public Object run() {
+                       return new DVBClassLoaderImpl(urls);
+                   }
+            });
     }
 
-    public static DVBClassLoader newInstance(URL[] urls, ClassLoader parent) {
-        return new DVBClassLoaderImpl(urls, parent);
+    public static DVBClassLoader newInstance(final URL[] urls, final ClassLoader parent) {
+        return (DVBClassLoader)AccessController.doPrivileged(
+            new PrivilegedAction() {
+                public Object run() {
+                    return new DVBClassLoaderImpl(urls, parent);
+                }
+            });
     }
 
-    public DVBClassLoader(URL[] urls) {
+    public DVBClassLoader(final URL[] urls) {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null)
             sm.checkCreateClassLoader();
-        loader = new DVBURLClassLoader(urls);
+        loader = (DVBURLClassLoader)AccessController.doPrivileged(
+            new PrivilegedAction() {
+                public Object run() {
+                    return new DVBURLClassLoader(urls);
+                }
+            });
     }
 
-    public DVBClassLoader(URL[] urls, ClassLoader parent) {
+    public DVBClassLoader(final URL[] urls, final ClassLoader parent) {
         super(parent);
         SecurityManager sm = System.getSecurityManager();
         if (sm != null)
             sm.checkCreateClassLoader();
-        loader = new DVBURLClassLoader(urls, parent);
+        loader = (DVBURLClassLoader)AccessController.doPrivileged(
+            new PrivilegedAction() {
+                public Object run() {
+                    return new DVBURLClassLoader(urls, parent);
+                }
+            });
     }
 
     public Class findClass(String name) throws ClassNotFoundException {

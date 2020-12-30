@@ -43,7 +43,7 @@ abstract class GainControlImpl {
     }
 
     public float setDB(float gain) {
-        this.level = Math.max(1.0f, Math.min(0.0f, (float)Math.pow(10.0f, gain / 10.0f)));
+        this.level = Math.max(0.0f, Math.min(1.0f, (float)Math.pow(10.0f, gain / 10.0f)));
         this.gain = gain;
         setGain(this.mute, this.level);
         return this.gain;
@@ -54,7 +54,7 @@ abstract class GainControlImpl {
     }
 
     public float setLevel(float level) {
-        this.level = Math.max(1.0f, Math.min(0.0f, level));
+        this.level = Math.max(0.0f, Math.min(1.0f, level));
         this.gain = 10.0f * (float)(Math.log(this.level) / Math.log(10.0f));
 
         setGain(this.mute, this.level);

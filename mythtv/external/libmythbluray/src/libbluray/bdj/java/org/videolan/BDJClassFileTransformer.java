@@ -20,16 +20,7 @@
 package org.videolan;
 
 /**
- * This is a class which is called by BDJClassLoader
- * when ClassFormatError is thrown inside defineClass().
- *
- * Some discs have invalid debug info in class files (broken by
- * malfunctioning obfuscater ?).
- * We strip debug info from the class and try to load it again.
- *
- * Penguins of MAdagascar:
- *   java.lang.ClassFormatError: Invalid index 0 in LocalVariableTable'
- *       in class file com/tcs/blr/bluray/pal/fox/controller/d
+ * Patch Xlet classes at runtime (modify bytecode)
  */
 
 import java.util.Map;
@@ -45,6 +36,9 @@ import org.objectweb.asm.commons.RemappingClassAdapter;
 
 public class BDJClassFileTransformer
 {
+    /*
+     * Rename class
+     */
     public byte[] rename(byte[] b, int off, int len, Map mappings)
         throws ClassFormatError
     {
@@ -65,7 +59,7 @@ public class BDJClassFileTransformer
             ClassReader cr = new ClassReader(b);
             ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES/* | ClassWriter.COMPUTE_MAXS*/);
             ClassVisitor cv = new RemappingClassAdapter(cw, m);
-            cr.accept(cv, ClassReader.SKIP_DEBUG);
+            cr.accept(cv, ClassReader.SKIP_DEBUG | ClassReader.EXPAND_FRAMES);
             return cw.toByteArray();
         } catch (Exception e) {
             logger.error("Failed renaming class: " + e);
@@ -74,6 +68,19 @@ public class BDJClassFileTransformer
         return null;
     }
 
+    /* Strip debug info
+     *
+     * This is a class which is called by BDJClassLoader
+     * when ClassFormatError is thrown inside defineClass().
+     *
+     * Some discs have invalid debug info in class files (broken by
+     * malfunctioning obfuscater ?).
+     * We strip debug info from the class and try to load it again.
+     *
+     * Penguins of MAdagascar:
+     *   java.lang.ClassFormatError: Invalid index 0 in LocalVariableTable'
+     *       in class file com/tcs/blr/bluray/pal/fox/controller/d
+     */
     public byte[] strip(byte[] b, int off, int len)
         throws ClassFormatError
     {
@@ -87,7 +94,7 @@ public class BDJClassFileTransformer
             ClassReader cr = new ClassReader(r);
             ClassWriter cw = new ClassWriter(cr, 0/*ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS*/);
             ClassVisitor cv = new MyClassVisitor(cw);
-            cr.accept(cv, ClassReader.SKIP_DEBUG);
+            cr.accept(cv, ClassReader.SKIP_DEBUG | ClassReader.EXPAND_FRAMES);
             return cw.toByteArray();
         } catch (Exception e) {
             logger.error("Failed transforming class: " + e);
@@ -96,7 +103,7 @@ public class BDJClassFileTransformer
         return r;
     }
 
-    private static class MyClassVisitor extends ClassVisitor {
+    private static final class MyClassVisitor extends ClassVisitor {
         public MyClassVisitor(ClassVisitor cv) {
             super(Opcodes.ASM4, cv);
         }
@@ -109,7 +116,7 @@ public class BDJClassFileTransformer
         }
     }
 
-    private static class MyMethodVisitor extends MethodVisitor {
+    private static final class MyMethodVisitor extends MethodVisitor {
         public MyMethodVisitor(MethodVisitor mv) {
             super(Opcodes.ASM4, mv);
         }

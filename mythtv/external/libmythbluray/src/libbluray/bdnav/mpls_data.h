@@ -37,6 +37,10 @@ typedef struct
     uint8_t         subclip_id;
     uint8_t         format;
     uint8_t         rate;
+    uint8_t         dynamic_range_type;
+    uint8_t         color_space;
+    uint8_t         cr_flag;
+    uint8_t         hdr_plus_flag;
     uint8_t         char_code;
     char            lang[4];
     // Secondary audio specific fields
@@ -58,12 +62,14 @@ typedef struct
     uint8_t         num_secondary_audio;
     uint8_t         num_secondary_video;
     uint8_t         num_pip_pg;
+    uint8_t         num_dv;
     MPLS_STREAM    *video;
     MPLS_STREAM    *audio;
     MPLS_STREAM    *pg;
     MPLS_STREAM    *ig;
     MPLS_STREAM    *secondary_audio;
     MPLS_STREAM    *secondary_video;
+    MPLS_STREAM    *dv;
 } MPLS_STN;
 
 typedef struct
@@ -107,6 +113,8 @@ typedef struct
     uint8_t         random_access_flag;
     uint8_t         audio_mix_flag;
     uint8_t         lossless_bypass_flag;
+    uint8_t         mvc_base_view_r_flag;
+    uint8_t         sdr_conversion_notification_flag;
 } MPLS_AI;
 
 typedef struct
@@ -128,7 +136,8 @@ typedef enum {
   //mpls_sub_path_        = 5,  /* Out-of-mux Synchronous elementary streams */
   mpls_sub_path_async_pip = 6,  /* Out-of-mux Asynchronous Picture-in-Picture presentation */
   mpls_sub_path_sync_pip  = 7,  /* In-mux Synchronous Picture-in-Picture presentation */
-  mpls_sub_path_ss_viseo  = 8,  /* SS Video */
+  mpls_sub_path_ss_video  = 8,  /* SS Video */
+  mpls_sub_path_dv_el     = 10, /* Dolby Vision Enhancement Layer */
 } mpls_sub_path_type;
 
 typedef struct
@@ -172,6 +181,25 @@ typedef struct {
     MPLS_PIP_DATA   *data;
 } MPLS_PIP_METADATA;
 
+typedef enum {
+    primary_green,
+    primary_blue,
+    primary_red
+} mpls_static_primaries;    /* They are stored as GBR, we would like to show them as RGB */
+
+typedef struct mpls_static_metadata
+{
+    uint8_t     dynamic_range_type;
+    uint16_t    display_primaries_x[3];
+    uint16_t    display_primaries_y[3];
+    uint16_t    white_point_x;
+    uint16_t    white_point_y;
+    uint16_t    max_display_mastering_luminance;
+    uint16_t    min_display_mastering_luminance;
+    uint16_t    max_CLL;
+    uint16_t    max_FALL;
+} MPLS_STATIC_METADATA;
+
 typedef struct mpls_pl
 {
     uint32_t        type_indicator;   /* 'MPLS' */
@@ -194,6 +222,10 @@ typedef struct mpls_pl
     // extension data (Picture-In-Picture metadata)
     uint16_t           ext_pip_data_count;
     MPLS_PIP_METADATA *ext_pip_data;  // pip metadata extension
+
+    // extension data (Static Metadata)
+    uint8_t               ext_static_metadata_count;
+    MPLS_STATIC_METADATA *ext_static_metadata;
 
 } MPLS_PL;
 

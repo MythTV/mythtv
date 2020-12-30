@@ -42,4 +42,5 @@ public class MediaTimeEvent extends java.util.EventObject {
     private final Object source;
     private final long eventTime;
     private final int eventId;
+    private static final long serialVersionUID = -5118752039526605115L;
 }

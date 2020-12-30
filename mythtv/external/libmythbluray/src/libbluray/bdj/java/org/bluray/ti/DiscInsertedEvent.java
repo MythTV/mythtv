@@ -23,4 +23,6 @@ public class DiscInsertedEvent extends DiscStatusEvent {
     public DiscInsertedEvent(Object source) {
         super(source);
     }
+
+    private static final long serialVersionUID = -474637357700362624L;
 }

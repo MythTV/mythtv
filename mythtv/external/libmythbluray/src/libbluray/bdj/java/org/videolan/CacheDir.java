@@ -84,7 +84,7 @@ class CacheDir {
         cleanupCache();
 
         for (int i = 0; i < 100; i++) {
-            File tmpDir = new File(baseDir, "" + System.nanoTime());
+            File tmpDir = new File(baseDir, Long.toHexString(System.nanoTime() + i));
             tmpDir = new File(tmpDir.getCanonicalPath());
 
             if (tmpDir.mkdirs()) {

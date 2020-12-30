@@ -31,7 +31,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-uint32_t            debug_mask = UINT32_MAX; /* set all bits to make sure bd_debug() is called for initialization */
+uint32_t            debug_mask = (uint32_t)-1; /* set all bits to make sure bd_debug() is called for initialization */
 static BD_LOG_FUNC  log_func   = NULL;
 
 void bd_set_debug_handler(BD_LOG_FUNC f)
@@ -60,7 +60,7 @@ void bd_debug(const char *file, int line, uint32_t mask, const char *format, ...
         logfile = stderr;
 
         char *env = NULL;
-        if (debug_mask == UINT32_MAX) {
+        if (debug_mask == (uint32_t)-1) {
             /* might be set by application with bd_set_debug_mask() */
             debug_mask = DBG_CRIT;
         }

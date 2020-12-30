@@ -24,13 +24,24 @@
 
 struct bd_disc;
 struct meta_dl;
+struct meta_tn;
 struct meta_root;
 
 typedef struct meta_root META_ROOT;
 
+typedef struct meta_tn {
+    char                 language_code[4];
+    char *               filename;
+
+    unsigned             playlist;
+    unsigned             num_chapter;
+    char               **chapter_name;
+} META_TN;
+
 BD_PRIVATE struct meta_root *     meta_parse(struct bd_disc *disc) BD_ATTR_MALLOC;
 BD_PRIVATE void                   meta_free (struct meta_root **index);
 BD_PRIVATE const struct meta_dl * meta_get  (const struct meta_root *meta_root, const char *language_code);
+BD_PRIVATE const struct meta_tn * meta_get_tn(const struct meta_root *meta_root, const char *language_code, unsigned playlist);
 
 #endif // _META_PARSE_H_
 

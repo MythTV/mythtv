@@ -51,6 +51,8 @@ public class TitleContextImpl implements TitleContext {
     }
 
     public ServiceContentHandler[] getServiceContentHandlers() throws SecurityException {
+        logger.info("getServiceContentHandlers");
+
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new ServiceContextPermission("getServiceContentHandlers", "own"));
@@ -129,6 +131,8 @@ public class TitleContextImpl implements TitleContext {
     }
 
     public void destroy() throws SecurityException {
+        logger.info("destroy()");
+
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new ServiceContextPermission("stop", "own"));

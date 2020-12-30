@@ -59,6 +59,7 @@ int bdmv_parse_header(BITSTREAM *bs, uint32_t type, uint32_t *version)
     switch (ver) {
         case BDMV_VERSION_0100:
         case BDMV_VERSION_0200:
+        case BDMV_VERSION_0240:
         case BDMV_VERSION_0300:
             break;
         default:

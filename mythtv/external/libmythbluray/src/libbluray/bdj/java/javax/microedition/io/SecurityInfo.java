@@ -1,6 +1,6 @@
 /*
  * This file is part of libbluray
- * Copyright (C) 2012  libbluray
+ * Copyright (C) 2019  VideoLAN
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,12 +17,13 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package java.awt;
+package javax.microedition.io;
 
-import sun.awt.image.BufferedImagePeer;
+import javax.microedition.pki.Certificate;
 
-class BDImage extends BDImageBase implements BufferedImagePeer {
-    BDImage(Component component, int width, int height, GraphicsConfiguration gc) {
-        super(component, width, height, gc);
-    }
+public interface SecurityInfo {
+    public abstract String getCipherSuite();
+    public abstract String getProtocolName();
+    public abstract String getProtocolVersion();
+    public abstract Certificate getServerCertificate();
 }

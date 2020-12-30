@@ -36,10 +36,10 @@ public class HScreenRectangle {
     }
 
     public int hashCode() {
-        int result = Float.hashCode(x);
-        result = 31 * result + Float.hashCode(y);
-        result = 31 * result + Float.hashCode(width);
-        result = 31 * result + Float.hashCode(height);
+        int result = (new Float(x).hashCode());
+        result = 31 * result + (new Float(y).hashCode());
+        result = 31 * result + (new Float(width).hashCode());
+        result = 31 * result + (new Float(height).hashCode());
         return result;
     }
 

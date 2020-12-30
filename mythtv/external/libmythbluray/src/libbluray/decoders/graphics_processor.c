@@ -542,7 +542,7 @@ static int graphics_processor_decode_pes(PG_DISPLAY_SET **s, PES_BUFFER **p, int
             /* filter out values that seem to be incorrect (if stc is not updated) */
             int64_t diff = (*p)->dts - stc;
             if (diff < MAX_STC_DTS_DIFF) {
-                GP_TRACE("Segment dts > stc (%"PRId64" > %"PRId64" ; diff %"PRId64")\n",
+                GP_TRACE("Segment dts > stc (%" PRId64 " > %" PRId64 " ; diff %" PRId64 ")\n",
                          (*p)->dts, stc, diff);
                 return 0;
             }
@@ -562,7 +562,7 @@ static int graphics_processor_decode_pes(PG_DISPLAY_SET **s, PES_BUFFER **p, int
 
         /* decode segment */
 
-        GP_TRACE("Decoding segment, dts %010"PRId64" pts %010"PRId64" len %d\n",
+        GP_TRACE("Decoding segment, dts %010" PRId64 " pts %010" PRId64 " len %d\n",
                  (*p)->dts, (*p)->pts, (*p)->len);
 
         _decode_segment(*s, *p);

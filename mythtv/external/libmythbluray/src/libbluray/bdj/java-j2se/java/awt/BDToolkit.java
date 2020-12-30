@@ -21,13 +21,23 @@
 package java.awt;
 
 import java.awt.peer.KeyboardFocusManagerPeer;
+import java.awt.peer.RobotPeer;
 
+import sun.awt.ComponentFactory;
 import sun.awt.KeyboardFocusManagerPeerProvider;
+import sun.awt.datatransfer.DataTransferer;
 
 import java.awt.peer.BDFramePeer;
 import java.awt.peer.BDKeyboardFocusManagerPeer;
 
-public class BDToolkit extends BDToolkitBase implements KeyboardFocusManagerPeerProvider {
+import org.videolan.GUIManager;
+import org.videolan.Logger;
+
+public class BDToolkit extends BDToolkitBase
+    implements KeyboardFocusManagerPeerProvider, ComponentFactory {
+
+    private static final Logger logger = Logger.getLogger(BDToolkit.class.getName());
+
     public BDToolkit () {
     }
 
@@ -62,92 +72,133 @@ public class BDToolkit extends BDToolkitBase implements KeyboardFocusManagerPeer
     }
 
     public void sync() {
-        org.videolan.GUIManager.getInstance().sync();
+        GUIManager.getInstance().sync();
     }
 
     public java.util.Map mapInputMethodHighlight(java.awt.im.InputMethodHighlight h) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
     public  boolean isModalExclusionTypeSupported(Dialog.ModalExclusionType modalExclusionType) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
     public  boolean isModalityTypeSupported(Dialog.ModalityType modalityType) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.FramePeer createFrame(Frame target) {
-        return new BDFramePeer(target, (BDRootWindow)target);
+    public java.awt.peer.FramePeer createFrame(Frame target) {
+        if (!(target instanceof BDRootWindow)) {
+            logger.error("createFrame(): not BDRootWindow");
+            throw new Error("Not implemented");
+        }
+        return new BDFramePeer((BDRootWindow)target);
     }
 
-    protected java.awt.peer.ButtonPeer createButton(Button target) {
+    public java.awt.peer.ButtonPeer createButton(Button target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.CanvasPeer createCanvas(Canvas target) {
+    public java.awt.peer.CanvasPeer createCanvas(Canvas target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.CheckboxPeer createCheckbox(Checkbox target) {
+    public java.awt.peer.CheckboxPeer createCheckbox(Checkbox target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.CheckboxMenuItemPeer createCheckboxMenuItem(CheckboxMenuItem target) {
+    public java.awt.peer.CheckboxMenuItemPeer createCheckboxMenuItem(CheckboxMenuItem target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.ChoicePeer createChoice(Choice target) {
+    public java.awt.peer.ChoicePeer createChoice(Choice target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.DesktopPeer createDesktopPeer(Desktop target) {
+    public java.awt.peer.DesktopPeer createDesktopPeer(Desktop target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.DialogPeer createDialog(Dialog target) {
+    public java.awt.peer.DialogPeer createDialog(Dialog target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
     public java.awt.dnd.peer.DragSourceContextPeer createDragSourceContextPeer(java.awt.dnd.DragGestureEvent dge) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
     public java.awt.peer.FileDialogPeer createFileDialog(FileDialog target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.LabelPeer createLabel(Label target) {
+    public java.awt.peer.LabelPeer createLabel(Label target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.ListPeer createList(List target) {
+    public java.awt.peer.ListPeer createList(List target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.MenuPeer createMenu(Menu target) {
+    public java.awt.peer.MenuPeer createMenu(Menu target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.MenuBarPeer createMenuBar(MenuBar target) {
+    public java.awt.peer.MenuBarPeer createMenuBar(MenuBar target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.MenuItemPeer createMenuItem(MenuItem target) {
+    public java.awt.peer.MenuItemPeer createMenuItem(MenuItem target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.PanelPeer createPanel(Panel target) {
+    public java.awt.peer.PanelPeer createPanel(Panel target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.PopupMenuPeer createPopupMenu(PopupMenu target) {
+    public java.awt.peer.PopupMenuPeer createPopupMenu(PopupMenu target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.ScrollbarPeer createScrollbar(Scrollbar target) {
+    public java.awt.peer.ScrollbarPeer createScrollbar(Scrollbar target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.ScrollPanePeer createScrollPane(ScrollPane target) {
+    public java.awt.peer.ScrollPanePeer createScrollPane(ScrollPane target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.TextAreaPeer createTextArea(TextArea target) {
+    public java.awt.peer.TextAreaPeer createTextArea(TextArea target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.TextFieldPeer createTextField(TextField target) {
+    public java.awt.peer.TextFieldPeer createTextField(TextField target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.WindowPeer createWindow(Window target) {
+    public java.awt.peer.WindowPeer createWindow(Window target) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
     public java.awt.datatransfer.Clipboard getSystemClipboard() {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
     public PrintJob getPrintJob(Frame frame, String jobtitle, java.util.Properties props)  {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
-    protected java.awt.peer.FontPeer getFontPeer(String name, int style) {
+    public java.awt.peer.FontPeer getFontPeer(String name, int style) {
+        logger.unimplemented();
         throw new Error("Not implemented");
     }
+
+    /* required for Java < 9 */
+    public DataTransferer getDataTransferer() {
+        return null;
+    }
+    public RobotPeer createRobot(Robot target, GraphicsDevice screen) {
+        logger.unimplemented();
+        throw new Error("Not implemented");
+    }
+
 }
