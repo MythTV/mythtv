@@ -186,7 +186,7 @@ class DecoderBase
 
     virtual bool IsLastFrameKey(void) const = 0;
     virtual void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,
-                                 long timecodeOffset) = 0;
+                                 std::chrono::milliseconds timecodeOffset) = 0;
     virtual void ClearStoredData(void) { }
     virtual void SetRawAudioState(bool state) { m_getRawFrames = state; }
     virtual bool GetRawAudioState(void) const { return m_getRawFrames; }

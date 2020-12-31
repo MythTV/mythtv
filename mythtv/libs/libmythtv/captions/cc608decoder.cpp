@@ -46,7 +46,7 @@ CC608Decoder::~CC608Decoder(void)
     delete [] m_rbuf;
 }
 
-void CC608Decoder::FormatCC(int tc, int code1, int code2)
+void CC608Decoder::FormatCC(std::chrono::milliseconds tc, int code1, int code2)
 {
     FormatCCField(tc, 0, code1);
     FormatCCField(tc, 1, code2);
@@ -97,7 +97,7 @@ static const std::array<const QChar,32> extendedchar3 =
     0x250C, 0x2510, 0x2514, 0x2518                                              // ┌┐└┘
 };
 
-void CC608Decoder::FormatCCField(int tc, int field, int data)
+void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, int field, int data)
 {
     int len = 0;
     int mode = 0;
@@ -133,7 +133,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
 #if 1
     LOG(VB_VBI, LOG_DEBUG,
         QString("Format CC @%1/%2 = %3 %4, %5/%6 = '%7' '%8'")
-        .arg(tc).arg(field)
+        .arg(tc.count()).arg(field)
         .arg((data&0xff), 2, 16)
         .arg((data&0xff00)>>8, 2, 16)
         .arg(b1, 2, 16, QChar('0'))
@@ -173,7 +173,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     {
         if (mode >= 0)
         {
-            m_lastCodeTc[field] += 33;
+            m_lastCodeTc[field] += 33ms;
             m_timeCode[mode] = tc;
 
             // commit row number only when first text code
@@ -195,7 +195,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
         // 0x10 <= b1 <= 0x1F
         // control codes
     {
-        m_lastCodeTc[field] += 67;
+        m_lastCodeTc[field] += 67ms;
 
         int newccmode = (b1 >> 3) & 1;
         int newtxtmode = m_txtMode[field*2 + newccmode];
@@ -422,8 +422,8 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                             break;
                         case 0x2C:      //erase displayed memory
                             if (m_ignoreTimeCode ||
-                                (tc - m_lastClr[mode]) > 5000 ||
-                                m_lastClr[mode] == 0)
+                                (tc - m_lastClr[mode]) > 5s ||
+                                m_lastClr[mode] == 0ms)
                             {
                                 // don't overflow the frontend with
                                 // too many redundant erase codes
@@ -459,8 +459,8 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
                                     BufferCC(mode, len, 0);
                             }
                             else if (m_ignoreTimeCode ||
-                                     (tc - m_lastClr[mode]) > 5000 ||
-                                     m_lastClr[mode] == 0)
+                                     (tc - m_lastClr[mode]) > 5s ||
+                                     m_lastClr[mode] == 0ms)
                             {
                                 // clear and flush
                                 BufferCC(mode, len, 1);
@@ -518,7 +518,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     for (mode = field*4; mode < (field*4 + 4); mode++)
     {
         len = m_ccBuf[mode].length();
-        if ((m_ignoreTimeCode || ((tc - m_timeCode[mode]) > 100)) &&
+        if ((m_ignoreTimeCode || ((tc - m_timeCode[mode]) > 100ms)) &&
              (m_style[mode] != CC_STYLE_POPUP) && len)
         {
             // flush unfinished line if waiting too long
@@ -539,7 +539,7 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
     m_lastTc[field] = tc;
 }
 
-bool CC608Decoder::FalseDup(int tc, int field, int data)
+bool CC608Decoder::FalseDup(std::chrono::milliseconds tc, int field, int data)
 {
     int b1 = data & 0x7f;
     int b2 = (data >> 8) & 0x7f;
@@ -562,12 +562,12 @@ bool CC608Decoder::FalseDup(int tc, int field, int data)
     // bttv-0.7 reads don't seem to work as well so if read intervals
     // vary from this, be more conservative in detecting duplicate
     // CC codes.
-    int dup_text_fudge = 0;
-    int dup_ctrl_fudge = 0;
+    std::chrono::milliseconds dup_text_fudge = 0ms;
+    std::chrono::milliseconds dup_ctrl_fudge = 0ms;
     if (m_badVbi[field] < 100 && b1 != 0 && b2 != 0)
     {
-        int d = tc - m_lastTc[field];
-        if (d < 25 || d > 42)
+        std::chrono::milliseconds d = tc - m_lastTc[field];
+        if (d < 25ms || d > 42ms)
             m_badVbi[field]++;
         else if (m_badVbi[field] > 0)
             m_badVbi[field]--;
@@ -575,27 +575,27 @@ bool CC608Decoder::FalseDup(int tc, int field, int data)
     if (m_badVbi[field] < 4)
     {
         // this should pick up all codes
-        dup_text_fudge = -2;
+        dup_text_fudge = -2ms;
         // this should pick up 1st, 4th, 6th, 8th, ... codes
-        dup_ctrl_fudge = 33 - 4;
+        dup_ctrl_fudge = 33ms - 4ms;
     }
     else
     {
-        dup_text_fudge = 4;
-        dup_ctrl_fudge = 33 - 4;
+        dup_text_fudge = 4ms;
+        dup_ctrl_fudge = 33ms - 4ms;
     }
 
     if (data == m_lastCode[field])
     {
         if ((b1 & 0x70) == 0x10)
         {
-            if (tc > (m_lastCodeTc[field] + 67 + dup_ctrl_fudge))
+            if (tc > (m_lastCodeTc[field] + 67ms + dup_ctrl_fudge))
                 return false;
         }
         else if (b1)
         {
             // text, XDS
-            if (tc > (m_lastCodeTc[field] + 33 + dup_text_fudge))
+            if (tc > (m_lastCodeTc[field] + 33ms + dup_text_fudge))
                 return false;
         }
 
@@ -617,7 +617,7 @@ void CC608Decoder::ResetCC(int mode)
 //    m_style[mode] = CC_STYLE_POPUP;
     m_lineCont[mode] = 0;
     m_resumeText[mode] = 0;
-    m_lastClr[mode] = 0;
+    m_lastClr[mode] = 0ms;
     m_ccBuf[mode] = "";
 }
 
@@ -695,7 +695,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     if ((len != 0) && VERBOSE_LEVEL_CHECK(VB_VBI, LOG_INFO))
     {
         LOG(VB_VBI, LOG_INFO, QString("### %1 %2 %3 %4 %5 %6 %7 - '%8'")
-            .arg(m_timeCode[mode], 10)
+            .arg(m_timeCode[mode].count(), 10)
             .arg(m_row[mode], 2).arg(m_rowCount[mode])
             .arg(m_style[mode]).arg(f, 2, 16)
             .arg(clr).arg(len, 3)
@@ -719,7 +719,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     if (clr && !len)
         m_lastClr[mode] = m_timeCode[mode];
     else if (len)
-        m_lastClr[mode] = 0;
+        m_lastClr[mode] = 0ms;
 }
 
 int CC608Decoder::NewRowCC(int mode, int len)

@@ -226,7 +226,7 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     if (!got_pkt)
         return ret;
 
-    long long tc = Frame->m_timecode;
+    std::chrono::milliseconds tc = Frame->m_timecode;
 
     if (!m_bufferedVideoFrameTimes.isEmpty())
         tc = m_bufferedVideoFrameTimes.takeFirst();
@@ -238,11 +238,11 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
             pkt.flags |= AV_PKT_FLAG_KEY;
     }
 
-    if (m_startingTimecodeOffset == -1)
-        m_startingTimecodeOffset = tc - 1;
+    if (m_startingTimecodeOffset == -1ms)
+        m_startingTimecodeOffset = tc - 1ms;
     tc -= m_startingTimecodeOffset;
 
-    pkt.pts = tc * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
+    pkt.pts = tc.count() * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
     pkt.dts = AV_NOPTS_VALUE;
     pkt.stream_index= m_videoStream->index;
 
@@ -267,7 +267,7 @@ static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 }
 #endif
 
-int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber*/, long long &Timecode)
+int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber*/, std::chrono::milliseconds &Timecode)
 {
 #if HAVE_BIGENDIAN
     bswap_16_buf((short int*) buf, m_audioFrameSize, m_audioChannels);
@@ -338,19 +338,19 @@ int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber
     if (!got_packet)
         return ret;
 
-    long long tc = Timecode;
+    std::chrono::milliseconds tc = Timecode;
 
     if (!m_bufferedAudioFrameTimes.empty())
         tc = m_bufferedAudioFrameTimes.takeFirst();
 
-    if (m_startingTimecodeOffset == -1)
-        m_startingTimecodeOffset = tc - 1;
+    if (m_startingTimecodeOffset == -1ms)
+        m_startingTimecodeOffset = tc - 1ms;
     tc -= m_startingTimecodeOffset;
 
     if (m_avVideoCodec)
-        pkt.pts = tc * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
+        pkt.pts = tc.count() * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
     else
-        pkt.pts = tc * m_audioStream->time_base.den / m_audioStream->time_base.num / 1000;
+        pkt.pts = tc.count() * m_audioStream->time_base.den / m_audioStream->time_base.num / 1000;
 
     pkt.dts = AV_NOPTS_VALUE;
     pkt.flags |= AV_PKT_FLAG_KEY;
@@ -366,7 +366,7 @@ int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber
 }
 
 int MythAVFormatWriter::WriteTextFrame(int /*VBIMode*/, unsigned char* /*Buffer*/, int /*Length*/,
-                                   long long /*Timecode*/, int /*PageNumber*/)
+                                       std::chrono::milliseconds /*Timecode*/, int /*PageNumber*/)
 {
     return 1;
 }

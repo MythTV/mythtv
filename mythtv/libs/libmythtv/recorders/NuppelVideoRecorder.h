@@ -119,8 +119,8 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     void SetVideoAspect(float newAspect) {m_videoAspect = newAspect; };
     void WriteVideo(MythVideoFrame *frame, bool skipsync = false, 
                     bool forcekey = false);
-    void WriteAudio(unsigned char *buf, int fnum, int timecode);
-    void WriteText(unsigned char *buf, int len, int timecode, int pagenr);
+    void WriteAudio(unsigned char *buf, int fnum, std::chrono::milliseconds timecode);
+    void WriteText(unsigned char *buf, int len, std::chrono::milliseconds timecode, int pagenr);
 
     void SetNewVideoParams(double newaspect);
 
@@ -152,7 +152,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     void FormatTT(struct VBIData *vbidata) override; // V4LRecorder
     void FormatCC(uint code1, uint code2) override; // V4LRecorder
-    void AddTextData(unsigned char*buf, int len, int64_t timecode, char type) override; // CC608Input
+    void AddTextData(unsigned char *buf, int len, std::chrono::milliseconds timecode, char type) override; // CC608Input
 
     void UpdateResolutions(void);
     
@@ -240,7 +240,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
     double              m_heightMultiplier       {1.0};
 
     int                 m_lastBlock              {0};
-    int                 m_firstTc                {0};
+    std::chrono::milliseconds  m_firstTc         {0ms};
     std::chrono::milliseconds  m_oldTc           {0ms};
     int                 m_startNum               {0};
     int                 m_frameOfGop             {0};

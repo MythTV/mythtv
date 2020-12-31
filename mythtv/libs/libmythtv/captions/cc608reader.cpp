@@ -81,7 +81,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed, int &streamIdx)
     if (m_parent->GetVideoOutput())
         last = m_parent->GetVideoOutput()->GetLastShownFrame();
 
-    if (NumInputBuffers() && m_inputBuffers[m_writePosition].timecode &&
+    if (NumInputBuffers() && (m_inputBuffers[m_writePosition].timecode > 0ms) &&
        (last && m_inputBuffers[m_writePosition].timecode <= last->m_timecode))
     {
         if (m_inputBuffers[m_writePosition].type == 'T')
@@ -441,7 +441,7 @@ void CC608Reader::ClearBuffers(bool input, bool output, int outputStreamIdx)
     {
         for (int i = 0; i < MAXTBUFFER; i++)
         {
-            m_inputBuffers[i].timecode = 0;
+            m_inputBuffers[i].timecode = 0ms;
             if (m_inputBuffers[i].buffer)
                 memset(m_inputBuffers[i].buffer, 0, m_maxTextSize);
         }
@@ -483,7 +483,7 @@ int CC608Reader::NumInputBuffers(bool need_to_lock)
 }
 
 void CC608Reader::AddTextData(unsigned char *buffer, int len,
-                              int64_t timecode, char type)
+                              std::chrono::milliseconds timecode, char type)
 {
     if (m_parent)
         m_parent->WrapTimecode(timecode, TC_CC);
@@ -521,9 +521,9 @@ void CC608Reader::AddTextData(unsigned char *buffer, int len,
         */
         LOG(VB_VBI, LOG_INFO,
             QString("Writing caption timecode %1 but waiting on %2")
-                .arg(timecode).arg(m_inputBuffers[m_readPosition].timecode));
+            .arg(timecode.count()).arg(m_inputBuffers[m_readPosition].timecode.count()));
         m_inputBuffers[m_readPosition].timecode =
-            m_inputBuffers[prev_readpos].timecode + 500;
+            m_inputBuffers[prev_readpos].timecode + 500ms;
     }
 
     m_inputBuffers[m_readPosition].timecode = timecode;

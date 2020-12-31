@@ -1511,7 +1511,7 @@ void TV::GetStatus()
             status.insert("audiotracks", tracks);
 
         status.insert("playspeed", m_player->GetPlaySpeed());
-        status.insert("audiosyncoffset", static_cast<long long>(m_audioState.m_audioOffset));
+        status.insert("audiosyncoffset", static_cast<long long>(m_audioState.m_audioOffset.count()));
 
         if (m_audioState.m_volumeControl)
         {
@@ -3708,13 +3708,13 @@ bool TV::AudioSyncHandleAction(const QStringList& Actions)
     bool handled = true;
 
     if (IsActionable(ACTION_LEFT, Actions))
-        emit ChangeAudioOffset(-1);
+        emit ChangeAudioOffset(-1ms);
     else if (IsActionable(ACTION_RIGHT, Actions))
-        emit ChangeAudioOffset(1);
+        emit ChangeAudioOffset(1ms);
     else if (IsActionable(ACTION_UP, Actions))
-        emit ChangeAudioOffset(10);
+        emit ChangeAudioOffset(10ms);
     else if (IsActionable(ACTION_DOWN, Actions))
-        emit ChangeAudioOffset(-10);
+        emit ChangeAudioOffset(-10ms);
     else if (IsActionable({ ACTION_TOGGELAUDIOSYNC, ACTION_SELECT }, Actions))
         ClearOSD();
     else
@@ -3778,7 +3778,7 @@ bool TV::DiscMenuHandleAction(const QStringList& Actions) const
         MythVideoFrame *frame = output->GetLastShownFrame();
         // convert timecode (msec) to pts (90kHz)
         if (frame)
-            pts = static_cast<int64_t>(frame->m_timecode  * 90);
+            pts = static_cast<int64_t>(frame->m_timecode.count()  * 90);
     }
     if (m_playerContext.m_buffer)
         return m_playerContext.m_buffer->HandleAction(Actions, pts);
@@ -4068,7 +4068,7 @@ bool TV::ToggleHandleAction(const QStringList &Actions, bool IsDVD)
     else if (IsActionable("TOGGLEFILL", Actions))
         emit ChangeAdjustFill();
     else if (IsActionable(ACTION_TOGGELAUDIOSYNC, Actions))
-        emit ChangeAudioOffset(0);   // just display
+        emit ChangeAudioOffset(0ms);   // just display
     else if (IsActionable(ACTION_TOGGLESUBTITLEZOOM, Actions))
         emit AdjustSubtitleZoom(0);   // just display
     else if (IsActionable(ACTION_TOGGLESUBTITLEDELAY, Actions))
@@ -7289,7 +7289,7 @@ void TV::customEvent(QEvent *Event)
         if (message == ACTION_SETVOLUME)
             VolumeChange(false, value);
         else if (message == ACTION_SETAUDIOSYNC)
-            emit ChangeAudioOffset(0, value);
+            emit ChangeAudioOffset(0ms, std::chrono::milliseconds(value));
         else if (message == ACTION_SETBRIGHTNESS)
             emit ChangePictureAttribute(kPictureAttribute_Brightness, false, value);
         else if (message == ACTION_SETCONTRAST)
@@ -7684,7 +7684,7 @@ void TV::HandleOSDClosed(int OSDType)
             break;
         case kOSDFunctionalType_AudioSyncAdjust:
             m_audiosyncAdjustment = false;
-            gCoreContext->SaveSetting("AudioSyncOffset", QString::number(m_audioState.m_audioOffset));
+            gCoreContext->SaveSetting("AudioSyncOffset", QString::number(m_audioState.m_audioOffset.count()));
             break;
         case kOSDFunctionalType_SubtitleZoomAdjust:
             m_subtitleZoomAdjustment = false;
@@ -8144,7 +8144,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action.startsWith("SELECTSCAN_"))
         OverrideScan(static_cast<FrameScanType>(Action.rightRef(1).toInt()));
     else if (Action.startsWith(ACTION_TOGGELAUDIOSYNC))
-        emit ChangeAudioOffset(0);
+        emit ChangeAudioOffset(0ms);
     else if (Action == ACTION_TOGGLESUBTITLEZOOM)
         emit AdjustSubtitleZoom(0);
     else if (Action == ACTION_TOGGLESUBTITLEDELAY)

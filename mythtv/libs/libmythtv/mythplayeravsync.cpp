@@ -95,9 +95,9 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
     {
         if (Frame)
         {
-            videotimecode = std::chrono::milliseconds(Frame->m_timecode & 0x0000ffffffffffff);
+            videotimecode = std::chrono::milliseconds(Frame->m_timecode.count() & 0x0000ffffffffffff);
             // Detect bogus timecodes from DVD and ignore them.
-            if (videotimecode != std::chrono::milliseconds(Frame->m_timecode))
+            if (videotimecode != Frame->m_timecode)
                 videotimecode = m_maxTcVal;
         }
 

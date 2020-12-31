@@ -118,7 +118,7 @@ class AvFormatDecoder : public DecoderBase
 
     /// This is a No-op for this class.
     void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,
-                         long timecodeOffset) override // DecoderBase
+                         std::chrono::milliseconds timecodeOffset) override // DecoderBase
         { (void)Buffer; (void)storevid; (void)timecodeOffset;}
 
     /// This is a No-op for this class.

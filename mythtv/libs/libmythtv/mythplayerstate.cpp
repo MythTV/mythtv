@@ -16,7 +16,7 @@ MythOverlayState::MythOverlayState(bool Browsing, bool Editing)
  * \brief A simple wrapper around audio state used to signal changes
  * in the current state.
 */
-MythAudioState::MythAudioState(AudioPlayer* Player, int64_t Offset)
+MythAudioState::MythAudioState(AudioPlayer* Player, std::chrono::milliseconds Offset)
   : m_hasAudioOut(Player->HasAudioOut()),
     m_volumeControl(Player->ControlsVolume()),
     m_volume(Player->GetVolume()),

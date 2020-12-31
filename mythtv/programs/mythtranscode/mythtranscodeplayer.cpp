@@ -115,7 +115,8 @@ long MythTranscodePlayer::UpdateStoredFrameNum(long CurrentFrameNum)
 }
 
 bool MythTranscodePlayer::WriteStoredData(MythMediaBuffer* OutBuffer,
-                                          bool Writevideo, long TimecodeOffset)
+                                          bool Writevideo,
+                                          std::chrono::milliseconds TimecodeOffset)
 {
     if (!m_decoder)
         return false;

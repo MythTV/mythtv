@@ -32,7 +32,7 @@ void MythDVDPlayer::AutoDeint(MythVideoFrame *Frame, MythVideoOutput *VideoOutpu
  *                   whether or not video is currently playing.
  */
 void MythDVDPlayer::ReleaseNextVideoFrame(MythVideoFrame *Buffer,
-                                          int64_t Timecode, bool /*wrap*/)
+                                          std::chrono::milliseconds Timecode, bool /*wrap*/)
 {
     MythPlayerUI::ReleaseNextVideoFrame(Buffer, Timecode,
                         !m_playerCtx->m_buffer->IsInDiscMenuOrStillFrame());
@@ -309,7 +309,7 @@ void MythDVDPlayer::EventEnd(void)
         m_playerCtx->m_buffer->DVD()->SetParent(nullptr);
 }
 
-bool MythDVDPlayer::PrepareAudioSample(int64_t &Timecode)
+bool MythDVDPlayer::PrepareAudioSample(std::chrono::milliseconds &Timecode)
 {
     if (!m_playerCtx->m_buffer->IsInDiscMenuOrStillFrame())
         WrapTimecode(Timecode, TC_AUDIO);
@@ -573,7 +573,7 @@ void MythDVDPlayer::DisplayDVDButton(void)
 
     if (dvdSubtitle &&
         (dvdSubtitle->end_display_time > dvdSubtitle->start_display_time) &&
-        (dvdSubtitle->end_display_time < currentFrame->m_timecode))
+        (dvdSubtitle->end_display_time < currentFrame->m_timecode.count()))
     {
         expired = true;
     }
@@ -594,7 +594,8 @@ void MythDVDPlayer::DisplayDVDButton(void)
         return;
     }
 
-    if (currentFrame->m_timecode && (dvdSubtitle->start_display_time > currentFrame->m_timecode))
+    if ((currentFrame->m_timecode > 0ms) &&
+        (dvdSubtitle->start_display_time > currentFrame->m_timecode.count()))
     {
         m_playerCtx->m_buffer->DVD()->ReleaseMenuButton();
         return;

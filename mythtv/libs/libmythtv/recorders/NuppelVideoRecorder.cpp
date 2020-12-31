@@ -1831,7 +1831,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
     // record the time at the start of this frame.
     // 'tcres' is at the end of the frame, so subtract the right # of ms
     m_videoBuffer[act]->timecode =
-        (m_ntscFrameRate) ? (tcres.count() - 33) : (tcres.count() - 40);
+        (m_ntscFrameRate) ? (tcres - 33ms) : (tcres - 40ms);
 
     memcpy(m_videoBuffer[act]->buffer, buf, len);
     m_videoBuffer[act]->bufferlen = len;
@@ -2140,7 +2140,7 @@ void NuppelVideoRecorder::Reset(void)
     {
         vidbuffertype *vidbuf = m_videoBuffer[i];
         vidbuf->sample = 0;
-        vidbuf->timecode = 0;
+        vidbuf->timecode = 0ms;
         vidbuf->freeToEncode = 0;
         vidbuf->freeToBuffer = 1;
         vidbuf->forcekey = false;
@@ -2150,7 +2150,7 @@ void NuppelVideoRecorder::Reset(void)
     {
         audbuffertype *audbuf = m_audioBuffer[i];
         audbuf->sample = 0;
-        audbuf->timecode = 0;
+        audbuf->timecode = 0ms;
         audbuf->freeToEncode = 0;
         audbuf->freeToBuffer = 1;
     }
@@ -2262,12 +2262,12 @@ void NuppelVideoRecorder::doAudioThread(void)
 
         /* calculate timecode. First compute the difference
            between now and stm (start time) */
-        m_audioBuffer[act]->timecode = (anow.tv_sec - m_stm.tv_sec) * 1000 +
-                                      anow.tv_usec / 1000 - m_stm.tv_usec / 1000;
+        m_audioBuffer[act]->timecode =
+            durationFromTimevalDelta<std::chrono::milliseconds>(anow, m_stm);
         /* We want the timestamp to point to the start of this
            audio chunk. So, subtract off the length of the chunk
            and the length of audio still in the capture buffer. */
-        m_audioBuffer[act]->timecode -= (int)(
+        m_audioBuffer[act]->timecode -= millisecondsFromFloat(
                 (bytes_read + m_audioBufferSize)
                  * 1000.0 / (m_audioSampleRate * m_audioBytesPerSample));
 
@@ -2304,8 +2304,8 @@ void NuppelVideoRecorder::FormatTT(struct VBIData *vbidata)
 
     // calculate timecode:
     // compute the difference  between now and stm (start time)
-    m_textBuffer[act]->timecode = (tnow.tv_sec-m_stm.tv_sec) * 1000 +
-                                  tnow.tv_usec/1000 - m_stm.tv_usec/1000;
+    m_textBuffer[act]->timecode =
+            durationFromTimevalDelta<std::chrono::milliseconds>(tnow, m_stm);
     m_textBuffer[act]->pagenr = (vbidata->teletextpage.pgno << 16) +
                                 vbidata->teletextpage.subno;
 
@@ -2460,14 +2460,12 @@ void NuppelVideoRecorder::FormatCC(uint code1, uint code2)
 
     // calculate timecode:
     // compute the difference  between now and stm (start time)
-    int tc = (tnow.tv_sec - m_stm.tv_sec) * 1000 +
-             tnow.tv_usec / 1000 - m_stm.tv_usec / 1000;
-
+    auto tc = durationFromTimevalDelta<std::chrono::milliseconds>(tnow, m_stm);
     m_ccd->FormatCC(tc, code1, code2);
 }
 
 void NuppelVideoRecorder::AddTextData(unsigned char *buf, int len,
-                                      int64_t timecode, char /*type*/)
+                                      std::chrono::milliseconds timecode, char /*type*/)
 {
     int act = m_actTextBuffer;
     if (!m_textBuffer[act]->freeToBuffer)
@@ -2525,7 +2523,7 @@ void NuppelVideoRecorder::doWriteThread(void)
           ACTION_AUDIO,
           ACTION_TEXT
         } action = ACTION_NONE;
-        int firsttimecode = -1;
+        std::chrono::milliseconds firsttimecode = -1ms;
 
         if (m_videoBuffer[m_actVideoEncode]->freeToEncode)
         {
@@ -2665,7 +2663,7 @@ void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
         frame->m_buffer + frame->m_offsets[1],
         frame->m_buffer + frame->m_offsets[2] };
     int fnum = frame->m_frameNumber;
-    long long timecode = frame->m_timecode;
+    std::chrono::milliseconds timecode = frame->m_timecode;
 
     if (m_lf == 0)
     {   // this will be triggered every new file
@@ -2799,7 +2797,7 @@ void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
     }
 
     frameheader.frametype = 'V'; // video frame
-    frameheader.timecode  = timecode;
+    frameheader.timecode  = timecode.count();
     m_lastTimecode = frameheader.timecode;
     frameheader.filters   = 0;             // no filters applied
 
@@ -2878,13 +2876,13 @@ static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 }
 #endif
 
-void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
+void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, std::chrono::milliseconds timecode)
 {
     struct rtframeheader frameheader {};
 
     if (m_lastBlock == 0)
     {
-        m_firstTc = -1;
+        m_firstTc = -1ms;
     }
 
     if (m_lastBlock != 0)
@@ -2898,14 +2896,14 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     }
 
     frameheader.frametype = 'A'; // audio frame
-    frameheader.timecode = timecode;
+    frameheader.timecode = timecode.count();
 
-    if (m_firstTc == -1)
+    if (m_firstTc == -1ms)
     {
         m_firstTc = timecode;
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
-            QString("first timecode=%1").arg(m_firstTc));
+            QString("first timecode=%1").arg(m_firstTc.count()));
 #endif
     }
     else
@@ -2917,7 +2915,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         auto abytes = (double)m_audioBytes; // - (double)m_audioBufferSize;
                                      // wrong guess ;-)
         // need seconds instead of msec's
-        auto mt = (double)timecode;
+        auto mt = (double)timecode.count();
         if (mt > 0.0)
         {
             double eff = (abytes / mt) * (100000.0 / m_audioBytesPerSample);
@@ -3009,13 +3007,13 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     m_lastBlock = fnum;
 }
 
-void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
+void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, std::chrono::milliseconds timecode,
                                     int pagenr)
 {
     struct rtframeheader frameheader {};
 
     frameheader.frametype = 'T'; // text frame
-    frameheader.timecode = timecode;
+    frameheader.timecode = timecode.count();
 
     if (VBIMode::PAL_TT == m_vbiMode)
     {

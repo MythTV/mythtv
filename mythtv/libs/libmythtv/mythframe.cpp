@@ -152,7 +152,7 @@ void MythVideoFrame::ClearMetadata()
     m_frameRate           = -1.0 ;
     m_frameNumber         = 0;
     m_frameCounter        = 0;
-    m_timecode            = 0;
+    m_timecode            = 0ms;
     m_displayTimecode     = 0ms;
     m_priv                = { nullptr };
     m_interlaced          = 0;

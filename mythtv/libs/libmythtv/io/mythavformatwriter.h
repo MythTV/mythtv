@@ -26,9 +26,9 @@ class MTV_PUBLIC MythAVFormatWriter : public MythMediaWriter
     bool OpenFile            (void) override;
     bool CloseFile           (void) override;
     int  WriteVideoFrame     (MythVideoFrame *Frame) override;
-    int  WriteAudioFrame     (unsigned char *Buffer, int FrameNumber, long long &Timecode) override;
+    int  WriteAudioFrame     (unsigned char *Buffer, int FrameNumber, std::chrono::milliseconds &Timecode) override;
     int  WriteTextFrame      (int VBIMode, unsigned char *Buffer, int Length,
-                              long long Timecode, int PageNumber) override;
+                              std::chrono::milliseconds Timecode, int PageNumber) override;
     int  WriteSeekTable      (void) override;
     bool SwitchToNextFile    (void) override;
 
@@ -58,9 +58,9 @@ class MTV_PUBLIC MythAVFormatWriter : public MythMediaWriter
     AVFrame               *m_audPicture    { nullptr };
     unsigned char         *m_audioInBuf    { nullptr };
     unsigned char         *m_audioInPBuf   { nullptr };
-    QList<long long>       m_bufferedVideoFrameTimes;
+    QList<std::chrono::milliseconds> m_bufferedVideoFrameTimes;
     QList<int>             m_bufferedVideoFrameTypes;
-    QList<long long>       m_bufferedAudioFrameTimes;
+    QList<std::chrono::milliseconds> m_bufferedAudioFrameTimes;
 };
 
 #endif

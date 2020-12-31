@@ -84,7 +84,7 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
         if (fps <= 0)
             fps = GetDecoder()->GetFPS();
         double duration = 1 / fps + static_cast<double>(frame->m_repeatPic) * 0.5 / fps;
-        m_curTime += std::chrono::seconds(static_cast<int64_t>(duration));
+        m_curTime += secondsFromFloat(duration);
         m_videoOutput->DoneDisplayingFrame(frame);
     }
 
@@ -630,14 +630,14 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
                 "There are unhandled text dvb subtitles");
         }
 
-        uint64_t duration = 0;
+        std::chrono::milliseconds duration = 0ms;
         const QStringList rawSubs =
             (*subit).m_reader->GetRawTextSubtitles(duration);
         if (!rawSubs.isEmpty())
         {
             LOG(VB_VBI, LOG_DEBUG,
                 QString("There are also %1 raw text subtitles with duration %2")
-                .arg(rawSubs.size()).arg(duration));
+                .arg(rawSubs.size()).arg(duration.count()));
         }
         /// INFO -- end
 

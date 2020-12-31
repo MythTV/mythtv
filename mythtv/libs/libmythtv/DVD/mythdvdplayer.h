@@ -14,9 +14,9 @@ class MythDVDPlayer : public MythPlayerUI
   public:
     MythDVDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context,PlayerFlags Flags = kNoFlags);
 
-    void     ReleaseNextVideoFrame(MythVideoFrame *Buffer, int64_t Timecode, bool Wrap = true) override;
+    void     ReleaseNextVideoFrame(MythVideoFrame *Buffer, std::chrono::milliseconds Timecode, bool Wrap = true) override;
     bool     HasReachedEof(void) const override;
-    bool     PrepareAudioSample(int64_t &Timecode) override;
+    bool     PrepareAudioSample(std::chrono::milliseconds &Timecode) override;
     uint64_t GetBookmark(void) override;
     std::chrono::milliseconds  GetMillisecondsPlayed(bool HonorCutList) override;
     std::chrono::milliseconds  GetTotalMilliseconds(bool HonorCutList) const override;

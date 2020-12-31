@@ -104,7 +104,7 @@ bool SubtitleReader::HasTextSubtitles(void)
     return m_textSubtitles.GetSubtitleCount() >= 0;
 }
 
-QStringList SubtitleReader::GetRawTextSubtitles(uint64_t &duration)
+QStringList SubtitleReader::GetRawTextSubtitles(std::chrono::milliseconds &duration)
 {
     QMutexLocker lock(&m_rawTextSubtitles.m_lock);
     if (m_rawTextSubtitles.m_buffers.empty())
@@ -116,7 +116,7 @@ QStringList SubtitleReader::GetRawTextSubtitles(uint64_t &duration)
     return result;
 }
 
-void SubtitleReader::AddRawTextSubtitle(const QStringList& list, uint64_t duration)
+void SubtitleReader::AddRawTextSubtitle(const QStringList& list, std::chrono::milliseconds duration)
 {
     if (!m_rawTextSubtitlesEnabled || list.empty())
         return;

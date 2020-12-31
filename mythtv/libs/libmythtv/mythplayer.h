@@ -57,7 +57,7 @@ enum TCTypes
     TC_CC
 };
 #define TCTYPESMAX 4
-using tctype_arr = std::array<int64_t,TCTYPESMAX>;
+using tctype_arr = std::array<std::chrono::milliseconds,TCTYPESMAX>;
 
 enum PlayerFlags
 {
@@ -177,7 +177,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Decoder stuff..
     MythVideoFrame *GetNextVideoFrame(void);
     void DeLimboFrame(MythVideoFrame *frame);
-    virtual void ReleaseNextVideoFrame(MythVideoFrame *buffer, int64_t timecode,
+    virtual void ReleaseNextVideoFrame(MythVideoFrame *buffer, std::chrono::milliseconds timecode,
                                        bool wrap = true);
     void DiscardVideoFrame(MythVideoFrame *buffer);
     void DiscardVideoFrames(bool KeyFrame, bool Flushed);
@@ -188,7 +188,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     void ForceSetupAudioStream(void);
 
     // Add data
-    virtual bool PrepareAudioSample(int64_t &timecode);
+    virtual bool PrepareAudioSample(std::chrono::milliseconds &timecode);
 
     // Public Closed caption and teletext stuff
     virtual uint GetCaptionMode() const    { return kDisplayNone; }
@@ -360,7 +360,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual int64_t GetChapter(int chapter);
 
     // Private A/V Sync Stuff
-    void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
+    void  WrapTimecode(std::chrono::milliseconds &timecode, TCTypes tc_type);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
 
   protected:
@@ -431,7 +431,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     std::chrono::seconds  m_totalLength   {0s};
     std::chrono::seconds  m_totalDuration {0s};
     long long m_rewindTime                {0};
-    int64_t   m_latestVideoTimecode       {-1};
+    std::chrono::milliseconds  m_latestVideoTimecode {-1ms};
     MythPlayerAVSync m_avSync;
 
     // -- end state stuff --
@@ -500,7 +500,7 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Time Code stuff
     tctype_arr m_tcWrap                   {};
-    int64_t    m_savedAudioTimecodeOffset {0};
+    std::chrono::milliseconds m_savedAudioTimecodeOffset {0ms};
 
     // LiveTV
     bool m_isDummy                        {false};

@@ -19,14 +19,16 @@
 using CC608Seen        = std::array<bool,4>;
 using CC608ProgramType = std::array<QString,96>;
 using CC608PerField    = std::array<int,2>;
+using CC608PerFieldTc  = std::array<std::chrono::milliseconds,2>;
 using CC608PerMode     = std::array<int,8>;
+using CC608PerModeTc   = std::array<std::chrono::milliseconds,8>;
 
 class CC608Input
 {
   public:
     virtual ~CC608Input() = default;
     virtual void AddTextData(unsigned char *buf, int len,
-                             int64_t timecode, char type) = 0;
+                             std::chrono::milliseconds timecode, char type) = 0;
 };
 
 enum
@@ -51,9 +53,9 @@ class CC608Decoder
     CC608Decoder(const CC608Decoder& rhs);
     ~CC608Decoder();
 
-    void FormatCC(int tc, int code1, int code2);
-    void FormatCCField(int tc, int field, int data);
-    bool FalseDup(int tc, int field, int data);
+    void FormatCC(std::chrono::milliseconds tc, int code1, int code2);
+    void FormatCCField(std::chrono::milliseconds tc, int field, int data);
+    bool FalseDup(std::chrono::milliseconds tc, int field, int data);
 
     void DecodeVPS(const unsigned char *buf);
     void DecodeWSS(const unsigned char *buf);
@@ -96,9 +98,9 @@ class CC608Decoder
 
     // per-field
     CC608PerField   m_badVbi                { 0,  0};
-    CC608PerField   m_lastTc                { 0,  0};
+    CC608PerFieldTc m_lastTc                { 0ms,  0ms};
     CC608PerField   m_lastCode              {-1, -1};
-    CC608PerField   m_lastCodeTc            { 0,  0};
+    CC608PerFieldTc m_lastCodeTc            { 0ms,  0ms};
     CC608PerField   m_ccMode                {-1, -1}; // 0=cc1/txt1, 1=cc2/txt2
     CC608PerField   m_xds                   { 0,  0};
     std::array<int,4> m_txtMode             { 0,  0,  0,  0};
@@ -108,14 +110,14 @@ class CC608Decoder
     CC608PerMode    m_newRow                {0};
     CC608PerMode    m_newCol                {0};
     CC608PerMode    m_newAttr               {0}; // color+italic+underline
-    CC608PerMode    m_timeCode              {0};
+    CC608PerModeTc  m_timeCode              {0ms};
     CC608PerMode    m_row                   {0};
     CC608PerMode    m_col                   {0};
     CC608PerMode    m_rowCount              {0};
     CC608PerMode    m_style                 {0};
     CC608PerMode    m_lineCont              {0};
     CC608PerMode    m_resumeText            {0};
-    CC608PerMode    m_lastClr               {0};
+    CC608PerModeTc  m_lastClr               {0ms};
     std::array<QString,8> m_ccBuf;
 
     // translation table
@@ -123,8 +125,8 @@ class CC608Decoder
 
     // temporary buffer
     unsigned char  *m_rbuf                  {nullptr};
-    std::array<int,2>  m_lastFormatTc       {0, 0};
-    std::array<int,2>  m_lastFormatData     {0, 0};
+    CC608PerFieldTc    m_lastFormatTc       {0ms, 0ms};
+    CC608PerField      m_lastFormatData     {0, 0};
 
     // VPS data
     std::array<char,20> m_vpsPrLabel        {0};

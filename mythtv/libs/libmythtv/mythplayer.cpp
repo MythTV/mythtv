@@ -596,7 +596,7 @@ MythVideoFrame *MythPlayer::GetNextVideoFrame(void)
  *  \brief Places frame on the queue of frames ready for display.
  */
 void MythPlayer::ReleaseNextVideoFrame(MythVideoFrame *buffer,
-                                       int64_t timecode,
+                                       std::chrono::milliseconds timecode,
                                        bool wrap)
 {
     if (wrap)
@@ -1267,12 +1267,12 @@ bool MythPlayer::DoGetFrame(DecodeType Type)
     return ret;
 }
 
-void MythPlayer::WrapTimecode(int64_t &timecode, TCTypes tc_type)
+void MythPlayer::WrapTimecode(std::chrono::milliseconds &timecode, TCTypes tc_type)
 {
     timecode += m_tcWrap[tc_type];
 }
 
-bool MythPlayer::PrepareAudioSample(int64_t &timecode)
+bool MythPlayer::PrepareAudioSample(std::chrono::milliseconds &timecode)
 {
     WrapTimecode(timecode, TC_AUDIO);
     return false;
@@ -1662,9 +1662,9 @@ void MythPlayer::ClearAfterSeek(bool clearvideobuffers)
     if (clearvideobuffers && m_videoOutput)
         m_videoOutput->ClearAfterSeek();
 
-    int64_t savedTC = m_tcWrap[TC_AUDIO];
+    std::chrono::milliseconds savedTC = m_tcWrap[TC_AUDIO];
 
-    m_tcWrap.fill(0);
+    m_tcWrap.fill(0ms);
     m_tcWrap[TC_AUDIO] = savedTC;
     m_audio.Reset();
 

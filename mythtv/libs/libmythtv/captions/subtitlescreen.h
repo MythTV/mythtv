@@ -75,7 +75,8 @@ class FormattedTextSubtitle
 {
 protected:
     FormattedTextSubtitle(QString base, QRect safearea,
-                          uint64_t start, uint64_t duration,
+                          std::chrono::milliseconds start,
+                          std::chrono::milliseconds duration,
                           SubtitleScreen *p) :
         m_base(std::move(base)), m_safeArea(safearea),
         m_start(start), m_duration(duration), m_subScreen(p) {}
@@ -96,8 +97,8 @@ protected:
     QString         m_base;
     QVector<FormattedTextLine> m_lines;
     const QRect     m_safeArea;
-    uint64_t        m_start        {0};
-    uint64_t        m_duration     {0};
+    std::chrono::milliseconds m_start    {0ms};
+    std::chrono::milliseconds m_duration {0ms};
     SubtitleScreen *m_subScreen    {nullptr}; // where fonts and sizes are kept
     int             m_xAnchorPoint {0}; // 0=left, 1=center, 2=right
     int             m_yAnchorPoint {0}; // 0=top,  1=center, 2=bottom
@@ -111,8 +112,8 @@ class FormattedTextSubtitleSRT : public FormattedTextSubtitle
 public:
     FormattedTextSubtitleSRT(const QString &base,
                              QRect safearea,
-                             uint64_t start,
-                             uint64_t duration,
+                             std::chrono::milliseconds start,
+                             std::chrono::milliseconds duration,
                              SubtitleScreen *p,
                              const QStringList &subs) :
         FormattedTextSubtitle(base, safearea, start, duration, p)
@@ -131,7 +132,7 @@ public:
                              const QString &base = "",
                              QRect safearea = QRect(),
                              SubtitleScreen *p = nullptr) :
-        FormattedTextSubtitle(base, safearea, 0, 0, p)
+        FormattedTextSubtitle(base, safearea, 0ms, 0ms, p)
     {
         Init(buffers);
     }
@@ -150,7 +151,7 @@ public:
                              QRect safearea = QRect(),
                              SubtitleScreen *p = nullptr,
                              float aspect = 1.77777F) :
-        FormattedTextSubtitle(base, safearea, 0, 0, p),
+        FormattedTextSubtitle(base, safearea, 0ms, 0ms, p),
         m_num(num),
         m_bgFillAlpha(win.GetFillAlpha()),
         m_bgFillColor(win.GetFillColor())
@@ -221,11 +222,12 @@ private:
     int  DisplayScaledAVSubtitles(const AVSubtitleRect *rect, QRect &bbox,
                                   bool top, QRect &display, int forced,
                                   const QString& imagename,
-                                  long long displayuntil, long long late);
+                                  std::chrono::milliseconds displayuntil,
+                                  std::chrono::milliseconds late);
     void DisplayTextSubtitles(void);
     void DisplayRawTextSubtitles(void);
-    void DrawTextSubtitles(const QStringList &subs, uint64_t start,
-                           uint64_t duration);
+    void DrawTextSubtitles(const QStringList &subs, std::chrono::milliseconds start,
+                           std::chrono::milliseconds duration);
     void DisplayCC608Subtitles(void);
     void DisplayCC708Subtitles(void);
     void AddScaledImage(QImage &img, QRect &pos);
@@ -263,7 +265,7 @@ private:
     void CleanupAssTrack(void);
     void AddAssEvent(char *event);
     void ResizeAssRenderer(void);
-    void RenderAssTrack(uint64_t timecode);
+    void RenderAssTrack(std::chrono::milliseconds timecode);
 
     ASS_Library    *m_assLibrary          {nullptr};
     ASS_Renderer   *m_assRenderer         {nullptr};

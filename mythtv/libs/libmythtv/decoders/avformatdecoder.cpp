@@ -2897,11 +2897,11 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
                     field = 1;
 
                     // flush decoder
-                    m_ccd608->FormatCC(0, -1, -1);
+                    m_ccd608->FormatCC(0ms, -1, -1);
                 }
 
                 had_608 = true;
-                m_ccd608->FormatCCField(m_lastCcPtsu / 1000, field, data);
+                m_ccd608->FormatCCField(std::chrono::milliseconds(m_lastCcPtsu/1000), field, data);
 
                 m_lastScteField = field;
             }
@@ -3752,7 +3752,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     // Retrieve HDR metadata
     MythHDRMetadata::Populate(frame, AvFrame);
 
-    m_parent->ReleaseNextVideoFrame(frame, temppts);
+    m_parent->ReleaseNextVideoFrame(frame, std::chrono::milliseconds(temppts));
     m_mythCodecCtx->PostProcessFrame(context, frame);
 
     m_nextDecodedFrameIsKeyFrame = false;
@@ -3838,7 +3838,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 {
                     int data = (buf[2] << 8) | buf[1];
                     if (cc608_good_parity(m_cc608ParityTable, data))
-                        m_ccd608->FormatCCField(utc/1000, field, data);
+                        m_ccd608->FormatCCField(std::chrono::milliseconds(utc/1000), field, data);
                     utc += 33367;
                 }
                 break;
@@ -4031,7 +4031,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket* Packet)
 #else
     auto list = text.split('\n', Qt::SkipEmptyParts);
 #endif
-    m_parent->GetSubReader(id)->AddRawTextSubtitle(list, static_cast<uint64_t>(Packet->duration));
+    m_parent->GetSubReader(id)->AddRawTextSubtitle(list, std::chrono::milliseconds(Packet->duration));
     return true;
 }
 
@@ -5143,7 +5143,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrames(void)
         frame->m_frameNumber  = m_framesPlayed;
         frame->m_frameCounter = m_frameCounter++;
 
-        m_parent->ReleaseNextVideoFrame(frame, m_lastVPts);
+        m_parent->ReleaseNextVideoFrame(frame, std::chrono::milliseconds(m_lastVPts));
         m_parent->DeLimboFrame(frame);
 
         m_decodedVideoFrame = frame;

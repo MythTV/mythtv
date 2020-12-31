@@ -3,6 +3,7 @@
 
 // MythTV
 #include "mythtvexp.h"
+#include "mythchrono.h"
 #include "volumebase.h"
 #include "videoouttypes.h"
 #include "audiooutputsettings.h"
@@ -47,7 +48,7 @@ class MTV_PUBLIC MythAudioState
 {
   public:
     MythAudioState() = default;
-    MythAudioState(AudioPlayer* Player, int64_t Offset);
+    MythAudioState(AudioPlayer* Player, std::chrono::milliseconds Offset);
 
     bool m_hasAudioOut    { true  };
     bool m_volumeControl  { true  };
@@ -56,7 +57,7 @@ class MTV_PUBLIC MythAudioState
     bool m_canUpmix       { false };
     bool m_isUpmixing     { false };
     bool m_paused         { false };
-    int64_t m_audioOffset { 0     };
+    std::chrono::milliseconds m_audioOffset { 0ms };
 };
 
 Q_DECLARE_METATYPE(MythAudioState)

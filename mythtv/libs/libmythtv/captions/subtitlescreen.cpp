@@ -24,7 +24,7 @@ class SubWrapper
 {
 protected:
     SubWrapper(const MythRect &rect,
-               long long expireTime,
+               std::chrono::milliseconds expireTime,
                int whichImageCache = -1) :
         m_swOrigArea(rect),
         m_swWhichImageCache(whichImageCache),
@@ -32,14 +32,14 @@ protected:
     {
     }
 public:
-    long long GetExpireTime(void) const { return m_swExpireTime; }
+    std::chrono::milliseconds GetExpireTime(void) const { return m_swExpireTime; }
     MythRect GetOrigArea(void) const { return m_swOrigArea; }
     int GetWhichImageCache(void) const { return m_swWhichImageCache; }
 protected:
     // Returns true if the object was deleted.
     const MythRect m_swOrigArea;
     const int m_swWhichImageCache; // cc708 only; -1 = none
-    const long long m_swExpireTime; // avsubs only; -1 = none
+    const std::chrono::milliseconds m_swExpireTime; // avsubs only; -1 = none
 };
 
 class SubSimpleText : public MythUISimpleText, public SubWrapper
@@ -48,7 +48,7 @@ public:
     SubSimpleText(const QString &text, const MythFontProperties &font,
                   QRect rect, Qt::Alignment align,
                   MythUIType *parent, const QString &name,
-                  int whichImageCache, long long expireTime) :
+                  int whichImageCache, std::chrono::milliseconds expireTime) :
         MythUISimpleText(text, font, rect, align, parent, name),
         SubWrapper(MythRect(rect), expireTime, whichImageCache) {}
 };
@@ -57,7 +57,7 @@ class SubShape : public MythUIShape, public SubWrapper
 {
 public:
     SubShape(MythUIType *parent, const QString &name, const MythRect &area,
-             int whichImageCache, long long expireTime) :
+             int whichImageCache, std::chrono::milliseconds expireTime) :
         MythUIShape(parent, name),
         SubWrapper(area, expireTime, whichImageCache) {}
 };
@@ -66,7 +66,7 @@ class SubImage : public MythUIImage, public SubWrapper
 {
 public:
     SubImage(MythUIType *parent, const QString &name, const MythRect &area,
-             long long expireTime) :
+             std::chrono::milliseconds expireTime) :
         MythUIImage(parent, name),
         SubWrapper(area, expireTime) {}
     MythImage *GetImage(void) { return m_images[0]; }
@@ -140,7 +140,8 @@ public:
                             const CC708CharacterAttribute &attr,
                             const MythRect &area,
                             int whichImageCache,
-                            int start, int duration);
+                            std::chrono::milliseconds start,
+                            std::chrono::milliseconds duration);
     int GetBackgroundAlpha(const QString &family);
     static QString MakePrefix(const QString &family,
                               const CC708CharacterAttribute &attr);
@@ -599,8 +600,8 @@ SubtitleFormat::GetBackground(MythUIType *parent, const QString &name,
                               const CC708CharacterAttribute &attr,
                               const MythRect &area,
                               int whichImageCache,
-                              int start,
-                              int duration)
+                              std::chrono::milliseconds start,
+                              std::chrono::milliseconds duration)
 {
     QString prefix = MakePrefix(family, attr);
     if (!m_shapeMap.contains(prefix))
@@ -638,7 +639,7 @@ int SubtitleFormat::GetBackgroundAlpha(const QString &family)
     // background alpha value from osd_subtitle.xml.
     CC708CharacterAttribute attr(false, false, false, Qt::white);
     SubShape *bgShape = GetBackground(nullptr, "dummyName", family, attr,
-                                      MythRect(), -1, 0, -1);
+                                      MythRect(), -1, 0ms, -1ms);
     return bgShape->m_fillBrush.color().alpha();
 }
 
@@ -1719,7 +1720,8 @@ void SubtitleScreen::Pulse(void)
 
     MythVideoOutput *videoOut = m_player->GetVideoOutput();
     MythVideoFrame *currentFrame = videoOut ? videoOut->GetLastShownFrame() : nullptr;
-    long long now = currentFrame ? currentFrame->m_timecode : LLONG_MAX;
+    std::chrono::milliseconds now =
+        currentFrame ? currentFrame->m_timecode : std::chrono::milliseconds::max();
     bool needRescale = (m_textFontZoom != m_textFontZoomPrev);
 
     for (it = m_childrenList.begin(); it != m_childrenList.end(); it = itNext)
@@ -1731,8 +1733,8 @@ void SubtitleScreen::Pulse(void)
             continue;
 
         // Expire the subtitle object if needed.
-        long long expireTime = wrapper->GetExpireTime();
-        if (expireTime > 0 && expireTime < now)
+        std::chrono::milliseconds expireTime = wrapper->GetExpireTime();
+        if (expireTime > 0ms && expireTime < now)
         {
             DeleteChild(child);
             SetElementDeleted();
@@ -1740,7 +1742,7 @@ void SubtitleScreen::Pulse(void)
         }
 
         // Rescale the AV subtitle image if the zoom changed.
-        if (expireTime > 0 && needRescale)
+        if (expireTime > 0ms && needRescale)
         {
             auto *image = dynamic_cast<SubImage *>(child);
             if (image)
@@ -1848,16 +1850,16 @@ void SubtitleScreen::DisplayAVSubtitles(void)
     while (!subs->m_buffers.empty())
     {
         AVSubtitle subtitle = subs->m_buffers.front();
-        if (subtitle.start_display_time > currentFrame->m_timecode)
+        if (subtitle.start_display_time > currentFrame->m_timecode.count())
             break;
 
-        long long displayfor = subtitle.end_display_time -
-                               subtitle.start_display_time;
-        if (displayfor == 0)
-            displayfor = 60000;
-        displayfor = (displayfor < 50) ? 50 : displayfor;
-        long long late = currentFrame->m_timecode -
-                         subtitle.start_display_time;
+        auto displayfor = std::chrono::milliseconds(subtitle.end_display_time -
+                                                    subtitle.start_display_time);
+        if (displayfor == 0ms)
+            displayfor = 60s;
+        displayfor = (displayfor < 50ms) ? 50ms : displayfor;
+        std::chrono::milliseconds late = currentFrame->m_timecode -
+                         std::chrono::milliseconds(subtitle.start_display_time);
 
         ClearDisplayedSubtitles();
         subs->m_buffers.pop_front();
@@ -1868,7 +1870,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
             bool displaysub = true;
             if (!subs->m_buffers.empty() &&
                 subs->m_buffers.front().end_display_time <
-                currentFrame->m_timecode)
+                currentFrame->m_timecode.count())
             {
                 displaysub = false;
             }
@@ -1906,7 +1908,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
                 // split into upper/lower to allow zooming
                 QRect bbox;
                 int uh = display.height() / 2 - rect->y;
-                long long displayuntil = currentFrame->m_timecode + displayfor;
+                std::chrono::milliseconds displayuntil = currentFrame->m_timecode + displayfor;
                 if (uh > 0)
                 {
                     bbox = QRect(0, 0, rect->w, uh);
@@ -1946,8 +1948,8 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
                                              QRect &bbox, bool top,
                                              QRect &display, int forced,
                                              const QString& imagename,
-                                             long long displayuntil,
-                                             long long late)
+                                             std::chrono::milliseconds displayuntil,
+                                             std::chrono::milliseconds late)
 {
     // split image vertically if it spans middle of display
     // - split point is empty line nearest the middle
@@ -2094,9 +2096,9 @@ int SubtitleScreen::DisplayScaledAVSubtitles(const AVSubtitleRect *rect,
     if (uiimage)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Display %1AV sub until %2ms")
-           .arg(forced ? "FORCED " : "").arg(displayuntil));
-        if (late > 50)
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AV Sub was %1ms late").arg(late));
+            .arg(forced ? "FORCED " : "").arg(displayuntil.count()));
+        if (late > 50ms)
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("AV Sub was %1ms late").arg(late.count()));
     }
 
     return (ysplit + 1);
@@ -2146,7 +2148,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
         //    playPos = (uint64_t)
         //        ((currentFrame->frameNumber / video_frame_rate) * 1000);
         //else
-        auto tc_ms = std::chrono::milliseconds(currentFrame->m_timecode);
+        auto tc_ms = currentFrame->m_timecode;
         playPos = m_player->GetDecoder()->NormalizeVideoTimecode(tc_ms).count();
     }
     playPos -= playPosAdj;
@@ -2175,7 +2177,7 @@ void SubtitleScreen::DisplayTextSubtitles(void)
     }
 
     subs->Unlock();
-    DrawTextSubtitles(rawsubs, 0, 0);
+    DrawTextSubtitles(rawsubs, 0ms, 0ms);
 }
 
 void SubtitleScreen::DisplayRawTextSubtitles(void)
@@ -2183,7 +2185,7 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
     if (!m_player || !m_subreader)
         return;
 
-    uint64_t duration = 0;
+    std::chrono::milliseconds duration = 0ms;
     QStringList subs = m_subreader->GetRawTextSubtitles(duration);
     if (subs.empty())
         return;
@@ -2205,7 +2207,8 @@ void SubtitleScreen::DisplayRawTextSubtitles(void)
 }
 
 void SubtitleScreen::DrawTextSubtitles(const QStringList &subs,
-                                       uint64_t start, uint64_t duration)
+                                       std::chrono::milliseconds start,
+                                       std::chrono::milliseconds duration)
 {
     auto *fsub = new FormattedTextSubtitleSRT(m_family, m_safeArea, start,
                                               duration, this, subs);
@@ -2309,7 +2312,7 @@ void SubtitleScreen::AddScaledImage(QImage &img, QRect &pos)
     if (image)
     {
         image->Assign(img);
-        MythUIImage *uiimage = new SubImage(this, "dvd_button", MythRect(scaled), 0);
+        MythUIImage *uiimage = new SubImage(this, "dvd_button", MythRect(scaled), 0ms);
         if (uiimage)
         {
             uiimage->SetImage(image);
@@ -2485,7 +2488,7 @@ void SubtitleScreen::ResizeAssRenderer(void)
     ass_set_font_scale(m_assRenderer, 1.0);
 }
 
-void SubtitleScreen::RenderAssTrack(uint64_t timecode)
+void SubtitleScreen::RenderAssTrack(std::chrono::milliseconds timecode)
 {
     if (!m_player || !m_assRenderer || !m_assTrack)
         return;
@@ -2500,7 +2503,7 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
         ResizeAssRenderer();
 
     int changed = 0;
-    ASS_Image *images = ass_render_frame(m_assRenderer, m_assTrack, timecode, &changed);
+    ASS_Image *images = ass_render_frame(m_assRenderer, m_assTrack, timecode.count(), &changed);
     if (!changed)
         return;
 
@@ -2555,7 +2558,7 @@ void SubtitleScreen::RenderAssTrack(uint64_t timecode)
         {
             image->Assign(qImage);
             QString name = QString("asssub%1").arg(count);
-            uiimage = new SubImage(this, name, MythRect(img_rect), 0);
+            uiimage = new SubImage(this, name, MythRect(img_rect), 0ms);
             if (uiimage)
             {
                 uiimage->SetImage(image);

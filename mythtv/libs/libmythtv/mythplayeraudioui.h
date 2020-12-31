@@ -24,7 +24,7 @@ class MTV_PUBLIC MythPlayerAudioUI : public MythPlayerOverlayUI
     void      ReinitAudio();
     void      EnableUpmix(bool Enable, bool Toggle = false);
     void      PauseAudioUntilBuffered();
-    void      AdjustAudioTimecodeOffset(int64_t Delta, int Value);
+    void      AdjustAudioTimecodeOffset(std::chrono::milliseconds Delta, std::chrono::milliseconds Value);
 
   public:
     MythPlayerAudioUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);

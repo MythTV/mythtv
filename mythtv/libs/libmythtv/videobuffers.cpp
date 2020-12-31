@@ -899,7 +899,7 @@ void VideoBuffers::ClearAfterSeek(void)
         QMutexLocker locker(&m_globalLock);
 
         for (uint i = 0; i < Size(); i++)
-            At(i)->m_timecode = 0;
+            At(i)->m_timecode = 0ms;
 
         for (uint i = 0; (i < Size()) && (m_used.count() > 1); i++)
         {

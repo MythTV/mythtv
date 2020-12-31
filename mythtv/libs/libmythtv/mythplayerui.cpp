@@ -565,7 +565,7 @@ void MythPlayerUI::RefreshPauseFrame()
             if (m_deleteMap.IsEditing())
             {
                 m_osdLock.lock();
-                DeleteMap::UpdateOSD(std::chrono::milliseconds(m_latestVideoTimecode), &m_osd);
+                DeleteMap::UpdateOSD(m_latestVideoTimecode, &m_osd);
                 m_osdLock.unlock();
             }
         }
@@ -1287,7 +1287,7 @@ void MythPlayerUI::EnableEdit()
     SetupAudioGraph(m_videoFrameRate);
 
     m_savedAudioTimecodeOffset = m_tcWrap[TC_AUDIO];
-    m_tcWrap[TC_AUDIO] = 0;
+    m_tcWrap[TC_AUDIO] = 0ms;
 
     m_speedBeforeEdit = m_playSpeed;
     m_pausedBeforeEdit = Pause();
@@ -1333,7 +1333,7 @@ void MythPlayerUI::DisableEdit(int HowToSave)
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
     ClearAudioGraph();
     m_tcWrap[TC_AUDIO] = m_savedAudioTimecodeOffset;
-    m_savedAudioTimecodeOffset = 0;
+    m_savedAudioTimecodeOffset = 0ms;
 
     if (!m_pausedBeforeEdit)
         Play(m_speedBeforeEdit);

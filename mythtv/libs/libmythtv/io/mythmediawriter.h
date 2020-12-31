@@ -18,9 +18,10 @@ class MTV_PUBLIC MythMediaWriter
     virtual bool OpenFile          (void) = 0;
     virtual bool CloseFile         (void) = 0;
     virtual int  WriteVideoFrame   (MythVideoFrame *Frame) = 0;
-    virtual int  WriteAudioFrame   (unsigned char *Buffer, int FrameNumber, long long &Timecode) = 0;
+    virtual int  WriteAudioFrame   (unsigned char *Buffer, int FrameNumber,
+                                    std::chrono::milliseconds &Timecode) = 0;
     virtual int  WriteTextFrame    (int VBIMode, unsigned char *Buffer, int Length,
-                                    long long Timecode, int PageNumber) = 0;
+                                    std::chrono::milliseconds Timecode, int PageNumber) = 0;
     virtual int  WriteSeekTable    (void) = 0;
     virtual bool SwitchToNextFile  (void) = 0;
 
@@ -39,11 +40,11 @@ class MTV_PUBLIC MythMediaWriter
     void         SetAudioFrameRate (int Rate);
     void         SetAudioFormat    (AudioFormat Format);
     void         SetThreadCount    (int Count);
-    void         SetTimecodeOffset (long long Offset);
+    void         SetTimecodeOffset (std::chrono::milliseconds Offset);
     void         SetEncodingPreset (const QString& Preset);
     void         SetEncodingTune   (const QString& Tune);
     long long    GetFramesWritten  (void) const;
-    long long    GetTimecodeOffset (void) const;
+    std::chrono::milliseconds GetTimecodeOffset (void) const;
     int          GetAudioFrameSize (void) const; // Number of audio samples (per channel) in an AVFrame
 
  protected:
@@ -64,7 +65,7 @@ class MTV_PUBLIC MythMediaWriter
     int         m_audioFrameSize         { -1     };
     int         m_encodingThreadCount    { 1      };
     long long   m_framesWritten          { 0      };
-    long long   m_startingTimecodeOffset { -1     };
+    std::chrono::milliseconds  m_startingTimecodeOffset { -1ms   };
     QString     m_encodingPreset;
     QString     m_encodingTune;
 };
