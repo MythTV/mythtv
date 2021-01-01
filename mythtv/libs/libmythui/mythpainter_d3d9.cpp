@@ -20,7 +20,7 @@ MythD3D9Painter::MythD3D9Painter(MythRenderD3D9 *render) :
 
 MythD3D9Painter::~MythD3D9Painter()
 {
-    Teardown();
+    MythD3D9Painter::Teardown();
 }
 
 bool MythD3D9Painter::InitD3D9(QPaintDevice *parent)
