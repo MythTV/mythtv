@@ -340,10 +340,11 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
  * \bug    If the user changes the MonitorDrives or IgnoreDevices settings,
  *         it will have no effect until the frontend is restarted.
  */
-MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
-                           bool allowEject)
-    : QObject(par), m_devicesLock(QMutex::Recursive),
-      m_monitorPollingInterval(interval), m_allowEject(allowEject)
+MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, bool allowEject)
+  : QObject(par),
+    m_devicesLock(QMutex::Recursive),
+    m_monitorPollingInterval(interval),
+    m_allowEject(allowEject)
 {
     // User can specify that some devices are not monitored
     QString ignore = gCoreContext->GetSetting("IgnoreDevices", "");
@@ -356,32 +357,26 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
         m_ignoreList = ignore.split(',', Qt::SkipEmptyParts);
 #endif
     }
-    else
-        m_ignoreList = QStringList();  // Force empty list
 
     LOG(VB_MEDIA, LOG_NOTICE, "Creating MediaMonitor");
     LOG(VB_MEDIA, LOG_INFO, "IgnoreDevices=" + ignore);
 
     // If any of IgnoreDevices are symlinks, also add the real device
-    QStringList::Iterator dev;
-    for (dev = m_ignoreList.begin(); dev != m_ignoreList.end(); ++dev)
+    QStringList symlinked;
+    for (const auto & ignored : m_ignoreList)
     {
-        auto *fi = new QFileInfo(*dev);
-
-        if (fi && fi->isSymLink())
+        if (auto fi = QFileInfo(ignored); fi.isSymLink())
         {
-            QString target = getSymlinkTarget(*dev);
-
-            if (m_ignoreList.filter(target).isEmpty())
+            if (auto target = getSymlinkTarget(ignored); m_ignoreList.filter(target).isEmpty())
             {
-                LOG(VB_MEDIA, LOG_INFO,
-                         "Also ignoring " + target + " (symlinked from " +
-                         *dev + ").");
-                m_ignoreList += target;
+                symlinked += target;
+                LOG(VB_MEDIA, LOG_INFO, QString("Also ignoring %1 (symlinked from %2)")
+                    .arg(target).arg(ignored));
             }
         }
-        delete fi;
     }
+
+    m_ignoreList += symlinked;
 }
 
 void MediaMonitor::deleteLater(void)
