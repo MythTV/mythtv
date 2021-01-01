@@ -1316,15 +1316,16 @@ const QList<QPair<QString, QString> >& MythVideoProfile::GetDeinterlacers()
 
 void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
 {
-    if (!HasMythMainWindow())
+    if (!gCoreContext->IsUIThread())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "No window!");
+        if (!kSafeInitialized)
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Cannot initialise video profiles from this thread");
         return;
     }
 
-    if (!gCoreContext->IsUIThread())
+    if (!HasMythMainWindow())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC + "Called from wrong thread");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No window!");
         return;
     }
 
