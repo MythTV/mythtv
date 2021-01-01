@@ -24,6 +24,9 @@ class MythScreenSaverX11 : public MythScreenSaver
 
   protected:
     class ScreenSaverX11Private* m_priv { nullptr };
+
+  private:
+    Q_DISABLE_COPY(MythScreenSaverX11)
 };
 
 #endif

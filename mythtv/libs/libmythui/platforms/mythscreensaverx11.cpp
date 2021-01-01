@@ -23,16 +23,16 @@ class ScreenSaverX11Private
     friend class MythScreenSaverX11;
 
   public:
-    explicit ScreenSaverX11Private(MythScreenSaverX11 *outer)
+    explicit ScreenSaverX11Private(MythScreenSaverX11* Parent)
     {
         const uint flags = kMSDontBlockInputDevs | kMSDontDisableDrawing |
                            kMSProcessEvents;
         m_xscreensaverRunning = myth_system("xscreensaver-command -version >&- 2>&-", flags) == 0;
         if (m_xscreensaverRunning)
         {
-            m_resetTimer = new QTimer(outer);
+            m_resetTimer = new QTimer(Parent);
             m_resetTimer->setSingleShot(false);
-            QObject::connect(m_resetTimer, &QTimer::timeout, outer, &MythScreenSaverX11::ResetSlot);
+            QObject::connect(m_resetTimer, &QTimer::timeout, Parent, &MythScreenSaverX11::ResetSlot);
             if (m_xscreensaverRunning)
                 LOG(VB_GENERAL, LOG_INFO, LOC + "XScreenSaver support enabled");
         }
@@ -201,6 +201,7 @@ class ScreenSaverX11Private
     };
 
   private:
+    Q_DISABLE_COPY(ScreenSaverX11Private)
     bool m_dpmsaware           {false};
     bool m_dpmsdeactivated     {false}; ///< true if we disabled DPMS
     bool m_xscreensaverRunning {false};
