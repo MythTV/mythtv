@@ -183,15 +183,16 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
 
     Image->SetChanged(false);
 
-    MythGLTexture *texture = nullptr;
-    for (;;)
+    int count = 0;
+    MythGLTexture* texture = nullptr;
+    while (texture == nullptr)
     {
         texture = m_render->CreateTextureFromQImage(Image);
-        if (texture)
+        if (texture != nullptr)
             break;
 
         // This can happen if the cached textures are too big for GPU memory
-        if (m_hardwareCacheSize <= 8 * 1024 * 1024)
+        if ((count++ > 1000) || (m_hardwareCacheSize <= 8 * 1024 * 1024))
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to create OpenGL texture.");
             return nullptr;
@@ -199,8 +200,7 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
 
         // Shrink the cache size
         m_maxHardwareCacheSize = (3 * m_hardwareCacheSize) / 4;
-        LOG(VB_GENERAL, LOG_NOTICE, QString(
-                "Shrinking UIPainterMaxCacheHW to %1KB")
+        LOG(VB_GENERAL, LOG_NOTICE, QString("Shrinking UIPainterMaxCacheHW to %1KB")
             .arg(m_maxHardwareCacheSize / 1024));
 
         while (m_hardwareCacheSize > m_maxHardwareCacheSize)
