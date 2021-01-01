@@ -91,7 +91,7 @@ bool D3D9Image::SetAsRenderTarget(void)
 {
     if (m_valid)
         return m_render->SetRenderTarget(m_texture);
-    return m_valid;
+    return false;
 }
 
 bool D3D9Image::UpdateImage(IDirect3DSurface9 *surface)
@@ -116,16 +116,15 @@ bool D3D9Image::UpdateVertices(const QRect &dvr, const QRect &vr, int alpha,
                                bool video)
 {
     if (m_valid)
-        return m_render->UpdateVertexBuffer(m_vertexbuffer, dvr, vr,
-                                            alpha, video);
-    return m_valid;
+        return m_render->UpdateVertexBuffer(m_vertexbuffer, dvr, vr, alpha, video);
+    return false;
 }
 
 bool D3D9Image::Draw(void)
 {
     if (m_valid)
         return m_render->DrawTexturedQuad(m_vertexbuffer);
-    return m_valid;
+    return false;
 }
 
 uint8_t* D3D9Image::GetBuffer(bool &hardware_conv, uint &pitch)
