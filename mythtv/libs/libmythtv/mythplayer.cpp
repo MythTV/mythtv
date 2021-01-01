@@ -1726,9 +1726,9 @@ QString MythPlayer::GetXDS(const QString &key) const
     return m_decoder->GetXDS(key);
 }
 
-void MythPlayer::SetCommBreakMap(frm_dir_map_t &newMap)
+void MythPlayer::SetCommBreakMap(const frm_dir_map_t& NewMap)
 {
-    m_commBreakMap.SetMap(newMap, m_framesPlayed);
+    m_commBreakMap.SetMap(NewMap, m_framesPlayed);
     m_forcePositionMapSync = true;
 }
 

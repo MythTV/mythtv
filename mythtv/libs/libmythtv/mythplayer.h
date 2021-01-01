@@ -282,7 +282,7 @@ class MTV_PUBLIC MythPlayer : public QObject
         { m_commBreakMap.SetAutoCommercialSkip(autoskip, m_framesPlayed); }
     void SkipCommercials(int direction)
         { m_commBreakMap.SkipCommercials(direction); }
-    void SetCommBreakMap(frm_dir_map_t &newMap);
+    void SetCommBreakMap(const frm_dir_map_t& NewMap);
     CommSkipMode GetAutoCommercialSkip(void)
         { return m_commBreakMap.GetAutoCommercialSkip(); }
 
