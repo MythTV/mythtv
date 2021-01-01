@@ -82,7 +82,7 @@ MediaMonitorWindows::MediaMonitorWindows(QObject* par,
                 media->setVolumeID(volumeName);
             }
 
-            AddDevice(media);
+            MediaMonitorWindows::AddDevice(media);
         }
         else
             LOG(VB_GENERAL, LOG_ALERT,
