@@ -28,7 +28,7 @@ class AudioInputOSS : public AudioInput
 {
     public:
         explicit AudioInputOSS(const QString &device);
-        ~AudioInputOSS() override { Close(); };
+        ~AudioInputOSS() override { AudioInputOSS::Close(); }
 
         bool Open(uint sample_bits, uint sample_rate, uint channels) override; // AudioInput
         inline bool IsOpen(void) override // AudioInput
