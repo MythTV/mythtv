@@ -36,45 +36,45 @@ class MUI_PUBLIC MythNotification : public MythEvent
     static Type Busy;
 
     explicit MythNotification(Type type, void *parent = nullptr)
-        : MythEvent(type, "NOTIFICATION"), m_parent(parent) {}
+      : MythEvent(type, "NOTIFICATION"),
+        m_parent(parent)
+    {
+    }
 
     MythNotification(int id, void *parent)
-        : MythEvent(Update, "NOTIFICATION"), m_id(id), m_parent(parent) {}
+      : MythEvent(Update, "NOTIFICATION"),
+        m_id(id),
+        m_parent(parent)
+    {
+    }
 
     MythNotification(const QString &title, const QString &author,
                      const QString &details = QString())
-        : MythEvent(New, "NOTIFICATION"), m_description(title)
+      : MythEvent(New, "NOTIFICATION"),
+        m_description(title),
+        m_metadata({{"minm", title}, {"asar", author}, {"asal", details}})
     {
-        DMAP map;
-        map["minm"] = title;
-        map["asar"] = author;
-        map["asal"] = details;
-        m_metadata = map;
         ToStringList();
     }
 
     MythNotification(Type type, const QString &title, const QString &author,
                      const QString &details = QString(),
                      const QString &extra   = QString())
-        : MythEvent(type, "NOTIFICATION"), m_description(title)
+      : MythEvent(type, "NOTIFICATION"),
+        m_description(title),
+        m_metadata({{"minm", title}, {"asar", author}, {"asal", details}, {"asfm", extra}})
     {
-        DMAP map;
-        map["minm"] = title;
-        map["asar"] = author;
-        map["asal"] = details;
-        map["asfm"] = extra;
-        m_metadata = map;
         ToStringList();
     }
 
     MythNotification(Type type, DMAP metadata)
-        : MythEvent(type, "NOTIFICATION"), m_metadata(std::move(metadata))
+      : MythEvent(type, "NOTIFICATION"), m_metadata(std::move(metadata))
     {
         ToStringList();
     }
 
     explicit MythNotification(const MythEvent &me)
-        : MythEvent(me)
+      : MythEvent(me)
     {
         FromStringList();
     }
@@ -82,13 +82,16 @@ class MUI_PUBLIC MythNotification : public MythEvent
     ~MythNotification() override = default;
 
     MythEvent *clone(void) const override // MythEvent
-        { return new MythNotification(*this); }
+    {
+        return new MythNotification(*this);
+    }
 
     /** Priority enum
      * A notification can be given a priority. Display order of notification
      * will be sorted according to the priority level
      */
-    enum Priority {
+    enum Priority
+    {
         kDefault    = 0,
         kLow,
         kMedium,
@@ -183,19 +186,23 @@ class MUI_PUBLIC MythNotification : public MythEvent
     bool        GetFullScreen(void) const   { return m_fullScreen; }
     QString     GetDescription(void) const  { return m_description; }
     DMAP        GetMetaData(void) const     { return m_metadata; }
-    int         GetDuration(void) const     { return m_duration; };
+    int         GetDuration(void) const     { return m_duration; }
     QString     GetStyle(void) const        { return m_style; }
     VNMask      GetVisibility(void) const   { return m_visibility; }
     Priority    GetPriority(void) const     { return m_priority; }
 
   protected:
     MythNotification(const MythNotification &o)
-        : MythEvent(o),
-        m_id(o.m_id),      m_parent(o.m_parent),   m_fullScreen(o.m_fullScreen),
+      : MythEvent(o),
+        m_id(o.m_id),
+        m_parent(o.m_parent),
+        m_fullScreen(o.m_fullScreen),
         m_description(o.m_description),
-        m_duration(o.m_duration),                  m_metadata(o.m_metadata),
+        m_duration(o.m_duration),
+        m_metadata(o.m_metadata),
         m_style(o.m_style),
-        m_visibility(o.m_visibility),              m_priority(o.m_priority)
+        m_visibility(o.m_visibility),
+        m_priority(o.m_priority)
     {
         ToStringList();
     }
@@ -220,27 +227,33 @@ class MUI_PUBLIC MythImageNotification : public virtual MythNotification
 {
   public:
     MythImageNotification(Type type, QImage image)
-        : MythNotification(type), m_image(std::move(image))
+      : MythNotification(type),
+        m_image(std::move(image))
     {
     }
 
     MythImageNotification(Type type, QString imagePath)
-        : MythNotification(type), m_imagePath(std::move(imagePath))
+      : MythNotification(type),
+        m_imagePath(std::move(imagePath))
     {
     }
 
     MythImageNotification(Type type, QImage image, const DMAP &metadata)
-        : MythNotification(type, metadata), m_image(std::move(image))
+      : MythNotification(type, metadata),
+        m_image(std::move(image))
     {
     }
 
     MythImageNotification(Type type, QString imagePath, const DMAP &metadata)
-        : MythNotification(type, metadata), m_imagePath(std::move(imagePath))
+      : MythNotification(type, metadata),
+        m_imagePath(std::move(imagePath))
     {
     }
 
     MythEvent *clone(void) const override // MythNotification
-        { return new MythImageNotification(*this); }
+    {
+        return new MythImageNotification(*this);
+    }
 
     // Setter
     /**
@@ -268,22 +281,25 @@ class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
 {
   public:
     MythPlaybackNotification(Type type, float progress, QString progressText)
-        : MythNotification(type), m_progress(progress), m_progressText(std::move(progressText))
+      : MythNotification(type),
+        m_progress(progress),
+        m_progressText(std::move(progressText))
     {
     }
 
     MythPlaybackNotification(Type type, float progress, QString progressText,
                              const DMAP &metadata)
-        : MythNotification(type, metadata),
-        m_progress(progress), m_progressText(std::move(progressText))
+      : MythNotification(type, metadata),
+        m_progress(progress),
+        m_progressText(std::move(progressText))
     {
     }
 
     MythPlaybackNotification(Type type, int duration, int position)
-        : MythNotification(type)
+      : MythNotification(type),
+        m_progress(static_cast<float>(position) /  static_cast<float>(duration)),
+        m_progressText(stringFromSeconds(duration))
     {
-        m_progress      = (float)position / (float)duration;
-        m_progressText  = stringFromSeconds(duration);
     }
 
     MythEvent *clone(void) const override // MythNotification
@@ -322,38 +338,46 @@ class MUI_PUBLIC MythMediaNotification : public MythImageNotification,
   public:
     MythMediaNotification(Type type, const QImage &image, const DMAP &metadata,
                           float progress, const QString &durationText)
-        : MythNotification(type, metadata), MythImageNotification(type, image),
+      : MythNotification(type, metadata),
+        MythImageNotification(type, image),
         MythPlaybackNotification(type, progress, durationText)
     {
     }
 
     MythMediaNotification(Type type, const QImage &image, const DMAP &metadata,
                           int duration, int position)
-        : MythNotification(type, metadata), MythImageNotification(type, image),
+      : MythNotification(type, metadata),
+        MythImageNotification(type, image),
         MythPlaybackNotification(type, duration, position)
     {
     }
 
     MythMediaNotification(Type type, const QString &imagePath, const DMAP &metadata,
                           float progress, const QString &durationText)
-        : MythNotification(type, metadata), MythImageNotification(type, imagePath),
+      : MythNotification(type, metadata),
+        MythImageNotification(type, imagePath),
         MythPlaybackNotification(type, progress, durationText)
     {
     }
 
     MythMediaNotification(Type type, const QString &imagePath, const DMAP &metadata,
                           int duration, int position)
-        : MythNotification(type, metadata), MythImageNotification(type, imagePath),
+      : MythNotification(type, metadata),
+        MythImageNotification(type, imagePath),
         MythPlaybackNotification(type, duration, position)
     {
     }
 
     MythEvent *clone(void) const override // MythImageNotification
-        { return new MythMediaNotification(*this); }
+    {
+        return new MythMediaNotification(*this);
+    }
 
   protected:
     MythMediaNotification(const MythMediaNotification &o)
-        : MythNotification(o), MythImageNotification(o), MythPlaybackNotification(o)
+      : MythNotification(o),
+        MythImageNotification(o),
+        MythPlaybackNotification(o)
     {
     }
 };
@@ -363,7 +387,7 @@ class MUI_PUBLIC MythErrorNotification : public MythNotification
   public:
     MythErrorNotification(const QString &title, const QString &author,
                           const QString &details = QString())
-        : MythNotification(Error, title, author, details)
+      : MythNotification(Error, title, author, details)
     {
         SetDuration(10);
     }
@@ -374,7 +398,7 @@ class MUI_PUBLIC MythWarningNotification : public MythNotification
   public:
     MythWarningNotification(const QString &title, const QString &author,
                             const QString &details = QString())
-    : MythNotification(Warning, title, author, details)
+      : MythNotification(Warning, title, author, details)
     {
         SetDuration(10);
     }
@@ -385,7 +409,7 @@ class MUI_PUBLIC MythCheckNotification : public MythNotification
   public:
     MythCheckNotification(const QString &title, const QString &author,
                           const QString &details = QString())
-    : MythNotification(Check, title, author, details)
+      : MythNotification(Check, title, author, details)
     {
         SetDuration(5);
     }
@@ -396,7 +420,7 @@ class MUI_PUBLIC MythBusyNotification : public MythNotification
   public:
     MythBusyNotification(const QString &title, const QString &author,
                          const QString &details = QString())
-    : MythNotification(Busy, title, author, details) { }
+      : MythNotification(Busy, title, author, details) { }
 };
 
-#endif /* defined(MYTHTV_MYTHNOTIFICATION_H) */
+#endif
