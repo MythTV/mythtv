@@ -253,11 +253,11 @@ FrameScanType MythVideoScanTracker::DetectInterlace(FrameScanType NewScan, float
         // default to interlaced
         scan = kScan_Interlaced;
         // 720P, outside interlaced frame rates or too large for interlaced
-        if ((720 == VideoHeight) || ((Rate < 25) && (Rate > 30)) || (VideoHeight > 1080))
+        if ((720 == VideoHeight) || (Rate < 25) || (Rate > 30) || (VideoHeight > 1080))
             scan = kScan_Progressive;
         if (kScan_Detect != NewScan)
             scan = NewScan;
-    };
+    }
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + dbg + ScanTypeToString(scan));
     return scan;
