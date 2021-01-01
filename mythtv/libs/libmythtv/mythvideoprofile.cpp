@@ -703,12 +703,14 @@ bool MythVideoProfile::SaveDB(uint GroupId, vector<MythVideoProfileItem> &Items)
 
 QStringList MythVideoProfile::GetDecoders()
 {
+    QMutexLocker locker(&kSafeLock);
     InitStatics();
     return kSafeDecoders;
 }
 
 QStringList MythVideoProfile::GetDecoderNames()
 {
+    QMutexLocker locker(&kSafeLock);
     InitStatics();
     return std::accumulate(kSafeDecoders.cbegin(), kSafeDecoders.cend(), QStringList{},
         [](QStringList Res, const QString& Dec) { return Res << GetDecoderName(Dec); });
@@ -864,13 +866,12 @@ QStringList MythVideoProfile::GetProfiles(const QString &HostName)
     InitStatics();
     QStringList list;
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT name "
-        "FROM displayprofilegroups "
-        "WHERE hostname = :HOST ");
+    query.prepare("SELECT name FROM displayprofilegroups WHERE hostname = :HOST ");
     query.bindValue(":HOST", HostName);
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("get_profiles", query);
+    }
     else
     {
         while (query.next())
@@ -881,11 +882,8 @@ QStringList MythVideoProfile::GetProfiles(const QString &HostName)
 
 QString MythVideoProfile::GetDefaultProfileName(const QString &HostName)
 {
-    QString tmp =
-        gCoreContext->GetSettingOnHost("DefaultVideoPlaybackProfile", HostName);
-
+    auto tmp = gCoreContext->GetSettingOnHost("DefaultVideoPlaybackProfile", HostName);
     QStringList profiles = GetProfiles(HostName);
-
     tmp = (profiles.contains(tmp)) ? tmp : QString();
 
     if (tmp.isEmpty())
@@ -894,12 +892,8 @@ QString MythVideoProfile::GetDefaultProfileName(const QString &HostName)
             tmp = profiles[0];
 
         tmp = (profiles.contains("Normal")) ? "Normal" : tmp;
-
         if (!tmp.isEmpty())
-        {
-            gCoreContext->SaveSettingOnHost(
-                "DefaultVideoPlaybackProfile", tmp, HostName);
-        }
+            gCoreContext->SaveSettingOnHost("DefaultVideoPlaybackProfile", tmp, HostName);
     }
 
     return tmp;
@@ -1316,6 +1310,8 @@ const QList<QPair<QString, QString> >& MythVideoProfile::GetDeinterlacers()
 
 void MythVideoProfile::InitStatics(bool Reinit /*= false*/)
 {
+    QMutexLocker locker(&kSafeLock);
+
     if (!gCoreContext->IsUIThread())
     {
         if (!kSafeInitialized)
