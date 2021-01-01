@@ -334,7 +334,7 @@ void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
             }
             LOG(VB_PLAYBACK, LOG_INFO, "No captions available yet to enable.");
         }
-        else if (mode)
+        else
         {
             EnableCaptions(mode, UpdateOSD);
         }
