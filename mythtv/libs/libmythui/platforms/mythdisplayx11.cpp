@@ -143,17 +143,14 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
             int width = static_cast<int>(mode.width);
             int height = static_cast<int>(mode.height);
             double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
-            bool interlaced = (mode.modeFlags & RR_Interlace) != 0U;
-            if (interlaced)
-                rate *= 2.0;
 
             // TODO don't filter out interlaced modes but ignore them in MythDisplayMode
             // when not required. This may then be used in future to allow 'exact' match
             // display modes to display interlaced material on interlaced displays
-            if (interlaced)
+            if ((mode.modeFlags & RR_Interlace) != 0U)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Ignoring interlaced mode %1x%2 %3i")
-                    .arg(width).arg(height).arg(rate, 2, 'f', 2, '0'));
+                    .arg(width).arg(height).arg(rate * 2.0, 2, 'f', 2, '0'));
                 continue;
             }
 
