@@ -420,7 +420,7 @@ void MythPlayer::CreateDecoder(TestBufferVec & TestBuffer)
 int MythPlayer::OpenFile(int Retries)
 {
     // Sanity check
-    if (!m_playerCtx || (m_playerCtx && !m_playerCtx->m_buffer))
+    if (!m_playerCtx || !m_playerCtx->m_buffer)
         return -1;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Opening '%1'").arg(m_playerCtx->m_buffer->GetSafeFilename()));
