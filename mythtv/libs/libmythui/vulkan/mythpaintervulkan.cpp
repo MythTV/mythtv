@@ -425,17 +425,18 @@ MythTextureVulkan* MythPainterVulkan::GetTextureFromCache(MythImage *Image)
 
     Image->SetChanged(false);
 
-    MythTextureVulkan *texture = nullptr;
-    for (;;)
+    int count = 0; // guard against unexpected texture creation failure
+    MythTextureVulkan* texture = nullptr;
+    while (texture == nullptr)
     {
         if (!m_textureUploadCmd)
             m_textureUploadCmd = m_vulkan->Render()->CreateSingleUseCommandBuffer();
         texture = MythTextureVulkan::Create(m_vulkan, Image, m_textureSampler, m_textureUploadCmd);
-        if (texture)
+        if (texture != nullptr)
             break;
 
         // This can happen if the cached textures are too big for GPU memory
-        if (m_hardwareCacheSize < (8 * 1024 * 1024))
+        if ((count++ > 1000) || m_hardwareCacheSize < (8 * 1024 * 1024))
         {
             LOG(VB_GENERAL, LOG_ERR, "Failed to create Vulkan texture.");
             return nullptr;
@@ -455,50 +456,47 @@ MythTextureVulkan* MythPainterVulkan::GetTextureFromCache(MythImage *Image)
         }
     }
 
-    if (texture)
+    if (!m_textureDescriptorPool)
     {
-        if (!m_textureDescriptorPool)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC + "No descriptor pool?");
-            delete texture;
-            return nullptr;
-        }
+        LOG(VB_GENERAL, LOG_ERR, LOC + "No descriptor pool?");
+        delete texture;
+        return nullptr;
+    }
 
-        // With a reasonable hardware cache size and many small thumbnails and
-        // text images, we can easily hit the max texture count before the cache
-        // size. So ensure we always have a descriptor available.
+    // With a reasonable hardware cache size and many small thumbnails and
+    // text images, we can easily hit the max texture count before the cache
+    // size. So ensure we always have a descriptor available.
+
+    if (m_availableTextureDescriptors.empty())
+    {
+        MythImage *expired = m_imageExpire.front();
+        m_imageExpire.pop_front();
+        DeleteFormatImagePriv(expired);
+        DeleteTextures();
 
         if (m_availableTextureDescriptors.empty())
         {
-            MythImage *expired = m_imageExpire.front();
-            m_imageExpire.pop_front();
-            DeleteFormatImagePriv(expired);
-            DeleteTextures();
-
-            if (m_availableTextureDescriptors.empty())
-            {
-                LOG(VB_GENERAL, LOG_WARNING, LOC + "No texture descriptor available??");
-                delete texture;
-                return nullptr;
-            }
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "No texture descriptor available??");
+            delete texture;
+            return nullptr;
         }
-
-        VkDescriptorSet descset = m_availableTextureDescriptors.back();
-        m_availableTextureDescriptors.pop_back();
-
-        auto imagedesc = texture->GetDescriptorImage();
-        VkWriteDescriptorSet write { };
-        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        write.dstSet = descset;
-        write.dstBinding = 0;
-        write.dstArrayElement = 0;
-        write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        write.descriptorCount = 1;
-        write.pImageInfo = &imagedesc;
-        m_vulkan->Funcs()->vkUpdateDescriptorSets(m_vulkan->Device(), 1, &write, 0, nullptr);
-        texture->AddDescriptor(descset);
-        m_stagedTextures.emplace_back(texture);
     }
+
+    VkDescriptorSet descset = m_availableTextureDescriptors.back();
+    m_availableTextureDescriptors.pop_back();
+
+    auto imagedesc = texture->GetDescriptorImage();
+    VkWriteDescriptorSet write { };
+    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write.dstSet = descset;
+    write.dstBinding = 0;
+    write.dstArrayElement = 0;
+    write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.descriptorCount = 1;
+    write.pImageInfo = &imagedesc;
+    m_vulkan->Funcs()->vkUpdateDescriptorSets(m_vulkan->Device(), 1, &write, 0, nullptr);
+    texture->AddDescriptor(descset);
+    m_stagedTextures.emplace_back(texture);
 
     CheckFormatImage(Image);
     m_hardwareCacheSize += texture->m_dataSize;
