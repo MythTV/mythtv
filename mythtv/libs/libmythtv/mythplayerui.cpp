@@ -210,8 +210,7 @@ void MythPlayerUI::EventLoop()
     // Check for error
     if (IsErrored() || m_playerCtx->IsRecorderErrored())
     {
-        LOG(VB_GENERAL, LOG_ERR, LOC +
-            "Unknown recorder error, exiting decoder");
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown recorder error, exiting decoder");
         if (!IsErrored())
             SetErrored(tr("Irrecoverable recorder error"));
         m_killDecoder = true;
@@ -220,7 +219,7 @@ void MythPlayerUI::EventLoop()
 
     // Handle speed change
     if (!qFuzzyCompare(m_playSpeed + 1.0F, m_nextPlaySpeed + 1.0F) &&
-        (!m_playerCtx->m_tvchain || (m_playerCtx->m_tvchain && !m_playerCtx->m_tvchain->NeedsToJump())))
+        (!m_playerCtx->m_tvchain || !m_playerCtx->m_tvchain->NeedsToJump()))
     {
         ChangeSpeed();
         return;
