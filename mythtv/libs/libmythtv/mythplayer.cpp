@@ -1580,7 +1580,7 @@ void MythPlayer::DoJumpToFrame(uint64_t frame, double inaccuracy)
 {
     if (frame > m_framesPlayed)
         DoFastForward(frame - m_framesPlayed, inaccuracy);
-    else if (frame <= m_framesPlayed)
+    else
         DoRewind(m_framesPlayed - frame, inaccuracy);
 }
 
