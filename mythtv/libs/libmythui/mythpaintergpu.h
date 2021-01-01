@@ -21,7 +21,7 @@ class MUI_PUBLIC MythPainterGPU : public MythPainter
     };
     Q_DECLARE_FLAGS(ViewControls, ViewControl)
 
-    MythPainterGPU(MythMainWindow* Parent);
+    explicit MythPainterGPU(MythMainWindow* Parent);
    ~MythPainterGPU() override = default;
 
     void SetViewControl    (ViewControls Control);
