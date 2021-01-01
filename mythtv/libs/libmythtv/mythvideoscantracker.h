@@ -12,7 +12,7 @@ class MythVideoOutput;
 class MTV_PUBLIC MythVideoScanTracker
 {
   public:
-    MythVideoScanTracker(MythPlayerUI* Parent);
+    explicit MythVideoScanTracker(MythPlayerUI* Parent);
     virtual ~MythVideoScanTracker() = default;
 
     FrameScanType  NextScanOverride     ();

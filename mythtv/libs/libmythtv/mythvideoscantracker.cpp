@@ -8,7 +8,7 @@
 
 #define LOC QString("ScanTracker: ")
 
-MythVideoScanTracker::MythVideoScanTracker(MythPlayerUI *Parent)
+MythVideoScanTracker::MythVideoScanTracker(MythPlayerUI* Parent)
   : m_parentPlayer(Parent)
 {
 }
@@ -23,9 +23,9 @@ void MythVideoScanTracker::InitialiseScan(MythVideoOutput* VideoOutput)
     // needlessly setup deinterlacers - which may consume significant resources.
     // We set to interlaced for those streams whose frame rate is initially detected
     // as e.g. 59.9 when it is actually 29.97 interlaced.
-    m_scan             = kScan_Interlaced;
-    m_scanLocked       = false;
-    m_scanTracker      = -2;
+    m_scan        = kScan_Interlaced;
+    m_scanLocked  = false;
+    m_scanTracker = -2;
     if (VideoOutput)
         VideoOutput->SetDeinterlacing(true, m_parentPlayer->CanSupportDoubleRate());
 }
@@ -64,7 +64,7 @@ void MythVideoScanTracker::SetScanOverride(FrameScanType Scan)
     }
 }
 
-FrameScanType MythVideoScanTracker::GetScanForDisplay(MythVideoFrame *Frame, bool &SecondField)
+FrameScanType MythVideoScanTracker::GetScanForDisplay(MythVideoFrame* Frame, bool& SecondField)
 {
     if (!Frame)
         return kScan_Progressive;
