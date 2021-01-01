@@ -329,8 +329,7 @@ AudioOutputOpenSLES::AudioOutputOpenSLES(const AudioSettings &settings) :
 AudioOutputOpenSLES::~AudioOutputOpenSLES()
 {
     KillAudio();
-
-    CloseDevice();
+    AudioOutputOpenSLES::CloseDevice();
 }
 
 AudioOutputSettings* AudioOutputOpenSLES::GetOutputSettings(bool /*digital*/)
