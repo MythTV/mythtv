@@ -10,20 +10,19 @@
 class MUI_PUBLIC MythUIStateTracker
 {
   public:
-    static void SetState(QVariantMap &newstate);
-    static void GetState(QVariantMap &state);
-    static void GetFreshState(QVariantMap &state);
+    static void SetState(const QVariantMap& NewState);
+    static void GetState(QVariantMap& State);
+    static void GetFreshState(QVariantMap& State);
 
   protected:
-    static MythUIStateTracker* GetMythUIStateTracker(void);
-    static int                 TimeSinceLastUpdate(void);
-    static MythUIStateTracker *gUIState;
-    static QMutex             *gUIStateLock;
+    static MythUIStateTracker* GetMythUIStateTracker();
+    static int                 TimeSinceLastUpdate();
+    static inline MythUIStateTracker* gUIState { nullptr };
+    static inline QMutex gUIStateLock { QMutex::Recursive };
 
-    MythUIStateTracker(): m_lastUpdated(QTime::currentTime().addSecs(-1)) { }
-
+    MythUIStateTracker();
     QVariantMap m_state;
     QTime       m_lastUpdated;
 };
 
-#endif // MYTHUISTATETRACKER_H
+#endif
