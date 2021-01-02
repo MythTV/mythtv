@@ -985,7 +985,7 @@ void MythDisplay::WaitForNewScreen()
     // exiting deliberately. It does however somehow filter out unwanted screenChanged
     // events that otherwise often put the widget in the wrong screen.
     // Needs more investigation - but for now it works:)
-    if (!m_widget || (m_widget && !m_widget->windowHandle()))
+    if (!m_widget || !m_widget->windowHandle())
         return;
     LOG(VB_GENERAL, LOG_INFO, LOC + "Waiting for new screen");
     QEventLoop loop;
