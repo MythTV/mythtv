@@ -58,6 +58,7 @@ class MPUBLIC MythContext
     void SetDisableEventPopup(bool check);
 
   private:
+    Q_DISABLE_COPY(MythContext)
     MythContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
     QString             m_appBinaryVersion;
 };
