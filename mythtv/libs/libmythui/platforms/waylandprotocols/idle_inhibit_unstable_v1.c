@@ -48,7 +48,7 @@ static const struct wl_message zwp_idle_inhibit_manager_v1_requests[] = {
 
 const struct wl_interface zwp_idle_inhibit_manager_v1_interface = {
     "zwp_idle_inhibit_manager_v1",        1, 2,
-    zwp_idle_inhibit_manager_v1_requests, 0, NULL,
+    zwp_idle_inhibit_manager_v1_requests, 0, nullptr,
 };
 
 static const struct wl_message zwp_idle_inhibitor_v1_requests[] = {
@@ -56,5 +56,5 @@ static const struct wl_message zwp_idle_inhibitor_v1_requests[] = {
 };
 
 const struct wl_interface zwp_idle_inhibitor_v1_interface = {
-    "zwp_idle_inhibitor_v1", 1, 1, zwp_idle_inhibitor_v1_requests, 0, NULL,
+    "zwp_idle_inhibitor_v1", 1, 1, zwp_idle_inhibitor_v1_requests, 0, nullptr,
 };
