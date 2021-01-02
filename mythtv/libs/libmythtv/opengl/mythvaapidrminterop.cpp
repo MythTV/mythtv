@@ -447,8 +447,8 @@ void MythVAAPIInteropDRM::CleanupDRMPRIME()
 
 bool MythVAAPIInteropDRM::TestPrimeInterop()
 {
-    static bool s_supported = false;
 #if VA_CHECK_VERSION(1, 1, 0)
+    static bool s_supported = false;
     static bool s_checked = false;
 
     if (s_checked)
@@ -494,8 +494,10 @@ bool MythVAAPIInteropDRM::TestPrimeInterop()
         }
         vaDestroySurfaces(m_vaDisplay, &surface, 1);
     }
-#endif
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI DRM PRIME interop is %1supported")
         .arg(s_supported ? "" : "not "));
     return s_supported;
+#else
+    return false;
+#endif
 }
