@@ -25,30 +25,30 @@ class MUI_PUBLIC MythEDID
         WhiteSpace   whitepoint;
     };
 
-    MythEDID(void) = default;
+    MythEDID() = default;
     explicit MythEDID(const QByteArray& Data);
     MythEDID(const char* Data, int Length);
 
-    bool        Valid             (void) const;
-    QStringList SerialNumbers     (void) const;
-    QSize       DisplaySize       (void) const;
-    double      DisplayAspect     (void) const;
-    uint16_t    PhysicalAddress   (void) const;
-    float       Gamma             (void) const;
-    bool        IsHDMI            (void) const;
-    bool        IsSRGB            (void) const;
-    bool        IsLikeSRGB        (void) const;
-    Primaries   ColourPrimaries   (void) const;
+    bool        Valid             () const;
+    QStringList SerialNumbers     () const;
+    QSize       DisplaySize       () const;
+    double      DisplayAspect     () const;
+    uint16_t    PhysicalAddress   () const;
+    float       Gamma             () const;
+    bool        IsHDMI            () const;
+    bool        IsSRGB            () const;
+    bool        IsLikeSRGB        () const;
+    Primaries   ColourPrimaries   () const;
     int         AudioLatency      (bool Interlaced) const;
     int         VideoLatency      (bool Interlaced) const;
-    void        Debug             (void) const;
+    void        Debug             () const;
 
   private:
-    void        Parse             (void);
-    bool        ParseBaseBlock    (const quint8 *Data);
-    bool        ParseCTA861       (const quint8 *Data, uint Offset);
-    bool        ParseCTABlock     (const quint8 *Data, uint Offset);
-    bool        ParseVSDB         (const quint8 *Data, uint Offset, uint Length);
+    void        Parse             ();
+    bool        ParseBaseBlock    (const quint8* Data);
+    bool        ParseCTA861       (const quint8* Data, uint Offset);
+    bool        ParseCTABlock     (const quint8* Data, uint Offset);
+    bool        ParseVSDB         (const quint8* Data, uint Offset, uint Length);
 
     bool        m_valid           { false };
     QByteArray  m_data            { };
@@ -69,4 +69,4 @@ class MUI_PUBLIC MythEDID
     std::array<int,2> m_videoLatency { 0 };
 };
 
-#endif // MYTHEDID_H
+#endif
