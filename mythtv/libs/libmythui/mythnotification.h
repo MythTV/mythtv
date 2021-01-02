@@ -181,7 +181,7 @@ class MUI_PUBLIC MythMediaNotification : public MythImageNotification,
     MythMediaNotification(Type nType, const QString& Image, const DMAP& Metadata,
                           float Progress, const QString& DurationText);
     MythMediaNotification(Type nType, const QString& Image, const DMAP& Metadata,
-                          int Duration, int Dosition);
+                          int Duration, int Position);
     MythEvent* clone() const override;
 
   protected:

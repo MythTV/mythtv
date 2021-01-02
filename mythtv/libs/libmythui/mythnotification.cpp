@@ -329,10 +329,10 @@ MythMediaNotification::MythMediaNotification(Type nType, const QString& Image, c
 }
 
 MythMediaNotification::MythMediaNotification(Type nType, const QString& Image, const DMAP& Metadata,
-                                             int Duration, int Dosition)
+                                             int Duration, int Position)
   : MythNotification(nType, Metadata),
     MythImageNotification(nType, Image),
-    MythPlaybackNotification(nType, Duration, Dosition)
+    MythPlaybackNotification(nType, Duration, Position)
 {
 }
 
