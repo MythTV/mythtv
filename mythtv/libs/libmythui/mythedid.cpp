@@ -17,7 +17,7 @@
 
 #define LOC QString("EDID: ")
 
-MythEDID::MythEDID(QByteArray &Data)
+MythEDID::MythEDID(const QByteArray& Data)
   : m_data(Data)
 {
     Parse();

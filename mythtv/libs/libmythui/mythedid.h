@@ -1,15 +1,15 @@
 #ifndef MYTHEDID_H
 #define MYTHEDID_H
 
-// C++
-#include <array>
-
 // Qt
 #include <QSize>
 #include <QStringList>
 
 // MythTV
 #include "mythuiexp.h"
+
+// Std
+#include <array>
 
 using PrimarySpace = std::array<std::array<float,2>,3>;
 using WhiteSpace = std::array<float,2>;
@@ -26,7 +26,7 @@ class MUI_PUBLIC MythEDID
     };
 
     MythEDID(void) = default;
-    explicit MythEDID(QByteArray &Data);
+    explicit MythEDID(const QByteArray& Data);
     MythEDID(const char* Data, int Length);
 
     bool        Valid             (void) const;
