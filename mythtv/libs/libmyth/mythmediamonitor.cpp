@@ -363,7 +363,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, bool allowEject
 
     // If any of IgnoreDevices are symlinks, also add the real device
     QStringList symlinked;
-    for (const auto & ignored : m_ignoreList)
+    for (const auto & ignored : qAsConst(m_ignoreList))
     {
         if (auto fi = QFileInfo(ignored); fi.isSymLink())
         {
