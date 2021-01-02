@@ -736,14 +736,14 @@ int MythDisplay::GetRefreshInterval(int Fallback) const
     return Fallback;
 }
 
-std::vector<double> MythDisplay::GetRefreshRates(QSize Size)
+MythDisplayRates MythDisplay::GetRefreshRates(QSize Size)
 {
     auto targetrate = static_cast<double>(NAN);
     const MythDisplayMode mode(Size, QSize(0, 0), -1.0, 0.0);
     const auto & modes = GetVideoModes();
     int match = MythDisplayMode::FindBestMatch(modes, mode, targetrate);
     if (match < 0)
-        return std::vector<double>();
+        return {};
     return modes[static_cast<size_t>(match)].RefreshRates();
 }
 

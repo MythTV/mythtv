@@ -46,7 +46,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     double       GetAspectRatio        (QString &Source, bool IgnoreModeOverride = false);
     double       EstimateVirtualAspectRatio();
     MythEDID&    GetEDID               ();
-    std::vector<double> GetRefreshRates(QSize Size);
+    MythDisplayRates GetRefreshRates   (QSize Size);
 
   public slots:
     virtual void ScreenChanged         (QScreen *qScreen);

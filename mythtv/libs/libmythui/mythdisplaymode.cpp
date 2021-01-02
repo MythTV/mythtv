@@ -44,38 +44,38 @@ bool MythDisplayMode::operator == (const MythDisplayMode &Other) const
     return m_width == Other.m_width && m_height == Other.m_height;
 }
 
-void MythDisplayMode::Init(void)
+void MythDisplayMode::Init()
 {
     m_width = m_height = m_widthMM = m_heightMM = 0;
     m_aspect = -1.0;
 }
 
-QSize MythDisplayMode::Resolution(void) const
+QSize MythDisplayMode::Resolution() const
 {
     return { m_width, m_height };
 }
 
-int MythDisplayMode::Width(void) const
+int MythDisplayMode::Width() const
 {
     return m_width;
 }
 
-int MythDisplayMode::Height(void) const
+int MythDisplayMode::Height() const
 {
     return m_height;
 }
 
-int MythDisplayMode::WidthMM(void) const
+int MythDisplayMode::WidthMM() const
 {
     return m_widthMM;
 }
 
-int MythDisplayMode::HeightMM(void) const
+int MythDisplayMode::HeightMM() const
 {
     return m_heightMM;
 }
 
-const std::vector<double>& MythDisplayMode::RefreshRates(void) const
+const MythDisplayRates& MythDisplayMode::RefreshRates() const
 {
     return m_refreshRates;
 }
@@ -112,7 +112,7 @@ void MythDisplayMode::AddRefreshRate(double Rate)
     std::sort(m_refreshRates.begin(), m_refreshRates.end());
 }
 
-void MythDisplayMode::ClearRefreshRates(void)
+void MythDisplayMode::ClearRefreshRates()
 {
     m_refreshRates.clear();
 }
