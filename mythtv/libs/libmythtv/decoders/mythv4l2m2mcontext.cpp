@@ -324,7 +324,7 @@ V4L2Profiles MythV4L2M2MContext::GetProfiles(const std::vector<V4L2Mapping>& Pro
         QStringList debug;
         QSize dummy{0, 0};
 
-        for (auto & profile : Profiles)
+        for (const auto & profile : Profiles)
         {
             bool found = false;
             uint32_t v4l2pixfmt = profile.first;
