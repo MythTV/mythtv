@@ -130,7 +130,7 @@ void MythEDID::Parse()
     }
 
     // checksum
-    if (auto sum = std::accumulate(m_data.cbegin(), m_data.cend(), 0, std::plus<char>()); (sum % 0xff) != 0)
+    if (auto sum = std::accumulate(m_data.cbegin(), m_data.cend(), 0, std::plus<>()); (sum % 0xff) != 0)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Checksum error");
         return;
