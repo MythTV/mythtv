@@ -65,7 +65,7 @@ bool MythDisplayOSX::UsingVideoModes(void)
     return false;
 }
 
-const std::vector<MythDisplayMode>& MythDisplayOSX::GetVideoModes(void)
+const MythDisplayModes& MythDisplayOSX::GetVideoModes(void)
 {
     if (!m_videoModes.empty() || !HasMythMainWindow())
         return m_videoModes;

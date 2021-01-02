@@ -17,7 +17,7 @@ class MythDisplayOSX : public MythDisplay
 
     bool VideoModesAvailable(void) override { return true; }
     bool UsingVideoModes(void) override;
-    const std::vector<MythDisplayMode>& GetVideoModes(void) override;
+    const MythDisplayModes& GetVideoModes(void) override;
     bool SwitchToVideoMode(QSize Size, double DesiredRate) override;
 
   private:

@@ -25,7 +25,7 @@ class MythDisplayRPI : public MythDisplay
     bool  VideoModesAvailable(void) override { return true; }
     bool  UsingVideoModes   (void) override;
     bool  SwitchToVideoMode (QSize Size, double Framerate) override;
-    const std::vector<MythDisplayMode>& GetVideoModes(void) override;
+    const MythDisplayModes& GetVideoModes(void) override;
     void  Callback(uint32_t Reason, uint32_t, uint32_t);
 
   private:

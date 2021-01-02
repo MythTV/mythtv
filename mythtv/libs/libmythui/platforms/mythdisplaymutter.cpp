@@ -296,7 +296,7 @@ bool MythDisplayMutter::UsingVideoModes()
     return false;
 }
 
-const std::vector<MythDisplayMode>& MythDisplayMutter::GetVideoModes()
+const MythDisplayModes& MythDisplayMutter::GetVideoModes()
 {
     if (!m_interface || m_outputIdx < 0 || !m_videoModes.empty())
         return m_videoModes;

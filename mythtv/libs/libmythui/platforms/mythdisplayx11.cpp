@@ -14,7 +14,7 @@ MythDisplayX11::MythDisplayX11()
     Initialise();
 }
 
-bool MythDisplayX11::IsAvailable(void)
+bool MythDisplayX11::IsAvailable()
 {
     static bool s_checked = false;
     static bool s_available = false;
@@ -40,18 +40,18 @@ bool MythDisplayX11::IsAvailable(void)
  * So we now use the Qt defaults and override where possible with XRANDR versions.
  * If XRANDR is not available we try and get a more accurate refresh rate only.
 */
-void MythDisplayX11::UpdateCurrentMode(void)
+void MythDisplayX11::UpdateCurrentMode()
 {
     // Get some Qt basics first
     MythDisplay::UpdateCurrentMode();
 
-    MythXDisplay *display = MythXDisplay::OpenMythXDisplay();
+    auto * display = MythXDisplay::OpenMythXDisplay();
     if (display)
     {
         // XRANDR should always be accurate
         GetEDID(display);
-        XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
-        XRROutputInfo *output = GetOutput(res, display, m_screen);
+        auto * res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
+        auto * output = GetOutput(res, display, m_screen);
         if (output)
         {
             m_physicalSize = QSize(static_cast<int>(output->mm_width),
@@ -63,14 +63,14 @@ void MythDisplayX11::UpdateCurrentMode(void)
             (void)GetVideoModes();
         while (m_crtc && res)
         {
-            XRRCrtcInfo *currentcrtc = XRRGetCrtcInfo(display->GetDisplay(), res, m_crtc);
+            auto * currentcrtc = XRRGetCrtcInfo(display->GetDisplay(), res, m_crtc);
             if (!currentcrtc)
                 break;
             for (int i = 0; i < res->nmode; ++i)
             {
                 if (res->modes[i].id != currentcrtc->mode)
                     continue;
-                XRRModeInfo mode = res->modes[i];
+                auto mode = res->modes[i];
                 m_resolution = QSize(static_cast<int>(mode.width),
                                      static_cast<int>(mode.height));
                 if (mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1)
@@ -91,14 +91,14 @@ void MythDisplayX11::UpdateCurrentMode(void)
     }
 }
 
-bool MythDisplayX11::UsingVideoModes(void)
+bool MythDisplayX11::UsingVideoModes()
 {
     if (gCoreContext)
         return gCoreContext->GetBoolSetting("UseVideoModes", false);
     return false;
 }
 
-const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
+const MythDisplayModes& MythDisplayX11::GetVideoModes()
 {
     if (!m_videoModes.empty() || !m_screen)
         return m_videoModes;
@@ -106,12 +106,12 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
     m_videoModes.clear();
     m_modeMap.clear();
 
-    MythXDisplay *display = MythXDisplay::OpenMythXDisplay();
+    auto * display = MythXDisplay::OpenMythXDisplay();
     if (!display)
         return m_videoModes;
 
-    XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
-    XRROutputInfo *output = GetOutput(res, display, m_screen);
+    auto * res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
+    auto * output = GetOutput(res, display, m_screen);
 
     if (!output)
     {
@@ -122,8 +122,8 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
         return m_videoModes;
     }
 
-    int mmwidth = static_cast<int>(output->mm_width);
-    int mmheight = static_cast<int>(output->mm_height);
+    auto mmwidth = static_cast<int>(output->mm_width);
+    auto mmheight = static_cast<int>(output->mm_height);
     m_crtc = output->crtc;
 
     DisplayModeMap screenmap;
@@ -135,14 +135,14 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
             if (res->modes[j].id != rrmode)
                 continue;
 
-            XRRModeInfo mode = res->modes[j];
+            auto mode = res->modes[j];
             if (mode.id != rrmode)
                 continue;
             if (!(mode.dotClock > 1 && mode.vTotal > 1 && mode.hTotal > 1))
                 continue;
-            int width = static_cast<int>(mode.width);
-            int height = static_cast<int>(mode.height);
-            double rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
+            auto width = static_cast<int>(mode.width);
+            auto height = static_cast<int>(mode.height);
+            auto rate = static_cast<double>(mode.dotClock) / (mode.vTotal * mode.hTotal);
 
             // TODO don't filter out interlaced modes but ignore them in MythDisplayMode
             // when not required. This may then be used in future to allow 'exact' match
@@ -156,7 +156,7 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
 
             QSize resolution(width, height);
             QSize physical(mmwidth, mmheight);
-            uint64_t key = MythDisplayMode::CalcKey(resolution, 0.0);
+            auto key = MythDisplayMode::CalcKey(resolution, 0.0);
             if (screenmap.find(key) == screenmap.end())
                 screenmap[key] = MythDisplayMode(resolution, physical, -1.0, rate);
             else
@@ -178,9 +178,11 @@ const std::vector<MythDisplayMode>& MythDisplayX11::GetVideoModes(void)
 bool MythDisplayX11::SwitchToVideoMode(QSize Size, double DesiredRate)
 {
     if (!m_crtc)
+    {
         (void)GetVideoModes();
-    if (!m_crtc)
-        return false;
+        if (!m_crtc)
+            return false;
+    }
 
     auto rate = static_cast<double>(NAN);
     QSize dummy(0, 0);
@@ -200,15 +202,15 @@ bool MythDisplayX11::SwitchToVideoMode(QSize Size, double DesiredRate)
         return false;
     }
 
-    MythXDisplay *display = MythXDisplay::OpenMythXDisplay();
+    auto * display = MythXDisplay::OpenMythXDisplay();
     if (!display)
         return false;
 
     Status status = RRSetConfigFailed;
-    XRRScreenResources* res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
+    auto * res = XRRGetScreenResourcesCurrent(display->GetDisplay(), display->GetRoot());
     if (res)
     {
-        XRRCrtcInfo *currentcrtc = XRRGetCrtcInfo(display->GetDisplay(), res, m_crtc);
+        auto * currentcrtc = XRRGetCrtcInfo(display->GetDisplay(), res, m_crtc);
         if (currentcrtc)
         {
             status = XRRSetCrtcConfig(display->GetDisplay(), res, m_crtc, CurrentTime,
@@ -216,7 +218,7 @@ bool MythDisplayX11::SwitchToVideoMode(QSize Size, double DesiredRate)
                                       currentcrtc->rotation, currentcrtc->outputs,
                                       currentcrtc->noutput);
             XRRFreeCrtcInfo(currentcrtc);
-            XRRScreenConfiguration *config = XRRGetScreenInfo(display->GetDisplay(), display->GetRoot());
+            auto * config = XRRGetScreenInfo(display->GetDisplay(), display->GetRoot());
             if (config)
                 XRRFreeScreenConfigInfo(config);
         }
@@ -231,12 +233,12 @@ bool MythDisplayX11::SwitchToVideoMode(QSize Size, double DesiredRate)
 
 XRROutputInfo* MythDisplayX11::GetOutput(XRRScreenResources* Resources,
                                          MythXDisplay* mDisplay,
-                                         QScreen* qScreen, RROutput *Output)
+                                         QScreen* qScreen, RROutput* Output)
 {
     if (!(Resources && mDisplay && qScreen))
         return nullptr;
 
-    XRROutputInfo *result = nullptr;
+    XRROutputInfo* result = nullptr;
     for (int i = 0; i < Resources->noutput; ++i)
     {
         if (result)
@@ -277,19 +279,19 @@ void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
         return;
     }
 
-    XRRScreenResources* res = XRRGetScreenResourcesCurrent(mDisplay->GetDisplay(), mDisplay->GetRoot());
+    auto * res = XRRGetScreenResourcesCurrent(mDisplay->GetDisplay(), mDisplay->GetRoot());
     RROutput rroutput = 0;
-    XRROutputInfo *output = GetOutput(res, mDisplay, m_screen, &rroutput);
+    auto * output = GetOutput(res, mDisplay, m_screen, &rroutput);
 
     while (rroutput)
     {
-        Atom edidproperty = XInternAtom(mDisplay->GetDisplay(), RR_PROPERTY_RANDR_EDID,
+        auto edidproperty = XInternAtom(mDisplay->GetDisplay(), RR_PROPERTY_RANDR_EDID,
                                         static_cast<Bool>(false));
         if (!edidproperty)
             break;
 
         int propertycount = 0;
-        Atom* properties = XRRListOutputProperties(mDisplay->GetDisplay(), rroutput, &propertycount);
+        auto * properties = XRRListOutputProperties(mDisplay->GetDisplay(), rroutput, &propertycount);
         if (!properties)
             break;
 
@@ -307,7 +309,7 @@ void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
             break;
 
         Atom actualtype = 0;
-        int actualformat = 0;;
+        int actualformat = 0;
         unsigned long bytesafter = 0;
         unsigned long nitems = 0;
         unsigned char* data = nullptr;
@@ -317,8 +319,7 @@ void MythDisplayX11::GetEDID(MythXDisplay *mDisplay)
                                  &actualformat, &nitems, &bytesafter, &data) == Success)
         {
             if (actualtype == XA_INTEGER && actualformat == 8)
-                m_edid = MythEDID(reinterpret_cast<const char*>(data),
-                                  static_cast<int>(nitems));
+                m_edid = MythEDID(reinterpret_cast<const char*>(data), static_cast<int>(nitems));
         }
         break;
     }
