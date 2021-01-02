@@ -274,9 +274,8 @@ bool MythEDID::ParseBaseBlock(const quint8* Data)
     }
 
     // Set status
-    for (const auto & sn : qAsConst(m_serialNumbers))
-        if (!sn.isEmpty())
-            m_valid = true;
+    m_valid = std::any_of(m_serialNumbers.cbegin(), m_serialNumbers.cend(),
+                          [](const QString& Serial) { return !Serial.isEmpty(); });
     if (!m_valid)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "No serial number(s) in EDID");
     return m_valid;
