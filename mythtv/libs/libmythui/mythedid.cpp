@@ -130,12 +130,9 @@ void MythEDID::Parse(void)
     }
 
     // checksum
-    qint8 sum = 0;
-    for (char i : qAsConst(m_data))
-        sum += i;
-    if (sum != 0)
+    if (auto sum = std::accumulate(m_data.cbegin(), m_data.cend(), 0, std::plus<char>()); (sum % 0xff) != 0)
     {
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + "Checksum error");
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Checksum error");
         return;
     }
 
