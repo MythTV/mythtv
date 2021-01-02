@@ -1,13 +1,11 @@
 #ifndef MYTHUDPLISTENER_H
 #define MYTHUDPLISTENER_H
 
+// Qt
 #include <QObject>
 
+// MythTV
 #include "serverpool.h"
-
-class QByteArray;
-class QUdpSocket;
-class QDomElement;
 
 class MythUDPListener : public QObject
 {
@@ -15,24 +13,15 @@ class MythUDPListener : public QObject
 
   public:
     MythUDPListener();
-
-    void Enable(void);
-    void Disable(void);
-
-  public slots:
-    virtual void deleteLater(void);
+   ~MythUDPListener() override;
+    void Enable();
+    void Disable();
 
   private slots:
-    static void Process(const QByteArray &buf, const QHostAddress& sender,
-                 quint16 senderPort);
+    static void Process(const QByteArray &Buffer, const QHostAddress& /*Sender*/, quint16 /*SenderPort*/);
 
   private:
-    ~MythUDPListener(void) override { Disable(); }
-
-    void TeardownAll(void) { Disable(); }
-
-  private:
-    ServerPool *m_socketPool {nullptr};
+    ServerPool* m_socketPool { nullptr };
 };
 
-#endif // MYTHUDPLISTENER_H
+#endif

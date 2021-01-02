@@ -212,6 +212,8 @@ MythMainWindow::~MythMainWindow()
     if (gCoreContext != nullptr)
         gCoreContext->removeListener(this);
 
+    delete m_priv->m_udpListener;
+
     while (!m_priv->m_stackList.isEmpty())
     {
         MythScreenStack *stack = m_priv->m_stackList.back();
