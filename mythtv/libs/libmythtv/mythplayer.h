@@ -1,10 +1,6 @@
 ﻿#ifndef MYTHPLAYER_H
 #define MYTHPLAYER_H
 
-// Std
-#include <cstdint>
-#include <utility>
-
 // Qt
 #include <QCoreApplication>
 #include <QList>
@@ -38,6 +34,11 @@
 #include "mythmiscutil.h"
 #include "mythplayeravsync.h"
 #include "mythtvexp.h"
+
+// Std
+#include <cstdint>
+#include <utility>
+#include <thread>
 
 class ProgramInfo;
 class InteractiveTV;
