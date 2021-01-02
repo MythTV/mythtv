@@ -6,41 +6,167 @@
 //  Copyright (c) 2013 Bubblestuff Pty Ltd. All rights reserved.
 //
 
-// libmyth headers
+// Qt
+#include <QCoreApplication>
+
+// MythTV
 #include "mythlogging.h"
 #include "mythnotification.h"
 
-#include <QCoreApplication>
-
-QEvent::Type MythNotification::New =
-    (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythNotification::Update =
-    (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythNotification::Info =
-    (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythNotification::Error =
-    (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythNotification::Warning =
-    (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythNotification::Check =
-    (QEvent::Type) QEvent::registerEventType();
-QEvent::Type MythNotification::Busy =
-    (QEvent::Type) QEvent::registerEventType();
-
-void MythNotification::SetId(int id)
+MythNotification::MythNotification(Type nType, void* Parent)
+  : MythEvent(nType, "NOTIFICATION"),
+    m_parent(Parent)
 {
-    m_id = id;
-    // default registered notification is to not expire
-    if (m_id > 0 && m_duration == 0)
-    {
-        m_duration = -1;
-    }
 }
 
-void MythNotification::ToStringList(void)
+MythNotification::MythNotification(int Id, void* Parent)
+  : MythEvent(Update, "NOTIFICATION"),
+    m_id(Id),
+    m_parent(Parent)
+{
+}
+
+MythNotification::MythNotification(const QString& Title, const QString& Author,
+                                   const QString& Details)
+  : MythEvent(New, "NOTIFICATION"),
+    m_description(Title),
+    m_metadata({{"minm", Title}, {"asar", Author}, {"asal", Details}})
+{
+    ToStringList();
+}
+
+MythNotification::MythNotification(Type nType, const QString& Title, const QString& Author,
+                                   const QString& Details, const QString& Extra)
+  : MythEvent(nType, "NOTIFICATION"),
+    m_description(Title),
+    m_metadata({{"minm", Title}, {"asar", Author}, {"asal", Details}, {"asfm", Extra}})
+{
+    ToStringList();
+}
+
+MythNotification::MythNotification(Type nType, DMAP Metadata)
+  : MythEvent(nType, "NOTIFICATION"),
+    m_metadata(std::move(Metadata))
+{
+    ToStringList();
+}
+
+MythNotification::MythNotification(const MythEvent& Event)
+  : MythEvent(Event)
+{
+    FromStringList();
+}
+
+MythNotification::MythNotification(const MythNotification& Notification)
+  : MythEvent(Notification),
+    m_id(Notification.m_id),
+    m_parent(Notification.m_parent),
+    m_fullScreen(Notification.m_fullScreen),
+    m_description(Notification.m_description),
+    m_duration(Notification.m_duration),
+    m_metadata(Notification.m_metadata),
+    m_style(Notification.m_style),
+    m_visibility(Notification.m_visibility),
+    m_priority(Notification.m_priority)
+{
+    ToStringList();
+}
+
+MythEvent* MythNotification::clone() const
+{
+    return new MythNotification(*this);
+}
+
+/*! \brief Contains the application registration id
+ *
+ * Required to update an existing notification screen owned by an application
+ */
+void MythNotification::SetId(int Id)
+{
+    m_id = Id;
+    // default registered notification is to not expire
+    if (m_id > 0 && m_duration == 0)
+        m_duration = -1;
+}
+
+/*! \brief Contains the parent address. Required if id is set
+ * Id provided must match the parent address as provided during the
+ * MythNotificationCenter registration, otherwise the id value will be
+ * ignored
+ */
+void MythNotification::SetParent(void* Parent)
+{
+    m_parent = Parent;
+}
+
+/*! \brief A notification may request to be displayed in full screen,
+ * this request may not be fullfilled should the theme not handle full screen
+ * notification
+ */
+void MythNotification::SetFullScreen(bool FullScreen)
+{
+    m_fullScreen = FullScreen;
+    ToStringList();
+}
+
+/*! \brief Contains a short description of the notification
+ */
+void MythNotification::SetDescription(const QString& Description)
+{
+    m_description = Description;
+    ToStringList();
+}
+
+/*! \brief metadata of the notification.
+ * In DMAP format. DMAP can contains various information such as artist,
+ * album name, author name, genre etc..
+ */
+void MythNotification::SetMetaData(const DMAP& MetaData)
+{
+    m_metadata = MetaData;
+    ToStringList();
+}
+
+/*! \brief Contains a duration during which the notification will be displayed for.
+ * The duration is informative only as the MythNotificationCenter will
+ * determine automatically how long a notification can be displayed for
+ * and will depend on priority, visibility and other factors
+ */
+void MythNotification::SetDuration(int Duration)
+{
+    m_duration = Duration;
+    ToStringList();
+}
+
+/*! \brief Contains an alternative notification style.
+ * Should a style be defined, the Notification Center will attempt to load
+ * an alternative theme and fall back to the default one if unsuccessful
+ */
+void MythNotification::SetStyle(const QString& Style)
+{
+    m_style = Style;
+    ToStringList();
+}
+
+/*! \brief Define a bitmask of Visibility
+ */
+void MythNotification::SetVisibility(VNMask Visibility)
+{
+    m_visibility = Visibility;
+    ToStringList();
+}
+
+/*! \brief Reserved for future use, not implemented at this stage
+ */
+void MythNotification::SetPriority(Priority nPriority)
+{
+    m_priority = nPriority;
+    ToStringList();
+}
+
+void MythNotification::ToStringList()
 {
     m_extradata.clear();
-
     m_extradata << QString::number(Type())
                 << QString::number(static_cast<int>(m_fullScreen))
                 << m_description
@@ -54,20 +180,18 @@ void MythNotification::ToStringList(void)
                 << m_metadata.value("asfm");
 }
 
-bool MythNotification::FromStringList(void)
+bool MythNotification::FromStringList()
 {
     if (m_extradata.size() != 11)
     {
         LOG(VB_GENERAL, LOG_ERR,
-            QString("MythNotification::FromStringList called with %1 items, "
-                    "expecting 11. '%2'")
+            QString("MythNotification::FromStringList called with %1 items, expecting 11. '%2'")
             .arg(m_extradata.size()).arg(m_extradata.join(",")));
         return false;
     }
 
-    QStringList::const_iterator Istr = m_extradata.cbegin();
-
-    Type type     = static_cast<Type>((*Istr++).toInt());
+    QStringList::const_iterator it = m_extradata.cbegin();
+    Type type = static_cast<Type>((*it++).toInt());
     if (type != Type())
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -76,69 +200,177 @@ bool MythNotification::FromStringList(void)
             .arg(type).arg(Type()));
         return false;
     }
-    m_fullScreen  = ((*Istr++).toInt() != 0);
-    m_description = *Istr++;
-    m_duration    = (*Istr++).toInt();
-    m_style       = *Istr++;
-    m_visibility  = static_cast<VNMask>((*Istr++).toInt());
-    m_priority    = static_cast<Priority>((*Istr++).toInt());
-    m_metadata["minm"] = *Istr++;
-    m_metadata["asar"] = *Istr++;
-    m_metadata["asal"] = *Istr++;
-    m_metadata["asfm"] = *Istr++;
-
+    m_fullScreen  = ((*it++).toInt() != 0);
+    m_description = *it++;
+    m_duration    = (*it++).toInt();
+    m_style       = *it++;
+    m_visibility  = static_cast<VNMask>((*it++).toInt());
+    m_priority    = static_cast<Priority>((*it++).toInt());
+    m_metadata["minm"] = *it++;
+    m_metadata["asar"] = *it++;
+    m_metadata["asal"] = *it++;
+    m_metadata["asfm"] = *it++;
     return true;
 }
 
 
-/**
- * stringFromSeconds:
+/*! \brief Create a string in the format HH:mm:ss from a duration in seconds.
  *
- * Usage: stringFromSeconds(seconds).
- * Description: create a string in the format HH:mm:ss from a duration in seconds.
  * HH: will not be displayed if there's less than one hour.
  */
-QString MythPlaybackNotification::stringFromSeconds(int time)
+QString MythPlaybackNotification::StringFromSeconds(int Time)
 {
-    int   hour    = time / 3600;
-    int   minute  = (time - hour * 3600) / 60;
-    int seconds   = time - hour * 3600 - minute * 60;
+    int hour    = Time / 3600;
+    int minute  = (Time - hour * 3600) / 60;
+    int seconds = Time - hour * 3600 - minute * 60;
     QString str;
 
     if (hour)
-    {
         str += QString("%1:").arg(hour);
-    }
     if (minute < 10)
-    {
         str += "0";
-    }
     str += QString("%1:").arg(minute);
     if (seconds < 10)
-    {
         str += "0";
-    }
     str += QString::number(seconds);
     return str;
 }
 
-MythNotification::Type MythNotification::TypeFromString(const QString &type)
+MythNotification::Type MythNotification::TypeFromString(const QString& Type)
 {
-    if (type == "error")
-    {
-        return MythNotification::Error;
-    }
-    if (type == "warning")
-    {
-        return MythNotification::Warning;
-    }
-    if (type == "check")
-    {
-        return MythNotification::Check;
-    }
-    if (type == "busy")
-    {
-        return MythNotification::Busy;
-    }
+    if (Type == "error")   return MythNotification::Error;
+    if (Type == "warning") return MythNotification::Warning;
+    if (Type == "check")   return MythNotification::Check;
+    if (Type == "busy")    return MythNotification::Busy;
     return MythNotification::New;
+}
+
+MythImageNotification::MythImageNotification(Type nType, QImage Image)
+  : MythNotification(nType),
+    m_image(std::move(Image))
+{
+}
+
+MythImageNotification::MythImageNotification(Type nType, QString ImagePath)
+  : MythNotification(nType),
+    m_imagePath(std::move(ImagePath))
+{
+}
+
+MythImageNotification::MythImageNotification(Type nType, QImage Image, const DMAP& Metadata)
+  : MythNotification(nType, Metadata),
+    m_image(std::move(Image))
+{
+}
+
+MythImageNotification::MythImageNotification(Type nType, QString ImagePath, const DMAP& Metadata)
+  : MythNotification(nType, Metadata),
+    m_imagePath(std::move(ImagePath))
+{
+}
+
+MythEvent* MythImageNotification::clone() const
+{
+    return new MythImageNotification(*this);
+}
+
+MythPlaybackNotification::MythPlaybackNotification(Type nType, float Progress,
+                                                   QString ProgressText)
+  : MythNotification(nType),
+    m_progress(Progress),
+    m_progressText(std::move(ProgressText))
+{
+}
+
+MythPlaybackNotification::MythPlaybackNotification(Type nType, float Progress,
+                                                   QString ProgressText,
+                         const DMAP& Metadata)
+  : MythNotification(nType, Metadata),
+    m_progress(Progress),
+    m_progressText(std::move(ProgressText))
+{
+}
+
+MythPlaybackNotification::MythPlaybackNotification(Type nType, int Duration,
+                                                   int Position)
+  : MythNotification(nType),
+    m_progress(static_cast<float>(Position) /  static_cast<float>(Duration)),
+    m_progressText(StringFromSeconds(Duration))
+{
+}
+
+MythEvent* MythPlaybackNotification::clone() const
+{
+    return new MythPlaybackNotification(*this);
+}
+
+MythMediaNotification::MythMediaNotification(Type nType, const QImage& Image, const DMAP& Metadata,
+                                             float Progress, const QString& DurationText)
+  : MythNotification(nType, Metadata),
+    MythImageNotification(nType, Image),
+    MythPlaybackNotification(nType, Progress, DurationText)
+{
+}
+
+MythMediaNotification::MythMediaNotification(Type nType, const QImage& Image, const DMAP& Metadata,
+                                             int Duration, int Position)
+  : MythNotification(nType, Metadata),
+    MythImageNotification(nType, Image),
+    MythPlaybackNotification(nType, Duration, Position)
+{
+}
+
+MythMediaNotification::MythMediaNotification(Type nType, const QString& Image, const DMAP& Metadata,
+                                             float Progress, const QString& DurationText)
+  : MythNotification(nType, Metadata),
+    MythImageNotification(nType, Image),
+    MythPlaybackNotification(nType, Progress, DurationText)
+{
+}
+
+MythMediaNotification::MythMediaNotification(Type nType, const QString& Image, const DMAP& Metadata,
+                                             int Duration, int Dosition)
+  : MythNotification(nType, Metadata),
+    MythImageNotification(nType, Image),
+    MythPlaybackNotification(nType, Duration, Dosition)
+{
+}
+
+MythMediaNotification::MythMediaNotification(const MythMediaNotification& Notification)
+  : MythNotification(Notification),
+    MythImageNotification(Notification),
+    MythPlaybackNotification(Notification)
+{
+}
+
+MythEvent* MythMediaNotification::clone() const
+{
+    return new MythMediaNotification(*this);
+}
+
+MythErrorNotification::MythErrorNotification(const QString& Title, const QString& Author,
+                                             const QString& Details)
+  : MythNotification(Error, Title, Author, Details)
+{
+    SetDuration(10);
+}
+
+MythWarningNotification::MythWarningNotification(const QString& Title, const QString& Author,
+                                                 const QString& Details)
+  : MythNotification(Warning, Title, Author, Details)
+{
+    SetDuration(10);
+}
+
+MythCheckNotification::MythCheckNotification(const QString& Title, const QString& Author,
+                                             const QString& Details)
+  : MythNotification(Check, Title, Author, Details)
+{
+    SetDuration(5);
+}
+
+MythBusyNotification::MythBusyNotification(const QString& Title, const QString& Author,
+                                           const QString& Details)
+  : MythNotification(Busy, Title, Author, Details)
+{
 }
