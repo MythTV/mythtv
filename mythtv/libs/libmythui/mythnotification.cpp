@@ -8,6 +8,7 @@
 
 // Qt
 #include <QCoreApplication>
+#include <QTime>
 
 // MythTV
 #include "mythlogging.h"
@@ -220,20 +221,8 @@ bool MythNotification::FromStringList()
  */
 QString MythPlaybackNotification::StringFromSeconds(int Time)
 {
-    int hour    = Time / 3600;
-    int minute  = (Time - hour * 3600) / 60;
-    int seconds = Time - hour * 3600 - minute * 60;
-    QString str;
-
-    if (hour)
-        str += QString("%1:").arg(hour);
-    if (minute < 10)
-        str += "0";
-    str += QString("%1:").arg(minute);
-    if (seconds < 10)
-        str += "0";
-    str += QString::number(seconds);
-    return str;
+    QTime ltime = QTime(0,0).addSecs(Time);
+    return ltime.toString(ltime.hour() > 0 ? "HH:mm:ss" : "mm:ss");
 }
 
 MythNotification::Type MythNotification::TypeFromString(const QString& Type)
