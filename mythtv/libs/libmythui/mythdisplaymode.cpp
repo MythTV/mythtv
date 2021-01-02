@@ -214,39 +214,37 @@ int MythDisplayMode::FindBestMatch(const MythDisplayModes& Modes,
     return -1;
 }
 
-#define extract_key(key) { \
-        rate = ((key) & ((1<<18) - 1)) / 1000.0; \
-        height = ((key) >> 18) & ((1<<16) - 1); \
-        width = ((key) >> 34) & ((1<<16) - 1); }
+#define extract_key(key) \
+double rate = ((key) & ((1 << 18) - 1)) / 1000.0; \
+int height  = ((key) >> 18) & ((1 << 16) - 1); \
+int width   = ((key) >> 34) & ((1 << 16) - 1);
 
 uint64_t MythDisplayMode::FindBestScreen(const DisplayModeMap& Map,
                                          int Width, int Height, double Rate)
 {
-    int width = 0;
-    int height = 0;
-    double rate = 0.0;
-
     // 1. search for exact match (width, height, rate)
     // 2. search for resolution, ignoring rate
     // 3. search for matching height and rate (or any rate if rate = 0)
     // 4. search for 2x rate
     // 5. search for 1x rate
 
-    for ( auto it = Map.cbegin(); it != Map.cend(); ++it)
+    for (auto it = Map.cbegin(); it != Map.cend(); ++it)
     {
-        extract_key(it->first);
+        extract_key(it->first)
         if (width == Width && height == Height && CompareRates(Rate, rate, 0.01))
             return it->first;
     }
+
     for (auto it = Map.cbegin(); it != Map.cend(); ++it)
     {
-        extract_key(it->first);
+        extract_key(it->first)
         if (width == Width && height == Height && qFuzzyCompare(rate + 1.0, 1.0))
             return it->first;
     }
+
     for (auto it = Map.cbegin(); it != Map.cend(); ++it)
     {
-        extract_key(it->first);
+        extract_key(it->first)
         if ((width == 0 && height == Height &&
              (CompareRates(Rate, rate, 0.01) || qFuzzyCompare(rate + 1.0, 1.0))) ||
             (width == 0 && height == 0 && CompareRates(Rate, rate * 2.0, 0.01)) ||
