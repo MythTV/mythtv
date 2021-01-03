@@ -288,48 +288,54 @@ class XMLTVGrabber : public MythUIComboBoxSetting
         //-=>TODO:Screen doesn't show up if the call to MythSysemLegacy is executed
 #else
 
-        QString loc = "XMLTVGrabber::Load: ";
+        QString loc = QString("XMLTVGrabber::Load(%1): ").arg(m_parent.getSourceName());
 
-        QStringList name_list;
-        QStringList prog_list;
-
-        QStringList args;
-        args += "baseline";
-
-        MythSystemLegacy find_grabber_proc("tv_find_grabbers", args,
-                                            kMSStdOut | kMSRunShell);
-        find_grabber_proc.Run(25);
-        LOG(VB_GENERAL, LOG_INFO,
-            loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
-        uint status = find_grabber_proc.Wait();
-
-        if (status == GENERIC_EXIT_OK)
+        QMutexLocker lock(&m_lock);
+        if (m_nameList.isEmpty())
         {
-            QTextStream ostream(find_grabber_proc.ReadAll());
-            while (!ostream.atEnd())
-            {
-                QString grabber_list(ostream.readLine());
-#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                QStringList grabber_split =
-                    grabber_list.split("|", QString::SkipEmptyParts);
-#else
-                QStringList grabber_split =
-                    grabber_list.split("|", Qt::SkipEmptyParts);
-#endif
-                QString grabber_name = grabber_split[1] + " (xmltv)";
-                QFileInfo grabber_file(grabber_split[0]);
+            QStringList args;
+            args += "baseline";
 
-                name_list.push_back(grabber_name);
-                prog_list.push_back(grabber_file.fileName());
-                LOG(VB_GENERAL, LOG_DEBUG, "Found " + grabber_split[0]);
+            MythSystemLegacy find_grabber_proc("tv_find_grabbers", args,
+                                                kMSStdOut | kMSRunShell);
+            find_grabber_proc.Run(25);
+            LOG(VB_GENERAL, LOG_INFO,
+                loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
+            uint status = find_grabber_proc.Wait();
+
+            if (status == GENERIC_EXIT_OK)
+            {
+                QTextStream ostream(find_grabber_proc.ReadAll());
+                while (!ostream.atEnd())
+                {
+                    QString grabber_list(ostream.readLine());
+    #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+                    QStringList grabber_split =
+                        grabber_list.split("|", QString::SkipEmptyParts);
+    #else
+                    QStringList grabber_split =
+                        grabber_list.split("|", Qt::SkipEmptyParts);
+    #endif
+                    QString grabber_name = grabber_split[1] + " (xmltv)";
+                    QFileInfo grabber_file(grabber_split[0]);
+
+                    m_nameList.push_back(grabber_name);
+                    m_progList.push_back(grabber_file.fileName());
+                    LOG(VB_GENERAL, LOG_DEBUG, "Found " + grabber_split[0]);
+                }
+                LOG(VB_GENERAL, LOG_INFO, loc + "Finished running tv_find_grabbers");
             }
-            LOG(VB_GENERAL, LOG_INFO, loc + "Finished running tv_find_grabbers");
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, loc + "Failed to run tv_find_grabbers");
+            }
         }
         else
-            LOG(VB_GENERAL, LOG_ERR, loc + "Failed to run tv_find_grabbers");
+        {
+            LOG(VB_GENERAL, LOG_INFO, loc + "Loading results of tv_find_grabbers");
+        }
 
-        LoadXMLTVGrabbers(name_list, prog_list);
-
+        LoadXMLTVGrabbers(m_nameList, m_progList);
         MythUIComboBoxSetting::Load();
 #endif
     }
@@ -371,7 +377,17 @@ class XMLTVGrabber : public MythUIComboBoxSetting
     }
 private:
     const VideoSource &m_parent;
+
+private:
+    static QMutex      m_lock;
+    static QStringList m_nameList;
+    static QStringList m_progList;
 };
+
+// Results of search for XMLTV grabbers
+QMutex      XMLTVGrabber::m_lock;
+QStringList XMLTVGrabber::m_nameList;
+QStringList XMLTVGrabber::m_progList;
 
 class CaptureCardSpinBoxSetting : public MythUISpinBoxSetting
 {
