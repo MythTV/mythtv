@@ -22,6 +22,7 @@
 #include "Bluray/mythbdbuffer.h"
 
 // Std
+#include <thread>
 #include <fcntl.h>
 
 // BluRay
@@ -715,7 +716,7 @@ bool MythBDBuffer::UpdateTitleInfo(void)
     m_titlesize = bd_get_title_size(m_bdnav);
     uint32_t chapter_count = GetNumChapters();
     uint64_t total_msecs = m_currentTitleLength / 90;
-    QString duration = MythFormatTimeMs(total_msecs, "HH:mm:ss.zzz");
+    auto duration = MythFormatTimeMs(static_cast<int>(total_msecs), "HH:mm:ss.zzz");
     duration.chop(2); // Chop 2 to show tenths
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New title info: Index %1 Playlist: %2 Duration: %3 ""Chapters: %5")
             .arg(m_currentTitle).arg(m_currentTitleInfo->playlist).arg(duration).arg(chapter_count));
@@ -728,7 +729,7 @@ bool MythBDBuffer::UpdateTitleInfo(void)
         uint64_t framenum   = GetChapterStartFrame(i);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chapter %1 found @ [%2]->%3")
             .arg(i + 1,   2, 10, QChar('0'))
-            .arg(MythFormatTimeMs(GetChapterStartTimeMs(i), "HH:mm:ss.zzz"))
+            .arg(MythFormatTimeMs(static_cast<int>(GetChapterStartTimeMs(i)), "HH:mm:ss.zzz"))
             .arg(framenum));
     }
 
@@ -1077,7 +1078,7 @@ void MythBDBuffer::HandleBDEvent(BD_EVENT &Event)
         case BD_EVENT_STILL_TIME:
             // we use the clip information to determine the still frame status
             // sleep a little
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             break;
         case BD_EVENT_SEEK:
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EVENT_SEEK"));
@@ -1131,7 +1132,7 @@ void MythBDBuffer::HandleBDEvent(BD_EVENT &Event)
         case BD_EVENT_IDLE:
             /* Nothing to do. Playlist is not playing, but title applet is running.
              * Application should not call bd_read*() immediately again to avoid busy loop. */
-            usleep(40000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(40));
             break;
 
         case BD_EVENT_MENU:
@@ -1226,7 +1227,7 @@ void MythBDBuffer::WaitForPlayer(void)
     m_playerWait = true;
     int count = 0;
     while (m_playerWait && count++ < 200)
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     if (m_playerWait)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Player wait state was not cleared");

@@ -415,7 +415,7 @@ uint64_t MythBDPlayer::GetBookmark(void)
     }
 
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
-    return frames;;
+    return frames;
 }
 
 void MythBDPlayer::CreateDecoder(TestBufferVec & TestBuffer)
