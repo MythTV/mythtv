@@ -1535,8 +1535,8 @@ void MythUIImage::customEvent(QEvent *event)
 {
     if (event->type() == ImageLoadEvent::kEventType)
     {
-        auto *le = dynamic_cast<ImageLoadEvent *>(event);
-        if (le->GetParent() != this)
+        auto * le = dynamic_cast<ImageLoadEvent *>(event);
+        if (!le || le->GetParent() != this)
             return;
 
         MythImage *image                 = le->GetImage();
