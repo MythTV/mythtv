@@ -58,14 +58,14 @@ void MythUDPListener::DoEnable(bool Enable)
 void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Sender*/,
                               quint16 /*SenderPort*/)
 {
-    QString msg;
+    QString errormsg;
     int line = 0;
     int column = 0;
     QDomDocument doc;
-    if (!doc.setContent(Buffer, false, &msg, &line, &column))
+    if (!doc.setContent(Buffer, false, &errormsg, &line, &column))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Error parsing xml: Line: %1 Column: %2 Error: %3")
-            .arg(line).arg(column).arg(msg));
+            .arg(line).arg(column).arg(errormsg));
         return;
     }
 
@@ -89,6 +89,7 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
         }
     }
 
+    QString msg;
     uint timeout = 0;
     QString image;
     QString origin;
@@ -125,7 +126,7 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
             else if (notification && tagname == "fullscreen")
                 fullscreen = dom.text().toLower() == "true";
             else if (notification && tagname == "error")
-                msg = dom.text().toLower() == "true";
+                error = dom.text().toLower() == "true";
             else if (tagname == "visibility")
                 visibility = dom.text().toInt();
             else if (tagname == "type")
