@@ -71,7 +71,6 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
                               MythVideoProfile *Profile, bool Force)
 {
     // nothing to see here
-
     if (!Frame || !is_interlaced(Scan))
     {
         Cleanup();
@@ -92,8 +91,8 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
     bool doublerate = true;
     bool topfieldfirst = Frame->m_interlacedReverse ? !Frame->m_topFieldFirst : Frame->m_topFieldFirst;
 
-    MythDeintType deinterlacer = Frame->GetDoubleRateOption(DEINT_CPU);
-    MythDeintType other        = Frame->GetDoubleRateOption(DEINT_SHADER);
+    auto deinterlacer = Frame->GetDoubleRateOption(DEINT_CPU);
+    auto other        = Frame->GetDoubleRateOption(DEINT_SHADER);
     if (other)
     {
         Cleanup();
@@ -220,7 +219,7 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
     m_frame->format = Frame->m_pixFmt;
     m_frame->pts    = Frame->m_timecode;
 
-    auto AddFrame = [](AVFilterContext* Source, AVFrame *AvFrame)
+    auto AddFrame = [](AVFilterContext* Source, AVFrame* AvFrame)
         { return av_buffersrc_add_frame(Source, AvFrame); };
 
     // Add frame on first pass only
@@ -272,7 +271,7 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
     av_frame_unref(m_frame);
 }
 
-void MythDeinterlacer::Cleanup(void)
+void MythDeinterlacer::Cleanup()
 {
     if (m_graph || m_swsContext)
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Removing CPU deinterlacer");
@@ -311,7 +310,7 @@ bool MythDeinterlacer::Initialise(MythVideoFrame *Frame, MythDeintType Deinterla
     m_height    = Frame->m_height;
     m_inputType = Frame->m_type;
     m_inputFmt  = MythAVUtil::FrameTypeToPixelFormat(Frame->m_type);
-    QString name = MythVideoFrame::DeinterlacerName(Deinterlacer | DEINT_CPU, DoubleRate);
+    auto name   = MythVideoFrame::DeinterlacerName(Deinterlacer | DEINT_CPU, DoubleRate);
 
     // simple onefield/bob?
     if (Deinterlacer == DEINT_BASIC || Deinterlacer == DEINT_MEDIUM)
@@ -353,11 +352,11 @@ bool MythDeinterlacer::Initialise(MythVideoFrame *Frame, MythDeintType Deinterla
     AVFilterInOut* inputs = nullptr;
     AVFilterInOut* outputs = nullptr;
 
-    QString deint = QString("yadif=mode=%1:parity=%2:threads=%3")
+    auto deint = QString("yadif=mode=%1:parity=%2:threads=%3")
         .arg(DoubleRate ? 1 : 0).arg(m_autoFieldOrder ? -1 : TopFieldFirst ? 0 : 1).arg(threads);
 
-    QString graph = QString("buffer=video_size=%1x%2:pix_fmt=%3:time_base=1/1[in];[in]%4[out];[out] buffersink")
-                       .arg(m_width).arg(m_height).arg(m_inputFmt).arg(deint);
+    auto graph = QString("buffer=video_size=%1x%2:pix_fmt=%3:time_base=1/1[in];[in]%4[out];[out] buffersink")
+        .arg(m_width).arg(m_height).arg(m_inputFmt).arg(deint);
 
     int res = avfilter_graph_parse2(m_graph, graph.toLatin1().constData(), &inputs, &outputs);
     if (res >= 0 && !inputs && !outputs)
