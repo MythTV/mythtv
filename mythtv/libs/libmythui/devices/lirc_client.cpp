@@ -936,8 +936,7 @@ int lirc_readconfig(const struct lirc_state *state,
 	return -1;
 	
  lirc_readconfig_compat:
-	/* compat fallback */
-	if(sockfd != -1) close(sockfd);
+    /* compat fallback */
 	if(sha_bang!=nullptr) free(sha_bang);
 	free(filename);
 	return 0;
