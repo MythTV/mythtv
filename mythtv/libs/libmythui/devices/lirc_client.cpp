@@ -894,7 +894,7 @@ int lirc_readconfig(const struct lirc_state *state,
 	sockfd = -1;
 	
 	/* launch lircrcd */
-	sha_bang2=sha_bang!=nullptr ? sha_bang:"lircrcd";
+    sha_bang2=sha_bang;
 	
 	command=static_cast<char*>(malloc(strlen(sha_bang2)+1+strlen(filename)+1));
 	if(command==nullptr)
