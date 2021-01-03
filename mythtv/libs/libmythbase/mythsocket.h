@@ -121,6 +121,9 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     static QMutex s_thread_lock;
     static MThread *s_thread; // protected by s_thread_lock
     static int s_thread_cnt;  // protected by s_thread_lock
+
+  private:
+    Q_DISABLE_COPY(MythSocket)
 };
 
 #endif /* MYTH_SOCKET_H */
