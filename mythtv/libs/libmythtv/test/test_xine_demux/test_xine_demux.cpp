@@ -194,8 +194,11 @@ void TestXineDemux::test_captions_aqtitle(void)
     QCOMPARE(sub_data.format, FORMAT_AQTITLE);
     QCOMPARE(loaded, true);
     QCOMPARE(sub_data.num, 6);
-    QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(2));
-    QCOMPARE(sub_data.subtitles[4].text.size(), static_cast<size_t>(2));
+    QCOMPARE(sub_data.subtitles[0].text.size(), static_cast<size_t>(1));
+    QCOMPARE(sub_data.subtitles[1].text.size(), static_cast<size_t>(1));
+    QCOMPARE(sub_data.subtitles[2].text.size(), static_cast<size_t>(2));
+    QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(1));
+    QCOMPARE(sub_data.subtitles[4].text.size(), static_cast<size_t>(3));
     QCOMPARE(sub_data.subtitles[5].text.size(), static_cast<size_t>(1));
 }
 
