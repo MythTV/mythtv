@@ -44,17 +44,14 @@ MythTerminal::MythTerminal(MythScreenStack *parent, QString _program,
 
 void MythTerminal::TeardownAll(void)
 {
+    QMutexLocker locker(&m_lock);
     if (m_process)
     {
-        QMutexLocker locker(&m_lock);
-        if (m_process)
-        {
-            if (m_running)
-                Kill();
-            m_process->disconnect();
-            m_process->deleteLater();
-            m_process = nullptr;
-        }
+        if (m_running)
+            Kill();
+        m_process->disconnect();
+        m_process->deleteLater();
+        m_process = nullptr;
     }
 }
 
