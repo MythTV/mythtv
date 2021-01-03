@@ -1,5 +1,5 @@
 /*
- *  Class TextXineDemux
+ *  Class TestXineDemux
  *
  *  Copyright (c) David Hampton 2020
  *
@@ -22,7 +22,7 @@
 #include <iostream>
 #include "captions/xine_demux_sputext.h"
 
-class TextXineDemux : public QObject
+class TestXineDemux : public QObject
 {
     Q_OBJECT
 

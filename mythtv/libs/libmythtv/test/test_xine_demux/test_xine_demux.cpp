@@ -1,5 +1,5 @@
 /*
- *  Class TextXineDemux
+ *  Class TestXineDemux
  *
  *  Copyright (c) David Hampton 2020
  *
@@ -19,13 +19,13 @@
  */
 #include "test_xine_demux.h"
 
-void TextXineDemux::initTestCase()
+void TestXineDemux::initTestCase()
 {
     QDir::setCurrent("libmythtv/test/test_xine_demux");
 }
 
 
-void TextXineDemux::open_file(const QString& filename,
+void TestXineDemux::open_file(const QString& filename,
                               demux_sputext_t& sub_data,
                               bool& loaded)
 {
@@ -40,7 +40,7 @@ void TextXineDemux::open_file(const QString& filename,
     loaded = sub_read_file(&sub_data);
 }
 
-void TextXineDemux::test_captions_microdvd(void)
+void TestXineDemux::test_captions_microdvd(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -55,7 +55,7 @@ void TextXineDemux::test_captions_microdvd(void)
     QCOMPARE(sub_data.subtitles[16].text.size(), static_cast<size_t>(1));
 }
 
-void TextXineDemux::test_captions_srt(void)
+void TestXineDemux::test_captions_srt(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -69,7 +69,7 @@ void TextXineDemux::test_captions_srt(void)
     QVERIFY(!QString::fromStdString(sub_data.subtitles[3].text[1]).contains("</i>"));
 }
 
-void TextXineDemux::test_captions_subviewer_data(void)
+void TestXineDemux::test_captions_subviewer_data(void)
 {
     QTest::addColumn<QString>("filename");
     QTest::addColumn<int>("format");
@@ -78,7 +78,7 @@ void TextXineDemux::test_captions_subviewer_data(void)
     QTest::newRow("subviewer2") << "samples/subviewer2.sub" << FORMAT_SUBVIEWER2;
 }
 
-void TextXineDemux::test_captions_subviewer(void)
+void TestXineDemux::test_captions_subviewer(void)
 {
     QFETCH(QString, filename);
     QFETCH(int, format);
@@ -96,7 +96,7 @@ void TextXineDemux::test_captions_subviewer(void)
     QVERIFY(QString::fromStdString(sub_data.subtitles[2].text[0]).contains("String3"));
 }
 
-void TextXineDemux::test_captions_smi(void)
+void TestXineDemux::test_captions_smi(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -111,7 +111,7 @@ void TextXineDemux::test_captions_smi(void)
     QVERIFY(!QString::fromStdString(sub_data.subtitles[3].text[1]).contains("</i>"));
 }
 
-void TextXineDemux::test_captions_vplayer(void)
+void TestXineDemux::test_captions_vplayer(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -123,7 +123,7 @@ void TextXineDemux::test_captions_vplayer(void)
     QCOMPARE(sub_data.subtitles[3].text.size(), static_cast<size_t>(1));
 }
 
-void TextXineDemux::test_captions_rt(void)
+void TestXineDemux::test_captions_rt(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -134,7 +134,7 @@ void TextXineDemux::test_captions_rt(void)
     QCOMPARE(sub_data.num, 8);
 }
 
-void TextXineDemux::test_captions_ssa_ass_data(void)
+void TestXineDemux::test_captions_ssa_ass_data(void)
 {
     QTest::addColumn<QString>("filename");
     QTest::addColumn<int>("expectedLines");
@@ -144,7 +144,7 @@ void TextXineDemux::test_captions_ssa_ass_data(void)
     QTest::newRow("subtitles.ass")     << "samples/advancedssa.ass"        << 3;
 }
 
-void TextXineDemux::test_captions_ssa_ass(void)
+void TestXineDemux::test_captions_ssa_ass(void)
 {
     QFETCH(QString, filename);
     QFETCH(int, expectedLines);
@@ -161,7 +161,7 @@ void TextXineDemux::test_captions_ssa_ass(void)
 }
 
 // Phoenix Japanimation Society
-void TextXineDemux::test_captions_pjs(void)
+void TestXineDemux::test_captions_pjs(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -172,7 +172,7 @@ void TextXineDemux::test_captions_pjs(void)
     QCOMPARE(sub_data.num, 2);
 }
 
-void TextXineDemux::test_captions_mpsub(void)
+void TestXineDemux::test_captions_mpsub(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -185,7 +185,7 @@ void TextXineDemux::test_captions_mpsub(void)
     QCOMPARE(sub_data.subtitles[1].text.size(), static_cast<size_t>(2));
 }
 
-void TextXineDemux::test_captions_aqtitle(void)
+void TestXineDemux::test_captions_aqtitle(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -199,7 +199,7 @@ void TextXineDemux::test_captions_aqtitle(void)
     QCOMPARE(sub_data.subtitles[5].text.size(), static_cast<size_t>(1));
 }
 
-void TextXineDemux::test_captions_jaco(void)
+void TestXineDemux::test_captions_jaco(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -217,7 +217,7 @@ void TextXineDemux::test_captions_jaco(void)
     QCOMPARE(sub_data.subtitles[6].text.size(), static_cast<size_t>(2));
 }
 
-void TextXineDemux::test_captions_subrip09(void)
+void TestXineDemux::test_captions_subrip09(void)
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -231,7 +231,7 @@ void TextXineDemux::test_captions_subrip09(void)
     QVERIFY(QString::fromStdString(sub_data.subtitles[3].text[1]).contains("fleece"));
 }
 
-void TextXineDemux::test_captions_mpl2(void) // MPL
+void TestXineDemux::test_captions_mpl2(void) // MPL
 {
     demux_sputext_t sub_data {};
     bool loaded = false;
@@ -246,8 +246,8 @@ void TextXineDemux::test_captions_mpl2(void) // MPL
     QCOMPARE(sub_data.subtitles[5].text.size(), static_cast<size_t>(2));
 }
 
-void TextXineDemux::cleanupTestCase()
+void TestXineDemux::cleanupTestCase()
 {
 }
 
-QTEST_APPLESS_MAIN(TextXineDemux)
+QTEST_APPLESS_MAIN(TestXineDemux)
