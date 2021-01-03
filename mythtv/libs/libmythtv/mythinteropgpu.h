@@ -26,16 +26,16 @@ class MythInteropGPU : public QObject, public ReferenceCounter
     enum InteropType
     {
         Unsupported  = 0,
-        VAAPIGLXCOPY,
-        VAAPIGLXPIX,
-        VAAPIEGLDRM,
-        VTBOPENGL,
-        VTBSURFACE,
-        MEDIACODEC,
-        VDPAU,
-        NVDEC,
-        MMAL,
-        DRMPRIME,
+        GL_VAAPIGLXCOPY,
+        GL_VAAPIGLXPIX,
+        GL_VAAPIEGLDRM,
+        GL_VTB,
+        GL_VTBSURFACE,
+        GL_MEDIACODEC,
+        GL_VDPAU,
+        GL_NVDEC,
+        GL_MMAL,
+        GL_DRMPRIME,
         // used for default free/user_opaque storage
         DUMMY
     };

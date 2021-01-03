@@ -21,17 +21,17 @@ MythInteropGPU::InteropMap MythInteropGPU::GetTypes(MythRender* Render)
 
 QString MythInteropGPU::TypeToString(InteropType Type)
 {
-    if (Type == VAAPIEGLDRM)  return "VAAPI-DRM";
-    if (Type == VAAPIGLXPIX)  return "VAAPI-GLX-Pixmap";
-    if (Type == VAAPIGLXCOPY) return "VAAPI-GLX-Copy";
-    if (Type == VTBOPENGL)    return "VTB-OpenGL";
-    if (Type == VTBSURFACE)   return "VTB-IOSurface";
-    if (Type == MEDIACODEC)   return "MediaCodec-Surface";
-    if (Type == VDPAU)        return "VDPAU";
-    if (Type == NVDEC)        return "NVDEC";
-    if (Type == MMAL)         return "MMAL";
-    if (Type == DRMPRIME)     return "DRM-PRIME";
-    if (Type == DUMMY)        return "DUMMY";
+    if (Type == GL_VAAPIEGLDRM)  return "GL-VAAPI-DRM";
+    if (Type == GL_VAAPIGLXPIX)  return "GL-VAAPI-GLX-Pixmap";
+    if (Type == GL_VAAPIGLXCOPY) return "GL-VAAPI-GLX-Copy";
+    if (Type == GL_VTB)          return "GL-VTB";
+    if (Type == GL_VTBSURFACE)   return "GL-VTB-IOSurface";
+    if (Type == GL_MEDIACODEC)   return "GL-MediaCodec-Surface";
+    if (Type == GL_VDPAU)        return "GL-VDPAU";
+    if (Type == GL_NVDEC)        return "GL-NVDEC";
+    if (Type == GL_MMAL)         return "GL-MMAL";
+    if (Type == GL_DRMPRIME)     return "GL-DRM-PRIME";
+    if (Type == DUMMY)           return "DUMMY";
     return "Unsupported";
 }
 

@@ -15,7 +15,7 @@ extern "C" {
 #define LOC QString("VAAPIDRM: ")
 
 MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythPlayerUI *Player, MythRenderOpenGL* Context)
-  : MythVAAPIInterop(Player, Context, VAAPIEGLDRM),
+  : MythVAAPIInterop(Player, Context, GL_VAAPIEGLDRM),
     MythEGLDMABUF(Context)
 {
     QString device = gCoreContext->GetSetting("VAAPIDevice");

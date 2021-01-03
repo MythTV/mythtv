@@ -28,7 +28,7 @@ MythMediaCodecInterop* MythMediaCodecInterop::CreateMediaCodec(MythPlayerUI* Pla
 }
 
 MythMediaCodecInterop::MythMediaCodecInterop(MythPlayerUI* Player, MythRenderOpenGL* Context)
-  : MythOpenGLInterop(Context, MEDIACODEC, Player),
+  : MythOpenGLInterop(Context, GL_MEDIACODEC, Player),
     m_frameWait(),
     m_frameWaitLock(),
     m_colourSpaceInitialised(false),

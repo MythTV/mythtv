@@ -212,7 +212,7 @@ int MythVAAPIInteropGLX::SetPictureAttribute(PictureAttribute Attribute, int Val
 }
 
 MythVAAPIInteropGLXCopy::MythVAAPIInteropGLXCopy(MythPlayerUI* Player, MythRenderOpenGL* Context)
-  : MythVAAPIInteropGLX(Player, Context, VAAPIGLXCOPY)
+  : MythVAAPIInteropGLX(Player, Context, GL_VAAPIGLXCOPY)
 {
     Display *display = glXGetCurrentDisplay();
     if (!display)
@@ -309,7 +309,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenG
 }
 
 MythVAAPIInteropGLXPixmap::MythVAAPIInteropGLXPixmap(MythPlayerUI* Player, MythRenderOpenGL* Context)
-  : MythVAAPIInteropGLX(Player, Context, VAAPIGLXPIX)
+  : MythVAAPIInteropGLX(Player, Context, GL_VAAPIGLXPIX)
 {
     m_vaDisplay = vaGetDisplay(glXGetCurrentDisplay());
     if (!m_vaDisplay)

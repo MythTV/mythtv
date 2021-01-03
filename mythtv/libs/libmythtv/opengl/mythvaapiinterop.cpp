@@ -45,14 +45,14 @@ void MythVAAPIInterop::GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::
 #ifdef USING_EGL
     // zero copy
     if (egl && MythVAAPIInteropDRM::IsSupported(Context))
-        vaapitypes.emplace_back(VAAPIEGLDRM);
+        vaapitypes.emplace_back(GL_VAAPIEGLDRM);
 #endif
     // 1x copy
     if (!egl && !wayland && MythVAAPIInteropGLXPixmap::IsSupported(Context))
-        vaapitypes.emplace_back(VAAPIGLXPIX);
+        vaapitypes.emplace_back(GL_VAAPIGLXPIX);
     // 2x copy
     if (!egl && !opengles && !wayland)
-        vaapitypes.emplace_back(VAAPIGLXCOPY);
+        vaapitypes.emplace_back(GL_VAAPIGLXCOPY);
 
     if (!vaapitypes.empty())
         Types[FMT_VAAPI] = vaapitypes;
@@ -70,12 +70,12 @@ MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythPlayerUI *Player, MythRender
         for (auto type : vaapi->second)
         {
 #ifdef USING_EGL
-            if (type == VAAPIEGLDRM)
+            if (type == GL_VAAPIEGLDRM)
                 return new MythVAAPIInteropDRM(Player, Context);
 #endif
-            if (type == VAAPIGLXPIX)
+            if (type == GL_VAAPIGLXPIX)
                 return new MythVAAPIInteropGLXPixmap(Player, Context);
-            if (type == VAAPIGLXCOPY)
+            if (type == GL_VAAPIGLXCOPY)
                 return new MythVAAPIInteropGLXCopy(Player, Context);
         }
     }

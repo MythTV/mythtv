@@ -11,7 +11,7 @@ extern "C" {
 #define LOC QString("DRMInterop: ")
 
 MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL* Context, MythPlayerUI* Player)
-  : MythOpenGLInterop(Context, DRMPRIME, Player),
+  : MythOpenGLInterop(Context, GL_DRMPRIME, Player),
     MythEGLDMABUF(Context)
 {
 }
@@ -61,7 +61,7 @@ MythDRMPRIMEInterop* MythDRMPRIMEInterop::CreateDRM(MythRenderOpenGL* Context, M
 void MythDRMPRIMEInterop::GetDRMTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types)
 {
     if (HaveDMABuf(Render))
-        Types[FMT_DRMPRIME] = { DRMPRIME };
+        Types[FMT_DRMPRIME] = { GL_DRMPRIME };
 }
 
 AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Context, MythVideoFrame *Frame)

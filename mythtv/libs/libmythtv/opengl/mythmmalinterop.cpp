@@ -13,7 +13,7 @@ extern "C" {
 #define LOC QString("MMALInterop: ")
 
 MythMMALInterop::MythMMALInterop(MythRenderOpenGL *Context)
-  : MythOpenGLInterop(Context, MMAL)
+  : MythOpenGLInterop(Context, GL_MMAL)
 {
 }
 
@@ -38,7 +38,7 @@ void MythMMALInterop::GetMMALTypes(MythRenderOpenGL* Render, MythInteropGPU::Int
     }
 
     if (Render->hasExtension("GL_OES_EGL_image"))
-        Types[FMT_MMAL] = { MMAL };
+        Types[FMT_MMAL] = { GL_MMAL };
 }
 
 /*! \brief Create an MMAL interop

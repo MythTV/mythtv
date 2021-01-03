@@ -21,7 +21,7 @@
 }
 
 MythNVDECInterop::MythNVDECInterop(MythPlayerUI* Player, MythRenderOpenGL* Context)
-  : MythOpenGLInterop(Context, NVDEC, Player),
+  : MythOpenGLInterop(Context, GL_NVDEC, Player),
     m_cudaContext()
 {
     InitialiseCuda();
@@ -85,7 +85,7 @@ MythNVDECInterop* MythNVDECInterop::CreateNVDEC(MythPlayerUI* Player, MythRender
     if (auto nvdec = types.find(FMT_NVDEC); nvdec != types.end())
     {
         for (auto type : nvdec->second)
-            if (type == NVDEC)
+            if (type == GL_NVDEC)
                 return new MythNVDECInterop(Player, Context);
     }
     return nullptr;
@@ -94,7 +94,7 @@ MythNVDECInterop* MythNVDECInterop::CreateNVDEC(MythPlayerUI* Player, MythRender
 void MythNVDECInterop::GetNVDECTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types)
 {
     if (Render)
-        Types[FMT_NVDEC] = { NVDEC };
+        Types[FMT_NVDEC] = { GL_NVDEC };
 }
 
 /*! \brief Map CUDA video memory to OpenGL textures.

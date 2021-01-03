@@ -18,7 +18,7 @@ MythVDPAUInterop* MythVDPAUInterop::CreateVDPAU(MythPlayerUI* Player,
     if (auto vdpau = types.find(FMT_VDPAU); vdpau != types.end())
     {
         for (auto type : vdpau->second)
-            if (type == VDPAU)
+            if (type == GL_VDPAU)
                 return new MythVDPAUInterop(Player, Context, CodecId);
     }
     return nullptr;
@@ -30,14 +30,14 @@ void MythVDPAUInterop::GetVDPAUTypes(MythRenderOpenGL* Render, MythInteropGPU::I
         return;
     if (Render->hasExtension("GL_NV_vdpau_interop"))
     {
-        Types[FMT_VDPAU] = { VDPAU };
+        Types[FMT_VDPAU] = { GL_VDPAU };
         return;
     }
     LOG(VB_GENERAL, LOG_WARNING, LOC + "GL_NV_vdpau_interop is not available");
 }
 
 MythVDPAUInterop::MythVDPAUInterop(MythPlayerUI *Player, MythRenderOpenGL* Context, MythCodecID CodecId)
-  : MythOpenGLInterop(Context, VDPAU, Player),
+  : MythOpenGLInterop(Context, GL_VDPAU, Player),
     m_codec(CodecId)
 {
 }
