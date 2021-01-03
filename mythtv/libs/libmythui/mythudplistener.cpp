@@ -9,45 +9,50 @@
 #include "mythmainwindow.h"
 #include "mythudplistener.h"
 
+// Std
+#include <thread>
+
 #define LOC QString("UDPListener: ")
 
 MythUDPListener::MythUDPListener()
 {
-    Enable();
+    connect(this, &MythUDPListener::EnableUDPListener, this, &MythUDPListener::DoEnable);
 }
 
 MythUDPListener::~MythUDPListener()
 {
-    Disable();
+    DoEnable(false);
 }
 
-void MythUDPListener::Enable()
+void MythUDPListener::DoEnable(bool Enable)
 {
-    if (m_socketPool)
-        return;
-
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Enabling");
-    m_socketPool = new ServerPool(this);
-    connect(m_socketPool, &ServerPool::newDatagram, this, &MythUDPListener::Process);
-    QList<QHostAddress> addrs = ServerPool::DefaultListen();
-    addrs << ServerPool::DefaultBroadcast();
-    auto port = static_cast<uint16_t>(gCoreContext->GetNumSetting("UDPNotifyPort", 0));
-    if (!m_socketPool->bind(addrs, port, false))
+    if (Enable)
     {
+        if (m_socketPool)
+            return;
+
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Enabling");
+        m_socketPool = new ServerPool(this);
+        connect(m_socketPool, &ServerPool::newDatagram, this, &MythUDPListener::Process);
+        QList<QHostAddress> addrs = ServerPool::DefaultListen();
+        addrs << ServerPool::DefaultBroadcast();
+        auto port = static_cast<uint16_t>(gCoreContext->GetNumSetting("UDPNotifyPort", 0));
+        if (!m_socketPool->bind(addrs, port, false))
+        {
+            delete m_socketPool;
+            m_socketPool = nullptr;
+        }
+    }
+    else
+    {
+        if (!m_socketPool)
+            return;
+
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling");
+        m_socketPool->close();
         delete m_socketPool;
         m_socketPool = nullptr;
     }
-}
-
-void MythUDPListener::Disable()
-{
-    if (!m_socketPool)
-        return;
-
-    LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling");
-    m_socketPool->close();
-    delete m_socketPool;
-    m_socketPool = nullptr;
 }
 
 void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Sender*/,
@@ -161,4 +166,50 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
             qApp->postEvent(GetMythMainWindow(), new MythEvent(MythEvent::MythUserMessage, msg, args));
         }
     }
+}
+
+void MythUDP::EnableUDPListener(bool Enable)
+{
+    emit Instance().m_listener->EnableUDPListener(Enable);
+}
+
+MythUDP& MythUDP::Instance()
+{
+    static MythUDP s_instance;
+    return s_instance;
+}
+
+MythUDP::MythUDP()
+  : m_listener(new MythUDPListener),
+    m_thread(new MThread("UDP"))
+{
+    m_listener->moveToThread(m_thread->qthread());
+    m_thread->start();
+    do { std::this_thread::sleep_for(std::chrono::microseconds(5)); }
+    while (!m_thread->qthread()->isRunning());
+}
+
+MythUDP::~MythUDP()
+{
+    if (m_thread)
+    {
+        m_thread->quit();
+        m_thread->wait();
+    }
+    delete m_thread;
+    delete m_listener;
+}
+
+void MythUDP::StopUDPListener()
+{
+    if (Instance().m_thread)
+    {
+        Instance().m_thread->quit();
+        Instance().m_thread->wait();
+        delete Instance().m_thread;
+        Instance().m_thread = nullptr;
+    }
+
+    delete Instance().m_listener;
+    Instance().m_listener = nullptr;
 }

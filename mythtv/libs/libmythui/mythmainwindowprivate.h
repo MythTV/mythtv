@@ -7,7 +7,6 @@
 #include "mythgesture.h"
 
 class MythScreenStack;
-class MythUDPListener;
 class MythMediaDevice;
 
 class KeyContext
@@ -77,7 +76,6 @@ class MythMainWindowPrivate
     QTimer          *m_hideMouseTimer    { nullptr };
     QMutex           m_drawDisableLock;
     uint             m_drawDisabledDepth { 0       };
-    MythUDPListener *m_udpListener       { nullptr };
     MythNotificationCenter *m_nc         { nullptr };
     bool             m_standby           { false   };
     bool             m_enteringStandby   { false   };
