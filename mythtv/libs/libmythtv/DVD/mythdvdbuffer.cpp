@@ -15,6 +15,7 @@
 #include "mythdvdbuffer.h"
 
 // Std
+#include <thread>
 #include <algorithm>
 
 #define LOC QString("DVDRB: ")
@@ -501,9 +502,8 @@ void MythDVDBuffer::WaitForPlayer(void)
         int count = 0;
         while (m_playerWait && count++ < 200)
         {
-            const struct timespec tenms {0, 10000000};
             m_rwLock.unlock();
-            nanosleep(&tenms, nullptr);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             m_rwLock.lockForWrite();
         }
 
@@ -517,14 +517,13 @@ void MythDVDBuffer::WaitForPlayer(void)
 
 int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
 {
-    uint8_t*        blockBuf     = nullptr;
-    uint            tot          = 0;
-    int             needed       = static_cast<int>(Size);
-    char           *dest         = static_cast<char*>(Buffer);
-    int             offset       = 0;
-    bool            reprocessing = false;
-    bool            waiting      = false;
-    const struct timespec tenms {0, 10000000};
+    uint8_t* blockBuf  = nullptr;
+    uint  tot          = 0;
+    int   needed       = static_cast<int>(Size);
+    char* dest         = static_cast<char*>(Buffer);
+    int   offset       = 0;
+    bool  reprocessing = false;
+    bool  waiting      = false;
 
     if (m_gotStop)
     {
@@ -999,7 +998,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         // pause a little as the dvdnav VM will continue to return
                         // this event until it has been skipped
                         m_rwLock.unlock();
-                        nanosleep(&tenms, nullptr);
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
                         m_rwLock.lockForWrite();
 
                         // when scanning the file or exiting playback, skip immediately
@@ -1055,7 +1054,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         {
                             m_dvdWaiting = true;
                             m_rwLock.unlock();
-                            nanosleep(&tenms, nullptr);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
                             m_rwLock.lockForWrite();
                         }
 

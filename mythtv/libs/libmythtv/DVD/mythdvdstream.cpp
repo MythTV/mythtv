@@ -242,7 +242,7 @@ int MythDVDStream::SafeRead(void *Buffer, uint Size)
         }
 
         m_pos += static_cast<uint>(ret2);
-        ret += ret2;;
+        ret += ret2;
     }
 
     return ret * DVD_VIDEO_LB_LEN;
