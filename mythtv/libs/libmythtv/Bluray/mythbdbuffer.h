@@ -48,7 +48,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     uint32_t  GetNumTitles       (void) const;
     int       GetCurrentTitle    (void);
     uint64_t  GetCurrentAngle    (void) const;
-    int       GetTitleDuration   (int Title);
+    std::chrono::seconds  GetTitleDuration   (int Title);
     uint64_t  GetTitleSize       (void) const;
     std::chrono::seconds  GetTotalTimeOfTitle(void) const;
     std::chrono::seconds  GetCurrentTime     (void) const;

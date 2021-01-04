@@ -388,7 +388,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     int  GetCurrentChapter();
     int  GetNumTitles();
     int  GetCurrentTitle();
-    int  GetTitleDuration(int Title);
+    std::chrono::seconds  GetTitleDuration(int Title);
     QString GetTitleName(int Title);
     void DoSwitchTitle(int Title);
     int  GetNumAngles();

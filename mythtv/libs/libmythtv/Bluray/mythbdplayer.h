@@ -23,7 +23,7 @@ class MythBDPlayer : public MythPlayerUI
     int      GetNumAngles      (void) const override;
     int      GetCurrentTitle   (void) const override;
     int      GetCurrentAngle   (void) const override;
-    int      GetTitleDuration  (int Title) const override;
+    std::chrono::seconds  GetTitleDuration  (int Title) const override;
     QString  GetTitleName      (int Title) const override;
     QString  GetAngleName      (int Angle) const override;
     bool     SwitchTitle       (int Title) override;

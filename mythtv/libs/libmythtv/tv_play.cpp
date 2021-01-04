@@ -5432,9 +5432,9 @@ QString TV::GetAngleName(int Angle)
     return name;
 }
 
-int TV::GetTitleDuration(int Title)
+std::chrono::seconds TV::GetTitleDuration(int Title)
 {
-    int seconds = 0;
+    std::chrono::seconds seconds = 0s;
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     if (m_player)
         seconds = m_player->GetTitleDuration(Title);
@@ -8769,7 +8769,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
     {
         for (int i = 0; i < m_tvmNumTitles; i++)
         {
-            if (GetTitleDuration(i) < 120) // Ignore < 2 minutes long
+            if (GetTitleDuration(i) < 2min) // Ignore < 2 minutes long
                 continue;
 
             QString titleIdx = QString("%1").arg(i, 3, 10, QChar(48));

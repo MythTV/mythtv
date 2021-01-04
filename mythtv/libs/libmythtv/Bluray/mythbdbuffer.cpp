@@ -601,18 +601,18 @@ uint64_t MythBDBuffer::GetCurrentAngle(void) const
     return static_cast<uint64_t>(m_currentAngle);
 }
 
-int MythBDBuffer::GetTitleDuration(int Title)
+std::chrono::seconds MythBDBuffer::GetTitleDuration(int Title)
 {
     QMutexLocker locker(&m_infoLock);
     auto numTitles = GetNumTitles();
     if (!(numTitles > 0 && Title >= 0 && Title < static_cast<int>(numTitles)))
-        return 0;
+        return 0s;
 
     BLURAY_TITLE_INFO *info = GetTitleInfo(static_cast<uint32_t>(Title));
     if (!info)
-        return 0;
+        return 0s;
 
-    return static_cast<int>(static_cast<double>(info->duration) / 90000.0);
+    return secondsFromFloat(static_cast<double>(info->duration) / 90000.0);
 }
 
 uint64_t MythBDBuffer::GetTitleSize(void) const

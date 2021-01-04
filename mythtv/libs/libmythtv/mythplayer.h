@@ -221,7 +221,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Title public stuff
     virtual int GetNumTitles(void) const { return 0; }
     virtual int GetCurrentTitle(void) const { return 0; }
-    virtual int GetTitleDuration(int /*title*/) const { return 0; }
+    virtual std::chrono::seconds GetTitleDuration(int /*title*/) const { return 0s; }
     virtual QString GetTitleName(int /*title*/) const { return QString(); }
 
     // Angle public stuff
