@@ -890,8 +890,7 @@ int lirc_readconfig(const struct lirc_state *state,
 		lirc_freeconfig(*config);
 		return -1;
 	}
-	close(sockfd);
-	sockfd = -1;
+    close(sockfd);
 	
 	/* launch lircrcd */
     sha_bang2=sha_bang;
