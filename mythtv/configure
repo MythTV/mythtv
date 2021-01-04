@@ -136,7 +136,7 @@ Advanced options (experts only):
   --disable-x11            disable X11 support
   --enable-opengles        link to OpenGL ES (auto)
   --enable-vulkan          enable Vulkan rendering
-  --enable-waylandextras   enable optional Wayland integrations (requires Qt private headers)
+  --disable-waylandextras  disable optional Wayland integrations (requires Qt private headers)
   --enable-libglslang      enable runtime GLSL compilation for Vulkan (development only)
   --x11-path=X11LOC        location of X11 include files [$x11_path_default]
   --disable-vdpau          disable NVidia VDPAU hardware acceleration.
@@ -2803,6 +2803,7 @@ enable systemd_notify
 enable systemd_journal
 enable libexiv2_external
 enable libbluray_external
+enable waylandextras
 
 # mythtv paths
 dvb_path_default="${sysinclude:-$sysroot/usr/include}"
@@ -3023,7 +3024,7 @@ for opt do
         ;;
         --enable-vulkan) enable vulkan
         ;;
-        --enable-waylandextras) enable waylandextras
+        --disable-waylandextras) disable waylandextras
         ;;
         --enable-libglslang) enable libglslang
         ;;
@@ -6604,10 +6605,19 @@ esac
 
 enabled vulkan && enabled libglslang && require_cpp libglslang glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${EXTRA_GLSLANG_LIBS:-} -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread
 
-# TODO This only checks for Wayland support but we also need to check for Qt private
-# headers - but I can't see how to do that here (private headers are normally
-# enabled in the .pro)
+# Check for Wayland support and Qt private headers
 enabled waylandextras && use_pkg_config wayland_client wayland-client "wayland-client.h" wl_surface_set_opaque_region || disable waylandextras
+if enabled waylandextras ; then
+    cat >$TMPPRO <<EOF
+QT += gui-private
+EOF
+    qt_private_headers_incpath=`${qmakeconf} -makefile -Wnone -nocache -nomoc -nodepend -norecursive -o - $TMPPRO 2>/dev/null | sed -n -e 's/^\s*INCPATH\s*=//p'`
+    check_ecxx $qt_private_headers_incpath <<EOF || disable waylandextras
+    #include <QGuiApplication>
+    #include <qpa/qplatformnativeinterface.h>
+    int x;
+EOF
+fi
 
 enable enforce_wshadow
 case $target_os in
