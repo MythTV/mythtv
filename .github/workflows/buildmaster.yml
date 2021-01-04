@@ -45,7 +45,6 @@ jobs:
         sudo apt install libass-dev libpulse-dev libcec-dev libfftw3-dev libssl-dev libtag1-dev libbluray-dev libbluray-bdj libgnutls28-dev libqt5webkit5-dev
         sudo apt install libvpx-dev python3-mysqldb python3-lxml python3-simplejson python3-future libdbi-perl libdbd-mysql-perl libnet-upnp-perl
         sudo apt install libio-socket-inet6-perl libxml-simple-perl libqt5sql5-mysql libwayland-dev qtbase5-private-dev
-        echo "MYTHTV_CORE_CONFIG=--enable-waylandextras" >> $GITHUB_ENV
       if: runner.os == 'Linux'
       
     - name: Install core dependencies (macOS)
@@ -57,7 +56,7 @@ jobs:
       
     - name: Configure core
       working-directory: ./mythtv
-      run: ./configure $MYTHTV_CONFIG $MYTHTV_CORE_CONFIG --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan
+      run: ./configure $MYTHTV_CONFIG --enable-libmp3lame --enable-libvpx --enable-libx264 --enable-libx265 --enable-bdjava --enable-vulkan
       
     - name: Make core
       working-directory: ./mythtv
