@@ -1927,11 +1927,11 @@ void MythMainWindow::customEvent(QEvent* Event)
     }
     else if (Event->type() == MythEvent::kDisableUDPListenerEventType)
     {
-        MythUDP::EnableUDPListener();
+        MythUDP::EnableUDPListener(false);
     }
     else if (Event->type() == MythEvent::kEnableUDPListenerEventType)
     {
-        MythUDP::EnableUDPListener(false);
+        MythUDP::EnableUDPListener(true);
     }
     else if (Event->type() == MythEvent::MythEventMessage)
     {
