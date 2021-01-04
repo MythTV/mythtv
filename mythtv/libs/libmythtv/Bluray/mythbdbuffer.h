@@ -70,7 +70,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     int       GetAudioLanguage   (uint StreamID);
     int       GetSubtitleLanguage(uint StreamID);
     void      Close              (void);
-    bool      GoToMenu           (const QString &Menu, int64_t Pts);
+    bool      GoToMenu           (const QString &Menu, mpeg::chrono::pts Pts);
     bool      SwitchTitle        (uint32_t Index);
     bool      SwitchPlaylist     (uint32_t Index);
     bool      SwitchAngle        (uint Angle);
@@ -101,12 +101,11 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     bool               m_firstPlaySupported          { false   };
     uint32_t           m_numTitles                   { 0       };
     uint32_t           m_mainTitle                   { 0       };
-    uint64_t           m_currentTitleLength          { 0       };
+    mpeg::chrono::pts  m_currentTitleLength          { 0_pts   };
     BLURAY_TITLE_INFO *m_currentTitleInfo            { nullptr };
     uint64_t           m_titlesize                   { 0       };
     uint64_t           m_currentTitleAngleCount      { 0       };
-    // Current time in 1/90th of a millisecond
-    uint64_t           m_currentTime                 { 0       };
+    mpeg::chrono::pts  m_currentTime                 { 0_pts   };
     int                m_imgHandle                   { -1      };
     int                m_currentTitle                { -1      };
     int                m_currentPlaylist             { 0       };
@@ -127,7 +126,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     QMutex             m_overlayLock;
     QList<MythBDOverlay*>   m_overlayImages;
     QVector<MythBDOverlay*> m_overlayPlanes;
-    int                m_stillTime                   { 0       };
+    std::chrono::seconds    m_stillTime              { 0       };
     int                m_stillMode                   { BLURAY_STILL_NONE};
     BD_EVENT           m_lastEvent                   { BD_EVENT_NONE, 0};
     QByteArray         m_pendingData;

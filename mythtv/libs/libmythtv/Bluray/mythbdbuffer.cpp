@@ -142,7 +142,7 @@ long long MythBDBuffer::SeekInternal(long long Position, int Whence)
     else
     {
         SeekInternal(static_cast<uint64_t>(newposition));
-        m_currentTime = bd_tell_time(m_bdnav);
+        m_currentTime = mpeg::chrono::pts(bd_tell_time(m_bdnav));
         ret = newposition;
     }
 
@@ -447,9 +447,9 @@ bool MythBDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds /
         .arg(discinfo->bdplus_handled ? "yes" : "no"));
 
     m_mainTitle = 0;
-    m_currentTitleLength = 0;
+    m_currentTitleLength = 0_pts;
     m_titlesize = 0;
-    m_currentTime = 0;
+    m_currentTime = 0_pts;
     m_currentTitleInfo = nullptr;
     m_currentTitleAngleCount = 0;
     m_processState = PROCESS_NORMAL;
@@ -472,7 +472,7 @@ bool MythBDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds /
     m_secondaryVideoEnabled = false;
     m_secondaryVideoIsFullscreen = false;
     m_stillMode = BLURAY_STILL_NONE;
-    m_stillTime = 0;
+    m_stillTime = 0s;
     m_timeDiff = 0;
     m_inMenu = false;
 
@@ -566,7 +566,8 @@ std::chrono::milliseconds MythBDBuffer::GetChapterStartTimeMs(uint32_t Chapter)
     if (Chapter >= GetNumChapters())
         return 0ms;
     QMutexLocker locker(&m_infoLock);
-    return std::chrono::milliseconds(m_currentTitleInfo->chapters[Chapter].start / 90);
+    auto start = mpeg::chrono::pts(m_currentTitleInfo->chapters[Chapter].start);
+    return duration_cast<std::chrono::milliseconds>(start);
 }
 
 std::chrono::seconds MythBDBuffer::GetChapterStartTime(uint32_t Chapter)
@@ -574,7 +575,8 @@ std::chrono::seconds MythBDBuffer::GetChapterStartTime(uint32_t Chapter)
     if (Chapter >= GetNumChapters())
         return 0s;
     QMutexLocker locker(&m_infoLock);
-    return std::chrono::seconds(m_currentTitleInfo->chapters[Chapter].start / 90000);
+    auto start = mpeg::chrono::pts(m_currentTitleInfo->chapters[Chapter].start);
+    return duration_cast<std::chrono::seconds>(start);
 }
 
 uint64_t MythBDBuffer::GetChapterStartFrame(uint32_t Chapter)
@@ -612,7 +614,7 @@ std::chrono::seconds MythBDBuffer::GetTitleDuration(int Title)
     if (!info)
         return 0s;
 
-    return secondsFromFloat(static_cast<double>(info->duration) / 90000.0);
+    return duration_cast<std::chrono::seconds>(mpeg::chrono::pts(info->duration));
 }
 
 uint64_t MythBDBuffer::GetTitleSize(void) const
@@ -622,12 +624,12 @@ uint64_t MythBDBuffer::GetTitleSize(void) const
 
 std::chrono::seconds MythBDBuffer::GetTotalTimeOfTitle(void) const
 {
-    return std::chrono::seconds(m_currentTitleLength / 90000);
+    return duration_cast<std::chrono::seconds>(m_currentTitleLength);
 }
 
 std::chrono::seconds MythBDBuffer::GetCurrentTime(void) const
 {
-    return std::chrono::seconds(m_currentTime / 90000);
+    return duration_cast<std::chrono::seconds>(m_currentTime);
 }
 
 bool MythBDBuffer::SwitchTitle(uint32_t Index)
@@ -708,14 +710,14 @@ bool MythBDBuffer::UpdateTitleInfo(void)
         return false;
 
     m_titleChanged = true;
-    m_currentTitleLength = m_currentTitleInfo->duration;
+    m_currentTitleLength = mpeg::chrono::pts(m_currentTitleInfo->duration);
     m_currentTitleAngleCount = m_currentTitleInfo->angle_count;
     m_currentAngle = 0;
     m_currentPlayitem = 0;
     m_timeDiff = 0;
     m_titlesize = bd_get_title_size(m_bdnav);
     uint32_t chapter_count = GetNumChapters();
-    auto total_msecs = std::chrono::milliseconds(m_currentTitleLength / 90);
+    auto total_msecs = duration_cast<std::chrono::milliseconds>(m_currentTitleLength);
     auto duration = MythFormatTimeMs(total_msecs, "HH:mm:ss.zzz");
     duration.chop(2); // Chop 2 to show tenths
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New title info: Index %1 Playlist: %2 Duration: %3 ""Chapters: %5")
@@ -734,7 +736,7 @@ bool MythBDBuffer::UpdateTitleInfo(void)
     }
 
     int still = BLURAY_STILL_NONE;
-    int time  = 0;
+    std::chrono::seconds time  = 0s;
     if (m_currentTitleInfo->clip_count)
     {
         for (uint i = 0; i < m_currentTitleInfo->clip_count; i++)
@@ -747,7 +749,7 @@ bool MythBDBuffer::UpdateTitleInfo(void)
                     .arg(m_currentTitleInfo->clips[i].audio_stream_count)
                     .arg(m_currentTitleInfo->clips[i].ig_stream_count));
             still |= m_currentTitleInfo->clips[i].still_mode;
-            time = m_currentTitleInfo->clips[i].still_time;
+            time = std::chrono::seconds(m_currentTitleInfo->clips[i].still_time);
         }
     }
 
@@ -759,7 +761,7 @@ bool MythBDBuffer::UpdateTitleInfo(void)
 
     if (still == BLURAY_STILL_TIME)
     {
-        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Entering still frame (%1 seconds) UNSUPPORTED").arg(time));
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Entering still frame (%1 seconds) UNSUPPORTED").arg(time.count()));
         bd_read_skip_still(m_bdnav);
     }
     else if (still == BLURAY_STILL_INFINITE)
@@ -861,7 +863,7 @@ int MythBDBuffer::SafeRead(void *Buffer, uint Size)
     if (result < 0)
         StopReads();
 
-    m_currentTime = bd_tell_time(m_bdnav);
+    m_currentTime = mpeg::chrono::pts(bd_tell_time(m_bdnav));
     return result;
 }
 
@@ -947,9 +949,9 @@ void MythBDBuffer::ClickButton(int64_t Pts, uint16_t X, uint16_t Y)
 
 /** \brief jump to a Blu-ray root or popup menu
  */
-bool MythBDBuffer::GoToMenu(const QString &Menu, int64_t Pts)
+bool MythBDBuffer::GoToMenu(const QString &Menu, mpeg::chrono::pts Pts)
 {
-    if (!m_isHDMVNavigation || Pts < 0)
+    if (!m_isHDMVNavigation || Pts < 0_pts)
         return false;
 
     if (!m_topMenuSupported)
@@ -962,15 +964,15 @@ bool MythBDBuffer::GoToMenu(const QString &Menu, int64_t Pts)
 
     if (Menu.compare("root") == 0)
     {
-        if (bd_menu_call(m_bdnav, Pts))
+        if (bd_menu_call(m_bdnav, Pts.count()))
         {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC +QString("Invoked Top Menu (pts %1)").arg(Pts));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC +QString("Invoked Top Menu (pts %1)").arg(Pts.count()));
             return true;
         }
     }
     else if (Menu.compare("popup") == 0)
     {
-        PressButton(BD_VK_POPUP, Pts);
+        PressButton(BD_VK_POPUP, Pts.count());
         return true;
     }
 
@@ -1163,7 +1165,7 @@ void MythBDBuffer::HandleBDEvent(BD_EVENT &Event)
 
 bool MythBDBuffer::IsInStillFrame(void) const
 {
-    return m_stillTime > 0 && m_stillMode != BLURAY_STILL_NONE;
+    return m_stillTime > 0s && m_stillMode != BLURAY_STILL_NONE;
 }
 
 /**
@@ -1264,10 +1266,10 @@ bool MythBDBuffer::GetNameAndSerialNum(QString &Name, QString &SerialNum)
 bool MythBDBuffer::GetBDStateSnapshot(QString& State)
 {
     int      title = GetCurrentTitle();
-    uint64_t time  = m_currentTime;
+    mpeg::chrono::pts time  = m_currentTime;
     uint64_t angle = GetCurrentAngle();
     if (title >= 0)
-        State = QString("title:%1,time:%2,angle:%3").arg(title).arg(time).arg(angle);
+        State = QString("title:%1,time:%2,angle:%3").arg(title).arg(time.count()).arg(angle);
     else
         State.clear();
     return !State.isEmpty();

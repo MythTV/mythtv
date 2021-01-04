@@ -31,10 +31,10 @@ bool MythBDPlayer::GoToMenu(const QString& Menu)
     if (!(m_playerCtx->m_buffer->BD() && m_videoOutput))
         return false;
 
-    int64_t pts = 0;
+    mpeg::chrono::pts pts = 0_pts;
     MythVideoFrame *frame = m_videoOutput->GetLastShownFrame();
     if (frame)
-        pts = static_cast<int64_t>(frame->m_timecode.count()  * 90);
+        pts = duration_cast<mpeg::chrono::pts>(frame->m_timecode);
     return m_playerCtx->m_buffer->BD()->GoToMenu(Menu, pts);
 }
 
