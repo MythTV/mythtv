@@ -234,17 +234,42 @@ QString JSONSerializer::Encode(const QString &sIn)
 
     sStr.replace( '\\', "\\\\" ); // This must be first
     sStr.replace( '"' , "\\\"" ); 
-    sStr.replace( '\b', "\\b"  );
-    sStr.replace( '\f', "\\f"  );
-    sStr.replace( '\n', "\\n"  );
-    sStr.replace( "\r", "\\r"  );
-    sStr.replace( "\t", "\\t"  );
+    sStr.replace( '\b', "\\b"  ); // ^H (\u0008)
+    sStr.replace( '\f', "\\f"  ); // ^L (\u000C)
+    sStr.replace( '\n', "\\n"  ); // ^J (\u000A)
+    sStr.replace( "\r", "\\r"  ); // ^M (\u000D)
+    sStr.replace( "\t", "\\t"  ); // ^I (\u0009)
     sStr.replace(  "/", "\\/"  );
 
-    // Officially we need to handle \u0000 - \u001F, but only a limited
-    // number are actually used in the wild.
-    sStr.replace(QChar('\u0011'), "\\u0011"); // XON  ^Q
-    sStr.replace(QChar('\u0013'), "\\u0013"); // XOFF ^S
+    // Escape remaining chars from \u0000 - \u001F
+    // Details at https://en.wikipedia.org/wiki/C0_and_C1_control_codes
+    sStr.replace(QChar('\u0000'), "\\u0000"); // ^@ NULL
+    sStr.replace(QChar('\u0001'), "\\u0001"); // ^A
+    sStr.replace(QChar('\u0002'), "\\u0002"); // ^B
+    sStr.replace(QChar('\u0003'), "\\u0003"); // ^C
+    sStr.replace(QChar('\u0004'), "\\u0004"); // ^D
+    sStr.replace(QChar('\u0005'), "\\u0005"); // ^E
+    sStr.replace(QChar('\u0006'), "\\u0006"); // ^F
+    sStr.replace(QChar('\u0007'), "\\u0007"); // ^G (\a)
+    sStr.replace(QChar('\u000B'), "\\u000B"); // ^K (\v)
+    sStr.replace(QChar('\u000E'), "\\u000E"); // ^N
+    sStr.replace(QChar('\u000F'), "\\u000F"); // ^O
+    sStr.replace(QChar('\u0010'), "\\u0010"); // ^P
+    sStr.replace(QChar('\u0011'), "\\u0011"); // ^Q XON
+    sStr.replace(QChar('\u0012'), "\\u0012"); // ^R
+    sStr.replace(QChar('\u0013'), "\\u0013"); // ^S XOFF
+    sStr.replace(QChar('\u0014'), "\\u0014"); // ^T
+    sStr.replace(QChar('\u0015'), "\\u0015"); // ^U
+    sStr.replace(QChar('\u0016'), "\\u0016"); // ^V
+    sStr.replace(QChar('\u0017'), "\\u0017"); // ^W
+    sStr.replace(QChar('\u0018'), "\\u0018"); // ^X
+    sStr.replace(QChar('\u0019'), "\\u0019"); // ^Y
+    sStr.replace(QChar('\u001A'), "\\u001A"); // ^Z
+    sStr.replace(QChar('\u001B'), "\\u001B");
+    sStr.replace(QChar('\u001C'), "\\u001C");
+    sStr.replace(QChar('\u001D'), "\\u001D");
+    sStr.replace(QChar('\u001E'), "\\u001E");
+    sStr.replace(QChar('\u001F'), "\\u001F");
 
     return sStr;
 }
