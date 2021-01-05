@@ -186,8 +186,8 @@ long long MythDVDBuffer::Seek(long long Time)
     }
     else
     {
-        m_seektime = Time;
-        dvdRet = dvdnav_absolute_time_search(m_dvdnav, static_cast<uint64_t>(m_seektime), 0);
+        m_seektime = mpeg::chrono::pts(Time);
+        dvdRet = dvdnav_absolute_time_search(m_dvdnav, m_seektime.count(), 0);
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("DVD Playback Seek() time: %1; seekSpeed: %2")
@@ -375,6 +375,7 @@ void MythDVDBuffer::GetChapterTimes(QList<std::chrono::seconds> &Times)
     std::copy(chapters.cbegin(), chapters.cend(), std::back_inserter(Times));
 }
 
+static constexpr mpeg::chrono::pts HALFSECOND { 45000_pts };
 std::chrono::seconds MythDVDBuffer::GetChapterTimes(int Title)
 {
     if (!m_dvdnav)
@@ -396,13 +397,13 @@ std::chrono::seconds MythDVDBuffer::GetChapterTimes(int Title)
     // don't add the last 'chapter' - which is the title end
     if (num > 1)
         for (uint i = 0; i < num - 1; i++)
-            chapters.append(std::chrono::seconds((times[i] + 45000) / 90000));
+            chapters.append(duration_cast<std::chrono::seconds>(mpeg::chrono::pts(times[i]) + HALFSECOND));
 
     // Assigned via calloc, must be free'd not deleted
     if (times)
         free(times);
     m_chapterMap.insert(Title, chapters);
-    return std::chrono::seconds((duration + 45000) / 90000);
+    return duration_cast<std::chrono::seconds>(mpeg::chrono::pts(duration) + HALFSECOND);
 }
 
 /** \brief returns current position in the PGC.
@@ -454,7 +455,7 @@ long long MythDVDBuffer::GetTotalReadPosition(void) const
 
 std::chrono::seconds MythDVDBuffer::GetChapterLength(void) const
 {
-    return std::chrono::seconds(m_pgLength / 90000);
+    return duration_cast<std::chrono::seconds>(m_pgLength);
 }
 
 void MythDVDBuffer::GetPartAndTitle(int &Part, int &Title) const
@@ -586,11 +587,11 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
 
                     // update information for the current cell
                     m_cellChanged = true;
-                    if (m_pgcLength != cell_event->pgc_length)
+                    if (m_pgcLength != mpeg::chrono::pts(cell_event->pgc_length))
                         m_pgcLengthChanged = true;
-                    m_pgLength  = cell_event->pg_length;
-                    m_pgcLength = cell_event->pgc_length;
-                    m_cellStart = cell_event->cell_start;
+                    m_pgLength  = mpeg::chrono::pts(cell_event->pg_length);
+                    m_pgcLength = mpeg::chrono::pts(cell_event->pgc_length);
+                    m_cellStart = mpeg::chrono::pts(cell_event->cell_start);
                     m_pgStart   = cell_event->pg_start;
 
                     // update title/part/still/menu information
@@ -626,7 +627,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         QString("Stillframe: %1 seconds").arg(stillTimer) :
                         QString("Infinite stillframe")) :
                         QString("Length: %1 seconds")
-                            .arg(static_cast<double>(m_pgcLength) / 90000.0, 0, 'f', 1);
+                            .arg(duration_cast<std::chrono::seconds>(m_pgcLength).count());
                     if (m_title == 0)
                     {
                         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Menu #%1 %2")
@@ -834,20 +835,20 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                             }
 
                             // update our status
-                            m_currentTime = dvdnav_get_current_time(m_dvdnav);
+                            m_currentTime = mpeg::chrono::pts(dvdnav_get_current_time(m_dvdnav));
                             m_currentpos = GetReadPosition();
 
                             if (m_seeking)
                             {
-                                int relativetime = static_cast<int>((m_seektime - m_currentTime) / 90000);
-                                if (abs(relativetime) <= 1)
+                                auto relativetime = duration_cast<std::chrono::seconds>(m_seektime - m_currentTime);
+                                if (abs(relativetime) <= 1s)
                                 {
                                     m_seeking = false;
-                                    m_seektime = 0;
+                                    m_seektime = 0_pts;
                                 }
                                 else
                                 {
-                                    dvdnav_relative_time_search(m_dvdnav, relativetime * 2);
+                                    dvdnav_relative_time_search(m_dvdnav, relativetime.count() * 2);
                                 }
                             }
 
@@ -876,7 +877,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                                 .arg(m_vobid)
                                 .arg(m_cellid)
                                 .arg(m_seeking)
-                                .arg(m_seektime));
+                                .arg(m_seektime.count()));
 
                             if (!m_seeking)
                             {
@@ -1139,7 +1140,7 @@ void MythDVDBuffer::PrevTrack(void)
  */
 std::chrono::seconds MythDVDBuffer::GetTotalTimeOfTitle(void) const
 {
-    return std::chrono::seconds(lround(m_pgcLength / 90000.0F));
+    return duration_cast<std::chrono::seconds>(m_pgcLength);
 }
 
 float MythDVDBuffer::GetAspectOverride(void) const
@@ -1149,9 +1150,9 @@ float MythDVDBuffer::GetAspectOverride(void) const
 
 /** \brief get the start of the cell in seconds
  */
-uint MythDVDBuffer::GetCellStart(void) const
+std::chrono::seconds MythDVDBuffer::GetCellStart(void) const
 {
-    return static_cast<uint>(m_cellStart / 900000.F);
+    return duration_cast<std::chrono::seconds>(m_cellStart);
 }
 
 /** \brief check if dvd cell has changed
@@ -1977,7 +1978,7 @@ std::chrono::seconds MythDVDBuffer::TitleTimeLeft(void) const
 
 std::chrono::seconds MythDVDBuffer::GetCurrentTime(void) const
 {
-    return std::chrono::seconds(m_currentTime / 90000);
+    return duration_cast<std::chrono::seconds>(m_currentTime);
 }
 
 /// \brief converts palette values from YUV to RGB

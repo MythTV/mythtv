@@ -542,7 +542,7 @@ bool MythDVDPlayer::DoJumpChapter(int Chapter)
         if (m_decoder)
         {
             m_decoder->UpdateFramesPlayed();
-            if (m_playerCtx->m_buffer->DVD()->GetCellStart() == 0)
+            if (m_playerCtx->m_buffer->DVD()->GetCellStart() == 0s)
                 m_decoder->SeekReset(static_cast<long long>(m_framesPlayed), 0, true, true);
         }
         ClearAfterSeek(!m_playerCtx->m_buffer->IsInDiscMenuOrStillFrame());

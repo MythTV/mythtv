@@ -66,7 +66,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     void      GetPartAndTitle      (int &Part, int &Title) const;
     std::chrono::seconds  GetTotalTimeOfTitle  (void) const;
     float     GetAspectOverride    (void) const;
-    uint      GetCellStart         (void) const;
+    std::chrono::seconds  GetCellStart         (void) const;
     bool      PGCLengthChanged     (void);
     bool      CellChanged          (void);
     bool      IsStillFramePending  (void) const;
@@ -153,9 +153,9 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     unsigned char *m_dvdBlockReadBuf        { nullptr };
     int            m_dvdBlockRPos           { 0       };
     int            m_dvdBlockWPos           { 0       };
-    long long      m_pgLength               { 0       };
-    long long      m_pgcLength              { 0       };
-    long long      m_cellStart              { 0       };
+    mpeg::chrono::pts  m_pgLength           { 0_pts   };
+    mpeg::chrono::pts  m_pgcLength          { 0_pts   };
+    mpeg::chrono::pts  m_cellStart          { 0_pts   };
     bool           m_cellChanged            { false   };
     bool           m_pgcLengthChanged       { false   };
     long long      m_pgStart                { 0       };
@@ -190,8 +190,8 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     int8_t         m_curSubtitleTrack       { 0       };
     bool           m_autoselectsubtitle     { true    };
     bool           m_seeking                { false   };
-    int64_t        m_seektime               { 0       };
-    int64_t        m_currentTime            { 0       };
+    mpeg::chrono::pts  m_seektime           { 0_pts   };
+    mpeg::chrono::pts  m_currentTime        { 0_pts   };
     static const QMap<int, int> kSeekSpeedMap;
     QMap<int, QList<std::chrono::seconds> > m_chapterMap;
     MythDVDPlayer  *m_parent                { nullptr };
