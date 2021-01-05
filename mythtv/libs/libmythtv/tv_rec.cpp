@@ -823,7 +823,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     if (recq)
     {
         LOG((recq->IsDamaged()) ? VB_GENERAL : VB_RECORD, LOG_INFO,
-            LOC + QString("FinishedRecording(%1) %2 recq:%3\n")
+            LOC + QString("FinishedRecording(%1) %2 recq:\n%3")
             .arg(curRec->MakeUniqueKey())
             .arg((recq->IsDamaged()) ? "damaged" : "good")
             .arg(recq->toStringXML()));
@@ -1231,6 +1231,7 @@ static bool is_dishnet_eit(uint inputid)
     return false;
 }
 
+// Number of capturecard instances including multirec instances
 static int num_inputs(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1425,6 +1426,7 @@ void TVRec::run(void)
             ClearFlags(kFlagExitPlayer, __FILE__, __LINE__);
         }
 
+        // Start active EIT scan
         if (m_scanner && m_channel &&
             MythDate::current() > m_eitScanStartTime)
         {

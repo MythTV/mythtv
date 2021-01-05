@@ -1836,7 +1836,8 @@ QString ProgramInfo::toString(const Verbosity v, const QString& sep, const QStri
     switch (v)
     {
         case kLongDescription:
-            str = LOC + "channame(" + m_chanName + ") startts(" +
+            str = LOC + "channame(" + m_chanName + ")\n";
+            str += "             startts(" +
                 m_startTs.toString() + ") endts(" + m_endTs.toString() + ")\n";
             str += "             recstartts(" + m_recStartTs.toString() +
                 ") recendts(" + m_recEndTs.toString() + ")\n";
