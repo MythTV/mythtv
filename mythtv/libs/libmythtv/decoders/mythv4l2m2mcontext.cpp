@@ -250,6 +250,14 @@ bool MythV4L2M2MContext::GetBuffer(AVCodecContext *Context, MythVideoFrame *Fram
 #define V4L2_PIX_FMT_VP9 v4l2_fourcc('V', 'P', '9', '0')
 #endif
 
+#ifndef V4L2_PIX_FMT_NV12_COL128
+#define V4L2_PIX_FMT_NV12_COL128 v4l2_fourcc('N', 'C', '1', '2')
+#endif
+
+#ifndef V4L2_PIX_FMT_NV12_10_COL128
+#define V4L2_PIX_FMT_NV12_10_COL128 v4l2_fourcc('N', 'C', '3', '0')
+#endif
+
 const V4L2Profiles& MythV4L2M2MContext::GetStandardProfiles()
 {
     static const std::vector<V4L2Mapping> s_map
@@ -282,7 +290,8 @@ V4L2Profiles MythV4L2M2MContext::GetProfiles(const std::vector<V4L2Mapping>& Pro
     {
         V4L2_PIX_FMT_YUV420,  V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV420M,
         V4L2_PIX_FMT_YVU420M, V4L2_PIX_FMT_NV12,   V4L2_PIX_FMT_NV12M,
-        V4L2_PIX_FMT_NV21,    V4L2_PIX_FMT_NV21M
+        V4L2_PIX_FMT_NV21,    V4L2_PIX_FMT_NV21M,  V4L2_PIX_FMT_NV12_COL128,
+	V4L2_PIX_FMT_NV12_10_COL128
     };
 
     V4L2Profiles result;
