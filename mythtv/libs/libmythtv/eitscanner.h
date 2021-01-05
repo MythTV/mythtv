@@ -58,12 +58,12 @@ class EITScanner : public QRunnable
     EITHelper            *m_eitHelper               {nullptr};
     MThread              *m_eventThread             {nullptr};
     volatile bool         m_exitThread              {false};
-    QWaitCondition        m_exitThreadCond; // protected by lock
+    QWaitCondition        m_exitThreadCond;                     // protected by lock
 
     TVRec                *m_rec                     {nullptr};
     volatile bool         m_activeScan              {false};
-    volatile bool         m_activeScanStopped       {true}; // protected by lock
-    QWaitCondition        m_activeScanCond; // protected by lock
+    volatile bool         m_activeScanStopped       {true};     // protected by lock
+    QWaitCondition        m_activeScanCond;                     // protected by lock
     QDateTime             m_activeScanNextTrig;
     uint                  m_activeScanTrigTime      {0};
     QStringList           m_activeScanChannels;
@@ -75,8 +75,6 @@ class EITScanner : public QRunnable
     static QMutex         s_resched_lock;
     static QDateTime      s_resched_next_time;
 
-    /// Minumum number of seconds between reschedules.
-    static const uint kMinRescheduleInterval;
 };
 
 #endif // EITSCANNER_H

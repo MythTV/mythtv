@@ -47,7 +47,7 @@ QString EITCache::GetStatistics(void) const
 {
     QMutexLocker locker(&m_eventMapLock);
     return QString(
-        "EITCache stats: Access:%1 Hits:%2 "
+        "EITCache Access:%1 Hits:%2 "
         "Table:%3 Version:%4 Endtime:%5 New:%6 "
         "Pruned:%7 Pruned Hits:%8 Future:%9 Wrong Channel:%10 "
         "Hit Ratio:%11")
@@ -401,7 +401,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
 
 /** \fn EITCache::PruneOldEntries(uint timestamp)
  *  \brief Prunes entries that describe events ending before timestamp time.
- *  \return number of entries pruned
+ *  \return Number of entries pruned
  */
 uint EITCache::PruneOldEntries(uint timestamp)
 {
@@ -426,7 +426,7 @@ uint EITCache::PruneOldEntries(uint timestamp)
 
 
 /** \fn EITCache::ClearChannelLocks(void)
- *  \brief removes old channel locks, use it only at master backend start
+ *  \brief Removes old channel locks, use it only at master backend start
  */
 void EITCache::ClearChannelLocks(void)
 {

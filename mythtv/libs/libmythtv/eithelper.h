@@ -74,7 +74,7 @@ class ATSCEtt
 using EventIDToATSCEvent = QMap<uint,ATSCEvent> ;
 using EventIDToETT       = QMap<uint,ATSCEtt>;
 using ATSCSRCToEvents    = QMap<uint,EventIDToATSCEvent>;
-using ServiceToChanID    = QMap<unsigned long long,uint>;
+using ServiceToChanID    = QMap<uint64_t,uint>;
 
 using FixupKey   = uint64_t;
 using FixupValue = uint64_t;
@@ -103,11 +103,11 @@ class EITHelper
 
     uint GetGPSOffset(void) const { return (uint) (0 - m_gpsOffset); }
 
-    void SetChannelID(uint _channelid);
-    void SetGPSOffset(uint _gps_offset) { m_gpsOffset = 0 - _gps_offset; }
+    void SetChannelID(uint channelid);
+    void SetGPSOffset(uint gps_offset) { m_gpsOffset = 0 - gps_offset; }
     void SetFixup(uint atsc_major, uint atsc_minor, FixupValue eitfixup);
     void SetLanguagePreferences(const QStringList &langPref);
-    void SetSourceID(uint _sourceid);
+    void SetSourceID(uint sourceid);
     void RescheduleRecordings(void);
 
 #ifdef USING_BACKEND
@@ -129,19 +129,15 @@ class EITHelper
     static void WriteEITCache(void);
 
   private:
-    // only ATSC
-    uint GetChanID(uint atsc_major, uint atsc_minor);
-    // only DVB
-    uint GetChanID(uint serviceid, uint networkid, uint tsid);
-    // any DTV
-    uint GetChanID(uint program_number);
+    uint GetChanID(uint atsc_major, uint atsc_minor);           // Only ATSC
+    uint GetChanID(uint serviceid, uint networkid, uint tsid);  // Only DVB
+    uint GetChanID(uint program_number);                        // Any DTV
 
-    void CompleteEvent(uint atsc_major, uint atsc_minor,
+    void CompleteEvent(uint atsc_major, uint atsc_minor,        // Only ATSC
                        const ATSCEvent &event,
                        const QString   &ett);
 
-        //QListList_Events  m_eitList;     ///< Event Information Tables List
-    mutable QMutex          m_eitListLock; ///< EIT List lock
+    mutable QMutex          m_eitListLock;
     mutable ServiceToChanID m_srvToChanid;
 
     EITFixUp               *m_eitFixup     {nullptr};
@@ -149,12 +145,12 @@ class EITHelper
 
     int                     m_gpsOffset    {-1 * GPS_LEAP_SECONDS};
 
-    /* carry some values to optimize channel lookup and reschedules */
-    uint                    m_cardnum      {0};
-    uint                    m_sourceid     {0};    ///< id of the video source
-    uint                    m_channelid    {0};    ///< id of the channel
-    QDateTime               m_maxStarttime;        ///< latest starttime of changed events
-    bool                    m_seenEITother {false};///< if false we only reschedule the active mplex
+    // Carry some values to optimize channel lookup and reschedules
+    uint                    m_cardnum      {0};       // Card ID
+    uint                    m_sourceid     {0};       // Video source ID
+    uint                    m_channelid    {0};       // Channel ID
+    QDateTime               m_maxStarttime;           // Latest starttime of changed events
+    bool                    m_seenEITother {false};   // If false we only reschedule the active mplex
 
     FixupMap                m_fixup;
     ATSCSRCToEvents         m_incompleteEvents;
@@ -163,8 +159,8 @@ class EITHelper
 
     QMap<uint,uint>         m_languagePreferences;
 
-    /// Maximum number of DB inserts per ProcessEvents call.
-    static const uint kChunkSize;
+    static const uint kChunkSize;   // Maximum number of DB inserts per ProcessEvents call
+    static const uint kMaxSize;     // Maximum number of events waiting to be processed
 };
 
 #endif // EIT_HELPER_H

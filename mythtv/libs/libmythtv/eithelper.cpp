@@ -20,7 +20,9 @@
 #include "scheduledrecording.h" // for ScheduledRecording
 #include "compat.h"             // for gmtime_r on windows.
 
-const uint EITHelper::kChunkSize = 20;
+const uint EITHelper::kChunkSize =   20;
+const uint EITHelper::kMaxSize   = 1000;
+
 EITCache *EITHelper::s_eitCache = new EITCache();
 
 static uint get_chan_id_from_db_atsc(uint sourceid,
@@ -58,14 +60,16 @@ uint EITHelper::GetListSize(void) const
 
 bool EITHelper::EventQueueFull(void) const
 {
-    const uint kMaxSize = 2000;
     uint listsize = GetListSize();
     bool full = listsize > kMaxSize;
     return full;
 }
 
 /** \fn EITHelper::ProcessEvents(void)
- *  \brief Inserts events in EIT list.
+ *  \brief Get events from queue and insert into DB after processing.
+ *
+ * Process a maximum of kChunkSize events at a time
+ * to avoid clogging the machine.
  *
  *  \return Returns number of events inserted into DB.
  */
@@ -135,16 +139,16 @@ void EITHelper::SetLanguagePreferences(const QStringList &langPref)
     }
 }
 
-void EITHelper::SetSourceID(uint _sourceid)
+void EITHelper::SetSourceID(uint sourceid)
 {
     QMutexLocker locker(&m_eitListLock);
-    m_sourceid = _sourceid;
+    m_sourceid = sourceid;
 }
 
-void EITHelper::SetChannelID(uint _channelid)
+void EITHelper::SetChannelID(uint channelid)
 {
     QMutexLocker locker(&m_eitListLock);
-    m_channelid = _channelid;
+    m_channelid = channelid;
 }
 
 void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
