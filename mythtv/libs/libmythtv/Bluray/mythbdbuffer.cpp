@@ -184,7 +184,7 @@ void MythBDBuffer::GetDescForPos(QString &Desc)
     m_infoLock.unlock();
 }
 
-bool MythBDBuffer::HandleAction(const QStringList &Actions, int64_t Pts)
+bool MythBDBuffer::HandleAction(const QStringList &Actions, mpeg::chrono::pts Pts)
 {
     if (!m_isHDMVNavigation)
         return false;
@@ -928,14 +928,14 @@ int MythBDBuffer::GetSubtitleLanguage(uint StreamID)
     return code;
 }
 
-void MythBDBuffer::PressButton(int32_t Key, int64_t Pts)
+void MythBDBuffer::PressButton(int32_t Key, mpeg::chrono::pts Pts)
 {
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Key %1 (pts %2)").arg(Key).arg(Pts));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Key %1 (pts %2)").arg(Key).arg(Pts.count()));
     // HACK for still frame menu navigation
-    Pts = 1;
+    Pts = 1_pts;
     if (!m_bdnav || /*Pts <= 0 ||*/ Key < 0)
         return;
-    bd_user_input(m_bdnav, Pts, static_cast<uint32_t>(Key));
+    bd_user_input(m_bdnav, Pts.count(), static_cast<uint32_t>(Key));
 }
 
 void MythBDBuffer::ClickButton(int64_t Pts, uint16_t X, uint16_t Y)
@@ -972,7 +972,7 @@ bool MythBDBuffer::GoToMenu(const QString &Menu, mpeg::chrono::pts Pts)
     }
     else if (Menu.compare("popup") == 0)
     {
-        PressButton(BD_VK_POPUP, Pts.count());
+        PressButton(BD_VK_POPUP, Pts);
         return true;
     }
 

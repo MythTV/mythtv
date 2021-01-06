@@ -3771,14 +3771,14 @@ bool TV::SubtitleDelayHandleAction(const QStringList &Actions)
 
 bool TV::DiscMenuHandleAction(const QStringList& Actions) const
 {
-    int64_t pts = 0;
+    mpeg::chrono::pts pts = 0_pts;
     MythVideoOutput *output = m_player->GetVideoOutput();
     if (output)
     {
         MythVideoFrame *frame = output->GetLastShownFrame();
         // convert timecode (msec) to pts (90kHz)
         if (frame)
-            pts = static_cast<int64_t>(frame->m_timecode.count()  * 90);
+            pts = duration_cast<mpeg::chrono::pts>(frame->m_timecode);
     }
     if (m_playerContext.m_buffer)
         return m_playerContext.m_buffer->HandleAction(Actions, pts);

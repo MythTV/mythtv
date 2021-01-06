@@ -1311,7 +1311,7 @@ void MythDVDBuffer::GoToPreviousProgram(void)
         dvdnav_prev_pg_search(m_dvdnav);
 }
 
-bool MythDVDBuffer::HandleAction(const QStringList &Actions, int64_t /*Pts*/)
+bool MythDVDBuffer::HandleAction(const QStringList &Actions, mpeg::chrono::pts /*Pts*/)
 {
     if (!NumMenuButtons())
         return false;

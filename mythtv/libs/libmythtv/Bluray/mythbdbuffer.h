@@ -31,7 +31,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     long long GetReadPosition    (void) const override;
     bool      IsOpen             (void) const override;
     bool      IsInStillFrame     (void) const override;
-    bool      HandleAction       (const QStringList &Actions, int64_t Pts) override;
+    bool      HandleAction       (const QStringList &Actions, mpeg::chrono::pts Pts) override;
     bool      OpenFile           (const QString &Filename,
                                   std::chrono::milliseconds Retry = kDefaultOpenTimeout) override;
 
@@ -85,7 +85,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     bool      UpdateTitleInfo    (void);
     BLURAY_TITLE_INFO* GetTitleInfo   (uint32_t Index);
     BLURAY_TITLE_INFO* GetPlaylistInfo(uint32_t Index);
-    void      PressButton        (int32_t Key, int64_t Pts);
+    void      PressButton        (int32_t Key, mpeg::chrono::pts Pts);
     void      ClickButton        (int64_t Pts, uint16_t X, uint16_t Y);
     bool      HandleBDEvents     (void);
     void      HandleBDEvent      (BD_EVENT &Event);

@@ -131,7 +131,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     virtual bool      IsInMenu          (void) const { return false; }
     virtual bool      IsInStillFrame    (void) const { return false; }
     virtual bool      IsInDiscMenuOrStillFrame(void) const { return IsInMenu() || IsInStillFrame(); }
-    virtual bool      HandleAction      (const QStringList &/*Action*/, int64_t /*Frame*/) { return false; }
+    virtual bool      HandleAction      (const QStringList &/*Action*/, mpeg::chrono::pts /*Pts*/) { return false; }
     virtual bool      OpenFile          (const QString &Filename, std::chrono::milliseconds Retry = kDefaultOpenTimeout) = 0;
     virtual bool      ReOpen            (const QString& /*Filename*/ = "") { return false; }
 

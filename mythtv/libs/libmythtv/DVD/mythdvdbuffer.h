@@ -47,7 +47,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     bool      IsInStillFrame       (void) const override;
     bool      OpenFile             (const QString &Filename,
                                     std::chrono::milliseconds Retry = kDefaultOpenTimeout) override;
-    bool      HandleAction         (const QStringList &Actions, int64_t Pts) override;
+    bool      HandleAction         (const QStringList &Actions, mpeg::chrono::pts Pts) override;
     void      IgnoreWaitStates     (bool Ignore) override;
     bool      StartFromBeginning   (void) override;
     long long GetReadPosition      (void) const override;
