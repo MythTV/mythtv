@@ -316,7 +316,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
 
     // Generic EIT stuff used for ATSC and DVB
     EITHelper                *m_eitHelper                   {nullptr};
-    float                     m_eitRate                     {0.0F};
+    float                     m_eitRate                     {1.0F};
 
     // Listening
     pid_map_t                 m_pidsListening;
