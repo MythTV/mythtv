@@ -2071,9 +2071,13 @@ def convert_series_to_xml(t, series_season_ep, ep_info):
 
     # dict for 'data['_banners']['poster']['raw'] must exist for fetching coverarts,
     # check with ttvdb.py -l de -a CH -D 89901 36 4
-    if 'poster' not in t.shows[show_id].data['_banners'].keys():
-        t.shows[show_id].data['_banners']['poster'] = {}
-        t.shows[show_id].data['_banners']['poster']['raw'] = {}
+    try:
+        if 'poster' not in t.shows[show_id].data['_banners'].keys():
+            t.shows[show_id].data['_banners']['poster'] = {}
+            t.shows[show_id].data['_banners']['poster']['raw'] = {}
+    except KeyError:
+        # no banner fanart exists
+        pass
 
     # sort the cast into sort order
     t.shows[show_id].data['_actors'] = sorted(t.shows[show_id].data['_actors'], key=lambda k: k['sortOrder'])
