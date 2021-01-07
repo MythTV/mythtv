@@ -36,7 +36,7 @@ void MythOpenGLInterop::GetTypes(MythRender* Render, InteropMap& Types)
         return;
 
 #ifdef USING_MEDIACODEC
-    Types[FMT_MEDIACODEC] = { MEDIACODEC };
+    Types[FMT_MEDIACODEC] = { GL_MEDIACODEC };
 #endif
 
 #ifdef USING_VDPAU
