@@ -2061,6 +2061,7 @@ USING_LIST='
     libglslang
     videotoolbox
     waylandextras
+    qtprivateheaders
 '
 
 CMDLINE_SELECT="
@@ -4927,6 +4928,7 @@ case $target_os in
         enable libudev
         enable pic
         enable drm
+        enable qtprivateheaders
 	if [ x`uname -m` = x"armv7l" ]; then
 	    disable vaapi
 	fi
@@ -6605,19 +6607,22 @@ esac
 
 enabled vulkan && enabled libglslang && require_cpp libglslang glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${EXTRA_GLSLANG_LIBS:-} -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread
 
-# Check for Wayland support and Qt private headers
-enabled waylandextras && use_pkg_config wayland_client wayland-client "wayland-client.h" wl_surface_set_opaque_region || disable waylandextras
-if enabled waylandextras ; then
-    cat >$TMPPRO <<EOF
+# Qt private headers are required for wayland extras and some DRM functionality on linux
+if enabled qtprivateheaders ; then
+cat >$TMPPRO <<EOF
 QT += gui-private
 EOF
-    qt_private_headers_incpath=`${qmakeconf} -makefile -Wnone -nocache -nomoc -nodepend -norecursive -o - $TMPPRO 2>/dev/null | sed -n -e 's/^\s*INCPATH\s*=//p'`
-    check_ecxx $qt_private_headers_incpath <<EOF || disable waylandextras
-    #include <QGuiApplication>
-    #include <qpa/qplatformnativeinterface.h>
-    int x;
+qt_private_headers_incpath=`${qmakeconf} -makefile -Wnone -nocache -nomoc -nodepend -norecursive -o - $TMPPRO 2>/dev/null | sed -n -e 's/^\s*INCPATH\s*=//p'`
+check_ecxx $qt_private_headers_incpath <<EOF || disable qtprivateheaders
+#include <QGuiApplication>
+#include <qpa/qplatformnativeinterface.h>
+int x;
 EOF
 fi
+
+# Check for Wayland support
+enabled waylandextras && enabled qtprivateheaders || disable waylandextras
+enabled waylandextras && use_pkg_config wayland_client wayland-client "wayland-client.h" wl_surface_set_opaque_region || disable waylandextras
 
 enable enforce_wshadow
 case $target_os in
@@ -7512,6 +7517,9 @@ if test x"$target_os" = x"darwin" ; then
 fi
   echo "VAAPI support             ${vaapi-no}"
   echo "DRM support               ${drm-no}"
+  if enabled drm; then
+    echo "DRM Qt integration        ${qtprivateheaders-no}"
+  fi
   echo "Video4Linux codecs        ${v4l2-no} (DRM ${v4l2prime-no})"
   echo "MMAL decoder support      ${mmal-no}"
   echo "OpenGL                    ${opengl-no} (OpenGLES ${opengles-no})"
@@ -7529,6 +7537,7 @@ fi
 echo "# Misc Features"
 echo "Frontend                  ${frontend-no}"
 echo "Backend                   ${backend-no}"
+echo "Qt private headers        ${qtprivateheaders-no}"
 echo "Wayland extras            ${waylandextras-no}"
 echo "multi threaded libavcodec ${threads-no}"
 if enabled frontend; then
