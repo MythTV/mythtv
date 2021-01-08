@@ -12,7 +12,7 @@
 #define LOC QString("AOSLES: ")
 
 #define OPENSLES_BUFFERS 10  /* maximum number of buffers */
-#define OPENSLES_BUFLEN  10  /* ms */
+static constexpr std::chrono::milliseconds OPENSLES_BUFLEN { 10ms };
 //#define POSITIONUPDATEPERIOD 1000
 //#define POSITIONUPDATEPERIOD 25000
 #define POSITIONUPDATEPERIOD 40
@@ -236,7 +236,7 @@ bool AudioOutputOpenSLES::StartPlayer()
     CHECK_OPENSL_ERROR("Failed to switch to playing state");
 
     /* XXX: rounding shouldn't affect us at normal sampling rate */
-    uint32_t samplesPerBuf = OPENSLES_BUFLEN * m_sampleRate / 1000;
+    uint32_t samplesPerBuf = OPENSLES_BUFLEN.count() * m_sampleRate / 1000;
     m_buf = (uint8_t*)malloc(OPENSLES_BUFFERS * samplesPerBuf * m_bytesPerFrame);
     if (!m_buf)
     {
@@ -369,7 +369,7 @@ bool AudioOutputOpenSLES::OpenDevice(void)
     }
 
     // fragments are 10ms worth of samples
-    m_fragmentSize = OPENSLES_BUFLEN * m_outputBytesPerFrame * m_sampleRate / 1000;
+    m_fragmentSize = OPENSLES_BUFLEN.count() * m_outputBytesPerFrame * m_sampleRate / 1000;
     // OpenSLES buffer holds 10 fragments = 80ms worth of samples
     m_soundcardBufferSize = OPENSLES_BUFFERS * m_fragmentSize;
 
@@ -426,7 +426,7 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
         if (numBufferesQueued == OPENSLES_BUFFERS)
         {
             // wait for a buffer period, should be clear next time around
-            usleep(OPENSLES_BUFLEN * 1000);
+            usleep(OPENSLES_BUFLEN);
             continue;
         }
 
