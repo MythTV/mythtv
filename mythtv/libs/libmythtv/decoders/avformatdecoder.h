@@ -219,7 +219,7 @@ class AvFormatDecoder : public DecoderBase
     bool ProcessAudioPacket(AVStream *stream, AVPacket *pkt,
                             DecodeType decodetype);
     bool ProcessSubtitlePacket(AVStream *stream, AVPacket *pkt);
-    bool ProcessRawTextPacket(AVPacket *pkt);
+    bool ProcessRawTextPacket(AVPacket* Packet);
     virtual bool ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
                                    DecodeType decodetype);
 

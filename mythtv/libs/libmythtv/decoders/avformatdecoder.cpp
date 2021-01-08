@@ -4012,25 +4012,23 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     return true;
 }
 
-bool AvFormatDecoder::ProcessRawTextPacket(AVPacket *pkt)
+bool AvFormatDecoder::ProcessRawTextPacket(AVPacket* Packet)
 {
-    if (!(m_decodeAllSubtitles || m_selectedTrack[kTrackTypeRawText].m_av_stream_index == pkt->stream_index))
+    if (!(m_decodeAllSubtitles || m_selectedTrack[kTrackTypeRawText].m_av_stream_index == Packet->stream_index))
         return false;
 
-    if (!m_parent->GetSubReader(pkt->stream_index + 0x2000))
+    auto id = static_cast<uint>(Packet->stream_index + 0x2000);
+    if (!m_parent->GetSubReader(id))
         return false;
 
-    QTextCodec *codec = QTextCodec::codecForName("utf-8");
-    QTextDecoder *dec = codec->makeDecoder();
-    QString text      = dec->toUnicode((const char*)pkt->data, pkt->size - 1);
+    const auto * codec = QTextCodec::codecForName("utf-8");
+    auto text = codec->toUnicode(reinterpret_cast<const char *>(Packet->data), Packet->size - 1);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-    QStringList list  = text.split('\n', QString::SkipEmptyParts);
+    auto list = text.split('\n', QString::SkipEmptyParts);
 #else
-    QStringList list  = text.split('\n', Qt::SkipEmptyParts);
+    auto list = text.split('\n', Qt::SkipEmptyParts);
 #endif
-    delete dec;
-
-    m_parent->GetSubReader(pkt->stream_index + 0x2000)->AddRawTextSubtitle(list, pkt->duration);
+    m_parent->GetSubReader(id)->AddRawTextSubtitle(list, static_cast<uint64_t>(Packet->duration));
     return true;
 }
 
