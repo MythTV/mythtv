@@ -2160,10 +2160,13 @@ def displaySeriesXML(tvdb_api, series_season_ep):
     if len(items.xpath("//image[@type='coverart']")) == 0:
         for el in allDataElement.iter("series"):
             glob_poster = el.find("poster")
-            if glob_poster is not None:
+            if glob_poster is not None and glob_poster.text != 'http://thetvdb.com/banners/':
                 glob_url = glob_poster.text
                 glob_thumb = glob_url.replace("posters", "_cache/posters")
                 glob_coverart = etree.Element("image", type = "coverart", url = glob_url, thumb = glob_thumb)
+                image_items = items.find("item").find("images")
+                if image_items is None:
+                    etree.SubElement(items.find("item"), "images")
                 items.find("item").find("images").append(glob_coverart)
                 break
 
