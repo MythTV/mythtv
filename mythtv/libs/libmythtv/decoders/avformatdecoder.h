@@ -297,10 +297,10 @@ class AvFormatDecoder : public DecoderBase
 
     uint32_t           m_startCodeState               {0xffffffff};
 
-    long long          m_lastVPts                     {0};
-    long long          m_lastAPts                     {0};
-    long long          m_lastCcPtsu                   {0};
-    long long          m_firstVPts                    {0};
+    std::chrono::milliseconds  m_lastVPts             {0ms};
+    std::chrono::milliseconds  m_lastAPts             {0ms};
+    std::chrono::microseconds  m_lastCcPtsu           {0ms};
+    std::chrono::milliseconds  m_firstVPts            {0ms};
     bool               m_firstVPtsInuse               {false};
 
     int64_t            m_faultyPts                    {0};
