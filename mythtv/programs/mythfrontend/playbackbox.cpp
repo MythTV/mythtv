@@ -2254,7 +2254,7 @@ void PlaybackBox::playSelectedPlaylist(bool Random)
         QList<uint> tmp = m_playList;
         while (!tmp.isEmpty())
         {
-            uint i = static_cast<int>(MythRandom()) % tmp.size();
+            uint i = MythRandom() % tmp.size();
             m_playListPlay.append(tmp[i]);
             tmp.removeAll(tmp[i]);
         }

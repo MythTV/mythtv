@@ -541,7 +541,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     nMX = (nMX > 120) ? 120 : nMX;
 
-    int nNewMX = (0 + (static_cast<int>(MythRandom()) % nMX)) * 1000;
+    int nNewMX = (0 + static_cast<int>(MythRandom() % nMX)) * 1000;
 
     // ----------------------------------------------------------------------
     // See what they are looking for...
