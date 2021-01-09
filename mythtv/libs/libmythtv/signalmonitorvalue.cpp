@@ -26,7 +26,7 @@ void SignalMonitorValue::Init()
 
         SignalMonitorValue slock(
             QCoreApplication::translate("(Common)", "Signal Lock"),
-                "slock", 0, true, 0, 1, 0);
+                "slock", 0, true, 0, 1, 0ms);
         slock.SetValue(1);
         SIGNAL_LOCK<<slock.GetName()<<slock.GetStatus();
     }
@@ -37,7 +37,7 @@ SignalMonitorValue::SignalMonitorValue(QString _name,
                                        int _threshold,
                                        bool _high_threshold,
                                        int _min, int _max,
-                                       int _timeout) :
+                                       std::chrono::milliseconds _timeout) :
     m_name(std::move(_name)),
     m_noSpaceName(std::move(_noSpaceName)),
     m_value(0),
@@ -50,7 +50,7 @@ SignalMonitorValue::SignalMonitorValue(QString _name,
     LOG(VB_GENERAL, LOG_DEBUG,
         QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7, %8, %9)")
             .arg(m_name) .arg(m_noSpaceName) .arg(m_value) .arg(m_threshold)
-            .arg(m_minVal) .arg(m_maxVal) .arg(m_timeout) .arg(m_highThreshold)
+            .arg(m_minVal) .arg(m_maxVal) .arg(m_timeout.count()) .arg(m_highThreshold)
             .arg((m_set ? "true" : "false")));
 #endif
 }
@@ -60,7 +60,8 @@ SignalMonitorValue::SignalMonitorValue(QString _name,
                                        int _value, int _threshold,
                                        bool _high_threshold,
                                        int _min, int _max,
-                                       int _timeout, bool _set) :
+                                       std::chrono::milliseconds _timeout,
+                                       bool _set) :
     m_name(std::move(_name)),
     m_noSpaceName(std::move(_noSpaceName)),
     m_value(_value),
@@ -73,7 +74,7 @@ SignalMonitorValue::SignalMonitorValue(QString _name,
     LOG(VB_GENERAL, LOG_DEBUG,
         QString("SignalMonitorValue(%1, %2, %3, %4, %5, %6, %7, %8, %9)")
             .arg(m_name) .arg(m_noSpaceName) .arg(m_value) .arg(m_threshold)
-            .arg(m_minVal) .arg(m_maxVal) .arg(m_timeout) .arg(m_highThreshold)
+            .arg(m_minVal) .arg(m_maxVal) .arg(m_timeout.count()) .arg(m_highThreshold)
             .arg((m_set ? "true" : "false")));
 #endif
 }
@@ -107,7 +108,7 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
         SetRange(0, 1);
         SetValue(0);
         SetThreshold( ("message" == m_name) ? 0 : 1, true );
-        SetTimeout( ("message" == m_name) ? 0 : -1 );
+        SetTimeout( ("message" == m_name) ? 0ms : -1ms );
         m_noSpaceName = m_name;
         m_name = longString;
 
@@ -127,7 +128,7 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
     SetRange(vals[3].toInt(), vals[4].toInt());
     SetValue(vals[1].toInt());
     SetThreshold(vals[2].toInt(), (bool) vals[6].toInt());
-    SetTimeout(vals[5].toInt());
+    SetTimeout(std::chrono::milliseconds(vals[5].toInt()));
 
     m_set = (bool) vals[7].toInt();
     return true;
@@ -205,14 +206,14 @@ bool SignalMonitorValue::AllGood(const SignalMonitorList& slist)
  *  \brief Returns the maximum timeout value in the signal monitor list.
  *  \param slist List of SignalMonitorValue classes to check.
  */
-int SignalMonitorValue::MaxWait(const SignalMonitorList& slist)
+std::chrono::milliseconds SignalMonitorValue::MaxWait(const SignalMonitorList& slist)
 {
-    int wait = 0;
-    int minWait = 0;
+    std::chrono::milliseconds wait = 0ms;
+    std::chrono::milliseconds minWait = 0s;
     for (const auto & smv : slist)
     {
         wait = std::max(wait, smv.GetTimeout());
         minWait = std::min(minWait, smv.GetTimeout());
     }
-    return (minWait<0) ? -1 : wait;
+    return (minWait < 0ms) ? -1ms : wait;
 }

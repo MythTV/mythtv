@@ -21,7 +21,7 @@ SatIPSignalMonitor::SatIPSignalMonitor(int db_cardnum,
 
     m_signalStrength.SetThreshold(0);
     m_signalStrength.SetRange(0, 255);
-    m_signalStrength.SetTimeout(3000);  // TODO Use value from database
+    m_signalStrength.SetTimeout(3s);  // TODO Use value from database
 
     AddFlags(kSigMon_WaitForSig);
 

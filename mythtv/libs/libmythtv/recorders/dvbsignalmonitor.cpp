@@ -52,13 +52,13 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
       // for the 4.0 DVB API which uses a uint16_t for the snr
       m_signalToNoise    (QCoreApplication::translate("(Common)",
                           "Signal To Noise"),  "snr",
-                          0,      true,      0, 65535, 0),
+                          0,      true,      0, 65535, 0ms),
       m_bitErrorRate     (tr("Bit Error Rate"),     "ber",
-                          65535,  false,     0, 65535, 0),
+                          65535,  false,     0, 65535, 0ms),
       m_uncorrectedBlocks(tr("Uncorrected Blocks"), "ucb",
-                          65535,  false,     0, 65535, 0),
+                          65535,  false,     0, 65535, 0ms),
       m_rotorPosition    (tr("Rotor Progress"),     "pos",
-                          100,    true,      0,   100, 0),
+                          100,    true,      0,   100, 0ms),
       m_streamHandlerStarted(false),
       m_streamHandler(nullptr)
 {
@@ -83,8 +83,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
             QString("Tuning timeout: %1 ms").arg(wait.count()));
     }
 
-    m_signalLock.SetTimeout(wait.count());
-    m_signalStrength.SetTimeout(wait.count());
+    m_signalLock.SetTimeout(wait);
+    m_signalStrength.SetTimeout(wait);
     m_signalStrength.SetThreshold(threshold);
 
     // This is incorrect for API 3.x but works better than int16_t range

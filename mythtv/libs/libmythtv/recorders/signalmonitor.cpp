@@ -241,11 +241,11 @@ SignalMonitor::SignalMonitor(int _inputid, ChannelBase *_channel,
       m_inputid(_inputid), m_flags(wait_for_mask),
       m_releaseStream(_release_stream),
       m_signalLock    (QCoreApplication::translate("(Common)", "Signal Lock"),
-                     "slock", 1, true, 0,   1, 0),
+                     "slock", 1, true, 0,   1, 0ms),
       m_signalStrength(QCoreApplication::translate("(Common)", "Signal Power"),
-                     "signal", 0, true, 0, 100, 0),
+                     "signal", 0, true, 0, 100, 0ms),
       m_scriptStatus  (QCoreApplication::translate("(Common)", "Script Status"),
-                     "script", 3, true, 0, 3, 0)
+                     "script", 3, true, 0, 3, 0ms)
 {
     if (!m_channel->IsExternalChannelChangeInUse())
     {
