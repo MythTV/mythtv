@@ -101,19 +101,20 @@ bool DBUtil::IsBackupInProgress(void)
     backupStartTimeStr.replace(" ", "T");
 
     QDateTime backupStartTime = MythDate::fromString(backupStartTimeStr);
+    auto backupElapsed = MythDate::secsInPast(backupStartTime);
 
     // No end time set
     if (backupEndTimeStr.isEmpty())
     {
         // If DB Backup started less then 10 minutes ago, assume still running
-        if (backupStartTime.secsTo(MythDate::current()) < 600)
+        if (backupElapsed < 10min)
         {
             LOG(VB_DATABASE, LOG_INFO,
                 QString("DBUtil::BackupInProgress(): Found "
                     "database backup start time of %1 which was %2 seconds "
                     "ago, therefore it appears the backup is still running.")
                     .arg(backupStartTimeStr)
-                    .arg(backupStartTime.secsTo(MythDate::current())));
+                    .arg(backupElapsed.count()));
             return true;
         }
         LOG(VB_DATABASE, LOG_ERR, QString("DBUtil::BackupInProgress(): "
@@ -121,7 +122,7 @@ bool DBUtil::IsBackupInProgress(void)
                 "The backup started %2 seconds ago and should have "
                 "finished by now therefore it appears it is not running .")
                 .arg(backupStartTimeStr)
-                .arg(backupStartTime.secsTo(MythDate::current())));
+                .arg(backupElapsed.count()));
         return false;
     }
 
@@ -138,7 +139,7 @@ bool DBUtil::IsBackupInProgress(void)
             .arg(backupEndTimeStr).arg(backupStartTimeStr));
         return false;
     }
-    if (backupStartTime.secsTo(MythDate::current()) > 600)
+    if (backupElapsed > 10min)
     {
         LOG(VB_DATABASE, LOG_ERR,
             QString("DBUtil::BackupInProgress(): "
@@ -146,7 +147,7 @@ bool DBUtil::IsBackupInProgress(void)
                     "The backup started %2 seconds ago and should have "
                     "finished by now therefore it appears it is not running")
             .arg(backupStartTimeStr)
-            .arg(backupStartTime.secsTo(MythDate::current())));
+            .arg(backupElapsed.count()));
         return false;
     }
 
