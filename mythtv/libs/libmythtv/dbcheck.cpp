@@ -3710,7 +3710,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
-        // insert a new profile group for the VBox
+        // insert a new profile group for Sat>IP
         query.prepare("INSERT INTO profilegroups SET name = 'Sat>IP Recorder', "
                        "cardtype = 'SATIP', is_default = 1;");
         if (!query.exec())
