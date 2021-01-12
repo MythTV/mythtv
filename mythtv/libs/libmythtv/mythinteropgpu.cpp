@@ -31,6 +31,7 @@ QString MythInteropGPU::TypeToString(InteropType Type)
     if (Type == GL_NVDEC)        return "GL-NVDEC";
     if (Type == GL_MMAL)         return "GL-MMAL";
     if (Type == GL_DRMPRIME)     return "GL-DRM-PRIME";
+    if (Type == DRM_DRMPRIME)    return "DRM-DRM-PRIME";
     if (Type == DUMMY)           return "DUMMY";
     return "Unsupported";
 }

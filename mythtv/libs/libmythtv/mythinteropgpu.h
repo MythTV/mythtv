@@ -36,6 +36,7 @@ class MythInteropGPU : public QObject, public ReferenceCounter
         GL_NVDEC,
         GL_MMAL,
         GL_DRMPRIME,
+        DRM_DRMPRIME,
         // used for default free/user_opaque storage
         DUMMY
     };
