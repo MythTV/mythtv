@@ -37,6 +37,7 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
                                                  MythVideoFrame* Frame);
     vector<MythVideoTextureOpenGL*> AcquirePrime(VASurfaceID Id, MythRenderOpenGL* Context,
                                                  MythVideoFrame* Frame);
+    AVDRMFrameDescriptor*     GetDRMFrameDescriptor(VASurfaceID Id);
     void                      CleanupDRMPRIME();
     bool                      TestPrimeInterop();
     bool                      m_usePrime { false };
