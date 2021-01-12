@@ -290,11 +290,9 @@ void MythVideoOutputOpenGL::RenderFrame(MythVideoFrame* Frame, FrameScanType Sca
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_openglRender->logDebugMarker(LOC + "CLEAR_START");
 
-    uint8_t gray = m_dbLetterboxColour == kLetterBoxColour_Gray25 ? 64 : 0;
-
     if (!Frame || Frame->m_dummy || ((m_openglRender->GetExtraFeatures() & kGLTiled) != 0))
     {
-        m_openglRender->SetBackground(gray, gray, gray, 255);
+        m_openglRender->SetBackground(m_clearColor, m_clearColor, m_clearColor, m_clearAlpha);
         m_openglRender->ClearFramebuffer();
     }
     // Avoid clearing the framebuffer if it will be entirely overwritten by video
@@ -303,7 +301,7 @@ void MythVideoOutputOpenGL::RenderFrame(MythVideoFrame* Frame, FrameScanType Sca
         if (IsEmbedding())
         {
             // use MythRenderOpenGL rendering as it will clear to the appropriate 'black level'
-            m_openglRender->ClearRect(nullptr, GetWindowRect(), gray);
+            m_openglRender->ClearRect(nullptr, GetWindowRect(), m_clearColor, m_clearAlpha);
         }
         else
         {
@@ -311,7 +309,7 @@ void MythVideoOutputOpenGL::RenderFrame(MythVideoFrame* Frame, FrameScanType Sca
             // clear the unused portions of the screen
             QRegion toclear = GetBoundingRegion();
             for (auto rect : qAsConst(toclear))
-                m_openglRender->ClearRect(nullptr, rect, gray);
+                m_openglRender->ClearRect(nullptr, rect, m_clearColor, m_clearAlpha);
         }
     }
 

@@ -94,6 +94,8 @@ class MythVideoOutput : public MythVideoBounds
 
     MythVideoColourSpace m_videoColourSpace;
     LetterBoxColour      m_dbLetterboxColour  { kLetterBoxColour_Black };
+    uint8_t              m_clearColor         { 0 };
+    uint8_t              m_clearAlpha         { 255 };
     MythCodecID          m_videoCodecID       { kCodec_NONE };
     int                  m_maxReferenceFrames { 16 };
     MythVideoProfilePtr  m_videoProfile       { nullptr };

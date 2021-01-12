@@ -929,7 +929,7 @@ static const float kLimitedRangeOffset = (16.0F / 255.0F);
 static const float kLimitedRangeScale  = (219.0F / 255.0F);
 
 /// \brief An optimised method to clear a QRect to the given color
-void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect Area, int Color)
+void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect Area, int Color, int Alpha)
 {
     makeCurrent();
     BindFramebuffer(Target);
@@ -937,7 +937,7 @@ void MythRenderOpenGL::ClearRect(QOpenGLFramebufferObject *Target, const QRect A
 
     // Set the fill color
     float color = m_fullRange ? Color / 255.0F : (Color * kLimitedRangeScale) + kLimitedRangeOffset;
-    glVertexAttrib4f(COLOR_INDEX, color, color, color, 255.0F);
+    glVertexAttrib4f(COLOR_INDEX, color, color, color, Alpha / 255.0F);
     SetShaderProjection(m_defaultPrograms[kShaderSimple]);
 
     GetCachedVBO(GL_TRIANGLE_STRIP, Area);

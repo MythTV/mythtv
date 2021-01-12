@@ -163,7 +163,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DrawRoundRect(QOpenGLFramebufferObject *Target,
                         QRect Area, int CornerRadius,
                         const QBrush &FillBrush, const QPen &LinePen, int Alpha);
-    void  ClearRect(QOpenGLFramebufferObject *Target, QRect Area, int Color);
+    void  ClearRect(QOpenGLFramebufferObject *Target, QRect Area, int Color, int Alpha);
 
     std::tuple<int,int,int> GetGPUMemory();
 
@@ -228,7 +228,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     QRect      m_viewport;
     GLuint     m_activeTexture { 0 };
     bool       m_blend { false };
-    int32_t    m_background { 0x00000000 };
+    int32_t    m_background { 0x00000001 };
     bool       m_fullRange { true };
     QMatrix4x4 m_projection;
     QStack<QMatrix4x4> m_transforms;
