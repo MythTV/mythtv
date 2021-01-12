@@ -140,9 +140,9 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext** Context,
     if (!Decoder.startsWith("vaapi") || vendor.isEmpty() || qEnvironmentVariableIsSet("NO_VAAPI"))
         return failure;
 
-    auto codec   = ff_codec_id_string((*Context)->codec_id);
-    auto profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
-    auto pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
+    const auto * codec   = ff_codec_id_string((*Context)->codec_id);
+    const auto * profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
+    const auto * pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
 
     // Simple check for known profile
     auto desired = VAAPIProfileForCodec(*Context);
