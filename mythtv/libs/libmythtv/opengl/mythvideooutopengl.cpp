@@ -290,7 +290,7 @@ void MythVideoOutputOpenGL::RenderFrame(MythVideoFrame* Frame, FrameScanType Sca
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_openglRender->logDebugMarker(LOC + "CLEAR_START");
 
-    if (!Frame || Frame->m_dummy || ((m_openglRender->GetExtraFeatures() & kGLTiled) != 0))
+    if (!Frame || Frame->m_dummy || m_needFullClear || ((m_openglRender->GetExtraFeatures() & kGLTiled) != 0))
     {
         m_openglRender->SetBackground(m_clearColor, m_clearColor, m_clearColor, m_clearAlpha);
         m_openglRender->ClearFramebuffer();

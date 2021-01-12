@@ -213,6 +213,15 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* R
     SetDisplay(Display);
     m_painter->SetViewControl(MythPainterGPU::None);
 
+    // If our rendering context is overlaid on top of a video plane, we need transparency
+    // and we need to ensure we are clearing the entire framebuffer.
+    // Note: an alpha of zero is probably safe to use everywhere. tbc.
+    if (m_display->IsPlanar())
+    {
+        m_clearAlpha = 0;
+        m_needFullClear = true;
+    }
+
     connect(this, &MythVideoOutputGPU::RefreshState,   this, &MythVideoOutputGPU::DoRefreshState);
     connect(this, &MythVideoOutputGPU::DoRefreshState, this, &MythVideoOutputGPU::RefreshVideoBoundsState);
     connect(this, &MythVideoOutputGPU::DoRefreshState,

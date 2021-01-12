@@ -76,6 +76,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     bool            m_newFrameRate        { false };
     bool            m_buffersCreated      { false };
     QString         m_profile;
+    bool            m_needFullClear       { false };
 
   private:
     Q_DISABLE_COPY(MythVideoOutputGPU)

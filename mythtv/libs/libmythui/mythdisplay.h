@@ -24,6 +24,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
   public:
     virtual bool  VideoModesAvailable  () { return false; }
     virtual bool  UsingVideoModes      () { return false; }
+    virtual bool  IsPlanar             () { return false; }
     virtual const MythDisplayModes& GetVideoModes();
 
     static void  ConfigureQtGUI        (int SwapInterval = 1, const QString& Display = QString());
