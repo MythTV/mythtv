@@ -495,6 +495,16 @@ PrimariesMode MythVideoColourSpace::GetPrimariesMode(void)
     return m_primariesMode;
 }
 
+int MythVideoColourSpace::GetRange() const
+{
+    return m_range;
+}
+
+int MythVideoColourSpace::GetColourSpace() const
+{
+    return m_colourSpace;
+}
+
 void MythVideoColourSpace::SetPrimariesMode(PrimariesMode Mode)
 {
     m_primariesMode = Mode;

@@ -46,6 +46,8 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     float         GetColourGamma(void) const;
     float         GetDisplayGamma(void) const;
     PrimariesMode GetPrimariesMode(void);
+    int           GetRange() const;
+    int           GetColourSpace() const;
 
     struct ColourPrimaries
     {
