@@ -1,6 +1,9 @@
 #ifndef MYTHFRAME_H
 #define MYTHFRAME_H
 
+// Qt
+#include <QRect>
+
 // MythTV
 #include "mythtvexp.h"
 #include "mythaverror.h"
@@ -153,6 +156,11 @@ class MTV_PUBLIC MythVideoFrame
     MythDeintType  m_deinterlaceAllowed { DEINT_NONE };
     MythDeintType  m_deinterlaceInuse  { DEINT_NONE };
     bool           m_deinterlaceInuse2x { false };
+
+    // Presentation details for 'pure' direct rendering methods (e.g. DRM)
+    // Experimental and may be removed.
+    QRect          m_srcRect;
+    QRect          m_dstRect;
 
     static inline int BitsPerPixel(VideoFrameType Type)
     {
