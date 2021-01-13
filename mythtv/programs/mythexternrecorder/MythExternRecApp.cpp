@@ -300,33 +300,48 @@ Q_SLOT void MythExternRecApp::Cleanup(void)
 
 Q_SLOT void MythExternRecApp::DataStarted(void)
 {
+    LOG(VB_RECORD, LOG_INFO, LOC + "DataStarted");
+
     if (m_onDataStart.isEmpty())
         return;
 
     QString cmd = m_onDataStart;
     cmd.replace("%CHANNUM%", m_tunedChannel);
 
+    bool background = false;
+    int pos = cmd.lastIndexOf(QChar('&'));
+    if (pos > 0)
+    {
+        background = true;
+        cmd = cmd.left(pos);
+    }
+
     QStringList args = MythSplitCommandString(cmd);
     cmd = args.takeFirst();
 
-    LOG(VB_RECORD, LOG_INFO, LOC +
-        QString(" Data started, finishing tune: '%1'").arg(cmd));
+    TerminateProcess(m_finishTuneProc, "FinishTuning");
 
-    QProcess finish;
-    finish.start(cmd, args);
-    if (!finish.waitForStarted())
+    LOG(VB_RECORD, LOG_INFO, LOC + QString("Finishing tune: '%1' %3")
+        .arg(m_onDataStart).arg(background ? "in the background" : ""));
+
+    m_finishTuneProc.start(cmd, args);
+    if (!m_finishTuneProc.waitForStarted())
     {
         LOG(VB_RECORD, LOG_ERR, LOC + ": Failed to finish tune process: "
             + ENO);
         return;
     }
-    finish.waitForFinished(5000);
-    if (finish.state() == QProcess::NotRunning)
+
+    if (!background)
     {
-        if (finish.exitStatus() != QProcess::NormalExit)
+        m_finishTuneProc.waitForFinished(5000);
+        if (m_finishTuneProc.state() == QProcess::NotRunning)
         {
-            LOG(VB_RECORD, LOG_ERR, LOC + ": Finish tune failed: " + ENO);
-            return;
+            if (m_finishTuneProc.exitStatus() != QProcess::NormalExit)
+            {
+                LOG(VB_RECORD, LOG_ERR, LOC + ": Finish tune failed: " + ENO);
+                return;
+            }
         }
     }
 
@@ -519,6 +534,14 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
 
     QString tunecmd = m_tuneCommand;
     QString url;
+    bool    background = false;
+
+    int pos = tunecmd.lastIndexOf(QChar('&'));
+    if (pos > 0)
+    {
+        background = true;
+        tunecmd = tunecmd.left(pos);
+    }
 
     if (!m_channelsIni.isEmpty())
     {
@@ -591,10 +614,25 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
             return;
         }
 
-        LOG(VB_CHANNEL, LOG_INFO, LOC + QString(": Started `%1` URL '%2'")
-            .arg(tunecmd).arg(url));
-        emit SendMessage("TuneChannel", serial,
-                         QString("OK:InProgress `%1`").arg(tunecmd));
+        if (background)
+        {
+            LOG(VB_CHANNEL, LOG_INFO, LOC +
+                QString(": Started in background `%1` URL '%2'")
+                .arg(tunecmd).arg(url));
+
+            m_tunedChannel = m_tuningChannel;
+            m_tuningChannel.clear();
+            emit SetDescription(Desc());
+            emit SendMessage("TuneChannel", serial,
+                             QString("OK:Tuned `%1`").arg(m_tunedChannel));
+        }
+        else
+        {
+            LOG(VB_CHANNEL, LOG_INFO, LOC + QString(": Started `%1` URL '%2'")
+                .arg(tunecmd).arg(url));
+            emit SendMessage("TuneChannel", serial,
+                             QString("OK:InProgress `%1`").arg(tunecmd));
+        }
     }
     else
     {

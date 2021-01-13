@@ -31,7 +31,7 @@
 
 using namespace std::chrono_literals;
 
-const QString VERSION = "0.6";
+const QString VERSION = "1.0";
 
 #define LOC Desc()
 
