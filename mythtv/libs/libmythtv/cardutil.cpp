@@ -590,7 +590,7 @@ QStringList CardUtil::ProbeDeliverySystems(const QString &device)
     cmd.props = &prop;
     if (ioctl(fd_frontend, FE_GET_PROPERTY, &cmd) == 0)
     {
-        LOG(VB_GENERAL, LOG_INFO,
+        LOG(VB_GENERAL, LOG_DEBUG,
             QString("CardUtil(%1): ").arg(device) +
             QString("dvb api version %1.%2").arg((prop.u.data>>8)&0xff).arg((prop.u.data)&0xff));
     }
@@ -1005,7 +1005,7 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
     QString msg = "Supported delivery systems:";
     QStringList delsyslist = ProbeDeliverySystems(fd);
     msg.append(delsyslist.join(" "));
-    LOG(VB_GENERAL, LOG_INFO, LOC + msg);
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + msg);
 
     // If the current delivery system is DVB-T and DVB-T2 is supported then select DVB-T2
     if (DTVModulationSystem::kModulationSystem_DVBT == delsys)

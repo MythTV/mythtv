@@ -309,6 +309,12 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QMap<QString,int>     m_testOverrideInts    {};
     QMap<QString,double>  m_testOverrideFloats  {};
     QMap<QString,QString> m_testOverrideStrings {};
+
+  private:
+    bool m_dvbv3                {false};
+  public:
+    void SetDVBv3(bool dvbv3)   { m_dvbv3 = dvbv3; }
+    bool GetDVBv3(void)         { return m_dvbv3; }
 };
 
 /// This global variable contains the MythCoreContext instance for the app

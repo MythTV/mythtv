@@ -54,6 +54,7 @@
 #include "dvbcam.h"
 #include "tv_rec.h"
 
+
 // Local functions
 static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     DTVTunerType tuner_type, const DTVMultiplex& tuning, uint intermediate_freq, bool can_fec_auto);
@@ -187,6 +188,12 @@ bool DVBChannel::Open(DVBChannel *who)
     }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Opening DVB channel");
+
+    m_legacyFe = gCoreContext->GetDVBv3();
+    if (m_legacyFe)
+    {
+        LOG(VB_CHANNEL, LOG_INFO, LOC + "Use legacy DVBv3 API");
+    }
 
     QMutexLocker locker(&m_hwLock);
 

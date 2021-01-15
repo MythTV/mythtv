@@ -14,6 +14,7 @@ void MythBackendCommandLineParser::LoadArguments(void)
     addDaemon();
     addSettingsOverride();
     addUPnP();
+    addDVBv3();
     addLogging();
     addPIDFile();
 

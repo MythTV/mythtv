@@ -706,6 +706,12 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         g_pUPnp->Init(ismaster, cmdline.toBool("noupnp"));
     }
 
+    if (cmdline.toBool("dvbv3"))
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Use legacy DVBv3 API");
+        gCoreContext->SetDVBv3(true);
+    }
+
     // ----------------------------------------------------------------------
     // Setup status server
     // ----------------------------------------------------------------------

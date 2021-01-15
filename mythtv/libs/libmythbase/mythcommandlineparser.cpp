@@ -2379,6 +2379,13 @@ void MythCommandLineParser::addUPnP(void)
     add("--noupnp", "noupnp", false, "Disable use of UPnP.", "");
 }
 
+/** \brief Canned argument definition for --dvbv3
+ */
+void MythCommandLineParser::addDVBv3(void)
+{
+    add("--dvbv3", "dvbv3", false, "Use legacy DVBv3 API.", "");
+}
+
 /** \brief Canned argument definition for all logging options, including
  *  --verbose, --logpath, --quiet, --loglevel, --syslog, and --enable-dblog
   */
