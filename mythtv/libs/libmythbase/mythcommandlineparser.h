@@ -129,9 +129,9 @@ class MBASE_PUBLIC MythCommandLineParser
     };
 
     explicit MythCommandLineParser(QString appname);
-   ~MythCommandLineParser();
+    virtual ~MythCommandLineParser();
 
-    virtual void LoadArguments(void) {};
+    virtual void LoadArguments(void) {}
     static void PrintVersion(void) ;
     void PrintHelp(void) const;
     QString GetHelpString(void) const;
