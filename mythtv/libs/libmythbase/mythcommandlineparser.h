@@ -1,4 +1,5 @@
-// -*- Mode: c++ -*-
+#ifndef MYTHCOMMANDLINEPARSER_H
+#define MYTHCOMMANDLINEPARSER_H
 
 #include <cstdint>   // for uint64_t
 #include <utility>
@@ -143,114 +144,72 @@ class MBASE_PUBLIC MythCommandLineParser
 // overloaded add constructors for single string options
     // bool with default
     CommandLineArg* add(const QString& arg, const QString& name, bool def,
-                        QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::Bool,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // int
     CommandLineArg* add(const QString& arg, const QString& name, int def,
-                        QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::Int,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // uint
     CommandLineArg* add(const QString& arg, const QString& name, uint def,
-             QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::UInt,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // long long
     CommandLineArg* add(const QString& arg, const QString& name, long long def,
-             QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::LongLong,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // double
     CommandLineArg* add(const QString& arg, const QString& name, double def,
-             QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::Double,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // const char *
     CommandLineArg* add(const QString& arg, const QString& name, const char *def,
-             QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::String,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // QString
     CommandLineArg* add(const QString& arg, const QString& name, const QString& def,
-             QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::String,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // QSize
     CommandLineArg* add(const QString& arg, const QString& name, QSize def,
-             QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::Size,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // QDateTime
     CommandLineArg* add(const QString& arg, const QString& name, const QDateTime& def,
-             QString help, QString longhelp)
-          { return add(QStringList(arg), name, QVariant::DateTime,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // anything else
     CommandLineArg* add(const QString& arg, const QString& name, QVariant::Type type,
-             QString help, QString longhelp)
-          { return add(QStringList(arg), name, type,
-                       QVariant(type), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // anything else with default
     CommandLineArg* add(const QString& arg, const QString& name, QVariant::Type type,
-             QVariant def, QString help, QString longhelp)
-          { return add(QStringList(arg), name, type,
-                       std::move(def), std::move(help), std::move(longhelp)); }
+                        QVariant def, QString help, QString longhelp);
 
 // overloaded add constructors for multi-string options
     // bool with default
     CommandLineArg* add(QStringList arglist, const QString& name, bool def,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, QVariant::Bool,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // int
     CommandLineArg* add(QStringList arglist, const QString& name, int def,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, QVariant::Int,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // uint
     CommandLineArg* add(QStringList arglist, const QString& name, uint def,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, QVariant::UInt,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // long long
     CommandLineArg* add(QStringList arglist, const QString& name, long long def,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, QVariant::LongLong,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // float
     CommandLineArg* add(QStringList arglist, const QString& name, double def,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, QVariant::Double,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // const char *
     CommandLineArg* add(QStringList arglist, const QString& name, const char *def,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, QVariant::String,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // QString
     CommandLineArg* add(QStringList arglist, const QString& name, const QString& def,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, QVariant::String,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // QSize
     CommandLineArg* add(QStringList arglist, const QString& name, QSize def,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, QVariant::Size,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // QDateTime
     CommandLineArg* add(QStringList arglist, const QString& name, const QDateTime& def,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, QVariant::DateTime,
-                       QVariant(def), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // anything else
     CommandLineArg* add(QStringList arglist, const QString& name, QVariant::Type type,
-             QString help, QString longhelp)
-          { return add(std::move(arglist), name, type,
-                       QVariant(type), std::move(help), std::move(longhelp)); }
+                        QString help, QString longhelp);
     // anything else with default
     CommandLineArg* add(QStringList arglist, const QString& name, QVariant::Type type,
-             QVariant def, QString help, QString longhelp);
+                        QVariant def, QString help, QString longhelp);
 
     QVariant                operator[](const QString &name);
     QStringList             GetArgs(void) const;
@@ -316,3 +275,5 @@ class MBASE_PUBLIC MythCommandLineParser
 };
 
 Q_DECLARE_METATYPE(MythCommandLineParser::Result)
+
+#endif

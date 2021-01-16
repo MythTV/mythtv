@@ -1648,6 +1648,132 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
     return true;
 }
 
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, bool def,
+                                           QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, QVariant::Bool, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, int def,
+                                          QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, QVariant::Int, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, uint def,
+                                           QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, QVariant::UInt, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, long long def,
+                                           QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, QVariant::LongLong, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, double def,
+                                           QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, QVariant::Double, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, const char *def,
+                                           QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, QVariant::String, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, const QString& def,
+                                           QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, QVariant::String, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, QSize def,
+                                           QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, QVariant::Size, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, const QDateTime& def,
+                                           QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, QVariant::DateTime, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, QVariant::Type type,
+                                           QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, type, QVariant(type), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, QVariant::Type type,
+                                           QVariant def, QString help, QString longhelp)
+{
+    return add(QStringList(arg), name, type, std::move(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, bool def,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, QVariant::Bool, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, int def,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, QVariant::Int, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, uint def,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, QVariant::UInt, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, long long def,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, QVariant::LongLong, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, double def,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, QVariant::Double, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, const char *def,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, QVariant::String, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, const QString& def,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, QVariant::String, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, QSize def,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, QVariant::Size, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, const QDateTime& def,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, QVariant::DateTime, QVariant(def), std::move(help), std::move(longhelp));
+}
+
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, QVariant::Type type,
+                                           QString help, QString longhelp)
+{
+    return add(std::move(arglist), name, type, QVariant(type), std::move(help), std::move(longhelp));
+}
+
 /** \brief Replace dummy arguments used to define interdependency with pointers
  *  to their real counterparts.
  */
