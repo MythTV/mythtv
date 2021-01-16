@@ -11,6 +11,7 @@
 #include "referencecounter.h"
 #include "mythdisplaymode.h"
 #include "mythedid.h"
+#include "mythcommandlineparser.h"
 
 // Std
 #include <cmath>
@@ -27,7 +28,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     virtual bool  IsPlanar             () { return false; }
     virtual const MythDisplayModes& GetVideoModes();
 
-    static void  ConfigureQtGUI        (int SwapInterval = 1, const QString& Display = QString());
+    static void  ConfigureQtGUI        (int SwapInterval, const MythCommandLineParser& CmdLine);
     static bool  SpanAllScreens        ();
     static QString GetExtraScreenInfo  (QScreen *qScreen);
     QStringList  GetDescription        ();

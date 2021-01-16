@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
 
     if (use_display)
     {
-        MythDisplay::ConfigureQtGUI(1, cmdline.toString("display"));
+        MythDisplay::ConfigureQtGUI(1, cmdline);
         app = std::make_unique<QApplication>(argc, argv);
     }
     else

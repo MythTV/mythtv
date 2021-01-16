@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
         swapinterval = 0;
     }
 
-    MythDisplay::ConfigureQtGUI(swapinterval, cmdline.toString("display"));
+    MythDisplay::ConfigureQtGUI(swapinterval, cmdline);
 
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHAVTEST);

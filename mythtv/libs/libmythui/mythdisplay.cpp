@@ -1041,7 +1041,7 @@ void MythDisplay::DebugModes() const
  * \note This function must be called before Qt/QPA is initialised i.e. before
  * any call to QApplication.
 */
-void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
+void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& CmdLine)
 {
 #ifdef USING_QTWEBENGINE
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
@@ -1098,8 +1098,9 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const QString& _Display)
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 
 #ifdef USING_X11
-    MythXDisplay::SetQtX11Display(_Display);
+    if (auto display = CmdLine.toString("display"); !display.isEmpty())
+        MythXDisplay::SetQtX11Display(display);
 #else
-    (void)_Display;
+    (void)CmdLine;
 #endif
 }
