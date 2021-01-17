@@ -616,7 +616,7 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     AES_cbc_encrypt((const unsigned char *)data_in,
                     decrypted_data.data(), aeslen,
                     &m_aesKey, iv.data(), AES_DECRYPT);
-    std::copy(data_in + aeslen, data_in + len - aeslen,
+    std::copy(data_in + aeslen, data_in + len,
               decrypted_data.data() + aeslen);
 
     AVPacket tmp_pkt;
