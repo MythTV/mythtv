@@ -10,7 +10,8 @@ using DRMFbs = std::vector<DRMFb>;
 class MythDRMFramebuffer
 {
   public:
-    DRMFb Create(int FD, uint32_t Id);
+    static DRMFb Create(int FD, uint32_t Id);
+    QString Description() const;
 
     uint32_t m_id        { 0 };
     uint32_t m_width     { 0 };

@@ -1,5 +1,6 @@
 // MythTV
 #include "platforms/drm/mythdrmframebuffer.h"
+#include "platforms/drm/mythdrmplane.h"
 
 /*! \class MythDRMFramebuffer
  * \brief A simple object representing a DRM Framebuffer object.
@@ -25,4 +26,10 @@ MythDRMFramebuffer::MythDRMFramebuffer(int FD, uint32_t Id)
         std::copy(std::begin(fb->offsets), std::end(fb->offsets), std::begin(m_offsets));
         drmModeFreeFB2(fb);
     }
+}
+
+QString MythDRMFramebuffer::Description() const
+{
+    return QString("Framebuffer #%1 Size: %2x%3 Format: %4 Mods: 0x%5")
+        .arg(m_id).arg(m_width).arg(m_height).arg(MythDRMPlane::FormatToString(m_format)).arg(m_modifiers, 0, 16);
 }
