@@ -23,5 +23,6 @@ MythDRMFramebuffer::MythDRMFramebuffer(int FD, uint32_t Id)
         std::copy(std::begin(fb->handles), std::end(fb->handles), std::begin(m_handles));
         std::copy(std::begin(fb->pitches), std::end(fb->pitches), std::begin(m_pitches));
         std::copy(std::begin(fb->offsets), std::end(fb->offsets), std::begin(m_offsets));
+        drmModeFreeFB2(fb);
     }
 }
