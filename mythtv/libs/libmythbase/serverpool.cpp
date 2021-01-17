@@ -503,19 +503,27 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
 
         QNetworkAddressEntry host;
 
-        auto sameaddr = [qha](const auto & iae)
-            {return PrivUdpSocket::contains(iae, qha); };
         if (qha.protocol() == QAbstractSocket::IPv6Protocol)
         {
-            auto it = std::find_if(naList_6.cbegin(), naList_6.cend(), sameaddr);
-            if (it != naList_6.cend())
-                host = *it;
+            for (const auto& iae : qAsConst(naList_6))
+            {
+                if (PrivUdpSocket::contains(iae, qha))
+                {
+                    host = iae;
+                    break;
+                }
+            }
         }
         else
         {
-            auto it = std::find_if(naList_4.cbegin(), naList_4.cend(), sameaddr);
-            if (it != naList_4.cend())
-                host = *it;
+            for (const auto& iae : qAsConst(naList_4))
+            {
+                if (PrivUdpSocket::contains(iae, qha))
+                {
+                    host = iae;
+                    break;
+                }
+            }
         }
 
         auto *socket = new PrivUdpSocket(this, host);
