@@ -12,7 +12,7 @@
 // mytharchive
 #include "archivedbcheck.h"
 
-const QString currentDatabaseVersion = "1005";
+const QString currentDatabaseVersion = "1006";
 const QString MythArchiveVersionName = "ArchiveDBSchemaVer";
 
 bool UpgradeArchiveDatabaseSchema(void)
@@ -93,12 +93,12 @@ bool UpgradeArchiveDatabaseSchema(void)
             qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                        .arg(gContext->GetDatabaseParams().m_dbName)),
             "ALTER TABLE archiveitems"
-            "  DEFAULT CHARACTER SET default,"
-            "  MODIFY title varchar(128) CHARACTER SET utf8 default NULL,"
-            "  MODIFY subtitle varchar(128) CHARACTER SET utf8 default NULL,"
+            "  DEFAULT CHARACTER SET utf8,"
+            "  MODIFY title varchar(128) CHARACTER SET utf8 NULL,"
+            "  MODIFY subtitle varchar(128) CHARACTER SET utf8 NULL,"
             "  MODIFY description text CHARACTER SET utf8,"
-            "  MODIFY startdate varchar(30) CHARACTER SET utf8 default NULL,"
-            "  MODIFY starttime varchar(30) CHARACTER SET utf8 default NULL,"
+            "  MODIFY startdate varchar(30) CHARACTER SET utf8 NULL,"
+            "  MODIFY starttime varchar(30) CHARACTER SET utf8 NULL,"
             "  MODIFY filename text CHARACTER SET utf8 NOT NULL,"
             "  MODIFY cutlist text CHARACTER SET utf8;"
         };
@@ -137,6 +137,25 @@ bool UpgradeArchiveDatabaseSchema(void)
 
         if (!performActualUpdate("MythArchive", MythArchiveVersionName,
                                  updates, "1005", dbver))
+            return false;
+    }
+
+    // Repeat 1003 DBs pre MySQL v8 systems that may have not be set to utf8
+
+    if (dbver == "1005")
+    {
+        DBUpdates updates
+        {
+            "ALTER TABLE archiveitems"
+            "  DEFAULT CHARACTER SET utf8,"
+            "  MODIFY title varchar(128) CHARACTER SET utf8 NULL,"
+            "  MODIFY subtitle varchar(128) CHARACTER SET utf8 NULL,"
+            "  MODIFY startdate varchar(30) CHARACTER SET utf8 NULL,"
+            "  MODIFY starttime varchar(30) CHARACTER SET utf8 NULL;"
+        };
+
+        if (!performActualUpdate("MythArchive", MythArchiveVersionName,
+                                 updates, "1006", dbver))
             return false;
     }
 

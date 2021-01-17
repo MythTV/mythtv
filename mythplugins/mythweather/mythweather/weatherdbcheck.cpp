@@ -9,7 +9,7 @@
 
 #include "weatherdbcheck.h"
 
-const QString currentDatabaseVersion = "1006";
+const QString currentDatabaseVersion = "1007";
 const QString MythWeatherVersionName = "WeatherDBSchemaVer";
 
 /*
@@ -125,15 +125,15 @@ bool InitializeDatabase()
             qPrintable(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             .arg(gContext->GetDatabaseParams().m_dbName)),
             "ALTER TABLE weatherdatalayout"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SET utf8,"
             "  MODIFY location varchar(64) CHARACTER SET utf8 NOT NULL,"
             "  MODIFY dataitem varchar(64) CHARACTER SET utf8 NOT NULL;",
             "ALTER TABLE weatherscreens"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SET utf8,"
             "  MODIFY container varchar(64) CHARACTER SET utf8 NOT NULL,"
             "  MODIFY hostname varchar(64) CHARACTER SET utf8 default NULL;",
             "ALTER TABLE weathersourcesettings"
-            "  DEFAULT CHARACTER SET default,"
+            "  DEFAULT CHARACTER SET utf8,"
             "  MODIFY source_name varchar(64) CHARACTER SET utf8 NOT NULL,"
             "  MODIFY hostname varchar(64) CHARACTER SET utf8 default NULL,"
             "  MODIFY path varchar(255) CHARACTER SET utf8 default NULL,"
@@ -185,5 +185,19 @@ bool InitializeDatabase()
             return false;
     }
 
+    // Repeat 1002 DBs pre MySQL v8 systems that may have not be set to utf8
+
+    if (dbver == "1006")
+    {
+        DBUpdates updates {
+            "ALTER TABLE weatherdatalayout DEFAULT CHARACTER SET utf8;"
+            "ALTER TABLE weatherscreens DEFAULT CHARACTER SET utf8;"
+            "ALTER TABLE weathersourcesettings DEFAULT CHARACTER SET utf8;"
+        };
+
+        if (!performActualUpdate("MythWeather", MythWeatherVersionName,
+                                 updates, "1007", dbver))
+            return false;
+    }
     return true;
 }
