@@ -1,5 +1,3 @@
-#include <chrono>
-
 //Qt
 #include <QTimer>
 #include <QThread>
@@ -16,6 +14,8 @@
 #include "mythegl.h"
 #include "mythmainwindow.h"
 
+// Std
+#include <chrono>
 using namespace std::chrono_literals;
 
 #ifdef USING_DBUS
@@ -1064,10 +1064,10 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
 
 #if defined (Q_OS_LINUX) && defined (USING_EGL) && defined (USING_X11)
     // We want to use EGL for VAAPI/MMAL/DRMPRIME rendering to ensure we
-    // can use zero copy video buffers for the best performance (N.B. not tested
-    // on AMD desktops). To force Qt to use EGL we must set 'QT_XCB_GL_INTEGRATION'
-    // to 'xcb_egl' and this must be done before any GUI is created. If the platform
-    // plugin is not xcb then this should have no effect.
+    // can use zero copy video buffers for the best performance.
+    // To force Qt to use EGL we must set 'QT_XCB_GL_INTEGRATION' to 'xcb_egl'
+    // and this must be done before any GUI is created. If the platform plugin is
+    // not xcb then this should have no effect.
     // This does however break when using NVIDIA drivers - which do not support
     // EGL like other drivers so we try to check the EGL vendor - and we currently
     // have no need for EGL with NVIDIA (that may change however).
@@ -1084,11 +1084,11 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
         QString vendor = MythEGL::GetEGLVendor();
         if (vendor.contains("nvidia", Qt::CaseInsensitive) && !force)
         {
-            qInfo() << LOC + QString("Not requesting EGL for vendor '%1'").arg(vendor);
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Not requesting EGL for vendor '%1'").arg(vendor));
         }
         else if (!vendor.isEmpty() || force)
         {
-            qInfo() << LOC + QString("Requesting EGL for '%1'").arg(vendor);
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Requesting EGL for vendor '%1'").arg(vendor));
             setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
         }
     }
