@@ -17,6 +17,7 @@
 
 #define LOC QString("ServerPool: ")
 
+// Lists of IP address this machine is listening to.
 static QList<QNetworkAddressEntry> naList_4;
 static QList<QNetworkAddressEntry> naList_6;
 static QReadWriteLock naLock;
@@ -502,6 +503,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
             continue;
 
         QNetworkAddressEntry host;
+        QNetworkAddressEntry wildcard;
 
         if (qha.protocol() == QAbstractSocket::IPv6Protocol)
         {
@@ -512,6 +514,8 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
                     host = iae;
                     break;
                 }
+                if (iae.ip() == QHostAddress::AnyIPv6)
+                    wildcard = iae;
             }
         }
         else
@@ -523,7 +527,25 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
                     host = iae;
                     break;
                 }
+                if (iae.ip() == QHostAddress::AnyIPv4)
+                    wildcard = iae;
             }
+        }
+
+        if (host.ip().isNull())
+        {
+            if (wildcard.ip().isNull())
+            {
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("Failed to find local address to use for destination %1:%2.")
+                    .arg(PRETTYIP_(qha)).arg(port));
+                continue;
+            }
+
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("Failed to find local address to use for destination %1:%2. Using wildcard.")
+                .arg(PRETTYIP_(qha)).arg(port));
+            host = wildcard;
         }
 
         auto *socket = new PrivUdpSocket(this, host);
@@ -609,7 +631,27 @@ qint64 ServerPool::writeDatagram(const char * data, qint64 size,
         }
     }
     if (!m_lastUdpSocket)
+    {
+        // Couldn't find an exact socket. See is there is a wildcard one.
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("No exact socket match for %1:%2. Searching for wildcard.")
+            .arg(PRETTYIP_(addr)).arg(port));
+        for (auto *val : qAsConst(m_udpSockets))
+        {
+            if ((addr.protocol() == QAbstractSocket::IPv6Protocol &&
+                 val->host().ip() == QHostAddress::AnyIPv6) ||
+                (val->host().ip() == QHostAddress::AnyIPv4))
+            {
+                m_lastUdpSocket = val;
+                break;
+            }
+        }
+    }
+    if (!m_lastUdpSocket)
+    {
+        LOG(VB_GENERAL, LOG_DEBUG, QString("No m_lastUdpSocket"));
         return -1;
+    }
 
     qint64 ret = m_lastUdpSocket->writeDatagram(data, size, addr, port);
     if (ret != size)
