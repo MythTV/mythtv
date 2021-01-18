@@ -812,6 +812,8 @@ void MythDRMDevice::MainWindowReady()
     // This is causing issues - disabled for now
     //DisableVideoPlane();
 
+    // Temporarily disabled - this is informational only
+    /*
     // Confirm GUI plane format now that Qt is setup
     if (m_guiPlane.get())
     {
@@ -834,6 +836,7 @@ void MythDRMDevice::MainWindowReady()
             }
         }
     }
+    */
 }
 
 DRMCrtc MythDRMDevice::GetCrtc() const
