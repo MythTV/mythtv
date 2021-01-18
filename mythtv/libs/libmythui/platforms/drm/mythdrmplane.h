@@ -34,6 +34,7 @@ class MUI_PUBLIC MythDRMPlane
     static bool      FormatIsVideo       (uint32_t Format);
     static bool      HasOverlayFormat    (FOURCCVec Formats);
     static uint32_t  GetAlphaFormat      (FOURCCVec Formats);
+    QString          Description() const;
 
     uint32_t  m_id            { 0 };
     uint32_t  m_index         { 0 };

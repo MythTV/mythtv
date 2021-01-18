@@ -75,6 +75,13 @@ MythDRMPlane::MythDRMPlane(int FD, uint32_t Id, uint32_t Index)
     }
 }
 
+QString MythDRMPlane::Description() const
+{
+    return QString("Plane #%1 %2 Index: %3 FB: %4 CRTC: %5 Formats: %6")
+        .arg(m_id).arg(MythDRMPlane::PlaneTypeToString(m_type)).arg(m_index)
+        .arg(m_fbId).arg(m_crtcId).arg(MythDRMPlane::FormatsToString(m_formats));
+}
+
 DRMPlanes MythDRMPlane::GetPlanes(int FD, int CRTCFilter)
 {
     DRMPlanes result;
