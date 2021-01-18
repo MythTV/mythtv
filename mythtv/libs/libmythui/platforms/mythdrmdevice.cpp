@@ -118,7 +118,11 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     // Note: Not sure which takes precedent in Qt or what happens if they are different.
     auto platform = CmdLine.toString("platform");
     if (platform.isEmpty())
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+        platform = QString(qgetenv("QT_QPA_PLATFORM"));
+#else
         platform = qEnvironmentVariable("QT_QPA_PLATFORM");
+#endif
     if (!platform.contains("eglfs", Qt::CaseInsensitive))
     {
         // Log something just in case it reminds someone to enable eglfs
