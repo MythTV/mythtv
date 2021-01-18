@@ -42,6 +42,7 @@ QString MythInteropGPU::TypesToString(const InteropMap &Types)
     for (const auto & types : Types)
         for (auto type : types.second)
             result << TypeToString(type);
+    result.removeDuplicates();
     return result.isEmpty() ? "None" : result.join(",");
 }
 
