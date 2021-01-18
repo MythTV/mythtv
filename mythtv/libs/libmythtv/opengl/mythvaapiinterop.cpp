@@ -1,5 +1,10 @@
 ﻿// MythTV
+#ifdef USING_DRM_VIDEO
+#include "platforms/mythdisplaydrm.h"
+#endif
+
 #include "mythvideoout.h"
+#include "mythplayerui.h"
 #include "mythvideocolourspace.h"
 #include "fourcc.h"
 #include "mythvaapiinterop.h"
@@ -42,6 +47,12 @@ void MythVAAPIInterop::GetVAAPITypes(MythRenderOpenGL* Context, MythInteropGPU::
 
     // best first
     MythInteropGPU::InteropTypes vaapitypes;
+
+#ifdef USING_DRM_VIDEO
+    if (MythDisplayDRM::DirectRenderingAvailable())
+        vaapitypes.emplace_back(DRM_DRMPRIME);
+#endif
+
 #ifdef USING_EGL
     // zero copy
     if (egl && MythVAAPIInteropDRM::IsSupported(Context))
@@ -63,15 +74,14 @@ MythVAAPIInterop* MythVAAPIInterop::CreateVAAPI(MythPlayerUI *Player, MythRender
     if (!(Player && Context))
         return nullptr;
 
-    MythInteropGPU::InteropMap types;
-    MythVAAPIInterop::GetVAAPITypes(Context, types);
-    if (auto vaapi = types.find(FMT_VAAPI); vaapi != types.end())
+    const auto & types = Player->GetInteropTypes();
+    if (const auto & vaapi = types.find(FMT_VAAPI); vaapi != types.cend())
     {
         for (auto type : vaapi->second)
         {
 #ifdef USING_EGL
-            if (type == GL_VAAPIEGLDRM)
-                return new MythVAAPIInteropDRM(Player, Context);
+            if ((type == GL_VAAPIEGLDRM) || (type == DRM_DRMPRIME))
+                return new MythVAAPIInteropDRM(Player, Context, type);
 #endif
             if (type == GL_VAAPIGLXPIX)
                 return new MythVAAPIInteropGLXPixmap(Player, Context);

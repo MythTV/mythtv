@@ -159,6 +159,7 @@ class MTV_PUBLIC MythVideoFrame
 
     // Presentation details for 'pure' direct rendering methods (e.g. DRM)
     // Experimental and may be removed.
+    bool           m_displayed { false };
     QRect          m_srcRect;
     QRect          m_dstRect;
 

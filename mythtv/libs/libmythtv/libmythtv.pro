@@ -33,7 +33,7 @@ DEPENDPATH  += ../libmyth ../libmyth/audio
 DEPENDPATH  += ../libmythbase
 DEPENDPATH  += ./mpeg ./channelscan ./mheg ./decoders ./opengl ./io ./captions
 DEPENDPATH  += ./visualisations ./visualisations/opengl ./visualisations/vulkan
-DEPENDPATH  += ./vulkan
+DEPENDPATH  += ./vulkan ./drm
 DEPENDPATH  += ./overlays
 DEPENDPATH  += ./recorders
 DEPENDPATH  += ./recorders/dvbdev
@@ -519,6 +519,20 @@ using_frontend {
         HEADERS += decoders/mythvdpaucontext.h   decoders/mythvdpauhelper.h
         SOURCES += decoders/mythvdpaucontext.cpp decoders/mythvdpauhelper.cpp
         LIBS += -lvdpau
+    }
+
+    using_drm:using_qtprivateheaders {
+        DEFINES += USING_DRM
+        DEFINES += USING_DRM_VIDEO
+        DEFINES += USING_QTPRIVATEHEADERS
+        QT += gui-private
+        QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
+        HEADERS += drm/mythvideodrm.h
+        HEADERS += drm/mythvideodrmbuffer.h
+        HEADERS += drm/mythvideodrmutils.h
+        SOURCES += drm/mythvideodrm.cpp
+        SOURCES += drm/mythvideodrmbuffer.cpp
+        SOURCES += drm/mythvideodrmutils.cpp
     }
 
     using_vaapi {

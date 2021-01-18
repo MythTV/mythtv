@@ -671,24 +671,28 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // nothing to display, then fallback to this framebuffer.
     // N.B. this is now strictly necessary with v4l2 and DRM PRIME direct rendering
     // but ignore now for performance reasons
-    bool expectinghwframes = Frame ? MythVideoFrame::HardwareFramesFormat(Frame->m_type) :
-                                     MythVideoFrame::HardwareFramesFormat(m_inputType);
-    VideoResizing resize = expectinghwframes ? Framebuffer: None;
-
-    // This is experimental support for direct rendering to a framebuffer (e.g. DRM).
-    // It may be removed or refactored (e.g. pass presentation details through to
-    // the interop).
-    if (Frame && expectinghwframes)
-    {
-        Frame->m_srcRect = m_videoRect;
-        Frame->m_dstRect = m_displayVideoRect;
-    }
+    VideoResizing resize = Frame ? (MythVideoFrame::HardwareFramesFormat(Frame->m_type) ? Framebuffer : None) :
+                                   (MythVideoFrame::HardwareFramesFormat(m_inputType)  ? Framebuffer : None);
 
     vector<MythVideoTextureOpenGL*> inputtextures = m_inputTextures;
     if (inputtextures.empty())
     {
+        // This is experimental support for direct rendering to a framebuffer (e.g. DRM).
+        // It may be removed or refactored (e.g. pass presentation details through to
+        // the interop).
+        if (Frame)
+        {
+            Frame->m_displayed = false;
+            Frame->m_srcRect = m_videoRect;
+            Frame->m_dstRect = m_displayVideoRect;
+        }
+
         // Pull in any hardware frames
         inputtextures = MythOpenGLInterop::Retrieve(m_openglRender, m_videoColourSpace, Frame, Scan);
+
+        if (Frame && Frame->m_displayed)
+            return;
+
         if (!inputtextures.empty())
         {
             hwframes = true;

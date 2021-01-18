@@ -14,8 +14,8 @@ extern "C" {
 
 #define LOC QString("VAAPIDRM: ")
 
-MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythPlayerUI *Player, MythRenderOpenGL* Context)
-  : MythVAAPIInterop(Player, Context, GL_VAAPIEGLDRM),
+MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythPlayerUI *Player, MythRenderOpenGL* Context, InteropType Type)
+  : MythVAAPIInterop(Player, Context, Type),
     MythEGLDMABUF(Context)
 {
     QString device = gCoreContext->GetSetting("VAAPIDevice");
@@ -48,6 +48,9 @@ MythVAAPIInteropDRM::MythVAAPIInteropDRM(MythPlayerUI *Player, MythRenderOpenGL*
 
 MythVAAPIInteropDRM::~MythVAAPIInteropDRM()
 {
+#ifdef USING_DRM_VIDEO
+    delete m_drm;
+#endif
     OpenGLLocker locker(m_openglContext);
     CleanupDRMPRIME();
     CleanupReferenceFrames();
@@ -247,6 +250,12 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL* C
         CleanupReferenceFrames();
     }
     m_discontinuityCounter = Frame->m_frameCounter;
+
+#ifdef USING_DRM_VIDEO
+    if (!m_drmTriedAndFailed)
+        if (HandleDRMVideo(ColourSpace, id, Frame))
+            return result;
+#endif
 
     // return cached texture if available
     if (m_openglTextures.contains(id))
@@ -506,3 +515,35 @@ bool MythVAAPIInteropDRM::TestPrimeInterop()
     return false;
 #endif
 }
+
+#ifdef USING_DRM_VIDEO
+bool MythVAAPIInteropDRM::HandleDRMVideo(MythVideoColourSpace* ColourSpace, VASurfaceID Id, MythVideoFrame* Frame)
+{
+    if (!((m_type == DRM_DRMPRIME) && m_usePrime && Id && Frame && ColourSpace))
+        return false;
+
+    if (!m_drm)
+        m_drm = new MythVideoDRM(ColourSpace);
+
+    if (m_drm)
+    {
+        if (m_drm->IsValid())
+        {
+            if (!m_drmFrames.contains(Id))
+                m_drmFrames.insert(Id, GetDRMFrameDescriptor(Id));
+            if (m_drm->RenderFrame(m_drmFrames[Id], Frame))
+                return true;
+        }
+
+        // RenderFrame may have decided we should give up
+        if (!m_drm->IsValid())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling DRM video");
+            m_drmTriedAndFailed = true;
+            delete m_drm;
+            m_drm = nullptr;
+        }
+    }
+    return false;
+}
+#endif

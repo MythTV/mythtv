@@ -1,6 +1,12 @@
 // MythTV
+#include "mythplayerui.h"
 #include "mythvideocolourspace.h"
 #include "mythdrmprimeinterop.h"
+
+#ifdef USING_DRM_VIDEO
+#include "mythmainwindow.h"
+#include "platforms/mythdisplaydrm.h"
+#endif
 
 // FFmpeg
 extern "C" {
@@ -10,14 +16,17 @@ extern "C" {
 
 #define LOC QString("DRMInterop: ")
 
-MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL* Context, MythPlayerUI* Player)
-  : MythOpenGLInterop(Context, GL_DRMPRIME, Player),
+MythDRMPRIMEInterop::MythDRMPRIMEInterop(MythRenderOpenGL* Context, MythPlayerUI* Player, InteropType Type)
+  : MythOpenGLInterop(Context, Type, Player),
     MythEGLDMABUF(Context)
 {
 }
 
 MythDRMPRIMEInterop::~MythDRMPRIMEInterop()
 {
+#ifdef USING_DRM_VIDEO
+    delete m_drm;
+#endif
     MythDRMPRIMEInterop::DeleteTextures();
 }
 
@@ -49,19 +58,35 @@ void MythDRMPRIMEInterop::DeleteTextures(void)
 }
 
 /*! \brief Create a DRM PRIME interop instance.
- *
- * \note This is called directly from the decoder - hence we do not attempt
- * to retrieve the list of supported types again. Assume it has already been verified.
 */
 MythDRMPRIMEInterop* MythDRMPRIMEInterop::CreateDRM(MythRenderOpenGL* Context, MythPlayerUI* Player)
 {
-    return Context ? new MythDRMPRIMEInterop(Context, Player) : nullptr;
+    if (!(Player && Context))
+        return nullptr;
+
+    const auto & types = Player->GetInteropTypes();
+    if (const auto & drm = types.find(FMT_DRMPRIME); drm != types.cend())
+        for (auto type : drm->second)
+            if ((type == GL_DRMPRIME) || (type == DRM_DRMPRIME))
+                return new MythDRMPRIMEInterop(Context, Player, type);
+
+    return nullptr;
 }
 
 void MythDRMPRIMEInterop::GetDRMTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types)
 {
+    MythInteropGPU::InteropTypes drmtypes;
+
+#ifdef USING_DRM_VIDEO
+    if (MythDisplayDRM::DirectRenderingAvailable())
+        drmtypes.emplace_back(DRM_DRMPRIME);
+#endif
+
     if (HaveDMABuf(Render))
-        Types[FMT_DRMPRIME] = { GL_DRMPRIME };
+        drmtypes.emplace_back(GL_DRMPRIME);
+
+    if (!drmtypes.empty())
+        Types[FMT_DRMPRIME] = drmtypes;
 }
 
 AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Context, MythVideoFrame *Frame)
@@ -106,9 +131,14 @@ vector<MythVideoTextureOpenGL*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *C
     if (!Frame)
         return result;
 
-    auto *drmdesc = VerifyBuffer(Context, Frame);
+    auto * drmdesc = VerifyBuffer(Context, Frame);
     if (!drmdesc)
         return result;
+
+#ifdef USING_DRM_VIDEO
+    if (HandleDRMVideo(ColourSpace, Frame, drmdesc))
+        return result;
+#endif
 
     bool firstpass  = m_openglTextures.isEmpty();
     bool interlaced = is_interlaced(Scan);
@@ -205,3 +235,31 @@ vector<MythVideoTextureOpenGL*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *C
     return result;
 }
 
+#ifdef USING_DRM_VIDEO
+bool MythDRMPRIMEInterop::HandleDRMVideo(MythVideoColourSpace* ColourSpace, MythVideoFrame* Frame,
+                                         AVDRMFrameDescriptor* DRMDesc)
+{
+    if (!((m_type == DRM_DRMPRIME) && !m_drmTriedAndFailed && Frame && DRMDesc && ColourSpace))
+        return false;
+
+    if (!m_drm)
+        m_drm = new MythVideoDRM(ColourSpace);
+
+    if (m_drm)
+    {
+        if (m_drm->IsValid())
+            if (m_drm->RenderFrame(DRMDesc, Frame))
+                return true;
+
+        // RenderFrame may have decided we should give up
+        if (!m_drm->IsValid())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling DRM video");
+            m_drmTriedAndFailed = true;
+            delete m_drm;
+            m_drm = nullptr;
+        }
+    }
+    return false;
+}
+#endif

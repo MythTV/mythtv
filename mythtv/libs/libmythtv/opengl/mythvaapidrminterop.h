@@ -5,13 +5,17 @@
 #include "opengl/mythegldmabuf.h"
 #include "opengl/mythvaapiinterop.h"
 
+#ifdef USING_DRM_VIDEO
+#include "drm/mythvideodrm.h"
+#endif
+
 class MythDRMPRIMEInterop;
 struct AVDRMFrameDescriptor;
 
 class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
 {
   public:
-    MythVAAPIInteropDRM(MythPlayerUI* Player, MythRenderOpenGL* Context);
+    MythVAAPIInteropDRM(MythPlayerUI* Player, MythRenderOpenGL* Context, InteropType Type);
    ~MythVAAPIInteropDRM() override;
     vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context,
                                             MythVideoColourSpace* ColourSpace,
@@ -42,6 +46,12 @@ class MythVAAPIInteropDRM : public MythVAAPIInterop, public MythEGLDMABUF
     bool                      TestPrimeInterop();
     bool                      m_usePrime { false };
     QHash<unsigned long long, AVDRMFrameDescriptor*> m_drmFrames { };
+
+#ifdef USING_DRM_VIDEO
+    bool HandleDRMVideo(MythVideoColourSpace* ColourSpace, VASurfaceID Id, MythVideoFrame* Frame);
+    MythVideoDRM* m_drm { nullptr };
+    bool          m_drmTriedAndFailed { false };
+#endif
 };
 
 #endif

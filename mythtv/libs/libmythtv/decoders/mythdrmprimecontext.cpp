@@ -112,7 +112,7 @@ int MythDRMPRIMEContext::HwDecoderInit(AVCodecContext *Context)
 #ifdef USING_EGL
     if (auto * player = GetPlayerUI(Context); player != nullptr)
         if (FrameTypeIsSupported(Context, FMT_DRMPRIME))
-            m_interop = MythDRMPRIMEInterop::CreateDRM(dynamic_cast<MythRenderOpenGL*>(player->GetRender()));
+            m_interop = MythDRMPRIMEInterop::CreateDRM(dynamic_cast<MythRenderOpenGL*>(player->GetRender()), player);
 #endif
     return m_interop ? 0 : -1;
 }
