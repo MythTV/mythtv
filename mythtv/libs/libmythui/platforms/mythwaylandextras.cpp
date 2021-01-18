@@ -17,11 +17,10 @@
  * \brief A simple wrapper to retrieve the major Wayland objects from the Qt
  * Wayland native interface.
  *
- * \note This class requires access to private Qt headers and there is currently
- * no check for those headers in configure. When processing the libmythui.pro
- * file, qmake will throw out warnings on binary compatibility - our use of the
- * private headers is however limited here, the API has not changed for some
- * time and appears to be stable into Qt6.
+ * \note This class requires access to private Qt headers. When processing the
+ * libmythui.pro file, qmake will throw out warnings on binary compatibility
+ *  - our use of the private headers is however limited here, the API has not
+ * changed for some time and appears to be stable into Qt6.
 */
 MythWaylandDevice::MythWaylandDevice(QWidget* Widget)
 {
@@ -94,4 +93,25 @@ void MythWaylandExtras::AnnounceGlobal(void *Opaque, struct wl_registry *Reg,
         if (!found->second)
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to bind %1").arg(found->first->name));
     }
+}
+
+/// \brief Check whether we can connect to a Wayland server.
+bool MythWaylandDevice::IsAvailable()
+{
+    static bool s_checked = false;
+    static bool s_available = false;
+    if (!s_checked)
+    {
+        s_checked = true;
+        auto waylanddisplay = qEnvironmentVariable("WAYLAND_DISPLAY");
+        auto name = waylanddisplay.isEmpty() ? nullptr : waylanddisplay.toLocal8Bit().constData();
+        if (auto display = wl_display_connect(name); display)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Available (WAYLAND_DISPLAY: '%1')")
+                .arg(waylanddisplay));
+            s_available = true;
+            wl_display_disconnect(display);
+        }
+    }
+    return s_available;
 }

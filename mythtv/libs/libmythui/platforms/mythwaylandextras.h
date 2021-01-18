@@ -27,6 +27,7 @@ class MythWaylandExtras
 class MythWaylandDevice
 {
   public:
+    static bool IsAvailable();
     explicit MythWaylandDevice(QWidget* Widget);
     bool SetOpaqueRegion(const QRect Region);
 
