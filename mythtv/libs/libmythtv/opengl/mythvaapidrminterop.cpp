@@ -269,7 +269,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropDRM::Acquire(MythRenderOpenGL* C
 #define DRM_FORMAT_R8       MKTAG2('R', '8', ' ', ' ')
 #define DRM_FORMAT_GR88     MKTAG2('G', 'R', '8', '8')
 #define DRM_FORMAT_R16      MKTAG2('R', '1', '6', ' ')
-#define DRM_FORMAT_GR32     MKTAG2('G', 'R', '3', '2')
+#define DRM_FORMAT_GR1616   MKTAG2('G', 'R', '3', '2')
 #endif
 
 vector<MythVideoTextureOpenGL*> MythVAAPIInteropDRM::AcquireVAAPI(VASurfaceID Id,
@@ -319,7 +319,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropDRM::AcquireVAAPI(VASurfaceID Id
             {
                 uint32_t fourcc = (format == FMT_P010) ? DRM_FORMAT_R16 : DRM_FORMAT_R8;
                 if (i > 0)
-                    fourcc = (format == FMT_P010) ? DRM_FORMAT_GR32 : DRM_FORMAT_GR88;
+                    fourcc = (format == FMT_P010) ? DRM_FORMAT_GR1616 : DRM_FORMAT_GR88;
                 drmdesc.layers[i].nb_planes = 1;
                 drmdesc.layers[i].format = fourcc;
                 drmdesc.layers[i].planes[0].object_index = 0;

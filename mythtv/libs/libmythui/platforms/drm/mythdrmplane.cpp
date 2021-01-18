@@ -2,11 +2,6 @@
 #include "mythlogging.h"
 #include "platforms/drm/mythdrmplane.h"
 
-// libdrm
-extern "C" {
-#include <drm_fourcc.h>
-}
-
 #define LOC QString("DRMPlane: ")
 
 /*! \class MythDRMPlane

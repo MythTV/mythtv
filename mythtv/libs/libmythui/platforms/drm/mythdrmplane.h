@@ -4,16 +4,43 @@
 // MythTV
 #include "platforms/drm/mythdrmproperty.h"
 
+// libdrm
+extern "C" {
+#include <drm_fourcc.h>
+}
+
 #ifndef DRM_FORMAT_NV15
 #define DRM_FORMAT_NV15 fourcc_code('N', 'V', '1', '5')
 #endif
-
 #ifndef DRM_FORMAT_NV20
 #define DRM_FORMAT_NV20 fourcc_code('N', 'V', '2', '0')
 #endif
-
+#ifndef DRM_FORMAT_P210
+#define DRM_FORMAT_P210 fourcc_code('P', '2', '1', '0')
+#endif
+#ifndef DRM_FORMAT_P010
+#define DRM_FORMAT_P010 fourcc_code('P', '0', '1', '0')
+#endif
+#ifndef DRM_FORMAT_P012
+#define DRM_FORMAT_P012 fourcc_code('P', '0', '1', '2')
+#endif
+#ifndef DRM_FORMAT_P016
+#define DRM_FORMAT_P016 fourcc_code('P', '0', '1', '6')
+#endif
 #ifndef DRM_FORMAT_P030
 #define DRM_FORMAT_P030 fourcc_code('P', '0', '3', '0')
+#endif
+#ifndef DRM_FORMAT_XRGB16161616F
+#define DRM_FORMAT_XRGB16161616F fourcc_code('X', 'R', '4', 'H')
+#endif
+#ifndef DRM_FORMAT_XBGR16161616F
+#define DRM_FORMAT_XBGR16161616F fourcc_code('X', 'B', '4', 'H')
+#endif
+#ifndef DRM_FORMAT_ARGB16161616F
+#define DRM_FORMAT_ARGB16161616F fourcc_code('A', 'R', '4', 'H')
+#endif
+#ifndef DRM_FORMAT_ABGR16161616F
+#define DRM_FORMAT_ABGR16161616F fourcc_code('A', 'B', '4', 'H')
 #endif
 
 using FOURCCVec = std::vector<uint32_t>;
