@@ -1,5 +1,6 @@
 // Qt
 #include <QWidget>
+#include <QtGlobal>
 #include <QGuiApplication>
 // N.B. Private headers
 #include <qpa/qplatformnativeinterface.h>
