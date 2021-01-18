@@ -62,7 +62,7 @@ bool MythDRMConnector::Connected() const
 
 QString MythDRMConnector::GetConnectorName(uint32_t Type, uint32_t Id)
 {
-    static const std::array<const std::string,DRM_MODE_CONNECTOR_DPI + 1> s_connectorNames =
+    static const std::array<const std::string,DRM_MODE_CONNECTOR_DPI + 1> s_connectorNames
     {
         "None", "VGA", "DVI", "DVI",  "DVI",  "Composite", "TV", "LVDS",
         "CTV",  "DIN", "DP",  "HDMI", "HDMI", "TV", "eDP", "Virtual", "DSI", "DPI"
