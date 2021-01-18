@@ -16,6 +16,8 @@
 // Std
 #include <cmath>
 
+class MythMainWindow;
+
 class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
 {
     Q_OBJECT
@@ -64,7 +66,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     void         CurrentDPIChanged     (qreal    DPI);
 
   protected:
-    static MythDisplay* Create();
+    static MythDisplay* Create(MythMainWindow* MainWindow);
     MythDisplay();
    ~MythDisplay() override;
 

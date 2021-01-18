@@ -21,6 +21,9 @@ using namespace std::chrono_literals;
 #ifdef USING_DBUS
 #include "platforms/mythdisplaymutter.h"
 #endif
+#ifdef USING_WAYLANDEXTRAS
+#include "platforms/mythwaylandextras.h"
+#endif
 #ifdef Q_OS_ANDROID
 #include "platforms/mythdisplayandroid.h"
 #endif
@@ -76,7 +79,7 @@ using namespace std::chrono_literals;
 /*! \brief Create a MythDisplay object appropriate for the current platform.
  * \note This function always returns a valid MythDisplay object.
 */
-MythDisplay* MythDisplay::Create()
+MythDisplay* MythDisplay::Create(MythMainWindow* MainWindow)
 {
     MythDisplay* result = nullptr;
 #ifdef USING_X11
@@ -84,19 +87,35 @@ MythDisplay* MythDisplay::Create()
         result = new MythDisplayX11();
 #endif
 #ifdef USING_DBUS
-    /* disabled until testing can be completed (add docs on subclass choice when done)
+    // Disabled for now as org.gnome.Mutter.DisplayConfig.ApplyConfiguration does
+    // not seem to be actually implemented by anyone.
+#ifdef USING_WAYLANDEXTRAS
+    //if (MythWaylandDevice::IsAvailable())
+#endif
+    //{
+    //    if (!result)
+    //        result = MythDisplayMutter::Create();
+    //}
+#endif
+#ifdef USING_DRM
     if (!result)
-        result = MythDisplayMutter::Create();
-    */
+    {
+        result = new MythDisplayDRM(MainWindow);
+        // On the Pi, use MythDisplayRPI if mode switching is not available via DRM
+#ifdef USING_MMAL
+        if (!result->VideoModesAvailable())
+        {
+            delete result;
+            result = nullptr;
+        }
+#endif
+    }
+#else
+    (void)MainWindow;
 #endif
 #ifdef USING_MMAL
     if (!result)
         result = new MythDisplayRPI();
-#endif
-#ifdef USING_DRM
-    // this will only work by validating the screen's serial number
-    if (!result)
-        result = new MythDisplayDRM();
 #endif
 #if defined(Q_OS_MAC)
     if (!result)
@@ -1060,6 +1079,22 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);
+#endif
+
+#if defined (USING_DRM) && defined (USING_QTPRIVATEHEADERS)
+    // Avoid trying to setup DRM if we are definitely not going to use it.
+#ifdef USING_X11
+    if (!MythDisplayX11::IsAvailable())
+#endif
+    {
+#ifdef USING_WAYLANDEXTRAS
+        // When vt switching this still detects wayland servers, so disabled for now
+        //if (!MythWaylandDevice::IsAvailable())
+#endif
+        {
+            MythDRMDevice::SetupDRM(CmdLine);
+        }
+    }
 #endif
 
 #if defined (Q_OS_LINUX) && defined (USING_EGL) && defined (USING_X11)

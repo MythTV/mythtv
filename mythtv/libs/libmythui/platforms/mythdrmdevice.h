@@ -1,48 +1,67 @@
 #ifndef MYTHDRMDEVICE_H
 #define MYTHDRMDEVICE_H
 
-// Qt
-#include <QString>
-
 // MythTV
 #include "mythlogging.h"
 #include "mythdisplay.h"
-
-// libdrm
-extern "C" {
-#include <xf86drm.h>
-#include <xf86drmMode.h>
-}
+#if defined (USING_QTPRIVATEHEADERS)
+#include "mythcommandlineparser.h"
+#endif
+#include "platforms/drm/mythdrmconnector.h"
+#include "platforms/drm/mythdrmencoder.h"
+#include "platforms/drm/mythdrmcrtc.h"
+#include "platforms/drm/mythdrmplane.h"
 
 // Std
 #include <memory>
 
-using MythDRMPtr = std::shared_ptr<class MythDRMDevice>;
+using MythDRMPtr  = std::shared_ptr<class MythDRMDevice>;
+using MythAtomic  = std::tuple<uint32_t,uint32_t,uint64_t>;
+using MythAtomics = std::vector<MythAtomic>;
 
-class MythDRMDevice
+class MUI_PUBLIC MythDRMDevice
 {
   public:
+    static std::tuple<QString,QStringList> GetDeviceList();
     static MythDRMPtr Create(QScreen *qScreen, const QString& Device = QString());
    ~MythDRMDevice();
 
-    class DRMEnum
-    {
-      public:
-        DRMEnum(uint64_t Value) : m_value(Value) {}
-        uint64_t m_value { 0 };
-        std::map<uint64_t,QString> m_enums;
-    };
-
-    bool     IsValid        () const;
+    bool     Authenticated  () const;
+    bool     Atomic         () const;
+    int      GetFD          () const;
     QString  GetSerialNumber() const;
     QScreen* GetScreen      () const;
     QSize    GetResolution  () const;
     QSize    GetPhysicalSize() const;
-    double   GetRefreshRate () const;
-    bool     Authenticated  () const;
-    MythEDID GetEDID        ();
-    DRMEnum  GetEnumProperty(const QString& Property);
-    bool     SetEnumProperty(const QString& Property, uint64_t Value);
+    double   GetRefreshRate () const;    
+    MythEDID GetEDID        () const;
+    const DRMModes& GetModes() const;
+    bool     CanSwitchModes () const;
+    bool     SwitchMode     (int ModeIndex);
+
+#if defined (USING_QTPRIVATEHEADERS)
+    static inline bool    s_mythDRMVideo     = qEnvironmentVariableIsSet("MYTHTV_DRM_VIDEO");
+    static inline bool    s_planarRequested  = false;
+    static inline bool    s_planarSetup      = false;
+    static inline QString s_mythDRMDevice    = qEnvironmentVariable("MYTHTV_DRM_DEVICE");
+    static inline QString s_mythDRMConnector = qEnvironmentVariable("MYTHTV_DRM_CONNECTOR");
+    static void SetupDRM      (const MythCommandLineParser& CmdLine);
+    DRMPlane GetVideoPlane    () const;
+    DRMPlane GetGUIPlane      () const;
+    DRMCrtc  GetCrtc          () const;
+    bool     QueueAtomics     (const MythAtomics& Atomics);
+    void     DisableVideoPlane();
+    void     MainWindowReady  ();
+
+  protected:
+    explicit MythDRMDevice(const QString& Device);
+    MythDRMDevice(int Fd, uint32_t CrtcId, uint32_t ConnectorId, bool Atomic);
+
+  private:
+    void     AnalysePlanes  ();
+    DRMPlane m_videoPlane { nullptr };
+    DRMPlane m_guiPlane   { nullptr };
+#endif
 
   protected:
     explicit MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
@@ -50,29 +69,32 @@ class MythDRMDevice
   private:
     Q_DISABLE_COPY(MythDRMDevice)
     bool     Open           ();
-    void     Close          ();
     void     Authenticate   ();
+    void     Load           ();
     bool     Initialise     ();
     QString  FindBestDevice ();
     static bool ConfirmDevice(const QString& Device);
-    drmModePropertyBlobPtr GetBlobProperty(drmModeConnectorPtr Connector, const QString& Property) const;
 
-  private:
-    bool               m_valid         { false };
-    QScreen*           m_screen        { nullptr };
-    QString            m_deviceName    { };
-    int                m_fd            { -1 };
-    bool               m_authenticated { false };
-    drmModeRes*        m_resources     { nullptr };
-    drmModeConnector*  m_connector     { nullptr };
-    QSize              m_resolution    { };
-    QSize              m_physicalSize  { };
-    double             m_refreshRate   { 0.0 };
-    QString            m_serialNumber  { };
-    drmModeCrtc*       m_crtc          { nullptr };
-    int                m_crtcIdx       { -1 };
-    LogLevel_t         m_verbose       { LOG_INFO };
-    MythEDID           m_edid          { };
+    bool       m_valid         { false };
+    QScreen*   m_screen        { nullptr };
+    QString    m_deviceName    { };
+    bool       m_openedDevice  { true };
+    int        m_fd            { -1 };
+    bool       m_atomic        { false };
+    bool       m_authenticated { false };
+    DRMConns   m_connectors;
+    DRMEncs    m_encoders;
+    DRMCrtcs   m_crtcs;
+    DRMPlanes  m_planes;
+    DRMConn    m_connector     { nullptr };
+    DRMCrtc    m_crtc          { nullptr };
+    QSize      m_resolution    { };
+    QSize      m_physicalSize  { };
+    double     m_refreshRate   { 0.0 };
+    double     m_adjustedRefreshRate { 0.0 };
+    QString    m_serialNumber  { };
+    LogLevel_t m_verbose       { LOG_INFO };
+    MythEDID   m_edid          { };
 };
 
 #endif
