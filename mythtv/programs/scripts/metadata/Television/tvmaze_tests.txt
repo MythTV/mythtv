@@ -1,0 +1,350 @@
+Doc-Tests for tvmaze
+
+### Important Notice:
+###    tvmaze shuffles the search order results which have an equal distance from time to time.
+###    Various python versions ( 2.7, 3.6+ ) and/or lxml versions display xml attributes
+###    in a different order. Please double check the output for these failure conditions.
+###    Please do not raise an issue in one of above cases.
+
+
+# This might be sorted in different way: update this file if the sort order does not match
+# tvmaze.py -M "night a"
+>>> sys.argv = shlex.split('tvmaze -M "night a"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Tales for a Halloween Night</title>
+    <description>Tales for a Halloween Night is based on John Carpenter's award-winning graphic novel anthology of stories where he unites storytellers from movies, novels and comics for a collection of horror stories featuring graveyards, sunken ships and ghosts, among others.</description>
+    <inetref>30203</inetref>
+    <collectionref>30203</collectionref>
+    <language>en</language>
+  </item>
+  <item>
+    <title>A Clear Midsummer Night</title>
+    <description>The daughter of a real estate mogul Xia Wan Qing, has seemingly no way of retreating after a friend's betrayal and her boyfriend backing out of their wedding. Fortunately, she's saved by business genius Qiao Jin Fan. Jin Fan is a "playboy" and the future successor for Qiao corporation. He extends an offering hand and together they embark on a path of revenge. Each for reasons of their own, begin a love with "uncertain motives". After enduring circumstances because of their families' competing interests and a number of conspiracies the two find true love.</description>
+    <inetref>24598</inetref>
+    <collectionref>24598</collectionref>
+    <language>zh</language>
+    <releasedate>2013-02-15</releasedate>
+    <year>2013</year>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>A Night of Exploration</title>
+    <description>Weekly look at different parts of the world investigated and documented by National Geographic. </description>
+    <inetref>31623</inetref>
+    <collectionref>31623</collectionref>
+    <language>en</language>
+    <releasedate>2013-01-11</releasedate>
+    <year>2013</year>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/126/316260.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/126/316260.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>A Night at the Theatre</title>
+    <description>Entertainment and comedy at Glasgow's Theatre Royal.</description>
+    <inetref>42539</inetref>
+    <collectionref>42539</collectionref>
+    <language>en</language>
+    <releasedate>2019-02-24</releasedate>
+    <year>2019</year>
+  </item>
+  <item>
+    <title>A Night at The Classic</title>
+    <description>Mixing the best bits of stand-up comedy with hilarious backstage action, A Night at The Classic is raw, uncensored comedy at its best.</description>
+    <inetref>19206</inetref>
+    <collectionref>19206</collectionref>
+    <language>en</language>
+    <releasedate>2010-11-03</releasedate>
+    <year>2010</year>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/67/169985.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/67/169985.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>A Night with My Ex</title>
+    <description>What would you do if you had the chance to spend an entire night with your ex? Would you seek answers, try to gain closure, or make a play to get back together? For the first time since their split, ex-couples will be brought together for one night in a camera-rigged apartment with no crew. What they do or say during their night is completely up to them, but one thing is for sure. A Night with My Ex will be surprising, emotionally raw, and in many cases, totally hilarious.</description>
+    <inetref>27687</inetref>
+    <collectionref>27687</collectionref>
+    <language>en</language>
+    <releasedate>2017-07-18</releasedate>
+    <year>2017</year>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/118/296875.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/118/296875.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Night Stalker: The Hunt for a Serial Killer</title>
+    <description>Beneath the sunlit glamour of 1985 LA lurks a relentlessly evil serial killer. In this true-crime story, two detectives won't rest until they catch him.</description>
+    <inetref>52474</inetref>
+    <collectionref>52474</collectionref>
+    <language>en</language>
+    <releasedate>2021-01-13</releasedate>
+    <year>2021</year>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/289/723250.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/289/723250.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Boys on Film - A Night with Duran Duran</title>
+    <description>Iconic British rock band Duran Duran take over BBC Four for one night with exclusive access to the band, two newly-filmed documentaries bring incredible insights, showcase previously unseen archive footage and rare demo tapes, and reveal the thoughts and inspirations of the band across the decades.</description>
+    <inetref>37161</inetref>
+    <collectionref>37161</collectionref>
+    <language>en</language>
+    <releasedate>2018-06-29</releasedate>
+    <year>2018</year>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/158/396533.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/158/396533.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Going Out</title>
+    <description>A mother and daughter who stand before the truth after a sudden tragic accident and deal with the meaning of family.</description>
+    <inetref>47528</inetref>
+    <collectionref>47528</collectionref>
+    <language>ko</language>
+    <releasedate>2020-05-04</releasedate>
+    <year>2020</year>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/253/634317.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/253/634317.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Una luz en el camino</title>
+    <description></description>
+    <inetref>48110</inetref>
+    <collectionref>48110</collectionref>
+    <language>es</language>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/257/642920.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/257/642920.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+# tvmaze.py -N "A Clear Midsummer Night" "Episode 42"
+>>> sys.argv = shlex.split('tvmaze -N "A Clear Midsummer Night" "Episode 42"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>A Clear Midsummer Night</title>
+    <subtitle>Episode 42</subtitle>
+    <description></description>
+    <season>1</season>
+    <episode>42</episode>
+    <inetref>24598</inetref>
+    <collectionref>24598</collectionref>
+    <language>zh</language>
+    <releasedate>2013-02-23</releasedate>
+    <year>2013</year>
+    <runtime>50</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Romance"/>
+    </categories>
+    <studios>
+      <studio name="Hunan TV"/>
+    </studios>
+    <people>
+      <person name="Yang Mi" character="Xia Wan Qing" job="Actor"/>
+      <person name="Lau Hawick" character="Qiao Jin Fan" job="Actor"/>
+      <person name="Wu Jerry" character="Mo Ling Tian" job="Actor"/>
+    </people>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# python3 tvmaze.py -C 525
+>>> sys.argv = shlex.split('tvmaze -C 525')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Gilmore Girls</title>
+    <description>Gilmore Girls is a drama centering around the relationship between a thirtysomething single mother and her teen daughter living in Stars Hollow, Connecticut.</description>
+    <inetref>525</inetref>
+    <imdb>tt0238784</imdb>
+    <collectionref>525</collectionref>
+    <language>en</language>
+    <releasedate>2000-10-05</releasedate>
+    <userrating>8.400000</userrating>
+    <year>2000</year>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Romance"/>
+    </categories>
+    <studios>
+      <studio name="The CW"/>
+    </studios>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# python3 tvmaze.py -D 525 5 2
+>>> sys.argv = shlex.split('tvmaze -D 525 5 2')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Gilmore Girls</title>
+    <subtitle>A Messenger, Nothing More</subtitle>
+    <description>T.J. is milking his injuries for all he's worth, but Luke decides that it's time to go home after seven weeks on the Ren Faire circuit; Rory calls to apologize and to ask her mother to deliver a letter to Dean; Sookie accurately diagnoses Lorelai with a bad case of management burnout, and the two friends decide to decompress with a girls-day-out; Emily and Rory come home exhausted from fending off the attentions of randy European men; Michel is wildly unenthusiastic when he's pressed into babysitting for guests whose children take an inexplicable shine to him; after Lindsay finds Rory's letter, she throws Dean and all his possessions out of the house, and her mother has an angry confrontation with Lorelai in the town square; Lane realizes that she's falling for Zack; Rory is saddened when Dean expresses regret for the shift in their relationship and the harm it caused to his wife and their families.</description>
+    <season>5</season>
+    <episode>2</episode>
+    <inetref>525</inetref>
+    <collectionref>525</collectionref>
+    <language>en</language>
+    <releasedate>2004-09-28</releasedate>
+    <year>2004</year>
+    <runtime>60</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Romance"/>
+    </categories>
+    <studios>
+      <studio name="The CW"/>
+    </studios>
+    <people>
+      <person name="Lauren Graham" character="Lorelai Gilmore" job="Actor"/>
+      <person name="Alexis Bledel" character="Rory Gilmore" job="Actor"/>
+      <person name="Scott Patterson" character="Luke Danes" job="Actor"/>
+      <person name="Melissa McCarthy" character="Sookie St. James" job="Actor"/>
+      <person name="Kelly Bishop" character="Emily Gilmore" job="Actor"/>
+      <person name="Sean Gunn" character="Kirk Gleason" job="Actor"/>
+      <person name="Keiko Agena" character="Lane Kim" job="Actor"/>
+      <person name="Liza Weil" character="Paris Geller" job="Actor"/>
+      <person name="Yanic Truesdale" character="Michel Gerard" job="Actor"/>
+      <person name="Edward Herrmann" character="Richard Gilmore" job="Actor"/>
+      <person name="Jared Padalecki" character="Dean Forester" job="Actor"/>
+      <person name="Matt Czuchry" character="Logan Huntzberger" job="Actor"/>
+      <person name="Milo Ventimiglia" character="Jess Mariano" job="Actor"/>
+      <person name="Chris Eigeman" character="Jason Stiles" job="Actor"/>
+      <person name="Helen Pai" job="Co-Producer"/>
+      <person name="Helen Pai" job="Producer"/>
+      <person name="Jane Espenson" job="Co-Executive Producer"/>
+      <person name="Chris Long" job="Co-Executive Producer"/>
+      <person name="Chris Long" job="Supervising Producer"/>
+      <person name="Michael Katleman" job="Co-Executive Producer"/>
+      <person name="Michael Katleman" job="Consulting Producer"/>
+      <person name="Rina Mimoun" job="Consulting Producer"/>
+      <person name="Lauren Graham" job="Producer"/>
+      <person name="Chad Savage" job="Associate Producer"/>
+      <person name="John Stephens" job="Co-Producer"/>
+      <person name="Bill Prady" job="Co-Executive Producer"/>
+      <person name="Allan Heinberg" job="Consulting Producer"/>
+      <person name="Lee Shallat-Chemel" job="Co-Executive Producer"/>
+      <person name="David S. Rosenthal" job="Executive Producer"/>
+      <person name="Gina Fattore" job="Co-Executive Producer"/>
+      <person name="Daniel Palladino" job="Executive Producer"/>
+      <person name="Jennie Snyder Urman" job="Co-Producer"/>
+      <person name="David Babcock" job="Consulting Producer"/>
+      <person name="Keith Eisner" job="Supervising Producer"/>
+      <person name="Steve Turner" job="Associate Producer"/>
+      <person name="Jonathan C. Brody" job="Associate Producer"/>
+      <person name="David Grae" job="Co-Producer"/>
+      <person name="Geoffrey Hemwall" job="Associate Producer"/>
+      <person name="Rebecca Kirschner" job="Co-Executive Producer"/>
+      <person name="Rebecca Kirschner" job="Supervising Producer"/>
+      <person name="Rebecca Kirschner" job="Producer"/>
+      <person name="Jenji Kohan" job="Producer"/>
+      <person name="Hynndie Wali" job="Associate Producer"/>
+      <person name="Jessica Queller" job="Co-Producer"/>
+      <person name="Keira Morrisette" job="Associate Producer"/>
+      <person name="Gavin Polone" job="Executive Producer"/>
+      <person name="William Klug" job="Associate Producer"/>
+      <person name="Sheila R. Lawrence" job="Co-Executive Producer"/>
+      <person name="Sheila R. Lawrence" job="Supervising Producer"/>
+      <person name="Sheila R. Lawrence" job="Producer"/>
+      <person name="Janet Leahy" job="Consulting Producer"/>
+      <person name="Barbara Brace" job="Associate Producer"/>
+      <person name="Scott Kaufer" job="Supervising Producer"/>
+      <person name="Jed Seidel" job="Supervising Producer"/>
+      <person name="Amy Sherman-Palladino" job="Creator"/>
+      <person name="Amy Sherman-Palladino" job="Executive Producer"/>
+      <person name="Lynn Stevenson" job="Associate Producer"/>
+      <person name="Mea Squires" job="Associate Producer"/>
+      <person name="David Glazier" job="Associate Producer"/>
+      <person name="Gayle Abrams" job="Co-Executive Producer"/>
+      <person name="James Berg" job="Consulting Producer"/>
+      <person name="Mel Efros" job="Producer"/>
+      <person name="Joanne Waters" job="Consulting Producer"/>
+      <person name="Patricia Fass Palmer" job="Producer"/>
+      <person name="Kimberly Costello" job="Co-Executive Producer"/>
+      <person name="Stan Zimmerman" job="Consulting Producer"/>
+      <person name="Chrisann Verges" job="Producer"/>
+    </people>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/260/652344.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/260/652344.jpg"/>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
+      <image type="fanart" url="http://static.tvmaze.com/uploads/images/original_untouched/87/217545.jpg"/>
+      <image type="fanart" url="http://static.tvmaze.com/uploads/images/original_untouched/87/217546.jpg"/>
+      <image type="fanart" url="http://static.tvmaze.com/uploads/images/original_untouched/222/557215.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+
+# python3 tvmaze.py -M BÖsterreich
+>>> if sys.version_info[0] == 2:
+...     sys.argv = shlex.split(u'tvmaze -M BÖsterreich'.encode('utf-8'))
+... else:
+...     sys.argv = shlex.split('tvmaze -M BÖsterreich')
+...
+
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>BÖsterreich</title>
+    <description></description>
+    <inetref>23361</inetref>
+    <collectionref>23361</collectionref>
+    <language>de</language>
+    <releasedate>2014-04-01</releasedate>
+    <year>2014</year>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/87/219221.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/87/219221.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Willkommen Österreich</title>
+    <description></description>
+    <inetref>34194</inetref>
+    <collectionref>34194</collectionref>
+    <language>de</language>
+    <releasedate>2007-05-31</releasedate>
+    <year>2007</year>
+    <images>
+      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/141/352576.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/141/352576.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+
+
+
+
+
+
+##
+## Testing this traceback does not work:
+##
+# python3 tvmaze.py -N 4711 "Episode 42"
+#  >>> sys.argv = shlex.split('tvmaze -N 4711 "Episode 42"')
+#  >>> main()
+
+
