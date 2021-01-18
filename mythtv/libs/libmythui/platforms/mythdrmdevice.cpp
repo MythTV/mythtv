@@ -113,6 +113,7 @@ extern "C" {
 #ifdef USING_QTPRIVATEHEADERS
 void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
     // Return early if eglfs is not *explicitly* requested via the command line or environment.
     // Note: On some setups it is not necessary to explicitly request eglfs for Qt to use it.
     // Note: Not sure which takes precedent in Qt or what happens if they are different.
@@ -201,7 +202,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     }
     if (!device.get())
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Failed to open an DRM devices with privileges");
+        LOG(VB_GENERAL, LOG_WARNING, "Failed to open any DRM devices with privileges");
         return;
     }
 
@@ -259,6 +260,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 
     // Signal to our future self that we did request some Qt DRM configuration
     s_planarRequested = true;
+#endif
 }
 #endif
 
