@@ -167,7 +167,7 @@ QString DeleteMap::CreateTimeString(uint64_t frame, bool use_cutlist,
     QString fmt = (ms >= 1h) ? "H:mm:ss" : "mm:ss";
     if (full_resolution)
         fmt += ".zzz";
-    return MythFormatTimeMs(ms, fmt);
+    return MythFormatTime(ms, fmt);
 }
 
  /**

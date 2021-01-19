@@ -109,26 +109,16 @@ MBASE_PUBLIC int naturalCompare(const QString &_a, const QString &_b,
  *
  * Convert a millisecond time value into a textual representation of the value.
  *
- * \param msecs The time value in milliseconds.
+ * \param msecs The time value in milliseconds. Since the type of this
+ *     field is std::chrono::duration, any duration of a larger
+ *     interval can be passed to this function and the compiler will
+ *     convert it to milliseconds.
  *
  * \param fmt A formatting string specifying how to output the time.
  *     See QTime::toString for the a definition fo valid formatting
  *     characters.
  */
-MBASE_PUBLIC QString MythFormatTimeMs(std::chrono::milliseconds msecs, const QString& fmt);
-
-/**
- * \brief Format a seconds time value
- *
- * Convert a second time value into a textual representation of the value.
- *
- * \param secs The time value in seconds.
- *
- * \param mft A formatting string specifying how to output the time.
- *     See QTime::toString for the a definition fo valid formatting
- *     characters.
- */
-MBASE_PUBLIC QString MythFormatTime(std::chrono::seconds secs, const QString& fmt);
+MBASE_PUBLIC QString MythFormatTime(std::chrono::milliseconds msecs, const QString& fmt);
 
 // CPU Tick timing function
 #ifdef MMX

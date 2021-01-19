@@ -1235,7 +1235,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Chapter %1 found @ [%2]->%3")
                 .arg(i + 1,   2,10,QChar('0'))
-                .arg(MythFormatTimeMs(msec, "HH:mm:ss.zzz"))
+                .arg(MythFormatTime(msec, "HH:mm:ss.zzz"))
                 .arg(framenum));
     }
 

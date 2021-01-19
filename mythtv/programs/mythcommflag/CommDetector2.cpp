@@ -258,7 +258,7 @@ QString frameToTimestamp(long long frameno, float fps)
 QString frameToTimestampms(long long frameno, float fps)
 {
     auto ms = millisecondsFromFloat(frameno / fps * 1000);
-    QString timestr = MythFormatTimeMs(ms, "mm:ss.zzz");
+    QString timestr = MythFormatTime(ms, "mm:ss.zzz");
     timestr.chop(1); // Chop 1 to return hundredths
     return timestr;
 }
