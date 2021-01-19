@@ -28,16 +28,17 @@ DRMEncs MythDRMEncoder::GetEncoders(int FD)
 {
     DRMEncs result;
     if (auto resources = MythDRMResources(FD); *resources)
+    {
         for (auto i = 0; i < resources->count_encoders; ++i)
             if (auto encoder = Create(FD, resources->encoders[i]); encoder.get())
                 result.emplace_back(encoder);
-
+    }
     return result;
 }
 
 MythDRMEncoder::MythDRMEncoder(int FD, uint32_t Id)
 {
-    if (auto encoder = drmModeGetEncoder(FD, Id); encoder)
+    if (auto * encoder = drmModeGetEncoder(FD, Id); encoder)
     {
         m_id = encoder->encoder_id;
         m_type = encoder->encoder_type;
