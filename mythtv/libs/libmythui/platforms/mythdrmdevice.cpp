@@ -644,7 +644,7 @@ void MythDRMDevice::Authenticate()
 
     if (m_authenticated)
     {
-        auto extra = m_atomic ? "" : " but atomic operations required for mode switching";
+        const auto * extra = m_atomic ? "" : " but atomic operations required for mode switching";
         LOG(VB_GENERAL, m_verbose, LOC + "Authenticated" + extra);
     }
     else
@@ -691,10 +691,10 @@ bool MythDRMDevice::Initialise()
             }
 
             // Does the connected display have the serial number we are looking for?
-            if (auto edidprop = MythDRMProperty::GetProperty("EDID", connector->m_properties); edidprop.get())
+            if (const auto edidprop = MythDRMProperty::GetProperty("EDID", connector->m_properties); edidprop.get())
             {
                 MythEDID edid;
-                if (auto blob = dynamic_cast<MythDRMBlobProperty*>(edidprop.get()); blob)
+                if (auto * blob = dynamic_cast<MythDRMBlobProperty*>(edidprop.get()); blob)
                     edid = MythEDID(blob->m_blob);
 
                 if (edid.Valid() && edid.SerialNumbers().contains(serial))
