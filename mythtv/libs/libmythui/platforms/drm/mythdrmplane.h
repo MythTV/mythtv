@@ -57,10 +57,10 @@ class MUI_PUBLIC MythDRMPlane
     static DRMPlanes FilterPrimaryPlanes (const DRMPlanes& Planes);
     static DRMPlanes FilterOverlayPlanes (const DRMPlanes& Planes);
     static QString   FormatToString      (uint32_t Format);
-    static QString   FormatsToString     (FOURCCVec Formats);
+    static QString   FormatsToString     (const FOURCCVec& Formats);
     static bool      FormatIsVideo       (uint32_t Format);
-    static bool      HasOverlayFormat    (FOURCCVec Formats);
-    static uint32_t  GetAlphaFormat      (FOURCCVec Formats);
+    static bool      HasOverlayFormat    (const FOURCCVec& Formats);
+    static uint32_t  GetAlphaFormat      (const FOURCCVec& Formats);
     QString          Description() const;
 
     uint32_t  m_id            { 0 };

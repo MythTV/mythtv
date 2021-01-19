@@ -28,7 +28,7 @@ DRMPlane MythDRMPlane::Create(int FD, uint32_t Id, uint32_t Index)
 
 MythDRMPlane::MythDRMPlane(int FD, uint32_t Id, uint32_t Index)
 {
-    if (auto plane = drmModeGetPlane(FD, Id); plane)
+    if (auto * plane = drmModeGetPlane(FD, Id); plane)
     {
         auto id  = plane->plane_id;
         m_index  = Index;
@@ -48,7 +48,7 @@ MythDRMPlane::MythDRMPlane(int FD, uint32_t Id, uint32_t Index)
 
         // Add generic properties
         if (auto type = MythDRMProperty::GetProperty("type", m_properties); type)
-            if (auto enumt = dynamic_cast<MythDRMEnumProperty*>(type.get()); enumt)
+            if (auto * enumt = dynamic_cast<MythDRMEnumProperty*>(type.get()); enumt)
                 m_type = enumt->m_value;
 
         // Add video specific properties
@@ -80,7 +80,7 @@ QString MythDRMPlane::Description() const
 DRMPlanes MythDRMPlane::GetPlanes(int FD, int CRTCFilter)
 {
     DRMPlanes result;
-    auto planes = drmModeGetPlaneResources(FD);
+    auto * planes = drmModeGetPlaneResources(FD);
     if (!planes)
     {
         LOG(VB_GENERAL, LOG_ERR, QString(drmGetDeviceNameFromFd2(FD)) + ": Failed to retrieve planes");
@@ -148,7 +148,7 @@ QString MythDRMPlane::FormatToString(uint32_t Format)
     return QString::asprintf("%c%c%c%c", Format, Format >> 8, Format >> 16, Format >> 24);
 }
 
-QString MythDRMPlane::FormatsToString(FOURCCVec Formats)
+QString MythDRMPlane::FormatsToString(const FOURCCVec &Formats)
 {
     QStringList formats;
     for (auto format : Formats)
@@ -178,7 +178,7 @@ bool MythDRMPlane::FormatIsVideo(uint32_t Format)
 
 /*! \brief Enusure list of supplied formats contains a format that is suitable for OpenGL/Vulkan.
 */
-bool MythDRMPlane::HasOverlayFormat(FOURCCVec Formats)
+bool MythDRMPlane::HasOverlayFormat(const FOURCCVec &Formats)
 {
     // Formats as deemed suitable by QKmsDevice
     static const FOURCCVec s_rgbFormats =
@@ -196,7 +196,7 @@ bool MythDRMPlane::HasOverlayFormat(FOURCCVec Formats)
     return false;
 }
 
-uint32_t MythDRMPlane::GetAlphaFormat(FOURCCVec Formats)
+uint32_t MythDRMPlane::GetAlphaFormat(const FOURCCVec &Formats)
 {
     // N.B. Prioritised list
     static const FOURCCVec s_alphaFormats =
