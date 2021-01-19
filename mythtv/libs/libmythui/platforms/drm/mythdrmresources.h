@@ -15,6 +15,7 @@ extern "C" {
 
 // Std
 #include <map>
+#include <array>
 #include <vector>
 #include <memory>
 

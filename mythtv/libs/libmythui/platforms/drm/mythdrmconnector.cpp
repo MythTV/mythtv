@@ -1,9 +1,6 @@
 // MythTV
 #include "platforms/drm/mythdrmconnector.h"
 
-// Std
-#include <array>
-
 /*! \class MythDRMConnector
  * \brief A wrapper around a DRM connector object.
  *
