@@ -97,6 +97,8 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
     void     SendTimeRequest(void);
     void     ProcessTimeResponse(const QByteArray &buf);
     static std::chrono::milliseconds NTPToLocal(uint32_t sec, uint32_t ticks);
+    static void microsecondsToNTP(std::chrono::microseconds usec, uint32_t &ntpSec, uint32_t &ntpTicks);
+    static void timevalToNTP(timeval t, uint32_t &ntpSec, uint32_t &ntpTicks);
 
     // incoming data packet
     static bool GetPacketType(const QByteArray &buf, uint8_t &type,
@@ -171,7 +173,9 @@ class MTV_PUBLIC MythRAOPConnection : public QObject
 
     // clock sync
     std::chrono::milliseconds  m_networkLatency      {0ms};
-                    // difference in ms between reference
+    // Difference in ms between reference. This value will typically
+    // be huge (~50 years)and meaningless as Apple products seem to
+    // only send uptimes, not wall times.
     std::chrono::milliseconds  m_clockSkew           {0ms};
 
     // audio retry timer

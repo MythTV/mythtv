@@ -483,8 +483,10 @@ void MythRAOPConnection::SendTimeRequest(void)
     if (!m_clientControlSocket) // should never happen
         return;
 
-    timeval t {};
-    gettimeofday(&t, nullptr);
+    uint32_t ntpSec {0};
+    uint32_t ntpTicks {0};
+    auto usecs = nowAsDuration<std::chrono::microseconds>();
+    microsecondsToNTP(usecs, ntpSec, ntpTicks);
 
     std::array<uint8_t,32> req {
         0x80, TIMING_REQUEST | 0x80,
@@ -492,8 +494,8 @@ void MythRAOPConnection::SendTimeRequest(void)
         // no other value works
         0x00, 0x07
     };
-    *(uint32_t *)(&req[24]) = qToBigEndian((uint32_t)t.tv_sec);
-    *(uint32_t *)(&req[28]) = qToBigEndian((uint32_t)t.tv_usec);
+    *(uint32_t *)(&req[24]) = qToBigEndian(ntpSec);
+    *(uint32_t *)(&req[28]) = qToBigEndian(ntpTicks);
 
     if (m_clientTimingSocket->writeDatagram((char *)req.data(), req.size(), m_peerAddress,
                                             m_clientTimingPort) != (qint64)req.size())
@@ -503,7 +505,7 @@ void MythRAOPConnection::SendTimeRequest(void)
     }
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("Requesting master time (Local %1.%2)")
-        .arg(t.tv_sec).arg(t.tv_usec));
+        .arg(ntpSec,8,16,QChar('0')).arg(ntpTicks,8,16,QChar('0')));
 }
 
 /**
@@ -514,16 +516,14 @@ void MythRAOPConnection::SendTimeRequest(void)
  */
 void MythRAOPConnection::ProcessTimeResponse(const QByteArray &buf)
 {
-    timeval t1 {};
     const char *req = buf.constData();
 
-    t1.tv_sec  = qFromBigEndian(*(uint32_t *)(req + 8));
-    t1.tv_usec = qFromBigEndian(*(uint32_t *)(req + 12));
-
-    auto time1 = durationFromTimeval<std::chrono::milliseconds>(t1);
+    uint32_t ntpSec   = qFromBigEndian(*(uint32_t *)(req + 8));
+    uint32_t ntpTicks = qFromBigEndian(*(uint32_t *)(req + 12));
+    auto time1 = NTPToLocal(ntpSec, ntpTicks);
     auto time2 = nowAsDuration<std::chrono::milliseconds>();
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Read back time (Local %1.%2)")
-        .arg(t1.tv_sec).arg(t1.tv_usec));
+        .arg(ntpSec,8,16,QChar('0')).arg(ntpTicks,8,16,QChar('0')));
     // network latency equal time difference in ms between request and response
     // divide by two for approximate time of one way trip
     m_networkLatency = (time2 - time1) / 2;
@@ -534,15 +534,41 @@ void MythRAOPConnection::ProcessTimeResponse(const QByteArray &buf)
     // this is NTP time, where sec is in seconds, and ticks is in 1/2^32s
     uint32_t sec    = qFromBigEndian(*(uint32_t *)(req + 24));
     uint32_t ticks  = qFromBigEndian(*(uint32_t *)(req + 28));
+    LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Source NTP clock time %1.%2")
+        .arg(sec,8,16,QChar('0')).arg(ticks,8,16,QChar('0')));
+
     // convert ticks into ms
     std::chrono::milliseconds master = NTPToLocal(sec, ticks);
+
+    // This value is typically huge (~50 years) and meaningless as
+    // Apple products send uptime, not wall time.
     m_clockSkew     = master - time2;
 }
 
+
+// Timestamps in Airplay packets are stored using the format designed
+// for NTP: a 32-bit seconds field and a 32-bit fractional seconds
+// field, based on a zero value meaning January 1st 1900. This
+// constant handles the conversion between that epoch base, and the
+// unix epoch base time of January 1st, 1970.
+static constexpr uint64_t CLOCK_EPOCH {0x83aa7e80};
 std::chrono::milliseconds MythRAOPConnection::NTPToLocal(uint32_t sec, uint32_t ticks)
 {
-    return std::chrono::milliseconds((int64_t)sec * 1000LL + (((int64_t)ticks * 1000LL) >> 32));
+    return std::chrono::milliseconds(((int64_t)sec - CLOCK_EPOCH) * 1000LL +
+                                     (((int64_t)ticks * 1000LL) >> 32));
 }
+void MythRAOPConnection::microsecondsToNTP(std::chrono::microseconds usec,
+                                           uint32_t &ntpSec, uint32_t &ntpTicks)
+{
+    ntpSec = duration_cast<std::chrono::seconds>(usec).count() + CLOCK_EPOCH;
+    ntpTicks = ((usec % 1s).count() << 32) / 1000000;
+}
+void MythRAOPConnection::timevalToNTP(timeval t, uint32_t &ntpSec, uint32_t &ntpTicks)
+{
+    auto micros = durationFromTimeval<std::chrono::microseconds>(t);
+    microsecondsToNTP(micros, ntpSec, ntpTicks);
+}
+
 
 ///
 // \param buf       A pointer to the received data.
