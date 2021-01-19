@@ -9,6 +9,9 @@ extern "C" {
 #include <drm_fourcc.h>
 }
 
+#ifndef DRM_FORMAT_INVALID
+#define DRM_FORMAT_INVALID	0
+#endif
 #ifndef DRM_FORMAT_NV15
 #define DRM_FORMAT_NV15 fourcc_code('N', 'V', '1', '5')
 #endif
