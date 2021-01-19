@@ -28,23 +28,24 @@ DRMCrtcs MythDRMCrtc::GetCrtcs(int FD)
 {
     DRMCrtcs result;
     if (auto resources = MythDRMResources(FD); *resources)
+    {
         for (auto i = 0; i < resources->count_crtcs; ++i)
             if (auto crtc = Create(FD, resources->crtcs[i], i); crtc.get())
                 result.emplace_back(crtc);
-
+    }
     return result;
 }
 
 MythDRMCrtc::MythDRMCrtc(int FD, uint32_t Id, int Index)
 {
-    if (auto crtc = drmModeGetCrtc(FD, Id); crtc)
+    if (auto * crtc = drmModeGetCrtc(FD, Id); crtc)
     {
-        m_index = Index;
-        m_id = crtc->crtc_id;
-        m_fbId = crtc->buffer_id;
-        m_x = crtc->x;
-        m_y = crtc->y;
-        m_width = crtc->width;
+        m_index  = Index;
+        m_id     = crtc->crtc_id;
+        m_fbId   = crtc->buffer_id;
+        m_x      = crtc->x;
+        m_y      = crtc->y;
+        m_width  = crtc->width;
         m_height = crtc->height;
         if (crtc->mode_valid)
             m_mode = MythDRMMode::Create(&crtc->mode, 0);
@@ -63,7 +64,7 @@ int MythDRMCrtc::RetrieveCRTCIndex(int FD, uint32_t Id)
     {
         for (auto i = 0; i < resources->count_crtcs; ++i)
         {
-            if (auto crtc = drmModeGetCrtc(FD, resources->crtcs[i]); crtc)
+            if (auto * crtc = drmModeGetCrtc(FD, resources->crtcs[i]); crtc)
             {
                 bool match = crtc->crtc_id == Id;
                 drmModeFreeCrtc(crtc);

@@ -27,7 +27,7 @@ class MUI_PUBLIC MythDRMCrtc
 
   protected:
     MythDRMCrtc(int FD, uint32_t Id, int Index);
-    int RetrieveCRTCIndex(int FD, uint32_t Id);
+    static int RetrieveCRTCIndex(int FD, uint32_t Id);
 
   private:
     Q_DISABLE_COPY(MythDRMCrtc)
