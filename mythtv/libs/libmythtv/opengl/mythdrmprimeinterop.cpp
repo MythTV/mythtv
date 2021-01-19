@@ -249,8 +249,11 @@ bool MythDRMPRIMEInterop::HandleDRMVideo(MythVideoColourSpace* ColourSpace, Myth
     if (m_drm)
     {
         if (m_drm->IsValid())
+        {
+            ColourSpace->UpdateColourSpace(Frame);
             if (m_drm->RenderFrame(DRMDesc, Frame))
                 return true;
+        }
 
         // RenderFrame may have decided we should give up
         if (!m_drm->IsValid())
