@@ -29,16 +29,17 @@ DRMConns MythDRMConnector::GetConnectors(int FD)
 {
     DRMConns result;
     if (auto resources = MythDRMResources(FD); *resources)
+    {
         for (auto i = 0; i < resources->count_connectors; ++i)
             if (auto connector = Create(FD, resources->connectors[i]); connector.get())
                 result.emplace_back(connector);
-
+    }
     return result;
 }
 
 MythDRMConnector::MythDRMConnector(int FD, uint32_t Id)
 {
-    if (auto connector = drmModeGetConnector(FD, Id); connector)
+    if (auto * connector = drmModeGetConnector(FD, Id); connector)
     {
         m_id         = connector->connector_id;
         m_encoderId  = connector->encoder_id;
