@@ -24,11 +24,11 @@ MythDRMProperty::MythDRMProperty(Type mType, uint32_t Id, uint32_t Flags, const 
 DRMProps MythDRMProperty::GetProperties(int FD, const uint32_t ObjectId, uint32_t ObjectType)
 {
     DRMProps result;
-    if (auto props = drmModeObjectGetProperties(FD, ObjectId, ObjectType); props)
+    if (auto * props = drmModeObjectGetProperties(FD, ObjectId, ObjectType); props)
     {
         for (uint32_t index = 0; index < props->count_props; ++index)
         {
-            if (auto prop = drmModeGetProperty(FD, props->props[index]); prop)
+            if (auto * prop = drmModeGetProperty(FD, props->props[index]); prop)
             {
                 auto key   = QString(prop->name);
                 auto value = props->prop_values[index];
@@ -124,7 +124,7 @@ MythDRMBitmaskProperty::MythDRMBitmaskProperty(uint64_t Value, drmModePropertyPt
 MythDRMBlobProperty::MythDRMBlobProperty(int FD, uint64_t Value, drmModePropertyPtr Property)
   : MythDRMProperty(Blob, Property->prop_id, Property->flags, Property->name)
 {
-    if (auto blob = drmModeGetPropertyBlob(FD, static_cast<uint32_t>(Value)); blob)
+    if (auto * blob = drmModeGetPropertyBlob(FD, static_cast<uint32_t>(Value)); blob)
     {
         m_blob = QByteArray(reinterpret_cast<const char *>(blob->data), static_cast<int>(blob->length));
         drmModeFreePropertyBlob(blob);
