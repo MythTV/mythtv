@@ -48,6 +48,10 @@ MythVideoDRM::MythVideoDRM(MythVideoColourSpace* ColourSpace)
         // Set colourspace and listen for changes
         if (m_colourSpace)
         {
+            // Disable colour adjustments.
+            // Note: If DRM subsequently fails, these should be re-enabled by
+            // the OpenGL code.
+            m_colourSpace->SetSupportedAttributes(kPictureAttributeSupported_None);
             connect(m_colourSpace, &MythVideoColourSpace::Updated, this, &MythVideoDRM::ColourSpaceUpdated);
             ColourSpaceUpdated(true/*??*/);
         }
