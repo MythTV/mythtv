@@ -216,38 +216,37 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     // We have a valid, authenticated device with a connected display and validated planes
     auto guiplane = device->m_guiPlane;
     auto format   = MythDRMPlane::GetAlphaFormat(guiplane->m_formats);
-    if (format != DRM_FORMAT_INVALID)
+    if (format == DRM_FORMAT_INVALID)
     {
-        static const QString s_json =
-            "{\n"
-            "  \"device\": \"%1\",\n"
-            "  \"outputs\": [ { \"name\": \"%2\", \"format\": \"%3\" } ]\n"
-            "}\n";
-        // N.B. No MythDirs setup yet - just dump this in the current directory
-        auto filename = "eglfs_kms_config.json";
-        QFile file(filename);
-        if (file.open(QIODevice::WriteOnly))
-        {
-            auto wrote = qPrintable(s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
-                .arg(device->m_connector->m_name).arg(MythDRMPlane::FormatToString(format).toLower()));
-            if (file.write(wrote))
-            {
-                LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1:\r\n%2").arg(filename).arg(wrote));
-                LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsConfigFile).arg(filename));
-                setenv(s_kmsConfigFile, qPrintable(filename), 1);
-            }
-            file.close();
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing. DRM setup incomplete")
-                .arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_WARNING, "Failed to find alpha format for GUI. Quitting DRM setup.");
+        return;
     }
-    else
+
+    // N.B. No MythDirs setup yet - just dump this in the current directory
+    auto filename = "eglfs_kms_config.json";
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly))
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Failed to find alpha format for GUI. DRM setup incomplete");
+        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing. Quitting DRM setup.")
+            .arg(filename));
+        return;
     }
+
+    static const QString s_json =
+        "{\n"
+        "  \"device\": \"%1\",\n"
+        "  \"outputs\": [ { \"name\": \"%2\", \"format\": \"%3\" } ]\n"
+        "}\n";
+
+    auto wrote = qPrintable(s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
+        .arg(device->m_connector->m_name).arg(MythDRMPlane::FormatToString(format).toLower()));
+    if (file.write(wrote))
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1:\r\n%2").arg(filename).arg(wrote));
+        LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsConfigFile).arg(filename));
+        setenv(s_kmsConfigFile, qPrintable(filename), 1);
+    }
+    file.close();
 
     auto planeindex = QString::number(guiplane->m_index);
     auto crtcplane  = QString("%1,%2").arg(device->m_crtc->m_id).arg(guiplane->m_id);
@@ -320,7 +319,6 @@ MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device)
         // N.B. Don't fall through here.
         return nullptr;
     }
-
 
 #ifdef USING_QTPRIVATEHEADERS
     if (auto result = std::shared_ptr<MythDRMDevice>(new MythDRMDevice(Device));
