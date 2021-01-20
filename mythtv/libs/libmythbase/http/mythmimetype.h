@@ -3,6 +3,7 @@
 
 // Qt
 #include <QMimeType>
+#include <QStringList>
 
 // Std
 #include <variant>
