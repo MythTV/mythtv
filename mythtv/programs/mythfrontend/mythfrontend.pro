@@ -83,6 +83,9 @@ HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h
 SOURCES += services/frontend.cpp
 
+HEADERS += services/mythfrontendservice.h
+SOURCES += services/mythfrontendservice.cpp
+
 HEADERS += progdetails.h proginfolist.h
 SOURCES += progdetails.cpp proginfolist.cpp
 
