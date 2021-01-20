@@ -6,6 +6,7 @@
 
 // Std
 #include <variant>
+#include <vector>
 
 class MythMimeType;
 using MythMimeTypes = std::vector<MythMimeType>;
