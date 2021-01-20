@@ -238,6 +238,15 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
             }
             file.close();
         }
+        else
+        {
+            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing. DRM setup incomplete")
+                .arg(filename));
+        }
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_WARNING, "Failed to find alpha format for GUI. DRM setup incomplete");
     }
 
     auto planeindex = QString::number(guiplane->m_index);
