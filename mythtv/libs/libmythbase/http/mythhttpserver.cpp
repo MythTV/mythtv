@@ -11,7 +11,9 @@
 #include "mythdirs.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"
+#ifdef USING_LIBDNS_SD
 #include "bonjourregister.h"
+#endif
 #include "http/mythhttpsocket.h"
 #include "http/mythhttpresponse.h"
 #include "http/mythhttpthread.h"
@@ -196,6 +198,7 @@ void MythHTTPServer::Started(bool Tcp, bool Ssl)
     if (host.isEmpty())
         host = tr("Unknown");
 
+#ifdef USING_LIBDNS_SD
     if (Tcp)
     {
         m_bonjour = new BonjourRegister();
@@ -209,6 +212,7 @@ void MythHTTPServer::Started(bool Tcp, bool Ssl)
         m_bonjourSSL->Register(m_config.m_sslPort, QByteArrayLiteral("_https._tcp"),
             QStringLiteral("%1 on %2").arg(QCoreApplication::applicationName(), host).toLatin1().constData(), {});
     }
+#endif
 
     // Build our list of hosts and allowed origins.
     BuildHosts();
