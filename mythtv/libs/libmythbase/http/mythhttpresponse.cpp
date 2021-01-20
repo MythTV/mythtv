@@ -288,7 +288,7 @@ void MythHTTPResponse::AddDefaultHeaders()
         MythHTTPRanges::HandleRangeRequest(this, range);
 
     QByteArray def = QString("%1 %2\r\n").arg(MythHTTP::VersionToString(m_version))
-                                         .arg(MythHTTP::StatusToString(m_status).constData()).toUtf8();
+                                         .arg(MythHTTP::StatusToString(m_status)).toUtf8();
     m_responseHeaders.emplace_back(MythHTTPData::Create(def));
     HEADER("Date", MythDate::toString(MythDate::current(), MythDate::kRFC822)) // RFC 822
     HEADER("Server", m_serverName)
