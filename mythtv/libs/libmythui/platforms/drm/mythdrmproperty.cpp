@@ -17,6 +17,7 @@ MythDRMProperty::MythDRMProperty(Type mType, uint32_t Id, uint32_t Flags, const 
   : m_type(mType),
     m_id(Id),
     m_readOnly(Flags & DRM_MODE_PROP_IMMUTABLE),
+    m_atomic(Flags & DRM_MODE_PROP_ATOMIC),
     m_name(Name)
 {
 }

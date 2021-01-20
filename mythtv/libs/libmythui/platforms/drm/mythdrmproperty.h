@@ -29,6 +29,7 @@ class MUI_PUBLIC MythDRMProperty
     Type     m_type     { Invalid };
     uint32_t m_id       { 0 };
     bool     m_readOnly { true };
+    bool     m_atomic   { false };
     QString  m_name;
 
   protected:
