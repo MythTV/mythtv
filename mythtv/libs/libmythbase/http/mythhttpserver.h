@@ -8,8 +8,6 @@
 #include "http/mythhttptypes.h"
 #include "http/mythhttpthreadpool.h"
 
-class BonjourRegister;
-
 class MythHTTPServer : public MythHTTPThreadPool
 {
     Q_OBJECT
@@ -63,8 +61,10 @@ class MythHTTPServer : public MythHTTPThreadPool
     bool ReservedPath(const QString& Path);
     static QStringList BuildAddressList(QHostInfo& Info);
 
-    BonjourRegister*  m_bonjour       { nullptr };
-    BonjourRegister*  m_bonjourSSL    { nullptr };
+#ifdef USING_LIBDNS_SD
+    class BonjourRegister* m_bonjour    { nullptr };
+    BonjourRegister*       m_bonjourSSL { nullptr };
+#endif
     int               m_originLookups { 0 };
     int               m_hostLookups   { 0 };
     MythHTTPConfig    m_config;

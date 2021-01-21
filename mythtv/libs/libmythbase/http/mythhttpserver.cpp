@@ -186,6 +186,7 @@ void MythHTTPServer::Init()
 
 void MythHTTPServer::Started(bool Tcp, bool Ssl)
 {
+#ifdef USING_LIBDNS_SD
     // Advertise our webserver
     delete m_bonjour;
     delete m_bonjourSSL;
@@ -198,7 +199,6 @@ void MythHTTPServer::Started(bool Tcp, bool Ssl)
     if (host.isEmpty())
         host = tr("Unknown");
 
-#ifdef USING_LIBDNS_SD
     if (Tcp)
     {
         m_bonjour = new BonjourRegister();
@@ -225,11 +225,13 @@ void MythHTTPServer::Stopped()
     m_config.m_hosts.clear();
     m_config.m_allowedOrigins.clear();
 
+#ifdef USING_LIBDNS_SD
     // Stop advertising
     delete m_bonjour;
     delete m_bonjourSSL;
     m_bonjour = nullptr;
     m_bonjourSSL = nullptr;
+#endif
 }
 
 void MythHTTPServer::newTcpConnection(qt_socket_fd_t Socket)
