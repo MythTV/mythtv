@@ -143,17 +143,17 @@ void MythNotification::SetDuration(int Duration)
  * Should a style be defined, the Notification Center will attempt to load
  * an alternative theme and fall back to the default one if unsuccessful
  */
-void MythNotification::SetStyle(const QString& Style)
+void MythNotification::SetStyle(const QString& sStyle)
 {
-    m_style = Style;
+    m_style = sStyle;
     ToStringList();
 }
 
 /*! \brief Define a bitmask of Visibility
  */
-void MythNotification::SetVisibility(VNMask Visibility)
+void MythNotification::SetVisibility(VNMask nVisibility)
 {
-    m_visibility = Visibility;
+    m_visibility = nVisibility;
     ToStringList();
 }
 

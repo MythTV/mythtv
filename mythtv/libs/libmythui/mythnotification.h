@@ -84,8 +84,8 @@ class MUI_PUBLIC MythNotification : public MythEvent
     void SetDescription(const QString& Description);
     void SetMetaData(const DMAP& MetaData);
     void SetDuration(int Duration);
-    void SetStyle(const QString& Style);
-    void SetVisibility(VNMask Visibility);
+    void SetStyle(const QString& sStyle);
+    void SetVisibility(VNMask nVisibility);
     void SetPriority(Priority nPriority);
     static Type TypeFromString(const QString& Type);
     void ToStringList();
