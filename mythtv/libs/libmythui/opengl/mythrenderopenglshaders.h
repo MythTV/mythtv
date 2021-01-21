@@ -69,7 +69,7 @@ static const QString kDrawVertexShader =
 static const QString kSDF =
 "highp float SignedDistance(highp vec2 p, highp vec2 b, highp float r)\n"
 "{\n"
-"    return length(max(abs(p) - b + r, 0.0)) - r;"
+"    return length(max(abs(p) - b + r, 0.0)) - r;\n"
 "}\n";
 
 static const QString kRoundedRectShader =
