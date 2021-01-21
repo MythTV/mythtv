@@ -20,6 +20,7 @@
 #include "libmythbase/http/mythhttpmetaservice.h"
 
 // Std
+#include <thread>
 #include <algorithm>
 
 #define LOC QString("FrontendServices: ")
