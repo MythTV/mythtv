@@ -578,20 +578,31 @@ void MythDisplay::Initialise()
 */
 void MythDisplay::InitScreenBounds()
 {
-    QList<QScreen*> screens = QGuiApplication::screens();
-    for (auto *screen : screens)
+    const auto screens = QGuiApplication::screens();
+    for (auto * screen : qAsConst(screens))
     {
-        QRect dim = screen->geometry();
-        QString extra = MythDisplay::GetExtraScreenInfo(screen);
+        auto dim = screen->geometry();
+        auto extra = MythDisplay::GetExtraScreenInfo(screen);
         LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1: %2x%3 %4")
             .arg(screen->name()).arg(dim.width()).arg(dim.height()).arg(extra));
     }
 
-    QScreen *primary = QGuiApplication::primaryScreen();
+    const auto * primary = QGuiApplication::primaryScreen();
+    if (!primary)
+    {
+        if (!screens.empty())
+            primary = screens.front();
+        if (!primary)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Qt has no screens!");
+            return;
+        }
+    }
+
     LOG(VB_GUI, LOG_INFO, LOC +QString("Primary screen: %1.").arg(primary->name()));
 
-    int numScreens = MythDisplay::GetScreenCount();
-    QSize dim = primary->virtualSize();
+    auto numScreens = MythDisplay::GetScreenCount();
+    auto dim = primary->virtualSize();
     LOG(VB_GUI, LOG_INFO, LOC + QString("Total desktop dim: %1x%2, over %3 screen[s].")
         .arg(dim.width()).arg(dim.height()).arg(numScreens));
 
