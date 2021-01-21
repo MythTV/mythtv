@@ -510,7 +510,7 @@ void MythHTTPSocket::Write(int64_t Written)
                 if (offset != (*file)->pos())
                     (*file)->seek(offset);
             }
-            int64_t writebufsize = std::min(itemsize, HTTP_CHUNKSIZE);
+            int64_t writebufsize = std::min(itemsize, static_cast<int64_t>(HTTP_CHUNKSIZE));
             if (m_writeBuffer && (m_writeBuffer->size() < writebufsize))
                 m_writeBuffer = nullptr;
             if (!m_writeBuffer)
