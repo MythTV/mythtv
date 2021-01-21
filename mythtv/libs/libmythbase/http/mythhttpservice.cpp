@@ -62,7 +62,7 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
     // Parse the parameters and match against those expected by the method.
     // As for the old code, this allows parameters to be missing and they will
     // thus be allocated a default/null/value.
-    size_t typecount = std::min(handler->m_types.size(), 100UL);
+    size_t typecount = std::min(handler->m_types.size(), static_cast<size_t>(100));
 
     // Build parameters list
     // Note: We allow up to 100 args but anything above Q_METAMETHOD_INVOKE_MAX_ARGS
