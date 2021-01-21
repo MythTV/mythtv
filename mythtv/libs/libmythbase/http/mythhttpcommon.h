@@ -75,7 +75,7 @@ class MythHTTPWS
     {
         if (Rate < 1)
             return "-";
-        else if (Rate > (1073741824L * 1024))
+        else if (Rate > (1073741824LL * 1024))
             return ">1TBps";
         else if (Rate >= 1073741824)
             return QStringLiteral("%1GBps").arg(Rate / 1073741824.0);
