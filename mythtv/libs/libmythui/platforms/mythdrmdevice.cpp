@@ -249,8 +249,16 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
         return;
     }
 
-    // N.B. No MythDirs setup yet - just dump this in the current directory
-    auto filename = "eglfs_kms_config.json";
+    // N.B. No MythDirs setup yet so mimic the conf dir setup
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+    QString confdir = QString(qgetenv("MYTHCONFDIR"));
+#else
+    QString confdir = qEnvironmentVariable("MYTHCONFDIR");
+#endif
+    if (confdir.isEmpty())
+        confdir = QDir::homePath() + "/.mythtv";
+
+    auto filename = confdir + "/eglfs_kms_config.json";
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly))
     {
