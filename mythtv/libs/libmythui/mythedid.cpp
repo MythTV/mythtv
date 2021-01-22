@@ -2,6 +2,9 @@
 #include "mythlogging.h"
 #include "mythedid.h"
 
+// Qt
+#include <QObject>
+
 #define DESCRIPTOR_ALPHANUMERIC_STRING 0xFE
 #define DESCRIPTOR_PRODUCT_NAME 0xFC
 #define DESCRIPTOR_SERIAL_NUMBER 0xFF
@@ -96,11 +99,11 @@ std::pair<int,int> MythEDID::GetHDRSupport() const
 
 QString MythEDID::EOTFToString(int EOTF)
 {
-    if (EOTF & SDR)     return "SDR";
-    if (EOTF & HDRTrad) return "HDR(Trad)";
-    if (EOTF & HDR10)   return "HDR10 (SMPTE ST2084)";
-    if (EOTF & HLG)     return "Hybrid Log-Gamma";
-    return "Unknown";
+    if (EOTF & SDR)     return QObject::tr("SDR");
+    if (EOTF & HDRTrad) return QObject::tr("HDR(Trad)");
+    if (EOTF & HDR10)   return QObject::tr("HDR10 (SMPTE ST2084)");
+    if (EOTF & HLG)     return QObject::tr("Hybrid Log-Gamma");
+    return QObject::tr("Unknown");
 }
 
 QStringList MythEDID::EOTFToStrings(int EOTF)
