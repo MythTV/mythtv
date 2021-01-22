@@ -151,22 +151,49 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=1'").arg(s_kmsSetMode));
     setenv(s_kmsSetMode, "1", 0);
 
-    bool customplane = qEnvironmentVariableIsSet(s_kmsPlaneIndex) ||
-                       qEnvironmentVariableIsSet(s_kmsPlaneCRTCS);
-    bool custom =      customplane ||
-                       qEnvironmentVariableIsSet(s_kmsPlaneZpos)  ||
-                       qEnvironmentVariableIsSet(s_kmsConfigFile);
+    bool plane  = qEnvironmentVariableIsSet(s_kmsPlaneIndex) ||
+                  qEnvironmentVariableIsSet(s_kmsPlaneCRTCS);
+    bool config = qEnvironmentVariableIsSet(s_kmsConfigFile);
+    bool zpos   = qEnvironmentVariableIsSet(s_kmsPlaneZpos);
+    bool custom = plane || config || zpos;
 
     // Don't attempt to override any custom user configuration
     if (custom)
     {
         LOG(VB_GENERAL, LOG_INFO, "QT_QPA_EGLFS_KMS user overrides detected");
-        // If plane details are set, it is likely the user is customising planar
-        // video; so warn if planar video has not been enabled
-        if (customplane && !s_mythDRMVideo)
+
+        if (!s_mythDRMVideo)
         {
+            // It is likely the user is customising planar video; so warn if planar
+            // video has not been enabled
             LOG(VB_GENERAL, LOG_WARNING, "Qt eglfs_kms custom plane settings detected"
                                          " but planar support not requested.");
+        }
+        else
+        {
+            // Planar support requested so we must signal to our future self
+            s_planarRequested = true;
+
+            // We don't know whether zpos support is required at this point
+            if (!zpos)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("%1 not detected - assuming not required")
+                    .arg(s_kmsPlaneZpos));
+            }
+
+            // Warn if we do no see all of the known required config
+            if (!(plane && config))
+            {
+                LOG(VB_GENERAL, LOG_WARNING, "Warning: DRM planar support requested but "
+                    "it looks like not all environment variables have been set.");
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Minimum required: %1 and/or %2 for plane index and %3 for alpha blending")
+                    .arg(s_kmsPlaneIndex).arg(s_kmsPlaneCRTCS).arg(s_kmsConfigFile));
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_INFO, "DRM planar support enabled for custom user settings");
+            }
         }
         return;
     }
