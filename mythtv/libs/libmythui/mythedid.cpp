@@ -89,6 +89,30 @@ int MythEDID::VideoLatency(bool Interlaced) const
     return m_videoLatency[Interlaced ? 1 : 0];
 }
 
+std::pair<int,int> MythEDID::GetHDRSupport() const
+{
+    return { m_hdrSupport, m_hdrMetaTypes };
+}
+
+QString MythEDID::EOTFToString(int EOTF)
+{
+    if (EOTF & SDR)     return "SDR";
+    if (EOTF & HDRTrad) return "HDR(Trad)";
+    if (EOTF & HDR10)   return "HDR10 (SMPTE ST2084)";
+    if (EOTF & HLG)     return "Hybrid Log-Gamma";
+    return "Unknown";
+}
+
+QStringList MythEDID::EOTFToStrings(int EOTF)
+{
+    QStringList res;
+    if (EOTF & SDR)     res << EOTFToString(SDR);
+    if (EOTF & HDRTrad) res << EOTFToString(HDRTrad);
+    if (EOTF & HDR10)   res << EOTFToString(HDR10);
+    if (EOTF & HLG)     res << EOTFToString(HLG);
+    return res;
+}
+
 // from QEdidParser
 static QString ParseEdidString(const quint8* data, bool Replace)
 {
@@ -310,7 +334,7 @@ bool MythEDID::ParseCTABlock(const quint8* Data, uint Offset)
         case 0x03: ParseVSDB(Data, Offset + 1, length); break; // Vendor Specific Data Block
         case 0x04: break; // Speaker Allocation data block // NOLINT(bugprone-branch-clone)
         case 0x05: break; // VESA DTC data block
-        case 0x07: break; // Extended tag. HDR metadata here
+        case 0x07: ParseExtended(Data, Offset + 1, length); break; // Extended tag. HDR metadata here
         default: break;
     }
     return true;
@@ -321,9 +345,10 @@ bool MythEDID::ParseVSDB(const quint8* Data, uint Offset, uint Length)
     if (Offset + 3 >= m_size)
         return false;
 
+    // N.B. Little endian
     int registration = Data[Offset] + (Data[Offset + 1] << 8) + (Data[Offset + 2] << 16);
 
-    // HDMI
+    // "HDMI Licensing, LLC"
     while (registration == 0x000C03)
     {
         m_isHDMI = true;
@@ -333,6 +358,13 @@ bool MythEDID::ParseVSDB(const quint8* Data, uint Offset, uint Length)
 
         // CEC physical address
         m_physicalAddress = static_cast<uint16_t>((Data[Offset + 3] << 8) + Data[Offset + 4]);
+
+        if (Length < 6 || (Offset + 6 >= m_size))
+            break;
+
+        // Deep color
+        m_deepColor = Data[Offset + 5] & 0x78;
+
         if (Length < 8 || (Offset + 8 >= m_size))
             break;
 
@@ -367,11 +399,75 @@ bool MythEDID::ParseVSDB(const quint8* Data, uint Offset, uint Length)
 
         break;
     }
+
+    // "HDMI Forum"
+    while (registration == 0xC45DD8)
+    {
+        if (Length < 5 || (Offset + 5 >= m_size))
+            break;
+
+        // Deep Color 4:2:0
+        m_deepYUV = Data[Offset + 4] & 0x7;
+
+        if (Length < 11 || (Offset + 11 >= m_size))
+            break;
+
+        // Variable Refresh Rate
+        m_vrrMin = Data[Offset + 9] & 0x3f;
+        m_vrrMax = ((Data[Offset + 9] & 0xc0) << 2) | Data[Offset + 10];
+        break;
+    }
+
+    return true;
+}
+
+bool MythEDID::ParseExtended(const quint8* Data, uint Offset, uint Length)
+{
+    if (Offset + 1 >= m_size)
+        return false;
+
+    // HDR Static Metadata Data Block
+    if (Data[Offset] == 0x06 && Length)
+    {
+        if (Length >= 3 && (Offset + 3 < m_size))
+        {
+            m_hdrSupport = Data[Offset + 1] & 0x3f;
+            m_hdrMetaTypes = Data[Offset + 2] & 0xff;
+        }
+
+        if (Length >= 4)
+            m_maxLuminance = 50.0F * ((2 ^ Data[Offset + 3]) / 32.0F);
+
+        if (Length >= 5)
+            m_maxAvgLuminance = 50.0F * ((2 ^ Data[Offset + 4]) / 32.0F);
+
+        if (Length >= 6)
+            m_minLuminance = 50.0F * ((2 ^ Data[Offset + 5]) / 32.0F);
+    }
     return true;
 }
 
 void MythEDID::Debug() const
 {
+    auto deep = [](uint8_t Deep)
+    {
+        QStringList res;
+        if (Deep & 0x08) res << "Y444";
+        if (Deep & 0x10) res << "30bit";
+        if (Deep & 0x20) res << "36bit";
+        if (Deep & 0x40) res << "48bit";
+        return res.join(",");
+    };
+
+    auto deepyuv = [](uint8_t Deep)
+    {
+        QStringList res;
+        if (Deep & 0x01) res << "10bit";
+        if (Deep & 0x02) res << "12bit";
+        if (Deep & 0x04) res << "16bit";
+        return res.join(",");
+    };
+
     if (!m_valid)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Invalid EDID");
@@ -401,6 +497,8 @@ void MythEDID::Debug() const
                                   .arg((m_physicalAddress >> 4) & 0xF)
                                   .arg(m_physicalAddress & 0xF);
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Physical address: %1").arg(address));
+    if (m_deepColor)
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Deep color: %1").arg(deep(m_deepColor)));
     if (m_latencies)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Latencies: Audio:%1 Video:%2")
@@ -410,5 +508,18 @@ void MythEDID::Debug() const
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Latencies: Audio:%1 Video:%2 (Interlaced)")
                     .arg(m_audioLatency[1]).arg(m_videoLatency[1]));
         }
+    }
+    if (m_deepYUV)
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Deep YUV 4:2:0 %1").arg(deepyuv(m_deepYUV)));
+    if (m_vrrMin || m_vrrMax)
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("VRR: %1<->%2").arg(m_vrrMin).arg(m_vrrMax));
+    if (m_hdrSupport)
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("HDR types: %1").arg(EOTFToStrings(m_hdrSupport).join(",")));
+    if (m_maxLuminance > 0.0F || m_maxAvgLuminance > 0.0F)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Desired luminance: Min: %1 Max: %2 Avg: %3")
+            .arg(static_cast<double>(m_minLuminance))
+            .arg(static_cast<double>(m_maxLuminance))
+            .arg(static_cast<double>(m_maxAvgLuminance)));
     }
 }

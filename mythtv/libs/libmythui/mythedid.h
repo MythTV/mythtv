@@ -9,6 +9,7 @@
 #include "mythuiexp.h"
 
 // Std
+#include <utility>
 #include <array>
 
 using PrimarySpace = std::array<std::array<float,2>,3>;
@@ -23,6 +24,19 @@ class MUI_PUBLIC MythEDID
     {
         PrimarySpace primaries;
         WhiteSpace   whitepoint;
+    };
+
+    enum HDREOTF
+    {
+        SDR     = 1 << 0,
+        HDRTrad = 1 << 1,
+        HDR10   = 1 << 2,
+        HLG     = 1 << 3
+    };
+
+    enum HDRMetadaType
+    {
+        Static1 = 1 << 0
     };
 
     MythEDID() = default;
@@ -42,6 +56,9 @@ class MUI_PUBLIC MythEDID
     int         AudioLatency      (bool Interlaced) const;
     int         VideoLatency      (bool Interlaced) const;
     void        Debug             () const;
+    std::pair<int,int> GetHDRSupport() const;
+    static QString EOTFToString   (int EOTF);
+    static QStringList EOTFToStrings(int EOTF);
 
   private:
     void        Parse             ();
@@ -49,6 +66,7 @@ class MUI_PUBLIC MythEDID
     bool        ParseCTA861       (const quint8* Data, uint Offset);
     bool        ParseCTABlock     (const quint8* Data, uint Offset);
     bool        ParseVSDB         (const quint8* Data, uint Offset, uint Length);
+    bool        ParseExtended     (const quint8* Data, uint Offset, uint Length);
 
     bool        m_valid           { false };
     QByteArray  m_data            { };
@@ -63,10 +81,19 @@ class MUI_PUBLIC MythEDID
     Primaries   m_primaries       { {{{0.0F, 0.0F}, {0.0F, 0.0F}, {0.0F, 0.0F}}}, {0.0F, 0.0F} };
     bool        m_isHDMI          { false };
     uint16_t    m_physicalAddress { 0 };
+    uint8_t     m_deepColor       { 0 };
     bool        m_latencies       { false };
     bool        m_interLatencies  { false };
     std::array<int,2> m_audioLatency { 0 };
     std::array<int,2> m_videoLatency { 0 };
+    uint8_t     m_deepYUV         { 0 };
+    int         m_vrrMin          { 0 };
+    int         m_vrrMax          { 0 };
+    int         m_hdrSupport      { 0 };
+    int         m_hdrMetaTypes    { 0 };
+    float       m_maxLuminance    { 0.0F };
+    float       m_maxAvgLuminance { 0.0F };
+    float       m_minLuminance    { 0.0F };
 };
 
 #endif
