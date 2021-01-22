@@ -262,11 +262,14 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     static const QString s_json =
         "{\n"
         "  \"device\": \"%1\",\n"
-        "  \"outputs\": [ { \"name\": \"%2\", \"format\": \"%3\" } ]\n"
+        "  \"outputs\": [ { \"name\": \"%2\", \"format\": \"%3\", \"mode\": \"%4\" } ]\n"
         "}\n";
 
+    // Note: mode is not sanitised
     auto wrote = qPrintable(s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
-        .arg(device->m_connector->m_name).arg(MythDRMPlane::FormatToString(format).toLower()));
+        .arg(device->m_connector->m_name).arg(MythDRMPlane::FormatToString(format).toLower())
+        .arg(s_mythDRMVideoMode.isEmpty() ? "current" : s_mythDRMVideoMode));
+
     if (file.write(wrote))
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1:\r\n%2").arg(filename).arg(wrote));

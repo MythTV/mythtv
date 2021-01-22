@@ -46,9 +46,11 @@ class MUI_PUBLIC MythDRMDevice
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     static inline QString s_mythDRMDevice    = QString(qgetenv("MYTHTV_DRM_DEVICE"));
     static inline QString s_mythDRMConnector = QString(qgetenv("MYTHTV_DRM_CONNECTOR"));
+    static inline QString s_mythDRMVideoMode = QString(qgetenv("MYTHTV_DRM_MODE"));
 #else
     static inline QString s_mythDRMDevice    = qEnvironmentVariable("MYTHTV_DRM_DEVICE");
     static inline QString s_mythDRMConnector = qEnvironmentVariable("MYTHTV_DRM_CONNECTOR");
+    static inline QString s_mythDRMVideoMode = qEnvironmentVariable("MYTHTV_DRM_MODE");
 #endif
     static void SetupDRM      (const MythCommandLineParser& CmdLine);
     DRMPlane GetVideoPlane    () const;
