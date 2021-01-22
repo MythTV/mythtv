@@ -213,7 +213,7 @@ void ImageScanThread<DBFS>::run()
             // For initial scans pause briefly to give thumb generator a headstart
             // before being deluged by client requests
             if (firstScan)
-                msleep(1s);
+                usleep(1s);
 
             // Notify clients of completion with removed & changed images
             m_dbfs.Notify("IMAGE_DB_CHANGED", mesg);

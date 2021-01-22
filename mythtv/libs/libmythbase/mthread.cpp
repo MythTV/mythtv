@@ -87,8 +87,6 @@ class MThreadInternal : public QThread
     static void SetTerminationEnabled(bool enabled = true)
     { QThread::setTerminationEnabled(enabled); }
 
-    static void Sleep(std::chrono::seconds time) { QThread::sleep(time.count()); }
-    static void MSleep(std::chrono::milliseconds time) { QThread::msleep(time.count()); }
     static void USleep(std::chrono::microseconds time) { QThread::usleep(time.count()); }
 
   private:
@@ -327,16 +325,6 @@ int MThread::exec(void)
 void MThread::setTerminationEnabled(bool enabled)
 {
     MThreadInternal::SetTerminationEnabled(enabled);
-}
-
-void MThread::sleep(std::chrono::seconds time)
-{
-    MThreadInternal::Sleep(time);
-}
-
-void MThread::msleep(std::chrono::milliseconds time)
-{
-    MThreadInternal::MSleep(time);
 }
 
 void MThread::usleep(std::chrono::microseconds time)

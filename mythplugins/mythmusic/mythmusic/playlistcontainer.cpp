@@ -15,7 +15,7 @@ void PlaylistLoadingThread::run()
     RunProlog();
     while (!m_allMusic->doneLoading())
     {
-        msleep(250ms);
+        usleep(250ms);
     }
     m_parent->load();
     RunEpilog();

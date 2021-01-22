@@ -137,7 +137,7 @@ void TaskQueue::run( )
         }
         // Make sure to throttle our processing.
 
-        msleep( 100ms );
+        usleep( 100ms );
     }
 
     RunEpilog();

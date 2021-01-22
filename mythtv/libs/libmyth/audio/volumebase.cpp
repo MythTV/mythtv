@@ -72,7 +72,7 @@ class VolumeWriteBackThread : public MThread
 
             // Ignore further volume changes for the holdoff period
             setTerminationEnabled(true);
-            msleep(holdoff);
+            usleep(holdoff);
             setTerminationEnabled(false);
 
             lock.relock();

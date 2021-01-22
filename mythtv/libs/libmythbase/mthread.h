@@ -128,8 +128,6 @@ class MBASE_PUBLIC MThread
     int exec(void);
 
     static void setTerminationEnabled(bool enabled = true);
-    static void sleep(std::chrono::seconds time);
-    static void msleep(std::chrono::milliseconds time);
     static void usleep(std::chrono::microseconds time);
     template<typename R, typename P>
     static typename std::enable_if_t<std::chrono::treat_as_floating_point<R>::value, void>
