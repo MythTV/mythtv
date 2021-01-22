@@ -286,9 +286,9 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     setenv(s_kmsPlaneCRTCS, qPrintable(crtcplane), 1);
 
     // Set the zpos if supported
-    if (auto zpos = MythDRMProperty::GetProperty("zpos", guiplane->m_properties); zpos.get())
+    if (auto zposp = MythDRMProperty::GetProperty("zpos", guiplane->m_properties); zposp.get())
     {
-        if (auto range = dynamic_cast<MythDRMRangeProperty*>(zpos.get()); range)
+        if (auto range = dynamic_cast<MythDRMRangeProperty*>(zposp.get()); range)
         {
             auto val = QString::number(std::min(range->m_min + 1, range->m_max));
             LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneZpos).arg(val));
