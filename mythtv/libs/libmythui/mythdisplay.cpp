@@ -144,15 +144,15 @@ QStringList MythDisplay::GetDescription()
         result.append("");
     }
 
-    QScreen *current = GetCurrentScreen();
-    QList<QScreen*> screens = QGuiApplication::screens();
+    auto * current = GetCurrentScreen();
+    const auto screens = QGuiApplication::screens();
     bool first = true;
     for (auto *screen : qAsConst(screens))
     {
         if (!first)
             result.append("");
         first = false;
-        QString id = QString("(%1)").arg(screen->manufacturer());
+        auto id = QString("(%1)").arg(screen->manufacturer());
         if (screen == current && !spanall)
             result.append(tr("Current screen %1 %2:").arg(screen->name()).arg(id));
         else
@@ -162,7 +162,7 @@ QStringList MythDisplay::GetDescription()
         if (screen == current)
         {
             QString source;
-            double aspect = GetAspectRatio(source);
+            auto aspect = GetAspectRatio(source);
             result.append(tr("Aspect ratio") + QString("\t: %1 (%2)")
                     .arg(aspect, 0, 'f', 3).arg(source));
             if (!spanall)
@@ -172,6 +172,15 @@ QStringList MythDisplay::GetDescription()
                               .arg(GetRefreshRate(), 0, 'f', 2));
             }
         }
+    }
+
+    if (m_edid.Valid())
+    {
+        auto [types, dummy] = m_edid.GetHDRSupport();
+        auto hdr = MythEDID::EOTFToStrings(types);
+        if (hdr.empty())
+            hdr.append(tr("None"));
+        result.append(tr("Supported HDR formats\t: %1").arg(hdr.join(",")));
     }
     return result;
 }
@@ -521,6 +530,14 @@ void MythDisplay::Initialise()
                 LOG(VB_GENERAL, LOG_NOTICE, LOC + "Display is using sRGB colourspace");
             else
                 LOG(VB_GENERAL, LOG_NOTICE, LOC + "Display has custom colourspace");
+
+            auto [types, metadata] = m_edid.GetHDRSupport();
+            auto hdr = MythEDID::EOTFToStrings(types);
+            if (hdr.empty())
+                hdr.append("None");
+            else if ((metadata & MythEDID::Static1) != MythEDID::Static1)
+                LOG(VB_GENERAL, LOG_WARNING, LOC + "Display does not report support for Static Metadata Type 1");
+            LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Supported HDR formats: %1").arg(hdr.join(",")));
         }
     }
 
