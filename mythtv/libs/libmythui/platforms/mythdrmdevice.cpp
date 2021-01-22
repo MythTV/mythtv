@@ -853,6 +853,11 @@ DRMCrtc MythDRMDevice::GetCrtc() const
     return m_crtc;
 }
 
+DRMConn MythDRMDevice::GetConnector() const
+{
+    return m_connector;
+}
+
 bool MythDRMDevice::QueueAtomics(const MythAtomics& Atomics)
 {
     if (!(m_atomic && m_authenticated))

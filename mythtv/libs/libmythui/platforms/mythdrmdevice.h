@@ -54,6 +54,7 @@ class MUI_PUBLIC MythDRMDevice
     DRMPlane GetVideoPlane    () const;
     DRMPlane GetGUIPlane      () const;
     DRMCrtc  GetCrtc          () const;
+    DRMConn  GetConnector     () const;
     bool     QueueAtomics     (const MythAtomics& Atomics);
     void     DisableVideoPlane();
     void     MainWindowReady  ();
