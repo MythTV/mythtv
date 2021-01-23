@@ -2,6 +2,9 @@
 #include "mythhdrmetadata.h"
 #include "mythframe.h"
 
+// Std
+#include <cmath>
+
 // FFmpeg
 extern "C" {
 #include "libavutil/mastering_display_metadata.h"
