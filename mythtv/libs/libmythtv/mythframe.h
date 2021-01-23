@@ -11,6 +11,7 @@
 // Std
 #include <array>
 #include <vector>
+#include <memory>
 
 #define MYTH_WIDTH_ALIGNMENT 64
 #define MYTH_HEIGHT_ALIGNMENT 16
@@ -81,6 +82,7 @@ inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintT
 using VideoFrameTypes = std::vector<VideoFrameType>;
 using FramePitches = std::array<int,3>;
 using FrameOffsets = std::array<int,3>;
+using MythHDRPtr = std::shared_ptr<class MythHDRMetadata>;
 
 class MTV_PUBLIC MythVideoFrame
 {
@@ -151,6 +153,7 @@ class MTV_PUBLIC MythVideoFrame
     bool           m_alreadyDeinterlaced { false };
     int            m_rotation          { 0 };
     uint           m_stereo3D          { 0 };
+    MythHDRPtr     m_hdrMetadata       { nullptr };
     MythDeintType  m_deinterlaceSingle { DEINT_NONE };
     MythDeintType  m_deinterlaceDouble { DEINT_NONE };
     MythDeintType  m_deinterlaceAllowed { DEINT_NONE };

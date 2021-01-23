@@ -35,6 +35,7 @@
 #include "DVD/mythdvdbuffer.h"
 #include "Bluray/mythbdbuffer.h"
 #include "mythavutil.h"
+#include "mythhdrmetadata.h"
 
 #include "lcddevice.h"
 
@@ -3546,7 +3547,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
 {
 
-    AVCodecContext *context = m_codecMap.GetCodecContext(Stream);
+    auto * context = m_codecMap.GetCodecContext(Stream);
 
     // We need to mediate between ATSC and SCTE data when both are present.  If
     // both are present, we generally want to prefer ATSC.  However, there may
@@ -3579,15 +3580,15 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     for (uint i = 0; i < cc_len; i += ((cc_buf[i] & 0x1f) * 3) + 2)
         DecodeDTVCC(cc_buf + i, cc_len - i, scte);
 
-    if (cc_len == 0) {
-        // look for A53 captions
-        AVFrameSideData *side_data = av_frame_get_side_data(AvFrame, AV_FRAME_DATA_A53_CC);
-        if (side_data && (side_data->size > 0)) {
+    // look for A53 captions
+    if (cc_len == 0)
+    {
+        auto * side_data = av_frame_get_side_data(AvFrame, AV_FRAME_DATA_A53_CC);
+        if (side_data && (side_data->size > 0))
             DecodeCCx08(side_data->data, static_cast<uint>(side_data->size), false);
-        }
     }
 
-    auto *frame = static_cast<MythVideoFrame*>(AvFrame->opaque);
+    auto * frame = static_cast<MythVideoFrame*>(AvFrame->opaque);
     if (frame)
         frame->m_directRendering = m_directRendering;
 
@@ -3748,6 +3749,9 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     frame->m_deinterlaceInuse2x  = false;
     frame->m_alreadyDeinterlaced = false;
     frame->m_interlacedReverse   = false;
+
+    // Retrieve HDR metadata
+    MythHDRMetadata::Populate(frame, AvFrame);
 
     m_parent->ReleaseNextVideoFrame(frame, temppts);
     m_mythCodecCtx->PostProcessFrame(context, frame);
