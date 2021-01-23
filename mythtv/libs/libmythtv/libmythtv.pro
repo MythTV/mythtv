@@ -158,6 +158,7 @@ HEADERS += metadataimagehelper.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
 HEADERS += driveroption.h
+HEADERS += mythhdrmetadata.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -191,8 +192,10 @@ SOURCES += io/mythstreamingbuffer.cpp
 SOURCES += io/mythinteractivebuffer.cpp
 SOURCES += io/mythopticalbuffer.cpp
 SOURCES += metadataimagehelper.cpp
-SOURCES += mythframe.cpp            mythavutil.cpp
+SOURCES += mythframe.cpp
+SOURCES += mythavutil.cpp
 SOURCES += recordingfile.cpp
+SOURCES += mythhdrmetadata.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
