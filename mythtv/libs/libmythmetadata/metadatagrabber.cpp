@@ -385,7 +385,7 @@ void MetaGrabberScript::ParseGrabberVersion(const QDomElement &item)
     if (!m_typestring.isEmpty() && grabberTypeStrings.contains(m_typestring))
         m_type = grabberTypeStrings[m_typestring];
     else
-        m_type = kGrabberMovie;
+        m_type = kGrabberInvalid;
 
     QDomElement accepts = item.firstChildElement("accepts");
     if (!accepts.isNull())
