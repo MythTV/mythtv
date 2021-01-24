@@ -3,6 +3,7 @@
 #include "drm/mythhdrtrackerdrm.h"
 #endif
 #include "mythhdrtracker.h"
+#include "mythedid.h"
 
 HDRTracker MythHDRTracker::Create(MythDisplay* _Display)
 {
