@@ -159,6 +159,7 @@ HEADERS += mythavutil.h
 HEADERS += recordingfile.h
 HEADERS += driveroption.h
 HEADERS += mythhdrmetadata.h
+HEADERS += mythhdrtracker.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -196,6 +197,7 @@ SOURCES += mythframe.cpp
 SOURCES += mythavutil.cpp
 SOURCES += recordingfile.cpp
 SOURCES += mythhdrmetadata.cpp
+SOURCES += mythhdrtracker.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -533,9 +535,11 @@ using_frontend {
         HEADERS += drm/mythvideodrm.h
         HEADERS += drm/mythvideodrmbuffer.h
         HEADERS += drm/mythvideodrmutils.h
+        HEADERS += drm/mythhdrtrackerdrm.h
         SOURCES += drm/mythvideodrm.cpp
         SOURCES += drm/mythvideodrmbuffer.cpp
         SOURCES += drm/mythvideodrmutils.cpp
+        SOURCES += drm/mythhdrtrackerdrm.cpp
     }
 
     using_vaapi {
