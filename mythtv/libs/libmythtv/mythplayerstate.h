@@ -122,6 +122,8 @@ class MTV_PUBLIC MythVideoColourState
     std::map<PictureAttribute,int> m_attributeValues;
 };
 
+Q_DECLARE_METATYPE(MythVideoColourState)
+
 class MTV_PUBLIC MythVisualiserState
 {
   public:

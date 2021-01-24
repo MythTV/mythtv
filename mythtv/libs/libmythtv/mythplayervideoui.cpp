@@ -12,6 +12,7 @@ MythPlayerVideoUI::MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerC
 {
     // Register our types for signalling
     qRegisterMetaType<MythVideoBoundsState>();
+    qRegisterMetaType<MythVideoColourState>();
     connect(this, &MythPlayerVideoUI::CheckCallbacks, this, &MythPlayerVideoUI::ProcessCallbacks);
     m_interopTypes = MythInteropGPU::GetTypes(m_render);
 }
