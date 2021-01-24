@@ -811,7 +811,11 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
 
 uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
 {
-    uint64_t key  = ((uint64_t) m_sourceid);
+    uint sourceid = m_sourceid;
+    if (sourceid == 0)
+        return 0;
+
+    uint64_t key  = sourceid;
     key |= ((uint64_t) atsc_minor) << 16;
     key |= ((uint64_t) atsc_major) << 32;
 
@@ -819,7 +823,7 @@ uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
     if (it != m_srvToChanid.constEnd())
         return *it;
 
-    uint chanid = get_chan_id_from_db_atsc(m_sourceid, atsc_major, atsc_minor);
+    uint chanid = get_chan_id_from_db_atsc(sourceid, atsc_major, atsc_minor);
     m_srvToChanid[key] = chanid;
 
     return chanid;
@@ -827,7 +831,11 @@ uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)
 
 uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
 {
-    uint64_t key  = ((uint64_t) m_sourceid);
+    uint sourceid = m_sourceid;
+    if (sourceid == 0)
+        return 0;
+
+    uint64_t key  = sourceid;
     key |= ((uint64_t) serviceid) << 16;
     key |= ((uint64_t) networkid) << 32;
     key |= ((uint64_t) tsid)      << 48;
@@ -836,7 +844,7 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
     if (it != m_srvToChanid.constEnd())
         return *it;
 
-    uint chanid = get_chan_id_from_db_dvb(m_sourceid, serviceid, networkid, tsid);
+    uint chanid = get_chan_id_from_db_dvb(sourceid, serviceid, networkid, tsid);
     m_srvToChanid[key] = chanid;
 
     return chanid;
@@ -844,7 +852,11 @@ uint EITHelper::GetChanID(uint serviceid, uint networkid, uint tsid)
 
 uint EITHelper::GetChanID(uint program_number)
 {
-    uint64_t key  = ((uint64_t) m_sourceid);
+    uint sourceid = m_sourceid;
+    if (sourceid == 0)
+        return 0;
+
+    uint64_t key  = sourceid;
     key |= ((uint64_t) program_number) << 16;
     key |= ((uint64_t) m_channelid)    << 32;
 
@@ -852,14 +864,14 @@ uint EITHelper::GetChanID(uint program_number)
     if (it != m_srvToChanid.constEnd())
         return *it;
 
-    uint chanid = get_chan_id_from_db_dtv(m_sourceid, program_number, m_channelid);
+    uint chanid = get_chan_id_from_db_dtv(sourceid, program_number, m_channelid);
     m_srvToChanid[key] = chanid;
 
     return chanid;
 }
 
 static uint get_chan_id_from_db_atsc(uint sourceid,
-                                uint atsc_major, uint atsc_minor)
+                                     uint atsc_major, uint atsc_minor)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -886,7 +898,7 @@ static uint get_chan_id_from_db_atsc(uint sourceid,
 
 // Figure out the chanid for this channel
 static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
-                                uint networkid, uint transportid)
+                                    uint networkid, uint transportid)
 {
     uint chanid = 0;
     bool useOnAirGuide = false;
@@ -894,60 +906,51 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
 
     // DVB Link to chanid
     QString qstr =
-        "SELECT chanid, useonairguide, channel.sourceid "
+        "SELECT chanid, useonairguide "
         "FROM channel, dtv_multiplex "
         "WHERE deleted          IS NULL        AND "
         "      serviceid        = :SERVICEID   AND "
         "      networkid        = :NETWORKID   AND "
         "      transportid      = :TRANSPORTID AND "
+        "      channel.sourceid = :SOURCEID    AND "
         "      channel.mplexid  = dtv_multiplex.mplexid";
 
     query.prepare(qstr);
     query.bindValue(":SERVICEID",   serviceid);
     query.bindValue(":NETWORKID",   networkid);
     query.bindValue(":TRANSPORTID", transportid);
+    query.bindValue(":SOURCEID",    sourceid);
 
     if (!query.exec() || !query.isActive())
-        MythDB::DBError("Looking up chanID", query);
-
-    if (query.size() == 0) {
-        // Attempt fuzzy matching, by skipping the tsid
-        // DVB Link to chanid
-        qstr =
-            "SELECT chanid, useonairguide, channel.sourceid "
-            "FROM channel, dtv_multiplex "
-            "WHERE deleted          IS NULL        AND "
-            "      serviceid        = :SERVICEID   AND "
-            "      networkid        = :NETWORKID   AND "
-            "      channel.mplexid  = dtv_multiplex.mplexid";
-
-        query.prepare(qstr);
-        query.bindValue(":SERVICEID",   serviceid);
-        query.bindValue(":NETWORKID",   networkid);
-        if (!query.exec() || !query.isActive())
-            MythDB::DBError("Looking up chanID in fuzzy mode", query);
-    }
-
-    while (query.next())
     {
-        // Check to see if we are interested in this channel
-        chanid        = query.value(0).toUInt();
-        useOnAirGuide = query.value(1).toBool();
-        if (sourceid == query.value(2).toUInt())
-            return useOnAirGuide ? chanid : 0;
+        MythDB::DBError("Looking up chanID", query);
+        return 0;
     }
 
     if (query.size() > 1)
     {
-        LOG(VB_EIT, LOG_INFO,
-            LOC + QString("found %1 channels for networkid %2, "
-                          "transportid %3, serviceid %4 but none "
-                          "for current sourceid %5.")
-                .arg(query.size()).arg(networkid).arg(transportid)
-                .arg(serviceid).arg(sourceid));
+        LOG(VB_EIT, LOG_ERR, LOC +
+            QString("Found %1 channels for sourceid %1 networkid %2 "
+                    "transportid %3 serviceid %4 but only one expected")
+                .arg(query.size())
+                .arg(sourceid).arg(networkid).arg(transportid).arg(serviceid));
     }
 
-    return useOnAirGuide ? chanid : 0;
+    while (query.next())
+    {
+        chanid        = query.value(0).toUInt();
+        useOnAirGuide = query.value(1).toBool();
+        return useOnAirGuide ? chanid : 0;
+    }
+
+    // EIT information for channels that are not present such as encrypted
+    // channels when only FTA channels are selected etc.
+    LOG(VB_EIT, LOG_DEBUG, LOC +
+        QString("No channel found for sourceid %1 networkid %2 "
+                "transportid %3 serviceid %4")
+            .arg(sourceid).arg(networkid).arg(transportid).arg(serviceid));
+
+    return 0;
 }
 
 /* Figure out the chanid for this channel from the sourceid,
@@ -957,10 +960,11 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
  * in dtv_multiplex
  */
 static uint get_chan_id_from_db_dtv(uint sourceid, uint serviceid,
-                                uint tunedchanid)
+                                    uint tunedchanid)
 {
     uint chanid = 0;
     bool useOnAirGuide = false;
+    uint db_sourceid = 0;
     MSqlQuery query(MSqlQuery::InitCon());
 
     // DVB Link to chanid
@@ -978,28 +982,32 @@ static uint get_chan_id_from_db_dtv(uint sourceid, uint serviceid,
     query.bindValue(":CHANID", tunedchanid);
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("Looking up chanID", query);
+        return 0;
+    }
 
     while (query.next())
     {
         // Check to see if we are interested in this channel
         chanid        = query.value(0).toUInt();
         useOnAirGuide = query.value(1).toBool();
-        if (sourceid == query.value(2).toUInt())
+        db_sourceid   = query.value(2).toUInt();
+        if (sourceid == db_sourceid)
             return useOnAirGuide ? chanid : 0;
     }
 
-    if (query.size() > 1)
+    if (query.size() > 0)
     {
-        LOG(VB_EIT, LOG_INFO,
-            LOC + QString("found %1 channels for multiplex of chanid %2, "
-                          "serviceid %3 but none "
-                          "for current sourceid %4.")
+        LOG(VB_EIT, LOG_DEBUG,
+            LOC + QString("Found %1 channels for multiplex of chanid %2, "
+                          "serviceid %3, sourceid %4 in database but none "
+                          "for current sourceid %5.")
                 .arg(query.size()).arg(tunedchanid)
-                .arg(serviceid).arg(sourceid));
+                .arg(serviceid).arg(db_sourceid).arg(sourceid));
     }
 
-    return useOnAirGuide ? chanid : 0;
+    return 0;
 }
 
 static void init_fixup(FixupMap &fix)
