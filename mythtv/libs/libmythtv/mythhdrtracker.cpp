@@ -4,6 +4,8 @@
 #endif
 #include "mythhdrtracker.h"
 #include "mythedid.h"
+#include "mythdisplay.h"
+#include "mythlogging.h"
 
 HDRTracker MythHDRTracker::Create(MythDisplay* _Display)
 {
