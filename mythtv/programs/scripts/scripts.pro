@@ -32,12 +32,17 @@ INSTALLS += database_scripts
 
 using_bindings_python {
 
-    PYTHON_SOURCES += hardwareprofile/*
-    PYTHON_SOURCES += internetcontent/*.py internetcontent/nv_python_libs
-    PYTHON_SOURCES += metadata/*
+    PYTHON_SOURCES += $$files("hardwareprofile/*", true)
+    PYTHON_SOURCES += $$files("internetcontent/*", true)
+    PYTHON_SOURCES += $$files("metadata/*", true)
+    DIR_NAMES = $$system(find . -type d)
+    DIR_NAMES = $$replace(DIR_NAMES, '\./', '')
+    for(name, DIR_NAMES) {
+        PYTHON_SOURCES -= $$name
+    }
 
     python_pathfix.output  = $${OBJECTS_DIR}/${QMAKE_FILE_NAME}
-    python_pathfix.commands = $${QMAKE_COPY_DIR} ${QMAKE_FILE_NAME} $${OBJECTS_DIR}/${QMAKE_FILE_NAME} $$escape_expand(\n\t) \
+    python_pathfix.commands = $${QMAKE_COPY} ${QMAKE_FILE_NAME} $${OBJECTS_DIR}/${QMAKE_FILE_NAME} $$escape_expand(\n\t) \
                               $${PYTHON} ./python_pathfix.py $${OBJECTS_DIR}/${QMAKE_FILE_NAME}
     python_pathfix.input = PYTHON_SOURCES
     python_pathfix.variable_out = PYTHON_FIXUPS
