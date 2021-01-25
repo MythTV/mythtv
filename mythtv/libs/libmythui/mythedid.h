@@ -91,9 +91,9 @@ class MUI_PUBLIC MythEDID
     int         m_vrrMax          { 0 };
     int         m_hdrSupport      { 0 };
     int         m_hdrMetaTypes    { 0 };
-    float       m_maxLuminance    { 0.0F };
-    float       m_maxAvgLuminance { 0.0F };
-    float       m_minLuminance    { 0.0F };
+    double      m_maxLuminance    { 0.0 };
+    double      m_maxAvgLuminance { 0.0 };
+    double      m_minLuminance    { 0.0 };
 };
 
 #endif

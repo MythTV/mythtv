@@ -5,6 +5,9 @@
 // Qt
 #include <QObject>
 
+// Std
+#include <cmath>
+
 #define DESCRIPTOR_ALPHANUMERIC_STRING 0xFE
 #define DESCRIPTOR_PRODUCT_NAME 0xFC
 #define DESCRIPTOR_SERIAL_NUMBER 0xFF
@@ -439,13 +442,13 @@ bool MythEDID::ParseExtended(const quint8* Data, uint Offset, uint Length)
         }
 
         if (Length >= 4)
-            m_maxLuminance = 50.0F * ((2 ^ Data[Offset + 3]) / 32.0F);
+            m_maxLuminance = 50.0 * pow(2, Data[Offset + 3] / 32.0);
 
         if (Length >= 5)
-            m_maxAvgLuminance = 50.0F * ((2 ^ Data[Offset + 4]) / 32.0F);
+            m_maxAvgLuminance = 50.0 * pow(2, Data[Offset + 4] / 32.0);
 
         if (Length >= 6)
-            m_minLuminance = 50.0F * ((2 ^ Data[Offset + 5]) / 32.0F);
+            m_minLuminance = (50.0 * pow(2, Data[Offset + 3] / 32.0)) * pow(Data[Offset + 5] / 255.0, 2) / 100.0;
     }
     return true;
 }
@@ -518,11 +521,9 @@ void MythEDID::Debug() const
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("VRR: %1<->%2").arg(m_vrrMin).arg(m_vrrMax));
     if (m_hdrSupport)
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("HDR types: %1").arg(EOTFToStrings(m_hdrSupport).join(",")));
-    if (m_maxLuminance > 0.0F || m_maxAvgLuminance > 0.0F)
+    if (m_maxLuminance > 0.0 || m_maxAvgLuminance > 0.0)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Desired luminance: Min: %1 Max: %2 Avg: %3")
-            .arg(static_cast<double>(m_minLuminance))
-            .arg(static_cast<double>(m_maxLuminance))
-            .arg(static_cast<double>(m_maxAvgLuminance)));
+            .arg(m_minLuminance, 3, 'f', 3).arg(m_maxLuminance, 3, 'f', 3).arg(m_maxAvgLuminance, 3, 'f', 3));
     }
 }
