@@ -415,6 +415,7 @@ void MythRenderOpenGL::DebugFeatures(void)
         if (m_extraFeatures & kGLComputeShaders)
             shaders << "Compute";
     }
+    auto module = QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL ? "OpenGL (not ES)" : "OpenGL ES";
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
@@ -424,6 +425,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("EGL display          : %1").arg(GLYesNo(GetEGLDisplay() != nullptr)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("EGL images           : %1").arg(GLYesNo(eglfuncs)));
 #endif
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL module     : %1").arg(module));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL format     : %1").arg(qtglversion));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL surface    : %1").arg(qtglsurface));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size     : %1").arg(m_maxTextureSize));
