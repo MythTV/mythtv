@@ -5199,6 +5199,11 @@ enable_weak_pic() {
 
 enabled pic && enable_weak_pic
 
+version2num10(){
+    # accepts version as in 3.12.4 and turns it into 3012004 which can be compared as a number
+    echo $1 | awk -F. '{ print ( ( $1 * 1000 ) + $2 ) * 1000 + $3; };'
+}
+
 version2num(){
     # accepts version as in 1.10.4 and turns it into 0x010A04 which can be compared as a number
     echo $1 | awk -F. '{ print ( ( $1 * 256 ) + $2 ) * 256 + $3; };'
@@ -5890,13 +5895,11 @@ if enabled taglib; then
     elif test $target_os = mingw32 ; then
         TAGLIB_CONFIG="taglib-config.cmd"
     fi
-    taglib_minor="0"
+    taglib_verstring="nothing"
+    taglib_version=0
     if test $TAGLIB_CONFIG ; then
-        taglib_minor=`$TAGLIB_CONFIG --version | cut -d. -f2`
-        if test x"$taglib_minor" = x"" ; then
-            echo "Can't find taglib-config. Assuming 1.7 or later."
-            taglib_minor="7"
-        fi
+        taglib_verstring=`$TAGLIB_CONFIG --version`
+        taglib_version=$(version2num10 $taglib_verstring)
         if test $target_os = android ; then
             tagprefix=`$TAGLIB_CONFIG --prefix`
         else
@@ -5909,8 +5912,9 @@ if enabled taglib; then
         fi
     fi
 
-    if test $taglib_minor -lt 7 || ! check_class_headers_cpp "taglib/fileref.h stdlib.h" TagLib::FileRef $tagincludes $taglibs -lstdc++; then
-        die "ERROR: cannot find taglib 1.7 or later."
+    if test $taglib_version -lt 1011001 || \
+            ! check_class_headers_cpp "taglib/fileref.h stdlib.h" TagLib::FileRef $tagincludes $taglibs -lstdc++; then
+        die "ERROR: cannot find taglib 1.11.1 or later (found $taglib_verstring)."
     fi
 fi
 
