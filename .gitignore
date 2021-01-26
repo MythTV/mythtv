@@ -56,3 +56,4 @@ uic_wrapper.sh
 *.gcno
 *.profraw
 *.profdata
+__pycache__

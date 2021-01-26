@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # ----------------------
-# Name: tmdb3.py
+# Name: tmdb3tv.py
 # Python Script
 # Author: Peter Bennett
 # Purpose:
 #   Frontend for the tmdb3 lookup.py script that now supports both Movies and
-#   TV shows. This frontend supports Movies
+#   TV shows. This frontend supports TV shows.
 # Command example:
 # See help (-h) options
-#
-# Code that was originally here is now in tmdb3/lookup.py
 #
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
@@ -58,12 +56,16 @@ def main(showType, command):
                       dest="test", help="Perform self-test for dependencies.")
     parser.add_option('-M', "--movielist", "--list", action="store_true", default=False,
                       dest="movielist",
-                      help="Get Movies. Needs search key.")
+                      help="Get Television Series List. Needs search key.")
     parser.add_option('-D', "--moviedata", "--data", action="store_true", default=False,
-                      dest="moviedata", help="Get Movie data. " \
-                      "Needs inetref. ")
+                      dest="moviedata", help="Get TV Episode data. " \
+                      "Needs inetref, season and episode. ")
     parser.add_option('-C', "--collection", action="store_true", default=False,
-                      dest="collectiondata", help="Get Collection data.")
+                      dest="collectiondata",
+                      help='Get a television Series (collection) "series" level information')
+    parser.add_option("-N", "--numbers", action="store_true", default=False, dest="numbers",
+                        help="Get television Season and Episode numbers. " \
+                        "Needs title and subtitle or inetref and subtitle.")
     parser.add_option('-l', "--language", metavar="LANGUAGE", default=u'en',
                       dest="language", help="Specify language for filtering.")
     parser.add_option('-a', "--area", metavar="COUNTRY", default=None,
@@ -113,21 +115,28 @@ def main(showType, command):
             sys.stdout.write('ERROR: tmdb3.py requires at least one non-empty argument.\n')
             return 1
 
-    from MythTV.tmdb3.lookup import buildVersion, buildMovieList, \
-        buildSingle, buildCollection, print_etree
+    if opts.moviedata and len(args) < 3:
+        sys.stdout.write('ERROR: tmdb3.py -D requires three non-empty arguments.\n')
+        return 1
+
+    from MythTV.tmdb3.lookup import buildVersion, buildTVList, \
+        buildEpisode, buildTVSeries, print_etree
     try:
         xml = None
         if opts.version:
             xml = buildVersion(showType, command)
 
         elif opts.movielist:
-            xml = buildMovieList(args[0], opts)
+            xml = buildTVList(args[0], opts)
+
+        elif opts.numbers:
+            xml = buildEpisode(args[0:2], opts)
 
         elif opts.moviedata:
-            xml = buildSingle(args[0], opts)
+            xml = buildEpisode(args[0:3], opts)
 
         elif opts.collectiondata:
-            xml = buildCollection(args[0], opts)
+            xml = buildTVSeries(args[0], opts)
 
         # if a number is returned, it is an error code return
         if isinstance(xml,int):
@@ -147,4 +156,4 @@ def main(showType, command):
     return 0
 
 if __name__ == '__main__':
-    sys.exit(main("movie",'tmdb3.py'))
+    sys.exit(main("television",'tmdb3tv.py'))
