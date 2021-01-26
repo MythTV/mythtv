@@ -41,14 +41,13 @@ enum GLFeatures
     kGLFeatNone        = 0x0000,
     kGLBufferMap       = 0x0001,
     kGLExtRects        = 0x0002,
-    kGLExtRGBA16       = 0x0004, // TODO remove
-    kGLExtSubimage     = 0x0008,
-    kGLTiled           = 0x0010,
-    kGLLegacyTextures  = 0x0020,
-    kGLNVMemory        = 0x0040,
-    kGL16BitFBO        = 0x0080,
-    kGLComputeShaders  = 0x0100,
-    kGLGeometryShaders = 0x0200
+    kGLExtSubimage     = 0x0004,
+    kGLTiled           = 0x0008,
+    kGLLegacyTextures  = 0x0010,
+    kGLNVMemory        = 0x0020,
+    kGL16BitFBO        = 0x0040,
+    kGLComputeShaders  = 0x0080,
+    kGLGeometryShaders = 0x0100
 };
 
 #define TEX_OFFSET 8

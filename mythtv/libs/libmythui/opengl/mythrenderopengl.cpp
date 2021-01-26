@@ -309,9 +309,6 @@ bool MythRenderOpenGL::Init(void)
     m_maxTextureSize  = (maxtexsz) ? maxtexsz : 512;
     QSurfaceFormat fmt = format();
 
-    // RGBA16 - available on ES via extension
-    m_extraFeatures |= isOpenGLES() ? hasExtension("GL_EXT_texture_norm16") ? kGLExtRGBA16 : kGLFeatNone : kGLExtRGBA16;
-
     // Pixel buffer objects
     bool buffer_procs = reinterpret_cast<MYTH_GLMAPBUFFERPROC>(GetProcAddress("glMapBuffer")) &&
                         reinterpret_cast<MYTH_GLUNMAPBUFFERPROC>(GetProcAddress("glUnmapBuffer"));
@@ -432,11 +429,8 @@ void MythRenderOpenGL::DebugFeatures(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture units    : %1").arg(m_maxTextureUnits));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Shaders              : %1").arg(shaders.join(",")));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Multitexturing       : %1").arg(GLYesNo(m_features & Multitexture)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rectangular textures : %1").arg(GLYesNo(m_extraFeatures & kGLExtRects)));
-    //LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("16bit framebuffers   : %1").arg(GLYesNo(m_extraFeatures & kGL16BitFBO)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("GL_RED/GL_R8         : %1").arg(GLYesNo(!(m_extraFeatures & kGLLegacyTextures))));
