@@ -31,7 +31,6 @@ DRMProps MythDRMProperty::GetProperties(int FD, const uint32_t ObjectId, uint32_
         {
             if (auto * prop = drmModeGetProperty(FD, props->props[index]); prop)
             {
-                auto key   = QString(prop->name);
                 auto value = props->prop_values[index];
                 if (prop->flags & DRM_MODE_PROP_RANGE)
                     result.emplace_back(std::shared_ptr<MythDRMProperty>(new MythDRMRangeProperty(value, prop)));
