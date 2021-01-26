@@ -19,6 +19,7 @@
 #include "tv.h" // for CHANNEL_DIRECTION
 
 class NetworkInformationTable;
+class TestEITFixups;
 
 class pid_cache_item_t
 {
@@ -46,6 +47,8 @@ using pid_cache_t = std::vector<pid_cache_item_t>;
  */
 class MTV_PUBLIC ChannelUtil
 {
+    friend class TestEITFixups;
+
     Q_DECLARE_TR_FUNCTIONS(ChannelUtil);
 
   public:

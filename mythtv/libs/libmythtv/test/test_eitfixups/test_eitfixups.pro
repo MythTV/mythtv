@@ -1,7 +1,7 @@
 include ( ../../../../settings.pro )
 include ( ../../../../test.pro )
 
-QT += xml sql network testlib
+QT += xml sql network testlib widgets
 
 TEMPLATE = app
 TARGET = test_eitfixups

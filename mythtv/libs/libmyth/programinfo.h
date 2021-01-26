@@ -947,6 +947,7 @@ MPUBLIC QString myth_category_type_to_string(ProgramInfo::CategoryType category_
 MPUBLIC ProgramInfo::CategoryType string_to_myth_category_type(const QString &type);
 
 Q_DECLARE_METATYPE(ProgramInfo*)
+Q_DECLARE_METATYPE(ProgramInfo::CategoryType)
 
 #endif // MYTHPROGRAM_H_
 
