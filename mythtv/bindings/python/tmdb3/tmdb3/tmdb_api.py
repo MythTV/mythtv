@@ -21,7 +21,7 @@ for search and retrieval of text metadata and image URLs from TMDB.
 Preliminary API specifications can be found at
 http://help.themoviedb.org/kb/api/about-3"""
 
-__version__ = "v0.7.0"
+__version__ = "v0.7.1"
 # 0.1.0  Initial development
 # 0.2.0  Add caching mechanism for API queries
 # 0.2.1  Temporary work around for broken search paging
@@ -62,6 +62,7 @@ __version__ = "v0.7.0"
 #           releasedate sorting from Collection Movies
 # 0.7.0  Add support for television series data
 # 0.7.0.a  Added compatibility to python3, tested with python 3.6 and 2.7
+# 0.7.1 Changes to support TV series lookup.
 
 from . import IS_PY2
 
@@ -171,7 +172,7 @@ class SeriesSearchResult(SearchRepr, PagedRequest):
             locale = get_locale()
         super(SeriesSearchResult, self).__init__(
                     request.new(language=locale.language),
-                    lambda x: Series(raw=x, locale=locale))
+                    lambda x: Series_base(raw=x, locale=locale))
 
 def searchPerson(query, adult=False):
     return PeopleSearchResult(Request('search/person', query=query,
@@ -779,10 +780,12 @@ class Network(NameRepr,Element):
     id = Datapoint('id', initarg=1)
     name = Datapoint('name')
 
-class Episode(NameRepr, Element):
-    episode_number = Datapoint('episode_number', initarg=3)
-    season_number = Datapoint('season_number', initarg=2)
+# This class excludes the _populate members because they are harmful
+# when doing a Season as they cause it to take forever.
+class Episode_base(NameRepr, Element):
     series_id = Datapoint('series_id', initarg=1)
+    season_number = Datapoint('season_number', initarg=2)
+    episode_number = Datapoint('episode_number', initarg=3)
     air_date = Datapoint('air_date', handler=process_date)
     overview = Datapoint('overview')
     name = Datapoint('name')
@@ -791,16 +794,22 @@ class Episode(NameRepr, Element):
     id = Datapoint('id')
     production_code = Datapoint('production_code')
     still = Datapoint('still_path', handler=Backdrop, raw=False, default=None)
+    guest_stars = Datalist('guest_stars', handler=Cast,
+                    sort='order')
 
+class Episode(Episode_base):
     def _populate(self):
         return Request('tv/{0}/season/{1}/episode/{2}'.format(self.series_id, self.season_number, self.episode_number),
                        language=self._locale.language)
-
     def _populate_cast(self):
         return Request('tv/{0}/season/{1}/episode/{2}/credits'.format(
             self.series_id, self.season_number, self.episode_number),
                        language=self._locale.language)
+    cast = Datalist('cast', handler=Cast,
+                    poller=_populate_cast, sort='order')
+    crew = Datalist('crew', handler=Crew, poller=_populate_cast)
 
+    # Items not currently used by tmdb3tv
     def _populate_external_ids(self):
         return Request('tv/{0}/season/{1}/episode/{2}/external_ids'.format(
             self.series_id, self.season_number, self.episode_number))
@@ -812,11 +821,6 @@ class Episode(NameRepr, Element):
         return Request('tv/{0}/season/{1}/episode/{2}/images'.format(
             self.series_id, self.season_number, self.episode_number), **kwargs)
 
-    cast = Datalist('cast', handler=Cast,
-                    poller=_populate_cast, sort='order')
-    guest_stars = Datalist('guest_stars', handler=Cast,
-                    poller=_populate_cast, sort='order')
-    crew = Datalist('crew', handler=Crew, poller=_populate_cast)
     imdb_id = Datapoint('imdb_id', poller=_populate_external_ids)
     freebase_id = Datapoint('freebase_id', poller=_populate_external_ids)
     freebase_mid = Datapoint('freebase_mid', poller=_populate_external_ids)
@@ -825,20 +829,21 @@ class Episode(NameRepr, Element):
     stills = Datalist('stills', handler=Backdrop, poller=_populate_images, sort=True)
 
 class Season(NameRepr, Element):
-    season_number = Datapoint('season_number', initarg=2)
     series_id = Datapoint('series_id', initarg=1)
+    season_number = Datapoint('season_number', initarg=2)
     id = Datapoint('id')
     air_date = Datapoint('air_date', handler=process_date)
     poster = Datapoint('poster_path', handler=Poster, raw=False, default=None)
     overview = Datapoint('overview')
     name = Datapoint('name')
-    episodes = Datadict('episodes', attr='episode_number', handler=Episode,
+    episodes = Datadict('episodes', attr='episode_number', handler=Episode_base,
                         passthrough={'series_id': 'series_id', 'season_number': 'season_number'})
 
     def _populate(self):
         return Request('tv/{0}/season/{1}'.format(self.series_id, self.season_number),
                        language=self._locale.language)
 
+    # Items not currently used by tmdb3tv
     def _populate_images(self):
         kwargs = {}
         if not self._locale.fallthrough:
@@ -856,9 +861,11 @@ class Season(NameRepr, Element):
     tvdb_id = Datapoint('tvdb_id', poller=_populate_external_ids)
     tvrage_id = Datapoint('tvrage_id', poller=_populate_external_ids)
 
-class Series(NameRepr, Element):
+# This class excludes the _populate members because they are harmful.
+# when doing a search as they cause the search to take forever.
+class Series_base(NameRepr, Element):
     id = Datapoint('id', initarg=1)
-    backdrop = Datapoint('backdrop_path', handler=Backdrop, raw=False, default=None)
+    original_language = Datapoint('original_language')
     authors = Datalist('created_by', handler=Person)
     episode_run_times = Datalist('episode_run_time')
     first_air_date = Datapoint('first_air_date', handler=process_date)
@@ -873,6 +880,8 @@ class Series(NameRepr, Element):
     number_of_episodes = Datapoint('number_of_episodes')
     number_of_seasons = Datapoint('number_of_seasons')
     overview = Datapoint('overview')
+    backdrop = Datapoint('backdrop_path', handler=Backdrop,
+                         raw=False, default=None)
     popularity = Datapoint('popularity')
     status = Datapoint('status')
     userrating = Datapoint('vote_average')
@@ -881,10 +890,13 @@ class Series(NameRepr, Element):
     networks = Datalist('networks', handler=Network)
     seasons = Datadict('seasons', attr='season_number', handler=Season, passthrough={'id': 'series_id'})
 
+
+class Series(Series_base):
     def _populate(self):
         return Request('tv/{0}'.format(self.id),
                        language=self._locale.language)
 
+    # Items not currently used by tmdb3tv
     def _populate_cast(self):
         return Request('tv/{0}/credits'.format(self.id))
 

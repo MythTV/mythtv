@@ -49,3 +49,4 @@ GPATH
 GRTAGS
 GTAGS
 compile_commands.json
+__pycache__
