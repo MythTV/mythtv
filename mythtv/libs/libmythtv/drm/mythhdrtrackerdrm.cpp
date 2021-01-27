@@ -84,7 +84,7 @@ void MythHDRTrackerDRM::Update(MythVideoFrame* Frame)
             {
                 needhdrblob = true;
                 m_ffmpegMetadata = Frame->m_hdrMetadata.get() ?
-                    Frame->m_hdrMetadata : std::shared_ptr<MythHDRMetadata>(new MythHDRMetadata());
+                    Frame->m_hdrMetadata : std::make_shared<MythHDRMetadata>();
                 m_drmMetadata = MythVideoDRMUtils::s_defaultMetadata;
                 m_drmMetadata.hdmi_metadata_type1.eotf = eotf;
                 m_drmMetadata.hdmi_metadata_type1.max_display_mastering_luminance = m_ffmpegMetadata->m_maxMasteringLuminance;

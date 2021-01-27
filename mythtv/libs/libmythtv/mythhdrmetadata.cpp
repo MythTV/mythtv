@@ -57,7 +57,7 @@ void MythHDRMetadata::Populate(MythVideoFrame *Frame, AVFrame *AvFrame)
         if (ddata || cdata)
         {
             if (!Frame->m_hdrMetadata.get())
-                Frame->m_hdrMetadata = std::shared_ptr<MythHDRMetadata>(new MythHDRMetadata());
+                Frame->m_hdrMetadata = std::make_shared<MythHDRMetadata>();
             Frame->m_hdrMetadata->Update(ddata, cdata);
             return;
         }
