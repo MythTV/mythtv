@@ -99,13 +99,12 @@ bool Jitterometer::RecordEndTime()
         /* compute and display stuff, reset count to -1  */
 
         /* compute the mean */
-        std::chrono::microseconds tottime =
-            std::accumulate(m_times.cbegin(), m_times.cend(), 0us);
+        std::chrono::microseconds tottime = std::accumulate(m_times.cbegin(), m_times.cend(), 0us);
         using doublemics = std::chrono::duration<double, std::micro>;
         doublemics mean = duration_cast<doublemics>(tottime) / cycles;
 
         if (tottime > 0us)
-            m_lastFps = (1.0 * cycles) / duration_cast<std::chrono::seconds>(tottime).count();
+            m_lastFps = static_cast<float>(cycles) / (tottime.count() / 1000000.0F);
 
         /* compute the sum of the squares of each deviation from the mean */
         double sum_of_squared_deviations =
