@@ -63,6 +63,8 @@ class MUI_PUBLIC MythEDID
   private:
     void        Parse             ();
     bool        ParseBaseBlock    (const quint8* Data);
+    void        ParseDisplayDescriptor(const quint8* Data, uint Offset);
+    void        ParseDetailedTimingDescriptor(const quint8* Data, uint Offset);
     bool        ParseCTA861       (const quint8* Data, uint Offset);
     bool        ParseCTABlock     (const quint8* Data, uint Offset);
     bool        ParseVSDB         (const quint8* Data, uint Offset, uint Length);
@@ -75,6 +77,9 @@ class MUI_PUBLIC MythEDID
     QSize       m_displaySize     { };    // N.B. Either size or aspect are valid
     double      m_displayAspect   { 0.0 };
     QStringList m_serialNumbers   { };
+    QString     m_name;
+    int         m_vrangeMin       { 0 };
+    int         m_vrangeMax       { 0 };
     float       m_gamma           { 0.0F }; // Invalid
     bool        m_sRGB            { false };
     bool        m_likeSRGB        { false }; // Temporary until Colourspace handling in libmythui

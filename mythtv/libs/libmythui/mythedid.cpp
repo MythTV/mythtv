@@ -10,6 +10,7 @@
 
 #define DESCRIPTOR_ALPHANUMERIC_STRING 0xFE
 #define DESCRIPTOR_PRODUCT_NAME 0xFC
+#define DESCRIPTOR_RANGE_LIMITS 0xFD
 #define DESCRIPTOR_SERIAL_NUMBER 0xFF
 #define DATA_BLOCK_OFFSET 0x36
 #define SERIAL_OFFSET     0x0C
@@ -292,16 +293,13 @@ bool MythEDID::ParseBaseBlock(const quint8* Data)
     m_likeSRGB = like(m_primaries, s_sRGBPrim, 0.025F) && qFuzzyCompare(m_gamma + 1.0F, 2.20F + 1.0F);
 
     // Parse blocks
-    for (int i = 0; i < 5; ++i)
+    for (uint i = 0; i < 5; ++i)
     {
-        const int offset = DATA_BLOCK_OFFSET + i * 18;
-        if (Data[offset] != 0 || Data[offset + 1] != 0 || Data[offset + 2] != 0)
-            continue;
-        if (Data[offset + 3] == DESCRIPTOR_SERIAL_NUMBER)
-        {
-            m_serialNumbers << ParseEdidString(&Data[offset + 5], false);
-            m_serialNumbers << ParseEdidString(&Data[offset + 5], true);
-        }
+        uint offset = DATA_BLOCK_OFFSET + i * 18;
+        if (Data[offset] == 0 || Data[offset + 1] == 0 || Data[offset + 2] == 0)
+            ParseDisplayDescriptor(Data, offset);
+        else
+            ParseDetailedTimingDescriptor(Data, offset);
     }
 
     // Set status
@@ -310,6 +308,52 @@ bool MythEDID::ParseBaseBlock(const quint8* Data)
     if (!m_valid)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "No serial number(s) in EDID");
     return m_valid;
+}
+
+void MythEDID::ParseDisplayDescriptor(const quint8* Data, uint Offset)
+{
+    auto type = Data[Offset + 3];
+    auto offset = Offset + 5;
+    if (DESCRIPTOR_SERIAL_NUMBER == type)
+    {
+        m_serialNumbers << ParseEdidString(&Data[offset], false);
+        m_serialNumbers << ParseEdidString(&Data[offset], true);
+    }
+    else if (DESCRIPTOR_PRODUCT_NAME == type)
+    {
+        m_name = ParseEdidString(&Data[offset], true);
+    }
+    else if (DESCRIPTOR_RANGE_LIMITS == type)
+    {
+        auto vminoffset = 0;
+        auto vmaxoffset = 0;
+        if (m_minorVersion > 3)
+        {
+            if (Data[Offset + 4] & 0x02)
+            {
+                vmaxoffset = 255;
+                if (Data[Offset + 4] & 0x01)
+                    vminoffset = 255;
+            }
+        }
+        m_vrangeMin = Data[Offset + 5] + vminoffset;
+        m_vrangeMax = Data[Offset + 6] + vmaxoffset;
+    }
+}
+
+void MythEDID::ParseDetailedTimingDescriptor(const quint8* Data, uint Offset)
+{
+    // We're only really interested in a more accurate display size
+    auto width = Data[Offset + 12] + ((Data[Offset + 14] & 0xF0) << 4);
+    auto height = Data[Offset + 13] + ((Data[Offset + 14] & 0x0F) << 8);
+
+    // 1.4 may have set an aspect ratio instead of size, otherwise use if this
+    // looks like a more accurate version of our current size
+    if (m_displaySize.isEmpty() ||
+       ((abs(m_displaySize.width() - width) < 10) && (abs(m_displaySize.height() - height) < 10)))
+    {
+        m_displaySize = { width, height };
+    }
 }
 
 bool MythEDID::ParseCTA861(const quint8* Data, uint Offset)
