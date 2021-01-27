@@ -399,7 +399,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     QString qtglversion = QString("OpenGL%1 %2.%3")
             .arg(fmt.renderableType() == QSurfaceFormat::OpenGLES ? "ES" : "")
             .arg(fmt.majorVersion()).arg(fmt.minorVersion());
-    QString qtglsurface = QString("RGBA: %1%2%3%4 Depth: %5 Stencil: %6")
+    QString qtglsurface = QString("RGBA: %1:%2:%3:%4 Depth: %5 Stencil: %6")
             .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize())
             .arg(fmt.greenBufferSize()).arg(fmt.alphaBufferSize())
             .arg(fmt.depthBufferSize()).arg(fmt.stencilBufferSize());
@@ -1116,8 +1116,9 @@ QStringList MythRenderOpenGL::GetDescription(void)
     result.append(tr("OpenGL renderer") + "\t: " + reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     result.append(tr("OpenGL version")  + "\t: " + reinterpret_cast<const char*>(glGetString(GL_VERSION)));
     QSurfaceFormat fmt = format();
-    result.append(tr("Color depth (RGBA)")   + "\t: " + QString("%1%2%3%4")
-                  .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize()).arg(fmt.blueBufferSize()).arg(fmt.alphaBufferSize()));
+    result.append(tr("Color depth (RGBA)")   + "\t: " + QString("%1:%2:%3:%4")
+                  .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize())
+                  .arg(fmt.blueBufferSize()).arg(fmt.alphaBufferSize()));
     return result;
 }
 
