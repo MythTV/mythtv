@@ -1837,6 +1837,7 @@ TYPES_LIST="
     struct_sockaddr_sa_len
     struct_sockaddr_storage
     struct_stat_st_mtim_tv_nsec
+    struct_hdr_metadata_infoframe
 "
 
 HAVE_LIST="
@@ -6058,6 +6059,7 @@ enabled libxml2           && require_pkg_config libxml2 libxml-2.0 libxml/xmlver
 
 enabled drm && use_pkg_config libdrm libdrm xf86drm.h drmGetVersion || disable drm
 enabled drm && check_cpp_condition drm_fourcc.h 'defined(DRM_FORMAT_MOD_LINEAR)' || disable drm
+enabled drm && check_struct drm_mode.h "struct hdr_metadata_infoframe" eotf
 
 if enabled libmpeg2external; then
     check_lib libmpeg2external mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external

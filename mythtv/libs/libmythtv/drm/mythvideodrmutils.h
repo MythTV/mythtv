@@ -2,9 +2,10 @@
 #define MYTHVIDEODRMUTILS_H
 
 // MythTV
+#include "config.h"
 #include "platforms/drm/mythdrmproperty.h"
 
-// These are not widely found in drm headers yet - so use a copy for now
+// libdrm
 extern "C" {
 enum hdmi_eotf
 {
@@ -14,37 +15,36 @@ enum hdmi_eotf
     HDMI_EOTF_BT_2100_HLG,
 };
 
+#if HAVE_STRUCT_HDR_METADATA_INFOFRAME
+#include <drm_mode.h>
+#else
 enum hdmi_metadata_type
 {
     HDMI_STATIC_METADATA_TYPE1 = 1,
 };
 
-struct hdr_metadata_infoframe
-{
-    uint8_t eotf;
-    hdmi_metadata_type metadata_type;
-    struct
-    {
-        uint16_t x, y;
-    } display_primaries[3];
-    struct
-    {
-        uint16_t x, y;
-    } white_point;
-    uint16_t max_display_mastering_luminance;
-    uint16_t min_display_mastering_luminance;
-    uint16_t max_cll;
-    uint16_t max_fall;
+struct hdr_metadata_infoframe {
+    __u8 eotf;
+    __u8 metadata_type;
+    struct {
+        __u16 x, y;
+        } display_primaries[3];
+    struct {
+        __u16 x, y;
+        } white_point;
+    __u16 max_display_mastering_luminance;
+    __u16 min_display_mastering_luminance;
+    __u16 max_cll;
+    __u16 max_fall;
 };
 
-struct hdr_output_metadata
-{
-    hdmi_metadata_type metadata_type;
-    union
-    {
+struct hdr_output_metadata {
+    __u32 metadata_type;
+    union {
         struct hdr_metadata_infoframe hdmi_metadata_type1;
     };
 };
+#endif
 }
 
 class MythVideoDRMUtils
