@@ -289,8 +289,8 @@ class MBASE_PUBLIC LCD : public QObject
 
     void stopAll(void);
 
-    uint getLCDHeight(void) const { return m_lcdHeight; }
-    uint getLCDWidth(void) const { return m_lcdWidth; }
+    int getLCDHeight(void) const { return m_lcdHeight; }
+    int getLCDWidth(void) const { return m_lcdWidth; }
 
     void resetServer(void); // tell the mythlcdserver to reload its settings
 

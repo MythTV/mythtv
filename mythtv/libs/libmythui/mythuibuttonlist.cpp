@@ -554,7 +554,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
          * Allocate array to hold columns widths, now that we know
          * how many columns there are.
          */
-        *col_widths = new int[col_cnt];
+        *col_widths = new int[static_cast<size_t>(col_cnt)];
 
         for (col_idx = 0; col_idx < col_cnt; ++col_idx)
             (*col_widths)[col_idx] = 0;
@@ -2473,7 +2473,7 @@ uint MythUIButtonList::ItemWidth(void)
     if (!m_initialized)
         Init();
 
-    return m_itemWidth;
+    return static_cast<uint>(m_itemWidth);
 }
 
 uint MythUIButtonList::ItemHeight(void)
@@ -2481,7 +2481,7 @@ uint MythUIButtonList::ItemHeight(void)
     if (!m_initialized)
         Init();
 
-    return m_itemHeight;
+    return static_cast<uint>(m_itemHeight);
 }
 
 /**
@@ -3048,8 +3048,8 @@ void MythUIButtonList::updateLCD(void)
     // Build a list of the menu items
     QList<LCDMenuItem> menuItems;
 
-    int start = std::max(0, (int)(m_selPosition - lcddev->getLCDHeight()));
-    int end = std::min(m_itemCount, (int)(start + (lcddev->getLCDHeight() * 2)));
+    auto start = std::max(0, m_selPosition - lcddev->getLCDHeight());
+    auto end = std::min(m_itemCount, start + (lcddev->getLCDHeight() * 2));
 
     for (int r = start; r < end; ++r)
     {
