@@ -49,10 +49,13 @@ uint64_t MythVideoDRMUtils::FFmpegColorEncodingToDRM(DRMProp Property, int Encod
     switch (Encoding)
     {
         case AVCOL_SPC_BT709: searchstring = "709"; break;
-        case AVCOL_SPC_BT2020_NCL:
-        case AVCOL_SPC_BT2020_CL:
-        case AVCOL_SPC_CHROMA_DERIVED_NCL:
-        case AVCOL_SPC_CHROMA_DERIVED_CL: searchstring = "2020"; break;
+        // I've only seen 2020 available on amdgpu with a Ryzen3400G. If selected
+        // it produces an EINVAL - which breaks Qt rendering. Probably needs to be
+        // used in conjunction with HDR. Needs investigating.
+        //case AVCOL_SPC_BT2020_NCL:
+        //case AVCOL_SPC_BT2020_CL:
+        //case AVCOL_SPC_CHROMA_DERIVED_NCL:
+        //case AVCOL_SPC_CHROMA_DERIVED_CL: searchstring = "2020"; break;
         default: break;
     }
 
