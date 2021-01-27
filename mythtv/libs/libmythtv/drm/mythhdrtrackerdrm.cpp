@@ -32,8 +32,8 @@ MythHDRTrackerDRM::MythHDRTrackerDRM(MythDRMPtr Device, DRMConn Connector, DRMPr
     m_connector(Connector),
     m_hdrProp(HDRProp)
 {
-    m_connector = m_device->GetConnector();
-    m_hdrProp   = MythDRMProperty::GetProperty("HDR_OUTPUT_METADATA", m_connector->m_properties);
+    m_crtc = m_device->GetCrtc();
+    m_activeProp = MythDRMProperty::GetProperty("ACTIVE", m_crtc->m_properties);
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Tracking HDR signalling for: %1")
         .arg(MythEDID::EOTFToStrings(m_hdrSupport).join(",")));
 }
@@ -48,6 +48,9 @@ void MythHDRTrackerDRM::Reset()
     if (m_hdrBlob)
     {
         m_device->QueueAtomics({{ m_connector->m_id, m_hdrProp->m_id, 0 }});
+        if (m_crtc.get() && m_activeProp.get())
+            m_device->QueueAtomics({{ m_crtc->m_id, m_activeProp->m_id, 1 }});
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling HDR");
         drmModeDestroyPropertyBlob(m_device->GetFD(), m_hdrBlob);
         m_hdrBlob = 0;
     }
@@ -104,8 +107,17 @@ void MythHDRTrackerDRM::Update(MythVideoFrame* Frame)
                 drmModeDestroyPropertyBlob(m_device->GetFD(), m_hdrBlob);
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Creating HDR info frame for %1")
                 .arg(eotf == HDMI_EOTF_BT_2100_HLG ? "HLG" : "HDR10"));
-            drmModeCreatePropertyBlob(m_device->GetFD(), &m_drmMetadata, sizeof(m_drmMetadata), &m_hdrBlob);
-            m_device->QueueAtomics({{ m_connector->m_id, m_hdrProp->m_id, m_hdrBlob }});
+            if (drmModeCreatePropertyBlob(m_device->GetFD(), &m_drmMetadata, sizeof(m_drmMetadata), &m_hdrBlob) == 0)
+            {
+                LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("HDR blob id %1").arg(m_hdrBlob));
+                m_device->QueueAtomics({{ m_connector->m_id, m_hdrProp->m_id, m_hdrBlob }});
+                if (m_crtc.get() && m_activeProp.get())
+                    m_device->QueueAtomics({{ m_crtc->m_id, m_activeProp->m_id, 1 }});
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create HDR blob id");
+            }
         }
     }
     else

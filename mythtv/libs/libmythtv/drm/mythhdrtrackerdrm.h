@@ -20,11 +20,13 @@ class MythHDRTrackerDRM : public MythHDRTracker
   protected:
     MythHDRTrackerDRM(MythDRMPtr Device, DRMConn Connector, DRMProp HDRProp, int HDRSupport);
 
-    MythDRMPtr m_device    { nullptr };
-    DRMConn    m_connector { nullptr };
-    DRMProp    m_hdrProp   { nullptr };
+    MythDRMPtr m_device     { nullptr };
+    DRMConn    m_connector  { nullptr };
+    DRMProp    m_hdrProp    { nullptr };
+    DRMCrtc    m_crtc       { nullptr };
+    DRMProp    m_activeProp { nullptr };
     DRMMeta    m_drmMetadata;
-    uint32_t   m_hdrBlob   { 0 };
+    uint32_t   m_hdrBlob    { 0 };
 };
 
 #endif
