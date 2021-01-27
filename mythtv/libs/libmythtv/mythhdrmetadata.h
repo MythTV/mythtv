@@ -13,6 +13,7 @@ class MythHDRMetadata
 {
   public:
     static void Populate(class MythVideoFrame* Frame, struct AVFrame* AvFrame);
+    MythHDRMetadata() = default;
    ~MythHDRMetadata() = default;
     bool Equals(MythHDRMetadata* Other);
 
@@ -24,7 +25,6 @@ class MythHDRMetadata
     uint16_t m_maxFrameAverageLightLevel  { 0 };
 
   protected:
-    MythHDRMetadata() = default;
     void Update(const struct AVMasteringDisplayMetadata* Display,
                 const struct AVContentLightMetadata* Light);
 };

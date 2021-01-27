@@ -77,14 +77,14 @@ void MythHDRTrackerDRM::Update(MythVideoFrame* Frame)
                 m_drmMetadata.hdmi_metadata_type1.eotf = eotf;
             }
         }
-        // We need static metadata for HDR10
-        else if (Frame->m_hdrMetadata.get())
+        else
         {
             if (!m_ffmpegMetadata.get() || !m_ffmpegMetadata.get()->Equals(Frame->m_hdrMetadata.get()) ||
                  m_drmMetadata.hdmi_metadata_type1.eotf != HDMI_EOTF_SMPTE_ST2084)
             {
                 needhdrblob = true;
-                m_ffmpegMetadata = Frame->m_hdrMetadata;
+                m_ffmpegMetadata = Frame->m_hdrMetadata.get() ?
+                    Frame->m_hdrMetadata : std::shared_ptr<MythHDRMetadata>(new MythHDRMetadata());
                 m_drmMetadata = MythVideoDRMUtils::s_defaultMetadata;
                 m_drmMetadata.hdmi_metadata_type1.eotf = eotf;
                 m_drmMetadata.hdmi_metadata_type1.max_display_mastering_luminance = m_ffmpegMetadata->m_maxMasteringLuminance;
