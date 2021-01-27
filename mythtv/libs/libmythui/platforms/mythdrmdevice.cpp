@@ -229,11 +229,12 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     }
     if (!device.get())
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Failed to open any DRM devices with privileges");
+        LOG(VB_GENERAL, LOG_WARNING, "Failed to open any suitable DRM devices with privileges");
         return;
     }
 
-    if (!(device->m_guiPlane->m_id && device->m_videoPlane->m_id))
+    if (!(device->m_guiPlane.get()   && device->m_guiPlane->m_id &&
+          device->m_videoPlane.get() && device->m_videoPlane->m_id))
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("Failed to deduce correct planes for device '%1'")
             .arg(drmGetDeviceNameFromFd2(device->GetFD())));
@@ -316,7 +317,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device)
 {
 #ifdef USING_QTPRIVATEHEADERS
-    if (qScreen && qGuiApp->platformName().contains("eglfs", Qt::CaseInsensitive))
+    if (qScreen && qGuiApp && qGuiApp->platformName().contains("eglfs", Qt::CaseInsensitive))
     {
         int fd = 0;
         uint32_t crtc = 0;
@@ -898,7 +899,7 @@ DRMConn MythDRMDevice::GetConnector() const
 
 bool MythDRMDevice::QueueAtomics(const MythAtomics& Atomics)
 {
-    if (!(m_atomic && m_authenticated))
+    if (!(m_atomic && m_authenticated && qGuiApp))
         return false;
 
     if (auto * dri = qGuiApp->platformNativeInterface()->nativeResourceForIntegration("dri_atomic_request"); dri)
