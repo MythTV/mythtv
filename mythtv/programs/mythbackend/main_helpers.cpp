@@ -607,9 +607,12 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     int     port = gCoreContext->GetBackendServerPort();
     if (gCoreContext->GetBackendServerIP().isEmpty())
     {
-        std::cerr << "No setting found for this machine's BackendServerIP.\n"
-                  << "Please run setup on this machine and modify the first page\n"
-                  << "of the general settings.\n";
+        std::cerr << "No setting found for this machine's BackendServerAddr.\n"
+                  << "Please run mythtv-setup on this machine.\n"
+                  << "Go to page \"1. General\" / \"Host Address Backend Setup\" and examine the values.\n"
+                  << "N.B. The default values are correct for a combined frontend/backend machine.\n"
+                  << "Press Escape, select \"Save and Exit\" and exit mythtv-setup.\n"
+                  << "Then start mythbackend again.\n";
         return GENERIC_EXIT_SETUP_ERROR;
     }
 
