@@ -340,14 +340,18 @@ void MythUIStateType::RecalculateArea(bool recurse)
     {
         if (objectName().startsWith("buttonlist button"))
         {
-            auto *list = dynamic_cast<MythUIButtonList *>(m_parent);
-            m_parentArea = list->GetButtonArea();
+            if (auto * list = dynamic_cast<MythUIButtonList *>(m_parent); list)
+                m_parentArea = list->GetButtonArea();
         }
         else
+        {
             m_parentArea = m_parent->GetFullArea();
+        }
     }
     else
+    {
         m_parentArea = GetMythMainWindow()->GetUIScreenRect();
+    }
 
     m_area.Reset();
     m_area.CalculateArea(m_parentArea);
