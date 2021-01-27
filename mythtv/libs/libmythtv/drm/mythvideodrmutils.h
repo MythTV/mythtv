@@ -15,14 +15,14 @@ enum hdmi_eotf
     HDMI_EOTF_BT_2100_HLG,
 };
 
-#if HAVE_STRUCT_HDR_METADATA_INFOFRAME
-#include <drm_mode.h>
-#else
 enum hdmi_metadata_type
 {
     HDMI_STATIC_METADATA_TYPE1 = 1,
 };
 
+#if HAVE_STRUCT_HDR_METADATA_INFOFRAME
+#include <drm_mode.h>
+#else
 struct hdr_metadata_infoframe {
     __u8 eotf;
     __u8 metadata_type;
