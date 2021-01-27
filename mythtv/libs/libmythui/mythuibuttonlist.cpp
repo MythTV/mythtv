@@ -2733,19 +2733,21 @@ void MythUIButtonList::customEvent(QEvent *event)
 {
     if (event->type() == NextButtonListPageEvent::kEventType)
     {
-        auto *npe = dynamic_cast<NextButtonListPageEvent*>(event);
-        int cur = npe->m_start;
-        for (; cur < npe->m_start + npe->m_pageSize && cur < GetCount(); ++cur)
+        if (auto *npe = dynamic_cast<NextButtonListPageEvent*>(event); npe)
         {
-            const int loginterval = (cur < 1000 ? 100 : 500);
-            if (cur > 200 && cur % loginterval == 0)
-                LOG(VB_GUI, LOG_INFO,
-                    QString("Build background buttonlist item %1").arg(cur));
-            emit itemLoaded(GetItemAt(cur));
+            int cur = npe->m_start;
+            for (; cur < npe->m_start + npe->m_pageSize && cur < GetCount(); ++cur)
+            {
+                const int loginterval = (cur < 1000 ? 100 : 500);
+                if (cur > 200 && cur % loginterval == 0)
+                    LOG(VB_GUI, LOG_INFO,
+                        QString("Build background buttonlist item %1").arg(cur));
+                emit itemLoaded(GetItemAt(cur));
+            }
+            m_nextItemLoaded = cur;
+            if (cur < GetCount())
+                LoadInBackground(cur, npe->m_pageSize);
         }
-        m_nextItemLoaded = cur;
-        if (cur < GetCount())
-            LoadInBackground(cur, npe->m_pageSize);
     }
 }
 
