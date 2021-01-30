@@ -267,7 +267,8 @@ class MTV_PUBLIC ChannelUtil
                                   uint chanid_restriction,
                                   ChannelChangeDirection direction,
                                   bool skip_non_visible = true,
-                                  bool skip_same_channum_and_callsign = false);
+                                  bool skip_same_channum_and_callsign = false,
+                                  bool skip_other_sources = false);
 
     static QString GetChannelValueStr(const QString &channel_field,
                                       uint           sourceid,

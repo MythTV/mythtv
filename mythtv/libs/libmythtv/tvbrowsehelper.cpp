@@ -341,10 +341,14 @@ void TVBrowseHelper::GetNextProgramDB(BrowseDirection direction, InfoMap& Infoma
 
     if (chandir != -1)
     {
-        chanid = ChannelUtil::GetNextChannel(m_dbAllVisibleChannels, chanid, 0 /*mplexid_restriction*/,
+        chanid = ChannelUtil::GetNextChannel(m_dbAllVisibleChannels,
+                                            chanid,
+                                             0 /* mplexid_restriction */,
                                              0 /* chanid restriction */,
                                              static_cast<ChannelChangeDirection>(chandir),
-                                             true /*skip non visible*/, true /*skip same callsign*/);
+                                             true /* skip non visible */,
+                                             true /* skip_same_channum_and_callsign */,
+                                             true /* skip_other_sources */);
     }
 
     Infomap["chanid"]  = QString::number(chanid);

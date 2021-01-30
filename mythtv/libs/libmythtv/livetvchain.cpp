@@ -363,7 +363,7 @@ std::chrono::seconds LiveTVChain::GetLengthAtCurPos(void)
 }
 
 /**
- *  \returns length in seocnds of recording at m_curPos
+ *  \returns length in seconds of recording at m_curPos
  */
 std::chrono::seconds LiveTVChain::GetLengthAtPos(int pos)
 {
@@ -423,7 +423,7 @@ void LiveTVChain::ClearSwitch(void)
  *
  *   This also clears the NeedsToSwitch()/NeedsToJump() state.
  *
- *   NOTE: The caller is resposible for deleting the ProgramInfo
+ *   NOTE: The caller is responsible for deleting the ProgramInfo
  */
 ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
                                            int &newid)

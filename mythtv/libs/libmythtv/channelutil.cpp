@@ -2340,7 +2340,8 @@ uint ChannelUtil::GetNextChannel(
     uint              chanid_restriction,
     ChannelChangeDirection direction,
     bool              skip_non_visible,
-    bool              skip_same_channum_and_callsign)
+    bool              skip_same_channum_and_callsign,
+    bool              skip_other_sources)
 {
     auto it = find(sorted.cbegin(), sorted.cend(), old_chanid);
 
@@ -2370,6 +2371,8 @@ uint ChannelUtil::GetNextChannel(
         }
         while ((it != start) &&
                ((skip_non_visible && it->m_visible < kChannelVisible) ||
+                (skip_other_sources &&
+                 it->m_sourceId != start->m_sourceId) ||
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||
@@ -2389,6 +2392,8 @@ uint ChannelUtil::GetNextChannel(
         }
         while ((it != start) &&
                ((skip_non_visible && it->m_visible < kChannelVisible) ||
+                (skip_other_sources &&
+                 it->m_sourceId != start->m_sourceId) ||
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||
