@@ -115,8 +115,8 @@ class MUI_PUBLIC MythUIButtonListItem
     QString         m_fontState;
     MythImage      *m_image         {nullptr};
     QString         m_imageFilename;
-    bool            m_checkable;
-    CheckState      m_state;
+    bool            m_checkable     {false};
+    CheckState      m_state         {CantCheck};
     QVariant        m_data          {0};
     bool            m_showArrow     {false};
     bool            m_isVisible     {false};
