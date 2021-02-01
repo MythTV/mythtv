@@ -4144,7 +4144,7 @@ Dispositivo supporta fino a %1</translation>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="466"/>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation>Valutazione gradimento minimo (solo film, da 0.0 a 1.0)</translation>
+        <translation type="unfinished">Valutazione minima (solo film, da 0.0 a 1.0)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="351"/>
@@ -4690,7 +4690,7 @@ Dispositivo supporta fino a %1</translation>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="115"/>
         <source>Reconnect time</source>
-        <translation>Ora riconnessione</translation>
+        <translation type="unfinished">Attesa riconnessione</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="117"/>
@@ -15519,7 +15519,7 @@ non può essere vuoto.</translation>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="426"/>
         <source>Schedule Priorities</source>
-        <translation>Priorità pianificazioni</translation>
+        <translation type="unfinished">Priorità programmazione</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1386"/>
@@ -18871,7 +18871,7 @@ Il Grabber non fornisce i numeri dei canali, quindi devi impostarlo manualmente.
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="312"/>
         <source>This setting controls how the Storage Group scheduling code will balance new recordings across directories. &apos;Balanced Free Space&apos; is the recommended method for most users.</source>
-        <translation>Questa impostazione controlla come il codice pianificazione del gruppo di archiviazione bilancierà le nuove registrazioni tra le directory. &apos;Spazio Libero bilanciato &apos; è il metodo raccomandato per la maggior parte degli utenti.</translation>
+        <translation type="unfinished">Questa impostazione controlla come il codice programmazione del gruppo di archiviazione bilancierà le nuove registrazioni tra le directory. &apos;Spazio Libero bilanciato &apos; è il metodo raccomandato per la maggior parte degli utenti.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="322"/>
@@ -19200,7 +19200,7 @@ Il Grabber non fornisce i numeri dei canali, quindi devi impostarlo manualmente.
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="864"/>
         <source>Program Schedule Downloading Options</source>
-        <translation>Opzioni programma di pianificazione download</translation>
+        <translation type="unfinished">Opzioni download della pianificazione programma</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="916"/>
@@ -24074,7 +24074,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="21"/>
         <source>%1 total</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 totale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="23"/>
@@ -24166,7 +24166,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="59"/>
         <source>%Directed by |DIRECTOR|, %%YEAR%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%Diretto da |DIRECTOR|, %%YEAR%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="61"/>
@@ -24186,7 +24186,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="67"/>
         <source>%LONGCHANNEL| %%on card: |CARD%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%LONGCHANNEL| %%su scheda: |CARD%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="68"/>
@@ -24196,7 +24196,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="69"/>
         <source>%LONGREPEAT%     Size: %FILESIZE_STR%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%LONGREPEAT%     Dimensione: %FILESIZE_STR%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="71"/>
@@ -24236,12 +24236,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="83"/>
         <source>%PLAYEDTIME| of% %TOTALTIME% %(|REMAININGTIME| remaining)%%(|BEHINDTIME| behind)%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%PLAYEDTIME| di% %TOTALTIME% %(|REMAININGTIME| rimanente)%%(|BEHINDTIME| fatto)%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="84"/>
         <source>%PLAYGROUP% play group</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">gruppo riproduz. %PLAYGROUP% </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="88"/>
@@ -24298,12 +24298,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="109"/>
         <source>%STORAGEGROUP% storage group</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">gruppo archiviaz. %STORAGEGROUP%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="110"/>
         <source>%SUBTITLE%%[font]myverysmallsub[/font]  [Part |PARTNUMBER|]%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%SUBTITLE%%[font]myverysmallsub[/font]  [Part |PARTNUMBER|]%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="111"/>
@@ -24383,7 +24383,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="131"/>
         <source>%TITLE%% - [font]mymediumlight[/font]|SUBTITLE%%[font]myverysmallsub[/font]  [Part |PARTNUMBER|]%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%TITLE%% - [font]mymediumlight[/font]|SUBTITLE%%[font]myverysmallsub[/font]  [Part |PARTNUMBER|]%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="132"/>
@@ -24438,7 +24438,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="150"/>
         <source>%VIDEOFRAMES% frames</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%VIDEOFRAMES% frame</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="151"/>
@@ -24538,7 +24538,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="182"/>
         <source>%callsign%  (Priority: %priority%)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%callsign%  (Priorità: %priority%)</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="183"/>
@@ -24573,12 +24573,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="192"/>
         <source>%filesize_str% of %storagegroup% Storage</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%filesize_str% dell&apos;Archivio %storagegroup%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="193"/>
         <source>%lastplayed% (played: %playcount% times)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%lastplayed% (riprodotto: %playcount% volte)</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="194"/>
@@ -24588,7 +24588,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="195"/>
         <source>%longchannel%  |  %filesize_str% of %storagegroup% Storage</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%longchannel%  |  %filesize_str% dell&apos;Archivio %storagegroup%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="196"/>
@@ -24604,8 +24604,8 @@ Do you wish to continue watching?</source>
         <location filename="../themes/themestrings.h" line="199"/>
         <source>%n in current group</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n nel gruppo corrente</numerusform>
+            <numerusform>%n nel gruppo corrente</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -24628,8 +24628,8 @@ Do you wish to continue watching?</source>
         <location filename="../themes/themestrings.h" line="204"/>
         <source>%name% / %callsign%  (Source: %sourcename%)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%name% / %callsign%  (Sorgente: %sourcename%)</numerusform>
+            <numerusform>%name% / %callsign%  (Sorgenti: %sourcename%)</numerusform>
         </translation>
     </message>
     <message>
@@ -24655,12 +24655,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="210"/>
         <source>%rectypestatus% on card number %card%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%rectypestatus% sulla scheda numero: %card%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="211"/>
         <source>%rectypestatus%% on card number |card%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%rectypestatus%% sulla scheda numero: |card%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="214"/>
@@ -24727,7 +24727,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="230"/>
         <source>%title%  |  %timedate% on %channel%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%title%  |  %timedate% su %channel%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="232"/>
@@ -24747,7 +24747,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="236"/>
         <source>%titlesubtitle%  (Priority: %progpriority% / %finalpriority%)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%titlesubtitle%  (Priorità: %progpriority% / %finalpriority%)</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="237"/>
@@ -24772,7 +24772,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="241"/>
         <source>%year%% by |director%%, |length%%, rating: |userrating%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%year%% di |director%%, |length%%, valutazione: |userrating%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="242"/>
@@ -24810,22 +24810,22 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="265"/>
         <source>(%statusbefore%) -&gt; (%statusafter%):  %shorttimedate% on %channel%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(%statusbefore%) -&gt; (%statusafter%):  %shorttimedate% su %channel%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="268"/>
         <source>(1) Channel    (2) Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(1) Canale    (2) Priorità</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="271"/>
         <source>(1) Title    (2) Priority    (4) Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(1) Titolo    (2) Priorità    (4) Tipo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="274"/>
         <source>(4) Program Guide   **(6) Program Finder **</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(4) Guida TV   **(6) Ricerca Programma **</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="281"/>
@@ -24835,16 +24835,18 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="282"/>
         <source>0 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">0 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="285"/>
         <source>0.0</source>
+        <translatorcomment>0% {0.0?}</translatorcomment>
         <translation type="unfinished">0% {0.0?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="286"/>
         <source>0.5</source>
+        <translatorcomment>0% {0.5?}</translatorcomment>
         <translation type="unfinished">0% {0.5?}</translation>
     </message>
     <message>
@@ -24860,72 +24862,81 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="292"/>
         <source>1.0</source>
+        <translatorcomment>0% {1.0?}</translatorcomment>
         <translation type="unfinished">0% {1.0?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="293"/>
         <source>1.5</source>
+        <translatorcomment>0% {1.5?}</translatorcomment>
         <translation type="unfinished">0% {1.5?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="294"/>
         <source>10 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">10 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="298"/>
         <source>16x9</source>
+        <translatorcomment>1h30m {16x?} {9?}</translatorcomment>
         <translation type="unfinished">1h30m {16x?} {9?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="300"/>
         <source>2 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">2 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="302"/>
         <source>2.0</source>
+        <translatorcomment>0% {2.0?}</translatorcomment>
         <translation type="unfinished">0% {2.0?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="303"/>
         <source>2.5</source>
+        <translatorcomment>0% {2.5?}</translatorcomment>
         <translation type="unfinished">0% {2.5?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="305"/>
         <source>3 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">3 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="307"/>
         <source>3.0</source>
+        <translatorcomment>0% {3.0?}</translatorcomment>
         <translation type="unfinished">0% {3.0?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="308"/>
         <source>3.5</source>
+        <translatorcomment>0% {3.5?}</translatorcomment>
         <translation type="unfinished">0% {3.5?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="310"/>
         <source>4 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">4 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="312"/>
         <source>4.0</source>
+        <translatorcomment>0% {4.0?}</translatorcomment>
         <translation type="unfinished">0% {4.0?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="313"/>
         <source>4.5</source>
+        <translatorcomment>0% {4.5?}</translatorcomment>
         <translation type="unfinished">0% {4.5?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="314"/>
         <source>5 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">5 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="315"/>
@@ -24935,17 +24946,19 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="316"/>
         <source>5.0</source>
+        <translatorcomment>0% {5.0?}</translatorcomment>
         <translation type="unfinished">0% {5.0?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="317"/>
         <source>576p</source>
+        <translatorcomment>0% {576p?}</translatorcomment>
         <translation type="unfinished">0% {576p?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="318"/>
         <source>6 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">6 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="319"/>
@@ -24955,7 +24968,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="320"/>
         <source>7 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">7 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="321"/>
@@ -24965,12 +24978,13 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="323"/>
         <source>720p</source>
+        <translatorcomment>0% {720p?}</translatorcomment>
         <translation type="unfinished">0% {720p?}</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="324"/>
         <source>8 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">8 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="325"/>
@@ -24980,17 +24994,17 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="326"/>
         <source>9 Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">8 Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="327"/>
         <source>:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="334"/>
         <source>???</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">???</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="338"/>
@@ -25000,97 +25014,97 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="341"/>
         <source>A simple theme of black, white and shades of gray.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Un tema semplice binco e nero e sfumature di grigio.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="343"/>
         <source>A version of Steppes with 25% larger fonts. Reminder: On Watch Recordings screen [Rew] and [FF] can be used to change the Rec. Group.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Una versione di Steppes con font più grandi del 25%. Promemoria: Nella schermata Registrazioni [Rew] e [FF] cambiano il Gruppo di Reg.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="346"/>
         <source>A/V Sync:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A/V Sync:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="347"/>
         <source>A/V Sync: %avsync%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A/V Sync: %avsync%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="350"/>
         <source>AC3 Audio:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Audio AC3:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="351"/>
         <source>AP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AP</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="352"/>
         <source>AUTOEXPIRE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AUTOEXPIRE</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="353"/>
         <source>AVCHD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AVCHD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="356"/>
         <source>Actions:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Azioni:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="362"/>
         <source>Add File Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi Estensioni File</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="364"/>
         <source>Add your storage</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi il tuo archivio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="365"/>
         <source>Add your storage Folders</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi le tue cartelle archivio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="375"/>
         <source>Aired</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trasmesso</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="376"/>
         <source>Aired:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trasmesso:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="377"/>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Album:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="378"/>
         <source>All programs alphabetically sorted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tutti i programmi ordinati alfabeticamente</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="380"/>
         <source>Allow recordings to expire:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Consenti scadenza registrazioni:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="382"/>
         <source>Alphabet</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alfabeto</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="385"/>
         <source>Alternative player:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduttore alternativo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="387"/>
@@ -25100,47 +25114,47 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="391"/>
         <source>Apply filters to select your movies</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Applica filtri per selezionare i tuoi film</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="394"/>
         <source>Archive Utilities</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utilità archiviazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="395"/>
         <source>Archives</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="397"/>
         <source>Article item:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Articolo numero:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="398"/>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Artista:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="399"/>
         <source>Artwork Results</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Risultati Artwork</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="402"/>
         <source>Artwork and Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Artwork e Metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="404"/>
         <source>Artwork selector</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">selettore Artwork</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="405"/>
         <source>Artwork, Metadata Sources</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Artwork, Sorgenti Metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="406"/>
@@ -25150,222 +25164,222 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="407"/>
         <source>Aspect:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aspetto:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="408"/>
         <source>Aspect: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aspetto: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="410"/>
         <source>Associate File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Associa File</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="412"/>
         <source>Attempting to connect to Database.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sto cercando di collegarmi al Database.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="413"/>
         <source>Attempting to connect to master backend.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sto cercando di collegarmi al master backend.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="414"/>
         <source>Attempting to wake master backend.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sto cercando di avviare il master backend.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="418"/>
         <source>Audio Details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dettagli audio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="420"/>
         <source>Audio Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura audio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="421"/>
         <source>Audio Track:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Traccia audio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="422"/>
         <source>Audio codec:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Codec Audio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="423"/>
         <source>Audio volume:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Volume audio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="424"/>
         <source>Audio: %audiocodec%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Audio: %audiocodec%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="425"/>
         <source>Audio: 5 CH.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Audio: 5 CH.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="426"/>
         <source>Audio: 7 CH.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Audio: 7 CH.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="427"/>
         <source>Audio: 7.1 CH.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Audio: 7.1 CH.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="428"/>
         <source>Audio: Mono</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Audio: Mono</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="429"/>
         <source>AudioChannels: 5.1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Canali Audio: 5.1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="430"/>
         <source>AudioChannels: Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Canali Audio: Stereo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="431"/>
         <source>AudioCodec: AAC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: AAC</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="432"/>
         <source>AudioCodec: AC3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: AC3</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="433"/>
         <source>AudioCodec: BLURAY</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: BLURAY</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="434"/>
         <source>AudioCodec: DTS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: DTS</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="435"/>
         <source>AudioCodec: E-AC3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: E-AC3</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="436"/>
         <source>AudioCodec: MP2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: MP2</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="437"/>
         <source>AudioCodec: MP3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: MP3</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="438"/>
         <source>AudioCodec: PCM_DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: PCM_DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="439"/>
         <source>AudioCodec: TRUEHD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: TRUEHD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="440"/>
         <source>AudioCodec: VORBIS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: VORBIS</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="441"/>
         <source>AudioCodec: WMAPRO</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">AudioCodec: WMAPRO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="442"/>
         <source>Auto expire:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scade automaticamente:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="448"/>
         <source>Available Buffer: %BUFFERAVAIL% of %BUFFERSIZE%Mb</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Buffer disponibile: %BUFFERAVAIL% di %BUFFERSIZE%Mb</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="452"/>
         <source>BOOKMARKED</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SEGNALIBRO INS</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="454"/>
         <source>Back more</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Più indietro</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="455"/>
         <source>Backend Selection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Selezione backend</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="457"/>
         <source>Backend is idle!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Backend inattivo!</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="459"/>
         <source>Backend is offline!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Backend scollegato!</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="461"/>
         <source>Backend is recording!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Backend sta registrando!</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="466"/>
         <source>Banner Image:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Immagine banner:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="468"/>
         <source>Banner: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Banner: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="470"/>
         <source>Based on Mythbuntu theme with 14ch 4hr guide full menus</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basato sul tema Mythbuntu con guida TV di 14 canali per 4 ore</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="471"/>
         <source>Basic configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configurazione base</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="472"/>
         <source>Basic configuration wizard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configurazione base guidata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="476"/>
         <source>Blu-ray</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Blu-ray</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="483"/>
         <source>BlueRay Disc</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Disco Blu-ray</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="485"/>
@@ -25375,67 +25389,67 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="492"/>
         <source>Browse Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sfoglia video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="494"/>
         <source>Browse Web</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naviga sul web</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="496"/>
         <source>Browse popular video sites</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naviga sui siti di video popolari</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="497"/>
         <source>Browse the</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sfoglia </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="498"/>
         <source>Browse the World Wide Web</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naviga sul World Wide Web</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="503"/>
         <source>Browse your movie library</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sfoglia la tua libreria video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="506"/>
         <source>Browse your video games library</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sfoglia la tua libreria di videogiochi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="511"/>
         <source>Browseable: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Navigabile: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="512"/>
         <source>Browseble:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Navigabile:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="513"/>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Browser</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="514"/>
         <source>BrowsingLiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scorri DirettaTV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="517"/>
         <source>Buffer to Decoder: %decoderrate%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Buffer al Decoder: %decoderrate%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="518"/>
         <source>Buffer: %bufferstatus%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Buffer: %bufferstatus%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="521"/>
@@ -25445,7 +25459,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="522"/>
         <source>CCTV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CCTV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="523"/>
@@ -25455,192 +25469,193 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="525"/>
         <source>CFLAGQUEUED</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CFLAGQUEUED</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="526"/>
         <source>COMFLAGGED</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COMFLAGGED</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="527"/>
         <source>COMFLAGGING</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">COMFLAGGING</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="528"/>
         <source>CPU load:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Carico CPU:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="529"/>
         <source>CPU load: %load%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Carico CPU: %load%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="531"/>
         <source>CUTLIST</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CUTLIST</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="536"/>
         <source>Captions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Didascalie</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="537"/>
         <source>Card: %card%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scheda: %card%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="538"/>
         <source>Cards</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Schede</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="542"/>
         <source>Cast: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cast: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="543"/>
         <source>Catagories</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Categorie</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="544"/>
         <source>Catagory</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Categoria</translatorcomment>
+        <translation type="unfinished">Catagory</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="551"/>
         <source>Category: %CATEGORY%               PlayBackGroup: %PLAYGROUP%               RecGroup: %RECORDINGGROUP%               StorageGroup: %STORAGEGROUP%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Categoria: %CATEGORY%               GruppoRiproduz.: %PLAYGROUP%               GruppoReg.: %RECORDINGGROUP%               GruppoArchiv.: %STORAGEGROUP%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="563"/>
         <source>Change display groups</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cambia gruppi visualizzazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="564"/>
         <source>Change mythtv key bindings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cambia associazioni tasti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="565"/>
         <source>Change recording group password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cambia password gruppo di registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="566"/>
         <source>Change:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="578"/>
         <source>Channel Rec Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorità Reg. canale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="583"/>
         <source>Channel name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome canale:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="584"/>
         <source>Channel number:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Numero canale:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="589"/>
         <source>Channels:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Canali:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="590"/>
         <source>Channels: %audiochannels%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Canali: %audiochannels%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="591"/>
         <source>Check the</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verifica il</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="592"/>
         <source>Check your Surveillance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Controlla la tua sorveglianza</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="593"/>
         <source>Check your Surveillance Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Controlla le tue telecamere di sorveglianza</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="595"/>
         <source>Choose Country and Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli Paese e lingua</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="596"/>
         <source>Choose a</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli un</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="597"/>
         <source>Choose a Theme</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli un Tema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="598"/>
         <source>Choose a local theme or download new</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli un tema presente o scaricane uno</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="603"/>
         <source>Choose sources for your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli le sorgenti per il tuo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="604"/>
         <source>Choose which artwork you like most</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli quale artwork ti piace di più</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="605"/>
         <source>Choose which movie or tvserie you look for</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli il film o la serie tv che stai cercando</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="607"/>
         <source>Choose your mythtv backend server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli il tuo server backend mythtv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="610"/>
         <source>Clear database contents (Resync required):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cancella contenuto database (richiede risincronizzazione):</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="622"/>
         <source>Codec :</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Codec :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="625"/>
         <source>Codec/Dec:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Codec/Dec:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="626"/>
         <source>Codec/Dec: %VIDEOCODEC% %VIDEODECODER%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Codec/Dec: %VIDEOCODEC% %VIDEODECODER%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="630"/>
         <source>Commercial Flag recordings:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricerca pubblicità nelle registrazioni:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="631"/>
@@ -25670,217 +25685,217 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="638"/>
         <source>Configure Mythtv key bindings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura associazioni tasti Mythtv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="641"/>
         <source>Configure audio settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura impostazioni audio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="642"/>
         <source>Configure display of</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura visualizzazione di</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="643"/>
         <source>Configure display of Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura visualizzazione immagini</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="645"/>
         <source>Configure how mythtv</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura come mythtv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="647"/>
         <source>Configure information plugins</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura informazioni plugin</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="649"/>
         <source>Configure media plugins</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura plugin multimedia</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="651"/>
         <source>Configure mythtv core</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura core mythtv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="652"/>
         <source>Configure mythtv look and feel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura aspetto mythtv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="653"/>
         <source>Configure playback</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura riproduzione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="654"/>
         <source>Configure playback and</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura riproduzione e</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="656"/>
         <source>Configure playback and TV settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura riproduzione e impostazioni TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="658"/>
         <source>Configure playback of</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura riproduzione di</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="659"/>
         <source>Configure playback of Music</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura riproduzione Musica</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="660"/>
         <source>Configure playback of Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura riproduzione Video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="662"/>
         <source>Configure playback of media streams</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura riproduzione media stream</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="663"/>
         <source>Configure playing of</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura riproduzione di</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="664"/>
         <source>Configure playing of Games</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura riproduzione Giochi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="665"/>
         <source>Configure sources for</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura sorgenti di</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="668"/>
         <source>Configure system settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura impostazioni sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="669"/>
         <source>Configure the metadata</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="671"/>
         <source>Configure the skin and</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura skin e</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="672"/>
         <source>Configure video and DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura video e DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="673"/>
         <source>Configure video and DVD archives</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura archivi video e DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="677"/>
         <source>Configure your capture</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura acquisizione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="678"/>
         <source>Configure your capture cards</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura schede acquisizione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="679"/>
         <source>Configure your video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="680"/>
         <source>Configure your video Sources</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura sorgenti video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="681"/>
         <source>Configure your web</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura web</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="682"/>
         <source>Connect your cards to</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Connetti schede a</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="683"/>
         <source>Connect your cards to video sources</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Connetti schede alle sorgenti video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="685"/>
         <source>Context:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Contesto:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="687"/>
         <source>Controls:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Controlli:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="689"/>
         <source>Core Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configurazione base</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="692"/>
         <source>Country and Language selection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona lingua e paese</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="700"/>
         <source>Coverart Image:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Immagine copertina:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="702"/>
         <source>Coverart: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copertina: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="703"/>
         <source>Coverfile:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File copertina:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="705"/>
         <source>Create advanced recording rules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Crea regole registrazione avanzate</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="707"/>
         <source>Creating thumbnail %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Creazione miniatura: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="712"/>
         <source>Current Rule Phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frase regola corrente:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="713"/>
         <source>Current phrase to search for:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frase corrente da cercare:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="715"/>
         <source>Currently Playing:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">In riproduzione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="717"/>
@@ -25890,57 +25905,57 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="718"/>
         <source>Custom Edit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica personalizzata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="726"/>
         <source>Customize meta data of your Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalizza metadati registrazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="727"/>
         <source>Customize meta data of your videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalizza metadati video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="728"/>
         <source>Customize your channel icons</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalizza icone canali</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="729"/>
         <source>Customize your channels settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalizza impostazioni canale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="730"/>
         <source>Customize your country settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalizza impostazioni paese</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="731"/>
         <source>Customize your grabber settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalizza impostazioni grabber</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="732"/>
         <source>Customize your recording schedule</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalizza calendario registrazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="733"/>
         <source>DOLBY</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DOLBY</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="738"/>
         <source>DVD drive:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DVD drive:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="739"/>
         <source>DVD player:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DVD player:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="740"/>
@@ -25950,32 +25965,32 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="742"/>
         <source>Database failed to start.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mancato avvio database.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="743"/>
         <source>Database machine failed to wake up.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mancato avvio macchina del database.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="746"/>
         <source>Decoder :</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Decoder :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="747"/>
         <source>Decoder rate:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Velocità decoder:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="749"/>
         <source>Default player:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riprodut. predefinito:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="751"/>
         <source>Deint :</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Deint :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="756"/>
@@ -25985,72 +26000,72 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="758"/>
         <source>Delete system Profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Elimina profilo sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="765"/>
         <source>Detailed information about your video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Informazioni dettagliate sul video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="766"/>
         <source>Detailed information of your video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Informazioni dettagliate del video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="768"/>
         <source>Details:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dettagli:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="769"/>
         <source>Directed By:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diretto da:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="772"/>
         <source>Directed by %director%%, |year%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diretto da %director%%, |year%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="774"/>
         <source>Directed by: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diretto da: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="775"/>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Regista</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="777"/>
         <source>Director: %director% - %length%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Regista: %director% - %length%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="778"/>
         <source>Directories</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Directory</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="781"/>
         <source>Disk space:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spazio disco:  %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="782"/>
         <source>Disks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dischi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="786"/>
         <source>Download icons</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scarica icone</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="788"/>
         <source>Download status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stato scaricamento</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="789"/>
@@ -26060,22 +26075,22 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="794"/>
         <source>Duplicate Method:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Replica Metodo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="795"/>
         <source>Duplicate Scope:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Replica Scopo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="796"/>
         <source>Duplication Methode:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Replicazione Metodo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="797"/>
         <source>Duplication Scope:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Replicazione Scopo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="798"/>
@@ -26085,122 +26100,122 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="800"/>
         <source>Duration of an image transition (ms):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Durata intervallo immagini (ms):</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="805"/>
         <source>Edit Command for</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica Comando per</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="810"/>
         <source>Edit Metadata Information</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica Informazioni Metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="814"/>
         <source>Edit Powersearch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica Powersearch</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="816"/>
         <source>Edit System events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica eventi sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="820"/>
         <source>Edit keys</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica tasti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="822"/>
         <source>Edit search item:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica elemento ricerca:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="825"/>
         <source>Edit your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica il tuo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="826"/>
         <source>Edit your Channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica Canali</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="827"/>
         <source>Edit your television channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica canali televisivi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="828"/>
         <source>Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Editor</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="829"/>
         <source>Eject</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Espelli</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="832"/>
         <source>Eject optical from drive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Espelli disco dall&apos;unità</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="842"/>
         <source>End late:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fine entro:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="847"/>
         <source>End time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ora fine:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="848"/>
         <source>End: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fine: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="849"/>
         <source>Enter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Inserisci</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="850"/>
         <source>Enter Plot:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Inserisci trama:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="852"/>
         <source>Enter Search Text:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Immetti testo ricerca:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="854"/>
         <source>Enter information for action</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Immetti informazioni per l&apos;azione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="855"/>
         <source>Enter phrase to search for:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Immetti frase da cercare:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="856"/>
         <source>Enter:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Immissione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="858"/>
         <source>Episode %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Episodio %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="862"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eventi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="866"/>
@@ -26210,27 +26225,27 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="867"/>
         <source>Exit from MythTV.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esci da MythTV.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="870"/>
         <source>Extra</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extra</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="874"/>
         <source>FPS:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FPS:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="875"/>
         <source>FPS: %framerate%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FPS: %framerate%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="878"/>
         <source>Fanart: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fanart: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="879"/>
@@ -26240,57 +26255,57 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="880"/>
         <source>Fast fwd</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fast fwd</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="881"/>
         <source>File :</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="882"/>
         <source>File Associations</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Associazioni File</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="884"/>
         <source>File Buffer:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Buffer file:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="886"/>
         <source>File Manager</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File Manager</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="888"/>
         <source>File Size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensione file:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="890"/>
         <source>File browser</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Browser file</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="891"/>
         <source>File info:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Info file:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="894"/>
         <source>FileBrowser</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FileBrowser</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="898"/>
         <source>Filename: %filename%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome file: %filename%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="899"/>
         <source>Fill</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riempi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="900"/>
@@ -26300,7 +26315,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="905"/>
         <source>Filter:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filtro:  %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="907"/>
@@ -26310,27 +26325,27 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="909"/>
         <source>Filters you can apply:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filtri possibili:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="911"/>
         <source>Final Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorità ultima</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="920"/>
         <source>Find OnNet</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trova su Net</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="928"/>
         <source>Find broadcasted programs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca programmi trasmessi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="936"/>
         <source>Find your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trova il tuo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="937"/>
@@ -26340,37 +26355,37 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="940"/>
         <source>Flag</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Segno</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="944"/>
         <source>Frame Number</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Numero Frame</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="945"/>
         <source>Frame audio level +/-0.5</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Livello audio frame +/-0.5</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="946"/>
         <source>Frame: %framedisplay%  |  %cutindicator%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frame: %framedisplay%  |  %cutindicator%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="949"/>
         <source>Frames decoded/free: %videoframes%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Frame decodificati/liberi: %videoframes%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="953"/>
         <source>Full plot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trama completa</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="954"/>
         <source>Fwd more</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fwd ulteriore</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="956"/>
@@ -26380,32 +26395,32 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="963"/>
         <source>General movie</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Film generale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="968"/>
         <source>Genres</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Generi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="977"/>
         <source>Grabber</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grabber</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="980"/>
         <source>Group selector</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Selettore gruppo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="981"/>
         <source>Group your favorite</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Raggruppa preferito</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="983"/>
         <source>Grouplist item:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Voce elenco gruppi:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="984"/>
@@ -26415,7 +26430,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="985"/>
         <source>Guide</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guida</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="989"/>
@@ -26425,12 +26440,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="990"/>
         <source>HD1080</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HD1080</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="991"/>
         <source>HD720P</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HD720P</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="992"/>
@@ -26440,72 +26455,72 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="993"/>
         <source>Handlers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gestori</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="994"/>
         <source>Hardware Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configuraizone Hardware</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="998"/>
         <source>Hide Channels without channel number</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nascondi Canali senza numero canale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1000"/>
         <source>Hide Channels without channel number:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nascondi Canali senza numero canale:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1008"/>
         <source>IMDB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IMDB</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1011"/>
         <source>INETREF:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">INETREF:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1016"/>
         <source>Icon Import</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importa icona</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1023"/>
         <source>Image Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Caricamento immagine ...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1028"/>
         <source>Import and Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importa e Esporta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1029"/>
         <source>Import and Export your videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importa e Esporta video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1032"/>
         <source>Import your music from CD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importa musica dal CD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1043"/>
         <source>Info Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura info</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1044"/>
         <source>Info about your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Info riguardo al</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1045"/>
         <source>Info about your system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Info riguardo al sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1046"/>
@@ -26515,37 +26530,37 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1048"/>
         <source>Information about your System</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Informazioni riguardo al sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1050"/>
         <source>Information and Tools</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Informazioni e strumenti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1052"/>
         <source>Inputs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ingressi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1054"/>
         <source>Install Rule</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Regola installazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1055"/>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Installata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1056"/>
         <source>Internet</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Internet</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1062"/>
         <source>Job 1 of 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lavoro 1 di 1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1063"/>
@@ -26555,7 +26570,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1064"/>
         <source>Jump Forward</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Salta avanti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1065"/>
@@ -26565,12 +26580,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1066"/>
         <source>Jump bkmark</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vai al segno</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1067"/>
         <source>Jump fwd</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vai avanti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1068"/>
@@ -26580,27 +26595,27 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1069"/>
         <source>Jump to Start</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vai all&apos;inizio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1070"/>
         <source>Jump to start</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vai all&apos;inizio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1073"/>
         <source>Key Bindings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Associazioni tasti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1074"/>
         <source>Key Grabber</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grabber tasto</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1076"/>
         <source>Key pressed:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tasto premuto:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1077"/>
@@ -26610,78 +26625,79 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1082"/>
         <source>Language:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lingua:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1083"/>
         <source>Last Played:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ultimo riprodotto:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1086"/>
         <source>Last Recorded:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ultimo registrato:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1087"/>
         <source>Last recorded %lastrecordeddate%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ultimo registrato %lastrecordeddate%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1088"/>
         <source>Last: %statusbefore%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ultimo: %statusbefore%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1090"/>
         <source>Lenght</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Durata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1093"/>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Livello</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1096"/>
         <source>List item:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Voce elenco:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1097"/>
         <source>Listen to</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ascolta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1098"/>
         <source>Listen to Internet</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ascolta da Internet</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1099"/>
         <source>Listen to Internet Radio Streams</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ascolta Internet Radio Stream</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1106"/>
         <source>Lists</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Liste</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1108"/>
         <source>Live Television</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diretta TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1110"/>
         <source>Loading Video Library
  If no videos appear your library is either empty or unconfigured (Press M to adjust settings)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Caricamento libreria video
+ Se non vengono visualizzati video, la libreria è vuota o non configurata (premi M per cambiare le impostazioni)</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1111"/>
         <source>Loading content for playback...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Caricamento contenuto da riprodurre ...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1112"/>
@@ -26691,32 +26707,32 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1113"/>
         <source>Local Banner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Banner locale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1114"/>
         <source>Local Coverart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copertina locale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1115"/>
         <source>Local Fanart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fanart locale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1116"/>
         <source>Local Search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricerca locale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1118"/>
         <source>Locally installed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Installato localmente</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1119"/>
         <source>Location and sources for</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Posizione e sorgenti per</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1120"/>
@@ -26726,67 +26742,67 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1121"/>
         <source>Lock: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lock: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1126"/>
         <source>Look at the TV Guide</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guarda la guida TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1128"/>
         <source>Look what is on the</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guarda cosa c&apos;è il</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1129"/>
         <source>Looks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Simile</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1132"/>
         <source>MANAGE RECORDING RULES</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GESTISCI REGOLE REGISTRAZIONE</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1133"/>
         <source>MONO</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MONO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1147"/>
         <source>Manual Schedule your Recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programma registrazione manualmente</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1149"/>
         <source>Manually Schedule programs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programma programmi manualmente</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1150"/>
         <source>Master backend failed to wake.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Il Master backend non si è avviato.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1152"/>
         <source>Max episodes:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Max episodi:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1154"/>
         <source>Maximum Number of Episodes to Keep:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Numero massimo di episodi da conservare:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1155"/>
         <source>Maximum Number of Newest Episodes:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Numero massimo di episodi più recenti:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1158"/>
         <source>Media Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta media</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1160"/>
@@ -26796,17 +26812,17 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1161"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Messaggio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1162"/>
         <source>MetaData</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MetaDati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1163"/>
         <source>Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1164"/>
@@ -26816,12 +26832,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1165"/>
         <source>Metadata OPTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OPZIONI metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1170"/>
         <source>Metadata settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impostazioni metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1173"/>
@@ -26831,47 +26847,47 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1177"/>
         <source>More Actions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Più azioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1179"/>
         <source>Move BottomLine</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sposta BottomLine</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1181"/>
         <source>Move the selected amber arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sposta la freccia ambra sull&apos;angolo dello schermo TV. Premi SELEZIONA per modificare l&apos;altra posizione. Premi MENU per le opzioni e ESC per uscire.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1186"/>
         <source>Move the selected corner of the preview image to the corner of the TV screen.  Press SELECT to edit the other corner. Press MENU for options and ESC to quit.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sposta l&apos;angolo selezionato dell&apos;anteprima nell&apos;angolo dello schermo TV. Premi SELEZIONA per modificare l&apos;altro angolo. Premi MENU per le opzioni e ESC per uscire.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1187"/>
         <source>Movie Details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dettagli film</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1190"/>
         <source>Movie Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Classifica film:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1191"/>
         <source>Movie Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impostazioni film</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1192"/>
         <source>Movie/TV DB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Film/TV DB</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1193"/>
         <source>Movie/TV DB:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Film/TV DB:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1199"/>
@@ -26881,57 +26897,57 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1202"/>
         <source>My audio subsystem supports DTS-HD:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Il sottosistema audio supporta DTS-HD:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1203"/>
         <source>My audio subsystem supports DTS:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Il sottosistema audio supporta DTS:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1205"/>
         <source>My audio subsystem supports Dolby Digital:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Il sottosistema audio supporta Dolby Digital:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1207"/>
         <source>My audio subsystem supports E-AC-3:</source>
-        <translation>Il sottosistema audio supporta il formato E-AC-3:</translation>
+        <translation type="unfinished">Il sottosistema audio supporta E-AC-3:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1209"/>
         <source>My audio subsystem supports TrueHD:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Il sottosistema audio supporta TrueHD:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1219"/>
         <source>MythTV Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impostazioni MythTV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1220"/>
         <source>MythTV Startup Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stato di avvio MythTV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1221"/>
         <source>MythTV is a Free Open Source software digital video recorder (DVR) project distributed under the terms of the GNU GPL  -  It has been under heavy development since 2002  -  Now it contains most features one would expect from a good DVR and many new ones that you soon won&apos;t be able to live without  -  This theme is based on and inspired by the original XBMC skin called Aeon by Duncan Harris  -  When using this theme you should select the customized menu called &apos;MythAeon&apos; as this menu lay-out and items are tailored for this particular theme</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythTV è un software open source gratuito di videoregistrazione digitale (DVR) distribuito secondo i termini della GNU GPL - È stato sviluppato intensamente dal 2002 - Ora contiene la maggior parte delle funzionalità che ci si aspetterebbe da un buon DVR e da molte nuove che presto non potrai più farne a meno - Questo tema è basato e ispirato alla skin XBMC originale chiamata Aeon di Duncan Harris - Quando usi questo tema dovresti selezionare il menu personalizzato chiamato &apos;MythAeon&apos; dato che questo layout di menu e le voci sono fatti su misura per questo particolare tema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1225"/>
         <source>MythTV is in standby mode!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythTV è in modalità standby!</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1227"/>
         <source>NO</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">NO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1229"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1231"/>
@@ -26941,22 +26957,22 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1232"/>
         <source>Navigation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Navigazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1233"/>
         <source>Navigation control:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Controllo navigazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1236"/>
         <source>New Password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nuova Password</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1240"/>
         <source>New: %statusafter%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nuovo: %statusafter%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1241"/>
@@ -26966,7 +26982,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1248"/>
         <source>Next Song:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prossima canzone:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1252"/>
@@ -26976,97 +26992,97 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1256"/>
         <source>No additional info available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nessuna ulteriore informazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1258"/>
         <source>No extra info available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nessuna informazione aggiuntiva</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1259"/>
         <source>No listings found for this program search.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non c&apos;è nessun elenco relativo al programma cercato.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1262"/>
         <source>No resolution specified</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nessuna risoluzione specificata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1267"/>
         <source>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Change.&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nessun video nella libreria o file. Se hai configurato una directory video, premi &quot;M&quot; (o il tasto MENU) e seleziona &quot;Cerca modifiche&quot;.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1271"/>
         <source>No volume controls configured</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nessun controllo volume configurato</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1276"/>
         <source>Not applicable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non applicabile</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1277"/>
         <source>Not recorded yet</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non ancora registrato</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1278"/>
         <source>Not sure which screen this is:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non sono sicuro quale schermata sia:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1279"/>
         <source>Number of Recordings:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Numero di registrazioni:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1282"/>
         <source>OSD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OSD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1286"/>
         <source>OSD Input Message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Messaggio di input OSD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1289"/>
         <source>OSD Notification Message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Messaggio di notifica OSD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1297"/>
         <source>Online Banner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Banner oline</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1298"/>
         <source>Online Coverart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copertina online</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1299"/>
         <source>Online Fanart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fanart online</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1302"/>
         <source>Optional category:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Categoria opzionale:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1303"/>
         <source>Optional channel:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Canale opzionale:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1305"/>
         <source>Optional genre:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Genere opzionale:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1308"/>
@@ -27076,7 +27092,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1309"/>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ordinato per:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1313"/>
@@ -27086,42 +27102,42 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1316"/>
         <source>PLAYLIST</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PLAYLIST</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1317"/>
         <source>POSTPROCESSING OPTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OPZIONI DI POSTPROCESSO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1318"/>
         <source>PROGRAM DETAILS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DETTAGLI PROGRAMMA</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1319"/>
         <source>PROGRAM GUIDE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GUIDA PROGRAMMI</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1320"/>
         <source>PROGRAM LIST</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LISTA PROGRAMMI</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1321"/>
         <source>PROGRAM SEARCH</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RICERCA PROGRAMMI</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1322"/>
         <source>Parental</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Parentale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1338"/>
         <source>Parential level:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Livello parentale:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1340"/>
@@ -27131,137 +27147,137 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1345"/>
         <source>Perform daily updates of recording artwork:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiorna giornalmente le copertine delle registrazioni:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1346"/>
         <source>Perform daily updates:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiorna ogni giorno:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1349"/>
         <source>Perform query</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esegui query</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1354"/>
         <source>Pick a program from a set of lists</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli un programma da una serie di elenchi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1360"/>
         <source>Pick programs to be recorded</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli i programmi da registrare</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1362"/>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli la lettera con cui inizia lo spettacolo, quindi premi SELEZIONA o la freccia destra</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1367"/>
         <source>Play Back Group:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci gruppo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1368"/>
         <source>Play Back Group: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci gruppo: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1369"/>
         <source>Play Blu-ray and DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci Blu-ray e DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1380"/>
         <source>Play a film on</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci film su</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1381"/>
         <source>Play a film on Blu-ray Disk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci film su disco Blu-ray</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1383"/>
         <source>Play a film on a DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci film su DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1385"/>
         <source>Play any of your recorded programs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci uno dei programmi registrati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1387"/>
         <source>Play group:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci gruppo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1389"/>
         <source>Play next</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci seguente</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1397"/>
         <source>Play your video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1401"/>
         <source>Playback starting ...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvio riproduzione ...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1403"/>
         <source>Player</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduttore</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1405"/>
         <source>Player CMD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduttore CMD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1409"/>
         <source>Player:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduttore:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1410"/>
         <source>Playlist duration:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Durata playlist:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1411"/>
         <source>Playlist item:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Elemento playlist:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1412"/>
         <source>Playlist position:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Posizione playlist:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1413"/>
         <source>Playlist progress:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avanzamento playlist:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1414"/>
         <source>Playlist: %playlisttime%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Playlist: %playlisttime%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1416"/>
         <source>Please Wait....</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Attendere ...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1420"/>
         <source>Plot: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Traccia: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1422"/>
@@ -27271,17 +27287,17 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1424"/>
         <source>Post Process Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Editor di post-elaborazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1428"/>
         <source>Post Processing Options Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opzioni editor di post-elaborazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1429"/>
         <source>Post processing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Post-elaborazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1430"/>
@@ -27291,42 +27307,42 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1431"/>
         <source>Powersearch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricerca-avanzata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1432"/>
         <source>PreRecorded</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PreRegistrato</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1433"/>
         <source>Press &apos;up&apos;, &apos;down, &apos;left&apos; and &apos;right&apos; arrows to move through the files and folders. Press &apos;select&apos; or &apos;enter&apos; key to select the file or folder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Premi le frecce &quot;su&quot;, &quot;giù,&quot;sinistra&quot; e &quot;destra&quot;per spostarti tra i file e le cartelle. Premi il tasto &quot;seleziona&quot; o &quot;invio&quot; per selezionare il file o la cartella.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1441"/>
         <source>Preview Schedule Changes:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anteprima modifiche programmazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1444"/>
         <source>Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorità</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1451"/>
         <source>Priority:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorità: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1452"/>
         <source>Priority: %finalpriority%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorità: %finalpriority%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1453"/>
         <source>Priority: %priority%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorità: %priority%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1455"/>
@@ -27336,7 +27352,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1456"/>
         <source>Profile:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profilo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1457"/>
@@ -27346,22 +27362,22 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1462"/>
         <source>Program Guide Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guida ai programmi Video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1466"/>
         <source>Program Recording Priorities</source>
-        <translation>Priorità di registrazione del programma</translation>
+        <translation type="unfinished">Priorità registrazione del programma</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1468"/>
         <source>Program Searches</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricerche programmi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1470"/>
         <source>Programid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programid</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1472"/>
@@ -27371,12 +27387,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1475"/>
         <source>Protocol: %PROTOCOLVERSION%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Protocollo: %PROTOCOLVERSION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1476"/>
         <source>Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Qualità:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1477"/>
@@ -27391,105 +27407,105 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1480"/>
         <source>Radio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Radio</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="1482"/>
         <source>Raise recording priority by %n</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Aumenta priorità registrazione di %n</numerusform>
+            <numerusform>Aumenta priorità registrazione di %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1484"/>
         <source>Rated: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valutato: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1486"/>
         <source>Rating</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valutazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1488"/>
         <source>Ratings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valutazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1489"/>
         <source>Ratings:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valutazioni:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1491"/>
         <source>Read the</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Leggi il</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1492"/>
         <source>Read the news online</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Leggi notizie online</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1494"/>
         <source>Rec</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rec</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1499"/>
         <source>Recipe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricetta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1503"/>
         <source>Record Group:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gruppo registrazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1504"/>
         <source>Record Profile:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profilo registrazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1505"/>
         <source>Record Type:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipo registrazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1508"/>
         <source>Recording Group</source>
-        <translation>Gruppo di registrazione</translation>
+        <translation type="unfinished">Gruppo registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1510"/>
         <source>Recording Group: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gruppo registrazione: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1511"/>
         <source>Recording Groups</source>
-        <translation>Gruppi di registrazione</translation>
+        <translation type="unfinished">Gruppi registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1513"/>
         <source>Recording Priority</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Priorità registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1515"/>
         <source>Recording Profile: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profilo registrazione: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1517"/>
         <source>Recording Rule Active:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Regola registrazione attiva:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1520"/>
         <source>Recording Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stato registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1521"/>
@@ -27499,22 +27515,22 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1522"/>
         <source>Recording details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dettagli registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1523"/>
         <source>Recording group:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gruppo registrazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1524"/>
         <source>Recording groups</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gruppi registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1525"/>
         <source>Recording has Subtitles Available</source>
-        <translation>La registrazione ha sottotitoli disponibili</translation>
+        <translation type="unfinished">Registrazione con sottotitoli disponibili</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1526"/>
@@ -27564,7 +27580,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1535"/>
         <source>Recording is in WideScreen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La registrazione è WideScreen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1536"/>
@@ -27574,7 +27590,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1537"/>
         <source>Recording is preserved</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Registrazione mantenuta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1538"/>
@@ -27590,55 +27606,56 @@ Do you wish to continue watching?</source>
         <location filename="../themes/themestrings.h" line="1541"/>
         <source>Reduce recording priority by %n</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Riduci priorità registrazione di %n</numerusform>
+            <numerusform>Riduci priorità registrazione di %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1543"/>
         <source>Remote</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Telecomando</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1545"/>
         <source>Resolution %RESOLUTION%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Risoluzione %RESOLUTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1546"/>
         <source>Resolution Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Risoluzione sconosciuta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1547"/>
         <source>Resolution:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Risoluzione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1548"/>
         <source>Resolution: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Risoluzione: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1550"/>
         <source>Resolution: %resolution% - %aspect| 
 %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Risoluzione: %resolution% - %aspect| 
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1559"/>
         <source>Retry</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riprova</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1560"/>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riavvolgi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1561"/>
         <source>Rip/Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copia/Transcodifica</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1562"/>
@@ -27648,62 +27665,62 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1563"/>
         <source>Rule Clause:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Clausola regola:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1567"/>
         <source>Rule active:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Regola attiva:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1568"/>
         <source>Rules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Regole</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1574"/>
         <source>Run user job four</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvia processo utente quattro</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1575"/>
         <source>Run user job one</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvia processo utente uno</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1576"/>
         <source>Run user job three</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvia processo utente tre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1577"/>
         <source>Run user job two</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvia processo utente due</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1578"/>
         <source>Run userjob #1:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvia processo utente #1:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1579"/>
         <source>Run userjob #2:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvia processo utente #2:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1580"/>
         <source>Run userjob #3:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvia processo utente #3:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1581"/>
         <source>Run userjob #4:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvia processo utente #4:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1585"/>
         <source>Runtime: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Durata: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1586"/>
@@ -27713,62 +27730,62 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1587"/>
         <source>SCHEDULE EDITOR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">EDITOR PROGRAMMAZIONE</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1588"/>
         <source>SCHEDULE FILTERS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FILTRI PROGRAMMAZIONE</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1589"/>
         <source>SCHEDULE OPTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OPZIONI PROGRAMMAZIONE</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1590"/>
         <source>SD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1591"/>
         <source>SEARCH</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RICERCA</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1592"/>
         <source>STEREO</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">STEREO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1593"/>
         <source>STORAGE OPTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OPZIONI ARCHIVIAZIONE</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1594"/>
         <source>SUB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SUB</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1595"/>
         <source>SUBTITLES</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SOTTOTITOLI</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1596"/>
         <source>SURROUND</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SURROUND</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1600"/>
         <source>Sample rate:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Freq. campionamento:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1601"/>
         <source>Sample rate: %samplerate%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Freq. campionamento: %samplerate%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1604"/>
@@ -27788,232 +27805,232 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1608"/>
         <source>Scanning %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scansiono %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1612"/>
         <source>Schedule Filter Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Editor filtri programmazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1618"/>
         <source>Schedule Rule:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Regola programmazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1623"/>
         <source>Schedule info</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Info programmazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1624"/>
         <source>Schedule programs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pianifica programmi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1626"/>
         <source>Screen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Schermo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1628"/>
         <source>Screen setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura schermo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1630"/>
         <source>Screenshot Image:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Immagine schermo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1632"/>
         <source>Screenshot: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Schermata: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1635"/>
         <source>Search Field:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Campo ricerca:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1642"/>
         <source>Search Local</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricerca locale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1643"/>
         <source>Search Net</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca su Net</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1648"/>
         <source>Search Terms:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca termini:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1649"/>
         <source>Search Times</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca orari</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1650"/>
         <source>Search Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1653"/>
         <source>Search by</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca per</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1654"/>
         <source>Search by alphabet</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricerca alfabetica</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1655"/>
         <source>Search by category</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricerca per categoria</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1656"/>
         <source>Search by channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricerca per canale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1657"/>
         <source>Search files on your harddisk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca file sul tuo harddisk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1659"/>
         <source>Search item:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Elemento di ricerca:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1660"/>
         <source>Search on</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca per</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1661"/>
         <source>Search on broadcast times</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca in orari trasmissione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1662"/>
         <source>Search on keywords</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca per parole chiave</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1663"/>
         <source>Search on people</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca persone</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1664"/>
         <source>Search on titles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca nei titoli</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1665"/>
         <source>Search or browse popular video sites</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca o esplora siti di video popolari</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1667"/>
         <source>Search programs using sorted lists</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca programmi utilizzando elenchi ordinati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1668"/>
         <source>Search programs using words</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca programmi con le parole</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1670"/>
         <source>Search the local network for the MythTV Backend.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca nella rete locale il backend MythTV.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1672"/>
         <source>Searches</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ricerche</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1673"/>
         <source>Searchlist item:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Elemento di ricerca:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1676"/>
         <source>Season and Episode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stagione e Episodio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1677"/>
         <source>Season and Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stagione e Episodio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1680"/>
         <source>Season/Episode: %s00e00%               ProgramID: %PROGRAMID%               SeriesID: %SERIESID%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stagione/Episodio: %s00e00%               IDprogramma: %PROGRAMID%               IDserie: %SERIESID%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1684"/>
         <source>See what is previously</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guarda cosa c&apos;è prima</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1685"/>
         <source>See what is previously recorded</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guarda cosa è stato registrato in precedenza</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1690"/>
         <source>Seek Amount</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Entità ricerca</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1691"/>
         <source>Seek Back</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca Indietro</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1692"/>
         <source>Seek Forward</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca Avanti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1694"/>
         <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona &apos;Guida programmi&apos; o &apos;Trova programmi&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1695"/>
         <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona &apos;Registra&apos; dal menu principale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1696"/>
         <source>Select Date:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona data:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1697"/>
         <source>Select Event:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona evento:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1698"/>
         <source>Select Icons</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona icone</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1706"/>
         <source>Select Time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona ora:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1709"/>
@@ -28028,47 +28045,47 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1711"/>
         <source>Select a recording to permanently erase.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona registrazione da cancellare definitivamente.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1712"/>
         <source>Select a recording to watch.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona registrazione da vedere.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1713"/>
         <source>Select a recording to watch:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona registrazione da vedere:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1715"/>
         <source>Select an option below.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona un&apos;opzione di seguito.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1718"/>
         <source>Select country and language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona paese e lingua</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1720"/>
         <source>Select item to be searched for from the list:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona elemento di ricerca dall&apos;elenco:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1721"/>
         <source>Select recording rule:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona regola registrazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1723"/>
         <source>Select the country where you reside.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona la Nazione in cui risiedi.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1729"/>
         <source>Select the recording rule:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona regola di registrazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1731"/>
@@ -28078,47 +28095,47 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1732"/>
         <source>Select your language.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona la lingua.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1734"/>
         <source>Select your theme</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona il tema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1736"/>
         <source>Select:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1737"/>
         <source>Selected Image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Immagine selezionata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1740"/>
         <source>Send and receive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Invia e ricevi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1743"/>
         <source>Set Priorities for</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta priorità per</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1744"/>
         <source>Set Priorities for channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta priorità per i canali</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1747"/>
         <source>Set your recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1748"/>
         <source>Set your recording priorities</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta le priorità registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1749"/>
@@ -28128,137 +28145,137 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1750"/>
         <source>Settings for</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Settings per</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1760"/>
         <source>Setup Audio Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta configurazione audio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1761"/>
         <source>Setup Custom Priorities rules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta regole priorità personalizzate</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1762"/>
         <source>Setup System event</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta evento sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1763"/>
         <source>Setup System event handlers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta gestori evento sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1764"/>
         <source>Setup Video Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta configurazione video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1765"/>
         <source>Setup Weather</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta meteo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1767"/>
         <source>Setup behavior of the</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta comportamento del</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1768"/>
         <source>Setup file associations for your videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta associazioni file dei tuoi video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1769"/>
         <source>Setup filter for your video library</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta filtro della tua libreria video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1770"/>
         <source>Setup metadata for your video library</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta metadati della tua libreria video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1771"/>
         <source>Setup navigation and</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta navigazione e</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1772"/>
         <source>Setup player to play your videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta lettore riproduzione video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1773"/>
         <source>Setup recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1774"/>
         <source>Setup recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta registrazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1775"/>
         <source>Setup recordings profiles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta profili registrazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1776"/>
         <source>Setup the behavior of the system events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta comportamento eventi sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1777"/>
         <source>Setup your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta il tuo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1778"/>
         <source>Setup your Movie</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta il film</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1779"/>
         <source>Setup your system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta il sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1780"/>
         <source>Setup your system events</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta eventi sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1782"/>
         <source>Share your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Condividi il tuo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1783"/>
         <source>Share your hardware profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Condividi il tuo profilo hardware</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1797"/>
         <source>Show files that are marked as hidden:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostra i file nascosti:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1798"/>
         <source>Show:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostra:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1801"/>
         <source>Shutting Down!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arresto in corso!</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1802"/>
         <source>Signal / Noise</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Segnale/Rumore</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1803"/>
@@ -28273,192 +28290,192 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1805"/>
         <source>Site item:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Elemento del sito:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1806"/>
         <source>Skin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skin</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1807"/>
         <source>Skins</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Skin</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1809"/>
         <source>Sorry, No Recordings Available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spiacente, nessuna registrazione disponibile</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1818"/>
         <source>Sort: (1) by Title, (2) by Priority, (4) by Type.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ordina: (1) per titolo, (2) per priorità, (4) per tipo.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1819"/>
         <source>Sorting order of the shown images:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ordinamento immagini visualizzate:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1822"/>
         <source>Sources</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sorgenti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1823"/>
         <source>Sources for metadata grabbers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sorgenti dei grabber metadati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1824"/>
         <source>Space</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spazio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1825"/>
         <source>Sports running</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Corsa sportiva</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1827"/>
         <source>Standby Accessing Database</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Database di accesso in standby</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1829"/>
         <source>Star rating</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valutazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1830"/>
         <source>Starring</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Protagonista</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1831"/>
         <source>Starring:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Protagonista:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1833"/>
         <source>Stars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stelle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1834"/>
         <source>Stars:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stelle:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1835"/>
         <source>Start Date:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Data inizio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1837"/>
         <source>Start Hour:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ora inizio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1838"/>
         <source>Start Minute:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Minuto inizio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1843"/>
         <source>Start early:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anticipo avvio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1849"/>
         <source>Start time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ora inizio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1850"/>
         <source>Start: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvio: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1853"/>
         <source>Stations</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1857"/>
         <source>Status:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stato:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1858"/>
         <source>Status: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stato: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1859"/>
         <source>Status: %rectypechar%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stato: %rectypechar%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1861"/>
         <source>Storage</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1862"/>
         <source>Storage Details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dettagli archiviazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1864"/>
         <source>Storage Group: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gruppo archiviazione: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1867"/>
         <source>Storage group:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gruppo archiviazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1868"/>
         <source>Storage rate:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Velocità archiviazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1871"/>
         <source>Storage to Buffer: %storagerate%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivia su buffer:%storagerate%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1872"/>
         <source>Storage:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1874"/>
         <source>Store Rule</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Regola salvataggio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1875"/>
         <source>Stored</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Salvato</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1877"/>
         <source>Streams</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stream</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1879"/>
         <source>Sub Title:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sottotitolo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1882"/>
         <source>Submit system Profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Invia profilo sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1886"/>
@@ -28468,72 +28485,72 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1887"/>
         <source>Subtitles:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sottotitoli:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1893"/>
         <source>Syncing image %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sincronizzazione immagine %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1894"/>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1898"/>
         <source>System Info</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Informazioni sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1900"/>
         <source>System status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stato sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1901"/>
         <source>T: 1%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">T: 1%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1905"/>
         <source>TMDB/TVDB ID:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TMDB/TVDB ID:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1907"/>
         <source>TRANSCODING</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TRANSCODFICO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1910"/>
         <source>TV Guide</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guida TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1913"/>
         <source>TV Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Imposta TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1914"/>
         <source>TV Shows</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TV Show</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1917"/>
         <source>TVGuide</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GuidaTV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1924"/>
         <source>Terminal</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Terminale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1929"/>
         <source>Test Rule</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Regola di test</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1931"/>
@@ -28548,12 +28565,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1938"/>
         <source>The recording schedule would not be affected.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La registrazione programmi non verrà interessata.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1941"/>
         <source>There are no Recordings Scheduled...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non ci sono registrazioni programmate...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1942"/>
@@ -28563,87 +28580,87 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="1950"/>
         <source>This is a children&apos;s Christmas version of the popular MythCenter-wide theme with festive backgrounds and colour scheme.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Questa è una versione natalizia per bambini del popolare tema MythCenter con sfondi festivi e combinazioni di colori.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1957"/>
         <source>Time to display each image during a slideshow (ms):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Durata visualizzazione di ciascuna immagine durante la presentazione (ms):</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1958"/>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Durata:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1962"/>
         <source>Title 1 of 1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Titolo 1 di 1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1965"/>
         <source>To be determined</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Da definire</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1973"/>
         <source>To schedule a recording, exit this screen and</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Per programmare una registrazione, esci da questa videata e</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1974"/>
         <source>Tools</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Strumenti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1975"/>
         <source>Tools for your music library</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Strumenti per la libreria musicale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1976"/>
         <source>Track: %time%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Traccia:%time%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1980"/>
         <source>Trailer: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trailer: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1982"/>
         <source>Trans</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trans</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1984"/>
         <source>Transcode new recordings:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Transcodifica nuove registrazioni:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1985"/>
         <source>Transcoding...</source>
-        <translation>In transcodifica...</translation>
+        <translation type="unfinished">Transcodifica...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2253"/>
         <source>upcoming recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">prossime registrazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2254"/>
         <source>widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">widescreen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2255"/>
         <source>year</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anno</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2256"/>
         <source>~</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">~</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1311"/>
@@ -29930,19 +29947,21 @@ Una volta completate le modifiche, premi il pulsante &quot;OK&quot;.</translatio
     <message>
         <location filename="../themes/themestrings.h" line="2181"/>
         <source>XXXXXX %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">XXXXXX %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2187"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded!
 To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non hai pianificato nessun programma da registrare!
+Per programmare una registrazione, esci da questa videata e seleziona &apos;Guida programmi&apos; o &apos;Cerca programmi&apos;.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2194"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos; </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non hai pianificato alcun programma da registrare!
+Per programmare una registrazione, esci da questa videata e seleziona &apos;Guida programmi&apos; o &apos;Cerca programmi&apos; </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2195"/>
@@ -29950,58 +29969,60 @@ To schedule a recording, exit this screen and select &apos;Program Guide&apos; o
 
 To schedule a recording, exit this screen and
 Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Per programmare una registrazione, esci da questa videata e
+seleziona &apos;Guida programmi&apos; o &apos;Cerca programmi&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2198"/>
         <source>You haven&apos;t made any changes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non hai apportato modifiche</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2199"/>
         <source>You haven&apos;t made any changes in your Schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non hai apportato modifiche alla programmazione.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2200"/>
         <source>You may enter a value here or cancel to continue using the Spinbox.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Puoi immettere un valore qui o annullare e continuare ad utilizzare la casella di selezione.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2205"/>
         <source>Zone Minder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zone Minder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2209"/>
         <source>[</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2210"/>
         <source>[%statusbefore% &gt;&gt; %statusafter%]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[%statusbefore% &gt;&gt; %statusafter%]</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2211"/>
         <source>[O]k</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[O]k</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2212"/>
         <source>[P]robe</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[P]robe</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2213"/>
         <source>[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2214"/>
         <source>[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%
 [font]myverysmallsub[/font]|CAST| %</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%
+[font]myverysmallsub[/font]|CAST| %</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2215"/>
@@ -30010,28 +30031,33 @@ Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
 [font]myverysmallsub[/font]Part |PARTNUMBER| of %%PARTTOTAL%%
 [font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]  
 [font]myverysmalllabel[/font]Director: |DIRECTOR| %</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[font]myverysmalllabel[/font]%(|s00e00|) %%|RATING| %%|(STARS|) %[font]myverysmall[/font]%DESCRIPTION%%
+
+[font]myverysmallsub[/font]Part |PARTNUMBER| of %%PARTTOTAL%%
+[font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]  
+[font]myverysmalllabel[/font]Director: |DIRECTOR| %</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2216"/>
         <source>[font]myverysmalllabel[/font]%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%
 [font]myverysmallsub[/font]|CAST| %</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[font]myverysmalllabel[/font]%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%%
+[font]myverysmallsub[/font]|CAST| %</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2217"/>
         <source>]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">]</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2218"/>
         <source>] =</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">] =</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2220"/>
         <source>album</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">album</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2221"/>
@@ -30041,22 +30067,22 @@ Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
     <message>
         <location filename="../themes/themestrings.h" line="2223"/>
         <source>browse your Pictures library</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">sfoglia libreria immagini</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2224"/>
         <source>callsign: %callsign%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nome can.: %callsign%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2225"/>
         <source>dddd,  MMMM dd,  yyyy  |  hh:mm AP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">gggg,  MMMM gg,  aaaa  |  hh:mm AP</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2226"/>
         <source>dddd, MMMM dd, yyyy  |</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">gggg,  MMMM gg,  aaaa  |</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2228"/>
@@ -30749,52 +30775,52 @@ Regista: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="2149"/>
         <source>Watch your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guarda il</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2152"/>
         <source>Watched Programs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programmi già visti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2153"/>
         <source>Watched programs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programmi già visti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2155"/>
         <source>WatchingBD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VisioneBD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2156"/>
         <source>WatchingDVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VisioneDVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2157"/>
         <source>WatchingLiveTM</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VisioneLiveTM</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2158"/>
         <source>WatchingPreRecorded</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VisionePreRegistrato</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2159"/>
         <source>WatchingRecording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VisioneRegistrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2160"/>
         <source>WatchingVideo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VisioneVideo</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2161"/>
         <source>Watchlist</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Watchlist</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2169"/>
@@ -32199,112 +32225,112 @@ dd MMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="1986"/>
         <source>Transports</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trasporti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1988"/>
         <source>Try again to establish connections.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prova di nuovo a stabilire le connessioni.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1989"/>
         <source>Tweets</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tweet</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1994"/>
         <source>Type of transition between two images:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipo di transizione tra due immagini:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1996"/>
         <source>Types</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1997"/>
         <source>Unable to connect to Database.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossibile connettersi al database.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1998"/>
         <source>Unable to connect to master backend.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossibile connettersi al master backend.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2001"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sconosciuto</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2002"/>
         <source>Unmute</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Audio ON</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2005"/>
         <source>Up to date</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggionato</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2006"/>
         <source>UpToDate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggionato</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2007"/>
         <source>Upcoming</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prossimi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2010"/>
         <source>Update available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiornamento disponibile</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2012"/>
         <source>Update your channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiorna canali</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2014"/>
         <source>UpdateAvailable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiornamento disponibile</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2015"/>
         <source>Upload your hardware</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Carica il tuo hardware</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2016"/>
         <source>Upload your hardware profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Carica il tuo profilo hardware</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2017"/>
         <source>Uptodate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggionato</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2018"/>
         <source>Usage:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utilizzo:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2019"/>
         <source>Use Database setup to enter database parameters.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Usa Configura database per inserire i parametri del database.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2024"/>
         <source>Use music</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Usa musica</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2025"/>
         <source>Use the</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Usa il</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2029"/>
@@ -32314,162 +32340,162 @@ dd MMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="2034"/>
         <source>UserRating:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valutazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2035"/>
         <source>Userrating:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valutazione:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2040"/>
         <source>VCD Drive:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unità VCD:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2041"/>
         <source>VCD Player:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lettore VCD:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2043"/>
         <source>VIDEO BROWSER</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BROWSER VIDEO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2044"/>
         <source>VIDEO GALLERY</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GALLERIA VIDEO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2045"/>
         <source>VIDEO LIST</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ELENCO VIDEO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2046"/>
         <source>VIDEO MANAGER</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GESTORE VIDEO</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2047"/>
         <source>VRC-Like recording scheduler</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prograzione registrazioni simil-VRC</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2048"/>
         <source>Values from %LOW% to %HIGH% in increments of %STEP%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valori da %LOW% a %HIGH% con incrementi di %STEP%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2053"/>
         <source>Video #:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video #:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2054"/>
         <source>Video #: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video #: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2056"/>
         <source>Video Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vista navigazione video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2063"/>
         <source>Video Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vista galleria video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2066"/>
         <source>Video List View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vista elenco video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2067"/>
         <source>Video Manage View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vista gestione video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2074"/>
         <source>Video Res:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ris. Video:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2078"/>
         <source>Video details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dettagli video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2079"/>
         <source>Video sites you can</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Siti di video che puoi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2080"/>
         <source>Video#:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video#:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2081"/>
         <source>Video: %VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video: %VIDEOWIDTH%x%VIDEOHEIGHT%@%VIDEOFRAMERATE%fps</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2082"/>
         <source>VideoCodec: H.263</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CodecVideo: H.263</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2083"/>
         <source>VideoCodec: H.264</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CodecVideo: H.264</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2084"/>
         <source>VideoCodec: MPEG-2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CodecVideo: MPEG-2</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2085"/>
         <source>VideoCodec: MPEG-4</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CodecVideo: MPEG-4</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2086"/>
         <source>VideoCodec: RTjpeg</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CodecVideo: RTjpeg</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2087"/>
         <source>VideoCodec: VC-1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CodecVideo: VC-1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2088"/>
         <source>VideoCodec: WMV3</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CodecVideo: WMV3</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2089"/>
         <source>VideoDesc: HD_1080_I</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DescVideo: HD_1080_I</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2090"/>
         <source>VideoDesc: HD_1080_P</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DescVideo: HD_1080_P</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2091"/>
         <source>VideoDesc: HD_720_P</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DescVideo: HD_720_P</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2092"/>
         <source>VideoDesc: SD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DescVideo: SD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2093"/>
@@ -33223,107 +33249,107 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="2105"/>
         <source>View all</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi tutti</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2106"/>
         <source>View all movies</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi tutti i film</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2107"/>
         <source>View all searches stored</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi tutte le ricerche salvate</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2110"/>
         <source>View new</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi nuovi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2111"/>
         <source>View new titles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi i titoli nuovi</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2112"/>
         <source>View stored</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi salvati</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2113"/>
         <source>View system Profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi Profilo sistema</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2114"/>
         <source>View the</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi i</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2116"/>
         <source>View upcoming</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi prossime</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2117"/>
         <source>View upcoming recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi prossime registrazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2119"/>
         <source>View your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi le tue</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2121"/>
         <source>View your recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi le tue registrazioni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2122"/>
         <source>View your recording rules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi le tue regole di registrazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2123"/>
         <source>View:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vedi:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2124"/>
         <source>Viewing and TV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Visualizzazione e TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2125"/>
         <source>Visible</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Visibile</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2129"/>
         <source>W</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">W</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2131"/>
         <source>WATCH RECORDINGS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GUARDA REGISTRAZIONI</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2132"/>
         <source>WATCHED</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VISTE</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2135"/>
         <source>Waiting for Database to start.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Attesa avvio Database.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2136"/>
         <source>Waking up Database Machine.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avvio macchina del database.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2137"/>
@@ -33343,12 +33369,12 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="2145"/>
         <source>Watch list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">In evidenza</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2146"/>
         <source>Watch live</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guarda diretta</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2148"/>
@@ -33627,80 +33653,83 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="2229"/>
         <source>decoded/free:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">decodificato/libero:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2231"/>
         <source>h.264</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">h.264</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2233"/>
         <source>hh:mm AP</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">hh:mm AP</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2234"/>
         <source>key pressed:
 %osd_number_entry%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">tasto premuto:
+%osd_number_entry%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2235"/>
         <source>message:
 %message_text%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">messaggio:
+%message_text%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2238"/>
         <source>no info available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nessuna info disponibile</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2239"/>
         <source>not recorded yet</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non ancora registrato</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2240"/>
         <source>ok</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ok</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2242"/>
         <source>publisher:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">editore:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2243"/>
         <source>ratings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">valutazione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2244"/>
         <source>recording group filter set on %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">filtro gruppo registrazione impostato su %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2246"/>
         <source>save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">salva</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2247"/>
         <source>smart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">inteligente</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2248"/>
         <source>starring
 %cast%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">protagonisti
+%cast%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2249"/>
         <source>television</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">televisione</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2252"/>
@@ -35107,17 +35136,17 @@ Per programmare una registrazione, esci da questa schermata e seleziona &apos;Gu
     <message>
         <location filename="../themes/themestrings.h" line="2173"/>
         <source>Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Guidata</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2174"/>
         <source>Wizard for main mythtv settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Procedura guidata impostazioni principali di mythtv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2175"/>
         <source>Words</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Parole</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2179"/>

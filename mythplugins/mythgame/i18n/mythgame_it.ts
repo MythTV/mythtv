@@ -970,54 +970,57 @@ di volerlo fare?</translation>
         <location filename="themestrings.h" line="5"/>
         <source>%00x00| - %%&quot;|SUBTITLE|&quot;
 %%|YEARSTARS| - %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%00x00| - %%&quot;|SUBTITLE|&quot;
+%%|YEARSTARS| - %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
         <source>%Published by |publisher|%%, |YEAR%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%Pubblicato da|publisher|%%, |YEAR%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>%&quot;|SUBTITLE|&quot;
 
 %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%&quot;|SUBTITLE|&quot;
+
+%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>%cast%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%cast%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>%playcount% times</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%playcount% volte</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>%romname%%, |(rompath)%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%romname%%, |(rompath)%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Add game to Favorites:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi gioco ai preferiti:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>Add games to your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi giochi al tuo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Add to favorites:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi ai preferiti:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>CRC</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CRC</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
@@ -1027,57 +1030,57 @@ di volerlo fare?</translation>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Clear data of all your games</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cancella dati di tutti i giochi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>Clear your game</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cancella il tuo gioco</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Configure game emulators</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura emulatori giochi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Configure your game</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura gioco</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Country</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Paese</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Coverart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copertina</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Coverart:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Copertina:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Customize meta data of your games</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Personalizza metadati dei giochi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dati</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Description: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Descrizione: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Detailed information about your game</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Informazioni dettagliate sul gioco</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
@@ -1087,57 +1090,57 @@ di volerlo fare?</translation>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Fanart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fanart</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>File:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Filename</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>GAMES</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">GIOCHI</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="58"/>
         <source>Game Type:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipo gioco:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="59"/>
         <source>Game details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dettagli gioco</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>Game folders and general</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cartelle gioco e generale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
         <source>Game folders and general settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cartelle gioco e impostazioni generali</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>
         <source>Game plot:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trama gioco:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>Library</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Biblioteca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
         <source>Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metadati</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="72"/>
@@ -1147,92 +1150,92 @@ di volerlo fare?</translation>
     <message>
         <location filename="themestrings.h" line="73"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
         <source>Navigation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Navigazione</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="77"/>
         <source>Path:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Percorso:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="80"/>
         <source>Players</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Giocatori</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Publisher</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Editore</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
         <source>ROM path</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Percorso ROM</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>ROM:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ROM:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="91"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Salva</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
         <source>Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Schermata</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="95"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="96"/>
         <source>Search Boxart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca boxart</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="97"/>
         <source>Search Fanart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca fanart</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="98"/>
         <source>Search Screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca schermata</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="99"/>
         <source>Select Game</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona gioco</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="100"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impostazioni</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="101"/>
         <source>Starring:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Protagonista:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="102"/>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sistema</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="106"/>
         <source>Systems:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sistemi:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="107"/>
@@ -1242,17 +1245,17 @@ di volerlo fare?</translation>
     <message>
         <location filename="themestrings.h" line="113"/>
         <source>_</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">_</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="114"/>
         <source>genre:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">genere:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="115"/>
         <source>system:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">sistema:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
