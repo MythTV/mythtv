@@ -1290,300 +1290,300 @@ Attendere...</translation>
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>%SIZE% ~ %PROFILE%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%SIZE% ~ %PROFILE%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>%date% / %profile%</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%date% / %profile%</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>%size% (%profile%)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%size% (%profile%)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>0.00Gb</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">0.00Gb</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>12.34GB</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">12.34GB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>&lt;-- Details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;-- Dettagli</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>&lt;-- Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;-- Menu Principale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Add Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Agg.Registrazioni</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Add Videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
         <source>Add a recording or video to archive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi una registrazione o un video da archiviare.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="30"/>
         <source>Add a recording, video or file to archive.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aggiungi una registrazione, un video o un file da archiviare.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Archive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>Archive Callsign:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio Stazioni:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
         <source>Archive Chan ID:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio Chan ID:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Archive Chan No:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio Chan No:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="36"/>
         <source>Archive Files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio File</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
         <source>Archive Item:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio Elementi:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="40"/>
         <source>Archive Items to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio elementi a DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="41"/>
         <source>Archive Log Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Visualizza Log archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>Archive Media</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archivio Media</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Archive Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome archivio:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Associate Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Associa canale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Associated Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Canale associato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Burn</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Masterizza</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
         <source>Burn Created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Masterizza DVD creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Burn the last created archive to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Masterizza su DVD l&apos;ultimo archivio creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>Burn to DVD:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Masterizza su DVD:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>CUTLIST</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">LISTATAGLI</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Emittente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
         <source>Callsign:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Emittente:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="59"/>
         <source>Cancel Job</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Annulla lavoro</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Chan. Id:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Id Can.:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="63"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="65"/>
         <source>Channel ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ID Canale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="67"/>
         <source>Channel ID:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ID Canale:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="68"/>
         <source>Channel Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome canale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="69"/>
         <source>Channel No</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">N. canale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
         <source>Channel Number:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Numero canale:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
         <source>Chapter Menu --&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Menu capitolo --&gt;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="75"/>
         <source>Chapter Menu:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Menu capitolo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="76"/>
         <source>Chapters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Capitoli</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Create ISO Image:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Crea immagine ISO:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="83"/>
         <source>Create a</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Crea un</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="84"/>
         <source>Create a DVD of your videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Crea un DVD dei tuoi video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>Current Destination:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Destinazione attuale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="87"/>
         <source>Current Position:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Posizione attuale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>Current Size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensione attuale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="89"/>
         <source>Current selected item size: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensione elemento selezionato: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="90"/>
         <source>Current size: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensione attuale: %1</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="91"/>
         <source>Current: %n</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Corrente: %n</numerusform>
+            <numerusform>Correnti: %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="themestrings.h" line="92"/>
         <source>DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="93"/>
         <source>DVD Media</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DVD Media</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="94"/>
         <source>DVD Menu</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Menu DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="96"/>
         <source>Date (time)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Data (ora)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="98"/>
         <source>Destination</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Destinazione</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="99"/>
         <source>Destination Free Space:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Spazio libero su destinazione:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="103"/>
         <source>Details:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dettagli:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="104"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fatto</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="105"/>
         <source>Edit Archive item Information</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica info elemento dell&apos;archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="106"/>
@@ -1598,52 +1598,52 @@ Attendere...</translation>
     <message>
         <location filename="themestrings.h" line="108"/>
         <source>Eject your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Espelli il tuo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="110"/>
         <source>Encode your video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Codifica il video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="111"/>
         <source>Encode your video to a file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Codifica il video su un file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="112"/>
         <source>Encoded Size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensione codificata:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="113"/>
         <source>Encoder Profile:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profilo  encoder:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="114"/>
         <source>Encoding Profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Profilo codifica</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="116"/>
         <source>Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Errore: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="118"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esporta</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="119"/>
         <source>Export your</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esporta il tuo</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="120"/>
         <source>Export your videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Esporta i tuoi video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="121"/>
@@ -1653,37 +1653,37 @@ Attendere...</translation>
     <message>
         <location filename="themestrings.h" line="122"/>
         <source>File Browser</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Browser File</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="125"/>
         <source>File browser</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Browser file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="126"/>
         <source>File...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File...</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="127"/>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome file:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="128"/>
         <source>Filesize</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensione file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="132"/>
         <source>Find Location</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trova posizione</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="134"/>
         <source>First, select the thumb image you want to change from the overview. Second, press the &apos;tab&apos; key to move to the select thumb frame button to change the image.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona prima dall&apos;elenco l&apos;icona che desideri modificare, poi premi il tasto &quot;Tab&quot; per passare al pulsante di selezione del riquadro dell&apos;icona per modificare l&apos;immagine.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="135"/>
@@ -1693,254 +1693,255 @@ Attendere...</translation>
     <message>
         <location filename="themestrings.h" line="136"/>
         <source>Force Overwrite of DVD-RW Media:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Forza sovrascrittura supporti DVD-RW:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="140"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importa</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="142"/>
         <source>Import an</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importa un</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="143"/>
         <source>Import recordings from a native archive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importa registrazioni da archivio originale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="144"/>
         <source>Import videos from an Archive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importa registrazioni da un archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="146"/>
         <source>Intro --&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Intro --&gt;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="147"/>
         <source>Intro:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Intro:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="148"/>
         <source>Local Callsign:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Emittente locale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="149"/>
         <source>Local Chan ID:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ID emittente locale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="150"/>
         <source>Local Chan No:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">N. Can. locale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="152"/>
         <source>Local Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome locale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="153"/>
         <source>Log</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Log</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="155"/>
         <source>Log viewer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Visualizz. Log</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="156"/>
         <source>MENU changes focus. Numbers 0-9 jump to that thumb image.
 When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT jumps forward/backward by the seek amount, and SELECT chooses the current preview image for the selected thumb image.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MENU cambia selezione. I numeri da 0 a 9 spostano sull&apos;immagine dell&apos;icona.
+Quando l&apos;immagine di anteprima è selezionata, SU/GIÙ cambia l&apos;entità dello spostamento, SINISTRA/DESTRA salta in avanti/indietro dell&apos;entità di spostamento definita e SELEZIONA sceglie l&apos;immagine di anteprima corrente come immagine della stazione selezionata.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="158"/>
         <source>Main Menu:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Menù principale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="159"/>
         <source>Main menu</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Menù principale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="161"/>
         <source>Make ISO image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Crea immagine ISO</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="162"/>
         <source>Make ISO image:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Crea immagine ISO:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="163"/>
         <source>Media</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Media</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="165"/>
         <source>Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Metadati</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="166"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="168"/>
         <source>Name:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome:  %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="169"/>
         <source>Navigation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Navigazione</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="172"/>
         <source>New: %n</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Nuovo: %n</numerusform>
+            <numerusform>Nuovi: %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="themestrings.h" line="174"/>
         <source>No files are selected for DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non ci sono file selezionati per il DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="177"/>
         <source>Not Applicable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non applicabile</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="178"/>
         <source>Not Available in this Theme</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non disponibile in questo tema</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="179"/>
         <source>Not available in this theme</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Non disponibile in questo tema</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="184"/>
         <source>Original Size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensione originale:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="186"/>
         <source>Overwrite DVD-RW Media:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sovrascrivi media DVD-RW:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="188"/>
         <source>Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Livello parentale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="189"/>
         <source>Parental Level:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Livello parentale:</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="191"/>
         <source>Parental Level: %n</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Livello parentale: %n</numerusform>
+            <numerusform>Livelli parentali: %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="themestrings.h" line="194"/>
         <source>Play the last created archive DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Riproduci ultimo DVD archivio creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="195"/>
         <source>Position View:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vista posizione:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="196"/>
         <source>Press &apos;left&apos; and &apos;right&apos; arrows to move through the frames. Press &apos;up&apos; and &apos;down&apos; arrows to change seek amount. Press &apos;select&apos; or &apos;enter&apos; key to lock the selected thumb image.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Premi le frecce &quot;sinistra&quot; e &quot;destra&quot; per spostarti tra i frame. Premi le frecce &quot;su&quot; e &quot;giù&quot; per modificare l&apos;entità della ricerca. Premi il tasto &quot;seleziona&quot; o &quot;invio&quot; per bloccare l&apos;immagine dell&apos;icona selezionata.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="198"/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anteprima</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="201"/>
         <source>Read video from data dvd or file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Leggi video da dvd o file dati</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="203"/>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Registrazioni</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="204"/>
         <source>Recordings group:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gruppo registrazioni:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="206"/>
         <source>Save recordings and videos to a native archive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Salva registrazioni e video in un archivio originale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="207"/>
         <source>Save recordings and videos to video DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Salva registrazioni e video su DVD video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="209"/>
         <source>Search Chan ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca ID Can</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="210"/>
         <source>Search Chan NO</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca N. Can</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="212"/>
         <source>Search Local</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca localmente</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="216"/>
         <source>Seek Amount:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Entità spostamento:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="217"/>
         <source>Seek amount:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Entità spostamento:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="220"/>
         <source>Select Channel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona canale</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="224"/>
         <source>Select Files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Selesiona file</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="225"/>
@@ -1950,52 +1951,52 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
     <message>
         <location filename="themestrings.h" line="226"/>
         <source>Select Recordings for your archive or image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona registrazioni per l&apos;archivio o immagine</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="228"/>
         <source>Select a destination for your archive or image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona destinazione per l&apos;archivio o immagine</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="233"/>
         <source>Select thumb image:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona immagine icona:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="234"/>
         <source>Select your DVD menu theme</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona tema del menu del DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="235"/>
         <source>Selected Items to be archived</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Elementi selezionati da archiviare</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="236"/>
         <source>Selected Items to be burned</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Elementi selezionati da masterizzare</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="237"/>
         <source>Selected recording item size: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensioni della registrazione selezionata: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="238"/>
         <source>Selected video item size: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensioni del video selezionato: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="239"/>
         <source>Sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Set 13, 2004 11:00 pm (1h 15m)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="240"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostra</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="241"/>
@@ -2005,7 +2006,7 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
     <message>
         <location filename="themestrings.h" line="293"/>
         <source>~</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">~</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="227"/>
@@ -2015,110 +2016,110 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
     <message>
         <location filename="themestrings.h" line="242"/>
         <source>Show Videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostra video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="243"/>
         <source>Show log with archive activities</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostra log attività di archiviazione</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="244"/>
         <source>Show the Archive Log Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostra visualizzatore log dell&apos;archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="245"/>
         <source>Size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensione:</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="246"/>
         <source>Size: %n</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Dimensione: %n</numerusform>
+            <numerusform>Dimensioni: %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="themestrings.h" line="249"/>
         <source>Start Time: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ora inizio: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="250"/>
         <source>Start to</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Inizia a</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="251"/>
         <source>Start to Burn your archive to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Inizia a masterizzare l&apos;archivio su DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="253"/>
         <source>Subtitle: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sottotitolo: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="254"/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Test</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="255"/>
         <source>Test created</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Test creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="256"/>
         <source>Test created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prova il DVD creato</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="257"/>
         <source>Theme description</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Descrizione tema</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="258"/>
         <source>Theme for the DVD menu:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tema del menu del DVD:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="259"/>
         <source>Theme preview:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anteprima tema:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="264"/>
         <source>Title: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Titolo: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="265"/>
         <source>Tools and Utilities for archives</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Strumenti e utilità per gli archivi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="268"/>
         <source>Use archive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Usa archivio</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="269"/>
         <source>Used: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Usato: %1</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="270"/>
         <source>Utilities</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utilità</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="271"/>
         <source>Utilities for MythArchive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utilità per MythArchive</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="273"/>
@@ -2128,70 +2129,70 @@ When the preview image has focus, UP/DOWN changes the seek amount, LEFT/RIGHT ju
     <message>
         <location filename="themestrings.h" line="274"/>
         <source>Video category:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Categoria video:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="275"/>
         <source>Videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="276"/>
         <source>View progress of your archive or image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostra stato di avanzamento dell&apos;archivio o immagine</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="277"/>
         <source>Write video to data dvd or file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scrivi video su dvd o file dati</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="278"/>
         <source>XML File to Import</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File XML da importare</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="279"/>
         <source>decrease seek amount</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">riduci entità ricerca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="281"/>
         <source>frame</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">frame</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="282"/>
         <source>increase seek amount</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">aumenta entità ricerca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="283"/>
         <source>move left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">muovi a sinistra</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="284"/>
         <source>move right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">muovi a destra</translation>
     </message>
     <message numerus="yes">
         <location filename="themestrings.h" line="285"/>
         <source>profile: %n</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>profilo: %n</numerusform>
+            <numerusform>profili: %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="themestrings.h" line="286"/>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation>sett 13, 2004 11:00 pm (1h 15m)</translation>
+        <translation type="unfinished">set 13, 2004 11:00 pm (1h 15m)</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="288"/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">a</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="289"/>
