@@ -448,9 +448,9 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
     {
         LOG(VB_MEDIA, LOG_WARNING,
             (msg + "() - Waiting for mount '%1' to become stable.").arg(mnt));
-        usleep(120000);
+        usleep(std::chrono::microseconds(120000));
         if ( ++attempts > 4 )
-            usleep(200000);
+            usleep(std::chrono::microseconds(200000));
         if ( attempts > 8 )
         {
             delete media;
