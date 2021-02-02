@@ -1089,8 +1089,20 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
 
     // Set the default surface format. Explicitly required on some platforms.
     QSurfaceFormat format;
-    format.setDepthBufferSize(0);
-    format.setStencilBufferSize(0);
+    // Allow overriding the default depth - use with caution as Qt will likely
+    // crash if it cannot find a matching visual.
+    if (qEnvironmentVariableIsSet("MYTHTV_DEPTH"))
+    {
+        // Note: Don't set depth and stencil to give Qt as much flexibility as possible
+        int depth = qBound(6, qEnvironmentVariableIntValue("MYTHTV_DEPTH"), 16);
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying to force depth to '%1'").arg(depth));
+        format.setRedBufferSize(depth);
+    }
+    else
+    {
+        format.setDepthBufferSize(0);
+        format.setStencilBufferSize(0);
+    }
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     format.setProfile(QSurfaceFormat::CompatibilityProfile);
     format.setSwapInterval(SwapInterval);
