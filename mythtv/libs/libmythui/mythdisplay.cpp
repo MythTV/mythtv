@@ -186,7 +186,6 @@ QStringList MythDisplay::GetDescription()
 }
 
 MythDisplay::MythDisplay()
-  : ReferenceCounter("Display")
 {
     m_screen = GetDesiredScreen();
     DebugScreen(m_screen, "Using");
@@ -489,11 +488,9 @@ void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
     if (!qScreen)
         return;
 
-    QRect geom = qScreen->geometry();
-    QString extra = GetExtraScreenInfo(qScreen);
-
+    auto geom = qScreen->geometry();
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 screen '%2' %3")
-        .arg(Message).arg(qScreen->name()).arg(extra));
+        .arg(Message).arg(qScreen->name()).arg(GetExtraScreenInfo(qScreen)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt screen pixel ratio: %1")
         .arg(qScreen->devicePixelRatio(), 2, 'f', 2, '0'));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Geometry: %1x%2+%3+%4 Size(Qt): %5mmx%6mm")

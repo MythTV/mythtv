@@ -8,7 +8,6 @@
 
 // MythTV
 #include "mythuiexp.h"
-#include "referencecounter.h"
 #include "mythdisplaymode.h"
 #include "mythedid.h"
 #include "mythcommandlineparser.h"
@@ -18,7 +17,7 @@
 
 class MythMainWindow;
 
-class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
+class MUI_PUBLIC MythDisplay : public QObject
 {
     Q_OBJECT
 
