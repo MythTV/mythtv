@@ -135,16 +135,42 @@ QString MythJSONSerialiser::Encode(const QString& Value)
     QString value = Value;
     value.replace( '\\', "\\\\" ); // This must be first
     value.replace( '"' , "\\\"" );
-    value.replace( '\b', "\\b"  );
-    value.replace( '\f', "\\f"  );
-    value.replace( '\n', "\\n"  );
-    value.replace( "\r", "\\r"  );
-    value.replace( "\t", "\\t"  );
+    value.replace( '\b', "\\b"  ); // ^H (\u0008)
+    value.replace( '\f', "\\f"  ); // ^L (\u000C)
+    value.replace( '\n', "\\n"  ); // ^J (\u000A)
+    value.replace( "\r", "\\r"  ); // ^M (\u000D)
+    value.replace( "\t", "\\t"  ); // ^I (\u0009)
     value.replace(  "/", "\\/"  );
 
-    // Officially we need to handle \u0000 - \u001F, but only a limited
-    // number are actually used in the wild.
-    value.replace(QChar('\u0011'), "\\u0011"); // XON  ^Q
-    value.replace(QChar('\u0013'), "\\u0013"); // XOFF ^S
+    // Escape remaining chars from \u0000 - \u001F
+    // Details at https://en.wikipedia.org/wiki/C0_and_C1_control_codes
+    value.replace(QChar('\u0000'), "\\u0000"); // ^@ NULL
+    value.replace(QChar('\u0001'), "\\u0001"); // ^A
+    value.replace(QChar('\u0002'), "\\u0002"); // ^B
+    value.replace(QChar('\u0003'), "\\u0003"); // ^C
+    value.replace(QChar('\u0004'), "\\u0004"); // ^D
+    value.replace(QChar('\u0005'), "\\u0005"); // ^E
+    value.replace(QChar('\u0006'), "\\u0006"); // ^F
+    value.replace(QChar('\u0007'), "\\u0007"); // ^G (\a)
+    value.replace(QChar('\u000B'), "\\u000B"); // ^K (\v)
+    value.replace(QChar('\u000E'), "\\u000E"); // ^N
+    value.replace(QChar('\u000F'), "\\u000F"); // ^O
+    value.replace(QChar('\u0010'), "\\u0010"); // ^P
+    value.replace(QChar('\u0011'), "\\u0011"); // ^Q XON
+    value.replace(QChar('\u0012'), "\\u0012"); // ^R
+    value.replace(QChar('\u0013'), "\\u0013"); // ^S XOFF
+    value.replace(QChar('\u0014'), "\\u0014"); // ^T
+    value.replace(QChar('\u0015'), "\\u0015"); // ^U
+    value.replace(QChar('\u0016'), "\\u0016"); // ^V
+    value.replace(QChar('\u0017'), "\\u0017"); // ^W
+    value.replace(QChar('\u0018'), "\\u0018"); // ^X
+    value.replace(QChar('\u0019'), "\\u0019"); // ^Y
+    value.replace(QChar('\u001A'), "\\u001A"); // ^Z
+    value.replace(QChar('\u001B'), "\\u001B");
+    value.replace(QChar('\u001C'), "\\u001C");
+    value.replace(QChar('\u001D'), "\\u001D");
+    value.replace(QChar('\u001E'), "\\u001E");
+    value.replace(QChar('\u001F'), "\\u001F");
+
     return value;
 }
