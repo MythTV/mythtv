@@ -7,15 +7,13 @@
 #include <QMatrix4x4>
 
 // MythTV
+#include "mythcolourspace.h"
 #include "mythframe.h"
 #include "videoouttypes.h"
 #include "referencecounter.h"
 
 // FFmpeg
 #include "libavutil/pixfmt.h" // For AVCOL_xxx defines
-
-using PrimarySpace = std::array<std::array<float,2>,3>;
-using WhiteSpace = std::array<float,2>;
 
 class MythVideoColourSpace : public QObject, public QMatrix4x4, public ReferenceCounter
 {
@@ -49,19 +47,6 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     int           GetRange() const;
     int           GetColourSpace() const;
 
-    struct ColourPrimaries
-    {
-        PrimarySpace primaries;
-        WhiteSpace   whitepoint;
-    };
-
-    static const ColourPrimaries kBT709;
-    static const ColourPrimaries kBT610_525;
-    static const ColourPrimaries kBT610_625;
-    static const ColourPrimaries kBT2020;
-    static bool  Similar(const ColourPrimaries &First, const ColourPrimaries &Second,
-                         float Fuzz);
-
   protected:
     ~MythVideoColourSpace() override;
 
@@ -75,8 +60,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     void  Update(void);
     void  Debug(void);
     QMatrix4x4 GetPrimaryConversion(int Source, int Dest);
-    static ColourPrimaries GetPrimaries(int Primary, float &Gamma);
-    static QMatrix4x4 RGBtoXYZ(const ColourPrimaries& Primaries);
+    static MythColourSpace GetPrimaries(int Primary, float &Gamma);
 
   private:
     PictureAttributeSupported  m_supportedAttributes { kPictureAttributeSupported_None };
@@ -102,7 +86,7 @@ class MythVideoColourSpace : public QObject, public QMatrix4x4, public Reference
     float             m_displayGamma           { 2.2F };
     QMatrix4x4        m_primaryMatrix          { };
     float             m_customDisplayGamma     { 0.0F };
-    ColourPrimaries*  m_customDisplayPrimaries { nullptr };
+    MythColourSpace*  m_customDisplayPrimaries { nullptr };
 };
 
 #endif

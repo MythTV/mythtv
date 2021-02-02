@@ -7,25 +7,15 @@
 
 // MythTV
 #include "mythuiexp.h"
+#include "mythcolourspace.h"
 
 // Std
 #include <utility>
 #include <array>
 
-using PrimarySpace = std::array<std::array<float,2>,3>;
-using WhiteSpace = std::array<float,2>;
-
 class MUI_PUBLIC MythEDID
 {
   public:
-    // This structure matches VideoColourSpace::ColourPrimaries
-    // TODO move ColourPrimaries into MythDisplay
-    struct Primaries
-    {
-        PrimarySpace primaries;
-        WhiteSpace   whitepoint;
-    };
-
     enum HDREOTF
     {
         SDR     = 1 << 0,
@@ -52,7 +42,7 @@ class MUI_PUBLIC MythEDID
     bool        IsHDMI            () const;
     bool        IsSRGB            () const;
     bool        IsLikeSRGB        () const;
-    Primaries   ColourPrimaries   () const;
+    MythColourSpace ColourPrimaries() const;
     int         AudioLatency      (bool Interlaced) const;
     int         VideoLatency      (bool Interlaced) const;
     void        Debug             () const;
@@ -83,7 +73,7 @@ class MUI_PUBLIC MythEDID
     float       m_gamma           { 0.0F }; // Invalid
     bool        m_sRGB            { false };
     bool        m_likeSRGB        { false }; // Temporary until Colourspace handling in libmythui
-    Primaries   m_primaries       { {{{0.0F, 0.0F}, {0.0F, 0.0F}, {0.0F, 0.0F}}}, {0.0F, 0.0F} };
+    MythColourSpace m_primaries   { {{{0.0F}}}, {0.0F} };
     bool        m_isHDMI          { false };
     uint16_t    m_physicalAddress { 0 };
     uint8_t     m_deepColor       { 0 };

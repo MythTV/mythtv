@@ -15,15 +15,6 @@ extern "C" {
 // Std
 #include <cmath>
 
-const MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::kBT709 =
-    {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
-const MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::kBT610_525 =
-    {{{{0.630F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}}, {0.3127F, 0.3290F}};
-const MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::kBT610_625 =
-    {{{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
-const MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::kBT2020 =
-    {{{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}}, {0.3127F, 0.3290F}};
-
 #define LOC QString("ColourSpace: ")
 
 /*! \class MythVideoColourSpace
@@ -38,14 +29,6 @@ const MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::kBT2020 =
  * Levels are expanded to the full RGB colourspace range by default but enabling studio
  * levels will ensure there is no adjustment. In both cases it is assumed the display
  * device is setup appropriately.
- *
- * Each instance may have a parent MythVideoColourSpace. This configuration is used
- * for Picture In Picture support. The master/parent object will receive requests
- * to update the various attributes and will signal changes to the children. Each
- * instance manages its own underlying video colourspace for the stream it is playing.
- * In this way, picture adjustments affect each player in the same way whilst each
- * underlying stream dictates the video colourspace to use. 'Child' instances do
- * not interrogate or update the database settings.
  *
  * \note This class is not complete and will have limitations for certain source material
  * and displays. It currently assumes an 8bit display (and GPU framebuffer) with
@@ -144,7 +127,7 @@ int MythVideoColourSpace::GetPictureAttribute(PictureAttribute Attribute)
 /*! \brief Update the matrix for the current settings and colourspace.
  *
  * The matrix is built from first principles to help with maintainability.
- * This an expensive task but it is only recalculated when a change is detected
+ * This is an expensive task but it is only recalculated when a change is detected
  * or notified.
 */
 void MythVideoColourSpace::Update(void)
@@ -468,10 +451,8 @@ QStringList MythVideoColourSpace::GetColourMappingDefines(void)
         result << "CHROMALEFT";
     }
 
-    if (m_primaryMatrix.isIdentity())
-        return result;
-
-    result << "COLOURMAPPING";
+    if (!m_primaryMatrix.isIdentity())
+        result << "COLOURMAPPING";
     return result;
 }
 
@@ -547,8 +528,8 @@ QMatrix4x4 MythVideoColourSpace::GetPrimaryConversion(int Source, int Dest)
     if (!custom && (source == dest))
         return result;
 
-    ColourPrimaries srcprimaries = GetPrimaries(source, m_colourGamma);
-    ColourPrimaries dstprimaries = GetPrimaries(dest, m_displayGamma);
+    auto srcprimaries = GetPrimaries(source, m_colourGamma);
+    auto dstprimaries = GetPrimaries(dest, m_displayGamma);
     if (custom)
     {
         dstprimaries   = *m_customDisplayPrimaries;
@@ -558,89 +539,26 @@ QMatrix4x4 MythVideoColourSpace::GetPrimaryConversion(int Source, int Dest)
     // If 'exact' is not requested and the primaries and gamma are similar, then
     // ignore. Note: 0.021F should cover any differences between Rec.709/sRGB and Rec.610
     if ((m_primariesMode == PrimariesRelaxed) && qFuzzyCompare(m_colourGamma + 1.0F, m_displayGamma + 1.0F) &&
-        Similar(srcprimaries, dstprimaries, 0.021F))
+        MythColourSpace::Alike(srcprimaries, dstprimaries, 0.021F))
     {
         return result;
     }
 
-    return (RGBtoXYZ(srcprimaries) * RGBtoXYZ(dstprimaries).inverted());
+    return (MythColourSpace::RGBtoXYZ(srcprimaries) *
+            MythColourSpace::RGBtoXYZ(dstprimaries).inverted());
 }
 
-MythVideoColourSpace::ColourPrimaries MythVideoColourSpace::GetPrimaries(int Primary, float &Gamma)
+MythColourSpace MythVideoColourSpace::GetPrimaries(int Primary, float &Gamma)
 {
     auto primary = static_cast<AVColorPrimaries>(Primary);
     Gamma = 2.2F;
     switch (primary)
     {
         case AVCOL_PRI_BT470BG:
-        case AVCOL_PRI_BT470M:    return kBT610_625;
+        case AVCOL_PRI_BT470M:    return MythColourSpace::s_BT610_625;
         case AVCOL_PRI_SMPTE170M:
-        case AVCOL_PRI_SMPTE240M: return kBT610_525;
-        case AVCOL_PRI_BT2020:    Gamma = 2.4F; return kBT2020;
-        default: return kBT709;
+        case AVCOL_PRI_SMPTE240M: return MythColourSpace::s_BT610_525;
+        case AVCOL_PRI_BT2020:    Gamma = 2.4F; return MythColourSpace::s_BT2020;
+        default: return MythColourSpace::s_BT709;
     }
-}
-
-bool MythVideoColourSpace::Similar(const ColourPrimaries &First, const ColourPrimaries &Second, float Fuzz)
-{
-    auto cmp = [=](float One, float Two) { return (abs(One - Two) < Fuzz); };
-    return cmp(First.primaries[0][0], Second.primaries[0][0]) &&
-           cmp(First.primaries[0][1], Second.primaries[0][1]) &&
-           cmp(First.primaries[1][0], Second.primaries[1][0]) &&
-           cmp(First.primaries[1][1], Second.primaries[1][1]) &&
-           cmp(First.primaries[2][0], Second.primaries[2][0]) &&
-           cmp(First.primaries[2][1], Second.primaries[2][1]) &&
-           cmp(First.whitepoint[0],   Second.whitepoint[0])   &&
-           cmp(First.whitepoint[1],   Second.whitepoint[1]);
-}
-
-inline float CalcBy(const PrimarySpace& p, const WhiteSpace w)
-{
-    float val = ((1-w[0])/w[1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1]) -
-    (w[0]/w[1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]);
-    val /= ((1-p[2][0])/p[2][1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1]) -
-    (p[2][0]/p[2][1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]);
-    return val;
-}
-
-inline float CalcGy(const PrimarySpace& p, const WhiteSpace w, const float By)
-{
-    float val = w[0]/w[1] - p[0][0]/p[0][1] - By * (p[2][0]/p[2][1] - p[0][0]/p[0][1]);
-    val /= p[1][0]/p[1][1] - p[0][0]/p[0][1];
-    return val;
-}
-
-inline float CalcRy(const float By, const float Gy)
-{
-    return 1.0F - Gy - By;
-}
-
-/*! \brief Create a conversion matrix for RGB to XYZ with the given primaries
- *
- * This is a joyous mindbender. There are various explanations on the interweb
- * but this is based on the Kodi implementation - with due credit to Team Kodi.
- *
- * \note We use QMatrix4x4 because QMatrix3x3 has no inverted method.
- */
-QMatrix4x4 MythVideoColourSpace::RGBtoXYZ(const ColourPrimaries& Primaries)
-{
-    float By = CalcBy(Primaries.primaries, Primaries.whitepoint);
-    float Gy = CalcGy(Primaries.primaries, Primaries.whitepoint, By);
-    float Ry = CalcRy(By, Gy);
-
-    return {
-        // Row 0
-        Ry * Primaries.primaries[0][0] / Primaries.primaries[0][1],
-        Gy * Primaries.primaries[1][0] / Primaries.primaries[1][1],
-        By * Primaries.primaries[2][0] / Primaries.primaries[2][1],
-        0.0F,
-        // Row 1
-        Ry, Gy, By, 0.0F,
-        // Row 2
-        Ry / Primaries.primaries[0][1] * (1- Primaries.primaries[0][0] - Primaries.primaries[0][1]),
-        Gy / Primaries.primaries[1][1] * (1- Primaries.primaries[1][0] - Primaries.primaries[1][1]),
-        By / Primaries.primaries[2][1] * (1- Primaries.primaries[2][0] - Primaries.primaries[2][1]),
-        0.0F,
-        // Row 3
-        0.0F, 0.0F, 0.0F, 1.0F };
 }

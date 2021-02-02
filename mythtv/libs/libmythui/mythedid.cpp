@@ -81,7 +81,7 @@ bool MythEDID::IsLikeSRGB() const
     return m_likeSRGB;
 }
 
-MythEDID::Primaries MythEDID::ColourPrimaries() const
+MythColourSpace MythEDID::ColourPrimaries() const
 {
     return m_primaries;
 }
@@ -257,40 +257,22 @@ bool MythEDID::ParseBaseBlock(const quint8* Data)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Chromaticity mismatch!");
 
     // Red
-    m_primaries.primaries[0][0] = ((Data[0x1B] << 2) |  (Data[0x19] >> 6)) / 1024.0F;
-    m_primaries.primaries[0][1] = ((Data[0x1C] << 2) | ((Data[0x19] >> 4) & 3)) / 1024.0F;
+    m_primaries.m_primaries[0][0] = ((Data[0x1B] << 2) |  (Data[0x19] >> 6)) / 1024.0F;
+    m_primaries.m_primaries[0][1] = ((Data[0x1C] << 2) | ((Data[0x19] >> 4) & 3)) / 1024.0F;
     // Green
-    m_primaries.primaries[1][0] = ((Data[0x1D] << 2) | ((Data[0x19] >> 2) & 3)) / 1024.0F;
-    m_primaries.primaries[1][1] = ((Data[0x1E] << 2) |  (Data[0x19] & 3)) / 1024.0F;
+    m_primaries.m_primaries[1][0] = ((Data[0x1D] << 2) | ((Data[0x19] >> 2) & 3)) / 1024.0F;
+    m_primaries.m_primaries[1][1] = ((Data[0x1E] << 2) |  (Data[0x19] & 3)) / 1024.0F;
     // Blue
-    m_primaries.primaries[2][0] = ((Data[0x1F] << 2) |  (Data[0x1A] >> 6)) / 1024.0F;
-    m_primaries.primaries[2][1] = ((Data[0x20] << 2) | ((Data[0x1A] >> 4) & 3)) / 1024.0F;
+    m_primaries.m_primaries[2][0] = ((Data[0x1F] << 2) |  (Data[0x1A] >> 6)) / 1024.0F;
+    m_primaries.m_primaries[2][1] = ((Data[0x20] << 2) | ((Data[0x1A] >> 4) & 3)) / 1024.0F;
     // White
-    m_primaries.whitepoint[0]   = ((Data[0x21] << 2) | ((Data[0x1A] >> 2) & 3)) / 1024.0F;
-    m_primaries.whitepoint[1]   = ((Data[0x22] << 2) |  (Data[0x1A] & 3)) / 1024.0F;
+    m_primaries.m_whitePoint[0]   = ((Data[0x21] << 2) | ((Data[0x1A] >> 2) & 3)) / 1024.0F;
+    m_primaries.m_whitePoint[1]   = ((Data[0x22] << 2) |  (Data[0x1A] & 3)) / 1024.0F;
 
     // Check whether this is very similar to sRGB and hence if non-exact colourspace
     // handling is preferred, then just use sRGB.
-    // TODO Move to new MythColourSpace class.
-
-    // As per VideoColourspace.
-    static const Primaries s_sRGBPrim =
-        {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
-
-    auto like = [](const Primaries &First, const Primaries &Second, float Fuzz)
-    {
-        auto cmp = [=](float One, float Two) { return (qAbs(One - Two) < Fuzz); };
-        return cmp(First.primaries[0][0], Second.primaries[0][0]) &&
-               cmp(First.primaries[0][1], Second.primaries[0][1]) &&
-               cmp(First.primaries[1][0], Second.primaries[1][0]) &&
-               cmp(First.primaries[1][1], Second.primaries[1][1]) &&
-               cmp(First.primaries[2][0], Second.primaries[2][0]) &&
-               cmp(First.primaries[2][1], Second.primaries[2][1]) &&
-               cmp(First.whitepoint[0],   Second.whitepoint[0]) &&
-               cmp(First.whitepoint[1],   Second.whitepoint[1]);
-    };
-
-    m_likeSRGB = like(m_primaries, s_sRGBPrim, 0.025F) && qFuzzyCompare(m_gamma + 1.0F, 2.20F + 1.0F);
+    m_likeSRGB = MythColourSpace::Alike(m_primaries, MythColourSpace::s_sRGB, 0.025F) &&
+                 qFuzzyCompare(m_gamma + 1.0F, 2.20F + 1.0F);
 
     // Parse blocks
     for (uint i = 0; i < 5; ++i)
@@ -530,17 +512,17 @@ void MythEDID::Debug() const
             .arg(static_cast<double>(m_gamma)).arg(m_sRGB));
     LOG(VB_GENERAL, LOG_INFO, LOC + "Display chromaticity:-");
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Red:\t%1,\t%2")
-            .arg(static_cast<double>(m_primaries.primaries[0][0]), 0, 'f', 4)
-            .arg(static_cast<double>(m_primaries.primaries[0][1]), 0, 'f', 4));
+            .arg(static_cast<double>(m_primaries.m_primaries[0][0]), 0, 'f', 4)
+            .arg(static_cast<double>(m_primaries.m_primaries[0][1]), 0, 'f', 4));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Green:\t%1,\t%2")
-            .arg(static_cast<double>(m_primaries.primaries[1][0]), 0, 'f', 4)
-            .arg(static_cast<double>(m_primaries.primaries[1][1]), 0, 'f', 4));
+            .arg(static_cast<double>(m_primaries.m_primaries[1][0]), 0, 'f', 4)
+            .arg(static_cast<double>(m_primaries.m_primaries[1][1]), 0, 'f', 4));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Blue:\t%1,\t%2")
-            .arg(static_cast<double>(m_primaries.primaries[2][0]), 0, 'f', 4)
-            .arg(static_cast<double>(m_primaries.primaries[2][1]), 0, 'f', 4));
+            .arg(static_cast<double>(m_primaries.m_primaries[2][0]), 0, 'f', 4)
+            .arg(static_cast<double>(m_primaries.m_primaries[2][1]), 0, 'f', 4));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("White:\t%1,\t%2")
-            .arg(static_cast<double>(m_primaries.whitepoint[0]), 0, 'f', 4)
-            .arg(static_cast<double>(m_primaries.whitepoint[1]), 0, 'f', 4));
+            .arg(static_cast<double>(m_primaries.m_whitePoint[0]), 0, 'f', 4)
+            .arg(static_cast<double>(m_primaries.m_whitePoint[1]), 0, 'f', 4));
     QString address = !m_physicalAddress ? QString("N/A") :
             QString("%1.%2.%3.%4").arg((m_physicalAddress >> 12) & 0xF)
                                   .arg((m_physicalAddress >> 8) & 0xF)
