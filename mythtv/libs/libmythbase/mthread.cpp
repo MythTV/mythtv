@@ -303,7 +303,15 @@ void MThread::quit(void)
 bool MThread::wait(std::chrono::milliseconds time)
 {
     if (m_thread->isRunning())
-        return m_thread->wait(time.count());
+    {
+        if (time == std::chrono::milliseconds::max())
+            return m_thread->wait(ULONG_MAX); // Magic number in recent Qt5.
+        if (time >= 0ms)
+            return m_thread->wait(time.count());
+        LOG(VB_GENERAL, LOG_CRIT,
+            QString("'%1': MThread::wait called for %1 ms!").arg(time.count()));
+        return m_thread->wait(1);
+    }
     return true;
 }
 
