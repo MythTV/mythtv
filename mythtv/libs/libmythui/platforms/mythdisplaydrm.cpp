@@ -81,6 +81,13 @@ bool MythDisplayDRM::IsPlanar()
 #endif
 }
 
+void MythDisplayDRM::InitHDR()
+{
+    MythDisplay::InitHDR();
+    if (m_hdrState.get() && m_device.get() && m_device->Atomic() && m_device->Authenticated())
+        m_hdrState->m_controllable = true;
+}
+
 bool MythDisplayDRM::UsingVideoModes()
 {
     if (gCoreContext && m_device.get() && m_device->CanSwitchModes())

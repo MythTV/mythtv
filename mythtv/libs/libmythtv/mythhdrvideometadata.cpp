@@ -1,5 +1,5 @@
 // MythTV
-#include "mythhdrmetadata.h"
+#include "mythhdrvideometadata.h"
 #include "mythframe.h"
 
 // Std
@@ -12,7 +12,7 @@ extern "C" {
 
 #define UINT16(X) static_cast<uint16_t>(std::round(X))
 
-/*! \class MythHDRMetadata
+/*! \class MythHDRVideoMetadata
  *  \brief A wrapper around static HDR metadata.
  *
  * This class acts as an intermediate format between FFmpeg's HDR metadata
@@ -23,8 +23,13 @@ extern "C" {
  * \note The linux kernel structures are aligned with the structures defined
  * in the HDMI standards (e.g. CTA-861-G).
 */
-void MythHDRMetadata::Update(const AVMasteringDisplayMetadata* Display,
-                             const AVContentLightMetadata* Light)
+MythHDRVideoMetadata::MythHDRVideoMetadata(const MythHDRVideoMetadata& Other)
+  : MythHDRMetadata(Other)
+{
+}
+
+void MythHDRVideoMetadata::Update(const AVMasteringDisplayMetadata* Display,
+                                  const AVContentLightMetadata* Light)
 {
     bool luminance = Display && Display->has_luminance;
     bool primaries = Display && Display->has_primaries;
@@ -43,7 +48,7 @@ void MythHDRMetadata::Update(const AVMasteringDisplayMetadata* Display,
 
 /*! \brief Create, update or destroy HDR metadata for the given MythVideoFrame.
 */
-void MythHDRMetadata::Populate(MythVideoFrame *Frame, AVFrame *AvFrame)
+void MythHDRVideoMetadata::Populate(MythVideoFrame* Frame, AVFrame* AvFrame)
 {
     if (!Frame)
         return;
@@ -57,27 +62,10 @@ void MythHDRMetadata::Populate(MythVideoFrame *Frame, AVFrame *AvFrame)
         if (ddata || cdata)
         {
             if (!Frame->m_hdrMetadata.get())
-                Frame->m_hdrMetadata = std::make_shared<MythHDRMetadata>();
+                Frame->m_hdrMetadata = std::make_shared<MythHDRVideoMetadata>();
             Frame->m_hdrMetadata->Update(ddata, cdata);
             return;
         }
     }
     Frame->m_hdrMetadata = nullptr;
-}
-
-bool MythHDRMetadata::Equals(MythHDRMetadata* Other)
-{
-    return Other &&
-           m_maxMasteringLuminance     == Other->m_maxMasteringLuminance     &&
-           m_minMasteringLuminance     == Other->m_minMasteringLuminance     &&
-           m_maxContentLightLevel      == Other->m_maxContentLightLevel      &&
-           m_maxFrameAverageLightLevel == Other->m_maxFrameAverageLightLevel &&
-           m_whitePoint[0]             == Other->m_whitePoint[0]             &&
-           m_whitePoint[1]             == Other->m_whitePoint[1]             &&
-           m_displayPrimaries[0][0]    == Other->m_displayPrimaries[0][0]    &&
-           m_displayPrimaries[0][1]    == Other->m_displayPrimaries[0][1]    &&
-           m_displayPrimaries[1][0]    == Other->m_displayPrimaries[1][0]    &&
-           m_displayPrimaries[1][1]    == Other->m_displayPrimaries[1][1]    &&
-           m_displayPrimaries[2][0]    == Other->m_displayPrimaries[2][0]    &&
-           m_displayPrimaries[2][1]    == Other->m_displayPrimaries[2][1];
 }

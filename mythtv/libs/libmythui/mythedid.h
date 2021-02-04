@@ -7,6 +7,7 @@
 
 // MythTV
 #include "mythuiexp.h"
+#include "mythhdr.h"
 #include "mythcolourspace.h"
 
 // Std
@@ -16,19 +17,6 @@
 class MUI_PUBLIC MythEDID
 {
   public:
-    enum HDREOTF
-    {
-        SDR     = 1 << 0,
-        HDRTrad = 1 << 1,
-        HDR10   = 1 << 2,
-        HLG     = 1 << 3
-    };
-
-    enum HDRMetadaType
-    {
-        Static1 = 1 << 0
-    };
-
     MythEDID() = default;
     explicit MythEDID(QByteArray  Data);
     MythEDID(const char* Data, int Length);
@@ -46,11 +34,23 @@ class MUI_PUBLIC MythEDID
     int         AudioLatency      (bool Interlaced) const;
     int         VideoLatency      (bool Interlaced) const;
     void        Debug             () const;
-    std::pair<int,int> GetHDRSupport() const;
-    static QString EOTFToString   (int EOTF);
-    static QStringList EOTFToStrings(int EOTF);
+    MythHDRPtr  GetHDRSupport     () const;
 
   private:
+    enum HDREOTF
+    {
+        SDR     = 1 << 0,
+        HDRTrad = 1 << 1,
+        HDR10   = 1 << 2,
+        HLG     = 1 << 3
+    };
+
+    enum HDRMetadaType
+    {
+        Unknown = 0,
+        Static1 = 1 << 0
+    };
+
     void        Parse             ();
     bool        ParseBaseBlock    (const quint8* Data);
     void        ParseDisplayDescriptor(const quint8* Data, uint Offset);
@@ -84,7 +84,7 @@ class MUI_PUBLIC MythEDID
     uint8_t     m_deepYUV         { 0 };
     int         m_vrrMin          { 0 };
     int         m_vrrMax          { 0 };
-    int         m_hdrSupport      { 0 };
+    MythHDR::HDRTypes m_hdrSupport { MythHDR::SDR };
     int         m_hdrMetaTypes    { 0 };
     double      m_maxLuminance    { 0.0 };
     double      m_maxAvgLuminance { 0.0 };

@@ -49,6 +49,7 @@ HEADERS += mythuianimation.h mythuiscrollbar.h
 HEADERS += mythnotificationcenter.h mythnotificationcenter_private.h
 HEADERS += mythuicomposite.h mythnotification.h
 HEADERS += mythedid.h
+HEADERS += mythhdr.h
 HEADERS += mythcolourspace.h
 HEADERS += devices/mythinputdevicehandler.h
 
@@ -81,6 +82,7 @@ SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
 SOURCES += mythnotificationcenter.cpp mythnotification.cpp
 SOURCES += mythuicomposite.cpp
 SOURCES += mythedid.cpp
+SOURCES += mythhdr.cpp
 SOURCES += mythcolourspace.cpp
 SOURCES += devices/mythinputdevicehandler.cpp
 

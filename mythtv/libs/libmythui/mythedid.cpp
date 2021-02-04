@@ -96,28 +96,15 @@ int MythEDID::VideoLatency(bool Interlaced) const
     return m_videoLatency[Interlaced ? 1 : 0];
 }
 
-std::pair<int,int> MythEDID::GetHDRSupport() const
+MythHDRPtr MythEDID::GetHDRSupport() const
 {
-    return { m_hdrSupport, m_hdrMetaTypes };
-}
-
-QString MythEDID::EOTFToString(int EOTF)
-{
-    if (EOTF & SDR)     return QObject::tr("SDR");
-    if (EOTF & HDRTrad) return QObject::tr("HDR(Trad)");
-    if (EOTF & HDR10)   return QObject::tr("HDR10 (SMPTE ST2084)");
-    if (EOTF & HLG)     return QObject::tr("Hybrid Log-Gamma");
-    return QObject::tr("Unknown");
-}
-
-QStringList MythEDID::EOTFToStrings(int EOTF)
-{
-    QStringList res;
-    if (EOTF & SDR)     res << EOTFToString(SDR);
-    if (EOTF & HDRTrad) res << EOTFToString(HDRTrad);
-    if (EOTF & HDR10)   res << EOTFToString(HDR10);
-    if (EOTF & HLG)     res << EOTFToString(HLG);
-    return res;
+    auto result = MythHDR::Create();
+    result->m_supportedTypes  = m_hdrSupport;
+    result->m_minLuminance    = m_minLuminance;
+    result->m_maxAvgLuminance = m_maxAvgLuminance;
+    result->m_maxLuminance    = m_maxLuminance;
+    result->m_metadataType    = static_cast<MythHDR::HDRMeta>(m_hdrMetaTypes);
+    return result;
 }
 
 // from QEdidParser
@@ -463,7 +450,11 @@ bool MythEDID::ParseExtended(const quint8* Data, uint Offset, uint Length)
     {
         if (Length >= 3 && (Offset + 3 < m_size))
         {
-            m_hdrSupport = Data[Offset + 1] & 0x3f;
+            int hdrsupport = Data[Offset + 1] & 0x3f;
+            if (hdrsupport & HDR10)
+                m_hdrSupport |= MythHDR::HDR10;
+            if (hdrsupport & HLG)
+                m_hdrSupport |= MythHDR::HLG;
             m_hdrMetaTypes = Data[Offset + 2] & 0xff;
         }
 
@@ -546,7 +537,7 @@ void MythEDID::Debug() const
     if (m_vrrMin || m_vrrMax)
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("VRR: %1<->%2").arg(m_vrrMin).arg(m_vrrMax));
     if (m_hdrSupport)
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("HDR types: %1").arg(EOTFToStrings(m_hdrSupport).join(",")));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("HDR types: %1").arg(MythHDR::TypesToString(m_hdrSupport).join(",")));
     if (m_maxLuminance > 0.0 || m_maxAvgLuminance > 0.0)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Desired luminance: Min: %1 Max: %2 Avg: %3")

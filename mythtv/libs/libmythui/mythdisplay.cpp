@@ -174,13 +174,13 @@ QStringList MythDisplay::GetDescription()
         }
     }
 
-    if (m_edid.Valid())
+    if (m_hdrState.get())
     {
-        auto [types, dummy] = m_edid.GetHDRSupport();
-        auto hdr = MythEDID::EOTFToStrings(types);
-        if (hdr.empty())
-            hdr.append(tr("None"));
+        auto types = m_hdrState->m_supportedTypes;
+        auto hdr = m_hdrState->TypesToString();
         result.append(tr("Supported HDR formats\t: %1").arg(hdr.join(",")));
+        if (types && !m_hdrState->m_controllable)
+            result.append(tr("HDR mode switching is not available"));
     }
     return result;
 }
@@ -528,13 +528,7 @@ void MythDisplay::Initialise()
             else
                 LOG(VB_GENERAL, LOG_NOTICE, LOC + "Display has custom colourspace");
 
-            auto [types, metadata] = m_edid.GetHDRSupport();
-            auto hdr = MythEDID::EOTFToStrings(types);
-            if (hdr.empty())
-                hdr.append("None");
-            else if ((metadata & MythEDID::Static1) != MythEDID::Static1)
-                LOG(VB_GENERAL, LOG_WARNING, LOC + "Display does not report support for Static Metadata Type 1");
-            LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Supported HDR formats: %1").arg(hdr.join(",")));
+            InitHDR();
         }
     }
 
@@ -881,6 +875,26 @@ double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
 MythEDID& MythDisplay::GetEDID()
 {
     return m_edid;
+}
+
+MythHDRPtr MythDisplay::GetHDRState()
+{
+    return m_hdrState;
+}
+
+void MythDisplay::InitHDR()
+{
+    if (m_edid.Valid())
+    {
+        m_hdrState = m_edid.GetHDRSupport();
+        auto hdr = m_hdrState->TypesToString();
+        if (m_hdrState->m_metadataType != MythHDR::StaticType1 &&
+            m_hdrState->m_supportedTypes > MythHDR::SDR)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Display does not report support for Static Metadata Type 1");
+        }
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Supported HDR formats: %1").arg(hdr.join(",")));
+    }
 }
 
 /*! \brief Estimate the overall display aspect ratio for multi screen setups.

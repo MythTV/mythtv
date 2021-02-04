@@ -6,7 +6,7 @@
 
 #define LOC QString("HDRDrm: ")
 
-HDRTracker MythHDRTrackerDRM::Create(MythDisplay* _Display, int HDRSupport)
+HDRTracker MythHDRTrackerDRM::Create(MythDisplay* _Display)
 {
     auto * display = dynamic_cast<MythDisplayDRM*>(_Display);
     if (!display)
@@ -21,21 +21,21 @@ HDRTracker MythHDRTrackerDRM::Create(MythDisplay* _Display, int HDRSupport)
 
     if (auto connector = device->GetConnector(); connector.get())
         if (auto hdrprop = MythDRMProperty::GetProperty("HDR_OUTPUT_METADATA", connector->m_properties); hdrprop.get())
-            return std::shared_ptr<MythHDRTracker>(new MythHDRTrackerDRM(device, connector, hdrprop, HDRSupport));
+            return std::shared_ptr<MythHDRTracker>(new MythHDRTrackerDRM(display, hdrprop));
 
     return nullptr;
 }
 
-MythHDRTrackerDRM::MythHDRTrackerDRM(MythDRMPtr Device, DRMConn Connector, DRMProp HDRProp, int HDRSupport)
-  : MythHDRTracker(HDRSupport),
-    m_device(Device),
-    m_connector(Connector),
-    m_hdrProp(HDRProp)
+MythHDRTrackerDRM::MythHDRTrackerDRM(MythDisplayDRM* DRMDisplay, DRMProp HDRProp)
+  : MythHDRTracker(DRMDisplay->GetHDRState()),
+    m_device(DRMDisplay->GetDevice()),
+    m_connector(DRMDisplay->GetDevice()->GetConnector()),
+    m_hdrProp(HDRProp),
+    m_crtc(DRMDisplay->GetDevice()->GetCrtc())
 {
-    m_crtc = m_device->GetCrtc();
     m_activeProp = MythDRMProperty::GetProperty("ACTIVE", m_crtc->m_properties);
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Tracking HDR signalling for: %1")
-        .arg(MythEDID::EOTFToStrings(m_hdrSupport).join(",")));
+        .arg(m_hdrSupport->TypesToString().join(",")));
 }
 
 MythHDRTrackerDRM::~MythHDRTrackerDRM()
@@ -53,6 +53,7 @@ void MythHDRTrackerDRM::Reset()
         LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling HDR");
         drmModeDestroyPropertyBlob(m_device->GetFD(), m_hdrBlob);
         m_hdrBlob = 0;
+        m_hdrSupport->m_currentType = MythHDR::SDR;
     }
 }
 
@@ -62,7 +63,7 @@ void MythHDRTrackerDRM::Update(MythVideoFrame* Frame)
         return;
 
     // Do we have an HDR EOTF that is supported by the display and HDR Metadata blob support
-    if (auto eotf = MythVideoDRMUtils::FFmpegTransferToEOTF(Frame->m_colortransfer, m_hdrSupport);
+    if (auto eotf = MythVideoDRMUtils::FFmpegTransferToEOTF(Frame->m_colortransfer, m_hdrSupport->m_supportedTypes);
         eotf >= HDMI_EOTF_SMPTE_ST2084)
     {
         bool needhdrblob = false;
@@ -84,7 +85,8 @@ void MythHDRTrackerDRM::Update(MythVideoFrame* Frame)
             {
                 needhdrblob = true;
                 m_ffmpegMetadata = Frame->m_hdrMetadata.get() ?
-                    Frame->m_hdrMetadata : std::make_shared<MythHDRMetadata>();
+                    std::make_shared<MythHDRVideoMetadata>(*(Frame->m_hdrMetadata.get())) :
+                    std::make_shared<MythHDRVideoMetadata>();
                 m_drmMetadata = MythVideoDRMUtils::s_defaultMetadata;
                 m_drmMetadata.hdmi_metadata_type1.eotf = eotf;
                 m_drmMetadata.hdmi_metadata_type1.max_display_mastering_luminance = m_ffmpegMetadata->m_maxMasteringLuminance;
@@ -113,6 +115,7 @@ void MythHDRTrackerDRM::Update(MythVideoFrame* Frame)
                 m_device->QueueAtomics({{ m_connector->m_id, m_hdrProp->m_id, m_hdrBlob }});
                 if (m_crtc.get() && m_activeProp.get())
                     m_device->QueueAtomics({{ m_crtc->m_id, m_activeProp->m_id, 1 }});
+                m_hdrSupport->m_currentType = eotf == HDMI_EOTF_BT_2100_HLG ? MythHDR::HLG : MythHDR::HDR10;
             }
             else
             {

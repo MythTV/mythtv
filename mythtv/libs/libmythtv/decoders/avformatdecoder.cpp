@@ -57,7 +57,7 @@ extern "C" {
 #include "DVD/mythdvdbuffer.h"
 #include "Bluray/mythbdbuffer.h"
 #include "mythavutil.h"
-#include "mythhdrmetadata.h"
+#include "mythhdrvideometadata.h"
 
 #include "lcddevice.h"
 
@@ -3753,7 +3753,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     frame->m_interlacedReverse   = false;
 
     // Retrieve HDR metadata
-    MythHDRMetadata::Populate(frame, AvFrame);
+    MythHDRVideoMetadata::Populate(frame, AvFrame);
 
     m_parent->ReleaseNextVideoFrame(frame, std::chrono::milliseconds(temppts));
     m_mythCodecCtx->PostProcessFrame(context, frame);

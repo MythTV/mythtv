@@ -158,7 +158,7 @@ HEADERS += metadataimagehelper.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
 HEADERS += driveroption.h
-HEADERS += mythhdrmetadata.h
+HEADERS += mythhdrvideometadata.h
 HEADERS += mythhdrtracker.h
 
 SOURCES += recordinginfo.cpp
@@ -196,7 +196,7 @@ SOURCES += metadataimagehelper.cpp
 SOURCES += mythframe.cpp
 SOURCES += mythavutil.cpp
 SOURCES += recordingfile.cpp
-SOURCES += mythhdrmetadata.cpp
+SOURCES += mythhdrvideometadata.cpp
 SOURCES += mythhdrtracker.cpp
 
 # DiSEqC

@@ -71,15 +71,15 @@ uint64_t MythVideoDRMUtils::FFmpegColorEncodingToDRM(DRMProp Property, int Encod
     return result;
 }
 
-uint8_t MythVideoDRMUtils::FFmpegTransferToEOTF(int Transfer, int Supported)
+uint8_t MythVideoDRMUtils::FFmpegTransferToEOTF(int Transfer, MythHDR::HDRTypes Supported)
 {
     switch (Transfer)
     {
         case AVCOL_TRC_SMPTE2084:
-            return (Supported & MythEDID::HDR10) ? HDMI_EOTF_SMPTE_ST2084 : HDMI_EOTF_TRADITIONAL_GAMMA_SDR;
+            return (Supported & MythHDR::HDR10) ? HDMI_EOTF_SMPTE_ST2084 : HDMI_EOTF_TRADITIONAL_GAMMA_SDR;
         case AVCOL_TRC_BT2020_10:
         case AVCOL_TRC_ARIB_STD_B67:
-            return (Supported & MythEDID::HLG) ? HDMI_EOTF_BT_2100_HLG : HDMI_EOTF_TRADITIONAL_GAMMA_SDR;
+            return (Supported & MythHDR::HLG) ? HDMI_EOTF_BT_2100_HLG : HDMI_EOTF_TRADITIONAL_GAMMA_SDR;
         default: break;
     }
     return HDMI_EOTF_TRADITIONAL_GAMMA_SDR;

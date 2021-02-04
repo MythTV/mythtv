@@ -3,6 +3,7 @@
 
 // MythTV
 #include "config.h"
+#include "mythhdr.h"
 #include "platforms/drm/mythdrmproperty.h"
 
 // libdrm
@@ -52,7 +53,7 @@ class MythVideoDRMUtils
   public:
     static uint64_t FFmpegColorRangeToDRM    (DRMProp Property, int Range);
     static uint64_t FFmpegColorEncodingToDRM (DRMProp Property, int Encoding);
-    static uint8_t  FFmpegTransferToEOTF     (int Transfer, int Supported);
+    static uint8_t  FFmpegTransferToEOTF     (int Transfer, MythHDR::HDRTypes Supported);
     static inline hdr_output_metadata s_defaultMetadata =
     {
         HDMI_STATIC_METADATA_TYPE1, { 0, HDMI_STATIC_METADATA_TYPE1, {{0,0}}, {0,0}, 0, 0, 0, 0}

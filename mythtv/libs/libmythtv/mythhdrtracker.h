@@ -2,7 +2,7 @@
 #define MYTHHDRTRACKER_H
 
 // MythTV
-#include "mythhdrmetadata.h"
+#include "mythhdrvideometadata.h"
 
 // Std
 #include <memory>
@@ -17,11 +17,11 @@ class MythHDRTracker
     virtual void Reset() = 0;
 
   protected:
-    explicit MythHDRTracker(int HDRSupport);
+    explicit MythHDRTracker(MythHDRPtr HDR);
     virtual ~MythHDRTracker() = default;
 
-    MythHDRPtr m_ffmpegMetadata { nullptr };
-    int        m_hdrSupport     { 0 };
+    MythHDRVideoPtr m_ffmpegMetadata { nullptr };
+    MythHDRPtr      m_hdrSupport     { nullptr };
 };
 
 #endif

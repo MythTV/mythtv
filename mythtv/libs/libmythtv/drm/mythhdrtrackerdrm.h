@@ -12,13 +12,13 @@ using DRMMeta = hdr_output_metadata;
 class MythHDRTrackerDRM : public MythHDRTracker
 {
   public:
-    static HDRTracker Create(MythDisplay* _Display, int HDRSupport);
+    static HDRTracker Create(MythDisplay* _Display);
    ~MythHDRTrackerDRM() override;
     void Update(MythVideoFrame* Frame) override;
     void Reset() override;
 
   protected:
-    MythHDRTrackerDRM(MythDRMPtr Device, DRMConn Connector, DRMProp HDRProp, int HDRSupport);
+    MythHDRTrackerDRM(class MythDisplayDRM* DRMDisplay, DRMProp HDRProp);
 
     MythDRMPtr m_device     { nullptr };
     DRMConn    m_connector  { nullptr };

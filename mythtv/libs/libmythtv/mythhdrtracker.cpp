@@ -12,27 +12,25 @@ HDRTracker MythHDRTracker::Create(MythDisplay* _Display)
     if (!_Display)
         return nullptr;
 
-    // Check the EDID for HDR support first
-    const auto & edid = _Display->GetEDID();
-    if (!edid.Valid())
+    // Check for HDR support
+    auto hdr = _Display->GetHDRState();
+    if (!hdr.get())
         return nullptr;
 
-    auto [types, metadata] = edid.GetHDRSupport();
-
     // We only support HDR10 and HLG
-    if (types < MythEDID::HDR10)
+    if (!hdr->m_supportedTypes)
     {
         LOG(VB_PLAYBACK, LOG_INFO, "No HDR support detected for this display");
         return nullptr;
     }
 
     // We only know how to deal with HDR Static Metablock Type 1 (which is the only type)
-    if ((metadata & MythEDID::Static1) != MythEDID::Static1)
+    if (hdr->m_metadataType != MythHDR::StaticType1)
         return nullptr;
 
     HDRTracker result = nullptr;
 #ifdef USING_DRM_VIDEO
-    result = MythHDRTrackerDRM::Create(_Display, types);
+    result = MythHDRTrackerDRM::Create(_Display);
 #endif
 
     if (!result.get())
@@ -40,8 +38,8 @@ HDRTracker MythHDRTracker::Create(MythDisplay* _Display)
     return result;
 }
 
-MythHDRTracker::MythHDRTracker(int HDRSupport)
-  : m_hdrSupport(HDRSupport)
+MythHDRTracker::MythHDRTracker(MythHDRPtr HDR)
+  : m_hdrSupport(HDR)
 {
 }
 
