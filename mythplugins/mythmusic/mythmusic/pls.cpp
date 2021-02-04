@@ -51,14 +51,37 @@ int PlayListFile::parse(PlayListFile *pls, const QString &filename)
 
 int PlayListFile::parsePLS(PlayListFile *pls, const QString &filename)
 {
+    LOG(VB_FILE, LOG_DEBUG, QString("DecoderHandler: parsePLS - '%1'").arg(filename));
+
     QSettings settings(filename, QSettings::IniFormat);
-    settings.beginGroup("playlist");
 
-    int num_entries = settings.value("numberofentries", -1).toInt();
+    // we allow both 'playlist' and 'Playlist' for the group name
+    QStringList groups = settings.childGroups();
 
-    // Some pls files have "numberofentries", some has "NumberOfEntries".
-    if (num_entries == -1)
+    if (groups.contains("playlist"))
+        settings.beginGroup("playlist");
+    else if (groups.contains("Playlist"))
+        settings.beginGroup("Playlist");
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("DecoderHandler: parsePLS - playlist group not found"));
+        return 0;
+    }
+
+    int num_entries = -1;
+
+    // Some pls files have "numberofentries", some have "NumberOfEntries".
+    QStringList keys = settings.childKeys();
+
+    if (keys.contains("numberofentries"))
+        num_entries = settings.value("numberofentries", -1).toInt();
+    else if (keys.contains("NumberOfEntries"))
         num_entries = settings.value("NumberOfEntries", -1).toInt();
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("DecoderHandler: parsePLS - NumberOfEntries key not found"));
+        return 0;
+    }
 
     for (int n = 1; n <= num_entries; n++)
     {
