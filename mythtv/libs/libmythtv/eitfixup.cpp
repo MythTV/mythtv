@@ -125,16 +125,16 @@ EITFixUp::EITFixUp()
       m_dishDescriptionPremiere2(R"(\s*(Premier|Premiere)\.\s*)"),
       m_dishPPVCode(R"(\s*\(([A-Z]|[0-9]){5}\)\s*$)"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
-                      "(?:\\sfr\xE5n\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
+                      "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
-      m_comHemActor("[Ss]k\xE5""despelare|[Ii] rollerna"),
+      m_comHemActor("[Ss]kådespelare|[Ii] rollerna"),
       m_comHemHost("[Pp]rogramledare"),
       m_comHemSub("[.\\?\\!] "),
-      m_comHemRerun1("[Rr]epris\\sfr\xE5n\\s([^\\.]+)(?:\\.|$)"),
+      m_comHemRerun1("[Rr]epris\\sfrån\\s([^\\.]+)(?:\\.|$)"),
       m_comHemRerun2("([0-9]+)/([0-9]+)(?:\\s-\\s([0-9]{4}))?"),
       m_comHemTT("[Tt]ext-[Tt][Vv]"),
       m_comHemPersSeparator("(, |\\soch\\s)"),
-      m_comHemPersons("\\s?([Rr]egi|[Ss]k\xE5""despelare|[Pp]rogramledare|"
+      m_comHemPersons("\\s?([Rr]egi|[Ss]kådespelare|[Pp]rogramledare|"
                       "[Ii] rollerna):\\s([^\\.]+)\\."),
       m_comHemSubEnd(R"(\s?\.\s?$)"),
       m_comHemSeries1("\\s?(?:[dD]el|[eE]pisode)\\s([0-9]+)"
@@ -195,8 +195,8 @@ EITFixUp::EITFixUp()
       m_dkPart("\\(([0-9]+):([0-9]+)\\)"),
       m_dkSubtitle1("^([^:]+): (.+)"),
       m_dkSubtitle2("^([^:]+) - (.+)"),
-      m_dkSeason1("S\xE6son ([0-9]+)\\."),
-      m_dkSeason2("- \xE5r ([0-9]+)(?: :)"),
+      m_dkSeason1("Sæson ([0-9]+)\\."),
+      m_dkSeason2("- år ([0-9]+)(?: :)"),
       m_dkFeatures("Features:(.+)"),
       m_dkWidescreen(" 16:9"),
       m_dkDolby(" 5:1"),
@@ -2540,7 +2540,7 @@ void EITFixUp::FixDK(DBEventEIT &event) const
             event.m_episode = episode;
             event.m_syndicatedepisodenumber =
                     QString("S%1E%2").arg(season).arg(episode);
-            event.m_subtitle = QString("%1 S\xE6son %2").arg(event.m_subtitle).
+            event.m_subtitle = QString("%1 Sæson %2").arg(event.m_subtitle).
                     arg(season);
         }
         event.m_subtitle = QString("%1)").arg(event.m_subtitle);
