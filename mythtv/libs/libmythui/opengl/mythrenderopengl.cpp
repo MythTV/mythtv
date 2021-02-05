@@ -412,7 +412,7 @@ void MythRenderOpenGL::DebugFeatures(void)
         if (m_extraFeatures & kGLComputeShaders)
             shaders << "Compute";
     }
-    const auto module = QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL ? "OpenGL (not ES)" : "OpenGL ES";
+    const QString module = QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL ? "OpenGL (not ES)" : "OpenGL ES";
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
