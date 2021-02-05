@@ -39,7 +39,7 @@ HDRTracker MythHDRTracker::Create(MythDisplay* _Display)
 }
 
 MythHDRTracker::MythHDRTracker(MythHDRPtr HDR)
-  : m_hdrSupport(HDR)
+  : m_hdrSupport(std::move(HDR))
 {
 }
 
