@@ -22,7 +22,7 @@ const int kBufferMilliSecs = 500;
 /*
  * Audio data buffer
  */
-class AudioOutputGraph::Buffer : protected QByteArray
+class AudioOutputGraph::Buffer : public QByteArray
 {
 public:
     Buffer() = default;
@@ -268,7 +268,7 @@ MythImage *AudioOutputGraph::GetImage(int64_t timecode) const
         .arg(timecode).arg(avail.first).arg(avail.second)
         .arg(m_buffer->First()).arg(m_buffer->Next()) );
 
-    const int width = m_buffer->Samples(avail);
+    int width = m_buffer->Samples(avail);
     if (width <= 0)
         return nullptr;
 
@@ -278,13 +278,22 @@ MythImage *AudioOutputGraph::GetImage(int64_t timecode) const
     if (height <= 0)
         return nullptr;
 
-    QImage image(width, height, QImage::Format_ARGB32);
-    image.fill(0);
-
     const int channels = m_buffer->Channels();
 
     // Assume signed 16 bit/sample
-    const int16_t *p = m_buffer->Data16(avail);
+    const auto * p   = m_buffer->Data16(avail);
+    const auto * max = reinterpret_cast<const int16_t*>(m_buffer->constData() + m_buffer->size());
+    if (p >= max)
+        return nullptr;
+
+    if ((p + (channels * width)) >= max)
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC + " Buffer overflow. Clipping samples.");
+        width = static_cast<int>(max - p) / channels;
+    }
+
+    QImage image(width, height, QImage::Format_ARGB32);
+    image.fill(0);
 
     for (int x = 0; x < width; ++x)
     {
