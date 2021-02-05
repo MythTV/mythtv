@@ -2047,6 +2047,33 @@ void EITFixUp::FixPremiere(DBEventEIT &event)
     }
 }
 
+/*
+ * Mapping table from English category names to Dutch names and types
+ */
+struct NLMapResult {
+    QString name;
+    ProgramInfo::CategoryType type {ProgramInfo::kCategoryNone};
+};
+QMap<QString, NLMapResult> categoryTrans = {
+    { "Documentary",                { "Documentaire",         ProgramInfo::kCategoryNone   } },
+    { "News",                       { "Nieuws/actualiteiten", ProgramInfo::kCategoryNone   } },
+    { "Kids",                       { "Jeugd",                ProgramInfo::kCategoryNone   } },
+    { "Show/game Show",             { "Amusement",            ProgramInfo::kCategoryTVShow } },
+    { "Music/Ballet/Dance",         { "Muziek",               ProgramInfo::kCategoryNone   } },
+    { "News magazine",              { "Informatief",          ProgramInfo::kCategoryNone   } },
+    { "Movie",                      { "Film",                 ProgramInfo::kCategoryMovie  } },
+    { "Nature/animals/Environment", { "Natuur",               ProgramInfo::kCategoryNone   } },
+    { "Movie - Adult",              { "Erotiek",              ProgramInfo::kCategoryNone   } },
+    { "Movie - Soap/melodrama/folkloric",
+                                    { "Serie/soap",           ProgramInfo::kCategorySeries } },
+    { "Arts/Culture",               { "Kunst/Cultuur",        ProgramInfo::kCategoryNone   } },
+    { "Sports",                     { "Sport",                ProgramInfo::kCategorySports } },
+    { "Cartoons/Puppets",           { "Animatie",             ProgramInfo::kCategoryNone   } },
+    { "Movie - Comedy",             { "Comedy",               ProgramInfo::kCategorySeries } },
+    { "Movie - Detective/Thriller", { "Misdaad",              ProgramInfo::kCategoryNone   } },
+    { "Social/Spiritual Sciences",  { "Religieus",            ProgramInfo::kCategoryNone   } },
+};
+
 /** \fn EITFixUp::FixNL(DBEventEIT&) const
  *  \brief Use this to standardize \@Home DVB-C guide in the Netherlands.
  */
@@ -2060,85 +2087,11 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     // Convert categories to Dutch categories Myth knows.
     // nog invoegen: comedy, sport, misdaad
 
-    if (event.m_category == "Documentary")
+    if (categoryTrans.contains(event.m_category))
     {
-        event.m_category = "Documentaire";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "News")
-    {
-        event.m_category = "Nieuws/actualiteiten";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "Kids")
-    {
-        event.m_category = "Jeugd";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "Show/game Show")
-    {
-        event.m_category = "Amusement";
-        event.m_categoryType = ProgramInfo::kCategoryTVShow;
-    }
-    if (event.m_category == "Music/Ballet/Dance")
-    {
-        event.m_category = "Muziek";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "News magazine")
-    {
-        event.m_category = "Informatief";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "Movie")
-    {
-        event.m_category = "Film";
-        event.m_categoryType = ProgramInfo::kCategoryMovie;
-    }
-    if (event.m_category == "Nature/animals/Environment")
-    {
-        event.m_category = "Natuur";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "Movie - Adult")
-    {
-        event.m_category = "Erotiek";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "Movie - Soap/melodrama/folkloric")
-    {
-        event.m_category = "Serie/soap";
-        event.m_categoryType = ProgramInfo::kCategorySeries;
-    }
-    if (event.m_category == "Arts/Culture")
-    {
-        event.m_category = "Kunst/Cultuur";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "Sports")
-    {
-        event.m_category = "Sport";
-        event.m_categoryType = ProgramInfo::kCategorySports;
-    }
-    if (event.m_category == "Cartoons/Puppets")
-    {
-        event.m_category = "Animatie";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "Movie - Comedy")
-    {
-        event.m_category = "Comedy";
-        event.m_categoryType = ProgramInfo::kCategorySeries;
-    }
-    if (event.m_category == "Movie - Detective/Thriller")
-    {
-        event.m_category = "Misdaad";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
-    }
-    if (event.m_category == "Social/Spiritual Sciences")
-    {
-        event.m_category = "Religieus";
-        event.m_categoryType = ProgramInfo::kCategoryNone;
+        auto [name, type]    = categoryTrans[event.m_category];
+        event.m_category     = name;
+        event.m_categoryType = type;
     }
 
     // Film - categories are usually not Films
