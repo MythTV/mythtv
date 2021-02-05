@@ -23,11 +23,6 @@ extern "C" {
  * \note The linux kernel structures are aligned with the structures defined
  * in the HDMI standards (e.g. CTA-861-G).
 */
-MythHDRVideoMetadata::MythHDRVideoMetadata(const MythHDRVideoMetadata& Other)
-  : MythHDRMetadata(Other)
-{
-}
-
 void MythHDRVideoMetadata::Update(const AVMasteringDisplayMetadata* Display,
                                   const AVContentLightMetadata* Light)
 {

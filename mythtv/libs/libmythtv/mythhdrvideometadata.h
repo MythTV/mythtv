@@ -11,7 +11,7 @@ class MythHDRVideoMetadata : public MythHDRMetadata
   public:
     static void Populate(class MythVideoFrame* Frame, struct AVFrame* AvFrame);
     MythHDRVideoMetadata() = default;
-    explicit MythHDRVideoMetadata(const MythHDRVideoMetadata& Other);
+    explicit MythHDRVideoMetadata(const MythHDRVideoMetadata& Other) = default;
 
   protected:
     void Update(const struct AVMasteringDisplayMetadata* Display,
