@@ -10,9 +10,9 @@ MythColourSpace MythColourSpace::s_BT610_525 = {{{{0.630F, 0.340F}, {0.310F, 0.5
 MythColourSpace MythColourSpace::s_BT610_625 = {{{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
 MythColourSpace MythColourSpace::s_BT2020    = {{{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}}, {0.3127F, 0.3290F}};
 
-MythColourSpace::MythColourSpace(const MythPrimariesFloat& Primaries, const MythPrimaryFloat& WhitePoint)
+MythColourSpace::MythColourSpace(const MythPrimariesFloat& Primaries, const MythPrimaryFloat WhitePoint)
   : m_primaries(std::move(Primaries)),
-    m_whitePoint(std::move(WhitePoint))
+    m_whitePoint(WhitePoint)
 {
 }
 
@@ -29,7 +29,7 @@ bool MythColourSpace::Alike(const MythColourSpace &First, const MythColourSpace 
            cmp(First.m_whitePoint[1],   Second.m_whitePoint[1]);
 }
 
-inline float CalcBy(const MythPrimariesFloat& p, const MythPrimaryFloat& w)
+inline float CalcBy(const MythPrimariesFloat& p, const MythPrimaryFloat w)
 {
     float val = ((1-w[0])/w[1] - (1-p[0][0])/p[0][1]) * (p[1][0]/p[1][1] - p[0][0]/p[0][1]) -
     (w[0]/w[1] - p[0][0]/p[0][1]) * ((1-p[1][0])/p[1][1] - (1-p[0][0])/p[0][1]);
@@ -38,7 +38,7 @@ inline float CalcBy(const MythPrimariesFloat& p, const MythPrimaryFloat& w)
     return val;
 }
 
-inline float CalcGy(const MythPrimariesFloat& p, const MythPrimaryFloat& w, const float By)
+inline float CalcGy(const MythPrimariesFloat& p, const MythPrimaryFloat w, const float By)
 {
     float val = w[0]/w[1] - p[0][0]/p[0][1] - By * (p[2][0]/p[2][1] - p[0][0]/p[0][1]);
     val /= p[1][0]/p[1][1] - p[0][0]/p[0][1];
