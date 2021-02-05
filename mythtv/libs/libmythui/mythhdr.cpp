@@ -5,8 +5,8 @@
  * \brief Encapsulates HDR metadata conformant with Static Metadata Type 1 per CTA-861-G Final.
  */
 MythHDRMetadata::MythHDRMetadata(const MythHDRMetadata &Other)
-  : m_displayPrimaries(std::move(Other.m_displayPrimaries)),
-    m_whitePoint(std::move(Other.m_whitePoint)),
+  : m_displayPrimaries(Other.m_displayPrimaries),
+    m_whitePoint(Other.m_whitePoint),
     m_maxMasteringLuminance(Other.m_maxMasteringLuminance),
     m_minMasteringLuminance(Other.m_minMasteringLuminance),
     m_maxContentLightLevel(Other.m_maxContentLightLevel),
@@ -52,7 +52,7 @@ QStringList MythHDR::TypesToString(HDRTypes Types)
     return res;
 }
 
-QStringList MythHDR::TypesToString()
+QStringList MythHDR::TypesToString() const
 {
     return MythHDR::TypesToString(m_supportedTypes);
 }

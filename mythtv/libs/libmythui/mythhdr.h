@@ -52,7 +52,7 @@ class MUI_PUBLIC MythHDR
 
     static QString     TypeToString (HDRType Type);
     static QStringList TypesToString(HDRTypes Types);
-    QStringList        TypesToString();
+    QStringList        TypesToString() const;
 
     bool     m_controllable    { false };
     HDRType  m_currentType     { SDR };
