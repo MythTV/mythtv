@@ -16,7 +16,7 @@ class MUI_PUBLIC MythHDRMetadata
 {
   public:
     MythHDRMetadata() = default;
-    explicit MythHDRMetadata(const MythHDRMetadata& Other);
+    explicit MythHDRMetadata(const MythHDRMetadata& Other) = default;
     bool Equals(MythHDRMetadata* Other);
 
     MythPrimariesUInt16 m_displayPrimaries {{{ 0 }}};

@@ -4,16 +4,6 @@
 /*! \class MythHDRMetadata
  * \brief Encapsulates HDR metadata conformant with Static Metadata Type 1 per CTA-861-G Final.
  */
-MythHDRMetadata::MythHDRMetadata(const MythHDRMetadata &Other)
-  : m_displayPrimaries(Other.m_displayPrimaries),
-    m_whitePoint(Other.m_whitePoint),
-    m_maxMasteringLuminance(Other.m_maxMasteringLuminance),
-    m_minMasteringLuminance(Other.m_minMasteringLuminance),
-    m_maxContentLightLevel(Other.m_maxContentLightLevel),
-    m_maxFrameAverageLightLevel(Other.m_maxFrameAverageLightLevel)
-{
-}
-
 bool MythHDRMetadata::Equals(MythHDRMetadata* Other)
 {
     return Other &&
