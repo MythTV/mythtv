@@ -878,10 +878,16 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
                 tspacket->data()[i++] != 0x00 ||
                 tspacket->data()[i++] != 0x01)
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "PES start code not found in TS packet with PUSI set");
+                if (!m_pesTimer.isRunning() || m_pesTimer.elapsed() > 20000ms)
+                {
+                    m_pesTimer.restart();
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        "PES start code not found in TS packet with PUSI set");
+                }
                 break;
             }
+            else
+                m_pesTimer.stop();
 
             // bounds check
             if (i + 5 >= TSPacket::kSize)

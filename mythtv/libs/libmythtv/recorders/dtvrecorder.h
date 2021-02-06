@@ -130,6 +130,7 @@ class DTVRecorder :
     QString                  m_recordingType              {"all"};
 
     // used for scanning pes headers for keyframes
+    MythTimer                m_pesTimer;
     QElapsedTimer            m_audioTimer;
     uint32_t                 m_startCode                  {0xffffffff};
     int                      m_firstKeyframe              {-1};
