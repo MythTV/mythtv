@@ -28,7 +28,7 @@ class MUI_PUBLIC MythColourSpace
     static QMatrix4x4 RGBtoXYZ(const MythColourSpace& Primaries);
 
     MythColourSpace() = default;
-    MythColourSpace(const MythPrimariesFloat& Primaries, const MythPrimaryFloat WhitePoint);
+    MythColourSpace(const MythPrimariesFloat& Primaries, MythPrimaryFloat WhitePoint);
 
     MythPrimariesFloat m_primaries  {{{0.0F}}};
     MythPrimaryFloat   m_whitePoint   {0.0F};

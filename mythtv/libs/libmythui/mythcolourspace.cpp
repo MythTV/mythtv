@@ -10,7 +10,7 @@ MythColourSpace MythColourSpace::s_BT610_525 = {{{{0.630F, 0.340F}, {0.310F, 0.5
 MythColourSpace MythColourSpace::s_BT610_625 = {{{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
 MythColourSpace MythColourSpace::s_BT2020    = {{{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}}, {0.3127F, 0.3290F}};
 
-MythColourSpace::MythColourSpace(const MythPrimariesFloat& Primaries, const MythPrimaryFloat WhitePoint)
+MythColourSpace::MythColourSpace(const MythPrimariesFloat& Primaries, MythPrimaryFloat WhitePoint)
   : m_primaries(Primaries),
     m_whitePoint(WhitePoint)
 {
