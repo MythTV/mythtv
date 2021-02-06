@@ -178,9 +178,9 @@ EITFixUp::EITFixUp()
       m_nlPres(R"(\sPresentatie:\s([^\.]+)\.)"),
       m_nlPersSeparator("(, |\\sen\\s)"),
       m_nlRub(R"(\s?\({1}\W+\){1}\s?)"),
-      m_nlYear1("(?=\\suit\\s)([1-2]{2}[0-9]{2})"),
+      m_nlYear1("\\suit\\s([1-2]{2}[0-9]{2})"),
       m_nlYear2(R"(([\s]{1}[\(]{1}[A-Z]{0,3}/?)([1-2]{2}[0-9]{2})([\)]{1}))"),
-      m_nlDirector(R"((?=\svan\s)(([A-Z]{1}[a-z]+\s)|([A-Z]{1}\.\s)))"),
+      m_nlDirector(R"(\svan\s(([A-Z]{1}[a-z]+\s)|([A-Z]{1}\.\s)))"),
       m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
       m_nlOmroep (R"(\s\(([A-Z]+/?)+\)$)"),
       m_noRerun("\\(R\\)"),
@@ -2178,10 +2178,10 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         tmpActorsString = tmpActorsString.left(tmpActorsString.length() - 5);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors =
-            tmpActorsString.split(", ", QString::SkipEmptyParts);
+            tmpActorsString.split(m_nlPersSeparator, QString::SkipEmptyParts);
 #else
         const QStringList actors =
-            tmpActorsString.split(", ", Qt::SkipEmptyParts);
+            tmpActorsString.split(m_nlPersSeparator, Qt::SkipEmptyParts);
 #endif
         for (const auto & actor : qAsConst(actors))
             event.AddPerson(DBPerson::kActor, actor);
@@ -2229,9 +2229,9 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     // Try to find director
     QRegExp tmpDirector = m_nlDirector;
     QString tmpDirectorString;
-    if (fullinfo.indexOf(m_nlDirector) != -1)
+    if (fullinfo.indexOf(tmpDirector) != -1)
     {
-        tmpDirectorString = tmpDirector.cap(0);
+        tmpDirectorString = tmpDirector.cap(1);
         event.AddPerson(DBPerson::kDirector, tmpDirectorString);
     }
 
