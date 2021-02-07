@@ -178,8 +178,8 @@ EITFixUp::EITFixUp()
       m_nlPres(R"(\sPresentatie:\s([^\.]+)\.)"),
       m_nlPersSeparator("(, |\\sen\\s)"),
       m_nlRub(R"(\s?\({1}\W+\){1}\s?)"),
-      m_nlYear1("\\suit\\s([1-2]{2}[0-9]{2})"),
-      m_nlYear2(R"(([\s]{1}[\(]{1}[A-Z]{0,3}/?)([1-2]{2}[0-9]{2})([\)]{1}))"),
+      m_nlYear1("\\suit\\s([1-2][0-9]{3})"),
+      m_nlYear2(R"((\s\([A-Z]{0,3}/?)([1-2][0-9]{3})\))"),
       m_nlDirector(R"(\svan\s(([A-Z]{1}[a-z]+\s)|([A-Z]{1}\.\s)))"),
       m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
       m_nlOmroep (R"(\s\(([A-Z]+/?)+\)$)"),
@@ -2213,7 +2213,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     if (tmpYear1.indexIn(fullinfo) != -1)
     {
         bool ok = false;
-        uint y = tmpYear1.cap(0).toUInt(&ok);
+        uint y = tmpYear1.cap(1).toUInt(&ok);
         if (ok)
             event.m_originalairdate = QDate(y, 1, 1);
     }
