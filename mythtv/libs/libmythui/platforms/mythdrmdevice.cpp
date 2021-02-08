@@ -370,6 +370,8 @@ MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device, bool N
 #ifdef USING_QTPRIVATEHEADERS
     if (auto result = std::shared_ptr<MythDRMDevice>(new MythDRMDevice(Device, NeedPlanes)); result && result->m_valid)
         return result;
+#else
+    (void)NeedPlanes;
 #endif
     return nullptr;
 }
