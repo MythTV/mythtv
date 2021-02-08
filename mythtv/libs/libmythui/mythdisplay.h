@@ -11,6 +11,7 @@
 #include "mythdisplaymode.h"
 #include "mythedid.h"
 #include "mythhdr.h"
+#include "mythvrr.h"
 #include "mythcommandlineparser.h"
 
 // Std
@@ -96,6 +97,7 @@ class MUI_PUBLIC MythDisplay : public QObject
     QScreen*        m_screen           { nullptr };
     MythDisplayModes m_videoModes      { };
     MythHDRPtr      m_hdrState         { nullptr };
+    MythVRRPtr      m_vrrState         { nullptr };
 
   private:
     Q_DISABLE_COPY(MythDisplay)

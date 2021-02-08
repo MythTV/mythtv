@@ -50,6 +50,7 @@ HEADERS += mythnotificationcenter.h mythnotificationcenter_private.h
 HEADERS += mythuicomposite.h mythnotification.h
 HEADERS += mythedid.h
 HEADERS += mythhdr.h
+HEADERS += mythvrr.h
 HEADERS += mythcolourspace.h
 HEADERS += devices/mythinputdevicehandler.h
 
@@ -83,6 +84,7 @@ SOURCES += mythnotificationcenter.cpp mythnotification.cpp
 SOURCES += mythuicomposite.cpp
 SOURCES += mythedid.cpp
 SOURCES += mythhdr.cpp
+SOURCES += mythvrr.cpp
 SOURCES += mythcolourspace.cpp
 SOURCES += devices/mythinputdevicehandler.cpp
 
@@ -123,9 +125,11 @@ using_x11 {
     HEADERS += platforms/mythxdisplay.h
     HEADERS += platforms/mythdisplayx11.h
     HEADERS += platforms/mythscreensaverx11.h
+    HEADERS += platforms/mythnvcontrol.h
     SOURCES += platforms/mythxdisplay.cpp
     SOURCES += platforms/mythdisplayx11.cpp
     SOURCES += platforms/mythscreensaverx11.cpp
+    SOURCES += platforms/mythnvcontrol.cpp
     freebsd:LIBS += -lXext -lXxf86vm
 }
 
@@ -142,6 +146,7 @@ using_drm {
     HEADERS += platforms/drm/mythdrmconnector.h
     HEADERS += platforms/drm/mythdrmencoder.h
     HEADERS += platforms/drm/mythdrmframebuffer.h
+    HEADERS += platforms/drm/mythdrmvrr.h
     SOURCES += platforms/mythdisplaydrm.cpp
     SOURCES += platforms/mythscreensaverdrm.cpp
     SOURCES += platforms/mythdrmdevice.cpp
@@ -153,6 +158,7 @@ using_drm {
     SOURCES += platforms/drm/mythdrmconnector.cpp
     SOURCES += platforms/drm/mythdrmencoder.cpp
     SOURCES += platforms/drm/mythdrmframebuffer.cpp
+    SOURCES += platforms/drm/mythdrmvrr.cpp
     QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
 }
 

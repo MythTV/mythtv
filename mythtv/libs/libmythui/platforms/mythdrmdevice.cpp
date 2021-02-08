@@ -11,6 +11,7 @@
 
 // MythTV
 #include "mythedid.h"
+#include "platforms/drm/mythdrmvrr.h"
 #include "platforms/drm/mythdrmencoder.h"
 #include "platforms/drm/mythdrmframebuffer.h"
 #include "platforms/mythdrmdevice.h"
@@ -138,6 +139,10 @@ MythDRMPtr MythDRMDevice::FindDevice(bool NeedPlanes)
 
 void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 {
+    // Try and enable/disable FreeSync if requested by the user
+    if (CmdLine.toBool("vrr"))
+        MythDRMVRR::ForceFreeSync(FindDevice(false), CmdLine.toUInt("vrr") > 0);
+
 #if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
     // Return early if eglfs is not *explicitly* requested via the command line or environment.
     // Note: On some setups it is not necessary to explicitly request eglfs for Qt to use it.

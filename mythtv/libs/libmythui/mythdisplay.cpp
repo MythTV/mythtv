@@ -28,9 +28,11 @@
 #endif
 #ifdef USING_X11
 #include "platforms/mythdisplayx11.h"
+#include "platforms/mythnvcontrol.h"
 #endif
 #ifdef USING_DRM
 #include "platforms/mythdisplaydrm.h"
+#include "platforms/drm/mythdrmvrr.h"
 #endif
 #if defined(Q_OS_WIN)
 #include "platforms/mythdisplaywindows.h"
@@ -174,7 +176,7 @@ QStringList MythDisplay::GetDescription()
         }
     }
 
-    if (m_hdrState.get())
+    if (m_hdrState)
     {
         auto types = m_hdrState->m_supportedTypes;
         auto hdr = m_hdrState->TypesToString();
@@ -182,6 +184,15 @@ QStringList MythDisplay::GetDescription()
         if (types && !m_hdrState->m_controllable)
             result.append(tr("HDR mode switching is not available"));
     }
+
+    if (m_vrrState)
+    {
+        result.append(tr("Variable refresh rate '%1': %2 %3")
+                      .arg(m_vrrState->TypeToString())
+                      .arg(m_vrrState->Enabled() ? tr("Enabled") : tr("Disabled"))
+                      .arg(m_vrrState->RangeDescription()));
+    }
+
     return result;
 }
 
@@ -510,6 +521,9 @@ void MythDisplay::Initialise()
     m_videoModes.clear();
     m_overrideVideoModes.clear();
     UpdateCurrentMode();
+    // Note: The EDID is retrieved in UpdateCurrentMode and we need the EDID to
+    // check for refresh rate range support.
+    m_vrrState = MythVRR::Create(this);
     InitScreenBounds();
 
     // Set the desktop mode - which is the mode at startup. We must always return
@@ -693,6 +707,23 @@ bool MythDisplay::SwitchToVideo(QSize Size, double Rate)
 
     // need to change video mode?
     MythDisplayMode::FindBestMatch(GetVideoModes(), next, targetrate);
+
+    // If GSync or FreeSync are enabled, ignore refresh rate only changes.
+    // N.B. This check is not used when switching to GUI (which already ignores
+    // rate only changes) or switching back to the desktop (where we must reset
+    // the display to the original state).
+    if (m_vrrState && m_vrrState->Enabled())
+    {
+        if (next.Resolution() == current.Resolution())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Ignoring mode switch to %1Hz - VRR enabled")
+                .arg(Rate, 0, 'f', 3));
+            return true;
+        }
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Allowing mode switch with VRR enabled for new resolution");
+    }
+
+    // No need for change
     if ((next == current) && (MythDisplayMode::CompareRates(current.RefreshRate(), targetrate)))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using current mode %1x%2@%3Hz")
@@ -763,6 +794,19 @@ double MythDisplay::GetRefreshRate() const
 
 std::chrono::microseconds MythDisplay::GetRefreshInterval(std::chrono::microseconds Fallback) const
 {
+    // If FreeSync or GSync are enabled, return the maximum refresh rate.
+    // N.B. This may need more work as the max may not be well defined - especially
+    // if the resolution is changing. Displays should however support at least 60Hz
+    // at all resolutions which should be fine in the vast majority of cases (as the
+    // only place the refresh interval is functionally important is in checking
+    // for double rate deinterlacing support).
+    if (m_vrrState && m_vrrState->Enabled())
+    {
+        const auto range = m_vrrState->GetRange();
+        auto max = std::get<1>(range) > 60 ? std::get<1>(range) : 60;
+        return microsecondsFromFloat(1000000.0 / max);
+    }
+
     if (m_refreshRate > 20.0 && m_refreshRate < 200.0)
         return microsecondsFromFloat(1000000.0 / m_refreshRate);
     if (Fallback > 33ms) // ~30Hz
@@ -1179,10 +1223,16 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     // Ignore desktop scaling
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 
+    auto forcevrr = CmdLine.toBool("vrr");
 #ifdef USING_X11
     if (auto display = CmdLine.toString("display"); !display.isEmpty())
         MythXDisplay::SetQtX11Display(display);
-#else
-    (void)CmdLine;
+    // GSync support via libXNVCtrl
+    // Note: FreeSync support is checked in MythDRMDevice::SetupDRM
+    if (forcevrr)
+        MythGSync::ForceGSync(CmdLine.toUInt("vrr") > 0);
 #endif
+
+    if (forcevrr && !(MythGSync::s_gsyncResetOnExit || MythDRMVRR::s_freeSyncResetOnExit))
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Variable refresh rate not adjusted");
 }
