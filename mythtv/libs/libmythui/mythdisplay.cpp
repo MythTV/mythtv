@@ -1141,6 +1141,10 @@ void MythDisplay::DebugModes() const
 */
 void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& CmdLine)
 {
+    auto forcevrr = CmdLine.toBool("vrr");
+    bool gsyncchanged = false;
+    bool freesyncchanged = false;
+
 #ifdef USING_QTWEBENGINE
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
@@ -1184,6 +1188,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
 #endif
         {
             MythDRMDevice::SetupDRM(CmdLine);
+            freesyncchanged = MythDRMVRR::s_freeSyncResetOnExit;
         }
     }
 #endif
@@ -1223,16 +1228,18 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     // Ignore desktop scaling
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 
-    auto forcevrr = CmdLine.toBool("vrr");
 #ifdef USING_X11
     if (auto display = CmdLine.toString("display"); !display.isEmpty())
         MythXDisplay::SetQtX11Display(display);
     // GSync support via libXNVCtrl
     // Note: FreeSync support is checked in MythDRMDevice::SetupDRM
     if (forcevrr)
+    {
         MythGSync::ForceGSync(CmdLine.toUInt("vrr") > 0);
+        gsyncchanged = MythGSync::s_gsyncResetOnExit;
+    }
 #endif
 
-    if (forcevrr && !(MythGSync::s_gsyncResetOnExit || MythDRMVRR::s_freeSyncResetOnExit))
+    if (forcevrr && !(gsyncchanged || freesyncchanged))
         LOG(VB_GENERAL, LOG_INFO, LOC + "Variable refresh rate not adjusted");
 }
