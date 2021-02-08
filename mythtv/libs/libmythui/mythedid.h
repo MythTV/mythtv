@@ -13,6 +13,9 @@
 // Std
 #include <utility>
 #include <array>
+#include <tuple>
+
+using MythVRRRange = std::tuple<int,int,bool>;
 
 class MUI_PUBLIC MythEDID
 {
@@ -35,6 +38,7 @@ class MUI_PUBLIC MythEDID
     int         VideoLatency      (bool Interlaced) const;
     void        Debug             () const;
     MythHDRPtr  GetHDRSupport     () const;
+    MythVRRRange GetVRRRange      () const;
 
   private:
     enum HDREOTF

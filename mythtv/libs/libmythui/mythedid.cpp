@@ -107,6 +107,24 @@ MythHDRPtr MythEDID::GetHDRSupport() const
     return result;
 }
 
+/*! \brief Return the range of supported refresh rates
+ *
+ * If the VRR range is explicit in the EDID then the third element of MythVRRRange
+ * is set to true, otherwise 'false' indicates that the VRR range is assumed from
+ * the vertical refresh range indicated in the EDID. In both cases the behaviour
+ * of the display below any minimum is undefined (e.g. there is no current indication
+ * whether the display supports 'FreeSync Premium' - in which case low frame rates
+ * may produce significant jitter).
+*/
+MythVRRRange MythEDID::GetVRRRange() const
+{
+    if (m_valid && m_vrrMin && m_vrrMax)
+        return { m_vrrMin, m_vrrMax, true };
+    if (m_valid && m_vrangeMin && m_vrangeMax)
+        return { m_vrangeMin, m_vrangeMax, false };
+    return { 0, 0, false };
+}
+
 // from QEdidParser
 static QString ParseEdidString(const quint8* data, bool Replace)
 {
