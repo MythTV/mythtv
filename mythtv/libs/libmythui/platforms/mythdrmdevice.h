@@ -35,6 +35,8 @@ class MUI_PUBLIC MythDRMDevice
     QSize    GetPhysicalSize() const;
     double   GetRefreshRate () const;    
     MythEDID GetEDID        () const;
+    DRMCrtc  GetCrtc        () const;
+    DRMConn  GetConnector   () const;
     const DRMModes& GetModes() const;
     bool     CanSwitchModes () const;
     bool     SwitchMode     (int ModeIndex);
@@ -56,8 +58,6 @@ class MUI_PUBLIC MythDRMDevice
     static void SetupDRM      (const MythCommandLineParser& CmdLine);
     DRMPlane GetVideoPlane    () const;
     DRMPlane GetGUIPlane      () const;
-    DRMCrtc  GetCrtc          () const;
-    DRMConn  GetConnector     () const;
     bool     QueueAtomics     (const MythAtomics& Atomics);
     void     DisableVideoPlane();
     void     MainWindowReady  ();

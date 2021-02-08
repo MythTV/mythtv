@@ -866,6 +866,16 @@ bool MythDRMDevice::ConfirmDevice(const QString& Device)
     return result;
 }
 
+DRMCrtc MythDRMDevice::GetCrtc() const
+{
+    return m_crtc;
+}
+
+DRMConn MythDRMDevice::GetConnector() const
+{
+    return m_connector;
+}
+
 #if defined (USING_QTPRIVATEHEADERS)
 void MythDRMDevice::MainWindowReady()
 {
@@ -897,16 +907,6 @@ void MythDRMDevice::MainWindowReady()
         }
     }
     */
-}
-
-DRMCrtc MythDRMDevice::GetCrtc() const
-{
-    return m_crtc;
-}
-
-DRMConn MythDRMDevice::GetConnector() const
-{
-    return m_connector;
 }
 
 bool MythDRMDevice::QueueAtomics(const MythAtomics& Atomics)
