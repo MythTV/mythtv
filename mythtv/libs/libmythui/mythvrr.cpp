@@ -8,6 +8,7 @@
 #include "platforms/mythdisplayx11.h"
 #include "platforms/mythnvcontrol.h"
 #endif
+#include "mythdisplay.h"
 #include "mythlogging.h"
 
 // Qt
@@ -50,7 +51,7 @@ MythVRR::MythVRR(bool Controllable, VRRType Type, bool Enabled, MythVRRRange Ran
 
 /*! \brief Create a concrete implementation of MythVRR suitable for the given Display
 */
-MythVRRPtr MythVRR::Create(class MythDisplay* Display)
+MythVRRPtr MythVRR::Create(MythDisplay* Display)
 {
     if (!Display)
         return nullptr;
