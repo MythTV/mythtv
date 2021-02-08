@@ -22,7 +22,7 @@ class MythVRR
         GSyncCompat
     };
 
-    static MythVRRPtr Create(class MythDisplay* Display);
+    static MythVRRPtr Create(class MythDisplay* _Display);
     virtual ~MythVRR() = default;
     virtual void SetEnabled(bool Enable = true) = 0;
     QString      TypeToString() const;

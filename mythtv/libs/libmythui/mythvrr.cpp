@@ -51,12 +51,12 @@ MythVRR::MythVRR(bool Controllable, VRRType Type, bool Enabled, MythVRRRange Ran
 
 /*! \brief Create a concrete implementation of MythVRR suitable for the given Display
 */
-MythVRRPtr MythVRR::Create(MythDisplay* Display)
+MythVRRPtr MythVRR::Create(MythDisplay* _Display)
 {
-    if (!Display)
+    if (!_Display)
         return nullptr;
 
-    const auto range = Display->GetEDID().GetVRRRange();
+    const auto range = _Display->GetEDID().GetVRRRange();
     MythVRRPtr result = nullptr;
 
 #ifdef USING_X11
@@ -70,7 +70,7 @@ MythVRRPtr MythVRR::Create(MythDisplay* Display)
     // FreeSync is only currently *controllable* via DRM with an AMD GPU/APU and Display Port
     if (!result)
     {
-        if (auto * display = dynamic_cast<MythDisplayDRM*>(Display); display && display->GetDevice())
+        if (auto * display = dynamic_cast<MythDisplayDRM*>(_Display); display && display->GetDevice())
             if (auto freesync = MythDRMVRR::CreateFreeSync(display->GetDevice(), range); freesync)
                 result =  freesync;
     }
@@ -79,7 +79,7 @@ MythVRRPtr MythVRR::Create(MythDisplay* Display)
     // tell us if it is available/enabled - which is still useful
     if (!result)
     {
-        if (auto drm = MythDRMDevice::Create(Display->GetCurrentScreen()); drm)
+        if (auto drm = MythDRMDevice::Create(_Display->GetCurrentScreen()); drm)
             if (auto freesync = MythDRMVRR::CreateFreeSync(drm, range); freesync)
                 result = freesync;
     }
