@@ -107,16 +107,21 @@ MythDRMVRR::~MythDRMVRR()
 {
     if (s_freeSyncResetOnExit)
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "Resetting FreeSync to desktop default");
-        MythDRMVRR::SetEnabled(s_freeSyncDefaultValue);
+        if (m_controllable)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "Resetting FreeSync to desktop default");
+            MythDRMVRR::SetEnabled(s_freeSyncDefaultValue);
+        }
         s_freeSyncResetOnExit = false;
     }
 }
 
 void MythDRMVRR::SetEnabled(bool Enable)
 {
+#ifdef USING_QTPRIVATEHEADERS
     if (m_device && m_vrrProp && m_device->GetCrtc() &&
         m_device->QueueAtomics({{ m_device->GetCrtc()->m_id, m_vrrProp->m_id, Enable ? 1 : 0 }}))
+#endif
     {
         m_enabled = Enable;
         LOG(VB_GENERAL, LOG_INFO, LOC + (Enable ? "Enabled" : "Disabled"));
