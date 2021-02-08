@@ -63,7 +63,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     Q_PROPERTY(int type READ type WRITE setType)
     Q_PROPERTY(int level READ level WRITE setLevel)
     Q_PROPERTY(int facility READ facility WRITE setFacility)
-    Q_PROPERTY(std::chrono::milliseconds epoch READ epoch WRITE setEpoch)
+    Q_PROPERTY(qlonglong epoch READ epochInt WRITE setEpochInt)
     Q_PROPERTY(QString file READ file WRITE setFile)
     Q_PROPERTY(QString function READ function WRITE setFunction)
     Q_PROPERTY(QString threadName READ threadName WRITE setThreadName)
@@ -96,6 +96,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     int                 level() const       { return (int)m_level; };
     int                 facility() const    { return m_facility; };
     std::chrono::milliseconds epoch() const { return m_epoch; };
+    qlonglong epochInt() const              { return m_epoch.count(); };
     QString             file() const        { return m_file; };
     QString             function() const    { return m_function; };
     QString             threadName() const  { return m_threadName; };
@@ -112,6 +113,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     void setLevel(const int val)            { m_level = (LogLevel_t)val; };
     void setFacility(const int val)         { m_facility = val; };
     void setEpoch(std::chrono::milliseconds val) { m_epoch = val; };
+    void setEpochInt(const qlonglong val)   { m_epoch = std::chrono::milliseconds(val); };
     void setFile(const QString &val)        { m_file = val; };
     void setFunction(const QString &val)    { m_function = val; };
     void setThreadName(const QString &val)  { m_threadName = val; };
