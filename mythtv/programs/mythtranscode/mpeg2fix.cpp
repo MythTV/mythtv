@@ -512,7 +512,7 @@ int MPEG2replex::WaitBuffers()
     if (m_done)
     {
         finish_mpg(m_mplex);
-	// bug12602: thread exit must return static, not stack
+	// mythtv#244: thread exit must return static, not stack
 	static int errorcount = 0;
 	errorcount = m_mplex->error;
 	if (m_mplex->error) {
@@ -577,7 +577,7 @@ void MPEG2replex::Start()
     {
         check_times( &mx, &video_ok, ext_ok, &start);
         if (write_out_packs( &mx, video_ok, ext_ok)) {
-	  // bug12602: exiting here blocks the reading thread indefinitely;
+	  // mythtv#244: exiting here blocks the reading thread indefinitely;
 	  // maybe there is a way to fail it also?
 	  // LOG(VB_GENERAL, LOG_ERR, // or comment all this to fail until close
 	  //     QString("exiting thread after %1 write errors")
@@ -2627,13 +2627,12 @@ int MPEG2fixup::Start()
         }
     }
 
-
     m_rx.m_done = 1;
     pthread_mutex_lock( &m_rx.m_mutex );
     pthread_cond_signal(&m_rx.m_cond);
     pthread_mutex_unlock( &m_rx.m_mutex );
     int ex = REENCODE_OK;
-    void *errors; // bug12602: return error if any write or close failures
+    void *errors; // mythtv#244: return error if any write or close failures
     pthread_join(m_thread, &errors);
     if (*(int *)errors) {
       LOG(VB_GENERAL, LOG_ERR,
