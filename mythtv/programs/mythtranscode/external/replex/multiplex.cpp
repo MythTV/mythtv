@@ -301,7 +301,7 @@ static void writeout_video(multiplex_t *mx)
 	if (write(mx->fd_out, outbuf.data(), written) != written) {
 	  mx->error++;
 	  if (mx->error <= 0) mx->error = 1; // avoid int rollover to zero
-	  if (mx->error < 10) // bug12602: log only first few failures
+	  if (mx->error < 10) // mythtv#244: log only first few failures
 	    LOG(VB_GENERAL, LOG_ERR,
 		QString("%1 writes failed: %2")
 		.arg(mx->error).arg(strerror(errno)));
@@ -651,7 +651,7 @@ int finish_mpg(multiplex_t *mx)
 		write(mx->fd_out, mpeg_end.data(), 4);
 
 	if (close(mx->fd_out) < 0) {
-	  mx->error++;	    // bug12602: close could fail on full disk
+	  mx->error++;	    // mythtv#244: close could fail on full disk
 	  if (mx->error <= 0) mx->error = 1; // avoid int rollover to zero
 	  LOG(VB_GENERAL, LOG_ERR,
 	      QString("close failed: %1")
@@ -703,7 +703,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 	int i = 0;
 	uint32_t data_rate = 0;
 
-	mx->error = 0; // bug12602: added to catch full disk write failures
+	mx->error = 0; // mythtv#244: added to catch full disk write failures
 	mx->fill_buffers = fill_buffers;
 	mx->video_delay = video_delay;
 	mx->audio_delay = audio_delay;

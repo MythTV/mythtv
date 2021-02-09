@@ -86,13 +86,12 @@ struct multiplex_t {
 
 	int (*fill_buffers)(void *p, int f);
 	void *priv;
-	int error; // bug12602: added to catch full disk write failures
+	int error; /* mythtv#244: added to catch full disk write failures */
 };
 
 void check_times( multiplex_t *mx, int *video_ok, aok_arr &ext_ok, int *start);
 int write_out_packs( multiplex_t *mx, int video_ok, aok_arr &ext_ok);
 int finish_mpg(multiplex_t *mx);
-
 void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 		     audio_frame_t *extframe, int *exttype, const int *exttypcnt,
 		     uint64_t video_delay, uint64_t audio_delay, int fd,
