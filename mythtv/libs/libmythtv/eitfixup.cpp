@@ -213,7 +213,7 @@ EITFixUp::EITFixUp()
       m_auFreeviewY("(.*) \\(([12][0-9][0-9][0-9])\\)$"),
       m_auFreeviewYC(R"((.*) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
       m_auFreeviewSYC(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
-      m_grRating("(?:(\\[[KΚ](?:(|8|12|16|18)\\]\\s*)))", Qt::CaseInsensitive),
+      m_grRating(R"(\[(K|Κ|8|12|16|18)\]\s*)", Qt::CaseInsensitive),
       m_grReplay("\\([ΕE]\\)"),
       m_grDescriptionFinale("\\s*Τελευταίο\\sΕπεισόδιο\\.\\s*"),
       m_grActors("(?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\\s+στο ρόλο(?: του| της)?\\s(?:\\w+\\s[οη]\\s))?([-\\w\\s']+(?:,[-\\w\\s']+)*)(?:κ\\.[αά])?(?:\\W?)"),
@@ -2599,7 +2599,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
       EventRating prograting;
       prograting.m_system="GR"; prograting.m_rating = tmpRegEx.cap(1);
       event.m_ratings.push_back(prograting);
-      event.m_title = event.m_title.replace(tmpRegEx.cap(1), "").trimmed();
+      event.m_title = event.m_title.replace(tmpRegEx.cap(0), "").trimmed();
     }
 
     //Live show
