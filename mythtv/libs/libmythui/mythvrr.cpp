@@ -45,7 +45,7 @@ MythVRR::MythVRR(bool Controllable, VRRType Type, bool Enabled, MythVRRRange Ran
   : m_controllable(Controllable),
     m_type(Type),
     m_enabled(Enabled),
-    m_range(Range)
+    m_range(std::move(Range))
 {
 }
 
