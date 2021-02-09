@@ -512,7 +512,15 @@ int MPEG2replex::WaitBuffers()
     if (m_done)
     {
         finish_mpg(m_mplex);
-        pthread_exit(nullptr);
+	// bug12602: thread exit must return static, not stack
+	static int errorcount = 0;
+	errorcount = m_mplex->error;
+	if (m_mplex->error) {
+	  LOG(VB_GENERAL, LOG_ERR,
+	      QString("thread finished with %1 write errors")
+	      .arg(m_mplex->error));
+	}
+	pthread_exit(&errorcount);
     }
 
     return 0;
@@ -568,7 +576,14 @@ void MPEG2replex::Start()
     while (true)
     {
         check_times( &mx, &video_ok, ext_ok, &start);
-        write_out_packs( &mx, video_ok, ext_ok);
+        if (write_out_packs( &mx, video_ok, ext_ok)) {
+	  // bug12602: exiting here blocks the reading thread indefinitely;
+	  // maybe there is a way to fail it also?
+	  // LOG(VB_GENERAL, LOG_ERR, // or comment all this to fail until close
+	  //     QString("exiting thread after %1 write errors")
+	  //     .arg(m_mplex->error));
+	  // pthread_exit(&m_mplex->error);
+	}
     }
 }
 
@@ -2612,15 +2627,24 @@ int MPEG2fixup::Start()
         }
     }
 
+
     m_rx.m_done = 1;
     pthread_mutex_lock( &m_rx.m_mutex );
     pthread_cond_signal(&m_rx.m_cond);
     pthread_mutex_unlock( &m_rx.m_mutex );
-    pthread_join(m_thread, nullptr);
+    int ex = REENCODE_OK;
+    void *errors; // bug12602: return error if any write or close failures
+    pthread_join(m_thread, &errors);
+    if (*(int *)errors) {
+      LOG(VB_GENERAL, LOG_ERR,
+	  QString("joined thread failed with %1 write errors")
+	  .arg(*(int *)errors));
+      ex = REENCODE_ERROR;
+    }
 
     avformat_close_input(&m_inputFC);
     m_inputFC = nullptr;
-    return REENCODE_OK;
+    return ex;
 }
 
 #ifdef NO_MYTH
