@@ -11,8 +11,8 @@ class MythDRMVRR : public MythVRR
     static inline bool s_freeSyncResetOnExit  = false;
     static inline bool s_freeSyncDefaultValue = false;
 
-    static void       ForceFreeSync  (MythDRMPtr Device, bool Enable);
-    static MythVRRPtr CreateFreeSync (MythDRMPtr Device, MythVRRRange Range);
+    static void       ForceFreeSync  (const MythDRMPtr& Device, bool Enable);
+    static MythVRRPtr CreateFreeSync (const MythDRMPtr& Device, MythVRRRange Range);
    ~MythDRMVRR() override;
 
     void SetEnabled(bool Enable = true) override;

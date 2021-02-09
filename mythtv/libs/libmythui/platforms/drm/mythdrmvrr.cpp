@@ -6,7 +6,7 @@
 
 /*! \brief Force FreeSync on or off *before* the main app is started
  */
-void MythDRMVRR::ForceFreeSync(MythDRMPtr Device, bool Enable)
+void MythDRMVRR::ForceFreeSync(const MythDRMPtr& Device, bool Enable)
 {
     if (!(Device && Device->Authenticated() && Device->GetCrtc()))
         return;
@@ -32,7 +32,7 @@ void MythDRMVRR::ForceFreeSync(MythDRMPtr Device, bool Enable)
         return;
     }
 
-    auto freesync2 = dynamic_cast<MythDRMVRR*>(freesync.get());
+    auto * freesync2 = dynamic_cast<MythDRMVRR*>(freesync.get());
     if (!freesync2)
         return;
 
@@ -53,7 +53,7 @@ void MythDRMVRR::ForceFreeSync(MythDRMPtr Device, bool Enable)
     }
 }
 
-MythVRRPtr MythDRMVRR::CreateFreeSync(MythDRMPtr Device, MythVRRRange Range)
+MythVRRPtr MythDRMVRR::CreateFreeSync(const MythDRMPtr& Device, MythVRRRange Range)
 {
     if (!(Device && Device->GetConnector() && Device->GetCrtc()))
         return nullptr;
@@ -98,8 +98,8 @@ MythVRRPtr MythDRMVRR::CreateFreeSync(MythDRMPtr Device, MythVRRRange Range)
 MythDRMVRR::MythDRMVRR(MythDRMPtr Device, DRMProp VRRProp, bool Controllable,
                        bool Enabled, MythVRRRange Range)
   : MythVRR(Controllable, FreeSync, Enabled, Range),
-    m_device(Device),
-    m_vrrProp(VRRProp)
+    m_device(std::move(Device)),
+    m_vrrProp(std::move(VRRProp))
 {
 }
 
