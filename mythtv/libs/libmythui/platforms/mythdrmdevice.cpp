@@ -41,6 +41,7 @@ extern "C" {
  * 1. Set the video mode
  * 2. Improve performance on SoCs by rendering YUV video directly to the framebuffer
  * 3. Implement HDR support and/or setup 10bit output
+ * 4. Enable/disable FreeSync
  *
  * There are a variety of use cases, depending on hardware, user preferences and
  * compile time support (and assuming neither X or Wayland are running):-
