@@ -174,6 +174,7 @@ using_qtprivateheaders {
         SOURCES += platforms/mythscreensaverwayland.cpp
         SOURCES += platforms/mythwaylandextras.cpp
         SOURCES += platforms/waylandprotocols/idle_inhibit_unstable_v1.c
+        QMAKE_CXXFLAGS += $${LIBWAYLAND_CFLAGS}
     }
 }
 

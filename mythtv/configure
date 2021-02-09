@@ -7801,6 +7801,10 @@ if enabled drm; then
     echo "LIBDRM_CFLAGS=$($pkg_config --cflags $pkg_config_flags libdrm)" >> $TMPMAK
 fi
 
+if enabled waylandextras; then
+    echo "LIBWAYLAND_CFLAGS=$($pkg_config --cflags $pkg_config_flags wayland-client)" >> $TMPMAK
+fi
+
 if test $target_os = darwin; then
   # Qt, by default builds .app bundles everywhere. Prevent this.
   enabled mac_bundle || echo "CONFIG-=app_bundle" >> $TMPMAK
