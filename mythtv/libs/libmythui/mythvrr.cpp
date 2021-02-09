@@ -56,8 +56,10 @@ MythVRRPtr MythVRR::Create(MythDisplay* _Display)
     if (!_Display)
         return nullptr;
 
-    const auto range = _Display->GetEDID().GetVRRRange();
     MythVRRPtr result = nullptr;
+
+#if defined (USING_X11) || defined (USING_DRM)
+    const auto range = _Display->GetEDID().GetVRRRange();
 
 #ifdef USING_X11
     // GSync is only available with X11 over Display Port
@@ -83,6 +85,7 @@ MythVRRPtr MythVRR::Create(MythDisplay* _Display)
             if (auto freesync = MythDRMVRR::CreateFreeSync(drm, range); freesync)
                 result = freesync;
     }
+#endif
 #endif
 
     if (!result)
