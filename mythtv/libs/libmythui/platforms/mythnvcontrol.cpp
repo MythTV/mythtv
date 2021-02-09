@@ -49,7 +49,7 @@ void MythGSync::ForceGSync(bool Enable)
     }
 }
 
-MythVRRPtr MythGSync::CreateGSync(NVControl Device, MythVRRRange Range)
+MythVRRPtr MythGSync::CreateGSync(const NVControl& Device, MythVRRRange Range)
 {
     if (!Device)
         return nullptr;
@@ -58,7 +58,7 @@ MythVRRPtr MythGSync::CreateGSync(NVControl Device, MythVRRRange Range)
     if (displayid < 0)
         return nullptr;
 
-    auto display = Device->m_display->GetDisplay();
+    auto * display = Device->m_display->GetDisplay();
     int enabled = 0;
     if (!Device->m_queryTarget(display, NV_CTRL_TARGET_TYPE_DISPLAY, displayid,
                                0, NV_CTRL_DISPLAY_VRR_ENABLED, &enabled) || !enabled)
@@ -98,9 +98,9 @@ MythVRRPtr MythGSync::CreateGSync(NVControl Device, MythVRRRange Range)
  * \sa MythVRR
  * \sa MythNVControl
 */
-MythGSync::MythGSync(NVControl Control, VRRType Type, bool Enabled, MythVRRRange Range)
+MythGSync::MythGSync(NVControl Device, VRRType Type, bool Enabled, MythVRRRange Range)
   : MythVRR(true, Type, Enabled, Range),
-    m_nvControl(Control)
+    m_nvControl(std::move(Device))
 {
 }
 
@@ -119,7 +119,7 @@ void MythGSync::SetEnabled(bool Enable)
     if (!m_nvControl || !m_nvControl->m_display)
         return;
     int enable = Enable ? 1 : 0;
-    auto display = m_nvControl->m_display;
+    auto * display = m_nvControl->m_display;
     m_nvControl->m_setAttrib(display->GetDisplay(), display->GetScreen(), 0, NV_CTRL_VRR_ALLOWED, enable);
 }
 
@@ -149,7 +149,7 @@ NVControl MythNVControl::Create()
             auto queryversion = reinterpret_cast<bool(*)(Display*,int,int)>(lib.resolve("XNVCTRLQueryVersion"));
             if (isnvscreen && queryversion)
             {
-                if (auto xdisplay = MythXDisplay::OpenMythXDisplay(false); xdisplay && xdisplay->GetDisplay())
+                if (auto * xdisplay = MythXDisplay::OpenMythXDisplay(false); xdisplay && xdisplay->GetDisplay())
                 {
                     int major = 0;
                     int minor = 0;
@@ -185,14 +185,13 @@ MythNVControl::MythNVControl(const QString &Path, MythXDisplay* _Display)
 
 MythNVControl::~MythNVControl()
 {
-    if (m_display)
-        delete m_display;
+    delete m_display;
     m_lib.unload();
 }
 
-int MythNVControl::GetDisplayID()
+int MythNVControl::GetDisplayID() const
 {
-    auto display = m_display->GetDisplay();
+    auto * display = m_display->GetDisplay();
     auto screen  = m_display->GetScreen();
     uint32_t * data = nullptr;
     int size = 0;

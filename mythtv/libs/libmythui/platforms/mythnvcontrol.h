@@ -26,7 +26,7 @@ class MythGSync : public MythVRR
     static inline bool s_gsyncResetOnExit  = false;
     static inline bool s_gsyncDefaultValue = false;
     static void ForceGSync(bool Enable);
-    static MythVRRPtr CreateGSync(NVControl Device, MythVRRRange Range);
+    static MythVRRPtr CreateGSync(const NVControl& Device, MythVRRRange Range);
    ~MythGSync() override;
     void SetEnabled(bool Enable = true) override;
 
@@ -41,7 +41,7 @@ class MythNVControl
     static NVControl Create();
    ~MythNVControl();
 
-    int GetDisplayID();
+    int GetDisplayID() const;
 
   protected:
     MythNVControl(const QString& Path, MythXDisplay* _Display);
