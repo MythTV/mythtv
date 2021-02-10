@@ -104,6 +104,31 @@ static const QRegularExpression kUKYear { R"([\[\(]([\d]{4})[\)\]])" };
 static const QRegularExpression kUKYearColon { R"(^[\d]{4}:)" };
 static const QRegularExpression kUnitymediaImdbrating { R"(\s*IMDb Rating: (\d\.\d)\s?/10$)" };
 
+QMap<QChar,quint16> r2v = {
+    {'I' ,   1}, {'V' ,   5}, {'X' ,   10}, {'L' , 50},
+    {'C' , 100}, {'D' , 500}, {'M' , 1000},
+    {QChar(0x399), 1}, // Greek Ι
+};
+
+int EITFixUp::parseRoman (QString roman)
+{
+    if (roman.isEmpty())
+        return 0;
+
+    uint result = 0;
+    for (int i = 0; i < roman.size() - 1; i++)
+    {
+        int v1 = r2v[roman.at(i)];
+        int v2 = r2v[roman.at(i+1)];
+        result += (v1 >= v2) ? v1 : -v1;
+    }
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+    return result + r2v[roman.at(roman.size() - 1)];
+#else
+    return result + r2v[roman.back()];
+#endif
+}
+
 
 EITFixUp::EITFixUp()
     : m_bellYear("[\\(]{1}[0-9]{4}[\\)]{1}"),
@@ -2849,50 +2874,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
           || (position2 = tmpSeries.indexIn(event.m_description)) != -1)
     {
         if (!tmpSeries.isEmpty()) //number
-        {
-            // make sure I replace greek Ι with english I
-            QString romanSeries = tmpSeries.cap(1).replace("Ι","I").toUpper();
-            if (romanSeries == "I")
-                event.m_season = 1;
-            else if (romanSeries == "II")
-                event.m_season = 2;
-            else if (romanSeries== "III")
-                event.m_season = 3;
-            else if (romanSeries == "IV")
-                event.m_season = 4;
-            else if (romanSeries == "V")
-                event.m_season = 5;
-            else if (romanSeries== "VI")
-                event.m_season = 6;
-            else if (romanSeries == "VII")
-                event.m_season = 7;
-            else if (romanSeries == "VIII")
-                event.m_season = 8;
-            else if (romanSeries == "IX")
-                event.m_season = 9;
-            else if (romanSeries == "X")
-                event.m_season = 10;
-            else if (romanSeries == "XI")
-                event.m_season = 11;
-            else if (romanSeries == "XII")
-                event.m_season = 12;
-            else if (romanSeries == "XIII")
-                event.m_season = 13;
-            else if (romanSeries == "XIV")
-                event.m_season = 14;
-            else if (romanSeries == "XV")
-                event.m_season = 15;
-            else if (romanSeries == "XVI")
-                event.m_season = 16;
-            else if (romanSeries == "XVII")
-                event.m_season = 17;
-            else if (romanSeries == "XVIII")
-                event.m_season = 18;
-            else if (romanSeries == "XIX")
-                event.m_season = 19;
-            else if (romanSeries == "XX")
-                event.m_season = 20;
-        }
+            event.m_season = parseRoman(tmpSeries.cap(1).toUpper());
         series = true;
         if (position1 != -1)
         {

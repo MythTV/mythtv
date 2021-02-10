@@ -76,6 +76,8 @@ class MTV_PUBLIC EITFixUp
 
     void Fix(DBEventEIT &event) const;
 
+    static int parseRoman (QString roman);
+
     /** Corrects starttime to the multiple of a minute. 
      *  Used for providers who fail to handle leap seconds timely. Changes the
      *  starttime not more than 3 seconds. Sshould only be used if the
