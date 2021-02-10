@@ -156,7 +156,7 @@ bool TVRec::Init(void)
         m_eitTransportTimeout = 6s;
     m_eitCrawlIdleStart = gCoreContext->GetDurSetting<std::chrono::seconds>("EITCrawIdleStart", 60s);
     m_audioSampleRateDB = gCoreContext->GetNumSetting("AudioSampleRate");
-    m_overRecordSecNrml = gCoreContext->GetDurSetting<std::chrono::minutes>("RecordOverTime");
+    m_overRecordSecNrml = gCoreContext->GetDurSetting<std::chrono::seconds>("RecordOverTime");
     m_overRecordSecCat  = gCoreContext->GetDurSetting<std::chrono::minutes>("CategoryOverTime");
     m_overRecordCategory= gCoreContext->GetSetting("OverTimeCategory");
 
