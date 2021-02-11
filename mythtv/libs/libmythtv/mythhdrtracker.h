@@ -13,15 +13,15 @@ class MythHDRTracker
 {
   public:
     static HDRTracker Create(class MythDisplay* _Display);
-    virtual void Update(class MythVideoFrame* Frame) = 0;
-    virtual void Reset() = 0;
+    ~MythHDRTracker();
+    void     Update(class MythVideoFrame* Frame);
 
   protected:
     explicit MythHDRTracker(MythHDRPtr HDR);
-    virtual ~MythHDRTracker() = default;
+    void     Reset();
 
-    MythHDRVideoPtr m_ffmpegMetadata { nullptr };
-    MythHDRPtr      m_hdrSupport     { nullptr };
+    MythHDRVideoPtr m_metadata { nullptr };
+    MythHDRPtr      m_hdr      { nullptr };
 };
 
 #endif

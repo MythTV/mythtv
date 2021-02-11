@@ -535,11 +535,9 @@ using_frontend {
         HEADERS += drm/mythvideodrm.h
         HEADERS += drm/mythvideodrmbuffer.h
         HEADERS += drm/mythvideodrmutils.h
-        HEADERS += drm/mythhdrtrackerdrm.h
         SOURCES += drm/mythvideodrm.cpp
         SOURCES += drm/mythvideodrmbuffer.cpp
         SOURCES += drm/mythvideodrmutils.cpp
-        SOURCES += drm/mythhdrtrackerdrm.cpp
     }
 
     using_vaapi {

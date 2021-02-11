@@ -181,7 +181,7 @@ QStringList MythDisplay::GetDescription()
         auto types = m_hdrState->m_supportedTypes;
         auto hdr = m_hdrState->TypesToString();
         result.append(tr("Supported HDR formats\t: %1").arg(hdr.join(",")));
-        if (types && !m_hdrState->m_controllable)
+        if (types && !m_hdrState->IsControllable())
             result.append(tr("HDR mode switching is not available"));
     }
 
@@ -930,14 +930,10 @@ void MythDisplay::InitHDR()
 {
     if (m_edid.Valid())
     {
-        m_hdrState = m_edid.GetHDRSupport();
-        auto hdr = m_hdrState->TypesToString();
-        if (m_hdrState->m_metadataType != MythHDR::StaticType1 &&
-            m_hdrState->m_supportedTypes > MythHDR::SDR)
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC + "Display does not report support for Static Metadata Type 1");
-        }
-        LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Supported HDR formats: %1").arg(hdr.join(",")));
+        auto hdrdesc = m_edid.GetHDRSupport();
+        m_hdrState = MythHDR::Create(this, hdrdesc);
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Supported HDR formats: %1")
+            .arg(m_hdrState->TypesToString().join(",")));
     }
 }
 

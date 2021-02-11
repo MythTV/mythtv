@@ -22,7 +22,6 @@ class MUI_PUBLIC MythDisplayDRM : public MythDisplay
 
   public:
     bool IsPlanar() override;
-    void InitHDR() override;
     bool VideoModesAvailable() override;
     bool UsingVideoModes() override;
     void UpdateCurrentMode() override;

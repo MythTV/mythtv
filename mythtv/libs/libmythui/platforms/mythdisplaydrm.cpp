@@ -9,7 +9,7 @@
 void MythDisplayDRM::MainWindowReady()
 {
 #ifdef USING_QTPRIVATEHEADERS
-    if (m_device.get())
+    if (m_device)
         m_device->MainWindowReady();
 #endif
 }
@@ -22,8 +22,8 @@ bool MythDisplayDRM::DirectRenderingAvailable()
 
     if (auto mainwindow = GetMythMainWindow(); mainwindow)
         if (auto drmdisplay = dynamic_cast<MythDisplayDRM*>(mainwindow->GetDisplay()); drmdisplay)
-            if (auto drm = drmdisplay->GetDevice(); drm.get() && drm->Atomic() && drm->Authenticated())
-                if (auto plane = drm->GetVideoPlane(); plane.get() && plane->m_id)
+            if (auto drm = drmdisplay->GetDevice(); drm && drm->Atomic() && drm->Authenticated())
+                if (auto plane = drm->GetVideoPlane(); plane && plane->m_id)
                     return true;
 #endif
     return false;
@@ -34,7 +34,7 @@ MythDisplayDRM::MythDisplayDRM(MythMainWindow* MainWindow)
     m_device = MythDRMDevice::Create(m_screen);
     Initialise();
 #ifdef USING_QTPRIVATEHEADERS
-    if (MainWindow && m_device.get() && m_device->GetVideoPlane().get())
+    if (MainWindow && m_device && m_device->GetVideoPlane())
         connect(MainWindow, &MythMainWindow::SignalWindowReady, this, &MythDisplayDRM::MainWindowReady);
 #else
     (void)MainWindow;
@@ -57,10 +57,10 @@ void MythDisplayDRM::ScreenChanged(QScreen *qScreen)
 {
     MythDisplay::ScreenChanged(qScreen);
 
-    if (m_device.get() && m_device->GetScreen() != m_screen)
+    if (m_device && m_device->GetScreen() != m_screen)
         m_device = nullptr;
 
-    if (!m_device.get())
+    if (!m_device)
         m_device = MythDRMDevice::Create(m_screen);
 
     emit screenChanged();
@@ -68,36 +68,29 @@ void MythDisplayDRM::ScreenChanged(QScreen *qScreen)
 
 bool MythDisplayDRM::VideoModesAvailable()
 {
-    return m_device.get() && m_device->CanSwitchModes();
+    return m_device && m_device->CanSwitchModes();
 }
 
 bool MythDisplayDRM::IsPlanar()
 {
 #ifdef USING_QTPRIVATEHEADERS
-    return m_device.get() && m_device->Authenticated() && m_device->Atomic() &&
-           m_device->GetVideoPlane().get() && m_device->GetVideoPlane()->m_id;
+    return m_device && m_device->Authenticated() && m_device->Atomic() &&
+           m_device->GetVideoPlane() && m_device->GetVideoPlane()->m_id;
 #else
     return false;
 #endif
 }
 
-void MythDisplayDRM::InitHDR()
-{
-    MythDisplay::InitHDR();
-    if (m_hdrState.get() && m_device.get() && m_device->Atomic() && m_device->Authenticated())
-        m_hdrState->m_controllable = true;
-}
-
 bool MythDisplayDRM::UsingVideoModes()
 {
-    if (gCoreContext && m_device.get() && m_device->CanSwitchModes())
+    if (gCoreContext && m_device && m_device->CanSwitchModes())
         return gCoreContext->GetBoolSetting("UseVideoModes", false);
     return false;
 }
 
 void MythDisplayDRM::UpdateCurrentMode()
 {
-    if (m_device.get())
+    if (m_device)
     {
         // Ensure video modes are fetched early
         GetVideoModes();
@@ -118,7 +111,7 @@ const MythDisplayModes& MythDisplayDRM::GetVideoModes()
 
     m_videoModes.clear();
     m_modeMap.clear();
-    if (!m_screen || !m_device.get() || !m_device->CanSwitchModes())
+    if (!m_screen || !m_device || !m_device->CanSwitchModes())
         return m_videoModes;
 
     auto mainresolution = m_device->GetResolution();
@@ -169,7 +162,7 @@ const MythDisplayModes& MythDisplayDRM::GetVideoModes()
 
 bool MythDisplayDRM::SwitchToVideoMode(QSize Size, double DesiredRate)
 {
-    if (!m_screen || !m_device.get() || !m_device->CanSwitchModes() || m_videoModes.empty())
+    if (!m_screen || !m_device || !m_device->CanSwitchModes() || m_videoModes.empty())
         return false;
 
     auto rate = static_cast<double>(NAN);

@@ -74,7 +74,6 @@ class MUI_PUBLIC MythDisplay : public QObject
 
     virtual void    UpdateCurrentMode  ();
     virtual bool    SwitchToVideoMode  (QSize Size, double Framerate);
-    virtual void    InitHDR            ();
 
     void            DebugModes         () const;
     void            SetWidget          (QWidget *MainWindow);
@@ -84,6 +83,7 @@ class MUI_PUBLIC MythDisplay : public QObject
     void            InitScreenBounds   ();
     void            WaitForScreenChange();
     void            WaitForNewScreen   ();
+    void            InitHDR            ();
 
     bool            m_waitForModeChanges { true };
     bool            m_modeComplete     { false };

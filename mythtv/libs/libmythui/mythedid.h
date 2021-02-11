@@ -15,6 +15,7 @@
 #include <array>
 #include <tuple>
 
+using MythHDRDesc  = std::tuple<MythHDR::HDRTypes,double,double,double>;
 using MythVRRRange = std::tuple<int,int,bool>;
 
 class MUI_PUBLIC MythEDID
@@ -37,7 +38,7 @@ class MUI_PUBLIC MythEDID
     int         AudioLatency      (bool Interlaced) const;
     int         VideoLatency      (bool Interlaced) const;
     void        Debug             () const;
-    MythHDRPtr  GetHDRSupport     () const;
+    MythHDRDesc GetHDRSupport     () const;
     MythVRRRange GetVRRRange      () const;
 
   private:
@@ -47,12 +48,6 @@ class MUI_PUBLIC MythEDID
         HDRTrad = 1 << 1,
         HDR10   = 1 << 2,
         HLG     = 1 << 3
-    };
-
-    enum HDRMetadaType
-    {
-        Unknown = 0,
-        Static1 = 1 << 0
     };
 
     void        Parse             ();
@@ -88,8 +83,8 @@ class MUI_PUBLIC MythEDID
     uint8_t     m_deepYUV         { 0 };
     int         m_vrrMin          { 0 };
     int         m_vrrMax          { 0 };
-    MythHDR::HDRTypes m_hdrSupport { MythHDR::SDR };
     int         m_hdrMetaTypes    { 0 };
+    MythHDR::HDRTypes m_hdrSupport { MythHDR::SDR };
     double      m_maxLuminance    { 0.0 };
     double      m_maxAvgLuminance { 0.0 };
     double      m_minLuminance    { 0.0 };
