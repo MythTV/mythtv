@@ -222,6 +222,8 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* R
         m_needFullClear = true;
     }
 
+    m_hdrTracker = MythHDRTracker::Create(Display);
+
     connect(this, &MythVideoOutputGPU::RefreshState,   this, &MythVideoOutputGPU::DoRefreshState);
     connect(this, &MythVideoOutputGPU::DoRefreshState, this, &MythVideoOutputGPU::RefreshVideoBoundsState);
     connect(this, &MythVideoOutputGPU::DoRefreshState,
@@ -238,6 +240,8 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* R
 
 MythVideoOutputGPU::~MythVideoOutputGPU()
 {
+    m_hdrTracker = nullptr;
+
     MythVideoOutputGPU::DestroyBuffers();
     delete m_video;
     if (m_painter)
@@ -584,6 +588,10 @@ void MythVideoOutputGPU::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
     if (Frame)
     {
         SetRotation(Frame->m_rotation);
+
+        if (m_hdrTracker)
+            m_hdrTracker->Update(Frame);
+
         if (MythVideoFrame::HardwareFormat(Frame->m_type) || Frame->m_dummy)
             return;
 

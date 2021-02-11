@@ -3,6 +3,7 @@
 
 // MythTV
 #include "mythvideoout.h"
+#include "mythhdrtracker.h"
 
 class MythMainWindow;
 class MythVideoGPU;
@@ -77,6 +78,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     bool            m_buffersCreated      { false };
     QString         m_profile;
     bool            m_needFullClear       { false };
+    HDRTracker      m_hdrTracker          { nullptr };
 
   private:
     Q_DISABLE_COPY(MythVideoOutputGPU)
