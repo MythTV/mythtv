@@ -147,7 +147,6 @@ using_drm {
     HEADERS += platforms/drm/mythdrmencoder.h
     HEADERS += platforms/drm/mythdrmframebuffer.h
     HEADERS += platforms/drm/mythdrmvrr.h
-    HEADERS += platforms/drm/mythdrmhdr.h
     SOURCES += platforms/mythdisplaydrm.cpp
     SOURCES += platforms/mythscreensaverdrm.cpp
     SOURCES += platforms/mythdrmdevice.cpp
@@ -160,8 +159,12 @@ using_drm {
     SOURCES += platforms/drm/mythdrmencoder.cpp
     SOURCES += platforms/drm/mythdrmframebuffer.cpp
     SOURCES += platforms/drm/mythdrmvrr.cpp
-    SOURCES += platforms/drm/mythdrmhdr.cpp
     QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
+
+    using_qtprivateheaders {
+        HEADERS += platforms/drm/mythdrmhdr.h
+        SOURCES += platforms/drm/mythdrmhdr.cpp
+    }
 }
 
 using_qtprivateheaders {

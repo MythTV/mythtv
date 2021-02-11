@@ -2,7 +2,7 @@
 #include "mythhdr.h"
 #include "mythdisplay.h"
 
-#ifdef USING_DRM
+#if defined (USING_DRM) && defined (USING_QTPRIVATEHEADERS)
 #include "platforms/drm/mythdrmhdr.h"
 #endif
 
@@ -33,7 +33,7 @@ MythHDRPtr MythHDR::Create(MythDisplay* _Display, const MythHDRDesc& Desc)
     // Only try and create a controllable device if the display supports HDR
     if (std::get<0>(Desc) > SDR)
     {
-#ifdef USING_DRM
+#if defined (USING_DRM) && defined (USING_QTPRIVATEHEADERS)
         result = MythDRMHDR::Create(_Display, Desc);
 #else
         (void)_Display;
