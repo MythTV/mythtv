@@ -115,25 +115,24 @@ using_bindings_python {
 
     INSTALLS += internetcontent_python_scripts
 
+    #
+    # internetcontent perl scripts do not require transformation
+    # but do require the perl bindings to function
+    #
+    using_bindings_perl {
+
+        internetcontent_perl_scripts.path = $${PREFIX}/share/mythtv/internetcontent
+        internetcontent_perl_scripts.files += internetcontent/nv_perl_libs internetcontent/*.pl
+
+        INSTALLS += internetcontent_perl_scripts
+
+    }
+
     unix|macx|mingw:QMAKE_CLEAN += -r $${OBJECTS_DIR}/metadata/Music/*
     unix|macx|mingw:QMAKE_DISTCLEAN += -r $${OBJECTS_DIR}/metadata
     win32-msvc*:QMAKE_CLEAN += /s /f /q $${OBJECTS_DIR}/metadata/Music/*.* $$escape_expand(\n\t) \
                                rd /s /q $${OBJECTS_DIR}/metadata/Music/*.*
     win32-msvc*:QMAKE_DISTCLEAN += /s /f /q $${OBJECTS_DIR}/metadata/*.* $$escape_expand(\n\t) \
                                    rd /s /q $${OBJECTS_DIR}/metadata
-
-
-}
-
-#
-# internetcontent perl scripts do not require transformation
-# but do require the perl bindings to function
-#
-using_bindings_perl {
-
-    internetcontent_perl_scripts.path = $${PREFIX}/share/mythtv/internetcontent
-    internetcontent_perl_scripts.files += internetcontent/nv_perl_libs internetcontent/*.pl
-
-    INSTALLS += internetcontent_perl_scripts
 
 }
