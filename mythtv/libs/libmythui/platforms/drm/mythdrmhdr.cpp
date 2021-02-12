@@ -61,7 +61,7 @@ static inline hdmi_eotf MythHDRToDRMHDR(MythHDR::HDRType Type)
     return HDMI_EOTF_TRADITIONAL_GAMMA_SDR;
 }
 
-void MythDRMHDR::SetHDRMetadata(HDRType Type, MythHDRMetaPtr Metadata)
+void MythDRMHDR::SetHDRMetadata(HDRType Type, const MythHDRMetaPtr& Metadata)
 {
     static hdr_output_metadata s_defaultMetadata =
     {

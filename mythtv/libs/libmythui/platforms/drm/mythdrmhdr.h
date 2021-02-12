@@ -55,7 +55,7 @@ class MythDRMHDR : public MythHDR
   public:
     static MythHDRPtr Create(class MythDisplay* _Display, const MythHDRDesc& Desc);
    ~MythDRMHDR() override;
-    void SetHDRMetadata(HDRType Type, MythHDRMetaPtr Metadata) override;
+    void SetHDRMetadata(HDRType Type, const MythHDRMetaPtr& Metadata) override;
 
   protected:
     MythDRMHDR(MythDRMPtr Device, DRMProp HDRProp, const MythHDRDesc& Desc);

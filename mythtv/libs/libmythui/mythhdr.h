@@ -45,7 +45,7 @@ class MUI_PUBLIC MythHDR
     using MythHDRDesc = std::tuple<HDRTypes,double,double,double>;
     static MythHDRPtr  Create(class MythDisplay* _Display, const MythHDRDesc& Desc);
     virtual ~MythHDR() = default;
-    virtual void SetHDRMetadata(HDRType /*Type*/, MythHDRMetaPtr /*Metadata*/) {}
+    virtual void SetHDRMetadata(HDRType /*Type*/, const MythHDRMetaPtr& /*Metadata*/) {}
 
     static QString     TypeToString (HDRType Type);
     static QStringList TypesToString(HDRTypes Types);
