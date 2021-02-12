@@ -65,6 +65,7 @@ class StatusBox : public MythScreenType
     void doAutoExpireList(bool updateExpList);
     void doAutoExpireList() { doAutoExpireList(true); }
     void doDisplayStatus();
+    void doRenderStatus();
     void doDecoderStatus();
 
   private:

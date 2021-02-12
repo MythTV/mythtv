@@ -134,6 +134,10 @@ void StatusBox::Init()
                                     &StatusBox::doDisplayStatus);
     item->DisplayState("display", "icon");
 
+    item = new MythUIButtonListItem(m_categoryList, tr("Rendering"),
+                                    &StatusBox::doRenderStatus);
+    item->DisplayState("render", "icon");
+
     item = new MythUIButtonListItem(m_categoryList, tr("Machine Status"),
                                     &StatusBox::doMachineStatus);
     item->DisplayState("machine", "icon");
@@ -1550,19 +1554,29 @@ void StatusBox::doDisplayStatus()
     if (m_iconState)
         m_iconState->DisplayState("display");
     m_logList->Reset();
-    QString displayhelp = tr("Display and rendering information.");
+    auto displayhelp = tr("Display information.");
     if (m_helpText)
         m_helpText->SetText(displayhelp);
     if (m_justHelpText)
         m_justHelpText->SetText(displayhelp);
 
-    auto * window = GetMythMainWindow();
-    QStringList desc = window->GetDisplay()->GetDescription();
+    auto desc = GetMythMainWindow()->GetDisplay()->GetDescription();
     for (const auto & line : qAsConst(desc))
         AddLogLine(line);
-    AddLogLine("");
+}
 
-    auto * render = window->GetRenderDevice();
+void StatusBox::doRenderStatus()
+{
+    if (m_iconState)
+        m_iconState->DisplayState("render");
+    m_logList->Reset();
+    auto displayhelp = tr("Render information.");
+    if (m_helpText)
+        m_helpText->SetText(displayhelp);
+    if (m_justHelpText)
+        m_justHelpText->SetText(displayhelp);
+
+    auto * render = GetMythMainWindow()->GetRenderDevice();
     if (render && render->Type() == kRenderOpenGL)
     {
         auto * opengl = dynamic_cast<MythRenderOpenGL*>(render);
@@ -1612,7 +1626,7 @@ void StatusBox::doDisplayStatus()
             freemem->Start();
         }
 
-        desc = render->GetDescription();
+        auto desc = render->GetDescription();
         for (const auto & line : qAsConst(desc))
             AddLogLine(line);
     }
