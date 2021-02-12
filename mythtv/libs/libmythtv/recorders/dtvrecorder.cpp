@@ -886,8 +886,8 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
                 }
                 break;
             }
-            else
-                m_pesTimer.stop();
+
+            m_pesTimer.stop();
 
             // bounds check
             if (i + 5 >= TSPacket::kSize)
