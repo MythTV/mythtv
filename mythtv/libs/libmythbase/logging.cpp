@@ -203,7 +203,7 @@ void LoggingItem::setThreadTid(void)
 /// \brief Convert numerical timestamp to a readable date and time.
 QString LoggingItem::getTimestamp (const char *format) const
 {
-    QDateTime epoch = QDateTime::fromMSecsSinceEpoch(m_epoch.count());
+    QDateTime epoch = QDateTime::fromMSecsSinceEpoch(m_epoch.count()/1000);
     QString timestamp = epoch.toString(format);
     return timestamp;
 }
