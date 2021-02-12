@@ -301,10 +301,11 @@ static void writeout_video(multiplex_t *mx)
 	if (write(mx->fd_out, outbuf.data(), written) != written) {
 	  mx->error++;
 	  if (mx->error <= 0) mx->error = 1; // avoid int rollover to zero
-	  if (mx->error < 10) // mythtv#244: log only first few failures
+	  if (mx->error < 10) { // mythtv#244: log only first few failures
 	    LOG(VB_GENERAL, LOG_ERR,
 		QString("%1 writes failed: %2")
 		.arg(mx->error).arg(strerror(errno)));
+          }
 	}
 
 #ifdef OUT_DEBUG
@@ -602,7 +603,7 @@ int write_out_packs( multiplex_t *mx, int video_ok, aok_arr &ext_ok)
 			writeout_padding(mx);
 		}
 	}
-	return mx->error || 0;
+	return mx->error;
 }
 
 int finish_mpg(multiplex_t *mx)
@@ -661,7 +662,7 @@ int finish_mpg(multiplex_t *mx)
 	dummy_destroy(&mx->vdbuf);
 	for (int i=0; i<mx->extcnt;i++)
 		dummy_destroy(&mx->ext[i].dbuf);
-	return mx->error || 0;
+	return mx->error;
 }
 
 static int get_ts_video_overhead(int pktsize, sequence_t *seq)

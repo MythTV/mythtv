@@ -2632,7 +2632,7 @@ int MPEG2fixup::Start()
     pthread_cond_signal(&m_rx.m_cond);
     pthread_mutex_unlock( &m_rx.m_mutex );
     int ex = REENCODE_OK;
-    void *errors; // mythtv#244: return error if any write or close failures
+    void *errors = nullptr; // mythtv#244: return error if any write or close failures
     pthread_join(m_thread, &errors);
     if (*(int *)errors) {
       LOG(VB_GENERAL, LOG_ERR,
