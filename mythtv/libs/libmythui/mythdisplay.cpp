@@ -146,6 +146,23 @@ QStringList MythDisplay::GetDescription()
         result.append("");
     }
 
+    if (m_hdrState)
+    {
+        auto types = m_hdrState->m_supportedTypes;
+        auto hdr = m_hdrState->TypesToString();
+        result.append(tr("Supported HDR formats\t: %1").arg(hdr.join(",")));
+        if (types && !m_hdrState->IsControllable())
+            result.append(tr("HDR mode switching is not available"));
+    }
+
+    if (m_vrrState)
+    {
+        result.append(tr("Variable refresh rate '%1': %2 %3")
+                      .arg(m_vrrState->TypeToString())
+                      .arg(m_vrrState->Enabled() ? tr("Enabled") : tr("Disabled"))
+                      .arg(m_vrrState->RangeDescription()));
+    }
+
     auto * current = GetCurrentScreen();
     const auto screens = QGuiApplication::screens();
     bool first = true;
@@ -172,25 +189,15 @@ QStringList MythDisplay::GetDescription()
                 result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
                               .arg(GetResolution().width()).arg(GetResolution().height())
                               .arg(GetRefreshRate(), 0, 'f', 2));
+                const auto & modes = GetVideoModes();
+                if (!modes.empty())
+                {
+                    result.append(tr("Available modes:"));
+                    for (auto it = modes.crbegin(); it != modes.crend(); ++it)
+                        result.append("  " + it->ToString());
+                }
             }
         }
-    }
-
-    if (m_hdrState)
-    {
-        auto types = m_hdrState->m_supportedTypes;
-        auto hdr = m_hdrState->TypesToString();
-        result.append(tr("Supported HDR formats\t: %1").arg(hdr.join(",")));
-        if (types && !m_hdrState->IsControllable())
-            result.append(tr("HDR mode switching is not available"));
-    }
-
-    if (m_vrrState)
-    {
-        result.append(tr("Variable refresh rate '%1': %2 %3")
-                      .arg(m_vrrState->TypeToString())
-                      .arg(m_vrrState->Enabled() ? tr("Enabled") : tr("Disabled"))
-                      .arg(m_vrrState->RangeDescription()));
     }
 
     return result;
