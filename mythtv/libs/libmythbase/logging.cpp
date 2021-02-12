@@ -130,7 +130,7 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
         m_line(_line), m_type(_type), m_level(_level),
         m_file(_file), m_function(_function)
 {
-    m_epoch = nowAsDuration<std::chrono::milliseconds>();
+    m_epoch = nowAsDuration<std::chrono::microseconds>();
     setThreadTid();
 }
 
@@ -205,6 +205,13 @@ QString LoggingItem::getTimestamp (const char *format) const
 {
     QDateTime epoch = QDateTime::fromMSecsSinceEpoch(m_epoch.count());
     QString timestamp = epoch.toString(format);
+    return timestamp;
+}
+
+QString LoggingItem::getTimestampUs (const char *format) const
+{
+    QString timestamp = getTimestamp(format);
+    timestamp += QString(".%1").arg((m_epoch % 1s).count(),6,10,QChar('0'));
     return timestamp;
 }
 

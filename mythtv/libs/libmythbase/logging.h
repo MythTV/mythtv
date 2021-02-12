@@ -85,7 +85,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     static LoggingItem *create(QByteArray &buf);
     QByteArray toByteArray(void);
     QString getTimestamp(const char *format = "yyyy-MM-dd HH:mm:ss") const;
-    QString getTimestampUs(void) const { return getTimestamp("yyyy-MM-dd HH:mm:ss.zzz"); };
+    QString getTimestampUs(const char *format = "yyyy-MM-dd HH:mm:ss") const;
     char getLevelChar(void);
 
     int                 pid() const         { return m_pid; };
@@ -95,7 +95,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     int                 type() const        { return (int)m_type; };
     int                 level() const       { return (int)m_level; };
     int                 facility() const    { return m_facility; };
-    std::chrono::milliseconds epoch() const { return m_epoch; };
+    std::chrono::microseconds epoch() const { return m_epoch; };
     qlonglong epochInt() const              { return m_epoch.count(); };
     QString             file() const        { return m_file; };
     QString             function() const    { return m_function; };
@@ -112,8 +112,8 @@ class LoggingItem: public QObject, public ReferenceCounter
     void setType(const int val)             { m_type = (LoggingType)val; };
     void setLevel(const int val)            { m_level = (LogLevel_t)val; };
     void setFacility(const int val)         { m_facility = val; };
-    void setEpoch(std::chrono::milliseconds val) { m_epoch = val; };
-    void setEpochInt(const qlonglong val)   { m_epoch = std::chrono::milliseconds(val); };
+    void setEpoch(std::chrono::microseconds val) { m_epoch = val; };
+    void setEpochInt(const qlonglong val)   { setEpoch(std::chrono::microseconds(val)); };
     void setFile(const QString &val)        { m_file = val; };
     void setFunction(const QString &val)    { m_function = val; };
     void setThreadName(const QString &val)  { m_threadName = val; };
@@ -130,7 +130,7 @@ class LoggingItem: public QObject, public ReferenceCounter
     LoggingType         m_type       {kMessage};
     LogLevel_t          m_level      {LOG_INFO};
     int                 m_facility   {0};
-    std::chrono::milliseconds m_epoch {0ms};
+    std::chrono::microseconds m_epoch {0us};
     QString             m_file       {};
     QString             m_function   {};
     QString             m_threadName {};
