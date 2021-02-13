@@ -35,7 +35,6 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
 {
     uint port = 0;
 
-    qRegisterMetaType<std::chrono::milliseconds>("std::chrono::milliseconds");
     connect(this, &SatIPRTSP::startKeepAlive, this, &SatIPRTSP::startKeepAliveRequested);
     connect(this, &SatIPRTSP::stopKeepAlive, this, &SatIPRTSP::stopKeepAliveRequested);
 

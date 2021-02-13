@@ -1577,6 +1577,10 @@ bool MythContext::Init(const bool gui,
         return false;
     }
 
+    qRegisterMetaType<std::chrono::seconds>("std::chrono::seconds");
+    qRegisterMetaType<std::chrono::milliseconds>("std::chrono::milliseconds");
+    qRegisterMetaType<std::chrono::microseconds>("std::chrono::microseconds");
+
     SetDisableEventPopup(true);
 
     if (m_appBinaryVersion != MYTH_BINARY_VERSION)
