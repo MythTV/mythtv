@@ -1169,21 +1169,21 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
     return query.exec();
 }
 
+QReadWriteLock ChannelUtil::s_channelDefaultAuthorityMapLock;
+QMap<uint,QString> ChannelUtil::s_channelDefaultAuthorityMap;
+bool ChannelUtil::s_channelDefaultAuthority_runInit = true;
+
 /** Returns the DVB default authority for the chanid given. */
 QString ChannelUtil::GetDefaultAuthority(uint chanid)
 {
-    static QReadWriteLock s_channelDefaultAuthorityMapLock;
-    static QMap<uint,QString> s_channelDefaultAuthorityMap;
-    static bool s_runInit = true;
-
     s_channelDefaultAuthorityMapLock.lockForRead();
 
-    if (s_runInit)
+    if (s_channelDefaultAuthority_runInit)
     {
         s_channelDefaultAuthorityMapLock.unlock();
         s_channelDefaultAuthorityMapLock.lockForWrite();
         // cppcheck-suppress identicalInnerCondition
-        if (s_runInit)
+        if (s_channelDefaultAuthority_runInit)
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare(
@@ -1202,7 +1202,7 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
                             query.value(1).toString();
                     }
                 }
-                s_runInit = false;
+                s_channelDefaultAuthority_runInit = false;
             }
             else
             {
@@ -1223,7 +1223,7 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
                             query.value(1).toString();
                     }
                 }
-                s_runInit = false;
+                s_channelDefaultAuthority_runInit = false;
             }
             else
             {
