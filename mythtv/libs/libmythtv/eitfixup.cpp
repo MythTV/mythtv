@@ -629,7 +629,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     position = event.m_title.indexOf("(HD)");
     if (position != -1)
     {
-        event.m_description = event.m_title.replace("(HD)", "");
+        event.m_title = event.m_title.replace("(HD)", "");
         event.m_videoProps |= VID_HDTV;
     }
 
