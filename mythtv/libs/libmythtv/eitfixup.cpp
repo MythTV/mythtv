@@ -46,19 +46,7 @@ int EITFixUp::parseRoman (QString roman)
 
 
 EITFixUp::EITFixUp()
-    : m_mcaIncompleteTitle(R"((.*).\.\.\.$)"),
-      m_mcaCompleteTitlea("^'?("),
-      m_mcaCompleteTitleb(R"([^\.\?]+[^\'])'?[\.\?]\s+(.+))"),
-      m_mcaSubtitle(R"(^'([^\.]+)'\.\s+(.+))"),
-      m_mcaSeries(R"(^S?(\d+)\/E?(\d+)\s-\s(.*)$)"),
-      m_mcaCredits(R"((.*)\s\((\d{4})\)\s*([^\.]+)\.?\s*$)"),
-      m_mcaAvail(R"(\s(Only available on [^\.]*bouquet|Not available in RSA [^\.]*)\.?)"),
-      m_mcaActors(R"((.*\.)\s+([^\.]+\s[A-Z][^\.]+)\.\s*)"),
-      m_mcaActorsSeparator("(,\\s+)"),
-      m_mcaYear(R"((.*)\s\((\d{4})\)\s*$)"),
-      m_mcaCC(",?\\s(HI|English) Subtitles\\.?"),
-      m_mcaDD(",?\\sDD\\.?"),
-      m_rtlRepeat(R"((\(|\s)?Wiederholung.+vo[m|n].+((?:\d{2}\.\d{2}\.\d{4})|(?:\d{2}[:\.]\d{2}\sUhr))\)?)"),
+    : m_rtlRepeat(R"((\(|\s)?Wiederholung.+vo[m|n].+((?:\d{2}\.\d{2}\.\d{4})|(?:\d{2}[:\.]\d{2}\sUhr))\)?)"),
       m_rtlSubtitle(R"(^([^\.]{3,})\.\s+(.+))"),
       /* should be (?:\x{8a}|\\.\\s*|$) but 0x8A gets replaced with 0x20 */
       m_rtlSubtitle1(R"(^Folge\s(\d{1,4})\s*:\s+'(.*)'(?:\s|\.\s*|$))"),
@@ -1549,14 +1537,13 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event) const
     }
 }
 
-/** \fn EITFixUp::FixMCA(DBEventEIT&) const
+/**
  *  \brief Use this to standardise the MultiChoice Africa DVB-S guide.
  */
-void EITFixUp::FixMCA(DBEventEIT &event) const
+void EITFixUp::FixMCA(DBEventEIT &event)
 {
     const uint SUBTITLE_PCT     = 60; // % of description to allow subtitle to
     const uint lSUBTITLE_MAX_LEN = 128;// max length of subtitle field in db.
-    QRegExp    tmpExp1;
 
     // Remove subtitle, it contains category information too specific to use
     event.m_subtitle = QString("");
@@ -1566,42 +1553,47 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         return;
 
     // Replace incomplete title if the full one is in the description
-    tmpExp1 = m_mcaIncompleteTitle;
-    if (tmpExp1.indexIn(event.m_title) != -1)
+    QRegularExpression mcaIncompleteTitle { R"((.*).\.\.\.$)" };
+    auto match = mcaIncompleteTitle.match(event.m_title);
+    if (match.hasMatch())
     {
-        tmpExp1 = QRegExp( m_mcaCompleteTitlea.pattern() + tmpExp1.cap(1) +
-                                   m_mcaCompleteTitleb.pattern());
-        tmpExp1.setCaseSensitivity(Qt::CaseInsensitive);
-        if (tmpExp1.indexIn(event.m_description) != -1)
+        QString mcaCompleteTitlea { "^'?(" };
+        QString mcaCompleteTitleb { R"([^\.\?]+[^\'])'?[\.\?]\s+(.+))" };
+        QRegularExpression mcaCompleteTitle
+            { mcaCompleteTitlea + match.capturedRef(1) + mcaCompleteTitleb,
+              QRegularExpression::CaseInsensitiveOption};
+        match = mcaCompleteTitle.match(event.m_description);
+        if (match.hasMatch())
         {
-            event.m_title       = tmpExp1.cap(1).trimmed();
-            event.m_description = tmpExp1.cap(2).trimmed();
+            event.m_title       = match.captured(1).trimmed();
+            event.m_description = match.captured(2).trimmed();
         }
-        tmpExp1.setCaseSensitivity(Qt::CaseSensitive);
     }
 
     // Try to find subtitle in description
-    tmpExp1 = m_mcaSubtitle;
-    if (tmpExp1.indexIn(event.m_description) != -1)
+    QRegularExpression mcaSubtitle { R"(^'([^\.]+)'\.\s+(.+))" };
+    match = mcaSubtitle.match(event.m_description);
+    if (match.hasMatch())
     {
-        uint tmpExp1Len = tmpExp1.cap(1).length();
+        uint matchLen = match.capturedLength(1);
         uint evDescLen = std::max(event.m_description.length(), 1);
 
-        if ((tmpExp1Len < lSUBTITLE_MAX_LEN) &&
-            ((tmpExp1Len * 100 / evDescLen) < SUBTITLE_PCT))
+        if ((matchLen < lSUBTITLE_MAX_LEN) &&
+            ((matchLen * 100 / evDescLen) < SUBTITLE_PCT))
         {
-            event.m_subtitle    = tmpExp1.cap(1);
-            event.m_description = tmpExp1.cap(2);
+            event.m_subtitle    = match.captured(1);
+            event.m_description = match.captured(2);
         }
     }
 
     // Try to find episode numbers in subtitle
-    tmpExp1 = m_mcaSeries;
-    if (tmpExp1.indexIn(event.m_subtitle) != -1)
+    QRegularExpression mcaSeries { R"(^S?(\d+)\/E?(\d+)\s-\s(.*)$)" };
+    match = mcaSeries.match(event.m_subtitle);
+    if (match.hasMatch())
     {
-        uint season    = tmpExp1.cap(1).toUInt();
-        uint episode   = tmpExp1.cap(2).toUInt();
-        event.m_subtitle = tmpExp1.cap(3).trimmed();
+        uint season      = match.capturedRef(1).toUInt();
+        uint episode     = match.capturedRef(2).toUInt();
+        event.m_subtitle = match.captured(3).trimmed();
         event.m_syndicatedepisodenumber =
                 QString("S%1E%2").arg(season).arg(episode);
         event.m_season = season;
@@ -1609,50 +1601,53 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
         event.m_categoryType = ProgramInfo::kCategorySeries;
     }
 
-    // Close captioned?
-    int position = event.m_description.indexOf(m_mcaCC);
+    // Closed captioned?
+    QRegularExpression mcaCC { R"(,?\s(HI|English) Subtitles\.?)" };
+    int position = event.m_description.indexOf(mcaCC);
     if (position > 0)
     {
         event.m_subtitleType |= SUB_HARDHEAR;
-        event.m_description.replace(m_mcaCC, "");
+        event.m_description.remove(mcaCC);
     }
 
     // Dolby Digital 5.1?
-    position = event.m_description.indexOf(m_mcaDD);
+    QRegularExpression mcaDD { R"(,?\sDD\.?)" };
+    position = event.m_description.indexOf(mcaDD);
     if ((position > 0) && (position > event.m_description.length() - 7))
     {
         event.m_audioProps |= AUD_DOLBY;
-        event.m_description.replace(m_mcaDD, "");
+        event.m_description.remove(mcaDD);
     }
 
     // Remove bouquet tags
-    event.m_description.replace(m_mcaAvail, "");
+    QRegularExpression mcaAvail { R"(\s(Only available on [^\.]*bouquet|Not available in RSA [^\.]*)\.?)" };
+    event.m_description.remove(mcaAvail);
 
     // Try to find year and director from the end of the description
     bool isMovie = false;
-    tmpExp1  = m_mcaCredits;
-    position = tmpExp1.indexIn(event.m_description);
-    if (position != -1)
+    QRegularExpression mcaCredits { R"((.*)\s\((\d{4})\)\s*([^\.]+)\.?\s*$)" };
+    match = mcaCredits.match(event.m_description);
+    if (match.hasMatch())
     {
         isMovie = true;
-        event.m_description = tmpExp1.cap(1).trimmed();
+        event.m_description = match.captured(1).trimmed();
         bool ok = false;
-        uint y = tmpExp1.cap(2).trimmed().toUInt(&ok);
+        uint y = match.captured(2).trimmed().toUInt(&ok);
         if (ok)
             event.m_airdate = y;
-        event.AddPerson(DBPerson::kDirector, tmpExp1.cap(3).trimmed());
+        event.AddPerson(DBPerson::kDirector, match.captured(3).trimmed());
     }
     else
     {
         // Try to find year only from the end of the description
-        tmpExp1  = m_mcaYear;
-        position = tmpExp1.indexIn(event.m_description);
-        if (position != -1)
+        QRegularExpression mcaYear { R"((.*)\s\((\d{4})\)\s*$)" };
+        match = mcaYear.match(event.m_description);
+        if (match.hasMatch())
         {
             isMovie = true;
-            event.m_description = tmpExp1.cap(1).trimmed();
+            event.m_description = match.captured(1).trimmed();
             bool ok = false;
-            uint y = tmpExp1.cap(2).trimmed().toUInt(&ok);
+            uint y = match.captured(2).trimmed().toUInt(&ok);
             if (ok)
                 event.m_airdate = y;
         }
@@ -1660,24 +1655,24 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
 
     if (isMovie)
     {
-        tmpExp1  = m_mcaActors;
-        position = tmpExp1.indexIn(event.m_description);
-        if (position != -1)
+        QRegularExpression mcaActors { R"((.*\.)\s+([^\.]+\s[A-Z][^\.]+)\.\s*)" };
+        match = mcaActors.match(event.m_description);
+        if (match.hasMatch())
         {
+            QRegularExpression mcaActorsSeparator { "(,\\s+)" };
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-            const QStringList actors = tmpExp1.cap(2).split(
-                m_mcaActorsSeparator, QString::SkipEmptyParts);
+            const QStringList actors = match.captured(2).split(
+                mcaActorsSeparator, QString::SkipEmptyParts);
 #else
-            const QStringList actors = tmpExp1.cap(2).split(
-                m_mcaActorsSeparator, Qt::SkipEmptyParts);
+            const QStringList actors = match.captured(2).split(
+                mcaActorsSeparator, Qt::SkipEmptyParts);
 #endif
             for (const auto & actor : qAsConst(actors))
                 event.AddPerson(DBPerson::kActor, actor.trimmed());
-            event.m_description = tmpExp1.cap(1).trimmed();
+            event.m_description = match.captured(1).trimmed();
         }
         event.m_categoryType = ProgramInfo::kCategoryMovie;
     }
-
 }
 
 /** \fn EITFixUp::FixRTL(DBEventEIT&) const

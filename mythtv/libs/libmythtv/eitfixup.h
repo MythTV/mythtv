@@ -103,7 +103,7 @@ class MTV_PUBLIC EITFixUp
     static void FixAUNine(DBEventEIT &event);
     static void FixAUSeven(DBEventEIT &event);
     static void FixAUDescription(DBEventEIT &event);
-    void FixMCA(DBEventEIT &event) const;           // MultiChoice Africa DVB-S
+    static void FixMCA(DBEventEIT &event);          // MultiChoice Africa DVB-S
     void FixRTL(DBEventEIT &event) const;           // RTL group DVB
     static void FixPRO7(DBEventEIT &event);         // Pro7/Sat1 Group
     static void FixDisneyChannel(DBEventEIT &event);// Disney Channel
@@ -123,18 +123,6 @@ class MTV_PUBLIC EITFixUp
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
-    const QRegExp m_mcaIncompleteTitle;
-    const QRegExp m_mcaCompleteTitlea;
-    const QRegExp m_mcaCompleteTitleb;
-    const QRegExp m_mcaSubtitle;
-    const QRegExp m_mcaSeries;
-    const QRegExp m_mcaCredits;
-    const QRegExp m_mcaAvail;
-    const QRegExp m_mcaActors;
-    const QRegExp m_mcaActorsSeparator;
-    const QRegExp m_mcaYear;
-    const QRegExp m_mcaCC;
-    const QRegExp m_mcaDD;
     const QRegExp m_rtlRepeat;
     const QRegExp m_rtlSubtitle;
     const QRegExp m_rtlSubtitle1;
