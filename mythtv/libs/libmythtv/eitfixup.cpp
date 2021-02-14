@@ -1535,7 +1535,7 @@ void EITFixUp::FixAUSeven(DBEventEIT &event)
     QRegExp year("(\\d{4})$");
     if (year.indexIn(event.m_description) != -1)
     {
-        event.m_airdate = year.cap(3).toUInt();
+        event.m_airdate = year.cap(1).toUInt();
         event.m_description.resize(event.m_description.size()-5);
     }
     if (event.m_description.endsWith(" CC"))
