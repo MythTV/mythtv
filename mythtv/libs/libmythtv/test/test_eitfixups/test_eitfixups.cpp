@@ -2763,7 +2763,7 @@ void TestEITFixups::testNL_data()
     QTest::newRow("stripme")    << "Title" << "Description. Alpha beta breedbeeld gamma herh. Delta." << "Documentary"
                                 << "Title" << "" << "Description. Alpha beta . gamma . Delta."
                                 << "Documentaire" << ProgramInfo::kCategoryNone
-                                << (int)VID_UNKNOWN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN
+                                << (int)VID_WIDESCREEN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN
                                 << QDate() << QStringList() << QStringList() << QStringList();
     QTest::newRow("teletext")   << "Title" << "Description. Alpha txt Beta" << "Documentary"
                                 << "Title" << "" << "Description. Alpha . Beta"

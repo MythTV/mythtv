@@ -46,22 +46,7 @@ int EITFixUp::parseRoman (QString roman)
 
 
 EITFixUp::EITFixUp()
-    : m_nlTxt("txt"),
-      m_nlWide("breedbeeld"),
-      m_nlRepeat("herh."),
-      m_nlHD("\\sHD$"),
-      m_nlSub(R"(\sAfl\.:\s([^\.]+)\.)"),
-      m_nlSub2("\\s\"([^\"]+)\""),
-      m_nlActors(R"(\sMet:\s.+e\.a\.)"),
-      m_nlPres(R"(\sPresentatie:\s([^\.]+)\.)"),
-      m_nlPersSeparator("(, |\\sen\\s)"),
-      m_nlRub(R"(\s?\({1}\W+\){1}\s?)"),
-      m_nlYear1("\\suit\\s([1-2][0-9]{3})"),
-      m_nlYear2(R"((\s\([A-Z]{0,3}/?)([1-2][0-9]{3})\))"),
-      m_nlDirector(R"(\svan\s(([A-Z]{1}[a-z]+\s)|([A-Z]{1}\.\s)))"),
-      m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
-      m_nlOmroep (R"(\s\(([A-Z]+/?)+\)$)"),
-      m_noRerun("\\(R\\)"),
+    : m_noRerun("\\(R\\)"),
       m_noHD(R"([\(\[]HD[\)\]])"),
       m_noColonSubtitle("^([^:]+): (.+)"),
       m_noNRKCategories("^(Superstrek[ea]r|Supersomm[ea]r|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorg[eo]n|Julemorg[eo]n|Sommermorg[eo]n|"
@@ -2050,14 +2035,12 @@ QMap<QString, NLMapResult> categoryTrans = {
     { "Social/Spiritual Sciences",  { "Religieus",            ProgramInfo::kCategoryNone   } },
 };
 
-/** \fn EITFixUp::FixNL(DBEventEIT&) const
+/**
  *  \brief Use this to standardize \@Home DVB-C guide in the Netherlands.
  */
-void EITFixUp::FixNL(DBEventEIT &event) const
+void EITFixUp::FixNL(DBEventEIT &event)
 {
-    QString fullinfo = "";
-    fullinfo.append (event.m_subtitle);
-    fullinfo.append (event.m_description);
+    QString fullinfo = event.m_subtitle + event.m_description;
     event.m_subtitle = "";
 
     // Convert categories to Dutch categories Myth knows.
@@ -2072,64 +2055,69 @@ void EITFixUp::FixNL(DBEventEIT &event) const
 
     // Film - categories are usually not Films
     if (event.m_category.startsWith("Film -"))
-    {
         event.m_categoryType = ProgramInfo::kCategorySeries;
-    }
 
     // Get stereo info
     auto match = kStereo.match(fullinfo);
     if (match.hasMatch())
     {
         event.m_audioProps |= AUD_STEREO;
-        fullinfo.remove(match.capturedStart(0), match.capturedLength(0));
+        fullinfo.remove(match.capturedStart(), match.capturedLength());
     }
 
     //Get widescreen info
-    if (fullinfo.indexOf(m_nlWide) != -1)
+    QRegularExpression nlWide { "breedbeeld" };
+    match = nlWide.match(fullinfo);
+    if (match.hasMatch())
     {
+        event.m_videoProps |= VID_WIDESCREEN;
         fullinfo = fullinfo.replace("breedbeeld", ".");
     }
 
     // Get repeat info
-    if (fullinfo.indexOf(m_nlRepeat) != -1)
-    {
+    QRegularExpression nlRepeat { "herh." };
+    match = nlRepeat.match(fullinfo);
+    if (match.hasMatch())
         fullinfo = fullinfo.replace("herh.", ".");
-    }
 
     // Get teletext subtitle info
-    if (fullinfo.indexOf(m_nlTxt) != -1)
+    QRegularExpression nlTxt { "txt" };
+    match = nlTxt.match(fullinfo);
+    if (match.hasMatch())
     {
         event.m_subtitleType |= SUB_NORMAL;
         fullinfo = fullinfo.replace("txt", ".");
     }
 
     // Get HDTV information
-    if (event.m_title.indexOf(m_nlHD) != -1)
+    QRegularExpression nlHD { R"(\sHD$)" };
+    match = nlHD.match(event.m_title);
+    if (match.hasMatch())
     {
         event.m_videoProps |= VID_HDTV;
-        event.m_title = event.m_title.replace(m_nlHD, "");
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Try to make subtitle from Afl.:
-    QRegExp tmpSub = m_nlSub;
-    QString tmpSubString;
-    if (tmpSub.indexIn(fullinfo) != -1)
+    QRegularExpression nlSub { R"(\sAfl\.:\s([^\.]+)\.)" };
+    match = nlSub.match(fullinfo);
+    if (match.hasMatch())
     {
-        tmpSubString = tmpSub.cap(0);
-        tmpSubString = tmpSubString.right(tmpSubString.length() - 7);
+        QString tmpSubString = match.captured(0);
+        tmpSubString = tmpSubString.right(match.capturedLength() - 7);
         event.m_subtitle = tmpSubString.left(tmpSubString.length() -1);
-        fullinfo = fullinfo.replace(tmpSub.cap(0), "");
+        fullinfo.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Try to make subtitle from " "
-    QRegExp tmpSub2 = m_nlSub2;
-    //QString tmpSubString2;
-    if (tmpSub2.indexIn(fullinfo) != -1)
+    QRegularExpression nlSub2 { R"(\s\"([^\"]+)\")" };
+    match = nlSub2.match(fullinfo);
+    if (match.hasMatch())
     {
-        tmpSubString = tmpSub2.cap(0);
-        tmpSubString = tmpSubString.right(tmpSubString.length() - 2);
+        QString tmpSubString = match.captured(0);
+        tmpSubString = tmpSubString.right(match.capturedLength() - 2);
         event.m_subtitle = tmpSubString.left(tmpSubString.length() -1);
-        fullinfo = fullinfo.replace(tmpSub2.cap(0), "");
+        fullinfo.remove(match.capturedStart(), match.capturedLength());
     }
 
 
@@ -2146,88 +2134,84 @@ void EITFixUp::FixNL(DBEventEIT &event) const
 
 
     // Get the actors
-    QRegExp tmpActors = m_nlActors;
-    if (tmpActors.indexIn(fullinfo) != -1)
+    QRegularExpression nlActors { R"(\sMet:\s.+e\.a\.)" };
+    QRegularExpression nlPersSeparator { R"((, |\sen\s))" };
+    match = nlActors.match(fullinfo);
+    if (match.hasMatch())
     {
-        QString tmpActorsString = tmpActors.cap(0);
+        QString tmpActorsString = match.captured(0);
         tmpActorsString = tmpActorsString.right(tmpActorsString.length() - 6);
         tmpActorsString = tmpActorsString.left(tmpActorsString.length() - 5);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors =
-            tmpActorsString.split(m_nlPersSeparator, QString::SkipEmptyParts);
+            tmpActorsString.split(nlPersSeparator, QString::SkipEmptyParts);
 #else
         const QStringList actors =
-            tmpActorsString.split(m_nlPersSeparator, Qt::SkipEmptyParts);
+            tmpActorsString.split(nlPersSeparator, Qt::SkipEmptyParts);
 #endif
         for (const auto & actor : qAsConst(actors))
             event.AddPerson(DBPerson::kActor, actor);
-        fullinfo = fullinfo.replace(tmpActors.cap(0), "");
+        fullinfo.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Try to find presenter
-    QRegExp tmpPres = m_nlPres;
-    if (tmpPres.indexIn(fullinfo) != -1)
+    QRegularExpression nlPres { R"(\sPresentatie:\s([^\.]+)\.)" };
+    match = nlPres.match(fullinfo);
+    if (match.hasMatch())
     {
-        QString tmpPresString = tmpPres.cap(0);
+        QString tmpPresString = match.captured(0);
         tmpPresString = tmpPresString.right(tmpPresString.length() - 14);
         tmpPresString = tmpPresString.left(tmpPresString.length() -1);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList presenters =
-            tmpPresString.split(m_nlPersSeparator, QString::SkipEmptyParts);
+            tmpPresString.split(nlPersSeparator, QString::SkipEmptyParts);
 #else
         const QStringList presenters =
-            tmpPresString.split(m_nlPersSeparator, Qt::SkipEmptyParts);
+            tmpPresString.split(nlPersSeparator, Qt::SkipEmptyParts);
 #endif
         for (const auto & presenter : qAsConst(presenters))
             event.AddPerson(DBPerson::kPresenter, presenter);
-        fullinfo = fullinfo.replace(tmpPres.cap(0), "");
+        fullinfo.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Try to find year
-    QRegExp tmpYear1 = m_nlYear1;
-    QRegExp tmpYear2 = m_nlYear2;
-    if (tmpYear1.indexIn(fullinfo) != -1)
+    QRegularExpression nlYear1 { R"(\suit\s([1-2][0-9]{3}))" };
+    QRegularExpression nlYear2 { R"((\s\([A-Z]{0,3}/?)([1-2][0-9]{3})\))" };
+    match = nlYear1.match(fullinfo);
+    if (match.hasMatch())
     {
         bool ok = false;
-        uint y = tmpYear1.cap(1).toUInt(&ok);
+        uint y = match.capturedRef(1).toUInt(&ok);
         if (ok)
             event.m_originalairdate = QDate(y, 1, 1);
     }
 
-    if (tmpYear2.indexIn(fullinfo) != -1)
+    match = nlYear2.match(fullinfo);
+    if (match.hasMatch())
     {
         bool ok = false;
-        uint y = tmpYear2.cap(2).toUInt(&ok);
+        uint y = match.capturedRef(2).toUInt(&ok);
         if (ok)
             event.m_originalairdate = QDate(y, 1, 1);
     }
 
     // Try to find director
-    QRegExp tmpDirector = m_nlDirector;
-    QString tmpDirectorString;
-    if (fullinfo.indexOf(tmpDirector) != -1)
-    {
-        tmpDirectorString = tmpDirector.cap(1);
-        event.AddPerson(DBPerson::kDirector, tmpDirectorString);
-    }
+    QRegularExpression nlDirector { R"(\svan\s(([A-Z]{1}[a-z]+\s)|([A-Z]{1}\.\s)))" };
+    match = nlDirector.match(fullinfo);
+    if (match.hasMatch())
+        event.AddPerson(DBPerson::kDirector, match.captured(1));
 
     // Strip leftovers
-    if (fullinfo.indexOf(m_nlRub) != -1)
-    {
-        fullinfo = fullinfo.replace(m_nlRub, "");
-    }
+    QRegularExpression nlRub { R"(\s?\({1}\W+\){1}\s?)" };
+    fullinfo.remove(nlRub);
 
     // Strip category info from description
-    if (fullinfo.indexOf(m_nlCat) != -1)
-    {
-        fullinfo = fullinfo.replace(m_nlCat, "");
-    }
+    QRegularExpression nlCat { "^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s" };
+    fullinfo.remove(nlCat);
 
     // Remove omroep from title
-    if (event.m_title.indexOf(m_nlOmroep) != -1)
-    {
-        event.m_title = event.m_title.replace(m_nlOmroep, "");
-    }
+    QRegularExpression nlOmroep { R"(\s\(([A-Z]+/?)+\)$)" };
+    event.m_title.remove(nlOmroep);
 
     // Put information back in description
 
