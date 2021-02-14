@@ -92,7 +92,7 @@ class MTV_PUBLIC EITFixUp
     }
 
   private:
-    void FixBellExpressVu(DBEventEIT &event) const; // Canada DVB-S
+    static void FixBellExpressVu(DBEventEIT &event);// Canada DVB-S
     static void SetUKSubtitle(DBEventEIT &event);
     static void FixUK(DBEventEIT &event);           // UK DVB-T
     static void FixPBS(DBEventEIT &event);          // USA ATSC
@@ -123,24 +123,6 @@ class MTV_PUBLIC EITFixUp
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
-    const QRegExp m_bellYear;
-    const QRegExp m_bellActors;
-    const QRegExp m_bellPPVTitleAllDayHD;
-    const QRegExp m_bellPPVTitleAllDay;
-    const QRegExp m_bellPPVTitleHD;
-    const QRegExp m_bellPPVSubtitleAllDay;
-    const QRegExp m_bellPPVDescriptionAllDay;
-    const QRegExp m_bellPPVDescriptionAllDay2;
-    const QRegExp m_bellPPVDescriptionEventId;
-    const QRegExp m_dishPPVTitleHD;
-    const QRegExp m_dishPPVTitleColon;
-    const QRegExp m_dishPPVSpacePerenEnd;
-    const QRegExp m_dishDescriptionNew;
-    const QRegExp m_dishDescriptionFinale;
-    const QRegExp m_dishDescriptionFinale2;
-    const QRegExp m_dishDescriptionPremiere;
-    const QRegExp m_dishDescriptionPremiere2;
-    const QRegExp m_dishPPVCode;
     const QRegExp m_comHemCountry;
     const QRegExp m_comHemDirector;
     const QRegExp m_comHemActor;

@@ -46,25 +46,7 @@ int EITFixUp::parseRoman (QString roman)
 
 
 EITFixUp::EITFixUp()
-    : m_bellYear("[\\(]{1}[0-9]{4}[\\)]{1}"),
-      m_bellActors("\\set\\s|,"),
-      m_bellPPVTitleAllDayHD(R"(\s*\(All Day\, HD\)\s*$)"),
-      m_bellPPVTitleAllDay(R"(\s*\(All Day.*\)\s*$)"),
-      m_bellPPVTitleHD("^HD\\s?-\\s?"),
-      m_bellPPVSubtitleAllDay(R"(^All Day \(.*\sEastern\)\s*$)"),
-      m_bellPPVDescriptionAllDay(R"(^\(.*\sEastern\))"),
-      m_bellPPVDescriptionAllDay2(R"(^\([0-9].*am-[0-9].*am\sET\))"),
-      m_bellPPVDescriptionEventId("\\([0-9]{5}\\)"),
-      m_dishPPVTitleHD("\\sHD\\s*$"),
-      m_dishPPVTitleColon("\\:\\s*$"),
-      m_dishPPVSpacePerenEnd(R"(\s\)\s*$)"),
-      m_dishDescriptionNew(R"(\s*New\.\s*)"),
-      m_dishDescriptionFinale(R"(\s*(Series|Season)\sFinale\.\s*)"),
-      m_dishDescriptionFinale2(R"(\s*Finale\.\s*)"),
-      m_dishDescriptionPremiere(R"(\s*(Series|Season)\s(Premier|Premiere)\.\s*)"),
-      m_dishDescriptionPremiere2(R"(\s*(Premier|Premiere)\.\s*)"),
-      m_dishPPVCode(R"(\s*\(([A-Z]|[0-9]){5}\)\s*$)"),
-      m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
+    : m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
       m_comHemDirector("[Rr]egi"),
       m_comHemActor("[Ss]kådespelare|[Ii] rollerna"),
@@ -384,7 +366,7 @@ QString EITFixUp::AddDVBEITAuthority(uint chanid, const QString &id)
  *  \brief Use this for the Canadian BellExpressVu to standardize DVB-S guide.
  *  \todo  deal with events that don't have eventype at the begining?
  */
-void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
+void EITFixUp::FixBellExpressVu(DBEventEIT &event)
 {
     // A 0x0D character is present between the content
     // and the subtitle if its present
@@ -459,7 +441,8 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     }
 
     // See if a year is present as (xxxx)
-    position = event.m_description.indexOf(m_bellYear);
+    QRegularExpression bellYear { R"(\([0-9]{4}\))" };
+    position = event.m_description.indexOf(bellYear);
     if (position != -1 && !event.m_category.isEmpty())
     {
         // Parse out the year
@@ -475,13 +458,14 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
         // Get the actors if they exist
         if (position > 3)
         {
+            QRegularExpression bellActors { R"(\set\s|,)" };
             QString tmp = event.m_description.left(position-3);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             QStringList actors =
-                tmp.split(m_bellActors, QString::SkipEmptyParts);
+                tmp.split(bellActors, QString::SkipEmptyParts);
 #else
             QStringList actors =
-                tmp.split(m_bellActors, Qt::SkipEmptyParts);
+                tmp.split(bellActors, Qt::SkipEmptyParts);
 #endif
             for (const auto & actor : qAsConst(actors))
                 event.AddPerson(DBPerson::kActor, actor);
@@ -510,25 +494,26 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     }
 
     // Check for "title (All Day, HD)" in the title
-    position = event.m_title.indexOf(m_bellPPVTitleAllDayHD);
-    if (position != -1)
+    QRegularExpression bellPPVTitleAllDayHD { R"(\s*\(All Day\, HD\)\s*$)" };
+    match = bellPPVTitleAllDayHD.match(event.m_title);
+    if (match.hasMatch())
     {
-        event.m_title = event.m_title.replace(m_bellPPVTitleAllDayHD, "");
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
         event.m_videoProps |= VID_HDTV;
      }
 
     // Check for "title (All Day)" in the title
-    position = event.m_title.indexOf(m_bellPPVTitleAllDay);
-    if (position != -1)
-    {
-        event.m_title = event.m_title.replace(m_bellPPVTitleAllDay, "");
-    }
+    QRegularExpression bellPPVTitleAllDay { R"(\s*\(All Day.*\)\s*$)" };
+    match = bellPPVTitleAllDay.match(event.m_title);
+    if (match.hasMatch())
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
 
     // Check for "HD - title" in the title
-    position = event.m_title.indexOf(m_bellPPVTitleHD);
-    if (position != -1)
+    QRegularExpression bellPPVTitleHD { R"(^HD\s?-\s?)" };
+    match = bellPPVTitleHD.match(event.m_title);
+    if (match.hasMatch())
     {
-        event.m_title = event.m_title.replace(m_bellPPVTitleHD, "");
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
         event.m_videoProps |= VID_HDTV;
     }
 
@@ -549,10 +534,11 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     }
 
     // Check for HD at the end of the title
-    position = event.m_title.indexOf(m_dishPPVTitleHD);
-    if (position != -1)
+    QRegularExpression dishPPVTitleHD { R"(\sHD\s*$)" };
+    match = dishPPVTitleHD.match(event.m_title);
+    if (match.hasMatch())
     {
-        event.m_title = event.m_title.replace(m_dishPPVTitleHD, "");
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
         event.m_videoProps |= VID_HDTV;
     }
 
@@ -574,96 +560,92 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     }
 
     // Remove any trailing colon in title
-    position = event.m_title.indexOf(m_dishPPVTitleColon);
-    if (position != -1)
-    {
-        event.m_title = event.m_title.replace(m_dishPPVTitleColon, "");
-    }
+    QRegularExpression dishPPVTitleColon { R"(\:\s*$)" };
+    match = dishPPVTitleColon.match(event.m_title);
+    if (match.hasMatch())
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
 
     // Remove New at the end of the description
-    position = event.m_description.indexOf(m_dishDescriptionNew);
-    if (position != -1)
+    QRegularExpression dishDescriptionNew { R"(\s*New\.\s*)" };
+    match = dishDescriptionNew.match(event.m_description);
+    if (match.hasMatch())
     {
         event.m_previouslyshown = false;
-        event.m_description = event.m_description.replace(m_dishDescriptionNew, "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Remove Series Finale at the end of the desciption
-    position = event.m_description.indexOf(m_dishDescriptionFinale);
-    if (position != -1)
+    QRegularExpression dishDescriptionFinale { R"(\s*(Series|Season)\sFinale\.\s*)" };
+    match = dishDescriptionFinale.match(event.m_description);
+    if (match.hasMatch())
     {
         event.m_previouslyshown = false;
-        event.m_description = event.m_description.replace(m_dishDescriptionFinale, "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Remove Series Finale at the end of the desciption
-    position = event.m_description.indexOf(m_dishDescriptionFinale2);
-    if (position != -1)
+    QRegularExpression dishDescriptionFinale2 { R"(\s*Finale\.\s*)" };
+    match = dishDescriptionFinale2.match(event.m_description);
+    if (match.hasMatch())
     {
         event.m_previouslyshown = false;
-        event.m_description = event.m_description.replace(m_dishDescriptionFinale2, "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Remove Series Premiere at the end of the description
-    position = event.m_description.indexOf(m_dishDescriptionPremiere);
-    if (position != -1)
+    QRegularExpression dishDescriptionPremiere { R"(\s*(Series|Season)\s(Premier|Premiere)\.\s*)" };
+    match = dishDescriptionPremiere.match(event.m_description);
+    if (match.hasMatch())
     {
         event.m_previouslyshown = false;
-        event.m_description = event.m_description.replace(m_dishDescriptionPremiere, "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Remove Series Premiere at the end of the description
-    position = event.m_description.indexOf(m_dishDescriptionPremiere2);
-    if (position != -1)
+    QRegularExpression dishDescriptionPremiere2 { R"(\s*(Premier|Premiere)\.\s*)" };
+    match = dishDescriptionPremiere2.match(event.m_description);
+    if (match.hasMatch())
     {
         event.m_previouslyshown = false;
-        event.m_description = event.m_description.replace(m_dishDescriptionPremiere2, "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Remove Dish's PPV code at the end of the description
-    QRegExp ppvcode = m_dishPPVCode;
-    ppvcode.setCaseSensitivity(Qt::CaseInsensitive);
-    position = event.m_description.indexOf(ppvcode);
-    if (position != -1)
-    {
-        event.m_description = event.m_description.replace(ppvcode, "");
-    }
+    QRegularExpression ppvcode { R"(\s*\(([A-Z]|[0-9]){5}\)\s*$)",
+        QRegularExpression::CaseInsensitiveOption };
+    match = ppvcode.match(event.m_description);
+    if (match.hasMatch())
+       event.m_description.remove(match.capturedStart(), match.capturedLength());
 
     // Remove trailing garbage
-    position = event.m_description.indexOf(m_dishPPVSpacePerenEnd);
-    if (position != -1)
-    {
-        event.m_description = event.m_description.replace(m_dishPPVSpacePerenEnd, "");
-    }
+    QRegularExpression dishPPVSpacePerenEnd { R"(\s\)\s*$)" };
+    match = dishPPVSpacePerenEnd.match(event.m_description);
+    if (match.hasMatch())
+       event.m_description.remove(match.capturedStart(), match.capturedLength());
 
     // Check for subtitle "All Day (... Eastern)" in the subtitle
-    position = event.m_subtitle.indexOf(m_bellPPVSubtitleAllDay);
-    if (position != -1)
-    {
-        event.m_subtitle = event.m_subtitle.replace(m_bellPPVSubtitleAllDay, "");
-    }
+    QRegularExpression bellPPVSubtitleAllDay { R"(^All Day \(.*\sEastern\)\s*$)" };
+    match = bellPPVSubtitleAllDay.match(event.m_subtitle);
+    if (match.hasMatch())
+       event.m_subtitle.remove(match.capturedStart(), match.capturedLength());
 
     // Check for description "(... Eastern)" in the description
-    position = event.m_description.indexOf(m_bellPPVDescriptionAllDay);
-    if (position != -1)
-    {
-        event.m_description = event.m_description.replace(m_bellPPVDescriptionAllDay, "");
-    }
+    QRegularExpression bellPPVDescriptionAllDay { R"(^\(.*\sEastern\))" };
+    match = bellPPVDescriptionAllDay.match(event.m_description);
+    if (match.hasMatch())
+       event.m_description.remove(match.capturedStart(), match.capturedLength());
 
     // Check for description "(... ET)" in the description
-    position = event.m_description.indexOf(m_bellPPVDescriptionAllDay2);
-    if (position != -1)
-    {
-        event.m_description = event.m_description.replace(m_bellPPVDescriptionAllDay2, "");
-    }
+    QRegularExpression bellPPVDescriptionAllDay2 { R"(^\([0-9].*am-[0-9].*am\sET\))" };
+    match = bellPPVDescriptionAllDay2.match(event.m_description);
+    if (match.hasMatch())
+       event.m_description.remove(match.capturedStart(), match.capturedLength());
 
     // Check for description "(nnnnn)" in the description
-    position = event.m_description.indexOf(m_bellPPVDescriptionEventId);
-    if (position != -1)
-    {
-        event.m_description = event.m_description.replace(m_bellPPVDescriptionEventId, "");
-    }
-
+    QRegularExpression bellPPVDescriptionEventId { R"(\([0-9]{5}\))" };
+    match = bellPPVDescriptionEventId.match(event.m_description);
+    if (match.hasMatch())
+       event.m_description.remove(match.capturedStart(), match.capturedLength());
 }
 
 /** \fn EITFixUp::SetUKSubtitle(DBEventEIT&) const
