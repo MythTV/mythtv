@@ -46,11 +46,7 @@ int EITFixUp::parseRoman (QString roman)
 
 
 EITFixUp::EITFixUp()
-    : m_fiRerun(R"(\ ?Uusinta[a-zA-Z\ ]*\.?)"),
-      m_fiRerun2("\\([Uu]\\)"),
-      m_fiAgeLimit("\\(((1?[0-9]?)|[ST])\\)$"),
-      m_fiFilm("^(Film|Elokuva): "),
-      m_nlTxt("txt"),
+    : m_nlTxt("txt"),
       m_nlWide("breedbeeld"),
       m_nlRepeat("herh."),
       m_nlHD("\\sHD$"),
@@ -1909,53 +1905,55 @@ void EITFixUp::FixATV(DBEventEIT &event)
 }
 
 
-/** \fn EITFixUp::FixFI(DBEventEIT&) const
+/**
  *  \brief Use this to clean DVB-T guide in Finland.
  */
-void EITFixUp::FixFI(DBEventEIT &event) const
+void EITFixUp::FixFI(DBEventEIT &event)
 {
-    int position = event.m_description.indexOf(m_fiRerun);
-    if (position != -1)
+    QRegularExpression fiRerun { R"(\s?Uusinta[a-zA-Z\s]*\.?)" };
+    auto match = fiRerun.match(event.m_description);
+    if (match.hasMatch())
     {
         event.m_previouslyshown = true;
-        event.m_description = event.m_description.replace(m_fiRerun, "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
-    position = event.m_description.indexOf(m_fiRerun2);
-    if (position != -1)
+    QRegularExpression fiRerun2 { R"(\([Uu]\))" };
+    match = fiRerun2.match(event.m_description);
+    if (match.hasMatch())
     {
         event.m_previouslyshown = true;
-        event.m_description = event.m_description.replace(m_fiRerun2, "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Check for (Stereo) in the decription and set the <audio> tags
-    auto match = kStereo.match(event.m_description);
+    match = kStereo.match(event.m_description);
     if (match.hasMatch())
     {
         event.m_audioProps |= AUD_STEREO;
-        event.m_description.remove(match.capturedStart(0),
-                                   match.capturedLength(0));
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Remove age limit in parenthesis at end of title
-    position = m_fiAgeLimit.indexIn(event.m_title);
-    if (position != -1)
+    QRegularExpression fiAgeLimit { R"(\((\d{1,2}|[ST])\)$)" };
+    match = fiAgeLimit.match(event.m_title);
+    if (match.hasMatch())
     {
         EventRating prograting;
-        prograting.m_system="FI"; prograting.m_rating = m_fiAgeLimit.cap(1);
+        prograting.m_system="FI"; prograting.m_rating = match.captured(1);
         event.m_ratings.push_back(prograting);
-        event.m_title.remove(position, m_fiAgeLimit.matchedLength());
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Remove Film or Elokuva at start of title
-    position = event.m_title.indexOf(m_fiFilm);
-    if (position != -1)
+    QRegularExpression fiFilm { "^(Film|Elokuva): " };
+    match = fiFilm.match(event.m_title);
+    if (match.hasMatch())
     {
         event.m_category = "Film";
         event.m_categoryType = ProgramInfo::kCategoryMovie;
-        event.m_title = event.m_title.replace(m_fiFilm, "");
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
-
 }
 
 /** \fn EITFixUp::FixPremiere(DBEventEIT&) const

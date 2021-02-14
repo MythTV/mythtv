@@ -2658,11 +2658,7 @@ void TestEITFixups::testFI_data()
                              << "Title" << "Subtitle" << "Description."
                              << true << "" << ProgramInfo::kCategoryNone
                              << (int)AUD_UNKNOWN << true << "17";
-    QTest::newRow("rating5") << "Title ()" << "Subtitle" << "Description. (u)"
-                             << "Title" << "Subtitle" << "Description."
-                             << true << "" << ProgramInfo::kCategoryNone
-                             << (int)AUD_UNKNOWN << true << ""; // Oops?
-    QTest::newRow("rating6") << "Title (17)" << "Subtitle" << "Description. (u) Stereo"
+    QTest::newRow("rating5") << "Title (17)" << "Subtitle" << "Description. (u) Stereo"
                              << "Title" << "Subtitle" << "Description."
                              << true << "" << ProgramInfo::kCategoryNone
                              << (int)AUD_STEREO << true << "17";

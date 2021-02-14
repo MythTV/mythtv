@@ -108,7 +108,7 @@ class MTV_PUBLIC EITFixUp
     static void FixPRO7(DBEventEIT &event);         // Pro7/Sat1 Group
     static void FixDisneyChannel(DBEventEIT &event);// Disney Channel
     static void FixATV(DBEventEIT &event);          // ATV/ATV2
-    void FixFI(DBEventEIT &event) const;            // Finland DVB-T
+    static void FixFI(DBEventEIT &event);           // Finland DVB-T
     static void FixPremiere(DBEventEIT &event);     // german pay-tv Premiere
     void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
     static void FixCategory(DBEventEIT &event);     // Generic Category fixes
@@ -123,10 +123,6 @@ class MTV_PUBLIC EITFixUp
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
-    const QRegExp m_fiRerun;
-    const QRegExp m_fiRerun2;
-    const QRegExp m_fiAgeLimit;
-    const QRegExp m_fiFilm;
     const QRegExp m_nlTxt;
     const QRegExp m_nlWide;
     const QRegExp m_nlRepeat;
