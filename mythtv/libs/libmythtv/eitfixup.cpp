@@ -46,18 +46,7 @@ int EITFixUp::parseRoman (QString roman)
 
 
 EITFixUp::EITFixUp()
-    : m_rtlRepeat(R"((\(|\s)?Wiederholung.+vo[m|n].+((?:\d{2}\.\d{2}\.\d{4})|(?:\d{2}[:\.]\d{2}\sUhr))\)?)"),
-      m_rtlSubtitle(R"(^([^\.]{3,})\.\s+(.+))"),
-      /* should be (?:\x{8a}|\\.\\s*|$) but 0x8A gets replaced with 0x20 */
-      m_rtlSubtitle1(R"(^Folge\s(\d{1,4})\s*:\s+'(.*)'(?:\s|\.\s*|$))"),
-      m_rtlSubtitle2(R"(^Folge\s(\d{1,4})\s+(.{,5}[^\.]{,120})[\?!\.]\s*)"),
-      m_rtlSubtitle3(R"(^(?:Folge\s)?(\d{1,4}(?:\/[IVX]+)?)\s+(.{,5}[^\.]{,120})[\?!\.]\s*)"),
-      m_rtlSubtitle4(R"(^Thema.{0,5}:\s([^\.]+)\.\s*)"),
-      m_rtlSubtitle5("^'(.+)'\\.\\s*"),
-      m_rtlEpisodeNo1(R"(^(Folge\s\d{1,4})\.*\s*)"),
-      m_rtlEpisodeNo2(R"(^(\d{1,2}\/[IVX]+)\.*\s*)"),
-      m_superRTLSubtitle("^Folge\\s(\\d{1,3}):\\s'(.*)'"),
-      m_fiRerun(R"(\ ?Uusinta[a-zA-Z\ ]*\.?)"),
+    : m_fiRerun(R"(\ ?Uusinta[a-zA-Z\ ]*\.?)"),
       m_fiRerun2("\\([Uu]\\)"),
       m_fiAgeLimit("\\(((1?[0-9]?)|[ST])\\)$"),
       m_fiFilm("^(Film|Elokuva): "),
@@ -1675,21 +1664,19 @@ void EITFixUp::FixMCA(DBEventEIT &event)
     }
 }
 
-/** \fn EITFixUp::FixRTL(DBEventEIT&) const
+/**
  *  \brief Use this to standardise the RTL group guide in Germany.
  */
-void EITFixUp::FixRTL(DBEventEIT &event) const
+void EITFixUp::FixRTL(DBEventEIT &event)
 {
-    int pos = 0;
-
-    QRegExp tmpExpSubtitleSRTL = m_superRTLSubtitle;
-
     // subtitle with episode number: "Folge *: 'subtitle'
-    if (tmpExpSubtitleSRTL.indexIn(event.m_subtitle) != -1)
+    QRegularExpression superRTLSubtitle { R"(^Folge\s(\d{1,3}):\s'(.*)')" };
+    auto match = superRTLSubtitle.match(event.m_subtitle);
+    if (match.hasMatch())
     {
         event.m_season = 0;
-        event.m_episode = tmpExpSubtitleSRTL.cap(1).toUInt();
-        event.m_subtitle = tmpExpSubtitleSRTL.cap(2);
+        event.m_episode  = match.capturedRef(1).toUInt();
+        event.m_subtitle = match.captured(2);
     }
 
     // No need to continue without a description or with an subtitle.
@@ -1697,85 +1684,92 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
         return;
 
     // Repeat
-    QRegExp tmpExpRepeat = m_rtlRepeat;
-    if ((pos = tmpExpRepeat.indexIn(event.m_description)) != -1)
+    QRegularExpression rtlRepeat
+        { R"([\s\(]?Wiederholung.+vo[m|n].+(\d{2}\.\d{2}\.\d{4}|\d{2}[:\.]\d{2}\sUhr)\)?)" };
+    match = rtlRepeat.match(event.m_description);
+    if (match.hasMatch())
     {
         // remove '.' if it matches at the beginning of the description
-        int length = tmpExpRepeat.cap(0).length() + (pos ? 0 : 1);
+        int pos = match.capturedStart(0);
+        int length = match.capturedLength(0) + (pos ? 0 : 1);
         event.m_description = event.m_description.remove(pos, length).trimmed();
     }
 
-    QRegExp tmpExp1 = m_rtlSubtitle;
-    QRegExp tmpExpSubtitle1 = m_rtlSubtitle1;
-    tmpExpSubtitle1.setMinimal(true);
-    QRegExp tmpExpSubtitle2 = m_rtlSubtitle2;
-    QRegExp tmpExpSubtitle3 = m_rtlSubtitle3;
-    QRegExp tmpExpSubtitle4 = m_rtlSubtitle4;
-    QRegExp tmpExpSubtitle5 = m_rtlSubtitle5;
-    tmpExpSubtitle5.setMinimal(true);
-    QRegExp tmpExpEpisodeNo1 = m_rtlEpisodeNo1;
-    QRegExp tmpExpEpisodeNo2 = m_rtlEpisodeNo2;
+    // should be (?:\x{8a}|\\.\\s*|$) but 0x8A gets replaced with 0x20
+    QRegularExpression rtlSubtitle1  { R"(^Folge\s(\d{1,4})\s*:\s+'(.*)'(?:\s|\.\s*|$))" };
+    QRegularExpression rtlSubtitle2  { R"(^Folge\s(\d{1,4})\s+(.{0,5}[^\?!\.]{0,120})[\?!\.]\s*)" };
+    QRegularExpression rtlSubtitle3  { R"(^(?:Folge\s)?(\d{1,4}(?:\/[IVX]+)?)\s+(.{0,5}[^\?!\.]{0,120})[\?!\.]\s*)" };
+    QRegularExpression rtlSubtitle4  { R"(^Thema.{0,5}:\s([^\.]+)\.\s*)" };
+    QRegularExpression rtlSubtitle5  { "^'(.+)'\\.\\s*" };
+    QRegularExpression rtlEpisodeNo1 { R"(^(Folge\s\d{1,4})\.*\s*)" };
+    QRegularExpression rtlEpisodeNo2 { R"(^(\d{1,2}\/[IVX]+)\.*\s*)" };
+
+    auto match1 = rtlSubtitle1.match(event.m_description);
+    auto match2 = rtlSubtitle2.match(event.m_description);
+    auto match3 = rtlSubtitle3.match(event.m_description);
+    auto match4 = rtlSubtitle4.match(event.m_description);
+    auto match5 = rtlSubtitle5.match(event.m_description);
+    auto match6 = rtlEpisodeNo1.match(event.m_description);
+    auto match7 = rtlEpisodeNo2.match(event.m_description);
 
     // subtitle with episode number: "Folge *: 'subtitle'. description
-    if (tmpExpSubtitle1.indexIn(event.m_description) != -1)
+    if (match1.hasMatch())
     {
-        event.m_syndicatedepisodenumber = tmpExpSubtitle1.cap(1);
-        event.m_subtitle    = tmpExpSubtitle1.cap(2);
+        event.m_syndicatedepisodenumber = match1.captured(1);
+        event.m_subtitle = match1.captured(2);
         event.m_description =
-            event.m_description.remove(0, tmpExpSubtitle1.matchedLength());
+            event.m_description.remove(0, match1.capturedLength());
     }
     // episode number subtitle
-    else if (tmpExpSubtitle2.indexIn(event.m_description) != -1)
+    else if (match2.hasMatch())
     {
-        event.m_syndicatedepisodenumber = tmpExpSubtitle2.cap(1);
-        event.m_subtitle    = tmpExpSubtitle2.cap(2);
+        event.m_syndicatedepisodenumber = match2.captured(1);
+        event.m_subtitle = match2.captured(2);
         event.m_description =
-            event.m_description.remove(0, tmpExpSubtitle2.matchedLength());
+            event.m_description.remove(0, match2.capturedLength());
     }
     // episode number subtitle
-    else if (tmpExpSubtitle3.indexIn(event.m_description) != -1)
+    else if (match3.hasMatch())
     {
-        event.m_syndicatedepisodenumber = tmpExpSubtitle3.cap(1);
-        event.m_subtitle    = tmpExpSubtitle3.cap(2);
+        event.m_syndicatedepisodenumber = match3.captured(1);
+        event.m_subtitle = match3.captured(2);
         event.m_description =
-            event.m_description.remove(0, tmpExpSubtitle3.matchedLength());
+            event.m_description.remove(0, match3.capturedLength());
     }
     // "Thema..."
-    else if (tmpExpSubtitle4.indexIn(event.m_description) != -1)
+    else if (match4.hasMatch())
     {
-        event.m_subtitle    = tmpExpSubtitle4.cap(1);
+        event.m_subtitle = match4.captured(1);
         event.m_description =
-            event.m_description.remove(0, tmpExpSubtitle4.matchedLength());
+            event.m_description.remove(0, match4.capturedLength());
     }
     // "'...'"
-    else if (tmpExpSubtitle5.indexIn(event.m_description) != -1)
+    else if (match5.hasMatch())
     {
-        event.m_subtitle    = tmpExpSubtitle5.cap(1);
+        event.m_subtitle = match5.captured(1);
         event.m_description =
-            event.m_description.remove(0, tmpExpSubtitle5.matchedLength());
+            event.m_description.remove(0, match5.capturedLength());
     }
     // episode number
-    else if (tmpExpEpisodeNo1.indexIn(event.m_description) != -1)
+    else if (match6.hasMatch())
     {
-        event.m_syndicatedepisodenumber = tmpExpEpisodeNo1.cap(2);
-        event.m_subtitle    = tmpExpEpisodeNo1.cap(1);
+        event.m_syndicatedepisodenumber = match6.captured(2);
+        event.m_subtitle = match6.captured(1);
         event.m_description =
-            event.m_description.remove(0, tmpExpEpisodeNo1.matchedLength());
+            event.m_description.remove(0, match6.capturedLength());
     }
     // episode number
-    else if (tmpExpEpisodeNo2.indexIn(event.m_description) != -1)
+    else if (match7.hasMatch())
     {
-        event.m_syndicatedepisodenumber = tmpExpEpisodeNo2.cap(2);
-        event.m_subtitle    = tmpExpEpisodeNo2.cap(1);
+        event.m_syndicatedepisodenumber = match7.captured(2);
+        event.m_subtitle = match7.captured(1);
         event.m_description =
-            event.m_description.remove(0, tmpExpEpisodeNo2.matchedLength());
+            event.m_description.remove(0, match7.capturedLength());
     }
 
     /* got an episode title now? (we did not have one at the start of this function) */
     if (!event.m_subtitle.isEmpty())
-    {
         event.m_categoryType = ProgramInfo::kCategorySeries;
-    }
 
     /* if we do not have an episode title by now try some guessing as last resort */
     if (event.m_subtitle.length() == 0)
@@ -1783,16 +1777,18 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
         const uint SUBTITLE_PCT = 35; // % of description to allow subtitle up to
         const uint lSUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
 
-        if (tmpExp1.indexIn(event.m_description) != -1)
+        QRegularExpression rtlSubtitle { R"(^([^\.]{3,})\.\s+(.+))" };
+        match = rtlSubtitle.match(event.m_description);
+        if (match.hasMatch())
         {
-            uint tmpExp1Len = tmpExp1.cap(1).length();
+            uint matchLen = match.capturedLength(1);
             uint evDescLen = std::max(event.m_description.length(), 1);
 
-            if ((tmpExp1Len < lSUBTITLE_MAX_LEN) &&
-                (tmpExp1Len * 100 / evDescLen < SUBTITLE_PCT))
+            if ((matchLen < lSUBTITLE_MAX_LEN) &&
+                (matchLen * 100 / evDescLen < SUBTITLE_PCT))
             {
-                event.m_subtitle    = tmpExp1.cap(1);
-                event.m_description = tmpExp1.cap(2);
+                event.m_subtitle    = match.captured(1);
+                event.m_description = match.captured(2);
             }
         }
     }
