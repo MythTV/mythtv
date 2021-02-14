@@ -96,8 +96,8 @@ class MTV_PUBLIC EITFixUp
     static void SetUKSubtitle(DBEventEIT &event);
     static void FixUK(DBEventEIT &event);           // UK DVB-T
     static void FixPBS(DBEventEIT &event);          // USA ATSC
-    void FixComHem(DBEventEIT &event,
-                   bool process_subtitle) const;    // Sweden DVB-C
+    static void FixComHem(DBEventEIT &event,
+                          bool process_subtitle);   // Sweden DVB-C
     static void FixAUStar(DBEventEIT &event);       // Australia DVB-S
     void FixAUFreeview(DBEventEIT &event) const;    // Australia DVB-T
     static void FixAUNine(DBEventEIT &event);
@@ -123,20 +123,6 @@ class MTV_PUBLIC EITFixUp
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
-    const QRegExp m_comHemCountry;
-    const QRegExp m_comHemDirector;
-    const QRegExp m_comHemActor;
-    const QRegExp m_comHemHost;
-    const QRegExp m_comHemSub;
-    const QRegExp m_comHemRerun1;
-    const QRegExp m_comHemRerun2;
-    const QRegExp m_comHemTT;
-    const QRegExp m_comHemPersSeparator;
-    const QRegExp m_comHemPersons;
-    const QRegExp m_comHemSubEnd;
-    const QRegExp m_comHemSeries1;
-    const QRegExp m_comHemSeries2;
-    const QRegExp m_comHemTSub;
     const QRegExp m_mcaIncompleteTitle;
     const QRegExp m_mcaCompleteTitlea;
     const QRegExp m_mcaCompleteTitleb;
