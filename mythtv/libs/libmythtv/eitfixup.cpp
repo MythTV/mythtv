@@ -46,15 +46,7 @@ int EITFixUp::parseRoman (QString roman)
 
 
 EITFixUp::EITFixUp()
-    : m_noRerun("\\(R\\)"),
-      m_noHD(R"([\(\[]HD[\)\]])"),
-      m_noColonSubtitle("^([^:]+): (.+)"),
-      m_noNRKCategories("^(Superstrek[ea]r|Supersomm[ea]r|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorg[eo]n|Julemorg[eo]n|Sommermorg[eo]n|"
-                        "Kuraffen-TV|Sport i dag|NRKs sportsl.rdag|NRKs sportss.ndag|Dagens dokumentar|"
-                        "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorg[eo]n|"
-                        "Radioteatret|Opera|P2-Akademiet|Nyhetsmorg[eo]n i P2 og Alltid Nyheter:): (.+)"),
-      m_noPremiere("\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$"),
-      m_dkEpisode("\\(([0-9]+)\\)"),
+    : m_dkEpisode("\\(([0-9]+)\\)"),
       m_dkPart("\\(([0-9]+):([0-9]+)\\)"),
       m_dkSubtitle1("^([^:]+): (.+)"),
       m_dkSubtitle2("^([^:]+) - (.+)"),
@@ -2233,83 +2225,93 @@ void EITFixUp::FixCategory(DBEventEIT &event)
     }
 }
 
-/** \fn EITFixUp::FixNO(DBEventEIT&) const
+/**
  *  \brief Use this to clean DVB-S guide in Norway.
  */
-void EITFixUp::FixNO(DBEventEIT &event) const
+void EITFixUp::FixNO(DBEventEIT &event)
 {
     // Check for "title (R)" in the title
-    int position = event.m_title.indexOf(m_noRerun);
-    if (position != -1)
+    QRegularExpression noRerun { "\\(R\\)" };
+    auto match = noRerun.match(event.m_title);
+    if (match.hasMatch())
     {
       event.m_previouslyshown = true;
-      event.m_title = event.m_title.replace(m_noRerun, "");
+      event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
     // Check for "subtitle (HD)" in the subtitle
-    position = event.m_subtitle.indexOf(m_noHD);
-    if (position != -1)
+    QRegularExpression noHD { R"([\(\[]HD[\)\]])" };
+    match = noHD.match(event.m_subtitle);
+    if (match.hasMatch())
     {
       event.m_videoProps |= VID_HDTV;
-      event.m_subtitle = event.m_subtitle.replace(m_noHD, "");
+      event.m_subtitle.remove(match.capturedStart(), match.capturedLength());
     }
    // Check for "description (HD)" in the description
-    position = event.m_description.indexOf(m_noHD);
-    if (position != -1)
+    match = noHD.match(event.m_description);
+    if (match.hasMatch())
     {
       event.m_videoProps |= VID_HDTV;
-      event.m_description = event.m_description.replace(m_noHD, "");
+      event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 }
 
-/** \fn EITFixUp::FixNRK_DVBT(DBEventEIT&) const
+/**
  *  \brief Use this to clean DVB-T guide in Norway (NRK)
  */
-void EITFixUp::FixNRK_DVBT(DBEventEIT &event) const
+void EITFixUp::FixNRK_DVBT(DBEventEIT &event)
 {
-    QRegExp    tmpExp1;
     // Check for "title (R)" in the title
-    if (event.m_title.indexOf(m_noRerun) != -1)
+    QRegularExpression noRerun { "\\(R\\)" };
+    auto match = noRerun.match(event.m_title);
+    if (match.hasMatch())
     {
       event.m_previouslyshown = true;
-      event.m_title = event.m_title.replace(m_noRerun, "");
+      event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
     // Check for "(R)" in the description
-    if (event.m_description.indexOf(m_noRerun) != -1)
+    match = noRerun.match(event.m_description);
+    if (match.hasMatch())
     {
       event.m_previouslyshown = true;
     }
+
     // Move colon separated category from program-titles into description
     // Have seen "NRK2s historiekveld: Film: bla-bla"
-    tmpExp1 =  m_noNRKCategories;
-    while ((tmpExp1.indexIn(event.m_title) != -1) &&
-           (tmpExp1.cap(2).length() > 1))
+    QRegularExpression noNRKCategories
+        { "^(Superstrek[ea]r|Supersomm[ea]r|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorg[eo]n|Julemorg[eo]n|Sommermorg[eo]n|"
+          "Kuraffen-TV|Sport i dag|NRKs sportsl.rdag|NRKs sportss.ndag|Dagens dokumentar|"
+          "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorg[eo]n|"
+          "Radioteatret|Opera|P2-Akademiet|Nyhetsmorg[eo]n i P2 og Alltid Nyheter:): (.+)" };
+    match = noNRKCategories.match(event.m_title);
+    if (match.hasMatch() && (match.capturedLength(2) > 1))
     {
-        event.m_title  = tmpExp1.cap(2);
-        event.m_description = "(" + tmpExp1.cap(1) + ") " + event.m_description;
+        event.m_title = match.captured(2);
+        event.m_description = "(" + match.capturedRef(1) + ") " + event.m_description;
     }
+
     // Remove season premiere markings
-    tmpExp1 = m_noPremiere;
-    if (tmpExp1.indexIn(event.m_title) >= 3)
-    {
-        event.m_title.remove(m_noPremiere);
-    }
+    QRegularExpression noPremiere { "\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$" };
+    match = noPremiere.match(event.m_title);
+    if (match.hasMatch() && (match.capturedStart() >= 3))
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
+
     // Try to find colon-delimited subtitle in title, only tested for NRK channels
-    tmpExp1 = m_noColonSubtitle;
     if (!event.m_title.startsWith("CSI:") &&
         !event.m_title.startsWith("CD:") &&
         !event.m_title.startsWith("Distriktsnyheter: fra"))
     {
-        if (tmpExp1.indexIn(event.m_title) != -1)
+        QRegularExpression noColonSubtitle { "^([^:]+): (.+)" };
+        match = noColonSubtitle.match(event.m_title);
+        if (match.hasMatch())
         {
-
             if (event.m_subtitle.length() <= 0)
             {
-                event.m_title    = tmpExp1.cap(1);
-                event.m_subtitle = tmpExp1.cap(2);
+                event.m_title    = match.captured(1);
+                event.m_subtitle = match.captured(2);
             }
-            else if (event.m_subtitle == tmpExp1.cap(2))
+            else if (event.m_subtitle == match.captured(2))
             {
-                event.m_title    = tmpExp1.cap(1);
+                event.m_title    = match.captured(1);
             }
         }
     }

@@ -112,8 +112,8 @@ class MTV_PUBLIC EITFixUp
     static void FixPremiere(DBEventEIT &event);     // german pay-tv Premiere
     static void FixNL(DBEventEIT &event);           // Netherlands DVB-C
     static void FixCategory(DBEventEIT &event);     // Generic Category fixes
-    void FixNO(DBEventEIT &event) const;            // Norwegian DVB-S
-    void FixNRK_DVBT(DBEventEIT &event) const;      // Norwegian NRK DVB-T
+    static void FixNO(DBEventEIT &event);           // Norwegian DVB-S
+    static void FixNRK_DVBT(DBEventEIT &event);     // Norwegian NRK DVB-T
     void FixDK(DBEventEIT &event) const;            // Danish YouSee DVB-C
     static void FixStripHTML(DBEventEIT &event);    // Strip HTML tags
     static void FixGreekSubtitle(DBEventEIT &event);// Greek Nat TV fix
@@ -123,11 +123,6 @@ class MTV_PUBLIC EITFixUp
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
-    const QRegExp m_noRerun;
-    const QRegExp m_noHD;
-    const QRegExp m_noColonSubtitle;
-    const QRegExp m_noNRKCategories;
-    const QRegExp m_noPremiere;
     const QRegExp m_dkEpisode;
     const QRegExp m_dkPart;
     const QRegExp m_dkSubtitle1;
