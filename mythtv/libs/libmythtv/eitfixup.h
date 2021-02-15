@@ -118,7 +118,7 @@ class MTV_PUBLIC EITFixUp
     static void FixStripHTML(DBEventEIT &event);    // Strip HTML tags
     static void FixGreekSubtitle(DBEventEIT &event);// Greek Nat TV fix
     void FixGreekEIT(DBEventEIT &event) const;
-    void FixGreekCategories(DBEventEIT &event) const; // Greek categories from descr.
+    static void FixGreekCategories(DBEventEIT &event);// Greek categories from descr.
     static void FixUnitymedia(DBEventEIT &event);     // handle cast/crew from Unitymedia
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
@@ -143,28 +143,6 @@ class MTV_PUBLIC EITFixUp
     const QRegExp m_grCommentsinTitle; // Sometimes esp. national stations include comments in the title eg "(ert arxeio)"
     const QRegExp m_grNotPreviouslyShown; // Not previously shown on TV
     const QRegExp m_grEpisodeAsSubtitle; // Description field: "^Episode: Lion in the cage. (Description follows)"
-    const QRegExp m_grCategFood; // Greek category food
-    const QRegExp m_grCategDrama; // Greek category social/drama
-    const QRegExp m_grCategComedy; // Greek category comedy
-    const QRegExp m_grCategChildren; // Greek category for children / cartoons
-    const QRegExp m_grCategMystery; // Greek category for mystery
-    const QRegExp m_grCategFantasy; // Greek category for fantasy
-    const QRegExp m_grCategHistory; //Greek category for historical movie/series
-    const QRegExp m_grCategTeleMag; //Greek category for Telemagazine show
-    const QRegExp m_grCategTeleShop; //Greek category for teleshopping
-    const QRegExp m_grCategGameShow; //Greek category for game show
-    const QRegExp m_grCategDocumentary; // Greek category for Documentaries
-    const QRegExp m_grCategBiography; // Greek category for biography
-    const QRegExp m_grCategNews; // Greek category for News
-    const QRegExp m_grCategSports; // Greek category for Sports
-    const QRegExp m_grCategMusic; // Greek category for Music
-    const QRegExp m_grCategReality; // Greek category for reality shows
-    const QRegExp m_grCategReligion; //Greek category for religion
-    const QRegExp m_grCategCulture; //Greek category for Arts/Culture
-    const QRegExp m_grCategNature; //Greek category for Nature/Science
-    const QRegExp m_grCategSciFi;  // Greek category for Science Fiction
-    const QRegExp m_grCategHealth; //Greek category for Health
-    const QRegExp m_grCategSpecial; //Greek category for specials.
 };
 
 #endif // EITFIXUP_H

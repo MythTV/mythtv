@@ -72,29 +72,7 @@ EITFixUp::EITFixUp()
       // cap0 = real title in parentheses.
       m_grNotPreviouslyShown("(?:\\W?)(?:-\\s*)*(?:\\b[Α1]['΄η]?\\s*(?:τηλεοπτικ[ηή]\\s*)?(?:μετ[αά]δοση|προβολ[ηή]))(?:\\W?)",Qt::CaseInsensitive),
       // Try to exctract Greek categories from keywords in description.
-      m_grEpisodeAsSubtitle("(?:^Επεισ[οό]διο:\\s?)([\\w\\s-,']+)\\.(?:\\s)?"),
-      m_grCategFood("(?:\\W)?(?:εκπομπ[ηή]\\W)?(Γαστρονομ[ιί]α[σς]?|μαγειρικ[ηή][σς]?|chef|συνταγ[εέηή]|διατροφ|wine|μ[αά]γειρα[σς]?)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategDrama("(?:\\W)?(κοινωνικ[ηήό]|δραματικ[ηή]|δρ[αά]μα)(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
-      m_grCategComedy("(?:\\W)?(κωμικ[ηήοό]|χιουμοριστικ[ηήοό]|κωμωδ[ιί]α)(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
-      m_grCategChildren("(?:\\W)?(παιδικ[ηήοό]|κινο[υύ]μ[εέ]ν(ων|α)\\sσχ[εέ]δ[ιί](ων|α))(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
-      m_grCategMystery("(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?(?:\\W)?(μυστηρ[ιί]ου)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategFantasy("(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?(?:\\W)?(φαντασ[ιί]ας)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategHistory("(?:\\W)?(ιστορικ[ηήοό])(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
-      m_grCategTeleMag("(?:\\W)?(ενημερωτικ[ηή]|ψυχαγωγικ[ηή]|τηλεπεριοδικ[οό]|μαγκαζ[ιί]νο)(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
-      m_grCategTeleShop("(?:\\W)?(οδηγ[οό][σς]?\\sαγορ[ωώ]ν|τηλεπ[ωώ]λ[ηή]σ|τηλεαγορ|τηλεμ[αά]ρκετ|telemarket)(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",Qt::CaseInsensitive),
-      m_grCategGameShow("(?:\\W)?(τηλεπαιχν[ιί]δι|quiz)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategDocumentary("(?:\\W)?(ντοκ[ιυ]μαντ[εέ]ρ)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategBiography("(?:\\W)?(βιογραφ[ιί]α|βιογραφικ[οό][σς]?)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategNews("(?:\\W)?(δελτ[ιί]ο\\W?|ειδ[ηή]σε(ι[σς]|ων))(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategSports("(?:\\W)?(champion|αθλητικ[αάοόηή]|πρωτ[αά]θλημα|ποδ[οό]σφαιρο(ου)?|κολ[υύ]μβηση|πατιν[αά]ζ|formula|μπ[αά]σκετ|β[οό]λε[ιϊ])(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategMusic("(?:\\W)?(μουσικ[οόηή]|eurovision|τραγο[υύ]δι)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategReality("(?:\\W)?(ρι[αά]λιτι|reality)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategReligion("(?:\\W)?(θρησκε[ιί]α|θρησκευτικ|να[οό][σς]?|θε[ιί]α λειτουργ[ιί]α)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategCulture("(?:\\W)?(τ[εέ]χν(η|ε[σς])|πολιτισμ)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategNature("(?:\\W)?(φ[υύ]ση|περιβ[αά]λλο|κατασκευ|επιστ[ηή]μ(?!ονικ[ηή]ς φαντασ[ιί]ας))(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategSciFi("(?:\\W)?(επιστ(.|ημονικ[ηή]ς)\\s?φαντασ[ιί]ας)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategHealth("(?:\\W)?(υγε[ιί]α|υγειιν|ιατρικ|διατροφ)(?:\\W)?",Qt::CaseInsensitive),
-      m_grCategSpecial("(?:\\W)?(αφι[εέ]ρωμα)(?:\\W)?",Qt::CaseInsensitive)
+      m_grEpisodeAsSubtitle("(?:^Επεισ[οό]διο:\\s?)([\\w\\s-,']+)\\.(?:\\s)?")
 {
 }
 
@@ -2927,105 +2905,111 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
 // να σβήσω τα κομμάτια που περισσεύουν από την περιγραφή πχ παραγωγής χχχχ
 }
 
-void EITFixUp::FixGreekCategories(DBEventEIT &event) const
+void EITFixUp::FixGreekCategories(DBEventEIT &event)
 {
-    if (event.m_description.indexOf(m_grCategComedy) != -1)
-    {
-        event.m_category = "Κωμωδία";
-    }
-    else if (event.m_description.indexOf(m_grCategTeleMag) != -1)
-    {
-        event.m_category = "Τηλεπεριοδικό";
-    }
-    else if (event.m_description.indexOf(m_grCategNature) != -1)
-    {
-        event.m_category = "Επιστήμη/Φύση";
-    }
-    else if (event.m_description.indexOf(m_grCategHealth) != -1)
-    {
-        event.m_category = "Υγεία";
-    }
-    else if (event.m_description.indexOf(m_grCategReality) != -1)
-    {
-        event.m_category = "Ριάλιτι";
-    }
-    else if (event.m_description.indexOf(m_grCategDrama) != -1)
-    {
-        event.m_category = "Κοινωνικό";
-    }
-    else if (event.m_description.indexOf(m_grCategChildren) != -1)
-    {
-        event.m_category = "Παιδικό";
-    }
-    else if (event.m_description.indexOf(m_grCategSciFi) != -1)
-    {
-        event.m_category = "Επιστ.Φαντασίας";
-    }
-    else if ((event.m_description.indexOf(m_grCategFantasy) != -1)
-             && (event.m_description.indexOf(m_grCategMystery) != -1))
+    struct grCategoryEntry {
+        QRegularExpression expr;
+        QString category;
+    };
+    static const QRegularExpression grCategFood { "(?:\\W)?(?:εκπομπ[ηή]\\W)?(Γαστρονομ[ιί]α[σς]?|μαγειρικ[ηή][σς]?|chef|συνταγ[εέηή]|διατροφ|wine|μ[αά]γειρα[σς]?)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption };
+    static const QRegularExpression grCategDrama { "(?:\\W)?(κοινωνικ[ηήό]|δραματικ[ηή]|δρ[αά]μα)(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategComedy { "(?:\\W)?(κωμικ[ηήοό]|χιουμοριστικ[ηήοό]|κωμωδ[ιί]α)(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategChildren { "(?:\\W)?(παιδικ[ηήοό]|κινο[υύ]μ[εέ]ν(ων|α)\\sσχ[εέ]δ[ιί](ων|α))(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategMystery { "(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?(?:\\W)?(μυστηρ[ιί]ου)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategFantasy { "(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?(?:\\W)?(φαντασ[ιί]ας)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategHistory { "(?:\\W)?(ιστορικ[ηήοό])(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategTeleMag { "(?:\\W)?(ενημερωτικ[ηή]|ψυχαγωγικ[ηή]|τηλεπεριοδικ[οό]|μαγκαζ[ιί]νο)(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategTeleShop { "(?:\\W)?(οδηγ[οό][σς]?\\sαγορ[ωώ]ν|τηλεπ[ωώ]λ[ηή]σ|τηλεαγορ|τηλεμ[αά]ρκετ|telemarket)(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategGameShow { "(?:\\W)?(τηλεπαιχν[ιί]δι|quiz)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategDocumentary { "(?:\\W)?(ντοκ[ιυ]μαντ[εέ]ρ)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategBiography { "(?:\\W)?(βιογραφ[ιί]α|βιογραφικ[οό][σς]?)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategNews { "(?:\\W)?(δελτ[ιί]ο\\W?|ειδ[ηή]σε(ι[σς]|ων))(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategSports { "(?:\\W)?(champion|αθλητικ[αάοόηή]|πρωτ[αά]θλημα|ποδ[οό]σφαιρο(ου)?|κολ[υύ]μβηση|πατιν[αά]ζ|formula|μπ[αά]σκετ|β[οό]λε[ιϊ])(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategMusic { "(?:\\W)?(μουσικ[οόηή]|eurovision|τραγο[υύ]δι)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategReality { "(?:\\W)?(ρι[αά]λιτι|reality)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategReligion { "(?:\\W)?(θρησκε[ιί]α|θρησκευτικ|να[οό][σς]?|θε[ιί]α λειτουργ[ιί]α)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategCulture { "(?:\\W)?(τ[εέ]χν(η|ε[σς])|πολιτισμ)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategNature { "(?:\\W)?(φ[υύ]ση|περιβ[αά]λλο|κατασκευ|επιστ[ηή]μ(?!ονικ[ηή]ς φαντασ[ιί]ας))(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategSciFi { "(?:\\W)?(επιστ(.|ημονικ[ηή]ς)\\s?φαντασ[ιί]ας)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategHealth { "(?:\\W)?(υγε[ιί]α|υγειιν|ιατρικ|διατροφ)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QRegularExpression grCategSpecial { "(?:\\W)?(αφι[εέ]ρωμα)(?:\\W)?",
+            QRegularExpression::CaseInsensitiveOption};
+    static const QList<grCategoryEntry> grCategoryDescData = {
+        { grCategComedy,      "Κωμωδία" },
+        { grCategTeleMag,     "Τηλεπεριοδικό" },
+        { grCategNature,      "Επιστήμη/Φύση" },
+        { grCategHealth,      "Υγεία" },
+        { grCategReality,     "Ριάλιτι" },
+        { grCategDrama,       "Κοινωνικό" },
+        { grCategChildren,    "Παιδικό" },
+        { grCategSciFi,       "Επιστ.Φαντασίας" },
+        { grCategMystery,     "Μυστηρίου" },
+        { grCategFantasy,     "Φαντασίας" },
+        { grCategHistory,     "Ιστορικό" },
+        { grCategTeleShop,    "Τηλεπωλήσεις" },
+        { grCategFood,        "Γαστρονομία" },
+        { grCategGameShow,    "Τηλεπαιχνίδι" },
+        { grCategBiography,   "Βιογραφία" },
+        { grCategSports,      "Αθλητικά" },
+        { grCategMusic,       "Μουσική" },
+        { grCategDocumentary, "Ντοκιμαντέρ" },
+        { grCategReligion,    "Θρησκεία" },
+        { grCategCulture,     "Τέχνες/Πολιτισμός" },
+        { grCategSpecial,     "Αφιέρωμα" },
+    };
+    static const QList<grCategoryEntry> grCategoryTitleData = {
+        { grCategTeleShop,    "Τηλεπωλήσεις" },
+        { grCategGameShow,    "Τηλεπαιχνίδι" },
+        { grCategMusic,       "Μουσική" },
+        { grCategNews,        "Ειδήσεις" },
+    };
+
+    // Handle special cases
+    if ((event.m_description.indexOf(grCategFantasy) != -1)
+        && (event.m_description.indexOf(grCategMystery) != -1))
     {
         event.m_category = "Φαντασίας/Μυστηρίου";
-    }
-    else if (event.m_description.indexOf(m_grCategMystery) != -1)
-    {
-        event.m_category = "Μυστηρίου";
-    }
-    else if (event.m_description.indexOf(m_grCategFantasy) != -1)
-    {
-        event.m_category = "Φαντασίας";
-    }
-    else if (event.m_description.indexOf(m_grCategHistory) != -1)
-    {
-        event.m_category = "Ιστορικό";
-    }
-    else if (event.m_description.indexOf(m_grCategTeleShop) != -1
-            || event.m_title.indexOf(m_grCategTeleShop) != -1)
-    {
-        event.m_category = "Τηλεπωλήσεις";
-    }
-    else if (event.m_description.indexOf(m_grCategFood) != -1)
-    {
-        event.m_category = "Γαστρονομία";
-    }
-    else if (event.m_description.indexOf(m_grCategGameShow) != -1
-             || event.m_title.indexOf(m_grCategGameShow) != -1)
-    {
-        event.m_category = "Τηλεπαιχνίδι";
-    }
-    else if (event.m_description.indexOf(m_grCategBiography) != -1)
-    {
-        event.m_category = "Βιογραφία";
-    }
-    else if (event.m_title.indexOf(m_grCategNews) != -1)
-    {
-        event.m_category = "Ειδήσεις";
-    }
-    else if (event.m_description.indexOf(m_grCategSports) != -1)
-    {
-        event.m_category = "Αθλητικά";
-    }
-    else if (event.m_description.indexOf(m_grCategMusic) != -1
-            || event.m_title.indexOf(m_grCategMusic) != -1)
-    {
-        event.m_category = "Μουσική";
-    }
-    else if (event.m_description.indexOf(m_grCategDocumentary) != -1)
-    {
-        event.m_category = "Ντοκιμαντέρ";
-    }
-    else if (event.m_description.indexOf(m_grCategReligion) != -1)
-    {
-        event.m_category = "Θρησκεία";
-    }
-    else if (event.m_description.indexOf(m_grCategCulture) != -1)
-    {
-        event.m_category = "Τέχνες/Πολιτισμός";
-    }
-    else if (event.m_description.indexOf(m_grCategSpecial) != -1)
-    {
-        event.m_category = "Αφιέρωμα";
+        return;
     }
 
+    // Find categories in the description
+    for (const auto& [expression, category] : grCategoryDescData)
+    {
+        if (event.m_description.indexOf(expression) != -1) {
+            event.m_category = category;
+            return;
+        }
+    }
+
+    // Find categories in the title
+    for (const auto& [expression, category] : grCategoryTitleData)
+    {
+        if (event.m_title.indexOf(expression) != -1) {
+            event.m_category = category;
+            return;
+        }
+    }
 }
 
 void EITFixUp::FixUnitymedia(DBEventEIT &event)
