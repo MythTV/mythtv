@@ -46,11 +46,7 @@ int EITFixUp::parseRoman (QString roman)
 
 
 EITFixUp::EITFixUp()
-    : m_auFreeviewSY(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\)$)"),
-      m_auFreeviewY("(.*) \\(([12][0-9][0-9][0-9])\\)$"),
-      m_auFreeviewYC(R"((.*) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
-      m_auFreeviewSYC(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
-      m_grRating(R"(\[(K|Κ|8|12|16|18)\]\s*)", Qt::CaseInsensitive),
+    : m_grRating(R"(\[(K|Κ|8|12|16|18)\]\s*)", Qt::CaseInsensitive),
       m_grReplay("\\([ΕE]\\)"),
       m_grDescriptionFinale("\\s*Τελευταίο\\sΕπεισόδιο\\.\\s*"),
       m_grActors("(?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\\s+στο ρόλο(?: του| της)?\\s(?:\\w+\\s[οη]\\s))?([-\\w\\s']+(?:,[-\\w\\s']+)*)(?:κ\\.[αά])?(?:\\W?)"),
@@ -1441,43 +1437,57 @@ void EITFixUp::FixAUSeven(DBEventEIT &event)
         event.m_description.resize(event.m_description.size()-(rating.matchedLength()+1));
     }
 }
-/** \fn EITFixUp::FixAUFreeview(DBEventEIT&) const
+/**
  *  \brief Use this to standardize DVB-T guide in Australia. (generic freeview - extra info in brackets at end of desc)
  */
-void EITFixUp::FixAUFreeview(DBEventEIT &event) const
+void EITFixUp::FixAUFreeview(DBEventEIT &event)
 {
-    if (event.m_description.endsWith(".."))//has been truncated to fit within the 'subtitle' eit field, so none of the following will work (ABC)
+    // If the description has been truncated to fit within the
+    // 'subtitle' eit field, none of the following will work (ABC)
+    if (event.m_description.endsWith(".."))
         return;
+    event.m_description = event.m_description.trimmed();
 
-    if (m_auFreeviewSY.indexIn(event.m_description.trimmed(), 0) != -1)
+    QRegularExpression auFreeviewSY { R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\)$)" };
+    auto match = auFreeviewSY.match(event.m_description);
+    if (match.hasMatch())
     {
         if (event.m_subtitle.isEmpty())//nine sometimes has an actual subtitle field and the brackets thingo)
-            event.m_subtitle = m_auFreeviewSY.cap(2);
-        event.m_airdate = m_auFreeviewSY.cap(3).toUInt();
-        event.m_description = m_auFreeviewSY.cap(1);
+            event.m_subtitle = match.captured(2);
+        event.m_airdate = match.capturedRef(3).toUInt();
+        event.m_description = match.captured(1);
+        return;
     }
-    else if (m_auFreeviewY.indexIn(event.m_description.trimmed(), 0) != -1)
+    QRegularExpression auFreeviewY { "(.*) \\(([12][0-9][0-9][0-9])\\)$" };
+    match = auFreeviewY.match(event.m_description);
+    if (match.hasMatch())
     {
-        event.m_airdate = m_auFreeviewY.cap(2).toUInt();
-        event.m_description = m_auFreeviewY.cap(1);
+        event.m_airdate = match.capturedRef(2).toUInt();
+        event.m_description = match.captured(1);
+        return;
     }
-    else if (m_auFreeviewSYC.indexIn(event.m_description.trimmed(), 0) != -1)
+    QRegularExpression auFreeviewSYC { R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\) \((.+)\)$)" };
+    match = auFreeviewSYC.match(event.m_description);
+    if (match.hasMatch())
     {
         if (event.m_subtitle.isEmpty())
-            event.m_subtitle = m_auFreeviewSYC.cap(2);
-        event.m_airdate = m_auFreeviewSYC.cap(3).toUInt();
-        QStringList actors = m_auFreeviewSYC.cap(4).split("/");
+            event.m_subtitle = match.captured(2);
+        event.m_airdate = match.capturedRef(3).toUInt();
+        QStringList actors = match.captured(4).split("/");
         for (int i = 0; i < actors.size(); ++i)
             event.AddPerson(DBPerson::kActor, actors.at(i));
-        event.m_description = m_auFreeviewSYC.cap(1);
+        event.m_description = match.captured(1);
+        return;
     }
-    else if (m_auFreeviewYC.indexIn(event.m_description.trimmed(), 0) != -1)
+    QRegularExpression auFreeviewYC { R"((.*) \(([12][0-9][0-9][0-9])\) \((.+)\)$)" };
+    match = auFreeviewYC.match(event.m_description);
+    if (match.hasMatch())
     {
-        event.m_airdate = m_auFreeviewYC.cap(2).toUInt();
-        QStringList actors = m_auFreeviewYC.cap(3).split("/");
+        event.m_airdate = match.capturedRef(2).toUInt();
+        QStringList actors = match.captured(3).split("/");
         for (int i = 0; i < actors.size(); ++i)
             event.AddPerson(DBPerson::kActor, actors.at(i));
-        event.m_description = m_auFreeviewYC.cap(1);
+        event.m_description = match.captured(1);
     }
 }
 

@@ -99,7 +99,7 @@ class MTV_PUBLIC EITFixUp
     static void FixComHem(DBEventEIT &event,
                           bool process_subtitle);   // Sweden DVB-C
     static void FixAUStar(DBEventEIT &event);       // Australia DVB-S
-    void FixAUFreeview(DBEventEIT &event) const;    // Australia DVB-T
+    static void FixAUFreeview(DBEventEIT &event);   // Australia DVB-T
     static void FixAUNine(DBEventEIT &event);
     static void FixAUSeven(DBEventEIT &event);
     static void FixAUDescription(DBEventEIT &event);
@@ -123,10 +123,6 @@ class MTV_PUBLIC EITFixUp
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
-    const QRegExp m_auFreeviewSY;//subtitle, year
-    const QRegExp m_auFreeviewY;//year
-    const QRegExp m_auFreeviewYC;//year, cast
-    const QRegExp m_auFreeviewSYC;//subtitle, year, cast
     const QRegExp m_grRating; // Greek new parental rating system
     const QRegExp m_grReplay; //Greek rerun
     const QRegExp m_grDescriptionFinale; //Greek last m_grEpisode
