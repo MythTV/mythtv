@@ -46,25 +46,7 @@ int EITFixUp::parseRoman (QString roman)
 
 
 EITFixUp::EITFixUp()
-    : m_dkEpisode("\\(([0-9]+)\\)"),
-      m_dkPart("\\(([0-9]+):([0-9]+)\\)"),
-      m_dkSubtitle1("^([^:]+): (.+)"),
-      m_dkSubtitle2("^([^:]+) - (.+)"),
-      m_dkSeason1("Sæson ([0-9]+)\\."),
-      m_dkSeason2("- år ([0-9]+)(?: :)"),
-      m_dkFeatures("Features:(.+)"),
-      m_dkWidescreen(" 16:9"),
-      m_dkDolby(" 5:1"),
-      m_dkSurround(R"( \(\(S\)\))"),
-      m_dkStereo(" S"),
-      m_dkReplay(" \\(G\\)"),
-      m_dkTxt(" TTV"),
-      m_dkHD(" HD"),
-      m_dkActors("(?:Medvirkende: |Medv\\.: )(.+)"),
-      m_dkPersonsSeparator("(, )|(og )"),
-      m_dkDirector("(?:Instr.: |Instrukt.r: )(.+)$"),
-      m_dkYear(" fra ([0-9]{4})[ \\.]"),
-      m_auFreeviewSY(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\)$)"),
+    : m_auFreeviewSY(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\)$)"),
       m_auFreeviewY("(.*) \\(([12][0-9][0-9][0-9])\\)$"),
       m_auFreeviewYC(R"((.*) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
       m_auFreeviewSYC(R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\) \((.+)\)$)"),
@@ -2317,69 +2299,72 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event)
     }
 }
 
-/** \fn EITFixUp::FixDK(DBEventEIT&) const
+/**
  *  \brief Use this to clean YouSee's DVB-C guide in Denmark.
  */
-void EITFixUp::FixDK(DBEventEIT &event) const
+void EITFixUp::FixDK(DBEventEIT &event)
 {
     // Source: YouSee Rules of Operation v1.16
     // url: http://yousee.dk/~/media/pdf/CPE/Rules_Operation.ashx
     int        episode = -1;
     int        season = -1;
-    QRegExp    tmpRegEx;
+
     // Title search
     // episode and part/part total
-    tmpRegEx = m_dkEpisode;
-    int position = event.m_title.indexOf(tmpRegEx);
-    if (position != -1)
+    QRegularExpression dkEpisode { R"(\(([0-9]+)\))" };
+    auto match = dkEpisode.match(event.m_title);
+    if (match.hasMatch())
     {
-      episode = tmpRegEx.cap(1).toInt();
-      event.m_partnumber = tmpRegEx.cap(1).toInt();
-      event.m_title = event.m_title.replace(tmpRegEx, "");
+        episode = match.capturedRef(1).toInt();
+        event.m_partnumber = match.capturedRef(1).toInt();
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
 
-    tmpRegEx = m_dkPart;
-    position = event.m_title.indexOf(tmpRegEx);
-    if (position != -1)
+    QRegularExpression dkPart { R"(\(([0-9]+):([0-9]+)\))" };
+    match = dkPart.match(event.m_title);
+    if (match.hasMatch())
     {
-      episode = tmpRegEx.cap(1).toInt();
-      event.m_partnumber = tmpRegEx.cap(1).toInt();
-      event.m_parttotal = tmpRegEx.cap(2).toInt();
-      event.m_title = event.m_title.replace(tmpRegEx, "");
+        episode = match.capturedRef(1).toInt();
+        event.m_partnumber = match.capturedRef(1).toInt();
+        event.m_parttotal = match.capturedRef(2).toInt();
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
 
     // subtitle delimiters
-    tmpRegEx = m_dkSubtitle1;
-    position = event.m_title.indexOf(tmpRegEx);
-    if (position != -1)
+    QRegularExpression dkSubtitle1 { "^([^:]+): (.+)" };
+    match = dkSubtitle1.match(event.m_title);
+    if (match.hasMatch())
     {
-      event.m_title = tmpRegEx.cap(1);
-      event.m_subtitle = tmpRegEx.cap(2);
+        event.m_title =    match.captured(1);
+        event.m_subtitle = match.captured(2);
     }
     else
     {
-        tmpRegEx = m_dkSubtitle2;
-        if(event.m_title.indexOf(tmpRegEx) != -1)
+        QRegularExpression dkSubtitle2 { "^([^:]+) - (.+)" };
+        match = dkSubtitle2.match(event.m_title);
+        if (match.hasMatch())
         {
-            event.m_title = tmpRegEx.cap(1);
-            event.m_subtitle = tmpRegEx.cap(2);
+            event.m_title =    match.captured(1);
+            event.m_subtitle = match.captured(2);
         }
     }
+
     // Description search
     // Season (Sæson [:digit:]+.) => episode = season episode number
     // or year (- år [:digit:]+(\\)|:) ) => episode = total episode number
-    tmpRegEx = m_dkSeason1;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    QRegularExpression dkSeason1 { "Sæson ([0-9]+)\\." };
+    match = dkSeason1.match(event.m_description);
+    if (match.hasMatch())
     {
-      season = tmpRegEx.cap(1).toInt();
+        season = match.capturedRef(1).toInt();
     }
     else
     {
-        tmpRegEx = m_dkSeason2;
-        if(event.m_description.indexOf(tmpRegEx) !=  -1)
+        QRegularExpression dkSeason2 { "- år ([0-9]+)(?: :)" };
+        match = dkSeason2.match(event.m_description);
+        if (match.hasMatch())
         {
-            season = tmpRegEx.cap(1).toInt();
+            season = match.capturedRef(1).toInt();
         }
     }
 
@@ -2390,32 +2375,40 @@ void EITFixUp::FixDK(DBEventEIT &event) const
         event.m_season = season;
 
     //Feature:
-    tmpRegEx = m_dkFeatures;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    QRegularExpression dkFeatures { "Features:(.+)" };
+    match = dkFeatures.match(event.m_description);
+    if (match.hasMatch())
     {
-        QString features = tmpRegEx.cap(1);
-        event.m_description = event.m_description.replace(tmpRegEx, "");
+        QString features = match.captured(1);
+        event.m_description.remove(match.capturedStart(),
+                                   match.capturedLength());
         // 16:9
-        if (features.indexOf(m_dkWidescreen) !=  -1)
+        QRegularExpression dkWidescreen { " 16:9" };
+        if (features.indexOf(dkWidescreen) !=  -1)
             event.m_videoProps |= VID_WIDESCREEN;
         // HDTV
-        if (features.indexOf(m_dkHD) !=  -1)
+        QRegularExpression dkHD { " HD" };
+        if (features.indexOf(dkHD) !=  -1)
             event.m_videoProps |= VID_HDTV;
         // Dolby Digital surround
-        if (features.indexOf(m_dkDolby) !=  -1)
+        QRegularExpression dkDolby { " 5:1" };
+        if (features.indexOf(dkDolby) !=  -1)
             event.m_audioProps |= AUD_DOLBY;
         // surround
-        if (features.indexOf(m_dkSurround) !=  -1)
+        QRegularExpression dkSurround { R"( \(\(S\)\))" };
+        if (features.indexOf(dkSurround) !=  -1)
             event.m_audioProps |= AUD_SURROUND;
         // stereo
-        if (features.indexOf(m_dkStereo) !=  -1)
+        QRegularExpression dkStereo { " S" };
+        if (features.indexOf(dkStereo) !=  -1)
             event.m_audioProps |= AUD_STEREO;
         // (G)
-        if (features.indexOf(m_dkReplay) !=  -1)
+        QRegularExpression dkReplay { " \\(G\\)" };
+        if (features.indexOf(dkReplay) !=  -1)
             event.m_previouslyshown = true;
         // TTV
-        if (features.indexOf(m_dkTxt) !=  -1)
+        QRegularExpression dkTxt { " TTV" };
+        if (features.indexOf(dkTxt) !=  -1)
             event.m_subtitleType |= SUB_NORMAL;
     }
 
@@ -2462,58 +2455,60 @@ void EITFixUp::FixDK(DBEventEIT &event) const
     }
 
     // Find actors and director in description
-    tmpRegEx = m_dkDirector;
+    QRegularExpression dkDirector { "(?:Instr.: |Instrukt.r: )(.+)$" };
+    QRegularExpression dkPersonsSeparator { "(, )|(og )" };
     bool directorPresent = false;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    match = dkDirector.match(event.m_description);
+    if (match.hasMatch())
     {
-        QString tmpDirectorsString = tmpRegEx.cap(1);
+        QString tmpDirectorsString = match.captured(1);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList directors =
-            tmpDirectorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
+            tmpDirectorsString.split(dkPersonsSeparator, QString::SkipEmptyParts);
 #else
         const QStringList directors =
-            tmpDirectorsString.split(m_dkPersonsSeparator, Qt::SkipEmptyParts);
+            tmpDirectorsString.split(dkPersonsSeparator, Qt::SkipEmptyParts);
 #endif
         for (const auto & director : qAsConst(directors))
         {
             tmpDirectorsString = director.split(":").last().trimmed().
-                    remove(QRegExp("\\.$"));
+                remove(QRegularExpression("\\.$"));
             if (tmpDirectorsString != "")
                 event.AddPerson(DBPerson::kDirector, tmpDirectorsString);
         }
         directorPresent = true;
     }
 
-    tmpRegEx = m_dkActors;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    QRegularExpression dkActors { "(?:Medvirkende: |Medv\\.: )(.+)" };
+    match = dkActors.match(event.m_description);
+    if (match.hasMatch())
     {
-        QString tmpActorsString = tmpRegEx.cap(1);
+        QString tmpActorsString = match.captured(1);
         if (directorPresent)
-            tmpActorsString = tmpActorsString.replace(m_dkDirector,"");
+            tmpActorsString = tmpActorsString.replace(dkDirector,"");
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors =
-            tmpActorsString.split(m_dkPersonsSeparator, QString::SkipEmptyParts);
+            tmpActorsString.split(dkPersonsSeparator, QString::SkipEmptyParts);
 #else
         const QStringList actors =
-            tmpActorsString.split(m_dkPersonsSeparator, Qt::SkipEmptyParts);
+            tmpActorsString.split(dkPersonsSeparator, Qt::SkipEmptyParts);
 #endif
         for (const auto & actor : qAsConst(actors))
         {
             tmpActorsString = actor.split(":").last().trimmed().
-                    remove(QRegExp("\\.$"));
+                    remove(QRegularExpression("\\.$"));
             if (tmpActorsString != "")
                 event.AddPerson(DBPerson::kActor, tmpActorsString);
         }
     }
+
     //find year
-    tmpRegEx = m_dkYear;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    QRegularExpression dkYear { " fra ([0-9]{4})[ \\.]" };
+    match = dkYear.match(event.m_description);
+    if (match.hasMatch())
     {
         bool ok = false;
-        uint y = tmpRegEx.cap(1).toUInt(&ok);
+        uint y = match.capturedRef(1).toUInt(&ok);
         if (ok)
             event.m_originalairdate = QDate(y, 1, 1);
     }

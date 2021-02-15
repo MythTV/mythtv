@@ -114,7 +114,7 @@ class MTV_PUBLIC EITFixUp
     static void FixCategory(DBEventEIT &event);     // Generic Category fixes
     static void FixNO(DBEventEIT &event);           // Norwegian DVB-S
     static void FixNRK_DVBT(DBEventEIT &event);     // Norwegian NRK DVB-T
-    void FixDK(DBEventEIT &event) const;            // Danish YouSee DVB-C
+    static void FixDK(DBEventEIT &event);           // Danish YouSee DVB-C
     static void FixStripHTML(DBEventEIT &event);    // Strip HTML tags
     static void FixGreekSubtitle(DBEventEIT &event);// Greek Nat TV fix
     void FixGreekEIT(DBEventEIT &event) const;
@@ -123,24 +123,6 @@ class MTV_PUBLIC EITFixUp
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
-    const QRegExp m_dkEpisode;
-    const QRegExp m_dkPart;
-    const QRegExp m_dkSubtitle1;
-    const QRegExp m_dkSubtitle2;
-    const QRegExp m_dkSeason1;
-    const QRegExp m_dkSeason2;
-    const QRegExp m_dkFeatures;
-    const QRegExp m_dkWidescreen;
-    const QRegExp m_dkDolby;
-    const QRegExp m_dkSurround;
-    const QRegExp m_dkStereo;
-    const QRegExp m_dkReplay;
-    const QRegExp m_dkTxt;
-    const QRegExp m_dkHD;
-    const QRegExp m_dkActors;
-    const QRegExp m_dkPersonsSeparator;
-    const QRegExp m_dkDirector;
-    const QRegExp m_dkYear;
     const QRegExp m_auFreeviewSY;//subtitle, year
     const QRegExp m_auFreeviewY;//year
     const QRegExp m_auFreeviewYC;//year, cast
