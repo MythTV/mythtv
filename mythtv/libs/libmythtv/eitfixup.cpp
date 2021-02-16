@@ -15,7 +15,6 @@
  * Event Fix Up Scripts - Turned on by entry in dtv_privatetype table
  *------------------------------------------------------------------------*/
 
-static const QRegularExpression kHtml { "</?EM>", QRegularExpression::CaseInsensitiveOption };
 static const QRegularExpression kStereo { R"(\b\(?[sS]tereo\)?\b)" };
 static const QRegularExpression kUKSpaceColonStart { R"(^[ |:]*)" };
 
@@ -2487,7 +2486,8 @@ void EITFixUp::FixDK(DBEventEIT &event)
 void EITFixUp::FixStripHTML(DBEventEIT &event)
 {
     LOG(VB_EIT, LOG_INFO, QString("Applying html strip to %1").arg(event.m_title));
-    event.m_title.remove(kHtml);
+    const QRegularExpression html { "</?EM>", QRegularExpression::CaseInsensitiveOption };
+    event.m_title.remove(html);
 }
 
 // Moves the subtitle field into the description since it's just used
