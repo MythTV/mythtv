@@ -45,38 +45,7 @@ int EITFixUp::parseRoman (QString roman)
 }
 
 
-EITFixUp::EITFixUp()
-    : m_grRating(R"(\[(K|Κ|8|12|16|18)\]\s*)", Qt::CaseInsensitive),
-      m_grReplay("\\([ΕE]\\)"),
-      m_grDescriptionFinale("\\s*Τελευταίο\\sΕπεισόδιο\\.\\s*"),
-      m_grActors("(?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\\s+στο ρόλο(?: του| της)?\\s(?:\\w+\\s[οη]\\s))?([-\\w\\s']+(?:,[-\\w\\s']+)*)(?:κ\\.[αά])?(?:\\W?)"),
-      // cap(1) actors, just names
-      m_grFixnofullstopActors("(\\w\\s(Παίζουν:|Πρωταγων))"),
-      m_grFixnofullstopDirectors(R"(\w\s(Σκηνοθ[εέ]))"),
-      m_grPeopleSeparator("([,-]\\s+)"),
-      m_grDirector("(?:Σκηνοθεσία: |Σκηνοθέτης: |Σκηνοθέτης - Επιμέλεια: )(\\w+\\s\\w+\\s?)(?:\\W?)"),
-      m_grPres("(?:Παρουσ[ιί]αση:(?:\\b)*|Παρουσι[αά]ζ(?:ουν|ει)(?::|\\sο|\\sη)|Παρουσι[αά]στ(?:[ηή]ς|ρια|ριες|[εέ]ς)(?::|\\sο|\\sη)|Με τ(?:ον |ην )(?:[\\s|:|ο|η])*(?:\\b)*)([-\\w\\s]+(?:,[-\\w\\s]+)*)(?:\\W?)"),
-      m_grYear("(?:\\W?)(?:\\s?παραγωγ[ηή]ς|\\s?-|,)\\s*([1-2]{1}[0-9]{3})(?:-\\d{1,4})?",Qt::CaseInsensitive),
-      m_grCountry("(?:\\W|\\b)(?:(ελλην|τουρκ|αμερικ[αά]ν|γαλλ|αγγλ|βρεττ?αν|γερμαν|ρωσσ?|ιταλ|ελβετ|σουηδ|ισπαν|πορτογαλ|μεξικ[αά]ν|κιν[εέ]ζικ|ιαπων|καναδ|βραζιλι[αά]ν)(ικ[ηή][ςσ]))",Qt::CaseInsensitive),
-      m_grlongEp("\\b(?:Επ.|επεισ[οό]διο:?)\\s*(\\d+)(?:\\W?)",Qt::CaseInsensitive),
-      m_grSeasonAsRomanNumerals(",\\s*([MDCLXVIΙΧ]+)$",Qt::CaseInsensitive),
-      m_grSeason("(?:\\W-?)*(?:\\(-\\s*)?\\b(([Α-Ω|A|B|E|Z|H|I|K|M|N]{1,2})(?:'|΄)?|(\\d{1,2})(?:ος|ου|oς|os)?)(?:\\s*[ΚκKk][υύ]κλο(?:[σς]|υ)){1}\\s?",Qt::CaseInsensitive),
-      m_grRealTitleinDescription(R"((?:^\()([A-Za-z\s\d-]+)(?:\))(?:\s*))"),
-      // cap1 = real title
-      // cap0 = real title in parentheses.
-      m_grRealTitleinTitle(R"((?:\()([A-Za-z\s\d-]+)(?:\))(?:\s*$)*)"),
-      // cap1 = real title
-      // cap0 = real title in parentheses.
-      m_grCommentsinTitle("(?:\\()([Α-Ωα-ω\\s\\d-]+)(?:\\))(?:\\s*$)*"),
-      // cap1 = real title
-      // cap0 = real title in parentheses.
-      m_grNotPreviouslyShown("(?:\\W?)(?:-\\s*)*(?:\\b[Α1]['΄η]?\\s*(?:τηλεοπτικ[ηή]\\s*)?(?:μετ[αά]δοση|προβολ[ηή]))(?:\\W?)",Qt::CaseInsensitive),
-      // Try to exctract Greek categories from keywords in description.
-      m_grEpisodeAsSubtitle("(?:^Επεισ[οό]διο:\\s?)([\\w\\s-,']+)\\.(?:\\s)?")
-{
-}
-
-void EITFixUp::Fix(DBEventEIT &event) const
+void EITFixUp::Fix(DBEventEIT &event)
 {
     if (event.m_fixup)
     {
@@ -2534,21 +2503,23 @@ void EITFixUp::FixGreekSubtitle(DBEventEIT &event)
     }
 }
 
-void EITFixUp::FixGreekEIT(DBEventEIT &event) const
+void EITFixUp::FixGreekEIT(DBEventEIT &event)
 {
     // Program ratings
-    QRegExp tmpRegEx = m_grRating;
-    int position = event.m_title.indexOf(tmpRegEx);
-    if (position != -1)
+    const QRegularExpression grRating { R"(\[(K|Κ|8|12|16|18)\]\s*)",
+        QRegularExpression::CaseInsensitiveOption };
+    auto match = grRating.match(event.m_title);
+    if (match.hasMatch())
     {
       EventRating prograting;
-      prograting.m_system="GR"; prograting.m_rating = tmpRegEx.cap(1);
+      prograting.m_system="GR"; prograting.m_rating = match.captured(1);
       event.m_ratings.push_back(prograting);
-      event.m_title = event.m_title.replace(tmpRegEx.cap(0), "").trimmed();
+      event.m_title.remove(match.capturedStart(), match.capturedLength());
+      event.m_title = event.m_title.trimmed();
     }
 
     //Live show
-    position = event.m_title.indexOf("(Ζ)");
+    int position = event.m_title.indexOf("(Ζ)");
     if (position != -1)
     {
         event.m_title = event.m_title.replace("(Ζ)", "");
@@ -2556,21 +2527,25 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     }
 
     // Greek not previously Shown
-    position = event.m_title.indexOf(m_grNotPreviouslyShown);
-    if (position != -1)
+    const QRegularExpression grNotPreviouslyShown {
+        R"(\W?(?:-\s*)*(?:\b[Α1]['΄η]?\s*(?:τηλεοπτικ[ηή]\s*)?(?:μετ[αά]δοση|προβολ[ηή]))\W?)",
+        QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
+    match = grNotPreviouslyShown.match(event.m_title);
+    if (match.hasMatch())
     {
         event.m_previouslyshown = false;
-        event.m_title = event.m_title.replace(m_grNotPreviouslyShown, "");
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Greek Replay (Ε)
     // it might look redundant compared to previous check but at least it helps
     // remove the (Ε) From the title.
-    tmpRegEx = m_grReplay;
-    if (event.m_title.indexOf(tmpRegEx) !=  -1)
+    const QRegularExpression grReplay { R"(\([ΕE]\))" };
+    match = grReplay.match(event.m_title);
+    if (match.hasMatch())
     {
         event.m_previouslyshown = true;
-        event.m_title = event.m_title.replace(tmpRegEx, "");
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
 
     // Check for (HD) in the decription
@@ -2589,21 +2564,16 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
         event.m_videoProps |= VID_HDTV;
     }
 
-
-    tmpRegEx = m_grFixnofullstopActors;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
-    {
-        event.m_description.insert(position + 1, ".");
-    }
+    const QRegularExpression grFixnofullstopActors { R"(\w\s(Παίζουν:|Πρωταγων))" };
+    match = grFixnofullstopActors.match(event.m_description);
+    if (match.hasMatch())
+        event.m_description.insert(match.capturedStart() + 1, ".");
 
     // If they forgot the "." at the end of the sentence before the actors/directors begin, let's insert it.
-    tmpRegEx = m_grFixnofullstopDirectors;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
-    {
-        event.m_description.insert(position + 1, ".");
-    }
+    const QRegularExpression grFixnofullstopDirectors { R"(\w\s(Σκηνοθ[εέ]))" };
+    match = grFixnofullstopDirectors.match(event.m_description);
+    if (match.hasMatch())
+        event.m_description.insert(match.capturedStart() + 1, ".");
 
     // Find actors and director in description
     // I am looking for actors first and then for directors/presenters because
@@ -2611,89 +2581,94 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     // for a director's/presenter's surname (directors/presenters are shown
     // before actors in the description field.). So removing the text after
     // adding the actors AND THEN looking for dir/pres helps to clear things up.
-    tmpRegEx = m_grActors;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    const QRegularExpression grActors { R"((?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\s+στο ρόλο(?: του| της)?\s(?:\w+\s[οη]\s))?([-\w\s']+(?:,[-\w\s']+)*)(?:κ\.[αά])?(?:\W?))" };
+      // cap(1) actors, just names
+    const QRegularExpression grPeopleSeparator { R"(([,-]\s+))" };
+    match = grActors.match(event.m_description);
+    if (match.hasMatch())
     {
-        QString tmpActorsString = tmpRegEx.cap(1);
+        QString tmpActorsString = match.captured(1);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors =
-            tmpActorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+            tmpActorsString.split(grPeopleSeparator, QString::SkipEmptyParts);
 #else
         const QStringList actors =
-            tmpActorsString.split(m_grPeopleSeparator, Qt::SkipEmptyParts);
+            tmpActorsString.split(grPeopleSeparator, Qt::SkipEmptyParts);
 #endif
         for (const auto & actor : qAsConst(actors))
         {
             tmpActorsString = actor.split(":").last().trimmed().
-                    remove(QRegExp("\\.$"));
+                    remove(QRegularExpression("\\.$"));
             if (tmpActorsString != "")
                 event.AddPerson(DBPerson::kActor, tmpActorsString);
         }
-        event.m_description.replace(tmpRegEx.cap(0), "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
+
     // Director
-    tmpRegEx = m_grDirector;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    const QRegularExpression grDirector { R"((?:Σκηνοθεσία: |Σκηνοθέτης: |Σκηνοθέτης - Επιμέλεια: )(\w+\s\w+\s?)(?:\W?))" };
+    match = grDirector.match(event.m_description);
+    if (match.hasMatch())
     {
-        QString tmpDirectorsString = tmpRegEx.cap(1);
+        QString tmpDirectorsString = match.captured(1);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList directors =
-            tmpDirectorsString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+            tmpDirectorsString.split(grPeopleSeparator, QString::SkipEmptyParts);
 #else
         const QStringList directors =
-            tmpDirectorsString.split(m_grPeopleSeparator, Qt::SkipEmptyParts);
+            tmpDirectorsString.split(grPeopleSeparator, Qt::SkipEmptyParts);
 #endif
         for (const auto & director : qAsConst(directors))
         {
             tmpDirectorsString = director.split(":").last().trimmed().
-                    remove(QRegExp("\\.$"));
+                    remove(QRegularExpression("\\.$"));
             if (tmpDirectorsString != "")
             {
                 event.AddPerson(DBPerson::kDirector, tmpDirectorsString);
             }
         }
-        event.m_description.replace(tmpRegEx.cap(0), "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     //Try to find presenter
-    tmpRegEx = m_grPres;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    const QRegularExpression grPres { R"((?:Παρουσ[ιί]αση:(?:\b)*|Παρουσι[αά]ζ(?:ουν|ει)(?::|\sο|\sη)|Παρουσι[αά]στ(?:[ηή]ς|ρια|ριες|[εέ]ς)(?::|\sο|\sη)|Με τ(?:ον |ην )(?:[\s|:|ο|η])*(?:\b)*)([-\w\s]+(?:,[-\w\s]+)*)(?:\W?))",
+        QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
+    match = grPres.match(event.m_description);
+    if (match.hasMatch())
     {
-        QString tmpPresentersString = tmpRegEx.cap(1);
+        QString tmpPresentersString = match.captured(1);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList presenters =
-            tmpPresentersString.split(m_grPeopleSeparator, QString::SkipEmptyParts);
+            tmpPresentersString.split(grPeopleSeparator, QString::SkipEmptyParts);
 #else
         const QStringList presenters =
-            tmpPresentersString.split(m_grPeopleSeparator, Qt::SkipEmptyParts);
+            tmpPresentersString.split(grPeopleSeparator, Qt::SkipEmptyParts);
 #endif
         for (const auto & presenter : qAsConst(presenters))
         {
             tmpPresentersString = presenter.split(":").last().trimmed().
-                    remove(QRegExp("\\.$"));
+                    remove(QRegularExpression("\\.$"));
             if (tmpPresentersString != "")
             {
                 event.AddPerson(DBPerson::kPresenter, tmpPresentersString);
             }
         }
-        event.m_description.replace(tmpRegEx.cap(0), "");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     //find year e.g Παραγωγής 1966 ή ΝΤΟΚΙΜΑΝΤΕΡ - 1998 Κατάλληλο για όλους
     // Used in Private channels (not 'secret', just not owned by Government!)
-    tmpRegEx = m_grYear;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    const QRegularExpression grYear { R"(\W?(?:\s?παραγωγ[ηή]ς|\s?-|,)\s*([1-2][0-9]{3})(?:-\d{1,4})?)",
+        QRegularExpression::CaseInsensitiveOption };
+    match = grYear.match(event.m_description);
+    if (match.hasMatch())
     {
         bool ok = false;
-        uint y = tmpRegEx.cap(1).toUInt(&ok);
+        uint y = match.capturedRef(1).toUInt(&ok);
         if (ok)
         {
             event.m_originalairdate = QDate(y, 1, 1);
-            event.m_description.replace(tmpRegEx, "");
+            event.m_description.remove(match.capturedStart(), match.capturedLength());
         }
     }
     // Remove white spaces
@@ -2704,145 +2679,149 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     event.m_description = event.m_description.replace(" .",".").trimmed();
 
     //find country of origin and remove it from description.
-    tmpRegEx = m_grCountry;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
-    {
-        event.m_description.replace(tmpRegEx, "");
-    }
+    const QRegularExpression grCountry {
+        R"((?:\W|\b)(?:(ελλην|τουρκ|αμερικ[αά]ν|γαλλ|αγγλ|βρεττ?αν|γερμαν|ρωσσ?|ιταλ|ελβετ|σουηδ|ισπαν|πορτογαλ|μεξικ[αά]ν|κιν[εέ]ζικ|ιαπων|καναδ|βραζιλι[αά]ν)(ικ[ηή][ςσ])))",
+        QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption  };
+    match = grCountry.match(event.m_description);
+    if (match.hasMatch())
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
 
     // Work out the season and episode numbers (if any)
     // Matching pattern "Επεισ[όο]διο:?|Επ 3 από 14|3/14" etc
     bool    series  = false;
-    QRegExp tmpSeries = m_grSeason;
+    const QRegularExpression grSeason {
+        R"((?:\W-?)*(?:\(-\s*)?\b(([Α-Ω|A|B|E|Z|H|I|K|M|N]{1,2})(?:'|΄)?|(\d{1,2})(?:ος|ου|oς|os)?)(?:\s*[ΚκKk][υύ]κλο(?:[σς]|υ))\s?)",
+        QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
     // cap(2) is the season for ΑΒΓΔ
     // cap(3) is the season for 1234
-    int position1 = tmpSeries.indexIn(event.m_title);
-    if (position1 != -1)
+    match = grSeason.match(event.m_title);
+    if (match.hasMatch())
     {
-        if (!tmpSeries.cap(2).isEmpty()) // we found a letter representing a number
+        if (!match.capturedRef(2).isEmpty()) // we found a letter representing a number
         {
             //sometimes Nat. TV writes numbers as letters, i.e Α=1, Β=2, Γ=3, etc
             //must convert them to numbers.
-            int tmpinteger = tmpSeries.cap(2).toUInt();
+            int tmpinteger = match.capturedRef(2).toUInt();
             if (tmpinteger < 1)
             {
-                if (tmpSeries.cap(2) == "ΣΤ") // 6, don't ask!
+                if (match.capturedRef(2) == "ΣΤ") // 6, don't ask!
                     event.m_season = 6;
                 else
                 {
                     QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";
-                    tmpinteger = LettToNumber.indexOf(tmpSeries.cap(2));
+                    tmpinteger = LettToNumber.indexOf(match.capturedRef(2));
                     if (tmpinteger != -1)
                         event.m_season = tmpinteger;
                     else
                     //sometimes they use english letters instead of greek. Compensating:
                     {
                         LettToNumber = "0ABΓΔE6ZHΘIKΛMN";
-                        tmpinteger = LettToNumber.indexOf(tmpSeries.cap(2));
+                        tmpinteger = LettToNumber.indexOf(match.capturedRef(2));
                         if (tmpinteger != -1)
                            event.m_season = tmpinteger;
                     }
                 }
             }
         }
-        else if (!tmpSeries.cap(3).isEmpty()) //number
+        else if (!match.capturedRef(3).isEmpty()) //number
         {
-            event.m_season = tmpSeries.cap(3).toUInt();
+            event.m_season = match.capturedRef(3).toUInt();
         }
         series = true;
-        event.m_title.replace(tmpSeries.cap(0),"");
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
 
     // I have to search separately for season in title and description because it wouldn't work when in both.
-    tmpSeries = m_grSeason;
-    // cap(2) is the season for ΑΒΓΔ
-    // cap(3) is the season for 1234
-    int position2 = tmpSeries.indexIn(event.m_description);
-    if (position2 != -1)
+    match = grSeason.match(event.m_description);
+    if (match.hasMatch())
     {
-        if (!tmpSeries.cap(2).isEmpty()) // we found a letter representing a number
+        if (!match.capturedRef(2).isEmpty()) // we found a letter representing a number
         {
             //sometimes Nat. TV writes numbers as letters, i.e Α=1, Β=2, Γ=3, etc
             //must convert them to numbers.
-            int tmpinteger = tmpSeries.cap(2).toUInt();
+            int tmpinteger = match.capturedRef(2).toUInt();
             if (tmpinteger < 1)
             {
-                if (tmpSeries.cap(2) == "ΣΤ") // 6, don't ask!
+                if (match.capturedRef(2) == "ΣΤ") // 6, don't ask!
                     event.m_season = 6;
                 else
                 {
                     QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";
-                    tmpinteger = LettToNumber.indexOf(tmpSeries.cap(2));
+                    tmpinteger = LettToNumber.indexOf(match.capturedRef(2));
                     if (tmpinteger != -1)
                         event.m_season = tmpinteger;
                 }
             }
         }
-        else if (!tmpSeries.cap(3).isEmpty()) //number
+        else if (!match.capturedRef(3).isEmpty()) //number
         {
-            event.m_season = tmpSeries.cap(3).toUInt();
+            event.m_season = match.capturedRef(3).toUInt();
         }
         series = true;
-        event.m_description.replace(tmpSeries.cap(0),"");
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
 
     // If Season is in Roman Numerals (I,II,etc)
-    tmpSeries = m_grSeasonAsRomanNumerals;
-    if ((position1 = tmpSeries.indexIn(event.m_title)) != -1
-          || (position2 = tmpSeries.indexIn(event.m_description)) != -1)
+    const QRegularExpression grSeasonAsRomanNumerals { ",\\s*([MDCLXVIΙΧ]+)$",
+        QRegularExpression::CaseInsensitiveOption };
+    match = grSeasonAsRomanNumerals.match(event.m_title);
+    auto match2 = grSeasonAsRomanNumerals.match(event.m_description);
+    if (match.hasMatch())
     {
-        if (!tmpSeries.isEmpty()) //number
-            event.m_season = parseRoman(tmpSeries.cap(1).toUpper());
+        if (!match.capturedRef(1).isEmpty()) //number
+            event.m_season = parseRoman(match.captured(1).toUpper());
         series = true;
-        if (position1 != -1)
-        {
-            event.m_title.replace(tmpSeries.cap(0),"");
-            event.m_title = event.m_title.trimmed();
-            if (event.m_title.right(1) == ",")
-               event.m_title.chop(1);
-        }
-        if (position2 != -1)
-        {
-            event.m_description.replace(tmpSeries.cap(0),"");
-            event.m_description = event.m_description.trimmed();
-            if (event.m_description.right(1) == ",")
-               event.m_description.chop(1);
-        }
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
+        event.m_title = event.m_title.trimmed();
+        if (event.m_title.right(1) == ",")
+            event.m_title.chop(1);
     }
-
-
-    QRegExp tmpEpisode = m_grlongEp;
-    //tmpEpisode.setMinimal(true);
-    // cap(1) is the Episode No.
-    if ((position1 = tmpEpisode.indexIn(event.m_title)) != -1
-            || (position2 = tmpEpisode.indexIn(event.m_description)) != -1)
+    else if (match2.hasMatch())
     {
-        if (!tmpEpisode.cap(1).isEmpty())
-        {
-            event.m_episode = tmpEpisode.cap(1).toUInt();
-            series = true;
-            if (position1 != -1)
-                event.m_title.replace(tmpEpisode.cap(0),"");
-            if (position2 != -1)
-                event.m_description.replace(tmpEpisode.cap(0),"");
-            // Sometimes description omits Season if it's 1. We fix this
-            if (0 == event.m_season)
-                event.m_season = 1;
-        }
+        if (!match2.capturedRef(1).isEmpty()) //number
+            event.m_season = parseRoman(match2.captured(1).toUpper());
+        series = true;
+        event.m_description.remove(match2.capturedStart(), match2.capturedLength());
+        event.m_description = event.m_description.trimmed();
+        if (event.m_description.right(1) == ",")
+            event.m_description.chop(1);
     }
+
+    const QRegularExpression grlongEp { R"(\b(?:Επ.|επεισ[οό]διο:?)\s*(\d+)\W?)",
+        QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
+    // cap(1) is the Episode No.
+    match  = grlongEp.match(event.m_title);
+    match2 = grlongEp.match(event.m_description);
+    if (match.hasMatch() || match2.hasMatch())
+    {
+        if (!match.capturedRef(1).isEmpty())
+        {
+            event.m_episode = match.capturedRef(1).toUInt();
+            series = true;
+            event.m_title.remove(match.capturedStart(), match.capturedLength());
+        }
+        else if (!match2.capturedRef(1).isEmpty())
+        {
+            event.m_episode = match2.capturedRef(1).toUInt();
+            series = true;
+            event.m_description.remove(match2.capturedStart(), match2.capturedLength());
+        }
+        // Sometimes description omits Season if it's 1. We fix this
+        if (0 == event.m_season)
+            event.m_season = 1;
+    }
+
     // Sometimes, especially on greek national tv, they include comments in the
     // title, e.g "connection to ert1", "ert archives".
     // Because they obscure the real title, I'll isolate and remove them.
 
-    QRegExp tmpComment = m_grCommentsinTitle;
-    tmpComment.setMinimal(true);
-    position = event.m_title.indexOf(tmpComment);
-    if (position != -1)
-    {
-        event.m_title.replace(tmpComment.cap(0),"");
-    }
+    const QRegularExpression grCommentsinTitle { R"(\(([Α-Ωα-ω\s\d-]+)\)(?:\s*$)*)" };
+      // cap1 = real title
+      // cap0 = real title in parentheses.
+    match = grCommentsinTitle.match(event.m_title);
+    if (match.hasMatch()) // found in title instead
+        event.m_title.remove(match.capturedStart(), match.capturedLength());
 
     // Sometimes the real (mostly English) title of a movie or series is
     // enclosed in parentheses in the event title, subtitle or description.
@@ -2850,51 +2829,51 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event) const
     // EITFixUp::FixGreekSubtitle, I will search for it only in the description.
     // It will replace the translated one to get better chances of metadata
     // retrieval. The old title will be moved in the description.
-    QRegExp tmptitle = m_grRealTitleinDescription;
-    tmptitle.setMinimal(true);
-    position = event.m_description.indexOf(tmptitle);
-    if (position != -1)
+    const QRegularExpression grRealTitleInDescription { R"(^\(([A-Za-z\s\d-]+)\)\s*)" };
+    // cap1 = real title
+    // cap0 = real title in parentheses.
+    match = grRealTitleInDescription.match(event.m_description);
+    if (match.hasMatch())
     {
-        event.m_description = event.m_description.replace(tmptitle, "");
-        if (tmptitle.cap(0) != event.m_title.trimmed())
+        event.m_description.remove(0, match.capturedLength());
+        if (match.captured(0) != event.m_title.trimmed())
         {
             event.m_description = "(" + event.m_title.trimmed() + "). " + event.m_description;
         }
-        event.m_title = tmptitle.cap(1);
+        event.m_title = match.captured(1);
         // Remove the real title from the description
     }
     else // search in title
     {
-        tmptitle = m_grRealTitleinTitle;
-        position = event.m_title.indexOf(tmptitle);
-        if (position != -1) // found in title instead
+        QRegularExpression grRealTitleInTitle { R"(\(([A-Za-z\s\d-]+)\)(?:\s*$)?)" };
+        // cap1 = real title
+        // cap0 = real title in parentheses.
+        match = grRealTitleInTitle.match(event.m_title);
+        if (match.hasMatch()) // found in title instead
         {
-            event.m_title.replace(tmptitle.cap(0),"");
+            event.m_title.remove(match.capturedStart(), match.capturedLength());
             QString tmpTranslTitle = event.m_title;
             //QString tmpTranslTitle = event.m_title.replace(tmptitle.cap(0),"");
-            event.m_title = tmptitle.cap(1);
+            event.m_title = match.captured(1);
             event.m_description = "(" + tmpTranslTitle.trimmed() + "). " + event.m_description;
         }
     }
 
     // Description field: "^Episode: Lion in the cage. (Description follows)"
-    tmpRegEx = m_grEpisodeAsSubtitle;
-    position = event.m_description.indexOf(tmpRegEx);
-    if (position != -1)
+    const QRegularExpression grEpisodeAsSubtitle { R"(^Επεισ[οό]διο:\s?([\w\s\-,']+)\.\s?)" };
+    match = grEpisodeAsSubtitle.match(event.m_description);
+    if (match.hasMatch())
     {
-        event.m_subtitle = tmpRegEx.cap(1).trimmed();
-        event.m_description.replace(tmpRegEx, "");
+        event.m_subtitle = match.captured(1).trimmed();
+        event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
-    QRegExp m_grMovie("\\bταιν[ιί]α\\b",Qt::CaseInsensitive);
-    bool isMovie = (event.m_description.indexOf(m_grMovie) !=-1) ;
+    const QRegularExpression grMovie { R"(\bταιν[ιί]α\b)",
+        QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
+    bool isMovie = (event.m_description.indexOf(grMovie) !=-1) ;
     if (isMovie)
-    {
         event.m_categoryType = ProgramInfo::kCategoryMovie;
-    }
     else if (series)
-    {
         event.m_categoryType = ProgramInfo::kCategorySeries;
-    }
     // clear double commas.
     event.m_description.replace(",,", ",");
     // just for luck, retrim fields.

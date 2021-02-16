@@ -72,9 +72,9 @@ class MTV_PUBLIC EITFixUp
         kFixGreekCategories  = 1U << 31,
     };
 
-    EITFixUp();
+    EITFixUp() = default;
 
-    void Fix(DBEventEIT &event) const;
+    static void Fix(DBEventEIT &event);
 
     static int parseRoman (QString roman);
 
@@ -117,32 +117,11 @@ class MTV_PUBLIC EITFixUp
     static void FixDK(DBEventEIT &event);           // Danish YouSee DVB-C
     static void FixStripHTML(DBEventEIT &event);    // Strip HTML tags
     static void FixGreekSubtitle(DBEventEIT &event);// Greek Nat TV fix
-    void FixGreekEIT(DBEventEIT &event) const;
+    static void FixGreekEIT(DBEventEIT &event);
     static void FixGreekCategories(DBEventEIT &event);// Greek categories from descr.
     static void FixUnitymedia(DBEventEIT &event);     // handle cast/crew from Unitymedia
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
-
-    const QRegExp m_grRating; // Greek new parental rating system
-    const QRegExp m_grReplay; //Greek rerun
-    const QRegExp m_grDescriptionFinale; //Greek last m_grEpisode
-    const QRegExp m_grActors; //Greek actors
-    const QRegExp m_grFixnofullstopActors; //bad punctuation makes the "Παίζουν:" and the actors' names part of the directors...
-    const QRegExp m_grFixnofullstopDirectors; //bad punctuation makes the "Σκηνοθ...:" and the previous sentence.
-    const QRegExp m_grPeopleSeparator; // The comma that separates the actors.
-    const QRegExp m_grDirector;
-    const QRegExp m_grPres; // Greek Presenters for shows
-    const QRegExp m_grYear; // Greek release year.
-    const QRegExp m_grCountry; // Greek event country of origin.
-    const QRegExp m_grlongEp; // Greek Episode
-    const QRegExp m_grSeasonAsRomanNumerals; // Greek Episode in Roman numerals
-    const QRegExp m_grSeason; // Greek Season
-    const QRegExp m_grSeries;
-    const QRegExp m_grRealTitleinDescription; // The original title is often in the descr in parenthesis.
-    const QRegExp m_grRealTitleinTitle; // The original title is often in the title in parenthesis.
-    const QRegExp m_grCommentsinTitle; // Sometimes esp. national stations include comments in the title eg "(ert arxeio)"
-    const QRegExp m_grNotPreviouslyShown; // Not previously shown on TV
-    const QRegExp m_grEpisodeAsSubtitle; // Description field: "^Episode: Lion in the cage. (Description follows)"
 };
 
 #endif // EITFIXUP_H

@@ -3559,7 +3559,7 @@ void TestEITFixups::testGreek2_data()
                                  << "Real Title" << "Subtitle" << "(Title). Description"
                                  << 0 << 0 << QDate();
     QTest::newRow("realTitleD")  << "Title" << "Subtitle" << "(Real Title) Description"
-                                 << "Real Title" << "Subtitle" << "(Title).  Description"
+                                 << "Real Title" << "Subtitle" << "(Title). Description"
                                  << 0 << 0 << QDate();
     QTest::newRow("eposideInSt") << "Title" << "Subtitle" << "Επεισόδιο: Lion in the cage. Description"
                                  << "Title" << "Lion in the cage" << "Description"
