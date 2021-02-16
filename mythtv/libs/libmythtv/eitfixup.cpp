@@ -142,6 +142,7 @@ void EITFixUp::Fix(DBEventEIT &event)
     if (kFixUnitymedia & event.m_fixup)
         FixUnitymedia(event);
 
+    // Clean up text strings after all fixups have been applied.
     if (event.m_fixup)
     {
         if (!event.m_title.isEmpty())
@@ -2152,10 +2153,6 @@ void EITFixUp::FixNL(DBEventEIT &event)
     // Put information back in description
 
     event.m_description = fullinfo;
-    event.m_description = event.m_description.trimmed();
-    event.m_title       = event.m_title.trimmed();
-    event.m_subtitle    = event.m_subtitle.trimmed();
-
 }
 
 void EITFixUp::FixCategory(DBEventEIT &event)
@@ -2474,10 +2471,6 @@ void EITFixUp::FixDK(DBEventEIT &event)
         if (ok)
             event.m_originalairdate = QDate(y, 1, 1);
     }
-    // Remove white spaces
-    event.m_description = event.m_description.trimmed();
-    event.m_title       = event.m_title.trimmed();
-    event.m_subtitle    = event.m_subtitle.trimmed();
 }
 
 /**
@@ -2677,10 +2670,6 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
             event.m_description.remove(match.capturedStart(), match.capturedLength());
         }
     }
-    // Remove white spaces
-    event.m_description = event.m_description.trimmed();
-    event.m_title       = event.m_title.trimmed();
-    event.m_subtitle    = event.m_subtitle.trimmed();
     // Remove " ."
     event.m_description = event.m_description.replace(" .",".").trimmed();
 
@@ -2882,10 +2871,6 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
         event.m_categoryType = ProgramInfo::kCategorySeries;
     // clear double commas.
     event.m_description.replace(",,", ",");
-    // just for luck, retrim fields.
-    event.m_description = event.m_description.trimmed();
-    event.m_title       = event.m_title.trimmed();
-    event.m_subtitle    = event.m_subtitle.trimmed();
 
 // να σβήσω τα κομμάτια που περισσεύουν από την περιγραφή πχ παραγωγής χχχχ
 }
