@@ -1347,7 +1347,8 @@ void EITFixUp::FixAUNine(DBEventEIT &event)
     if (event.m_description.startsWith(event.m_title))
       event.m_description.remove(0,event.m_title.length()+1);
 }
-/** \fn EITFixUp::FixAUSeven(DBEventEIT&) const
+
+/**
  *  \brief Use this to standardize DVB-T guide in Australia. (Seven network)
  */
 void EITFixUp::FixAUSeven(DBEventEIT &event)
@@ -1357,10 +1358,11 @@ void EITFixUp::FixAUSeven(DBEventEIT &event)
         event.m_previouslyshown = true;
         event.m_description.resize(event.m_description.size()-4);
     }
-    QRegExp year("(\\d{4})$");
-    if (year.indexIn(event.m_description) != -1)
+    QRegularExpression year { "(\\d{4})$" };
+    auto match = year.match(event.m_description);
+    if (match.hasMatch())
     {
-        event.m_airdate = year.cap(1).toUInt();
+        event.m_airdate = match.capturedRef(1).toUInt();
         event.m_description.resize(event.m_description.size()-5);
     }
     if (event.m_description.endsWith(" CC"))
@@ -1369,21 +1371,23 @@ void EITFixUp::FixAUSeven(DBEventEIT &event)
       event.m_description.resize(event.m_description.size()-3);
     }
     QString advisories;//store the advisories to append later
-    QRegExp adv("(\\([A-Z,]+\\))$");
-    if (adv.indexIn(event.m_description) != -1)
+    QRegularExpression adv { "(\\([A-Z,]+\\))$" };
+    match = adv.match(event.m_description);
+    if (match.hasMatch())
     {
-        advisories = adv.cap(1);
-        event.m_description.resize(event.m_description.size()-(adv.matchedLength()+1));
+        advisories = match.captured(1);
+        event.m_description.remove(match.capturedStart()-1, match.capturedLength()+1);
     }
-    QRegExp rating("(C|G|PG|M|MA)$");
-    if (rating.indexIn(event.m_description) != -1)
+    QRegularExpression rating { "(C|G|PG|M|MA)$" };
+    match = rating.match(event.m_description);
+    if (match.hasMatch())
     {
         EventRating prograting;
-        prograting.m_system=""; prograting.m_rating = rating.cap(1);
+        prograting.m_system=""; prograting.m_rating = match.captured(1);
         if (!advisories.isEmpty())
             prograting.m_rating.append(" ").append(advisories);
         event.m_ratings.push_back(prograting);
-        event.m_description.resize(event.m_description.size()-(rating.matchedLength()+1));
+        event.m_description.remove(match.capturedStart()-1, match.capturedLength()+1);
     }
 }
 /**
