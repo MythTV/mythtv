@@ -1382,7 +1382,7 @@ void EITFixUp::FixAUSeven(DBEventEIT &event)
     if (match.hasMatch())
     {
         EventRating prograting;
-        prograting.m_system=""; prograting.m_rating = match.captured(1);
+        prograting.m_system="AU"; prograting.m_rating = match.captured(1);
         if (!advisories.isEmpty())
             prograting.m_rating.append(" ").append(advisories);
         event.m_ratings.push_back(prograting);

@@ -2215,7 +2215,7 @@ void TestEITFixups::testAUSeven()
     QCOMPARE(event.m_subtitleType,    (uint8_t)e_subtitleType);
     QCOMPARE(event.m_airdate,         (uint16_t)e_year);
     QCOMPARE(event.m_ratings.isEmpty(), e_rating.isEmpty());
-    checkRating(event, "", e_rating); // Oops. Shouldn't this be "AU"
+    checkRating(event, "AU", e_rating);
 }
 
 void TestEITFixups::testAUFreeview_data()
