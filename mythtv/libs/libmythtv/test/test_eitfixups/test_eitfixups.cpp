@@ -3220,10 +3220,9 @@ void TestEITFixups::testDK2_data()
     QTest::newRow("actor2")    << "Description. Medv.: Larry, Moe og Curly" << "" << ""
                                << "Description. Medv.: Larry, Moe og Curly" << "" << ""
                                << QStringList({"Larry", "Moe", "Curly"}) << QStringList();
-    // Oops. Code looks like it should remove director from actors, but doesn't work.
-    QTest::newRow("actor3")    << "Description. Medv.: Larry, Moe, Curly, Barry Levinson. Instruktor: Barry Levinson" << "" << ""
-                               << "Description. Medv.: Larry, Moe, Curly, Barry Levinson. Instruktor: Barry Levinson" << "" << ""
-                               << QStringList({"Larry", "Moe", "Curly", "Barry Levinson"}) << QStringList("Barry Levinson");
+    QTest::newRow("actor3")    << "Description. Medv.: Larry, Moe, Curly, Barry Levinson, Steven Spielberg. Instruktor: Barry Levinson, Steven Spielberg" << "" << ""
+                               << "Description. Medv.: Larry, Moe, Curly, Barry Levinson, Steven Spielberg. Instruktor: Barry Levinson, Steven Spielberg" << "" << ""
+                               << QStringList({"Larry", "Moe", "Curly"}) << QStringList({"Barry Levinson", "Steven Spielberg"});
 }
 
 void TestEITFixups::testDK2()

@@ -2420,17 +2420,15 @@ void EITFixUp::FixDK(DBEventEIT &event)
     // Find actors and director in description
     QRegularExpression dkDirector { "(?:Instr.: |Instrukt.r: )(.+)$" };
     QRegularExpression dkPersonsSeparator { "(, )|(og )" };
-    bool directorPresent = false;
+    QStringList directors {};
     match = dkDirector.match(event.m_description);
     if (match.hasMatch())
     {
         QString tmpDirectorsString = match.captured(1);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        const QStringList directors =
-            tmpDirectorsString.split(dkPersonsSeparator, QString::SkipEmptyParts);
+        directors = tmpDirectorsString.split(dkPersonsSeparator, QString::SkipEmptyParts);
 #else
-        const QStringList directors =
-            tmpDirectorsString.split(dkPersonsSeparator, Qt::SkipEmptyParts);
+        directors = tmpDirectorsString.split(dkPersonsSeparator, Qt::SkipEmptyParts);
 #endif
         for (const auto & director : qAsConst(directors))
         {
@@ -2439,7 +2437,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
             if (tmpDirectorsString != "")
                 event.AddPerson(DBPerson::kDirector, tmpDirectorsString);
         }
-        directorPresent = true;
+        //event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     QRegularExpression dkActors { "(?:Medvirkende: |Medv\\.: )(.+)" };
@@ -2447,8 +2445,6 @@ void EITFixUp::FixDK(DBEventEIT &event)
     if (match.hasMatch())
     {
         QString tmpActorsString = match.captured(1);
-        if (directorPresent)
-            tmpActorsString = tmpActorsString.replace(dkDirector,"");
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
         const QStringList actors =
             tmpActorsString.split(dkPersonsSeparator, QString::SkipEmptyParts);
@@ -2460,9 +2456,10 @@ void EITFixUp::FixDK(DBEventEIT &event)
         {
             tmpActorsString = actor.split(":").last().trimmed().
                     remove(QRegularExpression("\\.$"));
-            if (tmpActorsString != "")
+            if (!tmpActorsString.isEmpty() && !directors.contains(tmpActorsString))
                 event.AddPerson(DBPerson::kActor, tmpActorsString);
         }
+        //event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
     //find year
