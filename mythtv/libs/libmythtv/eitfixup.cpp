@@ -574,7 +574,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event)
              fColon = true;
          }
     }
-    QRegularExpression ukQuotedSubtitle { R"((?:^')([\w\s\-,]+?)(?:\.' ))" };
+    QRegularExpression ukQuotedSubtitle { R"(^'([\w\s\-,]+?)\.' )" };
     auto match = ukQuotedSubtitle.match(event.m_description);
     if (match.hasMatch())
     {
@@ -860,7 +860,7 @@ void EITFixUp::FixUK(DBEventEIT &event)
         }
     }
 
-    QRegularExpression ukStarring { R"((?:Western\s)?[Ss]tarring ([\w\s\-']+?)[Aa]nd\s([\w\s\-']+?)[\.|,](?:\s)*(\d{4})?(?:\.\s)?)" };
+    QRegularExpression ukStarring { R"((?:Western\s)?[Ss]tarring ([\w\s\-']+?)[Aa]nd\s([\w\s\-']+?)[\.|,]\s*(\d{4})?(?:\.\s)?)" };
     match = ukStarring.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1096,7 +1096,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
     // Try to find country category, year and possibly other information
     // from the begining of the description
     QRegularExpression comHemCountry
-        { R"(^(\(.+\))?\s?([^ ]+)\s([^\.0-9]+)(?:\sfrån\s([0-9]{4}))(?:\smed\s([^\.]+))?\.?)" };
+        { R"(^(\(.+\))?\s?([^ ]+)\s([^\.0-9]+)\sfrån\s([0-9]{4})(?:\smed\s([^\.]+))?\.?)" };
     match = comHemCountry.match(event.m_description);
     if (match.hasMatch())
     {
@@ -2322,7 +2322,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
     }
     else
     {
-        QRegularExpression dkSeason2 { "- år ([0-9]+)(?: :)" };
+        QRegularExpression dkSeason2 { "- år ([0-9]+) :" };
         match = dkSeason2.match(event.m_description);
         if (match.hasMatch())
         {
@@ -2587,7 +2587,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     // for a director's/presenter's surname (directors/presenters are shown
     // before actors in the description field.). So removing the text after
     // adding the actors AND THEN looking for dir/pres helps to clear things up.
-    const QRegularExpression grActors { R"((?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\s+στο ρόλο(?: του| της)?\s(?:\w+\s[οη]\s))?([-\w\s']+(?:,[-\w\s']+)*)(?:κ\.[αά])?(?:\W?))" };
+    const QRegularExpression grActors { R"((?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\s+στο ρόλο(?: του| της)?\s(?:\w+\s[οη]\s))?([-\w\s']+(?:,[-\w\s']+)*)(?:κ\.[αά])?\W?)" };
       // cap(1) actors, just names
     const QRegularExpression grPeopleSeparator { R"(([,-]\s+))" };
     match = grActors.match(event.m_description);
@@ -2637,7 +2637,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     }
 
     //Try to find presenter
-    const QRegularExpression grPres { R"((?:Παρουσ[ιί]αση:(?:\b)*|Παρουσι[αά]ζ(?:ουν|ει)(?::|\sο|\sη)|Παρουσι[αά]στ(?:[ηή]ς|ρια|ριες|[εέ]ς)(?::|\sο|\sη)|Με τ(?:ον |ην )(?:[\s|:|ο|η])*(?:\b)*)([-\w\s]+(?:,[-\w\s]+)*)(?:\W?))",
+    const QRegularExpression grPres { R"((?:Παρουσ[ιί]αση:(?:\b)*|Παρουσι[αά]ζ(?:ουν|ει)(?::|\sο|\sη)|Παρουσι[αά]στ(?:[ηή]ς|ρια|ριες|[εέ]ς)(?::|\sο|\sη)|Με τ(?:ον |ην )(?:[\s|:|ο|η])*(?:\b)*)([-\w\s]+(?:,[-\w\s]+)*)\W?)",
         QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
     match = grPres.match(event.m_description);
     if (match.hasMatch())
@@ -2896,49 +2896,49 @@ void EITFixUp::FixGreekCategories(DBEventEIT &event)
         QRegularExpression expr;
         QString category;
     };
-    static const QRegularExpression grCategFood { "(?:\\W)?(?:εκπομπ[ηή]\\W)?(Γαστρονομ[ιί]α[σς]?|μαγειρικ[ηή][σς]?|chef|συνταγ[εέηή]|διατροφ|wine|μ[αά]γειρα[σς]?)(?:\\W)?",
+    static const QRegularExpression grCategFood { "\\W?(?:εκπομπ[ηή]\\W)?(Γαστρονομ[ιί]α[σς]?|μαγειρικ[ηή][σς]?|chef|συνταγ[εέηή]|διατροφ|wine|μ[αά]γειρα[σς]?)\\W?",
             QRegularExpression::CaseInsensitiveOption };
-    static const QRegularExpression grCategDrama { "(?:\\W)?(κοινωνικ[ηήό]|δραματικ[ηή]|δρ[αά]μα)(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+    static const QRegularExpression grCategDrama { "\\W?(κοινωνικ[ηήό]|δραματικ[ηή]|δρ[αά]μα)\\W(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategComedy { "(?:\\W)?(κωμικ[ηήοό]|χιουμοριστικ[ηήοό]|κωμωδ[ιί]α)(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+    static const QRegularExpression grCategComedy { "\\W?(κωμικ[ηήοό]|χιουμοριστικ[ηήοό]|κωμωδ[ιί]α)\\W(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategChildren { "(?:\\W)?(παιδικ[ηήοό]|κινο[υύ]μ[εέ]ν(ων|α)\\sσχ[εέ]δ[ιί](ων|α))(?:\\W)(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+    static const QRegularExpression grCategChildren { "\\W?(παιδικ[ηήοό]|κινο[υύ]μ[εέ]ν(ων|α)\\sσχ[εέ]δ[ιί](ων|α))\\W(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategMystery { "(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?(?:\\W)?(μυστηρ[ιί]ου)(?:\\W)?",
+    static const QRegularExpression grCategMystery { "(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?\\W?(μυστηρ[ιί]ου)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategFantasy { "(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?(?:\\W)?(φαντασ[ιί]ας)(?:\\W)?",
+    static const QRegularExpression grCategFantasy { "(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?\\W?(φαντασ[ιί]ας)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategHistory { "(?:\\W)?(ιστορικ[ηήοό])(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+    static const QRegularExpression grCategHistory { "\\W?(ιστορικ[ηήοό])\\W?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategTeleMag { "(?:\\W)?(ενημερωτικ[ηή]|ψυχαγωγικ[ηή]|τηλεπεριοδικ[οό]|μαγκαζ[ιί]νο)(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+    static const QRegularExpression grCategTeleMag { "\\W?(ενημερωτικ[ηή]|ψυχαγωγικ[ηή]|τηλεπεριοδικ[οό]|μαγκαζ[ιί]νο)\\W?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategTeleShop { "(?:\\W)?(οδηγ[οό][σς]?\\sαγορ[ωώ]ν|τηλεπ[ωώ]λ[ηή]σ|τηλεαγορ|τηλεμ[αά]ρκετ|telemarket)(?:\\W)?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
+    static const QRegularExpression grCategTeleShop { "\\W?(οδηγ[οό][σς]?\\sαγορ[ωώ]ν|τηλεπ[ωώ]λ[ηή]σ|τηλεαγορ|τηλεμ[αά]ρκετ|telemarket)\\W?(?:(?:εκπομπ[ηή]|σειρ[αά]|ταιν[ιί]α)\\W)?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategGameShow { "(?:\\W)?(τηλεπαιχν[ιί]δι|quiz)(?:\\W)?",
+    static const QRegularExpression grCategGameShow { "\\W?(τηλεπαιχν[ιί]δι|quiz)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategDocumentary { "(?:\\W)?(ντοκ[ιυ]μαντ[εέ]ρ)(?:\\W)?",
+    static const QRegularExpression grCategDocumentary { "\\W?(ντοκ[ιυ]μαντ[εέ]ρ)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategBiography { "(?:\\W)?(βιογραφ[ιί]α|βιογραφικ[οό][σς]?)(?:\\W)?",
+    static const QRegularExpression grCategBiography { "\\W?(βιογραφ[ιί]α|βιογραφικ[οό][σς]?)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategNews { "(?:\\W)?(δελτ[ιί]ο\\W?|ειδ[ηή]σε(ι[σς]|ων))(?:\\W)?",
+    static const QRegularExpression grCategNews { "\\W?(δελτ[ιί]ο\\W?|ειδ[ηή]σε(ι[σς]|ων))\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategSports { "(?:\\W)?(champion|αθλητικ[αάοόηή]|πρωτ[αά]θλημα|ποδ[οό]σφαιρο(ου)?|κολ[υύ]μβηση|πατιν[αά]ζ|formula|μπ[αά]σκετ|β[οό]λε[ιϊ])(?:\\W)?",
+    static const QRegularExpression grCategSports { "\\W?(champion|αθλητικ[αάοόηή]|πρωτ[αά]θλημα|ποδ[οό]σφαιρο(ου)?|κολ[υύ]μβηση|πατιν[αά]ζ|formula|μπ[αά]σκετ|β[οό]λε[ιϊ])\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategMusic { "(?:\\W)?(μουσικ[οόηή]|eurovision|τραγο[υύ]δι)(?:\\W)?",
+    static const QRegularExpression grCategMusic { "\\W?(μουσικ[οόηή]|eurovision|τραγο[υύ]δι)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategReality { "(?:\\W)?(ρι[αά]λιτι|reality)(?:\\W)?",
+    static const QRegularExpression grCategReality { "\\W?(ρι[αά]λιτι|reality)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategReligion { "(?:\\W)?(θρησκε[ιί]α|θρησκευτικ|να[οό][σς]?|θε[ιί]α λειτουργ[ιί]α)(?:\\W)?",
+    static const QRegularExpression grCategReligion { "\\W?(θρησκε[ιί]α|θρησκευτικ|να[οό][σς]?|θε[ιί]α λειτουργ[ιί]α)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategCulture { "(?:\\W)?(τ[εέ]χν(η|ε[σς])|πολιτισμ)(?:\\W)?",
+    static const QRegularExpression grCategCulture { "\\W?(τ[εέ]χν(η|ε[σς])|πολιτισμ)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategNature { "(?:\\W)?(φ[υύ]ση|περιβ[αά]λλο|κατασκευ|επιστ[ηή]μ(?!ονικ[ηή]ς φαντασ[ιί]ας))(?:\\W)?",
+    static const QRegularExpression grCategNature { "\\W?(φ[υύ]ση|περιβ[αά]λλο|κατασκευ|επιστ[ηή]μ(?!ονικ[ηή]ς φαντασ[ιί]ας))\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategSciFi { "(?:\\W)?(επιστ(.|ημονικ[ηή]ς)\\s?φαντασ[ιί]ας)(?:\\W)?",
+    static const QRegularExpression grCategSciFi { "\\W?(επιστ(.|ημονικ[ηή]ς)\\s?φαντασ[ιί]ας)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategHealth { "(?:\\W)?(υγε[ιί]α|υγειιν|ιατρικ|διατροφ)(?:\\W)?",
+    static const QRegularExpression grCategHealth { "\\W?(υγε[ιί]α|υγειιν|ιατρικ|διατροφ)\\W?",
             QRegularExpression::CaseInsensitiveOption};
-    static const QRegularExpression grCategSpecial { "(?:\\W)?(αφι[εέ]ρωμα)(?:\\W)?",
+    static const QRegularExpression grCategSpecial { "\\W?(αφι[εέ]ρωμα)\\W?",
             QRegularExpression::CaseInsensitiveOption};
     static const QList<grCategoryEntry> grCategoryDescData = {
         { grCategComedy,      "Κωμωδία" },
