@@ -505,7 +505,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
        event.m_description.remove(match.capturedStart(), match.capturedLength());
 }
 
-/** \fn EITFixUp::SetUKSubtitle(DBEventEIT&) const
+/**
  *  \brief Use this in the United Kingdom to standardize DVB-T guide.
  */
 void EITFixUp::SetUKSubtitle(DBEventEIT &event)
@@ -643,7 +643,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event)
 }
 
 
-/** \fn EITFixUp::FixUK(DBEventEIT&) const
+/**
  *  \brief Use this in the United Kingdom to standardize DVB-T guide.
  */
 void EITFixUp::FixUK(DBEventEIT &event)
@@ -1012,7 +1012,7 @@ void EITFixUp::FixUK(DBEventEIT &event)
     }
 }
 
-/** \fn EITFixUp::FixPBS(DBEventEIT&) const
+/**
  *  \brief Use this to standardize PBS ATSC guide in the USA.
  */
 void EITFixUp::FixPBS(DBEventEIT &event)
@@ -1272,7 +1272,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
     }
 }
 
-/** \fn EITFixUp::FixAUStar(DBEventEIT&) const
+/**
  *  \brief Use this to standardize DVB-S guide in Australia.
  */
 void EITFixUp::FixAUStar(DBEventEIT &event)
@@ -1288,7 +1288,7 @@ void EITFixUp::FixAUStar(DBEventEIT &event)
     }
 }
 
-/** \fn EITFixUp::FixAUDescription(DBEventEIT&) const
+/**
  *  \brief Use this to standardize DVB-T guide in Australia. (fix common annoyances common to most networks)
  */
 void EITFixUp::FixAUDescription(DBEventEIT &event)
@@ -1718,7 +1718,7 @@ static const QMap<QString,DBPerson::Role> deCrewTitle {
     { "Autor",    DBPerson::kWriter },
 };
 
-/** \fn EITFixUp::FixPRO7(DBEventEIT&) const
+/**
  *  \brief Use this to standardise the PRO7/Sat1 group guide in Germany.
  */
 void EITFixUp::FixPRO7(DBEventEIT &event)
@@ -1789,7 +1789,7 @@ void EITFixUp::FixPRO7(DBEventEIT &event)
      */
 }
 
-/** \fn EITFixUp::FixDisneyChannel(DBEventEIT&) const
+/**
 *  \brief Use this to standardise the Disney Channel guide in Germany.
 */
 void EITFixUp::FixDisneyChannel(DBEventEIT &event)
@@ -1816,7 +1816,7 @@ void EITFixUp::FixDisneyChannel(DBEventEIT &event)
     }
 }
 
-/** \fn EITFixUp::FixATV(DBEventEIT&) const
+/**
 *  \brief Use this to standardise the ATV/ATV2 guide in Germany.
 **/
 void EITFixUp::FixATV(DBEventEIT &event)
@@ -1877,7 +1877,7 @@ void EITFixUp::FixFI(DBEventEIT &event)
     }
 }
 
-/** \fn EITFixUp::FixPremiere(DBEventEIT&) const
+/**
  *  \brief Use this to standardize DVB-C guide in Germany
  *         for the providers Kabel Deutschland and Premiere.
  */
@@ -2480,7 +2480,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
     event.m_subtitle    = event.m_subtitle.trimmed();
 }
 
-/** \fn EITFixUp::FixStripHTML(DBEventEIT&) const
+/**
  *  \brief Use this to clean HTML Tags from EIT Data
  */
 void EITFixUp::FixStripHTML(DBEventEIT &event)
