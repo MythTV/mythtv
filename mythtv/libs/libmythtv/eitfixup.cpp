@@ -145,22 +145,25 @@ void EITFixUp::Fix(DBEventEIT &event)
     // Clean up text strings after all fixups have been applied.
     if (event.m_fixup)
     {
+        const QRegularExpression emptyParens { R"(\(\s*\))" };
         if (!event.m_title.isEmpty())
         {
-            event.m_title = event.m_title.replace(QChar('\0'), "");
-            event.m_title = event.m_title.trimmed();
+            event.m_title.remove(QChar('\0')).remove(emptyParens);
+            event.m_title = event.m_title.simplified();
         }
 
         if (!event.m_subtitle.isEmpty())
         {
-            event.m_subtitle = event.m_subtitle.replace(QChar('\0'), "");
-            event.m_subtitle = event.m_subtitle.trimmed();
+            event.m_subtitle.remove(QChar('\0'));
+            event.m_subtitle.remove(emptyParens);
+            event.m_subtitle = event.m_subtitle.simplified();
         }
 
         if (!event.m_description.isEmpty())
         {
-            event.m_description = event.m_description.replace(QChar('\0'), "");
-            event.m_description = event.m_description.trimmed();
+            event.m_description.remove(QChar('\0'));
+            event.m_description.remove(emptyParens);
+            event.m_description = event.m_description.simplified();
         }
     }
 

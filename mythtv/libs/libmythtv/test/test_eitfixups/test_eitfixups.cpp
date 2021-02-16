@@ -376,7 +376,7 @@ void TestEITFixups::testUKFixups6()
     QCOMPARE(event6.m_episode,      3U);
     QCOMPARE(event6.m_subtitleType, (unsigned char)SUB_SIGNED);
     QCOMPARE(event6.m_subtitle,     QString("The Things We Do for Love"));
-    QCOMPARE(event6.m_description,  QString("When a beautiful woman is found dead in a car park, the list of suspects leads Jack Frost (David Jason) into the heart of a religious community.  S4 Ep3"));
+    QCOMPARE(event6.m_description,  QString("When a beautiful woman is found dead in a car park, the list of suspects leads Jack Frost (David Jason) into the heart of a religious community. S4 Ep3"));
 }
 
 void TestEITFixups::testUKFixups7()
@@ -474,7 +474,7 @@ void TestEITFixups::testUKLawAndOrder()
     PRINT_EVENT(*event2);
     QCOMPARE(event2->m_title,    QString("Law & Order: Special Victims Unit"));
     QCOMPARE(event2->m_subtitle, QString("Sugar"));
-    QCOMPARE(event2->m_description, QString("Police drama series about an elite sex crime  ..."));
+    QCOMPARE(event2->m_description, QString("Police drama series about an elite sex crime ..."));
 
     delete event2;
 }
@@ -1612,7 +1612,7 @@ void TestEITFixups::testBellExpress_data()
                               << (int)VID_HDTV << (int)AUD_STEREO << (int)SUB_HARDHEAR << false;
     QTest::newRow("stereo2")  << "Title (All Day)" << "Subtitle\r\nDescription. (Stereo) "
                               << "" << (int)DishThemeType::kThemeNone
-                              << "Title" << "Subtitle" << "Description. ()" << "Unknown" << -1
+                              << "Title" << "Subtitle" << "Description." << "Unknown" << -1
                               << (int)VID_UNKNOWN << (int)AUD_STEREO << (int)SUB_UNKNOWN << false;
     QTest::newRow("tagnew")   << "Title" << "Subtitle\r\nMovie. (2012) Description. New."
                               << "dummy" << (int)DishThemeType::kThemeMovie
@@ -2630,17 +2630,17 @@ void TestEITFixups::testFI_data()
                              << (int)AUD_UNKNOWN << false << "";
 
     QTest::newRow("stereo1") << "Title" << "Subtitle" << "Description. (Stereo)"
-                             << "Title" << "Subtitle" << "Description. ()"
+                             << "Title" << "Subtitle" << "Description."
                              << false << "" << ProgramInfo::kCategoryNone
-                             << (int)AUD_STEREO << false << ""; // Oops
+                             << (int)AUD_STEREO << false << "";
     QTest::newRow("stereo2") << "Title" << "Subtitle" << "Description. Stereo"
                              << "Title" << "Subtitle" << "Description."
                              << false << "" << ProgramInfo::kCategoryNone
                              << (int)AUD_STEREO << false << "";
     QTest::newRow("stereo3") << "Title" << "Subtitle" << "Description. (Stereo) (U)"
-                             << "Title" << "Subtitle" << "Description. ()"
+                             << "Title" << "Subtitle" << "Description."
                              << true << "" << ProgramInfo::kCategoryNone
-                             << (int)AUD_STEREO << false << ""; // Oops
+                             << (int)AUD_STEREO << false << "";
 
     QTest::newRow("rating1") << "Title (S)" << "Subtitle" << "Description. (u)"
                              << "Title" << "Subtitle" << "Description."
@@ -2751,7 +2751,7 @@ void TestEITFixups::testNL_data()
                                 << (int)VID_UNKNOWN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN
                                 << QDate() << QStringList() << QStringList() << QStringList();
     QTest::newRow("stereo1")    << "Title" << "Description. (Stereo)" << "Documentary"
-                                << "Title" << "" << "Description. ()" // Oops
+                                << "Title" << "" << "Description."
                                 << "Documentaire" << ProgramInfo::kCategoryNone
                                 << (int)VID_UNKNOWN << (int)AUD_STEREO << (int)SUB_UNKNOWN
                                 << QDate() << QStringList() << QStringList() << QStringList();
@@ -3117,7 +3117,7 @@ void TestEITFixups::testDK_data()
                                << 0 << 0 << 0 << 0 << false << QDate()
                                << (int)VID_UNKNOWN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN;
     QTest::newRow("subtitle3") << "Title - Subtitle (42:49)" << "Overwritten" << "Description."
-                               << "Title" << "Subtitle  (42:49)" << "Description."
+                               << "Title" << "Subtitle (42:49)" << "Description."
                                << 0 << 42 << 42 << 49 << false << QDate()
                                << (int)VID_UNKNOWN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN;
     QTest::newRow("season1")   << "Title (42)" << "Subtitle" << "Description. Sæson 2."
