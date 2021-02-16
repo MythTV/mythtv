@@ -2132,13 +2132,13 @@ void EITFixUp::FixNL(DBEventEIT &event)
     }
 
     // Try to find director
-    QRegularExpression nlDirector { R"(\svan\s(([A-Z]{1}[a-z]+\s)|([A-Z]{1}\.\s)))" };
+    QRegularExpression nlDirector { R"(\svan\s(([A-Z][a-z]+\s)|([A-Z]\.\s)))" };
     match = nlDirector.match(fullinfo);
     if (match.hasMatch())
         event.AddPerson(DBPerson::kDirector, match.captured(1));
 
     // Strip leftovers
-    QRegularExpression nlRub { R"(\s?\({1}\W+\){1}\s?)" };
+    QRegularExpression nlRub { R"(\s?\(\W+\)\s?)" };
     fullinfo.remove(nlRub);
 
     // Strip category info from description
