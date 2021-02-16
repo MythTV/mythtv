@@ -19,6 +19,7 @@
 #include "tv.h" // for CHANNEL_DIRECTION
 
 class NetworkInformationTable;
+class TestEITFixups;
 
 class pid_cache_item_t
 {
@@ -46,6 +47,8 @@ using pid_cache_t = std::vector<pid_cache_item_t>;
  */
 class MTV_PUBLIC ChannelUtil
 {
+    friend class TestEITFixups;
+
     Q_DECLARE_TR_FUNCTIONS(ChannelUtil);
 
   public:
@@ -338,6 +341,10 @@ class MTV_PUBLIC ChannelUtil
         uint sourceid, bool visible_only, bool include_disconnected,
         const QString &group_by, uint channel_groupid);
     static QString GetChannelStringField(int chan_id, const QString &field);
+
+    static QReadWriteLock s_channelDefaultAuthorityMapLock;
+    static QMap<uint,QString> s_channelDefaultAuthorityMap;
+    static bool s_channelDefaultAuthority_runInit;
 };
 
 #endif // CHANUTIL_H

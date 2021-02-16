@@ -23,6 +23,7 @@ class MSqlQuery;
 
 class MTV_PUBLIC DBPerson
 {
+    friend class TestEITFixups;
   public:
     enum Role
     {
