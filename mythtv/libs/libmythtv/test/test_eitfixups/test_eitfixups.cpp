@@ -2839,7 +2839,7 @@ void TestEITFixups::testNL_data()
                                 << "Title" << "Subtitle" << "Description. (Feb/2021)"
                                 << "Documentaire" << ProgramInfo::kCategoryNone
                                 << (int)VID_UNKNOWN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN
-                                << QDate() << QStringList() << QStringList() << QStringList(); // Oops
+                                << QDate(2021,1,1) << QStringList() << QStringList() << QStringList();
     QTest::newRow("rub")        << "Title" << "Description. (@@) foo" << "Documentary"
                                 << "Title" << "" << "Description.foo"
                                 << "Documentaire" << ProgramInfo::kCategoryNone

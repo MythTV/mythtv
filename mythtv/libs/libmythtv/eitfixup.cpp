@@ -2116,7 +2116,8 @@ void EITFixUp::FixNL(DBEventEIT &event)
 
     // Try to find year
     QRegularExpression nlYear1 { R"(\suit\s([1-2][0-9]{3}))" };
-    QRegularExpression nlYear2 { R"((\s\([A-Z]{0,3}/?)([1-2][0-9]{3})\))" };
+    QRegularExpression nlYear2 { R"((\s\([A-Z]{0,3}/?)([1-2][0-9]{3})\))",
+        QRegularExpression::CaseInsensitiveOption };
     match = nlYear1.match(fullinfo);
     if (match.hasMatch())
     {
