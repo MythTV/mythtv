@@ -1314,18 +1314,20 @@ void EITFixUp::FixAUDescription(DBEventEIT &event)
         event.m_description.prepend("(Live) ");
     }
 }
-/** \fn EITFixUp::FixAUNine(DBEventEIT&) const
+
+/**
  *  \brief Use this to standardize DVB-T guide in Australia. (Nine network)
  */
 void EITFixUp::FixAUNine(DBEventEIT &event)
 {
-    QRegExp rating("\\((G|PG|M|MA)\\)");
-    if (rating.indexIn(event.m_description) == 0)
+    QRegularExpression rating { "\\((G|PG|M|MA)\\)" };
+    auto match = rating.match(event.m_description);
+    if (match.hasMatch())
     {
       EventRating prograting;
-      prograting.m_system="AU"; prograting.m_rating = rating.cap(1);
+      prograting.m_system="AU"; prograting.m_rating = match.captured(1);
       event.m_ratings.push_back(prograting);
-      event.m_description.remove(0,rating.matchedLength()+1);
+      event.m_description.remove(0,match.capturedLength()+1);
     }
     if (event.m_description.startsWith("[HD]"))
     {
