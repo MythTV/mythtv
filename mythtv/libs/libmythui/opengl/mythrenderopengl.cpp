@@ -508,6 +508,14 @@ bool MythRenderOpenGL::IsReady(void)
 void MythRenderOpenGL::swapBuffers()
 {
     QOpenGLContext::swapBuffers(m_window);
+    m_swapCount++;
+}
+
+uint64_t MythRenderOpenGL::GetSwapCount()
+{
+    auto result = m_swapCount;
+    m_swapCount = 0;
+    return result;
 }
 
 void MythRenderOpenGL::SetWidget(QWidget *Widget)

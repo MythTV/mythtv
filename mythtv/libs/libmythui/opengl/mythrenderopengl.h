@@ -123,6 +123,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  SetBlend(bool Enable);
     void  SetBackground(uint8_t Red, uint8_t Green, uint8_t Blue, uint8_t Alpha);
     QFunctionPointer GetProcAddress(const QString &Proc) const;
+    uint64_t GetSwapCount();
 
     static const GLuint kVertexSize;
     QOpenGLBuffer* CreateVBO(int Size, bool Release = true);
@@ -224,6 +225,7 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     int        m_maxTextureUnits { 0 };
 
     // State
+    uint64_t   m_swapCount { 0 };
     QRect      m_viewport;
     GLuint     m_activeTexture { 0 };
     bool       m_blend { false };
