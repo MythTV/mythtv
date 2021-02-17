@@ -7,6 +7,7 @@
 #include "mythuibuttonlist.h"
 #include "channelsettings.h"
 #include "transporteditor.h"
+#include "restoredata.h"
 #include "mythuicheckbox.h"
 #include "mythuitextedit.h"
 #include "channeleditor.h"
@@ -87,16 +88,16 @@ bool ChannelEditor::Create()
 
     MythUIButton *deleteButton = dynamic_cast<MythUIButton *>(GetChild("delete"));
     MythUIButton *scanButton = dynamic_cast<MythUIButton *>(GetChild("scan"));
+    MythUIButton *restoreDataButton = dynamic_cast<MythUIButton *>(GetChild("restoredata"));
     MythUIButton *importIconButton = dynamic_cast<MythUIButton *>(GetChild("importicons"));
     MythUIButton *transportEditorButton = dynamic_cast<MythUIButton *>(GetChild("edittransport"));
 
     MythUICheckBox *hideCheck = dynamic_cast<MythUICheckBox *>(GetChild("nochannum"));
 
     if (!sortList || !m_sourceList || !m_channelList || !deleteButton ||
-        !scanButton || !importIconButton || !transportEditorButton ||
+        !scanButton || !restoreDataButton || !importIconButton || !transportEditorButton ||
         !hideCheck)
     {
-
         return false;
     }
 
@@ -140,6 +141,11 @@ bool ChannelEditor::Create()
     // Scan Button
     scanButton->SetHelpText(tr("Starts the channel scanner."));
     scanButton->SetEnabled(SourceUtil::IsAnySourceScanable());
+
+    // Restore Data button
+    restoreDataButton->SetHelpText(tr("Restore Data from deleted channels."));
+    restoreDataButton->SetEnabled(true);
+    connect(restoreDataButton, &MythUIButton::Clicked, this, &ChannelEditor::restoreData);
 
     // Import Icons Button
     importIconButton->SetHelpText(tr("Starts the icon downloader"));
@@ -620,6 +626,27 @@ void ChannelEditor::scan(void)
                                           new ScanWizard(m_sourceFilter));
     if (ssd->Create())
     {
+        connect(ssd, &MythScreenType::Exiting, this, &ChannelEditor::fillList);
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
+}
+
+void ChannelEditor::restoreData(void)
+{
+    // Check that we have a videosource and a connected capture card
+    if (!check_cardsource(m_sourceFilter, m_sourceFilterName))
+        return;
+
+    // Create the dialog now that we have a video source and a capture card
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    auto *ssd = new StandardSettingDialog(mainStack, "restoredata",
+                                  new RestoreData((uint)m_sourceFilter));
+    if (ssd->Create())
+    {
+        // Reload channel list with fillList after Restore
         connect(ssd, &MythScreenType::Exiting, this, &ChannelEditor::fillList);
         mainStack->AddScreen(ssd);
     }

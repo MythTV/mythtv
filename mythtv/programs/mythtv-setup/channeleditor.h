@@ -25,6 +25,7 @@ class ChannelEditor : public MythScreenType
     void del(void);
     void edit(MythUIButtonListItem *item = nullptr);
     void scan(void);
+    void restoreData(void);
     void transportEditor(void);
     void channelIconImport(void);
     void deleteChannels(void);
