@@ -19,6 +19,8 @@ using MythDRMPtr  = std::shared_ptr<class MythDRMDevice>;
 using MythAtomic  = std::tuple<uint32_t,uint32_t,uint64_t>;
 using MythAtomics = std::vector<MythAtomic>;
 
+#define DRM_QUIET "Shush"
+
 class MUI_PUBLIC MythDRMDevice
 {
   public:
@@ -73,7 +75,7 @@ class MUI_PUBLIC MythDRMDevice
 #endif
 
   protected:
-    explicit MythDRMDevice(QScreen *qScreen, const QString& Device = QString());
+    explicit MythDRMDevice(QScreen* qScreen, const QString& Device = QString());
 
   private:
     Q_DISABLE_COPY(MythDRMDevice)

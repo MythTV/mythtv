@@ -397,11 +397,18 @@ std::tuple<QString, QStringList> MythDRMDevice::GetDeviceList()
  * be authenticated. Useful for confirming current display settings and little
  * else.
 */
-MythDRMDevice::MythDRMDevice(QScreen *qScreen, const QString& Device)
+MythDRMDevice::MythDRMDevice(QScreen* qScreen, const QString& Device)
   : m_screen(qScreen),
     m_deviceName(Device),
     m_verbose(Device.isEmpty() ? LOG_INFO : LOG_DEBUG)
 {
+    // This is hackish workaround to suppress logging when it isn't required
+    if (m_deviceName == DRM_QUIET)
+    {
+        m_deviceName.clear();
+        m_verbose = LOG_DEBUG;
+    }
+
     if (!Open())
     {
         LOG(VB_GENERAL, m_verbose, LOC + "Failed to open");

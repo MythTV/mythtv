@@ -81,7 +81,7 @@ MythVRRPtr MythVRR::Create(MythDisplay* _Display)
     // tell us if it is available/enabled - which is still useful
     if (!result)
     {
-        if (auto drm = MythDRMDevice::Create(_Display->GetCurrentScreen()); drm)
+        if (auto drm = MythDRMDevice::Create(_Display->GetCurrentScreen(), DRM_QUIET); drm)
             if (auto freesync = MythDRMVRR::CreateFreeSync(drm, range); freesync)
                 result = freesync;
     }
