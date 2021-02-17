@@ -20,6 +20,7 @@ class MUI_PUBLIC MythColourSpace
   public:
     static MythColourSpace s_sRGB;
     static MythColourSpace s_BT709;
+    static MythColourSpace s_BT470M;
     static MythColourSpace s_BT610_525;
     static MythColourSpace s_BT610_625;
     static MythColourSpace s_BT2020;

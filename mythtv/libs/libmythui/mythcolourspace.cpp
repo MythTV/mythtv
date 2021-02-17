@@ -4,11 +4,19 @@
 // Qt
 #include <QtGlobal>
 
-MythColourSpace MythColourSpace::s_sRGB      = {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
-MythColourSpace MythColourSpace::s_BT709     = {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
-MythColourSpace MythColourSpace::s_BT610_525 = {{{{0.630F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}}, {0.3127F, 0.3290F}};
-MythColourSpace MythColourSpace::s_BT610_625 = {{{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
-MythColourSpace MythColourSpace::s_BT2020    = {{{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}}, {0.3127F, 0.3290F}};
+#define D65 {0.31271F, 0.32902F}
+#define Cwp {0.31006F, 0.31616F}
+
+MythColourSpace MythColourSpace::s_sRGB      = {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, D65};
+MythColourSpace MythColourSpace::s_BT709     = {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, D65};
+MythColourSpace MythColourSpace::s_BT610_525 = {{{{0.630F, 0.340F}, {0.310F, 0.595F}, {0.155F, 0.070F}}}, D65};
+MythColourSpace MythColourSpace::s_BT610_625 = {{{{0.640F, 0.330F}, {0.290F, 0.600F}, {0.150F, 0.060F}}}, D65};
+MythColourSpace MythColourSpace::s_BT2020    = {{{{0.708F, 0.292F}, {0.170F, 0.797F}, {0.131F, 0.046F}}}, D65};
+
+// This is currently unused because I have no material that uses it and hence cannot test it.
+// As it uses a different white point it will need an additional 'Chromatic adaption'
+// stage in the primaries conversion
+MythColourSpace MythColourSpace::s_BT470M    = {{{{0.670F, 0.330F}, {0.210F, 0.710F}, {0.140F, 0.080F}}}, Cwp};
 
 MythColourSpace::MythColourSpace(const MythPrimariesFloat& Primaries, MythPrimaryFloat WhitePoint)
   : m_primaries(Primaries),
