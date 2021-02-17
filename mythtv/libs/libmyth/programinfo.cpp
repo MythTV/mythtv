@@ -11,7 +11,6 @@ using std::max;
 using std::min;
 
 // Qt headers
-#include <QRegExp>
 #include <QMap>
 #include <QUrl>
 #include <QFile>

@@ -26,7 +26,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMap>
-#include <QRegExp>
 
 #include "mythcontext.h"
 #include "mythcorecontext.h"

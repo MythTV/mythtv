@@ -3,7 +3,6 @@
 
 // QT headers
 #include <QApplication>
-#include <QRegExp>
 #include <QChar>
 #include <QKeyEvent>
 #include <QDomDocument>

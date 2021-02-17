@@ -22,7 +22,6 @@
 
 #include <QCoreApplication>
 #include <QFileInfo>
-#include <QRegExp>
 #include <QFile>
 #include <QDir>
 #include <QMap>

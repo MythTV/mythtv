@@ -6,7 +6,6 @@
 #include <QDateTime>
 #include <QDir>
 #include <QDomDocument>
-#include <QRegExp>
 #include <QScopedPointer>
 #include <utility>
 

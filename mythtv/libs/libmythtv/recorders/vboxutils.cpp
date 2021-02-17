@@ -5,7 +5,6 @@
 #include <QString>
 #include <QStringList>
 #include <QDomDocument>
-#include <QRegExp>
 
 // MythTV headers
 #include "vboxutils.h"

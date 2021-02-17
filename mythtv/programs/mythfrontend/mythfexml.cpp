@@ -18,7 +18,6 @@
 #include <QTextStream>
 #include <QDir>
 #include <QFile>
-#include <QRegExp>
 #include <QBuffer>
 #include <QKeyEvent>
 

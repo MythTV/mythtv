@@ -6,7 +6,6 @@
 #include <QSqlError>
 #include <QVariant>
 #include <QSqlQuery>
-#include <QRegExp>
 #include <QDateTime>
 #include <QMutex>
 #include <QList>

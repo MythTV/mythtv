@@ -6,7 +6,6 @@
 #include <QEvent>
 #include <QFile>
 #include <QKeyEvent>
-#include <QRegExp>
 #include <QRegularExpression>
 #include <QRunnable>
 #include <QTimerEvent>

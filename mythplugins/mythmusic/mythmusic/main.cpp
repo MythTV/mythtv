@@ -7,7 +7,6 @@
 // Qt headers
 #include <QDir>
 #include <QApplication>
-#include <QRegExp>
 #include <QScopedPointer>
 
 // MythTV headers

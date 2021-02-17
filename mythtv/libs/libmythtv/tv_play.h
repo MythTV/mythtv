@@ -14,7 +14,6 @@
 #include <QStringList>
 #include <QDateTime>
 #include <QObject>
-#include <QRegExp>
 #include <QString>
 #include <QMutex>
 #include <QMap>

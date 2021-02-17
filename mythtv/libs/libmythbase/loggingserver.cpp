@@ -9,7 +9,6 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QMap>
-#include <QRegExp>
 #include <QSocketNotifier>
 #include <iostream>
 

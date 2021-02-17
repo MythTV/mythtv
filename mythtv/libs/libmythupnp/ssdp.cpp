@@ -26,7 +26,6 @@
 #include "mmulticastsocketdevice.h"
 #include "mbroadcastsocketdevice.h"
 
-#include <QRegExp>
 #include <QStringList>
 
 #ifdef Q_OS_ANDROID

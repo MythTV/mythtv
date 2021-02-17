@@ -4,7 +4,6 @@
 
 #include <QApplication>
 #include <QDir>
-#include <QRegExp>
 #include <QString>
 #include <QSurfaceFormat>
 #include <QTime>

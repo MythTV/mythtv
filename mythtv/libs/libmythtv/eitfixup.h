@@ -5,8 +5,6 @@
 #ifndef EITFIXUP_H
 #define EITFIXUP_H
 
-#include <QRegExp>
-
 #include "programdata.h"
 
 /// EIT Fix Up Functions

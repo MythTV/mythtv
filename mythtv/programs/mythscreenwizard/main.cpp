@@ -17,7 +17,6 @@
 #include <QWidget>
 #include <QApplication>
 #include <QString>
-#include <QRegExp>
 #include <QFileInfo>
 #include <QDir>
 

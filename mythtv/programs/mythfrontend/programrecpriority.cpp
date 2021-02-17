@@ -7,7 +7,6 @@
 
 // QT headers
 #include <QDateTime>
-#include <QRegExp>
 
 // libmythtv headers
 #include "recordingrule.h"

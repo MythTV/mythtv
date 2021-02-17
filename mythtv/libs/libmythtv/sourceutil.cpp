@@ -1,8 +1,5 @@
 // -*- Mode: c++ -*-
 
-// Qt headers
-#include <QRegExp>
-
 // MythTV headers
 #include "sourceutil.h"
 #include "cardutil.h"

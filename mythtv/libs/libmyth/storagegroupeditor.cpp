@@ -2,7 +2,6 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
-#include <QRegExp>
 #include <QUrl>
 #include <QVector>
 #include <utility>

@@ -9,7 +9,6 @@
 
 #include <QDateTime>
 #include <QFileInfo>
-#include <QRegExp>
 #include <QEvent>
 #include <QCoreApplication>
 

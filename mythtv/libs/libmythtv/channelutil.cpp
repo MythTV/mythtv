@@ -8,7 +8,6 @@
 #include <QHash>
 #include <QImage>
 #include <QReadWriteLock>
-#include <QRegExp>
 #include <utility>
 
 #include "channelutil.h"

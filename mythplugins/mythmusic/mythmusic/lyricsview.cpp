@@ -4,7 +4,6 @@
 
 // qt
 #include <QKeyEvent>
-#include <QRegExp>
 #include <QThread>
 #include <QDomDocument>
 
