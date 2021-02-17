@@ -30,7 +30,7 @@
 #include <QList>
 #include <QTextStream>
 #include <QDir>
-#include <QFile>
+#include <QRegularExpression>
 
 // MythTV headers
 #include "mythmediamonitor.h"
@@ -341,7 +341,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     QString ret = sysfs;
 
     // In case of error, a working default?  (device names usually match)
-    ret.replace(QRegExp(".*/"), "/dev/");
+    ret.replace(QRegularExpression(".*/"), "/dev/");
 
 #ifdef linux
   #if HAVE_LIBUDEV
