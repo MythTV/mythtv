@@ -7,7 +7,7 @@
 
 #include <QDir>
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDateTime>
 #include <QSqlError>
 #include <QSqlRecord>
@@ -779,26 +779,17 @@ bool DBUtil::ParseDBMSVersion()
         if (!QueryDBMSVersion())
             return false;
 
-    QString section;
-    int pos = 0;
-    int i = 0;
-    std::array<int,3> version = {-1, -1, -1};
-    QRegExp digits("(\\d+)");
+    static const QRegularExpression parseVersion
+        { R"(^(\d+)(?:\.(\d+)(?:\.(\d+))?)?)" };
+    auto match = parseVersion.match(m_versionString);
+    if (!match.hasMatch())
+        return false;
 
-    while ((i < 3) && ((pos = digits.indexIn(m_versionString, pos)) > -1))
-    {
-        bool ok = false;
-        section = digits.cap(1);
-        pos += digits.matchedLength();
-        version[i] = section.toInt(&ok, 10);
-        if (!ok)
-            version[i] = -1;
-        i++;
-    }
-
-    m_versionMajor = version[0];
-    m_versionMinor = version[1];
-    m_versionPoint = version[2];
+    // If any of these wasn't matched, the captured string will be
+    // empty and toInt will parse it as a zero.
+    m_versionMajor = match.capturedRef(1).toInt(nullptr);
+    m_versionMinor = match.capturedRef(2).toInt(nullptr);
+    m_versionPoint = match.capturedRef(3).toInt(nullptr);
 
     return m_versionMajor > -1;
 }
