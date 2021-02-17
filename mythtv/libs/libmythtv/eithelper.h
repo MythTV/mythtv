@@ -141,7 +141,6 @@ class EITHelper
     mutable QMutex          m_eitListLock;
     mutable ServiceToChanID m_srvToChanid;
 
-    EITFixUp               *m_eitFixup     {nullptr};
     static EITCache        *s_eitCache;
 
     int                     m_gpsOffset    {-1 * GPS_LEAP_SECONDS};

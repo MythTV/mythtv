@@ -37,7 +37,6 @@ static void init_fixup(FixupMap &fix);
 #define LOC_ID QString("EITHelper[%1]: ").arg(m_cardnum)
 
 EITHelper::EITHelper(uint cardnum) :
-    m_eitFixup(new EITFixUp()),
     m_cardnum(cardnum)
 {
     init_fixup(m_fixup);
@@ -48,8 +47,6 @@ EITHelper::~EITHelper()
     QMutexLocker locker(&m_eitListLock);
     while (!m_dbEvents.empty())
         delete m_dbEvents.dequeue();
-
-    delete m_eitFixup;
 }
 
 uint EITHelper::GetListSize(void) const
@@ -87,7 +84,7 @@ uint EITHelper::ProcessEvents(void)
         DBEventEIT *event = m_dbEvents.dequeue();
         m_eitListLock.unlock();
 
-        m_eitFixup->Fix(*event);
+        EITFixUp::Fix(*event);
 
         insertCount += event->UpdateDB(query, 1000);
         m_maxStarttime = std::max (m_maxStarttime, event->m_starttime);
