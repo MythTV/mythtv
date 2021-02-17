@@ -51,6 +51,7 @@ class MUI_PUBLIC MythHDR
     static QStringList TypesToString(HDRTypes Types);
     QStringList        TypesToString() const;
     bool               IsControllable() const;
+    double             GetMaxLuminance() const;
 
     HDRType  m_currentType     { SDR };
     HDRTypes m_supportedTypes  { SDR };

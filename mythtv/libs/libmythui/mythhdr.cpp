@@ -58,6 +58,11 @@ bool MythHDR::IsControllable() const
     return m_controllable;
 }
 
+double MythHDR::GetMaxLuminance() const
+{
+    return m_maxLuminance;
+}
+
 QString MythHDR::TypeToString(HDRType Type)
 {
     if (Type & HDR10) return QObject::tr("HDR10");

@@ -153,6 +153,8 @@ QStringList MythDisplay::GetDescription()
         result.append(tr("Supported HDR formats\t: %1").arg(hdr.join(",")));
         if (types && !m_hdrState->IsControllable())
             result.append(tr("HDR mode switching is not available"));
+        if (auto brightness = m_hdrState->GetMaxLuminance(); brightness > 1.0)
+            result.append(tr("Max display brightness\t: %1 nits").arg(static_cast<int>(brightness)));
     }
 
     if (m_vrrState)
@@ -941,6 +943,11 @@ void MythDisplay::InitHDR()
         m_hdrState = MythHDR::Create(this, hdrdesc);
         LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Supported HDR formats: %1")
             .arg(m_hdrState->TypesToString().join(",")));
+        if (auto brightness = m_hdrState->GetMaxLuminance(); brightness > 1.0)
+        {
+            LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Display reports max brightness of %1 nits")
+                .arg(static_cast<int>(brightness)));
+        }
     }
 }
 
