@@ -56,7 +56,7 @@ void TestRSSParse::test_rfc822(void)
     QFETCH(QDate, expectedDate);
     QFETCH(QTime, expectedTime);
 
-    QDateTime result = gParse->RFC822TimeToQDateTime(dateString);
+    QDateTime result = Parse::RFC822TimeToQDateTime(dateString);
     QDateTime expectedResult(expectedDate, expectedTime, Qt::OffsetFromUTC);
     QCOMPARE(result, expectedResult);
 }
