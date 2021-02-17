@@ -1580,6 +1580,26 @@ void StatusBox::doRenderStatus()
     if (render && render->Type() == kRenderOpenGL)
     {
         auto * opengl = dynamic_cast<MythRenderOpenGL*>(render);
+
+        if (opengl)
+        {
+            auto UpdateFPS = [](StatusBoxItem* Item)
+            {
+                uint64_t swapcount = 0;
+                auto * rend = GetMythMainWindow()->GetRenderDevice();
+                if (auto * gl = dynamic_cast<MythRenderOpenGL*>(rend); gl != nullptr)
+                    swapcount = gl->GetSwapCount();
+                Item->SetText(tr("Current fps: %1").arg(swapcount));
+            };
+
+            auto * fps = AddLogLine("");
+            // Reset the frame counter
+            (void)opengl->GetSwapCount();
+            UpdateFPS(fps);
+            connect(fps, &StatusBoxItem::UpdateRequired, UpdateFPS);
+            fps->Start();
+        }
+
         if (opengl && (opengl->GetExtraFeatures() & kGLNVMemory))
         {
             auto GetGPUMem = []()
