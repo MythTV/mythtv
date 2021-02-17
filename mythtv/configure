@@ -5920,7 +5920,7 @@ if enabled taglib; then
 fi
 
 # Attempt to use libudev for mediamonitor
-enabled libudev && check_lib udev libudev.h udev_new  || disable libudev
+enabled libudev && check_lib udev libudev.h udev_new -ludev || disable libudev
 
 # libexiv2
 if enabled libexiv2_external ; then
