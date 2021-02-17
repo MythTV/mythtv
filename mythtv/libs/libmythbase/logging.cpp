@@ -62,7 +62,6 @@ extern "C" {
 
 static QMutex                  logQueueMutex;
 static QQueue<LoggingItem *>   logQueue;
-static QRegExp                 logRegExp = QRegExp("[%]{1,2}");
 
 static LoggerThread           *logThread = nullptr;
 static QMutex                  logThreadMutex;
