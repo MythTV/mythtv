@@ -688,13 +688,9 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Audio
     bool    m_tvmAvsync {true};
-    bool    m_tvmUpmixing {false};
-    bool    m_tvmCanUpmix {false};
 
     // Video
     bool             m_tvmFillAutoDetect      {false};
-    uint             m_tvmSup                 {kPictureAttributeSupported_None};
-    StereoscopicMode m_tvmStereoMode          {kStereoscopicModeAuto};
 
     // Playback
     int          m_tvmSpeedX100         {100};
@@ -720,10 +716,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     int              m_tvmNumTitles {0};
     int              m_tvmCurrentTitle {0};
     // Subtitles
-    uint             m_tvmSubsCapMode {0};
-    bool             m_tvmSubsHaveText {false};
     bool             m_tvmSubsForcedOn {true};
-    bool             m_tvmSubsEnabled {false};
     bool             m_tvmSubsHaveSubs {false};
 
     bool             m_tvmIsOn {false};

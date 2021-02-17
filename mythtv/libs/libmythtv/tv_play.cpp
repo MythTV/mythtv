@@ -8601,7 +8601,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
     {
         for (int i = kPictureAttribute_MIN; i < kPictureAttribute_MAX; i++)
         {
-            if (toMask(static_cast<PictureAttribute>(i)) & m_tvmSup)
+            if (toMask(static_cast<PictureAttribute>(i)) & m_videoColourState.m_supportedAttributes)
             {
                 QString action = prefix + QString::number(i - kPictureAttribute_MIN);
                 if (static_cast<PictureAttribute>(i) != kPictureAttribute_Range)
@@ -8611,13 +8611,13 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
     }
     else if (MythTVMenu::MatchesGroup(actionName, "3D", category, prefix))
     {
-        active = (m_tvmStereoMode == kStereoscopicModeAuto);
+        active = (m_videoBoundsState.m_stereoOverride == kStereoscopicModeAuto);
         BUTTON(ACTION_3DNONE, tr("Auto"));
-        active = (m_tvmStereoMode == kStereoscopicModeIgnore3D);
+        active = (m_videoBoundsState.m_stereoOverride == kStereoscopicModeIgnore3D);
         BUTTON(ACTION_3DIGNORE, tr("Ignore"));
-        active = (m_tvmStereoMode == kStereoscopicModeSideBySideDiscard);
+        active = (m_videoBoundsState.m_stereoOverride == kStereoscopicModeSideBySideDiscard);
         BUTTON(ACTION_3DSIDEBYSIDEDISCARD, tr("Discard Side by Side"));
-        active = (m_tvmStereoMode == kStereoscopicModeTopAndBottomDiscard);
+        active = (m_videoBoundsState.m_stereoOverride == kStereoscopicModeTopAndBottomDiscard);
         BUTTON(ACTION_3DTOPANDBOTTOMDISCARD, tr("Discard Top and Bottom"));
     }
     else if (MythTVMenu::MatchesGroup(actionName, "SELECTSCAN_", category, prefix) && m_player)
@@ -8835,17 +8835,17 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         }
         else if (actionName == "DISABLEUPMIX")
         {
-            if (m_tvmCanUpmix)
+            if (m_audioState.m_canUpmix)
             {
-                active = !m_tvmUpmixing;
+                active = !m_audioState.m_isUpmixing;
                 BUTTON(actionName, tr("Disable Audio Upmixer"));
             }
         }
         else if (actionName == "ENABLEUPMIX")
         {
-            if (m_tvmCanUpmix)
+            if (m_audioState.m_canUpmix)
             {
-                active = m_tvmUpmixing;
+                active = m_audioState.m_isUpmixing;
                 BUTTON(actionName, tr("Auto Detect"));
             }
         }
@@ -8865,13 +8865,13 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         }
         else if (actionName == "DISABLESUBS")
         {
-            active = !m_tvmSubsEnabled;
+            active = !OptionalCaptionEnabled(m_captionsState.m_textDisplayMode);
             if (m_tvmSubsHaveSubs)
                 BUTTON(actionName, tr("Disable Subtitles"));
         }
         else if (actionName == "ENABLESUBS")
         {
-            active = m_tvmSubsEnabled;
+            active = OptionalCaptionEnabled(m_captionsState.m_textDisplayMode);
             if (m_tvmSubsHaveSubs)
                 BUTTON(actionName, tr("Enable Subtitles"));
         }
@@ -8895,14 +8895,14 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         }
         else if (actionName == "DISABLEEXTTEXT")
         {
-            active = m_tvmSubsCapMode != kDisplayTextSubtitle;
-            if (m_tvmSubsHaveText)
+            active = m_captionsState.m_textDisplayMode != kDisplayTextSubtitle;
+            if (m_captionsState.m_externalTextSubs)
                 BUTTON(actionName, tr("Disable External Subtitles"));
         }
         else if (actionName == "ENABLEEXTTEXT")
         {
-            active = m_tvmSubsCapMode == kDisplayTextSubtitle;
-            if (m_tvmSubsHaveText)
+            active = m_captionsState.m_textDisplayMode == kDisplayTextSubtitle;
+            if (m_captionsState.m_externalTextSubs)
                 BUTTON(actionName, tr("Enable External Subtitles"));
         }
         else if (actionName == "TOGGLETTM")
@@ -8912,14 +8912,14 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         }
         else if (actionName == "TOGGLESUBZOOM")
         {
-            if (m_tvmSubsEnabled)
+            if (OptionalCaptionEnabled(m_captionsState.m_textDisplayMode))
                 BUTTON(actionName, tr("Adjust Subtitle Zoom"));
         }
         else if (actionName == "TOGGLESUBDELAY")
         {
-            if (m_tvmSubsEnabled &&
-                (m_tvmSubsCapMode == kDisplayRawTextSubtitle ||
-                 m_tvmSubsCapMode == kDisplayTextSubtitle))
+            if (OptionalCaptionEnabled(m_captionsState.m_textDisplayMode) &&
+                (m_captionsState.m_textDisplayMode == kDisplayRawTextSubtitle ||
+                 m_captionsState.m_textDisplayMode == kDisplayTextSubtitle))
             {
                 BUTTON(actionName, tr("Adjust Subtitle Delay"));
             }
@@ -9113,12 +9113,8 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         return;
 
     m_tvmAvsync   = true;
-    m_tvmUpmixing = false;
-    m_tvmCanUpmix = false;
 
     m_tvmFillAutoDetect    = false;
-    m_tvmSup               = kPictureAttributeSupported_None;
-    m_tvmStereoMode        = kStereoscopicModeAuto;
 
     m_tvmSpeedX100         = static_cast<int>(round(m_playerContext.m_tsNormal * 100));
     m_tvmState             = m_playerContext.GetState();
@@ -9146,10 +9142,7 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
     m_tvmChapterTimes.clear();
     GetChapterTimes(m_tvmChapterTimes);
 
-    m_tvmSubsCapMode   = 0;
-    m_tvmSubsHaveText  = false;
     m_tvmSubsForcedOn  = true;
-    m_tvmSubsEnabled   = false;
     m_tvmSubsHaveSubs  = false;
 
     for (int i = kTrackTypeUnknown ; i < kTrackTypeCount ; ++i)
@@ -9177,23 +9170,16 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
         }
         m_tvmSubsHaveSubs =
             !m_tvmTracks[kTrackTypeSubtitle].empty() ||
-            m_tvmSubsHaveText ||
+            m_captionsState.m_externalTextSubs ||
             !m_tvmTracks[kTrackTypeCC708].empty() ||
             !m_tvmTracks[kTrackTypeCC608].empty() ||
             !m_tvmTracks[kTrackTypeTeletextCaptions].empty() ||
             !m_tvmTracks[kTrackTypeRawText].empty();
         m_tvmAvsync = (m_player->GetTrackCount(kTrackTypeVideo) > 0) &&
             !m_tvmTracks[kTrackTypeAudio].empty();
-        m_tvmUpmixing         = m_audioState.m_isUpmixing;
-        m_tvmCanUpmix         = m_audioState.m_canUpmix;
         m_tvmCurSkip          = m_player->GetAutoCommercialSkip();
         m_tvmIsPaused         = m_player->IsPaused();
-        m_tvmSubsCapMode      = m_captionsState.m_textDisplayMode;
-        m_tvmSubsEnabled      = OptionalCaptionEnabled(m_captionsState.m_textDisplayMode);
-        m_tvmSubsHaveText     = m_captionsState.m_externalTextSubs;
         m_tvmSubsForcedOn     = m_player->GetAllowForcedSubtitles();
-        m_tvmSup              = m_videoColourState.m_supportedAttributes;
-        m_tvmStereoMode       = m_videoBoundsState.m_stereoOverride;
         MythVideoOutput *vo = m_player->GetVideoOutput();
         if (vo)
         {
