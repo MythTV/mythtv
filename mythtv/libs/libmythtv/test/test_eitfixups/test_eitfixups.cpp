@@ -252,8 +252,6 @@ void TestEITFixups::testParseRoman()
 
 void TestEITFixups::testUKFixups1()
 {
-    EITFixUp fixup;
-
     DBEventEIT event1(11381,
                       "Book of the Week",
                       "Girl in the Dark: Anna Lyndsey's account of finding light in the darkness after illness changed her life. 3/5. A Descent into Darkness: The disquieting persistence of the light.",
@@ -264,7 +262,7 @@ void TestEITFixups::testUKFixups1()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event1);
+    EITFixUp::Fix(event1);
 
     PRINT_EVENT(event1);
     QCOMPARE(event1.m_episode,       3U);
@@ -273,8 +271,6 @@ void TestEITFixups::testUKFixups1()
 
 void TestEITFixups::testUKFixups2()
 {
-    EITFixUp fixup;
-
     DBEventEIT event2(54275,
                       "Hoarders",
                       "Fascinating series chronicling the lives of serial hoarders. Often facing loss of their children, career, or divorce, can people with this disorder be helped? S3, Ep1",
@@ -285,7 +281,7 @@ void TestEITFixups::testUKFixups2()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event2);
+    EITFixUp::Fix(event2);
     PRINT_EVENT(event2);
     QCOMPARE(event2.m_season,  3U);
     QCOMPARE(event2.m_episode, 1U);
@@ -293,8 +289,6 @@ void TestEITFixups::testUKFixups2()
 
 void TestEITFixups::testUKFixups3()
 {
-    EITFixUp fixup;
-
     DBEventEIT event3(54340,
                       "Yu-Gi-Oh! ZEXAL",
                       "It's a duelling disaster for Yuma when Astral, a mysterious visitor from another galaxy, suddenly appears, putting his duel with Shark in serious jeopardy! S01 Ep02 (Part 2 of 2)",
@@ -305,7 +299,7 @@ void TestEITFixups::testUKFixups3()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event3);
+    EITFixUp::Fix(event3);
     PRINT_EVENT(event3);
     QCOMPARE(event3.m_season,     1U);
     QCOMPARE(event3.m_episode,    2U);
@@ -315,8 +309,6 @@ void TestEITFixups::testUKFixups3()
 
 void TestEITFixups::testUKFixups4()
 {
-    EITFixUp fixup;
-
     DBEventEIT event4(54345,
                       "Ella The Elephant",
                       "Ella borrows her Dad's camera and sets out to take some exciting pictures for her newspaper. S01 Ep39",
@@ -327,7 +319,7 @@ void TestEITFixups::testUKFixups4()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event4);
+    EITFixUp::Fix(event4);
     PRINT_EVENT(event4);
     QCOMPARE(event4.m_season,  1U);
     QCOMPARE(event4.m_episode, 39U);
@@ -335,8 +327,6 @@ void TestEITFixups::testUKFixups4()
 
 void TestEITFixups::testUKFixups5()
 {
-    EITFixUp fixup;
-
     DBEventEIT event5(7940,
                       "The World at War",
                       "12/26. Whirlwind: Acclaimed documentary series about World War II. This episode focuses on the Allied bombing campaign which inflicted grievous damage upon Germany, both day and night. [S]",
@@ -347,7 +337,7 @@ void TestEITFixups::testUKFixups5()
                       AUD_STEREO,
                       VID_HDTV | VID_WIDESCREEN | VID_AVC);
 
-    fixup.Fix(event5);
+    EITFixUp::Fix(event5);
     PRINT_EVENT(event5);
     QCOMPARE(event5.m_episode,       12U);
     QCOMPARE(event5.m_totalepisodes, 26U);
@@ -358,8 +348,6 @@ void TestEITFixups::testUKFixups5()
 
 void TestEITFixups::testUKFixups6()
 {
-    EITFixUp fixup;
-
     DBEventEIT event6(11260,
                       "A Touch of Frost",
                       "The Things We Do for Love: When a beautiful woman is found dead in a car park, the list of suspects leads Jack Frost (David Jason) into the heart of a religious community. [SL] S4 Ep3",
@@ -370,7 +358,7 @@ void TestEITFixups::testUKFixups6()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event6);
+    EITFixUp::Fix(event6);
     PRINT_EVENT(event6);
     QCOMPARE(event6.m_season,       4U);
     QCOMPARE(event6.m_episode,      3U);
@@ -381,8 +369,6 @@ void TestEITFixups::testUKFixups6()
 
 void TestEITFixups::testUKFixups7()
 {
-    EITFixUp fixup;
-
     DBEventEIT event7(7940,
                       "Suffragettes Forever! The Story of...",
                       "...Women and Power. 2/3. Documentary series presented by Amanda Vickery. During Victoria's reign extraordinary women gradually changed the lives and opportunities of their sex. [HD] [AD,S]",
@@ -393,7 +379,7 @@ void TestEITFixups::testUKFixups7()
                       AUD_STEREO,
                       VID_HDTV | VID_WIDESCREEN | VID_AVC);
 
-    fixup.Fix(event7);
+    EITFixUp::Fix(event7);
     PRINT_EVENT(event7);
     QCOMPARE(event7.m_episode,       2U);
     QCOMPARE(event7.m_totalepisodes, 3U);
@@ -406,8 +392,6 @@ void TestEITFixups::testUKFixups7()
 
 void TestEITFixups::testUKFixups8()
 {
-    EITFixUp fixup;
-
     DBEventEIT event8(7302,
                       "Brooklyn's Finest",
                       "Three unconnected Brooklyn cops wind up at the same deadly location. Contains very strong language, sexual content and some violence.  Also in HD. [2009] [AD,S]",
@@ -418,7 +402,7 @@ void TestEITFixups::testUKFixups8()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event8);
+    EITFixUp::Fix(event8);
     PRINT_EVENT(event8);
     QCOMPARE(event8.m_subtitleType, (unsigned char)SUB_NORMAL);
     QCOMPARE(event8.m_audioProps,   (unsigned char)(AUD_STEREO | AUD_VISUALIMPAIR));
@@ -429,8 +413,6 @@ void TestEITFixups::testUKFixups8()
 void TestEITFixups::testUKFixups9()
 {
     // Make sure numbers don't get misinterpreted as episode number or similar.
-    EITFixUp fixup;
-
     DBEventEIT event9(9311,
                       "Channel 4 News",
                       "Includes sport and weather.",
@@ -441,7 +423,7 @@ void TestEITFixups::testUKFixups9()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event9);
+    EITFixUp::Fix(event9);
     PRINT_EVENT(event9);
     QCOMPARE(event9.m_title,       QString("Channel 4 News"));
     QCOMPARE(event9.m_description, QString("Includes sport and weather"));
@@ -449,15 +431,13 @@ void TestEITFixups::testUKFixups9()
 
 void TestEITFixups::testUKLawAndOrder()
 {
-    EITFixUp fixup;
-
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUK,
                                          "Law & Order: Special Victims Unit",
                                          "",
                                          "Crime drama series. Detective Cassidy is accused of raping ...");
 
     PRINT_EVENT(*event);
-    fixup.Fix(*event);
+    EITFixUp::Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->m_title,    QString("Law & Order: Special Victims Unit"));
     QCOMPARE(event->m_subtitle, QString(""));
@@ -470,7 +450,7 @@ void TestEITFixups::testUKLawAndOrder()
                                          "Sugar: New. Police drama series about an elite sex crime  ...");
 
     PRINT_EVENT(*event2);
-    fixup.Fix(*event2);
+    EITFixUp::Fix(*event2);
     PRINT_EVENT(*event2);
     QCOMPARE(event2->m_title,    QString("Law & Order: Special Victims Unit"));
     QCOMPARE(event2->m_subtitle, QString("Sugar"));
@@ -481,15 +461,13 @@ void TestEITFixups::testUKLawAndOrder()
 
 void TestEITFixups::testUKMarvel()
 {
-    EITFixUp fixup;
-
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUK,
                                          "Marvel's Agents of S.H.I.E.L.D.",
                                          "Maveth: <description> (S3 Ep10/22)  [AD,S]",
                                          "");
 
     PRINT_EVENT(*event);
-    fixup.Fix(*event);
+    EITFixUp::Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->m_title,    QString("Marvel's Agents of S.H.I.E.L.D."));
     QCOMPARE(event->m_subtitle, QString("Maveth"));
@@ -503,7 +481,7 @@ void TestEITFixups::testUKMarvel()
                                           "");
 
     PRINT_EVENT(*event2);
-    fixup.Fix(*event2);
+    EITFixUp::Fix(*event2);
     PRINT_EVENT(*event2);
     QCOMPARE(event2->m_title,    QString("Marvel's Agents of S.H.I.E.L.D."));
     QCOMPARE(event2->m_subtitle, QString("Bouncing Back"));
@@ -538,8 +516,6 @@ DBEventEIT *TestEITFixups::SimpleDBEventEIT (FixupValue fixup, const QString& ti
 void TestEITFixups::testUKXFiles()
 {
     // Make sure numbers don't get misinterpreted as episode number or similar.
-    EITFixUp fixup;
-
     DBEventEIT event(1005,
                       "New: The X-Files",
                       "Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy. (Ep 1)[AD,S]",
@@ -550,7 +526,7 @@ void TestEITFixups::testUKXFiles()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,       QString("The X-Files"));
     QCOMPARE(event.m_description, QString("Hit sci-fi drama series returns. Mulder and Scully are reunited after the collapse of their relationship when a TV host contacts them, believing he has uncovered a significant conspiracy. (Ep 1)"));
@@ -558,15 +534,13 @@ void TestEITFixups::testUKXFiles()
 
 void TestEITFixups::testDEPro7Sat1()
 {
-    EITFixUp fixup;
-
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixP7S1,
                                          "Titel",
                                          "Folgentitel, Mystery, USA 2011",
                                          "Beschreibung");
 
     PRINT_EVENT(*event);
-    fixup.Fix(*event);
+    EITFixUp::Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->m_title,    QString("Titel"));
     QCOMPARE(event->m_subtitle, QString("Folgentitel"));
@@ -579,7 +553,7 @@ void TestEITFixups::testDEPro7Sat1()
                                            "Kurznachrichten, D 2015",
                                            "Beschreibung");
     PRINT_EVENT(*event2);
-    fixup.Fix(*event2);
+    EITFixUp::Fix(*event2);
     PRINT_EVENT(*event2);
     QCOMPARE(event2->m_subtitle, QString(""));
     QCOMPARE(event2->m_airdate,  (unsigned short) 2015);
@@ -591,7 +565,7 @@ void TestEITFixups::testDEPro7Sat1()
                                            "Folgentitel",
                                            "Beschreibung");
     PRINT_EVENT(*event3);
-    fixup.Fix(*event3);
+    EITFixUp::Fix(*event3);
     PRINT_EVENT(*event3);
     QCOMPARE(event3->m_subtitle, QString("Folgentitel"));
     QCOMPARE(event3->m_airdate,  (unsigned short) 0);
@@ -603,7 +577,7 @@ void TestEITFixups::testDEPro7Sat1()
                                            "\"Lokal\", Ort, Doku-Soap, D 2015",
                                            "Beschreibung");
     PRINT_EVENT(*event4);
-    fixup.Fix(*event4);
+    EITFixUp::Fix(*event4);
     PRINT_EVENT(*event4);
     QCOMPARE(event4->m_subtitle, QString("\"Lokal\", Ort"));
     QCOMPARE(event4->m_airdate,  (unsigned short) 2015);
@@ -615,7 +589,7 @@ void TestEITFixups::testDEPro7Sat1()
                                            "In Morpheus' Armen, Science-Fiction, CDN/USA 2006",
                                            "Beschreibung");
     PRINT_EVENT(*event5);
-    fixup.Fix(*event5);
+    EITFixUp::Fix(*event5);
     PRINT_EVENT(*event5);
     QCOMPARE(event5->m_subtitle, QString("In Morpheus' Armen"));
     QCOMPARE(event5->m_airdate,  (unsigned short) 2006);
@@ -627,7 +601,7 @@ void TestEITFixups::testDEPro7Sat1()
                                            "Drei Kleintiere durchschneiden (1), Zeichentrick, J 2014",
                                            "Beschreibung");
     PRINT_EVENT(*event6);
-    fixup.Fix(*event6);
+    EITFixUp::Fix(*event6);
     PRINT_EVENT(*event6);
     QCOMPARE(event6->m_subtitle, QString("Drei Kleintiere durchschneiden (1)"));
     QCOMPARE(event6->m_airdate,  (unsigned short) 2014);
@@ -645,7 +619,7 @@ void TestEITFixups::testDEPro7Sat1()
                                            "Herr Schauspieler (in einer (kleinen) Rolle)\n"
                                            "Frau Schauspielerin (in einer Rolle)");
     PRINT_EVENT(*event7);
-    fixup.Fix(*event7);
+    EITFixUp::Fix(*event7);
     PRINT_EVENT(*event7);
     QCOMPARE(event7->m_subtitle, QString("<episode title>"));
     QCOMPARE(event7->m_airdate,  (unsigned short) 2011);
@@ -657,8 +631,6 @@ void TestEITFixups::testDEPro7Sat1()
 void TestEITFixups::testHTMLFixup()
 {
     // Make sure we correctly strip HTML tags from EIT data
-    EITFixUp fixup;
-
     DBEventEIT event(9311,
                       "<EM>CSI: Crime Scene Investigation</EM>",
                       "Double-Cross: Las Vegas-based forensic drama. The team investigates when two nuns find a woman crucified in the rafters of their church - and clues implicate the priest. (S7 Ep 5)",
@@ -669,7 +641,7 @@ void TestEITFixups::testHTMLFixup()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,       QString("CSI: Crime Scene Investigation"));
     QCOMPARE(event.m_subtitle,    QString("Double-Cross"));
@@ -686,7 +658,7 @@ void TestEITFixups::testHTMLFixup()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event2);
+    EITFixUp::Fix(event2);
     PRINT_EVENT(event2);
     QCOMPARE(event2.m_title,       QString("Redneck Island"));
 
@@ -700,7 +672,7 @@ void TestEITFixups::testHTMLFixup()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event3);
+    EITFixUp::Fix(event3);
     PRINT_EVENT(event3);
     QCOMPARE(event3.m_title,       QString("Jericho"));
     QCOMPARE(event3.m_description, QString("Drama set in 1870s Yorkshire. In her desperation to protect her son, Annie unwittingly opens the door for Bamford the railway detective, who has returned to Jericho."));
@@ -708,15 +680,13 @@ void TestEITFixups::testHTMLFixup()
 
 void TestEITFixups::testSkyEpisodes()
 {
-    EITFixUp fixup;
-
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixPremiere,
                                          "Titel",
                                          "Subtitle",
                                          "4. Staffel, Folge 16: Viele Mitglieder einer christlichen Gemeinde erkranken nach einem Giftanschlag tödlich. Doch die fanatisch Gläubigen lassen weder polizeiliche, noch ärztliche Hilfe zu. Don (Rob Morrow) und Charlie (David Krumholtz) gelingt es jedoch durch einen Nebeneingang ins Gebäude zu kommen. Bei ihren Ermittlungen finden sie heraus, dass der Anführer der Sekte ein Betrüger war. Auch sein Sohn wusste von den Machenschaften des Vaters. War der Giftanschlag ein Racheakt? 50 Min. USA 2008. Von Leslie Libman, mit Rob Morrow, David Krumholtz, Judd Hirsch. Ab 12 Jahren");
 
     PRINT_EVENT(*event);
-    fixup.Fix(*event);
+    EITFixUp::Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->m_description, QString("Viele Mitglieder einer christlichen Gemeinde erkranken nach einem Giftanschlag tödlich. Doch die fanatisch Gläubigen lassen weder polizeiliche, noch ärztliche Hilfe zu. Don (Rob Morrow) und Charlie (David Krumholtz) gelingt es jedoch durch einen Nebeneingang ins Gebäude zu kommen. Bei ihren Ermittlungen finden sie heraus, dass der Anführer der Sekte ein Betrüger war. Auch sein Sohn wusste von den Machenschaften des Vaters. War der Giftanschlag ein Racheakt? Ab 12 Jahren"));
     QCOMPARE(event->m_season,   4U);
@@ -732,7 +702,7 @@ void TestEITFixups::testSkyEpisodes()
                                          "Washington, 1971: Vor dem Obersten Gerichtshof wird über die Kriegsdienstverweigerung von Box-Ikone Cassius Clay aka Muhammad Ali verhandelt. Während draußen Tausende gegen den Vietnamkrieg protestieren, verteidigen acht weiße, alte Bundesrichter unter dem Vorsitzenden Warren Burger (Frank Langella) die harte Linie der Regierung Nixon. Doch Kevin Connolly (Benjamin Walker), ein idealistischer junger Mitarbeiter von Richter Harlan (Christopher Plummer), gibt nicht auf. - Muhammad Alis Kiegsdienst-Verweigerungsprozess, als Mix aus Kammerspiel und Archivaufnahmen starbesetzt verfilmt. 94 Min. USA 2012. Von Stephen Frears, mit Danny Glover, Barry Levinson, Bob Balaban. Ab 12 Jahren");
 
     PRINT_EVENT(*event2);
-    fixup.Fix(*event2);
+    EITFixUp::Fix(*event2);
     PRINT_EVENT(*event2);
     QCOMPARE(event2->m_description, QString("Washington, 1971: Vor dem Obersten Gerichtshof wird über die Kriegsdienstverweigerung von Box-Ikone Cassius Clay aka Muhammad Ali verhandelt. Während draußen Tausende gegen den Vietnamkrieg protestieren, verteidigen acht weiße, alte Bundesrichter unter dem Vorsitzenden Warren Burger (Frank Langella) die harte Linie der Regierung Nixon. Doch Kevin Connolly (Benjamin Walker), ein idealistischer junger Mitarbeiter von Richter Harlan (Christopher Plummer), gibt nicht auf. - Muhammad Alis Kiegsdienst-Verweigerungsprozess, als Mix aus Kammerspiel und Archivaufnahmen starbesetzt verfilmt. Ab 12 Jahren"));
     QCOMPARE(event2->m_season,  0U);
@@ -746,7 +716,7 @@ void TestEITFixups::testSkyEpisodes()
                                          "50 Min. USA 2008. Von Leslie Libman, mit Rob Morrow, David Krumholtz, Judd Hirsch. Ab 12 Jahren");
 
     PRINT_EVENT(*event3);
-    fixup.Fix(*event3);
+    EITFixUp::Fix(*event3);
     PRINT_EVENT(*event3);
     QCOMPARE(event3->m_description, QString("Ab 12 Jahren"));
     QCOMPARE(event3->m_season,  0U);
@@ -759,7 +729,7 @@ void TestEITFixups::testSkyEpisodes()
                                          "Subtitle",
                                          "Ex-Marine und Kampfsportlehrer Granger (Dolph Lundgren) ... Star Dolph Lundgren. 92 Min.\u000AD/CDN 2011. Von Uwe Boll, mit Dolph Lundgren, Natassia Malthe, Lochlyn Munro.\u000AAb 16 Jahren");
 
-    fixup.Fix(*event4);
+    EITFixUp::Fix(*event4);
     PRINT_EVENT(*event4);
     QCOMPARE(event4->m_description, QString("Ex-Marine und Kampfsportlehrer Granger (Dolph Lundgren) ... Star Dolph Lundgren. Ab 16 Jahren"));
     QCOMPARE(event4->m_season,  0U);
@@ -774,7 +744,7 @@ void TestEITFixups::testSkyEpisodes()
                                             "Laurie zieht aus",
                                             "2. Staffel, Folge 11: Lauries Auszug setzt Red zu, denn er hat ... ist.\u000AUSA 1999. 25 Min. Von David Trainer, mit Topher Grace, Mila Kunis, Ashton Kutcher.");
 
-    fixup.Fix(*event5);
+    EITFixUp::Fix(*event5);
     PRINT_EVENT(*event5);
     QCOMPARE(event5->m_description, QString("Lauries Auszug setzt Red zu, denn er hat ... ist."));
     QCOMPARE(event5->m_season,  2U);
@@ -790,7 +760,7 @@ void TestEITFixups::testSkyEpisodes()
                                            "Laurie zieht aus",
                                            "2. Staffel, Folge 11: Lauries Auszug setzt Red zu, denn er hat ... ist.\u000AUSA 1999. 25 Min. Von David Trainer, mit Topher Grace, Mila Kunis, Ashton Kutcher.");
 
-    fixup.Fix(*event6);
+    EITFixUp::Fix(*event6);
     PRINT_EVENT(*event6);
     QCOMPARE(event6->m_title, QString("Die wilden 70ern"));
     QCOMPARE(event6->m_subtitle, QString("Extra data here, USA"));
@@ -805,15 +775,13 @@ void TestEITFixups::testSkyEpisodes()
 
 void TestEITFixups::testRTLEpisodes()
 {
-    EITFixUp fixup;
-
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixRTL,
                                          "Titel",
                                          "Folge 9: 'Leckerlis auf Eis / Rettung aus höchster Not'",
                                          "Description")
 
     PRINT_EVENT(*event);
-    fixup.Fix(*event);
+    EITFixUp::Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->m_subtitle, QString("Leckerlis auf Eis / Rettung aus höchster Not"));
     QCOMPARE(event->m_season,  0U);
@@ -824,8 +792,6 @@ void TestEITFixups::testRTLEpisodes()
 
 void TestEITFixups::testUnitymedia()
 {
-    EITFixUp fixup;
-
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixUnitymedia,
                                          "Titel",
                                          "Beschreib",
@@ -845,7 +811,7 @@ void TestEITFixups::testUnitymedia()
     QCOMPARE(event->m_items.count(), 8);
 
     PRINT_EVENT(*event);
-    fixup.Fix(*event);
+    EITFixUp::Fix(*event);
     PRINT_EVENT(*event);
 
     QVERIFY(event->HasCredits());
@@ -866,7 +832,7 @@ void TestEITFixups::testUnitymedia()
                               "Beschreibung ... IMDb Rating: 8.9/10");
 
     PRINT_EVENT(*event);
-    fixup.Fix(*event);
+    EITFixUp::Fix(*event);
     PRINT_EVENT(*event);
 
     QCOMPARE(event->m_stars, 0.89F);
@@ -876,15 +842,13 @@ void TestEITFixups::testUnitymedia()
 
 void TestEITFixups::testDeDisneyChannel()
 {
-    EITFixUp fixup;
-
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixDisneyChannel,
                                          "Meine Schwester Charlie",
                                          "Das Ablenkungsmanöver Familien-Serie, USA 2011",
                                          "...");
 
     PRINT_EVENT(*event);
-    fixup.Fix(*event);
+    EITFixUp::Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->m_title,    QString("Meine Schwester Charlie"));
     QCOMPARE(event->m_subtitle, QString("Das Ablenkungsmanöver"));
@@ -899,7 +863,7 @@ void TestEITFixups::testDeDisneyChannel()
                                          "...");
 
     PRINT_EVENT(*event2);
-    fixup.Fix(*event2);
+    EITFixUp::Fix(*event2);
     PRINT_EVENT(*event2);
     QCOMPARE(event2->m_title,    QString("Phineas und Ferb"));
     QCOMPARE(event2->m_subtitle, QString("Das Achterbahn - Musical"));
@@ -909,15 +873,13 @@ void TestEITFixups::testDeDisneyChannel()
 
 void TestEITFixups::testATV()
 {
-    EITFixUp fixup;
-
     DBEventEIT *event = SimpleDBEventEIT (EITFixUp::kFixATV,
                                          "Gilmore Girls",
                                          "Eine Hochzeit und ein Todesfall, Folge 17",
                                          "Lorelai und Rory helfen Luke in seinem Café aus, der mit den Vorbereitungen für das ...");
 
     PRINT_EVENT(*event);
-    fixup.Fix(*event);
+    EITFixUp::Fix(*event);
     PRINT_EVENT(*event);
     QCOMPARE(event->m_title,    QString("Gilmore Girls"));
     QCOMPARE(event->m_subtitle, QString("Eine Hochzeit und ein Todesfall"));
@@ -991,7 +953,6 @@ void TestEITFixups::testDvbEitAuthority()
     QFETCH(QString, e_seriesID);
     QFETCH(QString, e_programID);
 
-    EITFixUp fixup;
     DBEventEIT event(chanid,
                      "Book of the Week", "Book of the Week",
                      "",
@@ -1003,7 +964,7 @@ void TestEITFixups::testDvbEitAuthority()
                      seriesID, programID,
                      0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
 
     PRINT_EVENT(event);
     QCOMPARE(event.m_subtitle, QString(""));
@@ -1056,8 +1017,6 @@ void TestEITFixups::testGenericTitle()
     QFETCH(QString, e_description);
     QFETCH(ProgramInfo::CategoryType, e_cattype);
 
-    EITFixUp fixup;
-
     DBEventEIT event_st(7302, title, description,
                       QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
                       QDateTime::fromString("2020-03-01T02:00:00Z", Qt::ISODate),
@@ -1067,7 +1026,7 @@ void TestEITFixups::testGenericTitle()
                       VID_UNKNOWN);
     event_st.m_subtitle = subtitle;
 
-    fixup.Fix(event_st);
+    EITFixUp::Fix(event_st);
     PRINT_EVENT(event_st);
     QCOMPARE(event_st.m_title,        e_title);
     QCOMPARE(event_st.m_subtitle,     e_subtitle);
@@ -1199,8 +1158,6 @@ void TestEITFixups::testUKTitleDescriptionFixups()
     QFETCH(QString, e_subtitle);
     QFETCH(QString, e_description);
 
-    EITFixUp fixup;
-
     DBEventEIT event_td(7302, title, description,
                       QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
                       QDateTime::fromString("2020-03-01T02:00:00Z", Qt::ISODate),
@@ -1211,7 +1168,7 @@ void TestEITFixups::testUKTitleDescriptionFixups()
     if (category != "")
         event_td.m_category = category;
 
-    fixup.Fix(event_td);
+    EITFixUp::Fix(event_td);
     PRINT_EVENT(event_td);
     QCOMPARE(event_td.m_title,        e_title);
     QCOMPARE(event_td.m_subtitle,     e_subtitle);
@@ -1220,8 +1177,6 @@ void TestEITFixups::testUKTitleDescriptionFixups()
 
 void TestEITFixups::testUKTitlePropsFixups()
 {
-    EITFixUp fixup;
-
     DBEventEIT event_prop(7302, "Title", "This is a [W]description. [AD] [HD,S] [SL]",
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
                           QDateTime::fromString("2020-03-01T02:00:00Z", Qt::ISODate),
@@ -1230,7 +1185,7 @@ void TestEITFixups::testUKTitlePropsFixups()
                           AUD_STEREO,
                           VID_UNKNOWN);
 
-    fixup.Fix(event_prop);
+    EITFixUp::Fix(event_prop);
     PRINT_EVENT(event_prop);
     QCOMPARE(event_prop.m_title,        QString("Title"));
     QCOMPARE(event_prop.m_description,  QString("This is a description"));
@@ -1313,8 +1268,6 @@ void TestEITFixups::testUKSubtitleFixups()
     QFETCH(QString, e_description);
     QFETCH(ProgramInfo::CategoryType, e_cattype);
 
-    EITFixUp fixup;
-
     DBEventEIT event_st(7302, title, description,
                       QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
                       QDateTime::fromString("2020-03-01T02:00:00Z", Qt::ISODate),
@@ -1325,7 +1278,7 @@ void TestEITFixups::testUKSubtitleFixups()
     event_st.m_subtitle = subtitle;
     event_st.m_category = category;
 
-    fixup.Fix(event_st);
+    EITFixUp::Fix(event_st);
     PRINT_EVENT(event_st);
     QCOMPARE(event_st.m_title,        e_title);
     QCOMPARE(event_st.m_subtitle,     e_subtitle);
@@ -1417,8 +1370,6 @@ void TestEITFixups::testUKSeriesFixups()
     QFETCH(int, e_episode);
     QFETCH(int, e_totalepisodes);
 
-    EITFixUp fixup;
-
     DBEventEIT event_se(7302, title, description,
                       QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
                       QDateTime::fromString("2020-03-01T02:00:00Z", Qt::ISODate),
@@ -1429,7 +1380,7 @@ void TestEITFixups::testUKSeriesFixups()
     event_se.m_subtitle = subtitle;
     event_se.m_category = category;
 
-    fixup.Fix(event_se);
+    EITFixUp::Fix(event_se);
     PRINT_EVENT(event_se);
     QCOMPARE(event_se.m_title,         e_title);
     QCOMPARE(event_se.m_subtitle,      e_subtitle);
@@ -1487,8 +1438,6 @@ void TestEITFixups::testUKPartFixups()
     QFETCH(int, e_partnumber);
     QFETCH(int, e_parttotal);
 
-    EITFixUp fixup;
-
     DBEventEIT event_pt(7302, title, description,
                       QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
                       QDateTime::fromString("2020-03-01T02:00:00Z", Qt::ISODate),
@@ -1498,7 +1447,7 @@ void TestEITFixups::testUKPartFixups()
                       VID_UNKNOWN);
     event_pt.m_subtitle = subtitle;
 
-    fixup.Fix(event_pt);
+    EITFixUp::Fix(event_pt);
     PRINT_EVENT(event_pt);
     QCOMPARE(event_pt.m_title,       e_title);
     QCOMPARE(event_pt.m_subtitle,    e_subtitle);
@@ -1531,8 +1480,6 @@ void TestEITFixups::testUKStarringFixups()
     QFETCH(QString, e_person2);
     QFETCH(int, e_year);
 
-    EITFixUp fixup;
-
     DBEventEIT event_st(7302, "Title", description,
                       QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
                       QDateTime::fromString("2020-03-01T02:00:00Z", Qt::ISODate),
@@ -1541,7 +1488,7 @@ void TestEITFixups::testUKStarringFixups()
                       AUD_STEREO,
                       VID_UNKNOWN);
 
-    fixup.Fix(event_st);
+    EITFixUp::Fix(event_st);
     PRINT_EVENT(event_st);
     if (e_year != -1)
     {
@@ -1688,8 +1635,6 @@ void TestEITFixups::testBellExpress()
     QFETCH(int, e_subtitleType);
     QFETCH(bool, e_previouslyShown);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, description,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
                      QDateTime::fromString("2020-03-01T02:00:00Z", Qt::ISODate),
@@ -1700,7 +1645,7 @@ void TestEITFixups::testBellExpress()
     event.m_category = category;
     event.m_categoryType = (ProgramInfo::CategoryType)cattype;
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,       e_title);
     QCOMPARE(event.m_subtitle,    e_subtitle);
@@ -1716,8 +1661,6 @@ void TestEITFixups::testBellExpress()
 
 void TestEITFixups::testBellExpressActors()
 {
-    EITFixUp fixup;
-
     DBEventEIT event(7302, "Title",
                      "Subtitle\r\nMovie. Actor 1, Actor 2 et Actor 3---(2012) Description.",
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -1729,7 +1672,7 @@ void TestEITFixups::testBellExpressActors()
     event.m_category = "dummy";
     event.m_categoryType = (ProgramInfo::CategoryType)DishThemeType::kThemeMovie;
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,          QString("Title"));
     QCOMPARE(event.m_subtitle,       QString("Subtitle"));
@@ -1749,8 +1692,6 @@ void TestEITFixups::testBellExpressActors()
 
 void TestEITFixups::testPBS()
 {
-    EITFixUp fixup;
-
     DBEventEIT event_prop(7302, "Title", "Subtitle : Description.",
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
                           QDateTime::fromString("2020-03-01T02:00:00Z", Qt::ISODate),
@@ -1759,7 +1700,7 @@ void TestEITFixups::testPBS()
                           AUD_STEREO,
                           VID_UNKNOWN);
 
-    fixup.Fix(event_prop);
+    EITFixUp::Fix(event_prop);
     PRINT_EVENT(event_prop);
     QCOMPARE(event_prop.m_title,        QString("Title"));
     QCOMPARE(event_prop.m_subtitle,     QString("Subtitle"));
@@ -1841,8 +1782,6 @@ void TestEITFixups::testComHem()
     QFETCH(ProgramInfo::CategoryType, e_category);
     QFETCH(bool, e_subtitles);
 
-    EITFixUp fixup;
-
     DBEventEIT event_prop(7302, title, subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -1851,7 +1790,7 @@ void TestEITFixups::testComHem()
                           SUB_UNKNOWN, AUD_STEREO, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event_prop);
+    EITFixUp::Fix(event_prop);
     PRINT_EVENT(event_prop);
     QCOMPARE(event_prop.m_title,        e_title);
     QCOMPARE(event_prop.m_subtitle,     e_subtitle);
@@ -1937,8 +1876,6 @@ void TestEITFixups::testComHem2()
     QFETCH(QStringList, e_directors);
     QFETCH(QStringList, e_hosts);
 
-    EITFixUp fixup;
-
     DBEventEIT event_prop(7302, title, subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -1947,7 +1884,7 @@ void TestEITFixups::testComHem2()
                           SUB_UNKNOWN, AUD_STEREO, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event_prop);
+    EITFixUp::Fix(event_prop);
     PRINT_EVENT(event_prop);
     QCOMPARE(event_prop.m_title,        e_title);
     QCOMPARE(event_prop.m_subtitle,     e_subtitle);
@@ -2000,8 +1937,6 @@ void TestEITFixups::testComHem3()
     QFETCH(QString, e_description);
     QFETCH(QDate,   e_airdate);
 
-    EITFixUp fixup;
-
     DBEventEIT event_prop(7302, title, subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-14T23:55:00Z", Qt::ISODate),
@@ -2010,7 +1945,7 @@ void TestEITFixups::testComHem3()
                           SUB_UNKNOWN, AUD_STEREO, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event_prop);
+    EITFixUp::Fix(event_prop);
     PRINT_EVENT(event_prop);
     QCOMPARE(event_prop.m_title,        e_title);
     QCOMPARE(event_prop.m_subtitle,     e_subtitle);
@@ -2040,8 +1975,6 @@ void TestEITFixups::testAUStar()
     QFETCH(QString, e_description);
     QFETCH(QString, e_category);
 
-    EITFixUp fixup;
-
     DBEventEIT event_prop(7302, "Title", subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2050,7 +1983,7 @@ void TestEITFixups::testAUStar()
                           SUB_UNKNOWN, AUD_STEREO, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event_prop);
+    EITFixUp::Fix(event_prop);
     PRINT_EVENT(event_prop);
     QCOMPARE(event_prop.m_subtitle,     e_subtitle);
     QCOMPARE(event_prop.m_description,  e_description);
@@ -2087,8 +2020,6 @@ void TestEITFixups::testAUDescription()
     QFETCH(QString, e_subtitle);
     QFETCH(QString, e_description);
 
-    EITFixUp fixup;
-
     DBEventEIT event_prop(7302, title, subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2097,7 +2028,7 @@ void TestEITFixups::testAUDescription()
                           SUB_UNKNOWN, AUD_STEREO, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event_prop);
+    EITFixUp::Fix(event_prop);
     PRINT_EVENT(event_prop);
     QCOMPARE(event_prop.m_title,        e_title);
     QCOMPARE(event_prop.m_subtitle,     e_subtitle);
@@ -2140,8 +2071,6 @@ void TestEITFixups::testAUNine()
     QFETCH(ProgramInfo::CategoryType, e_cattype);
     QFETCH(QString, e_rating);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2150,7 +2079,7 @@ void TestEITFixups::testAUNine()
                           SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,        e_title);
     QCOMPARE(event.m_subtitle,     e_subtitle);
@@ -2197,8 +2126,6 @@ void TestEITFixups::testAUSeven()
     QFETCH(int, e_year);
     QFETCH(QString, e_rating);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2207,7 +2134,7 @@ void TestEITFixups::testAUSeven()
                           SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -2252,8 +2179,6 @@ void TestEITFixups::testAUFreeview()
     QFETCH(int, e_year);
     QFETCH(bool, e_hascast);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, "Title", subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2262,7 +2187,7 @@ void TestEITFixups::testAUFreeview()
                           SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_subtitle,           e_subtitle);
     QCOMPARE(event.m_description,        e_description);
@@ -2356,8 +2281,6 @@ void TestEITFixups::testMCA()
     QFETCH(int, e_audioProps);
     QFETCH(int, e_subtitleType);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2366,7 +2289,7 @@ void TestEITFixups::testMCA()
                           SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -2416,8 +2339,6 @@ void TestEITFixups::testMCA2()
     QFETCH(QStringList, e_directors);
     QFETCH(QStringList, e_actors);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                           "", ProgramInfo::kCategoryNone,
                           QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2426,7 +2347,7 @@ void TestEITFixups::testMCA2()
                           SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                           "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -2571,8 +2492,6 @@ void TestEITFixups::testRTL()
     QFETCH(QString, e_syndicatedepisode);
     QFETCH(ProgramInfo::CategoryType, e_cattype);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2580,7 +2499,7 @@ void TestEITFixups::testRTL()
                      EITFixUp::kFixRTL, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -2688,8 +2607,6 @@ void TestEITFixups::testFI()
     QFETCH(bool, e_hasRatings);
     QFETCH(QString, e_rating);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2697,7 +2614,7 @@ void TestEITFixups::testFI()
                      EITFixUp::kFixFI, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -2885,8 +2802,6 @@ void TestEITFixups::testNL()
     QFETCH(QStringList, e_directors);
     QFETCH(QStringList, e_presenters);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, "", description,
                      category, ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2895,7 +2810,7 @@ void TestEITFixups::testNL()
                      "", "", 0, 0, 0);
 
     PRINT_EVENT(event);
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -2932,8 +2847,6 @@ void TestEITFixups::testCategory()
     QFETCH(QString, endTime);
     QFETCH(ProgramInfo::CategoryType, e_cattype);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, "Title", "Subtitle", "Description",
                      "", ProgramInfo::kCategoryMovie,
                      QDateTime::fromString(startTime, Qt::ISODate),
@@ -2941,7 +2854,7 @@ void TestEITFixups::testCategory()
                      EITFixUp::kFixCategory, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_categoryType,    e_cattype);
 }
@@ -2983,8 +2896,6 @@ void TestEITFixups::testNO()
     QFETCH(bool, e_previouslyShown);
     QFETCH(int, e_videoProps);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -2992,7 +2903,7 @@ void TestEITFixups::testNO()
                      EITFixUp::kFixNO, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -3060,8 +2971,6 @@ void TestEITFixups::testNRK()
     QFETCH(QString, e_description);
     QFETCH(bool, e_previouslyShown);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -3069,7 +2978,7 @@ void TestEITFixups::testNRK()
                      EITFixUp::kFixNRK_DVBT, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -3160,8 +3069,6 @@ void TestEITFixups::testDK()
     QFETCH(int, e_subtitleType);
     QFETCH(QDate, e_originalAirdate);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -3169,7 +3076,7 @@ void TestEITFixups::testDK()
                      EITFixUp::kFixDK, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -3236,8 +3143,6 @@ void TestEITFixups::testDK2()
     QFETCH(QStringList, e_actors);
     QFETCH(QStringList, e_directors);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, "Title", "Subtitle", description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -3245,7 +3150,7 @@ void TestEITFixups::testDK2()
                      EITFixUp::kFixDK, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      seriesID, programID, 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_description,     e_description);
     QCOMPARE(event.m_seriesId,        e_seriesID);
@@ -3281,8 +3186,6 @@ void TestEITFixups::testGreekSubtitle()
     QFETCH(QString, e_subtitle);
     QFETCH(QString, e_description);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -3290,7 +3193,7 @@ void TestEITFixups::testGreekSubtitle()
                      EITFixUp::kFixGreekSubtitle, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -3447,8 +3350,6 @@ void TestEITFixups::testGreek()
     QFETCH(QStringList, e_directors);
     QFETCH(QStringList, e_presenters);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -3457,7 +3358,7 @@ void TestEITFixups::testGreek()
                      "", "", 0, 0, 0);
     event.m_previouslyshown = previouslyShown;
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -3577,8 +3478,6 @@ void TestEITFixups::testGreek2()
     QFETCH(int, e_episode);
     QFETCH(QDate,   e_airdate);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, subtitle, description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -3586,7 +3485,7 @@ void TestEITFixups::testGreek2()
                      EITFixUp::kFixGreekEIT, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_title,           e_title);
     QCOMPARE(event.m_subtitle,        e_subtitle);
@@ -3598,8 +3497,6 @@ void TestEITFixups::testGreek2()
 
 void TestEITFixups::testGreek3()
 {
-    EITFixUp fixup;
-
     DBEventEIT event(7302, "Title", "Subtitle", "Description ταινια",
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -3607,7 +3504,7 @@ void TestEITFixups::testGreek3()
                      EITFixUp::kFixGreekEIT, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_description,  QString("Description ταινια"));
     QCOMPARE(event.m_categoryType, ProgramInfo::kCategoryMovie);
@@ -3772,8 +3669,6 @@ void TestEITFixups::testGreekCategories()
     QFETCH(QString, description);
     QFETCH(QString, e_category);
 
-    EITFixUp fixup;
-
     DBEventEIT event(7302, title, "Subtitle", description,
                      "", ProgramInfo::kCategoryNone,
                      QDateTime::fromString("2020-02-28T23:55:00Z", Qt::ISODate),
@@ -3781,7 +3676,7 @@ void TestEITFixups::testGreekCategories()
                      EITFixUp::kFixGreekCategories, SUB_UNKNOWN, AUD_UNKNOWN, VID_UNKNOWN, 0.0F,
                      "", "", 0, 0, 0);
 
-    fixup.Fix(event);
+    EITFixUp::Fix(event);
     PRINT_EVENT(event);
     QCOMPARE(event.m_category, e_category);
 }
