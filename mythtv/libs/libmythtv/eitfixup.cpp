@@ -18,7 +18,7 @@
 static const QRegularExpression kStereo { R"(\b\(?[sS]tereo\)?\b)" };
 static const QRegularExpression kUKSpaceColonStart { R"(^[ |:]*)" };
 
-QMap<QChar,quint16> r2v = {
+static const QMap<QChar,quint16> r2v = {
     {'I' ,   1}, {'V' ,   5}, {'X' ,   10}, {'L' , 50},
     {'C' , 100}, {'D' , 500}, {'M' , 1000},
     {QChar(0x399), 1}, // Greek Ι
@@ -145,7 +145,7 @@ void EITFixUp::Fix(DBEventEIT &event)
     // Clean up text strings after all fixups have been applied.
     if (event.m_fixup)
     {
-        const QRegularExpression emptyParens { R"(\(\s*\))" };
+        static const QRegularExpression emptyParens { R"(\(\s*\))" };
         if (!event.m_title.isEmpty())
         {
             event.m_title.remove(QChar('\0')).remove(emptyParens);
@@ -302,7 +302,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     }
 
     // See if a year is present as (xxxx)
-    QRegularExpression bellYear { R"(\([0-9]{4}\))" };
+    static const QRegularExpression bellYear { R"(\([0-9]{4}\))" };
     position = event.m_description.indexOf(bellYear);
     if (position != -1 && !event.m_category.isEmpty())
     {
@@ -319,7 +319,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
         // Get the actors if they exist
         if (position > 3)
         {
-            QRegularExpression bellActors { R"(\set\s|,)" };
+            static const QRegularExpression bellActors { R"(\set\s|,)" };
             QString tmp = event.m_description.left(position-3);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             QStringList actors =
@@ -355,7 +355,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     }
 
     // Check for "title (All Day, HD)" in the title
-    QRegularExpression bellPPVTitleAllDayHD { R"(\s*\(All Day\, HD\)\s*$)" };
+    static const QRegularExpression bellPPVTitleAllDayHD { R"(\s*\(All Day\, HD\)\s*$)" };
     match = bellPPVTitleAllDayHD.match(event.m_title);
     if (match.hasMatch())
     {
@@ -364,13 +364,13 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
      }
 
     // Check for "title (All Day)" in the title
-    QRegularExpression bellPPVTitleAllDay { R"(\s*\(All Day.*\)\s*$)" };
+    static const QRegularExpression bellPPVTitleAllDay { R"(\s*\(All Day.*\)\s*$)" };
     match = bellPPVTitleAllDay.match(event.m_title);
     if (match.hasMatch())
         event.m_title.remove(match.capturedStart(), match.capturedLength());
 
     // Check for "HD - title" in the title
-    QRegularExpression bellPPVTitleHD { R"(^HD\s?-\s?)" };
+    static const QRegularExpression bellPPVTitleHD { R"(^HD\s?-\s?)" };
     match = bellPPVTitleHD.match(event.m_title);
     if (match.hasMatch())
     {
@@ -395,7 +395,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     }
 
     // Check for HD at the end of the title
-    QRegularExpression dishPPVTitleHD { R"(\sHD\s*$)" };
+    static const QRegularExpression dishPPVTitleHD { R"(\sHD\s*$)" };
     match = dishPPVTitleHD.match(event.m_title);
     if (match.hasMatch())
     {
@@ -421,13 +421,13 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     }
 
     // Remove any trailing colon in title
-    QRegularExpression dishPPVTitleColon { R"(\:\s*$)" };
+    static const QRegularExpression dishPPVTitleColon { R"(\:\s*$)" };
     match = dishPPVTitleColon.match(event.m_title);
     if (match.hasMatch())
         event.m_title.remove(match.capturedStart(), match.capturedLength());
 
     // Remove New at the end of the description
-    QRegularExpression dishDescriptionNew { R"(\s*New\.\s*)" };
+    static const QRegularExpression dishDescriptionNew { R"(\s*New\.\s*)" };
     match = dishDescriptionNew.match(event.m_description);
     if (match.hasMatch())
     {
@@ -436,7 +436,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     }
 
     // Remove Series Finale at the end of the desciption
-    QRegularExpression dishDescriptionFinale { R"(\s*(Series|Season)\sFinale\.\s*)" };
+    static const QRegularExpression dishDescriptionFinale { R"(\s*(Series|Season)\sFinale\.\s*)" };
     match = dishDescriptionFinale.match(event.m_description);
     if (match.hasMatch())
     {
@@ -445,7 +445,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     }
 
     // Remove Series Finale at the end of the desciption
-    QRegularExpression dishDescriptionFinale2 { R"(\s*Finale\.\s*)" };
+    static const QRegularExpression dishDescriptionFinale2 { R"(\s*Finale\.\s*)" };
     match = dishDescriptionFinale2.match(event.m_description);
     if (match.hasMatch())
     {
@@ -454,7 +454,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     }
 
     // Remove Series Premiere at the end of the description
-    QRegularExpression dishDescriptionPremiere { R"(\s*(Series|Season)\s(Premier|Premiere)\.\s*)" };
+    static const QRegularExpression dishDescriptionPremiere { R"(\s*(Series|Season)\s(Premier|Premiere)\.\s*)" };
     match = dishDescriptionPremiere.match(event.m_description);
     if (match.hasMatch())
     {
@@ -463,7 +463,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     }
 
     // Remove Series Premiere at the end of the description
-    QRegularExpression dishDescriptionPremiere2 { R"(\s*(Premier|Premiere)\.\s*)" };
+    static const QRegularExpression dishDescriptionPremiere2 { R"(\s*(Premier|Premiere)\.\s*)" };
     match = dishDescriptionPremiere2.match(event.m_description);
     if (match.hasMatch())
     {
@@ -472,38 +472,38 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     }
 
     // Remove Dish's PPV code at the end of the description
-    QRegularExpression ppvcode { R"(\s*\(([A-Z]|[0-9]){5}\)\s*$)",
+    static const QRegularExpression ppvcode { R"(\s*\(([A-Z]|[0-9]){5}\)\s*$)",
         QRegularExpression::CaseInsensitiveOption };
     match = ppvcode.match(event.m_description);
     if (match.hasMatch())
        event.m_description.remove(match.capturedStart(), match.capturedLength());
 
     // Remove trailing garbage
-    QRegularExpression dishPPVSpacePerenEnd { R"(\s\)\s*$)" };
+    static const QRegularExpression dishPPVSpacePerenEnd { R"(\s\)\s*$)" };
     match = dishPPVSpacePerenEnd.match(event.m_description);
     if (match.hasMatch())
        event.m_description.remove(match.capturedStart(), match.capturedLength());
 
     // Check for subtitle "All Day (... Eastern)" in the subtitle
-    QRegularExpression bellPPVSubtitleAllDay { R"(^All Day \(.*\sEastern\)\s*$)" };
+    static const QRegularExpression bellPPVSubtitleAllDay { R"(^All Day \(.*\sEastern\)\s*$)" };
     match = bellPPVSubtitleAllDay.match(event.m_subtitle);
     if (match.hasMatch())
        event.m_subtitle.remove(match.capturedStart(), match.capturedLength());
 
     // Check for description "(... Eastern)" in the description
-    QRegularExpression bellPPVDescriptionAllDay { R"(^\(.*\sEastern\))" };
+    static const QRegularExpression bellPPVDescriptionAllDay { R"(^\(.*\sEastern\))" };
     match = bellPPVDescriptionAllDay.match(event.m_description);
     if (match.hasMatch())
        event.m_description.remove(match.capturedStart(), match.capturedLength());
 
     // Check for description "(... ET)" in the description
-    QRegularExpression bellPPVDescriptionAllDay2 { R"(^\([0-9].*am-[0-9].*am\sET\))" };
+    static const QRegularExpression bellPPVDescriptionAllDay2 { R"(^\([0-9].*am-[0-9].*am\sET\))" };
     match = bellPPVDescriptionAllDay2.match(event.m_description);
     if (match.hasMatch())
        event.m_description.remove(match.capturedStart(), match.capturedLength());
 
     // Check for description "(nnnnn)" in the description
-    QRegularExpression bellPPVDescriptionEventId { R"(\([0-9]{5}\))" };
+    static const QRegularExpression bellPPVDescriptionEventId { R"(\([0-9]{5}\))" };
     match = bellPPVDescriptionEventId.match(event.m_description);
     if (match.hasMatch())
        event.m_description.remove(match.capturedStart(), match.capturedLength());
@@ -578,7 +578,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event)
              fColon = true;
          }
     }
-    QRegularExpression ukQuotedSubtitle { R"(^'([\w\s\-,]+?)\.' )" };
+    static const QRegularExpression ukQuotedSubtitle { R"(^'([\w\s\-,]+?)\.' )" };
     auto match = ukQuotedSubtitle.match(event.m_description);
     if (match.hasMatch())
     {
@@ -632,7 +632,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event)
              return;
         if ((uint)strListSpace.size() > kDotToTitle)
              return;
-        QRegularExpression ukExclusionFromSubtitle {
+        static const QRegularExpression ukExclusionFromSubtitle {
             "(starring|stars\\s|drama|seres|sitcom)",
             QRegularExpression::CaseInsensitiveOption };
         if (strListSpace.filter(ukExclusionFromSubtitle).empty())
@@ -652,49 +652,49 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event)
  */
 void EITFixUp::FixUK(DBEventEIT &event)
 {
-    QRegularExpression uk24ep { R"(^\d{1,2}:00[ap]m to \d{1,2}:00[ap]m: )" };
-    QRegularExpression ukTime { R"(\d{1,2}[\.:]\d{1,2}\s*(am|pm|))" };
+    static const QRegularExpression uk24ep { R"(^\d{1,2}:00[ap]m to \d{1,2}:00[ap]m: )" };
+    static const QRegularExpression ukTime { R"(\d{1,2}[\.:]\d{1,2}\s*(am|pm|))" };
     QString strFull;
 
     bool isMovie = event.m_category.startsWith("Movie",Qt::CaseInsensitive) ||
                    event.m_category.startsWith("Film",Qt::CaseInsensitive);
     // BBC three case (could add another record here ?)
-    QRegularExpression ukThen { R"(\s*?(Then|Followed by) 60 Seconds\.)",
+    static const QRegularExpression ukThen { R"(\s*?(Then|Followed by) 60 Seconds\.)",
         QRegularExpression::CaseInsensitiveOption };
-    QRegularExpression ukNew { R"((New\.|\s*?(Brand New|New)\s*?(Series|Episode)\s*?[:\.\-]))",
+    static const QRegularExpression ukNew { R"((New\.|\s*?(Brand New|New)\s*?(Series|Episode)\s*?[:\.\-]))",
         QRegularExpression::CaseInsensitiveOption };
-    QRegularExpression ukNewTitle { R"(^(Brand New|New:)\s*)",
+    static const QRegularExpression ukNewTitle { R"(^(Brand New|New:)\s*)",
         QRegularExpression::CaseInsensitiveOption };
     event.m_description = event.m_description.remove(ukThen);
     event.m_description = event.m_description.remove(ukNew);
     event.m_title = event.m_title.remove(ukNewTitle);
 
     // Removal of Class TV, CBBC and CBeebies etc..
-    QRegularExpression ukTitleRemove { "^(?:[tT]4:|Schools\\s*?:)" };
-    QRegularExpression ukDescriptionRemove { R"(^(?:CBBC\s*?\.|CBeebies\s*?\.|Class TV\s*?:|BBC Switch\.))" };
+    static const QRegularExpression ukTitleRemove { "^(?:[tT]4:|Schools\\s*?:)" };
+    static const QRegularExpression ukDescriptionRemove { R"(^(?:CBBC\s*?\.|CBeebies\s*?\.|Class TV\s*?:|BBC Switch\.))" };
     event.m_title = event.m_title.remove(ukTitleRemove);
     event.m_description = event.m_description.remove(ukDescriptionRemove);
 
     // Removal of BBC FOUR and BBC THREE
-    QRegularExpression ukBBC34 { R"(BBC (?:THREE|FOUR) on BBC (?:ONE|TWO)\.)",
+    static const QRegularExpression ukBBC34 { R"(BBC (?:THREE|FOUR) on BBC (?:ONE|TWO)\.)",
         QRegularExpression::CaseInsensitiveOption };
     event.m_description = event.m_description.remove(ukBBC34);
 
     // BBC 7 [Rpt of ...] case.
-    QRegularExpression ukBBC7rpt { R"(\[Rptd?[^]]+?\d{1,2}\.\d{1,2}[ap]m\]\.)" };
+    static const QRegularExpression ukBBC7rpt { R"(\[Rptd?[^]]+?\d{1,2}\.\d{1,2}[ap]m\]\.)" };
     event.m_description = event.m_description.remove(ukBBC7rpt);
 
     // "All New To 4Music!
-    QRegularExpression ukAllNew { R"(All New To 4Music!\s?)" };
+    static const QRegularExpression ukAllNew { R"(All New To 4Music!\s?)" };
     event.m_description = event.m_description.remove(ukAllNew);
 
     // Removal of 'Also in HD' text
-    QRegularExpression ukAlsoInHD { R"(\s*Also in HD\.)",
+    static const QRegularExpression ukAlsoInHD { R"(\s*Also in HD\.)",
         QRegularExpression::CaseInsensitiveOption };
     event.m_description = event.m_description.remove(ukAlsoInHD);
 
     // Remove [AD,S] etc.
-    QRegularExpression ukCC { R"(\[(?:(AD|SL|S|W|HD),?)+\])" };
+    static const QRegularExpression ukCC { R"(\[(?:(AD|SL|S|W|HD),?)+\])" };
     auto match = ukCC.match(event.m_description);
     while (match.hasMatch())
     {
@@ -721,39 +721,39 @@ void EITFixUp::FixUK(DBEventEIT &event)
 
     // Matches Season 2, S 2 and "Series 2," etc but not "hits 2"
     // cap1 = season
-    const QString seasonStr = R"(\b(?:Season|Series|S)\s*(\d+)\s*,?)";
+    static const QString seasonStr = R"(\b(?:Season|Series|S)\s*(\d+)\s*,?)";
 
     // Work out the season and episode numbers (if any)
     // Matching pattern "Season 2 Episode|Ep 3 of 14|3/14" etc
 
     // Matches Episode 3, Ep 3/4, Ep 3 of 4 etc but not "step 1"
     // cap1 = ep, cap2 = total
-    const QString longEp = R"(\b(?:Ep|Episode)\s*(\d+)\s*(?:(?:/|of)\s*(\d*))?)";
+    static const QString longEp = R"(\b(?:Ep|Episode)\s*(\d+)\s*(?:(?:/|of)\s*(\d*))?)";
 
     // Matches S2 Ep 3/4, "Season 2, Ep 3 of 4", Episode 3 etc
     // cap1 = season, cap2 = ep, cap3 = total
-    const QString longSeasEp = QString("\\(?(?:%1)?\\s*%2").arg(seasonStr, longEp);
+    static const QString longSeasEp = QString("\\(?(?:%1)?\\s*%2").arg(seasonStr, longEp);
 
     // Matches long seas/ep with surrounding parenthesis & trailing period
     // cap1 = season, cap2 = ep, cap3 = total
-    const QString longContext = QString(R"(\(*%1\s*\)?\s*\.?)").arg(longSeasEp);
+    static const QString longContext = QString(R"(\(*%1\s*\)?\s*\.?)").arg(longSeasEp);
 
     // Matches 3/4, 3 of 4
     // cap1 = ep, cap2 = total
-    const QString shortEp = R"((\d+)\s*(?:/|of)\s*(\d+))";
+    static const QString shortEp = R"((\d+)\s*(?:/|of)\s*(\d+))";
 
     // Matches short ep/total, ignoring Parts and idioms such as 9/11, 24/7 etc.
     // ie. x/y in parenthesis or has no leading or trailing text in the sentence.
     // cap0 may include previous/anchoring period
     // cap1 = shortEp with surrounding parenthesis & trailing period (to remove)
     // cap2 = ep, cap3 = total,
-    const QString shortContext =
+    static const QString shortContext =
             QString(R"((?:^|\.)(\s*\(*\s*%1[\s)]*(?:[).:]|$)))").arg(shortEp);
 
     // Prefer long format resorting to short format
     // cap0 = long match to remove, cap1 = long season, cap2 = long ep, cap3 = long total,
     // cap4 = short match to remove, cap5 = short ep, cap6 = short total
-    QRegularExpression ukSeries { "(?:" + longContext + "|" + shortContext + ")",
+    static const QRegularExpression ukSeries { "(?:" + longContext + "|" + shortContext + ")",
         QRegularExpression::CaseInsensitiveOption };
 
     bool series  = false;
@@ -829,7 +829,7 @@ void EITFixUp::FixUK(DBEventEIT &event)
 
     // Multi-part episodes, or films (e.g. ITV film split by news)
     // Matches Part 1, Pt 1/2, Part 1 of 2 etc.
-    QRegularExpression ukPart { R"([-(\:,.]\s*(?:Part|Pt)\s*(\d+)\s*(?:(?:of|/)\s*(\d+))?\s*[-):,.])",
+    static const QRegularExpression ukPart { R"([-(\:,.]\s*(?:Part|Pt)\s*(\d+)\s*(?:(?:of|/)\s*(\d+))?\s*[-):,.])",
         QRegularExpression::CaseInsensitiveOption };
     match = ukPart.match(event.m_title);
     auto match2 = ukPart.match(event.m_description);
@@ -864,7 +864,7 @@ void EITFixUp::FixUK(DBEventEIT &event)
         }
     }
 
-    QRegularExpression ukStarring { R"((?:Western\s)?[Ss]tarring ([\w\s\-']+?)[Aa]nd\s([\w\s\-']+?)[\.|,]\s*(\d{4})?(?:\.\s)?)" };
+    static const QRegularExpression ukStarring { R"((?:Western\s)?[Ss]tarring ([\w\s\-']+?)[Aa]nd\s([\w\s\-']+?)[\.|,]\s*(\d{4})?(?:\.\s)?)" };
     match = ukStarring.match(event.m_description);
     if (match.hasMatch())
     {
@@ -883,22 +883,22 @@ void EITFixUp::FixUK(DBEventEIT &event)
         }
     }
 
-    QRegularExpression ukLaONoSplit { "^Law & Order: (?:Criminal Intent|LA|"
+    static const QRegularExpression ukLaONoSplit { "^Law & Order: (?:Criminal Intent|LA|"
         "Special Victims Unit|Trial by Jury|UK|You the Jury)" };
     if (!event.m_title.startsWith("CSI:") && !event.m_title.startsWith("CD:") &&
         !event.m_title.contains(ukLaONoSplit) &&
         !event.m_title.startsWith("Mission: Impossible"))
     {
-        QRegularExpression ukDoubleDotStart { R"(^\.\.+)" };
-        QRegularExpression ukDoubleDotEnd   { R"(\.\.+$)" };
+        static const QRegularExpression ukDoubleDotStart { R"(^\.\.+)" };
+        static const QRegularExpression ukDoubleDotEnd   { R"(\.\.+$)" };
         if ((event.m_title.indexOf(ukDoubleDotEnd) != -1) &&
             (event.m_description.indexOf(ukDoubleDotStart) != -1))
         {
             QString strPart=event.m_title.remove(ukDoubleDotEnd)+" ";
             strFull = strPart + event.m_description.remove(ukDoubleDotStart);
             int position1 = -1;
-            QRegularExpression ukCEPQ { R"([:\!\.\?]\s)" };
-            QRegularExpression ukSpaceStart { "^ " };
+            static const QRegularExpression ukCEPQ { R"([:\!\.\?]\s)" };
+            static const QRegularExpression ukSpaceStart { "^ " };
             if (isMovie &&
                 ((position1 = strFull.indexOf(ukCEPQ,strPart.length())) != -1))
             {
@@ -934,14 +934,14 @@ void EITFixUp::FixUK(DBEventEIT &event)
         }
         else if (event.m_description.indexOf(ukTime) == -1)
         {
-            QRegularExpression ukYearColon { R"(^[\d]{4}:)" };
+            static const QRegularExpression ukYearColon { R"(^[\d]{4}:)" };
             if (!isMovie && (event.m_title.indexOf(ukYearColon) < 0))
             {
                 int position1 = -1;
                 if (((position1 = event.m_title.indexOf(":")) != -1) &&
                     (event.m_description.indexOf(":") < 0 ))
                 {
-                    QRegularExpression ukCompleteDots { R"(^\.\.+$)" };
+                    static const QRegularExpression ukCompleteDots { R"(^\.\.+$)" };
                     if (event.m_title.mid(position1+1).indexOf(ukCompleteDots)==0)
                     {
                         SetUKSubtitle(event);
@@ -967,7 +967,7 @@ void EITFixUp::FixUK(DBEventEIT &event)
         int position1 = -1;
         if ((position1=event.m_description.indexOf(ukTime)) != -1)
         {
-            QRegularExpression ukColonPeriod { R"([:\.])" };
+            static const QRegularExpression ukColonPeriod { R"([:\.])" };
             int position2 = event.m_description.indexOf(ukColonPeriod);
             if ((position2>=0) && (position2 < (position1-2)))
                 SetUKSubtitle(event);
@@ -986,7 +986,7 @@ void EITFixUp::FixUK(DBEventEIT &event)
     }
 
     // Work out the year (if any)
-    QRegularExpression ukYear { R"([\[\(]([\d]{4})[\)\]])" };
+    static const QRegularExpression ukYear { R"([\[\(]([\d]{4})[\)\]])" };
     match = ukYear.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1002,8 +1002,8 @@ void EITFixUp::FixUK(DBEventEIT &event)
     }
 
     // Trim leading/trailing '.'
-    QRegularExpression ukDotSpaceStart { R"(^\. )" };
-    QRegularExpression ukDotEnd { R"(\.$)" };
+    static const QRegularExpression ukDotSpaceStart { R"(^\. )" };
+    static const QRegularExpression ukDotEnd { R"(\.$)" };
     event.m_subtitle.remove(ukDotSpaceStart);
     if (event.m_subtitle.lastIndexOf("..") != (event.m_subtitle.length()-2))
         event.m_subtitle.remove(ukDotEnd);
@@ -1036,7 +1036,7 @@ void EITFixUp::FixPBS(DBEventEIT &event)
  */
 void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
 {
-    QRegularExpression comHemPersSeparator { R"((, |\soch\s))" };
+    static const QRegularExpression comHemPersSeparator { R"((, |\soch\s))" };
 
     // Reverse what EITFixUp::Fix() did
     if (event.m_subtitle.isEmpty() && !event.m_description.isEmpty())
@@ -1050,9 +1050,9 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
 
     bool isSeries = false;
     // Try to find episode numbers
-    QRegularExpression comHemSeries1
+    static const QRegularExpression comHemSeries1
         { R"(\s?(?:[dD]el|[eE]pisode)\s([0-9]+)(?:\s?(?:/|:|av)\s?([0-9]+))?\.)" };
-    QRegularExpression  comHemSeries2 { R"(\s?-?\s?([Dd]el\s+([0-9]+)))" };
+    static const QRegularExpression  comHemSeries2 { R"(\s?-?\s?([Dd]el\s+([0-9]+)))" };
     auto match = comHemSeries1.match(event.m_description);
     auto match2 = comHemSeries2.match(event.m_title);
     if (match2.hasMatch())
@@ -1085,7 +1085,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
     }
 
     // Move subtitle info from title to subtitle
-    QRegularExpression comHemTSub { R"(\s+-\s+([^\-]+))" };
+    static const QRegularExpression comHemTSub { R"(\s+-\s+([^\-]+))" };
     match = comHemTSub.match(event.m_title);
     if (match.hasMatch())
     {
@@ -1099,7 +1099,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
 
     // Try to find country category, year and possibly other information
     // from the begining of the description
-    QRegularExpression comHemCountry
+    static const QRegularExpression comHemCountry
         { R"(^(\(.+\))?\s?([^ ]+)\s([^\.0-9]+)\sfrån\s([0-9]{4})(?:\smed\s([^\.]+))?\.?)" };
     match = comHemCountry.match(event.m_description);
     if (match.hasMatch())
@@ -1169,7 +1169,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
         event.m_categoryType = ProgramInfo::kCategorySeries;
 
     // Look for additional persons in the description
-    QRegularExpression comHemPersons
+    static const QRegularExpression comHemPersons
         { R"(\s?([Rr]egi|[Ss]kådespelare|[Pp]rogramledare|[Ii] rollerna):\s([^\.]+)\.)" };
     auto iter  = comHemPersons.globalMatch(event.m_description);
     while (iter.hasNext())
@@ -1177,9 +1177,9 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
         auto pmatch = iter.next();
         DBPerson::Role role = DBPerson::kUnknown;
 
-        QRegularExpression comHemDirector { "[Rr]egi" };
-        QRegularExpression comHemActor    { "[Ss]kådespelare|[Ii] rollerna" };
-        QRegularExpression comHemHost     { "[Pp]rogramledare" };
+        static const QRegularExpression comHemDirector { "[Rr]egi" };
+        static const QRegularExpression comHemActor    { "[Ss]kådespelare|[Ii] rollerna" };
+        static const QRegularExpression comHemHost     { "[Pp]rogramledare" };
         auto dmatch = comHemDirector.match(pmatch.capturedRef(1));
         auto amatch = comHemActor.match(pmatch.capturedRef(1));
         auto hmatch = comHemHost.match(pmatch.capturedRef(1));
@@ -1215,7 +1215,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
     // shorter than 55 characters or we risk picking up the wrong thing.
     if (process_subtitle)
     {
-        QRegularExpression comHemSub { R"([.\?\!] )" };
+        static const QRegularExpression comHemSub { R"([.\?\!] )" };
         int pos2 = event.m_description.indexOf(comHemSub);
         bool pvalid = pos2 != -1 && pos2 <= 55;
         if (pvalid && (event.m_description.length() - (pos2 + 2)) > 0)
@@ -1227,13 +1227,13 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
     }
 
     // Teletext subtitles?
-    QRegularExpression comHemTT { "[Tt]ext-[Tt][Vv]" };
+    static const QRegularExpression comHemTT { "[Tt]ext-[Tt][Vv]" };
     if (event.m_description.indexOf(comHemTT) != -1)
         event.m_subtitleType |= SUB_NORMAL;
 
     // Try to findout if this is a rerun and if so the date.
-    QRegularExpression comHemRerun1 { R"([Rr]epris\sfrån\s([^\.]+)(?:\.|$))" };
-    QRegularExpression comHemRerun2 { R"(([0-9]+)/([0-9]+)(?:\s-\s([0-9]{4}))?)" };
+    static const QRegularExpression comHemRerun1 { R"([Rr]epris\sfrån\s([^\.]+)(?:\.|$))" };
+    static const QRegularExpression comHemRerun2 { R"(([0-9]+)/([0-9]+)(?:\s-\s([0-9]{4}))?)" };
     match = comHemRerun1.match(event.m_description);
     if (!match.hasMatch())
         return;
@@ -1323,7 +1323,7 @@ void EITFixUp::FixAUDescription(DBEventEIT &event)
  */
 void EITFixUp::FixAUNine(DBEventEIT &event)
 {
-    QRegularExpression rating { "\\((G|PG|M|MA)\\)" };
+    static const QRegularExpression rating { "\\((G|PG|M|MA)\\)" };
     auto match = rating.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1361,7 +1361,7 @@ void EITFixUp::FixAUSeven(DBEventEIT &event)
         event.m_previouslyshown = true;
         event.m_description.resize(event.m_description.size()-4);
     }
-    QRegularExpression year { "(\\d{4})$" };
+    static const QRegularExpression year { "(\\d{4})$" };
     auto match = year.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1374,14 +1374,14 @@ void EITFixUp::FixAUSeven(DBEventEIT &event)
       event.m_description.resize(event.m_description.size()-3);
     }
     QString advisories;//store the advisories to append later
-    QRegularExpression adv { "(\\([A-Z,]+\\))$" };
+    static const QRegularExpression adv { "(\\([A-Z,]+\\))$" };
     match = adv.match(event.m_description);
     if (match.hasMatch())
     {
         advisories = match.captured(1);
         event.m_description.remove(match.capturedStart()-1, match.capturedLength()+1);
     }
-    QRegularExpression rating { "(C|G|PG|M|MA)$" };
+    static const QRegularExpression rating { "(C|G|PG|M|MA)$" };
     match = rating.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1404,7 +1404,7 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event)
         return;
     event.m_description = event.m_description.trimmed();
 
-    QRegularExpression auFreeviewSY { R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\)$)" };
+    static const QRegularExpression auFreeviewSY { R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\)$)" };
     auto match = auFreeviewSY.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1414,7 +1414,7 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event)
         event.m_description = match.captured(1);
         return;
     }
-    QRegularExpression auFreeviewY { "(.*) \\(([12][0-9][0-9][0-9])\\)$" };
+    static const QRegularExpression auFreeviewY { "(.*) \\(([12][0-9][0-9][0-9])\\)$" };
     match = auFreeviewY.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1422,7 +1422,7 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event)
         event.m_description = match.captured(1);
         return;
     }
-    QRegularExpression auFreeviewSYC { R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\) \((.+)\)$)" };
+    static const QRegularExpression auFreeviewSYC { R"((.*) \((.+)\) \(([12][0-9][0-9][0-9])\) \((.+)\)$)" };
     match = auFreeviewSYC.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1435,7 +1435,7 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event)
         event.m_description = match.captured(1);
         return;
     }
-    QRegularExpression auFreeviewYC { R"((.*) \(([12][0-9][0-9][0-9])\) \((.+)\)$)" };
+    static const QRegularExpression auFreeviewYC { R"((.*) \(([12][0-9][0-9][0-9])\) \((.+)\)$)" };
     match = auFreeviewYC.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1463,13 +1463,13 @@ void EITFixUp::FixMCA(DBEventEIT &event)
         return;
 
     // Replace incomplete title if the full one is in the description
-    QRegularExpression mcaIncompleteTitle { R"((.*).\.\.\.$)" };
+    static const QRegularExpression mcaIncompleteTitle { R"((.*).\.\.\.$)" };
     auto match = mcaIncompleteTitle.match(event.m_title);
     if (match.hasMatch())
     {
-        QString mcaCompleteTitlea { "^'?(" };
-        QString mcaCompleteTitleb { R"([^\.\?]+[^\'])'?[\.\?]\s+(.+))" };
-        QRegularExpression mcaCompleteTitle
+        static const QString mcaCompleteTitlea { "^'?(" };
+        static const QString mcaCompleteTitleb { R"([^\.\?]+[^\'])'?[\.\?]\s+(.+))" };
+        static const QRegularExpression mcaCompleteTitle
             { mcaCompleteTitlea + match.capturedRef(1) + mcaCompleteTitleb,
               QRegularExpression::CaseInsensitiveOption};
         match = mcaCompleteTitle.match(event.m_description);
@@ -1481,7 +1481,7 @@ void EITFixUp::FixMCA(DBEventEIT &event)
     }
 
     // Try to find subtitle in description
-    QRegularExpression mcaSubtitle { R"(^'([^\.]+)'\.\s+(.+))" };
+    static const QRegularExpression mcaSubtitle { R"(^'([^\.]+)'\.\s+(.+))" };
     match = mcaSubtitle.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1497,7 +1497,7 @@ void EITFixUp::FixMCA(DBEventEIT &event)
     }
 
     // Try to find episode numbers in subtitle
-    QRegularExpression mcaSeries { R"(^S?(\d+)\/E?(\d+)\s-\s(.*)$)" };
+    static const QRegularExpression mcaSeries { R"(^S?(\d+)\/E?(\d+)\s-\s(.*)$)" };
     match = mcaSeries.match(event.m_subtitle);
     if (match.hasMatch())
     {
@@ -1512,7 +1512,7 @@ void EITFixUp::FixMCA(DBEventEIT &event)
     }
 
     // Closed captioned?
-    QRegularExpression mcaCC { R"(,?\s(HI|English) Subtitles\.?)" };
+    static const QRegularExpression mcaCC { R"(,?\s(HI|English) Subtitles\.?)" };
     int position = event.m_description.indexOf(mcaCC);
     if (position > 0)
     {
@@ -1521,7 +1521,7 @@ void EITFixUp::FixMCA(DBEventEIT &event)
     }
 
     // Dolby Digital 5.1?
-    QRegularExpression mcaDD { R"(,?\sDD\.?)" };
+    static const QRegularExpression mcaDD { R"(,?\sDD\.?)" };
     position = event.m_description.indexOf(mcaDD);
     if ((position > 0) && (position > event.m_description.length() - 7))
     {
@@ -1530,12 +1530,12 @@ void EITFixUp::FixMCA(DBEventEIT &event)
     }
 
     // Remove bouquet tags
-    QRegularExpression mcaAvail { R"(\s(Only available on [^\.]*bouquet|Not available in RSA [^\.]*)\.?)" };
+    static const QRegularExpression mcaAvail { R"(\s(Only available on [^\.]*bouquet|Not available in RSA [^\.]*)\.?)" };
     event.m_description.remove(mcaAvail);
 
     // Try to find year and director from the end of the description
     bool isMovie = false;
-    QRegularExpression mcaCredits { R"((.*)\s\((\d{4})\)\s*([^\.]+)\.?\s*$)" };
+    static const QRegularExpression mcaCredits { R"((.*)\s\((\d{4})\)\s*([^\.]+)\.?\s*$)" };
     match = mcaCredits.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1550,7 +1550,7 @@ void EITFixUp::FixMCA(DBEventEIT &event)
     else
     {
         // Try to find year only from the end of the description
-        QRegularExpression mcaYear { R"((.*)\s\((\d{4})\)\s*$)" };
+        static const QRegularExpression mcaYear { R"((.*)\s\((\d{4})\)\s*$)" };
         match = mcaYear.match(event.m_description);
         if (match.hasMatch())
         {
@@ -1565,11 +1565,11 @@ void EITFixUp::FixMCA(DBEventEIT &event)
 
     if (isMovie)
     {
-        QRegularExpression mcaActors { R"((.*\.)\s+([^\.]+\s[A-Z][^\.]+)\.\s*)" };
+        static const QRegularExpression mcaActors { R"((.*\.)\s+([^\.]+\s[A-Z][^\.]+)\.\s*)" };
         match = mcaActors.match(event.m_description);
         if (match.hasMatch())
         {
-            QRegularExpression mcaActorsSeparator { "(,\\s+)" };
+            static const QRegularExpression mcaActorsSeparator { "(,\\s+)" };
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             const QStringList actors = match.captured(2).split(
                 mcaActorsSeparator, QString::SkipEmptyParts);
@@ -1591,7 +1591,7 @@ void EITFixUp::FixMCA(DBEventEIT &event)
 void EITFixUp::FixRTL(DBEventEIT &event)
 {
     // subtitle with episode number: "Folge *: 'subtitle'
-    QRegularExpression superRTLSubtitle { R"(^Folge\s(\d{1,3}):\s'(.*)')" };
+    static const QRegularExpression superRTLSubtitle { R"(^Folge\s(\d{1,3}):\s'(.*)')" };
     auto match = superRTLSubtitle.match(event.m_subtitle);
     if (match.hasMatch())
     {
@@ -1605,7 +1605,7 @@ void EITFixUp::FixRTL(DBEventEIT &event)
         return;
 
     // Repeat
-    QRegularExpression rtlRepeat
+    static const QRegularExpression rtlRepeat
         { R"([\s\(]?Wiederholung.+vo[m|n].+(\d{2}\.\d{2}\.\d{4}|\d{2}[:\.]\d{2}\sUhr)\)?)" };
     match = rtlRepeat.match(event.m_description);
     if (match.hasMatch())
@@ -1617,13 +1617,13 @@ void EITFixUp::FixRTL(DBEventEIT &event)
     }
 
     // should be (?:\x{8a}|\\.\\s*|$) but 0x8A gets replaced with 0x20
-    QRegularExpression rtlSubtitle1  { R"(^Folge\s(\d{1,4})\s*:\s+'(.*)'(?:\s|\.\s*|$))" };
-    QRegularExpression rtlSubtitle2  { R"(^Folge\s(\d{1,4})\s+(.{0,5}[^\?!\.]{0,120})[\?!\.]\s*)" };
-    QRegularExpression rtlSubtitle3  { R"(^(?:Folge\s)?(\d{1,4}(?:\/[IVX]+)?)\s+(.{0,5}[^\?!\.]{0,120})[\?!\.]\s*)" };
-    QRegularExpression rtlSubtitle4  { R"(^Thema.{0,5}:\s([^\.]+)\.\s*)" };
-    QRegularExpression rtlSubtitle5  { "^'(.+)'\\.\\s*" };
-    QRegularExpression rtlEpisodeNo1 { R"(^(Folge\s\d{1,4})\.*\s*)" };
-    QRegularExpression rtlEpisodeNo2 { R"(^(\d{1,2}\/[IVX]+)\.*\s*)" };
+    static const QRegularExpression rtlSubtitle1  { R"(^Folge\s(\d{1,4})\s*:\s+'(.*)'(?:\s|\.\s*|$))" };
+    static const QRegularExpression rtlSubtitle2  { R"(^Folge\s(\d{1,4})\s+(.{0,5}[^\?!\.]{0,120})[\?!\.]\s*)" };
+    static const QRegularExpression rtlSubtitle3  { R"(^(?:Folge\s)?(\d{1,4}(?:\/[IVX]+)?)\s+(.{0,5}[^\?!\.]{0,120})[\?!\.]\s*)" };
+    static const QRegularExpression rtlSubtitle4  { R"(^Thema.{0,5}:\s([^\.]+)\.\s*)" };
+    static const QRegularExpression rtlSubtitle5  { "^'(.+)'\\.\\s*" };
+    static const QRegularExpression rtlEpisodeNo1 { R"(^(Folge\s\d{1,4})\.*\s*)" };
+    static const QRegularExpression rtlEpisodeNo2 { R"(^(\d{1,2}\/[IVX]+)\.*\s*)" };
 
     auto match1 = rtlSubtitle1.match(event.m_description);
     auto match2 = rtlSubtitle2.match(event.m_description);
@@ -1698,7 +1698,7 @@ void EITFixUp::FixRTL(DBEventEIT &event)
         const uint SUBTITLE_PCT = 35; // % of description to allow subtitle up to
         const uint lSUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
 
-        QRegularExpression rtlSubtitle { R"(^([^\.]{3,})\.\s+(.+))" };
+        static const QRegularExpression rtlSubtitle { R"(^([^\.]{3,})\.\s+(.+))" };
         match = rtlSubtitle.match(event.m_description);
         if (match.hasMatch())
         {
@@ -1727,7 +1727,7 @@ static const QMap<QString,DBPerson::Role> deCrewTitle {
  */
 void EITFixUp::FixPRO7(DBEventEIT &event)
 {
-    QRegularExpression pro7Subtitle { R"(,{0,1}([^,]*?),([^,]+?)\s{0,1}(\d{4})$)" };
+    static const QRegularExpression pro7Subtitle { R"(,{0,1}([^,]*?),([^,]+?)\s{0,1}(\d{4})$)" };
     auto match = pro7Subtitle.match(event.m_subtitle);
     if (match.hasMatch())
     {
@@ -1740,7 +1740,7 @@ void EITFixUp::FixPRO7(DBEventEIT &event)
     }
 
     /* handle cast, the very last in description */
-    QRegularExpression pro7Cast { "\n\nDarsteller:\n(.*)$",
+    static const QRegularExpression pro7Cast { "\n\nDarsteller:\n(.*)$",
         QRegularExpression::DotMatchesEverythingOption };
     match = pro7Cast.match(event.m_description);
     if (match.hasMatch())
@@ -1748,7 +1748,7 @@ void EITFixUp::FixPRO7(DBEventEIT &event)
         QStringList cast = match.captured(1).split("\n");
         for (const auto& line : qAsConst(cast))
         {
-            QRegularExpression pro7CastOne { R"(^([^\(]*?)\((.*)\)$)" };
+            static const QRegularExpression pro7CastOne { R"(^([^\(]*?)\((.*)\)$)" };
             auto match2 = pro7CastOne.match(line);
             if (match2.hasMatch())
             {
@@ -1762,7 +1762,7 @@ void EITFixUp::FixPRO7(DBEventEIT &event)
     /* handle crew, the new very last in description
      * format: "Role: Name" or "Role: Name1, Name2"
      */
-    QRegularExpression pro7Crew { "\n\n(Regie:.*)$",
+    static const QRegularExpression pro7Crew { "\n\n(Regie:.*)$",
         QRegularExpression::DotMatchesEverythingOption };
     match = pro7Crew.match(event.m_description);
     if (match.hasMatch())
@@ -1770,7 +1770,7 @@ void EITFixUp::FixPRO7(DBEventEIT &event)
         QStringList crew = match.captured(1).split("\n");
         for (const auto& line : qAsConst(crew))
         {
-            QRegularExpression pro7CrewOne { R"(^(.*?):\s+(.*)$)" };
+            static const QRegularExpression pro7CrewOne { R"(^(.*?):\s+(.*)$)" };
             auto match2 = pro7CrewOne.match(line);
             if (match2.hasMatch())
             {
@@ -1798,7 +1798,7 @@ void EITFixUp::FixPRO7(DBEventEIT &event)
 */
 void EITFixUp::FixDisneyChannel(DBEventEIT &event)
 {
-    QRegularExpression deDisneyChannelSubtitle { R"(,([^,]+?)\s{0,1}(\d{4})$)" };
+    static const QRegularExpression deDisneyChannelSubtitle { R"(,([^,]+?)\s{0,1}(\d{4})$)" };
     auto match = deDisneyChannelSubtitle.match(event.m_subtitle);
     if (match.hasMatch())
     {
@@ -1809,7 +1809,7 @@ void EITFixUp::FixDisneyChannel(DBEventEIT &event)
 	event.m_subtitle.remove(match.capturedStart(0),
                                 match.capturedLength(0));
     }
-    QRegularExpression tmp { R"(\s[^\s]+?-(Serie))" };
+    static const QRegularExpression tmp { R"(\s[^\s]+?-(Serie))" };
     match = tmp.match(event.m_subtitle);
     if (match.hasMatch())
     {
@@ -1825,7 +1825,7 @@ void EITFixUp::FixDisneyChannel(DBEventEIT &event)
 **/
 void EITFixUp::FixATV(DBEventEIT &event)
 {
-    QRegularExpression atvSubtitle { R"(,{0,1}\sFolge\s(\d{1,3})$)" };
+    static const QRegularExpression atvSubtitle { R"(,{0,1}\sFolge\s(\d{1,3})$)" };
     event.m_subtitle.replace(atvSubtitle, "");
 }
 
@@ -1835,7 +1835,7 @@ void EITFixUp::FixATV(DBEventEIT &event)
  */
 void EITFixUp::FixFI(DBEventEIT &event)
 {
-    QRegularExpression fiRerun { R"(\s?Uusinta[a-zA-Z\s]*\.?)" };
+    static const QRegularExpression fiRerun { R"(\s?Uusinta[a-zA-Z\s]*\.?)" };
     auto match = fiRerun.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1843,7 +1843,7 @@ void EITFixUp::FixFI(DBEventEIT &event)
         event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
-    QRegularExpression fiRerun2 { R"(\([Uu]\))" };
+    static const QRegularExpression fiRerun2 { R"(\([Uu]\))" };
     match = fiRerun2.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1860,7 +1860,7 @@ void EITFixUp::FixFI(DBEventEIT &event)
     }
 
     // Remove age limit in parenthesis at end of title
-    QRegularExpression fiAgeLimit { R"(\((\d{1,2}|[ST])\)$)" };
+    static const QRegularExpression fiAgeLimit { R"(\((\d{1,2}|[ST])\)$)" };
     match = fiAgeLimit.match(event.m_title);
     if (match.hasMatch())
     {
@@ -1871,7 +1871,7 @@ void EITFixUp::FixFI(DBEventEIT &event)
     }
 
     // Remove Film or Elokuva at start of title
-    QRegularExpression fiFilm { "^(Film|Elokuva): " };
+    static const QRegularExpression fiFilm { "^(Film|Elokuva): " };
     match = fiFilm.match(event.m_title);
     if (match.hasMatch())
     {
@@ -1889,10 +1889,10 @@ void EITFixUp::FixPremiere(DBEventEIT &event)
 {
     QString country = "";
 
-    QRegularExpression dePremiereLength  { R"(\s?[0-9]+\sMin\.)" };
+    static const QRegularExpression dePremiereLength  { R"(\s?[0-9]+\sMin\.)" };
     event.m_description = event.m_description.replace(dePremiereLength, "");
 
-    QRegularExpression dePremiereAirdate { R"(\s?([^\s^\.]+)\s((?:1|2)[0-9]{3})\.)" };
+    static const QRegularExpression dePremiereAirdate { R"(\s?([^\s^\.]+)\s((?:1|2)[0-9]{3})\.)" };
     auto match = dePremiereAirdate.match(event.m_description);
     if ( match.hasMatch())
     {
@@ -1905,7 +1905,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event)
                                    match.capturedLength(0));
     }
 
-    QRegularExpression dePremiereCredits { R"(\sVon\s([^,]+)(?:,|\su\.\sa\.)\smit\s([^\.]*)\.)" };
+    static const QRegularExpression dePremiereCredits { R"(\sVon\s([^,]+)(?:,|\su\.\sa\.)\smit\s([^\.]*)\.)" };
     match = dePremiereCredits.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1927,7 +1927,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event)
     event.m_description = event.m_description.replace("\u000A", " ");
 
     // move the original titel from the title to subtitle
-    QRegularExpression dePremiereOTitle  { R"(\s*\(([^\)]*)\)$)" };
+    static const QRegularExpression dePremiereOTitle  { R"(\s*\(([^\)]*)\)$)" };
     match = dePremiereOTitle.match(event.m_title);
     if (match.hasMatch())
     {
@@ -1937,7 +1937,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event)
     }
 
     // Find infos about season and episode number
-    QRegularExpression deSkyDescriptionSeasonEpisode { R"(^(\d{1,2}).\sStaffel,\sFolge\s(\d{1,2}):\s)" };
+    static const QRegularExpression deSkyDescriptionSeasonEpisode { R"(^(\d{1,2}).\sStaffel,\sFolge\s(\d{1,2}):\s)" };
     match = deSkyDescriptionSeasonEpisode.match(event.m_description);
     if (match.hasMatch())
     {
@@ -1955,7 +1955,7 @@ struct NLMapResult {
     QString name;
     ProgramInfo::CategoryType type {ProgramInfo::kCategoryNone};
 };
-QMap<QString, NLMapResult> categoryTrans = {
+static const QMap<QString, NLMapResult> categoryTrans = {
     { "Documentary",                { "Documentaire",         ProgramInfo::kCategoryNone   } },
     { "News",                       { "Nieuws/actualiteiten", ProgramInfo::kCategoryNone   } },
     { "Kids",                       { "Jeugd",                ProgramInfo::kCategoryNone   } },
@@ -2006,7 +2006,7 @@ void EITFixUp::FixNL(DBEventEIT &event)
     }
 
     //Get widescreen info
-    QRegularExpression nlWide { "breedbeeld" };
+    static const QRegularExpression nlWide { "breedbeeld" };
     match = nlWide.match(fullinfo);
     if (match.hasMatch())
     {
@@ -2015,13 +2015,13 @@ void EITFixUp::FixNL(DBEventEIT &event)
     }
 
     // Get repeat info
-    QRegularExpression nlRepeat { "herh." };
+    static const QRegularExpression nlRepeat { "herh." };
     match = nlRepeat.match(fullinfo);
     if (match.hasMatch())
         fullinfo = fullinfo.replace("herh.", ".");
 
     // Get teletext subtitle info
-    QRegularExpression nlTxt { "txt" };
+    static const QRegularExpression nlTxt { "txt" };
     match = nlTxt.match(fullinfo);
     if (match.hasMatch())
     {
@@ -2030,7 +2030,7 @@ void EITFixUp::FixNL(DBEventEIT &event)
     }
 
     // Get HDTV information
-    QRegularExpression nlHD { R"(\sHD$)" };
+    static const QRegularExpression nlHD { R"(\sHD$)" };
     match = nlHD.match(event.m_title);
     if (match.hasMatch())
     {
@@ -2039,7 +2039,7 @@ void EITFixUp::FixNL(DBEventEIT &event)
     }
 
     // Try to make subtitle from Afl.:
-    QRegularExpression nlSub { R"(\sAfl\.:\s([^\.]+)\.)" };
+    static const QRegularExpression nlSub { R"(\sAfl\.:\s([^\.]+)\.)" };
     match = nlSub.match(fullinfo);
     if (match.hasMatch())
     {
@@ -2050,7 +2050,7 @@ void EITFixUp::FixNL(DBEventEIT &event)
     }
 
     // Try to make subtitle from " "
-    QRegularExpression nlSub2 { R"(\s\"([^\"]+)\")" };
+    static const QRegularExpression nlSub2 { R"(\s\"([^\"]+)\")" };
     match = nlSub2.match(fullinfo);
     if (match.hasMatch())
     {
@@ -2074,8 +2074,8 @@ void EITFixUp::FixNL(DBEventEIT &event)
 
 
     // Get the actors
-    QRegularExpression nlActors { R"(\sMet:\s.+e\.a\.)" };
-    QRegularExpression nlPersSeparator { R"((, |\sen\s))" };
+    static const QRegularExpression nlActors { R"(\sMet:\s.+e\.a\.)" };
+    static const QRegularExpression nlPersSeparator { R"((, |\sen\s))" };
     match = nlActors.match(fullinfo);
     if (match.hasMatch())
     {
@@ -2095,7 +2095,7 @@ void EITFixUp::FixNL(DBEventEIT &event)
     }
 
     // Try to find presenter
-    QRegularExpression nlPres { R"(\sPresentatie:\s([^\.]+)\.)" };
+    static const QRegularExpression nlPres { R"(\sPresentatie:\s([^\.]+)\.)" };
     match = nlPres.match(fullinfo);
     if (match.hasMatch())
     {
@@ -2115,8 +2115,8 @@ void EITFixUp::FixNL(DBEventEIT &event)
     }
 
     // Try to find year
-    QRegularExpression nlYear1 { R"(\suit\s([1-2][0-9]{3}))" };
-    QRegularExpression nlYear2 { R"((\s\([A-Z]{0,3}/?)([1-2][0-9]{3})\))",
+    static const QRegularExpression nlYear1 { R"(\suit\s([1-2][0-9]{3}))" };
+    static const QRegularExpression nlYear2 { R"((\s\([A-Z]{0,3}/?)([1-2][0-9]{3})\))",
         QRegularExpression::CaseInsensitiveOption };
     match = nlYear1.match(fullinfo);
     if (match.hasMatch())
@@ -2137,21 +2137,21 @@ void EITFixUp::FixNL(DBEventEIT &event)
     }
 
     // Try to find director
-    QRegularExpression nlDirector { R"(\svan\s(([A-Z][a-z]+\s)|([A-Z]\.\s)))" };
+    static const QRegularExpression nlDirector { R"(\svan\s(([A-Z][a-z]+\s)|([A-Z]\.\s)))" };
     match = nlDirector.match(fullinfo);
     if (match.hasMatch())
         event.AddPerson(DBPerson::kDirector, match.captured(1));
 
     // Strip leftovers
-    QRegularExpression nlRub { R"(\s?\(\W+\)\s?)" };
+    static const QRegularExpression nlRub { R"(\s?\(\W+\)\s?)" };
     fullinfo.remove(nlRub);
 
     // Strip category info from description
-    QRegularExpression nlCat { "^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s" };
+    static const QRegularExpression nlCat { "^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s" };
     fullinfo.remove(nlCat);
 
     // Remove omroep from title
-    QRegularExpression nlOmroep { R"(\s\(([A-Z]+/?)+\)$)" };
+    static const QRegularExpression nlOmroep { R"(\s\(([A-Z]+/?)+\)$)" };
     event.m_title.remove(nlOmroep);
 
     // Put information back in description
@@ -2176,7 +2176,7 @@ void EITFixUp::FixCategory(DBEventEIT &event)
 void EITFixUp::FixNO(DBEventEIT &event)
 {
     // Check for "title (R)" in the title
-    QRegularExpression noRerun { "\\(R\\)" };
+    static const QRegularExpression noRerun { "\\(R\\)" };
     auto match = noRerun.match(event.m_title);
     if (match.hasMatch())
     {
@@ -2184,7 +2184,7 @@ void EITFixUp::FixNO(DBEventEIT &event)
       event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
     // Check for "subtitle (HD)" in the subtitle
-    QRegularExpression noHD { R"([\(\[]HD[\)\]])" };
+    static const QRegularExpression noHD { R"([\(\[]HD[\)\]])" };
     match = noHD.match(event.m_subtitle);
     if (match.hasMatch())
     {
@@ -2206,7 +2206,7 @@ void EITFixUp::FixNO(DBEventEIT &event)
 void EITFixUp::FixNRK_DVBT(DBEventEIT &event)
 {
     // Check for "title (R)" in the title
-    QRegularExpression noRerun { "\\(R\\)" };
+    static const QRegularExpression noRerun { "\\(R\\)" };
     auto match = noRerun.match(event.m_title);
     if (match.hasMatch())
     {
@@ -2222,7 +2222,7 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event)
 
     // Move colon separated category from program-titles into description
     // Have seen "NRK2s historiekveld: Film: bla-bla"
-    QRegularExpression noNRKCategories
+    static const QRegularExpression noNRKCategories
         { "^(Superstrek[ea]r|Supersomm[ea]r|Superjul|Barne-tv|Fantorangen|Kuraffen|Supermorg[eo]n|Julemorg[eo]n|Sommermorg[eo]n|"
           "Kuraffen-TV|Sport i dag|NRKs sportsl.rdag|NRKs sportss.ndag|Dagens dokumentar|"
           "NRK2s historiekveld|Detektimen|Nattkino|Filmklassiker|Film|Kortfilm|P.skemorg[eo]n|"
@@ -2235,7 +2235,7 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event)
     }
 
     // Remove season premiere markings
-    QRegularExpression noPremiere { "\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$" };
+    static const QRegularExpression noPremiere { "\\s+-\\s+(Sesongpremiere|Premiere|premiere)!?$" };
     match = noPremiere.match(event.m_title);
     if (match.hasMatch() && (match.capturedStart() >= 3))
         event.m_title.remove(match.capturedStart(), match.capturedLength());
@@ -2245,7 +2245,7 @@ void EITFixUp::FixNRK_DVBT(DBEventEIT &event)
         !event.m_title.startsWith("CD:") &&
         !event.m_title.startsWith("Distriktsnyheter: fra"))
     {
-        QRegularExpression noColonSubtitle { "^([^:]+): (.+)" };
+        static const QRegularExpression noColonSubtitle { "^([^:]+): (.+)" };
         match = noColonSubtitle.match(event.m_title);
         if (match.hasMatch())
         {
@@ -2274,7 +2274,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
 
     // Title search
     // episode and part/part total
-    QRegularExpression dkEpisode { R"(\(([0-9]+)\))" };
+    static const QRegularExpression dkEpisode { R"(\(([0-9]+)\))" };
     auto match = dkEpisode.match(event.m_title);
     if (match.hasMatch())
     {
@@ -2283,7 +2283,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
         event.m_title.remove(match.capturedStart(), match.capturedLength());
     }
 
-    QRegularExpression dkPart { R"(\(([0-9]+):([0-9]+)\))" };
+    static const QRegularExpression dkPart { R"(\(([0-9]+):([0-9]+)\))" };
     match = dkPart.match(event.m_title);
     if (match.hasMatch())
     {
@@ -2294,7 +2294,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
     }
 
     // subtitle delimiters
-    QRegularExpression dkSubtitle1 { "^([^:]+): (.+)" };
+    static const QRegularExpression dkSubtitle1 { "^([^:]+): (.+)" };
     match = dkSubtitle1.match(event.m_title);
     if (match.hasMatch())
     {
@@ -2303,7 +2303,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
     }
     else
     {
-        QRegularExpression dkSubtitle2 { "^([^:]+) - (.+)" };
+        static const QRegularExpression dkSubtitle2 { "^([^:]+) - (.+)" };
         match = dkSubtitle2.match(event.m_title);
         if (match.hasMatch())
         {
@@ -2315,7 +2315,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
     // Description search
     // Season (Sæson [:digit:]+.) => episode = season episode number
     // or year (- år [:digit:]+(\\)|:) ) => episode = total episode number
-    QRegularExpression dkSeason1 { "Sæson ([0-9]+)\\." };
+    static const QRegularExpression dkSeason1 { "Sæson ([0-9]+)\\." };
     match = dkSeason1.match(event.m_description);
     if (match.hasMatch())
     {
@@ -2323,7 +2323,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
     }
     else
     {
-        QRegularExpression dkSeason2 { "- år ([0-9]+) :" };
+        static const QRegularExpression dkSeason2 { "- år ([0-9]+) :" };
         match = dkSeason2.match(event.m_description);
         if (match.hasMatch())
         {
@@ -2338,7 +2338,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
         event.m_season = season;
 
     //Feature:
-    QRegularExpression dkFeatures { "Features:(.+)" };
+    static const QRegularExpression dkFeatures { "Features:(.+)" };
     match = dkFeatures.match(event.m_description);
     if (match.hasMatch())
     {
@@ -2346,31 +2346,31 @@ void EITFixUp::FixDK(DBEventEIT &event)
         event.m_description.remove(match.capturedStart(),
                                    match.capturedLength());
         // 16:9
-        QRegularExpression dkWidescreen { " 16:9" };
+        static const QRegularExpression dkWidescreen { " 16:9" };
         if (features.indexOf(dkWidescreen) !=  -1)
             event.m_videoProps |= VID_WIDESCREEN;
         // HDTV
-        QRegularExpression dkHD { " HD" };
+        static const QRegularExpression dkHD { " HD" };
         if (features.indexOf(dkHD) !=  -1)
             event.m_videoProps |= VID_HDTV;
         // Dolby Digital surround
-        QRegularExpression dkDolby { " 5:1" };
+        static const QRegularExpression dkDolby { " 5:1" };
         if (features.indexOf(dkDolby) !=  -1)
             event.m_audioProps |= AUD_DOLBY;
         // surround
-        QRegularExpression dkSurround { R"( \(\(S\)\))" };
+        static const QRegularExpression dkSurround { R"( \(\(S\)\))" };
         if (features.indexOf(dkSurround) !=  -1)
             event.m_audioProps |= AUD_SURROUND;
         // stereo
-        QRegularExpression dkStereo { " S" };
+        static const QRegularExpression dkStereo { " S" };
         if (features.indexOf(dkStereo) !=  -1)
             event.m_audioProps |= AUD_STEREO;
         // (G)
-        QRegularExpression dkReplay { " \\(G\\)" };
+        static const QRegularExpression dkReplay { " \\(G\\)" };
         if (features.indexOf(dkReplay) !=  -1)
             event.m_previouslyshown = true;
         // TTV
-        QRegularExpression dkTxt { " TTV" };
+        static const QRegularExpression dkTxt { " TTV" };
         if (features.indexOf(dkTxt) !=  -1)
             event.m_subtitleType |= SUB_NORMAL;
     }
@@ -2418,8 +2418,8 @@ void EITFixUp::FixDK(DBEventEIT &event)
     }
 
     // Find actors and director in description
-    QRegularExpression dkDirector { "(?:Instr.: |Instrukt.r: )(.+)$" };
-    QRegularExpression dkPersonsSeparator { "(, )|(og )" };
+    static const QRegularExpression dkDirector { "(?:Instr.: |Instrukt.r: )(.+)$" };
+    static const QRegularExpression dkPersonsSeparator { "(, )|(og )" };
     QStringList directors {};
     match = dkDirector.match(event.m_description);
     if (match.hasMatch())
@@ -2440,7 +2440,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
         //event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
 
-    QRegularExpression dkActors { "(?:Medvirkende: |Medv\\.: )(.+)" };
+    static const QRegularExpression dkActors { "(?:Medvirkende: |Medv\\.: )(.+)" };
     match = dkActors.match(event.m_description);
     if (match.hasMatch())
     {
@@ -2463,7 +2463,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
     }
 
     //find year
-    QRegularExpression dkYear { " fra ([0-9]{4})[ \\.]" };
+    static const QRegularExpression dkYear { " fra ([0-9]{4})[ \\.]" };
     match = dkYear.match(event.m_description);
     if (match.hasMatch())
     {
@@ -2480,7 +2480,7 @@ void EITFixUp::FixDK(DBEventEIT &event)
 void EITFixUp::FixStripHTML(DBEventEIT &event)
 {
     LOG(VB_EIT, LOG_INFO, QString("Applying html strip to %1").arg(event.m_title));
-    const QRegularExpression html { "</?EM>", QRegularExpression::CaseInsensitiveOption };
+    static const QRegularExpression html { "</?EM>", QRegularExpression::CaseInsensitiveOption };
     event.m_title.remove(html);
 }
 
@@ -2506,7 +2506,7 @@ void EITFixUp::FixGreekSubtitle(DBEventEIT &event)
 void EITFixUp::FixGreekEIT(DBEventEIT &event)
 {
     // Program ratings
-    const QRegularExpression grRating { R"(\[(K|Κ|8|12|16|18)\]\s*)",
+    static const QRegularExpression grRating { R"(\[(K|Κ|8|12|16|18)\]\s*)",
         QRegularExpression::CaseInsensitiveOption };
     auto match = grRating.match(event.m_title);
     if (match.hasMatch())
@@ -2527,7 +2527,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     }
 
     // Greek not previously Shown
-    const QRegularExpression grNotPreviouslyShown {
+    static const QRegularExpression grNotPreviouslyShown {
         R"(\W?(?:-\s*)*(?:\b[Α1]['΄η]?\s*(?:τηλεοπτικ[ηή]\s*)?(?:μετ[αά]δοση|προβολ[ηή]))\W?)",
         QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
     match = grNotPreviouslyShown.match(event.m_title);
@@ -2540,7 +2540,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     // Greek Replay (Ε)
     // it might look redundant compared to previous check but at least it helps
     // remove the (Ε) From the title.
-    const QRegularExpression grReplay { R"(\([ΕE]\))" };
+    static const QRegularExpression grReplay { R"(\([ΕE]\))" };
     match = grReplay.match(event.m_title);
     if (match.hasMatch())
     {
@@ -2564,13 +2564,13 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
         event.m_videoProps |= VID_HDTV;
     }
 
-    const QRegularExpression grFixnofullstopActors { R"(\w\s(Παίζουν:|Πρωταγων))" };
+    static const QRegularExpression grFixnofullstopActors { R"(\w\s(Παίζουν:|Πρωταγων))" };
     match = grFixnofullstopActors.match(event.m_description);
     if (match.hasMatch())
         event.m_description.insert(match.capturedStart() + 1, ".");
 
     // If they forgot the "." at the end of the sentence before the actors/directors begin, let's insert it.
-    const QRegularExpression grFixnofullstopDirectors { R"(\w\s(Σκηνοθ[εέ]))" };
+    static const QRegularExpression grFixnofullstopDirectors { R"(\w\s(Σκηνοθ[εέ]))" };
     match = grFixnofullstopDirectors.match(event.m_description);
     if (match.hasMatch())
         event.m_description.insert(match.capturedStart() + 1, ".");
@@ -2581,9 +2581,9 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     // for a director's/presenter's surname (directors/presenters are shown
     // before actors in the description field.). So removing the text after
     // adding the actors AND THEN looking for dir/pres helps to clear things up.
-    const QRegularExpression grActors { R"((?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\s+στο ρόλο(?: του| της)?\s(?:\w+\s[οη]\s))?([-\w\s']+(?:,[-\w\s']+)*)(?:κ\.[αά])?\W?)" };
+    static const QRegularExpression grActors { R"((?:[Ππ]α[ιί]ζουν:|[ΜMμ]ε τους:|Πρωταγωνιστο[υύ]ν:|Πρωταγωνιστε[ιί]:?)(?:\s+στο ρόλο(?: του| της)?\s(?:\w+\s[οη]\s))?([-\w\s']+(?:,[-\w\s']+)*)(?:κ\.[αά])?\W?)" };
       // cap(1) actors, just names
-    const QRegularExpression grPeopleSeparator { R"(([,-]\s+))" };
+    static const QRegularExpression grPeopleSeparator { R"(([,-]\s+))" };
     match = grActors.match(event.m_description);
     if (match.hasMatch())
     {
@@ -2606,7 +2606,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     }
 
     // Director
-    const QRegularExpression grDirector { R"((?:Σκηνοθεσία: |Σκηνοθέτης: |Σκηνοθέτης - Επιμέλεια: )(\w+\s\w+\s?)(?:\W?))" };
+    static const QRegularExpression grDirector { R"((?:Σκηνοθεσία: |Σκηνοθέτης: |Σκηνοθέτης - Επιμέλεια: )(\w+\s\w+\s?)(?:\W?))" };
     match = grDirector.match(event.m_description);
     if (match.hasMatch())
     {
@@ -2631,7 +2631,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     }
 
     //Try to find presenter
-    const QRegularExpression grPres { R"((?:Παρουσ[ιί]αση:(?:\b)*|Παρουσι[αά]ζ(?:ουν|ει)(?::|\sο|\sη)|Παρουσι[αά]στ(?:[ηή]ς|ρια|ριες|[εέ]ς)(?::|\sο|\sη)|Με τ(?:ον |ην )(?:[\s|:|ο|η])*(?:\b)*)([-\w\s]+(?:,[-\w\s]+)*)\W?)",
+    static const QRegularExpression grPres { R"((?:Παρουσ[ιί]αση:(?:\b)*|Παρουσι[αά]ζ(?:ουν|ει)(?::|\sο|\sη)|Παρουσι[αά]στ(?:[ηή]ς|ρια|ριες|[εέ]ς)(?::|\sο|\sη)|Με τ(?:ον |ην )(?:[\s|:|ο|η])*(?:\b)*)([-\w\s]+(?:,[-\w\s]+)*)\W?)",
         QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
     match = grPres.match(event.m_description);
     if (match.hasMatch())
@@ -2658,7 +2658,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
 
     //find year e.g Παραγωγής 1966 ή ΝΤΟΚΙΜΑΝΤΕΡ - 1998 Κατάλληλο για όλους
     // Used in Private channels (not 'secret', just not owned by Government!)
-    const QRegularExpression grYear { R"(\W?(?:\s?παραγωγ[ηή]ς|\s?-|,)\s*([1-2][0-9]{3})(?:-\d{1,4})?)",
+    static const QRegularExpression grYear { R"(\W?(?:\s?παραγωγ[ηή]ς|\s?-|,)\s*([1-2][0-9]{3})(?:-\d{1,4})?)",
         QRegularExpression::CaseInsensitiveOption };
     match = grYear.match(event.m_description);
     if (match.hasMatch())
@@ -2675,7 +2675,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     event.m_description = event.m_description.replace(" .",".").trimmed();
 
     //find country of origin and remove it from description.
-    const QRegularExpression grCountry {
+    static const QRegularExpression grCountry {
         R"((?:\W|\b)(?:(ελλην|τουρκ|αμερικ[αά]ν|γαλλ|αγγλ|βρεττ?αν|γερμαν|ρωσσ?|ιταλ|ελβετ|σουηδ|ισπαν|πορτογαλ|μεξικ[αά]ν|κιν[εέ]ζικ|ιαπων|καναδ|βραζιλι[αά]ν)(ικ[ηή][ςσ])))",
         QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption  };
     match = grCountry.match(event.m_description);
@@ -2685,7 +2685,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     // Work out the season and episode numbers (if any)
     // Matching pattern "Επεισ[όο]διο:?|Επ 3 από 14|3/14" etc
     bool    series  = false;
-    const QRegularExpression grSeason {
+    static const QRegularExpression grSeason {
         R"((?:\W-?)*(?:\(-\s*)?\b(([Α-Ω|A|B|E|Z|H|I|K|M|N]{1,2})(?:'|΄)?|(\d{1,2})(?:ος|ου|oς|os)?)(?:\s*[ΚκKk][υύ]κλο(?:[σς]|υ))\s?)",
         QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
     // cap(2) is the season for ΑΒΓΔ
@@ -2704,15 +2704,15 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
                     event.m_season = 6;
                 else
                 {
-                    QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";
+                    static const QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";
                     tmpinteger = LettToNumber.indexOf(match.capturedRef(2));
                     if (tmpinteger != -1)
                         event.m_season = tmpinteger;
                     else
                     //sometimes they use english letters instead of greek. Compensating:
                     {
-                        LettToNumber = "0ABΓΔE6ZHΘIKΛMN";
-                        tmpinteger = LettToNumber.indexOf(match.capturedRef(2));
+                        static const QString LettToNumber2 = "0ABΓΔE6ZHΘIKΛMN";
+                        tmpinteger = LettToNumber2.indexOf(match.capturedRef(2));
                         if (tmpinteger != -1)
                            event.m_season = tmpinteger;
                     }
@@ -2742,7 +2742,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
                     event.m_season = 6;
                 else
                 {
-                    QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";
+                    static const QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";
                     tmpinteger = LettToNumber.indexOf(match.capturedRef(2));
                     if (tmpinteger != -1)
                         event.m_season = tmpinteger;
@@ -2759,7 +2759,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
 
 
     // If Season is in Roman Numerals (I,II,etc)
-    const QRegularExpression grSeasonAsRomanNumerals { ",\\s*([MDCLXVIΙΧ]+)$",
+    static const QRegularExpression grSeasonAsRomanNumerals { ",\\s*([MDCLXVIΙΧ]+)$",
         QRegularExpression::CaseInsensitiveOption };
     match = grSeasonAsRomanNumerals.match(event.m_title);
     auto match2 = grSeasonAsRomanNumerals.match(event.m_description);
@@ -2784,7 +2784,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
             event.m_description.chop(1);
     }
 
-    const QRegularExpression grlongEp { R"(\b(?:Επ.|επεισ[οό]διο:?)\s*(\d+)\W?)",
+    static const QRegularExpression grlongEp { R"(\b(?:Επ.|επεισ[οό]διο:?)\s*(\d+)\W?)",
         QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
     // cap(1) is the Episode No.
     match  = grlongEp.match(event.m_title);
@@ -2812,7 +2812,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     // title, e.g "connection to ert1", "ert archives".
     // Because they obscure the real title, I'll isolate and remove them.
 
-    const QRegularExpression grCommentsinTitle { R"(\(([Α-Ωα-ω\s\d-]+)\)(?:\s*$)*)" };
+    static const QRegularExpression grCommentsinTitle { R"(\(([Α-Ωα-ω\s\d-]+)\)(?:\s*$)*)" };
       // cap1 = real title
       // cap0 = real title in parentheses.
     match = grCommentsinTitle.match(event.m_title);
@@ -2825,7 +2825,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     // EITFixUp::FixGreekSubtitle, I will search for it only in the description.
     // It will replace the translated one to get better chances of metadata
     // retrieval. The old title will be moved in the description.
-    const QRegularExpression grRealTitleInDescription { R"(^\(([A-Za-z\s\d-]+)\)\s*)" };
+    static const QRegularExpression grRealTitleInDescription { R"(^\(([A-Za-z\s\d-]+)\)\s*)" };
     // cap1 = real title
     // cap0 = real title in parentheses.
     match = grRealTitleInDescription.match(event.m_description);
@@ -2841,7 +2841,7 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     }
     else // search in title
     {
-        QRegularExpression grRealTitleInTitle { R"(\(([A-Za-z\s\d-]+)\)(?:\s*$)?)" };
+        static const QRegularExpression grRealTitleInTitle { R"(\(([A-Za-z\s\d-]+)\)(?:\s*$)?)" };
         // cap1 = real title
         // cap0 = real title in parentheses.
         match = grRealTitleInTitle.match(event.m_title);
@@ -2856,14 +2856,14 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
     }
 
     // Description field: "^Episode: Lion in the cage. (Description follows)"
-    const QRegularExpression grEpisodeAsSubtitle { R"(^Επεισ[οό]διο:\s?([\w\s\-,']+)\.\s?)" };
+    static const QRegularExpression grEpisodeAsSubtitle { R"(^Επεισ[οό]διο:\s?([\w\s\-,']+)\.\s?)" };
     match = grEpisodeAsSubtitle.match(event.m_description);
     if (match.hasMatch())
     {
         event.m_subtitle = match.captured(1).trimmed();
         event.m_description.remove(match.capturedStart(), match.capturedLength());
     }
-    const QRegularExpression grMovie { R"(\bταιν[ιί]α\b)",
+    static const QRegularExpression grMovie { R"(\bταιν[ιί]α\b)",
         QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
     bool isMovie = (event.m_description.indexOf(grMovie) !=-1) ;
     if (isMovie)
@@ -3037,7 +3037,7 @@ void EITFixUp::FixUnitymedia(DBEventEIT &event)
     }
 
     // handle star rating in the description
-    QRegularExpression unitymediaImdbrating { R"(\s*IMDb Rating: (\d\.\d)\s?/10$)" };
+    static const QRegularExpression unitymediaImdbrating { R"(\s*IMDb Rating: (\d\.\d)\s?/10$)" };
     auto match = unitymediaImdbrating.match(event.m_description);
     if (match.hasMatch())
     {
