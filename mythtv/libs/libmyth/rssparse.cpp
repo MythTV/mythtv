@@ -707,6 +707,11 @@ const QString Parse::kGeoRSSW3 = "http://www.w3.org/2003/01/geo/wgs84_pos#";
 const QString Parse::kMediaRSS = "http://search.yahoo.com/mrss/";
 const QString Parse::kMythRSS = "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format";
 
+QMap<QString, int> Parse::m_timezoneOffsets {
+    { "EDT" , -4 },
+    { "EST" , -5 }
+};
+
 ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc) const
 {
     ResultItem::resultList vList;

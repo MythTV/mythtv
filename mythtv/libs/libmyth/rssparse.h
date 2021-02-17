@@ -210,7 +210,7 @@ class MPUBLIC Parse : public QObject
     static QString UnescapeHTML (const QString& escaped);
 
   private:
-    QMap<QString, int> m_timezoneOffsets;
+    static QMap<QString, int> m_timezoneOffsets;
 
   protected:
     static const QString kDC;
