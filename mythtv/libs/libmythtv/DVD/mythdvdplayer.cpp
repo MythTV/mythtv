@@ -12,6 +12,7 @@ MythDVDPlayer::MythDVDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* 
 {
     connect(Tv, &TV::GoToMenu, this, &MythDVDPlayer::GoToMenu);
     connect(Tv, &TV::GoToDVDProgram, this, &MythDVDPlayer::GoToDVDProgram);
+    connect(this, &MythDVDPlayer::DisableDVDSubtitles, this, &MythDVDPlayer::DoDisableDVDSubtitles);
 }
 
 void MythDVDPlayer::AutoDeint(MythVideoFrame *Frame, MythVideoOutput *VideoOutput,
@@ -47,6 +48,12 @@ bool MythDVDPlayer::HasReachedEof(void) const
     // DeleteMap and EditMode from the parent MythPlayer should not be
     // relevant here.
     return eof != kEofStateNone && !m_allPaused;
+}
+
+void MythDVDPlayer::DoDisableDVDSubtitles()
+{
+    if (kDisplayAVSubtitle == m_captionsState.m_textDisplayMode)
+        SetCaptionsEnabled(false, false);
 }
 
 void MythDVDPlayer::DisableCaptions(uint Mode, bool OSDMsg)

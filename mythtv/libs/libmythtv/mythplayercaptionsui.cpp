@@ -265,11 +265,6 @@ void MythPlayerCaptionsUI::ToggleCaptions()
     SetCaptionsEnabled(!(static_cast<bool>(m_captionsState.m_textDisplayMode)));
 }
 
-uint MythPlayerCaptionsUI::GetCaptionMode() const
-{
-    return m_captionsState.m_textDisplayMode;
-}
-
 void MythPlayerCaptionsUI::ToggleCaptionsByType(uint Type)
 {
     QMutexLocker locker(&m_osdLock);

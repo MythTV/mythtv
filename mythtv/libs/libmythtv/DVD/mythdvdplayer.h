@@ -11,6 +11,9 @@ class MythDVDPlayer : public MythPlayerUI
 {
     Q_OBJECT
 
+  signals:
+    void     DisableDVDSubtitles();
+
   public:
     MythDVDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context,PlayerFlags Flags = kNoFlags);
 
@@ -62,6 +65,7 @@ class MythDVDPlayer : public MythPlayerUI
     void     DisableCaptions(uint Mode, bool OSDMsg = true) override;
     void     EnableCaptions(uint Mode, bool OSDMsg = true) override;
     void     SetTrack(uint Type, uint TrackNo) override;
+    void     DoDisableDVDSubtitles();
 
   private:
     void     DisplayDVDButton(void);

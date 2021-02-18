@@ -191,7 +191,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual bool PrepareAudioSample(std::chrono::milliseconds &timecode);
 
     // Public Closed caption and teletext stuff
-    virtual uint GetCaptionMode() const    { return kDisplayNone; }
     virtual CC708Reader    *GetCC708Reader(uint /*id*/=0) { return &m_cc708; }
     virtual CC608Reader    *GetCC608Reader(uint /*id*/=0) { return &m_cc608; }
     virtual SubtitleReader *GetSubReader(uint /*id*/=0) { return &m_subReader; }

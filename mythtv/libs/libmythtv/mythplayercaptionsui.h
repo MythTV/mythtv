@@ -20,8 +20,6 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerCaptionsUI() override;
 
-    uint GetCaptionMode() const override;
-
     // N.B. These methods handle audio tracks as well. Fix.
     QStringList GetTracks(uint Type);
     uint GetTrackCount(uint Type);

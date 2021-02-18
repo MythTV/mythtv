@@ -485,7 +485,7 @@ void MythDVDDecoder::PostProcessTracks(void)
         m_tracks[kTrackTypeSubtitle] = filteredTracks;
         stable_sort(m_tracks[kTrackTypeSubtitle].begin(), m_tracks[kTrackTypeSubtitle].end());
 
-        int trackNo = -1;
+        int track = -1;
         int selectedStream = m_ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
 
         // Now iterate over the sorted list and try to find the index of the
@@ -509,19 +509,17 @@ void MythDVDDecoder::PostProcessTracks(void)
                     .arg(iso639_key_toName(stream. m_language)));
 
             if ((selectedStream != -1) && (stream.m_stream_id == selectedStream))
-                trackNo = static_cast<int>(idx);
+                track = static_cast<int>(idx);
         }
 
-        uint captionmode = m_parent->GetCaptionMode();
         int trackcount = static_cast<int>(m_tracks[kTrackTypeSubtitle].size());
-
-        if (captionmode == kDisplayAVSubtitle && (trackNo < 0 || trackNo >= trackcount))
+        if (auto * dvdplayer = dynamic_cast<MythDVDPlayer*>(m_parent); dvdplayer && (track < 0 || track >= trackcount))
         {
-            m_parent->EnableSubtitles(false);
+            emit dvdplayer->DisableDVDSubtitles();
         }
-        else if (trackNo >= 0 && trackNo < trackcount)
+        else if (track >= 0 && track < trackcount)
         {
-            SetTrack(kTrackTypeSubtitle, trackNo);
+            SetTrack(kTrackTypeSubtitle, track);
             m_parent->EnableSubtitles(true);
         }
     }
