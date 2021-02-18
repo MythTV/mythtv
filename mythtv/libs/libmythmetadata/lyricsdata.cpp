@@ -325,7 +325,7 @@ void LyricsData::setLyrics(const QStringList &lyrics)
                     int seconds    = match.capturedRef(3).toInt();
                     int hundredths = match.capturedRef(4).toInt();
 
-                    line->m_lyric  = match.captured(5);
+                    line->m_lyric  = match.captured(5).trimmed();
                     line->m_time   = millisecondsFromParts(0, minutes, seconds, hundredths * 10);
                     line->m_time   = std::max(0ms, line->m_time - offset);
                     lastTime       = line->m_time;
@@ -333,7 +333,7 @@ void LyricsData::setLyrics(const QStringList &lyrics)
                 else
                 {
                     line->m_time = ++lastTime;
-                    line->m_lyric = lyric;
+                    line->m_lyric = lyric.trimmed();
                 }
             }
         }
@@ -343,13 +343,13 @@ void LyricsData::setLyrics(const QStringList &lyrics)
             if (m_parent && !m_parent->isRadio())
             {
                 line->m_time = std::chrono::milliseconds((m_parent->Length() / lyrics.count()) * x);
-                line->m_lyric = lyric;
+                line->m_lyric = lyric.trimmed();
                 lastTime = line->m_time;
             }
             else
             {
                 line->m_time = ++lastTime;
-                line->m_lyric = lyric;
+                line->m_lyric = lyric.trimmed();
             }
         }
 
