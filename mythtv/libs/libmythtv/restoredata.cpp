@@ -195,7 +195,8 @@ void RestoreData::Restore()
         cd.found_visible = false;
 
         // Get xmltvid from the last deleted channel
-        // from any video source
+        // from any video source or from any channel
+        // on a different video source
         if (do_xmltvid && cd.xmltvid.isEmpty())
         {
             query2.prepare(
@@ -206,11 +207,13 @@ void RestoreData::Restore()
                 "  AND networkid   = :NETWORKID "
                 "  AND channel.mplexid = dtv_multiplex.mplexid "
                 "  AND xmltvid != ''"
-                "  AND deleted IS NOT NULL "
+                "  AND (deleted IS NOT NULL OR "
+                "       channel.sourceid != :SOURCEID)"
                 "ORDER BY deleted DESC;");
             query2.bindValue(":SERVICEID",   cd.serviceid);
             query2.bindValue(":TRANSPORTID", cd.transportid);
             query2.bindValue(":NETWORKID",   cd.networkid);
+            query2.bindValue(":SOURCEID",    m_sourceid);
             if (!query2.exec() || !query2.isActive())
             {
                 MythDB::DBError("RestoreData::Restore(2)", query);
@@ -224,7 +227,8 @@ void RestoreData::Restore()
         }
 
         // Get icon from the last deleted channel
-        // from any video source
+        // from any video source or from any channel
+        // on a different video source
         if (do_icon && cd.icon.isEmpty())
         {
             query2.prepare(
@@ -235,11 +239,13 @@ void RestoreData::Restore()
                 "  AND networkid   = :NETWORKID "
                 "  AND channel.mplexid = dtv_multiplex.mplexid "
                 "  AND icon != ''"
-                "  AND deleted IS NOT NULL "
+                "  AND (deleted IS NOT NULL OR "
+                "       channel.sourceid != :SOURCEID)"
                 "ORDER BY deleted DESC;");
             query2.bindValue(":SERVICEID",   cd.serviceid);
             query2.bindValue(":TRANSPORTID", cd.transportid);
             query2.bindValue(":NETWORKID",   cd.networkid);
+            query2.bindValue(":SOURCEID",    m_sourceid);
             if (!query2.exec() || !query2.isActive())
             {
                 MythDB::DBError("RestoreData::Restore(3)", query);
