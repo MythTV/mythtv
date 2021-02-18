@@ -253,9 +253,6 @@ void MythCECAdapter::Open(MythMainWindow *Window)
     HandleActions(actions);
 }
 
-// Workaround for bug in libcec/cecloader.h, issue #299
-extern void *g_libCEC;
-
 void MythCECAdapter::Close(void)
 {
     if (m_adapter)
@@ -264,7 +261,9 @@ void MythCECAdapter::Close(void)
             HandleActions(PowerOffTV);
         m_adapter->Close();
         UnloadLibCec(m_adapter);
-        g_libCEC = nullptr;     // Workaround for bug in libcec/cecloader.h, issue #299
+        // Workaround for bug in libcec/cecloader.h
+        // MythTV issue #299, libcec issue #555
+        g_libCEC = nullptr;
         LOG(VB_GENERAL, LOG_INFO, LOC + "Closing down CEC.");
     }
     m_valid = false;
