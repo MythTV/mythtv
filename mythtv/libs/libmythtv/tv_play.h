@@ -503,7 +503,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     MythMainWindow*   m_mainWindow { nullptr };
 
     // Configuration variables from database
-    QString           m_baseFilters;
     QString           m_dbChannelFormat {"<num> <sign>"};
     std::chrono::milliseconds m_dbIdleTimeout {0ms};
     int               m_dbPlaybackExitPrompt {0};
@@ -516,14 +515,11 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool              m_dbClearSavedPosition {false};
     bool              m_dbRunJobsOnRemote {false};
     bool              m_dbContinueEmbedded {false};
-    bool              m_dbRunFrontendInWindow {false};
     bool              m_dbBrowseAlways {false};
     bool              m_dbBrowseAllTuners {false};
     bool              m_dbUseChannelGroups {false};
     bool              m_dbRememberLastChannelGroup {false};
     ChannelGroupList  m_dbChannelGroups;
-
-    bool              m_tryUnflaggedSkip {false};
 
     bool              m_smartForward {false};
     float             m_ffRewRepos {1.0F};
@@ -531,8 +527,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     std::vector<int>  m_ffRewSpeeds;
 
     uint              m_vbimode {VBIMode::None};
-
-    QElapsedTimer     m_ctorTime;
     uint              m_switchToInputId {0};
 
     /// True if the user told MythTV to stop plaback. If this is false

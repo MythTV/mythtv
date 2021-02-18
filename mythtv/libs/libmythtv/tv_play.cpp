@@ -984,7 +984,6 @@ TV::TV(MythMainWindow* MainWindow)
 
 {
     LOG(VB_GENERAL, LOG_INFO, LOC + "Creating TV object");
-    m_ctorTime.start();
 
     QObject::setObjectName("TV");
     m_keyRepeatTimer.start();
@@ -1070,13 +1069,10 @@ void TV::InitFromDB()
     m_dbClearSavedPosition = (kv["ClearSavedPosition"].toInt() != 0);
     m_dbRunJobsOnRemote    = (kv["JobsRunOnRecordHost"].toInt() != 0);
     m_dbContinueEmbedded   = (kv["ContinueEmbeddedTVPlay"].toInt() != 0);
-    m_dbRunFrontendInWindow= (kv["RunFrontendInWindow"].toInt() != 0);
     m_dbBrowseAlways       = (kv["PersistentBrowseMode"].toInt() != 0);
     m_dbBrowseAllTuners    = (kv["BrowseAllTuners"].toInt() != 0);
     db_channel_ordering    = kv["ChannelOrdering"];
-    m_baseFilters         += kv["CustomFilters"];
     m_dbChannelFormat      = kv["ChannelFormat"];
-    m_tryUnflaggedSkip     = (kv["TryUnflaggedSkip"].toInt() != 0);
     m_smartForward         = (kv["SmartForward"].toInt() != 0);
     m_ffRewRepos           = kv["FFRewReposTime"].toFloat() * 0.01F;
     m_ffRewReverse         = (kv["FFRewReverse"].toInt() != 0);
@@ -4648,8 +4644,6 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
 bool TV::StartPlayer(TVState desiredState)
 {
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1) -- begin").arg(StateToString(desiredState)));
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Elapsed time since TV constructor was called: %1 ms")
-        .arg(m_ctorTime.elapsed()));
 
     bool ok = CreatePlayer(desiredState);
     ScheduleStateChange();
