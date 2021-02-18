@@ -15,6 +15,7 @@
 #include "mythmiscutil.h"
 
 class LyricsData;
+class TestLyrics;
 
 class META_PUBLIC LyricsLine
 {
@@ -49,8 +50,10 @@ class META_PUBLIC LyricsData : public QObject
 {
   Q_OBJECT
 
+  friend class TestLyrics;
+
   public:
-    LyricsData();
+    LyricsData() = default;
     explicit LyricsData(MusicMetadata *parent)
         : m_parent(parent) {}
     LyricsData(MusicMetadata *parent, QString grabber, QString artist,

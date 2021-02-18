@@ -17,9 +17,6 @@
 /*************************************************************************/
 //LyricsData
 
-//LyricsData::LyricsData():
-//    m_parent(nullptr), m_status(STATUS_NOTLOADED), m_syncronized(false), m_changed(false) { }
-
 LyricsData::~LyricsData()
 {
     clear();
