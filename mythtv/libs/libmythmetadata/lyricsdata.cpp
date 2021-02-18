@@ -3,7 +3,7 @@
 #include "musicmetadata.h"
 
 // qt
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDomDocument>
 
 // mythtv
@@ -13,6 +13,7 @@
 // libmythmetadata
 #include "lyricsdata.h"
 
+static const QRegularExpression kTimeCode { R"(^(\[(\d\d):(\d\d)(?:\.(\d\d))?\])(.*))" };
 
 /*************************************************************************/
 //LyricsData
@@ -266,30 +267,17 @@ void LyricsData::loadLyrics(const QString &xmlData)
         if (m_syncronized)
         {
             QStringList times;
-            int lastind = 0;
-            while (lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\])"),
-                                 lastind) == lastind ||
-                   lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\.\d\d\])"),
-                                 lastind) == lastind)
+            auto match = kTimeCode.match(lyric);
+            if (match.hasMatch())
             {
-                if (lyric[lastind+6] == '.')
+                while (match.hasMatch())
                 {
-                    times.append(lyric.mid(lastind,10));
-                    lastind += 10;
+                    times.append(lyric.left(match.capturedLength(1)));
+                    lyric.remove(0,match.capturedLength(1));
+                    match = kTimeCode.match(lyric);
                 }
-                else
-                {
-                    // short version
-                    times.append(lyric.mid(lastind,7));
-                    lastind += 7;
-                }
-            }
-            if (!times.isEmpty())
-            {
-                for (int y = 0; y < times.count(); y++)
-                {
-                    lyrics.append(times.at(y) + lyric.mid(lastind));
-                }
+                for (const auto &time : qAsConst(times))
+                    lyrics.append(time + lyric);
             }
             else
             {
@@ -320,42 +308,27 @@ void LyricsData::setLyrics(const QStringList &lyrics)
 
         auto *line = new LyricsLine;
 
-        if (lyric.startsWith("[offset:"))
-        {
-            offset = std::chrono::milliseconds(lyric.midRef(8,lyric.indexOf("]", 8)-8).toInt());
-        }
+        static const QRegularExpression kOffset { R"(^\[offset:(.+)\])" };
+        auto match = kOffset.match(lyric);
+        if (match.hasMatch())
+            offset = std::chrono::milliseconds(match.capturedRef(1).toInt());
 
         if (m_syncronized)
         {
             if (!lyric.isEmpty())
             {
                 // does the line start with a time code like [12:34] or [12:34.56]
-                if (lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\])"), 0) == 0 ||
-                    lyric.indexOf(QRegExp(R"(\[\d\d:\d\d\.\d\d\])"), 0) == 0)
+                match = kTimeCode.match(lyric);
+                if (match.hasMatch())
                 {
-                    int minutes = lyric.midRef(1, 2).toInt();
-                    int seconds = lyric.midRef(4, 2).toInt();
-                    int hundredths = 0;
-                    if (lyric[6] == '.')
-                    {
-                        hundredths = lyric.midRef(7, 2).toInt();
-                        line->m_lyric = lyric.mid(10);
-                    }
-                    else
-                    {
-                        line->m_lyric = lyric.mid(7);
-                    }
-                    line->m_time = millisecondsFromParts(0, minutes, seconds, hundredths * 10);
-                    if (offset > 0ms)
-                    {
-                        if (offset > line->m_time) line->m_time = 0ms;
-                        else line->m_time -= offset;
-                    }
-                    else
-                    {
-                        line->m_time -= offset;
-                    }
-                    lastTime = line->m_time;
+                    int minutes    = match.capturedRef(2).toInt();
+                    int seconds    = match.capturedRef(3).toInt();
+                    int hundredths = match.capturedRef(4).toInt();
+
+                    line->m_lyric  = match.captured(5);
+                    line->m_time   = millisecondsFromParts(0, minutes, seconds, hundredths * 10);
+                    line->m_time   = std::max(0ms, line->m_time - offset);
+                    lastTime       = line->m_time;
                 }
                 else
                 {
