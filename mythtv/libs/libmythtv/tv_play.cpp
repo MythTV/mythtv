@@ -4211,33 +4211,13 @@ bool TV::ActivePostQHandleAction(const QStringList &Actions)
         ShowOSDPromptDeleteRecording(tr("Are you sure you want to delete:"));
     }
     else if (IsActionable(ACTION_JUMPTODVDROOTMENU, Actions) && isdisc)
-    {
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        if (m_player)
-            m_player->GoToMenu("root");
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-    }
+        emit GoToMenu("root");
     else if (IsActionable(ACTION_JUMPTODVDCHAPTERMENU, Actions) && isdisc)
-    {
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        if (m_player)
-            m_player->GoToMenu("chapter");
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-    }
+        emit GoToMenu("chapter");
     else if (IsActionable(ACTION_JUMPTODVDTITLEMENU, Actions) && isdisc)
-    {
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        if (m_player)
-            m_player->GoToMenu("title");
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-    }
+        emit GoToMenu("title");
     else if (IsActionable(ACTION_JUMPTOPOPUPMENU, Actions) && isdisc)
-    {
-        m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        if (m_player)
-            m_player->GoToMenu("popup");
-        m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-    }
+        emit GoToMenu("popup");
     else if (IsActionable(ACTION_FINDER, Actions))
         EditSchedule(kScheduleProgramFinder);
     else
@@ -8280,17 +8260,14 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         if (IsActionable(Action, { ACTION_JUMPTODVDROOTMENU, ACTION_JUMPTODVDCHAPTERMENU,
                                    ACTION_JUMPTOPOPUPMENU, ACTION_JUMPTODVDTITLEMENU}))
         {
-            QString menu = "root";
             if (Action == ACTION_JUMPTODVDCHAPTERMENU)
-                menu = "chapter";
+                emit GoToMenu("chapter");
             else if (Action == ACTION_JUMPTODVDTITLEMENU)
-                menu = "title";
+                emit GoToMenu("title");
             else if (Action == ACTION_JUMPTOPOPUPMENU)
-                menu = "popup";
-            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-            if (m_player)
-                m_player->GoToMenu(menu);
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+                emit GoToMenu("popup");
+            else
+                emit GoToMenu("root");
         }
         else if (Action.startsWith(ACTION_JUMPCHAPTER))
         {
@@ -9770,11 +9747,7 @@ void TV::DVDJumpBack()
         }
         else
         {
-            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-            if (m_player)
-                m_player->GoToDVDProgram(false);
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
+            emit GoToDVDProgram(false);
             UpdateOSDSeekMessage(tr("Previous Title"), kOSDTimeout_Med);
         }
     }
@@ -9812,11 +9785,7 @@ void TV::DVDJumpForward()
         }
         else
         {
-            m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-            if (m_player)
-                m_player->GoToDVDProgram(true);
-            m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-
+            emit GoToDVDProgram(true);
             UpdateOSDSeekMessage(tr("Next Title"), kOSDTimeout_Med);
         }
     }

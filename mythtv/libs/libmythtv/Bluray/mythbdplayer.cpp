@@ -1,4 +1,5 @@
 // MythTV
+#include "tv_play.h"
 #include "Bluray/mythbdbuffer.h"
 #include "Bluray/mythbddecoder.h"
 #include "Bluray/mythbdplayer.h"
@@ -11,6 +12,7 @@
 MythBDPlayer::MythBDPlayer(MythMainWindow *MainWindow, TV *Tv, PlayerContext *Context, PlayerFlags Flags)
   : MythPlayerUI(MainWindow, Tv, Context, Flags)
 {
+    connect(Tv, &TV::GoToMenu, this, &MythBDPlayer::GoToMenu);
 }
 
 bool MythBDPlayer::HasReachedEof(void) const
@@ -26,16 +28,16 @@ void MythBDPlayer::PreProcessNormalFrame(void)
     DisplayMenu();
 }
 
-bool MythBDPlayer::GoToMenu(const QString& Menu)
+void MythBDPlayer::GoToMenu(const QString& Menu)
 {
     if (!(m_playerCtx->m_buffer->BD() && m_videoOutput))
-        return false;
+        return;
 
     mpeg::chrono::pts pts = 0_pts;
-    MythVideoFrame *frame = m_videoOutput->GetLastShownFrame();
+    const auto * frame = m_videoOutput->GetLastShownFrame();
     if (frame)
         pts = duration_cast<mpeg::chrono::pts>(frame->m_timecode);
-    return m_playerCtx->m_buffer->BD()->GoToMenu(Menu, pts);
+    m_playerCtx->m_buffer->BD()->GoToMenu(Menu, pts);
 }
 
 void MythBDPlayer::DisplayMenu(void)

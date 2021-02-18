@@ -14,7 +14,6 @@ class MythBDPlayer : public MythPlayerUI
   public:
     MythBDPlayer(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags = kNoFlags);
     bool     HasReachedEof     (void) const override;
-    bool     GoToMenu          (const QString& Menu) override;
     int      GetNumChapters    (void) override;
     int      GetCurrentChapter (void) override;
     void     GetChapterTimes   (QList<std::chrono::seconds> &ChapterTimes) override;
@@ -35,6 +34,7 @@ class MythBDPlayer : public MythPlayerUI
     uint64_t GetBookmark       (void) override;
 
   protected slots:
+    void     GoToMenu          (const QString& Menu);
     void     SetBookmark       (bool Clear) override;
 
   protected:

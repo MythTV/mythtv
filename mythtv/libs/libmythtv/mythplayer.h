@@ -230,8 +230,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual QString GetAngleName(int /*title*/) const { return QString(); }
 
     // DVD public stuff
-    virtual bool GoToMenu(const QString& /*str*/) { return false;     }
-    virtual void GoToDVDProgram(bool direction) { (void) direction; }
     virtual bool IsInStillFrame() const         { return false;     }
 
     // Position Map Stuff

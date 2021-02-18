@@ -20,8 +20,6 @@ class MythDVDPlayer : public MythPlayerUI
     uint64_t GetBookmark(void) override;
     std::chrono::milliseconds  GetMillisecondsPlayed(bool HonorCutList) override;
     std::chrono::milliseconds  GetTotalMilliseconds(bool HonorCutList) const override;
-    bool     GoToMenu(const QString& Menu) override;
-    void     GoToDVDProgram(bool Direction) override;
     bool     IsInStillFrame() const override;
     int      GetNumAngles(void) const override;
     int      GetCurrentAngle(void) const override;
@@ -58,6 +56,8 @@ class MythDVDPlayer : public MythPlayerUI
     bool     DoJumpChapter(int Chapter) override;
 
   protected slots:
+    void     GoToMenu(const QString& Menu);
+    void     GoToDVDProgram(bool Direction);
     void     SetBookmark(bool Clear = false) override;
     void     DisableCaptions(uint Mode, bool OSDMsg = true) override;
     void     EnableCaptions(uint Mode, bool OSDMsg = true) override;

@@ -80,6 +80,10 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     // Visualiser
     void EnableVisualiser(bool Enable, bool Toggle = false, const QString& Name = QString());
 
+    // Discs
+    void GoToMenu(const QString& Menu);
+    void GoToDVDProgram(bool Direction);
+
   public slots:
     void OverlayStateChanged(MythOverlayState OverlayState);
     void AudioPlayerStateChanged(const MythAudioPlayerState& AudioPlayerState);
