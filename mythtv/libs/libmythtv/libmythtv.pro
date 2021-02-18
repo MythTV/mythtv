@@ -390,6 +390,7 @@ using_frontend {
     HEADERS += mythplayerstate.h
     HEADERS += mythplayeruibase.h
     HEADERS += mythplayerui.h
+    HEADERS += mythplayereditorui.h
     HEADERS += mythplayervideoui.h
     HEADERS += mythplayercaptionsui.h
     HEADERS += mythplayeroverlayui.h
@@ -413,6 +414,7 @@ using_frontend {
     SOURCES += mythplayerstate.cpp
     SOURCES += mythplayeruibase.cpp
     SOURCES += mythplayerui.cpp
+    SOURCES += mythplayereditorui.cpp
     SOURCES += mythplayervideoui.cpp
     SOURCES += mythplayercaptionsui.cpp
     SOURCES += mythplayeroverlayui.cpp
