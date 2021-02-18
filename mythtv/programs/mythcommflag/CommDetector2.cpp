@@ -479,8 +479,6 @@ bool CommDetector2::go(void)
         return false;
     }
 
-    m_player->EnableSubtitles(false);
-
     QElapsedTimer totalFlagTime;
     totalFlagTime.start();
 

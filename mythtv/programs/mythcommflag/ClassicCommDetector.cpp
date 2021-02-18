@@ -351,7 +351,6 @@ bool ClassicCommDetector::go()
             "NVP: Unable to initialize video for FlagCommercials.");
         return false;
     }
-    m_player->EnableSubtitles(false);
 
     if (m_commDetectMethod & COMM_DETECT_LOGO)
     {

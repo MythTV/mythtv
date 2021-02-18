@@ -15,6 +15,7 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void SetInteractiveStream(const QString& Stream);
     void SetInteractiveStreamPos(std::chrono::milliseconds Position);
     void PlayInteractiveStream(bool Play);
+    void EnableSubtitles(bool Enable);
 
   public:
     MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);

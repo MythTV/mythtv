@@ -520,7 +520,8 @@ void MythDVDDecoder::PostProcessTracks(void)
         else if (track >= 0 && track < trackcount)
         {
             SetTrack(kTrackTypeSubtitle, track);
-            m_parent->EnableSubtitles(true);
+            if (auto * player = dynamic_cast<MythPlayerUI*>(m_parent); player)
+                emit player->EnableSubtitles(true);
         }
     }
 }

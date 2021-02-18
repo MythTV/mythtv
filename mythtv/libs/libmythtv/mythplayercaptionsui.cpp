@@ -46,6 +46,7 @@ MythPlayerCaptionsUI::MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, P
     connect(this, &MythPlayerCaptionsUI::PlayInteractiveStream,   this, &MythPlayerCaptionsUI::StreamPlay);
 
     // Signalled from the decoder
+    connect(this, &MythPlayerCaptionsUI::EnableSubtitles, this, [=](bool Enable) { this->SetCaptionsEnabled(Enable, false); });
     connect(this, &MythPlayerCaptionsUI::SignalTracksChanged, this, &MythPlayerCaptionsUI::TracksChanged);
 
     // Signalled from the base class
@@ -281,7 +282,6 @@ void MythPlayerCaptionsUI::ToggleCaptionsByType(uint Type)
 void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
 {
     QMutexLocker locker(&m_osdLock);
-    m_enableCaptions = m_disableCaptions = false;
     auto origmode = m_captionsState.m_textDisplayMode;
 
     // Only turn off textDesired if the Operator requested it.

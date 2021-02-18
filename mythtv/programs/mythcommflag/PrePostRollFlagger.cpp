@@ -68,7 +68,6 @@ bool PrePostRollFlagger::go()
             "NVP: Unable to initialize video for FlagCommercials.");
         return false;
     }
-    m_player->EnableSubtitles(false);
 
     emit breathe();
     if (m_bStop)

@@ -660,14 +660,6 @@ void MythPlayer::DeLimboFrame(MythVideoFrame *frame)
         m_videoOutput->DeLimboFrame(frame);
 }
 
-void MythPlayer::EnableSubtitles(bool enable)
-{
-    if (enable)
-        m_enableCaptions = true;
-    else
-        m_disableCaptions = true;
-}
-
 void MythPlayer::EnableForcedSubtitles(bool enable)
 {
     if (enable)

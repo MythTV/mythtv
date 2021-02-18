@@ -119,12 +119,6 @@ void MythPlayerUI::EventLoop()
     if (m_reinitOsd)
         ReinitOSD();
 
-    // reselect subtitle tracks if triggered by the decoder
-    if (m_enableCaptions)
-        SetCaptionsEnabled(true, false);
-    if (m_disableCaptions)
-        SetCaptionsEnabled(false, false);
-
     // enable/disable forced subtitles if signalled by the decoder
     if (m_enableForcedSubtitles)
         DoEnableForcedSubtitles();
@@ -397,7 +391,7 @@ void MythPlayerUI::ReinitVideo(bool ForceUpdate)
 
     // Signal to main thread to reinit subtitles
     if (m_captionsState.m_textDisplayMode != kDisplayNone)
-        EnableSubtitles(true);
+        emit EnableSubtitles(true);
 
     // Signal to the main thread to check auto visualise
     m_checkAutoVisualise = true;

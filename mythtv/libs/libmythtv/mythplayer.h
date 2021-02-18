@@ -197,7 +197,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual TeletextReader *GetTeletextReader(uint /*id*/=0) { return &m_ttxReader; }
 
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
-    void EnableSubtitles(bool enable);
     void EnableForcedSubtitles(bool enable);
     bool ForcedSubtitlesFavored(void) const {
         return m_allowForcedSubtitles && !m_captionsEnabledbyDefault;
@@ -462,8 +461,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
     bool      m_captionsEnabledbyDefault  {false};
-    bool      m_enableCaptions            {false};
-    bool      m_disableCaptions           {false};
     bool      m_enableForcedSubtitles     {false};
     bool      m_disableForcedSubtitles    {false};
     bool      m_allowForcedSubtitles      {true};
