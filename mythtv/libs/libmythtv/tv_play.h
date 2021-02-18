@@ -188,12 +188,12 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void Embed(bool Embed, QRect Rect = {}, const QStringList& Data = {});
 
   private:
-    static QStringList lastProgramStringList;
-    static EMBEDRETURNVOID RunPlaybackBoxPtr;
-    static EMBEDRETURNVOID RunViewScheduledPtr;
-    static EMBEDRETURNVOIDEPG RunProgramGuidePtr;
-    static EMBEDRETURNVOIDFINDER RunProgramFinderPtr;
-    static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
+    static inline QStringList lastProgramStringList = {};
+    static inline EMBEDRETURNVOID RunPlaybackBoxPtr = nullptr;
+    static inline EMBEDRETURNVOID RunViewScheduledPtr = nullptr;
+    static inline EMBEDRETURNVOIDEPG RunProgramGuidePtr = nullptr;
+    static inline EMBEDRETURNVOIDFINDER RunProgramFinderPtr = nullptr;
+    static inline EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr = nullptr;
 
     explicit TV(MythMainWindow* MainWindow);
    ~TV() override;
@@ -731,36 +731,30 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     MythTVMenu m_cutlistCompactMenu;
 
   public:
-    // Constants
-    static const int kInitFFRWSpeed; ///< 1x, default to normal speed
-    static const uint kInputKeysMax; ///< When to start discarding early keys
-    static const uint kNextSource;
-    static const uint kPreviousSource;
+    static inline const int kInitFFRWSpeed   = 0; // 1x, default to normal speed
+    static inline const uint kInputKeysMax   = 6; // When to start discarding early keys
+    static inline const uint kNextSource     = 1;
+    static inline const uint kPreviousSource = 2;
 
-    ///< Timeout for entry modes in msec
-    static const std::chrono::milliseconds kInputModeTimeout;
-    /// Timeout for updating LCD info in msec
-    static const std::chrono::milliseconds kLCDTimeout;
-    /// Timeout for browse mode exit in msec
-    static const std::chrono::milliseconds kBrowseTimeout;
-    /// Seek key repeat timeout in msec
-    static const std::chrono::milliseconds kKeyRepeatTimeout;
-    /// How long to wait before applying all previous channel keypresses in msec
-    static const std::chrono::milliseconds kPrevChanTimeout;
-    /// How long to display sleep timer dialog in msec
-    static const std::chrono::milliseconds kSleepTimerDialogTimeout;
-    /// How long to display idle timer dialog in seconds
-    static const std::chrono::milliseconds kIdleTimerDialogTimeout;
-    /// How long to display idle timer dialog in msec
-    static const std::chrono::milliseconds kVideoExitDialogTimeout;
-
-    static const std::chrono::milliseconds kEndOfPlaybackCheckFrequency;
-    static const std::chrono::milliseconds kEmbedCheckFrequency;
-    static const std::chrono::milliseconds kSpeedChangeCheckFrequency;
-    static const std::chrono::milliseconds kErrorRecoveryCheckFrequency;
-    static const std::chrono::milliseconds kEndOfRecPromptCheckFrequency;
-    static const std::chrono::milliseconds kEndOfPlaybackFirstCheckTimer;
-    static const std::chrono::milliseconds kSaveLastPlayPosTimeout;
+    static inline const std::chrono::milliseconds kInputModeTimeout        = 5s;
+    static inline const std::chrono::milliseconds kLCDTimeout              = 1s;
+    static inline const std::chrono::milliseconds kBrowseTimeout           = 30s;
+    static inline const std::chrono::milliseconds kKeyRepeatTimeout        = 300ms;
+    static inline const std::chrono::milliseconds kPrevChanTimeout         = 750ms;
+    static inline const std::chrono::milliseconds kSleepTimerDialogTimeout = 45s;
+    static inline const std::chrono::milliseconds kIdleTimerDialogTimeout  = 45s;
+    static inline const std::chrono::milliseconds kVideoExitDialogTimeout  = 2min;
+    static inline const std::chrono::milliseconds kEndOfPlaybackCheckFrequency  = 250ms;
+    static inline const std::chrono::milliseconds kEmbedCheckFrequency          = 250ms;
+    static inline const std::chrono::milliseconds kSpeedChangeCheckFrequency    = 250ms;
+    static inline const std::chrono::milliseconds kErrorRecoveryCheckFrequency  = 250ms;
+    static inline const std::chrono::milliseconds kEndOfRecPromptCheckFrequency = 250ms;
+    static inline const std::chrono::milliseconds kSaveLastPlayPosTimeout       = 30s;
+#ifdef USING_VALGRIND
+    static inline const std::chrono::milliseconds kEndOfPlaybackFirstCheckTimer = 1min;
+#else
+    static inline const std::chrono::milliseconds kEndOfPlaybackFirstCheckTimer = 5s;
+#endif
 };
 
 #endif

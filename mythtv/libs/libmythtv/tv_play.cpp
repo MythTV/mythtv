@@ -91,63 +91,6 @@
         osd->HideWindow(WINDOW); \
     ReturnOSDLock(); }
 
-const int  TV::kInitFFRWSpeed                = 0;
-const uint TV::kInputKeysMax                 = 6;
-const uint TV::kNextSource                   = 1;
-const uint TV::kPreviousSource               = 2;
-
-const std::chrono::milliseconds TV::kInputModeTimeout             = 5s;
-const std::chrono::milliseconds TV::kLCDTimeout                   = 1s;
-const std::chrono::milliseconds TV::kBrowseTimeout                = 30s;
-const std::chrono::milliseconds TV::kKeyRepeatTimeout             = 300ms;
-const std::chrono::milliseconds TV::kPrevChanTimeout              = 750ms;
-const std::chrono::milliseconds TV::kSleepTimerDialogTimeout      = 45s;
-const std::chrono::milliseconds TV::kIdleTimerDialogTimeout       = 45s;
-const std::chrono::milliseconds TV::kVideoExitDialogTimeout       = 2min;
-
-const std::chrono::milliseconds TV::kEndOfPlaybackCheckFrequency  = 250ms;
-const std::chrono::milliseconds TV::kEndOfRecPromptCheckFrequency = 250ms;
-const std::chrono::milliseconds TV::kEmbedCheckFrequency          = 250ms;
-const std::chrono::milliseconds TV::kSpeedChangeCheckFrequency    = 250ms;
-const std::chrono::milliseconds TV::kErrorRecoveryCheckFrequency  = 250ms;
-#ifdef USING_VALGRIND
-const std::chrono::milliseconds TV::kEndOfPlaybackFirstCheckTimer = 1min;
-#else
-const std::chrono::milliseconds TV::kEndOfPlaybackFirstCheckTimer = 5s;
-#endif
-const std::chrono::milliseconds TV::kSaveLastPlayPosTimeout       = 30s;
-
-/**
- * \brief stores last program info. maintains info so long as
- * mythfrontend is active
- */
-QStringList TV::lastProgramStringList = QStringList();
-
-/**
- * \brief function pointer for RunPlaybackBox in playbackbox.cpp
- */
-EMBEDRETURNVOID TV::RunPlaybackBoxPtr = nullptr;
-
-/**
- * \brief function pointer for RunViewScheduled in viewscheduled.cpp
- */
-EMBEDRETURNVOID TV::RunViewScheduledPtr = nullptr;
-
-/**
- * \brief function pointer for RunScheduleEditor in scheduleeditor.cpp
- */
-EMBEDRETURNVOIDSCHEDIT TV::RunScheduleEditorPtr = nullptr;
-
-/**
- * \brief function pointer for RunProgramGuide in guidegrid.cpp
- */
-EMBEDRETURNVOIDEPG TV::RunProgramGuidePtr = nullptr;
-
-/**
- * \brief function pointer for RunProgramFinder in progfind.cpp
- */
-EMBEDRETURNVOIDFINDER TV::RunProgramFinderPtr = nullptr;
-
 /**
  * \brief If any cards are configured, return the number.
  */
