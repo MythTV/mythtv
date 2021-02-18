@@ -18,6 +18,9 @@ class MusicMetadata;
 /// remove any bad filename characters
 META_PUBLIC QString fixFilename(const QString &filename);
 
+/// remove any bad filename characters (leaving '/' untouched)
+META_PUBLIC QString fixFileToken_sl (QString token);
+
 /// find an image for a artist or genre
 META_PUBLIC QString findIcon(const QString &type, const QString &name, bool ignoreCache = false);
 

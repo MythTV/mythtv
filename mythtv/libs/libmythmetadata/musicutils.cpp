@@ -66,7 +66,7 @@ QString findIcon(const QString &type, const QString &name, bool ignoreCache)
     return QString();
 }
 
-inline QString fixFileToken_sl(QString token)
+QString fixFileToken_sl(QString token)
 {
     // this version doesn't remove fwd-slashes so we can
     // pick them up later and create directories as required
