@@ -1194,7 +1194,7 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
 
     auto runtime =
         std::chrono::minutes(item.firstChildElement("runtime").text()
-                                               .remove(QRegExp("[A-Za-z]"))
+                                               .remove(QRegularExpression("[A-Za-z]"))
                                                .trimmed().toUInt());
 
     QDomElement actor = item.firstChildElement("actor");
@@ -1419,7 +1419,7 @@ QDateTime RFC822TimeToQDateTime(const QString& t)
     QStringList tmp = time.split(' ');
     if (tmp.isEmpty())
         return QDateTime();
-    if (tmp. at(0).contains(QRegExp("\\D")))
+    if (tmp.at(0).contains(QRegularExpression("\\D")))
         tmp.removeFirst();
     if (tmp.size() != 5)
         return QDateTime();
