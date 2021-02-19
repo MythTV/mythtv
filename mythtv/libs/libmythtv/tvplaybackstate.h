@@ -84,6 +84,11 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void GoToMenu(const QString& Menu);
     void GoToDVDProgram(bool Direction);
 
+    // Editor
+    void EnableEdit();
+    void DisableEdit(int HowToSave);
+    void RefreshEditorState(bool CheckSaved = false);
+
   public slots:
     void OverlayStateChanged(MythOverlayState OverlayState);
     void AudioPlayerStateChanged(const MythAudioPlayerState& AudioPlayerState);
@@ -92,6 +97,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void VideoBoundsStateChanged(const MythVideoBoundsState& VideoBoundsState);
     void VideoColourStateChanged(const MythVideoColourState& ColourState);
     void VisualiserStateChanged(const MythVisualiserState& VisualiserState);
+    void EditorStateChanged(const MythEditorState& EditorState);
 
   protected:
     MythOverlayState     m_overlayState     { };
@@ -101,6 +107,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     MythVideoBoundsState m_videoBoundsState { };
     MythVideoColourState m_videoColourState { };
     MythVisualiserState  m_visualiserState  { };
+    MythEditorState      m_editorState      { };
 };
 
 #endif

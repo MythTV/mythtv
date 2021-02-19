@@ -2,6 +2,7 @@
 #include "mythlogging.h"
 #include "mythuiactions.h"
 #include "tv_actions.h"
+#include "tv_play.h"
 #include "mythplayereditorui.h"
 
 #define LOC QString("Editor: ")
@@ -9,6 +10,15 @@
 MythPlayerEditorUI::MythPlayerEditorUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags)
   : MythPlayerVisualiserUI(MainWindow, Tv, Context, Flags)
 {
+    qRegisterMetaType<MythEditorState>();
+
+    // Connect incoming TV signals
+    connect(Tv, &TV::EnableEdit,  this, &MythPlayerEditorUI::EnableEdit);
+    connect(Tv, &TV::DisableEdit, this, &MythPlayerEditorUI::DisableEdit);
+    connect(Tv, &TV::RefreshEditorState, this, &MythPlayerEditorUI::RefreshEditorState);
+
+    // New state
+    connect(this, &MythPlayerEditorUI::EditorStateChanged, Tv, &TV::EditorStateChanged);
 }
 
 void MythPlayerEditorUI::InitialiseState()
@@ -17,44 +27,22 @@ void MythPlayerEditorUI::InitialiseState()
     MythPlayerVisualiserUI::InitialiseState();
 }
 
-uint64_t MythPlayerEditorUI::GetNearestMark(uint64_t Frame, bool Right)
+void MythPlayerEditorUI::RefreshEditorState(bool CheckSaved /*=false*/)
 {
-    return m_deleteMap.GetNearestMark(Frame, Right);
-}
-
-bool MythPlayerEditorUI::IsTemporaryMark(uint64_t Frame)
-{
-    return m_deleteMap.IsTemporaryMark(Frame);
-}
-
-bool MythPlayerEditorUI::HasTemporaryMark()
-{
-    return m_deleteMap.HasTemporaryMark();
-}
-
-bool MythPlayerEditorUI::IsCutListSaved()
-{
-    return m_deleteMap.IsSaved();
-}
-
-bool MythPlayerEditorUI::DeleteMapHasUndo()
-{
-    return m_deleteMap.HasUndo();
-}
-
-bool MythPlayerEditorUI::DeleteMapHasRedo()
-{
-    return m_deleteMap.HasRedo();
-}
-
-QString MythPlayerEditorUI::DeleteMapGetUndoMessage()
-{
-    return m_deleteMap.GetUndoMessage();
-}
-
-QString MythPlayerEditorUI::DeleteMapGetRedoMessage()
-{
-    return m_deleteMap.GetRedoMessage();
+    auto frame = GetFramesPlayed();
+    emit EditorStateChanged({
+        frame,
+        m_deleteMap.GetNearestMark(frame, true),
+        m_deleteMap.GetNearestMark(frame, false),
+        GetTotalFrameCount(),
+        m_deleteMap.IsInDelete(frame),
+        m_deleteMap.IsTemporaryMark(frame),
+        m_deleteMap.HasTemporaryMark(),
+        m_deleteMap.HasUndo(),
+        m_deleteMap.GetUndoMessage(),
+        m_deleteMap.HasRedo(),
+        m_deleteMap.GetRedoMessage(),
+        CheckSaved ? m_deleteMap.IsSaved() : false });
 }
 
 void MythPlayerEditorUI::EnableEdit()

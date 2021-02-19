@@ -141,4 +141,29 @@ class MTV_PUBLIC MythVisualiserState
 
 Q_DECLARE_METATYPE(MythVisualiserState)
 
+class MTV_PUBLIC MythEditorState
+{
+  public:
+    MythEditorState() = default;
+    MythEditorState(uint64_t Current, uint64_t Previous, uint64_t Next, uint64_t Total,
+                    bool InDelete, bool IsTemp, bool HasTemp,
+                    bool HasUndo, QString Undo, bool HasRedo, QString Redo,
+                    bool Saved);
+
+    uint64_t m_currentFrame  { 0 };
+    uint64_t m_previousCut   { 0 };
+    uint64_t m_nextCut       { 0 };
+    uint64_t m_totalFrames   { 0 };
+    bool     m_frameInDelete { false };
+    bool     m_isTempMark    { false };
+    bool     m_hasTempMark   { false };
+    bool     m_hasUndo       { false };
+    QString  m_undoMessage;
+    bool     m_hasRedo       { false };
+    QString  m_redoMessage;
+    bool     m_saved         { false };
+};
+
+Q_DECLARE_METATYPE(MythEditorState);
+
 #endif

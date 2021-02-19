@@ -3320,23 +3320,18 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
             }
             if (IsActionable("ESCAPE", actions))
             {
-                if (!m_player->IsCutListSaved())
+                emit RefreshEditorState(true);
+                if (!m_editorState.m_saved)
                     ShowOSDCutpoint("EXIT_EDIT_MODE");
                 else
-                {
-                    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-                    m_player->DisableEdit(0);
-                    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-                }
+                    emit DisableEdit(0);
                 handled = true;
             }
             else
             {
-                m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-                auto current_frame = m_player->GetFramesPlayed();
-                m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
-                if ((IsActionable(ACTION_SELECT, actions)) && (m_player->IsInDelete(current_frame)) &&
-                    (!(m_player->HasTemporaryMark())))
+                emit RefreshEditorState();
+                if ((IsActionable(ACTION_SELECT, actions)) && m_editorState.m_frameInDelete &&
+                    !m_editorState.m_hasTempMark)
                 {
                     ShowOSDCutpoint("EDIT_CUT_POINTS");
                     handled = true;
@@ -7388,8 +7383,7 @@ void TV::customEvent(QEvent *Event)
         GetPlayerReadLock();
         PrepareToExitPlayer(__LINE__);
         SetExitPlayer(true, true);
-        if (m_player)
-            m_player->DisableEdit(-1);
+        emit DisableEdit(-1);
         ReturnPlayerLock();
     }
 
@@ -7749,10 +7743,7 @@ void TV::StartProgramEditMode()
         return;
     }
 
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player)
-        m_player->EnableEdit();
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+    emit EnableEdit();
 }
 
 void TV::ShowOSDAlreadyEditing()
@@ -7788,13 +7779,10 @@ void TV::HandleOSDAlreadyEditing(const QString& Action, bool WasPaused)
     else // action == "CONTINUE"
     {
         m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-        if (m_player)
-        {
-            m_playerContext.m_playingInfo->SaveEditing(false);
-            m_player->EnableEdit();
-            if (!m_overlayState.m_editing && !WasPaused && paused)
-                DoTogglePause(false);
-        }
+        m_playerContext.m_playingInfo->SaveEditing(false);
+        emit EnableEdit();
+        if (!m_overlayState.m_editing && !WasPaused && paused)
+            DoTogglePause(false);
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     }
 
@@ -8333,82 +8321,72 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDia
         }
         return result;
     }
-    m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    uint64_t frame   = m_player->GetFramesPlayed();
-    uint64_t previous_cut = m_player->GetNearestMark(frame, false);
-    uint64_t next_cut = m_player->GetNearestMark(frame, true);
-    uint64_t total_frames = m_player->GetTotalFrameCount();
-    bool is_in_delete = m_player->IsInDelete(frame);
-    bool is_temporary_mark = m_player->IsTemporaryMark(frame);
+
+    emit RefreshEditorState();
+
     if (category == kMenuCategoryItem)
     {
         bool active = true;
         if (actionName == "DIALOG_CUTPOINT_MOVEPREV_0")
         {
-            if ((is_in_delete && is_temporary_mark &&
-                 previous_cut > 0) ||
-                (is_in_delete && !is_temporary_mark) ||
-                (!is_temporary_mark && previous_cut > 0))
+            if ((m_editorState.m_frameInDelete && m_editorState.m_isTempMark &&
+                 m_editorState.m_previousCut > 0) ||
+                (m_editorState.m_frameInDelete && !m_editorState.m_isTempMark) ||
+                (!m_editorState.m_isTempMark && m_editorState.m_previousCut > 0))
             {
-                active = !(is_in_delete && !is_temporary_mark);
-                BUTTON2(actionName, tr("Move Previous Cut End Here"),
-                        tr("Move Start of Cut Here"));
+                active = !(m_editorState.m_frameInDelete && !m_editorState.m_isTempMark);
+                BUTTON2(actionName, tr("Move Previous Cut End Here"), tr("Move Start of Cut Here"));
             }
         }
         else if (actionName == "DIALOG_CUTPOINT_MOVENEXT_0")
         {
-            if ((is_in_delete && is_temporary_mark &&
-                 next_cut != total_frames) ||
-                (is_in_delete && !is_temporary_mark) ||
-                (!is_temporary_mark && next_cut != total_frames))
+            if ((m_editorState.m_frameInDelete && m_editorState.m_isTempMark &&
+                 m_editorState.m_nextCut != m_editorState.m_totalFrames) ||
+                (m_editorState.m_frameInDelete && !m_editorState.m_isTempMark) ||
+                (!m_editorState.m_isTempMark && m_editorState.m_nextCut != m_editorState.m_totalFrames))
             {
-                active = !(is_in_delete && !is_temporary_mark);
-                BUTTON2(actionName, tr("Move Next Cut Start Here"),
-                        tr("Move End of Cut Here"));
+                active = !(m_editorState.m_frameInDelete && !m_editorState.m_isTempMark);
+                BUTTON2(actionName, tr("Move Next Cut Start Here"), tr("Move End of Cut Here"));
             }
         }
         else if (actionName == "DIALOG_CUTPOINT_CUTTOBEGINNING_0")
         {
-            if (previous_cut == 0 &&
-                (is_temporary_mark || !is_in_delete))
-            {
+            if (m_editorState.m_previousCut == 0 && (m_editorState.m_isTempMark || !m_editorState.m_frameInDelete))
                 BUTTON(actionName, tr("Cut to Beginning"));
-            }
         }
         else if (actionName == "DIALOG_CUTPOINT_CUTTOEND_0")
         {
-            if (next_cut == total_frames &&
-                (is_temporary_mark || !is_in_delete))
+            if (m_editorState.m_nextCut == m_editorState.m_totalFrames &&
+                (m_editorState.m_isTempMark || !m_editorState.m_frameInDelete))
             {
                 BUTTON(actionName, tr("Cut to End"));
             }
         }
         else if (actionName == "DIALOG_CUTPOINT_DELETE_0")
         {
-            active = is_in_delete;
-            BUTTON2(actionName, tr("Delete This Cut"),
-                    tr("Join Surrounding Cuts"));
+            active = m_editorState.m_frameInDelete;
+            BUTTON2(actionName, tr("Delete This Cut"), tr("Join Surrounding Cuts"));
         }
         else if (actionName == "DIALOG_CUTPOINT_NEWCUT_0")
         {
-            if (!is_in_delete)
+            if (!m_editorState.m_frameInDelete)
                 BUTTON(actionName, tr("Add New Cut"));
         }
         else if (actionName == "DIALOG_CUTPOINT_UNDO_0")
         {
-            active = m_player->DeleteMapHasUndo();
+            active = m_editorState.m_hasUndo;
             //: %1 is the undo message
             QString text = tr("Undo - %1");
             result = Context.AddButton(Menu, active, actionName, text, "", false,
-                                       m_player->DeleteMapGetUndoMessage());
+                                       m_editorState.m_undoMessage);
         }
         else if (actionName == "DIALOG_CUTPOINT_REDO_0")
         {
-            active = m_player->DeleteMapHasRedo();
+            active = m_editorState.m_hasRedo;
             //: %1 is the redo message
             QString text = tr("Redo - %1");
             result = Context.AddButton(Menu, active, actionName, text, "", false,
-                                       m_player->DeleteMapGetRedoMessage());
+                                       m_editorState.m_redoMessage);
         }
         else if (actionName == "DIALOG_CUTPOINT_CLEARMAP_0")
         {
@@ -8454,7 +8432,7 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDia
                 BUTTON(actionName, text);
         }
     }
-    m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
+
     return result;
 }
 
