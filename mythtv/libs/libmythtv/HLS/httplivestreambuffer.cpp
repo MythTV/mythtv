@@ -119,15 +119,15 @@ static void cancelURL(const QStringList &urls)
 class HLSSegment
 {
   public:
-    HLSSegment(const std::chrono::seconds mduration, const int id, const QString &title,
-               const QString &uri, const QString &current_key_path)
+    HLSSegment(const std::chrono::seconds mduration, const int id, QString title,
+               QString uri, QString current_key_path)
       : m_id(id),
         m_duration(mduration), // Seconds
-        m_title(title),
-        m_url(uri)
+        m_title(std::move(title)),
+        m_url(std::move(uri))
     {
 #ifdef USING_LIBCRYPTO
-        m_pszKeyPath = current_key_path;
+        m_pszKeyPath = std::move(current_key_path);
 #else
         Q_UNUSED(current_key_path);
 #endif
@@ -396,10 +396,10 @@ private:
 class HLSStream
 {
   public:
-    HLSStream(const int mid, const uint64_t bitrate, const QString &uri)
+    HLSStream(const int mid, const uint64_t bitrate, QString uri)
       : m_id(mid),
         m_bitrate(bitrate),
-        m_url(uri)
+        m_url(std::move(uri))
     {
 #ifdef USING_LIBCRYPTO
         m_aesIv.fill(0);
