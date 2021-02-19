@@ -798,8 +798,7 @@ static void playDisc()
             //
             //  Need to do device substitution
             //
-            command_string =
-                command_string.replace(QRegExp("%d"), dvd_device);
+            command_string = command_string.replace("%d", dvd_device);
         }
         gCoreContext->emitTVPlaybackStarted();
         GetMythMainWindow()->PauseIdleTimer(true);
