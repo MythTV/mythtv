@@ -22,7 +22,6 @@
 // Qt headers
 #include <QCoreApplication>
 #include <QString>
-#include <QRegExp>
 #include <QDir>
 #include <QEvent>
 
@@ -236,7 +235,7 @@ static int SetCutList(uint chanid, const QDateTime& starttime, QString newCutLis
 {
     frm_dir_map_t cutlist;
 
-    newCutList.replace(QRegExp(" "), "");
+    newCutList.remove(" ");
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList tokens = newCutList.split(",", QString::SkipEmptyParts);
