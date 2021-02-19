@@ -3,7 +3,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include "mythcorecontext.h"
 #include "mythmiscutil.h"
@@ -1073,9 +1073,9 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
     //          3 returns episode, 4 returns subtitle
 
     QString cleanFilename = file_name.left(file_name.lastIndexOf('.'));
-    cleanFilename.replace(QRegExp("%20"), " ");
-    cleanFilename.replace(QRegExp("_"), " ");
-    cleanFilename.replace(QRegExp("\\."), " ");
+    cleanFilename.replace(QRegularExpression("%20"), " ");
+    cleanFilename.replace(QRegularExpression("_"), " ");
+    cleanFilename.replace(QRegularExpression("\\."), " ");
 
     /*: Word(s) which should be recognized as "season" when parsing a video
      * file name. To list more than one word, separate them with a '|'.
@@ -1103,38 +1103,35 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
                   "(.*)$" // Subtitle
                   ).arg(separator)
                    .arg(season_translation).arg(episode_translation);
-    QRegExp filename_parse(regexp,
-                  Qt::CaseInsensitive, QRegExp::RegExp2);
+    static const QRegularExpression filename_parse { regexp,
+        QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
 
     // Cleanup Regexp
     QString regexp2 = QString("(%1(?:(?:Season|%2)%1\\d*%1)*%1)$")
                              .arg(separator).arg(season_translation);
-    QRegExp title_parse(regexp2, Qt::CaseInsensitive, QRegExp::RegExp2);
+    static const QRegularExpression title_parse {regexp2,
+        QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
 
-    int pos = filename_parse.indexIn(cleanFilename);
-    if (pos > -1)
+    auto match = filename_parse.match(cleanFilename);
+    if (match.hasMatch())
     {
-        QString title = filename_parse.cap(1);
-        QString season = filename_parse.cap(2);
-        QString episode = filename_parse.cap(3);
-        QString subtitle = filename_parse.cap(4);
-
-        // Clean up the title
-        int pos2 = title_parse.indexIn(title);
-        if (pos2 > -1)
-            title = title.left(pos2);
-        title = title.right(title.length() -
-                     title.lastIndexOf('/') -1);
-
         // Return requested value
-        if (position == 1 && !title.isEmpty())
+        if (position == 1 && !match.capturedRef(1).isEmpty())
+        {
+            // Clean up the title
+            QString title = match.captured(1);
+            match = title_parse.match(title);
+            if (match.hasMatch())
+                title = title.left(match.capturedStart());
+            title = title.right(title.length() - title.lastIndexOf('/') -1);
             return title.trimmed();
+        }
         if (position == 2)
-            return season.trimmed();
+            return match.captured(2).trimmed();
         if (position == 3)
-            return episode.trimmed();
+            return match.captured(3).trimmed();
         if (position == 4)
-            return subtitle.trimmed();
+            return match.captured(4).trimmed();
     }
     else if (position == 1)
     {

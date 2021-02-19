@@ -318,6 +318,11 @@ class Testvideometadata: public QObject
                       QString ("Episode Title"),
                       2,
                       3);
+        TestMetadata (QString ("Series.Title/Season.1/Season%20Title_-_02x03_-_Episode%20Title.mp4"),
+                      QString ("Season Title"),
+                      QString ("Episode Title"),
+                      2,
+                      3);
     }
 
     static void TestMetadata(const QString &filename,
