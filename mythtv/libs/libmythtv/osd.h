@@ -117,7 +117,7 @@ class OSD : public MythMediaOverlay
 
     void SetExpiry(const QString &Window, enum OSDTimeout Timeout, std::chrono::milliseconds CustomTimeout = 0ms);
     void ResetWindow(const QString &Window);
-    void Draw(QRect Rect);
+    void Draw();
 
     void SetValues(const QString &Window, const QHash<QString,int> &Map, OSDTimeout Timeout);
     void SetValues(const QString &Window, const QHash<QString,float> &Map, OSDTimeout Timeout);

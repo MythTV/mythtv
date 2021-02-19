@@ -59,7 +59,6 @@ class MythVideoOutputGPU : public MythVideoOutput
                                            QRect DisplayVisibleRect, MythCodecID CodecId) override;
     void            PrepareFrame          (MythVideoFrame* Frame, FrameScanType Scan) override;
     void            RenderFrame           (MythVideoFrame* Frame, FrameScanType Scan) override;
-    void            RenderOverlays        (OSD& Osd) override;
     bool            CreateBuffers         (MythCodecID CodecID, QSize Size);
     void            DestroyBuffers        ();
     bool            ProcessInputChange    ();

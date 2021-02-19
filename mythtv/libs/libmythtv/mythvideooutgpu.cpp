@@ -359,13 +359,13 @@ void MythVideoOutputGPU::DoneDisplayingFrame(MythVideoFrame* Frame)
     if (!Frame)
         return;
 
-    bool retain = MythVideoFrame::HardwareFormat(Frame->m_type);
+    auto retain = MythVideoFrame::HardwareFormat(Frame->m_type);
     QVector<MythVideoFrame*> release;
 
     m_videoBuffers.BeginLock(kVideoBuffer_pause);
     while (m_videoBuffers.Size(kVideoBuffer_pause))
     {
-        MythVideoFrame* frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
+        auto * frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
         if (!retain || (frame != Frame))
             release.append(frame);
     }
@@ -643,12 +643,6 @@ void MythVideoOutputGPU::RenderFrame(MythVideoFrame *Frame, FrameScanType Scan)
         m_video->RenderFrame(Frame, topfieldfirst, Scan, GetStereoOverride());
     else if (dummy)
         m_render->SetViewPort(GetWindowRect());
-}
-
-void MythVideoOutputGPU::RenderOverlays(OSD& Osd)
-{
-    if (!IsEmbedding())
-        Osd.Draw(GetDisplayVisibleRect());
 }
 
 void MythVideoOutputGPU::UpdatePauseFrame(std::chrono::milliseconds& DisplayTimecode, FrameScanType Scan)
