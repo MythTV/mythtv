@@ -59,20 +59,20 @@ class RestoreIcon;
 
 struct OldChannelData
 {
-    uint chanid;
-    uint sourceid;
-    uint serviceid;
-    uint transportid;
-    uint networkid;
+    uint chanid        {0};
+    uint sourceid      {0};
+    uint serviceid     {0};
+    uint transportid   {0};
+    uint networkid     {0};
     QString channum;
     QString name;
     QString xmltvid;
     QString icon;
-    int visible;
+    int visible        {0};
     QString deleted;
-    bool found_xmltvid;
-    bool found_icon;
-    bool found_visible;
+    bool found_xmltvid {false};
+    bool found_icon    {false};
+    bool found_visible {false};
 };
 
 // Page for updating the fields with non-scanned data
