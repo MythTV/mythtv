@@ -697,13 +697,14 @@ TemplateFinder::TemplateFinder(std::shared_ptr<PGMConverter> pgmc,
                                std::shared_ptr<BorderDetector> bd,
                                std::shared_ptr<EdgeDetector> ed,
                                MythPlayer *player, std::chrono::seconds proglen,
-        const QString& debugdir)
-    : m_pgmConverter(std::move(pgmc))
-    , m_borderDetector(std::move(bd))
-    , m_edgeDetector(std::move(ed))
-    , m_debugDir(debugdir)
-    , m_debugData(debugdir + "/TemplateFinder.txt")
-    , m_debugTmpl(debugdir + "/TemplateFinder.pgm")
+                               const QString& debugdir)
+  : m_pgmConverter(std::move(pgmc)),
+    m_borderDetector(std::move(bd)),
+    m_edgeDetector(std::move(ed)),
+    m_sampleTime(std::min(proglen / 2, 20 * 60s)),
+    m_debugDir(debugdir),
+    m_debugData(debugdir + "/TemplateFinder.txt"),
+    m_debugTmpl(debugdir + "/TemplateFinder.pgm")
 {
     /*
      * TUNABLE:
@@ -725,7 +726,7 @@ TemplateFinder::TemplateFinder(std::shared_ptr<PGMConverter> pgmc,
      *
      * Sample half of the program length or 20 minutes, whichever is less.
      */
-    m_sampleTime = std::min(proglen / 2, 20 * 60s);
+    // m_sampleTime
 
     const float fps = player->GetFrameRate();
 
