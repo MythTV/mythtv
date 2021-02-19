@@ -32,8 +32,8 @@ void MythPlayerEditorUI::RefreshEditorState(bool CheckSaved /*=false*/)
     auto frame = GetFramesPlayed();
     emit EditorStateChanged({
         frame,
-        m_deleteMap.GetNearestMark(frame, true),
         m_deleteMap.GetNearestMark(frame, false),
+        m_deleteMap.GetNearestMark(frame, true),
         GetTotalFrameCount(),
         m_deleteMap.IsInDelete(frame),
         m_deleteMap.IsTemporaryMark(frame),
