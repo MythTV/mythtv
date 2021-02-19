@@ -512,8 +512,7 @@ void MythPlayerUI::RenderVideoFrame(MythVideoFrame *Frame, FrameScanType Scan, b
     m_videoOutput->RenderFrame(Frame, Scan);
     RenderVisualiser();
     m_captionsOverlay.Draw(m_videoOutput->GetDisplayVisibleRect());
-    if (!m_videoOutput->IsEmbedding())
-        m_osd.Draw();
+    m_osd.Draw();
     m_videoOutput->RenderEnd();
 
     if (Wait > 0us)

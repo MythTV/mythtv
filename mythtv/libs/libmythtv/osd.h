@@ -102,6 +102,7 @@ class OSD : public MythMediaOverlay
     void SetText(const QString& Window, const InfoMap& Map, OSDTimeout Timeout);
     void DialogQuit();
     void HideAll(bool KeepSubs = true, MythScreenType* Except = nullptr, bool DropNotification = false);
+    void Embed(bool Embedding);
 
   protected slots:
     void ShowDialog(const MythOSDDialogData& Data);
@@ -142,6 +143,7 @@ class OSD : public MythMediaOverlay
     void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, std::chrono::milliseconds CustomTimeout);
 
   private:
+    bool            m_embedded          { false };
     std::chrono::milliseconds m_fadeTime { kOSDFadeTime };
     MythScreenType* m_dialog            { nullptr };
     QString         m_pulsedDialogText  { };

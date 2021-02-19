@@ -74,6 +74,11 @@ bool OSD::Init(QRect Rect, float FontAspect)
     return true;
 }
 
+void OSD::Embed(bool Embedding)
+{
+    m_embedded = Embedding;
+}
+
 void OSD::IsOSDVisible(bool& Visible)
 {
     if (m_mainWindow->GetCurrentNotificationCenter()->DisplayedNotifications() > 0)
@@ -449,6 +454,9 @@ void OSD::SetGraph(const QString &Window, const QString &Graph, std::chrono::mil
 
 void OSD::Draw()
 {
+    if (m_embedded)
+        return;
+
     bool visible = false;
     QTime now = MythDate::current().time();
 
