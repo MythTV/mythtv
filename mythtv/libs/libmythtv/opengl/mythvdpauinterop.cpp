@@ -16,11 +16,9 @@ MythVDPAUInterop* MythVDPAUInterop::CreateVDPAU(MythPlayerUI* Player,
     MythInteropGPU::InteropMap types;
     GetVDPAUTypes(Context, types);
     if (auto vdpau = types.find(FMT_VDPAU); vdpau != types.end())
-    {
-        for (auto type : vdpau->second)
-            if (type == GL_VDPAU)
-                return new MythVDPAUInterop(Player, Context, CodecId);
-    }
+        if (std::any_of(vdpau->second.cbegin(), vdpau->second.cend(), [](auto Type) { return Type == GL_VDPAU; }))
+            return new MythVDPAUInterop(Player, Context, CodecId);
+
     return nullptr;
 }
 
