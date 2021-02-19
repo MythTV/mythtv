@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QMutex>
 #include <QMutexLocker>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <utility>
 
 // MythTV headers
@@ -19,6 +19,8 @@
 
 #define LOC QString("Metadata Grabber: ")
 static constexpr std::chrono::seconds kGrabberRefresh { 60s };
+
+static const QRegularExpression kRetagRef { R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3})[:_](.*))" };
 
 static GrabberList     s_grabberList;
 static QMutex          s_grabberLock;
@@ -226,20 +228,12 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
 MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
                                                  bool absolute)
 {
-    static QRegExp s_retagref(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3})_(.*))");
-    static QRegExp s_retagref2(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3}):(.*))");
     static QMutex s_reLock;
     QMutexLocker lock(&s_reLock);
     QString tag;
-
-    if (s_retagref.indexIn(inetref) > -1)
-    {
-        tag = s_retagref.cap(1);
-    }
-    else if (s_retagref2.indexIn(inetref) > -1)
-    {
-        tag = s_retagref2.cap(1);
-    }
+    auto match = kRetagRef.match(inetref);
+    if (match.hasMatch())
+        tag = match.captured(1);
     if (!tag.isEmpty())
     {
         // match found, pull out the grabber
@@ -254,17 +248,13 @@ MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
 
 QString MetaGrabberScript::CleanedInetref(const QString &inetref)
 {
-    static QRegExp s_retagref(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3})_(.*))");
-    static QRegExp s_retagref2(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3}):(.*))");
     static QMutex s_reLock;
     QMutexLocker lock(&s_reLock);
 
     // try to strip grabber tag from inetref
-    if (s_retagref.indexIn(inetref) > -1)
-        return s_retagref.cap(2);
-    if (s_retagref2.indexIn(inetref) > -1)
-        return s_retagref2.cap(2);
-
+    auto match = kRetagRef.match(inetref);
+    if (match.hasMatch())
+        return match.captured(2);
     return inetref;
 }
 
