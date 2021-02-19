@@ -43,7 +43,7 @@ class MythVideoOutput : public MythVideoBounds
 
     virtual bool Init(QSize VideoDim, QSize VideoDispDim,
                       float VideoAspect, QRect WindowRect, MythCodecID CodecID);
-    virtual void SetVideoFrameRate(float playback_fps);
+    virtual void SetVideoFrameRate(float VideoFrameRate);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
     virtual void PrepareFrame (MythVideoFrame* Frame, FrameScanType Scan = kScan_Ignore) = 0;
     virtual void RenderFrame  (MythVideoFrame* Frame, FrameScanType) = 0;
@@ -71,7 +71,7 @@ class MythVideoOutput : public MythVideoBounds
     virtual void DeLimboFrame(MythVideoFrame* Frame);
     virtual void StartDisplayingFrame();
     virtual void DoneDisplayingFrame(MythVideoFrame* Frame);
-    virtual void DiscardFrame(MythVideoFrame* frame);
+    virtual void DiscardFrame(MythVideoFrame* Frame);
     virtual void DiscardFrames(bool KeyFrame, bool Flushed);
     virtual void CheckFrameStates() { }
     virtual MythVideoFrame* GetLastDecodedFrame();

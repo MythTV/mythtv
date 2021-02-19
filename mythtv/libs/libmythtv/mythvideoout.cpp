@@ -131,10 +131,10 @@ bool MythVideoOutput::Init(const QSize VideoDim, const QSize VideoDispDim,
     return mainSuccess;
 }
 
-void MythVideoOutput::SetVideoFrameRate(float playback_fps)
+void MythVideoOutput::SetVideoFrameRate(float VideoFrameRate)
 {
     if (m_videoProfile)
-        m_videoProfile->SetOutput(playback_fps);
+        m_videoProfile->SetOutput(VideoFrameRate);
 }
 
 void MythVideoOutput::SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force /*=DEINT_NONE*/)
