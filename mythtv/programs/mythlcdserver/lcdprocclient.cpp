@@ -327,8 +327,8 @@ void LCDProcClient::serverSendingData()
     while(m_socket->canReadLine())
     {
         lineFromServer = m_socket->readLine();
-        lineFromServer = lineFromServer.replace( QRegExp("\n"), "" );
-        lineFromServer = lineFromServer.replace( QRegExp("\r"), "" );
+        lineFromServer = lineFromServer.remove("\n");
+        lineFromServer = lineFromServer.remove("\r");
 
         if (debug_level > 0)
         {
@@ -1884,7 +1884,7 @@ void LCDProcClient::dostdclock()
         aString += time + "\"";
         if ( m_timeFlash )
         {
-            aString = aString.replace(QRegExp(":"), " ");
+            aString = aString.remove(":");
             m_timeFlash = false;
         }
         else

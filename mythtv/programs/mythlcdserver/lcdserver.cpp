@@ -60,7 +60,6 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QList>
-#include <QRegExp>
 #include <QStringList>
 #include <utility>
 
@@ -142,8 +141,8 @@ void LCDServer::readSocket()
         while(socket->canReadLine())
         {
             QString incoming_data = socket->readLine();
-            incoming_data = incoming_data.replace( QRegExp("\n"), "" );
-            incoming_data = incoming_data.replace( QRegExp("\r"), "" );
+            incoming_data = incoming_data.remove("\n");
+            incoming_data = incoming_data.remove("\r");
             incoming_data = incoming_data.simplified();
             QStringList tokens = parseCommand(incoming_data);
             parseTokens(tokens, socket);
