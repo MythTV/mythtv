@@ -198,8 +198,8 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
         if (playbackLen > 0s)
             pos = static_cast<int>(1000.0F * secsplayed.count() / playbackLen.count());
 
-        Info.values.insert(relPrefix + "secondsplayed", secsplayed.count());
-        Info.values.insert(relPrefix + "totalseconds", playbackLen.count());
+        Info.values.insert(relPrefix + "secondsplayed", static_cast<int>(secsplayed.count()));
+        Info.values.insert(relPrefix + "totalseconds", static_cast<int>(playbackLen.count()));
         Info.values[relPrefix + "position"] = pos;
 
         QString text1;
@@ -222,7 +222,7 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
             else if (secsbehind >= 1min)
                 text3 = MythFormatTime(secsbehind, "m:ss");
             else
-                text3 = tr("%n second(s)", "", secsbehind.count());
+                text3 = tr("%n second(s)", "", static_cast<int>(secsbehind.count()));
         }
 
         QString desc = stillFrame ? tr("Still Frame") : tr("%1 of %2").arg(text1).arg(text2);
@@ -242,8 +242,20 @@ std::chrono::milliseconds MythPlayerOverlayUI::GetMillisecondsPlayed(bool HonorC
     return pos;
 }
 
+std::chrono::seconds MythPlayerOverlayUI::GetSecondsPlayed(bool HonorCutList)
+{
+    return duration_cast<std::chrono::seconds>(GetMillisecondsPlayed(HonorCutList));
+}
+
 std::chrono::milliseconds MythPlayerOverlayUI::GetTotalMilliseconds(bool HonorCutList) const
 {
     uint64_t pos = IsWatchingInprogress() ? UINT64_MAX : m_totalFrames;
     return TranslatePositionFrameToMs(pos, HonorCutList);
 }
+
+std::chrono::seconds MythPlayerOverlayUI::GetTotalSeconds(bool HonorCutList) const
+{
+    return duration_cast<std::chrono::seconds>(GetTotalMilliseconds(HonorCutList));
+}
+
+
