@@ -194,15 +194,16 @@ bool CardUtil::IsCableCardPresent(uint inputid,
 
         QString response = QString(data);
 
-        QRegExp regex("^\\{ \"?result\"?: \"(.*)\" \\}$");
-        if (regex.indexIn(response) == -1)
+        static const QRegularExpression regex { "^\\{ \"?result\"?: \"(.*)\" \\}$"};
+        auto match = regex.match(response);
+        if (!match.hasMatch())
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("CardUtil: Ceton unexpected http response: %1").arg(response));
             return false;
         }
 
-        QString result = regex.cap(1);
+        QString result = match.captured(1);
 
         if (result == "Inserted")
         {
