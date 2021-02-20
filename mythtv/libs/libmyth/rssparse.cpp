@@ -711,7 +711,7 @@ QMap<QString, int> Parse::m_timezoneOffsets {
     { "EST" , -5 }
 };
 
-ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc) const
+ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc)
 {
     ResultItem::resultList vList;
 

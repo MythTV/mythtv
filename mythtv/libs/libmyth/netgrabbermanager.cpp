@@ -110,7 +110,7 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
     QDomElement fileitem = domElem.firstChildElement("item");
     while (!fileitem.isNull())
     {   // Fill the article list...
-        articles.append(parse.ParseItem(fileitem));
+        articles.append(Parse::ParseItem(fileitem));
         fileitem = fileitem.nextSiblingElement("item");
     }
 
@@ -302,7 +302,7 @@ void Search::resetSearch()
 void Search::process()
 {
     Parse parse;
-    m_videoList = parse.parseRSS(m_document);
+    m_videoList = Parse::parseRSS(m_document);
 
     QDomNodeList entries = m_document.elementsByTagName("channel");
 

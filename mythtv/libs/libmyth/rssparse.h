@@ -194,7 +194,7 @@ class MPUBLIC Parse : public QObject
     Parse() = default;
     ~Parse() override = default;
 
-    ResultItem::resultList parseRSS(const QDomDocument& domDoc) const;
+    static ResultItem::resultList parseRSS(const QDomDocument& domDoc);
     static ResultItem* ParseItem(const QDomElement& item) ;
 
     static QString GetLink(const QDomElement& parent);
