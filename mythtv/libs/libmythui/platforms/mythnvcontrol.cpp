@@ -162,6 +162,7 @@ NVControl MythNVControl::Create()
                             return res;
                         }
                     }
+                    delete xdisplay;
                 }
             }
             lib.unload();
