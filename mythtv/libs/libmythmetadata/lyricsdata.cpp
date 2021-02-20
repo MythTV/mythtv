@@ -304,7 +304,7 @@ void LyricsData::setLyrics(const QStringList &lyrics)
 
     for (int x = 0; x < lyrics.count(); x++)
     {
-        QString lyric = lyrics.at(x);
+        const QString& lyric = lyrics.at(x);
 
         auto *line = new LyricsLine;
 
