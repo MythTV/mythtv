@@ -715,7 +715,7 @@ bool MythDisplay::SwitchToVideo(QSize Size, double Rate)
     }
 
     // need to change video mode?
-    MythDisplayMode::FindBestMatch(GetVideoModes(), next, targetrate);
+    (void)MythDisplayMode::FindBestMatch(GetVideoModes(), next, targetrate);
 
     // If GSync or FreeSync are enabled, ignore refresh rate only changes.
     // N.B. This check is not used when switching to GUI (which already ignores
