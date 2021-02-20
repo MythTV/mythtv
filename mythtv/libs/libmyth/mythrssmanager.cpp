@@ -224,7 +224,7 @@ void RSSSite::process(void)
     {
         ResultItem::resultList items;
         Parse parser;
-        items = parser.parseRSS(domDoc);
+        items = Parse::parseRSS(domDoc);
 
         for (const auto *item : qAsConst(items))
         {
