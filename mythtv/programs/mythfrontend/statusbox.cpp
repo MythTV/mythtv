@@ -1333,8 +1333,8 @@ void StatusBox::doMachineStatus()
         auto UpdateUptime = [](StatusBoxItem* Item)
         {
             std::chrono::seconds time = 0s;
-            getUptime(time);
-            Item->SetText(uptimeStr(time));
+            if (getUptime(time))
+                Item->SetText(uptimeStr(time));
         };
         StatusBoxItem *uptimeitem = AddLogLine(uptimeStr(uptime));
         connect(uptimeitem, &StatusBoxItem::UpdateRequired, UpdateUptime);
