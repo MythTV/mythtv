@@ -134,21 +134,22 @@ bool SatIPRTSP::Setup(const QUrl& url)
         return false;
     }
 
-    QRegExp sessionTimeoutRegex(
-        "^([^\\r\\n]+);timeout=([0-9]+)?", Qt::CaseSensitive, QRegExp::RegExp2);
-
     if (m_headers.contains("SESSION"))
     {
-        if (sessionTimeoutRegex.indexIn(m_headers["SESSION"]) == -1)
+        static const QRegularExpression sessionTimeoutRegex {
+            "^([^\\r\\n]+);timeout=([0-9]+)?", QRegularExpression::CaseInsensitiveOption };
+        auto match = sessionTimeoutRegex.match(m_headers["SESSION"]);
+        if (!match.hasMatch())
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("Failed to extract session id from session header ('%1')")
                     .arg(m_headers["Session"]));
         }
 
-        QStringList parts = sessionTimeoutRegex.capturedTexts();
-        m_sessionid = parts.at(1);
-        m_timeout = parts.length() > 1 ? std::chrono::seconds(parts.at(2).toInt() / 2) : 30s;
+        m_sessionid = match.captured(1);
+        m_timeout = match.capturedLength(2) > 0
+            ? std::chrono::seconds(match.capturedRef(2).toInt() / 2)
+            : 30s;
 
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Sat>IP protocol timeout:%1 ms")
             .arg(m_timeout.count()));
