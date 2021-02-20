@@ -462,52 +462,57 @@ static bool parse_extinf(const QString &line,
                          int           &nextChanNum)
 {
     // Parse extension portion, Freebox or SAT>IP format
-    QRegExp chanNumName1(R"(^-?\d+,(\d+)(?:\.\s|\s-\s)(.*)$)");
-    int pos = chanNumName1.indexIn(line);
-    if (pos != -1)
+    static const QRegularExpression chanNumName1
+        { R"(^-?\d+,(\d+)(?:\.\s|\s-\s)(.*)$)" };
+    auto match = chanNumName1.match(line);
+    if (match.hasMatch())
     {
-        channum = chanNumName1.cap(1);
-        name = chanNumName1.cap(2);
+        channum = match.captured(1);
+        name = match.captured(2);
         return true;
     }
 
     // Parse extension portion, A1 TV format
-    QRegExp chanNumName2("^-?\\d+\\s+[^,]*tvg-num=\"(\\d+)\"[^,]*,(.*)$");
-    pos = chanNumName2.indexIn(line);
-    if (pos != -1)
+    static const QRegularExpression chanNumName2
+        { "^-?\\d+\\s+[^,]*tvg-num=\"(\\d+)\"[^,]*,(.*)$" };
+    match = chanNumName2.match(line);
+    if (match.hasMatch())
     {
-        channum = chanNumName2.cap(1);
-        name = chanNumName2.cap(2);
+        channum = match.captured(1);
+        name = match.captured(2);
         return true;
     }
 
     // Parse extension portion, Moviestar TV number then name
-    QRegExp chanNumName3(R"(^-?\d+,\[(\d+)\]\s+(.*)$)");
-    pos = chanNumName3.indexIn(line);
-    if (pos != -1)
+    static const QRegularExpression chanNumName3
+        { R"(^-?\d+,\[(\d+)\]\s+(.*)$)" };
+    match = chanNumName3.match(line);
+    if (match.hasMatch())
     {
-        channum = chanNumName3.cap(1);
-        name = chanNumName3.cap(2);
+        channum = match.captured(1);
+        name = match.captured(2);
         return true;
     }
 
     // Parse extension portion, Moviestar TV name then number
-    QRegExp chanNumName4(R"(^-?\d+,(.*)\s+\[(\d+)\]$)");
-    pos = chanNumName4.indexIn(line);
-    if (pos != -1)
+    static const QRegularExpression chanNumName4
+        { R"(^-?\d+,(.*)\s+\[(\d+)\]$)" };
+    match = chanNumName4.match(line);
+    if (match.hasMatch())
     {
-        channum = chanNumName4.cap(2);
-        name = chanNumName4.cap(1);
+        channum = match.captured(2);
+        name = match.captured(1);
         return true;
     }
 
     // Parse extension portion, russion iptv plugin style
-    QRegExp chanNumName5(R"(^(-?\d+)\s+[^,]*,\s*(.*)$)");
-    pos = chanNumName5.indexIn(line);
-    if (pos != -1)
+    static const QRegularExpression chanNumName5
+        { R"(^(-?\d+)\s+[^,]*,\s*(.*)$)" };
+    match = chanNumName5.match(line);
+    if (match.hasMatch())
     {
-        channum = chanNumName5.cap(1).simplified();
-        name = chanNumName5.cap(2).simplified();
+        channum = match.captured(1).simplified();
+        name = match.captured(2).simplified();
         bool ok = false;
         int channel_number = channum.toInt (&ok);
         if (ok && (channel_number > 0))
@@ -518,12 +523,13 @@ static bool parse_extinf(const QString &line,
 
     // Parse extension portion, https://github.com/iptv-org/iptv/blob/master/channels/ style
     // EG. #EXTINF:-1 tvg-id="" tvg-name="" tvg-logo="https://i.imgur.com/VejnhiB.png" group-title="News",BBC News
-    QRegExp chanNumName6("(^-?\\d+)\\s+[^,]*[^,]*,(.*)$");
-    pos = chanNumName6.indexIn(line);
-    if (pos != -1)
+    static const QRegularExpression chanNumName6
+        { "(^-?\\d+)\\s+[^,]*[^,]*,(.*)$" };
+    match = chanNumName6.match(line);
+    if (match.hasMatch())
     {
-        channum = chanNumName6.cap(1).simplified();
-        name = chanNumName6.cap(2).simplified();
+        channum = match.captured(1).simplified();
+        name = match.captured(2).simplified();
 
         bool ok = false;
         int channel_number = channum.toInt(&ok);
