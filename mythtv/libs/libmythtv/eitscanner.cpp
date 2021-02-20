@@ -188,10 +188,21 @@ void EITScanner::StartPassiveScan(ChannelBase *channel,
     m_eitSource->SetEITHelper(m_eitHelper);
     m_eitSource->SetEITRate(1.0F);
     int chanid = m_channel->GetChanID();
-    m_eitHelper->SetChannelID(chanid);
-    m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(chanid));
-
-    LOG(VB_EIT, LOG_INFO, LOC_ID + "Started passive scan");
+    if (chanid > 0)
+    {
+        m_eitHelper->SetChannelID(chanid);
+        m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(chanid));
+        LOG(VB_EIT, LOG_INFO, LOC_ID +
+            QString("Started processing EIT events in %1 scan for channel %2 chanid %3")
+                .arg(m_activeScan ? "active" : "passive")
+                .arg(m_channel->GetChannelName()).arg(chanid));
+    }
+    else
+    {
+        LOG(VB_EIT, LOG_INFO, LOC_ID +
+            QString("Failed to start processing EIT events, invalid chanid:%1")
+                .arg(chanid));
+    }
 }
 
 /** \fn EITScanner::StopPassiveScan(void)
@@ -211,12 +222,14 @@ void EITScanner::StopPassiveScan(void)
     EITHelper::WriteEITCache();
     m_eitHelper->SetChannelID(0);
     m_eitHelper->SetSourceID(0);
-    LOG(VB_EIT, LOG_INFO, LOC_ID + "Stopped passive scan");
+    LOG(VB_EIT, LOG_INFO, LOC_ID +
+        QString("Stopped processing EIT events in %1 scan")
+            .arg(m_activeScanStopped ? "passive" : "active"));
 }
 
-void EITScanner::StartActiveScan(TVRec *_rec, std::chrono::seconds max_seconds_per_source)
+void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_per_source)
 {
-    m_rec = _rec;
+    m_rec = rec;
 
     if (m_activeScanChannels.isEmpty())
     {

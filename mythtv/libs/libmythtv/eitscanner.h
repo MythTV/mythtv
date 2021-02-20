@@ -39,8 +39,7 @@ class EITScanner : public QRunnable
     void StartPassiveScan(ChannelBase *channel, EITSource *eitSource);
     void StopPassiveScan(void);
 
-    void StartActiveScan(TVRec *_rec, std::chrono::seconds max_seconds_per_source);
-
+    void StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_per_source);
     void StopActiveScan(void);
 
   protected:
