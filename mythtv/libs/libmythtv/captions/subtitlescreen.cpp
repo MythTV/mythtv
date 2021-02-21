@@ -1372,7 +1372,6 @@ SubtitleScreen::SubtitleScreen(MythPlayer *Player, MythPainter *Painter,
     m_format(new SubtitleFormat)
 {
     m_painter = Painter;
-    m_removeHTML.setMinimal(true);
 }
 
 SubtitleScreen::~SubtitleScreen(void)

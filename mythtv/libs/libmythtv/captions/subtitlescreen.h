@@ -14,7 +14,6 @@ extern "C" {
 #include <QFont>
 #include <QHash>
 #include <QRect>
-#include <QRegExp>
 #include <QSize>
 #include <QStringList>
 #include <QVector>
@@ -238,7 +237,6 @@ private:
     CC608Reader    *m_cc608reader         {nullptr};
     CC708Reader    *m_cc708reader         {nullptr};
     QRect           m_safeArea;
-    QRegExp         m_removeHTML          {"</?.+>"};
     int             m_subtitleType        {kDisplayNone};
     int             m_fontSize            {0};
     int             m_textFontZoom        {100}; // valid for 708 & text subs
