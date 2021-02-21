@@ -5,7 +5,6 @@
 
 #include <QStringList>
 #include <QMap>
-#include <QRegExp>
 #include <QList>
 #include <QWaitCondition>
 #include <QMutex>
@@ -776,7 +775,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     QString("Forcing Recorder option '%1' to '%2'")
                         .arg(key).arg(value));
 
-                if (value.contains(QRegExp("[^0-9]")))
+                if (value.contains(QRegularExpression("\\D")))
                     m_nvr->SetOption(key, value);
                 else
                     m_nvr->SetOption(key, value.toInt());
