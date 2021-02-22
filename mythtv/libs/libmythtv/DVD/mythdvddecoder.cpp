@@ -119,6 +119,12 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                             Reset(true, false, false);
                             m_audio->Reset();
                             m_parent->DiscardVideoFrames(false, false);
+                            // During a seek, the Reset call above resets the frames played
+                            // to zero - so we need to re-establish our position. Playback
+                            // appears unaffected by removing the Reset call - but better
+                            // safe than sorry when it comes to DVD so just update
+                            // the frames played.
+                            UpdateFramesPlayed();
                             break;
 
                         case DVDNAV_WAIT:
