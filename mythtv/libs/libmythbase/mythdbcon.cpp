@@ -6,6 +6,7 @@
 // Qt
 #include <QCoreApplication>
 #include <QElapsedTimer>
+#include <QRegularExpression>
 #include <QSemaphore>
 #include <QSqlDriver>
 #include <QSqlError>
@@ -929,23 +930,23 @@ void MSqlEscapeAsAQuery(QString &query, const MSqlBindings &bindings)
 {
     MSqlQuery result(MSqlQuery::InitCon());
 
-    QString q = query;
-    QRegExp rx(QString::fromLatin1("('[^']+'|:[a-zA-Z0-9_]+)"));
+    QRegularExpression rx { "('[^']+'|:\\w+)",
+        QRegularExpression::UseUnicodePropertiesOption};
 
     QVector<Holder> holders;
 
-    int i = 0;
-    while ((i = rx.indexIn(q, i)) != -1)
+    auto matchIter = rx.globalMatch(query);
+    while (matchIter.hasNext())
     {
-        if (!rx.cap(1).isEmpty())
-            holders.append(Holder(rx.cap(0), i));
-        i += rx.matchedLength();
+        auto match = matchIter.next();
+        if (match.capturedLength(1) > 0)
+            holders.append(Holder(match.captured(), match.capturedStart()));
     }
 
     QVariant val;
     QString holder;
 
-    for (i = holders.count() - 1; i >= 0; --i)
+    for (int i = holders.count() - 1; i >= 0; --i)
     {
         holder = holders[(uint)i].m_holderName;
         val = bindings[holder];

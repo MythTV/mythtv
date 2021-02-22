@@ -72,7 +72,6 @@ void TestDbCon::test_escapeAsQuery(void)
 
     MSqlEscapeAsAQuery(query, bindings);
 
-    QEXPECT_FAIL("unicode1", "Needs to parse unicode strings after a colon.", Continue);
     QCOMPARE(query, e_result);
 }
 
