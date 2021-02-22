@@ -999,17 +999,18 @@ void FormattedTextSubtitleSRT::Init(const QStringList &subs)
     bool isBold = false;
     bool isUnderline = false;
     QColor color(Qt::white);
-    QRegExp htmlTag("</?.+>");
+    static const QRegularExpression htmlTag {
+        "</?.+>", QRegularExpression::InvertedGreedinessOption };
     QString htmlPrefix("<font color=\"");
     QString htmlSuffix("\">");
-    htmlTag.setMinimal(true);
     for (const QString& subtitle : qAsConst(subs))
     {
         FormattedTextLine line;
         QString text(subtitle);
         while (!text.isEmpty())
         {
-            int pos = text.indexOf(htmlTag);
+            auto match = htmlTag.match(text);
+            int pos = match.capturedStart();
             if (pos != 0) // don't add a zero-length string
             {
                 CC708CharacterAttribute attr(isItalic, isBold, isUnderline,
@@ -1022,7 +1023,7 @@ void FormattedTextSubtitleSRT::Init(const QStringList &subs)
             }
             if (pos >= 0)
             {
-                int htmlLen = htmlTag.matchedLength();
+                int htmlLen = match.capturedLength();
                 QString html = text.left(htmlLen).toLower();
                 text = text.mid(htmlLen);
                 if (html == "<i>")
@@ -1155,7 +1156,7 @@ static QString extract_cc608(QString &text, int &color,
 
     // Copy the string into the result, up to the next control
     // character.
-    int nextControl = text.indexOf(QRegExp("[\\x7000-\\x7fff]"));
+    int nextControl = text.indexOf(QRegularExpression("[\\x{7000}-\\x{7fff}]"));
     if (nextControl < 0)
     {
         result = text;
