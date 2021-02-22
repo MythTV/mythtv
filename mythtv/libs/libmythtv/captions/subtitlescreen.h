@@ -27,6 +27,7 @@ extern "C" {
 #include "mythuiimage.h"
 
 class SubtitleScreen;
+class TestSubtitleScreen;
 
 class FormattedTextChunk
 {
@@ -70,8 +71,10 @@ public:
     int m_origY   {-1}; // original, unscaled coordinates
 };
 
-class FormattedTextSubtitle
+class MTV_PUBLIC FormattedTextSubtitle
 {
+    friend class TestSubtitleScreen;
+
 protected:
     FormattedTextSubtitle(QString base, QRect safearea,
                           std::chrono::milliseconds start,
@@ -106,7 +109,7 @@ protected:
     QRect           m_bounds;
 };
 
-class FormattedTextSubtitleSRT : public FormattedTextSubtitle
+class MTV_PUBLIC FormattedTextSubtitleSRT : public FormattedTextSubtitle
 {
 public:
     FormattedTextSubtitleSRT(const QString &base,
@@ -124,7 +127,7 @@ private:
     void Init(const QStringList &subs);
 };
 
-class FormattedTextSubtitle608 : public FormattedTextSubtitle
+class MTV_PUBLIC FormattedTextSubtitle608 : public FormattedTextSubtitle
 {
 public:
     explicit FormattedTextSubtitle608(const vector<CC608Text*> &buffers,
@@ -140,7 +143,7 @@ private:
     void Init(const vector<CC608Text*> &buffers);
 };
 
-class FormattedTextSubtitle708 : public FormattedTextSubtitle
+class MTV_PUBLIC FormattedTextSubtitle708 : public FormattedTextSubtitle
 {
 public:
     FormattedTextSubtitle708(const CC708Window &win,
@@ -169,7 +172,7 @@ private:
     QColor m_bgFillColor;
 };
 
-class SubtitleScreen : public MythScreenType
+class MTV_PUBLIC SubtitleScreen : public MythScreenType
 {
     Q_OBJECT
 public:
