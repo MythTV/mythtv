@@ -930,7 +930,7 @@ void MSqlEscapeAsAQuery(QString &query, const MSqlBindings &bindings)
     MSqlQuery result(MSqlQuery::InitCon());
 
     QString q = query;
-    QRegExp rx(QString::fromLatin1("'[^']*'|:([a-zA-Z0-9_]+)"));
+    QRegExp rx(QString::fromLatin1("('[^']+'|:[a-zA-Z0-9_]+)"));
 
     QVector<Holder> holders;
 
