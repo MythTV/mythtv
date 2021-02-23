@@ -24,6 +24,8 @@
 #include "mythdirs.h"
 #include "mythdb.h"
 
+#define LOC QString("ChannelEditor: ")
+
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
 {
     setLabel(tr("Channel Options"));
@@ -95,9 +97,10 @@ bool ChannelEditor::Create()
     MythUICheckBox *hideCheck = dynamic_cast<MythUICheckBox *>(GetChild("nochannum"));
 
     if (!sortList || !m_sourceList || !m_channelList || !deleteButton ||
-        !scanButton || !restoreDataButton || !importIconButton || !transportEditorButton ||
+        !scanButton || !importIconButton || !transportEditorButton ||
         !hideCheck)
     {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "One or more buttons not found in theme.");
         return false;
     }
 
@@ -143,9 +146,16 @@ bool ChannelEditor::Create()
     scanButton->SetEnabled(SourceUtil::IsAnySourceScanable());
 
     // Restore Data button
-    restoreDataButton->SetHelpText(tr("Restore Data from deleted channels."));
-    restoreDataButton->SetEnabled(true);
-    connect(restoreDataButton, &MythUIButton::Clicked, this, &ChannelEditor::restoreData);
+    if (restoreDataButton)
+    {
+        restoreDataButton->SetHelpText(tr("Restore Data from deleted channels."));
+        restoreDataButton->SetEnabled(true);
+        connect(restoreDataButton, &MythUIButton::Clicked, this, &ChannelEditor::restoreData);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Button \"Restore Data\" not found in theme.");
+    }
 
     // Import Icons Button
     importIconButton->SetHelpText(tr("Starts the icon downloader"));
