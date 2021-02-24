@@ -183,17 +183,22 @@
         </checkbox>
 
         <button name="scan" from="basewidebutton">
-            <position>90,605</position>
+            <position>40,605</position>
             <value>Channel Scan</value>
         </button>
 
+        <button name="restoredata" from="basewidebutton">
+            <position>340,605</position>
+            <value>Restore Data</value>
+        </button>
+
         <button name="importicons" from="basewidebutton">
-            <position>490,605</position>
+            <position>640,605</position>
             <value>Icon Download</value>
         </button>
 
         <button name="edittransport" from="basewidebutton">
-            <position>890,605</position>
+            <position>940,605</position>
             <value>Edit Transports</value>
         </button>
 

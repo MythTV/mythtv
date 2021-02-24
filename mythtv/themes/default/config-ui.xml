@@ -182,15 +182,15 @@
         </checkbox>
 
         <button name="scan">
-            <area>35,540,220,43</area>
+            <area>35,540,170,43</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
-                        <area>0,0,220,43</area>
+                        <area>0,0,170,43</area>
                         <filename>wide_button_background.png</filename>
                     </imagetype>
                     <textarea name="text">
-                        <area>5,6,210,30</area>
+                        <area>5,6,160,30</area>
                         <align>allcenter</align>
                         <font>basemedium</font>
                         <font state="selected">basemedium</font>
@@ -199,14 +199,14 @@
                 </state>
                 <state name="selected" from="active">
                     <imagetype name="background">
-                        <area>0,0,220,43</area>
+                        <area>0,0,170,43</area>
                         <filename>wide_button_selected_background.png</filename>
                     </imagetype>
                 </state>
                 <state name="disabled" from="active" />
                 <state name="pushed" from="active">
                     <imagetype name="background">
-                        <area>0,0,220,43</area>
+                        <area>0,0,170,43</area>
                         <filename>wide_button_pushed_background.png</filename>
                     </imagetype>
                     <textarea name="text">
@@ -217,13 +217,18 @@
             <value>Channel Scan</value>
         </button>
 
+        <button name="restoredata" from="scan">
+            <position>220,540</position>
+            <value>Restore Data</value>
+        </button>
+
         <button name="importicons" from="scan">
-            <position>290,540</position>
+            <position>405,540</position>
             <value>Icon Download</value>
         </button>
 
         <button name="edittransport" from="scan">
-            <position>545,540</position>
+            <position>590,540</position>
             <value>Edit Transports</value>
         </button>
 
