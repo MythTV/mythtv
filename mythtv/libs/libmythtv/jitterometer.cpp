@@ -104,7 +104,7 @@ bool Jitterometer::RecordEndTime()
         doublemics mean = duration_cast<doublemics>(tottime) / cycles;
 
         if (tottime > 0us)
-            m_lastFps = static_cast<float>(cycles) / (tottime.count() / 1000000.0F);
+            m_lastFps = cycles * (1000000.0F / tottime.count());
 
         /* compute the sum of the squares of each deviation from the mean */
         double sum_of_squared_deviations =
