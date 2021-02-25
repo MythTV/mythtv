@@ -42,7 +42,7 @@ else:
 
 
 def strip_tags(html):
-    if html is not None and html is not "":
+    if html is not None and html != "":
         s = MLStripper()
         s.feed(html)
         return s.get_data()

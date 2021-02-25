@@ -501,7 +501,7 @@ def main():
             confdir = os.path.join(confdir, '.mythtv')
         cachedir = os.path.join(confdir, 'cache')
         if not os.path.exists(cachedir):
-            os.makedirs(cachepath)
+            os.makedirs(cachedir)
         if sys.version_info[0] == 2:
             cache_name = os.path.join(cachedir, 'py2tvmaze')
         else:
