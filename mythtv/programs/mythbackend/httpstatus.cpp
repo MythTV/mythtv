@@ -18,7 +18,6 @@
 
 // Qt headers
 #include <QTextStream>
-#include <QRegExp>
 
 // MythTV headers
 #include "httpstatus.h"
@@ -1127,7 +1126,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, const QDomElement& jobs )
                             break;
                     }
 
-                    QString   sTitle       = p.attribute( "title"   , "" );       //.replace(QRegExp("\""), "&quot;");
+                    QString   sTitle       = p.attribute( "title"   , "" );       //.replace("\"", "&quot;");
                     QString   sSubTitle    = p.attribute( "subTitle", "" );
                     QDateTime startTs      = MythDate::fromString( p.attribute( "startTime" ,"" ));
                     QDateTime endTs        = MythDate::fromString( p.attribute( "endTime"   ,"" ));
@@ -1261,7 +1260,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, const QDomElement& info )
                 int nExpirable = g.attribute("expirable" , "0" ).toInt();
                 QString nDir = g.attribute("dir"  , "" );
 
-                nDir.replace(QRegExp(","), ", ");
+                nDir.replace(",", ", ");
 
                 os << "      Disk Usage Summary:<br />\r\n";
                 os << "      <ul>\r\n";
@@ -1335,7 +1334,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, const QDomElement& info )
             QString nDir = g.attribute("dir"  , "" );
             QString id   = g.attribute("id"   , "" );
 
-            nDir.replace(QRegExp(","), ", ");
+            nDir.replace(",", ", ");
 
 
             if (id != "total")

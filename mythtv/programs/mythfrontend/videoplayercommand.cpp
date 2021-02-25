@@ -18,9 +18,9 @@ namespace
     QString ShellEscape(const QString &src)
     {
         return QString(src)
-                .replace(QRegExp("\""), "\\\"")
-                .replace(QRegExp("`"), "\\`")
-                .replace(QRegExp("\\$"), "\\$");
+                .replace("\"",  "\\\"")
+                .replace("`",   "\\`")
+                .replace("\\$", "\\$");
     }
 
     QString ExpandPlayCommand(const QString &command, const QString &filename)
@@ -40,14 +40,14 @@ namespace
             QString default_handler =
                     gCoreContext->GetSetting("VideoDefaultPlayer");
             if (tmp.contains("%s") && default_handler.contains("%s"))
-                default_handler = default_handler.replace(QRegExp("%s"), "");
-            tmp.replace(QRegExp("%d"), default_handler);
+                default_handler = default_handler.replace("%s", "");
+            tmp.replace("%d", default_handler);
         }
 
         QString arg = QString("\"%1\"").arg(ShellEscape(filename));
 
         if (tmp.contains("%s"))
-            return tmp.replace(QRegExp("%s"), arg);
+            return tmp.replace("%s", arg);
 
         return QString("%1 %2").arg(tmp).arg(arg);
     }
