@@ -99,6 +99,7 @@ enum MythHTTPStatus
 {
     HTTPSwitchingProtocols  = 101,
     HTTPOK                  = 200,
+    HTTPAccepted            = 202,
     HTTPPartialContent      = 206,
     HTTPMovedPermanently    = 301,
     HTTPNotModified         = 304,
