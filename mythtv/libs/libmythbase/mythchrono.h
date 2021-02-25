@@ -198,13 +198,13 @@ T nowAsDuration (bool adjustForTZ = false)
 template <typename T>
 static constexpr T chronomult(T duration, float f)
 {
-    return T(std::lround(duration.count() * f));
+    return T(std::llround(duration.count() * f));
 }
 /// \brief Divide a duration by a float, returning a duration.
 template <typename T>
 static constexpr T chronodivide(T duration, float f)
 {
-    return T(std::lround(duration.count() / f));
+    return T(std::llround(duration.count() / f));
 }
 
 #endif // __MYTHCHRONO_H__
