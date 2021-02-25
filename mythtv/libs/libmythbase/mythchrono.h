@@ -36,9 +36,9 @@ namespace std::chrono // NOLINT(cert-dcl58-cpp)
 
 // There are a number of places that hold/manipulate time in the form
 // of a floating point number. Create unique types for these.
-using floatsecs = std::chrono::duration<float>;
-using floatmsecs = std::chrono::duration<float, std::milli>;
-using floatusecs = std::chrono::duration<float, std::micro>;
+using floatsecs = std::chrono::duration<double>;
+using floatmsecs = std::chrono::duration<double, std::milli>;
+using floatusecs = std::chrono::duration<double, std::micro>;
 
 // There are a handful of places that hold a time value in units of
 // AV_TIME_BASE. Create a unique type for this.
@@ -196,13 +196,13 @@ T nowAsDuration (bool adjustForTZ = false)
 
 /// \brief Multiply a duration by a float, returning a duration.
 template <typename T>
-static constexpr T chronomult(T duration, float f)
+static constexpr T chronomult(T duration, double f)
 {
     return T(std::llround(duration.count() * f));
 }
 /// \brief Divide a duration by a float, returning a duration.
 template <typename T>
-static constexpr T chronodivide(T duration, float f)
+static constexpr T chronodivide(T duration, double f)
 {
     return T(std::llround(duration.count() / f));
 }

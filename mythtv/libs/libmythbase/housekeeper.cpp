@@ -386,7 +386,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(const QDateTime& now)
 
     // calculate probability that task should not have yet run
     // it's backwards, but it makes the math simplier
-    float prob = 1.0F - (duration_cast<floatsecs>(elapsed - m_windowElapsed.first) /
+    double prob = 1.0 - (duration_cast<floatsecs>(elapsed - m_windowElapsed.first) /
                          duration_cast<floatsecs>(m_windowElapsed.second - m_windowElapsed.first));
     if (m_currentProb < prob)
         // more bad stuff
@@ -394,7 +394,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(const QDateTime& now)
 
     // calculate current probability to achieve overall probability
     // this should be nearly one
-    float prob2 = prob/m_currentProb;
+    double prob2 = prob/m_currentProb;
     // so rand() should have to return nearly RAND_MAX to get a positive
     // remember, this is computing the probability that up to this point, one
     //      of these tests has returned positive, so each individual test has
@@ -402,7 +402,7 @@ bool PeriodicHouseKeeperTask::DoCheckRun(const QDateTime& now)
     //
     // Pseudo-random is good enough. Don't need a true random.
     // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-    bool res = (rand() > (int)(prob2 * static_cast<float>(RAND_MAX)));
+    bool res = (rand() > (int)(prob2 * static_cast<double>(RAND_MAX)));
     m_currentProb = prob;
 //  if (res)
 //      LOG(VB_GENERAL, LOG_DEBUG, QString("%1 will run: this=%2; total=%3")
