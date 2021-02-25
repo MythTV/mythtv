@@ -84,7 +84,6 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
     std::chrono::milliseconds audio_adjustment = 0ms;
     std::chrono::microseconds unow = 0ms;
     std::chrono::microseconds lateness = 0us;
-    auto playspeed1000 = static_cast<int64_t>(1000.0F / PlaySpeed);
     bool reset = false;
     auto intervalms = duration_cast<std::chrono::milliseconds>(FrameInterval);
     // controller gain
@@ -125,7 +124,7 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
             if (videotimecode == 0ms && !dataonly)
                 return 0us;
 
-            m_rtcBase = unow - videotimecode * playspeed1000;
+            m_rtcBase = unow - chronodivide<std::chrono::microseconds>(videotimecode, PlaySpeed);
             m_maxTcVal = 0ms;
             m_maxTcFrames = 0;
             m_numDroppedFrames = 0;
@@ -146,7 +145,7 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
         }
 
         if (PlaySpeed > 0.0F)
-            framedue = m_rtcBase + videotimecode * playspeed1000;
+            framedue = m_rtcBase + chronodivide<std::chrono::microseconds>(videotimecode, PlaySpeed);
         else
             framedue = unow + FrameInterval / 2;
 
