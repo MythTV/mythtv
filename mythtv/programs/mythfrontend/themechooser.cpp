@@ -7,7 +7,7 @@
 
 // Qt headers
 #include <QCoreApplication>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QRunnable>
 
 // MythTV headers
@@ -170,15 +170,19 @@ void ThemeChooser::Load(void)
 
     // MYTH_SOURCE_VERSION - examples v29-pre-574-g92517f5, v29-Pre, v29.1-21-ge26a33c
     QString MythVersion(GetMythSourceVersion());
-    QRegExp trunkver("v[0-9]+-pre.*",Qt::CaseInsensitive);
-    QRegExp validver("v[0-9]+.*",Qt::CaseInsensitive);
+    static const QRegularExpression trunkver
+        { "\\Av[0-9]+-pre.*\\z", QRegularExpression::CaseInsensitiveOption };
+    static const QRegularExpression validver {
+        "\\Av[0-9]+.*\\z", QRegularExpression::CaseInsensitiveOption };
 
-    if (!validver.exactMatch(MythVersion))
+    auto match = validver.match(MythVersion);
+    if (!match.hasMatch())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Invalid MythTV version %1, will use themes from trunk").arg(MythVersion));
         MythVersion = "trunk";
     }
-    if (trunkver.exactMatch(MythVersion))
+    match = trunkver.match(MythVersion);
+    if (match.hasMatch())
         MythVersion = "trunk";
 
     if (MythVersion == "trunk")
@@ -191,19 +195,20 @@ void ThemeChooser::Load(void)
 
         MythVersion = MYTH_BINARY_VERSION; // Example: 29.20161017-1
         // Remove the date part and the rest, eg 29.20161017-1 -> 29
-        MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
+        MythVersion.remove(QRegularExpression("\\.[0-9]{8,}.*"));
         LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(MythVersion));
         LoadVersion(MythVersion, themesSeen, true);
 
         // If a version of the theme for this tag exists, use it...
         // MYTH_SOURCE_VERSION - examples v29-pre-574-g92517f5, v29-Pre, v29.1-21-ge26a33c
-        QRegExp subexp("v[0-9]+\\.([0-9]+)-*");
+        static const QRegularExpression subexp
+            { "v[0-9]+\\.([0-9]+)-*", QRegularExpression::CaseInsensitiveOption };
         // This captures the subversion, i.e. the number after a dot
-        int pos = subexp.indexIn(GetMythSourceVersion());
-        if (pos > -1)
+        match = subexp.match(GetMythSourceVersion());
+        if (match.hasMatch())
         {
             QString subversion;
-            for (int idx = subexp.cap(1).toInt(); idx > 0; --idx)
+            for (int idx = match.capturedRef(1).toInt(); idx > 0; --idx)
             {
                 subversion = MythVersion + "." + QString::number(idx);
                 LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(subversion));
@@ -1011,14 +1016,15 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
     else
     {
         version = MYTH_BINARY_VERSION; // Example: 0.25.20101017-1
-        version.replace(QRegExp("\\.[0-9]{8,}.*"), "");
+        version.remove(QRegularExpression("\\.[0-9]{8,}.*"));
 
         // If a version of the theme for this tag exists, use it...
-        QRegExp subexp("v[0-9]+.[0-9]+.([0-9]+)-*");
-        int pos = subexp.indexIn(GetMythSourceVersion());
-        if (pos > -1)
+        static const QRegularExpression subexp
+            { "v[0-9]+\\.([0-9]+)-*", QRegularExpression::CaseInsensitiveOption };
+        auto match = subexp.match(GetMythSourceVersion());
+        if (match.hasMatch())
         {
-            for (int idx = subexp.cap(1).toInt(); idx > 0; --idx)
+            for (int idx = match.capturedRef(1).toInt(); idx > 0; --idx)
                 m_mythVersions << version + "." + QString::number(idx);
         }
         m_mythVersions << version;
