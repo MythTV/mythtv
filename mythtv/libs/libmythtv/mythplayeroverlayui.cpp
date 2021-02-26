@@ -203,7 +203,7 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
         Info.values.insert(relPrefix + "totalseconds", static_cast<int>(playbackLen.count()));
         Info.values[relPrefix + "position"] = pos;
 
-        QDateTime wallclock = m_playerCtx->m_playingRecStart.addSecs(secsplayed);
+        QDateTime wallclock = m_playerCtx->m_playingRecStart.addSecs(static_cast<qint64>(secsplayed.count()));
         QString text1;
         QString text2;
         QString text3;
