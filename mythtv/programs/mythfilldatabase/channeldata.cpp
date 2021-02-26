@@ -3,9 +3,9 @@
 #include <cstdlib>
 
 // Qt headers
-#include <QRegExp>
 #include <QDir>
 #include <QFile>
+#include <QRegularExpression>
 
 // libmythbase headers
 #include "mythdownloadmanager.h"
@@ -25,18 +25,20 @@
 #include "channeldata.h"
 #include "fillutil.h"
 
+static const QRegularExpression parseMajorMinor { R"((\d+)\D(\d+))" };
+
 static void get_atsc_stuff(const QString& channum, int sourceid, int freqid,
                            int &major, int &minor, long long &freq)
 {
     major = freqid;
     minor = 0;
 
-    int chansep = channum.indexOf(QRegExp("\\D"));
-    if (chansep < 0)
+    auto match = parseMajorMinor.match(channum);
+    if (!match.hasMatch())
         return;
 
-    major = channum.leftRef(chansep).toInt();
-    minor = channum.rightRef(channum.length() - (chansep + 1)).toInt();
+    major = match.capturedRef(1).toInt();
+    minor = match.capturedRef(2).toInt();
 
     freq = get_center_frequency("atsc", "vsb8", "us", freqid);
 
@@ -166,13 +168,12 @@ ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
     if (existChan.m_chanId < 1)
     {
         // Check if it is ATSC
-        int chansep = chanInfo.m_chanNum.indexOf(QRegExp("\\D"));
-        if (chansep > 0)
+        auto match = parseMajorMinor.match(chanInfo.m_chanNum);
+        if (match.hasMatch())
         {
             // Populate xmltvid for scanned ATSC channels
-            uint major = chanInfo.m_chanNum.leftRef(chansep).toInt();
-            uint minor = chanInfo.m_chanNum.rightRef
-                         (chanInfo.m_chanNum.length() - (chansep + 1)).toInt();
+            uint major = match.capturedRef(1).toUInt();
+            uint minor = match.capturedRef(2).toUInt();
 
             for (it = existingChannels.begin();
                  it != existingChannels.end(); ++it)
