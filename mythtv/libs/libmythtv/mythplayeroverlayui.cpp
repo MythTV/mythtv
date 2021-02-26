@@ -203,6 +203,7 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
         Info.values.insert(relPrefix + "totalseconds", static_cast<int>(playbackLen.count()));
         Info.values[relPrefix + "position"] = pos;
 
+        QDateTime wallclock = m_playerCtx->m_playingRecStart.addSecs(secsplayed);
         QString text1;
         QString text2;
         QString text3;
@@ -230,6 +231,7 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
         Info.text[relPrefix + "description"] = desc;
         Info.text[relPrefix + "playedtime"] = text1;
         Info.text[relPrefix + "totaltime"] = text2;
+        Info.text[relPrefix + "wallclocktime"] = wallclock.toLocalTime().toString("ddd MMM d yyyy, hh:mm:ss");
         Info.text[relPrefix + "remainingtime"] = islive ? QString() : text3;
         Info.text[relPrefix + "behindtime"] = islive ? text3 : QString();
     }
