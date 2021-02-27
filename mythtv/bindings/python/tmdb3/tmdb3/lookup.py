@@ -297,7 +297,14 @@ def buildEpisode(args, opts):
     from lxml import etree
     from MythTV.tmdb3 import searchSeries
 
-    if query.isnumeric():
+    query_is_numeric = False
+    try:
+       query_is_numeric = query.isnumeric()
+    except AttributeError:
+       # python2 and ascii strings
+       query_is_numeric = query.isdigit()
+
+    if query_is_numeric:
         inetref = query
     else:
         results = searchSeries(query)
