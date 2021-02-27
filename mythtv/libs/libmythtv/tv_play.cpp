@@ -4440,7 +4440,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
     }
     else if (tokens.size() >= 3 && tokens[1] == "VOLUME")
     {
-        QRegularExpression re { "(\\d+)%" };
+        QRegularExpression re { "(\\d+)%?" };
         auto match = re.match(tokens[2]);
         if (match.hasMatch())
         {
