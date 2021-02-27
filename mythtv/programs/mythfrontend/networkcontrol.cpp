@@ -5,7 +5,7 @@
 #include <thread> // for sleep_for
 
 #include <QCoreApplication>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QTextStream>
 #include <QDir>
@@ -412,19 +412,16 @@ void NetworkControlClient::readClient(void)
     if (!socket)
         return;
 
-    QString lineIn;
     while (socket->canReadLine())
     {
-        lineIn = socket->readLine();
+        QString lineIn = socket->readLine();
 #if 0
-        lineIn.replace(QRegExp("[^-a-zA-Z0-9\\s\\.:_#/$%&()*+,;<=>?\\[\\]\\|]"),
-                       "");
+        static const QRegularExpression badChars
+            { "[^-a-zA-Z0-9\\s\\.:_#/$%&()*+,;<=>?\\[\\]\\|]" };
+        lineIn.remove(badChars);
 #endif
 
-        // TODO: can this be replaced with lineIn.simplify()?
-        lineIn.replace(QRegExp("[\r\n]"), "");
-        lineIn.replace(QRegExp("^\\s"), "");
-
+        lineIn = lineIn.simplified();
         if (lineIn.isEmpty())
             continue;
 
@@ -604,9 +601,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     }
     else if ((nc->getArgCount() >= 4) &&
              (is_abbrev("program", nc->getArg(1))) &&
-             (nc->getArg(2).contains(QRegExp("^\\d+$"))) &&
-             (nc->getArg(3).contains(QRegExp(
-                         R"(^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d$)"))))
+             (nc->getArg(2).contains(QRegularExpression("^\\d+$"))) &&
+             (nc->getArg(3).contains(QRegularExpression(
+                         R"(^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ?$)"))))
     {
         if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
         {
@@ -798,7 +795,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     }
     else if (is_abbrev("chanid", nc->getArg(1), 5))
     {
-        if (nc->getArg(2).contains(QRegExp("^\\d+$")))
+        if (nc->getArg(2).contains(QRegularExpression("^\\d+$")))
             message = QString("NETWORK_CONTROL CHANID %1").arg(nc->getArg(2));
         else
             return QString("ERROR: See 'help %1' for usage information")
@@ -813,7 +810,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
             message = "NETWORK_CONTROL CHANNEL UP";
         else if (is_abbrev("down", nc->getArg(2)))
             message = "NETWORK_CONTROL CHANNEL DOWN";
-        else if (nc->getArg(2).contains(QRegExp("^[-\\.\\d_#]+$")))
+        else if (nc->getArg(2).contains(QRegularExpression("^[-\\.\\d_#]+$")))
             message = QString("NETWORK_CONTROL CHANNEL %1").arg(nc->getArg(2));
         else
             return QString("ERROR: See 'help %1' for usage information")
@@ -832,7 +829,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         else if (is_abbrev("rewind",   nc->getArg(2)) ||
                  is_abbrev("backward", nc->getArg(2)))
             message = "NETWORK_CONTROL SEEK BACKWARD";
-        else if (nc->getArg(2).contains(QRegExp(R"(^\d\d:\d\d:\d\d$)")))
+        else if (nc->getArg(2).contains(QRegularExpression(R"(^\d\d:\d\d:\d\d$)")))
         {
             int hours   = nc->getArg(2).midRef(0, 2).toInt();
             int minutes = nc->getArg(2).midRef(3, 2).toInt();
@@ -851,9 +848,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                            .arg(nc->getArg(0));
 
         QString token2 = nc->getArg(2).toLower();
-        if ((token2.contains(QRegExp("^\\-*\\d+x$"))) ||
-            (token2.contains(QRegExp(R"(^\-*\d+\/\d+x$)"))) ||
-            (token2.contains(QRegExp(R"(^\-*\d*\.\d+x$)"))))
+        if ((token2.contains(QRegularExpression(R"(^\-*\d+x$)"))) ||
+            (token2.contains(QRegularExpression(R"(^\-*\d+\/\d+x$)"))) ||
+            (token2.contains(QRegularExpression(R"(^\-*\d*\.\d+x$)"))))
             message = QString("NETWORK_CONTROL SPEED %1").arg(token2);
         else if (is_abbrev("normal", token2))
             message = QString("NETWORK_CONTROL SPEED normal");
@@ -873,7 +870,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     else if (is_abbrev("volume", nc->getArg(1), 2))
     {
         if ((nc->getArgCount() < 3) ||
-            (!nc->getArg(2).toLower().contains(QRegExp("^\\d+%?$"))))
+            (!nc->getArg(2).toLower().contains(QRegularExpression("^\\d+%?$"))))
         {
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(nc->getArg(0));
@@ -886,7 +883,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
     {
         if (nc->getArgCount() < 3)
             message = QString("NETWORK_CONTROL SUBTITLES 0");
-        else if (!nc->getArg(2).toLower().contains(QRegExp("^\\d+$")))
+        else if (!nc->getArg(2).toLower().contains(QRegularExpression("^\\d+$")))
         {
             return QString("ERROR: See 'help %1' for usage information")
                 .arg(nc->getArg(0));
@@ -1044,9 +1041,9 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     }
     else if ((nc->getArgCount() == 4) &&
              is_abbrev("recording", nc->getArg(1)) &&
-             (nc->getArg(2).contains(QRegExp("^\\d+$"))) &&
-             (nc->getArg(3).contains(QRegExp(
-                         R"(^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d$)"))))
+             (nc->getArg(2).contains(QRegularExpression("^\\d+$"))) &&
+             (nc->getArg(3).contains(QRegularExpression(
+                         R"(^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ?$)"))))
         return listRecordings(nc->getArg(2), nc->getArg(3).toUpper());
     else if (is_abbrev("recordings", nc->getArg(1)))
         return listRecordings();
@@ -1541,8 +1538,8 @@ void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
         return;
     }
 
-    QRegExp crlfRegEx("\r\n$");
-    QRegExp crlfcrlfRegEx("\r\n.*\r\n");
+    QRegularExpression crlfRegEx("\r\n$");
+    QRegularExpression crlfcrlfRegEx("\r\n.*\r\n");
 
     QTcpSocket  *client = ncc->getSocket();
     QTextStream *clientStream = ncc->getTextStream();
