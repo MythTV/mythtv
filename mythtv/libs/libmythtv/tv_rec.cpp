@@ -2650,7 +2650,7 @@ long long TVRec::GetMaxBitrate(void) const
     }
     else if (m_genOpt.m_inputType == "HDPVR")
     {
-        bitrate = 20200000LL; // Peek bit rate for HD-PVR
+        bitrate = 20200000LL; // Peak bit rate for HD-PVR
     }
     else if (!CardUtil::IsEncoder(m_genOpt.m_inputType))
     {
