@@ -2353,6 +2353,19 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
 }
 #endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
 
+// Override database schema default, set schedgroup false
+class SchedGroupFalse : public MythUICheckBoxSetting
+{
+  public:
+    explicit SchedGroupFalse(const CaptureCard &parent) :
+        MythUICheckBoxSetting(new CaptureCardDBStorage(this, parent,
+                                                       "schedgroup"))
+    {
+        setValue(false);
+        setVisible(false);
+   };
+};
+
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
                                                  CardType &a_cardtype) :
     m_parent(a_parent), m_cardInfo(new GroupSetting()),
@@ -2371,6 +2384,9 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
     a_cardtype.addTargetedChild("HDPVR", m_cardInfo);
     a_cardtype.addTargetedChild("HDPVR", m_audioInput);
     a_cardtype.addTargetedChild("HDPVR", new ChannelTimeout(m_parent, 15s, 2s));
+
+    // Override database schema default, set schedgroup false
+    a_cardtype.addTargetedChild("HDPVR", new SchedGroupFalse(m_parent));
 
     connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,   &HDPVRConfigurationGroup::probeCard);
@@ -2408,6 +2424,9 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
     cardtype.addTargetedChild("V4L2ENC", m_device);
     m_cardInfo->setLabel(tr("Probed info"));
     cardtype.addTargetedChild("V4L2ENC", m_cardInfo);
+
+    // Override database schema default, set schedgroup false
+    cardtype.addTargetedChild("V4L2ENC", new SchedGroupFalse(m_parent));
 
     setVisible(false);
 
