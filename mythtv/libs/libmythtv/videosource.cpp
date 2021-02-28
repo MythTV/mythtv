@@ -2376,7 +2376,7 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
     auto *device = new VideoDevice(m_parent, 0, 15, QString(), "hdpvr");
 
     m_cardInfo->setLabel(tr("Probed info"));
-    m_cardInfo->setEnabled(false);
+    m_cardInfo->setReadOnly(true);
 
     a_cardtype.addTargetedChild("HDPVR", device);
     a_cardtype.addTargetedChild("HDPVR", new EmptyAudioDevice(m_parent));
