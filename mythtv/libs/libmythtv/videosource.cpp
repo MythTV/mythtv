@@ -2155,6 +2155,19 @@ void CetonSetting::CetonConfigurationGroup(CaptureCard& parent, CardType& cardty
 }
 #endif
 
+// Override database schema default, set schedgroup false
+class SchedGroupFalse : public MythUICheckBoxSetting
+{
+  public:
+    explicit SchedGroupFalse(const CaptureCard &parent) :
+        MythUICheckBoxSetting(new CaptureCardDBStorage(this, parent,
+                                                       "schedgroup"))
+    {
+        setValue(false);
+        setVisible(false);
+   };
+};
+
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& parent,
                                              CardType& cardtype,
                                              const QString inputtype) :
@@ -2175,6 +2188,9 @@ V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& parent,
     cardtype.addTargetedChild(inputtype, new AudioDevice(m_parent));
     cardtype.addTargetedChild(inputtype, new AudioRateLimit(m_parent));
     cardtype.addTargetedChild(inputtype, new SkipBtAudio(m_parent));
+
+    // Override database schema default, set schedgroup false
+    cardtype.addTargetedChild(inputtype, new SchedGroupFalse(m_parent));
 
     connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,   &V4LConfigurationGroup::probeCard);
@@ -2221,6 +2237,9 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &parent,
     cardtype.addTargetedChild("MPEG", m_vbiDevice);
     cardtype.addTargetedChild("MPEG", m_cardInfo);
     cardtype.addTargetedChild("MPEG", new ChannelTimeout(m_parent, 12s, 2s));
+
+    // Override database schema default, set schedgroup false
+    cardtype.addTargetedChild("MPEG", new SchedGroupFalse(m_parent));
 
     connect(m_device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,     &MPEGConfigurationGroup::probeCard);
@@ -2354,19 +2373,6 @@ void ExternalConfigurationGroup::probeApp(const QString & path)
     m_info->setHelpText(ci);
 }
 #endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
-
-// Override database schema default, set schedgroup false
-class SchedGroupFalse : public MythUICheckBoxSetting
-{
-  public:
-    explicit SchedGroupFalse(const CaptureCard &parent) :
-        MythUICheckBoxSetting(new CaptureCardDBStorage(this, parent,
-                                                       "schedgroup"))
-    {
-        setValue(false);
-        setVisible(false);
-   };
-};
 
 HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
                                                  CardType &a_cardtype) :
