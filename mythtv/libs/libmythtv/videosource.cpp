@@ -2155,24 +2155,26 @@ void CetonSetting::CetonConfigurationGroup(CaptureCard& parent, CardType& cardty
 }
 #endif
 
-V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent,
-                                             CardType& a_cardtype) :
-    m_parent(a_parent),
-    m_cardInfo(new TransTextEditSetting()),  m_vbiDev(new VBIDevice(m_parent))
+V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& parent,
+                                             CardType& cardtype,
+                                             const QString inputtype) :
+    m_parent(parent),
+    m_cardInfo(new GroupSetting()),
+    m_vbiDev(new VBIDevice(m_parent))
 {
     setVisible(false);
     QString drv = "(?!ivtv|hdpvr|(saa7164(.*))).*";
     auto *device = new VideoDevice(m_parent, 0, 15, QString(), drv);
 
     m_cardInfo->setLabel(tr("Probed info"));
-    m_cardInfo->setEnabled(false);
+    m_cardInfo->setReadOnly(true);
 
-    a_cardtype.addTargetedChild("V4L", device);
-    a_cardtype.addTargetedChild("V4L", m_cardInfo);
-    a_cardtype.addTargetedChild("V4L", m_vbiDev);
-    a_cardtype.addTargetedChild("V4L", new AudioDevice(m_parent));
-    a_cardtype.addTargetedChild("V4L", new AudioRateLimit(m_parent));
-    a_cardtype.addTargetedChild("V4L", new SkipBtAudio(m_parent));
+    cardtype.addTargetedChild(inputtype, device);
+    cardtype.addTargetedChild(inputtype, m_cardInfo);
+    cardtype.addTargetedChild(inputtype, m_vbiDev);
+    cardtype.addTargetedChild(inputtype, new AudioDevice(m_parent));
+    cardtype.addTargetedChild(inputtype, new AudioRateLimit(m_parent));
+    cardtype.addTargetedChild(inputtype, new SkipBtAudio(m_parent));
 
     connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,   &V4LConfigurationGroup::probeCard);
@@ -2201,10 +2203,10 @@ void V4LConfigurationGroup::probeCard(const QString &device)
     m_vbiDev->setFilter(cn, dn);
 }
 
-MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent,
-                                               CardType &a_cardtype) :
-    m_parent(a_parent),
-    m_cardInfo(new TransTextEditSetting())
+MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &parent,
+                                               CardType &cardtype) :
+    m_parent(parent),
+    m_cardInfo(new GroupSetting())
 {
     setVisible(false);
     QString drv = "ivtv|(saa7164(.*))";
@@ -2213,12 +2215,12 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent,
     m_vbiDevice->setVisible(false);
 
     m_cardInfo->setLabel(tr("Probed info"));
-    m_cardInfo->setEnabled(false);
+    m_cardInfo->setReadOnly(true);
 
-    a_cardtype.addTargetedChild("MPEG", m_device);
-    a_cardtype.addTargetedChild("MPEG", m_vbiDevice);
-    a_cardtype.addTargetedChild("MPEG", m_cardInfo);
-    a_cardtype.addTargetedChild("MPEG", new ChannelTimeout(m_parent, 12s, 2s));
+    cardtype.addTargetedChild("MPEG", m_device);
+    cardtype.addTargetedChild("MPEG", m_vbiDevice);
+    cardtype.addTargetedChild("MPEG", m_cardInfo);
+    cardtype.addTargetedChild("MPEG", new ChannelTimeout(m_parent, 12s, 2s));
 
     connect(m_device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,     &MPEGConfigurationGroup::probeCard);
@@ -2418,17 +2420,20 @@ V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
     m_parent(parent),
     m_cardInfo(new TransTextEditSetting())
 {
-    setLabel(QObject::tr("V4L2 encoder devices (multirec capable)"));
+    setVisible(false);
+
     m_device = new VideoDevice(m_parent, 0, 15);
 
-    cardtype.addTargetedChild("V4L2ENC", m_device);
+    setLabel(QObject::tr("V4L2 encoder devices (multirec capable)"));
+
     m_cardInfo->setLabel(tr("Probed info"));
+    m_cardInfo->setReadOnly(true);
+
+    cardtype.addTargetedChild("V4L2ENC", m_device);
     cardtype.addTargetedChild("V4L2ENC", m_cardInfo);
 
     // Override database schema default, set schedgroup false
     cardtype.addTargetedChild("V4L2ENC", new SchedGroupFalse(m_parent));
-
-    setVisible(false);
 
     connect(m_device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,     &V4L2encGroup::probeCard);
@@ -2539,11 +2544,11 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
 #ifdef USING_V4L2
     cardtype->addTargetedChild("V4L2ENC", new V4L2encGroup(parent, *cardtype));
     cardtype->addTargetedChild("V4L",
-                               new V4LConfigurationGroup(parent, *cardtype));
+                               new V4LConfigurationGroup(parent, *cardtype, "V4L"));
     cardtype->addTargetedChild("MJPEG",
-                               new V4LConfigurationGroup(parent, *cardtype));
+                               new V4LConfigurationGroup(parent, *cardtype, "MJPEG"));
     cardtype->addTargetedChild("GO7007",
-                               new V4LConfigurationGroup(parent, *cardtype));
+                               new V4LConfigurationGroup(parent, *cardtype, "GO7007"));
 # ifdef USING_IVTV
     cardtype->addTargetedChild("MPEG",
                                new MPEGConfigurationGroup(parent, *cardtype));
@@ -2707,7 +2712,7 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 #ifdef USING_HDPVR
     setting->addSelection(
         QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
-# endif // USING_HDPVR
+#endif // USING_HDPVR
 #endif // USING_V4L2
 
 #ifdef USING_HDHOMERUN
@@ -2740,10 +2745,10 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 #endif // USING_IPTV
 
 #ifdef USING_V4L2
-# ifdef USING_IVTV
+#ifdef USING_IVTV
     setting->addSelection(
         QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
-# endif // USING_IVTV
+#endif // USING_IVTV
     setting->addSelection(
         QObject::tr("Analog to MJPEG encoder card (Matrox G200, DC10, etc)"), "MJPEG");
     setting->addSelection(
