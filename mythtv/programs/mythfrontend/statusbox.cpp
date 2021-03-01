@@ -1,7 +1,6 @@
 
 #include "statusbox.h"
 
-#include <QRegExp>
 #include <QHostAddress>
 #include <QNetworkInterface>
 
@@ -196,49 +195,19 @@ bool StatusBox::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     bool handled = GetMythMainWindow()->TranslateKeyPress("Status", event, actions);
 
+#if 0
     for (int i = 0; i < actions.size() && !handled; ++i)
     {
         QString action = actions[i];
         handled = true;
 
-        QRegExp logNumberKeys( "^[12345678]$" );
-
-        MythUIButtonListItem* currentButton = m_categoryList->GetItemCurrent();
-        QString currentItem;
-        if (currentButton)
-            currentItem = currentButton->GetText();
-
         if (action == "MENU")
         {
-            if (currentItem == tr("Log Entries"))
-            {
-                QString message = tr("Acknowledge all log entries at "
-                                     "this priority level or lower?");
-
-                auto *confirmPopup =
-                        new MythConfirmationDialog(m_popupStack, message);
-
-                confirmPopup->SetReturnEvent(this, "LogAckAll");
-
-                if (confirmPopup->Create())
-                    m_popupStack->AddScreen(confirmPopup, false);
-            }
-        }
-        else if ((currentItem == tr("Log Entries")) &&
-                 (logNumberKeys.indexIn(action) == 0))
-        {
-            m_minLevel = action.toInt();
-            if (m_helpText)
-                m_helpText->SetText(tr("Setting priority level to %1")
-                                    .arg(m_minLevel));
-            if (m_justHelpText)
-                m_justHelpText->SetText(tr("Setting priority level to %1")
-                                        .arg(m_minLevel));
-            doLogEntries();
         }
         else
             handled = false;
     }
+#endif
 
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
@@ -293,19 +262,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
 
     // FIXME: Comparisons against strings here is not great, changing names
     //        breaks everything and it's inefficient
-    if (currentItem == tr("Log Entries"))
-    {
-        QString message = tr("Acknowledge this log entry?");
-
-        auto *confirmPopup = new MythConfirmationDialog(m_popupStack, message);
-
-        confirmPopup->SetReturnEvent(this, "LogAck");
-        confirmPopup->SetData(logline.m_data);
-
-        if (confirmPopup->Create())
-            m_popupStack->AddScreen(confirmPopup, false);
-    }
-    else if (currentItem == tr("Job Queue"))
+    if (currentItem == tr("Job Queue"))
     {
         QStringList msgs;
         int jobStatus = JobQueue::GetJobStatus(logline.m_data.toInt());
@@ -403,35 +360,7 @@ void StatusBox::customEvent(QEvent *event)
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();
 
-        if (resultid == "LogAck")
-        {
-            if (buttonnum == 1)
-            {
-                QString sql = dce->GetData().toString();
-                MSqlQuery query(MSqlQuery::InitCon());
-                query.prepare("UPDATE mythlog SET acknowledged = 1 "
-                            "WHERE logid = :LOGID ;");
-                query.bindValue(":LOGID", sql);
-                if (!query.exec())
-                    MythDB::DBError("StatusBox::customEvent -- LogAck", query);
-                m_logList->RemoveItem(m_logList->GetItemCurrent());
-            }
-        }
-        else if (resultid == "LogAckAll")
-        {
-            if (buttonnum == 1)
-            {
-                MSqlQuery query(MSqlQuery::InitCon());
-                query.prepare("UPDATE mythlog SET acknowledged = 1 "
-                                "WHERE priority <= :PRIORITY ;");
-                query.bindValue(":PRIORITY", m_minLevel);
-                if (!query.exec())
-                    MythDB::DBError("StatusBox::customEvent -- LogAckAll",
-                                    query);
-                doLogEntries();
-            }
-        }
-        else if (resultid == "JobDelete")
+        if (resultid == "JobDelete")
         {
             if (buttonnum == 1)
             {
