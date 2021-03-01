@@ -10,6 +10,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QFileInfoList>
+#include <QRegularExpression>
 #include <QTextStream>
 
 // MythTV headers
@@ -400,8 +401,8 @@ bool MythMediaDevice::findMountPath()
         stream >> deviceName;
         mountPoint = stream.readLine();
         mountPoint.remove(" on ");
-        mountPoint.remove(QRegExp(" type \\w.*"));   // Linux
-        mountPoint.remove(QRegExp(" \\(\\w.*"));     // Mac OS X
+        mountPoint.remove(QRegularExpression(" type \\w.*"));   // Linux
+        mountPoint.remove(QRegularExpression(" \\(\\w.*"));     // Mac OS X
 #else
         // Extract the mount point and device name.
         stream >> deviceName >> mountPoint;
