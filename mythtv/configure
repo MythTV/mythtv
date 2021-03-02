@@ -6607,7 +6607,7 @@ enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
                 }
 
 case $ID in
-    fedora)
+    fedora|debian)
         EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
 esac
 
