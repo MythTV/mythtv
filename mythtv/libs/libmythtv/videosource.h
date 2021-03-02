@@ -580,7 +580,7 @@ class V4L2encGroup: public GroupSetting
 
   private:
     CaptureCard          &m_parent;
-    TransTextEditSetting *m_cardInfo {nullptr};
+    GroupSetting         *m_cardInfo {nullptr};
     VideoDevice          *m_device   {nullptr};
 
     QString               m_driverName;

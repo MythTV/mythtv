@@ -1632,7 +1632,7 @@ VBoxDeviceID::VBoxDeviceID(const CaptureCard &parent) :
 {
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of VBox device"));
-    setEnabled(false);
+    setReadOnly(true);
 }
 
 void VBoxDeviceID::SetIP(const QString &ip)
@@ -2424,7 +2424,7 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
 
 V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
     m_parent(parent),
-    m_cardInfo(new TransTextEditSetting())
+    m_cardInfo(new GroupSetting())
 {
     setVisible(false);
 
