@@ -154,16 +154,14 @@ void CustomEdit::loadData(void)
 
 QString CustomEdit::evaluate(QString clause)
 {
-    int e0=0;
-    while (true) {
-        int s0 = clause.indexOf (QRegExp("\\{[A-Z]+\\}"), e0);
+    static const QRegularExpression replacement { "\\{([A-Z]+)\\}" };
 
-        if (s0 < 0)
+    while (true) {
+        QRegularExpressionMatch match;
+        if (!clause.contains(replacement, &match))
             break;
 
-        e0 = clause.indexOf ("}", s0);
-
-        QString mid = clause.mid(s0 + 1, e0 - s0 - 1);
+        QString mid = match.captured(1);
         QString repl = "";
 
         if (mid.compare("TITLE") == 0) {
@@ -221,7 +219,7 @@ QString CustomEdit::evaluate(QString clause)
             repl = QString("%1").arg(midnight.secsTo(date));
         }
         // unknown tags are simply removed
-        clause.replace(s0, e0 - s0 + 1, repl);
+        clause.replace(match.capturedStart(), match.capturedLength(), repl);
     }
     return clause;
 }
