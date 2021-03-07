@@ -382,7 +382,6 @@ void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 PlaybackBox::PlaybackBox(MythScreenStack *parent, const QString& name,
                          TV *player, bool /*showTV*/)
     : ScheduleCommon(parent, name),
-      m_titleChaff(" \\(.*\\)$"),
       // Artwork Variables
       m_artHostOverride(),
       // Recording Group settings
@@ -1711,7 +1710,7 @@ bool PlaybackBox::UpdateUILists(void)
                 while (query.next())
                 {
                     QString tmpTitle = query.value(1).toString();
-                    tmpTitle.remove(m_titleChaff);
+                    tmpTitle.remove(RecordingInfo::kReSearchTypeName);
                     searchRule[query.value(0).toInt()] = tmpTitle;
                 }
             }
