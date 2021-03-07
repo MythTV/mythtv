@@ -19,7 +19,7 @@
 const QRegularExpression VideoFilterSettings::m_reSeason {
     "(\\d+)x(\\d*)", QRegularExpression::CaseInsensitiveOption };
 const QRegularExpression VideoFilterSettings::m_reDate {
-    "-(\\d+)([dwm])", QRegularExpression::CaseInsensitiveOption };
+    "-(\\d+)([dwmy])", QRegularExpression::CaseInsensitiveOption };
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
 #define capturedView capturedRef
@@ -412,9 +412,10 @@ void VideoFilterSettings::setTextFilter(const QString& val)
         QDate testdate = MythDate::current().date();
         switch(match.capturedView(2).at(0).toLatin1())
         {
-            case 'm': testdate = testdate.addMonths(-modnr);break;
             case 'd': testdate = testdate.addDays(-modnr);break;
             case 'w': testdate = testdate.addDays(-modnr * 7);break;
+            case 'm': testdate = testdate.addMonths(-modnr);break;
+            case 'y': testdate = testdate.addYears(-modnr);break;
         }
         m_insertDate = testdate;
         m_textFilter.remove(match.capturedStart(), match.capturedLength());
