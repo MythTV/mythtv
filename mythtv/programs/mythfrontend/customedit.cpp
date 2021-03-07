@@ -613,9 +613,7 @@ void CustomEdit::clauseChanged(MythUIButtonListItem *item)
     auto rule = item->GetData().value<CustomRuleInfo>();
 
     QString msg = (m_evaluate) ? evaluate(rule.description) : rule.description;
-    msg.replace('\n', ' ');
-    msg.replace(QRegExp(" [ ]*"), " ");
-    msg = QString("\"%1\"").arg(msg);
+    msg = QString("\"%1\"").arg(msg.simplified());
     m_clauseText->SetText(msg);
 
     bool hastitle = !m_titleEdit->GetText().isEmpty();
