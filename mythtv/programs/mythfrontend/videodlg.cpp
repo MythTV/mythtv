@@ -1496,9 +1496,21 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                         {
                             for (const auto & pattern : qAsConst(imageTypes))
                             {
-                                QRegExp rx(pattern);
-                                rx.setPatternSyntax(QRegExp::Wildcard);
-                                rx.setCaseSensitivity(Qt::CaseInsensitive);
+#if QT_VERSION < QT_VERSION_CHECK(5,12,0)
+                                // Quick and dirt replacement. This
+                                // only handles the '*' character.
+                                QString rePattern = "\\A" + pattern + "\\z";
+#ifdef Q_OS_WIN
+                                rePattern.replace("*","[^/\\\\]*");
+#else
+                                rePattern.replace("*","[^/]*");
+#endif
+#else
+                                auto rePattern = QRegularExpression::wildcardToRegularExpression(pattern);
+#endif
+                                QRegularExpression rx {
+                                    rePattern.mid(2,rePattern.size()-4), // Remove anchors
+                                    QRegularExpression::CaseInsensitiveOption };
                                 QStringList matches = tmpList.filter(rx);
                                 if (!matches.isEmpty())
                                 {
