@@ -196,6 +196,9 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
     // For removing the search type from the end of a title.
     static const QRegularExpression kReSearchTypeName;
 
+    // For removing the string "AND" from the start of an sql fragment.
+    static const QRegularExpression kReLeadingAnd;
+
   public:
     RecordingInfo &operator=(const RecordingInfo &other)
         { if (this==&other) return *this; RecordingInfo::clone(other); return *this; }

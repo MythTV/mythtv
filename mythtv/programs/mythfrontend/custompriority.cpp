@@ -334,7 +334,7 @@ bool CustomPriority::checkSyntax(void)
 
     QString desc = m_descriptionEdit->GetText();
 
-    if (desc.contains(QRegExp("^\\s*AND\\s", Qt::CaseInsensitive)))
+    if (desc.contains(RecordingInfo::kReLeadingAnd))
     {
         msg = "Power Priority rules do not reqiure a leading \"AND\"";
     }

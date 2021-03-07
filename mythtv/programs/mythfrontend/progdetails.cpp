@@ -254,7 +254,7 @@ void ProgDetails::PowerPriorities(const QString & ptable)
         if (adj)
         {
             QString sclause = query.value(1).toString();
-            sclause.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
+            sclause.remove(RecordingInfo::kReLeadingAnd);
             sclause.remove(';');
             pwrpri = QString("(%1) * %2").arg(sclause)
                                             .arg(query.value(0).toInt());

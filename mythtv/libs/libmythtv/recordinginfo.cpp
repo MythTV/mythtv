@@ -22,6 +22,8 @@
 #define LOC      QString("RecordingInfo(%1): ").arg(GetBasename())
 
 const QRegularExpression RecordingInfo::kReSearchTypeName { R"(\s*\(.*\)$)" };
+const QRegularExpression RecordingInfo::kReLeadingAnd
+        { R"(^\s*AND\s*)", QRegularExpression::CaseInsensitiveOption };
 
 static inline QString null_to_empty(const QString &str)
 {

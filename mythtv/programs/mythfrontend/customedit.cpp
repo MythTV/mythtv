@@ -783,7 +783,7 @@ bool CustomEdit::checkSyntax(void)
 
     QString desc = evaluate(m_descriptionEdit->GetText());
     QString from = m_subtitleEdit->GetText();
-    if (desc.contains(QRegExp("^\\s*AND\\s", Qt::CaseInsensitive)))
+    if (desc.contains(RecordingInfo::kReLeadingAnd))
     {
         msg = tr("Power Search rules no longer require a leading \"AND\".");
     }
