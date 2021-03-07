@@ -264,7 +264,7 @@ void CustomPriority::addClicked(void)
 
     QString desc = m_descriptionEdit->GetText();
 
-    if (desc.contains(QRegExp("\\S")))
+    if (desc.contains(QRegularExpression("\\S")))
         clause = "AND ";
     clause += item->GetData().toString();
     m_descriptionEdit->SetText(desc.append(clause));

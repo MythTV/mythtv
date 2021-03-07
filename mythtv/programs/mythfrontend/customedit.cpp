@@ -633,7 +633,7 @@ void CustomEdit::clauseClicked(MythUIButtonListItem *item)
     QString clause;
     QString desc = m_descriptionEdit->GetText();
 
-    if (desc.contains(QRegExp("\\S")))
+    if (desc.contains(QRegularExpression("\\S")))
         clause = "AND ";
     clause += (m_evaluate) ? evaluate(rule.description) : rule.description;
 
