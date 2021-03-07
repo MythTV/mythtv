@@ -436,7 +436,7 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
                 !((recinfo.GetFindID() == 0 ||
                    !IsFindApplicable(recinfo)) &&
                   recinfo.GetCategoryType() == ProgramInfo::kCategorySeries &&
-                  recinfo.GetProgramID().contains(QRegExp("0000$"))) &&
+                  recinfo.GetProgramID().contains(QRegularExpression("0000$"))) &&
                 ((((dupmethod & kDupCheckNone) == 0) &&
                   !recinfo.GetProgramID().isEmpty() &&
                   (recinfo.GetFindID() != 0 ||
