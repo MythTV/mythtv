@@ -96,7 +96,7 @@ bool CustomPriority::Create()
 void CustomPriority::loadData()
 {
     QString baseTitle = m_pginfo->GetTitle();
-    baseTitle.remove(QRegExp(" \\(.*\\)$"));
+    baseTitle.remove(RecordingInfo::kReSearchTypeName);
 
     QString quoteTitle = baseTitle;
     quoteTitle.replace("\'","\'\'");
@@ -120,7 +120,7 @@ void CustomPriority::loadData()
         while (result.next())
         {
             QString trimTitle = result.value(0).toString();
-            trimTitle.remove(QRegExp(" \\(.*\\)$"));
+            trimTitle.remove(RecordingInfo::kReSearchTypeName);
 
             rule.title = trimTitle;
             rule.priority = result.value(1).toString();

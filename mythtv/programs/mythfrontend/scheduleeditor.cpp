@@ -650,7 +650,7 @@ void ScheduleEditor::showUpcomingByTitle(void)
     QString title = m_recordingRule->m_title;
 
     if (m_recordingRule->m_searchType != kNoSearch)
-        title.remove(QRegExp(" \\(.*\\)$"));
+        title.remove(RecordingInfo::kReSearchTypeName);
 
     ShowUpcoming(title, m_recordingRule->m_seriesid);
 }

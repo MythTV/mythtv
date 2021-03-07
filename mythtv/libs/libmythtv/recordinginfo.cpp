@@ -21,6 +21,8 @@
 
 #define LOC      QString("RecordingInfo(%1): ").arg(GetBasename())
 
+const QRegularExpression RecordingInfo::kReSearchTypeName { R"(\s*\(.*\)$)" };
+
 static inline QString null_to_empty(const QString &str)
 {
     return str.isEmpty() ? "" : str;

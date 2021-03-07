@@ -33,7 +33,7 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
         m_pginfo = new ProgramInfo();
 
     m_baseTitle = m_pginfo->GetTitle();
-    m_baseTitle.remove(QRegExp(" \\(.*\\)$"));
+    m_baseTitle.remove(RecordingInfo::kReSearchTypeName);
 
     m_seSuffix = QString(" (%1)").arg(tr("stored search"));
     m_exSuffix = QString(" (%1)").arg(tr("stored example"));
@@ -127,7 +127,7 @@ void CustomEdit::loadData(void)
         while (result.next())
         {
             QString trimTitle = result.value(1).toString();
-            trimTitle.remove(QRegExp(" \\(.*\\)$"));
+            trimTitle.remove(RecordingInfo::kReSearchTypeName);
 
             rule.recordid = result.value(0).toString();
             rule.title = trimTitle;
