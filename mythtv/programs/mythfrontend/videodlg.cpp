@@ -1469,12 +1469,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         // If we found nothing, load the first image we find
         if (icon_file.isEmpty())
         {
-            QStringList imageTypes;
-            imageTypes.append("*.png");
-            imageTypes.append("*.jpg");
-            imageTypes.append("*.jpeg");
-            imageTypes.append("*.gif");
-
+            QStringList imageTypes { "*.png", "*.jpg", "*.jpeg", "*.gif" };
             QStringList fList;
 
             if (!host.isEmpty())
