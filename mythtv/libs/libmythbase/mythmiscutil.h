@@ -12,9 +12,6 @@
 #include "mythbaseexp.h"
 #include "mythsystem.h"
 
-class QStringList;
-class QFile;
-
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #include <QtGlobal>
 #else

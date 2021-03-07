@@ -3,14 +3,13 @@
 
 #include <climits>
 
+#include <QRunnable>
 #include <QThread>
 
 #include "mythbaseexp.h"
 #include "mythchrono.h"
 
 class MThreadInternal;
-class QStringList;
-class QRunnable;
 class MThread;
 
 /// Use this to determine if you are in the named thread.

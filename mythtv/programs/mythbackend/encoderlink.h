@@ -19,7 +19,6 @@ class PlaybackSock;
 class LiveTVChain;
 class InputInfo;
 class ProgramInfo;
-class QStringList;
 
 class EncoderLink
 {

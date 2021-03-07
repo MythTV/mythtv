@@ -13,8 +13,6 @@
 #include "mythmetaexp.h"
 #include "libbluray/bluray.h"
 
-class QStringList;
-
 using BlurayTitles = QList< QPair < uint,QString > >;
 
 struct meta_dl;

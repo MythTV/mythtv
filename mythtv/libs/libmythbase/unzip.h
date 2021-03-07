@@ -42,9 +42,6 @@ class UnzipPrivate;
 class QIODevice;
 class QFile;
 class QDir;
-class QStringList;
-class QString;
-
 
 class MBASE_PUBLIC UnZip
 {
