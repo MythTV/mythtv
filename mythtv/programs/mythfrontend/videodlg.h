@@ -156,7 +156,6 @@ class VideoDialog : public MythScreenType
     static QString GetCoverImage(MythGenericTree *node);
     QString GetFirstImage(MythGenericTree *node, const QString& type,
                           const QString& gpnode = QString(), int levels = 0);
-    static QString GetImageFromFolder(VideoMetadata *metadata);
     static QString GetScreenshot(MythGenericTree *node);
     static QString GetBanner(MythGenericTree *node);
     static QString GetFanart(MythGenericTree *node);
