@@ -40,6 +40,8 @@ void GameScannerThread::run(void)
     verifyFiles();
     updateDB();
 
+    LOG(VB_GENERAL, LOG_INFO, QString("Finished Game Scan."));
+
     RunEpilog();
 }
 
