@@ -375,7 +375,7 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
     return 0;
 }
 
-static QRegExp badChars = QRegExp(R"((/|\\|:|'|"|\?|\|))");
+static const QRegularExpression badChars { R"((/|\\|:|'|"|\?|\|))" };
 
 static QString fixFilename(const QString &filename)
 {
