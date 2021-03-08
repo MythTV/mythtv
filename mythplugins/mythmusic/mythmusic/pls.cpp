@@ -16,6 +16,7 @@
 #include <QMap>
 #include <QStringList>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QDomDocument>
 
@@ -107,7 +108,7 @@ int PlayListFile::parseM3U(PlayListFile *pls, const QString &filename)
 
     QTextStream stream(&f);
     QString data = stream.readAll();
-    QStringList lines = data.split(QRegExp("[\r\n]"));
+    QStringList lines = data.split(QRegularExpression("\\R")); // Any unicode newline
 
     QStringList::iterator it;
     for (it = lines.begin(); it != lines.end(); ++it)
