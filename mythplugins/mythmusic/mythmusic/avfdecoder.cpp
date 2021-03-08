@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QIODevice>
 #include <QFile>
+#include <QRegularExpression>
 #include <QTimer>
 
 // Myth headers
@@ -145,25 +146,25 @@ ShoutCastMetaMap ShoutCastMetaParser::parseMeta(const QString &mdata)
         title_begin_pos += 13;
         int title_end_pos = mdata.indexOf("';", title_begin_pos);
         QString title = mdata.mid(title_begin_pos, title_end_pos - title_begin_pos);
-        QRegExp rx;
-        rx.setPattern(m_metaFormat);
-        if (rx.indexIn(title) != -1)
+        QRegularExpression rx { m_metaFormat };
+        auto match = rx.match(title);
+        if (match.hasMatch())
         {
             LOG(VB_PLAYBACK, LOG_INFO, QString("ShoutCast: Meta     : '%1'")
                     .arg(mdata));
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("ShoutCast: Parsed as: '%1' by '%2'")
-                    .arg(rx.cap(m_metaTitlePos))
-                    .arg(rx.cap(m_metaArtistPos)));
+                    .arg(match.captured(m_metaTitlePos))
+                    .arg(match.captured(m_metaArtistPos)));
 
             if (m_metaTitlePos > 0)
-                result["title"] = rx.cap(m_metaTitlePos);
+                result["title"] = match.captured(m_metaTitlePos);
 
             if (m_metaArtistPos > 0)
-                result["artist"] = rx.cap(m_metaArtistPos);
+                result["artist"] = match.captured(m_metaArtistPos);
 
             if (m_metaAlbumPos > 0)
-                result["album"] = rx.cap(m_metaAlbumPos);
+                result["album"] = match.captured(m_metaAlbumPos);
         }
     }
 
