@@ -34,7 +34,7 @@
 #include <QDir>
 #include <QWaitCondition>
 #include <QWriteLocker>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QEvent>
 #include <QTcpServer>
 #include <QTimer>
@@ -4041,7 +4041,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
                 LOG(VB_FILE, LOG_INFO, LOC + QString("Found '%1 - %2'").arg(x).arg(files[x]));
             }
 
-            QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
+            QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
             for (int x = 0; x < filteredFiles.size(); x++)
             {
                 fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
@@ -4127,7 +4127,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
                         LOG(VB_FILE, LOG_INFO, LOC + QString("Found '%1 - %2'").arg(x).arg(files[x]));
                     }
 
-                    QStringList filteredFiles = files.filter(QRegExp(fi.fileName()));
+                    QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
 
                     for (int x = 0; x < filteredFiles.size(); x++)
                     {
