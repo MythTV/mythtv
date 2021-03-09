@@ -28,6 +28,10 @@
 
 #include "enums/recStatus.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
+#define capturedView capturedRef
+#endif
+
 bool LogCleanerTask::DoRun(void)
 {
     int numdays = 14;
@@ -427,7 +431,7 @@ bool ThemeUpdateTask::DoRun(void)
         if (match.hasMatch())
         {
             QString subversion;
-            int idx = match.capturedRef(1).toInt();
+            int idx = match.capturedView(1).toInt();
             for ( ; idx > 0; --idx)
             {
                 subversion = MythVersion + "." + QString::number(idx);
