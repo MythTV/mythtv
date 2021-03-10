@@ -270,7 +270,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
             if (m_bonjour)
             {
                 QByteArray name("Mythbackend on ");
-                name.append(gCoreContext->GetHostName());
+                name.append(gCoreContext->GetHostName().toUtf8());
                 QByteArray txt(bIsMaster ? "\x06master" : "\x05slave");
                 m_bonjour->Register(nPort, "_mythbackend._tcp", name, txt);
             }
