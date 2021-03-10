@@ -25,6 +25,10 @@
 
 #define LOC QString("DBUtil: ")
 
+#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
+#define capturedView capturedRef
+#endif
+
 const int DBUtil::kUnknownVersionNumber = INT_MIN;
 
 /** \fn DBUtil::GetDBMSVersion(void)
@@ -787,9 +791,9 @@ bool DBUtil::ParseDBMSVersion()
 
     // If any of these wasn't matched, the captured string will be
     // empty and toInt will parse it as a zero.
-    m_versionMajor = match.capturedRef(1).toInt(nullptr);
-    m_versionMinor = match.capturedRef(2).toInt(nullptr);
-    m_versionPoint = match.capturedRef(3).toInt(nullptr);
+    m_versionMajor = match.capturedView(1).toInt(nullptr);
+    m_versionMinor = match.capturedView(2).toInt(nullptr);
+    m_versionPoint = match.capturedView(3).toInt(nullptr);
 
     return m_versionMajor > -1;
 }
