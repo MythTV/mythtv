@@ -83,6 +83,14 @@ class MBASE_PUBLIC MythEvent : public QEvent
     static Type kDisableUDPListenerEventType;
     static Type kEnableUDPListenerEventType;
 
+  // No implicit copying.
+  protected:
+    MythEvent(const MythEvent &other) = default;
+    MythEvent &operator=(const MythEvent &other) = default;
+  public:
+    MythEvent(MythEvent &&) = delete;
+    MythEvent &operator=(MythEvent &&) = delete;
+
   protected:
     QString m_message;
     QStringList m_extradata;
