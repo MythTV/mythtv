@@ -22,6 +22,10 @@
 #include "rtcpdatapacket.h"
 #include "satiprtcppacket.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
+#define capturedView capturedRef
+#endif
+
 #define LOC  QString("SatIPRTSP[%1]: ").arg(m_streamHandler->m_inputId)
 #define LOC2 QString("SatIPRTSP[%1](%2): ").arg(m_streamHandler->m_inputId).arg(m_requestUrl.toString())
 
@@ -148,7 +152,7 @@ bool SatIPRTSP::Setup(const QUrl& url)
 
         m_sessionid = match.captured(1);
         m_timeout = match.capturedLength(2) > 0
-            ? std::chrono::seconds(match.capturedRef(2).toInt() / 2)
+            ? std::chrono::seconds(match.capturedView(2).toInt() / 2)
             : 30s;
 
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Sat>IP protocol timeout:%1 ms")
