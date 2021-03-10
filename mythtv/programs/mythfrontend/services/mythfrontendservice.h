@@ -66,7 +66,7 @@ class MythFrontendService : public MythHTTPService
                                  const QString& Message,     const QString& Origin,
                                  const QString& Description, const QString& Image,
                                  const QString& Extra,       const QString& ProgressText,
-                                 float Progress,             int   Timeout,
+                                 float Progress,             std::chrono::seconds Timeout,
                                  bool  Fullscreen,           uint  Visibility,
                                  uint  Priority);
 

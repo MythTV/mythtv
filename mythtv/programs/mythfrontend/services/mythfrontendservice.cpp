@@ -172,7 +172,7 @@ bool MythFrontendService::SendNotification(bool  Error,                const QSt
                                            const QString& Message,     const QString& Origin,
                                            const QString& Description, const QString& Image,
                                            const QString& Extra,       const QString& ProgressText,
-                                           float Progress,             int   Timeout,
+                                           float Progress,             std::chrono::seconds Timeout,
                                            bool  Fullscreen,           uint  Visibility,
                                            uint  Priority)
 {
@@ -352,7 +352,7 @@ bool MythFrontendService::PlayVideo(const QString& Id, bool UseBookmark)
          << metadata->GetSubtitle() << metadata->GetDirector()
          << QString::number(metadata->GetSeason())
          << QString::number(metadata->GetEpisode())
-         << metadata->GetInetRef() << QString::number(metadata->GetLength())
+         << metadata->GetInetRef() << QString::number(metadata->GetLength().count())
          << QString::number(metadata->GetYear())
          << QString::number(metadata->GetID())
          << QString::number(static_cast<int>(UseBookmark));
