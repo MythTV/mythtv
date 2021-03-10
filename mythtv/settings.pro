@@ -25,6 +25,9 @@ win32-msvc* {
   include ( config.mak )
 }
 
+contains(QT_MAJOR_VERSION, 6) {
+QT += core5compat
+}
 CONFIG += $$CCONFIG
 CONFIG += c++17
 
@@ -48,7 +51,7 @@ defineReplace(avLibName) {
 
 #check QT major version
 contains(QT_MAJOR_VERSION, 4) {
-        error("Must build against Qt5")
+        error("Must build against Qt5 or higher")
 }
 
 # Where binaries, includes and runtime assets are installed by 'make install'
