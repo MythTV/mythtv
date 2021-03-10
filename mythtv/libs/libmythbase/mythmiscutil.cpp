@@ -1110,9 +1110,15 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
         }
 
         // compare these sequences
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         const QStringRef& subA(a.midRef(begSeqA - a.unicode(), currA - begSeqA));
         const QStringRef& subB(b.midRef(begSeqB - b.unicode(), currB - begSeqB));
         const int cmp = QStringRef::localeAwareCompare(subA, subB);
+#else
+        const QString& subA(a.sliced(begSeqA - a.unicode(), currA - begSeqA));
+        const QString& subB(b.sliced(begSeqB - b.unicode(), currB - begSeqB));
+        const int cmp = QString::localeAwareCompare(subA, subB);
+#endif
 
         if (cmp != 0)
         {
