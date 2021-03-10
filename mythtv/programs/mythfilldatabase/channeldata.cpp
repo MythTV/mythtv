@@ -25,6 +25,10 @@
 #include "channeldata.h"
 #include "fillutil.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
+#define capturedView capturedRef
+#endif
+
 static const QRegularExpression parseMajorMinor { R"((\d+)\D(\d+))" };
 
 static void get_atsc_stuff(const QString& channum, int sourceid, int freqid,
@@ -37,8 +41,8 @@ static void get_atsc_stuff(const QString& channum, int sourceid, int freqid,
     if (!match.hasMatch())
         return;
 
-    major = match.capturedRef(1).toInt();
-    minor = match.capturedRef(2).toInt();
+    major = match.capturedView(1).toInt();
+    minor = match.capturedView(2).toInt();
 
     freq = get_center_frequency("atsc", "vsb8", "us", freqid);
 
@@ -172,8 +176,8 @@ ChannelInfo ChannelData::FindMatchingChannel(const ChannelInfo &chanInfo,
         if (match.hasMatch())
         {
             // Populate xmltvid for scanned ATSC channels
-            uint major = match.capturedRef(1).toUInt();
-            uint minor = match.capturedRef(2).toUInt();
+            uint major = match.capturedView(1).toUInt();
+            uint minor = match.capturedView(2).toUInt();
 
             for (it = existingChannels.begin();
                  it != existingChannels.end(); ++it)
