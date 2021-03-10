@@ -62,7 +62,7 @@ void MythDVDDecoder::UpdateFramesPlayed(void)
     if (!m_ringBuffer->IsDVD())
         return;
 
-    auto currentpos = static_cast<long long>(m_ringBuffer->DVD()->GetCurrentTime() * m_fps);
+    auto currentpos = static_cast<long long>(m_ringBuffer->DVD()->GetCurrentTime().count() * m_fps);
     m_framesPlayed = m_framesRead = currentpos ;
     m_parent->SetFramesPlayed(static_cast<uint64_t>(currentpos + 1));
 }
@@ -119,6 +119,12 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                             Reset(true, false, false);
                             m_audio->Reset();
                             m_parent->DiscardVideoFrames(false, false);
+                            // During a seek, the Reset call above resets the frames played
+                            // to zero - so we need to re-establish our position. Playback
+                            // appears unaffected by removing the Reset call - but better
+                            // safe than sorry when it comes to DVD so just update
+                            // the frames played.
+                            UpdateFramesPlayed();
                             break;
 
                         case DVDNAV_WAIT:
@@ -485,7 +491,7 @@ void MythDVDDecoder::PostProcessTracks(void)
         m_tracks[kTrackTypeSubtitle] = filteredTracks;
         stable_sort(m_tracks[kTrackTypeSubtitle].begin(), m_tracks[kTrackTypeSubtitle].end());
 
-        int trackNo = -1;
+        int track = -1;
         int selectedStream = m_ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
 
         // Now iterate over the sorted list and try to find the index of the
@@ -509,20 +515,19 @@ void MythDVDDecoder::PostProcessTracks(void)
                     .arg(iso639_key_toName(stream. m_language)));
 
             if ((selectedStream != -1) && (stream.m_stream_id == selectedStream))
-                trackNo = static_cast<int>(idx);
+                track = static_cast<int>(idx);
         }
 
-        uint captionmode = m_parent->GetCaptionMode();
         int trackcount = static_cast<int>(m_tracks[kTrackTypeSubtitle].size());
-
-        if (captionmode == kDisplayAVSubtitle && (trackNo < 0 || trackNo >= trackcount))
+        if (auto * dvdplayer = dynamic_cast<MythDVDPlayer*>(m_parent); dvdplayer && (track < 0 || track >= trackcount))
         {
-            m_parent->EnableSubtitles(false);
+            emit dvdplayer->DisableDVDSubtitles();
         }
-        else if (trackNo >= 0 && trackNo < trackcount)
+        else if (track >= 0 && track < trackcount)
         {
-            SetTrack(kTrackTypeSubtitle, trackNo);
-            m_parent->EnableSubtitles(true);
+            SetTrack(kTrackTypeSubtitle, track);
+            if (auto * player = dynamic_cast<MythPlayerUI*>(m_parent); player)
+                emit player->EnableSubtitles(true);
         }
     }
 }
@@ -615,17 +620,17 @@ long long MythDVDDecoder::DVDFindPosition(long long DesiredFrame)
 
     if (ffrewSkip == 1 || ffrewSkip == 0)
     {
-        int diffTime = static_cast<int>(ceil((DesiredFrame - m_framesPlayed) / m_fps));
-        long long desiredTimePos = m_ringBuffer->DVD()->GetCurrentTime() +
+        std::chrono::seconds diffTime = std::chrono::seconds(static_cast<int>(ceil((DesiredFrame - m_framesPlayed) / m_fps)));
+        std::chrono::seconds desiredTimePos = m_ringBuffer->DVD()->GetCurrentTime() +
                         diffTime;
-        if (diffTime <= 0)
+        if (diffTime <= 0s)
             desiredTimePos--;
         else
             desiredTimePos++;
 
-        if (desiredTimePos < 0)
-            desiredTimePos = 0;
-        return (desiredTimePos * 90000LL);
+        if (desiredTimePos < 0s)
+            desiredTimePos = 0s;
+        return (desiredTimePos.count() * 90000LL);
     }
     return current_speed;
 }

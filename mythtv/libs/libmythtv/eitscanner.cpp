@@ -92,7 +92,7 @@ void EITScanner::run(void)
         // Tell the scheduler to run if we are in passive scan
         // and there have been updated events since the last scheduler run
         // but not in the last 60 seconds
-        if (!m_activeScan && eitCount && (t.elapsed() > 60 * 1000))
+        if (!m_activeScan && eitCount && (t.elapsed() > 60s))
         {
             LOG(VB_EIT, LOG_INFO,
                 LOC_ID + QString("Added %1 EIT events in passive scan").arg(eitCount));
@@ -132,7 +132,7 @@ void EITScanner::run(void)
             }
 
             m_activeScanNextTrig = MythDate::current()
-                .addSecs(m_activeScanTrigTime);
+                .addSecs(m_activeScanTrigTime.count());
             if (!m_activeScanChannels.empty())
             {
                 ++m_activeScanNextChan;
@@ -188,10 +188,21 @@ void EITScanner::StartPassiveScan(ChannelBase *channel,
     m_eitSource->SetEITHelper(m_eitHelper);
     m_eitSource->SetEITRate(1.0F);
     int chanid = m_channel->GetChanID();
-    m_eitHelper->SetChannelID(chanid);
-    m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(chanid));
-
-    LOG(VB_EIT, LOG_INFO, LOC_ID + "Started passive scan");
+    if (chanid > 0)
+    {
+        m_eitHelper->SetChannelID(chanid);
+        m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(chanid));
+        LOG(VB_EIT, LOG_INFO, LOC_ID +
+            QString("Started processing EIT events in %1 scan for channel %2 chanid %3")
+                .arg(m_activeScan ? "active" : "passive")
+                .arg(m_channel->GetChannelName()).arg(chanid));
+    }
+    else
+    {
+        LOG(VB_EIT, LOG_INFO, LOC_ID +
+            QString("Failed to start processing EIT events, invalid chanid:%1")
+                .arg(chanid));
+    }
 }
 
 /** \fn EITScanner::StopPassiveScan(void)
@@ -211,12 +222,14 @@ void EITScanner::StopPassiveScan(void)
     EITHelper::WriteEITCache();
     m_eitHelper->SetChannelID(0);
     m_eitHelper->SetSourceID(0);
-    LOG(VB_EIT, LOG_INFO, LOC_ID + "Stopped passive scan");
+    LOG(VB_EIT, LOG_INFO, LOC_ID +
+        QString("Stopped processing EIT events in %1 scan")
+            .arg(m_activeScanStopped ? "passive" : "active"));
 }
 
-void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
+void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_per_source)
 {
-    m_rec = _rec;
+    m_rec = rec;
 
     if (m_activeScanChannels.isEmpty())
     {
@@ -273,7 +286,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
         m_activeScanTrigTime = max_seconds_per_source;
         // Add a little randomness to trigger time so multiple
         // cards will have a staggered channel changing time.
-        m_activeScanTrigTime += MythRandom() % 29;
+        m_activeScanTrigTime += std::chrono::seconds(MythRandom() % 29);
         m_activeScanStopped = false;
         m_activeScan = true;
     }

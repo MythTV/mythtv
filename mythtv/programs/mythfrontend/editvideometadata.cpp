@@ -315,7 +315,7 @@ void EditMetadataDialog::fillWidgets()
     if (m_lengthSpin)
     {
         m_lengthSpin->SetRange(0,999,1,15);
-        m_lengthSpin->SetValue(m_workingMetadata->GetLength());
+        m_lengthSpin->SetValue(m_workingMetadata->GetLength().count());
     }
 
     // No memory leak. MythUIButtonListItem adds the new item into
@@ -585,7 +585,7 @@ void EditMetadataDialog::SetUserRating()
 
 void EditMetadataDialog::SetLength()
 {
-    m_workingMetadata->SetLength(m_lengthSpin->GetIntValue());
+    m_workingMetadata->SetLength(m_lengthSpin->GetDuration<std::chrono::minutes>());
 }
 
 void EditMetadataDialog::SetPlayer()

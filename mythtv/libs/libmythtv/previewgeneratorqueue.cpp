@@ -42,7 +42,7 @@ PreviewGeneratorQueue *PreviewGeneratorQueue::s_pgq = nullptr;
  */
 void PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
     PreviewGenerator::Mode mode,
-    uint maxAttempts, uint minBlockSeconds)
+    uint maxAttempts, std::chrono::seconds minBlockSeconds)
 {
     s_pgq = new PreviewGeneratorQueue(mode, maxAttempts, minBlockSeconds);
 }
@@ -82,7 +82,7 @@ void PreviewGeneratorQueue::TeardownPreviewGeneratorQueue()
  */
 PreviewGeneratorQueue::PreviewGeneratorQueue(
     PreviewGenerator::Mode mode,
-    uint maxAttempts, uint minBlockSeconds) :
+    uint maxAttempts, std::chrono::seconds minBlockSeconds) :
     MThread("PreviewGeneratorQueue"),
     m_mode(mode),
     m_maxAttempts(maxAttempts), m_minBlockSeconds(minBlockSeconds)
@@ -132,10 +132,10 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
  * \param[in] outputfile Use this specific filename for the preview
  *            image. If empty, a default name will be created based on the
  *            program information.
- * \param[in] time An offset from the start of the program. This can be
- *            seconds or frames. (See the next argument.)
- * \param[in] in_seconds If true, the 'time' offset is in seconds. If
- *            false, the offset is in frames.
+ * \param[in] time An offset from the start of the program in seconds.
+ *            This field has priority. If it is set to -1s then
+ *            seekframe will be used.
+ * \param[in] frame An offset from the start of the program in frames.
  * \param[in] token A user specified value used to match up this
  *            request with the response from the backend, and as a key for
  *            some indexing.  A token isn't required, but is strongly
@@ -145,7 +145,7 @@ void PreviewGeneratorQueue::GetPreviewImage(
     const ProgramInfo &pginfo,
     const QSize outputsize,
     const QString &outputfile,
-    long long time, bool in_seconds,
+    std::chrono::seconds time, long long frame,
     const QString& token)
 {
     if (!s_pgq)
@@ -166,8 +166,16 @@ void PreviewGeneratorQueue::GetPreviewImage(
     extra += QString::number(outputsize.width());
     extra += QString::number(outputsize.height());
     extra += outputfile;
-    extra += QString::number(time);
-    extra += (in_seconds ? "1" : "0");
+    if (time >= 0s)
+    {
+        extra += QString::number(time.count());
+        extra += "1";
+    }
+    else
+    {
+        extra += QString::number(frame);
+        extra += "0";
+    }
     auto *e = new MythEvent("GET_PREVIEW", extra);
     QCoreApplication::postEvent(s_pgq, e);
 }
@@ -236,7 +244,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
         QString token;
         QSize outputsize;
         QString outputfile;
-        long long time = -1LL;
+        long long time_or_frame = -1LL;
         if (it != list.end())
             token = (*it++);
         if (it != list.end())
@@ -246,12 +254,20 @@ bool PreviewGeneratorQueue::event(QEvent *e)
         if (it != list.end())
             outputfile = (*it++);
         if (it != list.end())
-            time = (*it++).toLongLong();
+            time_or_frame = (*it++).toLongLong();
         if (it != list.end())
         {
             bool time_fmt_sec = (*it++).toInt() != 0;
-            GeneratePreviewImage(evinfo, outputsize, outputfile,
-                                      time, time_fmt_sec, token);
+            if (time_fmt_sec)
+            {
+                GeneratePreviewImage(evinfo, outputsize, outputfile,
+                                     std::chrono::seconds(time_or_frame), -1, token);
+            }
+            else
+            {
+                GeneratePreviewImage(evinfo, outputsize, outputfile,
+                                     -1s, time_or_frame, token);
+            }
         }
         return true;
     }
@@ -288,7 +304,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             if (me->Message() == "PREVIEW_SUCCESS")
             {
                 (*it).m_attempts      = 0;
-                (*it).m_lastBlockTime = 0;
+                (*it).m_lastBlockTime = 0s;
                 (*it).m_blockRetryUntil = QDateTime();
             }
             else
@@ -296,7 +312,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                 (*it).m_lastBlockTime =
                     max(m_minBlockSeconds, (*it).m_lastBlockTime * 2);
                 (*it).m_blockRetryUntil =
-                    MythDate::current().addSecs((*it).m_lastBlockTime);
+                    MythDate::current().addSecs((*it).m_lastBlockTime.count());
             }
 
             QStringList list;
@@ -389,10 +405,10 @@ void PreviewGeneratorQueue::SendEvent(
  * \param outputfile Use this specific filename for the preview
  *        image. If empty, a default name will be created based on the
  *        program information.
- * \param time An offset from the start of the program. This can be
- *        seconds or frames. (See the next argument.)
- * \param in_seconds If true, the 'time' offset is in seconds. If
- *        false, the offset is in frames.
+ * \param time An offset from the start of the program in seconds.
+ *        This field has priority. If it is set to -1s then seekframe
+ *        will be used.
+ * \param frames An offset from the start of the program in frames.
  * \param token An arbitrary string value used to match up this
  *        request with the response from the backend, and as a key for
  *        some indexing.  A token isn't required, but is strongly
@@ -413,12 +429,15 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     ProgramInfo &pginfo,
     const QSize size,
     const QString &outputfile,
-    long long time, bool in_seconds,
+    std::chrono::seconds time, long long frame,
     const QString& token)
 {
-    QString key = QString("%1_%2x%3_%4%5")
+    auto pos_text = (time >= 0s)
+        ? QString::number(time.count()) + "s"
+        : QString::number(frame)+ "f";
+    QString key = QString("%1_%2x%3_%4")
         .arg(pginfo.GetBasename()).arg(size.width()).arg(size.height())
-        .arg(time).arg(in_seconds?"s":"f");
+        .arg(pos_text);
 
     if (pginfo.GetAvailableStatus() == asPendingDelete)
     {
@@ -433,7 +452,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     QString ret_file = filename;
     QString ret;
 
-    bool is_special = !outputfile.isEmpty() || time >= 0 ||
+    bool is_special = !outputfile.isEmpty() || time >= 0s ||
         (size.width() != 0) || (size.height() != 0);
 
     bool needs_gen = true;
@@ -533,10 +552,10 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Requesting preview for '%1'") .arg(key));
             auto *pg = new PreviewGenerator(&pginfo, token, m_mode);
-            if (!outputfile.isEmpty() || time >= 0 ||
+            if (!outputfile.isEmpty() || time >= 0s ||
                 size.width() || size.height())
             {
-                pg->SetPreviewTime(time, in_seconds);
+                pg->SetPreviewTime(time, frame);
                 pg->SetOutputFilename(outputfile);
                 pg->SetOutputSize(size);
             }
@@ -750,7 +769,7 @@ void PreviewGeneratorQueue::ClearPreviewGeneratorAttempts(const QString &key)
 {
     QMutexLocker locker(&m_lock);
     m_previewMap[key].m_attempts = 0;
-    m_previewMap[key].m_lastBlockTime = 0;
+    m_previewMap[key].m_lastBlockTime = 0s;
     m_previewMap[key].m_blockRetryUntil =
         MythDate::current().addSecs(-60);
 }

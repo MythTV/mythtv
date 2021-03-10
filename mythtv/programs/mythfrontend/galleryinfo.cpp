@@ -6,8 +6,6 @@
 #include "mythcoreutil.h"
 #include "mythdate.h"
 
-using namespace std::chrono_literals;
-
 
 //! The exif/video tags comprising the Basic file info
 static QSet<QString> kBasicInfoSet {
@@ -248,7 +246,7 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
     if (im.IsDevice())
     {
         CreateButton(tr("Last scan"),
-                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_date),
+                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_date.count()),
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
     }
 
@@ -258,7 +256,7 @@ void InfoList::Display(ImageItemK &im, const QStringList &tagStrings)
     if (!im.IsDevice())
     {
         CreateButton(tr("Modified"),
-                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_modTime),
+                     MythDate::toString(QDateTime::fromSecsSinceEpoch(im.m_modTime.count()),
                                         MythDate::kDateTimeFull | MythDate::kAddYear));
     }
 

@@ -118,7 +118,7 @@ class TestMythSystem: public QObject
         cmd->GetStandardInputStream()->write(in);
         cmd->GetStandardInputStream()->close();
         std::cerr << "stdin_works -- Wait starting" << std::endl;
-        cmd->Wait(0);
+        cmd->Wait(0ms);
         QVERIFY(cmd->GetExitCode() == 0);
         QByteArray out = tempfile.readAll();
         QVERIFY(QString(out).contains(QString(in)));
@@ -256,7 +256,7 @@ class TestMythSystem: public QObject
     {
         QScopedPointer<MythSystem> cmd(
             MythSystem::Create("sleep 2", kMSRunShell));
-        QVERIFY(!cmd->Wait(1));
+        QVERIFY(!cmd->Wait(1ms));
     }
 
     static void getexitcode_returns_exit_code_when_non_zero(void)

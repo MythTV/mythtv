@@ -220,9 +220,9 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     SetResponseHeader("Connection", m_bKeepAlive ? "Keep-Alive" : "Close" );
     if (m_bKeepAlive)
     {
-        if (m_nKeepAliveTimeout == 0) // Value wasn't passed in by the server, so go with the configured value
-            m_nKeepAliveTimeout = gCoreContext->GetNumSetting("HTTP/KeepAliveTimeoutSecs", 10);
-        SetResponseHeader("Keep-Alive", QString("timeout=%1").arg(m_nKeepAliveTimeout));
+        if (m_nKeepAliveTimeout == 0s) // Value wasn't passed in by the server, so go with the configured value
+            m_nKeepAliveTimeout = gCoreContext->GetDurSetting<std::chrono::seconds>("HTTP/KeepAliveTimeoutSecs", 10s);
+        SetResponseHeader("Keep-Alive", QString("timeout=%1").arg(m_nKeepAliveTimeout.count()));
     }
 
     //-----------------------------------------------------------------------
@@ -1266,7 +1266,7 @@ bool HTTPRequest::ParseRequest()
     try
     {
         // Read first line to determine requestType
-        QString sRequestLine = ReadLine( 2000 );
+        QString sRequestLine = ReadLine( 2s );
 
         if ( sRequestLine.isEmpty() )
         {
@@ -1300,7 +1300,7 @@ bool HTTPRequest::ParseRequest()
 
         // Read Header
         bool    bDone = false;
-        QString sLine = ReadLine( 2000 );
+        QString sLine = ReadLine( 2s );
 
         while (( !sLine.isEmpty() ) && !bDone )
         {
@@ -1316,7 +1316,7 @@ bool HTTPRequest::ParseRequest()
                     m_mapHeaders.insert(sName.toLower(), sValue.trimmed());
                 }
 
-                sLine = ReadLine( 2000 );
+                sLine = ReadLine( 2s );
             }
             else
                 bDone = true;
@@ -1401,7 +1401,7 @@ bool HTTPRequest::ParseRequest()
             char *pszPayload = new char[ nPayloadSize + 2 ];
             long  nBytes     = 0;
 
-            nBytes = ReadBlock( pszPayload, nPayloadSize, 5000 );
+            nBytes = ReadBlock( pszPayload, nPayloadSize, 5s );
             if (nBytes == nPayloadSize )
             {
                 m_sPayload = QString::fromUtf8( pszPayload, nPayloadSize );
@@ -2050,7 +2050,7 @@ bool HTTPRequest::DigestAuthentication()
         return false;
     }
 
-    const int AUTH_TIMEOUT = 2 * 60; // 2 Minute timeout to login, to reduce replay attack window
+    constexpr std::chrono::seconds AUTH_TIMEOUT { 2min }; // 2 Minute timeout to login, to reduce replay attack window
     QDateTime nonceTimeStamp = MythDate::fromString(nonceTimeStampStr);
     if (!nonceTimeStamp.isValid())
     {
@@ -2059,7 +2059,7 @@ bool HTTPRequest::DigestAuthentication()
         return false;
     }
 
-    if (nonceTimeStamp.secsTo(MythDate::current()) > AUTH_TIMEOUT)
+    if (MythDate::secsInPast(nonceTimeStamp) > AUTH_TIMEOUT)
     {
         LOG(VB_HTTP, LOG_NOTICE, "Authorization nonce timestamp is invalid or too old.");
         // Tell the client that the submitted nonce has expired at which
@@ -2383,7 +2383,7 @@ void HTTPRequest::AddCORSHeaders( const QString &sOrigin )
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-QString BufferedSocketDeviceRequest::ReadLine( int msecs )
+QString BufferedSocketDeviceRequest::ReadLine( std::chrono::milliseconds msecs )
 {
     QString sLine;
 
@@ -2395,7 +2395,7 @@ QString BufferedSocketDeviceRequest::ReadLine( int msecs )
         timer.start();
         while (!m_pSocket->canReadLine() && !timeout)
         {
-            timeout = !(m_pSocket->waitForReadyRead( msecs ));
+            timeout = !(m_pSocket->waitForReadyRead( msecs.count() ));
 
             if ( timer.elapsed() >= msecs )
             {
@@ -2416,12 +2416,12 @@ QString BufferedSocketDeviceRequest::ReadLine( int msecs )
 /////////////////////////////////////////////////////////////////////////////
 
 qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
-                                              int msecs)
+                                              std::chrono::milliseconds msecs)
 {
     if (m_pSocket && m_pSocket->isValid() &&
         m_pSocket->state() == QAbstractSocket::ConnectedState)
     {
-        if (msecs == 0)
+        if (msecs == 0ms)
             return( m_pSocket->read( pData, nMaxLen ));
 
         bool bTimeout = false;
@@ -2429,7 +2429,7 @@ qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
         timer.start();
         while ( (m_pSocket->bytesAvailable() < (int)nMaxLen) && !bTimeout ) // This can end up waiting far longer than msecs
         {
-            bTimeout = !(m_pSocket->waitForReadyRead( msecs ));
+            bTimeout = !(m_pSocket->waitForReadyRead( msecs.count() ));
 
             if ( timer.elapsed() >= msecs )
             {

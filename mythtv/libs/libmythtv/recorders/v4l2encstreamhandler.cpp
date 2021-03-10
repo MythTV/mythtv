@@ -551,7 +551,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "StartEncoding: read failing, re-opening device: " + ENO);
                 close(m_fd);
-                std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                std::this_thread::sleep_for(2ms);
                 m_fd = open(m_device.toLatin1().constData(), O_RDWR | O_NONBLOCK);
                 if (m_fd < 0)
                 {
@@ -566,7 +566,7 @@ bool V4L2encStreamHandler::StartEncoding(void)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("StartEncoding: read failed, retry in %1 msec:")
                     .arg(100 * idx) + ENO);
-                std::this_thread::sleep_for(std::chrono::microseconds(idx * 100));
+                std::this_thread::sleep_for(idx * 100us);
             }
         }
         if (idx == 50)
@@ -644,7 +644,7 @@ bool V4L2encStreamHandler::StopEncoding(void)
 
     // allow last bits of data through..
     if (m_drb && m_drb->IsRunning())
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(20ms);
 #if 0
     // close the fd so streamoff/streamon work in V4LChannel    Close();
     close(m_fd);
@@ -975,7 +975,7 @@ bool V4L2encStreamHandler::SetBitrateForResolution(void)
             m_v4l2.Close();
             m_v4l2.Open(m_device, m_vbiDevice);
         }
-        std::this_thread::sleep_for(std::chrono::microseconds(100));
+        std::this_thread::sleep_for(100us);
     }
     if (idx == 5)
         return false;

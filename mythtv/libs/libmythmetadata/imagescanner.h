@@ -49,7 +49,7 @@ private:
     int  SyncDirectory(const QFileInfo &dirInfo, int devId,
                        const QString &base, int parentId);
     void PopulateMetadata(const QString &path, int type, QString &comment,
-                          qint64 &time,
+                          std::chrono::seconds &time,
                           int &orientation);
     void SyncFile(const QFileInfo &fileInfo, int devId,
                   const QString &base, int parentId);

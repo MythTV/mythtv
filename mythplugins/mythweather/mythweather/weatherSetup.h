@@ -27,8 +27,8 @@ struct SourceListInfo
     QString author;
     QString email;
     QString version;
-    uint update_timeout   {DEFAULT_UPDATE_TIMEOUT};
-    uint retrieve_timeout {};
+    std::chrono::minutes update_timeout   {DEFAULT_UPDATE_TIMEOUT};
+    std::chrono::seconds retrieve_timeout {0s};
     uint id               {};
 };
 

@@ -23,8 +23,6 @@
 #include "mythuitext.h"
 #include "mythuiutils.h"
 
-using namespace std::chrono_literals;
-
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #define qEnvironmentVariable getenv
 #endif

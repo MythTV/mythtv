@@ -7,10 +7,12 @@
 // MythTV
 #include "mythtvexp.h"
 #include "mythaverror.h"
+#include "mythchrono.h"
 
 // Std
 #include <array>
 #include <vector>
+#include <memory>
 
 #define MYTH_WIDTH_ALIGNMENT 64
 #define MYTH_HEIGHT_ALIGNMENT 16
@@ -81,6 +83,7 @@ inline MythDeintType operator~ (MythDeintType a) { return static_cast<MythDeintT
 using VideoFrameTypes = std::vector<VideoFrameType>;
 using FramePitches = std::array<int,3>;
 using FrameOffsets = std::array<int,3>;
+using MythHDRVideoPtr = std::shared_ptr<class MythHDRVideoMetadata>;
 
 class MTV_PUBLIC MythVideoFrame
 {
@@ -125,8 +128,8 @@ class MTV_PUBLIC MythVideoFrame
     double         m_frameRate         { -1.0 };
     long long      m_frameNumber       { 0 };
     uint64_t       m_frameCounter      { 0 };
-    long long      m_timecode          { 0 };
-    int64_t        m_displayTimecode   { 0 };
+    std::chrono::milliseconds m_timecode          { 0ms };
+    std::chrono::milliseconds m_displayTimecode   { 0ms };
     std::array<uint8_t*,4> m_priv      { nullptr };
     int            m_interlaced        { 0    };
     bool           m_topFieldFirst     { true };
@@ -151,6 +154,7 @@ class MTV_PUBLIC MythVideoFrame
     bool           m_alreadyDeinterlaced { false };
     int            m_rotation          { 0 };
     uint           m_stereo3D          { 0 };
+    MythHDRVideoPtr m_hdrMetadata      { nullptr };
     MythDeintType  m_deinterlaceSingle { DEINT_NONE };
     MythDeintType  m_deinterlaceDouble { DEINT_NONE };
     MythDeintType  m_deinterlaceAllowed { DEINT_NONE };

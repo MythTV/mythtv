@@ -161,7 +161,7 @@ static int CheckRecordings(const MythUtilCommandLineParser &cmdline)
                                               .arg(p->GetRecordingStartTime(MythDate::ISODate));
                     std::cout << "Running - " << qPrintable(command) << std::endl;
                     QScopedPointer<MythSystem> cmd(MythSystem::Create(command));
-                    cmd->Wait(0);
+                    cmd->Wait(0s);
                     if (cmd.data()->GetExitCode() != GENERIC_EXIT_OK)
                     {
                         std::cout << "ERROR - mythcommflag exited with result: " << cmd.data()->GetExitCode() << std::endl;

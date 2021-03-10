@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 {
     int  special_port = -1;
     QString startup_message = "";          // default to no startup message
-    int message_time = 30;                 // time to display startup message
+    std::chrono::seconds message_time = 30s; // time to display startup message
 
     // TODO: check if this can use LOG_*
     debug_level = 0;  // don't show any debug messages by default
@@ -80,8 +80,8 @@ int main(int argc, char **argv)
         startup_message = cmdline.toString("message");
     if (cmdline.toBool("messagetime"))
     {
-        message_time = cmdline.toInt("messagetime");
-        if (message_time < 1 || message_time > 1000)
+        message_time = std::chrono::seconds(cmdline.toInt("messagetime"));
+        if (message_time < 1s || message_time > 1000s)
         {
             LOG(VB_GENERAL, LOG_ERR, "lcdserver: Bad message duration");
             return GENERIC_EXIT_INVALID_CMDLINE;

@@ -34,8 +34,6 @@
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
-using namespace std::chrono_literals;
-
 
 #define LOC QString("LCDdevice: ")
 

@@ -91,7 +91,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
 
     ClearAfterSeek();
 
-    int save_timeout = 1001;
+    std::chrono::milliseconds save_timeout { 1s + 1ms };
     MythTimer flagTime;
     MythTimer ui_timer;
     MythTimer inuse_timer;
@@ -110,7 +110,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
     bool usingIframes = false;
     while (GetEof() == kEofStateNone)
     {
-        if (inuse_timer.elapsed() > 2534)
+        if (inuse_timer.elapsed() > 2534ms)
         {
             inuse_timer.restart();
             m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
@@ -123,7 +123,7 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
         {
             // Give DB some breathing room if it gets far behind..
             if (myFramesPlayed - pmap_last > 5000)
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::this_thread::sleep_for(200ms);
 
             // If we're already saving, just save a larger block next time..
             if (MythRebuildSaver::GetCount(m_decoder) < 1)
@@ -138,13 +138,13 @@ bool MythCommFlagPlayer::RebuildSeekTable(bool ShowPercentage, StatusCallback Ca
             save_timer.restart();
         }
 
-        if (ui_timer.elapsed() > 98)
+        if (ui_timer.elapsed() > 98ms)
         {
             ui_timer.restart();
 
             if (m_totalFrames)
             {
-                float elapsed = flagTime.elapsed() * 0.001F;
+                float elapsed = flagTime.elapsed().count() * 0.001F;
                 auto flagFPS = (elapsed > 0.0F) ? static_cast<int>(myFramesPlayed / elapsed) : 0;
                 auto percentage = static_cast<int>(myFramesPlayed * 100 / m_totalFrames);
                 if (Callback)
@@ -243,7 +243,7 @@ MythVideoFrame* MythCommFlagPlayer::GetRawVideoFrame(long long FrameNumber)
     while (!m_videoOutput->ValidVideoFrames() && ((tries++) < 100))
     {
         m_decodeOneFrame = true;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
         if ((tries & 10) == 10)
             LOG(VB_PLAYBACK, LOG_INFO, LOC + "Waited 100ms for video frame");
     }

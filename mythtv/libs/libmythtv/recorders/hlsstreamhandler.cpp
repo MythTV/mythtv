@@ -120,7 +120,7 @@ void HLSStreamHandler::run(void)
     QString url = m_tuning.GetURL(0).toString();
     int err_cnt = 0;
     int nil_cnt = 0;
-    int open_sleep = 500;
+    std::chrono::milliseconds open_sleep = 500ms;
 
     LOG(VB_GENERAL, LOG_INFO, LOC + "run() -- begin");
 
@@ -139,12 +139,12 @@ void HLSStreamHandler::run(void)
             {
                 if (m_hls->FatalError())
                     break;
-                std::this_thread::sleep_for(std::chrono::milliseconds(open_sleep));
-                if (open_sleep < 20000)
-                    open_sleep += 500;
+                std::this_thread::sleep_for(open_sleep);
+                if (open_sleep < 20s)
+                    open_sleep += 500ms;
                 continue;
             }
-            open_sleep = 500;
+            open_sleep = 500ms;
             m_hls->Throttle(m_throttle);
             m_throttle = false;
         }
@@ -172,7 +172,7 @@ void HLSStreamHandler::run(void)
             if (nil_cnt < 4)
                 ++nil_cnt;
             // range .25 to 1 second
-            std::this_thread::sleep_for(std::chrono::milliseconds(nil_cnt *250));
+            std::this_thread::sleep_for(nil_cnt * 250ms);
             continue;
         }
         nil_cnt = 0;
@@ -203,17 +203,17 @@ void HLSStreamHandler::run(void)
         }
 
         if (m_hls->IsThrottled())
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(1s);
         else if (size < BUFFER_SIZE)
         {
             LOG(VB_RECORD, LOG_DEBUG, LOC +
                 QString("Requested %1 bytes, got %2 bytes.")
                 .arg(BUFFER_SIZE).arg(size));
             // hundredth of a second.
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
         }
         else
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(1ms);
     }
 
     m_hls->Throttle(false);

@@ -184,7 +184,7 @@ int BrowserApi::GetVolume(void)
     while (!timer.hasExpired(2000) && !m_gotAnswer)
     {
         QCoreApplication::processEvents();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
     }
 
     if (m_gotAnswer)
@@ -228,7 +228,7 @@ QString BrowserApi::GetMetadata(void)
     while (!timer.hasExpired(2000)  && !m_gotAnswer)
     {
         QCoreApplication::processEvents();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
     }
 
     if (m_gotAnswer)

@@ -1,6 +1,3 @@
-// POSIX headers
-#include <sys/time.h>      /* gettimeofday */
-
 // ANSI C headers
 #include <cstdlib>
 #include <cmath>
@@ -439,9 +436,8 @@ TemplateMatcher::analyzeFrame(const MythVideoFrame *frame, long long frameno,
     const AVFrame  *edges = nullptr;
     int             pgmwidth = 0;
     int             pgmheight = 0;
-    struct timeval  start {};
-    struct timeval  end {};
-    struct timeval  elapsed {};
+    std::chrono::microseconds start {0us};
+    std::chrono::microseconds end   {0us};
 
     *pNextFrame = kNextFrame;
 
@@ -449,7 +445,7 @@ TemplateMatcher::analyzeFrame(const MythVideoFrame *frame, long long frameno,
     if (pgm == nullptr)
         goto error;
 
-    (void)gettimeofday(&start, nullptr);
+    start = nowAsDuration<std::chrono::microseconds>();
 
     if (pgm_crop(&m_cropped, pgm, pgmheight, m_tmplRow, m_tmplCol,
                 m_tmplWidth, m_tmplHeight))
@@ -462,9 +458,8 @@ TemplateMatcher::analyzeFrame(const MythVideoFrame *frame, long long frameno,
     if (pgm_match(m_tmpl, edges, m_tmplHeight, JITTER_RADIUS, &m_matches[frameno]))
         goto error;
 
-    (void)gettimeofday(&end, nullptr);
-    timersub(&end, &start, &elapsed);
-    timeradd(&m_analyzeTime, &elapsed, &m_analyzeTime);
+    end = nowAsDuration<std::chrono::microseconds>();
+    m_analyzeTime += (end - start);
 
     return ANALYZE_OK;
 
@@ -581,7 +576,7 @@ TemplateMatcher::reportTime(void) const
         return -1;
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("TM Time: analyze=%1s")
-            .arg(strftimeval(&m_analyzeTime)));
+            .arg(strftimeval(m_analyzeTime)));
     return 0;
 }
 

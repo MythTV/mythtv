@@ -132,18 +132,18 @@ class TransportScanItem
                       const QString &_si_std,
                       QString        _name,
                       uint           _mplexid,
-                      uint           _timeoutTune);
+                      std::chrono::milliseconds _timeoutTune);
 
     TransportScanItem(uint           _sourceid,
                       QString        _name,
                       const DTVMultiplex &_tuning,
-                      uint           _timeoutTune);
+                      std::chrono::milliseconds _timeoutTune);
 
     TransportScanItem(uint                _sourceid,
                       QString             _name,
                       DTVTunerType        _tuner_type,
                       const DTVTransport &_tuning,
-                      uint                _timeoutTune);
+                      std::chrono::milliseconds _timeoutTune);
 
     TransportScanItem(uint                _sourceid,
                       const QString      &_si_std,
@@ -151,13 +151,13 @@ class TransportScanItem
                       uint freqNum,
                       uint frequency,         /* center frequency to use     */
                       const FrequencyTable &ft,  /* freq table to get info from */
-                      uint                _timeoutTune);
+                      std::chrono::milliseconds _timeoutTune);
 
     TransportScanItem(uint                  _sourceid,
                       QString               _name,
                       IPTVTuningData        _tuning,
                       QString               _channel,
-                      uint                  _timeoutTune);
+                      std::chrono::milliseconds _timeoutTune);
 
     uint offset_cnt() const
         { return (m_freqOffsets[2]) ? 3 : ((m_freqOffsets[1]) ? 2 : 1); }
@@ -179,7 +179,7 @@ class TransportScanItem
 
     bool               m_scanning    {false};   // Probably unnecessary
     std::array<int,3>  m_freqOffsets {0,0,0};   // Frequency offsets
-    unsigned           m_timeoutTune {1000};    // Timeout to tune to a frequency
+    std::chrono::milliseconds m_timeoutTune {1s};  ///< Timeout to tune to a frequency
 
     DTVMultiplex       m_tuning;                // Tuning info
     IPTVTuningData     m_iptvTuning;            // IPTV Tuning info

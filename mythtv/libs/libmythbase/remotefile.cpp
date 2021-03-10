@@ -34,7 +34,7 @@
 #include "threadedfilewriter.h"
 #include "storagegroup.h"
 
-#define MAX_FILE_CHECK 500  // in ms
+static constexpr std::chrono::milliseconds MAX_FILE_CHECK { 500ms };
 
 static bool RemoteSendReceiveStringList(const QString &host, QStringList &strlist)
 {
@@ -70,16 +70,16 @@ static bool RemoteSendReceiveStringList(const QString &host, QStringList &strlis
 }
 
 RemoteFile::RemoteFile(QString url, bool write, bool usereadahead,
-                       int timeout_ms,
+                       std::chrono::milliseconds timeout,
                        const QStringList *possibleAuxiliaryFiles) :
     m_path(std::move(url)),
-    m_useReadAhead(usereadahead),  m_timeoutMs(timeout_ms),
+    m_useReadAhead(usereadahead),  m_timeoutMs(timeout),
     m_writeMode(write)
 {
     if (m_writeMode)
     {
         m_useReadAhead = false;
-        m_timeoutMs = -1;
+        m_timeoutMs = -1ms;
     }
     else if (possibleAuxiliaryFiles)
         m_possibleAuxFiles = *possibleAuxiliaryFiles;
@@ -160,7 +160,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     QStringList strlist;
 
 #ifndef IGNORE_PROTO_VER_MISMATCH
-    if (!gCoreContext->CheckProtoVersion(lsock, 5000))
+    if (!gCoreContext->CheckProtoVersion(lsock, 5s))
     {
         LOG(VB_GENERAL, LOG_ERR, loc +
             QString("Failed validation to server %1:%2").arg(host).arg(port));
@@ -186,7 +186,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     {
         strlist.push_back(QString("ANN FileTransfer %1 %2 %3 %4")
                           .arg(hostname).arg(static_cast<int>(m_writeMode))
-                          .arg(static_cast<int>(m_useReadAhead)).arg(m_timeoutMs));
+                          .arg(static_cast<int>(m_useReadAhead)).arg(m_timeoutMs.count()));
         strlist << QString("%1").arg(dir);
         strlist << sgroup;
 
@@ -989,11 +989,11 @@ int RemoteFile::Read(void *data, int size)
 
     sent = size;
 
-    int waitms = 30;
+    std::chrono::milliseconds waitms { 30ms };
     MythTimer mtimer;
     mtimer.start();
 
-    while (recv < sent && !error && mtimer.elapsed() < 10000)
+    while (recv < sent && !error && mtimer.elapsed() < 10s)
     {
         int ret = m_sock->Read(((char *)data) + recv, sent - recv, waitms);
 
@@ -1002,7 +1002,7 @@ int RemoteFile::Read(void *data, int size)
         else if (ret < 0)
             error = true;
 
-        waitms += (waitms < 200) ? 20 : 0;
+        waitms += (waitms < 200ms) ? 20ms : 0ms;
 
         if (m_controlSock->IsDataAvailable() &&
             m_controlSock->ReadStringList(strlist, MythSocket::kShortTimeout) &&
@@ -1026,7 +1026,7 @@ int RemoteFile::Read(void *data, int size)
     {
         // Wait up to 1.5s for the backend to send the size
         // MythSocket::ReadString will drop the connection
-        if (m_controlSock->ReadStringList(strlist, 1500) &&
+        if (m_controlSock->ReadStringList(strlist, 1500ms) &&
             !strlist.isEmpty())
         {
             sent = strlist[0].toInt(); // -1 on backend error

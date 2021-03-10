@@ -16,6 +16,7 @@
 #ifndef ZMSERVER_H
 #define ZMSERVER_H
 
+#include <chrono>
 #include <cstdint>
 #include <map>
 #include <mysql/mysql.h>
@@ -23,6 +24,9 @@
 #include <string>
 #include <unistd.h>
 #include <vector>
+using namespace std::chrono_literals;
+using Clock = std::chrono::system_clock;
+using TimePoint = std::chrono::time_point<Clock>;
 
 // the maximum image size we are ever likely to get from ZM
 #define MAX_IMAGE_SIZE  (2048*1536*3)
@@ -47,8 +51,8 @@ extern int     g_majorVersion;
 extern int     g_minorVersion;
 extern int     g_revisionVersion;
 
-#define DB_CHECK_TIME 60
-extern time_t  g_lastDBKick;
+static constexpr std::chrono::seconds DB_CHECK_TIME { 60s };
+extern TimePoint g_lastDBKick;
 
 const std::string FUNCTION_MONITOR = "Monitor";
 const std::string FUNCTION_MODECT  = "Modect";

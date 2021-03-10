@@ -28,7 +28,7 @@ class TunerStatus
 MTV_PUBLIC uint RemoteGetState(uint inputid);
 MTV_PUBLIC uint RemoteGetFlags(uint inputid);
 MTV_PUBLIC bool RemoteRecordPending(
-    uint inputid, const ProgramInfo *pginfo, int secsleft, bool hasLater);
+    uint inputid, const ProgramInfo *pginfo, std::chrono::seconds secsleft, bool hasLater);
 MTV_PUBLIC bool RemoteStopLiveTV(uint inputid);
 MTV_PUBLIC bool RemoteStopRecording(uint inputid);
 MTV_PUBLIC void RemoteStopRecording(const ProgramInfo *pginfo);

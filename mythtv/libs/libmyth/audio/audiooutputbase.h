@@ -89,12 +89,12 @@ class AudioOutputBase : public AudioOutput, public MThread
     int GetSWVolume(void) override; // VolumeBase
 
     // timecode is in milliseconds.
-    bool AddFrames(void *buffer, int frames, int64_t timecode) override; // AudioOutput
-    bool AddData(void *buffer, int len, int64_t timecode, int frames) override; // AudioOutput
+    bool AddFrames(void *buffer, int frames, std::chrono::milliseconds timecode) override; // AudioOutput
+    bool AddData(void *buffer, int len, std::chrono::milliseconds timecode, int frames) override; // AudioOutput
     bool NeedDecodingBeforePassthrough() const override { return false; }; // AudioOutput
-    int64_t LengthLastData(void) const override { return m_lengthLastData; } // AudioOutput
+    std::chrono::milliseconds LengthLastData(void) const override { return m_lengthLastData; } // AudioOutput
 
-    void SetTimecode(int64_t timecode) override; // AudioOutput
+    void SetTimecode(std::chrono::milliseconds timecode) override; // AudioOutput
     bool IsPaused(void) const override { return m_actuallyPaused; } // AudioOutput
     void Pause(bool paused) override; // AudioOutput
     void PauseUntilBuffered(void) override; // AudioOutput
@@ -102,8 +102,8 @@ class AudioOutputBase : public AudioOutput, public MThread
     // Wait for all data to finish playing
     void Drain(void) override; // AudioOutput
 
-    int64_t GetAudiotime(void) override; // AudioOutput
-    int64_t GetAudioBufferedTime(void) override; // AudioOutput
+    std::chrono::milliseconds GetAudiotime(void) override; // AudioOutput
+    std::chrono::milliseconds GetAudioBufferedTime(void) override; // AudioOutput
 
     // Send output events showing current progress
     virtual void Status(void);
@@ -162,7 +162,8 @@ class AudioOutputBase : public AudioOutput, public MThread
     void SetStretchFactorLocked(float factor);
 
     // For audiooutputca
-    int GetBaseAudBufTimeCode() const { return m_audbufTimecode; }
+    std::chrono::milliseconds GetBaseAudBufTimeCode() const
+        { return m_audbufTimecode; }
 
     bool usesSpdif() const { return m_usesSpdif; }
 
@@ -218,7 +219,7 @@ class AudioOutputBase : public AudioOutput, public MThread
                           int &samplerate_tmp, int &channels_tmp);
     AudioOutputSettings* OutputSettings(bool digital = true);
     int CopyWithUpmix(char *buffer, int frames, uint &org_waud);
-    void SetAudiotime(int frames, int64_t timecode);
+    void SetAudiotime(int frames, std::chrono::milliseconds timecode);
     AudioOutputSettings       *m_outputSettingsRaw         {nullptr};
     AudioOutputSettings       *m_outputSettings            {nullptr};
     AudioOutputSettings       *m_outputSettingsDigitalRaw  {nullptr};
@@ -260,7 +261,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     /**
      * timecode of audio leaving the soundcard (same units as timecodes)
      */
-    int64_t           m_audioTime                         {0};
+    std::chrono::milliseconds m_audioTime                 {0ms};
 
     /**
      * Audio circular buffer
@@ -270,12 +271,12 @@ class AudioOutputBase : public AudioOutput, public MThread
     /**
      * timecode of audio most recently placed into buffer
      */
-    int64_t           m_audbufTimecode                    {0};
+    std::chrono::milliseconds m_audbufTimecode            {0ms};
     AsyncLooseLock    m_resetActive;
 
     QMutex            m_killAudioLock                     {QMutex::NonRecursive};
 
-    long              m_currentSeconds                    {-1};
+    std::chrono::seconds m_currentSeconds                 {-1s};
 
     float            *m_srcIn;
 
@@ -293,7 +294,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     std::array<uchar,kAudioRingBufferSize> m_audioBuffer  {0};
     uint              m_memoryCorruptionTest3             {0xdeadbeef};;
     bool              m_configureSucceeded                {false};
-    int64_t           m_lengthLastData                    {0};
+    std::chrono::milliseconds m_lengthLastData            {0ms};
 
     // SPDIF Encoder for digital passthrough
     bool              m_usesSpdif                         {true};

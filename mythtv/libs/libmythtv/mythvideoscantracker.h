@@ -24,12 +24,14 @@ class MTV_PUBLIC MythVideoScanTracker
     void           UnlockScan           ();
     void           ResetTracker         ();
 
-    void           SetScanType          (FrameScanType Scan, MythVideoOutput* VideoOutput, int FrameInterval);
+    void           SetScanType          (FrameScanType Scan, MythVideoOutput* VideoOutput,
+                                         std::chrono::microseconds FrameInterval);
     FrameScanType  GetScanForDisplay    (MythVideoFrame* Frame, bool& SecondField);
     FrameScanType  GetScanType          () const;
     virtual void   AutoDeint            (MythVideoFrame* Frame, MythVideoOutput* VideoOutput,
-                                         int FrameInterval, bool AllowLock = true);
-    void           CheckScanUpdate      (MythVideoOutput* VideoOutput, int FrameInterval);
+                                         std::chrono::microseconds FrameInterval, bool AllowLock = true);
+    void           CheckScanUpdate      (MythVideoOutput* VideoOutput,
+                                         std::chrono::microseconds FrameInterval);
     QString        GetDeinterlacerName  ();
     FrameScanType  DetectInterlace      (FrameScanType NewScan, float Rate, int VideoHeight);
 
@@ -41,7 +43,7 @@ class MTV_PUBLIC MythVideoScanTracker
     FrameScanType  m_scanOverride       { kScan_Detect     };
     bool           m_scanLocked         { false };
     bool           m_scanInitialized    { false };
-    int            m_lastFrameInterval  { 0     };
+    std::chrono::microseconds m_lastFrameInterval  { 0us   };
     bool           m_lastDeinterlacer2x { false };
     MythDeintType  m_lastDeinterlacer   { DEINT_NONE };
     VideoFrameType m_lastFrameCodec     { FMT_NONE };

@@ -47,7 +47,8 @@ void OutputListeners::removeVisual(MythTV::Visual *v)
 }
 
 void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
-                        unsigned long written, int chan, int prec)
+                                     std::chrono::milliseconds timecode,
+                                     int chan, int prec)
 {
     if (! buffer)
        return;
@@ -55,7 +56,7 @@ void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
     for (auto & visual : m_visuals)
     {
         QMutexLocker locker(visual->mutex());
-        visual->add(buffer, b_len, written, chan, prec);
+        visual->add(buffer, b_len, timecode, chan, prec);
     }
 }
 

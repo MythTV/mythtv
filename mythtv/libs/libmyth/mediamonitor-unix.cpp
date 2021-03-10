@@ -30,7 +30,7 @@
 #include <QList>
 #include <QTextStream>
 #include <QDir>
-#include <QFile>
+#include <QRegularExpression>
 
 // MythTV headers
 #include "mythmediamonitor.h"
@@ -341,7 +341,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     QString ret = sysfs;
 
     // In case of error, a working default?  (device names usually match)
-    ret.replace(QRegExp(".*/"), "/dev/");
+    ret.replace(QRegularExpression(".*/"), "/dev/");
 
 #ifdef linux
   #if HAVE_LIBUDEV
@@ -393,7 +393,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
 
     // TODO: change this to a MythSystemLegacy on the stack?
     MythSystemLegacy *udevinfo = new MythSystemLegacy("udevinfo", args, flags);
-    udevinfo->Run(4);
+    udevinfo->Run(4s);
     if( udevinfo->Wait() != GENERIC_EXIT_OK )
     {
         delete udevinfo;

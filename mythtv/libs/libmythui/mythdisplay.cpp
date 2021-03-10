@@ -14,10 +14,6 @@
 #include "mythegl.h"
 #include "mythmainwindow.h"
 
-// Std
-#include <chrono>
-using namespace std::chrono_literals;
-
 #ifdef USING_DBUS
 #include "platforms/mythdisplaymutter.h"
 #endif
@@ -32,9 +28,11 @@ using namespace std::chrono_literals;
 #endif
 #ifdef USING_X11
 #include "platforms/mythdisplayx11.h"
+#include "platforms/mythnvcontrol.h"
 #endif
 #ifdef USING_DRM
 #include "platforms/mythdisplaydrm.h"
+#include "platforms/drm/mythdrmvrr.h"
 #endif
 #if defined(Q_OS_WIN)
 #include "platforms/mythdisplaywindows.h"
@@ -148,15 +146,34 @@ QStringList MythDisplay::GetDescription()
         result.append("");
     }
 
-    QScreen *current = GetCurrentScreen();
-    QList<QScreen*> screens = QGuiApplication::screens();
+    if (m_hdrState)
+    {
+        auto types = m_hdrState->m_supportedTypes;
+        auto hdr = m_hdrState->TypesToString();
+        result.append(tr("Supported HDR formats\t: %1").arg(hdr.join(",")));
+        if (types && !m_hdrState->IsControllable())
+            result.append(tr("HDR mode switching is not available"));
+        if (auto brightness = m_hdrState->GetMaxLuminance(); brightness > 1.0)
+            result.append(tr("Max display brightness\t: %1 nits").arg(static_cast<int>(brightness)));
+    }
+
+    if (m_vrrState)
+    {
+        result.append(tr("Variable refresh rate '%1': %2 %3")
+                      .arg(m_vrrState->TypeToString())
+                      .arg(m_vrrState->Enabled() ? tr("Enabled") : tr("Disabled"))
+                      .arg(m_vrrState->RangeDescription()));
+    }
+
+    auto * current = GetCurrentScreen();
+    const auto screens = QGuiApplication::screens();
     bool first = true;
     for (auto *screen : qAsConst(screens))
     {
         if (!first)
             result.append("");
         first = false;
-        QString id = QString("(%1)").arg(screen->manufacturer());
+        auto id = QString("(%1)").arg(screen->manufacturer());
         if (screen == current && !spanall)
             result.append(tr("Current screen %1 %2:").arg(screen->name()).arg(id));
         else
@@ -166,7 +183,7 @@ QStringList MythDisplay::GetDescription()
         if (screen == current)
         {
             QString source;
-            double aspect = GetAspectRatio(source);
+            auto aspect = GetAspectRatio(source);
             result.append(tr("Aspect ratio") + QString("\t: %1 (%2)")
                     .arg(aspect, 0, 'f', 3).arg(source));
             if (!spanall)
@@ -174,14 +191,21 @@ QStringList MythDisplay::GetDescription()
                 result.append(tr("Current mode") + QString("\t: %1x%2@%3Hz")
                               .arg(GetResolution().width()).arg(GetResolution().height())
                               .arg(GetRefreshRate(), 0, 'f', 2));
+                const auto & modes = GetVideoModes();
+                if (!modes.empty())
+                {
+                    result.append(tr("Available modes:"));
+                    for (auto it = modes.crbegin(); it != modes.crend(); ++it)
+                        result.append("  " + it->ToString());
+                }
             }
         }
     }
+
     return result;
 }
 
 MythDisplay::MythDisplay()
-  : ReferenceCounter("Display")
 {
     m_screen = GetDesiredScreen();
     DebugScreen(m_screen, "Using");
@@ -484,11 +508,9 @@ void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
     if (!qScreen)
         return;
 
-    QRect geom = qScreen->geometry();
-    QString extra = GetExtraScreenInfo(qScreen);
-
+    auto geom = qScreen->geometry();
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 screen '%2' %3")
-        .arg(Message).arg(qScreen->name()).arg(extra));
+        .arg(Message).arg(qScreen->name()).arg(GetExtraScreenInfo(qScreen)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt screen pixel ratio: %1")
         .arg(qScreen->devicePixelRatio(), 2, 'f', 2, '0'));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Geometry: %1x%2+%3+%4 Size(Qt): %5mmx%6mm")
@@ -508,6 +530,9 @@ void MythDisplay::Initialise()
     m_videoModes.clear();
     m_overrideVideoModes.clear();
     UpdateCurrentMode();
+    // Note: The EDID is retrieved in UpdateCurrentMode and we need the EDID to
+    // check for refresh rate range support.
+    m_vrrState = MythVRR::Create(this);
     InitScreenBounds();
 
     // Set the desktop mode - which is the mode at startup. We must always return
@@ -525,6 +550,8 @@ void MythDisplay::Initialise()
                 LOG(VB_GENERAL, LOG_NOTICE, LOC + "Display is using sRGB colourspace");
             else
                 LOG(VB_GENERAL, LOG_NOTICE, LOC + "Display has custom colourspace");
+
+            InitHDR();
         }
     }
 
@@ -578,20 +605,31 @@ void MythDisplay::Initialise()
 */
 void MythDisplay::InitScreenBounds()
 {
-    QList<QScreen*> screens = QGuiApplication::screens();
-    for (auto *screen : screens)
+    const auto screens = QGuiApplication::screens();
+    for (auto * screen : qAsConst(screens))
     {
-        QRect dim = screen->geometry();
-        QString extra = MythDisplay::GetExtraScreenInfo(screen);
+        auto dim = screen->geometry();
+        auto extra = MythDisplay::GetExtraScreenInfo(screen);
         LOG(VB_GUI, LOG_INFO, LOC + QString("Screen %1: %2x%3 %4")
             .arg(screen->name()).arg(dim.width()).arg(dim.height()).arg(extra));
     }
 
-    QScreen *primary = QGuiApplication::primaryScreen();
+    const auto * primary = QGuiApplication::primaryScreen();
+    if (!primary)
+    {
+        if (!screens.empty())
+            primary = screens.front();
+        if (!primary)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Qt has no screens!");
+            return;
+        }
+    }
+
     LOG(VB_GUI, LOG_INFO, LOC +QString("Primary screen: %1.").arg(primary->name()));
 
-    int numScreens = MythDisplay::GetScreenCount();
-    QSize dim = primary->virtualSize();
+    auto numScreens = MythDisplay::GetScreenCount();
+    auto dim = primary->virtualSize();
     LOG(VB_GUI, LOG_INFO, LOC + QString("Total desktop dim: %1x%2, over %3 screen[s].")
         .arg(dim.width()).arg(dim.height()).arg(numScreens));
 
@@ -677,7 +715,24 @@ bool MythDisplay::SwitchToVideo(QSize Size, double Rate)
     }
 
     // need to change video mode?
-    MythDisplayMode::FindBestMatch(GetVideoModes(), next, targetrate);
+    (void)MythDisplayMode::FindBestMatch(GetVideoModes(), next, targetrate);
+
+    // If GSync or FreeSync are enabled, ignore refresh rate only changes.
+    // N.B. This check is not used when switching to GUI (which already ignores
+    // rate only changes) or switching back to the desktop (where we must reset
+    // the display to the original state).
+    if (m_vrrState && m_vrrState->Enabled())
+    {
+        if (next.Resolution() == current.Resolution())
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Ignoring mode switch to %1Hz - VRR enabled")
+                .arg(Rate, 0, 'f', 3));
+            return true;
+        }
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Allowing mode switch with VRR enabled for new resolution");
+    }
+
+    // No need for change
     if ((next == current) && (MythDisplayMode::CompareRates(current.RefreshRate(), targetrate)))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using current mode %1x%2@%3Hz")
@@ -746,11 +801,24 @@ double MythDisplay::GetRefreshRate() const
     return m_refreshRate;
 }
 
-int MythDisplay::GetRefreshInterval(int Fallback) const
+std::chrono::microseconds MythDisplay::GetRefreshInterval(std::chrono::microseconds Fallback) const
 {
+    // If FreeSync or GSync are enabled, return the maximum refresh rate.
+    // N.B. This may need more work as the max may not be well defined - especially
+    // if the resolution is changing. Displays should however support at least 60Hz
+    // at all resolutions which should be fine in the vast majority of cases (as the
+    // only place the refresh interval is functionally important is in checking
+    // for double rate deinterlacing support).
+    if (m_vrrState && m_vrrState->Enabled())
+    {
+        const auto range = m_vrrState->GetRange();
+        auto max = std::get<1>(range) > 60 ? std::get<1>(range) : 60;
+        return microsecondsFromFloat(1000000.0 / max);
+    }
+
     if (m_refreshRate > 20.0 && m_refreshRate < 200.0)
-        return static_cast<int>(lround(1000000.0 / m_refreshRate));
-    if (Fallback > 33000) // ~30Hz
+        return microsecondsFromFloat(1000000.0 / m_refreshRate);
+    if (Fallback > 33ms) // ~30Hz
         Fallback /= 2;
     return Fallback;
 }
@@ -860,6 +928,27 @@ double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
 MythEDID& MythDisplay::GetEDID()
 {
     return m_edid;
+}
+
+MythHDRPtr MythDisplay::GetHDRState()
+{
+    return m_hdrState;
+}
+
+void MythDisplay::InitHDR()
+{
+    if (m_edid.Valid())
+    {
+        auto hdrdesc = m_edid.GetHDRSupport();
+        m_hdrState = MythHDR::Create(this, hdrdesc);
+        LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Supported HDR formats: %1")
+            .arg(m_hdrState->TypesToString().join(",")));
+        if (auto brightness = m_hdrState->GetMaxLuminance(); brightness > 1.0)
+        {
+            LOG(VB_GENERAL, LOG_NOTICE, LOC + QString("Display reports max brightness of %1 nits")
+                .arg(static_cast<int>(brightness)));
+        }
+    }
 }
 
 /*! \brief Estimate the overall display aspect ratio for multi screen setups.
@@ -1062,14 +1151,30 @@ void MythDisplay::DebugModes() const
 */
 void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& CmdLine)
 {
+    auto forcevrr = CmdLine.toBool("vrr");
+    bool gsyncchanged = false;
+    bool freesyncchanged = false;
+
 #ifdef USING_QTWEBENGINE
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 #endif
 
     // Set the default surface format. Explicitly required on some platforms.
     QSurfaceFormat format;
-    format.setDepthBufferSize(0);
-    format.setStencilBufferSize(0);
+    // Allow overriding the default depth - use with caution as Qt will likely
+    // crash if it cannot find a matching visual.
+    if (qEnvironmentVariableIsSet("MYTHTV_DEPTH"))
+    {
+        // Note: Don't set depth and stencil to give Qt as much flexibility as possible
+        int depth = qBound(6, qEnvironmentVariableIntValue("MYTHTV_DEPTH"), 16);
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying to force depth to '%1'").arg(depth));
+        format.setRedBufferSize(depth);
+    }
+    else
+    {
+        format.setDepthBufferSize(0);
+        format.setStencilBufferSize(0);
+    }
     format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     format.setProfile(QSurfaceFormat::CompatibilityProfile);
     format.setSwapInterval(SwapInterval);
@@ -1093,6 +1198,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
 #endif
         {
             MythDRMDevice::SetupDRM(CmdLine);
+            freesyncchanged = MythDRMVRR::s_freeSyncResetOnExit;
         }
     }
 #endif
@@ -1135,7 +1241,15 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
 #ifdef USING_X11
     if (auto display = CmdLine.toString("display"); !display.isEmpty())
         MythXDisplay::SetQtX11Display(display);
-#else
-    (void)CmdLine;
+    // GSync support via libXNVCtrl
+    // Note: FreeSync support is checked in MythDRMDevice::SetupDRM
+    if (forcevrr)
+    {
+        MythGSync::ForceGSync(CmdLine.toUInt("vrr") > 0);
+        gsyncchanged = MythGSync::s_gsyncResetOnExit;
+    }
 #endif
+
+    if (forcevrr && !(gsyncchanged || freesyncchanged))
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Variable refresh rate not adjusted");
 }

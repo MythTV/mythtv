@@ -26,8 +26,8 @@ public:
     MusicMetadata* read(const QString &filename) override; // MetaIO
 
 private:
-    int getTrackLength(const QString &filename) override; // MetaIO
-    static int getTrackLength(AVFormatContext* pContext);
+    std::chrono::milliseconds getTrackLength(const QString &filename) override; // MetaIO
+    static std::chrono::milliseconds getTrackLength(AVFormatContext* pContext);
 };
 
 #endif

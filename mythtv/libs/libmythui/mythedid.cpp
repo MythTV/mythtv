@@ -2,8 +2,15 @@
 #include "mythlogging.h"
 #include "mythedid.h"
 
+// Qt
+#include <QObject>
+
+// Std
+#include <cmath>
+
 #define DESCRIPTOR_ALPHANUMERIC_STRING 0xFE
 #define DESCRIPTOR_PRODUCT_NAME 0xFC
+#define DESCRIPTOR_RANGE_LIMITS 0xFD
 #define DESCRIPTOR_SERIAL_NUMBER 0xFF
 #define DATA_BLOCK_OFFSET 0x36
 #define SERIAL_OFFSET     0x0C
@@ -74,7 +81,7 @@ bool MythEDID::IsLikeSRGB() const
     return m_likeSRGB;
 }
 
-MythEDID::Primaries MythEDID::ColourPrimaries() const
+MythColourSpace MythEDID::ColourPrimaries() const
 {
     return m_primaries;
 }
@@ -87,6 +94,29 @@ int MythEDID::AudioLatency(bool Interlaced) const
 int MythEDID::VideoLatency(bool Interlaced) const
 {
     return m_videoLatency[Interlaced ? 1 : 0];
+}
+
+MythHDRDesc MythEDID::GetHDRSupport() const
+{
+    return { m_hdrSupport, m_minLuminance, m_maxAvgLuminance, m_maxLuminance };
+}
+
+/*! \brief Return the range of supported refresh rates
+ *
+ * If the VRR range is explicit in the EDID then the third element of MythVRRRange
+ * is set to true, otherwise 'false' indicates that the VRR range is assumed from
+ * the vertical refresh range indicated in the EDID. In both cases the behaviour
+ * of the display below any minimum is undefined (e.g. there is no current indication
+ * whether the display supports 'FreeSync Premium' - in which case low frame rates
+ * may produce significant jitter).
+*/
+MythVRRRange MythEDID::GetVRRRange() const
+{
+    if (m_valid && m_vrrMin && m_vrrMax)
+        return { m_vrrMin, m_vrrMax, true };
+    if (m_valid && m_vrangeMin && m_vrangeMax)
+        return { m_vrangeMin, m_vrangeMax, false };
+    return { 0, 0, false };
 }
 
 // from QEdidParser
@@ -226,52 +256,31 @@ bool MythEDID::ParseBaseBlock(const quint8* Data)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Chromaticity mismatch!");
 
     // Red
-    m_primaries.primaries[0][0] = ((Data[0x1B] << 2) |  (Data[0x19] >> 6)) / 1024.0F;
-    m_primaries.primaries[0][1] = ((Data[0x1C] << 2) | ((Data[0x19] >> 4) & 3)) / 1024.0F;
+    m_primaries.m_primaries[0][0] = ((Data[0x1B] << 2) |  (Data[0x19] >> 6)) / 1024.0F;
+    m_primaries.m_primaries[0][1] = ((Data[0x1C] << 2) | ((Data[0x19] >> 4) & 3)) / 1024.0F;
     // Green
-    m_primaries.primaries[1][0] = ((Data[0x1D] << 2) | ((Data[0x19] >> 2) & 3)) / 1024.0F;
-    m_primaries.primaries[1][1] = ((Data[0x1E] << 2) |  (Data[0x19] & 3)) / 1024.0F;
+    m_primaries.m_primaries[1][0] = ((Data[0x1D] << 2) | ((Data[0x19] >> 2) & 3)) / 1024.0F;
+    m_primaries.m_primaries[1][1] = ((Data[0x1E] << 2) |  (Data[0x19] & 3)) / 1024.0F;
     // Blue
-    m_primaries.primaries[2][0] = ((Data[0x1F] << 2) |  (Data[0x1A] >> 6)) / 1024.0F;
-    m_primaries.primaries[2][1] = ((Data[0x20] << 2) | ((Data[0x1A] >> 4) & 3)) / 1024.0F;
+    m_primaries.m_primaries[2][0] = ((Data[0x1F] << 2) |  (Data[0x1A] >> 6)) / 1024.0F;
+    m_primaries.m_primaries[2][1] = ((Data[0x20] << 2) | ((Data[0x1A] >> 4) & 3)) / 1024.0F;
     // White
-    m_primaries.whitepoint[0]   = ((Data[0x21] << 2) | ((Data[0x1A] >> 2) & 3)) / 1024.0F;
-    m_primaries.whitepoint[1]   = ((Data[0x22] << 2) |  (Data[0x1A] & 3)) / 1024.0F;
+    m_primaries.m_whitePoint[0]   = ((Data[0x21] << 2) | ((Data[0x1A] >> 2) & 3)) / 1024.0F;
+    m_primaries.m_whitePoint[1]   = ((Data[0x22] << 2) |  (Data[0x1A] & 3)) / 1024.0F;
 
     // Check whether this is very similar to sRGB and hence if non-exact colourspace
     // handling is preferred, then just use sRGB.
-    // TODO Move to new MythColourSpace class.
-
-    // As per VideoColourspace.
-    static const Primaries s_sRGBPrim =
-        {{{{0.640F, 0.330F}, {0.300F, 0.600F}, {0.150F, 0.060F}}}, {0.3127F, 0.3290F}};
-
-    auto like = [](const Primaries &First, const Primaries &Second, float Fuzz)
-    {
-        auto cmp = [=](float One, float Two) { return (qAbs(One - Two) < Fuzz); };
-        return cmp(First.primaries[0][0], Second.primaries[0][0]) &&
-               cmp(First.primaries[0][1], Second.primaries[0][1]) &&
-               cmp(First.primaries[1][0], Second.primaries[1][0]) &&
-               cmp(First.primaries[1][1], Second.primaries[1][1]) &&
-               cmp(First.primaries[2][0], Second.primaries[2][0]) &&
-               cmp(First.primaries[2][1], Second.primaries[2][1]) &&
-               cmp(First.whitepoint[0],   Second.whitepoint[0]) &&
-               cmp(First.whitepoint[1],   Second.whitepoint[1]);
-    };
-
-    m_likeSRGB = like(m_primaries, s_sRGBPrim, 0.025F) && qFuzzyCompare(m_gamma + 1.0F, 2.20F + 1.0F);
+    m_likeSRGB = MythColourSpace::Alike(m_primaries, MythColourSpace::s_sRGB, 0.025F) &&
+                 qFuzzyCompare(m_gamma + 1.0F, 2.20F + 1.0F);
 
     // Parse blocks
-    for (int i = 0; i < 5; ++i)
+    for (uint i = 0; i < 5; ++i)
     {
-        const int offset = DATA_BLOCK_OFFSET + i * 18;
-        if (Data[offset] != 0 || Data[offset + 1] != 0 || Data[offset + 2] != 0)
-            continue;
-        if (Data[offset + 3] == DESCRIPTOR_SERIAL_NUMBER)
-        {
-            m_serialNumbers << ParseEdidString(&Data[offset + 5], false);
-            m_serialNumbers << ParseEdidString(&Data[offset + 5], true);
-        }
+        uint offset = DATA_BLOCK_OFFSET + i * 18;
+        if (Data[offset] == 0 || Data[offset + 1] == 0 || Data[offset + 2] == 0)
+            ParseDisplayDescriptor(Data, offset);
+        else
+            ParseDetailedTimingDescriptor(Data, offset);
     }
 
     // Set status
@@ -280,6 +289,52 @@ bool MythEDID::ParseBaseBlock(const quint8* Data)
     if (!m_valid)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "No serial number(s) in EDID");
     return m_valid;
+}
+
+void MythEDID::ParseDisplayDescriptor(const quint8* Data, uint Offset)
+{
+    auto type = Data[Offset + 3];
+    auto offset = Offset + 5;
+    if (DESCRIPTOR_SERIAL_NUMBER == type)
+    {
+        m_serialNumbers << ParseEdidString(&Data[offset], false);
+        m_serialNumbers << ParseEdidString(&Data[offset], true);
+    }
+    else if (DESCRIPTOR_PRODUCT_NAME == type)
+    {
+        m_name = ParseEdidString(&Data[offset], true);
+    }
+    else if (DESCRIPTOR_RANGE_LIMITS == type)
+    {
+        auto vminoffset = 0;
+        auto vmaxoffset = 0;
+        if (m_minorVersion > 3)
+        {
+            if (Data[Offset + 4] & 0x02)
+            {
+                vmaxoffset = 255;
+                if (Data[Offset + 4] & 0x01)
+                    vminoffset = 255;
+            }
+        }
+        m_vrangeMin = Data[Offset + 5] + vminoffset;
+        m_vrangeMax = Data[Offset + 6] + vmaxoffset;
+    }
+}
+
+void MythEDID::ParseDetailedTimingDescriptor(const quint8* Data, uint Offset)
+{
+    // We're only really interested in a more accurate display size
+    auto width = Data[Offset + 12] + ((Data[Offset + 14] & 0xF0) << 4);
+    auto height = Data[Offset + 13] + ((Data[Offset + 14] & 0x0F) << 8);
+
+    // 1.4 may have set an aspect ratio instead of size, otherwise use if this
+    // looks like a more accurate version of our current size
+    if (m_displaySize.isEmpty() ||
+       ((abs(m_displaySize.width() - width) < 10) && (abs(m_displaySize.height() - height) < 10)))
+    {
+        m_displaySize = { width, height };
+    }
 }
 
 bool MythEDID::ParseCTA861(const quint8* Data, uint Offset)
@@ -310,7 +365,7 @@ bool MythEDID::ParseCTABlock(const quint8* Data, uint Offset)
         case 0x03: ParseVSDB(Data, Offset + 1, length); break; // Vendor Specific Data Block
         case 0x04: break; // Speaker Allocation data block // NOLINT(bugprone-branch-clone)
         case 0x05: break; // VESA DTC data block
-        case 0x07: break; // Extended tag. HDR metadata here
+        case 0x07: ParseExtended(Data, Offset + 1, length); break; // Extended tag. HDR metadata here
         default: break;
     }
     return true;
@@ -321,9 +376,10 @@ bool MythEDID::ParseVSDB(const quint8* Data, uint Offset, uint Length)
     if (Offset + 3 >= m_size)
         return false;
 
+    // N.B. Little endian
     int registration = Data[Offset] + (Data[Offset + 1] << 8) + (Data[Offset + 2] << 16);
 
-    // HDMI
+    // "HDMI Licensing, LLC"
     while (registration == 0x000C03)
     {
         m_isHDMI = true;
@@ -333,6 +389,13 @@ bool MythEDID::ParseVSDB(const quint8* Data, uint Offset, uint Length)
 
         // CEC physical address
         m_physicalAddress = static_cast<uint16_t>((Data[Offset + 3] << 8) + Data[Offset + 4]);
+
+        if (Length < 6 || (Offset + 6 >= m_size))
+            break;
+
+        // Deep color
+        m_deepColor = Data[Offset + 5] & 0x78;
+
         if (Length < 8 || (Offset + 8 >= m_size))
             break;
 
@@ -367,11 +430,79 @@ bool MythEDID::ParseVSDB(const quint8* Data, uint Offset, uint Length)
 
         break;
     }
+
+    // "HDMI Forum"
+    while (registration == 0xC45DD8)
+    {
+        if (Length < 5 || (Offset + 5 >= m_size))
+            break;
+
+        // Deep Color 4:2:0
+        m_deepYUV = Data[Offset + 4] & 0x7;
+
+        if (Length < 11 || (Offset + 11 >= m_size))
+            break;
+
+        // Variable Refresh Rate
+        m_vrrMin = Data[Offset + 9] & 0x3f;
+        m_vrrMax = ((Data[Offset + 9] & 0xc0) << 2) | Data[Offset + 10];
+        break;
+    }
+
+    return true;
+}
+
+bool MythEDID::ParseExtended(const quint8* Data, uint Offset, uint Length)
+{
+    if (Offset + 1 >= m_size)
+        return false;
+
+    // HDR Static Metadata Data Block
+    if (Data[Offset] == 0x06 && Length)
+    {
+        if (Length >= 3 && (Offset + 3 < m_size))
+        {
+            int hdrsupport = Data[Offset + 1] & 0x3f;
+            if (hdrsupport & HDR10)
+                m_hdrSupport |= MythHDR::HDR10;
+            if (hdrsupport & HLG)
+                m_hdrSupport |= MythHDR::HLG;
+            m_hdrMetaTypes = Data[Offset + 2] & 0xff;
+        }
+
+        if (Length >= 4)
+            m_maxLuminance = 50.0 * pow(2, Data[Offset + 3] / 32.0);
+
+        if (Length >= 5)
+            m_maxAvgLuminance = 50.0 * pow(2, Data[Offset + 4] / 32.0);
+
+        if (Length >= 6)
+            m_minLuminance = (50.0 * pow(2, Data[Offset + 3] / 32.0)) * pow(Data[Offset + 5] / 255.0, 2) / 100.0;
+    }
     return true;
 }
 
 void MythEDID::Debug() const
 {
+    auto deep = [](uint8_t Deep)
+    {
+        QStringList res;
+        if (Deep & 0x08) res << "Y444";
+        if (Deep & 0x10) res << "30bit";
+        if (Deep & 0x20) res << "36bit";
+        if (Deep & 0x40) res << "48bit";
+        return res.join(",");
+    };
+
+    auto deepyuv = [](uint8_t Deep)
+    {
+        QStringList res;
+        if (Deep & 0x01) res << "10bit";
+        if (Deep & 0x02) res << "12bit";
+        if (Deep & 0x04) res << "16bit";
+        return res.join(",");
+    };
+
     if (!m_valid)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Invalid EDID");
@@ -384,23 +515,25 @@ void MythEDID::Debug() const
             .arg(static_cast<double>(m_gamma)).arg(m_sRGB));
     LOG(VB_GENERAL, LOG_INFO, LOC + "Display chromaticity:-");
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Red:\t%1,\t%2")
-            .arg(static_cast<double>(m_primaries.primaries[0][0]), 0, 'f', 4)
-            .arg(static_cast<double>(m_primaries.primaries[0][1]), 0, 'f', 4));
+            .arg(static_cast<double>(m_primaries.m_primaries[0][0]), 0, 'f', 4)
+            .arg(static_cast<double>(m_primaries.m_primaries[0][1]), 0, 'f', 4));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Green:\t%1,\t%2")
-            .arg(static_cast<double>(m_primaries.primaries[1][0]), 0, 'f', 4)
-            .arg(static_cast<double>(m_primaries.primaries[1][1]), 0, 'f', 4));
+            .arg(static_cast<double>(m_primaries.m_primaries[1][0]), 0, 'f', 4)
+            .arg(static_cast<double>(m_primaries.m_primaries[1][1]), 0, 'f', 4));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Blue:\t%1,\t%2")
-            .arg(static_cast<double>(m_primaries.primaries[2][0]), 0, 'f', 4)
-            .arg(static_cast<double>(m_primaries.primaries[2][1]), 0, 'f', 4));
+            .arg(static_cast<double>(m_primaries.m_primaries[2][0]), 0, 'f', 4)
+            .arg(static_cast<double>(m_primaries.m_primaries[2][1]), 0, 'f', 4));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("White:\t%1,\t%2")
-            .arg(static_cast<double>(m_primaries.whitepoint[0]), 0, 'f', 4)
-            .arg(static_cast<double>(m_primaries.whitepoint[1]), 0, 'f', 4));
+            .arg(static_cast<double>(m_primaries.m_whitePoint[0]), 0, 'f', 4)
+            .arg(static_cast<double>(m_primaries.m_whitePoint[1]), 0, 'f', 4));
     QString address = !m_physicalAddress ? QString("N/A") :
             QString("%1.%2.%3.%4").arg((m_physicalAddress >> 12) & 0xF)
                                   .arg((m_physicalAddress >> 8) & 0xF)
                                   .arg((m_physicalAddress >> 4) & 0xF)
                                   .arg(m_physicalAddress & 0xF);
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Physical address: %1").arg(address));
+    if (m_deepColor)
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Deep color: %1").arg(deep(m_deepColor)));
     if (m_latencies)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Latencies: Audio:%1 Video:%2")
@@ -410,5 +543,16 @@ void MythEDID::Debug() const
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Latencies: Audio:%1 Video:%2 (Interlaced)")
                     .arg(m_audioLatency[1]).arg(m_videoLatency[1]));
         }
+    }
+    if (m_deepYUV)
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Deep YUV 4:2:0 %1").arg(deepyuv(m_deepYUV)));
+    if (m_vrrMin || m_vrrMax)
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("VRR: %1<->%2").arg(m_vrrMin).arg(m_vrrMax));
+    if (m_hdrSupport)
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("HDR types: %1").arg(MythHDR::TypesToString(m_hdrSupport).join(",")));
+    if (m_maxLuminance > 0.0 || m_maxAvgLuminance > 0.0)
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Desired luminance: Min: %1 Max: %2 Avg: %3")
+            .arg(m_minLuminance, 3, 'f', 3).arg(m_maxLuminance, 3, 'f', 3).arg(m_maxAvgLuminance, 3, 'f', 3));
     }
 }

@@ -36,7 +36,7 @@ class PreviewGenState
 
     /// The amount of time (in seconds) that this generator was
     /// blocked before it could start. Initialized to zero.
-    uint              m_lastBlockTime {0};
+    std::chrono::seconds m_lastBlockTime {0s};
 
     /// Any request to generate an image will be ignored until after
     /// this time.
@@ -71,7 +71,7 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
   public:
     static void CreatePreviewGeneratorQueue(
         PreviewGenerator::Mode mode,
-        uint maxAttempts, uint minBlockSeconds);
+        uint maxAttempts, std::chrono::seconds minBlockSeconds);
     static void TeardownPreviewGeneratorQueue();
 
     /**
@@ -87,23 +87,23 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
      */
     static void GetPreviewImage(const ProgramInfo &pginfo, const QString& token)
     {
-        GetPreviewImage(pginfo, QSize(0,0), "", -1, true, token);
+        GetPreviewImage(pginfo, QSize(0,0), "", -1s, -1, token);
     }
     static void GetPreviewImage(const ProgramInfo &pginfo, QSize outputsize,
                                 const QString &outputfile,
-                                long long time, bool in_seconds,
+                                std::chrono::seconds time, long long frame,
                                 const QString& token);
     static void AddListener(QObject *listener);
     static void RemoveListener(QObject *listener);
 
   private:
     PreviewGeneratorQueue(PreviewGenerator::Mode mode,
-                          uint maxAttempts, uint minBlockSeconds);
+                          uint maxAttempts, std::chrono::seconds minBlockSeconds);
     ~PreviewGeneratorQueue() override;
 
     QString GeneratePreviewImage(ProgramInfo &pginfo, QSize size,
                                  const QString &outputfile,
-                                 long long time, bool in_seconds,
+                                 std::chrono::seconds time, long long frame,
                                  const QString& token);
 
     void GetInfo(const QString &key, uint &queue_depth, uint &token_cnt);
@@ -153,7 +153,7 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     uint                   m_maxAttempts;
     /// How long after a failed preview generation attempt will the
     /// code ignore subsequent requests.
-    uint                   m_minBlockSeconds;
+    std::chrono::seconds   m_minBlockSeconds;
 };
 
 #endif // PREVIEW_GENERATOR_QUEUE_H

@@ -1,5 +1,6 @@
 // Qt
 #include <QApplication>
+#include <QRegularExpression>
 
 // MythTV
 #include "mythcorecontext.h"
@@ -37,18 +38,20 @@ QRect MythUIScreenBounds::GetGeometryOverride()
  */
 void MythUIScreenBounds::ParseGeometryOverride(const QString& Geometry)
 {
-    QRegExp sre("^(\\d+)x(\\d+)$");
-    QRegExp lre(R"(^(\d+)x(\d+)([+-]\d+)([+-]\d+)$)");
+    QRegularExpression sre("^(\\d+)x(\\d+)$");
+    QRegularExpression lre(R"(^(\d+)x(\d+)([+-]\d+)([+-]\d+)$)");
     QStringList geometry;
     bool longform = false;
 
-    if (sre.exactMatch(Geometry))
+    auto smatch = sre.match(Geometry);
+    auto lmatch = lre.match(Geometry);
+    if (smatch.hasMatch())
     {
-        geometry = sre.capturedTexts();
+        geometry = smatch.capturedTexts();
     }
-    else if (lre.exactMatch(Geometry))
+    else if (lmatch.hasMatch())
     {
-        geometry = lre.capturedTexts();
+        geometry = lmatch.capturedTexts();
         longform = true;
     }
     else

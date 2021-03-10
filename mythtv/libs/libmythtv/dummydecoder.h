@@ -19,7 +19,8 @@ class DummyDecoder : public DecoderBase
     bool        GetFrame(DecodeType /*Type*/, bool &/*Retry*/) override
                     { usleep(10000); return false; }
     bool        IsLastFrameKey(void) const override       { return true; }
-    void        WriteStoredData(MythMediaBuffer* /*Buffer*/, bool /*storevid*/, long /*timecodeOffset*/) override {}
+    void        WriteStoredData(MythMediaBuffer* /*Buffer*/, bool /*storevid*/,
+                                std::chrono::milliseconds /*timecodeOffset*/) override {}
     long        UpdateStoredFrameNum(long /*frame*/) override { return 0; }
     QString     GetCodecDecoderName(void) const override  { return "dummy"; }
     MythCodecID GetVideoCodecID(void) const override      { return kCodec_NONE; }

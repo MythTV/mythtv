@@ -179,16 +179,31 @@ QString toString(const QDate date, uint format)
  *
  *  \param time     The QTime object to use
  */
-int toSeconds(QTime time)
+std::chrono::seconds toSeconds(QTime time)
 {
     if (!time.isValid())
-        return 0;
+        return 0s;
 
-    int nSecs = time.hour() * 3600;
-    nSecs += (time.minute() * 60 );
-    nSecs += time.second();
+    std::chrono::seconds nSecs = std::chrono::hours(time.hour());
+    nSecs += std::chrono::minutes(time.minute());
+    nSecs += std::chrono::seconds(time.second());
 
     return nSecs;
+}
+
+std::chrono::milliseconds currentMSecsSinceEpochAsDuration(void)
+{
+    return std::chrono::milliseconds(QDateTime::currentMSecsSinceEpoch());
+};
+
+std::chrono::seconds secsInPast (const QDateTime& past)
+{
+    return std::chrono::seconds(past.secsTo(MythDate::current()));
+}
+
+std::chrono::seconds secsInFuture (const QDateTime& future)
+{
+    return std::chrono::seconds(MythDate::current().secsTo(future));
 }
 
 }; // namespace MythDate

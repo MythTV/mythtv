@@ -75,10 +75,10 @@ MHEngine::~MHEngine()
 }
 
 // Check for external content every 2 seconds.
-#define CONTENT_CHECK_TIME 2000
+static constexpr std::chrono::milliseconds CONTENT_CHECK_TIME { 2s };
 
 // This is the main loop of the engine.
-int MHEngine::RunAll()
+std::chrono::milliseconds MHEngine::RunAll()
 {
     // Request to boot or reboot
     if (m_fBooting)
@@ -118,21 +118,21 @@ int MHEngine::RunAll()
             if (! Launch(startObj))
             {
                 MHLOG(MHLogNotifications, "NOTE Engine auto-boot failed");
-                return -1;
+                return -1ms;
             }
         }
 
         m_fBooting = false;
     }
 
-    int nNextTime = 0;
+    std::chrono::milliseconds nNextTime = 0ms;
 
     do
     {
         // Check to see if we need to close.
         if (m_context->CheckStop())
         {
-            return 0;
+            return 0ms;
         }
 
         // Run queued actions.
@@ -145,14 +145,14 @@ int MHEngine::RunAll()
         CheckContentRequests();
 
         // Check the timers.  This may result in timer events being raised.
-        nNextTime = CurrentScene() ? CurrentScene()->CheckTimers(this) : 0;
+        nNextTime = CurrentScene() ? CurrentScene()->CheckTimers(this) : 0ms;
 
         if (CurrentApp())
         {
             // The UK MHEG profile allows applications to have timers.
-            int nAppTime = CurrentApp()->CheckTimers(this);
+            std::chrono::milliseconds nAppTime = CurrentApp()->CheckTimers(this);
 
-            if (nAppTime != 0 && (nNextTime == 0 || nAppTime < nNextTime))
+            if (nAppTime != 0ms && (nNextTime == 0ms || nAppTime < nNextTime))
             {
                 nNextTime = nAppTime;
             }
@@ -161,7 +161,7 @@ int MHEngine::RunAll()
         if (! m_externContentTable.isEmpty())
         {
             // If we have an outstanding request for external content we need to set a timer.
-            if (nNextTime == 0 || nNextTime > CONTENT_CHECK_TIME)
+            if (nNextTime == 0ms || nNextTime > CONTENT_CHECK_TIME)
             {
                 nNextTime = CONTENT_CHECK_TIME;
             }

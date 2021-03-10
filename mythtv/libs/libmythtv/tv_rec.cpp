@@ -46,9 +46,6 @@
 #define LOC QString("TVRec[%1]: ").arg(m_inputId)
 #define LOC2 QString("TVRec[%1]: ").arg(inputid) // for static functions
 
-/// How many milliseconds the signal monitor should wait between checks
-const uint TVRec::kSignalMonitoringRate = 50; /* msec */
-
 QReadWriteLock    TVRec::s_inputsLock;
 QMap<uint,TVRec*> TVRec::s_inputs;
 
@@ -56,7 +53,7 @@ static bool is_dishnet_eit(uint inputid);
 static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
 static void apply_broken_dvb_driver_crc_hack(ChannelBase* /*c*/, MPEGStreamData* /*s*/);
-static int eit_start_rand(uint inputId, int eitTransportTimeout);
+static std::chrono::seconds eit_start_rand(uint inputId, std::chrono::seconds eitTransportTimeout);
 
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
@@ -154,12 +151,13 @@ bool TVRec::Init(void)
         gCoreContext->GetBoolSetting("AutoTranscodeBeforeAutoCommflag", false);
     m_earlyCommFlag     = gCoreContext->GetBoolSetting("AutoCommflagWhileRecording", false);
     m_runJobOnHostOnly  = gCoreContext->GetBoolSetting("JobsRunOnRecordHost", false);
-    m_eitTransportTimeout =
-        std::max(gCoreContext->GetNumSetting("EITTransportTimeout", 5) * 60, 6);
-    m_eitCrawlIdleStart = gCoreContext->GetNumSetting("EITCrawIdleStart", 60);
+    m_eitTransportTimeout = gCoreContext->GetDurSetting<std::chrono::minutes>("EITTransportTimeout", 5min);
+    if (m_eitTransportTimeout < 6s)
+        m_eitTransportTimeout = 6s;
+    m_eitCrawlIdleStart = gCoreContext->GetDurSetting<std::chrono::seconds>("EITCrawIdleStart", 60s);
     m_audioSampleRateDB = gCoreContext->GetNumSetting("AudioSampleRate");
-    m_overRecordSecNrml = gCoreContext->GetNumSetting("RecordOverTime");
-    m_overRecordSecCat  = gCoreContext->GetNumSetting("CategoryOverTime") * 60;
+    m_overRecordSecNrml = gCoreContext->GetDurSetting<std::chrono::seconds>("RecordOverTime");
+    m_overRecordSecCat  = gCoreContext->GetDurSetting<std::chrono::minutes>("CategoryOverTime");
     m_overRecordCategory= gCoreContext->GetSetting("OverTimeCategory");
 
     m_eventThread->start();
@@ -254,7 +252,7 @@ ProgramInfo *TVRec::GetRecording(void)
     return tmppginfo;
 }
 
-/** \fn TVRec::RecordPending(const RecordingInfo*, int, bool)
+/**
  *  \brief Tells TVRec "rcinfo" is the next pending recording.
  *
  *   When there is a pending recording and the frontend is in "Live TV"
@@ -268,13 +266,13 @@ ProgramInfo *TVRec::GetRecording(void)
  *                  Set to -1 to revoke the current pending recording.
  *  \param hasLater If true, a later non-conflicting showing is available.
  */
-void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
+void TVRec::RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsleft,
                           bool hasLater)
 {
     QMutexLocker statelock(&m_stateChangeLock);
     QMutexLocker pendlock(&m_pendingRecLock);
 
-    if (secsleft < 0)
+    if (secsleft < 0s)
     {
         LOG(VB_RECORD, LOG_INFO, LOC + "Pending recording revoked on " +
             QString("inputid [%1]").arg(rcinfo->GetInputID()));
@@ -293,7 +291,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
 
     PendingInfo pending;
     pending.m_info            = new ProgramInfo(*rcinfo);
-    pending.m_recordingStart  = MythDate::current().addSecs(secsleft);
+    pending.m_recordingStart  = MythDate::current().addSecs(secsleft.count());
     pending.m_hasLaterShowing = hasLater;
     pending.m_ask             = true;
     pending.m_doNotAsk        = false;
@@ -335,8 +333,8 @@ QDateTime TVRec::GetRecordEndTime(const ProgramInfo *pi) const
 {
     bool spcat = (!m_overRecordCategory.isEmpty() &&
                   pi->GetCategory() == m_overRecordCategory);
-    int secs = (spcat) ? m_overRecordSecCat : m_overRecordSecNrml;
-    return pi->GetRecordingEndTime().addSecs(secs);
+    std::chrono::seconds secs = (spcat) ? m_overRecordSecCat : m_overRecordSecNrml;
+    return pi->GetRecordingEndTime().addSecs(secs.count());
 }
 
 /** \fn TVRec::CancelNextRecording(bool)
@@ -368,7 +366,7 @@ void TVRec::CancelNextRecording(bool cancel)
                     .arg((uint64_t)inputid,0,16));
 
             pendlock.unlock();
-            RemoteRecordPending(inputid, (*it).m_info, -1, false);
+            RemoteRecordPending(inputid, (*it).m_info, -1s, false);
             pendlock.relock();
         }
 
@@ -376,7 +374,7 @@ void TVRec::CancelNextRecording(bool cancel)
             QString("CancelNextRecording -- inputid [%1]")
                            .arg(m_inputId));
 
-        RecordPending((*it).m_info, -1, false);
+        RecordPending((*it).m_info, -1s, false);
     }
     else
     {
@@ -953,10 +951,9 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     SendMythSystemRecEvent("REC_FINISHED", curRec);
 
     // send out DONE_RECORDING message
-    int secsSince = curRec->GetRecordingStartTime()
-        .secsTo(MythDate::current());
+    auto secsSince = MythDate::secsInPast(curRec->GetRecordingStartTime());
     QString message = QString("DONE_RECORDING %1 %2 %3")
-        .arg(m_inputId).arg(secsSince).arg(GetFramesWritten());
+        .arg(m_inputId).arg(secsSince.count()).arg(GetFramesWritten());
     MythEvent me(message);
     gCoreContext->dispatch(me);
 
@@ -1022,8 +1019,8 @@ void TVRec::HandleStateChange(void)
     {
         m_scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-        m_eitScanStartTime = MythDate::current().addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
+        auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+        m_eitScanStartTime = MythDate::current().addSecs(secs.count());
     }
 
     // Handle different state transitions
@@ -1067,8 +1064,8 @@ void TVRec::HandleStateChange(void)
     m_eitScanStartTime = MythDate::current();
     if (m_scanner && (m_internalState == kState_None))
     {
-        m_eitScanStartTime = m_eitScanStartTime.addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
+        auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+        m_eitScanStartTime = m_eitScanStartTime.addSecs(secs.count());
     }
     else
     {
@@ -1171,6 +1168,7 @@ void TVRec::CloseChannel(void)
          m_genOpt.m_inputType == "FREEBOX" ||
          m_genOpt.m_inputType == "VBOX" ||
          m_genOpt.m_inputType == "HDHOMERUN" ||
+         m_genOpt.m_inputType == "EXTERNAL" ||
          CardUtil::IsV4L(m_genOpt.m_inputType)))
     {
         m_channel->Close();
@@ -1252,10 +1250,10 @@ static int num_inputs(void)
     return -1;
 }
 
-static int eit_start_rand(uint inputId, int eitTransportTimeout)
+static std::chrono::seconds eit_start_rand(uint inputId, std::chrono::seconds eitTransportTimeout)
 {
     // Randomize start time a bit
-    int timeout = static_cast<int>(MythRandom() % (eitTransportTimeout / 3));
+    auto timeout = std::chrono::seconds(MythRandom()) % (eitTransportTimeout.count() / 3);
 
     // Get the number of inputs and the position of the current input
     // to distribute the scan start evenly over eitTransportTimeout
@@ -1281,8 +1279,8 @@ void TVRec::run(void)
         (m_dvbOpt.m_dvbEitScan || get_use_eit(m_inputId)))      // EIT is selected for card OR EIT is selected for video source
     {
         m_scanner = new EITScanner(m_inputId);
-        m_eitScanStartTime = m_eitScanStartTime.addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
+        auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+        m_eitScanStartTime = m_eitScanStartTime.addSecs(secs.count());
     }
     else
     {
@@ -1520,13 +1518,13 @@ void TVRec::run(void)
  *  You MUST HAVE the stateChange-lock locked when you call this method!
  */
 
-bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
+bool TVRec::WaitForEventThreadSleep(bool wake, std::chrono::milliseconds time)
 {
     bool ok = false;
     MythTimer t;
     t.start();
 
-    while (!ok && ((unsigned long) t.elapsed()) < time)
+    while (!ok && (t.elapsed() < time))
     {
         MythTimer t2;
         t2.start();
@@ -1550,9 +1548,9 @@ bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
         // verify that we were triggered.
         ok = (m_tuningRequests.empty() && !m_changeState);
 
-        int te = t2.elapsed();
-        if (!ok && te < 10)
-            std::this_thread::sleep_for(std::chrono::microseconds(10-te));
+        std::chrono::milliseconds te = t2.elapsed();
+        if (!ok && te < 10ms)
+            std::this_thread::sleep_for(10ms - te);
     }
     return ok;
 }
@@ -1610,15 +1608,15 @@ void TVRec::HandlePendingRecordings(void)
         if (!(*it).m_ask && !(*it).m_doNotAsk)
             continue;
 
-        int timeuntil = ((*it).m_doNotAsk) ?
-            -1: MythDate::current().secsTo((*it).m_recordingStart);
+        auto timeuntil = ((*it).m_doNotAsk) ?
+            -1s: MythDate::secsInFuture((*it).m_recordingStart);
 
         if (has_rec)
             (*it).m_canceled = true;
 
         QString query = QString("ASK_RECORDING %1 %2 %3 %4")
             .arg(m_inputId)
-            .arg(timeuntil)
+            .arg(timeuntil.count())
             .arg(has_rec ? 1 : 0)
             .arg((*it).m_hasLaterShowing ? 1 : 0);
 
@@ -1702,7 +1700,7 @@ bool TVRec::GetDevices(uint inputid,
     // DVB options
     uint dvboff = 9;
     dvb_opts.m_dvbOnDemand    = query.value(dvboff + 0).toBool();
-    dvb_opts.m_dvbTuningDelay = query.value(dvboff + 1).toUInt();
+    dvb_opts.m_dvbTuningDelay = std::chrono::milliseconds(query.value(dvboff + 1).toUInt());
     dvb_opts.m_dvbEitScan     = query.value(dvboff + 2).toBool();
 
     // Firewire options
@@ -2118,22 +2116,22 @@ void TVRec::TeardownSignalMonitor()
     LOG(VB_RECORD, LOG_INFO, LOC + "TeardownSignalMonitor() -- end");
 }
 
-/** \fn TVRec::SetSignalMonitoringRate(int,int)
+/**
  *  \brief Sets the signal monitoring rate.
  *
- *  \sa EncoderLink::SetSignalMonitoringRate(int,int),
- *      RemoteEncoder::SetSignalMonitoringRate(int,int)
+ *  \sa EncoderLink::SetSignalMonitoringRate(milliseconds,int),
+ *      RemoteEncoder::SetSignalMonitoringRate(milliseconds,int)
  *  \param rate           The update rate to use in milliseconds,
  *                        use 0 to disable signal monitoring.
  *  \param notifyFrontend If 1, SIGNAL messages will be sent to
  *                        the frontend using this recorder.
  *  \return 1 if it signal monitoring is turned on, 0 otherwise.
  */
-int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
+std::chrono::milliseconds TVRec::SetSignalMonitoringRate(std::chrono::milliseconds rate, int notifyFrontend)
 {
     QString msg = "SetSignalMonitoringRate(%1, %2)";
     LOG(VB_RECORD, LOG_INFO, LOC +
-        msg.arg(rate).arg(notifyFrontend) + "-- start");
+        msg.arg(rate.count()).arg(notifyFrontend) + "-- start");
 
     QMutexLocker lock(&m_stateChangeLock);
 
@@ -2141,19 +2139,19 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Signal Monitoring is notsupported by your hardware.");
-        return 0;
+        return 0ms;
     }
 
     if (GetState() != kState_WatchingLiveTV)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             "Signal can only be monitored in LiveTV Mode.");
-        return 0;
+        return 0ms;
     }
 
     ClearFlags(kFlagRingBufferReady, __FILE__, __LINE__);
 
-    TuningRequest req = (rate > 0) ?
+    TuningRequest req = (rate > 0ms) ?
         TuningRequest(kFlagAntennaAdjust, m_channel->GetChannelName()) :
         TuningRequest(kFlagLiveTV);
 
@@ -2163,8 +2161,8 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
     while (!HasFlags(kFlagRingBufferReady))
         WaitForEventThreadSleep();
     LOG(VB_RECORD, LOG_INFO, LOC +
-        msg.arg(rate).arg(notifyFrontend) + " -- end");
-    return 1;
+        msg.arg(rate.count()).arg(notifyFrontend) + " -- end");
+    return 1ms;
 }
 
 DTVSignalMonitor *TVRec::GetDTVSignalMonitor(void)
@@ -2480,12 +2478,12 @@ bool TVRec::IsReallyRecording(void)
             HasFlags(kFlagDummyRecorderRunning));
 }
 
-/** \fn TVRec::IsBusy(TunedInputInfo*,int) const
+/**
  *  \brief Returns true if the recorder is busy, or will be within
  *         the next time_buffer seconds.
  *  \sa EncoderLink::IsBusy(TunedInputInfo*, int time_buffer)
  */
-bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
+bool TVRec::IsBusy(InputInfo *busy_input, std::chrono::seconds time_buffer) const
 {
     InputInfo dummy;
     if (!busy_input)
@@ -2520,8 +2518,7 @@ bool TVRec::IsBusy(InputInfo *busy_input, int time_buffer) const
 
     if (!busy_input->m_inputId && has_pending)
     {
-        int timeLeft = MythDate::current()
-            .secsTo(pendinfo.m_recordingStart);
+        auto timeLeft = MythDate::secsInFuture(pendinfo.m_recordingStart);
 
         if (timeLeft <= time_buffer)
         {
@@ -2653,7 +2650,7 @@ long long TVRec::GetMaxBitrate(void) const
     }
     else if (m_genOpt.m_inputType == "HDPVR")
     {
-        bitrate = 20200000LL; // Peek bit rate for HD-PVR
+        bitrate = 20200000LL; // Peak bit rate for HD-PVR
     }
     else if (!CardUtil::IsEncoder(m_genOpt.m_inputType))
     {
@@ -3582,8 +3579,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
     {
         m_scanner->StopActiveScan();
         ClearFlags(kFlagEITScannerRunning, __FILE__, __LINE__);
-        m_eitScanStartTime = MythDate::current().addSecs(
-            m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout));
+        auto secs = m_eitCrawlIdleStart + eit_start_rand(m_inputId, m_eitTransportTimeout);
+        m_eitScanStartTime = MythDate::current().addSecs(secs.count());
     }
 
     if (m_scanner && !request.IsOnSameMultiplex())
@@ -3993,7 +3990,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
                             "Recording", title,
                             tr("See 'Tuning timeout' in mythtv-setup "
                                "for this input."));
-        mn.SetDuration(30);
+        mn.SetDuration(30s);
         gCoreContext->SendEvent(MythEvent(mn));
 
         LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -4308,7 +4305,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     // Wait for recorder to start.
     m_stateChangeLock.unlock();
     while (!m_recorder->IsRecording() && !m_recorder->IsErrored())
-        std::this_thread::sleep_for(std::chrono::microseconds(5));
+        std::this_thread::sleep_for(5us);
     m_stateChangeLock.lock();
 
     if (GetV4LChannel())
@@ -4576,9 +4573,10 @@ bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
         }
     }
 
-    int hoursMax = gCoreContext->GetNumSetting("MaxHoursPerLiveTVRecording", 8);
-    if (hoursMax <= 0)
-        hoursMax = 8;
+    auto hoursMax =
+        gCoreContext->GetDurSetting<std::chrono::hours>("MaxHoursPerLiveTVRecording", 8h);
+    if (hoursMax <= 0h)
+        hoursMax = 8h;
 
     RecordingInfo *prog = nullptr;
     if (m_pseudoLiveTVRecording)

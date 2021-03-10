@@ -52,8 +52,6 @@
 // for ImageDLFailureEvent
 #include "metadataimagedownload.h"
 
-using namespace std::chrono_literals;
-
 #define LOC_MML QString("Manual Metadata Lookup: ")
 
 static const QString sLocation = "MythVideo";
@@ -3753,7 +3751,7 @@ void VideoDialog::OnVideoSearchDone(MetadataLookup *lookup)
         metadata->SetUserRating(lookup->GetUserRating());
     if (metadata->GetRating() == VIDEO_RATING_DEFAULT)
         metadata->SetRating(lookup->GetCertification());
-    if (metadata->GetLength() == 0)
+    if (metadata->GetLength() == 0min)
         metadata->SetLength(lookup->GetRuntime());
     if (metadata->GetSeason() == 0)
         metadata->SetSeason(lookup->GetSeason());

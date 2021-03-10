@@ -143,13 +143,13 @@ QDateTime NewsSite::lastUpdated(void) const
     return m_updated;
 }
 
-unsigned int NewsSite::timeSinceLastUpdate(void) const
+std::chrono::minutes NewsSite::timeSinceLastUpdate(void) const
 {
     QMutexLocker locker(&m_lock);
 
     QDateTime curTime(MythDate::current());
-    unsigned int min = m_updated.secsTo(curTime)/60;
-    return min;
+    auto secs = std::chrono::seconds(m_updated.secsTo(curTime));
+    return duration_cast<std::chrono::minutes>(secs);
 }
 
 void NewsSite::customEvent(QEvent *event)

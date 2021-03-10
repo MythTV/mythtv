@@ -61,10 +61,10 @@
 #include <QtAndroid>
 #endif
 
-using namespace std::chrono_literals;
-static constexpr std::chrono::milliseconds GESTURE_TIMEOUT { 1s };
-#define STANDBY_TIMEOUT 90 // Minutes
-#define LONGPRESS_INTERVAL 1000
+static constexpr std::chrono::milliseconds GESTURE_TIMEOUT    { 1s    };
+static constexpr std::chrono::minutes      STANDBY_TIMEOUT    { 90min };
+static constexpr std::chrono::milliseconds LONGPRESS_INTERVAL { 1s    };
+
 #define LOC QString("MythMainWindow: ")
 
 static MythMainWindow *mainWin = nullptr;
@@ -188,12 +188,14 @@ MythMainWindow::MythMainWindow(const bool UseDB)
     gCoreContext->addListener(this);
 
     // Idle timer setup
-    m_idleTime = gCoreContext->GetNumSetting("FrontendIdleTimeout", STANDBY_TIMEOUT);
-    if (m_idleTime < 0)
-        m_idleTime = 0;
-    m_idleTimer.setInterval(1000 * 60 * m_idleTime);
+    m_idleTime =
+        gCoreContext->GetDurSetting<std::chrono::minutes>("FrontendIdleTimeout",
+                                                         STANDBY_TIMEOUT);
+    if (m_idleTime < 0min)
+        m_idleTime = 0min;
+    m_idleTimer.setInterval(m_idleTime);
     connect(&m_idleTimer, &QTimer::timeout, this, &MythMainWindow::IdleTimeout);
-    if (m_idleTime > 0)
+    if (m_idleTime > 0min)
         m_idleTimer.start();
 
     m_screensaver = new MythScreenSaverControl(this, m_display);
@@ -1483,7 +1485,7 @@ bool MythMainWindow::HandleMedia(const QString& Handler, const QString& Mrl,
                                  const QString& Subtitle,
                                  const QString& Director, int Season,
                                  int Episode, const QString& Inetref,
-                                 int LenMins, const QString& Year,
+                                 std::chrono::minutes LenMins, const QString& Year,
                                  const QString& Id, bool UseBookmarks)
 {
     QString lhandler(Handler);
@@ -1546,8 +1548,8 @@ bool MythMainWindow::KeyLongPressFilter(QEvent** Event, QScopedPointer<QEvent>& 
             // Check if we are in the middle of a long press
             if (keycode == m_priv->m_longPressKeyCode)
             {
-                if (keyevent->timestamp() - m_priv->m_longPressTime < LONGPRESS_INTERVAL
-                    || m_priv->m_longPressTime == 0)
+                if (std::chrono::milliseconds(keyevent->timestamp()) - m_priv->m_longPressTime < LONGPRESS_INTERVAL
+                    || m_priv->m_longPressTime == 0ms)
                 {
                     // waiting for release of key.
                     return true; // discard the key press
@@ -1560,7 +1562,7 @@ bool MythMainWindow::KeyLongPressFilter(QEvent** Event, QScopedPointer<QEvent>& 
                                          keyevent->text(), false,1);
                 *Event = newevent;
                 NewEvent.reset(newevent);
-                m_priv->m_longPressTime = 0;   // indicate we have generated the long press
+                m_priv->m_longPressTime = 0ms;   // indicate we have generated the long press
                 return false;
             }
             // If we got a keycode different from the long press keycode it
@@ -1584,7 +1586,7 @@ bool MythMainWindow::KeyLongPressFilter(QEvent** Event, QScopedPointer<QEvent>& 
             {
                 // Beginning of a press
                 m_priv->m_longPressKeyCode = keycode;
-                m_priv->m_longPressTime = keyevent->timestamp();
+                m_priv->m_longPressTime = std::chrono::milliseconds(keyevent->timestamp());
                 return true; // discard the key press
             }
             break;
@@ -1595,11 +1597,11 @@ bool MythMainWindow::KeyLongPressFilter(QEvent** Event, QScopedPointer<QEvent>& 
             {
                 if (keyevent->isAutoRepeat())
                     return true;
-                if (m_priv->m_longPressTime > 0)
+                if (m_priv->m_longPressTime > 0ms)
                 {
                     // short press or non-repeating keyboard - generate key
                     Qt::KeyboardModifiers modifier = Qt::NoModifier;
-                    if (keyevent->timestamp() - m_priv->m_longPressTime >= LONGPRESS_INTERVAL)
+                    if (std::chrono::milliseconds(keyevent->timestamp()) - m_priv->m_longPressTime >= LONGPRESS_INTERVAL)
                     {
                         // non-repeatng keyboard
                         modifier = Qt::MetaModifier;
@@ -1953,7 +1955,7 @@ void MythMainWindow::customEvent(QEvent* Event)
                     event->ExtraData(1), event->ExtraData(2),
                     event->ExtraData(3), event->ExtraData(4),
                     event->ExtraData(5).toInt(), event->ExtraData(6).toInt(),
-                    event->ExtraData(7), event->ExtraData(8).toInt(),
+                    event->ExtraData(7), std::chrono::minutes(event->ExtraData(8).toInt()),
                     event->ExtraData(9), event->ExtraData(10),
                     usebookmark);
             }
@@ -1987,15 +1989,18 @@ void MythMainWindow::customEvent(QEvent* Event)
         else if (message == "CLEAR_SETTINGS_CACHE")
         {
             // update the idle time
-            m_idleTime = gCoreContext->GetNumSetting("FrontendIdleTimeout", STANDBY_TIMEOUT);
-            if (m_idleTime < 0)
-                m_idleTime = 0;
+            m_idleTime =
+                gCoreContext->GetDurSetting<std::chrono::minutes>("FrontendIdleTimeout",
+                                                                  STANDBY_TIMEOUT);
+
+            if (m_idleTime < 0min)
+                m_idleTime = 0min;
             m_idleTimer.stop();
-            if (m_idleTime > 0)
+            if (m_idleTime > 0min)
             {
-                m_idleTimer.setInterval(1000 * 60 * m_idleTime);
+                m_idleTimer.setInterval(m_idleTime);
                 m_idleTimer.start();
-                LOG(VB_GENERAL, LOG_INFO, QString("Updating the frontend idle time to: %1 mins").arg(m_idleTime));
+                LOG(VB_GENERAL, LOG_INFO, QString("Updating the frontend idle time to: %1 mins").arg(m_idleTime.count()));
             }
             else
             {
@@ -2088,7 +2093,7 @@ void MythMainWindow::ResetIdleTimer()
     if (m_priv->m_disableIdle)
         return;
 
-    if (m_idleTime == 0 || !m_idleTimer.isActive() || (m_priv->m_standby && m_priv->m_enteringStandby))
+    if (m_idleTime == 0min || !m_idleTimer.isActive() || (m_priv->m_standby && m_priv->m_enteringStandby))
         return;
 
     if (m_priv->m_standby)
@@ -2106,7 +2111,7 @@ void MythMainWindow::PauseIdleTimer(bool Pause)
         return;
 
     // don't do anything if the idle timer is disabled
-    if (m_idleTime == 0)
+    if (m_idleTime == 0min)
         return;
 
     if (Pause)
@@ -2130,10 +2135,10 @@ void MythMainWindow::IdleTimeout()
 
     m_priv->m_enteringStandby = false;
 
-    if (m_idleTime > 0 && !m_priv->m_standby)
+    if (m_idleTime > 0min && !m_priv->m_standby)
     {
         LOG(VB_GENERAL, LOG_NOTICE,
-            QString("Entering standby mode after %1 minutes of inactivity").arg(m_idleTime));
+            QString("Entering standby mode after %1 minutes of inactivity").arg(m_idleTime.count()));
         EnterStandby(false);
         if (gCoreContext->GetNumSetting("idleTimeoutSecs", 0) > 0)
         {

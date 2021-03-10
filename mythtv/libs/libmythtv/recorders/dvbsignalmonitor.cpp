@@ -52,35 +52,35 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
       // for the 4.0 DVB API which uses a uint16_t for the snr
       m_signalToNoise    (QCoreApplication::translate("(Common)",
                           "Signal To Noise"),  "snr",
-                          0,      true,      0, 65535, 0),
+                          0,      true,      0, 65535, 0ms),
       m_bitErrorRate     (tr("Bit Error Rate"),     "ber",
-                          65535,  false,     0, 65535, 0),
+                          65535,  false,     0, 65535, 0ms),
       m_uncorrectedBlocks(tr("Uncorrected Blocks"), "ucb",
-                          65535,  false,     0, 65535, 0),
+                          65535,  false,     0, 65535, 0ms),
       m_rotorPosition    (tr("Rotor Progress"),     "pos",
-                          100,    true,      0,   100, 0),
+                          100,    true,      0,   100, 0ms),
       m_streamHandlerStarted(false),
       m_streamHandler(nullptr)
 {
     // This value should probably come from the database...
     int threshold = 0; // signal strength threshold
 
-    // Tuning timeout time for channel lock from database, minimum is 3000 ms
-    uint wait = 3000;                       // Minimum timeout time
-    uint signal_timeout = 0;                // Not used
-    uint tuning_timeout = 0;                // Maximum time for channel lock from card
+    // Tuning timeout time for channel lock from database, minimum is 3s
+    std::chrono::milliseconds wait = 3s;             // Minimum timeout time
+    std::chrono::milliseconds signal_timeout = 0ms;  // Not used
+    std::chrono::milliseconds tuning_timeout = 0ms;  // Maximum time for channel lock from card
     CardUtil::GetTimeouts(db_cardnum, signal_timeout, tuning_timeout);
     if (tuning_timeout < wait)
     {
         LOG(VB_CHANNEL, LOG_DEBUG, LOC +
             QString("Tuning timeout from database: %1 ms is too small, using %2 ms")
-                .arg(tuning_timeout).arg(wait));
+                .arg(tuning_timeout.count()).arg(wait.count()));
     }
     else
     {
         wait = tuning_timeout;              // Use value from database
         LOG(VB_CHANNEL, LOG_DEBUG, LOC +
-            QString("Tuning timeout: %1 ms").arg(wait));
+            QString("Tuning timeout: %1 ms").arg(wait.count()));
     }
 
     m_signalLock.SetTimeout(wait);
@@ -118,8 +118,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
             QString("initial flags %1").arg(sm_flags_to_string(m_flags)));
 
     m_minimumUpdateRate = _channel->GetMinSignalMonitorDelay();
-    if (m_minimumUpdateRate > 30)
-        usleep(m_minimumUpdateRate * 1000);
+    if (m_minimumUpdateRate > 30ms)
+        usleep(m_minimumUpdateRate);
 
     m_streamHandler = DVBStreamHandler::Get(_channel->GetCardNum(), m_inputid);
 }

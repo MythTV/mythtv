@@ -30,7 +30,7 @@ MBASE_PUBLIC inline uint32_t MythRandom()
 #endif
 }
 
-MBASE_PUBLIC bool getUptime(time_t &uptime);
+MBASE_PUBLIC bool getUptime(std::chrono::seconds &uptime);
 MBASE_PUBLIC bool getMemStats(
     int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 using loadArray = std::array<double,3>;
@@ -39,7 +39,7 @@ MBASE_PUBLIC loadArray getLoadAvgs(void);
 MBASE_PUBLIC bool hasUtf8(const char *str);
 #define M_QSTRING_UNICODE(str) hasUtf8(str) ? QString::fromUtf8(str) : str
 
-MBASE_PUBLIC bool ping(const QString &host, int timeout);
+MBASE_PUBLIC bool ping(const QString &host, std::chrono::milliseconds timeout);
 MBASE_PUBLIC bool telnet(const QString &host, int port);
 
 MBASE_PUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);
@@ -85,7 +85,7 @@ MBASE_PUBLIC QString xml_indent(uint level);
 MBASE_PUBLIC bool IsMACAddress(const QString& MAC);
 MBASE_PUBLIC bool WakeOnLAN(const QString& MAC);
 MBASE_PUBLIC bool MythWakeup(const QString &wakeUpCommand,
-    uint flags = kMSNone, uint timeout = 0);
+    uint flags = kMSNone, std::chrono::seconds timeout = 0s);
 
 MBASE_PUBLIC QString FileHash(const QString& filename);
 
@@ -104,39 +104,21 @@ MBASE_PUBLIC void setHttpProxy(void);
 MBASE_PUBLIC int naturalCompare(const QString &_a, const QString &_b,
                                 Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
-#define ONESECINMS   (         1000)
-#define ONEMININMS   (      60*1000)
-#define ONEHOURINMS  (   60*60*1000)
-#define ONEDAYINMS   (24*60*60*1000)
-#define ONEMININSEC  (      60)
-#define ONEHOURINSEC (   60*60)
-#define ONEDAYINSEC  (24*60*60)
-
 /**
  * \brief Format a milliseconds time value
  *
  * Convert a millisecond time value into a textual representation of the value.
  *
- * \param msecs The time value in milliseconds.
+ * \param msecs The time value in milliseconds. Since the type of this
+ *     field is std::chrono::duration, any duration of a larger
+ *     interval can be passed to this function and the compiler will
+ *     convert it to milliseconds.
  *
  * \param fmt A formatting string specifying how to output the time.
  *     See QTime::toString for the a definition fo valid formatting
  *     characters.
  */
-MBASE_PUBLIC QString MythFormatTimeMs(int msecs, const QString& fmt);
-
-/**
- * \brief Format a seconds time value
- *
- * Convert a second time value into a textual representation of the value.
- *
- * \param secs The time value in seconds.
- *
- * \param mft A formatting string specifying how to output the time.
- *     See QTime::toString for the a definition fo valid formatting
- *     characters.
- */
-MBASE_PUBLIC QString MythFormatTime(int secs, const QString& fmt);
+MBASE_PUBLIC QString MythFormatTime(std::chrono::milliseconds msecs, const QString& fmt);
 
 // CPU Tick timing function
 #ifdef MMX

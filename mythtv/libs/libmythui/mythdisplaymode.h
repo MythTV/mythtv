@@ -31,6 +31,7 @@ class MUI_PUBLIC MythDisplayMode
     MythDisplayMode(int Width, int Height, int MMWidth, int MMHeight,
                     double AspectRatio, double RefreshRate);
     void   Init          ();
+    QString ToString     () const;
     QSize  Resolution    () const;
     int    Width         () const;
     int    Height        () const;

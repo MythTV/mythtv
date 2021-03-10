@@ -114,7 +114,7 @@ class MTV_PUBLIC PlayerContext
     LiveTVChain        *m_tvchain            {nullptr};
     MythMediaBuffer    *m_buffer             {nullptr};
     ProgramInfo        *m_playingInfo        {nullptr}; ///< Currently playing info
-    long long           m_playingLen         {0};  ///< Initial CalculateLength()
+    std::chrono::seconds m_playingLen        {0s};  ///< Initial CalculateLength()
     int                 m_lastCardid         {-1}; ///< CardID of current/last recorder
     /// 0 == normal, +1 == fast forward, -1 == rewind
     int                 m_ffRewState         {0};
@@ -133,9 +133,9 @@ class MTV_PUBLIC PlayerContext
     ProgramInfo        *m_pseudoLiveTVRec    {nullptr};
     PseudoState         m_pseudoLiveTVState  {kPseudoNormalLiveTV};
 
-    int                 m_fftime             {0};
-    int                 m_rewtime            {0};
-    int                 m_jumptime           {0};
+    std::chrono::seconds  m_fftime           {0s};
+    std::chrono::seconds  m_rewtime          {0s};
+    std::chrono::minutes  m_jumptime         {0min};
     /** \brief Time stretch speed, 1.0F for normal playback.
      *
      *  Begins at 1.0F meaning normal playback, but can be increased
@@ -159,8 +159,8 @@ class MTV_PUBLIC PlayerContext
     MythDeque<TVState>  m_nextState;
 
     /// Timeout after last Signal Monitor message for ignoring OSD when exiting.
-    static const uint kSMExitTimeout;
-    static const uint kMaxChannelHistory;
+    static constexpr std::chrono::milliseconds kSMExitTimeout { 2s };
+    static constexpr uint kMaxChannelHistory { 30 };
 };
 
 #endif // PLAYER_CONTEXT_H

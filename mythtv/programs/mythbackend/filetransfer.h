@@ -23,7 +23,7 @@ class FileTransfer : public ReferenceCounter
 
   public:
     FileTransfer(QString &filename, MythSocket *remote,
-                 bool usereadahead, int timeout_ms);
+                 bool usereadahead, std::chrono::milliseconds timeout);
     FileTransfer(QString &filename, MythSocket *remote, bool write);
 
     MythSocket *getSocket() { return m_sock; }

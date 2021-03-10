@@ -5,7 +5,6 @@
 
 #include <QStringList>
 #include <QMap>
-#include <QRegExp>
 #include <QList>
 #include <QWaitCondition>
 #include <QMutex>
@@ -183,7 +182,7 @@ static bool get_bool_option(RecordingProfile *profile, const QString &name)
 }
 
 static void TranscodeWriteText(void *ptr, unsigned char *buf, int len,
-                               int timecode, int pagenr)
+                               std::chrono::milliseconds timecode, int pagenr)
 {
     auto *nvr = (NuppelVideoRecorder *)ptr;
     nvr->WriteText(buf, len, timecode, pagenr);
@@ -776,7 +775,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                     QString("Forcing Recorder option '%1' to '%2'")
                         .arg(key).arg(value));
 
-                if (value.contains(QRegExp("[^0-9]")))
+                if (value.contains(QRegularExpression("\\D")))
                     m_nvr->SetOption(key, value);
                 else
                     m_nvr->SetOption(key, value.toInt());
@@ -995,14 +994,15 @@ int Transcode::TranscodeFile(const QString &inputname,
     long totalAudio = 0;
     int dropvideo = 0;
     // timecode of the last read video frame in input time
-    long long lasttimecode = 0;
+    std::chrono::milliseconds lasttimecode = 0ms;
     // timecode of the last write video frame in input or output time
-    long long lastWrittenTime = 0;
+    std::chrono::milliseconds lastWrittenTime = 0ms;
     // delta between the same video frame in input and output due to applying the cut list
-    long long timecodeOffset = 0;
+    std::chrono::milliseconds timecodeOffset = 0ms;
 
     float rateTimeConv = arb->m_eff_audiorate / 1000.0F;
     float vidFrameTime = 1000.0F / video_frame_rate;
+    auto  vidFrameTimeMs = millisecondsFromFloat(vidFrameTime);
     int wait_recover = 0;
     MythVideoOutput *videoOutput = player->GetVideoOutput();
     bool is_key = false;
@@ -1060,7 +1060,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         // if the timecode jumps backwards just use the last frame's timecode plus the duration of a frame
         if (frame.m_timecode < lasttimecode)
-            frame.m_timecode = (long long)(lasttimecode + vidFrameTime);
+            frame.m_timecode = lasttimecode + vidFrameTimeMs;
 
         if (m_fifow)
         {
@@ -1077,26 +1077,26 @@ int Transcode::TranscodeFile(const QString &inputname,
                       lastDecode->m_height, imageOut.data, imageOut.linesize);
 
             totalAudio += arb->GetSamples(frame.m_timecode);
-            int audbufTime = (int)(totalAudio / rateTimeConv);
-            int auddelta = frame.m_timecode - audbufTime;
-            int vidTime = lroundf(curFrameNum * vidFrameTime);
-            int viddelta = frame.m_timecode - vidTime;
-            int delta = viddelta - auddelta;
-            int absdelta = delta < 0 ? -delta : delta;
-            if (absdelta < 500 && absdelta >= vidFrameTime)
+            std::chrono::milliseconds audbufTime = millisecondsFromFloat(totalAudio / rateTimeConv);
+            std::chrono::milliseconds auddelta = frame.m_timecode - audbufTime;
+            std::chrono::milliseconds vidTime = millisecondsFromFloat(curFrameNum * vidFrameTime);
+            std::chrono::milliseconds viddelta = frame.m_timecode - vidTime;
+            std::chrono::milliseconds delta = viddelta - auddelta;
+            std::chrono::milliseconds absdelta = std::chrono::abs(delta);
+            if (absdelta < 500ms && absdelta >= vidFrameTimeMs)
             {
                QString msg = QString("Audio is %1ms %2 video at # %3: "
                                      "auddelta=%4, viddelta=%5")
-                   .arg(absdelta)
-                   .arg(((delta > 0) ? "ahead of" : "behind"))
+                   .arg(absdelta.count())
+                   .arg(((delta > 0ms) ? "ahead of" : "behind"))
                    .arg((int)curFrameNum)
-                   .arg(auddelta)
-                   .arg(viddelta);
+                   .arg(auddelta.count())
+                   .arg(viddelta.count());
                 LOG(VB_GENERAL, LOG_INFO, msg);
-                dropvideo = (delta > 0) ? 1 : -1;
+                dropvideo = (delta > 0ms) ? 1 : -1;
                 wait_recover = 0;
             }
-            else if (delta >= 500 && delta < 10000)
+            else if (delta >= 500ms && delta < 10s)
             {
                 if (wait_recover == 0)
                 {
@@ -1107,13 +1107,13 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     // Video is badly lagging.  Try to catch up.
                     int count = 0;
-                    while (delta > vidFrameTime)
+                    while (delta > vidFrameTimeMs)
                     {
                         if (!cutter || !cutter->InhibitDummyFrame())
                             m_fifow->FIFOWrite(0, frame.m_buffer, frame.m_bufferSize);
 
                         count++;
-                        delta -= (int)vidFrameTime;
+                        delta -= vidFrameTimeMs;
                     }
                     QString msg = QString("Added %1 blank video frames")
                                   .arg(count);
@@ -1136,9 +1136,9 @@ int Transcode::TranscodeFile(const QString &inputname,
             LOG(VB_GENERAL, LOG_DEBUG,
                 QString("%1: video time: %2 audio time: %3 "
                         "buf: %4 exp: %5 delta: %6")
-                    .arg(curFrameNum) .arg(frame.timecode)
-                    .arg(arb->last_audiotime) .arg(buflen) .arg(audbufTime)
-                    .arg(delta));
+                    .arg(curFrameNum) .arg(frame.m_timecode.count())
+                    .arg(arb->last_audiotime) .arg(buflen) .arg(audbufTime.count())
+                    .arg(delta.count()));
 #endif
             AudioBuffer *ab = nullptr;
             while ((ab = arb->GetData(frame.m_timecode)) != nullptr)
@@ -1228,8 +1228,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
             if (did_ff == 1)
             {
-                timecodeOffset +=
-                    (frame.m_timecode - lasttimecode - (int)vidFrameTime);
+                timecodeOffset += (frame.m_timecode - lasttimecode - vidFrameTimeMs);
             }
             lasttimecode = frame.m_timecode;
 // from here on the timecode is on the output time base
@@ -1295,8 +1294,8 @@ int Transcode::TranscodeFile(const QString &inputname,
             if (did_ff == 1)
             {
                 did_ff = 2;
-                timecodeOffset +=
-                    (frame.m_timecode - lasttimecode - (int)vidFrameTime);
+                timecodeOffset += (frame.m_timecode - lasttimecode -
+                                   millisecondsFromFloat(vidFrameTime));
             }
 
             if (video_aspect != new_aspect)
@@ -1348,13 +1347,13 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     if (did_ff != 1)
                     {
-                        long long tc = ab->m_time - timecodeOffset;
+                        std::chrono::milliseconds tc = ab->m_time - timecodeOffset;
                         avfw->WriteAudioFrame(buf, audioFrame, tc);
 
                         if (avfw2)
                         {
-                            if ((avfw2->GetTimecodeOffset() == -1) &&
-                                (avfw->GetTimecodeOffset() != -1))
+                            if ((avfw2->GetTimecodeOffset() == -1ms) &&
+                                (avfw->GetTimecodeOffset() != -1ms))
                             {
                                 avfw2->SetTimecodeOffset(
                                     avfw->GetTimecodeOffset());
@@ -1372,7 +1371,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 {
                     m_nvr->SetOption("audioframesize", ab->size());
                     m_nvr->WriteAudio(buf, audioFrame++,
-                                    ab->m_time - timecodeOffset);
+                                      (ab->m_time - timecodeOffset));
                     if (m_nvr->IsErrored())
                     {
                         LOG(VB_GENERAL, LOG_ERR,

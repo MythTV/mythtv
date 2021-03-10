@@ -6,6 +6,7 @@
 #include <QMutex>
 
 // MythTV
+#include "mythchrono.h"
 #include "mythimage.h"
 
 enum ImageCacheMode
@@ -46,7 +47,7 @@ class MUI_PUBLIC MythUIThemeCache
     static void PruneCacheDir(const QString& Dir);
 
     QMap<QString, MythImage *> m_imageCache;
-    QMap<QString, qint64> m_cacheTrack;
+    QMap<QString, SystemTime> m_cacheTrack;
     QMutex m_cacheLock                    { QMutex::Recursive };
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     QAtomicInt m_cacheSize                { 0 };

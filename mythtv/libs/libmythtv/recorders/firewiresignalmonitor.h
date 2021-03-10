@@ -57,8 +57,8 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
     void AddData(const unsigned char *data, uint len) override; // TSDataListener
 
   public:
-    static const uint kPowerTimeout;
-    static const uint kBufferTimeout;
+    static constexpr std::chrono::milliseconds kPowerTimeout  { 3s };
+    static constexpr std::chrono::milliseconds kBufferTimeout { 5s };
 
   protected:
     volatile bool      m_dtvMonitorRunning           {false};

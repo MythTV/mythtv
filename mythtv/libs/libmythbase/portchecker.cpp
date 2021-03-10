@@ -70,10 +70,10 @@
  * of linkLocalOnly, return true if it was link local and
  * was changed, false in other cases.
 */
-bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLocalOnly)
+bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds timeLimit, bool linkLocalOnly)
 {
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("host %1 port %2 timeLimit %3 linkLocalOnly %4")
-        .arg(host).arg(port).arg(timeLimit).arg(linkLocalOnly));
+        .arg(host).arg(port).arg(timeLimit.count()).arg(linkLocalOnly));
     m_cancelCheck = false;
     QHostAddress addr;
     bool isIPAddress = addr.setAddress(host);
@@ -190,7 +190,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
         // Check if user got impatient and canceled
         if (m_cancelCheck)
             break;
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(500ms);
         state = socket.state();
         LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("socket state %1")
             .arg(state));
@@ -225,7 +225,7 @@ bool PortChecker::checkPort(QString &host, int port, int timeLimit, bool linkLoc
  * false in other cases.
 */
 // static method
-bool PortChecker::resolveLinkLocal(QString &host, int port, int timeLimit)
+bool PortChecker::resolveLinkLocal(QString &host, int port, std::chrono::milliseconds timeLimit)
 {
     PortChecker checker;
     return checker.checkPort(host,port,timeLimit,true);

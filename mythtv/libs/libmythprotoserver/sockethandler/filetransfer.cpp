@@ -10,9 +10,9 @@
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            MythSocketManager *parent,
-                           bool usereadahead, int timeout_ms) :
+                           bool usereadahead, std::chrono::milliseconds timeout) :
     SocketHandler(remote, parent, ""),
-    m_rbuffer(MythMediaBuffer::Create(filename, false, usereadahead, timeout_ms))
+    m_rbuffer(MythMediaBuffer::Create(filename, false, usereadahead, timeout))
 {
     m_pginfo = new ProgramInfo(filename);
     m_pginfo->MarkAsInUse(true, kFileTransferInUseID);
@@ -167,7 +167,7 @@ int FileTransfer::WriteBlock(int size)
     while (tot < size)
     {
         int request = size - tot;
-        int received = GetSocket()->Read(buf, (uint)request, 200 /*ms */);
+        int received = GetSocket()->Read(buf, (uint)request, 200ms);
 
         if (received != request)
         {

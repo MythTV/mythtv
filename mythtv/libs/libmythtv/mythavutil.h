@@ -8,6 +8,7 @@
 
 // MythTV
 #include "mythframe.h"
+#include "mythhdr.h"
 
 // FFmpeg
 extern "C" {
@@ -63,6 +64,7 @@ class MTV_PUBLIC MythAVUtil
     static int  FillAVFrame(AVFrame* Frame, const MythVideoFrame* From, AVPixelFormat Fmt = AV_PIX_FMT_NONE);
     static AVPixelFormat  FrameTypeToPixelFormat(VideoFrameType Type);
     static VideoFrameType PixelFormatToFrameType(AVPixelFormat Fmt);
+    static MythHDR::HDRType FFmpegTransferToHDRType(int Transfer);
 };
 
 class MTV_PUBLIC MythStreamInfo {

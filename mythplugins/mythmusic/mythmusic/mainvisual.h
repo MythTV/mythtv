@@ -44,7 +44,7 @@ class MainVisual :  public QObject, public MythTV::Visual
 
     void resize(QSize size);
 
-    void add(const void *buffer, unsigned long b_len, unsigned long timecode,
+    void add(const void *buffer, unsigned long b_len, std::chrono::milliseconds timecode,
              int source_channel, int bits_per_sample) override; // Visual
     void prepare(void) override; // Visual
 

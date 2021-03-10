@@ -81,38 +81,38 @@ void MetaIOTagLib::ReadGenericMetadata(Tag *tag, MusicMetadata *metadata)
 }
 
 /*!
-* \brief Find the length of the track (in seconds)
+* \brief Find the length of the track (in milliseconds)
 *
 * \param file Pointer to file object
 * \returns An integer (signed!) to represent the length in milliseconds.
 */
-int MetaIOTagLib::getTrackLength(TagLib::File *file)
+std::chrono::milliseconds MetaIOTagLib::getTrackLength(TagLib::File *file)
 {
-    int milliseconds = 0;
+    std::chrono::milliseconds milliseconds = 0ms;
 
     if (file && file->audioProperties())
-        milliseconds = file->audioProperties()->length() * 1000;
+        milliseconds = std::chrono::milliseconds(file->audioProperties()->lengthInMilliseconds());
 
     return milliseconds;
 }
 
 /*!
-* \brief Find the length of the track (in seconds)
+* \brief Find the length of the track (in milliseconds)
 *
 * \param filename The filename for which we want to find the length.
 * \returns An integer (signed!) to represent the length in milliseconds.
 */
-int MetaIOTagLib::getTrackLength(const QString &filename)
+std::chrono::milliseconds MetaIOTagLib::getTrackLength(const QString &filename)
 {
-    int milliseconds = 0;
+    std::chrono::milliseconds milliseconds = 0ms;
     QByteArray fname = filename.toLocal8Bit();
     auto *file = new TagLib::FileRef(fname.constData());
 
     if (file && file->audioProperties())
-        milliseconds = file->audioProperties()->length() * 1000;
+        milliseconds = std::chrono::milliseconds(file->audioProperties()->lengthInMilliseconds());
 
     // If we didn't get a valid length, add the metadata but show warning.
-    if (milliseconds <= 1000)
+    if (milliseconds <= 1s)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MetaIOTagLib: Failed to read length "

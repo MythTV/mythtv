@@ -152,8 +152,8 @@ void MythVideoFrame::ClearMetadata()
     m_frameRate           = -1.0 ;
     m_frameNumber         = 0;
     m_frameCounter        = 0;
-    m_timecode            = 0;
-    m_displayTimecode     = 0;
+    m_timecode            = 0ms;
+    m_displayTimecode     = 0ms;
     m_priv                = { nullptr };
     m_interlaced          = 0;
     m_topFieldFirst       = true;
@@ -177,6 +177,7 @@ void MythVideoFrame::ClearMetadata()
     m_alreadyDeinterlaced = false;
     m_rotation            = 0;
     m_stereo3D            = 0;
+    m_hdrMetadata         = nullptr;
     m_deinterlaceSingle   = DEINT_NONE;
     m_deinterlaceDouble   = DEINT_NONE;
     m_deinterlaceAllowed  = DEINT_NONE;
@@ -353,6 +354,8 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *From)
     m_colorshifted        = From->m_colorshifted;
     m_alreadyDeinterlaced = From->m_alreadyDeinterlaced;
     m_rotation            = From->m_rotation;
+    m_stereo3D            = From->m_stereo3D;
+    m_hdrMetadata         = From->m_hdrMetadata;
     m_deinterlaceSingle   = From->m_deinterlaceSingle;
     m_deinterlaceDouble   = From->m_deinterlaceDouble;
     m_deinterlaceAllowed  = From->m_deinterlaceAllowed;

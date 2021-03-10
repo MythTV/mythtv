@@ -10,7 +10,7 @@ class MythPreviewPlayer : public MythPlayer
     explicit MythPreviewPlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
     char* GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolute, int& BufferSize,
                                int& FrameWidth, int& FrameHeight, float& AspectRatio);
-    char* GetScreenGrab       (int SecondsIn, int& BufferSize, int& FrameWidth,
+    char* GetScreenGrab       (std::chrono::seconds SecondsIn, int& BufferSize, int& FrameWidth,
                                int& FrameHeight, float& AspectRatio);
 
   private:

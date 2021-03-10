@@ -109,6 +109,7 @@ class MythExternRecApp : public QObject
     QMap<QString, QString>  m_appEnv;
 
     QProcess                m_tuneProc;
+    QProcess                m_finishTuneProc;
     QString                 m_tuneCommand;
     QString                 m_onDataStart;
     QString                 m_newEpisodeCommand;

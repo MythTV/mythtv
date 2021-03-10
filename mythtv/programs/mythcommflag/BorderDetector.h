@@ -48,7 +48,7 @@ private:
 
     /* Debugging. */
     int                     m_debugLevel      {0};
-    struct timeval          m_analyzeTime     {0,0};
+    std::chrono::microseconds m_analyzeTime   {0us};
     bool                    m_timeReported    {false};
 };
 

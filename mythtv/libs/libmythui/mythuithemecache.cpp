@@ -273,8 +273,8 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
         // seconds.
 
         // This only applies to the MEMORY cache
-        const uint kImageCacheTimeout = 60;
-        qint64 now = MythDate::current().toSecsSinceEpoch();
+        constexpr std::chrono::seconds kImageCacheTimeout { 60s };
+        SystemTime now = SystemClock::now();
 
         QMutexLocker locker(&m_cacheLock);
 
@@ -392,7 +392,7 @@ MythImage* MythUIThemeCache::GetImageFromCache(const QString& URL)
 
     if (m_imageCache.contains(URL))
     {
-        m_cacheTrack[URL] = MythDate::current().toSecsSinceEpoch();
+        m_cacheTrack[URL] = SystemClock::now();
         m_imageCache[URL]->IncrRef();
         return m_imageCache[URL];
     }
@@ -435,7 +435,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
            m_maxCacheSize.fetchAndAddOrdered(0) && !m_imageCache.empty())
     {
         QMap<QString, MythImage *>::iterator it = m_imageCache.begin();
-        qint64 oldestTime = MythDate::current().toSecsSinceEpoch();
+        auto oldestTime = SystemClock::now();
         QString oldestKey = it.key();
 
         int count = 0;
@@ -484,7 +484,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
     {
         Image->IncrRef();
         m_imageCache[URL] = Image;
-        m_cacheTrack[URL] = MythDate::current().toSecsSinceEpoch();
+        m_cacheTrack[URL] = SystemClock::now();
 
         Image->SetIsInCache(true);
         LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +

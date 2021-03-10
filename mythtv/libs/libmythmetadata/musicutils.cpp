@@ -3,7 +3,7 @@
 
 // qt
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDir>
 
 // mythtv
@@ -21,13 +21,13 @@ extern "C" {
 #include "musicmetadata.h"
 #include "musicutils.h"
 
-static QRegExp badChars = QRegExp(R"((/|\\|:|'|"|\?|\|))");
+const static QRegularExpression badChars1 { R"((/|\\|:|'|"|\?|\|))" };
+const static QRegularExpression badChars2 { R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))" };
 
 QString fixFilename(const QString &filename)
 {
     QString ret = filename;
-    ret.replace(badChars, "_");
-    return ret;
+    return ret.replace(badChars1, "_");
 }
 
 static QMap<QString, QString> iconMap;
@@ -46,7 +46,7 @@ QString findIcon(const QString &type, const QString &name, bool ignoreCache)
     }
 
     QString cleanName = fixFilename(name) + '.';
-    cleanName = '^' + QRegExp::escape(cleanName);
+    cleanName = '^' + QRegularExpression::escape(cleanName);
     QString file = QString("/Icons/%1/%2").arg(type).arg(cleanName);
     QString imageExtensions = "(jpg|jpeg|png|gif)";
     QStringList fileList;
@@ -66,11 +66,11 @@ QString findIcon(const QString &type, const QString &name, bool ignoreCache)
     return QString();
 }
 
-inline QString fixFileToken_sl(QString token)
+QString fixFileToken_sl(QString token)
 {
     // this version doesn't remove fwd-slashes so we can
     // pick them up later and create directories as required
-    token.replace(QRegExp(R"((\\|:|'|"|\?|\|))"), QString("_"));
+    token.replace(QRegularExpression(R"((\\|:|'|"|\?|\|))"), QString("_"));
     return token;
 }
 
@@ -80,45 +80,31 @@ QString filenameFromMetadata(MusicMetadata *track)
     QString fntempl = gCoreContext->GetSetting("FilenameTemplate");
     bool no_ws = gCoreContext->GetBoolSetting("NoWhitespace", false);
 
-    QRegExp rx_ws("\\s{1,}");
-    QRegExp rx("(GENRE|ARTIST|ALBUM|TRACK|TITLE|YEAR)");
-    int i = 0;
-    int old_i = 0;
-    while (i >= 0)
+    QRegularExpression rx_ws("\\s{1,}");
+    QRegularExpression rx("^(.*?)(GENRE|ARTIST|ALBUM|TRACK|TITLE|YEAR)");
+    auto match = rx.match(fntempl);
+    while (match.hasMatch())
     {
-        i = rx.indexIn(fntempl, i);
-        if (i >= 0)
-        {
-            if (i > 0)
-                filename += fixFileToken_sl(fntempl.mid(old_i,i-old_i));
-            i += rx.matchedLength();
-            old_i = i;
+        filename += match.captured(1);
 
-            if ((rx.capturedTexts().at(1) == "GENRE") && (!track->Genre().isEmpty()))
-                filename += fixFilename(track->Genre());
-
-            if ((rx.capturedTexts().at(1) == "ARTIST")
-                    && (!track->FormatArtist().isEmpty()))
-                filename += fixFilename(track->FormatArtist());
-
-            if ((rx.capturedTexts().at(1) == "ALBUM") && (!track->Album().isEmpty()))
-                filename += fixFilename(track->Album());
-
-            if ((rx.capturedTexts().at(1) == "TRACK") && (track->Track() >= 0))
-            {
-                QString tempstr = QString::number(track->Track(), 10);
-                if (track->Track() < 10)
-                    tempstr.prepend('0');
-                filename += fixFilename(tempstr);
-            }
-
-            if ((rx.capturedTexts().at(1) == "TITLE")
-                    && (!track->FormatTitle().isEmpty()))
-                filename += fixFilename(track->FormatTitle());
-
-            if ((rx.capturedTexts().at(1) == "YEAR") && (track->Year() >= 0))
-                filename += fixFilename(QString::number(track->Year(), 10));
-        }
+        if ((match.capturedRef(2) == "GENRE") &&
+            (!track->Genre().isEmpty()))
+            filename += fixFilename(track->Genre());
+        else if ((match.capturedRef(2) == "ARTIST") &&
+                 (!track->FormatArtist().isEmpty()))
+            filename += fixFilename(track->FormatArtist());
+        else if ((match.capturedRef(2) == "ALBUM") &&
+                 (!track->Album().isEmpty()))
+            filename += fixFilename(track->Album());
+        else if ((match.capturedRef(2) == "TRACK") && (track->Track() >= 0))
+            filename += fixFilename(QString("%1").arg(track->Track(), 2,10,QChar('0')));
+        else if ((match.capturedRef(2) == "TITLE") &&
+                 (!track->FormatTitle().isEmpty()))
+            filename += fixFilename(track->FormatTitle());
+        else if ((match.capturedRef(2) == "YEAR") && (track->Year() >= 0))
+            filename += fixFilename(QString::number(track->Year(), 10));
+        fntempl.remove(0, match.capturedLength());
+        match = rx.match(fntempl);
     }
 
     if (no_ws)
@@ -144,19 +130,13 @@ bool isNewTune(const QString& artist, const QString& album, const QString& title
     QString matchtitle = title;
 
     if (! matchartist.isEmpty())
-    {
-        matchartist.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"), QString("_"));
-    }
+        matchartist.replace(badChars2, QString("_"));
 
     if (! matchalbum.isEmpty())
-    {
-        matchalbum.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"), QString("_"));
-    }
+        matchalbum.replace(badChars2, QString("_"));
 
     if (! matchtitle.isEmpty())
-    {
-        matchtitle.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"), QString("_"));
-    }
+        matchtitle.replace(badChars2, QString("_"));
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString queryString("SELECT filename, artist_name,"

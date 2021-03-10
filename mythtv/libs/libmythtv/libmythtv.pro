@@ -145,6 +145,7 @@ HEADERS += livetvchain.h            playgroup.h
 HEADERS += channelsettings.h
 HEADERS += previewgenerator.h       previewgeneratorqueue.h
 HEADERS += transporteditor.h        listingsources.h
+HEADERS += restoredata.h
 HEADERS += channelgroup.h
 HEADERS += recordingrule.h
 HEADERS += mythsystemevent.h
@@ -158,6 +159,8 @@ HEADERS += metadataimagehelper.h
 HEADERS += mythavutil.h
 HEADERS += recordingfile.h
 HEADERS += driveroption.h
+HEADERS += mythhdrvideometadata.h
+HEADERS += mythhdrtracker.h
 
 SOURCES += recordinginfo.cpp
 SOURCES += dbcheck.cpp
@@ -181,6 +184,7 @@ SOURCES += livetvchain.cpp          playgroup.cpp
 SOURCES += channelsettings.cpp
 SOURCES += previewgenerator.cpp     previewgeneratorqueue.cpp
 SOURCES += transporteditor.cpp
+SOURCES += restoredata.cpp
 SOURCES += channelgroup.cpp
 SOURCES += recordingrule.cpp
 SOURCES += mythsystemevent.cpp
@@ -191,8 +195,11 @@ SOURCES += io/mythstreamingbuffer.cpp
 SOURCES += io/mythinteractivebuffer.cpp
 SOURCES += io/mythopticalbuffer.cpp
 SOURCES += metadataimagehelper.cpp
-SOURCES += mythframe.cpp            mythavutil.cpp
+SOURCES += mythframe.cpp
+SOURCES += mythavutil.cpp
 SOURCES += recordingfile.cpp
+SOURCES += mythhdrvideometadata.cpp
+SOURCES += mythhdrtracker.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -383,6 +390,7 @@ using_frontend {
     HEADERS += mythplayerstate.h
     HEADERS += mythplayeruibase.h
     HEADERS += mythplayerui.h
+    HEADERS += mythplayereditorui.h
     HEADERS += mythplayervideoui.h
     HEADERS += mythplayercaptionsui.h
     HEADERS += mythplayeroverlayui.h
@@ -406,6 +414,7 @@ using_frontend {
     SOURCES += mythplayerstate.cpp
     SOURCES += mythplayeruibase.cpp
     SOURCES += mythplayerui.cpp
+    SOURCES += mythplayereditorui.cpp
     SOURCES += mythplayervideoui.cpp
     SOURCES += mythplayercaptionsui.cpp
     SOURCES += mythplayeroverlayui.cpp

@@ -222,6 +222,8 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* R
         m_needFullClear = true;
     }
 
+    m_hdrTracker = MythHDRTracker::Create(Display);
+
     connect(this, &MythVideoOutputGPU::RefreshState,   this, &MythVideoOutputGPU::DoRefreshState);
     connect(this, &MythVideoOutputGPU::DoRefreshState, this, &MythVideoOutputGPU::RefreshVideoBoundsState);
     connect(this, &MythVideoOutputGPU::DoRefreshState,
@@ -238,6 +240,8 @@ MythVideoOutputGPU::MythVideoOutputGPU(MythMainWindow* MainWindow, MythRender* R
 
 MythVideoOutputGPU::~MythVideoOutputGPU()
 {
+    m_hdrTracker = nullptr;
+
     MythVideoOutputGPU::DestroyBuffers();
     delete m_video;
     if (m_painter)
@@ -355,13 +359,13 @@ void MythVideoOutputGPU::DoneDisplayingFrame(MythVideoFrame* Frame)
     if (!Frame)
         return;
 
-    bool retain = MythVideoFrame::HardwareFormat(Frame->m_type);
+    auto retain = MythVideoFrame::HardwareFormat(Frame->m_type);
     QVector<MythVideoFrame*> release;
 
     m_videoBuffers.BeginLock(kVideoBuffer_pause);
     while (m_videoBuffers.Size(kVideoBuffer_pause))
     {
-        MythVideoFrame* frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
+        auto * frame = m_videoBuffers.Dequeue(kVideoBuffer_pause);
         if (!retain || (frame != Frame))
             release.append(frame);
     }
@@ -584,6 +588,10 @@ void MythVideoOutputGPU::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
     if (Frame)
     {
         SetRotation(Frame->m_rotation);
+
+        if (m_hdrTracker)
+            m_hdrTracker->Update(Frame);
+
         if (MythVideoFrame::HardwareFormat(Frame->m_type) || Frame->m_dummy)
             return;
 
@@ -637,13 +645,7 @@ void MythVideoOutputGPU::RenderFrame(MythVideoFrame *Frame, FrameScanType Scan)
         m_render->SetViewPort(GetWindowRect());
 }
 
-void MythVideoOutputGPU::RenderOverlays(OSD& Osd)
-{
-    if (!IsEmbedding())
-        Osd.Draw(GetDisplayVisibleRect());
-}
-
-void MythVideoOutputGPU::UpdatePauseFrame(int64_t& DisplayTimecode, FrameScanType Scan)
+void MythVideoOutputGPU::UpdatePauseFrame(std::chrono::milliseconds& DisplayTimecode, FrameScanType Scan)
 {
     MythVideoFrame* release = nullptr;
     m_videoBuffers.BeginLock(kVideoBuffer_used);

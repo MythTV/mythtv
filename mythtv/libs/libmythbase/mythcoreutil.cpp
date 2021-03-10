@@ -235,7 +235,8 @@ QByteArray gzipUncompress(const QByteArray &data)
 
     // allocate inflate state
     z_stream strm;
-
+    strm.total_in = 0;
+    strm.total_out = 0;
     strm.zalloc   = Z_NULL;
     strm.zfree    = Z_NULL;
     strm.opaque   = Z_NULL;

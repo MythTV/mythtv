@@ -54,7 +54,6 @@
 #    include <cstdlib>       // for rand()
 #    include <ctime>
 #    include <sys/time.h>
-#    include <sys/types.h>    // suseconds_t
 #endif
 
 #ifdef _MSC_VER
@@ -299,26 +298,6 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #endif
 
 #ifdef _WIN32
-#    define    timeradd(a, b, result)                    \
-    do {                                                \
-      (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;     \
-      (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;  \
-      if ((result)->tv_usec >= 1000000)                 \
-      {                                                 \
-          ++(result)->tv_sec;                           \
-          (result)->tv_usec -= 1000000;                 \
-      }                                                 \
-  } while (0)
-#    define    timersub(a, b, result)                    \
-    do {                                                \
-      (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;     \
-      (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;  \
-      if ((result)->tv_usec < 0) {                      \
-          --(result)->tv_sec;                           \
-         (result)->tv_usec += 1000000;                  \
-      }                                                 \
-  } while (0)
-
 // TODO this stuff is not implemented yet
 #    define daemon(x, y) -1
 #    define getloadavg(x, y) -1
@@ -330,17 +309,11 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #    define WEXITSTATUS(w) (((w) >> 8) & 0xff)
 #    define WTERMSIG(w)    ((w) & 0x7f)
 
-    using suseconds_t = long;
-
 #endif // _WIN32
 
 #include <sys/param.h>  // Defines BSD on FreeBSD, Mac OS X
 
 #include "mythconfig.h"
-
-#if CONFIG_DARWIN && ! defined (_SUSECONDS_T)
-    using suseconds_t = int32_t;   // 10.3 or earlier don't have this
-#endif
 
 // Libdvdnav now uses off64_t lseek64(), which BSD/Darwin doesn't have.
 // Luckily, its lseek() is already 64bit compatible

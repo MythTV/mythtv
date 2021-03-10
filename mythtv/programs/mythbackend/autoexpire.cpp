@@ -272,7 +272,7 @@ void AutoExpire::RunExpirer(void)
     QMutexLocker locker(&m_instanceLock);
 
     // wait a little for main server to come up and things to settle down
-    Sleep(20 * 1000);
+    Sleep(20s);
 
     timer.start();
 
@@ -329,27 +329,27 @@ void AutoExpire::RunExpirer(void)
 
         TVRec::s_inputsLock.unlock();
 
-        Sleep(60 * 1000 - timer.elapsed());
+        Sleep(60s - std::chrono::milliseconds(timer.elapsed()));
     }
 }
 
-/** \fn AutoExpire::Sleep(int sleepTime)
+/**
  *  \brief Sleeps for sleepTime milliseconds; unless the expire thread
  *         is told to quit. Must be called with instance_lock held.
  *
  *  \note Will release instance_lock!
  */
-void AutoExpire::Sleep(int sleepTime)
+void AutoExpire::Sleep(std::chrono::milliseconds sleepTime)
 {
-    if (sleepTime <= 0)
+    if (sleepTime <= 0ms)
         return;
 
-    QDateTime little_tm = MythDate::current().addMSecs(sleepTime);
-    int timeleft = sleepTime;
-    while (m_expireThreadRun && (timeleft > 0))
+    QDateTime little_tm = MythDate::current().addMSecs(sleepTime.count());
+    std::chrono::milliseconds timeleft = sleepTime;
+    while (m_expireThreadRun && (timeleft > 0ms))
     {
-        m_instanceCond.wait(&m_instanceLock, timeleft);
-        timeleft = MythDate::current().secsTo(little_tm) * 1000;
+        m_instanceCond.wait(&m_instanceLock, timeleft.count());
+        timeleft = MythDate::secsInFuture(little_tm);
     }
 }
 

@@ -118,7 +118,7 @@ class AvFormatDecoder : public DecoderBase
 
     /// This is a No-op for this class.
     void WriteStoredData(MythMediaBuffer *Buffer, bool storevid,
-                         long timecodeOffset) override // DecoderBase
+                         std::chrono::milliseconds timecodeOffset) override // DecoderBase
         { (void)Buffer; (void)storevid; (void)timecodeOffset;}
 
     /// This is a No-op for this class.
@@ -151,7 +151,7 @@ class AvFormatDecoder : public DecoderBase
     int FindStreamInfo(void);
 
     int  GetNumChapters() override; // DecoderBase
-    void GetChapterTimes(QList<long long> &times) override; // DecoderBase
+    void GetChapterTimes(QList<std::chrono::seconds> &times) override; // DecoderBase
     int  GetCurrentChapter(long long framesPlayed) override; // DecoderBase
     long long GetChapter(int chapter) override; // DecoderBase
     bool DoRewind(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
@@ -159,8 +159,8 @@ class AvFormatDecoder : public DecoderBase
     void SetIdrOnlyKeyframes(bool value) override // DecoderBase
         { m_avcParser->use_I_forKeyframes(!value); }
 
-    int64_t NormalizeVideoTimecode(int64_t timecode) override; // DecoderBase
-    virtual int64_t NormalizeVideoTimecode(AVStream *st, int64_t timecode);
+    std::chrono::milliseconds NormalizeVideoTimecode(std::chrono::milliseconds timecode) override; // DecoderBase
+    virtual std::chrono::milliseconds NormalizeVideoTimecode(AVStream *st, std::chrono::milliseconds timecode);
 
     int  GetTeletextDecoderType(void) const override; // DecoderBase
 
@@ -297,10 +297,10 @@ class AvFormatDecoder : public DecoderBase
 
     uint32_t           m_startCodeState               {0xffffffff};
 
-    long long          m_lastVPts                     {0};
-    long long          m_lastAPts                     {0};
-    long long          m_lastCcPtsu                   {0};
-    long long          m_firstVPts                    {0};
+    std::chrono::milliseconds  m_lastVPts             {0ms};
+    std::chrono::milliseconds  m_lastAPts             {0ms};
+    std::chrono::microseconds  m_lastCcPtsu           {0ms};
+    std::chrono::milliseconds  m_firstVPts            {0ms};
     bool               m_firstVPtsInuse               {false};
 
     int64_t            m_faultyPts                    {0};
@@ -365,7 +365,7 @@ class AvFormatDecoder : public DecoderBase
     bool               m_resetHardwareDecoders        { false };
 
     // Value in milliseconds, from setting AudioReadAhead
-    int                m_audioReadAhead               {100};
+    std::chrono::milliseconds  m_audioReadAhead       {100ms};
 
     QMutex             m_avCodecLock                  { QMutex::Recursive };
 };

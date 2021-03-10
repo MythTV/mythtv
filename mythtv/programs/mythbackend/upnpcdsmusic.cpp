@@ -755,7 +755,7 @@ bool UPnpCDSMusic::LoadTracks(const UPnpCDSRequest *pRequest,
         int            nTrackNum    = query.value( 6).toInt();
         QString        sDescription = query.value( 7).toString();
         QString        sFileName    = query.value( 8).toString();
-        uint32_t       nLengthMS    = query.value( 9).toUInt();
+        auto           nLengthMS    = std::chrono::milliseconds(query.value( 9).toUInt());
         uint64_t       nFileSize    = query.value(10).toULongLong();
 
         int            nPlaybackCount = query.value(11).toInt();

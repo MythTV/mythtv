@@ -14,6 +14,7 @@
 
 #include "rssparse.h"
 
+using namespace std::chrono_literals;
 
 class RSSSite;
 class MPUBLIC RSSSite : public QObject
@@ -60,7 +61,7 @@ class MPUBLIC RSSSite : public QObject
     const bool& GetDownload() const { return m_download; }
     const QDateTime& GetUpdated() const { return m_updated; }
 
-    unsigned int timeSinceLastUpdate(void) const; // in minutes
+    std::chrono::minutes timeSinceLastUpdate(void) const;
 
     void insertRSSArticle(ResultItem *item);
     void clearRSSArticles(void);
@@ -131,7 +132,7 @@ class MPUBLIC RSSManager : public QObject
 
     QTimer                        *m_timer      {nullptr};
     RSSSite::rssList               m_sites;
-    uint                           m_updateFreq {6 * 3600 * 1000};
+    std::chrono::hours             m_updateFreq {6h};
     RSSSite::rssList               m_inprogress;
 };
 

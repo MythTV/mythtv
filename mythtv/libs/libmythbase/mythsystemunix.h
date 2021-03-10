@@ -19,6 +19,7 @@
 
 #include "mythsystemprivate.h"
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 #include "mythsystemlegacy.h"
 #include "mthread.h"
 
@@ -96,7 +97,7 @@ class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
         explicit MythSystemLegacyUnix(MythSystemLegacy *parent);
         ~MythSystemLegacyUnix() override = default;
 
-        void Fork(time_t timeout) override; // MythSystemLegacyPrivate
+        void Fork(std::chrono::seconds timeout) override; // MythSystemLegacyPrivate
         void Manage(void) override; // MythSystemLegacyPrivate
 
         void Term(bool force=false) override; // MythSystemLegacyPrivate
@@ -112,7 +113,7 @@ class MBASE_PUBLIC MythSystemLegacyUnix : public MythSystemLegacyPrivate
 
     private:
         pid_t       m_pid     {0};
-        time_t      m_timeout {0};
+        SystemTime  m_timeout {0s};
 
         std::array<int,3> m_stdpipe {-1, -1, -1};
 };

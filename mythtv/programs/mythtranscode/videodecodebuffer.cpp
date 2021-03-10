@@ -18,7 +18,7 @@ VideoDecodeBuffer::~VideoDecodeBuffer()
     m_runThread = false;
     m_frameWaitCond.wakeAll();
     while (m_isRunning)
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
 }
 
 void VideoDecodeBuffer::stop()
@@ -26,7 +26,7 @@ void VideoDecodeBuffer::stop()
     m_runThread = false;
     m_frameWaitCond.wakeAll();
     while (m_isRunning)
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
 }
 
 void VideoDecodeBuffer::run()

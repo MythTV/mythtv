@@ -6,7 +6,6 @@
 #include <QLocale>
 #include <QUrl>
 #include <QFileInfo>
-#include <QRegExp>
 
 #include "rssparse.h"
 #include "mythcontext.h"
@@ -707,7 +706,12 @@ const QString Parse::kGeoRSSW3 = "http://www.w3.org/2003/01/geo/wgs84_pos#";
 const QString Parse::kMediaRSS = "http://search.yahoo.com/mrss/";
 const QString Parse::kMythRSS = "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format";
 
-ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc) const
+QMap<QString, int> Parse::m_timezoneOffsets {
+    { "EDT" , -4 },
+    { "EST" , -5 }
+};
+
+ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc)
 {
     ResultItem::resultList vList;
 
@@ -730,7 +734,7 @@ ResultItem::resultList Parse::parseRSS(const QDomDocument& domDoc) const
     return vList;
 }
 
-ResultItem* Parse::ParseItem(const QDomElement& item) const
+ResultItem* Parse::ParseItem(const QDomElement& item) 
 {
     QString title("");
     QString subtitle("");
@@ -1018,7 +1022,7 @@ QDateTime Parse::GetDCDateTime(const QDomElement& parent)
     return FromRFC3339(dates.at(0).toElement().text());
 }
 
-QDateTime Parse::RFC822TimeToQDateTime(const QString& t) const
+QDateTime Parse::RFC822TimeToQDateTime(const QString& t)
 {
     if (t.size() < 20)
         return QDateTime();
@@ -1071,11 +1075,12 @@ QDateTime Parse::FromRFC3339(const QString& t)
     if (t.size() < 19)
         return QDateTime();
     QDateTime result = MythDate::fromString(t.left(19).toUpper());
-    QRegExp fractionalSeconds("(\\.)(\\d+)");
-    if (fractionalSeconds.indexIn(t) > -1)
+    static const QRegularExpression fractionalSeconds { R"(\.(\d+))" };
+    auto match = fractionalSeconds.match(t);
+    if (match.hasMatch())
     {
         bool ok = false;
-        int fractional = fractionalSeconds.cap(2).toInt(&ok);
+        int fractional = match.capturedRef(1).toInt(&ok);
         if (ok)
         {
             if (fractional < 100)
@@ -1085,14 +1090,15 @@ QDateTime Parse::FromRFC3339(const QString& t)
             result = result.addMSecs(fractional);
         }
     }
-    QRegExp timeZone(R"((\+|\-)(\d\d)(:)(\d\d)$)");
-    if (timeZone.indexIn(t) > -1)
+    static const QRegularExpression timeZone { R"((\+|\-)(\d\d):(\d\d)$)" };
+    match = timeZone.match(t);
+    if (match.hasMatch())
     {
         short int multiplier = -1;
-        if (timeZone.cap(1) == "-")
+        if (match.capturedRef(1) == "-")
             multiplier = 1;
-        int hoursShift = timeZone.cap(2).toInt();
-        int minutesShift = timeZone.cap(4).toInt();
+        int hoursShift =   match.capturedRef(2).toInt();
+        int minutesShift = match.capturedRef(3).toInt();
         result = result.addSecs(hoursShift * 3600 * multiplier + minutesShift * 60 * multiplier);
     }
     result.setTimeSpec(Qt::UTC);

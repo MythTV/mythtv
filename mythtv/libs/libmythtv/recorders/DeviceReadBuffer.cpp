@@ -280,7 +280,7 @@ void DeviceReadBuffer::IncrWritePointer(uint len)
     m_writePtr += len;
     m_writePtr  = (m_writePtr >= m_endPtr) ? m_buffer + (m_writePtr - m_endPtr) : m_writePtr;
 #if REPORT_RING_STATS
-    m_maxUsed = max(m_used, m_maxUsed);
+    m_maxUsed = std::max(m_used, m_maxUsed);
     m_avgUsed = ((m_avgUsed * m_avgBufWriteCnt) + m_used) / (m_avgBufWriteCnt+1);
     ++m_avgBufWriteCnt;
 #endif
@@ -322,7 +322,7 @@ void DeviceReadBuffer::run(void)
 
         if (!IsOpen())
         {
-            usleep(5000);
+            usleep(5ms);
             continue;
         }
 
@@ -368,7 +368,7 @@ void DeviceReadBuffer::run(void)
 
         // Slow down reading if not under load
         if (errcnt == 0 && total < throttle)
-            usleep(1000);
+            usleep(1ms);
     }
 
     ClosePipes();
@@ -393,7 +393,7 @@ bool DeviceReadBuffer::HandlePausing(void)
         if (m_readerCB)
             m_readerCB->ReaderPaused(m_streamFd);
 
-        usleep(5000);
+        usleep(5ms);
         return false;
     }
     if (IsPaused())
@@ -441,14 +441,14 @@ bool DeviceReadBuffer::Poll(void) const
         polls[1].revents = 0;
         poll_cnt = (m_wakePipe[0] >= 0) ? poll_cnt : 1;
 
-        int timeout = m_maxPollWait;
+        std::chrono::milliseconds timeout = m_maxPollWait;
         if (1 == poll_cnt)
-            timeout = 10;
+            timeout = 10ms;
         else if (m_pollTimeoutIsError)
             // subtract a bit to allow processing time.
-            timeout = std::max((int)m_maxPollWait - timer.elapsed() - 15, 10);
+            timeout = std::max(m_maxPollWait - timer.elapsed() - 15ms, 10ms);
 
-        int ret = poll(polls.data(), poll_cnt, timeout);
+        int ret = poll(polls.data(), poll_cnt, timeout.count());
 
         if (polls[0].revents & POLLHUP)
         {
@@ -485,12 +485,12 @@ bool DeviceReadBuffer::Poll(void) const
                 if ((EAGAIN == errno) || (EINTR  == errno))
                     continue; // errors that tell you to try again
 
-                usleep(2500 /*2.5 ms*/);
+                usleep(2.5ms);
             }
             else //  ret == 0
             {
                 if (m_pollTimeoutIsError &&
-                    (timer.elapsed() >= (int)m_maxPollWait))
+                    (timer.elapsed() >= m_maxPollWait))
                 {
                     LOG(VB_GENERAL, LOG_ERR, LOC + "Poll giving up 1");
                     QMutexLocker locker(&m_lock);
@@ -508,22 +508,22 @@ bool DeviceReadBuffer::Poll(void) const
             ::read(m_wakePipe[0], dummy.data(), cnt);
         }
 
-        if (m_pollTimeoutIsError && (timer.elapsed() >= (int)m_maxPollWait))
+        if (m_pollTimeoutIsError && (timer.elapsed() >= m_maxPollWait))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Poll giving up after %1ms")
-                .arg(m_maxPollWait));
+                .arg(m_maxPollWait.count()));
             QMutexLocker locker(&m_lock);
             m_error = true;
             return true;
         }
     }
 
-    int e = timer.elapsed();
-    if (e > (int)m_maxPollWait)
+    std::chrono::milliseconds e = timer.elapsed();
+    if (e > m_maxPollWait)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("Poll took an unusually long time %1 ms")
-            .arg(timer.elapsed()));
+            .arg(timer.elapsed().count()));
     }
 
     return retval;
@@ -562,7 +562,7 @@ bool DeviceReadBuffer::CheckForErrors(
             return false;
         if (EAGAIN == errno)
         {
-            usleep(2500);
+            usleep(2.5ms);
             return false;
         }
         if (EOVERFLOW == errno)
@@ -582,7 +582,7 @@ bool DeviceReadBuffer::CheckForErrors(
             return false;
         }
 
-        usleep(500);
+        usleep(500ms);
         return false;
     }
     if (len == 0)
@@ -598,7 +598,7 @@ bool DeviceReadBuffer::CheckForErrors(
 
             return false;
         }
-        usleep(500);
+        usleep(500ms);
         return false;
     }
     return true;
@@ -613,7 +613,7 @@ bool DeviceReadBuffer::CheckForErrors(
  */
 uint DeviceReadBuffer::Read(unsigned char *buf, const uint count)
 {
-    uint avail = WaitForUsed(std::min(count, (uint)m_readThreshold), 20);
+    uint avail = WaitForUsed(std::min(count, (uint)m_readThreshold), 20ms);
     size_t cnt = std::min(count, avail);
 
     if (!cnt)
@@ -664,7 +664,7 @@ uint DeviceReadBuffer::WaitForUnused(uint needed) const
             unused = GetUnused();
             if (IsPauseRequested() || !IsOpen() || !m_doRun)
                 return 0;
-            usleep(5000);
+            usleep(5ms);
         }
         if (IsPauseRequested() || !IsOpen() || !m_doRun)
             return 0;
@@ -679,7 +679,7 @@ uint DeviceReadBuffer::WaitForUnused(uint needed) const
  *  \param max_wait Number of milliseconds to wait for the needed data
  *  \return bytes available for reading
  */
-uint DeviceReadBuffer::WaitForUsed(uint needed, uint max_wait) const
+uint DeviceReadBuffer::WaitForUsed(uint needed, std::chrono::milliseconds max_wait) const
 {
     MythTimer timer;
     timer.start();
@@ -688,7 +688,7 @@ uint DeviceReadBuffer::WaitForUsed(uint needed, uint max_wait) const
     size_t avail = m_used;
     while ((needed > avail) && isRunning() &&
            !m_requestPause && !m_error && !m_eof &&
-           (timer.elapsed() < (int)max_wait))
+           (timer.elapsed() < max_wait))
     {
         m_dataWait.wait(locker.mutex(), 10);
         avail = m_used;
@@ -699,9 +699,9 @@ uint DeviceReadBuffer::WaitForUsed(uint needed, uint max_wait) const
 void DeviceReadBuffer::ReportStats(void)
 {
 #if REPORT_RING_STATS
-    static const int secs = 20;
-    static const double d1_s = 1.0 / secs;
-    if (m_lastReport.elapsed() > secs * 1000 /* msg every 20 seconds */)
+    static constexpr std::chrono::seconds secs { 20s }; // msg every 20 seconds
+    static constexpr double d1_s = 1.0 / secs.count();
+    if (m_lastReport.elapsed() > duration_cast<std::chrono::milliseconds>(secs))
     {
         QMutexLocker locker(&m_lock);
         double rsize = 100.0 / m_size;

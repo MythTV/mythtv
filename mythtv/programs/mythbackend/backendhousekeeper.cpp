@@ -415,18 +415,19 @@ bool ThemeUpdateTask::DoRun(void)
     {
 
         MythVersion = MYTH_BINARY_VERSION; // Example: 29.20161017-1
-        MythVersion.replace(QRegExp("\\.[0-9]{8,}.*"), "");
+        MythVersion.remove(QRegularExpression("\\.[0-9]{8,}.*"));
         LOG(VB_GENERAL, LOG_INFO,
             QString("Loading themes for %1").arg(MythVersion));
         result |= LoadVersion(MythVersion, LOG_ERR);
 
         // If a version of the theme for this tag exists, use it...
-        QRegExp subexp("v[0-9]+\\.([0-9]+)-*");
-        int pos = subexp.indexIn(GetMythSourceVersion());
-        if (pos > -1)
+        static const QRegularExpression subexp
+            { "v[0-9]+\\.([0-9]+)-*", QRegularExpression::CaseInsensitiveOption };
+        auto match = subexp.match(GetMythSourceVersion());
+        if (match.hasMatch())
         {
             QString subversion;
-            int idx = subexp.cap(1).toInt();
+            int idx = match.capturedRef(1).toInt();
             for ( ; idx > 0; --idx)
             {
                 subversion = MythVersion + "." + QString::number(idx);
@@ -636,13 +637,13 @@ void MythFillDatabaseTask::SetHourWindowFromDB(void)
 {
     // we need to set the time window from database settings, so we cannot
     // initialize these values in. grab them and set them afterwards
-    int min = gCoreContext->GetNumSetting("MythFillMinHour", -1);
-    int max = gCoreContext->GetNumSetting("MythFillMaxHour", 23);
+    auto min = gCoreContext->GetDurSetting<std::chrono::hours>("MythFillMinHour", -1h);
+    auto max = gCoreContext->GetDurSetting<std::chrono::hours>("MythFillMaxHour", 23h);
 
-    if (min == -1)
+    if (min == -1h)
     {
-        min = 0;
-        max = 23;
+        min = 0h;
+        max = 23h;
     }
     else
     {

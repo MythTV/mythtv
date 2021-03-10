@@ -309,9 +309,6 @@ bool MythRenderOpenGL::Init(void)
     m_maxTextureSize  = (maxtexsz) ? maxtexsz : 512;
     QSurfaceFormat fmt = format();
 
-    // RGBA16 - available on ES via extension
-    m_extraFeatures |= isOpenGLES() ? hasExtension("GL_EXT_texture_norm16") ? kGLExtRGBA16 : kGLFeatNone : kGLExtRGBA16;
-
     // Pixel buffer objects
     bool buffer_procs = reinterpret_cast<MYTH_GLMAPBUFFERPROC>(GetProcAddress("glMapBuffer")) &&
                         reinterpret_cast<MYTH_GLUNMAPBUFFERPROC>(GetProcAddress("glUnmapBuffer"));
@@ -402,7 +399,7 @@ void MythRenderOpenGL::DebugFeatures(void)
     QString qtglversion = QString("OpenGL%1 %2.%3")
             .arg(fmt.renderableType() == QSurfaceFormat::OpenGLES ? "ES" : "")
             .arg(fmt.majorVersion()).arg(fmt.minorVersion());
-    QString qtglsurface = QString("RGBA: %1%2%3%4 Depth: %5 Stencil: %6")
+    QString qtglsurface = QString("RGBA: %1:%2:%3:%4 Depth: %5 Stencil: %6")
             .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize())
             .arg(fmt.greenBufferSize()).arg(fmt.alphaBufferSize())
             .arg(fmt.depthBufferSize()).arg(fmt.stencilBufferSize());
@@ -415,6 +412,7 @@ void MythRenderOpenGL::DebugFeatures(void)
         if (m_extraFeatures & kGLComputeShaders)
             shaders << "Compute";
     }
+    const QString module = QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL ? "OpenGL (not ES)" : "OpenGL ES";
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL vendor        : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VENDOR))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL renderer      : %1").arg(reinterpret_cast<const char*>(glGetString(GL_RENDERER))));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("OpenGL version       : %1").arg(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
@@ -422,23 +420,20 @@ void MythRenderOpenGL::DebugFeatures(void)
 #ifdef USING_EGL
     bool eglfuncs = IsEGL();
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("EGL display          : %1").arg(GLYesNo(GetEGLDisplay() != nullptr)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("EGL images           : %1").arg(GLYesNo(eglfuncs)));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("EGL images           : %1").arg(GLYesNo(eglfuncs)));
 #endif
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL module     : %1").arg(module));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL format     : %1").arg(qtglversion));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt OpenGL surface    : %1").arg(qtglsurface));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture size     : %1").arg(m_maxTextureSize));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Max texture units    : %1").arg(m_maxTextureUnits));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Shaders              : %1").arg(shaders.join(",")));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Multitexturing       : %1").arg(GLYesNo(m_features & Multitexture)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Rectangular textures : %1").arg(GLYesNo(m_extraFeatures & kGLExtRects)));
-    //LOG(VB_GENERAL, LOG_INFO, LOC + QString("RGBA16 textures      : %1").arg(GLYesNo(m_extraFeatures & kGLExtRGBA16)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Framebuffer objects  : %1").arg(GLYesNo(m_features & Framebuffers)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("16bit framebuffers   : %1").arg(GLYesNo(m_extraFeatures & kGL16BitFBO)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("GL_RED/GL_R8         : %1").arg(GLYesNo(!(m_extraFeatures & kGLLegacyTextures))));
-
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Unpack Subimage      : %1").arg(GLYesNo(m_extraFeatures & kGLExtSubimage)));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Buffer mapping       : %1").arg(GLYesNo(m_extraFeatures & kGLBufferMap)));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Rectangular textures : %1").arg(GLYesNo(m_extraFeatures & kGLExtRects)));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("NPOT textures        : %1").arg(GLYesNo(m_features & NPOTTextures)));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Max texture units    : %1").arg(m_maxTextureUnits));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("GL_RED/GL_R8         : %1").arg(GLYesNo(!(m_extraFeatures & kGLLegacyTextures))));
     // warnings
     if (m_maxTextureUnits < 3)
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Warning: Insufficient texture units for some features.");
@@ -513,6 +508,14 @@ bool MythRenderOpenGL::IsReady(void)
 void MythRenderOpenGL::swapBuffers()
 {
     QOpenGLContext::swapBuffers(m_window);
+    m_swapCount++;
+}
+
+uint64_t MythRenderOpenGL::GetSwapCount()
+{
+    auto result = m_swapCount;
+    m_swapCount = 0;
+    return result;
 }
 
 void MythRenderOpenGL::SetWidget(QWidget *Widget)
@@ -1014,7 +1017,7 @@ void MythRenderOpenGL::DrawRoundRect(QOpenGLFramebufferObject *Target,
     if (edge)
     {
         float innerradius = radius - LinePen.width();
-        if (innerradius < 0.0F) innerradius = 0.0F;
+        if (innerradius < 1.0F) innerradius = 1.0F;
         m_parameters(3,0) = innerradius;
         // Adjust the size for the inner radius (edge)
         m_parameters(2,1) = halfwidth - LinePen.width();
@@ -1121,8 +1124,9 @@ QStringList MythRenderOpenGL::GetDescription(void)
     result.append(tr("OpenGL renderer") + "\t: " + reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     result.append(tr("OpenGL version")  + "\t: " + reinterpret_cast<const char*>(glGetString(GL_VERSION)));
     QSurfaceFormat fmt = format();
-    result.append(tr("Color depth (RGBA)")   + "\t: " + QString("%1%2%3%4")
-                  .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize()).arg(fmt.blueBufferSize()).arg(fmt.alphaBufferSize()));
+    result.append(tr("Color depth (RGBA)")   + "\t: " + QString("%1:%2:%3:%4")
+                  .arg(fmt.redBufferSize()).arg(fmt.greenBufferSize())
+                  .arg(fmt.blueBufferSize()).arg(fmt.alphaBufferSize()));
     return result;
 }
 

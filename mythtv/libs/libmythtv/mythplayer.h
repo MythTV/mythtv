@@ -57,7 +57,7 @@ enum TCTypes
     TC_CC
 };
 #define TCTYPESMAX 4
-using tctype_arr = std::array<int64_t,TCTYPESMAX>;
+using tctype_arr = std::array<std::chrono::milliseconds,TCTYPESMAX>;
 
 enum PlayerFlags
 {
@@ -113,7 +113,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual void InitFrameInterval();
 
     // Public Sets
-    void SetLength(int len)                   { m_totalLength = len; }
+    void SetLength(std::chrono::seconds len)  { m_totalLength = len; }
     void SetFramesPlayed(uint64_t played);
     void SetEof(EofState eof);
     void SetWatchingRecording(bool mode);
@@ -122,8 +122,8 @@ class MTV_PUBLIC MythPlayer : public QObject
                         bool ForceUpdate, int ReferenceFrames,
                         FrameScanType /*scan*/ = kScan_Ignore,
                         const QString& codecName = QString());
-    void SetFileLength(int total, int frames);
-    void SetDuration(int duration);
+    void SetFileLength(std::chrono::seconds total, int frames);
+    void SetDuration(std::chrono::seconds duration);
     void SetFrameRate(double fps);
 
     // Gets
@@ -138,7 +138,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     float   GetPlaySpeed(void) const          { return m_playSpeed; }
     AudioPlayer* GetAudio(void)               { return &m_audio; }
     float   GetNextPlaySpeed(void) const      { return m_nextPlaySpeed; }
-    int     GetLength(void) const             { return m_totalLength; }
+    std::chrono::seconds GetLength(void) const  { return m_totalLength; }
     uint64_t GetTotalFrameCount(void) const   { return m_totalFrames; }
     uint64_t GetCurrentFrameCount(void) const;
     uint64_t GetFramesPlayed(void) const      { return m_framesPlayed; }
@@ -153,7 +153,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     bool    GetLimitKeyRepeat(void) const     { return m_limitKeyRepeat; }
     EofState GetEof(void) const;
     bool    IsErrored(void) const;
-    bool    IsPlaying(uint wait_in_msec = 0, bool wait_for = true) const;
+    bool    IsPlaying(std::chrono::milliseconds wait_in_msec = 0ms,
+                      bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return m_nextNormalSpeed; }
     bool    IsReallyNearEnd(void) const;
     bool    IsNearEnd(void);
@@ -176,7 +177,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Decoder stuff..
     MythVideoFrame *GetNextVideoFrame(void);
     void DeLimboFrame(MythVideoFrame *frame);
-    virtual void ReleaseNextVideoFrame(MythVideoFrame *buffer, int64_t timecode,
+    virtual void ReleaseNextVideoFrame(MythVideoFrame *buffer, std::chrono::milliseconds timecode,
                                        bool wrap = true);
     void DiscardVideoFrame(MythVideoFrame *buffer);
     void DiscardVideoFrames(bool KeyFrame, bool Flushed);
@@ -187,17 +188,15 @@ class MTV_PUBLIC MythPlayer : public QObject
     void ForceSetupAudioStream(void);
 
     // Add data
-    virtual bool PrepareAudioSample(int64_t &timecode);
+    virtual bool PrepareAudioSample(std::chrono::milliseconds &timecode);
 
     // Public Closed caption and teletext stuff
-    virtual uint GetCaptionMode() const    { return kDisplayNone; }
     virtual CC708Reader    *GetCC708Reader(uint /*id*/=0) { return &m_cc708; }
     virtual CC608Reader    *GetCC608Reader(uint /*id*/=0) { return &m_cc608; }
     virtual SubtitleReader *GetSubReader(uint /*id*/=0) { return &m_subReader; }
     virtual TeletextReader *GetTeletextReader(uint /*id*/=0) { return &m_ttxReader; }
 
     // Public Audio/Subtitle/EIA-608/EIA-708 stream selection - thread safe
-    void EnableSubtitles(bool enable);
     void EnableForcedSubtitles(bool enable);
     bool ForcedSubtitlesFavored(void) const {
         return m_allowForcedSubtitles && !m_captionsEnabledbyDefault;
@@ -215,12 +214,12 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Chapter public stuff
     virtual int  GetNumChapters(void);
     virtual int  GetCurrentChapter(void);
-    virtual void GetChapterTimes(QList<long long> &times);
+    virtual void GetChapterTimes(QList<std::chrono::seconds> &times);
 
     // Title public stuff
     virtual int GetNumTitles(void) const { return 0; }
     virtual int GetCurrentTitle(void) const { return 0; }
-    virtual int GetTitleDuration(int /*title*/) const { return 0; }
+    virtual std::chrono::seconds GetTitleDuration(int /*title*/) const { return 0s; }
     virtual QString GetTitleName(int /*title*/) const { return QString(); }
 
     // Angle public stuff
@@ -229,8 +228,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual QString GetAngleName(int /*title*/) const { return QString(); }
 
     // DVD public stuff
-    virtual bool GoToMenu(const QString& /*str*/) { return false;     }
-    virtual void GoToDVDProgram(bool direction) { (void) direction; }
     virtual bool IsInStillFrame() const         { return false;     }
 
     // Position Map Stuff
@@ -256,9 +253,9 @@ class MTV_PUBLIC MythPlayer : public QObject
     // Complicated gets
     virtual long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
-    uint64_t TranslatePositionFrameToMs(uint64_t position,
+    std::chrono::milliseconds TranslatePositionFrameToMs(uint64_t position,
                                         bool use_cutlist) const;
-    uint64_t TranslatePositionMsToFrame(uint64_t position,
+    uint64_t TranslatePositionMsToFrame(std::chrono::milliseconds position,
                                         bool use_cutlist) const {
         return m_deleteMap.TranslatePositionMsToFrame(position,
                                                     GetFrameRate(),
@@ -274,7 +271,7 @@ class MTV_PUBLIC MythPlayer : public QObject
         return m_deleteMap.TranslatePositionRelToAbs(position);
     }
     float ComputeSecs(uint64_t position, bool use_cutlist) const {
-        return TranslatePositionFrameToMs(position, use_cutlist) / 1000.0;
+        return TranslatePositionFrameToMs(position, use_cutlist).count() / 1000.0;
     }
     uint64_t FindFrame(float offset, bool use_cutlist) const;
 
@@ -359,7 +356,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     virtual int64_t GetChapter(int chapter);
 
     // Private A/V Sync Stuff
-    void  WrapTimecode(int64_t &timecode, TCTypes tc_type);
+    void  WrapTimecode(std::chrono::milliseconds &timecode, TCTypes tc_type);
     void  SetFrameInterval(FrameScanType scan, double frame_period);
 
   protected:
@@ -427,10 +424,10 @@ class MTV_PUBLIC MythPlayer : public QObject
     int       m_videobufRetries           {0};
     uint64_t  m_framesPlayed              {0};
     uint64_t  m_totalFrames               {0};
-    long long m_totalLength               {0};
-    int64_t   m_totalDuration             {0};
+    std::chrono::seconds  m_totalLength   {0s};
+    std::chrono::seconds  m_totalDuration {0s};
     long long m_rewindTime                {0};
-    int64_t   m_latestVideoTimecode       {-1};
+    std::chrono::milliseconds  m_latestVideoTimecode {-1ms};
     MythPlayerAVSync m_avSync;
 
     // -- end state stuff --
@@ -464,8 +461,6 @@ class MTV_PUBLIC MythPlayer : public QObject
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
     bool      m_captionsEnabledbyDefault  {false};
-    bool      m_enableCaptions            {false};
-    bool      m_disableCaptions           {false};
     bool      m_enableForcedSubtitles     {false};
     bool      m_disableForcedSubtitles    {false};
     bool      m_allowForcedSubtitles      {true};
@@ -488,7 +483,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     QMutex     m_decoderLock              {QMutex::Recursive};
     float      m_nextPlaySpeed            {1.0F};
     float      m_playSpeed                {1.0F};
-    int        m_frameInterval            {static_cast<int>((1000000.0F / 30))};///< always adjusted for play_speed
+    std::chrono::microseconds m_frameInterval
+        {microsecondsFromFloat(1000000.0F / 30)};///< always adjusted for play_speed
     int        m_fpsMultiplier            {1}; ///< used to detect changes
     int        m_ffrewSkip                {1};
     int        m_ffrewAdjust              {0};
@@ -498,7 +494,7 @@ class MTV_PUBLIC MythPlayer : public QObject
 
     // Time Code stuff
     tctype_arr m_tcWrap                   {};
-    int64_t    m_savedAudioTimecodeOffset {0};
+    std::chrono::milliseconds m_savedAudioTimecodeOffset {0ms};
 
     // LiveTV
     bool m_isDummy                        {false};

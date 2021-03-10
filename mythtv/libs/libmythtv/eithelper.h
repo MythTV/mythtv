@@ -16,6 +16,7 @@
 #include <QString>
 
 // MythTV includes
+#include "mythchrono.h"
 #include "mythdeque.h"
 #include "mpegtables.h" // for GPS_LEAP_SECONDS
 
@@ -29,13 +30,13 @@ class ATSCEvent
               const unsigned char *e, uint f)
         : m_startTime(a), m_length(b), m_etm(c), m_descLength(f),
           m_title(std::move(d)), m_desc(e),
-          m_scanTime(time(nullptr)) {}
+          m_scanTime(SystemClock::now()) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for EIT events according to
         // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
         // is one minute. Consider any EIT event seen > 2 minutes in the past as stale.
-        return m_scanTime + 2 * 60 < time(nullptr);
+        return m_scanTime + 2min < SystemClock::now();
     }
 
     uint32_t             m_startTime;
@@ -47,7 +48,7 @@ class ATSCEvent
 
   private:
     // The time the event was created.
-    time_t               m_scanTime;
+    SystemTime           m_scanTime;
 };
 
 // An entry from the ETT table containing description text for an event.
@@ -55,20 +56,20 @@ class ATSCEtt
 {
   public:
     explicit ATSCEtt(QString  text) :
-        m_ett_text(std::move(text)), m_scanTime(time(nullptr)) {}
+        m_ett_text(std::move(text)), m_scanTime(SystemClock::now()) {}
 
     bool IsStale() const {
         // The minimum recommended repetition time for ETT events according to
         // http://atsc.org/wp-content/uploads/2015/03/Program-and-system-information-protocol-implementation-guidelines-for-broadcaster.pdf
         // is one minute. Consider any ETT event seen > 2 minutes in the past as stale.
-        return m_scanTime + 2 * 60 < time(nullptr);
+        return m_scanTime + 2min < SystemClock::now();
     }
 
     QString m_ett_text;
 
   private:
     // The time the ETT was created.
-    time_t m_scanTime;
+    SystemTime m_scanTime;
 };
 
 using EventIDToATSCEvent = QMap<uint,ATSCEvent> ;
@@ -140,7 +141,6 @@ class EITHelper
     mutable QMutex          m_eitListLock;
     mutable ServiceToChanID m_srvToChanid;
 
-    EITFixUp               *m_eitFixup     {nullptr};
     static EITCache        *s_eitCache;
 
     int                     m_gpsOffset    {-1 * GPS_LEAP_SECONDS};

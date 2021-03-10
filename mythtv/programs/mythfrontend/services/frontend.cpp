@@ -41,14 +41,15 @@ DTC::FrontendStatus* Frontend::GetStatus(void)
     return status;
 }
 
-bool Frontend::SendMessage(const QString &Message, uint Timeout)
+bool Frontend::SendMessage(const QString &Message, uint _Timeout)
 {
     if (Message.isEmpty())
         return false;
 
     QStringList data;
-    if (Timeout > 0 && Timeout < 1000)
-        data << QString::number(Timeout);
+    auto Timeout = std::chrono::seconds(_Timeout);
+    if (Timeout > 0s && Timeout < 1000s)
+        data << QString::number(Timeout.count());
     qApp->postEvent(GetMythMainWindow(),
                     new MythEvent(MythEvent::MythUserMessage, Message,
                     data));
@@ -79,7 +80,7 @@ bool  Frontend::SendNotification(bool  Error,
                      Message,
                      Origin.isNull() ? tr("FrontendServices") : Origin,
                      Description, Image, Extra,
-                     ProgressText, Progress, Timeout,
+                     ProgressText, Progress, std::chrono::seconds(Timeout),
                      Fullscreen, Visibility, (MythNotification::Priority)Priority);
     return true;
 }
@@ -153,7 +154,7 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
         timer.start();
         while (!timer.hasExpired(10000) &&
                (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
     }
 
     if (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox")
@@ -164,11 +165,11 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
         timer.start();
         while (!timer.hasExpired(10000) &&
                (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
 
         timer.start();
         while (!timer.hasExpired(10000) && (!MythMainWindow::IsTopScreenInitialized()))
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
     }
 
     if (GetMythUI()->GetCurrentLocation().toLower() == "playbackbox")
@@ -235,7 +236,7 @@ bool Frontend::PlayVideo(const QString &Id, bool UseBookmark)
          << metadata->GetSubtitle() << metadata->GetDirector()
          << QString::number(metadata->GetSeason())
          << QString::number(metadata->GetEpisode())
-         << metadata->GetInetRef() << QString::number(metadata->GetLength())
+         << metadata->GetInetRef() << QString::number(metadata->GetLength().count())
          << QString::number(metadata->GetYear())
          << QString::number(metadata->GetID())
          << QString::number(static_cast<int>(UseBookmark));

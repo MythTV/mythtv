@@ -19,8 +19,7 @@
 
 RSSManager::RSSManager()
 {
-    m_updateFreq = (gCoreContext->GetNumSetting(
-                       "rss.updateFreq", 6) * 3600 * 1000);
+    m_updateFreq = gCoreContext->GetDurSetting<std::chrono::hours>("rss.updateFreq", 6h);
 
     m_timer = new QTimer();
 
@@ -188,13 +187,13 @@ ResultItem::resultList RSSSite::GetVideoList(void) const
     return m_articleList;
 }
 
-unsigned int RSSSite::timeSinceLastUpdate(void) const
+std::chrono::minutes RSSSite::timeSinceLastUpdate(void) const
 {
     QMutexLocker locker(&m_lock);
 
     QDateTime curTime(MythDate::current());
-    unsigned int min = m_updated.secsTo(curTime)/60;
-    return min;
+    auto secs = std::chrono::seconds(m_updated.secsTo(curTime));
+    return duration_cast<std::chrono::minutes>(secs);
 }
 
 void RSSSite::process(void)
@@ -225,7 +224,7 @@ void RSSSite::process(void)
     {
         ResultItem::resultList items;
         Parse parser;
-        items = parser.parseRSS(domDoc);
+        items = Parse::parseRSS(domDoc);
 
         for (const auto *item : qAsConst(items))
         {

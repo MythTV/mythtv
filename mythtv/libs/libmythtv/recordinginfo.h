@@ -183,7 +183,7 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         kFakedZeroMinProgram = 3,
     };
     RecordingInfo(uint _chanid, const QDateTime &desiredts,
-                  bool genUnknown, uint maxHours = 0,
+                  bool genUnknown, std::chrono::hours maxHours = 0h,
                   LoadStatus *status = nullptr);
 
     enum SpecialRecordingGroups {

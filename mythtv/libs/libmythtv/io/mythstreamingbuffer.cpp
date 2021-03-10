@@ -46,7 +46,7 @@ long long MythStreamingBuffer::GetReadPosition(void) const
  *                     inherited from the parent class.
  *  \return Returns true if the stream was opened.
  */
-bool MythStreamingBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
+bool MythStreamingBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds /*Retry*/)
 {
     MythMediaBuffer::AVFormatInitNetwork();
 

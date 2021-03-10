@@ -130,11 +130,11 @@ class MHIContext : public MHContext, public QRunnable
     /// Stop displaying video
     void StopVideo() override; // MHContext
     // Get current stream position, -1 if unknown
-    long GetStreamPos() override; // MHContext
+    std::chrono::milliseconds GetStreamPos() override; // MHContext
     // Get current stream size, -1 if unknown
-    long GetStreamMaxPos() override; // MHContext
+    std::chrono::milliseconds GetStreamMaxPos() override; // MHContext
     // Set current stream position
-    long SetStreamPos(long pos) override; // MHContext
+    std::chrono::milliseconds SetStreamPos(std::chrono::milliseconds pos) override; // MHContext
     // Play or pause a stream
     void StreamPlay(bool play) override; // MHContext
 

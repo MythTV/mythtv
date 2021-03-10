@@ -298,7 +298,7 @@ class XMLTVGrabber : public MythUIComboBoxSetting
 
             MythSystemLegacy find_grabber_proc("tv_find_grabbers", args,
                                                 kMSStdOut | kMSRunShell);
-            find_grabber_proc.Run(25);
+            find_grabber_proc.Run(25s);
             LOG(VB_GENERAL, LOG_INFO,
                 loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
             uint status = find_grabber_proc.Wait();
@@ -393,12 +393,21 @@ class CaptureCardSpinBoxSetting : public MythUISpinBoxSetting
 {
   public:
     CaptureCardSpinBoxSetting(const CaptureCard &parent,
-                              uint min_val, uint max_val, uint step,
+                              std::chrono::milliseconds min_val,
+                              std::chrono::milliseconds max_val,
+                              std::chrono::milliseconds step,
                               const QString &setting) :
         MythUISpinBoxSetting(new CaptureCardDBStorage(this, parent, setting),
-                             min_val, max_val, step)
+                             min_val.count(), max_val.count(), step.count())
     {
     }
+    // Handles integer milliseconds (compiler converts seconds to milliseconds)
+    void setValueMs (std::chrono::milliseconds newValue)
+        { setValue(newValue.count()); }
+    // Handle non-integer seconds
+    template<typename T, typename = typename std::enable_if<!std::is_integral<T>()>>
+    void setValueMs (std::chrono::duration<T> newSecs)
+        { setValueMs(duration_cast<std::chrono::milliseconds>(newSecs)); }
 };
 
 class CaptureCardTextEditSetting : public MythUITextEditSetting
@@ -770,7 +779,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
                 uint    minor_min = 0,
                 uint    minor_max = UINT_MAX,
                 const QString& card      = QString(),
-                const QString& driver    = QString()) :
+                const QRegularExpression& driver = QRegularExpression()) :
         CaptureCardComboBoxSetting(parent, true, "videodevice")
     {
         setLabel(QObject::tr("Video device"));
@@ -806,19 +815,15 @@ class VideoDevice : public CaptureCardComboBoxSetting
         // Needed to make both compiler and doxygen happy.
         (void) absPath;
 
-        fillSelectionsFromDir(dir, 0, 255, QString(), QString(), false);
+        fillSelectionsFromDir(dir, 0, 255, QString(), QRegularExpression(), false);
     }
 
     uint fillSelectionsFromDir(const QDir& dir,
                                uint minor_min, uint minor_max,
-                               const QString& card, const QString& driver,
+                               const QString& card, const QRegularExpression& driver,
                                bool allow_duplicates)
     {
         uint cnt = 0;
-        QRegExp *driverExp = nullptr;
-        if (!driver.isEmpty())
-            driverExp = new QRegExp(driver);
-
         QFileInfoList entries = dir.entryInfoList();
         for (const auto & fi : qAsConst(entries))
         {
@@ -853,12 +858,15 @@ class VideoDevice : public CaptureCardComboBoxSetting
             {
                 QString card_name;
                 QString driver_name;
-                if (CardUtil::GetV4LInfo(videofd, card_name, driver_name) &&
-                    (!driverExp     || (driverExp->exactMatch(driver_name)))  &&
-                    (card.isEmpty() || (card_name == card)))
+                if (CardUtil::GetV4LInfo(videofd, card_name, driver_name))
                 {
-                    addSelection(filepath);
-                    cnt++;
+                    auto match = driver.match(driver_name);
+                    if ((!driver.pattern().isEmpty() || match.hasMatch()) &&
+                        (card.isEmpty() || (card_name == card)))
+                    {
+                        addSelection(filepath);
+                        cnt++;
+                    }
                 }
                 close(videofd);
             }
@@ -866,7 +874,6 @@ class VideoDevice : public CaptureCardComboBoxSetting
             // add to list of minors discovered to avoid duplicates
             m_minorList[minor_num] = 1;
         }
-        delete driverExp;
 
         return cnt;
     }
@@ -1007,31 +1014,50 @@ class AudioDevice : public CaptureCardComboBoxSetting
 class SignalTimeout : public CaptureCardSpinBoxSetting
 {
   public:
-    SignalTimeout(const CaptureCard &parent, uint value, uint min_val) :
-        CaptureCardSpinBoxSetting(parent, min_val, 60000, 250, "signal_timeout")
+    // Handles integer milliseconds (compiler converts seconds to milliseconds)
+    SignalTimeout(const CaptureCard &parent, std::chrono::milliseconds value,
+                  std::chrono::milliseconds min_val) :
+        CaptureCardSpinBoxSetting(parent, min_val, 60s, 250ms, "signal_timeout")
     {
         setLabel(QObject::tr("Signal timeout (ms)"));
-        setValue(QString::number(value));
+        setValueMs(value);
         setHelpText(QObject::tr(
                         "Maximum time (in milliseconds) MythTV waits for "
                         "a signal when scanning for channels."));
     };
+    // Handle non-integer seconds
+    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    SignalTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs) :
+        SignalTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
+    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    SignalTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs) :
+        SignalTimeout(parent,
+                      duration_cast<std::chrono::milliseconds>(value),
+                      duration_cast<std::chrono::milliseconds>(min_secs)) {};
 };
 
 class ChannelTimeout : public CaptureCardSpinBoxSetting
 {
   public:
-    ChannelTimeout(const CaptureCard &parent, uint value, uint min_val) :
-        CaptureCardSpinBoxSetting(parent, min_val, 65000, 250,
-                                  "channel_timeout")
+    // Handles integer milliseconds (compiler converts seconds to milliseconds)
+    ChannelTimeout(const CaptureCard &parent, std::chrono::milliseconds value,
+                   std::chrono::milliseconds min_val) :
+        CaptureCardSpinBoxSetting(parent, min_val, 65s, 250ms, "channel_timeout")
     {
         setLabel(QObject::tr("Tuning timeout (ms)"));
-        setValue(value);
+        setValueMs(value);
         setHelpText(QObject::tr(
                         "Maximum time (in milliseconds) MythTV waits for "
                         "a channel lock.  For recordings, if this time is "
                         "exceeded, the recording will be marked as failed."));
     };
+    // Handle non-integer seconds
+    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    ChannelTimeout(const CaptureCard &parent, std::chrono::milliseconds value, std::chrono::duration<T> min_secs) :
+        ChannelTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
+    template<typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type >
+    ChannelTimeout(const CaptureCard &parent, std::chrono::duration<T> value, std::chrono::duration<T> min_secs) :
+        ChannelTimeout(parent, value, duration_cast<std::chrono::milliseconds>(min_secs)) {};
 };
 
 class AudioRateLimit : public CaptureCardComboBoxSetting
@@ -1216,11 +1242,10 @@ class DVBTuningDelay : public CaptureCardSpinBoxSetting
 {
   public:
     explicit DVBTuningDelay(const CaptureCard &parent) :
-        CaptureCardSpinBoxSetting(parent, 0, 2000, 25, "dvb_tuning_delay")
+        CaptureCardSpinBoxSetting(parent, 0ms, 2s, 25ms, "dvb_tuning_delay")
     {
-        setValue("0");
         setLabel(QObject::tr("DVB tuning delay (ms)"));
-        setValue(static_cast<int>(true));
+        setValueMs(0ms);
         setHelpText(
             QObject::tr("Some Linux DVB drivers, in particular for the "
                         "Hauppauge Nova-T, require that we slow down "
@@ -1356,8 +1381,8 @@ static void FirewireConfigurationGroup(CaptureCard& parent, CardType& cardtype)
     cardtype.addTargetedChild("FIREWIRE", new FirewireSpeed(parent));
 #endif // USING_LINUX_FIREWIRE
 
-    cardtype.addTargetedChild("FIREWIRE", new SignalTimeout(parent, 2000, 1000));
-    cardtype.addTargetedChild("FIREWIRE", new ChannelTimeout(parent, 9000, 1750));
+    cardtype.addTargetedChild("FIREWIRE", new SignalTimeout(parent, 2s, 1s));
+    cardtype.addTargetedChild("FIREWIRE", new ChannelTimeout(parent, 9s, 1.75s));
 
     model->SetGUID(dev->getValue());
     desc->SetGUID(dev->getValue());
@@ -1452,8 +1477,8 @@ HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
 
     auto *buttonRecOpt = new GroupSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));
-    buttonRecOpt->addChild(new SignalTimeout(m_parent, 3000, 250));
-    buttonRecOpt->addChild(new ChannelTimeout(m_parent, 6000, 1750));
+    buttonRecOpt->addChild(new SignalTimeout(m_parent, 3s, 0.25s));
+    buttonRecOpt->addChild(new ChannelTimeout(m_parent, 6s, 1.75s));
     buttonRecOpt->addChild(new HDHomeRunEITScan(m_parent));
     a_cardtype.addTargetedChild("HDHOMERUN", buttonRecOpt);
 };
@@ -1605,7 +1630,7 @@ VBoxDeviceID::VBoxDeviceID(const CaptureCard &parent) :
 {
     setLabel(tr("Device ID"));
     setHelpText(tr("Device ID of VBox device"));
-    setEnabled(false);
+    setReadOnly(true);
 }
 
 void VBoxDeviceID::SetIP(const QString &ip)
@@ -1761,7 +1786,7 @@ class IPTVHost : public CaptureCardTextEditSetting
 static void IPTVConfigurationGroup(CaptureCard& parent, CardType& cardType)
 {
     cardType.addTargetedChild("FREEBOX", new IPTVHost(parent));
-    cardType.addTargetedChild("FREEBOX", new ChannelTimeout(parent, 30000, 1750));
+    cardType.addTargetedChild("FREEBOX", new ChannelTimeout(parent, 30s, 1.75s));
     cardType.addTargetedChild("FREEBOX", new EmptyAudioDevice(parent));
     cardType.addTargetedChild("FREEBOX", new EmptyVBIDevice(parent));
 }
@@ -1981,8 +2006,8 @@ VBoxConfigurationGroup::VBoxConfigurationGroup
     a_cardtype.addTargetedChild("VBOX", m_desc);
     a_cardtype.addTargetedChild("VBOX", m_cardIp);
     a_cardtype.addTargetedChild("VBOX", m_cardTuner);
-    a_cardtype.addTargetedChild("VBOX", new SignalTimeout(m_parent, 7000, 1000));
-    a_cardtype.addTargetedChild("VBOX", new ChannelTimeout(m_parent, 10000, 1750));
+    a_cardtype.addTargetedChild("VBOX", new SignalTimeout(m_parent, 7s, 1s));
+    a_cardtype.addTargetedChild("VBOX", new ChannelTimeout(m_parent, 10s, 1.75s));
 
     connect(m_cardIp,    &VBoxIP::NewIP,
             m_deviceId,  &VBoxDeviceID::SetIP);
@@ -2066,8 +2091,10 @@ CetonDeviceID::CetonDeviceID(const CaptureCard &parent) :
 
 void CetonDeviceID::SetIP(const QString &ip)
 {
-    QString regexp = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){4}$";
-    if (QRegExp(regexp).exactMatch(ip + "."))
+    static const QRegularExpression ipV4Regex
+        { "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){4}$" };
+    auto match = ipV4Regex.match(ip + ".");
+    if (match.hasMatch())
     {
         m_ip = ip;
         setValue(QString("%1-RTP.%3").arg(m_ip).arg(m_tuner));
@@ -2076,7 +2103,9 @@ void CetonDeviceID::SetIP(const QString &ip)
 
 void CetonDeviceID::SetTuner(const QString &tuner)
 {
-    if (QRegExp("^\\d$").exactMatch(tuner))
+    static const QRegularExpression oneDigit { "^\\d$" };
+    auto match = oneDigit.match(tuner);
+    if (match.hasMatch())
     {
         m_tuner = tuner;
         setValue(QString("%1-RTP.%2").arg(m_ip).arg(m_tuner));
@@ -2091,11 +2120,12 @@ void CetonDeviceID::Load(void)
 
 void CetonDeviceID::UpdateValues(void)
 {
-    QRegExp newstyle(R"(^([0-9.]+)-(\d|RTP)\.(\d)$)");
-    if (newstyle.exactMatch(getValue()))
+    QRegularExpression newstyle { R"(^([0-9.]+)-(\d|RTP)\.(\d)$)" };
+    auto match = newstyle.match(getValue());
+    if (match.hasMatch())
     {
-        emit LoadedIP(newstyle.cap(1));
-        emit LoadedTuner(newstyle.cap(3));
+        emit LoadedIP(match.captured(1));
+        emit LoadedTuner(match.captured(3));
     }
 }
 
@@ -2113,8 +2143,8 @@ void CetonSetting::CetonConfigurationGroup(CaptureCard& parent, CardType& cardty
     cardtype.addTargetedChild("CETON", tuner);
     cardtype.addTargetedChild("CETON", deviceid);
     cardtype.addTargetedChild("CETON", desc);
-    cardtype.addTargetedChild("CETON", new SignalTimeout(parent, 1000, 250));
-    cardtype.addTargetedChild("CETON", new ChannelTimeout(parent, 3000, 1750));
+    cardtype.addTargetedChild("CETON", new SignalTimeout(parent, 1s, 0.25s));
+    cardtype.addTargetedChild("CETON", new ChannelTimeout(parent, 3s, 1.75s));
 
     QObject::connect(ip,       &CetonSetting::NewValue,
                      deviceid, &CetonDeviceID::SetIP);
@@ -2128,24 +2158,42 @@ void CetonSetting::CetonConfigurationGroup(CaptureCard& parent, CardType& cardty
 }
 #endif
 
-V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent,
-                                             CardType& a_cardtype) :
-    m_parent(a_parent),
-    m_cardInfo(new TransTextEditSetting()),  m_vbiDev(new VBIDevice(m_parent))
+// Override database schema default, set schedgroup false
+class SchedGroupFalse : public MythUICheckBoxSetting
+{
+  public:
+    explicit SchedGroupFalse(const CaptureCard &parent) :
+        MythUICheckBoxSetting(new CaptureCardDBStorage(this, parent,
+                                                       "schedgroup"))
+    {
+        setValue(false);
+        setVisible(false);
+   };
+};
+
+V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& parent,
+                                             CardType& cardtype,
+                                             const QString inputtype) :
+    m_parent(parent),
+    m_cardInfo(new GroupSetting()),
+    m_vbiDev(new VBIDevice(m_parent))
 {
     setVisible(false);
-    QString drv = "(?!ivtv|hdpvr|(saa7164(.*))).*";
+    QRegularExpression drv { "^(?!ivtv|hdpvr|(saa7164(.*))).*$" };
     auto *device = new VideoDevice(m_parent, 0, 15, QString(), drv);
 
     m_cardInfo->setLabel(tr("Probed info"));
-    m_cardInfo->setEnabled(false);
+    m_cardInfo->setReadOnly(true);
 
-    a_cardtype.addTargetedChild("V4L", device);
-    a_cardtype.addTargetedChild("V4L", m_cardInfo);
-    a_cardtype.addTargetedChild("V4L", m_vbiDev);
-    a_cardtype.addTargetedChild("V4L", new AudioDevice(m_parent));
-    a_cardtype.addTargetedChild("V4L", new AudioRateLimit(m_parent));
-    a_cardtype.addTargetedChild("V4L", new SkipBtAudio(m_parent));
+    cardtype.addTargetedChild(inputtype, device);
+    cardtype.addTargetedChild(inputtype, m_cardInfo);
+    cardtype.addTargetedChild(inputtype, m_vbiDev);
+    cardtype.addTargetedChild(inputtype, new AudioDevice(m_parent));
+    cardtype.addTargetedChild(inputtype, new AudioRateLimit(m_parent));
+    cardtype.addTargetedChild(inputtype, new SkipBtAudio(m_parent));
+
+    // Override database schema default, set schedgroup false
+    cardtype.addTargetedChild(inputtype, new SchedGroupFalse(m_parent));
 
     connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,   &V4LConfigurationGroup::probeCard);
@@ -2174,24 +2222,27 @@ void V4LConfigurationGroup::probeCard(const QString &device)
     m_vbiDev->setFilter(cn, dn);
 }
 
-MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent,
-                                               CardType &a_cardtype) :
-    m_parent(a_parent),
-    m_cardInfo(new TransTextEditSetting())
+MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &parent,
+                                               CardType &cardtype) :
+    m_parent(parent),
+    m_cardInfo(new GroupSetting())
 {
     setVisible(false);
-    QString drv = "ivtv|(saa7164(.*))";
+    QRegularExpression drv { "^(ivtv|(saa7164(.*)))$" };
     m_device    = new VideoDevice(m_parent, 0, 15, QString(), drv);
     m_vbiDevice = new VBIDevice(m_parent);
     m_vbiDevice->setVisible(false);
 
     m_cardInfo->setLabel(tr("Probed info"));
-    m_cardInfo->setEnabled(false);
+    m_cardInfo->setReadOnly(true);
 
-    a_cardtype.addTargetedChild("MPEG", m_device);
-    a_cardtype.addTargetedChild("MPEG", m_vbiDevice);
-    a_cardtype.addTargetedChild("MPEG", m_cardInfo);
-    a_cardtype.addTargetedChild("MPEG", new ChannelTimeout(m_parent, 12000, 2000));
+    cardtype.addTargetedChild("MPEG", m_device);
+    cardtype.addTargetedChild("MPEG", m_vbiDevice);
+    cardtype.addTargetedChild("MPEG", m_cardInfo);
+    cardtype.addTargetedChild("MPEG", new ChannelTimeout(m_parent, 12s, 2s));
+
+    // Override database schema default, set schedgroup false
+    cardtype.addTargetedChild("MPEG", new SchedGroupFalse(m_parent));
 
     connect(m_device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,     &MPEGConfigurationGroup::probeCard);
@@ -2289,7 +2340,7 @@ ExternalConfigurationGroup::ExternalConfigurationGroup(CaptureCard &a_parent,
     a_cardtype.addTargetedChild("EXTERNAL", m_info);
 
     a_cardtype.addTargetedChild("EXTERNAL",
-                                new ChannelTimeout(m_parent, 20000, 1750));
+                                new ChannelTimeout(m_parent, 20s, 1.75s));
 
     connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,   &ExternalConfigurationGroup::probeApp);
@@ -2333,17 +2384,21 @@ HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent,
 {
     setVisible(false);
 
-    auto *device = new VideoDevice(m_parent, 0, 15, QString(), "hdpvr");
+    auto *device = new VideoDevice(m_parent, 0, 15, QString(),
+                                   QRegularExpression("^hdpvr$"));
 
     m_cardInfo->setLabel(tr("Probed info"));
-    m_cardInfo->setEnabled(false);
+    m_cardInfo->setReadOnly(true);
 
     a_cardtype.addTargetedChild("HDPVR", device);
     a_cardtype.addTargetedChild("HDPVR", new EmptyAudioDevice(m_parent));
     a_cardtype.addTargetedChild("HDPVR", new EmptyVBIDevice(m_parent));
     a_cardtype.addTargetedChild("HDPVR", m_cardInfo);
     a_cardtype.addTargetedChild("HDPVR", m_audioInput);
-    a_cardtype.addTargetedChild("HDPVR", new ChannelTimeout(m_parent, 15000, 2000));
+    a_cardtype.addTargetedChild("HDPVR", new ChannelTimeout(m_parent, 15s, 2s));
+
+    // Override database schema default, set schedgroup false
+    a_cardtype.addTargetedChild("HDPVR", new SchedGroupFalse(m_parent));
 
     connect(device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,   &HDPVRConfigurationGroup::probeCard);
@@ -2373,16 +2428,22 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
 
 V4L2encGroup::V4L2encGroup(CaptureCard &parent, CardType& cardtype) :
     m_parent(parent),
-    m_cardInfo(new TransTextEditSetting())
+    m_cardInfo(new GroupSetting())
 {
-    setLabel(QObject::tr("V4L2 encoder devices (multirec capable)"));
+    setVisible(false);
+
     m_device = new VideoDevice(m_parent, 0, 15);
 
-    cardtype.addTargetedChild("V4L2ENC", m_device);
+    setLabel(QObject::tr("V4L2 encoder devices (multirec capable)"));
+
     m_cardInfo->setLabel(tr("Probed info"));
+    m_cardInfo->setReadOnly(true);
+
+    cardtype.addTargetedChild("V4L2ENC", m_device);
     cardtype.addTargetedChild("V4L2ENC", m_cardInfo);
 
-    setVisible(false);
+    // Override database schema default, set schedgroup false
+    cardtype.addTargetedChild("V4L2ENC", new SchedGroupFalse(m_parent));
 
     connect(m_device, qOverload<const QString&>(&StandardSetting::valueChanged),
             this,     &V4L2encGroup::probeCard);
@@ -2437,7 +2498,7 @@ void V4L2encGroup::probeCard(const QString &device_name)
 
         m_device->addTargetedChild(m_driverName, new EmptyVBIDevice(m_parent));
         m_device->addTargetedChild(m_driverName,
-                                   new ChannelTimeout(m_parent, 15000, 2000));
+                                   new ChannelTimeout(m_parent, 15s, 2s));
     }
 #else
     Q_UNUSED(device_name);
@@ -2493,11 +2554,11 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
 #ifdef USING_V4L2
     cardtype->addTargetedChild("V4L2ENC", new V4L2encGroup(parent, *cardtype));
     cardtype->addTargetedChild("V4L",
-                               new V4LConfigurationGroup(parent, *cardtype));
+                               new V4LConfigurationGroup(parent, *cardtype, "V4L"));
     cardtype->addTargetedChild("MJPEG",
-                               new V4LConfigurationGroup(parent, *cardtype));
+                               new V4LConfigurationGroup(parent, *cardtype, "MJPEG"));
     cardtype->addTargetedChild("GO7007",
-                               new V4LConfigurationGroup(parent, *cardtype));
+                               new V4LConfigurationGroup(parent, *cardtype, "GO7007"));
 # ifdef USING_IVTV
     cardtype->addTargetedChild("MPEG",
                                new MPEGConfigurationGroup(parent, *cardtype));
@@ -2661,7 +2722,7 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 #ifdef USING_HDPVR
     setting->addSelection(
         QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
-# endif // USING_HDPVR
+#endif // USING_HDPVR
 #endif // USING_V4L2
 
 #ifdef USING_HDHOMERUN
@@ -2694,10 +2755,10 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 #endif // USING_IPTV
 
 #ifdef USING_V4L2
-# ifdef USING_IVTV
+#ifdef USING_IVTV
     setting->addSelection(
         QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
-# endif // USING_IVTV
+#endif // USING_IVTV
     setting->addSelection(
         QObject::tr("Analog to MJPEG encoder card (Matrox G200, DC10, etc)"), "MJPEG");
     setting->addSelection(
@@ -3778,37 +3839,37 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         case CardUtil::QPSK:
             m_cardType->setValue("DVB-S");
             m_cardName->setValue(frontend_name);
-            m_signalTimeout->setValue(7000);
-            m_channelTimeout->setValue(10000);
+            m_signalTimeout->setValueMs(7s);
+            m_channelTimeout->setValueMs(10s);
             break;
         case CardUtil::DVBS2:
             m_cardType->setValue("DVB-S2");
             m_cardName->setValue(frontend_name);
-            m_signalTimeout->setValue(7000);
-            m_channelTimeout->setValue(10000);
+            m_signalTimeout->setValueMs(7s);
+            m_channelTimeout->setValueMs(10s);
             break;
         case CardUtil::QAM:
             m_cardType->setValue("DVB-C");
             m_cardName->setValue(frontend_name);
-            m_signalTimeout->setValue(3000);
-            m_channelTimeout->setValue(6000);
+            m_signalTimeout->setValueMs(3s);
+            m_channelTimeout->setValueMs(6s);
             break;
         case CardUtil::DVBT2:
             m_cardType->setValue("DVB-T2");
             m_cardName->setValue(frontend_name);
-            m_signalTimeout->setValue(3000);
-            m_channelTimeout->setValue(6000);
+            m_signalTimeout->setValueMs(3s);
+            m_channelTimeout->setValueMs(6s);
             break;
         case CardUtil::OFDM:
         {
             m_cardType->setValue("DVB-T");
             m_cardName->setValue(frontend_name);
-            m_signalTimeout->setValue(3000);
-            m_channelTimeout->setValue(6000);
+            m_signalTimeout->setValueMs(3s);
+            m_channelTimeout->setValueMs(6s);
             if (frontend_name.toLower().indexOf("usb") >= 0)
             {
-                m_signalTimeout->setValue(40000);
-                m_channelTimeout->setValue(42500);
+                m_signalTimeout->setValueMs(40s);
+                m_channelTimeout->setValueMs(42.5s);
             }
 
             // slow down tuning for buggy drivers
@@ -3816,7 +3877,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
                 (frontend_name ==
                  "TerraTec/qanu USB2.0 Highspeed DVB-T Receiver"))
             {
-                m_tuningDelay->setValue(200);
+                m_tuningDelay->setValueMs(200ms);
             }
 
 #if 0 // frontends on hybrid DVB-T/Analog cards
@@ -3836,15 +3897,15 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             QString short_name = remove_chaff(frontend_name);
             m_cardType->setValue("ATSC");
             m_cardName->setValue(short_name);
-            m_signalTimeout->setValue(2000);
-            m_channelTimeout->setValue(4000);
+            m_signalTimeout->setValueMs(2s);
+            m_channelTimeout->setValueMs(4s);
 
             // According to #1779 and #1935 the AverMedia 180 needs
             // a 3000 ms signal timeout, at least for QAM tuning.
             if (frontend_name == "Nextwave NXT200X VSB/QAM frontend")
             {
-                m_signalTimeout->setValue(3000);
-                m_channelTimeout->setValue(5500);
+                m_signalTimeout->setValueMs(3s);
+                m_channelTimeout->setValueMs(5.5s);
             }
 
 #if 0 // frontends on hybrid DVB-T/Analog cards
@@ -3933,8 +3994,8 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent,
     m_cardName = new DVBCardName();
     m_cardType = new DVBCardType(m_parent);
 
-    m_signalTimeout = new SignalTimeout(m_parent, 500, 250);
-    m_channelTimeout = new ChannelTimeout(m_parent, 3000, 1750);
+    m_signalTimeout = new SignalTimeout(m_parent, 0.5s, 0.25s);
+    m_channelTimeout = new ChannelTimeout(m_parent, 3s, 1.75s);
 
     cardType.addTargetedChild("DVB", m_cardNum);
 
@@ -4020,8 +4081,8 @@ SatIPConfigurationGroup::SatIPConfigurationGroup
     a_cardtype.addTargetedChild("SATIP", m_tunerType);
     a_cardtype.addTargetedChild("SATIP", m_tunerIndex);
     a_cardtype.addTargetedChild("SATIP", m_deviceId);
-    a_cardtype.addTargetedChild("SATIP", new SignalTimeout(m_parent, 7000, 1000));
-    a_cardtype.addTargetedChild("SATIP", new ChannelTimeout(m_parent, 10000, 2000));
+    a_cardtype.addTargetedChild("SATIP", new SignalTimeout(m_parent, 7s, 1s));
+    a_cardtype.addTargetedChild("SATIP", new ChannelTimeout(m_parent, 10s, 2s));
     a_cardtype.addTargetedChild("SATIP", new DVBEITScan(m_parent));
 
     connect(m_deviceIdList, &SatIPDeviceIDList::NewTuner,

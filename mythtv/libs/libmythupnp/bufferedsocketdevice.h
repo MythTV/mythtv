@@ -79,7 +79,7 @@ class BufferedSocketDevice
         bool                AtEnd               ();
 
         qulonglong          BytesAvailable      (); 
-        qulonglong          WaitForMore         ( int msecs,
+        qulonglong          WaitForMore         ( std::chrono::milliseconds msecs,
                                                   bool *timeout = nullptr );
 
         qulonglong          BytesToWrite        () const;
@@ -99,7 +99,7 @@ class BufferedSocketDevice
 
         bool                CanReadLine         ();
         QString             ReadLine            ();
-        QString             ReadLine            ( int msecs );
+        QString             ReadLine            ( std::chrono::milliseconds msecs );
         qlonglong           ReadLine            ( char *data,
                                                   qulonglong maxlen );
 

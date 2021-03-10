@@ -128,7 +128,7 @@ void DTVRecorder::FinishRecording(void)
 
     if (m_curRecording)
     {
-        SetDuration((int64_t)(m_totalDuration * 1000));
+        SetDuration(millisecondsFromFloat(m_totalDuration * 1000));
         SetTotalFrames(m_framesWrittenCount);
     }
 
@@ -276,14 +276,14 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
         if (val > thresh)
         {
             QMutexLocker locker(&m_statisticsLock);
-            uint elapsed = m_timeOfLatestDataTimer.restart();
+            std::chrono::milliseconds elapsed = m_timeOfLatestDataTimer.restart();
             int interval = thresh;
-            if (elapsed > kTimeOfLatestDataIntervalTarget + 250)
+            if (elapsed > kTimeOfLatestDataIntervalTarget + 250ms)
             {
                 interval = m_timeOfLatestDataPacketInterval
                            .fetchAndStoreRelaxed(thresh * 4 / 5);
             }
-            else if (elapsed + 250 < kTimeOfLatestDataIntervalTarget)
+            else if (elapsed + 250ms < kTimeOfLatestDataIntervalTarget)
             {
                 interval = m_timeOfLatestDataPacketInterval
                            .fetchAndStoreRelaxed(thresh * 9 / 8);
@@ -294,7 +294,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
 
             LOG(VB_RECORD, LOG_DEBUG, LOC +
                 QString("Updating timeOfLatestData elapsed(%1) interval(%2)")
-                .arg(elapsed).arg(interval));
+                .arg(elapsed.count()).arg(interval));
         }
 
         // Do we have to buffer the packet for exact keyframe detection?
@@ -878,10 +878,16 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
                 tspacket->data()[i++] != 0x00 ||
                 tspacket->data()[i++] != 0x01)
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "PES start code not found in TS packet with PUSI set");
+                if (!m_pesTimer.isRunning() || m_pesTimer.elapsed() > 20000ms)
+                {
+                    m_pesTimer.restart();
+                    LOG(VB_GENERAL, LOG_ERR, LOC +
+                        "PES start code not found in TS packet with PUSI set");
+                }
                 break;
             }
+
+            m_pesTimer.stop();
 
             // bounds check
             if (i + 5 >= TSPacket::kSize)
@@ -1508,12 +1514,12 @@ bool DTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
         if (m_framesSeenCount++ == 0)
             m_recordMptsTimer.start();
 
-        if (m_recordMptsTimer.elapsed() > 500) // 0.5 seconds
+        if (m_recordMptsTimer.elapsed() > 0.5s)
         {
             UpdateFramesWritten();
             m_lastKeyframeSeen = m_framesSeenCount;
             HandleKeyframe(m_payloadBuffer.size());
-            m_recordMptsTimer.addMSecs(-500);
+            m_recordMptsTimer.addMSecs(-500ms);
         }
     }
     else if (m_streamId[pid] == 0)

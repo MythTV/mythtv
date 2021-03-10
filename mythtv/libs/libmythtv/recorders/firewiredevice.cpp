@@ -249,7 +249,7 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
             if (!SendAVCCommand(cmd, ret, -1))
                 return false;
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::this_thread::sleep_for(500ms);
         }
 
         SetLastChannel(channel);

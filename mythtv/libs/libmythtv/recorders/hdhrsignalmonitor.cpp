@@ -45,7 +45,7 @@ HDHRSignalMonitor::HDHRSignalMonitor(int db_cardnum,
     : DTVSignalMonitor(db_cardnum, _channel, _release_stream, _flags),
       m_signalToNoise    (QCoreApplication::translate("(Common)",
                           "Signal To Noise"),  "snr",
-                          0,      true,      0, 100, 0)
+                          0,      true,      0, 100, 0ms)
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
 

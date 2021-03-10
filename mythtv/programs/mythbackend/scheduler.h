@@ -181,9 +181,9 @@ class Scheduler : public MThread, public MythScheduler
 
     bool ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp);
 
-    static bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
+    static bool CheckShutdownServer(std::chrono::seconds prerollseconds, QDateTime &idleSince,
                              bool &blockShutdown, uint logmask);
-    void ShutdownServer(int prerollseconds, QDateTime &idleSince);
+    void ShutdownServer(std::chrono::seconds prerollseconds, QDateTime &idleSince);
     void PutInactiveSlavesToSleep(void);
     bool WakeUpSlave(const QString& slaveHostname, bool setWakingStatus = true);
     void WakeUpSlaves(void);
@@ -204,17 +204,17 @@ class Scheduler : public MThread, public MythScheduler
                          const QString &programid);
     bool HandleReschedule(void);
     bool HandleRunSchedulerStartup(
-        int prerollseconds, int idleWaitForRecordingTime);
-    void HandleWakeSlave(RecordingInfo &ri, int prerollseconds);
+        std::chrono::seconds prerollseconds, std::chrono::minutes idleWaitForRecordingTime);
+    void HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerollseconds);
     bool HandleRecording(RecordingInfo &ri, bool &statuschanged,
                          QDateTime &nextStartTime, QDateTime &nextWakeTime,
-                         int prerollseconds);
+                         std::chrono::seconds prerollseconds);
     void HandleRecordingStatusChange(
         RecordingInfo &ri, RecStatus::Type recStatus, const QString &details);
-    bool AssignGroupInput(RecordingInfo &ri, int prerollseconds);
+    bool AssignGroupInput(RecordingInfo &ri, std::chrono::seconds prerollseconds);
     void HandleIdleShutdown(
-        bool &blockShutdown, QDateTime &idleSince, int prerollseconds,
-        int idleTimeoutSecs, int idleWaitForRecordingTime,
+        bool &blockShutdown, QDateTime &idleSince, std::chrono::seconds prerollseconds,
+        std::chrono::seconds idleTimeoutSecs, std::chrono::minutes idleWaitForRecordingTime,
         bool statuschanged);
 
     void EnqueueMatch(uint recordid, uint sourceid, uint mplexid,
@@ -279,7 +279,7 @@ class Scheduler : public MThread, public MythScheduler
 
     QDateTime m_lastPrepareTime;
     // Delay shutdown util this time (ms since epoch);
-    int64_t m_delayShutdownTime        {0};
+    std::chrono::milliseconds m_delayShutdownTime        {0ms};
 
     OpenEndType m_openEnd;
 

@@ -485,9 +485,6 @@ bool Scheduler::FillRecordList(void)
  */
 void Scheduler::FillRecordListFromDB(uint recordid)
 {
-    struct timeval fillstart {};
-    struct timeval fillend {};
-
     MSqlQuery query(m_dbConn);
     QString thequery;
     QString where = "";
@@ -529,27 +526,24 @@ void Scheduler::FillRecordListFromDB(uint recordid)
 
     QMutexLocker locker(&m_schedLock);
 
-    gettimeofday(&fillstart, nullptr);
+    auto fillstart = nowAsDuration<std::chrono::microseconds>();
     UpdateMatches(recordid, 0, 0, QDateTime());
-    gettimeofday(&fillend, nullptr);
-    float matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    auto fillend = nowAsDuration<std::chrono::microseconds>();
+    auto matchTime = fillend - fillstart;
 
     LOG(VB_SCHEDULE, LOG_INFO, "CreateTempTables...");
     CreateTempTables();
 
-    gettimeofday(&fillstart, nullptr);
+    fillstart = nowAsDuration<std::chrono::microseconds>();
     LOG(VB_SCHEDULE, LOG_INFO, "UpdateDuplicates...");
     UpdateDuplicates();
-    gettimeofday(&fillend, nullptr);
-    float checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    fillend = nowAsDuration<std::chrono::microseconds>();
+    auto checkTime = fillend - fillstart;
 
-    gettimeofday(&fillstart, nullptr);
+    fillstart = nowAsDuration<std::chrono::microseconds>();
     FillRecordList();
-    gettimeofday(&fillend, nullptr);
-    float placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    fillend = nowAsDuration<std::chrono::microseconds>();
+    auto placeTime = fillend - fillstart;
 
     LOG(VB_SCHEDULE, LOG_INFO, "DeleteTempTables...");
     DeleteTempTables();
@@ -565,10 +559,10 @@ void Scheduler::FillRecordListFromDB(uint recordid)
     QString msg = QString("Speculative scheduled %1 items in %2 "
                           "= %3 match + %4 check + %5 place")
         .arg(m_recList.size())
-        .arg(matchTime + checkTime + placeTime, 0, 'f', 1)
-        .arg(matchTime, 0, 'f', 2)
-        .arg(checkTime, 0, 'f', 2)
-        .arg(placeTime, 0, 'f', 2);
+        .arg(duration_cast<floatsecs>(matchTime + checkTime + placeTime).count(), 0, 'f', 1)
+        .arg(duration_cast<floatsecs>(matchTime).count(), 0, 'f', 2)
+        .arg(duration_cast<floatsecs>(checkTime).count(), 0, 'f', 2)
+        .arg(duration_cast<floatsecs>(placeTime).count(), 0, 'f', 2);
     LOG(VB_GENERAL, LOG_INFO, msg);
 }
 
@@ -1903,7 +1897,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 
     EncoderLink *rctv1 = (*m_tvList)[rcinfo->GetInputID()];
     // first check the input we will be recording on...
-    bool is_busy = rctv1->IsBusy(&busy_input, -1);
+    bool is_busy = rctv1->IsBusy(&busy_input, -1s);
     if (is_busy &&
         (rcinfo->GetRecordingStatus() == RecStatus::Pending ||
          !m_sinputInfoMap[rcinfo->GetInputID()].m_schedGroup ||
@@ -1930,7 +1924,7 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
         }
 
         EncoderLink *rctv2 = (*m_tvList)[id];
-        if (rctv2->IsBusy(&busy_input, -1))
+        if (rctv2->IsBusy(&busy_input, -1s))
         {
             if ((!busy_input.m_mplexId ||
                  busy_input.m_mplexId != rcinfo->m_mplexId) &&
@@ -2024,24 +2018,24 @@ void Scheduler::run(void)
     OldRecordedFixups();
 
     // wait for slaves to connect
-    sleep(3);
+    usleep(3s);
 
     QMutexLocker lockit(&m_schedLock);
 
     ClearRequestQueue();
     EnqueueMatch(0, 0, 0, QDateTime(), "SchedulerInit");
 
-    int       prerollseconds  = 0;
-    int       wakeThreshold   = 300;
-    int       idleTimeoutSecs = 0;
-    int       idleWaitForRecordingTime = 15; // in minutes
+    std::chrono::seconds prerollseconds  = 0s;
+    std::chrono::seconds wakeThreshold   = 5min;
+    std::chrono::seconds idleTimeoutSecs = 0s;
+    std::chrono::minutes idleWaitForRecordingTime = 15min;
     bool      blockShutdown   =
         gCoreContext->GetBoolSetting("blockSDWUwithoutClient", true);
     bool      firstRun        = true;
     QDateTime nextSleepCheck  = MythDate::current();
     auto      startIter       = m_recList.begin();
     QDateTime idleSince       = QDateTime();
-    int       schedRunTime    = 0; // max scheduler run time in seconds
+    std::chrono::seconds schedRunTime = 0s; // max scheduler run time
     bool      statuschanged   = false;
     QDateTime nextStartTime   = MythDate::current().addDays(14);
     QDateTime nextWakeTime    = nextStartTime;
@@ -2060,27 +2054,27 @@ void Scheduler::run(void)
 
         nextWakeTime = std::min(nextWakeTime, nextStartTime);
         QDateTime curtime = MythDate::current();
-        int secs_to_next = curtime.secsTo(nextStartTime);
-        int sched_sleep = std::max(curtime.msecsTo(nextWakeTime), qint64(0));
-        if (idleTimeoutSecs > 0)
-            sched_sleep = std::min(sched_sleep, 15000);
+        auto secs_to_next = std::chrono::seconds(curtime.secsTo(nextStartTime));
+        auto sched_sleep = std::max(std::chrono::milliseconds(curtime.msecsTo(nextWakeTime)), 0ms);
+        if (idleTimeoutSecs > 0s)
+            sched_sleep = std::min(sched_sleep, 15000ms);
         bool haveRequests = HaveQueuedRequests();
         int const kSleepCheck = 300;
         bool checkSlaves = curtime >= nextSleepCheck;
 
         // If we're about to start a recording don't do any reschedules...
         // instead sleep for a bit
-        if ((secs_to_next > -60 && secs_to_next < schedRunTime) ||
+        if ((secs_to_next > -60s && secs_to_next < schedRunTime) ||
             (!haveRequests && !checkSlaves))
         {
-            if (sched_sleep)
+            if (sched_sleep > 0ms)
             {
                 LOG(VB_SCHEDULE, LOG_INFO,
                     QString("sleeping for %1 ms "
                             "(s2n: %2 sr: %3 qr: %4 cs: %5)")
-                    .arg(sched_sleep).arg(secs_to_next).arg(schedRunTime)
+                    .arg(sched_sleep.count()).arg(secs_to_next.count()).arg(schedRunTime.count())
                     .arg(haveRequests).arg(checkSlaves));
-                if (m_reschedWait.wait(&m_schedLock, sched_sleep))
+                if (m_reschedWait.wait(&m_schedLock, sched_sleep.count()))
                     continue;
             }
         }
@@ -2091,14 +2085,13 @@ void Scheduler::run(void)
                 // The master backend is a long lived program, so
                 // we reload some key settings on each reschedule.
                 prerollseconds  =
-                    gCoreContext->GetNumSetting("RecordPreRoll", 0);
+                    gCoreContext->GetDurSetting<std::chrono::seconds>("RecordPreRoll", 0s);
                 wakeThreshold =
-                    gCoreContext->GetNumSetting("WakeUpThreshold", 300);
+                    gCoreContext->GetDurSetting<std::chrono::seconds>("WakeUpThreshold", 5min);
                 idleTimeoutSecs =
-                    gCoreContext->GetNumSetting("idleTimeoutSecs", 0);
+                    gCoreContext->GetDurSetting<std::chrono::seconds>("idleTimeoutSecs", 0s);
                 idleWaitForRecordingTime =
-                    gCoreContext->GetNumSetting("idleWaitForRecordingTime",
-                                                15);
+                    gCoreContext->GetDurSetting<std::chrono::minutes>("idleWaitForRecordingTime", 15min);
 
                 QElapsedTimer t; t.start();
                 if (HandleReschedule())
@@ -2106,9 +2099,8 @@ void Scheduler::run(void)
                     statuschanged = true;
                     startIter = m_recList.begin();
                 }
-                int elapsed = (t.elapsed() + 999) / 1000;
-                schedRunTime = std::max(static_cast<int>(elapsed * 1.5 + 2),
-                                   schedRunTime);
+                auto elapsed = std::chrono::ceil<std::chrono::seconds>(std::chrono::milliseconds(t.elapsed()));
+                schedRunTime = std::max(elapsed + elapsed/2 + 2s, schedRunTime);
             }
 
             if (firstRun)
@@ -2173,7 +2165,7 @@ void Scheduler::run(void)
         curtime = MythDate::current();
         for (auto it = startIter; it != m_recList.end(); ++it)
         {
-            int secsleft = curtime.secsTo((*it)->GetRecordingStartTime());
+            auto secsleft = std::chrono::seconds(curtime.secsTo((*it)->GetRecordingStartTime()));
             if ((secsleft - prerollseconds) <= wakeThreshold)
                 HandleWakeSlave(**it, prerollseconds);
             else
@@ -2189,7 +2181,7 @@ void Scheduler::run(void)
         }
 
         // if idletimeout is 0, the user disabled the auto-shutdown feature
-        if ((idleTimeoutSecs > 0) && (m_mainServer != nullptr))
+        if ((idleTimeoutSecs > 0s) && (m_mainServer != nullptr))
         {
             HandleIdleShutdown(blockShutdown, idleSince, prerollseconds,
                                idleTimeoutSecs, idleWaitForRecordingTime,
@@ -2197,8 +2189,8 @@ void Scheduler::run(void)
             if (idleSince.isValid())
             {
                 nextWakeTime = MythDate::current().addSecs(
-                    (idleSince.addSecs(idleTimeoutSecs - 10) <= curtime) ? 1 :
-                    (idleSince.addSecs(idleTimeoutSecs - 30) <= curtime) ? 5 : 10);
+                    (idleSince.addSecs((idleTimeoutSecs - 10s).count()) <= curtime) ? 1 :
+                    (idleSince.addSecs((idleTimeoutSecs - 30s).count()) <= curtime) ? 5 : 10);
             }
         }
 
@@ -2291,10 +2283,7 @@ bool Scheduler::HandleReschedule(void)
     // sure our DB connection is fresh before continuing.
     m_dbConn = MSqlQuery::SchedCon();
 
-    struct timeval fillstart {};
-    struct timeval fillend {};
-
-    gettimeofday(&fillstart, nullptr);
+    auto fillstart = nowAsDuration<std::chrono::microseconds>();
     QString msg;
     bool deleteFuture = false;
     bool runCheck = false;
@@ -2390,28 +2379,25 @@ bool Scheduler::HandleReschedule(void)
             MythDB::DBError("DeleteFuture", query);
     }
 
-    gettimeofday(&fillend, nullptr);
-    float matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    auto fillend = nowAsDuration<std::chrono::microseconds>();
+    auto matchTime = fillend - fillstart;
 
     LOG(VB_SCHEDULE, LOG_INFO, "CreateTempTables...");
     CreateTempTables();
 
-    gettimeofday(&fillstart, nullptr);
+    fillstart = nowAsDuration<std::chrono::microseconds>();
     if (runCheck)
     {
         LOG(VB_SCHEDULE, LOG_INFO, "UpdateDuplicates...");
         UpdateDuplicates();
     }
-    gettimeofday(&fillend, nullptr);
-    float checkTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    fillend = nowAsDuration<std::chrono::microseconds>();
+    auto checkTime = fillend - fillstart;
 
-    gettimeofday(&fillstart, nullptr);
+    fillstart = nowAsDuration<std::chrono::microseconds>();
     bool worklistused = FillRecordList();
-    gettimeofday(&fillend, nullptr);
-    float placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                       (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+    fillend = nowAsDuration<std::chrono::microseconds>();
+    auto placeTime = fillend - fillstart;
 
     LOG(VB_SCHEDULE, LOG_INFO, "DeleteTempTables...");
     DeleteTempTables();
@@ -2431,10 +2417,10 @@ bool Scheduler::HandleReschedule(void)
     msg = QString("Scheduled %1 items in %2 "
                   "= %3 match + %4 check + %5 place")
         .arg(m_recList.size())
-        .arg(matchTime + checkTime + placeTime, 0, 'f', 1)
-        .arg(matchTime, 0, 'f', 2)
-        .arg(checkTime, 0, 'f', 2)
-        .arg(placeTime, 0, 'f', 2);
+        .arg(duration_cast<floatsecs>(matchTime + checkTime + placeTime).count(), 0, 'f', 1)
+        .arg(duration_cast<floatsecs>(matchTime).count(), 0, 'f', 2)
+        .arg(duration_cast<floatsecs>(checkTime).count(), 0, 'f', 2)
+        .arg(duration_cast<floatsecs>(placeTime).count(), 0, 'f', 2);
     LOG(VB_GENERAL, LOG_INFO, msg);
 
     // Write changed entries to oldrecorded.
@@ -2466,7 +2452,8 @@ bool Scheduler::HandleReschedule(void)
 }
 
 bool Scheduler::HandleRunSchedulerStartup(
-    int prerollseconds, int idleWaitForRecordingTime)
+    std::chrono::seconds prerollseconds,
+    std::chrono::minutes idleWaitForRecordingTime)
 {
     bool blockShutdown = true;
 
@@ -2488,8 +2475,8 @@ bool Scheduler::HandleRunSchedulerStartup(
     QDateTime curtime = MythDate::current();
     if (WasStartedAutomatically() ||
         ((firstRunIter != m_recList.end()) &&
-         ((curtime.secsTo((*firstRunIter)->GetRecordingStartTime()) -
-           prerollseconds) < (idleWaitForRecordingTime * 60))))
+         ((std::chrono::seconds(curtime.secsTo((*firstRunIter)->GetRecordingStartTime())) -
+           prerollseconds) < idleWaitForRecordingTime)))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "AUTO-Startup assumed");
         startupParam = "auto";
@@ -2516,13 +2503,13 @@ bool Scheduler::HandleRunSchedulerStartup(
 }
 
 // If a recording is about to start on a backend in a few minutes, wake it...
-void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
+void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerollseconds)
 {
-    static constexpr std::array<const int,4> kSysEventSecs = { 120, 90, 60, 30 };
+    static constexpr std::array<const std::chrono::seconds,4> kSysEventSecs = { 120s, 90s, 60s, 30s };
 
     QDateTime curtime = MythDate::current();
     QDateTime nextrectime = ri.GetRecordingStartTime();
-    int secsleft = curtime.secsTo(nextrectime);
+    auto secsleft = std::chrono::seconds(curtime.secsTo(nextrectime));
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
@@ -2541,7 +2528,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
             if (!pendingEventSent)
             {
                 SendMythSystemRecEvent(
-                    QString("REC_PENDING SECS %1").arg(secsleft), &ri);
+                    QString("REC_PENDING SECS %1").arg(secsleft.count()), &ri);
             }
 
             m_sysEvents[i].insert(sysEventKey);
@@ -2585,7 +2572,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
             EnqueuePlace("HandleWakeSlave1");
     }
     else if ((nexttv->IsWaking()) &&
-             ((secsleft - prerollseconds) < 210) &&
+             ((secsleft - prerollseconds) < 210s) &&
              (nexttv->GetSleepStatusTime().secsTo(curtime) < 300) &&
              (nexttv->GetLastWakeTime().secsTo(curtime) > 10))
     {
@@ -2598,7 +2585,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
             EnqueuePlace("HandleWakeSlave2");
     }
     else if ((nexttv->IsWaking()) &&
-             ((secsleft - prerollseconds) < 150) &&
+             ((secsleft - prerollseconds) < 150s) &&
              (nexttv->GetSleepStatusTime().secsTo(curtime) < 300))
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
@@ -2621,21 +2608,22 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, int prerollseconds)
 bool Scheduler::HandleRecording(
     RecordingInfo &ri, bool &statuschanged,
     QDateTime &nextStartTime, QDateTime &nextWakeTime,
-    int prerollseconds)
+    std::chrono::seconds prerollseconds)
 {
     if (ri.GetRecordingStatus() == ri.m_oldrecstatus)
         return false;
 
     QDateTime curtime     = MythDate::current();
     QDateTime nextrectime = ri.GetRecordingStartTime();
-    int origprerollseconds = prerollseconds;
+    std::chrono::seconds origprerollseconds = prerollseconds;
 
     if (ri.GetRecordingStatus() != RecStatus::WillRecord &&
         ri.GetRecordingStatus() != RecStatus::Pending)
     {
         // If this recording is sufficiently after nextWakeTime,
         // nothing later can shorten nextWakeTime, so stop scanning.
-        if (nextWakeTime.secsTo(nextrectime) - prerollseconds > 300)
+        auto nextwake = std::chrono::seconds(nextWakeTime.secsTo(nextrectime));
+        if (nextwake - prerollseconds > 5min)
         {
             nextStartTime = std::min(nextStartTime, nextrectime);
             return true;
@@ -2648,16 +2636,16 @@ bool Scheduler::HandleRecording(
         return false;
     }
 
-    int secsleft = curtime.secsTo(nextrectime);
+    auto secsleft = std::chrono::seconds(curtime.secsTo(nextrectime));
 
     // If we haven't reached this threshold yet, nothing later can
     // shorten nextWakeTime, so stop scanning.  NOTE: this threshold
     // needs to be shorter than the related one in SchedLiveTV().
-    if (secsleft - prerollseconds > 60)
+    if (secsleft - prerollseconds > 1min)
     {
         nextStartTime = std::min(nextStartTime, nextrectime.addSecs(-30));
         nextWakeTime = std::min(nextWakeTime,
-                            nextrectime.addSecs(-prerollseconds - 60));
+                                nextrectime.addSecs(-prerollseconds.count() - 60));
         return true;
     }
 
@@ -2670,11 +2658,11 @@ bool Scheduler::HandleRecording(
         m_lastPrepareTime = ri.GetRecordingStartTime();
     }
 
-    if (secsleft - prerollseconds > 35)
+    if (secsleft - prerollseconds > 35s)
     {
         nextStartTime = std::min(nextStartTime, nextrectime.addSecs(-30));
         nextWakeTime = std::min(nextWakeTime,
-                            nextrectime.addSecs(-prerollseconds - 35));
+                                nextrectime.addSecs(-prerollseconds.count() - 35));
         return false;
     }
 
@@ -2719,7 +2707,7 @@ bool Scheduler::HandleRecording(
 
     // Try to use preroll.  If we can't do so right now, try again in
     // a little while in case the recorder frees up.
-    if (prerollseconds > 0)
+    if (prerollseconds > 0s)
     {
         m_schedLock.unlock();
         bool isBusyRecording = IsBusyRecording(&tempri);
@@ -2729,23 +2717,23 @@ bool Scheduler::HandleRecording(
 
         if (isBusyRecording)
         {
-            if (secsleft > 5)
+            if (secsleft > 5s)
                 nextWakeTime = std::min(nextWakeTime, curtime.addSecs(5));
-            prerollseconds = 0;
+            prerollseconds = 0s;
         }
     }
 
-    if (secsleft - prerollseconds > 30)
+    if (secsleft - prerollseconds > 30s)
     {
         nextStartTime = std::min(nextStartTime, nextrectime.addSecs(-30));
         nextWakeTime = std::min(nextWakeTime,
-                            nextrectime.addSecs(-prerollseconds - 30));
+                                nextrectime.addSecs(-prerollseconds.count() - 30));
         return false;
     }
 
     if (nexttv->IsWaking())
     {
-        if (secsleft > 0)
+        if (secsleft > 0s)
         {
             LOG(VB_SCHEDULE, LOG_WARNING,
                 QString("WARNING: Slave Backend %1 has NOT come "
@@ -2812,17 +2800,17 @@ bool Scheduler::HandleRecording(
         tempri.SetRecordingStatus(RecStatus::Pending);
         ri.AddHistory(false, false, true);
         m_schedLock.unlock();
-        nexttv->RecordPending(&tempri, std::max(secsleft, 0), false);
+        nexttv->RecordPending(&tempri, std::max(secsleft, 0s), false);
         m_schedLock.lock();
         if (m_recListChanged)
             return m_recListChanged;
     }
 
-    if (secsleft - prerollseconds > 0)
+    if (secsleft - prerollseconds > 0s)
     {
         nextStartTime = std::min(nextStartTime, nextrectime);
         nextWakeTime = std::min(nextWakeTime,
-                            nextrectime.addSecs(-prerollseconds));
+                                nextrectime.addSecs(-prerollseconds.count()));
         return false;
     }
 
@@ -2902,7 +2890,7 @@ void Scheduler::HandleRecordingStatusChange(
 }
 
 bool Scheduler::AssignGroupInput(RecordingInfo &ri,
-                                 int prerollseconds)
+                                 std::chrono::seconds prerollseconds)
 {
     if (!m_sinputInfoMap[ri.GetInputID()].m_schedGroup)
         return true;
@@ -2929,8 +2917,8 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
         // recording.
         for (auto *p : m_recList)
         {
-            if (now.secsTo(p->GetRecordingStartTime()) >
-                prerollseconds + 60)
+            auto recstarttime = std::chrono::seconds(now.secsTo(p->GetRecordingStartTime()));
+            if (recstarttime > prerollseconds + 60s)
                 break;
             if (p->GetInputID() != inputid)
                 continue;
@@ -2995,7 +2983,7 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
         InputInfo busy_info;
         EncoderLink *rctv = (*m_tvList)[inputid];
         m_schedLock.unlock();
-        bool isbusy = rctv->IsBusy(&busy_info, -1);
+        bool isbusy = rctv->IsBusy(&busy_info, -1s);
         m_schedLock.lock();
         if (m_recListChanged)
             return false;
@@ -3040,24 +3028,27 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
 // Called to delay shutdown for 5 minutes
 void Scheduler::DelayShutdown()
 {
-    m_delayShutdownTime = QDateTime::currentMSecsSinceEpoch() + 5*60*1000;
+    m_delayShutdownTime = nowAsDuration<std::chrono::milliseconds>() + 5min;
 }
 
 void Scheduler::HandleIdleShutdown(
     bool &blockShutdown, QDateTime &idleSince,
-    int prerollseconds, int idleTimeoutSecs, int idleWaitForRecordingTime,
+    std::chrono::seconds prerollseconds,
+    std::chrono::seconds idleTimeoutSecs,
+    std::chrono::minutes idleWaitForRecordingTime,
     bool statuschanged)
 {
     // To ensure that one idle message is logged per 15 minutes
     uint logmask = VB_IDLE;
-    int tm = QTime::currentTime().msecsSinceStartOfDay() / 900000;
+    int now = QTime::currentTime().msecsSinceStartOfDay();
+    int tm = std::chrono::milliseconds(now) / 15min;
     if (tm != m_tmLastLog)
     {
         logmask = VB_GENERAL;
         m_tmLastLog = tm;
     }
 
-    if ((idleTimeoutSecs <= 0) || (m_mainServer == nullptr))
+    if ((idleTimeoutSecs <= 0s) || (m_mainServer == nullptr))
         return;
 
     // we release the block when a client connects
@@ -3079,7 +3070,7 @@ void Scheduler::HandleIdleShutdown(
     else
     {
         // Check for delay shutdown request
-        bool delay = (m_delayShutdownTime > QDateTime::currentMSecsSinceEpoch());
+        bool delay = (m_delayShutdownTime > nowAsDuration<std::chrono::milliseconds>());
 
         QDateTime curtime = MythDate::current();
 
@@ -3103,7 +3094,7 @@ void Scheduler::HandleIdleShutdown(
             return;
 
         // If there are active jobs, then we're not idle
-        bool activeJobs = JobQueue::HasRunningOrPendingJobs(0);
+        bool activeJobs = JobQueue::HasRunningOrPendingJobs(0min);
 
         if (!blocking && !recording && !activeJobs && !delay)
         {
@@ -3140,9 +3131,8 @@ void Scheduler::HandleIdleShutdown(
 
                 if (idleIter != m_recList.end())
                 {
-                    if ((curtime.secsTo((*idleIter)->GetRecordingStartTime()) -
-                        prerollseconds) <
-                        ((idleWaitForRecordingTime * 60) + idleTimeoutSecs))
+                    auto recstarttime = std::chrono::seconds(curtime.secsTo((*idleIter)->GetRecordingStartTime()));
+                    if ((recstarttime - prerollseconds) < (idleWaitForRecordingTime + idleTimeoutSecs))
                     {
                         LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
                                                  "a recording is due to "
@@ -3160,8 +3150,7 @@ void Scheduler::HandleIdleShutdown(
 
                     if (guideRunTime.isValid() &&
                         (guideRunTime > MythDate::current()) &&
-                        (curtime.secsTo(guideRunTime) <
-                        (idleWaitForRecordingTime * 60)))
+                        (std::chrono::seconds(curtime.secsTo(guideRunTime)) < idleWaitForRecordingTime))
                     {
                         LOG(logmask, LOG_NOTICE, "Blocking shutdown because "
                                                  "mythfilldatabase is due to "
@@ -3184,15 +3173,14 @@ void Scheduler::HandleIdleShutdown(
             if (idleSince.isValid())
             {
                 // is the machine already idling the timeout time?
-                if (idleSince.addSecs(idleTimeoutSecs) < curtime)
+                if (idleSince.addSecs(idleTimeoutSecs.count()) < curtime)
                 {
                     // are we waiting for shutdown?
                     if (m_isShuttingDown)
                     {
                         // if we have been waiting more that 60secs then assume
                         // something went wrong so reset and try again
-                        if (idleSince.addSecs(idleTimeoutSecs + 60) <
-                            curtime)
+                        if (idleSince.addSecs((idleTimeoutSecs + 60s).count()) < curtime)
                         {
                             LOG(VB_GENERAL, LOG_WARNING,
                                 "Waited more than 60"
@@ -3216,25 +3204,24 @@ void Scheduler::HandleIdleShutdown(
                 }
                 else
                 {
-                    int itime = idleSince.secsTo(curtime);
+                    auto itime = std::chrono::seconds(idleSince.secsTo(curtime));
                     QString msg;
-                    if (itime <= 1)
+                    if (itime <= 1s)
                     {
                         msg = QString("I\'m idle now... shutdown will "
                                       "occur in %1 seconds.")
-                            .arg(idleTimeoutSecs);
+                            .arg(idleTimeoutSecs.count());
                         LOG(VB_GENERAL, LOG_NOTICE, msg);
                         MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
-                                     .arg(idleTimeoutSecs));
+                                     .arg(idleTimeoutSecs.count()));
                         gCoreContext->dispatch(me);
                     }
                     else
                     {
-                        msg = QString("%1 secs left to system shutdown!")
-                            .arg(idleTimeoutSecs - itime);
+                        int remain = (idleTimeoutSecs - itime).count();
+                        msg = QString("%1 secs left to system shutdown!").arg(remain);
                         LOG(logmask, LOG_NOTICE, msg);
-                        MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
-                                     .arg(idleTimeoutSecs - itime));
+                        MythEvent me(QString("SHUTDOWN_COUNTDOWN %1").arg(remain));
                         gCoreContext->dispatch(me);
                     }
                 }
@@ -3269,7 +3256,8 @@ void Scheduler::HandleIdleShutdown(
 }
 
 //returns true, if the shutdown is not blocked
-bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
+bool Scheduler::CheckShutdownServer(std::chrono::seconds prerollseconds,
+                                    QDateTime &idleSince,
                                     bool &blockShutdown, uint logmask)
 {
     (void)prerollseconds;
@@ -3327,7 +3315,8 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
     return retval;
 }
 
-void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
+void Scheduler::ShutdownServer(std::chrono::seconds prerollseconds,
+                               QDateTime &idleSince)
 {
     m_isShuttingDown = true;
 
@@ -3345,7 +3334,7 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
     {
         RecordingInfo *nextRecording = (*recIter);
         restarttime = nextRecording->GetRecordingStartTime()
-            .addSecs((-1) * prerollseconds);
+            .addSecs(-prerollseconds.count());
     }
     // Check if we need to wake up to grab guide data
     QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
@@ -3441,8 +3430,8 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
 void Scheduler::PutInactiveSlavesToSleep(void)
 {
-    int prerollseconds = 0;
-    int secsleft = 0;
+    std::chrono::seconds prerollseconds = 0s;
+    std::chrono::seconds secsleft = 0s;
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
 
@@ -3459,12 +3448,12 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     LOG(VB_SCHEDULE, LOG_INFO,
         "Scheduler, Checking for slaves that can be shut down");
 
-    int sleepThreshold =
-        gCoreContext->GetNumSetting( "SleepThreshold", 60 * 45);
+    auto sleepThreshold =
+        gCoreContext->GetDurSetting<std::chrono::seconds>( "SleepThreshold", 45min);
 
     LOG(VB_SCHEDULE, LOG_DEBUG,
         QString("  Getting list of slaves that will be active in the "
-                "next %1 minutes.") .arg(sleepThreshold / 60));
+                "next %1 minutes.") .arg(duration_cast<std::chrono::minutes>(sleepThreshold).count()));
 
     LOG(VB_SCHEDULE, LOG_DEBUG, "Checking scheduler's reclist");
     QDateTime curtime = MythDate::current();
@@ -3478,8 +3467,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
             pginfo->GetRecordingStatus() != RecStatus::Pending)
             continue;
 
-        secsleft = curtime.secsTo(
-            pginfo->GetRecordingStartTime()) - prerollseconds;
+        auto recstarttime = std::chrono::seconds(curtime.secsTo(pginfo->GetRecordingStartTime()));
+        secsleft = recstarttime - prerollseconds;
         if (secsleft > sleepThreshold)
             continue;
 
@@ -3494,7 +3483,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
                 {
                     LOG(VB_SCHEDULE, LOG_DEBUG,
                         QString("    Slave %1 will be in use in %2 minutes")
-                            .arg(enc->GetHostName()) .arg(secsleft / 60));
+                            .arg(enc->GetHostName())
+                            .arg(duration_cast<std::chrono::minutes>(secsleft).count()));
                 }
                 else
                 {
@@ -3527,7 +3517,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
 
     LOG(VB_SCHEDULE, LOG_DEBUG, QString("  Shutting down slaves which will "
         "be inactive for the next %1 minutes and can be put to sleep.")
-            .arg(sleepThreshold / 60));
+            .arg(sleepThreshold.count() / 60));
 
     for (auto * enc : qAsConst(*m_tvList))
     {
@@ -3955,9 +3945,6 @@ static QString progfindid = QString(
 void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
                               const QDateTime &maxstarttime)
 {
-    struct timeval dbstart {};
-    struct timeval dbend {};
-
     MSqlQuery query(m_dbConn);
     MSqlBindings bindings;
     QString deleteClause;
@@ -4096,7 +4083,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query %1...")
                 .arg(clause));
 
-        gettimeofday(&dbstart, nullptr);
+        auto dbstart = nowAsDuration<std::chrono::microseconds>();
         MSqlQuery result(m_dbConn);
         result.prepare(query2);
 
@@ -4107,7 +4094,8 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         }
 
         bool ok = result.exec();
-        gettimeofday(&dbend, nullptr);
+        auto dbend = nowAsDuration<std::chrono::microseconds>();
+        auto dbTime = dbend - dbstart;
 
         if (!ok)
         {
@@ -4117,8 +4105,7 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
 
         LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- %1 results in %2 sec.")
                 .arg(result.size())
-                .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
-                      (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
+                .arg(duration_cast<std::chrono::seconds>(dbTime).count()));
 
     }
 
@@ -4303,9 +4290,6 @@ void Scheduler::AddNewRecords(void)
     if (schedTmpRecord == "record")
         schedTmpRecord = "sched_temp_record";
 
-    struct timeval dbstart {};
-    struct timeval dbend {};
-
     RecList tmpList;
 
     QMap<int, bool> cardMap;
@@ -4489,20 +4473,20 @@ void Scheduler::AddNewRecords(void)
 
     LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query..."));
 
-    gettimeofday(&dbstart, nullptr);
+    auto dbstart = nowAsDuration<std::chrono::microseconds>();
     result.prepare(query);
     if (!result.exec())
     {
         MythDB::DBError("AddNewRecords", result);
         return;
     }
-    gettimeofday(&dbend, nullptr);
+    auto dbend = nowAsDuration<std::chrono::microseconds>();
+    auto dbTime = dbend - dbstart;
 
     LOG(VB_SCHEDULE, LOG_INFO,
         QString(" |-- %1 results in %2 sec. Processing...")
             .arg(result.size())
-            .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
-                  (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
+            .arg(duration_cast<std::chrono::seconds>(dbTime).count()));
 
     RecordingInfo *lastp = nullptr;
 
@@ -4723,8 +4707,6 @@ void Scheduler::AddNewRecords(void)
 
 void Scheduler::AddNotListed(void) {
 
-    struct timeval dbstart {};
-    struct timeval dbend {};
     RecList tmpList;
 
     QString query = QString(
@@ -4755,11 +4737,12 @@ void Scheduler::AddNotListed(void) {
 
     LOG(VB_SCHEDULE, LOG_INFO, QString(" |-- Start DB Query..."));
 
-    gettimeofday(&dbstart, nullptr);
+    auto dbstart = nowAsDuration<std::chrono::microseconds>();
     MSqlQuery result(m_dbConn);
     result.prepare(query);
     bool ok = result.exec();
-    gettimeofday(&dbend, nullptr);
+    auto dbend = nowAsDuration<std::chrono::microseconds>();
+    auto dbTime = dbend - dbstart;
 
     if (!ok)
     {
@@ -4770,8 +4753,7 @@ void Scheduler::AddNotListed(void) {
     LOG(VB_SCHEDULE, LOG_INFO,
         QString(" |-- %1 results in %2 sec. Processing...")
             .arg(result.size())
-            .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
-                  (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
+            .arg(duration_cast<std::chrono::seconds>(dbTime).count()));
 
     while (result.next())
     {
@@ -5086,7 +5068,7 @@ int Scheduler::FillRecordingDir(
     {
         if (cnt++ % 20 == 0)
             LOG(VB_SCHEDULE, LOG_WARNING, "Waiting for main server.");
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
     }
 
     int fsID = -1;
@@ -5128,7 +5110,8 @@ int Scheduler::FillRecordingDir(
                                         : (int)(-1.99 * weightPerRecording));
     int remoteStartingWeight =
             gCoreContext->GetNumSetting("SGweightRemoteStarting", 0);
-    int maxOverlap = gCoreContext->GetNumSetting("SGmaxRecOverlapMins", 3) * 60;
+    std::chrono::seconds maxOverlap =
+        gCoreContext->GetDurSetting<std::chrono::minutes>("SGmaxRecOverlapMins", 3min);
 
     FillDirectoryInfoCache();
 
@@ -5227,7 +5210,7 @@ int Scheduler::FillRecordingDir(
 
                     if (recUsage == kRecorderInUseID)
                     {
-                        if (recEnd > recstartts.addSecs(maxOverlap))
+                        if (recEnd > recstartts.addSecs(maxOverlap.count()))
                         {
                             weightOffset += weightPerRecording;
                             recsCounted << QString::number(recChanid) + ":" +
@@ -5589,13 +5572,13 @@ void Scheduler::FillDirectoryInfoCache(void)
 
 void Scheduler::SchedLiveTV(void)
 {
-    int prerollseconds = gCoreContext->GetNumSetting("RecordPreRoll", 0);
+    auto prerollseconds = gCoreContext->GetDurSetting<std::chrono::seconds>("RecordPreRoll", 0s);
     QDateTime curtime = MythDate::current();
-    int secsleft = curtime.secsTo(m_livetvTime);
+    auto secsleft = std::chrono::seconds(curtime.secsTo(m_livetvTime));
 
     // This check needs to be longer than the related one in
     // HandleRecording().
-    if (secsleft - prerollseconds > 120)
+    if (secsleft - prerollseconds > 120s)
         return;
 
     // Build a list of active livetv programs
@@ -5613,7 +5596,7 @@ void Scheduler::SchedLiveTV(void)
         // Get the program that will be recording on this channel at
         // record start time and assume this LiveTV session continues
         // for at least another 30 minutes from now.
-        auto *dummy = new RecordingInfo(in.m_chanId, m_livetvTime, true, 4);
+        auto *dummy = new RecordingInfo(in.m_chanId, m_livetvTime, true, 4h);
         dummy->SetRecordingStartTime(m_schedTime);
         if (m_schedTime.secsTo(dummy->GetRecordingEndTime()) < 1800)
             dummy->SetRecordingEndTime(m_schedTime.addSecs(1800));
@@ -5651,21 +5634,20 @@ bool Scheduler::WasStartedAutomatically()
     // if we don't have a valid startup time assume we were started manually
     if (startupTime.isValid())
     {
-        int startupSecs = gCoreContext->GetNumSetting("StartupSecsBeforeRecording");
+        auto startupSecs = gCoreContext->GetDurSetting<std::chrono::seconds>("StartupSecsBeforeRecording");
+        startupSecs = std::max(startupSecs, 15 * 60s);
         // If we started within 'StartupSecsBeforeRecording' OR 15 minutes
         // of the saved wakeup time assume we either started automatically
         // to record, to obtain guide data or or for a
         // daily wakeup/shutdown period
-        if (abs(startupTime.secsTo(MythDate::current())) <
-            std::max(startupSecs, 15 * 60))
+        if (abs(MythDate::secsInPast(startupTime)) < startupSecs)
         {
             LOG(VB_GENERAL, LOG_INFO,
                 "Close to auto-start time, AUTO-Startup assumed");
 
             QString str = gCoreContext->GetSetting("MythFillSuggestedRunTime");
             QDateTime guideRunTime = MythDate::fromString(str);
-            if (guideRunTime.secsTo(MythDate::current()) <
-                std::max(startupSecs, 15 * 60))
+            if (MythDate::secsInPast(guideRunTime) < startupSecs)
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     "Close to MythFillDB suggested run time, AUTO-Startup to fetch guide data?");

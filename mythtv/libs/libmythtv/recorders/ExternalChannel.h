@@ -53,7 +53,7 @@ class ExternalChannel : public DTVChannel
         { return true; }
 
   private:
-    int                      m_tuneTimeout { -1 };
+    std::chrono::milliseconds m_tuneTimeout { -1ms };
     bool                     m_backgroundTuning {false};
     QString                  m_device;
     QStringList              m_args;

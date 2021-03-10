@@ -10,6 +10,7 @@
 
 // MythTV
 #include "mythtvexp.h"
+#include "mythchrono.h"
 #include "mythconfig.h"
 #include "mthread.h"
 
@@ -53,13 +54,13 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
   public:
     static MythMediaBuffer *Create(const QString &Filename, bool Write,
                                    bool UseReadAhead = true,
-                                   int  Timeout = kDefaultOpenTimeout,
+                                   std::chrono::milliseconds Timeout = kDefaultOpenTimeout,
                                    bool StreamOnly = false);
     ~MythMediaBuffer() override = 0;
     MythBufferType GetType() const;
 
-    static const int kDefaultOpenTimeout;
-    static const int kLiveTVOpenTimeout;
+    static constexpr std::chrono::milliseconds kDefaultOpenTimeout {  2s };
+    static constexpr std::chrono::milliseconds kLiveTVOpenTimeout  { 10s };
     static QString   BitrateToString     (uint64_t Rate, bool Hz = false);
     static void      AVFormatInitNetwork (void);
 
@@ -130,8 +131,8 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     virtual bool      IsInMenu          (void) const { return false; }
     virtual bool      IsInStillFrame    (void) const { return false; }
     virtual bool      IsInDiscMenuOrStillFrame(void) const { return IsInMenu() || IsInStillFrame(); }
-    virtual bool      HandleAction      (const QStringList &/*Action*/, int64_t /*Frame*/) { return false; }
-    virtual bool      OpenFile          (const QString &Filename, uint Retry = static_cast<uint>(kDefaultOpenTimeout)) = 0;
+    virtual bool      HandleAction      (const QStringList &/*Action*/, mpeg::chrono::pts /*Pts*/) { return false; }
+    virtual bool      OpenFile          (const QString &Filename, std::chrono::milliseconds Retry = kDefaultOpenTimeout) = 0;
     virtual bool      ReOpen            (const QString& /*Filename*/ = "") { return false; }
 
   protected:
@@ -144,7 +145,7 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
     int      ReadPriv              (void *Buffer, int Count, bool Peek);
     int      ReadDirect            (void *Buffer, int Count, bool Peek);
     bool     WaitForReadsAllowed   (void);
-    int      WaitForAvail          (int Count, int Timeout);
+    int      WaitForAvail          (int Count, std::chrono::milliseconds Timeout);
     int      ReadBufFree           (void) const;
     int      ReadBufAvail          (void) const;
     void     ResetReadAhead        (long long NewInternal);
@@ -222,9 +223,9 @@ class MTV_PUBLIC MythMediaBuffer : protected MThread
 
     bool                   m_bitrateMonitorEnabled { false };
     QMutex                 m_decoderReadLock;
-    QMap<qint64, uint64_t> m_decoderReads;
+    QMap<std::chrono::milliseconds, uint64_t> m_decoderReads;
     QMutex                 m_storageReadLock;
-    QMap<qint64, uint64_t> m_storageReads;
+    QMap<std::chrono::milliseconds, uint64_t> m_storageReads;
 
     // note 1: numfailures is modified with only a read lock in the
     // read ahead thread, but this is safe since all other places

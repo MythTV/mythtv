@@ -13,7 +13,7 @@ class AudioBuffer
     AudioBuffer(const AudioBuffer &old);
     ~AudioBuffer();
 
-    void appendData(unsigned char *buffer, int len, int frames, long long time);
+    void appendData(unsigned char *buffer, int len, int frames, std::chrono::milliseconds time);
     char *data(void) const { return (char *)m_buffer; }
     int   size(void) const { return m_size; }
 
@@ -21,7 +21,7 @@ class AudioBuffer
     int         m_size     {0};
     int         m_realsize {ABLOCK_SIZE};
     int         m_frames   {0};
-    long long   m_time     {-1};
+    std::chrono::milliseconds   m_time     {-1ms};
 };
 
 /**
@@ -38,17 +38,17 @@ class AudioReencodeBuffer : public AudioOutput
     void      Reconfigure(const AudioSettings &settings) override; // AudioOutput
     void      SetEffDsp(int dsprate) override; // AudioOutput
     void      Reset(void) override; // AudioOutput
-    bool      AddFrames(void *buffer, int frames, int64_t timecode) override; // AudioOutput
-    bool      AddData(void *buffer, int len, int64_t timecode,
+    bool      AddFrames(void *buffer, int frames, std::chrono::milliseconds timecode) override; // AudioOutput
+    bool      AddData(void *buffer, int len, std::chrono::milliseconds timecode,
                       int frames) override; // AudioOutput
-    AudioBuffer      *GetData(long long time);
-    long long         GetSamples(long long time);
-    void      SetTimecode(int64_t timecode) override; // AudioOutput
+    AudioBuffer      *GetData(std::chrono::milliseconds time);
+    long long         GetSamples(std::chrono::milliseconds time);
+    void      SetTimecode(std::chrono::milliseconds timecode) override; // AudioOutput
     bool      IsPaused(void) const override         { return false; } // AudioOutput
     void      Pause(bool paused) override           { (void)paused; } // AudioOutput
     void      PauseUntilBuffered(void) override     { } // AudioOutput
     void      Drain(void) override                  { } // AudioOutput
-    int64_t   GetAudiotime(void) override           { return m_last_audiotime; } // AudioOutput
+    std::chrono::milliseconds GetAudiotime(void) override { return m_last_audiotime; } // AudioOutput
     int       GetVolumeChannel(int /*channel*/) const override  { return 100; } // VolumeBase
     void      SetVolumeChannel(int /*channel*/, int /*volume*/) override   { } // VolumeBase
     uint      GetCurrentVolume(void) const override { return 100; } // VolumeBase
@@ -71,7 +71,7 @@ class AudioReencodeBuffer : public AudioOutput
     int                  m_channels        {-1};
     int                  m_bytes_per_frame {-1};
     int                  m_eff_audiorate   {-1};
-    long long            m_last_audiotime  {0};
+    std::chrono::milliseconds m_last_audiotime  {0ms};
     bool                 m_passthru        {false};
     int                  m_audioFrameSize  {0};
 

@@ -12,7 +12,8 @@
 #define LOC QString("MythSingleDownload: ")
 
 bool MythSingleDownload::DownloadURL(const QUrl &url, QByteArray *buffer,
-                                     uint timeout, uint redirs, qint64 maxsize, QString *final_url)
+                                     std::chrono::seconds timeout,
+                                     uint redirs, qint64 maxsize, QString *final_url)
 {
     m_lock.lock();
 

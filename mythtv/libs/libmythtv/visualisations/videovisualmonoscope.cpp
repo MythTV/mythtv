@@ -24,7 +24,7 @@ void VideoVisualMonoScope::InitCommon(QRect Area)
     m_hue = 0.0;
     m_area = Area;
     m_rate = 1.0;
-    m_lastTime = QDateTime::currentMSecsSinceEpoch();
+    m_lastTime = nowAsDuration<std::chrono::milliseconds>();
     m_lineWidth = qMax(1.0F, m_area.height() * 0.004F);
 }
 
@@ -71,8 +71,8 @@ bool VideoVisualMonoScope::UpdateVertices(float* Buffer)
 void VideoVisualMonoScope::UpdateTime()
 {
     // try and give a similar rate of transitions for different playback speeds
-    auto timenow = QDateTime::currentMSecsSinceEpoch();
-    m_rate = (timenow - m_lastTime);
+    auto timenow = nowAsDuration<std::chrono::milliseconds>();
+    m_rate = (timenow - m_lastTime).count();
     m_lastTime = timenow;
     m_hue += m_rate / 7200.0F;
     if (m_hue > 1.0F)

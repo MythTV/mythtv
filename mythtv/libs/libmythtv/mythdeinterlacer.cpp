@@ -217,7 +217,7 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
     m_frame->width  = Frame->m_width;
     m_frame->height = Frame->m_height;
     m_frame->format = Frame->m_pixFmt;
-    m_frame->pts    = Frame->m_timecode;
+    m_frame->pts    = Frame->m_timecode.count();
 
     auto AddFrame = [](AVFilterContext* Source, AVFrame* AvFrame)
         { return av_buffersrc_add_frame(Source, AvFrame); };
@@ -264,7 +264,7 @@ void MythDeinterlacer::Filter(MythVideoFrame *Frame, FrameScanType Scan,
                                   MythVideoFrame::GetHeightForPlane(m_inputType, m_frame->height, plane));
     }
 
-    Frame->m_timecode = m_frame->pts;
+    Frame->m_timecode = std::chrono::milliseconds(m_frame->pts);
     Frame->m_alreadyDeinterlaced = true;
 
     // Free frame data

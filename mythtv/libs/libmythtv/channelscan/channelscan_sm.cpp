@@ -68,11 +68,11 @@
 /// SDT's should be sent every 2 seconds and NIT's every
 /// 10 seconds, so lets wait at least 30 seconds, in
 /// case of bad transmitter or lost packets.
-const uint ChannelScanSM::kDVBTableTimeout  = 30 * 1000;
+const std::chrono::milliseconds ChannelScanSM::kDVBTableTimeout  = 30s;
 /// No logic here, lets just wait at least 10 seconds.
-const uint ChannelScanSM::kATSCTableTimeout = 10 * 1000;
+const std::chrono::milliseconds ChannelScanSM::kATSCTableTimeout = 10s;
 /// No logic here, lets just wait at least 15 seconds.
-const uint ChannelScanSM::kMPEGTableTimeout = 15 * 1000;
+const std::chrono::milliseconds ChannelScanSM::kMPEGTableTimeout = 15s;
 
 // Freesat and Sky
 static const uint kRegionUndefined = 0xFFFF;        // Not regional
@@ -143,8 +143,8 @@ class ScannedChannelInfo
 
 ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
                              const QString &_cardtype, ChannelBase *_channel,
-                             int _sourceID, uint signal_timeout,
-                             uint channel_timeout, QString _inputname,
+                             int _sourceID, std::chrono::milliseconds signal_timeout,
+                             std::chrono::milliseconds channel_timeout, QString _inputname,
                              bool test_decryption)
     : // Set in constructor
       m_scanMonitor(_scan_monitor),
@@ -472,16 +472,16 @@ void ChannelScanSM::HandleSDT(uint /*tsid*/, const ServiceDescriptionTable *sdt)
                                SetFreesatAdditionalSI(true);
         m_setOtherTables = true;
         // The whole BAT & SDTo group comes round in 10s
-        m_otherTableTimeout = 10000;
+        m_otherTableTimeout = 10s;
         // Delay processing the SDT until we've seen BATs and SDTos
-        m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
+        m_otherTableTime = std::chrono::milliseconds(m_timer.elapsed()) + m_otherTableTimeout;
 
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
             QString("SDT has OriginalNetworkID %1, look for "
                     "additional Freesat SI").arg(sdt->OriginalNetworkID()));
     }
 
-    if (!m_timer.hasExpired(m_otherTableTime))
+    if (!m_timer.hasExpired(m_otherTableTime.count()))
     {
         // Set the version for the SDT so we see it again.
         GetDTVSignalMonitor()->GetDVBStreamData()->
@@ -525,7 +525,7 @@ void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
             .arg(bat->Section()).arg(bat->LastSection()));
     LogLines(bat->toString());
 
-    m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
+    m_otherTableTime = std::chrono::milliseconds(m_timer.elapsed()) + m_otherTableTimeout;
 
     for (uint i = 0; i < bat->TransportStreamCount(); ++i)
     {
@@ -579,7 +579,7 @@ void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
             .arg(tsid).arg(sdt->Section()).arg(sdt->LastSection()));
     LogLines(sdt->toString());
 
-    m_otherTableTime = m_timer.elapsed() + m_otherTableTimeout;
+    m_otherTableTime = std::chrono::milliseconds(m_timer.elapsed()) + m_otherTableTimeout;
 
     uint netid = sdt->OriginalNetworkID();
 
@@ -903,7 +903,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     // DVB
     if ((!wait_until_complete || sd->HasCachedAllNIT()) &&
         (m_currentInfo->m_nits.empty() ||
-         m_timer.hasExpired(m_otherTableTime)))
+         m_timer.hasExpired(m_otherTableTime.count())))
     {
         m_currentInfo->m_nits = sd->GetCachedNIT();
     }
@@ -926,7 +926,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
     if ((!wait_until_complete || sd->HasCachedAllBATs()) &&
         (m_currentInfo->m_bats.empty() ||
-         m_timer.hasExpired(m_otherTableTime)))
+         m_timer.hasExpired(m_otherTableTime.count())))
     {
         m_currentInfo->m_bats = sd->GetCachedBATs();
     }
@@ -1110,7 +1110,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             msg = QString("%1, %2").arg(chan_tr).arg(msg);
         }
         else if ((m_current != m_scanTransports.end()) &&
-                 m_timer.hasExpired((*m_current).m_timeoutTune) &&
+                 m_timer.hasExpired((*m_current).m_timeoutTune.count()) &&
                  sm && !sm->HasSignalLock())
         {
             msg_tr = QObject::tr("%1, no signal").arg(chan_tr);
@@ -1132,7 +1132,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         m_currentEncryptionStatusChecked.clear();
 
         m_setOtherTables = false;
-        m_otherTableTime = 0;
+        m_otherTableTime = 0ms;
 
         if (m_scanning)
         {
@@ -1970,7 +1970,7 @@ void ChannelScanSM::StartScanner(void)
     while (m_scannerThread)
     {
         m_threadExit = true;
-        if (m_scannerThread->wait(1000))
+        if (m_scannerThread->wait(1s))
         {
             delete m_scannerThread;
             m_scannerThread = nullptr;
@@ -2033,7 +2033,7 @@ bool ChannelScanSM::HasTimedOut(void)
 #endif // USING_DVB
 
     // have the tables have timed out?
-    if (m_timer.hasExpired(m_channelTimeout))
+    if (m_timer.hasExpired(m_channelTimeout.count()))
     {
         // the channelTimeout alone is only valid if we have seen no tables..
         const ScanStreamData *sd = nullptr;
@@ -2044,18 +2044,18 @@ bool ChannelScanSM::HasTimedOut(void)
             return true;
 
         if (sd->HasCachedAnyNIT() || sd->HasCachedAnySDTs())
-            return m_timer.hasExpired(kDVBTableTimeout);
+            return m_timer.hasExpired(kDVBTableTimeout.count());
         if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
-            return m_timer.hasExpired(kATSCTableTimeout);
+            return m_timer.hasExpired(kATSCTableTimeout.count());
         if (sd->HasCachedAnyPAT() || sd->HasCachedAnyPMTs())
-            return m_timer.hasExpired(kMPEGTableTimeout);
+            return m_timer.hasExpired(kMPEGTableTimeout.count());
 
         return true;
     }
 
     // ok the tables haven't timed out, but have we hit the signal timeout?
     SignalMonitor *sm = GetSignalMonitor();
-    if (m_timer.hasExpired((*m_current).m_timeoutTune) &&
+    if (m_timer.hasExpired((*m_current).m_timeoutTune.count()) &&
         sm && !sm->HasSignalLock())
     {
         const ScanStreamData *sd = nullptr;
@@ -2264,7 +2264,7 @@ void ChannelScanSM::StopScanner(void)
     while (m_scannerThread)
     {
         m_threadExit = true;
-        if (m_scannerThread->wait(1000))
+        if (m_scannerThread->wait(1s))
         {
             delete m_scannerThread;
             m_scannerThread = nullptr;
@@ -2606,7 +2606,7 @@ bool ChannelScanSM::ScanCurrentTransport(const QString &sistandard)
     m_scanTransports.clear();
     m_nextIt = m_scanTransports.end();
 
-    m_signalTimeout = 30000;
+    m_signalTimeout = 30s;
     QString name;
     TransportScanItem item(m_sourceID, sistandard, name, 0, m_signalTimeout);
     m_scanTransports.push_back(item);

@@ -62,7 +62,6 @@ extern "C" {
 
 static QMutex                  logQueueMutex;
 static QQueue<LoggingItem *>   logQueue;
-static QRegExp                 logRegExp = QRegExp("[%]{1,2}");
 
 static LoggerThread           *logThread = nullptr;
 static QMutex                  logThreadMutex;
@@ -123,26 +122,6 @@ void resetLogging(void)
     verboseInit();
 }
 
-void loggingGetTimeStamp(qlonglong *epoch, uint *usec)
-{
-#if HAVE_GETTIMEOFDAY
-    struct timeval tv {};
-    gettimeofday(&tv, nullptr);
-    *epoch = tv.tv_sec;
-    if (usec)
-        *usec  = tv.tv_usec;
-#else
-    /* Stupid system has no gettimeofday, use less precise QDateTime */
-    QDateTime date = MythDate::current();
-    *epoch = date.toTime_t();
-    if (usec)
-    {
-        QTime     time = date.time();
-        *usec  = time.msec() * 1000;
-    }
-#endif
-}
-
 LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
         ReferenceCounter("LoggingItem", false),
@@ -150,7 +129,7 @@ LoggingItem::LoggingItem(const char *_file, const char *_function,
         m_line(_line), m_type(_type), m_level(_level),
         m_file(_file), m_function(_function)
 {
-    loggingGetTimeStamp(&m_epoch, &m_usec);
+    m_epoch = nowAsDuration<std::chrono::microseconds>();
     setThreadTid();
 }
 
@@ -221,17 +200,17 @@ void LoggingItem::setThreadTid(void)
 }
 
 /// \brief Convert numerical timestamp to a readable date and time.
-QString LoggingItem::getTimestamp (void) const
+QString LoggingItem::getTimestamp (const char *format) const
 {
-    QDateTime epoch = QDateTime::fromSecsSinceEpoch(m_epoch);
-    QString timestamp = epoch.toString("yyyy-MM-dd HH:mm:ss");
+    QDateTime epoch = QDateTime::fromMSecsSinceEpoch(m_epoch.count()/1000);
+    QString timestamp = epoch.toString(format);
     return timestamp;
 }
 
-QString LoggingItem::getTimestampUs (void) const
+QString LoggingItem::getTimestampUs (const char *format) const
 {
-    QString timestamp = getTimestamp();
-    timestamp += QString(".%1").arg(m_usec,6,10,QChar('0'));
+    QString timestamp = getTimestamp(format);
+    timestamp += QString(".%1").arg((m_epoch % 1s).count(),6,10,QChar('0'));
     return timestamp;
 }
 

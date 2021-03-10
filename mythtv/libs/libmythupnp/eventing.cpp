@@ -71,7 +71,7 @@ Eventing::Eventing(const QString &sExtensionName,
     HttpServerExtension(sExtensionName, sSharePath),
     m_sEventMethodName(std::move(sEventMethodName)),
     m_nSubscriptionDuration(
-        UPnp::GetConfiguration()->GetValue("UPnP/SubscriptionDuration", 1800))
+        UPnp::GetConfiguration()->GetDuration<std::chrono::seconds>("UPnP/SubscriptionDuration", 30min))
 {
     m_nSupportedMethods |= (RequestTypeSubscribe | RequestTypeUnsubscribe);
 }
@@ -235,11 +235,11 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
 
         sCallBack = sCallBack.mid( 1, sCallBack.indexOf(">") - 1);
 
-        int nDuration = m_nSubscriptionDuration;
+        std::chrono::seconds nDuration = m_nSubscriptionDuration;
         if ( sTimeout.startsWith("Second-") )
         {
             bool ok = false;
-            int nValue = sTimeout.section("-", 1).toInt(&ok);
+            auto nValue = std::chrono::seconds(sTimeout.section("-", 1).toInt(&ok));
             if (ok)
                 nDuration = nValue;
         }
@@ -281,7 +281,7 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
                                                     .arg( pInfo->m_sUUID );
 
         pRequest->m_mapRespHeaders[ "TIMEOUT"] = QString( "Second-%1" )
-                                                    .arg( pInfo->m_nDuration );
+                                                    .arg( pInfo->m_nDuration.count() );
 
         pRequest->m_nResponseStatus = 200;
 
@@ -325,8 +325,7 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
 
 void Eventing::Notify()
 {
-    TaskTime tt;
-    gettimeofday( (&tt), nullptr );
+    auto tt = nowAsDuration<std::chrono::microseconds>();
 
     m_mutex.lock();
 
@@ -416,7 +415,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         auto *pEventTask = new UPnpEventTask(QHostAddress(pInfo->m_qURL.host()),
                                              nPort, pBuffer);
 
-        TaskQueue::Instance()->AddTask( 250, pEventTask );
+        TaskQueue::Instance()->AddTask( 250ms, pEventTask );
 
         pEventTask->DecrRef();
 
@@ -426,7 +425,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
         pInfo->IncrementKey();
 
-        gettimeofday( (&pInfo->m_ttLastNotified), nullptr );
+        pInfo->m_ttLastNotified = nowAsDuration<std::chrono::microseconds>();
     }
 }
 

@@ -112,7 +112,7 @@ class MHEngine: public MHEG {
 
     // Run synchronous actions and process any asynchronous events until the queues are empty.
     // Returns the number of milliseconds until wake-up or 0 if none.
-    int RunAll(void) override; // MHEG
+    std::chrono::milliseconds RunAll(void) override; // MHEG
 
     // Run synchronous actions.
     void RunActions();

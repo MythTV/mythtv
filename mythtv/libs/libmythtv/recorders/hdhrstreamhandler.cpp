@@ -135,9 +135,10 @@ void HDHRStreamHandler::run(void)
     QElapsedTimer last_update;
     while (m_runningDesired && !m_bError)
     {
-        int elapsed = !last_update.isValid() ? -1 : last_update.elapsed();
-        elapsed = (elapsed < 0) ? 1000 : elapsed;
-        if (elapsed > 100)
+        auto elapsed = !last_update.isValid()
+            ? -1ms : std::chrono::milliseconds(last_update.elapsed());
+        elapsed = (elapsed < 0ms) ? 1s : elapsed;
+        if (elapsed > 100ms)
         {
             UpdateFiltersFromStreamData();
             if (m_tuneMode != hdhrTuneModeVChannel)
@@ -155,7 +156,7 @@ void HDHRStreamHandler::run(void)
 
         if (!data_buffer)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            std::this_thread::sleep_for(20ms);
             continue;
         }
 

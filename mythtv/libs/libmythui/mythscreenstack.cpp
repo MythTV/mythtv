@@ -11,8 +11,6 @@
 #include <QString>
 #include <QTimer>
 
-using namespace std::chrono_literals;
-
 const int kFadeVal = 20;
 
 MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,

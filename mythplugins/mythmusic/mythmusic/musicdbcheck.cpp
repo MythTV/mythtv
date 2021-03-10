@@ -947,8 +947,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "ALTER TABLE music_directories DEFAULT CHARACTER SET utf8;",
             "ALTER TABLE music_genres DEFAULT CHARACTER SET utf8;",
             "ALTER TABLE music_playlists DEFAULT CHARACTER SET utf8;",
-            "ALTER TABLE music_smartplaylist_categories"
-            " DEFAULT CHARACTER SET utf8;",
+            "ALTER TABLE music_smartplaylist_categories DEFAULT CHARACTER SET utf8;",
             "ALTER TABLE music_smartplaylist_items DEFAULT CHARACTER SET utf8;",
             "ALTER TABLE music_smartplaylists DEFAULT CHARACTER SET utf8;",
             "ALTER TABLE music_songs DEFAULT CHARACTER SET utf8;",

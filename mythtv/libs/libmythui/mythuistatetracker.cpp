@@ -40,7 +40,7 @@ void MythUIStateTracker::GetState(QVariantMap &State)
 
 void MythUIStateTracker::GetFreshState(QVariantMap &State)
 {
-    if (MythUIStateTracker::TimeSinceLastUpdate() < 500)
+    if (MythUIStateTracker::TimeSinceLastUpdate() < 500ms)
     {
         MythUIStateTracker::GetState(State);
         return;
@@ -50,17 +50,17 @@ void MythUIStateTracker::GetFreshState(QVariantMap &State)
     qApp->postEvent(GetMythMainWindow(), event);
 
     int tries = 0;
-    while ((tries++ < 100) && (MythUIStateTracker::TimeSinceLastUpdate() >= 500))
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    while ((tries++ < 100) && (MythUIStateTracker::TimeSinceLastUpdate() >= 500ms))
+        std::this_thread::sleep_for(10ms);
 
     MythUIStateTracker::GetState(State);
 }
 
-int MythUIStateTracker::TimeSinceLastUpdate()
+std::chrono::milliseconds MythUIStateTracker::TimeSinceLastUpdate()
 {
     auto * state = MythUIStateTracker::GetMythUIStateTracker();
     gUIStateLock.lock();
-    int age = state->m_lastUpdated.msecsTo(QTime::currentTime());
+    auto age = std::chrono::milliseconds(state->m_lastUpdated.msecsTo(QTime::currentTime()));
     gUIStateLock.unlock();
-    return age < 0 ? 1000000 : age;
+    return age < 0ms ? 1000s : age;
 }

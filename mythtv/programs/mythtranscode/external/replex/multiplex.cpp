@@ -298,7 +298,15 @@ static void writeout_video(multiplex_t *mx)
 	//estimate next pts based on bitrate of this stream and data written
 	viu->dts = uptsdiff(viu->dts + ((nlength*viu->ptsrate)>>8), 0);
 
-	write(mx->fd_out, outbuf.data(), written);
+	if (write(mx->fd_out, outbuf.data(), written) != written) {
+	  mx->error++;
+	  if (mx->error <= 0) mx->error = 1; // avoid int rollover to zero
+	  if (mx->error < 10) { // mythtv#244: log only first few failures
+	    LOG(VB_GENERAL, LOG_ERR,
+		QString("%1 writes failed: %2")
+		.arg(mx->error).arg(strerror(errno)));
+          }
+	}
 
 #ifdef OUT_DEBUG
 	LOG(VB_GENERAL, LOG_DEBUG, "VPTS");
@@ -578,7 +586,8 @@ void check_times( multiplex_t *mx, int *video_ok, aok_arr &ext_ok, int *start)
         (void)set_ok;
 #endif
 }
-void write_out_packs( multiplex_t *mx, int video_ok, aok_arr &ext_ok)
+
+int write_out_packs( multiplex_t *mx, int video_ok, aok_arr &ext_ok)
 {
 	if (video_ok && use_video(mx->viu.dts + mx->video_delay,
 	    mx->ext, ext_ok, mx->extcnt)) {
@@ -594,10 +603,10 @@ void write_out_packs( multiplex_t *mx, int video_ok, aok_arr &ext_ok)
 			writeout_padding(mx);
 		}
 	}
-	
+	return mx->error;
 }
 
-void finish_mpg(multiplex_t *mx)
+int finish_mpg(multiplex_t *mx)
 {
 	int start=0;
 	int video_ok = 0;
@@ -642,9 +651,18 @@ void finish_mpg(multiplex_t *mx)
 	if (mx->otype == REPLEX_MPEG2)
 		write(mx->fd_out, mpeg_end.data(), 4);
 
+	if (close(mx->fd_out) < 0) {
+	  mx->error++;	    // mythtv#244: close could fail on full disk
+	  if (mx->error <= 0) mx->error = 1; // avoid int rollover to zero
+	  LOG(VB_GENERAL, LOG_ERR,
+	      QString("close failed: %1")
+	      .arg(strerror(errno)));
+	}
+
 	dummy_destroy(&mx->vdbuf);
 	for (int i=0; i<mx->extcnt;i++)
 		dummy_destroy(&mx->ext[i].dbuf);
+	return mx->error;
 }
 
 static int get_ts_video_overhead(int pktsize, sequence_t *seq)
@@ -686,6 +704,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 	int i = 0;
 	uint32_t data_rate = 0;
 
+	mx->error = 0; // mythtv#244: added to catch full disk write failures
 	mx->fill_buffers = fill_buffers;
 	mx->video_delay = video_delay;
 	mx->audio_delay = audio_delay;

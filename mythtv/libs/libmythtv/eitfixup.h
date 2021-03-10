@@ -5,8 +5,6 @@
 #ifndef EITFIXUP_H
 #define EITFIXUP_H
 
-#include <QRegExp>
-
 #include "programdata.h"
 
 /// EIT Fix Up Functions
@@ -72,9 +70,11 @@ class MTV_PUBLIC EITFixUp
         kFixGreekCategories  = 1U << 31,
     };
 
-    EITFixUp();
+    EITFixUp() = default;
 
-    void Fix(DBEventEIT &event) const;
+    static void Fix(DBEventEIT &event);
+
+    static int parseRoman (QString roman);
 
     /** Corrects starttime to the multiple of a minute. 
      *  Used for providers who fail to handle leap seconds timely. Changes the
@@ -90,178 +90,36 @@ class MTV_PUBLIC EITFixUp
     }
 
   private:
-    void FixBellExpressVu(DBEventEIT &event) const; // Canada DVB-S
+    static void FixBellExpressVu(DBEventEIT &event);// Canada DVB-S
     static void SetUKSubtitle(DBEventEIT &event);
     static void FixUK(DBEventEIT &event);           // UK DVB-T
     static void FixPBS(DBEventEIT &event);          // USA ATSC
-    void FixComHem(DBEventEIT &event,
-                   bool process_subtitle) const;    // Sweden DVB-C
+    static void FixComHem(DBEventEIT &event,
+                          bool process_subtitle);   // Sweden DVB-C
     static void FixAUStar(DBEventEIT &event);       // Australia DVB-S
-    void FixAUFreeview(DBEventEIT &event) const;    // Australia DVB-T
+    static void FixAUFreeview(DBEventEIT &event);   // Australia DVB-T
     static void FixAUNine(DBEventEIT &event);
     static void FixAUSeven(DBEventEIT &event);
     static void FixAUDescription(DBEventEIT &event);
-    void FixMCA(DBEventEIT &event) const;           // MultiChoice Africa DVB-S
-    void FixRTL(DBEventEIT &event) const;           // RTL group DVB
+    static void FixMCA(DBEventEIT &event);          // MultiChoice Africa DVB-S
+    static void FixRTL(DBEventEIT &event);          // RTL group DVB
     static void FixPRO7(DBEventEIT &event);         // Pro7/Sat1 Group
     static void FixDisneyChannel(DBEventEIT &event);// Disney Channel
     static void FixATV(DBEventEIT &event);          // ATV/ATV2
-    void FixFI(DBEventEIT &event) const;            // Finland DVB-T
+    static void FixFI(DBEventEIT &event);           // Finland DVB-T
     static void FixPremiere(DBEventEIT &event);     // german pay-tv Premiere
-    void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
+    static void FixNL(DBEventEIT &event);           // Netherlands DVB-C
     static void FixCategory(DBEventEIT &event);     // Generic Category fixes
-    void FixNO(DBEventEIT &event) const;            // Norwegian DVB-S
-    void FixNRK_DVBT(DBEventEIT &event) const;      // Norwegian NRK DVB-T
-    void FixDK(DBEventEIT &event) const;            // Danish YouSee DVB-C
+    static void FixNO(DBEventEIT &event);           // Norwegian DVB-S
+    static void FixNRK_DVBT(DBEventEIT &event);     // Norwegian NRK DVB-T
+    static void FixDK(DBEventEIT &event);           // Danish YouSee DVB-C
     static void FixStripHTML(DBEventEIT &event);    // Strip HTML tags
     static void FixGreekSubtitle(DBEventEIT &event);// Greek Nat TV fix
-    void FixGreekEIT(DBEventEIT &event) const;
-    void FixGreekCategories(DBEventEIT &event) const; // Greek categories from descr.
+    static void FixGreekEIT(DBEventEIT &event);
+    static void FixGreekCategories(DBEventEIT &event);// Greek categories from descr.
     static void FixUnitymedia(DBEventEIT &event);     // handle cast/crew from Unitymedia
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
-
-    const QRegExp m_bellYear;
-    const QRegExp m_bellActors;
-    const QRegExp m_bellPPVTitleAllDayHD;
-    const QRegExp m_bellPPVTitleAllDay;
-    const QRegExp m_bellPPVTitleHD;
-    const QRegExp m_bellPPVSubtitleAllDay;
-    const QRegExp m_bellPPVDescriptionAllDay;
-    const QRegExp m_bellPPVDescriptionAllDay2;
-    const QRegExp m_bellPPVDescriptionEventId;
-    const QRegExp m_dishPPVTitleHD;
-    const QRegExp m_dishPPVTitleColon;
-    const QRegExp m_dishPPVSpacePerenEnd;
-    const QRegExp m_dishDescriptionNew;
-    const QRegExp m_dishDescriptionFinale;
-    const QRegExp m_dishDescriptionFinale2;
-    const QRegExp m_dishDescriptionPremiere;
-    const QRegExp m_dishDescriptionPremiere2;
-    const QRegExp m_dishPPVCode;
-    const QRegExp m_comHemCountry;
-    const QRegExp m_comHemDirector;
-    const QRegExp m_comHemActor;
-    const QRegExp m_comHemHost;
-    const QRegExp m_comHemSub;
-    const QRegExp m_comHemRerun1;
-    const QRegExp m_comHemRerun2;
-    const QRegExp m_comHemTT;
-    const QRegExp m_comHemPersSeparator;
-    const QRegExp m_comHemPersons;
-    const QRegExp m_comHemSubEnd;
-    const QRegExp m_comHemSeries1;
-    const QRegExp m_comHemSeries2;
-    const QRegExp m_comHemTSub;
-    const QRegExp m_mcaIncompleteTitle;
-    const QRegExp m_mcaCompleteTitlea;
-    const QRegExp m_mcaCompleteTitleb;
-    const QRegExp m_mcaSubtitle;
-    const QRegExp m_mcaSeries;
-    const QRegExp m_mcaCredits;
-    const QRegExp m_mcaAvail;
-    const QRegExp m_mcaActors;
-    const QRegExp m_mcaActorsSeparator;
-    const QRegExp m_mcaYear;
-    const QRegExp m_mcaCC;
-    const QRegExp m_mcaDD;
-    const QRegExp m_rtlRepeat;
-    const QRegExp m_rtlSubtitle;
-    const QRegExp m_rtlSubtitle1;
-    const QRegExp m_rtlSubtitle2;
-    const QRegExp m_rtlSubtitle3;
-    const QRegExp m_rtlSubtitle4;
-    const QRegExp m_rtlSubtitle5;
-    const QRegExp m_rtlEpisodeNo1;
-    const QRegExp m_rtlEpisodeNo2;
-    const QRegExp m_fiRerun;
-    const QRegExp m_fiRerun2;
-    const QRegExp m_fiAgeLimit;
-    const QRegExp m_fiFilm;
-    const QRegExp m_nlTxt;
-    const QRegExp m_nlWide;
-    const QRegExp m_nlRepeat;
-    const QRegExp m_nlHD;
-    const QRegExp m_nlSub;
-    const QRegExp m_nlSub2;
-    const QRegExp m_nlActors;
-    const QRegExp m_nlPres;
-    const QRegExp m_nlPersSeparator;
-    const QRegExp m_nlRub;
-    const QRegExp m_nlYear1;
-    const QRegExp m_nlYear2;
-    const QRegExp m_nlDirector;
-    const QRegExp m_nlCat;
-    const QRegExp m_nlOmroep;
-    const QRegExp m_noRerun;
-    const QRegExp m_noHD;
-    const QRegExp m_noColonSubtitle;
-    const QRegExp m_noNRKCategories;
-    const QRegExp m_noPremiere;
-    const QRegExp m_dkEpisode;
-    const QRegExp m_dkPart;
-    const QRegExp m_dkSubtitle1;
-    const QRegExp m_dkSubtitle2;
-    const QRegExp m_dkSeason1;
-    const QRegExp m_dkSeason2;
-    const QRegExp m_dkFeatures;
-    const QRegExp m_dkWidescreen;
-    const QRegExp m_dkDolby;
-    const QRegExp m_dkSurround;
-    const QRegExp m_dkStereo;
-    const QRegExp m_dkReplay;
-    const QRegExp m_dkTxt;
-    const QRegExp m_dkHD;
-    const QRegExp m_dkActors;
-    const QRegExp m_dkPersonsSeparator;
-    const QRegExp m_dkDirector;
-    const QRegExp m_dkYear;
-    const QRegExp m_auFreeviewSY;//subtitle, year
-    const QRegExp m_auFreeviewY;//year
-    const QRegExp m_auFreeviewYC;//year, cast
-    const QRegExp m_auFreeviewSYC;//subtitle, year, cast
-    const QRegExp m_grRating; // Greek new parental rating system
-    const QRegExp m_grReplay; //Greek rerun
-    const QRegExp m_grDescriptionFinale; //Greek last m_grEpisode
-    const QRegExp m_grActors; //Greek actors
-    const QRegExp m_grFixnofullstopActors; //bad punctuation makes the "Παίζουν:" and the actors' names part of the directors...
-    const QRegExp m_grFixnofullstopDirectors; //bad punctuation makes the "Σκηνοθ...:" and the previous sentence.
-    const QRegExp m_grPeopleSeparator; // The comma that separates the actors.
-    const QRegExp m_grDirector;
-    const QRegExp m_grPres; // Greek Presenters for shows
-    const QRegExp m_grYear; // Greek release year.
-    const QRegExp m_grCountry; // Greek event country of origin.
-    const QRegExp m_grlongEp; // Greek Episode
-    const QRegExp m_grSeasonAsRomanNumerals; // Greek Episode in Roman numerals
-    const QRegExp m_grSeason; // Greek Season
-    const QRegExp m_grSeries;
-    const QRegExp m_grRealTitleinDescription; // The original title is often in the descr in parenthesis.
-    const QRegExp m_grRealTitleinTitle; // The original title is often in the title in parenthesis.
-    const QRegExp m_grCommentsinTitle; // Sometimes esp. national stations include comments in the title eg "(ert arxeio)"
-    const QRegExp m_grNotPreviouslyShown; // Not previously shown on TV
-    const QRegExp m_grEpisodeAsSubtitle; // Description field: "^Episode: Lion in the cage. (Description follows)"
-    const QRegExp m_grCategFood; // Greek category food
-    const QRegExp m_grCategDrama; // Greek category social/drama
-    const QRegExp m_grCategComedy; // Greek category comedy
-    const QRegExp m_grCategChildren; // Greek category for children / cartoons
-    const QRegExp m_grCategMystery; // Greek category for mystery
-    const QRegExp m_grCategFantasy; // Greek category for fantasy
-    const QRegExp m_grCategHistory; //Greek category for historical movie/series
-    const QRegExp m_grCategTeleMag; //Greek category for Telemagazine show
-    const QRegExp m_grCategTeleShop; //Greek category for teleshopping
-    const QRegExp m_grCategGameShow; //Greek category for game show
-    const QRegExp m_grCategDocumentary; // Greek category for Documentaries
-    const QRegExp m_grCategBiography; // Greek category for biography
-    const QRegExp m_grCategNews; // Greek category for News
-    const QRegExp m_grCategSports; // Greek category for Sports
-    const QRegExp m_grCategMusic; // Greek category for Music
-    const QRegExp m_grCategReality; // Greek category for reality shows
-    const QRegExp m_grCategReligion; //Greek category for religion
-    const QRegExp m_grCategCulture; //Greek category for Arts/Culture
-    const QRegExp m_grCategNature; //Greek category for Nature/Science
-    const QRegExp m_grCategSciFi;  // Greek category for Science Fiction
-    const QRegExp m_grCategHealth; //Greek category for Health
-    const QRegExp m_grCategSpecial; //Greek category for specials.
 };
 
 #endif // EITFIXUP_H

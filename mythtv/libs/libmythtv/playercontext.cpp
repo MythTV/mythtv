@@ -24,14 +24,11 @@
 
 #define LOC QString("playCtx: ")
 
-const uint PlayerContext::kSMExitTimeout     = 2000;
-const uint PlayerContext::kMaxChannelHistory = 30;
-
 PlayerContext::PlayerContext(QString inUseID) :
     m_recUsage(std::move(inUseID))
 {
     m_lastSignalMsgTime.start();
-    m_lastSignalMsgTime.addMSecs(-2 * (int)kSMExitTimeout);
+    m_lastSignalMsgTime.addMSecs(-2 * kSMExitTimeout);
 }
 
 PlayerContext::~PlayerContext()
@@ -527,9 +524,9 @@ void PlayerContext::SetPlayingInfo(const ProgramInfo *info)
 
 void PlayerContext::SetPlayGroup(const QString &group)
 {
-    m_fftime       = PlayGroup::GetSetting(group, "skipahead", 30);
-    m_rewtime      = PlayGroup::GetSetting(group, "skipback", 5);
-    m_jumptime     = PlayGroup::GetSetting(group, "jump", 10);
+    m_fftime       = PlayGroup::GetDurSetting<std::chrono::seconds>(group, "skipahead", 30s);
+    m_rewtime      = PlayGroup::GetDurSetting<std::chrono::seconds>(group, "skipback", 5s);
+    m_jumptime     = PlayGroup::GetDurSetting<std::chrono::minutes>(group, "jump", 10min);
     m_tsNormal     = PlayGroup::GetSetting(group, "timestretch", 100) * 0.01F;
     m_tsAlt        = (m_tsNormal == 1.0F) ? 1.5F : 1.0F;
 }

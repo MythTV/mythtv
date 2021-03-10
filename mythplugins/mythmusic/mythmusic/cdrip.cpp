@@ -62,8 +62,6 @@
 #include "mythlogging.h"
 #include "vorbisencoder.h"
 
-using namespace std::chrono_literals;
-
 #ifdef HAVE_CDIO
 // libparanoia compatibility
 #ifndef cdrom_paranoia
@@ -1225,9 +1223,9 @@ void Ripper::updateTrackList(void)
             item->SetText(metadata->Title(), "title");
             item->SetText(metadata->Artist(), "artist");
 
-            if (track->length >= ONESECINMS)
+            if (track->length >= 1s)
             {
-                item->SetText(MythFormatTimeMs(track->length, "mm:ss"), "length");
+                item->SetText(MythFormatTime(track->length, "mm:ss"), "length");
             }
             else
                 item->SetText("", "length");
@@ -1413,7 +1411,7 @@ void Ripper::ShowConflictMenu(RipTrack* track)
 
 void Ripper::updateTrackLengths()
 {
-    int length = 0;
+    std::chrono::milliseconds length = 0ms;
 
     for (auto *it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
     {
@@ -1421,11 +1419,11 @@ void Ripper::updateTrackLengths()
         if (track->active)
         {
             track->length = length + track->metadata->Length();
-            length = 0;
+            length = 0ms;
         }
         else
         {
-            track->length = 0;
+            track->length = 0ms;
             length += track->metadata->Length();
         }
     }

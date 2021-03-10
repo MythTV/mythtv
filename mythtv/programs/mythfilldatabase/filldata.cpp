@@ -354,7 +354,7 @@ bool FillData::Run(SourceList &sourcelist)
             MythSystemLegacy grabber_capabilities_proc(xmltv_grabber,
                                                  QStringList("--capabilities"),
                                                  flags);
-            grabber_capabilities_proc.Run(25);
+            grabber_capabilities_proc.Run(25s);
             if (grabber_capabilities_proc.Wait() != GENERIC_EXIT_OK)
             {
                 LOG(VB_GENERAL, LOG_ERR,
@@ -400,7 +400,7 @@ bool FillData::Run(SourceList &sourcelist)
             MythSystemLegacy grabber_method_proc(xmltv_grabber,
                                            QStringList("--preferredmethod"),
                                            flags);
-            grabber_method_proc.Run(15);
+            grabber_method_proc.Run(15s);
             if (grabber_method_proc.Wait() != GENERIC_EXIT_OK)
             {
                 LOG(VB_GENERAL, LOG_ERR,

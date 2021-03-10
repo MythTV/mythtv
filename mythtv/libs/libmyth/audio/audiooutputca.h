@@ -19,7 +19,7 @@ public:
     AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
     static QMap<QString, QString> *GetDevices(const char *type = nullptr);
 
-    int64_t GetAudiotime(void) override; // AudioOutputBase
+    std::chrono::milliseconds GetAudiotime(void) override; // AudioOutputBase
 
     // callback for delivering audio to output device
     bool RenderAudio(unsigned char *aubuf, int size,

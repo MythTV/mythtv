@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 /// Structure containing the basic Database parameters
 class MBASE_PUBLIC DatabaseParams
@@ -31,7 +32,7 @@ class MBASE_PUBLIC DatabaseParams
                                           ///< name used for loading/saving settings
 
     bool    m_wolEnabled    {false};        ///< true if wake-on-lan params are used
-    int     m_wolReconnect  {0};            ///< seconds to wait for reconnect
+    std::chrono::seconds m_wolReconnect  {0s}; ///< seconds to wait for reconnect
     int     m_wolRetry      {5};            ///< times to retry to reconnect
     QString m_wolCommand    {"echo 'WOLsqlServerCommand not set'"};
                                           ///< command to use for wake-on-lan

@@ -13,6 +13,7 @@
 #include <QPair>
 
 #include "mthread.h"
+#include "mythchrono.h"
 #include "mythdate.h"
 #include "mythevent.h"
 #include "mythbaseexp.h"
@@ -84,8 +85,8 @@ class MBASE_PUBLIC HouseKeeperTask : public ReferenceCounter
 class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
 {
   public:
-    PeriodicHouseKeeperTask(const QString &dbTag, int period, float min=0.5,
-                            float max=1.1, int retry=0, HouseKeeperScope scope=kHKGlobal,
+    PeriodicHouseKeeperTask(const QString &dbTag, std::chrono::seconds period, float min=0.5,
+                            float max=1.1, std::chrono::seconds retry=0s, HouseKeeperScope scope=kHKGlobal,
                             HouseKeeperStartup startup=kHKNormal);
     bool DoCheckRun(const QDateTime& now) override; // HouseKeeperTask
     virtual bool InWindow(const QDateTime& now);
@@ -97,11 +98,11 @@ class MBASE_PUBLIC PeriodicHouseKeeperTask : public HouseKeeperTask
   protected:
     virtual void CalculateWindow(void);
 
-    int                         m_period;
-    int                         m_retry;
+    std::chrono::seconds        m_period;
+    std::chrono::seconds        m_retry;
     QPair<float,float>          m_windowPercent;
-    QPair<int,int>              m_windowElapsed;
-    float                       m_currentProb;
+    QPair<std::chrono::seconds,std::chrono::seconds> m_windowElapsed;
+    double                      m_currentProb;
 };
 
 class MBASE_PUBLIC DailyHouseKeeperTask : public PeriodicHouseKeeperTask
@@ -110,17 +111,18 @@ class MBASE_PUBLIC DailyHouseKeeperTask : public PeriodicHouseKeeperTask
     explicit DailyHouseKeeperTask(const QString &dbTag,
                          HouseKeeperScope scope=kHKGlobal,
                          HouseKeeperStartup startup=kHKNormal);
-    DailyHouseKeeperTask(const QString &dbTag, int minhour, int maxhour,
+    DailyHouseKeeperTask(const QString &dbTag,
+                         std::chrono::hours minhour, std::chrono::hours maxhour,
                          HouseKeeperScope scope=kHKGlobal,
                          HouseKeeperStartup startup=kHKNormal);
-    virtual void SetHourWindow(int min, int max);
+    virtual void SetHourWindow(std::chrono::hours min, std::chrono::hours max);
     bool InWindow(const QDateTime& now) override; // PeriodicHouseKeeperTask
 
   protected:
     void CalculateWindow(void) override; // PeriodicHouseKeeperTask
 
   private:
-    QPair<int, int> m_windowHour;
+    QPair<std::chrono::hours, std::chrono::hours> m_windowHour;
 };
 
 class HouseKeepingThread : public MThread

@@ -83,12 +83,10 @@
 // mythbackend headers
 #include "backendcontext.h"
 
-using namespace std::chrono_literals;
-
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
  */
-#define PRT_TIMEOUT 10
+static constexpr std::chrono::milliseconds PRT_TIMEOUT { 10ms };
 /** Number of threads in process request thread pool at startup. */
 #define PRT_STARTUP_THREAD_COUNT 5
 
@@ -136,7 +134,7 @@ bool delete_file_immediately(const QString &filename,
 };
 
 QMutex MainServer::s_truncate_and_close_lock;
-const uint MainServer::kMasterServerReconnectTimeout = 1000; //ms
+const std::chrono::milliseconds MainServer::kMasterServerReconnectTimeout { 1s };
 
 class ProcessRequestRunnable : public QRunnable
 {
@@ -196,7 +194,7 @@ class FreeSpaceUpdater : public QRunnable
                 m_parent.m_masterFreeSpaceList = list;
             }
             QMutexLocker locker(&m_lock);
-            int left = kRequeryTimeout - t.elapsed();
+            std::chrono::milliseconds left = kRequeryTimeout - t.elapsed();
             if (m_lastRequest.elapsed() + left > kExitTimeout)
                 m_dorun = false;
             if (!m_dorun)
@@ -204,8 +202,8 @@ class FreeSpaceUpdater : public QRunnable
                 m_running = false;
                 break;
             }
-            if (left > 50)
-                m_wait.wait(locker.mutex(), left);
+            if (left > 50ms)
+                m_wait.wait(locker.mutex(), left.count());
         }
     }
 
@@ -231,11 +229,9 @@ class FreeSpaceUpdater : public QRunnable
     bool m_running;
     MythTimer m_lastRequest;
     QWaitCondition m_wait;
-    const static int kRequeryTimeout;
-    const static int kExitTimeout;
+    static constexpr std::chrono::milliseconds kRequeryTimeout { 15s };
+    static constexpr std::chrono::milliseconds kExitTimeout { 61s };
 };
-const int FreeSpaceUpdater::kRequeryTimeout = 15000;
-const int FreeSpaceUpdater::kExitTimeout = 61000;
 
 MainServer::MainServer(bool master, int port,
                        QMap<int, EncoderLink *> *_tvList,
@@ -245,7 +241,7 @@ MainServer::MainServer(bool master, int port,
     m_sched(sched), m_expirer(_expirer)
 {
     PreviewGeneratorQueue::CreatePreviewGeneratorQueue(
-        PreviewGenerator::kLocalAndRemote, ~0, 0);
+        PreviewGenerator::kLocalAndRemote, ~0, 0s);
     PreviewGeneratorQueue::AddListener(this);
 
     m_threadPool.setMaxThreadCount(PRT_STARTUP_THREAD_COUNT);
@@ -1949,7 +1945,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         FileTransfer *ft = nullptr;
         bool writemode = false;
         bool usereadahead = true;
-        int timeout_ms = 2000;
+        std::chrono::milliseconds timeout_ms = 2s;
         if (commands.size() > 3)
             writemode = (commands[3].toInt() != 0);
 
@@ -1957,7 +1953,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             usereadahead = (commands[4].toInt() != 0);
 
         if (commands.size() > 5)
-            timeout_ms = commands[5].toInt();
+            timeout_ms = std::chrono::milliseconds(commands[5].toInt());
 
         if (writemode)
         {
@@ -2374,7 +2370,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 {
     // sleep a little to let frontends reload the recordings list
     // after deleting a recording, then we can hammer the DB and filesystem
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(3s);
     std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom()%2));
 
     m_deletelock.lock();
@@ -2465,7 +2461,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     else
     {
         delete_file_immediately(ds->m_filename, followLinks, false);
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(2s);
         if (checkFile.exists())
             errmsg = true;
     }
@@ -2612,7 +2608,7 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
             QString("Error deleting recorded entry for %1.") .arg(logInfo));
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(1s);
 
     // Notify the frontend so it can requery for Free Space
     QString msg = QString("RECORDING_LIST_CHANGE DELETE %1")
@@ -2620,7 +2616,7 @@ void MainServer::DoDeleteInDB(DeleteStruct *ds)
     gCoreContext->SendEvent(MythEvent(msg));
 
     // sleep a little to let frontends reload the recordings list
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(3s);
 
     query.prepare("DELETE FROM recordedmarkup "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
@@ -2764,17 +2760,17 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     }
 
     // Time between truncation steps in milliseconds
-    const size_t sleep_time = 500;
+    constexpr std::chrono::milliseconds sleep_time = 500ms;
     const size_t min_tps    = 8 * 1024 * 1024;
     const auto calc_tps     = (size_t) (cards * 1.2 * (22200000LL / 8.0));
     const size_t tps        = std::max(min_tps, calc_tps);
-    const auto increment    = (size_t) (tps * (sleep_time * 0.001F));
+    const auto increment    = (size_t) (tps * (sleep_time.count() * 0.001F));
 
     LOG(VB_FILE, LOG_INFO, LOC +
         QString("Truncating '%1' by %2 MB every %3 milliseconds")
             .arg(filename)
             .arg(increment / (1024.0 * 1024.0), 0, 'f', 2)
-            .arg(sleep_time));
+            .arg(sleep_time.count()));
 
     GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
 
@@ -2803,7 +2799,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
 
         count++;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+        std::this_thread::sleep_for(sleep_time);
     }
 
     bool ok = (0 == close(fd));
@@ -2953,7 +2949,7 @@ void MainServer::DoHandleStopRecording(
             while (elink->IsBusyRecording() ||
                    elink->GetState() == kState_ChangingState)
             {
-                std::this_thread::sleep_for(std::chrono::microseconds(100));
+                std::this_thread::sleep_for(100us);
             }
 
             if (m_ismaster)
@@ -3523,10 +3519,10 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
 {
     MythSocket    *pbssock = pbs->getSocket();
     QStringList strlist;
-    time_t      uptime = 0;
+    std::chrono::seconds uptime = 0s;
 
     if (getUptime(uptime))
-        strlist << QString::number(uptime);
+        strlist << QString::number(uptime.count());
     else
     {
         strlist << "ERROR";
@@ -4731,10 +4727,10 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "SET_SIGNAL_MONITORING_RATE")
     {
-        int rate = slist[2].toInt();
+        auto rate = std::chrono::milliseconds(slist[2].toInt());
         int notifyFrontend = slist[3].toInt();
-        int oldrate = enc->SetSignalMonitoringRate(rate, notifyFrontend);
-        retlist << QString::number(oldrate);
+        auto oldrate = enc->SetSignalMonitoringRate(rate, notifyFrontend);
+        retlist << QString::number(oldrate.count());
     }
     else if (command == "GET_COLOUR")
     {
@@ -4980,7 +4976,8 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     }
     else if (command == "IS_BUSY")
     {
-        int time_buffer = (slist.size() >= 3) ? slist[2].toInt() : 5;
+        auto arg2 = std::chrono::seconds(slist[2].toInt());
+        std::chrono::seconds time_buffer = (slist.size() >= 3) ? arg2 : 5s;
         InputInfo busy_input;
         retlist << QString::number((int)enc->IsBusy(&busy_input, time_buffer));
         busy_input.ToStringList(retlist);
@@ -5010,7 +5007,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     else if (command == "RECORD_PENDING" &&
              (slist.size() >= 4 + NUMPROGRAMLINES))
     {
-        int secsleft = slist[2].toInt();
+        auto secsleft = std::chrono::seconds(slist[2].toInt());
         int haslater = slist[3].toInt();
         QStringList::const_iterator it = slist.cbegin() + 4;
         ProgramInfo pginfo(it, slist.cend());
@@ -7370,7 +7367,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     }
 
     bool      time_fmt_sec   = true;
-    long long time           = -1;
+    std::chrono::seconds time  = std::chrono::seconds::max();
+    long long frame          = -1;
     QString   outputfile;
     int       width          = -1;
     int       height         = -1;
@@ -7408,7 +7406,12 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (it != slist.cend())
         (time_fmt_sec = ((*it).toLower() == "s")), ++it;
     if (it != slist.cend())
-        (time = (*it).toLongLong()), ++it;
+    {
+        if (time_fmt_sec)
+            time = std::chrono::seconds((*it).toLongLong()), ++it;
+        else
+            frame = (*it).toLongLong(), ++it;
+    }
     if (it != slist.cend())
         (outputfile = *it), ++it;
     outputfile = (outputfile == "<EMPTY>") ? QString() : outputfile;
@@ -7427,10 +7430,13 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (has_extra_data)
     {
+        auto pos_text = (time != std::chrono::seconds::max())
+            ? QString::number(time.count()) + "s"
+            : QString::number(frame) + "f";
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("HandleGenPreviewPixmap got extra data\n\t\t\t"
-                    "%1%2 %3x%4 '%5'")
-                .arg(time).arg(time_fmt_sec?"s":"f")
+                    "%1 %2x%3 '%4'")
+                .arg(pos_text)
                 .arg(width).arg(height).arg(outputfile));
     }
 
@@ -7449,8 +7455,16 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
             QStringList outputlist;
             if (has_extra_data)
             {
-                outputlist = slave->GenPreviewPixmap(
-                    token, &pginfo, time_fmt_sec, time, outputfile, outputsize);
+                if (time != std::chrono::seconds::max())
+                {
+                    outputlist = slave->GenPreviewPixmap(
+                        token, &pginfo, time, -1, outputfile, outputsize);
+                }
+                else
+                {
+                    outputlist = slave->GenPreviewPixmap(
+                        token, &pginfo, std::chrono::seconds::max(), frame, outputfile, outputsize);
+                }
             }
             else
             {
@@ -7484,8 +7498,13 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (has_extra_data)
     {
-        PreviewGeneratorQueue::GetPreviewImage(
-            pginfo, outputsize, outputfile, time, time_fmt_sec, token);
+        if (time != std::chrono::seconds::max()) {
+            PreviewGeneratorQueue::GetPreviewImage(
+                pginfo, outputsize, outputfile, time, -1, token);
+        } else {
+            PreviewGeneratorQueue::GetPreviewImage(
+                pginfo, outputsize, outputfile, -1s, frame, token);
+}
     }
     else
     {
@@ -7720,7 +7739,7 @@ void MainServer::deferredDeleteSlot(void)
         return;
 
     DeferredDeleteStruct dds = m_deferredDeleteList.front();
-    while (dds.ts.secsTo(MythDate::current()) > 30)
+    while (MythDate::secsInPast(dds.ts) > 30s)
     {
         dds.sock->DecrRef();
         m_deferredDeleteList.pop_front();
@@ -7828,7 +7847,7 @@ void MainServer::connectionClosed(MythSocket *socket)
                         if (enc->IsLocal())
                         {
                             while (enc->GetState() == kState_ChangingState)
-                                std::this_thread::sleep_for(std::chrono::microseconds(500));
+                                std::this_thread::sleep_for(500us);
 
                             if (enc->IsBusy() &&
                                 enc->GetChainID() == chain->GetID())

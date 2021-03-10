@@ -31,7 +31,7 @@ class DVBRecorder : public DTVRecorder
     void StartNewFile(void) override; // RecorderBase
 
   private:
-    bool PauseAndWait(int timeout = 100) override; // RecorderBase
+    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
     QString GetSIStandard(void) const override; // DTVRecorder
     void SetCAMPMT(const ProgramMapTable *pmt) override; // DTVRecorder

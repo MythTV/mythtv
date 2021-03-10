@@ -15,15 +15,16 @@
 #include "mythmiscutil.h"
 
 class LyricsData;
+class TestLyrics;
 
 class META_PUBLIC LyricsLine
 {
   public:
     LyricsLine() = default;
-    LyricsLine(int time, QString lyric) :
+    LyricsLine(std::chrono::milliseconds time, QString lyric) :
         m_time(time), m_lyric(std::move(lyric)) { }
 
-    int     m_time {0};
+    std::chrono::milliseconds m_time {0ms};
     QString m_lyric;
 
     QString toString(bool syncronized)
@@ -37,18 +38,22 @@ class META_PUBLIC LyricsLine
   private:
     QString formatTime(void) const
     {
-        QString timestr = MythFormatTimeMs(m_time,"mm:ss.zzz");
+        QString timestr = MythFormatTime(m_time,"mm:ss.zzz");
         timestr.chop(1); // Chop 1 to return hundredths
         return QString("[%1]").arg(timestr);
     }
 };
 
+using LyricsLineMap = QMap<std::chrono::milliseconds, LyricsLine*>;
+
 class META_PUBLIC LyricsData : public QObject
 {
   Q_OBJECT
 
+  friend class TestLyrics;
+
   public:
-    LyricsData();
+    LyricsData() = default;
     explicit LyricsData(MusicMetadata *parent)
         : m_parent(parent) {}
     LyricsData(MusicMetadata *parent, QString grabber, QString artist,
@@ -70,7 +75,7 @@ class META_PUBLIC LyricsData : public QObject
     QString title(void) { return m_title; }
     void setTitle(const QString &title) { m_title = title; }
 
-    QMap<int, LyricsLine*>* lyrics(void) { return &m_lyricsMap; }
+    LyricsLineMap* lyrics(void) { return &m_lyricsMap; }
     void setLyrics(const QStringList &lyrics);
 
     bool syncronized(void) const { return m_syncronized; }
@@ -103,7 +108,7 @@ class META_PUBLIC LyricsData : public QObject
     void loadLyrics(const QString &xmlData);
     QString createLyricsXML(void);
 
-    QMap<int, LyricsLine*> m_lyricsMap;
+    LyricsLineMap m_lyricsMap;
 
     MusicMetadata *m_parent {nullptr};
 

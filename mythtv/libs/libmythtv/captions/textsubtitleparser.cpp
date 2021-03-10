@@ -94,7 +94,7 @@ public:
         if (m_isRemote)
         {
             m_localFile = nullptr;
-            m_remoteFile = new RemoteFile(filename, false, false, 0);
+            m_remoteFile = new RemoteFile(filename, false, false, 0s);
         }
         else
         {

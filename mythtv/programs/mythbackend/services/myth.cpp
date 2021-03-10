@@ -116,7 +116,7 @@ DTC::ConnectionInfo* Myth::GetConnectionInfo( const QString  &sPin )
     pDatabase->setLocalHostName( params.m_localHostName );
 
     pWOL->setEnabled           ( params.m_wolEnabled   );
-    pWOL->setReconnect         ( params.m_wolReconnect );
+    pWOL->setReconnect         ( params.m_wolReconnect.count() );
     pWOL->setRetry             ( params.m_wolRetry     );
     pWOL->setCommand           ( params.m_wolCommand   );
 

@@ -28,7 +28,7 @@ class CC608Text
 
 struct TextContainer
 {
-    int timecode;
+    std::chrono::milliseconds timecode;
     int len;
     unsigned char *buffer;
     char type;
@@ -74,7 +74,7 @@ class CC608StateTracker
 
 class MythPlayer;
 
-using CC608WriteFn = void (*) (void *, unsigned char *, int, int, int);
+using CC608WriteFn = void (*) (void *, unsigned char *, int, std::chrono::milliseconds, int);
 
 class MTV_PUBLIC CC608Reader : public CC608Input
 {
@@ -90,7 +90,7 @@ class MTV_PUBLIC CC608Reader : public CC608Input
     void SetMode(int mode);
     void ClearBuffers(bool input, bool output, int outputStreamIdx = -1);
     void AddTextData(unsigned char *buf, int len,
-                     int64_t timecode, char type) override; // CC608Input
+                     std::chrono::milliseconds timecode, char type) override; // CC608Input
     void TranscodeWriteText(CC608WriteFn func, void * ptr);
 
   private:

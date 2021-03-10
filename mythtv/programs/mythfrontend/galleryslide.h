@@ -15,7 +15,6 @@
 #include "mythuiimage.h"
 #include "imagetypes.h"
 
-
 // Min/max zoom extents available in slideshow
 #define MIN_ZOOM (0.1F)
 #define MAX_ZOOM (20.0F)
@@ -68,7 +67,7 @@ public:
     void Start(bool forwards = true, float speed = 1.0) override; // AbstractAnimation
     void Pulse() override; // AbstractAnimation
     void Set(const QVariant& from, const QVariant& to,
-             int duration = 500,
+             std::chrono::milliseconds duration = 500ms,
              const QEasingCurve& curve = QEasingCurve::InOutCubic,
              UIEffects::Centre centre = UIEffects::Middle);
     void updateCurrentValue(const QVariant &value) override; // QVariantAnimation
@@ -82,8 +81,8 @@ protected:
     UIEffects::Centre m_centre  {UIEffects::Middle};
     //! Current millisec position within animation, 0..duration.
     //! Decreases duration..0 when playing backwards
-    int               m_elapsed {0};
-    int64_t           m_lastUpdate { QDateTime::currentMSecsSinceEpoch() };
+    std::chrono::milliseconds m_elapsed {0ms};
+    std::chrono::milliseconds m_lastUpdate { MythDate::currentMSecsSinceEpochAsDuration() };
 };
 
 

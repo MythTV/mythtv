@@ -33,8 +33,6 @@
 #include "iso639.h"
 #include "mythccextractorplayer.h"
 
-const int OneSubtitle::kDefaultLength = 750; /* ms */
-
 SRTStuff::~SRTStuff()
 {
     while (!m_srtWriters.empty())
@@ -52,7 +50,7 @@ MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerContext *Context, PlayerFlags
                                              QString fileName,
                                              const QString &destdir) :
     MythPlayer(Context, flags),
-    m_curTime(0),
+    m_curTime(0ms),
     m_myFramesPlayed(0),
     m_showProgress(showProgress),
     m_fileName(std::move(fileName))
@@ -86,7 +84,7 @@ void MythCCExtractorPlayer::OnGotNewFrame(void)
         if (fps <= 0)
             fps = GetDecoder()->GetFPS();
         double duration = 1 / fps + static_cast<double>(frame->m_repeatPic) * 0.5 / fps;
-        m_curTime += duration * 1000;
+        m_curTime += secondsFromFloat(duration);
         m_videoOutput->DoneDisplayingFrame(frame);
     }
 
@@ -108,7 +106,7 @@ static QString progress_string(
     static const std::string kSpinChars { R"(/-\|)" };
     static uint s_spinCnt = 0;
 
-    double elapsed = flagTime.elapsed() * 0.001;
+    double elapsed = flagTime.elapsed().count() * 0.001;
     double flagFPS = (elapsed > 0.0) ? (m_myFramesPlayed / elapsed) : 0;
 
     double percentage = m_myFramesPlayed * 100.0 / totalFrames;
@@ -152,7 +150,7 @@ bool MythCCExtractorPlayer::run(void)
     inuse_timer.start();
     save_timer.start();
 
-    m_curTime = 0;
+    m_curTime = 0ms;
 
     if (DecoderGetFrame(kDecodeVideo))
         OnGotNewFrame();
@@ -162,7 +160,7 @@ bool MythCCExtractorPlayer::run(void)
 
     while (!m_killDecoder && !IsErrored())
     {
-        if (inuse_timer.elapsed() > 2534)
+        if (inuse_timer.elapsed() > 2534ms)
         {
             inuse_timer.restart();
             m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
@@ -171,7 +169,7 @@ bool MythCCExtractorPlayer::run(void)
             m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
         }
 
-        if (m_showProgress && (ui_timer.elapsed() > 98 * 4))
+        if (m_showProgress && (ui_timer.elapsed() > 98ms * 4))
         {
             ui_timer.restart();
             QString str = progress_string(
@@ -219,7 +217,7 @@ void MythCCExtractorPlayer::IngestSubtitle(
 {
     bool update_last =
         !list.isEmpty() &&
-        (int64_t)m_curTime == list.back().m_startTime &&
+        m_curTime == list.back().m_startTime &&
         !content.isEmpty();
 
     if (update_last)
@@ -230,19 +228,19 @@ void MythCCExtractorPlayer::IngestSubtitle(
     }
 
     OneSubtitle last_one = list.isEmpty() ? OneSubtitle() : list.back();
-    if (content != last_one.m_text || last_one.m_length >= 0)
+    if (content != last_one.m_text || last_one.m_length >= 0ms)
     {
         // Finish previous subtitle.
-        if (!last_one.m_text.isEmpty() && last_one.m_length < 0)
+        if (!last_one.m_text.isEmpty() && last_one.m_length < 0ms)
         {
-            list.back().m_length = (int64_t)m_curTime - last_one.m_startTime;
+            list.back().m_length = m_curTime - last_one.m_startTime;
         }
 
         // Put new one if it isn't empty.
         if (!content.isEmpty())
         {
             OneSubtitle new_one;
-            new_one.m_startTime = (int64_t)m_curTime;
+            new_one.m_startTime = m_curTime;
             new_one.m_text = content;
 
             list.push_back(new_one);
@@ -272,10 +270,10 @@ void MythCCExtractorPlayer::IngestSubtitle(
     }
 
     OneSubtitle last_one = list.isEmpty() ? OneSubtitle() : list.back();
-    if (content.m_img != last_one.m_img || last_one.m_length >= 0)
+    if (content.m_img != last_one.m_img || last_one.m_length >= 0ms)
     {
         // Finish previous subtitle.
-        if (!last_one.m_img.isNull() && last_one.m_length < 0)
+        if (!last_one.m_img.isNull() && last_one.m_length < 0ms)
         {
             list.back().m_length = content.m_startTime - last_one.m_startTime;
         }
@@ -390,7 +388,7 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
 
             while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
-                if ((*it).front().m_length <= 0)
+                if ((*it).front().m_length <= 0ms)
                     (*it).front().m_length = OneSubtitle::kDefaultLength;
 
                 (*cc608it).m_srtWriters[idx]->AddSubtitle(
@@ -509,7 +507,7 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
 
             while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
-                if ((*it).front().m_length <= 0)
+                if ((*it).front().m_length <= 0ms)
                     (*it).front().m_length = OneSubtitle::kDefaultLength;
 
                 (*cc708it).m_srtWriters[idx]->AddSubtitle(
@@ -607,7 +605,7 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
 
             while ((*it).size() > ((kProcessFinalize & flags) ? 0 : 1))
             {
-                if ((*it).front().m_length <= 0)
+                if ((*it).front().m_length <= 0ms)
                     (*it).front().m_length = OneSubtitle::kDefaultLength;
 
                 (*ttxit).m_srtWriters[page]->AddSubtitle(
@@ -632,14 +630,14 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
                 "There are unhandled text dvb subtitles");
         }
 
-        uint64_t duration = 0;
+        std::chrono::milliseconds duration = 0ms;
         const QStringList rawSubs =
             (*subit).m_reader->GetRawTextSubtitles(duration);
         if (!rawSubs.isEmpty())
         {
             LOG(VB_VBI, LOG_DEBUG,
                 QString("There are also %1 raw text subtitles with duration %2")
-                .arg(rawSubs.size()).arg(duration));
+                .arg(rawSubs.size()).arg(duration.count()));
         }
         /// INFO -- end
 
@@ -693,9 +691,11 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
             painter.end();
 
             OneSubtitle sub;
-            sub.m_startTime = subtitle.start_display_time;
+            sub.m_startTime =
+                std::chrono::milliseconds(subtitle.start_display_time);
             sub.m_length =
-                subtitle.end_display_time - subtitle.start_display_time;
+                std::chrono::milliseconds(subtitle.end_display_time -
+                                          subtitle.start_display_time);
 
             SubtitleReader::FreeAVSubtitle(subtitle);
 
@@ -752,22 +752,22 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
         QDir stream_dir(m_workingDir.filePath(dir_name));
         while (subs.size() > ((kProcessFinalize & flags) ? 0 : 1))
         {
-            if (subs.front().m_length <= 0)
+            if (subs.front().m_length <= 0ms)
                 subs.front().m_length = OneSubtitle::kDefaultLength;
 
             const OneSubtitle &sub = subs.front();
-            int64_t end_time = sub.m_startTime + sub.m_length;
+            std::chrono::milliseconds end_time = sub.m_startTime + sub.m_length;
             const QString file_name =
                 stream_dir.filePath(
                     QString("%1_%2-to-%3.png")
                     .arg((*subit).m_subsNum)
-                    .arg(sub.m_startTime).arg(end_time));
+                    .arg(sub.m_startTime.count()).arg(end_time.count()));
 
             if (end_time > sub.m_startTime)
             {
                 //check is there exist file with same m_startTime
                 QStringList filter;
-                filter << QString("*_%1*.png").arg(sub.m_startTime);
+                filter << QString("*_%1*.png").arg(sub.m_startTime.count());
                 QFileInfoList found = stream_dir.entryInfoList(filter);
                 if (found.isEmpty())
                 {

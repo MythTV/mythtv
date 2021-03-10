@@ -121,8 +121,7 @@ class DatabaseLogger : public LoggerBase
     bool m_loggingTableExists {false}; ///< The desired logging table exists
     QElapsedTimer m_disabledTime;       ///< Elapsed time since the DB logging was disabled
     QElapsedTimer m_errorLoggingTime;   ///< Elapsed time since DB error logging was last done
-    static const int kMinDisabledTime; ///< Minimum time to disable DB logging
-                                       ///  (in ms)
+    static constexpr std::chrono::milliseconds kMinDisabledTime {1s}; ///< Minimum time to disable DB logging
 };
 
 using LogMessage = QList<QByteArray>;

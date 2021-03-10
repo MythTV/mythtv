@@ -77,8 +77,9 @@ class MHGroup : public MHRoot
     // running so we know how to calculate expiration times.
     QElapsedTimer m_runTime;
     QList<MHTimer*> m_timers;
-    int CheckTimers(MHEngine *engine); // Checks the timers and fires any relevant events.  Returns the millisecs to the
-                        // next event or zero if there aren't any.
+    // Checks the timers and fires any relevant events.  Returns the
+    // millisecs to the next event or zero if there aren't any.
+    std::chrono::milliseconds CheckTimers(MHEngine *engine);
     int m_nLastId {0}; // Highest numbered ingredient.  Used to make new ids for clones.
 
     friend class MHEGEngine;

@@ -241,7 +241,7 @@ void MHIContext::run(void)
 
     while (!m_stop)
     {
-        int toWait = 0;
+        std::chrono::milliseconds toWait = 0ms;
         // Dequeue and process any key presses.
         int key = 0;
         do
@@ -258,14 +258,14 @@ void MHIContext::run(void)
 
             // Run the engine and find out how long to pause.
             toWait = m_engine->RunAll();
-            if (toWait < 0)
+            if (toWait < 0ms)
                 return;
         } while (key != 0);
 
-        toWait = (toWait > 1000 || toWait <= 0) ? 1000 : toWait;
+        toWait = (toWait > 1s || toWait <= 0ms) ? 1s : toWait;
 
-        if (!m_stop && (toWait > 0))
-            m_engineWait.wait(locker.mutex(), toWait);
+        if (!m_stop && (toWait > 0ms))
+            m_engineWait.wait(locker.mutex(), toWait.count());
     }
 }
 
@@ -1143,24 +1143,24 @@ void MHIContext::StopVideo()
 }
 
 // Get current stream position, -1 if unknown
-long MHIContext::GetStreamPos()
+std::chrono::milliseconds MHIContext::GetStreamPos()
 {
-    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamPos() : -1;
+    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamPos() : -1ms;
 }
 
 // Get current stream size, -1 if unknown
-long MHIContext::GetStreamMaxPos()
+std::chrono::milliseconds MHIContext::GetStreamMaxPos()
 {
-    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamMaxPos() : -1;
+    return m_parent->GetPlayer() ? m_parent->GetPlayer()->GetStreamMaxPos() : -1ms;
 }
 
 // Set current stream position
-long MHIContext::SetStreamPos(long pos)
+std::chrono::milliseconds MHIContext::SetStreamPos(std::chrono::milliseconds pos)
 {
     if (m_parent->GetPlayer())
         emit m_parent->GetPlayer()->SetInteractiveStreamPos(pos);
     // Note: return value is never used
-    return 0;
+    return 0ms;
 }
 
 // Play or pause a stream

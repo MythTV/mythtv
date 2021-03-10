@@ -91,7 +91,7 @@ class MPUBLIC GrabberManager : public QObject
     mutable QMutex                 m_lock         {QMutex::Recursive};
     QTimer                        *m_timer        {nullptr};
     GrabberScript::scriptList      m_scripts;
-    uint                           m_updateFreq   {24 * 3600 * 1000};
+    std::chrono::hours             m_updateFreq   {24h};
     uint                           m_runningCount {0};
     bool                           m_refreshAll   {false};
 };

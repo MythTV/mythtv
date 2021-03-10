@@ -110,7 +110,7 @@ class RemoteFileDownloadThread : public QRunnable
     {
         bool ok = false;
 
-        auto *rf = new RemoteFile(m_dlInfo->m_url, false, false, 0);
+        auto *rf = new RemoteFile(m_dlInfo->m_url, false, false, 0ms);
         ok = rf->SaveAs(m_dlInfo->m_privData);
         delete rf;
 
@@ -200,7 +200,7 @@ void MythDownloadManager::run(void)
     m_queueThread = QThread::currentThread();
 
     while (!m_runThread)
-        usleep(50000);
+        usleep(50ms);
 
     m_manager = new QNetworkAccessManager(this);
     m_diskCache = new QNetworkDiskCache(this);
@@ -832,9 +832,9 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     while ((!dlInfo->IsDone()) &&
            (dlInfo->m_errorCode == QNetworkReply::NoError) &&
            (((!dlInfo->m_url.startsWith("myth://")) &&
-             (dlInfo->m_lastStat.secsTo(MythDate::current()) < 60)) ||
+             (MythDate::secsInPast(dlInfo->m_lastStat) < 60s)) ||
             ((dlInfo->m_url.startsWith("myth://")) &&
-             (startedAt.secsTo(MythDate::current()) < 20))))
+             (MythDate::secsInPast(startedAt) < 20s))))
     {
         m_infoLock->unlock();
         m_queueWaitLock.lock();
@@ -1066,7 +1066,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 
     while (!m_cancellationQueue.isEmpty())
     {
-        usleep(50000); // re-test in another 50ms
+        usleep(50ms); // re-test in another 50ms
     }
 }
 
@@ -1526,7 +1526,7 @@ bool MythDownloadManager::saveFile(const QString &outFile,
         if (written < 0)
         {
             failure_cnt++;
-            usleep(50000);
+            usleep(50ms);
             continue;
         }
 

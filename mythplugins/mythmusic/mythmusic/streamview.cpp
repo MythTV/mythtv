@@ -5,7 +5,6 @@
 
 // qt
 #include <QKeyEvent>
-#include <QRegExp>
 #include <QThread>
 #include <QDomDocument>
 
@@ -30,8 +29,6 @@
 #include "musicdata.h"
 #include "musicplayer.h"
 #include "streamview.h"
-
-using namespace std::chrono_literals;
 
 StreamView::StreamView(MythScreenStack *parent, MythScreenType *parentScreen)
     : MusicCommon(parent, parentScreen, "streamview")

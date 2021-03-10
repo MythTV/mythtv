@@ -3,276 +3,25 @@
 # ----------------------
 # Name: tmdb3.py
 # Python Script
-# Author: Raymond Wagner
-# Purpose: This python script is intended to translate lookups between the
-#          TheMovieDB.org V3 API and MythTV's internal metadata format.
-#               http://www.mythtv.org/wiki/MythVideo_Grabber_Script_Format
-#               http://help.themoviedb.org/kb/api/about-3
-#-----------------------
-__title__ = "TheMovieDB.org V3"
-__author__ = "Raymond Wagner, Roland Ernst"
-__version__ = "0.3.8"
-# 0.1.0 Initial version
-# 0.2.0 Add language support, move cache to home directory
-# 0.3.0 Enable version detection to allow use in MythTV
-# 0.3.1 Add --test parameter for proper compatibility with mythmetadatalookup
-# 0.3.2 Add --area parameter to allow country selection for release date and
-#       parental ratings
-# 0.3.3 Use translated title if available
-# 0.3.4 Add support for finding by IMDB under -D (simulate previous version)
-# 0.3.5 Add debugging mode
-# 0.3.6 Add handling for TMDB site and library returning null results in
-#       search. This should only need to be a temporary fix, and should be
-#       resolved upstream.
-# 0.3.7 Add handling for TMDB site returning insufficient results from a
-#       query
-# 0.3.7.a : Added compatibiliy to python3, tested with python 3.6 and 2.7
-# 0.3.8 Sort posters by system language or 'en', if not found for given language
+# Author: Peter Bennett
+# Purpose:
+#   Frontend for the tmdb3 lookup.py script that now supports both Movies and
+#   TV shows. This frontend supports Movies
+# Command example:
+# See help (-h) options
+#
+# Code that was originally here is now in tmdb3/lookup.py
+#
+# License:Creative Commons GNU GPL v2
+# (http://creativecommons.org/licenses/GPL/2.0/)
+# -------------------------------------
+#
+__title__ = "TheMovieDB.org for TV V3"
+__author__ = "Peter Bennett"
 
 from optparse import OptionParser
 import sys
 import signal
-
-def print_etree(etostr):
-    """lxml.etree.tostring is a bytes object in python3, and a str in python2.
-    """
-    if sys.version_info[0] == 2:
-        sys.stdout.write(etostr)
-    else:
-        sys.stdout.write(etostr.decode())
-
-def timeouthandler(signal, frame):
-    raise RuntimeError("Timed out")
-
-def buildSingle(inetref, opts):
-    from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
-    from MythTV.tmdb3 import Movie, get_locale
-    from MythTV import VideoMetadata
-    from lxml import etree
-
-    import locale as py_locale
-    import re
-
-    if re.match('^0[0-9]{6}$', inetref):
-        movie = Movie.fromIMDB(inetref)
-    else:
-        movie = Movie(inetref)
-
-    tree = etree.XML(u'<metadata></metadata>')
-    mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
-               ['releasedate',  'releasedate'], ['tagline',     'tagline'],
-               ['description',  'overview'],    ['homepage',    'homepage'],
-               ['userrating',   'userrating'],  ['popularity',  'popularity'],
-               ['budget',       'budget'],      ['revenue',     'revenue']]
-    m = VideoMetadata()
-    for i,j in mapping:
-        try:
-            if getattr(movie, j):
-                setattr(m, i, getattr(movie, j))
-        except TMDBRequestInvalid:
-            print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
-                                            xml_declaration=True))
-            sys.exit()
-
-    if movie.title:
-        m.title = movie.title
-
-    releases = list(movie.releases.items())
-
-# get the release date for the wanted country
-# TODO if that is not part of the reply use the primary release date (Primary=true)
-# if that is not part of the reply use whatever release date is first in list
-# if there is not a single release date in the reply, then leave it empty
-    if len(releases) > 0:
-        if opts.country:
-            # resort releases with selected country at top to ensure it
-            # is selected by the metadata libraries
-            r = list(zip(*releases))
-            if opts.country in r[0]:
-                index = r[0].index(opts.country)
-                releases.insert(0, releases.pop(index))
-
-        m.releasedate = releases[0][1].releasedate
-
-    m.inetref = str(movie.id)
-    if movie.collection:
-        m.collectionref = str(movie.collection.id)
-    if m.releasedate:
-        m.year = m.releasedate.year
-    for country, release in releases:
-        if release.certification:
-            m.certifications[country] = release.certification
-    for genre in movie.genres:
-        m.categories.append(genre.name)
-    for studio in movie.studios:
-        m.studios.append(studio.name)
-    for country in movie.countries:
-        m.countries.append(country.name)
-    for cast in movie.cast:
-        d = {'name':cast.name, 'character':cast.character, 'department':'Actors',
-             'job':'Actor', 'url':'http://www.themoviedb.org/people/{0}'.format(cast.id)}
-        if cast.profile: d['thumb'] = cast.profile.geturl()
-        m.people.append(d)
-    for crew in movie.crew:
-        d = {'name':crew.name, 'job':crew.job, 'department':crew.department,
-             'url':'http://www.themoviedb.org/people/{0}'.format(crew.id)}
-        if crew.profile: d['thumb'] = crew.profile.geturl()
-        m.people.append(d)
-    for backdrop in movie.backdrops:
-        m.images.append({'type':'fanart', 'url':backdrop.geturl(),
-                        'thumb':backdrop.geturl(backdrop.sizes()[0]),
-                        'height':str(backdrop.height),
-                        'width':str(backdrop.width)})
-
-    # tmdb already sorts the posters by language
-    # if no poster of given language was found,
-    # try to sort by system language and then by language "en"
-    system_language = py_locale.getdefaultlocale()[0].split("_")[0]
-    locale_language = get_locale().language
-    if opts.debug:
-        print("system_language : ", system_language)
-        print("locale_language : ", locale_language)
-
-    loc_posters = movie.posters
-    if loc_posters[0].language != locale_language \
-                    and locale_language != system_language:
-        if opts.debug:
-            print("1: No poster found for language '%s', trying to sort posters by '%s' :"
-                    %(locale_language, system_language))
-        loc_posters = sorted(movie.posters,
-                    key = lambda x: x.language==system_language, reverse = True)
-
-    if loc_posters[0].language != system_language \
-                    and loc_posters[0].language != locale_language:
-        if opts.debug:
-            print("2: No poster found for language '%s', trying to sort posters by '%s' :"
-                    %(system_language, "en"))
-        loc_posters = sorted(movie.posters,
-                    key = lambda x: x.language=="en", reverse = True)
-
-    for poster in loc_posters:
-        if opts.debug:
-            print("Poster : ", poster.language, " | ", poster.userrating,
-                    "\t | ", poster.geturl())
-        m.images.append({'type':'coverart', 'url':poster.geturl(),
-                        'thumb':poster.geturl(poster.sizes()[0]),
-                        'height':str(poster.height),
-                        'width':str(poster.width)})
-
-    tree.append(m.toXML())
-    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
-    sys.exit()
-
-def buildList(query, opts):
-    # TEMPORARY FIX:
-    # replace all dashes from queries to work around search behavior
-    # as negative to all text that comes afterwards
-    query = query.replace('-',' ')
-
-    from MythTV.tmdb3 import searchMovie
-    from MythTV import VideoMetadata
-    from lxml import etree
-    results = iter(searchMovie(query))
-    tree = etree.XML(u'<metadata></metadata>')
-    mapping = [['runtime',      'runtime'],     ['title',       'originaltitle'],
-               ['releasedate',  'releasedate'], ['tagline',     'tagline'],
-               ['description',  'overview'],    ['homepage',    'homepage'],
-               ['userrating',   'userrating'],  ['popularity',  'popularity']]
-
-    count = 0
-    while True:
-        try:
-            res = next(results)
-        except StopIteration:
-            # end of results
-            break
-        except IndexError:
-            # unexpected end of results
-            # we still want to return whatever we have so far
-            break
-
-        if res is None:
-            # faulty data, skip it and continue
-            continue
-
-        m = VideoMetadata()
-        for i,j in mapping:
-            if getattr(res, j):
-                setattr(m, i, getattr(res, j))
-        m.inetref = str(res.id)
-
-        if res.title:
-            m.title = res.title
-
-        #TODO:
-        # should releasedate and year be pulled from the country-specific data
-        # or should it be left to the default information to cut down on
-        # traffic from searches
-        if res.releasedate:
-            m.year = res.releasedate.year
-        if res.backdrop:
-            b = res.backdrop
-            m.images.append({'type':'fanart', 'url':b.geturl(),
-                             'thumb':b.geturl(b.sizes()[0])})
-        if res.poster:
-            p = res.poster
-            m.images.append({'type':'coverart', 'url':p.geturl(),
-                             'thumb':p.geturl(p.sizes()[0])})
-        tree.append(m.toXML())
-        count += 1
-        if count >= 60:
-            # page limiter, dont want to overload the server
-            break
-
-    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
-    sys.exit(0)
-
-def buildCollection(inetref, opts):
-    from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
-    from MythTV.tmdb3 import Collection
-    from MythTV import VideoMetadata
-    from lxml import etree
-    collection = Collection(inetref)
-    tree = etree.XML(u'<metadata></metadata>')
-    m = VideoMetadata()
-    m.collectionref = str(collection.id)
-    try:
-        m.title = collection.name
-    except TMDBRequestInvalid:
-        print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
-                                        xml_declaration=True))
-        sys.exit()
-    if collection.backdrop:
-        b = collection.backdrop
-        m.images.append({'type':'fanart', 'url':b.geturl(),
-                  'thumb':b.geturl(b.sizes()[0])})
-    if collection.poster:
-        p = collection.poster
-        m.images.append({'type':'coverart', 'url':p.geturl(),
-                  'thumb':p.geturl(p.sizes()[0])})
-    tree.append(m.toXML())
-    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
-    sys.exit()
-
-def buildVersion():
-    from lxml import etree
-    version = etree.XML(u'<grabber></grabber>')
-    etree.SubElement(version, "name").text = __title__
-    etree.SubElement(version, "author").text = __author__
-    etree.SubElement(version, "thumbnail").text = 'tmdb.png'
-    etree.SubElement(version, "command").text = 'tmdb3.py'
-    etree.SubElement(version, "type").text = 'movie'
-    etree.SubElement(version, "description").text = \
-                                'Search and metadata downloads for themoviedb.org'
-    etree.SubElement(version, "version").text = __version__
-    etree.SubElement(version, "accepts").text = 'tmdb.py'
-    etree.SubElement(version, "accepts").text = 'tmdb.pl'
-    print_etree(etree.tostring(version, encoding='UTF-8', pretty_print=True,
-                                    xml_declaration=True))
-    sys.exit(0)
 
 def performSelfTest():
     err = 0
@@ -297,19 +46,22 @@ def performSelfTest():
 
     if not err:
         print ("Everything appears in order.")
-    sys.exit(err)
+    return err
 
-def main():
+def main(showType, command):
+
     parser = OptionParser()
 
     parser.add_option('-v', "--version", action="store_true", default=False,
                       dest="version", help="Display version and author")
     parser.add_option('-t', "--test", action="store_true", default=False,
                       dest="test", help="Perform self-test for dependencies.")
-    parser.add_option('-M', "--movielist", action="store_true", default=False,
-                      dest="movielist", help="Get Movies matching search.")
-    parser.add_option('-D', "--moviedata", action="store_true", default=False,
-                      dest="moviedata", help="Get Movie data.")
+    parser.add_option('-M', "--movielist", "--list", action="store_true", default=False,
+                      dest="movielist",
+                      help="Get Movies. Needs search key.")
+    parser.add_option('-D', "--moviedata", "--data", action="store_true", default=False,
+                      dest="moviedata", help="Get Movie data. " \
+                      "Needs inetref. ")
     parser.add_option('-C', "--collection", action="store_true", default=False,
                       dest="collectiondata", help="Get Collection data.")
     parser.add_option('-l', "--language", metavar="LANGUAGE", default=u'en',
@@ -322,14 +74,12 @@ def main():
 
     opts, args = parser.parse_args()
 
+    from MythTV.tmdb3.lookup import timeouthandler
     signal.signal(signal.SIGALRM, timeouthandler)
     signal.alarm(180)
 
-    if opts.version:
-        buildVersion()
-
     if opts.test:
-        performSelfTest()
+        return performSelfTest()
 
     from MythTV.tmdb3 import set_key, set_cache, set_locale
     set_key('c27cb71cff5bd76e1a7a009380562c62')
@@ -345,7 +95,7 @@ def main():
             confdir = os.environ.get('HOME', '')
             if (not confdir) or (confdir == '/'):
                 print ("Unable to find MythTV directory for metadata cache.")
-                sys.exit(1)
+                return 1
             confdir = os.path.join(confdir, '.mythtv')
         cachedir = os.path.join(confdir, 'cache')
         if not os.path.exists(cachedir):
@@ -358,22 +108,43 @@ def main():
     if opts.country:
         set_locale(country=opts.country, fallthrough=True)
 
-    if (len(args) != 1) or (args[0] == ''):
-        sys.stdout.write('ERROR: tmdb3.py requires exactly one non-empty argument')
-        sys.exit(1)
+    if (not opts.version):
+        if (len(args) < 1) or (args[0] == ''):
+            sys.stdout.write('ERROR: tmdb3.py requires at least one non-empty argument.\n')
+            return 1
 
+    from MythTV.tmdb3.lookup import buildVersion, buildMovieList, \
+        buildSingle, buildCollection, print_etree
     try:
-        if opts.movielist:
-            buildList(args[0], opts)
+        xml = None
+        if opts.version:
+            xml = buildVersion(showType, command)
 
-        if opts.moviedata:
-            buildSingle(args[0], opts)
+        elif opts.movielist:
+            xml = buildMovieList(args[0], opts)
 
-        if opts.collectiondata:
-            buildCollection(args[0], opts)
+        elif opts.moviedata:
+            xml = buildSingle(args[0], opts)
+
+        elif opts.collectiondata:
+            xml = buildCollection(args[0], opts)
+
+        # if a number is returned, it is an error code return
+        if isinstance(xml,int):
+            return xml
+
+        if xml:
+            print_etree(xml)
+        else:
+            return 1
+
     except RuntimeError as exc:
         sys.stdout.write('ERROR: ' + str(exc) + ' exception')
-        sys.exit(1)
+        import traceback
+        traceback.print_exc()
+        return 1
+
+    return 0
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main("movie",'tmdb3.py'))

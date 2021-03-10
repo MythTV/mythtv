@@ -6,6 +6,7 @@ extern "C" {
 #include "libavcodec/avcodec.h"        /* AVFrame */
 }
 #include "mythcorecontext.h"    /* gContext */
+#include "mythchrono.h"
 #include "compat.h"
 
 #include "CommDetector2.h"
@@ -114,10 +115,6 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
     const int               VERTSLOP = std::max(kMaxLines, pgmheight * 1 / 120);
     const int               HORIZSLOP = std::max(kMaxLines, pgmwidth * 1 / 160);
 
-    struct timeval start {};
-    struct timeval end {};
-    struct timeval elapsed {};
-
     int minrow    = VERTMARGIN;
     int mincol    = HORIZMARGIN;
     int maxrow1   = pgmheight - VERTMARGIN;   /* maxrow + 1 */
@@ -129,7 +126,7 @@ BorderDetector::getDimensions(const AVFrame *pgm, int pgmheight,
     bool top    = false;
     bool bottom = false;
 
-    (void)gettimeofday(&start, nullptr);
+    auto start = nowAsDuration<std::chrono::microseconds>();
 
     if (_frameno != kUncached && _frameno == m_frameNo)
         goto done;
@@ -366,9 +363,8 @@ done:
     *pwidth = m_width;
     *pheight = m_height;
 
-    (void)gettimeofday(&end, nullptr);
-    timersub(&end, &start, &elapsed);
-    timeradd(&m_analyzeTime, &elapsed, &m_analyzeTime);
+    auto end = nowAsDuration<std::chrono::microseconds>();
+    m_analyzeTime += (end - start);
 
     return m_isMonochromatic ? -1 : 0;
 }
@@ -379,7 +375,7 @@ BorderDetector::reportTime(void)
     if (!m_timeReported)
     {
         LOG(VB_COMMFLAG, LOG_INFO, QString("BD Time: analyze=%1s")
-                .arg(strftimeval(&m_analyzeTime)));
+                .arg(strftimeval(m_analyzeTime)));
         m_timeReported = true;
     }
     return 0;

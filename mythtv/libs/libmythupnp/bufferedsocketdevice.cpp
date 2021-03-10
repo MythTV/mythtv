@@ -381,7 +381,7 @@ qulonglong BufferedSocketDevice::BytesAvailable(void)
 /////////////////////////////////////////////////////////////////////////////
 
 qulonglong BufferedSocketDevice::WaitForMore(
-    int msecs, bool *pTimeout /* = nullptr*/ ) 
+    std::chrono::milliseconds msecs, bool *pTimeout /* = nullptr*/ )
 {
     bool bTimeout = false;
 
@@ -409,7 +409,7 @@ qulonglong BufferedSocketDevice::WaitForMore(
             // give up control
 
             // should be some multiple of msWait.
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(1ms);
 
         }
     }
@@ -417,7 +417,7 @@ qulonglong BufferedSocketDevice::WaitForMore(
         // -=>TODO: Override the timeout to 1 second... Closes connection sooner
         //          to help recover from lost requests.  (hack until better fix found)
 
-        msecs  = 1000;
+        msecs  = 1s;
 
         nBytes = m_pSocket->waitForMore( msecs, &bTimeout );
 
@@ -623,7 +623,7 @@ QString BufferedSocketDevice::ReadLine()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString BufferedSocketDevice::ReadLine( int msecs )
+QString BufferedSocketDevice::ReadLine( std::chrono::milliseconds msecs )
 {
     MythTimer timer;
     QString   sLine;
@@ -636,7 +636,7 @@ QString BufferedSocketDevice::ReadLine( int msecs )
     // or timeout.
     // ----------------------------------------------------------------------
 
-    if ( msecs > 0)
+    if ( msecs > 0ms)
     {
         bool bTimeout = false;
 
@@ -650,7 +650,7 @@ QString BufferedSocketDevice::ReadLine( int msecs )
 
             WaitForMore( msecs, &bTimeout );
 
-            if ( timer.elapsed() >= msecs ) 
+            if ( timer.elapsed() >= msecs )
             {
                 bTimeout = true;
                 LOG(VB_HTTP, LOG_INFO, "Exceeded Total Elapsed Wait Time." );

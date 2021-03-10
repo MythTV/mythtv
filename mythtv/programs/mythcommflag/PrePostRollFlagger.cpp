@@ -1,4 +1,3 @@
-#include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
 #include "PrePostRollFlagger.h"
@@ -46,7 +45,7 @@ bool PrePostRollFlagger::go()
         if (m_bStop)
             return false;
 
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(5s);
         secsSince = m_startedAt.secsTo(MythDate::current());
     }
 
@@ -69,7 +68,6 @@ bool PrePostRollFlagger::go()
             "NVP: Unable to initialize video for FlagCommercials.");
         return false;
     }
-    m_player->EnableSubtitles(false);
 
     emit breathe();
     if (m_bStop)
@@ -155,7 +153,7 @@ bool PrePostRollFlagger::go()
                 return false;
             emit statusUpdate(QCoreApplication::translate("(mythcommflag)",
                 "Waiting for recording to finish"));
-            std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::this_thread::sleep_for(5s);
         }
         m_stillRecording = false;
          m_myTotalFrames = m_player->GetTotalFrameCount();
@@ -238,9 +236,9 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 
     while (m_player->GetEof() == kEofStateNone)
     {
-        struct timeval startTime {};
+        std::chrono::microseconds startTime {0us};
         if (m_stillRecording)
-            gettimeofday(&startTime, nullptr);
+            startTime = nowAsDuration<std::chrono::microseconds>();
 
         MythVideoFrame* currentFrame = m_player->GetRawVideoFrame();
         currentFrameNumber = currentFrame->m_frameNumber;
@@ -279,12 +277,12 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
         while (m_bPaused)
         {
             emit breathe();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(1s);
         }
 
         // sleep a little so we don't use all cpu even if we're niced
         if (!m_fullSpeed && !m_stillRecording)
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
 
         if (((currentFrameNumber % 500) == 0) ||
             ((m_showProgress || m_stillRecording) &&
@@ -356,28 +354,24 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
                 m_recordingStartedAt.secsTo(MythDate::current());
             int secondsFlagged = (int)(framesProcessed / m_fps);
             int secondsBehind = secondsRecorded - secondsFlagged;
-            long usecPerFrame = (long)(1.0F / m_player->GetFrameRate() * 1000000);
+            auto usecPerFrame = floatusecs(1000000.0F / m_player->GetFrameRate());
 
-            struct timeval endTime {};
-            gettimeofday(&endTime, nullptr);
+            auto endTime = nowAsDuration<std::chrono::microseconds>();
 
-            long long usecSleep =
-                      usecPerFrame -
-                      (((endTime.tv_sec - startTime.tv_sec) * 1000000) +
-                       (endTime.tv_usec - startTime.tv_usec));
+            floatusecs usecSleep = usecPerFrame - (endTime - startTime);
 
             if (secondsBehind > requiredBuffer)
             {
                 if (m_fullSpeed)
-                    usecSleep = 0;
+                    usecSleep = 0us;
                 else
-                    usecSleep = (long)(usecSleep * 0.25);
+                    usecSleep = usecSleep * 0.25;
             }
             else if (secondsBehind < requiredBuffer)
-                usecSleep = (long)(usecPerFrame * 1.5);
+                usecSleep = usecPerFrame * 1.5;
 
-            if (usecSleep > 0)
-                std::this_thread::sleep_for(std::chrono::microseconds(usecSleep));
+            if (usecSleep > 0us)
+                std::this_thread::sleep_for(usecSleep);
         }
 
         m_player->DiscardVideoFrame(currentFrame);

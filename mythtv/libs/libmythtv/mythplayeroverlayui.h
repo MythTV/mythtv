@@ -37,8 +37,10 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
     void UpdateOSDPosition();
 
   protected:
-    virtual int64_t GetSecondsPlayed(bool HonorCutList, int Divisor = 1000);
-    virtual int64_t GetTotalSeconds(bool HonorCutList, int Divisor = 1000) const;
+    virtual std::chrono::milliseconds GetMillisecondsPlayed(bool HonorCutList);
+    virtual std::chrono::milliseconds GetTotalMilliseconds(bool HonorCutList) const;
+    std::chrono::seconds GetSecondsPlayed(bool HonorCutList);
+    std::chrono::seconds GetTotalSeconds(bool HonorCutList) const;
 
     OSD    m_osd;
     QMutex m_osdLock   { QMutex::Recursive };
@@ -49,7 +51,6 @@ class MTV_PUBLIC MythPlayerOverlayUI : public MythPlayerUIBase
 
   private:
     Q_DISABLE_COPY(MythPlayerOverlayUI)
-
     QTimer m_positionUpdateTimer;
 };
 

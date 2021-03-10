@@ -50,7 +50,7 @@ public:
     bool IsOpen(void) const override; // RingBuffer
     long long GetReadPosition(void) const override; // RingBuffer
     bool OpenFile(const QString &lfilename,
-                  uint retry_ms = kDefaultOpenTimeout) override; // RingBuffer
+                  std::chrono::milliseconds retry_ms = kDefaultOpenTimeout) override; // RingBuffer
     bool IsStreamed(void) override          { return false;   }  // RingBuffer
     bool IsSeekingAllowed(void) override    { return !m_error; } // RingBuffer
     bool IsBookmarkAllowed(void) override   { return true; }     // RingBuffer
@@ -91,7 +91,7 @@ private:
     int ParseM3U8(const QByteArray *buffer, StreamsList *streams = nullptr);
     int Prefetch(int count);
     void SanityCheck(const HLSStream *hls) const;
-    HLSSegment *GetSegment(int segnum, int timeout = 1000);
+    HLSSegment *GetSegment(int segnum, std::chrono::milliseconds timeout = 1s);
     int NumSegments(void) const;
     int ChooseSegment(int stream) const;
     int64_t SizeMedia(void) const;

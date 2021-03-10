@@ -29,7 +29,7 @@ void MythBDDecoder::UpdateFramesPlayed(void)
     if (!m_ringBuffer->IsBD())
         return;
 
-    auto currentpos = static_cast<long long>(m_ringBuffer->BD()->GetCurrentTime() * m_fps);
+    auto currentpos = static_cast<long long>(m_ringBuffer->BD()->GetCurrentTime().count() * m_fps);
     m_framesPlayed = m_framesRead = currentpos ;
     m_parent->SetFramesPlayed(static_cast<uint64_t>(currentpos + 1));
 }

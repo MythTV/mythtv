@@ -35,7 +35,7 @@ class MythPowerDBus : public MythPower
     void Init             (void) override;
     bool DoFeature        (bool Delayed = false) override;
     void DidWakeUp        (void) override;
-    bool ScheduleFeature  (enum Feature Type, uint Delay) override;
+    bool ScheduleFeature  (enum Feature Type, std::chrono::seconds Delay) override;
 
   private:
     bool UpdateStatus        (void);

@@ -13,7 +13,7 @@ class MythTranscodePlayer : public MythPlayer
     void InitForTranscode      (bool CopyAudio, bool CopyVideo);
     void SetCutList            (const frm_dir_map_t& CutList);
     bool TranscodeGetNextFrame (int& DidFF, bool& KeyFrame, bool HonorCutList);
-    bool WriteStoredData       (MythMediaBuffer* OutBuffer, bool WriteVideo, long TimecodeOffset);
+    bool WriteStoredData       (MythMediaBuffer* OutBuffer, bool WriteVideo, std::chrono::milliseconds TimecodeOffset);
     long UpdateStoredFrameNum  (long CurrentFrameNum);
 };
 

@@ -36,7 +36,7 @@ TVBrowseHelper::~TVBrowseHelper()
     BrowseWait();
 }
 
-void TVBrowseHelper::BrowseInit(uint BrowseMaxForward, bool BrowseAllTuners,
+void TVBrowseHelper::BrowseInit(std::chrono::seconds BrowseMaxForward, bool BrowseAllTuners,
                                 bool UseChannelGroups, const QString &DBChannelOrdering)
 {
     m_dbBrowseMaxForward = BrowseMaxForward;
@@ -147,7 +147,7 @@ void TVBrowseHelper::BrowseDispInfo(const BrowseInfo& Browseinfo)
         return;
 
     m_parent->KillTimer(m_browseTimerId);
-    m_browseTimerId = m_parent->StartTimer(static_cast<int>(TV::kBrowseTimeout), __LINE__);
+    m_browseTimerId = m_parent->StartTimer(TV::kBrowseTimeout, __LINE__);
 
     QMutexLocker locker(&m_browseLock);
     if (BROWSE_SAME == Browseinfo.m_dir)
@@ -341,10 +341,14 @@ void TVBrowseHelper::GetNextProgramDB(BrowseDirection direction, InfoMap& Infoma
 
     if (chandir != -1)
     {
-        chanid = ChannelUtil::GetNextChannel(m_dbAllVisibleChannels, chanid, 0 /*mplexid_restriction*/,
+        chanid = ChannelUtil::GetNextChannel(m_dbAllVisibleChannels,
+                                            chanid,
+                                             0 /* mplexid_restriction */,
                                              0 /* chanid restriction */,
                                              static_cast<ChannelChangeDirection>(chandir),
-                                             true /*skip non visible*/, true /*skip same callsign*/);
+                                             true /* skip non visible */,
+                                             true /* skip_same_channum_and_callsign */,
+                                             true /* skip_other_sources */);
     }
 
     Infomap["chanid"]  = QString::number(chanid);
@@ -438,7 +442,7 @@ void TVBrowseHelper::run()
         if (lasttime < curtime)
             m_browseStartTime = curtime.toString(Qt::ISODate);
 
-        QDateTime maxtime  = curtime.addSecs(m_dbBrowseMaxForward);
+        QDateTime maxtime  = curtime.addSecs(m_dbBrowseMaxForward.count());
         if ((lasttime > maxtime) && (direction == BROWSE_RIGHT))
             continue;
 

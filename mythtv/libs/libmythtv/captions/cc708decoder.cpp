@@ -73,10 +73,9 @@ void CC708Decoder::decode_cc_null(void)
     m_partialPacket.size = 0;
 }
 
-void CC708Decoder::services(uint seconds, cc708_seen_flags & seen) const
+void CC708Decoder::services(std::chrono::seconds seconds, cc708_seen_flags & seen) const
 {
-    time_t now = time(nullptr);
-    time_t then = now - seconds;
+    auto then = SystemClock::now() - seconds;
 
     seen[0] = false; // service zero is not allowed in CEA-708-D
     for (uint i = 1; i < 64; i++)
@@ -689,7 +688,7 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
             append_cc(cb_cbs, service_number,
                       &pkt_buf[block_data_offset], block_size);
 
-            last_seen[service_number] = time(nullptr);
+            last_seen[service_number] = std::chrono::system_clock::now();
         }
         off+=block_size+1;
     }

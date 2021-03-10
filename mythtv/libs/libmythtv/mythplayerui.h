@@ -2,12 +2,12 @@
 #define MYTHPLAYERUI_H
 
 // MythTV
-#include "mythplayervisualiserui.h"
+#include "mythplayereditorui.h"
 #include "mythvideoscantracker.h"
 #include "jitterometer.h"
 #include "mythplayer.h"
 
-class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoScanTracker
+class MTV_PUBLIC MythPlayerUI : public MythPlayerEditorUI, public MythVideoScanTracker
 {
     Q_OBJECT
 
@@ -36,27 +36,10 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
                         bool ForceUpdate, int ReferenceFrames,
                         FrameScanType Scan = kScan_Ignore,
                         const QString& CodecName = QString()) override;
-    bool DoFastForwardSecs(float Seconds, double Inaccuracy, bool UseCutlist);
-    bool DoRewindSecs(float Seconds, double Inaccuracy, bool UseCutlist);
     void GetPlaybackData(InfoMap& Map);
     void GetCodecDescription(InfoMap& Map);
     bool CanSupportDoubleRate();
     void SetWatched(bool ForceWatched = false);
-
-    // N.B. Editor - keep ringfenced and move into subclass
-    void EnableEdit();
-    void DisableEdit(int HowToSave);
-    bool HandleProgramEditorActions(QStringList& Actions);
-    uint64_t GetNearestMark(uint64_t Frame, bool Right);
-    bool IsTemporaryMark(uint64_t Frame);
-    bool HasTemporaryMark();
-    bool IsCutListSaved();
-    bool DeleteMapHasUndo();
-    bool DeleteMapHasRedo();
-    QString DeleteMapGetUndoMessage();
-    QString DeleteMapGetRedoMessage();
-    void HandleArbSeek(bool Direction);
-    // End editor stuff
 
   protected:
     void InitFrameInterval() override;
@@ -65,17 +48,12 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerVisualiserUI, public MythVideoS
 
     void FileChanged();
     void RefreshPauseFrame();
-    void RenderVideoFrame(MythVideoFrame* Frame, FrameScanType Scan, bool Prepare, int64_t Wait);
-    void DoDisplayVideoFrame(MythVideoFrame* Frame, int64_t Due);
+    void RenderVideoFrame(MythVideoFrame* Frame, FrameScanType Scan, bool Prepare, std::chrono::microseconds Wait);
+    void DoDisplayVideoFrame(MythVideoFrame* Frame, std::chrono::microseconds Due);
     void EnableFrameRateMonitor(bool Enable = false);
     void EnableBitrateMonitor(bool Enable = false);
 
     Jitterometer    m_outputJmeter { "Player" };
-
-    // N.B. Editor - keep ringfenced and move into subclass
-    QElapsedTimer   m_editUpdateTimer;
-    float           m_speedBeforeEdit  { 1.0   };
-    bool            m_pausedBeforeEdit { false };
 
   private:
     Q_DISABLE_COPY(MythPlayerUI)

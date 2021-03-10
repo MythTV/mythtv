@@ -34,8 +34,6 @@
 #include "zmclient.h"
 #include "zmplayer.h"
 
-using namespace std::chrono_literals;
-
 ZMPlayer::ZMPlayer(MythScreenStack *parent, const char *name,
                    std::vector<Event *> *eventList, size_t *currentEvent)
          :MythScreenType(parent, name),

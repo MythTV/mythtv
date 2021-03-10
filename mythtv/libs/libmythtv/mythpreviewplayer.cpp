@@ -25,10 +25,10 @@ MythPreviewPlayer::MythPreviewPlayer(PlayerContext* Context, PlayerFlags Flags)
  *  \param FrameHeight [out] Height of buffer returned
  *  \param AspectRatio [out] Aspect of buffer returned
  */
-char *MythPreviewPlayer::GetScreenGrab(int SecondsIn, int& BufferSize,
+char *MythPreviewPlayer::GetScreenGrab(std::chrono::seconds SecondsIn, int& BufferSize,
                                        int& FrameWidth, int& FrameHeight, float& AspectRatio)
 {
-    auto frameNum = static_cast<uint64_t>(SecondsIn * m_videoFrameRate);
+    auto frameNum = static_cast<uint64_t>(SecondsIn.count() * m_videoFrameRate);
     return GetScreenGrabAtFrame(frameNum, false, BufferSize, FrameWidth, FrameHeight, AspectRatio);
 }
 

@@ -53,7 +53,8 @@ MythPlayerAudioUI::MythPlayerAudioUI(MythMainWindow* MainWindow, TV *Tv,
 
     // Setup
     MythPlayerAudioUI::SetupAudioOutput(Context->m_tsNormal);
-    MythPlayerAudioUI::AdjustAudioTimecodeOffset(0, gCoreContext->GetNumSetting("AudioSyncOffset", 0));
+    auto offset = gCoreContext->GetDurSetting<std::chrono::milliseconds>("AudioSyncOffset", 0ms);
+    MythPlayerAudioUI::AdjustAudioTimecodeOffset(0ms, offset);
 }
 
 /// \brief Initialise audio and signal initial state
@@ -180,21 +181,21 @@ void MythPlayerAudioUI::SetupAudioOutput(float TimeStretch)
     m_audio.SetStretchFactor(TimeStretch);
 }
 
-void MythPlayerAudioUI::AdjustAudioTimecodeOffset(int64_t Delta, int Value)
+void MythPlayerAudioUI::AdjustAudioTimecodeOffset(std::chrono::milliseconds Delta, std::chrono::milliseconds Value)
 {
-    int64_t oldwrap = m_tcWrap[TC_AUDIO];
+    std::chrono::milliseconds oldwrap = m_tcWrap[TC_AUDIO];
 
-    if ((Value >= -1000) && (Value <= 1000))
+    if ((Value >= -1000ms) && (Value <= 1000ms))
         m_tcWrap[TC_AUDIO] = Value;
     else
         m_tcWrap[TC_AUDIO] += Delta;
 
-    int64_t newwrap = m_tcWrap[TC_AUDIO];
+    std::chrono::milliseconds newwrap = m_tcWrap[TC_AUDIO];
     if (!(m_browsing || m_editing))
     {
         UpdateOSDStatus(tr("Adjust Audio Sync"), tr("Audio Sync"),
-                        QString::number(newwrap), kOSDFunctionalType_AudioSyncAdjust,
-                        "ms", (static_cast<int>(newwrap) / 2) + 500, kOSDTimeout_None);
+                        QString::number(newwrap.count()), kOSDFunctionalType_AudioSyncAdjust,
+                        "ms", (newwrap / 2 + 500ms).count(), kOSDTimeout_None);
         ChangeOSDPositionUpdates(false);
     }
 

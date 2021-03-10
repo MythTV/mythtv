@@ -16,7 +16,7 @@ MythOverlayState::MythOverlayState(bool Browsing, bool Editing)
  * \brief A simple wrapper around audio state used to signal changes
  * in the current state.
 */
-MythAudioState::MythAudioState(AudioPlayer* Player, int64_t Offset)
+MythAudioState::MythAudioState(AudioPlayer* Player, std::chrono::milliseconds Offset)
   : m_hasAudioOut(Player->HasAudioOut()),
     m_volumeControl(Player->ControlsVolume()),
     m_volume(Player->GetVolume()),
@@ -73,5 +73,24 @@ MythVisualiserState::MythVisualiserState(bool Embedding, bool Visualising,
     m_visualising(Visualising),
     m_visualiserName(std::move(Name)),
     m_visualiserList(std::move(Visualisers))
+{
+}
+
+MythEditorState::MythEditorState(uint64_t Current, uint64_t Previous, uint64_t Next, uint64_t Total,
+                                 bool InDelete, bool IsTemp, bool HasTemp,
+                                 bool HasUndo, QString Undo, bool HasRedo, QString Redo,
+                                 bool Saved)
+  : m_currentFrame(Current),
+    m_previousCut(Previous),
+    m_nextCut(Next),
+    m_totalFrames(Total),
+    m_frameInDelete(InDelete),
+    m_isTempMark(IsTemp),
+    m_hasTempMark(HasTemp),
+    m_hasUndo(HasUndo),
+    m_undoMessage(std::move(Undo)),
+    m_hasRedo(HasRedo),
+    m_redoMessage(std::move(Redo)),
+    m_saved(Saved)
 {
 }

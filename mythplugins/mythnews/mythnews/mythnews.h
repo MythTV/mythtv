@@ -50,8 +50,8 @@ class MythNews : public MythScreenType
     NewsSite::List m_newsSites;
 
     QTimer        *m_retrieveTimer   {nullptr};
-    int            m_timerTimeout    {10*60*1000};
-    unsigned int   m_updateFreq      {30};
+    std::chrono::minutes  m_timerTimeout  {10min};
+    std::chrono::minutes  m_updateFreq    {30min};
 
     QString        m_zoom            {"1.0"};
     QString        m_browser;

@@ -211,15 +211,15 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
      * Common commercial-break lengths.
      */
     struct breakType {
-        int     m_len;    /* seconds */
-        int     m_delta;  /* seconds */
+        std::chrono::seconds m_len;
+        std::chrono::seconds m_delta;
     };
     static constexpr std::array<const breakType,4> kBreakType {{
         /* Sort by "len". */
-        { 15,   2 },
-        { 20,   2 },
-        { 30,   5 },
-        { 60,   5 },
+        { 15s,   2s },
+        { 20s,   2s },
+        { 30s,   5s },
+        { 60s,   5s },
     }};
 
     /*
@@ -249,13 +249,12 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                 long long jjlen = *jjblank;
                 long long end = brke + jjlen / 2;
 
-                auto testlen = (long long)roundf((end - start) / fps);
+                auto testlen = std::chrono::seconds(lroundf((end - start) / fps));
                 if (testlen > type.m_len + type.m_delta)
                     break;      /* Too far ahead; break to next break length. */
 
-                long long delta = testlen - type.m_len;
-                if (delta < 0)
-                    delta = 0 - delta;
+                std::chrono::seconds delta = testlen - type.m_len;
+                delta = std::chrono::abs(delta);
 
                 if (delta > type.m_delta)
                     continue;   /* Outside delta range; try next end-blank. */

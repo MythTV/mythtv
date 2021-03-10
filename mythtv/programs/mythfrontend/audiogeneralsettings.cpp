@@ -748,16 +748,16 @@ void AudioTestThread::run()
                     AudioOutputUtil::GeneratePinkFrames(frames, m_channels,
                                                         current, 1000,
                                                         m_hd ? 32 : 16);
-                    if (!m_audioOutput->AddFrames(frames, 1000 , -1))
+                    if (!m_audioOutput->AddFrames(frames, 1000 , -1ms))
                     {
                         LOG(VB_AUDIO, LOG_ERR, "AddData() Audio buffer "
                                                "overflow, audio data lost!");
                     }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(m_audioOutput->LengthLastData()));
+                    std::this_thread::sleep_for(m_audioOutput->LengthLastData());
                 }
                 m_audioOutput->Drain();
                 m_audioOutput->Pause(true);
-                std::this_thread::sleep_for(std::chrono::milliseconds(500)); // .5s pause
+                std::this_thread::sleep_for(500ms); // .5s pause
                 m_audioOutput->Pause(false);
             }
             if (m_channel >= 0)

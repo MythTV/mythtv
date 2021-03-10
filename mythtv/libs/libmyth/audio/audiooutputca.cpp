@@ -280,7 +280,7 @@ bool AudioOutputCA::OpenDevice()
             if (result < 0)
             {
                 d->CloseAnalog();
-                usleep((1000 * 1000) - 1); // Argument to usleep must be less than 1 million
+                usleep(1s - 1us); // Argument to usleep must be less than 1 second
             }
         }
         deviceOpened = (result > 0);
@@ -401,16 +401,16 @@ int AudioOutputCA::GetBufferedOnSoundcard(void) const
 /** Reimplement the base class's version of GetAudiotime()
  *  so that we don't use gettimeofday or Qt mutexes.
  */
-int64_t AudioOutputCA::GetAudiotime(void)
+std::chrono::milliseconds AudioOutputCA::GetAudiotime(void)
 {
-    int audbuf_timecode = GetBaseAudBufTimeCode();
+    std::chrono::milliseconds audbuf_timecode = GetBaseAudBufTimeCode();
 
-    if (!audbuf_timecode)
-        return 0;
+    if (audbuf_timecode == 0ms)
+        return 0ms;
 
     int totalbuffer = audioready() + GetBufferedOnSoundcard();
 
-    return audbuf_timecode - (int)(totalbuffer * 100000.0 /
+    return audbuf_timecode - millisecondsFromFloat(totalbuffer * 100000.0 /
                                    (m_outputBytesPerFrame *
                                     m_effDsp * m_stretchFactor));
 }

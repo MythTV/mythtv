@@ -10,7 +10,7 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-HEADERS += mthread.h mthreadpool.h
+HEADERS += mthread.h mthreadpool.h mythchrono.h
 HEADERS += mythsocket.h mythsocket_cb.h
 HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h
 HEADERS += verbosedefs.h mythversion.h compat.h mythconfig.h
@@ -153,7 +153,7 @@ inc.files += mythcoreutil.h mythlocale.h mythdownloadmanager.h
 inc.files += mythtranslation.h iso639.h iso3166.h mythmedia.h mythmiscutil.h
 inc.files += mythcdrom.h autodeletedeque.h dbutil.h mythdeque.h
 inc.files += referencecounter.h referencecounterlist.h mythcommandlineparser.h
-inc.files += mthread.h mthreadpool.h
+inc.files += mthread.h mthreadpool.h mythchrono.h
 inc.files += filesysteminfo.h hardwareprofile.h bonjourregister.h serverpool.h
 inc.files += plist.h bswap.h signalhandling.h ffmpeg-mmx.h mythdate.h
 inc.files += mythplugin.h mythpluginapi.h mythqtcompat.h

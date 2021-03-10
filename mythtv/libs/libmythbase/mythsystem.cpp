@@ -68,7 +68,7 @@ class MythSystemLegacyWrapper : public MythSystem
 
     ~MythSystemLegacyWrapper(void) override
     {
-        MythSystemLegacyWrapper::Wait(0);
+        MythSystemLegacyWrapper::Wait(0ms);
     }
 
     uint GetFlags(void) const override // MythSystem
@@ -100,11 +100,11 @@ class MythSystemLegacyWrapper : public MythSystem
     ///         think it is running even though it is not.
     /// WARNING The legacy timeout is in seconds not milliseconds,
     ///         timeout will be rounded.
-    bool Wait(uint timeout_ms) override // MythSystem
+    bool Wait(std::chrono::milliseconds timeout) override // MythSystem
     {
-        timeout_ms = (timeout_ms >= 1000) ? timeout_ms + 500 :
-            ((timeout_ms == 0) ? 0 : 1000);
-        uint legacy_wait_ret = m_legacy->Wait(timeout_ms / 1000);
+        timeout = (timeout >= 1s) ? timeout + 500ms :
+            ((timeout == 0ms) ? 0ms : 1s);
+        uint legacy_wait_ret = m_legacy->Wait(duration_cast<std::chrono::seconds>(timeout));
         return GENERIC_EXIT_RUNNING != legacy_wait_ret;
     }
 
@@ -132,7 +132,7 @@ class MythSystemLegacyWrapper : public MythSystem
         if (!(kMSStdOut & m_flags))
             return nullptr;
 
-        Wait(0); // legacy getbuffer is not thread-safe, so wait
+        Wait(0ms); // legacy getbuffer is not thread-safe, so wait
 
         if (!m_legacy->GetBuffer(1)->isOpen() &&
             !m_legacy->GetBuffer(1)->open(QIODevice::ReadOnly))
@@ -150,7 +150,7 @@ class MythSystemLegacyWrapper : public MythSystem
         if (!(kMSStdErr & m_flags))
             return nullptr;
 
-        Wait(0); // legacy getbuffer is not thread-safe, so wait
+        Wait(0ms); // legacy getbuffer is not thread-safe, so wait
 
         if (!m_legacy->GetBuffer(2)->isOpen() &&
             !m_legacy->GetBuffer(2)->open(QIODevice::ReadOnly))

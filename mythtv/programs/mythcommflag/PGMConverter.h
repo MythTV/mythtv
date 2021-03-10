@@ -45,7 +45,7 @@ private:
     int             m_height        {-1}; /* frame dimensions */
     AVFrame         m_pgm           {};   /* grayscale frame */
 #ifdef PGM_CONVERT_GREYSCALE
-    struct timeval  m_convertTime   {0,0};
+    std::chrono::microseconds  m_convertTime  {0us};
     bool            m_timeReported  {false};
     MythAVCopy     *m_copy          {nullptr};
 #endif /* PGM_CONVERT_GREYSCALE */

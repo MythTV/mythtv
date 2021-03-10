@@ -124,7 +124,7 @@ class UPNP_PUBLIC SSDPCache : public QObject,
         void Add        ( const QString &sURI,
                           const QString &sUSN,
                           const QString &sLocation,
-                          long           sExpiresInSecs );
+                          std::chrono::seconds sExpiresInSecs );
 
         void Remove     ( const QString &sURI, const QString &sUSN );
         int  RemoveStale( );

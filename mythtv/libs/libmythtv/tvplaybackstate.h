@@ -38,7 +38,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ChangeMuteState(bool CycleChannels = false);
     void ChangeVolume(bool Direction, int Volume);
     void ChangeUpmix(bool Enable, bool Toggle = false);
-    void ChangeAudioOffset(int64_t Delta, int Value = -9999);
+    void ChangeAudioOffset(std::chrono::milliseconds Delta, std::chrono::milliseconds Value = -9999ms);
 
     // Audio and captions
     void SetTrack(uint Type, uint TrackNo);
@@ -61,7 +61,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void RestartITV(uint Chanid, uint Cardid, bool IsLiveTV);
     void HandleITVAction(const QString& Action, bool& Handled);
     void AdjustSubtitleZoom(int Delta);
-    void AdjustSubtitleDelay(int Delta);
+    void AdjustSubtitleDelay(std::chrono::milliseconds Delta);
 
     // Video
     void RequestEmbedding(bool Embed, const QRect& Rect = {}, const QStringList& Data = {});
@@ -80,6 +80,15 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     // Visualiser
     void EnableVisualiser(bool Enable, bool Toggle = false, const QString& Name = QString());
 
+    // Discs
+    void GoToMenu(const QString& Menu);
+    void GoToDVDProgram(bool Direction);
+
+    // Editor
+    void EnableEdit();
+    void DisableEdit(int HowToSave);
+    void RefreshEditorState(bool CheckSaved = false);
+
   public slots:
     void OverlayStateChanged(MythOverlayState OverlayState);
     void AudioPlayerStateChanged(const MythAudioPlayerState& AudioPlayerState);
@@ -88,6 +97,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void VideoBoundsStateChanged(const MythVideoBoundsState& VideoBoundsState);
     void VideoColourStateChanged(const MythVideoColourState& ColourState);
     void VisualiserStateChanged(const MythVisualiserState& VisualiserState);
+    void EditorStateChanged(const MythEditorState& EditorState);
 
   protected:
     MythOverlayState     m_overlayState     { };
@@ -97,6 +107,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     MythVideoBoundsState m_videoBoundsState { };
     MythVideoColourState m_videoColourState { };
     MythVisualiserState  m_visualiserState  { };
+    MythEditorState      m_editorState      { };
 };
 
 #endif

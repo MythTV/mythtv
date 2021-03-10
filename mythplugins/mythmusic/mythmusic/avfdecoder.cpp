@@ -53,8 +53,6 @@ extern "C" {
 #include "libavutil/opt.h"
 }
 
-using namespace std::chrono_literals;
-
 /****************************************************************************/
 
 using ShoutCastMetaMap = QMap<QString,QString>;
@@ -314,7 +312,7 @@ bool avfDecoder::initialize()
             mdata.setArtist(tag->value);
 
             mdata.setAlbum("");
-            mdata.setLength(-1);
+            mdata.setLength(-1ms);
 
             DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
             dispatch(ev);
@@ -499,7 +497,7 @@ void avfDecoder::run()
                 if (data_size <= 0)
                     continue;
 
-                output()->AddData(m_outputBuffer, data_size, -1, 0);
+                output()->AddData(m_outputBuffer, data_size, -1ms, 0);
             }
 
             av_packet_unref(&pkt);
@@ -507,12 +505,12 @@ void avfDecoder::run()
             // Wait until we need to decode or supply more samples
             while (!m_finish && !m_userStop && m_seekTime <= 0.0)
             {
-                int64_t buffered = output()->GetAudioBufferedTime();
+                std::chrono::milliseconds buffered = output()->GetAudioBufferedTime();
                 // never go below 1s buffered
-                if (buffered < 1000)
+                if (buffered < 1s)
                     break;
                 // wait
-                const struct timespec ns {0, (buffered - 1000) * 1000000};
+                const struct timespec ns {0, (buffered.count() - 1000) * 1000000};
                 nanosleep(&ns, nullptr);
             }
         }
@@ -565,7 +563,7 @@ void avfDecoder::checkMetatdata(void)
             mdata.setTitle(meta_map["title"]);
             mdata.setArtist(meta_map["artist"]);
             mdata.setAlbum(meta_map["album"]);
-            mdata.setLength(-1);
+            mdata.setLength(-1ms);
 
             DecoderHandlerEvent ev(DecoderHandlerEvent::Meta, mdata);
             dispatch(ev);

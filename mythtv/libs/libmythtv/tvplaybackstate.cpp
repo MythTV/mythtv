@@ -49,3 +49,8 @@ void TVPlaybackState::VisualiserStateChanged(const MythVisualiserState& Visualis
 {
     m_visualiserState = VisualiserState;
 }
+
+void TVPlaybackState::EditorStateChanged(const MythEditorState& EditorState)
+{
+    m_editorState = EditorState;
+}

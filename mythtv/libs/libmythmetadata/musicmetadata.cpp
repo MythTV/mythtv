@@ -6,7 +6,6 @@
 #include <QDateTime>
 #include <QDir>
 #include <QDomDocument>
-#include <QRegExp>
 #include <QScopedPointer>
 #include <utility>
 
@@ -288,7 +287,7 @@ MusicMetadata *MusicMetadata::createFromID(int trackid)
         mdata->m_genre = query.value(4).toString();
         mdata->m_year = query.value(5).toInt();
         mdata->m_trackNum = query.value(6).toInt();
-        mdata->m_length = query.value(7).toInt();
+        mdata->m_length = std::chrono::milliseconds(query.value(7).toInt());
         mdata->m_id = query.value(8).toUInt();
         mdata->m_rating = query.value(9).toInt();
         mdata->m_playCount = query.value(10).toInt();
@@ -743,7 +742,7 @@ void MusicMetadata::dumpToDatabase()
     query.bindValue(":GENRE", m_genreId);
     query.bindValue(":YEAR", m_year);
     query.bindValue(":TRACKNUM", m_trackNum);
-    query.bindValue(":LENGTH", m_length);
+    query.bindValue(":LENGTH", static_cast<qint64>(m_length.count()));
     query.bindValue(":FILENAME", sqlfilename);
     query.bindValue(":RATING", m_rating);
     query.bindValueNoNull(":FORMAT", m_format);
@@ -1060,7 +1059,7 @@ void MusicMetadata::setField(const QString &field, const QString &data)
     else if (field == "disccount")
         m_discCount = data.toInt();
     else if (field == "length")
-        m_length = data.toInt();
+        m_length = std::chrono::milliseconds(data.toInt());
     else if (field == "compilation")
         m_compilation = (data.toInt() > 0);
     else
@@ -1116,8 +1115,8 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
     metadataMap[prefix + "genre"] = m_genre;
     metadataMap[prefix + "year"] = (m_year > 0 ? QString("%1").arg(m_year) : "");
 
-    QString fmt = (m_length >= ONEHOURINMS) ? "H:mm:ss" : "mm:ss";
-    metadataMap[prefix + "length"] = MythFormatTimeMs(m_length, fmt);
+    QString fmt = (m_length >= 1h) ? "H:mm:ss" : "mm:ss";
+    metadataMap[prefix + "length"] = MythFormatTime(m_length, fmt);
 
     if (m_lastPlay.isValid())
     {
@@ -1532,7 +1531,7 @@ void AllMusic::resync()
                 query.value(7).toString(),     // genre
                 query.value(8).toInt(),        // year
                 query.value(9).toInt(),        // track no.
-                query.value(10).toInt(),       // length
+                std::chrono::milliseconds(query.value(10).toInt()),       // length
                 query.value(0).toInt(),        // id
                 query.value(13).toInt(),       // rating
                 query.value(14).toInt(),       // playcount

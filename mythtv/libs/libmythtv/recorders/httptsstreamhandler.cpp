@@ -5,8 +5,6 @@
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
-using namespace std::chrono_literals;
-
 #define LOC QString("HTTPTSSH[%1](%2): ").arg(m_inputId).arg(m_device)
 
 // BUFFER_SIZE is a multiple of TS_SIZE
@@ -106,7 +104,7 @@ HTTPTSStreamHandler::~HTTPTSStreamHandler(void)
 void HTTPTSStreamHandler::run(void)
 {
     RunProlog();
-    int open_sleep = 250;
+    std::chrono::milliseconds open_sleep = 250ms;
     LOG(VB_RECORD, LOG_INFO, LOC + "run() -- begin");
     SetRunning(true, false, false);
 
@@ -116,12 +114,12 @@ void HTTPTSStreamHandler::run(void)
         if (!m_reader->DownloadStream(m_tuning.GetURL(0)))
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "DownloadStream failed to receive bytes from " + m_tuning.GetURL(0).toString());
-            std::this_thread::sleep_for(std::chrono::milliseconds(open_sleep));
-            if (open_sleep < 10000)
-                open_sleep += 250;
+            std::this_thread::sleep_for(open_sleep);
+            if (open_sleep < 10s)
+                open_sleep += 250ms;
             continue;
         }
-        open_sleep = 250;
+        open_sleep = 250ms;
     }
 
     delete m_reader;

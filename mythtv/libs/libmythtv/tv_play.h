@@ -14,7 +14,6 @@
 #include <QStringList>
 #include <QDateTime>
 #include <QObject>
-#include <QRegExp>
 #include <QString>
 #include <QMutex>
 #include <QMap>
@@ -188,18 +187,18 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void Embed(bool Embed, QRect Rect = {}, const QStringList& Data = {});
 
   private:
-    static QStringList lastProgramStringList;
-    static EMBEDRETURNVOID RunPlaybackBoxPtr;
-    static EMBEDRETURNVOID RunViewScheduledPtr;
-    static EMBEDRETURNVOIDEPG RunProgramGuidePtr;
-    static EMBEDRETURNVOIDFINDER RunProgramFinderPtr;
-    static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
+    static inline QStringList lastProgramStringList = {};
+    static inline EMBEDRETURNVOID RunPlaybackBoxPtr = nullptr;
+    static inline EMBEDRETURNVOID RunViewScheduledPtr = nullptr;
+    static inline EMBEDRETURNVOIDEPG RunProgramGuidePtr = nullptr;
+    static inline EMBEDRETURNVOIDFINDER RunProgramFinderPtr = nullptr;
+    static inline EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr = nullptr;
 
     explicit TV(MythMainWindow* MainWindow);
    ~TV() override;
     PlayerContext*  GetPlayerContext();
     bool CreatePlayer(TVState State, bool Muted = false);
-    bool StartPlaying(int MaxWait = -1);
+    bool StartPlaying(std::chrono::milliseconds MaxWait = -1ms);
 
     // Private initialisation
     static TV* AcquireRelease(int& RefCount, bool Acquire, bool Create = false);
@@ -234,10 +233,10 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool DiscMenuHandleAction(const QStringList& Actions) const;
 
     // Timers and timer events
-    int  StartTimer(int Interval, int Line);
+    int  StartTimer(std::chrono::milliseconds Interval, int Line);
     void KillTimer(int Id);
 
-    void SetSpeedChangeTimer(int When, int Line);
+    void SetSpeedChangeTimer(std::chrono::milliseconds When, int Line);
     void HandleEndOfPlaybackTimerEvent();
     void HandleEndOfRecordingExitPromptTimerEvent();
     void HandleVideoExitDialogTimerEvent();
@@ -297,7 +296,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool RequestNextRecorder(bool ShowDialogs, const ChannelInfoList &Selection = ChannelInfoList());
     void DeleteRecorder();
 
-    bool StartRecorder(int MaxWait = -1);
+    bool StartRecorder(std::chrono::milliseconds MaxWait = -1ms);
     void StopStuff(bool StopRingBuffer, bool StopPlayer, bool StopRecorder);
     bool StartPlayer(TVState desiredState);
 
@@ -358,6 +357,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Seek, skip, jump, speed
     void DoSeek(float Time, const QString &Msg, bool TimeIsOffset, bool HonorCutlist);
+    void DoSeek(std::chrono::seconds Time, const QString &Msg, bool TimeIsOffset, bool HonorCutlist) {
+        DoSeek(Time.count(), Msg, TimeIsOffset, HonorCutlist); };
     bool DoPlayerSeek(float Time);
     bool DoPlayerSeekToFrame(uint64_t FrameNum);
     enum ArbSeekWhence { ARBSEEK_SET = 0, ARBSEEK_REWIND, ARBSEEK_FORWARD, ARBSEEK_END };
@@ -382,11 +383,11 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Chapters, titles and angles
     int  GetNumChapters();
-    void GetChapterTimes(QList<long long> &Times);
+    void GetChapterTimes(QList<std::chrono::seconds> &Times);
     int  GetCurrentChapter();
     int  GetNumTitles();
     int  GetCurrentTitle();
-    int  GetTitleDuration(int Title);
+    std::chrono::seconds  GetTitleDuration(int Title);
     QString GetTitleName(int Title);
     void DoSwitchTitle(int Title);
     int  GetNumAngles();
@@ -501,9 +502,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     MythMainWindow*   m_mainWindow { nullptr };
 
     // Configuration variables from database
-    QString           m_baseFilters;
     QString           m_dbChannelFormat {"<num> <sign>"};
-    uint              m_dbIdleTimeout {0};
+    std::chrono::milliseconds m_dbIdleTimeout {0ms};
     int               m_dbPlaybackExitPrompt {0};
     uint              m_dbAutoexpireDefault {0};
     bool              m_dbAutoSetWatched {false};
@@ -514,14 +514,11 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool              m_dbClearSavedPosition {false};
     bool              m_dbRunJobsOnRemote {false};
     bool              m_dbContinueEmbedded {false};
-    bool              m_dbRunFrontendInWindow {false};
     bool              m_dbBrowseAlways {false};
     bool              m_dbBrowseAllTuners {false};
     bool              m_dbUseChannelGroups {false};
     bool              m_dbRememberLastChannelGroup {false};
     ChannelGroupList  m_dbChannelGroups;
-
-    bool              m_tryUnflaggedSkip {false};
 
     bool              m_smartForward {false};
     float             m_ffRewRepos {1.0F};
@@ -529,8 +526,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     std::vector<int>  m_ffRewSpeeds;
 
     uint              m_vbimode {VBIMode::None};
-
-    QElapsedTimer     m_ctorTime;
     uint              m_switchToInputId {0};
 
     /// True if the user told MythTV to stop plaback. If this is false
@@ -565,7 +560,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     class SleepTimerInfo;
     static const std::vector<SleepTimerInfo> s_sleepTimes;
     uint                   m_sleepIndex {0};          ///< Index into sleep_times.
-    uint                   m_sleepTimerTimeout {0};   ///< Current sleep timeout in msec
+    std::chrono::milliseconds m_sleepTimerTimeout {0ms};   ///< Current sleep timeout in msec
     int                    m_sleepTimerId {0};        ///< Timer for turning off playback.
     int                    m_sleepDialogTimerId {0};  ///< Timer for sleep dialog.
     /// Timer for turning off playback after idle period.
@@ -686,13 +681,9 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Audio
     bool    m_tvmAvsync {true};
-    bool    m_tvmUpmixing {false};
-    bool    m_tvmCanUpmix {false};
 
     // Video
     bool             m_tvmFillAutoDetect      {false};
-    uint             m_tvmSup                 {kPictureAttributeSupported_None};
-    StereoscopicMode m_tvmStereoMode          {kStereoscopicModeAuto};
 
     // Playback
     int          m_tvmSpeedX100         {100};
@@ -712,16 +703,13 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     // Navigate
     int              m_tvmNumChapters {0};
     int              m_tvmCurrentChapter {0};
-    QList<long long> m_tvmChapterTimes;
+    QList<std::chrono::seconds> m_tvmChapterTimes;
     int              m_tvmNumAngles {0};
     int              m_tvmCurrentAngle {0};
     int              m_tvmNumTitles {0};
     int              m_tvmCurrentTitle {0};
     // Subtitles
-    uint             m_tvmSubsCapMode {0};
-    bool             m_tvmSubsHaveText {false};
     bool             m_tvmSubsForcedOn {true};
-    bool             m_tvmSubsEnabled {false};
     bool             m_tvmSubsHaveSubs {false};
 
     bool             m_tvmIsOn {false};
@@ -736,36 +724,30 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     MythTVMenu m_cutlistCompactMenu;
 
   public:
-    // Constants
-    static const int kInitFFRWSpeed; ///< 1x, default to normal speed
-    static const uint kInputKeysMax; ///< When to start discarding early keys
-    static const uint kNextSource;
-    static const uint kPreviousSource;
+    static inline const int kInitFFRWSpeed   = 0; // 1x, default to normal speed
+    static inline const uint kInputKeysMax   = 6; // When to start discarding early keys
+    static inline const uint kNextSource     = 1;
+    static inline const uint kPreviousSource = 2;
 
-    ///< Timeout for entry modes in msec
-    static const uint kInputModeTimeout;
-    /// Timeout for updating LCD info in msec
-    static const uint kLCDTimeout;
-    /// Timeout for browse mode exit in msec
-    static const uint kBrowseTimeout;
-    /// Seek key repeat timeout in msec
-    static const uint kKeyRepeatTimeout;
-    /// How long to wait before applying all previous channel keypresses in msec
-    static const uint kPrevChanTimeout;
-    /// How long to display sleep timer dialog in msec
-    static const uint kSleepTimerDialogTimeout;
-    /// How long to display idle timer dialog in seconds
-    static const uint kIdleTimerDialogTimeout;
-    /// How long to display idle timer dialog in msec
-    static const uint kVideoExitDialogTimeout;
-
-    static const uint kEndOfPlaybackCheckFrequency;
-    static const uint kEmbedCheckFrequency;
-    static const uint kSpeedChangeCheckFrequency;
-    static const uint kErrorRecoveryCheckFrequency;
-    static const uint kEndOfRecPromptCheckFrequency;
-    static const uint kEndOfPlaybackFirstCheckTimer;
-    static const uint kSaveLastPlayPosTimeout;
+    static inline const std::chrono::milliseconds kInputModeTimeout        = 5s;
+    static inline const std::chrono::milliseconds kLCDTimeout              = 1s;
+    static inline const std::chrono::milliseconds kBrowseTimeout           = 30s;
+    static inline const std::chrono::milliseconds kKeyRepeatTimeout        = 300ms;
+    static inline const std::chrono::milliseconds kPrevChanTimeout         = 750ms;
+    static inline const std::chrono::milliseconds kSleepTimerDialogTimeout = 45s;
+    static inline const std::chrono::milliseconds kIdleTimerDialogTimeout  = 45s;
+    static inline const std::chrono::milliseconds kVideoExitDialogTimeout  = 2min;
+    static inline const std::chrono::milliseconds kEndOfPlaybackCheckFrequency  = 250ms;
+    static inline const std::chrono::milliseconds kEmbedCheckFrequency          = 250ms;
+    static inline const std::chrono::milliseconds kSpeedChangeCheckFrequency    = 250ms;
+    static inline const std::chrono::milliseconds kErrorRecoveryCheckFrequency  = 250ms;
+    static inline const std::chrono::milliseconds kEndOfRecPromptCheckFrequency = 250ms;
+    static inline const std::chrono::milliseconds kSaveLastPlayPosTimeout       = 30s;
+#ifdef USING_VALGRIND
+    static inline const std::chrono::milliseconds kEndOfPlaybackFirstCheckTimer = 1min;
+#else
+    static inline const std::chrono::milliseconds kEndOfPlaybackFirstCheckTimer = 5s;
+#endif
 };
 
 #endif

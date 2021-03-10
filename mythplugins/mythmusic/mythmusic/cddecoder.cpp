@@ -124,7 +124,7 @@ void CdDecoder::writeBlock()
 {
     while (m_seekTime <= +0.)
     {
-        if(output()->AddFrames(m_outputBuf, m_bksFrames, -1))
+        if(output()->AddFrames(m_outputBuf, m_bksFrames, -1ms))
         {
             if (m_outputAt >= m_bks)
             {
@@ -133,7 +133,7 @@ void CdDecoder::writeBlock()
             }
             break;
         }
-        ::usleep(output()->GetAudioBufferedTime()<<9);
+        ::usleep(output()->GetAudioBufferedTime().count()<<9);
     }
 }
 
@@ -384,7 +384,7 @@ void CdDecoder::run()
             if (fill < (thresh << 6))
                 break;
             // Wait for half of the buffer to drain
-            ::usleep(output()->GetAudioBufferedTime()<<9);
+            ::usleep(output()->GetAudioBufferedTime().count()<<9);
         }
 
         // write a block if there's sufficient space for it
@@ -506,7 +506,7 @@ MusicMetadata *CdDecoder::getMetadata()
     QString title;
     QString genre;
     int year = 0;
-    unsigned long length = 0;
+    std::chrono::milliseconds length = 0s;
     track_t tracknum = 0;
 
     if (-1 == m_setTrackNum)
@@ -572,8 +572,8 @@ MusicMetadata *CdDecoder::getMetadata()
     const lsn_t start = cdio_get_track_lsn(cdio, tracknum);
     if (CDIO_INVALID_LSN != start && CDIO_INVALID_LSN != end)
     {
-        length = ((end - start + 1) * 1000 + CDIO_CD_FRAMES_PER_SEC/2) /
-            CDIO_CD_FRAMES_PER_SEC;
+        length = std::chrono::milliseconds(((end - start + 1) * 1000 + CDIO_CD_FRAMES_PER_SEC/2) /
+                                           CDIO_CD_FRAMES_PER_SEC);
     }
 
     bool isCompilation = false;

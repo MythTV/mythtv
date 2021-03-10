@@ -211,11 +211,11 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
     QString filename    = "";
     bool writemode      = false;
     bool usereadahead   = true;
-    int timeout_ms      = 2000;
+    std::chrono::milliseconds timeout = 2s;
     switch (commands.size())
     {
       case 6:
-        timeout_ms      = commands[5].toInt();
+        timeout         = std::chrono::milliseconds(commands[5].toInt());
         [[clang::fallthrough]];
       case 5:
         usereadahead    = (commands[4].toInt() != 0);
@@ -320,7 +320,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
         ft = new FileTransfer(filename, socket, m_parent, writemode);
     }
     else
-        ft = new FileTransfer(filename, socket, m_parent, usereadahead, timeout_ms);
+        ft = new FileTransfer(filename, socket, m_parent, usereadahead, timeout);
 
     ft->BlockShutdown(true);
 

@@ -1,9 +1,9 @@
 #ifndef MYTHTIMER_H_
 #define MYTHTIMER_H_
 
-#include <cinttypes>
 #include <QElapsedTimer>
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 /** A QElapsedTimer based timer to replace use of QTime as a timer.
  *
@@ -21,18 +21,18 @@ class MBASE_PUBLIC MythTimer
     explicit MythTimer(StartState state = kStartInactive);
 
     void start(void);
-    int restart(void);
+    std::chrono::milliseconds restart(void);
     void stop(void);
 
-    void addMSecs(int ms);
+    void addMSecs(std::chrono::milliseconds ms);
 
-    int elapsed(void);
-    int64_t nsecsElapsed(void) const;
+    std::chrono::milliseconds elapsed(void);
+    std::chrono::nanoseconds nsecsElapsed(void) const;
     bool isRunning(void) const;
 
   private:
-    QElapsedTimer m_timer;
-    int           m_offset {0};
+    QElapsedTimer             m_timer;
+    std::chrono::milliseconds m_offset {0ms};
 };
 
 #endif

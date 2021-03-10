@@ -7,7 +7,7 @@
 // myth
 #include <mythscreentype.h>
 
-const int DEFAULT_UPDATE_TIME = 5;
+static constexpr std::chrono::seconds DEFAULT_UPDATE_TIME { 5s };
 
 class MythUIButton;
 class MythUIButtonList;
@@ -45,7 +45,7 @@ class LogViewer : public MythScreenType
     static QString getSetting(const QString &key);
 
     bool                m_autoUpdate   {false};
-    int                 m_updateTime   {DEFAULT_UPDATE_TIME};
+    std::chrono::seconds m_updateTime  {DEFAULT_UPDATE_TIME};
     QTimer             *m_updateTimer  {nullptr};
 
     QString             m_currentLog;

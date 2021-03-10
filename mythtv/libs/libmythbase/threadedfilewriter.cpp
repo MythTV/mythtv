@@ -452,10 +452,10 @@ void ThreadedFileWriter::DiskLoop(void)
             continue;
         }
 
-        int mwte = minWriteTimer.elapsed();
-        if (!m_flush && (mwte < 250) && (m_totalBufferUse < kMinWriteSize))
+        auto mwte = minWriteTimer.elapsed();
+        if (!m_flush && (mwte < 250ms) && (m_totalBufferUse < kMinWriteSize))
         {
-            m_bufferHasData.wait(locker.mutex(), 250 - mwte);
+            m_bufferHasData.wait(locker.mutex(), (250ms - mwte).count());
             TrimEmptyBuffers();
             continue;
         }
@@ -532,7 +532,7 @@ void ThreadedFileWriter::DiskLoop(void)
 
         //////////////////////////////////////////
 
-        if (lastRegisterTimer.elapsed() >= 10000)
+        if (lastRegisterTimer.elapsed() >= 10s)
         {
             gCoreContext->RegisterFileForWrite(m_filename, total_written);
             m_registered = true;
@@ -542,12 +542,12 @@ void ThreadedFileWriter::DiskLoop(void)
         buf->lastUsed = MythDate::current();
         m_emptyBuffers.push_back(buf);
 
-        if (writeTimer.elapsed() > 1000)
+        if (writeTimer.elapsed() > 1s)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("write(%1) cnt %2 total %3 -- took a long time, %4 ms")
                     .arg(sz).arg(m_writeBuffers.size())
-                    .arg(m_totalBufferUse).arg(writeTimer.elapsed()));
+                    .arg(m_totalBufferUse).arg(writeTimer.elapsed().count()));
         }
 
         if (!write_ok && ((EFBIG == errno) || (ENOSPC == errno)))

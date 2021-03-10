@@ -72,7 +72,7 @@ class VBIThread : public MThread
         while (isRunning())
         {
             m_parent->StopRecording();
-            wait(1000);
+            wait(1s);
         }
     }
 

@@ -157,7 +157,7 @@ class Data(object):
         if inst is None:
             return self
         if self.field not in inst._data:
-            if self.poller is None:
+            if self.poller is None or not callable(self.poller.func):
                 return None
             self.poller.__get__(inst, owner)()
         return inst._data[self.field]

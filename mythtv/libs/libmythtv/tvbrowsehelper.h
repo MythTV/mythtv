@@ -50,7 +50,7 @@ class TVBrowseHelper : public MThread
     explicit TVBrowseHelper(TV* Parent);
     ~TVBrowseHelper() override;
 
-    void BrowseInit(uint BrowseMaxForward, bool BrowseAllTuners,
+    void BrowseInit(std::chrono::seconds BrowseMaxForward, bool BrowseAllTuners,
                     bool UseChannelGroups, const QString& DBChannelOrdering);
     void BrowseStop();
     void BrowseWait();
@@ -73,7 +73,7 @@ class TVBrowseHelper : public MThread
     TV*                     m_parent                { nullptr };
     ChannelInfoList         m_dbAllChannels;
     ChannelInfoList         m_dbAllVisibleChannels;
-    uint                    m_dbBrowseMaxForward    { 0 };
+    std::chrono::seconds    m_dbBrowseMaxForward    { 0s };
     bool                    m_dbBrowseAllTuners     { false };
     bool                    m_dbUseChannelGroups    { false };
     QHash<uint,QString>     m_dbChanidToChannum;

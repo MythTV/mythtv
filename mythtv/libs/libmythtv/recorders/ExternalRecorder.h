@@ -38,7 +38,7 @@ class ExternalRecorder : public DTVRecorder
     void Close(void);
     void StartNewFile(void) override; // RecorderBase
 
-    bool PauseAndWait(int timeout = 100) override; // RecorderBase
+    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
   protected:
     bool StartStreaming(void);

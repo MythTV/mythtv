@@ -3,6 +3,7 @@
 
 // MythTV
 #include "mythtvexp.h"
+#include "mythchrono.h"
 #include "volumebase.h"
 #include "videoouttypes.h"
 #include "audiooutputsettings.h"
@@ -47,7 +48,7 @@ class MTV_PUBLIC MythAudioState
 {
   public:
     MythAudioState() = default;
-    MythAudioState(AudioPlayer* Player, int64_t Offset);
+    MythAudioState(AudioPlayer* Player, std::chrono::milliseconds Offset);
 
     bool m_hasAudioOut    { true  };
     bool m_volumeControl  { true  };
@@ -56,7 +57,7 @@ class MTV_PUBLIC MythAudioState
     bool m_canUpmix       { false };
     bool m_isUpmixing     { false };
     bool m_paused         { false };
-    int64_t m_audioOffset { 0     };
+    std::chrono::milliseconds m_audioOffset { 0ms };
 };
 
 Q_DECLARE_METATYPE(MythAudioState)
@@ -122,6 +123,8 @@ class MTV_PUBLIC MythVideoColourState
     std::map<PictureAttribute,int> m_attributeValues;
 };
 
+Q_DECLARE_METATYPE(MythVideoColourState)
+
 class MTV_PUBLIC MythVisualiserState
 {
   public:
@@ -137,5 +140,30 @@ class MTV_PUBLIC MythVisualiserState
 };
 
 Q_DECLARE_METATYPE(MythVisualiserState)
+
+class MTV_PUBLIC MythEditorState
+{
+  public:
+    MythEditorState() = default;
+    MythEditorState(uint64_t Current, uint64_t Previous, uint64_t Next, uint64_t Total,
+                    bool InDelete, bool IsTemp, bool HasTemp,
+                    bool HasUndo, QString Undo, bool HasRedo, QString Redo,
+                    bool Saved);
+
+    uint64_t m_currentFrame  { 0 };
+    uint64_t m_previousCut   { 0 };
+    uint64_t m_nextCut       { 0 };
+    uint64_t m_totalFrames   { 0 };
+    bool     m_frameInDelete { false };
+    bool     m_isTempMark    { false };
+    bool     m_hasTempMark   { false };
+    bool     m_hasUndo       { false };
+    QString  m_undoMessage;
+    bool     m_hasRedo       { false };
+    QString  m_redoMessage;
+    bool     m_saved         { false };
+};
+
+Q_DECLARE_METATYPE(MythEditorState);
 
 #endif

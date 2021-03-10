@@ -35,7 +35,7 @@
 #define OSD_WIN_BROWSE   "browse_info"
 #define OSD_WIN_PROGEDIT "osd_program_editor"
 
-#define kOSDFadeTime 1000
+static constexpr std::chrono::milliseconds kOSDFadeTime { 1s };
 
 class TV;
 class MythMainWindow;
@@ -84,7 +84,7 @@ class MythOSDDialogData
 
     QString m_dialogName;
     QString m_message { };
-    int     m_timeout { kOSDTimeout_None };
+    std::chrono::milliseconds m_timeout { 0ms };
     std::vector<MythOSDDialogButton> m_buttons { };
     MythOSDBackButton m_back { };
 };
@@ -102,6 +102,7 @@ class OSD : public MythMediaOverlay
     void SetText(const QString& Window, const InfoMap& Map, OSDTimeout Timeout);
     void DialogQuit();
     void HideAll(bool KeepSubs = true, MythScreenType* Except = nullptr, bool DropNotification = false);
+    void Embed(bool Embedding);
 
   protected slots:
     void ShowDialog(const MythOSDDialogData& Data);
@@ -115,14 +116,14 @@ class OSD : public MythMediaOverlay
     void HideWindow(const QString &Window) override;
     void SetFunctionalWindow(const QString &Window, enum OSDFunctionalType Type);
 
-    void SetExpiry(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout = 0);
+    void SetExpiry(const QString &Window, enum OSDTimeout Timeout, std::chrono::milliseconds CustomTimeout = 0ms);
     void ResetWindow(const QString &Window);
-    void Draw(QRect Rect);
+    void Draw();
 
     void SetValues(const QString &Window, const QHash<QString,int> &Map, OSDTimeout Timeout);
     void SetValues(const QString &Window, const QHash<QString,float> &Map, OSDTimeout Timeout);
     void SetRegions(const QString &Window, frm_dir_map_t &Map, long long Total);
-    void SetGraph(const QString &Window, const QString &Graph, int64_t Timecode);
+    void SetGraph(const QString &Window, const QString &Graph, std::chrono::milliseconds Timecode);
     bool IsWindowVisible(const QString &Window);
 
     bool DialogVisible(const QString& Window = QString());
@@ -133,20 +134,21 @@ class OSD : public MythMediaOverlay
   private:
     void PositionWindow(MythScreenType* Window);
     void RemoveWindow(const QString& Window);
-    void DialogShow(const QString& Window, const QString& Text = "", int UpdateFor = 0);
+    void DialogShow(const QString& Window, const QString& Text = "", std::chrono::milliseconds UpdateFor = 0ms);
     void DialogAddButton(const QString& Text, QVariant Data, bool Menu = false, bool Current = false);
     void DialogBack(const QString& Text = "", const QVariant& Data = 0, bool Exit = false);
     void TearDown() override;
     void LoadWindows();
     void CheckExpiry();
-    void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, int CustomTimeout);
+    void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, std::chrono::milliseconds CustomTimeout);
 
   private:
-    int             m_fadeTime          { kOSDFadeTime };
+    bool            m_embedded          { false };
+    std::chrono::milliseconds m_fadeTime { kOSDFadeTime };
     MythScreenType* m_dialog            { nullptr };
     QString         m_pulsedDialogText  { };
     QDateTime       m_nextPulseUpdate   { };
-    std::array<int,4> m_timeouts        { -1, 3000, 5000, 13000 };
+    std::array<std::chrono::milliseconds,4> m_timeouts  { -1ms, 3s, 5s, 13s };
     enum OSDFunctionalType m_functionalType { kOSDFunctionalType_Default };
     QString                m_functionalWindow { };
     QHash<MythScreenType*, QDateTime> m_expireTimes { };

@@ -2390,7 +2390,10 @@ static void do_replex(struct replex *rx)
 	while(1){
 		check_times( &mx, &video_ok, ext_ok, &start);
 
-		write_out_packs( &mx, video_ok, ext_ok);
+		if (write_out_packs( &mx, video_ok, ext_ok)) {
+			LOG(VB_GENERAL, LOG_ERR, "error while writing");
+			exit(1);
+		}
 	}
 }
 

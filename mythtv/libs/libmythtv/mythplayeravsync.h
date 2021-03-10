@@ -17,10 +17,11 @@ class MythPlayerAVSync
 
   public:
     void     InitAVSync          ();
-    int64_t  AVSync              (AudioPlayer* Audio, MythVideoFrame* Frame, int FrameInterval,
-                                  float PlaySpeed, bool HaveVideo, bool Force);
-    void     WaitForFrame        (int64_t FrameDue);
-    int64_t& DisplayTimecode     ();
+    std::chrono::microseconds AVSync (AudioPlayer* Audio, MythVideoFrame* Frame,
+                                      std::chrono::microseconds FrameInterval,
+                                      float PlaySpeed, bool HaveVideo, bool Force);
+    void     WaitForFrame        (std::chrono::microseconds FrameDue);
+    std::chrono::milliseconds& DisplayTimecode     ();
     void     ResetAVSyncClockBase();
     void     GetAVSyncData       (InfoMap& Map) const;
     bool     GetAVSyncAudioPause () const;
@@ -32,11 +33,11 @@ class MythPlayerAVSync
     QElapsedTimer m_avTimer;
     bool       m_avsyncAudioPaused  { false };
     int        m_avsyncAvg          { 0 };
-    int64_t    m_dispTimecode       { 0 };
-    int64_t    m_rtcBase            { 0 }; // real time clock base for presentation time (microsecs)
-    int64_t    m_maxTcVal           { 0 }; // maximum to date video tc
-    int64_t    m_priorAudioTimecode { 0 }; // time code from prior frame
-    int64_t    m_priorVideoTimecode { 0 }; // time code from prior frame
+    std::chrono::milliseconds m_dispTimecode       { 0ms };
+    std::chrono::microseconds m_rtcBase { 0us }; // real time clock base for presentation time
+    std::chrono::milliseconds m_maxTcVal           { 0ms }; // maximum to date video tc
+    std::chrono::milliseconds m_priorAudioTimecode { 0ms }; // time code from prior frame
+    std::chrono::milliseconds m_priorVideoTimecode { 0ms }; // time code from prior frame
     int        m_maxTcFrames        { 0 }; // number of frames seen since max to date tc
     int        m_numDroppedFrames   { 0 }; // number of consecutive dropped frames.
     float      m_lastFix            { 0.0F }; //last sync adjustment to prior frame]

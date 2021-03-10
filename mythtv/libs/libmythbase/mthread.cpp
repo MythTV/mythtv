@@ -61,7 +61,7 @@ class DBPurgeHandler : public QObject
   public:
     DBPurgeHandler()
     {
-        m_purgeTimer = startTimer(5 * 60000);
+        m_purgeTimer = startTimer(5min);
     }
     void timerEvent(QTimerEvent *event) override // QObject
     {
@@ -87,9 +87,7 @@ class MThreadInternal : public QThread
     static void SetTerminationEnabled(bool enabled = true)
     { QThread::setTerminationEnabled(enabled); }
 
-    static void Sleep(unsigned long time) { QThread::sleep(time); }
-    static void MSleep(unsigned long time) { QThread::msleep(time); }
-    static void USleep(unsigned long time) { QThread::usleep(time); }
+    static void USleep(std::chrono::microseconds time) { QThread::usleep(time.count()); }
 
   private:
     MThread &m_parent;
@@ -166,14 +164,14 @@ void MThread::Cleanup(void)
     }
     std::cerr<<std::endl;
 
-    static const int kTimeout = 5000;
+    static constexpr std::chrono::milliseconds kTimeout { 5s };
     MythTimer t;
     t.start();
     for (auto it = badGuys.cbegin();
          it != badGuys.cend() && t.elapsed() < kTimeout; ++it)
     {
-        int left = kTimeout - t.elapsed();
-        if (left > 0)
+        auto left = kTimeout - t.elapsed();
+        if (left > 0ms)
             (*it)->wait(left);
     }
 }
@@ -302,10 +300,18 @@ void MThread::quit(void)
     m_thread->quit();
 }
 
-bool MThread::wait(unsigned long time)
+bool MThread::wait(std::chrono::milliseconds time)
 {
     if (m_thread->isRunning())
-        return m_thread->wait(time);
+    {
+        if (time == std::chrono::milliseconds::max())
+            return m_thread->wait(ULONG_MAX); // Magic number in recent Qt5.
+        if (time >= 0ms)
+            return m_thread->wait(time.count());
+        LOG(VB_GENERAL, LOG_CRIT,
+            QString("'%1': MThread::wait called for %1 ms!").arg(time.count()));
+        return m_thread->wait(1);
+    }
     return true;
 }
 
@@ -329,17 +335,7 @@ void MThread::setTerminationEnabled(bool enabled)
     MThreadInternal::SetTerminationEnabled(enabled);
 }
 
-void MThread::sleep(unsigned long time)
-{
-    MThreadInternal::Sleep(time);
-}
-
-void MThread::msleep(unsigned long time)
-{
-    MThreadInternal::MSleep(time);
-}
-
-void MThread::usleep(unsigned long time)
+void MThread::usleep(std::chrono::microseconds time)
 {
     MThreadInternal::USleep(time);
 }

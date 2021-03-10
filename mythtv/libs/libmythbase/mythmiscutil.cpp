@@ -65,7 +65,7 @@
  *  \brief Returns uptime statistics.
  *  \return true if successful, false otherwise.
  */
-bool getUptime(time_t &uptime)
+bool getUptime(std::chrono::seconds &uptime)
 {
 #ifdef __linux__
     struct sysinfo sinfo {};
@@ -74,7 +74,7 @@ bool getUptime(time_t &uptime)
         LOG(VB_GENERAL, LOG_ERR, "sysinfo() error");
         return false;
     }
-    uptime = sinfo.uptime;
+    uptime = std::chrono::seconds(sinfo.uptime);
 
 #elif defined(__FreeBSD__) || CONFIG_DARWIN
 
@@ -90,9 +90,9 @@ bool getUptime(time_t &uptime)
         LOG(VB_GENERAL, LOG_ERR, "sysctl() error");
         return false;
     }
-    uptime = time(nullptr) - bootTime.tv_sec;
+    uptime = std::chrono::seconds(time(nullptr) - bootTime.tv_sec);
 #elif defined(_WIN32)
-    uptime = ::GetTickCount() / 1000;
+    uptime = std::chrono::seconds(::GetTickCount() / 1000);
 #else
     // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
     LOG(VB_GENERAL, LOG_NOTICE, "Unknown platform. How do I get the uptime?");
@@ -244,11 +244,11 @@ bool hasUtf8(const char *str)
  * determine what parameter that platform's ping requires to specify
  * the timeout and add another case to the \#ifdef statement.
  */
-bool ping(const QString &host, int timeout)
+bool ping(const QString &host, std::chrono::milliseconds timeout)
 {
 #ifdef _WIN32
     QString cmd = QString("%systemroot%\\system32\\ping.exe -w %1 -n 1 %2>NUL")
-                  .arg(timeout*1000).arg(host);
+                  .arg(timeout.count()) .arg(host);
 
     return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) == GENERIC_EXIT_OK;
@@ -265,7 +265,9 @@ bool ping(const QString &host, int timeout)
     QString pingcmd =
         addr.protocol() == QAbstractSocket::IPv6Protocol ? "ping6" : "ping";
     QString cmd = QString("%1 %2 %3 -c 1  %4  >/dev/null 2>&1")
-                  .arg(pingcmd).arg(timeoutparam).arg(timeout).arg(host);
+                  .arg(pingcmd).arg(timeoutparam)
+                  .arg(duration_cast<std::chrono::seconds>(timeout).count())
+                  .arg(host);
 
     return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) == GENERIC_EXIT_OK;
@@ -673,7 +675,7 @@ bool WakeOnLAN(const QString& MAC)
 
 // Wake up either by command or by MAC address
 // return true = success
-bool MythWakeup(const QString &wakeUpCommand, uint flags, uint timeout)
+bool MythWakeup(const QString &wakeUpCommand, uint flags, std::chrono::seconds timeout)
 {
     if (!IsMACAddress(wakeUpCommand))
         return myth_system(wakeUpCommand, flags, timeout) == 0U;
@@ -881,7 +883,7 @@ void setHttpProxy(void)
                 QString("assuming port %1 on host %2") .arg(port).arg(host));
             url.setPort(port);
         }
-        else if (!ping(host, 1))
+        else if (!ping(host, 1s))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("cannot locate host %1").arg(host) +
@@ -1230,14 +1232,9 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
     return currA->isNull() ? -1 : + 1;
 }
 
-QString MythFormatTimeMs(int msecs, const QString& fmt)
+QString MythFormatTime(std::chrono::milliseconds msecs, const QString& fmt)
 {
-    return QTime::fromMSecsSinceStartOfDay(msecs).toString(fmt);
-}
-
-QString MythFormatTime(int secs, const QString& fmt)
-{
-    return QTime::fromMSecsSinceStartOfDay(secs*1000).toString(fmt);
+    return QTime::fromMSecsSinceStartOfDay(msecs.count()).toString(fmt);
 }
 
 /*

@@ -213,7 +213,7 @@ void ImageScanThread<DBFS>::run()
             // For initial scans pause briefly to give thumb generator a headstart
             // before being deluged by client requests
             if (firstScan)
-                msleep(1000);
+                usleep(1s);
 
             // Notify clients of completion with removed & changed images
             m_dbfs.Notify("IMAGE_DB_CHANGED", mesg);
@@ -410,7 +410,7 @@ template <class DBFS>
 template <class DBFS>
 void ImageScanThread<DBFS>::PopulateMetadata(
     const QString &path, int type, QString &comment,
-    qint64 &time,
+    std::chrono::seconds &time,
     int &orientation)
 {
     // Set orientation, date, comment from file meta data
@@ -421,7 +421,7 @@ void ImageScanThread<DBFS>::PopulateMetadata(
     orientation  = metadata->GetOrientation();
     comment      = metadata->GetComment().simplified();
     QDateTime dt = metadata->GetOriginalDateTime();
-    time         = (dt.isValid()) ? dt.toSecsSinceEpoch() : 0;
+    time         = (dt.isValid()) ? std::chrono::seconds(dt.toSecsSinceEpoch()) : 0s;
 
     delete metadata;
 }

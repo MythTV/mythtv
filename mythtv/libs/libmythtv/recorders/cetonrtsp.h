@@ -16,6 +16,8 @@
 #include <QUrl>
 #include <QTimerEvent>
 
+using namespace std::chrono_literals;
+
 class QTcpSocket;
 class QUdpSocket;
 
@@ -62,7 +64,7 @@ protected:
     QString        m_responseMessage;
     Params         m_responseHeaders;
     QByteArray     m_responseContent;
-    int            m_timeout         {60};
+    std::chrono::seconds m_timeout   {60s};
     int            m_timer           {0};
     bool           m_canGetParameter {false};
 

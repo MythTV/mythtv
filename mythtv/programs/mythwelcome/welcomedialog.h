@@ -75,9 +75,9 @@ class WelcomeDialog : public MythScreenType
     bool           m_willShutdown             { false };
     int            m_secondsToShutdown        { -1 };
     QDateTime      m_nextRecordingStart;
-    int            m_preRollSeconds           { 0 };
-    int            m_idleWaitForRecordingTime { 0 };
-    int            m_idleTimeoutSecs          { 0 };
+    std::chrono::seconds m_preRollSeconds     { 0s };
+    std::chrono::seconds m_idleWaitForRecordingTime { 0s };
+    std::chrono::seconds m_idleTimeoutSecs    { 0s };
     uint           m_screenTunerNo            { 0 };
     uint           m_screenScheduledNo        { 0 };
     uint           m_statusListNo             { 0 };

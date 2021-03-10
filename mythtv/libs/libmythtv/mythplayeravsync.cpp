@@ -16,30 +16,30 @@ MythPlayerAVSync::MythPlayerAVSync()
 
 void MythPlayerAVSync::InitAVSync(void)
 {
-    m_rtcBase = 0;
-    m_priorAudioTimecode = 0;
-    m_priorVideoTimecode = 0;
+    m_rtcBase = 0us;
+    m_priorAudioTimecode = 0ms;
+    m_priorVideoTimecode = 0ms;
     m_lastFix = 0.0;
     m_avsyncAvg = 0;
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC + "Reset");
 }
 
-void MythPlayerAVSync::WaitForFrame(int64_t FrameDue)
+void MythPlayerAVSync::WaitForFrame(std::chrono::microseconds FrameDue)
 {
-    int64_t unow = m_avTimer.nsecsElapsed() / 1000;
-    int64_t delay = FrameDue - unow;
-    if (delay > 0)
-        QThread::usleep(static_cast<unsigned long>(delay));
+    auto unow = std::chrono::microseconds(m_avTimer.nsecsElapsed() / 1000);
+    auto delay = FrameDue - unow;
+    if (delay > 0us)
+        QThread::usleep(delay.count());
 }
 
-int64_t& MythPlayerAVSync::DisplayTimecode()
+std::chrono::milliseconds& MythPlayerAVSync::DisplayTimecode()
 {
     return m_dispTimecode;
 }
 
 void MythPlayerAVSync::ResetAVSyncClockBase()
 {
-    m_rtcBase = 0;
+    m_rtcBase = 0us;
 }
 
 bool MythPlayerAVSync::GetAVSyncAudioPause() const
@@ -54,10 +54,10 @@ void MythPlayerAVSync::SetAVSyncAudioPause(bool Pause)
 
 bool MythPlayerAVSync::ResetAVSyncForLiveTV(AudioPlayer* Audio)
 {
-    bool result = m_rtcBase != 0;
+    bool result = m_rtcBase != 0us;
     Audio->Pause(true);
     m_avsyncAudioPaused = true;
-    m_rtcBase = 0;
+    m_rtcBase = 0us;
     return result;
 }
 
@@ -72,37 +72,36 @@ void MythPlayerAVSync::GetAVSyncData(InfoMap& Map) const
     Map.insert("avsync", QObject::tr("%1 ms").arg(m_avsyncAvg / 1000));
 }
 
-#define AVSYNC_MAX_LATE 10000000
-int64_t MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideoFrame *Frame,
-                                 int FrameInterval, float PlaySpeed,
+static constexpr std::chrono::microseconds AVSYNC_MAX_LATE { 10s };
+std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideoFrame *Frame,
+                                 std::chrono::microseconds FrameInterval, float PlaySpeed,
                                  bool HaveVideo, bool Force)
 {
-    int64_t videotimecode = 0;
+    std::chrono::milliseconds videotimecode = 0ms;
     bool dropframe = false;
     bool pause_audio = false;
-    int64_t framedue = 0;
-    int64_t audio_adjustment = 0;
-    int64_t unow = 0;
-    int64_t lateness = 0;
-    auto playspeed1000 = static_cast<int64_t>(1000.0F / PlaySpeed);
+    std::chrono::microseconds framedue = 0us;
+    std::chrono::milliseconds audio_adjustment = 0ms;
+    std::chrono::microseconds unow = 0ms;
+    std::chrono::microseconds lateness = 0us;
     bool reset = false;
-    int intervalms = FrameInterval / 1000;
+    auto intervalms = duration_cast<std::chrono::milliseconds>(FrameInterval);
     // controller gain
     static float const s_av_control_gain = 0.4F;
     // time weighted exponential filter coefficient
     static float const s_sync_fc = 0.9F;
 
-    while (framedue == 0)
+    while (framedue == 0us)
     {
         if (Frame)
         {
-            videotimecode = Frame->m_timecode & 0x0000ffffffffffff;
+            videotimecode = std::chrono::milliseconds(Frame->m_timecode.count() & 0x0000ffffffffffff);
             // Detect bogus timecodes from DVD and ignore them.
             if (videotimecode != Frame->m_timecode)
                 videotimecode = m_maxTcVal;
         }
 
-        unow = m_avTimer.nsecsElapsed() / 1000;
+        unow = std::chrono::microseconds(m_avTimer.nsecsElapsed() / 1000);
 
         if (Force)
         {
@@ -111,30 +110,30 @@ int64_t MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideoFrame *Frame,
         }
 
         // first time or after a seek - setup of m_rtcBase
-        if (m_rtcBase == 0)
+        if (m_rtcBase == 0us)
         {
             // cater for DVB radio
-            if (videotimecode == 0)
-                videotimecode = Audio->GetAudioTime();;
+            if (videotimecode == 0ms)
+                videotimecode = Audio->GetAudioTime();
 
             // cater for data only streams (i.e. MHEG)
             bool dataonly = !Audio->HasAudioIn() && !HaveVideo;
 
             // On first frame we get nothing, so exit out.
             // FIXME - does this mean we skip the first frame? Should be avoidable.
-            if (videotimecode == 0 && !dataonly)
-                return 0;
+            if (videotimecode == 0ms && !dataonly)
+                return 0us;
 
-            m_rtcBase = unow - videotimecode * playspeed1000;
-            m_maxTcVal = 0;
+            m_rtcBase = unow - chronodivide<std::chrono::microseconds>(videotimecode, PlaySpeed);
+            m_maxTcVal = 0ms;
             m_maxTcFrames = 0;
             m_numDroppedFrames = 0;
         }
 
-        if (videotimecode == 0)
+        if (videotimecode == 0ms)
             videotimecode = m_maxTcVal + intervalms;
-        int64_t tcincr = videotimecode - m_maxTcVal;
-        if (tcincr > 0 || tcincr < -100)
+        std::chrono::milliseconds tcincr = videotimecode - m_maxTcVal;
+        if (tcincr > 0ms || tcincr < -100ms)
         {
             m_maxTcVal = videotimecode;
             m_maxTcFrames = 0;
@@ -146,51 +145,50 @@ int64_t MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideoFrame *Frame,
         }
 
         if (PlaySpeed > 0.0F)
-            framedue = m_rtcBase + videotimecode * playspeed1000;
+            framedue = m_rtcBase + chronodivide<std::chrono::microseconds>(videotimecode, PlaySpeed);
         else
             framedue = unow + FrameInterval / 2;
 
         lateness = unow - framedue;
         dropframe = false;
-        if (lateness > 30000)
+        if (lateness > 30ms)
             dropframe = m_numDroppedFrames < 10;
 
-        if (lateness <= 30000 && m_priorAudioTimecode > 0 && m_priorVideoTimecode > 0)
+        if (lateness <= 30ms && m_priorAudioTimecode > 0ms && m_priorVideoTimecode > 0ms)
         {
             // Get video in sync with audio
             audio_adjustment = m_priorAudioTimecode - m_priorVideoTimecode;
             // If there is excess audio - throw it away.
-            if (audio_adjustment < -200)
+            if (audio_adjustment < -200ms)
             {
                 Audio->Reset();
-                audio_adjustment = 0;
+                audio_adjustment = 0ms;
             }
-            int sign = audio_adjustment < 0 ? -1 : 1;
-            float fix_amount = (m_lastFix * s_sync_fc + (1 - s_sync_fc) * audio_adjustment) * sign * s_av_control_gain;
-            m_lastFix = fix_amount * sign;
-            auto speedup1000 = static_cast<int64_t>(1000 * PlaySpeed);
-            m_rtcBase -= static_cast<int64_t>(1000000 * fix_amount * sign / speedup1000);
+            int sign = audio_adjustment < 0ms ? -1 : 1;
+            float fix_amount_ms = (m_lastFix * s_sync_fc + (1 - s_sync_fc) * audio_adjustment.count()) * sign * s_av_control_gain;
+            m_lastFix = fix_amount_ms * sign;
+            m_rtcBase -= microsecondsFromFloat(1000 * fix_amount_ms * sign / PlaySpeed);
 
             if ((audio_adjustment * sign) > intervalms)
             {
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Audio %1 by %2 ms")
-                    .arg(audio_adjustment > 0 ? "ahead" : "behind").arg(abs(audio_adjustment)));
+                    .arg(audio_adjustment > 0ms ? "ahead" : "behind").arg(abs(audio_adjustment.count())));
             }
-            if (audio_adjustment > 200)
+            if (audio_adjustment > 200ms)
                 pause_audio = true;
         }
 
         // sanity check - reset m_rtcBase if time codes have gone crazy.
         if ((lateness > AVSYNC_MAX_LATE || lateness < - AVSYNC_MAX_LATE))
         {
-            framedue = 0;
-            m_rtcBase = 0;
+            framedue = 0us;
+            m_rtcBase = 0us;
             if (reset)
             {
-                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Resetting: lateness %1").arg(lateness));
-                return -1;
+                LOG(VB_GENERAL, LOG_ERR, LOC + QString("Resetting: lateness %1").arg(lateness.count()));
+                return -1us;
             }
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Resetting: lateness = %1").arg(lateness));
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Resetting: lateness = %1").arg(lateness.count()));
             reset = true;
         }
     }
@@ -217,15 +215,15 @@ int64_t MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideoFrame *Frame,
     {
         m_numDroppedFrames++;
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Dropping frame: Video is behind by %1ms")
-            .arg(lateness / 1000));
-        return -1;
+            .arg(duration_cast<std::chrono::milliseconds>(lateness).count()));
+        return -1us;
     }
 
     m_numDroppedFrames = 0;
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
         QString("A/V timecodes audio=%1 video=%2 frameinterval=%3 audioadj=%4 unow=%5 udue=%6 ")
-            .arg(m_priorAudioTimecode).arg(m_priorVideoTimecode).arg(FrameInterval)
-            .arg(audio_adjustment).arg(unow).arg(framedue));
+            .arg(m_priorAudioTimecode.count()).arg(m_priorVideoTimecode.count()).arg(FrameInterval.count())
+            .arg(audio_adjustment.count()).arg(unow.count()).arg(framedue.count()));
     return framedue;
 }

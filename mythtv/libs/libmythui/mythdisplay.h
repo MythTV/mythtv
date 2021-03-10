@@ -8,9 +8,10 @@
 
 // MythTV
 #include "mythuiexp.h"
-#include "referencecounter.h"
 #include "mythdisplaymode.h"
 #include "mythedid.h"
+#include "mythhdr.h"
+#include "mythvrr.h"
 #include "mythcommandlineparser.h"
 
 // Std
@@ -18,7 +19,7 @@
 
 class MythMainWindow;
 
-class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
+class MUI_PUBLIC MythDisplay : public QObject
 {
     Q_OBJECT
 
@@ -46,11 +47,12 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     QSize        GetResolution         ();
     QSize        GetPhysicalSize       ();
     double       GetRefreshRate        () const;
-    int          GetRefreshInterval    (int Fallback) const;
+    std::chrono::microseconds GetRefreshInterval (std::chrono::microseconds Fallback) const;
     double       GetAspectRatio        (QString &Source, bool IgnoreModeOverride = false);
     double       EstimateVirtualAspectRatio();
     MythEDID&    GetEDID               ();
     MythDisplayRates GetRefreshRates   (QSize Size);
+    MythHDRPtr   GetHDRState           ();
 
   public slots:
     virtual void ScreenChanged         (QScreen *qScreen);
@@ -81,6 +83,7 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     void            InitScreenBounds   ();
     void            WaitForScreenChange();
     void            WaitForNewScreen   ();
+    void            InitHDR            ();
 
     bool            m_waitForModeChanges { true };
     bool            m_modeComplete     { false };
@@ -93,6 +96,8 @@ class MUI_PUBLIC MythDisplay : public QObject, public ReferenceCounter
     QWindow*        m_window           { nullptr };
     QScreen*        m_screen           { nullptr };
     MythDisplayModes m_videoModes      { };
+    MythHDRPtr      m_hdrState         { nullptr };
+    MythVRRPtr      m_vrrState         { nullptr };
 
   private:
     Q_DISABLE_COPY(MythDisplay)

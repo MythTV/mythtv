@@ -92,7 +92,7 @@ class MBASE_PUBLIC MythSystemLegacyWindows : public MythSystemLegacyPrivate
         explicit MythSystemLegacyWindows(MythSystemLegacy *parent);
         ~MythSystemLegacyWindows() = default;
 
-        void Fork(time_t timeout) override; // MythSystemLegacyPrivate
+        void Fork(std::chrono::seconds timeout) override; // MythSystemLegacyPrivate
         void Manage(void) override; // MythSystemLegacyPrivate
 
         void Term(bool force=false) override; // MythSystemLegacyPrivate
@@ -108,7 +108,7 @@ class MBASE_PUBLIC MythSystemLegacyWindows : public MythSystemLegacyPrivate
 
     private:
         HANDLE      m_child   {nullptr};
-        time_t      m_timeout {0};
+        SystemTime  m_timeout {0s};
 
         HANDLE      m_stdpipe[3];
 };

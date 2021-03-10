@@ -22,8 +22,6 @@
 #include "archiveutil.h"
 #include "logviewer.h"
 
-using namespace std::chrono_literals;
-
 void showLogViewer(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -82,14 +80,14 @@ void showLogViewer(void)
 LogViewer::LogViewer(MythScreenStack *parent) :
     MythScreenType(parent, "logviewer")
 {
-    m_updateTime = gCoreContext->GetNumSetting(
+    m_updateTime = gCoreContext->GetDurSetting<std::chrono::seconds>(
         "LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
     m_autoUpdate = gCoreContext->GetBoolSetting("LogViewerAutoUpdate", true);
 }
 
 LogViewer::~LogViewer(void)
 {
-    gCoreContext->SaveSetting("LogViewerUpdateTime", m_updateTime);
+    gCoreContext->SaveDurSetting("LogViewerUpdateTime", m_updateTime);
     gCoreContext->SaveSetting("LogViewerAutoUpdate", m_autoUpdate ? "1" : "0");
     delete m_updateTimer;
 }
@@ -174,7 +172,7 @@ void LogViewer::toggleAutoUpdate(void)
     m_autoUpdate = ! m_autoUpdate;
 
     if (m_autoUpdate)
-        m_updateTimer->start(m_updateTime * 1000);
+        m_updateTimer->start(m_updateTime);
     else
         m_updateTimer->stop();
 }
@@ -232,7 +230,7 @@ void LogViewer::updateClicked(void)
     if (m_autoUpdate)
     {
         if (m_logList->GetCount() > 0)
-            m_updateTimer->start(m_updateTime * 1000);
+            m_updateTimer->start(m_updateTime);
         else
             m_updateTimer->start(500ms);
     }

@@ -57,7 +57,7 @@ class UPnpNotifyTask : public Task
 
         QString         m_sMasterIP;
         int             m_nServicePort;
-        int             m_nMaxAge       {3600};
+        std::chrono::seconds m_nMaxAge  {1h};
 
         UPnpNotifyNTS   m_eNTS          {NTS_alive};
 

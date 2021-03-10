@@ -28,7 +28,7 @@ class StatusBoxItem : public QTimer, public MythUIButtonListItem
     StatusBoxItem(MythUIButtonList *lbtype, const QString& text, QVariant data)
       : MythUIButtonListItem (lbtype, text, std::move(data)) { }
 
-    void Start(int Interval = 1); // Seconds
+    void Start(std::chrono::seconds Interval = 1s);
 
   signals:
     void UpdateRequired(StatusBoxItem* Item);
@@ -65,6 +65,7 @@ class StatusBox : public MythScreenType
     void doAutoExpireList(bool updateExpList);
     void doAutoExpireList() { doAutoExpireList(true); }
     void doDisplayStatus();
+    void doRenderStatus();
     void doDecoderStatus();
 
   private:

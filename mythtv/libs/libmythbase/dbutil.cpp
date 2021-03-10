@@ -7,7 +7,7 @@
 
 #include <QDir>
 #include <QFile>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDateTime>
 #include <QSqlError>
 #include <QSqlRecord>
@@ -101,19 +101,20 @@ bool DBUtil::IsBackupInProgress(void)
     backupStartTimeStr.replace(" ", "T");
 
     QDateTime backupStartTime = MythDate::fromString(backupStartTimeStr);
+    auto backupElapsed = MythDate::secsInPast(backupStartTime);
 
     // No end time set
     if (backupEndTimeStr.isEmpty())
     {
         // If DB Backup started less then 10 minutes ago, assume still running
-        if (backupStartTime.secsTo(MythDate::current()) < 600)
+        if (backupElapsed < 10min)
         {
             LOG(VB_DATABASE, LOG_INFO,
                 QString("DBUtil::BackupInProgress(): Found "
                     "database backup start time of %1 which was %2 seconds "
                     "ago, therefore it appears the backup is still running.")
                     .arg(backupStartTimeStr)
-                    .arg(backupStartTime.secsTo(MythDate::current())));
+                    .arg(backupElapsed.count()));
             return true;
         }
         LOG(VB_DATABASE, LOG_ERR, QString("DBUtil::BackupInProgress(): "
@@ -121,7 +122,7 @@ bool DBUtil::IsBackupInProgress(void)
                 "The backup started %2 seconds ago and should have "
                 "finished by now therefore it appears it is not running .")
                 .arg(backupStartTimeStr)
-                .arg(backupStartTime.secsTo(MythDate::current())));
+                .arg(backupElapsed.count()));
         return false;
     }
 
@@ -138,7 +139,7 @@ bool DBUtil::IsBackupInProgress(void)
             .arg(backupEndTimeStr).arg(backupStartTimeStr));
         return false;
     }
-    if (backupStartTime.secsTo(MythDate::current()) > 600)
+    if (backupElapsed > 10min)
     {
         LOG(VB_DATABASE, LOG_ERR,
             QString("DBUtil::BackupInProgress(): "
@@ -146,7 +147,7 @@ bool DBUtil::IsBackupInProgress(void)
                     "The backup started %2 seconds ago and should have "
                     "finished by now therefore it appears it is not running")
             .arg(backupStartTimeStr)
-            .arg(backupStartTime.secsTo(MythDate::current())));
+            .arg(backupElapsed.count()));
         return false;
     }
 
@@ -778,26 +779,17 @@ bool DBUtil::ParseDBMSVersion()
         if (!QueryDBMSVersion())
             return false;
 
-    QString section;
-    int pos = 0;
-    int i = 0;
-    std::array<int,3> version = {-1, -1, -1};
-    QRegExp digits("(\\d+)");
+    static const QRegularExpression parseVersion
+        { R"(^(\d+)(?:\.(\d+)(?:\.(\d+))?)?)" };
+    auto match = parseVersion.match(m_versionString);
+    if (!match.hasMatch())
+        return false;
 
-    while ((i < 3) && ((pos = digits.indexIn(m_versionString, pos)) > -1))
-    {
-        bool ok = false;
-        section = digits.cap(1);
-        pos += digits.matchedLength();
-        version[i] = section.toInt(&ok, 10);
-        if (!ok)
-            version[i] = -1;
-        i++;
-    }
-
-    m_versionMajor = version[0];
-    m_versionMinor = version[1];
-    m_versionPoint = version[2];
+    // If any of these wasn't matched, the captured string will be
+    // empty and toInt will parse it as a zero.
+    m_versionMajor = match.capturedRef(1).toInt(nullptr);
+    m_versionMinor = match.capturedRef(2).toInt(nullptr);
+    m_versionPoint = match.capturedRef(3).toInt(nullptr);
 
     return m_versionMajor > -1;
 }

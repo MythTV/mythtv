@@ -28,7 +28,7 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     friend int preview_helper(uint           chanid,
                               QDateTime      starttime,
                               long long      previewFrameNumber,
-                              long long      previewSeconds,
+                              std::chrono::seconds previewSeconds,
                               QSize          previewSize,
                               const QString &infile,
                               const QString &outfile);
@@ -51,12 +51,12 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
                      QString            token,
                      Mode               mode = kLocal);
 
-    void SetPreviewTime(long long time, bool in_seconds)
-        { m_captureTime = time; m_timeInSeconds = in_seconds; }
-    void SetPreviewTimeAsSeconds(long long seconds_in)
-        { SetPreviewTime(seconds_in, true); }
+    void SetPreviewTime(std::chrono::seconds time, long long frame)
+        { m_captureTime = time; m_captureFrame = frame; }
+    void SetPreviewTimeAsSeconds(std::chrono::seconds seconds)
+        { SetPreviewTime(seconds, -1); }
     void SetPreviewTimeAsFrameNumber(long long frame_number)
-        { SetPreviewTime(frame_number, false); }
+        { SetPreviewTime(-1s, frame_number); }
     void SetOutputFilename(const QString &fileName);
     void SetOutputSize(const QSize size) { m_outSize = size; }
 
@@ -82,8 +82,8 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
 
     static char *GetScreenGrab(const ProgramInfo &pginfo,
                                const QString     &filename,
-                               long long          seektime,
-                               bool               time_in_secs,
+                               std::chrono::seconds seektime,
+                               long long          seekframe,
                                int               &bufferlen,
                                int               &video_width,
                                int               &video_height,
@@ -111,10 +111,9 @@ class MTV_PUBLIC PreviewGenerator : public QObject, public MThread
     QObject           *m_listener      {nullptr};
     QString            m_pathname;
 
-    /// tells us whether to use time as seconds or frame number
-    bool               m_timeInSeconds {true};
-    /// snapshot time in seconds or frame number, depending on timeInSeconds
-    long long          m_captureTime   {-1};
+    /// snapshot time in seconds or frame number (seconds has priority)
+    std::chrono::seconds m_captureTime   {-1s};
+    long long          m_captureFrame  {-1};
     QString            m_outFileName;
     QSize              m_outSize       {0,0};
     QString            m_outFormat     {"PNG"};

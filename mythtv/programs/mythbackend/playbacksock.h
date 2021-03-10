@@ -78,8 +78,8 @@ class PlaybackSock : public ReferenceCounter
                                  const ProgramInfo *pginfo);
     QStringList GenPreviewPixmap(const QString     &token,
                                  const ProgramInfo *pginfo,
-                                 bool               time_fmt_sec,
-                                 long long          time,
+                                 std::chrono::seconds time,
+                                 long long          frame,
                                  const QString     &outputFile,
                                  QSize              outputSize);
     QDateTime PixmapLastModified(const ProgramInfo *pginfo);
@@ -87,7 +87,7 @@ class PlaybackSock : public ReferenceCounter
 
     bool IsBusy(int        capturecardnum,
                 InputInfo *busy_input  = nullptr,
-                int        time_buffer = 5);
+                std::chrono::seconds time_buffer = 5s);
     int GetEncoderState(int capturecardnum);
     long long GetMaxBitrate(int capturecardnum);
     ProgramInfo *GetRecording(uint cardid);
@@ -96,8 +96,8 @@ class PlaybackSock : public ReferenceCounter
                                  ProgramInfo *pginfo);
     RecStatus::Type GetRecordingStatus(int capturecardnum);
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
-                       int secsleft, bool hasLater);
-    int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
+                       std::chrono::seconds secsleft, bool hasLater);
+    std::chrono::milliseconds SetSignalMonitoringRate(int capturecardnum, std::chrono::milliseconds rate, int notifyFrontend);
     void SetNextLiveTVDir(int capturecardnum, const QString& dir);
     void CancelNextRecording(int capturecardnum, bool cancel);
 

@@ -18,7 +18,7 @@ HLSRecSegment::HLSRecSegment(const HLSRecSegment& rhs)
     operator=(rhs);
 }
 
-HLSRecSegment::HLSRecSegment(int seq, int duration,
+HLSRecSegment::HLSRecSegment(int seq, std::chrono::seconds duration,
                        QString title, QUrl uri)
     : m_sequence(seq),
       m_duration(duration),
@@ -28,7 +28,7 @@ HLSRecSegment::HLSRecSegment(int seq, int duration,
     LOG(VB_RECORD, LOG_DEBUG, LOC + "ctor");
 }
 
-HLSRecSegment::HLSRecSegment(int seq, int duration, QString title,
+HLSRecSegment::HLSRecSegment(int seq, std::chrono::seconds duration, QString title,
            QUrl uri, const QString& current_key_path)
     : m_sequence(seq),
       m_duration(duration),
@@ -67,5 +67,5 @@ HLSRecSegment::~HLSRecSegment(void)
 QString HLSRecSegment::toString(void) const
 {
     return QString("[%1] '%2' @ '%3' for %4")
-        .arg(m_sequence).arg(m_title).arg(m_url.toString()).arg(m_duration);
+        .arg(m_sequence).arg(m_title).arg(m_url.toString()).arg(m_duration.count());
 }

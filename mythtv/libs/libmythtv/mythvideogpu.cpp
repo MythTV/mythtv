@@ -110,6 +110,7 @@ QString MythVideoGPU::VideoResizeToString(VideoResizing Resize)
     if ((Resize & Sampling)     == Sampling)     reasons << "Sampling";
     if ((Resize & Performance)  == Performance)  reasons << "Performance";
     if ((Resize & Framebuffer)  == Framebuffer)  reasons << "Framebuffer";
+    if ((Resize & ToneMap)      == ToneMap)      reasons << "Tonemapping";
     if ((Resize & Bicubic)      == Bicubic)      reasons << "Bicubic";
     return reasons.join(",");
 }

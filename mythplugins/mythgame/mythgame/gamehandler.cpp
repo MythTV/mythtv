@@ -847,7 +847,7 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
         // the command.
         if (exec.contains("%s") || handler->SpanDisks())
         {
-            exec = exec.replace(QRegExp("%s"),arg);
+            exec = exec.replace("%s",arg);
 
             if (handler->SpanDisks())
             {

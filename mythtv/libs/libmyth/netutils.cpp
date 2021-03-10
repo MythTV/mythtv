@@ -327,12 +327,12 @@ bool markTreeUpdated(GrabberScript* script, const QDateTime& curTime)
     return (query.numRowsAffected() > 0);
 }
 
-bool needsUpdate(GrabberScript* script, uint updateFreq)
+bool needsUpdate(GrabberScript* script, std::chrono::hours updateFreq)
 {
     QDateTime now = MythDate::current();
     QDateTime then = lastUpdate(script);
 
-    return then.addSecs(updateFreq * 60 * 60) < now;
+    return then.addSecs(duration_cast<std::chrono::seconds>(updateFreq).count()) < now;
 }
 
 QDateTime lastUpdate(GrabberScript* script)

@@ -3,6 +3,7 @@
 #define CARDUTIL_H
 
 // C++ headers
+#include <chrono>
 #include <cstdint>
 #include <vector>
 
@@ -237,8 +238,8 @@ class MTV_PUBLIC CardUtil
                                           uint firewire_speed,
                                           const QString &firewire_model,
                                           uint firewire_connection,
-                                          uint signal_timeout,
-                                          uint channel_timeout,
+                                          std::chrono::milliseconds signal_timeout,
+                                          std::chrono::milliseconds channel_timeout,
                                           uint dvb_tuning_delay,
                                           uint contrast,
                                           uint brightness,
@@ -373,8 +374,8 @@ class MTV_PUBLIC CardUtil
 
     // DTV info
     static bool         GetTimeouts(uint inputid,
-                                    uint &signal_timeout,
-                                    uint &channel_timeout);
+                                    std::chrono::milliseconds &signal_timeout,
+                                    std::chrono::milliseconds &channel_timeout);
     static bool         IgnoreEncrypted(uint inputid,
                                         const QString &inputname);
     static bool         TVOnly(uint inputid, const QString &inputname);
@@ -392,7 +393,7 @@ class MTV_PUBLIC CardUtil
     static QString      ProbeDVBType(const QString &device);
     static QString      ProbeDVBFrontendName(const QString &device);
     static bool         HasDVBCRCBug(const QString &device);
-    static uint         GetMinSignalMonitoringDelay(const QString &device);
+    static std::chrono::milliseconds GetMinSignalMonitoringDelay(const QString &device);
     static DTVTunerType ConvertToTunerType(DTVModulationSystem delsys);
     static DTVTunerType GetTunerType(uint inputid);
     static DTVTunerType ProbeTunerType(int fd_frontend);

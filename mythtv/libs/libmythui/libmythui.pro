@@ -49,6 +49,9 @@ HEADERS += mythuianimation.h mythuiscrollbar.h
 HEADERS += mythnotificationcenter.h mythnotificationcenter_private.h
 HEADERS += mythuicomposite.h mythnotification.h
 HEADERS += mythedid.h
+HEADERS += mythhdr.h
+HEADERS += mythvrr.h
+HEADERS += mythcolourspace.h
 HEADERS += devices/mythinputdevicehandler.h
 
 SOURCES  = mythmainwindowprivate.cpp mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
@@ -80,6 +83,9 @@ SOURCES += mythuianimation.cpp mythuiscrollbar.cpp
 SOURCES += mythnotificationcenter.cpp mythnotification.cpp
 SOURCES += mythuicomposite.cpp
 SOURCES += mythedid.cpp
+SOURCES += mythhdr.cpp
+SOURCES += mythvrr.cpp
+SOURCES += mythcolourspace.cpp
 SOURCES += devices/mythinputdevicehandler.cpp
 
 using_qtwebkit {
@@ -106,6 +112,7 @@ inc.files += mythuieditbar.h mythuifilebrowser.h mythuivideo.h
 inc.files += mythuiexp.h mythuisimpletext.h mythuiactions.h
 inc.files += mythuistatetracker.h mythuianimation.h mythuiscrollbar.h
 inc.files += mythnotificationcenter.h mythnotification.h mythuicomposite.h
+inc.files += mythhdr.h mythcolourspace.h
 
 INSTALLS += inc
 
@@ -119,9 +126,11 @@ using_x11 {
     HEADERS += platforms/mythxdisplay.h
     HEADERS += platforms/mythdisplayx11.h
     HEADERS += platforms/mythscreensaverx11.h
+    HEADERS += platforms/mythnvcontrol.h
     SOURCES += platforms/mythxdisplay.cpp
     SOURCES += platforms/mythdisplayx11.cpp
     SOURCES += platforms/mythscreensaverx11.cpp
+    SOURCES += platforms/mythnvcontrol.cpp
     freebsd:LIBS += -lXext -lXxf86vm
 }
 
@@ -138,6 +147,7 @@ using_drm {
     HEADERS += platforms/drm/mythdrmconnector.h
     HEADERS += platforms/drm/mythdrmencoder.h
     HEADERS += platforms/drm/mythdrmframebuffer.h
+    HEADERS += platforms/drm/mythdrmvrr.h
     SOURCES += platforms/mythdisplaydrm.cpp
     SOURCES += platforms/mythscreensaverdrm.cpp
     SOURCES += platforms/mythdrmdevice.cpp
@@ -149,7 +159,13 @@ using_drm {
     SOURCES += platforms/drm/mythdrmconnector.cpp
     SOURCES += platforms/drm/mythdrmencoder.cpp
     SOURCES += platforms/drm/mythdrmframebuffer.cpp
+    SOURCES += platforms/drm/mythdrmvrr.cpp
     QMAKE_CXXFLAGS += $${LIBDRM_CFLAGS}
+
+    using_qtprivateheaders {
+        HEADERS += platforms/drm/mythdrmhdr.h
+        SOURCES += platforms/drm/mythdrmhdr.cpp
+    }
 }
 
 using_qtprivateheaders {
@@ -164,6 +180,7 @@ using_qtprivateheaders {
         SOURCES += platforms/mythscreensaverwayland.cpp
         SOURCES += platforms/mythwaylandextras.cpp
         SOURCES += platforms/waylandprotocols/idle_inhibit_unstable_v1.c
+        QMAKE_CXXFLAGS += $${LIBWAYLAND_CFLAGS}
     }
 }
 

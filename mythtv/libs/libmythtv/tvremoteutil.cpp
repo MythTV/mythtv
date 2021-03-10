@@ -47,7 +47,7 @@ uint RemoteGetState(uint inputid)
 
 
 bool RemoteRecordPending(uint inputid, const ProgramInfo *pginfo,
-                         int secsleft, bool hasLater)
+                         std::chrono::seconds secsleft, bool hasLater)
 {
     if (gCoreContext->IsBackend())
     {
@@ -62,7 +62,7 @@ bool RemoteRecordPending(uint inputid, const ProgramInfo *pginfo,
 
     QStringList strlist(QString("QUERY_REMOTEENCODER %1").arg(inputid));
     strlist << "RECORD_PENDING";
-    strlist << QString::number(secsleft);
+    strlist << QString::number(secsleft.count());
     strlist << QString::number(static_cast<int>(hasLater));
     pginfo->ToStringList(strlist);
 
@@ -428,7 +428,7 @@ bool RemoteGetRecordingStatus(
 
             state = strlist[0].toInt();
             if (kState_ChangingState == state)
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                std::this_thread::sleep_for(5ms);
         }
 
         if (kState_RecordingOnly == state || kState_WatchingRecording == state)

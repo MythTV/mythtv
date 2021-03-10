@@ -40,9 +40,6 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-const int  MythMediaBuffer::kDefaultOpenTimeout = 2000; // ms
-const int  MythMediaBuffer::kLiveTVOpenTimeout  = 10000;
-
 #define LOC      QString("RingBuf(%1): ").arg(m_filename)
 
 
@@ -98,7 +95,7 @@ const int  MythMediaBuffer::kLiveTVOpenTimeout  = 10000;
  *  \param StreamOnly   If true disallow DVD and Bluray (used by FileTransfer)
 */
 MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
-                               bool UseReadAhead, int Timeout, bool StreamOnly)
+                               bool UseReadAhead, std::chrono::milliseconds Timeout, bool StreamOnly)
 {
     QString filename = Filename;
     QString lower = filename.toLower();
@@ -655,7 +652,7 @@ void MythMediaBuffer::KillReadAheadThread(void)
         StopReads();
         m_generalWait.wakeAll();
         m_rwLock.unlock();
-        MThread::wait(5000);
+        MThread::wait(5s);
     }
 }
 
@@ -720,8 +717,9 @@ void MythMediaBuffer::WaitForPause(void)
     while (m_readAheadRunning && !m_paused && m_requestPause)
     {
         m_generalWait.wait(&m_rwLock, 1000);
-        if (m_readAheadRunning && !m_paused && m_requestPause && t.elapsed() > 1000)
-            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1 ms for ringbuffer pause").arg(t.elapsed()));
+        if (m_readAheadRunning && !m_paused && m_requestPause && t.elapsed() > 1s)
+            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Waited %1 ms for ringbuffer pause")
+                .arg(t.elapsed().count()));
     }
     m_rwLock.unlock();
 }
@@ -822,13 +820,11 @@ void MythMediaBuffer::run(void)
     RunProlog();
 
     // These variables are used to adjust the read block size
-    struct timeval lastread {};
-    struct timeval now {};
-    long readTimeAvg = 300;
+    std::chrono::milliseconds readTimeAvg = 300ms;
     bool ignoreForReadTiming = true;
     int  eofreads = 0;
 
-    gettimeofday(&lastread, nullptr); // this is just to keep gcc happy
+    auto lastread = nowAsDuration<std::chrono::milliseconds>();
 
     CreateReadAheadBuffer();
     m_rwLock.lockForWrite();
@@ -911,14 +907,12 @@ void MythMediaBuffer::run(void)
                 totfree = m_readBlockSize;
 
             // adapt blocksize
-            gettimeofday(&now, nullptr);
+            auto now = nowAsDuration<std::chrono::milliseconds>();
             if (!ignoreForReadTiming)
             {
-                long readinterval = (now.tv_sec  - lastread.tv_sec ) * 1000 +
-                                    (now.tv_usec - lastread.tv_usec) / 1000;
-                readTimeAvg = (readTimeAvg * 9 + readinterval) / 10;
+                readTimeAvg = (readTimeAvg * 9 + (now - lastread)) / 10;
 
-                if (readTimeAvg < 150 &&
+                if (readTimeAvg < 150ms &&
                     static_cast<uint>(m_readBlockSize) < (BUFFER_SIZE_MINIMUM >>2) &&
                     m_readBlockSize >= DEFAULT_CHUNK_SIZE /* low_buffers */ &&
                     m_readBlockSize <= KB512)
@@ -930,18 +924,18 @@ void MythMediaBuffer::run(void)
                         m_readBlockSize = KB512;
                     LOG(VB_FILE, LOG_INFO, LOC + QString("Avg read interval was %1 msec. "
                                                          "%2K -> %3K block size")
-                            .arg(readTimeAvg).arg(old_block_size/1024).arg(m_readBlockSize/1024));
-                    readTimeAvg = 225;
+                        .arg(readTimeAvg.count()).arg(old_block_size/1024).arg(m_readBlockSize/1024));
+                    readTimeAvg = 225ms;
                 }
-                else if (readTimeAvg > 300 && m_readBlockSize > DEFAULT_CHUNK_SIZE)
+                else if (readTimeAvg > 300ms && m_readBlockSize > DEFAULT_CHUNK_SIZE)
                 {
                     m_readBlockSize -= DEFAULT_CHUNK_SIZE;
                     LOG(VB_FILE, LOG_INFO, LOC +
                         QString("Avg read interval was %1 msec. %2K -> %3K block size")
-                            .arg(readTimeAvg)
+                            .arg(readTimeAvg.count())
                             .arg((m_readBlockSize+DEFAULT_CHUNK_SIZE)/1024)
                             .arg(m_readBlockSize/1024));
-                    readTimeAvg = 225;
+                    readTimeAvg = 225ms;
                 }
             }
             lastread = now;
@@ -973,14 +967,14 @@ void MythMediaBuffer::run(void)
 
             readResult = SafeRead(m_readAheadBuffer + rbwposcopy, static_cast<uint>(totfree));
 
-            int sr_elapsed = sr_timer.elapsed();
+            int sr_elapsed = sr_timer.elapsed().count();
             uint64_t bps = !sr_elapsed ? 1000000001 :
                            static_cast<uint64_t>((readResult * 8000.0) / static_cast<double>(sr_elapsed));
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("safe_read(...@%1, %2) -> %3, took %4 ms %5 avg %6 ms")
                 .arg(rbwposcopy).arg(totfree).arg(readResult).arg(sr_elapsed)
                 .arg(QString("(%1Mbps)").arg(static_cast<double>(bps) / 1000000.0))
-                .arg(readTimeAvg));
+                .arg(readTimeAvg.count()));
             UpdateStorageRate(bps);
 
             if (readResult >= 0)
@@ -1108,7 +1102,7 @@ void MythMediaBuffer::run(void)
             // like us, yield (currently implemented with short usleep).
             m_generalWait.wakeAll();
             m_rwLock.unlock();
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(5ms);
             m_rwLock.lockForRead();
         }
         else
@@ -1125,7 +1119,7 @@ void MythMediaBuffer::run(void)
                 // reader gets a chance to read before the buffer is full.
                 m_generalWait.wakeAll();
                 m_rwLock.unlock();
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                std::this_thread::sleep_for(5ms);
                 m_rwLock.lockForRead();
             }
         }
@@ -1188,7 +1182,7 @@ bool MythMediaBuffer::WaitForReadsAllowed(void)
     // Wait up to 30000 ms for reads allowed (or readsdesired if post seek/open)
     bool &check = (m_recentSeek || m_readInternalMode) ? m_readsDesired : m_readsAllowed;
     m_recentSeek = false;
-    int timeoutms = 30000;
+    std::chrono::milliseconds timeoutms = 30s;
     int count = 0;
     MythTimer timer;
     timer.start();
@@ -1196,8 +1190,9 @@ bool MythMediaBuffer::WaitForReadsAllowed(void)
     while ((timer.elapsed() < timeoutms) && !check && !m_stopReads &&
            !m_requestPause && !m_commsError && m_readAheadRunning)
     {
-        m_generalWait.wait(&m_rwLock, static_cast<unsigned long>(clamp(timeoutms - timer.elapsed(), 10, 100)));
-        if (!check && timer.elapsed() > 1000 && (count % 100) == 0)
+        std::chrono::milliseconds delta = clamp(timeoutms - timer.elapsed(), 10ms, 100ms);
+        m_generalWait.wait(&m_rwLock, delta.count());
+        if (!check && timer.elapsed() > 1s && (count % 100) == 0)
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Taking too long to be allowed to read..");
         count++;
     }
@@ -1205,13 +1200,13 @@ bool MythMediaBuffer::WaitForReadsAllowed(void)
     if (timer.elapsed() >= timeoutms)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Took more than %1 seconds to be allowed to read, aborting.")
-            .arg(timeoutms / 1000));
+            .arg(duration_cast<std::chrono::seconds>(timeoutms).count()));
         return false;
     }
     return check;
 }
 
-int MythMediaBuffer::WaitForAvail(int Count, int Timeout)
+int MythMediaBuffer::WaitForAvail(int Count, std::chrono::milliseconds  Timeout)
 {
     int available = ReadBufAvail();
     if (available >= Count)
@@ -1232,7 +1227,8 @@ int MythMediaBuffer::WaitForAvail(int Count, int Timeout)
     while ((available < Count) && !m_stopReads && !m_requestPause && !m_commsError && m_readAheadRunning)
     {
         m_wantToRead = Count;
-        m_generalWait.wait(&m_rwLock, static_cast<unsigned long>(clamp(Timeout - timer.elapsed(), 10, 250)));
+        std::chrono::milliseconds delta = clamp(Timeout - timer.elapsed(), 10ms, 250ms);
+        m_generalWait.wait(&m_rwLock, delta.count());
         available = ReadBufAvail();
         if (m_ateof)
             break;
@@ -1259,7 +1255,7 @@ int MythMediaBuffer::ReadDirect(void *Buffer, int Count, bool Peek)
     MythTimer timer;
     timer.start();
     int result = SafeRead(Buffer, static_cast<uint>(Count));
-    int elapsed = timer.elapsed();
+    int elapsed = timer.elapsed().count();
     uint64_t bps = !elapsed ? 1000000001 : static_cast<uint64_t>((result * 8000.0) / static_cast<double>(elapsed));
     UpdateStorageRate(bps);
 
@@ -1371,11 +1367,11 @@ int MythMediaBuffer::ReadPriv(void *Buffer, int Count, bool Peek)
     MythTimer timer(MythTimer::kStartRunning);
 
     // Wait up to 10000 ms for any data
-    int timeout_ms = 10000;
+    std::chrono::milliseconds timeout_ms = 10s;
     while (!m_readInternalMode && !m_ateof && (timer.elapsed() < timeout_ms) && m_readAheadRunning &&
            !m_stopReads && !m_requestPause && !m_commsError)
     {
-        available = WaitForAvail(Count, std::min(timeout_ms - timer.elapsed(), 100));
+        available = WaitForAvail(Count, std::min(timeout_ms - timer.elapsed(), 100ms));
         if (m_liveTVChain && m_setSwitchToNext && available < Count)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Checking to see if there's a new livetv program to switch to..");
@@ -1385,10 +1381,10 @@ int MythMediaBuffer::ReadPriv(void *Buffer, int Count, bool Peek)
         if (available > 0)
             break;
     }
-    if (timer.elapsed() > 6000)
+    if (timer.elapsed() > 6s)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + desc + QString(" -- waited %1 ms for avail(%2) > count(%3)")
-            .arg(timer.elapsed()).arg(available).arg(Count));
+            .arg(timer.elapsed().count()).arg(available).arg(Count));
     }
 
     if (m_readInternalMode)
@@ -1410,7 +1406,7 @@ int MythMediaBuffer::ReadPriv(void *Buffer, int Count, bool Peek)
         // If we're not at the end of file but have no data
         // at this point time out and shutdown read ahead.
         LOG(VB_GENERAL, LOG_ERR, LOC + desc + QString(" -- timed out waiting for data (%1 ms)")
-            .arg(timer.elapsed()));
+            .arg(timer.elapsed().count()));
 
         m_rwLock.unlock();
         m_stopReads = true; // this needs to be outside the lock
@@ -1553,14 +1549,14 @@ uint64_t MythMediaBuffer::UpdateDecoderRate(uint64_t Latest)
     if (!m_bitrateMonitorEnabled)
         return 0;
 
-    qint64 current = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    qint64 expire = current - 1000;
+    auto current = std::chrono::milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    std::chrono::milliseconds expire = current - 1s;
 
     m_decoderReadLock.lock();
     if (Latest)
         m_decoderReads.insert(current, Latest);
     uint64_t total = 0;
-    QMutableMapIterator<qint64,uint64_t> it(m_decoderReads);
+    QMutableMapIterator<std::chrono::milliseconds,uint64_t> it(m_decoderReads);
     while (it.hasNext())
     {
         it.next();
@@ -1584,14 +1580,14 @@ uint64_t MythMediaBuffer::UpdateStorageRate(uint64_t Latest)
     if (!m_bitrateMonitorEnabled)
         return 0;
 
-    qint64 current = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    qint64 expire = current - 1000;
+    auto current = std::chrono::milliseconds(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    auto expire = current - 1s;
 
     m_storageReadLock.lock();
     if (Latest)
         m_storageReads.insert(current, Latest);
     uint64_t total = 0;
-    QMutableMapIterator<qint64,uint64_t> it(m_storageReads);
+    QMutableMapIterator<std::chrono::milliseconds,uint64_t> it(m_storageReads);
     while (it.hasNext())
     {
         it.next();

@@ -980,27 +980,27 @@ void MpegRecorder::run(void)
     QByteArray vdevice = m_videodevice.toLatin1();
     while (IsRecordingRequested() && !IsErrored())
     {
-        if (PauseAndWait(100))
+        if (PauseAndWait(100ms))
             continue;
 
         if (m_deviceIsMpegFile)
         {
             if (dummyBPS && bytesRead)
             {
-                elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                elapsed = (elapsedTimer.elapsed().count() / 1000.0) + 1;
                 while ((bytesRead / elapsed) > dummyBPS)
                 {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                    elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                    std::this_thread::sleep_for(50ms);
+                    elapsed = (elapsedTimer.elapsed().count() / 1000.0) + 1;
                 }
             }
             else if (GetFramesWritten())
             {
-                elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                elapsed = (elapsedTimer.elapsed().count() / 1000.0) + 1;
                 while ((GetFramesWritten() / elapsed) > 30)
                 {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                    elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                    std::this_thread::sleep_for(50ms);
+                    elapsed = (elapsedTimer.elapsed().count() / 1000.0) + 1;
                 }
             }
         }
@@ -1238,7 +1238,7 @@ void MpegRecorder::Pause(bool clear)
     m_requestPause = true;
 }
 
-bool MpegRecorder::PauseAndWait(int timeout)
+bool MpegRecorder::PauseAndWait(std::chrono::milliseconds timeout)
 {
     QMutexLocker locker(&m_pauseLock);
     if (m_requestPause)
@@ -1256,7 +1256,7 @@ bool MpegRecorder::PauseAndWait(int timeout)
                 m_tvrec->RecorderPaused();
         }
 
-        m_unpauseWait.wait(&m_pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout.count());
     }
 
     if (!m_requestPause && IsPaused(true))
@@ -1349,7 +1349,7 @@ bool MpegRecorder::StartEncoding(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 "StartEncoding: read failing, re-opening device: " + ENO);
             close(m_readfd);
-            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            std::this_thread::sleep_for(2ms);
             m_readfd = open(m_videodevice.toLatin1().constData(),
                           O_RDWR | O_NONBLOCK);
             if (m_readfd < 0)
@@ -1365,7 +1365,7 @@ bool MpegRecorder::StartEncoding(void)
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("StartEncoding: read failed, retry in %1 msec:")
                 .arg(100 * idx) + ENO);
-            std::this_thread::sleep_for(std::chrono::microseconds(idx * 100));
+            std::this_thread::sleep_for(idx * 100us);
         }
     }
     if (idx == 50)
@@ -1429,7 +1429,7 @@ void MpegRecorder::StopEncoding(void)
     if (m_deviceReadBuffer && m_deviceReadBuffer->IsRunning())
     {
         // allow last bits of data through..
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(20ms);
         m_deviceReadBuffer->Stop();
     }
 

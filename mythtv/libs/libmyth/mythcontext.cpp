@@ -91,11 +91,11 @@ class MythContextPrivate : public QObject
     void    ResetDatabase(void) const;
 
     int     ChooseBackend(const QString &error);
-    int     UPnPautoconf(int milliSeconds = 2000);
+    int     UPnPautoconf(std::chrono::milliseconds milliSeconds = 2s);
     bool    DefaultUPnP(QString& Error);
     bool    UPnPconnect(const DeviceLocation *backend, const QString &PIN);
     void    ShowGuiStartup(void);
-    bool    checkPort(QString &host, int port, int timeLimit) const;
+    bool    checkPort(QString &host, int port, std::chrono::seconds timeLimit) const;
     static void processEvents(void);
     bool    saveSettingsCache(void);
     void    loadSettingsCacheOverride(void) const;
@@ -323,12 +323,12 @@ void MythContextPrivate::EndTempWindow(void)
  * \param timeLimit Limit in seconds for testing.
  */
 
-bool MythContextPrivate::checkPort(QString &host, int port, int timeLimit) const
+bool MythContextPrivate::checkPort(QString &host, int port, std::chrono::seconds timeLimit) const
 {
     PortChecker checker;
     if (m_guiStartup)
         QObject::connect(m_guiStartup,&GUIStartup::cancelPortCheck,&checker,&PortChecker::cancelPortCheck);
-    return checker.checkPort(host, port, timeLimit*1000);
+    return checker.checkPort(host, port, timeLimit);
 }
 
 
@@ -548,7 +548,7 @@ bool MythContextPrivate::LoadDatabaseSettings(void)
     m_dbParams.m_wolEnabled =
         m_pConfig->GetBoolValue(kDefaultWOL + "Enabled", false);
     m_dbParams.m_wolReconnect =
-        m_pConfig->GetValue(kDefaultWOL + "SQLReconnectWaitTime", 0);
+        m_pConfig->GetDuration<std::chrono::seconds>(kDefaultWOL + "SQLReconnectWaitTime", 0s);
     m_dbParams.m_wolRetry =
         m_pConfig->GetValue(kDefaultWOL + "SQLConnectRetry", 5);
     m_dbParams.m_wolCommand =
@@ -676,7 +676,7 @@ bool MythContextPrivate::SaveDatabaseParams(
 
         m_pConfig->SetBoolValue(
             kDefaultWOL + "Enabled", params.m_wolEnabled);
-        m_pConfig->SetValue(
+        m_pConfig->SetDuration(
             kDefaultWOL + "SQLReconnectWaitTime", params.m_wolReconnect);
         m_pConfig->SetValue(
             kDefaultWOL + "SQLConnectRetry", params.m_wolRetry);
@@ -748,7 +748,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
     {
         DatabaseParams params = m_parent->GetDatabaseParams();
         QString        response;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(1s);
         // give user chance to skip config
         std::cout << std::endl << error.toLocal8Bit().constData() << std::endl << std::endl;
         response = getResponse("Would you like to configure the database "
@@ -785,9 +785,10 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 
         if (params.m_wolEnabled)
         {
-            params.m_wolReconnect = intResponse("Seconds to wait for "
-                                                "reconnection:",
-                                                params.m_wolReconnect);
+            params.m_wolReconnect =
+                std::chrono::seconds(intResponse("Seconds to wait for "
+                                                 "reconnection:",
+                                                 params.m_wolReconnect.count()));
             params.m_wolRetry     = intResponse("Number of times to retry:",
                                                 params.m_wolRetry);
             params.m_wolCommand   = getResponse("Command to use to wake server or server MAC address:",
@@ -832,9 +833,8 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         {"start","dbAwake","dbStarted","dbConnects","beWOL","beAwake",
             "success" };
 
-    int msStartupScreenDelay = gCoreContext->GetNumSetting("StartupScreenDelay",2);
-    if (msStartupScreenDelay > 0)
-        msStartupScreenDelay *= 1000;
+    auto msStartupScreenDelay =
+        gCoreContext->GetDurSetting<std::chrono::milliseconds>("StartupScreenDelay",2s);
     do
     {
         QElapsedTimer timer;
@@ -846,7 +846,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         port = m_dbParams.m_dbPort;
         if (port == 0)
             port = 3306;
-        int wakeupTime = 3;
+        std::chrono::seconds wakeupTime = 3s;
         int attempts = 11;
         if (m_dbParams.m_wolEnabled) {
             wakeupTime = m_dbParams.m_wolReconnect;
@@ -859,10 +859,10 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
             attempts = 6;
         if (!prompt)
             attempts=1;
-        if (wakeupTime < 5)
-            wakeupTime = 5;
+        if (wakeupTime < 5s)
+            wakeupTime = 5s;
 
-        int progressTotal = wakeupTime * attempts;
+        std::chrono::seconds progressTotal = wakeupTime * attempts;
 
         if (m_guiStartup && !m_guiStartup->m_Exit)
             m_guiStartup->setTotal(progressTotal);
@@ -882,15 +882,16 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
 
             LOG(VB_GENERAL, LOG_INFO,
                  QString("Start up testing connections. DB %1, BE %2, attempt %3, status %4, Delay: %5")
-                      .arg(host).arg(backendIP).arg(attempt).arg(kGuiStatuses[startupState]).arg(msStartupScreenDelay) );
+                      .arg(host).arg(backendIP).arg(attempt).arg(kGuiStatuses[startupState])
+                      .arg(msStartupScreenDelay.count()) );
 
-            int useTimeout = wakeupTime;
+            std::chrono::seconds useTimeout = wakeupTime;
             if (attempt == 0)
-                useTimeout=1;
+                useTimeout=1s;
 
             if (m_gui && !m_guiStartup)
             {
-                if (msStartupScreenDelay==0 || timer.hasExpired(msStartupScreenDelay))
+                if (msStartupScreenDelay==0ms || timer.hasExpired(msStartupScreenDelay.count()))
                 {
                     ShowGuiStartup();
                     if (m_guiStartup)
@@ -932,10 +933,10 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                 ResetDatabase();
                 if (!MSqlQuery::testDBConnection())
                 {
-                    for (int temp = 0; temp < useTimeout * 2 ; temp++)
+                    for (std::chrono::seconds temp = 0s; temp < useTimeout * 2 ; temp++)
                     {
                         processEvents();
-                        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                        std::this_thread::sleep_for(500ms);
                     }
                     break;
                 }
@@ -947,13 +948,13 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
                     beWOLCmd = gCoreContext->GetSetting("WOLbackendCommand", "");
                     if (!beWOLCmd.isEmpty())
                     {
-                        wakeupTime += gCoreContext->GetNumSetting
-                            ("WOLbackendReconnectWaitTime", 0);
+                        wakeupTime += gCoreContext->GetDurSetting<std::chrono::seconds>
+                            ("WOLbackendReconnectWaitTime", 0s);
                         attempts += gCoreContext->GetNumSetting
                             ("WOLbackendConnectRetry", 0);
                         useTimeout = wakeupTime;
                         if (m_gui && !m_guiStartup && attempt == 0)
-                            useTimeout=1;
+                            useTimeout=1s;
                         progressTotal = wakeupTime * attempts;
                         if (m_guiStartup && !m_guiStartup->m_Exit)
                             m_guiStartup->setTotal(progressTotal);
@@ -1165,12 +1166,13 @@ int MythContextPrivate::ChooseBackend(const QString &error)
  * This does <i>not</i> prompt for PIN entry. If the backend requires one,
  * it will fail, and the caller needs to put up a UI to ask for one.
  */
-int MythContextPrivate::UPnPautoconf(const int milliSeconds)
+int MythContextPrivate::UPnPautoconf(const std::chrono::milliseconds milliSeconds)
 {
+    auto seconds = duration_cast<std::chrono::seconds>(milliSeconds);
     LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
-        .arg(milliSeconds / 1000));
+        .arg(seconds.count()));
 
-    SSDP::Instance()->PerformSearch(kBackendURI, milliSeconds / 1000);
+    SSDP::Instance()->PerformSearch(kBackendURI, seconds);
 
     // Search for a total of 'milliSeconds' ms, sending new search packet
     // about every 250 ms until less than one second remains.
@@ -1179,12 +1181,13 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
     while (totalTime.elapsed() < milliSeconds)
     {
         usleep(25000);
-        int ttl = milliSeconds - totalTime.elapsed();
-        if ((searchTime.elapsed() > 249) && (ttl > 1000))
+        auto ttl = milliSeconds - totalTime.elapsed();
+        if ((searchTime.elapsed() > 249ms) && (ttl > 1s))
         {
+            auto ttlSeconds = duration_cast<std::chrono::seconds>(ttl);
             LOG(VB_GENERAL, LOG_INFO, QString("UPNP Search %1 secs")
-                .arg(ttl / 1000));
-            SSDP::Instance()->PerformSearch(kBackendURI, ttl / 1000);
+                .arg(ttlSeconds.count()));
+            SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);
             searchTime.start();
         }
     }
@@ -1251,9 +1254,11 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
 
     // ----------------------------------------------------------------------
 
-    int timeout_ms = 2000;
-    LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs").arg(timeout_ms / 1000));
-    SSDP::Instance()->PerformSearch(kBackendURI, static_cast<uint>(timeout_ms / 1000));
+    std::chrono::milliseconds timeout_ms { 2s };
+    auto timeout_s = duration_cast<std::chrono::seconds>(timeout_ms);
+    LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
+        .arg(timeout_s.count()));
+    SSDP::Instance()->PerformSearch(kBackendURI, timeout_s);
 
     // ----------------------------------------------------------------------
     // We need to give the server time to respond...
@@ -1272,11 +1277,13 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
 
         usleep(25000);
 
-        int ttl = timeout_ms - totalTime.elapsed();
-        if ((searchTime.elapsed() > 249) && (ttl > 1000))
+        auto ttl = timeout_ms - totalTime.elapsed();
+        if ((searchTime.elapsed() > 249ms) && (ttl > 1s))
         {
-            LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs").arg(ttl / 1000));
-            SSDP::Instance()->PerformSearch(kBackendURI, static_cast<uint>(ttl / 1000));
+            auto ttlSeconds = duration_cast<std::chrono::seconds>(ttl);
+            LOG(VB_GENERAL, LOG_INFO, loc + QString("UPNP Search up to %1 secs")
+                .arg(ttlSeconds.count()));
+            SSDP::Instance()->PerformSearch(kBackendURI, ttlSeconds);
             searchTime.start();
         }
     }
@@ -1421,7 +1428,7 @@ void MythContextPrivate::HideConnectionFailurePopup(void)
     MythCheckNotification n(QObject::tr("Backend is online"), sLocation);
     n.SetId(m_registration);
     n.SetParent(this);
-    n.SetDuration(5);
+    n.SetDuration(5s);
     GetNotificationCenter()->Queue(n);
     m_lastCheck = QDateTime();
 }
@@ -1569,6 +1576,10 @@ bool MythContext::Init(const bool gui,
         LOG(VB_GENERAL, LOG_EMERG, LOC + "Init() Out-of-memory");
         return false;
     }
+
+    qRegisterMetaType<std::chrono::seconds>("std::chrono::seconds");
+    qRegisterMetaType<std::chrono::milliseconds>("std::chrono::milliseconds");
+    qRegisterMetaType<std::chrono::microseconds>("std::chrono::microseconds");
 
     SetDisableEventPopup(true);
 

@@ -270,7 +270,7 @@ class MPUBLIC ProgramInfo
                 const QString &director,
                 int season, int episode,
                 const QString &inetref,
-                uint length_in_minutes,
+                std::chrono::minutes length_in_minutes,
                 uint year,
                 const QString &programid);
     /// Constructs a manual record ProgramInfo.
@@ -336,7 +336,7 @@ class MPUBLIC ProgramInfo
     /// existing recording.
     QString MakeUniqueKey(void) const
         { return MakeUniqueKey(m_chanId, m_recStartTs); }
-    uint GetSecondsInRecording(void) const;
+    std::chrono::seconds GetSecondsInRecording(void) const;
     QString ChannelText(const QString& format) const;
     QString GetPathname(void) const { return m_pathname; }
     QString GetBasename(void) const { return m_pathname.section('/', -1); }
@@ -597,7 +597,7 @@ class MPUBLIC ProgramInfo
     uint        QueryAverageFrameRate(void) const;
     MarkTypes   QueryAverageAspectRatio(void) const;
     bool        QueryAverageScanProgressive(void) const;
-    uint32_t    QueryTotalDuration(void) const;
+    std::chrono::milliseconds  QueryTotalDuration(void) const;
     int64_t     QueryTotalFrames(void) const;
     QString     QueryRecordingGroup(void) const;
     bool        QueryMarkupFlag(MarkTypes type) const;
@@ -622,7 +622,7 @@ class MPUBLIC ProgramInfo
     void SaveResolution(uint64_t frame, uint width, uint height);
     void SaveFrameRate(uint64_t frame, uint framerate);
     void SaveVideoScanType(uint64_t frame, bool progressive);
-    void SaveTotalDuration(int64_t duration);
+    void SaveTotalDuration(std::chrono::milliseconds duration);
     void SaveTotalFrames(int64_t frames);
     void SaveVideoProperties(uint mask, uint video_property_flags);
     void SaveMarkupFlag(MarkTypes type) const;
@@ -947,6 +947,7 @@ MPUBLIC QString myth_category_type_to_string(ProgramInfo::CategoryType category_
 MPUBLIC ProgramInfo::CategoryType string_to_myth_category_type(const QString &type);
 
 Q_DECLARE_METATYPE(ProgramInfo*)
+Q_DECLARE_METATYPE(ProgramInfo::CategoryType)
 
 #endif // MYTHPROGRAM_H_
 

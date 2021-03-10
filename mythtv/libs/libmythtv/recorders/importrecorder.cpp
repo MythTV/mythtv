@@ -120,7 +120,7 @@ void ImportRecorder::run(void)
     {
         auto *ctx = new PlayerContext(kImportRecorderInUseID);
         auto *cfp = new MythCommFlagPlayer(ctx, (PlayerFlags)(kAudioMuted | kVideoIsNull | kNoITV));
-        MythMediaBuffer *buffer = MythMediaBuffer::Create(m_ringBuffer->GetFilename(), false, true, 6000);
+        MythMediaBuffer *buffer = MythMediaBuffer::Create(m_ringBuffer->GetFilename(), false, true, 6s);
         //This does update the status but does not set the ultimate
         //recorded / failure status for the relevant recording
         SetRecordingStatus(RecStatus::Recording, __FILE__, __LINE__);
@@ -203,7 +203,7 @@ bool ImportRecorder::Open(void)
         // Slow down run open loop when debugging -v record.
         // This is just to make the debugging output less spammy.
         if (VERBOSE_LEVEL_CHECK(VB_RECORD, LOG_ANY))
-            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            std::this_thread::sleep_for(250ms);
 
         return false;
     }

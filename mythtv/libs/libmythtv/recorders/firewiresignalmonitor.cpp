@@ -24,9 +24,6 @@ void FirewireTableMonitorThread::run(void)
     RunEpilog();
 }
 
-const uint FirewireSignalMonitor::kPowerTimeout  = 3000; /* ms */
-const uint FirewireSignalMonitor::kBufferTimeout = 5000; /* ms */
-
 QHash<void*,uint> FirewireSignalMonitor::s_patKeys;
 QMutex            FirewireSignalMonitor::s_patKeysLock;
 
@@ -96,7 +93,7 @@ void FirewireSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
 
     bool crc_bogus = !fwchan->GetFirewireDevice()->IsSTBBufferCleared();
     if (crc_bogus && m_stbNeedsToWaitForPat &&
-        (m_stbWaitForPatTimer.elapsed() < (int)kBufferTimeout))
+        (m_stbWaitForPatTimer.elapsed() < kBufferTimeout))
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC + "HandlePAT() ignoring PAT");
         uint tsid = pat->TransportStreamID();
@@ -145,7 +142,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
         // NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err");
         while (m_dtvMonitorRunning)
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- err end");
         return;
@@ -157,7 +154,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->AddListener(this);
 
     while (m_dtvMonitorRunning && GetStreamData())
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- shutdown ");
 
@@ -165,7 +162,7 @@ void FirewireSignalMonitor::RunTableMonitor(void)
     dev->ClosePort();
 
     while (m_dtvMonitorRunning)
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(10ms);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "RunTableMonitor(): -- end");
 }
@@ -206,7 +203,7 @@ void FirewireSignalMonitor::UpdateValues(void)
     }
 
     if (m_stbNeedsToWaitForPower &&
-        (m_stbWaitForPowerTimer.elapsed() < (int)kPowerTimeout))
+        (m_stbWaitForPowerTimer.elapsed() < kPowerTimeout))
     {
         return;
     }
@@ -291,7 +288,7 @@ void FirewireSignalMonitor::UpdateValues(void)
                 "Waiting for table monitor to start");
 
         while (!m_dtvMonitorRunning)
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(5ms);
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + "UpdateValues() -- "
                 "Table monitor started");

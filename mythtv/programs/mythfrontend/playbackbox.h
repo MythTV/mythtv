@@ -386,7 +386,7 @@ class PlaybackBox : public ScheduleCommon
     /// add 1 to the Watch List scord up to this many days
     int                 m_watchListMaxAge     {60};
     /// adjust exclusion of a title from the Watch List after a delete
-    int                 m_watchListBlackOut   {2 * 24};
+    std::chrono::hours  m_watchListBlackOut   {std::chrono::days(2)};
     /// allOrder controls the ordering of the "All Programs" list
     int                 m_allOrder;
     /// listOrder controls the ordering of the recordings in the list
@@ -479,7 +479,7 @@ class PlaybackBox : public ScheduleCommon
         bool IsJobQueuedOrRunning(int jobType, uint chanid,
                                   const QDateTime &recstartts);
     private:
-        static const qint64 kInvalidateTimeMs = 15000;
+        static constexpr std::chrono::milliseconds kInvalidateTimeMs { 15s };
         void Update();
         QDateTime m_lastUpdated;
         // Maps <chanid, recstartts> to a set of JobQueueEntry values.

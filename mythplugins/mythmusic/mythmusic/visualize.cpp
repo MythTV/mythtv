@@ -977,7 +977,7 @@ void Piano::zero_analysis(void)
 
         m_pianoData[key].samples_processed = 0;
     }
-    m_offsetProcessed = 0;
+    m_offsetProcessed = 0ms;
 }
 
 void Piano::resize(const QSize &newsize)
@@ -1096,16 +1096,16 @@ bool Piano::process_all_types(VisualNode *node, bool /*this_will_be_displayed*/)
         piano_audio short_to_bounded = 32768.0F;
 
         // Detect start of new song (current node more than 10s earlier than already seen)
-        if (node->m_offset + 10000 < m_offsetProcessed)
+        if (node->m_offset + 10s < m_offsetProcessed)
         {
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Node offset=%1 too far backwards : NEW SONG").arg(node->m_offset));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Node offset=%1 too far backwards : NEW SONG").arg(node->m_offset.count()));
             zero_analysis();
         }
 
         // Check whether we've seen this node (more recently than 10secs ago)
         if (node->m_offset <= m_offsetProcessed)
         {
-            LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Already seen node offset=%1, returning without processing").arg(node->m_offset));
+            LOG(VB_GENERAL, LOG_DEBUG, QString("Piano : Already seen node offset=%1, returning without processing").arg(node->m_offset.count()));
             return allZero; // Nothing to see here - the server can stop if it wants to
         }
 
@@ -1481,7 +1481,7 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
 
         if (imageFilename.startsWith("myth://"))
         {
-            auto *rf = new RemoteFile(imageFilename, false, false, 0);
+            auto *rf = new RemoteFile(imageFilename, false, false, 0ms);
 
             QByteArray data;
             bool ret = rf->SaveAs(data);

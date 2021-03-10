@@ -64,8 +64,8 @@ bool SourceManager::findScriptsDB()
         auto *si = new ScriptInfo;
         si->id = db.value(0).toInt();
         si->name = db.value(1).toString();
-        si->updateTimeout = db.value(2).toUInt() * 1000;
-        si->scriptTimeout = db.value(3).toUInt();
+        si->updateTimeout = std::chrono::seconds(db.value(2).toUInt());
+        si->scriptTimeout = std::chrono::seconds(db.value(3).toUInt());
         si->path = fi.absolutePath();
         si->program = fi.absoluteFilePath();
         si->author = db.value(5).toString();

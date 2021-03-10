@@ -154,7 +154,7 @@ void DVBStreamHandler::RunTS(void)
             m_bError = true;
             return;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
     }
 
     int remainder = 0;
@@ -241,7 +241,7 @@ void DVBStreamHandler::RunTS(void)
 
             if ((0 == len) || (-1 == len))
             {
-                std::this_thread::sleep_for(std::chrono::microseconds(100));
+                std::this_thread::sleep_for(100us);
                 continue;
             }
         }
@@ -338,7 +338,7 @@ void DVBStreamHandler::RunSR(void)
         }
 
         if (!readSomething)
-            std::this_thread::sleep_for(std::chrono::milliseconds(3));
+            std::this_thread::sleep_for(3ms);
     }
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunSR(): " + "shutdown");
 
@@ -457,7 +457,7 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
 
             // we have to cycle within our priority level
 
-            if (m_cycleTimer.elapsed() < 1000)
+            if (m_cycleTimer.elapsed() < 1s)
                 break; // we don't want to cycle too often
 
             if (!m_pidInfo[*open]->IsOpen())
@@ -721,9 +721,9 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     // bits per millisecond
     uint bpms = (StreamID::IsVideo(stream_type)) ? 19200 : 500;
     // msec of buffering we want
-    uint msec_of_buffering = max(POLL_WARNING_TIMEOUT + 50, 1500);
+    std::chrono::milliseconds msec_of_buffering = std::max(POLL_WARNING_TIMEOUT + 50ms, 1500ms);
     // actual size of buffer we need
-    uint pid_buffer_size = ((bpms*msec_of_buffering + 7) / 8);
+    uint pid_buffer_size = ((bpms*msec_of_buffering.count() + 7) / 8);
     // rounded up to the nearest page
     pid_buffer_size = ((pid_buffer_size + 4095) / 4096) * 4096;
 
@@ -746,7 +746,7 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     // Try to make the demux buffer large enough to
     // allow for longish disk writes.
     uint sz    = pid_buffer_size;
-    uint usecs = msec_of_buffering * 1000;
+    std::chrono::microseconds usecs = msec_of_buffering;
     while (ioctl(fd_tmp, DMX_SET_BUFFER_SIZE, sz) < 0 && sz > 1024*8)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set demux buffer size for "+
@@ -759,7 +759,8 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
 #if 0
     LOG(VB_RECORD, LOG_DEBUG, LOC + "Set demux buffer size for " +
         QString("pid 0x%1 to %2,\n\t\t\twhich gives us a %3 msec buffer.")
-            .arg(pid,0,16).arg(sz).arg(usecs/1000));
+            .arg(pid,0,16).arg(sz)
+            .arg(duration_cast<std::chrono::milliseconds>(usecs).count()));
 #endif
 
     // Set the filter type

@@ -119,8 +119,7 @@ void TaskQueue::run( )
         // Process Any Tasks that may need to be executed.
         // ------------------------------------------------------------------
 
-        TaskTime ttNow;
-        gettimeofday( (&ttNow), nullptr );
+        auto ttNow = nowAsDuration<std::chrono::microseconds>();
 
         Task *pTask = GetNextExpiredTask( ttNow );
         if (pTask != nullptr)
@@ -138,7 +137,7 @@ void TaskQueue::run( )
         }
         // Make sure to throttle our processing.
 
-        msleep( 100 );
+        usleep( 100ms );
     }
 
     RunEpilog();
@@ -164,24 +163,25 @@ void TaskQueue::Clear( )
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+/// \brief Add a task to run in the future.
+//  \param msec The number of milliseconds in the future to run this task
+//  \param pTask A pointer to the task.
 /////////////////////////////////////////////////////////////////////////////
 
-void TaskQueue::AddTask( long msec, Task *pTask )
+void TaskQueue::AddTask( std::chrono::milliseconds msec, Task *pTask )
 {
-    TaskTime tt;
-    gettimeofday( (&tt), nullptr );
+    auto tt = nowAsDuration<std::chrono::microseconds>() + msec;
 
-    AddMicroSecToTaskTime( tt, (msec * 1000) );
-
-    AddTask( tt, pTask );
+    AddTaskAbsolute( tt, pTask );
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+/// \brief Add a task to run at a specific time.
+//  \param msec The time when this task should run
+//  \param pTask A pointer to the task.
 /////////////////////////////////////////////////////////////////////////////
 
-void TaskQueue::AddTask( TaskTime ttKey, Task *pTask )
+void TaskQueue::AddTaskAbsolute( TaskTime ttKey, Task *pTask )
 {
     if (pTask != nullptr)
     {
@@ -193,7 +193,8 @@ void TaskQueue::AddTask( TaskTime ttKey, Task *pTask )
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//
+/// \brief Add a task to run now.
+//  \param pTask A pointer to the task.
 /////////////////////////////////////////////////////////////////////////////
 
 void TaskQueue::AddTask( Task *pTask )
@@ -201,10 +202,9 @@ void TaskQueue::AddTask( Task *pTask )
 
     if (pTask != nullptr)
     {
-        TaskTime tt;
-        gettimeofday( (&tt), nullptr );
+        auto tt = nowAsDuration<std::chrono::microseconds>();
 
-        AddTask( tt, pTask );
+        AddTaskAbsolute( tt, pTask );
     }
 }
 
@@ -212,11 +212,11 @@ void TaskQueue::AddTask( Task *pTask )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Task *TaskQueue::GetNextExpiredTask( TaskTime tt, long nWithinMilliSecs /*=50*/ )
+Task *TaskQueue::GetNextExpiredTask( TaskTime tt, std::chrono::milliseconds nWithinMilliSecs /*=50*/ )
 {
     Task *pTask = nullptr;
 
-    AddMicroSecToTaskTime( tt, nWithinMilliSecs * 1000 );
+    tt += nWithinMilliSecs ;
 
     m_mutex.lock(); 
 

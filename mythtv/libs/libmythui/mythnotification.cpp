@@ -86,8 +86,8 @@ void MythNotification::SetId(int Id)
 {
     m_id = Id;
     // default registered notification is to not expire
-    if (m_id > 0 && m_duration == 0)
-        m_duration = -1;
+    if (m_id > 0 && m_duration == 0s)
+        m_duration = -1s;
 }
 
 /*! \brief Contains the parent address. Required if id is set
@@ -133,7 +133,7 @@ void MythNotification::SetMetaData(const DMAP& MetaData)
  * determine automatically how long a notification can be displayed for
  * and will depend on priority, visibility and other factors
  */
-void MythNotification::SetDuration(int Duration)
+void MythNotification::SetDuration(std::chrono::seconds Duration)
 {
     m_duration = Duration;
     ToStringList();
@@ -143,17 +143,17 @@ void MythNotification::SetDuration(int Duration)
  * Should a style be defined, the Notification Center will attempt to load
  * an alternative theme and fall back to the default one if unsuccessful
  */
-void MythNotification::SetStyle(const QString& Style)
+void MythNotification::SetStyle(const QString& sStyle)
 {
-    m_style = Style;
+    m_style = sStyle;
     ToStringList();
 }
 
 /*! \brief Define a bitmask of Visibility
  */
-void MythNotification::SetVisibility(VNMask Visibility)
+void MythNotification::SetVisibility(VNMask nVisibility)
 {
-    m_visibility = Visibility;
+    m_visibility = nVisibility;
     ToStringList();
 }
 
@@ -171,7 +171,7 @@ void MythNotification::ToStringList()
     m_extradata << QString::number(Type())
                 << QString::number(static_cast<int>(m_fullScreen))
                 << m_description
-                << QString::number(m_duration)
+                << QString::number(m_duration.count())
                 << m_style
                 << QString::number(m_visibility)
                 << QString::number(m_priority)
@@ -203,7 +203,7 @@ bool MythNotification::FromStringList()
     }
     m_fullScreen  = ((*it++).toInt() != 0);
     m_description = *it++;
-    m_duration    = (*it++).toInt();
+    m_duration    = std::chrono::seconds((*it++).toInt());
     m_style       = *it++;
     m_visibility  = static_cast<VNMask>((*it++).toInt());
     m_priority    = static_cast<Priority>((*it++).toInt());
@@ -219,9 +219,9 @@ bool MythNotification::FromStringList()
  *
  * HH: will not be displayed if there's less than one hour.
  */
-QString MythPlaybackNotification::StringFromSeconds(int Time)
+QString MythPlaybackNotification::StringFromSeconds(std::chrono::seconds Time)
 {
-    QTime ltime = QTime(0,0).addSecs(Time);
+    QTime ltime = QTime(0,0).addSecs(Time.count());
     return ltime.toString(ltime.hour() > 0 ? "HH:mm:ss" : "mm:ss");
 }
 
@@ -280,10 +280,11 @@ MythPlaybackNotification::MythPlaybackNotification(Type nType, float Progress,
 {
 }
 
-MythPlaybackNotification::MythPlaybackNotification(Type nType, int Duration,
+MythPlaybackNotification::MythPlaybackNotification(Type nType,
+                                                   std::chrono::seconds Duration,
                                                    int Position)
   : MythNotification(nType),
-    m_progress(static_cast<float>(Position) /  static_cast<float>(Duration)),
+    m_progress(static_cast<float>(Position) /  static_cast<float>(Duration.count())),
     m_progressText(StringFromSeconds(Duration))
 {
 }
@@ -302,7 +303,7 @@ MythMediaNotification::MythMediaNotification(Type nType, const QImage& Image, co
 }
 
 MythMediaNotification::MythMediaNotification(Type nType, const QImage& Image, const DMAP& Metadata,
-                                             int Duration, int Position)
+                                             std::chrono::seconds Duration, int Position)
   : MythNotification(nType, Metadata),
     MythImageNotification(nType, Image),
     MythPlaybackNotification(nType, Duration, Position)
@@ -318,7 +319,7 @@ MythMediaNotification::MythMediaNotification(Type nType, const QString& Image, c
 }
 
 MythMediaNotification::MythMediaNotification(Type nType, const QString& Image, const DMAP& Metadata,
-                                             int Duration, int Position)
+                                             std::chrono::seconds Duration, int Position)
   : MythNotification(nType, Metadata),
     MythImageNotification(nType, Image),
     MythPlaybackNotification(nType, Duration, Position)
@@ -341,21 +342,21 @@ MythErrorNotification::MythErrorNotification(const QString& Title, const QString
                                              const QString& Details)
   : MythNotification(Error, Title, Author, Details)
 {
-    SetDuration(10);
+    SetDuration(10s);
 }
 
 MythWarningNotification::MythWarningNotification(const QString& Title, const QString& Author,
                                                  const QString& Details)
   : MythNotification(Warning, Title, Author, Details)
 {
-    SetDuration(10);
+    SetDuration(10s);
 }
 
 MythCheckNotification::MythCheckNotification(const QString& Title, const QString& Author,
                                              const QString& Details)
   : MythNotification(Check, Title, Author, Details)
 {
-    SetDuration(5);
+    SetDuration(5s);
 }
 
 MythBusyNotification::MythBusyNotification(const QString& Title, const QString& Author,

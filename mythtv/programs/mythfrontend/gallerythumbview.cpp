@@ -151,7 +151,7 @@ static void WaitUntilDone(MThread &worker)
     worker.start();
     while (!worker.isFinished())
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(1ms);
         QCoreApplication::processEvents();
     }
 }

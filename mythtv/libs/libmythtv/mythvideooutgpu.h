@@ -3,6 +3,7 @@
 
 // MythTV
 #include "mythvideoout.h"
+#include "mythhdrtracker.h"
 
 class MythMainWindow;
 class MythVideoGPU;
@@ -42,7 +43,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            SetVideoFrameRate     (float NewRate) override;
     void            DiscardFrames         (bool KeyFrame, bool Flushed) override;
     void            DoneDisplayingFrame   (MythVideoFrame* Frame) override;
-    void            UpdatePauseFrame      (int64_t& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
+    void            UpdatePauseFrame      (std::chrono::milliseconds& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
     bool            InputChanged          (QSize VideoDim, QSize VideoDispDim,
                                            float Aspect, MythCodecID CodecId, bool& AspectOnly,
                                            int ReferenceFrames, bool ForceChange) override;
@@ -58,7 +59,6 @@ class MythVideoOutputGPU : public MythVideoOutput
                                            QRect DisplayVisibleRect, MythCodecID CodecId) override;
     void            PrepareFrame          (MythVideoFrame* Frame, FrameScanType Scan) override;
     void            RenderFrame           (MythVideoFrame* Frame, FrameScanType Scan) override;
-    void            RenderOverlays        (OSD& Osd) override;
     bool            CreateBuffers         (MythCodecID CodecID, QSize Size);
     void            DestroyBuffers        ();
     bool            ProcessInputChange    ();
@@ -77,6 +77,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     bool            m_buffersCreated      { false };
     QString         m_profile;
     bool            m_needFullClear       { false };
+    HDRTracker      m_hdrTracker          { nullptr };
 
   private:
     Q_DISABLE_COPY(MythVideoOutputGPU)

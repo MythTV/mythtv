@@ -82,7 +82,7 @@ void MythDVDBuffer::CloseDVD(void)
 void MythDVDBuffer::ClearChapterCache(void)
 {
     m_rwLock.lockForWrite();
-    for (QList<uint64_t> chapters : qAsConst(m_chapterMap))
+    for (QList<std::chrono::seconds> chapters : qAsConst(m_chapterMap))
         chapters.clear();
     m_chapterMap.clear();
     m_rwLock.unlock();
@@ -175,7 +175,7 @@ long long MythDVDBuffer::Seek(long long Time)
 
     if (ffrewSkip != 1 && ffrewSkip != 0 && Time != 0)
     {
-        auto it = kSeekSpeedMap.lowerBound(static_cast<int>(labs(Time)));
+        auto it = kSeekSpeedMap.lowerBound(static_cast<int>(std::abs(Time)));
         if (it == kSeekSpeedMap.end())
             seekSpeed = *(it - 1);
         else
@@ -186,8 +186,8 @@ long long MythDVDBuffer::Seek(long long Time)
     }
     else
     {
-        m_seektime = Time;
-        dvdRet = dvdnav_absolute_time_search(m_dvdnav, static_cast<uint64_t>(m_seektime), 0);
+        m_seektime = mpeg::chrono::pts(Time);
+        dvdRet = dvdnav_absolute_time_search(m_dvdnav, m_seektime.count(), 0);
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("DVD Playback Seek() time: %1; seekSpeed: %2")
@@ -216,12 +216,12 @@ bool MythDVDBuffer::IsOpen(void) const
 
 bool MythDVDBuffer::IsBookmarkAllowed(void)
 {
-    return GetTotalTimeOfTitle() >= 120;
+    return GetTotalTimeOfTitle() >= 2min;
 }
 
 bool MythDVDBuffer::IsInStillFrame(void) const
 {
-    return m_still > 0;
+    return m_still > 0s;
 }
 
 bool MythDVDBuffer::IsSeekingAllowed(void)
@@ -253,7 +253,7 @@ void MythDVDBuffer::GetDescForPos(QString &Description) const
  *  \param lfilename   Path of the dvd device to read.
  *  \return Returns true if the dvd was opened.
  */
-bool MythDVDBuffer::OpenFile(const QString &Filename, uint /*Retry*/)
+bool MythDVDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds /*Retry*/)
 {
     QMutexLocker contextLocker(&m_contextLock);
     m_rwLock.lockForWrite();
@@ -365,21 +365,21 @@ bool MythDVDBuffer::StartFromBeginning(void)
     return m_dvdnav;
 }
 
-void MythDVDBuffer::GetChapterTimes(QList<long long> &Times)
+void MythDVDBuffer::GetChapterTimes(QList<std::chrono::seconds> &Times)
 {
     if (!m_chapterMap.contains(m_title))
         GetChapterTimes(m_title);
     if (!m_chapterMap.contains(m_title))
         return;
-    const QList<uint64_t>& chapters = m_chapterMap.value(m_title);
-    std::transform(chapters.cbegin(), chapters.cend(), std::back_inserter(Times),
-                   [](uint64_t chap) { return static_cast<long long>(chap); });
+    const QList<std::chrono::seconds>& chapters = m_chapterMap.value(m_title);
+    std::copy(chapters.cbegin(), chapters.cend(), std::back_inserter(Times));
 }
 
-uint64_t MythDVDBuffer::GetChapterTimes(int Title)
+static constexpr mpeg::chrono::pts HALFSECOND { 45000_pts };
+std::chrono::seconds MythDVDBuffer::GetChapterTimes(int Title)
 {
     if (!m_dvdnav)
-        return 0;
+        return 0s;
 
     uint64_t duration = 0;
     uint64_t *times = nullptr;
@@ -388,22 +388,22 @@ uint64_t MythDVDBuffer::GetChapterTimes(int Title)
     if (num < 1)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to retrieve chapter data");
-        return 0;
+        return 0s;
     }
 
-    QList<uint64_t> chapters;
+    QList<std::chrono::seconds> chapters;
     // add the start
-    chapters.append(0);
+    chapters.append(0s);
     // don't add the last 'chapter' - which is the title end
     if (num > 1)
         for (uint i = 0; i < num - 1; i++)
-            chapters.append((times[i] + 45000) / 90000);
+            chapters.append(duration_cast<std::chrono::seconds>(mpeg::chrono::pts(times[i]) + HALFSECOND));
 
     // Assigned via calloc, must be free'd not deleted
     if (times)
         free(times);
     m_chapterMap.insert(Title, chapters);
-    return (duration + 45000) / 90000;
+    return duration_cast<std::chrono::seconds>(mpeg::chrono::pts(duration) + HALFSECOND);
 }
 
 /** \brief returns current position in the PGC.
@@ -453,9 +453,9 @@ long long MythDVDBuffer::GetTotalReadPosition(void) const
     return m_titleLength;
 }
 
-uint MythDVDBuffer::GetChapterLength(void) const
+std::chrono::seconds MythDVDBuffer::GetChapterLength(void) const
 {
-    return static_cast<uint>(m_pgLength / 90000);
+    return duration_cast<std::chrono::seconds>(m_pgLength);
 }
 
 void MythDVDBuffer::GetPartAndTitle(int &Part, int &Title) const
@@ -503,7 +503,7 @@ void MythDVDBuffer::WaitForPlayer(void)
         while (m_playerWait && count++ < 200)
         {
             m_rwLock.unlock();
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(10ms);
             m_rwLock.lockForWrite();
         }
 
@@ -587,11 +587,11 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
 
                     // update information for the current cell
                     m_cellChanged = true;
-                    if (m_pgcLength != cell_event->pgc_length)
+                    if (m_pgcLength != mpeg::chrono::pts(cell_event->pgc_length))
                         m_pgcLengthChanged = true;
-                    m_pgLength  = cell_event->pg_length;
-                    m_pgcLength = cell_event->pgc_length;
-                    m_cellStart = cell_event->cell_start;
+                    m_pgLength  = mpeg::chrono::pts(cell_event->pg_length);
+                    m_pgcLength = mpeg::chrono::pts(cell_event->pgc_length);
+                    m_cellStart = mpeg::chrono::pts(cell_event->cell_start);
                     m_pgStart   = cell_event->pg_start;
 
                     // update title/part/still/menu information
@@ -601,7 +601,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                     uint32_t pos = 0;
                     uint32_t length = 0;
                     uint32_t stillTimer = dvdnav_get_next_still_flag(m_dvdnav);
-                    m_still = 0;
+                    m_still = 0s;
                     m_titleParts = 0;
                     dvdnav_current_title_info(m_dvdnav, &m_title, &m_part);
                     dvdnav_get_number_of_parts(m_dvdnav, m_title, &m_titleParts);
@@ -627,7 +627,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         QString("Stillframe: %1 seconds").arg(stillTimer) :
                         QString("Infinite stillframe")) :
                         QString("Length: %1 seconds")
-                            .arg(static_cast<double>(m_pgcLength) / 90000.0, 0, 'f', 1);
+                            .arg(duration_cast<std::chrono::seconds>(m_pgcLength).count());
                     if (m_title == 0)
                     {
                         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Menu #%1 %2")
@@ -650,7 +650,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
 
                     // Make sure the still frame timer is reset.
                     if (m_parent)
-                        m_parent->SetStillFrameTimeout(0);
+                        m_parent->SetStillFrameTimeout(0s);
 
                     // clear menus/still frame selections
                     m_lastvobid = m_vobid;
@@ -835,20 +835,20 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                             }
 
                             // update our status
-                            m_currentTime = dvdnav_get_current_time(m_dvdnav);
+                            m_currentTime = mpeg::chrono::pts(dvdnav_get_current_time(m_dvdnav));
                             m_currentpos = GetReadPosition();
 
                             if (m_seeking)
                             {
-                                int relativetime = static_cast<int>((m_seektime - m_currentTime) / 90000);
-                                if (abs(relativetime) <= 1)
+                                auto relativetime = duration_cast<std::chrono::seconds>(m_seektime - m_currentTime);
+                                if (abs(relativetime) <= 1s)
                                 {
                                     m_seeking = false;
-                                    m_seektime = 0;
+                                    m_seektime = 0_pts;
                                 }
                                 else
                                 {
-                                    dvdnav_relative_time_search(m_dvdnav, relativetime * 2);
+                                    dvdnav_relative_time_search(m_dvdnav, relativetime.count() * 2);
                                 }
                             }
 
@@ -877,7 +877,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                                 .arg(m_vobid)
                                 .arg(m_cellid)
                                 .arg(m_seeking)
-                                .arg(m_seektime));
+                                .arg(m_seektime.count()));
 
                             if (!m_seeking)
                             {
@@ -985,7 +985,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
 
                     if (!reprocessing && !m_skipstillorwait)
                     {
-                        if (m_still != still->length)
+                        if (m_still != std::chrono::seconds(still->length))
                         {
                             LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1) - waiting")
                                 .arg(still->length));
@@ -998,7 +998,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         // pause a little as the dvdnav VM will continue to return
                         // this event until it has been skipped
                         m_rwLock.unlock();
-                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                        std::this_thread::sleep_for(10ms);
                         m_rwLock.lockForWrite();
 
                         // when scanning the file or exiting playback, skip immediately
@@ -1012,13 +1012,13 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         else if (m_parent)
                         {
                             // debug
-                            if (m_still != still->length)
+                            if (m_still != std::chrono::seconds(still->length))
                             {
                                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("DVDNAV_STILL_FRAME (%1)")
                                     .arg(still->length));
                             }
 
-                            m_still = still->length;
+                            m_still = std::chrono::seconds(still->length);
                             Size = tot;
                             m_parent->SetStillFrameTimeout(m_still);
                         }
@@ -1054,7 +1054,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
                         {
                             m_dvdWaiting = true;
                             m_rwLock.unlock();
-                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                            std::this_thread::sleep_for(10ms);
                             m_rwLock.lockForWrite();
                         }
 
@@ -1138,9 +1138,9 @@ void MythDVDBuffer::PrevTrack(void)
 /** \brief get the total time of the title in seconds
  * 90000 ticks = 1 sec
  */
-uint MythDVDBuffer::GetTotalTimeOfTitle(void) const
+std::chrono::seconds MythDVDBuffer::GetTotalTimeOfTitle(void) const
 {
-    return static_cast<uint>(lround(m_pgcLength / 90000.0F));
+    return duration_cast<std::chrono::seconds>(m_pgcLength);
 }
 
 float MythDVDBuffer::GetAspectOverride(void) const
@@ -1150,9 +1150,9 @@ float MythDVDBuffer::GetAspectOverride(void) const
 
 /** \brief get the start of the cell in seconds
  */
-uint MythDVDBuffer::GetCellStart(void) const
+std::chrono::seconds MythDVDBuffer::GetCellStart(void) const
 {
-    return static_cast<uint>(m_cellStart / 900000.F);
+    return duration_cast<std::chrono::seconds>(m_cellStart);
 }
 
 /** \brief check if dvd cell has changed
@@ -1198,12 +1198,12 @@ void MythDVDBuffer::SkipStillFrame(void)
     QMutexLocker locker(&m_seekLock);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "Skipping still frame.");
 
-    m_still = 0;
+    m_still = 0s;
     dvdnav_still_skip(m_dvdnav);
 
     // Make sure the still frame timer is disabled.
     if (m_parent)
-        m_parent->SetStillFrameTimeout(0);
+        m_parent->SetStillFrameTimeout(0s);
 }
 
 void MythDVDBuffer::WaitSkip(void)
@@ -1311,7 +1311,7 @@ void MythDVDBuffer::GoToPreviousProgram(void)
         dvdnav_prev_pg_search(m_dvdnav);
 }
 
-bool MythDVDBuffer::HandleAction(const QStringList &Actions, int64_t /*Pts*/)
+bool MythDVDBuffer::HandleAction(const QStringList &Actions, mpeg::chrono::pts /*Pts*/)
 {
     if (!NumMenuButtons())
         return false;
@@ -1971,14 +1971,14 @@ void MythDVDBuffer::SetDVDSpeed(int Speed)
 }
 
 /// \brief returns seconds left in the title
-uint MythDVDBuffer::TitleTimeLeft(void) const
+std::chrono::seconds MythDVDBuffer::TitleTimeLeft(void) const
 {
-    return static_cast<uint>(GetTotalTimeOfTitle() - GetCurrentTime());
+    return GetTotalTimeOfTitle() - GetCurrentTime();
 }
 
-int64_t MythDVDBuffer::GetCurrentTime(void) const
+std::chrono::seconds MythDVDBuffer::GetCurrentTime(void) const
 {
-    return (m_currentTime / 90000);
+    return duration_cast<std::chrono::seconds>(m_currentTime);
 }
 
 /// \brief converts palette values from YUV to RGB

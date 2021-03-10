@@ -1,6 +1,5 @@
-
+// MythTV
 #include "commbreakmap.h"
-
 #include "mythcontext.h"
 #include "mythmiscutil.h"
 #include "programinfo.h"
@@ -8,15 +7,14 @@
 #define LOC QString("CommBreakMap: ")
 
 CommBreakMap::CommBreakMap(void)
-   : m_commBreakIter(m_commBreakMap.end())
-{
-    m_commrewindamount = gCoreContext->GetNumSetting("CommRewindAmount",0);
-    m_commnotifyamount = gCoreContext->GetNumSetting("CommNotifyAmount",0);
-    m_lastIgnoredManualSkip = MythDate::current().addSecs(-10);
-    m_autocommercialskip = (CommSkipMode)
-        gCoreContext->GetNumSetting("AutoCommercialSkip", kCommSkipOff);
-    m_maxskip = gCoreContext->GetNumSetting("MaximumCommercialSkip", 3600);
-    m_maxShortMerge = gCoreContext->GetNumSetting("MergeShortCommBreaks", 0);
+  : m_autocommercialskip(static_cast<CommSkipMode>(gCoreContext->GetNumSetting("AutoCommercialSkip", kCommSkipOff))),
+    m_commrewindamount(gCoreContext->GetDurSetting<std::chrono::seconds>("CommRewindAmount",0s)),
+    m_commnotifyamount(gCoreContext->GetDurSetting<std::chrono::seconds>("CommNotifyAmount",0s)),
+    m_lastIgnoredManualSkip(MythDate::current().addSecs(-10)),
+    m_maxskip(gCoreContext->GetDurSetting<std::chrono::seconds>("MaximumCommercialSkip", 1h)),
+    m_maxShortMerge(gCoreContext->GetDurSetting<std::chrono::seconds>("MergeShortCommBreaks", 0s)),
+    m_commBreakIter(m_commBreakMap.end())
+{    
 }
 
 CommSkipMode CommBreakMap::GetAutoCommercialSkip(void) const
@@ -172,7 +170,7 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
           (((kCommSkipOn == m_autocommercialskip) &&
             (framesPlayed >= m_commBreakIter.key())) ||
            ((kCommSkipNotify == m_autocommercialskip) &&
-            (framesPlayed + m_commnotifyamount * video_frame_rate >=
+            (framesPlayed + m_commnotifyamount.count() * video_frame_rate >=
              m_commBreakIter.key())))))
     {
         return false;
@@ -215,8 +213,8 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
         QString("AutoCommercialSkip(), new commBreakIter frame %1")
             .arg(m_commBreakIter.key()));
 
-    int skipped_seconds = (int)((m_commBreakIter.key() -
-                                 framesPlayed) / video_frame_rate);
+    auto skipped_seconds = std::chrono::seconds((int)((m_commBreakIter.key() -
+                                 framesPlayed) / video_frame_rate));
     QString skipTime = MythFormatTime(skipped_seconds, "m:ss");
     if (kCommSkipOn == m_autocommercialskip)
     {
@@ -231,17 +229,16 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
 
     if (kCommSkipOn == m_autocommercialskip)
     {
+        int framediff = (int)(m_commrewindamount.count() * video_frame_rate);
         LOG(VB_COMMFLAG, LOG_INFO, LOC +
             QString("AutoCommercialSkip(), auto-skipping to frame %1")
-                .arg(m_commBreakIter.key() -
-                     (int)(m_commrewindamount * video_frame_rate)));
+                .arg(m_commBreakIter.key() - framediff));
 
         m_lastCommSkipDirection = 1;
         m_lastCommSkipStart = framesPlayed;
         m_lastCommSkipTime = time(nullptr);
 
-        jumpToFrame = m_commBreakIter.key() -
-            (int)(m_commrewindamount * video_frame_rate);
+        jumpToFrame = m_commBreakIter.key() - framediff;
         return true;
     }
     ++m_commBreakIter;
@@ -310,15 +307,15 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
     }
     else
     {
-        int skipped_seconds = (int)(((int64_t)(m_commBreakIter.key()) -
-                              (int64_t)framesPlayed) / video_frame_rate);
+        int64_t framediff = m_commBreakIter.key() - framesPlayed;
+        auto skipped_seconds = std::chrono::seconds((int)(framediff / video_frame_rate));
 
         // special case when hitting 'skip' within 20 seconds of the break
         // start or within commrewindamount of the break end
         // Even though commrewindamount has a max of 10 per the settings UI,
         // check for MARK_COMM_END to make the code generic
         MarkTypes type = *m_commBreakIter;
-        if (((type == MARK_COMM_START) && (skipped_seconds < 20)) ||
+        if (((type == MARK_COMM_START) && (skipped_seconds < 20s)) ||
             ((type == MARK_COMM_END) && (skipped_seconds < m_commrewindamount)))
         {
             m_commBreakIter++;
@@ -336,11 +333,11 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
 
     if (m_skipcommercials > 0)
         MergeShortCommercials(video_frame_rate);
-    int skipped_seconds = (int)(((int64_t)(m_commBreakIter.key()) -
-                          (int64_t)framesPlayed) / video_frame_rate);
+    int64_t framediff = m_commBreakIter.key() - framesPlayed;
+    auto skipped_seconds = std::chrono::seconds((int)(framediff / video_frame_rate));
     QString skipTime = MythFormatTime(skipped_seconds, "m:ss");
 
-    if ((m_lastIgnoredManualSkip.secsTo(MythDate::current()) > 3) &&
+    if ((MythDate::secsInPast(m_lastIgnoredManualSkip) > 3s) &&
         (abs(skipped_seconds) >= m_maxskip))
     {
         //: %1 is the skip time
@@ -353,7 +350,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
     comm_msg = tr("Skip %1").arg(skipTime);
 
     uint64_t jumpto = (m_skipcommercials > 0) ?
-        m_commBreakIter.key() - (long long)(m_commrewindamount * video_frame_rate):
+        m_commBreakIter.key() - (long long)(m_commrewindamount.count() * video_frame_rate):
         m_commBreakIter.key();
     m_commBreakIter++;
     jumpToFrame = jumpto;
@@ -362,7 +359,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
 
 void CommBreakMap::MergeShortCommercials(double video_frame_rate)
 {
-    double maxMerge = m_maxShortMerge * video_frame_rate;
+    double maxMerge = m_maxShortMerge.count() * video_frame_rate;
     if (maxMerge <= 0.0 || (m_commBreakIter == m_commBreakMap.end()))
         return;
 

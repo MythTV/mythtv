@@ -143,7 +143,7 @@ struct kfatable_entry
 struct vidbuffertype
 {
     int sample;
-    int timecode;
+    std::chrono::milliseconds timecode;
     int freeToEncode;
     int freeToBuffer;
     unsigned char *buffer;
@@ -154,7 +154,7 @@ struct vidbuffertype
 struct audbuffertype
 {
     int sample;
-    int timecode;
+    std::chrono::milliseconds timecode;
     int freeToEncode;
     int freeToBuffer;
     unsigned char *buffer;
@@ -162,7 +162,7 @@ struct audbuffertype
 
 struct txtbuffertype
 {
-    int timecode;
+    std::chrono::milliseconds timecode;
     int pagenr;
     int freeToEncode;
     int freeToBuffer;

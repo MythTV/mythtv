@@ -144,7 +144,9 @@ void MainVisual::prepare()
 // This is called via : mythtv/libs/libmyth/output.cpp :: OutputListeners::dispatchVisual
 //    from : mythtv/libs/libmyth/audio/audiooutputbase.cpp :: AudioOutputBase::AddData
 // Caller holds mutex() lock
-void MainVisual::add(const void *buffer, unsigned long b_len, unsigned long timecode, int source_channels, int bits_per_sample)
+void MainVisual::add(const void *buffer, unsigned long b_len,
+                     std::chrono::milliseconds timecode,
+                     int source_channels, int bits_per_sample)
 {
     unsigned long len = b_len;
     short *l = nullptr;
@@ -211,10 +213,10 @@ void MainVisual::timeout()
     if (m_playing && gPlayer->getOutput())
     {
         QMutexLocker locker(mutex());
-        int64_t timestamp = gPlayer->getOutput()->GetAudiotime();
+        std::chrono::milliseconds timestamp = gPlayer->getOutput()->GetAudiotime();
         while (m_nodes.size() > 1)
         {
-            if ((int64_t)m_nodes.first()->m_offset > timestamp)
+            if (m_nodes.first()->m_offset > timestamp)
                 break;
 
             if (m_vis)

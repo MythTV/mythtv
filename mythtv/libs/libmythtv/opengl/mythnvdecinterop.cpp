@@ -388,7 +388,7 @@ bool MythNVDECInterop::CreateCUDAContext(MythRenderOpenGL* GLContext, CudaFuncti
         if (!retry)
             break;
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Will retry in 50ms");
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(50ms);
     }
     return false;
 }

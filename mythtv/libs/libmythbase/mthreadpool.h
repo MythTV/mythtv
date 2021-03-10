@@ -6,6 +6,7 @@
 #include <QString>
 
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 class MThreadPoolPrivate;
 class MPoolThread;
@@ -34,10 +35,10 @@ class MBASE_PUBLIC MThreadPool
     bool tryStart(QRunnable *runnable, const QString& debugName);
 
     void startReserved(QRunnable *runnable, const QString& debugName,
-                       int waitForAvailMS = 0);
+                       std::chrono::milliseconds waitForAvailMS = 0ms);
 
-    int expiryTimeout(void) const;
-    void setExpiryTimeout(int expiryTimeout);
+    std::chrono::milliseconds expiryTimeout(void) const;
+    void setExpiryTimeout(std::chrono::milliseconds expiryTimeout);
 
     int maxThreadCount(void) const;
     void setMaxThreadCount(int maxThreadCount);

@@ -827,7 +827,7 @@ DTC::LiveStreamInfo *HTTPLiveStream::StartStream(void)
 
     HTTPLiveStreamStatus status = GetDBStatus();
     while ((status == kHLSStatusQueued) &&
-           ((statusTimer.elapsed() / 1000) < 30))
+           (statusTimer.elapsed() < 30s))
     {
         delay = (int)(delay * 1.5);
         usleep(delay);
@@ -940,7 +940,7 @@ DTC::LiveStreamInfo *HTTPLiveStream::StopStream(int id)
     while ((status != kHLSStatusStopped) &&
            (status != kHLSStatusCompleted) &&
            (status != kHLSStatusErrored) &&
-           ((statusTimer.elapsed() / 1000) < 30))
+           (statusTimer.elapsed() < 30s))
     {
         delay = (int)(delay * 1.5);
         usleep(delay);

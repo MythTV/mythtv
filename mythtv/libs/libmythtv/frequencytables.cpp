@@ -24,7 +24,7 @@ TransportScanItem::TransportScanItem(uint           sourceid,
                                      const QString &_si_std,
                                      QString        _name,
                                      uint           _mplexid,
-                                     uint           _timeoutTune)
+                                     std::chrono::milliseconds _timeoutTune)
     : m_mplexid(_mplexid),  m_friendlyName(std::move(_name)),
       m_sourceID(sourceid),
       m_timeoutTune(_timeoutTune)
@@ -42,7 +42,7 @@ TransportScanItem::TransportScanItem(uint           sourceid,
 TransportScanItem::TransportScanItem(uint           _sourceid,
                                      QString        _name,
                                      const  DTVMultiplex &_tuning,
-                                     uint           _timeoutTune)
+                                     std::chrono::milliseconds _timeoutTune)
     : m_mplexid(0),
       m_friendlyName(std::move(_name)),
       m_sourceID(_sourceid),
@@ -55,7 +55,7 @@ TransportScanItem::TransportScanItem(uint                _sourceid,
                                      QString             _name,
                                      DTVTunerType        _tuner_type,
                                      const DTVTransport &_tuning,
-                                     uint                _timeoutTune)
+                                     std::chrono::milliseconds _timeoutTune)
     : m_mplexid(0),
       m_friendlyName(std::move(_name)),
       m_sourceID(_sourceid),
@@ -83,7 +83,7 @@ TransportScanItem::TransportScanItem(uint sourceid,
                                      uint freqNum,
                                      uint freq,
                                      const FrequencyTable &ft,
-                                     uint timeoutTune)
+                                     std::chrono::milliseconds timeoutTune)
     : m_mplexid(0),           m_friendlyName(std::move(strFmt)),
       m_friendlyNum(freqNum), m_sourceID(sourceid),
       m_timeoutTune(timeoutTune)
@@ -130,7 +130,7 @@ TransportScanItem::TransportScanItem(uint _sourceid,
                                      QString _name,
                                      IPTVTuningData _tuning,
                                      QString _channel,
-                                     uint _timeoutTune) :
+                                     std::chrono::milliseconds _timeoutTune) :
     m_mplexid(0),
     m_friendlyName(std::move(_name)),
     m_sourceID(_sourceid),
@@ -175,7 +175,7 @@ QString TransportScanItem::toString() const
     str += QString("sourceid(%1) "          ).arg(m_sourceID);
     str += QString("useTimer(%1) "          ).arg(static_cast<int>(m_useTimer));
     str += QString("scanning(%1) "          ).arg(static_cast<int>(m_scanning));
-    str += QString("timeoutTune(%3 msec)  " ).arg(m_timeoutTune);
+    str += QString("timeoutTune(%3 msec)  " ).arg(m_timeoutTune.count());
     str += "\n\t";
     str += QString("frequency(%1) "         ).arg(m_tuning.m_frequency);
     str += QString("offset[0..2]: %1 %2 %3 ").arg(m_freqOffsets[0]).arg(m_freqOffsets[1]).arg(m_freqOffsets[2]);

@@ -42,8 +42,6 @@
 #include "upnputil.h"
 #include "compat.h"
 
-using TaskTime = struct timeval;
-
 class HttpWorkerThread;
 class QScriptEngine;
 class HttpServer;
@@ -195,7 +193,7 @@ class HttpWorker : public QRunnable
   protected:
     HttpServer &m_httpServer; 
     qt_socket_fd_t m_socket;
-    int         m_socketTimeout;
+    std::chrono::milliseconds m_socketTimeout;
     PoolServerType m_connectionType;
 
 #ifndef QT_NO_OPENSSL

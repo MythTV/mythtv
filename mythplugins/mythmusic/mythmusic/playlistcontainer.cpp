@@ -10,13 +10,12 @@
 #include "playlist.h"
 #include "playlistcontainer.h"
 
-
 void PlaylistLoadingThread::run()
 {
     RunProlog();
     while (!m_allMusic->doneLoading())
     {
-        msleep(250);
+        usleep(250ms);
     }
     m_parent->load();
     RunEpilog();

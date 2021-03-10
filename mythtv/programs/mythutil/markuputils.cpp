@@ -79,7 +79,7 @@ static int SetMarkupList(const MythUtilCommandLineParser &cmdline,
     bool isCutlist = (type == "cutlist");
     frm_dir_map_t markuplist;
 
-    newList.replace(QRegExp(" "), "");
+    newList.remove(" ");
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList tokens = newList.split(",", QString::SkipEmptyParts);

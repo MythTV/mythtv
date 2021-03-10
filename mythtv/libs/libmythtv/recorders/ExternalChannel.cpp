@@ -99,38 +99,33 @@ bool ExternalChannel::Tune(const QString &channum)
         return true;
 
     QString result;
-    if (m_tuneTimeout < 0)
+    if (m_tuneTimeout < 0ms)
     {
-        // When mythbackend first starts up, just retrive the
-        // tuneTimeout for subsequent tune requests.
-
         if (!m_streamHandler->ProcessCommand("LockTimeout?", result))
         {
             LOG(VB_CHANNEL, LOG_ERR, LOC + QString
                 ("Failed to retrieve LockTimeout: %1").arg(result));
-            m_tuneTimeout = 60000;
+            m_tuneTimeout = 60s;
         }
         else
-            m_tuneTimeout = result.split(":")[1].toInt();
+            m_tuneTimeout = std::chrono::milliseconds(result.split(":")[1].toInt());
 
         LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Using Tune timeout of %1ms")
-            .arg(m_tuneTimeout));
+            .arg(m_tuneTimeout.count()));
     }
-    else
+
+    LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning to " + channum);
+
+    if (!m_streamHandler->ProcessCommand("TuneChannel:" + channum,
+                                         result, m_tuneTimeout))
     {
-        LOG(VB_CHANNEL, LOG_INFO, LOC + "Tuning to " + channum);
-
-        if (!m_streamHandler->ProcessCommand("TuneChannel:" + channum,
-                                             result, m_tuneTimeout))
-        {
-            LOG(VB_CHANNEL, LOG_ERR, LOC + QString
-                ("Failed to Tune %1: %2").arg(channum).arg(result));
-            return false;
-        }
-
-        UpdateDescription();
-        m_backgroundTuning = result.startsWith("OK:InProgress");
+        LOG(VB_CHANNEL, LOG_ERR, LOC + QString
+            ("Failed to Tune %1: %2").arg(channum).arg(result));
+        return false;
     }
+
+    UpdateDescription();
+    m_backgroundTuning = result.startsWith("OK:InProgress");
 
     return true;
 }

@@ -87,7 +87,7 @@ class META_PUBLIC MusicMetadata
 
     explicit MusicMetadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "",
              QString lalbum = "", QString ltitle = "", QString lgenre = "",
-             int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
+             int lyear = 0, int ltracknum = 0, std::chrono::milliseconds llength = 0ms, int lid = 0,
              int lrating = 0, int lplaycount = 0, QDateTime llastplay = QDateTime(),
              QDateTime ldateadded = QDateTime(), bool lcompilation = false, QString lformat = "")
                 : m_artist(std::move(lartist)),
@@ -202,8 +202,10 @@ class META_PUBLIC MusicMetadata
     int GetTrackCount() const { return m_trackCount; }
     void setTrackCount(int ltrackcount) { m_trackCount = ltrackcount; }
 
-    int Length() const { return m_length; }
-    void setLength(int llength) { m_length = llength; }
+    std::chrono::milliseconds Length() const { return m_length; }
+    template <typename T>
+    typename std::enable_if_t<std::chrono::__is_duration<T>::value, void>
+    setLength(T llength) { m_length = llength; }
 
     int DiscNumber() const {return m_discNum;}
     void setDiscNumber(int discnum) { m_discNum = discnum; }
@@ -339,7 +341,7 @@ class META_PUBLIC MusicMetadata
     int     m_trackCount       {0};
     int     m_discNum          {0};
     int     m_discCount        {0};
-    int     m_length           {0};
+    std::chrono::milliseconds  m_length  {0ms};
     int     m_rating           {0};
     int     m_directoryId      {-1};
     int     m_artistId         {-1};

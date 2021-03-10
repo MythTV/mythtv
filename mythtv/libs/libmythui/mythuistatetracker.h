@@ -16,7 +16,7 @@ class MUI_PUBLIC MythUIStateTracker
 
   protected:
     static MythUIStateTracker* GetMythUIStateTracker();
-    static int                 TimeSinceLastUpdate();
+    static std::chrono::milliseconds TimeSinceLastUpdate();
     static inline MythUIStateTracker* gUIState { nullptr };
     static inline QMutex gUIStateLock { QMutex::Recursive };
 

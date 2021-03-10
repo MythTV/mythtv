@@ -162,7 +162,7 @@ class UPNP_PUBLIC HTTPRequest
     private:
 
         bool                m_bKeepAlive        {true};
-        uint                m_nKeepAliveTimeout {0};
+        std::chrono::seconds m_nKeepAliveTimeout {0s};
 
     protected:
 
@@ -252,14 +252,14 @@ class UPNP_PUBLIC HTTPRequest
         static QString  Decode          ( const QString &sIn );
         static QString  GetETagHash     ( const QByteArray &data );
 
-        void            SetKeepAliveTimeout ( int nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
+        void            SetKeepAliveTimeout ( std::chrono::seconds nTimeout ) { m_nKeepAliveTimeout = nTimeout; }
 
         static bool            IsUrlProtected      ( const QString &sBaseUrl );
 
         // ------------------------------------------------------------------
 
-        virtual QString ReadLine        ( int msecs ) = 0;
-        virtual qint64  ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0 ) = 0;
+        virtual QString ReadLine        ( std::chrono::milliseconds msecs ) = 0;
+        virtual qint64  ReadBlock       ( char *pData, qint64 nMaxLen, std::chrono::milliseconds msecs = 0ms ) = 0;
         virtual qint64  WriteBlock      ( const char *pData,
                                           qint64 nLen    ) = 0;
         virtual QString  GetHostName     ();  // RFC 3875 - The name in the client request
@@ -285,8 +285,8 @@ class BufferedSocketDeviceRequest : public HTTPRequest
             : m_pSocket(pSocket) {}
         ~BufferedSocketDeviceRequest() override = default;
 
-        QString  ReadLine        ( int msecs ) override; // HTTPRequest
-        qint64   ReadBlock       ( char *pData, qint64 nMaxLen, int msecs = 0  ) override; // HTTPRequest
+        QString  ReadLine        ( std::chrono::milliseconds msecs ) override; // HTTPRequest
+        qint64   ReadBlock       ( char *pData, qint64 nMaxLen, std::chrono::milliseconds msecs = 0ms ) override; // HTTPRequest
         qint64   WriteBlock      ( const char *pData, qint64 nLen    ) override; // HTTPRequest
         QString  GetHostAddress  () override; // HTTPRequest
         quint16  GetHostPort     () override; // HTTPRequest

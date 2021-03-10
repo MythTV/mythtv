@@ -124,7 +124,7 @@ void CetonRecorder::run(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
 }
 
-bool CetonRecorder::PauseAndWait(int timeout)
+bool CetonRecorder::PauseAndWait(std::chrono::milliseconds timeout)
 {
     QMutexLocker locker(&m_pauseLock);
     if (m_requestPause)
@@ -139,7 +139,7 @@ bool CetonRecorder::PauseAndWait(int timeout)
                 m_tvrec->RecorderPaused();
         }
 
-        m_unpauseWait.wait(&m_pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout.count());
     }
 
     if (!m_requestPause && IsPaused(true))

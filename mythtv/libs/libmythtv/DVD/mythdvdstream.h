@@ -26,7 +26,7 @@ class MTV_PUBLIC MythDVDStream : public MythMediaBuffer
 
     long long GetReadPosition (void) const override;
     bool      IsOpen          (void) const override;
-    bool      OpenFile        (const QString &Filename, uint Retry = 0) override;
+    bool      OpenFile        (const QString &Filename, std::chrono::milliseconds Retry = 0ms) override;
 
   protected:
     int       SafeRead        (void *Buffer, uint Size) override;

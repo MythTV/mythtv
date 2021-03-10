@@ -13,14 +13,13 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void CaptionsStateChanged(MythCaptionsState& CaptionsState);
     void ResizeForInteractiveTV(const QRect& Rect);
     void SetInteractiveStream(const QString& Stream);
-    void SetInteractiveStreamPos(long Position);
+    void SetInteractiveStreamPos(std::chrono::milliseconds Position);
     void PlayInteractiveStream(bool Play);
+    void EnableSubtitles(bool Enable);
 
   public:
     MythPlayerCaptionsUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerCaptionsUI() override;
-
-    uint GetCaptionMode() const override;
 
     // N.B. These methods handle audio tracks as well. Fix.
     QStringList GetTracks(uint Type);
@@ -29,8 +28,8 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
 
     bool SetAudioByComponentTag(int Tag);
     bool SetVideoByComponentTag(int Tag);
-    long GetStreamPos();
-    long GetStreamMaxPos();
+    std::chrono::milliseconds GetStreamPos();
+    std::chrono::milliseconds GetStreamMaxPos();
     InteractiveTV* GetInteractiveTV() override;
 
   protected slots:
@@ -53,12 +52,12 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
     void ITVHandleAction(const QString& Action, bool& Handled);
     void ITVRestart(uint Chanid, uint Cardid, bool IsLiveTV);
     void AdjustSubtitleZoom(int Delta);
-    void AdjustSubtitleDelay(int Delta);
+    void AdjustSubtitleDelay(std::chrono::milliseconds Delta);
 
   private slots:
     void ExternalSubtitlesUpdated();
     void SetStream(const QString& Stream);
-    long SetStreamPos(long Position);
+    void SetStreamPos(std::chrono::milliseconds Position);
     void StreamPlay(bool Playing = true);
 
   protected:

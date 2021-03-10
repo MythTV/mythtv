@@ -11,6 +11,7 @@
 
 // MythTV
 #include "mythedid.h"
+#include "platforms/drm/mythdrmvrr.h"
 #include "platforms/drm/mythdrmencoder.h"
 #include "platforms/drm/mythdrmframebuffer.h"
 #include "platforms/mythdrmdevice.h"
@@ -40,6 +41,7 @@ extern "C" {
  * 1. Set the video mode
  * 2. Improve performance on SoCs by rendering YUV video directly to the framebuffer
  * 3. Implement HDR support and/or setup 10bit output
+ * 4. Enable/disable FreeSync
  *
  * There are a variety of use cases, depending on hardware, user preferences and
  * compile time support (and assuming neither X or Wayland are running):-
@@ -111,8 +113,37 @@ extern "C" {
  * reference is the MythCommandLineParsers instance and any environment variables.
 */
 #ifdef USING_QTPRIVATEHEADERS
+MythDRMPtr MythDRMDevice::FindDevice(bool NeedPlanes)
+{
+    // Retrieve possible devices and analyse them.
+    // We are only interested in authenticated devices with a connected connector.
+    // We can only use one device, so if there are multiple devices (RPI4 only?) then
+    // take the first with a connected connector (which on the RPI4 at least is
+    // usually the better choice anyway).
+    auto [root, devices] = GetDeviceList();
+
+    // Allow the user to specify the device
+    if (!s_mythDRMDevice.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Forcing '%1' as DRM device").arg(s_mythDRMDevice));
+        root.clear();
+        devices.clear();
+        devices.append(s_mythDRMDevice);
+    }
+
+    for (const auto & dev : devices)
+        if (auto device = MythDRMDevice::Create(nullptr, root + dev, NeedPlanes); device && device->Authenticated())
+            return device;
+
+    return nullptr;
+}
+
 void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 {
+    // Try and enable/disable FreeSync if requested by the user
+    if (CmdLine.toBool("vrr"))
+        MythDRMVRR::ForceFreeSync(FindDevice(false), CmdLine.toUInt("vrr") > 0);
+
 #if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
     // Return early if eglfs is not *explicitly* requested via the command line or environment.
     // Note: On some setups it is not necessary to explicitly request eglfs for Qt to use it.
@@ -151,22 +182,49 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=1'").arg(s_kmsSetMode));
     setenv(s_kmsSetMode, "1", 0);
 
-    bool customplane = qEnvironmentVariableIsSet(s_kmsPlaneIndex) ||
-                       qEnvironmentVariableIsSet(s_kmsPlaneCRTCS);
-    bool custom =      customplane ||
-                       qEnvironmentVariableIsSet(s_kmsPlaneZpos)  ||
-                       qEnvironmentVariableIsSet(s_kmsConfigFile);
+    bool plane  = qEnvironmentVariableIsSet(s_kmsPlaneIndex) ||
+                  qEnvironmentVariableIsSet(s_kmsPlaneCRTCS);
+    bool config = qEnvironmentVariableIsSet(s_kmsConfigFile);
+    bool zpos   = qEnvironmentVariableIsSet(s_kmsPlaneZpos);
+    bool custom = plane || config || zpos;
 
     // Don't attempt to override any custom user configuration
     if (custom)
     {
         LOG(VB_GENERAL, LOG_INFO, "QT_QPA_EGLFS_KMS user overrides detected");
-        // If plane details are set, it is likely the user is customising planar
-        // video; so warn if planar video has not been enabled
-        if (customplane && !s_mythDRMVideo)
+
+        if (!s_mythDRMVideo)
         {
+            // It is likely the user is customising planar video; so warn if planar
+            // video has not been enabled
             LOG(VB_GENERAL, LOG_WARNING, "Qt eglfs_kms custom plane settings detected"
                                          " but planar support not requested.");
+        }
+        else
+        {
+            // Planar support requested so we must signal to our future self
+            s_planarRequested = true;
+
+            // We don't know whether zpos support is required at this point
+            if (!zpos)
+            {
+                LOG(VB_GENERAL, LOG_WARNING, QString("%1 not detected - assuming not required")
+                    .arg(s_kmsPlaneZpos));
+            }
+
+            // Warn if we do no see all of the known required config
+            if (!(plane && config))
+            {
+                LOG(VB_GENERAL, LOG_WARNING, "Warning: DRM planar support requested but "
+                    "it looks like not all environment variables have been set.");
+                LOG(VB_GENERAL, LOG_INFO,
+                    QString("Minimum required: %1 and/or %2 for plane index and %3 for alpha blending")
+                    .arg(s_kmsPlaneIndex).arg(s_kmsPlaneCRTCS).arg(s_kmsConfigFile));
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_INFO, "DRM planar support enabled for custom user settings");
+            }
         }
         return;
     }
@@ -177,36 +235,15 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
         return;
     }
 
-    // Retrieve possible devices and analyse them.
-    // We are only interested in authenticated devices with a connected connector.
-    // We can only use one device, so if there are multiple devices (RPI4 only?) then
-    // take the first with a connected connector (which on the RPI4 at least is
-    // usually the better choice anyway).
-    auto [root, devices] = GetDeviceList();
-
-    // Allow the user to specify the device
-    if (!s_mythDRMDevice.isEmpty())
+    MythDRMPtr device = FindDevice();
+    if (!device)
     {
-        LOG(VB_GENERAL, LOG_INFO, QString("Forcing '%1' as DRM device").arg(s_mythDRMDevice));
-        root.clear();
-        devices.clear();
-        devices.append(s_mythDRMDevice);
-    }
-
-    MythDRMPtr device = nullptr;
-    for (const auto & dev : devices)
-    {
-        if (device = MythDRMDevice::Create(nullptr, root + dev); device.get() && device->Authenticated())
-            break;
-        device = nullptr;
-    }
-    if (!device.get())
-    {
-        LOG(VB_GENERAL, LOG_WARNING, "Failed to open any DRM devices with privileges");
+        LOG(VB_GENERAL, LOG_WARNING, "Failed to open any suitable DRM devices with privileges");
         return;
     }
 
-    if (!(device->m_guiPlane->m_id && device->m_videoPlane->m_id))
+    if (!(device->m_guiPlane.get()   && device->m_guiPlane->m_id &&
+          device->m_videoPlane.get() && device->m_videoPlane->m_id))
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("Failed to deduce correct planes for device '%1'")
             .arg(drmGetDeviceNameFromFd2(device->GetFD())));
@@ -216,38 +253,48 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     // We have a valid, authenticated device with a connected display and validated planes
     auto guiplane = device->m_guiPlane;
     auto format   = MythDRMPlane::GetAlphaFormat(guiplane->m_formats);
-    if (format != DRM_FORMAT_INVALID)
+    if (format == DRM_FORMAT_INVALID)
     {
-        static const QString s_json =
-            "{\n"
-            "  \"device\": \"%1\",\n"
-            "  \"outputs\": [ { \"name\": \"%2\", \"format\": \"%3\" } ]\n"
-            "}\n";
-        // N.B. No MythDirs setup yet - just dump this in the current directory
-        auto filename = "eglfs_kms_config.json";
-        QFile file(filename);
-        if (file.open(QIODevice::WriteOnly))
-        {
-            auto wrote = qPrintable(s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
-                .arg(device->m_connector->m_name).arg(MythDRMPlane::FormatToString(format).toLower()));
-            if (file.write(wrote))
-            {
-                LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1:\r\n%2").arg(filename).arg(wrote));
-                LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsConfigFile).arg(filename));
-                setenv(s_kmsConfigFile, qPrintable(filename), 1);
-            }
-            file.close();
-        }
-        else
-        {
-            LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing. DRM setup incomplete")
-                .arg(filename));
-        }
+        LOG(VB_GENERAL, LOG_WARNING, "Failed to find alpha format for GUI. Quitting DRM setup.");
+        return;
     }
-    else
+
+    // N.B. No MythDirs setup yet so mimic the conf dir setup
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+    QString confdir = QString(qgetenv("MYTHCONFDIR"));
+#else
+    QString confdir = qEnvironmentVariable("MYTHCONFDIR");
+#endif
+    if (confdir.isEmpty())
+        confdir = QDir::homePath() + "/.mythtv";
+
+    auto filename = confdir + "/eglfs_kms_config.json";
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly))
     {
-        LOG(VB_GENERAL, LOG_WARNING, "Failed to find alpha format for GUI. DRM setup incomplete");
+        LOG(VB_GENERAL, LOG_WARNING, QString("Failed to open '%1' for writing. Quitting DRM setup.")
+            .arg(filename));
+        return;
     }
+
+    static const QString s_json =
+        "{\n"
+        "  \"device\": \"%1\",\n"
+        "  \"outputs\": [ { \"name\": \"%2\", \"format\": \"%3\", \"mode\": \"%4\" } ]\n"
+        "}\n";
+
+    // Note: mode is not sanitised
+    auto wrote = qPrintable(s_json.arg(drmGetDeviceNameFromFd2(device->GetFD()))
+        .arg(device->m_connector->m_name).arg(MythDRMPlane::FormatToString(format).toLower())
+        .arg(s_mythDRMVideoMode.isEmpty() ? "current" : s_mythDRMVideoMode));
+
+    if (file.write(wrote))
+    {
+        LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1:\r\n%2").arg(filename).arg(wrote));
+        LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsConfigFile).arg(filename));
+        setenv(s_kmsConfigFile, qPrintable(filename), 1);
+    }
+    file.close();
 
     auto planeindex = QString::number(guiplane->m_index);
     auto crtcplane  = QString("%1,%2").arg(device->m_crtc->m_id).arg(guiplane->m_id);
@@ -257,9 +304,9 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     setenv(s_kmsPlaneCRTCS, qPrintable(crtcplane), 1);
 
     // Set the zpos if supported
-    if (auto zpos = MythDRMProperty::GetProperty("zpos", guiplane->m_properties); zpos.get())
+    if (auto zposp = MythDRMProperty::GetProperty("zpos", guiplane->m_properties); zposp.get())
     {
-        if (auto range = dynamic_cast<MythDRMRangeProperty*>(zpos.get()); range)
+        if (auto range = dynamic_cast<MythDRMRangeProperty*>(zposp.get()); range)
         {
             auto val = QString::number(std::min(range->m_min + 1, range->m_max));
             LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneZpos).arg(val));
@@ -276,10 +323,10 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 /*! \brief Create a MythDRMDevice instance.
  * \returns A valid instance or nullptr on error.
 */
-MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device)
+MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device, bool NeedPlanes)
 {
 #ifdef USING_QTPRIVATEHEADERS
-    if (qScreen && qGuiApp->platformName().contains("eglfs", Qt::CaseInsensitive))
+    if (qScreen && qGuiApp && qGuiApp->platformName().contains("eglfs", Qt::CaseInsensitive))
     {
         int fd = 0;
         uint32_t crtc = 0;
@@ -321,13 +368,11 @@ MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device)
         return nullptr;
     }
 
-
 #ifdef USING_QTPRIVATEHEADERS
-    if (auto result = std::shared_ptr<MythDRMDevice>(new MythDRMDevice(Device));
-        result.get() && result->m_valid)
-    {
+    if (auto result = std::shared_ptr<MythDRMDevice>(new MythDRMDevice(Device, NeedPlanes)); result && result->m_valid)
         return result;
-    }
+#else
+    (void)NeedPlanes;
 #endif
     return nullptr;
 }
@@ -352,11 +397,18 @@ std::tuple<QString, QStringList> MythDRMDevice::GetDeviceList()
  * be authenticated. Useful for confirming current display settings and little
  * else.
 */
-MythDRMDevice::MythDRMDevice(QScreen *qScreen, const QString& Device)
+MythDRMDevice::MythDRMDevice(QScreen* qScreen, const QString& Device)
   : m_screen(qScreen),
     m_deviceName(Device),
     m_verbose(Device.isEmpty() ? LOG_INFO : LOG_DEBUG)
 {
+    // This is hackish workaround to suppress logging when it isn't required
+    if (m_deviceName == DRM_QUIET)
+    {
+        m_deviceName.clear();
+        m_verbose = LOG_DEBUG;
+    }
+
     if (!Open())
     {
         LOG(VB_GENERAL, m_verbose, LOC + "Failed to open");
@@ -446,7 +498,7 @@ MythDRMDevice::MythDRMDevice(int Fd, uint32_t CrtcId, uint32_t ConnectorId, bool
  * other DRM clients running (i.e. no X or Wayland), finds a connected connector
  * and analyses planes. If any steps fail, the device is deemed invalid.
 */
-MythDRMDevice::MythDRMDevice(const QString& Device)
+MythDRMDevice::MythDRMDevice(const QString& Device, bool NeedPlanes)
   : m_deviceName(Device),
     m_atomic(true), // Just squashes some logging
     m_verbose(LOG_INFO)
@@ -463,6 +515,7 @@ MythDRMDevice::MythDRMDevice(const QString& Device)
         return;
     }
     Load();
+    m_valid = false;
 
     // Find a user suggested connector or the first connected
     if (!s_mythDRMConnector.isEmpty())
@@ -495,9 +548,15 @@ MythDRMDevice::MythDRMDevice(const QString& Device)
     if (!m_crtc)
         return;
 
-    AnalysePlanes();
-
-    m_valid = m_videoPlane.get() && m_guiPlane.get();
+    if (NeedPlanes)
+    {
+        AnalysePlanes();
+        m_valid = m_videoPlane.get() && m_guiPlane.get();
+    }
+    else
+    {
+        m_valid = true;
+    }
 }
 #endif
 
@@ -817,6 +876,16 @@ bool MythDRMDevice::ConfirmDevice(const QString& Device)
     return result;
 }
 
+DRMCrtc MythDRMDevice::GetCrtc() const
+{
+    return m_crtc;
+}
+
+DRMConn MythDRMDevice::GetConnector() const
+{
+    return m_connector;
+}
+
 #if defined (USING_QTPRIVATEHEADERS)
 void MythDRMDevice::MainWindowReady()
 {
@@ -850,14 +919,9 @@ void MythDRMDevice::MainWindowReady()
     */
 }
 
-DRMCrtc MythDRMDevice::GetCrtc() const
-{
-    return m_crtc;
-}
-
 bool MythDRMDevice::QueueAtomics(const MythAtomics& Atomics)
 {
-    if (!(m_atomic && m_authenticated))
+    if (!(m_atomic && m_authenticated && qGuiApp))
         return false;
 
     if (auto * dri = qGuiApp->platformNativeInterface()->nativeResourceForIntegration("dri_atomic_request"); dri)

@@ -164,7 +164,7 @@ void ExternalRecorder::Close(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
 
-bool ExternalRecorder::PauseAndWait(int timeout)
+bool ExternalRecorder::PauseAndWait(std::chrono::milliseconds timeout)
 {
     QMutexLocker locker(&m_pauseLock);
     if (m_requestPause)
@@ -201,7 +201,7 @@ bool ExternalRecorder::PauseAndWait(int timeout)
     }
 
     // Always wait a little bit, unless woken up
-    m_unpauseWait.wait(&m_pauseLock, timeout);
+    m_unpauseWait.wait(&m_pauseLock, timeout.count());
 
     return IsPaused(true);
 }

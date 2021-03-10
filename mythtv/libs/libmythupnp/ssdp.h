@@ -111,7 +111,7 @@ class UPNP_PUBLIC SSDP : public MThread
 
         void RequestTerminate(void);
 
-        void PerformSearch(const QString &sST, uint timeout_secs = 2);
+        void PerformSearch(const QString &sST, std::chrono::seconds timeout = 2s);
 
         void EnableNotifications ( int nServicePort );
         void DisableNotifications();

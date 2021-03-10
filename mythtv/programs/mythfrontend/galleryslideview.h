@@ -87,7 +87,7 @@ private:
 
     SlideBuffer m_slides;                  //!< A queue of slides used to display images.
     InfoList    m_infoList;                //!< Image details overlay
-    int         m_slideShowTime   {3000};  //!< Time to display a slide in a slideshow
+    std::chrono::milliseconds m_slideShowTime   {3s};  //!< Time to display a slide in a slideshow
     QTimer      m_timer;                   //!< Slide duration timer
     QTimer      m_delay;                   //!< Status delay timer
     QString     m_statusText;              //!< Text to display as status

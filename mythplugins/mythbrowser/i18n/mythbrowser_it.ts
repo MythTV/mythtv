@@ -226,22 +226,22 @@ Usa l&apos;opzione menù &quot;Aggiungi segnalibro&quot; per aggiungere nuovi se
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cerca</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Select bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona segnalibro</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
         <source>Select bookmark or add a new one</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona segnalibro o aggiungine uno</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="49"/>
         <source>Select bookmark:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Seleziona segnalibro:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="50"/>
@@ -276,27 +276,27 @@ Usa l&apos;opzione menù &quot;Aggiungi segnalibro&quot; per aggiungere nuovi se
     <message>
         <location filename="themestrings.h" line="51"/>
         <source>Text size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dimensione testo:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
         <source>URL Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>WEB BROWSER</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">BROWSER WEB</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="60"/>
         <source>Website Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome sito web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Website URL</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">URL sito web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
@@ -368,7 +368,7 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message>
         <location filename="themestrings.h" line="35"/>
         <source>Find category</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Trova categoria</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
@@ -378,12 +378,12 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message>
         <location filename="themestrings.h" line="39"/>
         <source>Myth Web Browser</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Browser web Myth</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ok</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
@@ -399,59 +399,59 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
         <location filename="themestrings.h" line="6"/>
         <source>%name% (%url%)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%name% (%url%)</numerusform>
+            <numerusform>%name% (%url%)</numerusform>
         </translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
         <source>Bookmark Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nome segnalibro:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
         <source>Bookmark URL:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">URL segnalibro:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>Browse the web</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Naviga web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Browser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>Browser command:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando browser:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>Choose a bookmark to open in the webbrowser</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Scegli un segnalibro da aprire nel browser web</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
         <source>Command:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Configure web browser settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configura le impostazioni del browser</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>Edit your bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modifica segnalibri</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
         <source>Enable Plugins:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Abilita plugin:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="29"/>
@@ -461,7 +461,7 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message>
         <location filename="themestrings.h" line="31"/>
         <source>Enable browser plugins:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Abilita plugin del browser:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="32"/>
@@ -501,7 +501,7 @@ Al termine della modifica, seleziona &quot;OK&quot; o &quot;Annulla&quot; per co
     <message>
         <location filename="themestrings.h" line="63"/>
         <source>Zoom:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zoom:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="64"/>

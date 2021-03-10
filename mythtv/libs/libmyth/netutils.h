@@ -21,7 +21,7 @@ MPUBLIC bool findSearchGrabberInDB(const QString &commandline, ArticleType type)
 MPUBLIC GrabberScript* findSearchGrabberByCommand(const QString &url, ArticleType type);
 MPUBLIC GrabberScript::scriptList findAllDBSearchGrabbers(ArticleType type);
 MPUBLIC bool markTreeUpdated(GrabberScript *script, const QDateTime& curTime);
-MPUBLIC bool needsUpdate(GrabberScript *script, uint updateFreq);
+MPUBLIC bool needsUpdate(GrabberScript *script, std::chrono::hours updateFreq);
 MPUBLIC QDateTime lastUpdate(GrabberScript* script);
 
 MPUBLIC bool clearTreeItems(const QString &feedcommand);

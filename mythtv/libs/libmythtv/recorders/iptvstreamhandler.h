@@ -18,7 +18,7 @@
 #include "streamhandler.h"
 
 #define IPTV_SOCKET_COUNT   3
-#define RTCP_TIMER          10
+static constexpr std::chrono::milliseconds RTCP_TIMER { 10s };
 
 class IPTVStreamHandler;
 class DTVSignalMonitor;
@@ -54,11 +54,11 @@ public:
 
     void Start(void)
     {
-        m_timer = startTimer(200);
+        m_timer = startTimer(200ms);
     }
     void StartRTCPRR(void)
     {
-        m_timerRtcp = startTimer(RTCP_TIMER * 1000);
+        m_timerRtcp = startTimer(RTCP_TIMER);
     }
 
     void SendRTCPReport(void);

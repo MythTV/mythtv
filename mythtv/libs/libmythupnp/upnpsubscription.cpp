@@ -21,7 +21,7 @@ QObject::customEvent to receive event notifications for subscribed services.
 // default requested time for subscription (actual is dictated by server)
 #define SUBSCRIPTION_TIME 1800
 // maximum time to wait for responses to subscription requests (UPnP spec. 30s)
-#define MAX_WAIT 30000
+static constexpr std::chrono::milliseconds MAX_WAIT { 30s };
 
 #define LOC QString("UPnPSub: ")
 
@@ -67,7 +67,7 @@ UPNPSubscription::~UPNPSubscription()
     LOG(VB_UPNP, LOG_DEBUG, LOC + "Finished");
 }
 
-int UPNPSubscription::Subscribe(const QString &usn, const QUrl &url,
+std::chrono::seconds UPNPSubscription::Subscribe(const QString &usn, const QUrl &url,
                                 const QString &path)
 {
     LOG(VB_UPNP, LOG_DEBUG, LOC + QString("Subscribe %1 %2 %3")
@@ -120,7 +120,7 @@ void UPNPSubscription::Unsubscribe(const QString &usn)
         SendUnsubscribeRequest(usn, url, path, uuid);
 }
 
-int UPNPSubscription::Renew(const QString &usn)
+std::chrono::seconds UPNPSubscription::Renew(const QString &usn)
 {
     LOG(VB_UPNP, LOG_DEBUG, LOC + QString("Renew: %1").arg(usn));
 
@@ -140,7 +140,7 @@ int UPNPSubscription::Renew(const QString &usn)
     {
         LOG(VB_UPNP, LOG_ERR, LOC + QString("Unrecognised renewal usn: %1")
             .arg(usn));
-        return 0;
+        return 0s;
     }
 
     if (!sid.isEmpty())
@@ -151,7 +151,7 @@ int UPNPSubscription::Renew(const QString &usn)
 
     LOG(VB_UPNP, LOG_ERR, LOC + QString("No uuid - not renewing usn: %1")
              .arg(usn));
-    return 0;
+    return 0s;
 }
 
 void UPNPSubscription::Remove(const QString &usn)
@@ -324,7 +324,7 @@ bool UPNPSubscription::SendUnsubscribeRequest(const QString &usn,
     return success;
 }
 
-int UPNPSubscription::SendSubscribeRequest(const QString &callback,
+std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callback,
                                            const QString &usn,
                                            const QUrl    &url,
                                            const QString &path,
@@ -363,7 +363,7 @@ int UPNPSubscription::SendSubscribeRequest(const QString &callback,
 
     QString uuid;
     QString timeout;
-    uint result = 0;
+    std::chrono::seconds result = 0s;
 
     if (sock->Connect(QHostAddress(host), port))
     {
@@ -388,7 +388,7 @@ int UPNPSubscription::SendSubscribeRequest(const QString &callback,
             if (ok && !uuid.isEmpty() && !timeout.isEmpty())
             {
                 uuidout = uuid;
-                result  = timeout.toUInt();
+                result  = std::chrono::seconds(timeout.toUInt());
             }
             else
             {

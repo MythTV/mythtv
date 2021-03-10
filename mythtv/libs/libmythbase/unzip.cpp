@@ -1137,6 +1137,8 @@ UnZip::ErrorCode UnzipPrivate::extractFile(const QString& path, ZipEntryP& entry
 		zstr.opaque = Z_NULL;
 		zstr.next_in = Z_NULL;
 		zstr.avail_in = 0;
+        zstr.total_in = 0;
+        zstr.total_out = 0;
 
 		int zret = Z_OK;
 

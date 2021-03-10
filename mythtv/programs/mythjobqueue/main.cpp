@@ -13,7 +13,6 @@
 
 #include <QCoreApplication>
 #include <QString>
-#include <QRegExp>
 #include <QFileInfo>
 #include <QDir>
 

@@ -7,6 +7,7 @@
 #include "mythuibuttonlist.h"
 #include "channelsettings.h"
 #include "transporteditor.h"
+#include "restoredata.h"
 #include "mythuicheckbox.h"
 #include "mythuitextedit.h"
 #include "channeleditor.h"
@@ -22,6 +23,8 @@
 #include "cardutil.h"
 #include "mythdirs.h"
 #include "mythdb.h"
+
+#define LOC QString("ChannelEditor: ")
 
 ChannelWizard::ChannelWizard(int id, int default_sourceid)
 {
@@ -87,6 +90,7 @@ bool ChannelEditor::Create()
 
     MythUIButton *deleteButton = dynamic_cast<MythUIButton *>(GetChild("delete"));
     MythUIButton *scanButton = dynamic_cast<MythUIButton *>(GetChild("scan"));
+    MythUIButton *restoreDataButton = dynamic_cast<MythUIButton *>(GetChild("restoredata"));
     MythUIButton *importIconButton = dynamic_cast<MythUIButton *>(GetChild("importicons"));
     MythUIButton *transportEditorButton = dynamic_cast<MythUIButton *>(GetChild("edittransport"));
 
@@ -96,7 +100,7 @@ bool ChannelEditor::Create()
         !scanButton || !importIconButton || !transportEditorButton ||
         !hideCheck)
     {
-
+        LOG(VB_GENERAL, LOG_ERR, LOC + "One or more buttons not found in theme.");
         return false;
     }
 
@@ -140,6 +144,18 @@ bool ChannelEditor::Create()
     // Scan Button
     scanButton->SetHelpText(tr("Starts the channel scanner."));
     scanButton->SetEnabled(SourceUtil::IsAnySourceScanable());
+
+    // Restore Data button
+    if (restoreDataButton)
+    {
+        restoreDataButton->SetHelpText(tr("Restore Data from deleted channels."));
+        restoreDataButton->SetEnabled(true);
+        connect(restoreDataButton, &MythUIButton::Clicked, this, &ChannelEditor::restoreData);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Button \"Restore Data\" not found in theme.");
+    }
 
     // Import Icons Button
     importIconButton->SetHelpText(tr("Starts the icon downloader"));
@@ -620,6 +636,27 @@ void ChannelEditor::scan(void)
                                           new ScanWizard(m_sourceFilter));
     if (ssd->Create())
     {
+        connect(ssd, &MythScreenType::Exiting, this, &ChannelEditor::fillList);
+        mainStack->AddScreen(ssd);
+    }
+    else
+        delete ssd;
+}
+
+void ChannelEditor::restoreData(void)
+{
+    // Check that we have a videosource and a connected capture card
+    if (!check_cardsource(m_sourceFilter, m_sourceFilterName))
+        return;
+
+    // Create the dialog now that we have a video source and a capture card
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    auto *ssd = new StandardSettingDialog(mainStack, "restoredata",
+                                  new RestoreData((uint)m_sourceFilter));
+    if (ssd->Create())
+    {
+        // Reload channel list with fillList after Restore
         connect(ssd, &MythScreenType::Exiting, this, &ChannelEditor::fillList);
         mainStack->AddScreen(ssd);
     }

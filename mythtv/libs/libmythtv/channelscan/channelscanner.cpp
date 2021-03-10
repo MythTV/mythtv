@@ -170,9 +170,9 @@ void ChannelScanner::Scan(
         // HACK HACK HACK -- begin
         // if using QAM we may need additional time... (at least with HD-3000)
         if ((mod.startsWith("qam", Qt::CaseInsensitive)) &&
-            (m_sigmonScanner->GetSignalTimeout() < 1000))
+            (m_sigmonScanner->GetSignalTimeout() < 1s))
         {
-            m_sigmonScanner->SetSignalTimeout(1000);
+            m_sigmonScanner->SetSignalTimeout(1s);
         }
         // HACK HACK HACK -- end
 
@@ -415,8 +415,8 @@ void ChannelScanner::PreScanCommon(
     bool do_test_decryption)
 {
     bool monitor_snr = false;
-    uint signal_timeout  = 1000;
-    uint channel_timeout = 40000;
+    std::chrono::milliseconds signal_timeout  = 1s;
+    std::chrono::milliseconds channel_timeout = 40s;
     CardUtil::GetTimeouts(cardid, signal_timeout, channel_timeout);
 
     QString device = CardUtil::GetVideoDevice(cardid);
@@ -450,12 +450,12 @@ void ChannelScanner::PreScanCommon(
         }
 
         // ensure a minimal signal timeout of 1 second
-        signal_timeout = std::max(signal_timeout, 1000U);
+        signal_timeout = std::max(signal_timeout, 1000ms);
 
         // Make sure that channel_timeout is at least 7 seconds to catch
         // at least one SDT section. kDVBTableTimeout in ChannelScanSM
         // ensures that we catch the NIT then.
-        channel_timeout = std::max(channel_timeout, static_cast<int>(need_nit) * 7 * 1000U);
+        channel_timeout = std::max(channel_timeout, static_cast<int>(need_nit) * 7 * 1000ms);
 
         m_channel = new DVBChannel(device);
     }

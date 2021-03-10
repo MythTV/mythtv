@@ -412,7 +412,8 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, const QString& name,
 
     m_watchListAutoExpire= gCoreContext->GetBoolSetting("PlaybackWLAutoExpire", false);
     m_watchListMaxAge    = gCoreContext->GetNumSetting("PlaybackWLMaxAge", 60);
-    m_watchListBlackOut  = gCoreContext->GetNumSetting("PlaybackWLBlackOut", 2) * 24;
+    m_watchListBlackOut  = gCoreContext->GetDurSetting<std::chrono::days>("PlaybackWLBlackOut",
+                                                                          std::chrono::days(2));
 
     bool displayCat  = gCoreContext->GetBoolSetting("DisplayRecGroupIsCategory", false);
 
@@ -2049,7 +2050,7 @@ bool PlaybackBox::UpdateUILists(void)
             if (spanHours[recid] < 50 ||
                 recType[recid] == kDailyRecord)
             {
-                if (delHours[recid] < m_watchListBlackOut / 6)
+                if (delHours[recid] < m_watchListBlackOut.count() / 6)
                 {
                     (*pit)->SetRecordingPriority2(wlDeleted);
                     LOG(VB_FILE, LOG_INFO,
@@ -2080,7 +2081,7 @@ bool PlaybackBox::UpdateUILists(void)
                      recType[recid] == kWeeklyRecord)
 
             {
-                if (delHours[recid] < m_watchListBlackOut - 4)
+                if (delHours[recid] < m_watchListBlackOut.count() - 4)
                 {
                     (*pit)->SetRecordingPriority2(wlDeleted);
                     LOG(VB_FILE, LOG_INFO,
@@ -2109,7 +2110,7 @@ bool PlaybackBox::UpdateUILists(void)
             // Not recurring
             else
             {
-                if (delHours[recid] < (m_watchListBlackOut * 2) - 4)
+                if (delHours[recid] < (m_watchListBlackOut.count() * 2) - 4)
                 {
                     (*pit)->SetRecordingPriority2(wlDeleted);
                     pit = m_progLists[m_watchGroupLabel].erase(pit);
@@ -4255,7 +4256,7 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if (message == "AVAILABILITY" && me->ExtraDataCount() == 8)
         {
-            const uint kMaxUIWaitTime = 10000; // ms
+            static constexpr std::chrono::milliseconds kMaxUIWaitTime = 10s;
             QStringList list = me->ExtraDataList();
             uint recordingID = list[0].toUInt();
             auto cat = (CheckAvailabilityType) list[1].toInt();
@@ -4265,9 +4266,9 @@ void PlaybackBox::customEvent(QEvent *event)
             tm.setHMS(list[4].toUInt(), list[5].toUInt(),
                       list[6].toUInt(), list[7].toUInt());
             QTime now = QTime::currentTime();
-            int time_elapsed = tm.msecsTo(now);
-            if (time_elapsed < 0)
-                time_elapsed += 24 * 60 * 60 * 1000;
+            auto time_elapsed = std::chrono::milliseconds(tm.msecsTo(now));
+            if (time_elapsed < 0ms)
+                time_elapsed += 24h;
 
             AvailableStatusType old_avail = availableStatus;
             ProgramInfo *pginfo = FindProgramInUILists(recordingID);
@@ -4278,7 +4279,7 @@ void PlaybackBox::customEvent(QEvent *event)
                 pginfo->SetAvailableStatus(availableStatus, "AVAILABILITY");
             }
 
-            if ((uint)time_elapsed >= kMaxUIWaitTime)
+            if (time_elapsed >= kMaxUIWaitTime)
                 m_playListPlay.clear();
 
             bool playnext = ((kCheckForPlaylistAction == cat) &&
@@ -4287,7 +4288,7 @@ void PlaybackBox::customEvent(QEvent *event)
 
             if (((kCheckForPlayAction     == cat) ||
                  (kCheckForPlaylistAction == cat)) &&
-                ((uint)time_elapsed < kMaxUIWaitTime))
+                (time_elapsed < kMaxUIWaitTime))
             {
                 if (asAvailable != availableStatus)
                 {
@@ -5594,7 +5595,7 @@ void PlaybackBox::PbbJobQueue::Update()
 {
     QDateTime now = QDateTime::currentDateTime();
     if (!m_lastUpdated.isValid() ||
-        m_lastUpdated.msecsTo(now) >= kInvalidateTimeMs)
+        m_lastUpdated.msecsTo(now) >= kInvalidateTimeMs.count())
     {
         QMap<int, JobQueueEntry> jobs;
         JobQueue::GetJobsInQueue(jobs, JOB_LIST_ALL);

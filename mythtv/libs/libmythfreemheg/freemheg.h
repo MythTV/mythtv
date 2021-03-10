@@ -29,9 +29,12 @@
 #include <QRect>
 #include <QSize>
 
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
+
+using namespace std::chrono_literals;
 
 using MHPointVec = std::vector<int>; // Duplicated in BaseClasses.h
 
@@ -56,7 +59,7 @@ class MHEG
     virtual void DrawDisplay(const QRegion& toDraw) = 0;
     // Run synchronous actions and process any asynchronous events until the queues are empty.
     // Returns the number of milliseconds until wake-up or 0 if none.
-    virtual int RunAll(void) = 0;
+    virtual std::chrono::milliseconds RunAll(void) = 0;
     // Generate a UserAction event i.e. a key press.
     virtual void GenerateUserAction(int nCode) = 0;
     virtual void EngineEvent(int) = 0;
@@ -151,11 +154,11 @@ class MHContext
     // Stop displaying video
     virtual void StopVideo() = 0;
     // Get current stream position in mS, -1 if unknown
-    virtual long GetStreamPos() = 0;
+    virtual std::chrono::milliseconds GetStreamPos() = 0;
     // Get current stream size in mS, -1 if unknown
-    virtual long GetStreamMaxPos() = 0;
+    virtual std::chrono::milliseconds GetStreamMaxPos() = 0;
     // Set current stream position in mS
-    virtual long SetStreamPos(long) = 0;
+    virtual std::chrono::milliseconds SetStreamPos(std::chrono::milliseconds) = 0;
     // Play or pause a stream
     virtual void StreamPlay(bool play = true) = 0;
 

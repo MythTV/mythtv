@@ -55,8 +55,6 @@
 
 #include "guistartup.h"
 
-using namespace std::chrono_literals;
-
 GUIStartup::GUIStartup(MythScreenStack *parent, QEventLoop *eventLoop)
                  :MythScreenType(parent, "GUIStartup"),
                   m_loop(eventLoop),
@@ -130,13 +128,13 @@ bool GUIStartup::setMessageState(const QString &name)
 }
 
 
-void GUIStartup::setTotal(int total)
+void GUIStartup::setTotal(std::chrono::seconds total)
 {
     delete m_progressTimer;
     m_progressTimer = new MythTimer(MythTimer::kStartRunning);
     m_timer.start(500ms);
-    m_total = total*1000;
-    m_progressBar->SetTotal(m_total);
+    m_total = total;
+    m_progressBar->SetTotal(m_total.count());
     SetFocusWidget(m_dummyButton);
 
     m_Exit = false;
@@ -150,12 +148,12 @@ bool GUIStartup::updateProgress(bool finished)
 {
     if (m_progressTimer)
     {
-        int elapsed = 0;
+        std::chrono::milliseconds elapsed { 0ms };
         if (finished)
             elapsed = m_total;
         else
             elapsed = m_progressTimer->elapsed();
-        m_progressBar->SetUsed(elapsed);
+        m_progressBar->SetUsed(elapsed.count());
         if (elapsed >= m_total)
         {
             m_timer.stop();
@@ -176,7 +174,7 @@ void GUIStartup::updateProgress(void)
 
 void GUIStartup::Close(void)
 {
-    int elapsed = 0;
+    std::chrono::milliseconds elapsed { 0ms };
     if (m_progressTimer)
     {
         elapsed = m_progressTimer->elapsed();

@@ -5,7 +5,6 @@
 #include <QString>
 #include <QStringList>
 #include <QDomDocument>
-#include <QRegExp>
 
 // MythTV headers
 #include "vboxutils.h"
@@ -20,14 +19,15 @@
 #define QUERY_CHANNELS  "http://{URL}/cgi-bin/HttpControl/HttpControlApp?OPTION=1&Method=GetXmltvChannelsList"\
                         "&FromChIndex=FirstChannel&ToChIndex=LastChannel&FilterBy=All"
 
-#define SEARCH_TIME 3000
+static constexpr std::chrono::milliseconds SEARCH_TIME { 3s };
 #define VBOX_URI "urn:schemas-upnp-org:device:MediaServer:1"
 #define VBOX_UDN "uuid:b7531642-0123-3210"
 
 // static method
 QStringList VBox::probeDevices(void)
 {
-    const int milliSeconds = SEARCH_TIME;
+    const std::chrono::milliseconds milliSeconds { SEARCH_TIME };
+    auto seconds = duration_cast<std::chrono::seconds>(milliSeconds);
 
     // see if we have already found one or more vboxes
     QStringList result = VBox::doUPNPSearch();
@@ -37,9 +37,9 @@ QStringList VBox::probeDevices(void)
 
     // non found so start a new search
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using UPNP to search for Vboxes (%1 secs)")
-        .arg(milliSeconds / 1000));
+        .arg(seconds.count()));
 
-    SSDP::Instance()->PerformSearch(VBOX_URI, milliSeconds / 1000);
+    SSDP::Instance()->PerformSearch(VBOX_URI, seconds);
 
     // Search for a total of 'milliSeconds' ms, sending new search packet
     // about every 250 ms until less than one second remains.
@@ -47,13 +47,13 @@ QStringList VBox::probeDevices(void)
     MythTimer searchTime; searchTime.start();
     while (totalTime.elapsed() < milliSeconds)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(25));
-        int ttl = milliSeconds - totalTime.elapsed();
-        if ((searchTime.elapsed() > 249) && (ttl > 1000))
+        std::this_thread::sleep_for(25ms);
+        auto ttl = duration_cast<std::chrono::seconds>(milliSeconds - totalTime.elapsed());
+        if ((searchTime.elapsed() > 249ms) && (ttl > 1s))
         {
             LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UPNP Search %1 secs")
-                .arg(ttl / 1000));
-            SSDP::Instance()->PerformSearch(VBOX_URI, ttl / 1000);
+                .arg(ttl.count()));
+            SSDP::Instance()->PerformSearch(VBOX_URI, ttl);
             searchTime.start();
         }
     }

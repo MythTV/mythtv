@@ -15,29 +15,32 @@
 
 #define LOC QString("SatIP: ")
 
-#define SEARCH_TIME_MS 3000
+static constexpr std::chrono::milliseconds SEARCH_TIME_MS { 3s };
 #define SATIP_URI "urn:ses-com:device:SatIPServer:1"
 
 QStringList SatIP::probeDevices(void)
 {
-    const int milliSeconds = SEARCH_TIME_MS;
+    const std::chrono::milliseconds milliSeconds = SEARCH_TIME_MS;
+    auto seconds = duration_cast<std::chrono::seconds>(milliSeconds);
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using UPNP to search for Sat>IP servers (%1 secs)")
-        .arg(milliSeconds / 1000));
+        .arg(seconds.count()));
 
-    SSDP::Instance()->PerformSearch(SATIP_URI, milliSeconds / 1000);
+    SSDP::Instance()->PerformSearch(SATIP_URI, seconds);
 
     MythTimer totalTime; totalTime.start();
     MythTimer searchTime; searchTime.start();
 
     while (totalTime.elapsed() < milliSeconds)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(25));
-        int ttl = milliSeconds - totalTime.elapsed();
-        if (searchTime.elapsed() > 249 && ttl > 1000)
+        std::this_thread::sleep_for(25ms);
+        std::chrono::milliseconds ttl = milliSeconds - totalTime.elapsed();
+        if (searchTime.elapsed() > 249ms && ttl > 1s)
         {
-            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UPNP search %1 ms").arg(ttl));
-            SSDP::Instance()->PerformSearch(SATIP_URI, ttl / 1000);
+            auto ttl_s = duration_cast<std::chrono::seconds>(ttl);
+            LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("UPNP search %1 ms")
+                .arg(ttl_s.count()));
+            SSDP::Instance()->PerformSearch(SATIP_URI, ttl_s);
             searchTime.start();
         }
     }

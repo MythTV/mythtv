@@ -31,9 +31,9 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     long long GetReadPosition    (void) const override;
     bool      IsOpen             (void) const override;
     bool      IsInStillFrame     (void) const override;
-    bool      HandleAction       (const QStringList &Actions, int64_t Pts) override;
+    bool      HandleAction       (const QStringList &Actions, mpeg::chrono::pts Pts) override;
     bool      OpenFile           (const QString &Filename,
-                                  uint Retry = static_cast<uint>(kDefaultOpenTimeout)) override;
+                                  std::chrono::milliseconds Retry = kDefaultOpenTimeout) override;
 
     void      ProgressUpdate     (void);
     bool      BDWaitingForPlayer (void) const;
@@ -48,16 +48,16 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     uint32_t  GetNumTitles       (void) const;
     int       GetCurrentTitle    (void);
     uint64_t  GetCurrentAngle    (void) const;
-    int       GetTitleDuration   (int Title);
+    std::chrono::seconds  GetTitleDuration   (int Title);
     uint64_t  GetTitleSize       (void) const;
-    uint64_t  GetTotalTimeOfTitle(void) const;
-    uint64_t  GetCurrentTime     (void) const;
+    std::chrono::seconds  GetTotalTimeOfTitle(void) const;
+    std::chrono::seconds  GetCurrentTime     (void) const;
     uint64_t  GetTotalReadPosition(void);
     uint32_t  GetNumChapters     (void);
     uint32_t  GetCurrentChapter  (void);
     uint64_t  GetNumAngles       (void) const;
-    uint64_t  GetChapterStartTimeMs(uint32_t Chapter);
-    uint64_t  GetChapterStartTime  (uint32_t Chapter);
+    std::chrono::milliseconds  GetChapterStartTimeMs(uint32_t Chapter);
+    std::chrono::seconds       GetChapterStartTime  (uint32_t Chapter);
     uint64_t  GetChapterStartFrame (uint32_t Chapter);
     bool      IsHDMVNavigation   (void) const;
     bool      TitleChanged       (void);
@@ -70,7 +70,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     int       GetAudioLanguage   (uint StreamID);
     int       GetSubtitleLanguage(uint StreamID);
     void      Close              (void);
-    bool      GoToMenu           (const QString &Menu, int64_t Pts);
+    bool      GoToMenu           (const QString &Menu, mpeg::chrono::pts Pts);
     bool      SwitchTitle        (uint32_t Index);
     bool      SwitchPlaylist     (uint32_t Index);
     bool      SwitchAngle        (uint Angle);
@@ -85,7 +85,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     bool      UpdateTitleInfo    (void);
     BLURAY_TITLE_INFO* GetTitleInfo   (uint32_t Index);
     BLURAY_TITLE_INFO* GetPlaylistInfo(uint32_t Index);
-    void      PressButton        (int32_t Key, int64_t Pts);
+    void      PressButton        (int32_t Key, mpeg::chrono::pts Pts);
     void      ClickButton        (int64_t Pts, uint16_t X, uint16_t Y);
     bool      HandleBDEvents     (void);
     void      HandleBDEvent      (BD_EVENT &Event);
@@ -101,11 +101,11 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     bool               m_firstPlaySupported          { false   };
     uint32_t           m_numTitles                   { 0       };
     uint32_t           m_mainTitle                   { 0       };
-    uint64_t           m_currentTitleLength          { 0       };
+    mpeg::chrono::pts  m_currentTitleLength          { 0_pts   };
     BLURAY_TITLE_INFO *m_currentTitleInfo            { nullptr };
     uint64_t           m_titlesize                   { 0       };
     uint64_t           m_currentTitleAngleCount      { 0       };
-    uint64_t           m_currentTime                 { 0       };
+    mpeg::chrono::pts  m_currentTime                 { 0_pts   };
     int                m_imgHandle                   { -1      };
     int                m_currentTitle                { -1      };
     int                m_currentPlaylist             { 0       };
@@ -126,7 +126,7 @@ class MTV_PUBLIC MythBDBuffer : public MythOpticalBuffer
     QMutex             m_overlayLock;
     QList<MythBDOverlay*>   m_overlayImages;
     QVector<MythBDOverlay*> m_overlayPlanes;
-    int                m_stillTime                   { 0       };
+    std::chrono::seconds    m_stillTime              { 0       };
     int                m_stillMode                   { BLURAY_STILL_NONE};
     BD_EVENT           m_lastEvent                   { BD_EVENT_NONE, 0};
     QByteArray         m_pendingData;

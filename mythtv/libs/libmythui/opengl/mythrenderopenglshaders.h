@@ -69,7 +69,7 @@ static const QString kDrawVertexShader =
 static const QString kSDF =
 "highp float SignedDistance(highp vec2 p, highp vec2 b, highp float r)\n"
 "{\n"
-"    return length(max(abs(p) - b + r, 0.0)) - r;"
+"    return length(max(abs(p) - b + r, 0.0)) - r;\n"
 "}\n";
 
 static const QString kRoundedRectShader =
@@ -81,7 +81,7 @@ static const QString kRoundedRectShader =
 "{\n"
 "    highp float dist = SignedDistance(v_position - u_parameters[0].xy,\n"
 "                                      u_parameters[1].xy, u_parameters[0].z);\n"
-"    gl_FragColor = v_color * vec4(1.0, 1.0, 1.0, smoothstep(0.0, -1.0, dist));\n"
+"    gl_FragColor = vec4(v_color.rgb, v_color.a * smoothstep(-1.0, 0.0, dist * -1.0));\n"
 "}\n";
 
 static const QString kRoundedEdgeShader =
@@ -95,7 +95,7 @@ static const QString kRoundedEdgeShader =
 "                                       u_parameters[1].xy, u_parameters[0].z);\n"
 "    highp float inner = SignedDistance(v_position - u_parameters[0].xy,\n"
 "                                       u_parameters[1].zw, u_parameters[0].w);\n"
-"    highp float both  = smoothstep(0.0, -1.0, outer) * smoothstep(-1.0, 0.0, inner);\n"
+"    highp float both  = smoothstep(-1.0, 0.0, outer * -1.0) * smoothstep(-1.0, 0.0, inner);\n"
 "    gl_FragColor = vec4(v_color.rgb, v_color.a * both);\n"
 "}\n";
 #endif

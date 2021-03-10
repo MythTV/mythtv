@@ -72,7 +72,7 @@ class DeviceReadBuffer : protected MThread
     bool Poll(void) const;
     void WakePoll(void) const;
     uint WaitForUnused(uint needed) const;
-    uint WaitForUsed  (uint needed, uint max_wait /*ms*/) const;
+    uint WaitForUsed  (uint needed, std::chrono::milliseconds max_wait) const;
 
     bool IsPauseRequested(void) const;
     bool IsOpen(void) const { return m_streamFd >= 0; }
@@ -99,7 +99,7 @@ class DeviceReadBuffer : protected MThread
     bool                    m_paused                {false};
     bool                    m_usingPoll             {true};
     bool                    m_pollTimeoutIsError    {true};
-    uint                    m_maxPollWait           {2500 /*ms*/};
+    std::chrono::milliseconds m_maxPollWait         {2500ms};
 
     size_t                  m_size                  {0};
     size_t                  m_used                  {0};

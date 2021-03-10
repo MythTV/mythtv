@@ -17,8 +17,6 @@
 #include "mythuistatetype.h"
 #include "mythuitext.h"
 
-using namespace std::chrono_literals;
-
 MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
 {

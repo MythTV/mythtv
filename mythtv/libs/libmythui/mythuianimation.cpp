@@ -99,11 +99,12 @@ void MythUIAnimation::IncrementCurrentTime(void)
     if (!m_active)
         return;
 
-    int64_t current = QDateTime::currentMSecsSinceEpoch();
-    int interval = std::min(static_cast<int>(current - m_lastUpdate), 50);
+    std::chrono::milliseconds current = MythDate::currentMSecsSinceEpochAsDuration();
+    std::chrono::milliseconds interval = std::min(current - m_lastUpdate, 50ms);
     m_lastUpdate = current;
 
-    setCurrentTime(currentTime() + ((direction() == Forward) ? interval : -interval));
+    int offset = (direction() == Forward) ? interval.count() : -interval.count();
+    setCurrentTime(currentTime() + offset);
 
     if (endValue() == currentValue())
     {

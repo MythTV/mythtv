@@ -27,7 +27,7 @@ class AnalogSignalMonitor : public SignalMonitor
     QString   m_driver;
     uint32_t  m_version     {0};
     uint      m_width       {0};
-    int       m_stableTime  {2000};
+    std::chrono::milliseconds m_stableTime  {2s};
     uint      m_lockCnt     {0};
     MythTimer m_timer;
     int       m_logIdx      {40};

@@ -4,7 +4,6 @@
 
 // qt
 #include <QKeyEvent>
-#include <QRegExp>
 #include <QThread>
 #include <QDomDocument>
 
@@ -111,14 +110,14 @@ void LyricsView::customEvent(QEvent *event)
             if (!oe || !curMeta)
                 return;
 
-            int rs = 0;
+            std::chrono::milliseconds rs = 0ms;
 
             if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
             {
-                rs = gPlayer->getCurrentTrackTime() * 1000; 
+                rs = gPlayer->getCurrentTrackTime();
             }
             else
-                rs = oe->elapsedSeconds() * 1000;
+                rs = oe->elapsedSeconds();
 
             int pos = 0;
             for (int x = 0; x < m_lyricsList->GetCount(); x++)
@@ -127,7 +126,7 @@ void LyricsView::customEvent(QEvent *event)
                 auto *lyric = item->GetData().value<LyricsLine*>();
                 if (lyric)
                 {
-                    if (lyric->m_time > 1000 && rs >= lyric->m_time)
+                    if (lyric->m_time > 1s && rs >= lyric->m_time)
                         pos = x;
                 }
             }
@@ -339,7 +338,7 @@ void LyricsView::setLyricTime(void)
             auto *lyric = item->GetData().value<LyricsLine*>();
             if (lyric)
             {
-                lyric->m_time = gPlayer->getOutput()->GetAudiotime() - 750;
+                lyric->m_time = gPlayer->getOutput()->GetAudiotime() - 750ms;
                 m_lyricData->setChanged(true);
                 m_lyricData->setSyncronized(true);
                 m_autoScroll = false;
@@ -448,13 +447,10 @@ void LyricsView::showLyrics(void)
     QString syncronized = m_lyricData->syncronized() ? tr("Syncronized") : tr("Unsyncronized");
     new MythUIButtonListItem(m_lyricsList, tr("** Lyrics from %1 (%2) **").arg(m_lyricData->grabber()).arg(syncronized));
 
-    QMap<int, LyricsLine*>::iterator i = m_lyricData->lyrics()->begin();
-    while (i != m_lyricData->lyrics()->end())
+    for (auto * line : qAsConst(*m_lyricData->lyrics()))
     {
-        LyricsLine *line = (*i);
         if (line)
             new MythUIButtonListItem(m_lyricsList, line->m_lyric, QVariant::fromValue(line));
-        ++i;
     }
 
     m_autoScroll = true;
@@ -564,7 +560,7 @@ bool EditLyricsDialog::keyPressEvent(QKeyEvent *event)
 void EditLyricsDialog::loadLyrics(void)
 {
     QString lyrics;
-    QMap<int, LyricsLine*>::iterator i = m_sourceData->lyrics()->begin();
+    LyricsLineMap::iterator i = m_sourceData->lyrics()->begin();
     while (i != m_sourceData->lyrics()->end())
     {
         LyricsLine *line = (*i);
@@ -602,14 +598,10 @@ bool EditLyricsDialog::somethingChanged(void)
         return true;
 
     int x = 0;
-    QMap<int, LyricsLine*>::iterator i = m_sourceData->lyrics()->begin();
-    while (i != m_sourceData->lyrics()->end())
+    for (auto * line : qAsConst(*m_sourceData->lyrics()))
     {
-        LyricsLine *line = (*i);
         if (line->toString(m_sourceData->syncronized()) != lines.at(x))
             changed = true;
-
-        ++i;
         ++x;
     }
 

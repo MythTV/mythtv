@@ -888,7 +888,7 @@ qint64 MSocketDevice::bytesAvailable() const
 
     \sa bytesAvailable()
 */
-qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
+qint64 MSocketDevice::waitForMore(std::chrono::milliseconds msecs, bool *timeout) const
 {
     if (!isValid())
         return -1;
@@ -904,11 +904,11 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
 
     FD_SET(m_fd, &fds);
 
-    tv.tv_sec = msecs / 1000;
+    tv.tv_sec = msecs.count() / 1000;
 
-    tv.tv_usec = (msecs % 1000) * 1000;
+    tv.tv_usec = (msecs.count() % 1000) * 1000;
 
-    int rv = select(m_fd + 1, &fds, nullptr, nullptr, msecs < 0 ? nullptr : &tv);
+    int rv = select(m_fd + 1, &fds, nullptr, nullptr, msecs < 0ms ? nullptr : &tv);
 
     if (rv < 0)
         return -1;
@@ -1170,7 +1170,7 @@ qint64 MSocketDevice::writeData(const char *data, qint64 len)
                     break;
             }
         }
-        else if (waitForMore(0, &timeout) == 0)
+        else if (waitForMore(0ms, &timeout) == 0)
         {
             if (!timeout)
             {

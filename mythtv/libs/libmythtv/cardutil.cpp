@@ -194,15 +194,16 @@ bool CardUtil::IsCableCardPresent(uint inputid,
 
         QString response = QString(data);
 
-        QRegExp regex("^\\{ \"?result\"?: \"(.*)\" \\}$");
-        if (regex.indexIn(response) == -1)
+        static const QRegularExpression regex { "^\\{ \"?result\"?: \"(.*)\" \\}$"};
+        auto match = regex.match(response);
+        if (!match.hasMatch())
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("CardUtil: Ceton unexpected http response: %1").arg(response));
             return false;
         }
 
-        QString result = regex.cap(1);
+        QString result = match.captured(1);
 
         if (result == "Inserted")
         {
@@ -742,14 +743,14 @@ bool CardUtil::HasDVBCRCBug(const QString &device)
             (name == "ST STV0299 DVB-S"));         // munges PAT
 }
 
-uint CardUtil::GetMinSignalMonitoringDelay(const QString &device)
+std::chrono::milliseconds CardUtil::GetMinSignalMonitoringDelay(const QString &device)
 {
     QString name = ProbeDVBFrontendName(device);
     if (name.indexOf("DVB-S") >= 0)
-        return 300;
+        return 300ms;
     if (name == "DiBcom 3000P/M-C DVB-T")
-        return 100;
-    return 25;
+        return 100ms;
+    return 25ms;
 }
 
 DTVTunerType CardUtil::ConvertToTunerType(DTVModulationSystem delsys)
@@ -2095,7 +2096,8 @@ std::vector<uint> CardUtil::GetConflictingInputs(uint inputid)
 }
 
 bool CardUtil::GetTimeouts(uint inputid,
-                           uint &signal_timeout, uint &channel_timeout)
+                           std::chrono::milliseconds &signal_timeout,
+                           std::chrono::milliseconds &channel_timeout)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -2108,8 +2110,8 @@ bool CardUtil::GetTimeouts(uint inputid,
         MythDB::DBError("CardUtil::GetTimeouts()", query);
     else if (query.next())
     {
-        signal_timeout  = (uint) std::max(query.value(0).toInt(), 250);
-        channel_timeout = (uint) std::max(query.value(1).toInt(), 500);
+        signal_timeout  = std::max(std::chrono::milliseconds(query.value(0).toInt()), 250ms);
+        channel_timeout = std::max(std::chrono::milliseconds(query.value(1).toInt()), 500ms);
         return true;
     }
 
@@ -2542,8 +2544,8 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
                                  const uint firewire_speed,
                                  const QString &firewire_model,
                                  const uint firewire_connection,
-                                 const uint signal_timeout,
-                                 const uint channel_timeout,
+                                 const std::chrono::milliseconds signal_timeout,
+                                 const std::chrono::milliseconds channel_timeout,
                                  const uint dvb_tuning_delay,
                                  const uint contrast,
                                  const uint brightness,
@@ -2584,8 +2586,8 @@ int CardUtil::CreateCaptureCard(const QString &videodevice,
     query.bindValue(":FIREWIRESPEED", firewire_speed);
     query.bindValue(":FIREWIREMODEL", firewire_model);
     query.bindValue(":FIREWIRECONNECTION", firewire_connection);
-    query.bindValue(":SIGNALTIMEOUT", signal_timeout);
-    query.bindValue(":CHANNELTIMEOUT", channel_timeout);
+    query.bindValue(":SIGNALTIMEOUT", static_cast<qint64>(signal_timeout.count()));
+    query.bindValue(":CHANNELTIMEOUT", static_cast<qint64>(channel_timeout.count()));
     query.bindValue(":DVBTUNINGDELAY", dvb_tuning_delay);
     query.bindValue(":CONTRAST", contrast);
     query.bindValue(":BRIGHTNESS", brightness);
@@ -3243,16 +3245,14 @@ bool CardUtil::IsVBoxPresent(uint inputid)
     }
 
     // get timeouts for inputid
-    uint signal_timeout = 0;
-    uint tuning_timeout = 0;
+    std::chrono::milliseconds signal_timeout = 0ms;
+    std::chrono::milliseconds tuning_timeout = 0ms;
     if (!GetTimeouts(inputid,signal_timeout,tuning_timeout))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to get timeouts for inputid (%1)")
                 .arg(inputid));
         return false;
     }
-
-    signal_timeout = signal_timeout/1000; //convert to seconds
 
     // now get url from iptv_channel table
     QUrl url;
@@ -3275,7 +3275,7 @@ bool CardUtil::IsVBoxPresent(uint inputid)
     if (!ping(ip,signal_timeout))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("VBOX at IP  (%1) failed to respond to network ping for inputid (%2) timeout (%3)")
-                .arg(ip).arg(inputid).arg(signal_timeout));
+            .arg(ip).arg(inputid).arg(signal_timeout.count()));
         return false;
     }
 

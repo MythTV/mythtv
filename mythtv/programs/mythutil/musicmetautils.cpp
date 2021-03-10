@@ -10,6 +10,7 @@
 #include "storagegroup.h"
 #include "musicmetadata.h"
 #include "metaio.h"
+#include "mythchrono.h"
 #include "mythcontext.h"
 #include "musicfilescanner.h"
 #include "musicutils.h"
@@ -266,7 +267,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_NOT_OK;;
     }
 
-    int duration = 0;
+    std::chrono::seconds duration = 0s;
     long long time = 0;
 
     for (uint i = 0; i < inputFC->nb_streams; i++)
@@ -302,7 +303,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
                     av_packet_unref(&pkt);
                 }
 
-                duration = time * av_q2d(inputFC->streams[i]->time_base);
+                duration = secondsFromFloat(time * av_q2d(inputFC->streams[i]->time_base));
                 break;
             }
 
@@ -319,13 +320,14 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
     avformat_close_input(&inputFC);
     inputFC = nullptr;
 
-    if (mdata->Length() / 1000 != duration)
+    std::chrono::seconds dbLength = duration_cast<std::chrono::seconds>(mdata->Length());
+    if (dbLength != duration)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("The length of this track in the database was %1s "
-                                          "it is now %2s").arg(mdata->Length() / 1000).arg(duration));
+                                          "it is now %2s").arg(dbLength.count()).arg(duration.count()));
 
         // update the track length in the database
-        mdata->setLength(duration * 1000);
+        mdata->setLength(duration);
         mdata->dumpToDatabase();
 
         // tell any clients that the metadata for this track has changed
@@ -334,7 +336,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
     else
     {
         LOG(VB_GENERAL, LOG_INFO, QString("The length of this track is unchanged %1s")
-                                          .arg(mdata->Length() / 1000));
+                                          .arg(dbLength.count()));
     }
 
     return GENERIC_EXIT_OK;

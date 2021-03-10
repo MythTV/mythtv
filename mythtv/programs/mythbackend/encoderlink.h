@@ -84,9 +84,9 @@ class EncoderLink
     bool CheckFile(ProgramInfo *pginfo);
     void GetDiskSpace(QStringList &o_strlist);
     long long GetMaxBitrate(void);
-    int SetSignalMonitoringRate(int rate, int notifyFrontend);
+    std::chrono::milliseconds SetSignalMonitoringRate(std::chrono::milliseconds rate, int notifyFrontend);
 
-    bool IsBusy(InputInfo *busy_input = nullptr, int time_buffer = 5);
+    bool IsBusy(InputInfo *busy_input = nullptr, std::chrono::seconds time_buffer = 5s);
     bool IsBusyRecording(void);
 
     TVState GetState();
@@ -94,7 +94,7 @@ class EncoderLink
     bool IsRecording(const ProgramInfo *rec); // scheduler call only.
 
     bool MatchesRecording(const ProgramInfo *rec);
-    void RecordPending(const ProgramInfo *rec, int secsleft, bool hasLater);
+    void RecordPending(const ProgramInfo *rec, std::chrono::seconds secsleft, bool hasLater);
     RecStatus::Type StartRecording(ProgramInfo *rec);
     RecStatus::Type GetRecordingStatus(void);
     void StopRecording(bool killFile = false);

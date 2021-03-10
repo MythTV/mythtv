@@ -59,5 +59,7 @@ void MythAVTestCommandLineParser::LoadArguments(void)
                     "The number of seconds to run the test (default 5).", "")
                     ->SetGroup("Video Performance Testing")
                     ->SetChildOf("test");
+    add(QStringList{"-vrr", "--vrr"}, "vrr", 0U,
+                    "Try to enable (1) or disable (0) variable refresh rate (FreeSync or GSync)","");
 }
 

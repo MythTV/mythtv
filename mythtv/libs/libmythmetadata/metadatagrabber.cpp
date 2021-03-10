@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QMutex>
 #include <QMutexLocker>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <utility>
 
 // MythTV headers
@@ -18,7 +18,9 @@
 #include "mythcorecontext.h"
 
 #define LOC QString("Metadata Grabber: ")
-#define kGrabberRefresh 60
+static constexpr std::chrono::seconds kGrabberRefresh { 60s };
+
+static const QRegularExpression kRetagRef { R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3})[:_](.*))" };
 
 static GrabberList     s_grabberList;
 static QMutex          s_grabberLock;
@@ -80,7 +82,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
         // this might have to be revised, or made more intelligent if
         // the delay during refreshes is too great
         if (refresh || !s_grabberAge.isValid() ||
-            (s_grabberAge.secsTo(now) > kGrabberRefresh))
+            (s_grabberAge.secsTo(now) > kGrabberRefresh.count()))
         {
             s_grabberList.clear();
             LOG(VB_GENERAL, LOG_DEBUG, LOC + "Clearing grabber cache");
@@ -171,7 +173,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
         cmd = grabberTypes[type].m_def;
     }
 
-    if (s_grabberAge.isValid() && s_grabberAge.secsTo(MythDate::current()) <= kGrabberRefresh)
+    if (s_grabberAge.isValid() && MythDate::secsInPast(s_grabberAge) <= kGrabberRefresh)
     {
         // just pull it from the cache
         GrabberList list = GetList();
@@ -226,20 +228,12 @@ MetaGrabberScript MetaGrabberScript::FromTag(const QString &tag,
 MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
                                                  bool absolute)
 {
-    static QRegExp s_retagref(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3})_(.*))");
-    static QRegExp s_retagref2(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3}):(.*))");
     static QMutex s_reLock;
     QMutexLocker lock(&s_reLock);
     QString tag;
-
-    if (s_retagref.indexIn(inetref) > -1)
-    {
-        tag = s_retagref.cap(1);
-    }
-    else if (s_retagref2.indexIn(inetref) > -1)
-    {
-        tag = s_retagref2.cap(1);
-    }
+    auto match = kRetagRef.match(inetref);
+    if (match.hasMatch())
+        tag = match.captured(1);
     if (!tag.isEmpty())
     {
         // match found, pull out the grabber
@@ -254,17 +248,13 @@ MetaGrabberScript MetaGrabberScript::FromInetref(const QString &inetref,
 
 QString MetaGrabberScript::CleanedInetref(const QString &inetref)
 {
-    static QRegExp s_retagref(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3})_(.*))");
-    static QRegExp s_retagref2(R"(^([a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9]{1,3}):(.*))");
     static QMutex s_reLock;
     QMutexLocker lock(&s_reLock);
 
     // try to strip grabber tag from inetref
-    if (s_retagref.indexIn(inetref) > -1)
-        return s_retagref.cap(2);
-    if (s_retagref2.indexIn(inetref) > -1)
-        return s_retagref2.cap(2);
-
+    auto match = kRetagRef.match(inetref);
+    if (match.hasMatch())
+        return match.captured(2);
     return inetref;
 }
 
@@ -348,7 +338,7 @@ void MetaGrabberScript::ParseGrabberVersion(const QDomElement &item)
     if (!m_typestring.isEmpty() && grabberTypeStrings.contains(m_typestring))
         m_type = grabberTypeStrings[m_typestring];
     else
-        m_type = kGrabberMovie;
+        m_type = kGrabberInvalid;
 
     QDomElement accepts = item.firstChildElement("accepts");
     if (!accepts.isNull())
@@ -388,7 +378,7 @@ MetadataLookupList MetaGrabberScript::RunGrabber(const QStringList &args,
         .arg(m_fullcommand).arg(args.join(" ")));
 
     grabber.Run();
-    if (grabber.Wait(180) != GENERIC_EXIT_OK)
+    if (grabber.Wait(180s) != GENERIC_EXIT_OK)
         return list;
 
     QByteArray result = grabber.ReadAll();

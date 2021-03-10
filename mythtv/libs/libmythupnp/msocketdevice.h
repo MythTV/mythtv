@@ -44,10 +44,14 @@
 #ifndef MSOCKETDEVICE_H
 #define MSOCKETDEVICE_H
 
+#include <chrono>
+
 #include <QIODevice>
 #include <QHostAddress> // int->QHostAddress conversion
 
 #include "upnpexp.h"
+
+using namespace std::chrono_literals;
 
 class MSocketDevicePrivate;
 
@@ -111,7 +115,7 @@ public:
     virtual int  accept();
 
     qint64  bytesAvailable() const override; // QIODevice
-    qint64  waitForMore(int msecs, bool *timeout = nullptr) const;
+    qint64  waitForMore(std::chrono::milliseconds msecs, bool *timeout = nullptr) const;
     virtual qint64 writeBlock(const char *data, quint64 len,
                               const QHostAddress & host, quint16 port);
     inline qint64  writeBlock(const char *data, quint64 len)

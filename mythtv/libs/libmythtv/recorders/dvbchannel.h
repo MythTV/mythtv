@@ -13,6 +13,7 @@
 #include <QMap>
 
 #include "mythcontext.h"
+#include "mythdate.h"
 #include "mythdbcon.h"
 #include "dtvchannel.h"
 #include "dtvconfparserhelpers.h" // for DTVTunerType
@@ -42,8 +43,8 @@ class DVBChannel : public DTVChannel
     // Sets
     void SetPMT(const ProgramMapTable *pmt);
     void SetTimeOffset(double offset);
-    void SetSlowTuning(uint how_slow_in_ms)
-        { m_tuningDelay = how_slow_in_ms; }
+    void SetSlowTuning(std::chrono::milliseconds how_slow)
+        { m_tuningDelay = how_slow; }
 
     // Gets
     bool IsOpen(void) const override; // ChannelBase
@@ -60,7 +61,7 @@ class DVBChannel : public DTVChannel
     bool IsMaster(void)                 const override; // DTVChannel
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return m_hasCrcBug; }
-    uint GetMinSignalMonitorDelay(void) const { return m_sigMonDelay; }
+    std::chrono::milliseconds GetMinSignalMonitorDelay(void) const { return m_sigMonDelay; }
     /// Returns rotor object if it exists, nullptr otherwise.
     const DiSEqCDevRotor *GetRotor(void) const;
 
@@ -127,7 +128,7 @@ class DVBChannel : public DTVChannel
     double GetUncorrectedBlockCountDVBv5(bool *ok) const;
 
     void DrainDVBEvents(void);
-    bool WaitForBackend(int timeout_ms);
+    bool WaitForBackend(std::chrono::milliseconds timeout_ms);
 
   private:
     IsOpenMap         m_isOpen;
@@ -161,8 +162,8 @@ class DVBChannel : public DTVChannel
 
     uint              m_lastLnbDevId        {(uint)~0x0};
 
-    uint              m_tuningDelay         {0};      // Extra delay to add for broken drivers
-    uint              m_sigMonDelay         {25};     // Minimum delay between FE_LOCK checks
+    std::chrono::milliseconds m_tuningDelay { 0ms};   // Extra delay to add for broken drivers
+    std::chrono::milliseconds m_sigMonDelay {25ms};   // Minimum delay between FE_LOCK checks
     bool              m_firstTune           {true};   // Used to force hardware reset
 
     // Other State
@@ -171,7 +172,7 @@ class DVBChannel : public DTVChannel
     QString           m_key;                          // master lock key
     bool              m_hasCrcBug           {false};  // true iff our driver munges PMT
 
-    static int64_t    s_lastTuning;                   // Time of last tuning [ms]
+    static std::chrono::milliseconds s_lastTuning;    // Time of last tuning
     QMutex            m_tuneDelayLock;
 };
 

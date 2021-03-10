@@ -8,6 +8,8 @@
 
 #include "tvremoteutil.h"
 
+using namespace std::chrono_literals;
+
 class LCDServer;
 class LCDTextItem;
 class LCDMenuItem;
@@ -30,7 +32,7 @@ class LCDProcClient : public QObject
     bool SetupLCD(void);
     void reset(void);
 
-    void setStartupMessage(QString msg, uint messagetime);
+    void setStartupMessage(QString msg, std::chrono::seconds messagetime);
 
     // Used to actually connect to an LCD device       
     bool connectToHost(const QString &hostname, unsigned int port);
@@ -224,12 +226,12 @@ class LCDProcClient : public QObject
     bool                m_lcdBacklightOn        {true};
     bool                m_lcdHeartbeatOn        {true};
     bool                m_lcdBigClock           {true};
-    int                 m_lcdPopupTime          {0};
+    std::chrono::milliseconds m_lcdPopupTime    {0ms};
     QString             m_lcdShowMusicItems;
     QString             m_lcdKeyString;
     LCDServer *         m_parentLCDServer       {nullptr};
     QString             m_startupMessage;
-    uint                m_startupShowTime       {0};
+    std::chrono::seconds m_startupShowTime      {0s};
 
     bool                m_isRecording           {false};
     bool                m_isTimeVisible         {false};

@@ -43,7 +43,7 @@ class MythVideoOutput : public MythVideoBounds
 
     virtual bool Init(QSize VideoDim, QSize VideoDispDim,
                       float VideoAspect, QRect WindowRect, MythCodecID CodecID);
-    virtual void SetVideoFrameRate(float playback_fps);
+    virtual void SetVideoFrameRate(float VideoFrameRate);
     virtual void SetDeinterlacing(bool Enable, bool DoubleRate, MythDeintType Force = DEINT_NONE);
     virtual void PrepareFrame (MythVideoFrame* Frame, FrameScanType Scan = kScan_Ignore) = 0;
     virtual void RenderFrame  (MythVideoFrame* Frame, FrameScanType) = 0;
@@ -71,7 +71,7 @@ class MythVideoOutput : public MythVideoBounds
     virtual void DeLimboFrame(MythVideoFrame* Frame);
     virtual void StartDisplayingFrame();
     virtual void DoneDisplayingFrame(MythVideoFrame* Frame);
-    virtual void DiscardFrame(MythVideoFrame* frame);
+    virtual void DiscardFrame(MythVideoFrame* Frame);
     virtual void DiscardFrames(bool KeyFrame, bool Flushed);
     virtual void CheckFrameStates() { }
     virtual MythVideoFrame* GetLastDecodedFrame();
@@ -84,8 +84,7 @@ class MythVideoOutput : public MythVideoBounds
     PictureAttributeSupported GetSupportedPictureAttributes();
     virtual void InitPictureAttributes () { }
     bool         HasSoftwareFrames     () const { return codec_sw_copy(m_videoCodecID); }
-    virtual void RenderOverlays        (OSD& /*Osd*/) {}
-    virtual void UpdatePauseFrame      (int64_t& /*DisplayTimecode*/,
+    virtual void UpdatePauseFrame      (std::chrono::milliseconds& /*DisplayTimecode*/,
                                         FrameScanType /*Scan*/ = kScan_Progressive) {}
 
   protected:

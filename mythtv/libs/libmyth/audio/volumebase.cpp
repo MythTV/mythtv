@@ -57,7 +57,7 @@ class VolumeWriteBackThread : public MThread
         m_state = kRunning;
         RunProlog();
 
-        const int holdoff = 500; // min ms between Db writes
+        static constexpr std::chrono::milliseconds holdoff { 500ms }; // min ms between Db writes
         QString controlLabel = gCoreContext->GetSetting("MixerControl", "PCM");
         controlLabel += "MixerVolume";
 
@@ -72,7 +72,7 @@ class VolumeWriteBackThread : public MThread
 
             // Ignore further volume changes for the holdoff period
             setTerminationEnabled(true);
-            msleep(holdoff);
+            usleep(holdoff);
             setTerminationEnabled(false);
 
             lock.relock();

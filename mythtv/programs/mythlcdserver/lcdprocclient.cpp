@@ -36,8 +36,6 @@
 #define LCD_VERSION_4 1
 #define LCD_VERSION_5 2
 
-using namespace std::chrono_literals;
-
 static constexpr std::chrono::milliseconds LCD_TIME_TIME       { 3s };
 static constexpr std::chrono::milliseconds LCD_SCROLLLIST_TIME { 2s };
 
@@ -157,7 +155,7 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
         while (--timeout && m_socket->state() != QAbstractSocket::ConnectedState)
         {
             qApp->processEvents();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(1ms);
 
             if (m_socket->state() == QAbstractSocket::ConnectedState)
             {
@@ -329,8 +327,8 @@ void LCDProcClient::serverSendingData()
     while(m_socket->canReadLine())
     {
         lineFromServer = m_socket->readLine();
-        lineFromServer = lineFromServer.replace( QRegExp("\n"), "" );
-        lineFromServer = lineFromServer.replace( QRegExp("\r"), "" );
+        lineFromServer = lineFromServer.remove("\n");
+        lineFromServer = lineFromServer.remove("\r");
 
         if (debug_level > 0)
         {
@@ -556,8 +554,7 @@ void LCDProcClient::loadSettings()
     m_lcdShowRecstatus=(gCoreContext->GetSetting("LCDShowRecStatus", "1")=="1");
     m_lcdBacklightOn=(gCoreContext->GetSetting("LCDBacklightOn", "1")=="1");
     m_lcdHeartbeatOn=(gCoreContext->GetSetting("LCDHeartBeatOn", "1")=="1");
-    aString = gCoreContext->GetSetting("LCDPopupTime", "5");
-    m_lcdPopupTime = aString.toInt() * 1000;
+    m_lcdPopupTime = gCoreContext->GetDurSetting<std::chrono::seconds>("LCDPopupTime", 5s);
     m_lcdBigClock = (gCoreContext->GetSetting("LCDBigClock", "1")=="1");
     m_lcdKeyString = gCoreContext->GetSetting("LCDKeyString", "ABCDEF");
 
@@ -615,7 +612,7 @@ void LCDProcClient::showStartupMessage(void)
 
     switchToGeneric(&textItems);
 
-    m_showMessageTimer->start( m_startupShowTime * 1000);
+    m_showMessageTimer->start( m_startupShowTime );
 }
 
 void LCDProcClient::removeStartupMessage(void)
@@ -623,7 +620,7 @@ void LCDProcClient::removeStartupMessage(void)
     switchToTime();
 }
 
-void LCDProcClient::setStartupMessage(QString msg, uint messagetime)
+void LCDProcClient::setStartupMessage(QString msg, std::chrono::seconds messagetime)
 {
     m_startupMessage = std::move(msg);
     m_startupShowTime = messagetime;
@@ -738,7 +735,7 @@ void LCDProcClient::describeServer()
                 .arg( m_lcdHeartbeatOn ));
         LOG(VB_GENERAL, LOG_INFO,
             QString("LCDProcClient: - popuptime      : %1")
-                    .arg( m_lcdPopupTime ));
+                    .arg( m_lcdPopupTime.count() ));
     }
 }
 
@@ -1887,7 +1884,7 @@ void LCDProcClient::dostdclock()
         aString += time + "\"";
         if ( m_timeFlash )
         {
-            aString = aString.replace(QRegExp(":"), " ");
+            aString = aString.remove(":");
             m_timeFlash = false;
         }
         else

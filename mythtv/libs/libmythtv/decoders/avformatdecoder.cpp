@@ -9,6 +9,28 @@
 #include <QTextCodec>
 #include <QFileInfo>
 
+#ifdef USING_MEDIACODEC
+extern "C" {
+#include "libavcodec/jni.h"
+}
+#include <QtAndroidExtras>
+#endif
+
+extern "C" {
+#include "libavutil/avutil.h"
+#include "libavutil/error.h"
+#include "libavutil/log.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavformat/avio.h"
+#include "libavformat/internal.h"
+#include "libswscale/swscale.h"
+#include "libavformat/isom.h"
+#include "ivtv_myth.h"
+#include "libavutil/imgutils.h"
+#include "libavutil/display.h"
+}
+
 // MythTV headers
 #include "mythtvexp.h"
 #include "mythconfig.h"
@@ -35,32 +57,11 @@
 #include "DVD/mythdvdbuffer.h"
 #include "Bluray/mythbdbuffer.h"
 #include "mythavutil.h"
+#include "mythhdrvideometadata.h"
 
 #include "lcddevice.h"
 
 #include "audiooutput.h"
-
-#ifdef USING_MEDIACODEC
-extern "C" {
-#include "libavcodec/jni.h"
-}
-#include <QtAndroidExtras>
-#endif
-
-extern "C" {
-#include "libavutil/avutil.h"
-#include "libavutil/error.h"
-#include "libavutil/log.h"
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-#include "libavformat/avio.h"
-#include "libavformat/internal.h"
-#include "libswscale/swscale.h"
-#include "libavformat/isom.h"
-#include "ivtv_myth.h"
-#include "libavutil/imgutils.h"
-#include "libavutil/display.h"
-}
 
 #ifdef _MSC_VER
 // MSVC isn't C99 compliant...
@@ -330,10 +331,10 @@ AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
     cc608_build_parity_table(m_cc608ParityTable);
 
     AvFormatDecoder::SetIdrOnlyKeyframes(true);
-    m_audioReadAhead = gCoreContext->GetNumSetting("AudioReadAhead", 100);
+    m_audioReadAhead = gCoreContext->GetDurSetting<std::chrono::milliseconds>("AudioReadAhead", 100ms);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("PlayerFlags: 0x%1, AudioReadAhead: %2 msec")
-        .arg(m_playerFlags, 0, 16).arg(m_audioReadAhead));
+        .arg(m_playerFlags, 0, 16).arg(m_audioReadAhead.count()));
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -411,7 +412,7 @@ static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
     return  ((lsb - base_ts)&mask);
 }
 
-int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
+std::chrono::milliseconds AvFormatDecoder::NormalizeVideoTimecode(std::chrono::milliseconds timecode)
 {
     int64_t start_pts = 0;
 
@@ -426,7 +427,7 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
         }
     }
     if (!st)
-        return 0;
+        return 0ms;
 
     if (m_ic->start_time != AV_NOPTS_VALUE)
     {
@@ -435,18 +436,18 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
                                AV_TIME_BASE * (int64_t)st->time_base.num);
     }
 
-    int64_t pts = av_rescale(timecode / 1000.0,
+    int64_t pts = av_rescale(timecode.count() / 1000.0,
                      st->time_base.den,
                      st->time_base.num);
 
     // adjust for start time and wrap
     pts = lsb3full(pts, start_pts, st->pts_wrap_bits);
 
-    return (int64_t)(av_q2d(st->time_base) * pts * 1000);
+    return millisecondsFromFloat(av_q2d(st->time_base) * pts * 1000);
 }
 
-int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
-                                                int64_t timecode)
+std::chrono::milliseconds AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
+                                                std::chrono::milliseconds timecode)
 {
     int64_t start_pts = 0;
 
@@ -457,14 +458,14 @@ int64_t AvFormatDecoder::NormalizeVideoTimecode(AVStream *st,
                                AV_TIME_BASE * (int64_t)st->time_base.num);
     }
 
-    int64_t pts = av_rescale(timecode / 1000.0,
+    int64_t pts = av_rescale(timecode.count() / 1000.0,
                      st->time_base.den,
                      st->time_base.num);
 
     // adjust for start time and wrap
     pts = lsb3full(pts, start_pts, st->pts_wrap_bits);
 
-    return (int64_t)(av_q2d(st->time_base) * pts * 1000);
+    return millisecondsFromFloat(av_q2d(st->time_base) * pts * 1000);
 }
 
 int AvFormatDecoder::GetNumChapters()
@@ -474,7 +475,7 @@ int AvFormatDecoder::GetNumChapters()
     return 0;
 }
 
-void AvFormatDecoder::GetChapterTimes(QList<long long> &times)
+void AvFormatDecoder::GetChapterTimes(QList<std::chrono::seconds> &times)
 {
     int total = GetNumChapters();
     if (!total)
@@ -487,7 +488,7 @@ void AvFormatDecoder::GetChapterTimes(QList<long long> &times)
         int64_t start = m_ic->chapters[i]->start;
         long double total_secs = (long double)start * (long double)num /
                                  (long double)den;
-        times.push_back((long long)total_secs);
+        times.push_back(std::chrono::seconds((long long)total_secs));
     }
 }
 
@@ -690,9 +691,9 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     if (doflush)
     {
-        m_lastAPts = 0;
-        m_lastVPts = 0;
-        m_lastCcPtsu = 0;
+        m_lastAPts = 0ms;
+        m_lastVPts = 0ms;
+        m_lastCcPtsu = 0us;
         m_faultyPts = m_faultyDts = 0;
         m_lastPtsForFaultDetection = 0;
         m_lastDtsForFaultDetection = 0;
@@ -761,7 +762,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     // skipping would take longer than giveUpPredictionMs, and if so,
     // stop skipping right away.
     bool exactSeeks = GetSeekSnap() == 0U;
-    const int maxSeekTimeMs = 200;
+    static constexpr std::chrono::milliseconds maxSeekTimeMs { 200ms };
     int profileFrames = 0;
     MythTimer begin(MythTimer::kStartRunning);
     for (; (skipFrames > 0 && !m_atEof &&
@@ -778,7 +779,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             retry = false;
             GetFrame(kDecodeVideo, retry);
             if (retry)
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                std::this_thread::sleep_for(1ms);
         }
 
         if (m_decodedVideoFrame)
@@ -790,7 +791,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         {
             const int giveUpPredictionMs = 400;
             int remainingTimeMs =
-                skipFrames * (float)begin.elapsed() / profileFrames;
+                skipFrames * (float)begin.elapsed().count() / profileFrames;
             if (remainingTimeMs > giveUpPredictionMs)
             {
               LOG(VB_PLAYBACK, LOG_DEBUG,
@@ -803,7 +804,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     if (doflush)
     {
-        m_firstVPts = 0;
+        m_firstVPts = 0ms;
         m_firstVPtsInuse = true;
     }
 }
@@ -1151,26 +1152,25 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
 
     // If watching pre-recorded television or video use the marked duration
     // from the db if it exists, else ffmpeg duration
-    int64_t dur = 0;
+    std::chrono::seconds dur = 0s;
 
     if (m_playbackInfo)
     {
-        dur = m_playbackInfo->QueryTotalDuration();
-        dur /= 1000;
+        dur = duration_cast<std::chrono::seconds>(m_playbackInfo->QueryTotalDuration());
     }
 
-    if (dur == 0)
+    if (dur == 0s)
     {
         if ((m_ic->duration == AV_NOPTS_VALUE) &&
             (!m_livetv && !m_ringBuffer->IsDisc()))
             av_estimate_timings(m_ic, 0);
 
-        dur = m_ic->duration / (int64_t)AV_TIME_BASE;
+        dur = duration_cast<std::chrono::seconds>(av_duration(m_ic->duration));
     }
 
-    if (dur > 0 && !m_livetv && !m_watchingRecording)
+    if (dur > 0s && !m_livetv && !m_watchingRecording)
     {
-        m_parent->SetDuration((int)dur);
+        m_parent->SetDuration(dur);
     }
 
     // If we don't have a position map, set up ffmpeg for seeking
@@ -1179,16 +1179,16 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             "Recording has no position -- using libavformat seeking.");
 
-        if (dur > 0)
+        if (dur > 0s)
         {
-            m_parent->SetFileLength((int)(dur), (int)(dur * m_fps));
+            m_parent->SetFileLength(dur, (int)(dur.count() * m_fps));
         }
         else
         {
             // the pvr-250 seems to over report the bitrate by * 2
             float bytespersec = (float)m_bitrate / 8 / 2;
             float secs = m_ringBuffer->GetRealFileSize() * 1.0F / bytespersec;
-            m_parent->SetFileLength((int)(secs),
+            m_parent->SetFileLength(secondsFromFloat(secs),
                                     (int)(secs * static_cast<float>(m_fps)));
         }
 
@@ -1230,12 +1230,12 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         int64_t start = m_ic->chapters[i]->start;
         auto total_secs = static_cast<long double>(start) * static_cast<long double>(num) /
                           static_cast<long double>(den);
-        auto msec = static_cast<uint64_t>(total_secs * 1000);
+        auto msec = millisecondsFromFloat(total_secs * 1000);
         auto framenum = static_cast<long long>(total_secs * static_cast<long double>(m_fps));
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Chapter %1 found @ [%2]->%3")
                 .arg(i + 1,   2,10,QChar('0'))
-                .arg(MythFormatTimeMs(static_cast<int>(msec), "HH:mm:ss.zzz"))
+                .arg(MythFormatTime(msec, "HH:mm:ss.zzz"))
                 .arg(framenum));
     }
 
@@ -2897,11 +2897,11 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
                     field = 1;
 
                     // flush decoder
-                    m_ccd608->FormatCC(0, -1, -1);
+                    m_ccd608->FormatCC(0ms, -1, -1);
                 }
 
                 had_608 = true;
-                m_ccd608->FormatCCField(m_lastCcPtsu / 1000, field, data);
+                m_ccd608->FormatCCField(duration_cast<std::chrono::milliseconds>(m_lastCcPtsu), field, data);
 
                 m_lastScteField = field;
             }
@@ -2922,7 +2922,7 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     CC608Seen seen_608;
     if (check_608)
     {
-        m_ccd608->GetServices(15/*seconds*/, seen_608);
+        m_ccd608->GetServices(15s, seen_608);
         for (uint i = 0; i < 4; i++)
         {
             need_change_608 |= (seen_608[i] && !m_ccX08InTracks[i]) ||
@@ -2934,14 +2934,14 @@ void AvFormatDecoder::UpdateCaptionTracksFromStreams(
     cc708_seen_flags seen_708;
     if (check_708 || need_change_608)
     {
-        m_ccd708->services(15/*seconds*/, seen_708);
+        m_ccd708->services(15s, seen_708);
         for (uint i = 1; i < 64 && !need_change_608 && !need_change_708; i++)
         {
             need_change_708 |= (seen_708[i] && !m_ccX08InTracks[i+4]) ||
                 (!seen_708[i] && m_ccX08InTracks[i+4] && !m_ccX08InPmt[i+4]);
         }
         if (need_change_708 && !check_608)
-            m_ccd608->GetServices(15/*seconds*/, seen_608);
+            m_ccd608->GetServices(15s, seen_608);
     }
 
     if (!need_change_608 && !need_change_708)
@@ -3168,7 +3168,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                 m_gopSet = false;
                 m_prevGopPos = 0;
-                m_firstVPts = m_lastAPts = m_lastVPts = m_lastCcPtsu = 0;
+                m_firstVPts = m_lastAPts = m_lastVPts = 0ms;
+                m_lastCcPtsu = 0us;
                 m_firstVPtsInuse = true;
                 m_faultyPts = m_faultyDts = 0;
                 m_lastPtsForFaultDetection = 0;
@@ -3286,7 +3287,8 @@ int AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             m_gopSet = false;
             m_prevGopPos = 0;
-            m_firstVPts = m_lastAPts = m_lastVPts = m_lastCcPtsu = 0;
+            m_firstVPts = m_lastAPts = m_lastVPts = 0ms;
+            m_lastCcPtsu = 0us;
             m_firstVPtsInuse = true;
             m_faultyPts = m_faultyDts = 0;
             m_lastPtsForFaultDetection = 0;
@@ -3546,7 +3548,7 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
 bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
 {
 
-    AVCodecContext *context = m_codecMap.GetCodecContext(Stream);
+    auto * context = m_codecMap.GetCodecContext(Stream);
 
     // We need to mediate between ATSC and SCTE data when both are present.  If
     // both are present, we generally want to prefer ATSC.  However, there may
@@ -3579,15 +3581,15 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     for (uint i = 0; i < cc_len; i += ((cc_buf[i] & 0x1f) * 3) + 2)
         DecodeDTVCC(cc_buf + i, cc_len - i, scte);
 
-    if (cc_len == 0) {
-        // look for A53 captions
-        AVFrameSideData *side_data = av_frame_get_side_data(AvFrame, AV_FRAME_DATA_A53_CC);
-        if (side_data && (side_data->size > 0)) {
+    // look for A53 captions
+    if (cc_len == 0)
+    {
+        auto * side_data = av_frame_get_side_data(AvFrame, AV_FRAME_DATA_A53_CC);
+        if (side_data && (side_data->size > 0))
             DecodeCCx08(side_data->data, static_cast<uint>(side_data->size), false);
-        }
     }
 
-    auto *frame = static_cast<MythVideoFrame*>(AvFrame->opaque);
+    auto * frame = static_cast<MythVideoFrame*>(AvFrame->opaque);
     if (frame)
         frame->m_directRendering = m_directRendering;
 
@@ -3670,41 +3672,42 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
         return false;
     }
 
-    long long pts = 0;
+    std::chrono::milliseconds pts = 0ms;
     if (m_useFrameTiming)
     {
-        pts = AvFrame->pts;
-        if (pts == AV_NOPTS_VALUE)
-            pts = AvFrame->pkt_dts;
-        if (pts == AV_NOPTS_VALUE)
-            pts = AvFrame->reordered_opaque;
-        if (pts == AV_NOPTS_VALUE)
+        long long av_pts = AvFrame->pts;
+        if (av_pts == AV_NOPTS_VALUE)
+            av_pts = AvFrame->pkt_dts;
+        if (av_pts == AV_NOPTS_VALUE)
+            av_pts = AvFrame->reordered_opaque;
+        if (av_pts == AV_NOPTS_VALUE)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "No PTS found - unable to process video.");
             return false;
         }
-        pts = static_cast<long long>(av_q2d(Stream->time_base) * pts * 1000);
+        pts = millisecondsFromFloat(av_q2d(Stream->time_base) * av_pts * 1000);
     }
     else
-        pts = static_cast<long long>(av_q2d(Stream->time_base) * AvFrame->reordered_opaque * 1000);
+        pts = millisecondsFromFloat(av_q2d(Stream->time_base) * AvFrame->reordered_opaque * 1000);
 
-    long long temppts = pts;
+    std::chrono::milliseconds temppts = pts;
     // Validate the video pts against the last pts. If it's
     // a little bit smaller, equal or missing, compute
     // it from the last. Otherwise assume a wraparound.
     if (!m_ringBuffer->IsDVD() &&
         temppts <= m_lastVPts &&
-        (temppts + (1000 / m_fps) > m_lastVPts || temppts <= 0))
+        (temppts + millisecondsFromFloat(1000 / m_fps) > m_lastVPts ||
+         temppts <= 0ms))
     {
         temppts = m_lastVPts;
-        temppts += static_cast<long long>(1000 / m_fps);
+        temppts += millisecondsFromFloat(1000 / m_fps);
         // MPEG2/H264 frames can be repeated, update pts accordingly
-        temppts += static_cast<long long>(AvFrame->repeat_pict * 500 / m_fps);
+        temppts += millisecondsFromFloat(AvFrame->repeat_pict * 500 / m_fps);
     }
 
     // Calculate actual fps from the pts values.
-    long long ptsdiff = temppts - m_lastVPts;
-    double calcfps = 1000.0 / ptsdiff;
+    std::chrono::milliseconds ptsdiff = temppts - m_lastVPts;
+    double calcfps = 1000.0 / ptsdiff.count();
     if (calcfps < 121.0 && calcfps > 3.0)
     {
         // If fps has doubled due to frame-doubling deinterlace
@@ -3721,15 +3724,15 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
 
     LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
         QString("video timecode %1 %2 %3 %4%5")
-            .arg(m_useFrameTiming ? AvFrame->pts : AvFrame->reordered_opaque).arg(pts)
-            .arg(temppts).arg(m_lastVPts)
+            .arg(m_useFrameTiming ? AvFrame->pts : AvFrame->reordered_opaque)
+            .arg(pts.count()).arg(temppts.count()).arg(m_lastVPts.count())
             .arg((pts != temppts) ? " fixup" : ""));
 
     frame->m_interlaced          = AvFrame->interlaced_frame;
     frame->m_topFieldFirst       = AvFrame->top_field_first != 0;
     frame->m_newGOP              = m_nextDecodedFrameIsKeyFrame;
     frame->m_repeatPic           = AvFrame->repeat_pict != 0;
-    frame->m_displayTimecode     = NormalizeVideoTimecode(Stream, temppts);
+    frame->m_displayTimecode     = NormalizeVideoTimecode(Stream, std::chrono::milliseconds(temppts));
     frame->m_frameNumber         = m_framesPlayed;
     frame->m_frameCounter        = m_frameCounter++;
     frame->m_aspect              = m_currentAspect;
@@ -3749,7 +3752,10 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     frame->m_alreadyDeinterlaced = false;
     frame->m_interlacedReverse   = false;
 
-    m_parent->ReleaseNextVideoFrame(frame, temppts);
+    // Retrieve HDR metadata
+    MythHDRVideoMetadata::Populate(frame, AvFrame);
+
+    m_parent->ReleaseNextVideoFrame(frame, std::chrono::milliseconds(temppts));
     m_mythCodecCtx->PostProcessFrame(context, frame);
 
     m_nextDecodedFrameIsKeyFrame = false;
@@ -3762,7 +3768,7 @@ bool AvFormatDecoder::ProcessVideoFrame(AVStream *Stream, AVFrame *AvFrame)
     }
 
     m_lastVPts = temppts;
-    if (!m_firstVPts && m_firstVPtsInuse)
+    if ((m_firstVPts == 0ms) && m_firstVPtsInuse)
         m_firstVPts = temppts;
 
     return true;
@@ -3780,7 +3786,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
 
     const uint8_t *buf     = pkt->data;
     uint64_t linemask      = 0;
-    unsigned long long utc = m_lastCcPtsu;
+    std::chrono::microseconds utc = m_lastCcPtsu;
 
     // [i]tv0 means there is a linemask
     // [I]TV0 means there is no linemask and all lines are present
@@ -3835,8 +3841,8 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 {
                     int data = (buf[2] << 8) | buf[1];
                     if (cc608_good_parity(m_cc608ParityTable, data))
-                        m_ccd608->FormatCCField(utc/1000, field, data);
-                    utc += 33367;
+                        m_ccd608->FormatCCField(duration_cast<std::chrono::milliseconds>(utc), field, data);
+                    utc += 33367us;
                 }
                 break;
             case VBI_TYPE_VPS: // Video Programming System
@@ -4028,7 +4034,7 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket* Packet)
 #else
     auto list = text.split('\n', Qt::SkipEmptyParts);
 #endif
-    m_parent->GetSubReader(id)->AddRawTextSubtitle(list, static_cast<uint64_t>(Packet->duration));
+    m_parent->GetSubReader(id)->AddRawTextSubtitle(list, std::chrono::milliseconds(Packet->duration));
     return true;
 }
 
@@ -4648,7 +4654,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             break;
 
         if (firstloop && pkt->pts != AV_NOPTS_VALUE)
-            m_lastAPts = (long long)(av_q2d(curstream->time_base) * pkt->pts * 1000);
+            m_lastAPts = millisecondsFromFloat(av_q2d(curstream->time_base) * pkt->pts * 1000);
 
         if (!m_useFrameTiming)
         {
@@ -4656,17 +4662,18 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             // audio.
             if (m_skipAudio && m_selectedTrack[kTrackTypeVideo].m_av_stream_index > -1)
             {
-                if ((m_lastAPts < m_lastVPts - (10.0 / m_fps)) || m_lastVPts == 0)
+                if ((m_lastAPts < m_lastVPts - millisecondsFromFloat(10.0 / m_fps)) ||
+                    m_lastVPts == 0ms)
                     break;
                 m_skipAudio = false;
             }
 
             // skip any audio frames preceding first video frame
-            if (m_firstVPtsInuse && m_firstVPts && (m_lastAPts < m_firstVPts))
+            if (m_firstVPtsInuse && (m_firstVPts != 0ms) && (m_lastAPts < m_firstVPts))
             {
                 LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
                     QString("discarding early audio timecode %1 %2 %3")
-                        .arg(pkt->pts).arg(pkt->dts).arg(m_lastAPts));
+                        .arg(pkt->pts).arg(pkt->dts).arg(m_lastAPts.count()));
                 break;
             }
         }
@@ -4745,7 +4752,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             continue;
         }
 
-        long long temppts = m_lastAPts;
+        std::chrono::milliseconds temppts = m_lastAPts;
 
         if (audSubIdx != -1 && !m_audioOut.m_doPassthru)
             extract_mono_channel(audSubIdx, &m_audioOut,
@@ -4761,12 +4768,12 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         }
         else
         {
-            m_lastAPts += (long long)
+            m_lastAPts += millisecondsFromFloat
                 ((double)(frames * 1000) / ctx->sample_rate);
         }
 
         LOG(VB_TIMESTAMP, LOG_INFO, LOC + QString("audio timecode %1 %2 %3 %4")
-                .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(m_lastAPts));
+                .arg(pkt->pts).arg(pkt->dts).arg(temppts.count()).arg(m_lastAPts.count()));
 
         m_allowedQuit |= m_ringBuffer->IsInStillFrame() ||
                        m_audio->IsBufferAlmostFull();
@@ -4797,7 +4804,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 
     AutoSelectTracks();
 
-    m_skipAudio = (m_lastVPts == 0);
+    m_skipAudio = (m_lastVPts == 0ms);
 
     if( !m_processFrames )
     {
@@ -4871,7 +4878,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         QString("Audio %1 ms behind video but already %2 "
                                 "video frames queued. AV-Sync might be broken.")
-                            .arg(m_lastVPts-m_lastAPts).arg(m_storedPackets.count()));
+                            .arg((m_lastVPts-m_lastAPts).count()).arg(m_storedPackets.count()));
                 }
                 m_allowedQuit = true;
                 continue;
@@ -5036,7 +5043,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 
                 if (pkt->pts != AV_NOPTS_VALUE)
                 {
-                    m_lastCcPtsu = (long long)
+                    m_lastCcPtsu = microsecondsFromFloat
                                  (av_q2d(curstream->time_base)*pkt->pts*1000000);
                 }
 

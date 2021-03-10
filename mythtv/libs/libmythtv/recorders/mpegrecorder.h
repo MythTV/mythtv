@@ -34,7 +34,7 @@ class MpegRecorder : public V4LRecorder,
     void Reset(void) override; // DTVRecorder
 
     void Pause(bool clear = true) override; // RecorderBase
-    bool PauseAndWait(int timeout = 100) override; // RecorderBase
+    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 
     bool IsRecording(void) override // RecorderBase
         { return m_recording; }

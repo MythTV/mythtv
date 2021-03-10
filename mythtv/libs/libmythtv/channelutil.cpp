@@ -8,7 +8,6 @@
 #include <QHash>
 #include <QImage>
 #include <QReadWriteLock>
-#include <QRegExp>
 #include <utility>
 
 #include "channelutil.h"
@@ -777,9 +776,9 @@ QString ChannelUtil::GetChanNum(int chan_id)
     return GetChannelStringField(chan_id, QString("channum"));
 }
 
-int ChannelUtil::GetTimeOffset(int chan_id)
+std::chrono::minutes ChannelUtil::GetTimeOffset(int chan_id)
 {
-    return GetChannelStringField(chan_id, QString("tmoffset")).toInt();
+    return std::chrono::minutes(GetChannelStringField(chan_id, QString("tmoffset")).toInt());
 }
 
 int ChannelUtil::GetSourceID(int db_mplexid)
@@ -1169,21 +1168,21 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
     return query.exec();
 }
 
+QReadWriteLock ChannelUtil::s_channelDefaultAuthorityMapLock;
+QMap<uint,QString> ChannelUtil::s_channelDefaultAuthorityMap;
+bool ChannelUtil::s_channelDefaultAuthority_runInit = true;
+
 /** Returns the DVB default authority for the chanid given. */
 QString ChannelUtil::GetDefaultAuthority(uint chanid)
 {
-    static QReadWriteLock s_channelDefaultAuthorityMapLock;
-    static QMap<uint,QString> s_channelDefaultAuthorityMap;
-    static bool s_runInit = true;
-
     s_channelDefaultAuthorityMapLock.lockForRead();
 
-    if (s_runInit)
+    if (s_channelDefaultAuthority_runInit)
     {
         s_channelDefaultAuthorityMapLock.unlock();
         s_channelDefaultAuthorityMapLock.lockForWrite();
         // cppcheck-suppress identicalInnerCondition
-        if (s_runInit)
+        if (s_channelDefaultAuthority_runInit)
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare(
@@ -1202,7 +1201,7 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
                             query.value(1).toString();
                     }
                 }
-                s_runInit = false;
+                s_channelDefaultAuthority_runInit = false;
             }
             else
             {
@@ -1223,7 +1222,7 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
                             query.value(1).toString();
                     }
                 }
-                s_runInit = false;
+                s_channelDefaultAuthority_runInit = false;
             }
             else
             {
@@ -2340,7 +2339,8 @@ uint ChannelUtil::GetNextChannel(
     uint              chanid_restriction,
     ChannelChangeDirection direction,
     bool              skip_non_visible,
-    bool              skip_same_channum_and_callsign)
+    bool              skip_same_channum_and_callsign,
+    bool              skip_other_sources)
 {
     auto it = find(sorted.cbegin(), sorted.cend(), old_chanid);
 
@@ -2370,6 +2370,8 @@ uint ChannelUtil::GetNextChannel(
         }
         while ((it != start) &&
                ((skip_non_visible && it->m_visible < kChannelVisible) ||
+                (skip_other_sources &&
+                 it->m_sourceId != start->m_sourceId) ||
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||
@@ -2389,6 +2391,8 @@ uint ChannelUtil::GetNextChannel(
         }
         while ((it != start) &&
                ((skip_non_visible && it->m_visible < kChannelVisible) ||
+                (skip_other_sources &&
+                 it->m_sourceId != start->m_sourceId) ||
                 (skip_same_channum_and_callsign &&
                  it->m_chanNum  == start->m_chanNum &&
                  it->m_callSign == start->m_callSign) ||

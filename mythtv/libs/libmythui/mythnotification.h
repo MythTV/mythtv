@@ -21,6 +21,8 @@
 // Std
 #include <utility>
 
+using namespace std::chrono_literals;
+
 using DMAP = QMap<QString,QString>;
 using VNMask = unsigned int;
 
@@ -83,9 +85,9 @@ class MUI_PUBLIC MythNotification : public MythEvent
     void SetFullScreen(bool FullScreen);
     void SetDescription(const QString& Description);
     void SetMetaData(const DMAP& MetaData);
-    void SetDuration(int Duration);
-    void SetStyle(const QString& Style);
-    void SetVisibility(VNMask Visibility);
+    void SetDuration(std::chrono::seconds Duration);
+    void SetStyle(const QString& sStyle);
+    void SetVisibility(VNMask nVisibility);
     void SetPriority(Priority nPriority);
     static Type TypeFromString(const QString& Type);
     void ToStringList();
@@ -97,7 +99,7 @@ class MUI_PUBLIC MythNotification : public MythEvent
     bool     GetFullScreen() const  { return m_fullScreen; }
     QString  GetDescription() const { return m_description; }
     DMAP     GetMetaData() const    { return m_metadata; }
-    int      GetDuration() const    { return m_duration; }
+    std::chrono::seconds GetDuration() const { return m_duration; }
     QString  GetStyle() const       { return m_style; }
     VNMask   GetVisibility() const  { return m_visibility; }
     Priority GetPriority() const    { return m_priority; }
@@ -114,7 +116,7 @@ class MUI_PUBLIC MythNotification : public MythEvent
     void*    m_parent      { nullptr };
     bool     m_fullScreen  { false };
     QString  m_description;
-    int      m_duration    { 0 };
+    std::chrono::seconds m_duration { 0s };
     DMAP     m_metadata;
     QString  m_style;
     VNMask   m_visibility  { static_cast<VNMask>(kAll) };
@@ -149,7 +151,7 @@ class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
     MythPlaybackNotification(Type nType, float Progress, QString ProgressText);
     MythPlaybackNotification(Type nType, float Progress, QString ProgressText,
                              const DMAP& Metadata);
-    MythPlaybackNotification(Type nType, int Duration, int Position);
+    MythPlaybackNotification(Type nType, std::chrono::seconds Duration, int Position);
     MythEvent* clone() const override;
 
     // Setter
@@ -161,7 +163,7 @@ class MUI_PUBLIC MythPlaybackNotification : public virtual MythNotification
     void    SetProgressText(const QString& text) { m_progressText = text; }
     float   GetProgress() const                  { return m_progress; }
     QString GetProgressText() const              { return m_progressText; }
-    static QString StringFromSeconds(int Time);
+    static QString StringFromSeconds(std::chrono::seconds Time);
 
   protected:
     MythPlaybackNotification(const MythPlaybackNotification&) = default;
@@ -177,11 +179,11 @@ class MUI_PUBLIC MythMediaNotification : public MythImageNotification,
     MythMediaNotification(Type nType, const QImage& Image, const DMAP& Metadata,
                           float Progress, const QString& DurationText);
     MythMediaNotification(Type nType, const QImage& Image, const DMAP& Metadata,
-                          int Duration, int Position);
+                          std::chrono::seconds Duration, int Position);
     MythMediaNotification(Type nType, const QString& Image, const DMAP& Metadata,
                           float Progress, const QString& DurationText);
     MythMediaNotification(Type nType, const QString& Image, const DMAP& Metadata,
-                          int Duration, int Position);
+                          std::chrono::seconds Duration, int Position);
     MythEvent* clone() const override;
 
   protected:

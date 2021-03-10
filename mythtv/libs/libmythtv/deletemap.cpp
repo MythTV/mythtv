@@ -163,11 +163,11 @@ QString DeleteMap::CreateTimeString(uint64_t frame, bool use_cutlist,
                                     double frame_rate, bool full_resolution)
     const
 {
-    uint64_t ms = TranslatePositionFrameToMs(frame, frame_rate, use_cutlist);
-    QString fmt = (ms >= ONEHOURINMS) ? "H:mm:ss" : "mm:ss";
+    std::chrono::milliseconds ms = TranslatePositionFrameToMs(frame, frame_rate, use_cutlist);
+    QString fmt = (ms >= 1h) ? "H:mm:ss" : "mm:ss";
     if (full_resolution)
         fmt += ".zzz";
-    return MythFormatTimeMs(ms, fmt);
+    return MythFormatTime(ms, fmt);
 }
 
  /**
@@ -217,7 +217,7 @@ void DeleteMap::UpdateOSD(uint64_t frame, double frame_rate, OSD *osd)
     m_cachedTotalForOSD = total;
 }
 
-void DeleteMap::UpdateOSD(int64_t timecode, OSD *osd)
+void DeleteMap::UpdateOSD(std::chrono::milliseconds timecode, OSD *osd)
 {
     osd->SetGraph(OSD_WIN_PROGEDIT, "audiograph", timecode);
 }
@@ -892,7 +892,7 @@ bool DeleteMap::IsSaved(void) const
     return currentMap == savedMap;
 }
 
-uint64_t DeleteMap::TranslatePositionFrameToMs(uint64_t position,
+std::chrono::milliseconds DeleteMap::TranslatePositionFrameToMs(uint64_t position,
                                                float fallback_framerate,
                                                bool use_cutlist) const
 {
@@ -901,7 +901,7 @@ uint64_t DeleteMap::TranslatePositionFrameToMs(uint64_t position,
                                      use_cutlist ? m_deleteMap :
                                      frm_dir_map_t());
 }
-uint64_t DeleteMap::TranslatePositionMsToFrame(uint64_t dur_ms,
+uint64_t DeleteMap::TranslatePositionMsToFrame(std::chrono::milliseconds dur_ms,
                                                float fallback_framerate,
                                                bool use_cutlist) const
 {

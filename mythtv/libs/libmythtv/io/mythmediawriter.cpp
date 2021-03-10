@@ -96,7 +96,7 @@ void MythMediaWriter::SetThreadCount(int Count)
     m_encodingThreadCount = Count;
 }
 
-void MythMediaWriter::SetTimecodeOffset(long long Offset)
+void MythMediaWriter::SetTimecodeOffset(std::chrono::milliseconds Offset)
 {
     m_startingTimecodeOffset = Offset;
 }
@@ -116,7 +116,7 @@ long long MythMediaWriter::GetFramesWritten(void) const
     return m_framesWritten;
 }
 
-long long MythMediaWriter::GetTimecodeOffset(void) const
+std::chrono::milliseconds MythMediaWriter::GetTimecodeOffset(void) const
 {
     return m_startingTimecodeOffset;
 }

@@ -90,7 +90,7 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
     }
 
     QString msg;
-    uint timeout = 0;
+    std::chrono::seconds timeout = 0s;
     QString image;
     QString origin;
     QString description;
@@ -112,7 +112,7 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
             if (tagname == "text")
                 msg = dom.text();
             else if (tagname == "timeout")
-                timeout = dom.text().toUInt();
+                timeout = std::chrono::seconds(dom.text().toUInt());
             else if (notification && tagname == "image")
                 image = dom.text();
             else if (notification && tagname == "origin")
@@ -149,21 +149,22 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
     if (!msg.isEmpty() || !image.isEmpty() || !extra.isEmpty())
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Received %1 '%2', timeout %3")
-            .arg(notification ? "notification" : "message").arg(msg).arg(timeout));
-        if (timeout > 1000)
-            timeout = notification ? 5 : 0;
+            .arg(notification ? "notification" : "message")
+            .arg(msg).arg(timeout.count()));
+        if (timeout > 1000s)
+            timeout = notification ? 5s : 0s;
         if (notification)
         {
             origin = origin.isEmpty() ? tr("UDP Listener") : origin;
             ShowNotification(error ? MythNotification::Error :
                              MythNotification::TypeFromString(type),
                              msg, origin, description, image, extra,
-                             progress_text, progress, static_cast<int>(timeout),
+                             progress_text, progress, timeout,
                              fullscreen, static_cast<VNMask>(visibility));
         }
         else
         {
-            QStringList args(QString::number(timeout));
+            QStringList args(QString::number(timeout.count()));
             qApp->postEvent(GetMythMainWindow(), new MythEvent(MythEvent::MythUserMessage, msg, args));
         }
     }
@@ -186,7 +187,7 @@ MythUDP::MythUDP()
 {
     m_listener->moveToThread(m_thread->qthread());
     m_thread->start();
-    do { std::this_thread::sleep_for(std::chrono::microseconds(5)); }
+    do { std::this_thread::sleep_for(5us); }
     while (!m_thread->qthread()->isRunning());
 }
 

@@ -9,7 +9,6 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QMap>
-#include <QRegExp>
 #include <QSocketNotifier>
 #include <iostream>
 
@@ -63,7 +62,7 @@ using LoggerList = QList<LoggerBase *>;
 
 struct LoggerListItem {
     LoggerList *m_itemList;
-    qlonglong   m_itemEpoch;
+    std::chrono::seconds m_itemEpoch;
 };
 using  ClientMap = QMap<QString, LoggerListItem *>;
 
@@ -313,8 +312,6 @@ bool JournalLogger::logmsg(LoggingItem *item)
 #endif
 #endif
 
-const int DatabaseLogger::kMinDisabledTime = 1000;
-
 /// \brief DatabaseLogger constructor
 /// \param table C-string of the database table to log to
 DatabaseLogger::DatabaseLogger(const char *table) :
@@ -396,7 +393,7 @@ bool DatabaseLogger::logmsg(LoggingItem *item)
         return false;
     }
 
-    if (m_disabledTime.isValid() && m_disabledTime.hasExpired(kMinDisabledTime))
+    if (m_disabledTime.isValid() && m_disabledTime.hasExpired(kMinDisabledTime.count()))
     {
         if (isDatabaseReady() && !m_thread->queueFull())
         {
@@ -761,7 +758,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
     // cout << "msg  " << clientId.toLocal8Bit().constData() << endl;
     if (logItem)
     {
-        loggingGetTimeStamp(&logItem->m_itemEpoch, nullptr);
+        logItem->m_itemEpoch = nowAsDuration<std::chrono::seconds>();
     }
     else
     {
@@ -841,7 +838,7 @@ void LogForwardThread::forwardMessage(LogMessage *msg)
         }
 
         logItem = new LoggerListItem;
-        loggingGetTimeStamp(&logItem->m_itemEpoch, nullptr);
+        logItem->m_itemEpoch = nowAsDuration<std::chrono::seconds>();
         logItem->m_itemList = loggers;
         logClientMap.insert(clientId, logItem);
 

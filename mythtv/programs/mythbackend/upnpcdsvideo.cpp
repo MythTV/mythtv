@@ -655,9 +655,7 @@ bool UPnpCDSVideo::LoadVideos(const UPnpCDSRequest* pRequest,
         int            nYear        = query.value( 7).toInt();
         // int             nUserRating  = query.value( 8).toInt();
 
-        uint32_t       nLength      = query.value( 9).toUInt();
-        // Convert from minutes to milliseconds
-        nLength = (nLength * 60 *1000);
+        auto           nLength      = std::chrono::minutes(query.value( 9).toUInt());
 
         int            nSeason      = query.value(10).toInt();
         int            nEpisode     = query.value(11).toInt();

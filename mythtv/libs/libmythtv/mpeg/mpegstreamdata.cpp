@@ -760,7 +760,7 @@ void MPEGStreamData::ProcessPAT(const ProgramAssociationTable *pat)
             "ProcessPAT: PAT is missing program, setting timeout");
     }
     else if (m_invalidPatSeen && !foundProgram &&
-             (m_invalidPatTimer.elapsed() > 400) && !m_invalidPatWarning)
+             (m_invalidPatTimer.elapsed() > 400ms) && !m_invalidPatWarning)
     {
         m_invalidPatWarning = true; // only emit one warning...
         // After 400ms emit error if we haven't found correct PAT.
@@ -1029,7 +1029,7 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
                     QString("PID %1 (0x%2) has PCR %3μs")
                     .arg(m_pmtSingleProgram->PCRPID())
                     .arg(m_pmtSingleProgram->PCRPID(), 0, 16)
-                    .arg(std::chrono::duration_cast<std::chrono::microseconds>
+                    .arg(duration_cast<std::chrono::microseconds>
                          (tspacket.GetPCR().time_since_epoch()).count()));
             }
         }

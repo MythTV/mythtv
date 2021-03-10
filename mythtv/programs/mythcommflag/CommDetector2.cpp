@@ -1,7 +1,6 @@
 // ANSI C headers
 #include <cmath>
 #include <cerrno>
-#include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
 // C++ headers
@@ -46,19 +45,17 @@ bool needToReportState(bool showprogress, bool isrecording, long long frameno)
         (frameno % 500) == 0;
 }
 
-void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
+void waitForBuffer(std::chrono::microseconds framestart, int minlag, int flaglag,
         float fps, bool fullspeed)
 {
-    long usperframe = (long)(1000000.0F / fps);
-    struct timeval now {};
-    struct timeval elapsed {};
+    auto usperframe = floatusecs(1000000.0F / fps);
 
-    (void)gettimeofday(&now, nullptr);
-    timersub(&now, framestart, &elapsed);
+    auto now = nowAsDuration<std::chrono::microseconds>();
+    auto elapsed = (now - framestart);
 
     // Sleep for one frame's worth of time.
-    long sleepus = usperframe - elapsed.tv_sec * 1000000 - elapsed.tv_usec;
-    if (sleepus <= 0)
+    auto sleepus = usperframe - duration_cast<floatusecs>(elapsed);
+    if (sleepus <= 0us)
         return;
 
     if (flaglag > minlag)
@@ -73,7 +70,7 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
         // Slow down; increase sleep time
         sleepus = sleepus * 3 / 2;
     }
-    std::this_thread::sleep_for(std::chrono::microseconds(sleepus));
+    std::this_thread::sleep_for(sleepus);
 }
 
 bool MythPlayerInited(FrameAnalyzerItem &pass,
@@ -253,24 +250,25 @@ void createDebugDirectory(const QString& dirname, const QString& comment)
 
 QString frameToTimestamp(long long frameno, float fps)
 {
-    int ms = (int)roundf(frameno / fps * 1000);
-    if (ms % 1000 >= 500)
-        ms += 500; // Round up to next second
-    return MythFormatTimeMs(ms, "hh:mm:ss");
+    auto ms = millisecondsFromFloat(frameno / fps * 1000);
+    auto secs = std::chrono::ceil<std::chrono::seconds>(ms);
+    return MythFormatTime(secs, "hh:mm:ss");
 }
 
 QString frameToTimestampms(long long frameno, float fps)
 {
-    int ms = (int)roundf(frameno / fps * 1000);
-    QString timestr = MythFormatTimeMs(ms, "mm:ss.zzz");
+    auto ms = millisecondsFromFloat(frameno / fps * 1000);
+    QString timestr = MythFormatTime(ms, "mm:ss.zzz");
     timestr.chop(1); // Chop 1 to return hundredths
     return timestr;
 }
 
-QString strftimeval(const struct timeval *tv)
+QString strftimeval(std::chrono::microseconds usecs)
 {
+    auto msecs = duration_cast<std::chrono::milliseconds>(usecs);
     return QString("%1.%2")
-        .arg(tv->tv_sec).arg(tv->tv_usec, 6, 10, QChar(QChar('0')));
+        .arg(duration_cast<std::chrono::seconds>(usecs).count())
+        .arg((msecs % 1s).count(), 3, 10, QChar(QChar('0')));
 }
 
 };  /* namespace */
@@ -481,8 +479,6 @@ bool CommDetector2::go(void)
         return false;
     }
 
-    m_player->EnableSubtitles(false);
-
     QElapsedTimer totalFlagTime;
     totalFlagTime.start();
 
@@ -529,7 +525,7 @@ bool CommDetector2::go(void)
         long long lastLoggedFrame = m_currentFrameNumber;
         QElapsedTimer passTime;
         QElapsedTimer clock;
-        struct timeval getframetime {};
+        std::chrono::microseconds getframetime {0us};
 
         m_player->ResetTotalDuration();
 
@@ -539,22 +535,16 @@ bool CommDetector2::go(void)
 
         clock.start();
         passTime.start();
-        memset(&getframetime, 0, sizeof(getframetime));
         while (!(*m_currentPass).empty() && m_player->GetEof() == kEofStateNone)
         {
-            struct timeval start {};
-            struct timeval end {};
-            struct timeval elapsedtv {};
-
-            (void)gettimeofday(&start, nullptr);
+            auto start = nowAsDuration<std::chrono::microseconds>();
             bool fetchNext = (nextFrame == m_currentFrameNumber + 1);
             MythVideoFrame *currentFrame =
                 m_player->GetRawVideoFrame(fetchNext ? -1 : nextFrame);
             long long lastFrameNumber = m_currentFrameNumber;
             m_currentFrameNumber = currentFrame->m_frameNumber + 1;
-            (void)gettimeofday(&end, nullptr);
-            timersub(&end, &start, &elapsedtv);
-            timeradd(&getframetime, &elapsedtv, &getframetime);
+            auto end = nowAsDuration<std::chrono::microseconds>();
+            getframetime += (end - start);
 
             if (nextFrame != -1 && nextFrame == lastFrameNumber + 1 &&
                     m_currentFrameNumber != nextFrame)
@@ -581,7 +571,7 @@ bool CommDetector2::go(void)
             while (m_bPaused)
             {
                 emit breathe();
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::this_thread::sleep_for(1s);
             }
 
             if (!searchingForLogo(m_logoFinder, *m_currentPass) &&
@@ -616,7 +606,7 @@ bool CommDetector2::go(void)
 
             if (m_isRecording)
             {
-                waitForBuffer(&start, minlag,
+                waitForBuffer(start, minlag,
                         m_recstartts.secsTo(MythDate::current()) -
                         totalFlagTime.elapsed() / 1000, m_player->GetFrameRate(),
                         m_fullSpeed);
@@ -624,7 +614,7 @@ bool CommDetector2::go(void)
 
             // sleep a little so we don't use all cpu even if we're niced
             if (!m_fullSpeed && !m_isRecording)
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                std::this_thread::sleep_for(10ms);
 
             if (m_sendBreakMapUpdates && (m_breakMapUpdateRequested ||
                         !(m_currentFrameNumber % 500)))
@@ -672,7 +662,7 @@ bool CommDetector2::go(void)
             return false;
 
         LOG(VB_COMMFLAG, LOG_INFO, QString("NVP Time: GetRawVideoFrame=%1s")
-                .arg(strftimeval(&getframetime)));
+                .arg(strftimeval(getframetime)));
         if (passReportTime(*m_currentPass))
             return false;
     }

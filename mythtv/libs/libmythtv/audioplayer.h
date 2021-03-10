@@ -77,7 +77,7 @@ class MTV_PUBLIC AudioPlayer : public QObject
     bool  CanDTSHD(void);
     uint  GetMaxChannels(void);
     int   GetMaxHDRate(void);
-    int64_t GetAudioTime(void);
+    std::chrono::milliseconds GetAudioTime(void);
     AudioFormat GetFormat(void) const { return m_state.m_format; }
     bool CanProcess(AudioFormat fmt);
     uint32_t CanProcess(void);
@@ -91,12 +91,12 @@ class MTV_PUBLIC AudioPlayer : public QObject
     MuteState SetMuteState(MuteState mstate);
     MuteState IncrMuteState(void);
 
-    void AddAudioData(char *buffer, int len, int64_t timecode, int frames);
+    void AddAudioData(char *buffer, int len, std::chrono::milliseconds timecode, int frames);
     bool NeedDecodingBeforePassthrough(void);
-    int64_t LengthLastData(void);
+    std::chrono::milliseconds LengthLastData(void);
     bool GetBufferStatus(uint &fill, uint &total);
     bool IsBufferAlmostFull(void);
-    int64_t GetAudioBufferedTime(void);
+    std::chrono::milliseconds GetAudioBufferedTime(void);
     
     /**
      * Return internal AudioOutput object

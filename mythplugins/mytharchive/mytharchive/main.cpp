@@ -230,7 +230,7 @@ static void runTestDVD(void)
     }
 
     if (command.contains("%f"))
-        command = command.replace(QRegExp("%f"), filename);
+        command = command.replace("%f", filename);
     myth_system(command);
 }
 

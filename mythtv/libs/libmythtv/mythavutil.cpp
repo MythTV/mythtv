@@ -113,6 +113,18 @@ VideoFrameType MythAVUtil::PixelFormatToFrameType(AVPixelFormat Fmt)
     return FMT_NONE;
 }
 
+MythHDR::HDRType MythAVUtil::FFmpegTransferToHDRType(int Transfer)
+{
+    switch (Transfer)
+    {
+        case AVCOL_TRC_SMPTE2084: return MythHDR::HDR10;
+        case AVCOL_TRC_BT2020_10:
+        case AVCOL_TRC_ARIB_STD_B67: return MythHDR::HLG;
+        default: break;
+    }
+    return MythHDR::SDR;
+}
+
 /*! \brief Deinterlace an AVFrame
  *
  * This is only used by the mytharchive plugin and can be removed if MythArchive

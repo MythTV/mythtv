@@ -521,14 +521,14 @@ class V4LConfigurationGroup : public GroupSetting
     Q_OBJECT
 
   public:
-    V4LConfigurationGroup(CaptureCard &parent, CardType &cardtype);
+    V4LConfigurationGroup(CaptureCard &parent, CardType &cardtype, const QString inputtype);
 
   public slots:
     void probeCard(const QString &device);
 
   private:
     CaptureCard          &m_parent;
-    TransTextEditSetting *m_cardInfo {nullptr};
+    GroupSetting         *m_cardInfo {nullptr};
     VBIDevice            *m_vbiDev   {nullptr};
 };
 
@@ -549,7 +549,7 @@ class MPEGConfigurationGroup: public GroupSetting
     CaptureCard          &m_parent;
     VideoDevice          *m_device    {nullptr};
     VBIDevice            *m_vbiDevice {nullptr};
-    TransTextEditSetting *m_cardInfo  {nullptr};
+    GroupSetting         *m_cardInfo  {nullptr};
 };
 
 class HDPVRConfigurationGroup: public GroupSetting
@@ -580,7 +580,7 @@ class V4L2encGroup: public GroupSetting
 
   private:
     CaptureCard          &m_parent;
-    TransTextEditSetting *m_cardInfo {nullptr};
+    GroupSetting         *m_cardInfo {nullptr};
     VideoDevice          *m_device   {nullptr};
 
     QString               m_driverName;

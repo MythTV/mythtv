@@ -19,13 +19,6 @@ static QUrl RelativeURI (const QString& baseString, const QString& uriString)
     return base.resolved(uri);
 }
 
-static uint64_t MDate(void)
-{
-    timeval t {};
-    gettimeofday(&t, nullptr);
-    return t.tv_sec * 1000000ULL + t.tv_usec;
-}
-
 HLSReader::~HLSReader(void)
 {
     LOG(VB_RECORD, LOG_INFO, LOC + "dtor -- start");
@@ -58,7 +51,7 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
 #else
     MythSingleDownload downloader;
     QString redir;
-    if (!downloader.DownloadURL(m3u, &buffer, 30000, 0, 0, &redir))
+    if (!downloader.DownloadURL(m3u, &buffer, 30s, 0, 0, &redir))
     {
         LOG(VB_GENERAL, LOG_ERR,
             LOC + "Open failed: " + downloader.ErrorString());
@@ -414,7 +407,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 if (!M3U::ParseTargetDuration(text.readLine(), StreamURL(),
                                               duration))
                     return false;
-                hls->SetTargetDuration(duration); /* seconds */
+                hls->SetTargetDuration(std::chrono::seconds(duration));
             }
             /* Store version */
             hls->SetVersion(version);
@@ -427,7 +420,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
         text.seek(0);
 
         QString title;
-        uint    segment_duration = -1;
+        std::chrono::seconds segment_duration = -1s;
         int64_t first_sequence   = -1;
         int64_t sequence_num     = 0;
         int     skipped = 0;
@@ -446,17 +439,19 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
 
             if (line.startsWith(QLatin1String("#EXTINF")))
             {
+                uint tmp_duration = -1;
                 if (!M3U::ParseSegmentInformation(hls->Version(), line,
-                                                  segment_duration,
+                                                  tmp_duration,
                                                   title, StreamURL()))
                     return false;
+                segment_duration = std::chrono::seconds(tmp_duration);
             }
             else if (line.startsWith(QLatin1String("#EXT-X-TARGETDURATION")))
             {
                 int duration = 0;
                 if (!M3U::ParseTargetDuration(line, StreamURL(), duration))
                     return false;
-                hls->SetTargetDuration(duration); /* seconds */
+                hls->SetTargetDuration(std::chrono::seconds(duration));
             }
             else if (line.startsWith(QLatin1String("#EXT-X-MEDIA-SEQUENCE")))
             {
@@ -531,7 +526,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                     ++skipped;
 
                 ++sequence_num;
-                segment_duration = -1; /* reset duration */
+                segment_duration = -1s; /* reset duration */
                 title.clear();
             }
         }
@@ -678,7 +673,7 @@ bool HLSReader::LoadMetaPlaylists(MythSingleDownload& downloader)
         return false;
 #else
     QString redir;
-    if (!downloader.DownloadURL(m_curstream->M3U8Url(), &buffer, 30000, 0, 0, &redir))
+    if (!downloader.DownloadURL(m_curstream->M3U8Url(), &buffer, 30s, 0, 0, &redir))
     {
         LOG(VB_GENERAL, LOG_WARNING,
             LOC + "Download failed: " + downloader.ErrorString());
@@ -893,22 +888,22 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     /* sanity check - can we download this segment on time? */
     if ((bandwidth > 0) && (hls->Bitrate() > 0))
     {
-        uint64_t size = (segment.Duration() * hls->Bitrate()); /* bits */
-        int estimated_time = (int)(size / bandwidth);
+        uint64_t size = (segment.Duration().count() * hls->Bitrate()); /* bits */
+        auto estimated_time = std::chrono::seconds(size / bandwidth);
         if (estimated_time > segment.Duration())
         {
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("downloading of %1 will take %2s, "
                         "which is longer than its playback (%3s) at %4kiB/s")
                 .arg(segment.Sequence())
-                .arg(estimated_time)
-                .arg(segment.Duration())
+                .arg(estimated_time.count())
+                .arg(segment.Duration().count())
                 .arg(bandwidth / 8192));
         }
     }
 
     QByteArray buffer;
-    uint64_t   start = MDate();
+    auto start = nowAsDuration<std::chrono::milliseconds>();
 
 #ifdef HLS_USE_MYTHDOWNLOADMANAGER // MythDownloadManager leaks memory
                                    // and can only handle six download at a time
@@ -937,7 +932,7 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     }
 #endif
 
-    uint64_t downloadduration = (MDate() - start) / 1000;
+    auto downloadduration = nowAsDuration<std::chrono::milliseconds>() - start;
 
 #ifdef USING_LIBCRYPTO
     /* If the segment is encrypted, decode it */
@@ -981,28 +976,28 @@ int HLSReader::DownloadSegmentData(MythSingleDownload& downloader,
     m_buffer += buffer;
     m_bufLock.unlock();
 
-    if (hls->Bitrate() == 0 && segment.Duration() > 0)
+    if (hls->Bitrate() == 0 && segment.Duration() > 0s)
     {
         /* Try to estimate the bandwidth for this stream */
         hls->SetBitrate((uint64_t)(((double)segment_len * 8) /
-                                   ((double)segment.Duration())));
+                                   ((double)segment.Duration().count())));
     }
 
-    if (downloadduration < 1)
-        downloadduration = 1;
+    if (downloadduration < 1ms)
+        downloadduration = 1ms;
 
     /* bits/sec */
-    bandwidth = segment_len * 8 * 1000ULL / downloadduration;
+    bandwidth = segment_len * 8 * 1000ULL / downloadduration.count();
     hls->AverageBandwidth(bandwidth);
     hls->SetCurrentByteRate(static_cast<uint64_t>
                             ((static_cast<double>(segment_len) /
-                              static_cast<double>(segment.Duration()))));
+                              static_cast<double>(segment.Duration().count()))));
 
     LOG(VB_RECORD, (m_debug ? LOG_INFO : LOG_DEBUG), LOC +
         QString("%1 took %3ms for %4 bytes: "
                 "bandwidth:%5kiB/s")
         .arg(segment.Sequence())
-        .arg(downloadduration)
+        .arg(downloadduration.count())
         .arg(segment_len)
         .arg(bandwidth / 8192.0));
 

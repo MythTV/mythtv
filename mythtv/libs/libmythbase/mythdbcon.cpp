@@ -6,6 +6,7 @@
 // Qt
 #include <QCoreApplication>
 #include <QElapsedTimer>
+#include <QRegularExpression>
 #include <QSemaphore>
 #include <QSqlDriver>
 #include <QSqlError>
@@ -32,7 +33,7 @@
 #include <cstdlib>
 #endif
 
-static const uint kPurgeTimeout = 60 * 60;
+static constexpr std::chrono::seconds kPurgeTimeout { 1h };
 
 bool TestDatabase(const QString& dbHostName,
                   const QString& dbUserName,
@@ -58,7 +59,7 @@ bool TestDatabase(const QString& dbHostName,
 
     // Just use some sane defaults for these values
     dbparms.m_wolEnabled = false;
-    dbparms.m_wolReconnect = 1;
+    dbparms.m_wolReconnect = 1s;
     dbparms.m_wolRetry = 3;
     dbparms.m_wolCommand = QString();
 
@@ -185,7 +186,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
                             .arg(m_dbparms.m_wolCommand));
                 }
 
-                sleep(m_dbparms.m_wolReconnect);
+                sleep(m_dbparms.m_wolReconnect.count());
                 connected = m_db.open();
             }
 
@@ -386,7 +387,7 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
     while (it != list.end())
     {
         totalConnections++;
-        if ((*it)->m_lastDBKick.secsTo(now) <= (int)kPurgeTimeout)
+        if ((*it)->m_lastDBKick.secsTo(now) <= kPurgeTimeout.count())
         {
             ++it;
             continue;
@@ -929,23 +930,23 @@ void MSqlEscapeAsAQuery(QString &query, const MSqlBindings &bindings)
 {
     MSqlQuery result(MSqlQuery::InitCon());
 
-    QString q = query;
-    QRegExp rx(QString::fromLatin1("'[^']*'|:([a-zA-Z0-9_]+)"));
+    QRegularExpression rx { "('[^']+'|:\\w+)",
+        QRegularExpression::UseUnicodePropertiesOption};
 
     QVector<Holder> holders;
 
-    int i = 0;
-    while ((i = rx.indexIn(q, i)) != -1)
+    auto matchIter = rx.globalMatch(query);
+    while (matchIter.hasNext())
     {
-        if (!rx.cap(1).isEmpty())
-            holders.append(Holder(rx.cap(0), i));
-        i += rx.matchedLength();
+        auto match = matchIter.next();
+        if (match.capturedLength(1) > 0)
+            holders.append(Holder(match.captured(), match.capturedStart()));
     }
 
     QVariant val;
     QString holder;
 
-    for (i = holders.count() - 1; i >= 0; --i)
+    for (int i = holders.count() - 1; i >= 0; --i)
     {
         holder = holders[(uint)i].m_holderName;
         val = bindings[holder];

@@ -10,8 +10,6 @@
 #include <thread> // for sleep_for
 #include <utility>
 
-using namespace std::chrono_literals;
-
 #define LOC QString("UPnPScan: ")
 #define ERR QString("UPnPScan error: ")
 
@@ -252,7 +250,7 @@ void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
 
     int count = 0;
     while (!m_scanComplete && (count++ < 300))
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(100ms);
 
     // some scans may just take too long (PlayOn)
     if (!m_scanComplete)
@@ -310,7 +308,7 @@ bool UPNPScanner::GetMetadata(QVariant &data)
     LOG(VB_GENERAL, LOG_INFO, "START");
     while (!found && (count++ < 100)) // 10 seconds
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(100ms);
         m_lock.lock();
         if (m_servers.contains(usn))
         {
@@ -724,7 +722,7 @@ void UPNPScanner::timerEvent(QTimerEvent * event)
     if (id)
         killTimer(id);
 
-    int timeout = 0;
+    std::chrono::seconds timeout = 0s;
     QString usn;
 
     m_lock.lock();
@@ -742,12 +740,12 @@ void UPNPScanner::timerEvent(QTimerEvent * event)
     }
     m_lock.unlock();
 
-    if (timeout > 0)
+    if (timeout > 0s)
     {
         ScheduleRenewal(usn, timeout);
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Re-subscribed for %1 seconds to %2")
-                .arg(timeout).arg(usn));
+                .arg(timeout.count()).arg(usn));
     }
 }
 
@@ -963,21 +961,17 @@ void UPNPScanner::RemoveServer(const QString &usn)
 }
 
 /**
- * \fn UPNPScanner::ScheduleRenewal(const QString&, int)
  *  Creates a QTimer to trigger a subscription renewal for a given media server.
  */
-void UPNPScanner::ScheduleRenewal(const QString &usn, int timeout)
+void UPNPScanner::ScheduleRenewal(const QString &usn, std::chrono::seconds timeout)
 {
     // sanitise the timeout
-    int renew = timeout - 10;
-    if (renew < 10)
-        renew = 10;
-    if (renew > 43200)
-        renew = 43200;
+    std::chrono::seconds twelvehours { 12h };
+    std::chrono::seconds renew = std::clamp(timeout - 10s, 10s, twelvehours);
 
     m_lock.lock();
     if (m_servers.contains(usn))
-        m_servers[usn]->m_renewalTimerId = startTimer(renew * 1000);
+        m_servers[usn]->m_renewalTimerId = startTimer(renew);
     m_lock.unlock();
 }
 
@@ -1291,7 +1285,7 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     // was posted, this will silently fail and we won't try again
     QString usn;
     QUrl qeventurl = QUrl(fulleventURL);
-    int timeout = 0;
+    std::chrono::seconds timeout = 0s;
 
     m_lock.lock();
     QHashIterator<QString,MediaServer*> it(m_servers);
@@ -1314,14 +1308,14 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     if (m_subscription && !usn.isEmpty())
     {
         timeout = m_subscription->Subscribe(usn, qeventurl, eventURL);
-        m_servers[usn]->m_subscribed = (timeout > 0);
+        m_servers[usn]->m_subscribed = (timeout > 0s);
     }
     m_lock.unlock();
 
-    if (timeout > 0)
+    if (timeout > 0s)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Subscribed for %1 seconds to %2") .arg(timeout).arg(usn));
+            QString("Subscribed for %1 seconds to %2") .arg(timeout.count()).arg(usn));
         ScheduleRenewal(usn, timeout);
         // we only scan servers we are subscribed to - and the scan is now
         // incomplete

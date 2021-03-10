@@ -137,8 +137,8 @@ class META_PUBLIC VideoMetadata
     const QString &GetRating() const;
     void SetRating(const QString &rating);
 
-    int GetLength() const;
-    void SetLength(int length);
+    std::chrono::minutes GetLength() const;
+    void SetLength(std::chrono::minutes length);
 
     int GetSeason() const;
     void SetSeason(int season);

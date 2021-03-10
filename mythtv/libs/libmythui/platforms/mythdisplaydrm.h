@@ -20,6 +20,7 @@ class MUI_PUBLIC MythDisplayDRM : public MythDisplay
     void MainWindowReady();
     static bool DirectRenderingAvailable();
 
+  public:
     bool IsPlanar() override;
     bool VideoModesAvailable() override;
     bool UsingVideoModes() override;

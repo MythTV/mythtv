@@ -1837,6 +1837,7 @@ TYPES_LIST="
     struct_sockaddr_sa_len
     struct_sockaddr_storage
     struct_stat_st_mtim_tv_nsec
+    struct_hdr_metadata_infoframe
 "
 
 HAVE_LIST="
@@ -5199,6 +5200,11 @@ enable_weak_pic() {
 
 enabled pic && enable_weak_pic
 
+version2num10(){
+    # accepts version as in 3.12.4 and turns it into 3012004 which can be compared as a number
+    echo $1 | awk -F. '{ print ( ( $1 * 1000 ) + $2 ) * 1000 + $3; };'
+}
+
 version2num(){
     # accepts version as in 1.10.4 and turns it into 0x010A04 which can be compared as a number
     echo $1 | awk -F. '{ print ( ( $1 * 256 ) + $2 ) * 256 + $3; };'
@@ -5890,13 +5896,11 @@ if enabled taglib; then
     elif test $target_os = mingw32 ; then
         TAGLIB_CONFIG="taglib-config.cmd"
     fi
-    taglib_minor="0"
+    taglib_verstring="nothing"
+    taglib_version=0
     if test $TAGLIB_CONFIG ; then
-        taglib_minor=`$TAGLIB_CONFIG --version | cut -d. -f2`
-        if test x"$taglib_minor" = x"" ; then
-            echo "Can't find taglib-config. Assuming 1.7 or later."
-            taglib_minor="7"
-        fi
+        taglib_verstring=`$TAGLIB_CONFIG --version`
+        taglib_version=$(version2num10 $taglib_verstring)
         if test $target_os = android ; then
             tagprefix=`$TAGLIB_CONFIG --prefix`
         else
@@ -5909,13 +5913,14 @@ if enabled taglib; then
         fi
     fi
 
-    if test $taglib_minor -lt 7 || ! check_class_headers_cpp "taglib/fileref.h stdlib.h" TagLib::FileRef $tagincludes $taglibs -lstdc++; then
-        die "ERROR: cannot find taglib 1.7 or later."
+    if test $taglib_version -lt 1011001 || \
+            ! check_class_headers_cpp "taglib/fileref.h stdlib.h" TagLib::FileRef $tagincludes $taglibs -lstdc++; then
+        die "ERROR: cannot find taglib 1.11.1 or later (found $taglib_verstring)."
     fi
 fi
 
 # Attempt to use libudev for mediamonitor
-enabled libudev && check_lib udev libudev.h udev_new  || disable libudev
+enabled libudev && check_lib udev libudev.h udev_new -ludev || disable libudev
 
 # libexiv2
 if enabled libexiv2_external ; then
@@ -6054,6 +6059,7 @@ enabled libxml2           && require_pkg_config libxml2 libxml-2.0 libxml/xmlver
 
 enabled drm && use_pkg_config libdrm libdrm xf86drm.h drmGetVersion || disable drm
 enabled drm && check_cpp_condition drm_fourcc.h 'defined(DRM_FORMAT_MOD_LINEAR)' || disable drm
+enabled drm && check_type drm_mode.h "struct hdr_metadata_infoframe"
 
 if enabled libmpeg2external; then
     check_lib libmpeg2external mpeg2dec/mpeg2.h mpeg2_init -lmpeg2 || disable libmpeg2external
@@ -6601,7 +6607,7 @@ enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
                 }
 
 case $ID in
-    fedora)
+    fedora|debian)
         EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
 esac
 
@@ -6759,6 +6765,7 @@ fi
 enabled x11 && check_lib X11 "X11/Xdefs.h X11/Xlib.h" XQueryExtension  -lX11 || disable x11
 
 if enabled x11; then
+    require libXext "X11/Xdefs.h X11/Xlib.h X11/extensions/Xext.h" XMissingExtension -lXext
     require libXrandr "X11/Xdefs.h X11/Xlib.h X11/extensions/Xrandr.h" XRRSelectInput -lXrandr
 fi
 
@@ -7793,6 +7800,10 @@ fi
 
 if enabled drm; then
     echo "LIBDRM_CFLAGS=$($pkg_config --cflags $pkg_config_flags libdrm)" >> $TMPMAK
+fi
+
+if enabled waylandextras; then
+    echo "LIBWAYLAND_CFLAGS=$($pkg_config --cflags $pkg_config_flags wayland-client)" >> $TMPMAK
 fi
 
 if test $target_os = darwin; then

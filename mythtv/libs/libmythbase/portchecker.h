@@ -29,6 +29,7 @@
 #include <QString>
 
 #include "mythbaseexp.h"
+#include "mythchrono.h"
 
 /** 
  * Small class to handle TCP port checking and finding link-local context.
@@ -47,11 +48,11 @@ class MBASE_PUBLIC PortChecker : public QObject
   public:
     PortChecker() = default;
     ~PortChecker() override = default;
-    bool checkPort(QString &host, int port, int timeLimit=30000,
+    bool checkPort(QString &host, int port, std::chrono::milliseconds timeLimit=30s,
       bool linkLocalOnly=false);
 
     static bool resolveLinkLocal(QString &host, int port,
-      int timeLimit=30000);
+      std::chrono::milliseconds timeLimit=30s);
 
   public slots:
     void cancelPortCheck(void);

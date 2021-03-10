@@ -46,7 +46,7 @@ signals:
 
 protected:
     //! Seconds transition will last
-    int m_duration {1000};
+    std::chrono::milliseconds m_duration {1s};
     //! The image currently displayed, which will be replaced
     //! (whatever the transition direction)
     Slide *m_old   {nullptr};

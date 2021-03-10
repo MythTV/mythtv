@@ -53,7 +53,7 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
             ExternalStreamHandler::Return(m_streamHandler, m_inputid);
     }
     else
-        m_lockTimeout = GetLockTimeout() * 1000;
+        m_lockTimeout = GetLockTimeout();
 
     ExternalChannel *channel = GetExternalChannel();
     if (channel && channel->IsBackgroundTuning())
@@ -217,21 +217,21 @@ int ExternalSignalMonitor::GetSignalStrengthPercent(void)
     return -1;
 }
 
-int ExternalSignalMonitor::GetLockTimeout(void)
+std::chrono::seconds ExternalSignalMonitor::GetLockTimeout(void)
 {
     QString result;
 
-    m_streamHandler->ProcessCommand("LockTimeout?", result, 10000);
+    m_streamHandler->ProcessCommand("LockTimeout?", result, 10s);
     if (result.startsWith("OK:"))
     {
         bool ok = false;
-        int timeout = result.midRef(3).toInt(&ok);
+        auto timeout = std::chrono::seconds(result.midRef(3).toInt(&ok));
         if (!ok)
         {
             LOG(VB_CHANNEL, LOG_ERR, LOC + QString
                 ("GetLockTimeout: invalid response '%1'")
                 .arg(result));
-            return -1;
+            return -1s;
         }
         return timeout;
     }
@@ -239,5 +239,5 @@ int ExternalSignalMonitor::GetLockTimeout(void)
         ("GetLockTimeout: invalid response '%1'").arg(result));
     if (!result.startsWith("WARN"))
         m_error = QString("GetLockTimeout: invalid response '%1'").arg(result);
-    return -1;
+    return -1s;
 }

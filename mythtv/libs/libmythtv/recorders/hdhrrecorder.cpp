@@ -127,7 +127,7 @@ void HDHRRecorder::run(void)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                     "Recording will not commence until a PMT is set.");
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(5ms);
             continue;
         }
 
@@ -155,7 +155,7 @@ void HDHRRecorder::run(void)
     LOG(VB_RECORD, LOG_INFO, LOC + "run -- end");
 }
 
-bool HDHRRecorder::PauseAndWait(int timeout)
+bool HDHRRecorder::PauseAndWait(std::chrono::milliseconds timeout)
 {
     QMutexLocker locker(&m_pauseLock);
     if (m_requestPause)
@@ -170,7 +170,7 @@ bool HDHRRecorder::PauseAndWait(int timeout)
                 m_tvrec->RecorderPaused();
         }
 
-        m_unpauseWait.wait(&m_pauseLock, timeout);
+        m_unpauseWait.wait(&m_pauseLock, timeout.count());
     }
 
     if (!m_requestPause && IsPaused(true))

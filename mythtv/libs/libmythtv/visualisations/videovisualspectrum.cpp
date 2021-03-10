@@ -65,7 +65,7 @@ void VideoVisualSpectrum::Draw(const QRect Area, MythPainter* Painter, QPaintDev
     fftw_execute(m_lplan);
     fftw_execute(m_rplan);
 
-    double falloff = std::clamp(((static_cast<double>(SetLastUpdate())) / 40.0) * m_falloff, 0.0, 2048.0);
+    double falloff = std::clamp(((static_cast<double>(SetLastUpdate().count())) / 40.0) * m_falloff, 0.0, 2048.0);
     for (int l = 0, r = m_scale.range(); l < m_scale.range(); l++, r++)
     {
         int index = m_scale[l];

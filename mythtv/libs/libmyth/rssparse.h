@@ -194,8 +194,8 @@ class MPUBLIC Parse : public QObject
     Parse() = default;
     ~Parse() override = default;
 
-    ResultItem::resultList parseRSS(const QDomDocument& domDoc) const;
-    ResultItem* ParseItem(const QDomElement& item) const;
+    static ResultItem::resultList parseRSS(const QDomDocument& domDoc);
+    static ResultItem* ParseItem(const QDomElement& item) ;
 
     static QString GetLink(const QDomElement& parent);
     static QString GetAuthor(const QDomElement& parent);
@@ -203,14 +203,14 @@ class MPUBLIC Parse : public QObject
     static QString GetCommentsLink(const QDomElement& parent);
     static QDateTime GetDCDateTime(const QDomElement& parent);
     static QDateTime FromRFC3339(const QString& t);
-    QDateTime RFC822TimeToQDateTime (const QString& parent) const;
+    static QDateTime RFC822TimeToQDateTime (const QString& parent);
     QStringList GetAllCategories (const QDomElement&) const;
     static QList<MRSSEntry> GetMediaRSS (const QDomElement& item);
     static QList<Enclosure> GetEnclosures(const QDomElement& entry);
     static QString UnescapeHTML (const QString& escaped);
 
   private:
-    QMap<QString, int> m_timezoneOffsets;
+    static QMap<QString, int> m_timezoneOffsets;
 
   protected:
     static const QString kDC;
