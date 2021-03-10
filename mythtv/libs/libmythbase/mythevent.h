@@ -67,8 +67,13 @@ class MBASE_PUBLIC MythEvent : public QEvent
     const QStringList& ExtraDataList() const { return m_extradata; }
     int ExtraDataCount() const { return m_extradata.size(); }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     virtual MythEvent *clone() const
     { return new MythEvent(m_message, m_extradata); }
+#else
+    MythEvent *clone() const override
+    { return new MythEvent(type(), m_message, m_extradata); }
+#endif
 
     static Type MythEventMessage;
     static Type MythUserMessage;
