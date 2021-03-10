@@ -253,6 +253,7 @@ class MythHTTP
         {
             case HTTPSwitchingProtocols:  return QStringLiteral("101 Switching Protocols");
             case HTTPOK:                  return QStringLiteral("200 OK");
+            case HTTPAccepted:            return QStringLiteral("202 Accepted");
             case HTTPPartialContent:      return QStringLiteral("206 Partial Content");
             case HTTPMovedPermanently:    return QStringLiteral("301 Moved Permanently");
             case HTTPNotModified:         return QStringLiteral("304 Not Modified");
