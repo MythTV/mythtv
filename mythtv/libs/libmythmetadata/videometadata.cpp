@@ -21,6 +21,10 @@
 #include "programinfo.h" // for format_season_and_episode
 #include "mythsorthelper.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
+#define capturedView capturedRef
+#endif
+
 class VideoMetadataImp
 {
   public:
@@ -1116,7 +1120,7 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
     if (match.hasMatch())
     {
         // Return requested value
-        if (position == 1 && !match.capturedRef(1).isEmpty())
+        if (position == 1 && !match.capturedView(1).isEmpty())
         {
             // Clean up the title
             QString title = match.captured(1);
