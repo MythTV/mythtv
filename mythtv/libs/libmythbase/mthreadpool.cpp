@@ -83,6 +83,9 @@
 #include <QMutexLocker>
 #include <QPair>
 #include <QRunnable>
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#include <QRecursiveMutex>
+#endif
 #include <QSet>
 #include <QWaitCondition>
 #include <utility>
@@ -233,12 +236,20 @@ class MThreadPoolPrivate
     QSet<MPoolThread*>  m_runningThreads;
     QList<MPoolThread*> m_deleteThreads;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex s_pool_lock;
+#else
+    static QRecursiveMutex s_pool_lock;
+#endif
     static MThreadPool *s_pool;
     static QList<MThreadPool*> s_all_pools;
 };
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 QMutex MThreadPoolPrivate::s_pool_lock(QMutex::Recursive);
+#else
+QRecursiveMutex MThreadPoolPrivate::s_pool_lock;
+#endif
 MThreadPool *MThreadPoolPrivate::s_pool = nullptr;
 QList<MThreadPool*> MThreadPoolPrivate::s_all_pools;
 
