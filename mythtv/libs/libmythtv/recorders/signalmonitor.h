@@ -12,6 +12,9 @@
 #include <QWaitCondition>
 #include <QMutex>
 #include <QCoreApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#include <QRecursiveMutex>
+#endif
 
 // MythTV headers
 #include "signalmonitorlistener.h"
@@ -225,7 +228,11 @@ class SignalMonitor : protected MThread
     volatile bool      m_running      {false}; // protected by startStopLock
     volatile bool      m_exit         {false}; // protected by startStopLock
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex     m_statusLock   {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex m_statusLock;
+#endif
     mutable QMutex     m_listenerLock;
 };
 
