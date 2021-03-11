@@ -33,7 +33,11 @@
 
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = nullptr;
 MThread*           MythAirplayServer::gMythAirplayServerThread = nullptr;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMutex::Recursive);
+#else
+QRecursiveMutex*   MythAirplayServer::gMythAirplayServerMutex = new QRecursiveMutex();
+#endif
 
 #define LOC QString("AirPlay: ")
 
