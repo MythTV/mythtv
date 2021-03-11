@@ -342,7 +342,6 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
  */
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, bool allowEject)
   : QObject(par),
-    m_devicesLock(QMutex::Recursive),
     m_monitorPollingInterval(interval),
     m_allowEject(allowEject)
 {
