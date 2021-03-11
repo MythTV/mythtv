@@ -200,7 +200,11 @@ enum AVPixelFormat MythVTBContext::GetFormat(struct AVCodecContext* Context, con
 
 const VTBProfiles& MythVTBContext::GetProfiles(void)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     static bool s_initialised = false;
     static VTBProfiles s_profiles;
 
@@ -234,7 +238,11 @@ const VTBProfiles& MythVTBContext::GetProfiles(void)
 
 bool MythVTBContext::HaveVTB(bool Reinit /*=false*/)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     QMutexLocker locker(&lock);
     static bool s_checked = false;
     static bool s_available = false;

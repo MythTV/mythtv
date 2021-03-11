@@ -464,7 +464,11 @@ QString MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
 
 const VAAPIProfiles& MythVAAPIContext::GetProfiles()
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     static bool s_initialised = false;
     static VAAPIProfiles s_profiles;
 

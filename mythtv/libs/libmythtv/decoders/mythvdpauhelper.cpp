@@ -166,7 +166,11 @@ const VDPAUProfiles& MythVDPAUHelper::GetProfiles(void)
         return MythCodecContext::NoProfile;
     };
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     static bool s_initialised = false;
     static VDPAUProfiles s_profiles;
 

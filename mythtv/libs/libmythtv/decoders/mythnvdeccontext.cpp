@@ -511,7 +511,11 @@ bool MythNVDECContext::MythNVDECCaps::Supports(cudaVideoCodec Codec, cudaVideoCh
 
 bool MythNVDECContext::HaveNVDEC(bool Reinit /*=false*/)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     QMutexLocker locker(&lock);
     static bool s_checked = false;
     static bool s_available = false;
@@ -562,7 +566,11 @@ void MythNVDECContext::GetDecoderList(QStringList &Decoders)
 
 const std::vector<MythNVDECContext::MythNVDECCaps> &MythNVDECContext::GetProfiles(void)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     static bool s_initialised = false;
     static std::vector<MythNVDECContext::MythNVDECCaps> s_profiles;
 
