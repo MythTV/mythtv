@@ -5,7 +5,11 @@
 
 // Qt headers
 #include <QDomDocument>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -96,7 +100,11 @@ class RSSEditor : public MythScreenType
 
   private:
     void fillRSSButtonList();
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex    m_lock    {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex  m_lock;
+#endif
     bool              m_changed {false};
 
     RSSSite::rssList  m_siteList;
