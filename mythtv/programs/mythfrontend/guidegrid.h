@@ -282,7 +282,11 @@ private:
     int               m_changrpid {-1};
     ChannelGroupList  m_changrplist;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QMutex            m_jumpToChannelLock {QMutex::Recursive};
+#else
+    QRecursiveMutex   m_jumpToChannelLock;
+#endif
     JumpToChannel    *m_jumpToChannel     {nullptr};
 
     MythUIButtonList *m_timeList          {nullptr};
