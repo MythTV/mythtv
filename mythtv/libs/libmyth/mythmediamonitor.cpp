@@ -663,7 +663,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
         if (!extensions.isEmpty())
-            msg += QString(", ext(%1)").arg(extensions, 0, 16);
+            msg += QString(", ext(%1)").arg(extensions);
 
         LOG(VB_MEDIA, LOG_INFO,
                  "Registering '" + destination + "' as a media handler for " +
