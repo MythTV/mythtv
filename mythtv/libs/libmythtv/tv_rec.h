@@ -13,6 +13,9 @@
 #include <QString>
 #include <QMap>
 #include <QMutex>                       // for QMutex
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#include <QRecursiveMutex>
+#endif
 #include <QReadWriteLock>
 #include <QHash>                        // for QHash
 
@@ -380,8 +383,13 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
 
     // State variables
     mutable QMutex     m_setChannelLock;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex     m_stateChangeLock          {QMutex::Recursive};
     mutable QMutex     m_pendingRecLock           {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex  m_stateChangeLock;
+    mutable QRecursiveMutex  m_pendingRecLock;
+#endif
     TVState            m_internalState            {kState_None};
     TVState            m_desiredNextState         {kState_None};
     bool               m_changeState              {false};
@@ -390,10 +398,10 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     TuningQueue        m_tuningRequests;
     TuningRequest      m_lastTuningRequest        {0};
     QDateTime          m_eitScanStartTime;
-    mutable QMutex     m_triggerEventLoopLock     {QMutex::NonRecursive};
+    mutable QMutex     m_triggerEventLoopLock;
     QWaitCondition     m_triggerEventLoopWait;
     bool               m_triggerEventLoopSignal   {false};
-    mutable QMutex     m_triggerEventSleepLock    {QMutex::NonRecursive};
+    mutable QMutex     m_triggerEventSleepLock;
     QWaitCondition     m_triggerEventSleepWait;
     bool               m_triggerEventSleepSignal  {false};
     volatile bool      m_switchingBuffer          {false};
