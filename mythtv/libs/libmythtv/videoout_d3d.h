@@ -66,7 +66,11 @@ class VideoOutputD3D : public MythVideoOutput
 
   private:
     MythVideoFrame              m_pauseFrame;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QMutex                  m_lock           {QMutex::Recursive};
+#else
+    QRecursiveMutex         m_lock;
+#endif
     HWND                    m_hWnd           {nullptr};
     HWND                    m_hEmbedWnd      {nullptr};
     MythRenderD3D9         *m_render         {nullptr};
