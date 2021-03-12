@@ -73,7 +73,11 @@ class CdDecoder : public Decoder
     double             m_lengthInSecs;
     vector<int>        m_tracks;        ///< Start block offset of each track
 #endif
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex& getCdioMutex();
+#else
+    static QRecursiveMutex& getCdioMutex();
+#endif
 
     DecoderEvent::Type m_stat        {DecoderEvent::Error};
     char              *m_outputBuf   {nullptr};
