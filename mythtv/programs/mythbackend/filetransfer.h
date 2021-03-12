@@ -59,7 +59,7 @@ class FileTransfer : public ReferenceCounter
 
     std::vector<char> m_requestBuffer;
 
-    QMutex          m_lock              {QMutex::NonRecursive};
+    QMutex          m_lock;
 
     bool            m_writemode         {false};
 };

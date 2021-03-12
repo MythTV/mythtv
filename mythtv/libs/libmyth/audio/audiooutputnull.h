@@ -44,7 +44,7 @@ class AudioOutputNULL : public AudioOutputBase
     AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
 
   private:
-    QMutex        m_pcmOutputBufferMutex {QMutex::NonRecursive};
+    QMutex        m_pcmOutputBufferMutex;
     std::vector<unsigned char> m_pcmOutputBuffer {0};
 };
 
