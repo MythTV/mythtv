@@ -31,6 +31,7 @@
 
 // Qt
 #include <QDateTime>
+#include <QSequentialIterable>
 #include <QTextStream>
 #include <QBuffer>
 
