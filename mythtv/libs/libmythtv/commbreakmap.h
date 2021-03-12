@@ -7,7 +7,11 @@
 #include "playercontext.h"
 
 // Qt headers
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QMap>
 #include <QCoreApplication>
 
@@ -46,7 +50,11 @@ class CommBreakMap
   private:
     void MergeShortCommercials(double video_frame_rate);
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex          m_commBreakMapLock      {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex m_commBreakMapLock;
+#endif
     int                     m_skipcommercials       {0};
     CommSkipMode            m_autocommercialskip    {kCommSkipOff};
     std::chrono::seconds    m_commrewindamount      {0s};
