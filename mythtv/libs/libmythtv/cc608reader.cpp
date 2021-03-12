@@ -43,7 +43,7 @@ CC608Buffer *CC608Reader::GetOutputText(bool &changed)
         last_changed = false;
         int streamIdx = -1;
         CC608Buffer *tmp = GetOutputText(last_changed, streamIdx);
-        if (last_changed && (streamIdx == m_ccMode))
+        if (last_changed && (((streamIdx << 4) & CC_MODE_MASK) == m_ccMode))
         {
             changed = true;
             return tmp;
