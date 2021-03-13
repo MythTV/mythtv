@@ -25,6 +25,8 @@
 #include "programinfo.h"
 #include "programtypes.h"
 
+#define DEBUG 0
+
 class TestProgramInfo : public QObject
 {
     Q_OBJECT
@@ -106,17 +108,207 @@ class TestProgramInfo : public QObject
     QString m_flash34List = "The Flash (2014)|The New Rogues|Barry continues to "
         "train Jesse ...|3|4|23|syndicatedepisode|Drama|1514|514|WNUVDT|"
         "WNUBDT (WNUV-DT)|/recordings/1514_20161025235800.ts|6056109800|"
-        "1477440000|1477443600|0|localhost|0|0|0|0|0|0|0|15|8|1477439880|"
-        "1477443720|0|Default||EP01922936|EP019229360055|ttvdb.py_279121|"
-        "1477444354|0|2016-10-26|Default|0|0|Default|0|0|0|2016|0|0|4|715|"
+        "1477440000|1477443600|20141007|localhost|0|0|0|7|0|19890314|0|15|8|1477439880|"
+        "1477443720|131600|Default||EP01922936|EP019229360055|ttvdb.py_279121|"
+        "1477444354|0.95|2016-10-26|Default|0|0|Default|8|1090|1|2016|50|133|4|715|"
         "Prime A-1|4294967295";
     QString m_supergirl23List = "Supergirl|Welcome to Earth|An attack is made "
         "on the President as hot-button...|2|3|23|syndicatedepisode|Drama|"
         "1514|514|WNUVDT|WNUBDT (WNUV-DT)|/recordings/1514_20161024235800.ts|"
-        "6056109670|1477353600|1477357200|0|localhost|0|0|0|0|0|0|0|15|8|"
-        "1477353480|1477357320|0|Default||EP02185451|EP021854510025|"
-        "ttvdb.py_295759|1477444354|0|2016-10-25|Default|0|0|Default|0|0|0|"
-        "2016|0|0|4|711|Prime A-0|4294967295";
+        "6056109670|1477353600|1477357200|20151026|localhost|0|0|0|-1|0|19660922|0|15|8|"
+        "1477353480|1477357320|1538|Default||EP02185451|EP021854510025|"
+        "ttvdb.py_295759|1477444354|0.94|2016-10-25|Default|0|0|Default|33|33|8|"
+        "2016|23|106|4|66247|Prime A-0|4294967295";
+    InfoMap m_flash34Map = {
+        {"00x00", "3x04"},
+        {"audioproperties", QChar(8)},
+        {"audioproperties_str", "8"},
+        {"audioproperties_names", "DOLBY"},
+        {"callsign", "WNUVDT"},
+        {"card", "-"},
+        {"catType", "tvshow"},
+        {"category", "Drama"},
+        {"chanid", QChar(1514)},
+        {"chanid_str", "1514"},
+        {"channame", "WNUBDT (WNUV-DT)"},
+        {"channel", "514 WNUVDT"},
+        {"channum", "514"},
+        {"commfree", QChar(0)},
+        {"commfree_str", "0"},
+        {"description", "Barry continues to train Jesse ..."},
+        {"description0", "Barry continues to train Jesse ..."},
+        {"enddate", "Tue 25 October"},
+        {"endtime", "9:00 PM"},
+        {"endts", "1477443600"},
+        {"endyear", "2016"},
+        {"episode", "4"},
+        {"filesize", "6,056,109,800"},
+        {"filesize_str", "5.64 GB"},
+        {"inetref", "ttvdb.py_279121"},
+        {"input", "-"},
+        {"inputname", "Prime A-1"},
+        {"lastmodified", "Tue 25 October, 9:12 PM"},
+        {"lastmodifieddate", "Tue 25 October"},
+        {"lastmodifiedtime", "9:12 PM"},
+        {"lenmins", "64 minute(s)"},
+        {"lentime", "1 hour(s) 4 minute(s)"},
+        {"longchannel", "514 WNUBDT (WNUV-DT)"},
+        {"mediatype", "recording"},
+        {"mediatypestring", "Recording"},
+        {"numstars", "10"},
+        {"originalairdate", "Wed 26 October"},
+        {"partnumber", "50"},
+        {"parttotal", "133"},
+        {"playgroup", "Default"},
+        {"programflags", QChar(528)}, // Bad
+        {"programflags_str", "131600"},
+        {"programflags_names", "BOOKMARK|WATCHED|ALLOWLASTPLAYPOS"},
+        {"programid", "EP019229360055"},
+        {"recenddate", "Tue 25"},
+        {"recendtime", "9:02 PM"},
+        {"recordedid", QChar(715)},
+        {"recordedid_str", "715"},
+        {"recordinggroup", "Default"},
+        {"recpriority", QChar(7)},
+        {"recpriority2", QChar(0)},
+        {"recpriority_str", "7"},
+        {"recpriority2_str", "0"},
+        {"recstartdate", "Tue 25"},
+        {"recstarttime", "7:58 PM"},
+        {"recstatus", "Not Recording"},
+        {"recstatuslong", "This showing is not scheduled to record"},
+        {"rectype", "Not Recording"},
+        {"rectypechar", " "},
+        {"rectypestatus", "Not Recording"},
+        {"s00e00", "s03e04"},
+        {"season", "3"},
+        {"seriesid", "EP01922936"},
+        {"shortenddate", "Tue 25"},
+        {"shortoriginalairdate", "Wed 26"},
+        {"shortstartdate", "Tue 25"},
+        {"shortstarttimedate", "Tue 25, 7:58 PM"},
+        {"shorttimedate", "Tue 25, 7:58 PM - 9:02 PM"},
+        {"sortsubtitle", "new rogues"},
+        {"sorttitle", "flash (2014)"},
+        {"sorttitlesubtitle", "flash (2014) - \"new rogues\""},
+        {"stars", "10 star(s)"},
+        {"startdate", "Tue 25 October"},
+        {"starttime", "8:00 PM"},
+        {"starttimedate", "Tue 25 October, 7:58 PM"},
+        {"startts", "1477440000"},
+        {"startyear", "2016"},
+        {"storagegroup", "Default"},
+        {"subtitle", "The New Rogues"},
+        {"subtitleType", QChar(1)},
+        {"subtitleType_str", "1"},
+        {"subtitleType_names", "HARDHEAR"},
+        {"syndicatedepisode", "syndicatedepisode"},
+        {"timedate", "Tue 25 October, 7:58 PM - 9:02 PM"},
+        {"title", "The Flash (2014)"},
+        {"titlesubtitle", "The Flash (2014) - \"The New Rogues\""},
+        {"totalepisodes", "23"},
+        {"videoproperties", QChar(1090)},
+        {"videoproperties_str", "1090"},
+        {"videoproperties_names", "HDTV|1080|DAMAGED"},
+        {"year", "2016"},
+        {"yearstars", "(2016, 10 star(s))"},
+    };
+    InfoMap m_supergirl23Map = {
+        {"00x00", "2x03"},
+        {"audioproperties", QChar(33)},
+        {"audioproperties_str", "33"},
+        {"audioproperties_names", "STEREO|VISUALIMPAIR"},
+        {"callsign", "WNUVDT"},
+        {"card", "-"},
+        {"catType", "tvshow"},
+        {"category", "Drama"},
+        {"chanid", QChar(1514)},
+        {"chanid_str", "1514"},
+        {"channame", "WNUBDT (WNUV-DT)"},
+        {"channel", "514 WNUVDT"},
+        {"channum", "514"},
+        {"commfree", QChar(0)},
+        {"commfree_str", "0"},
+        {"description", "An attack is made on the President as hot-button..."},
+        {"description0", "An attack is made on the President as hot-button..."},
+        {"enddate", "Mon 24 October"},
+        {"endtime", "9:00 PM"},
+        {"endts", "1477357200"},
+        {"endyear", "2016"},
+        {"episode", "3"},
+        {"filesize", "6,056,109,670"},
+        {"filesize_str", "5.64 GB"},
+        {"inetref", "ttvdb.py_295759"},
+        {"input", "-"},
+        {"inputname", "Prime A-0"},
+        {"lastmodified", "Tue 25 October, 9:12 PM"},
+        {"lastmodifieddate", "Tue 25 October"},
+        {"lastmodifiedtime", "9:12 PM"},
+        {"lenmins", "64 minute(s)"},
+        {"lentime", "1 hour(s) 4 minute(s)"},
+        {"longchannel", "514 WNUBDT (WNUV-DT)"},
+        {"mediatype", "recording"},
+        {"mediatypestring", "Recording"},
+        {"numstars", "9"},
+        {"originalairdate", "Tue 25 October"},
+        {"outputfilters", ""},
+        {"partnumber", "23"},
+        {"parttotal", "106"},
+        {"playgroup", "Default"},
+        {"programflags", QChar(1538)},
+        {"programflags_str", "1538"},
+        {"programflags_names", "CUTLIST|WATCHED|PRESERVED"},
+        {"programid", "EP021854510025"},
+        {"recenddate", "Mon 24"},
+        {"recendtime", "9:02 PM"},
+        {"recordedid", QChar(711)}, // Bad
+        {"recordedid_str", "66247"},
+        {"recordinggroup", "Default"},
+        {"recpriority", QChar(-1)},
+        {"recpriority2", QChar(0)},
+        {"recpriority_str", "-1"},
+        {"recpriority2_str", "0"},
+        {"recstartdate", "Mon 24"},
+        {"recstarttime", "7:58 PM"},
+        {"recstatus", "Not Recording"},
+        {"recstatuslong", "This showing is not scheduled to record"},
+        {"rectype", "Not Recording"},
+        {"rectypechar", " "},
+        {"rectypestatus", "Not Recording"},
+        {"s00e00", "s02e03"},
+        {"season", "2"},
+        {"seriesid", "EP02185451"},
+        {"shortenddate", "Mon 24"},
+        {"shortoriginalairdate", "Tue 25"},
+        {"shortstartdate", "Mon 24"},
+        {"shortstarttimedate", "Mon 24, 7:58 PM"},
+        {"shorttimedate", "Mon 24, 7:58 PM - 9:02 PM"},
+        {"sortsubtitle", "welcome to earth"},
+        {"sorttitle", "supergirl"},
+        {"sorttitlesubtitle", "supergirl - \"welcome to earth\""},
+        {"stars", "9 star(s)"},
+        {"startdate", "Mon 24 October"},
+        {"starttime", "8:00 PM"},
+        {"starttimedate", "Mon 24 October, 7:58 PM"},
+        {"startts", "1477353600"},
+        {"startyear", "2016"},
+        {"storagegroup", "Default"},
+        {"subtitle", "Welcome to Earth"},
+        {"subtitleType", QChar(8)},
+        {"subtitleType_str", "8"},
+        {"subtitleType_names", "SIGNED"},
+        {"syndicatedepisode", "syndicatedepisode"},
+        {"timedate", "Mon 24 October, 7:58 PM - 9:02 PM"},
+        {"title", "Supergirl"},
+        {"titlesubtitle", "Supergirl - \"Welcome to Earth\""},
+        {"totalepisodes", "23"},
+        {"videoproperties", QChar(33)},
+        {"videoproperties_str", "33"},
+        {"videoproperties_names", "WIDESCREEN|720"},
+        {"year", "2016"},
+        {"yearstars", "(2016, 9 star(s))"},
+    };
+
     ProgramInfo m_dracula;
     ProgramInfo m_flash34;
     ProgramInfo m_supergirl23;
@@ -142,19 +334,24 @@ class TestProgramInfo : public QObject
              "/recordings/1514_20161025235800.ts",
              "localhost", "Default",
              "EP01922936", "EP019229360055", "ttvdb.py_279121",
-             ProgramInfo::kCategoryTVShow, 0, 6056109800,
+             ProgramInfo::kCategoryTVShow, 7, 6056109800,
              MythDate::fromString("2016-10-26 00:00:00"),
              MythDate::fromString("2016-10-26 01:00:00"),
              MythDate::fromString("2016-10-25 23:58:00"),
              MythDate::fromString("2016-10-26 01:02:00"),
-             0.0, 2016, 0, 0, QDate(2016,10,26),
+             0.95, 2016, 50, 133, QDate(2016,10,26),
              MythDate::fromString("2016-10-26 01:12:34"),
-             RecStatus::Unknown, 0,
+             RecStatus::Unknown, 19890314, // recordid
              kDupsInAll, kDupCheckSubThenDesc,
-             0, 0, 0, 0, 0, "Prime A-1",
+             20141007, // findId
+             FL_ALLOWLASTPLAYPOS | FL_WATCHED | FL_BOOKMARK,
+             AUD_DOLBY,
+             VID_DAMAGED | VID_1080 | VID_HDTV,
+             SUB_HARDHEAR,
+             "Prime A-1",
              QDateTime());
         m_supergirl23 = ProgramInfo
-            (711,
+            (65536+711,
              "Supergirl", "",
              "Welcome to Earth", "",
              "An attack is made on the President as hot-button...",
@@ -164,16 +361,21 @@ class TestProgramInfo : public QObject
              "/recordings/1514_20161024235800.ts",
              "localhost", "Default",
              "EP02185451", "EP021854510025", "ttvdb.py_295759",
-             ProgramInfo::kCategoryTVShow, 0, 6056109670,
+             ProgramInfo::kCategoryTVShow, -1, 6056109670,
              MythDate::fromString("2016-10-25 00:00:00"),
              MythDate::fromString("2016-10-25 01:00:00"),
              MythDate::fromString("2016-10-24 23:58:00"),
              MythDate::fromString("2016-10-25 01:02:00"),
-             0.0, 2016, 0, 0, QDate(2016,10,25),
+             0.94, 2016, 23, 106, QDate(2016,10,25),
              MythDate::fromString("2016-10-26 01:12:34"),
-             RecStatus::Unknown, 0,
+             RecStatus::Unknown, 19660922, // recordid
              kDupsInAll, kDupCheckSubThenDesc,
-             0, 0, 0, 0, 0, "Prime A-0",
+             20151026, // findId
+             FL_PRESERVED | FL_WATCHED | FL_CUTLIST,
+             AUD_VISUALIMPAIR | AUD_STEREO,
+             VID_720 | VID_WIDESCREEN,
+             SUB_SIGNED,
+             "Prime A-0",
              QDateTime());
     }
 
@@ -289,6 +491,14 @@ class TestProgramInfo : public QObject
         QVERIFY(m_supergirl23 == lrigrepus23c);
     }
 
+    void printList (const QStringList& list)
+    {
+        Q_UNUSED(list);
+#if DEBUG
+        std::cerr << qPrintable(list.join('|')) << std::endl;
+#endif
+    }
+
     void programSorting_test(void)
     {
         QStringList program_list;
@@ -302,10 +512,12 @@ class TestProgramInfo : public QObject
         program_list.clear();
 
         m_flash34.ToStringList(program_list);
+        printList(program_list);
         QVERIFY (program_list.join('|') == m_flash34List);
         program_list.clear();
 
         m_supergirl23.ToStringList(program_list);
+        printList(program_list);
         QVERIFY (program_list.join('|') == m_supergirl23List);
         program_list.clear();
 
@@ -391,5 +603,83 @@ class TestProgramInfo : public QObject
         QString output = input;
         m_supergirl23.SubstituteMatches(output);
         QCOMPARE(output, expected);
+    }
+
+    void checkMap (const InfoMap& actual, InfoMap expected)
+    {
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+        for (auto key : actual.keys())
+        {
+            auto actualValue = actual[key];
+            if (expected.contains(key))
+            {
+                QVERIFY2(actualValue == expected[key],
+                         qPrintable(QString("Key '%1': actual '%2' is not expected '%3'")
+                                    .arg(key).arg(actualValue).arg(expected[key])));
+                expected.remove(key);
+            }
+            else
+            {
+                QVERIFY2(actualValue == QString(""),
+                         qPrintable(QString("Key '%1': actual '%2' is not empty")
+                                    .arg(key).arg(actualValue)));
+            }
+        }
+#else
+        for (auto it = actual.constKeyValueBegin(); it != actual.constKeyValueEnd(); it++)
+        {
+            auto [key, actualValue] = *it;
+            if (expected.contains(key))
+            {
+                QVERIFY2(actualValue == expected[key],
+                         qPrintable(QString("Key '%1': actual '%2' is not expected '%3'")
+                                    .arg(key).arg(actualValue).arg(expected[key])));
+                expected.remove(key);
+            }
+            else
+            {
+                QVERIFY2(actualValue == QString(""),
+                         qPrintable(QString("Key '%1': actual '%2' is not empty")
+                                    .arg(key).arg(actualValue)));
+            }
+        }
+#endif
+        QStringList missingKeys = expected.keys();
+        QCOMPARE(QString(""), missingKeys.join('|'));
+    }
+
+    void printMap (const QString& title, const QString& subtitle, const InfoMap& progMap)
+    {
+        Q_UNUSED(title);
+        Q_UNUSED(subtitle);
+        Q_UNUSED(progMap);
+#if DEBUG
+        std::cerr << qPrintable(QString("progMap for title '%1' subtitle '%2'")
+                                .arg(title).arg(subtitle))
+                  << std::endl;
+        auto keys = progMap.keys();
+        keys.sort();
+        for (auto key : keys)
+        {
+            if (progMap[key].size() > 1)
+                std::cerr << qPrintable(QString("  %1: string [%2]").arg(key).arg(progMap[key])) << std::endl;
+            else if (progMap[key].size() == 1)
+                std::cerr << qPrintable(QString("  %1: NUMBER [%2]").arg(key).arg(progMap[key].at(0).unicode())) << std::endl;
+            else
+                std::cerr << qPrintable(QString("  %1: [<empty>]").arg(key)) << std::endl;
+        }
+#endif
+    }
+
+    void test_toMap (void)
+    {
+        InfoMap progMap;
+        m_flash34.ToMap(progMap);
+        printMap(m_flash34.GetTitle(), m_flash34.GetSubtitle(), progMap);
+        checkMap(progMap, m_flash34Map);
+
+        m_supergirl23.ToMap(progMap);
+        printMap(m_supergirl23.GetTitle(), m_supergirl23.GetSubtitle(), progMap);
+        checkMap(progMap, m_supergirl23Map);
     }
 };
