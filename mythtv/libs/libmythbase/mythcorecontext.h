@@ -310,6 +310,8 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     Q_DISABLE_COPY_MOVE(MythCoreContext)
     MythCoreContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
 
+    QList<QPair<QHostAddress, int>> allowedSubnets();
+
     QMap<QString,int>     m_testOverrideInts;
     QMap<QString,double>  m_testOverrideFloats;
     QMap<QString,QString> m_testOverrideStrings;
