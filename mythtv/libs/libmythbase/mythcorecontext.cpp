@@ -1268,6 +1268,8 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
  * There is a setting called AllowConnFromAll. If it is
  * true, then no check needs to be done. If false, check that
  * the connection comes from a subnet to which I am connected.
+ * If again false, check if the connection comes from a subnet
+ * listed in the AllowConnFromSubnets setting.
  *
  * \param socket in Socket to check.
  * \return true if the connection is allowed, false if not.
@@ -1285,6 +1287,8 @@ bool MythCoreContext::CheckSubnet(const QAbstractSocket *socket)
  * There is a setting called AllowConnFromAll. If it is
  * true, then no check needs to be done. If false, check that
  * the connection comes from a subnet to which I am connected.
+ * If again false, check if the connection comes from a subnet
+ * listed in the AllowConnFromSubnets setting.
  *
  * \param peer in Host Address to check.
  * \return true if the connection is allowed, false if not.
@@ -1334,6 +1338,17 @@ bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
             }
         }
     }
+
+    // check AllowConnFromSubnets
+    for (const auto &subnet : allowedSubnets())
+    {
+        if (peer.isInSubnet(subnet.first, subnet.second))
+        {
+            d->m_approvedIps.append(peer);
+            return true;
+        }
+    }
+
     d->m_deniedIps.append(peer);
     LOG(VB_GENERAL, LOG_WARNING, LOC +
         QString("Denied connection from ip address: %1")
@@ -1341,6 +1356,22 @@ bool MythCoreContext::CheckSubnet(const QHostAddress &peer)
     return false;
 }
 
+QList<QPair<QHostAddress, int>> MythCoreContext::allowedSubnets()
+{
+    QList<QPair<QHostAddress, int>> subnets{};
+
+    auto subnetList = GetSetting("AllowConnFromSubnets", "");
+    if (subnetList == "")
+        return subnets;
+
+    for (const auto &subnet : subnetList.split(";"))
+    {
+        const auto parsed = QHostAddress::parseSubnet(subnet);
+        subnets.append(parsed);
+    }
+
+    return subnets;
+}
 
 void MythCoreContext::OverrideSettingForSession(const QString &key,
                                                 const QString &value)
