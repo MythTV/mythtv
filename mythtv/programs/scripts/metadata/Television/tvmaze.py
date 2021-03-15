@@ -85,9 +85,30 @@ def buildList(tvtitle, opts):
         if show_info.premiere_date:
             m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
             m.year = check_item(m, ("year", show_info.premiere_date.year))
-        if show_info.images is not None and len(show_info.images) > 0:
-            m.images.append({'type': 'coverart', 'url': show_info.images['original'],
-                             'thumb': show_info.images['medium']})
+
+        artlist = tvmaze.get_show_artwork(show_info.id)
+        fanartList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'background']
+        posterList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'poster']
+        bannerList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'banner']
+
+        for fanartEntry in fanartList:
+            if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+                m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+            elif fanartEntry[0] is not None:
+                m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
+
+        for posterEntry in posterList:
+            if (posterEntry[0] is not None) and (posterEntry[1] is not None):
+                m.images.append({'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]})
+            elif posterEntry[0] is not None:
+                m.images.append({'type': 'coverart', 'url': posterEntry[0]})
+
+        for bannerEntry in bannerList:
+            if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
+                m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
+            elif bannerEntry[0] is not None:
+                m.images.append({'type': 'banner', 'url': bannerEntry[0]})
+
         tree.append(m.toXML())
 
     print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
@@ -371,9 +392,30 @@ def buildCollection(tvinetref, opts):
             m.studios.append(sinfo)
     except:
         pass
-    if show_info.images is not None and len(show_info.images) > 0:
-        m.images.append({'type': 'coverart', 'url': show_info.images['original'],
-                         'thumb': show_info.images['medium']})
+
+    artlist = tvmaze.get_show_artwork(show_info.id)
+    fanartList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'background']
+    posterList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'poster']
+    bannerList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'banner']
+
+    for fanartEntry in fanartList:
+        if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+        elif fanartEntry[0] is not None:
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
+
+    for posterEntry in posterList:
+        if (posterEntry[0] is not None) and (posterEntry[1] is not None):
+            m.images.append({'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]})
+        elif posterEntry[0] is not None:
+            m.images.append({'type': 'coverart', 'url': posterEntry[0]})
+
+    for bannerEntry in bannerList:
+        if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
+            m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
+        elif bannerEntry[0] is not None:
+            m.images.append({'type': 'banner', 'url': bannerEntry[0]})
+
     tree.append(m.toXML())
 
     print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
