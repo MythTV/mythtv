@@ -87,23 +87,45 @@ def buildList(tvtitle, opts):
             m.year = check_item(m, ("year", show_info.premiere_date.year))
 
         artlist = tvmaze.get_show_artwork(show_info.id)
-        fanartList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'background']
-        posterList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'poster']
-        bannerList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'banner']
 
-        for fanartEntry in fanartList:
+        #--------------------------------------------------------------------------
+        # The Main flag is true for artwork which is "official" from the Network.
+        # Under the theory that "official" artwork should be high quality, we want
+        # those artworks to be located at the beginning of the generated list.
+        #--------------------------------------------------------------------------
+        fanartList = [(art_item.original, art_item.medium) for art_item in artlist \
+                  if ((art_item.main == True) and (art_item.type == 'background'))]
+        fanartReg  = [(art_item.original, art_item.medium) for art_item in artlist \
+                  if ((art_item.main == False) and (art_item.type == 'background'))]
+        fanartList.extend(fanartReg)
+        posterList = [(art_item.original, art_item.medium) for art_item in artlist \
+                  if ((art_item.main == True) and (art_item.type == 'poster'))]
+        posterReg  = [(art_item.original, art_item.medium) for art_item in artlist \
+                  if ((art_item.main == False) and (art_item.type == 'poster'))]
+        posterList.extend(posterReg)
+        bannerList = [(art_item.original, art_item.medium) for art_item in artlist \
+                  if ((art_item.main == True) and (art_item.type == 'banner'))]
+        bannerReg  = [(art_item.original, art_item.medium) for art_item in artlist \
+                  if ((art_item.main == False) and (art_item.type == 'banner'))]
+        bannerList.extend(bannerReg)
+
+        # Generate one image line for each type of artwork
+        if fanartList:
+            fanartEntry = fanartList[0]
             if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
                 m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
             elif fanartEntry[0] is not None:
                 m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
 
-        for posterEntry in posterList:
+        if posterList:
+            posterEntry = posterList[0]
             if (posterEntry[0] is not None) and (posterEntry[1] is not None):
                 m.images.append({'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]})
             elif posterEntry[0] is not None:
                 m.images.append({'type': 'coverart', 'url': posterEntry[0]})
 
-        for bannerEntry in bannerList:
+        if bannerList:
+            bannerEntry = bannerList[0]
             if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
                 m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
             elif bannerEntry[0] is not None:
@@ -394,10 +416,29 @@ def buildCollection(tvinetref, opts):
         pass
 
     artlist = tvmaze.get_show_artwork(show_info.id)
-    fanartList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'background']
-    posterList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'poster']
-    bannerList = [(art_item.original, art_item.medium) for art_item in artlist if art_item.type == 'banner']
 
+    #--------------------------------------------------------------------------
+    # The Main flag is true for artwork which is "official" from the Network.
+    # Under the theory that "official" artwork should be high quality, we want
+    # those artworks to be located at the beginning of the generated list.
+    #--------------------------------------------------------------------------
+    fanartList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((art_item.main == True) and (art_item.type == 'background'))]
+    fanartReg  = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((art_item.main == False) and (art_item.type == 'background'))]
+    fanartList.extend(fanartReg)
+    posterList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((art_item.main == True) and (art_item.type == 'poster'))]
+    posterReg  = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((art_item.main == False) and (art_item.type == 'poster'))]
+    posterList.extend(posterReg)
+    bannerList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((art_item.main == True) and (art_item.type == 'banner'))]
+    bannerReg  = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((art_item.main == False) and (art_item.type == 'banner'))]
+    bannerList.extend(bannerReg)
+
+    # Generate image lines for every piece of artwork
     for fanartEntry in fanartList:
         if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
             m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
