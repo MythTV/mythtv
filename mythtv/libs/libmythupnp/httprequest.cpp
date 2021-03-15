@@ -951,6 +951,10 @@ HttpContentType HTTPRequest::SetContentType( const QString &sType )
         (sType.startsWith("text/xml;")                         ))
         return( m_eContentType = ContentType_XML        );
 
+    if ((sType == "application/json") ||
+        sType.startsWith("application/json;"))
+        return( m_eContentType = ContentType_JSON);
+
     return( m_eContentType = ContentType_Unknown );
 }
 
@@ -1407,6 +1411,8 @@ bool HTTPRequest::ParseRequest()
                 // See if the payload is just data from a form post
                 if (m_eContentType == ContentType_Urlencoded)
                     GetParameters( m_sPayload, m_mapParams );
+                if (m_eContentType == ContentType_JSON)
+                    m_mapParams.insert( "json", m_sPayload );
             }
             else
             {
@@ -2488,4 +2494,3 @@ QString BufferedSocketDeviceRequest::GetPeerAddress()
 {
     return( m_pSocket->peerAddress().toString() );
 }
-
