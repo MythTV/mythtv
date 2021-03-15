@@ -201,7 +201,9 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
 
     m_findId(other.m_findId),
     m_programFlags(other.m_programFlags),
-    m_properties(other.m_properties),
+    m_videoProperties(other.m_videoProperties),
+    m_audioProperties(other.m_audioProperties),
+    m_subtitleProperties(other.m_subtitleProperties),
     m_year(other.m_year),
     m_partNumber(other.m_partNumber),
     m_partTotal(other.m_partTotal),
@@ -384,9 +386,9 @@ ProgramInfo::ProgramInfo(
     m_findId(_findid),
 
     m_programFlags(_programflags),
-    m_properties((_subtitleType    << kSubtitlePropertyOffset) |
-               (_videoproperties << kVideoPropertyOffset)    |
-               (_audioproperties << kAudioPropertyOffset)),
+    m_videoProperties(_videoproperties),
+    m_audioProperties(_audioproperties),
+    m_subtitleProperties(_subtitleType),
     m_year(_year),
     m_partNumber(_partnumber),
     m_partTotal(_parttotal),
@@ -566,9 +568,9 @@ ProgramInfo::ProgramInfo(
     m_recordId(_recordid),
     m_findId(_findid),
 
-    m_properties((_subtitleType    << kSubtitlePropertyOffset) |
-               (_videoproperties << kVideoPropertyOffset)    |
-               (_audioproperties << kAudioPropertyOffset)),
+    m_videoProperties(_videoproperties),
+    m_audioProperties(_audioproperties),
+    m_subtitleProperties(_subtitleType),
     m_year(_year),
     m_partNumber(_partnumber),
     m_partTotal(_parttotal),
@@ -912,7 +914,9 @@ void ProgramInfo::clone(const ProgramInfo &other,
 
     m_findId = other.m_findId;
     m_programFlags = other.m_programFlags;
-    m_properties = other.m_properties;
+    m_videoProperties = other.m_videoProperties;
+    m_audioProperties = other.m_audioProperties;
+    m_subtitleProperties= other.m_subtitleProperties;
 
     if (!ignore_non_serialized_data)
     {
@@ -997,7 +1001,9 @@ void ProgramInfo::clear(void)
     m_findId = 0;
 
     m_programFlags = FL_NONE;
-    m_properties = 0;
+    m_videoProperties = VID_UNKNOWN;
+    m_audioProperties = AUD_UNKNOWN;
+    m_subtitleProperties = SUB_UNKNOWN;
 
     // everything below this line is not serialized
     m_spread = -1;
@@ -1109,7 +1115,9 @@ bool ProgramInfo::operator==(const ProgramInfo& rhs)
         return false;
 
     if ((m_programFlags != rhs.m_programFlags) ||
-        (m_properties != rhs.m_properties) ||
+        (m_videoProperties != rhs.m_videoProperties) ||
+        (m_audioProperties != rhs.m_audioProperties) ||
+        (m_subtitleProperties != rhs.m_subtitleProperties) ||
         (m_year != rhs.m_year) ||
         (m_partNumber != rhs.m_partNumber) ||
         (m_partTotal != rhs.m_partTotal))
@@ -1314,9 +1322,9 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(m_recPriority2);      // 39
     INT_TO_LIST(m_parentId);          // 40
     STR_TO_LIST((!m_storageGroup.isEmpty()) ? m_storageGroup : "Default"); // 41
-    INT_TO_LIST(GetAudioProperties()); // 42
-    INT_TO_LIST(GetVideoProperties()); // 43
-    INT_TO_LIST(GetSubtitleType());    // 44
+    INT_TO_LIST(m_audioProperties);    // 42
+    INT_TO_LIST(m_videoProperties);    // 43
+    INT_TO_LIST(m_subtitleProperties); // 44
 
     INT_TO_LIST(m_year);              // 45
     INT_TO_LIST(m_partNumber);   // 46
@@ -1424,15 +1432,9 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(m_recPriority2);      // 39
     INT_FROM_LIST(m_parentId);          // 40
     STR_FROM_LIST(m_storageGroup);      // 41
-    uint audioproperties = 0;
-    uint videoproperties = 0;
-    uint subtitleType = 0;
-    INT_FROM_LIST(audioproperties);   // 42
-    INT_FROM_LIST(videoproperties);   // 43
-    INT_FROM_LIST(subtitleType);      // 44
-    m_properties = ((subtitleType    << kSubtitlePropertyOffset) |
-                    (videoproperties << kVideoPropertyOffset)    |
-                    (audioproperties << kAudioPropertyOffset));
+    INT_FROM_LIST(m_audioProperties);   // 42
+    INT_FROM_LIST(m_videoProperties);   // 43
+    INT_FROM_LIST(m_subtitleProperties);// 44
 
     INT_FROM_LIST(m_year);              // 45
     INT_FROM_LIST(m_partNumber);        // 46
@@ -2044,9 +2046,9 @@ bool ProgramInfo::LoadProgramFromRecorded(
              ((m_programFlags & FL_REALLYEDITING) != 0U) ||
              ((m_programFlags & FL_COMMPROCESSING) != 0U));
 
-    m_properties = ((query.value(44).toUInt() << kSubtitlePropertyOffset) |
-                    (query.value(43).toUInt() << kVideoPropertyOffset)    |
-                    (query.value(42).toUInt() << kAudioPropertyOffset));
+    m_audioProperties    = query.value(42).toUInt();
+    m_videoProperties    = query.value(43).toUInt();
+    m_subtitleProperties = query.value(44).toUInt();
     // ancillary data -- end
 
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1895, 12, 28))
@@ -4672,11 +4674,10 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint video_property_flags)
         return;
     }
 
-    uint videoproperties = GetVideoProperties();
+    uint videoproperties = m_videoProperties;
     videoproperties &= ~mask;
     videoproperties |= video_property_flags;
-    m_properties &= ~kVideoPropertyMask;
-    m_properties |= videoproperties << kVideoPropertyOffset;
+    m_videoProperties = videoproperties;
 
     SendUpdateEvent();
 }

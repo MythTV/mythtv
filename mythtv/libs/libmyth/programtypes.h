@@ -174,10 +174,8 @@ enum AudioProps {
     AUD_DOLBY         = 0x08,
     AUD_HARDHEAR      = 0x10,
     AUD_VISUALIMPAIR  = 0x20,
-}; // has 6 bits in ProgramInfo::properties
-#define kAudioPropertyBits 6
-#define kAudioPropertyOffset 0
-#define kAudioPropertyMask (0x3f<<kAudioPropertyOffset)
+};
+using AudioPropsType = uint8_t;
 
 /// if VideoProps changes, the videoprop column in program and
 /// recordedprogram has to changed accordingly
@@ -195,10 +193,8 @@ enum VideoProps {
     VID_3DTV          = 0x100,
     VID_PROGRESSIVE   = 0x200,
     VID_DAMAGED       = 0x400,
-}; // has 11 bits in ProgramInfo::properties
-#define kVideoPropertyBits 11
-#define kVideoPropertyOffset kAudioPropertyBits
-#define kVideoPropertyMask (0x7ff<<kVideoPropertyOffset)
+};
+using VideoPropsType = uint16_t;
 
 /// if SubtitleTypes changes, the subtitletypes column in program and
 /// recordedprogram has to changed accordingly
@@ -209,10 +205,8 @@ enum SubtitleType {
     SUB_NORMAL        = 0x02,
     SUB_ONSCREEN      = 0x04,
     SUB_SIGNED        = 0x08
-}; // has 4 bits in ProgramInfo::properties
-#define kSubtitlePropertyBits 4
-#define kSubtitlePropertyOffset (kAudioPropertyBits+kVideoPropertyBits)
-#define kSubtitlePropertyMask (0x0f<<kSubtitlePropertyOffset)
+};
+using SubtitlePropsType = uint8_t;
 
 
 enum AvailableStatusType {
