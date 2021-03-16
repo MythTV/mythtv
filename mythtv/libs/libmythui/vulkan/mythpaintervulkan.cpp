@@ -329,7 +329,7 @@ void MythPainterVulkan::End()
     // Retrieve the command buffer
     VkCommandBuffer currentcmdbuf = m_vulkan->Window()->currentCommandBuffer();
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_vulkan->Render()->BeginDebugRegion(currentcmdbuf, "PAINTER_RENDER", MythDebugVulkan::s_DebugGreen);
+        m_vulkan->Render()->BeginDebugRegion(currentcmdbuf, "PAINTER_RENDER", MythDebugVulkan::kDebugGreen);
 
     // Bind our pipeline and retrieve layout once
     m_vulkan->Funcs()->vkCmdBindPipeline(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_texturePipeline);

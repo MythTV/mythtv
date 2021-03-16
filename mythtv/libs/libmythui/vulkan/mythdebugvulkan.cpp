@@ -5,11 +5,11 @@
 
 #define LOC QString("VulkanMarker: ")
 
-MythVulkan4F const MythDebugVulkan::s_DebugRed   { 1.0, 0.0, 0.0, 1.0 };
-MythVulkan4F const MythDebugVulkan::s_DebugGreen { 0.0, 1.0, 0.0, 1.0 };
-MythVulkan4F const MythDebugVulkan::s_DebugBlue  { 0.0, 0.0, 1.0, 1.0 };
-MythVulkan4F const MythDebugVulkan::s_DebugGray  { 0.5, 0.5, 0.5, 1.0 };
-MythVulkan4F const MythDebugVulkan::s_DebugBlack { 0.0, 0.0, 0.0, 1.0 };
+MythVulkan4F const MythDebugVulkan::kDebugRed   { 1.0, 0.0, 0.0, 1.0 };
+MythVulkan4F const MythDebugVulkan::kDebugGreen { 0.0, 1.0, 0.0, 1.0 };
+MythVulkan4F const MythDebugVulkan::kDebugBlue  { 0.0, 0.0, 1.0, 1.0 };
+MythVulkan4F const MythDebugVulkan::kDebugGray  { 0.5, 0.5, 0.5, 1.0 };
+MythVulkan4F const MythDebugVulkan::kDebugBlack { 0.0, 0.0, 0.0, 1.0 };
 
 MythDebugVulkan* MythDebugVulkan::Create(MythVulkanObject *Vulkan)
 {
