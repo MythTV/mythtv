@@ -122,6 +122,7 @@ void MythSystemLegacyIOHandler::run(void)
             }
             else if( retval > 0 )
             {
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
                 PMap_t::iterator i;
                 PMap_t::iterator next;
                 for( i = m_pMap.begin(); i != m_pMap.end(); i = next )
@@ -136,6 +137,21 @@ void MythSystemLegacyIOHandler::run(void)
                             HandleWrite(i.key(), i.value());
                     }
                 }
+#else
+                auto it = m_pMap.keyValueBegin();
+                while (it != m_pMap.keyValueEnd())
+                {
+                    auto [fd, buffer] = *it;
+                    ++it;
+                    if( FD_ISSET(fd, &fds) )
+                    {
+                        if( m_read )
+                            HandleRead(fd, buffer);
+                        else
+                            HandleWrite(fd, buffer);
+                    }
+                }
+#endif
             }
             m_pLock.unlock();
         }
@@ -378,11 +394,21 @@ void MythSystemLegacyManager::run(void)
 
         m_mapLock.lock();
         m_jumpLock.lock();
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         for( i = m_pMap.begin(); i != m_pMap.end(); i = next )
+#else
+        auto it = m_pMap.keyValueBegin();
+        while (it != m_pMap.keyValueEnd())
+#endif
         {
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
             next = i + 1;
-            pid  = i.key();
+            auto pid2  = i.key();
             MythSystemLegacyUnix *ms = i.value();
+#else
+            auto [pid2, ms] = *it;
+            ++it;
+#endif
             if (!ms)
                 continue;
 
@@ -394,7 +420,7 @@ void MythSystemLegacyManager::run(void)
                 {
                     LOG(VB_SYSTEM, LOG_INFO,
                         QString("Managed child (PID: %1) timed out"
-                                ", issuing KILL signal").arg(pid));
+                                ", issuing KILL signal").arg(pid2));
                     // Prevent constant attempts to kill an obstinate child
                     ms->m_timeout = SystemTime(0s);
                     ms->Signal(SIGKILL);
@@ -405,7 +431,7 @@ void MythSystemLegacyManager::run(void)
                 {
                     LOG(VB_SYSTEM, LOG_INFO,
                         QString("Managed child (PID: %1) timed out"
-                                ", issuing TERM signal").arg(pid));
+                                ", issuing TERM signal").arg(pid2));
                     ms->SetStatus( GENERIC_EXIT_TIMEOUT );
                     ms->m_timeout = now + 1s;
                     ms->Term();
