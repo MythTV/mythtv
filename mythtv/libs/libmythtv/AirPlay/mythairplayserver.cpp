@@ -11,6 +11,9 @@
 #include <QCoreApplication>
 #include <QKeyEvent>
 #include <QCryptographicHash>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QTimer>
 #include <QUrlQuery>
 
@@ -982,7 +985,11 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
         socket->state() != QAbstractSocket::ConnectedState)
         return;
     QTextStream response(socket);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     response.setCodec("UTF-8");
+#else
+    response.setCodec(QStringConverter::Utf8);
+#endif
     QByteArray reply;
     reply.append("HTTP/1.1 ");
     reply.append(QString::number(status).toUtf8());
@@ -1040,7 +1047,11 @@ bool MythAirplayServer::SendReverseEvent(QByteArray &session,
 
     m_connections[session].m_lastEvent = event;
     QTextStream response(m_connections[session].m_reverseSocket);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     response.setCodec("UTF-8");
+#else
+    response.setCodec(QStringConverter::Utf8);
+#endif
     QByteArray reply;
     reply.append("POST /event HTTP/1.1\r\n");
     reply.append("Content-Type: text/x-apple-plist+xml\r\n");

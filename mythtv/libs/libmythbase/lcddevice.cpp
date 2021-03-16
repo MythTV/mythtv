@@ -20,6 +20,9 @@
 #include <QTextStream>
 #include <QTextCodec>
 #include <QByteArray>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QTcpSocket>
 #include <QTimer>
 
@@ -212,7 +215,11 @@ void LCD::sendToServerSlot(const QString &someText)
     }
 
     QTextStream os(m_socket);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     os.setCodec(QTextCodec::codecForName("ISO 8859-1"));
+#else
+    os.setEncoding(QStringConverter::Latin1);
+#endif
 
     m_lastCommand = someText;
 
