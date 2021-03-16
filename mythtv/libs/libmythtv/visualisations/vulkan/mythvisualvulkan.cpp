@@ -4,16 +4,18 @@
 #include "vulkan/mythuniformbuffervulkan.h"
 #include "visualisations/vulkan/mythvisualvulkan.h"
 
+#include <utility>
+
 #define LOC QString("VulkanVis: ")
 
 MythVisualVulkan::MythVisualVulkan(MythRenderVulkan *Render,
-                                   const std::vector<VkDynamicState>& Dynamic,
-                                   const std::vector<int>& Stages,
+                                   std::vector<VkDynamicState> Dynamic,
+                                   std::vector<int> Stages,
                                    const MythShaderMap *Sources,
                                    const MythBindingMap *Bindings)
   : MythVulkanObject(Render),
-    m_dynamicState(Dynamic),
-    m_shaderStages(Stages),
+    m_dynamicState(std::move(Dynamic)),
+    m_shaderStages(std::move(Stages)),
     m_shaderSources(Sources),
     m_shaderBindings(Bindings)
 {

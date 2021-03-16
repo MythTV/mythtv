@@ -10,8 +10,8 @@ class MythVisualVulkan : public MythVulkanObject
 {
   public:
     MythVisualVulkan(MythRenderVulkan* Render,
-                     const std::vector<VkDynamicState>& Dynamic,
-                     const std::vector<int>& Stages,
+                     std::vector<VkDynamicState> Dynamic,
+                     std::vector<int> Stages,
                      const MythShaderMap* Sources,
                      const MythBindingMap* Bindings);
     virtual ~MythVisualVulkan();
