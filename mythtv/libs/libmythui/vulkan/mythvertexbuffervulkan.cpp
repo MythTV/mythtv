@@ -6,7 +6,7 @@
 
 MythBufferVulkan* MythBufferVulkan::Create(MythVulkanObject *Vulkan, VkDeviceSize Size)
 {
-    MythBufferVulkan* result = new MythBufferVulkan(Vulkan, Size);
+    auto* result = new MythBufferVulkan(Vulkan, Size);
     if (result && !result->IsValidVulkan())
     {
         delete result;
@@ -60,7 +60,7 @@ void MythBufferVulkan::Update(VkCommandBuffer CommandBuffer)
 
 MythVertexBufferVulkan* MythVertexBufferVulkan::Create(MythVulkanObject *Vulkan, VkDeviceSize Size)
 {
-    MythVertexBufferVulkan* result = new MythVertexBufferVulkan(Vulkan, Size);
+    auto* result = new MythVertexBufferVulkan(Vulkan, Size);
     if (result && !result->IsValidVulkan())
     {
         delete result;
