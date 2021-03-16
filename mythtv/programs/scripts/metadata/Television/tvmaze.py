@@ -83,7 +83,7 @@ def buildList(tvtitle, opts):
         m.collectionref = check_item(m, ("collectionref", str(show_info.id)), ignore=False)
         m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
         m.userrating = check_item(m, ("userrating", show_info.rating['average']))
-        m.popularity = check_item(m, ("popularity", show_info.weight), ignore=False)
+        m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
         if show_info.premiere_date:
             m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
             m.year = check_item(m, ("year", show_info.premiere_date.year))
@@ -308,7 +308,7 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     m.collectionref = check_item(m, ("inetref", str(show_info.id)), ignore=False)
     m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
     m.userrating = check_item(m, ("userrating", show_info.rating['average']))
-    m.popularity = check_item(m, ("popularity", show_info.weight), ignore=False)
+    m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
     # prefer episode airdate dates:
     if ep_info.airdate:
         m.releasedate = check_item(m, ("releasedate", ep_info.airdate))
@@ -409,7 +409,7 @@ def buildCollection(tvinetref, opts):
     m.imdb = check_item(m, ("imdb", str(show_info.external_ids['imdb'])))
     m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
     m.userrating = check_item(m, ("userrating", show_info.rating['average']))
-    m.popularity = check_item(m, ("popularity", show_info.weight), ignore=False)
+    m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
     if show_info.premiere_date:
         m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
         m.year = check_item(m, ("year", show_info.premiere_date.year))
