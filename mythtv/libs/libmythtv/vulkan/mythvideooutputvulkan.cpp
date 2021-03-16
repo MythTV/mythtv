@@ -87,10 +87,7 @@ bool MythVideoOutputVulkan::Init(const QSize VideoDim, const QSize VideoDispDim,
         return false;
     }
 
-    if (!MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecId))
-        return false;
-
-    return true;
+    return MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecId);
 }
 
 void MythVideoOutputVulkan::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
