@@ -16,9 +16,9 @@
 #include "videolist.h"
 #include "videofilter.h"
 
-const QRegularExpression VideoFilterSettings::m_reSeason {
+const QRegularExpression VideoFilterSettings::kReSeason {
     "(\\d+)x(\\d*)", QRegularExpression::CaseInsensitiveOption };
-const QRegularExpression VideoFilterSettings::m_reDate {
+const QRegularExpression VideoFilterSettings::kReDate {
     "-(\\d+)([dwmy])", QRegularExpression::CaseInsensitiveOption };
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
@@ -387,7 +387,7 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
 void VideoFilterSettings::setTextFilter(const QString& val)
 {
     m_changedState |= kFilterTextFilterChanged;
-    auto match = m_reSeason.match(val);
+    auto match = kReSeason.match(val);
     if (match.hasMatch())
     {
         m_season = match.capturedView(1).isEmpty()
@@ -405,7 +405,7 @@ void VideoFilterSettings::setTextFilter(const QString& val)
         m_season = -1;
         m_episode = -1;
     }
-    match = m_reDate.match(m_textFilter);
+    match = kReDate.match(m_textFilter);
     if (match.hasMatch())
     {
         int modnr = match.capturedView(1).toInt();

@@ -237,8 +237,8 @@ class VideoFilterSettings
     int                  m_season         {-1};
     int                  m_episode        {-1};
     QDate                m_insertDate;
-    static const QRegularExpression m_reSeason;
-    static const QRegularExpression m_reDate;
+    static const QRegularExpression kReSeason;
+    static const QRegularExpression kReDate;
 
     unsigned int         m_changedState   {0};
 };
