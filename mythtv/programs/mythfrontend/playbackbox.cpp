@@ -921,7 +921,7 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
         codecFlags[VID_AVC]   = "avc";
         codecFlags[VID_HEVC]  = "hevc";
 
-        QMap<SubtitleType, QString> subtitleFlags;
+        QMap<SubtitleProps, QString> subtitleFlags;
         subtitleFlags[SUB_SIGNED]   = "deafsigned";
         subtitleFlags[SUB_ONSCREEN] = "onscreensub";
         subtitleFlags[SUB_NORMAL]   = "subtitles";
@@ -1002,7 +1002,7 @@ void PlaybackBox::ItemLoaded(MythUIButtonListItem *item)
                 item->DisplayState("sd", "videoprops");
         }
 
-        QMap<SubtitleType, QString>::iterator sit;
+        QMap<SubtitleProps, QString>::iterator sit;
         for (sit = subtitleFlags.begin(); sit != subtitleFlags.end(); ++sit)
         {
             if (pginfo->GetSubtitleType() & sit.key())
