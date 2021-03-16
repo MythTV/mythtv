@@ -2173,7 +2173,7 @@ class SchedGroupFalse : public MythUICheckBoxSetting
 
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& parent,
                                              CardType& cardtype,
-                                             const QString inputtype) :
+                                             const QString &inputtype) :
     m_parent(parent),
     m_cardInfo(new GroupSetting()),
     m_vbiDev(new VBIDevice(m_parent))
