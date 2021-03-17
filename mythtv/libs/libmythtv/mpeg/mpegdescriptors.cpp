@@ -695,7 +695,7 @@ QString MPEGDescriptor::toStringXML(uint level) const
     str += indent_1 + QString("<Tag>0x%1</Tag>\n")
         .arg(DescriptorTag(),2,16,QChar('0'));
     str += indent_1 + QString("<Description>%1</Description>\n")
-        .arg(DescriptorTagString(),0,16);
+        .arg(DescriptorTagString());
 
     str += indent_1 + "<Data>";
     for (uint i = 0; i < DescriptorLength(); i++)
