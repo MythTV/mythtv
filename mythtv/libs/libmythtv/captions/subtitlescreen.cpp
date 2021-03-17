@@ -1128,7 +1128,7 @@ static QString extract_cc608(QString &text, int &color,
     QString result;
 
     // Handle an initial control sequence.
-    if (text.length() >= 1 && text[0] >= 0x7000)
+    if (text.length() >= 1 && text[0] >= QChar(0x7000))
     {
         int op = text[0].unicode() - 0x7000;
         isUnderline = ((op & 0x1) != 0);

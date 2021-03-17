@@ -611,9 +611,9 @@ void TeletextScreen::DrawStatus()
             DrawBackground(i, 0);
 
     DrawCharacter(1, 0, 'P', false);
-    DrawCharacter(2, 0, m_teletextReader->GetPageInput(0), false);
-    DrawCharacter(3, 0, m_teletextReader->GetPageInput(1), false);
-    DrawCharacter(4, 0, m_teletextReader->GetPageInput(2), false);
+    DrawCharacter(2, 0, QChar(m_teletextReader->GetPageInput(0)), false);
+    DrawCharacter(3, 0, QChar(m_teletextReader->GetPageInput(1)), false);
+    DrawCharacter(4, 0, QChar(m_teletextReader->GetPageInput(2)), false);
 
     const TeletextSubPage *ttpage = m_teletextReader->FindSubPage();
 
