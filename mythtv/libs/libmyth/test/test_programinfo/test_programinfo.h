@@ -25,7 +25,7 @@
 #include "programinfo.h"
 #include "programtypes.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 class TestProgramInfo : public QObject
 {
@@ -137,8 +137,8 @@ class TestProgramInfo : public QObject
         {"commfree_str", "0"},
         {"description", "Barry continues to train Jesse ..."},
         {"description0", "Barry continues to train Jesse ..."},
-        {"enddate", "Tue 25 October"},
-        {"endtime", "9:00 PM"},
+        {"enddate", "Wed 26 October"},
+        {"endtime", "1:00 AM"},
         {"endts", "1477443600"},
         {"endyear", "2016"},
         {"episode", "4"},
@@ -147,9 +147,9 @@ class TestProgramInfo : public QObject
         {"inetref", "ttvdb.py_279121"},
         {"input", "-"},
         {"inputname", "Prime A-1"},
-        {"lastmodified", "Tue 25 October, 9:12 PM"},
-        {"lastmodifieddate", "Tue 25 October"},
-        {"lastmodifiedtime", "9:12 PM"},
+        {"lastmodified", "Wed 26 October, 1:12 AM"},
+        {"lastmodifieddate", "Wed 26 October"},
+        {"lastmodifiedtime", "1:12 AM"},
         {"lenmins", "64 minute(s)"},
         {"lentime", "1 hour(s) 4 minute(s)"},
         {"longchannel", "514 WNUBDT (WNUV-DT)"},
@@ -164,8 +164,8 @@ class TestProgramInfo : public QObject
         {"programflags_str", "131600"},
         {"programflags_names", "BOOKMARK|WATCHED|ALLOWLASTPLAYPOS"},
         {"programid", "EP019229360055"},
-        {"recenddate", "Tue 25"},
-        {"recendtime", "9:02 PM"},
+        {"recenddate", "Wed 26"},
+        {"recendtime", "1:02 AM"},
         {"recordedid", QChar(715)},
         {"recordedid_str", "715"},
         {"recordinggroup", "Default"},
@@ -174,7 +174,7 @@ class TestProgramInfo : public QObject
         {"recpriority_str", "7"},
         {"recpriority2_str", "0"},
         {"recstartdate", "Tue 25"},
-        {"recstarttime", "7:58 PM"},
+        {"recstarttime", "11:58 PM"},
         {"recstatus", "Not Recording"},
         {"recstatuslong", "This showing is not scheduled to record"},
         {"rectype", "Not Recording"},
@@ -183,18 +183,18 @@ class TestProgramInfo : public QObject
         {"s00e00", "s03e04"},
         {"season", "3"},
         {"seriesid", "EP01922936"},
-        {"shortenddate", "Tue 25"},
+        {"shortenddate", "Wed 26"},
         {"shortoriginalairdate", "Wed 26"},
-        {"shortstartdate", "Tue 25"},
-        {"shortstarttimedate", "Tue 25, 7:58 PM"},
-        {"shorttimedate", "Tue 25, 7:58 PM - 9:02 PM"},
+        {"shortstartdate", "Wed 26"},
+        {"shortstarttimedate", "Tue 25, 11:58 PM"},
+        {"shorttimedate", "Tue 25, 11:58 PM - 1:02 AM"},
         {"sortsubtitle", "new rogues"},
         {"sorttitle", "flash (2014)"},
         {"sorttitlesubtitle", "flash (2014) - \"new rogues\""},
         {"stars", "10 star(s)"},
-        {"startdate", "Tue 25 October"},
-        {"starttime", "8:00 PM"},
-        {"starttimedate", "Tue 25 October, 7:58 PM"},
+        {"startdate", "Wed 26 October"},
+        {"starttime", "12:00 AM"},
+        {"starttimedate", "Tue 25 October, 11:58 PM"},
         {"startts", "1477440000"},
         {"startyear", "2016"},
         {"storagegroup", "Default"},
@@ -203,7 +203,7 @@ class TestProgramInfo : public QObject
         {"subtitleType_str", "1"},
         {"subtitleType_names", "HARDHEAR"},
         {"syndicatedepisode", "syndicatedepisode"},
-        {"timedate", "Tue 25 October, 7:58 PM - 9:02 PM"},
+        {"timedate", "Tue 25 October, 11:58 PM - 1:02 AM"},
         {"title", "The Flash (2014)"},
         {"titlesubtitle", "The Flash (2014) - \"The New Rogues\""},
         {"totalepisodes", "23"},
@@ -231,8 +231,8 @@ class TestProgramInfo : public QObject
         {"commfree_str", "0"},
         {"description", "An attack is made on the President as hot-button..."},
         {"description0", "An attack is made on the President as hot-button..."},
-        {"enddate", "Mon 24 October"},
-        {"endtime", "9:00 PM"},
+        {"enddate", "Tue 25 October"},
+        {"endtime", "1:00 AM"},
         {"endts", "1477357200"},
         {"endyear", "2016"},
         {"episode", "3"},
@@ -241,9 +241,9 @@ class TestProgramInfo : public QObject
         {"inetref", "ttvdb.py_295759"},
         {"input", "-"},
         {"inputname", "Prime A-0"},
-        {"lastmodified", "Tue 25 October, 9:12 PM"},
-        {"lastmodifieddate", "Tue 25 October"},
-        {"lastmodifiedtime", "9:12 PM"},
+        {"lastmodified", "Wed 26 October, 1:12 AM"},
+        {"lastmodifieddate", "Wed 26 October"},
+        {"lastmodifiedtime", "1:12 AM"},
         {"lenmins", "64 minute(s)"},
         {"lentime", "1 hour(s) 4 minute(s)"},
         {"longchannel", "514 WNUBDT (WNUV-DT)"},
@@ -259,8 +259,8 @@ class TestProgramInfo : public QObject
         {"programflags_str", "1538"},
         {"programflags_names", "CUTLIST|WATCHED|PRESERVED"},
         {"programid", "EP021854510025"},
-        {"recenddate", "Mon 24"},
-        {"recendtime", "9:02 PM"},
+        {"recenddate", "Tue 25"},
+        {"recendtime", "1:02 AM"},
         {"recordedid", QChar(711)}, // Bad
         {"recordedid_str", "66247"},
         {"recordinggroup", "Default"},
@@ -269,7 +269,7 @@ class TestProgramInfo : public QObject
         {"recpriority_str", "-1"},
         {"recpriority2_str", "0"},
         {"recstartdate", "Mon 24"},
-        {"recstarttime", "7:58 PM"},
+        {"recstarttime", "11:58 PM"},
         {"recstatus", "Not Recording"},
         {"recstatuslong", "This showing is not scheduled to record"},
         {"rectype", "Not Recording"},
@@ -278,18 +278,18 @@ class TestProgramInfo : public QObject
         {"s00e00", "s02e03"},
         {"season", "2"},
         {"seriesid", "EP02185451"},
-        {"shortenddate", "Mon 24"},
+        {"shortenddate", "Tue 25"},
         {"shortoriginalairdate", "Tue 25"},
-        {"shortstartdate", "Mon 24"},
-        {"shortstarttimedate", "Mon 24, 7:58 PM"},
-        {"shorttimedate", "Mon 24, 7:58 PM - 9:02 PM"},
+        {"shortstartdate", "Tue 25"},
+        {"shortstarttimedate", "Mon 24, 11:58 PM"},
+        {"shorttimedate", "Mon 24, 11:58 PM - 1:02 AM"},
         {"sortsubtitle", "welcome to earth"},
         {"sorttitle", "supergirl"},
         {"sorttitlesubtitle", "supergirl - \"welcome to earth\""},
         {"stars", "9 star(s)"},
-        {"startdate", "Mon 24 October"},
-        {"starttime", "8:00 PM"},
-        {"starttimedate", "Mon 24 October, 7:58 PM"},
+        {"startdate", "Tue 25 October"},
+        {"starttime", "12:00 AM"},
+        {"starttimedate", "Mon 24 October, 11:58 PM"},
         {"startts", "1477353600"},
         {"startyear", "2016"},
         {"storagegroup", "Default"},
@@ -298,7 +298,7 @@ class TestProgramInfo : public QObject
         {"subtitleType_str", "8"},
         {"subtitleType_names", "SIGNED"},
         {"syndicatedepisode", "syndicatedepisode"},
-        {"timedate", "Mon 24 October, 7:58 PM - 9:02 PM"},
+        {"timedate", "Mon 24 October, 11:58 PM - 1:02 AM"},
         {"title", "Supergirl"},
         {"titlesubtitle", "Supergirl - \"Welcome to Earth\""},
         {"totalepisodes", "23"},
@@ -674,11 +674,11 @@ class TestProgramInfo : public QObject
     void test_toMap (void)
     {
         InfoMap progMap;
-        m_flash34.ToMap(progMap);
+        m_flash34.ToMap(progMap, false, 10, MythDate::kOverrideUTC);
         printMap(m_flash34.GetTitle(), m_flash34.GetSubtitle(), progMap);
         checkMap(progMap, m_flash34Map);
 
-        m_supergirl23.ToMap(progMap);
+        m_supergirl23.ToMap(progMap, false, 10, MythDate::kOverrideUTC);
         printMap(m_supergirl23.GetTitle(), m_supergirl23.GetSubtitle(), progMap);
         checkMap(progMap, m_supergirl23Map);
     }
