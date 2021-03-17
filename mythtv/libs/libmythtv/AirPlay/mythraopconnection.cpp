@@ -183,7 +183,7 @@ bool MythRAOPConnection::Init(void)
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     m_textStream->setCodec("UTF-8");
 #else
-    m_textStream->setCodec(QStringConverter::Utf8);
+    m_textStream->setEncoding(QStringConverter::Utf8);
 #endif
     if (!connect(m_socket, &QIODevice::readyRead, this, &MythRAOPConnection::readClient))
     {

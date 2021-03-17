@@ -286,7 +286,7 @@ bool UPNPSubscription::SendUnsubscribeRequest(const QString &usn,
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     data.setCodec(QTextCodec::codecForName("UTF-8"));
 #else
-    data.setCodec(QStringConverter::Utf8);
+    data.setEncoding(QStringConverter::Utf8);
 #endif
     // N.B. Play On needs an extra space between UNSUBSCRIBE and path...
     data << QString("UNSUBSCRIBE  %1 HTTP/1.1\r\n").arg(path);
@@ -346,7 +346,7 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     data.setCodec(QTextCodec::codecForName("UTF-8"));
 #else
-    data.setCodec(QStringConverter::Utf8);
+    data.setEncoding(QStringConverter::Utf8);
 #endif
     // N.B. Play On needs an extra space between SUBSCRIBE and path...
     data << QString("SUBSCRIBE  %1 HTTP/1.1\r\n").arg(path);

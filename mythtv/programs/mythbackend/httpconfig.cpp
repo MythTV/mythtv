@@ -2,6 +2,9 @@
 #include <QByteArray>
 #include <QDir>
 #include <QFileInfo>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QTextStream>
 #include <QUrl>
 
@@ -360,7 +363,11 @@ void HttpConfig::PrintHeader(QBuffer &buffer, const QString &form,
 {
     QTextStream os(&buffer);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     os.setCodec("UTF-8");
+#else
+    os.setEncoding(QStringConverter::Utf8);
+#endif
 
     os << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
        << "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n"
@@ -384,7 +391,11 @@ void HttpConfig::OpenForm(QBuffer &buffer, const QString &form,
 {
     QTextStream os(&buffer);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     os.setCodec("UTF-8");
+#else
+    os.setEncoding(QStringConverter::Utf8);
+#endif
 
     os << "  <form id=\"config_form_" << group << "\">\r\n"
        << R"(    <input type="hidden" id="__config_form_action__" value=")" << form << "\" />\r\n"

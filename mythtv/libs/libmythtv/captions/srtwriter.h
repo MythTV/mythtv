@@ -36,7 +36,7 @@ class MTV_PUBLIC SRTWriter
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         m_outStream.setCodec("UTF-8");
 #else
-        m_outStream.setCodec(QStringConverter::Utf8);
+        m_outStream.setEncoding(QStringConverter::Utf8);
 #endif
         if (!m_outFile.open(QFile::WriteOnly))
         {

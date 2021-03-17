@@ -373,7 +373,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     tsBody.setCodec(QTextCodec::codecForName("UTF-8"));
 #else
-    tsBody.setCodec(QStringConverter::Utf8);
+    tsBody.setEncoding(QStringConverter::Utf8);
 #endif
 
     // ----------------------------------------------------------------------
@@ -392,7 +392,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         tsMsg.setCodec(QTextCodec::codecForName("UTF-8"));
 #else
-        tsMsg.setCodec(QStringConverter::Utf8);
+        tsMsg.setEncoding(QStringConverter::Utf8);
 #endif
 
         // ----------------------------------------------------------------------

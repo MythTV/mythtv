@@ -988,7 +988,7 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     response.setCodec("UTF-8");
 #else
-    response.setCodec(QStringConverter::Utf8);
+    response.setEncoding(QStringConverter::Utf8);
 #endif
     QByteArray reply;
     reply.append("HTTP/1.1 ");
@@ -1050,7 +1050,7 @@ bool MythAirplayServer::SendReverseEvent(QByteArray &session,
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     response.setCodec("UTF-8");
 #else
-    response.setCodec(QStringConverter::Utf8);
+    response.setEncoding(QStringConverter::Utf8);
 #endif
     QByteArray reply;
     reply.append("POST /event HTTP/1.1\r\n");

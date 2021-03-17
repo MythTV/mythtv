@@ -1,4 +1,7 @@
 #include <QCoreApplication>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QTextCodec>
 
 #include "mythcorecontext.h"
@@ -878,7 +881,11 @@ void UPNPScanner::SendBrowseRequest(const QUrl &url, const QString &objectid)
 
     QByteArray body;
     QTextStream data(&body);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     data.setCodec(QTextCodec::codecForName("UTF-8"));
+#else
+    data.setEncoding(QStringConverter::Utf8);
+#endif
     data << "<?xml version=\"1.0\"?>\r\n";
     data << "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\r\n";
     data << "  <s:Body>\r\n";

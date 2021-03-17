@@ -273,7 +273,7 @@ QString CDSObject::toXml( FilterMap &filter,
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     os.setCodec(QTextCodec::codecForName("UTF-8"));
 #else
-    os.setCodec(QStringConverter::Utf8);
+    os.setEncoding(QStringConverter::Utf8);
 #endif
     toXml(os, filter, ignoreChildren);
     os << QT_FLUSH;

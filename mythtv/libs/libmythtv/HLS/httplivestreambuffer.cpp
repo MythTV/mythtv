@@ -2118,7 +2118,7 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     stream.setCodec("UTF-8");
 #else
-    stream.setCodec(QStringConverter::Utf8);
+    stream.setEncoding(QStringConverter::Utf8);
 #endif
 
     QString line = stream.readLine();

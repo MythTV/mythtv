@@ -68,7 +68,7 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     text.setCodec("UTF-8");
 #else
-    text.setCodec(QStringConverter::Utf8);
+    text.setEncoding(QStringConverter::Utf8);
 #endif
 
     if (!IsValidPlaylist(text))
