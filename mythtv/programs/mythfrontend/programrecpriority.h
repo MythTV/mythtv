@@ -46,7 +46,8 @@ class ProgramRecPriorityInfo : public RecordingInfo
 
     void ToMap(InfoMap &progMap,
                bool showrerecord = false,
-               uint star_range = 10) const override; // ProgramInfo
+               uint star_range = 10,
+               uint date_format = 0) const override; // ProgramInfo
 
     RecordingType m_recType     {kNotRecording};
     int           m_matchCount  {0};

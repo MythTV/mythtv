@@ -310,7 +310,8 @@ class MPUBLIC ProgramInfo
     void ToStringList(QStringList &list) const;
     virtual void ToMap(InfoMap &progMap,
                        bool showrerecord = false,
-                       uint star_range = 10) const;
+                       uint star_range = 10,
+                       uint date_format = 0) const;
     virtual void SubstituteMatches(QString &str);
 
     // Used for scheduling recordings

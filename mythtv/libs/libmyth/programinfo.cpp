@@ -1493,7 +1493,8 @@ QString propsValueToString (const QString& name, QMap<T,QString> propNames, T pr
  */
 void ProgramInfo::ToMap(InfoMap &progMap,
                         bool showrerecord,
-                        uint star_range) const
+                        uint star_range,
+                        uint date_format) const
 {
     QLocale locale = gCoreContext->GetQLocale();
     // NOTE: Format changes and relevant additions made here should be
@@ -1577,17 +1578,17 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     else // if (IsRecording())
     {
         using namespace MythDate;
-        progMap["starttime"] = MythDate::toString(m_startTs, kTime);
+        progMap["starttime"] = MythDate::toString(m_startTs, date_format | kTime);
         progMap["startdate"] =
-            MythDate::toString(m_startTs, kDateFull | kSimplify);
-        progMap["shortstartdate"] = MythDate::toString(m_startTs, kDateShort);
-        progMap["endtime"] = MythDate::toString(m_endTs, kTime);
-        progMap["enddate"] = MythDate::toString(m_endTs, kDateFull | kSimplify);
-        progMap["shortenddate"] = MythDate::toString(m_endTs, kDateShort);
-        progMap["recstarttime"] = MythDate::toString(m_recStartTs, kTime);
-        progMap["recstartdate"] = MythDate::toString(m_recStartTs, kDateShort);
-        progMap["recendtime"] = MythDate::toString(m_recEndTs, kTime);
-        progMap["recenddate"] = MythDate::toString(m_recEndTs, kDateShort);
+            MythDate::toString(m_startTs, date_format | kDateFull | kSimplify);
+        progMap["shortstartdate"] = MythDate::toString(m_startTs, date_format | kDateShort);
+        progMap["endtime"] = MythDate::toString(m_endTs, date_format | kTime);
+        progMap["enddate"] = MythDate::toString(m_endTs, date_format | kDateFull | kSimplify);
+        progMap["shortenddate"] = MythDate::toString(m_endTs, date_format | kDateShort);
+        progMap["recstarttime"] = MythDate::toString(m_recStartTs, date_format | kTime);
+        progMap["recstartdate"] = MythDate::toString(m_recStartTs, date_format | kDateShort);
+        progMap["recendtime"] = MythDate::toString(m_recEndTs, date_format | kTime);
+        progMap["recenddate"] = MythDate::toString(m_recEndTs, date_format | kDateShort);
         progMap["startts"] = QString::number(m_startTs.toSecsSinceEpoch());
         progMap["endts"]   = QString::number(m_endTs.toSecsSinceEpoch());
         if (timeNow.toLocalTime().date().year() !=
@@ -1600,24 +1601,24 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     using namespace MythDate;
     progMap["timedate"] =
-        MythDate::toString(m_recStartTs, kDateTimeFull | kSimplify) + " - " +
-        MythDate::toString(m_recEndTs, kTime);
+        MythDate::toString(m_recStartTs, date_format | kDateTimeFull | kSimplify) + " - " +
+        MythDate::toString(m_recEndTs, date_format | kTime);
 
     progMap["shorttimedate"] =
-        MythDate::toString(m_recStartTs, kDateTimeShort | kSimplify) + " - " +
-        MythDate::toString(m_recEndTs, kTime);
+        MythDate::toString(m_recStartTs, date_format | kDateTimeShort | kSimplify) + " - " +
+        MythDate::toString(m_recEndTs, date_format | kTime);
 
     progMap["starttimedate"] =
-        MythDate::toString(m_recStartTs, kDateTimeFull | kSimplify);
+        MythDate::toString(m_recStartTs, date_format | kDateTimeFull | kSimplify);
 
     progMap["shortstarttimedate"] =
-        MythDate::toString(m_recStartTs, kDateTimeShort | kSimplify);
+        MythDate::toString(m_recStartTs, date_format | kDateTimeShort | kSimplify);
 
-    progMap["lastmodifiedtime"] = MythDate::toString(m_lastModified, kTime);
+    progMap["lastmodifiedtime"] = MythDate::toString(m_lastModified, date_format | kTime);
     progMap["lastmodifieddate"] =
-        MythDate::toString(m_lastModified, kDateFull | kSimplify);
+        MythDate::toString(m_lastModified, date_format | kDateFull | kSimplify);
     progMap["lastmodified"] =
-        MythDate::toString(m_lastModified, kDateTimeFull | kSimplify);
+        MythDate::toString(m_lastModified, date_format | kDateTimeFull | kSimplify);
 
     if (m_recordedId)
     {
@@ -1747,7 +1748,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
                 .arg(QObject::tr("Repeat"))
                 .arg(MythDate::toString(
                          m_originalAirDate,
-                         MythDate::kDateFull | MythDate::kAddYear));
+                         date_format | MythDate::kDateFull | MythDate::kAddYear));
         }
     }
     else
@@ -1789,9 +1790,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     else
     {
         progMap["originalairdate"] = MythDate::toString(
-            m_originalAirDate, MythDate::kDateFull);
+            m_originalAirDate, date_format | MythDate::kDateFull);
         progMap["shortoriginalairdate"] = MythDate::toString(
-            m_originalAirDate, MythDate::kDateShort);
+            m_originalAirDate, date_format | MythDate::kDateShort);
     }
 
     // 'mediatype' for a statetype, so untranslated
