@@ -294,7 +294,7 @@ QString MythGesture::Translate(bool Timeout)
             if ((bin_count > (total_points * m_binPercent)) || first_bin)
             {
                 first_bin = false;
-                sequence += '0' + static_cast<char>(prev_bin);
+                sequence += '0' + QChar(prev_bin);
                 sequence_count ++;
             }
 
@@ -305,7 +305,7 @@ QString MythGesture::Translate(bool Timeout)
     }
 
     /* add the last run of points to the sequence */
-    sequence += '0' + static_cast<char>(current_bin);
+    sequence += '0' + QChar(current_bin);
     sequence_count++;
 
     /* bail out on error cases */
