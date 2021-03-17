@@ -2320,7 +2320,7 @@ QString atsc_huffman2_to_string(const unsigned char *compressed,
             uint key = lookup[bits];
             if (key && (ptrTable[key].m_numberOfBits == cur_size))
             {
-                decompressed += ptrTable[key].m_character;
+                decompressed += QChar(ptrTable[key].m_character);
                 current_bit += cur_size;
                 break;
             }

@@ -1361,7 +1361,9 @@ class TargetRegionDescriptor : public MPEGDescriptor
     }
     QString CountryCodeString(void) const
     {
-        return QString(m_data[3]) + QChar(m_data[4]) + QChar(m_data[5]);
+        std::array<QChar,3> code
+            { QChar(m_data[3]), QChar(m_data[4]), QChar(m_data[5]) };
+        return QString(code.data(), 3);
     }
     //
     // TBD
@@ -1394,7 +1396,9 @@ class TargetRegionNameDescriptor : public MPEGDescriptor
     }
     QString CountryCodeString(void) const
     {
-        return QString(m_data[3]) + QChar(m_data[4]) + QChar(m_data[5]);
+        std::array<QChar,3> code
+            { QChar(m_data[3]), QChar(m_data[4]), QChar(m_data[5]) };
+        return QString(code.data(), 3);
     }
 
     // ISO_639_language_code           24   6.0
@@ -1634,7 +1638,9 @@ class LocalTimeOffsetDescriptor : public MPEGDescriptor
     QString CountryCodeString(uint i) const
     {
         int o = 2 + i*13;
-        return QString(m_data[o]) + QChar(m_data[o+1]) + QChar(m_data[o+2]);
+        std::array<QChar,3> code
+            { QChar(m_data[o]), QChar(m_data[o+1]), QChar(m_data[o+2]) };
+        return QString(code.data(), 3);
     }
     //   country_region_id      6   3.0+p
     uint CountryRegionId(uint i) const { return m_data[2 + i*13 + 3] >> 2; }
@@ -1816,9 +1822,11 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     QString CountryCodeString(uint i) const
     {
         int o = 2 + i*4;
-        if (i < Count())
-            return QString(m_data[o]) + QChar(m_data[o+1]) + QChar(m_data[o+2]);
-        return QString("");
+        if (i >= Count())
+            return QString("");
+        std::array<QChar,3> code
+            { QChar(m_data[o]), QChar(m_data[o+1]), QChar(m_data[o+2]) };
+        return QString(code.data(), 3);
     }
     int Rating(uint i) const
     {
