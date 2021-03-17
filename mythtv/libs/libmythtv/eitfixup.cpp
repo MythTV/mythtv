@@ -235,7 +235,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
 {
     // A 0x0D character is present between the content
     // and the subtitle if its present
-    int position = event.m_description.indexOf(0x0D);
+    int position = event.m_description.indexOf('\r');
 
     if (position != -1)
     {
