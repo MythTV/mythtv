@@ -10,7 +10,6 @@ __version__ = "0.1.0"
 
 import sys
 import os
-import shlex
 from optparse import OptionParser
 
 
@@ -39,21 +38,41 @@ def check_item(m, mitem, ignore=True):
             raise
 
 
-def _get_series_image(item):
-    url = item['resolutions']['original']['url']
-    if item['resolutions'].get('medium') is not None:
-        thumb = item['resolutions']['medium']['url']
-        pdict = {'type': 'fanart', 'url': url, 'thumb': thumb}
-    else:
-        pdict = {'type': 'fanart', 'url': url}
-    return pdict
+def get_show_art_lists(tvmaze_show_id):
+    from MythTV.tvmaze import tvmaze_api as tvmaze
+
+    artlist = tvmaze.get_show_artwork(tvmaze_show_id)
+
+    #--------------------------------------------------------------------------
+    # The Main flag is true for artwork which is "official" from the Network.
+    # Under the theory that "official" artwork should be high quality, we want
+    # those artworks to be located at the beginning of the generated list.
+    #--------------------------------------------------------------------------
+    posterList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if (art_item.main and (art_item.type == 'poster'))]
+    posterNorm = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((not art_item.main) and (art_item.type == 'poster'))]
+    posterList.extend(posterNorm)
+
+    fanartList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if (art_item.main and (art_item.type == 'background'))]
+    fanartNorm = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((not art_item.main) and (art_item.type == 'background'))]
+    fanartList.extend(fanartNorm)
+
+    bannerList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if (art_item.main and (art_item.type == 'banner'))]
+    bannerNorm = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((not art_item.main) and (art_item.type == 'banner'))]
+    bannerList.extend(bannerNorm)
+
+    return posterList, fanartList, bannerList
 
 
 def buildList(tvtitle, opts):
     # option -M title
     from lxml import etree
-    from MythTV import VideoMetadata, datetime
-    from MythTV.utility import levenshtein
+    from MythTV import VideoMetadata
     from MythTV.tvmaze import tvmaze_api as tvmaze
     from MythTV.tvmaze import locales
 
@@ -83,48 +102,30 @@ def buildList(tvtitle, opts):
         m.collectionref = check_item(m, ("collectionref", str(show_info.id)), ignore=False)
         m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
         m.userrating = check_item(m, ("userrating", show_info.rating['average']))
-        m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+        try:
+            m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+        except (TypeError, ValueError):
+            pass
         if show_info.premiere_date:
             m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
             m.year = check_item(m, ("year", show_info.premiere_date.year))
 
-        artlist = tvmaze.get_show_artwork(show_info.id)
-
-        #--------------------------------------------------------------------------
-        # The Main flag is true for artwork which is "official" from the Network.
-        # Under the theory that "official" artwork should be high quality, we want
-        # those artworks to be located at the beginning of the generated list.
-        #--------------------------------------------------------------------------
-        fanartList = [(art_item.original, art_item.medium) for art_item in artlist \
-                  if ((art_item.main == True) and (art_item.type == 'background'))]
-        fanartReg  = [(art_item.original, art_item.medium) for art_item in artlist \
-                  if ((art_item.main == False) and (art_item.type == 'background'))]
-        fanartList.extend(fanartReg)
-        posterList = [(art_item.original, art_item.medium) for art_item in artlist \
-                  if ((art_item.main == True) and (art_item.type == 'poster'))]
-        posterReg  = [(art_item.original, art_item.medium) for art_item in artlist \
-                  if ((art_item.main == False) and (art_item.type == 'poster'))]
-        posterList.extend(posterReg)
-        bannerList = [(art_item.original, art_item.medium) for art_item in artlist \
-                  if ((art_item.main == True) and (art_item.type == 'banner'))]
-        bannerReg  = [(art_item.original, art_item.medium) for art_item in artlist \
-                  if ((art_item.main == False) and (art_item.type == 'banner'))]
-        bannerList.extend(bannerReg)
+        posterList, fanartList, bannerList = get_show_art_lists(show_info.id)
 
         # Generate one image line for each type of artwork
-        if fanartList:
-            fanartEntry = fanartList[0]
-            if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
-                m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
-            elif fanartEntry[0] is not None:
-                m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
-
         if posterList:
             posterEntry = posterList[0]
             if (posterEntry[0] is not None) and (posterEntry[1] is not None):
                 m.images.append({'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]})
             elif posterEntry[0] is not None:
                 m.images.append({'type': 'coverart', 'url': posterEntry[0]})
+
+        if fanartList:
+            fanartEntry = fanartList[0]
+            if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+                m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+            elif fanartEntry[0] is not None:
+                m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
 
         if bannerList:
             bannerEntry = bannerList[0]
@@ -142,11 +143,8 @@ def buildList(tvtitle, opts):
 def buildNumbers(args, opts):
     # either option -N inetref subtitle
     # or  option -N title subtitle
-    from lxml import etree
-    from MythTV import VideoMetadata, datetime
     from MythTV.utility import levenshtein
     from MythTV.tvmaze import tvmaze_api as tvmaze
-    from MythTV.tvmaze import locales
 
     if opts.debug:
         print("Function 'buildNumbers' called with arguments: " +
@@ -221,8 +219,7 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     # option -D inetref season episode
 
     from lxml import etree
-    from MythTV import VideoMetadata, datetime
-    from MythTV.utility import levenshtein
+    from MythTV import VideoMetadata
     from MythTV.tvmaze import tvmaze_api as tvmaze
     from MythTV.tvmaze import locales
 
@@ -243,7 +240,7 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     # get the episode_id if not provided:
     if tvmaze_episode_id is None:
         episodes = tvmaze.get_show_episode_list(inetref)
-        for ep in (episodes):
+        for ep in episodes:
             if 0 and opts.debug:
                 print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
                 for k, v in ep.__dict__.items():
@@ -262,6 +259,8 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
             print(k, " : ", v)
 
     # get global info for all seasons/episodes:
+    posterList, fanartList, bannerList = get_show_art_lists(inetref)
+
     show_info = tvmaze.get_show(inetref, populated=True)
     if opts.debug:
         print("tvmaze.get_show(%s, populated=True) returned :" % inetref)
@@ -308,7 +307,10 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     m.collectionref = check_item(m, ("inetref", str(show_info.id)), ignore=False)
     m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
     m.userrating = check_item(m, ("userrating", show_info.rating['average']))
-    m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+    try:
+        m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+    except (TypeError, ValueError):
+        pass
     # prefer episode airdate dates:
     if ep_info.airdate:
         m.releasedate = check_item(m, ("releasedate", ep_info.airdate))
@@ -339,34 +341,33 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     if season_info.images is not None and len(season_info.images) > 0:
         m.images.append({'type': 'coverart', 'url': season_info.images['original'],
                          'thumb': season_info.images['medium']})
-    if show_info.images is not None and len(show_info.images) > 0:
-        m.images.append({'type': 'coverart', 'url': show_info.images['original'],
-                         'thumb': show_info.images['medium']})
+
+    # generate series coverart, fanart, and banners
+    for posterEntry in posterList:
+        if (posterEntry[0] is not None) and (posterEntry[1] is not None):
+            image_entry = {'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]}
+        elif posterEntry[0] is not None:
+            image_entry = {'type': 'coverart', 'url': posterEntry[0]}
+        # Avoid duplicate coverart entries
+        if image_entry not in m.images:
+            m.images.append(image_entry)
+
+    for fanartEntry in fanartList:
+        if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+        elif fanartEntry[0] is not None:
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
+
+    for bannerEntry in bannerList:
+        if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
+            m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
+        elif bannerEntry[0] is not None:
+            m.images.append({'type': 'banner', 'url': bannerEntry[0]})
+
     # screenshot is associated to episode
     if ep_info.images is not None and len(ep_info.images) > 0:
         m.images.append({'type': 'screenshot', 'url': ep_info.images['original'],
                          'thumb': ep_info.images['medium']})
-
-    if show_info.series_images is not None and len(show_info.series_images) > 0:
-        # sort for 'background' and then for 'poster'
-        for item in show_info.series_images:
-            if item['type'] == 'background' and not item['main']:
-                try:
-                    pdict = _get_series_image(item)
-                    if pdict not in m.images:
-                        m.images.append(pdict)
-                except(KeyError, ValueError):
-                    pass
-
-        ## posters cannot be stretched to fullscreen as fanart          ### XXX
-        #for item in show_info.series_images:
-        #    if item['type'] == 'poster' and not item['main']:
-        #        try:
-        #            pdict = _get_series_image(item)
-        #            if pdict not in m.images:
-        #                m.images.append(pdict)
-        #        except(KeyError, ValueError):
-        #            pass
 
     tree.append(m.toXML())
     print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
@@ -376,8 +377,7 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
 def buildCollection(tvinetref, opts):
     # option -C inetref
     from lxml import etree
-    from MythTV import VideoMetadata, datetime
-    from MythTV.utility import levenshtein
+    from MythTV import VideoMetadata
     from MythTV.tvmaze import tvmaze_api as tvmaze
     from MythTV.tvmaze import locales
 
@@ -409,7 +409,10 @@ def buildCollection(tvinetref, opts):
     m.imdb = check_item(m, ("imdb", str(show_info.external_ids['imdb'])))
     m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
     m.userrating = check_item(m, ("userrating", show_info.rating['average']))
-    m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+    try:
+        m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+    except (TypeError, ValueError):
+        pass
     if show_info.premiere_date:
         m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
         m.year = check_item(m, ("year", show_info.premiere_date.year))
@@ -420,41 +423,20 @@ def buildCollection(tvinetref, opts):
     except:
         pass
 
-    artlist = tvmaze.get_show_artwork(show_info.id)
-
-    #--------------------------------------------------------------------------
-    # The Main flag is true for artwork which is "official" from the Network.
-    # Under the theory that "official" artwork should be high quality, we want
-    # those artworks to be located at the beginning of the generated list.
-    #--------------------------------------------------------------------------
-    fanartList = [(art_item.original, art_item.medium) for art_item in artlist \
-              if ((art_item.main == True) and (art_item.type == 'background'))]
-    fanartReg  = [(art_item.original, art_item.medium) for art_item in artlist \
-              if ((art_item.main == False) and (art_item.type == 'background'))]
-    fanartList.extend(fanartReg)
-    posterList = [(art_item.original, art_item.medium) for art_item in artlist \
-              if ((art_item.main == True) and (art_item.type == 'poster'))]
-    posterReg  = [(art_item.original, art_item.medium) for art_item in artlist \
-              if ((art_item.main == False) and (art_item.type == 'poster'))]
-    posterList.extend(posterReg)
-    bannerList = [(art_item.original, art_item.medium) for art_item in artlist \
-              if ((art_item.main == True) and (art_item.type == 'banner'))]
-    bannerReg  = [(art_item.original, art_item.medium) for art_item in artlist \
-              if ((art_item.main == False) and (art_item.type == 'banner'))]
-    bannerList.extend(bannerReg)
+    posterList, fanartList, bannerList = get_show_art_lists(show_info.id)
 
     # Generate image lines for every piece of artwork
-    for fanartEntry in fanartList:
-        if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
-            m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
-        elif fanartEntry[0] is not None:
-            m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
-
     for posterEntry in posterList:
         if (posterEntry[0] is not None) and (posterEntry[1] is not None):
             m.images.append({'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]})
         elif posterEntry[0] is not None:
             m.images.append({'type': 'coverart', 'url': posterEntry[0]})
+
+    for fanartEntry in fanartList:
+        if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+        elif fanartEntry[0] is not None:
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
 
     for bannerEntry in bannerList:
         if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
