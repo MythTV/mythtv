@@ -262,7 +262,7 @@ void XmlPListSerializer::SerializePListObjectProperties(const QString &sName,
     {
         QMetaProperty metaProperty = pMetaObject->property(nIdx);
 
-        if (metaProperty.isDesignable(pObject))
+        if (metaProperty.isDesignable())
         {
             const char *pszPropName = metaProperty.name();
             QString     sPropName(pszPropName);
