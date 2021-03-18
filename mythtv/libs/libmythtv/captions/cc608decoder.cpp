@@ -667,7 +667,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     {
         // calculate UTF-8 encoding length
         tmpbuf = m_ccBuf[mode].toUtf8();
-        len = std::min(tmpbuf.length(), 255);
+        len = std::min(static_cast<int>(tmpbuf.length()), 255);
     }
 
     unsigned char *bp = m_rbuf;

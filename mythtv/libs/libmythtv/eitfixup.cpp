@@ -1490,7 +1490,7 @@ void EITFixUp::FixMCA(DBEventEIT &event)
     if (match.hasMatch())
     {
         uint matchLen = match.capturedLength(1);
-        uint evDescLen = std::max(event.m_description.length(), 1);
+        uint evDescLen = std::max(static_cast<int>(event.m_description.length()), 1);
 
         if ((matchLen < lSUBTITLE_MAX_LEN) &&
             ((matchLen * 100 / evDescLen) < SUBTITLE_PCT))
@@ -1707,7 +1707,7 @@ void EITFixUp::FixRTL(DBEventEIT &event)
         if (match.hasMatch())
         {
             uint matchLen = match.capturedLength(1);
-            uint evDescLen = std::max(event.m_description.length(), 1);
+            uint evDescLen = std::max(static_cast<int>(event.m_description.length()), 1);
 
             if ((matchLen < lSUBTITLE_MAX_LEN) &&
                 (matchLen * 100 / evDescLen < SUBTITLE_PCT))
