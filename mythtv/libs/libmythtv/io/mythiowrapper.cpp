@@ -34,6 +34,8 @@ class MythIOCallback
         m_callback(Callback)
     {
     }
+    bool operator==(MythIOCallback rhs) const
+        { return (m_object == rhs.m_object) && (m_callback == rhs.m_callback); };
 
     void       *m_object;
     callback_t  m_callback;
@@ -83,13 +85,13 @@ void MythFileOpenRegisterCallback(const char *Pathname, void* Object, callback_t
     {
         // if we already have a callback registered for this path with this
         // object then remove the callback and return (i.e. end callback)
-        QMutableHashIterator<QString,MythIOCallback> it(s_fileOpenCallbacks);
-        while (it.hasNext())
+        for (auto it = s_fileOpenCallbacks.begin();
+             it != s_fileOpenCallbacks.end();
+             it++)
         {
-            it.next();
             if (Object == it.value().m_object)
             {
-                it.remove();
+                s_fileOpenCallbacks.remove(path, { Object, it.value().m_callback });
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Removing fileopen callback for %1").arg(path));
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("%1 callbacks remaining").arg(s_fileOpenCallbacks.size()));
                 return;
@@ -183,15 +185,15 @@ int MythFileOpen(const char *Pathname, int Flags)
     }
 
     s_callbackLock.lock();
-    if (!s_fileOpenCallbacks.isEmpty())
+    QString path(Pathname);
+    for (auto it = s_fileOpenCallbacks.begin();
+         it != s_fileOpenCallbacks.end();
+         it++)
     {
-        QString path(Pathname);
-        QHashIterator<QString,MythIOCallback> it(s_fileOpenCallbacks);
-        while (it.hasNext())
-        {
-            it.next();
-            if (path.startsWith(it.key()))
-                it.value().m_callback(it.value().m_object);
+        if (path.startsWith(it.key())) {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Calling callback %1 for %2")
+                .arg(it.key()).arg((qulonglong)it.value().m_callback));
+            it.value().m_callback(it.value().m_object);
         }
     }
     s_callbackLock.unlock();
