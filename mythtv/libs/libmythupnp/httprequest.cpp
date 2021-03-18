@@ -1175,7 +1175,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
 QString HTTPRequest::GetRequestHeader( const QString &sKey, const QString &sDefault )
 {
-    QStringMap::iterator it = m_mapHeaders.find( sKey.toLower() );
+    auto it = m_mapHeaders.find( sKey.toLower() );
 
     if ( it == m_mapHeaders.end())
         return( sDefault );
@@ -1323,9 +1323,7 @@ bool HTTPRequest::ParseRequest()
         }
 
         // Dump request header
-        for ( QStringMap::iterator it  = m_mapHeaders.begin();
-                                it != m_mapHeaders.end();
-                                ++it )
+        for ( auto it = m_mapHeaders.begin(); it != m_mapHeaders.end(); ++it )
         {
             LOG(VB_HTTP, LOG_INFO, QString("(Request Header) %1: %2")
                                             .arg(it.key()).arg(*it));
