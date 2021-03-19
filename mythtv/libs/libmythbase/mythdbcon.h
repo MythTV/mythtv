@@ -196,8 +196,13 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     // Thunks that allow us to make QSqlQuery private
     QVariant value(int i) const { return QSqlQuery::value(i); }
     QString executedQuery(void) const { return QSqlQuery::executedQuery(); }
+
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QMap<QString, QVariant> boundValues(void) const
         { return QSqlQuery::boundValues(); }
+#else
+    QVariantList boundValues(void) const { return QSqlQuery::boundValues(); }
+#endif
     QSqlError lastError(void) const { return QSqlQuery::lastError(); }
     int size(void) const { return QSqlQuery::size();}
     bool isActive(void) const { return  QSqlQuery::isActive(); }
