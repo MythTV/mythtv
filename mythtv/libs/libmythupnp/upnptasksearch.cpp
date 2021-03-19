@@ -17,6 +17,7 @@
 #include <QDateTime>
 #include <QFile>
 #include <QStringList>
+#include <QNetworkInterface>
 #include <utility>
 
 #include "upnp.h"
@@ -25,6 +26,7 @@
 #include "compat.h"
 #include "mythmiscutil.h"
 #include "mythdate.h"
+#include "mythlogging.h"
 
 static QPair<QHostAddress, int> kLinkLocal6 =
                             QHostAddress::parseSubnet("fe80::/10");
@@ -96,47 +98,56 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                         .arg(m_peerAddress.toString()) .arg(m_nPeerPort));
 #endif
 
-    for (const auto & addr : qAsConst(m_addressList))
+    // TODO: When we add dynamic handling of interfaces the information
+    // for each address on the system should be available from the
+    // "central" location on request.
+    //
+    // loop through all available interfaces
+    QList<QNetworkInterface> IFs = QNetworkInterface::allInterfaces();
+    for (const auto & qni : qAsConst(IFs))
     {
-        QString ipaddress;
+        QList<QNetworkAddressEntry> netAddressList = qni.addressEntries();
+        for (const auto & netAddr : qAsConst(netAddressList))
+        {
+            QString ip_subnet = QString("%1/%2").arg(netAddr.ip().toString()).arg(netAddr.prefixLength());
+            QPair<QHostAddress, int> subnet = QHostAddress::parseSubnet(ip_subnet);
+            if (m_peerAddress.isInSubnet(subnet)) {
+                LOG(VB_UPNP, LOG_DEBUG, QString("UPnpSearchTask::SendMsg : IP: [%1], Found network [%2], relevant to peer [%3]")
+                    .arg(netAddr.ip().toString()).arg(subnet.first.toString()).arg(m_peerAddress.toString()));
 
-        // Avoid announcing the localhost address
-        if (addr == QHostAddress::LocalHost ||
-            addr == QHostAddress::LocalHostIPv6 ||
-            addr == QHostAddress::AnyIPv4 ||
-            addr == QHostAddress::AnyIPv6)
-            continue;
+                QString ipaddress;
+                QHostAddress ip = netAddr.ip();
+                // Descope the Link Local address. The scope is only valid
+                // on the server sending the announcement, not the clients
+                // that receive it
+                ip.setScopeId(QString());
 
-        QHostAddress ip = addr;
-        // Descope the Link Local address. The scope is only valid
-        // on the server sending the announcement, not the clients
-        // that receive it
-        ip.setScopeId(QString());
+                // If this looks like an IPv6 address, then enclose it in []'s
+                if (ip.protocol() == QAbstractSocket::IPv6Protocol)
+                    ipaddress = "[" + ip.toString() + "]";
+                else
+                    ipaddress = ip.toString();
 
-        // If this looks like an IPv6 address, then enclose it in []'s
-        if (ip.protocol() == QAbstractSocket::IPv6Protocol)
-            ipaddress = "[" + ip.toString() + "]";
-        else
-            ipaddress = ip.toString();
-
-        QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
-                                    "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
-                            .arg( ipaddress )
-                            .arg( m_nServicePort);
+                QString sHeader = QString ( "HTTP/1.1 200 OK\r\n"
+                                            "LOCATION: http://%1:%2/getDeviceDesc\r\n" )
+                                    .arg( ipaddress )
+                                    .arg( m_nServicePort);
 
 
-        QString  sPacket  = sHeader + sData;
-        QByteArray scPacket = sPacket.toUtf8();
+                QString  sPacket  = sHeader + sData;
+                QByteArray scPacket = sPacket.toUtf8();
 
-        // ------------------------------------------------------------------
-        // Send Packet to UDP Socket (Send same packet twice)
-        // ------------------------------------------------------------------
+                // ------------------------------------------------------------------
+                // Send Packet to UDP Socket (Send same packet twice)
+                // ------------------------------------------------------------------
 
-        pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
-                             m_nPeerPort );
-        std::this_thread::sleep_for( std::chrono::milliseconds( MythRandom() % 250 ));
-        pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
-                             m_nPeerPort );
+                pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
+                                    m_nPeerPort );
+                std::this_thread::sleep_for( std::chrono::milliseconds( MythRandom() % 250 ));
+                pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
+                                    m_nPeerPort );
+            }
+        }
     }
 }
 
