@@ -6637,6 +6637,8 @@ case $target_os in
         ;;
 esac
 
+# Omit Qt5 modules that aren't in Qt6.
+if [ $qt_version -lt $(version2num "6.0.0") ]; then
 if $(pkg-config --exists Qt5WebKit) || $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
@@ -6658,6 +6660,7 @@ EOF
 fi
 
 enabled qtscript || die "Error! QtScript headers not found"
+fi
 
 # Check if Qt was built with DBus support:
 if ! disabled qtdbus; then
