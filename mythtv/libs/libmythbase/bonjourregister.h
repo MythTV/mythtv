@@ -35,7 +35,11 @@ class MBASE_PUBLIC BonjourRegister : public QObject
 
     DNSServiceRef    m_dnssref {nullptr};
     QSocketNotifier *m_socket  {nullptr};
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QMutexLocker    *m_lock    {nullptr};
+#else
+    QMutexLocker<QMutex>  *m_lock    {nullptr};
+#endif
     static QMutex    g_lock;
     QByteArray       m_data;
 };

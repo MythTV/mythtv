@@ -55,7 +55,7 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
 
         case QMetaType::Char        : *(( char           *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 ).toLatin1() : 0; break;
         case QMetaType::UChar       : *(( unsigned char  *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 ).toLatin1() : 0; break;
-        case QMetaType::QChar       : *(( QChar          *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 )           : 0; break;
+        case QMetaType::QChar       : *(( QChar          *)pParam) = ( sValue.length() > 0) ? sValue.at( 0 )            : QChar(0); break;
 
         case QMetaType::Short       : *(( short          *)pParam) = sValue.toShort     (); break;
         case QMetaType::UShort      : *(( ushort         *)pParam) = sValue.toUShort    (); break;

@@ -310,7 +310,8 @@ class MPUBLIC ProgramInfo
     void ToStringList(QStringList &list) const;
     virtual void ToMap(InfoMap &progMap,
                        bool showrerecord = false,
-                       uint star_range = 10) const;
+                       uint star_range = 10,
+                       uint date_format = 0) const;
     virtual void SubstituteMatches(QString &str);
 
     // Used for scheduling recordings
@@ -487,12 +488,9 @@ class MPUBLIC ProgramInfo
     bool IsDeletePending(void)  const
         { return (m_programFlags & FL_DELETEPENDING) != 0U; }
 
-    uint GetSubtitleType(void)    const
-        { return (m_properties&kSubtitlePropertyMask)>>kSubtitlePropertyOffset; }
-    uint GetVideoProperties(void) const
-        { return (m_properties & kVideoPropertyMask) >> kVideoPropertyOffset; }
-    uint GetAudioProperties(void) const
-        { return (m_properties & kAudioPropertyMask) >> kAudioPropertyOffset; }
+    uint GetSubtitleType(void)    const { return m_subtitleProperties; }
+    uint GetVideoProperties(void) const { return m_videoProperties; }
+    uint GetAudioProperties(void) const { return m_audioProperties; }
 
     enum Verbosity
     {
@@ -795,8 +793,9 @@ class MPUBLIC ProgramInfo
     uint32_t        m_findId            {0};
 
     uint32_t        m_programFlags      {FL_NONE}; ///< ProgramFlag
-                    /// SubtitleType,VideoProperty,AudioProperty
-    uint16_t        m_properties        {0};
+    VideoPropsType    m_videoProperties   {VID_UNKNOWN};
+    AudioPropsType    m_audioProperties   {AUD_UNKNOWN};
+    SubtitlePropsType m_subtitleProperties {SUB_UNKNOWN};
     uint16_t        m_year              {0};
     uint16_t        m_partNumber        {0};
     uint16_t        m_partTotal         {0};

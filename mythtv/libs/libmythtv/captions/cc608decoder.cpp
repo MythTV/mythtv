@@ -36,7 +36,7 @@ CC608Decoder::CC608Decoder(CC608Input *ccr)
     m_stdChar[124] = QLatin1Char(0xF7); // ÷
     m_stdChar[125] = QLatin1Char(0xD1); // Ñ
     m_stdChar[126] = QLatin1Char(0xF1); // ñ
-    m_stdChar[127] = 0x2588; /* full block */
+    m_stdChar[127] = QChar(0x2588);     // full block
 
     init_xds_program_type(m_xdsProgramTypeString);
 }
@@ -68,7 +68,7 @@ static const std::array<const int,16> rowdata =
 static const std::array<const QChar,16> specialchar =
 {
     QLatin1Char(0xAE), QLatin1Char(0xB0), QLatin1Char(0xBD), QLatin1Char(0xBF), // ®°½¿
-    0x2122,            QLatin1Char(0xA2), QLatin1Char(0xA3), 0x266A,            // ™¢£♪
+    QChar(0x2122),     QLatin1Char(0xA2), QLatin1Char(0xA3), QChar(0x266A),     // ™¢£♪
     QLatin1Char(0xE0), QLatin1Char(' '),  QLatin1Char(0xE8), QLatin1Char(0xE2), // à èâ
     QLatin1Char(0xEA), QLatin1Char(0xEE), QLatin1Char(0xF4), QLatin1Char(0xFB)  // êîôû
 };
@@ -77,8 +77,8 @@ static const std::array<const QChar,32> extendedchar2 =
 {
     QLatin1Char(0xC1), QLatin1Char(0xC9),  QLatin1Char(0xD3), QLatin1Char(0xDA), // ÁÉÓÚ
     QLatin1Char(0xDC), QLatin1Char(0xFC),  QLatin1Char('`'),  QLatin1Char(0xA1), // Üü`¡
-    QLatin1Char('*'),  QLatin1Char('\''),  0x2014,            QLatin1Char(0xA9), // *'-©
-    0x2120,            QLatin1Char(0xB7),  0x201C,            0x201D,            // ℠·“”
+    QLatin1Char('*'),  QLatin1Char('\''),  QChar(0x2014),     QLatin1Char(0xA9), // *'-©
+    QChar(0x2120),     QLatin1Char(0xB7),  QChar(0x201C),     QChar(0x201D),     // ℠·“”
     QLatin1Char(0xC0), QLatin1Char(0xC2),  QLatin1Char(0xC7), QLatin1Char(0xC8), // ÀÂÇÈ
     QLatin1Char(0xCA), QLatin1Char(0xCB),  QLatin1Char(0xEB), QLatin1Char(0xCE), // ÊËëÎ
     QLatin1Char(0xCF), QLatin1Char(0xEF),  QLatin1Char(0xD4), QLatin1Char(0xD9), // ÏïÔÙ
@@ -94,7 +94,7 @@ static const std::array<const QChar,32> extendedchar3 =
     QLatin1Char(0xC4), QLatin1Char(0xE4), QLatin1Char(0xD6), QLatin1Char(0xF6), // ÄäÖö
     QLatin1Char(0xDF), QLatin1Char(0xA5), QLatin1Char(0xA4), QLatin1Char('|'),  // ß¥¤|
     QLatin1Char(0xC5), QLatin1Char(0xE5), QLatin1Char(0xD8), QLatin1Char(0xF8), // ÅåØø
-    0x250C, 0x2510, 0x2514, 0x2518                                              // ┌┐└┘
+    QChar(0x250C),     QChar(0x2510),     QChar(0x2514),     QChar(0x2518)      // ┌┐└┘
 };
 
 void CC608Decoder::FormatCCField(std::chrono::milliseconds tc, int field, int data)

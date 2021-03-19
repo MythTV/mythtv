@@ -48,6 +48,9 @@ bool ProgramInfo::s_usingProgIDAuth = true;
 
 const static uint kInvalidDateTime = UINT_MAX;
 
+#define DEFINE_FLAGS_NAMES
+#include "programtypeflags.h"
+#undef DEFINE_FLAGS_NAMES
 
 const QString ProgramInfo::kFromRecordedQuery =
     "SELECT r.title,            r.subtitle,     r.description,     "// 0-2
@@ -201,7 +204,9 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
 
     m_findId(other.m_findId),
     m_programFlags(other.m_programFlags),
-    m_properties(other.m_properties),
+    m_videoProperties(other.m_videoProperties),
+    m_audioProperties(other.m_audioProperties),
+    m_subtitleProperties(other.m_subtitleProperties),
     m_year(other.m_year),
     m_partNumber(other.m_partNumber),
     m_partTotal(other.m_partTotal),
@@ -384,9 +389,9 @@ ProgramInfo::ProgramInfo(
     m_findId(_findid),
 
     m_programFlags(_programflags),
-    m_properties((_subtitleType    << kSubtitlePropertyOffset) |
-               (_videoproperties << kVideoPropertyOffset)    |
-               (_audioproperties << kAudioPropertyOffset)),
+    m_videoProperties(_videoproperties),
+    m_audioProperties(_audioproperties),
+    m_subtitleProperties(_subtitleType),
     m_year(_year),
     m_partNumber(_partnumber),
     m_partTotal(_parttotal),
@@ -566,9 +571,9 @@ ProgramInfo::ProgramInfo(
     m_recordId(_recordid),
     m_findId(_findid),
 
-    m_properties((_subtitleType    << kSubtitlePropertyOffset) |
-               (_videoproperties << kVideoPropertyOffset)    |
-               (_audioproperties << kAudioPropertyOffset)),
+    m_videoProperties(_videoproperties),
+    m_audioProperties(_audioproperties),
+    m_subtitleProperties(_subtitleType),
     m_year(_year),
     m_partNumber(_partnumber),
     m_partTotal(_parttotal),
@@ -912,7 +917,9 @@ void ProgramInfo::clone(const ProgramInfo &other,
 
     m_findId = other.m_findId;
     m_programFlags = other.m_programFlags;
-    m_properties = other.m_properties;
+    m_videoProperties = other.m_videoProperties;
+    m_audioProperties = other.m_audioProperties;
+    m_subtitleProperties= other.m_subtitleProperties;
 
     if (!ignore_non_serialized_data)
     {
@@ -997,7 +1004,9 @@ void ProgramInfo::clear(void)
     m_findId = 0;
 
     m_programFlags = FL_NONE;
-    m_properties = 0;
+    m_videoProperties = VID_UNKNOWN;
+    m_audioProperties = AUD_UNKNOWN;
+    m_subtitleProperties = SUB_UNKNOWN;
 
     // everything below this line is not serialized
     m_spread = -1;
@@ -1109,7 +1118,9 @@ bool ProgramInfo::operator==(const ProgramInfo& rhs)
         return false;
 
     if ((m_programFlags != rhs.m_programFlags) ||
-        (m_properties != rhs.m_properties) ||
+        (m_videoProperties != rhs.m_videoProperties) ||
+        (m_audioProperties != rhs.m_audioProperties) ||
+        (m_subtitleProperties != rhs.m_subtitleProperties) ||
         (m_year != rhs.m_year) ||
         (m_partNumber != rhs.m_partNumber) ||
         (m_partTotal != rhs.m_partTotal))
@@ -1314,9 +1325,9 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(m_recPriority2);      // 39
     INT_TO_LIST(m_parentId);          // 40
     STR_TO_LIST((!m_storageGroup.isEmpty()) ? m_storageGroup : "Default"); // 41
-    INT_TO_LIST(GetAudioProperties()); // 42
-    INT_TO_LIST(GetVideoProperties()); // 43
-    INT_TO_LIST(GetSubtitleType());    // 44
+    INT_TO_LIST(m_audioProperties);    // 42
+    INT_TO_LIST(m_videoProperties);    // 43
+    INT_TO_LIST(m_subtitleProperties); // 44
 
     INT_TO_LIST(m_year);              // 45
     INT_TO_LIST(m_partNumber);   // 46
@@ -1424,15 +1435,9 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(m_recPriority2);      // 39
     INT_FROM_LIST(m_parentId);          // 40
     STR_FROM_LIST(m_storageGroup);      // 41
-    uint audioproperties = 0;
-    uint videoproperties = 0;
-    uint subtitleType = 0;
-    INT_FROM_LIST(audioproperties);   // 42
-    INT_FROM_LIST(videoproperties);   // 43
-    INT_FROM_LIST(subtitleType);      // 44
-    m_properties = ((subtitleType    << kSubtitlePropertyOffset) |
-                    (videoproperties << kVideoPropertyOffset)    |
-                    (audioproperties << kAudioPropertyOffset));
+    INT_FROM_LIST(m_audioProperties);   // 42
+    INT_FROM_LIST(m_videoProperties);   // 43
+    INT_FROM_LIST(m_subtitleProperties);// 44
 
     INT_FROM_LIST(m_year);              // 45
     INT_FROM_LIST(m_partNumber);        // 46
@@ -1458,12 +1463,38 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     return true;
 }
 
+template <typename T>
+QString propsValueToString (const QString& name, QMap<T,QString> propNames, T props)
+{
+    if (props == 0)
+        return propNames[0];
+
+    QStringList result;
+    for (uint i = 0; i < sizeof(T)*8 - 1; i++)
+    {
+        uint bit = 1<<i;
+        if ((props & bit) == 0)
+            continue;
+        if (propNames.contains(bit))
+        {
+            result += propNames[bit];
+            continue;
+        }
+        QString tmp = QString("0x%1").arg(bit, sizeof(T)*2,16,QChar('0'));
+        LOG(VB_GENERAL, LOG_ERR, QString("Unknown name for %1 flag 0x%2.")
+            .arg(name).arg(tmp));
+        result += tmp;
+    }
+    return result.join('|');
+}
+
 /** \brief Converts ProgramInfo into QString QHash containing each field
  *         in ProgramInfo converted into localized strings.
  */
 void ProgramInfo::ToMap(InfoMap &progMap,
                         bool showrerecord,
-                        uint star_range) const
+                        uint star_range,
+                        uint date_format) const
 {
     QLocale locale = gCoreContext->GetQLocale();
     // NOTE: Format changes and relevant additions made here should be
@@ -1519,7 +1550,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["director"] = m_director;
 
     progMap["callsign"] = m_chanSign;
-    progMap["commfree"] = (m_programFlags & FL_CHANCOMMFREE) ? 1 : 0;
+    progMap["commfree"] = QChar((m_programFlags & FL_CHANCOMMFREE) ? 1 : 0);
+    progMap["commfree_str"] = (m_programFlags & FL_CHANCOMMFREE) ? "1" : "0";
     progMap["outputfilters"] = m_chanPlaybackFilters;
     if (IsVideo())
     {
@@ -1546,17 +1578,17 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     else // if (IsRecording())
     {
         using namespace MythDate;
-        progMap["starttime"] = MythDate::toString(m_startTs, kTime);
+        progMap["starttime"] = MythDate::toString(m_startTs, date_format | kTime);
         progMap["startdate"] =
-            MythDate::toString(m_startTs, kDateFull | kSimplify);
-        progMap["shortstartdate"] = MythDate::toString(m_startTs, kDateShort);
-        progMap["endtime"] = MythDate::toString(m_endTs, kTime);
-        progMap["enddate"] = MythDate::toString(m_endTs, kDateFull | kSimplify);
-        progMap["shortenddate"] = MythDate::toString(m_endTs, kDateShort);
-        progMap["recstarttime"] = MythDate::toString(m_recStartTs, kTime);
-        progMap["recstartdate"] = MythDate::toString(m_recStartTs, kDateShort);
-        progMap["recendtime"] = MythDate::toString(m_recEndTs, kTime);
-        progMap["recenddate"] = MythDate::toString(m_recEndTs, kDateShort);
+            MythDate::toString(m_startTs, date_format | kDateFull | kSimplify);
+        progMap["shortstartdate"] = MythDate::toString(m_startTs, date_format | kDateShort);
+        progMap["endtime"] = MythDate::toString(m_endTs, date_format | kTime);
+        progMap["enddate"] = MythDate::toString(m_endTs, date_format | kDateFull | kSimplify);
+        progMap["shortenddate"] = MythDate::toString(m_endTs, date_format | kDateShort);
+        progMap["recstarttime"] = MythDate::toString(m_recStartTs, date_format | kTime);
+        progMap["recstartdate"] = MythDate::toString(m_recStartTs, date_format | kDateShort);
+        progMap["recendtime"] = MythDate::toString(m_recEndTs, date_format | kTime);
+        progMap["recenddate"] = MythDate::toString(m_recEndTs, date_format | kDateShort);
         progMap["startts"] = QString::number(m_startTs.toSecsSinceEpoch());
         progMap["endts"]   = QString::number(m_endTs.toSecsSinceEpoch());
         if (timeNow.toLocalTime().date().year() !=
@@ -1569,30 +1601,34 @@ void ProgramInfo::ToMap(InfoMap &progMap,
 
     using namespace MythDate;
     progMap["timedate"] =
-        MythDate::toString(m_recStartTs, kDateTimeFull | kSimplify) + " - " +
-        MythDate::toString(m_recEndTs, kTime);
+        MythDate::toString(m_recStartTs, date_format | kDateTimeFull | kSimplify) + " - " +
+        MythDate::toString(m_recEndTs, date_format | kTime);
 
     progMap["shorttimedate"] =
-        MythDate::toString(m_recStartTs, kDateTimeShort | kSimplify) + " - " +
-        MythDate::toString(m_recEndTs, kTime);
+        MythDate::toString(m_recStartTs, date_format | kDateTimeShort | kSimplify) + " - " +
+        MythDate::toString(m_recEndTs, date_format | kTime);
 
     progMap["starttimedate"] =
-        MythDate::toString(m_recStartTs, kDateTimeFull | kSimplify);
+        MythDate::toString(m_recStartTs, date_format | kDateTimeFull | kSimplify);
 
     progMap["shortstarttimedate"] =
-        MythDate::toString(m_recStartTs, kDateTimeShort | kSimplify);
+        MythDate::toString(m_recStartTs, date_format | kDateTimeShort | kSimplify);
 
-    progMap["lastmodifiedtime"] = MythDate::toString(m_lastModified, kTime);
+    progMap["lastmodifiedtime"] = MythDate::toString(m_lastModified, date_format | kTime);
     progMap["lastmodifieddate"] =
-        MythDate::toString(m_lastModified, kDateFull | kSimplify);
+        MythDate::toString(m_lastModified, date_format | kDateFull | kSimplify);
     progMap["lastmodified"] =
-        MythDate::toString(m_lastModified, kDateTimeFull | kSimplify);
+        MythDate::toString(m_lastModified, date_format | kDateTimeFull | kSimplify);
 
     if (m_recordedId)
-        progMap["recordedid"] = m_recordedId;
+    {
+        progMap["recordedid"] = QChar(m_recordedId);
+        progMap["recordedid_str"] = QString::number(m_recordedId);
+    }
 
     progMap["channum"] = m_chanStr;
-    progMap["chanid"] = m_chanId;
+    progMap["chanid"] = QChar(m_chanId);
+    progMap["chanid_str"] = QString::number(m_chanId);
     progMap["channame"] = m_chanName;
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
@@ -1624,6 +1660,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["lentime"] = QObject::tr("%n hour(s)","", hours);
     }
 
+    // This is calling toChar from recordingtypes.cpp, not the QChar
+    // constructor.
     progMap["rectypechar"] = toQChar(GetRecordingRuleType());
     progMap["rectype"] = ::toString(GetRecordingRuleType());
     QString tmp_rec = progMap["rectype"];
@@ -1659,8 +1697,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["inputname"] = m_inputName;
     // Don't add bookmarkupdate to progMap, for now.
 
-    progMap["recpriority"] = m_recPriority;
-    progMap["recpriority2"] = m_recPriority2;
+    progMap["recpriority"] = QChar(m_recPriority);
+    progMap["recpriority2"] = QChar(m_recPriority2);
+    progMap["recpriority_str"]  = QString::number(m_recPriority);
+    progMap["recpriority2_str"] = QString::number(m_recPriority2);
     progMap["recordinggroup"] = (m_recGroup == "Default")
         ? QObject::tr("Default") : m_recGroup;
     progMap["playgroup"] = m_playGroup;
@@ -1679,11 +1719,18 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["storagegroup"] = m_storageGroup;
     }
 
-    progMap["programflags"] = m_programFlags;
-
-    progMap["audioproperties"] = GetAudioProperties();
-    progMap["videoproperties"] = GetVideoProperties();
-    progMap["subtitleType"] = GetSubtitleType();
+    progMap["programflags"]    = QChar(m_programFlags);
+    progMap["audioproperties"] = QChar(m_audioProperties);
+    progMap["videoproperties"] = QChar(m_videoProperties);
+    progMap["subtitleType"]    = QChar(m_subtitleProperties);
+    progMap["programflags_str"]    = QString::number(m_programFlags);
+    progMap["audioproperties_str"] = QString::number(m_audioProperties);
+    progMap["videoproperties_str"] = QString::number(m_videoProperties);
+    progMap["subtitleType_str"]    = QString::number(m_subtitleProperties);
+    progMap["programflags_names"]    = propsValueToString("program", ProgramFlagNames, m_programFlags);
+    progMap["audioproperties_names"] = propsValueToString("audio", AudioPropsNames, m_audioProperties);
+    progMap["videoproperties_names"] = propsValueToString("video", VideoPropsNames, m_videoProperties);
+    progMap["subtitleType_names"]    = propsValueToString("subtitle", SubtitlePropsNames, m_subtitleProperties);
 
     progMap["recstatus"] = RecStatus::toString(GetRecordingStatus(),
                                       GetRecordingRuleType());
@@ -1701,7 +1748,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
                 .arg(QObject::tr("Repeat"))
                 .arg(MythDate::toString(
                          m_originalAirDate,
-                         MythDate::kDateFull | MythDate::kAddYear));
+                         date_format | MythDate::kDateFull | MythDate::kAddYear));
         }
     }
     else
@@ -1743,9 +1790,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     else
     {
         progMap["originalairdate"] = MythDate::toString(
-            m_originalAirDate, MythDate::kDateFull);
+            m_originalAirDate, date_format | MythDate::kDateFull);
         progMap["shortoriginalairdate"] = MythDate::toString(
-            m_originalAirDate, MythDate::kDateShort);
+            m_originalAirDate, date_format | MythDate::kDateShort);
     }
 
     // 'mediatype' for a statetype, so untranslated
@@ -2044,9 +2091,9 @@ bool ProgramInfo::LoadProgramFromRecorded(
              ((m_programFlags & FL_REALLYEDITING) != 0U) ||
              ((m_programFlags & FL_COMMPROCESSING) != 0U));
 
-    m_properties = ((query.value(44).toUInt() << kSubtitlePropertyOffset) |
-                    (query.value(43).toUInt() << kVideoPropertyOffset)    |
-                    (query.value(42).toUInt() << kAudioPropertyOffset));
+    m_audioProperties    = query.value(42).toUInt();
+    m_videoProperties    = query.value(43).toUInt();
+    m_subtitleProperties = query.value(44).toUInt();
     // ancillary data -- end
 
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1895, 12, 28))
@@ -4672,11 +4719,10 @@ void ProgramInfo::SaveVideoProperties(uint mask, uint video_property_flags)
         return;
     }
 
-    uint videoproperties = GetVideoProperties();
+    uint videoproperties = m_videoProperties;
     videoproperties &= ~mask;
     videoproperties |= video_property_flags;
-    m_properties &= ~kVideoPropertyMask;
-    m_properties |= videoproperties << kVideoPropertyOffset;
+    m_videoProperties = videoproperties;
 
     SendUpdateEvent();
 }

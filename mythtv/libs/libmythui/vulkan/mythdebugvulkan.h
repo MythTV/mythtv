@@ -8,11 +8,11 @@
 class MUI_PUBLIC MythDebugVulkan : protected MythVulkanObject
 {
   public:
-    static const MythVulkan4F s_DebugRed;
-    static const MythVulkan4F s_DebugGreen;
-    static const MythVulkan4F s_DebugBlue;
-    static const MythVulkan4F s_DebugGray;
-    static const MythVulkan4F s_DebugBlack;
+    static const MythVulkan4F kDebugRed;
+    static const MythVulkan4F kDebugGreen;
+    static const MythVulkan4F kDebugBlue;
+    static const MythVulkan4F kDebugGray;
+    static const MythVulkan4F kDebugBlack;
 
     static MythDebugVulkan* Create(MythVulkanObject* Vulkan);
 

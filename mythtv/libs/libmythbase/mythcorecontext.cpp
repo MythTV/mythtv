@@ -133,7 +133,6 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_guiContext(guicontext),
       m_guiObject(nullptr),
       m_appBinaryVersion(std::move(binversion)),
-      m_sockLock(QMutex::NonRecursive),
       m_serverSock(nullptr),
       m_eventSock(nullptr),
       m_wolInProgress(false),
@@ -159,7 +158,13 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
 #endif
 }
 
-static void delete_sock(QMutexLocker &locker, MythSocket **s)
+static void delete_sock(
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    QMutexLocker &locker,
+#else
+    QMutexLocker<QMutex> &locker,
+#endif
+    MythSocket **s)
 {
     if (*s)
     {

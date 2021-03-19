@@ -11,6 +11,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <QBuffer>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 
 #include "soapclient.h"
 
@@ -217,7 +220,11 @@ QDomDocument SOAPClient::SendSOAPRequest(const QString &sMethod,
     QByteArray  aBuffer;
     QTextStream os( &aBuffer );
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     os.setCodec("UTF-8");
+#else
+    os.setEncoding(QStringConverter::Utf8);
+#endif
 
     os << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"; 
     os << "<s:Envelope "

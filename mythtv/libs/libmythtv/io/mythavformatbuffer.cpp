@@ -90,7 +90,11 @@ int64_t MythAVFormatBuffer::SeekPacket(void *Context, int64_t Offset, int Whence
 
 URLProtocol *MythAVFormatBuffer::GetURLProtocol(void)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex s_avringbufferLock(QMutex::Recursive);
+#else
+    static QRecursiveMutex s_avringbufferLock;
+#endif
     static bool   s_avringbufferInitialised = false;
 
     QMutexLocker lock(&s_avringbufferLock);

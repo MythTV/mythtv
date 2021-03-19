@@ -116,7 +116,7 @@ void MythUISpinBox::AddSelection(int value, const QString &label)
         }
     }
 
-    new MythUIButtonListItem(this, label.isEmpty() ? QString(value) : label,
+    new MythUIButtonListItem(this, label.isEmpty() ? QChar(value) : label,
                                     QVariant::fromValue(value), insertPos);
 }
 

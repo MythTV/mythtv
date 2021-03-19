@@ -342,7 +342,6 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
  */
 MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, bool allowEject)
   : QObject(par),
-    m_devicesLock(QMutex::Recursive),
     m_monitorPollingInterval(interval),
     m_allowEject(allowEject)
 {
@@ -663,7 +662,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
         QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
         if (!extensions.isEmpty())
-            msg += QString(", ext(%1)").arg(extensions, 0, 16);
+            msg += QString(", ext(%1)").arg(extensions);
 
         LOG(VB_MEDIA, LOG_INFO,
                  "Registering '" + destination + "' as a media handler for " +

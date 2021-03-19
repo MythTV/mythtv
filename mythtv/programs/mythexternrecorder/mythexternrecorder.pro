@@ -2,7 +2,8 @@ include (../../settings.pro)
 include (../../version.pro)
 include ( ../programs-libs.pro )
 
-QT += network xml sql script core
+QT += network xml sql core
+contains(QT_MAJOR_VERSION, 5): QT += script
 
 TEMPLATE = app
 CONFIG += thread

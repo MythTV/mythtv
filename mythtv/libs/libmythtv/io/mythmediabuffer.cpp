@@ -1848,7 +1848,11 @@ MythBDBuffer  *MythMediaBuffer::BD(void)
 
 void MythMediaBuffer::AVFormatInitNetwork(void)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex s_avnetworkLock(QMutex::Recursive);
+#else
+    static QRecursiveMutex s_avnetworkLock;
+#endif
     static bool s_avnetworkInitialised = false;
     QMutexLocker lock(&s_avnetworkLock);
     if (!s_avnetworkInitialised)

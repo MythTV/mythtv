@@ -1511,7 +1511,7 @@ void MainServer::customEvent(QEvent *e)
         if (me->Message() == "IMAGE_GET_METADATA")
             ImageManagerBe::getInstance()->HandleGetMetadata(me->ExtraData());
 
-        MythEvent mod_me("");
+        std::unique_ptr<MythEvent> mod_me {nullptr};
         if (me->Message().startsWith("MASTER_UPDATE_REC_INFO"))
         {
             QStringList tokens = me->Message().simplified().split(" ");
@@ -1530,8 +1530,7 @@ void MainServer::customEvent(QEvent *e)
 
                 QStringList list;
                 evinfo.ToStringList(list);
-                mod_me = MythEvent("RECORDING_LIST_CHANGE UPDATE", list);
-                me = &mod_me;
+                mod_me = std::make_unique<MythEvent>("RECORDING_LIST_CHANGE UPDATE", list);
             }
             else
             {
@@ -1555,15 +1554,22 @@ void MainServer::customEvent(QEvent *e)
             if ((tokens.size() >= 2) && (tokens[1] == "FINISHED"))
                 m_downloadURLs.remove(localFile);
 
-            mod_me = MythEvent(me->Message(), extraDataList);
-            me = &mod_me;
+            mod_me = std::make_unique<MythEvent>(me->Message(), extraDataList);
         }
 
         if (broadcast.empty())
         {
             broadcast.push_back("BACKEND_MESSAGE");
-            broadcast.push_back(me->Message());
-            broadcast += me->ExtraDataList();
+            if (mod_me != nullptr)
+            {
+                broadcast.push_back(mod_me->Message());
+                broadcast += mod_me->ExtraDataList();
+            }
+            else
+            {
+                broadcast.push_back(me->Message());
+                broadcast += me->ExtraDataList();
+            }
         }
     }
 

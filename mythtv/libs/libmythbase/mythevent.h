@@ -67,8 +67,13 @@ class MBASE_PUBLIC MythEvent : public QEvent
     const QStringList& ExtraDataList() const { return m_extradata; }
     int ExtraDataCount() const { return m_extradata.size(); }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     virtual MythEvent *clone() const
     { return new MythEvent(m_message, m_extradata); }
+#else
+    MythEvent *clone() const override
+    { return new MythEvent(type(), m_message, m_extradata); }
+#endif
 
     static Type MythEventMessage;
     static Type MythUserMessage;
@@ -82,6 +87,14 @@ class MBASE_PUBLIC MythEvent : public QEvent
     static Type kUpdateBrowseInfoEventType;
     static Type kDisableUDPListenerEventType;
     static Type kEnableUDPListenerEventType;
+
+  // No implicit copying.
+  protected:
+    MythEvent(const MythEvent &other) = default;
+    MythEvent &operator=(const MythEvent &other) = default;
+  public:
+    MythEvent(MythEvent &&) = delete;
+    MythEvent &operator=(MythEvent &&) = delete;
 
   protected:
     QString m_message;

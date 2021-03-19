@@ -3,7 +3,11 @@
 
 #include <QStringList>
 #include <QPointer>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QWaitCondition>
 #include <QList>
 #include <QDateTime>
@@ -113,7 +117,11 @@ class MPUBLIC MediaMonitor : public QObject
                                       bool showUsable = false);
 
   protected:
-    QMutex                       m_devicesLock;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+    QMutex                       m_devicesLock {QMutex::Recursive};
+#else
+    QRecursiveMutex              m_devicesLock;
+#endif
     QList<MythMediaDevice*>      m_devices;
     QList<MythMediaDevice*>      m_removedDevices;
     QMap<MythMediaDevice*, int>  m_useCount;

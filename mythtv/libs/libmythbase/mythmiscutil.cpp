@@ -178,7 +178,7 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
 loadArray getLoadAvgs (void)
 {
 #if !defined(_WIN32) && !defined(Q_OS_ANDROID)
-    loadArray loads;
+    loadArray loads {};
     if (getloadavg(loads.data(), loads.size()) != -1)
         return loads;
 #endif

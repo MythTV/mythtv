@@ -3,7 +3,11 @@
 
 // Qt
 #include <QMap>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QVector>
 
 // MythTV
@@ -33,7 +37,11 @@ class MTV_PUBLIC MythCodecMap
 
   private:
     QMap<const AVStream*, AVCodecContext*> m_streamMap;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QMutex m_mapLock { QMutex::Recursive };
+#else
+    QRecursiveMutex m_mapLock;
+#endif
 };
 
 class MTV_PUBLIC MythAVCopy

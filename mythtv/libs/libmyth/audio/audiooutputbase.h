@@ -274,7 +274,7 @@ class AudioOutputBase : public AudioOutput, public MThread
     std::chrono::milliseconds m_audbufTimecode            {0ms};
     AsyncLooseLock    m_resetActive;
 
-    QMutex            m_killAudioLock                     {QMutex::NonRecursive};
+    QMutex            m_killAudioLock;
 
     std::chrono::seconds m_currentSeconds                 {-1s};
 

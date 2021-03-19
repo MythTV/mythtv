@@ -345,7 +345,11 @@ bool MythMediaCodecContext::IsDeinterlacing(bool &DoubleRate, bool)
 MCProfiles &MythMediaCodecContext::GetProfiles(void)
 {
     // TODO Something tells me this is leakier than a leaky thing
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     static bool s_initialised = false;
     static MCProfiles s_profiles;
 
@@ -494,7 +498,11 @@ void MythMediaCodecContext::GetDecoderList(QStringList &Decoders)
 
 bool MythMediaCodecContext::HaveMediaCodec(bool Reinit /*=false*/)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     static bool s_initialised = false;
     static bool s_available   = false;
 

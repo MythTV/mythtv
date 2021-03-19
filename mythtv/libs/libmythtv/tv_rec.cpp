@@ -3935,7 +3935,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
                                 "Recording", title,
                                 tr("See 'Tuning timeout' in mythtv-setup "
                                    "for this input."));
-            gCoreContext->SendEvent(MythEvent(mn));
+            gCoreContext->SendEvent(mn);
 
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("It took longer than %1 ms to get a signal lock. "
@@ -3991,7 +3991,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
                             tr("See 'Tuning timeout' in mythtv-setup "
                                "for this input."));
         mn.SetDuration(30s);
-        gCoreContext->SendEvent(MythEvent(mn));
+        gCoreContext->SendEvent(mn);
 
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("TuningSignalCheck: taking more than %1 ms to get a lock. "

@@ -10,6 +10,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QTextStream>
 #include <QTextCodec>
 #include <QUrl>
@@ -266,7 +270,11 @@ QString CDSObject::toXml( FilterMap &filter,
 {
     QString     sXML;
     QTextStream os( &sXML, QIODevice::WriteOnly );
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     os.setCodec(QTextCodec::codecForName("UTF-8"));
+#else
+    os.setEncoding(QStringConverter::Utf8);
+#endif
     toXml(os, filter, ignoreChildren);
     os << QT_FLUSH;
     return( sXML );

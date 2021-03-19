@@ -207,7 +207,7 @@ class DTVInversion : public DTVParamHelper
         {
             if (toString().length() > 0)
                 return toString().at(0);
-            return {0};
+            return QChar(0);
         }
 
     static QString toString(int _value)
@@ -270,7 +270,7 @@ class DTVBandwidth : public DTVParamHelper
         {
             if (toString().length() > 0)
                 return toString().at(0);
-            return {0};
+            return QChar(0);
         }
 
     static QString toString(int _value)
@@ -477,7 +477,7 @@ class DTVTransmitMode : public DTVParamHelper
         {
             if (toString().length() > 0)
                 return toString().at(0);
-            return {0};
+            return QChar(0);
         }
 
     static QString toString(int _value)
@@ -595,7 +595,7 @@ class DTVHierarchy : public DTVParamHelper
         {
             if (toString().length() > 0)
                 return toString().at(0);
-            return {0};
+            return QChar(0);
         }
 
     static QString toString(int _value)
@@ -634,7 +634,7 @@ class DTVPolarity : public DTVParamHelper
         {
             if (toString().length() > 0)
                 return toString().at(0);
-            return {0};
+            return QChar(0);
         }
 
     static QString toString(int _value)

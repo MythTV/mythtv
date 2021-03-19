@@ -8,6 +8,9 @@
 #include <QString>
 #include <QMutex>
 #include <QMap>
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#include <QRecursiveMutex>
+#endif
 
 #include "mythdate.h"
 #include "DeviceReadBuffer.h"
@@ -93,7 +96,11 @@ class HDHRStreamHandler : public StreamHandler
     HDHRTuneMode                 m_tuneMode         {hdhrTuneModeNone}; // debug self check
     int                          m_majorId;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex               m_hdhrLock         {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex      m_hdhrLock;
+#endif
 
     // for implementing Get & Return
     static QMutex                            s_handlersLock;

@@ -58,7 +58,7 @@ class MTV_PUBLIC RecordingRule
     void UseTempTable(bool usetemp, const QString& table = "record_tmp");
     static unsigned GetDefaultFilter(void);
 
-    void ToMap(InfoMap &infoMap) const;
+    void ToMap(InfoMap &infoMap, uint date_format = 0) const;
 
     AutoExpireType GetAutoExpire(void) const
         { return m_autoExpire ? kNormalAutoExpire : kDisableAutoExpire; }

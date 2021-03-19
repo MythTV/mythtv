@@ -129,7 +129,7 @@ void MythVideoVulkan::PrepareFrame(MythVideoFrame* Frame, FrameScanType /*Scan*/
     //MythVideoTexture::UpdateTextures(m_render, Frame, current ? m_inputTextures : m_nextTextures);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
-        m_vulkanRender->BeginDebugRegion(cmdbuffer, "PREPARE_FRAME", MythDebugVulkan::s_DebugBlue);
+        m_vulkanRender->BeginDebugRegion(cmdbuffer, "PREPARE_FRAME", MythDebugVulkan::kDebugBlue);
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
         m_vulkanRender->EndDebugRegion(cmdbuffer);

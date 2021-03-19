@@ -150,9 +150,9 @@ RecordingInfo::RecordingInfo(
     m_inputId = _inputid;
     m_findId = _findid;
 
-    m_properties = ((_subtitleType    << kSubtitlePropertyOffset) |
-                  (_videoproperties << kVideoPropertyOffset)  |
-                  _audioproperties);
+    m_videoProperties = _videoproperties;
+    m_audioProperties = _audioproperties;
+    m_subtitleProperties = _subtitleType;
 
     if (m_recStartTs >= m_recEndTs)
     {

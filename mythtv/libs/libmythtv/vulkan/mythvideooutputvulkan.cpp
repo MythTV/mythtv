@@ -87,10 +87,7 @@ bool MythVideoOutputVulkan::Init(const QSize VideoDim, const QSize VideoDispDim,
         return false;
     }
 
-    if (!MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecId))
-        return false;
-
-    return true;
+    return MythVideoOutputGPU::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecId);
 }
 
 void MythVideoOutputVulkan::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
@@ -113,7 +110,7 @@ void MythVideoOutputVulkan::RenderFrame(MythVideoFrame* Frame, FrameScanType Sca
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))
     {
         m_vulkanRender->BeginDebugRegion(m_vulkanWindow->currentCommandBuffer(),
-                                         "RENDER_FRAME", MythDebugVulkan::s_DebugBlue);
+                                         "RENDER_FRAME", MythDebugVulkan::kDebugBlue);
     }
 
     // Actual render

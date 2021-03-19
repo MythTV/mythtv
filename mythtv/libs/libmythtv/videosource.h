@@ -521,7 +521,7 @@ class V4LConfigurationGroup : public GroupSetting
     Q_OBJECT
 
   public:
-    V4LConfigurationGroup(CaptureCard &parent, CardType &cardtype, const QString inputtype);
+    V4LConfigurationGroup(CaptureCard &parent, CardType &cardtype, const QString &inputtype);
 
   public slots:
     void probeCard(const QString &device);

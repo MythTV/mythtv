@@ -51,6 +51,14 @@ class DecoderHandlerEvent : public MythEvent
     static Type OperationStop;
     static Type Error;
 
+  // No implicit copying.
+  protected:
+    DecoderHandlerEvent(const DecoderHandlerEvent &other) = default;
+    DecoderHandlerEvent &operator=(const DecoderHandlerEvent &other) = default;
+  public:
+    DecoderHandlerEvent(DecoderHandlerEvent &&) = delete;
+    DecoderHandlerEvent &operator=(DecoderHandlerEvent &&) = delete;
+
   private:
     QString       *m_msg       {nullptr};
     MusicMetadata *m_meta      {nullptr};
