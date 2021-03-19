@@ -58,8 +58,11 @@ void FillProgramInfo( DTC::Program *pProgram,
     pProgram->setCatType   (  pInfo->GetCategoryTypeString());
     pProgram->setRepeat    (  pInfo->IsRepeat()             );
     pProgram->setVideoProps(  pInfo->GetVideoProperties()   );
+    pProgram->setVideoPropNames( pInfo->GetVideoPropertyNames() );
     pProgram->setAudioProps(  pInfo->GetAudioProperties()   );
+    pProgram->setAudioPropNames( pInfo->GetAudioPropertyNames() );
     pProgram->setSubProps  (  pInfo->GetSubtitleType()      );
+    pProgram->setSubPropNames( pInfo->GetSubtitleTypeNames() );
 
     pProgram->setSerializeDetails( bDetails );
 
@@ -70,6 +73,7 @@ void FillProgramInfo( DTC::Program *pProgram,
         pProgram->setStars       ( pInfo->GetStars()            );
         pProgram->setLastModified( pInfo->GetLastModifiedTime() );
         pProgram->setProgramFlags( pInfo->GetProgramFlags()     );
+        pProgram->setProgramFlagNames( pInfo->GetProgramFlagNames() );
 
         // ----
         // DEPRECATED - See RecordingInfo instead

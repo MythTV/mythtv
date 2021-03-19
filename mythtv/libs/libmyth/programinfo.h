@@ -469,6 +469,7 @@ class MPUBLIC ProgramInfo
     uint    GetFindID(void)               const { return m_findId;       }
 
     uint32_t GetProgramFlags(void)        const { return m_programFlags; }
+    QString GetProgramFlagNames(void) const;
     ProgramInfoType GetProgramInfoType(void) const
         { return (ProgramInfoType)((m_programFlags & FL_TYPEMASK) >> 20); }
     QDateTime GetBookmarkUpdate(void) const { return m_bookmarkUpdate; }
@@ -489,8 +490,17 @@ class MPUBLIC ProgramInfo
         { return (m_programFlags & FL_DELETEPENDING) != 0U; }
 
     uint GetSubtitleType(void)    const { return m_subtitleProperties; }
+    QString GetSubtitleTypeNames(void) const;
     uint GetVideoProperties(void) const { return m_videoProperties; }
+    QString GetVideoPropertyNames(void) const;
     uint GetAudioProperties(void) const { return m_audioProperties; }
+    QString GetAudioPropertyNames(void) const;
+
+    static uint ProgramFlagsFromNames(const QString & names);
+    static uint SubtitleTypesFromNames(const QString & names);
+    static uint VideoPropertiesFromNames(const QString & names);
+    static uint AudioPropertiesFromNames(const QString & names);
+
 
     enum Verbosity
     {
