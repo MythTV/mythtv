@@ -1216,7 +1216,6 @@ void MythMainWindow::BindKey(const QString& Context, const QString& Action, cons
     for (unsigned int i = 0; i < static_cast<uint>(keyseq.count()); i++)
     {
         int keynum = keyseq[i];
-        keynum &= ~Qt::UNICODE_ACCEL;
 
         QStringList dummyaction("");
         if (m_priv->m_keyContexts.value(Context)->GetMapping(keynum, dummyaction))
@@ -1372,7 +1371,6 @@ void MythMainWindow::BindJump(const QString& Destination, const QString& Key)
     for (unsigned int i = 0; i < static_cast<uint>(keyseq.count()); i++)
     {
         int keynum = keyseq[i];
-        keynum &= ~Qt::UNICODE_ACCEL;
 
         if (m_priv->m_jumpMap.count(keynum) == 0)
         {
