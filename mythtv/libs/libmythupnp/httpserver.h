@@ -43,7 +43,9 @@
 #include "compat.h"
 
 class HttpWorkerThread;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 class QScriptEngine;
+#endif
 class HttpServer;
 #ifndef QT_NO_OPENSSL
 class QSslKey;

@@ -26,7 +26,10 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QScriptEngine>
+#endif
 
 #include "videometadatalistmanager.h"
 
@@ -138,6 +141,7 @@ class Video : public VideoServices
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 class ScriptableVideo : public QObject
 {
     Q_OBJECT
@@ -297,5 +301,6 @@ class ScriptableVideo : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableVideo, QObject*);
+#endif
 
 #endif

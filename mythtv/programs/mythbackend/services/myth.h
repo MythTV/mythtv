@@ -26,7 +26,10 @@
 #ifndef MYTH_H
 #define MYTH_H
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QScriptEngine>
+#endif
 
 #include "services/mythServices.h"
 #include <datacontracts/frontend.h>
@@ -168,6 +171,7 @@ class Myth : public MythServices
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 class ScriptableMyth : public QObject
 {
     Q_OBJECT
@@ -438,5 +442,6 @@ class ScriptableMyth : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableMyth, QObject*);
+#endif
 
 #endif

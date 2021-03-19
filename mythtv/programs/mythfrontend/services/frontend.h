@@ -1,7 +1,10 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QScriptEngine>
+#endif
 #include "services/frontendServices.h"
 #include "service.h"
 
@@ -65,6 +68,7 @@ class Frontend : public FrontendServices
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 class ScriptableFrontend : public QObject
 {
     Q_OBJECT
@@ -85,5 +89,6 @@ class ScriptableFrontend : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV(ScriptableFrontend, QObject*);
+#endif
 
 #endif // FRONTEND_H

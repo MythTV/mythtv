@@ -14,7 +14,9 @@
 #define HTMLSERVER_H
 
 #include "httpserver.h"
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include "serverSideScripting.h"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -28,7 +30,9 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
 {
     private:
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         ServerSideScripting m_scripting;
+#endif
         QString             m_indexFilename;
 
     public:
@@ -44,11 +48,12 @@ class UPNP_PUBLIC HtmlServerExtension : public HttpServerExtension
 
         bool ProcessRequest( HTTPRequest *pRequest ) override; // HttpServerExtension
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         QScriptEngine* ScriptEngine()
         {
             return &(m_scripting.m_engine);
         }
-
+#endif
 };
 
 #endif // HTMLSERVER_H

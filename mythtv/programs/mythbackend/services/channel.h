@@ -26,7 +26,10 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QScriptEngine>
+#endif
 
 #include "services/channelServices.h"
 
@@ -166,6 +169,7 @@ class Channel : public ChannelServices
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 class ScriptableChannel : public QObject
 {
     Q_OBJECT
@@ -363,5 +367,6 @@ class ScriptableChannel : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableChannel, QObject*);
+#endif
 
 #endif

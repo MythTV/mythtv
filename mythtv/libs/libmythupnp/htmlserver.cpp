@@ -31,6 +31,7 @@ HtmlServerExtension::HtmlServerExtension( const QString &sSharePath,
   : HttpServerExtension( "Html" , sSharePath),
     m_indexFilename(sApplicationPrefix + "index")
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     LOG(VB_HTTP, LOG_INFO, QString("HtmlServerExtension() - SharePath = %1")
             .arg(m_sSharePath));
     m_scripting.SetResourceRootPath( m_sSharePath );
@@ -43,6 +44,7 @@ HtmlServerExtension::HtmlServerExtension( const QString &sSharePath,
     QScriptEngine *pEngine = ScriptEngine();
     pEngine->globalObject().setProperty("Rtti",
          pEngine->scriptValueFromQMetaObject< ScriptableRtti >() );
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -203,7 +205,9 @@ bool HtmlServerExtension::ProcessRequest( HTTPRequest *pRequest )
                     {
                         QTextStream stream( &pRequest->m_response );
                         
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
                         m_scripting.EvaluatePage( &stream, sResName, pRequest, cspNonce);
+#endif
 
                         return true;
                     }

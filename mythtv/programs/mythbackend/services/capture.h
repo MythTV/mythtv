@@ -26,7 +26,10 @@
 #ifndef CAPTURE_H
 #define CAPTURE_H
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QScriptEngine>
+#endif
 
 #include "services/captureServices.h"
 
@@ -117,6 +120,7 @@ class Capture : public CaptureServices
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 class ScriptableCapture : public QObject
 {
     Q_OBJECT
@@ -181,5 +185,6 @@ class ScriptableCapture : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableCapture, QObject*);
+#endif
 
 #endif

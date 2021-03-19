@@ -26,7 +26,10 @@
 #ifndef GUIDE_H
 #define GUIDE_H
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QScriptEngine>
+#endif
 
 #include "serviceUtil.h"
 
@@ -106,6 +109,7 @@ class Guide : public GuideServices
 // We should continue to look for a cleaning solution to this problem.
 // --------------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 class ScriptableGuide : public QObject
 {
     Q_OBJECT
@@ -216,5 +220,6 @@ class ScriptableGuide : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableGuide, QObject*);
+#endif
 
 #endif

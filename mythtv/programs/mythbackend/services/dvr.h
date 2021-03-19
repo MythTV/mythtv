@@ -26,7 +26,10 @@
 #ifndef DVR_H
 #define DVR_H
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QScriptEngine>
+#endif
 
 #include "services/dvrServices.h"
 
@@ -320,6 +323,8 @@ class Dvr : public DvrServices
 // --------------------------------------------------------------------------
 
 
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 class ScriptableDvr : public QObject
 {
     Q_OBJECT
@@ -692,5 +697,6 @@ class ScriptableDvr : public QObject
 
 // NOLINTNEXTLINE(modernize-use-auto)
 Q_SCRIPT_DECLARE_QMETAOBJECT_MYTHTV( ScriptableDvr, QObject*)
+#endif
 
 #endif

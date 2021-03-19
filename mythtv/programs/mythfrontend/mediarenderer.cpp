@@ -9,7 +9,9 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <QTextStream>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QScriptEngine>
+#endif
 
 #include "upnpsubscription.h"
 #include "upnputil.h"
@@ -84,10 +86,12 @@ MediaRenderer::MediaRenderer()
     //          classes. - dblain
     // ------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QScriptEngine* pEngine = pHtmlServer->ScriptEngine();
 
     pEngine->globalObject().setProperty("Frontend"   ,
         pEngine->scriptValueFromQMetaObject< ScriptableFrontend    >() );
+#endif
 
     // ----------------------------------------------------------------------
     // Initialize UPnp Stack
