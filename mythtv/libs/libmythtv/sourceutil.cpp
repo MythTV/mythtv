@@ -103,7 +103,7 @@ QString SourceUtil::GetChannelSeparator(uint sourceid)
         {
             const QString channum = query.value(0).toString();
             const int where = channum.indexOf(sepExpr);
-            if (channum.rightRef(2).startsWith("0"))
+            if (channum.right(2).startsWith("0"))
                 counts["0"]++;
             else
                 counts[(where < 0) ? "" : QString(channum.at(where))]++;

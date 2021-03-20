@@ -58,7 +58,7 @@ namespace M3U
         while (++i < line.size() && line[i].isNumber());
         if (i == p + 1)
             return false;
-        target = line.midRef(p + 1, i - p - 1).toInt();
+        target = line.mid(p + 1, i - p - 1).toInt();
         return true;
     }
 
@@ -75,7 +75,7 @@ namespace M3U
         while (++i < line.size() && line[i].isNumber());
         if (i == p + 1)
             return false;
-        target = line.midRef(p + 1, i - p - 1).toInt();
+        target = line.mid(p + 1, i - p - 1).toInt();
         return true;
     }
 

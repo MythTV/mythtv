@@ -8,6 +8,8 @@ level1
 // Disable these level0 checks
    no-overloaded-signal
    no-qstring-arg
+   // Qt6 removed QStringRef class
+   no-qstring-ref
  
 // Disable these level1 checks
    no-qproperty-without-notify

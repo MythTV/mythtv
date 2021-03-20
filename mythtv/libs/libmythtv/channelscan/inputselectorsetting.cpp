@@ -136,7 +136,7 @@ bool InputSelector::Parse(const QString &cardid_inputname,
     if (sep0 < 1)
         return false;
 
-    cardid    = cardid_inputname.leftRef(sep0).toUInt();
+    cardid    = cardid_inputname.left(sep0).toUInt();
     inputname = cardid_inputname.mid(sep0 + 1);
 
     return true;

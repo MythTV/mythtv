@@ -1498,7 +1498,7 @@ void LCDProcClient::scrollMenuText()
                 // Indent this item if nessicary
                 aString += bString.fill(' ', curItem->getIndent());
 
-                aString += curItem->ItemName().midRef(curItem->getScrollPos(),
+                aString += curItem->ItemName().mid(curItem->getScrollPos(),
                                                    ( m_lcdWidth - lcdStartCol));
                 aString += "\"";
                 sendToServer(aString);
@@ -1604,7 +1604,7 @@ void LCDProcClient::scrollMenuText()
             curItem->incrementScrollPos();
 
             if ((int)curItem->getScrollPos() <= longest_line)
-                aString += curItem->ItemName().midRef(curItem->getScrollPos(),
+                aString += curItem->ItemName().mid(curItem->getScrollPos(),
                                                    ( m_lcdWidth-lcdStartCol));
 
             aString += "\"";

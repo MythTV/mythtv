@@ -604,7 +604,7 @@ QString MythUIVirtualKeyboard::decodeChar(QString c)
         }
         else
         {
-            res += c.leftRef(1);
+            res += c.at(0);
             c = c.mid(1);
         }
     }

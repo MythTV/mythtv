@@ -1778,7 +1778,7 @@ int HLSRingBuffer::ParseDecimalValue(const QString &line, int &target)
     while (++i < line.size() && line[i].isNumber());
     if (i == p + 1)
         return RET_ERROR;
-    target = line.midRef(p+1, i - p - 1).toInt();
+    target = line.mid(p+1, i - p - 1).toInt();
     return RET_OK;
 }
 

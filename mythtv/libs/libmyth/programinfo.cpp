@@ -2152,7 +2152,7 @@ bool ProgramInfo::IsDuplicateProgram(const ProgramInfo& other) const
             int index = m_programId.indexOf('/');
             int oindex = other.m_programId.indexOf('/');
             if (index == oindex && (index < 0 ||
-                m_programId.leftRef(index) == other.m_programId.leftRef(oindex)))
+                m_programId.left(index) == other.m_programId.left(oindex)))
                 return m_programId == other.m_programId;
         }
         else
@@ -2211,7 +2211,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
             int index = m_programId.indexOf('/');
             int oindex = other.m_programId.indexOf('/');
             if (index == oindex && (index < 0 ||
-                m_programId.leftRef(index) == other.m_programId.leftRef(oindex)))
+                m_programId.left(index) == other.m_programId.left(oindex)))
                 return m_programId == other.m_programId;
         }
         else
