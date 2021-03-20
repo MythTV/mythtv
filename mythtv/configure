@@ -6966,7 +6966,7 @@ if enabled gxx; then
     #check_cxxflags -Wuseless-cast
 
     # Ubuntu 16.04 uses gcc 5.4.0 which complains about '[[clang::fallthrough]]'
-    gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\)\{1,\}.*/\1/')
+    gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\{1,\}\).*/\1/')
     if test $gxx_major_version -lt 7; then
         if enabled arm; then
             check_cxxflags -Wno-psabi
