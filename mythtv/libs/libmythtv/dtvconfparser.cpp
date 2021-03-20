@@ -41,7 +41,8 @@
 #include "channelutil.h"
 
 #define PARSE_SKIP(VAR) do { \
-    if (it == tokens.end()) return false; ++it; } while(false)
+    if (it == tokens.end()) return false; \
+    ++it; } while(false)
 
 #define PARSE_CONF(VAR) do { \
     if (it == tokens.end() || !(VAR).ParseConf(*it++)) \
