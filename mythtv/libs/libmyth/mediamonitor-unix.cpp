@@ -279,7 +279,8 @@ bool MediaMonitorUnix::CheckMountable(void)
     QDir sysfs("/sys/block");
     sysfs.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 
-    for (const auto& device : sysfs.entryList())
+    auto list = sysfs.entryList();
+    for (const auto& device : qAsConst(list))
     {
         // ignore floppies, too slow
         if (device.startsWith("fd"))
@@ -843,19 +844,19 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
  */
 void MediaMonitorUnix::CheckDeviceNotifications(void)
 {
-    char buffer[256];
+    std::string buffer(256,'\0');
     QString qBuffer;
 
     if (m_fifo == -1)
         return;
 
-    int size = read(m_fifo, buffer, 255);
+    int size = read(m_fifo, buffer.data(), 255);
     while (size > 0)
     {
         // append buffer to QString
         buffer[size] = '\0';
-        qBuffer.append(buffer);
-        size = read(m_fifo, buffer, 255);
+        qBuffer.append(QString::fromStdString(buffer));
+        size = read(m_fifo, buffer.data(), 255);
     }
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     const QStringList list = qBuffer.split('\n', QString::SkipEmptyParts);
