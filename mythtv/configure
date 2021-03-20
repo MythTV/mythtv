@@ -6983,11 +6983,14 @@ if enabled gxx; then
     if enabled enforce_nullptr; then
         check_cxxflags -Wzero-as-null-pointer-constant
     fi
-    # Ubuntu 16.04 has problems with this flag.  Its not GCC or Qt, as
-    # both older compilers and/or older Qt versions on other systems
-    # produce clean output.  This is a simple check to eliminate that
-    # specific version (and more, but it gets the job done).
-    if [ $qt_version -ge $(version2num "5.7.0") ]; then
+    # The Q_OBJECT macro gets included in every subclass that is based
+    # on QOBject, and has a couple of functions marked as "virtual"
+    # instead of "override". Apparently earlier version of GCC didn't
+    # warn about this because the errors were in the /usr/include
+    # directory. GCC11 does print these warnings. A ton of
+    # them. Disable this warning to make it easier to find real
+    # errors.
+    if [ $qt_version -ge $(version2num "11.0.0") ]; then
         check_cxxflags -Wsuggest-override
     fi
 elif enabled icpc; then
