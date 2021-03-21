@@ -209,16 +209,16 @@ def buildNumbers(args, opts):
     if dt:
         # get episode info based on inetref and datetime
         episodes = tvmaze.get_show_episodes_by_date(inetref, dtInTgtZone)
+        best_ep_index = None
         for i, ep in enumerate(episodes):
             if 0 and opts.debug:
                 print("tvmaze.vmaze.get_show_episodes_by_date(%s, %s) returned :" % (inetref, dtInTgtZone))
                 for k, v in ep.__dict__.items():
                     print(k, " : ", v)
             if ep.airtime == show_hour_min_str:
-                # Since we found an exact time match, we're done searching for the best
+                # Since we found an exact time match, we're done searching
                 best_ep_index = i
                 break
-            best_ep_index = i
 
         if len(episodes) > 0 and best_ep_index is not None:
             season_nr  = str(episodes[best_ep_index].season)
