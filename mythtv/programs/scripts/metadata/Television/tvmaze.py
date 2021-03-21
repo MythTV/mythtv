@@ -14,8 +14,12 @@ __version__ = "0.1.0"
 import sys
 import os
 from optparse import OptionParser
-import datetime
-import dateutil
+try:
+    import datetime
+    import dateutil
+    dateLibsAvailable = True
+except ImportError:
+    dateLibsAvailable = False
 
 def print_etree(etostr):
     """lxml.etree.tostring is a bytes object in python3, and a str in python2.
@@ -185,18 +189,21 @@ def buildNumbers(args, opts):
         except(TypeError, ValueError):
             raise Exception("Cannot resolve argument 'inetref'")
 
-    # check whether the 'subtitle' is really a timestamp
-    try:
-        dt = datetime.datetime.strptime(tvsubtitle, "%Y-%m-%d %H:%M:%S")
-        show_info = tvmaze.get_show(inetref)
-        show_network = show_info.network
-        show_country = show_network.get('country')
-        show_tz = show_country.get('timezone')
-        dtInLocalZone = dt.replace(tzinfo=dateutil.tz.gettz())  # assign local timezone
-        dtInTgtZone = dtInLocalZone.astimezone(dateutil.tz.gettz(show_tz)) # convert to show timezone
-        show_hour_min_str = dtInTgtZone.strftime("%H:%M")
+    if dateLibsAvailable:
+        # check whether the 'subtitle' is really a timestamp
+        try:
+            dt = datetime.datetime.strptime(tvsubtitle, "%Y-%m-%d %H:%M:%S")
+            show_info = tvmaze.get_show(inetref)
+            show_network = show_info.network
+            show_country = show_network.get('country')
+            show_tz = show_country.get('timezone')
+            dtInLocalZone = dt.replace(tzinfo=dateutil.tz.gettz())  # assign local timezone
+            dtInTgtZone = dtInLocalZone.astimezone(dateutil.tz.gettz(show_tz)) # convert to show timezone
+            show_hour_min_str = dtInTgtZone.strftime("%H:%M")
 
-    except ValueError as e:
+        except ValueError as e:
+            dt = None
+    else:
         dt = None
 
     if dt:
