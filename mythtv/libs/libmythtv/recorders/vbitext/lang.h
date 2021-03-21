@@ -4,7 +4,7 @@
 #include "vt.h"
 #include "vbilut.h"
 
-extern int latin1;
+extern int isLatin1;
 
 struct enhance
 {

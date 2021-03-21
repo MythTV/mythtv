@@ -3,7 +3,7 @@
 #include "vt.h"
 #include "lang.h"
 
-int latin1 = -1;
+int isLatin1 = -1;
 
 static std::array<uint8_t,256> lang_char;
 
@@ -166,7 +166,7 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
                    case 15: // char from G2 set
                        if (adr < VT_WIDTH && row < VT_HEIGHT)
                        {
-                           if (latin1)
+                           if (isLatin1)
                                vtp->data[row][adr] = g2map_latin1[data-32];
                            else
                                vtp->data[row][adr] = g2map_latin2[data-32];
@@ -179,7 +179,7 @@ do_enhancements(struct enhance *eh, struct vt_page *vtp)
                            size_t index = mark->m_g0.find(data);
                            if (index != std::string::npos)
                            {
-                               if (latin1)
+                               if (isLatin1)
                                    data = mark->m_latin1[index];
                                else
                                    data = mark->m_latin2[index];
