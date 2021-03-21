@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+# Support python3 print syntax if we're running in python2
+from __future__ import print_function
+
 from __future__ import unicode_literals
 
 __title__ = "TVmaze.com"
@@ -11,7 +14,8 @@ __version__ = "0.1.0"
 import sys
 import os
 from optparse import OptionParser
-
+import datetime
+import dateutil
 
 def print_etree(etostr):
     """lxml.etree.tostring is a bytes object in python3, and a str in python2.
@@ -141,8 +145,9 @@ def buildList(tvtitle, opts):
 
 
 def buildNumbers(args, opts):
-    # either option -N inetref subtitle
-    # or  option -N title subtitle
+    # either option -N <inetref> <subtitle>   e.g. -N 69 "Elizabeth Keen"
+    #    or  option -N <title> <subtitle>     e.g. -N "The Blacklist" "Elizabeth Keen"
+    #    or  option -N <title> <date time>    e.g. -N "The Blacklist" "2021-01-29 19:00:00"
     from MythTV.utility import levenshtein
     from MythTV.tvmaze import tvmaze_api as tvmaze
 
@@ -165,6 +170,7 @@ def buildNumbers(args, opts):
     except ValueError:
         tvtitle = args[0]
         tvsubtitle = args[1]
+
         serie = tvmaze.search_show_best_match(tvtitle)
         try:
             # inetref = str(serie.id)
@@ -179,35 +185,70 @@ def buildNumbers(args, opts):
         except(TypeError, ValueError):
             raise Exception("Cannot resolve argument 'inetref'")
 
-    # get episode based on subtitle
-    episodes = tvmaze.get_show_episode_list(inetref)
+    # check whether the 'subtitle' is really a timestamp
+    try:
+        dt = datetime.datetime.strptime(tvsubtitle, "%Y-%m-%d %H:%M:%S")
+        show_info = tvmaze.get_show(inetref)
+        show_network = show_info.network
+        show_country = show_network.get('country')
+        show_tz = show_country.get('timezone')
+        dtInLocalZone = dt.replace(tzinfo=dateutil.tz.gettz())  # assign local timezone
+        dtInTgtZone = dtInLocalZone.astimezone(dateutil.tz.gettz(show_tz)) # convert to show timezone
+        show_hour_min_str = dtInTgtZone.strftime("%H:%M")
 
-    best_ep_index = None
-    ep_distance = 5                     ### XXX read distance from settings
-    for i, ep in enumerate(episodes):
-        if 0 and opts.debug:
-            print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
-            for k, v in ep.__dict__.items():
-                print(k, " : ", v)
-        distance = levenshtein(ep.name, tvsubtitle)
-        if distance < ep_distance:
+    except ValueError as e:
+        dt = None
+
+    if dt:
+        # get episode info based on inetref and datetime
+        episodes = tvmaze.get_show_episodes_by_date(inetref, dtInTgtZone)
+        for i, ep in enumerate(episodes):
+            if 0 and opts.debug:
+                print("tvmaze.vmaze.get_show_episodes_by_date(%s, %s) returned :" % (inetref, dtInTgtZone))
+                for k, v in ep.__dict__.items():
+                    print(k, " : ", v)
+            if ep.airtime == show_hour_min_str:
+                # Since we found an exact time match, we're done searching for the best
+                best_ep_index = i
+                break
             best_ep_index = i
-            ep_distance = distance
-    if len(episodes) > 0 and best_ep_index is not None:
-        season_nr  = str(episodes[best_ep_index].season)
-        episode_nr = str(episodes[best_ep_index].number)
-        episode_id = episodes[best_ep_index].id
-        if opts.debug:
-            print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
-            print("with season : %s and episode %s" % (season_nr, episode_nr))
-            print("Chosen episode index '%d' based on levenshtein distance '%d'."
-                  % (best_ep_index, ep_distance))
 
-        # we have now inetref, season, episode, episode_id
-        buildSingle([inetref, season_nr, episode_nr], opts, tvmaze_episode_id=episode_id)
+        if len(episodes) > 0 and best_ep_index is not None:
+            season_nr  = str(episodes[best_ep_index].season)
+            episode_nr = str(episodes[best_ep_index].number)
+            episode_id = episodes[best_ep_index].id
+            # we have now inetref, season, episode, episode_id
+            buildSingle([inetref, season_nr, episode_nr], opts, tvmaze_episode_id=episode_id)
     else:
-        # tvmaze.py -N 4711 "Episode 42"
-        raise Exception("Cannot find episodes for inetref '%s'." % inetref)
+        # get episode based on subtitle
+        episodes = tvmaze.get_show_episode_list(inetref)
+
+        best_ep_index = None
+        ep_distance = 5                     ### XXX read distance from settings
+        for i, ep in enumerate(episodes):
+            if 0 and opts.debug:
+                print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
+                for k, v in ep.__dict__.items():
+                    print(k, " : ", v)
+            distance = levenshtein(ep.name, tvsubtitle)
+            if distance < ep_distance:
+                best_ep_index = i
+                ep_distance = distance
+        if len(episodes) > 0 and best_ep_index is not None:
+            season_nr  = str(episodes[best_ep_index].season)
+            episode_nr = str(episodes[best_ep_index].number)
+            episode_id = episodes[best_ep_index].id
+            if opts.debug:
+                print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
+                print("with season : %s and episode %s" % (season_nr, episode_nr))
+                print("Chosen episode index '%d' based on levenshtein distance '%d'."
+                      % (best_ep_index, ep_distance))
+
+            # we have now inetref, season, episode, episode_id
+            buildSingle([inetref, season_nr, episode_nr], opts, tvmaze_episode_id=episode_id)
+        else:
+            # tvmaze.py -N 4711 "Episode 42"
+            raise Exception("Cannot find episodes for inetref '%s'." % inetref)
 
 
 def buildSingle(args, opts, tvmaze_episode_id=None):
