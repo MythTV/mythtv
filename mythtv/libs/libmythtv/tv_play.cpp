@@ -1243,6 +1243,10 @@ TV::~TV()
         m_mainWindow->PauseIdleTimer(false);
     }
 
+    qDeleteAll(m_screenPressKeyMapPlayback);
+    m_screenPressKeyMapPlayback.clear();
+    qDeleteAll(m_screenPressKeyMapLiveTV);
+    m_screenPressKeyMapLiveTV.clear();
 
     delete m_lastProgram;
 
@@ -3148,9 +3152,9 @@ static bool SysEventHandleAction(MythMainWindow* MainWindow, QKeyEvent *e, const
     return false;
 }
 
-QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &KeyList)
+QList<QKeyEvent*> TV::ConvertScreenPressKeyMap(const QString &KeyList)
 {
-    QList<QKeyEvent> keyPressList;
+    QList<QKeyEvent*> keyPressList;
     int i = 0;
     QStringList stringKeyList = KeyList.split(',');
     for (const auto & str : qAsConst(stringKeyList))
@@ -3159,7 +3163,7 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &KeyList)
         for(i = 0; i < keySequence.count(); i++)
         {
             uint keynum = static_cast<uint>(keySequence[static_cast<uint>(i)]);
-            QKeyEvent keyEvent(QEvent::None, keynum & ~Qt::KeyboardModifierMask,
+            auto * keyEvent = new QKeyEvent(QEvent::None, keynum & ~Qt::KeyboardModifierMask,
                                static_cast<Qt::KeyboardModifiers>(keynum & Qt::KeyboardModifierMask));
             keyPressList.append(keyEvent);
         }
@@ -3169,7 +3173,7 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &KeyList)
         // add default remainders
         for(; i < kScreenPressRegionCount; i++)
         {
-            QKeyEvent keyEvent(QEvent::None, Qt::Key_Escape, Qt::NoModifier);
+            auto * keyEvent = new QKeyEvent(QEvent::None, Qt::Key_Escape, Qt::NoModifier);
             keyPressList.append(keyEvent);
         }
     }
@@ -3199,8 +3203,8 @@ bool TV::TranslateGesture(const QString &Context, MythGestureEvent *Event,
             region += (pos.y() / h3) * widthDivider;
 
             if (IsLiveTV)
-                return m_mainWindow->TranslateKeyPress(Context, &(m_screenPressKeyMapLiveTV[region]), Actions, true);
-            return m_mainWindow->TranslateKeyPress(Context, &(m_screenPressKeyMapPlayback[region]), Actions, true);
+                return m_mainWindow->TranslateKeyPress(Context, m_screenPressKeyMapLiveTV[region], Actions, true);
+            return m_mainWindow->TranslateKeyPress(Context, m_screenPressKeyMapPlayback[region], Actions, true);
         }
         return false;
     }
