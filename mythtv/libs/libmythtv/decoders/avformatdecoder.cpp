@@ -2876,7 +2876,7 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
 
     bool had_608 = false;
     bool had_708 = false;
-    for (uint cur = 0; cur + 3 < buf_size; cur += 3)
+    for (uint cur = 0; cur + 2 < buf_size; cur += 3)
     {
         uint cc_code  = buf[cur];
         bool cc_valid = (cc_code & 0x04) != 0U;
