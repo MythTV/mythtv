@@ -144,7 +144,7 @@ Checks: '-*,
         # Cases exist. Need to add getters/setters to classes. ,
        -misc-non-private-member-variables-in-classes,
 
-        # The Q_DECLARE_METATYPE_IMPL macro triggers a warning from
+        # The Q_DECLARE_METATYPE macro triggers a warning from
         # this checker. There are also a handful of places where
         # MythTV uses recursion on purpose. These should be checked to
         # ensure there are no problems. ,
@@ -162,6 +162,10 @@ Checks: '-*,
        -modernize-use-nodiscard,
 
     performance-*,
+
+        # The Q_DECLARE_METATYPE macro triggers a warning from this
+        # new clang12 checker. ,
+        -performance-no-int-to-ptr,
 
     readability-*,
 
