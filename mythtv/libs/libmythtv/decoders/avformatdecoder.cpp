@@ -1671,6 +1671,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 
     const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
 
+    bool video_found = false;
     uint i = 0;
     for (i = 0; i < pmt.StreamCount(); i++)
     {
@@ -1678,10 +1679,12 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
         // so "dvb" is the safest choice for system info type, since this
         // will ignore other uses of the same stream id in DVB countries.
         if (pmt.IsVideo(i, "dvb"))
+        {
+            video_found = true;
             break;
+        }
     }
-
-    if (!pmt.IsVideo(i, "dvb"))
+    if (!video_found)
         return;
 
     desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
