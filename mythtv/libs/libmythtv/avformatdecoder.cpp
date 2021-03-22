@@ -3193,7 +3193,7 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint len, bool scte)
         return;
 
     bool had_608 = false, had_708 = false;
-    for (uint cur = 0; cur + 3 < len; cur += 3)
+    for (uint cur = 0; cur + 2 < len; cur += 3)
     {
         uint cc_code  = buf[cur];
         bool cc_valid = cc_code & 0x04;
