@@ -166,7 +166,7 @@ int DeviceManager::OpenDevice(const QString &name, const QString &mount,
     if (id == DEVICE_INVALID)
     {
         state = "New";
-        id = m_devices.isEmpty() ? 0 : (m_devices.constEnd() - 1).key() + 1;
+        id = m_devices.isEmpty() ? 0 : m_devices.lastKey() + 1;
         m_devices.insert(id, new Device(name, mount, media, dir));
     }
     else if (m_devices.value(id))
