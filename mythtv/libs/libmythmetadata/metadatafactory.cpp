@@ -497,7 +497,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
 
     metadata->SetCountries(video_countries);
 
-    ArtworkMap map = lookup->GetDownloads();
+    DownloadMap map = lookup->GetDownloads();
 
     QUrl coverurl(map.value(kArtworkCoverart).url);
     if (!coverurl.path().isEmpty())
