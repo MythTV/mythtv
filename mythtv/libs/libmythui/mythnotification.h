@@ -47,6 +47,9 @@ class MUI_PUBLIC MythNotification : public MythEvent
     explicit MythNotification(const MythEvent& Event);
    ~MythNotification() override = default;
     MythEvent* clone() const override;
+    // No implicit copying.
+    MythNotification(MythNotification &&) = delete;
+    MythNotification &operator=(MythNotification &&) = delete;
 
     /*! \enum Priority
      * A notification can be given a priority. Display order of notification
@@ -109,6 +112,8 @@ class MUI_PUBLIC MythNotification : public MythEvent
 
 #ifndef _MSC_VER
     MythNotification &operator=(const MythNotification&);
+#else
+    MythNotification &operator=(const MythNotification &other) = default;
 #endif
 
   protected:

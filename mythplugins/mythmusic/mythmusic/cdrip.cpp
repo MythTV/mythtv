@@ -19,7 +19,7 @@
 #include <QEvent>
 #include <QFile>
 #include <QKeyEvent>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTimer>
 #include <QUrl>
 #include <utility>
@@ -887,17 +887,15 @@ bool Ripper::deleteExistingTrack(RipTrack *track)
             " ON music_songs.directory_id=music_directories.directory_id "
             "WHERE artist_name REGEXP \'");
     QString token = artist;
-    token.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"),
-                  QString("."));
-
+    static const QRegularExpression punctuation
+        { R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))" };
+    token.replace(punctuation, QString("."));
     queryString += token + "\' AND " + "album_name REGEXP \'";
     token = album;
-    token.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"),
-                  QString("."));
+    token.replace(punctuation, QString("."));
     queryString += token + "\' AND " + "name    REGEXP \'";
     token = title;
-    token.replace(QRegExp(R"((/|\\|:|'|\,|\!|\(|\)|"|\?|\|))"),
-                  QString("."));
+    token.replace(punctuation, QString("."));
     queryString += token + "\' ORDER BY artist_name, album_name,"
                            " name, song_id, filename LIMIT 1";
     query.prepare(queryString);

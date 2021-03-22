@@ -8,6 +8,7 @@
 // Qt headers
 #include <QCoreApplication>
 #include <QDate>
+#include <QRegularExpression>
 
 class MythUIButtonList;
 class MythUIButtonListItem;
@@ -236,8 +237,8 @@ class VideoFilterSettings
     int                  m_season         {-1};
     int                  m_episode        {-1};
     QDate                m_insertDate;
-    const QRegExp        m_reSeason       {"(\\d+)[xX](\\d*)"};
-    const QRegExp        m_reDate         {"-(\\d+)([dmw])"};
+    static const QRegularExpression kReSeason;
+    static const QRegularExpression kReDate;
 
     unsigned int         m_changedState   {0};
 };

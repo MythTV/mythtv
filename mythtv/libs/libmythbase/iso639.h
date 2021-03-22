@@ -7,8 +7,6 @@
 #include <QMap>
 #include <QString>
 
-class QStringList;
-
 #include "mythbaseexp.h"
 
 extern MBASE_PUBLIC QMap<int, QString> iso639_key_to_english_name;

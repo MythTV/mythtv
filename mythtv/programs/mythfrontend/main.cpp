@@ -1969,7 +1969,7 @@ int main(int argc, char **argv)
         QByteArray dummy;
         int port = gCoreContext->GetNumSetting("UPnP/MythFrontend/ServicePort", 6547);
         QByteArray name("Mythfrontend on ");
-        name.append(gCoreContext->GetHostName());
+        name.append(gCoreContext->GetHostName().toUtf8());
         bonjour->Register(port, "_mythfrontend._tcp",
                                  name, dummy);
     }

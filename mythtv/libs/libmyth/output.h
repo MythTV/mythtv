@@ -48,8 +48,6 @@ class MPUBLIC OutputEvent : public MythEvent
         delete m_errorMsg;
     }
 
-    OutputEvent &operator=(const OutputEvent&) = delete;
-
     const QString *errorMessage() const { return m_errorMsg; }
 
     const std::chrono::seconds &elapsedSeconds() const { return m_elaspedSeconds; }
@@ -81,6 +79,12 @@ class MPUBLIC OutputEvent : public MythEvent
             m_errorMsg = new QString(*o.m_errorMsg);
         }
     }
+
+  // No implicit copying.
+  public:
+    OutputEvent &operator=(const OutputEvent &other) = delete;
+    OutputEvent(OutputEvent &&) = delete;
+    OutputEvent &operator=(OutputEvent &&) = delete;
 
   private:
     QString       *m_errorMsg        {nullptr};

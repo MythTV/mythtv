@@ -2,6 +2,9 @@
 #include <QDomDocument>
 #include <QString>
 #include <QStringList>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QMap>
 #include <QMultiMap>
 #include <QStringList>
@@ -210,7 +213,11 @@ int main(int argc, char *argv[])
     }
 
     fdataout.setDevice(&fstringout);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     fdataout.setCodec("UTF-8");
+#else
+    fdataout.setEncoding(QStringConverter::Utf8);
+#endif
 
     fdataout << QString("// This is an automatically generated file\n");
     fdataout << QString("// Do not edit\n\n");
@@ -257,7 +264,11 @@ int main(int argc, char *argv[])
                 }
 
                 QTextStream dstream(transFiles[language]);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
                 dstream.setCodec("UTF-8");
+#else
+                dstream.setEncoding(QStringConverter::Utf8);
+#endif
 
                 dstream << "    <message>\n"
                         << "        <location filename=\"" << qPrintable(outfile) << "\" line=\"" << lineCount << "\"/>\n"

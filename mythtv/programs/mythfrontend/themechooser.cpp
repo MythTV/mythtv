@@ -35,6 +35,10 @@
 #include "mythuistatetype.h"
 #include "mythuitext.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
+#define capturedView capturedRef
+#endif
+
 #define LOC      QString("ThemeChooser: ")
 #define LOC_WARN QString("ThemeChooser, Warning: ")
 #define LOC_ERR  QString("ThemeChooser, Error: ")
@@ -208,7 +212,7 @@ void ThemeChooser::Load(void)
         if (match.hasMatch())
         {
             QString subversion;
-            for (int idx = match.capturedRef(1).toInt(); idx > 0; --idx)
+            for (int idx = match.capturedView(1).toInt(); idx > 0; --idx)
             {
                 subversion = MythVersion + "." + QString::number(idx);
                 LOG(VB_GUI, LOG_INFO, QString("Loading themes for %1").arg(subversion));
@@ -1024,7 +1028,7 @@ ThemeUpdateChecker::ThemeUpdateChecker(void) :
         auto match = subexp.match(GetMythSourceVersion());
         if (match.hasMatch())
         {
-            for (int idx = match.capturedRef(1).toInt(); idx > 0; --idx)
+            for (int idx = match.capturedView(1).toInt(); idx > 0; --idx)
                 m_mythVersions << version + "." + QString::number(idx);
         }
         m_mythVersions << version;

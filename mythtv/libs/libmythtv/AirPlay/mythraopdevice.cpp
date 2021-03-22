@@ -17,7 +17,11 @@
 
 MythRAOPDevice *MythRAOPDevice::gMythRAOPDevice = nullptr;
 MThread        *MythRAOPDevice::gMythRAOPDeviceThread = nullptr;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 QMutex         *MythRAOPDevice::gMythRAOPDeviceMutex = new QMutex(QMutex::Recursive);
+#else
+QRecursiveMutex *MythRAOPDevice::gMythRAOPDeviceMutex = new QRecursiveMutex();
+#endif
 
 #define LOC QString("RAOP Device: ")
 
@@ -85,7 +89,11 @@ void MythRAOPDevice::Cleanup(void)
 }
 
 MythRAOPDevice::MythRAOPDevice()
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     : m_lock(new QMutex(QMutex::Recursive))
+#else
+    : m_lock(new QRecursiveMutex())
+#endif
 {
     m_hardwareId = QByteArray::fromHex(AirPlayHardwareId().toLatin1());
 }
@@ -163,9 +171,9 @@ bool MythRAOPDevice::RegisterForBonjour(void)
 
     QByteArray name = m_hardwareId.toHex();
     name.append("@");
-    name.append(m_name);
+    name.append(m_name.toUtf8());
     name.append(" on ");
-    name.append(gCoreContext->GetHostName());
+    name.append(gCoreContext->GetHostName().toUtf8());
     QByteArray type = "_raop._tcp";
     QByteArray txt;
     txt.append(6); txt.append("tp=UDP");

@@ -8,6 +8,9 @@
 #include <QDateTime>
 #include <QMutex>
 #include <QList>
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#include <QRecursiveMutex>
+#endif
 
 #include "mythtvexp.h"
 #include "referencecounter.h"
@@ -106,7 +109,11 @@ class MTV_PUBLIC LiveTVChain : public ReferenceCounter
     QString                 m_id;
     QList<LiveTVChainEntry> m_chain;
     int                     m_maxPos      {0};
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex          m_lock        {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex m_lock;
+#endif
 
     QString                 m_hostPrefix;
     QString                 m_inputType;

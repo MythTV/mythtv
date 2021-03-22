@@ -90,9 +90,10 @@ void ProgramRecPriorityInfo::clear(void)
 }
 
 void ProgramRecPriorityInfo::ToMap(InfoMap &progMap,
-                                   bool showrerecord, uint star_range) const
+                                   bool showrerecord, uint star_range,
+                                   uint date_format) const
 {
-    RecordingInfo::ToMap(progMap, showrerecord, star_range);
+    RecordingInfo::ToMap(progMap, showrerecord, star_range, date_format);
     progMap["title"] = (m_title == "Default (Template)") ?
         QObject::tr("Default (Template)") : m_title;
     progMap["category"] = (m_category == "Default") ?

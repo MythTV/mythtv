@@ -11,7 +11,11 @@
 
 #define LOC QString("Power: ")
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 QMutex MythPower::s_lock(QMutex::Recursive);
+#else
+QRecursiveMutex MythPower::s_lock;
+#endif
 
 /*! \class MythPower
  *

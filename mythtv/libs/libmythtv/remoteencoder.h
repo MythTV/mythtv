@@ -18,7 +18,6 @@
 #include "programtypes.h"
 #include "mythtimer.h"
 
-class QStringList;
 class ProgramInfo;
 class MythSocket;
 

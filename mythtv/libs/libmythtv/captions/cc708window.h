@@ -10,7 +10,11 @@
 
 // Qt headers
 #include <QString>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QColor>
 
 // MythTV headers
@@ -306,7 +310,11 @@ class MTV_PUBLIC CC708Window
     {
         m_changed = false;
     }
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex  m_lock {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex  m_lock;
+#endif
 };
 
 class CC708Service

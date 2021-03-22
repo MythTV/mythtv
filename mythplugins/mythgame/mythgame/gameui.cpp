@@ -130,14 +130,14 @@ void GameUI::BuildTree()
     //  approach with multiple roots if/when someone has the time to create
     //  the relevant dialog screens
 
-    QString levels = gCoreContext->GetSetting("GameFavTreeLevels");
+    QString levels = gCoreContext->GetSetting("GameFavTreeLevels", "gamename");
 
     auto *new_node = new MythGenericTree(tr("Favorites"), 1, true);
     new_node->SetData(QVariant::fromValue(
                 new GameTreeInfo(levels, systemFilter + " and favorite=1")));
     m_favouriteNode = m_gameTree->addNode(new_node);
 
-    levels = gCoreContext->GetSetting("GameAllTreeLevels");
+    levels = gCoreContext->GetSetting("GameAllTreeLevels", "system gamename");
 
     if (m_showHashed)
     {
@@ -643,6 +643,9 @@ QString GameUI::getFillSql(MythGenericTree *node) const
     QString filter = getFilter(node);
     bool childIsLeaf = childDepth == getLevelsOnThisBranch(node) + 1;
     auto *romInfo = node->GetData().value<RomInfo *>();
+
+    if (childLevel.isEmpty())
+        childLevel = "gamename";
 
     QString columns;
     QString conj = "where ";

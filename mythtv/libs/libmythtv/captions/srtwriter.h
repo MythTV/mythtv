@@ -6,6 +6,9 @@
 #include <QImage>
 #include <QPoint>
 #include <QHash>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QTime>
 
 #include <QtXml/QDomDocument>
@@ -30,7 +33,11 @@ class MTV_PUBLIC SRTWriter
     explicit SRTWriter(const QString &fileName) :
         m_outFile(fileName), m_outStream(&m_outFile)
     {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         m_outStream.setCodec("UTF-8");
+#else
+        m_outStream.setEncoding(QStringConverter::Utf8);
+#endif
         if (!m_outFile.open(QFile::WriteOnly))
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Failed to create '%1'")

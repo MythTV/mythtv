@@ -1166,12 +1166,11 @@ void Playlist::cdrecordData(int fd)
         // to update the same line, so I'm splitting it on \r or \n
         // Track 01:    6 of  147 MB written (fifo 100%) [buf  99%]  16.3x.
         QString data(buf);
+        static const QRegularExpression newline { "\\R" }; // Any unicode newline
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList list = data.split(QRegExp("[\\r\\n]"),
-                                      QString::SkipEmptyParts);
+        QStringList list = data.split(newline, QString::SkipEmptyParts);
 #else
-        QStringList list = data.split(QRegExp("[\\r\\n]"),
-                                      Qt::SkipEmptyParts);
+        QStringList list = data.split(newline, Qt::SkipEmptyParts);
 #endif
 
         for (int i = 0; i < list.size(); i++)

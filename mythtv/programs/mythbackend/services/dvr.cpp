@@ -24,7 +24,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <QMap>
-#include <QRegExp>
 
 #include "dvr.h"
 
@@ -103,7 +102,8 @@ DTC::ProgramList* Dvr::GetRecordedList( bool           bDescending,
     nAvailable = 0;
     nCount = 0;
 
-    QRegExp rTitleRegEx        = QRegExp(sTitleRegEx, Qt::CaseInsensitive);
+    QRegularExpression rTitleRegEx
+        { sTitleRegEx, QRegularExpression::CaseInsensitiveOption };
 
     for (auto *pInfo : progList)
     {

@@ -13,6 +13,10 @@
 // libmythmetadata
 #include "lyricsdata.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
+#define capturedView capturedRef
+#endif
+
 static const QRegularExpression kTimeCode { R"(^(\[(\d\d):(\d\d)(?:\.(\d\d))?\])(.*))" };
 
 /*************************************************************************/
@@ -311,7 +315,7 @@ void LyricsData::setLyrics(const QStringList &lyrics)
         static const QRegularExpression kOffset { R"(^\[offset:(.+)\])" };
         auto match = kOffset.match(lyric);
         if (match.hasMatch())
-            offset = std::chrono::milliseconds(match.capturedRef(1).toInt());
+            offset = std::chrono::milliseconds(match.capturedView(1).toInt());
 
         if (m_syncronized)
         {
@@ -321,9 +325,9 @@ void LyricsData::setLyrics(const QStringList &lyrics)
                 match = kTimeCode.match(lyric);
                 if (match.hasMatch())
                 {
-                    int minutes    = match.capturedRef(2).toInt();
-                    int seconds    = match.capturedRef(3).toInt();
-                    int hundredths = match.capturedRef(4).toInt();
+                    int minutes    = match.capturedView(2).toInt();
+                    int seconds    = match.capturedView(3).toInt();
+                    int hundredths = match.capturedView(4).toInt();
 
                     line->m_lyric  = match.captured(5).trimmed();
                     line->m_time   = millisecondsFromParts(0, minutes, seconds, hundredths * 10);

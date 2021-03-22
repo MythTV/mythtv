@@ -5,7 +5,7 @@
 
 #include <QDir>
 #include <QList>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <utility>
 
 #include <mythdb.h>
@@ -297,7 +297,7 @@ static void UpdateGameCounts(const QStringList& updatelist)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QRegExp multiDiskRGXP = QRegExp( "[0-4]$", Qt::CaseSensitive, QRegExp::RegExp);
+    static const QRegularExpression multiDiskRGXP { "[0-4]$" };
     int pos = 0;
 
     QString lastrom;
@@ -585,10 +585,9 @@ int GameHandler::buildFileCount(const QString& directory, GameHandler *handler)
 
         if (handler->m_validextensions.count() > 0)
         {
-            QRegExp r;
-
-            r.setPattern("^" + Info.suffix() + "$");
-            r.setCaseSensitivity(Qt::CaseInsensitive);
+            QRegularExpression r {
+                "^" + Info.suffix() + "$",
+                QRegularExpression::CaseInsensitiveOption };
             QStringList result;
             for (int x = 0; x < handler->m_validextensions.size(); x++)
             {
@@ -649,10 +648,9 @@ void GameHandler::buildFileList(const QString& directory, GameHandler *handler,
 
         if (handler->m_validextensions.count() > 0)
         {
-            QRegExp r;
-
-            r.setPattern("^" + Info.suffix() + "$");
-            r.setCaseSensitivity(Qt::CaseInsensitive);
+            QRegularExpression r {
+                "^" + Info.suffix() + "$",
+                QRegularExpression::CaseInsensitiveOption };
             QStringList result;
             for (int x = 0; x < handler->m_validextensions.size(); x++)
             {
@@ -721,7 +719,7 @@ void GameHandler::processGames(GameHandler *handler)
                     handler->SystemCmdLine(),
                     inFileSystem,
                     handler->SystemName(),
-                    handler->SystemCmdLine().left(handler->SystemCmdLine().lastIndexOf(QRegExp("/"))));
+                    handler->SystemCmdLine().left(handler->SystemCmdLine().lastIndexOf("/")));
 
         if (busyDialog)
             busyDialog->Close();
@@ -851,7 +849,7 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
 
             if (handler->SpanDisks())
             {
-                QRegExp rxp = QRegExp( "%d[0-4]", Qt::CaseSensitive, QRegExp::RegExp);
+                QRegularExpression rxp { "%d[0-4]" };
 
                 if (exec.contains(rxp))
                 {
@@ -870,11 +868,11 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
                                           .arg(basename)
                                           .arg(disk)
                                           .arg(extension);
-                            exec = exec.replace(QRegExp(diskid[disk]),rom);
+                            exec = exec.replace(diskid[disk],rom);
                         }
                     } else
                     {   // If there is only one disk make sure we replace %d1 just like %s
-                        exec = exec.replace(QRegExp("%d1"),arg);
+                        exec = exec.replace("%d1",arg);
                     }
                 }
             }

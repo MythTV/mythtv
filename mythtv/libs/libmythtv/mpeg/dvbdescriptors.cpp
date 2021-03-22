@@ -68,7 +68,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         size_t length = (raw_length - 1) / 2;
         auto *to = new QChar[length];
         for (size_t i=0; i<length; i++)
-            to[i] = (src[1 + i*2] << 8) + src[1 + i*2 + 1];
+            to[i] = QChar((src[1 + i*2] << 8) + src[1 + i*2 + 1]);
         QString to2(to, length);
         delete [] to;
         return to2;

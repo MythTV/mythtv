@@ -11,6 +11,9 @@
 #include <QCoreApplication>
 #include <QKeyEvent>
 #include <QCryptographicHash>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QTimer>
 #include <QUrlQuery>
 
@@ -30,7 +33,11 @@
 
 MythAirplayServer* MythAirplayServer::gMythAirplayServer = nullptr;
 MThread*           MythAirplayServer::gMythAirplayServerThread = nullptr;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 QMutex*            MythAirplayServer::gMythAirplayServerMutex = new QMutex(QMutex::Recursive);
+#else
+QRecursiveMutex*   MythAirplayServer::gMythAirplayServerMutex = new QRecursiveMutex();
+#endif
 
 #define LOC QString("AirPlay: ")
 
@@ -482,10 +489,10 @@ void MythAirplayServer::Start(void)
 
         QByteArray name = m_name.toUtf8();
         name.append(" on ");
-        name.append(gCoreContext->GetHostName());
+        name.append(gCoreContext->GetHostName().toUtf8());
         QByteArray type = "_airplay._tcp";
         QByteArray txt;
-        txt.append(26); txt.append("deviceid="); txt.append(GetMacAddress());
+        txt.append(26); txt.append("deviceid="); txt.append(GetMacAddress().toUtf8());
         // supposed to be: 0: video, 1:Phone, 3: Volume Control, 4: HLS
         // 9: Audio, 10: ? (but important without it it fails) 11: Audio redundant
         txt.append(13); txt.append("features=0xF7");
@@ -982,15 +989,19 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
         socket->state() != QAbstractSocket::ConnectedState)
         return;
     QTextStream response(socket);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     response.setCodec("UTF-8");
+#else
+    response.setEncoding(QStringConverter::Utf8);
+#endif
     QByteArray reply;
     reply.append("HTTP/1.1 ");
-    reply.append(QString::number(status));
+    reply.append(QString::number(status).toUtf8());
     reply.append(" ");
     reply.append(StatusToString(status));
     reply.append("\r\n");
     reply.append("DATE: ");
-    reply.append(MythDate::current().toString("ddd, d MMM yyyy hh:mm:ss"));
+    reply.append(MythDate::current().toString("ddd, d MMM yyyy hh:mm:ss").toUtf8());
     reply.append(" GMT\r\n");
     if (!header.isEmpty())
         reply.append(header);
@@ -1000,7 +1011,7 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
         reply.append("Content-Type: ");
         reply.append(content_type);
         reply.append("Content-Length: ");
-        reply.append(QString::number(body.size()));
+        reply.append(QString::number(body.size()).toUtf8());
     }
     else
     {
@@ -1009,7 +1020,7 @@ void MythAirplayServer::SendResponse(QTcpSocket *socket,
     reply.append("\r\n\r\n");
 
     if (!body.isEmpty())
-        reply.append(body);
+        reply.append(body.toUtf8());
 
     response << reply;
     response.flush();
@@ -1040,18 +1051,22 @@ bool MythAirplayServer::SendReverseEvent(QByteArray &session,
 
     m_connections[session].m_lastEvent = event;
     QTextStream response(m_connections[session].m_reverseSocket);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     response.setCodec("UTF-8");
+#else
+    response.setEncoding(QStringConverter::Utf8);
+#endif
     QByteArray reply;
     reply.append("POST /event HTTP/1.1\r\n");
     reply.append("Content-Type: text/x-apple-plist+xml\r\n");
     reply.append("Content-Length: ");
-    reply.append(QString::number(body.size()));
+    reply.append(QString::number(body.size()).toUtf8());
     reply.append("\r\n");
     reply.append("x-apple-session-id: ");
     reply.append(session);
     reply.append("\r\n\r\n");
     if (!body.isEmpty())
-        reply.append(body);
+        reply.append(body.toUtf8());
 
     response << reply;
     response.flush();

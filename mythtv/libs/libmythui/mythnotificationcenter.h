@@ -28,6 +28,13 @@ public:
     MythNotificationCenterEvent() : MythEvent(kEventType) { }
 
     static Type kEventType;
+
+    // No implicit copying.
+    MythNotificationCenterEvent(MythNotificationCenterEvent &&) = delete;
+    MythNotificationCenterEvent &operator=(MythNotificationCenterEvent &&) = delete;
+protected:
+    MythNotificationCenterEvent(const MythNotificationCenterEvent &other) = default;
+    MythNotificationCenterEvent &operator=(const MythNotificationCenterEvent &other) = default;
 };
 
 class MUI_PUBLIC MythNotificationCenter

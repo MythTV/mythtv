@@ -15,10 +15,6 @@
 #include "mythbaseexp.h"
 #include "mythsystemlegacy.h"
 
-class QStringList;
-class QString;
-class QBuffer;
-
 // FIXME: do we really need reference counting?
 // it shouldn't be difficult to track the lifetime of a private object.
 // FIXME: This should not live in the same header as MythSystemLegacy

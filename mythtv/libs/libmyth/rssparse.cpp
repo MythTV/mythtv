@@ -14,6 +14,10 @@
 #include "programinfo.h" // for format_season_and_episode()
 #include "mythsorthelper.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
+#define capturedView capturedRef
+#endif
+
 ResultItem::ResultItem(const QString& title, const QString& sortTitle,
               const QString& subtitle, const QString& sortSubtitle,
               const QString& desc, const QString& URL,
@@ -1080,7 +1084,7 @@ QDateTime Parse::FromRFC3339(const QString& t)
     if (match.hasMatch())
     {
         bool ok = false;
-        int fractional = match.capturedRef(1).toInt(&ok);
+        int fractional = match.capturedView(1).toInt(&ok);
         if (ok)
         {
             if (fractional < 100)
@@ -1095,10 +1099,10 @@ QDateTime Parse::FromRFC3339(const QString& t)
     if (match.hasMatch())
     {
         short int multiplier = -1;
-        if (match.capturedRef(1) == "-")
+        if (match.captured(1) == "-")
             multiplier = 1;
-        int hoursShift =   match.capturedRef(2).toInt();
-        int minutesShift = match.capturedRef(3).toInt();
+        int hoursShift =   match.capturedView(2).toInt();
+        int minutesShift = match.capturedView(3).toInt();
         result = result.addSecs(hoursShift * 3600 * multiplier + minutesShift * 60 * multiplier);
     }
     result.setTimeSpec(Qt::UTC);

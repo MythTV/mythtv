@@ -13,6 +13,9 @@
 #include <cmath>
 
 #include <QStringList>
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QTextCodec>
 #include <QTextStream>
 
@@ -367,7 +370,11 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
     QByteArray   aBody;
     QTextStream  tsBody( &aBody, QIODevice::WriteOnly );
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     tsBody.setCodec(QTextCodec::codecForName("UTF-8"));
+#else
+    tsBody.setEncoding(QStringConverter::Utf8);
+#endif
 
     // ----------------------------------------------------------------------
     // Build Body... Only send if there are changes
@@ -382,7 +389,11 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         auto *pBuffer = new QByteArray();    // UPnpEventTask will delete this pointer.
         QTextStream  tsMsg( pBuffer, QIODevice::WriteOnly );
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         tsMsg.setCodec(QTextCodec::codecForName("UTF-8"));
+#else
+        tsMsg.setEncoding(QStringConverter::Utf8);
+#endif
 
         // ----------------------------------------------------------------------
         // Build Message Header 

@@ -165,7 +165,7 @@ QString SpliceDescriptor::toStringXML(uint level) const
     str += indent_1 + QString("<TAG>0x%1</TAG>\n")
         .arg(DescriptorTag(),2,16,QChar('0'));
     str += indent_1 + QString("<DESCRIPTION>%1</DESCRIPTION>\n")
-        .arg(DescriptorTagString(),0,16);
+        .arg(DescriptorTagString());
 
     str += indent_1 + "<DATA>";
     for (uint i = 0; i < DescriptorLength(); i++)

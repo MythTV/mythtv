@@ -2,6 +2,7 @@
 #define RECORDING_INFO_H
 
 #include <QDateTime>
+#include <QRegularExpression>
 #include <QString>
 
 #include "mythtvexp.h"
@@ -191,6 +192,12 @@ class MTV_PUBLIC RecordingInfo : public ProgramInfo
         kLiveTVRecGroup      = 2,
         kDeletedRecGroup     = 3,
     };
+
+    // For removing the search type from the end of a title.
+    static const QRegularExpression kReSearchTypeName;
+
+    // For removing the string "AND" from the start of an sql fragment.
+    static const QRegularExpression kReLeadingAnd;
 
   public:
     RecordingInfo &operator=(const RecordingInfo &other)

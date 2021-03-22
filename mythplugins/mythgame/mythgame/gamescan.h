@@ -11,8 +11,6 @@
 
 #include "mthread.h"
 
-class QStringList;
-
 class MythUIProgressDialog;
 class GameHandler;
 class RomInfo;

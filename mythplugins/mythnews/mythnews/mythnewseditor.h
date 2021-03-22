@@ -2,7 +2,12 @@
 #define MYTHNEWSEDITOR_H
 
 // Qt headers
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QString>
 
 // MythTV headers
@@ -30,7 +35,11 @@ class MythNewsEditor : public MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private:
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex  m_lock             {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex  m_lock;
+#endif
     NewsSite       *m_site             {nullptr};
     QString         m_siteName;
     bool            m_editing;

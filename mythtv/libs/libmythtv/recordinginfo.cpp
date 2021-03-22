@@ -21,6 +21,10 @@
 
 #define LOC      QString("RecordingInfo(%1): ").arg(GetBasename())
 
+const QRegularExpression RecordingInfo::kReSearchTypeName { R"(\s*\(.*\)$)" };
+const QRegularExpression RecordingInfo::kReLeadingAnd
+        { R"(^\s*AND\s*)", QRegularExpression::CaseInsensitiveOption };
+
 static inline QString null_to_empty(const QString &str)
 {
     return str.isEmpty() ? "" : str;
@@ -146,9 +150,9 @@ RecordingInfo::RecordingInfo(
     m_inputId = _inputid;
     m_findId = _findid;
 
-    m_properties = ((_subtitleType    << kSubtitlePropertyOffset) |
-                  (_videoproperties << kVideoPropertyOffset)  |
-                  _audioproperties);
+    m_videoProperties = _videoproperties;
+    m_audioProperties = _audioproperties;
+    m_subtitleProperties = _subtitleType;
 
     if (m_recStartTs >= m_recEndTs)
     {

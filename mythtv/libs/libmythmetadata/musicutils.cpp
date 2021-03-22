@@ -87,21 +87,21 @@ QString filenameFromMetadata(MusicMetadata *track)
     {
         filename += match.captured(1);
 
-        if ((match.capturedRef(2) == "GENRE") &&
+        if ((match.captured(2) == "GENRE") &&
             (!track->Genre().isEmpty()))
             filename += fixFilename(track->Genre());
-        else if ((match.capturedRef(2) == "ARTIST") &&
+        else if ((match.captured(2) == "ARTIST") &&
                  (!track->FormatArtist().isEmpty()))
             filename += fixFilename(track->FormatArtist());
-        else if ((match.capturedRef(2) == "ALBUM") &&
+        else if ((match.captured(2) == "ALBUM") &&
                  (!track->Album().isEmpty()))
             filename += fixFilename(track->Album());
-        else if ((match.capturedRef(2) == "TRACK") && (track->Track() >= 0))
+        else if ((match.captured(2) == "TRACK") && (track->Track() >= 0))
             filename += fixFilename(QString("%1").arg(track->Track(), 2,10,QChar('0')));
-        else if ((match.capturedRef(2) == "TITLE") &&
+        else if ((match.captured(2) == "TITLE") &&
                  (!track->FormatTitle().isEmpty()))
             filename += fixFilename(track->FormatTitle());
-        else if ((match.capturedRef(2) == "YEAR") && (track->Year() >= 0))
+        else if ((match.captured(2) == "YEAR") && (track->Year() >= 0))
             filename += fixFilename(QString::number(track->Year(), 10));
         fntempl.remove(0, match.capturedLength());
         match = rx.match(fntempl);

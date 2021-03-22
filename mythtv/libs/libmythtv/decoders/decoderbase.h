@@ -321,7 +321,11 @@ class DecoderBase
     bool                 m_posmapStarted           {false};
     MarkTypes            m_positionMapType         {MARK_UNSET};
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex       m_positionMapLock         {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex m_positionMapLock;
+#endif
     std::vector<PosMapEntry>  m_positionMap;
     frm_pos_map_t        m_frameToDurMap; // guarded by m_positionMapLock
     frm_pos_map_t        m_durToFrameMap; // guarded by m_positionMapLock
@@ -346,7 +350,11 @@ class DecoderBase
     uint                 m_stereo3D                {0};
 
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QMutex               m_trackLock                     { QMutex::Recursive };
+#else
+    QRecursiveMutex      m_trackLock;
+#endif
     bool                 m_decodeAllSubtitles            { false };
     std::array<int,        kTrackTypeCount> m_currentTrack {};
     std::array<sinfo_vec_t,kTrackTypeCount> m_tracks;

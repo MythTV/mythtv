@@ -273,7 +273,11 @@ const V4L2Profiles& MythV4L2M2MContext::GetStandardProfiles()
         { V4L2_PIX_FMT_HEVC,        MythCodecContext::HEVC  }
     }};
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     static bool s_initialised = false;
     static V4L2Profiles s_profiles;
 
@@ -414,7 +418,11 @@ void MythV4L2M2MContext::GetDecoderList(QStringList &Decoders)
 
 bool MythV4L2M2MContext::HaveV4L2Codecs(bool Reinit /*=false*/)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     QMutexLocker locker(&lock);
     static bool s_checked = false;
     static bool s_available = false;
@@ -472,7 +480,11 @@ const V4L2Profiles& MythV4L2M2MContext::GetRequestProfiles()
         { V4L2_PIX_FMT_HEVC_SLICE,  MythCodecContext::HEVC  }
     }};
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex lock(QMutex::Recursive);
+#else
+    static QRecursiveMutex lock;
+#endif
     static bool s_initialised = false;
     static V4L2Profiles s_profiles;
 

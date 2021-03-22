@@ -44,8 +44,6 @@
 // MythTV headers
 #include "dtvmultiplex.h"
 
-class QStringList;
-
 class DTVChannelInfo
 {
   public:

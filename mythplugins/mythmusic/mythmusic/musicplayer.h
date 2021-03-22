@@ -49,6 +49,14 @@ class MusicPlayerEvent : public MythEvent
         static Type CDChangedEvent;
         static Type PlaylistChangedEvent;
         static Type PlayedTracksChangedEvent;
+
+    // No implicit copying.
+    protected:
+        MusicPlayerEvent(const MusicPlayerEvent &other) = default;
+        MusicPlayerEvent &operator=(const MusicPlayerEvent &other) = default;
+    public:
+        MusicPlayerEvent(MusicPlayerEvent &&) = delete;
+        MusicPlayerEvent &operator=(MusicPlayerEvent &&) = delete;
 };
 
 class MusicPlayer : public QObject, public MythObservable

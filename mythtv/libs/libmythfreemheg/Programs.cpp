@@ -212,7 +212,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
                 for (int i = 0; i < format.Size(); i++)
                 {
-                    unsigned char ch = format.GetAt(i);
+                    char ch = format.GetAt(i);
                     QString buffer {};
 
                     if (ch == '%')

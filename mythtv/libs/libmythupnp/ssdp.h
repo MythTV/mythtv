@@ -72,7 +72,7 @@ class UPNP_PUBLIC SSDP : public MThread
         bool                m_bAnnouncementsEnabled {false};
 
         bool                m_bTermRequested        {false};
-        QMutex              m_lock                  {QMutex::NonRecursive};
+        QMutex              m_lock;
 
     private:
 

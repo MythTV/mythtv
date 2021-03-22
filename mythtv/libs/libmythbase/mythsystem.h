@@ -24,6 +24,7 @@
 #define MYTHSYSTEM_H_
 
 // Qt headers
+#include <QIODevice>
 #include <QString>
 
 // MythTV headers
@@ -66,9 +67,6 @@ enum MythSignal {
     kSignalTerm,
     kSignalStop,
 };
-
-class QStringList;
-class QIODevice;
 
 /** \brief class for managing sub-processes.
  *

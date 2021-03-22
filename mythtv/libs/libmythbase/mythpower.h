@@ -2,7 +2,12 @@
 #define MYTHPOWER_H
 
 // Qt
+#include <QtGlobal>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QObject>
 #include <QDateTime>
 #include <QTimer>
@@ -72,7 +77,11 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
     virtual void Refresh (void) {  }
 
   protected:
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex s_lock;
+#else
+    static QRecursiveMutex s_lock;
+#endif
 
     MythPower();
     ~MythPower() override = default;

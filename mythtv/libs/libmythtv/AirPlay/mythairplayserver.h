@@ -2,6 +2,11 @@
 #define MYTHAIRPLAYSERVER_H
 
 #include <QObject>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+#include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QUrl>
 #include <cstdint>     // for uintxx_t
 
@@ -9,7 +14,6 @@
 #include "mythtvexp.h"
 #include "mythmainwindow.h"
 
-class QMutex;
 class QTimer;
 class MThread;
 class BonjourRegister;
@@ -74,8 +78,13 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
     static MythAirplayServer *AirplaySharedInstance(void)
     { return gMythAirplayServer; }
 
-    MythAirplayServer()
-        : m_lock(new QMutex(QMutex::Recursive)) {}
+    MythAirplayServer() :
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+        m_lock(new QMutex(QMutex::Recursive))
+#else
+        m_lock(new QRecursiveMutex())
+#endif
+        {}
 
   private slots:
     void Start();
@@ -112,14 +121,22 @@ class MTV_PUBLIC MythAirplayServer : public ServerPool
 
     // Globals
     static MythAirplayServer *gMythAirplayServer;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex            *gMythAirplayServerMutex;
+#else
+    static QRecursiveMutex   *gMythAirplayServerMutex;
+#endif
     static MThread           *gMythAirplayServerThread;
 
     // Members
     QString          m_name          {"MythTV"};
     BonjourRegister *m_bonjour       {nullptr};
     bool             m_valid         {false};
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QMutex          *m_lock          {nullptr};
+#else
+    QRecursiveMutex *m_lock          {nullptr};
+#endif
     int              m_setupPort     {5100};
     QList<QTcpSocket*> m_sockets;
     QHash<QByteArray,AirplayConnection> m_connections;

@@ -85,7 +85,7 @@ class MBASE_PUBLIC RemoteFile
     bool            m_canResume        {false};
     int             m_recorderNum      {0};
 
-    mutable QMutex  m_lock             {QMutex::NonRecursive};
+    mutable QMutex  m_lock;
     MythSocket     *m_controlSock      {nullptr};
     MythSocket     *m_sock             {nullptr};
     QString         m_query            {"QUERY_FILETRANSFER %1"};

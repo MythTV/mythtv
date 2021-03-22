@@ -96,7 +96,7 @@ bool CustomPriority::Create()
 void CustomPriority::loadData()
 {
     QString baseTitle = m_pginfo->GetTitle();
-    baseTitle.remove(QRegExp(" \\(.*\\)$"));
+    baseTitle.remove(RecordingInfo::kReSearchTypeName);
 
     QString quoteTitle = baseTitle;
     quoteTitle.replace("\'","\'\'");
@@ -120,7 +120,7 @@ void CustomPriority::loadData()
         while (result.next())
         {
             QString trimTitle = result.value(0).toString();
-            trimTitle.remove(QRegExp(" \\(.*\\)$"));
+            trimTitle.remove(RecordingInfo::kReSearchTypeName);
 
             rule.title = trimTitle;
             rule.priority = result.value(1).toString();
@@ -264,7 +264,7 @@ void CustomPriority::addClicked(void)
 
     QString desc = m_descriptionEdit->GetText();
 
-    if (desc.contains(QRegExp("\\S")))
+    if (desc.contains(QRegularExpression("\\S")))
         clause = "AND ";
     clause += item->GetData().toString();
     m_descriptionEdit->SetText(desc.append(clause));
@@ -334,7 +334,7 @@ bool CustomPriority::checkSyntax(void)
 
     QString desc = m_descriptionEdit->GetText();
 
-    if (desc.contains(QRegExp("^\\s*AND\\s", Qt::CaseInsensitive)))
+    if (desc.contains(RecordingInfo::kReLeadingAnd))
     {
         msg = "Power Priority rules do not reqiure a leading \"AND\"";
     }

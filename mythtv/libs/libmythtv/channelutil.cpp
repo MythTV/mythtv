@@ -58,7 +58,7 @@ static uint get_dtv_multiplex(uint     db_source_id,  const QString& sistandard,
     {
         query.bindValue(":TRANSPORTID", transport_id);
         query.bindValue(":NETWORKID",   network_id);
-        query.bindValue(":POLARITY",    QString(polarity));
+        query.bindValue(":POLARITY",    QChar(polarity));
     }
 
     if (!query.exec() || !query.isActive())
@@ -204,7 +204,7 @@ static uint insert_dtv_multiplex(
         {
             query.bindValue(":TRANSPORTID",   transport_id);
             query.bindValue(":NETWORKID",     network_id);
-            query.bindValue(":WHEREPOLARITY", QString(polarity));
+            query.bindValue(":WHEREPOLARITY", QChar(polarity));
         }
         else
         {

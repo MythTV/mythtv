@@ -273,7 +273,7 @@ void MythVisualCirclesVulkan::DrawPriv(MythPainter* /*Painter*/, QPaintDevice* /
     m_vulkanFuncs->vkCmdBindDescriptorSets(currentcmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
                                            layout, 0, 1, &m_projectionDescriptor, 0, nullptr);
 
-    float range = static_cast<float>(m_range);
+    auto range = static_cast<float>(m_range);
     float red = 0.0F;
     float green = 0.8F;
     int count = m_scale.range();

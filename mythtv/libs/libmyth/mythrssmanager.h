@@ -5,7 +5,11 @@
 
 #include <QObject>
 #include <QMetaType>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QTimer>
 #include <QDateTime>
 #include <QByteArray>
@@ -88,7 +92,11 @@ class MPUBLIC RSSSite : public QObject
     bool        m_download;
     QDateTime   m_updated;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable    QMutex m_lock          {QMutex::Recursive};
+#else
+    mutable    QRecursiveMutex m_lock;
+#endif
     QByteArray m_data;
     QString    m_imageURL;
     bool       m_podcast              {false};

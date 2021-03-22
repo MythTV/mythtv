@@ -10,7 +10,6 @@
 // Qt
 #include <QCoreApplication>
 #include <QLocale>
-#include <QRegExp>
 #include <utility>
 
 // MythTV
@@ -1216,7 +1215,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
     else if (m_type == plSQLSearch) // complex search
     {
-        qphrase.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
+        qphrase.remove(RecordingInfo::kReLeadingAnd);
         where = QString("WHERE channel.deleted iS NULL "
                         "  AND channel.visible > 0 "
                         "  AND program.endtime > :PGILSTART "

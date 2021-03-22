@@ -15,7 +15,11 @@
 #include <QVariant>
 #include <QObject>
 #include <QString>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
 #include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 #include <QUrl>
 
 // MythNews headers
@@ -109,7 +113,11 @@ class NewsSite : public QObject
   private:
     ~NewsSite() override;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     mutable QMutex m_lock {QMutex::Recursive};
+#else
+    mutable QRecursiveMutex m_lock;
+#endif
     QString    m_name;
     QString    m_sortName;
     QString    m_url;

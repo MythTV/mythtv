@@ -10,6 +10,9 @@ QObject::customEvent to receive event notifications for subscribed services.
 
 #include "upnpsubscription.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QStringConverter>
+#endif
 #include <QTextCodec>
 #include <utility>
 
@@ -280,7 +283,11 @@ bool UPNPSubscription::SendUnsubscribeRequest(const QString &usn,
 
     QByteArray sub;
     QTextStream data(&sub);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     data.setCodec(QTextCodec::codecForName("UTF-8"));
+#else
+    data.setEncoding(QStringConverter::Utf8);
+#endif
     // N.B. Play On needs an extra space between UNSUBSCRIBE and path...
     data << QString("UNSUBSCRIBE  %1 HTTP/1.1\r\n").arg(path);
     data << QString("HOST: %1:%2\r\n").arg(host).arg(QString::number(port));
@@ -336,7 +343,11 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
 
     QByteArray sub;
     QTextStream data(&sub);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     data.setCodec(QTextCodec::codecForName("UTF-8"));
+#else
+    data.setEncoding(QStringConverter::Utf8);
+#endif
     // N.B. Play On needs an extra space between SUBSCRIBE and path...
     data << QString("SUBSCRIBE  %1 HTTP/1.1\r\n").arg(path);
     data << QString("HOST: %1:%2\r\n").arg(host).arg(QString::number(port));

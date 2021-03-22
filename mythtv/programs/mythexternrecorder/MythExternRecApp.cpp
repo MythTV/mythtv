@@ -185,21 +185,21 @@ void MythExternRecApp::TerminateProcess(QProcess & proc, const QString & desc) c
     if (proc.state() == QProcess::Running)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("Sending SIGINT to %1(%2)").arg(desc).arg(proc.pid()));
-        kill(proc.pid(), SIGINT);
+            QString("Sending SIGINT to %1(%2)").arg(desc).arg(proc.processId()));
+        kill(proc.processId(), SIGINT);
         proc.waitForFinished(5000);
     }
     if (proc.state() == QProcess::Running)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("Sending SIGTERM to %1(%2)").arg(desc).arg(proc.pid()));
+            QString("Sending SIGTERM to %1(%2)").arg(desc).arg(proc.processId()));
         proc.terminate();
         proc.waitForFinished();
     }
     if (proc.state() == QProcess::Running)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
-            QString("Sending SIGKILL to %1(%2)").arg(desc).arg(proc.pid()));
+            QString("Sending SIGKILL to %1(%2)").arg(desc).arg(proc.processId()));
         proc.kill();
         proc.waitForFinished();
     }
@@ -648,7 +648,7 @@ Q_SLOT void MythExternRecApp::TuneStatus(const QString & serial)
     if (m_tuneProc.state() == QProcess::Running)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC +
-            QString(": Tune process(%1) still running").arg(m_tuneProc.pid()));
+            QString(": Tune process(%1) still running").arg(m_tuneProc.processId()));
         emit SendMessage("TuneStatus", serial, "OK:InProgress");
         return;
     }

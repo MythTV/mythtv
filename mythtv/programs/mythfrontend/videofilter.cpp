@@ -16,6 +16,15 @@
 #include "videolist.h"
 #include "videofilter.h"
 
+const QRegularExpression VideoFilterSettings::kReSeason {
+    "(\\d+)x(\\d*)", QRegularExpression::CaseInsensitiveOption };
+const QRegularExpression VideoFilterSettings::kReDate {
+    "-(\\d+)([dwmy])", QRegularExpression::CaseInsensitiveOption };
+
+#if QT_VERSION < QT_VERSION_CHECK(5,15,2)
+#define capturedView capturedRef
+#endif
+
 VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
                                          const QString& _prefix)
 {
@@ -378,24 +387,16 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
 void VideoFilterSettings::setTextFilter(const QString& val)
 {
     m_changedState |= kFilterTextFilterChanged;
-    if (m_reSeason.indexIn(val) != -1)
+    auto match = kReSeason.match(val);
+    if (match.hasMatch())
     {
-        bool res = false;
-        QStringList list = m_reSeason.capturedTexts();
-        m_season = list[1].toInt(&res);
-        if (!res)
-            m_season = -1;
-        if (list.size() > 2) {
-            m_episode = list[2].toInt(&res);
-            if (!res)
-                m_episode = -1;
-        }
-        else {
-            m_episode = -1;
-        }
+        m_season = match.capturedView(1).isEmpty()
+            ? -1 : match.capturedView(1).toInt();
+        m_episode = match.capturedView(2).isEmpty()
+            ? -1 : match.capturedView(2).toInt();
         //clear \dX\d from string for string-search in plot/title/subtitle
         m_textFilter = val;
-        m_textFilter.replace(m_reSeason, "");
+        m_textFilter.remove(match.capturedStart(), match.capturedLength());
         m_textFilter = m_textFilter.simplified ();
     }
     else
@@ -404,19 +405,20 @@ void VideoFilterSettings::setTextFilter(const QString& val)
         m_season = -1;
         m_episode = -1;
     }
-    if (m_reDate.indexIn(m_textFilter) != -1)
+    match = kReDate.match(m_textFilter);
+    if (match.hasMatch())
     {
-        QStringList list = m_reDate.capturedTexts();
-        int modnr = list[1].toInt();
+        int modnr = match.capturedView(1).toInt();
         QDate testdate = MythDate::current().date();
-        switch(list[2].at(0).toLatin1())
+        switch(match.capturedView(2).at(0).toLatin1())
         {
-            case 'm': testdate = testdate.addMonths(-modnr);break;
             case 'd': testdate = testdate.addDays(-modnr);break;
             case 'w': testdate = testdate.addDays(-modnr * 7);break;
+            case 'm': testdate = testdate.addMonths(-modnr);break;
+            case 'y': testdate = testdate.addYears(-modnr);break;
         }
         m_insertDate = testdate;
-        m_textFilter.replace(m_reDate, "");
+        m_textFilter.remove(match.capturedStart(), match.capturedLength());
         m_textFilter = m_textFilter.simplified ();
     }
     else

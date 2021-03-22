@@ -2,11 +2,15 @@
 #define MYTHRAOPDEVICE_H
 
 #include <QObject>
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+#include <QMutex>
+#else
+#include <QRecursiveMutex>
+#endif
 
 #include "serverpool.h"
 #include "mythtvexp.h"
 
-class QMutex;
 class MThread;
 class BonjourRegister;
 class MythRAOPConnection;
@@ -41,7 +45,11 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
 
     // Globals
     static MythRAOPDevice *gMythRAOPDevice;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex         *gMythRAOPDeviceMutex;
+#else
+    static QRecursiveMutex *gMythRAOPDeviceMutex;
+#endif
     static MThread        *gMythRAOPDeviceThread;
 
     // Members
@@ -49,7 +57,11 @@ class MTV_PUBLIC MythRAOPDevice : public ServerPool
     QByteArray       m_hardwareId;
     BonjourRegister *m_bonjour    {nullptr};
     bool             m_valid      {false};
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QMutex          *m_lock       {nullptr};
+#else
+    QRecursiveMutex *m_lock       {nullptr};
+#endif
     int              m_setupPort  {5000};
     int              m_basePort   {0};
     QList<MythRAOPConnection*> m_clients;

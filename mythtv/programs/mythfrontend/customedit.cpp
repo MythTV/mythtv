@@ -33,7 +33,7 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
         m_pginfo = new ProgramInfo();
 
     m_baseTitle = m_pginfo->GetTitle();
-    m_baseTitle.remove(QRegExp(" \\(.*\\)$"));
+    m_baseTitle.remove(RecordingInfo::kReSearchTypeName);
 
     m_seSuffix = QString(" (%1)").arg(tr("stored search"));
     m_exSuffix = QString(" (%1)").arg(tr("stored example"));
@@ -127,7 +127,7 @@ void CustomEdit::loadData(void)
         while (result.next())
         {
             QString trimTitle = result.value(1).toString();
-            trimTitle.remove(QRegExp(" \\(.*\\)$"));
+            trimTitle.remove(RecordingInfo::kReSearchTypeName);
 
             rule.recordid = result.value(0).toString();
             rule.title = trimTitle;
@@ -154,16 +154,14 @@ void CustomEdit::loadData(void)
 
 QString CustomEdit::evaluate(QString clause)
 {
-    int e0=0;
-    while (true) {
-        int s0 = clause.indexOf (QRegExp("\\{[A-Z]+\\}"), e0);
+    static const QRegularExpression replacement { "\\{([A-Z]+)\\}" };
 
-        if (s0 < 0)
+    while (true) {
+        QRegularExpressionMatch match;
+        if (!clause.contains(replacement, &match))
             break;
 
-        e0 = clause.indexOf ("}", s0);
-
-        QString mid = clause.mid(s0 + 1, e0 - s0 - 1);
+        QString mid = match.captured(1);
         QString repl = "";
 
         if (mid.compare("TITLE") == 0) {
@@ -221,7 +219,7 @@ QString CustomEdit::evaluate(QString clause)
             repl = QString("%1").arg(midnight.secsTo(date));
         }
         // unknown tags are simply removed
-        clause.replace(s0, e0 - s0 + 1, repl);
+        clause.replace(match.capturedStart(), match.capturedLength(), repl);
     }
     return clause;
 }
@@ -615,9 +613,7 @@ void CustomEdit::clauseChanged(MythUIButtonListItem *item)
     auto rule = item->GetData().value<CustomRuleInfo>();
 
     QString msg = (m_evaluate) ? evaluate(rule.description) : rule.description;
-    msg.replace('\n', ' ');
-    msg.replace(QRegExp(" [ ]*"), " ");
-    msg = QString("\"%1\"").arg(msg);
+    msg = QString("\"%1\"").arg(msg.simplified());
     m_clauseText->SetText(msg);
 
     bool hastitle = !m_titleEdit->GetText().isEmpty();
@@ -637,7 +633,7 @@ void CustomEdit::clauseClicked(MythUIButtonListItem *item)
     QString clause;
     QString desc = m_descriptionEdit->GetText();
 
-    if (desc.contains(QRegExp("\\S")))
+    if (desc.contains(QRegularExpression("\\S")))
         clause = "AND ";
     clause += (m_evaluate) ? evaluate(rule.description) : rule.description;
 
@@ -785,7 +781,7 @@ bool CustomEdit::checkSyntax(void)
 
     QString desc = evaluate(m_descriptionEdit->GetText());
     QString from = m_subtitleEdit->GetText();
-    if (desc.contains(QRegExp("^\\s*AND\\s", Qt::CaseInsensitive)))
+    if (desc.contains(RecordingInfo::kReLeadingAnd))
     {
         msg = tr("Power Search rules no longer require a leading \"AND\".");
     }

@@ -26,7 +26,7 @@ HEADERS += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 HEADERS += configuration.h
 HEADERS += soapclient.h mythxmlclient.h mmembuf.h upnpexp.h
 HEADERS += upnpserviceimpl.h
-HEADERS += servicehost.h wsdl.h htmlserver.h serverSideScripting.h xsd.h
+HEADERS += servicehost.h wsdl.h htmlserver.h xsd.h
 HEADERS += upnphelpers.h websocket.h
 
 HEADERS += services/rtti.h
@@ -48,7 +48,7 @@ SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
 SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp mmembuf.cpp
 SOURCES += upnpserviceimpl.cpp
-SOURCES += htmlserver.cpp serverSideScripting.cpp
+SOURCES += htmlserver.cpp
 SOURCES += servicehost.cpp wsdl.cpp upnpsubscription.cpp xsd.cpp
 SOURCES += upnphelpers.cpp websocket.cpp
 
@@ -59,6 +59,11 @@ SOURCES += serializers/jsonSerializer.cpp
 SOURCES += serializers/xmlplistSerializer.cpp
 
 SOURCES += websocket_extensions/*.cpp
+
+contains(QT_MAJOR_VERSION, 5) {
+    HEADERS += serverSideScripting.h
+    SOURCES += serverSideScripting.cpp
+}
 
 INCLUDEPATH += ../libmythbase ../libmythservicecontracts ..
 INCLUDEPATH += ./serializers
@@ -101,7 +106,8 @@ macx {
     QMAKE_LFLAGS_SHLIB += -flat_namespace
 }
 
-QT += network xml sql script
+QT += network xml sql
+contains(QT_MAJOR_VERSION, 5): QT += script
 
 mingw | win32-msvc* {
 

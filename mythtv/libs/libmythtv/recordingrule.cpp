@@ -541,7 +541,7 @@ bool RecordingRule::Delete(bool sendSig)
     return true;
 }
 
-void RecordingRule::ToMap(InfoMap &infoMap) const
+void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
 {
     if (m_title == "Default (Template)")
     {
@@ -566,17 +566,18 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     infoMap["callsign"] = m_station;
 
     QDateTime starttm(m_startdate, m_starttime, Qt::UTC);
-    infoMap["starttime"] = MythDate::toString(starttm, MythDate::kTime);
+    infoMap["starttime"] = MythDate::toString(starttm, date_format | MythDate::kTime);
     infoMap["startdate"] = MythDate::toString(
-        starttm, MythDate::kDateFull | MythDate::kSimplify);
+        starttm, date_format | MythDate::kDateFull | MythDate::kSimplify);
 
     QDateTime endtm(m_enddate, m_endtime, Qt::UTC);
-    infoMap["endtime"] = MythDate::toString(endtm, MythDate::kTime);
+    infoMap["endtime"] = MythDate::toString(endtm, date_format | MythDate::kTime);
     infoMap["enddate"] = MythDate::toString(
-        endtm, MythDate::kDateFull | MythDate::kSimplify);
+        endtm, date_format | MythDate::kDateFull | MythDate::kSimplify);
 
     infoMap["inetref"] = m_inetref;
-    infoMap["chanid"] = m_channelid;
+    infoMap["chanid"] = QChar(m_channelid);
+    infoMap["chanid_str"] = QString::number(m_channelid);
     infoMap["channel"] = m_station;
 
     QDateTime startts(m_startdate, m_starttime, Qt::UTC);
@@ -607,20 +608,20 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
 
 
     infoMap["timedate"] = MythDate::toString(
-        startts, MythDate::kDateTimeFull | MythDate::kSimplify) + " - " +
-        MythDate::toString(endts, MythDate::kTime);
+        startts, date_format | MythDate::kDateTimeFull | MythDate::kSimplify) + " - " +
+        MythDate::toString(endts, date_format | MythDate::kTime);
 
     infoMap["shorttimedate"] =
         MythDate::toString(
-            startts, MythDate::kDateTimeShort | MythDate::kSimplify) + " - " +
-        MythDate::toString(endts, MythDate::kTime);
+            startts, date_format | MythDate::kDateTimeShort | MythDate::kSimplify) + " - " +
+        MythDate::toString(endts, date_format | MythDate::kTime);
 
     if (m_type == kDailyRecord || m_type == kWeeklyRecord)
     {
         QDateTime ldt =
             QDateTime(MythDate::current().toLocalTime().date(), m_findtime,
                       Qt::LocalTime);
-        QString findfrom = MythDate::toString(ldt, MythDate::kTime);
+        QString findfrom = MythDate::toString(ldt, date_format | MythDate::kTime);
         if (m_type == kWeeklyRecord)
         {
             int daynum = (m_findday + 5) % 7 + 1;
@@ -642,17 +643,17 @@ void RecordingRule::ToMap(InfoMap &infoMap) const
     if (m_nextRecording.isValid())
     {
         infoMap["nextrecording"] = MythDate::toString(
-            m_nextRecording, kDateFull | kAddYear);
+            m_nextRecording, date_format | kDateFull | kAddYear);
     }
     if (m_lastRecorded.isValid())
     {
         infoMap["lastrecorded"] = MythDate::toString(
-            m_lastRecorded, kDateFull | kAddYear);
+            m_lastRecorded, date_format | kDateFull | kAddYear);
     }
     if (m_lastDeleted.isValid())
     {
         infoMap["lastdeleted"] = MythDate::toString(
-            m_lastDeleted, kDateFull | kAddYear);
+            m_lastDeleted, date_format | kDateFull | kAddYear);
     }
 
     infoMap["ruletype"] = toString(m_type);

@@ -15,9 +15,6 @@
 class PreviewGenerator;
 class PBHEventHandler;
 class ProgramInfo;
-class QStringList;
-class QObject;
-class QTimer;
 
 enum CheckAvailabilityType {
     kCheckForCache,

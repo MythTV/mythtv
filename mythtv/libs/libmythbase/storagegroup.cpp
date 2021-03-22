@@ -401,7 +401,7 @@ QStringList StorageGroup::GetFileInfo(const QString &lfilename)
         if (fInfo.lastModified().isValid()) {
             details << QString("%1").arg(fInfo.lastModified().toSecsSinceEpoch());
         } else {
-            details << QString(UINT_MAX);
+            details << QString::number(UINT_MAX);
         }
         details << QString("%1").arg(fInfo.size());
     }
