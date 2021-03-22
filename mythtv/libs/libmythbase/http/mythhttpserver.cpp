@@ -128,11 +128,19 @@ void MythHTTPServer::Init()
         m_config.m_port    = static_cast<uint16_t>(gCoreContext->GetNumSetting("UPnP/MythFrontend/ServicePort", 6547));
         // I don't think there is an existing setting for this
         m_config.m_sslPort = static_cast<uint16_t>(gCoreContext->GetNumSetting("FrontendSSLPort", m_config.m_port + 10));
+
+        // TEMPORARY
+        m_config.m_port = 8081;
+        m_config.m_sslPort = 8091;
     }
     else if (gCoreContext->IsBackend())
     {
         m_config.m_port    = static_cast<uint16_t>(gCoreContext->GetBackendStatusPort());
         m_config.m_sslPort = static_cast<uint16_t>(gCoreContext->GetNumSetting("BackendSSLPort", m_config.m_port + 10));
+
+        // TEMPORARY
+        m_config.m_port    = m_config.m_port + 200;
+        m_config.m_sslPort = m_config.m_sslPort + 200;
     }
     else
     {
@@ -140,10 +148,6 @@ void MythHTTPServer::Init()
         m_config.m_port = 0;
         m_config.m_sslPort = 0;
     }
-
-    // TEMPORARY
-    m_config.m_port = 8081;
-    m_config.m_sslPort = 8091;
 
     // If this fails, unset the SSL port
 #ifndef QT_NO_OPENSSL
