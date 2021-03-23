@@ -253,9 +253,10 @@ int CC608Reader::Update(unsigned char *inpos)
                 ccbuf->push_back(tmpcc);
 #if 0
                 if (ccbuf->size() > 4)
-                    LOG(VB_VBI, LOG_DEBUG, QString("CC overflow:  %1 %2 %3")
-                            .arg(m_outputCol) .arg(m_outputRow)
-                            .arg(m_outputText));
+                    LOG(VB_VBI, LOG_DEBUG, QString("CC overflow: %1 %2 %3")
+                        .arg(m_state[streamIdx].m_outputCol)
+                        .arg(m_state[streamIdx].m_outputRow)
+                        .arg(m_state[streamIdx].m_outputText));
 #endif
             }
             subtitle.row++;
@@ -355,6 +356,15 @@ void CC608Reader::Update608Text(
 // scroll_yoff:  yoff < scroll window <= ymax
 // scroll_ymax:
 {
+#if 0
+    LOG(VB_VBI, LOG_DEBUG, QString("%1:%2 ").arg(__FUNCTION__).arg(__LINE__) +
+        QString("replace:%1 ").arg(replace) +
+        QString("scroll:%1 ").arg(scroll) +
+        QString("scroll_prsv:%1 ").arg(scroll_prsv) +
+        QString("scroll_yoff:%1 ").arg(scroll_yoff) +
+        QString("scroll_ymax:%1 ").arg(scroll_ymax) +
+        QString("streamIdx:%1 ").arg(streamIdx));
+#endif
     vector<CC608Text*>::iterator i;
     int visible = 0;
 

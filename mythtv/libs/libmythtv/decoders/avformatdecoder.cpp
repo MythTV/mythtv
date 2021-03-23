@@ -1702,6 +1702,9 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
         const CaptionServiceDescriptor csd(desc);
         if (!csd.IsValid())
             continue;
+
+        LOG(VB_VBI, LOG_DEBUG, LOC + csd.toString());
+
         for (uint k = 0; k < csd.ServicesCount(); k++)
         {
             int lang = csd.CanonicalLanguageKey(k);
