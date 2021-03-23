@@ -194,6 +194,9 @@ def buildNumbers(args, opts):
         try:
             dt = datetime.datetime.strptime(tvsubtitle, "%Y-%m-%d %H:%M:%S")
             show_info = tvmaze.get_show(inetref)
+            # Some cases (e.g. "Bulletproof") have no 'network' field. If the
+            # 'network', 'country', or 'timezone' fields are missing there will
+            # be an AttributeError exception.
             show_network = show_info.network
             show_country = show_network.get('country')
             show_tz = show_country.get('timezone')
@@ -201,7 +204,7 @@ def buildNumbers(args, opts):
             dtInTgtZone = dtInLocalZone.astimezone(dateutil.tz.gettz(show_tz)) # convert to show timezone
             show_hour_min_str = dtInTgtZone.strftime("%H:%M")
 
-        except ValueError as e:
+        except (ValueError, AttributeError) as e:
             dt = None
     else:
         dt = None
