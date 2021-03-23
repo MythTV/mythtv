@@ -194,10 +194,13 @@ def buildNumbers(args, opts):
         try:
             dt = datetime.datetime.strptime(tvsubtitle, "%Y-%m-%d %H:%M:%S")
             show_info = tvmaze.get_show(inetref)
-            # Some cases (e.g. "Bulletproof") have no 'network' field. If the
-            # 'network', 'country', or 'timezone' fields are missing there will
-            # be an AttributeError exception.
+            # Some cases (e.g. "Bulletproof") have 'network' = None, but webChannel
+            # is not None. If we find such a case, we'll set show_network to the webChannel.
+            # If both 'network' and 'webChannel' fields are None then the search for 'country'
+            # will cause an AttributeError exception.
             show_network = show_info.network
+            if show_network is None:
+                show_network = show_info.streaming_service
             show_country = show_network.get('country')
             show_tz = show_country.get('timezone')
             dtInLocalZone = dt.replace(tzinfo=dateutil.tz.gettz())  # assign local timezone
@@ -229,6 +232,8 @@ def buildNumbers(args, opts):
             episode_id = episodes[best_ep_index].id
             # we have now inetref, season, episode, episode_id
             buildSingle([inetref, season_nr, episode_nr], opts, tvmaze_episode_id=episode_id)
+        else:
+            raise Exception("Cannot find episode matching timestamp '%s'." % tvsubtitle)
     else:
         # get episode based on subtitle
         episodes = tvmaze.get_show_episode_list(inetref)
