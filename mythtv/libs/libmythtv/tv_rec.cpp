@@ -4848,8 +4848,9 @@ static void apply_broken_dvb_driver_crc_hack(ChannelBase *c, MPEGStreamData *s)
     // Some DVB devices munge the PMT and/or PAT so the CRC check fails.
     // We need to tell the stream data class to not check the CRC on
     // these devices. This can cause segfaults.
-    if (dynamic_cast<DVBChannel*>(c))
-        s->SetIgnoreCRC(dynamic_cast<DVBChannel*>(c)->HasCRCBug());
+    auto * dvb = dynamic_cast<DVBChannel*>(c);
+    if (dvb != nullptr)
+        s->SetIgnoreCRC(dvb->HasCRCBug());
 }
 #else
 static void apply_broken_dvb_driver_crc_hack(ChannelBase*, MPEGStreamData*) {}
