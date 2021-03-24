@@ -52,13 +52,13 @@
 
 bool debugConflicts = false;
 
-Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
+Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *_tvList,
                      const QString& tmptable, Scheduler *master_sched) :
     MThread("Scheduler"),
     m_recordTable(tmptable),
     m_priorityTable("powerpriority"),
     m_specSched(master_sched),
-    m_tvList(tvList),
+    m_tvList(_tvList),
     m_doRun(runthread),
     m_openEnd(openEndNever)
 {

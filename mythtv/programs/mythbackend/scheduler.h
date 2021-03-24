@@ -45,7 +45,7 @@ class SchedInputInfo
 class Scheduler : public MThread, public MythScheduler
 {
   public:
-    Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
+    Scheduler(bool runthread, QMap<int, EncoderLink *> *_tvList,
               const QString& tmptable = "record", Scheduler *master_sched = nullptr);
     ~Scheduler() override;
 
