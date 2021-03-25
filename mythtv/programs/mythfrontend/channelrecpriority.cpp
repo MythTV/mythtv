@@ -278,7 +278,7 @@ void ChannelRecPriority::FillList(void)
             // save recording priority value in map so we don't have to save
             // all channel's recording priority values when we exit
             m_origRecPriorityData[QString::number(chaninfo->m_chanId)] =
-                    chaninfo->m_recPriority;
+                QString::number(chaninfo->m_recPriority);
 
             cnt--;
         }
