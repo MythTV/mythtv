@@ -957,7 +957,7 @@ void LCDProcClient::formatScrollingWidgets()
 
     // Get the length of the longest item to scroll
     auto longest = [](int cur, const auto & item)
-        { return std::max(cur, item.getText().length()); };
+        { return std::max(cur, static_cast<int>(item.getText().length())); };
     int max_len = std::accumulate(m_lcdTextItems->cbegin(), m_lcdTextItems->cend(),
                                   0, longest);
 
