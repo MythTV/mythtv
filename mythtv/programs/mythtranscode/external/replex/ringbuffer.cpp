@@ -358,7 +358,7 @@ static void show(uint8_t *buf, int length)
 			switch(buf[i+j]){
 			case '0'...'Z':
 			case 'a'...'z':
-				buffer += QString(buf[i+j]);
+				buffer += QString(QChar(buf[i+j]));
 				break;
 			default:
 				buffer += ".";

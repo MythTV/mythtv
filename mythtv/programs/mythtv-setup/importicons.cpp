@@ -765,7 +765,7 @@ bool ImportIconsWizard::findmissing(const QString& strParam)
 #endif
     for (auto line : qAsConst(strSplit))
     {
-        if (line[0] == "#")
+        if (line[0] == QChar('#'))
             continue;
 
         const QStringList ret = extract_csv(line);
@@ -821,7 +821,7 @@ bool ImportIconsWizard::submit()
     unsigned xmltvid = 0;
     for (auto line : qAsConst(strSplit))
     {
-        if (line[0] == "#")
+        if (line[0] == QChar('#'))
             continue;
 
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
