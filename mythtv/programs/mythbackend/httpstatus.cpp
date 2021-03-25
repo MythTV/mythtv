@@ -337,7 +337,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         backends.appendChild(mbe);
         mbe.setAttribute("type", "Master");
         mbe.setAttribute("name", masterhost);
-        mbe.setAttribute("url" , masterip + ":" + masterport);
+        mbe.setAttribute("url" , masterip + ":" + QString::number(masterport));
     }
 
     SSDPCacheEntries *sbes = SSDP::Find(
@@ -751,7 +751,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, const QDomElement& encoders
                 {
                     SleepStatus sleepStatus =
                         (SleepStatus) e.attribute("sleepstatus",
-                            QString((int)sStatus_Undefined)).toInt();
+                            QString::number(sStatus_Undefined)).toInt();
 
                     if (sleepStatus == sStatus_Asleep)
                         os << " (currently asleep).<br />";
