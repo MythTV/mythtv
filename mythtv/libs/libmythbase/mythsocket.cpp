@@ -832,7 +832,7 @@ void MythSocket::ReadStringListReal(
         m_tcpSocket->waitForReadyRead(50);
     }
 
-    QByteArray sizestr(8 + 1, '\0');
+    QByteArray sizestr(8, '\0');
     if (m_tcpSocket->read(sizestr.data(), 8) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -844,14 +844,16 @@ void MythSocket::ReadStringListReal(
     }
 
     QString sizes = sizestr;
-    int btr = sizes.trimmed().toInt();
+    bool ok { false };
+    int btr = sizes.trimmed().toInt(&ok);
 
     if (btr < 1)
     {
         int pending = m_tcpSocket->bytesAvailable();
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Protocol error: '%1' is not a valid size "
-                    "prefix. %2 bytes pending.")
+            QString("Protocol error: %1'%2' is not a valid size "
+                    "prefix. %3 bytes pending.")
+                .arg(ok ? "" : "(parse failed) ")
                 .arg(sizestr.data()).arg(pending));
         ResetReal();
         return;
