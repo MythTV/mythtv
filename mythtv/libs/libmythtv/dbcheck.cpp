@@ -3790,6 +3790,16 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1367")
+    {
+        DBUpdates updates {
+            "ALTER TABLE videosource ADD COLUMN lcnoffset INT UNSIGNED DEFAULT 0;"
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1368", dbver))
+            return false;
+    }
+
     return true;
 }
 
