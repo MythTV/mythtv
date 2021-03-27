@@ -63,7 +63,7 @@ INSTALLS +=  scriptfiles introfiles themefiles imagefiles musicfiles
 INSTALLS +=  profilefiles burnuifiles
 INSTALLS +=  nativeuifiles
 
-QT += xml sql opengl network
+QT += xml sql opengl network widgets
 
 DEFINES += MPLUGIN_API
 
