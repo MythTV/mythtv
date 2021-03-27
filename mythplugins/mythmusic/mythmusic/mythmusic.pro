@@ -3,7 +3,7 @@ include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 include (config.pro)
 
-QT += xml sql opengl network widgets webkitwidgets
+QT += xml sql opengl network widgets
 
 !exists( config.pro ) {
    error(Missing config.pro: please run the configure script)
