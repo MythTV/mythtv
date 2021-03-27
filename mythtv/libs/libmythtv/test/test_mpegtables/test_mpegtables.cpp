@@ -129,7 +129,7 @@ void TestMPEGTables::dvbdate(void)
     };
 
     QCOMPARE (dvbdate2unix (dvbdate_data), (time_t) 1373978017);
-    QCOMPARE (dvbdate2qt (dvbdate_data), MythDate::fromString("2013-07-16 12:33:37 Z"));
+    QCOMPARE (dvbdate2qt (dvbdate_data), MythDate::fromString("2013-07-16 12:33:37Z"));
 }
 
 void TestMPEGTables::tdt_test(void)
@@ -163,7 +163,7 @@ void TestMPEGTables::tdt_test(void)
 
     // actual is 2013-03-30 01:00:00 UTC, 24 hours before the switch to DST in europe
     QCOMPARE (tdt.UTCUnix(), (time_t) 1373978017);
-    QCOMPARE (tdt.UTC(), MythDate::fromString("2013-07-16 12:33:37 Z"));
+    QCOMPARE (tdt.UTC(), MythDate::fromString("2013-07-16 12:33:37Z"));
 }
 
 void TestMPEGTables::ContentIdentifierDescriptor_test(void)
