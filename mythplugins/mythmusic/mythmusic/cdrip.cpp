@@ -847,7 +847,8 @@ void Ripper::scanCD(void)
 
 void Ripper::deleteAllExistingTracks(void)
 {
-    for (auto *it = m_tracks->begin(); it < m_tracks->end(); ++it)
+    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+    for (auto it = m_tracks->begin(); it < m_tracks->end(); ++it)
     {
         RipTrack *track = (*it);
         if (track && !track->isNew)
@@ -1411,7 +1412,8 @@ void Ripper::updateTrackLengths()
 {
     std::chrono::milliseconds length = 0ms;
 
-    for (auto *it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
+    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+    for (auto it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
     {
         RipTrack *track = *it;
         if (track->active)
