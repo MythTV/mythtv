@@ -1007,7 +1007,7 @@ void GameUI::StartGameImageSet(MythGenericTree *node, QStringList coverart,
     if (!metadata)
         return;
 
-    ArtworkMap map;
+    DownloadMap map;
 
     if (metadata->Boxart().isEmpty() && !coverart.empty())
     {

@@ -675,7 +675,7 @@ void EditMetadataDialog::OnSearchListSelection(const ArtworkInfo& info, VideoArt
     lookup->SetAutomatic(true);
     lookup->SetData(QVariant::fromValue<VideoArtworkType>(type));
 
-    ArtworkMap downloads;
+    DownloadMap downloads;
     downloads.insert(type, info);
     lookup->SetDownloads(downloads);
     lookup->SetAllowOverwrites(true);
@@ -700,7 +700,7 @@ void EditMetadataDialog::handleDownloadedImages(MetadataLookup *lookup)
     }
 
     auto type = lookup->GetData().value<VideoArtworkType>();
-    ArtworkMap map = lookup->GetDownloads();
+    DownloadMap map = lookup->GetDownloads();
 
     if (map.count() >= 1)
     {
