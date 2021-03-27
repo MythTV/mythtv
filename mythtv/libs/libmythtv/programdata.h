@@ -42,8 +42,10 @@ class MTV_PUBLIC DBPerson
     };
 
     DBPerson(const DBPerson &other);
-    DBPerson(Role _role, QString _name);
-    DBPerson(const QString &_role, QString _name);
+    DBPerson(Role _role, QString _name,
+             int _priority, QString _character);
+    DBPerson(const QString &_role, QString _name,
+             int _priority, QString _character);
     DBPerson& operator=(const DBPerson &rhs);
 
     QString GetRole(void) const;
@@ -54,12 +56,16 @@ class MTV_PUBLIC DBPerson
   private:
     uint GetPersonDB(MSqlQuery &query) const;
     uint InsertPersonDB(MSqlQuery &query) const;
-    uint InsertCreditsDB(MSqlQuery &query, uint personid, uint chanid,
-                         const QDateTime &starttime) const;
+    uint GetRoleDB(MSqlQuery &query) const;
+    bool InsertRoleDB(MSqlQuery &query) const;
+    uint InsertCreditsDB(MSqlQuery &query, uint personid, uint roleid,
+                         uint chanid, const QDateTime &starttime) const;
 
   private:
     Role    m_role;
     QString m_name;
+    int     m_priority;
+    QString m_character;
 };
 using DBCredits = std::vector<DBPerson>;
 
@@ -107,8 +113,10 @@ class MTV_PUBLIC DBEvent
 
     virtual ~DBEvent() { delete m_credits; }
 
-    void AddPerson(DBPerson::Role role, const QString &name);
-    void AddPerson(const QString &role, const QString &name);
+    void AddPerson(DBPerson::Role role, const QString &name,
+                   int priority = 0, const QString &character = "");
+    void AddPerson(const QString &role, const QString &name,
+                   int priority = 0, const QString &character = "");
 
     uint UpdateDB(MSqlQuery &query, uint chanid, int match_threshold) const;
 

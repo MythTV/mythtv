@@ -552,23 +552,23 @@ void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
+
+    QString table;
     if (pInfo->GetFilesize() > 0) // FIXME: This shouldn't be the way to determine what is or isn't a recording!
-    {
-        query.prepare("SELECT role, people.name FROM recordedcredits"
-                        " AS credits"
-                        " LEFT JOIN people ON credits.person = people.person"
-                        " WHERE credits.chanid = :CHANID"
-                        " AND credits.starttime = :STARTTIME"
-                        " ORDER BY role;");
-    }
+        table = "recordedcredits";
     else
-    {
-        query.prepare("SELECT role, people.name FROM credits"
-                        " LEFT JOIN people ON credits.person = people.person"
-                        " WHERE credits.chanid = :CHANID"
-                        " AND credits.starttime = :STARTTIME"
-                        " ORDER BY role;");
-    }
+        table = "credits";
+
+    query.prepare(QString("SELECT role, people.name, roles.name FROM %1"
+                          " AS credits"
+                          " LEFT JOIN people ON"
+                          "  credits.person = people.person"
+                          " LEFT JOIN roles ON"
+                          "  credits.roleid = roles.roleid"
+                          " WHERE credits.chanid = :CHANID"
+                          " AND credits.starttime = :STARTTIME"
+                          " ORDER BY role, priority;").arg(table));
+
     query.bindValue(":CHANID",    pInfo->GetChanID());
     query.bindValue(":STARTTIME", pInfo->GetScheduledStartTime());
 
@@ -610,8 +610,9 @@ void FillCastMemberList(DTC::CastMemberList* pCastMemberList,
                 * reverse.
                 */
             pCastMember->setName(QString::fromUtf8(query.value(1)
-                                        .toByteArray().constData()));
-
+                                                   .toByteArray().constData()));
+            pCastMember->setCharacterName(QString::fromUtf8(query.value(2)
+                                                   .toByteArray().constData()));
         }
     }
 

@@ -56,10 +56,14 @@ static void add_genres(MSqlQuery &query, const QStringList &genres,
     }
 }
 
-DBPerson::DBPerson(const DBPerson &other) :
-    m_role(other.m_role), m_name(other.m_name)
+DBPerson::DBPerson(const DBPerson &other)
+    : m_role(other.m_role)
+    , m_name(other.m_name)
+    , m_priority(other.m_priority)
+    , m_character(other.m_character)
 {
     m_name.squeeze();
+    m_character.squeeze();
 }
 
 DBPerson& DBPerson::operator=(const DBPerson &rhs)
@@ -69,28 +73,41 @@ DBPerson& DBPerson::operator=(const DBPerson &rhs)
     m_role = rhs.m_role;
     m_name = rhs.m_name;
     m_name.squeeze();
+    m_priority = rhs.m_priority;
+    m_character = rhs.m_character;
+    m_character.squeeze();
     return *this;
 }
 
-DBPerson::DBPerson(Role role, QString name) :
-    m_role(role), m_name(std::move(name))
+DBPerson::DBPerson(Role role, QString name, int priority,
+                   QString character)
+    : m_role(role)
+    , m_name(std::move(name))
+    , m_priority(priority)
+    , m_character(std::move(character))
 {
     m_name.squeeze();
+    m_character.squeeze();
 }
 
-DBPerson::DBPerson(const QString &role, QString name) :
-    m_role(kUnknown), m_name(std::move(name))
+DBPerson::DBPerson(const QString &role, QString name,
+                   int priority, QString character)
+    : m_role(kUnknown)
+    , m_name(std::move(name))
+    , m_priority(priority)
+    , m_character(std::move(character))
 {
     if (!role.isEmpty())
     {
         std::string rolestr = role.toStdString();
-        for (size_t i = 0; i < roles.size(); i++)
+        for (size_t i = 0; i < roles.size(); ++i)
         {
             if (rolestr == roles[i])
                 m_role = (Role) i;
         }
     }
     m_name.squeeze();
+    m_character.squeeze();
 }
 
 QString DBPerson::GetRole(void) const
@@ -107,7 +124,15 @@ uint DBPerson::InsertDB(MSqlQuery &query, uint chanid,
     if (!personid && InsertPersonDB(query))
         personid = GetPersonDB(query);
 
-    return InsertCreditsDB(query, personid, chanid, starttime);
+    uint roleid = 0;
+    if (!m_character.isEmpty())
+    {
+        roleid = GetRoleDB(query);
+        if (!roleid && InsertRoleDB(query))
+            roleid = GetRoleDB(query);
+    }
+
+    return InsertCreditsDB(query, personid, roleid, chanid, starttime);
 }
 
 uint DBPerson::GetPersonDB(MSqlQuery &query) const
@@ -140,20 +165,50 @@ uint DBPerson::InsertPersonDB(MSqlQuery &query) const
     return 0;
 }
 
-uint DBPerson::InsertCreditsDB(MSqlQuery &query, uint personid, uint chanid,
-                               const QDateTime &starttime) const
+uint DBPerson::GetRoleDB(MSqlQuery &query) const
+{
+    query.prepare(
+        "SELECT roleid "
+        "FROM roles "
+        "WHERE name = :NAME");
+    query.bindValue(":NAME", m_character);
+
+    if (query.exec() && query.next())
+        return query.value(0).toUInt();
+
+    return 0;
+}
+
+bool DBPerson::InsertRoleDB(MSqlQuery &query) const
+{
+    query.prepare(
+        "INSERT IGNORE INTO roles (name) "
+        "VALUES (:NAME);");
+    query.bindValue(":NAME", m_character);
+
+    if (query.exec())
+        return true;
+
+    MythDB::DBError("insert_role", query);
+    return false;
+}
+
+uint DBPerson::InsertCreditsDB(MSqlQuery &query, uint personid, uint roleid,
+                               uint chanid, const QDateTime &starttime) const
 {
     if (!personid)
         return 0;
 
     query.prepare(
         "REPLACE INTO credits "
-        "       ( person,  chanid,  starttime,  role) "
-        "VALUES (:PERSON, :CHANID, :STARTTIME, :ROLE) ");
+        "       ( person,  roleid,  chanid,  starttime,  role, priority) "
+        "VALUES (:PERSON, :ROLEID, :CHANID, :STARTTIME, :ROLE, :PRIORITY);");
     query.bindValue(":PERSON",    personid);
+    query.bindValue(":ROLEID",    roleid);
     query.bindValue(":CHANID",    chanid);
     query.bindValue(":STARTTIME", starttime);
     query.bindValue(":ROLE",      GetRole());
+    query.bindValue(":PRIORITY",  m_priority);
 
     if (query.exec())
         return 1;
@@ -229,20 +284,24 @@ void DBEvent::Squeeze(void)
     m_inetref.squeeze();
 }
 
-void DBEvent::AddPerson(DBPerson::Role role, const QString &name)
+void DBEvent::AddPerson(DBPerson::Role role, const QString &name,
+                        int priority, const QString &character)
 {
     if (!m_credits)
         m_credits = new DBCredits;
 
-    m_credits->push_back(DBPerson(role, name.simplified()));
+    m_credits->push_back(DBPerson(role, name.simplified(),
+                                  priority, character.simplified()));
 }
 
-void DBEvent::AddPerson(const QString &role, const QString &name)
+void DBEvent::AddPerson(const QString &role, const QString &name,
+                        int priority, const QString &character)
 {
     if (!m_credits)
         m_credits = new DBCredits;
 
-    m_credits->push_back(DBPerson(role, name.simplified()));
+    m_credits->push_back(DBPerson(role, name.simplified(),
+                                  priority, character.simplified()));
 }
 
 bool DBEvent::HasTimeConflict(const DBEvent &o) const
@@ -286,7 +345,7 @@ uint DBEvent::UpdateDB(
         return InsertDB(query, chanid);
 
     // List all overlapping programs with start- and endtime.
-    for (uint j=0; j<count; j++)
+    for (uint j=0; j<count; ++j)
     {
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: overlap[%1] : %2 %3 '%4'")
@@ -455,7 +514,7 @@ static int score_words(const QStringList &al, const QStringList &bl)
         }
         if (bscore && dist < 3)
         {
-            for (int i = 0; (i < dist) && bit != bl.end(); i++)
+            for (int i = 0; (i < dist) && bit != bl.end(); ++i)
                 ++bit;
         }
         score += bscore;
@@ -504,7 +563,7 @@ int DBEvent::GetMatch(const std::vector<DBEvent> &programs, int &bestmatch) cons
     int match_val = INT_MIN;
     int duration = m_starttime.secsTo(m_endtime);
 
-    for (size_t i = 0; i < programs.size(); i++)
+    for (size_t i = 0; i < programs.size(); ++i)
     {
         int mv = 0;
         int duration_loop = programs[i].m_starttime.secsTo(programs[i].m_endtime);
@@ -577,7 +636,7 @@ uint DBEvent::UpdateDB(
 {
     // Adjust/delete overlaps;
     bool ok = true;
-    for (size_t i = 0; i < p.size(); i++)
+    for (size_t i = 0; i < p.size(); ++i)
     {
         if (i != (uint)match)
             ok &= MoveOutOfTheWayDB(q, chanid, p[i]);

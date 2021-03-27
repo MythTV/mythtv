@@ -211,6 +211,43 @@ bool XMLTVParser::parseFile(
     bool haveReadTV = false;
     while (!xml.atEnd() && !xml.hasError() && (! (xml.isEndElement() && xml.name() == QString("tv"))))
     {
+#if 0
+        if (xml.isDTD())
+        {
+            QStringRef text = xml.text();
+            QStringRef name = xml.dtdName();
+            QStringRef publicId = xml.dtdPublicId();
+            QStringRef systemId = xml.dtdSystemId();
+            QXmlStreamEntityDeclarations entities = xml.entityDeclarations();
+            QXmlStreamNotationDeclarations notations = xml.notationDeclarations();
+
+            QString msg = QString("DTD %1 name %2 PublicId %3 SystemId %4")
+                          .arg(text).arg(name).arg(publicId).arg(systemId);
+
+            if (!entities.isEmpty())
+            {
+                msg += " Entities";
+                for (const auto entity : entities)
+                    msg += QString(":name %1 PublicId %2 SystemId %3 ")
+                           .arg(entity.name())
+                           .arg(entity.publicId())
+                           .arg(entity.systemId());
+            }
+
+            if (!notations.isEmpty())
+            {
+                msg += " Notations";
+                for (const auto notation : notations)
+                    msg += QString(": name %1 PublicId %2 SystemId %3 ")
+                           .arg(notation.name())
+                           .arg(notation.publicId())
+                           .arg(notation.systemId());
+            }
+
+            LOG(VB_XMLTV, LOG_INFO, msg);
+        }
+#endif
+
         if (xml.readNextStartElement())
         {
             if (xml.name() == QString("tv"))
@@ -476,15 +513,47 @@ bool XMLTVParser::parseFile(
                     }
                     else if (xml.name() == QString("credits"))
                     {
+                        int priority = 1;
                         do
                         {
                             if (!readNextWithErrorCheck(xml))
                                 return false;
                             if (xml.isStartElement())
                             {
-                                QString tagname=xml.name().toString();
-                                QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
-                                pginfo->AddPerson(tagname, text2);
+                                // Character role in optional role attribute
+                                QString role = xml.attributes()
+                                                  .value("role").toString();
+                                QString tagname = xml.name().toString();
+                                if (tagname == "actor")
+                                {
+                                    QString guest = xml.attributes()
+                                                       .value("guest")
+                                                       .toString();
+                                    if (guest == "yes")
+                                        tagname = "guest_star";
+                                }
+                                QString text2 = xml.readElementText(QXmlStreamReader::SkipChildElements);
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+                                QStringList roles = role.split("/", QString::SkipEmptyParts);
+#else
+                                QStringList roles = role.split("/", Qt::SkipEmptyParts);
+#endif
+                                if (roles.isEmpty())
+                                {
+                                    pginfo->AddPerson(tagname, text2,
+                                                      priority, role);
+                                    ++priority;
+                                }
+                                else
+                                {
+                                    for (auto & r : roles)
+                                    {
+                                        pginfo->AddPerson(tagname, text2,
+                                                          priority,
+                                                          r.simplified());
+                                        ++priority;
+                                    }
+                                }
                             }
                         }
                         while (! (xml.isEndElement() && xml.name() == QString("credits")));
