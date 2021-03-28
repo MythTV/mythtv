@@ -566,9 +566,9 @@ DTC::CutList* Dvr::GetRecordedCutList ( int RecordedId,
         ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
 
     auto* pCutList = new DTC::CutList();
-    if (offsettype == "Position")
+    if (offsettype.toLower() == "position")
         marktype = 1;
-    else if (offsettype == "Duration")
+    else if (offsettype.toLower() == "duration")
         marktype = 2;
     else
         marktype = 0;
@@ -599,9 +599,9 @@ DTC::CutList* Dvr::GetRecordedCommBreak ( int RecordedId,
         ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
 
     auto* pCutList = new DTC::CutList();
-    if (offsettype == "Position")
+    if (offsettype.toLower() == "position")
         marktype = 1;
-    else if (offsettype == "Duration")
+    else if (offsettype.toLower() == "duration")
         marktype = 2;
     else
         marktype = 0;
@@ -626,9 +626,9 @@ DTC::CutList* Dvr::GetRecordedSeek ( int RecordedId,
     ri = RecordingInfo(RecordedId);
 
     auto* pCutList = new DTC::CutList();
-    if (offsettype == "BYTES")
+    if (offsettype.toLower() == "bytes")
         marktype = MARK_GOP_BYFRAME;
-    else if (offsettype == "DURATION")
+    else if (offsettype.toLower() == "duration")
         marktype = MARK_DURATION_MS;
     else
     {
