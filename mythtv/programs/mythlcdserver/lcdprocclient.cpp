@@ -139,7 +139,6 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
     // Open communications
     // Store the hostname and port in case we need to reconnect.
 
-    int timeout = 1000;
     m_hostname = lhostname;
     m_port = lport;
 
@@ -155,6 +154,7 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
         QTextStream os(m_socket);
         m_socket->connectToHost(m_hostname, m_port);
 
+        int timeout = 1000;
         while (--timeout && m_socket->state() != QAbstractSocket::ConnectedState)
         {
             qApp->processEvents();
