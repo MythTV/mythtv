@@ -150,10 +150,12 @@ def buildList(tvtitle, opts):
 
 def buildNumbers(args, opts):
     # either option -N <inetref> <subtitle>   e.g. -N 69 "Elizabeth Keen"
+    #    or  option -N <inetref> <date time>  e.g. -N 69 "2021-01-29 19:00:00"
     #    or  option -N <title> <subtitle>     e.g. -N "The Blacklist" "Elizabeth Keen"
     #    or  option -N <title> <date time>    e.g. -N "The Blacklist" "2021-01-29 19:00:00"
     from MythTV.utility import levenshtein
     from MythTV.tvmaze import tvmaze_api as tvmaze
+    from lxml import etree
 
     if opts.debug:
         print("Function 'buildNumbers' called with arguments: " +
@@ -163,6 +165,7 @@ def buildNumbers(args, opts):
     if opts.session:
         tvmaze.set_session(opts.session)
 
+    dtInLocalZone = None
     # ToDo:
     # below check shows a deficiency of the MythTV grabber API itself:
     # TV-Shows or Movies with an integer as title are not recognized correctly.
@@ -171,100 +174,158 @@ def buildNumbers(args, opts):
     try:
         inetref = int(args[0])
         tvsubtitle = args[1]
+        inetrefList = [inetref]
+
     except ValueError:
         tvtitle = args[0]
         tvsubtitle = args[1]
+        inetrefList = []    # inetrefs for shows with exact title matches
+        minimal_show_distance = 6
 
-        serie = tvmaze.search_show_best_match(tvtitle)
-        try:
-            # inetref = str(serie.id)
-            inetref = int(serie.id)
-            if opts.debug:
-                print("tvmaze.search_show_best_match(%s) returned inetref : %s"
-                      % (tvtitle, inetref))
-                if 0 and opts.debug:
-                    print(serie, type(serie))
-                    for k, v in serie.__dict__.items():
-                        print(k, " : ", v)
-        except(TypeError, ValueError):
-            raise Exception("Cannot resolve argument 'inetref'")
+        showlist = tvmaze.search_show(tvtitle)
+
+        for show_info in showlist:
+            try:
+                inetref = int(show_info.id)
+                distance = levenshtein(show_info.name.lower(), tvtitle.lower())
+                if distance == minimal_show_distance:
+                    inetrefList.append(inetref)
+                    #if opts.debug:
+                        #print ('show_info =', show_info, ', distance =', distance)
+                elif distance < minimal_show_distance:
+                    # Any items previously appended for a lesser match need to be eliminated
+                    inetrefList = [inetref]
+                    minimal_show_distance = distance
+                    #if opts.debug:
+                        #print ('show_info =', show_info, ', new minimal distance =', distance)
+            except(TypeError, ValueError):
+                pass
 
     if dateLibsAvailable:
         # check whether the 'subtitle' is really a timestamp
         try:
             dt = datetime.datetime.strptime(tvsubtitle, "%Y-%m-%d %H:%M:%S")
-            show_info = tvmaze.get_show(inetref)
-            # Some cases (e.g. "Bulletproof") have 'network' = None, but webChannel
-            # is not None. If we find such a case, we'll set show_network to the webChannel.
-            # If both 'network' and 'webChannel' fields are None then the search for 'country'
-            # will cause an AttributeError exception.
-            show_network = show_info.network
-            if show_network is None:
-                show_network = show_info.streaming_service
-            show_country = show_network.get('country')
-            show_tz = show_country.get('timezone')
             dtInLocalZone = dt.replace(tzinfo=dateutil.tz.gettz())  # assign local timezone
-            dtInTgtZone = dtInLocalZone.astimezone(dateutil.tz.gettz(show_tz)) # convert to show timezone
-            show_hour_min_str = dtInTgtZone.strftime("%H:%M")
+        except ValueError:
+            dtInLocalZone = None
 
-        except (ValueError, AttributeError) as e:
-            dt = None
-    else:
-        dt = None
+    matchesFound = 0
+    minimal_ep_distance = 5                     ### XXX read distance from settings
+    preDelta = datetime.timedelta(minutes=4)  # allow matches within this distance
+    tree = etree.XML(u'<metadata></metadata>')
+    for inetref in inetrefList:
+        dtInTgtZone = None
+        if dateLibsAvailable and dtInLocalZone:
+            try:
+                show_info = tvmaze.get_show(inetref)
+                # Some cases have 'network' = None, but webChannel != None. If we
+                # find such a case, we'll set show_network to the webChannel.
+                show_network = show_info.network
+                if show_network is None:
+                    show_network = show_info.streaming_service
+                show_country = show_network.get('country')
+                show_tz = show_country.get('timezone')
+                dtInTgtZone = dtInLocalZone.astimezone(dateutil.tz.gettz(show_tz))
 
-    if dt:
-        # get episode info based on inetref and datetime
-        episodes = tvmaze.get_show_episodes_by_date(inetref, dtInTgtZone)
-        best_ep_index = None
-        for i, ep in enumerate(episodes):
-            if 0 and opts.debug:
-                print("tvmaze.vmaze.get_show_episodes_by_date(%s, %s) returned :" % (inetref, dtInTgtZone))
-                for k, v in ep.__dict__.items():
-                    print(k, " : ", v)
-            if ep.airtime == show_hour_min_str:
-                # Since we found an exact time match, we're done searching
-                best_ep_index = i
-                break
+            except (ValueError, AttributeError) as e:
+                dtInTgtZone = None
 
-        if len(episodes) > 0 and best_ep_index is not None:
-            season_nr  = str(episodes[best_ep_index].season)
-            episode_nr = str(episodes[best_ep_index].number)
-            episode_id = episodes[best_ep_index].id
-            # we have now inetref, season, episode, episode_id
-            buildSingle([inetref, season_nr, episode_nr], opts, tvmaze_episode_id=episode_id)
+        if dtInTgtZone:
+            # get episode info based on inetref and datetime in target zone
+            try:
+                episodes = tvmaze.get_show_episodes_by_date(inetref, dtInTgtZone)
+            except SystemExit:
+                episodes = []
+            time_match_list = []
+            early_match_list = []
+            minTimeDelta = datetime.timedelta(minutes=60)
+            for i, ep in enumerate(episodes):
+                if 0 and opts.debug:
+                    print("tvmaze.get_show_episodes_by_date(%s, %s) returned :" % (inetref, dtInTgtZone))
+                    for k, v in ep.__dict__.items():
+                        print(k, " : ", v)
+                epInTgtZone = dateutil.parser.parse(ep.timestamp).astimezone(dateutil.tz.gettz(show_tz))
+                durationDelta = datetime.timedelta(minutes=ep.duration)
+
+                # Consider it a match if the recording starts late, but within the duration of the show.
+                if epInTgtZone <= dtInTgtZone < epInTgtZone+durationDelta:
+                    # Recording start time is within the range of this episode
+                    #print('recording in range of this episode\n')
+                    time_match_list.append(i)
+                    minTimeDelta = datetime.timedelta(minutes=0)
+                # Consider it a match if the recording is a little bit early. This helps cases
+                # where you set up a rule to record, at say 9:00, and the broadcaster uses a
+                # slightly odd start time, like 9:05.
+                elif epInTgtZone-minTimeDelta <= dtInTgtZone < epInTgtZone:
+                    # Recording started earlier than this episode, so see if it's the closest match
+                    if epInTgtZone - dtInTgtZone == minTimeDelta:
+                        #print('adding episode to closest list', epInTgtZone - dtInTgtZone, '\n')
+                        early_match_list.append(i)
+                    elif epInTgtZone - dtInTgtZone < minTimeDelta:
+                        #print('this episode is new closest', epInTgtZone - dtInTgtZone, '\n')
+                        minTimeDelta = epInTgtZone - dtInTgtZone
+                        early_match_list = [i]
+
+            if not time_match_list:
+                # No exact matches found, so use the list of the closest episode(s)
+                time_match_list = early_match_list
+
+            if time_match_list:
+                for ep_index in time_match_list:
+                    season_nr  = str(episodes[ep_index].season)
+                    episode_id = episodes[ep_index].id
+                    item = buildSingleItem(inetref, season_nr, episode_id)
+                    if item is not None:
+                        tree.append(item.toXML())
+                        matchesFound += 1
         else:
-            raise Exception("Cannot find episode matching timestamp '%s'." % tvsubtitle)
+            # get episode based on subtitle
+            episodes = tvmaze.get_show_episode_list(inetref)
+
+            min_dist_list = []
+            for i, ep in enumerate(episodes):
+                if 0 and opts.debug:
+                    print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
+                    for k, v in ep.__dict__.items():
+                        print(k, " : ", v)
+                distance = levenshtein(ep.name, tvsubtitle)
+                #print('episode =', ep.name, ', distance =', distance)
+                if len(tvsubtitle) > distance:
+                    if distance == minimal_ep_distance:
+                        #print('adding episode to closest list, distance =', distance)
+                        min_dist_list.append(i)
+                    elif distance < minimal_ep_distance:
+                        #print('this episode is new closest distance =', distance)
+                        # Any items previously appended for a lesser match need to be eliminated
+                        tree = etree.XML(u'<metadata></metadata>')
+                        min_dist_list = [i]
+                        minimal_ep_distance = distance
+            if min_dist_list:
+                for ep_index in min_dist_list:
+                    season_nr  = str(episodes[ep_index].season)
+                    episode_id = episodes[ep_index].id
+                    if opts.debug:
+                        episode_nr = str(episodes[ep_index].number)
+                        print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
+                        print("with season : %s and episode %s" % (season_nr, episode_nr))
+                        print("Chosen episode index '%d' based on levenshtein distance '%d'."
+                              % (ep_index, minimal_ep_distance))
+
+                    # we have now inetref, season, episode_id
+                    item = buildSingleItem(inetref, season_nr, episode_id)
+                    if item is not None:
+                        tree.append(item.toXML())
+                        matchesFound += 1
+
+    if matchesFound > 0:
+        print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                                   xml_declaration=True))
     else:
-        # get episode based on subtitle
-        episodes = tvmaze.get_show_episode_list(inetref)
-
-        best_ep_index = None
-        ep_distance = 5                     ### XXX read distance from settings
-        for i, ep in enumerate(episodes):
-            if 0 and opts.debug:
-                print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
-                for k, v in ep.__dict__.items():
-                    print(k, " : ", v)
-            distance = levenshtein(ep.name, tvsubtitle)
-            if distance < ep_distance:
-                best_ep_index = i
-                ep_distance = distance
-        if len(episodes) > 0 and best_ep_index is not None:
-            season_nr  = str(episodes[best_ep_index].season)
-            episode_nr = str(episodes[best_ep_index].number)
-            episode_id = episodes[best_ep_index].id
-            if opts.debug:
-                print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
-                print("with season : %s and episode %s" % (season_nr, episode_nr))
-                print("Chosen episode index '%d' based on levenshtein distance '%d'."
-                      % (best_ep_index, ep_distance))
-
-            # we have now inetref, season, episode, episode_id
-            buildSingle([inetref, season_nr, episode_nr], opts, tvmaze_episode_id=episode_id)
+        if dtInLocalZone:
+            raise Exception("Cannot find any episode with timestamp matching '%s'." % tvsubtitle)
         else:
             # tvmaze.py -N 4711 "Episode 42"
-            raise Exception("Cannot find episodes for inetref '%s'." % inetref)
-
+            raise Exception("Cannot find any episode with subtitle '%s'." % tvsubtitle)
 
 def buildSingle(args, opts, tvmaze_episode_id=None):
     """
@@ -275,15 +336,13 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     # option -D inetref season episode
 
     from lxml import etree
-    from MythTV import VideoMetadata
     from MythTV.tvmaze import tvmaze_api as tvmaze
-    from MythTV.tvmaze import locales
 
     if opts.debug:
         dstr = "Function 'buildSingle' called with arguments: " + \
                 (" ".join(["'%s'" % i for i in args]))
         if tvmaze_episode_id is not None:
-            dstr += "tvmaze_episode_id = %d" % tvmaze_episode_id
+            dstr += " tvmaze_episode_id = %d" % tvmaze_episode_id
         print(dstr)
     inetref = args[0]
     season  = args[1]
@@ -298,46 +357,38 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
         episodes = tvmaze.get_show_episode_list(inetref)
         for ep in episodes:
             if 0 and opts.debug:
-                print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
+                print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
                 for k, v in ep.__dict__.items():
                     print(k, " : ", v)
             if ep.season == int(season) and ep.number == int(episode):
                 tvmaze_episode_id = ep.id
-                ### XXX check if season == int(ep.season)          ### XXX
                 if opts.debug:
                     print(" Found tvmaze_episode_id : %d" % tvmaze_episode_id)
                 break
 
-    # get info for dedicated season:
-    ep_info = tvmaze.get_episode_information(tvmaze_episode_id)
-    if opts.debug:
-        for k, v in ep_info.__dict__.items():
-            print(k, " : ", v)
+    # build xml:
+    tree = etree.XML(u'<metadata></metadata>')
+    item = buildSingleItem(inetref, season, tvmaze_episode_id)
+    if item is not None:
+        tree.append(item.toXML())
+    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                               xml_declaration=True))
+
+
+def buildSingleItem(inetref, season, episode_id):
+    """
+    This routine returns a video metadata item for one episode.
+    """
+    from MythTV import VideoMetadata
+    from MythTV.tvmaze import tvmaze_api as tvmaze
+    from MythTV.tvmaze import locales
 
     # get global info for all seasons/episodes:
     posterList, fanartList, bannerList = get_show_art_lists(inetref)
-
     show_info = tvmaze.get_show(inetref, populated=True)
-    if opts.debug:
-        print("tvmaze.get_show(%s, populated=True) returned :" % inetref)
-        for k, v in show_info.__dict__.items():
-            print(k, " : ", v)
-        if 0 and opts.debug:
-            for c in show_info.cast:
-                for k, v in c.__dict__.items():
-                    print(k, " : ", v)
-            for c in show_info.crew:
-                for k, v in c.__dict__.items():
-                    print(k, " : ", v)
 
-    # get info for dedicated season:
-    season_info = show_info.seasons[int(season)]
-    if opts.debug:
-        for k, v in season_info.__dict__.items():
-            print(k, " : ", v)
-
-    # build xml:
-    tree = etree.XML(u'<metadata></metadata>')
+    # get info for season episodes:
+    ep_info = tvmaze.get_episode_information(episode_id)
     m = VideoMetadata()
     if show_info.genres is not None and len(show_info.genres) > 0:
         for g in show_info.genres:
@@ -393,6 +444,11 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
         except:
             pass
 
+    # get info for dedicated season:
+    season_info = show_info.seasons[int(season)]
+    #for k, v in season_info.__dict__.items():
+        #print(k, " : ", v)
+
     # prefer season coverarts over series coverart:
     if season_info.images is not None and len(season_info.images) > 0:
         m.images.append({'type': 'coverart', 'url': season_info.images['original'],
@@ -424,10 +480,7 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     if ep_info.images is not None and len(ep_info.images) > 0:
         m.images.append({'type': 'screenshot', 'url': ep_info.images['original'],
                          'thumb': ep_info.images['medium']})
-
-    tree.append(m.toXML())
-    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
-                               xml_declaration=True))
+    return m
 
 
 def buildCollection(tvinetref, opts):
@@ -616,7 +669,6 @@ def main():
 
     if opts.debug:
         import requests
-        pass
     else:
         confdir = os.environ.get('MYTHCONFDIR', '')
         if (not confdir) or (confdir == '/'):
@@ -664,6 +716,7 @@ def main():
                 buildSingle(args, opts)
 
             if opts.collectiondata:
+                # option -C inetref
                 if (len(args) != 1) or (len(args[0]) == 0):
                     sys.stdout.write('ERROR: tvmaze -C requires exactly one non-empty argument')
                     sys.exit(1)
