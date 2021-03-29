@@ -13,6 +13,7 @@ __version__ = "0.1.0"
 
 import sys
 import os
+import shlex
 from optparse import OptionParser
 try:
     import datetime
