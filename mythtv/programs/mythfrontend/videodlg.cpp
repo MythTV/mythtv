@@ -115,7 +115,7 @@ namespace
 
     MythGenericTree *GetNodePtrFromButton(MythUIButtonListItem *item)
     {
-        if (item)
+        if (item && item->GetData().canConvert<MythGenericTree *>())
             return item->GetData().value<MythGenericTree *>();
 
         return nullptr;
@@ -123,7 +123,7 @@ namespace
 
     VideoMetadata *GetMetadataPtrFromNode(MythGenericTree *node)
     {
-        if (node)
+        if (node && node->GetData().canConvert<TreeNodeData>())
             return node->GetData().value<TreeNodeData>().GetMetadata();
 
         return nullptr;
@@ -1412,6 +1412,10 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
     if (nodeInt  == kSubFolder)  // subdirectory
     {
+        // First validate that the data can be converted
+        if (!node || !node->GetData().canConvert<TreeNodeData>())
+            return icon_file;
+
         // load folder icon
         QString folder_path = node->GetData().value<TreeNodeData>().GetPath();
         QString host = node->GetData().value<TreeNodeData>().GetHost();
