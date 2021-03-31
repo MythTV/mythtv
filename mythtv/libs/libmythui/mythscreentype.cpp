@@ -164,10 +164,10 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
                                      m_currentFocusWidget);
     if (up)
     {
+        if (it != m_focusWidgetList.end())
+            it++;
         if (it == m_focusWidgetList.end())
             it = m_focusWidgetList.begin();
-        else
-            it++;
         // Put an upper limit on loops to guarantee exit at some point.
         for (auto count = m_focusWidgetList.size() * 2; count > 0; count--)
         {
