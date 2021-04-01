@@ -128,7 +128,6 @@ static HostTextEditSetting *VAAPIDevice()
 }
 #endif
 
-#if CONFIG_DEBUGTYPE
 static HostCheckBoxSetting *FFmpegDemuxer()
 {
     HostCheckBoxSetting *gc = new HostCheckBoxSetting("FFMPEGTS");
@@ -138,11 +137,10 @@ static HostCheckBoxSetting *FFmpegDemuxer()
     gc->setValue(false);
 
     gc->setHelpText(PlaybackSettings::tr("Experimental: Enable this setting to "
-                                         "use FFmpeg's native demuxer. Things "
-                                         "will be broken."));
+                                         "use FFmpeg's native demuxer. "
+                                         "Try this when encountering playback issues."));
     return gc;
 }
-#endif
 
 static HostComboBoxSetting *PIPLocationComboBox()
 {
@@ -4263,9 +4261,7 @@ void PlaybackSettings::Load(void)
     general->addChild(ContinueEmbeddedTVPlay());
     general->addChild(LiveTVIdleTimeout());
 
-#if CONFIG_DEBUGTYPE
     general->addChild(FFmpegDemuxer());
-#endif
 
     general->addChild(new PlayBackScaling());
 
