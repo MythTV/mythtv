@@ -47,7 +47,7 @@ class MTV_PUBLIC SourceUtil
                                  const QString& password, bool useeit,
                                  const QString& configpath, int nitid,
                                  uint bouquetid, uint regionid, uint scanfrequency,
-                                 uint lncoffset);
+                                 uint lcnoffset);
     static bool    DeleteSource(uint sourceid);
     static bool    DeleteAllSources(void);
 };
