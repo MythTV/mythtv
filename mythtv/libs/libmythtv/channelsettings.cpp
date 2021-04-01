@@ -574,8 +574,8 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
         QString frequency = query.value(1).toString();
         DTVModulationSystem modSys;
         modSys.Parse(query.value(3).toString());
-        if (modSys == DTVModulationSystem::kModulationSystem_DVBS ||
-            modSys == DTVModulationSystem::kModulationSystem_DVBS2)
+        if ((modSys == DTVModulationSystem::kModulationSystem_DVBS) ||
+            (modSys == DTVModulationSystem::kModulationSystem_DVBS2))
         {
             QString polarization = query.value(2).toString().toUpper();
             frequency.append(polarization);
