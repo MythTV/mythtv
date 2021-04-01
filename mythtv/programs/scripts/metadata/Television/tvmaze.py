@@ -15,12 +15,6 @@ import sys
 import os
 import shlex
 from optparse import OptionParser
-try:
-    import datetime
-    import dateutil
-    dateLibsAvailable = True
-except ImportError:
-    dateLibsAvailable = False
 
 def print_etree(etostr):
     """lxml.etree.tostring is a bytes object in python3, and a str in python2.
@@ -155,8 +149,11 @@ def buildNumbers(args, opts):
     #    or  option -N <title> <subtitle>     e.g. -N "The Blacklist" "Elizabeth Keen"
     #    or  option -N <title> <date time>    e.g. -N "The Blacklist" "2021-01-29 19:00:00"
     from MythTV.utility import levenshtein
+    from MythTV.utility.dt import posixtzinfo
     from MythTV.tvmaze import tvmaze_api as tvmaze
+    from MythTV import datetime
     from lxml import etree
+    from datetime import timedelta
 
     if opts.debug:
         print("Function 'buildNumbers' called with arguments: " +
@@ -180,43 +177,54 @@ def buildNumbers(args, opts):
     except ValueError:
         tvtitle = args[0]
         tvsubtitle = args[1]
-        inetrefList = []    # inetrefs for shows with exact title matches
-        minimal_show_distance = 6
+        inetrefList = []    # inetrefs for shows with title matches
+        best_show_quality = 0.5     # require at least this quality on string match
 
         showlist = tvmaze.search_show(tvtitle)
+
+        # It's problematic to make decisions soley upon the Levenshtein distance.
+        # If the strings are really long or really short, a simple rule, such as
+        # "accept any distance < 6" can provide misleading results.
+        # To establish a more useful measurement, we'll use the Levenshtein
+        # distance to figure out the ratio (0 - 1) of matching characters in the
+        # longer string, and call this 'match_quality'.
+        #    "Risk", "Call" -> distance = 4
+        #           match_quality = (4 - 4) / 4 = 0
+        #    "In Sickness and in Health", "Sickness and Health" -> distance = 6
+        #           match_quality = (25 - 6)/25 = .76
 
         for show_info in showlist:
             try:
                 inetref = int(show_info.id)
                 distance = levenshtein(show_info.name.lower(), tvtitle.lower())
-                if distance == minimal_show_distance:
-                    inetrefList.append(inetref)
+                if len(tvtitle) > len(show_info.name):
+                    match_quality = float(len(tvtitle) - distance) / len(tvtitle)
+                else:
+                    match_quality = float(len(show_info.name) - distance) / len(show_info.name)
+                if match_quality >= best_show_quality:
                     #if opts.debug:
-                        #print ('show_info =', show_info, ', distance =', distance)
-                elif distance < minimal_show_distance:
-                    # Any items previously appended for a lesser match need to be eliminated
-                    inetrefList = [inetref]
-                    minimal_show_distance = distance
-                    #if opts.debug:
-                        #print ('show_info =', show_info, ', new minimal distance =', distance)
+                        #print ('show_info =', show_info, ', match_quality =', match_quality)
+                    if match_quality == best_show_quality:
+                        inetrefList.append(inetref)
+                    else:
+                        # Any items previously appended for a lesser match need to be eliminated
+                        inetrefList = [inetref]
+                        best_show_quality = match_quality
             except(TypeError, ValueError):
                 pass
 
-    if dateLibsAvailable:
-        # check whether the 'subtitle' is really a timestamp
-        try:
-            dt = datetime.datetime.strptime(tvsubtitle, "%Y-%m-%d %H:%M:%S")
-            dtInLocalZone = dt.replace(tzinfo=dateutil.tz.gettz())  # assign local timezone
-        except ValueError:
-            dtInLocalZone = None
+    # check whether the 'subtitle' is really a timestamp
+    try:
+        dtInLocalZone = datetime.strptime(tvsubtitle, "%Y-%m-%d %H:%M:%S") # defaults to local timezone
+    except ValueError:
+        dtInLocalZone = None
 
     matchesFound = 0
-    minimal_ep_distance = 5                     ### XXX read distance from settings
-    preDelta = datetime.timedelta(minutes=4)  # allow matches within this distance
+    best_ep_quality = 0.5   # require at least this quality on string match
     tree = etree.XML(u'<metadata></metadata>')
     for inetref in inetrefList:
         dtInTgtZone = None
-        if dateLibsAvailable and dtInLocalZone:
+        if dtInLocalZone:
             try:
                 show_info = tvmaze.get_show(inetref)
                 # Some cases have 'network' = None, but webChannel != None. If we
@@ -226,7 +234,7 @@ def buildNumbers(args, opts):
                     show_network = show_info.streaming_service
                 show_country = show_network.get('country')
                 show_tz = show_country.get('timezone')
-                dtInTgtZone = dtInLocalZone.astimezone(dateutil.tz.gettz(show_tz))
+                dtInTgtZone = dtInLocalZone.astimezone(posixtzinfo(show_tz))
 
             except (ValueError, AttributeError) as e:
                 dtInTgtZone = None
@@ -234,36 +242,37 @@ def buildNumbers(args, opts):
         if dtInTgtZone:
             # get episode info based on inetref and datetime in target zone
             try:
+                #print('get_show_episodes_by_date(', inetref, ',', dtInTgtZone, ')')
                 episodes = tvmaze.get_show_episodes_by_date(inetref, dtInTgtZone)
             except SystemExit:
                 episodes = []
             time_match_list = []
             early_match_list = []
-            minTimeDelta = datetime.timedelta(minutes=60)
+            minTimeDelta = timedelta(minutes=60)
             for i, ep in enumerate(episodes):
-                if 0 and opts.debug:
-                    print("tvmaze.get_show_episodes_by_date(%s, %s) returned :" % (inetref, dtInTgtZone))
-                    for k, v in ep.__dict__.items():
-                        print(k, " : ", v)
-                epInTgtZone = dateutil.parser.parse(ep.timestamp).astimezone(dateutil.tz.gettz(show_tz))
-                durationDelta = datetime.timedelta(minutes=ep.duration)
+                epInTgtZone = datetime.fromIso(ep.timestamp, tz = posixtzinfo(show_tz))
+                durationDelta = timedelta(minutes=ep.duration)
 
                 # Consider it a match if the recording starts late, but within the duration of the show.
                 if epInTgtZone <= dtInTgtZone < epInTgtZone+durationDelta:
                     # Recording start time is within the range of this episode
-                    #print('recording in range of this episode\n')
+                    if opts.debug:
+                        print('Recording in range of inetref %d, season %d, episode %d (%s ... %s)' \
+                                % (inetref, ep.season, ep.number, epInTgtZone, epInTgtZone+durationDelta))
                     time_match_list.append(i)
-                    minTimeDelta = datetime.timedelta(minutes=0)
+                    minTimeDelta = timedelta(minutes=0)
                 # Consider it a match if the recording is a little bit early. This helps cases
                 # where you set up a rule to record, at say 9:00, and the broadcaster uses a
                 # slightly odd start time, like 9:05.
                 elif epInTgtZone-minTimeDelta <= dtInTgtZone < epInTgtZone:
                     # Recording started earlier than this episode, so see if it's the closest match
                     if epInTgtZone - dtInTgtZone == minTimeDelta:
-                        #print('adding episode to closest list', epInTgtZone - dtInTgtZone, '\n')
+                        if opts.debug:
+                            print('adding episode to closest list', epInTgtZone - dtInTgtZone, '\n')
                         early_match_list.append(i)
                     elif epInTgtZone - dtInTgtZone < minTimeDelta:
-                        #print('this episode is new closest', epInTgtZone - dtInTgtZone, '\n')
+                        if opts.debug:
+                            print('this episode is new closest', epInTgtZone - dtInTgtZone, '\n')
                         minTimeDelta = epInTgtZone - dtInTgtZone
                         early_match_list = [i]
 
@@ -290,17 +299,25 @@ def buildNumbers(args, opts):
                     for k, v in ep.__dict__.items():
                         print(k, " : ", v)
                 distance = levenshtein(ep.name, tvsubtitle)
-                #print('episode =', ep.name, ', distance =', distance)
-                if len(tvsubtitle) > distance:
-                    if distance == minimal_ep_distance:
-                        #print('adding episode to closest list, distance =', distance)
+                if len(tvsubtitle) >= len(ep.name):
+                    match_quality = float(len(tvsubtitle) - distance) / len(tvsubtitle)
+                else:
+                    match_quality = float(len(ep.name) - distance) / len(ep.name)
+                #if opts.debug:
+                    #print('inetref', inetref, 'episode =', ep.name, ', distance =', distance, ', match_quality =', match_quality)
+                if match_quality >= best_ep_quality:
+                    if match_quality == best_ep_quality:
                         min_dist_list.append(i)
-                    elif distance < minimal_ep_distance:
-                        #print('this episode is new closest distance =', distance)
+                        if opts.debug:
+                            print('"%s" added to best list, match_quality = %g' % (ep.name, match_quality))
+                    else:
                         # Any items previously appended for a lesser match need to be eliminated
                         tree = etree.XML(u'<metadata></metadata>')
                         min_dist_list = [i]
-                        minimal_ep_distance = distance
+                        best_ep_quality = match_quality
+                        if opts.debug:
+                            print('"%s" is new best match_quality = %g' % (ep.name, match_quality))
+
             if min_dist_list:
                 for ep_index in min_dist_list:
                     season_nr  = str(episodes[ep_index].season)
@@ -309,8 +326,8 @@ def buildNumbers(args, opts):
                         episode_nr = str(episodes[ep_index].number)
                         print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
                         print("with season : %s and episode %s" % (season_nr, episode_nr))
-                        print("Chosen episode index '%d' based on levenshtein distance '%d'."
-                              % (ep_index, minimal_ep_distance))
+                        print("Chosen episode index '%d' based on match quality %g"
+                              % (ep_index, best_ep_quality))
 
                     # we have now inetref, season, episode_id
                     item = buildSingleItem(inetref, season_nr, episode_id)
@@ -648,7 +665,6 @@ def main():
 
     if opts.doctest:
         import doctest
-        opts.debug = False
 
         try:
             with open("tvmaze_tests.txt") as f:
@@ -660,7 +676,7 @@ def main():
         except IOError:
             pass
         # perhaps try optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
-        doctest.testmod(verbose=True, optionflags=doctest.ELLIPSIS)
+        doctest.testmod(verbose=opts.debug, optionflags=doctest.ELLIPSIS)
 
     if opts.version:
         buildVersion()
