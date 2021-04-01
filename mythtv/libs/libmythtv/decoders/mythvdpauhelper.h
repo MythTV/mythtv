@@ -15,8 +15,13 @@
 
 // FFmpeg
 extern "C" {
+#define Cursor XCursor // Prevent conflicts with Qt6.
+#define pointer Xpointer // Prevent conflicts with Qt6.
 #include "libavutil/hwcontext_vdpau.h"
 #include "vdpau/vdpau_x11.h"
+#undef None            // X11/X.h defines this. Causes compile failure in Qt6.
+#undef Cursor
+#undef pointer
 #include "libavcodec/avcodec.h"
 }
 

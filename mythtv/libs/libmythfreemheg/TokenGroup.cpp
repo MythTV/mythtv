@@ -534,7 +534,8 @@ void MHListGroup::Update(MHEngine *engine)
 
     if (m_nLastCount - m_nLastFirstItem != m_itemList.size() - m_nFirstItem)
     {
-        engine->EventTriggered(this, EventTailItems, m_itemList.size() - m_nFirstItem);
+        engine->EventTriggered(this, EventTailItems,
+			       static_cast<int>(m_itemList.size()) - m_nFirstItem);
     }
 
     m_nLastCount = m_itemList.size();

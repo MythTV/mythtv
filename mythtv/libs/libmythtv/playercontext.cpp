@@ -411,7 +411,7 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
             if (!filters.isEmpty() && (!filters.endsWith(",")))
                 filters += ",";
 
-            filters += chanFilters.midRef(1);
+            filters += chanFilters.mid(1);
         }
     }
 

@@ -345,8 +345,8 @@ void MythMainWindow::Animate(void)
         redraw = true;
 
     // The call to GetDrawOrder can apparently alter m_stackList.
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto * it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6
+    for (auto it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
     {
         QVector<MythScreenType *> drawList;
         (*it)->GetDrawOrder(drawList);
@@ -393,8 +393,8 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
         // Check for any widgets that have been updated since we built
         // the dirty region list in ::animate()
         // The call to GetDrawOrder can apparently alter m_stackList.
-        // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto * it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
+        // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6
+        for (auto it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
@@ -453,8 +453,8 @@ void MythMainWindow::Draw(MythPainter* Painter)
             Painter->SetClipRect(rect);
 
         // The call to GetDrawOrder can apparently alter m_stackList.
-        // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto * it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
+        // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6
+        for (auto it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
@@ -1216,7 +1216,6 @@ void MythMainWindow::BindKey(const QString& Context, const QString& Action, cons
     for (unsigned int i = 0; i < static_cast<uint>(keyseq.count()); i++)
     {
         int keynum = keyseq[i];
-        keynum &= ~Qt::UNICODE_ACCEL;
 
         QStringList dummyaction("");
         if (m_priv->m_keyContexts.value(Context)->GetMapping(keynum, dummyaction))
@@ -1372,7 +1371,6 @@ void MythMainWindow::BindJump(const QString& Destination, const QString& Key)
     for (unsigned int i = 0; i < static_cast<uint>(keyseq.count()); i++)
     {
         int keynum = keyseq[i];
-        keynum &= ~Qt::UNICODE_ACCEL;
 
         if (m_priv->m_jumpMap.count(keynum) == 0)
         {
@@ -1676,7 +1674,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
             }
 #endif
 
-            for (auto * it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+            // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+            for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
             {
                 if (auto * top = (*it)->GetTopScreen(); top)
                 {
@@ -1732,7 +1731,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                     if (!mouseevent)
                         return MythUIScreenBounds::eventFilter(Watched, Event);
 
-                    for (auto * it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+                    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+                    for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
                     {
                         auto * screen = (*it)->GetTopScreen();
                         if (!screen || !screen->ContainsPoint(point))
@@ -1762,7 +1762,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                         return true;
                     }
                     
-                    for (auto *it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+                    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+                    for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
                         if (!screen || !screen->ContainsPoint(point))

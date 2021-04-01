@@ -139,7 +139,6 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
     // Open communications
     // Store the hostname and port in case we need to reconnect.
 
-    int timeout = 1000;
     m_hostname = lhostname;
     m_port = lport;
 
@@ -155,6 +154,7 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
         QTextStream os(m_socket);
         m_socket->connectToHost(m_hostname, m_port);
 
+        int timeout = 1000;
         while (--timeout && m_socket->state() != QAbstractSocket::ConnectedState)
         {
             qApp->processEvents();
@@ -957,7 +957,7 @@ void LCDProcClient::formatScrollingWidgets()
 
     // Get the length of the longest item to scroll
     auto longest = [](int cur, const auto & item)
-        { return std::max(cur, item.getText().length()); };
+        { return std::max(cur, static_cast<int>(item.getText().length())); };
     int max_len = std::accumulate(m_lcdTextItems->cbegin(), m_lcdTextItems->cend(),
                                   0, longest);
 
@@ -1498,7 +1498,7 @@ void LCDProcClient::scrollMenuText()
                 // Indent this item if nessicary
                 aString += bString.fill(' ', curItem->getIndent());
 
-                aString += curItem->ItemName().midRef(curItem->getScrollPos(),
+                aString += curItem->ItemName().mid(curItem->getScrollPos(),
                                                    ( m_lcdWidth - lcdStartCol));
                 aString += "\"";
                 sendToServer(aString);
@@ -1604,7 +1604,7 @@ void LCDProcClient::scrollMenuText()
             curItem->incrementScrollPos();
 
             if ((int)curItem->getScrollPos() <= longest_line)
-                aString += curItem->ItemName().midRef(curItem->getScrollPos(),
+                aString += curItem->ItemName().mid(curItem->getScrollPos(),
                                                    ( m_lcdWidth-lcdStartCol));
 
             aString += "\"";

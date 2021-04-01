@@ -948,7 +948,7 @@ int MHIContext::GetChannelIndex(const QString &str)
         {
             // I haven't seen this yet so this is untested.
             bool ok = false;
-            int channelNo = str.midRef(14).toInt(&ok); // Decimal integer
+            int channelNo = str.mid(14).toInt(&ok); // Decimal integer
             if (!ok)
                 break;
             MSqlQuery query(MSqlQuery::InitCon());

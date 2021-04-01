@@ -2,6 +2,7 @@ include ( ../../../../settings.pro )
 include ( ../../../../test.pro )
 
 QT += xml sql network testlib
+using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_audioconvert

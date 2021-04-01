@@ -1243,6 +1243,10 @@ TV::~TV()
         m_mainWindow->PauseIdleTimer(false);
     }
 
+    qDeleteAll(m_screenPressKeyMapPlayback);
+    m_screenPressKeyMapPlayback.clear();
+    qDeleteAll(m_screenPressKeyMapLiveTV);
+    m_screenPressKeyMapLiveTV.clear();
 
     delete m_lastProgram;
 
@@ -3148,9 +3152,9 @@ static bool SysEventHandleAction(MythMainWindow* MainWindow, QKeyEvent *e, const
     return false;
 }
 
-QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &KeyList)
+QList<QKeyEvent*> TV::ConvertScreenPressKeyMap(const QString &KeyList)
 {
-    QList<QKeyEvent> keyPressList;
+    QList<QKeyEvent*> keyPressList;
     int i = 0;
     QStringList stringKeyList = KeyList.split(',');
     for (const auto & str : qAsConst(stringKeyList))
@@ -3159,7 +3163,7 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &KeyList)
         for(i = 0; i < keySequence.count(); i++)
         {
             uint keynum = static_cast<uint>(keySequence[static_cast<uint>(i)]);
-            QKeyEvent keyEvent(QEvent::None, keynum & ~Qt::KeyboardModifierMask,
+            auto * keyEvent = new QKeyEvent(QEvent::None, keynum & ~Qt::KeyboardModifierMask,
                                static_cast<Qt::KeyboardModifiers>(keynum & Qt::KeyboardModifierMask));
             keyPressList.append(keyEvent);
         }
@@ -3169,7 +3173,7 @@ QList<QKeyEvent> TV::ConvertScreenPressKeyMap(const QString &KeyList)
         // add default remainders
         for(; i < kScreenPressRegionCount; i++)
         {
-            QKeyEvent keyEvent(QEvent::None, Qt::Key_Escape, Qt::NoModifier);
+            auto * keyEvent = new QKeyEvent(QEvent::None, Qt::Key_Escape, Qt::NoModifier);
             keyPressList.append(keyEvent);
         }
     }
@@ -3199,8 +3203,8 @@ bool TV::TranslateGesture(const QString &Context, MythGestureEvent *Event,
             region += (pos.y() / h3) * widthDivider;
 
             if (IsLiveTV)
-                return m_mainWindow->TranslateKeyPress(Context, &(m_screenPressKeyMapLiveTV[region]), Actions, true);
-            return m_mainWindow->TranslateKeyPress(Context, &(m_screenPressKeyMapPlayback[region]), Actions, true);
+                return m_mainWindow->TranslateKeyPress(Context, m_screenPressKeyMapLiveTV[region], Actions, true);
+            return m_mainWindow->TranslateKeyPress(Context, m_screenPressKeyMapPlayback[region], Actions, true);
         }
         return false;
     }
@@ -5755,7 +5759,7 @@ bool TV::ProcessSmartChannel(QString &InputStr)
     if ((size > 2) && (chan.at(size - 1) == chan.at(size - 2)))
     {
         bool ok = false;
-        chan.rightRef(1).toUInt(&ok);
+        chan.right(1).toUInt(&ok);
         if (!ok)
         {
             chan = chan.left(chan.length()-1);
@@ -8030,7 +8034,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action.startsWith("ADJUSTSTRETCH"))
     {
         bool floatRead = false;
-        float stretch = Action.rightRef(Action.length() - 13).toFloat(&floatRead);
+        float stretch = Action.right(Action.length() - 13).toFloat(&floatRead);
         if (floatRead &&
             stretch <= 2.0F &&
             stretch >= 0.48F)
@@ -8046,7 +8050,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         ChangeTimeStretch(0, !floatRead);   // just display
     }
     else if (Action.startsWith("SELECTSCAN_"))
-        OverrideScan(static_cast<FrameScanType>(Action.rightRef(1).toInt()));
+        OverrideScan(static_cast<FrameScanType>(Action.right(1).toInt()));
     else if (Action.startsWith(ACTION_TOGGELAUDIOSYNC))
         emit ChangeAudioOffset(0ms);
     else if (Action == ACTION_TOGGLESUBTITLEZOOM)
@@ -8063,17 +8067,17 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         ToggleSleepTimer(Action.left(13));
     else if (Action.startsWith("TOGGLEPICCONTROLS"))
     {
-        m_adjustingPictureAttribute = static_cast<PictureAttribute>(Action.rightRef(1).toInt() - 1);
+        m_adjustingPictureAttribute = static_cast<PictureAttribute>(Action.right(1).toInt() - 1);
         DoTogglePictureAttribute(kAdjustingPicture_Playback);
     }
     else if (Action == "TOGGLEASPECT")
         emit ChangeAspectOverride();
     else if (Action.startsWith("TOGGLEASPECT"))
-        emit ChangeAspectOverride(static_cast<AspectOverrideMode>(Action.rightRef(1).toInt()));
+        emit ChangeAspectOverride(static_cast<AspectOverrideMode>(Action.right(1).toInt()));
     else if (Action == "TOGGLEFILL")
         emit ChangeAdjustFill();
     else if (Action.startsWith("TOGGLEFILL"))
-        emit ChangeAdjustFill(static_cast<AdjustFillMode>(Action.rightRef(1).toInt()));
+        emit ChangeAdjustFill(static_cast<AdjustFillMode>(Action.right(1).toInt()));
     else if (Action == "MENU")
          ShowOSDMenu();
     else if (Action == "AUTODETECT_FILL")
@@ -8165,7 +8169,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
             PopPreviousChannel(true);
         else if (Action.startsWith("SWITCHTOINPUT_"))
         {
-            m_switchToInputId = Action.midRef(14).toUInt();
+            m_switchToInputId = Action.mid(14).toUInt();
             ScheduleInputChange();
         }
         else if (Action == "EDIT")
@@ -8195,17 +8199,17 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         }
         else if (Action.startsWith(ACTION_JUMPCHAPTER))
         {
-            int chapter = Action.rightRef(3).toInt();
+            int chapter = Action.right(3).toInt();
             DoJumpChapter(chapter);
         }
         else if (Action.startsWith(ACTION_SWITCHTITLE))
         {
-            int title = Action.rightRef(3).toInt();
+            int title = Action.right(3).toInt();
             DoSwitchTitle(title);
         }
         else if (Action.startsWith(ACTION_SWITCHANGLE))
         {
-            int angle = Action.rightRef(3).toInt();
+            int angle = Action.right(3).toInt();
             DoSwitchAngle(angle);
         }
         else if (Action == "EDIT")
@@ -8217,7 +8221,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
             ToggleAutoExpire();
         else if (Action.startsWith("TOGGLECOMMSKIP"))
         {
-            SetAutoCommercialSkip(static_cast<CommSkipMode>(Action.rightRef(1).toInt()));
+            SetAutoCommercialSkip(static_cast<CommSkipMode>(Action.right(1).toInt()));
         }
         else if (Action == "QUEUETRANSCODE")
         {
@@ -9453,7 +9457,7 @@ void TV::ToggleSleepTimer(const QString& Time)
         if (Time.length() > 11)
         {
             bool intRead = false;
-            mins = std::chrono::minutes(Time.rightRef(Time.length() - 11).toUInt(&intRead));
+            mins = std::chrono::minutes(Time.right(Time.length() - 11).toUInt(&intRead));
 
             if (intRead)
             {

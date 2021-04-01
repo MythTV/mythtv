@@ -166,7 +166,7 @@ int DeviceManager::OpenDevice(const QString &name, const QString &mount,
     if (id == DEVICE_INVALID)
     {
         state = "New";
-        id = m_devices.isEmpty() ? 0 : (m_devices.constEnd() - 1).key() + 1;
+        id = m_devices.isEmpty() ? 0 : m_devices.lastKey() + 1;
         m_devices.insert(id, new Device(name, mount, media, dir));
     }
     else if (m_devices.value(id))
@@ -1725,7 +1725,11 @@ QStringList ImageHandler<DBFS>::HandleCreateThumbnails
 template <class DBFS>
 void ImageHandler<DBFS>::RemoveFiles(ImageList &images) const
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QMutableVectorIterator<ImagePtr> it(images);
+#else
+    QMutableListIterator<ImagePtr> it(images);
+#endif
     it.toBack();
     while (it.hasPrevious())
     {

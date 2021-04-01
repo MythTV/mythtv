@@ -214,7 +214,7 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
     if (m_ignoreKeys)
         return;
 
-    QKeyEvent key(QEvent::KeyPress, 0, Qt::NoModifier);
+    QScopedPointer<QKeyEvent> key { new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier) };
     QObject* target = nullptr;
     QString error;
 
@@ -228,10 +228,10 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
         int keycode = jke->getKeycode();
         if (keycode)
         {
-            key = QKeyEvent(jke->isKeyDown() ? QEvent::KeyPress : QEvent::KeyRelease,
-                            (keycode & static_cast<int>(~Qt::MODIFIER_MASK)),
-                            Qt::KeyboardModifiers(keycode & static_cast<int>(Qt::MODIFIER_MASK)));
-            target = m_parent->GetTarget(key);
+            key.reset(new QKeyEvent(jke->isKeyDown() ? QEvent::KeyPress : QEvent::KeyRelease,
+                                  (keycode & static_cast<int>(~Qt::MODIFIER_MASK)),
+                                  Qt::KeyboardModifiers(keycode & static_cast<int>(Qt::MODIFIER_MASK))));
+            target = m_parent->GetTarget(*key);
         }
         else
         {
@@ -253,8 +253,8 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
         }
         else
         {
-            key = QKeyEvent(lke->keytype(), lke->key(), lke->modifiers(), lke->text());
-            target = m_parent->GetTarget(key);
+            key.reset(new QKeyEvent(lke->keytype(), lke->key(), lke->modifiers(), lke->text()));
+            target = m_parent->GetTarget(*key);
         }
     }
 #endif
@@ -269,6 +269,6 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
         MythMainWindow::ResetScreensaver();
         if (MythMainWindow::IsScreensaverAsleep())
             return;
-        QCoreApplication::sendEvent(target, &key);
+        QCoreApplication::sendEvent(target, key.data());
     }
 }

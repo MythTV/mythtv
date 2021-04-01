@@ -1235,8 +1235,10 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     }
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     // Ignore desktop scaling
     QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+#endif
 
 #ifdef USING_X11
     if (auto display = CmdLine.toString("display"); !display.isEmpty())

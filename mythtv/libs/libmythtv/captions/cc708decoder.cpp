@@ -306,17 +306,20 @@ static int handle_cc_c0_ext1_p16(CC708Reader* cc, uint service_num, int i)
 {
     // C0 code -- subset of ASCII misc. control codes
     const int code = cc->m_buf[service_num][i];
-    if (code<=0xf)
+
+    if (code <= 0xf)
     {
         // single byte code
-        if (ETX==code)
+        if (C0::ETX == code)
             SEND_STR;
-        else if (BS==code)
-            append_character(cc, service_num, 0x08);
-        else if (FF==code)
-            append_character(cc, service_num, 0x0c);
-        else if ((CR==code) || (HCR==code))
-            append_character(cc, service_num, 0x0d);
+        else if (C0::BS == code)
+            append_character(cc, service_num, 0x8);     // Backspace
+        else if (C0::FF==code)
+            append_character(cc, service_num, 0xc);     // Form Feed
+        else if (C0::CR==code)
+            append_character(cc, service_num, 0xd);     // Carriage Return
+        else if (C0::HCR==code)
+            append_character(cc, service_num, 0xe);     // Horizontal Carriage Return
         i++;
     }
     else if (code<=0x17)

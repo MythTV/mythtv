@@ -28,7 +28,7 @@ class RTPTSDataPacket : public RTPDataPacket
 
     unsigned int GetTSDataSize(void) const
     {
-        return std::max(m_data.size() - (int)GetTSOffset() - (int)GetPaddingSize(), 0);
+        return std::max(static_cast<int>(m_data.size() - (int)GetTSOffset() - (int)GetPaddingSize()), 0);
     }
 
   private:

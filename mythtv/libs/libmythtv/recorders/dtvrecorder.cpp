@@ -1383,10 +1383,13 @@ void DTVRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt, bool insert)
                     }
                     if (m_h2645Parser == nullptr)
                     {
-                        m_h2645Parser = reinterpret_cast<H2645Parser *>
-                                        (new AVCParser);
-                        dynamic_cast<AVCParser *>(m_h2645Parser)->
-                            use_I_forKeyframes(m_useIForKeyframe);
+                        auto * avcParser = new AVCParser;
+                        if (avcParser != nullptr)
+                        {
+                            m_h2645Parser = reinterpret_cast<H2645Parser *>
+                                (avcParser);
+                            avcParser->use_I_forKeyframes(m_useIForKeyframe);
+                        }
                     }
                     break;
                 case StreamID::H265Video:

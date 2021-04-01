@@ -41,7 +41,8 @@
 #include "channelutil.h"
 
 #define PARSE_SKIP(VAR) do { \
-    if (it == tokens.end()) return false; ++it; } while(false)
+    if (it == tokens.end()) return false; \
+    ++it; } while(false)
 
 #define PARSE_CONF(VAR) do { \
     if (it == tokens.end() || !(VAR).ParseConf(*it++)) \
@@ -96,7 +97,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
 
         if ((str.length() >= 1) && (str.at(0) == '@'))
         {
-            channelNo = str.midRef(1).toInt();
+            channelNo = str.mid(1).toInt();
             line = stream.readLine();
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
             list = line.split(":", QString::SkipEmptyParts);

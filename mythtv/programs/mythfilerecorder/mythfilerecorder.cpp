@@ -93,7 +93,7 @@ void Streamer::SendBytes(void)
         int rate  = (delta * m_dataRate) - m_dataRead;
 
         read_sz = std::min(rate, read_sz);
-        read_sz = std::min(m_bufferMax - m_buffer.size(), read_sz);
+        read_sz = std::min(static_cast<int>(m_bufferMax - m_buffer.size()), read_sz);
 
         if (read_sz > 0)
         {
@@ -282,7 +282,7 @@ bool Commands::process_command(QString & cmd)
     }
     else if (cmd.startsWith("BlockSize"))
     {
-        m_streamer->BlockSize(cmd.midRef(10).toInt());
+        m_streamer->BlockSize(cmd.mid(10).toInt());
         send_status("OK");
     }
     else if (cmd.startsWith("StartStreaming"))

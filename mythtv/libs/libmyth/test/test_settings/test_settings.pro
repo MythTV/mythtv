@@ -1,6 +1,7 @@
 include ( ../../../../settings.pro )
 
 QT += sql testlib widgets
+using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_settings

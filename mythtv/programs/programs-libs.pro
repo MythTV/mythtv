@@ -64,6 +64,7 @@ LIBS += -lmythmetadata-$$LIBVERSION
 LIBS += -lmythservicecontracts-$$LIBVERSION
 LIBS += -lmythprotoserver-$$LIBVERSION
 
+using_frontend: using_opengl: QT += opengl
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -lhdhomerun

@@ -436,7 +436,11 @@ void SubtitleFormat::Complement(MythFontProperties *font, MythUIShape *bg)
     face->setItalic(!face->italic());
     face->setPixelSize(face->pixelSize() + 1);
     face->setUnderline(!face->underline());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     face->setWeight((face->weight() + 1) % 32);
+#else
+    // qt6: Weight has become an enum. Leave it alone.
+#endif
     font->SetColor(differentColor(font->color()));
 
     font->GetShadow(offset, color, alpha);

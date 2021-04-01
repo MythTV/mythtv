@@ -488,7 +488,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
                     else
                     {
                         callsign = w1.left(w2.length() == 1 ? 4:3);
-                        callsign += w2.leftRef(5 - callsign.length());
+                        callsign += w2.left(5 - callsign.length());
                     }
                     (*i).m_callSign = callsign;
                 }

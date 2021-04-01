@@ -618,7 +618,7 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     if ((nPos = sCache.indexOf("=", nPos)) < 0)
         return false;
 
-    auto nSecs = std::chrono::seconds(sCache.midRef( nPos+1 ).toInt());
+    auto nSecs = std::chrono::seconds(sCache.mid( nPos+1 ).toInt());
 
     SSDPCache::Instance()->Add( sST, sUSN, sDescURL, nSecs );
 
@@ -656,7 +656,7 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
         if ((nPos = sCache.indexOf("=", nPos)) < 0)
             return false;
 
-        auto nSecs = std::chrono::seconds(sCache.midRef( nPos+1 ).toInt());
+        auto nSecs = std::chrono::seconds(sCache.mid( nPos+1 ).toInt());
 
         SSDPCache::Instance()->Add( sNT, sUSN, sDescURL, nSecs );
 

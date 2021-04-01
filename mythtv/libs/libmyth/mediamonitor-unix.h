@@ -37,7 +37,7 @@ class MediaMonitorUnix : public MediaMonitor
     bool CheckFileSystemTable(void);
     bool CheckMountable(void);
 #if !CONFIG_QTDBUS
-    bool CheckRemovable(const QString &dev);
+    static bool CheckRemovable(const QString &dev);
     bool FindPartitions(const QString &dev, bool checkPartitions);
 #endif
 
@@ -45,7 +45,7 @@ class MediaMonitorUnix : public MediaMonitor
     bool AddDevice(struct fstab* mep);
 
 #if !CONFIG_QTDBUS
-    QString GetDeviceFile(const QString &sysfs);
+    static QString GetDeviceFile(const QString &sysfs);
 #endif
 
     QStringList GetCDROMBlockDevices(void) override; // MediaMonitor

@@ -168,7 +168,7 @@ void CC708Window::Resize(uint new_rows, uint new_columns)
     // Ex: [CAPTIONING FUNDED BY CBS SPORTS
     //     DIVISION]NG FUNDED BY CBS SPORTS
 
-    if(new_rows < m_true_row_count || new_columns < m_true_column_count)
+    if (new_rows < m_true_row_count || new_columns < m_true_column_count)
     {
       delete [] m_text;
       m_text = new CC708Character [new_rows * new_columns];
@@ -430,20 +430,55 @@ void CC708Window::AddChar(QChar ch)
         return;
     }
 
-    if (ch.toLatin1() == 0x0D)
+    // CEA-708-D Section 7.1.4, page 30
+    // Carriage Return (CR) moves the current entry point to the beginning of the next row. If the next row is
+    // below the visible window, the window "rolls up" as defined in CEA-608-E Section 7.4. If the next row is
+    // within the visible window and contains text, the cursor is moved to the beginning of the row, but the pre-
+    // existing text is not erased.
+    if (ch.toLatin1() == 0x0D)      // C0::CR
     {
         Scroll(m_pen.m_row + 1, 0);
         SetChanged();
         return;
     }
+
     QMutexLocker locker(&m_lock);
 
+    // CEA-708-D Section 7.1.4, page 30
+    // Horizontal Carriage Return (HCR) moves the current entry point to the beginning of the current row
+    // without row increment or decrement. It shall erase all text on the row.
+    if (ch.toLatin1() == 0x0E)      // C0::HCR
+    {
+        uint p = m_pen.m_row * m_true_column_count;
+        for (uint c = 0; c < m_column_count; c++)
+        {
+            m_text[c + p].m_attr      = m_pen.m_attr;
+            m_text[c + p].m_character = QChar(' ');
+        }
+        m_pen.m_column = 0;
+        LimitPenLocation();
+        SetChanged();
+        return;
+    }
+
+    // Backspace
     if (ch.toLatin1() == 0x08)
     {
         DecrPenLocation();
         CC708Character& chr = GetCCChar();
         chr.m_attr      = m_pen.m_attr;
         chr.m_character = QChar(' ');
+        SetChanged();
+        return;
+    }
+
+    // CEA-708-D Section 7.1.4, page 30
+    // Form Feed (FF) erases all text in the window and moves the cursor to the first character position in the
+    // window (0,0).
+    if (ch.toLatin1() == 0x0c)      // C0::FF
+    {
+        Clear();
+        SetPenLocation(0,0);
         SetChanged();
         return;
     }

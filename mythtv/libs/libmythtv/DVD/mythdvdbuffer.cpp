@@ -177,7 +177,7 @@ long long MythDVDBuffer::Seek(long long Time)
     {
         auto it = kSeekSpeedMap.lowerBound(static_cast<int>(std::abs(Time)));
         if (it == kSeekSpeedMap.end())
-            seekSpeed = *(it - 1);
+            seekSpeed = kSeekSpeedMap.last();
         else
             seekSpeed = *it;
         if (Time < 0)

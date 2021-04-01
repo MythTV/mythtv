@@ -1010,7 +1010,7 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             }
         }
 
-        QMap<QString, int>::const_iterator i = map.constBegin();
+        auto i = map.constBegin();
         while (i != map.constEnd())
         {
             auto *newnode = new MusicGenericTree(node, i.key(), "trackid");

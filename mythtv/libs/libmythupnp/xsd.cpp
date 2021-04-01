@@ -347,7 +347,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
     {
         QMetaProperty metaProperty = pMetaObject->property( nIdx );
 
-        if (metaProperty.isDesignable( pClass ))
+        if (metaProperty.isDesignable())
         {
             const char *pszPropName = metaProperty.name();
             QString     sPropName( pszPropName );

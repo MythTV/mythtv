@@ -285,7 +285,8 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
 
     query.prepare("SELECT sourceid, name, xmltvgrabber, userid, "
                   "freqtable, lineupid, password, useeit, configpath, "
-                  "dvb_nit_id, bouquet_id, region_id, scanfrequency FROM videosource "
+                  "dvb_nit_id, bouquet_id, region_id, scanfrequency, "
+                  "lcnoffset FROM videosource "
                   "ORDER BY sourceid" );
 
     if (!query.exec())
@@ -319,6 +320,7 @@ DTC::VideoSourceList* Channel::GetVideoSourceList()
         pVideoSource->setBouquetId     ( query.value(10).toUInt()     );
         pVideoSource->setRegionId      ( query.value(11).toUInt()     );
         pVideoSource->setScanFrequency ( query.value(12).toUInt()     );
+        pVideoSource->setLCNOffset     ( query.value(13).toUInt()     );
     }
 
     pList->setAsOf          ( MythDate::current() );
@@ -342,7 +344,8 @@ DTC::VideoSource* Channel::GetVideoSource( uint nSourceID )
 
     query.prepare("SELECT name, xmltvgrabber, userid, "
                   "freqtable, lineupid, password, useeit, configpath, "
-                  "dvb_nit_id, bouquet_id, region_id, scanfrequency "
+                  "dvb_nit_id, bouquet_id, region_id, scanfrequency, "
+                  "lcnoffset "
                   "FROM videosource WHERE sourceid = :SOURCEID "
                   "ORDER BY sourceid" );
     query.bindValue(":SOURCEID", nSourceID);
@@ -375,6 +378,7 @@ DTC::VideoSource* Channel::GetVideoSource( uint nSourceID )
         pVideoSource->setBouquetId     ( query.value(9).toUInt()      );
         pVideoSource->setRegionId      ( query.value(10).toUInt()     );
         pVideoSource->setScanFrequency ( query.value(11).toUInt()     );
+        pVideoSource->setLCNOffset     ( query.value(12).toUInt()     );
     }
 
     return pVideoSource;
@@ -396,7 +400,8 @@ bool Channel::UpdateVideoSource( uint          nSourceId,
                                  int           nNITId,
                                  uint          nBouquetId,
                                  uint          nRegionId,
-                                 uint          nScanFrequency )
+                                 uint          nScanFrequency,
+                                 uint          nLCNOffset )
 {
 
     if (!HAS_PARAM("sourceid"))
@@ -464,6 +469,9 @@ bool Channel::UpdateVideoSource( uint          nSourceId,
     if ( HAS_PARAM("scanfrequency") )
         ADD_SQL(settings, bindings, "scanfrequency", "ScanFrequency", nScanFrequency)
 
+    if ( HAS_PARAM("lcnoffset") )
+        ADD_SQL(settings, bindings, "lcnoffset", "LCNOffset", nLCNOffset)
+
     if ( settings.isEmpty() )
     {
         LOG(VB_GENERAL, LOG_ERR, "No valid parameters were passed");
@@ -506,11 +514,13 @@ int  Channel::AddVideoSource( const QString &sSourceName,
                               int           nNITId,
                               uint          nBouquetId,
                               uint          nRegionId,
-                              uint          nScanFrequency )
+                              uint          nScanFrequency,
+                              uint          nLCNOffset )
 {
     int nResult = SourceUtil::CreateSource(sSourceName, sGrabber, sUserId, sFreqTable,
                                        sLineupId, sPassword, bUseEIT, sConfigPath,
-                                       nNITId, nBouquetId, nRegionId, nScanFrequency);
+                                       nNITId, nBouquetId, nRegionId, nScanFrequency,
+                                       nLCNOffset);
 
     return nResult;
 }

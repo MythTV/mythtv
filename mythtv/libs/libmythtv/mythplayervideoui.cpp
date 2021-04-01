@@ -151,7 +151,8 @@ void MythPlayerVideoUI::HandleDecoderCallback(const QString& Debug, DecoderCallb
 void MythPlayerVideoUI::ProcessCallbacks()
 {
     m_decoderCallbackLock.lock();
-    for (auto *it = m_decoderCallbacks.begin(); it != m_decoderCallbacks.end(); ++it)
+    // NOLINTNEXTLINE(readability-qualified-auto) for Qt6
+    for (auto it = m_decoderCallbacks.begin(); it != m_decoderCallbacks.end(); ++it)
     {
         if (it->m_function)
         {

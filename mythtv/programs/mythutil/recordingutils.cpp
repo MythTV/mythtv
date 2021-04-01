@@ -57,7 +57,7 @@ static QString CreateProgramInfoString(const ProgramInfo &pginfo)
     if (!pginfo.GetSubtitle().isEmpty())
     {
         extra = QString(" ~ ") + pginfo.GetSubtitle();
-        int maxll = std::max(title.length(), 20);
+        int maxll = std::max(static_cast<int>(title.length()), 20);
         if (extra.length() > maxll)
             extra = extra.left(maxll - 3) + "...";
     }

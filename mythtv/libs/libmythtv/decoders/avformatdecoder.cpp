@@ -1671,6 +1671,7 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 
     const ProgramMapTable pmt(PSIPTable(m_ic->cur_pmt_sect));
 
+    bool video_found = false;
     uint i = 0;
     for (i = 0; i < pmt.StreamCount(); i++)
     {
@@ -1678,10 +1679,12 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
         // so "dvb" is the safest choice for system info type, since this
         // will ignore other uses of the same stream id in DVB countries.
         if (pmt.IsVideo(i, "dvb"))
+        {
+            video_found = true;
             break;
+        }
     }
-
-    if (!pmt.IsVideo(i, "dvb"))
+    if (!video_found)
         return;
 
     desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
@@ -1699,6 +1702,9 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
         const CaptionServiceDescriptor csd(desc);
         if (!csd.IsValid())
             continue;
+
+        LOG(VB_VBI, LOG_DEBUG, LOC + csd.toString());
+
         for (uint k = 0; k < csd.ServicesCount(); k++)
         {
             int lang = csd.CanonicalLanguageKey(k);
@@ -2853,7 +2859,7 @@ void AvFormatDecoder::DecodeCCx08(const uint8_t *buf, uint buf_size, bool scte)
 
     bool had_608 = false;
     bool had_708 = false;
-    for (uint cur = 0; cur + 3 < buf_size; cur += 3)
+    for (uint cur = 0; cur + 2 < buf_size; cur += 3)
     {
         uint cc_code  = buf[cur];
         bool cc_valid = (cc_code & 0x04) != 0U;

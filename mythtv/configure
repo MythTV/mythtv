@@ -5891,23 +5891,18 @@ enabled ffmpeg_pthreads && enable pthreads
 # Check for taglib for libmythmetadata. MSYS2 uses taglib-config.cmd
 TAGLIB_CONFIG=""
 if enabled taglib; then
-    if test x`which taglib-config` != x"" ; then
-        TAGLIB_CONFIG="taglib-config"
-    elif test $target_os = mingw32 ; then
-        TAGLIB_CONFIG="taglib-config.cmd"
-    fi
     taglib_verstring="nothing"
     taglib_version=0
-    if test $TAGLIB_CONFIG ; then
-        taglib_verstring=`$TAGLIB_CONFIG --version`
+    if test $pkg_config ; then
+        taglib_verstring=`$pkg_config --modversion taglib`
         taglib_version=$(version2num10 $taglib_verstring)
         if test $target_os = android ; then
-            tagprefix=`$TAGLIB_CONFIG --prefix`
+            tagprefix=`$pkg_config --variable=prefix taglib`
         else
-            tagprefix=${sysroot}`$TAGLIB_CONFIG --prefix`
+            tagprefix=${sysroot}`$pkg_config --variable=prefix taglib`
         fi
         tagincludes="-I${tagprefix}/include"
-        taglibs=`$TAGLIB_CONFIG --libs`
+        taglibs=`$pkg_config --libs taglib`
         if test $target_os = android ; then
             taglibs="$taglibs -lz -lm"
         fi
@@ -6637,6 +6632,8 @@ case $target_os in
         ;;
 esac
 
+# Omit Qt5 modules that aren't in Qt6.
+if [ $qt_version -lt $(version2num "6.0.0") ]; then
 if $(pkg-config --exists Qt5WebKit) || $(pkg-config --exists QtWebKit) ; then
     enable qtwebkit
 else
@@ -6658,6 +6655,7 @@ EOF
 fi
 
 enabled qtscript || die "Error! QtScript headers not found"
+fi
 
 # Check if Qt was built with DBus support:
 if ! disabled qtdbus; then
@@ -6758,8 +6756,8 @@ int main(void) {
 EOF
 
 if enabled taglib; then
-    taglib_include=`$TAGLIB_CONFIG --prefix`/include/taglib
-    taglib_libs=`$TAGLIB_CONFIG --libs`
+    taglib_include=`$pkg_config --variable=prefix taglib`/include/taglib
+    taglib_libs=`$pkg_config --libs taglib`
 fi
 
 enabled x11 && check_lib X11 "X11/Xdefs.h X11/Xlib.h" XQueryExtension  -lX11 || disable x11
@@ -6966,7 +6964,7 @@ if enabled gxx; then
     #check_cxxflags -Wuseless-cast
 
     # Ubuntu 16.04 uses gcc 5.4.0 which complains about '[[clang::fallthrough]]'
-    gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\)\{1,\}.*/\1/')
+    gxx_major_version=$(echo $gxx_version | sed -e 's/\([[:digit:]]\{1,\}\).*/\1/')
     if test $gxx_major_version -lt 7; then
         if enabled arm; then
             check_cxxflags -Wno-psabi
@@ -6983,11 +6981,14 @@ if enabled gxx; then
     if enabled enforce_nullptr; then
         check_cxxflags -Wzero-as-null-pointer-constant
     fi
-    # Ubuntu 16.04 has problems with this flag.  Its not GCC or Qt, as
-    # both older compilers and/or older Qt versions on other systems
-    # produce clean output.  This is a simple check to eliminate that
-    # specific version (and more, but it gets the job done).
-    if [ $qt_version -ge $(version2num "5.7.0") ]; then
+    # The Q_OBJECT macro gets included in every subclass that is based
+    # on QOBject, and has a couple of functions marked as "virtual"
+    # instead of "override". Apparently earlier version of GCC didn't
+    # warn about this because the errors were in the /usr/include
+    # directory. GCC11 does print these warnings. A ton of
+    # them. Disable this warning to make it easier to find real
+    # errors.
+    if [ $qt_version -ge $(version2num "11.0.0") ]; then
         check_cxxflags -Wsuggest-override
     fi
 elif enabled icpc; then

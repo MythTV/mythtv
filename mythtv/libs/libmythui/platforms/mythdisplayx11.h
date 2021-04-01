@@ -9,7 +9,9 @@
 #include "mythxdisplay.h"
 
 // X11 - always last
+#define pointer Xpointer // Prevent conflicts with Qt6.
 #include <X11/extensions/Xrandr.h>
+#undef pointer
 
 class MythDisplayX11 : public MythDisplay
 {

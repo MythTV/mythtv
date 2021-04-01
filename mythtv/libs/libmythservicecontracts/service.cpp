@@ -33,7 +33,11 @@ QVariant Service::ConvertToVariant( int nType, void *pValue )
         return QVariant::fromValue<QObject*>( pObj );
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     return QVariant( nType, pValue );
+#else
+    return QVariant( QMetaType(nType), pValue );
+#endif
 }
 
 
