@@ -4483,7 +4483,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
 
         // could not select track based on user preferences (language)
         // try to select the default track
-        if (selTrack < 0 && numStreams)
+        if (selTrack < 0)
         {
             LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select default track");
             for (size_t i = 0; i < atracks.size(); i++) {
