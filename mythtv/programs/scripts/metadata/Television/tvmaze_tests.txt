@@ -132,16 +132,16 @@ Doc-Tests for tvmaze
     </images>
   </item>
   <item>
-    <title>Going Out</title>
-    <description>A mother and daughter who stand before the truth after a sudden tragic accident and deal with the meaning of family.</description>
-    <inetref>47528</inetref>
-    <collectionref>47528</collectionref>
+    <title>The Night Watchman</title>
+    <description>Young watchmen of the Joseon Dynasty fight demons in this "Ghostbusters"-like story. Set in the backdrop of the royal palace, the good guys vanquish demons while the bad guys use them for their purposes. The palace is rife with sinister plans to seize power and usurp the king. Through this story of young people who hunt demons, the tribulations and joys of life are shown in all their glory.</description>
+    <inetref>3237</inetref>
+    <collectionref>3237</collectionref>
     <language>ko</language>
-    <releasedate>2020-05-04</releasedate>
-    <popularity>...</popularity>
-    <year>2020</year>
+    <releasedate>2014-08-04</releasedate>
+    <popularity>46.0</popularity>
+    <year>2014</year>
     <images>
-      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/253/634317.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/253/634317.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/17/43577.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/17/43577.jpg"/>
     </images>
   </item>
 </metadata>
