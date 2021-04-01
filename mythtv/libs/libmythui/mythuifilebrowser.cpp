@@ -411,13 +411,15 @@ void MythUIFileBrowser::homePressed()
 void MythUIFileBrowser::OKPressed()
 {
     MythUIButtonListItem *item = m_fileList->GetItemCurrent();
-        auto finfo = item->GetData().value<MFileInfo>();
 
     if (m_retObject)
     {
         QString selectedPath = m_locationEdit->GetText();
+        QVariant vData;
+        if (item != nullptr)
+            vData = item->GetData();
         auto *dce = new DialogCompletionEvent(m_id, 0, selectedPath,
-                                              item->GetData());
+                                              vData);
         QCoreApplication::postEvent(m_retObject, dce);
     }
 
