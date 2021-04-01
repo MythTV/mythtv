@@ -1147,10 +1147,10 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
     int keynum = MythMainWindowPrivate::TranslateKeyNum(Event);
 
     QStringList localActions;
+    auto * keycontext = m_priv->m_keyContexts.value(Context);
     if (AllowJumps && (m_priv->m_jumpMap.count(keynum) > 0) &&
         (!m_priv->m_jumpMap[keynum]->m_localAction.isEmpty()) &&
-        (m_priv->m_keyContexts.value(Context)) &&
-        (m_priv->m_keyContexts.value(Context)->GetMapping(keynum, localActions)))
+        keycontext && (keycontext->GetMapping(keynum, localActions)))
     {
         if (localActions.contains(m_priv->m_jumpMap[keynum]->m_localAction))
             AllowJumps = false;
@@ -1174,11 +1174,15 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
         return true;
     }
 
-    if (m_priv->m_keyContexts.value(Context))
-        m_priv->m_keyContexts.value(Context)->GetMapping(keynum, Actions);
+    if (keycontext)
+        keycontext->GetMapping(keynum, Actions);
 
     if (Context != "Global")
-        m_priv->m_keyContexts.value("Global")->GetMapping(keynum, Actions);
+    {
+        auto * keycontextG = m_priv->m_keyContexts.value("Global");
+        if (keycontextG)
+            keycontextG->GetMapping(keynum, Actions);
+    }
 
     return false;
 }
@@ -1209,8 +1213,14 @@ void MythMainWindow::ClearKeyContext(const QString& Context)
 
 void MythMainWindow::BindKey(const QString& Context, const QString& Action, const QString& Key)
 {
-    if (!m_priv->m_keyContexts.contains(Context))
-        m_priv->m_keyContexts.insert(Context, new KeyContext());
+    auto * keycontext = m_priv->m_keyContexts.value(Context);
+    if (keycontext == nullptr)
+    {
+        keycontext = new KeyContext();
+        if (keycontext == nullptr)
+            return;
+        m_priv->m_keyContexts.insert(Context, keycontext);
+    }
 
     QKeySequence keyseq(Key);
     for (unsigned int i = 0; i < static_cast<uint>(keyseq.count()); i++)
@@ -1218,16 +1228,16 @@ void MythMainWindow::BindKey(const QString& Context, const QString& Action, cons
         int keynum = keyseq[i];
 
         QStringList dummyaction("");
-        if (m_priv->m_keyContexts.value(Context)->GetMapping(keynum, dummyaction))
+        if (keycontext->GetMapping(keynum, dummyaction))
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("Key %1 is bound to multiple actions in context %2.")
                 .arg(Key).arg(Context));
         }
 
-        m_priv->m_keyContexts.value(Context)->AddMapping(keynum, Action);
+        keycontext->AddMapping(keynum, Action);
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, QString("Binding: %1 to action: %2 (%3)")
-                                   .arg(key).arg(action).arg(context));
+                                   .arg(Key).arg(Action).arg(Context));
 #endif
 
         if (Action == "ESCAPE" && Context == "Global" && i == 0)
@@ -1650,7 +1660,7 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
 
 #ifdef Q_OS_LINUX
             // Fixups for _some_ linux native codes that QT doesn't know
-            if (event->key() <= 0)
+            if (event && event->key() <= 0)
             {
                 int keycode = 0;
                 switch (event->nativeScanCode())
