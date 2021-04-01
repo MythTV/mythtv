@@ -29,10 +29,13 @@ git fetch ffmpeg
   In your mythtv directory.
 git log mythtv/external/FFmpeg/
 - If the log contains any changes check if they are in the MythTV/FFmpeg repository
-  and if not commit them into MythTV/FFmpeg/master and cherry-pick them into the 
-  current release branch (e.g. release/4.0).
-  Note if the commit is in ffmpeg/FFMpeg master then no need to add it to ours
-  as it will get merged in.
+  and if not commit them into MythTV/FFmpeg/master
+  For each one:
+    in mythtv directory
+        git show <commit-hash> > commit_n.patch
+    in FFmpeg directory
+        git apply -p 4  commit_n.patch
+  Then commit the result and cherry-pick into the current release branch (e.g. release/4.x).
 - Check for a new branch. From FFmpeg clone directory:
 git branch -a
 - Check list from above command to see if there is any new release branch in 

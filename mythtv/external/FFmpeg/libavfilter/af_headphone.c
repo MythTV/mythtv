@@ -88,15 +88,13 @@ typedef struct HeadphoneContext {
     } *in;
 } HeadphoneContext;
 
-static int parse_channel_name(HeadphoneContext *s, int x, char **arg, int *rchannel, char *buf)
+static int parse_channel_name(char **arg, int *rchannel, char *buf)
 {
     int len, i, channel_id = 0;
     int64_t layout, layout0;
 
     if (sscanf(*arg, "%7[A-Z]%n", buf, &len)) {
         layout0 = layout = av_get_channel_layout(buf);
-        if (layout == AV_CH_LOW_FREQUENCY)
-            s->lfe_channel = x;
         for (i = 32; i > 0; i >>= 1) {
             if (layout >= 1LL << i) {
                 channel_id += i;
@@ -116,6 +114,7 @@ static void parse_map(AVFilterContext *ctx)
 {
     HeadphoneContext *s = ctx->priv;
     char *arg, *tokenizer, *p, *args = av_strdup(s->map);
+    uint64_t used_channels = 0;
     int i;
 
     if (!args)
@@ -134,10 +133,17 @@ static void parse_map(AVFilterContext *ctx)
         char buf[8];
 
         p = NULL;
-        if (parse_channel_name(s, s->nb_irs, &arg, &out_ch_id, buf)) {
-            av_log(ctx, AV_LOG_WARNING, "Failed to parse \'%s\' as channel name.\n", buf);
+        if (parse_channel_name(&arg, &out_ch_id, buf)) {
+            av_log(ctx, AV_LOG_WARNING, "Failed to parse \'%s\' as channel name.\n", arg);
             continue;
         }
+        if (used_channels & (1ULL << out_ch_id)) {
+            av_log(ctx, AV_LOG_WARNING, "Ignoring duplicate channel '%s'.\n", buf);
+            continue;
+        }
+        used_channels |= 1ULL << out_ch_id;
+        if (out_ch_id == av_log2(AV_CH_LOW_FREQUENCY))
+            s->lfe_channel = s->nb_irs;
         s->mapping[s->nb_irs] = out_ch_id;
         s->nb_irs++;
     }
@@ -181,7 +187,7 @@ static int headphone_convolute(AVFilterContext *ctx, void *arg, int jobnr, int n
     const int in_channels = in->channels;
     const int buffer_length = s->buffer_length;
     const uint32_t modulo = (uint32_t)buffer_length - 1;
-    float *buffer[16];
+    float *buffer[64];
     int wr = *write;
     int read;
     int i, l;
@@ -405,6 +411,9 @@ static int convert_coeffs(AVFilterContext *ctx, AVFilterLink *inlink)
     int i, j, k;
 
     s->air_len = 1 << (32 - ff_clz(ir_len));
+    if (s->type == TIME_DOMAIN) {
+        s->air_len = FFALIGN(s->air_len, 32);
+    }
     s->buffer_length = 1 << (32 - ff_clz(s->air_len));
     s->n_fft = n_fft = 1 << (32 - ff_clz(ir_len + s->size));
 
@@ -631,8 +640,12 @@ static int activate(AVFilterContext *ctx)
             if ((ret = check_ir(ctx->inputs[i], i)) < 0)
                 return ret;
 
-            if (!s->in[i].eof) {
-                if (ff_outlink_get_status(ctx->inputs[i]) == AVERROR_EOF)
+            if (ff_outlink_get_status(ctx->inputs[i]) == AVERROR_EOF) {
+                if (!ff_inlink_queued_samples(ctx->inputs[i])) {
+                    av_log(ctx, AV_LOG_ERROR, "No samples provided for "
+                           "HRIR stream %d.\n", i - 1);
+                    return AVERROR_INVALIDDATA;
+                }
                     s->in[i].eof = 1;
             }
         }
@@ -705,6 +718,9 @@ static int query_formats(AVFilterContext *ctx)
     ret = ff_add_channel_layout(&stereo_layout, AV_CH_LAYOUT_STEREO);
     if (ret)
         return ret;
+    ret = ff_channel_layouts_ref(stereo_layout, &ctx->outputs[0]->in_channel_layouts);
+    if (ret)
+        return ret;
 
     if (s->hrir_fmt == HRIR_MULTI) {
         hrir_layouts = ff_all_channel_counts();
@@ -720,10 +736,6 @@ static int query_formats(AVFilterContext *ctx)
                 return ret;
         }
     }
-
-    ret = ff_channel_layouts_ref(stereo_layout, &ctx->outputs[0]->in_channel_layouts);
-    if (ret)
-        return ret;
 
     formats = ff_all_samplerates();
     if (!formats)
@@ -812,7 +824,6 @@ static int config_output(AVFilterLink *outlink)
 static av_cold void uninit(AVFilterContext *ctx)
 {
     HeadphoneContext *s = ctx->priv;
-    int i;
 
     av_fft_end(s->ifft[0]);
     av_fft_end(s->ifft[1]);
@@ -834,11 +845,9 @@ static av_cold void uninit(AVFilterContext *ctx)
     av_freep(&s->data_hrtf[1]);
     av_freep(&s->fdsp);
 
-    for (i = 0; i < s->nb_inputs; i++) {
-        if (ctx->input_pads && i)
-            av_freep(&ctx->input_pads[i].name);
-    }
     av_freep(&s->in);
+    for (unsigned i = 1; i < ctx->nb_inputs; i++)
+        av_freep(&ctx->input_pads[i].name);
 }
 
 #define OFFSET(x) offsetof(HeadphoneContext, x)

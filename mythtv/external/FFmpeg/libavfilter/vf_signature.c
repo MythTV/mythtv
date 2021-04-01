@@ -664,6 +664,10 @@ static av_cold int init(AVFilterContext *ctx)
 
         if (!pad.name)
             return AVERROR(ENOMEM);
+        if ((ret = ff_insert_inpad(ctx, i, &pad)) < 0) {
+            av_freep(&pad.name);
+            return ret;
+        }
 
         sc = &(sic->streamcontexts[i]);
 
@@ -680,11 +684,6 @@ static av_cold int init(AVFilterContext *ctx)
         sc->coarseend = sc->coarsesiglist;
         sc->coarsecount = 0;
         sc->midcoarse = 0;
-
-        if ((ret = ff_insert_inpad(ctx, i, &pad)) < 0) {
-            av_freep(&pad.name);
-            return ret;
-        }
     }
 
     /* check filename */
@@ -731,6 +730,8 @@ static av_cold void uninit(AVFilterContext *ctx)
         }
         av_freep(&sic->streamcontexts);
     }
+    for (unsigned i = 0; i < ctx->nb_inputs; i++)
+        av_freep(&ctx->input_pads[i].name);
 }
 
 static int config_output(AVFilterLink *outlink)
