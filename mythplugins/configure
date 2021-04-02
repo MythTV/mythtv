@@ -614,8 +614,6 @@ if enabled browser; then
     if test "$WEBKIT" != "CONFIG_QTWEBKIT=yes"; then
         disable browser
         echo "MythBrowser requires QtWebkit."
-    else
-        append CCONFIG "using_browser"
     fi
 fi
 
@@ -689,6 +687,13 @@ if test x"$icc" != x ; then
 fi
 
 if enabled music ; then
+    if [ $qt_version -lt $(version2num "6.0.0") ]; then
+        if test "$WEBKIT" != "CONFIG_QTWEBKIT=yes"; then
+            disable music
+            echo "MythMusic requires QtWebkit."
+        fi
+    fi
+
     if ! check_lib vorbis/codec.h vorbis_info_init -lvorbis || ! check_lib vorbis/vorbisenc.h vorbis_encode_setup_vbr -lvorbisenc -lvorbis -logg ; then
         disable vorbis
         echo "MythMusic requires vorbis."
@@ -865,10 +870,6 @@ if enabled music ; then
       echo "#define HAVE_STDINT_H 1" >> ./mythmusic/mythmusic/config.h
     else
       echo "#undef  HAVE_STDINT_H" >> ./mythmusic/mythmusic/config.h
-    fi
-
-    if enabled browser ; then
-      echo "#define HAVE_BROWSER 1" >> ./mythmusic/mythmusic/config.h
     fi
 
     if enabled cdio ; then

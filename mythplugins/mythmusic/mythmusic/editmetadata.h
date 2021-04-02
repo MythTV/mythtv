@@ -6,8 +6,6 @@
 #include <mythscreentype.h>
 #include <musicmetadata.h>
 
-#include "config.h"
-
 class MythUIStateType;
 class MythUIImage;
 class MythUIButton;
@@ -46,9 +44,7 @@ class EditMetadataCommon : public MythScreenType
   protected:
     static bool hasMetadataChanged(void);
     void updateMetadata(void);
-#if HAVE_BROWSER
     void searchForAlbumImages(void);
-#endif
     static void scanForImages(void);
 
     static bool           s_metadataOnly;
@@ -107,10 +103,8 @@ class EditMetadataDialog : public EditMetadataCommon
 
     void updateRating(void);
 
-#if HAVE_BROWSER
     void searchForArtistImages(void);
     void searchForGenreImages(void);
-#endif
 
     //
     //  GUI stuff

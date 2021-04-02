@@ -22,10 +22,6 @@
 #include <remotefile.h>
 #include <mthreadpool.h>
 
-#if HAVE_BROWSER
-#include <mythuiwebbrowser.h>
-#endif
-
 // mythmusic
 #include "musicdata.h"
 #include "decoder.h"
@@ -263,8 +259,6 @@ bool EditMetadataCommon::hasMetadataChanged(void)
     return changed;
 }
 
-#if HAVE_BROWSER
-
 /// search Google for images
 void EditMetadataCommon::searchForAlbumImages(void)
 {
@@ -280,8 +274,6 @@ void EditMetadataCommon::searchForAlbumImages(void)
 
     GetMythMainWindow()->HandleMedia("WebBrowser", url.toString(), GetConfDir() + "/MythMusic/", "front.jpg");
 }
-
-#endif // HAVE_BROWSER
 
 void EditMetadataCommon::scanForImages(void)
 {
@@ -493,11 +485,9 @@ void EditMetadataDialog::showMenu(void )
     menu->SetReturnEvent(this, "optionsmenu");
 
     menu->AddButton(tr("Edit Albumart Images"));
-#if HAVE_BROWSER
     menu->AddButton(tr("Search Internet For Artist Image"));
     menu->AddButton(tr("Search Internet For Album Image"));
     menu->AddButton(tr("Search Internet For Genre Image"));
-#endif
     menu->AddButton(tr("Check Track Length"));
 
     popupStack->AddScreen(menu);
@@ -718,8 +708,6 @@ void EditMetadataDialog::genreLostFocus(void)
     updateGenreImage();
 }
 
-#if HAVE_BROWSER
-
 /// search flickr for genre images
 void EditMetadataDialog::searchForGenreImages(void)
 {
@@ -744,8 +732,6 @@ void EditMetadataDialog::searchForArtistImages(void)
     GetMythMainWindow()->HandleMedia("WebBrowser", url.toString(), GetConfDir() + "/MythMusic/", "artist.jpg");
 }
 
-#endif
-
 void EditMetadataDialog::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
@@ -763,7 +749,6 @@ void EditMetadataDialog::customEvent(QEvent *event)
         {
             if (resulttext == tr("Edit Albumart Images"))
                 switchToAlbumArt();
-#if HAVE_BROWSER
             else if (resulttext == tr("Search Internet For Genre Image"))
             {
                 updateMetadata();
@@ -779,7 +764,6 @@ void EditMetadataDialog::customEvent(QEvent *event)
                 updateMetadata();
                 searchForAlbumImages();
             }
-#endif
             else if (resulttext == tr("Check Track Length"))
             {
                 QStringList strList;
@@ -1068,9 +1052,7 @@ void EditAlbumartDialog::showMenu(void )
     menu->AddButton(tr("Rescan For Images"));
 
 
-#if HAVE_BROWSER
     menu->AddButton(tr("Search Internet For Images"));
-#endif
 
     MetaIO *tagger = MetaIO::createTagger(s_metadata->Filename(false));
 
@@ -1166,10 +1148,8 @@ void EditAlbumartDialog::customEvent(QEvent *event)
                 switchToMetadata();
             else if (resulttext == tr("Rescan For Images"))
                 rescanForImages();
-#if HAVE_BROWSER
             else if (resulttext == tr("Search Internet For Images"))
                 searchForAlbumImages();
-#endif
             else if (resulttext == tr("Change Image Type"))
                 showTypeMenu();
             else if (resulttext == tr("Copy Selected Image To Tag"))
