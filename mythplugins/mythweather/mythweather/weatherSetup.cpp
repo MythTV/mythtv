@@ -207,8 +207,7 @@ void ScreenSetup::updateHelpText()
         text = tr("Add desired screen to the Active Screens list "
             "by pressing SELECT.") + "\n";
         text += si->m_title + "\n";
-        text += QString("%1: %2").arg(tr("Sources"))
-                                 .arg(sources.join(", "));
+        text += QString("%1: %2").arg(tr("Sources"), sources.join(", "));
     }
     else if (list == m_activeList)
     {
@@ -536,7 +535,7 @@ void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
     if (!si)
         return;
 
-    QString label = QString("%1 %2").arg(name).arg(tr("Change Units"));
+    QString label = QString("%1 %2").arg(name, tr("Change Units"));
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -964,11 +963,10 @@ void LocationDialog::doSearch()
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                         QString("Invalid line in Location Search reponse "
-                                "from %1: %2")
-                                    .arg(name).arg(*rit));
+                                "from %1: %2").arg(name, *rit));
                 continue;
             }
-            QString resultstring = QString("%1 (%2)").arg(tmp[1]).arg(name);
+            QString resultstring = QString("%1 (%2)").arg(tmp[1], name);
             auto *item = new MythUIButtonListItem(m_locationList, resultstring);
             auto *ri = new ResultListInfo;
             ri->idstr = tmp[0];
