@@ -128,7 +128,7 @@ static long int getSectorCount (QString &cddevice, int tracknum)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Error: %1('%2',track=%3) failed at cdda_identify()").
-            arg(__func__).arg(cddevice).arg(tracknum));
+            arg(__func__, cddevice, QString::number(tracknum)));
         return -1;
     }
 
@@ -136,7 +136,7 @@ static long int getSectorCount (QString &cddevice, int tracknum)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Error: %1('%2',track=%3) failed at cdda_open() - cdda not supported").
-            arg(__func__).arg(cddevice).arg(tracknum));
+            arg(__func__, cddevice, QString::number(tracknum)));
         cdda_close(device);
         return -1;
     }
@@ -415,7 +415,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     {
         LOG(VB_MEDIA, LOG_INFO,
             QString("Error: %1('%2',track=%3) failed at cdda_open() - cdda not supported")
-            .arg(__func__).arg(cddevice).arg(tracknum));
+            .arg(__func__, cddevice, QString::number(tracknum)));
         cdda_close(device);
         return -1;
     }
@@ -424,7 +424,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     long int start = cdda_track_firstsector(device, tracknum);
     long int end = cdda_track_lastsector(device, tracknum);
     LOG(VB_MEDIA, LOG_INFO, QString("%1(%2,track=%3) start=%4 end=%5")
-        .arg(__func__).arg(cddevice).arg(tracknum).arg(start).arg(end));
+        .arg(__func__,  cddevice).arg(tracknum).arg(start).arg(end));
 
     cdrom_paranoia *paranoia = paranoia_init(device);
     if (gCoreContext->GetSetting("ParanoiaLevel") == "full")
@@ -834,7 +834,7 @@ void Ripper::scanCD(void)
 #ifdef HAVE_CDIO
     {
     LOG(VB_MEDIA, LOG_INFO, QString("Ripper::%1 CD='%2'").
-        arg(__func__).arg(m_cdDevice));
+        arg(__func__, m_cdDevice));
     (void)cdio_close_tray(m_cdDevice.toLatin1().constData(), nullptr);
     }
 #endif // HAVE_CDIO
@@ -1167,7 +1167,7 @@ void Ripper::ejectCD()
     {
 #ifdef HAVE_CDIO
         LOG(VB_MEDIA, LOG_INFO, QString("Ripper::%1 '%2'").
-            arg(__func__).arg(m_cdDevice));
+            arg(__func__, m_cdDevice));
         (void)cdio_eject_media_drive(m_cdDevice.toLatin1().constData());
 #else
         MediaMonitor *mon = MediaMonitor::GetMediaMonitor();

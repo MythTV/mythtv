@@ -154,8 +154,8 @@ ShoutCastMetaMap ShoutCastMetaParser::parseMeta(const QString &mdata)
                     .arg(mdata));
             LOG(VB_PLAYBACK, LOG_INFO,
                 QString("ShoutCast: Parsed as: '%1' by '%2'")
-                    .arg(match.captured(m_metaTitlePos))
-                    .arg(match.captured(m_metaArtistPos)));
+                    .arg(match.captured(m_metaTitlePos),
+                         match.captured(m_metaArtistPos)));
 
             if (m_metaTitlePos > 0)
                 result["title"] = match.captured(m_metaTitlePos);

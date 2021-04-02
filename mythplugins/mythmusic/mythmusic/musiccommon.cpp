@@ -2107,8 +2107,7 @@ void MusicCommon::updatePlaylistStats(void)
         QString playlistcurrent = QLocale::system().toString(m_currentTrack + 1);
         QString playlisttotal = QLocale::system().toString(trackCount);
 
-        map["playlistposition"] = tr("%1 of %2").arg(playlistcurrent)
-                                                .arg(playlisttotal);
+        map["playlistposition"] = tr("%1 of %2").arg(playlistcurrent, playlisttotal);
         map["playlistcurrent"] = playlistcurrent;
         map["playlistcount"] = playlisttotal;
         map["playlisttime"] = getTimeString(m_playlistPlayedTime + m_currentTime, m_playlistMaxTime);

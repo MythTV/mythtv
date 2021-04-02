@@ -402,7 +402,7 @@ void StreamView::removeStream(void)
         {
             ShowOkPopup(tr("Are you sure you want to delete this Stream?\n"
                            "Broadcaster: %1 - Channel: %2")
-                           .arg(mdata->Broadcaster()).arg(mdata->Channel()),
+                           .arg(mdata->Broadcaster(), mdata->Channel()),
                         this, &StreamView::doRemoveStream, true);
         }
     }

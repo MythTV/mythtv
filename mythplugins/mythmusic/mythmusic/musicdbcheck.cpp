@@ -172,7 +172,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
                     if (modify.exec(QString("UPDATE musicmetadata SET "
                                     "filename = \"%1\" "
                                     "WHERE filename = \"%2\" AND intid = %3;")
-                                    .arg(newname).arg(name).arg(intid)))
+                                    .arg(newname, name, intid)))
                         i += modify.numRowsAffected();
                 }
             }
