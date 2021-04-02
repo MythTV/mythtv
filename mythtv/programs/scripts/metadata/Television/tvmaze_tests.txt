@@ -117,6 +117,19 @@ Doc-Tests for tvmaze
     </images>
   </item>
   <item>
+    <title>The Night Watchman</title>
+    <description>Young watchmen of the Joseon Dynasty fight demons in this "Ghostbusters"-like story. Set in the backdrop of the royal palace, the good guys vanquish demons while the bad guys use them for their purposes. The palace is rife with sinister plans to seize power and usurp the king. Through this story of young people who hunt demons, the tribulations and joys of life are shown in all their glory.</description>
+    <inetref>3237</inetref>
+    <collectionref>3237</collectionref>
+    <language>ko</language>
+    <releasedate>2014-08-04</releasedate>
+    <popularity>...</popularity>
+    <year>2014</year>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/17/43577.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/17/43577.jpg"/>
+    </images>
+  </item>
+  <item>
     <title>Light as a Feather</title>
     <description>An innocent game of "Light as a Feather, Stiff as a Board" goes wrong when the five teen girls who played start dying off in the exact way that was predicted, forcing the survivors to figure out why they're being targeted - and whether the evil force hunting them down is one of their own.</description>
     <inetref>36655</inetref>
@@ -129,19 +142,6 @@ Doc-Tests for tvmaze
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/213/534600.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/213/534600.jpg"/>
       <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/171/428424.jpg"/>
-    </images>
-  </item>
-  <item>
-    <title>The Night Watchman</title>
-    <description>Young watchmen of the Joseon Dynasty fight demons in this "Ghostbusters"-like story. Set in the backdrop of the royal palace, the good guys vanquish demons while the bad guys use them for their purposes. The palace is rife with sinister plans to seize power and usurp the king. Through this story of young people who hunt demons, the tribulations and joys of life are shown in all their glory.</description>
-    <inetref>3237</inetref>
-    <collectionref>3237</collectionref>
-    <language>ko</language>
-    <releasedate>2014-08-04</releasedate>
-    <popularity>46.0</popularity>
-    <year>2014</year>
-    <images>
-      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/17/43577.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/17/43577.jpg"/>
     </images>
   </item>
 </metadata>
@@ -392,70 +392,6 @@ Doc-Tests for tvmaze
   <item>
     <title>Bulletproof</title>
     <subtitle>Episode 4</subtitle>
-    <description>Pike and Bishop's refusal to follow orders hurls them into a disturbing case.</description>
-    <season>1</season>
-    <episode>4</episode>
-    <inetref>31477</inetref>
-    <collectionref>31477</collectionref>
-    <language>en</language>
-    <releasedate>2018-06-05</releasedate>
-    <userrating>...</userrating>
-    <popularity>...</popularity>
-    <year>2018</year>
-    <runtime>60</runtime>
-    <categories>
-      <category name="Drama"/>
-      <category name="Comedy"/>
-      <category name="Action"/>
-    </categories>
-    <people>
-      <person name="Noel Clarke" character="DI Aaron Bishop" job="Actor"/>
-      <person name="Ashley Walters" character="DI Ronnie Pike" job="Actor"/>
-      <person name="Vanessa Vanderpuye" character="Arjana Pike" job="Actor"/>
-      <person name="Lashana Lynch" character="Arjana Pike" job="Actor"/>
-      <person name="Jason Maza" character="DS Chris Munroe" job="Actor"/>
-      <person name="Lindsey Coulson" character="DCI Sarah Tanner" job="Actor"/>
-      <person name="Olivia Chenery" character="Scooch" job="Actor"/>
-      <person name="Lucie Shorthouse" character="DS Paige Pennington" job="Actor"/>
-      <person name="Stavros Zalmas" character="Alex Markides" job="Actor"/>
-      <person name="Ben Tavassoli" character="Mikey Markides" job="Actor"/>
-      <person name="Lee Ross" character="Deputy Director Richard Cockridge" job="Actor"/>
-      <person name="Gina Bellman" character="Elena Markides" job="Actor"/>
-      <person name="David Elliot" character="DS Tim 'Jonesy' Jones" job="Actor"/>
-      <person name="Gala Gordon" character="Anna Markides" job="Actor"/>
-      <person name="Kim Engelbrecht" character="Megan" job="Actor"/>
-      <person name="Thapelo Mokoena" character="William" job="Actor"/>
-      <person name="Paul du Toit" character="Dewald" job="Actor"/>
-      <person name="Richard September" character="Kojo" job="Actor"/>
-      <person name="Sechaba Morojele" character="Thato" job="Actor"/>
-      <person name="Christina Chong" character="Nell McBride" job="Actor"/>
-      <person name="Mandeep Dhillon" character="Kamali Khan" job="Actor"/>
-      <person name="Caroline Goodall" character="Deputy Mayor Charlotte Carmel" job="Actor"/>
-      <person name="Clarke Peters" character="Ronald Pike" job="Actor"/>
-      <person name="Anton Saunders" character="Tommy" job="Actor"/>
-      <person name="Tafara Nyatsanza" character="Damian" job="Actor"/>
-      <person name="Noel Clarke" job="Creator"/>
-      <person name="Noel Clarke" job="Executive Producer"/>
-      <person name="Ashley Walters" job="Creator"/>
-      <person name="Ashley Walters" job="Executive Producer"/>
-      <person name="Michele Buck" job="Executive Producer"/>
-      <person name="Nick Love" job="Creator"/>
-      <person name="Nick Love" job="Executive Producer"/>
-      <person name="Judy Counihan" job="Executive Producer"/>
-      <person name="Allan Niblo" job="Executive Producer"/>
-      <person name="Jon Finn" job="Producer"/>
-      <person name="Kiaran Murray-Smith" job="Producer"/>
-    </people>
-    <images>
-      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/247/617968.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/247/617968.jpg"/>
-      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/154/387396.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/154/387396.jpg"/>
-      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/159/398236.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/159/398236.jpg"/>
-      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/556230.jpg"/>
-    </images>
-  </item>
-  <item>
-    <title>Bulletproof</title>
-    <subtitle>Episode 4</subtitle>
     <description>As Alex regains control of the family, Mikey puts Bishop and Pike in charge of a gun-trafficking op. But the boys quickly find themselves out of their depth. </description>
     <season>2</season>
     <episode>4</episode>
@@ -516,6 +452,70 @@ Doc-Tests for tvmaze
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/159/398236.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/159/398236.jpg"/>
       <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/556230.jpg"/>
       <image type="screenshot" url="https://static.tvmaze.com/uploads/images/original_untouched/247/618006.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_landscape/247/618006.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Bulletproof</title>
+    <subtitle>Episode 4</subtitle>
+    <description>Pike and Bishop's refusal to follow orders hurls them into a disturbing case.</description>
+    <season>1</season>
+    <episode>4</episode>
+    <inetref>31477</inetref>
+    <collectionref>31477</collectionref>
+    <language>en</language>
+    <releasedate>2018-06-05</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
+    <year>2018</year>
+    <runtime>60</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Action"/>
+    </categories>
+    <people>
+      <person name="Noel Clarke" character="DI Aaron Bishop" job="Actor"/>
+      <person name="Ashley Walters" character="DI Ronnie Pike" job="Actor"/>
+      <person name="Vanessa Vanderpuye" character="Arjana Pike" job="Actor"/>
+      <person name="Lashana Lynch" character="Arjana Pike" job="Actor"/>
+      <person name="Jason Maza" character="DS Chris Munroe" job="Actor"/>
+      <person name="Lindsey Coulson" character="DCI Sarah Tanner" job="Actor"/>
+      <person name="Olivia Chenery" character="Scooch" job="Actor"/>
+      <person name="Lucie Shorthouse" character="DS Paige Pennington" job="Actor"/>
+      <person name="Stavros Zalmas" character="Alex Markides" job="Actor"/>
+      <person name="Ben Tavassoli" character="Mikey Markides" job="Actor"/>
+      <person name="Lee Ross" character="Deputy Director Richard Cockridge" job="Actor"/>
+      <person name="Gina Bellman" character="Elena Markides" job="Actor"/>
+      <person name="David Elliot" character="DS Tim 'Jonesy' Jones" job="Actor"/>
+      <person name="Gala Gordon" character="Anna Markides" job="Actor"/>
+      <person name="Kim Engelbrecht" character="Megan" job="Actor"/>
+      <person name="Thapelo Mokoena" character="William" job="Actor"/>
+      <person name="Paul du Toit" character="Dewald" job="Actor"/>
+      <person name="Richard September" character="Kojo" job="Actor"/>
+      <person name="Sechaba Morojele" character="Thato" job="Actor"/>
+      <person name="Christina Chong" character="Nell McBride" job="Actor"/>
+      <person name="Mandeep Dhillon" character="Kamali Khan" job="Actor"/>
+      <person name="Caroline Goodall" character="Deputy Mayor Charlotte Carmel" job="Actor"/>
+      <person name="Clarke Peters" character="Ronald Pike" job="Actor"/>
+      <person name="Anton Saunders" character="Tommy" job="Actor"/>
+      <person name="Tafara Nyatsanza" character="Damian" job="Actor"/>
+      <person name="Noel Clarke" job="Creator"/>
+      <person name="Noel Clarke" job="Executive Producer"/>
+      <person name="Ashley Walters" job="Creator"/>
+      <person name="Ashley Walters" job="Executive Producer"/>
+      <person name="Michele Buck" job="Executive Producer"/>
+      <person name="Nick Love" job="Creator"/>
+      <person name="Nick Love" job="Executive Producer"/>
+      <person name="Judy Counihan" job="Executive Producer"/>
+      <person name="Allan Niblo" job="Executive Producer"/>
+      <person name="Jon Finn" job="Producer"/>
+      <person name="Kiaran Murray-Smith" job="Producer"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/247/617968.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/247/617968.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/154/387396.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/154/387396.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/159/398236.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/159/398236.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/556230.jpg"/>
     </images>
   </item>
 </metadata>

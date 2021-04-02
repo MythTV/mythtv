@@ -182,7 +182,7 @@ def buildNumbers(args, opts):
 
         showlist = tvmaze.search_show(tvtitle)
 
-        # It's problematic to make decisions soley upon the Levenshtein distance.
+        # It's problematic to make decisions solely upon the Levenshtein distance.
         # If the strings are really long or really short, a simple rule, such as
         # "accept any distance < 6" can provide misleading results.
         # To establish a more useful measurement, we'll use the Levenshtein
@@ -318,22 +318,27 @@ def buildNumbers(args, opts):
                         if opts.debug:
                             print('"%s" is new best match_quality = %g' % (ep.name, match_quality))
 
-            if min_dist_list:
-                for ep_index in min_dist_list:
-                    season_nr  = str(episodes[ep_index].season)
-                    episode_id = episodes[ep_index].id
-                    if opts.debug:
-                        episode_nr = str(episodes[ep_index].number)
-                        print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
-                        print("with season : %s and episode %s" % (season_nr, episode_nr))
-                        print("Chosen episode index '%d' based on match quality %g"
-                              % (ep_index, best_ep_quality))
+            # The list is constructed in order of oldest season to newest.
+            # If episodes with equivalent match quality show up in multiple
+            # seasons, we want to list the most recent first. To accomplish
+            # this, we'll process items starting at the end of the list, and
+            # proceed to the beginning.
+            while min_dist_list:
+                ep_index = min_dist_list.pop()
+                season_nr  = str(episodes[ep_index].season)
+                episode_id = episodes[ep_index].id
+                if opts.debug:
+                    episode_nr = str(episodes[ep_index].number)
+                    print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
+                    print("with season : %s and episode %s" % (season_nr, episode_nr))
+                    print("Chosen episode index '%d' based on match quality %g"
+                          % (ep_index, best_ep_quality))
 
-                    # we have now inetref, season, episode_id
-                    item = buildSingleItem(inetref, season_nr, episode_id)
-                    if item is not None:
-                        tree.append(item.toXML())
-                        matchesFound += 1
+                # we have now inetref, season, episode_id
+                item = buildSingleItem(inetref, season_nr, episode_id)
+                if item is not None:
+                    tree.append(item.toXML())
+                    matchesFound += 1
 
     if matchesFound > 0:
         print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
