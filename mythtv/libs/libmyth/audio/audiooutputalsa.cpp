@@ -841,9 +841,8 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
     if (chk < 0)
     {
         VBERROR(QString("failed to get channel %1 volume, mixer %2/%3: %4")
-                .arg(channel).arg(m_mixer.device)
-                .arg(m_mixer.control)
-                .arg(snd_strerror(chk)));
+                .arg(QString::number(channel), m_mixer.device,
+                     m_mixer.control, snd_strerror(chk)));
     }
     else
     {
@@ -899,7 +898,7 @@ bool AudioOutputALSA::OpenMixer(void)
     if (chk < 0)
     {
         VBERROR(QString("failed to open mixer device %1: %2")
-                .arg(mixer_device_tag).arg(snd_strerror(chk)));
+                .arg(mixer_device_tag, snd_strerror(chk)));
         return false;
     }
 
@@ -912,7 +911,7 @@ bool AudioOutputALSA::OpenMixer(void)
         snd_mixer_close(m_mixer.handle);
         m_mixer.handle = nullptr;
         VBERROR(QString("failed to register %1: %2")
-                .arg(mixer_device_tag).arg(snd_strerror(chk)));
+                .arg(mixer_device_tag, snd_strerror(chk)));
         return false;
     }
 
@@ -921,7 +920,7 @@ bool AudioOutputALSA::OpenMixer(void)
         snd_mixer_close(m_mixer.handle);
         m_mixer.handle = nullptr;
         VBERROR(QString("failed to load %1: %2")
-                .arg(mixer_device_tag).arg(snd_strerror(chk)));
+                .arg(mixer_device_tag, snd_strerror(chk)));
         return false;
     }
 
@@ -939,8 +938,7 @@ bool AudioOutputALSA::OpenMixer(void)
         {
             m_mixer.elem = elx;
             VBAUDIO(QString("found playback control %1 on %2")
-                    .arg(m_mixer.control)
-                    .arg(mixer_device_tag));
+                    .arg(m_mixer.control, mixer_device_tag));
             break;
         }
         elx = snd_mixer_elem_next(elx);
@@ -950,7 +948,7 @@ bool AudioOutputALSA::OpenMixer(void)
         snd_mixer_close(m_mixer.handle);
         m_mixer.handle = nullptr;
         VBERROR(QString("no playback control %1 found on %2")
-                .arg(m_mixer.control).arg(mixer_device_tag));
+                .arg(m_mixer.control, mixer_device_tag));
         return false;
     }
     if ((snd_mixer_selem_get_playback_volume_range(m_mixer.elem,
@@ -960,17 +958,16 @@ bool AudioOutputALSA::OpenMixer(void)
         snd_mixer_close(m_mixer.handle);
         m_mixer.handle = nullptr;
         VBERROR(QString("failed to get volume range on %1/%2")
-                .arg(mixer_device_tag).arg(m_mixer.control));
+                .arg(mixer_device_tag, m_mixer.control));
         return false;
     }
 
     m_mixer.volrange = m_mixer.volmax - m_mixer.volmin;
     VBAUDIO(QString("mixer volume range on %1/%2 - min %3, max %4, range %5")
-            .arg(mixer_device_tag).arg(m_mixer.control)
+            .arg(mixer_device_tag, m_mixer.control)
             .arg(m_mixer.volmin).arg(m_mixer.volmax).arg(m_mixer.volrange));
     VBAUDIO(QString("%1/%2 set up successfully")
-            .arg(mixer_device_tag)
-            .arg(m_mixer.control));
+            .arg(mixer_device_tag, m_mixer.control));
 
     if (m_setInitialVol)
     {

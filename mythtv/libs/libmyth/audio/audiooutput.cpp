@@ -325,8 +325,8 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
         if (aosettings.getELD().isValid())
         {
             capabilities += tr(" (%1 connected to %2)")
-                .arg(aosettings.getELD().product_name().simplified())
-                .arg(aosettings.getELD().connection_name());
+                .arg(aosettings.getELD().product_name().simplified(),
+                     aosettings.getELD().connection_name());
         }
         else
         {
@@ -386,8 +386,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
             }
         }
     }
-    LOG(VB_AUDIO, LOG_INFO, QString("Found %1 (%2)")
-                                .arg(name).arg(capabilities));
+    LOG(VB_AUDIO, LOG_INFO, QString("Found %1 (%2)") .arg(name, capabilities));
     auto *adc = new AudioOutput::AudioDeviceConfig(name, capabilities);
     adc->m_settings = aosettings;
     return adc;

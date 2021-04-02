@@ -666,8 +666,8 @@ void AudioOutputPulseAudio::ServerInfoCallback(
     VBAUDIO(fn_log_tag +
             QString("PulseAudio server info - host name: %1, server version: "
                     "%2, server name: %3, default sink: %4")
-            .arg(inf->host_name).arg(inf->server_version)
-            .arg(inf->server_name).arg(inf->default_sink_name));
+            .arg(inf->host_name, inf->server_version,
+                 inf->server_name, inf->default_sink_name));
 }
 
 void AudioOutputPulseAudio::SinkInfoCallback(

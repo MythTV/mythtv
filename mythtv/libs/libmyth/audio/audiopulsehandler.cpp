@@ -148,8 +148,7 @@ static void StatusCallback(pa_context *ctx, void *userdata)
     // update our status
     pa_context_state state = pa_context_get_state(ctx);
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("Callback: State changed %1->%2")
-            .arg(state_to_string(handler->m_ctxState))
-            .arg(state_to_string(state)));
+        .arg(state_to_string(handler->m_ctxState), state_to_string(state)));
     handler->m_ctxState = state;
 }
 

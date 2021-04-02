@@ -367,10 +367,8 @@ QString eld::sad_desc(int index)
 
     return QString("supports coding type %1:"
                    " channels = %2, rates =%3%4")
-        .arg(audiotype_names[a->format])
-        .arg(a->channels)
-        .arg(buf)
-        .arg(buf2);
+        .arg(audiotype_names[a->format], QString::number(a->channels),
+             buf, buf2);
 }
 
 QString eld::channel_allocation_desc() const
@@ -435,8 +433,7 @@ void eld::show()
         return;
     }
     VBAUDIO(QString("Detected monitor %1 at connection type %2")
-            .arg(product_name().simplified())
-            .arg(connection_name()));
+            .arg(product_name().simplified(), connection_name()));
 
     if (m_e.spk_alloc)
     {
