@@ -202,13 +202,13 @@ bool ZMClient::checkProtoVersion(void)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Protocol version mismatch (plugin=%1, mythzmserver=%2)")
-                .arg(ZM_PROTOCOL_VERSION).arg(strList[1]));
+                .arg(ZM_PROTOCOL_VERSION, strList[1]));
 
         ShowOkPopup(QString("The mythzmserver uses protocol version %1, "
                             "but this client only understands version %2. "
                             "Make sure you are running compatible versions of "
                             "both the server and plugin.")
-                            .arg(strList[1]).arg(ZM_PROTOCOL_VERSION));
+                            .arg(strList[1], ZM_PROTOCOL_VERSION));
         return false;
     }
 
@@ -385,7 +385,7 @@ bool ZMClient::updateAlarmStates(void)
                 // alarm state has changed for this monitor
                 LOG(VB_GENERAL, LOG_DEBUG,
                     QString("ZMClient monitor %1 changed state from %2 to %3")
-                            .arg(mon->name).arg(stateToString(mon->state)).arg(stateToString(state)));
+                            .arg(mon->name, stateToString(mon->state), stateToString(state)));
                 mon->previousState = mon->state;
                 mon->state = state;
                 changed = true;
