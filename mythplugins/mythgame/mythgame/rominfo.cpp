@@ -25,8 +25,8 @@ void RomInfo::SaveToDatabase() const
 
     if (inserting)
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Adding %1 - %2").arg(Rompath())
-            .arg(Romname()));
+        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Adding %1 - %2")
+            .arg(Rompath(), Romname()));
 
         query.prepare("INSERT INTO gamemetadata "
                       "(`system`, romname, gamename, genre, year, gametype, "
@@ -93,8 +93,8 @@ void RomInfo::SaveToDatabase() const
 
 void RomInfo::DeleteFromDatabase() const
 {
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing %1 - %2").arg(Rompath())
-            .arg(Romname()));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing %1 - %2")
+        .arg(Rompath(), Romname()));
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -417,6 +417,5 @@ QString RomInfo::toString() const
                "Game Name: %2\n"
                "Rom Name: %3\n"
                "Rom Path: %4")
-               .arg(Id()).arg(Gamename())
-               .arg(Romname()).arg(Rompath());
+               .arg(QString::number(Id()), Gamename(), Romname(), Rompath());
 }

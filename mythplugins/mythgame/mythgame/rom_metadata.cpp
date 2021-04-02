@@ -85,9 +85,7 @@ QString crcinfo(const QString& romname, const QString& GameType, QString *key, R
                     crc = crc32(crc, (Bytef *)block.data(), (uInt)count);
                 }
                 crcRes = crcStr(crc);
-                *key = QString("%1:%2")
-                             .arg(crcRes)
-                             .arg(filename_inzip.data());
+                *key = QString("%1:%2").arg(crcRes, filename_inzip.data());
 
                 if (romDB->contains(*key))
                 {
