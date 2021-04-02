@@ -563,8 +563,8 @@ void NetTree::FillTree()
         QList< QPair<QString,QString> > paths = treePathsNodes.uniqueKeys();
 
         auto *ret = new MythGenericTree(g->GetTitle(), kSubFolder, false);
-        QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg(g->GetImage());
+        QString thumb = QString("%1mythnetvision/icons/%2")
+            .arg(GetShareDir(), g->GetImage());
         ret->SetData(QVariant::fromValue(thumb));
 
         // Add an upfolder

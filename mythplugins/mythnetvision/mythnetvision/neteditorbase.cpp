@@ -201,8 +201,8 @@ void NetEditorBase::FillGrabberButtonList()
 
         if (!img.startsWith("/") && !img.isEmpty())
         {
-            thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                .arg(g->GetImage());
+            thumb = QString("%1mythnetvision/icons/%2")
+                .arg(GetShareDir(), g->GetImage());
         }
         else
         {
