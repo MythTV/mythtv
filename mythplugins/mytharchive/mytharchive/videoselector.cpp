@@ -408,10 +408,10 @@ std::vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
                 if (episode.size() < 2)
                         episode.prepend("0");
                     info->title = QString("%1 %2x%3 - %4")
-                                .arg(query.value(1).toString())
-                                .arg(query.value(9).toString())
-                                .arg(episode)
-                                .arg(query.value(8).toString());
+                                .arg(query.value(1).toString(),
+                                     query.value(9).toString(),
+                                     episode,
+                                     query.value(8).toString());
             }
             else
                 info->title = query.value(1).toString();
