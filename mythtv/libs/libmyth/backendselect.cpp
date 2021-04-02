@@ -224,7 +224,7 @@ bool BackendSelection::ConnectBackend(DeviceLocation *dev)
         default:
             LOG(VB_GENERAL, LOG_ERR,
                 QString("GetConnectionInfo() failed for %1 : %2")
-                .arg(backendName).arg(message));
+                .arg(backendName, message));
             ShowOkPopup(message);
     }
 
@@ -315,7 +315,7 @@ void BackendSelection::customEvent(QEvent *event)
 
         LOG(VB_UPNP, LOG_DEBUG,
                  QString("BackendSelection::customEvent(%1, %2, %3, %4)")
-                .arg(message).arg(URI).arg(URN).arg(URL));
+                .arg(message, URI, URN, URL));
 
         if (message.startsWith("SSDP_ADD") &&
             URI.startsWith("urn:schemas-mythtv-org:device:MasterMediaServer:"))

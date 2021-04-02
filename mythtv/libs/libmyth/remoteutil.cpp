@@ -115,10 +115,10 @@ bool RemoteDeleteRecording(uint recordingID, bool forceMetadataDelete,
     bool result = true;
     QString cmd =
         QString("DELETE_RECORDING %1 %2 %3 %4")
-        .arg(QString::number(recInfo.GetChanID()))
-        .arg(recInfo.GetRecordingStartTime().toString(Qt::ISODate))
-        .arg(forceMetadataDelete ? "FORCE" : "NO_FORCE")
-        .arg(forgetHistory ? "FORGET" : "NO_FORGET");
+        .arg(QString::number(recInfo.GetChanID()),
+             recInfo.GetRecordingStartTime().toString(Qt::ISODate),
+             forceMetadataDelete ? "FORCE" : "NO_FORCE",
+             forgetHistory ? "FORGET" : "NO_FORGET");
     QStringList strlist(cmd);
 
     if ((!gCoreContext->SendReceiveStringList(strlist) || strlist.isEmpty()) ||

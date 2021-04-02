@@ -116,7 +116,7 @@ int SchemaUpgradeWizard::Compare(void)
     {
         LOG(VB_GENERAL, LOG_INFO,
                  QString("Current %1 Schema Version (%2): %3")
-                     .arg(m_schemaName).arg(m_schemaSetting).arg(m_DBver));
+                     .arg(m_schemaName, m_schemaSetting, m_DBver));
     }
 
 #if TESTING
@@ -313,7 +313,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             LOG(VB_GENERAL, LOG_CRIT,
                      QString("Error: MythTV database has newer %1 schema (%2) "
                              "than expected (%3).")
-                         .arg(name).arg(m_DBver).arg(m_newSchemaVer));
+                         .arg(name, m_DBver, m_newSchemaVer));
             return MYTH_SCHEMA_ERROR;
         }
 
@@ -388,12 +388,12 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         message += "\n" + tr("MythTV was unable to backup your database.");
 
     if (message.contains("%1"))
-        message = message.arg(name).arg(m_DBver).arg(m_newSchemaVer);
+        message = message.arg(name, m_DBver, m_newSchemaVer);
 
 
     DatabaseParams dbParam = MythDB::getMythDB()->GetDatabaseParams();
     message += "\n\n" + tr("Database Host: %1\nDatabase Name: %2")
-                        .arg(dbParam.m_dbHostName).arg(dbParam.m_dbName);
+                        .arg(dbParam.m_dbHostName, dbParam.m_dbName);
 
     if (gui)
     {
@@ -426,7 +426,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             }
             message = tr("If your system becomes unstable, a database"
                          " backup file called\n%1\nis located in %2")
-                      .arg(fileName).arg(dirName);
+                      .arg(fileName, dirName);
         }
         else
             message = tr("This cannot be un-done, so having a"

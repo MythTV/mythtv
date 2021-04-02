@@ -170,9 +170,9 @@ static void exec_program_tv_cb(const QString &cmd)
 
     if (cardid >= 0)
     {
-        s = s.arg(qPrintable(strlist[1]))
-            .arg(qPrintable(strlist[2]))
-            .arg(qPrintable(strlist[3]));
+        s = s.arg(qPrintable(strlist[1]),
+                  qPrintable(strlist[2]),
+                  qPrintable(strlist[3]));
 
         myth_system(s);
 
@@ -882,8 +882,9 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
 
             LOG(VB_GENERAL, LOG_INFO,
                  QString("Start up testing connections. DB %1, BE %2, attempt %3, status %4, Delay: %5")
-                      .arg(host).arg(backendIP).arg(attempt).arg(kGuiStatuses[startupState])
-                      .arg(msStartupScreenDelay.count()) );
+                      .arg(host, backendIP, QString::number(attempt),
+                           kGuiStatuses[startupState],
+                           QString::number(msStartupScreenDelay.count())) );
 
             std::chrono::seconds useTimeout = wakeupTime;
             if (attempt == 0)
@@ -1006,7 +1007,7 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         stateMsg.append("Fail");
         LOG(VB_GENERAL, LOG_INFO,
              QString("Start up failure. host %1, status %2")
-                  .arg(host).arg(stateMsg));
+                  .arg(host, stateMsg));
 
         if (m_gui && !m_guiStartup)
         {
@@ -1250,7 +1251,7 @@ bool MythContextPrivate::DefaultUPnP(QString& Error)
     }
 
     LOG(VB_UPNP, LOG_INFO, loc + QString("config.xml has default PIN '%1' and host USN: %2")
-        .arg(pin).arg(usn));
+        .arg(pin, usn));
 
     // ----------------------------------------------------------------------
 
@@ -1588,7 +1589,7 @@ bool MythContext::Init(const bool gui,
         LOG(VB_GENERAL, LOG_EMERG,
                  QString("Application binary version (%1) does not "
                          "match libraries (%2)")
-                     .arg(m_appBinaryVersion) .arg(MYTH_BINARY_VERSION));
+                     .arg(m_appBinaryVersion, MYTH_BINARY_VERSION));
 
         QString warning = QObject::tr(
             "This application is not compatible "

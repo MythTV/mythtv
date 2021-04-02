@@ -370,7 +370,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, bool allowEject
             {
                 symlinked += target;
                 LOG(VB_MEDIA, LOG_INFO, QString("Also ignoring %1 (symlinked from %2)")
-                    .arg(target).arg(ignored));
+                    .arg(target, ignored));
             }
         }
     }
@@ -698,7 +698,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
         {
             LOG(VB_GENERAL, LOG_NOTICE,
                 QString("Found a handler for %1 - '%2'")
-                .arg(pMedia->MediaTypeString()) .arg(itr.key()));
+                .arg(pMedia->MediaTypeString(), itr.key()));
             handlers.append(*itr);
         }
         itr++;
@@ -731,9 +731,9 @@ void MediaMonitor::mediaStatusChanged(MythMediaStatus oldStatus,
 
     MythMediaStatus  stat = pMedia->getStatus();
     QString      msg  = QString(" (%1, %2 -> %3)")
-                        .arg(pMedia->MediaTypeString())
-                        .arg(MythMediaDevice::kMediaStatusStrings[oldStatus])
-                        .arg(MythMediaDevice::kMediaStatusStrings[stat]);
+                        .arg(pMedia->MediaTypeString(),
+                             MythMediaDevice::kMediaStatusStrings[oldStatus],
+                             MythMediaDevice::kMediaStatusStrings[stat]);
 
     // This gets called from outside the main thread so we need
     // to post an event back to the main thread.
@@ -861,7 +861,7 @@ QString MediaMonitor::defaultDevice(const QString &dbSetting,
 
     LOG(VB_MEDIA, LOG_DEBUG,
              QString("MediaMonitor::defaultDevice(%1,..,%2) dbSetting='%3'")
-                 .arg(dbSetting).arg(hardCodedDefault).arg(device));
+                 .arg(dbSetting, hardCodedDefault, device));
 
     // No settings database defaults? Try to choose one:
     if (device.isEmpty() || device == "default")

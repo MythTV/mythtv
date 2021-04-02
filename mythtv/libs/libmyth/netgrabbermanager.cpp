@@ -133,7 +133,7 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
         if (path.isEmpty())
             pathToUse = dirname;
         else
-            pathToUse = QString("%1/%2").arg(path).arg(dirname);
+            pathToUse = QString("%1/%2").arg(path, dirname);
 
         parseDBTree(feedtitle,
                     pathToUse,
@@ -286,7 +286,7 @@ void Search::executeSearch(const QString &script, const QString &query,
     args.append(MythSystemLegacy::ShellEscape(term));
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
-        QString("Internet Search Query: %1 %2").arg(cmd).arg(args.join(" ")));
+        QString("Internet Search Query: %1 %2").arg(cmd, args.join(" ")));
 
     uint flags = kMSRunShell | kMSStdOut | kMSRunBackground;
     m_searchProcess->SetCommand(cmd, args, flags);

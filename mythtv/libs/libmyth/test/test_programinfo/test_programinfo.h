@@ -633,14 +633,14 @@ class TestProgramInfo : public QObject
             {
                 QVERIFY2(actualValue == expected[key],
                          qPrintable(QString("Key '%1': actual '%2' is not expected '%3'")
-                                    .arg(key).arg(actualValue).arg(expected[key])));
+                                    .arg(key, actualValue, expected[key])));
                 expected.remove(key);
             }
             else
             {
                 QVERIFY2(actualValue == QString(""),
                          qPrintable(QString("Key '%1': actual '%2' is not empty")
-                                    .arg(key).arg(actualValue)));
+                                    .arg(key, actualValue)));
             }
         }
 #endif
