@@ -347,7 +347,7 @@ void MHText::ContentArrived(const unsigned char *data, int length, MHEngine *eng
 {
     CreateContent(data, length, engine);
     MHLOG(MHLogDetail, QString("Content arrived %1 := '%2'")
-        .arg(m_ObjectReference.Printable()).arg(m_content.Printable()) );
+        .arg(m_ObjectReference.Printable(), m_content.Printable()) );
     // Now signal that the content is available.
     engine->EventTriggered(this, EventContentAvailable);
     m_fNeedsRedraw = true;

@@ -171,8 +171,8 @@ std::chrono::milliseconds MHEngine::RunAll()
         {
             MHAsynchEvent *pEvent = m_eventQueue.dequeue();
             MHLOG(MHLogLinks, QString("Asynchronous event dequeued - %1 from %2")
-                  .arg(MHLink::EventTypeToString(pEvent->m_eventType))
-                  .arg(pEvent->m_pEventSource->m_ObjectReference.Printable()));
+                  .arg(MHLink::EventTypeToString(pEvent->m_eventType),
+                       pEvent->m_pEventSource->m_ObjectReference.Printable()));
             CheckLinks(pEvent->m_pEventSource->m_ObjectReference,
                        pEvent->m_eventType, pEvent->m_eventData);
             delete pEvent;
@@ -639,7 +639,7 @@ void MHEngine::RunActions()
 void MHEngine::EventTriggered(MHRoot *pSource, enum EventType ev, const MHUnion &evData)
 {
     MHLOG(MHLogLinks, QString("Event - %1 from %2")
-          .arg(MHLink::EventTypeToString(ev)).arg(pSource->m_ObjectReference.Printable()));
+          .arg(MHLink::EventTypeToString(ev), pSource->m_ObjectReference.Printable()));
 
     switch (ev)
     {
@@ -1004,7 +1004,7 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
         else
         {
             MHLOG(MHLogWarning, QString("WARN No file content %1 <= %2")
-                .arg(pRequester->m_ObjectReference.Printable()).arg(csPath));
+                .arg(pRequester->m_ObjectReference.Printable(), csPath));
             if (kProtoHTTP == PathProtocol(csPath))
                 EngineEvent(203); // 203=RemoteNetworkError if 404 reply
             EngineEvent(3); // ContentRefError
@@ -1014,7 +1014,7 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
     {
         // Need to record this and check later.
         MHLOG(MHLogNotifications, QString("Waiting for %1 <= %2")
-            .arg(pRequester->m_ObjectReference.Printable()).arg(csPath.left(128)) );
+            .arg(pRequester->m_ObjectReference.Printable(), csPath.left(128)) );
         auto *pContent = new MHExternContent;
         pContent->m_FileName = csPath;
         pContent->m_pRequester = pRequester;
@@ -1075,8 +1075,8 @@ void MHEngine::CheckContentRequests()
             else
             {
                 MHLOG(MHLogWarning, QString("WARN No file content %1 <= %2")
-                    .arg(pContent->m_pRequester->m_ObjectReference.Printable())
-                    .arg(pContent->m_FileName));
+                    .arg(pContent->m_pRequester->m_ObjectReference.Printable(),
+                         pContent->m_FileName));
                 if (kProtoHTTP == PathProtocol(pContent->m_FileName))
                     EngineEvent(203); // 203=RemoteNetworkError if 404 reply
                 EngineEvent(3); // ContentRefError
@@ -1090,8 +1090,8 @@ void MHEngine::CheckContentRequests()
             it = m_externContentTable.erase(it);
 
             MHLOG(MHLogWarning, QString("WARN File timed out %1 <= %2")
-                .arg(pContent->m_pRequester->m_ObjectReference.Printable())
-                .arg(pContent->m_FileName));
+                .arg(pContent->m_pRequester->m_ObjectReference.Printable(),
+                     pContent->m_FileName));
 
             if (kProtoHTTP == PathProtocol(pContent->m_FileName))
                 EngineEvent(203); // 203=RemoteNetworkError if 404 reply
@@ -1180,7 +1180,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
             pEntry->m_Data.Append(pValue);
             FindObject(*(variables.GetAt(i)))->GetVariableValue(*pValue, this);
             MHLOG(MHLogNotifications, QString("Store Persistent(%1) %2=>#%3")
-                .arg(csFile).arg(pValue->Printable()).arg(i) );
+                .arg(csFile, pValue->Printable(), QString::number(i)) );
         }
     }
 
