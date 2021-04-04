@@ -288,9 +288,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     {
         QString title = lkup->GetTitle();
         LOG(VB_GENERAL, LOG_INFO, QString("Comparing metadata title '%1' [%2] to recording title '%3'")
-                .arg(title)
-                .arg(lkup->GetReleaseDate().toString())
-                .arg(originaltitle));
+                .arg(title, lkup->GetReleaseDate().toString(), originaltitle));
         // Consider exact title matches (ignoring case), which have some artwork available.
         if (QString::compare(title, originaltitle, Qt::CaseInsensitive) == 0)
         {
@@ -348,8 +346,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
             LOG(VB_GENERAL, LOG_INFO,
                 QString("Multiple exact title matches found for '%1'. "
                         "Selecting most popular or most recent [%2]")
-                    .arg(originaltitle)
-                    .arg(exactTitleDate.toString()));
+                    .arg(originaltitle, exactTitleDate.toString()));
         }
         return ret;
     }
@@ -368,7 +365,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Best Title Match For %1: %2")
-                    .arg(originaltitle).arg(bestTitle));
+                    .arg(originaltitle, bestTitle));
 
     // Grab the one item that matches the besttitle (IMPERFECT)
     for (auto item : qAsConst(list))
@@ -391,7 +388,7 @@ MetadataLookupList MetadataDownload::runGrabber(const QString& cmd, const QStrin
     MetadataLookupList list;
 
     LOG(VB_GENERAL, LOG_INFO, QString("Running Grabber: %1 %2")
-        .arg(cmd).arg(args.join(" ")));
+        .arg(cmd, args.join(" ")));
 
     grabber.Run();
     grabber.Wait();

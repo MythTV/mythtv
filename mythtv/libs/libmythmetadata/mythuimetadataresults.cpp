@@ -112,7 +112,7 @@ void MetadataResultsDialog::cleanCacheDir()
 
     for (auto i = thumbs.crbegin(); i != thumbs.crend(); ++i)
     {
-        QString filename = QString("%1/%2").arg(cache).arg(*i);
+        QString filename = QString("%1/%2").arg(cache, *i);
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
         if (lastmod.addDays(2) < MythDate::current())

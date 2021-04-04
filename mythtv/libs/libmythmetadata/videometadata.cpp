@@ -1105,14 +1105,13 @@ QString VideoMetadata::FilenameToMeta(const QString &file_name, int position)
                   "(\\d{1,3})" // Episode
                   "%1" // optional separator
                   "(.*)$" // Subtitle
-                  ).arg(separator)
-                   .arg(season_translation).arg(episode_translation);
+                  ).arg(separator, season_translation, episode_translation);
     static const QRegularExpression filename_parse { regexp,
         QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
 
     // Cleanup Regexp
     QString regexp2 = QString("(%1(?:(?:Season|%2)%1\\d*%1)*%1)$")
-                             .arg(separator).arg(season_translation);
+                             .arg(separator, season_translation);
     static const QRegularExpression title_parse {regexp2,
         QRegularExpression::CaseInsensitiveOption|QRegularExpression::UseUnicodePropertiesOption };
 
@@ -1240,11 +1239,11 @@ void VideoMetadata::toMap(InfoMap &metadataMap)
         metadataMap["season"] = format_season_and_episode(GetSeason(), 1);
         metadataMap["episode"] = format_season_and_episode(GetEpisode(), 1);
         metadataMap["s##e##"] = metadataMap["s00e00"] = QString("s%1e%2")
-            .arg(format_season_and_episode(GetSeason(), 2))
-            .arg(format_season_and_episode(GetEpisode(), 2));
+            .arg(format_season_and_episode(GetSeason(), 2),
+                 format_season_and_episode(GetEpisode(), 2));
         metadataMap["##x##"] = metadataMap["00x00"] = QString("%1x%2")
-            .arg(format_season_and_episode(GetSeason(), 1))
-            .arg(format_season_and_episode(GetEpisode(), 2));
+            .arg(format_season_and_episode(GetSeason(), 1),
+                 format_season_and_episode(GetEpisode(), 2));
     }
     else
     {

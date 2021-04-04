@@ -163,7 +163,7 @@ void MetadataImageDownload::run()
 
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("Metadata Image Download: %1 ->%2")
-                         .arg(oldurl).arg(finalfile));
+                         .arg(oldurl, finalfile));
                     QByteArray download;
                     GetMythDownloadManager()->download(oldurl, &download);
 
@@ -235,7 +235,7 @@ void MetadataImageDownload::run()
 
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("Metadata Image Download: %1 -> %2")
-                            .arg(oldurl).arg(finalfile));
+                            .arg(oldurl, finalfile));
                     QByteArray download;
                     GetMythDownloadManager()->download(oldurl, &download);
 
@@ -352,10 +352,10 @@ QString getDownloadFilename(const QString& title, const QString& url)
     QUrl qurl(url);
     QString ext = QFileInfo(qurl.path()).suffix();
     QString basefilename = QString("thumbnail_%1_%2.%3")
-                           .arg(QString::number(urlChecksum))
-                           .arg(QString::number(titleChecksum)).arg(ext);
+                           .arg(QString::number(urlChecksum),
+                                QString::number(titleChecksum), ext);
 
-    QString outputfile = QString("%1/%2").arg(fileprefix).arg(basefilename);
+    QString outputfile = QString("%1/%2").arg(fileprefix, basefilename);
 
     return outputfile;
 }
@@ -387,8 +387,7 @@ QString getDownloadFilename(VideoArtworkType type, MetadataLookup *lookup,
              lookup->GetType() == kMetadataRecording)
         title = lookup->GetInetref();
     else if (lookup->GetType() == kMetadataGame)
-        title = QString("%1 (%2)").arg(lookup->GetTitle())
-                    .arg(lookup->GetSystem());
+        title = QString("%1 (%2)").arg(lookup->GetTitle(), lookup->GetSystem());
 
     if (tracknum > 0)
         inter = QString(" Track %1").arg(QString::number(tracknum));
@@ -497,7 +496,7 @@ void cleanThumbnailCacheDir()
 
     for (auto i = thumbs.crbegin(); i != thumbs.crend(); ++i)
     {
-        QString filename = QString("%1/%2").arg(cache).arg(*i);
+        QString filename = QString("%1/%2").arg(cache, *i);
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
         if (lastmod.addDays(2) < MythDate::current())

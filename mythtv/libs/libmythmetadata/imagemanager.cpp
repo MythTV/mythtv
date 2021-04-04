@@ -1052,7 +1052,7 @@ void ImageDb<FS>::GetDescendantCount(int id, bool all, int &dirs,
                           "       SUM(type =  :PIC)  AS Pics, "
                           "       SUM(type =  :VID)  AS Vids, "
                           "       SUM(size / 1024) "
-                          "FROM %2 %1;").arg(whereClause).arg(m_table));
+                          "FROM %2 %1;").arg(whereClause, m_table));
 
     query.bindValue(":FLDR", kDirectory);
     query.bindValue(":PIC",  kImageFile);
@@ -1465,7 +1465,7 @@ QStringList ImageHandler<DBFS>::HandleDbMove(const QString &ids,
     }
     HandleScanRequest("START");
 
-    RESULT_OK(QString("Moved %1 from %2 -> %3").arg(ids).arg(srcPath, destPath))
+    RESULT_OK(QString("Moved %1 from %2 -> %3").arg(ids, srcPath, destPath))
 }
 
 

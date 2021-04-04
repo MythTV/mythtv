@@ -33,7 +33,7 @@ QString fixFilename(const QString &filename)
 static QMap<QString, QString> iconMap;
 QString findIcon(const QString &type, const QString &name, bool ignoreCache)
 {
-    LOG(VB_FILE, LOG_INFO, QString("findicon: looking for type: %1, name: %2").arg(type).arg(name));
+    LOG(VB_FILE, LOG_INFO, QString("findicon: looking for type: %1, name: %2").arg(type, name));
 
     if (!ignoreCache)
     {
@@ -47,7 +47,7 @@ QString findIcon(const QString &type, const QString &name, bool ignoreCache)
 
     QString cleanName = fixFilename(name) + '.';
     cleanName = '^' + QRegularExpression::escape(cleanName);
-    QString file = QString("/Icons/%1/%2").arg(type).arg(cleanName);
+    QString file = QString("/Icons/%1/%2").arg(type, cleanName);
     QString imageExtensions = "(jpg|jpeg|png|gif)";
     QStringList fileList;
 
@@ -61,7 +61,7 @@ QString findIcon(const QString &type, const QString &name, bool ignoreCache)
 
     iconMap.insert(type + name, QString());
 
-    LOG(VB_FILE, LOG_INFO, QString("findicon: not found type: %1, name: %2").arg(type).arg(name));
+    LOG(VB_FILE, LOG_INFO, QString("findicon: not found type: %1, name: %2").arg(type, name));
 
     return QString();
 }

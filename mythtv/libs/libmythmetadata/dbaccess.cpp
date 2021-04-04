@@ -38,11 +38,11 @@ class SingleValueImp
           m_valueName(std::move(value_name)), m_cleanStub(this)
     {
         m_insertSql = QString("INSERT INTO %1 (%2) VALUES (:NAME)")
-                .arg(m_tableName).arg(m_valueName);
-        m_fillSql = QString("SELECT %1, %2 FROM %3").arg(m_idName)
-                .arg(m_valueName).arg(m_tableName);
+                .arg(m_tableName, m_valueName);
+        m_fillSql = QString("SELECT %1, %2 FROM %3")
+                .arg(m_idName, m_valueName, m_tableName);
         m_deleteSql = QString("DELETE FROM %1 WHERE %2 = :ID")
-                .arg(m_tableName).arg(m_idName);
+                .arg(m_tableName, m_idName);
     }
 
     virtual ~SingleValueImp() = default;
@@ -263,9 +263,9 @@ class MultiValueImp
         m_cleanStub(this)
     {
         m_insertSql = QString("INSERT INTO %1 (%2, %3) VALUES (:ID, :VALUE)")
-                .arg(m_tableName).arg(m_idName).arg(m_valueName);
-        m_fillSql = QString("SELECT %1, %2 FROM %3 ORDER BY %4").arg(m_idName)
-                .arg(m_valueName).arg(m_tableName).arg(m_idName);
+                .arg(m_tableName, m_idName, m_valueName);
+        m_fillSql = QString("SELECT %1, %2 FROM %3 ORDER BY %4")
+                .arg(m_idName, m_valueName, m_tableName, m_idName);
     }
 
     mutable QMutex m_mutex;
@@ -345,7 +345,7 @@ class MultiValueImp
                 MSqlQuery query(MSqlQuery::InitCon());
                 QString del_query = QString("DELETE FROM %1 WHERE %2 = :ID AND "
                                             "%3 = :VALUE")
-                        .arg(m_tableName).arg(m_idName).arg(m_valueName);
+                        .arg(m_tableName, m_idName, m_valueName);
                 query.prepare(del_query);
                 query.bindValue(":ID", p->first);
                 query.bindValue(":VALUE", int(*vp));
@@ -365,7 +365,7 @@ class MultiValueImp
         {
             MSqlQuery query(MSqlQuery::InitCon());
             QString del_query = QString("DELETE FROM %1 WHERE %2 = :ID")
-                    .arg(m_tableName).arg(m_idName);
+                    .arg(m_tableName, m_idName);
             query.prepare(del_query);
             query.bindValue(":ID", p->first);
             if (!query.exec() || !query.isActive())
