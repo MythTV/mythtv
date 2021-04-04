@@ -340,7 +340,7 @@ void TextSubtitleParser::LoadSubtitles(const QString &fileName,
     }
 
     LOG(VB_VBI, LOG_INFO, QString("Opened subtitle file '%1' with codec '%2'")
-        .arg(fileName).arg(textCodec->name().constData()));
+        .arg(fileName, textCodec->name().constData()));
 
     // load the entire subtitle file, converting to unicode as we go
     QScopedPointer<QTextDecoder> dec(textCodec->makeDecoder());

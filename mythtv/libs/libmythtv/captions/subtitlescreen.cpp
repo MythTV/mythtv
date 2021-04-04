@@ -228,10 +228,10 @@ static QString fontToString(MythFontProperties *f)
     f->GetShadow(offset, color, alpha);
     result += QString(" shadow=%1 shadowoffset=%2 "
                       "shadowcolor=%3 shadowalpha=%4")
-        .arg(static_cast<int>(f->hasShadow()))
-        .arg(QString("(%1,%2)").arg(offset.x()).arg(offset.y()))
-        .arg(srtColorString(color))
-        .arg(alpha);
+        .arg(QString::number(static_cast<int>(f->hasShadow())),
+             QString("(%1,%2)").arg(offset.x()).arg(offset.y()),
+             srtColorString(color),
+             QString::number(alpha));
     f->GetOutline(color, size, alpha);
     result += QString(" outline=%1 outlinecolor=%2 "
                       "outlinesize=%3 outlinealpha=%4")
@@ -339,7 +339,7 @@ SubtitleFormat::GetFont(const QString &family,
     LOG(VB_VBI, LOG_DEBUG,
         QString("GetFont(family=%1, prefix=%2, orig pixelSize=%3, "
                 "new pixelSize=%4 zoom=%5) = %6")
-        .arg(family).arg(prefix).arg(origPixelSize).arg(pixelSize)
+        .arg(family, prefix).arg(origPixelSize).arg(pixelSize)
         .arg(zoom).arg(fontToString(result)));
     return result;
 }
@@ -593,7 +593,7 @@ QSet<QString> SubtitleFormat::Diff(const QString &family,
         values += " " + (*i);
     LOG(VB_VBI, LOG_INFO,
         QString("Subtitle family %1 allows provider to change:%2")
-        .arg(MakePrefix(family, attr)).arg(values));
+        .arg(MakePrefix(family, attr), values));
 
     return result;
 }
@@ -631,9 +631,9 @@ SubtitleFormat::GetBackground(MythUIType *parent, const QString &name,
     LOG(VB_VBI, LOG_DEBUG,
         QString("GetBackground(prefix=%1) = "
                 "{type=%2 alpha=%3 brushstyle=%4 brushcolor=%5}")
-        .arg(prefix).arg(result->m_type).arg(result->GetAlpha())
-        .arg(result->m_fillBrush.style())
-        .arg(srtColorString(result->m_fillBrush.color())));
+        .arg(prefix, result->m_type, QString::number(result->GetAlpha()),
+             QString::number(result->m_fillBrush.style()),
+             srtColorString(result->m_fillBrush.color())));
     return result;
 }
 
@@ -676,7 +676,7 @@ bool FormattedTextChunk::Split(FormattedTextChunk &newChunk)
     newChunk.m_text = m_text.mid(lastSpace + 1).trimmed() + ' ';
     m_text = m_text.left(lastSpace).trimmed();
     LOG(VB_VBI, LOG_INFO,
-        QString("Split chunk into '%1' + '%2'").arg(m_text).arg(newChunk.m_text));
+        QString("Split chunk into '%1' + '%2'").arg(m_text, newChunk.m_text));
     return true;
 }
 
