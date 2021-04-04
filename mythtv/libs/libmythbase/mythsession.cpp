@@ -364,8 +364,8 @@ MythUserSession MythSessionManager::CreateUserSession(uint userId,
         if (!gCoreContext->IsMasterBackend())
             type = "Slave";
 
-        clientIdentifier = QString("%1_%2").arg(type)
-                                            .arg(gCoreContext->GetHostName());
+        clientIdentifier =
+            QString("%1_%2").arg(type, gCoreContext->GetHostName());
     }
 
     session.m_sessionClient = clientIdentifier;
@@ -538,7 +538,7 @@ QByteArray MythSessionManager::CreateDigest(const QString &username,
 {
     // The realm is a constant, it's not private because it's included in the
     // plain text sent with an HTTP WWW-Authenticate header.
-    QString plainText = QString("%1:MythTV:%2").arg(username).arg(password);
+    QString plainText = QString("%1:MythTV:%2").arg(username, password);
     QByteArray digest = QCryptographicHash::hash(plainText.toLatin1(),
                                                  QCryptographicHash::Md5).toHex();
     return digest;

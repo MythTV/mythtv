@@ -140,7 +140,7 @@ bool DBUtil::IsBackupInProgress(void)
             QString("DBUtil::BackupInProgress(): Found "
                     "database backup end time of %1 later than start time "
                     "of %2, therefore backup is not running.")
-            .arg(backupEndTimeStr).arg(backupStartTimeStr));
+            .arg(backupEndTimeStr, backupStartTimeStr));
         return false;
     }
     if (backupElapsed > 10min)
@@ -286,8 +286,8 @@ bool DBUtil::CheckTables(const bool repair, const QString &options)
     if (all_tables.empty())
         return true;
 
-    QString sql = QString("CHECK TABLE %1 %2;").arg(all_tables.join(", "))
-                                               .arg(options);
+    QString sql = QString("CHECK TABLE %1 %2;")
+        .arg(all_tables.join(", "), options);
 
     LOG(VB_GENERAL, LOG_CRIT, "Checking database tables.");
     if (!query.exec(sql))
@@ -470,7 +470,7 @@ QStringList DBUtil::GetTables(const QStringList &engines)
 QString DBUtil::CreateBackupFilename(const QString& prefix, const QString& extension)
 {
     QString time = MythDate::toString(MythDate::current(), MythDate::kFilename);
-    return QString("%1-%2%3").arg(prefix).arg(time).arg(extension);
+    return QString("%1-%2%3").arg(prefix, time, extension);
 }
 
 /** \fn DBUtil::GetBackupDirectory(void)
@@ -585,10 +585,11 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename,
                 "DBUserName=%3\nDBPassword=%4\n"
                 "DBName=%5\nDBSchemaVer=%6\n"
                 "DBBackupDirectory=%7\nDBBackupFilename=%8\n%9\n")
-        .arg(dbParams.m_dbHostName).arg(dbParams.m_dbPort)
-        .arg(dbParams.m_dbUserName).arg(dbParams.m_dbPassword)
-        .arg(dbParams.m_dbName).arg(dbSchemaVer)
-        .arg(backupDirectory).arg(backupFilename).arg(rotate);
+        .arg(dbParams.m_dbHostName, QString::number(dbParams.m_dbPort),
+             dbParams.m_dbUserName, dbParams.m_dbPassword,
+             dbParams.m_dbName,     dbSchemaVer,
+             backupDirectory,       backupFilename,
+             rotate);
     QString tempDatabaseConfFile;
     bool hastemp = CreateTemporaryDBConf(privateinfo, tempDatabaseConfFile);
     if (!hastemp)
@@ -629,7 +630,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename,
         LOG(VB_FILE, LOG_ERR, LOC +
             QString("No files beginning with the suggested database backup "
                     "filename '%1' were found in '%2'.")
-                .arg(backupFilename).arg(backupDirectory));
+                .arg(backupFilename, backupDirectory));
     }
     else
     {
@@ -640,7 +641,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename,
                 QString("Multiple files beginning with the suggested database "
                         "backup filename '%1' were found in '%2'. "
                         "Assuming the first is the backup.")
-                    .arg(backupFilename).arg(backupDirectory));
+                    .arg(backupFilename, backupDirectory));
         }
     }
 
@@ -682,7 +683,7 @@ bool DBUtil::DoBackup(QString &filename)
 
     QString privateinfo = QString(
         "[client]\npassword=%1\n[mysqldump]\npassword=%2\n")
-        .arg(dbParams.m_dbPassword).arg(dbParams.m_dbPassword);
+        .arg(dbParams.m_dbPassword, dbParams.m_dbPassword);
     QString tempExtraConfFile;
     if (!CreateTemporaryDBConf(privateinfo, tempExtraConfFile))
         return false;
@@ -695,9 +696,9 @@ bool DBUtil::DoBackup(QString &filename)
                       " --allow-keywords --complete-insert"
                       " --extended-insert --lock-tables --no-create-db --quick"
                       " '%5' > '%6' 2>/dev/null")
-                      .arg(tempExtraConfFile).arg(dbParams.m_dbHostName)
-                      .arg(portArg).arg(dbParams.m_dbUserName)
-                      .arg(dbParams.m_dbName).arg(backupPathname);
+                      .arg(tempExtraConfFile, dbParams.m_dbHostName,
+                           portArg,           dbParams.m_dbUserName,
+                           dbParams.m_dbName, backupPathname);
 
     LOG(VB_FILE, LOG_INFO, QString("Backing up database with command: '%1'")
             .arg(command));

@@ -265,9 +265,9 @@ bool ping(const QString &host, std::chrono::milliseconds timeout)
     QString pingcmd =
         addr.protocol() == QAbstractSocket::IPv6Protocol ? "ping6" : "ping";
     QString cmd = QString("%1 %2 %3 -c 1  %4  >/dev/null 2>&1")
-                  .arg(pingcmd).arg(timeoutparam)
-                  .arg(duration_cast<std::chrono::seconds>(timeout).count())
-                  .arg(host);
+                  .arg(pingcmd, timeoutparam,
+                       QString::number(duration_cast<std::chrono::seconds>(timeout).count()),
+                       host);
 
     return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) == GENERIC_EXIT_OK;
@@ -575,7 +575,7 @@ bool IsMACAddress(const QString& MAC)
             LOG(VB_NETWORK, LOG_ERR,
                 QString("IsMACAddress(%1) = false, unable to "
                         "convert part '%2' to integer.")
-                    .arg(MAC).arg(tokens[y]));
+                    .arg(MAC, tokens[y]));
             return false;
         }
 
@@ -943,7 +943,7 @@ void setHttpProxy(void)
         if (!p.user().isEmpty())
         {
             url = "http://%1:%2@%3:%4",
-            url = url.arg(p.user()).arg(p.password());
+            url = url.arg(p.user(), p.password());
         }
         else
         {

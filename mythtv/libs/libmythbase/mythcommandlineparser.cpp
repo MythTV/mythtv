@@ -1131,7 +1131,7 @@ void CommandLineArg::PrintRemovedWarning(QString &keyword) const
                          " WARNING: %1\n"
                          "          %2\n"
                          "****************************************************\n\n")
-                .arg(warn).arg(m_removed)
+                .arg(warn, m_removed)
                 .toLocal8Bit().constData();
 }
 
@@ -1143,7 +1143,7 @@ void CommandLineArg::PrintDeprecatedWarning(QString &keyword) const
                          " WARNING: %1 has been deprecated\n"
                          "          %2\n"
                          "****************************************************\n\n")
-                .arg(keyword).arg(m_deprecated)
+                .arg(keyword, m_deprecated)
                 .toLocal8Bit().constData();
 }
 
@@ -1293,7 +1293,7 @@ QString MythCommandLineParser::GetHelpString(void) const
     QTextStream msg(&helpstr, QIODevice::WriteOnly);
 
     QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-        .arg(m_appname).arg(GetMythSourcePath()).arg(GetMythSourceVersion());
+        .arg(m_appname, GetMythSourcePath(), GetMythSourceVersion());
     msg << versionStr << QT_ENDL;
 
     if (toString("showhelp").isEmpty())
@@ -1808,7 +1808,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             if (m_verbose)
             {
                 std::cerr << QString("  Setting %1 as child of %2")
-                                 .arg((*args_it)->m_name).arg((*links_it)->m_name)
+                                 .arg((*args_it)->m_name, (*links_it)->m_name)
                                  .toLocal8Bit().constData()
                           << std::endl;
             }
@@ -1837,7 +1837,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             if (m_verbose)
             {
                 std::cerr << QString("  Setting %1 as parent of %2")
-                                 .arg((*args_it)->m_name).arg((*links_it)->m_name)
+                                 .arg((*args_it)->m_name, (*links_it)->m_name)
                                  .toLocal8Bit().constData()
                      << std::endl;
             }
@@ -1866,7 +1866,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             if (m_verbose)
             {
                 std::cerr << QString("  Setting %1 as requiring %2")
-                                 .arg((*args_it)->m_name).arg((*links_it)->m_name)
+                                 .arg((*args_it)->m_name, (*links_it)->m_name)
                                  .toLocal8Bit().constData()
                      << std::endl;
             }
@@ -1886,8 +1886,8 @@ bool MythCommandLineParser::ReconcileLinks(void)
                     if (m_verbose)
                     {
                         std::cerr << QString("  Setting %1 as blocking %2")
-                                         .arg((*args_it)->m_name)
-                                         .arg((*req_it)->m_name)
+                                         .arg((*args_it)->m_name,
+                                              (*req_it)->m_name)
                                          .toLocal8Bit().constData()
                                   << std::endl;
                     }
@@ -1919,7 +1919,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             if (m_verbose)
             {
                 std::cerr << QString("  Setting %1 as blocking %2")
-                                 .arg((*args_it)->m_name).arg((*block_it)->m_name)
+                                 .arg((*args_it)->m_name, (*block_it)->m_name)
                                  .toLocal8Bit().constData()
                           << std::endl;
             }
@@ -2758,12 +2758,12 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
 
     LOG(VB_GENERAL, LOG_CRIT,
         QString("%1 version: %2 [%3] www.mythtv.org")
-        .arg(QCoreApplication::applicationName())
-        .arg(GetMythSourcePath()).arg(GetMythSourceVersion()));
+        .arg(QCoreApplication::applicationName(),
+             GetMythSourcePath(), GetMythSourceVersion()));
     LOG(VB_GENERAL, LOG_CRIT, QString("Qt version: compile: %1, runtime: %2")
-        .arg(QT_VERSION_STR).arg(qVersion()));
+        .arg(QT_VERSION_STR, qVersion()));
     LOG(VB_GENERAL, LOG_INFO, QString("%1 (%2)")
-        .arg(QSysInfo::prettyProductName()).arg(QSysInfo::currentCpuArchitecture()));
+        .arg(QSysInfo::prettyProductName(), QSysInfo::currentCpuArchitecture()));
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("Enabled verbose msgs: %1").arg(verboseString));
 
@@ -2797,7 +2797,7 @@ void MythCommandLineParser::ApplySettingsOverride(void)
         {
             LOG(VB_GENERAL, LOG_NOTICE,
                  QString("Setting '%1' being forced to '%2'")
-                     .arg(it.key()).arg(*it));
+                     .arg(it.key(), *it));
             gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }

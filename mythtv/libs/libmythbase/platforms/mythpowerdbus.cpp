@@ -324,7 +324,7 @@ bool MythPowerDBus::ScheduleFeature(enum Feature Type, std::chrono::seconds Dela
                     QString("Failed to schedule %1 - falling back to default behaviour")
                     .arg(FeatureToString(Type)));
                 LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Error %1 Message %2")
-                    .arg(reply.error().name()).arg(reply.error().message()));
+                    .arg(reply.error().name(), reply.error().message()));
             }
         }
     }
@@ -537,7 +537,7 @@ void MythPowerDBus::AcquireLock(Features Types)
     if (!reply.isValid())
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Failed to delay %1: %2")
-            .arg(types.join(",")).arg(reply.error().message()));
+            .arg(types.join(","), reply.error().message()));
         m_lockHandle = -1;
         return;
     }

@@ -749,7 +749,7 @@ bool MythSystemLegacyUnix::ParseShell(const QString &cmd, QString &abscmd,
 #endif
         for (const auto& pit : qAsConst(path))
         {
-            QFile file(QString("%1/%2").arg(pit).arg(abscmd));
+            QFile file(QString("%1/%2").arg(pit, abscmd));
             if (file.exists())
             {
                 abscmd = file.fileName();
@@ -965,9 +965,11 @@ void MythSystemLegacyUnix::Fork(std::chrono::seconds timeout)
         LOG(VB_SYSTEM, LOG_INFO,
                     QString("Managed child (PID: %1) has started! "
                             "%2%3 command=%4, timeout=%5")
-                        .arg(m_pid) .arg(GetSetting("UseShell") ? "*" : "")
-                        .arg(GetSetting("RunInBackground") ? "&" : "")
-                        .arg(GetLogCmd()).arg(timeout.count()));
+                        .arg(QString::number(m_pid),
+                             GetSetting("UseShell") ? "*" : "",
+                             GetSetting("RunInBackground") ? "&" : "",
+                             GetLogCmd(),
+                             QString::number(timeout.count())));
 
         /* close unused pipe ends */
         if (p_stdin[0] >= 0)

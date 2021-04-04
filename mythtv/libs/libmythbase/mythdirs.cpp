@@ -164,7 +164,7 @@ void InitializeMythDirs(void)
         // use relative PREFIX values with care.
 
         LOG(VB_GENERAL, LOG_DEBUG, QString("Relative PREFIX! (%1), appDir=%2")
-            .arg(installprefix) .arg(prefixDir.canonicalPath()));
+            .arg(installprefix, prefixDir.canonicalPath()));
 
         if (!prefixDir.cd(installprefix))
         {

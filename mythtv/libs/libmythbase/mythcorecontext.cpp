@@ -254,7 +254,7 @@ bool MythCoreContext::Init(void)
         LOG(VB_GENERAL, LOG_CRIT,
             QString("Application binary version (%1) does not "
                     "match libraries (%2)")
-                .arg(d->m_appBinaryVersion) .arg(MYTH_BINARY_VERSION));
+                .arg(d->m_appBinaryVersion, MYTH_BINARY_VERSION));
 
         QString warning = tr("This application is not compatible with the "
                              "installed MythTV libraries. Please recompile "
@@ -409,8 +409,7 @@ bool MythCoreContext::ConnectToMasterServer(bool blockingClient,
     {
         QString type = IsFrontend() ? "Frontend" : (blockingClient ? "Playback" : "Monitor");
         QString ann = QString("ANN %1 %2 %3")
-            .arg(type)
-            .arg(d->m_localHostname).arg(static_cast<int>(false));
+            .arg(type, d->m_localHostname, QString::number(static_cast<int>(false)));
         d->m_serverSock = ConnectCommandSocket(
             server, port, ann, &proto_mismatch);
     }
@@ -793,7 +792,7 @@ QString MythCoreContext::GenMythURL(const QString& host, int port, QString path,
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("(%1/%2): Given "
                                           "IP address instead of hostname "
-                                          "(ID). This is invalid.").arg(host).arg(path));
+                                          "(ID). This is invalid.").arg(host, path));
     }
 
     m_host = host;
@@ -1481,7 +1480,7 @@ bool MythCoreContext::SendReceiveStringList(
             {
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("Protocol query '%1' responded with the error '%2'")
-                        .arg(query_type).arg(strlist[1]));
+                        .arg(query_type, strlist[1]));
             }
             else
             {
@@ -1561,14 +1560,14 @@ void MythCoreContext::SendSystemEvent(const QString &msg)
         return;
 
     SendMessage(QString("SYSTEM_EVENT %1 SENDER %2")
-                        .arg(msg).arg(GetHostName()));
+                        .arg(msg, GetHostName()));
 }
 
 void MythCoreContext::SendHostSystemEvent(const QString &msg,
                                           const QString &hostname,
                                           const QString &args)
 {
-    SendSystemEvent(QString("%1 HOST %2 %3").arg(msg).arg(hostname).arg(args));
+    SendSystemEvent(QString("%1 HOST %2 %3").arg(msg, hostname, args));
 }
 
 
@@ -1686,8 +1685,8 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket,
         return false;
 
     QStringList strlist(QString("MYTH_PROTO_VERSION %1 %2")
-                        .arg(MYTH_PROTO_VERSION)
-                        .arg(QString::fromUtf8(MYTH_PROTO_TOKEN)));
+                        .arg(MYTH_PROTO_VERSION,
+                             QString::fromUtf8(MYTH_PROTO_TOKEN)));
     socket->WriteStringList(strlist);
 
     if (!socket->ReadStringList(strlist, timeout) || strlist.empty())
@@ -1703,9 +1702,9 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket,
     {
         LOG(VB_GENERAL, LOG_CRIT, LOC + QString("Protocol version or token mismatch "
                                           "(frontend=%1/%2,backend=%3/\?\?)\n")
-                                      .arg(MYTH_PROTO_VERSION)
-                                      .arg(QString::fromUtf8(MYTH_PROTO_TOKEN))
-                                      .arg(strlist[1]));
+                                      .arg(MYTH_PROTO_VERSION,
+                                           QString::fromUtf8(MYTH_PROTO_TOKEN),
+                                           strlist[1]));
 
         if (error_dialog_desired && d->m_guiContext)
         {
@@ -1723,8 +1722,8 @@ bool MythCoreContext::CheckProtoVersion(MythSocket *socket,
             d->m_announcedProtocol = true;
             LOG(VB_GENERAL, LOG_INFO, LOC +
                             QString("Using protocol version %1 %2")
-                                .arg(MYTH_PROTO_VERSION)
-                                .arg(QString::fromUtf8(MYTH_PROTO_TOKEN)));
+                                .arg(MYTH_PROTO_VERSION,
+                                     QString::fromUtf8(MYTH_PROTO_TOKEN)));
         }
 
         return true;
@@ -2072,7 +2071,7 @@ bool MythCoreContext::TestPluginVersion(const QString &name,
     LOG(VB_GENERAL, LOG_EMERG, LOC +
              QString("Plugin %1 (%2) binary version does not "
                      "match libraries (%3)")
-                 .arg(name).arg(pluginversion).arg(libversion));
+                 .arg(name, pluginversion, libversion));
     return false;
 }
 

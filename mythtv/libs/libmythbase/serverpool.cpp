@@ -413,7 +413,8 @@ bool ServerPool::listen(QList<QHostAddress> addrs, quint16 port,
         if (server->listen(qha, m_port))
         {
             LOG(VB_GENERAL, LOG_INFO, QString("Listening on TCP%1 %2:%3")
-                .arg(servertype == kSSLServer ? " (SSL)" : "").arg(PRETTYIP_(qha)).arg(port));
+                .arg(servertype == kSSLServer ? " (SSL)" : "",
+                     PRETTYIP_(qha), QString::number(port)));
             if ((servertype == kTCPServer) || (servertype == kSSLServer))
                 m_tcpServers.append(server);
             if (m_port == 0)

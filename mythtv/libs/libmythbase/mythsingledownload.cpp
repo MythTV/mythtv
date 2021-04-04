@@ -71,7 +71,7 @@ bool MythSingleDownload::DownloadURL(const QUrl &url, QByteArray *buffer,
         {
             if (redirs <= 3)
             {
-                LOG(VB_GENERAL, LOG_INFO, QString("%1 -> %2").arg(url.toString()).arg(redir));
+                LOG(VB_GENERAL, LOG_INFO, QString("%1 -> %2").arg(url.toString(), redir));
                 m_replylock.unlock();
                 m_lock.unlock();
                 return DownloadURL(redir, buffer, timeout, redirs + 1, maxsize, final_url);
