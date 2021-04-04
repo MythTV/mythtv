@@ -73,10 +73,10 @@ void MultiplexSetting::Load(void)
         else
         {
             DisplayText = QString("%1 Hz (%2) (%3) (%4)")
-                .arg(query.value(3).toString())
-                .arg(query.value(4).toString())
-                .arg(query.value(1).toInt())
-                .arg(query.value(2).toInt());
+                .arg(query.value(3).toString(),
+                     query.value(4).toString(),
+                     query.value(1).toString(),
+                     query.value(2).toString());
         }
         addSelection(DisplayText, query.value(0).toString());
     }

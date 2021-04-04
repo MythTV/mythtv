@@ -165,7 +165,7 @@ void ChannelScanner::Scan(
         (ScanTypeSetting::FullScan_Analog == scantype))
     {
         LOG(VB_CHANSCAN, LOG_INFO, LOC + QString("ScanTransports(%1, %2, %3)")
-                .arg(freq_std).arg(mod).arg(tbl));
+                .arg(freq_std, mod, tbl));
 
         // HACK HACK HACK -- begin
         // if using QAM we may need additional time... (at least with HD-3000)

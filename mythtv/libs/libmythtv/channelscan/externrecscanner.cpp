@@ -138,10 +138,10 @@ void ExternRecChannelScanner::run(void)
     uint idx = 0;
     for (;;)
     {
-        QString msg = tr("Channel #%1 : %2").arg(channum).arg(name);
+        QString msg = tr("Channel #%1 : %2").arg(channum, name);
 
         LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
-            .arg(channum).arg(name));
+            .arg(channum, name));
 
         int chanid = ChannelUtil::GetChanID(m_sourceId, channum);
 

@@ -115,7 +115,7 @@ void ScanMonitor::ScanUpdateStatusText(const QString &status)
 {
     QString msg = tr("Scanning");
     if (!status.isEmpty())
-        msg = QString("%1 %2").arg(msg).arg(status);
+        msg = QString("%1 %2").arg(msg, status);
 
     post_event(this, ScannerEvent::SetStatusText, msg);
 }
