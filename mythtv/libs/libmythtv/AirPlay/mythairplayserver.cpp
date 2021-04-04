@@ -663,13 +663,13 @@ void MythAirplayServer::HandleResponse(APHTTPRequest *req,
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Method: %1 URI: %2")
-            .arg(req->GetMethod().data()).arg(req->GetURI().data()));
+            .arg(req->GetMethod().data(), req->GetURI().data()));
     }
     else
     {
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Method: %1 URI: %2")
-            .arg(req->GetMethod().data()).arg(req->GetURI().data()));
+            .arg(req->GetMethod().data(), req->GetURI().data()));
     }
 
     if (req->GetURI() == "200" || req->GetMethod().startsWith("HTTP"))
