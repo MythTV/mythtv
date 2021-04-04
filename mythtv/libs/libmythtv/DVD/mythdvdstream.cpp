@@ -110,7 +110,7 @@ bool MythDVDStream::OpenFile(const QString &Filename, std::chrono::milliseconds 
         if (m_start == 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("(%1) UDFFindFile(%2) failed").
-                arg(root).arg(path));
+                arg(root, path));
             DVDClose(m_reader);
             m_reader = nullptr;
             m_rwLock.unlock();
