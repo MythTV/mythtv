@@ -241,7 +241,7 @@ bool NetStream::Request(const QUrl& url)
             {
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     QString("Opening client certificate '%1': %2")
-                    .arg(f1.fileName()).arg(f1.errorString()) );
+                    .arg(f1.fileName(), f1.errorString()) );
             }
 
             // Get the private key
@@ -263,7 +263,7 @@ bool NetStream::Request(const QUrl& url)
                 {
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         QString("Opening private key '%1': %2")
-                        .arg(f2.fileName()).arg(f2.errorString()) );
+                        .arg(f2.fileName(), f2.errorString()) );
                 }
             }
         }
@@ -952,7 +952,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     if (expire.isValid() && expire.toLocalTime() < now)
     {
         LOG(VB_FILE, LOG_INFO, LOC + QString("GetLastModified('%1') past expiration %2")
-            .arg(url.toString()).arg(expire.toString()));
+            .arg(url.toString(), expire.toString()));
         return QDateTime(); // Invalid
     }
 
@@ -994,7 +994,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     }
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1') last modified %2")
-        .arg(url.toString()).arg(lastMod.toString()));
+        .arg(url.toString(), lastMod.toString()));
     return lastMod;
 }
 
