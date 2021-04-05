@@ -20,7 +20,7 @@ Doc-Tests for tvmaze
     <collectionref>24598</collectionref>
     <language>zh</language>
     <releasedate>2013-02-15</releasedate>
-    <popularity>13.0</popularity>
+    <popularity>...</popularity>
     <year>2013</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
@@ -33,7 +33,7 @@ Doc-Tests for tvmaze
     <collectionref>31623</collectionref>
     <language>en</language>
     <releasedate>2013-01-11</releasedate>
-    <popularity>0.0</popularity>
+    <popularity>...</popularity>
     <year>2013</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/126/316260.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/126/316260.jpg"/>
@@ -46,8 +46,8 @@ Doc-Tests for tvmaze
     <collectionref>52474</collectionref>
     <language>en</language>
     <releasedate>2021-01-13</releasedate>
-    <userrating>6.800000</userrating>
-    <popularity>81.0</popularity>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
     <year>2021</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/289/723250.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/289/723250.jpg"/>
@@ -61,7 +61,7 @@ Doc-Tests for tvmaze
     <collectionref>42539</collectionref>
     <language>en</language>
     <releasedate>2019-02-24</releasedate>
-    <popularity>0.0</popularity>
+    <popularity>...</popularity>
     <year>2019</year>
     <images>
       <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/231/578439.jpg"/>
@@ -74,7 +74,7 @@ Doc-Tests for tvmaze
     <collectionref>19206</collectionref>
     <language>en</language>
     <releasedate>2010-11-03</releasedate>
-    <popularity>0.0</popularity>
+    <popularity>...</popularity>
     <year>2010</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/67/169985.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/67/169985.jpg"/>
@@ -89,7 +89,7 @@ Doc-Tests for tvmaze
     <collectionref>27687</collectionref>
     <language>en</language>
     <releasedate>2017-07-18</releasedate>
-    <popularity>0.0</popularity>
+    <popularity>...</popularity>
     <year>2017</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/118/296875.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/118/296875.jpg"/>
@@ -101,7 +101,7 @@ Doc-Tests for tvmaze
     <inetref>30203</inetref>
     <collectionref>30203</collectionref>
     <language>en</language>
-    <popularity>18.0</popularity>
+    <popularity>...</popularity>
   </item>
   <item>
     <title>Boys on Film - A Night with Duran Duran</title>
@@ -110,7 +110,7 @@ Doc-Tests for tvmaze
     <collectionref>37161</collectionref>
     <language>en</language>
     <releasedate>2018-06-29</releasedate>
-    <popularity>0.0</popularity>
+    <popularity>...</popularity>
     <year>2018</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/158/396533.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/158/396533.jpg"/>
@@ -123,7 +123,7 @@ Doc-Tests for tvmaze
     <collectionref>3237</collectionref>
     <language>ko</language>
     <releasedate>2014-08-04</releasedate>
-    <popularity>46.0</popularity>
+    <popularity>...</popularity>
     <year>2014</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/17/43577.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/17/43577.jpg"/>
@@ -136,8 +136,8 @@ Doc-Tests for tvmaze
     <collectionref>36655</collectionref>
     <language>en</language>
     <releasedate>2018-10-12</releasedate>
-    <userrating>6.200000</userrating>
-    <popularity>85.0</popularity>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
     <year>2018</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/213/534600.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/213/534600.jpg"/>
@@ -162,7 +162,7 @@ Doc-Tests for tvmaze
     <collectionref>24598</collectionref>
     <language>zh</language>
     <releasedate>2013-02-23</releasedate>
-    <popularity>13.0</popularity>
+    <popularity>...</popularity>
     <year>2013</year>
     <runtime>50</runtime>
     <categories>
@@ -197,8 +197,8 @@ Doc-Tests for tvmaze
     <collectionref>525</collectionref>
     <language>en</language>
     <releasedate>2000-10-05</releasedate>
-    <userrating>8.400000</userrating>
-    <popularity>84.0</popularity>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
     <year>2000</year>
     <categories>
       <category name="Drama"/>
@@ -234,8 +234,8 @@ Doc-Tests for tvmaze
     <collectionref>525</collectionref>
     <language>en</language>
     <releasedate>2004-09-28</releasedate>
-    <userrating>8.400000</userrating>
-    <popularity>84.0</popularity>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
     <year>2004</year>
     <runtime>60</runtime>
     <categories>
@@ -327,6 +327,7 @@ Doc-Tests for tvmaze
 </metadata>
 
 
+
 # python3 tvmaze.py -M BÖsterreich
 >>> if sys.version_info[0] == 2:
 ...     sys.argv = shlex.split(u'tvmaze -M BÖsterreich'.encode('utf-8'))
@@ -344,7 +345,7 @@ Doc-Tests for tvmaze
     <collectionref>23361</collectionref>
     <language>de</language>
     <releasedate>2014-04-01</releasedate>
-    <popularity>0.0</popularity>
+    <popularity>...</popularity>
     <year>2014</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/219221.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/87/219221.jpg"/>
@@ -357,7 +358,7 @@ Doc-Tests for tvmaze
     <collectionref>34194</collectionref>
     <language>de</language>
     <releasedate>2007-05-31</releasedate>
-    <popularity>0.0</popularity>
+    <popularity>...</popularity>
     <year>2007</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/141/352576.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/141/352576.jpg"/>
@@ -368,9 +369,304 @@ Doc-Tests for tvmaze
 
 
 
+
+
+
+
+
 ##
 ## Testing this traceback does not work:
 ##
 # python3 tvmaze.py -N 4711 "Episode 42"
 #  >>> sys.argv = shlex.split('tvmaze -N 4711 "Episode 42"')
 #  >>> main()
+
+
+
+# The following matches on two episodes.
+# tvmaze.py -N Bulletproof "Episode 4"
+>>> sys.argv = shlex.split('tvmaze -N "Bulletproof" "Episode 4"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Bulletproof</title>
+    <subtitle>Episode 4</subtitle>
+    <description>As Alex regains control of the family, Mikey puts Bishop and Pike in charge of a gun-trafficking op. But the boys quickly find themselves out of their depth. </description>
+    <season>2</season>
+    <episode>4</episode>
+    <inetref>31477</inetref>
+    <collectionref>31477</collectionref>
+    <language>en</language>
+    <releasedate>2020-03-20</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
+    <year>2020</year>
+    <runtime>60</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Action"/>
+    </categories>
+    <people>
+      <person name="Noel Clarke" character="DI Aaron Bishop" job="Actor"/>
+      <person name="Ashley Walters" character="DI Ronnie Pike" job="Actor"/>
+      <person name="Vanessa Vanderpuye" character="Arjana Pike" job="Actor"/>
+      <person name="Lashana Lynch" character="Arjana Pike" job="Actor"/>
+      <person name="Jason Maza" character="DS Chris Munroe" job="Actor"/>
+      <person name="Lindsey Coulson" character="DCI Sarah Tanner" job="Actor"/>
+      <person name="Olivia Chenery" character="Scooch" job="Actor"/>
+      <person name="Lucie Shorthouse" character="DS Paige Pennington" job="Actor"/>
+      <person name="Stavros Zalmas" character="Alex Markides" job="Actor"/>
+      <person name="Ben Tavassoli" character="Mikey Markides" job="Actor"/>
+      <person name="Lee Ross" character="Deputy Director Richard Cockridge" job="Actor"/>
+      <person name="Gina Bellman" character="Elena Markides" job="Actor"/>
+      <person name="David Elliot" character="DS Tim 'Jonesy' Jones" job="Actor"/>
+      <person name="Gala Gordon" character="Anna Markides" job="Actor"/>
+      <person name="Kim Engelbrecht" character="Megan" job="Actor"/>
+      <person name="Thapelo Mokoena" character="William" job="Actor"/>
+      <person name="Paul du Toit" character="Dewald" job="Actor"/>
+      <person name="Richard September" character="Kojo" job="Actor"/>
+      <person name="Sechaba Morojele" character="Thato" job="Actor"/>
+      <person name="Christina Chong" character="Nell McBride" job="Actor"/>
+      <person name="Mandeep Dhillon" character="Kamali Khan" job="Actor"/>
+      <person name="Caroline Goodall" character="Deputy Mayor Charlotte Carmel" job="Actor"/>
+      <person name="Clarke Peters" character="Ronald Pike" job="Actor"/>
+      <person name="Anton Saunders" character="Tommy" job="Actor"/>
+      <person name="Tafara Nyatsanza" character="Damian" job="Actor"/>
+      <person name="Noel Clarke" job="Creator"/>
+      <person name="Noel Clarke" job="Executive Producer"/>
+      <person name="Ashley Walters" job="Creator"/>
+      <person name="Ashley Walters" job="Executive Producer"/>
+      <person name="Michele Buck" job="Executive Producer"/>
+      <person name="Nick Love" job="Creator"/>
+      <person name="Nick Love" job="Executive Producer"/>
+      <person name="Judy Counihan" job="Executive Producer"/>
+      <person name="Allan Niblo" job="Executive Producer"/>
+      <person name="Jon Finn" job="Producer"/>
+      <person name="Kiaran Murray-Smith" job="Producer"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/247/617968.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/247/617968.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/154/387396.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/154/387396.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/159/398236.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/159/398236.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/556230.jpg"/>
+      <image type="screenshot" url="https://static.tvmaze.com/uploads/images/original_untouched/247/618006.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_landscape/247/618006.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Bulletproof</title>
+    <subtitle>Episode 4</subtitle>
+    <description>Pike and Bishop's refusal to follow orders hurls them into a disturbing case.</description>
+    <season>1</season>
+    <episode>4</episode>
+    <inetref>31477</inetref>
+    <collectionref>31477</collectionref>
+    <language>en</language>
+    <releasedate>2018-06-05</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
+    <year>2018</year>
+    <runtime>60</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Action"/>
+    </categories>
+    <people>
+      <person name="Noel Clarke" character="DI Aaron Bishop" job="Actor"/>
+      <person name="Ashley Walters" character="DI Ronnie Pike" job="Actor"/>
+      <person name="Vanessa Vanderpuye" character="Arjana Pike" job="Actor"/>
+      <person name="Lashana Lynch" character="Arjana Pike" job="Actor"/>
+      <person name="Jason Maza" character="DS Chris Munroe" job="Actor"/>
+      <person name="Lindsey Coulson" character="DCI Sarah Tanner" job="Actor"/>
+      <person name="Olivia Chenery" character="Scooch" job="Actor"/>
+      <person name="Lucie Shorthouse" character="DS Paige Pennington" job="Actor"/>
+      <person name="Stavros Zalmas" character="Alex Markides" job="Actor"/>
+      <person name="Ben Tavassoli" character="Mikey Markides" job="Actor"/>
+      <person name="Lee Ross" character="Deputy Director Richard Cockridge" job="Actor"/>
+      <person name="Gina Bellman" character="Elena Markides" job="Actor"/>
+      <person name="David Elliot" character="DS Tim 'Jonesy' Jones" job="Actor"/>
+      <person name="Gala Gordon" character="Anna Markides" job="Actor"/>
+      <person name="Kim Engelbrecht" character="Megan" job="Actor"/>
+      <person name="Thapelo Mokoena" character="William" job="Actor"/>
+      <person name="Paul du Toit" character="Dewald" job="Actor"/>
+      <person name="Richard September" character="Kojo" job="Actor"/>
+      <person name="Sechaba Morojele" character="Thato" job="Actor"/>
+      <person name="Christina Chong" character="Nell McBride" job="Actor"/>
+      <person name="Mandeep Dhillon" character="Kamali Khan" job="Actor"/>
+      <person name="Caroline Goodall" character="Deputy Mayor Charlotte Carmel" job="Actor"/>
+      <person name="Clarke Peters" character="Ronald Pike" job="Actor"/>
+      <person name="Anton Saunders" character="Tommy" job="Actor"/>
+      <person name="Tafara Nyatsanza" character="Damian" job="Actor"/>
+      <person name="Noel Clarke" job="Creator"/>
+      <person name="Noel Clarke" job="Executive Producer"/>
+      <person name="Ashley Walters" job="Creator"/>
+      <person name="Ashley Walters" job="Executive Producer"/>
+      <person name="Michele Buck" job="Executive Producer"/>
+      <person name="Nick Love" job="Creator"/>
+      <person name="Nick Love" job="Executive Producer"/>
+      <person name="Judy Counihan" job="Executive Producer"/>
+      <person name="Allan Niblo" job="Executive Producer"/>
+      <person name="Jon Finn" job="Producer"/>
+      <person name="Kiaran Murray-Smith" job="Producer"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/247/617968.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/247/617968.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/154/387396.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/154/387396.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/159/398236.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/159/398236.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/556230.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+
+# There are at least 3 programs called "The Flash". Test that we find
+# a matching subtitle in the correct version.
+# tvmaze.py -N "The Flash" "Double Vision"
+>>> sys.argv = shlex.split('tvmaze -N "The Flash" "Double Vision"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>The Flash</title>
+    <subtitle>Double Vision</subtitle>
+    <description>Barry attempts to foil the kidnapping of Sofia Tomarquin, daughter of DEA agent Felix Tomarquin, who is scheduled to testify against drug lord Reuben Calderon. However, Calderon's enforcer, Marcos Trachmann, utilizes advanced microscopic devices to control Barry's nervous system and force him to help them kidnap Sofia.</description>
+    <season>1</season>
+    <episode>5</episode>
+    <inetref>528</inetref>
+    <collectionref>528</collectionref>
+    <language>en</language>
+    <releasedate>1990-11-01</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
+    <year>1990</year>
+    <runtime>60</runtime>
+    <categories>
+      <category name="Action"/>
+      <category name="Adventure"/>
+      <category name="Science-Fiction"/>
+    </categories>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <people>
+      <person name="John Wesley Shipp" character="Barry Allen / The Flash" job="Actor"/>
+      <person name="Alex Désert" character="Julio Mendez" job="Actor"/>
+      <person name="Amanda Pays" character="Dr. Christina 'Tina' McGee" job="Actor"/>
+      <person name="David Boyd" job="Camera Operator"/>
+      <person name="Steven Long Mitchell" job="Producer"/>
+      <person name="Craig Van Sickle" job="Producer"/>
+      <person name="Don Kurt" job="Supervising Producer"/>
+      <person name="Don Kurt" job="Producer"/>
+      <person name="Howard Chaykin" job="Story Editor"/>
+      <person name="Howard Chaykin" job="Executive Story Consultant"/>
+      <person name="David L. Newman" job="First Assistant Director"/>
+      <person name="Danny Bilson" job="Developer"/>
+      <person name="Danny Bilson" job="Executive Producer"/>
+      <person name="Paul DeMeo" job="Executive Producer"/>
+      <person name="Steve Hattman" job="Supervising Producer"/>
+      <person name="Michael Lacoe" job="Co-Producer"/>
+      <person name="David L. Beanes" job="Co-Producer"/>
+      <person name="David L. Beanes" job="Unit Production Manager"/>
+      <person name="Frank Jimenez" job="Associate Producer"/>
+      <person name="April Webster" job="Casting"/>
+      <person name="Robert D. Bailey" job="Visual Effects Supervisor"/>
+      <person name="Bill Zabala" job="Film Editor"/>
+      <person name="Gail Morgan Hickman" job="Producer"/>
+      <person name="Fred Lerner" job="Stunt Coordinator"/>
+      <person name="Paul De Meo" job="Developer"/>
+      <person name="Greg Gardiner" job="Director Of Photography"/>
+      <person name="John Francis Moore" job="Story Editor"/>
+      <person name="John Francis Moore" job="Executive Story Consultant"/>
+      <person name="Francis Kenny" job="Director Of Photography"/>
+      <person name="Danny Elfman" job="Main Title Theme"/>
+      <person name="Greg Wong" job="Film Editor"/>
+      <person name="John C. Newby" job="Camera Operator"/>
+      <person name="Craig Binkley" job="Property Master"/>
+      <person name="Dean Edward Mitzner" job="Production Designer"/>
+      <person name="Shirley Walker" job="Music"/>
+      <person name="Richard Graves" job="First Assistant Director"/>
+      <person name="David D'Ovidio" job="First Assistant Director"/>
+      <person name="David D'Ovidio" job="Second Assistant Director"/>
+      <person name="Jim Troutman" job="Sound Editor"/>
+      <person name="Abby Treloggen" job="Music Editor"/>
+      <person name="Jim Larue" job="Sound Mixer"/>
+      <person name="Bob Miller" job="Costume Supervisor"/>
+      <person name="Bill Myer" job="Makeup Supervisor"/>
+      <person name="Dino Ganziano" job="Hair Stylist"/>
+      <person name="Ray Quiroz" job="Script Supervisor"/>
+      <person name="Jeannie Gunn" job="Set Decorator"/>
+      <person name="Rick Dinieri" job="Property Master"/>
+      <person name="Robert Benjamin" job="Transportation Coordinator"/>
+      <person name="Bill Schirmer" job="Special Effects"/>
+      <person name="Billy Burton" job="Stunt Coordinator"/>
+      <person name="Billy Burton" job="Second Unit Director"/>
+      <person name="David Stipes" job="Visual Effects Supervisor"/>
+      <person name="Patrick Clancy" job="Visual Effects Artist"/>
+      <person name="Philip Barberio" job="Visual Effects Coordinator"/>
+      <person name="Robert Short" job="Costume Designer"/>
+      <person name="Greg Cannom" job="Special Effects Makeup Designer"/>
+      <person name="Robert S. Mills" job="Second Assistant Director"/>
+      <person name="Lawrence J. Gleason" job="Film Editor"/>
+      <person name="Thomas Milano" job="Music Editor"/>
+      <person name="Hugh K. Gagnier" job="Director Of Photography"/>
+      <person name="David Kelley" job="Second Assistant Director"/>
+      <person name="Perri Kimono" job="Costume Supervisor"/>
+      <person name="Richard Fernandez" job="Art Director"/>
+      <person name="Daniel R. Suhart" job="Second Assistant Director"/>
+      <person name="Robinson Royce" job="Set Decorator"/>
+      <person name="Le Dawson" job="Costume Designer"/>
+      <person name="Lana Sharpe" job="Hair Stylist"/>
+      <person name="Gillian Murphy" job="Script Supervisor"/>
+      <person name="Peter W. Moyer" job="Visual Effects Artist"/>
+      <person name="Peter A. Samish" job="Art Director"/>
+      <person name="Francis J. Pezza" job="Art Director"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/4/11360.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/4/11360.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/225/563491.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/251/629841.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/251/629843.jpg"/>
+      <image type="screenshot" url="https://static.tvmaze.com/uploads/images/original_untouched/55/139950.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_landscape/55/139950.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+
+# This example is a partial match on subtitle from the 1967 version of "The Flash"
+# tvmaze.py -N "The Flash" "To Catch a Blue"
+>>> sys.argv = shlex.split('tvmaze -N "The Flash" "To Catch a Blue"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>The Flash</title>
+    <subtitle>To Catch a Blue Bolt</subtitle>
+    <description>Blue Bolt, an alien being with the same Super Speed as The Flash, attacks the Earth.</description>
+    <season>1</season>
+    <episode>3</episode>
+    <inetref>7079</inetref>
+    <collectionref>7079</collectionref>
+    <language>en</language>
+    <releasedate>1967-11-25</releasedate>
+    <popularity>...</popularity>
+    <year>1967</year>
+    <runtime>7</runtime>
+    <categories>
+      <category name="Action"/>
+      <category name="Adventure"/>
+      <category name="Science-Fiction"/>
+    </categories>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/29/73727.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/29/73727.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/26/66242.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/26/66242.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/226/566930.jpg"/>
+    </images>
+  </item>
+</metadata>

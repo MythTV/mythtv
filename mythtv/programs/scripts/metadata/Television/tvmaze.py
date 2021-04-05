@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 
 __title__ = "TVmaze.com"
 __author__ = "Roland Ernst, Steve Erlenborn"
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 
 import sys
@@ -170,52 +170,108 @@ def buildNumbers(args, opts):
     try:
         inetref = int(args[0])
         tvsubtitle = args[1]
+        inetrefList = [inetref]
+
     except ValueError:
         tvtitle = args[0]
         tvsubtitle = args[1]
-        serie = tvmaze.search_show_best_match(tvtitle)
-        try:
-            # inetref = str(serie.id)
-            inetref = int(serie.id)
+        inetrefList = []    # inetrefs for shows with title matches
+        best_show_quality = 0.5     # require at least this quality on string match
+
+        showlist = tvmaze.search_show(tvtitle)
+
+        # It's problematic to make decisions solely upon the Levenshtein distance.
+        # If the strings are really long or really short, a simple rule, such as
+        # "accept any distance < 6" can provide misleading results.
+        # To establish a more useful measurement, we'll use the Levenshtein
+        # distance to figure out the ratio (0 - 1) of matching characters in the
+        # longer string, and call this 'match_quality'.
+        #    "Risk", "Call" -> distance = 4
+        #           match_quality = (4 - 4) / 4 = 0
+        #    "In Sickness and in Health", "Sickness and Health" -> distance = 6
+        #           match_quality = (25 - 6)/25 = .76
+
+        for show_info in showlist:
+            try:
+                inetref = int(show_info.id)
+                distance = levenshtein(show_info.name.lower(), tvtitle.lower())
+                if len(tvtitle) > len(show_info.name):
+                    match_quality = float(len(tvtitle) - distance) / len(tvtitle)
+                else:
+                    match_quality = float(len(show_info.name) - distance) / len(show_info.name)
+                if match_quality >= best_show_quality:
+                    #if opts.debug:
+                        #print ('show_info =', show_info, ', match_quality =', match_quality)
+                    if match_quality == best_show_quality:
+                        inetrefList.append(inetref)
+                    else:
+                        # Any items previously appended for a lesser match need to be eliminated
+                        inetrefList = [inetref]
+                        best_show_quality = match_quality
+            except(TypeError, ValueError):
+                pass
+
+    matchesFound = 0
+    best_ep_quality = 0.5   # require at least this quality on string match
+    tree = etree.XML(u'<metadata></metadata>')
+    for inetref in inetrefList:
+        # get episode based on subtitle
+        episodes = tvmaze.get_show_episode_list(inetref)
+
+        min_dist_list = []
+        for i, ep in enumerate(episodes):
+            if 0 and opts.debug:
+                print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
+                for k, v in ep.__dict__.items():
+                    print(k, " : ", v)
+            distance = levenshtein(ep.name, tvsubtitle)
+            if len(tvsubtitle) >= len(ep.name):
+                match_quality = float(len(tvsubtitle) - distance) / len(tvsubtitle)
+            else:
+                match_quality = float(len(ep.name) - distance) / len(ep.name)
+            #if opts.debug:
+                #print('inetref', inetref, 'episode =', ep.name, ', distance =', distance, ', match_quality =', match_quality)
+            if match_quality >= best_ep_quality:
+                if match_quality == best_ep_quality:
+                    min_dist_list.append(i)
+                    if opts.debug:
+                        print('"%s" added to best list, match_quality = %g' % (ep.name, match_quality))
+                else:
+                    # Any items previously appended for a lesser match need to be eliminated
+                    tree = etree.XML(u'<metadata></metadata>')
+                    min_dist_list = [i]
+                    best_ep_quality = match_quality
+                    if opts.debug:
+                        print('"%s" is new best match_quality = %g' % (ep.name, match_quality))
+
+        # The list is constructed in order of oldest season to newest.
+        # If episodes with equivalent match quality show up in multiple
+        # seasons, we want to list the most recent first. To accomplish
+        # this, we'll process items starting at the end of the list, and
+        # proceed to the beginning.
+        while min_dist_list:
+            ep_index = min_dist_list.pop()
+            season_nr  = str(episodes[ep_index].season)
+            episode_id = episodes[ep_index].id
             if opts.debug:
-                print("tvmaze.search_show_best_match(%s) returned inetref : %s"
-                      % (tvtitle, inetref))
-                if 0 and opts.debug:
-                    print(serie, type(serie))
-                    for k, v in serie.__dict__.items():
-                        print(k, " : ", v)
-        except(TypeError, ValueError):
-            raise Exception("Cannot resolve argument 'inetref'")
+                episode_nr = str(episodes[ep_index].number)
+                print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
+                print("with season : %s and episode %s" % (season_nr, episode_nr))
+                print("Chosen episode index '%d' based on match quality %g"
+                      % (ep_index, best_ep_quality))
 
-    # get episode based on subtitle
-    episodes = tvmaze.get_show_episode_list(inetref)
+            # we have now inetref, season, episode_id
+            item = buildSingleItem(inetref, season_nr, episode_id)
+            if item is not None:
+                tree.append(item.toXML())
+                matchesFound += 1
 
-    best_ep_index = None
-    ep_distance = 5                     ### XXX read distance from settings
-    for i, ep in enumerate(episodes):
-        if 0 and opts.debug:
-            print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
-            for k, v in ep.__dict__.items():
-                print(k, " : ", v)
-        distance = levenshtein(ep.name, tvsubtitle)
-        if distance < ep_distance:
-            best_ep_index = i
-            ep_distance = distance
-    if len(episodes) > 0 and best_ep_index is not None:
-        season_nr  = str(episodes[best_ep_index].season)
-        episode_nr = str(episodes[best_ep_index].number)
-        episode_id = episodes[best_ep_index].id
-        if opts.debug:
-            print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
-            print("with season : %s and episode %s" % (season_nr, episode_nr))
-            print("Chosen episode index '%d' based on levenshtein distance '%d'."
-                  % (best_ep_index, ep_distance))
-
-        # we have now inetref, season, episode, episode_id
-        buildSingle([inetref, season_nr, episode_nr], opts, tvmaze_episode_id=episode_id)
+    if matchesFound > 0:
+        print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                                   xml_declaration=True))
     else:
         # tvmaze.py -N 4711 "Episode 42"
-        raise Exception("Cannot find episodes for inetref '%s'." % inetref)
+        raise Exception("Cannot find any episode with subtitle '%s'." % tvsubtitle)
 
 
 def buildSingle(args, opts, tvmaze_episode_id=None):
@@ -251,46 +307,38 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
         episodes = tvmaze.get_show_episode_list(inetref)
         for ep in (episodes):
             if 0 and opts.debug:
-                print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
+                print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
                 for k, v in ep.__dict__.items():
                     print(k, " : ", v)
             if ep.season == int(season) and ep.number == int(episode):
                 tvmaze_episode_id = ep.id
-                ### XXX check if season == int(ep.season)          ### XXX
                 if opts.debug:
                     print(" Found tvmaze_episode_id : %d" % tvmaze_episode_id)
                 break
 
-    # get info for dedicated season:
-    ep_info = tvmaze.get_episode_information(tvmaze_episode_id)
-    if opts.debug:
-        for k, v in ep_info.__dict__.items():
-            print(k, " : ", v)
+    # build xml:
+    tree = etree.XML(u'<metadata></metadata>')
+    item = buildSingleItem(inetref, season, tvmaze_episode_id)
+    if item is not None:
+        tree.append(item.toXML())
+    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                               xml_declaration=True))
+
+
+def buildSingleItem(inetref, season, episode_id):
+    """
+    This routine returns a video metadata item for one episode.
+    """
+    from MythTV import VideoMetadata
+    from MythTV.tvmaze import tvmaze_api as tvmaze
+    from MythTV.tvmaze import locales
 
     # get global info for all seasons/episodes:
     posterList, fanartList, bannerList = get_show_art_lists(inetref)
-
     show_info = tvmaze.get_show(inetref, populated=True)
-    if opts.debug:
-        print("tvmaze.get_show(%s, populated=True) returned :" % inetref)
-        for k, v in show_info.__dict__.items():
-            print(k, " : ", v)
-        if 0 and opts.debug:
-            for c in show_info.cast:
-                for k, v in c.__dict__.items():
-                    print(k, " : ", v)
-            for c in show_info.crew:
-                for k, v in c.__dict__.items():
-                    print(k, " : ", v)
 
-    # get info for dedicated season:
-    season_info = show_info.seasons[int(season)]
-    if opts.debug:
-        for k, v in season_info.__dict__.items():
-            print(k, " : ", v)
-
-    # build xml:
-    tree = etree.XML(u'<metadata></metadata>')
+    # get info for season episodes:
+    ep_info = tvmaze.get_episode_information(episode_id)
     m = VideoMetadata()
     if show_info.genres is not None and len(show_info.genres) > 0:
         for g in show_info.genres:
@@ -346,6 +394,11 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
         except:
             pass
 
+    # get info for dedicated season:
+    season_info = show_info.seasons[int(season)]
+    #for k, v in season_info.__dict__.items():
+        #print(k, " : ", v)
+
     # prefer season coverarts over series coverart:
     if season_info.images is not None and len(season_info.images) > 0:
         m.images.append({'type': 'coverart', 'url': season_info.images['original'],
@@ -377,10 +430,7 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     if ep_info.images is not None and len(ep_info.images) > 0:
         m.images.append({'type': 'screenshot', 'url': ep_info.images['original'],
                          'thumb': ep_info.images['medium']})
-
-    tree.append(m.toXML())
-    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
-                               xml_declaration=True))
+    return m
 
 
 def buildCollection(tvinetref, opts):
