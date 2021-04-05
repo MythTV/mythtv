@@ -473,8 +473,8 @@ long long MythMediaBuffer::Seek(long long Position, int Whence, bool HasLock)
 {
     LOG(VB_FILE, LOG_INFO, LOC + QString("Seek: Position:%1 Type: %2 Locked: %3)")
         .arg(Position)
-        .arg((SEEK_SET == Whence) ? "SEEK_SET" : ((SEEK_CUR == Whence) ? "SEEK_CUR" : "SEEK_END"))
-        .arg(HasLock?"locked":"unlocked"));
+        .arg((SEEK_SET == Whence) ? "SEEK_SET" : ((SEEK_CUR == Whence) ? "SEEK_CUR" : "SEEK_END"),
+             HasLock?"locked":"unlocked"));
 
     if (!HasLock)
         m_rwLock.lockForWrite();
