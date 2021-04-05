@@ -40,8 +40,11 @@
 #include "recordinginfo.h"
 #include "cardutil.h"
 #include "inputinfo.h"
+#include "programinfo.h"
+#include "programdata.h"
 #include "programtypes.h"
 #include "recordingtypes.h"
+#include "channelutil.h"
 
 #include "serviceUtil.h"
 #include "mythscheduler.h"
@@ -280,6 +283,190 @@ DTC::Program* Dvr::GetRecorded(int RecordedId,
     FillProgramInfo( pProgram, &pi, true );
 
     return pProgram;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Dvr::AddRecordedCredits(int RecordedId, const QJsonObject &jsonObj)
+{
+    // Verify the corresponding recording exists
+    RecordingInfo ri(RecordedId);
+    if (!ri.HasPathname())
+        throw QString("AddRecordedCredits: recordedid %1 does "
+                      "not exist.").arg(RecordedId);
+
+    DBCredits* credits = jsonCastToCredits(jsonObj);
+    if (credits == nullptr)
+        throw QString("AddRecordedCredits: Failed to parse cast from json.");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    for (auto & person : *credits)
+    {
+        if (!person.InsertDB(query, ri.GetChanID(),
+                             ri.GetScheduledStartTime(), true))
+            throw QString("AddRecordedCredits: Failed to add credit "
+                          "%1 to DB").arg(person.toString());
+    }
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+int Dvr::AddRecordedProgram(const QJsonObject &jsonObj)
+{
+    QJsonObject root      = jsonObj;
+    QJsonObject program   = root["Program"].toObject();
+    QJsonObject channel   = program["Channel"].toObject();
+    QJsonObject recording = program["Recording"].toObject();
+    QJsonObject cast      = program["Cast"].toObject();
+
+    ProgInfo *pi = new ProgInfo();
+    int       chanid = channel.value("ChanId").toString("0").toUInt();
+    QString   hostname = program["HostName"].toString("");
+
+    if (ChannelUtil::GetChanNum(chanid).isEmpty())
+        throw QString("AddRecordedProgram: chanid %1 does "
+                      "not exist.").arg(chanid);
+
+    pi->m_title           = program.value("Title").toString("");
+    pi->m_subtitle        = program.value("SubTitle").toString("");
+    pi->m_description     = program.value("Description").toString("");
+    pi->m_category        = program.value("Category").toString("");
+    pi->m_starttime       = QDateTime::fromString(program.value("StartTime")
+                                                  .toString(""), Qt::ISODate);
+    pi->m_endtime         = QDateTime::fromString(program.value("EndTime")
+                                                  .toString(""), Qt::ISODate);
+    pi->m_originalairdate = QDate::fromString(program.value("Airdate").toString(),
+                                              Qt::ISODate);
+    pi->m_airdate       = pi->m_originalairdate.year();
+    pi->m_partnumber    = program.value("PartNumber").toString("0").toUInt();
+    pi->m_parttotal     = program.value("PartTotal").toString("0").toUInt();
+    pi->m_syndicatedepisodenumber = "";
+    pi->m_subtitleType  = ProgramInfo::SubtitleTypesFromNames
+                          (program.value("SubPropNames").toString(""));
+    pi->m_audioProps    = ProgramInfo::AudioPropertiesFromNames
+                          (program.value("AudioPropNames").toString(""));
+    pi->m_videoProps    = ProgramInfo::VideoPropertiesFromNames
+                          (program.value("VideoPropNames").toString(""));
+    pi->m_stars         = program.value("Stars").toString("0.0").toFloat();
+    pi->m_categoryType  = string_to_myth_category_type(program.value("CatType").toString(""));
+    pi->m_seriesId      = program.value("SeriesId").toString("");
+    pi->m_programId     = program.value("ProgramId").toString("");
+    pi->m_inetref       = program.value("Inetref").toString("");
+    pi->m_previouslyshown = false;
+    pi->m_listingsource = 0;
+//    pi->m_ratings =
+//    pi->m_genres =
+    pi->m_season        = program.value("Season").toString("0").toUInt();
+    pi->m_episode       = program.value("Episode").toString("0").toUInt();
+    pi->m_totalepisodes = program.value("TotalEpisodes").toString("0").toUInt();
+
+    pi->m_channel        = channel.value("ChannelName").toString("");
+
+    pi->m_startts        = recording.value("StartTs").toString("");
+    pi->m_endts          = recording.value("EndTs").toString("");
+    QDateTime recstartts = QDateTime::fromString(pi->m_startts, Qt::ISODate);
+    QDateTime recendts   = QDateTime::fromString(pi->m_endts, Qt::ISODate);
+
+    pi->m_title_pronounce = "";
+    pi->m_credits = jsonCastToCredits(cast);
+    pi->m_showtype  = "";
+    pi->m_colorcode = "";
+    pi->m_clumpidx  = "";
+    pi->m_clumpmax  = "";
+
+    // pi->m_ratings =
+
+    /* Create a recordedprogram DB entry. */
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!pi->InsertDB(query, chanid, true))
+    {
+        throw QString("AddRecordedProgram: "
+                      "Failed to add recordedprogram entry.");
+    }
+
+    /* Create recorded DB entry */
+    RecordingInfo ri(pi->m_title, pi->m_title,
+                     pi->m_subtitle, pi->m_subtitle,
+                     pi->m_description,
+                     pi->m_season, pi->m_episode,
+                     pi->m_totalepisodes,
+                     pi->m_syndicatedepisodenumber,
+                     pi->m_category,
+                     chanid,
+                     channel.value("ChanNum").toString("0"),
+                     channel.value("CallSign").toString(""),
+                     pi->m_channel,
+                     recording.value("RecGroup").toString(""),
+                     recording.value("PlayGroup").toString(""),
+                     hostname,
+                     recording.value("StorageGroup").toString(""),
+                     pi->m_airdate,
+                     pi->m_partnumber,
+                     pi->m_parttotal,
+                     pi->m_seriesId,
+                     pi->m_programId,
+                     pi->m_inetref,
+                     pi->m_categoryType,
+                     recording.value("Priority").toString("0").toInt(),
+                     pi->m_starttime,
+                     pi->m_endtime,
+                     recstartts,
+                     recendts,
+                     pi->m_stars,
+                     pi->m_originalairdate,
+                     program.value("Repeat").toString("false").toLower() == "true",
+                     static_cast<RecStatus::Type>(recording.value("Status").toString("-3").toInt()),
+                     false, // reactivate
+                     recording.value("RecordedId").toString("0").toInt(),
+                     0, // parentid
+                     static_cast<RecordingType>(recording.value("RecType").toString("0").toInt()),
+                     static_cast<RecordingDupInType>(recording.value("DupInType").toString("0").toInt()),
+                     static_cast<RecordingDupMethodType>(recording.value("DupMethod").toString("0").toInt()),
+                     channel.value("SourceId").toString("0").toUInt(),
+                     channel.value("InputId").toString("0").toUInt(),
+                     0, // findid
+                     channel.value("CommFree").toString("false").toLower() == "true",
+                     pi->m_subtitleType,
+                     pi->m_videoProps,
+                     pi->m_audioProps,
+                     false, // future
+                     0, // schedorder
+                     0, // mplexid
+                     0, // sgroupid,
+                     recording.value("EncoderName").toString(""));
+
+    ri.ProgramFlagsFromNames(program.value("ProgramFlagNames").toString(""));
+
+    QString filename = program.value("FileName").toString("");
+    QString ext("");
+    int idx = filename.lastIndexOf('.');
+    if (idx > 0)
+        ext = filename.right(filename.size() - idx - 1);
+    // Inserts this RecordingInfo into the database as an existing recording
+    if (!ri.InsertRecording(ext, true))
+        throw QString("Failed to create RecordingInfo database entry. "
+                      "Non unique starttime?");
+
+    ri.InsertFile();
+
+    ri.SaveAutoExpire(ri.IsAutoExpirable() ?
+                      kNormalAutoExpire : kDisableAutoExpire);
+    ri.SavePreserve(ri.IsPreserved());
+    ri.SaveCommFlagged(ri.IsCommercialFlagged() ?
+                       COMM_FLAG_DONE : COMM_FLAG_NOT_FLAGGED);
+    ri.SaveWatched(ri.IsWatched());
+    // TODO: Cutlist
+
+    ri.SetRecordingStatus(RecStatus::Recorded);
+    ri.SendUpdateEvent();
+
+    return ri.GetRecordingID();
 }
 
 /////////////////////////////////////////////////////////////////////////////

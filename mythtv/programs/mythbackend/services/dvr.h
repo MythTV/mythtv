@@ -66,6 +66,11 @@ class Dvr : public DvrServices
                                                 int              ChanId,
                                                 const QDateTime &recstarttsRaw  ) override; // DvrServices
 
+        bool              AddRecordedCredits  ( int RecordedId,
+                                                const QJsonObject & json) override;
+
+        int               AddRecordedProgram  ( const QJsonObject & json) override;
+
         bool              RemoveRecorded      ( int              RecordedId,
                                                 int              ChanId,
                                                 const QDateTime &recstarttsRaw,

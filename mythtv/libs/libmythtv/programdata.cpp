@@ -99,7 +99,7 @@ DBPerson::DBPerson(const QString &role, QString name,
 {
     if (!role.isEmpty())
     {
-        std::string rolestr = role.toStdString();
+        std::string rolestr = role.toLower().toStdString();
         for (size_t i = 0; i < roles.size(); ++i)
         {
             if (rolestr == roles[i])
@@ -117,8 +117,17 @@ QString DBPerson::GetRole(void) const
     return QString::fromStdString(roles[m_role]);
 }
 
+QString DBPerson::toString(void) const
+{
+    return QString("%1 %2 as %3")
+        .arg(m_role)
+        .arg(m_name)
+        .arg(m_character);
+}
+
 uint DBPerson::InsertDB(MSqlQuery &query, uint chanid,
-                        const QDateTime &starttime) const
+                        const QDateTime &starttime,
+                        bool recording) const
 {
     uint personid = GetPersonDB(query);
     if (!personid && InsertPersonDB(query))
@@ -132,7 +141,8 @@ uint DBPerson::InsertDB(MSqlQuery &query, uint chanid,
             roleid = GetRoleDB(query);
     }
 
-    return InsertCreditsDB(query, personid, roleid, chanid, starttime);
+    return InsertCreditsDB(query, personid, roleid, chanid,
+                           starttime, recording);
 }
 
 uint DBPerson::GetPersonDB(MSqlQuery &query) const
@@ -194,15 +204,18 @@ bool DBPerson::InsertRoleDB(MSqlQuery &query) const
 }
 
 uint DBPerson::InsertCreditsDB(MSqlQuery &query, uint personid, uint roleid,
-                               uint chanid, const QDateTime &starttime) const
+                               uint chanid, const QDateTime &starttime,
+                               bool recording) const
 {
     if (!personid)
         return 0;
 
-    query.prepare(
-        "REPLACE INTO credits "
+    QString table = recording ? "recordedcredits" : "credits";
+
+    query.prepare(QString("REPLACE INTO %1 "
         "       ( person,  roleid,  chanid,  starttime,  role, priority) "
-        "VALUES (:PERSON, :ROLEID, :CHANID, :STARTTIME, :ROLE, :PRIORITY);");
+        "VALUES (:PERSON, :ROLEID, :CHANID, :STARTTIME, :ROLE, :PRIORITY);")
+                  .arg(table));
     query.bindValue(":PERSON",    personid);
     query.bindValue(":ROLEID",    roleid);
     query.bindValue(":CHANID",    chanid);
@@ -1128,10 +1141,13 @@ bool DBEvent::MoveOutOfTheWayDB(
 /**
  *  \brief Insert Callback function when Allow Re-record is pressed in Watch Recordings
  */
-uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
+uint DBEvent::InsertDB(MSqlQuery &query, uint chanid,
+                       bool recording) const
 {
-    query.prepare(
-        "REPLACE INTO program ("
+    QString table = recording ? "recordedprogram" : "program";
+
+    query.prepare(QString(
+        "REPLACE INTO %1 ("
         "  chanid,         title,          subtitle,        description, "
         "  category,       category_type, "
         "  starttime,      endtime, "
@@ -1154,7 +1170,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
         " :SERIESID,      :PROGRAMID,     :PREVSHOWN, "
         " :SEASON,        :EPISODE,       :TOTALEPISODES, "
-        " :INETREF ) ");
+        " :INETREF ) ").arg(table));
 
     QString cattype = myth_category_type_to_string(m_categoryType);
     query.bindValue(":CHANID",      chanid);
@@ -1193,12 +1209,13 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
         return 0;
     }
 
+    table = recording ? "recordedrating" : "programrating";
     for (const auto & rating : qAsConst(m_ratings))
     {
-        query.prepare(
-            "INSERT IGNORE INTO programrating "
+        query.prepare(QString(
+            "INSERT IGNORE INTO %1 "
             "       ( chanid, starttime, `system`, rating) "
-            "VALUES (:CHANID, :START,    :SYS,  :RATING)");
+            "VALUES (:CHANID, :START,    :SYS,  :RATING)").arg(table));
         query.bindValue(":CHANID", chanid);
         query.bindValue(":START",  m_starttime);
         query.bindValue(":SYS",    rating.m_system);
@@ -1211,7 +1228,7 @@ uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
     if (m_credits)
     {
         for (auto & credit : *m_credits)
-            credit.InsertDB(query, chanid, m_starttime);
+            credit.InsertDB(query, chanid, m_starttime, recording);
     }
 
     add_genres(query, m_genres, chanid, m_starttime);
@@ -1277,18 +1294,22 @@ void ProgInfo::Squeeze(void)
  *  \param query  Any mysql query structure. The contents is ignored
  *                and the structure is repurposed for local queries.
  *  \param chanid The channel number for this program.
+ *  \param recorded defaults to false, i.e. program, programrating
  */
-uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
+uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid,
+                        bool recording) const
 {
-    LOG(VB_XMLTV, LOG_DEBUG,
-        QString("Inserting new program    : %1 - %2 %3 %4")
-            .arg(m_starttime.toString(Qt::ISODate))
-            .arg(m_endtime.toString(Qt::ISODate))
-            .arg(m_channel)
-            .arg(m_title));
+    QString table = recording ? "recordedprogram" : "program";
 
-    query.prepare(
-        "REPLACE INTO program ("
+    LOG(VB_XMLTV, LOG_DEBUG,
+        QString("Inserting new %1    : %2 - %3 %4 %5")
+        .arg(table)
+        .arg(m_starttime.toString(Qt::ISODate))
+        .arg(m_endtime.toString(Qt::ISODate))
+        .arg(m_channel));
+
+    query.prepare(QString(
+        "REPLACE INTO %1 ("
         "  chanid,         title,          subtitle,        description, "
         "  category,       category_type,  "
         "  starttime,      endtime, "
@@ -1301,7 +1322,6 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
         "  stars,          showtype,       title_pronounce, colorcode, "
         "  season,         episode,        totalepisodes, "
         "  inetref ) "
-
         "VALUES("
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
         " :CATEGORY,      :CATTYPE,       "
@@ -1314,7 +1334,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
         " :SERIESID,      :PROGRAMID,     :PREVSHOWN, "
         " :STARS,         :SHOWTYPE,      :TITLEPRON,      :COLORCODE, "
         " :SEASON,        :EPISODE,       :TOTALEPISODES, "
-        " :INETREF )");
+        " :INETREF )").arg(table));
 
     QString cattype = myth_category_type_to_string(m_categoryType);
 
@@ -1357,29 +1377,30 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
 
     if (!query.exec())
     {
-        MythDB::DBError("program insert", query);
+        MythDB::DBError(table + " insert", query);
         return 0;
     }
 
+    table = recording ? "recordedrating" : "programrating";
     for (const auto & rating : m_ratings)
     {
-        query.prepare(
-            "INSERT IGNORE INTO programrating "
-            "       ( chanid, starttime, `system`, rating) "
-            "VALUES (:CHANID, :START,    :SYS,  :RATING)");
+        query.prepare(QString("INSERT IGNORE INTO %1 "
+                              "       ( chanid, starttime, `system`, rating) "
+                              "VALUES (:CHANID, :START,    :SYS,  :RATING)")
+                      .arg(table));
         query.bindValue(":CHANID", chanid);
         query.bindValue(":START",  m_starttime);
         query.bindValue(":SYS",    rating.m_system);
         query.bindValue(":RATING", rating.m_rating);
 
         if (!query.exec())
-            MythDB::DBError("programrating insert", query);
+            MythDB::DBError(QString("%1 insert").arg(table), query);
     }
 
     if (m_credits)
     {
         for (auto & credit : *m_credits)
-            credit.InsertDB(query, chanid, m_starttime);
+            credit.InsertDB(query, chanid, m_starttime, recording);
     }
 
     add_genres(query, m_genres, chanid, m_starttime);
