@@ -69,7 +69,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     VideoFrameType type = MythAVUtil::PixelFormatToFrameType((*Context)->pix_fmt);
     uint depth = static_cast<uint>(MythVideoFrame::ColorDepth(type) - 8);
     QString desc = QString("'%1 %2 %3 Depth:%4 %5x%6'")
-            .arg(codecstr).arg(profile).arg(pixfmt).arg(depth + 8)
+            .arg(codecstr, profile, pixfmt).arg(depth + 8)
             .arg((*Context)->width).arg((*Context)->height);
 
     // N.B. on stream changes format is set to CUDA/NVDEC. This may break if the new

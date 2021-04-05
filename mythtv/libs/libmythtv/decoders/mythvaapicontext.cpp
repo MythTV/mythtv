@@ -149,7 +149,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext** Context,
     if (desired == VAProfileNone)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("VAAPI does not support decoding '%1 %2 %3'")
-            .arg(codec).arg(profile).arg(pixfmt));
+            .arg(codec, profile, pixfmt));
         return failure;
     }
 
@@ -192,7 +192,7 @@ MythCodecID MythVAAPIContext::GetSupportedCodec(AVCodecContext** Context,
         ok = haveprofile(MythCodecContext::MJPEG, QSize());
     }
 
-   auto desc = QString("'%1 %2 %3 %4x%5'").arg(codec).arg(profile).arg(pixfmt)
+    auto desc = QString("'%1 %2 %3 %4x%5'").arg(codec, profile, pixfmt)
                                           .arg((*Context)->width).arg((*Context)->height);
 
     if (ok)
@@ -317,7 +317,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext* Context)
         {
             auto vaapiid = static_cast<MythCodecID>(kCodec_MPEG1_VAAPI + (mpeg_version(Context->codec_id) - 1));
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Forcing surface format for %1 and %2 with driver '%3'")
-                .arg(toString(vaapiid)).arg(MythOpenGLInterop::TypeToString(interop->GetType())).arg(vendor));
+                .arg(toString(vaapiid), MythOpenGLInterop::TypeToString(interop->GetType()), vendor));
         }
 
         std::array<VASurfaceAttrib,3> prefs {{

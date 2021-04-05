@@ -171,7 +171,7 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
     }
 
     QString desc = QString("'%1 %2 %3 %4x%5'")
-        .arg(codec).arg(profile).arg(pixfmt).arg((*Context)->width).arg((*Context)->height);
+        .arg(codec, profile, pixfmt).arg((*Context)->width).arg((*Context)->height);
 
     if (!vdpau)
     {
