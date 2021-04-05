@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-#  Copyright (c) 2020 Lachlan Mackenzie
+#  Copyright (c) 2021 Steve Erlenborn
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -21,28 +21,25 @@
 #  SOFTWARE.
 
 
-# ---------------------------------------------------
-# Steve Erlenborn
-# Changes implemented for MythTV:
-# - added show_artwork
-#
-# ---------------------------------------------------
-
 from __future__ import unicode_literals
 
+class Artwork(object):
+    def __init__(self, data):
+        self.id = data.get('id')        # ID for the artwork
+        self.type = data.get('type')    # 'poster', 'background', or 'banner'
+        self.main = data.get('main')    # 'true' for official artwork, released by the Network
 
-API_URL = 'https://api.tvmaze.com'
-search_show_name = 'https://api.tvmaze.com/search/shows?'
-search_show_best_match = 'https://api.tvmaze.com/singlesearch/shows?'
-search_external_show_id = 'https://api.tvmaze.com/lookup/shows?'
-show_information = 'https://api.tvmaze.com/shows/{0}'
-show_episode_list = 'https://api.tvmaze.com/shows/{0}/episodes?'
-show_episode = 'http://api.tvmaze.com/shows/{0}/episodebynumber?'
-show_episodes_on_date = 'http://api.tvmaze.com/shows/{0}/episodesbydate?'
-show_season_list = 'http://api.tvmaze.com/shows/{0}/seasons'
-season_episode_list = 'http://api.tvmaze.com/seasons/{0}/episodes'
-show_alias_list = 'http://api.tvmaze.com/shows/{0}/akas'
-episode_information = 'http://api.tvmaze.com/episodes/{0}?'
-show_cast = 'http://api.tvmaze.com/shows/{0}/cast'
-show_crew = 'http://api.tvmaze.com/shows/{0}/crew'
-show_artwork = 'http://api.tvmaze.com/shows/{0}/images'
+        if (data.get('resolutions') is not None) and \
+           (data.get('resolutions').get('original') is not None):
+            self.original = data.get('resolutions').get('original').get('url')
+        else:
+            self.original = None
+
+        if (data.get('resolutions') is not None) and \
+           (data.get('resolutions').get('medium') is not None):
+            self.medium = data.get('resolutions').get('medium').get('url')
+        else:
+            self.medium = None
+
+    def __str__(self):
+        return self.original

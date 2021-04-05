@@ -26,6 +26,7 @@
 # Changes implemented for MythTV:
 # - added support for requests.Session()
 # - relax requirement for dateutil
+# - added get_show_artwork()
 #
 # ---------------------------------------------------
 
@@ -44,6 +45,7 @@ from .episode import Episode
 from .season import Season
 from .person import Character, Person, Crew
 from .embed import Embed
+from .artwork import Artwork
 
 
 MYTHTV_TVMAZE_API_VERSION = "0.1.0"
@@ -90,6 +92,8 @@ def _query_api(url, params=None):
                 sys.exit(1)
             time.sleep(10)
             http_retries += 1
+        elif res.status_code == 404: # no such page
+            return None
         elif res.status_code != requestcodes.OK:
             print('Page request was unsuccessful: ' + str(res.status_code), res.reason)
             sys.exit(1)
@@ -233,3 +237,8 @@ def get_show_cast(tvmaze_id):
 def get_show_crew(tvmaze_id):
     res = _query_api(endpoints.show_crew.format(str(tvmaze_id)))
     return [Crew(crew_member) for crew_member in res]
+
+
+def get_show_artwork(tvmaze_id):
+    res = _query_api(endpoints.show_artwork.format(str(tvmaze_id)))
+    return [Artwork(art_item) for art_item in res]
