@@ -15,7 +15,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -100,6 +99,9 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
                 if(doc.isObject())
                     *(( QJsonObject *)pParam) = doc.object();
             }
+            else
+                throw QString("Invalid JSON: %1").arg(sValue);
+
             break;
         }
         default:

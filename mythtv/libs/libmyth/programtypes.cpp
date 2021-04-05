@@ -27,6 +27,7 @@ QString toString(MarkTypes type)
 {
     switch (type)
     {
+        case MARK_INVALID:      return "INVALID";
         case MARK_ALL:          return "ALL";
         case MARK_UNSET:        return "UNSET";
         case MARK_TMP_CUT_END:  return "TMP_CUT_END";
@@ -59,6 +60,14 @@ QString toString(MarkTypes type)
     }
 
     return "unknown";
+}
+
+MarkTypes markTypeFromString(const QString & str)
+{
+    stringMarkMap::const_iterator Im;
+    if ((Im = MarkTypeStrings.find(str)) == MarkTypeStrings.end())
+        return MARK_INVALID;
+    return (*Im).second;
 }
 
 QString toString(AvailableStatusType status)

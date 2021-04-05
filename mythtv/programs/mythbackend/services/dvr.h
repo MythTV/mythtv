@@ -122,6 +122,11 @@ class Dvr : public DvrServices
         DTC::CutList*     GetRecordedSeek      ( int              RecordedId,
                                                  const QString   &OffsetType ) override; // DvrServices
 
+        DTC::MarkupList*  GetRecordedMarkup ( int                RecordedId ) override; // DvrServices
+
+        bool              SetRecordedMarkup     ( int            RecordedId,
+                                                  const QJsonObject & json ) override; // DvrServices
+
         DTC::ProgramList* GetConflictList     ( int              StartIndex,
                                                 int              Count,
                                                 int              RecordId ) override; // DvrServices

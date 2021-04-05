@@ -25,6 +25,7 @@
 #include "datacontracts/input.h"
 #include "datacontracts/inputList.h"
 #include "datacontracts/cutList.h"
+#include "datacontracts/markupList.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -58,6 +59,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
     Q_CLASSINFO( "EnableRecordSchedule_Method",                 "POST" )
     Q_CLASSINFO( "DisableRecordSchedule_Method",                "POST" )
     Q_CLASSINFO( "ManageJobQueue_Method",                       "POST" )
+    Q_CLASSINFO( "SetRecordedMarkup_Method",                    "POST" )
 
 
     public:
@@ -74,6 +76,7 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
             DTC::TitleInfoList::InitializeCustomTypes();
             DTC::RecRuleFilterList::InitializeCustomTypes();
             DTC::CutList::InitializeCustomTypes();
+            DTC::MarkupList::InitializeCustomTypes();
         }
 
     public slots:
@@ -158,6 +161,11 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
 
         virtual DTC::CutList*      GetRecordedSeek       ( int              RecordedId,
                                                            const QString   &OffsetType ) = 0;
+
+        virtual DTC::MarkupList*   GetRecordedMarkup     ( int              RecordedId ) = 0;
+
+        virtual bool               SetRecordedMarkup     ( int              RecordedId,
+                                                           const QJsonObject & json ) = 0;
 
         virtual DTC::ProgramList*  GetConflictList       ( int              StartIndex,
                                                            int              Count,

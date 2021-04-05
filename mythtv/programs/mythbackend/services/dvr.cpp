@@ -645,6 +645,108 @@ DTC::CutList* Dvr::GetRecordedSeek ( int RecordedId,
 //
 /////////////////////////////////////////////////////////////////////////////
 
+DTC::MarkupList* Dvr::GetRecordedMarkup ( int RecordedId )
+{
+    RecordingInfo ri;
+    ri = RecordingInfo(RecordedId);
+
+    if (!ri.HasPathname())
+        throw QString("Invalid RecordedId %1").arg(RecordedId);
+
+    QVector<ProgramInfo::MarkupEntry> mapMark;
+    QVector<ProgramInfo::MarkupEntry> mapSeek;
+    QVector<ProgramInfo::MarkupEntry>::iterator it;
+
+    ri.QueryMarkup(mapMark, mapSeek);
+
+    auto* pMarkupList = new DTC::MarkupList();
+    for (it = mapMark.begin(); it != mapMark.end(); ++it)
+    {
+        DTC::Markup *pMarkup = pMarkupList->AddNewMarkup();
+        QString typestr = toString(static_cast<MarkTypes>((*it).type));
+        pMarkup->setType(typestr);
+        pMarkup->setFrame((*it).frame);
+        if ((*it).isDataNull)
+            pMarkup->setData("NULL");
+        else
+            pMarkup->setData(QString::number((*it).data));
+    }
+    for (it = mapSeek.begin(); it != mapSeek.end(); ++it)
+    {
+        DTC::Markup *pSeek = pMarkupList->AddNewSeek();
+        QString typestr = toString(static_cast<MarkTypes>((*it).type));
+        pSeek->setType(typestr);
+        pSeek->setFrame((*it).frame);
+        if ((*it).isDataNull)
+            pSeek->setData("NULL");
+        else
+            pSeek->setData(QString::number((*it).data));
+    }
+
+
+    return pMarkupList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
+{
+    RecordingInfo ri;
+    ri = RecordingInfo(RecordedId);
+
+    if (!ri.HasPathname())
+        throw QString("Invalid RecordedId %1").arg(RecordedId);
+
+    QVector<ProgramInfo::MarkupEntry> mapMark;
+    QVector<ProgramInfo::MarkupEntry> mapSeek;
+
+    QJsonObject markuplist = jsonObj["MarkupList"].toObject();
+
+    QJsonArray  marks = markuplist["Mark"].toArray();
+    for (const QJsonValue & m : marks)
+    {
+        QJsonObject markup = m.toObject();
+        ProgramInfo::MarkupEntry entry;
+
+        QString typestr = markup.value("Type").toString("");
+        entry.type  = markTypeFromString(typestr);
+        entry.frame = markup.value("Frame").toString("-1").toLongLong();
+        QString data  = markup.value("Data").toString("NULL");
+        entry.isDataNull = (data == "NULL");
+        if (!entry.isDataNull)
+            entry.data = data.toLongLong();
+
+        mapMark.append(entry);
+    }
+
+    QJsonArray  seeks = markuplist["Seek"].toArray();
+    for (const QJsonValue & m : seeks)
+    {
+        QJsonObject markup = m.toObject();
+        ProgramInfo::MarkupEntry entry;
+
+        QString typestr = markup.value("Type").toString("");
+        entry.type  = markTypeFromString(typestr);
+        entry.frame = markup.value("Frame").toString("-1").toLongLong();
+        QString data  = markup.value("Data").toString("NULL");
+        entry.isDataNull = (data == "NULL");
+        if (!entry.isDataNull)
+            entry.data = data.toLongLong();
+
+        mapSeek.append(entry);
+    }
+
+    ri.SaveMarkup(mapMark, mapSeek);
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
 DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
                                         int nCount      )
 {

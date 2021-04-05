@@ -59,6 +59,7 @@ HEADERS += datacontracts/recRuleFilter.h         datacontracts/recRuleFilterList
 HEADERS += datacontracts/castMember.h            datacontracts/castMemberList.h
 HEADERS += datacontracts/frontend.h              datacontracts/frontendList.h
 HEADERS += datacontracts/cutting.h               datacontracts/cutList.h
+HEADERS += datacontracts/markup.h                datacontracts/markupList.h
 HEADERS += datacontracts/backendInfo.h           datacontracts/envInfo.h
 HEADERS += datacontracts/buildInfo.h             datacontracts/logInfo.h
 HEADERS += datacontracts/genre.h                 datacontracts/genreList.h
