@@ -368,12 +368,6 @@ Doc-Tests for tvmaze
 </metadata>
 
 
-
-
-
-
-
-
 ##
 ## Testing this traceback does not work:
 ##
@@ -667,6 +661,50 @@ Doc-Tests for tvmaze
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/29/73727.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/29/73727.jpg"/>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/26/66242.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/26/66242.jpg"/>
       <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/226/566930.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# This example shows the '-N title datetime' syntax
+>>> from MythTV import datetime
+>>> showtimeisoutc = "2021-03-21 13:00:00"
+>>> showtimeutc = datetime.fromIso(showtimeisoutc, tz='Etc/UTC')
+>>> showtimelocal = showtimeutc.astimezone(datetime.localTZ())
+>>> showtimeisolocal = showtimelocal.strftime("%Y-%m-%d %H:%M:%S")
+>>> sys.argv = shlex.split('tvmaze -N "CBS Sunday Morning" "%s"' % showtimeisolocal)
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>CBS News Sunday Morning</title>
+    <subtitle>Episode 12</subtitle>
+    <description>Hosted by Jane Pauley. In our cover story, David Pogue looks at the hit online instruction series MasterClass. Plus: Singer Demi Lovato talks with Tracy Smith about her life since surviving a 2018 heroin overdose; Martha Teichner visits with abstract artist Frank Stella; Ali MacGraw and Ryan O'Neal reminisce about the making of the classic "Love Story" with Ben Mankiewicz; Seth Doane reviews an exhibition of Roman and Greek antiquities which have been out of public view for about 70 years; Rita Braver tells the story of a man, adopted at birth, who reconnects with his birth mother; Conor Knighton explores extinct species that may not be extinct; and Luke Burbank reports on the rise in sports betting, and tests his luck at a Las Vegas sportsbook.</description>
+    <season>2021</season>
+    <episode>12</episode>
+    <inetref>15779</inetref>
+    <collectionref>15779</collectionref>
+    <language>en</language>
+    <releasedate>2021-03-21</releasedate>
+    <popularity>...</popularity>
+    <year>2021</year>
+    <runtime>90</runtime>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <people>
+      <person name="Jane Pauley" character="Host" job="Actor"/>
+      <person name="Charles Kuralt" character="Host" job="Actor"/>
+      <person name="Charles Osgood" character="Host" job="Actor"/>
+      <person name="Lee Cowan" character="Substitute Host" job="Actor"/>
+      <person name="Erin Moriarty" character="Erin" job="Actor"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/237/592585.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/237/592585.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/53/132964.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/53/132964.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/90/226497.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/90/226497.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/221/553290.jpg"/>
+      <image type="screenshot" url="https://static.tvmaze.com/uploads/images/original_untouched/300/751352.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_landscape/300/751352.jpg"/>
     </images>
   </item>
 </metadata>
