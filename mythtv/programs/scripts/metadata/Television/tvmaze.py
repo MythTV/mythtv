@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 
 __title__ = "TVmaze.com"
 __author__ = "Roland Ernst, Steve Erlenborn"
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 
 import sys
@@ -106,6 +106,11 @@ def buildList(tvtitle, opts):
         m.inetref = check_item(m, ("inetref", str(show_info.id)), ignore=False)
         m.collectionref = check_item(m, ("collectionref", str(show_info.id)), ignore=False)
         m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
+        m.userrating = check_item(m, ("userrating", show_info.rating['average']))
+        try:
+            m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+        except (TypeError, ValueError):
+            pass
         if show_info.premiere_date:
             m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
             m.year = check_item(m, ("year", show_info.premiere_date.year))
@@ -310,6 +315,11 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     m.inetref = check_item(m, ("inetref", str(show_info.id)), ignore=False)
     m.collectionref = check_item(m, ("inetref", str(show_info.id)), ignore=False)
     m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
+    m.userrating = check_item(m, ("userrating", show_info.rating['average']))
+    try:
+        m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+    except (TypeError, ValueError):
+        pass
     # prefer episode airdate dates:
     if ep_info.airdate:
         m.releasedate = check_item(m, ("releasedate", ep_info.airdate))
@@ -409,6 +419,10 @@ def buildCollection(tvinetref, opts):
     m.imdb = check_item(m, ("imdb", str(show_info.external_ids['imdb'])))
     m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
     m.userrating = check_item(m, ("userrating", show_info.rating['average']))
+    try:
+        m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+    except (TypeError, ValueError):
+        pass
     if show_info.premiere_date:
         m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
         m.year = check_item(m, ("year", show_info.premiere_date.year))

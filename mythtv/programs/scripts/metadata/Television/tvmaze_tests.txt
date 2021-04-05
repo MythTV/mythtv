@@ -20,6 +20,7 @@ Doc-Tests for tvmaze
     <collectionref>24598</collectionref>
     <language>zh</language>
     <releasedate>2013-02-15</releasedate>
+    <popularity>13.0</popularity>
     <year>2013</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
@@ -32,6 +33,7 @@ Doc-Tests for tvmaze
     <collectionref>31623</collectionref>
     <language>en</language>
     <releasedate>2013-01-11</releasedate>
+    <popularity>0.0</popularity>
     <year>2013</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/126/316260.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/126/316260.jpg"/>
@@ -44,6 +46,8 @@ Doc-Tests for tvmaze
     <collectionref>52474</collectionref>
     <language>en</language>
     <releasedate>2021-01-13</releasedate>
+    <userrating>6.800000</userrating>
+    <popularity>81.0</popularity>
     <year>2021</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/289/723250.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/289/723250.jpg"/>
@@ -57,6 +61,7 @@ Doc-Tests for tvmaze
     <collectionref>42539</collectionref>
     <language>en</language>
     <releasedate>2019-02-24</releasedate>
+    <popularity>0.0</popularity>
     <year>2019</year>
     <images>
       <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/231/578439.jpg"/>
@@ -69,6 +74,7 @@ Doc-Tests for tvmaze
     <collectionref>19206</collectionref>
     <language>en</language>
     <releasedate>2010-11-03</releasedate>
+    <popularity>0.0</popularity>
     <year>2010</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/67/169985.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/67/169985.jpg"/>
@@ -83,6 +89,7 @@ Doc-Tests for tvmaze
     <collectionref>27687</collectionref>
     <language>en</language>
     <releasedate>2017-07-18</releasedate>
+    <popularity>0.0</popularity>
     <year>2017</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/118/296875.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/118/296875.jpg"/>
@@ -94,6 +101,7 @@ Doc-Tests for tvmaze
     <inetref>30203</inetref>
     <collectionref>30203</collectionref>
     <language>en</language>
+    <popularity>18.0</popularity>
   </item>
   <item>
     <title>Boys on Film - A Night with Duran Duran</title>
@@ -102,6 +110,7 @@ Doc-Tests for tvmaze
     <collectionref>37161</collectionref>
     <language>en</language>
     <releasedate>2018-06-29</releasedate>
+    <popularity>0.0</popularity>
     <year>2018</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/158/396533.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/158/396533.jpg"/>
@@ -114,6 +123,7 @@ Doc-Tests for tvmaze
     <collectionref>3237</collectionref>
     <language>ko</language>
     <releasedate>2014-08-04</releasedate>
+    <popularity>46.0</popularity>
     <year>2014</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/17/43577.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/17/43577.jpg"/>
@@ -126,6 +136,8 @@ Doc-Tests for tvmaze
     <collectionref>36655</collectionref>
     <language>en</language>
     <releasedate>2018-10-12</releasedate>
+    <userrating>6.200000</userrating>
+    <popularity>85.0</popularity>
     <year>2018</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/213/534600.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/213/534600.jpg"/>
@@ -150,6 +162,7 @@ Doc-Tests for tvmaze
     <collectionref>24598</collectionref>
     <language>zh</language>
     <releasedate>2013-02-23</releasedate>
+    <popularity>13.0</popularity>
     <year>2013</year>
     <runtime>50</runtime>
     <categories>
@@ -170,6 +183,7 @@ Doc-Tests for tvmaze
   </item>
 </metadata>
 
+
 # python3 tvmaze.py -C 525
 >>> sys.argv = shlex.split('tvmaze -C 525')
 >>> main()
@@ -184,6 +198,7 @@ Doc-Tests for tvmaze
     <language>en</language>
     <releasedate>2000-10-05</releasedate>
     <userrating>8.400000</userrating>
+    <popularity>84.0</popularity>
     <year>2000</year>
     <categories>
       <category name="Drama"/>
@@ -204,7 +219,6 @@ Doc-Tests for tvmaze
 </metadata>
 
 
-
 # python3 tvmaze.py -D 525 5 2
 >>> sys.argv = shlex.split('tvmaze -D 525 5 2')
 >>> main()
@@ -220,6 +234,8 @@ Doc-Tests for tvmaze
     <collectionref>525</collectionref>
     <language>en</language>
     <releasedate>2004-09-28</releasedate>
+    <userrating>8.400000</userrating>
+    <popularity>84.0</popularity>
     <year>2004</year>
     <runtime>60</runtime>
     <categories>
@@ -311,8 +327,6 @@ Doc-Tests for tvmaze
 </metadata>
 
 
-
-
 # python3 tvmaze.py -M BÖsterreich
 >>> if sys.version_info[0] == 2:
 ...     sys.argv = shlex.split(u'tvmaze -M BÖsterreich'.encode('utf-8'))
@@ -330,6 +344,7 @@ Doc-Tests for tvmaze
     <collectionref>23361</collectionref>
     <language>de</language>
     <releasedate>2014-04-01</releasedate>
+    <popularity>0.0</popularity>
     <year>2014</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/219221.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/87/219221.jpg"/>
@@ -342,6 +357,7 @@ Doc-Tests for tvmaze
     <collectionref>34194</collectionref>
     <language>de</language>
     <releasedate>2007-05-31</releasedate>
+    <popularity>0.0</popularity>
     <year>2007</year>
     <images>
       <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/141/352576.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/141/352576.jpg"/>
@@ -349,6 +365,7 @@ Doc-Tests for tvmaze
     </images>
   </item>
 </metadata>
+
 
 
 ##
