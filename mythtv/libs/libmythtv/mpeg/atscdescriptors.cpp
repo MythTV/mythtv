@@ -294,11 +294,13 @@ QString AC3AudioStreamDescriptor::toString() const
     QString str;
     str.append(QString("AC-3 Audio Stream Descriptor "));
     str.append(QString(" full_srv(%1) sample_rate(%2) bit_rate(%3, %4)\n")
-               .arg(static_cast<int>(FullService())).arg(SampleRateCodeString())
-               .arg(BitRateCodeString()).arg(BitRateCode()));
+               .arg(static_cast<int>(FullService()))
+               .arg(SampleRateCodeString(),
+                    BitRateCodeString())
+               .arg(BitRateCode()));
     str.append(QString("      bsid(%1) bs_mode(%2) channels(%3) Dolby(%4)\n")
                .arg(bsid()).arg(BasicServiceMode())
-               .arg(ChannelsString()).arg(SurroundModeString()));
+               .arg(ChannelsString(), SurroundModeString()));
 
     /*
     str.append(QString("   language code: %1").arg(languageCode()));

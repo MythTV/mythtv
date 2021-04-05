@@ -138,9 +138,9 @@ QString ServiceDescriptionTable::toString(void) const
         str.append(QString("  Service #%1 SID(0x%2) ")
                    .arg(i, 2, 10).arg(ServiceID(i), 0, 16));
         str.append(QString("eit_schd(%1) eit_pf(%2) encrypted(%3)\n")
-                   .arg(HasEITSchedule(i) ? "t" : "f")
-                   .arg(HasEITPresentFollowing(i) ? "t" : "f")
-                   .arg(IsEncrypted(i) ? "t" : "f"));
+                   .arg(HasEITSchedule(i) ? "t" : "f",
+                        HasEITPresentFollowing(i) ? "t" : "f",
+                        IsEncrypted(i) ? "t" : "f"));
 
         if (0 != ServiceDescriptorsLength(i))
         {

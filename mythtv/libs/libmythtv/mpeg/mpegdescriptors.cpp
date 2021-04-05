@@ -730,7 +730,7 @@ QString MPEGDescriptor::hexdump(void) const
         {
             str.append(QString("      %1 %2 |%3|")
                 .arg(i - (i % 16),3,16,QChar('0'))
-                .arg(hex).arg(prt));
+                .arg(hex, prt));
             hex.clear();
             prt.clear();
             if (i < (DescriptorLength() - 1))
@@ -869,8 +869,8 @@ QString ConditionalAccessDescriptor::toString() const
 QString ISO639LanguageDescriptor::toString() const
 {
     return QString("ISO-639 Language: code(%1) canonical(%2) eng(%3)")
-        .arg(LanguageString()).arg(CanonicalLanguageString())
-        .arg(iso639_key_toName(CanonicalLanguageKey()));
+        .arg(LanguageString(), CanonicalLanguageString(),
+             iso639_key_toName(CanonicalLanguageKey()));
 }
 
 QString SystemClockDescriptor::toString() const

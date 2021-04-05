@@ -860,8 +860,8 @@ QString ProgramAssociationTable::toStringXML(uint indent_level) const
         .arg(indent_0)
         .arg(TransportStreamID(),4,16,QChar('0'))
         .arg(ProgramCount())
-        .arg(indent_1)
-        .arg(PSIPTable::XMLValues(indent_level + 1));
+        .arg(indent_1,
+             PSIPTable::XMLValues(indent_level + 1));
 
     for (uint i = 0; i < ProgramCount(); i++)
     {
@@ -1192,8 +1192,8 @@ QString ConditionalAccessTable::toStringXML(uint indent_level) const
 
     QString str =
         QString("%1<ConditionalAccessSection %3")
-        .arg(indent_0)
-        .arg(PSIPTable::XMLValues(indent_level + 1));
+        .arg(indent_0,
+             PSIPTable::XMLValues(indent_level + 1));
 
     std::vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
@@ -1226,9 +1226,9 @@ QString SpliceTimeView::toString(int64_t first, int64_t last) const
         QTime rel = QTime(0,0,0,0).addMSecs(elapsed/90);
 
         return QString("splice_time(pts: %1 abs: %2, rel: +%3)")
-            .arg(abs_pts_time)
-            .arg(abs.toString("hh:mm:ss.zzz"))
-            .arg(rel.toString("hh:mm:ss.zzz"));
+            .arg(QString::number(abs_pts_time),
+                 abs.toString("hh:mm:ss.zzz"),
+                 rel.toString("hh:mm:ss.zzz"));
     }
 
     return QString("splice_time(pts: %1)").arg(abs_pts_time);
@@ -1265,7 +1265,7 @@ QString SpliceTimeView::toStringXML(
     }
 
     return QString("%1<SpliceTime pts=\"%2\" %3%4/>")
-        .arg(indent).arg(abs_pts_time).arg(abs_str).arg(rel_str);
+        .arg(indent,QString::number(abs_pts_time),abs_str,rel_str);
 }
 
 /// \brief Returns decrypted version of this packet.
@@ -1443,11 +1443,11 @@ QString SpliceInsertView::toString(int64_t first, int64_t last) const
                 "out_of_network(%3) program_splice(%4) "
                 "duration(%5) immediate(%6)\n  ")
         .arg(SpliceEventID(),0,16)
-        .arg(IsSpliceEventCancel()?"yes":"no")
-        .arg(IsOutOfNetwork()?"yes":"no")
-        .arg(IsProgramSplice()?"yes":"no")
-        .arg(IsDuration()?"yes":"no")
-        .arg(IsSpliceImmediate()?"yes":"no");
+        .arg(IsSpliceEventCancel()?"yes":"no",
+             IsOutOfNetwork()?"yes":"no",
+             IsProgramSplice()?"yes":"no",
+             IsDuration()?"yes":"no",
+             IsSpliceImmediate()?"yes":"no");
 
     if (IsProgramSplice() && !IsSpliceImmediate())
         str += SpliceTime().toString(first, last);
@@ -1481,9 +1481,9 @@ QString SpliceInformationTable::toStringXML(
     QString str = QString(
         "%1<SpliceInformationSection %2 encryption_algorithm=\"%3\" "
         "pts_adjustment=\"%4\" code_word_index=\"%5\" command_type=\"%6\" scte_pid=\"0x%7\" >\n")
-        .arg(indent)
-        .arg(cap_time)
-        .arg(EncryptionAlgorithmString())
+        .arg(indent,
+             cap_time,
+             EncryptionAlgorithmString())
         .arg(PTSAdjustment())
         .arg(CodeWordIndex())
         .arg(SpliceCommandTypeString())
@@ -1523,16 +1523,16 @@ QString SpliceInsertView::toStringXML(
 
     str += QString(
         "%1out_of_network=\"%2\" program_splice=\"%3\" duration=\"%4\"\n")
-        .arg(indent_1)
-        .arg(xml_bool_to_string(IsOutOfNetwork()))
-        .arg(xml_bool_to_string(IsProgramSplice()))
-        .arg(xml_bool_to_string(IsDuration()));
+        .arg(indent_1,
+             xml_bool_to_string(IsOutOfNetwork()),
+             xml_bool_to_string(IsProgramSplice()),
+             xml_bool_to_string(IsDuration()));
 
     str += QString(
         "%1immediate=\"%2\" unique_program_id=\"%3\"\n"
         "%4avail_num=\"%5\" avails_expected=\"%6\">\n")
-        .arg(indent_1)
-        .arg(xml_bool_to_string(IsSpliceImmediate()))
+        .arg(indent_1,
+             xml_bool_to_string(IsSpliceImmediate()))
         .arg(UniqueProgramID())
         .arg(indent_1)
         .arg(AvailNum())

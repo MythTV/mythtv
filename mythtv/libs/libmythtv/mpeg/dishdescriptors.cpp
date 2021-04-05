@@ -109,7 +109,7 @@ QString DishEventTagsDescriptor::programid(void) const
     } else
         return prefix;
 
-    QString id = QString("%1%2%3").arg(prefix).arg(series).arg(episode, 4, 0);
+    QString id = QString("%1%2%3").arg(prefix, series).arg(episode, 4, 0);
 
     return id;
 }
