@@ -52,7 +52,7 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
 
         LOG(VB_RECORD, LOG_INFO,
             QString("CetonSH[%1]: Creating new stream handler %2 for %3")
-            .arg(inputid).arg(devkey).arg(devname));
+            .arg(QString::number(inputid), devkey, devname));
     }
     else
     {
@@ -60,8 +60,8 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
         uint rcount = s_handlersRefCnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("CetonSH[%1]: Using existing stream handler %2 for %3")
-            .arg(inputid).arg(devkey)
-            .arg(devname) + QString(" (%1 in use)").arg(rcount));
+                .arg(QString::number(inputid), devkey, devname) +
+            QString(" (%1 in use)").arg(rcount));
     }
 
     return s_handlers[devkey];
@@ -160,7 +160,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("Ceton device %1 initialized. SN: %2, "
                     "Firmware ver. %3, Hardware ver. %4")
-            .arg(m_ipAddress).arg(sernum).arg(firmware_ver).arg(hardware_ver));
+            .arg(m_ipAddress, sernum, firmware_ver, hardware_ver));
 
         if (m_usingCablecard)
         {
@@ -168,7 +168,7 @@ CetonStreamHandler::CetonStreamHandler(const QString &device, int inputid)
             QString auth = GetVar("cas", "CardAuthorization");
 
             LOG(VB_RECORD, LOG_INFO, LOC +
-                QString("Cable card installed (%1) - %2").arg(brand).arg(auth));
+                QString("Cable card installed (%1) - %2").arg(brand, auth));
         }
         else
         {

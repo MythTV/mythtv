@@ -904,7 +904,7 @@ bool V4L2encStreamHandler::SetOption(const QString &opt, const QString &value)
         return false;
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("SetOption('%1', '%2') -- success")
-        .arg(opt).arg(value));
+        .arg(opt, value));
     return true;
 }
 

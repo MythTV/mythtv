@@ -120,7 +120,7 @@ bool ExternalChannel::Tune(const QString &channum)
                                          result, m_tuneTimeout))
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + QString
-            ("Failed to Tune %1: %2").arg(channum).arg(result));
+            ("Failed to Tune %1: %2").arg(channum, result));
         return false;
     }
 

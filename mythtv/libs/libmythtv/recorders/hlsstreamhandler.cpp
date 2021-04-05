@@ -40,7 +40,7 @@ HLSStreamHandler* HLSStreamHandler::Get(const IPTVTuningData& tuning, int inputi
 
         LOG(VB_RECORD, LOG_INFO,
             QString("HLSSH[%1]: Creating new stream handler %2 for %3")
-            .arg(inputid).arg(devkey).arg(tuning.GetDeviceName()));
+            .arg(QString::number(inputid), devkey, tuning.GetDeviceName()));
     }
     else
     {
@@ -48,7 +48,7 @@ HLSStreamHandler* HLSStreamHandler::Get(const IPTVTuningData& tuning, int inputi
         uint rcount = s_hlshandlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("HLSSH[%1]: Using existing stream handler %2 for %3")
-            .arg(inputid).arg(devkey).arg(tuning.GetDeviceName()) +
+            .arg(QString::number(inputid), devkey, tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 

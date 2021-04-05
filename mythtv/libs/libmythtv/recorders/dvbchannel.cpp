@@ -479,8 +479,8 @@ bool DVBChannel::Open(DVBChannel *who)
         {
             LOG(VB_CHANNEL, LOG_INFO, LOC +
                 QString("Change delivery system from %1 to %2.")
-                .arg(m_currentSys.toString())
-                .arg(delsys.toString()));
+                .arg(m_currentSys.toString(),
+                     delsys.toString()));
 
             CardUtil::SetDeliverySystem(m_inputId, delsys, m_fdFrontend);
             m_currentSys = delsys;
@@ -1141,7 +1141,7 @@ int DVBChannel::GetChanID() const
             }
             LOG(VB_CHANNEL, LOG_INFO, LOC +
                 QString("Found for '%1' multiple visible channel IDs: %2")
-                .arg(m_curChannelName).arg(sl.join(" ")));
+                .arg(m_curChannelName, sl.join(" ")));
         }
         else
         {
@@ -1741,9 +1741,9 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(uint inputId,
     uint c = 0;
 
     LOG(VB_CHANNEL, LOG_DEBUG, QString("DVBChan[%1]: m_modsys:%2  current_sys:%3")
-        .arg(inputId)
-        .arg(tuning.m_modSys.toString())
-        .arg(current_sys.toString()));
+        .arg(QString::number(inputId),
+             tuning.m_modSys.toString(),
+             current_sys.toString()));
 
     auto *cmdseq = (struct dtv_properties*) calloc(1, sizeof(struct dtv_properties));
     if (!cmdseq)

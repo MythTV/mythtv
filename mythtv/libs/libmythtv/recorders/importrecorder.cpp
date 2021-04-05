@@ -43,7 +43,7 @@
         ((m_tvrec != nullptr) ? QString::number(m_tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("ImportRec[%1](%2): ") \
-            .arg(TVREC_CARDNUM).arg(m_videodevice)
+            .arg(TVREC_CARDNUM, m_videodevice)
 
 void ImportRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                            const QString &videodev,
@@ -180,7 +180,7 @@ bool ImportRecorder::Open(void)
         }
 
         LOG(VB_RECORD, LOG_INFO, LOC + QString("Trying to link %1 to %2")
-                           .arg(m_videodevice).arg(fn));
+                           .arg(m_videodevice, fn));
 
         if (preRecorded.link(fn))
             LOG(VB_RECORD, LOG_DEBUG, LOC + "success!");

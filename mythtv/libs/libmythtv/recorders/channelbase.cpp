@@ -363,7 +363,7 @@ bool ChannelBase::ChangeInternalChannel(const QString &freqid,
 
     LOG(VB_GENERAL, LOG_ERR, LOC + QString("Internal channel change to %1 "
             "on inputid %2, GUID %3 (%4)").arg(freqid).arg(inputid)
-            .arg(fwnode).arg(fwmodel));
+            .arg(fwnode, fwmodel));
 
 #ifdef USING_LINUX_FIREWIRE
     device = new LinuxFirewireDevice(
@@ -409,7 +409,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &changer,
     if (changer.isEmpty() || freqid.isEmpty())
         return false;
 
-    QString command = QString("%1 %2").arg(changer).arg(freqid);
+    QString command = QString("%1 %2").arg(changer, freqid);
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("Running command: %1").arg(command));
 
@@ -608,7 +608,7 @@ bool ChannelBase::InitializeInput(void)
     // print it
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("Input #%1: '%2' schan(%3) sourceid(%4)")
-        .arg(m_inputId).arg(m_name).arg(m_startChanNum)
+        .arg(m_inputId).arg(m_name, m_startChanNum)
         .arg(m_sourceId));
 
     return true;
@@ -794,8 +794,8 @@ ChannelBase *ChannelBase::CreateChannel(
             "\n"
             "Recompile MythTV with %4 support or remove the card \n"
             "from the configuration and restart MythTV.")
-            .arg(genOpt.m_inputType).arg(genOpt.m_videoDev)
-            .arg(genOpt.m_inputType).arg(genOpt.m_inputType);
+            .arg(genOpt.m_inputType, genOpt.m_videoDev,
+                 genOpt.m_inputType, genOpt.m_inputType);
         LOG(VB_GENERAL, LOG_ERR, "ChannelBase: CreateChannel() Error: \n" +
             msg + "\n");
         return nullptr;

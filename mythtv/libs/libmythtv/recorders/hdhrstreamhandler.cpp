@@ -435,7 +435,7 @@ QString HDHRStreamHandler::TunerGet(
         if (print_error)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceGet(%1): %2")
-                    .arg(name).arg(error));
+                    .arg(name, error));
         }
 
         return QString();
@@ -469,7 +469,7 @@ QString HDHRStreamHandler::TunerSet(
             val.toLocal8Bit().constData(), &value, &error) < 0)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
-            QString("Set %1 to '%2' request failed").arg(valname).arg(val) +
+            QString("Set %1 to '%2' request failed").arg(valname, val) +
             ENO);
 
         return QString();
@@ -483,7 +483,7 @@ QString HDHRStreamHandler::TunerSet(
             if (!(val.contains("0x2000") && strstr(error, "ERROR: invalid pid filter")))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("DeviceSet(%1 %2): %3")
-                        .arg(name).arg(val).arg(error));
+                        .arg(name, val, error));
             }
         }
 
@@ -518,7 +518,7 @@ bool HDHRStreamHandler::TuneChannel(const QString &chanid)
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning channel %1 (was %2)")
-            .arg(chanid).arg(current));
+            .arg(chanid, current));
     return !TunerSet("channel", chanid).isEmpty();
 }
 
@@ -551,7 +551,7 @@ bool HDHRStreamHandler::TuneVChannel(const QString &vchn)
         return true;
     }
     LOG(VB_RECORD, LOG_INFO, LOC + QString("TuneVChannel(%1) from (%2)")
-        .arg(vchn).arg(current));
+        .arg(vchn, current));
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Tuning vchannel %1").arg(vchn));
     return !TunerSet("vchannel", vchn).isEmpty();

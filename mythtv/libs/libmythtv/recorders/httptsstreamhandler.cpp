@@ -33,7 +33,7 @@ HTTPTSStreamHandler* HTTPTSStreamHandler::Get(const IPTVTuningData& tuning,
 
         LOG(VB_RECORD, LOG_INFO,
             QString("HTTPTSSH[%1]: Creating new stream handler %2 for %3")
-            .arg(inputid).arg(devkey).arg(tuning.GetDeviceName()));
+            .arg(QString::number(inputid), devkey, tuning.GetDeviceName()));
     }
     else
     {
@@ -41,7 +41,7 @@ HTTPTSStreamHandler* HTTPTSStreamHandler::Get(const IPTVTuningData& tuning,
         uint rcount = s_httphandlers_refcnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("HTTPTSSH[%1]: Using existing stream handler %2 for %3")
-            .arg(inputid).arg(devkey).arg(tuning.GetDeviceName()) +
+            .arg(QString::number(inputid), devkey, tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 

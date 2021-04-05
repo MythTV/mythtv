@@ -12,7 +12,7 @@
 
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_INFO, \
-    QString("DTVSigMon[%1]: %2 %3").arg(m_inputid).arg(FUNC).arg(MSG))
+    QString("DTVSigMon[%1]: %2 %3").arg(m_inputid).arg(FUNC, MSG))
 
 #define LOC QString("DTVSigMon[%1]: ").arg(m_inputid)
 

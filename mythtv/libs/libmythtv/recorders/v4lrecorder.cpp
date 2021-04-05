@@ -24,7 +24,7 @@
         ((m_tvrec != nullptr) ? QString::number(m_tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("V4LRec[%1](%2): ") \
-            .arg(TVREC_CARDNUM).arg(m_videodevice)
+            .arg(TVREC_CARDNUM, m_videodevice)
 
 V4LRecorder::~V4LRecorder()
 {

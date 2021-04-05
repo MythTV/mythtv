@@ -101,7 +101,8 @@ QStringList VBox::doUPNPSearch(void)
         QString udn = BE->GetDeviceDesc()->m_rootDevice.m_sUDN;
         int port = BE->GetDeviceDesc()->m_hostUrl.port();
 
-        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Found possible VBox at %1 (%2:%3)").arg(friendlyName).arg(ip).arg(port));
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Found possible VBox at %1 (%2:%3)")
+            .arg(friendlyName, ip, QString::number(port)));
 
         if (udn.startsWith(VBOX_UDN))
         {
@@ -127,7 +128,7 @@ QStringList VBox::doUPNPSearch(void)
                 // add a device in the format ID IP TUNERNO TUNERTYPE
                 // eg vbox_3718 192.168.1.204 1 DVBT/T2
                 const QString& tuner = tuners.at(x);
-                QString device = QString("%1 %2 %3").arg(id).arg(ip).arg(tuner);
+                QString device = QString("%1 %2 %3").arg(id, ip, tuner);
                 result << device;
                 LOG(VB_GENERAL, LOG_INFO, QString("Found VBox - %1").arg(device));
             }
@@ -252,7 +253,8 @@ bool VBox::checkVersion(QString &version)
 
     delete xmlDoc;
 
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("CheckVersion - required: %1, actual: %2").arg(VBOX_MIN_API_VERSION).arg(version));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("CheckVersion - required: %1, actual: %2")
+        .arg(VBOX_MIN_API_VERSION, version));
 
     if (major < requiredMajor)
         return false;
@@ -388,7 +390,7 @@ bool VBox::sendQuery(const QString& query, QDomDocument* xmlDoc)
                 return true;
 
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("API Error: %1 - %2, Query was: %3").arg(errorCode).arg(errorDesc).arg(query));
+                QString("API Error: %1 - %2, Query was: %3").arg(errorCode).arg(errorDesc, query));
 
             return false;
         }
