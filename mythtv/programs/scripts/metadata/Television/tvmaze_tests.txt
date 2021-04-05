@@ -14,13 +14,6 @@ Doc-Tests for tvmaze
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
   <item>
-    <title>Tales for a Halloween Night</title>
-    <description>Tales for a Halloween Night is based on John Carpenter's award-winning graphic novel anthology of stories where he unites storytellers from movies, novels and comics for a collection of horror stories featuring graveyards, sunken ships and ghosts, among others.</description>
-    <inetref>30203</inetref>
-    <collectionref>30203</collectionref>
-    <language>en</language>
-  </item>
-  <item>
     <title>A Clear Midsummer Night</title>
     <description>The daughter of a real estate mogul Xia Wan Qing, has seemingly no way of retreating after a friend's betrayal and her boyfriend backing out of their wedding. Fortunately, she's saved by business genius Qiao Jin Fan. Jin Fan is a "playboy" and the future successor for Qiao corporation. He extends an offering hand and together they embark on a path of revenge. Each for reasons of their own, begin a love with "uncertain motives". After enduring circumstances because of their families' competing interests and a number of conspiracies the two find true love.</description>
     <inetref>24598</inetref>
@@ -29,7 +22,7 @@ Doc-Tests for tvmaze
     <releasedate>2013-02-15</releasedate>
     <year>2013</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
     </images>
   </item>
   <item>
@@ -41,40 +34,7 @@ Doc-Tests for tvmaze
     <releasedate>2013-01-11</releasedate>
     <year>2013</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/126/316260.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/126/316260.jpg"/>
-    </images>
-  </item>
-  <item>
-    <title>A Night at the Theatre</title>
-    <description>Entertainment and comedy at Glasgow's Theatre Royal.</description>
-    <inetref>42539</inetref>
-    <collectionref>42539</collectionref>
-    <language>en</language>
-    <releasedate>2019-02-24</releasedate>
-    <year>2019</year>
-  </item>
-  <item>
-    <title>A Night at The Classic</title>
-    <description>Mixing the best bits of stand-up comedy with hilarious backstage action, A Night at The Classic is raw, uncensored comedy at its best.</description>
-    <inetref>19206</inetref>
-    <collectionref>19206</collectionref>
-    <language>en</language>
-    <releasedate>2010-11-03</releasedate>
-    <year>2010</year>
-    <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/67/169985.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/67/169985.jpg"/>
-    </images>
-  </item>
-  <item>
-    <title>A Night with My Ex</title>
-    <description>What would you do if you had the chance to spend an entire night with your ex? Would you seek answers, try to gain closure, or make a play to get back together? For the first time since their split, ex-couples will be brought together for one night in a camera-rigged apartment with no crew. What they do or say during their night is completely up to them, but one thing is for sure. A Night with My Ex will be surprising, emotionally raw, and in many cases, totally hilarious.</description>
-    <inetref>27687</inetref>
-    <collectionref>27687</collectionref>
-    <language>en</language>
-    <releasedate>2017-07-18</releasedate>
-    <year>2017</year>
-    <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/118/296875.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/118/296875.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/126/316260.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/126/316260.jpg"/>
     </images>
   </item>
   <item>
@@ -86,8 +46,54 @@ Doc-Tests for tvmaze
     <releasedate>2021-01-13</releasedate>
     <year>2021</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/289/723250.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/289/723250.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/289/723250.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/289/723250.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/289/722954.jpg"/>
     </images>
+  </item>
+  <item>
+    <title>A Night at the Theatre</title>
+    <description>Entertainment and comedy at Glasgow's Theatre Royal.</description>
+    <inetref>42539</inetref>
+    <collectionref>42539</collectionref>
+    <language>en</language>
+    <releasedate>2019-02-24</releasedate>
+    <year>2019</year>
+    <images>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/231/578439.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>A Night at The Classic</title>
+    <description>Mixing the best bits of stand-up comedy with hilarious backstage action, A Night at The Classic is raw, uncensored comedy at its best.</description>
+    <inetref>19206</inetref>
+    <collectionref>19206</collectionref>
+    <language>en</language>
+    <releasedate>2010-11-03</releasedate>
+    <year>2010</year>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/67/169985.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/67/169985.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/224/561692.jpg"/>
+      <image type="banner" url="https://static.tvmaze.com/uploads/images/original_untouched/67/169988.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_leaderboard/67/169988.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>A Night with My Ex</title>
+    <description>What would you do if you had the chance to spend an entire night with your ex? Would you seek answers, try to gain closure, or make a play to get back together? For the first time since their split, ex-couples will be brought together for one night in a camera-rigged apartment with no crew. What they do or say during their night is completely up to them, but one thing is for sure. A Night with My Ex will be surprising, emotionally raw, and in many cases, totally hilarious.</description>
+    <inetref>27687</inetref>
+    <collectionref>27687</collectionref>
+    <language>en</language>
+    <releasedate>2017-07-18</releasedate>
+    <year>2017</year>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/118/296875.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/118/296875.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Tales for a Halloween Night</title>
+    <description>Tales for a Halloween Night is based on John Carpenter's award-winning graphic novel anthology of stories where he unites storytellers from movies, novels and comics for a collection of horror stories featuring graveyards, sunken ships and ghosts, among others.</description>
+    <inetref>30203</inetref>
+    <collectionref>30203</collectionref>
+    <language>en</language>
   </item>
   <item>
     <title>Boys on Film - A Night with Duran Duran</title>
@@ -98,32 +104,36 @@ Doc-Tests for tvmaze
     <releasedate>2018-06-29</releasedate>
     <year>2018</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/158/396533.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/158/396533.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/158/396533.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/158/396533.jpg"/>
     </images>
   </item>
   <item>
-    <title>Going Out</title>
-    <description>A mother and daughter who stand before the truth after a sudden tragic accident and deal with the meaning of family.</description>
-    <inetref>47528</inetref>
-    <collectionref>47528</collectionref>
+    <title>The Night Watchman</title>
+    <description>Young watchmen of the Joseon Dynasty fight demons in this "Ghostbusters"-like story. Set in the backdrop of the royal palace, the good guys vanquish demons while the bad guys use them for their purposes. The palace is rife with sinister plans to seize power and usurp the king. Through this story of young people who hunt demons, the tribulations and joys of life are shown in all their glory.</description>
+    <inetref>3237</inetref>
+    <collectionref>3237</collectionref>
     <language>ko</language>
-    <releasedate>2020-05-04</releasedate>
-    <year>2020</year>
+    <releasedate>2014-08-04</releasedate>
+    <year>2014</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/253/634317.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/253/634317.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/17/43577.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/17/43577.jpg"/>
     </images>
   </item>
   <item>
-    <title>Una luz en el camino</title>
-    <description></description>
-    <inetref>48110</inetref>
-    <collectionref>48110</collectionref>
-    <language>es</language>
+    <title>Light as a Feather</title>
+    <description>An innocent game of "Light as a Feather, Stiff as a Board" goes wrong when the five teen girls who played start dying off in the exact way that was predicted, forcing the survivors to figure out why they're being targeted - and whether the evil force hunting them down is one of their own.</description>
+    <inetref>36655</inetref>
+    <collectionref>36655</collectionref>
+    <language>en</language>
+    <releasedate>2018-10-12</releasedate>
+    <year>2018</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/257/642920.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/257/642920.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/213/534600.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/213/534600.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/171/428424.jpg"/>
     </images>
   </item>
 </metadata>
+
 
 # tvmaze.py -N "A Clear Midsummer Night" "Episode 42"
 >>> sys.argv = shlex.split('tvmaze -N "A Clear Midsummer Night" "Episode 42"')
@@ -155,11 +165,10 @@ Doc-Tests for tvmaze
       <person name="Wu Jerry" character="Mo Ling Tian" job="Actor"/>
     </people>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
     </images>
   </item>
 </metadata>
-
 
 # python3 tvmaze.py -C 525
 >>> sys.argv = shlex.split('tvmaze -C 525')
@@ -185,10 +194,15 @@ Doc-Tests for tvmaze
       <studio name="The CW"/>
     </studios>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217547.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/87/217547.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217545.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217546.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/557215.jpg"/>
     </images>
   </item>
 </metadata>
+
 
 
 # python3 tvmaze.py -D 525 5 2
@@ -286,14 +300,16 @@ Doc-Tests for tvmaze
       <person name="Chrisann Verges" job="Producer"/>
     </people>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/260/652344.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/260/652344.jpg"/>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
-      <image type="fanart" url="http://static.tvmaze.com/uploads/images/original_untouched/87/217545.jpg"/>
-      <image type="fanart" url="http://static.tvmaze.com/uploads/images/original_untouched/87/217546.jpg"/>
-      <image type="fanart" url="http://static.tvmaze.com/uploads/images/original_untouched/222/557215.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/260/652344.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/260/652344.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217547.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/87/217547.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217545.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217546.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/557215.jpg"/>
     </images>
   </item>
 </metadata>
+
 
 
 
@@ -316,7 +332,7 @@ Doc-Tests for tvmaze
     <releasedate>2014-04-01</releasedate>
     <year>2014</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/87/219221.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/87/219221.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/219221.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/87/219221.jpg"/>
     </images>
   </item>
   <item>
@@ -328,16 +344,11 @@ Doc-Tests for tvmaze
     <releasedate>2007-05-31</releasedate>
     <year>2007</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/141/352576.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/141/352576.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/141/352576.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/141/352576.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/223/559895.jpg"/>
     </images>
   </item>
 </metadata>
-
-
-
-
-
-
 
 
 ##
@@ -346,5 +357,3 @@ Doc-Tests for tvmaze
 # python3 tvmaze.py -N 4711 "Episode 42"
 #  >>> sys.argv = shlex.split('tvmaze -N 4711 "Episode 42"')
 #  >>> main()
-
-

@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+# Support python3 print syntax if we're running in python2
+from __future__ import print_function
+
 from __future__ import unicode_literals
 
 __title__ = "TVmaze.com"
-__author__ = "Roland Ernst"
-__version__ = "0.1.0"
+__author__ = "Roland Ernst, Steve Erlenborn"
+__version__ = "0.2.0"
 
 
 import sys
@@ -39,14 +42,35 @@ def check_item(m, mitem, ignore=True):
             raise
 
 
-def _get_series_image(item):
-    url = item['resolutions']['original']['url']
-    if item['resolutions'].get('medium') is not None:
-        thumb = item['resolutions']['medium']['url']
-        pdict = {'type': 'fanart', 'url': url, 'thumb': thumb}
-    else:
-        pdict = {'type': 'fanart', 'url': url}
-    return pdict
+def get_show_art_lists(tvmaze_show_id):
+    from MythTV.tvmaze import tvmaze_api as tvmaze
+
+    artlist = tvmaze.get_show_artwork(tvmaze_show_id)
+
+    #--------------------------------------------------------------------------
+    # The Main flag is true for artwork which is "official" from the Network.
+    # Under the theory that "official" artwork should be high quality, we want
+    # those artworks to be located at the beginning of the generated list.
+    #--------------------------------------------------------------------------
+    posterList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if (art_item.main and (art_item.type == 'poster'))]
+    posterNorm = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((not art_item.main) and (art_item.type == 'poster'))]
+    posterList.extend(posterNorm)
+
+    fanartList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if (art_item.main and (art_item.type == 'background'))]
+    fanartNorm = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((not art_item.main) and (art_item.type == 'background'))]
+    fanartList.extend(fanartNorm)
+
+    bannerList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if (art_item.main and (art_item.type == 'banner'))]
+    bannerNorm = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((not art_item.main) and (art_item.type == 'banner'))]
+    bannerList.extend(bannerNorm)
+
+    return posterList, fanartList, bannerList
 
 
 def buildList(tvtitle, opts):
@@ -85,9 +109,31 @@ def buildList(tvtitle, opts):
         if show_info.premiere_date:
             m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
             m.year = check_item(m, ("year", show_info.premiere_date.year))
-        if show_info.images is not None and len(show_info.images) > 0:
-            m.images.append({'type': 'coverart', 'url': show_info.images['original'],
-                             'thumb': show_info.images['medium']})
+
+        posterList, fanartList, bannerList = get_show_art_lists(show_info.id)
+
+        # Generate one image line for each type of artwork
+        if posterList:
+            posterEntry = posterList[0]
+            if (posterEntry[0] is not None) and (posterEntry[1] is not None):
+                m.images.append({'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]})
+            elif posterEntry[0] is not None:
+                m.images.append({'type': 'coverart', 'url': posterEntry[0]})
+
+        if fanartList:
+            fanartEntry = fanartList[0]
+            if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+                m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+            elif fanartEntry[0] is not None:
+                m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
+
+        if bannerList:
+            bannerEntry = bannerList[0]
+            if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
+                m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
+            elif bannerEntry[0] is not None:
+                m.images.append({'type': 'banner', 'url': bannerEntry[0]})
+
         tree.append(m.toXML())
 
     print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
@@ -217,6 +263,8 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
             print(k, " : ", v)
 
     # get global info for all seasons/episodes:
+    posterList, fanartList, bannerList = get_show_art_lists(inetref)
+
     show_info = tvmaze.get_show(inetref, populated=True)
     if opts.debug:
         print("tvmaze.get_show(%s, populated=True) returned :" % inetref)
@@ -292,34 +340,33 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     if season_info.images is not None and len(season_info.images) > 0:
         m.images.append({'type': 'coverart', 'url': season_info.images['original'],
                          'thumb': season_info.images['medium']})
-    if show_info.images is not None and len(show_info.images) > 0:
-        m.images.append({'type': 'coverart', 'url': show_info.images['original'],
-                         'thumb': show_info.images['medium']})
+
+    # generate series coverart, fanart, and banners
+    for posterEntry in posterList:
+        if (posterEntry[0] is not None) and (posterEntry[1] is not None):
+            image_entry = {'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]}
+        elif posterEntry[0] is not None:
+            image_entry = {'type': 'coverart', 'url': posterEntry[0]}
+        # Avoid duplicate coverart entries
+        if image_entry not in m.images:
+            m.images.append(image_entry)
+
+    for fanartEntry in fanartList:
+        if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+        elif fanartEntry[0] is not None:
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
+
+    for bannerEntry in bannerList:
+        if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
+            m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
+        elif bannerEntry[0] is not None:
+            m.images.append({'type': 'banner', 'url': bannerEntry[0]})
+
     # screenshot is associated to episode
     if ep_info.images is not None and len(ep_info.images) > 0:
         m.images.append({'type': 'screenshot', 'url': ep_info.images['original'],
                          'thumb': ep_info.images['medium']})
-
-    if show_info.series_images is not None and len(show_info.series_images) > 0:
-        # sort for 'background' and then for 'poster'
-        for item in show_info.series_images:
-            if item['type'] == 'background' and not item['main']:
-                try:
-                    pdict = _get_series_image(item)
-                    if pdict not in m.images:
-                        m.images.append(pdict)
-                except(KeyError, ValueError):
-                    pass
-
-        ## posters cannot be stretched to fullscreen as fanart          ### XXX
-        #for item in show_info.series_images:
-        #    if item['type'] == 'poster' and not item['main']:
-        #        try:
-        #            pdict = _get_series_image(item)
-        #            if pdict not in m.images:
-        #                m.images.append(pdict)
-        #        except(KeyError, ValueError):
-        #            pass
 
     tree.append(m.toXML())
     print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
@@ -371,9 +418,28 @@ def buildCollection(tvinetref, opts):
             m.studios.append(sinfo)
     except:
         pass
-    if show_info.images is not None and len(show_info.images) > 0:
-        m.images.append({'type': 'coverart', 'url': show_info.images['original'],
-                         'thumb': show_info.images['medium']})
+
+    posterList, fanartList, bannerList = get_show_art_lists(show_info.id)
+
+    # Generate image lines for every piece of artwork
+    for posterEntry in posterList:
+        if (posterEntry[0] is not None) and (posterEntry[1] is not None):
+            m.images.append({'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]})
+        elif posterEntry[0] is not None:
+            m.images.append({'type': 'coverart', 'url': posterEntry[0]})
+
+    for fanartEntry in fanartList:
+        if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+        elif fanartEntry[0] is not None:
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
+
+    for bannerEntry in bannerList:
+        if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
+            m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
+        elif bannerEntry[0] is not None:
+            m.images.append({'type': 'banner', 'url': bannerEntry[0]})
+
     tree.append(m.toXML())
 
     print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
@@ -490,7 +556,6 @@ def main():
 
     if opts.debug:
         import requests
-        pass
     else:
         confdir = os.environ.get('MYTHCONFDIR', '')
         if (not confdir) or (confdir == '/'):
@@ -538,6 +603,7 @@ def main():
                 buildSingle(args, opts)
 
             if opts.collectiondata:
+                # option -C inetref
                 if (len(args) != 1) or (len(args[0]) == 0):
                     sys.stdout.write('ERROR: tvmaze -C requires exactly one non-empty argument')
                     sys.exit(1)
