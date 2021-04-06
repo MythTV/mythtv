@@ -475,7 +475,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
         if (streaming)
         {
             ret_file = QString("%1/%2")
-                .arg(GetRemoteCacheDir()).arg(filename.section('/', -1));
+                .arg(GetRemoteCacheDir(), filename.section('/', -1));
 
             QFileInfo finfo(ret_file);
             if (finfo.isReadable() && finfo.lastModified() >= cmp_ts)

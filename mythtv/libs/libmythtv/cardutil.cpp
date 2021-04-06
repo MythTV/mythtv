@@ -1016,7 +1016,7 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Changing delivery system from %1 to %2")
-                    .arg(delsys.toString()).arg(newdelsys.toString()));
+                    .arg(delsys.toString(), newdelsys.toString()));
             delsys = newdelsys;
         }
     }
@@ -1029,7 +1029,7 @@ DTVModulationSystem CardUtil::ProbeBestDeliverySystem(int fd)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Changing delivery system from %1 to %2")
-                    .arg(delsys.toString()).arg(newdelsys.toString()));
+                    .arg(delsys.toString(), newdelsys.toString()));
             delsys = newdelsys;
         }
     }
@@ -1217,7 +1217,7 @@ int CardUtil::OpenVideoDevice(const QString &device)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Can't open DVB frontend (%1) for %2.")
-                .arg(dvbdev).arg(device) + ENO);
+                .arg(dvbdev, device) + ENO);
     }
     return fd_frontend;
 }
@@ -2399,7 +2399,7 @@ QStringList CardUtil::ProbeVideoInputs(const QString& device, const QString& inp
 QStringList CardUtil::ProbeAudioInputs(const QString& device, const QString& inputtype)
 {
     LOG(VB_GENERAL, LOG_DEBUG, QString("ProbeAudioInputs(%1,%2)")
-                                   .arg(device).arg(inputtype));
+                                   .arg(device, inputtype));
     QStringList ret;
 
     if ("HDPVR" == inputtype ||
@@ -2496,7 +2496,7 @@ QStringList CardUtil::ProbeDVBInputs(const QString& device)
 QString CardUtil::GetDeviceLabel(const QString &inputtype,
                                  const QString &videodevice)
 {
-    return QString("[ %1 : %2 ]").arg(inputtype).arg(videodevice);
+    return QString("[ %1 : %2 ]").arg(inputtype, videodevice);
 }
 
 QString CardUtil::GetDeviceLabel(uint inputid)
@@ -3012,7 +3012,7 @@ QString CardUtil::GetVBoxdesc(const QString &id, const QString &ip,
     if (!vbox->checkVersion(version))
     {
         QString apiVersionErr = QObject::tr("The VBox software version is too old (%1), we require %2")
-                                            .arg(version).arg(VBOX_MIN_API_VERSION);
+                                            .arg(version, VBOX_MIN_API_VERSION);
         delete vbox;
         return apiVersionErr;
 
@@ -3020,8 +3020,8 @@ QString CardUtil::GetVBoxdesc(const QString &id, const QString &ip,
 
     delete vbox;
 
-    return QString("V@Box TV Gateway - ID: %1, IP: %2, Tuner: %3-%4").arg(id)
-                   .arg(ip).arg(tunerNo).arg(tunerType);
+    return QString("V@Box TV Gateway - ID: %1, IP: %2, Tuner: %3-%4")
+                   .arg(id, ip, tunerNo, tunerType);
 
 #else
     (void) id;

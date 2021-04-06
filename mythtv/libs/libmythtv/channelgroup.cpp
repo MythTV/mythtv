@@ -130,7 +130,7 @@ bool ChannelGroup::AddChannel(uint chanid, int changrpid)
             MythDB::DBError("ChannelGroup::AddChannel -- insert", query);
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Adding channel %1 to group %2.")
-                 .arg(chanName).arg(groupName));
+                 .arg(chanName, groupName));
     }
 
     return true;

@@ -230,7 +230,7 @@ static freq_table_list_t get_matching_freq_tables_internal(
     freq_table_list_t list;
 
     QString lookup = QString("%1_%2_%3%4")
-        .arg(format).arg(modulation).arg(country);
+        .arg(format, modulation, country);
 
     freq_table_map_t::const_iterator it = fmap.begin();
     for (uint i = 0; it != fmap.end(); i++)
@@ -595,7 +595,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
         "ATSC ", "QAM-256 ", "QAM-128 ", "QAM-64 ", };
 
 #define FREQ(A,B, C,D, E,F,G, H, I) \
-    fmap[QString("atsc_%1_us%2").arg(A).arg(B)] = \
+    fmap[QString("atsc_%1_us%2").arg(A,B)] =      \
         new FrequencyTable((C)+(D), E, F, G, H, I);
 
 // The maximum channel defined in the US frequency tables (standard, HRC, IRC)
@@ -713,7 +713,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
             uint64_t freq = (list[i].freq * 1000LL) + 1750000;
             fmap[QString("analog_analog_%1%2").arg(name).arg(i)] =
                 new FrequencyTable(
-                    QString("%1 %2").arg(name).arg(list[i].name), i+2,
+                    QString("%1 %2").arg(name, list[i].name), i+2,
                     freq, freq + 3000000,
                     6000000, DTVModulation::kModulationAnalog);
         }

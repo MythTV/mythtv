@@ -628,9 +628,8 @@ void RecordingInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
     }
 
     LOG(VB_GENERAL, LOG_NOTICE,
-            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)").arg(m_recGroup)
-                                                               .arg(newrecgroup)
-                                                               .arg(newrecgroupid));
+            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)")
+                .arg(m_recGroup, newrecgroup, QString::number(newrecgroupid)));
 
     query.prepare("UPDATE recorded"
                   " SET recgroup = :RECGROUP, "
@@ -680,9 +679,8 @@ void RecordingInfo::ApplyRecordRecGroupChange(int newrecgroupid)
     }
 
     LOG(VB_GENERAL, LOG_NOTICE,
-            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)").arg(m_recGroup)
-                                                               .arg(newrecgroup)
-                                                               .arg(newrecgroupid));
+            QString("ApplyRecordRecGroupChange: %1 to %2 (%3)")
+                .arg(m_recGroup, newrecgroup).arg(newrecgroupid));
 }
 
 /** \fn RecordingInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
@@ -1241,11 +1239,9 @@ void RecordingInfo::FinishedRecording(bool allowReRecord)
         QString msg_subtitle = m_subtitle.isEmpty() ? "" :
                                         QString(" \"%1\"").arg(m_subtitle);
         QString details = QString("%1%2: channel %3")
-                                        .arg(m_title)
-                                        .arg(msg_subtitle)
-                                        .arg(m_chanId);
+            .arg(m_title, msg_subtitle, QString::number(m_chanId));
 
-        LOG(VB_GENERAL, LOG_INFO, QString("%1 %2").arg(msg).arg(details));
+        LOG(VB_GENERAL, LOG_INFO, QString("%1 %2").arg(msg, details));
     }
 
     SendUpdateEvent();
@@ -1303,7 +1299,7 @@ void RecordingInfo::AddHistory(bool resched, bool forcedup, bool future)
                         !future) ? RecStatus::PreviousRecording : GetRecordingStatus();
     LOG(VB_SCHEDULE, LOG_INFO, QString("AddHistory: %1/%2, %3, %4, %5/%6")
         .arg(int(rs)).arg(int(m_oldrecstatus)).arg(future).arg(dup)
-        .arg(GetScheduledStartTime(MythDate::ISODate)).arg(GetTitle()));
+        .arg(GetScheduledStartTime(MythDate::ISODate), GetTitle()));
     if (!future)
         m_oldrecstatus = GetRecordingStatus();
     if (dup)

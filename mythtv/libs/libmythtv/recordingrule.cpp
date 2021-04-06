@@ -248,7 +248,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, const QString& textname,
         m_searchType = lsearch;
         searchType = SearchTypeToString(m_searchType);
 
-        QString ltitle = QString("%1 (%2)").arg(textname).arg(searchType);
+        QString ltitle = QString("%1 (%2)").arg(textname, searchType);
         m_title = ltitle;
         m_sortTitle = nullptr;
         m_subtitle = m_sortSubtitle = std::move(joininfo);
@@ -346,8 +346,7 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, const QString& textname,
     if (!Load() || m_searchType != kPowerSearch)
         return false;
 
-    QString ltitle = QString("%1 (%2)").arg(textname)
-                                       .arg(tr("Power Search"));
+    QString ltitle = QString("%1 (%2)").arg(textname, tr("Power Search"));
     m_title = ltitle;
     m_sortTitle = nullptr;
     m_subtitle = m_sortSubtitle = std::move(joininfo);
@@ -415,11 +414,11 @@ bool RecordingRule::Save(bool sendSig)
     if (m_recordID > 0 || (m_recordTable != "record" && m_tempID > 0))
     {
         sqlquery = QString("UPDATE %1 %2 WHERE recordid = :RECORDID;")
-                                                        .arg(m_recordTable).arg(sql);
+                                                        .arg(m_recordTable, sql);
     }
     else
     {
-        sqlquery = QString("INSERT INTO %1 %2;").arg(m_recordTable).arg(sql);
+        sqlquery = QString("INSERT INTO %1 %2;").arg(m_recordTable, sql);
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -601,7 +600,7 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
     {
         //: Time duration, %1 is replaced by the hours, %2 by the minutes
         infoMap["lentime"] = QCoreApplication::translate("(Common)", "%1 %2",
-            "Hours and minutes").arg(hourstring).arg(minstring);
+            "Hours and minutes").arg(hourstring, minstring);
     }
     else
         infoMap["lentime"] = minstring;
@@ -626,13 +625,12 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
         {
             int daynum = (m_findday + 5) % 7 + 1;
             findfrom = QString("%1, %2")
-		 .arg(gCoreContext->GetQLocale().dayName(daynum, QLocale::ShortFormat))
-		 .arg(findfrom);
+		 .arg(gCoreContext->GetQLocale().dayName(daynum, QLocale::ShortFormat),
+                      findfrom);
         }
         infoMap["subtitle"] = tr("(%1 or later) %3",
                                  "e.g. (Sunday or later) program "
-                                 "subtitle").arg(findfrom)
-                                 .arg(m_subtitle);
+                                 "subtitle").arg(findfrom, m_subtitle);
     }
 
     infoMap["searchtype"] = SearchTypeToString(m_searchType);
@@ -919,7 +917,7 @@ bool RecordingRule::IsValid(QString &msg) const
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(QString("SELECT NULL FROM (program, channel) "
                               "%1 WHERE %2")
-                      .arg(m_subtitle).arg(m_description));
+                      .arg(m_subtitle, m_description));
         if (m_description.contains(';') || !query.exec())
         {
             msg = QString("Invalid custom search values.");

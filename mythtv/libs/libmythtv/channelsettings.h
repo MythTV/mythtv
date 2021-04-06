@@ -35,7 +35,7 @@ class ChannelID : public GroupSetting
             MSqlQuery query(MSqlQuery::InitCon());
 
             QString querystr = QString("SELECT %1 FROM %2 WHERE %3='%4'")
-                             .arg(m_field).arg(m_table).arg(m_field).arg(getValue());
+                             .arg(m_field, m_table, m_field, getValue());
             query.prepare(querystr);
 
             if (!query.exec() && !query.isActive())
@@ -45,7 +45,7 @@ class ChannelID : public GroupSetting
                 return;
 
             querystr = QString("INSERT INTO %1 (%2) VALUES ('%3')")
-                             .arg(m_table).arg(m_field).arg(getValue());
+                             .arg(m_table, m_field, getValue());
             query.prepare(querystr);
 
             if (!query.exec() || !query.isActive())
@@ -65,7 +65,7 @@ class ChannelID : public GroupSetting
         MSqlQuery query(MSqlQuery::InitCon());
 
         QString querystr = QString("SELECT %1 FROM %2")
-                                .arg(m_field).arg(m_table);
+                                .arg(m_field, m_table);
         query.prepare(querystr);
 
         if (!query.exec() || !query.isActive())

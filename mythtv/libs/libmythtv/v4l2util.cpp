@@ -249,8 +249,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
         case V4L2_CTRL_TYPE_U16:
         case V4L2_CTRL_TYPE_U32:
           msg = QString("%1 : min=%2 max=%3 step=%4 default=%5")
-                .arg(QString("%1 (%2)").arg(nameStr)
-                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                .arg(QString("%1 (%2)").arg(nameStr, queryctrl_toString(queryctrl.type)), 31, QChar(' '))
                 .arg(queryctrl.minimum)
                 .arg(queryctrl.maximum)
                 .arg(queryctrl.step)
@@ -259,8 +258,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
           break;
         case V4L2_CTRL_TYPE_STRING:
           msg =  QString("%1 : min=%2 max=%3 step=%4")
-                .arg(QString("%1 (%2)").arg(nameStr)
-                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                .arg(QString("%1 (%2)").arg(nameStr, queryctrl_toString(queryctrl.type)), 31, QChar(' '))
                  .arg(queryctrl.minimum)
                  .arg(queryctrl.maximum)
                  .arg(queryctrl.step);
@@ -268,8 +266,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
           break;
         case V4L2_CTRL_TYPE_BOOLEAN:
           msg = QString("%1 : default=%2")
-                .arg(QString("%1 (%2)").arg(nameStr)
-                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                .arg(QString("%1 (%2)").arg(nameStr, queryctrl_toString(queryctrl.type)), 31, QChar(' '))
                 .arg(queryctrl.default_value);
           drv_opt.m_type = DriverOption::BOOLEAN;
           break;
@@ -277,8 +274,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
         case V4L2_CTRL_TYPE_INTEGER_MENU:
         {
             msg = QString("%1 : min=%3 max=%4 default=%5")
-                .arg(QString("%1 (%2)").arg(nameStr)
-                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                  .arg(QString("%1 (%2)").arg(nameStr, queryctrl_toString(queryctrl.type)), 31, QChar(' '))
                   .arg(queryctrl.minimum)
                   .arg(queryctrl.maximum)
                   .arg(queryctrl.default_value);
@@ -305,14 +301,12 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
         }
         case V4L2_CTRL_TYPE_BUTTON:
           msg = QString("%1 :")
-                .arg(QString("%1 (%2)").arg(nameStr)
-                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '));
+                .arg(QString("%1 (%2)").arg(nameStr, queryctrl_toString(queryctrl.type)), 31, QChar(' '));
           drv_opt.m_type = DriverOption::BUTTON;
                 break;
         case V4L2_CTRL_TYPE_BITMASK:
           msg = QString("%1 : max=0x%2 default=0x%3")
-                .arg(QString("%1 (%2)").arg(nameStr)
-                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                .arg(QString("%1 (%2)").arg(nameStr, queryctrl_toString(queryctrl.type)), 31, QChar(' '))
                 .arg(queryctrl.maximum, 8, 16, QChar(' '))
                 .arg(queryctrl.default_value, 8, 16, QChar(' '));
           drv_opt.m_type = DriverOption::BITMASK;
@@ -320,8 +314,7 @@ void V4L2util::log_qctrl(struct v4l2_queryctrl& queryctrl,
 
         default:
           msg = QString("%1 : type=%2")
-                .arg(QString("%1 (%2)").arg(nameStr)
-                     .arg(queryctrl_toString(queryctrl.type)), 31, QChar(' '))
+                .arg(QString("%1 (%2)").arg(nameStr, queryctrl_toString(queryctrl.type)), 31, QChar(' '))
                 .arg(queryctrl.type);
           drv_opt.m_type = DriverOption::UNKNOWN_TYPE;
           break;
@@ -519,8 +512,8 @@ bool V4L2util::GetFormats(QStringList& formats)
     vid_fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     while(ioctl(m_fd, VIDIOC_ENUM_FMT, &vid_fmtdesc) == 0)
     {
-        formats << QString("%1 (%2)").arg((char *)vid_fmtdesc.description)
-                                    .arg(flags[vid_fmtdesc.flags]);
+        formats << QString("%1 (%2)").arg((char *)vid_fmtdesc.description,
+                                          flags[vid_fmtdesc.flags]);
 
         /* Convert the pixelformat attributes from FourCC into 'human readab
            fprintf(stdout, "  pixelformat  :%c%c%c%c\\n",
@@ -749,8 +742,8 @@ bool V4L2util::SetExtControl(int request, int value, const QString& ctrl_desc,
     if (current_value == value)
     {
         LOG(VB_CHANNEL, LOG_INFO, LOC +
-            QString("%1 value is already %2 (%3).").arg(ctrl_desc)
-            .arg(value_desc).arg(value));
+            QString("%1 value is already %2 (%3).")
+            .arg(ctrl_desc, value_desc, QString::number(value)));
         return true;
     }
 
@@ -768,13 +761,13 @@ bool V4L2util::SetExtControl(int request, int value, const QString& ctrl_desc,
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to set %1 value to %2 (%3).")
-            .arg(ctrl_desc).arg(value_desc).arg(value) + ENO);
+            .arg(ctrl_desc, value_desc, QString::number(value)) + ENO);
         return false;
     }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
-        QString("%1 value set to %2 (%3).").arg(ctrl_desc)
-        .arg(value_desc).arg(value));
+        QString("%1 value set to %2 (%3).")
+        .arg(ctrl_desc, value_desc, QString::number(value)));
 
     return true;
 }

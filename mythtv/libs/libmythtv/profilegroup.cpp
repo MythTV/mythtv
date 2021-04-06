@@ -196,7 +196,7 @@ bool ProfileGroup::allowedGroupName(void)
     MSqlQuery result(MSqlQuery::InitCon());
     QString querystr = QString("SELECT DISTINCT id FROM profilegroups WHERE "
                             "name = '%1' AND hostname = '%2';")
-                            .arg(getName()).arg(m_host->getValue());
+                            .arg(getName(), m_host->getValue());
     result.prepare(querystr);
 
     return !(result.exec() && result.next());

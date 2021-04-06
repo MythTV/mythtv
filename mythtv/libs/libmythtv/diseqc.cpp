@@ -2152,12 +2152,12 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
 
     LOG(VB_GENERAL, LOG_INFO, QString("SCR: Tuning to %1kHz, %2, %3 using UB=%4, FREQ=%5MHz, POS=%6%7")
             .arg(tuning.m_frequency)
-            .arg(high_band ? "HiBand" : "LoBand")
-            .arg(horizontal ? "H" : "V")
+            .arg(high_band ? "HiBand" : "LoBand",
+                 horizontal ? "H" : "V")
             .arg(m_scrUserband)
             .arg(m_scrFrequency)
-            .arg((scr_position) ? "B" : "A")
-            .arg((m_scrPin >= 0 && m_scrPin <= 255) ?
+            .arg((scr_position) ? "B" : "A",
+                 (m_scrPin >= 0 && m_scrPin <= 255) ?
                      QString(", PIN=%1").arg(m_scrPin) : QString("")));
 
     // build command

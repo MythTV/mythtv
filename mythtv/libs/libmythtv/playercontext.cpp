@@ -541,9 +541,9 @@ void PlayerContext::SetPseudoLiveTV(
     {
         new_rec = new ProgramInfo(*pi);
         QString msg = QString("Wants to record: %1 %2 %3 %4")
-            .arg(new_rec->GetTitle()).arg(new_rec->GetChanNum())
-            .arg(new_rec->GetRecordingStartTime(MythDate::ISODate))
-            .arg(new_rec->GetRecordingEndTime(MythDate::ISODate));
+            .arg(new_rec->GetTitle(), new_rec->GetChanNum(),
+                 new_rec->GetRecordingStartTime(MythDate::ISODate),
+                 new_rec->GetRecordingEndTime(MythDate::ISODate));
         LOG(VB_PLAYBACK, LOG_INFO, LOC + msg);
     }
 
@@ -553,9 +553,9 @@ void PlayerContext::SetPseudoLiveTV(
     if (old_rec)
     {
         QString msg = QString("Done recording: %1 %2 %3 %4")
-            .arg(old_rec->GetTitle()).arg(old_rec->GetChanNum())
-            .arg(old_rec->GetRecordingStartTime(MythDate::ISODate))
-            .arg(old_rec->GetRecordingEndTime(MythDate::ISODate));
+            .arg(old_rec->GetTitle(), old_rec->GetChanNum(),
+                 old_rec->GetRecordingStartTime(MythDate::ISODate),
+                 old_rec->GetRecordingEndTime(MythDate::ISODate));
         LOG(VB_PLAYBACK, LOG_INFO, LOC + msg);
         delete old_rec;
     }

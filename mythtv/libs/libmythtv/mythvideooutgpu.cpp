@@ -73,11 +73,13 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
 #endif
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers for %1 %2 (Decoder: %3): '%4'")
-        .arg(get_encoding_type(CodecID)).arg(get_decoder_name(CodecID))
-        .arg(Decoder).arg(renderers.join(",")));
+        .arg(get_encoding_type(CodecID),
+             get_decoder_name(CodecID),
+             Decoder,
+             renderers.join(",")));
     renderers = MythVideoProfile::GetFilteredRenderers(Decoder, renderers);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Allowed renderers (filt: %1): %2")
-        .arg(Decoder).arg(renderers.join(",")));
+        .arg(Decoder, renderers.join(",")));
 
     QString renderer;
 
@@ -95,7 +97,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
         else
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("No preferred renderer for decoder '%1' - profile renderer: '%2'")
-                .arg(Decoder).arg(tmp));
+                .arg(Decoder, tmp));
         }
     }
 

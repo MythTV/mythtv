@@ -194,8 +194,9 @@ void EITScanner::StartPassiveScan(ChannelBase *channel,
         m_eitHelper->SetSourceID(ChannelUtil::GetSourceIDForChannel(chanid));
         LOG(VB_EIT, LOG_INFO, LOC_ID +
             QString("Started processing EIT events in %1 scan for channel %2 chanid %3")
-                .arg(m_activeScan ? "active" : "passive")
-                .arg(m_channel->GetChannelName()).arg(chanid));
+                .arg(m_activeScan ? "active" : "passive",
+                     m_channel->GetChannelName(),
+                     QString::number(chanid)));
     }
     else
     {

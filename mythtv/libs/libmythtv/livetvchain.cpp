@@ -37,7 +37,7 @@ LiveTVChain::~LiveTVChain()
 QString LiveTVChain::InitializeNewChain(const QString &seed)
 {
     QDateTime curdt = MythDate::current();
-    m_id = QString("live-%1-%2").arg(seed).arg(curdt.toString(Qt::ISODate));
+    m_id = QString("live-%1-%2").arg(seed, curdt.toString(Qt::ISODate));
     return m_id;
 }
 
@@ -124,9 +124,9 @@ void LiveTVChain::FinishedRecording(ProgramInfo *pginfo)
     {
         LOG(VB_RECORD, LOG_INFO,
             QString("Chain: Updated endtime for '%1_%2' to %3")
-                .arg(pginfo->GetChanID())
-                .arg(pginfo->GetRecordingStartTime(MythDate::kFilename))
-                .arg(pginfo->GetRecordingEndTime(MythDate::kFilename)));
+                .arg(QString::number(pginfo->GetChanID()),
+                     pginfo->GetRecordingStartTime(MythDate::kFilename),
+                     pginfo->GetRecordingEndTime(MythDate::kFilename)));
     }
 
     QList<LiveTVChainEntry>::iterator it;
@@ -730,9 +730,9 @@ static QString toString(const LiveTVChainEntry &v)
 {
     return QString("%1: %2 (%3 to %4)%5")
         .arg(v.inputtype,6).arg(v.chanid,4)
-        .arg(v.starttime.time().toString())
-        .arg(v.endtime.time().toString())
-        .arg(v.discontinuity?" discontinuous":"");
+        .arg(v.starttime.time().toString(),
+             v.endtime.time().toString(),
+             v.discontinuity?" discontinuous":"");
 }
 
 QString LiveTVChain::toString() const

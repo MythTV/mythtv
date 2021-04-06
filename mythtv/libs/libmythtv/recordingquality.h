@@ -21,8 +21,8 @@ class RecordingGap
     QString toString(void) const
     {
         return QString("<<%1 to %2>>")
-            .arg(m_start.toString(Qt::ISODate))
-            .arg(m_end.toString(Qt::ISODate));
+            .arg(m_start.toString(Qt::ISODate),
+                 m_end.toString(Qt::ISODate));
     }
     bool operator<(const RecordingGap &o) const { return m_start < o.m_start; }
   private:

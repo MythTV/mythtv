@@ -303,7 +303,7 @@ MythVideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType EnqueueTo)
     {
         LOG(VB_PLAYBACK, LOG_NOTICE,
             QString("GetNextFreeFrame() served a busy frame %1. Dropping. %2")
-                .arg(DebugString(frame, true)).arg(GetStatus()));
+                .arg(DebugString(frame, true), GetStatus()));
         frame = m_available.dequeue();
     }
 

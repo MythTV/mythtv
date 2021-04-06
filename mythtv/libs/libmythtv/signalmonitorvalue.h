@@ -124,8 +124,9 @@ class SignalMonitorValue
                        "timeout(%7 ms) %8 set. %9 good.")
             .arg(str).arg(m_value).arg( (m_highThreshold) ? ">=" : "<=" )
             .arg(m_threshold).arg(m_minVal).arg(m_maxVal)
-            .arg(m_timeout.count()).arg( (m_set) ? "is" : "is NOT" )
-            .arg( (IsGood()) ? "Is" : "Is NOT" );
+            .arg(m_timeout.count())
+            .arg(m_set    ? "is" : "is NOT",
+                 IsGood() ? "Is" : "Is NOT" );
     }
   private:
     SignalMonitorValue() = default;
