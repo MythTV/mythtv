@@ -1744,7 +1744,7 @@ void TV::ShowOSDAskAllow()
             .replace("<sign>", (*it).m_info->GetChannelSchedulingID())
             .replace("<name>", (*it).m_info->GetChannelName());
 
-        message = single_rec.arg((*it).m_info->GetTitle()).arg(channel);
+        message = single_rec.arg((*it).m_info->GetTitle(), channel);
 
         BrowseEnd(false);
         timeuntil = MythDate::secsInFuture((*it).m_expiry);
@@ -1784,12 +1784,12 @@ void TV::ShowOSDAskAllow()
 
             if (conflict_count > 1)
             {
-                message += tr("\"%1\" on %2").arg(title).arg(channel);
+                message += tr("\"%1\" on %2").arg(title, channel);
                 message += "\n";
             }
             else
             {
-                message = single_rec.arg((*it).m_info->GetTitle()).arg(channel);
+                message = single_rec.arg((*it).m_info->GetTitle(), channel);
                 has_rec = (*it).m_hasRec;
             }
         }
@@ -1963,7 +1963,7 @@ void TV::HandleStateChange()
     TVState desiredNextState = m_playerContext.DequeueNextState();
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Attempting to change from %1 to %2")
-        .arg(StateToString(nextState)).arg(StateToString(desiredNextState)));
+        .arg(StateToString(nextState), StateToString(desiredNextState)));
 
     if (desiredNextState == kState_Error)
     {
@@ -2055,7 +2055,7 @@ void TV::HandleStateChange()
 
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("playbackURL(%1) inputtype(%2)")
-                    .arg(playbackURL).arg(m_playerContext.m_tvchain->GetInputType(-1)));
+                    .arg(playbackURL, m_playerContext.m_tvchain->GetInputType(-1)));
 
             m_playerContext.SetRingBuffer(
                 MythMediaBuffer::Create(
@@ -2190,12 +2190,12 @@ void TV::HandleStateChange()
     if (!changed)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unknown state transition: %1 to %2")
-            .arg(StateToString(m_playerContext.GetState())).arg(StateToString(desiredNextState)));
+            .arg(StateToString(m_playerContext.GetState()), StateToString(desiredNextState)));
     }
     else if (m_playerContext.GetState() != nextState)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Changing from %1 to %2")
-            .arg(StateToString(m_playerContext.GetState())).arg(StateToString(nextState)));
+            .arg(StateToString(m_playerContext.GetState()), StateToString(nextState)));
     }
 
     // update internal state variable
@@ -4532,24 +4532,24 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             if ((infoStr == "Recorded") || (infoStr == "LiveTV"))
             {
                 infoStr += QString(" %1 %2 %3 %4 %5 %6 %7")
-                    .arg(info.text["description"])
-                    .arg(speedStr)
-                    .arg(m_playerContext.m_playingInfo != nullptr ?
-                         m_playerContext.m_playingInfo->GetChanID() : 0)
-                    .arg(respDate.toString(Qt::ISODate))
-                    .arg(fplay)
-                    .arg(bufferFilename)
-                    .arg(rate);
+                    .arg(info.text["description"],
+                         speedStr,
+                         m_playerContext.m_playingInfo != nullptr
+                         ? QString::number(m_playerContext.m_playingInfo->GetChanID()) : "0",
+                         respDate.toString(Qt::ISODate),
+                         QString::number(fplay),
+                         bufferFilename,
+                         QString::number(rate));
             }
             else
             {
                 QString position = info.text["description"].section(" ",0,0);
                 infoStr += QString(" %1 %2 %3 %4 %5")
-                    .arg(position)
-                    .arg(speedStr)
-                    .arg(bufferFilename)
-                    .arg(fplay)
-                    .arg(rate);
+                    .arg(position,
+                         speedStr,
+                         bufferFilename,
+                         QString::number(fplay),
+                         QString::number(rate));
             }
 
             infoStr += QString(" Subtitles:");
@@ -4657,7 +4657,7 @@ bool TV::StartPlayer(TVState desiredState)
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("(%1) -- end %2")
-        .arg(StateToString(desiredState)).arg((ok) ? "ok" : "error"));
+        .arg(StateToString(desiredState), (ok) ? "ok" : "error"));
 
     return ok;
 }
@@ -6143,7 +6143,7 @@ void TV::PopPreviousChannel(bool ImmediateChange)
     QString cur_channum  = m_playerContext.m_tvchain->GetChannelName(-1);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("'%1'->'%2'")
-            .arg(cur_channum).arg(prev_channum));
+            .arg(cur_channum, prev_channum));
 
     // Only change channel if previous channel != current channel
     if (cur_channum != prev_channum && !prev_channum.isEmpty())
@@ -6421,7 +6421,7 @@ void TV::UpdateOSDSignal(const QStringList &List)
         infoMap["signal"] = QString::number(sig); // use normalized value
 
     bool    allGood = SignalMonitorValue::AllGood(slist);
-    char    tuneCode = 0;
+    QString tuneCode;
     QString slock   = ("1" == infoMap["slock"]) ? "L" : "l";
     QString lockMsg = (slock=="L") ? tr("Partial Lock") : tr("No Lock");
     QString sigMsg  = allGood ? tr("Lock") : lockMsg;
@@ -6435,17 +6435,18 @@ void TV::UpdateOSDSignal(const QStringList &List)
         sigDesc += " | " + tr("Rotor %1%").arg(pos,2);
 
     if (tuned == 1)
-        tuneCode = 't';
+        tuneCode = "t";
     else if (tuned == 2)
-        tuneCode = 'F';
+        tuneCode = "F";
     else if (tuned == 3)
-        tuneCode = 'T';
+        tuneCode = "T";
     else
-        tuneCode = '_';
+        tuneCode = "_";
 
     sigDesc = sigDesc + QString(" | (%1%2%3%4%5%6%7%8%9) %10")
-              .arg(tuneCode).arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct)
-              .arg(nit).arg(sdt).arg(crypt).arg(sigMsg);
+              .arg(tuneCode, slock, pat, pmt, mgt, vct,
+                   nit, sdt, crypt)
+              .arg(sigMsg);
 
     if (!err.isEmpty())
         sigDesc = err;
@@ -6518,7 +6519,7 @@ void TV::UpdateOSDTimeoutMessage()
         "You can continue to wait for a signal, or you "
         "can change the channel with %1 or %2, change "
         "video source (%3), inputs (%4), etc.")
-        .arg(s_chanUp).arg(s_chanDown).arg(s_nextSrc).arg(s_togCards);
+        .arg(s_chanUp, s_chanDown, s_nextSrc, s_togCards);
 
     emit ChangeOSDDialog({ OSD_DLG_INFO, message, 0ms,
                        { {tr("OK"), "DIALOG_INFO_CHANNELLOCK_0" } },
@@ -7930,7 +7931,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
 {
     GetPlayerReadLock();
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("result %1 text %2 action %3")
-        .arg(Result).arg(Text).arg(Action));
+        .arg(QString::number(Result), Text, Action));
 
     bool hide = true;
     if (Result == 100)
@@ -8127,7 +8128,7 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
 
                 LOG(VB_CHANNEL, LOG_INFO, LOC +
                     QString("Channel Group: '%1'->'%2'")
-                        .arg(cur_channum).arg(new_channum));
+                        .arg(cur_channum, new_channum));
             }
 
             if (m_playerContext.m_tvchain)
@@ -8913,8 +8914,8 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
                 {
                     BUTTON(actionName,
                            QString("%1: %2")
-                           .arg(m_lastProgram->GetTitle())
-                           .arg(m_lastProgram->GetSubtitle()));
+                           .arg(m_lastProgram->GetTitle(),
+                                m_lastProgram->GetSubtitle()));
                 }
             }
         }
@@ -9237,7 +9238,7 @@ void TV::FillOSDMenuJumpRec(const QString &Category, int Level, const QString &S
             else if (progIndex > 1 && Level == 0)
             {
                 QString act = QString("DIALOG_%1_%2_1")
-                                .arg(ACTION_JUMPREC).arg(group);
+                                .arg(ACTION_JUMPREC, group);
                 dialog.m_buttons.push_back( {group, act, true, Selected == group });
             }
             else if (Level == 1 && Iprog.key() == Category)
@@ -9393,7 +9394,7 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
         if (!proginfo)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to locate jump to program '%1' @ %2")
-                .arg(key).arg(action.section(" ",-1,-1)));
+                .arg(key, action.section(" ",-1,-1)));
             return true;
         }
 
@@ -9870,7 +9871,7 @@ void TV::ShowOSDPromptDeleteRecording(const QString& Title, bool Force)
     if (m_player)
         m_player->GetCodecDescription(infoMap);
     QString message = QString("%1\n%2\n%3")
-        .arg(Title).arg(infoMap["title"]).arg(infoMap["timedate"]);
+        .arg(Title, infoMap["title"], infoMap["timedate"]);
 
     OSD *osd = GetOSDL();
     if (osd && (!osd->DialogVisible() || Force))
