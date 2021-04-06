@@ -20,6 +20,8 @@
 
 #define LOC      QString("MythFontProperties: ")
 
+#define KEEP_OLD_NAMES 1
+
 QMutex MythFontProperties::s_zoomLock;
 uint MythFontProperties::s_zoomPercent = 0;
 
@@ -345,27 +347,39 @@ MythFontProperties *MythFontProperties::ParseFromXml(
             {
                 QString weight = getFirstText(info).toLower();
 
-                if (weight == "ultralight" ||
+                if (weight == "thin" ||
                     weight == "1")
-                    newFont->m_face.setWeight(1);
-                else if (weight == "light" ||
+                    newFont->m_face.setWeight(QFont::Thin);
+                else if (weight == "extralight" ||
+#ifdef KEEP_OLD_NAMES
+                         weight == "ultralight" ||
+#endif
                          weight == "2")
+                    newFont->m_face.setWeight(QFont::ExtraLight);
+                else if (weight == "light" ||
+                         weight == "3")
                     newFont->m_face.setWeight(QFont::Light);
                 else if (weight == "normal" ||
-                         weight == "3")
-                    newFont->m_face.setWeight(QFont::Normal);    // NOLINT(bugprone-branch-clone)
-                else if (weight == "demibold" ||
                          weight == "4")
+                    newFont->m_face.setWeight(QFont::Normal);    // NOLINT(bugprone-branch-clone)
+                else if (weight == "medium" ||
+                         weight == "5")
+                    newFont->m_face.setWeight(QFont::Medium);
+                else if (weight == "demibold" ||
+                         weight == "6")
                     newFont->m_face.setWeight(QFont::DemiBold);
                 else if (weight == "bold" ||
-                         weight == "5")
-                    newFont->m_face.setWeight(QFont::Bold);
-                else if (weight == "black" ||
-                         weight == "6")
-                    newFont->m_face.setWeight(QFont::Black);
-                else if (weight == "ultrablack" ||
                          weight == "7")
-                    newFont->m_face.setWeight(99);
+                    newFont->m_face.setWeight(QFont::Bold);
+                else if (weight == "extrabold" ||
+                         weight == "8")
+                    newFont->m_face.setWeight(QFont::ExtraBold);
+                else if (weight == "black" ||
+#ifdef KEEP_OLD_NAMES
+                         weight == "ultrablack" ||
+#endif
+                         weight == "9")
+                    newFont->m_face.setWeight(QFont::Black);
                 else
                     newFont->m_face.setWeight(QFont::Normal);
             }

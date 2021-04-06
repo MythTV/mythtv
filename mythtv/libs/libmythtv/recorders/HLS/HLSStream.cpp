@@ -175,7 +175,7 @@ bool HLSRecStream::SetAESIV(QString line)
         // not even size, pad with front 0
         line.insert(2, QLatin1String("0"));
     }
-    int padding = std::max(0, AES_BLOCK_SIZE - (line.size() - 2));
+    int padding = std::max(0, AES_BLOCK_SIZE - (static_cast<int>(line.size()) - 2));
     QByteArray ba = QByteArray(padding, 0x0);
     ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
     m_aesIV = ba;

@@ -2,16 +2,18 @@
 // Program Name: service.cpp
 // Created     : Jan. 19, 2010
 //
-// Purpose     : Base class for all Web Services 
-//                                                                            
+// Purpose     : Base class for all Web Services
+//
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
-//                                          
+//
 // Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
 #include "service.h"
 #include <QMetaEnum>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -33,19 +35,23 @@ QVariant Service::ConvertToVariant( int nType, void *pValue )
         return QVariant::fromValue<QObject*>( pObj );
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     return QVariant( nType, pValue );
+#else
+    return QVariant( QMetaType(nType), pValue );
+#endif
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////////////
 
 void* Service::ConvertToParameterPtr( int            nTypeId,
-                                      const QString &sParamType, 
+                                      const QString &sParamType,
                                       void*          pParam,
                                       const QString &sValue )
-{      
+{
     // -=>NOTE: Only intrinsic or Qt type conversions should be here
     //          All others should be added to overridden implementation.
 
@@ -84,7 +90,18 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
         }
         case QMetaType::QTime       : *(( QTime          *)pParam) = QTime::fromString    ( sValue, Qt::ISODate ); break;
         case QMetaType::QDate       : *(( QDate          *)pParam) = QDate::fromString    ( sValue, Qt::ISODate ); break;
+        case QMetaType::QJsonObject :
+        {
+            QJsonDocument doc = QJsonDocument::fromJson(sValue.toUtf8());
 
+            // check validity of the document
+            if(!doc.isNull())
+            {
+                if(doc.isObject())
+                    *(( QJsonObject *)pParam) = doc.object();
+            }
+            break;
+        }
         default:
 
             // --------------------------------------------------------------

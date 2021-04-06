@@ -250,7 +250,7 @@ class META_PUBLIC MetadataLookup : public QObject, public ReferenceCounter
     void SetAllowOverwrites(bool allow) { m_allowOverwrites = allow; };
     void SetAllowGeneric(bool allow) { m_allowGeneric = allow; };
     void SetHost(const QString &host) { m_host = host; };
-    void SetDownloads(ArtworkMap map) { m_downloads = std::move(map); };
+    void SetDownloads(DownloadMap map) { m_downloads = std::move(map); };
 
     // General Sets
     void SetTitle(const QString &title)

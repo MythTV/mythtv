@@ -29,6 +29,7 @@ class SERVICE_PUBLIC VideoSource : public QObject
     Q_PROPERTY( uint            BouquetId       READ BouquetId        WRITE setBouquetId      )
     Q_PROPERTY( uint            RegionId        READ RegionId         WRITE setRegionId       )
     Q_PROPERTY( uint            ScanFrequency   READ ScanFrequency    WRITE setScanFrequency  )
+    Q_PROPERTY( uint            LCNOffset       READ LCNOffset        WRITE setLCNOffset      )
 
     PROPERTYIMP    ( int        , Id             )
     PROPERTYIMP_REF( QString    , SourceName     )
@@ -43,6 +44,7 @@ class SERVICE_PUBLIC VideoSource : public QObject
     PROPERTYIMP    ( uint       , BouquetId      )
     PROPERTYIMP    ( uint       , RegionId       )
     PROPERTYIMP    ( uint       , ScanFrequency  )
+    PROPERTYIMP    ( uint       , LCNOffset      )
 
     public:
 

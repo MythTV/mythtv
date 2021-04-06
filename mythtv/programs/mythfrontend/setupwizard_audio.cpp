@@ -189,7 +189,8 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
     AudioOutputSettings settings;
 
     auto samename = [out](const auto & ao){ return ao.m_name == out; };
-    const auto *ao = std::find_if(m_outputlist->cbegin(), m_outputlist->cend(), samename);
+    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+    const auto ao = std::find_if(m_outputlist->cbegin(), m_outputlist->cend(), samename);
     if (ao != m_outputlist->cend())
         settings = ao->m_settings;
 

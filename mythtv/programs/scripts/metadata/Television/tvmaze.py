@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+# Support python3 print syntax if we're running in python2
+from __future__ import print_function
+
 from __future__ import unicode_literals
 
 __title__ = "TVmaze.com"
-__author__ = "Roland Ernst"
-__version__ = "0.1.0"
+__author__ = "Roland Ernst, Steve Erlenborn"
+__version__ = "0.5.0"
 
 
 import sys
@@ -39,14 +42,35 @@ def check_item(m, mitem, ignore=True):
             raise
 
 
-def _get_series_image(item):
-    url = item['resolutions']['original']['url']
-    if item['resolutions'].get('medium') is not None:
-        thumb = item['resolutions']['medium']['url']
-        pdict = {'type': 'fanart', 'url': url, 'thumb': thumb}
-    else:
-        pdict = {'type': 'fanart', 'url': url}
-    return pdict
+def get_show_art_lists(tvmaze_show_id):
+    from MythTV.tvmaze import tvmaze_api as tvmaze
+
+    artlist = tvmaze.get_show_artwork(tvmaze_show_id)
+
+    #--------------------------------------------------------------------------
+    # The Main flag is true for artwork which is "official" from the Network.
+    # Under the theory that "official" artwork should be high quality, we want
+    # those artworks to be located at the beginning of the generated list.
+    #--------------------------------------------------------------------------
+    posterList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if (art_item.main and (art_item.type == 'poster'))]
+    posterNorm = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((not art_item.main) and (art_item.type == 'poster'))]
+    posterList.extend(posterNorm)
+
+    fanartList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if (art_item.main and (art_item.type == 'background'))]
+    fanartNorm = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((not art_item.main) and (art_item.type == 'background'))]
+    fanartList.extend(fanartNorm)
+
+    bannerList = [(art_item.original, art_item.medium) for art_item in artlist \
+              if (art_item.main and (art_item.type == 'banner'))]
+    bannerNorm = [(art_item.original, art_item.medium) for art_item in artlist \
+              if ((not art_item.main) and (art_item.type == 'banner'))]
+    bannerList.extend(bannerNorm)
+
+    return posterList, fanartList, bannerList
 
 
 def buildList(tvtitle, opts):
@@ -82,12 +106,39 @@ def buildList(tvtitle, opts):
         m.inetref = check_item(m, ("inetref", str(show_info.id)), ignore=False)
         m.collectionref = check_item(m, ("collectionref", str(show_info.id)), ignore=False)
         m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
+        m.userrating = check_item(m, ("userrating", show_info.rating['average']))
+        try:
+            m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+        except (TypeError, ValueError):
+            pass
         if show_info.premiere_date:
             m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
             m.year = check_item(m, ("year", show_info.premiere_date.year))
-        if show_info.images is not None and len(show_info.images) > 0:
-            m.images.append({'type': 'coverart', 'url': show_info.images['original'],
-                             'thumb': show_info.images['medium']})
+
+        posterList, fanartList, bannerList = get_show_art_lists(show_info.id)
+
+        # Generate one image line for each type of artwork
+        if posterList:
+            posterEntry = posterList[0]
+            if (posterEntry[0] is not None) and (posterEntry[1] is not None):
+                m.images.append({'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]})
+            elif posterEntry[0] is not None:
+                m.images.append({'type': 'coverart', 'url': posterEntry[0]})
+
+        if fanartList:
+            fanartEntry = fanartList[0]
+            if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+                m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+            elif fanartEntry[0] is not None:
+                m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
+
+        if bannerList:
+            bannerEntry = bannerList[0]
+            if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
+                m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
+            elif bannerEntry[0] is not None:
+                m.images.append({'type': 'banner', 'url': bannerEntry[0]})
+
         tree.append(m.toXML())
 
     print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
@@ -95,13 +146,16 @@ def buildList(tvtitle, opts):
 
 
 def buildNumbers(args, opts):
-    # either option -N inetref subtitle
-    # or  option -N title subtitle
-    from lxml import etree
-    from MythTV import VideoMetadata, datetime
+    # either option -N <inetref> <subtitle>   e.g. -N 69 "Elizabeth Keen"
+    #    or  option -N <inetref> <date time>  e.g. -N 69 "2021-01-29 19:00:00"
+    #    or  option -N <title> <subtitle>     e.g. -N "The Blacklist" "Elizabeth Keen"
+    #    or  option -N <title> <date time>    e.g. -N "The Blacklist" "2021-01-29 19:00:00"
     from MythTV.utility import levenshtein
+    from MythTV.utility.dt import posixtzinfo
     from MythTV.tvmaze import tvmaze_api as tvmaze
-    from MythTV.tvmaze import locales
+    from MythTV import datetime
+    from lxml import etree
+    from datetime import timedelta
 
     if opts.debug:
         print("Function 'buildNumbers' called with arguments: " +
@@ -111,6 +165,7 @@ def buildNumbers(args, opts):
     if opts.session:
         tvmaze.set_session(opts.session)
 
+    dtInLocalZone = None
     # ToDo:
     # below check shows a deficiency of the MythTV grabber API itself:
     # TV-Shows or Movies with an integer as title are not recognized correctly.
@@ -119,52 +174,183 @@ def buildNumbers(args, opts):
     try:
         inetref = int(args[0])
         tvsubtitle = args[1]
+        inetrefList = [inetref]
+
     except ValueError:
         tvtitle = args[0]
         tvsubtitle = args[1]
-        serie = tvmaze.search_show_best_match(tvtitle)
-        try:
-            # inetref = str(serie.id)
-            inetref = int(serie.id)
-            if opts.debug:
-                print("tvmaze.search_show_best_match(%s) returned inetref : %s"
-                      % (tvtitle, inetref))
+        inetrefList = []    # inetrefs for shows with title matches
+        best_show_quality = 0.5     # require at least this quality on string match
+
+        showlist = tvmaze.search_show(tvtitle)
+
+        # It's problematic to make decisions solely upon the Levenshtein distance.
+        # If the strings are really long or really short, a simple rule, such as
+        # "accept any distance < 6" can provide misleading results.
+        # To establish a more useful measurement, we'll use the Levenshtein
+        # distance to figure out the ratio (0 - 1) of matching characters in the
+        # longer string, and call this 'match_quality'.
+        #    "Risk", "Call" -> distance = 4
+        #           match_quality = (4 - 4) / 4 = 0
+        #    "In Sickness and in Health", "Sickness and Health" -> distance = 6
+        #           match_quality = (25 - 6)/25 = .76
+
+        for show_info in showlist:
+            try:
+                inetref = int(show_info.id)
+                distance = levenshtein(show_info.name.lower(), tvtitle.lower())
+                if len(tvtitle) > len(show_info.name):
+                    match_quality = float(len(tvtitle) - distance) / len(tvtitle)
+                else:
+                    match_quality = float(len(show_info.name) - distance) / len(show_info.name)
+                if match_quality >= best_show_quality:
+                    #if opts.debug:
+                        #print ('show_info =', show_info, ', match_quality =', match_quality)
+                    if match_quality == best_show_quality:
+                        inetrefList.append(inetref)
+                    else:
+                        # Any items previously appended for a lesser match need to be eliminated
+                        inetrefList = [inetref]
+                        best_show_quality = match_quality
+            except(TypeError, ValueError):
+                pass
+
+    # check whether the 'subtitle' is really a timestamp
+    try:
+        dtInLocalZone = datetime.strptime(tvsubtitle, "%Y-%m-%d %H:%M:%S") # defaults to local timezone
+    except ValueError:
+        dtInLocalZone = None
+
+    matchesFound = 0
+    best_ep_quality = 0.5   # require at least this quality on string match
+    tree = etree.XML(u'<metadata></metadata>')
+    for inetref in inetrefList:
+        dtInTgtZone = None
+        if dtInLocalZone:
+            try:
+                show_info = tvmaze.get_show(inetref)
+                # Some cases have 'network' = None, but webChannel != None. If we
+                # find such a case, we'll set show_network to the webChannel.
+                show_network = show_info.network
+                if show_network is None:
+                    show_network = show_info.streaming_service
+                show_country = show_network.get('country')
+                show_tz = show_country.get('timezone')
+                dtInTgtZone = dtInLocalZone.astimezone(posixtzinfo(show_tz))
+
+            except (ValueError, AttributeError) as e:
+                dtInTgtZone = None
+
+        if dtInTgtZone:
+            # get episode info based on inetref and datetime in target zone
+            try:
+                #print('get_show_episodes_by_date(', inetref, ',', dtInTgtZone, ')')
+                episodes = tvmaze.get_show_episodes_by_date(inetref, dtInTgtZone)
+            except SystemExit:
+                episodes = []
+            time_match_list = []
+            early_match_list = []
+            minTimeDelta = timedelta(minutes=60)
+            for i, ep in enumerate(episodes):
+                epInTgtZone = datetime.fromIso(ep.timestamp, tz = posixtzinfo(show_tz))
+                durationDelta = timedelta(minutes=ep.duration)
+
+                # Consider it a match if the recording starts late, but within the duration of the show.
+                if epInTgtZone <= dtInTgtZone < epInTgtZone+durationDelta:
+                    # Recording start time is within the range of this episode
+                    if opts.debug:
+                        print('Recording in range of inetref %d, season %d, episode %d (%s ... %s)' \
+                                % (inetref, ep.season, ep.number, epInTgtZone, epInTgtZone+durationDelta))
+                    time_match_list.append(i)
+                    minTimeDelta = timedelta(minutes=0)
+                # Consider it a match if the recording is a little bit early. This helps cases
+                # where you set up a rule to record, at say 9:00, and the broadcaster uses a
+                # slightly odd start time, like 9:05.
+                elif epInTgtZone-minTimeDelta <= dtInTgtZone < epInTgtZone:
+                    # Recording started earlier than this episode, so see if it's the closest match
+                    if epInTgtZone - dtInTgtZone == minTimeDelta:
+                        if opts.debug:
+                            print('adding episode to closest list', epInTgtZone - dtInTgtZone, '\n')
+                        early_match_list.append(i)
+                    elif epInTgtZone - dtInTgtZone < minTimeDelta:
+                        if opts.debug:
+                            print('this episode is new closest', epInTgtZone - dtInTgtZone, '\n')
+                        minTimeDelta = epInTgtZone - dtInTgtZone
+                        early_match_list = [i]
+
+            if not time_match_list:
+                # No exact matches found, so use the list of the closest episode(s)
+                time_match_list = early_match_list
+
+            if time_match_list:
+                for ep_index in time_match_list:
+                    season_nr  = str(episodes[ep_index].season)
+                    episode_id = episodes[ep_index].id
+                    item = buildSingleItem(inetref, season_nr, episode_id)
+                    if item is not None:
+                        tree.append(item.toXML())
+                        matchesFound += 1
+        else:
+            # get episode based on subtitle
+            episodes = tvmaze.get_show_episode_list(inetref)
+
+            min_dist_list = []
+            for i, ep in enumerate(episodes):
                 if 0 and opts.debug:
-                    print(serie, type(serie))
-                    for k, v in serie.__dict__.items():
+                    print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
+                    for k, v in ep.__dict__.items():
                         print(k, " : ", v)
-        except(TypeError, ValueError):
-            raise Exception("Cannot resolve argument 'inetref'")
+                distance = levenshtein(ep.name, tvsubtitle)
+                if len(tvsubtitle) >= len(ep.name):
+                    match_quality = float(len(tvsubtitle) - distance) / len(tvsubtitle)
+                else:
+                    match_quality = float(len(ep.name) - distance) / len(ep.name)
+                #if opts.debug:
+                    #print('inetref', inetref, 'episode =', ep.name, ', distance =', distance, ', match_quality =', match_quality)
+                if match_quality >= best_ep_quality:
+                    if match_quality == best_ep_quality:
+                        min_dist_list.append(i)
+                        if opts.debug:
+                            print('"%s" added to best list, match_quality = %g' % (ep.name, match_quality))
+                    else:
+                        # Any items previously appended for a lesser match need to be eliminated
+                        tree = etree.XML(u'<metadata></metadata>')
+                        min_dist_list = [i]
+                        best_ep_quality = match_quality
+                        if opts.debug:
+                            print('"%s" is new best match_quality = %g' % (ep.name, match_quality))
 
-    # get episode based on subtitle
-    episodes = tvmaze.get_show_episode_list(inetref)
+            # The list is constructed in order of oldest season to newest.
+            # If episodes with equivalent match quality show up in multiple
+            # seasons, we want to list the most recent first. To accomplish
+            # this, we'll process items starting at the end of the list, and
+            # proceed to the beginning.
+            while min_dist_list:
+                ep_index = min_dist_list.pop()
+                season_nr  = str(episodes[ep_index].season)
+                episode_id = episodes[ep_index].id
+                if opts.debug:
+                    episode_nr = str(episodes[ep_index].number)
+                    print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
+                    print("with season : %s and episode %s" % (season_nr, episode_nr))
+                    print("Chosen episode index '%d' based on match quality %g"
+                          % (ep_index, best_ep_quality))
 
-    best_ep_index = None
-    ep_distance = 5                     ### XXX read distance from settings
-    for i, ep in enumerate(episodes):
-        if 0 and opts.debug:
-            print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
-            for k, v in ep.__dict__.items():
-                print(k, " : ", v)
-        distance = levenshtein(ep.name, tvsubtitle)
-        if distance < ep_distance:
-            best_ep_index = i
-            ep_distance = distance
-    if len(episodes) > 0 and best_ep_index is not None:
-        season_nr  = str(episodes[best_ep_index].season)
-        episode_nr = str(episodes[best_ep_index].number)
-        episode_id = episodes[best_ep_index].id
-        if opts.debug:
-            print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
-            print("with season : %s and episode %s" % (season_nr, episode_nr))
-            print("Chosen episode index '%d' based on levenshtein distance '%d'."
-                  % (best_ep_index, ep_distance))
+                # we have now inetref, season, episode_id
+                item = buildSingleItem(inetref, season_nr, episode_id)
+                if item is not None:
+                    tree.append(item.toXML())
+                    matchesFound += 1
 
-        # we have now inetref, season, episode, episode_id
-        buildSingle([inetref, season_nr, episode_nr], opts, tvmaze_episode_id=episode_id)
+    if matchesFound > 0:
+        print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                                   xml_declaration=True))
     else:
-        # tvmaze.py -N 4711 "Episode 42"
-        raise Exception("Cannot find episodes for inetref '%s'." % inetref)
+        if dtInLocalZone:
+            raise Exception("Cannot find any episode with timestamp matching '%s'." % tvsubtitle)
+        else:
+            # tvmaze.py -N 4711 "Episode 42"
+            raise Exception("Cannot find any episode with subtitle '%s'." % tvsubtitle)
 
 
 def buildSingle(args, opts, tvmaze_episode_id=None):
@@ -185,7 +371,7 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
         dstr = "Function 'buildSingle' called with arguments: " + \
                 (" ".join(["'%s'" % i for i in args]))
         if tvmaze_episode_id is not None:
-            dstr += "tvmaze_episode_id = %d" % tvmaze_episode_id
+            dstr += " tvmaze_episode_id = %d" % tvmaze_episode_id
         print(dstr)
     inetref = args[0]
     season  = args[1]
@@ -200,44 +386,38 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
         episodes = tvmaze.get_show_episode_list(inetref)
         for ep in (episodes):
             if 0 and opts.debug:
-                print("tvmaze.vmaze.get_show_episode_list(%s) returned :" % inetref)
+                print("tvmaze.get_show_episode_list(%s) returned :" % inetref)
                 for k, v in ep.__dict__.items():
                     print(k, " : ", v)
             if ep.season == int(season) and ep.number == int(episode):
                 tvmaze_episode_id = ep.id
-                ### XXX check if season == int(ep.season)          ### XXX
                 if opts.debug:
                     print(" Found tvmaze_episode_id : %d" % tvmaze_episode_id)
                 break
 
-    # get info for dedicated season:
-    ep_info = tvmaze.get_episode_information(tvmaze_episode_id)
-    if opts.debug:
-        for k, v in ep_info.__dict__.items():
-            print(k, " : ", v)
-
-    # get global info for all seasons/episodes:
-    show_info = tvmaze.get_show(inetref, populated=True)
-    if opts.debug:
-        print("tvmaze.get_show(%s, populated=True) returned :" % inetref)
-        for k, v in show_info.__dict__.items():
-            print(k, " : ", v)
-        if 0 and opts.debug:
-            for c in show_info.cast:
-                for k, v in c.__dict__.items():
-                    print(k, " : ", v)
-            for c in show_info.crew:
-                for k, v in c.__dict__.items():
-                    print(k, " : ", v)
-
-    # get info for dedicated season:
-    season_info = show_info.seasons[int(season)]
-    if opts.debug:
-        for k, v in season_info.__dict__.items():
-            print(k, " : ", v)
-
     # build xml:
     tree = etree.XML(u'<metadata></metadata>')
+    item = buildSingleItem(inetref, season, tvmaze_episode_id)
+    if item is not None:
+        tree.append(item.toXML())
+    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
+                               xml_declaration=True))
+
+
+def buildSingleItem(inetref, season, episode_id):
+    """
+    This routine returns a video metadata item for one episode.
+    """
+    from MythTV import VideoMetadata
+    from MythTV.tvmaze import tvmaze_api as tvmaze
+    from MythTV.tvmaze import locales
+
+    # get global info for all seasons/episodes:
+    posterList, fanartList, bannerList = get_show_art_lists(inetref)
+    show_info = tvmaze.get_show(inetref, populated=True)
+
+    # get info for season episodes:
+    ep_info = tvmaze.get_episode_information(episode_id)
     m = VideoMetadata()
     if show_info.genres is not None and len(show_info.genres) > 0:
         for g in show_info.genres:
@@ -262,6 +442,11 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
     m.inetref = check_item(m, ("inetref", str(show_info.id)), ignore=False)
     m.collectionref = check_item(m, ("inetref", str(show_info.id)), ignore=False)
     m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
+    m.userrating = check_item(m, ("userrating", show_info.rating['average']))
+    try:
+        m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+    except (TypeError, ValueError):
+        pass
     # prefer episode airdate dates:
     if ep_info.airdate:
         m.releasedate = check_item(m, ("releasedate", ep_info.airdate))
@@ -288,42 +473,43 @@ def buildSingle(args, opts, tvmaze_episode_id=None):
         except:
             pass
 
+    # get info for dedicated season:
+    season_info = show_info.seasons[int(season)]
+    #for k, v in season_info.__dict__.items():
+        #print(k, " : ", v)
+
     # prefer season coverarts over series coverart:
     if season_info.images is not None and len(season_info.images) > 0:
         m.images.append({'type': 'coverart', 'url': season_info.images['original'],
                          'thumb': season_info.images['medium']})
-    if show_info.images is not None and len(show_info.images) > 0:
-        m.images.append({'type': 'coverart', 'url': show_info.images['original'],
-                         'thumb': show_info.images['medium']})
+
+    # generate series coverart, fanart, and banners
+    for posterEntry in posterList:
+        if (posterEntry[0] is not None) and (posterEntry[1] is not None):
+            image_entry = {'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]}
+        elif posterEntry[0] is not None:
+            image_entry = {'type': 'coverart', 'url': posterEntry[0]}
+        # Avoid duplicate coverart entries
+        if image_entry not in m.images:
+            m.images.append(image_entry)
+
+    for fanartEntry in fanartList:
+        if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+        elif fanartEntry[0] is not None:
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
+
+    for bannerEntry in bannerList:
+        if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
+            m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
+        elif bannerEntry[0] is not None:
+            m.images.append({'type': 'banner', 'url': bannerEntry[0]})
+
     # screenshot is associated to episode
     if ep_info.images is not None and len(ep_info.images) > 0:
         m.images.append({'type': 'screenshot', 'url': ep_info.images['original'],
                          'thumb': ep_info.images['medium']})
-
-    if show_info.series_images is not None and len(show_info.series_images) > 0:
-        # sort for 'background' and then for 'poster'
-        for item in show_info.series_images:
-            if item['type'] == 'background' and not item['main']:
-                try:
-                    pdict = _get_series_image(item)
-                    if pdict not in m.images:
-                        m.images.append(pdict)
-                except(KeyError, ValueError):
-                    pass
-
-        ## posters cannot be stretched to fullscreen as fanart          ### XXX
-        #for item in show_info.series_images:
-        #    if item['type'] == 'poster' and not item['main']:
-        #        try:
-        #            pdict = _get_series_image(item)
-        #            if pdict not in m.images:
-        #                m.images.append(pdict)
-        #        except(KeyError, ValueError):
-        #            pass
-
-    tree.append(m.toXML())
-    print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
-                               xml_declaration=True))
+    return m
 
 
 def buildCollection(tvinetref, opts):
@@ -362,6 +548,10 @@ def buildCollection(tvinetref, opts):
     m.imdb = check_item(m, ("imdb", str(show_info.external_ids['imdb'])))
     m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
     m.userrating = check_item(m, ("userrating", show_info.rating['average']))
+    try:
+        m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
+    except (TypeError, ValueError):
+        pass
     if show_info.premiere_date:
         m.releasedate = check_item(m, ("releasedate", show_info.premiere_date))
         m.year = check_item(m, ("year", show_info.premiere_date.year))
@@ -371,9 +561,28 @@ def buildCollection(tvinetref, opts):
             m.studios.append(sinfo)
     except:
         pass
-    if show_info.images is not None and len(show_info.images) > 0:
-        m.images.append({'type': 'coverart', 'url': show_info.images['original'],
-                         'thumb': show_info.images['medium']})
+
+    posterList, fanartList, bannerList = get_show_art_lists(show_info.id)
+
+    # Generate image lines for every piece of artwork
+    for posterEntry in posterList:
+        if (posterEntry[0] is not None) and (posterEntry[1] is not None):
+            m.images.append({'type': 'coverart', 'url': posterEntry[0], 'thumb': posterEntry[1]})
+        elif posterEntry[0] is not None:
+            m.images.append({'type': 'coverart', 'url': posterEntry[0]})
+
+    for fanartEntry in fanartList:
+        if (fanartEntry[0] is not None) and (fanartEntry[1] is not None):
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0], 'thumb': fanartEntry[1]})
+        elif fanartEntry[0] is not None:
+            m.images.append({'type': 'fanart', 'url': fanartEntry[0]})
+
+    for bannerEntry in bannerList:
+        if (bannerEntry[0] is not None) and (bannerEntry[1] is not None):
+            m.images.append({'type': 'banner', 'url': bannerEntry[0], 'thumb': bannerEntry[1]})
+        elif bannerEntry[0] is not None:
+            m.images.append({'type': 'banner', 'url': bannerEntry[0]})
+
     tree.append(m.toXML())
 
     print_etree(etree.tostring(tree, encoding='UTF-8', pretty_print=True,
@@ -468,8 +677,6 @@ def main():
 
     if opts.doctest:
         import doctest
-        opts.debug = False
-
         try:
             with open("tvmaze_tests.txt") as f:
                 if sys.version_info[0] == 2:
@@ -480,7 +687,7 @@ def main():
         except IOError:
             pass
         # perhaps try optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
-        doctest.testmod(verbose=True, optionflags=doctest.ELLIPSIS)
+        doctest.testmod(verbose=opts.debug, optionflags=doctest.ELLIPSIS)
 
     if opts.version:
         buildVersion()
@@ -490,7 +697,6 @@ def main():
 
     if opts.debug:
         import requests
-        pass
     else:
         confdir = os.environ.get('MYTHCONFDIR', '')
         if (not confdir) or (confdir == '/'):
@@ -538,6 +744,7 @@ def main():
                 buildSingle(args, opts)
 
             if opts.collectiondata:
+                # option -C inetref
                 if (len(args) != 1) or (len(args[0]) == 0):
                     sys.stdout.write('ERROR: tvmaze -C requires exactly one non-empty argument')
                     sys.exit(1)

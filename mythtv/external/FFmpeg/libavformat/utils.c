@@ -252,13 +252,16 @@ int av_format_get_probe_score(const AVFormatContext *s)
 int ffio_limit(AVIOContext *s, int size)
 {
     if (s->maxsize>= 0) {
-        int64_t remaining= s->maxsize - avio_tell(s);
+        int64_t pos = avio_tell(s);
+        int64_t remaining= s->maxsize - pos;
         if (remaining < size) {
             int64_t newsize = avio_size(s);
             if (!s->maxsize || s->maxsize<newsize)
                 s->maxsize = newsize - !newsize;
-            remaining= s->maxsize - avio_tell(s);
-            remaining= FFMAX(remaining, 0);
+            if (pos > s->maxsize && s->maxsize >= 0)
+                s->maxsize = AVERROR(EIO);
+            if (s->maxsize >= 0)
+                remaining = s->maxsize - pos;
         }
 
         if (s->maxsize>= 0 && remaining+1 < size) {
@@ -1154,6 +1157,7 @@ static void update_initial_timestamps(AVFormatContext *s, int stream_index,
         dts           == AV_NOPTS_VALUE ||
         st->cur_dts   == AV_NOPTS_VALUE ||
         st->cur_dts < INT_MIN + RELATIVE_TS_BASE ||
+        dts  < INT_MIN + (st->cur_dts - RELATIVE_TS_BASE) ||
         is_relative(dts))
         return;
 
@@ -1305,7 +1309,7 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
         presentation_delayed = 1;
 
     if (pkt->pts != AV_NOPTS_VALUE && pkt->dts != AV_NOPTS_VALUE &&
-        st->pts_wrap_bits < 63 &&
+        st->pts_wrap_bits < 63 && pkt->dts > INT64_MIN + (1LL << (st->pts_wrap_bits - 1)) &&
         pkt->dts - (1LL << (st->pts_wrap_bits - 1)) > pkt->pts) {
         if (is_relative(st->cur_dts) || pkt->dts - (1LL<<(st->pts_wrap_bits - 1)) > st->cur_dts) {
             pkt->dts -= 1LL << st->pts_wrap_bits;
@@ -1490,7 +1494,8 @@ static int parse_packet(AVFormatContext *s, AVPacket *pkt,
         pkt->pts = pkt->dts = AV_NOPTS_VALUE;
         pkt->pos = -1;
         /* increment read pointer */
-        data += len;
+        av_assert1(data || !len);
+        data  = len ? data + len : data;
         size -= len;
 
         got_output = !!out_pkt.size;
@@ -4819,8 +4824,11 @@ int av_get_frame_filename2(char *buf, int buf_size, const char *path, int number
         if (c == '%') {
             do {
                 nd = 0;
-                while (av_isdigit(*p))
+                while (av_isdigit(*p)) {
+                    if (nd >= INT_MAX / 10 - 255)
+                        goto fail;
                     nd = nd * 10 + *p++ - '0';
+                }
                 c = *p++;
             } while (av_isdigit(c));
 

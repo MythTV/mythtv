@@ -25,6 +25,8 @@
 # Roland Ernst
 # Changes implemented for MythTV:
 # - added support for requests.Session()
+# - relax requirement for dateutil
+# - added get_show_artwork()
 #
 # ---------------------------------------------------
 
@@ -35,7 +37,6 @@ from datetime import datetime
 from requests import codes as requestcodes
 import sys
 import time
-from dateutil import parser
 from pprint import pprint
 
 from . import endpoints
@@ -44,6 +45,7 @@ from .episode import Episode
 from .season import Season
 from .person import Character, Person, Crew
 from .embed import Embed
+from .artwork import Artwork
 
 
 MYTHTV_TVMAZE_API_VERSION = "0.1.0"
@@ -90,6 +92,8 @@ def _query_api(url, params=None):
                 sys.exit(1)
             time.sleep(10)
             http_retries += 1
+        elif res.status_code == 404: # no such page
+            return None
         elif res.status_code != requestcodes.OK:
             print('Page request was unsuccessful: ' + str(res.status_code), res.reason)
             sys.exit(1)
@@ -104,6 +108,25 @@ def _query_api(url, params=None):
         return None
     else:
         return res.json()
+
+
+def _simple_iso_date_parser(date):
+    """ A simple parser for dates in ISO-8601 format.
+    """
+    try:
+        # python 3.7+
+        return datetime.fromisoformat(date)
+    except:
+        for f, s in [("%Y-%m-%dT%H:%M:%S", 19),
+                     ("%Y-%m-%d %H:%M:%S", 19),
+                     ("%Y-%m-%d", 10)]:
+            try:
+                isodate = datetime.strptime(date[:s], f)
+                return isodate
+            except:
+                pass
+    raise TypeError("time data '{0}' does not match ISO 8601 format" \
+                                .format(date))
 
 
 def search_show(show_name):
@@ -173,10 +196,10 @@ def get_show_episode(tvmaze_id, season, episode):
 def get_show_episodes_by_date(tvmaze_id, date_input):
     if type(date_input) is str:
         try:
-            date = parser.parse(date_input)
-        except parser._parser.ParserError:                      ### XXX check this
+            date = _simple_iso_date_parser(date_input)
+        except TypeError:
             return []
-    elif type(date_input) is datetime:
+    elif isinstance(date_input, datetime):
         date = date_input
     else:
         return []
@@ -214,3 +237,8 @@ def get_show_cast(tvmaze_id):
 def get_show_crew(tvmaze_id):
     res = _query_api(endpoints.show_crew.format(str(tvmaze_id)))
     return [Crew(crew_member) for crew_member in res]
+
+
+def get_show_artwork(tvmaze_id):
+    res = _query_api(endpoints.show_artwork.format(str(tvmaze_id)))
+    return [Artwork(art_item) for art_item in res]

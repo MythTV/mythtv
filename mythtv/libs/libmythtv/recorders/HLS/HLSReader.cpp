@@ -112,7 +112,7 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
             return false;
         }
 
-        m_curstream = *(m_streams.begin() + (m_bitrateIndex - 1));
+        m_curstream = m_streams[m_streams.keys().at(m_bitrateIndex - 1)];
     }
 
     if (!m_curstream)

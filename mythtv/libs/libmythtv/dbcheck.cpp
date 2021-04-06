@@ -3790,6 +3790,45 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1367")
+    {
+        DBUpdates updates {
+            "ALTER TABLE videosource ADD COLUMN lcnoffset INT UNSIGNED DEFAULT 0;"
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1368", dbver))
+            return false;
+    }
+    if (dbver == "1368")
+    {
+        DBUpdates updates {
+            "ALTER TABLE credits ADD COLUMN priority "
+            "    TINYINT UNSIGNED DEFAULT 0;",
+            "ALTER TABLE credits ADD COLUMN roleid "
+            "    MEDIUMINT UNSIGNED DEFAULT 0;",
+            "ALTER TABLE credits drop key chanid, "
+            "     add unique key `chanid` "
+            "          (chanid, starttime, person, role, roleid);"
+            "ALTER TABLE recordedcredits ADD COLUMN priority "
+            "    TINYINT UNSIGNED DEFAULT 0;",
+            "ALTER TABLE recordedcredits ADD COLUMN roleid "
+            "    MEDIUMINT UNSIGNED DEFAULT 0;",
+            "ALTER TABLE recordedcredits drop key chanid, "
+            "     add unique key `chanid` "
+            "          (chanid, starttime, person, role, roleid);"
+            "CREATE TABLE roles (roleid MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,"
+            "  `name` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin"
+            "    NOT NULL DEFAULT '',"
+            "  PRIMARY KEY (roleid),"
+            "  UNIQUE KEY `name` (`name`)"
+            ") ENGINE=MyISAM DEFAULT CHARSET=utf8;",
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1369", dbver))
+            return false;
+    }
+
+
     return true;
 }
 

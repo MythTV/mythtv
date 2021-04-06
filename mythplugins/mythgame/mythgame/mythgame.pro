@@ -34,7 +34,7 @@ use_hidesyms {
 
 LIBS += -lz -lminizip
 
-QT += xml sql opengl network
+QT += xml sql opengl network widgets
 
 android {
     # to discriminate plugins in a flat directory structure

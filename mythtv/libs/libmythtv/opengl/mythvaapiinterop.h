@@ -16,7 +16,12 @@ struct AVFilterContext;
 #if VA_CHECK_VERSION(0,34,0)
 #include "va/va_compat.h"
 #endif
+#define Cursor XCursor // Prevent conflicts with Qt6.
+#define pointer Xpointer // Prevent conflicts with Qt6.
 #include "va/va_x11.h"
+#undef None            // X11/X.h defines this. Causes compile failure in Qt6.
+#undef Cursor
+#undef pointer
 #include "va/va_glx.h"
 #include "va/va_drm.h"
 #include "va/va_drmcommon.h"

@@ -2,11 +2,11 @@
 // Program Name: servicehost.cpp
 // Created     : Jan. 19, 2010
 //
-// Purpose     : Service Host Abstract Class 
-//                                                                            
+// Purpose     : Service Host Abstract Class
+//
 // Copyright (c) 2010 David Blain <dblain@mythtv.org>
-//                                          
-// Licensed under the GPL v2 or later, see COPYING for details                    
+//
+// Licensed under the GPL v2 or later, see COPYING for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -63,7 +63,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
         // Add a place for the Return value
         // --------------------------------------------------------------
 
-        int nRetIdx = QMetaType::type( m_oMethod.typeName() ); 
+        int nRetIdx = QMetaType::type( m_oMethod.typeName() );
 
         if (nRetIdx != 0)
         {
@@ -80,7 +80,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
         // Fill in parameters from request values
         // --------------------------------------------------------------
 
-        for( int nIdx = 0; nIdx < paramNames.length(); nIdx++ )
+        for( int nIdx = 0; nIdx < paramNames.length(); ++nIdx )
         {
             QString sValue     = lowerParams[ paramNames[ nIdx ].toLower() ];
             QString sParamType = paramTypes[ nIdx ];
@@ -97,6 +97,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("MethodInfo::Invoke - Type unknown '%1'")
                         .arg(sParamType));
+                throw;
             }
 
             types[nIdx+1] = nId;
@@ -122,7 +123,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
         // created.
         // --------------------------------------------------------------
 
-        for (int nIdx=1; nIdx < paramNames.length()+1; nIdx++)
+        for (int nIdx=1; nIdx < paramNames.length()+1; ++nIdx)
         {
             if ((types[ nIdx ] != 0) && (param[ nIdx ] != nullptr))
                 QMetaType::destroy( types[ nIdx ], param[ nIdx ] );
@@ -155,7 +156,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
     // --------------------------------------------------------------
 
     QVariant vReturn;
-  
+
     if ( param[ 0 ] != nullptr)
     {
         vReturn = pService->ConvertToVariant( types[ 0 ], param[ 0 ] );
@@ -185,7 +186,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
 ServiceHost::ServiceHost(const QMetaObject &metaObject,
                          const QString     &sExtensionName,
                          const QString     &sBaseUrl,
-                         const QString     &sSharePath ) 
+                         const QString     &sSharePath )
             : HttpServerExtension ( sExtensionName,   sSharePath )
 {
     m_oMetaObject = metaObject;
@@ -208,7 +209,7 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
         if ((method.methodType() == QMetaMethod::Slot   ) &&
             (method.access()     == QMetaMethod::Public ))
         {
-            QString sName( method.methodSignature() );      
+            QString sName( method.methodSignature() );
 
             // --------------------------------------------------------------
             // Ignore the following methods...
@@ -258,8 +259,8 @@ ServiceHost::ServiceHost(const QMetaObject &metaObject,
 //
 //////////////////////////////////////////////////////////////////////////////
 
-QStringList ServiceHost::GetBasePaths() 
-{ 
+QStringList ServiceHost::GetBasePaths()
+{
     return QStringList( m_sBaseUrl );
 }
 
@@ -347,8 +348,8 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
             }
 
             // --------------------------------------------------------------
-            // Allow a more REST like calling convention.  If the Method 
-            // Name isn't found, search for one with the request method 
+            // Allow a more REST like calling convention.  If the Method
+            // Name isn't found, search for one with the request method
             // appended to the name ( "Get" or "Put" for POST)
             // --------------------------------------------------------------
 
@@ -395,7 +396,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                     // since we are making direct calls into it.
                     // ------------------------------------------------------
 
-                    pService = 
+                    pService =
                         qobject_cast<Service*>(m_oMetaObject.newInstance());
 
                     QVariant vResult = oInfo.Invoke(pService,
@@ -495,14 +496,14 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, const QFileInfo& oInfo 
 
 bool ServiceHost::FormatResponse( HTTPRequest *pRequest, const QVariant& vValue )
 {
-    if ( vValue.canConvert< QObject* >()) 
-    { 
-        const QObject *pObject = vValue.value< QObject* >(); 
+    if ( vValue.canConvert< QObject* >())
+    {
+        const QObject *pObject = vValue.value< QObject* >();
 
         return FormatResponse( pRequest, (QObject *)pObject );
     }
 
-    if ( vValue.canConvert< QFileInfo >()) 
+    if ( vValue.canConvert< QFileInfo >())
     {
         const auto oFileInfo = vValue.value< QFileInfo >();
 
@@ -512,7 +513,7 @@ bool ServiceHost::FormatResponse( HTTPRequest *pRequest, const QVariant& vValue 
     // ----------------------------------------------------------------------
     // Simple Variant... serialize it.
     // ----------------------------------------------------------------------
-    
+
     Serializer *pSer = pRequest->GetSerializer();
 
     pSer->Serialize( vValue, vValue.typeName() );

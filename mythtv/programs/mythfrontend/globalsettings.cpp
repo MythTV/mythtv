@@ -129,7 +129,6 @@ static HostTextEditSetting *VAAPIDevice()
 }
 #endif
 
-#if CONFIG_DEBUGTYPE
 static HostCheckBoxSetting *FFmpegDemuxer()
 {
     auto *gc = new HostCheckBoxSetting("FFMPEGTS");
@@ -139,11 +138,10 @@ static HostCheckBoxSetting *FFmpegDemuxer()
     gc->setValue(false);
 
     gc->setHelpText(PlaybackSettings::tr("Experimental: Enable this setting to "
-                                         "use FFmpeg's native demuxer. Things "
-                                         "will be broken."));
+                                         "use FFmpeg's native demuxer. "
+                                         "Try this when encountering playback issues."));
     return gc;
 }
-#endif
 
 static HostComboBoxSetting *DisplayRecGroup()
 {
@@ -2110,14 +2108,14 @@ static HostComboBoxSetting *ScreenAspectRatio()
     gc->setLabel(AppearanceSettings::tr("Screen aspect ratio"));
     gc->addSelection(AppearanceSettings::tr("Auto (Assume square pixels)"), "-1.0");
     gc->addSelection(AppearanceSettings::tr("Auto (Detect from display)"), "0.0");
-    gc->addSelection(AppearanceSettings::tr("16:9"),    "1.7777");
-    gc->addSelection(AppearanceSettings::tr("16:10"),   "1.6");
-    gc->addSelection(AppearanceSettings::tr("21:9"),    "2.3704"); // N.B. Actually 64:27
-    gc->addSelection(AppearanceSettings::tr("32:9"),    "3.5555");
-    gc->addSelection(AppearanceSettings::tr("256:135"), "1.8963"); // '4K HD'
-    gc->addSelection(AppearanceSettings::tr("3:2"),     "1.5");
-    gc->addSelection(AppearanceSettings::tr("5:4"),     "1.25");
-    gc->addSelection(AppearanceSettings::tr("4:3"),     "1.3333");
+    gc->addSelection("16:9",    "1.7777");
+    gc->addSelection("16:10",   "1.6");
+    gc->addSelection("21:9",    "2.3704"); // N.B. Actually 64:27
+    gc->addSelection("32:9",    "3.5555");
+    gc->addSelection("256:135", "1.8963"); // '4K HD'
+    gc->addSelection("3:2",     "1.5");
+    gc->addSelection("5:4",     "1.25");
+    gc->addSelection("4:3",     "1.3333");
     gc->addSelection(AppearanceSettings::tr("16:18 (16:9 Above and below)"),  "0.8888");
     gc->addSelection(AppearanceSettings::tr("32:10 (16:10 Side by side)"),    "3.2");
     gc->addSelection(AppearanceSettings::tr("16:20 (16:10 Above and below)"), "0.8");
@@ -4322,9 +4320,7 @@ void PlaybackSettings::Load(void)
     general->addChild(ContinueEmbeddedTVPlay());
     general->addChild(LiveTVIdleTimeout());
 
-#if CONFIG_DEBUGTYPE
     general->addChild(FFmpegDemuxer());
-#endif
 
     general->addChild(new PlayBackScaling());
     general->addChild(StereoDiscard());

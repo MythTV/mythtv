@@ -2803,6 +2803,8 @@ the_end_no_picture:
     return buf_ptr - buf;
 }
 
+/* mxpeg may call the following function (with a blank MJpegDecodeContext)
+ * even without having called ff_mjpeg_decode_init(). */
 av_cold int ff_mjpeg_decode_end(AVCodecContext *avctx)
 {
     MJpegDecodeContext *s = avctx->priv_data;
@@ -2876,7 +2878,7 @@ AVCodec ff_mjpeg_decoder = {
     .max_lowres     = 3,
     .priv_class     = &mjpegdec_class,
     .profiles       = NULL_IF_CONFIG_SMALL(ff_mjpeg_profiles),
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE |
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP |
                       FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM,
     .hw_configs     = (const AVCodecHWConfigInternal*[]) {
 #if CONFIG_MJPEG_NVDEC_HWACCEL
@@ -2902,6 +2904,6 @@ AVCodec ff_thp_decoder = {
     .flush          = decode_flush,
     .capabilities   = AV_CODEC_CAP_DR1,
     .max_lowres     = 3,
-    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE | FF_CODEC_CAP_INIT_CLEANUP,
 };
 #endif

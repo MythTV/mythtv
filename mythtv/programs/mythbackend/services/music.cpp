@@ -41,9 +41,10 @@ DTC::MusicMetadataInfoList* Music::GetTrackList(int nStartIndex,
 
     auto *pMusicMetadataInfos = new DTC::MusicMetadataInfoList();
 
-    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, musicList->count() ) : 0;
-    nCount        = (nCount > 0) ? std::min( nCount, musicList->count() ) : musicList->count();
-    int nEndIndex = std::min((nStartIndex + nCount), musicList->count() );
+    auto musicListCount = static_cast<int>(musicList->count());
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, musicListCount ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, musicListCount ) : musicListCount;
+    int nEndIndex = std::min((nStartIndex + nCount), musicListCount );
 
     for( int n = nStartIndex; n < nEndIndex; n++ )
     {

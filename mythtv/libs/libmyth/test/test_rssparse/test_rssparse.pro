@@ -2,6 +2,7 @@ include ( ../../../../settings.pro )
 include ( ../../../../test.pro )
 
 QT += xml sql network testlib widgets
+using_opengl: QT += opengl
 
 TEMPLATE = app
 TARGET = test_rssparse

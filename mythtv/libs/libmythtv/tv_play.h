@@ -207,7 +207,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     static TV* AcquireRelease(int& RefCount, bool Acquire, bool Create = false);
     bool Init();
     void InitFromDB();
-    static QList<QKeyEvent> ConvertScreenPressKeyMap(const QString& KeyList);
+    static QList<QKeyEvent*> ConvertScreenPressKeyMap(const QString& KeyList);
 
     // Top level playback methods
     bool LiveTV(bool ShowDialogs, const ChannelInfoList &Selection);
@@ -605,8 +605,8 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     ///  4  5   6  7
     ///  8  9  10 11
     static const int kScreenPressRegionCount = 12;
-    QList<QKeyEvent> m_screenPressKeyMapPlayback;
-    QList<QKeyEvent> m_screenPressKeyMapLiveTV;
+    QList<QKeyEvent*> m_screenPressKeyMapPlayback;
+    QList<QKeyEvent*> m_screenPressKeyMapLiveTV;
 
     // Channel changing timeout notification variables
     QElapsedTimer m_lockTimer;

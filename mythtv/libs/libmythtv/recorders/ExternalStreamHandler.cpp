@@ -35,7 +35,7 @@ ExternIO::ExternIO(const QString & app,
                    const QStringList & args)
     : m_status(&m_statusBuf, QIODevice::ReadWrite)
 {
-    m_app  = (app);
+    m_app  = QFileInfo(app);
 
     if (!m_app.exists())
     {

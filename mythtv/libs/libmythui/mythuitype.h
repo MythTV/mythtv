@@ -301,6 +301,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
 
     QColor       m_borderColor     {Qt::black};
 
+    friend class MythScreenType;
     friend class XMLParseBase;
 };
 

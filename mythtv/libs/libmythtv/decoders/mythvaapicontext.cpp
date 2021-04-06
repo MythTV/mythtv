@@ -443,7 +443,7 @@ QString MythVAAPIContext::HaveVAAPI(bool ReCheck /*= false*/)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Supported/available VAAPI decoders:");
             const auto & profiles = MythVAAPIContext::GetProfiles();
-            for (const auto profile : qAsConst(profiles))
+            for (const auto & profile : qAsConst(profiles))
             {
                 if (profile.first != MythCodecContext::MJPEG)
                 {
@@ -581,7 +581,7 @@ void MythVAAPIContext::GetDecoderList(QStringList& Decoders)
     if (profiles.isEmpty())
         return;
     Decoders.append("VAAPI:");
-    for (const auto profile : qAsConst(profiles))
+    for (const auto & profile : qAsConst(profiles))
         if (profile.first != MythCodecContext::MJPEG)
             Decoders.append(MythCodecContext::GetProfileDescription(profile.first, profile.second.second));
 }

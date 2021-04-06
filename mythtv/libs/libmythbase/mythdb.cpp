@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QHash>
 #include <QDir>
+#include <QRegularExpression>
 
 #include "mythdb.h"
 #include "mythdbcon.h"
@@ -165,7 +166,22 @@ QString MythDB::GetError(const QString &where, const MSqlQuery &query)
 
     str += "Query was:\n";
     str += query.executedQuery() + '\n';
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QString tmp = toCommaList(query.boundValues());
+#else
+    QVariantList numberedBindings = query.boundValues();
+    QMap<QString, QVariant> namedBindings;
+    static const QRegularExpression placeholders { "(:\\w+)" };
+    auto iter = placeholders.globalMatch(str);
+    while (iter.hasNext())
+    {
+        auto match = iter.next();
+        namedBindings[match.captured()] = numberedBindings.isEmpty()
+	    ? QString("INVALID")
+	    : numberedBindings.takeFirst();
+    }
+    QString tmp = toCommaList(namedBindings);
+#endif
     if (!tmp.isEmpty())
     {
         str += "Bindings were:\n";

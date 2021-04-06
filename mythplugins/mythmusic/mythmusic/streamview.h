@@ -12,7 +12,6 @@
 // mythmusic
 #include <musiccommon.h>
 
-class MythUIWebBrowser;
 class MythUIText;
 class MythUIProgressBar;
 

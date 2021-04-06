@@ -485,6 +485,23 @@ class RegionID : public MythUISpinBoxSetting
     };
 };
 
+class LCNOffset : public MythUISpinBoxSetting
+{
+  public:
+    LCNOffset(const VideoSource &parent, signed int value, signed int min_val) :
+        MythUISpinBoxSetting(new VideoSourceDBStorage(this, parent, "lcnoffset"),
+                             min_val, 20000, 100)
+    {
+       setLabel(QObject::tr("Logical Channel Number Offset"));
+       setHelpText(QObject::tr("The offset is added to each logical channel number found "
+                               "during a scan of a DVB video source. This makes it possible "
+                               "to give different video sources a non-overlapping range "
+                               "of channel numbers. Leave at 0 if you have only one video source "
+                               "or if the video sources do not have DVB logical channel numbers."));
+       setValue(value);
+    };
+};
+
 FreqTableSelector::FreqTableSelector(const VideoSource &parent) :
     MythUIComboBoxSetting(new VideoSourceDBStorage(this, parent, "freqtable"))
 {
@@ -701,6 +718,7 @@ VideoSource::VideoSource()
     addChild(new DVBNetID(*this, -1, -1));
     addChild(new BouquetID(*this, 0, 0));
     addChild(new RegionID(*this, 0, 0));
+    addChild(new LCNOffset(*this, 0, 0));
 }
 
 bool VideoSource::canDelete(void)

@@ -396,10 +396,14 @@ void LookerUpper::customEvent(QEvent *levent)
 
         if (m_updateartwork)
         {
-            ArtworkMap map = lookup->GetDownloads();
+            DownloadMap dlmap = lookup->GetDownloads();
+            // Convert from QMap to QMultiMap
+            ArtworkMap artmap;
+            for (auto it = dlmap.cbegin(); it != dlmap.cend(); it++)
+                artmap.insert(it.key(), it.value());
             SetArtwork(lookup->GetInetref(),
                        lookup->GetIsCollection() ? 0 : lookup->GetSeason(),
-                       gCoreContext->GetMasterHostName(), map);
+                       gCoreContext->GetMasterHostName(), artmap);
         }
 
         m_busyRecList.removeAll(pginfo);

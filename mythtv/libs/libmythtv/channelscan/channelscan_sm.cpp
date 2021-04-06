@@ -170,7 +170,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
-                "SELECT dvb_nit_id, bouquet_id, region_id "
+                "SELECT dvb_nit_id, bouquet_id, region_id, lcnoffset "
                 "FROM videosource "
                 "WHERE videosource.sourceid = :SOURCEID");
         query.bindValue(":SOURCEID", _sourceID);
@@ -187,6 +187,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
 
             m_bouquetId = query.value(1).toUInt();
             m_regionId  = query.value(2).toUInt();
+            m_lcnOffset = query.value(3).toUInt();
             m_nitId     = nitid > 0 ? nitid : 0;
         }
 
@@ -1737,7 +1738,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
             if (it != scnChanNums.constEnd())
             {
-                info.m_chanNum = QString::number(*it);
+                info.m_chanNum = QString::number(*it + m_lcnOffset);
             }
         }
 
@@ -1749,7 +1750,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
             if (it != ukChanNums.constEnd())
             {
-                info.m_chanNum = QString::number(*it);
+                info.m_chanNum = QString::number(*it + m_lcnOffset);
             }
         }
 
@@ -1761,7 +1762,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
             if (it != sid_lcn.constEnd())
             {
-                info.m_chanNum = QString::number(*it);
+                info.m_chanNum = QString::number(*it + m_lcnOffset);
             }
         }
 

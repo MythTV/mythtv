@@ -951,6 +951,10 @@ HttpContentType HTTPRequest::SetContentType( const QString &sType )
         (sType.startsWith("text/xml;")                         ))
         return( m_eContentType = ContentType_XML        );
 
+    if ((sType == "application/json") ||
+        sType.startsWith("application/json;"))
+        return( m_eContentType = ContentType_JSON);
+
     return( m_eContentType = ContentType_Unknown );
 }
 
@@ -1175,7 +1179,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
 QString HTTPRequest::GetRequestHeader( const QString &sKey, const QString &sDefault )
 {
-    QStringMap::iterator it = m_mapHeaders.find( sKey.toLower() );
+    auto it = m_mapHeaders.find( sKey.toLower() );
 
     if ( it == m_mapHeaders.end())
         return( sDefault );
@@ -1323,9 +1327,7 @@ bool HTTPRequest::ParseRequest()
         }
 
         // Dump request header
-        for ( QStringMap::iterator it  = m_mapHeaders.begin();
-                                it != m_mapHeaders.end();
-                                ++it )
+        for ( auto it = m_mapHeaders.begin(); it != m_mapHeaders.end(); ++it )
         {
             LOG(VB_HTTP, LOG_INFO, QString("(Request Header) %1: %2")
                                             .arg(it.key()).arg(*it));
@@ -1409,6 +1411,8 @@ bool HTTPRequest::ParseRequest()
                 // See if the payload is just data from a form post
                 if (m_eContentType == ContentType_Urlencoded)
                     GetParameters( m_sPayload, m_mapParams );
+                if (m_eContentType == ContentType_JSON)
+                    m_mapParams.insert( "json", m_sPayload );
             }
             else
             {
@@ -2490,4 +2494,3 @@ QString BufferedSocketDeviceRequest::GetPeerAddress()
 {
     return( m_pSocket->peerAddress().toString() );
 }
-

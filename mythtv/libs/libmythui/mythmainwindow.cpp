@@ -345,8 +345,8 @@ void MythMainWindow::Animate(void)
         redraw = true;
 
     // The call to GetDrawOrder can apparently alter m_stackList.
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto * it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
+    // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6
+    for (auto it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
     {
         QVector<MythScreenType *> drawList;
         (*it)->GetDrawOrder(drawList);
@@ -393,8 +393,8 @@ void MythMainWindow::drawScreen(QPaintEvent* Event)
         // Check for any widgets that have been updated since we built
         // the dirty region list in ::animate()
         // The call to GetDrawOrder can apparently alter m_stackList.
-        // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto * it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
+        // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6
+        for (auto it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
@@ -453,8 +453,8 @@ void MythMainWindow::Draw(MythPainter* Painter)
             Painter->SetClipRect(rect);
 
         // The call to GetDrawOrder can apparently alter m_stackList.
-        // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto * it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
+        // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6
+        for (auto it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
         {
             QVector<MythScreenType *> redrawList;
             (*it)->GetDrawOrder(redrawList);
@@ -1147,10 +1147,10 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
     int keynum = MythMainWindowPrivate::TranslateKeyNum(Event);
 
     QStringList localActions;
+    auto * keycontext = m_priv->m_keyContexts.value(Context);
     if (AllowJumps && (m_priv->m_jumpMap.count(keynum) > 0) &&
         (!m_priv->m_jumpMap[keynum]->m_localAction.isEmpty()) &&
-        (m_priv->m_keyContexts.value(Context)) &&
-        (m_priv->m_keyContexts.value(Context)->GetMapping(keynum, localActions)))
+        keycontext && (keycontext->GetMapping(keynum, localActions)))
     {
         if (localActions.contains(m_priv->m_jumpMap[keynum]->m_localAction))
             AllowJumps = false;
@@ -1174,11 +1174,15 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
         return true;
     }
 
-    if (m_priv->m_keyContexts.value(Context))
-        m_priv->m_keyContexts.value(Context)->GetMapping(keynum, Actions);
+    if (keycontext)
+        keycontext->GetMapping(keynum, Actions);
 
     if (Context != "Global")
-        m_priv->m_keyContexts.value("Global")->GetMapping(keynum, Actions);
+    {
+        auto * keycontextG = m_priv->m_keyContexts.value("Global");
+        if (keycontextG)
+            keycontextG->GetMapping(keynum, Actions);
+    }
 
     return false;
 }
@@ -1209,26 +1213,31 @@ void MythMainWindow::ClearKeyContext(const QString& Context)
 
 void MythMainWindow::BindKey(const QString& Context, const QString& Action, const QString& Key)
 {
-    if (!m_priv->m_keyContexts.contains(Context))
-        m_priv->m_keyContexts.insert(Context, new KeyContext());
+    auto * keycontext = m_priv->m_keyContexts.value(Context);
+    if (keycontext == nullptr)
+    {
+        keycontext = new KeyContext();
+        if (keycontext == nullptr)
+            return;
+        m_priv->m_keyContexts.insert(Context, keycontext);
+    }
 
     QKeySequence keyseq(Key);
     for (unsigned int i = 0; i < static_cast<uint>(keyseq.count()); i++)
     {
         int keynum = keyseq[i];
-        keynum &= ~Qt::UNICODE_ACCEL;
 
         QStringList dummyaction("");
-        if (m_priv->m_keyContexts.value(Context)->GetMapping(keynum, dummyaction))
+        if (keycontext->GetMapping(keynum, dummyaction))
         {
             LOG(VB_GENERAL, LOG_WARNING, QString("Key %1 is bound to multiple actions in context %2.")
                 .arg(Key).arg(Context));
         }
 
-        m_priv->m_keyContexts.value(Context)->AddMapping(keynum, Action);
+        keycontext->AddMapping(keynum, Action);
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, QString("Binding: %1 to action: %2 (%3)")
-                                   .arg(key).arg(action).arg(context));
+                                   .arg(Key).arg(Action).arg(Context));
 #endif
 
         if (Action == "ESCAPE" && Context == "Global" && i == 0)
@@ -1372,7 +1381,6 @@ void MythMainWindow::BindJump(const QString& Destination, const QString& Key)
     for (unsigned int i = 0; i < static_cast<uint>(keyseq.count()); i++)
     {
         int keynum = keyseq[i];
-        keynum &= ~Qt::UNICODE_ACCEL;
 
         if (m_priv->m_jumpMap.count(keynum) == 0)
         {
@@ -1652,7 +1660,7 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
 
 #ifdef Q_OS_LINUX
             // Fixups for _some_ linux native codes that QT doesn't know
-            if (event->key() <= 0)
+            if (event && event->key() <= 0)
             {
                 int keycode = 0;
                 switch (event->nativeScanCode())
@@ -1676,7 +1684,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
             }
 #endif
 
-            for (auto * it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+            // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+            for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
             {
                 if (auto * top = (*it)->GetTopScreen(); top)
                 {
@@ -1732,7 +1741,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                     if (!mouseevent)
                         return MythUIScreenBounds::eventFilter(Watched, Event);
 
-                    for (auto * it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+                    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+                    for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
                     {
                         auto * screen = (*it)->GetTopScreen();
                         if (!screen || !screen->ContainsPoint(point))
@@ -1762,7 +1772,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                         return true;
                     }
                     
-                    for (auto *it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
+                    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+                    for (auto it = m_priv->m_stackList.end() - 1; it != m_priv->m_stackList.begin() - 1; --it)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
                         if (!screen || !screen->ContainsPoint(point))

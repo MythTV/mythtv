@@ -1464,13 +1464,14 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
 }
 
 template <typename T>
-QString propsValueToString (const QString& name, QMap<T,QString> propNames, T props)
+QString propsValueToString (const QString& name, QMap<T,QString> propNames,
+                            T props)
 {
     if (props == 0)
         return propNames[0];
 
     QStringList result;
-    for (uint i = 0; i < sizeof(T)*8 - 1; i++)
+    for (uint i = 0; i < sizeof(T)*8 - 1; ++i)
     {
         uint bit = 1<<i;
         if ((props & bit) == 0)
@@ -1487,6 +1488,72 @@ QString propsValueToString (const QString& name, QMap<T,QString> propNames, T pr
     }
     return result.join('|');
 }
+
+template <typename T>
+uint propsValueFromString (const QString& name, QMap<T,QString> propNames,
+                           const QString& props)
+{
+    if (props.isEmpty())
+        return 0;
+
+    uint result = 0;
+
+    QStringList names = props.split('|');
+    for ( const auto& n : names  )
+    {
+        uint bit = propNames.key(n, 0);
+        if (bit == 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("Unknown flag for %1 %2")
+                .arg(name).arg(n));
+        }
+        else
+            result |= bit;
+    }
+    return result;
+}
+
+QString ProgramInfo::GetProgramFlagNames(void) const
+{
+    return propsValueToString("program", ProgramFlagNames, m_programFlags);
+}
+
+QString ProgramInfo::GetSubtitleTypeNames(void) const
+{
+    return propsValueToString("subtitle", SubtitlePropsNames,
+                              m_subtitleProperties);
+}
+
+QString ProgramInfo::GetVideoPropertyNames(void) const
+{
+    return propsValueToString("video", VideoPropsNames, m_videoProperties);
+}
+
+QString ProgramInfo::GetAudioPropertyNames(void) const
+{
+    return propsValueToString("audio", AudioPropsNames, m_audioProperties);
+}
+
+uint ProgramInfo::ProgramFlagsFromNames(const QString & names)
+{
+    return propsValueFromString("program", ProgramFlagNames, names);
+}
+
+uint ProgramInfo::SubtitleTypesFromNames(const QString & names)
+{
+    return propsValueFromString("subtitle", SubtitlePropsNames, names);
+}
+
+uint ProgramInfo::VideoPropertiesFromNames(const QString & names)
+{
+    return propsValueFromString("video", VideoPropsNames, names);
+}
+
+uint ProgramInfo::AudioPropertiesFromNames(const QString & names)
+{
+    return propsValueFromString("audio", AudioPropsNames, names);
+}
+
 
 /** \brief Converts ProgramInfo into QString QHash containing each field
  *         in ProgramInfo converted into localized strings.
@@ -1727,10 +1794,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["audioproperties_str"] = QString::number(m_audioProperties);
     progMap["videoproperties_str"] = QString::number(m_videoProperties);
     progMap["subtitleType_str"]    = QString::number(m_subtitleProperties);
-    progMap["programflags_names"]    = propsValueToString("program", ProgramFlagNames, m_programFlags);
-    progMap["audioproperties_names"] = propsValueToString("audio", AudioPropsNames, m_audioProperties);
-    progMap["videoproperties_names"] = propsValueToString("video", VideoPropsNames, m_videoProperties);
-    progMap["subtitleType_names"]    = propsValueToString("subtitle", SubtitlePropsNames, m_subtitleProperties);
+    progMap["programflags_names"]    = GetProgramFlagNames();
+    progMap["audioproperties_names"] = GetAudioPropertyNames();
+    progMap["videoproperties_names"] = GetVideoPropertyNames();
+    progMap["subtitleType_names"]    = GetSubtitleTypeNames();
 
     progMap["recstatus"] = RecStatus::toString(GetRecordingStatus(),
                                       GetRecordingRuleType());
@@ -2152,7 +2219,7 @@ bool ProgramInfo::IsDuplicateProgram(const ProgramInfo& other) const
             int index = m_programId.indexOf('/');
             int oindex = other.m_programId.indexOf('/');
             if (index == oindex && (index < 0 ||
-                m_programId.leftRef(index) == other.m_programId.leftRef(oindex)))
+                m_programId.left(index) == other.m_programId.left(oindex)))
                 return m_programId == other.m_programId;
         }
         else
@@ -2211,7 +2278,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
             int index = m_programId.indexOf('/');
             int oindex = other.m_programId.indexOf('/');
             if (index == oindex && (index < 0 ||
-                m_programId.leftRef(index) == other.m_programId.leftRef(oindex)))
+                m_programId.left(index) == other.m_programId.left(oindex)))
                 return m_programId == other.m_programId;
         }
         else

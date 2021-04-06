@@ -163,7 +163,7 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
                 query.bindValue(":CHANID", (*it).chanid);
                 query.bindValue(":START", (*it).starttime);
                 query.bindValue(":CHAINID", m_id);
-                query.bindValue(":DISCONT", true);
+                query.bindValue(":DISCONT", (*it).discontinuity);
                 if (!query.exec())
                     MythDB::DBError("LiveTVChain::DeleteProgram -- "
                                     "discontinuity", query);

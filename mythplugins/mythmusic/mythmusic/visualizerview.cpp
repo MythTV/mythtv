@@ -10,7 +10,6 @@
 #include <mythdbcon.h>
 #include <mythmainwindow.h>
 #include <mythuibuttonlist.h>
-#include <mythuiwebbrowser.h>
 #include <mythuitext.h>
 #include <mythuiimage.h>
 #include <mythuistatetype.h>

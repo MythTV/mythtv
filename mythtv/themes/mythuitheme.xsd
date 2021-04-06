@@ -350,20 +350,24 @@
                 <xs:element name="weight" minOccurs="0" maxOccurs="1">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
+                            <xs:enumeration value="thin" />
                             <xs:enumeration value="1" />
-                            <xs:enumeration value="ultralight" />
+                            <xs:enumeration value="extralight" />
                             <xs:enumeration value="2" />
                             <xs:enumeration value="light" />
                             <xs:enumeration value="3" />
                             <xs:enumeration value="normal" />
                             <xs:enumeration value="4" />
-                            <xs:enumeration value="demibold" />
+                            <xs:enumeration value="medium" />
                             <xs:enumeration value="5" />
-                            <xs:enumeration value="bold" />
+                            <xs:enumeration value="demibold" />
                             <xs:enumeration value="6" />
-                            <xs:enumeration value="black" />
+                            <xs:enumeration value="bold" />
                             <xs:enumeration value="7" />
-                            <xs:enumeration value="ultrablack" />
+                            <xs:enumeration value="extrabold" />
+                            <xs:enumeration value="8" />
+                            <xs:enumeration value="black" />
+                            <xs:enumeration value="9" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>

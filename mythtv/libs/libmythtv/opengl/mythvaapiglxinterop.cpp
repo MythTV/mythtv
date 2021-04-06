@@ -382,7 +382,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpe
                 GLX_GREEN_SIZE, 8,
                 GLX_BLUE_SIZE, 8,
                 GLX_ALPHA_SIZE, 8,
-                None };
+                0 };
         int fbcount = 0;
         GLXFBConfig *fbs = glXChooseFBConfig(display, DefaultScreen(display), fbattribs.data(), &fbcount);
         if (!fbcount)
@@ -410,7 +410,7 @@ vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpe
         const std::array<const int,7> attribs {
                 GLX_TEXTURE_TARGET_EXT, GLX_TEXTURE_2D_EXT,
                 GLX_TEXTURE_FORMAT_EXT, xwattribs.depth == 32 ? GLX_TEXTURE_FORMAT_RGBA_EXT : GLX_TEXTURE_FORMAT_RGB_EXT,
-                GLX_MIPMAP_TEXTURE_EXT, False, None};
+                GLX_MIPMAP_TEXTURE_EXT, False, 0};
 
         m_glxPixmap = glXCreatePixmap(display, fbconfig, m_pixmap, attribs.data());
         if (!m_glxPixmap)

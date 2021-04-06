@@ -93,7 +93,7 @@ class PremiereContentInformationTable;
 class EITHelper
 {
   public:
-    EITHelper(uint cardnum);
+    explicit EITHelper(uint cardnum);
     EITHelper &operator=(const EITHelper &) = delete;
     EITHelper(const EITHelper& rhs);
     virtual ~EITHelper(void);

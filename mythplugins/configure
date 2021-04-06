@@ -593,6 +593,8 @@ version2num(){
 # Use the qmake specified when building the mythtv directory.
 qmake=$(cat mythconfig.mak | grep -e "^QMAKE=")
 qmake=${qmake#QMAKE=}
+qt_version_str=`$qmake -query QT_VERSION`
+qt_version=$(version2num $qt_version_str)
 
 # rely on what was discover during MythTV configure
 if enabled opengl && test "$OPENGLV" != "CONFIG_OPENGL_VIDEO=yes"; then
@@ -685,9 +687,11 @@ if test x"$icc" != x ; then
 fi
 
 if enabled music ; then
-    if test "$WEBKIT" != "CONFIG_QTWEBKIT=yes"; then
-       disable music
-       echo "MythMusic requires QtWebkit."
+    if [ $qt_version -lt $(version2num "6.0.0") ]; then
+        if test "$WEBKIT" != "CONFIG_QTWEBKIT=yes"; then
+            disable music
+            echo "MythMusic requires QtWebkit."
+        fi
     fi
 
     if ! check_lib vorbis/codec.h vorbis_info_init -lvorbis || ! check_lib vorbis/vorbisenc.h vorbis_encode_setup_vbr -lvorbisenc -lvorbis -logg ; then

@@ -194,14 +194,14 @@ int MythCDROMLinux::driveStatus()
 
 bool MythCDROMLinux::hasWritableMedia()
 {
-    std::array<uint8_t,32> buffer {};
+    CDROMdiscInfo    di {};
     CDROMgenericCmd  cgc {};
 
     cgc.cmd[0] = GPCMD_READ_DISC_INFO;
-    cgc.cmd[8] = buffer.size();
+    cgc.cmd[8] = sizeof(CDROMdiscInfo);
     cgc.quiet  = 1;
-    cgc.buffer = buffer.data();
-    cgc.buflen = buffer.size();
+    cgc.buffer = reinterpret_cast<uint8_t*>(&di);
+    cgc.buflen = sizeof(CDROMdiscInfo);
     cgc.data_direction = CGC_DATA_READ;
 
     if (ioctl(m_deviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
@@ -211,8 +211,7 @@ bool MythCDROMLinux::hasWritableMedia()
         return false;
     }
 
-    auto *di = (CDROMdiscInfo *) buffer.data();
-    switch (di->m_discStatus)
+    switch (di.m_discStatus)
     {
         case MEDIA_IS_EMPTY:
             return true;
@@ -222,7 +221,7 @@ bool MythCDROMLinux::hasWritableMedia()
             // writing, so we treat it just like a finished disc:
 
         case MEDIA_IS_COMPLETE:
-            return di->m_erasable;
+            return di.m_erasable;
 
         case MEDIA_IS_OTHER:
             ;
@@ -241,37 +240,35 @@ bool MythCDROMLinux::hasWritableMedia()
 
 int MythCDROMLinux::SCSIstatus()
 {
-    std::array<uint8_t,8> buffer {};
+    CDROMeventStatus es {};
     CDROMgenericCmd  cgc {};
 
     cgc.cmd[0] = GPCMD_GET_EVENT_STATUS_NOTIFICATION;
     cgc.cmd[1] = 1;       // Tell us immediately
     cgc.cmd[4] = 1 << 4;  // notification class of media
-    cgc.cmd[8] = buffer.size();
+    cgc.cmd[8] = sizeof(CDROMeventStatus);
     cgc.quiet  = 1;
-    cgc.buffer = buffer.data();
-    cgc.buflen = buffer.size();
+    cgc.buffer = reinterpret_cast<uint8_t*>(&es);
+    cgc.buflen = sizeof(CDROMeventStatus);
     cgc.data_direction = CGC_DATA_READ;
 
-    auto *es = (CDROMeventStatus *) buffer.data();
-
     if ((ioctl(m_deviceHandle, CDROM_SEND_PACKET, &cgc) < 0)
-        || es->m_nea                         // drive does not support request
-        || (es->m_notificationClass != 0x4)) // notification class mismatch
+        || es.m_nea                          // drive does not support request
+        || (es.m_notificationClass != 0x4))  // notification class mismatch
     {
         LOG(VB_MEDIA, LOG_ERR, LOC +
             ":SCSIstatus() - failed to send SCSI packet to " + m_devicePath + ENO);
         return CDS_TRAY_OPEN;
     }
 
-    if (es->m_mediaPresent)
+    if (es.m_mediaPresent)
     {
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
             ":SCSIstatus() - ioctl said tray was open, "
             "but drive is actually closed with a disc");
         return CDS_DISC_OK;
     }
-    if (es->m_doorOpen)
+    if (es.m_doorOpen)
     {
         LOG(VB_MEDIA, LOG_DEBUG, LOC +
             ":SCSIstatus() - tray is definitely open");

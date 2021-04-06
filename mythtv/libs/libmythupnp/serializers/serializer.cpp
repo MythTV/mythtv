@@ -112,7 +112,7 @@ void Serializer::SerializeObjectProperties( const QObject *pObject )
         {
             QMetaProperty metaProperty = pMetaObject->property( nIdx );
 
-            if (metaProperty.isDesignable( pObject ))
+            if (metaProperty.isDesignable())
             {
                 const char *pszPropName = metaProperty.name();
                 QString     sPropName( pszPropName );

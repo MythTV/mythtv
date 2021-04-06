@@ -980,9 +980,7 @@ static av_cold int sonic_decode_close(AVCodecContext *avctx)
     av_freep(&s->int_samples);
     av_freep(&s->tap_quant);
     av_freep(&s->predictor_k);
-
-    for (i = 0; i < s->channels; i++)
-    {
+    for (i = 0; i < MAX_CHANNELS; i++) {
         av_freep(&s->predictor_state[i]);
         av_freep(&s->coded_samples[i]);
     }
@@ -1032,6 +1030,9 @@ static int sonic_decode_frame(AVCodecContext *avctx,
     for (ch = 0; ch < s->channels; ch++)
     {
         int x = ch;
+
+        if (c.overread > MAX_OVERREAD)
+            return AVERROR_INVALIDDATA;
 
         predictor_init_state(s->predictor_k, s->predictor_state[ch], s->num_taps);
 
@@ -1095,6 +1096,7 @@ AVCodec ff_sonic_decoder = {
     .close          = sonic_decode_close,
     .decode         = sonic_decode_frame,
     .capabilities   = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_EXPERIMENTAL,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };
 #endif /* CONFIG_SONIC_DECODER */
 
@@ -1109,6 +1111,7 @@ AVCodec ff_sonic_encoder = {
     .encode2        = sonic_encode_frame,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_NONE },
     .capabilities   = AV_CODEC_CAP_EXPERIMENTAL,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .close          = sonic_encode_close,
 };
 #endif
@@ -1124,6 +1127,7 @@ AVCodec ff_sonic_ls_encoder = {
     .encode2        = sonic_encode_frame,
     .sample_fmts    = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_NONE },
     .capabilities   = AV_CODEC_CAP_EXPERIMENTAL,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
     .close          = sonic_encode_close,
 };
 #endif

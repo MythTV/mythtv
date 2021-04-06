@@ -704,7 +704,7 @@ int Params::evalDelete(const std::string& optarg)
         case Action::none:
             action_ = Action::erase;
             target_ = 0;
-            // fallthrough
+            [[fallthrough]];
         case Action::erase:
             rc = parseCommonTargets(optarg, "erase");
             if (rc > 0) {
@@ -730,7 +730,7 @@ int Params::evalExtract(const std::string& optarg)
         case Action::modify:
             action_ = Action::extract;
             target_ = 0;
-            // fallthrough
+            [[fallthrough]];
         case Action::extract:
             rc = parseCommonTargets(optarg, "extract");
             if (rc > 0) {
@@ -756,7 +756,7 @@ int Params::evalInsert(const std::string& optarg)
         case Action::modify:
             action_ = Action::insert;
             target_ = 0;
-            // fallthrough
+            [[fallthrough]];
         case Action::insert:
             rc = parseCommonTargets(optarg, "insert");
             if (rc > 0) {
@@ -780,7 +780,7 @@ int Params::evalModify(int opt, const std::string& optarg)
     switch (action_) {
         case Action::none:
             action_ = Action::modify;
-            // fallthrough
+            [[fallthrough]];
         case Action::modify:
         case Action::extract:
         case Action::insert:

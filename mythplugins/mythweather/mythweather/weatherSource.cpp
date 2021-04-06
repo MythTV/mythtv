@@ -4,7 +4,11 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
-#include <QTextCodec>                                                          
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+#include <QTextCodec>
+#else
+#include <QStringConverter>
+#endif
 #include <QApplication>
 
 // MythTV headers
@@ -396,20 +400,16 @@ QStringList WeatherSource::getLocationList(const QString &str)
     QStringList locs;
     QByteArray result = ms.ReadAll();
     QTextStream text(result);
-                                                                                
-    QTextCodec *codec = QTextCodec::codecForName("UTF-8");                     
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    text.setCodec("UTF-8");
+#else
+    text.setEncoding(QStringConverter::Utf8);
+#endif
     while (!text.atEnd())
     {
-        QString tmp = text.readLine();
-
-        while (tmp.endsWith('\n') || tmp.endsWith('\r'))
-            tmp.chop(1);
-
+        QString tmp = text.readLine().trimmed();
         if (!tmp.isEmpty())
-         {                                                                      
-             QString loc_string = codec->toUnicode(tmp.toUtf8());
-             locs << loc_string;
-         }
+            locs << tmp;
     }
 
     return locs;
@@ -568,8 +568,7 @@ void WeatherSource::processExit(void)
 
 void WeatherSource::processData()
 {
-    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-    QString unicode_buffer = codec->toUnicode(m_buffer);
+    QString unicode_buffer = QString::fromUtf8(m_buffer);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     QStringList data = unicode_buffer.split('\n', QString::SkipEmptyParts);
 #else

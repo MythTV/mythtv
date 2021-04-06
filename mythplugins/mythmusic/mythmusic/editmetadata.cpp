@@ -16,7 +16,6 @@
 #include <mythuibuttonlist.h>
 #include <mythuispinbox.h>
 #include <mythuiimage.h>
-#include <mythuiwebbrowser.h>
 #include <mythuifilebrowser.h>
 #include <musicutils.h>
 #include <mythprogressdialog.h>

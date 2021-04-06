@@ -103,7 +103,7 @@ QString SourceUtil::GetChannelSeparator(uint sourceid)
         {
             const QString channum = query.value(0).toString();
             const int where = channum.indexOf(sepExpr);
-            if (channum.rightRef(2).startsWith("0"))
+            if (channum.right(2).startsWith("0"))
                 counts["0"]++;
             else
                 counts[(where < 0) ? "" : QString(channum.at(where))]++;
@@ -434,7 +434,8 @@ bool SourceUtil::UpdateSource( uint sourceid, const QString& sourcename,
                                const QString& freqtable, const QString& lineupid,
                                const QString& password, bool useeit,
                                const QString& configpath, int nitid,
-                               uint bouquetid, uint regionid, uint scanfrequency)
+                               uint bouquetid, uint regionid, uint scanfrequency,
+                               uint lcnoffset)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -442,7 +443,7 @@ bool SourceUtil::UpdateSource( uint sourceid, const QString& sourcename,
                   "userid = :USERID, freqtable = :FREQTABLE, lineupid = :LINEUPID,"
                   "password = :PASSWORD, useeit = :USEEIT, configpath = :CONFIGPATH, "
                   "dvb_nit_id = :NITID, bouquet_id = :BOUQUETID, region_id = :REGIONID, "
-                  "scanfrequency = :SCANFREQUENCY "
+                  "scanfrequency = :SCANFREQUENCY, lcnoffset = :LCNOFFSET "
                   "WHERE sourceid = :SOURCEID");
 
     query.bindValue(":NAME", sourcename);
@@ -458,6 +459,7 @@ bool SourceUtil::UpdateSource( uint sourceid, const QString& sourcename,
     query.bindValue(":REGIONID", regionid);
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":SCANFREQUENCY", scanfrequency);
+    query.bindValue(":LCNOFFSET", lcnoffset);
 
     if (!query.exec() || !query.isActive())
     {
@@ -473,14 +475,17 @@ int SourceUtil::CreateSource( const QString& sourcename,
                                const QString& freqtable, const QString& lineupid,
                                const QString& password, bool useeit,
                                const QString& configpath, int nitid,
-                               uint bouquetid, uint regionid, uint scanfrequency)
+                               uint bouquetid, uint regionid, uint scanfrequency,
+                               uint lcnoffset)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("INSERT INTO videosource (name,xmltvgrabber,userid,freqtable,lineupid,"
-                  "password,useeit,configpath,dvb_nit_id,bouquet_id,region_id, scanfrequency) "
+                  "password,useeit,configpath,dvb_nit_id,bouquet_id,region_id, scanfrequency,"
+                  "lcnoffset) "
                   "VALUES (:NAME, :XMLTVGRABBER, :USERID, :FREQTABLE, :LINEUPID, :PASSWORD, "
-                  ":USEEIT, :CONFIGPATH, :NITID, :BOUQUETID, :REGIONID, :SCANFREQUENCY)");
+                  ":USEEIT, :CONFIGPATH, :NITID, :BOUQUETID, :REGIONID, :SCANFREQUENCY, "
+                  ":LCNOFFSET");
 
     query.bindValue(":NAME", sourcename);
     query.bindValue(":XMLTVGRABBER", grabber);
@@ -494,6 +499,7 @@ int SourceUtil::CreateSource( const QString& sourcename,
     query.bindValue(":BOUQUETID", bouquetid);
     query.bindValue(":REGIONID", regionid);
     query.bindValue(":SCANFREQUENCY", scanfrequency);
+    query.bindValue(":LCNOFFSET", lcnoffset);
 
     if (!query.exec() || !query.isActive())
     {

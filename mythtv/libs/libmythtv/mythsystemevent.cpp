@@ -233,7 +233,7 @@ QString MythSystemEventHandler::EventNameToSetting(const QString &name)
     for (const auto & part : qAsConst(parts))
     {
         result += part.at(0).toUpper();
-        result += part.midRef(1);
+        result += part.mid(1);
     }
 
     return result;

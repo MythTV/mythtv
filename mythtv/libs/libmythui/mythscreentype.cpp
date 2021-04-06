@@ -118,18 +118,13 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
 {
     if (!widget || !widget->IsVisible(true))
     {
-        QMap<int, MythUIType *>::iterator it = m_focusWidgetList.begin();
-
-        while (it != m_focusWidgetList.end())
+        for (auto *current : qAsConst(m_focusWidgetList))
         {
-            MythUIType *current = *it;
-
             if (current->CanTakeFocus() && current->IsVisible(true))
             {
                 widget = current;
                 break;
             }
-            ++it;
         }
     }
 
@@ -158,61 +153,49 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
 {
     if (!m_currentFocusWidget || m_focusWidgetList.isEmpty())
         return SetFocusWidget(nullptr);
+    if (m_focusWidgetList.size() == 1)
+      return false;
 
-    bool reachedCurrent = false;
-    bool looped = false;
-
-    QMap<int, MythUIType *>::iterator it = m_focusWidgetList.begin();
-
-    // There is probably a more efficient way to do this, but the list
-    // is never going to be that big so it will do for now
+    // Run the list from the current pointer to the end/begin and loop
+    // around back to itself.  Start by geting an iterator pointing at
+    // the current focus (or at the end if the focus isn't in the
+    // list).
+    auto it = m_focusWidgetList.find(m_currentFocusWidget->m_focusOrder,
+                                     m_currentFocusWidget);
     if (up)
     {
-        while (it != m_focusWidgetList.end())
+        if (it != m_focusWidgetList.end())
+            it++;
+        if (it == m_focusWidgetList.end())
+            it = m_focusWidgetList.begin();
+        // Put an upper limit on loops to guarantee exit at some point.
+        for (auto count = m_focusWidgetList.size() * 2; count > 0; count--)
         {
             MythUIType *current = *it;
-
-            if ((looped || reachedCurrent) &&
-                current->IsVisible(true) && current->IsEnabled())
+            if (current->IsVisible(true) && current->IsEnabled())
                 return SetFocusWidget(current);
-
-            if (current == m_currentFocusWidget)
-                reachedCurrent = true;
-
-            ++it;
-
+            it++;
             if (it == m_focusWidgetList.end())
-            {
-                if (looped)
-                    return false;
-                looped = true;
                 it = m_focusWidgetList.begin();
-            }
+            if (*it == m_currentFocusWidget)
+                return false;
         }
     }
     else
     {
-        it = m_focusWidgetList.end() - 1;
-        while (it != m_focusWidgetList.begin() - 1)
+        if (it == m_focusWidgetList.begin())
+            it = m_focusWidgetList.end();
+        // Put an upper limit on loops to guarantee exit at some point.
+        for (auto count = m_focusWidgetList.size() * 2; count > 0; count--)
         {
+            it--;
+            if (*it == m_currentFocusWidget)
+                return false;
             MythUIType *current = *it;
-
-            if ((looped || reachedCurrent) &&
-                current->IsVisible(true) && current->IsEnabled())
+            if (current->IsVisible(true) && current->IsEnabled())
                 return SetFocusWidget(current);
-
-            if (current == m_currentFocusWidget)
-                reachedCurrent = true;
-
-            --it;
-
-            if (it == m_focusWidgetList.begin() - 1)
-            {
-                if (looped)
-                    return false;
-                looped = true;
-                it = m_focusWidgetList.end() - 1;
-            }
+            if (it == m_focusWidgetList.begin())
+                it = m_focusWidgetList.end();
         }
     }
 

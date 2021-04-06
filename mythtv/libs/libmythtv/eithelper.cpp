@@ -897,8 +897,6 @@ static uint get_chan_id_from_db_atsc(uint sourceid,
 static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
                                     uint networkid, uint transportid)
 {
-    uint chanid = 0;
-    bool useOnAirGuide = false;
     MSqlQuery query(MSqlQuery::InitCon());
 
     // DVB Link to chanid
@@ -935,8 +933,8 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
 
     while (query.next())
     {
-        chanid        = query.value(0).toUInt();
-        useOnAirGuide = query.value(1).toBool();
+        uint chanid        = query.value(0).toUInt();
+        bool useOnAirGuide = query.value(1).toBool();
         return useOnAirGuide ? chanid : 0;
     }
 
@@ -959,8 +957,6 @@ static uint get_chan_id_from_db_dvb(uint sourceid, uint serviceid,
 static uint get_chan_id_from_db_dtv(uint sourceid, uint serviceid,
                                     uint tunedchanid)
 {
-    uint chanid = 0;
-    bool useOnAirGuide = false;
     uint db_sourceid = 0;
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -987,9 +983,9 @@ static uint get_chan_id_from_db_dtv(uint sourceid, uint serviceid,
     while (query.next())
     {
         // Check to see if we are interested in this channel
-        chanid        = query.value(0).toUInt();
-        useOnAirGuide = query.value(1).toBool();
-        db_sourceid   = query.value(2).toUInt();
+        uint chanid        = query.value(0).toUInt();
+        bool useOnAirGuide = query.value(1).toBool();
+        db_sourceid        = query.value(2).toUInt();
         if (sourceid == db_sourceid)
             return useOnAirGuide ? chanid : 0;
     }

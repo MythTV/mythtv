@@ -14,22 +14,16 @@ Doc-Tests for tvmaze
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
   <item>
-    <title>Tales for a Halloween Night</title>
-    <description>Tales for a Halloween Night is based on John Carpenter's award-winning graphic novel anthology of stories where he unites storytellers from movies, novels and comics for a collection of horror stories featuring graveyards, sunken ships and ghosts, among others.</description>
-    <inetref>30203</inetref>
-    <collectionref>30203</collectionref>
-    <language>en</language>
-  </item>
-  <item>
     <title>A Clear Midsummer Night</title>
     <description>The daughter of a real estate mogul Xia Wan Qing, has seemingly no way of retreating after a friend's betrayal and her boyfriend backing out of their wedding. Fortunately, she's saved by business genius Qiao Jin Fan. Jin Fan is a "playboy" and the future successor for Qiao corporation. He extends an offering hand and together they embark on a path of revenge. Each for reasons of their own, begin a love with "uncertain motives". After enduring circumstances because of their families' competing interests and a number of conspiracies the two find true love.</description>
     <inetref>24598</inetref>
     <collectionref>24598</collectionref>
     <language>zh</language>
     <releasedate>2013-02-15</releasedate>
+    <popularity>...</popularity>
     <year>2013</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
     </images>
   </item>
   <item>
@@ -39,42 +33,10 @@ Doc-Tests for tvmaze
     <collectionref>31623</collectionref>
     <language>en</language>
     <releasedate>2013-01-11</releasedate>
+    <popularity>...</popularity>
     <year>2013</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/126/316260.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/126/316260.jpg"/>
-    </images>
-  </item>
-  <item>
-    <title>A Night at the Theatre</title>
-    <description>Entertainment and comedy at Glasgow's Theatre Royal.</description>
-    <inetref>42539</inetref>
-    <collectionref>42539</collectionref>
-    <language>en</language>
-    <releasedate>2019-02-24</releasedate>
-    <year>2019</year>
-  </item>
-  <item>
-    <title>A Night at The Classic</title>
-    <description>Mixing the best bits of stand-up comedy with hilarious backstage action, A Night at The Classic is raw, uncensored comedy at its best.</description>
-    <inetref>19206</inetref>
-    <collectionref>19206</collectionref>
-    <language>en</language>
-    <releasedate>2010-11-03</releasedate>
-    <year>2010</year>
-    <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/67/169985.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/67/169985.jpg"/>
-    </images>
-  </item>
-  <item>
-    <title>A Night with My Ex</title>
-    <description>What would you do if you had the chance to spend an entire night with your ex? Would you seek answers, try to gain closure, or make a play to get back together? For the first time since their split, ex-couples will be brought together for one night in a camera-rigged apartment with no crew. What they do or say during their night is completely up to them, but one thing is for sure. A Night with My Ex will be surprising, emotionally raw, and in many cases, totally hilarious.</description>
-    <inetref>27687</inetref>
-    <collectionref>27687</collectionref>
-    <language>en</language>
-    <releasedate>2017-07-18</releasedate>
-    <year>2017</year>
-    <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/118/296875.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/118/296875.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/126/316260.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/126/316260.jpg"/>
     </images>
   </item>
   <item>
@@ -84,10 +46,62 @@ Doc-Tests for tvmaze
     <collectionref>52474</collectionref>
     <language>en</language>
     <releasedate>2021-01-13</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
     <year>2021</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/289/723250.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/289/723250.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/289/723250.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/289/723250.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/289/722954.jpg"/>
     </images>
+  </item>
+  <item>
+    <title>A Night at the Theatre</title>
+    <description>Entertainment and comedy at Glasgow's Theatre Royal.</description>
+    <inetref>42539</inetref>
+    <collectionref>42539</collectionref>
+    <language>en</language>
+    <releasedate>2019-02-24</releasedate>
+    <popularity>...</popularity>
+    <year>2019</year>
+    <images>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/231/578439.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>A Night at The Classic</title>
+    <description>Mixing the best bits of stand-up comedy with hilarious backstage action, A Night at The Classic is raw, uncensored comedy at its best.</description>
+    <inetref>19206</inetref>
+    <collectionref>19206</collectionref>
+    <language>en</language>
+    <releasedate>2010-11-03</releasedate>
+    <popularity>...</popularity>
+    <year>2010</year>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/67/169985.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/67/169985.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/224/561692.jpg"/>
+      <image type="banner" url="https://static.tvmaze.com/uploads/images/original_untouched/67/169988.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_leaderboard/67/169988.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>A Night with My Ex</title>
+    <description>What would you do if you had the chance to spend an entire night with your ex? Would you seek answers, try to gain closure, or make a play to get back together? For the first time since their split, ex-couples will be brought together for one night in a camera-rigged apartment with no crew. What they do or say during their night is completely up to them, but one thing is for sure. A Night with My Ex will be surprising, emotionally raw, and in many cases, totally hilarious.</description>
+    <inetref>27687</inetref>
+    <collectionref>27687</collectionref>
+    <language>en</language>
+    <releasedate>2017-07-18</releasedate>
+    <popularity>...</popularity>
+    <year>2017</year>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/118/296875.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/118/296875.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Tales for a Halloween Night</title>
+    <description>Tales for a Halloween Night is based on John Carpenter's award-winning graphic novel anthology of stories where he unites storytellers from movies, novels and comics for a collection of horror stories featuring graveyards, sunken ships and ghosts, among others.</description>
+    <inetref>30203</inetref>
+    <collectionref>30203</collectionref>
+    <language>en</language>
+    <popularity>...</popularity>
   </item>
   <item>
     <title>Boys on Film - A Night with Duran Duran</title>
@@ -96,34 +110,42 @@ Doc-Tests for tvmaze
     <collectionref>37161</collectionref>
     <language>en</language>
     <releasedate>2018-06-29</releasedate>
+    <popularity>...</popularity>
     <year>2018</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/158/396533.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/158/396533.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/158/396533.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/158/396533.jpg"/>
     </images>
   </item>
   <item>
-    <title>Going Out</title>
-    <description>A mother and daughter who stand before the truth after a sudden tragic accident and deal with the meaning of family.</description>
-    <inetref>47528</inetref>
-    <collectionref>47528</collectionref>
+    <title>The Night Watchman</title>
+    <description>Young watchmen of the Joseon Dynasty fight demons in this "Ghostbusters"-like story. Set in the backdrop of the royal palace, the good guys vanquish demons while the bad guys use them for their purposes. The palace is rife with sinister plans to seize power and usurp the king. Through this story of young people who hunt demons, the tribulations and joys of life are shown in all their glory.</description>
+    <inetref>3237</inetref>
+    <collectionref>3237</collectionref>
     <language>ko</language>
-    <releasedate>2020-05-04</releasedate>
-    <year>2020</year>
+    <releasedate>2014-08-04</releasedate>
+    <popularity>...</popularity>
+    <year>2014</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/253/634317.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/253/634317.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/17/43577.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/17/43577.jpg"/>
     </images>
   </item>
   <item>
-    <title>Una luz en el camino</title>
-    <description></description>
-    <inetref>48110</inetref>
-    <collectionref>48110</collectionref>
-    <language>es</language>
+    <title>Light as a Feather</title>
+    <description>An innocent game of "Light as a Feather, Stiff as a Board" goes wrong when the five teen girls who played start dying off in the exact way that was predicted, forcing the survivors to figure out why they're being targeted - and whether the evil force hunting them down is one of their own.</description>
+    <inetref>36655</inetref>
+    <collectionref>36655</collectionref>
+    <language>en</language>
+    <releasedate>2018-10-12</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
+    <year>2018</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/257/642920.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/257/642920.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/213/534600.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/213/534600.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/171/428424.jpg"/>
     </images>
   </item>
 </metadata>
+
 
 # tvmaze.py -N "A Clear Midsummer Night" "Episode 42"
 >>> sys.argv = shlex.split('tvmaze -N "A Clear Midsummer Night" "Episode 42"')
@@ -140,6 +162,7 @@ Doc-Tests for tvmaze
     <collectionref>24598</collectionref>
     <language>zh</language>
     <releasedate>2013-02-23</releasedate>
+    <popularity>...</popularity>
     <year>2013</year>
     <runtime>50</runtime>
     <categories>
@@ -155,7 +178,7 @@ Doc-Tests for tvmaze
       <person name="Wu Jerry" character="Mo Ling Tian" job="Actor"/>
     </people>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/94/235015.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/94/235015.jpg"/>
     </images>
   </item>
 </metadata>
@@ -174,7 +197,8 @@ Doc-Tests for tvmaze
     <collectionref>525</collectionref>
     <language>en</language>
     <releasedate>2000-10-05</releasedate>
-    <userrating>8.400000</userrating>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
     <year>2000</year>
     <categories>
       <category name="Drama"/>
@@ -185,7 +209,11 @@ Doc-Tests for tvmaze
       <studio name="The CW"/>
     </studios>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217547.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/87/217547.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217545.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217546.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/557215.jpg"/>
     </images>
   </item>
 </metadata>
@@ -206,6 +234,8 @@ Doc-Tests for tvmaze
     <collectionref>525</collectionref>
     <language>en</language>
     <releasedate>2004-09-28</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
     <year>2004</year>
     <runtime>60</runtime>
     <categories>
@@ -286,11 +316,12 @@ Doc-Tests for tvmaze
       <person name="Chrisann Verges" job="Producer"/>
     </people>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/260/652344.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/260/652344.jpg"/>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
-      <image type="fanart" url="http://static.tvmaze.com/uploads/images/original_untouched/87/217545.jpg"/>
-      <image type="fanart" url="http://static.tvmaze.com/uploads/images/original_untouched/87/217546.jpg"/>
-      <image type="fanart" url="http://static.tvmaze.com/uploads/images/original_untouched/222/557215.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/260/652344.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/260/652344.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/4/11308.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/4/11308.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217547.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/87/217547.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217545.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/217546.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/557215.jpg"/>
     </images>
   </item>
 </metadata>
@@ -314,9 +345,10 @@ Doc-Tests for tvmaze
     <collectionref>23361</collectionref>
     <language>de</language>
     <releasedate>2014-04-01</releasedate>
+    <popularity>...</popularity>
     <year>2014</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/87/219221.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/87/219221.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/87/219221.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/87/219221.jpg"/>
     </images>
   </item>
   <item>
@@ -326,18 +358,14 @@ Doc-Tests for tvmaze
     <collectionref>34194</collectionref>
     <language>de</language>
     <releasedate>2007-05-31</releasedate>
+    <popularity>...</popularity>
     <year>2007</year>
     <images>
-      <image type="coverart" url="http://static.tvmaze.com/uploads/images/original_untouched/141/352576.jpg" thumb="http://static.tvmaze.com/uploads/images/medium_portrait/141/352576.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/141/352576.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/141/352576.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/223/559895.jpg"/>
     </images>
   </item>
 </metadata>
-
-
-
-
-
-
 
 
 ##
@@ -348,3 +376,335 @@ Doc-Tests for tvmaze
 #  >>> main()
 
 
+
+# The following matches on two episodes.
+# tvmaze.py -N Bulletproof "Episode 4"
+>>> sys.argv = shlex.split('tvmaze -N "Bulletproof" "Episode 4"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Bulletproof</title>
+    <subtitle>Episode 4</subtitle>
+    <description>As Alex regains control of the family, Mikey puts Bishop and Pike in charge of a gun-trafficking op. But the boys quickly find themselves out of their depth. </description>
+    <season>2</season>
+    <episode>4</episode>
+    <inetref>31477</inetref>
+    <collectionref>31477</collectionref>
+    <language>en</language>
+    <releasedate>2020-03-20</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
+    <year>2020</year>
+    <runtime>60</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Action"/>
+    </categories>
+    <people>
+      <person name="Noel Clarke" character="DI Aaron Bishop" job="Actor"/>
+      <person name="Ashley Walters" character="DI Ronnie Pike" job="Actor"/>
+      <person name="Vanessa Vanderpuye" character="Arjana Pike" job="Actor"/>
+      <person name="Lashana Lynch" character="Arjana Pike" job="Actor"/>
+      <person name="Jason Maza" character="DS Chris Munroe" job="Actor"/>
+      <person name="Lindsey Coulson" character="DCI Sarah Tanner" job="Actor"/>
+      <person name="Olivia Chenery" character="Scooch" job="Actor"/>
+      <person name="Lucie Shorthouse" character="DS Paige Pennington" job="Actor"/>
+      <person name="Stavros Zalmas" character="Alex Markides" job="Actor"/>
+      <person name="Ben Tavassoli" character="Mikey Markides" job="Actor"/>
+      <person name="Lee Ross" character="Deputy Director Richard Cockridge" job="Actor"/>
+      <person name="Gina Bellman" character="Elena Markides" job="Actor"/>
+      <person name="David Elliot" character="DS Tim 'Jonesy' Jones" job="Actor"/>
+      <person name="Gala Gordon" character="Anna Markides" job="Actor"/>
+      <person name="Kim Engelbrecht" character="Megan" job="Actor"/>
+      <person name="Thapelo Mokoena" character="William" job="Actor"/>
+      <person name="Paul du Toit" character="Dewald" job="Actor"/>
+      <person name="Richard September" character="Kojo" job="Actor"/>
+      <person name="Sechaba Morojele" character="Thato" job="Actor"/>
+      <person name="Christina Chong" character="Nell McBride" job="Actor"/>
+      <person name="Mandeep Dhillon" character="Kamali Khan" job="Actor"/>
+      <person name="Caroline Goodall" character="Deputy Mayor Charlotte Carmel" job="Actor"/>
+      <person name="Clarke Peters" character="Ronald Pike" job="Actor"/>
+      <person name="Anton Saunders" character="Tommy" job="Actor"/>
+      <person name="Tafara Nyatsanza" character="Damian" job="Actor"/>
+      <person name="Noel Clarke" job="Creator"/>
+      <person name="Noel Clarke" job="Executive Producer"/>
+      <person name="Ashley Walters" job="Creator"/>
+      <person name="Ashley Walters" job="Executive Producer"/>
+      <person name="Michele Buck" job="Executive Producer"/>
+      <person name="Nick Love" job="Creator"/>
+      <person name="Nick Love" job="Executive Producer"/>
+      <person name="Judy Counihan" job="Executive Producer"/>
+      <person name="Allan Niblo" job="Executive Producer"/>
+      <person name="Jon Finn" job="Producer"/>
+      <person name="Kiaran Murray-Smith" job="Producer"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/247/617968.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/247/617968.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/154/387396.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/154/387396.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/159/398236.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/159/398236.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/556230.jpg"/>
+      <image type="screenshot" url="https://static.tvmaze.com/uploads/images/original_untouched/247/618006.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_landscape/247/618006.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>Bulletproof</title>
+    <subtitle>Episode 4</subtitle>
+    <description>Pike and Bishop's refusal to follow orders hurls them into a disturbing case.</description>
+    <season>1</season>
+    <episode>4</episode>
+    <inetref>31477</inetref>
+    <collectionref>31477</collectionref>
+    <language>en</language>
+    <releasedate>2018-06-05</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
+    <year>2018</year>
+    <runtime>60</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Action"/>
+    </categories>
+    <people>
+      <person name="Noel Clarke" character="DI Aaron Bishop" job="Actor"/>
+      <person name="Ashley Walters" character="DI Ronnie Pike" job="Actor"/>
+      <person name="Vanessa Vanderpuye" character="Arjana Pike" job="Actor"/>
+      <person name="Lashana Lynch" character="Arjana Pike" job="Actor"/>
+      <person name="Jason Maza" character="DS Chris Munroe" job="Actor"/>
+      <person name="Lindsey Coulson" character="DCI Sarah Tanner" job="Actor"/>
+      <person name="Olivia Chenery" character="Scooch" job="Actor"/>
+      <person name="Lucie Shorthouse" character="DS Paige Pennington" job="Actor"/>
+      <person name="Stavros Zalmas" character="Alex Markides" job="Actor"/>
+      <person name="Ben Tavassoli" character="Mikey Markides" job="Actor"/>
+      <person name="Lee Ross" character="Deputy Director Richard Cockridge" job="Actor"/>
+      <person name="Gina Bellman" character="Elena Markides" job="Actor"/>
+      <person name="David Elliot" character="DS Tim 'Jonesy' Jones" job="Actor"/>
+      <person name="Gala Gordon" character="Anna Markides" job="Actor"/>
+      <person name="Kim Engelbrecht" character="Megan" job="Actor"/>
+      <person name="Thapelo Mokoena" character="William" job="Actor"/>
+      <person name="Paul du Toit" character="Dewald" job="Actor"/>
+      <person name="Richard September" character="Kojo" job="Actor"/>
+      <person name="Sechaba Morojele" character="Thato" job="Actor"/>
+      <person name="Christina Chong" character="Nell McBride" job="Actor"/>
+      <person name="Mandeep Dhillon" character="Kamali Khan" job="Actor"/>
+      <person name="Caroline Goodall" character="Deputy Mayor Charlotte Carmel" job="Actor"/>
+      <person name="Clarke Peters" character="Ronald Pike" job="Actor"/>
+      <person name="Anton Saunders" character="Tommy" job="Actor"/>
+      <person name="Tafara Nyatsanza" character="Damian" job="Actor"/>
+      <person name="Noel Clarke" job="Creator"/>
+      <person name="Noel Clarke" job="Executive Producer"/>
+      <person name="Ashley Walters" job="Creator"/>
+      <person name="Ashley Walters" job="Executive Producer"/>
+      <person name="Michele Buck" job="Executive Producer"/>
+      <person name="Nick Love" job="Creator"/>
+      <person name="Nick Love" job="Executive Producer"/>
+      <person name="Judy Counihan" job="Executive Producer"/>
+      <person name="Allan Niblo" job="Executive Producer"/>
+      <person name="Jon Finn" job="Producer"/>
+      <person name="Kiaran Murray-Smith" job="Producer"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/247/617968.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/247/617968.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/154/387396.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/154/387396.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/159/398236.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/159/398236.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/222/556230.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+
+# There are at least 3 programs called "The Flash". Test that we find
+# a matching subtitle in the correct version.
+# tvmaze.py -N "The Flash" "Double Vision"
+>>> sys.argv = shlex.split('tvmaze -N "The Flash" "Double Vision"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>The Flash</title>
+    <subtitle>Double Vision</subtitle>
+    <description>Barry attempts to foil the kidnapping of Sofia Tomarquin, daughter of DEA agent Felix Tomarquin, who is scheduled to testify against drug lord Reuben Calderon. However, Calderon's enforcer, Marcos Trachmann, utilizes advanced microscopic devices to control Barry's nervous system and force him to help them kidnap Sofia.</description>
+    <season>1</season>
+    <episode>5</episode>
+    <inetref>528</inetref>
+    <collectionref>528</collectionref>
+    <language>en</language>
+    <releasedate>1990-11-01</releasedate>
+    <userrating>...</userrating>
+    <popularity>...</popularity>
+    <year>1990</year>
+    <runtime>60</runtime>
+    <categories>
+      <category name="Action"/>
+      <category name="Adventure"/>
+      <category name="Science-Fiction"/>
+    </categories>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <people>
+      <person name="John Wesley Shipp" character="Barry Allen / The Flash" job="Actor"/>
+      <person name="Alex Désert" character="Julio Mendez" job="Actor"/>
+      <person name="Amanda Pays" character="Dr. Christina 'Tina' McGee" job="Actor"/>
+      <person name="David Boyd" job="Camera Operator"/>
+      <person name="Steven Long Mitchell" job="Producer"/>
+      <person name="Craig Van Sickle" job="Producer"/>
+      <person name="Don Kurt" job="Supervising Producer"/>
+      <person name="Don Kurt" job="Producer"/>
+      <person name="Howard Chaykin" job="Story Editor"/>
+      <person name="Howard Chaykin" job="Executive Story Consultant"/>
+      <person name="David L. Newman" job="First Assistant Director"/>
+      <person name="Danny Bilson" job="Developer"/>
+      <person name="Danny Bilson" job="Executive Producer"/>
+      <person name="Paul DeMeo" job="Executive Producer"/>
+      <person name="Steve Hattman" job="Supervising Producer"/>
+      <person name="Michael Lacoe" job="Co-Producer"/>
+      <person name="David L. Beanes" job="Co-Producer"/>
+      <person name="David L. Beanes" job="Unit Production Manager"/>
+      <person name="Frank Jimenez" job="Associate Producer"/>
+      <person name="April Webster" job="Casting"/>
+      <person name="Robert D. Bailey" job="Visual Effects Supervisor"/>
+      <person name="Bill Zabala" job="Film Editor"/>
+      <person name="Gail Morgan Hickman" job="Producer"/>
+      <person name="Fred Lerner" job="Stunt Coordinator"/>
+      <person name="Paul De Meo" job="Developer"/>
+      <person name="Greg Gardiner" job="Director Of Photography"/>
+      <person name="John Francis Moore" job="Story Editor"/>
+      <person name="John Francis Moore" job="Executive Story Consultant"/>
+      <person name="Francis Kenny" job="Director Of Photography"/>
+      <person name="Danny Elfman" job="Main Title Theme"/>
+      <person name="Greg Wong" job="Film Editor"/>
+      <person name="John C. Newby" job="Camera Operator"/>
+      <person name="Craig Binkley" job="Property Master"/>
+      <person name="Dean Edward Mitzner" job="Production Designer"/>
+      <person name="Shirley Walker" job="Music"/>
+      <person name="Richard Graves" job="First Assistant Director"/>
+      <person name="David D'Ovidio" job="First Assistant Director"/>
+      <person name="David D'Ovidio" job="Second Assistant Director"/>
+      <person name="Jim Troutman" job="Sound Editor"/>
+      <person name="Abby Treloggen" job="Music Editor"/>
+      <person name="Jim Larue" job="Sound Mixer"/>
+      <person name="Bob Miller" job="Costume Supervisor"/>
+      <person name="Bill Myer" job="Makeup Supervisor"/>
+      <person name="Dino Ganziano" job="Hair Stylist"/>
+      <person name="Ray Quiroz" job="Script Supervisor"/>
+      <person name="Jeannie Gunn" job="Set Decorator"/>
+      <person name="Rick Dinieri" job="Property Master"/>
+      <person name="Robert Benjamin" job="Transportation Coordinator"/>
+      <person name="Bill Schirmer" job="Special Effects"/>
+      <person name="Billy Burton" job="Stunt Coordinator"/>
+      <person name="Billy Burton" job="Second Unit Director"/>
+      <person name="David Stipes" job="Visual Effects Supervisor"/>
+      <person name="Patrick Clancy" job="Visual Effects Artist"/>
+      <person name="Philip Barberio" job="Visual Effects Coordinator"/>
+      <person name="Robert Short" job="Costume Designer"/>
+      <person name="Greg Cannom" job="Special Effects Makeup Designer"/>
+      <person name="Robert S. Mills" job="Second Assistant Director"/>
+      <person name="Lawrence J. Gleason" job="Film Editor"/>
+      <person name="Thomas Milano" job="Music Editor"/>
+      <person name="Hugh K. Gagnier" job="Director Of Photography"/>
+      <person name="David Kelley" job="Second Assistant Director"/>
+      <person name="Perri Kimono" job="Costume Supervisor"/>
+      <person name="Richard Fernandez" job="Art Director"/>
+      <person name="Daniel R. Suhart" job="Second Assistant Director"/>
+      <person name="Robinson Royce" job="Set Decorator"/>
+      <person name="Le Dawson" job="Costume Designer"/>
+      <person name="Lana Sharpe" job="Hair Stylist"/>
+      <person name="Gillian Murphy" job="Script Supervisor"/>
+      <person name="Peter W. Moyer" job="Visual Effects Artist"/>
+      <person name="Peter A. Samish" job="Art Director"/>
+      <person name="Francis J. Pezza" job="Art Director"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/4/11360.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/4/11360.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/225/563491.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/251/629841.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/251/629843.jpg"/>
+      <image type="screenshot" url="https://static.tvmaze.com/uploads/images/original_untouched/55/139950.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_landscape/55/139950.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+
+# This example is a partial match on subtitle from the 1967 version of "The Flash"
+# tvmaze.py -N "The Flash" "To Catch a Blue"
+>>> sys.argv = shlex.split('tvmaze -N "The Flash" "To Catch a Blue"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>The Flash</title>
+    <subtitle>To Catch a Blue Bolt</subtitle>
+    <description>Blue Bolt, an alien being with the same Super Speed as The Flash, attacks the Earth.</description>
+    <season>1</season>
+    <episode>3</episode>
+    <inetref>7079</inetref>
+    <collectionref>7079</collectionref>
+    <language>en</language>
+    <releasedate>1967-11-25</releasedate>
+    <popularity>...</popularity>
+    <year>1967</year>
+    <runtime>7</runtime>
+    <categories>
+      <category name="Action"/>
+      <category name="Adventure"/>
+      <category name="Science-Fiction"/>
+    </categories>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/29/73727.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/29/73727.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/26/66242.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/26/66242.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/226/566930.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# This example shows the '-N title datetime' syntax
+>>> from MythTV import datetime
+>>> showtimeisoutc = "2021-03-21 13:00:00"
+>>> showtimeutc = datetime.fromIso(showtimeisoutc, tz='Etc/UTC')
+>>> showtimelocal = showtimeutc.astimezone(datetime.localTZ())
+>>> showtimeisolocal = showtimelocal.strftime("%Y-%m-%d %H:%M:%S")
+>>> sys.argv = shlex.split('tvmaze -N "CBS Sunday Morning" "%s"' % showtimeisolocal)
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>CBS News Sunday Morning</title>
+    <subtitle>Episode 12</subtitle>
+    <description>Hosted by Jane Pauley. In our cover story, David Pogue looks at the hit online instruction series MasterClass. Plus: Singer Demi Lovato talks with Tracy Smith about her life since surviving a 2018 heroin overdose; Martha Teichner visits with abstract artist Frank Stella; Ali MacGraw and Ryan O'Neal reminisce about the making of the classic "Love Story" with Ben Mankiewicz; Seth Doane reviews an exhibition of Roman and Greek antiquities which have been out of public view for about 70 years; Rita Braver tells the story of a man, adopted at birth, who reconnects with his birth mother; Conor Knighton explores extinct species that may not be extinct; and Luke Burbank reports on the rise in sports betting, and tests his luck at a Las Vegas sportsbook.</description>
+    <season>2021</season>
+    <episode>12</episode>
+    <inetref>15779</inetref>
+    <collectionref>15779</collectionref>
+    <language>en</language>
+    <releasedate>2021-03-21</releasedate>
+    <popularity>...</popularity>
+    <year>2021</year>
+    <runtime>90</runtime>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <people>
+      <person name="Jane Pauley" character="Host" job="Actor"/>
+      <person name="Charles Kuralt" character="Host" job="Actor"/>
+      <person name="Charles Osgood" character="Host" job="Actor"/>
+      <person name="Lee Cowan" character="Substitute Host" job="Actor"/>
+      <person name="Erin Moriarty" character="Erin" job="Actor"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/237/592585.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/237/592585.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/53/132964.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/53/132964.jpg"/>
+      <image type="coverart" url="https://static.tvmaze.com/uploads/images/original_untouched/90/226497.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_portrait/90/226497.jpg"/>
+      <image type="fanart" url="https://static.tvmaze.com/uploads/images/original_untouched/221/553290.jpg"/>
+      <image type="screenshot" url="https://static.tvmaze.com/uploads/images/original_untouched/300/751352.jpg" thumb="https://static.tvmaze.com/uploads/images/medium_landscape/300/751352.jpg"/>
+    </images>
+  </item>
+</metadata>

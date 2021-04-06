@@ -199,7 +199,7 @@ int ExternalSignalMonitor::GetSignalStrengthPercent(void)
     if (result.startsWith("OK:"))
     {
         bool ok = false;
-        int percent = result.midRef(3).toInt(&ok);
+        int percent = result.mid(3).toInt(&ok);
         if (!ok)
         {
             LOG(VB_CHANNEL, LOG_ERR, LOC + QString
@@ -225,7 +225,7 @@ std::chrono::seconds ExternalSignalMonitor::GetLockTimeout(void)
     if (result.startsWith("OK:"))
     {
         bool ok = false;
-        auto timeout = std::chrono::seconds(result.midRef(3).toInt(&ok));
+        auto timeout = std::chrono::seconds(result.mid(3).toInt(&ok));
         if (!ok)
         {
             LOG(VB_CHANNEL, LOG_ERR, LOC + QString
