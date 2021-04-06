@@ -203,8 +203,8 @@ void MythFontManager::LoadFontFile(const QString &fontPath,
         {
             LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC +
                 QString("In file '%1', found font(s) '%2'")
-                    .arg(fontPath)
-                    .arg(QFontDatabase::applicationFontFamilies(result)
+                    .arg(fontPath,
+                         QFontDatabase::applicationFontFamilies(result)
                          .join(", ")));
 
             if (!RegisterFont(fontPath, registeredFor, result))

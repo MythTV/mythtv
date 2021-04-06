@@ -449,7 +449,8 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *event)
         if (gDeadKeyMap.isEmpty())
             LoadDeadKeys(gDeadKeyMap);
 
-        LOG(VB_GUI, LOG_DEBUG, QString("Compose key: %1 Key: %2").arg(QString::number(m_composeKey, 16)).arg(QString::number(keynum, 16)));
+        LOG(VB_GUI, LOG_DEBUG, QString("Compose key: %1 Key: %2")
+            .arg(QString::number(m_composeKey, 16), QString::number(keynum, 16)));
 
         if (gDeadKeyMap.contains(keyCombo(m_composeKey, keynum)))
         {

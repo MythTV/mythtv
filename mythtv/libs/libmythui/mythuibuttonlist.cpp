@@ -2390,7 +2390,7 @@ void MythUIButtonList::Init()
     {
         LOG(VB_GENERAL, LOG_ERR, QString("(%1) Statetype buttonitem is "
                                          "required in mythuibuttonlist: %2")
-            .arg(GetXMLLocation()).arg(objectName()));
+            .arg(GetXMLLocation(), objectName()));
         return;
     }
 
@@ -3717,10 +3717,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
                     if (!value.isEmpty())
                     {
                         replacement = QString("%1%2%3%4")
-                                      .arg(match.captured(2))
-                                      .arg(match.captured(3))
-                                      .arg(m_strings.value(key).text)
-                                      .arg(match.captured(6));
+                                      .arg(match.captured(2),
+                                           match.captured(3),
+                                           m_strings.value(key).text,
+                                           match.captured(6));
                     }
 
                     tempString.replace(match.captured(0), replacement);

@@ -216,9 +216,9 @@ void MythCECAdapter::Open(MythMainWindow *Window)
         bool match = find ? (comm == defaultDevice) : (i == 0);
         devicenum = match ? i : devicenum;
         LOG(VB_GENERAL, LOG_INFO, LOC +
-            QString("Device %1: path '%2' com port '%3' %4").arg(i + 1)
-            .arg(path).arg(comm)
-            .arg(match ? "SELECTED" : ""));
+            QString("Device %1: path '%2' com port '%3' %4")
+            .arg(QString::number(i + 1),
+                 path, comm, match ? "SELECTED" : ""));
     }
 
     // open adapter
@@ -230,7 +230,7 @@ void MythCECAdapter::Open(MythMainWindow *Window)
     QString path = QString::fromLatin1(devices[devicenum].path);
 #endif
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Trying to open device %1 (%2).")
-        .arg(path).arg(comm));
+        .arg(path, comm));
 
 #if CEC_LIB_VERSION_MAJOR >= 4
     if (!m_adapter->Open(devices[devicenum].strComName))
@@ -634,7 +634,7 @@ int MythCECAdapter::HandleKeyPress(const cec_keypress Key) const
     }
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Keypress %1 %2")
-        .arg(code).arg(0 == action ? "(Not actioned)" : ""));
+        .arg(code, 0 == action ? "(Not actioned)" : ""));
 
     if (0 == action)
         return 1;

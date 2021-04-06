@@ -187,7 +187,8 @@ void MythRenderOpenGL::MessageLogged(const QOpenGLDebugMessage &Message)
             type = "GroupPop"; break;
         default: break;
     }
-    LOG(VB_GPU, LOG_INFO, LOC + QString("Src: %1 Type: %2 Msg: %3").arg(source).arg(type).arg(Message.message()));
+    LOG(VB_GPU, LOG_INFO, LOC + QString("Src: %1 Type: %2 Msg: %3")
+        .arg(source, type, Message.message()));
 }
 
 void MythRenderOpenGL:: logDebugMarker(const QString &Message)

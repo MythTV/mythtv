@@ -498,11 +498,11 @@ void MythDisplayMutter::UpdateResources()
             modes.append(QString::number(mode));
         QStringList props;
         for (const auto& prop : qAsConst(output.properties))
-            props.append(QString("%1:%2").arg(prop.first).arg(prop.second.variant().toString()));
+            props.append(QString("%1:%2").arg(prop.first, prop.second.variant().toString()));
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Output %1/%2: CRTC: %3 Possible CRTCs: %4 Name: '%5'")
                 .arg(output.id).arg(output.sys_id).arg(output.current_crtc)
-                .arg(possiblecrtcs.join(",")).arg(output.name));
+                .arg(possiblecrtcs.join(","), output.name));
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Output %1/%2: Modes: %3")
                 .arg(output.id).arg(output.sys_id).arg(modes.join(",")));
@@ -550,7 +550,7 @@ void MythDisplayMutter::UpdateResources()
                 if (output.serialnumber == serial)
                 {
                     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Matched serial '%1' to device '%2'")
-                        .arg(serial).arg(output.name));
+                        .arg(serial, output.name));
                     m_outputIdx = idx;
                     break;
                 }

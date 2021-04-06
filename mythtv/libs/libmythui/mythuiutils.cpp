@@ -14,7 +14,7 @@ bool ETPrintWarning::Child(const MythUIType *container,
 {
     LOG(VB_GUI, LOG_NOTICE,
         QString("Container '%1' is missing child '%2' at %3")
-        .arg(container->GetXMLName()).arg(child_name).arg(container->GetXMLLocation()));
+        .arg(container->GetXMLName(), child_name, container->GetXMLLocation()));
     return false;
 }
 
@@ -31,7 +31,7 @@ bool ETPrintError::Child(const MythUIType *container,
 {
     LOG(VB_GENERAL, LOG_ERR,
         QString("Container '%1' is missing child '%2' at %3")
-        .arg(container->GetXMLName()).arg(child_name).arg(container->GetXMLLocation()));
+        .arg(container->GetXMLName(), child_name, container->GetXMLLocation()));
     return true;
 }
 

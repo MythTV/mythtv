@@ -482,7 +482,7 @@ MythUIType *XMLParseBase::ParseUIType(
         {
             VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                        QString("Couldn't find object '%1' to inherit '%2' from")
-                        .arg(inherits).arg(name));
+                        .arg(inherits, name));
             return nullptr;
         }
     }
@@ -546,7 +546,7 @@ MythUIType *XMLParseBase::ParseUIType(
         {
             VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                         QString("Duplicate name: '%1' in parent '%2'")
-                        .arg(name).arg(parent->objectName()));
+                        .arg(name, parent->objectName()));
             parent->DeleteChild(olduitype);
         }
         else
@@ -562,7 +562,7 @@ MythUIType *XMLParseBase::ParseUIType(
         {
             VERBOSE_XML(VB_GENERAL, LOG_ERR, filename, element,
                       QString("Type of new widget '%1' doesn't match old '%2'")
-                        .arg(name).arg(inherits));
+                        .arg(name, inherits));
             if (parent)
                 parent->DeleteChild(uitype);
             return nullptr;
@@ -700,7 +700,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
     for (const auto & dir : qAsConst(searchpath))
     {
         QString themefile = dir + xmlfile;
-        LOG(VB_GUI, LOG_INFO, LOC + QString("Loading window %1 from %2").arg(windowname).arg(themefile));
+        LOG(VB_GUI, LOG_INFO, LOC + QString("Loading window %1 from %2").arg(windowname, themefile));
         if (doLoad(windowname, parent, themefile,
                    onlyLoadWindows, showWarnings))
         {
@@ -711,7 +711,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
 
     LOG(VB_GENERAL, LOG_ERR, LOC +
         QString("Unable to load window '%1' from '%2'")
-            .arg(windowname).arg(xmlfile));
+            .arg(windowname, xmlfile));
 
     return false;
 }

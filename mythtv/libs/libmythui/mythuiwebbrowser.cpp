@@ -196,7 +196,7 @@ int BrowserApi::GetVolume(void)
 void BrowserApi::PlayFile(const QString& filename)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_FILE '%2'")
-                 .arg(gCoreContext->GetHostName()).arg(filename));
+                 .arg(gCoreContext->GetHostName(), filename));
     gCoreContext->dispatch(me);
 }
 
@@ -210,7 +210,7 @@ void BrowserApi::PlayTrack(int trackID)
 void BrowserApi::PlayURL(const QString& url)
 {
     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_URL %2")
-                 .arg(gCoreContext->GetHostName()).arg(url));
+                 .arg(gCoreContext->GetHostName(), url));
     gCoreContext->dispatch(me);
 }
 
@@ -316,9 +316,9 @@ bool MythWebPage::extension(Extension extension, const ExtensionOption *option,
 
         QString title = tr("Error loading page: %1").arg(erroroption->url.toString());
         QString html = QString(QLatin1String(file.readAll()))
-                       .arg(title)
-                       .arg(erroroption->errorString)
-                       .arg(erroroption->url.toString());
+                       .arg(title,
+                            erroroption->errorString,
+                            erroroption->url.toString());
 
         QBuffer imageBuffer;
         imageBuffer.open(QBuffer::ReadWrite);
@@ -515,9 +515,9 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
         extension = '.' + extension;
 
     QString saveFilename = QString("%1%2%3")
-                                .arg(m_parentBrowser->GetDefaultSaveDirectory())
-                                .arg(saveBaseName)
-                                .arg(extension);
+                                .arg(m_parentBrowser->GetDefaultSaveDirectory(),
+                                     saveBaseName,
+                                     extension);
 
     // dont overwrite an existing file
     if (QFile::exists(saveFilename))
@@ -527,10 +527,10 @@ void  MythWebView::doDownloadRequested(const QNetworkRequest &request)
         do
         {
             saveFilename = QString("%1%2-%3%4")
-                                .arg(m_parentBrowser->GetDefaultSaveDirectory())
-                                .arg(saveBaseName)
-                                .arg(QString::number(i++))
-                                .arg(extension);
+                                .arg(m_parentBrowser->GetDefaultSaveDirectory(),
+                                     saveBaseName,
+                                     QString::number(i++),
+                                     extension);
         }
         while (QFile::exists(saveFilename));
     }
@@ -622,8 +622,8 @@ void MythWebView::customEvent(QEvent *event)
                 if (isMusicFile(extension, mimeType))
                 {
                     MythEvent me(QString("MUSIC_COMMAND %1 PLAY_URL %2")
-                                 .arg(gCoreContext->GetHostName())
-                                 .arg(m_downloadRequest.url().toString()));
+                                 .arg(gCoreContext->GetHostName(),
+                                      m_downloadRequest.url().toString()));
                     gCoreContext->dispatch(me);
                 }
                 else if (isVideoFile(extension, mimeType))

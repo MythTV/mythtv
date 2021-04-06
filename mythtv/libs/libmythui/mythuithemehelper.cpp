@@ -72,7 +72,7 @@ QString MythUIThemeHelper::FindThemeDir(const QString& ThemeName, bool Fallback)
     if (dir.exists())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not find theme: %1 - Switching to %2")
-            .arg(ThemeName).arg(DEFAULT_UI_THEME));
+            .arg(ThemeName, DEFAULT_UI_THEME));
         gCoreContext->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
         return testdir;
     }
@@ -85,7 +85,7 @@ QString MythUIThemeHelper::FindThemeDir(const QString& ThemeName, bool Fallback)
     if (dir.exists())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Could not find theme: %1 - Switching to %2")
-            .arg(ThemeName).arg(FALLBACK_UI_THEME));
+            .arg(ThemeName, FALLBACK_UI_THEME));
         gCoreContext->OverrideSettingForSession("Theme", FALLBACK_UI_THEME);
         return testdir;
     }

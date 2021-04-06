@@ -184,10 +184,10 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
             if (!map.value(key).isEmpty())
             {
                 replacement = QString("%1%2%3%4")
-                .arg(match.captured(2))
-                .arg(match.captured(3))
-                .arg(map.value(key))
-                .arg(match.captured(6));
+                .arg(match.captured(2),
+                     match.captured(3),
+                     map.value(key),
+                     match.captured(6));
             }
 
             tempString.replace(match.captured(0), replacement);
@@ -289,7 +289,7 @@ void MythUIText::SetCutDown(Qt::TextElideMode mode)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("'%1' (%2): <scroll> and "
                                              "<cutdown> are not combinable.")
-                .arg(objectName()).arg(GetXMLLocation()));
+                .arg(objectName(), GetXMLLocation()));
             m_cutdown = Qt::ElideNone;
         }
         if (!m_message.isEmpty())
@@ -491,9 +491,9 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
                     formats.push_back(range);
                     LOG(VB_GUI, LOG_DEBUG,
                         QString("'%1' Setting \"%2\" with FONT %3")
-                        .arg(objectName())
-                        .arg(paragraph.mid(range.start, range.length))
-                        .arg(fontname));
+                        .arg(objectName(),
+                             paragraph.mid(range.start, range.length),
+                             fontname));
                 }
                 range.length = 0;
             }
@@ -519,8 +519,7 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
             {
                 LOG(VB_GUI, LOG_ERR,
                     QString("'%1' Unknown Font '%2' specified in template.")
-                    .arg(objectName())
-                    .arg(fontname));
+                    .arg(objectName(), fontname));
             }
 
             LOG(VB_GUI, LOG_DEBUG, QString("Removing %1 through %2 '%3'")
@@ -544,9 +543,9 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
         formats.push_back(range);
         LOG(VB_GUI, LOG_DEBUG,
             QString("'%1' Setting \"%2\" with FONT %3")
-            .arg(objectName())
-            .arg(paragraph.mid(range.start, range.length))
-            .arg(fontname));
+            .arg(objectName(),
+                 paragraph.mid(range.start, range.length),
+                 fontname));
     }
 
     if (!formats.empty())
@@ -598,8 +597,8 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                 LOG(VB_GUI, num_lines ? LOG_DEBUG : LOG_NOTICE,
                     QString("'%1' (%2): height overflow. line height %3 "
                             "paragraph height %4, area height %5")
-                    .arg(objectName())
-                    .arg(GetXMLLocation())
+                    .arg(objectName(),
+                         GetXMLLocation())
                     .arg(line.height())
                     .arg(height)
                     .arg(m_area.height()));
@@ -778,7 +777,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
     LOG(VB_GENERAL, LOG_ERR, QString("'%1' (%2) GetNarrowWidth: Gave up "
                                      "while trying to find optimal width "
                                      "for '%3'.")
-        .arg(objectName()).arg(GetXMLLocation()).arg(m_cutMessage));
+        .arg(objectName(), GetXMLLocation(), m_cutMessage));
 
     width = best_width;
     m_cutdown = cutdown;
@@ -1074,7 +1073,7 @@ int MythUIText::MoveCursor(int lines)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("'%1' (%2) MoveCursor offset %3 not found in ANY paragraph!")
-            .arg(objectName()).arg(GetXMLLocation()).arg(m_textCursor));
+            .arg(objectName(), GetXMLLocation(), QString::number(m_textCursor)));
         return m_textCursor;
     }
 
@@ -1141,7 +1140,7 @@ QPoint MythUIText::CursorPosition(int text_offset)
         LOG(VB_GENERAL, LOG_ERR,
             QString("'%1' (%2) CursorPosition offset %3 not found in "
                     "ANY paragraph!")
-            .arg(objectName()).arg(GetXMLLocation()).arg(text_offset));
+            .arg(objectName(), GetXMLLocation(), QString::number(text_offset)));
         return m_area.topLeft().toQPoint();
     }
 
@@ -1529,7 +1528,7 @@ bool MythUIText::ParseElement(
                     m_scrollDirection = ScrollNone;
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("'%1' (%2) Invalid scroll attribute")
-                        .arg(objectName()).arg(GetXMLLocation()));
+                        .arg(objectName(), GetXMLLocation()));
                 }
             }
 
@@ -1610,8 +1609,8 @@ void MythUIText::CopyFrom(MythUIType *base)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("'%1' (%2) ERROR, bad parsing '%3' (%4)")
-            .arg(objectName()).arg(GetXMLLocation())
-            .arg(base->objectName()).arg(base->GetXMLLocation()));
+            .arg(objectName(), GetXMLLocation(),
+                 base->objectName(), base->GetXMLLocation()));
         return;
     }
 
@@ -1682,7 +1681,7 @@ void MythUIText::Finalize(void)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("'%1' (%2): <scroll> and <cutdown> are not combinable.")
-            .arg(objectName()).arg(GetXMLLocation()));
+            .arg(objectName(), GetXMLLocation()));
         m_cutdown = Qt::ElideNone;
     }
     FillCutMessage();

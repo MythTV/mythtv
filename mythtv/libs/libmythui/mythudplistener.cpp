@@ -149,8 +149,8 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
     if (!msg.isEmpty() || !image.isEmpty() || !extra.isEmpty())
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Received %1 '%2', timeout %3")
-            .arg(notification ? "notification" : "message")
-            .arg(msg).arg(timeout.count()));
+            .arg(notification ? "notification" : "message",
+                 msg, QString::number(timeout.count())));
         if (timeout > 1000s)
             timeout = notification ? 5s : 0s;
         if (notification)

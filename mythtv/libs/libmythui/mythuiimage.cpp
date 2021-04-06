@@ -189,8 +189,8 @@ class ImageLoader
 
 
         imagelabel  = QString("%1-%2-%3x%4.png")
-                    .arg(imProps.m_filename)
-                    .arg(s_Attrib)
+                    .arg(imProps.m_filename,
+                         s_Attrib)
                     .arg(w)
                     .arg(h);
         imagelabel.replace('/', '-');
@@ -1434,8 +1434,8 @@ void MythUIImage::CopyFrom(MythUIType *base)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("'%1' (%2) ERROR, bad parsing '%3' (%4)")
-            .arg(objectName()).arg(GetXMLLocation())
-            .arg(base->objectName()).arg(base->GetXMLLocation()));
+            .arg(objectName(), GetXMLLocation(),
+                 base->objectName(), base->GetXMLLocation()));
         d->m_updateLock.unlock();
         return;
     }
@@ -1661,7 +1661,7 @@ void MythUIImage::FindRandomImage(void)
         do
         {
             uint32_t rand = MythRandom() % static_cast<uint32_t>(imageList.size());
-            randFile = QString("%1%2").arg(m_imageDirectory).arg(imageList.takeAt(static_cast<int>(rand)));
+            randFile = QString("%1%2").arg(m_imageDirectory, imageList.takeAt(static_cast<int>(rand)));
 
         } while (imageList.size() > 1 && randFile == m_origFilename);
     }

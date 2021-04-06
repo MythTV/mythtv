@@ -20,7 +20,7 @@ MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
     m_shortDateFormat = GetMythDB()->GetSetting("ShortDateFormat", "ddd M/d");
     m_timeFormat = GetMythDB()->GetSetting("TimeFormat", "h:mm ap");
 
-    m_format = QString("%1, %2").arg(m_dateFormat).arg(m_timeFormat);
+    m_format = QString("%1, %2").arg(m_dateFormat, m_timeFormat);
 }
 
 MythUIClock::~MythUIClock()
