@@ -330,10 +330,10 @@ uint DBEvent::UpdateDB(
     // List the program that we are going to add
     LOG(VB_EIT, LOG_DEBUG,
         QString("EIT: new program: %1 %2 '%3' chanid %4")
-                .arg(m_starttime.toString(Qt::ISODate))
-                .arg(m_endtime.toString(Qt::ISODate))
-                .arg(m_title.left(35))
-                .arg(chanid));
+                .arg(m_starttime.toString(Qt::ISODate),
+                     m_endtime.toString(Qt::ISODate),
+                     m_title.left(35),
+                     QString::number(chanid)));
 
     // Do not insert or update when the program is in the past
     QDateTime now = QDateTime::currentDateTimeUtc();
@@ -362,10 +362,10 @@ uint DBEvent::UpdateDB(
     {
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: overlap[%1] : %2 %3 '%4'")
-                .arg(j)
-                .arg(programs[j].m_starttime.toString(Qt::ISODate))
-                .arg(programs[j].m_endtime.toString(Qt::ISODate))
-                .arg(programs[j].m_title.left(35)));
+                .arg(QString::number(j),
+                     programs[j].m_starttime.toString(Qt::ISODate),
+                     programs[j].m_endtime.toString(Qt::ISODate),
+                     programs[j].m_title.left(35)));
     }
 
     // Determine which of the overlapping programs is a match with
@@ -382,8 +382,9 @@ uint DBEvent::UpdateDB(
         // out of the way.
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: accept match[%1]: %2 '%3' vs. '%4'")
-                .arg(i).arg(match).arg(m_title.left(35))
-                .arg(programs[i].m_title.left(35)));
+                .arg(i).arg(match)
+                .arg(m_title.left(35),
+                     programs[i].m_title.left(35)));
         return UpdateDB(query, chanid, programs, i);
     }
 
@@ -394,8 +395,9 @@ uint DBEvent::UpdateDB(
     {
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
-                .arg(i).arg(match).arg(m_title.left(35))
-                .arg(programs[i].m_title.left(35)));
+                .arg(i).arg(match)
+                .arg(m_title.left(35),
+                     programs[i].m_title.left(35)));
     }
 
     // Move the overlapping programs out of the way and
@@ -622,11 +624,11 @@ int DBEvent::GetMatch(const std::vector<DBEvent> &programs, int &bestmatch) cons
                 QString("Unexpected result: shows don't "
                         "overlap\n\t%1: %2 - %3\n\t%4: %5 - %6")
                     .arg(m_title.left(35), 35)
-                    .arg(m_starttime.toString(Qt::ISODate))
-                    .arg(m_endtime.toString(Qt::ISODate))
+                    .arg(m_starttime.toString(Qt::ISODate),
+                         m_endtime.toString(Qt::ISODate))
                     .arg(programs[i].m_title.left(35), 35)
-                    .arg(programs[i].m_starttime.toString(Qt::ISODate))
-                    .arg(programs[i].m_endtime.toString(Qt::ISODate))
+                    .arg(programs[i].m_starttime.toString(Qt::ISODate),
+                         programs[i].m_endtime.toString(Qt::ISODate))
                 );
         }
 
@@ -634,8 +636,9 @@ int DBEvent::GetMatch(const std::vector<DBEvent> &programs, int &bestmatch) cons
         {
             LOG(VB_EIT, LOG_DEBUG,
                 QString("GM : '%1' new best match '%2' with score %3")
-                    .arg(m_title.left(35))
-                    .arg(programs[i].m_title.left(35)).arg(mv));
+                    .arg(m_title.left(35),
+                         programs[i].m_title.left(35),
+                         QString::number(mv)));
             bestmatch = i;
             match_val = mv;
         }
@@ -692,8 +695,8 @@ uint DBEvent::UpdateDB(
     // Update matched item with current data
     LOG(VB_EIT, LOG_DEBUG,
          QString("EIT: update '%1' with '%2'")
-                 .arg(p[match].m_title.left(35))
-                 .arg(m_title.left(35)));
+                 .arg(p[match].m_title.left(35),
+                      m_title.left(35)));
     return UpdateDB(q, chanid, p[match]);
 }
 
@@ -737,10 +740,10 @@ static int change_record(MSqlQuery &query, uint chanid,
     {
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: Updated record: chanid:%1 old:%3 new:%4 rows:%5")
-            .arg(chanid)
-            .arg(old_starttime.toString(Qt::ISODate))
-            .arg(new_starttime.toString(Qt::ISODate))
-            .arg(rows));
+            .arg(QString::number(chanid),
+                 old_starttime.toString(Qt::ISODate),
+                 new_starttime.toString(Qt::ISODate),
+                 QString::number(rows)));
     }
     return rows;
 }
@@ -770,10 +773,10 @@ uint DBEvent::UpdateDB(
 
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: (U) change starttime from %1 to %2 for chanid:%3 program '%4' ")
-                    .arg(old_starttime.toString(Qt::ISODate))
-                    .arg(new_starttime.toString(Qt::ISODate))
-                    .arg(chanid)
-                    .arg(m_title.left(35)));
+                    .arg(old_starttime.toString(Qt::ISODate),
+                         new_starttime.toString(Qt::ISODate),
+                         QString::number(chanid),
+                         m_title.left(35)));
     }
 
     if (ltitle.isEmpty() && !match.m_title.isEmpty())
@@ -1084,9 +1087,9 @@ bool DBEvent::MoveOutOfTheWayDB(
         // Delete the old program completely.
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: delete '%1' %2 - %3")
-                    .arg(prog.m_title.left(35))
-                    .arg(prog.m_starttime.toString(Qt::ISODate))
-                    .arg(prog.m_endtime.toString(Qt::ISODate)));
+                    .arg(prog.m_title.left(35),
+                         prog.m_starttime.toString(Qt::ISODate),
+                         prog.m_endtime.toString(Qt::ISODate)));
         return delete_program(query, chanid, prog.m_starttime);
     }
     if (prog.m_starttime < m_starttime && prog.m_endtime > m_starttime)
@@ -1098,8 +1101,8 @@ bool DBEvent::MoveOutOfTheWayDB(
         // the old program was after the end time of the new program!!
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: change '%1' endtime to %2")
-                    .arg(prog.m_title.left(35))
-                    .arg(m_starttime.toString(Qt::ISODate)));
+                    .arg(prog.m_title.left(35),
+                         m_starttime.toString(Qt::ISODate)));
         return change_program(query, chanid, prog.m_starttime,
                               prog.m_starttime, // Keep the start time
                               m_starttime);     // New end time is our start time
@@ -1116,17 +1119,17 @@ bool DBEvent::MoveOutOfTheWayDB(
         {
             LOG(VB_EIT, LOG_DEBUG,
                 QString("EIT: delete '%1' %2 - %3")
-                        .arg(prog.m_title.left(35))
-                        .arg(prog.m_starttime.toString(Qt::ISODate))
-                        .arg(prog.m_endtime.toString(Qt::ISODate)));
+                        .arg(prog.m_title.left(35),
+                             prog.m_starttime.toString(Qt::ISODate),
+                             prog.m_endtime.toString(Qt::ISODate)));
             return delete_program(query, chanid, prog.m_starttime);
         }
         LOG(VB_EIT, LOG_DEBUG,
             QString("EIT: (M) change starttime from %1 to %2 for chanid:%3 program '%4' ")
-                    .arg(prog.m_starttime.toString(Qt::ISODate))
-                    .arg(m_endtime.toString(Qt::ISODate))
-                    .arg(chanid)
-                    .arg(prog.m_title.left(35)));
+                    .arg(prog.m_starttime.toString(Qt::ISODate),
+                         m_endtime.toString(Qt::ISODate),
+                         QString::number(chanid),
+                         prog.m_title.left(35)));
 
         // Update starttime in tables record and program so they stay consistent.
         change_record(query, chanid, prog.m_starttime, m_endtime);
@@ -1303,10 +1306,10 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid,
 
     LOG(VB_XMLTV, LOG_DEBUG,
         QString("Inserting new %1    : %2 - %3 %4 %5")
-        .arg(table)
-        .arg(m_starttime.toString(Qt::ISODate))
-        .arg(m_endtime.toString(Qt::ISODate))
-        .arg(m_channel));
+        .arg(table,
+             m_starttime.toString(Qt::ISODate),
+             m_endtime.toString(Qt::ISODate),
+             m_channel));
 
     query.prepare(QString(
         "REPLACE INTO %1 ("
@@ -1524,17 +1527,17 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
 
             LOG(VB_XMLTV, LOG_DEBUG,
                 QString("Removing conflicting program: %1 - %2 %3 %4")
-                    .arg((*todelete)->m_starttime.toString(Qt::ISODate))
-                    .arg((*todelete)->m_endtime.toString(Qt::ISODate))
-                    .arg((*todelete)->m_channel)
-                    .arg((*todelete)->m_title));
+                    .arg((*todelete)->m_starttime.toString(Qt::ISODate),
+                         (*todelete)->m_endtime.toString(Qt::ISODate),
+                         (*todelete)->m_channel,
+                         (*todelete)->m_title));
 
             LOG(VB_XMLTV, LOG_DEBUG,
                 QString("Conflicted with            : %1 - %2 %3 %4")
-                    .arg((*tokeep)->m_starttime.toString(Qt::ISODate))
-                    .arg((*tokeep)->m_endtime.toString(Qt::ISODate))
-                    .arg((*tokeep)->m_channel)
-                    .arg((*tokeep)->m_title));
+                    .arg((*tokeep)->m_starttime.toString(Qt::ISODate),
+                         (*tokeep)->m_endtime.toString(Qt::ISODate),
+                         (*tokeep)->m_channel,
+                         (*tokeep)->m_title));
 
             bool step_back = todelete == it;
             it = fixlist.erase(todelete);
@@ -1673,8 +1676,7 @@ int ProgramData::fix_end_times(void)
                            "WHERE starttime > '%1' "
                            "AND chanid = '%2' "
                            "ORDER BY starttime LIMIT 1;")
-                           .arg(starttime)
-                           .arg(chanid);
+                           .arg(starttime, chanid);
 
         if (!query2.exec(querystr))
         {
@@ -1690,9 +1692,7 @@ int ProgramData::fix_end_times(void)
             querystr = QString("UPDATE program SET "
                                "endtime = '%2' WHERE (chanid = '%3' AND "
                                "starttime = '%4');")
-                               .arg(endtime)
-                               .arg(chanid)
-                               .arg(starttime);
+                               .arg(endtime, chanid, starttime);
 
             if (!query2.exec(querystr))
             {
@@ -1803,10 +1803,10 @@ bool ProgramData::DeleteOverlaps(
         {
             LOG(VB_XMLTV, LOG_DEBUG,
                 QString("Removing existing program: %1 - %2 %3 %4")
-                .arg(MythDate::as_utc(query.value(1).toDateTime()).toString(Qt::ISODate))
-                .arg(MythDate::as_utc(query.value(2).toDateTime()).toString(Qt::ISODate))
-                .arg(pi.m_channel)
-                .arg(query.value(0).toString()));
+                .arg(MythDate::as_utc(query.value(1).toDateTime()).toString(Qt::ISODate),
+                     MythDate::as_utc(query.value(2).toDateTime()).toString(Qt::ISODate),
+                     pi.m_channel,
+                     query.value(0).toString()));
         } while (query.next());
     }
 
@@ -1814,10 +1814,10 @@ bool ProgramData::DeleteOverlaps(
     {
         LOG(VB_XMLTV, LOG_ERR,
             QString("Program delete failed    : %1 - %2 %3 %4")
-                .arg(pi.m_starttime.toString(Qt::ISODate))
-                .arg(pi.m_endtime.toString(Qt::ISODate))
-                .arg(pi.m_channel)
-                .arg(pi.m_title));
+                .arg(pi.m_starttime.toString(Qt::ISODate),
+                     pi.m_endtime.toString(Qt::ISODate),
+                     pi.m_channel,
+                     pi.m_title));
         return false;
     }
 
