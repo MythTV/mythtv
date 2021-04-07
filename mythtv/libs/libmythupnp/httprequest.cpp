@@ -211,8 +211,8 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
     //-----------------------------------------------------------------------
 
     // The protocol string
-    sHeader = QString( "%1 %2\r\n" ).arg(GetResponseProtocol())
-                                    .arg(GetResponseStatus());
+    sHeader = QString( "%1 %2\r\n" ).arg(GetResponseProtocol(),
+                                         GetResponseStatus());
 
     SetResponseHeader("Date", MythDate::toString(MythDate::current(), MythDate::kRFC822)); // RFC 822
     SetResponseHeader("Server", HttpServer::GetServerVersion());
@@ -295,7 +295,7 @@ QString HTTPRequest::BuildResponseHeader( long long nSize )
         QMap<QString, QString>::iterator it;
         for ( it = m_mapRespHeaders.begin(); it != m_mapRespHeaders.end(); ++it )
         {
-            LOG(VB_HTTP, LOG_INFO, QString("(Response Header) %1: %2").arg(it.key()).arg(it.value()));
+            LOG(VB_HTTP, LOG_INFO, QString("(Response Header) %1: %2").arg(it.key(), it.value()));
         }
     }
 
@@ -320,7 +320,7 @@ qint64 HTTPRequest::SendResponse( void )
         case ResponseTypeNone:
             LOG(VB_HTTP, LOG_INFO,
                 QString("HTTPRequest::SendResponse( None ) :%1 -> %2:")
-                    .arg(GetResponseStatus()) .arg(GetPeerAddress()));
+                    .arg(GetResponseStatus(), GetPeerAddress()));
             return( -1 );
         case ResponseTypeJS:
         case ResponseTypeCSS:
@@ -347,7 +347,7 @@ qint64 HTTPRequest::SendResponse( void )
         case ResponseTypeFile: // Binary files
             LOG(VB_HTTP, LOG_INFO,
                 QString("HTTPRequest::SendResponse( File ) :%1 -> %2:")
-                    .arg(GetResponseStatus()) .arg(GetPeerAddress()));
+                    .arg(GetResponseStatus(), GetPeerAddress()));
             return( SendResponseFile( m_sFileName ));
         case ResponseTypeOther:
         case ResponseTypeHeader:
@@ -357,8 +357,8 @@ qint64 HTTPRequest::SendResponse( void )
 
     LOG(VB_HTTP, LOG_INFO,
         QString("HTTPRequest::SendResponse(xml/html) (%1) :%2 -> %3: %4")
-             .arg(m_sFileName) .arg(GetResponseStatus())
-             .arg(GetPeerAddress()) .arg(m_eResponseType));
+             .arg(m_sFileName, GetResponseStatus(), GetPeerAddress(),
+                  QString::number(m_eResponseType)));
 
     // ----------------------------------------------------------------------
     // Make it so the header is sent with the data
@@ -911,9 +911,9 @@ void HTTPRequest::SetRequestProtocol( const QString &sLine )
 
 QString HTTPRequest::GetRequestProtocol() const
 {
-    return QString("%1/%2.%3").arg(m_sProtocol)
-                              .arg(QString::number(m_nMajor))
-                              .arg(QString::number(m_nMinor));
+    return QString("%1/%2.%3").arg(m_sProtocol,
+                                   QString::number(m_nMajor),
+                                   QString::number(m_nMinor));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1019,7 +1019,7 @@ QString HTTPRequest::GetResponseStatus( void ) const
 
 QByteArray HTTPRequest::GetResponsePage( void )
 {
-    return StaticPage.arg(QString::number(m_nResponseStatus)).arg(GetResponseStatus()).toUtf8();
+    return StaticPage.arg(QString::number(m_nResponseStatus), GetResponseStatus()).toUtf8();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1330,7 +1330,7 @@ bool HTTPRequest::ParseRequest()
         for ( auto it = m_mapHeaders.begin(); it != m_mapHeaders.end(); ++it )
         {
             LOG(VB_HTTP, LOG_INFO, QString("(Request Header) %1: %2")
-                                            .arg(it.key()).arg(*it));
+                                            .arg(it.key(), *it));
         }
 
         // Parse Cookies
@@ -1654,7 +1654,7 @@ void HTTPRequest::ExtractMethodFromURL()
 
     m_sBaseUrl = '/' + sList.join( "/" );
     LOG(VB_HTTP, LOG_INFO, QString("ExtractMethodFromURL(end) : %1 : %2")
-                               .arg(m_sMethod).arg(m_sBaseUrl));
+                               .arg(m_sMethod, m_sBaseUrl));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1892,7 +1892,7 @@ QString HTTPRequest::GetAuthenticationHeader(bool isStale)
         QString stale = isStale ? "true" : "false"; // FIXME
         authHeader = QString("Digest realm=\"%1\",nonce=\"%2\","
                              "qop=\"auth\",stale=\"%3\",algorithm=\"MD5\"")
-                        .arg(realm).arg(nonce).arg(stale);
+                        .arg(realm, nonce, stale);
     }
     else
     {
@@ -1908,9 +1908,9 @@ QString HTTPRequest::GetAuthenticationHeader(bool isStale)
 
 QString HTTPRequest::CalculateDigestNonce(const QString& timeStamp) const
 {
-    QString uniqueID = QString("%1:%2").arg(timeStamp).arg(m_sPrivateToken);
+    QString uniqueID = QString("%1:%2").arg(timeStamp, m_sPrivateToken);
     QString hash = QCryptographicHash::hash( uniqueID.toLatin1(), QCryptographicHash::Sha1).toHex(); // TODO: Change to Sha2 with QT5?
-    QString nonce = QString("%1%2").arg(timeStamp).arg(hash); // Note: since this is going in a header it should avoid illegal chars
+    QString nonce = QString("%1%2").arg(timeStamp, hash); // Note: since this is going in a header it should avoid illegal chars
     return nonce;
 }
 
@@ -2049,8 +2049,8 @@ bool HTTPRequest::DigestAuthentication()
     if (nonce != CalculateDigestNonce(nonceTimeStampStr))
     {
         LOG(VB_GENERAL, LOG_WARNING, "Authorization nonce doesn't match reference");
-        LOG(VB_HTTP, LOG_DEBUG, QString("%1  vs  %2").arg(QString(nonce))
-                                                     .arg(CalculateDigestNonce(nonceTimeStampStr)));
+        LOG(VB_HTTP, LOG_DEBUG, QString("%1  vs  %2").arg(QString(nonce),
+                                                          CalculateDigestNonce(nonceTimeStampStr)));
         return false;
     }
 
@@ -2090,16 +2090,16 @@ bool HTTPRequest::DigestAuthentication()
 
     QByteArray a1 = MythSessionManager::GetPasswordDigest(paramMap["username"]).toLatin1();
     //QByteArray a1 = "bcd911b2ecb15ffbd6d8e6e744d60cf6";
-    QString methodDigest = QString("%1:%2").arg(GetRequestType()).arg(paramMap["uri"]);
+    QString methodDigest = QString("%1:%2").arg(GetRequestType(), paramMap["uri"]);
     QByteArray a2 = QCryptographicHash::hash(methodDigest.toLatin1(),
                                           QCryptographicHash::Md5).toHex();
 
-    QString responseDigest = QString("%1:%2:%3:%4:%5:%6").arg(QString(a1))
-                                                        .arg(paramMap["nonce"])
-                                                        .arg(paramMap["nc"])
-                                                        .arg(paramMap["cnonce"])
-                                                        .arg(paramMap["qop"])
-                                                        .arg(QString(a2));
+    QString responseDigest = QString("%1:%2:%3:%4:%5:%6").arg(a1,
+                                                              paramMap["nonce"],
+                                                              paramMap["nc"],
+                                                              paramMap["cnonce"],
+                                                              paramMap["qop"],
+                                                              a2);
     QByteArray kd = QCryptographicHash::hash(responseDigest.toLatin1(),
                                              QCryptographicHash::Md5).toHex();
 
@@ -2128,8 +2128,7 @@ bool HTTPRequest::DigestAuthentication()
 
     LOG(VB_GENERAL, LOG_WARNING, "Authorization attempt with invalid password digest");
     LOG(VB_HTTP, LOG_DEBUG, QString("Received hash was '%1', calculated hash was '%2'")
-                            .arg(paramMap["response"])
-                            .arg(QString(kd)));
+                            .arg(paramMap["response"], QString(kd)));
 
     return false;
 }
@@ -2181,14 +2180,14 @@ void HTTPRequest::SetCookie(const QString &sKey, const QString &sValue,
     {
         LOG(VB_GENERAL, LOG_WARNING, QString("HTTPRequest::SetCookie(%1=%2): "
                   "A secure cookie cannot be set on an unencrypted connection.")
-                    .arg(sKey).arg(sValue));
+                    .arg(sKey, sValue));
         return;
     }
 
     QStringList cookieAttributes;
 
     // Key=Value
-    cookieAttributes.append(QString("%1=%2").arg(sKey).arg(sValue));
+    cookieAttributes.append(QString("%1=%2").arg(sKey, sValue));
 
     // Domain - Most browsers have problems with a hostname, so it's better to omit this
 //     cookieAttributes.append(QString("Domain=%1").arg(GetHostName()));

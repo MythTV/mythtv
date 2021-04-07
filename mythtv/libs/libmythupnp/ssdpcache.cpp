@@ -120,7 +120,7 @@ void SSDPCacheEntries::Insert(const QString &sUSN, DeviceLocation *pEntry)
     m_mapEntries[usn] = pEntry;
 
     LOG(VB_UPNP, LOG_INFO, QString("SSDP Cache adding USN: %1 Location %2")
-            .arg(pEntry->m_sUSN).arg(pEntry->m_sLocation));
+            .arg(pEntry->m_sUSN, pEntry->m_sLocation));
 }
 
 /// Removes a specific entry from the cache
@@ -136,7 +136,7 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
         {
             LOG(VB_UPNP, LOG_INFO,
                 QString("SSDP Cache removing USN: %1 Location %2")
-                    .arg((*it)->m_sUSN).arg((*it)->m_sLocation));
+                    .arg((*it)->m_sUSN, (*it)->m_sLocation));
             (*it)->DecrRef();
         }
 

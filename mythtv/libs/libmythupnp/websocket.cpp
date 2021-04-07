@@ -394,7 +394,7 @@ bool WebSocketWorker::ProcessHandshake(QTcpSocket *socket)
           ++it )
     {
         LOG(VB_HTTP, LOG_INFO, QString("(Request Header) %1: %2")
-                                        .arg(it.key()).arg(*it));
+                                        .arg(it.key(), *it));
     }
 
     if (!requestHeaders.contains("connection")) // RFC 6455 - 1.3. Opening Handshake
@@ -465,9 +465,9 @@ bool WebSocketWorker::ProcessHandshake(QTcpSocket *socket)
     QString header("%1: %2\r\n");
     for (it = responseHeaders.begin(); it != responseHeaders.end(); ++it)
     {
-        socket->write(header.arg(it.key()).arg(*it).toLatin1().constData());
+        socket->write(header.arg(it.key(), *it).toLatin1());
         LOG(VB_HTTP, LOG_INFO, QString("(Response Header) %1: %2")
-                                        .arg(it.key()).arg(*it));
+                                        .arg(it.key(), *it));
     }
 
     socket->write("\r\n");
@@ -761,7 +761,7 @@ void WebSocketWorker::HandleCloseConnection(const QByteArray &payload)
     }
 
     LOG(VB_HTTP, LOG_INFO, QString("WebSocketWorker - Received CLOSE frame - [%1] %2")
-                                    .arg(QString::number(code)).arg(closeMessage));
+                                    .arg(QString::number(code), closeMessage));
     SendClose((ErrorCode)code);
 }
 

@@ -282,7 +282,7 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
 
             LOG(VB_HTTP, LOG_INFO,
                 QString("ServiceHost::ProcessRequest: %1 : %2")
-                    .arg(pRequest->m_sMethod) .arg(pRequest->m_sRawRequest));
+                    .arg(pRequest->m_sMethod, pRequest->m_sRawRequest));
 
             // --------------------------------------------------------------
             // Check to see if they are requesting the WSDL service Definition

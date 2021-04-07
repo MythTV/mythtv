@@ -86,10 +86,10 @@ UPnPResultCode MythXMLClient::GetConnectionInfo( const QString &sPin, DatabasePa
             LOG(VB_GENERAL, LOG_ERR,
                 QString("MythXMLClient::GetConnectionInfo Failed - "
                         "Version Mismatch (%1,%2) != (%3,%4)")
-                .arg(pParams->m_verProtocol)
-                .arg(pParams->m_verSchema)
-                .arg(MYTH_PROTO_VERSION)
-                .arg(MYTH_DATABASE_VERSION));
+                .arg(pParams->m_verProtocol,
+                     pParams->m_verSchema,
+                     MYTH_PROTO_VERSION,
+                     MYTH_DATABASE_VERSION));
             sMsg = QObject::tr("Version Mismatch", "UPNP Errors");
             return UPnPResult_ActionFailed;
         }

@@ -517,7 +517,7 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     std::chrono::seconds nMX  = 0s;
 
     LOG(VB_UPNP, LOG_DEBUG, QString("SSDP::ProcessSearchrequest : [%1] MX=%2")
-             .arg(sST).arg(sMX));
+             .arg(sST, sMX));
 
     // ----------------------------------------------------------------------
     // Validate Header Values...
@@ -608,7 +608,7 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
                  "ST     =%2\n"
                  "USN    =%3\n"
                  "Cache  =%4")
-             .arg(sDescURL).arg(sST).arg(sUSN).arg(sCache));
+             .arg(sDescURL, sST, sUSN, sCache));
 
     int nPos = sCache.indexOf("max-age", 0, Qt::CaseInsensitive);
 
@@ -644,7 +644,7 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
                  "NT     =%3\n"
                  "USN    =%4\n"
                  "Cache  =%5" )
-            .arg(sDescURL).arg(sNTS).arg(sNT).arg(sUSN).arg(sCache));
+            .arg(sDescURL, sNTS, sNT, sUSN, sCache));
 
     if (sNTS.contains( "ssdp:alive"))
     {
