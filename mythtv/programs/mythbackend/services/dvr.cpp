@@ -500,10 +500,10 @@ bool Dvr::DeleteRecording(int RecordedId,
     if (pi.GetChanID() && pi.HasPathname())
     {
         QString cmd = QString("DELETE_RECORDING %1 %2 %3 %4")
-            .arg(pi.GetChanID())
-            .arg(pi.GetRecordingStartTime(MythDate::ISODate))
-            .arg(forceDelete ? "FORCE" : "NO_FORCE")
-            .arg(allowRerecord ? "FORGET" : "NO_FORGET");
+            .arg(QString::number(pi.GetChanID()),
+                 pi.GetRecordingStartTime(MythDate::ISODate),
+                 forceDelete ? "FORCE" : "NO_FORCE",
+                 allowRerecord ? "FORGET" : "NO_FORGET");
         MythEvent me(cmd);
 
         gCoreContext->dispatch(me);
@@ -2046,7 +2046,7 @@ int Dvr::ManageJobQueue( const QString   &sAction,
                                             sRemoteHost, false))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been allowed on host %2.")
-                                         .arg(sJobName).arg(sRemoteHost));
+                                         .arg(sJobName, sRemoteHost));
         return nReturn;
     }
 

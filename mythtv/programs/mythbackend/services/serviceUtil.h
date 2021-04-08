@@ -48,7 +48,7 @@
 #include "musicmetadata.h"
 
 #define ADD_SQL(settings_var, bindvar, col, api_param, val) { \
-    (settings_var) += QString("%1=:%2, ").arg(col).arg(api_param); \
+    (settings_var) += QString("%1=:%2, ").arg(col, api_param); \
     (bindvar)[QString(":").append(api_param)] = val; \
     }
 

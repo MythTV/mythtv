@@ -438,7 +438,7 @@ void AutoExpire::ExpireRecordings(void)
 
             LOG(VB_FILE, LOG_INFO, LOC +
                 QString("%1:%2 has an in-progress truncating delete.")
-                    .arg(rechost).arg(recdir));
+                    .arg(rechost, recdir));
 
             for (fsit = fsInfos.begin(); fsit != fsInfos.end(); ++fsit)
             {
@@ -481,7 +481,7 @@ void AutoExpire::ExpireRecordings(void)
                 if (fsit2->getFSysID() == fsit->getFSysID())
                 {
                     LOG(VB_FILE, LOG_INFO, QString("    %1:%2")
-                            .arg(fsit2->getHostname()).arg(fsit2->getPath()));
+                            .arg(fsit2->getHostname(), fsit2->getPath()));
                 }
             }
 
@@ -517,7 +517,7 @@ void AutoExpire::ExpireRecordings(void)
                 if (fsit2->getFSysID() == fsit->getFSysID())
                 {
                     LOG(VB_FILE, LOG_INFO, QString("        %1:%2")
-                            .arg(fsit2->getHostname()).arg(fsit2->getPath()));
+                            .arg(fsit2->getHostname(), fsit2->getPath()));
                     dirList[fsit2->getHostname() + ":" + fsit2->getPath()] = 1;
                 }
             }
@@ -534,8 +534,8 @@ void AutoExpire::ExpireRecordings(void)
                 ++it;
 
                 LOG(VB_FILE, LOG_INFO, QString("        Checking %1 => %2")
-                        .arg(p->toString(ProgramInfo::kRecordingKey))
-                        .arg(p->GetTitle()));
+                        .arg(p->toString(ProgramInfo::kRecordingKey),
+                             p->GetTitle()));
 
                 if (!p->IsLocal())
                 {
@@ -591,8 +591,8 @@ void AutoExpire::ExpireRecordings(void)
                                 "%1 is located at %2 which is on fsID #%3. "
                                 "Adding to deleteList.  After deleting we "
                                 "should have %4 MB free on this filesystem.")
-                            .arg(p->toString(ProgramInfo::kRecordingKey))
-                            .arg(p->GetPathname()).arg(fsit->getFSysID())
+                            .arg(p->toString(ProgramInfo::kRecordingKey),
+                                 p->GetPathname()).arg(fsit->getFSysID())
                             .arg(fsit->getFreeSpace() / 1024));
                 }
             }
@@ -624,10 +624,10 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
     while (it != deleteList.end())
     {
         msg = QString("%1Expiring %2 MB for %3 => %4")
-            .arg(VERBOSE_LEVEL_CHECK(VB_FILE, LOG_ANY) ? "    " : "")
-            .arg(((*it)->GetFilesize() >> 20))
-            .arg((*it)->toString(ProgramInfo::kRecordingKey))
-            .arg((*it)->toString(ProgramInfo::kTitleSubtitle));
+            .arg(VERBOSE_LEVEL_CHECK(VB_FILE, LOG_ANY) ? "    " : "",
+                 QString::number((*it)->GetFilesize() >> 20),
+                 (*it)->toString(ProgramInfo::kRecordingKey),
+                 (*it)->toString(ProgramInfo::kTitleSubtitle));
 
         LOG(VB_GENERAL, LOG_NOTICE, msg);
 
@@ -706,9 +706,9 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                 int duplicate = query.value(5).toInt();
 
                 episodeKey = QString("%1_%2_%3")
-                             .arg(chanid)
-                             .arg(progstart.toString(Qt::ISODate))
-                             .arg(progend.toString(Qt::ISODate));
+                             .arg(QString::number(chanid),
+                                  progstart.toString(Qt::ISODate),
+                                  progend.toString(Qt::ISODate));
 
                 if ((!IsInDontExpireSet(chanid, startts)) &&
                     (!episodeParts.contains(episodeKey)) &&
@@ -717,10 +717,11 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     QString msg =
                         QString("%1Deleting %2 at %3 => %4.  "
                                 "Too many episodes, we only want to keep %5.")
-                        .arg(VERBOSE_LEVEL_CHECK(VB_FILE, LOG_ANY) ?
-                             "    " : "")
-                        .arg(chanid).arg(startts.toString(Qt::ISODate))
-                        .arg(title).arg(*maxIter);
+                        .arg(VERBOSE_LEVEL_CHECK(VB_FILE, LOG_ANY) ? "    " : "",
+                             QString::number(chanid),
+                             startts.toString(Qt::ISODate),
+                             title,
+                             QString::number(*maxIter));
 
                     LOG(VB_GENERAL, LOG_NOTICE, msg);
 
@@ -806,12 +807,12 @@ void AutoExpire::PrintExpireList(const QString& expHost)
         title = title.leftJustified(39, ' ', true);
 
         QString outstr = QString("%1 %2 MB %3 [%4]")
-            .arg(title)
-            .arg(QString::number(first->GetFilesize() >> 20)
-                 .rightJustified(5, ' ', true))
-            .arg(first->GetRecordingStartTime(MythDate::ISODate)
-                 .leftJustified(24, ' ', true))
-            .arg(QString::number(first->GetRecordingPriority())
+            .arg(title,
+                 QString::number(first->GetFilesize() >> 20)
+                 .rightJustified(5, ' ', true),
+                 first->GetRecordingStartTime(MythDate::ISODate)
+                 .leftJustified(24, ' ', true),
+                 QString::number(first->GetRecordingPriority())
                  .rightJustified(3, ' ', true));
         QByteArray out = outstr.toLocal8Bit();
 
@@ -969,7 +970,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         "FROM recorded "
         "LEFT JOIN channel ON recorded.chanid = channel.chanid "
         "WHERE %1 AND deletepending = 0 "
-        "ORDER BY autoexpire DESC, %2").arg(where).arg(orderby);
+        "ORDER BY autoexpire DESC, %2").arg(where, orderby);
 
     query.prepare(querystr);
 
@@ -1089,10 +1090,10 @@ void AutoExpire::UpdateDontExpireSet(void)
                 .arg(chanid).arg(recstartts.toString(Qt::ISODate));
             m_dontExpireSet.insert(key);
             LOG(VB_FILE, LOG_INFO, QString("    %1 at %2 in use by %3 on %4")
-                    .arg(chanid)
-                    .arg(recstartts.toString(Qt::ISODate))
-                    .arg(query.value(3).toString())
-                    .arg(query.value(4).toString()));
+                    .arg(QString::number(chanid),
+                         recstartts.toString(Qt::ISODate),
+                         query.value(3).toString(),
+                         query.value(4).toString()));
         }
     }
     while (query.next());

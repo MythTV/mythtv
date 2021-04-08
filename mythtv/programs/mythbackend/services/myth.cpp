@@ -808,14 +808,15 @@ bool Myth::SendMessage( const QString &sMessage,
         LOG(VB_GENERAL, LOG_ERR,
             QString("Failed to send UDP/XML packet (Message: %1 "
                     "Address: %2 Port: %3")
-                .arg(sMessage).arg(sAddress).arg(port));
+                .arg(sMessage, sAddress, QString::number(port)));
     }
     else
     {
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("UDP/XML packet sent! (Message: %1 Address: %2 Port: %3")
-                .arg(sMessage)
-                .arg(address.toString().toLocal8Bit().constData()).arg(port));
+                .arg(sMessage,
+                     address.toString().toLocal8Bit(),
+                     QString::number(port)));
         bResult = true;
     }
 
@@ -882,14 +883,14 @@ bool Myth::SendNotification( bool  bError,
         LOG(VB_GENERAL, LOG_ERR,
             QString("Failed to send UDP/XML packet (Notification: %1 "
                     "Address: %2 Port: %3")
-                .arg(sMessage).arg(sAddress).arg(port));
+            .arg(sMessage, sAddress, QString::number(port)));
     }
     else
     {
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("UDP/XML packet sent! (Notification: %1 Address: %2 Port: %3")
-                .arg(sMessage)
-                .arg(address.toString().toLocal8Bit().constData()).arg(port));
+                .arg(sMessage,
+                     address.toString().toLocal8Bit(), QString::number(port)));
         bResult = true;
     }
 

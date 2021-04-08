@@ -858,7 +858,7 @@ bool UPnpCDSTv::LoadChannels(const UPnpCDSRequest* pRequest,
         QString sName = query.value(2).toString();
         int nRecCount = query.value(3).toInt();
 
-        QString sFullName = QString("%1 %2").arg(sChanNum).arg(sName);
+        QString sFullName = QString("%1 %2").arg(sChanNum, sName);
 
         // TODO Album or plain old container?
         CDSObject* pContainer = CDSObject::CreateContainer( CreateIDString(sRequestId, "Channel", nChanID),
@@ -979,7 +979,7 @@ bool UPnpCDSTv::LoadRecordings(const UPnpCDSRequest* pRequest,
     QStringList clauses;
     QString whereString = BuildWhereClause(clauses, tokens);
 
-    query.prepare(sql.arg(whereString).arg(orderByString));
+    query.prepare(sql.arg(whereString, orderByString));
 
     BindValues(query, tokens);
 

@@ -57,8 +57,8 @@ bool InternetContent::ProcessRequest( HTTPRequest *pRequest )
 
             LOG(VB_UPNP, LOG_INFO,
                 QString("InternetContent::ProcessRequest: %1 : %2")
-                    .arg(pRequest->m_sMethod)
-                    .arg(pRequest->m_sRawRequest));
+                    .arg(pRequest->m_sMethod,
+                         pRequest->m_sRawRequest));
 
             // --------------------------------------------------------------
 
@@ -113,8 +113,8 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
     if (grabber.isEmpty() || query.isEmpty())
         return;
 
-    QString command = QString("%1internetcontent/%2").arg(GetShareDir())
-                        .arg(grabber);
+    QString command = QString("%1internetcontent/%2")
+                      .arg(GetShareDir(), grabber);
 
     if (!QFile::exists(command))
     {
