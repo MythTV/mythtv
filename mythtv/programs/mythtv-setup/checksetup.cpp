@@ -228,7 +228,7 @@ bool checkChannelPresets(QStringList &probs)
         {
             probs.push_back(QObject::tr("Card %1 (type %2) is set to start on "
                             "channel %3, which does not exist.")
-                    .arg(cardid).arg(query.value(3).toString()).arg(startchan));
+                    .arg(cardid).arg(query.value(3).toString(), startchan));
             problemFound = true;
         }
     }
