@@ -71,7 +71,7 @@ writeData(const QString& filename, const std::vector<uint16_t>& scdiff)
         (void)fprintf(fp, "%5u\n", value);
     if (fclose(fp))
         LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
     return true;
 }
 

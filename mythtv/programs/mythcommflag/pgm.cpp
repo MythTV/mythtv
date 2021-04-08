@@ -35,7 +35,7 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
     if (fp == nullptr)
     {
         LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_read fopen %1 failed: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
         return -1;
     }
 
@@ -46,7 +46,7 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
     if (nn != 3)
     {
         LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_read fscanf %1 failed: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
         goto error;
     }
 
@@ -64,7 +64,7 @@ int pgm_read(unsigned char *buf, int width, int height, const char *filename)
         if (fread(buf + rr * width, 1, width, fp) != (size_t)width)
         {
             LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_read fread %1 failed: %2")
-                    .arg(filename).arg(strerror(errno)));
+                    .arg(filename, strerror(errno)));
             goto error;
         }
     }
@@ -86,7 +86,7 @@ int pgm_write(const unsigned char *buf, int width, int height,
     if (fp == nullptr)
     {
         LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_write fopen %1 failed: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
         return -1;
     }
 
@@ -96,7 +96,7 @@ int pgm_write(const unsigned char *buf, int width, int height,
         if (fwrite(buf + rr * width, 1, width, fp) != (size_t)width)
         {
             LOG(VB_COMMFLAG, LOG_ERR, QString("pgm_write fwrite %1 failed: %2")
-                    .arg(filename).arg(strerror(errno)));
+                    .arg(filename, strerror(errno)));
             goto error;
         }
     }

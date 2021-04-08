@@ -97,13 +97,13 @@ readData(const QString& filename, float *mean, unsigned char *median, float *std
     }
     if (fclose(fp))
         LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
     return true;
 
 error:
     if (fclose(fp))
         LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
     return false;
 }
 
@@ -131,7 +131,7 @@ writeData(const QString& filename, float *mean, unsigned char *median, float *st
     }
     if (fclose(fp))
         LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
     return true;
 }
 

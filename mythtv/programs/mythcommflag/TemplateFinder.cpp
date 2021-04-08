@@ -51,7 +51,7 @@ bool writeJPG(const QString& prefix, const AVFrame *img, int imgheight)
         }
 
         QString cmd = QString("convert -quality 50 -resize 192x144 %1 %2")
-                      .arg(pgmfile.fileName()).arg(jpgfi.filePath());
+                      .arg(pgmfile.fileName(), jpgfi.filePath());
         if (myth_system(cmd) != GENERIC_EXIT_OK)
             return false;
 
@@ -59,7 +59,7 @@ bool writeJPG(const QString& prefix, const AVFrame *img, int imgheight)
         {
             LOG(VB_COMMFLAG, LOG_ERR, 
                 QString("TemplateFinder.writeJPG error removing %1 (%2)")
-                    .arg(pgmfile.fileName()).arg(strerror(errno)));
+                    .arg(pgmfile.fileName(), strerror(errno)));
             return false;
         }
     }
@@ -799,8 +799,7 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
 
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("TemplateFinder::MythPlayerInited read %1: %2")
-                    .arg(m_debugTmpl)
-                    .arg(tmpldims));
+                    .arg(m_debugTmpl, tmpldims));
         }
     }
 
@@ -816,7 +815,7 @@ TemplateFinder::MythPlayerInited(MythPlayer *player, long long nframes)
         {
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("TemplateFinder::MythPlayerInited %1 of %2 (%3)")
-                    .arg(tmpldims).arg(playerdims).arg(m_debugTmpl));
+                    .arg(tmpldims, playerdims, m_debugTmpl));
         }
         return ANALYZE_FINISHED;
     }
@@ -1006,7 +1005,7 @@ TemplateFinder::finished(long long nframes, bool final)
                 LOG(VB_COMMFLAG, LOG_INFO,
                     QString("TemplateFinder::finished wrote %1"
                             " and %2 [%3x%4@(%5,%6)]")
-                        .arg(m_debugTmpl).arg(m_debugData)
+                        .arg(m_debugTmpl, m_debugData)
                         .arg(m_tmplWidth).arg(m_tmplHeight)
                         .arg(m_tmplCol).arg(m_tmplRow));
             }
