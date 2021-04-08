@@ -58,8 +58,8 @@ static int SendEvent(const MythUtilCommandLineParser &cmdline)
 static int SendSystemEvent(const MythUtilCommandLineParser &cmdline)
 {
     return RawSendEvent(QStringList(QString("SYSTEM_EVENT %1 SENDER %2")
-                                    .arg(cmdline.toString("systemevent"))
-                                    .arg(gCoreContext->GetHostName())));
+                                    .arg(cmdline.toString("systemevent"),
+                                         gCoreContext->GetHostName())));
 }
 
 static int Reschedule(const MythUtilCommandLineParser &/*cmdline*/)
