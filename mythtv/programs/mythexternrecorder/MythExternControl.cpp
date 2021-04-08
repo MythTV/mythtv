@@ -212,7 +212,7 @@ bool Commands::SendStatus(const QString & command, const QString & status)
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Processing '%1' --> '%2'")
-        .arg(command).arg(status));
+        .arg(command, status));
 
     m_parent->ClearError();
     return true;
@@ -221,7 +221,7 @@ bool Commands::SendStatus(const QString & command, const QString & status)
 bool Commands::SendStatus(const QString & command, const QString & serial,
                           const QString & status)
 {
-    QString msg = QString("%1:%2").arg(serial).arg(status);
+    QString msg = QString("%1:%2").arg(serial, status);
 
     int len = write(2, msg.toUtf8().constData(), msg.size());
     len += write(2, "\n", 1);
@@ -237,7 +237,7 @@ bool Commands::SendStatus(const QString & command, const QString & serial,
     if (!command.isEmpty())
     {
         LOG(VB_RECORD, LOG_INFO, LOC + QString("Processing '%1' --> '%2'")
-            .arg(command).arg(msg));
+            .arg(command, msg));
     }
 #if 0
     else
