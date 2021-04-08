@@ -73,8 +73,8 @@ void LookerUpper::HandleAllRecordings(bool updaterules)
             (pginfo->GetSeason() == 0) &&
             (pginfo->GetEpisode() == 0))))
         {
-            QString msg = QString("Looking up: %1 %2").arg(pginfo->GetTitle())
-                                           .arg(pginfo->GetSubtitle());
+            QString msg = QString("Looking up: %1 %2")
+                .arg(pginfo->GetTitle(), pginfo->GetSubtitle());
             LOG(VB_GENERAL, LOG_INFO, msg);
 
             m_busyRecList.append(pginfo);
@@ -98,8 +98,8 @@ void LookerUpper::HandleAllRecordingRules()
         auto *pginfo = new ProgramInfo(*pg);
         if (pginfo->GetInetRef().isEmpty())
         {
-            QString msg = QString("Looking up: %1 %2").arg(pginfo->GetTitle())
-                                           .arg(pginfo->GetSubtitle());
+            QString msg = QString("Looking up: %1 %2")
+                .arg(pginfo->GetTitle(), pginfo->GetSubtitle());
             LOG(VB_GENERAL, LOG_INFO, msg);
 
             m_busyRecList.append(pginfo);
@@ -136,8 +136,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
             if (map.isEmpty() || (aggressive && map.count() < maxartnum))
             {
                 QString msg = QString("Looking up artwork for recording rule: %1 %2")
-                                               .arg(pginfo->GetTitle())
-                                               .arg(pginfo->GetSubtitle());
+                    .arg(pginfo->GetTitle(), pginfo->GetSubtitle());
                 LOG(VB_GENERAL, LOG_INFO, msg);
 
                 m_busyRecList.append(pginfo);
@@ -178,8 +177,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
             if (map.isEmpty() || (aggressive && map.count() < maxartnum))
             {
                QString msg = QString("Looking up artwork for recording: %1 %2")
-                                           .arg(pginfo->GetTitle())
-                                           .arg(pginfo->GetSubtitle());
+                   .arg(pginfo->GetTitle(), pginfo->GetSubtitle());
                 LOG(VB_GENERAL, LOG_INFO, msg);
 
                 m_busyRecList.append(pginfo);
