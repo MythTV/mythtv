@@ -253,7 +253,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Converting old xmltvid (%1) to new (%2)")
-                        .arg((*i).m_oldXmltvId).arg((*i).m_xmltvId));
+                        .arg((*i).m_oldXmltvId, (*i).m_xmltvId));
 
                 query.prepare("UPDATE channel "
                               "SET xmltvid = :NEWXMLTVID"
@@ -273,7 +273,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
         {
             LOG(VB_XMLTV, LOG_DEBUG,
                     QString("Match found for xmltvid %1 to channel %2 (%3)")
-                        .arg((*i).m_xmltvId).arg(dbChan.m_name).arg(dbChan.m_chanId));
+                .arg((*i).m_xmltvId, dbChan.m_name, QString::number(dbChan.m_chanId)));
             if (m_interactive)
             {
 

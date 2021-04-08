@@ -136,14 +136,13 @@ bool FillData::GrabData(const Source& source, int offset)
     if (query1.next())
         configfile = query1.value(0).toString();
     else
-        configfile = QString("%1/%2.xmltv").arg(GetConfDir())
-                                           .arg(source.name);
+        configfile = QString("%1/%2.xmltv").arg(GetConfDir(), source.name);
 
     LOG(VB_GENERAL, LOG_INFO,
         QString("XMLTV config file is: %1").arg(configfile));
 
     QString command = QString("nice %1 --config-file '%2' --output %3")
-        .arg(xmltv_grabber).arg(configfile).arg(filename);
+        .arg(xmltv_grabber, configfile, filename);
 
 
     if (source.xmltvgrabber_prefmethod != "allatonce"  || m_noAllAtOnce)
@@ -313,9 +312,9 @@ bool FillData::Run(SourceList &sourcelist)
             continue;
         }
 
-        LOG(VB_GENERAL, LOG_INFO, sidStr.arg((*it).id)
-                                  .arg((*it).name)
-                                  .arg(xmltv_grabber));
+        LOG(VB_GENERAL, LOG_INFO, sidStr.arg(QString::number((*it).id),
+                                             (*it).name,
+                                             xmltv_grabber));
 
         query.prepare(
             "SELECT COUNT(chanid) FROM channel "
