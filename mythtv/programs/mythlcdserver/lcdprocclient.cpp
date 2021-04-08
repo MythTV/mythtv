@@ -703,7 +703,7 @@ void LCDProcClient::describeServer()
             .arg( m_lcdWidth ).arg( m_lcdHeight ).arg( m_cellWidth ).arg( m_cellHeight ));
         LOG(VB_GENERAL, LOG_INFO,
             QString("LCDProcClient: LCDd version %1, protocol version %2.")
-            .arg( m_serverVersion ).arg( m_protocolVersion ));
+            .arg( m_serverVersion, m_protocolVersion ));
     }
 
     if (debug_level > 1)
