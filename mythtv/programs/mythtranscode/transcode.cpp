@@ -543,7 +543,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
         LOG(VB_GENERAL, LOG_NOTICE,
             QString("x264 HLS using: %1 threads, '%2' profile and '%3' tune")
-                .arg(threads).arg(preset).arg(tune));
+                .arg(QString::number(threads), preset, tune));
 
         avfw->SetThreadCount(threads);
         avfw->SetEncodingPreset(preset);
@@ -773,7 +773,7 @@ int Transcode::TranscodeFile(const QString &inputname,
 
                 LOG(VB_GENERAL, LOG_NOTICE,
                     QString("Forcing Recorder option '%1' to '%2'")
-                        .arg(key).arg(value));
+                        .arg(key, value));
 
                 if (value.contains(QRegularExpression("\\D")))
                     m_nvr->SetOption(key, value);
