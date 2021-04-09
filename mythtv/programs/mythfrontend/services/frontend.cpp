@@ -179,9 +179,9 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
             .arg(ChanId).arg(starttime.toString(Qt::ISODate)));
 
         QString message = QString("NETWORK_CONTROL PLAY PROGRAM %1 %2 %3")
-            .arg(ChanId)
-            .arg(starttime.toString("yyyyMMddhhmmss"))
-            .arg("12345");
+            .arg(QString::number(ChanId),
+                 starttime.toString("yyyyMMddhhmmss"),
+                 "12345");
 
         MythEvent me(message);
         gCoreContext->dispatch(me);

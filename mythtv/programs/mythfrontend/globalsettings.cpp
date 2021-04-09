@@ -4212,10 +4212,11 @@ void PlayBackScaling::updateButton(MythUIButtonListItem *item)
     else
     {
         item->SetText(QString("%1%x%2%+%3%+%4%")
-                .arg(m_horizScan->getValue())
-                .arg(m_vertScan->getValue())
-                .arg(m_xScan->getValue())
-                .arg(m_yScan->getValue()), "value");
+                      .arg(m_horizScan->getValue(),
+                           m_vertScan->getValue(),
+                           m_xScan->getValue(),
+                           m_yScan->getValue()),
+                      "value");
     }
 }
 
@@ -4593,10 +4594,11 @@ void GuiDimension::updateButton(MythUIButtonListItem *item)
     else
     {
         item->SetText(QString("%1x%2+%3+%4")
-                      .arg(m_width->getValue())
-                      .arg(m_height->getValue())
-                      .arg(m_offsetX->getValue())
-                      .arg(m_offsetY->getValue()), "value");
+                      .arg(m_width->getValue(),
+                           m_height->getValue(),
+                           m_offsetX->getValue(),
+                           m_offsetY->getValue()),
+                      "value");
     }
 }
 
@@ -4700,7 +4702,7 @@ ChannelCheckBoxSetting::ChannelCheckBoxSetting(uint chanid,
         const QString &channum, const QString &channame)
     : m_channelId(chanid)
 {
-    setLabel(QString("%1 %2").arg(channum).arg(channame));
+    setLabel(QString("%1 %2").arg(channum, channame));
     setHelpText(ChannelGroupSettings::tr("Select/Unselect channels for this channel group"));
 }
 

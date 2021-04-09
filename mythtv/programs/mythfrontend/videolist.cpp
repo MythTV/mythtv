@@ -584,12 +584,12 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
                 ep.prepend("0");
 
             QString displayTitle = QString("%1 %2x%3 - %4")
-                .arg(title).arg(seas).arg(ep).arg(subtitle);
+                .arg(title, seas, ep, subtitle);
 
             if (src->getName() == title)
             {
                 displayTitle = QString("%2x%3 - %4")
-                    .arg(seas).arg(ep).arg(subtitle);
+                    .arg(seas, ep, subtitle);
             }
             AddFileNode(dst, displayTitle, (*entry)->getData());
         }
@@ -601,8 +601,8 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
         else
         {
             QString TitleSub = QString("%1 - %2")
-                .arg((*entry)->getData()->GetTitle())
-                .arg((*entry)->getData()->GetSubtitle());
+                .arg((*entry)->getData()->GetTitle(),
+                     (*entry)->getData()->GetSubtitle());
             AddFileNode(dst, TitleSub, (*entry)->getData());
         }
     }

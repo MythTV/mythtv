@@ -50,8 +50,8 @@ HostTextEditSetting *VideoAdminPassword()
     gc->setHelpText(QString("%1 %2")
         .arg(VideoGeneralSettings::tr("This PIN is used to enter Parental "
                                       "Control Level 4 as well as the Video "
-                                      "Manager."))
-        .arg(VideoGeneralSettings::tr(password_clue)));
+                                      "Manager."),
+             VideoGeneralSettings::tr(password_clue)));
 
     return gc;
 }
@@ -64,8 +64,8 @@ HostTextEditSetting *VideoAdminPasswordThree()
 
     gc->setHelpText(QString("%1 %2")
         .arg(VideoGeneralSettings::tr("This PIN is used to enter Parental "
-                                      "Control Level 3."))
-        .arg(VideoGeneralSettings::tr(password_clue)));
+                                      "Control Level 3."),
+             VideoGeneralSettings::tr(password_clue)));
 
     return gc;
 }
@@ -78,8 +78,8 @@ HostTextEditSetting *VideoAdminPasswordTwo()
 
     gc->setHelpText(QString("%1 %2")
         .arg(VideoGeneralSettings::tr("This PIN is used to enter Parental "
-                                      "Control Level 2."))
-        .arg(VideoGeneralSettings::tr(password_clue)));
+                                      "Control Level 2."),
+             VideoGeneralSettings::tr(password_clue)));
 
     return gc;
 }

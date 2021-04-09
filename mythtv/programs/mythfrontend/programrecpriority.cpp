@@ -984,8 +984,8 @@ void ProgramRecPriority::remove(void)
         return;
     }
 
-    QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
-        .arg(toString(pgRecInfo->GetRecordingRuleType()));
+    QString message = tr("Delete '%1' %2 rule?")
+        .arg(record->m_title, toString(pgRecInfo->GetRecordingRuleType()));
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -1352,7 +1352,7 @@ void ProgramRecPriority::UpdateList()
                         .arg(m_listMatch[progInfo->GetRecordingRuleID()]);
         }
 
-        subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
+        subtitle = QString("(%1) %2").arg(matchInfo, subtitle);
         item->SetText(subtitle, "scheduleinfo", state);
 
         item->SetText(QString::number(progRecPriority), "progpriority", state);
@@ -1446,7 +1446,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
             .arg(m_listMatch[pgRecInfo->GetRecordingRuleID()]);
     }
 
-    subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
+    subtitle = QString("(%1) %2").arg(matchInfo, subtitle);
 
     InfoMap infoMap;
     pgRecInfo->ToMap(infoMap);

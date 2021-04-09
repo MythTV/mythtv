@@ -435,8 +435,8 @@ void ProgLister::ShowChooseViewMenu(void)
                 case plCategory: msg = tr("Select Category"); break;
                 case plNewListings: msg = tr("Select List"); break;
                 case plStoredSearch: msg = QString("%1\n%2")
-                    .arg(tr("Select a search stored from"))
-                    .arg(tr("Custom Record")); break;
+                    .arg(tr("Select a search stored from"),
+                         tr("Custom Record")); break;
                 default: // silence warning
                     break;
             }
@@ -614,8 +614,8 @@ void ProgLister::ShowDeleteRuleMenu(void)
         return;
     }
 
-    QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
-        .arg(toString(pi->GetRecordingRuleType()));
+    QString message = tr("Delete '%1' %2 rule?")
+        .arg(record->m_title, toString(pi->GetRecordingRuleType()));
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -1560,8 +1560,8 @@ void ProgLister::UpdateButtonList(void)
         m_positionText->SetText(
             tr("%1 of %2", "Current position in list where %1 is the "
                "position, %2 is the total count")
-            .arg(QLocale::system().toString(m_progList->IsEmpty() ? 0 : m_progList->GetCurrentPos() + 1))
-            .arg(QLocale::system().toString(m_progList->GetCount())));
+            .arg(QLocale::system().toString(m_progList->IsEmpty() ? 0 : m_progList->GetCurrentPos() + 1),
+                 QLocale::system().toString(m_progList->GetCount())));
     }
 }
 
@@ -1589,8 +1589,8 @@ void ProgLister::HandleSelected(MythUIButtonListItem *item)
         m_positionText->SetText(
             tr("%1 of %2", "Current position in list where %1 is the "
                "position, %2 is the total count")
-            .arg(QLocale::system().toString(m_progList->IsEmpty() ? 0 : m_progList->GetCurrentPos() + 1))
-            .arg(QLocale::system().toString(m_progList->GetCount())));
+            .arg(QLocale::system().toString(m_progList->IsEmpty() ? 0 : m_progList->GetCurrentPos() + 1),
+                 QLocale::system().toString(m_progList->GetCount())));
     }
 
     MythUIStateType *ratingState = dynamic_cast<MythUIStateType*>

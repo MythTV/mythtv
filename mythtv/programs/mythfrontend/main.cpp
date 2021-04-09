@@ -1278,8 +1278,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         QString errorText = QCoreApplication::translate("(MythFrontendMain)",
             "Failed to open \n '%1' in %2 \n"
             "Check if the video exists")
-            .arg(mrl.section('/', -1))
-            .arg(mrl.section('/', 0, -2));
+            .arg(mrl.section('/', -1),
+                 mrl.section('/', 0, -2));
 
         ShowOkPopup(errorText);
         return res;
@@ -1388,7 +1388,7 @@ static bool resetTheme(QString themedir, const QString &badtheme)
         themename = FALLBACK_UI_THEME;
 
     LOG(VB_GENERAL, LOG_WARNING, QString("Overriding broken theme '%1' with '%2'")
-        .arg(badtheme).arg(themename));
+        .arg(badtheme, themename));
 
     gCoreContext->OverrideSettingForSession("Theme", themename);
     themedir = GetMythUI()->FindThemeDir(themename);

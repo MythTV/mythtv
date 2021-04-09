@@ -575,13 +575,13 @@ void MythControls::ResolveConflict(ActionID *conflict, int error_level,
     {
         label = tr("This key binding conflicts with %1 in the %2 context. "
                    "Unable to bind key.")
-                    .arg(conflict->GetAction()).arg(conflict->GetContext());
+                    .arg(conflict->GetAction(), conflict->GetContext());
     }
     else
     {
         label = tr("This key binding conflicts with %1 in the %2 context. "
                    "Do you want to bind it anyway?")
-                    .arg(conflict->GetAction()).arg(conflict->GetContext());
+                    .arg(conflict->GetAction(), conflict->GetContext());
     }
 
     MythScreenStack *popupStack =

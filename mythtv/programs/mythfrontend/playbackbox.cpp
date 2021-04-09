@@ -1116,7 +1116,7 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
     if (item)
     {
         LOG(VB_GUI, LOG_INFO, LOC + QString("Loading preview %1,\n\t\t\tmsg %2")
-                .arg(previewFile).arg(message));
+                .arg(previewFile, message));
 
         item->SetImage(previewFile, "preview", true);
 
@@ -1335,8 +1335,8 @@ void PlaybackBox::UpdateUsageUI(void)
                                    'f', 2);
 
     QString usestr = tr("%1% used, %2 GB free", "Diskspace")
-                                                .arg(QString::number((int)perc))
-                                                .arg(size);
+                                                .arg(QString::number((int)perc),
+                                                     size);
 
     if (freereportText)
         freereportText->SetText(usestr);
@@ -2987,12 +2987,12 @@ MythMenu* PlaybackBox::createPlaylistJobMenu(void)
 
         if (!isRunningUserJob4)
         {
-            menu->AddItem(QString("%1 %2").arg(tr("Begin")).arg(jobTitle),
+            menu->AddItem(QString("%1 %2").arg(tr("Begin"), jobTitle),
                           &PlaybackBox::doPlaylistBeginUserJob4);
         }
         else
         {
-            menu->AddItem(QString("%1 %2").arg(tr("Stop")).arg(jobTitle),
+            menu->AddItem(QString("%1 %2").arg(tr("Stop"), jobTitle),
                           &PlaybackBox::stopPlaylistUserJob4);
         }
     }
@@ -3393,8 +3393,8 @@ QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo)
 
     QString timedate = QString("%1 - %2")
         .arg(MythDate::toString(
-                 recstartts, MythDate::kDateTimeFull | MythDate::kSimplify))
-        .arg(MythDate::toString(recendts, MythDate::kTime));
+                 recstartts, MythDate::kDateTimeFull | MythDate::kSimplify),
+             MythDate::toString(recendts, MythDate::kTime));
 
     QString title = pginfo.GetTitle();
 
@@ -3405,7 +3405,7 @@ QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo)
         extra = QString('\n') + pginfo.GetSubtitle();
     }
 
-    return QString("\n%1%2\n%3").arg(title).arg(extra).arg(timedate);
+    return QString("\n%1%2\n%3").arg(title, extra, timedate);
 }
 
 void PlaybackBox::doClearPlaylist(void)
@@ -3870,7 +3870,7 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
 
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("NetworkControl: Trying to %1 program '%2' @ '%3'")
-                    .arg(tokens[1]).arg(tokens[3]).arg(tokens[4]));
+                    .arg(tokens[1], tokens[3], tokens[4]));
 
             if (m_playingSomething)
             {
@@ -3911,8 +3911,8 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
             {
                 QString message = QString("NETWORK_CONTROL RESPONSE %1 "
                                           "ERROR: Could not find recording for "
-                                          "chanid %2 @ %3").arg(clientID)
-                                          .arg(tokens[3]).arg(tokens[4]);
+                                          "chanid %2 @ %3")
+                    .arg(tokens[5], tokens[3], tokens[4]);
                 MythEvent me(message);
                 gCoreContext->dispatch(me);
             }
@@ -4928,7 +4928,7 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         QString tempSubTitle = newTitle;
         if (!newSubtitle.trimmed().isEmpty())
             tempSubTitle = QString("%1 - \"%2\"")
-                            .arg(tempSubTitle).arg(newSubtitle);
+                            .arg(tempSubTitle, newSubtitle);
 
         QString seasone;
         QString seasonx;
@@ -4939,11 +4939,11 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
             season = format_season_and_episode(newSeason, 1);
             episode = format_season_and_episode(newEpisode, 1);
             seasone = QString("s%1e%2")
-                .arg(format_season_and_episode(newSeason, 2))
-                .arg(format_season_and_episode(newEpisode, 2));
+                .arg(format_season_and_episode(newSeason, 2),
+                     format_season_and_episode(newEpisode, 2));
             seasonx = QString("%1x%2")
-                .arg(format_season_and_episode(newSeason, 1))
-                .arg(format_season_and_episode(newEpisode, 2));
+                .arg(format_season_and_episode(newSeason, 1),
+                     format_season_and_episode(newEpisode, 2));
         }
 
         item->SetText(tempSubTitle, "titlesubtitle");

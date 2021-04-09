@@ -312,10 +312,10 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
             ProgramInfo *p = *confList->begin();
             message += QString("%1 - %2  %3\n")
                 .arg(p->GetRecordingStartTime()
-                     .toLocalTime().toString(timeFormat))
-                .arg(p->GetRecordingEndTime()
-                     .toLocalTime().toString(timeFormat))
-                .arg(p->toString(ProgramInfo::kTitleSubtitle, " - "));
+                     .toLocalTime().toString(timeFormat),
+                     p->GetRecordingEndTime()
+                     .toLocalTime().toString(timeFormat),
+                     p->toString(ProgramInfo::kTitleSubtitle, " - "));
             delete p;
             confList->erase(confList->begin());
         }

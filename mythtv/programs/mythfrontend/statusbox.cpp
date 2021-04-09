@@ -485,8 +485,9 @@ void StatusBox::doListingsStatus()
 
     mfdLastRunStatus = gCoreContext->GetSetting("mythfilldatabaseLastRunStatus");
 
-    AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(GetMythSourcePath())
-               .arg(GetMythSourceVersion()), helpmsg);
+    AddLogLine(tr("Mythfrontend version: %1 (%2)")
+               .arg(GetMythSourcePath(), GetMythSourceVersion()),
+               helpmsg);
     AddLogLine(tr("Last mythfilldatabase guide update:"), helpmsg);
     tmp = tr("Started:   %1").arg(
         MythDate::toString(
@@ -712,14 +713,14 @@ void StatusBox::doScheduleStatus()
 
     if (lowerpriority > 0)
     {
-        tmpstr = QString("%1 %2 %3").arg(lowerpriority).arg(willrec)
-                                    .arg(tr("with lower priority"));
+        tmpstr = QString("%1 %2 %3").arg(QString::number(lowerpriority),
+                                         willrec, tr("with lower priority"));
         AddLogLine(tmpstr, helpmsg, tmpstr, tmpstr, "warning");
     }
     if (hdflag > 0)
     {
-        tmpstr = QString("%1 %2 %3").arg(hdflag).arg(willrec)
-                                    .arg(tr("marked as HDTV"));
+        tmpstr = QString("%1 %2 %3").arg(QString::number(hdflag),
+                                         willrec, tr("marked as HDTV"));
         AddLogLine(tmpstr, helpmsg);
     }
     for (int i = 1; i <= maxSource; ++i)
@@ -727,8 +728,8 @@ void StatusBox::doScheduleStatus()
         if (sourceMatch[i] > 0)
         {
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
-                             .arg(sourceMatch[i]).arg(willrec)
-                             .arg(tr("from source")).arg(i).arg(sourceText[i]);
+                             .arg(QString::number(sourceMatch[i]), willrec,
+                                  tr("from source"), QString::number(i), sourceText[i]);
             AddLogLine(tmpstr, helpmsg);
         }
     }
@@ -737,8 +738,8 @@ void StatusBox::doScheduleStatus()
         if (cardMatch[i] > 0)
         {
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
-                             .arg(cardMatch[i]).arg(willrec)
-                             .arg(tr("on input")).arg(i).arg(cardText[i]);
+                             .arg(QString::number(cardMatch[i]), willrec,
+                                  tr("on input"), QString::number(i), cardText[i]);
             AddLogLine(tmpstr, helpmsg);
         }
     }
@@ -874,8 +875,8 @@ void StatusBox::doTunerStatus()
             fontstate = "warning";
 
         QString shortstatus = tr("Input %1 %2: %3")
-            .arg(inputid).arg(info[inputid].m_displayname)
-            .arg(statuslist.join(tr(", ")));
+            .arg(QString::number(inputid), info[inputid].m_displayname,
+                 statuslist.join(tr(", ")));
         QString longstatus = shortstatus + "\n" +
             info[inputid].m_recordings.join("\n");
 
@@ -914,10 +915,10 @@ void StatusBox::doLogEntries(void)
             detail = tr("On %1 from %2.%3\n%4\n")
                 .arg(MythDate::toString(
                          MythDate::as_utc(query.value(3).toDateTime()),
-                         MythDate::kDateTimeShort))
-                .arg(query.value(4).toString())
-                .arg(query.value(1).toString())
-                .arg(query.value(5).toString());
+                         MythDate::kDateTimeShort),
+                     query.value(4).toString(),
+                     query.value(1).toString(),
+                     query.value(5).toString());
 
             QString tmp = query.value(6).toString();
             if (!tmp.isEmpty())
@@ -972,16 +973,16 @@ void StatusBox::doJobQueueStatus()
                 continue;
 
             detail = QString("%1\n%2 %3 @ %4\n%5 %6     %7 %8")
-                .arg(pginfo.GetTitle())
-                .arg(pginfo.GetChannelName())
-                .arg(pginfo.GetChanNum())
-                .arg(MythDate::toString(
+                .arg(pginfo.GetTitle(),
+                     pginfo.GetChannelName(),
+                     pginfo.GetChanNum(),
+                     MythDate::toString(
                          pginfo.GetRecordingStartTime(),
-                         MythDate::kDateTimeFull | MythDate::kSimplify))
-                .arg(tr("Job:"))
-                .arg(JobQueue::JobText((*it).type))
-                .arg(tr("Status: "))
-                .arg(JobQueue::StatusText((*it).status));
+                         MythDate::kDateTimeFull | MythDate::kSimplify),
+                     tr("Job:"),
+                     JobQueue::JobText((*it).type),
+                     tr("Status: "),
+                     JobQueue::StatusText((*it).status));
 
             if ((*it).status != JOB_QUEUED)
                 detail += " (" + (*it).hostname + ')';
@@ -998,8 +999,9 @@ void StatusBox::doJobQueueStatus()
                 detail += '\n' + (*it).comment;
             }
 
-            line = QString("%1 @ %2").arg(pginfo.GetTitle())
-                .arg(MythDate::toString(
+            line = QString("%1 @ %2")
+                .arg(pginfo.GetTitle(),
+                     MythDate::toString(
                          pginfo.GetRecordingStartTime(),
                          MythDate::kDateTimeFull | MythDate::kSimplify));
 
@@ -1057,8 +1059,8 @@ static QString usage_str_kb(long long total,
     {
         double percent = (100.0*free)/total;
         ret = StatusBox::tr("%1 total, %2 used, %3 (or %4%) free.")
-            .arg(sm_str(total)).arg(sm_str(used))
-            .arg(sm_str(free)).arg(percent, 0, 'f', (percent >= 10.0) ? 0 : 2);
+            .arg(sm_str(total), sm_str(used),
+                 sm_str(free)).arg(percent, 0, 'f', (percent >= 10.0) ? 0 : 2);
     }
     return ret;
 }
@@ -1096,8 +1098,8 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
             out<<remainstring.arg(hourstring) + pro;
         else if (minLeft > 60)
         {
-            out<<StatusBox::tr("%1 and %2 remaining", "time").arg(hourstring)
-                                                   .arg(minstring) + pro;
+            out<<StatusBox::tr("%1 and %2 remaining", "time")
+                .arg(hourstring, minstring) + pro;
         }
         else
         {
@@ -1120,8 +1122,8 @@ static QString uptimeStr(std::chrono::seconds uptime)
     if (days.count() > 0)
     {
         astext = QString("%1, %2")
-            .arg(StatusBox::tr("%n day(s)", "", days.count()))
-            .arg(MythFormatTime(secs, "H:mm"));
+            .arg(StatusBox::tr("%n day(s)", "", days.count()),
+                 MythFormatTime(secs, "H:mm"));
     } else {
         astext = MythFormatTime(secs, "H:mm:ss");
     }
@@ -1220,8 +1222,8 @@ void StatusBox::doMachineStatus()
 
     // Hostname & IP
     AddLogLine("   " + tr("Hostname") + ": " + gCoreContext->GetHostName());
-    AddLogLine("   " + tr("OS") + QString(": %1 (%2)").arg(QSysInfo::prettyProductName())
-                                                      .arg(QSysInfo::currentCpuArchitecture()));
+    AddLogLine("   " + tr("OS") + QString(": %1 (%2)").arg(QSysInfo::prettyProductName(),
+                                                           QSysInfo::currentCpuArchitecture()));
     AddLogLine("   " + tr("Qt version") + QString(": %1").arg(qVersion()));
 
     QList allInterfaces = QNetworkInterface::allInterfaces();

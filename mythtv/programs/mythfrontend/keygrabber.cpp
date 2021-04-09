@@ -30,8 +30,8 @@ bool KeyGrabPopupBox::Create(void)
         return false;
     }
 
-    QString label = QString("%1\n\n%2").arg(tr("Press A Key"))
-                                       .arg(tr("Waiting for key press"));
+    QString label = QString("%1\n\n%2").arg(tr("Press A Key"),
+                                            tr("Waiting for key press"));
 
     m_messageText->SetText(label);
 

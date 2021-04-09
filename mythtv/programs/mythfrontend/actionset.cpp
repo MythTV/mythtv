@@ -314,7 +314,7 @@ Action *ActionSet::GetAction(const ActionID &id)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetAction: Did not find action '%1' in context '%1'")
-                .arg(id.GetAction()).arg(id.GetContext()));
+                .arg(id.GetAction(), id.GetContext()));
         return nullptr;
     }
 
