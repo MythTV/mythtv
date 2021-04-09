@@ -25,6 +25,8 @@ level1
    global-const-char-pointer
    old-style-connect
    returning-void-expression
+   static-pmf
+   virtual-call-ctor
 
 // Not investigated yet
 //   copyable-polymorphic
@@ -32,10 +34,9 @@ level1
 //   implicit-casts
 //   missing-qobject-macro
 //   missing-typeinfo
+     // Qt6 is migrating from QLatin1String to c++ unicode string literals.
 //   qstring-allocations
 //   rule-of-three
-//   static-pmf
-//   virtual-call-ctor
 
 //
 // MANUAL CHECKS
@@ -44,6 +45,9 @@ level1
    container-inside-loop
    isempty-vs-count
    qhash-with-char-pointer-key
+   qt6-fwd-fixes
+   qt6-header-fixes
+   qt6-qhash-signature
    raw-environment-function
    use-chrono-in-qtimer
 
@@ -58,9 +62,7 @@ level1
 //   jni-signatures
 //   qproperty-type-mismatch
 //   qrequiredresult-candidates
-//   qt6-header-fixes
-//   qt6-qdir-fixes
-//   qt6-qhash-signature
+//   qt6-deprecated-api-fixes
 //   qt6-qlatin1stringchar-to-u
 //   qvariant-template-instantiation
 //   reserve-candidates
