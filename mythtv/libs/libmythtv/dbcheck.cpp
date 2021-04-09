@@ -3802,6 +3802,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1368")
     {
         DBUpdates updates {
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE credits ADD COLUMN priority "
             "    TINYINT UNSIGNED DEFAULT 0;",
             "ALTER TABLE credits ADD COLUMN roleid "
