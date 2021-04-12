@@ -12,8 +12,9 @@ QObject::customEvent to receive event notifications for subscribed services.
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
-#endif
+#else
 #include <QTextCodec>
+#endif
 #include <utility>
 
 #include "mythcorecontext.h"

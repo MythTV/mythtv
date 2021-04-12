@@ -1,8 +1,9 @@
 #include <QCoreApplication>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
-#endif
+#else
 #include <QTextCodec>
+#endif
 
 #include "mythcorecontext.h"
 #include "mythlogging.h"

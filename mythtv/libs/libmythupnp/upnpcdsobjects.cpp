@@ -13,9 +13,10 @@
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
+#else
+#include <QTextCodec>
 #endif
 #include <QTextStream>
-#include <QTextCodec>
 #include <QUrl>
 
 #include "upnpcds.h"
