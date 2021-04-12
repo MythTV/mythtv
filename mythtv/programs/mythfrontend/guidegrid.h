@@ -11,7 +11,6 @@
 #include <QString>
 #include <QDateTime>
 #include <QEvent>
-#include <QLinkedList>
 
 // myth
 #include "mythscreentype.h"

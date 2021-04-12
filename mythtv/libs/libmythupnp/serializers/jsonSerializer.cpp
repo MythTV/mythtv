@@ -13,7 +13,6 @@
 #include "jsonSerializer.h"
 #include "mythdate.h"
 
-#include <QTextCodec>
 #include <QVariant>
 
 //////////////////////////////////////////////////////////////////////////////

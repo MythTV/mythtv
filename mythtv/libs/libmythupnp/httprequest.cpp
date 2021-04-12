@@ -15,7 +15,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QHostInfo>
-#include <QTextCodec>
 #include <QStringList>
 #include <QCryptographicHash>
 #include <QDateTime>

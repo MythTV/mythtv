@@ -11,7 +11,6 @@
 #include <QKeyEvent>
 #include <QEvent>
 #include <QDir>
-#include <QTextCodec>
 #include <QApplication>
 #include <QTimer>
 #ifdef Q_OS_MAC
