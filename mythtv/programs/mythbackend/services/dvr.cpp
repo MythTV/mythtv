@@ -325,7 +325,7 @@ int Dvr::AddRecordedProgram(const QJsonObject &jsonObj)
     QJsonObject recording = program["Recording"].toObject();
     QJsonObject cast      = program["Cast"].toObject();
 
-    ProgInfo *pi = new ProgInfo();
+    auto     *pi = new ProgInfo();
     int       chanid = channel.value("ChanId").toString("0").toUInt();
     QString   hostname = program["HostName"].toString("");
 

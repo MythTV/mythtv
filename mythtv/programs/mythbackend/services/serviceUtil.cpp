@@ -765,7 +765,7 @@ int CreateRecordingGroup(const QString& groupName)
 DBCredits * jsonCastToCredits(const QJsonObject &cast)
 {
     int priority = 1;
-    DBCredits* credits = new DBCredits;
+    auto* credits = new DBCredits;
 
     QJsonArray members = cast["CastMembers"].toArray();
     for (const auto & m : members)
