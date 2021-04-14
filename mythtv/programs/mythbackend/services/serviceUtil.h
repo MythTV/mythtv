@@ -104,6 +104,6 @@ void FillSeek(DTC::CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype);
 
 int CreateRecordingGroup(const QString& groupName);
 
-DBCredits * jsonCastToCredits(const QJsonObject &jsonObj);
+DBCredits * jsonCastToCredits(const QJsonObject &cast);
 
 #endif // SERVICEUTIL_H
