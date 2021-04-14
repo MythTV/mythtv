@@ -842,32 +842,31 @@ DTC::MarkupList* Dvr::GetRecordedMarkup ( int RecordedId )
 
     QVector<ProgramInfo::MarkupEntry> mapMark;
     QVector<ProgramInfo::MarkupEntry> mapSeek;
-    QVector<ProgramInfo::MarkupEntry>::iterator it;
 
     ri.QueryMarkup(mapMark, mapSeek);
 
     auto* pMarkupList = new DTC::MarkupList();
-    for (it = mapMark.begin(); it != mapMark.end(); ++it)
+    for (auto entry : qAsConst(mapMark))
     {
         DTC::Markup *pMarkup = pMarkupList->AddNewMarkup();
-        QString typestr = toString(static_cast<MarkTypes>((*it).type));
+        QString typestr = toString(static_cast<MarkTypes>(entry.type));
         pMarkup->setType(typestr);
-        pMarkup->setFrame((*it).frame);
-        if ((*it).isDataNull)
+        pMarkup->setFrame(entry.frame);
+        if (entry.isDataNull)
             pMarkup->setData("NULL");
         else
-            pMarkup->setData(QString::number((*it).data));
+            pMarkup->setData(QString::number(entry.data));
     }
-    for (it = mapSeek.begin(); it != mapSeek.end(); ++it)
+    for (auto entry : qAsConst(mapSeek))
     {
         DTC::Markup *pSeek = pMarkupList->AddNewSeek();
-        QString typestr = toString(static_cast<MarkTypes>((*it).type));
+        QString typestr = toString(static_cast<MarkTypes>(entry.type));
         pSeek->setType(typestr);
-        pSeek->setFrame((*it).frame);
-        if ((*it).isDataNull)
+        pSeek->setFrame(entry.frame);
+        if (entry.isDataNull)
             pSeek->setData("NULL");
         else
-            pSeek->setData(QString::number((*it).data));
+            pSeek->setData(QString::number(entry.data));
     }
 
 
