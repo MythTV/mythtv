@@ -768,7 +768,7 @@ DBCredits * jsonCastToCredits(const QJsonObject &cast)
     DBCredits* credits = new DBCredits;
 
     QJsonArray members = cast["CastMembers"].toArray();
-    for (const QJsonValue & m : members)
+    for (const auto & m : members)
     {
         QJsonObject actor     = m.toObject();
         QString     name      = actor.value("Name").toString("");
