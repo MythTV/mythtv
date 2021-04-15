@@ -128,12 +128,13 @@ bool MythTVMenu::MatchesGroup(const QString &Name, const QString &Prefix,
             (Category == kMenuCategoryItemlist && Name == Prefix));
 }
 
-bool MythTVMenu::LoadFromFile(const QString& Filename, const QString& Menuname,
+bool MythTVMenu::LoadFromFile(MenuTypeId id, const QString& Filename, const QString& Menuname,
                               const char * TranslationContext, const QString& KeyBindingContext,
                               int IncludeLevel)
 {
     bool result = false;
 
+    m_id = id;
     m_translationContext = TranslationContext;
     m_keyBindingContext  = KeyBindingContext;
     QStringList searchpath = GetMythUI()->GetThemeSearchPath();
@@ -168,12 +169,13 @@ bool MythTVMenu::LoadFromFile(const QString& Filename, const QString& Menuname,
     return result;
 }
 
-bool MythTVMenu::LoadFromString(const QString& Text, const QString& Menuname,
+bool MythTVMenu::LoadFromString(MenuTypeId id, const QString& Text, const QString& Menuname,
                                 const char * TranslationContext, const QString& KeyBindingContext,
                                 int IncludeLevel)
 {
     bool result = false;
 
+    m_id = id;
     m_translationContext = TranslationContext;
     m_keyBindingContext = KeyBindingContext;
     m_document = new QDomDocument();
@@ -214,7 +216,7 @@ void MythTVMenu::ProcessIncludes(QDomElement& Root, int IncludeLevel)
                 }
 
                 MythTVMenu menu;
-                if (menu.LoadFromFile(include, include, m_translationContext,
+                if (menu.LoadFromFile(m_id, include, include, m_translationContext,
                                       m_keyBindingContext, IncludeLevel + 1))
                 {
                     QDomNode newChild = menu.GetRoot();
@@ -288,14 +290,14 @@ bool MythTVMenu::Show(const QDomNode& Node, const QDomNode& Selected,
     return displayed;
 }
 
-MythTVMenuNodeTuple::MythTVMenuNodeTuple(const MythTVMenu& Menu, const QDomNode& Node)
-  : m_menu(Menu),
+MythTVMenuNodeTuple::MythTVMenuNodeTuple(MenuTypeId Id, const QDomNode& Node)
+  : m_id(Id),
     m_node(Node)
 {
 }
 
 MythTVMenuNodeTuple::MythTVMenuNodeTuple()
-  : m_menu(dummy_menubase)
+  : m_id(kMenuIdUnknown)
 {
 }
 

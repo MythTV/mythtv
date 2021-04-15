@@ -495,6 +495,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void PlaybackMenuDeinit(const MythTVMenu& Menu);
     static void MenuStrings();
     void MenuLazyInit(void* Field);
+    const MythTVMenu& getMenuFromId(MenuTypeId id);
 
     // LCD
     void UpdateLCD();

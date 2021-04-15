@@ -7095,6 +7095,26 @@ void TV::IdleDialogTimeout()
     ReturnPlayerLock();
 }
 
+// Retrieve the proper MythTVMenu object from The TV object, given its
+// id number. This is used to find the original menu again, instead of
+// serializing/deserializing the entire MythTVMenu object to/from a
+// QVariant.
+const MythTVMenu& TV::getMenuFromId(MenuTypeId id)
+{
+    switch (id) {
+    case kMenuIdPlayback:
+        return m_playbackMenu;
+    case kMenuIdPlaybackCompact:
+        return m_playbackCompactMenu;
+    case kMenuIdCutlist:
+        return m_cutlistMenu;
+    case kMenuIdCutlistCompact:
+        return m_cutlistCompactMenu;
+    default:
+        return dummy_menubase;
+    }
+}
+
 /// This handles all custom events
 void TV::customEvent(QEvent *Event)
 {
@@ -7142,10 +7162,11 @@ void TV::customEvent(QEvent *Event)
         if (dce->GetData().userType() == qMetaTypeId<MythTVMenuNodeTuple>())
         {
             auto data = dce->GetData().value<MythTVMenuNodeTuple>();
+            const MythTVMenu& Menu = getMenuFromId(data.m_id);
             if (dce->GetResult() == -1) // menu exit/back
-                PlaybackMenuShow(data.m_menu, data.m_node.parentNode(), data.m_node);
+                PlaybackMenuShow(Menu, data.m_node.parentNode(), data.m_node);
             else
-                PlaybackMenuShow(data.m_menu, data.m_node, QDomNode());
+                PlaybackMenuShow(Menu, data.m_node, QDomNode());
         }
         else
         {
@@ -7677,7 +7698,8 @@ void TV::ShowOSDCutpoint(const QString &Type)
         if (!m_cutlistMenu.IsLoaded())
         {
             // TODO which translation context to use?
-            m_cutlistMenu.LoadFromFile("menu_cutlist.xml", tr("Edit Cut Points"),
+            m_cutlistMenu.LoadFromFile(kMenuIdCutlist,
+                                       "menu_cutlist.xml", tr("Edit Cut Points"),
                                        metaObject()->className(), "TV Editing");
         }
 
@@ -7689,7 +7711,8 @@ void TV::ShowOSDCutpoint(const QString &Type)
         if (!m_cutlistCompactMenu.IsLoaded())
         {
             // TODO which translation context to use?
-            m_cutlistCompactMenu.LoadFromFile("menu_cutlist_compact.xml", tr("Edit Cut Points"),
+            m_cutlistCompactMenu.LoadFromFile(kMenuIdCutlistCompact,
+                                              "menu_cutlist_compact.xml", tr("Edit Cut Points"),
                                               metaObject()->className(), "TV Editing");
         }
 
@@ -8319,7 +8342,7 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDia
         if (result && Context.m_doDisplay)
         {
             QVariant v;
-            v.setValue(MythTVMenuNodeTuple(Context.m_menu, Context.m_node));
+            v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id, Context.m_node));
             Menu->m_buttons.push_back( { Context.m_menuName, v, true,
                                          Context.m_currentContext != kMenuCurrentDefault });
         }
@@ -8455,7 +8478,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         if (result && Context.m_doDisplay)
         {
             QVariant v;
-            v.setValue(MythTVMenuNodeTuple(Context.m_menu, Context.m_node));
+            v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id, Context.m_node));
             Menu->m_buttons.push_back( { Context.m_menuName, v, true,
                                          Context.m_currentContext != kMenuCurrentDefault } );
         }
@@ -8901,7 +8924,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         {
             BUTTON3(actionName, tr("Recorded Program"), "", true);
             QVariant v;
-            v.setValue(MythTVMenuNodeTuple(Context.m_menu, Context.m_node));
+            v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id, Context.m_node));
             m_tvmJumprecBackHack = v;
         }
         else if (actionName == "JUMPPREV")
@@ -9109,7 +9132,7 @@ void TV::PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QD
     if (!parent.parentNode().isNull())
     {
         QVariant v;
-        v.setValue(MythTVMenuNodeTuple(Menu, Node));
+        v.setValue(MythTVMenuNodeTuple(Menu.m_id, Node));
         menu.m_back = { "", v };
     }
 
@@ -9175,9 +9198,11 @@ void TV::ShowOSDMenu(bool isCompact)
 {
     if (!m_playbackMenu.IsLoaded())
     {
-        m_playbackMenu.LoadFromFile("menu_playback.xml", tr("Playback Menu"),
+        m_playbackMenu.LoadFromFile(kMenuIdPlayback,
+                                    "menu_playback.xml", tr("Playback Menu"),
                                     metaObject()->className(), "TV Playback");
-        m_playbackCompactMenu.LoadFromFile("menu_playback_compact.xml", tr("Playback Compact Menu"),
+        m_playbackCompactMenu.LoadFromFile(kMenuIdPlaybackCompact,
+                                           "menu_playback_compact.xml", tr("Playback Compact Menu"),
                                            metaObject()->className(), "TV Playback");
     }
 
