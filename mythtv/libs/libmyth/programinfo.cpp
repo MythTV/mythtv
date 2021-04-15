@@ -1534,11 +1534,6 @@ QString ProgramInfo::GetAudioPropertyNames(void) const
     return propsValueToString("audio", AudioPropsNames, m_audioProperties);
 }
 
-uint ProgramInfo::ProgramFlagsFromNames(const QString & names)
-{
-    return propsValueFromString("program", ProgramFlagNames, names);
-}
-
 uint ProgramInfo::SubtitleTypesFromNames(const QString & names)
 {
     return propsValueFromString("subtitle", SubtitlePropsNames, names);
@@ -1554,6 +1549,10 @@ uint ProgramInfo::AudioPropertiesFromNames(const QString & names)
     return propsValueFromString("audio", AudioPropsNames, names);
 }
 
+void ProgramInfo::ProgramFlagsFromNames(const QString & names)
+{
+    m_programFlags = propsValueFromString("program", ProgramFlagNames, names);
+}
 
 /** \brief Converts ProgramInfo into QString QHash containing each field
  *         in ProgramInfo converted into localized strings.

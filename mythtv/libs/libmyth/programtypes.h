@@ -46,6 +46,7 @@ MPUBLIC extern const QString kCCExtractorInUseID;
 using frm_pos_map_t = QMap<long long, long long>;
 
 enum MarkTypes {
+    MARK_INVALID       = -9999,
     MARK_ALL           = -100,
     MARK_UNSET         = -10,
     MARK_TMP_CUT_END   = -5,
@@ -76,7 +77,43 @@ enum MarkTypes {
     MARK_UTIL_PROGSTART = 40,
     MARK_UTIL_LASTPLAYPOS = 41,
 };
+
 MPUBLIC QString toString(MarkTypes type);
+
+using stringMarkMap = std::map<QString, MarkTypes>;
+static stringMarkMap MarkTypeStrings =
+{
+    { "ALL",              MARK_ALL },
+    { "UNSET",            MARK_UNSET },
+    { "TMP_CUT_END",      MARK_TMP_CUT_END },
+    { "TMP_CUT_START",    MARK_TMP_CUT_START },
+    { "UPDATED_CUT",      MARK_UPDATED_CUT },
+    { "PLACEHOLDER",      MARK_PLACEHOLDER },
+    { "CUT_END",          MARK_CUT_END },
+    { "CUT_START",        MARK_CUT_START },
+    { "BOOKMARK",         MARK_BOOKMARK },
+    { "BLANK_FRAME",      MARK_BLANK_FRAME },
+    { "COMM_START",       MARK_COMM_START },
+    { "COMM_END",         MARK_COMM_END },
+    { "GOP_START",        MARK_GOP_START },
+    { "KEYFRAME",         MARK_KEYFRAME },
+    { "SCENE_CHANGE",     MARK_SCENE_CHANGE },
+    { "GOP_BYFRAME",      MARK_GOP_BYFRAME },
+    { "ASPECT_4_3",       MARK_ASPECT_4_3 },
+    { "ASPECT_16_9",      MARK_ASPECT_16_9 },
+    { "ASPECT_2_21_1",    MARK_ASPECT_2_21_1 },
+    { "ASPECT_CUSTOM",    MARK_ASPECT_CUSTOM },
+    { "PROGRESSIVE",      MARK_SCAN_PROGRESSIVE },
+    { "VIDEO_WIDTH",      MARK_VIDEO_WIDTH },
+    { "VIDEO_HEIGHT",     MARK_VIDEO_HEIGHT },
+    { "VIDEO_RATE",       MARK_VIDEO_RATE },
+    { "DURATION_MS",      MARK_DURATION_MS },
+    { "TOTAL_FRAMES",     MARK_TOTAL_FRAMES },
+    { "UTIL_PROGSTART",   MARK_UTIL_PROGSTART },
+    { "UTIL_LASTPLAYPOS", MARK_UTIL_LASTPLAYPOS }
+};
+
+MPUBLIC MarkTypes markTypeFromString(const QString & str);
 
 /// Frame # -> Mark map
 using frm_dir_map_t = QMap<uint64_t, MarkTypes>;

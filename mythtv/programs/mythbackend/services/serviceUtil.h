@@ -38,6 +38,7 @@
 #include "datacontracts/genreList.h"
 
 #include "programinfo.h"
+#include "programdata.h"
 #include "recordingrule.h"
 #include "videometadatalistmanager.h"
 #include "channelgroup.h"
@@ -102,5 +103,7 @@ void FillCommBreak( DTC::CutList* pCutList, RecordingInfo* rInfo, int marktype);
 void FillSeek(DTC::CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype);
 
 int CreateRecordingGroup(const QString& groupName);
+
+DBCredits * jsonCastToCredits(const QJsonObject &jsonObj);
 
 #endif // SERVICEUTIL_H

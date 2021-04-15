@@ -49,9 +49,11 @@ class MTV_PUBLIC DBPerson
     DBPerson& operator=(const DBPerson &rhs);
 
     QString GetRole(void) const;
+    QString toString(void) const;
 
     uint InsertDB(MSqlQuery &query, uint chanid,
-                  const QDateTime &starttime) const;
+                  const QDateTime &starttime,
+                  bool recording = false) const;
 
   private:
     uint GetPersonDB(MSqlQuery &query) const;
@@ -59,7 +61,8 @@ class MTV_PUBLIC DBPerson
     uint GetRoleDB(MSqlQuery &query) const;
     bool InsertRoleDB(MSqlQuery &query) const;
     uint InsertCreditsDB(MSqlQuery &query, uint personid, uint roleid,
-                         uint chanid, const QDateTime &starttime) const;
+                         uint chanid, const QDateTime &starttime,
+                         bool recording = false) const;
 
   private:
     Role    m_role;
@@ -136,7 +139,9 @@ class MTV_PUBLIC DBEvent
         MSqlQuery &query, uint chanid, const DBEvent &match) const;
     bool MoveOutOfTheWayDB(
         MSqlQuery &query, uint chanid, const DBEvent &prog) const;
-    virtual uint InsertDB(MSqlQuery &query, uint chanid) const;
+    virtual uint InsertDB(MSqlQuery &query, uint chanid,
+                          bool recording = false) const; // DBEvent
+
     virtual void Squeeze(void);
 
   public:
@@ -226,7 +231,8 @@ class MTV_PUBLIC ProgInfo : public DBEvent
 
     ProgInfo(const ProgInfo &other);
 
-    uint InsertDB(MSqlQuery &query, uint chanid) const override; // DBEvent
+    uint InsertDB(MSqlQuery &query, uint chanid,
+                  bool recording = false) const override; // DBEvent
 
     void Squeeze(void) override; // DBEvent
 

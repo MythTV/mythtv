@@ -934,32 +934,10 @@ bool RecordingInfo::QueryRecordedIdForKey(int & recordedid,
  */
 void RecordingInfo::StartedRecording(const QString& ext)
 {
-    QString dirname = m_pathname;
-
-    if (!m_record)
-    {
-        m_record = new RecordingRule();
-        m_record->LoadByProgram(this);
-    }
-
     m_hostname = gCoreContext->GetHostName();
-    m_pathname = CreateRecordBasename(ext);
 
-    int count = 0;
-    while (!InsertProgram(this, m_record) && count < 50)
-    {
-        m_recStartTs = m_recStartTs.addSecs(1);
-        m_pathname = CreateRecordBasename(ext);
-        count++;
-    }
-
-    if (count >= 50)
-    {
-        LOG(VB_GENERAL, LOG_ERR, "Couldn't insert program");
+    if (!InsertRecording(ext))
         return;
-    }
-
-    m_pathname = dirname + "/" + m_pathname;
 
     LOG(VB_FILE, LOG_INFO, LOC + QString("StartedRecording: Recording to '%1'")
                              .arg(m_pathname));
@@ -1009,16 +987,51 @@ void RecordingInfo::StartedRecording(const QString& ext)
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Copy program ratings on record", query);
 
-    // File
-    if (!GetRecordingFile())
-        LoadRecordingFile();
-    RecordingFile *recFile = GetRecordingFile();
-    recFile->m_fileName = GetBasename();
-    recFile->m_storageDeviceID = GetHostname();
-    recFile->m_storageGroup = GetStorageGroup();
-    recFile->Save();
+    InsertFile();
+}
 
-    SendAddedEvent();
+bool RecordingInfo::InsertRecording(const QString &ext, bool force_match)
+{
+    QString dirname = m_pathname;
+
+#if 1
+    if (!dirname.isEmpty())
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("InsertRecording: m_pathname was '%1'. "
+                    "This is usually blank.").arg(dirname));
+#endif
+
+    m_pathname = CreateRecordBasename(ext);
+
+    if (!m_record)
+    {
+        m_record = new RecordingRule();
+        m_record->LoadByProgram(this);
+    }
+
+    int count = 0;
+    while (!InsertProgram(this, m_record) && count < 50)
+    {
+        if (force_match)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "Failed to insert new recording.");
+            return false;
+        }
+
+        m_recStartTs = m_recStartTs.addSecs(1);
+        m_pathname = CreateRecordBasename(ext);
+        ++count;
+    }
+
+    if (count >= 50)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Could not insert program");
+        return false;
+    }
+
+    m_pathname = dirname + "/" + m_pathname;
+
+    return true;
 }
 
 bool RecordingInfo::InsertProgram(RecordingInfo *pg,
@@ -1176,6 +1189,20 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
     }
 
     return ok;
+}
+
+void RecordingInfo::InsertFile(void)
+{
+    // File
+    if (!GetRecordingFile())
+        LoadRecordingFile();
+    RecordingFile *recFile = GetRecordingFile();
+    recFile->m_fileName = GetBasename();
+    recFile->m_storageDeviceID = GetHostname();
+    recFile->m_storageGroup = GetStorageGroup();
+    recFile->Save();
+
+    SendAddedEvent();
 }
 
 /**

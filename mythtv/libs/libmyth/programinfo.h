@@ -469,13 +469,14 @@ class MPUBLIC ProgramInfo
     uint    GetFindID(void)               const { return m_findId;       }
 
     uint32_t GetProgramFlags(void)        const { return m_programFlags; }
-    QString GetProgramFlagNames(void) const;
+    QString GetProgramFlagNames(void)     const;
     ProgramInfoType GetProgramInfoType(void) const
         { return (ProgramInfoType)((m_programFlags & FL_TYPEMASK) >> 20); }
     QDateTime GetBookmarkUpdate(void) const { return m_bookmarkUpdate; }
     bool IsGeneric(void) const;
     bool IsInUsePlaying(void)   const { return (m_programFlags & FL_INUSEPLAYING) != 0U;}
     bool IsCommercialFree(void) const { return (m_programFlags & FL_CHANCOMMFREE) != 0U;}
+    bool IsCommercialFlagged(void) const { return (m_programFlags & FL_COMMFLAG) != 0U;}
     bool HasCutlist(void)       const { return (m_programFlags & FL_CUTLIST) != 0U;     }
     bool IsBookmarkSet(void)    const { return (m_programFlags & FL_BOOKMARK) != 0U;    }
     bool IsWatched(void)        const { return (m_programFlags & FL_WATCHED) != 0U;     }
@@ -496,11 +497,11 @@ class MPUBLIC ProgramInfo
     uint GetAudioProperties(void) const { return m_audioProperties; }
     QString GetAudioPropertyNames(void) const;
 
-    static uint ProgramFlagsFromNames(const QString & names);
     static uint SubtitleTypesFromNames(const QString & names);
     static uint VideoPropertiesFromNames(const QString & names);
     static uint AudioPropertiesFromNames(const QString & names);
 
+    void ProgramFlagsFromNames(const QString & names);
 
     enum Verbosity
     {

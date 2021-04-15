@@ -757,3 +757,23 @@ int CreateRecordingGroup(const QString& groupName)
 
     return groupID;
 }
+
+DBCredits * jsonCastToCredits(const QJsonObject &cast)
+{
+    int priority = 1;
+    DBCredits* credits = new DBCredits;
+
+    QJsonArray members = cast["CastMembers"].toArray();
+    for (const QJsonValue & m : members)
+    {
+        QJsonObject actor     = m.toObject();
+        QString     name      = actor.value("Name").toString("");
+        QString     character = actor.value("CharacterName").toString("");
+        QString     role      = actor.value("Role").toString("");
+
+        credits->push_back(DBPerson(role, name, priority, character));
+        ++priority;
+    }
+
+    return credits;
+}
