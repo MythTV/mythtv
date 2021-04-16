@@ -128,6 +128,64 @@ bool MythTVMenu::MatchesGroup(const QString &Name, const QString &Prefix,
             (Category == kMenuCategoryItemlist && Name == Prefix));
 }
 
+QString MythTVMenu::GetPathFromNode(QDomNode Node)
+{
+    QStringList path;
+
+    while (Node.isElement())
+    {
+        QDomElement el = Node.toElement();
+        if (el.tagName() != "menu")
+        {
+            path.prepend("NotMenu");
+            break;
+        }
+        path.prepend(el.attribute("text"));
+        Node = Node.parentNode();
+    }
+    return path.join('/');
+}
+
+QDomNode MythTVMenu::GetNodeFromPath(const QString& path) const
+{
+    QStringList pathList = path.split('/');
+    if (pathList.isEmpty())
+        return QDomNode();
+
+    // Root node is special
+    QDomElement result = GetRoot();
+    QString name = pathList.takeFirst();
+    if ((result.tagName() != "menu") || (result.attribute("text") != name))
+        return QDomNode();
+
+    // Start walking children
+    while (!pathList.isEmpty())
+    {
+        bool found = false;
+        name = pathList.takeFirst();
+        auto children = result.childNodes();
+        for (int i = 0 ; i < children.count(); i++)
+        {
+            auto child = children.at(i).toElement();
+            if (child.isNull() ||
+                (name == child.attribute("text")) ||
+                (name == child.attribute("XXXtext")))
+            {
+                result = child;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            // Oops. Have name but no matching child.
+            return QDomNode();
+        }
+    }
+    return result;
+}
+
 bool MythTVMenu::LoadFromFile(MenuTypeId id, const QString& Filename, const QString& Menuname,
                               const char * TranslationContext, const QString& KeyBindingContext,
                               int IncludeLevel)
@@ -290,14 +348,9 @@ bool MythTVMenu::Show(const QDomNode& Node, const QDomNode& Selected,
     return displayed;
 }
 
-MythTVMenuNodeTuple::MythTVMenuNodeTuple(MenuTypeId Id, const QDomNode& Node)
+MythTVMenuNodeTuple::MythTVMenuNodeTuple(MenuTypeId Id, QString Path)
   : m_id(Id),
-    m_node(Node)
-{
-}
-
-MythTVMenuNodeTuple::MythTVMenuNodeTuple()
-  : m_id(kMenuIdUnknown)
+    m_path(std::move(Path))
 {
 }
 

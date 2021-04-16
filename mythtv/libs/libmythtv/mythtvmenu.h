@@ -102,6 +102,8 @@ class MTV_PUBLIC MythTVMenu
     QString     GetName() const;
     const char* GetTranslationContext() const;
     const QString& GetKeyBindingContext() const;
+    static QString GetPathFromNode(QDomNode Node);
+    QDomNode GetNodeFromPath(const QString& path) const;
     friend class TV;
 
   private:
@@ -119,11 +121,11 @@ static const MythTVMenu dummy_menubase;
 class MythTVMenuNodeTuple
 {
   public:
-    MythTVMenuNodeTuple(MenuTypeId Id, const QDomNode& Node);
-    MythTVMenuNodeTuple();
+    MythTVMenuNodeTuple(MenuTypeId Id, QString Path);
+    MythTVMenuNodeTuple() = default;
 
     MenuTypeId m_id { kMenuIdUnknown };
-    const QDomNode   m_node;
+    QString m_path;
 };
 
 Q_DECLARE_METATYPE(MythTVMenuNodeTuple)

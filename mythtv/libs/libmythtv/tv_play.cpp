@@ -7163,10 +7163,11 @@ void TV::customEvent(QEvent *Event)
         {
             auto data = dce->GetData().value<MythTVMenuNodeTuple>();
             const MythTVMenu& Menu = getMenuFromId(data.m_id);
+            QDomNode Node = Menu.GetNodeFromPath(data.m_path);
             if (dce->GetResult() == -1) // menu exit/back
-                PlaybackMenuShow(Menu, data.m_node.parentNode(), data.m_node);
+                PlaybackMenuShow(Menu, Node.parentNode(), Node);
             else
-                PlaybackMenuShow(Menu, data.m_node, QDomNode());
+                PlaybackMenuShow(Menu, Node, QDomNode());
         }
         else
         {
@@ -8342,7 +8343,8 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDia
         if (result && Context.m_doDisplay)
         {
             QVariant v;
-            v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id, Context.m_node));
+            v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id,
+                                           MythTVMenu::GetPathFromNode(Context.m_node)));
             Menu->m_buttons.push_back( { Context.m_menuName, v, true,
                                          Context.m_currentContext != kMenuCurrentDefault });
         }
@@ -8478,7 +8480,8 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         if (result && Context.m_doDisplay)
         {
             QVariant v;
-            v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id, Context.m_node));
+            v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id,
+                                           MythTVMenu::GetPathFromNode(Context.m_node)));
             Menu->m_buttons.push_back( { Context.m_menuName, v, true,
                                          Context.m_currentContext != kMenuCurrentDefault } );
         }
@@ -8924,7 +8927,8 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
         {
             BUTTON3(actionName, tr("Recorded Program"), "", true);
             QVariant v;
-            v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id, Context.m_node));
+            v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id,
+                                           MythTVMenu::GetPathFromNode(Context.m_node)));
             m_tvmJumprecBackHack = v;
         }
         else if (actionName == "JUMPPREV")
@@ -9132,7 +9136,7 @@ void TV::PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QD
     if (!parent.parentNode().isNull())
     {
         QVariant v;
-        v.setValue(MythTVMenuNodeTuple(Menu.m_id, Node));
+        v.setValue(MythTVMenuNodeTuple(Menu.m_id, MythTVMenu::GetPathFromNode(Node)));
         menu.m_back = { "", v };
     }
 
