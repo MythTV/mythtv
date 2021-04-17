@@ -60,9 +60,14 @@ qvariant2qobject( const QVariantMap& variant, QObject* object )
         if ( property.isValid() )
         {
             QVariant value = iter.value();
-            if ( value.canConvert( property.type() ) )
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            QVariant::Type type = property.type();
+#else
+            QMetaType type = property.metaType();
+#endif
+            if ( value.canConvert( type ) )
             {
-                value.convert( property.type() );
+                value.convert( type );
                 object->setProperty( iter.key().toLatin1(), value );
             } else if ( QString( QLatin1String("QVariant") ).compare( QLatin1String( property.typeName() ) ) == 0 ) {
                 object->setProperty( iter.key().toLatin1(), value );
@@ -89,7 +94,13 @@ QByteArray
 toJson( const QVariant &variant )
 {
     QVariant _variant = variant;
-    if ( variant.type() == QVariant::Hash )
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto type = static_cast<QMetaType::Type>(variant.type());
+#else
+    auto type = variant.typeId();
+#endif
+
+    if ( type == QMetaType::QVariantHash )
     {
         // QJsonDocument cannot deal with QVariantHash, so convert.
         const QVariantHash hash = variant.toHash();
