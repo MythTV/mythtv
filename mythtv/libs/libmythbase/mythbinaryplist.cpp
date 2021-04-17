@@ -127,7 +127,13 @@ MythBinaryPList::MythBinaryPList(const QByteArray& Data)
 
 QVariant MythBinaryPList::GetValue(const QString& Key)
 {
-    if (m_result.type() != QVariant::Map)
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto type = static_cast<QMetaType::Type>(m_result.type());
+#else
+    auto type = m_result.typeId();
+#endif
+
+    if (type != QMetaType::QVariantMap)
         return QVariant();
 
     QVariantMap map = m_result.toMap();
@@ -166,30 +172,35 @@ bool MythBinaryPList::ToXML(QIODevice* Device)
 
 bool MythBinaryPList::ToXML(const QVariant& Data, QXmlStreamWriter& Xml)
 {
-    switch (Data.type())
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto type = static_cast<QMetaType::Type>(Data.type());
+#else
+    auto type = Data.typeId();
+#endif
+    switch (type)
     {
-        case QVariant::Map:
+        case QMetaType::QVariantMap:
             DictToXML(Data, Xml);
             break;
-        case QVariant::List:
+        case QMetaType::QVariantList:
             ArrayToXML(Data, Xml);
             break;
-        case QVariant::Double:
+        case QMetaType::Double:
             Xml.writeTextElement("real", QString("%1").arg(Data.toDouble(), 0, 'f', 6));
             break;
-        case QVariant::ByteArray:
+        case QMetaType::QByteArray:
             Xml.writeTextElement("data", Data.toByteArray().toBase64().data());
             break;
-        case QVariant::ULongLong:
+        case QMetaType::ULongLong:
             Xml.writeTextElement("integer", QString("%1").arg(Data.toULongLong()));
             break;
-        case QVariant::String:
+        case QMetaType::QString:
             Xml.writeTextElement("string", Data.toString());
             break;
-        case QVariant::DateTime:
+        case QMetaType::QDateTime:
             Xml.writeTextElement("date", Data.toDateTime().toString(Qt::ISODate));
             break;
-        case QVariant::Bool:
+        case QMetaType::Bool:
             {
                 bool val = Data.toBool();
                 Xml.writeEmptyElement(val ? "true" : "false");
@@ -493,7 +504,7 @@ QVariant MythBinaryPList::ParseBinaryUnicode(uint8_t* Data)
         tmp.append(static_cast<char>(twobyte & 0xff));
         tmp.append(static_cast<char>((twobyte >> 8) & 0xff));
     }
-    result = QString::fromUtf16(reinterpret_cast<const quint16*>(tmp.data()), static_cast<int>(count));
+    result = QString::fromUtf16(reinterpret_cast<const char16_t*>(tmp.data()), static_cast<int>(count));
     LOG(VB_GENERAL, LOG_DEBUG, LOC + QString("Unicode: %1").arg(result));
     return QVariant(result);
 }
