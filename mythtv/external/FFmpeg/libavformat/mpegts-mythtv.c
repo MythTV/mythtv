@@ -80,8 +80,8 @@ static int is_pat_same(MpegTSContext *mpegts_ctx,
                        int *pmt_pnums, int *pmts_pids, unsigned int pmt_count);
 
 static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item, uint32_t prog_reg_desc, int pcr_pid);
-static int is_pmt_same(MpegTSContext *mpegts_ctx, pmt_entry_t* items,
-                       int item_cnt);
+static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
+                             pmt_entry_t* items, int item_cnt);
 
 typedef int PESCallback(MpegTSFilter *f, const uint8_t *buf, int len, int is_start, int64_t pos);
 
@@ -1868,18 +1868,20 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     /* if the pmt has changed delete old streams,
      * create new ones, and notify any listener.
      */
-    if (!is_pmt_same(ts, items, last_item))
+    int equal_streams = pmt_equal_streams(ts, items, last_item);
+    if (equal_streams != last_item || ts->pid_cnt != last_item)
     {
         AVFormatContext *avctx = ts->stream;
         int idx;
         /* flush out old AVPackets */
         ff_read_frame_flush(avctx);
+
         /* delete old streams */
-        for (idx = ts->pid_cnt-1; idx>=0; idx--)
+        for (idx = ts->pid_cnt-1; idx >= equal_streams; idx--)
             av_remove_stream(ts->stream, ts->pmt_pids[idx], 1);
 
         /* create new streams */
-        for (idx = 0; idx < last_item; idx++)
+        for (idx = equal_streams; idx < last_item; idx++)
             mpegts_add_stream(ts, h->id, &items[idx], prog_reg_desc, pcr_pid);
 
         /* cache pmt */
@@ -1923,19 +1925,15 @@ static int is_pat_same(MpegTSContext *mpegts_ctx,
     return 1;
 }
 
-static int is_pmt_same(MpegTSContext *mpegts_ctx,
-                       pmt_entry_t* items, int item_cnt)
+// Find number of equal streams in old and new pmt starting at 0
+// and stopping at the first different stream.
+static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
+                             pmt_entry_t* items, int item_cnt)
 {
+    int limit = mpegts_ctx->pid_cnt < item_cnt ? mpegts_ctx->pid_cnt : item_cnt;
     int idx;
-    if (mpegts_ctx->pid_cnt != item_cnt)
-    {
-#ifdef DEBUG
-        av_log(NULL, AV_LOG_DEBUG, "mpegts_ctx->pid_cnt=%d != item_cnt=%d\n",
-               mpegts_ctx->pid_cnt, item_cnt);
-#endif
-        return 0;
-    }
-    for (idx = 0; idx < item_cnt; idx++)
+
+    for (idx = 0; idx < limit; idx++)
     {
         /* check for pid */
         int loc = find_in_list(mpegts_ctx->pmt_pids, items[idx].pid);
@@ -1943,11 +1941,10 @@ static int is_pmt_same(MpegTSContext *mpegts_ctx,
         {
 #ifdef DEBUG
             av_log(NULL, AV_LOG_DEBUG,
-                   "find_in_list(..,[%d].pid=%d) => -1\n"
-                   "is_pmt_same() => false\n",
+                   "find_in_list(..,[%d].pid=%d) => -1\n",
                    idx, items[idx].pid);
 #endif
-            return 0;
+            break;
         }
 
         /* check stream type */
@@ -1956,11 +1953,10 @@ static int is_pmt_same(MpegTSContext *mpegts_ctx,
         {
 #ifdef DEBUG
             av_log(NULL, AV_LOG_DEBUG,
-                   "mpegts_ctx->pids[items[%d].pid=%d] => null\n"
-                   "is_pmt_same() => false\n",
+                   "mpegts_ctx->pids[items[%d].pid=%d] => null\n",
                    idx, items[idx].pid);
 #endif
-            return 0;
+            break;
         }
         if (tss->type == MPEGTS_PES)
         {
@@ -1968,19 +1964,17 @@ static int is_pmt_same(MpegTSContext *mpegts_ctx,
             if (!pes)
             {
 #ifdef DEBUG
-                av_log(NULL, AV_LOG_DEBUG, "pes == null, where idx %d\n"
-                       "is_pmt_same() => false\n", idx);
+                av_log(NULL, AV_LOG_DEBUG, "pes == null, where idx %d\n", idx);
 #endif
-                return 0;
+                break;
             }
             if (pes->stream_type != items[idx].type)
             {
 #ifdef DEBUG
                 av_log(NULL, AV_LOG_DEBUG,
-                       "pes->stream_type != items[%d].type\n"
-                       "is_pmt_same() => false\n", idx);
+                       "pes->stream_type != items[%d].type\n", idx);
 #endif
-                return 0;
+                break;
             }
         }
         else if (tss->type == MPEGTS_SECTION)
@@ -1989,35 +1983,33 @@ static int is_pmt_same(MpegTSContext *mpegts_ctx,
             if (!sect)
             {
 #ifdef DEBUG
-                av_log(NULL, AV_LOG_DEBUG, "sect == null, where idx %d\n"
-                       "is_pmt_same() => false\n", idx);
+                av_log(NULL, AV_LOG_DEBUG, "sect == null, where idx %d\n", idx);
 #endif
-                return 0;
+                break;
             }
             if (sect->stream_type != items[idx].type)
             {
 #ifdef DEBUG
                 av_log(NULL, AV_LOG_DEBUG,
-                       "sect->stream_type != items[%d].type\n"
-                       "is_pmt_same() => false\n", idx);
+                       "sect->stream_type != items[%d].type\n", idx);
 #endif
-                return 0;
-            }            
+                break;
+            }
         }
         else
         {
 #ifdef DEBUG
             av_log(NULL, AV_LOG_DEBUG,
-                   "tss->type != MPEGTS_PES, where idx %d\n"
-                   "is_pmt_same() => false\n", idx);
+                   "tss->type != MPEGTS_PES, where idx %d\n", idx);
 #endif
-            return 0;
+            break;
         }
     }
 #ifdef DEBUG
-    av_log(NULL, AV_LOG_DEBUG, "is_pmt_same() => true\n", idx);
+    av_log(NULL, AV_LOG_DEBUG, "pmt_equal_streams:%d old:%d new:%d limit:%d\n",
+        idx, mpegts_ctx->pid_cnt, item_cnt, limit);
 #endif
-    return 1;
+    return idx;
 }
 
 static void mpegts_cleanup_streams(MpegTSContext *ts)
