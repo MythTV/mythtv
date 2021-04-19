@@ -287,7 +287,7 @@ void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
 bool UPNPScanner::GetMetadata(QVariant &data)
 {
     // we need a USN and objectID
-    if (!data.canConvert(QVariant::StringList))
+    if (!data.canConvert<QStringList>())
         return false;
 
     QStringList list = data.toStringList();
