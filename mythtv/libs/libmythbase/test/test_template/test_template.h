@@ -25,47 +25,17 @@ class TestTemplate: public QObject
     Q_OBJECT
 
   private slots:
-    // called at the beginning of these sets of tests
-    void initTestCase(void)
-    {
-    }
+    // Functions to setup/cleanup or reset between tests
+    static void initTestCase(void);
+    static void cleanupTestCase(void);
+    static void init(void);
+    static void cleanup(void);
 
-    // called at the end of these sets of tests
-    void cleanupTestCase(void)
-    {
-    }
+    // Individual function tests
+    static void example_passing_unit_test(void);
+    static void example_benchmark_test(void);
+    static void example_skipped_test(void);
 
-    // called before each test case
-    void init(void)
-    {
-    }
-
-    // called after each test case
-    void cleanup(void)
-    {
-    }
-
-    // example passing test
-    static void example_passing_unit_test(void)
-    {
-        QVERIFY(true);
-    }
-
-    // example benchmark test
-    static void example_benchmark_test(void)
-    {
-        QBENCHMARK
-        {
-            int sum = 0;
-            for (int i = 0; i < 999; i++)
-                sum += i;
-        }
-    }
-
-    // example skipped test
-    static void example_skipped_test(void)
-    {
-        QSKIP("this test should pass, but doesn't yet");
-        QVERIFY(true); // yes this really would pass, but this is an example
-    }
+    static void example_repeated_test_data(void);
+    static void example_repeated_test(void);
 };
