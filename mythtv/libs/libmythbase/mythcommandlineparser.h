@@ -21,9 +21,9 @@ class TestCommandLineParser;
 class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
 {
   public:
-    CommandLineArg(const QString& name, QVariant::Type type, QVariant def,
+    CommandLineArg(const QString& name, QMetaType::Type type, QVariant def,
                    QString help, QString longhelp);
-    CommandLineArg(const QString& name, QVariant::Type type, QVariant def);
+    CommandLineArg(const QString& name, QMetaType::Type type, QVariant def);
     explicit CommandLineArg(const QString& name);
    ~CommandLineArg() override = default;
 
@@ -96,7 +96,7 @@ class MBASE_PUBLIC CommandLineArg : public ReferenceCounter
     QString                 m_deprecated;
     QString                 m_removed;
     QString                 m_removedversion;
-    QVariant::Type          m_type      {QVariant::Invalid};
+    QMetaType::Type         m_type      {QMetaType::UnknownType};
     QVariant                m_default;
     QVariant                m_stored;
 
@@ -170,10 +170,10 @@ class MBASE_PUBLIC MythCommandLineParser
     CommandLineArg* add(const QString& arg, const QString& name, const QDateTime& def,
                         QString help, QString longhelp);
     // anything else
-    CommandLineArg* add(const QString& arg, const QString& name, QVariant::Type type,
+    CommandLineArg* add(const QString& arg, const QString& name, QMetaType::Type type,
                         QString help, QString longhelp);
     // anything else with default
-    CommandLineArg* add(const QString& arg, const QString& name, QVariant::Type type,
+    CommandLineArg* add(const QString& arg, const QString& name, QMetaType::Type type,
                         QVariant def, QString help, QString longhelp);
 
 // overloaded add constructors for multi-string options
@@ -205,10 +205,10 @@ class MBASE_PUBLIC MythCommandLineParser
     CommandLineArg* add(QStringList arglist, const QString& name, const QDateTime& def,
                         QString help, QString longhelp);
     // anything else
-    CommandLineArg* add(QStringList arglist, const QString& name, QVariant::Type type,
+    CommandLineArg* add(QStringList arglist, const QString& name, QMetaType::Type type,
                         QString help, QString longhelp);
     // anything else with default
-    CommandLineArg* add(QStringList arglist, const QString& name, QVariant::Type type,
+    CommandLineArg* add(QStringList arglist, const QString& name, QMetaType::Type type,
                         QVariant def, QString help, QString longhelp);
 
     QVariant                operator[](const QString &name);

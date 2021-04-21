@@ -179,14 +179,14 @@ const char* MythCommandLineParser::NamedOptType(Result type)
  *  that can be used on the command line, and should be reported in --help
  *  printouts
  */
-CommandLineArg::CommandLineArg(const QString& name, QVariant::Type type,
+CommandLineArg::CommandLineArg(const QString& name, QMetaType::Type type,
                    QVariant def, QString help, QString longhelp) :
     ReferenceCounter(QString("CommandLineArg:%1").arg(name)),
     m_name(name), m_type(type), m_default(std::move(def)),
     m_help(std::move(help)), m_longhelp(std::move(longhelp))
 {
-    if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
-            (m_type != QVariant::Map))
+    if ((m_type != QMetaType::QString) && (m_type != QMetaType::QStringList) &&
+        (m_type != QMetaType::QVariantMap))
         m_converted = true;
 }
 
@@ -196,12 +196,12 @@ CommandLineArg::CommandLineArg(const QString& name, QVariant::Type type,
  *  is intended for use in supplementary data storage for information not
  *  supplied directly on the command line.
  */
-CommandLineArg::CommandLineArg(const QString& name, QVariant::Type type, QVariant def)
+CommandLineArg::CommandLineArg(const QString& name, QMetaType::Type type, QVariant def)
   : ReferenceCounter(QString("CommandLineArg:%1").arg(name)),
     m_name(name), m_type(type), m_default(std::move(def))
 {
-    if ((m_type != QVariant::String) && (m_type != QVariant::StringList) &&
-            (m_type != QVariant::Map))
+    if ((m_type != QMetaType::QString) && (m_type != QMetaType::QStringList) &&
+        (m_type != QMetaType::QVariantMap))
         m_converted = true;
 }
 
@@ -372,7 +372,11 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
     }
 
     // print type and default for the stored value
-    msg << "Type:        " << QVariant::typeToName(static_cast<int>(m_type)) << QT_ENDL;
+#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
+    msg << "Type:        " << QMetaType::typeName(m_type) << QT_ENDL;
+#else
+    msg << "Type:        " << QMetaType(m_type).name() << QT_ENDL;
+#endif
     if (m_default.canConvert<QString>())
         msg << "Default:     " << m_default.toString() << QT_ENDL;
 
@@ -443,18 +447,18 @@ bool CommandLineArg::Set(const QString& opt)
 
     switch (m_type)
     {
-      case QVariant::Bool:
+      case QMetaType::Bool:
         m_stored = QVariant(!m_default.toBool());
         break;
 
-      case QVariant::Int:
+      case QMetaType::Int:
         if (m_stored.isNull())
             m_stored = QVariant(1);
         else
             m_stored = QVariant(m_stored.toInt() + 1);
         break;
 
-      case QVariant::String:
+      case QMetaType::QString:
         m_stored = m_default;
         break;
 
@@ -479,43 +483,43 @@ bool CommandLineArg::Set(const QString& opt, const QByteArray& val)
 
     switch (m_type)
     {
-      case QVariant::Bool:
+      case QMetaType::Bool:
         std::cerr << "Boolean type options do not accept values:" << std::endl
                   << "    " << opt.toLocal8Bit().constData() << std::endl;
         return false;
 
-      case QVariant::String:
+      case QMetaType::QString:
         m_stored = QVariant(val);
         break;
 
-      case QVariant::Int:
+      case QMetaType::Int:
         m_stored = QVariant(val.toInt());
         break;
 
-      case QVariant::UInt:
+      case QMetaType::UInt:
         m_stored = QVariant(val.toUInt());
         break;
 
-      case QVariant::LongLong:
+      case QMetaType::LongLong:
         m_stored = QVariant(val.toLongLong());
         break;
 
-      case QVariant::Double:
+      case QMetaType::Double:
         m_stored = QVariant(val.toDouble());
         break;
 
-      case QVariant::DateTime:
+      case QMetaType::QDateTime:
         m_stored = QVariant(MythDate::fromString(QString(val)));
         break;
 
-      case QVariant::StringList:
+      case QMetaType::QStringList:
         if (!m_stored.isNull())
             vlist = m_stored.toList();
         vlist << val;
         m_stored = QVariant(vlist);
         break;
 
-      case QVariant::Map:
+      case QMetaType::QVariantMap:
         if (!val.contains('='))
         {
             std::cerr << "Command line option did not get expected "
@@ -531,7 +535,7 @@ bool CommandLineArg::Set(const QString& opt, const QByteArray& val)
         m_stored = QVariant(vmap);
         break;
 
-      case QVariant::Size:
+      case QMetaType::QSize:
         if (!val.contains('x'))
         {
             std::cerr << "Command line option did not get expected "
@@ -848,7 +852,7 @@ void CommandLineArg::AllowOneOf(const QList<CommandLineArg*>& args)
             (*i1)->SetBlocks(*i2);
         }
 
-        if ((*i1)->m_type == QVariant::Invalid)
+        if ((*i1)->m_type == QMetaType::UnknownType)
             (*i1)->DecrRef();
     }
 }
@@ -876,9 +880,14 @@ void CommandLineArg::Convert(void)
         return;
     }
 
-    if (m_type == QVariant::String)
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto storedType = static_cast<QMetaType::Type>(m_stored.type());
+#else
+    auto storedType = m_stored.typeId();
+#endif
+    if (m_type == QMetaType::QString)
     {
-        if (m_stored.type() == QVariant::ByteArray)
+        if (storedType == QMetaType::QByteArray)
         {
             m_stored = QString::fromLocal8Bit(m_stored.toByteArray());
         }
@@ -886,9 +895,9 @@ void CommandLineArg::Convert(void)
         //      not sure why this isnt a bytearray, but ignore it and
         //      set it as converted
     }
-    else if (m_type == QVariant::StringList)
+    else if (m_type == QMetaType::QStringList)
     {
-        if (m_stored.type() == QVariant::List)
+        if (storedType == QMetaType::QVariantList)
         {
             QVariantList vlist = m_stored.toList();
             QStringList slist;
@@ -897,7 +906,7 @@ void CommandLineArg::Convert(void)
             m_stored = QVariant(slist);
         }
     }
-    else if (m_type == QVariant::Map)
+    else if (m_type == QMetaType::QVariantMap)
     {
         QVariantMap vmap = m_stored.toMap();
         // NOLINTNEXTLINE(modernize-loop-convert)
@@ -1046,39 +1055,39 @@ void CommandLineArg::PrintVerbose(void) const
 
     switch (m_type)
     {
-      case QVariant::Bool:
+      case QMetaType::Bool:
         std::cerr << (m_stored.toBool() ? "True" : "False") << std::endl;
         break;
 
-      case QVariant::Int:
+      case QMetaType::Int:
         std::cerr << m_stored.toInt() << std::endl;
         break;
 
-      case QVariant::UInt:
+      case QMetaType::UInt:
         std::cerr << m_stored.toUInt() << std::endl;
         break;
 
-      case QVariant::LongLong:
+      case QMetaType::LongLong:
         std::cerr << m_stored.toLongLong() << std::endl;
         break;
 
-      case QVariant::Double:
+      case QMetaType::Double:
         std::cerr << m_stored.toDouble() << std::endl;
         break;
 
-      case QVariant::Size:
+      case QMetaType::QSize:
         tmpsize = m_stored.toSize();
         std::cerr <<  "x=" << tmpsize.width()
                   << " y=" << tmpsize.height()
                   << std::endl;
         break;
 
-      case QVariant::String:
+      case QMetaType::QString:
         std::cerr << '"' << m_stored.toByteArray().constData()
                   << '"' << std::endl;
         break;
 
-      case QVariant::StringList:
+      case QMetaType::QStringList:
         vlist = m_stored.toList();
         std::cerr << '"' << vlist.takeFirst().toByteArray().constData() << '"';
         for (const auto& str : qAsConst(vlist))
@@ -1090,7 +1099,7 @@ void CommandLineArg::PrintVerbose(void) const
         std::cerr << std::endl;
         break;
 
-      case QVariant::Map:
+      case QMetaType::QVariantMap:
         tmpmap = m_stored.toMap();
         for (it = tmpmap.cbegin(); it != tmpmap.cend(); ++it)
         {
@@ -1108,7 +1117,7 @@ void CommandLineArg::PrintVerbose(void) const
 
         break;
 
-      case QVariant::DateTime:
+      case QMetaType::QDateTime:
         std::cerr << m_stored.toDateTime().toString(Qt::ISODate)
                              .toLocal8Bit().constData()
              << std::endl;
@@ -1226,7 +1235,7 @@ MythCommandLineParser::~MythCommandLineParser()
  * </table>
  */
 CommandLineArg* MythCommandLineParser::add(QStringList arglist,
-        const QString& name, QVariant::Type type, QVariant def,
+        const QString& name, QMetaType::Type type, QVariant def,
         QString help, QString longhelp)
 {
     CommandLineArg *arg = nullptr;
@@ -1247,7 +1256,12 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
             if (m_verbose)
             {
                 std::cerr << "Adding " << str.toLocal8Bit().constData()
-                          << " as taking type '" << QVariant::typeToName(static_cast<int>(type))
+                          << " as taking type '"
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                          << QVariant::typeToName(static_cast<int>(type))
+#else
+                          << QMetaType(type).name()
+#endif
                           << "'" << std::endl;
             }
             arg->IncrRef();
@@ -1651,64 +1665,71 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, bool def,
                                            QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, QVariant::Bool, QVariant(def), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, QMetaType::Bool, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, int def,
                                           QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, QVariant::Int, QVariant(def), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, QMetaType::Int, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, uint def,
                                            QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, QVariant::UInt, QVariant(def), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, QMetaType::UInt, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, long long def,
                                            QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, QVariant::LongLong, QVariant(def), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, QMetaType::LongLong, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, double def,
                                            QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, QVariant::Double, QVariant(def), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, QMetaType::Double, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, const char *def,
                                            QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, QVariant::String, QVariant(def), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, QMetaType::QString, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, const QString& def,
                                            QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, QVariant::String, QVariant(def), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, QMetaType::QString, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, QSize def,
                                            QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, QVariant::Size, QVariant(def), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, QMetaType::QSize, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, const QDateTime& def,
                                            QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, QVariant::DateTime, QVariant(def), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, QMetaType::QDateTime, QVariant(def), std::move(help), std::move(longhelp));
 }
 
-CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, QVariant::Type type,
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, QMetaType::Type type,
                                            QString help, QString longhelp)
 {
-    return add(QStringList(arg), name, type, QVariant(type), std::move(help), std::move(longhelp));
+    return add(QStringList(arg), name, type,
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+               QVariant(static_cast<QVariant::Type>(type)),
+#else
+               QVariant(QMetaType(type)),
+#endif
+               std::move(help), std::move(longhelp));
 }
 
-CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name, QVariant::Type type,
+CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& name,
+                                           QMetaType::Type type,
                                            QVariant def, QString help, QString longhelp)
 {
     return add(QStringList(arg), name, type, std::move(def), std::move(help), std::move(longhelp));
@@ -1717,61 +1738,68 @@ CommandLineArg* MythCommandLineParser::add(const QString& arg, const QString& na
 CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, bool def,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, QVariant::Bool, QVariant(def), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, QMetaType::Bool, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, int def,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, QVariant::Int, QVariant(def), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, QMetaType::Int, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, uint def,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, QVariant::UInt, QVariant(def), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, QMetaType::UInt, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, long long def,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, QVariant::LongLong, QVariant(def), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, QMetaType::LongLong, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, double def,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, QVariant::Double, QVariant(def), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, QMetaType::Double, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, const char *def,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, QVariant::String, QVariant(def), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, QMetaType::QString, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, const QString& def,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, QVariant::String, QVariant(def), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, QMetaType::QString, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, QSize def,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, QVariant::Size, QVariant(def), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, QMetaType::QSize, QVariant(def), std::move(help), std::move(longhelp));
 }
 
 CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, const QDateTime& def,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, QVariant::DateTime, QVariant(def), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, QMetaType::QDateTime, QVariant(def), std::move(help), std::move(longhelp));
 }
 
-CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name, QVariant::Type type,
+CommandLineArg* MythCommandLineParser::add(QStringList arglist, const QString& name,
+                                           QMetaType::Type type,
                                            QString help, QString longhelp)
 {
-    return add(std::move(arglist), name, type, QVariant(type), std::move(help), std::move(longhelp));
+    return add(std::move(arglist), name, type,
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+               QVariant(static_cast<QVariant::Type>(type)),
+#else
+               QVariant(QMetaType(type)),
+#endif
+               std::move(help), std::move(longhelp));
 }
 
 /** \brief Replace dummy arguments used to define interdependency with pointers
@@ -1789,7 +1817,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
         QList<CommandLineArg*>::iterator links_it;
         for (links_it = links.begin(); links_it != links.end(); ++links_it)
         {
-            if ((*links_it)->m_type != QVariant::Invalid)
+            if ((*links_it)->m_type != QMetaType::UnknownType)
                 continue; // already handled
 
             if (!m_namedArgs.contains((*links_it)->m_name))
@@ -1818,7 +1846,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
         links = (*args_it)->m_children;
         for (links_it = links.begin(); links_it != links.end(); ++links_it)
         {
-            if ((*links_it)->m_type != QVariant::Invalid)
+            if ((*links_it)->m_type != QMetaType::UnknownType)
                 continue; // already handled
 
             if (!m_namedArgs.contains((*links_it)->m_name))
@@ -1847,7 +1875,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
         links = (*args_it)->m_requires;
         for (links_it = links.begin(); links_it != links.end(); ++links_it)
         {
-            if ((*links_it)->m_type != QVariant::Invalid)
+            if ((*links_it)->m_type != QMetaType::UnknownType)
                 continue; // already handled
 
             if (!m_namedArgs.contains((*links_it)->m_name))
@@ -1877,7 +1905,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             (*args_it)->m_requiredby.begin();
         while (req_it != (*args_it)->m_requiredby.end())
         {
-            if ((*req_it)->m_type == QVariant::Invalid)
+            if ((*req_it)->m_type == QMetaType::UnknownType)
             {
                 // if its not an invalid, it shouldnt be here anyway
                 if (m_namedArgs.contains((*req_it)->m_name))
@@ -1902,7 +1930,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             (*args_it)->m_blocks.begin();
         while (block_it != (*args_it)->m_blocks.end())
         {
-            if ((*block_it)->m_type != QVariant::Invalid)
+            if ((*block_it)->m_type != QMetaType::UnknownType)
             {
                 ++block_it;
                 continue; // already handled
@@ -2073,7 +2101,7 @@ bool MythCommandLineParser::toBool(const QString& key) const
     if (arg == nullptr)
         return false;
 
-    if (arg->m_type == QVariant::Bool)
+    if (arg->m_type == QMetaType::Bool)
     {
         if (arg->m_given)
             return arg->m_stored.toBool();
@@ -2273,7 +2301,7 @@ QStringList MythCommandLineParser::toStringList(const QString& key, const QStrin
     else
         varval = arg->m_default;
 
-    if (arg->m_type == QVariant::String && !sep.isEmpty())
+    if (arg->m_type == QMetaType::QString && !sep.isEmpty())
         val = varval.toString().split(sep);
     else if (varval.canConvert<QStringList>())
         val = varval.toStringList();
@@ -2355,7 +2383,7 @@ void MythCommandLineParser::allowArgs(bool allow)
     else if (!allow)
         return;
 
-    auto *arg = new CommandLineArg("_args", QVariant::StringList, QStringList());
+    auto *arg = new CommandLineArg("_args", QMetaType::QStringList, QStringList());
     m_namedArgs["_args"] = arg;
 }
 
@@ -2373,7 +2401,7 @@ void MythCommandLineParser::allowExtras(bool allow)
         return;
 
     QMap<QString,QVariant> vmap;
-    auto *arg = new CommandLineArg("_extra", QVariant::Map, vmap);
+    auto *arg = new CommandLineArg("_extra", QMetaType::QVariantMap, vmap);
 
     m_namedArgs["_extra"] = arg;
 }
@@ -2392,7 +2420,7 @@ void MythCommandLineParser::allowPassthrough(bool allow)
         return;
 
     auto *arg = new CommandLineArg("_passthrough",
-                                    QVariant::StringList, QStringList());
+                                    QMetaType::QStringList, QStringList());
     m_namedArgs["_passthrough"] = arg;
 }
 
@@ -2465,7 +2493,7 @@ void MythCommandLineParser::addDaemon(void)
 void MythCommandLineParser::addSettingsOverride(void)
 {
     add(QStringList{"-O", "--override-setting"},
-            "overridesettings", QVariant::Map,
+            "overridesettings", QMetaType::QVariantMap,
             "Override a single setting defined by a key=value pair.",
             "Override a single setting from the database using "
             "options defined as one or more key=value pairs\n"
@@ -2699,13 +2727,23 @@ bool MythCommandLineParser::SetValue(const QString &key, const QVariant& value)
     if (!m_namedArgs.contains(key))
     {
         const QVariant& val(value);
-        arg = new CommandLineArg(key, val.type(), val);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        auto type = static_cast<QMetaType::Type>(val.type());
+#else
+        auto type = static_cast<QMetaType::Type>(val.typeId());
+#endif
+        arg = new CommandLineArg(key, type, val);
         m_namedArgs.insert(key, arg);
     }
     else
     {
         arg = m_namedArgs[key];
-        if (arg->m_type != value.type())
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        auto type = static_cast<QMetaType::Type>(value.type());
+#else
+        auto type = value.typeId();
+#endif
+        if (arg->m_type != type)
             return false;
     }
 
