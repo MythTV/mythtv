@@ -183,25 +183,25 @@ void XmlSerializer::RenderValue( const QString &sName, const QVariant &vValue )
 
     switch( vValue.type() )
     {
-        case QVariant::List:
+        case QMetaType::QVariantList:
         {
             RenderList( sName, vValue.toList() );
             break;
         }
 
-        case QVariant::StringList:
+        case QMetaType::QStringList:
         {
             RenderStringList( sName, vValue.toStringList() );
             break;
         }
 
-        case QVariant::Map:
+        case QMetaType::QVariantMap:
         {
             RenderMap( sName, vValue.toMap() );
             break;
         }
 
-        case QVariant::DateTime:
+        case QMetaType::QDateTime:
         {
             QDateTime dt( vValue.toDateTime() );
 

@@ -60,25 +60,25 @@ void XmlPListSerializer::RenderValue(const QString &sName,
 
     switch(vValue.type())
     {
-        case QVariant::List:
+        case QMetaType::QVariantList:
         {
             RenderList(sName, vValue.toList());
             break;
         }
 
-        case QVariant::StringList:
+        case QMetaType::QStringList:
         {
             RenderStringList(sName, vValue.toStringList());
             break;
         }
 
-        case QVariant::Map:
+        case QMetaType::QVariantMap:
         {
             RenderMap(sName, vValue.toMap());
             break;
         }
 
-        case QVariant::DateTime:
+        case QMetaType::QDateTime:
         {
             if (vValue.toDateTime().isValid())
             {
@@ -90,7 +90,7 @@ void XmlPListSerializer::RenderValue(const QString &sName,
             break;
         }
 
-        case QVariant::ByteArray:
+        case QMetaType::QByteArray:
         {
             if (!vValue.toByteArray().isNull())
             {
@@ -102,7 +102,7 @@ void XmlPListSerializer::RenderValue(const QString &sName,
             break;
         }
 
-        case QVariant::Bool:
+        case QMetaType::Bool:
         {
             if (needKey)
                 m_pXmlWriter->writeTextElement("key", sName);
@@ -111,8 +111,8 @@ void XmlPListSerializer::RenderValue(const QString &sName,
             break;
         }
 
-        case QVariant::UInt:
-        case QVariant::ULongLong:
+        case QMetaType::UInt:
+        case QMetaType::ULongLong:
         {
             if (needKey)
                 m_pXmlWriter->writeTextElement("key", sName);
@@ -121,9 +121,9 @@ void XmlPListSerializer::RenderValue(const QString &sName,
             break;
         }
 
-        case QVariant::Int:
-        case QVariant::LongLong:
-        case QVariant::Double:
+        case QMetaType::Int:
+        case QMetaType::LongLong:
+        case QMetaType::Double:
         {
             if (needKey)
                 m_pXmlWriter->writeTextElement("key", sName);
@@ -133,7 +133,7 @@ void XmlPListSerializer::RenderValue(const QString &sName,
         }
 
         // anything else will be unrecognised, so wrap in a string
-        case QVariant::String:
+        case QMetaType::QString:
         default:
         {
             if (needKey)
