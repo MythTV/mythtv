@@ -298,23 +298,30 @@ void JoystickMenuThread::EmitKey(const QString& code)
 {
     QKeySequence a(code);
 
-    int keycode = 0;
+    int key { QKeySequence::UnknownKey };
+    Qt::KeyboardModifiers modifiers { Qt::NoModifier };
 
     // Send a dummy keycode if we couldn't convert the key sequence.
     // This is done so the main code can output a warning for bad
     // mappings.
     if (a.isEmpty())
         QCoreApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
-                                keycode, true));
+                                key, Qt::NoModifier, QEvent::KeyPress));
 
     for (int i = 0; i < a.count(); i++)
     {
-        keycode = a[i];
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        key       = a[i] & ~(Qt::MODIFIER_MASK);
+        modifiers = static_cast<Qt::KeyboardModifiers>(a[i] & Qt::MODIFIER_MASK);
+#else
+        key       = a[i].key();
+        modifiers = a[i].keyboardModifiers();
+#endif
 
         QCoreApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
-                                keycode, true));
+                                key, modifiers, QEvent::KeyPress));
         QCoreApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
-                                keycode, false));
+                                key, modifiers, QEvent::KeyRelease));
     }
 }
 

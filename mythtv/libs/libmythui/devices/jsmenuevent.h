@@ -17,22 +17,25 @@ class JoystickKeycodeEvent : public QEvent
 {
   public:
     JoystickKeycodeEvent(
-        QString jsmenuevent_text, int key_code, bool key_down) :
+        QString jsmenuevent_text, int key_code,
+        Qt::KeyboardModifiers key_modifiers, QEvent::Type key_action) :
         QEvent(kEventType), m_jsmenueventtext(std::move(jsmenuevent_text)),
-        m_keycode(key_code), m_keydown(key_down)
+        m_key(key_code), m_keyModifiers(key_modifiers), m_keyAction(key_action)
     {
     }
 
     QString getJoystickMenuText() const { return m_jsmenueventtext; }
-    int getKeycode() const { return m_keycode; }
-    bool isKeyDown() const { return m_keydown; }
+    int key() const { return m_key; }
+    Qt::KeyboardModifiers keyModifiers() const { return m_keyModifiers; }
+    QEvent::Type keyAction() const { return m_keyAction; }
 
     static Type kEventType;
 
   private:
     QString m_jsmenueventtext;
-    int m_keycode;
-    bool m_keydown;
+    int m_key;
+    Qt::KeyboardModifiers m_keyModifiers;
+    QEvent::Type m_keyAction;
 };
 
 #endif
