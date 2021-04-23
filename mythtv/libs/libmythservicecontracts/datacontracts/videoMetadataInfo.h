@@ -168,7 +168,7 @@ inline void VideoMetadataInfo::InitializeCustomTypes()
     if (QMetaType::type( "DTC::CastMemberList*" ) == 0)
         CastMemberList::InitializeCustomTypes();
 
-    if (QMetaType::type( "DTC::GenreMemberList*" ) == 0)
+    if (QMetaType::type( "DTC::GenreList*" ) == 0)
         GenreList::InitializeCustomTypes();
 }
 
