@@ -2507,6 +2507,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
         if (a.isEmpty())
             continue;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         int keyCode = a[0];
         Qt::KeyboardModifiers modifiers = Qt::NoModifier;
         QStringList parts = key.split('+');
@@ -2521,6 +2522,10 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
             if (parts[j].toUpper() == "META")
                 modifiers |= Qt::MetaModifier;
         }
+#else
+        int keyCode = a[0].key();
+        Qt::KeyboardModifiers modifiers = a[0].keyboardModifiers();
+#endif
 
         QCoreApplication::postEvent(
             GetMythMainWindow(),
