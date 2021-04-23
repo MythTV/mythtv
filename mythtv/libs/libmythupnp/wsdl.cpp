@@ -472,7 +472,7 @@ bool Wsdl::IsCustomType( QString &sTypeName )
 
         default:
             // for now, treat QFileInfo as a string.  Need to turn into MTOM later.
-            if (id == QMetaType::type( "QFileInfo" ))
+            if (id == qMetaTypeId<QFileInfo>())
                 return false;
             break;
     }

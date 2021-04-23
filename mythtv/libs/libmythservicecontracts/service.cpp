@@ -24,7 +24,7 @@ QVariant Service::ConvertToVariant( int nType, void *pValue )
     // -=>NOTE: This assumes any UserType will be derived from QObject...
     //          (Exception for QFileInfo )
 
-    if ( nType == QMetaType::type( "QFileInfo" ))
+    if ( nType == qMetaTypeId<QFileInfo>() )
         return QVariant::fromValue< QFileInfo >( *((QFileInfo *)pValue) );
 
     if (nType > QMetaType::User)

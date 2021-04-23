@@ -328,7 +328,7 @@ inline void ChannelInfo::InitializeCustomTypes()
 {
     qRegisterMetaType< ChannelInfo* >();
 
-    if (QMetaType::type( "DTC::Program*" ) == 0)
+    if (qMetaTypeId<DTC::Program*>() == 0)
         Program::InitializeCustomTypes();
 }
 
@@ -336,16 +336,16 @@ inline void Program::InitializeCustomTypes()
 {
     qRegisterMetaType< Program* >();
 
-    if (QMetaType::type( "DTC::ChannelInfo*" ) == 0)
+    if (qMetaTypeId<DTC::ChannelInfo*>() == QMetaType::UnknownType)
         ChannelInfo::InitializeCustomTypes();
 
-    if (QMetaType::type( "DTC::RecordingInfo*" ) == 0)
+    if (qMetaTypeId<DTC::RecordingInfo*>() == QMetaType::UnknownType)
         RecordingInfo::InitializeCustomTypes();
 
-    if (QMetaType::type( "DTC::ArtworkInfoList*" ) == 0)
+    if (qMetaTypeId<DTC::ArtworkInfoList*>() == QMetaType::UnknownType)
         ArtworkInfoList::InitializeCustomTypes();
 
-     if (QMetaType::type( "DTC::CastMemberList*" ) == 0)
+    if (qMetaTypeId<DTC::CastMemberList*>() == QMetaType::UnknownType)
         CastMemberList::InitializeCustomTypes();
 }
 
