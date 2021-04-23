@@ -460,22 +460,33 @@ MythFontProperties *MythFontProperties::ParseFromXml(
         {
             LOG(VB_GUI, LOG_DEBUG, "Available fonts:");
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             QFontDatabase database;
-
             QStringList families = database.families();
+#else
+            QStringList families = QFontDatabase::families();
+#endif
             for (const QString & family : qAsConst(families))
             {
                 QStringList family_styles;
 
                 family_styles << family + "::";
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
                 QStringList styles = database.styles(family);
+#else
+                QStringList styles = QFontDatabase::styles(family);
+#endif
                 for (const QString & style : qAsConst(styles))
                 {
                     family_styles << style + ":";
 
                     QString sizes;
                     bool    tic = false;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
                     QList<int> pointList = database.smoothSizes(family, style);
+#else
+                    QList<int> pointList = QFontDatabase::smoothSizes(family, style);
+#endif
                     for (int points : qAsConst(pointList))
                     {
                         if (tic)
