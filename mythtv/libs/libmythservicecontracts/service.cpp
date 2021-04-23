@@ -122,6 +122,7 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
             // Create Parent object so we can get to its metaObject
             // --------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             int nParentId = QMetaType::type( sParentFQN.toUtf8() );
 
             auto *pParentClass = (QObject *)QMetaType::create( nParentId );
@@ -131,6 +132,10 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
             const QMetaObject *pMetaObject = pParentClass->metaObject();
 
             QMetaType::destroy( nParentId, pParentClass );
+#else
+            const QMetaObject *pMetaObject =
+                QMetaType::fromName( sParentFQN.toUtf8() ).metaObject();
+#endif
 
             // --------------------------------------------------------------
             // Now look up enum
