@@ -58,7 +58,12 @@ void XmlPListSerializer::RenderValue(const QString &sName,
         return;
     }
 
-    switch(vValue.type())
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto type = static_cast<QMetaType::Type>(vValue.type());
+#else
+    auto type = vValue.typeId();
+#endif
+    switch( type )
     {
         case QMetaType::QVariantList:
         {
@@ -150,16 +155,16 @@ void XmlPListSerializer::RenderList(const QString &sName,
     bool array = true;
     if (!list.isEmpty())
     {
-        QVariant::Type t = list[0].type();
-        QListIterator<QVariant> it(list);
-        while (it.hasNext())
-        {
-            if (it.next().type() != t)
-            {
-                array = false;
-                break;
-            }
-        }
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        auto t = static_cast<QMetaType::Type>(list[0].type());
+        array = std::all_of(list.cbegin(), list.cend(),
+                            [t](const QVariant& v)
+                                { return t == static_cast<QMetaType::Type>(v.type()); } );
+#else
+        auto t = list[0].typeId();
+        array = std::all_of(list.cbegin(), list.cend(),
+                            [t](const QVariant& v) { return t == v.typeId(); } );
+#endif
     }
 
     QString sItemName = GetItemName(sName);
