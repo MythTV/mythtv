@@ -65,31 +65,51 @@ void TestMythBinaryPList::plist_read(void)
     // Check values
     QVariant variant = plist.GetValue("CFBundleIconFile");
     QVERIFY(variant.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant.type(), QVariant::String);
+#else
+    QCOMPARE(variant.typeId(), QMetaType::QString);
+#endif
     auto icon_name = variant.value<QString>();
     QCOMPARE(icon_name, QString("@ICON@"));
 
     variant = plist.GetValue("CFBundleDocumentTypes");
     QVERIFY(variant.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant.type(), QVariant::List);
+#else
+    QCOMPARE(variant.typeId(), QMetaType::QVariantList);
+#endif
     auto list = variant.value<QVariantList>();
     QCOMPARE(list.size(), 1);
 
     variant = list[0];
     QVERIFY(variant.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant.type(), QVariant::Map);
+#else
+    QCOMPARE(variant.typeId(), QMetaType::QVariantMap);
+#endif
     auto map = variant.value<QVariantMap>();
     QCOMPARE(map.size(), 5);
 
     QVERIFY(map.contains("CFBundleTypeExtensions"));
     QVariant variant2 = map["CFBundleTypeExtensions"];
     QVERIFY(variant2.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant2.type(), QVariant::List);
+#else
+    QCOMPARE(variant2.typeId(), QMetaType::QVariantList);
+#endif
     auto list2 = variant2.value<QVariantList>();
     QCOMPARE(list2.size(), 5);
     QVariant variant3 = list2[4];
     QVERIFY(variant3.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant3.type(), QVariant::String);
+#else
+    QCOMPARE(variant3.typeId(), QMetaType::QString);
+#endif
     auto ext_name = variant3.value<QString>();
     QCOMPARE(ext_name, QString("xhtml"));
     
@@ -100,34 +120,58 @@ void TestMythBinaryPList::plist_read(void)
     // Test float twice. Catch conversion in place.
     variant = plist.GetValue("TestFloat");
     QVERIFY(variant.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant.type(), QVariant::Double);
+#else
+    QCOMPARE(variant.typeId(), QMetaType::Double);
+#endif
     auto pi = variant.value<double>();
     QCOMPARE(pi, 3.1415926545897932);
     variant = plist.GetValue("TestFloat");
     QVERIFY(variant.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant.type(), QVariant::Double);
+#else
+    QCOMPARE(variant.typeId(), QMetaType::Double);
+#endif
     pi = variant.value<double>();
     QCOMPARE(pi, 3.1415926545897932);
     variant = plist.GetValue("TestFloat2");
     QVERIFY(variant.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant.type(), QVariant::Double);
+#else
+    QCOMPARE(variant.typeId(), QMetaType::Double);
+#endif
     pi = variant.value<double>();
     QCOMPARE(pi, 3.1415926545897932);
 
     // Check dates
     variant = plist.GetValue("TestDate");
     QVERIFY(variant.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant.type(), QVariant::DateTime);
+#else
+    QCOMPARE(variant.typeId(), QMetaType::QDateTime);
+#endif
     auto when = variant.value<QDateTime>();
     QCOMPARE(when, test_datetime);
     variant = plist.GetValue("TestDate");
     QVERIFY(variant.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant.type(), QVariant::DateTime);
+#else
+    QCOMPARE(variant.typeId(), QMetaType::QDateTime);
+#endif
     when = variant.value<QDateTime>();
     QCOMPARE(when, test_datetime);
     variant = plist.GetValue("TestDate2");
     QVERIFY(variant.isValid());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QCOMPARE(variant.type(), QVariant::DateTime);
+#else
+    QCOMPARE(variant.typeId(), QMetaType::QDateTime);
+#endif
     when = variant.value<QDateTime>();
     QCOMPARE(when, test_datetime);
 }

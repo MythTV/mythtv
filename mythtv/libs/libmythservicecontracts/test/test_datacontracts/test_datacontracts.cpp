@@ -43,8 +43,13 @@ void TestDataContracts::test_channelinfo(void)
 
     // Convert to QVariant
     QVariant v = QVariant::fromValue(pChan);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QVariant::Type known = QVariant::nameToType("DTC::ChannelInfo*");
     QVariant::Type qtype = v.type();
+#else
+    QMetaType known = QMetaType::fromName("DTC::ChannelInfo*");
+    QMetaType qtype = v.metaType();
+#endif
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::Program
@@ -67,8 +72,13 @@ void TestDataContracts::test_program(void)
 
     // Convert to QVariant
     QVariant v = QVariant::fromValue(pProgram);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QVariant::Type known = QVariant::nameToType("DTC::Program*");
     QVariant::Type qtype = v.type();
+#else
+    QMetaType known = QMetaType::fromName("DTC::Program*");
+    QMetaType qtype = v.metaType();
+#endif
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::Program
@@ -98,8 +108,13 @@ void TestDataContracts::test_programlist(void)
 
     // Convert to QVariant
     QVariant v = QVariant::fromValue(pPrograms);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QVariant::Type known = QVariant::nameToType("DTC::ProgramList*");
     QVariant::Type qtype = v.type();
+#else
+    QMetaType known = QMetaType::fromName("DTC::ProgramList*");
+    QMetaType qtype = v.metaType();
+#endif
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::ProgramList
@@ -135,8 +150,13 @@ void TestDataContracts::test_recrule(void)
 
     // Convert to QVariant
     QVariant v = QVariant::fromValue(pRule);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QVariant::Type known = QVariant::nameToType("DTC::RecRule*");
     QVariant::Type qtype = v.type();
+#else
+    QMetaType known = QMetaType::fromName("DTC::RecRule*");
+    QMetaType qtype = v.metaType();
+#endif
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::RecRule
@@ -162,8 +182,13 @@ void TestDataContracts::test_recordinginfo(void)
 
     // Convert to QVariant
     QVariant v = QVariant::fromValue(pRecording);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QVariant::Type known = QVariant::nameToType("DTC::RecordingInfo*");
     QVariant::Type qtype = v.type();
+#else
+    QMetaType known = QMetaType::fromName("DTC::RecordingInfo*");
+    QMetaType qtype = v.metaType();
+#endif
     QCOMPARE(known, qtype);
 
     // Convert back to DTC::RecordingInfo
