@@ -346,9 +346,14 @@ QString getDownloadFilename(const QString& title, const QString& url)
         dir.mkdir(fileprefix);
 
     QByteArray titlearr(title.toLatin1());
-    quint16 titleChecksum = qChecksum(titlearr.data(), titlearr.length());
     QByteArray urlarr(url.toLatin1());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    quint16 titleChecksum = qChecksum(titlearr.data(), titlearr.length());
     quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());
+#else
+    quint16 titleChecksum = qChecksum(titlearr);
+    quint16 urlChecksum = qChecksum(urlarr);
+#endif
     QUrl qurl(url);
     QString ext = QFileInfo(qurl.path()).suffix();
     QString basefilename = QString("thumbnail_%1_%2.%3")

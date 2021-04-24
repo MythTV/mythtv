@@ -1165,8 +1165,12 @@ void MainServer::customEvent(QEvent *e)
                 extra.push_back(msg);
                 extra.push_back(datetime);
                 extra.push_back(QString::number(data.size()));
-                extra.push_back(
-                    QString::number(qChecksum(data.constData(), data.size())));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                quint16 checksum = qChecksum(data.constData(), data.size());
+#else
+                quint16 checksum = qChecksum(data);
+#endif
+                extra.push_back(QString::number(checksum));
                 extra.push_back(QString(data.toBase64()));
 
                 for (uint i = 4 ; i < (uint) me->ExtraDataCount(); i++)
@@ -7649,8 +7653,12 @@ void MainServer::HandlePixmapGetIfModified(
                     else
                         strlist += QString::number(UINT_MAX);
                     strlist += QString::number(data.size());
-                    strlist += QString::number(qChecksum(data.constData(),
-                                               data.size()));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                    quint16 checksum = qChecksum(data.constData(), data.size());
+#else
+                    quint16 checksum = qChecksum(data);
+#endif
+                    strlist += QString::number(checksum);
                     strlist += QString(data.toBase64());
                 }
                 else
