@@ -65,7 +65,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
 
         int nRetIdx = QMetaType::type( m_oMethod.typeName() );
 
-        if (nRetIdx != 0)
+        if (nRetIdx != QMetaType::UnknownType)
         {
             param[ 0 ] = QMetaType::create( nRetIdx );
             types[ 0 ] = nRetIdx;
@@ -73,7 +73,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
         else
         {
             param[ 0 ] = nullptr;
-            types[ 0 ] = 0;
+            types[ 0 ] = QMetaType::UnknownType;
         }
 
         // --------------------------------------------------------------
@@ -88,7 +88,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
             int     nId        = QMetaType::type( paramTypes[ nIdx ] );
             void   *pParam     = nullptr;
 
-            if (nId != 0)
+            if (nId != QMetaType::UnknownType)
             {
                 pParam = QMetaType::create( nId );
             }
@@ -125,7 +125,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
 
         for (int nIdx=1; nIdx < paramNames.length()+1; ++nIdx)
         {
-            if ((types[ nIdx ] != 0) && (param[ nIdx ] != nullptr))
+            if ((types[ nIdx ] != QMetaType::UnknownType) && (param[ nIdx ] != nullptr))
                 QMetaType::destroy( types[ nIdx ], param[ nIdx ] );
         }
     }
@@ -135,7 +135,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
             QString("MethodInfo::Invoke - An Exception Occurred: %1")
                  .arg(sMsg));
 
-        if  ((types[ 0 ] != 0) && (param[ 0 ] != nullptr ))
+        if  ((types[ 0 ] != QMetaType::UnknownType) && (param[ 0 ] != nullptr ))
             QMetaType::destroy( types[ 0 ], param[ 0 ] );
 
         throw;
@@ -161,7 +161,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
     {
         vReturn = pService->ConvertToVariant( types[ 0 ], param[ 0 ] );
 
-        if  (types[ 0 ] != 0)
+        if  (types[ 0 ] != QMetaType::UnknownType)
             QMetaType::destroy( types[ 0 ], param[ 0 ] );
     }
 
