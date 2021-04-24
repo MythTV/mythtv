@@ -4186,7 +4186,14 @@ void ProgramInfo::SaveAspect(
     if (type == MARK_ASPECT_CUSTOM)
         query.bindValue(":DATA", customAspect);
     else
-        query.bindValue(":DATA", QVariant::UInt);
+    {
+        // create NULL value
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        query.bindValue(":DATA", QVariant(QVariant::UInt));
+#else
+        query.bindValue(":DATA", QVariant(QMetaType(QMetaType::UInt)));
+#endif
+    }
 
     if (!query.exec())
         MythDB::DBError("aspect ratio change insert", query);
