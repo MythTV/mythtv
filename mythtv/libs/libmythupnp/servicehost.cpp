@@ -63,11 +63,17 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
         // Add a place for the Return value
         // --------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         int nRetIdx = QMetaType::type( m_oMethod.typeName() );
+        QMetaType oRetType = QMetaType(nRetIdx);
+#else
+        int nRetIdx = m_oMethod.returnType();
+        QMetaType oRetType = m_oMethod.returnMetaType();
+#endif
 
         if (nRetIdx != QMetaType::UnknownType)
         {
-            param[ 0 ] = QMetaType::create( nRetIdx );
+            param[ 0 ] = oRetType.create();
             types[ 0 ] = nRetIdx;
         }
         else
@@ -85,6 +91,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
             QString sValue     = lowerParams[ paramNames[ nIdx ].toLower() ];
             QString sParamType = paramTypes[ nIdx ];
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
             int     nId        = QMetaType::type( paramTypes[ nIdx ] );
             void   *pParam     = nullptr;
 
@@ -92,7 +99,12 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
             {
                 pParam = QMetaType::create( nId );
             }
-            else
+#else
+            QMetaType metaType = QMetaType::fromName( paramTypes[ nIdx ] );
+            void *pParam = metaType.create();
+            int nId = metaType.id();
+#endif
+            if (nId == QMetaType::UnknownType)
             {
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("MethodInfo::Invoke - Type unknown '%1'")
@@ -126,7 +138,10 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
         for (int nIdx=1; nIdx < paramNames.length()+1; ++nIdx)
         {
             if ((types[ nIdx ] != QMetaType::UnknownType) && (param[ nIdx ] != nullptr))
-                QMetaType::destroy( types[ nIdx ], param[ nIdx ] );
+            {
+                auto metaType = QMetaType( types[ nIdx ] );
+                metaType.destroy(param[ nIdx ]);
+            }
         }
     }
     catch (QString &sMsg)
@@ -136,7 +151,10 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
                  .arg(sMsg));
 
         if  ((types[ 0 ] != QMetaType::UnknownType) && (param[ 0 ] != nullptr ))
-            QMetaType::destroy( types[ 0 ], param[ 0 ] );
+        {
+            auto metaType = QMetaType( types[ 0 ] );
+            metaType.destroy(param[ 0 ]);
+        }
 
         throw;
     }
@@ -161,8 +179,11 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
     {
         vReturn = pService->ConvertToVariant( types[ 0 ], param[ 0 ] );
 
-        if  (types[ 0 ] != QMetaType::UnknownType)
-            QMetaType::destroy( types[ 0 ], param[ 0 ] );
+        if (types[ 0 ] != QMetaType::UnknownType)
+        {
+            auto metaType = QMetaType( types[ 0 ] );
+            metaType.destroy(param[ 0 ]);
+        }
     }
 
     // --------------------------------------------------------------
