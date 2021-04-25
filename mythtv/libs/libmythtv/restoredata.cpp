@@ -316,7 +316,7 @@ void RestoreData::Restore()
     int num_visible = 0;
     for (auto & cd : m_ocd)
     {
-        QString msg = QString("Channel %1 \'%2\' update ").arg(cd.channum).arg(cd.name);
+        QString msg = QString("Channel %1 \'%2\' update ").arg(cd.channum, cd.name);
         if (cd.found_xmltvid)
         {
             msg += QString("xmltvid(%1) ").arg(cd.xmltvid);

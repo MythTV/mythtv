@@ -935,13 +935,14 @@ void CC608Decoder::DecodeWSS(const unsigned char *buf)
             .arg(QString::fromStdString(formats[wss & 7]),
                  (wss & 0x0010) ? "film"                 : "camera",
                  (wss & 0x0020) ? "MA/CP"                : "standard",
-                 (wss & 0x0040) ? "modulated"            : "no")
-            .arg((wss & 0x0080) ? "1"                    : "0")
-            .arg((wss & 0x0100) ? "have TTX subtitles; " : "",
+                 (wss & 0x0040) ? "modulated"            : "no",
+                 (wss & 0x0080) ? "1"                    : "0",
+                 (wss & 0x0100) ? "have TTX subtitles; " : "",
                  QString::fromStdString(subtitles[(wss >> 9) & 3]),
                  (wss & 0x0800) ? "surround sound; "     : "",
-                 (wss & 0x1000) ? "asserted"             : "unknown",
-                 (wss & 0x2000) ? "restricted"           : "not restricted"));
+                 (wss & 0x1000) ? "asserted"             : "unknown")
+            // Qt < 5.14 only allows a max of nin string arguments in a single call
+            .arg((wss & 0x2000) ? "restricted"           : "not restricted")); // clazy:exclude=qstring-arg
 
     if (parity & 1)
     {

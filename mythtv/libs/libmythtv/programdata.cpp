@@ -119,10 +119,7 @@ QString DBPerson::GetRole(void) const
 
 QString DBPerson::toString(void) const
 {
-    return QString("%1 %2 as %3")
-        .arg(m_role)
-        .arg(m_name)
-        .arg(m_character);
+    return QString("%1 %2 as %3").arg(m_role).arg(m_name, m_character);
 }
 
 uint DBPerson::InsertDB(MSqlQuery &query, uint chanid,
