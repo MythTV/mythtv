@@ -5210,26 +5210,13 @@ version2num(){
     echo $1 | awk -F. '{ print ( ( $1 * 256 ) + $2 ) * 256 + $3; };'
 }
 
-BRANCH=$(git branch | grep '^*'  | cut -b 3-)
-
 # Minimum supported Qt version
-case $BRANCH in
-    *[Qq][Tt]6*) QT_MIN_VERSION_STR="6.0" ;;
-    *)           QT_MIN_VERSION_STR="5.9" ;;
-esac
-QT_MIN_VERSION=$(version2num $QT_MIN_VERSION_STR)
-QT_MIN_VERSION_HEX=$(printf "0x%06x" $QT_MIN_VERSION)
+QT5_MIN_VERSION_STR="5.9"
+QT6_MIN_VERSION_STR="6.0"
 
 # qmake-qt5 /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 if [ x"$qmake" = "xqmake" ]; then
-    case $BRANCH in
-        *[Qq][Tt]6*)
-            CHECK_QMAKE=`which qmake-qt6 2>/dev/null`" /usr/lib64/qt6/bin/qmake /usr/lib/x86_64-linux-gnu/qt6/bin/qmake /usr/lib/i386-linux-gnu/qt6/bin/qmake /usr/lib/arm-linux-gnueabihf/qt6/bin/qmake /usr/local/lib/qt6/bin/qmake `which $qmake 2>/dev/null`"
-            ;;
-        *)
-            CHECK_QMAKE=`which qmake-qt5 2>/dev/null`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake `which $qmake 2>/dev/null`"
-            ;;
-    esac
+    CHECK_QMAKE=`which qmake-qt5 2>/dev/null`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake `which $qmake 2>/dev/null`"
 else
     CHECK_QMAKE=`which $qmake 2>/dev/null`" "`which qmake-qt5 2>/dev/null`" /usr/lib64/qt5/bin/qmake /usr/lib/x86_64-linux-gnu/qt5/bin/qmake /usr/lib/i386-linux-gnu/qt5/bin/qmake /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake /usr/local/lib/qt5/bin/qmake"
 fi
@@ -5240,6 +5227,12 @@ for i in $CHECK_QMAKE; do
         qt_version_str=`$i -query QT_VERSION`
         qt_version=$(version2num $qt_version_str)
         qt_version_hex=$(printf "0x%06x" $qt_version)
+        case $qt_version_str in
+            6*) QT_MIN_VERSION_STR=$QT6_MIN_VERSION_STR ;;
+            *)  QT_MIN_VERSION_STR=$QT5_MIN_VERSION_STR ;;
+        esac
+        QT_MIN_VERSION=$(version2num $QT_MIN_VERSION_STR)
+        QT_MIN_VERSION_HEX=$(printf "0x%06x" $QT_MIN_VERSION)
         if [ $qt_version -ge $QT_MIN_VERSION ]; then
             found_qmake=$i
             check_cxxflags -DQT_DISABLE_DEPRECATED_BEFORE=$QT_MIN_VERSION_HEX
@@ -5252,7 +5245,7 @@ for i in $CHECK_QMAKE; do
     fi
 done
 if [ x"$found_qmake" = "x" ]; then
-    die "qmake for Qt $QT_MIN_VERSION_STR or newer not found.  Please specify the correct qmake with --qmake="
+    die "qmake for Qt $QT5_MIN_VERSION_STR or newer not found.  Please specify the correct qmake with --qmake="
 else
     qmake=$found_qmake
 fi
