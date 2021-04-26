@@ -485,7 +485,7 @@ int SourceUtil::CreateSource( const QString& sourcename,
                   "lcnoffset) "
                   "VALUES (:NAME, :XMLTVGRABBER, :USERID, :FREQTABLE, :LINEUPID, :PASSWORD, "
                   ":USEEIT, :CONFIGPATH, :NITID, :BOUQUETID, :REGIONID, :SCANFREQUENCY, "
-                  ":LCNOFFSET");
+                  ":LCNOFFSET)");
 
     query.bindValue(":NAME", sourcename);
     query.bindValue(":XMLTVGRABBER", grabber);
