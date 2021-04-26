@@ -218,8 +218,8 @@ static GlobalComboBoxSetting *TVFormat()
     gc->setLabel(QObject::tr("TV format"));
 
     QStringList list = ChannelTVFormat::GetFormats();
-    for (int i = 0; i < list.size(); i++)
-        gc->addSelection(list[i]);
+    for (const QString& item : qAsConst(list))
+        gc->addSelection(item);
 
     gc->setHelpText(QObject::tr("The TV standard to use for viewing TV."));
     return gc;

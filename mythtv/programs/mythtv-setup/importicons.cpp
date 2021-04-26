@@ -50,10 +50,8 @@ ImportIconsWizard::~ImportIconsWizard()
     if (m_tmpDir.exists())
     {
         QStringList files = m_tmpDir.entryList();
-        for (int i = 0; i < files.size(); ++i)
-        {
-            m_tmpDir.remove(files.at(i));
-        }
+        for (const QString &file : qAsConst(files))
+            m_tmpDir.remove(file);
         m_tmpDir.rmpath(m_tmpDir.absolutePath());
     }
 }
@@ -689,9 +687,8 @@ bool ImportIconsWizard::search(const QString& strParam)
         QString prevIconName;
         int namei = 1;
 
-        for (int x = 0; x < strSplit.size(); ++x)
+        for (const QString& row : qAsConst(strSplit))
         {
-            QString row = strSplit[x];
             if (row != "#" )
             {
                 QStringList ret = extract_csv(row);
