@@ -5579,7 +5579,9 @@ case $target_os in
         CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
         # Workaround compile errors from missing ru_maxrss
         add_cppflags -D_DARWIN_C_SOURCE
-
+	#use macports includedir
+	append CONFIG_INCLUDEPATH "${sysroot}/opt/local/include"
+	
         ###### Standard ffmpeg configure stuff follows:
         enabled ppc && add_asflags -force_cpusubtype_ALL
         install_name_dir_default='$(SHLIBDIR)'
