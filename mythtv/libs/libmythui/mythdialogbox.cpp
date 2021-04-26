@@ -877,10 +877,8 @@ void MythUISearchDialog::slotUpdateList(void)
 {
     m_itemList->Reset();
 
-    for (int x = 0; x < m_list.size(); x++)
+    for (const QString& item : qAsConst(m_list))
     {
-        QString item = m_list.at(x);
-
         if (m_matchAnywhere)
         {
             if (!item.contains(m_textEdit->GetText(), Qt::CaseInsensitive))

@@ -1431,9 +1431,9 @@ void MythUIType::ConnectDependants(bool recurse)
         operators.clear();
         QString name = it.value();
         QStringList tmp1 = name.split("&");
-        for (int i = 0; i < tmp1.size(); i++)
+        for (const QString& t1 : qAsConst(tmp1))
         {
-            QStringList tmp2 = tmp1[i].split("|");
+            QStringList tmp2 = t1.split("|");
 
             dependees.append(tmp2[0]);
             for (int j = 1; j < tmp2.size(); j++)

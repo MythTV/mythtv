@@ -2494,12 +2494,12 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
     handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     // Handle action remappings
-    for (int i = 0; i < actions.size(); ++i)
+    for (const QString& action : qAsConst(actions))
     {
-        if (!m_actionRemap.contains(actions[i]))
+        if (!m_actionRemap.contains(action))
             continue;
 
-        QString key = m_actionRemap[actions[i]];
+        QString key = m_actionRemap[action];
         if (key.isEmpty())
             return true;
 
