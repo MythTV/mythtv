@@ -1341,11 +1341,11 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
             }
 
             QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
-            for (int x = 0; x < filteredFiles.size(); x++)
+            for (const QString& file : qAsConst(filteredFiles))
             {
                 strList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
                                                        gCoreContext->GetBackendServerPort(),
-                                                       fi.path() + '/' + filteredFiles[x],
+                                                       fi.path() + '/' + file,
                                                        storageGroup);
             }
         }

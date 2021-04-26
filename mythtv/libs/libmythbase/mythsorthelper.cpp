@@ -36,6 +36,7 @@ void MythSortHelper::MythSortHelperCommon(void)
 #else
     m_exclList = m_exclusions.split(";", Qt::SkipEmptyParts);
 #endif
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < m_exclList.size(); i++)
       m_exclList[i] = m_exclList[i].trimmed();
 }
@@ -203,15 +204,11 @@ QString MythSortHelper::doPathname(const QString& pathname) const
     if (m_prefixMode == SortPrefixKeep)
 	return lpathname;
     QStringList parts = lpathname.split("/");
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int i = 0; i < parts.size(); ++i) {
-        bool excluded = false;
-        for (int j = 0; j < m_exclList.size(); ++j) {
-            if (parts[i].startsWith(m_exclList[j])) {
-                excluded = true;
-                break;
-            }
-        }
-        if (excluded)
+        if (std::any_of(m_exclList.cbegin(), m_exclList.cend(),
+                        [&parts,i](const QString& excl)
+                            { return parts[i].startsWith(excl); } ))
             continue;
         if (m_prefixMode == SortPrefixRemove)
             parts[i] = parts[i].remove(m_prefixesRegex);
