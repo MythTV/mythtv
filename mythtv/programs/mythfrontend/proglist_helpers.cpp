@@ -43,9 +43,9 @@ bool PhrasePopup::Create()
         new MythUIButtonListItem(m_phraseList, tr("<New Phrase>"), nullptr, false);
     }
 
-    for (int x = 0; x < m_list.size(); x++)
+    for (const QString& item : qAsConst(m_list))
     {
-        new MythUIButtonListItem(m_phraseList, m_list.at(x), nullptr, false);
+        new MythUIButtonListItem(m_phraseList, item, nullptr, false);
     }
 
     connect(m_phraseList, &MythUIButtonList::itemClicked,
@@ -229,9 +229,9 @@ bool PowerSearchPopup::Create()
     m_titleText->SetText(tr("Select Search"));
     new MythUIButtonListItem(m_phraseList, tr("<New Search>"), nullptr, false);
 
-    for (int x = 0; x < m_list.size(); x++)
+    for (const QString &item : qAsConst(m_list))
     {
-        new MythUIButtonListItem(m_phraseList, m_list.at(x), nullptr, false);
+        new MythUIButtonListItem(m_phraseList, item, nullptr, false);
     }
 
     connect(m_phraseList, &MythUIButtonList::itemClicked,
