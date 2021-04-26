@@ -327,8 +327,8 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
 
         QStringList list = pExtension->GetBasePaths();
 
-        for( int nIdx = 0; nIdx < list.size(); nIdx++)
-            m_basePaths.insert( list[ nIdx ], pExtension );
+        for( const QString& base : qAsConst(list))
+            m_basePaths.insert( base, pExtension );
 
         m_rwlock.unlock();
     }
@@ -346,8 +346,8 @@ void HttpServer::UnregisterExtension( HttpServerExtension *pExtension )
 
         QStringList list = pExtension->GetBasePaths();
 
-        for( int nIdx = 0; nIdx < list.size(); nIdx++)
-            m_basePaths.remove( list[ nIdx ], pExtension );
+        for( const QString& base : qAsConst(list))
+            m_basePaths.remove( base, pExtension );
 
         m_extensions.removeAll(pExtension);
 

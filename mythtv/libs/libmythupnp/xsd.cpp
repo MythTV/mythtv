@@ -931,10 +931,10 @@ QString Xsd::ReadPropertyMetadata( QObject *pObject, const QString& sPropName, c
 
         QString     sFullKey  = sKey + "=";
 
-        for (int nIdx2 = 0; nIdx2 < sOptions.size(); ++nIdx2)
+        for (const QString& option : qAsConst(sOptions))
         {
-            if (sOptions.at( nIdx2 ).startsWith( sFullKey ))
-                return sOptions.at( nIdx2 ).mid( sFullKey.length() );
+            if (option.startsWith( sFullKey ))
+                return option.mid( sFullKey.length() );
         }
     }
 

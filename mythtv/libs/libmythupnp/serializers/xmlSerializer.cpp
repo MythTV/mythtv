@@ -369,10 +369,10 @@ QString XmlSerializer::FindOptionValue( const QStringList &sOptions, const QStri
 {
     QString sKey = sName + "=";
 
-    for (int nIdx = 0; nIdx < sOptions.size(); ++nIdx)
+    for (const QString& option : qAsConst(sOptions))
     {
-        if (sOptions.at( nIdx ).startsWith( sKey ))
-            return sOptions.at( nIdx ).mid( sKey.length() );
+        if (option.startsWith( sKey ))
+            return option.mid( sKey.length() );
     }
 
     return QString();
