@@ -3384,9 +3384,9 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
         if (!handled && !tt_actions.isEmpty())
         {
-            for (int i = 0; i < tt_actions.size(); i++)
+            for (const QString& action : qAsConst(tt_actions))
             {
-                emit HandleTeletextAction(tt_actions[i], handled);
+                emit HandleTeletextAction(action, handled);
                 if (handled)
                     return true;
             }
@@ -3404,9 +3404,9 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
         if (!handled && !actions.isEmpty())
         {
-            for (int i = 0; i < actions.size(); i++)
+            for (const QString& action : qAsConst(actions))
             {
-                emit HandleITVAction(actions[i], handled);
+                emit HandleITVAction(action, handled);
                 if (handled)
                     return true;
             }

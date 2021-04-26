@@ -378,13 +378,13 @@ bool HDHRStreamHandler::Connect(void)
     }
 
     QStringList devices = m_device.split(",");
-    for (int i = 0; i < devices.size(); ++i)
+    for (const QString& device : qAsConst(devices))
     {
-        QByteArray ba = devices[i].toUtf8();
+        QByteArray ba = device.toUtf8();
         int n = hdhomerun_device_selector_load_from_str(
             m_deviceSelector, ba.data());
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Added %1 devices from %3")
-            .arg(n).arg(devices[i]));
+            .arg(n).arg(device));
     }
 
     m_hdhomerunDevice = hdhomerun_device_selector_choose_and_lock(

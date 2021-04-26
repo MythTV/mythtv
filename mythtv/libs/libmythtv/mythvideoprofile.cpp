@@ -75,10 +75,10 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
     if (!cmp.isEmpty())
     {
         cmp.replace(QLatin1String(" "),QLatin1String(""));
-        QStringList expr = cmp.split("&");
-        for (int ix = 0; ix < expr.size(); ++ix)
+        QStringList exprList = cmp.split("&");
+        for (const QString& expr : qAsConst(exprList))
         {
-            if (expr[ix].isEmpty())
+            if (expr.isEmpty())
             {
                 isOK = false;
                 continue;
@@ -86,7 +86,7 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
             if (IValue > 0)
             {
                 QRegularExpression regex("^([0-9.]*)([^0-9.]*)([0-9.]*)$");
-                QRegularExpressionMatch rmatch = regex.match(expr[ix]);
+                QRegularExpressionMatch rmatch = regex.match(expr);
 
                 int value1 = 0;
                 int value2 = 0;
