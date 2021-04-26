@@ -4052,11 +4052,11 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
             }
 
             QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
-            for (int x = 0; x < filteredFiles.size(); x++)
+            for (const QString& file : qAsConst(filteredFiles))
             {
                 fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
                                                         gCoreContext->GetBackendServerPort(),
-                                                        fi.path() + '/' + filteredFiles[x],
+                                                        fi.path() + '/' + file,
                                                         storageGroup);
             }
         }
@@ -4140,11 +4140,11 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
 
                     QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
 
-                    for (int x = 0; x < filteredFiles.size(); x++)
+                    for (const QString& file : qAsConst(filteredFiles))
                     {
                         fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
                                                                 gCoreContext->GetBackendServerPort(),
-                                                                fi.path() + '/' + filteredFiles[x],
+                                                                fi.path() + '/' + file,
                                                                 storageGroup);
                     }
                 }
@@ -6239,9 +6239,9 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
     fi.setFile(mdata->Filename(false));
     QString startDir = fi.path();
 
-    for (int x = 0; x < files.size(); x++)
+    for (const QString& file : qAsConst(files))
     {
-        fi.setFile(files.at(x));
+        fi.setFile(file);
         auto *image = new AlbumArtImage();
         image->m_filename = startDir + '/' + fi.fileName();
         image->m_hostname = gCoreContext->GetHostName();

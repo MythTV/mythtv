@@ -739,11 +739,9 @@ bool Video::UpdateVideoMetadata ( int           nId,
         QStringList genresList = sGenres.split(',', Qt::SkipEmptyParts);
 #endif
 
-        for (int x = 0; x < genresList.size(); x++)
-        {
-            QString genre = genresList.at(x).simplified();
-            genres.push_back(VideoMetadata::genre_list::value_type(-1, genre));
-        }
+        std::transform(genresList.cbegin(), genresList.cend(), std::back_inserter(genres),
+                       [](const QString& name)
+                           {return VideoMetadata::genre_list::value_type(-1, name.simplified());} );
 
         metadata->SetGenres(genres);
         update_required = true;
@@ -758,11 +756,9 @@ bool Video::UpdateVideoMetadata ( int           nId,
         QStringList castList = sCast.split(',', Qt::SkipEmptyParts);
 #endif
 
-        for (int x = 0; x < castList.size(); x++)
-        {
-            QString castName = castList.at(x).simplified();
-            cast.push_back(VideoMetadata::cast_list::value_type(-1, castName));
-        }
+        std::transform(castList.cbegin(), castList.cend(), std::back_inserter(cast),
+                       [](const QString& name)
+                           {return VideoMetadata::cast_list::value_type(-1, name.simplified());} );
 
         metadata->SetCast(cast);
         update_required = true;
@@ -777,11 +773,9 @@ bool Video::UpdateVideoMetadata ( int           nId,
         QStringList countryList = sCountries.split(',', Qt::SkipEmptyParts);
 #endif
 
-        for (int x = 0; x < countryList.size(); x++)
-        {
-            QString country = countryList.at(x).simplified();
-            countries.push_back(VideoMetadata::country_list::value_type(-1, country));
-        }
+        std::transform(countryList.cbegin(), countryList.cend(), std::back_inserter(countries),
+                       [](const QString& name)
+                           {return VideoMetadata::country_list::value_type(-1, name.simplified());} );
 
         metadata->SetCountries(countries);
         update_required = true;
