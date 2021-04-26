@@ -509,7 +509,6 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 void GameHandler::VerifyGameDB(GameHandler *handler)
 {
     int counter = 0;
-    GameScanMap::Iterator iter;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT romname,rompath,gamename FROM gamemetadata "
@@ -537,7 +536,12 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
         QString GameName = query.value(2).toString();
         if (!RomName.isEmpty())
         {
-            if ((iter = m_gameMap.find(RomName)) != m_gameMap.end())
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            auto iter = m_gameMap.find(RomName);
+#else
+            auto iter = m_gameMap.constFind(RomName);
+#endif
+            if (iter != m_gameMap.end())
             {
                 // If it's both on disk and in the database we're done with it.
                 m_gameMap.erase(iter);
@@ -588,12 +592,9 @@ int GameHandler::buildFileCount(const QString& directory, GameHandler *handler)
                 "^" + Info.suffix() + "$",
                 QRegularExpression::CaseInsensitiveOption };
             QStringList result;
-            for (int x = 0; x < handler->m_validextensions.size(); x++)
-            {
-                QString extension = handler->m_validextensions.at(x);
-                if (extension.contains(r))
-                    result.append(extension);
-            }
+            QStringList& exts = handler->m_validextensions;
+            std::copy_if(exts.cbegin(), exts.cend(), std::back_inserter(result),
+                         [&r](const QString& extension){ return extension.contains(r); } );
             if (result.isEmpty())
                 continue;
         }
@@ -651,13 +652,9 @@ void GameHandler::buildFileList(const QString& directory, GameHandler *handler,
                 "^" + Info.suffix() + "$",
                 QRegularExpression::CaseInsensitiveOption };
             QStringList result;
-            for (int x = 0; x < handler->m_validextensions.size(); x++)
-            {
-                QString extension = handler->m_validextensions.at(x);
-                if (extension.contains(r))
-                    result.append(extension);
-            }
-
+            QStringList& exts = handler->m_validextensions;
+            std::copy_if(exts.cbegin(), exts.cend(), std::back_inserter(result),
+                         [&r](const QString& extension){ return extension.contains(r); } );
             if (result.isEmpty())
                 continue;
         }
