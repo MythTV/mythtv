@@ -216,8 +216,8 @@ public:
     MenuNodeTuple(const MenuBase &menu, const QDomNode &node) :
         m_menu(menu), m_node(node) {}
     MenuNodeTuple(void) : m_menu(MenuBase()) {}
-    const MenuBase &m_menu;
-    const QDomNode  m_node;
+    const MenuBase m_menu;
+    const QDomNode m_node;
 };
 
 Q_DECLARE_METATYPE(MenuNodeTuple)
