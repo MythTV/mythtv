@@ -15,7 +15,7 @@ void SatIPRTCPPacket::parse()
 
     while (offset < pkt_length - 3)
     {
-        uint8_t type = (uint8_t)m_data[offset + 1];
+        auto type = (uint8_t)m_data[offset + 1];
         uint16_t length = ((m_data[offset + 2] & 0xFF) << 8) | (m_data[offset + 3] & 0xFF);
         length++;
 
