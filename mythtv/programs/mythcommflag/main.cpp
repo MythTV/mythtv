@@ -243,12 +243,12 @@ static int SetCutList(uint chanid, const QDateTime& starttime, QString newCutLis
     QStringList tokens = newCutList.split(",", Qt::SkipEmptyParts);
 #endif
 
-    for (int i = 0; i < tokens.size(); i++)
+    for (const QString& token : qAsConst(tokens))
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList cutpair = tokens[i].split("-", QString::SkipEmptyParts);
+        QStringList cutpair = token.split("-", QString::SkipEmptyParts);
 #else
-        QStringList cutpair = tokens[i].split("-", Qt::SkipEmptyParts);
+        QStringList cutpair = token.split("-", Qt::SkipEmptyParts);
 #endif
         cutlist[cutpair[0].toInt()] = MARK_CUT_START;
         cutlist[cutpair[1].toInt()] = MARK_CUT_END;
