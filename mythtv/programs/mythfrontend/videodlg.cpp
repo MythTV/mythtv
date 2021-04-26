@@ -2075,7 +2075,6 @@ void VideoDialog::searchComplete(const QString& string)
     LOG(VB_GENERAL, LOG_DEBUG, QString("Jumping to: %1").arg(string));
 
     MythGenericTree *parent = m_d->m_currentNode->getParent();
-    QStringList childList;
     QList<MythGenericTree*> *children = nullptr;
     QMap<int, QString> idTitle;
 

@@ -591,7 +591,7 @@ bool UPnpCDSMusic::LoadArtists(const UPnpCDSRequest *pRequest,
     {
         int nArtistId = query.value(0).toInt();
         QString sArtistName = query.value(1).toString();
-        QStringList sGenres = query.value(2).toString().split(',');
+//      QStringList sGenres = query.value(2).toString().split(',');
         int nAlbumCount = query.value(3).toInt();
 
         CDSObject* pContainer = CDSObject::CreateMusicArtist( CreateIDString(sRequestId, "Artist", nArtistId),

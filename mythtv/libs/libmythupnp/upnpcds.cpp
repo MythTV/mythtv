@@ -907,7 +907,6 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Search( UPnpCDSRequest *pRequest )
     // -=>TODO: Need to add Filter & Sorting Support.
     // -=>TODO: Need to add Sub-Folder/Category Support!!!!!
 
-    QStringList sEmptyList;
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDSExtension::Search : m_sClass = %1 : "
                 "m_sSearchClass = %2")

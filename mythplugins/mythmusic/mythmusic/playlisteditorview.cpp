@@ -977,7 +977,6 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
     if (node->getAction() == "all tracks")
     {
         QMultiMap<QString, int> map;
-        QStringList list;
         bool isAlbum = false;
         auto *parentNode = dynamic_cast<MusicGenericTree*>(node->getParent());
 

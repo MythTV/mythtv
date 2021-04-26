@@ -334,7 +334,6 @@ V4L2Profiles MythV4L2M2MContext::GetProfiles(const std::vector<V4L2Mapping>& Pro
         }
 
         // check codec support
-        QStringList debug;
         QSize dummy{0, 0};
 
         for (const auto & profile : Profiles)
