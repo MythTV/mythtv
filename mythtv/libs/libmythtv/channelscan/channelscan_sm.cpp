@@ -368,8 +368,8 @@ void ChannelScanSM::LogLines(const QString& string)
     if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN, LOG_DEBUG))
     {
         QStringList lines = string.split('\n');
-        for (int i = 0; i < lines.size(); ++i)
-            LOG(VB_CHANSCAN, LOG_DEBUG, lines[i]);
+        for (const QString& line : qAsConst(lines))
+            LOG(VB_CHANSCAN, LOG_DEBUG, line);
     }
 }
 
