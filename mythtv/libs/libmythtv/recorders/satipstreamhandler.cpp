@@ -320,7 +320,7 @@ bool SatIPStreamHandler::Open(void)
         QString ip = SatIP::findDeviceIP(deviceId);
         if (ip != nullptr)
         {
-            LOG(VB_RECORD, LOG_INFO, LOC + QString("Discovered device %1 at %2").arg(deviceId).arg(ip));
+            LOG(VB_RECORD, LOG_INFO, LOC + QString("Discovered device %1 at %2").arg(deviceId, ip));
         }
         else
         {

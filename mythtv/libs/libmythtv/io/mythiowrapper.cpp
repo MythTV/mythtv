@@ -358,13 +358,13 @@ int MythFileStatFD(int FileID, struct stat *Buf)
 int MythFileExists(const char *Path, const char *File)
 {
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("MythFileExists('%1', '%2')")
-        .arg(Path).arg(File));
+        .arg(Path, File));
 
     bool ret = false;
     if (strncmp(Path, "myth://", 7) == 0)
-        ret = RemoteFile::Exists(QString("%1/%2").arg(Path).arg(File));
+        ret = RemoteFile::Exists(QString("%1/%2").arg(Path, File));
     else
-        ret = QFile::exists(QString("%1/%2").arg(Path).arg(File));
+        ret = QFile::exists(QString("%1/%2").arg(Path, File));
     return static_cast<int>(ret);
 }
 

@@ -32,9 +32,9 @@ class SERVICE_PUBLIC Markup : public QObject
     Q_PROPERTY( quint64  Frame   READ Frame        WRITE setFrame )
     Q_PROPERTY( QString  Data    READ Data         WRITE setData  )
 
-    PROPERTYIMP    ( QString   , Type  )
+    PROPERTYIMP_REF( QString   , Type  )
     PROPERTYIMP    ( quint64   , Frame )
-    PROPERTYIMP    ( QString   , Data  )
+    PROPERTYIMP_REF( QString   , Data  )
 
     public:
 

@@ -29,6 +29,19 @@ enum MenuCurrentContext
     kMenuCurrentAlways
 };
 
+// These correlate to the four MythTVMenu objects that are allocated
+// and stashed inside of a TV object. They are used to find the
+// original menu again, instead of serializing/deserializing the
+// entire MythTVMenu object to/from a QVariant.
+enum MenuTypeId
+{
+    kMenuIdUnknown,
+    kMenuIdPlayback,
+    kMenuIdPlaybackCompact,
+    kMenuIdCutlist,
+    kMenuIdCutlistCompact,
+};
+
 class OSD;
 class MythOSDDialogData;
 class MythTVMenu;
@@ -74,10 +87,10 @@ class MTV_PUBLIC MythTVMenu
    ~MythTVMenu();
     static bool MatchesGroup(const QString& Name, const QString& Prefix,
                              MenuCategory Category, QString& OutPrefix);
-    bool        LoadFromFile(const QString& Filename, const QString& Menuname,
+    bool        LoadFromFile(MenuTypeId id, const QString& Filename, const QString& Menuname,
                              const char * TranslationContext, const QString& KeyBindingContext,
                              int IncludeLevel = 0);
-    bool        LoadFromString(const QString& Text, const QString& Menuname,
+    bool        LoadFromString(MenuTypeId id, const QString& Text, const QString& Menuname,
                                const char * TranslationContext, const QString& KeyBindingContext,
                                int IncludeLevel = 0);
     bool        IsLoaded() const;
@@ -89,10 +102,14 @@ class MTV_PUBLIC MythTVMenu
     QString     GetName() const;
     const char* GetTranslationContext() const;
     const QString& GetKeyBindingContext() const;
+    static QString GetPathFromNode(QDomNode Node);
+    QDomNode GetNodeFromPath(const QString& path) const;
+    friend class TV;
 
   private:
     void ProcessIncludes(QDomElement& Root, int IncludeLevel);
 
+    MenuTypeId    m_id                 { kMenuIdUnknown };
     QDomDocument* m_document           { nullptr };
     const char*   m_translationContext { "" };
     QString       m_menuName;
@@ -104,11 +121,11 @@ static const MythTVMenu dummy_menubase;
 class MythTVMenuNodeTuple
 {
   public:
-    MythTVMenuNodeTuple(const MythTVMenu& Menu, const QDomNode& Node);
-    MythTVMenuNodeTuple();
+    MythTVMenuNodeTuple(MenuTypeId Id, QString Path);
+    MythTVMenuNodeTuple() = default;
 
-    const MythTVMenu& m_menu;
-    const QDomNode   m_node;
+    MenuTypeId m_id { kMenuIdUnknown };
+    QString m_path;
 };
 
 Q_DECLARE_METATYPE(MythTVMenuNodeTuple)

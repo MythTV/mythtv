@@ -292,14 +292,14 @@ void VideoScannerThread::verifyFiles(FileCheckList &files,
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Removing file SG(%1) :%2:")
-                        .arg(lhost).arg(lname));
+                        .arg(lhost, lname));
                 remove.push_back(std::make_pair(file->GetID(), lname));
             }
             else
             {
                 LOG(VB_GENERAL, LOG_WARNING,
                     QString("SG(%1) not available. Not removing file :%2:")
-                        .arg(lhost).arg(lname));
+                        .arg(lhost, lname));
                 if (!m_offlineSGHosts.contains(lhost))
                     m_offlineSGHosts.append(lhost);
             }
@@ -362,8 +362,7 @@ bool VideoScannerThread::updateDB(const FileCheckList &add, const PurgeList &rem
                     0, ParentalLevel::plLowest);
 
                 LOG(VB_GENERAL, LOG_INFO, QString("Adding : %1 : %2 : %3")
-                        .arg(newFile.GetHost()).arg(newFile.GetFilename())
-                        .arg(hash));
+                    .arg(newFile.GetHost(), newFile.GetFilename(), hash));
                 newFile.SetHost(p->second.host);
                 newFile.SaveToDatabase();
                 m_addList << newFile.GetID();

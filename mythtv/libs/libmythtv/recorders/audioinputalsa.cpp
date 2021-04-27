@@ -320,8 +320,8 @@ bool AudioInputALSA::Recovery(int err)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
                     QString("failed to recover from %1. %2")
-                        .arg(suspense ? "suspend" : "underrun")
-                        .arg(snd_strerror(ret)));
+                        .arg(suspense ? "suspend" : "underrun",
+                             snd_strerror(ret)));
                 return false;
             }
             isgood = true;

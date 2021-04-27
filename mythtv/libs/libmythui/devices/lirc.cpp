@@ -307,7 +307,7 @@ bool LIRC::Init(void)
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Successfully initialized '%1' using '%2' config")
-            .arg(m_lircdDevice).arg(m_configFile));
+            .arg(m_lircdDevice, m_configFile));
 
     return true;
 }

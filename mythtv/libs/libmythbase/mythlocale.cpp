@@ -31,8 +31,7 @@ void MythLocale::Init(const QString &localeName)
              !dbCountry.isEmpty())
     {
         QString langcode = dbLanguage.section('_',0,0);
-        m_localeCode = QString("%1_%2").arg(langcode)
-                                       .arg(dbCountry.toUpper());
+        m_localeCode = QString("%1_%2").arg(langcode, dbCountry.toUpper());
     }
     else
     {

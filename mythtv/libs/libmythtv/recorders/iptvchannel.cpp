@@ -156,8 +156,8 @@ bool IPTVChannel::IsOpen(void) const
     bool ret = (m_streamHandler && !m_streamHandler->HasError() &&
                 m_streamHandler->IsRunning());
     LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("IsOpen(%1) %2")
-        .arg(m_lastTuning.GetDeviceName())
-        .arg(ret ? "true" : "false"));
+        .arg(m_lastTuning.GetDeviceName(),
+             ret ? "true" : "false"));
     return ret;
 }
 

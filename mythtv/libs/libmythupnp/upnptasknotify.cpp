@@ -69,16 +69,16 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                               "USN: %5\r\n"
                               "CACHE-CONTROL: max-age=%6\r\n"
                               "Content-Length: 0\r\n\r\n" )
-                            .arg( HttpServer::GetServerVersion() )
-                            .arg( GetNTSString()    )
-                            .arg( sNT          )
-                            .arg( sUSN         )
-                            .arg( m_nMaxAge.count()    );
+                            .arg( HttpServer::GetServerVersion(),
+                                  GetNTSString(),
+                                  sNT,
+                                  sUSN,
+                                  QString::number(m_nMaxAge.count()));
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpNotifyTask::SendNotifyMsg : %1:%2 : %3 : %4")
-            .arg(pSocket->address().toString()) .arg(pSocket->port())
-            .arg(sNT) .arg(sUSN));
+            .arg(pSocket->address().toString(), QString::number(pSocket->port()),
+                 sNT, sUSN));
 
     QMutexLocker qml(&m_mutex); // for addressList
 

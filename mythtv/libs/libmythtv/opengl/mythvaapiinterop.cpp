@@ -138,7 +138,7 @@ void MythVAAPIInterop::InitaliseDisplay(void)
     {
         m_vaVendor = vaQueryVendorString(m_vaDisplay);
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Created VAAPI %1.%2 display for %3 (%4)")
-            .arg(major).arg(minor).arg(TypeToString(m_type)).arg(m_vaVendor));
+            .arg(major).arg(minor).arg(TypeToString(m_type), m_vaVendor));
     }
 }
 
@@ -215,7 +215,7 @@ bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool Double
 
     // N.B. set auto to 0 otherwise we confuse playback if VAAPI does not deinterlace
     QString filters = QString("deinterlace_vaapi=mode=%1:rate=%2:auto=0")
-            .arg(deinterlacer).arg(DoubleRate ? "field" : "frame");
+            .arg(deinterlacer, DoubleRate ? "field" : "frame");
     const AVFilter *buffersrc  = avfilter_get_by_name("buffer");
     const AVFilter *buffersink = avfilter_get_by_name("buffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();

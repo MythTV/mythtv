@@ -355,9 +355,9 @@ void MythThemedMenu::aboutScreen()
     }
 
     QString label = tr("Revision: %1\n Branch: %2\n %3")
-                        .arg(GetMythSourceVersion())
-                        .arg(GetMythSourcePath())
-                        .arg(distro_line);
+                        .arg(GetMythSourceVersion(),
+                             GetMythSourcePath(),
+                             distro_line);
 
     MythScreenStack* mainStack = GetMythMainWindow()->GetMainStack();
     m_menuPopup = new MythDialogBox(label, mainStack, "version_dialog");

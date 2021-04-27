@@ -99,8 +99,8 @@ AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Contex
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Invalid DRM PRIME buffer %1 %2 %3 %4")
             .arg(Frame->m_buffer != nullptr).arg(Frame->m_priv[0] != nullptr)
-            .arg(MythVideoFrame::FormatDescription(Frame->m_type))
-            .arg(av_get_pix_fmt_name(static_cast<AVPixelFormat>(Frame->m_pixFmt))));
+            .arg(MythVideoFrame::FormatDescription(Frame->m_type),
+                 av_get_pix_fmt_name(static_cast<AVPixelFormat>(Frame->m_pixFmt))));
         return result;
     }
 

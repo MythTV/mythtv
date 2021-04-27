@@ -51,7 +51,7 @@ QString UPnPFeatureList::toXML()
     NameValues::iterator ait;
     for (ait = m_attributes.begin(); ait != m_attributes.end(); ++ait)
     {
-        xml += QString(" %1=\"%2\"").arg((*ait).m_sName).arg((*ait).m_sValue);
+        xml += QString(" %1=\"%2\"").arg((*ait).m_sName, (*ait).m_sValue);
     }
     xml += ">\r\n";
     QList<UPnPFeature*>::iterator fit;

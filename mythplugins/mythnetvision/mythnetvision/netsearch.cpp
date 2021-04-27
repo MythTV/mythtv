@@ -248,8 +248,8 @@ void NetSearch::FillGrabberButtonList()
         auto *item = new MythUIButtonListItem(m_siteList, g->GetTitle());
         item->SetText(g->GetTitle(), "title");
         item->SetData(g->GetCommandline());
-        QString thumb = QString("%1mythnetvision/icons/%2").arg(GetShareDir())
-                            .arg(g->GetImage());
+        QString thumb = QString("%1mythnetvision/icons/%2")
+                            .arg(GetShareDir(), g->GetImage());
         item->SetImage(thumb);
     }
 }
@@ -281,7 +281,7 @@ void NetSearch::DoSearch()
     m_currentSearch = query;
 
     QString title = tr("Searching %1 for \"%2\"...")
-                    .arg(grabber).arg(query);
+                    .arg(grabber, query);
     OpenBusyPopup(title);
 
     if (!m_netSearch)
@@ -305,8 +305,7 @@ void NetSearch::GetLastResults()
     m_pagenum--;
 
     QString title = tr("Changing to page %1 of search \"%2\"...")
-                    .arg(QString::number(m_pagenum))
-                    .arg(m_currentSearch);
+                    .arg(QString::number(m_pagenum), m_currentSearch);
     OpenBusyPopup(title);
 
     QString page = m_prevPageToken.isEmpty() ? QString::number(m_pagenum) :
@@ -324,8 +323,7 @@ void NetSearch::GetMoreResults()
     m_pagenum++;
 
     QString title = tr("Changing to page %1 of search \"%2\"...")
-                    .arg(QString::number(m_pagenum))
-                    .arg(m_currentSearch);
+                    .arg(QString::number(m_pagenum), m_currentSearch);
     OpenBusyPopup(title);
 
     QString page = m_nextPageToken.isEmpty() ? QString::number(m_pagenum) :
@@ -387,8 +385,8 @@ void NetSearch::SearchFinished(void)
     if (m_pageText && m_maxpage > 0 && m_pagenum > 0)
     {
         m_pageText->SetText(QString("%1 / %2")
-                        .arg(QString::number(m_pagenum))
-                        .arg(QString::number(m_maxpage)));
+                        .arg(QString::number(m_pagenum),
+                             QString::number(m_maxpage)));
     }
 
     ResultItem::resultList list = item->GetVideoList();

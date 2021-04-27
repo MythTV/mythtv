@@ -1010,7 +1010,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                     msg_tr2 = QObject::tr("Encrypted");
                 else if (kEncDecrypted == *it)
                     msg_tr2 = QObject::tr("Decrypted");
-                QString msg_tr =QString("%1 %2").arg(msg_tr1).arg(msg_tr2);
+                QString msg_tr =QString("%1 %2").arg(msg_tr1, msg_tr2);
                 m_scanMonitor->ScanAppendTextToLog(msg_tr);
             }
 
@@ -1104,11 +1104,11 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             msg_tr = (cchan_cnt) ?
                 QObject::tr("%1 possible channels").arg(cchan_cnt) :
                 QObject::tr("no channels");
-            msg_tr = QString("%1, %2").arg(chan_tr).arg(msg_tr);
+            msg_tr = QString("%1, %2").arg(chan_tr, msg_tr);
             msg = (cchan_cnt) ?
                 QString("%1 possible channels").arg(cchan_cnt) :
                 QString("no channels");
-            msg = QString("%1, %2").arg(chan_tr).arg(msg);
+            msg = QString("%1, %2").arg(chan_tr, msg);
         }
         else if ((m_current != m_scanTransports.end()) &&
                  m_timer.hasExpired((*m_current).m_timeoutTune.count()) &&
@@ -1342,13 +1342,13 @@ uint ChannelScanSM::GetCurrentTransportInfo(
 
     QString offset_str_tr = m_current.offset() ?
         QObject::tr(" offset %2").arg(m_current.offset()) : "";
-     cur_chan_tr = QString("%1%2")
-        .arg((*m_current).m_friendlyName).arg(offset_str_tr);
+    cur_chan_tr = QString("%1%2")
+        .arg((*m_current).m_friendlyName, offset_str_tr);
 
     QString offset_str = m_current.offset() ?
         QString(" offset %2").arg(m_current.offset()) : "";
     cur_chan = QString("%1%2")
-        .arg((*m_current).m_friendlyName).arg(offset_str);
+        .arg((*m_current).m_friendlyName, offset_str);
 
     return max_chan_cnt;
 }
@@ -1769,7 +1769,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
         LOG(VB_CHANSCAN, LOG_INFO, LOC +
             QString("GetChannelList: service %1 (0x%2) chan_num '%3' callsign '%4'")
                 .arg(info.m_serviceId).arg(info.m_serviceId,4,16,QChar('0'))
-                .arg(info.m_chanNum).arg(info.m_callSign));
+                .arg(info.m_chanNum, info.m_callSign));
     }
 
     // Get QAM/SCTE/MPEG channel numbers
@@ -2205,7 +2205,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
     QString offset_str = (transport.offset()) ?
         QObject::tr(" offset %2").arg(transport.offset()) : "";
     QString cur_chan = QString("%1%2")
-        .arg((*m_current).m_friendlyName).arg(offset_str);
+        .arg((*m_current).m_friendlyName, offset_str);
     QString tune_msg_str =
         QObject::tr("ScanTransport Tuning to %1 mplexid(%2)")
         .arg(cur_chan).arg((*m_current).m_mplexid);
@@ -2310,12 +2310,12 @@ bool ChannelScanSM::ScanTransports(
     if (tables.empty())
     {
         QString msg = QString("No freq table for (%1, %2, %3) found")
-                      .arg(std).arg(modulation).arg(country);
+                      .arg(std, modulation, country);
         m_scanMonitor->ScanAppendTextToLog(msg);
     }
     LOG(VB_CHANSCAN, LOG_INFO, LOC +
         QString("Looked up freq table (%1, %2, %3) w/%4 entries")
-            .arg(std).arg(modulation).arg(country).arg(tables.size()));
+            .arg(std, modulation, country, QString::number(tables.size())));
 
     QString start = table_start;
     const QString& end   = table_end;
@@ -2567,7 +2567,7 @@ bool ChannelScanSM::AddToList(uint mplexid)
 
     LOG(VB_CHANSCAN, LOG_DEBUG, LOC +
         QString("tunertype:%1 %2 sourceid:%3 sistandard:%4 fn:'%5' mplexid:%6")
-            .arg(tt).arg(tt.toString()).arg(sourceid).arg(sistandard).arg(fn).arg(mplexid));
+            .arg(tt).arg(tt.toString()).arg(sourceid).arg(sistandard, fn).arg(mplexid));
 
     if (item.m_tuning.FillFromDB(tt, mplexid))
     {
@@ -2656,7 +2656,7 @@ bool ChannelScanSM::CheckImportedList(
     if (found)
     {
         common_status_info += QString(" %1 %2")
-            .arg(QObject::tr("as")).arg(service_name);
+            .arg(QObject::tr("as"), service_name);
     }
     else
     {

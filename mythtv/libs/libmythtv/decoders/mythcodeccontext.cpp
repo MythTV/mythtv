@@ -313,8 +313,8 @@ void MythCodecContext::InitVideoCodec(AVCodecContext *Context,
             DirectRendering = false;
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Using software scaling to convert pixel format %1 for "
-                    "codec %2").arg(av_get_pix_fmt_name(Context->pix_fmt))
-                .arg(ff_codec_id_string(Context->codec_id)));
+                    "codec %2").arg(av_get_pix_fmt_name(Context->pix_fmt),
+                                    ff_codec_id_string(Context->codec_id)));
     }
 }
 
@@ -561,8 +561,8 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, MythInteropGPU*
     if (res == 0)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Created hardware device '%1'%2")
-            .arg(av_hwdevice_get_type_name(Type))
-            .arg(Device == nullptr ? "" : QString(" (%1)").arg(Device)));
+            .arg(av_hwdevice_get_type_name(Type),
+                 Device == nullptr ? "" : QString(" (%1)").arg(Device)));
         auto *context = reinterpret_cast<AVHWDeviceContext*>(result->data);
 
         if ((context->free || context->user_opaque) && !Interop)
@@ -585,9 +585,9 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, MythInteropGPU*
 
     std::string error;
     LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Failed to create hardware device '%1'%2 Error '%3'")
-        .arg(av_hwdevice_get_type_name(Type))
-        .arg(Device == nullptr ? "" : QString(" (%1)").arg(Device))
-        .arg(av_make_error_stdstring(error, res)));
+        .arg(av_hwdevice_get_type_name(Type),
+             Device == nullptr ? "" : QString(" (%1)").arg(Device),
+             av_make_error_stdstring(error, res)));
     return nullptr;
 }
 
@@ -857,7 +857,8 @@ QString MythCodecContext::GetProfileDescription(CodecProfile Profile, QSize Size
         return profile;
 
     return QObject::tr("%1%2%3 (Max size: %4x%5)")
-            .arg(profile).arg(Format != FMT_NONE ? QString(" %1").arg(MythVideoFrame::FormatDescription(Format)) : "")
-            .arg(ColorDepth > 8 ? QString(" %1Bit").arg(ColorDepth) : "")
+            .arg(profile,
+                 Format != FMT_NONE ? QString(" %1").arg(MythVideoFrame::FormatDescription(Format)) : "",
+                 ColorDepth > 8 ? QString(" %1Bit").arg(ColorDepth) : "")
             .arg(Size.width()).arg(Size.height());
 }

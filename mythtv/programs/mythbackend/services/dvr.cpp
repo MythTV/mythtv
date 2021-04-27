@@ -325,7 +325,7 @@ int Dvr::AddRecordedProgram(const QJsonObject &jsonObj)
     QJsonObject recording = program["Recording"].toObject();
     QJsonObject cast      = program["Cast"].toObject();
 
-    ProgInfo *pi = new ProgInfo();
+    auto     *pi = new ProgInfo();
     int       chanid = channel.value("ChanId").toString("0").toUInt();
     QString   hostname = program["HostName"].toString("");
 
@@ -500,10 +500,10 @@ bool Dvr::DeleteRecording(int RecordedId,
     if (pi.GetChanID() && pi.HasPathname())
     {
         QString cmd = QString("DELETE_RECORDING %1 %2 %3 %4")
-            .arg(pi.GetChanID())
-            .arg(pi.GetRecordingStartTime(MythDate::ISODate))
-            .arg(forceDelete ? "FORCE" : "NO_FORCE")
-            .arg(allowRerecord ? "FORGET" : "NO_FORGET");
+            .arg(QString::number(pi.GetChanID()),
+                 pi.GetRecordingStartTime(MythDate::ISODate),
+                 forceDelete ? "FORCE" : "NO_FORCE",
+                 allowRerecord ? "FORGET" : "NO_FORGET");
         MythEvent me(cmd);
 
         gCoreContext->dispatch(me);
@@ -842,32 +842,31 @@ DTC::MarkupList* Dvr::GetRecordedMarkup ( int RecordedId )
 
     QVector<ProgramInfo::MarkupEntry> mapMark;
     QVector<ProgramInfo::MarkupEntry> mapSeek;
-    QVector<ProgramInfo::MarkupEntry>::iterator it;
 
     ri.QueryMarkup(mapMark, mapSeek);
 
     auto* pMarkupList = new DTC::MarkupList();
-    for (it = mapMark.begin(); it != mapMark.end(); ++it)
+    for (auto entry : qAsConst(mapMark))
     {
         DTC::Markup *pMarkup = pMarkupList->AddNewMarkup();
-        QString typestr = toString(static_cast<MarkTypes>((*it).type));
+        QString typestr = toString(static_cast<MarkTypes>(entry.type));
         pMarkup->setType(typestr);
-        pMarkup->setFrame((*it).frame);
-        if ((*it).isDataNull)
+        pMarkup->setFrame(entry.frame);
+        if (entry.isDataNull)
             pMarkup->setData("NULL");
         else
-            pMarkup->setData(QString::number((*it).data));
+            pMarkup->setData(QString::number(entry.data));
     }
-    for (it = mapSeek.begin(); it != mapSeek.end(); ++it)
+    for (auto entry : qAsConst(mapSeek))
     {
         DTC::Markup *pSeek = pMarkupList->AddNewSeek();
-        QString typestr = toString(static_cast<MarkTypes>((*it).type));
+        QString typestr = toString(static_cast<MarkTypes>(entry.type));
         pSeek->setType(typestr);
-        pSeek->setFrame((*it).frame);
-        if ((*it).isDataNull)
+        pSeek->setFrame(entry.frame);
+        if (entry.isDataNull)
             pSeek->setData("NULL");
         else
-            pSeek->setData(QString::number((*it).data));
+            pSeek->setData(QString::number(entry.data));
     }
 
 
@@ -892,7 +891,7 @@ bool Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
     QJsonObject markuplist = jsonObj["MarkupList"].toObject();
 
     QJsonArray  marks = markuplist["Mark"].toArray();
-    for (const QJsonValue & m : marks)
+    for (const auto & m : marks)
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;
@@ -909,7 +908,7 @@ bool Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
     }
 
     QJsonArray  seeks = markuplist["Seek"].toArray();
-    for (const QJsonValue & m : seeks)
+    for (const auto & m : seeks)
     {
         QJsonObject markup = m.toObject();
         ProgramInfo::MarkupEntry entry;
@@ -2046,7 +2045,7 @@ int Dvr::ManageJobQueue( const QString   &sAction,
                                             sRemoteHost, false))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been allowed on host %2.")
-                                         .arg(sJobName).arg(sRemoteHost));
+                                         .arg(sJobName, sRemoteHost));
         return nReturn;
     }
 

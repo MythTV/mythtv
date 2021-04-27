@@ -15,8 +15,8 @@ class QBrush;
     LOG(type, level, LOC + QString("%1\n\t\t\t"                           \
                              "Location: %2 @ %3\n\t\t\t"                  \
                              "Name: '%4'\tType: '%5'")                    \
-            .arg(msg).arg(filename).arg((element).lineNumber())             \
-            .arg((element).attribute("name", "")).arg((element).tagName()))
+            .arg(msg, filename, QString::number((element).lineNumber()),  \
+                 (element).attribute("name", ""), (element).tagName()))
 
 
 class MUI_PUBLIC XMLParseBase

@@ -109,7 +109,7 @@ QString FileServerHandler::LocalFilePath(const QString &path,
                 LOG(VB_GENERAL, LOG_ERR,
                         QString("LocalFilePath unable to find local "
                                 "path for '%1', found '%2' instead.")
-                                .arg(lpath).arg(pburl));
+                                .arg(lpath, pburl));
                 lpath = "";
             }
         }
@@ -136,7 +136,7 @@ QString FileServerHandler::LocalFilePath(const QString &path,
                 LOG(VB_FILE, LOG_INFO,
                         QString("LocalFilePath(%1 '%2'), found through "
                                 "exhaustive search at '%3'")
-                            .arg(path).arg(opath).arg(lpath));
+                            .arg(path, opath, lpath));
             }
             else
             {
@@ -833,7 +833,7 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
     LOG(VB_FILE, LOG_INFO,
         QString("HandleSGGetFileList: group = %1  host = %2  "
                 "path = %3 wanthost = %4")
-            .arg(groupname).arg(host).arg(path).arg(wantHost));
+            .arg(groupname, host, path, wantHost));
 
     if (gCoreContext->IsThisHost(wantHost))
     {
@@ -899,7 +899,7 @@ bool FileServerHandler::HandleFileQuery(SocketHandler *socket,
     QString filename  = slist[3];
 
     LOG(VB_FILE, LOG_DEBUG, QString("HandleSGFileQuery: myth://%1@%2/%3")
-                             .arg(groupname).arg(wantHost).arg(filename));
+                             .arg(groupname, wantHost, filename));
 
     if (gCoreContext->IsThisHost(wantHost))
     {
@@ -1101,7 +1101,7 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
     {
         LOG(VB_GENERAL, LOG_ERR, QString("ERROR: %1 write "
                 "filename '%2' does not pass sanity checks.")
-                .arg(slist[0]).arg(filename));
+                .arg(slist[0], filename));
         res << "ERROR" << "downloadfile_filename_dangerous";
         socket->WriteStringList(res);
         return true;

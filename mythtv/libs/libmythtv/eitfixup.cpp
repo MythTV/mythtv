@@ -184,7 +184,7 @@ void EITFixUp::Fix(DBEventEIT &event)
         {
             LOG(VB_EIT, LOG_DEBUG, QString("Unhandled item in EIT for"
                 " channel id \"%1\", \"%2\": %3").arg(event.m_chanid)
-                .arg(i.key()).arg(i.value()));
+                .arg(i.key(), i.value()));
         }
     }
 }
@@ -1957,7 +1957,7 @@ void EITFixUp::FixPremiere(DBEventEIT &event)
     match = dePremiereOTitle.match(event.m_title);
     if (match.hasMatch())
     {
-        event.m_subtitle = QString("%1, %2").arg(match.captured(1)).arg(country);
+        event.m_subtitle = QString("%1, %2").arg(match.captured(1), country);
         event.m_title.remove(match.capturedStart(0),
                              match.capturedLength(0));
     }

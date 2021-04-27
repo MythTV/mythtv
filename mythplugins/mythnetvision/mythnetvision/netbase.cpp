@@ -74,7 +74,7 @@ void NetBase::CleanCacheDir()
 
     for (auto i = thumbs.crbegin(); i != thumbs.crend(); ++i)
     {
-        QString filename = QString("%1/%2").arg(cache).arg(*i);
+        QString filename = QString("%1/%2").arg(cache, *i);
         LOG(VB_GENERAL, LOG_DEBUG, QString("Deleting file %1").arg(filename));
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
@@ -246,8 +246,8 @@ void NetBase::customEvent(QEvent *event)
                 QString message = tr("Downloading Video...\n"
                                      "(%1 of %2 MB)")
                     .arg(QString::number(args[2].toInt() / 1024.0 / 1024.0,
-                                         'f', 2))
-                    .arg(QString::number(args[3].toInt() / 1024.0 / 1024.0,
+                                         'f', 2),
+                         QString::number(args[3].toInt() / 1024.0 / 1024.0,
                                          'f', 2));
                 m_progressDialog->SetMessage(message);
                 m_progressDialog->SetTotal(args[3].toInt());
@@ -295,7 +295,7 @@ void NetBase::DoDownloadAndPlay()
                                               baseFilename);
 
     LOG(VB_GENERAL, LOG_INFO, QString("Downloading %1 to %2")
-        .arg(item->GetMediaURL()).arg(finalFilename));
+        .arg(item->GetMediaURL(), finalFilename));
 
     // Does the file already exist?
     bool exists = RemoteFile::Exists(finalFilename);

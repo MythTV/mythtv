@@ -64,7 +64,7 @@ void NewsSite::retrieve(void)
     m_errorString.clear();
     m_updateErrorString.clear();
     m_articleList.clear();
-    QString destFile = QString("%1/%2").arg(m_destDir).arg(m_name);
+    QString destFile = QString("%1/%2").arg(m_destDir, m_name);
     GetMythDownloadManager()->queueDownload(m_url, destFile, this, true);
 }
 
@@ -442,7 +442,7 @@ void NewsSite::parseRSS(const QDomDocument& domDoc)
 
             LOG(VB_GENERAL, LOG_DEBUG,
                 QString("parseRSS found media:content: medium: %1, type: %2, url: %3")
-                        .arg(medium).arg(type).arg(url2));
+                        .arg(medium, type, url2));
 
             // if this is an image use it as the thumbnail if we haven't found one yet
             if (thumbnail.isEmpty() && (medium == "image" || isImage(type)))

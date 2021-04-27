@@ -265,7 +265,7 @@ bool ExternIO::KillIfRunning(const QString & cmd)
     int res_kil = system(kil.toUtf8().constData());
     if (WEXITSTATUS(res_kil) == 1)
         LOG(VB_GENERAL, LOG_WARNING, QString("'%1' failed: %2")
-            .arg(kil).arg(ENO));
+            .arg(kil, ENO));
 
     res_grp = system(grp.toUtf8().constData());
     if (WEXITSTATUS(res_grp) == 1)
@@ -281,12 +281,12 @@ bool ExternIO::KillIfRunning(const QString & cmd)
     res_kil = system(kil.toUtf8().constData());
     if (WEXITSTATUS(res_kil) > 0)
         LOG(VB_GENERAL, LOG_WARNING, QString("'%1' failed: %2")
-            .arg(kil).arg(ENO));
+            .arg(kil, ENO));
 
     res_grp = system(grp.toUtf8().constData());
     LOG(WEXITSTATUS(res_kil) == 0 ? VB_RECORD : VB_GENERAL, LOG_WARNING,
-        QString("'%1' %2.").arg(cmd)
-        .arg(WEXITSTATUS(res_grp) == 0 ? "sill running" : "terminated"));
+        QString("'%1' %2.")
+        .arg(cmd, WEXITSTATUS(res_grp) == 0 ? "sill running" : "terminated"));
 
     return (WEXITSTATUS(res_grp) != 0);
 #endif
@@ -640,7 +640,7 @@ void ExternalStreamHandler::run(void)
                     {
                         LOG(VB_GENERAL, LOG_ERR, LOC +
                             QString("Aborting: %1 -> %2")
-                            .arg(ready_cmd).arg(result));
+                            .arg(ready_cmd, result));
                         m_bError = true;
                         continue;
                     }
@@ -985,9 +985,9 @@ bool ExternalStreamHandler::OpenApp(void)
         QString("Capabilities: tuner(%1) "
                 "Picture attributes(%2) "
                 "Flow control(%3)")
-        .arg(m_hasTuner ? "yes" : "no")
-        .arg(m_hasPictureAttributes ? "yes" : "no")
-        .arg(m_pollMode ? "Polling" : "XON/XOFF")
+        .arg(m_hasTuner ? "yes" : "no",
+             m_hasPictureAttributes ? "yes" : "no",
+             m_pollMode ? "Polling" : "XON/XOFF")
         );
 
     /* Let the external app know how many bytes will read without blocking */
@@ -1329,15 +1329,15 @@ bool ExternalStreamHandler::ProcessVer1(const QString & cmd,
 
                 LOG(VB_RECORD, level,
                     LOC + QString("ProcessCommand('%1') = '%2' took %3ms %4")
-                    .arg(cmd).arg(result)
-                    .arg(timer.elapsed().count())
-                    .arg(okay ? "" : "<-- NOTE"));
+                    .arg(cmd, result,
+                         QString::number(timer.elapsed().count()),
+                         okay ? "" : "<-- NOTE"));
 
                 return okay;
             }
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("External Recorder invalid response to '%1': '%2'")
-                .arg(cmd).arg(result));
+                .arg(cmd, result));
         }
 
         if (++m_ioErrCnt > 10)
@@ -1446,14 +1446,14 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("Did not receive a valid response "
-                        "for command '%1', received '%2'").arg(cmd).arg(result));
+                        "for command '%1', received '%2'").arg(cmd, result));
         }
         else if (tokens[0].toUInt() > m_serialNo)
         {
             LOG(VB_RECORD, LOG_ERR, LOC +
                 QString("ProcessVer2: Looking for serial no %1, "
                         "but received %2 for command '%2'")
-                .arg(m_serialNo).arg(tokens[0]).arg(cmd));
+                .arg(QString::number(m_serialNo), tokens[0], cmd));
         }
         else
         {
@@ -1476,14 +1476,14 @@ bool ExternalStreamHandler::ProcessVer2(const QString & command,
 
                 LOG(VB_RECORD, level,
                     LOC + QString("ProcessV2('%1') = '%2' took %3ms %4")
-                    .arg(cmd).arg(result).arg(timer.elapsed().count())
-                    .arg(okay ? "" : "<-- NOTE"));
+                    .arg(cmd, result, QString::number(timer.elapsed().count()),
+                         okay ? "" : "<-- NOTE"));
 
                 return okay;
             }
             LOG(VB_GENERAL, LOG_WARNING, LOC +
                 QString("External Recorder invalid response to '%1': '%2'")
-                .arg(cmd).arg(result));
+                .arg(cmd, result));
         }
 
         if (++m_ioErrCnt > 10)

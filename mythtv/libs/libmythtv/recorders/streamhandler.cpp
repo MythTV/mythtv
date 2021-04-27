@@ -382,16 +382,13 @@ bool StreamHandler::AddNamedOutputFile(const QString &file)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Failed to link '%1' to '%2'")
-                .arg(m_mptsBaseFile)
-                .arg(fn) +
-                ENO);
+                .arg(m_mptsBaseFile, fn) + ENO);
         }
         else
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("linked '%1' to '%2'")
-                .arg(m_mptsBaseFile)
-                .arg(fn));
+                .arg(m_mptsBaseFile, fn));
         }
     }
 

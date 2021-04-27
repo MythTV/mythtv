@@ -84,10 +84,10 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
                               "USN: %5\r\n"
                               "Content-Length: 0\r\n\r\n" )
                               .arg( m_nMaxAge.count()    )
-                              .arg( sDate )
-                              .arg( HttpServer::GetServerVersion() )
-                              .arg( sST )
-                              .arg( sUSN );
+                              .arg( sDate,
+                                    HttpServer::GetServerVersion(),
+                                    sST,
+                                    sUSN );
 
 #if 0
     LOG(VB_UPNP, LOG_DEBUG, QString("UPnpSearchTask::SendMsg : %1 : %2 ")
@@ -113,7 +113,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
             QPair<QHostAddress, int> subnet = QHostAddress::parseSubnet(ip_subnet);
             if (m_peerAddress.isInSubnet(subnet)) {
                 LOG(VB_UPNP, LOG_DEBUG, QString("UPnpSearchTask::SendMsg : IP: [%1], Found network [%2], relevant to peer [%3]")
-                    .arg(netAddr.ip().toString()).arg(subnet.first.toString()).arg(m_peerAddress.toString()));
+                    .arg(netAddr.ip().toString(), subnet.first.toString(), m_peerAddress.toString()));
 
                 QString ipaddress;
                 QHostAddress ip = netAddr.ip();

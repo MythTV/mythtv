@@ -861,8 +861,7 @@ void MythRAOPConnection::readClient(void)
             if (line.size() == 0)
                 break;
             LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Header(%1) = %2")
-                .arg(m_socket->peerAddress().toString())
-                .arg(line));
+                .arg(m_socket->peerAddress().toString(), line));
             m_incomingHeaders.append(line);
             if (line.contains("Content-Length:"))
             {
@@ -1355,7 +1354,7 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
 
                 LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                     QString("text/parameters: name=%1 parem=%2")
-                    .arg(name).arg(param));
+                    .arg(name, param));
 
                 if (name == "volume" && m_allowVolumeControl && m_audio)
                 {
@@ -1383,8 +1382,8 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
 
                     LOG(VB_PLAYBACK, LOG_INFO,
                         LOC +QString("Progress: %1/%2")
-                        .arg(stringFromSeconds(current))
-                        .arg(stringFromSeconds(length)));
+                        .arg(stringFromSeconds(current),
+                             stringFromSeconds(length)));
                     SendNotification(true);
                 }
             }
@@ -1405,8 +1404,8 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 m_dmap = decodeDMAP(content);
                 LOG(VB_PLAYBACK, LOG_INFO,
                     QString("Receiving Title:%1 Artist:%2 Album:%3 Format:%4")
-                    .arg(m_dmap["minm"]).arg(m_dmap["asar"])
-                    .arg(m_dmap["asal"]).arg(m_dmap["asfm"]));
+                    .arg(m_dmap["minm"], m_dmap["asar"],
+                         m_dmap["asal"], m_dmap["asfm"]));
                 SendNotification(false);
             }
         }
@@ -1476,7 +1475,7 @@ void MythRAOPConnection::FinishResponse(RaopNetStream *stream, QTcpSocket *socke
         *stream << "\r\n";
     stream->flush();
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC + QString("Finished %1 %2 , Send: %3")
-        .arg(option).arg(cseq).arg(socket->flush()));
+        .arg(option, cseq, QString::number(socket->flush())));
 }
 
 /**

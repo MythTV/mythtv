@@ -67,5 +67,5 @@ HLSRecSegment::~HLSRecSegment(void)
 QString HLSRecSegment::toString(void) const
 {
     return QString("[%1] '%2' @ '%3' for %4")
-        .arg(m_sequence).arg(m_title).arg(m_url.toString()).arg(m_duration.count());
+        .arg(m_sequence).arg(m_title, m_url.toString(), QString::number(m_duration.count()));
 }

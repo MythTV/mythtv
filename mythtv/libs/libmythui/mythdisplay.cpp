@@ -160,9 +160,9 @@ QStringList MythDisplay::GetDescription()
     if (m_vrrState)
     {
         result.append(tr("Variable refresh rate '%1': %2 %3")
-                      .arg(m_vrrState->TypeToString())
-                      .arg(m_vrrState->Enabled() ? tr("Enabled") : tr("Disabled"))
-                      .arg(m_vrrState->RangeDescription()));
+                      .arg(m_vrrState->TypeToString(),
+                           m_vrrState->Enabled() ? tr("Enabled") : tr("Disabled"),
+                           m_vrrState->RangeDescription()));
     }
 
     auto * current = GetCurrentScreen();
@@ -175,9 +175,9 @@ QStringList MythDisplay::GetDescription()
         first = false;
         auto id = QString("(%1)").arg(screen->manufacturer());
         if (screen == current && !spanall)
-            result.append(tr("Current screen %1 %2:").arg(screen->name()).arg(id));
+            result.append(tr("Current screen %1 %2:").arg(screen->name(), id));
         else
-            result.append(tr("Screen %1 %2:").arg(screen->name()).arg(id));
+            result.append(tr("Screen %1 %2:").arg(screen->name(), id));
         result.append(tr("Size") + QString("\t\t: %1mmx%2mm")
                 .arg(screen->physicalSize().width()).arg(screen->physicalSize().height()));
         if (screen == current)
@@ -388,7 +388,7 @@ QScreen *MythDisplay::GetDesiredScreen()
         if (ok && (screen_num >= 0) && (screen_num < screens.size()))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found screen number %1 (%2)")
-                .arg(name).arg(screens[screen_num]->name()));
+                .arg(name, screens[screen_num]->name()));
             newscreen = screens[screen_num];
         }
     }
@@ -405,7 +405,7 @@ QScreen *MythDisplay::GetDesiredScreen()
         else if (name != "-1" && primary)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screen '%1' not found, defaulting to primary screen (%2)")
-                .arg(name).arg(primary->name()));
+                .arg(name, primary->name()));
         }
         newscreen = primary;
     }
@@ -500,7 +500,7 @@ QString MythDisplay::GetExtraScreenInfo(QScreen *qScreen)
     QString model = qScreen->model();
     if (model.isEmpty())
         model = "Unknown";
-    return QString("(Make: %1 Model: %2)").arg(mfg).arg(model);
+    return QString("(Make: %1 Model: %2)").arg(mfg, model);
 }
 
 void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
@@ -510,7 +510,7 @@ void MythDisplay::DebugScreen(QScreen *qScreen, const QString &Message)
 
     auto geom = qScreen->geometry();
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("%1 screen '%2' %3")
-        .arg(Message).arg(qScreen->name()).arg(GetExtraScreenInfo(qScreen)));
+        .arg(Message, qScreen->name(), GetExtraScreenInfo(qScreen)));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Qt screen pixel ratio: %1")
         .arg(qScreen->devicePixelRatio(), 2, 'f', 2, '0'));
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Geometry: %1x%2+%3+%4 Size(Qt): %5mmx%6mm")

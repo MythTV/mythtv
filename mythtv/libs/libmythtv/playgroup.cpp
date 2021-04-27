@@ -255,7 +255,7 @@ int PlayGroup::GetSetting(const QString &name, const QString &field,
                           "WHERE (name = :NAME OR name = 'Default') "
                           "      AND %2 <> 0 "
                           "ORDER BY name = 'Default';")
-                  .arg(field).arg(field));
+                  .arg(field, field));
     query.bindValue(":NAME", name);
     if (!query.exec())
         MythDB::DBError("PlayGroupConfig::GetSetting", query);

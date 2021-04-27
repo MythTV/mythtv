@@ -190,7 +190,7 @@ void ScanWizard::SetPaneDefaults(const QString &cardid_inputname)
         LOG(VB_CHANSCAN, LOG_DEBUG,
             QString("SetPaneDefaults sourceid:%1 frequency:%2 mplexid:%3 tuner_type:%4 mpx:%5")
                 .arg(sourceid).arg(scanfrequency).arg(mplexid)
-                .arg(tuner_type.toString()).arg(mpx.toString()));
+                .arg(tuner_type.toString(), mpx.toString()));
     }
 
     m_scanConfig->SetTuningPaneValues(scanfrequency, mpx);

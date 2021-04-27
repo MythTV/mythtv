@@ -304,9 +304,9 @@ int main(int argc, char *argv[])
                         QString err("Cut %1points found at %3 and %4, with no "
                                     "%2 point in between.");
                         if (prev.value() == MARK_CUT_END)
-                            err = err.arg("end").arg("start");
+                            err = err.arg("end", "start");
                         else
-                            err = err.arg("start").arg("end");
+                            err = err.arg("start", "end");
                         LOG(VB_GENERAL, LOG_CRIT, "Invalid cutlist defined!");
                         LOG(VB_GENERAL, LOG_CRIT, err.arg(prev.key())
                                                      .arg(cur.key()));
@@ -565,7 +565,7 @@ int main(int argc, char *argv[])
         else if (fifodir.isEmpty())
         {
             LOG(VB_GENERAL, LOG_NOTICE, QString("Transcoding from %1 to %2")
-                    .arg(infile).arg(outfile));
+                    .arg(infile, outfile));
         }
         else
         {
@@ -718,8 +718,7 @@ int main(int argc, char *argv[])
         if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_STOPPING);
         LOG(VB_GENERAL, LOG_NOTICE, QString("%1 %2 done")
-                .arg(build_index ? "Building Index for" : "Transcoding")
-                .arg(infile));
+            .arg(build_index ? "Building Index for" : "Transcoding", infile));
     }
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
@@ -945,14 +944,14 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("mythtranscode: Error Renaming '%1' to '%2'")
-                    .arg(filename).arg(oldfile) + ENO);
+                    .arg(filename, oldfile) + ENO);
         }
 
         if (rename(atmpfile.constData(), anewfile.constData()) == -1)
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("mythtranscode: Error Renaming '%1' to '%2'")
-                    .arg(tmpfile).arg(newfile) + ENO);
+                    .arg(tmpfile, newfile) + ENO);
         }
 
         if (!gCoreContext->GetBoolSetting("SaveTranscoding", false) || forceDelete)
@@ -969,14 +968,13 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             {
                 QString link = getSymlinkTarget(oldfile);
                 QByteArray alink = link.toLocal8Bit();
-                int err = transUnlink(alink.constData(), pginfo);
+                int err = transUnlink(alink, pginfo);
                 if (err)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("mythtranscode: Error deleting '%1' "
                                 "pointed to by '%2'")
-                            .arg(alink.constData())
-                            .arg(aoldfile.constData()) + ENO);
+                            .arg(alink.constData(), aoldfile.constData()) + ENO);
                 }
 
                 err = unlink(aoldfile.constData());
@@ -985,8 +983,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("mythtranscode: Error deleting '%1', "
                                 "a link pointing to '%2'")
-                            .arg(aoldfile.constData())
-                            .arg(alink.constData()) + ENO);
+                            .arg(aoldfile.constData(), alink.constData()) + ENO);
                 }
             }
             else
@@ -1051,7 +1048,7 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
                     {
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("mythtranscode: Error renaming %1 to %2")
-                                    .arg(oldFileName).arg(newFileName));
+                                    .arg(oldFileName, newFileName));
                     }
                 }
             }

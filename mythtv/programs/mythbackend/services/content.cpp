@@ -525,8 +525,8 @@ QFileInfo Content::GetPreviewImage(        int        nRecordedId,
     {
         QString sMsg =
             QString("GetPreviewImage: Wrong Host '%1' request from '%2'")
-                          .arg( gCoreContext->GetHostName())
-                          .arg( pginfo.GetHostname() );
+                          .arg( gCoreContext->GetHostName(),
+                                pginfo.GetHostname() );
 
         LOG(VB_UPNP, LOG_ERR, sMsg);
 
@@ -691,8 +691,8 @@ QFileInfo Content::GetRecording( int              nRecordedId,
 
         QString sMsg =
             QString("GetRecording: Wrong Host '%1' request from '%2'.")
-                          .arg( gCoreContext->GetHostName())
-                          .arg( pginfo.GetHostname() );
+                          .arg( gCoreContext->GetHostName(),
+                                pginfo.GetHostname() );
 
         LOG(VB_UPNP, LOG_ERR, sMsg);
 
@@ -850,7 +850,7 @@ bool Content::DownloadFile( const QString &sURL, const QString &sStorageGroup )
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("ERROR: %1 write filename '%2' does not "
-                    "pass sanity checks.") .arg(sURL).arg(filename));
+                    "pass sanity checks.").arg(sURL, filename));
         return false;
     }
 
@@ -1034,8 +1034,8 @@ DTC::LiveStreamInfo *Content::AddRecordingLiveStream(
 
         QString sMsg =
             QString("GetRecording: Wrong Host '%1' request from '%2'.")
-                          .arg( gCoreContext->GetHostName())
-                          .arg( pginfo.GetHostname() );
+                          .arg( gCoreContext->GetHostName(),
+                                pginfo.GetHostname() );
 
         LOG(VB_UPNP, LOG_ERR, sMsg);
 
@@ -1100,8 +1100,8 @@ DTC::LiveStreamInfo *Content::AddVideoLiveStream( int nId,
 
         QString sMsg =
             QString("AddVideoLiveStream: Wrong Host '%1' request from '%2'.")
-                          .arg( gCoreContext->GetHostName())
-                          .arg( metadata->GetHost() );
+                          .arg( gCoreContext->GetHostName(),
+                                metadata->GetHost() );
 
         LOG(VB_UPNP, LOG_ERR, sMsg);
 

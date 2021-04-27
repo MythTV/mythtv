@@ -1193,8 +1193,8 @@ HostComboBoxSetting *AudioConfigSettings::SRCQuality()
                        "conversion. \"%1\" (default) provides the best "
                        "compromise between CPU usage and quality. \"%2\" "
                        "lets the audio device handle sample-rate conversion.")
-                       .arg(tr("Good", "Sample rate conversion"))
-                       .arg(tr("Disabled", "Sample rate conversion")));
+                       .arg(tr("Good", "Sample rate conversion"),
+                            tr("Disabled", "Sample rate conversion")));
 
     return gc;
 }

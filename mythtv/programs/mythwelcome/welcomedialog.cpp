@@ -361,8 +361,8 @@ void WelcomeDialog::updateScreen(void)
 
             status += "\n" +
               tr("%1 to %2", "Time period, 'starttime to endtime'")
-                  .arg(MythDate::toString(tuner.startTime, MythDate::kTime))
-                  .arg(MythDate::toString(tuner.endTime, MythDate::kTime));
+                  .arg(MythDate::toString(tuner.startTime, MythDate::kTime),
+                       MythDate::toString(tuner.endTime, MythDate::kTime));
         }
         else
             status = tr("There are no recordings currently taking place");
@@ -433,7 +433,7 @@ void WelcomeDialog::runMythFillDatabase()
                                           "mythfilldatabase");
     QString mfarg = gCoreContext->GetSetting("MythFillDatabaseArgs", "");
 
-    command = QString("%1 %2").arg(mfpath).arg(mfarg);
+    command = QString("%1 %2").arg(mfpath, mfarg);
     command += logPropagateArgs;
 
     command += "&";

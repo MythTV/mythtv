@@ -1395,7 +1395,7 @@ QString ChannelImporter::FormatChannel(
     if (si_standard == "atsc" || si_standard == "scte")
     {
         ssMsg << (QString("%1:%2:%3-%4:%5:%6=%7=%8:%9")
-                  .arg(chan.m_callSign).arg(chan.m_chanNum)
+                  .arg(chan.m_callSign, chan.m_chanNum)
                   .arg(chan.m_atscMajorChannel)
                   .arg(chan.m_atscMinorChannel)
                   .arg(chan.m_serviceId)
@@ -1407,7 +1407,7 @@ QString ChannelImporter::FormatChannel(
     else if (si_standard == "dvb")
     {
         ssMsg << (QString("%1:%2:%3:%4:%5:%6=%7:%8")
-                  .arg(chan.m_serviceName).arg(chan.m_chanNum)
+                  .arg(chan.m_serviceName, chan.m_chanNum)
                   .arg(chan.m_netId).arg(chan.m_origNetId)
                   .arg(chan.m_serviceId)
                   .arg(chan.m_sdtTsId)
@@ -1417,7 +1417,7 @@ QString ChannelImporter::FormatChannel(
     else
     {
         ssMsg << (QString("%1:%2:%3:%4:%5")
-                  .arg(chan.m_callSign).arg(chan.m_chanNum)
+                  .arg(chan.m_callSign, chan.m_chanNum)
                   .arg(chan.m_serviceId)
                   .arg(chan.m_patTsId)
                   .arg(si_standard)).toLatin1().constData();
@@ -2111,8 +2111,8 @@ OkCancelType ChannelImporter::QueryUserResolve(
     ChannelInsertInfo               &chan)
 {
     QString msg = tr("Channel %1 has channel number %2 but that is already in use.")
-                    .arg(SimpleFormatChannel(transport, chan))
-                    .arg(chan.m_chanNum);
+                    .arg(SimpleFormatChannel(transport, chan),
+                         chan.m_chanNum);
 
     OkCancelType ret = kOCTCancel;
 
@@ -2152,7 +2152,7 @@ OkCancelType ChannelImporter::QueryUserResolve(
                                    "Cancel All").toLower();
         QString msg2 = tr("Please enter a non-conflicting channel number "
                           "(or type '%1' to skip, '%2' to skip all):")
-            .arg(cancelStr).arg(cancelAllStr);
+            .arg(cancelStr, cancelAllStr);
 
         while (true)
         {
@@ -2230,7 +2230,7 @@ OkCancelType ChannelImporter::QueryUserInsert(
         //: %1 is the translation of "Cancel", %2 of "Cancel All"
         QString msg2 = tr("Please enter a non-conflicting channel number "
                           "(or type '%1' to skip, '%2' to skip all): ")
-                          .arg(cancelStr).arg(cancelAllStr);
+                          .arg(cancelStr, cancelAllStr);
 
         while (true)
         {

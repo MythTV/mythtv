@@ -197,8 +197,9 @@ void PTSOffsetQueue::SetNextPos(int64_t newPTS, AVPacket *pkt)
     idx.type = true;
 
     LOG(VB_FRAME, LOG_INFO, QString("Offset %1 -> %2 (%3) at %4")
-            .arg(PtsTime(m_offset[m_vidId].last().newPTS))
-            .arg(PtsTime(newPTS)).arg(PtsTime(delta)).arg(pkt->pos));
+            .arg(PtsTime(m_offset[m_vidId].last().newPTS),
+                 PtsTime(newPTS),
+                 PtsTime(delta), QString::number(pkt->pos)));
     for (const int key : qAsConst(m_keyList))
     {
         idx.newPTS = newPTS;
@@ -1559,8 +1560,8 @@ bool MPEG2fixup::FindStart()
                         QString("Dropping A packet from stream %1")
                                    .arg(it.key()));
                     LOG(VB_PROCESS, LOG_INFO, QString("     A:%1 V:%2")
-                            .arg(PtsTime(af->first()->m_pkt.pts))
-                            .arg(PtsTime(m_vFrame.first()->m_pkt.pts)));
+                            .arg(PtsTime(af->first()->m_pkt.pts),
+                                 PtsTime(m_vFrame.first()->m_pkt.pts)));
                     m_framePool.enqueue(af->takeFirst());
                     continue;
                 }
@@ -1991,8 +1992,8 @@ void MPEG2fixup::InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
             PTSdiscrep = tmpPTS;
             LOG(VB_PROCESS, LOG_INFO,
                 QString("Found invalid PTS (off by %1) at %2")
-                       .arg(PtsTime(tmpPTS))
-                       .arg(PtsTime(origvPTS / 300)));
+                       .arg(PtsTime(tmpPTS),
+                            PtsTime(origvPTS / 300)));
         }
         if (fix)
             curFrame->m_pkt.pts = origvPTS / 300;
@@ -2018,9 +2019,9 @@ void MPEG2fixup::dumpList(FrameList *list)
                 .arg(GetFrameTypeT(curFrame))
                 .arg(GetFrameNum(curFrame))
                 .arg(GetNbFields(curFrame))
-                .arg(PtsTime(curFrame->m_pkt.pts))
-                .arg(PtsTime(curFrame->m_pkt.dts))
-                .arg(curFrame->m_pkt.pos));
+                .arg(PtsTime(curFrame->m_pkt.pts),
+                     PtsTime(curFrame->m_pkt.dts),
+                     QString::number(curFrame->m_pkt.pos)));
     }
     LOG(VB_GENERAL, LOG_INFO, "=========================================");
 }
@@ -2153,9 +2154,9 @@ int MPEG2fixup::Start()
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("expectedPTS != expectedDTS + ptsIncrement"));
                     LOG(VB_GENERAL, LOG_ERR, QString("%1 != %2 + %3")
-                            .arg(PtsTime(expectedvPTS / 300))
-                            .arg(PtsTime(expectedDTS / 300))
-                            .arg(PtsTime(m_ptsIncrement)));
+                            .arg(PtsTime(expectedvPTS / 300),
+                                 PtsTime(expectedDTS / 300),
+                                 PtsTime(m_ptsIncrement)));
                     LOG(VB_GENERAL, LOG_ERR, QString("%1 != %2 + %3")
                             .arg(expectedvPTS)
                             .arg(expectedDTS)
@@ -2439,9 +2440,9 @@ int MPEG2fixup::Start()
                                 .arg(GetFrameTypeT(curFrame))
                                 .arg(GetFrameNum(curFrame))
                                 .arg(GetNbFields(curFrame))
-                                .arg(PtsTime(curFrame->m_pkt.pts))
-                                .arg(PtsTime(curFrame->m_pkt.dts))
-                                .arg(curFrame->m_pkt.pos));
+                                .arg(PtsTime(curFrame->m_pkt.pts),
+                                     PtsTime(curFrame->m_pkt.dts),
+                                     QString::number(curFrame->m_pkt.pos)));
                         if (AddFrame(curFrame))
                             return GENERIC_EXIT_DEADLOCK;
 
@@ -2532,8 +2533,8 @@ int MPEG2fixup::Start()
                 {
                     LOG(VB_PROCESS, LOG_INFO,
                         QString("Found invalid audio PTS (off by %1) at %2")
-                            .arg(PtsTime(tmpPTS))
-                            .arg(PtsTime(origaPTS[it.key()] / 300)));
+                            .arg(PtsTime(tmpPTS),
+                                 PtsTime(origaPTS[it.key()] / 300)));
                     if (backwardsPTS && tmpPTS < 90000LL)
                     {
                         //there are missing audio frames

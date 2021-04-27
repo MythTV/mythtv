@@ -144,13 +144,13 @@ void DVBStreamHandler::RunTS(void)
 
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("Opening DVR device %1 failed : %2")
-                .arg(m_dvrDevPath).arg(strerror(errno)));
+                .arg(m_dvrDevPath, strerror(errno)));
 
         if (tries >= 20 || (errno != EBUSY && errno != EAGAIN))
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Failed to open DVR device %1 : %2")
-                    .arg(m_dvrDevPath).arg(strerror(errno)));
+                    .arg(m_dvrDevPath, strerror(errno)));
             m_bError = true;
             return;
         }

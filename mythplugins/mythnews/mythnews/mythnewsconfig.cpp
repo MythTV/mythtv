@@ -48,7 +48,7 @@ void MythNewsConfig::populateSites(void)
     QMutexLocker locker(&m_lock);
 
     QString filename = QString("%1%2")
-        .arg(GetShareDir()).arg("mythnews/news-sites.xml");
+        .arg(GetShareDir(), "mythnews/news-sites.xml");
 
     QFile xmlFile(filename);
 

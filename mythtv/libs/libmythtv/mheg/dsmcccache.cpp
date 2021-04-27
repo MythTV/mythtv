@@ -209,7 +209,7 @@ void DSMCCCache::AddFileInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
 
     LOG(VB_DSMCC, LOG_INFO,
         QString("[DSMCCCache] Added file name %1 reference %2 parent %3")
-        .arg(name).arg(entry->toString()).arg(pDir->m_reference.toString()));
+        .arg(name, entry->toString(), pDir->m_reference.toString()));
 }
 
 // Add a sub-directory to the directory.
@@ -226,7 +226,7 @@ void DSMCCCache::AddDirInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
 
     LOG(VB_DSMCC, LOG_INFO,
         QString("[DSMCCCache] added subdirectory name %1 reference %2 parent %3")
-        .arg(name).arg(entry->toString()).arg(pDir->m_reference.toString()));
+        .arg(name, entry->toString(), pDir->m_reference.toString()));
 }
 
 // Find File, Directory or Gateway by reference.

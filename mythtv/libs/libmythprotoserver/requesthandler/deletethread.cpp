@@ -124,7 +124,7 @@ void DeleteThread::ProcessNew(void)
                 {
                     LOG(VB_GENERAL, LOG_ERR, 
                         QString("Error deleting '%1' -> '%2': ")
-                            .arg(handler->m_path).arg(tmppath) + ENO);
+                            .arg(handler->m_path, tmppath) + ENO);
                     handler->DeleteFailed();
                     handler->DecrRef();
                     continue;

@@ -226,7 +226,7 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
                 text3 = tr("%n second(s)", "", static_cast<int>(secsbehind.count()));
         }
 
-        QString desc = stillFrame ? tr("Still Frame") : tr("%1 of %2").arg(text1).arg(text2);
+        QString desc = stillFrame ? tr("Still Frame") : tr("%1 of %2").arg(text1, text2);
         Info.text[relPrefix + "description"] = desc;
         Info.text[relPrefix + "playedtime"] = text1;
         Info.text[relPrefix + "totaltime"] = text2;

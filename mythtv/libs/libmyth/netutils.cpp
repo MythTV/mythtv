@@ -69,8 +69,8 @@ GrabberScript* findTreeGrabberByCommand(const QString& commandline,
     QString image = query.value(1).toString();
     QString author = query.value(2).toString();
     QString desc = query.value(3).toString();
-    QString command = QString("%1/internetcontent/%2").arg(GetShareDir())
-                        .arg(query.value(4).toString());
+    QString command = QString("%1/internetcontent/%2")
+        .arg(GetShareDir(), query.value(4).toString());
     double ver = query.value(5).toDouble();
     bool search = query.value(6).toBool();
     bool tree = query.value(7).toBool();
@@ -101,8 +101,8 @@ GrabberScript* findSearchGrabberByCommand(const QString& commandline,
     QString image = query.value(1).toString();
     QString author = query.value(2).toString();
     QString desc = query.value(3).toString();
-    QString command = QString("%1/internetcontent/%2").arg(GetShareDir())
-                        .arg(query.value(4).toString());
+    QString command = QString("%1/internetcontent/%2")
+        .arg(GetShareDir(), query.value(4).toString());
     double ver = query.value(5).toDouble();
     bool search = query.value(6).toBool();
     bool tree = query.value(7).toBool();
@@ -132,8 +132,8 @@ GrabberScript::scriptList findAllDBTreeGrabbers()
         ArticleType type = (ArticleType)query.value(2).toInt();
         QString author = query.value(3).toString();
         QString desc = query.value(4).toString();
-        QString commandline = QString("%1/internetcontent/%2").arg(GetShareDir())
-                            .arg(query.value(5).toString());
+        QString commandline = QString("%1/internetcontent/%2")
+            .arg(GetShareDir(), query.value(5).toString());
         double ver = query.value(6).toDouble();
         bool search = query.value(7).toBool();
         bool tree = query.value(8).toBool();
@@ -167,8 +167,8 @@ GrabberScript::scriptList findAllDBTreeGrabbersByHost(ArticleType type)
         QString image = query.value(1).toString();
         QString author = query.value(2).toString();
         QString desc = query.value(3).toString();
-        QString commandline = QString("%1/internetcontent/%2").arg(GetShareDir())
-                            .arg(query.value(4).toString());
+        QString commandline = QString("%1/internetcontent/%2")
+            .arg(GetShareDir(), query.value(4).toString());
         double ver = query.value(5).toDouble();
         bool search = query.value(6).toBool();
         bool tree = query.value(7).toBool();
@@ -202,8 +202,8 @@ GrabberScript::scriptList findAllDBSearchGrabbers(ArticleType type)
         QString image = query.value(1).toString();
         QString author = query.value(2).toString();
         QString desc = query.value(3).toString();
-        QString commandline = QString("%1/internetcontent/%2").arg(GetShareDir())
-                            .arg(query.value(4).toString());
+        QString commandline = QString("%1/internetcontent/%2")
+            .arg(GetShareDir(), query.value(4).toString());
         double ver = query.value(5).toDouble();
         bool search = query.value(6).toBool();
         bool tree = query.value(7).toBool();
@@ -861,8 +861,7 @@ QString GetDownloadFilename(const QString& title, const QString& url)
     QUrl qurl(url);
     QString ext = QFileInfo(qurl.path()).suffix();
     QString basefilename = QString("download_%1_%2.%3")
-                           .arg(QString::number(urlChecksum))
-                           .arg(QString::number(titleChecksum)).arg(ext);
+        .arg(QString::number(urlChecksum), QString::number(titleChecksum), ext);
 
     return basefilename;
 }

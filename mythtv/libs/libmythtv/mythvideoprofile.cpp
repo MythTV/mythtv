@@ -245,7 +245,7 @@ auto MythVideoProfileItem::IsValid() const
     if (auto decoders = MythVideoProfile::GetDecoders(); !decoders.contains(decoder))
         return result { false, QString("decoder %1 is not available").arg(decoder) };
     if (auto renderers = MythVideoProfile::GetVideoRenderers(decoder); !renderers.contains(renderer))
-        return result { false, QString("renderer %1 is not supported with decoder %2") .arg(renderer).arg(decoder) };
+        return result { false, QString("renderer %1 is not supported with decoder %2") .arg(renderer, decoder) };
 
     return result { true, {}};
 }
@@ -272,12 +272,12 @@ QString MythVideoProfileItem::toString() const
     QString upscale   = Get(PREF_UPSCALE);
 
     QString cond = QString("w(%1) h(%2) framerate(%3) codecs(%4)")
-        .arg(width).arg(height).arg(framerate).arg(codecs);
+        .arg(width, height, framerate, codecs);
     QString str =  QString("cmp(%1%2) %7 dec(%3) cpus(%4) skiploop(%5) rend(%6) ")
-        .arg(cmp0).arg(QString(cmp1.isEmpty() ? "" : ",") + cmp1)
-        .arg(decoder).arg(max_cpus).arg((skiploop) ? "enabled" : "disabled").arg(renderer)
-        .arg(cond);
-    str += QString("deint(%1,%2) upscale(%3)").arg(deint0).arg(deint1).arg(upscale);
+        .arg(cmp0, QString(cmp1.isEmpty() ? "" : ",") + cmp1,
+             decoder, QString::number(max_cpus), (skiploop) ? "enabled" : "disabled",
+             renderer, cond);
+    str += QString("deint(%1,%2) upscale(%3)").arg(deint0, deint1, upscale);
     return str;
 }
 
@@ -469,13 +469,13 @@ void MythVideoProfile::LoadBestPreferences(const QSize Size, float Framerate,
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("LoadBestPreferences result: "
             "priority:%1 width:%2 height:%3 fps:%4 codecs:%5")
-            .arg(GetPreference(PREF_PRIORITY)).arg(GetPreference(COND_WIDTH))
-            .arg(GetPreference(COND_HEIGHT)).arg(GetPreference(COND_RATE))
-            .arg(GetPreference(COND_CODECS)));
+            .arg(GetPreference(PREF_PRIORITY), GetPreference(COND_WIDTH),
+                 GetPreference(COND_HEIGHT),   GetPreference(COND_RATE),
+                 GetPreference(COND_CODECS)));
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("decoder:%1 renderer:%2 deint0:%3 deint1:%4 cpus:%5 upscale:%6")
-            .arg(GetPreference(PREF_DEC)).arg(GetPreference(PREF_RENDER))
-            .arg(GetPreference(PREF_DEINT1X)).arg(GetPreference(PREF_DEINT2X))
-            .arg(GetPreference(PREF_CPUS)).arg(GetPreference(PREF_UPSCALE)));
+            .arg(GetPreference(PREF_DEC),     GetPreference(PREF_RENDER),
+                 GetPreference(PREF_DEINT1X), GetPreference(PREF_DEINT2X),
+                 GetPreference(PREF_CPUS),    GetPreference(PREF_UPSCALE)));
 
     // Signal any changes
     if (auto upscale = GetPreference(PREF_UPSCALE); oldupscale != upscale)
@@ -1255,7 +1255,7 @@ QString MythVideoProfile::GetPreferredVideoRenderer(const QString &Decoder)
 QStringList MythVideoProfile::GetFilteredRenderers(const QString &Decoder, const QStringList &Renderers)
 {
     const QStringList safe = GetVideoRenderers(Decoder);
-    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Safe renderers for '%1': %2").arg(Decoder).arg(safe.join(",")));
+    LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Safe renderers for '%1': %2").arg(Decoder, safe.join(",")));
 
     QStringList filtered;
     for (const auto& dec : qAsConst(safe))
@@ -1292,7 +1292,7 @@ QString MythVideoProfile::toString() const
     auto cpus     = GetPreference(PREF_CPUS);
     auto upscale  = GetPreference(PREF_UPSCALE);
     return QString("rend:%1 deint:%2/%3 CPUs: %4 Upscale: %5")
-        .arg(renderer).arg(deint0).arg(deint1).arg(cpus).arg(upscale);
+        .arg(renderer, deint0, deint1, cpus, upscale);
 }
 
 const QList<QPair<QString, QString> >& MythVideoProfile::GetDeinterlacers()

@@ -315,7 +315,7 @@ bool RemoteFile::OpenInternal()
         if (m_localFile == -1)
         {
             LOG(VB_FILE, LOG_ERR, QString("RemoteFile::Open(%1) Error: %2")
-                .arg(m_path).arg(strerror(errno)));
+                .arg(m_path, strerror(errno)));
             return false;
         }
         return true;
@@ -588,7 +588,7 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst,
                            bool overwrite, bool verify)
 {
     LOG(VB_FILE, LOG_INFO,
-        QString("RemoteFile::CopyFile: Copying file from '%1' to '%2'").arg(src).arg(dst));
+        QString("RemoteFile::CopyFile: Copying file from '%1' to '%2'").arg(src, dst));
 
     // sanity check
     if (src == dst)
@@ -677,7 +677,7 @@ bool RemoteFile::CopyFile (const QString& src, const QString& dst,
 bool RemoteFile::MoveFile (const QString& src, const QString& dst, bool overwrite)
 {
     LOG(VB_FILE, LOG_INFO,
-        QString("RemoteFile::MoveFile: Moving file from '%1' to '%2'").arg(src).arg(dst));
+        QString("RemoteFile::MoveFile: Moving file from '%1' to '%2'").arg(src, dst));
 
     // sanity check
     if (src == dst)
@@ -1306,7 +1306,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
 {
     LOG(VB_FILE, LOG_INFO, QString("RemoteFile::FindFile(): looking for '%1' on '%2' in group '%3' "
                                    "(useregex: %4, allowfallback: %5)")
-                                   .arg(filename).arg(host).arg(storageGroup)
+                                   .arg(filename, host, storageGroup)
                                    .arg(useRegex).arg(allowFallback));
 
     if (filename.isEmpty() || storageGroup.isEmpty())
@@ -1332,7 +1332,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
             QStringList files = sgroup.GetFileList('/' + fi.path());
 
             LOG(VB_FILE, LOG_INFO, QString("RemoteFile::FindFileList: Looking in dir '%1' for '%2'")
-                                           .arg(fi.path()).arg(fi.fileName()));
+                                           .arg(fi.path(), fi.fileName()));
 
             for (int x = 0; x < files.size(); x++)
             {

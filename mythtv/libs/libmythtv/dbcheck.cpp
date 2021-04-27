@@ -1849,7 +1849,7 @@ static bool doUpgradeTVDatabaseSchema(void)
                 LOG(VB_GENERAL, LOG_CRIT,
                     QString("Invalid address string '%1' found on %2. "
                             "Reverting to localhost defaults.")
-                        .arg(query.value(0).toString()).arg(hostname));
+                        .arg(query.value(0).toString(), hostname));
             }
 
             if (!update.exec() || !insert.exec())
@@ -3802,6 +3802,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1368")
     {
         DBUpdates updates {
+            // NOLINTNEXTLINE(bugprone-suspicious-missing-comma)
             "ALTER TABLE credits ADD COLUMN priority "
             "    TINYINT UNSIGNED DEFAULT 0;",
             "ALTER TABLE credits ADD COLUMN roleid "

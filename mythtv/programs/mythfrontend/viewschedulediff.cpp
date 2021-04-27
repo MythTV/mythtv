@@ -110,10 +110,10 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem */*item*/)
             {
                 message += QString("%1 - %2  %3\n")
                     .arg(pa->GetRecordingStartTime()
-                         .toLocalTime().toString(timeFormat))
-                    .arg(pa->GetRecordingEndTime()
-                         .toLocalTime().toString(timeFormat))
-                    .arg(pa->toString(ProgramInfo::kTitleSubtitle, " - "));
+                         .toLocalTime().toString(timeFormat),
+                         pa->GetRecordingEndTime()
+                         .toLocalTime().toString(timeFormat),
+                         pa->toString(ProgramInfo::kTitleSubtitle, " - "));
             }
         }
     }

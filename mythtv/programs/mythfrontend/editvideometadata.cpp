@@ -363,9 +363,9 @@ void EditMetadataDialog::fillWidgets()
         QString title;
         if (md->GetSeason() > 0 || md->GetEpisode() > 0)
         {
-            title = QString("%1 %2x%3").arg(md->GetTitle())
-                                       .arg(QString::number(md->GetSeason()))
-                                       .arg(QString::number(md->GetEpisode()));
+            title = QString("%1 %2x%3").arg(md->GetTitle(),
+                                            QString::number(md->GetSeason()),
+                                            QString::number(md->GetEpisode()));
         }
         else
         {

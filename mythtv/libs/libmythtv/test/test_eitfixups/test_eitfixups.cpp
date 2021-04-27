@@ -218,7 +218,7 @@ void TestEITFixups::checkCast(const DBEventEIT& event,
                 break;
               default:
                 QFAIL(qPrintable(QString("Unknown person '%1'of type %2")
-                                 .arg(person.m_name).arg(person.GetRole())));
+                                 .arg(person.m_name, person.GetRole())));
                 allCast.removeOne(person.m_name);
                 break;
             }

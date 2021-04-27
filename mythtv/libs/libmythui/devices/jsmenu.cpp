@@ -116,7 +116,7 @@ bool JoystickMenuThread::Init(QString &config_file)
 
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Initialization of %1 succeeded using config file %2")
-                                        .arg(m_devicename) .arg(config_file));
+                                        .arg(m_devicename, config_file));
     return true;
 }
 

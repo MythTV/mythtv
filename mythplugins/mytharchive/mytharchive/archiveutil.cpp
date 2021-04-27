@@ -177,7 +177,7 @@ bool extractDetailsFromFilename(const QString &inFile,
     }
 
     LOG(VB_JOBQUEUE, LOG_INFO,
-        QString("chanid: %1 starttime:%2 ").arg(chanID).arg(startTime));
+        QString("chanid: %1 starttime:%2 ").arg(chanID, startTime));
 
     return true;
 }
@@ -246,7 +246,7 @@ bool getFileDetails(ArchiveItem *a)
     // call mytharchivehelper to get files stream info etc.
     QString command = QString("mytharchivehelper --getfileinfo --infile \"%1\" "
                               "--outfile \"%2\" --method %3")
-            .arg(inFile).arg(outFile).arg(lenMethod);
+            .arg(inFile, outFile, QString::number(lenMethod));
     command += logPropagateArgs;
     if (!logPropagateQuiet())
         command += " --quiet";

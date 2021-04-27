@@ -117,8 +117,11 @@ void MHBooleanVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
             MHERROR("Invalid comparison for bool");
     }
 
-    MHLOG(MHLogDetail, QString("Comparison %1 between %2 and %3 => %4").arg(TestToText(nOp))
-          .arg(m_fValue ? "true" : "false").arg(parm.m_fBoolVal ? "true" : "false").arg(fRes ? "true" : "false"));
+    MHLOG(MHLogDetail, QString("Comparison %1 between %2 and %3 => %4")
+          .arg(TestToText(nOp),
+               m_fValue ? "true" : "false",
+               parm.m_fBoolVal ? "true" : "false",
+               fRes ? "true" : "false"));
     engine->EventTriggered(this, EventTestEvent, fRes);
 }
 
@@ -134,7 +137,8 @@ void MHBooleanVar::SetVariableValue(const MHUnion &value)
 {
     value.CheckType(MHUnion::U_Bool);
     m_fValue = value.m_fBoolVal;
-    MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable()).arg(m_fValue ? "true" : "false"));
+    MHLOG(MHLogDetail, QString("Update %1 := %2")
+          .arg(m_ObjectReference.Printable(), m_fValue ? "true" : "false"));
 }
 
 
@@ -323,8 +327,9 @@ void MHOctetStrVar::TestVariable(int nOp, const MHUnion &parm, MHEngine *engine)
 
     MHOctetString sample1(m_value, 0, 10);
     MHOctetString sample2(parm.m_strVal, 0, 10);
-    MHLOG(MHLogDetail, QString("Comparison %1 %2 and %3 => %4").arg(TestToText(nOp))
-          .arg(sample1.Printable()).arg(sample2.Printable()).arg(fRes ? "true" : "false"));
+    MHLOG(MHLogDetail, QString("Comparison %1 %2 and %3 => %4")
+          .arg(TestToText(nOp), sample1.Printable(), sample2.Printable(),
+               fRes ? "true" : "false"));
     engine->EventTriggered(this, EventTestEvent, fRes);
 }
 
@@ -350,8 +355,8 @@ void MHOctetStrVar::SetVariableValue(const MHUnion &value)
 
     // Debug
     MHOctetString sample(m_value, 0, 60);
-    MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable())
-          .arg(sample.Printable()));
+    MHLOG(MHLogDetail, QString("Update %1 := %2")
+          .arg(m_ObjectReference.Printable(), sample.Printable()));
 }
 
 
@@ -430,7 +435,8 @@ void MHObjectRefVar::SetVariableValue(const MHUnion &value)
 {
     value.CheckType(MHUnion::U_ObjRef);
     m_value.Copy(value.m_objRefVal);
-    MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable()).arg(m_value.Printable()));
+    MHLOG(MHLogDetail, QString("Update %1 := %2")
+          .arg(m_ObjectReference.Printable(), m_value.Printable()));
 }
 
 
@@ -509,7 +515,8 @@ void MHContentRefVar::SetVariableValue(const MHUnion &value)
 {
     value.CheckType(MHUnion::U_ContentRef);
     m_value.Copy(value.m_contentRefVal);
-    MHLOG(MHLogDetail, QString("Update %1 := %2").arg(m_ObjectReference.Printable()).arg(m_value.Printable()));
+    MHLOG(MHLogDetail, QString("Update %1 := %2")
+          .arg(m_ObjectReference.Printable(), m_value.Printable()));
 }
 
 // Actions

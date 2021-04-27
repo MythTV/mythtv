@@ -419,8 +419,8 @@ bool MythSocket::Validate(std::chrono::milliseconds timeout, bool error_dialog_d
         return true;
 
     QStringList strlist(QString("MYTH_PROTO_VERSION %1 %2")
-                        .arg(MYTH_PROTO_VERSION)
-                        .arg(QString::fromUtf8(MYTH_PROTO_TOKEN)));
+                        .arg(MYTH_PROTO_VERSION,
+                             QString::fromUtf8(MYTH_PROTO_TOKEN)));
 
     WriteStringList(strlist);
 
@@ -438,9 +438,9 @@ bool MythSocket::Validate(std::chrono::milliseconds timeout, bool error_dialog_d
         LOG(VB_GENERAL, LOG_ERR,
             QString("Protocol version or token mismatch "
                     "(frontend=%1/%2,backend=%3/\?\?)\n")
-            .arg(MYTH_PROTO_VERSION)
-            .arg(QString::fromUtf8(MYTH_PROTO_TOKEN))
-            .arg(strlist[1]));
+            .arg(MYTH_PROTO_VERSION,
+                 QString::fromUtf8(MYTH_PROTO_TOKEN),
+                 strlist[1]));
 
         QObject *GUIcontext = gCoreContext->GetGUIContext();
         if (error_dialog_desired && GUIcontext)
@@ -453,7 +453,7 @@ bool MythSocket::Validate(std::chrono::milliseconds timeout, bool error_dialog_d
     else if (strlist[0] == "ACCEPT")
     {
         LOG(VB_GENERAL, LOG_NOTICE, QString("Using protocol version %1 %2")
-            .arg(MYTH_PROTO_VERSION).arg(QString::fromUtf8(MYTH_PROTO_TOKEN)));
+            .arg(MYTH_PROTO_VERSION, QString::fromUtf8(MYTH_PROTO_TOKEN)));
         m_isValidated = true;
     }
     else
@@ -853,8 +853,8 @@ void MythSocket::ReadStringListReal(
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Protocol error: %1'%2' is not a valid size "
                     "prefix. %3 bytes pending.")
-                .arg(ok ? "" : "(parse failed) ")
-                .arg(sizestr.data()).arg(pending));
+                .arg(ok ? "" : "(parse failed) ",
+                     sizestr.data(), QString::number(pending)));
         ResetReal();
         return;
     }

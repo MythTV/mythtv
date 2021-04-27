@@ -162,13 +162,13 @@ inline void VideoMetadataInfo::InitializeCustomTypes()
 {
     qRegisterMetaType< VideoMetadataInfo* >();
 
-    if (QMetaType::type( "DTC::ArtworkInfoList*" ) == 0)
+    if (qMetaTypeId<DTC::ArtworkInfoList*>() == QMetaType::UnknownType)
         ArtworkInfoList::InitializeCustomTypes();
 
-    if (QMetaType::type( "DTC::CastMemberList*" ) == 0)
+    if (qMetaTypeId<DTC::CastMemberList*>() == QMetaType::UnknownType)
         CastMemberList::InitializeCustomTypes();
 
-    if (QMetaType::type( "DTC::GenreMemberList*" ) == 0)
+    if (qMetaTypeId<DTC::GenreList*>() == QMetaType::UnknownType)
         GenreList::InitializeCustomTypes();
 }
 

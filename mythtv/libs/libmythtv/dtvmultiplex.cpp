@@ -34,13 +34,14 @@ bool DTVMultiplex::operator==(const DTVMultiplex &m) const
 QString DTVMultiplex::toString() const
 {
     QString ret = QString("%1 %2 %3 ")
-        .arg(m_frequency).arg(m_modulation.toString()).arg(m_inversion.toString());
+        .arg(QString::number(m_frequency), m_modulation.toString(),
+             m_inversion.toString());
 
     ret += QString("%1 %2 %3 %4 %5 %6 %7")
-        .arg(m_hpCodeRate.toString()).arg(m_lpCodeRate.toString())
-        .arg(m_bandwidth.toString()).arg(m_transMode.toString())
-        .arg(m_guardInterval.toString()).arg(m_hierarchy.toString())
-        .arg(m_polarity.toString());
+        .arg(m_hpCodeRate.toString(),    m_lpCodeRate.toString(),
+             m_bandwidth.toString(),     m_transMode.toString(),
+             m_guardInterval.toString(), m_hierarchy.toString(),
+             m_polarity.toString());
     ret += QString(" fec:%1 msys:%2 ro:%3")
         .arg(m_fec.toString(),-4).arg(m_modSys.toString(),-6).arg(m_rolloff.toString());
 
@@ -321,7 +322,7 @@ bool DTVMultiplex::ParseDVB_T2(
     {
         m_modSys = DTVModulationSystem::kModulationSystem_DVBT;
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Deprecated DVB-T modulation system " +
-                QString("parameter '%1', using %2.").arg(_mod_sys).arg(m_modSys.toString()));
+                QString("parameter '%1', using %2.").arg(_mod_sys, m_modSys.toString()));
     }
 
     // Accept 1 for DVB-T2
@@ -329,7 +330,7 @@ bool DTVMultiplex::ParseDVB_T2(
     {
         m_modSys = DTVModulationSystem::kModulationSystem_DVBT2;
         LOG(VB_GENERAL, LOG_WARNING, LOC + "Deprecated DVB-T2 modulation system " +
-                QString("parameter '%1', using %2.").arg(_mod_sys).arg(m_modSys.toString()));
+                QString("parameter '%1', using %2.").arg(_mod_sys, m_modSys.toString()));
     }
 
     // We have a DVB-T2 tuner, change undefined modulation system to DVB-T2

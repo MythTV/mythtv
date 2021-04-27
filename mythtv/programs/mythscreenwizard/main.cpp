@@ -13,7 +13,6 @@
 
 #include <QKeyEvent>
 #include <QEvent>
-#include <QTextCodec>
 #include <QWidget>
 #include <QApplication>
 #include <QString>

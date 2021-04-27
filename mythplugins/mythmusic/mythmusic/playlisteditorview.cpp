@@ -271,7 +271,7 @@ void PlaylistEditorView::customEvent(QEvent *event)
                 QString name = mnode->GetText();
 
                 ShowOkPopup(tr("Are you sure you want to delete this Smart Playlist?\n"
-                               "Category: %1 - Name: %2").arg(category).arg(name),
+                               "Category: %1 - Name: %2").arg(category, name),
                             this, &PlaylistEditorView::deleteSmartPlaylist, true);
             }
             else if (resulttext == tr("Edit Smart Playlist"))
@@ -452,7 +452,7 @@ bool PlaylistEditorView::keyPressEvent(QKeyEvent *event)
                         QString name = mnode->GetText();
 
                         ShowOkPopup(tr("Are you sure you want to delete this Smart Playlist?\n"
-                                       "Category: %1 - Name: %2").arg(category).arg(name),
+                                       "Category: %1 - Name: %2").arg(category, name),
                                     this, &PlaylistEditorView::deleteSmartPlaylist, true);
                         handled = true;
                     }

@@ -398,8 +398,8 @@ void CustomPriority::testSchedule(void)
         QString msg =
             QString("DB Error (Obtaining lock in testRecording): \n"
                     "Query was: %1 \nError was: %2 \n")
-            .arg(thequery)
-            .arg(MythDB::DBErrorMessage(query.lastError()));
+            .arg(thequery,
+                 MythDB::DBErrorMessage(query.lastError()));
         LOG(VB_GENERAL, LOG_ERR, msg);
         return;
     }
@@ -411,8 +411,8 @@ void CustomPriority::testSchedule(void)
         QString msg =
             QString("DB Error (deleting old table in testRecording): \n"
                     "Query was: %1 \nError was: %2 \n")
-            .arg(thequery)
-            .arg(MythDB::DBErrorMessage(query.lastError()));
+            .arg(thequery,
+                 MythDB::DBErrorMessage(query.lastError()));
         LOG(VB_GENERAL, LOG_ERR, msg);
         return;
     }
@@ -425,8 +425,8 @@ void CustomPriority::testSchedule(void)
         QString msg =
             QString("DB Error (create new table): \n"
                     "Query was: %1 \nError was: %2 \n")
-            .arg(thequery)
-            .arg(MythDB::DBErrorMessage(query.lastError()));
+            .arg(thequery,
+                 MythDB::DBErrorMessage(query.lastError()));
         LOG(VB_GENERAL, LOG_ERR, msg);
         return;
     }
@@ -469,8 +469,8 @@ void CustomPriority::testSchedule(void)
         QString msg =
             QString("DB Error (free lock): \n"
                     "Query was: %1 \nError was: %2 \n")
-            .arg(thequery)
-            .arg(MythDB::DBErrorMessage(query.lastError()));
+            .arg(thequery,
+                 MythDB::DBErrorMessage(query.lastError()));
         LOG(VB_GENERAL, LOG_ERR, msg);
     }
 }

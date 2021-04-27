@@ -662,7 +662,7 @@ bool SlideBuffer::Load(const ImagePtrK& im, int direction)
         ++m_nextLoad;
 
     LOG(VB_FILE, LOG_DEBUG, SBLOC + QString("Loading %1 in %2, %3")
-        .arg(im->m_filePath, slide->objectName()).arg(BufferState()));
+        .arg(im->m_filePath, slide->objectName(), BufferState()));
 
     return slide->LoadSlide(im, direction, true);
 }
@@ -683,7 +683,7 @@ void SlideBuffer::Preload(const ImagePtrK& im)
     Slide *slide = m_queue.at(m_nextLoad);
 
     LOG(VB_FILE, LOG_DEBUG, SBLOC + QString("Preloading %1 in %2, %3")
-        .arg(im->m_filePath, slide->objectName()).arg(BufferState()));
+        .arg(im->m_filePath, slide->objectName(), BufferState()));
 
     // Load silently
     slide->LoadSlide(im);
@@ -741,7 +741,7 @@ void SlideBuffer::Flush(Slide *slide, const QString& reason)
     QString   path = im ? im->m_filePath : "Unknown";
 
     LOG(VB_FILE, LOG_DEBUG, SBLOC + QString("%1 %2 in %3, %4")
-        .arg(reason, path, slide->objectName()).arg(BufferState()));
+        .arg(reason, path, slide->objectName(), BufferState()));
 
     emit SlideReady(--available);
 }

@@ -266,7 +266,7 @@ void DecoderHandler::createPlaylist(const QUrl &url)
     QString extension = QFileInfo(url.path()).suffix();
     LOG(VB_NETWORK, LOG_INFO,
         QString("File %1 has extension %2")
-            .arg(QFileInfo(url.path()).fileName()).arg(extension));
+            .arg(QFileInfo(url.path()).fileName(), extension));
 
     if (extension == "pls" || extension == "m3u" || extension == "asx")
     {
@@ -360,7 +360,7 @@ void DecoderHandler::doConnectDecoder(const QUrl &url, const QString &format)
 void DecoderHandler::doFailed(const QUrl &url, const QString &message)
 {
     LOG(VB_NETWORK, LOG_ERR,
-        QString("DecoderHandler error: '%1' - %2").arg(message).arg(url.toString()));
+        QString("DecoderHandler error: '%1' - %2").arg(message, url.toString()));
     DecoderHandlerEvent ev(DecoderHandlerEvent::Error, new QString(message));
     dispatch(ev);
 }

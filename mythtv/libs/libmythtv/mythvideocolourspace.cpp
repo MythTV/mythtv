@@ -374,30 +374,31 @@ bool MythVideoColourSpace::UpdateColourSpace(const MythVideoFrame *Frame)
             .arg(MythVideoFrame::FormatDescription(Frame->m_type)));
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Input : %1(%2) Depth:%3 %4Range:%5")
-        .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)))
-        .arg(m_colourSpace == raw ? "Detected" : "Guessed")
-        .arg(m_colourSpaceDepth)
-        .arg((m_colourSpaceDepth > 8) ? (m_colourShifted ? "(Pre-scaled) " : "(Fixed point) ") : "")
-        .arg((AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited"));
+        .arg(av_color_space_name(static_cast<AVColorSpace>(m_colourSpace)),
+             m_colourSpace == raw ? "Detected" : "Guessed",
+             QString::number(m_colourSpaceDepth),
+             (m_colourSpaceDepth > 8) ? (m_colourShifted ? "(Pre-scaled) " : "(Fixed point) ") : "",
+             (AVCOL_RANGE_JPEG == m_range) ? "Full" : "Limited"));
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Input : Primaries:%1 Transfer: %2")
-        .arg(av_color_primaries_name(static_cast<AVColorPrimaries>(m_colourPrimaries)))
-        .arg(av_color_transfer_name(static_cast<AVColorTransferCharacteristic>(m_colourTransfer))));
+        .arg(av_color_primaries_name(static_cast<AVColorPrimaries>(m_colourPrimaries)),
+             av_color_transfer_name(static_cast<AVColorTransferCharacteristic>(m_colourTransfer))));
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Output: Range:%1 Primaries: %2")
-        .arg(m_fullRange ? "Full" : "Limited")
-        .arg(m_customDisplayPrimaries ? "Custom (screen)" :
+        .arg(m_fullRange ? "Full" : "Limited",
+             m_customDisplayPrimaries ? "Custom (screen)" :
                 av_color_primaries_name(static_cast<AVColorPrimaries>(m_displayPrimaries))));
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chroma location: %1 %2")
-        .arg(av_chroma_location_name(static_cast<AVChromaLocation>(m_chromaLocation)))
-        .arg(rawchroma == m_chromaLocation ? "(Detected)" : "(Guessed)"));
+        .arg(av_chroma_location_name(static_cast<AVChromaLocation>(m_chromaLocation)),
+             rawchroma == m_chromaLocation ? "(Detected)" : "(Guessed)"));
 
     Update();
 
     if (!m_primaryMatrix.isIdentity())
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Enabled colourspace primaries conversion from %1 to %2")
-            .arg(av_color_primaries_name(static_cast<AVColorPrimaries>(m_colourPrimaries)))
-            .arg(m_customDisplayPrimaries ? "Custom (screen)" :
-                 av_color_primaries_name(static_cast<AVColorPrimaries>(m_displayPrimaries))));
+            .arg(av_color_primaries_name(static_cast<AVColorPrimaries>(m_colourPrimaries)),
+                 m_customDisplayPrimaries
+                 ? "Custom (screen)"
+                 : av_color_primaries_name(static_cast<AVColorPrimaries>(m_displayPrimaries))));
     }
     return true;
 }

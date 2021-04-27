@@ -24,6 +24,7 @@ using std::getenv;
 #include <QMutexLocker>
 #include <QNetworkAccessManager>
 #include <QNetworkDiskCache>
+#include <QNetworkInterface>
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -240,7 +241,7 @@ bool NetStream::Request(const QUrl& url)
             {
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     QString("Opening client certificate '%1': %2")
-                    .arg(f1.fileName()).arg(f1.errorString()) );
+                    .arg(f1.fileName(), f1.errorString()) );
             }
 
             // Get the private key
@@ -262,7 +263,7 @@ bool NetStream::Request(const QUrl& url)
                 {
                     LOG(VB_GENERAL, LOG_WARNING, LOC +
                         QString("Opening private key '%1': %2")
-                        .arg(f2.fileName()).arg(f2.errorString()) );
+                        .arg(f2.fileName(), f2.errorString()) );
                 }
             }
         }
@@ -911,25 +912,15 @@ bool NAMThread::AbortRequest(NetStreamAbort *p)
 // static
 bool NAMThread::isAvailable()
 {
-    NAMThread &m = manager();
-
-    if (!m.m_running.tryAcquire(1, 3000))
-        return false;
-
-    m.m_running.release();
-
-    QMutexLocker locker(&m.m_mutex);
-
-    if (!m.m_nam)
-        return false;
-
-    switch (m.m_nam->networkAccessible())
-    {
-    case QNetworkAccessManager::Accessible: return true;
-    case QNetworkAccessManager::NotAccessible: return false;
-    case QNetworkAccessManager::UnknownAccessibility: return true;
-    }
-    return false;
+    auto interfaces = QNetworkInterface::allInterfaces();
+    return std::any_of(interfaces.begin(), interfaces.end(),
+		       [](const QNetworkInterface& iface)
+			   {
+                               auto f = iface.flags();
+                               if (f.testFlag(QNetworkInterface::IsLoopBack))
+                                   return false;
+                               return f.testFlag(QNetworkInterface::IsRunning);
+                           } );
 }
 
 // Time when URI was last written to cache or invalid if not cached.
@@ -961,7 +952,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     if (expire.isValid() && expire.toLocalTime() < now)
     {
         LOG(VB_FILE, LOG_INFO, LOC + QString("GetLastModified('%1') past expiration %2")
-            .arg(url.toString()).arg(expire.toString()));
+            .arg(url.toString(), expire.toString()));
         return QDateTime(); // Invalid
     }
 
@@ -1003,7 +994,7 @@ QDateTime NAMThread::GetLastModified(const QUrl &url)
     }
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1') last modified %2")
-        .arg(url.toString()).arg(lastMod.toString()));
+        .arg(url.toString(), lastMod.toString()));
     return lastMod;
 }
 

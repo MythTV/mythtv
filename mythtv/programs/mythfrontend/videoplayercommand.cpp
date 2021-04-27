@@ -49,7 +49,7 @@ namespace
         if (tmp.contains("%s"))
             return tmp.replace("%s", arg);
 
-        return QString("%1 %2").arg(tmp).arg(arg);
+        return QString("%1 %2").arg(tmp, arg);
     }
 }
 

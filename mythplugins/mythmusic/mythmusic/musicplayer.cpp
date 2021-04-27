@@ -681,12 +681,12 @@ void MusicPlayer::customEvent(QEvent *event)
                     QString mdataStr;
                     MusicMetadata *mdata = getCurrentMetadata();
                     if (mdata)
-                        mdataStr = QString("%1 by %2 from %3").arg(mdata->Title()).arg(mdata->Artist()).arg(mdata->Album());
+                        mdataStr = QString("%1 by %2 from %3").arg(mdata->Title(), mdata->Artist(), mdata->Album());
                     else
                         mdataStr = "Unknown Track2";
 
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
-                            .arg(gCoreContext->GetHostName()).arg(mdataStr);
+                            .arg(gCoreContext->GetHostName(), mdataStr);
                     MythEvent me2(message);
                     gCoreContext->dispatch(me2);
                 }
@@ -700,7 +700,7 @@ void MusicPlayer::customEvent(QEvent *event)
                         statusStr = "PAUSED";
 
                     QString message = QString("MUSIC_CONTROL ANSWER %1 %2")
-                            .arg(gCoreContext->GetHostName()).arg(statusStr);
+                            .arg(gCoreContext->GetHostName(), statusStr);
                     MythEvent me2(message);
                     gCoreContext->dispatch(me2);
                 }

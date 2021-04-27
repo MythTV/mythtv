@@ -613,13 +613,13 @@ void Scheduler::PrintRec(const RecordingInfo *p, const QString &prefix)
         .leftJustified(34 - prefix.length(), ' ', true);
 
     outstr += QString("%1 %2 %3 %4-%5  %6 %7  ")
-        .arg(episode)
-        .arg(p->GetChanNum().rightJustified(5, ' '))
-        .arg(p->GetChannelSchedulingID().leftJustified(7, ' ', true))
-        .arg(p->GetRecordingStartTime().toLocalTime().toString("dd hh:mm"))
-        .arg(p->GetRecordingEndTime().toLocalTime().toString("hh:mm"))
-        .arg(p->GetShortInputName().rightJustified(2, ' '))
-        .arg(QString::number(p->GetInputID()).rightJustified(2, ' '));
+        .arg(episode,
+             p->GetChanNum().rightJustified(5, ' '),
+             p->GetChannelSchedulingID().leftJustified(7, ' ', true),
+             p->GetRecordingStartTime().toLocalTime().toString("dd hh:mm"),
+             p->GetRecordingEndTime().toLocalTime().toString("hh:mm"),
+             p->GetShortInputName().rightJustified(2, ' '),
+             QString::number(p->GetInputID()).rightJustified(2, ' '));
     outstr += QString("%1 %2 %3")
         .arg(toQChar(p->GetRecordingRuleType()))
         .arg(RecStatus::toString(p->GetRecordingStatus(), p->GetInputID()).rightJustified(2, ' '))
@@ -657,11 +657,11 @@ void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Updating status for %1 on cardid [%2] (%3 => %4)")
-                        .arg(p->toString(ProgramInfo::kTitleSubtitle))
-                        .arg(p->GetInputID())
-                        .arg(RecStatus::toString(p->GetRecordingStatus(),
-                                      p->GetRecordingRuleType()))
-                        .arg(RecStatus::toString(pginfo->GetRecordingStatus(),
+                        .arg(p->toString(ProgramInfo::kTitleSubtitle),
+                             QString::number(p->GetInputID()),
+                             RecStatus::toString(p->GetRecordingStatus(),
+                                      p->GetRecordingRuleType()),
+                             RecStatus::toString(pginfo->GetRecordingStatus(),
                                       p->GetRecordingRuleType())));
                 bool resched =
                     ((p->GetRecordingStatus() != RecStatus::Recording &&
@@ -705,11 +705,11 @@ void Scheduler::UpdateRecStatus(uint cardid, uint chanid,
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Updating status for %1 on cardid [%2] (%3 => %4)")
-                        .arg(p->toString(ProgramInfo::kTitleSubtitle))
-                        .arg(p->GetInputID())
-                        .arg(RecStatus::toString(p->GetRecordingStatus(),
-                                      p->GetRecordingRuleType()))
-                        .arg(RecStatus::toString(recstatus,
+                        .arg(p->toString(ProgramInfo::kTitleSubtitle),
+                             QString::number(p->GetInputID()),
+                             RecStatus::toString(p->GetRecordingStatus(),
+                                      p->GetRecordingRuleType()),
+                             RecStatus::toString(recstatus,
                                       p->GetRecordingRuleType())));
                 bool resched =
                     ((p->GetRecordingStatus() != RecStatus::Recording &&
@@ -840,18 +840,18 @@ void Scheduler::SlaveConnected(const RecordingList &slavelist)
                     rp->AddHistory(false);
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("setting %1/%2/\"%3\" as %4")
-                            .arg(sp->GetInputID())
-                            .arg(sp->GetChannelSchedulingID())
-                            .arg(sp->GetTitle())
-                            .arg(RecStatus::toUIState(sp->GetRecordingStatus())));
+                            .arg(QString::number(sp->GetInputID()),
+                                 sp->GetChannelSchedulingID(),
+                                 sp->GetTitle(),
+                                 RecStatus::toUIState(sp->GetRecordingStatus())));
                 }
                 else
                 {
                     LOG(VB_GENERAL, LOG_NOTICE,
                         QString("%1/%2/\"%3\" is already recording on card %4")
                             .arg(sp->GetInputID())
-                            .arg(sp->GetChannelSchedulingID())
-                            .arg(sp->GetTitle())
+                            .arg(sp->GetChannelSchedulingID(),
+                                 sp->GetTitle())
                             .arg(rp->GetInputID()));
                 }
             }
@@ -865,9 +865,9 @@ void Scheduler::SlaveConnected(const RecordingList &slavelist)
                 rp->AddHistory(false);
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("setting %1/%2/\"%3\" as aborted")
-                        .arg(rp->GetInputID())
-                        .arg(rp->GetChannelSchedulingID())
-                        .arg(rp->GetTitle()));
+                        .arg(QString::number(rp->GetInputID()),
+                             rp->GetChannelSchedulingID(),
+                             rp->GetTitle()));
             }
         }
 
@@ -880,9 +880,9 @@ void Scheduler::SlaveConnected(const RecordingList &slavelist)
             sp->AddHistory(false);
             LOG(VB_GENERAL, LOG_INFO,
                 QString("adding %1/%2/\"%3\" as recording")
-                    .arg(sp->GetInputID())
-                    .arg(sp->GetChannelSchedulingID())
-                    .arg(sp->GetTitle()));
+                    .arg(QString::number(sp->GetInputID()),
+                         sp->GetChannelSchedulingID(),
+                         sp->GetTitle()));
         }
     }
 }
@@ -911,8 +911,8 @@ void Scheduler::SlaveDisconnected(uint cardid)
             }
             m_recListChanged = true;
             LOG(VB_GENERAL, LOG_INFO, QString("setting %1/%2/\"%3\" as aborted")
-                    .arg(rp->GetInputID()).arg(rp->GetChannelSchedulingID())
-                    .arg(rp->GetTitle()));
+                    .arg(QString::number(rp->GetInputID()), rp->GetChannelSchedulingID(),
+                         rp->GetTitle()));
         }
     }
 }
@@ -2565,7 +2565,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
     {
         LOG(VB_SCHEDULE, LOG_INFO, LOC +
             QString("Slave Backend %1 is being awakened to record: %2")
-                .arg(nexttv->GetHostName()).arg(ri.GetTitle()));
+                .arg(nexttv->GetHostName(), ri.GetTitle()));
 
         if (!WakeUpSlave(nexttv->GetHostName()))
             EnqueuePlace("HandleWakeSlave1");
@@ -2738,8 +2738,8 @@ bool Scheduler::HandleRecording(
                 QString("WARNING: Slave Backend %1 has NOT come "
                         "back from sleep yet.  Recording can "
                         "not begin yet for: %2")
-                    .arg(nexttv->GetHostName())
-                    .arg(ri.GetTitle()));
+                    .arg(nexttv->GetHostName(),
+                         ri.GetTitle()));
         }
         else if (nexttv->GetLastWakeTime().secsTo(curtime) > 300)
         {
@@ -2873,7 +2873,7 @@ void Scheduler::HandleRecordingStatusChange(
          QString("Canceled recording (%1)")
          .arg(RecStatus::toString(ri.GetRecordingStatus(), ri.GetRecordingRuleType())));
 
-    LOG(VB_GENERAL, LOG_INFO, QString("%1: %2").arg(msg).arg(details));
+    LOG(VB_GENERAL, LOG_INFO, QString("%1: %2").arg(msg, details));
 
     if ((RecStatus::Recording == recStatus) || (RecStatus::Tuning == recStatus))
     {
@@ -2896,9 +2896,9 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
 
     LOG(VB_SCHEDULE, LOG_DEBUG,
         QString("Assigning input for %1/%2/\"%3\"")
-        .arg(ri.GetInputID())
-        .arg(ri.GetChannelSchedulingID())
-        .arg(ri.GetTitle()));
+        .arg(QString::number(ri.GetInputID()),
+             ri.GetChannelSchedulingID(),
+             ri.GetTitle()));
 
     uint bestid = 0;
     uint betterid = 0;
@@ -3009,16 +3009,18 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
     {
         LOG(VB_SCHEDULE, LOG_INFO,
             QString("Assigned input %1 for %2/%3/\"%4\"")
-            .arg(bestid).arg(ri.GetInputID()).arg(ri.GetChannelSchedulingID())
-            .arg(ri.GetTitle()));
+            .arg(bestid).arg(ri.GetInputID())
+            .arg(ri.GetChannelSchedulingID(),
+                 ri.GetTitle()));
         ri.SetInputID(bestid);
     }
     else
     {
         LOG(VB_SCHEDULE, LOG_WARNING,
             QString("Failed to assign input for %1/%2/\"%3\"")
-            .arg(ri.GetInputID()).arg(ri.GetChannelSchedulingID())
-            .arg(ri.GetTitle()));
+            .arg(QString::number(ri.GetInputID()),
+                 ri.GetChannelSchedulingID(),
+                 ri.GetTitle()));
     }
 
     return bestid != 0U;
@@ -3490,7 +3492,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
                     LOG(VB_SCHEDULE, LOG_DEBUG,
                         QString("    Slave %1 is in use currently "
                                 "recording '%1'")
-                            .arg(enc->GetHostName()).arg(pginfo->GetTitle()));
+                            .arg(enc->GetHostName(), pginfo->GetTitle()));
                 }
                 SlavesInUse << enc->GetHostName();
             }
@@ -3509,8 +3511,8 @@ void Scheduler::PutInactiveSlavesToSleep(void)
             SlavesInUse << query.value(0).toString();
             LOG(VB_SCHEDULE, LOG_DEBUG,
                 QString("    Slave %1 is marked as in use by a %2")
-                    .arg(query.value(0).toString())
-                    .arg(query.value(1).toString()));
+                    .arg(query.value(0).toString(),
+                         query.value(1).toString()));
         }
     }
 
@@ -4035,8 +4037,8 @@ void Scheduler::UpdateMatches(uint recordid, uint sourceid, uint mplexid,
         for (int clause = 0; clause < fromclauses.count(); ++clause)
         {
             LOG(VB_SCHEDULE, LOG_INFO, QString("Query %1: %2/%3")
-                .arg(clause).arg(fromclauses[clause])
-                .arg(whereclauses[clause]));
+                .arg(QString::number(clause), fromclauses[clause],
+                     whereclauses[clause]));
         }
     }
 
@@ -4638,9 +4640,9 @@ void Scheduler::AddNewRecords(void)
                 LOG(VB_GENERAL, LOG_WARNING, LOC +
                     QString("Channel %1, Title %2 %3 cardinput.schedorder = %4, "
                             "it must be >0 to record from this input.")
-                    .arg(p->GetChannelName()).arg(p->GetTitle())
-                    .arg(p->GetScheduledStartTime().toString())
-                    .arg(p->m_schedOrder));
+                    .arg(p->GetChannelName(), p->GetTitle(),
+                         p->GetScheduledStartTime().toString(),
+                         QString::number(p->m_schedOrder)));
                 m_schedOrderWarned.insert(p->GetInputID());
             }
         }
@@ -4885,7 +4887,7 @@ void Scheduler::GetAllScheduled(RecList &proglist, SchedSortColumn sortBy,
         "GROUP BY recordid "
         "ORDER BY %1 %2");
 
-    query = query.arg(sortColumn).arg(order);
+    query = query.arg(sortColumn, order);
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);
@@ -5085,7 +5087,7 @@ int Scheduler::FillRecordingDir(
         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
             QString("FillRecordingDir: The only directory in the %1 Storage "
                     "Group is %2, so it will be used by default.")
-                .arg(storagegroup) .arg(dirlist[0]));
+                .arg(storagegroup, dirlist[0]));
         recording_dir = dirlist[0];
         LOG(VB_SCHEDULE, LOG_INFO, LOC + "FillRecordingDir: Finished");
 
@@ -5123,8 +5125,7 @@ int Scheduler::FillRecordingDir(
         FileSystemInfo *fs = &(*fsit);
         int tmpWeight = 0;
 
-        QString msg = QString("  %1:%2").arg(fs->getHostname())
-                              .arg(fs->getPath());
+        QString msg = QString("  %1:%2").arg(fs->getHostname(), fs->getPath());
         if (fs->isLocal())
         {
             tmpWeight = localStartingWeight;
@@ -5139,7 +5140,7 @@ int Scheduler::FillRecordingDir(
         fs->setWeight(tmpWeight);
 
         tmpWeight = gCoreContext->GetNumSetting(QString("SGweightPerDir:%1:%2")
-                                .arg(fs->getHostname()).arg(fs->getPath()), 0);
+                                .arg(fs->getHostname(), fs->getPath()), 0);
         fs->setWeight(fs->getWeight() + tmpWeight);
 
         if (tmpWeight)
@@ -5228,10 +5229,11 @@ int Scheduler::FillRecordingDir(
                         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
                             QString("  %1 @ %2 in use by '%3' on %4:%5, FSID "
                                     "#%6, FSID weightOffset +%7.")
-                                .arg(recChanid)
-                                .arg(recStart.toString(Qt::ISODate))
-                                .arg(recUsage).arg(recHost).arg(recDir)
-                                .arg(fs->getFSysID()).arg(weightOffset));
+                            .arg(QString::number(recChanid),
+                                 recStart.toString(Qt::ISODate),
+                                 recUsage, recHost, recDir,
+                                 QString::number(fs->getFSysID()),
+                                 QString::number(weightOffset)));
 
                         // need to offset all directories on this filesystem
                         for (auto & fsit2 : m_fsInfoCache)
@@ -5242,8 +5244,8 @@ int Scheduler::FillRecordingDir(
                                 LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
                                     QString("    %1:%2 => old weight %3 plus "
                                             "%4 = %5")
-                                        .arg(fs2->getHostname())
-                                        .arg(fs2->getPath())
+                                        .arg(fs2->getHostname(),
+                                             fs2->getPath())
                                         .arg(fs2->getWeight())
                                         .arg(weightOffset)
                                         .arg(fs2->getWeight() + weightOffset));
@@ -5284,8 +5286,8 @@ int Scheduler::FillRecordingDir(
                     QString("%1 @ %2 will record on %3:%4, FSID #%5, "
                             "weightPerRecording +%6.")
                         .arg(thispg->GetChanID())
-                        .arg(thispg->GetRecordingStartTime(MythDate::ISODate))
-                        .arg(fs->getHostname()).arg(fs->getPath())
+                        .arg(thispg->GetRecordingStartTime(MythDate::ISODate),
+                             fs->getHostname(), fs->getPath())
                         .arg(fs->getFSysID()).arg(weightPerRecording));
 
                 // NOLINTNEXTLINE(modernize-loop-convert)
@@ -5297,7 +5299,7 @@ int Scheduler::FillRecordingDir(
                     {
                         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
                             QString("    %1:%2 => old weight %3 plus %4 = %5")
-                                .arg(fs2->getHostname()).arg(fs2->getPath())
+                                .arg(fs2->getHostname(), fs2->getPath())
                                 .arg(fs2->getWeight()).arg(weightPerRecording)
                                 .arg(fs2->getWeight() + weightPerRecording));
 
@@ -5331,7 +5333,7 @@ int Scheduler::FillRecordingDir(
         {
             FileSystemInfo *fs = *fslistit;
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("%1:%2")
-                .arg(fs->getHostname()) .arg(fs->getPath()));
+                .arg(fs->getHostname(), fs->getPath()));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("    Location    : %1")
                 .arg((fs->isLocal()) ? "local" : "remote"));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("    weight      : %1")
@@ -5475,7 +5477,7 @@ int Scheduler::FillRecordingDir(
                                 "to be expired from the AutoExpire list and "
                                 "there are enough that the Expirer should "
                                 "be able to free up space for this recording.")
-                            .arg(title).arg(recording_dir)
+                            .arg(title, recording_dir)
                             .arg(fs->getFreeSpace() / 1024)
                             .arg(desiredSpaceKB / 1024));
 
@@ -5512,8 +5514,7 @@ int Scheduler::FillRecordingDir(
                                     "'%2' which has %3 MB free. This recording "
                                     "could use a max of %4 MB and the "
                                     "AutoExpirer wants to keep %5 MB free.")
-                                .arg(title)
-                                .arg(recording_dir)
+                                .arg(title, recording_dir)
                                 .arg(fs->getFreeSpace() / 1024)
                                 .arg(maxSizeKB / 1024)
                                 .arg(desiredSpaceKB / 1024));
@@ -5527,8 +5528,7 @@ int Scheduler::FillRecordingDir(
                                 "Something will have to be deleted or expired "
                                 "in order for this recording to complete "
                                 "successfully.")
-                                .arg(pass).arg(title)
-                                .arg(recording_dir)
+                                .arg(pass).arg(title, recording_dir)
                                 .arg(fs->getFreeSpace() / 1024)
                                 .arg(desiredSpaceKB / 1024));
                     }

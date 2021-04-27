@@ -445,7 +445,8 @@ void LyricsView::showLyrics(void)
     m_lyricsList->Reset();
 
     QString syncronized = m_lyricData->syncronized() ? tr("Syncronized") : tr("Unsyncronized");
-    new MythUIButtonListItem(m_lyricsList, tr("** Lyrics from %1 (%2) **").arg(m_lyricData->grabber()).arg(syncronized));
+    new MythUIButtonListItem(m_lyricsList, tr("** Lyrics from %1 (%2) **")
+                             .arg(m_lyricData->grabber(), syncronized));
 
     for (auto * line : qAsConst(*m_lyricData->lyrics()))
     {

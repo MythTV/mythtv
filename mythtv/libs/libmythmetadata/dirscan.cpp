@@ -203,7 +203,7 @@ namespace
                 else
                 {
                     suffix = fi.suffix();
-                    URL = QString("%1/%2").arg(path).arg(fileName);
+                    URL = QString("%1/%2").arg(path, fileName);
                 }
 
                 URL.replace("//","/");

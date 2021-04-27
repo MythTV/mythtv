@@ -310,7 +310,7 @@ V4L2Profiles MythV4L2M2MContext::GetProfiles(const std::vector<V4L2Mapping>& Pro
         V4L2util v4l2dev(root + device);
         uint32_t caps = v4l2dev.GetCapabilities();
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Device: %1 Driver: '%2' Capabilities: 0x%3")
-            .arg(v4l2dev.GetDeviceName()).arg(v4l2dev.GetDriverName()).arg(caps, 0, 16));
+            .arg(v4l2dev.GetDeviceName(), v4l2dev.GetDriverName(), QString::number(caps, 16)));
 
         // check capture and output support
         // these mimic the device checks in v4l2_m2m.c
@@ -385,7 +385,7 @@ V4L2Profiles MythV4L2M2MContext::GetProfiles(const std::vector<V4L2Mapping>& Pro
                     if (pixformats.isEmpty())
                         pixformats.append("None");
                     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Codec '%1' has no supported formats (Supported: %2)")
-                        .arg(MythCodecContext::GetProfileDescription(mythprofile, dummy)).arg(pixformats.join((","))));
+                        .arg(MythCodecContext::GetProfileDescription(mythprofile, dummy), pixformats.join((","))));
                 }
             }
         }

@@ -322,6 +322,11 @@ def buildEpisode(args, opts):
         episode_number = int(args[2])
 
     episode = None
+
+    if season_number > series.number_of_seasons:
+        sys.stdout.write('ERROR: Episode not found: ' + str(args))
+        return 9
+
     # process seasons backwards because it is more likely
     # that you have a recent one than an old one
     while season_number > 0:

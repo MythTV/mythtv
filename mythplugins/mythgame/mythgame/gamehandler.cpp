@@ -116,8 +116,8 @@ void GameHandler::InitMetaDataMap(const QString& GameType)
         while (query.next())
         {
             key = QString("%1:%2")
-                  .arg(query.value(0).toString())
-                  .arg(query.value(9).toString());
+                  .arg(query.value(0).toString(),
+                       query.value(9).toString());
             m_romDB[key] = RomData(
                                          query.value(1).toString(),
                                          query.value(2).toString(),
@@ -171,7 +171,7 @@ void GameHandler::GetMetadata(GameHandler *handler, const QString& rom, QString*
         if (m_romDB.contains(key))
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("ROMDB FOUND for %1 - %2")
-                     .arg(m_romDB[key].GameName()).arg(key));
+                     .arg(m_romDB[key].GameName(), key));
             *Year      = m_romDB[key].Year();
             *Country   = m_romDB[key].Country();
             *Genre     = m_romDB[key].Genre();
@@ -182,7 +182,7 @@ void GameHandler::GetMetadata(GameHandler *handler, const QString& rom, QString*
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + QString("NO ROMDB FOUND for %1 (%2)")
-                    .arg(rom).arg(*CRC32));
+                    .arg(rom, *CRC32));
         }
 
     };
@@ -195,8 +195,8 @@ void GameHandler::GetMetadata(GameHandler *handler, const QString& rom, QString*
 
 static void purgeGameDB(const QString& filename, const QString& RomPath)
 {
-    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Purging %1 - %2").arg(RomPath)
-            .arg(filename));
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Purging %1 - %2")
+            .arg(RomPath, filename));
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -386,8 +386,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 
     //: %1 is the system name, %2 is the game type
     QString message = tr("Updating %1 (%2) ROM database")
-                          .arg(handler->SystemName())
-                          .arg(handler->GameType());
+        .arg(handler->SystemName(), handler->GameType());
 
     CreateProgress(message);
 
@@ -667,7 +666,7 @@ void GameHandler::buildFileList(const QString& directory, GameHandler *handler,
                                       GameName, Info.absoluteDir().path());
 
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found ROM : (%1) - %2")
-            .arg(handler->SystemName()).arg(RomName));
+            .arg(handler->SystemName(), RomName));
 
         *filecount = *filecount + 1;
         if (m_progressDlg)
@@ -864,10 +863,8 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
                         for (int disk = 1; disk <= romdata->DiskCount(); disk++)
                         {
                             rom = QString("\"%1/%2%3.%4\"")
-                                          .arg(romdata->Rompath())
-                                          .arg(basename)
-                                          .arg(disk)
-                                          .arg(extension);
+                                .arg(romdata->Rompath(), basename,
+                                     QString::number(disk), extension);
                             exec = exec.replace(diskid[disk],rom);
                         }
                     } else
@@ -897,10 +894,10 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
         }
     }
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Launching Game : %1 : %2")
-           .arg(handler->SystemName())
-           .arg(exec));
+           .arg(handler->SystemName(), exec));
 
-    GetMythUI()->AddCurrentLocation(QString("MythGame %1 ( %2 )").arg(handler->SystemName()).arg(exec));
+    GetMythUI()->AddCurrentLocation(QString("MythGame %1 ( %2 )")
+                                    .arg(handler->SystemName(), exec));
 
     QStringList cmdlist = exec.split(";");
     if (cmdlist.count() > 0)

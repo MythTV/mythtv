@@ -166,7 +166,7 @@ bool SatIPRTSP::Setup(const QUrl& url)
 
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("Setup completed, sessionID = %1, streamID = %2, timeout = %3s")
-            .arg(m_sessionid).arg(m_streamid)
+            .arg(m_sessionid, m_streamid)
             .arg(duration_cast<std::chrono::seconds>(m_timeout).count()));
     emit startKeepAlive(m_timeout);
 
@@ -278,7 +278,7 @@ bool SatIPRTSP::sendMessage(const QUrl& url, const QString& msg, QStringList *ad
     }
 
     QStringList headers;
-    headers.append(QString("%1 %2 RTSP/1.0").arg(msg).arg(url.toString()));
+    headers.append(QString("%1 %2 RTSP/1.0").arg(msg, url.toString()));
     headers.append(QString("User-Agent: MythTV Sat>IP client"));
     headers.append(QString("CSeq: %1").arg(++m_cseq));
 

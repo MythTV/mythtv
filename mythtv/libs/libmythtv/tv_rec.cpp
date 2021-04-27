@@ -428,9 +428,10 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
             .addSecs(post_roll_seconds);
 
         QString msg = QString("updating recording: %1 %2 %3 %4")
-            .arg(m_curRecording->GetTitle()).arg(m_curRecording->GetChanID())
-            .arg(m_curRecording->GetRecordingStartTime(MythDate::ISODate))
-            .arg(m_curRecording->GetRecordingEndTime(MythDate::ISODate));
+            .arg(m_curRecording->GetTitle(),
+                 QString::number(m_curRecording->GetChanID()),
+                 m_curRecording->GetRecordingStartTime(MythDate::ISODate),
+                 m_curRecording->GetRecordingEndTime(MythDate::ISODate));
         LOG(VB_RECORD, LOG_INFO, LOC + msg);
 
         ClearFlags(kFlagCancelNextRecording, __FILE__, __LINE__);
@@ -613,9 +614,10 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
     else if (!did_switch)
     {
         QString msg = QString("Wanted to record: %1 %2 %3 %4\n\t\t\t")
-            .arg(rcinfo->GetTitle()).arg(rcinfo->GetChanID())
-            .arg(rcinfo->GetRecordingStartTime(MythDate::ISODate))
-            .arg(rcinfo->GetRecordingEndTime(MythDate::ISODate));
+            .arg(rcinfo->GetTitle(),
+                 QString::number(rcinfo->GetChanID()),
+                 rcinfo->GetRecordingStartTime(MythDate::ISODate),
+                 rcinfo->GetRecordingEndTime(MythDate::ISODate));
 
         if (cancelNext)
         {
@@ -632,9 +634,10 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         if (m_curRecording && m_internalState == kState_RecordingOnly)
         {
             msg += QString("\n\t\t\tCurrently recording: %1 %2 %3 %4")
-                .arg(m_curRecording->GetTitle()).arg(m_curRecording->GetChanID())
-                .arg(m_curRecording->GetRecordingStartTime(MythDate::ISODate))
-                .arg(m_curRecording->GetRecordingEndTime(MythDate::ISODate));
+                .arg(m_curRecording->GetTitle(),
+                     QString::number(m_curRecording->GetChanID()),
+                     m_curRecording->GetRecordingStartTime(MythDate::ISODate),
+                     m_curRecording->GetRecordingEndTime(MythDate::ISODate));
         }
 
         LOG(VB_GENERAL, LOG_INFO, LOC + msg);
@@ -688,9 +691,9 @@ void TVRec::SetRecordingStatus(
 
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("SetRecordingStatus(%1->%2) on line %3")
-        .arg(RecStatus::toString(old_status, kSingleRecord))
-        .arg(RecStatus::toString(new_status, kSingleRecord))
-        .arg(line));
+        .arg(RecStatus::toString(old_status, kSingleRecord),
+             RecStatus::toString(new_status, kSingleRecord),
+             QString::number(line)));
 }
 
 /** \fn TVRec::StopRecording(bool killFile)
@@ -789,7 +792,7 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
 
     curRec->StartedRecording(m_rbFileExt);
     LOG(VB_RECORD, LOG_INFO, LOC + QString("StartedRecording(%1) fn(%2)")
-        .arg(curRec->MakeUniqueKey()).arg(curRec->GetPathname()));
+        .arg(curRec->MakeUniqueKey(), curRec->GetPathname()));
 
     if (curRec->IsCommercialFree())
         curRec->SaveCommFlagged(COMM_FLAG_COMMFREE);
@@ -822,9 +825,9 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
     {
         LOG((recq->IsDamaged()) ? VB_GENERAL : VB_RECORD, LOG_INFO,
             LOC + QString("FinishedRecording(%1) %2 recq:\n%3")
-            .arg(curRec->MakeUniqueKey())
-            .arg((recq->IsDamaged()) ? "damaged" : "good")
-            .arg(recq->toStringXML()));
+            .arg(curRec->MakeUniqueKey(),
+                 (recq->IsDamaged()) ? "damaged" : "good",
+                 recq->toStringXML()));
         is_good = !recq->IsDamaged();
         delete recq;
         recq = nullptr;
@@ -868,14 +871,14 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
         QString("FinishedRecording(%1) %2 quality"
                 "\n\t\t\ttitle: %3\n\t\t\t"
                 "in recgroup: %4 status: %5:%6 %7 %8")
-            .arg(curRec->MakeUniqueKey())
-            .arg(is_good ? "Good" : "Bad")
-            .arg(curRec->GetTitle())
-            .arg(recgrp)
-            .arg(RecStatus::toString(ors, kSingleRecord))
-            .arg(RecStatus::toString(curRec->GetRecordingStatus(), kSingleRecord))
-            .arg(HasFlags(kFlagDummyRecorderRunning)?"is_dummy":"not_dummy")
-            .arg(was_finished?"already_finished":"finished_now"));
+            .arg(curRec->MakeUniqueKey(),
+                 is_good ? "Good" : "Bad",
+                 curRec->GetTitle(),
+                 recgrp,
+                 RecStatus::toString(ors, kSingleRecord),
+                 RecStatus::toString(curRec->GetRecordingStatus(), kSingleRecord),
+                 HasFlags(kFlagDummyRecorderRunning)?"is_dummy":"not_dummy",
+                 was_finished?"already_finished":"finished_now"));
 
     // This has already been called on this recording..
     if (was_finished)
@@ -1002,8 +1005,7 @@ void TVRec::HandleStateChange(void)
     bool changed = false;
 
     QString transMsg = QString(" %1 to %2")
-        .arg(StateToString(nextState))
-        .arg(StateToString(m_desiredNextState));
+        .arg(StateToString(nextState), StateToString(m_desiredNextState));
 
     if (m_desiredNextState == m_internalState)
     {
@@ -1793,8 +1795,8 @@ QString TVRec::GetStartChannel(uint inputid)
         if (!startchan.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC2 + QString("Start channel invalid, "
-                    "setting to '%1' on input %2 instead.").arg(startchan)
-                    .arg(query.value(1).toString()));
+                    "setting to '%1' on input %2 instead.")
+                    .arg(startchan, query.value(1).toString()));
             return startchan;
         }
     }
@@ -2251,7 +2253,7 @@ bool TVRec::ShouldSwitchToAnotherInput(const QString& chanid) const
     else if (query.next())
     {
         msg = QString("Found channel (%1) on different input(%2).")
-            .arg(query.value(0).toString()).arg(query.value(1).toString());
+            .arg(query.value(0).toString(), query.value(1).toString());
         LOG(VB_RECORD, LOG_INFO, LOC + msg);
         return true;
     }
@@ -2992,7 +2994,7 @@ void TVRec::ToggleChannelFavorite(const QString& changroupname)
         {
            LOG(VB_RECORD, LOG_INFO, LOC +
                QString("Toggled channel favorite.channum %1, chan group %2")
-                   .arg(channum).arg(changroupname));
+                   .arg(channum, changroupname));
         }
     }
 }
@@ -3233,7 +3235,7 @@ void TVRec::GetNextProgram(BrowseDirection direction,
         "      channel.chanid = :CHANID        AND "
         "      starttime %1 :STARTTIME "
         "ORDER BY starttime %2 "
-        "LIMIT 1").arg(compare).arg(sortorder);
+        "LIMIT 1").arg(compare, sortorder);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
@@ -3851,10 +3853,10 @@ void TVRec::TuningFrequency(const TuningRequest &request)
                                 "Start recording deadline: %2 "
                                 "Good signal deadline: %3")
                         .arg(m_preFailDeadline.toLocalTime()
-                             .toString("hh:mm:ss.zzz"))
-                        .arg(m_startRecordingDeadline.toLocalTime()
-                             .toString("hh:mm:ss.zzz"))
-                        .arg(m_signalMonitorDeadline.toLocalTime()
+                             .toString("hh:mm:ss.zzz"),
+                             m_startRecordingDeadline.toLocalTime()
+                             .toString("hh:mm:ss.zzz"),
+                             m_signalMonitorDeadline.toLocalTime()
                              .toString("hh:mm:ss.zzz")));
                 }
                 else
@@ -4149,7 +4151,7 @@ QString TVRec::LoadProfile(void *tvchain, RecordingInfo *rec,
             LOG(VB_RECORD, LOG_INFO, LOC +
                 QString("Profile '%1' not found, using "
                         "fallback profile '%2' to record")
-                    .arg(profileRequested).arg(profileName));
+                    .arg(profileRequested, profileName));
         }
         else
         {
@@ -4157,7 +4159,7 @@ QString TVRec::LoadProfile(void *tvchain, RecordingInfo *rec,
                 QString("Profile '%1' not found, and unable "
                         "to load fallback profile '%2'.  Results "
                         "may be unpredicable")
-                    .arg(profileRequested).arg(profileName));
+                    .arg(profileRequested, profileName));
         }
     }
 
@@ -4395,14 +4397,14 @@ void TVRec::TuningRestartRecorder(void)
     {
         ProgramInfo *rcinfo1 = m_pseudoLiveTVRecording;
         QString msg1 = QString("Recording: %1 %2 %3 %4")
-            .arg(rcinfo1->GetTitle()).arg(rcinfo1->GetChanID())
-            .arg(rcinfo1->GetRecordingStartTime(MythDate::ISODate))
-            .arg(rcinfo1->GetRecordingEndTime(MythDate::ISODate));
+            .arg(rcinfo1->GetTitle(), QString::number(rcinfo1->GetChanID()),
+                 rcinfo1->GetRecordingStartTime(MythDate::ISODate),
+                 rcinfo1->GetRecordingEndTime(MythDate::ISODate));
         ProgramInfo *rcinfo2 = m_tvChain->GetProgramAt(-1);
         QString msg2 = QString("Recording: %1 %2 %3 %4")
-            .arg(rcinfo2->GetTitle()).arg(rcinfo2->GetChanID())
-            .arg(rcinfo2->GetRecordingStartTime(MythDate::ISODate))
-            .arg(rcinfo2->GetRecordingEndTime(MythDate::ISODate));
+            .arg(rcinfo2->GetTitle(), QString::number(rcinfo2->GetChanID()),
+                 rcinfo2->GetRecordingStartTime(MythDate::ISODate),
+                 rcinfo2->GetRecordingEndTime(MythDate::ISODate));
         delete rcinfo2;
         LOG(VB_RECORD, LOG_INFO, LOC + "Pseudo LiveTV recording starting." +
                 "\n\t\t\t" + msg1 + "\n\t\t\t" + msg2);
@@ -4423,7 +4425,7 @@ void TVRec::SetFlags(uint f, const QString & file, int line)
     QMutexLocker lock(&m_stateChangeLock);
     m_stateFlags |= f;
     LOG(VB_RECORD, LOG_INFO, LOC + QString("SetFlags(%1) -> %2 @ %3:%4")
-        .arg(FlagToString(f)).arg(FlagToString(m_stateFlags)).arg(file).arg(line));
+        .arg(FlagToString(f), FlagToString(m_stateFlags), file, QString::number(line)));
     WakeEventLoop();
 }
 
@@ -4432,7 +4434,7 @@ void TVRec::ClearFlags(uint f, const QString & file, int line)
     QMutexLocker lock(&m_stateChangeLock);
     m_stateFlags &= ~f;
     LOG(VB_RECORD, LOG_INFO, LOC + QString("ClearFlags(%1) -> %2 @ %3:%4")
-        .arg(FlagToString(f)).arg(FlagToString(m_stateFlags)).arg(file).arg(line));
+        .arg(FlagToString(f), FlagToString(m_stateFlags), file, QString::number(line)));
     WakeEventLoop();
 }
 
@@ -4793,7 +4795,7 @@ RecordingInfo *TVRec::SwitchRecordingRingBuffer(const RecordingInfo &rcinfo)
         LOG(VB_RECORD, LOG_ERR, LOC +
             QString("SwitchRecordingRingBuffer() -> "
                     "cannot switch profile '%1' to '%2'")
-            .arg(m_recProfileName).arg(pn));
+            .arg(m_recProfileName, pn));
         return nullptr;
     }
 
@@ -4836,9 +4838,8 @@ TVRec* TVRec::GetTVRec(uint inputid)
 QString TuningRequest::toString(void) const
 {
     return QString("Program(%1) channel(%2) input(%3) flags(%4)")
-        .arg((m_program == nullptr) ? QString("NULL") : m_program->toString())
-        .arg(m_channel).arg(m_input)
-        .arg(TVRec::FlagToString(m_flags));
+        .arg((m_program == nullptr) ? QString("NULL") : m_program->toString(),
+             m_channel, m_input, TVRec::FlagToString(m_flags));
 }
 
 #ifdef USING_DVB

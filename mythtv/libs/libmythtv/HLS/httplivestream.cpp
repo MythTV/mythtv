@@ -373,7 +373,7 @@ bool HTTPLiveStream::WriteHTML(void)
         "    </center>\n"
         "  </body>\n"
         "</html>\n"
-        ).arg(m_sourceFile).arg(m_outBaseEncoded)
+        ).arg(m_sourceFile, m_outBaseEncoded)
          .toLatin1());
 
     file.close();
@@ -492,7 +492,7 @@ bool HTTPLiveStream::WritePlaylist(bool audioOnly, bool writeEndTag)
               outFile.toLatin1().constData()) == -1)
     {
         LOG(VB_RECORD, LOG_ERR, LOC +
-            QString("Error renaming %1 to %2").arg(tmpFile).arg(outFile) + ENO);
+            QString("Error renaming %1 to %2").arg(tmpFile, outFile) + ENO);
         return false;
     }
 
@@ -593,7 +593,7 @@ bool HTTPLiveStream::UpdateStatus(HTTPLiveStreamStatus status)
     QString statusStr = StatusToString(status);
     LOG(VB_RECORD, LOG_DEBUG, LOC +
         QString("Switch streamid %1 from %2 to %3")
-        .arg(m_streamid).arg(mStatusStr).arg(statusStr));
+        .arg(QString::number(m_streamid), mStatusStr, statusStr));
 
     m_status = status;
 

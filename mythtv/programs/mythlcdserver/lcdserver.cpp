@@ -630,7 +630,7 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QTcpSocket *socket
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("LCDServer: bad bool value in SET_GENERIC_PROGRESS "
-                    "command: %1 %2").arg(tokens[1]).arg(tokens[2]));
+                    "command: %1 %2").arg(tokens[1], tokens[2]));
         sendMessage(socket, "HUH?");
         return;
     }

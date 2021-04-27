@@ -594,9 +594,9 @@ uint MpegRecorder::GetFilteredStreamType(void) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("Stream type '%1'\n\t\t\t"
                     "is not supported by %2 driver, using '%3' instead.")
-                .arg(QString::fromStdString(kStreamType[m_streamType]))
-                .arg(m_driver)
-                .arg(QString::fromStdString(kStreamType[st])));
+                .arg(QString::fromStdString(kStreamType[m_streamType]),
+                     m_driver,
+                     QString::fromStdString(kStreamType[st])));
     }
 
     return st;

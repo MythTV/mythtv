@@ -373,8 +373,8 @@ void MythCCExtractorPlayer::Process608Captions(uint flags)
 
                 QString service_key = QString("cc%1").arg(idx + 1);
                 QString filename = QString("%1.%2%3-%4.%5.srt")
-                    .arg(m_baseName).arg(stream_id_str).arg("608")
-                    .arg(service_key).arg(lang);
+                    .arg(m_baseName, stream_id_str, "608",
+                         service_key, lang);
 
                 (*cc608it).m_srtWriters[idx] = new SRTWriter(
                     m_workingDir.filePath(filename));
@@ -492,8 +492,8 @@ void MythCCExtractorPlayer::Process708Captions(uint flags)
                 QString service_key = QString("service-%1")
                     .arg(idx, 2, 10, QChar('0'));
                 QString filename = QString("%1.%2%3-%4.%5.srt")
-                    .arg(m_baseName).arg(stream_id_str).arg("708")
-                    .arg(service_key).arg(lang);
+                    .arg(m_baseName, stream_id_str, "708",
+                         service_key, lang);
 
                 (*cc708it).m_srtWriters[idx] = new SRTWriter(
                     m_workingDir.filePath(filename));
@@ -588,9 +588,7 @@ void MythCCExtractorPlayer::ProcessTeletext(uint flags)
                 QString lang = iso639_key_to_str3(langCode);
                 lang = iso639_is_key_undefined(langCode) ? "und" : lang;
                 QString filename = QString("%1-%2.%3ttx-0x%4.srt")
-                    .arg(m_baseName)
-                    .arg(lang)
-                    .arg(stream_id_str)
+                    .arg(m_baseName, lang, stream_id_str)
                     .arg(page, 3, 16, QChar('0'));
 
                 (*ttxit).m_srtWriters[page] = new SRTWriter(

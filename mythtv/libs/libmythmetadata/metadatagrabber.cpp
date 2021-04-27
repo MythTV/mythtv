@@ -184,7 +184,7 @@ MetaGrabberScript MetaGrabberScript::GetType(const GrabberType type)
 
     // polling the cache will cause a refresh, so lets just grab and
     // process the script directly
-    QString fullcmd = QString("%1%2").arg(GetShareDir()).arg(cmd);
+    QString fullcmd = QString("%1%2").arg(GetShareDir(), cmd);
     MetaGrabberScript script(fullcmd);
 
     if (script.IsValid())
@@ -375,7 +375,7 @@ MetadataLookupList MetaGrabberScript::RunGrabber(const QStringList &args,
     MetadataLookupList list;
 
     LOG(VB_GENERAL, LOG_INFO, QString("Running Grabber: %1 %2")
-        .arg(m_fullcommand).arg(args.join(" ")));
+        .arg(m_fullcommand, args.join(" ")));
 
     grabber.Run();
     if (grabber.Wait(180s) != GENERIC_EXIT_OK)
@@ -392,12 +392,11 @@ MetadataLookupList MetaGrabberScript::RunGrabber(const QStringList &args,
         while (!item.isNull())
         {
             MetadataLookup *tmp = ParseMetadataItem(item, lookup, passseas);
-            tmp->SetInetref(QString("%1_%2").arg(m_command)
-                                            .arg(tmp->GetInetref()));
+            tmp->SetInetref(QString("%1_%2").arg(m_command,tmp->GetInetref()));
             if (!tmp->GetCollectionref().isEmpty())
             {
-                tmp->SetCollectionref(QString("%1_%2").arg(m_command)
-                                .arg(tmp->GetCollectionref()));
+                tmp->SetCollectionref(QString("%1_%2")
+                                .arg(m_command, tmp->GetCollectionref()));
             }
             list.append(tmp);
             // MetadataLookup is to be owned by the list

@@ -33,7 +33,7 @@ static int CopyFile(const MythUtilCommandLineParser &cmdline)
         return GENERIC_EXIT_NOT_OK;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Copying %1 to %2").arg(src).arg(dest));
+    LOG(VB_GENERAL, LOG_INFO, QString("Copying %1 to %2").arg(src, dest));
     MythMediaBuffer *srcbuffer = MythMediaBuffer::Create(src, false);
     if (!srcbuffer)
     {

@@ -105,11 +105,11 @@ QStringList SatIP::doUPNPsearch(void)
                     for (int i = 0; i < num_tuners; i++)
                     {
                         QString device = QString("%1 %2 %3 %4 %5")
-                                            .arg(id)
-                                            .arg(friendlyName.replace(" ", ""))
-                                            .arg(ip)
-                                            .arg(i)
-                                            .arg(tuner.at(0));
+                                            .arg(id,
+                                                 friendlyName.remove(" "),
+                                                 ip,
+                                                 QString::number(i),
+                                                 tuner.at(0));
                         result << device;
                         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found %1").arg(device));
                     }

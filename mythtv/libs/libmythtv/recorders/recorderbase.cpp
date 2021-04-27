@@ -42,7 +42,7 @@
         ((m_tvrec != nullptr) ? QString::number(m_tvrec->GetInputId()) : "NULL")
 
 #define LOC QString("RecBase[%1](%2): ") \
-            .arg(TVREC_CARDNUM).arg(m_videodevice)
+            .arg(TVREC_CARDNUM, m_videodevice)
 
 RecorderBase::RecorderBase(TVRec *rec)
     : m_tvrec(rec)
@@ -184,7 +184,7 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("SetOption(%1,%2): Option not recognized")
-                .arg(name).arg(value));
+                .arg(name, value));
     }
 }
 
@@ -399,8 +399,10 @@ void RecorderBase::SetRecordingStatus(RecStatus::Type status,
     {
         LOG(VB_RECORD, LOG_INFO,
             QString("Modifying recording status from %1 to %2 at %3:%4")
-            .arg(RecStatus::toString(m_curRecording->GetRecordingStatus(), kSingleRecord))
-            .arg(RecStatus::toString(status, kSingleRecord)).arg(file).arg(line));
+            .arg(RecStatus::toString(m_curRecording->GetRecordingStatus(), kSingleRecord),
+                 RecStatus::toString(status, kSingleRecord),
+                 file,
+                 QString::number(line)));
 
         m_curRecording->SetRecordingStatus(status);
 
@@ -496,8 +498,8 @@ void RecorderBase::FinishRecording(void)
                                         .arg(m_videoHeight)
                                         .arg(m_videoAspect)
                                         .arg(GetFrameRate())
-                                        .arg(avcodec_get_name(m_primaryAudioCodec))
-                                        .arg(RecordingFile::AVContainerToString(m_containerFormat)));
+                                        .arg(avcodec_get_name(m_primaryAudioCodec),
+                                             RecordingFile::AVContainerToString(m_containerFormat)));
 }
 
 RecordingQuality *RecorderBase::GetRecordingQuality(
@@ -984,7 +986,7 @@ RecorderBase *RecorderBase::CreateRecorder(
     else
     {
         QString msg = "Need %1 recorder, but compiled without %2 support!";
-        msg = msg.arg(genOpt.m_inputType).arg(genOpt.m_inputType);
+        msg = msg.arg(genOpt.m_inputType, genOpt.m_inputType);
         LOG(VB_GENERAL, LOG_ERR,
             "RecorderBase::CreateRecorder() Error, " + msg);
     }

@@ -2063,8 +2063,8 @@ class ServiceDescriptor : public MPEGDescriptor
     QString toString(void) const override // MPEGDescriptor
     {
         return QString("ServiceDescriptor: %1 %2(0x%3)")
-            .arg(ServiceName())
-            .arg(ServiceDescriptorMapping(ServiceType()).toString())
+            .arg(ServiceName(),
+                 ServiceDescriptorMapping(ServiceType()).toString())
             .arg(ServiceType(),2,16,QChar('0'));
     }
 };

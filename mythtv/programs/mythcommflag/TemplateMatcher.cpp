@@ -115,13 +115,13 @@ bool readMatches(const QString& filename, unsigned short *matches, long long nfr
 
     if (fclose(fp))
         LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
     return true;
 
 error:
     if (fclose(fp))
         LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
     return false;
 }
 
@@ -137,7 +137,7 @@ bool writeMatches(const QString& filename, unsigned short *matches, long long nf
 
     if (fclose(fp))
         LOG(VB_COMMFLAG, LOG_ERR, QString("Error closing %1: %2")
-                .arg(filename).arg(strerror(errno)));
+                .arg(filename, strerror(errno)));
     return true;
 }
 

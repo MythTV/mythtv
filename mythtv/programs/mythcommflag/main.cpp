@@ -718,8 +718,9 @@ static bool IsMarked(uint chanid, const QDateTime& starttime)
 
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("Status for chanid %1 @ %2 is '%3'")
-                    .arg(chanid).arg(starttime.toString(Qt::ISODate))
-                    .arg(flagStatusStr));
+                    .arg(QString::number(chanid),
+                         starttime.toString(Qt::ISODate),
+                         flagStatusStr));
 
             if ((flagStatus == COMM_FLAG_NOT_FLAGGED) && (marksFound == 0))
                 return false;
@@ -1026,7 +1027,7 @@ static int RebuildSeekTable(ProgramInfo *pginfo, int jobid, bool writefile = fal
         // and try again
 
         filename = QString("myth://Videos@%1/%2")
-                            .arg(gCoreContext->GetHostName()).arg(filename);
+                            .arg(gCoreContext->GetHostName(), filename);
         pginfo->SetPathname(filename);
         if (!DoesFileExist(pginfo))
         {

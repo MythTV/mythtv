@@ -201,14 +201,14 @@ void MythUIThemeCache::PruneCacheDir(const QString& dirname)
             {
                 deleted += 1;
                 LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC + QString("%1 Delete %2")
-                    .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate)).arg(fi.fileName()));
+                    .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate), fi.fileName()));
                 unlink(qPrintable(fullname));
             }
             else
             {
                 kept += 1;
                 LOG(VB_GUI | VB_FILE, LOG_DEBUG, LOC + QString("%1 Keep   %2")
-                    .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate)).arg(fi.fileName()));
+                    .arg(fi.lastRead().toLocalTime().toString(Qt::ISODate), fi.fileName()));
             }
         }
         else
@@ -258,7 +258,7 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
                                         ImageCacheMode cacheMode)
 {
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC +
-        QString("LoadCacheImage(%1,%2)").arg(File).arg(Label));
+        QString("LoadCacheImage(%1,%2)").arg(File, Label));
 
     if (File.isEmpty() || Label.isEmpty())
         return nullptr;

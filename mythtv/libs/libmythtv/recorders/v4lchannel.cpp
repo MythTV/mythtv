@@ -85,7 +85,7 @@ bool V4LChannel::Open(void)
         m_hasStreamIO = false; // driver workaround, see #9825, #10519 and #12336
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("Device name '%1' driver '%2'.")
-            .arg(m_deviceName).arg(m_driverName));
+            .arg(m_deviceName, m_driverName));
 
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("v4l2: stream io: %2 std io: %3 async io: %4 "
@@ -251,9 +251,9 @@ bool V4LChannel::InitializeInputs(void)
     // print it
     LOG(VB_CHANNEL, LOG_INFO, LOC +
         QString("Input #%1: '%2' schan(%3) tun(%4) v4l2(%6)")
-        .arg(m_inputId).arg(m_name).arg(m_startChanNum)
-        .arg(m_tuneToChannel)
-        .arg(mode_to_format(m_videoModeV4L2)));
+        .arg(QString::number(m_inputId), m_name, m_startChanNum,
+             m_tuneToChannel,
+             mode_to_format(m_videoModeV4L2)));
 
     return valid_cnt != 0U;
 }
@@ -282,7 +282,7 @@ void V4LChannel::SetFormat(const QString &format)
     }
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetFormat(%1) fmt(%2) input(%3)")
-            .arg(format).arg(fmt).arg(inputNum));
+            .arg(format, fmt, QString::number(inputNum)));
 
     if (!SetInputAndFormat(inputNum, fmt))
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to set format." + ENO);
@@ -328,7 +328,7 @@ int V4LChannel::SetFreqTable(const QString &tablename)
     LOG(VB_CHANNEL, LOG_ERR,
         QString("Channel(%1)::SetFreqTable(): Invalid "
                 "frequency table name %2, using %3.").
-            arg(m_device).arg(name).arg((char *)gChanLists[1].name));
+            arg(m_device, name, (char *)gChanLists[1].name));
     SetFreqTable(1);
     return 1;
 }
@@ -353,14 +353,14 @@ bool V4LChannel::Tune(const QString &freqid, int finetune)
     int i = GetCurrentChannelNum(freqid);
     LOG(VB_CHANNEL, LOG_INFO,
         QString("Channel(%1)::Tune(%2): curList[%3].freq(%4)")
-            .arg(m_device).arg(freqid).arg(i)
+            .arg(m_device, freqid, QString::number(i))
             .arg((i != -1) ? m_curList[i].freq : -1));
 
     if (i == -1)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Channel(%1)::Tune(%2): Error, failed to find channel.")
-                .arg(m_device).arg(freqid));
+                .arg(m_device, freqid));
         return false;
     }
 

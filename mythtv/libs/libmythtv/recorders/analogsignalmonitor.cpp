@@ -32,7 +32,7 @@ AnalogSignalMonitor::AnalogSignalMonitor(int db_cardnum,
 
         m_usingV4l2 = ((caps & V4L2_CAP_VIDEO_CAPTURE) != 0U);
         LOG(VB_RECORD, LOG_INFO, QString("card '%1' driver '%2' version '%3'")
-                .arg(m_card).arg(m_driver).arg(m_version));
+                .arg(m_card, m_driver, QString::number(m_version)));
     }
 }
 

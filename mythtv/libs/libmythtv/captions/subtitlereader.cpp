@@ -1,6 +1,9 @@
 #include "mythlogging.h"
 #include "captions/subtitlereader.h"
 
+// If the count of subtitle buffers is greater than this, force a clear
+static const int MAX_BUFFERS_BEFORE_CLEAR = 175;  // 125 too low for karaoke
+
 SubtitleReader::SubtitleReader()
 {
     connect(&m_textSubtitles, &TextSubtitles::TextSubtitlesUpdated,
@@ -60,10 +63,11 @@ bool SubtitleReader::AddAVSubtitle(AVSubtitle &subtitle,
     m_avSubtitles.m_buffers.push_back(subtitle);
     // in case forced subtitles aren't displayed, avoid leaking by
     // manually clearing the subtitles
-    if (m_avSubtitles.m_buffers.size() > 40)
+    if (m_avSubtitles.m_buffers.size() > MAX_BUFFERS_BEFORE_CLEAR)
     {
         LOG(VB_GENERAL, LOG_ERR,
-            "SubtitleReader: >40 AVSubtitles queued - clearing.");
+            QString("SubtitleReader: >%1 AVSubtitles queued - clearing.")
+                .arg(MAX_BUFFERS_BEFORE_CLEAR));
         clearsubs = true;
     }
     m_avSubtitles.m_lock.unlock();

@@ -814,12 +814,12 @@ ProgramInfo::ProgramInfo(const QString &_title, uint _chanid,
         QString channelFormat =
             gCoreContext->GetSetting("ChannelFormat", "<num> <sign>");
 
-        m_title = QString("%1 - %2").arg(ChannelText(channelFormat))
-            .arg(MythDate::toString(m_startTs, MythDate::kTime));
+        m_title = QString("%1 - %2").arg(ChannelText(channelFormat),
+            MythDate::toString(m_startTs, MythDate::kTime));
     }
 
     m_description = m_title =
-        QString("%1 (%2)").arg(m_title).arg(QObject::tr("Manual Record"));
+        QString("%1 (%2)").arg(m_title, QObject::tr("Manual Record"));
     ensureSortFields();
 }
 
@@ -1483,7 +1483,7 @@ QString propsValueToString (const QString& name, QMap<T,QString> propNames,
         }
         QString tmp = QString("0x%1").arg(bit, sizeof(T)*2,16,QChar('0'));
         LOG(VB_GENERAL, LOG_ERR, QString("Unknown name for %1 flag 0x%2.")
-            .arg(name).arg(tmp));
+            .arg(name, tmp));
         result += tmp;
     }
     return result.join('|');
@@ -1505,7 +1505,7 @@ uint propsValueFromString (const QString& name, QMap<T,QString> propNames,
         if (bit == 0)
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Unknown flag for %1 %2")
-                .arg(name).arg(n));
+                .arg(name, n));
         }
         else
             result |= bit;
@@ -1582,9 +1582,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     if (!m_subtitle.trimmed().isEmpty())
     {
         tempSubTitle = QString("%1 - \"%2\"")
-            .arg(tempSubTitle).arg(m_subtitle);
+            .arg(tempSubTitle, m_subtitle);
         tempSortSubtitle = QString("%1 - \"%2\"")
-            .arg(tempSortSubtitle).arg(m_sortSubtitle);
+            .arg(tempSortSubtitle, m_sortSubtitle);
     }
 
     progMap["titlesubtitle"] = tempSubTitle;
@@ -1598,11 +1598,11 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["episode"] = format_season_and_episode(m_episode, 1);
         progMap["totalepisodes"] = format_season_and_episode(m_totalEpisodes, 1);
         progMap["s00e00"] = QString("s%1e%2")
-            .arg(format_season_and_episode(GetSeason(), 2))
-            .arg(format_season_and_episode(GetEpisode(), 2));
+            .arg(format_season_and_episode(GetSeason(), 2),
+                 format_season_and_episode(GetEpisode(), 2));
         progMap["00x00"] = QString("%1x%2")
-            .arg(format_season_and_episode(GetSeason(), 1))
-            .arg(format_season_and_episode(GetEpisode(), 2));
+            .arg(format_season_and_episode(GetSeason(), 1),
+                 format_season_and_episode(GetEpisode(), 2));
     }
     else
     {
@@ -1718,8 +1718,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     {
         min_str = QObject::tr("%n minute(s)","",minutes);
         progMap["lentime"] = QString("%1 %2")
-            .arg(QObject::tr("%n hour(s)","", hours))
-            .arg(min_str);
+            .arg(QObject::tr("%n hour(s)","", hours), min_str);
     }
     else if (hours > 0)
     {
@@ -1811,8 +1810,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         if (m_originalAirDate.isValid())
         {
             progMap["longrepeat"] = QString("(%1 %2) ")
-                .arg(QObject::tr("Repeat"))
-                .arg(MythDate::toString(
+                .arg(QObject::tr("Repeat"),
+                     MythDate::toString(
                          m_originalAirDate,
                          date_format | MythDate::kDateFull | MythDate::kAddYear));
         }
@@ -1958,13 +1957,12 @@ QString ProgramInfo::toString(const Verbosity v, const QString& sep, const QStri
             break;
         case kTitleSubtitle:
             str = m_title.contains(' ') ?
-                QString("%1%2%3").arg(grp).arg(m_title).arg(grp) : m_title;
+                QString("%1%2%3").arg(grp, m_title, grp) : m_title;
             if (!m_subtitle.isEmpty())
             {
                 str += m_subtitle.contains(' ') ?
-                    QString("%1%2%3%4").arg(sep)
-                        .arg(grp).arg(m_subtitle).arg(grp) :
-                    QString("%1%2").arg(sep).arg(m_subtitle);
+                    QString("%1%2%3%4").arg(sep, grp, m_subtitle, grp) :
+                    QString("%1%2").arg(sep, m_subtitle);
             }
             break;
         case kRecordingKey:
@@ -2083,7 +2081,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
         {
             LOG(VB_FILE, LOG_INFO, LOC +
                 QString("Updated pathname '%1':'%2' -> '%3'")
-                    .arg(m_pathname).arg(GetBasename()).arg(new_basename));
+                    .arg(m_pathname, GetBasename(), new_basename));
         }
         SetPathname(new_basename);
     }
@@ -2404,8 +2402,8 @@ QString ProgramInfo::CreateRecordBasename(const QString &ext) const
 {
     QString starts = MythDate::toString(m_recStartTs, MythDate::kFilename);
 
-    QString retval = QString("%1_%2.%3").arg(m_chanId)
-                             .arg(starts).arg(ext);
+    QString retval = QString("%1_%2.%3")
+        .arg(QString::number(m_chanId), starts, ext);
 
     return retval;
 }
@@ -2466,9 +2464,9 @@ void ProgramInfo::SetAvailableStatus(
     {
         LOG(VB_GUI, LOG_INFO,
             toString(kTitleSubtitle) + QString(": %1 -> %2 in %3")
-            .arg(::toString((AvailableStatusType)m_availableStatus))
-            .arg(::toString(status))
-            .arg(where));
+            .arg(::toString((AvailableStatusType)m_availableStatus),
+                 ::toString(status),
+                 where));
     }
     m_availableStatus = status;
 }
@@ -2629,7 +2627,7 @@ QString ProgramInfo::GetPlaybackURL(
             // Note do not preceed with "/" that will cause existing code
             // to look for a local file with this name...
             return QString("GetPlaybackURL/UNABLE/TO/FIND/LOCAL/FILE/ON/%1/%2")
-                           .arg(m_hostname).arg(basename);
+                           .arg(m_hostname, basename);
         }
     }
 
@@ -5051,7 +5049,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, const QString& usedFor)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("MarkAsInUse(false, '%1'->'%2')")
-                .arg(m_inUseForWhat).arg(usedFor) +
+                .arg(m_inUseForWhat, usedFor) +
             " -- use has changed since first setting as in use.");
     }
 #ifdef DEBUG_IN_USE
@@ -5989,9 +5987,9 @@ bool LoadFromRecorded(
                     table = "r";
 
                 if (sSortBy.isEmpty())
-                    sSortBy = QString("%1.%2 %3").arg(table).arg(field).arg(ascending ? "ASC" : "DESC");
+                    sSortBy = QString("%1.%2 %3").arg(table, field, ascending ? "ASC" : "DESC");
                 else
-                    sSortBy += QString(",%1.%2 %3").arg(table).arg(field).arg(ascending ? "ASC" : "DESC");
+                    sSortBy += QString(",%1.%2 %3").arg(table, field, ascending ? "ASC" : "DESC");
             }
             else
             {

@@ -34,7 +34,7 @@ QString SCTEComponentNameDescriptor::toString(void) const
     for (uint i = 0; i < StringCount(); ++i)
     {
         ret += QString(" Language(%1) Name(%2)")
-            .arg(LanguageString(i)).arg(NameString(i));
+            .arg(LanguageString(i), NameString(i));
     }
     return ret;
 }

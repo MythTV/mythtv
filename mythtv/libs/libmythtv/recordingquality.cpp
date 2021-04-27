@@ -79,9 +79,9 @@ RecordingQuality::RecordingQuality(
 
     LOG(VB_RECORD, LOG_INFO,
         QString("RecordingQuality() start(%1) end(%2) score(%3)")
-        .arg(MythDate::toString(start, MythDate::ISODate))
-        .arg(MythDate::toString(end, MythDate::ISODate))
-        .arg(m_overallScore));
+        .arg(MythDate::toString(start, MythDate::ISODate),
+             MythDate::toString(end, MythDate::ISODate),
+             QString::number(m_overallScore)));
 }
 
 void RecordingQuality::AddTSStatistics(

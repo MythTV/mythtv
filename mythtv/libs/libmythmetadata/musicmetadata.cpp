@@ -1101,7 +1101,7 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
         if (m_broadcaster.isEmpty())
             metadataMap[prefix + "album"] = m_channel;
         else
-            metadataMap[prefix + "album"] = QString("%1 - %2").arg(m_broadcaster).arg(m_channel);
+            metadataMap[prefix + "album"] = QString("%1 - %2").arg(m_broadcaster, m_channel);
     }
     else
         metadataMap[prefix + "album"] = m_album;
@@ -1286,7 +1286,7 @@ QString MusicMetadata::getAlbumArtFile(void)
             // image is a radio station icon, check if we have already downloaded and cached it
             QString path = GetConfDir() + "/MythMusic/AlbumArt/";
             QFileInfo fi(res);
-            QString filename = QString("%1-%2.%3").arg(m_id).arg("front").arg(fi.suffix());
+            QString filename = QString("%1-%2.%3").arg(m_id).arg("front", fi.suffix());
 
             albumart_image->m_filename = path + filename;
 

@@ -682,7 +682,8 @@ void MHUnion::CheckType(enum UnionTypes t) const
 {
     if (m_Type != t)
     {
-        MHERROR(QString("Type mismatch - expected %1 found %2").arg(GetAsString(m_Type)).arg(GetAsString(t)));
+        MHERROR(QString("Type mismatch - expected %1 found %2")
+                .arg(GetAsString(m_Type), GetAsString(t)));
     }
 }
 

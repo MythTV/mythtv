@@ -338,7 +338,7 @@ bool MythBDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds /
     if (metaDiscLibrary)
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Disc Title: %1 (%2)")
-            .arg(metaDiscLibrary->di_name).arg(metaDiscLibrary->language_code));
+            .arg(metaDiscLibrary->di_name, metaDiscLibrary->language_code));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Alternative Title: %1")
             .arg(metaDiscLibrary->di_alternative));
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Disc Number: %1 of %2")
@@ -1296,7 +1296,7 @@ bool MythBDBuffer::RestoreBDStateSnapshot(const QString& State)
         if (keyvalue.length() != 2)
         {
             LOG(VB_PLAYBACK, LOG_ERR, LOC + QString("Invalid BD state: %1 (%2)")
-                .arg(state).arg(State));
+                .arg(state, State));
         }
         else
         {

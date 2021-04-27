@@ -13,9 +13,10 @@
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
+#else
+#include <QTextCodec>
 #endif
 #include <QTextStream>
-#include <QTextCodec>
 #include <QUrl>
 
 #include "upnpcds.h"
@@ -391,8 +392,8 @@ void CDSObject::toXml( QTextStream &os, FilterMap &filter,
 
                 for (const auto & attr : qAsConst(pProp->m_lstAttributes))
                 {
-                    QString filterName = QString("%1@%2").arg(sName)
-                                                         .arg(attr.m_sName);
+                    QString filterName = QString("%1@%2").arg(sName,
+                                                              attr.m_sName);
                     if (attr.m_bRequired  || !filterAttributes ||
                         filter.contains(filterName))
                         os << " " << attr.m_sName << "=\"" << attr.m_sValue << "\"";

@@ -373,7 +373,7 @@ QString CommandLineArg::GetLongHelpString(QString keyword) const
 
     // print type and default for the stored value
     msg << "Type:        " << QVariant::typeToName(static_cast<int>(m_type)) << QT_ENDL;
-    if (m_default.canConvert(QVariant::String))
+    if (m_default.canConvert<QString>())
         msg << "Default:     " << m_default.toString() << QT_ENDL;
 
     QStringList help;
@@ -1131,7 +1131,7 @@ void CommandLineArg::PrintRemovedWarning(QString &keyword) const
                          " WARNING: %1\n"
                          "          %2\n"
                          "****************************************************\n\n")
-                .arg(warn).arg(m_removed)
+                .arg(warn, m_removed)
                 .toLocal8Bit().constData();
 }
 
@@ -1143,7 +1143,7 @@ void CommandLineArg::PrintDeprecatedWarning(QString &keyword) const
                          " WARNING: %1 has been deprecated\n"
                          "          %2\n"
                          "****************************************************\n\n")
-                .arg(keyword).arg(m_deprecated)
+                .arg(keyword, m_deprecated)
                 .toLocal8Bit().constData();
 }
 
@@ -1293,7 +1293,7 @@ QString MythCommandLineParser::GetHelpString(void) const
     QTextStream msg(&helpstr, QIODevice::WriteOnly);
 
     QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
-        .arg(m_appname).arg(GetMythSourcePath()).arg(GetMythSourceVersion());
+        .arg(m_appname, GetMythSourcePath(), GetMythSourceVersion());
     msg << versionStr << QT_ENDL;
 
     if (toString("showhelp").isEmpty())
@@ -1808,7 +1808,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             if (m_verbose)
             {
                 std::cerr << QString("  Setting %1 as child of %2")
-                                 .arg((*args_it)->m_name).arg((*links_it)->m_name)
+                                 .arg((*args_it)->m_name, (*links_it)->m_name)
                                  .toLocal8Bit().constData()
                           << std::endl;
             }
@@ -1837,7 +1837,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             if (m_verbose)
             {
                 std::cerr << QString("  Setting %1 as parent of %2")
-                                 .arg((*args_it)->m_name).arg((*links_it)->m_name)
+                                 .arg((*args_it)->m_name, (*links_it)->m_name)
                                  .toLocal8Bit().constData()
                      << std::endl;
             }
@@ -1866,7 +1866,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             if (m_verbose)
             {
                 std::cerr << QString("  Setting %1 as requiring %2")
-                                 .arg((*args_it)->m_name).arg((*links_it)->m_name)
+                                 .arg((*args_it)->m_name, (*links_it)->m_name)
                                  .toLocal8Bit().constData()
                      << std::endl;
             }
@@ -1886,8 +1886,8 @@ bool MythCommandLineParser::ReconcileLinks(void)
                     if (m_verbose)
                     {
                         std::cerr << QString("  Setting %1 as blocking %2")
-                                         .arg((*args_it)->m_name)
-                                         .arg((*req_it)->m_name)
+                                         .arg((*args_it)->m_name,
+                                              (*req_it)->m_name)
                                          .toLocal8Bit().constData()
                                   << std::endl;
                     }
@@ -1919,7 +1919,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
             if (m_verbose)
             {
                 std::cerr << QString("  Setting %1 as blocking %2")
-                                 .arg((*args_it)->m_name).arg((*block_it)->m_name)
+                                 .arg((*args_it)->m_name, (*block_it)->m_name)
                                  .toLocal8Bit().constData()
                           << std::endl;
             }
@@ -2098,12 +2098,12 @@ int MythCommandLineParser::toInt(const QString& key) const
 
     if (arg->m_given)
     {
-        if (arg->m_stored.canConvert(QVariant::Int))
+        if (arg->m_stored.canConvert<int>())
             val = arg->m_stored.toInt();
     }
     else
     {
-        if (arg->m_default.canConvert(QVariant::Int))
+        if (arg->m_default.canConvert<int>())
             val = arg->m_default.toInt();
     }
 
@@ -2125,12 +2125,12 @@ uint MythCommandLineParser::toUInt(const QString& key) const
 
     if (arg->m_given)
     {
-        if (arg->m_stored.canConvert(QVariant::UInt))
+        if (arg->m_stored.canConvert<uint>())
             val = arg->m_stored.toUInt();
     }
     else
     {
-        if (arg->m_default.canConvert(QVariant::UInt))
+        if (arg->m_default.canConvert<uint>())
             val = arg->m_default.toUInt();
     }
 
@@ -2152,12 +2152,12 @@ long long MythCommandLineParser::toLongLong(const QString& key) const
 
     if (arg->m_given)
     {
-        if (arg->m_stored.canConvert(QVariant::LongLong))
+        if (arg->m_stored.canConvert<long long>())
             val = arg->m_stored.toLongLong();
     }
     else
     {
-        if (arg->m_default.canConvert(QVariant::LongLong))
+        if (arg->m_default.canConvert<long long>())
             val = arg->m_default.toLongLong();
     }
 
@@ -2179,12 +2179,12 @@ double MythCommandLineParser::toDouble(const QString& key) const
 
     if (arg->m_given)
     {
-        if (arg->m_stored.canConvert(QVariant::Double))
+        if (arg->m_stored.canConvert<double>())
             val = arg->m_stored.toDouble();
     }
     else
     {
-        if (arg->m_default.canConvert(QVariant::Double))
+        if (arg->m_default.canConvert<double>())
             val = arg->m_default.toDouble();
     }
 
@@ -2206,12 +2206,12 @@ QSize MythCommandLineParser::toSize(const QString& key) const
 
     if (arg->m_given)
     {
-        if (arg->m_stored.canConvert(QVariant::Size))
+        if (arg->m_stored.canConvert<QSize>())
             val = arg->m_stored.toSize();
     }
     else
     {
-        if (arg->m_default.canConvert(QVariant::Size))
+        if (arg->m_default.canConvert<QSize>())
             val = arg->m_default.toSize();
     }
 
@@ -2236,12 +2236,12 @@ QString MythCommandLineParser::toString(const QString& key) const
         if (!arg->m_converted)
             arg->Convert();
 
-        if (arg->m_stored.canConvert(QVariant::String))
+        if (arg->m_stored.canConvert<QString>())
             val = arg->m_stored.toString();
     }
     else
     {
-        if (arg->m_default.canConvert(QVariant::String))
+        if (arg->m_default.canConvert<QString>())
             val = arg->m_default.toString();
     }
 
@@ -2275,7 +2275,7 @@ QStringList MythCommandLineParser::toStringList(const QString& key, const QStrin
 
     if (arg->m_type == QVariant::String && !sep.isEmpty())
         val = varval.toString().split(sep);
-    else if (varval.canConvert(QVariant::StringList))
+    else if (varval.canConvert<QStringList>())
         val = varval.toStringList();
 
     return val;
@@ -2300,12 +2300,12 @@ QMap<QString,QString> MythCommandLineParser::toMap(const QString& key) const
         if (!arg->m_converted)
             arg->Convert();
 
-        if (arg->m_stored.canConvert(QVariant::Map))
+        if (arg->m_stored.canConvert<QMap<QString, QVariant>>())
             tmp = arg->m_stored.toMap();
     }
     else
     {
-        if (arg->m_default.canConvert(QVariant::Map))
+        if (arg->m_default.canConvert<QMap<QString, QVariant>>())
             tmp = arg->m_default.toMap();
     }
 
@@ -2330,12 +2330,12 @@ QDateTime MythCommandLineParser::toDateTime(const QString& key) const
 
     if (arg->m_given)
     {
-        if (arg->m_stored.canConvert(QVariant::DateTime))
+        if (arg->m_stored.canConvert<QDateTime>())
             val = arg->m_stored.toDateTime();
     }
     else
     {
-        if (arg->m_default.canConvert(QVariant::DateTime))
+        if (arg->m_default.canConvert<QDateTime>())
             val = arg->m_default.toDateTime();
     }
 
@@ -2758,12 +2758,12 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
 
     LOG(VB_GENERAL, LOG_CRIT,
         QString("%1 version: %2 [%3] www.mythtv.org")
-        .arg(QCoreApplication::applicationName())
-        .arg(GetMythSourcePath()).arg(GetMythSourceVersion()));
+        .arg(QCoreApplication::applicationName(),
+             GetMythSourcePath(), GetMythSourceVersion()));
     LOG(VB_GENERAL, LOG_CRIT, QString("Qt version: compile: %1, runtime: %2")
-        .arg(QT_VERSION_STR).arg(qVersion()));
+        .arg(QT_VERSION_STR, qVersion()));
     LOG(VB_GENERAL, LOG_INFO, QString("%1 (%2)")
-        .arg(QSysInfo::prettyProductName()).arg(QSysInfo::currentCpuArchitecture()));
+        .arg(QSysInfo::prettyProductName(), QSysInfo::currentCpuArchitecture()));
     LOG(VB_GENERAL, LOG_NOTICE,
         QString("Enabled verbose msgs: %1").arg(verboseString));
 
@@ -2797,7 +2797,7 @@ void MythCommandLineParser::ApplySettingsOverride(void)
         {
             LOG(VB_GENERAL, LOG_NOTICE,
                  QString("Setting '%1' being forced to '%2'")
-                     .arg(it.key()).arg(*it));
+                     .arg(it.key(), *it));
             gCoreContext->OverrideSettingForSession(it.key(), *it);
         }
     }

@@ -145,10 +145,10 @@ inline QString NameValue::toXML() const
     NameValues::const_iterator it;
     for (it = m_pAttributes->constBegin(); it != m_pAttributes->constEnd(); ++it)
     {
-        sAttributes += attributeTemplate.arg((*it).m_sName).arg((*it).m_sValue);
+        sAttributes += attributeTemplate.arg((*it).m_sName, (*it).m_sValue);
     }
 
-    return xml.arg(m_sName).arg(sAttributes).arg(m_sValue);
+    return xml.arg(m_sName, sAttributes, m_sValue);
 }
 
 //////////////////////////////////////////////////////////////////////////////

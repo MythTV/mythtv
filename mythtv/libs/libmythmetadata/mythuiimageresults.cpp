@@ -58,7 +58,7 @@ bool ImageSearchResultsDialog::Create()
             button->SetText(width, "width");
             button->SetText(height, "height");
             if (info.width > 0 && info.height > 0)
-                button->SetText(QString("%1x%2").arg(width).arg(height),
+                button->SetText(QString("%1x%2").arg(width, height),
                     "resolution");
 
             QString artfile = info.thumbnail;
@@ -103,7 +103,7 @@ void ImageSearchResultsDialog::cleanCacheDir()
 
     for (auto i = thumbs.crbegin(); i != thumbs.crend(); ++i)
     {
-        QString filename = QString("%1/%2").arg(cache).arg(*i);
+        QString filename = QString("%1/%2").arg(cache, *i);
         QFileInfo fi(filename);
         QDateTime lastmod = fi.lastModified();
         if (lastmod.addDays(2) < MythDate::current())

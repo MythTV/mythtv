@@ -92,7 +92,7 @@ bool ExternalRecChannelFetcher::FetchChannel(const QString & cmd,
     if (result.startsWith("ERR"))
     {
         LOG(VB_CHANNEL, LOG_ERR, LOC + QString("%1: %2")
-            .arg(cmd).arg(result));
+            .arg(cmd, result));
         return false;
     }
     if (result.startsWith("OK:DONE"))

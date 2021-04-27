@@ -83,7 +83,7 @@ static void UpdateHashes(void)
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Hash (%1) generated for file (%2)")
-                        .arg(hash).arg(filename));
+                        .arg(hash, filename));
             }
         }
     }
@@ -306,8 +306,8 @@ bool doUpgradeVideoDatabaseSchema(void)
             "Unrecognized video database schema version. "
             "Unable to upgrade database.");
         LOG(VB_GENERAL, LOG_ERR, QString("mythvideo.DBSchemaVer: '%1', "
-            "VideoDBSchemaVer: '%2', DVDDBSchemaVer: '%3'").arg(dbver)
-                .arg(olddbver).arg(dvddbver));
+            "VideoDBSchemaVer: '%2', DVDDBSchemaVer: '%3'")
+            .arg(dbver, olddbver, dvddbver));
         return false;
     }
 
@@ -570,7 +570,7 @@ bool doUpgradeVideoDatabaseSchema(void)
                         LOG(VB_GENERAL, LOG_ERR,
                             QString("ERROR converting '%1' to '%2' in "
                                     "filemarkup table.")
-                                .arg(origPath).arg(relPath));
+                                .arg(origPath, relPath));
                         ok = false;
                     }
                 }

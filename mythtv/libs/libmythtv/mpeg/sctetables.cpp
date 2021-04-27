@@ -379,9 +379,9 @@ QString DefinedChannelsMapSubtable::toStringXML(uint indent_level) const
     {
         str += indent_1 + QString("<Range range_defined=\"%1\"%2 "
                                   "channels_count=\"%3\" />\n")
-            .arg(xml_bool_to_string(RangeDefined(i)))
-            .arg(RangeDefined(i) ? " " : "")
-            .arg(ChannelsCount(i));
+            .arg(xml_bool_to_string(RangeDefined(i)),
+                 RangeDefined(i) ? " " : "",
+                 QString::number(ChannelsCount(i)));
     }
 
     return str + indent_0 + "</DefinedChannelsMap>";
@@ -563,8 +563,8 @@ QString SCTESystemTimeTable::toStringXML(uint indent_level) const
         QString("<SCTESystemTimeSection system_time=\"%1\" "
                 "gps_utc_offset=\"%2\"\n%3utc_time_desc=\"%4\" psip=\"scte\"")
         .arg(SystemTimeRaw()).arg(GPSUTCOffset())
-        .arg(indent_1)
-        .arg(SystemTimeUTC().toString(Qt::ISODate));
+        .arg(indent_1,
+             SystemTimeUTC().toString(Qt::ISODate));
 
     if (!DescriptorsLength())
         return str + " />";

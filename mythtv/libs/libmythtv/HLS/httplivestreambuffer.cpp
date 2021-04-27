@@ -1461,7 +1461,7 @@ private:
                         .arg(p->Duration().count()).arg(segment->Duration().count()));
                     LOG(VB_PLAYBACK, LOG_WARNING, LOC +
                         QString("-     file: new=%1 old=%2")
-                        .arg(p->Url()).arg(segment->Url()));
+                        .arg(p->Url(), segment->Url()));
 
                     /* Resetting content */
                     *segment = *p;
@@ -2531,7 +2531,7 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, std::chrono::milliseconds
     if (m_filename != finalURL)
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
-            QString("Redirected %1 -> %2 ").arg(m_filename).arg(finalURL));
+            QString("Redirected %1 -> %2 ").arg(m_filename, finalURL));
         m_filename = finalURL;
     }
     if (!IsHTTPLiveStreaming(&buffer))

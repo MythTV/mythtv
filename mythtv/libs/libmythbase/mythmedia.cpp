@@ -136,14 +136,12 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         if (QFile(PATHTO_PMOUNT).exists() && QFile(PATHTO_PUMOUNT).exists())
         {
             MountCommand = QString("%1 %2")
-                .arg((DoMount) ? PATHTO_PMOUNT : PATHTO_PUMOUNT)
-                .arg(m_devicePath);
+                .arg((DoMount) ? PATHTO_PMOUNT : PATHTO_PUMOUNT, m_devicePath);
         }
         else
         {
             MountCommand = QString("%1 %2")
-                .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
-                .arg(m_devicePath);
+                .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT, m_devicePath);
         }
 
         LOG(VB_MEDIA, LOG_INFO, QString("Executing '%1'").arg(MountCommand));
@@ -187,7 +185,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             return true;
         }
         LOG(VB_GENERAL, LOG_ERR, QString("Failed to %1 %2.")
-            .arg(DoMount ? "mount" : "unmount").arg(m_devicePath));
+            .arg(DoMount ? "mount" : "unmount", m_devicePath));
     }
     else
     {
@@ -233,7 +231,7 @@ MythMediaType MythMediaDevice::DetectMediaType(void)
         if (found != s_ext_to_media.constEnd())
         {
             LOG(VB_MEDIA, LOG_INFO, QString("DetectMediaType %1 (%2)")
-                .arg(MediaTypeString(found.value())).arg(it.key()));
+                .arg(MediaTypeString(found.value()), it.key()));
             media_cnts[*found] += *it;
         }
         else
@@ -474,8 +472,8 @@ MythMediaStatus MythMediaDevice::setStatus( MythMediaStatus NewStatus,
     {
         LOG(VB_MEDIA, LOG_DEBUG,
             QString("MythMediaDevice::setStatus %1 %2->%3")
-            .arg(getDevicePath()).arg(kMediaStatusStrings[OldStatus])
-            .arg(kMediaStatusStrings[NewStatus]));
+            .arg(getDevicePath(), kMediaStatusStrings[OldStatus],
+                 kMediaStatusStrings[NewStatus]));
         switch (NewStatus)
         {
             // the disk is not / should not be mounted.

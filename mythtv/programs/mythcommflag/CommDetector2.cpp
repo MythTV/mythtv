@@ -230,7 +230,7 @@ void createDebugDirectory(const QString& dirname, const QString& comment)
     if (qdir.exists())
     {
         LOG(VB_COMMFLAG, LOG_INFO, QString("%1 using debug directory \"%2\"")
-                .arg(comment).arg(dirname));
+                .arg(comment, dirname));
     }
     else
     {
@@ -238,12 +238,12 @@ void createDebugDirectory(const QString& dirname, const QString& comment)
         {
             LOG(VB_COMMFLAG, LOG_INFO,
                 QString("%1 created debug directory \"%1\"")
-                    .arg(comment).arg(dirname));
+                    .arg(comment, dirname));
         }
         else
         {
             LOG(VB_COMMFLAG, LOG_INFO, QString("%1 failed to create \"%2\": %3")
-                    .arg(comment).arg(dirname).arg(strerror(errno)));
+                    .arg(comment, dirname, strerror(errno)));
         }
     }
 }
@@ -733,19 +733,19 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
 
         LOG(VB_COMMFLAG, LOG_INFO, QString("Break: frame %1-%2 (%3-%4, %5)")
                 .arg(markstart, 6).arg(markend, 6)
-                .arg(frameToTimestamp(markstart, fps))
-                .arg(frameToTimestamp(markend, fps))
-                .arg(frameToTimestamp(markend - markstart + 1, fps)));
+                .arg(frameToTimestamp(markstart, fps),
+                     frameToTimestamp(markend, fps),
+                     frameToTimestamp(markend - markstart + 1, fps)));
     }
 
     const long long nframes = m_player->GetTotalFrameCount();
     LOG(VB_COMMFLAG, LOG_INFO,
         QString("Flagged %1 of %2 frames (%3 of %4), %5% commercials (%6)")
             .arg(m_currentFrameNumber + 1).arg(nframes)
-            .arg(frameToTimestamp(m_currentFrameNumber + 1, fps))
-            .arg(frameToTimestamp(nframes, fps))
-            .arg(breakframes * 100 / m_currentFrameNumber)
-            .arg(frameToTimestamp(breakframes, fps)));
+            .arg(frameToTimestamp(m_currentFrameNumber + 1, fps),
+                 frameToTimestamp(nframes, fps),
+                 QString::number(breakframes * 100 / m_currentFrameNumber),
+                 frameToTimestamp(breakframes, fps)));
 }
 
 void CommDetector2::recordingFinished(long long totalFileSize)

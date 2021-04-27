@@ -105,17 +105,17 @@ class MTV_PUBLIC IPTVTuningData
         if (IsHTTPTS() || IsRTSP())
             return QString("%1").arg(u.toString());
         return QString("%1:%2:%3")
-            .arg(u.host()).arg(u.userInfo()).arg(u.port()).toLower();
+            .arg(u.host(),u.userInfo(),QString::number(u.port())).toLower();
     }
 
     QString GetDeviceName(void) const
     {
         return QString("[data]%1[fectype]%2[fec0]%3[fec1]%4%5")
-            .arg(GetDataURL().toString())
-            .arg(GetFECTypeString(1))
-            .arg(GetFECURL1().toString())
-            .arg(GetFECURL1().toString())
-            .arg(GetBitrate(0) ? QString("-%1").arg(GetBitrate(0)) : "");
+            .arg(GetDataURL().toString(),
+                 GetFECTypeString(1),
+                 GetFECURL1().toString(),
+                 GetFECURL1().toString(),
+                 GetBitrate(0) ? QString("-%1").arg(GetBitrate(0)) : "");
     }
 
     bool operator==(const IPTVTuningData &other) const
@@ -172,8 +172,8 @@ class MTV_PUBLIC IPTVTuningData
         bool ret = (m_dataUrl.isValid() && (IsUDP() || IsRTP() || IsRTSP() || IsHLS() || IsHTTPTS()));
 
         LOG(VB_CHANNEL, LOG_DEBUG, QString("IPTVTuningdata (%1): IsValid = %2")
-            .arg(m_dataUrl.toString())
-            .arg(ret ? "true" : "false"));
+            .arg(m_dataUrl.toString(),
+                 ret ? "true" : "false"));
 
         return ret;
     }
@@ -257,7 +257,7 @@ class MTV_PUBLIC IPTVTuningData
         if (buffer.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR, QString("IsHLSPlaylist - Open Failed: %1\n\t\t\t%2")
-                .arg(downloader.ErrorString()).arg(url));
+                .arg(downloader.ErrorString(), url));
             return false;
         }
 

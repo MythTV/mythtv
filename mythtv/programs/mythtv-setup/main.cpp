@@ -196,7 +196,7 @@ static bool resetTheme(QString themedir, const QString &badtheme)
 
     LOG(VB_GENERAL, LOG_ERR,
         QString("Overriding broken theme '%1' with '%2'")
-                .arg(badtheme).arg(themename));
+                .arg(badtheme, themename));
 
     gCoreContext->OverrideSettingForSession("Theme", themename);
     themedir = GetMythUI()->FindThemeDir(themename);

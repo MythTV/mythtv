@@ -160,10 +160,10 @@ void IPTVChannelFetcher::run(void)
             QString xmltvid = (*it).m_xmltvid.isEmpty() ? "" : (*it).m_xmltvid;
             uint programnumber = (*it).m_programNumber;
             //: %1 is the channel number, %2 is the channel name
-            QString msg = tr("Channel #%1 : %2").arg(channum).arg(name);
+            QString msg = tr("Channel #%1 : %2").arg(channum, name);
 
             LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
-                .arg(channum).arg(name));
+                .arg(channum, name));
 
             int chanid = ChannelUtil::GetChanID(m_sourceId, channum);
             if (chanid <= 0)
@@ -369,8 +369,8 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
             chanmap[channum] = info;
 
             msg = QString("Parsing Channel #%1 : %2 : %3")
-                .arg(channum).arg(info.m_name)
-                .arg(info.m_tuning.GetDataURL().toString());
+                .arg(channum, info.m_name,
+                     info.m_tuning.GetDataURL().toString());
             LOG(VB_CHANNEL, LOG_INFO, LOC + msg);
 
             msg.clear(); // don't tell fetcher
@@ -443,7 +443,7 @@ static bool parse_chan_info(const QString   &rawdata,
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("parse_chan_info [%1]='%2'")
-                .arg(it.key()).arg(*it));
+                .arg(it.key(), *it));
         }
         info = IPTVChannelInfo(
             name, values["xmltvid"],

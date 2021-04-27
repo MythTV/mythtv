@@ -200,8 +200,7 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
         {
             LOG(VB_DATABASE, LOG_INFO,
                     QString("[%1] Connected to database '%2' at host: %3")
-                            .arg(m_name)
-                            .arg(m_db.databaseName()).arg(m_db.hostName()));
+                        .arg(m_name, m_db.databaseName(), m_db.hostName()));
 
             InitSessionVars();
 
@@ -723,10 +722,11 @@ bool MSqlQuery::exec()
 
             LOG(VB_DATABASE, LOG_INFO,
                 QString("MSqlQuery::exec(%1) %2%3%4")
-                        .arg(m_db->MSqlDatabase::GetConnectionName()).arg(str)
-                        .arg(QString(" <<<< Took %1ms").arg(QString::number(elapsed)))
-                        .arg(isSelect() ? QString(", Returned %1 row(s)")
-                                              .arg(size()) : QString()));
+                        .arg(m_db->MSqlDatabase::GetConnectionName(), str,
+                             QString(" <<<< Took %1ms").arg(QString::number(elapsed)),
+                             isSelect()
+                             ? QString(", Returned %1 row(s)").arg(size())
+                             : QString()));
         }
     }
 
@@ -761,9 +761,10 @@ bool MSqlQuery::exec(const QString &query)
 
     LOG(VB_DATABASE, LOG_INFO,
             QString("MSqlQuery::exec(%1) %2%3")
-                    .arg(m_db->MSqlDatabase::GetConnectionName()).arg(query)
-                    .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
-                                          .arg(size()) : QString()));
+                    .arg(m_db->MSqlDatabase::GetConnectionName(), query,
+                         isSelect()
+                         ? QString(" <<<< Returns %1 row(s)").arg(size())
+                         : QString()));
 
     return result;
 }
@@ -797,8 +798,7 @@ bool MSqlQuery::seekDebug(const char *type, bool result,
         {
             LOG(VB_DATABASE, LOG_DEBUG,
                 QString("MSqlQuery::%1(%2) Result: \"%3\"")
-                .arg(type).arg(m_db->MSqlDatabase::GetConnectionName())
-                .arg(str));
+                .arg(type, m_db->MSqlDatabase::GetConnectionName(), str));
         }
     }
     return result;

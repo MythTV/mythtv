@@ -303,8 +303,8 @@ void TransportListEditor::Load()
                 type = "(DVB-S2)";
 
             QString txt = QString("%1 %2 %3 %4 %5 %6 %7")
-                .arg(mod).arg(query.value(2).toString())
-                .arg(hz).arg(rate).arg(netid).arg(tid).arg(type);
+                .arg(mod, query.value(2).toString(),
+                     hz, rate, netid, tid, type);
 
             auto *transport = new TransportSetting(txt, query.value(0).toUInt(),
                                                    m_sourceid, m_cardtype);

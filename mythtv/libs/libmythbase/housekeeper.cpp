@@ -290,9 +290,9 @@ QDateTime HouseKeeperTask::UpdateLastRun(const QDateTime& last, bool successful)
         msg = QString("HOUSE_KEEPER_SUCCESSFUL %1 %2 %3");
     else
         msg = QString("HOUSE_KEEPER_RUNNING %1 %2 %3");
-    msg = msg.arg(gCoreContext->GetHostName())
-             .arg(m_dbTag)
-             .arg(MythDate::toString(last, MythDate::ISODate));
+    msg = msg.arg(gCoreContext->GetHostName(),
+                  m_dbTag,
+                  MythDate::toString(last, MythDate::ISODate));
     gCoreContext->SendEvent(MythEvent(msg));
     m_lastUpdate = MythDate::current();
 

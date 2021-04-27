@@ -527,7 +527,7 @@ void ImportNative::fillSearchList(const QString &field)
     m_searchList.clear();
 
     QString querystr;
-    querystr = QString("SELECT %1 FROM channel ORDER BY %2").arg(field).arg(field);
+    querystr = QString("SELECT %1 FROM channel ORDER BY %2").arg(field, field);
 
     MSqlQuery query(MSqlQuery::InitCon());
 

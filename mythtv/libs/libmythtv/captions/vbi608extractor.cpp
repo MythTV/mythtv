@@ -46,7 +46,7 @@ static void print(
     for (float maxima : qAsConst(maximas))
         maxs += QString("%1,").arg(maxima);
     LOG(VB_VBI, LOG_DEBUG, QString("mins: %1 maxs: %2")
-            .arg(mins).arg(maxs));
+            .arg(mins, maxs));
 }
 
 static float find_clock_diff(const QList<float> &list)

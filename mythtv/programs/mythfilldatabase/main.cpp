@@ -467,7 +467,7 @@ int main(int argc, char *argv[])
 
             LOG(VB_GENERAL, LOG_INFO,
                 QString("    %1 -> %2 (part %3 of %4)")
-                    .arg(orig_programid).arg(new_programid)
+                    .arg(orig_programid, new_programid)
                     .arg(partnum).arg(parttotal));
 
             repl.bindValue(":NEWID", new_programid);
@@ -478,8 +478,7 @@ int main(int argc, char *argv[])
             {
                 LOG(VB_GENERAL, LOG_INFO,
                     QString("Fudging programid from '%1' to '%2'")
-                        .arg(orig_programid)
-                        .arg(new_programid));
+                        .arg(orig_programid, new_programid));
             }
             else
                 found += repl.numRowsAffected();

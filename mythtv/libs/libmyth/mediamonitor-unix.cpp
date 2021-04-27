@@ -555,7 +555,7 @@ static void LookupModel(MythMediaDevice* device)
 #endif
 
     LOG(VB_MEDIA, LOG_DEBUG, QString("LookupModel '%1' -> '%2'")
-             .arg(device->getRealDevice()).arg(desc) );
+             .arg(device->getRealDevice(), desc) );
     device->setDeviceModel(desc.toLatin1().constData());
 }
 

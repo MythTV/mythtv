@@ -204,8 +204,8 @@ void DeleteMap::UpdateOSD(uint64_t frame, double frame_rate, OSD *osd)
     infoMap["reltimedisplay"] = relTimeDisplay;
     infoMap["rellengthdisplay"] = relLengthDisplay;
     //: example: "13:24 (10:23 of 24:37)"
-    infoMap["fulltimedisplay"] = tr("%3 (%1 of %2)").arg(relTimeDisplay)
-        .arg(relLengthDisplay).arg(timestr);
+    infoMap["fulltimedisplay"] = tr("%3 (%1 of %2)")
+        .arg(relTimeDisplay, relLengthDisplay, timestr);
 
     QHash<QString,float> posMap;
     posMap.insert("position", (float)((double)frame/(double)total));

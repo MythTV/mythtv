@@ -40,17 +40,17 @@ bool UpdateDBVersionNumber(const QString &component, const QString &versionkey,
         QString msg =
             QString("DB Error (Deleting old %1 DB version number): \n"
                     "Query was: %2 \nError was: %3 \nnew version: %4")
-            .arg(component)
-            .arg(thequery)
-            .arg(MythDB::DBErrorMessage(query.lastError()))
-            .arg(newnumber);
+            .arg(component,
+                 thequery,
+                 MythDB::DBErrorMessage(query.lastError()),
+                 newnumber);
         LOG(VB_GENERAL, LOG_ERR, msg);
         return false;
     }
 
     // set new schema version
     thequery = QString("INSERT INTO settings (value, data, hostname) "
-                       "VALUES ('%1', %2, NULL);").arg(versionkey).arg(newnumber);
+                       "VALUES ('%1', %2, NULL);").arg(versionkey, newnumber);
     query.prepare(thequery);
 
     if (!query.exec())
@@ -58,10 +58,10 @@ bool UpdateDBVersionNumber(const QString &component, const QString &versionkey,
         QString msg =
             QString("DB Error (Setting new %1 DB version number): \n"
                     "Query was: %2 \nError was: %3 \nnew version: %4")
-            .arg(component)
-            .arg(thequery)
-            .arg(MythDB::DBErrorMessage(query.lastError()))
-            .arg(newnumber);
+            .arg(component,
+                 thequery,
+                 MythDB::DBErrorMessage(query.lastError()),
+                 newnumber);
         LOG(VB_GENERAL, LOG_ERR, msg);
         return false;
     }
@@ -89,9 +89,9 @@ bool performUpdateSeries(const QString &component, const DBUpdates& updates)
             QString msg =
                 QString("DB Error (Performing %1 database upgrade): \n"
                         "Query was: %2 \nError was: %3")
-                .arg(component)
-                .arg(thequery)
-                .arg(MythDB::DBErrorMessage(query.lastError()));
+                .arg(component,
+                     thequery,
+                     MythDB::DBErrorMessage(query.lastError()));
             LOG(VB_GENERAL, LOG_ERR, msg);
             return false;
         }
@@ -117,7 +117,7 @@ bool performActualUpdate(
     MSqlQuery query(MSqlQuery::InitCon());
 
     LOG(VB_GENERAL, LOG_CRIT, QString("Upgrading to %1 schema version %2")
-        .arg(component).arg(version));
+        .arg(component, version));
 
     if (!performUpdateSeries(component, updates))
         return false;

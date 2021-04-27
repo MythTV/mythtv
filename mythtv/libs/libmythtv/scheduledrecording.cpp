@@ -28,10 +28,10 @@ QStringList ScheduledRecording::BuildMatchRequest(uint recordid,
 {
     return QStringList(QString("MATCH %1 %2 %3 %4 %5")
                        .arg(recordid).arg(sourceid).arg(mplexid)
-                       .arg(maxstarttime.isValid() ?
-                            maxstarttime.toString(Qt::ISODate) :
-                            "-")
-                       .arg(why));
+                       .arg(maxstarttime.isValid()
+                            ? maxstarttime.toString(Qt::ISODate)
+                            : "-",
+                            why));
 };
 
 QStringList ScheduledRecording::BuildCheckRequest(const RecordingInfo &recinfo,

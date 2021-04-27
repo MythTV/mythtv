@@ -59,8 +59,7 @@ bool BlurayMetadata::ParseDisc(void)
         for (unsigned i = 0; i < metadata->thumb_count; i++)
         {
             QString filepath = QString("%1/BDMV/META/DL/%2")
-                                   .arg(m_path)
-                                   .arg(metadata->thumbnails[i].path);
+                                   .arg(m_path, metadata->thumbnails[i].path);
             m_images.append(filepath);
         }
     }

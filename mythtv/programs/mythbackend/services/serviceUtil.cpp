@@ -345,18 +345,18 @@ void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
                 pArtInfo->setStorageGroup("Fanart");
                 pArtInfo->setType("fanart");
                 pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                    "&FileName=%2").arg("Fanart")
-                    .arg(QString(
-                        QUrl::toPercentEncoding(
+                    "&FileName=%2")
+                    .arg("Fanart",
+                         QString(QUrl::toPercentEncoding(
                             QUrl(i.value().url).path()))));
                 break;
             case kArtworkBanner:
                 pArtInfo->setStorageGroup("Banners");
                 pArtInfo->setType("banner");
                 pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                    "&FileName=%2").arg("Banners")
-                    .arg(QString(
-                        QUrl::toPercentEncoding(
+                    "&FileName=%2")
+                    .arg("Banners",
+                         QString(QUrl::toPercentEncoding(
                             QUrl(i.value().url).path()))));
                 break;
             case kArtworkCoverart:
@@ -364,9 +364,9 @@ void FillArtworkInfoList( DTC::ArtworkInfoList *pArtworkInfoList,
                 pArtInfo->setStorageGroup("Coverart");
                 pArtInfo->setType("coverart");
                 pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                    "&FileName=%2").arg("Coverart")
-                    .arg(QString(
-                        QUrl::toPercentEncoding(
+                    "&FileName=%2")
+                    .arg("Coverart",
+                         QString(QUrl::toPercentEncoding(
                             QUrl(i.value().url).path()))));
                 break;
         }
@@ -457,8 +457,9 @@ void FillVideoMetadataInfo (
             pArtInfo->setStorageGroup("Fanart");
             pArtInfo->setType("fanart");
             pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                      "&FileName=%2").arg("Fanart")
-                      .arg(QString(
+                      "&FileName=%2")
+                      .arg("Fanart",
+                           QString(
                            QUrl::toPercentEncoding(pMetadata->GetFanart()))));
         }
         if (!pMetadata->GetCoverFile().isEmpty())
@@ -468,8 +469,9 @@ void FillVideoMetadataInfo (
             pArtInfo->setStorageGroup("Coverart");
             pArtInfo->setType("coverart");
             pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                      "&FileName=%2").arg("Coverart")
-                      .arg(QString(
+                      "&FileName=%2")
+                      .arg("Coverart",
+                           QString(
                            QUrl::toPercentEncoding(pMetadata->GetCoverFile()))));
         }
         if (!pMetadata->GetBanner().isEmpty())
@@ -479,8 +481,9 @@ void FillVideoMetadataInfo (
             pArtInfo->setStorageGroup("Banners");
             pArtInfo->setType("banner");
             pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                      "&FileName=%2").arg("Banners")
-                      .arg(QString(
+                      "&FileName=%2")
+                      .arg("Banners",
+                           QString(
                            QUrl::toPercentEncoding(pMetadata->GetBanner()))));
         }
         if (!pMetadata->GetScreenshot().isEmpty())
@@ -490,8 +493,9 @@ void FillVideoMetadataInfo (
             pArtInfo->setStorageGroup("Screenshots");
             pArtInfo->setType("screenshot");
             pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                      "&FileName=%2").arg("Screenshots")
-                      .arg(QString(
+                      "&FileName=%2")
+                      .arg("Screenshots",
+                           QString(
                            QUrl::toPercentEncoding(pMetadata->GetScreenshot()))));
         }
     }
@@ -761,10 +765,10 @@ int CreateRecordingGroup(const QString& groupName)
 DBCredits * jsonCastToCredits(const QJsonObject &cast)
 {
     int priority = 1;
-    DBCredits* credits = new DBCredits;
+    auto* credits = new DBCredits;
 
     QJsonArray members = cast["CastMembers"].toArray();
-    for (const QJsonValue & m : members)
+    for (const auto & m : members)
     {
         QJsonObject actor     = m.toObject();
         QString     name      = actor.value("Name").toString("");

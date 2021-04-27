@@ -125,7 +125,7 @@ NativeArchive::~NativeArchive(void)
 bool NativeArchive::copyFile(const QString &source, const QString &destination)
 {
     QString command = QString("mythutil --copyfile --infile '%1' --outfile '%2'")
-                              .arg(source).arg(destination);
+                              .arg(source, destination);
     uint res = myth_system(command);
     if (res != GENERIC_EXIT_OK)
     {
@@ -413,7 +413,7 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
     QString filename = itemNode.attribute("filename");
     bool doDelete = (itemNode.attribute("delete", "0") == "0");
     LOG(VB_JOBQUEUE, LOG_INFO, QString("Archiving %1 (%2), do delete: %3")
-            .arg(title).arg(filename).arg(doDelete));
+            .arg(title, filename, doDelete ? "true" : "false"));
 
     if (title == "" || filename == "")
     {
@@ -637,7 +637,7 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
     QString filename = itemNode.attribute("filename");
     bool doDelete = (itemNode.attribute("delete", "0") == "0");
     LOG(VB_JOBQUEUE, LOG_INFO, QString("Archiving %1 (%2), do delete: %3")
-            .arg(title).arg(filename).arg(doDelete));
+            .arg(title, filename, doDelete ? "true" : "false"));
 
     if (title == "" || filename == "")
     {
@@ -920,7 +920,7 @@ int NativeArchive::doImportArchive(const QString &xmlFile, int chanID)
 
         LOG(VB_JOBQUEUE, LOG_INFO,
             QString("Archive DB version: %1, Local DB version: %2")
-                .arg(dbVersion).arg(gCoreContext->GetSetting("DBSchemaVer")));
+                .arg(dbVersion, gCoreContext->GetSetting("DBSchemaVer")));
     }
     else
     {

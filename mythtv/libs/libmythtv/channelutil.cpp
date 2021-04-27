@@ -1590,12 +1590,12 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
         "    sourceid        = :SOURCEID,  useonairguide   = :USEOAG,    "
         "    visible         = :VISIBLE,   service_type    = :SERVICETYPE "
         "WHERE chanid=:CHANID")
-        .arg((!set_channum)       ? "" : "channum  = :CHANNUM,  ")
-        .arg((freqid.isEmpty())   ? "" : "freqid   = :FREQID,   ")
-        .arg((icon.isEmpty())     ? "" : "icon     = :ICON,     ")
-        .arg((tvformat.isEmpty()) ? "" : "tvformat = :TVFORMAT, ")
-        .arg((xmltvid.isEmpty())  ? "" : "xmltvid  = :XMLTVID,  ")
-        .arg((default_authority.isEmpty()) ?
+        .arg((!set_channum)       ? "" : "channum  = :CHANNUM,  ",
+             (freqid.isEmpty())   ? "" : "freqid   = :FREQID,   ",
+             (icon.isEmpty())     ? "" : "icon     = :ICON,     ",
+             (tvformat.isEmpty()) ? "" : "tvformat = :TVFORMAT, ",
+             (xmltvid.isEmpty())  ? "" : "xmltvid  = :XMLTVID,  ",
+             (default_authority.isEmpty()) ?
              "" : "default_authority = :AUTHORITY,");
 
     MSqlQuery query(MSqlQuery::InitCon());

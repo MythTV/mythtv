@@ -394,8 +394,8 @@ void RecordingSelector::updateRecordingList(void)
                 QDateTime recendts   = p->GetScheduledEndTime();
 
                 QString timedate = QString("%1 - %2")
-                    .arg(MythDate::toString(recstartts,MythDate::kDateTimeFull))
-                    .arg(MythDate::toString(recendts, MythDate::kTime));
+                    .arg(MythDate::toString(recstartts,MythDate::kDateTimeFull),
+                         MythDate::toString(recendts, MythDate::kTime));
 
                 uint season = p->GetSeason();
                 uint episode = p->GetEpisode();
@@ -405,11 +405,11 @@ void RecordingSelector::updateRecordingList(void)
                 if (season && episode)
                 {
                     seasone = QString("s%1e%2")
-                        .arg(format_season_and_episode(season, 2))
-                        .arg(format_season_and_episode(episode, 2));
+                        .arg(format_season_and_episode(season, 2),
+                             format_season_and_episode(episode, 2));
                     seasonx = QString("%1x%2")
-                        .arg(format_season_and_episode(season, 1))
-                        .arg(format_season_and_episode(episode, 2));
+                        .arg(format_season_and_episode(season, 1),
+                             format_season_and_episode(episode, 2));
                 }
 
                 item->SetText(title, "title");

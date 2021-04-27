@@ -511,8 +511,8 @@ void MythDVDDecoder::PostProcessTracks(void)
                 QString("DVD Subtitle Track Map Stream id #%1, av_stream_idx %2, MPEG #%3, lang %4")
                     .arg(stream.m_stream_id)
                     .arg(stream.m_av_stream_index)
-                    .arg(mpegstream)
-                    .arg(iso639_key_toName(stream. m_language)));
+                    .arg(mpegstream,
+                         iso639_key_toName(stream. m_language)));
 
             if ((selectedStream != -1) && (stream.m_stream_id == selectedStream))
                 track = static_cast<int>(idx);

@@ -128,12 +128,71 @@ bool MythTVMenu::MatchesGroup(const QString &Name, const QString &Prefix,
             (Category == kMenuCategoryItemlist && Name == Prefix));
 }
 
-bool MythTVMenu::LoadFromFile(const QString& Filename, const QString& Menuname,
+QString MythTVMenu::GetPathFromNode(QDomNode Node)
+{
+    QStringList path;
+
+    while (Node.isElement())
+    {
+        QDomElement el = Node.toElement();
+        if (el.tagName() != "menu")
+        {
+            path.prepend("NotMenu");
+            break;
+        }
+        path.prepend(el.attribute("text"));
+        Node = Node.parentNode();
+    }
+    return path.join('/');
+}
+
+QDomNode MythTVMenu::GetNodeFromPath(const QString& path) const
+{
+    QStringList pathList = path.split('/');
+    if (pathList.isEmpty())
+        return QDomNode();
+
+    // Root node is special
+    QDomElement result = GetRoot();
+    QString name = pathList.takeFirst();
+    if ((result.tagName() != "menu") || (result.attribute("text") != name))
+        return QDomNode();
+
+    // Start walking children
+    while (!pathList.isEmpty())
+    {
+        bool found = false;
+        name = pathList.takeFirst();
+        auto children = result.childNodes();
+        for (int i = 0 ; i < children.count(); i++)
+        {
+            auto child = children.at(i).toElement();
+            if (child.isNull() ||
+                (name == child.attribute("text")) ||
+                (name == child.attribute("XXXtext")))
+            {
+                result = child;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            // Oops. Have name but no matching child.
+            return QDomNode();
+        }
+    }
+    return result;
+}
+
+bool MythTVMenu::LoadFromFile(MenuTypeId id, const QString& Filename, const QString& Menuname,
                               const char * TranslationContext, const QString& KeyBindingContext,
                               int IncludeLevel)
 {
     bool result = false;
 
+    m_id = id;
     m_translationContext = TranslationContext;
     m_keyBindingContext  = KeyBindingContext;
     QStringList searchpath = GetMythUI()->GetThemeSearchPath();
@@ -168,12 +227,13 @@ bool MythTVMenu::LoadFromFile(const QString& Filename, const QString& Menuname,
     return result;
 }
 
-bool MythTVMenu::LoadFromString(const QString& Text, const QString& Menuname,
+bool MythTVMenu::LoadFromString(MenuTypeId id, const QString& Text, const QString& Menuname,
                                 const char * TranslationContext, const QString& KeyBindingContext,
                                 int IncludeLevel)
 {
     bool result = false;
 
+    m_id = id;
     m_translationContext = TranslationContext;
     m_keyBindingContext = KeyBindingContext;
     m_document = new QDomDocument();
@@ -214,7 +274,7 @@ void MythTVMenu::ProcessIncludes(QDomElement& Root, int IncludeLevel)
                 }
 
                 MythTVMenu menu;
-                if (menu.LoadFromFile(include, include, m_translationContext,
+                if (menu.LoadFromFile(m_id, include, include, m_translationContext,
                                       m_keyBindingContext, IncludeLevel + 1))
                 {
                     QDomNode newChild = menu.GetRoot();
@@ -288,14 +348,9 @@ bool MythTVMenu::Show(const QDomNode& Node, const QDomNode& Selected,
     return displayed;
 }
 
-MythTVMenuNodeTuple::MythTVMenuNodeTuple(const MythTVMenu& Menu, const QDomNode& Node)
-  : m_menu(Menu),
-    m_node(Node)
-{
-}
-
-MythTVMenuNodeTuple::MythTVMenuNodeTuple()
-  : m_menu(dummy_menubase)
+MythTVMenuNodeTuple::MythTVMenuNodeTuple(MenuTypeId Id, QString Path)
+  : m_id(Id),
+    m_path(std::move(Path))
 {
 }
 

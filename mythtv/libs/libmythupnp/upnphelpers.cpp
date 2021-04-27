@@ -25,7 +25,7 @@ QString DurationFormat(std::chrono::milliseconds msec)
     }
     QString timeStr = UPnPDateTime::TimeFormat(msec);
 
-    return durationStr.arg(dayStr).arg(timeStr);
+    return durationStr.arg(dayStr, timeStr);
 }
 
 QString TimeFormat(const QTime time)
@@ -393,14 +393,14 @@ QString OpParamString(UPNPProtocol::TransferProtocol protocol)
     if (protocol == UPNPProtocol::kHTTP)
     {
         // Section 7.4.1.3.20
-        str = str.arg("0")  // A-val - DLNA Time Seek header support (not currently supported)
-                 .arg("1"); // B-val - HTTP Range support
+        str = str.arg("0",  // A-val - DLNA Time Seek header support (not currently supported)
+                      "1"); // B-val - HTTP Range support
     }
     else if (protocol == UPNPProtocol::kRTP)
     {
         // Section 7.4.1.3.21
-        str = str.arg("0")  // A-val - Range Header Support
-                 .arg("0"); // B-val - Must always zero
+        str = str.arg("0",  // A-val - Range Header Support
+                      "0"); // B-val - Must always zero
     }
 
     return str;

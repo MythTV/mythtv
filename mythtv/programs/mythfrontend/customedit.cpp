@@ -729,8 +729,8 @@ void CustomEdit::storeClicked(void)
     if (query.exec() && query.next())
         exampleExists = true;
 
-    QString msg = QString("%1: %2\n\n").arg(tr("Current Example"))
-                                       .arg(m_titleEdit->GetText());
+    QString msg = QString("%1: %2\n\n").arg(tr("Current Example"),
+                                            m_titleEdit->GetText());
 
     if (!m_subtitleEdit->GetText().isEmpty())
         msg += m_subtitleEdit->GetText() + "\n\n";
@@ -763,8 +763,8 @@ void CustomEdit::storeClicked(void)
         if (m_clauseList->GetCurrentPos() >= m_maxex)
         {
             MythUIButtonListItem* item = m_clauseList->GetItemCurrent();
-            QString str = QString("%1 \"%2\"").arg(tr("Delete"))
-                                      .arg(item->GetText());
+            QString str = QString("%1 \"%2\"").arg(tr("Delete"),
+                                                   item->GetText());
             storediag->AddButton(str);
         }
         mainStack->AddScreen(storediag);
@@ -794,7 +794,7 @@ bool CustomEdit::checkSyntax(void)
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(QString("SELECT NULL FROM (program,channel) "
-                              "%1 WHERE\n%2").arg(from).arg(desc));
+                              "%1 WHERE\n%2").arg(from, desc));
 
         if (query.exec())
         {

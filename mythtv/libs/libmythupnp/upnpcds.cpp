@@ -345,7 +345,7 @@ void UPnpCDS::DetermineClient( HTTPRequest *pRequest,
 
         LOG(VB_UPNP, LOG_INFO,
             QString("DetermineClient %1:%2 Identified as %3 version %4")
-                .arg(except.sHeaderKey) .arg(sHeaderValue)
+                .arg(except.sHeaderKey, sHeaderValue)
                 .arg(pCDSRequest->m_eClient)
                 .arg(pCDSRequest->m_nClientVersion));
         break;
@@ -386,14 +386,14 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                                     ": StartingIndex  = %6 \n"
                                     ": RequestedCount = %7 \n"
                                     ": SortCriteria   = %8 " )
-                       .arg( pRequest->m_sBaseUrl     )
-                       .arg( pRequest->m_sMethod      )
-                       .arg( request.m_sObjectId      )
-                       .arg( request.m_eBrowseFlag    )
-                       .arg( request.m_sFilter        )
-                       .arg( request.m_nStartingIndex )
-                       .arg( request.m_nRequestedCount)
-                       .arg( request.m_sSortCriteria  ));
+                       .arg( pRequest->m_sBaseUrl,
+                             pRequest->m_sMethod,
+                             request.m_sObjectId,
+                             QString::number(request.m_eBrowseFlag),
+                             request.m_sFilter,
+                             QString::number(request.m_nStartingIndex),
+                             QString::number(request.m_nRequestedCount),
+                             request.m_sSortCriteria  ));
 
     UPnPResultCode eErrorCode      = UPnPResult_CDS_NoSuchObject;
     QString        sErrorDesc      = "";
@@ -477,7 +477,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
         {
             LOG(VB_UPNP, LOG_INFO,
                 QString("UPNP Browse : Searching for : %1  / ObjectID : %2")
-                    .arg((*it)->m_sExtensionId).arg(request.m_sObjectId));
+                    .arg((*it)->m_sExtensionId, request.m_sObjectId));
 
             pResult = (*it)->Browse(&request);
         }
@@ -561,7 +561,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::HandleSearch ObjectID=%1, ContainerId=%2")
-            .arg(request.m_sObjectId) .arg(request.m_sContainerID));
+            .arg(request.m_sObjectId, request.m_sContainerID));
 
     // ----------------------------------------------------------------------
     // Break the SearchCriteria into it's parts
@@ -619,15 +619,15 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
                                     ": RequestedCount = %7 \n"
                                     ": SortCriteria   = %8 \n"
                                     ": SearchClass    = %9" )
-                       .arg( pRequest->m_sBaseUrl     )
-                       .arg( pRequest->m_sMethod      )
-                       .arg( request.m_sObjectId      )
-                       .arg( request.m_sSearchCriteria)
-                       .arg( request.m_sFilter        )
-                       .arg( request.m_nStartingIndex )
-                       .arg( request.m_nRequestedCount)
-                       .arg( request.m_sSortCriteria  )
-                       .arg( request.m_sSearchClass   ));
+                       .arg( pRequest->m_sBaseUrl,
+                             pRequest->m_sMethod,
+                             request.m_sObjectId,
+                             request.m_sSearchCriteria,
+                             request.m_sFilter,
+                             QString::number(request.m_nStartingIndex),
+                             QString::number(request.m_nRequestedCount),
+                             request.m_sSortCriteria,
+                             request.m_sSearchClass));
 
 #if 0
     bool bSearchDone = false;
@@ -693,7 +693,7 @@ void UPnpCDS::HandleGetSearchCapabilities( HTTPRequest *pRequest )
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::ProcessRequest : %1 : %2")
-            .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
+            .arg(pRequest->m_sBaseUrl, pRequest->m_sMethod));
 
     // -=>TODO: Need to implement based on CDS Extension Capabilities
 
@@ -719,7 +719,7 @@ void UPnpCDS::HandleGetSortCapabilities( HTTPRequest *pRequest )
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::ProcessRequest : %1 : %2")
-            .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
+            .arg(pRequest->m_sBaseUrl, pRequest->m_sMethod));
 
     // -=>TODO: Need to implement based on CDS Extension Capabilities
 
@@ -743,7 +743,7 @@ void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::ProcessRequest : %1 : %2")
-            .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
+            .arg(pRequest->m_sBaseUrl, pRequest->m_sMethod));
 
     auto nId = GetValue<uint16_t>("SystemUpdateID");
 
@@ -761,7 +761,7 @@ void UPnpCDS::HandleGetFeatureList(HTTPRequest* pRequest)
     NameValues list;
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::ProcessRequest : %1 : %2")
-            .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
+            .arg(pRequest->m_sBaseUrl, pRequest->m_sMethod));
 
     QString sResults = m_features.toXML();
 
@@ -776,7 +776,7 @@ void UPnpCDS::HandleGetServiceResetToken(HTTPRequest* pRequest)
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::ProcessRequest : %1 : %2")
-            .arg(pRequest->m_sBaseUrl) .arg(pRequest->m_sMethod));
+            .arg(pRequest->m_sBaseUrl, pRequest->m_sMethod));
 
     auto sToken = GetValue<QString>("ServiceResetToken");
 
@@ -837,7 +837,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
     QString currentToken = GetCurrentToken(pRequest->m_sObjectId).first;
 
     LOG(VB_UPNP, LOG_DEBUG, QString("Browse (%1): Current Token '%2'")
-                                .arg(m_sExtensionId).arg(currentToken));
+                                .arg(m_sExtensionId, currentToken));
 
     // ----------------------------------------------------------------------
     // Process based on location in hierarchy
@@ -911,14 +911,14 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Search( UPnpCDSRequest *pRequest )
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDSExtension::Search : m_sClass = %1 : "
                 "m_sSearchClass = %2")
-            .arg(m_sClass).arg(pRequest->m_sSearchClass));
+            .arg(m_sClass, pRequest->m_sSearchClass));
 
     if ( !IsSearchRequestForUs( pRequest ))
     {
         LOG(VB_UPNP, LOG_INFO,
             QString("UPnpCDSExtension::Search - Not For Us : "
                     "m_sClass = %1 : m_sSearchClass = %2")
-                .arg(m_sClass).arg(pRequest->m_sSearchClass));
+                .arg(m_sClass, pRequest->m_sSearchClass));
         return nullptr;
     }
 
@@ -1022,8 +1022,8 @@ IDTokenMap UPnpCDSExtension::TokenizeIDString(const QString& Id)
         QString value = (*it).section('=', 1, 1);
 
         tokenMap.insert(key, value);
-        LOG(VB_UPNP, LOG_DEBUG, QString("Token Key: %1 Value: %2").arg(key)
-                                                                  .arg(value));
+        LOG(VB_UPNP, LOG_DEBUG, QString("Token Key: %1 Value: %2").arg(key,
+                                                                       value));
     }
 
     return tokenMap;
@@ -1075,8 +1075,8 @@ QString UPnpCDSExtension::CreateIDString(const QString &requestId,
         currentValue == value.toLower())
         return requestId;
     if (currentName == name.toLower() && currentValue.isEmpty())
-        return QString("%1=%2").arg(requestId).arg(value);
-    return QString("%1/%2=%3").arg(requestId).arg(name).arg(value);
+        return QString("%1=%2").arg(requestId, value);
+    return QString("%1/%2=%3").arg(requestId, name, value);
 }
 
 void UPnpCDSExtension::CreateRoot()

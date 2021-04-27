@@ -490,9 +490,9 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
 
             TypeInfo info = it.value();
 
-            QString sValue = QString( "%1?%2=%3" ).arg( sBaseUri       )
-                                                  .arg( info.sAttrName )
-                                                  .arg( sType          );
+            QString sValue = QString( "%1?%2=%3" ).arg( sBaseUri,
+                                                        info.sAttrName,
+                                                        sType );
 
             if (!info.sContentType.isEmpty())
                 sValue += "&name=" + info.sContentType;

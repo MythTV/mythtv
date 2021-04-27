@@ -272,7 +272,7 @@ bool PreviewGenerator::Run(void)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Encountered problems running '%1 %2' - (%3)")
-                    .arg(command).arg(cmdargs.join(" ")).arg(ret));
+                    .arg(command, cmdargs.join(" "), QString::number(ret)));
         }
         else
         {
@@ -513,7 +513,7 @@ bool PreviewGenerator::SaveOutFile(const QByteArray &data, const QDateTime &dt)
         }
 
         QString filename = m_programInfo.GetBasename() + ".png";
-        SetOutputFilename(QString("%1/%2").arg(remotecachedirname).arg(filename));
+        SetOutputFilename(QString("%1/%2").arg(remotecachedirname, filename));
     }
 
     QFile file(m_outFileName);
@@ -742,7 +742,7 @@ QString PreviewGenerator::CreateAccessibleFilename(
         }
         outname = dir  + "/" + fi.fileName();
         LOG(VB_FILE, LOG_INFO, LOC + QString("outfile '%1' -> '%2'")
-                .arg(outFileName).arg(outname));
+                .arg(outFileName, outname));
     }
 
     return outname;

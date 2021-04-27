@@ -736,8 +736,8 @@ bool LinuxFirewireDevice::SetAVStreamSpeed(uint speed)
     }
 
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Changing Speed %1 -> %2")
-            .arg(speed_to_string(curspeed))
-            .arg(speed_to_string(m_speed)));
+            .arg(speed_to_string(curspeed),
+                 speed_to_string(m_speed)));
 
     iec61883_mpeg2_set_speed(m_priv->m_avstream, speed);
 

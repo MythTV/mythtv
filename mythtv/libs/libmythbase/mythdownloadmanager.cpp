@@ -396,7 +396,7 @@ void MythDownloadManager::queueDownload(const QString &url,
                                         const bool reload)
 {
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("queueDownload('%1', '%2', %3)")
-            .arg(url).arg(dest).arg((long long)caller));
+        .arg(url, dest, QString::number((long long)caller)));
 
     queueItem(url, nullptr, dest, nullptr, caller, kRequestGet, reload);
 }
@@ -908,7 +908,7 @@ bool MythDownloadManager::downloadNowLinkLocal(MythDownloadInfo *dlInfo, bool de
     if (ok && !dlInfo->m_outFile.isEmpty())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unsupported File output %1 for %2")
-            .arg(dlInfo->m_outFile).arg(dlInfo->m_url));
+            .arg(dlInfo->m_outFile, dlInfo->m_url));
         ok = false;
     }
 
@@ -1240,9 +1240,9 @@ void MythDownloadManager::downloadFinished(MythDownloadInfo *dlInfo)
     {
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("downloadFinished(%1): Redirect: %2 -> %3")
-                .arg((long long)dlInfo)
-                .arg(reply->url().toString())
-                .arg(dlInfo->m_redirectedTo.toString()));
+                .arg(QString::number((long long)dlInfo),
+                     reply->url().toString(),
+                     dlInfo->m_redirectedTo.toString()));
 
         if (dlInfo->m_data)
             dlInfo->m_data->clear();
@@ -1451,7 +1451,7 @@ void MythDownloadManager::downloadProgress(qint64 bytesReceived,
 
     LOG(VB_FILE, LOG_DEBUG, LOC +
         QString("downloadProgress: %1 to %2 is at %3 of %4 bytes downloaded")
-            .arg(dlInfo->m_url).arg(dlInfo->m_outFile)
+            .arg(dlInfo->m_url, dlInfo->m_outFile)
             .arg(bytesReceived).arg(bytesTotal));
 
     if (!dlInfo->m_syncMode && dlInfo->m_caller)
@@ -1627,7 +1627,7 @@ QDateTime MythDownloadManager::GetLastModified(const QString &url)
     }
 
     LOG(VB_FILE, LOG_DEBUG, LOC + QString("GetLastModified('%1'): Result %2")
-                                            .arg(url).arg(result.toString()));
+                                            .arg(url, result.toString()));
 
     return result;
 }

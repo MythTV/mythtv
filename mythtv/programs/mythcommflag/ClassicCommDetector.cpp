@@ -113,9 +113,9 @@ QString FrameInfoEntry::toString(uint64_t frame, bool verbose) const
         .arg(maxBrightness,3)
         .arg(avgBrightness,3)
         .arg(sceneChangePercent,3)
-        .arg(toStringFrameAspects(aspect, verbose))
-        .arg(toStringFrameFormats(format, verbose))
-        .arg(toStringFrameMaskValues(flagMask, verbose));
+        .arg(toStringFrameAspects(aspect, verbose),
+             toStringFrameFormats(format, verbose),
+             toStringFrameMaskValues(flagMask, verbose));
 }
 
 ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,

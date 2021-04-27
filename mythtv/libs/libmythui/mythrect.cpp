@@ -397,7 +397,7 @@ QString MythRect::toString(bool details) const
 
     if (details)
         result += QString(" [%1,%2,%3,%4]")
-                  .arg(getX()).arg(getY()).arg(getWidth()).arg(getHeight());
+                  .arg(getX(), getY(), getWidth(), getHeight());
 
     return result;
 }
@@ -587,7 +587,7 @@ QString MythPoint::toString(bool details) const
 
     if (details)
         result += QString(" [%1,%2]")
-                      .arg(getX()).arg(getY());
+                      .arg(getX(), getY());
 
     return result;
 }

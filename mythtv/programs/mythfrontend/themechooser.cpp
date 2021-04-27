@@ -233,9 +233,9 @@ void ThemeChooser::LoadVersion(const QString &version,
     remoteThemesFile.append("/tmp/themes.zip");
     QString themeSite = QString("%1/%2")
         .arg(gCoreContext->GetSetting("ThemeRepositoryURL",
-             "http://themes.mythtv.org/themes/repository")).arg(version);
+             "http://themes.mythtv.org/themes/repository"), version);
     QString destdir = GetCacheDir().append("/themechooser/");
-    QString versiondir = QString("%1/%2").arg(destdir).arg(version);
+    QString versiondir = QString("%1/%2").arg(destdir, version);
     QDir remoteThemesDir(versiondir);
 
     int downloadFailures =
@@ -286,7 +286,7 @@ void ThemeChooser::LoadVersion(const QString &version,
         bool result = GetMythDownloadManager()->download(url, remoteThemesFile, true);
 
         LOG(VB_GUI, LOG_INFO, LOC +
-            QString("Downloading '%1' to '%2'").arg(url).arg(remoteThemesFile));
+            QString("Downloading '%1' to '%2'").arg(url, remoteThemesFile));
 
         SetBusyPopupMessage(tr("Extracting Downloadable Themes Information"));
 
@@ -309,18 +309,17 @@ void ThemeChooser::LoadVersion(const QString &version,
             {
                 LOG(VB_GUI, LOG_ERR, LOC +
                     QString("Failed to unzip '%1' to '%2'")
-                    .arg(remoteThemesFile).arg(destdir));
+                    .arg(remoteThemesFile, destdir));
                 if (alert_user)
                     ShowOkPopup(tr("Failed to unzip '%1' to '%2'")
-                                   .arg(remoteThemesFile).arg(destdir));
+                                   .arg(remoteThemesFile, destdir));
             }
         }
         else
         {
             LOG(VB_GUI, LOG_INFO, LOC +
                 QString("Unzipped '%1' to '%2'")
-                .arg(remoteThemesFile)
-                .arg(destdir));
+                .arg(remoteThemesFile, destdir));
         }
     }
 
@@ -335,7 +334,7 @@ void ThemeChooser::LoadVersion(const QString &version,
 
         LOG(VB_GUI, LOG_INFO, LOC +
             QString("%1 and %2 exist, using cached remote themes list")
-                .arg(remoteThemesFile).arg(remoteThemesDir.absolutePath()));
+                .arg(remoteThemesFile, remoteThemesDir.absolutePath()));
 
         QString themesPath = remoteThemesDir.absolutePath();
         themes.setPath(themesPath);
@@ -726,7 +725,7 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
             downloadURL.replace(tokens[0], tokens[1]);
             LOG(VB_FILE, LOG_WARNING, LOC +
                 QString("Theme download URL overridden from %1 to %2.")
-                    .arg(origURL).arg(downloadURL));
+                    .arg(origURL, downloadURL));
         }
 
         OpenBusyPopup(tr("Downloading %1 Theme").arg(info->GetName()));
@@ -1087,8 +1086,8 @@ void ThemeUpdateChecker::checkForUpdate(void)
                 MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
                                             MythCoreContext::GetMasterServerPort(),
                                             QString("remotethemes/%1/%2")
-                                            .arg(*Iversion)
-                                            .arg(GetMythUI()->GetThemeName()),
+                                            .arg(*Iversion,
+                                                 GetMythUI()->GetThemeName()),
                                             "Temp");
 
             QString infoXML = remoteThemeDir;
@@ -1164,9 +1163,9 @@ void ThemeUpdateChecker::checkForUpdate(void)
                                              "available in the Theme Chooser. "
                                              "The currently installed version "
                                              "is %3.")
-                          .arg(m_newVersion)
-                          .arg(GetMythUI()->GetThemeName())
-                          .arg(m_currentVersion);
+                          .arg(m_newVersion,
+                               GetMythUI()->GetThemeName(),
+                               m_currentVersion);
 
                         ShowOkPopup(message);
                         break;

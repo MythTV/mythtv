@@ -61,15 +61,14 @@ void MythTranslation::load(const QString &module_name)
     {
         LOG(VB_GENERAL, LOG_INFO,
             QString("Loading %1 translation for module %2")
-                .arg(lang).arg(module_name));
+                .arg(lang, module_name));
         QCoreApplication::installTranslator(trans);
         d.m_translators[module_name] = trans;
     }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Error Loading %1 translation for "
-                                        "module %2").arg(lang)
-                                        .arg(module_name));
+                                         "module %2").arg(lang, module_name));
     }
 }
 
@@ -133,8 +132,8 @@ QMap<QString, QString> MythTranslation::getLanguages(void)
         QString languageCode = (*it).baseName().section('_', 1, 1);
         QString countryCode = (*it).baseName().section('_', 2, 2);
         if (!countryCode.isEmpty())
-            languageCode = QString("%1_%2").arg(languageCode)
-                                           .arg(countryCode.toUpper());
+            languageCode = QString("%1_%2")
+                .arg(languageCode, countryCode.toUpper());
 
         MythLocale locale(languageCode);
         QString language = locale.GetNativeLanguage();

@@ -52,7 +52,7 @@ VBoxChannelFetcher::VBoxChannelFetcher(uint cardid, QString inputname, uint sour
     }
 
      LOG(VB_CHANNEL, LOG_INFO, LOC + QString("VideoDevice is: %1, tunerType is: %2")
-         .arg(videoDev).arg(m_transType));
+         .arg(videoDev, m_transType));
 }
 
 VBoxChannelFetcher::~VBoxChannelFetcher()
@@ -177,10 +177,10 @@ void VBoxChannelFetcher::run(void)
         uint transportID  = (*it).m_transportID;
 
         //: %1 is the channel number, %2 is the channel name
-        QString msg = tr("Channel #%1 : %2").arg(channum).arg(name);
+        QString msg = tr("Channel #%1 : %2").arg(channum, name);
 
         LOG(VB_CHANNEL, LOG_INFO, QString("Handling channel %1 %2")
-            .arg(channum).arg(name));
+            .arg(channum, name));
         uint mplexID = 0;
         if (m_ftaOnly && !fta)
         {

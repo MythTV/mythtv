@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+        <key>CFBundleIconFile</key>
+        <string>@ICON@</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleGetInfoString</key>
+        <string>Created by Qt/QMake</string>
+        <key>CFBundleIdentifier</key>
+        <string>com.trolltech.DemoBrowser</string>
+        <key>CFBundleSignature</key>
+        <string>ttxt</string>
+        <key>CFBundleExecutable</key>
+        <string>@EXECUTABLE@</string>
+        <key>CFBundleDocumentTypes</key>
+        <array>
+                <dict>
+                        <key>CFBundleTypeExtensions</key>
+                        <array>
+                                <string>html</string>
+                                <string>htm</string>
+                                <string>shtml</string>
+                                <string>xht</string>
+                                <string>xhtml</string>
+                        </array>
+                        <key>CFBundleTypeIconFile</key>
+                        <string>@ICON@</string>
+                        <key>CFBundleTypeName</key>
+                        <string>HTML Document</string>
+                        <key>CFBundleTypeOSTypes</key>
+                        <array>
+                                <string>HTML</string>
+                        </array>
+                        <key>CFBundleTypeRole</key>
+                        <string>Viewer</string>
+                </dict>
+        </array>
+        <key>NOTE</key>
+        <string>DemoBrowser by The Qt Company Ltd.</string>
+        <key>TestFloat</key>
+        <real>3.1415926545897932</real>
+        <key>TestFloat2</key>
+        <real>3.1415926545897932</real>
+        <key>TestDate</key>
+        <date>2021-04-21T13:26:03Z</date>
+        <key>TestDate2</key>
+        <date>2021-04-21T13:26:03Z</date>
+</dict>
+</plist>

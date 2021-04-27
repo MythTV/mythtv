@@ -153,7 +153,7 @@ class PaneATSC : public GroupSetting
         QString country    = GetFrequencyTable();
 
         const QString new_tables_sig =
-            QString("%1_%2_%3").arg(format).arg(modulation).arg(country);
+            QString("%1_%2_%3").arg(format, modulation, country);
 
         if (new_tables_sig != m_tablesSig)
         {

@@ -48,7 +48,7 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
 
         LOG(VB_RECORD, LOG_INFO,
             QString("ASISH[%1]: Creating new stream handler %2 for %3")
-            .arg(inputid).arg(devkey).arg(devname));
+            .arg(QString::number(inputid), devkey, devname));
     }
     else
     {
@@ -56,8 +56,8 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
         uint rcount = s_handlersRefCnt[devkey];
         LOG(VB_RECORD, LOG_INFO,
             QString("ASISH[%1]: Using existing stream handler %2 for %3")
-            .arg(inputid).arg(devkey)
-            .arg(devname) + QString(" (%1 in use)").arg(rcount));
+                .arg(QString::number(inputid), devkey, devname) +
+            QString(" (%1 in use)").arg(rcount));
     }
 
     return s_handlers[devkey];
@@ -137,7 +137,7 @@ void ASIStreamHandler::run(void)
     if (!Open())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("Failed to open device %1 : %2")
-                .arg(m_device).arg(strerror(errno)));
+                .arg(m_device, strerror(errno)));
         m_bError = true;
         return;
     }

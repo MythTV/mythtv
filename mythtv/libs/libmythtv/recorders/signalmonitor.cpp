@@ -68,7 +68,7 @@ extern "C" {
 #undef DBG_SM
 #define DBG_SM(FUNC, MSG) LOG(VB_CHANNEL, LOG_DEBUG, \
     QString("SigMon[%1](%2)::%3: %4").arg(m_inputid) \
-                              .arg(m_channel->GetDevice()).arg(FUNC).arg(MSG))
+                              .arg(m_channel->GetDevice(), FUNC, MSG))
 
 /** \class SignalMonitor
  *  \brief Signal monitoring base class.

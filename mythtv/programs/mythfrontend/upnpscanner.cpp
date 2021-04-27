@@ -1,8 +1,9 @@
 #include <QCoreApplication>
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
 #include <QStringConverter>
-#endif
+#else
 #include <QTextCodec>
+#endif
 
 #include "mythcorecontext.h"
 #include "mythlogging.h"
@@ -286,7 +287,7 @@ void UPNPScanner::GetMetadata(VideoMetadataListManager::metadata_list* list,
 bool UPNPScanner::GetMetadata(QVariant &data)
 {
     // we need a USN and objectID
-    if (!data.canConvert(QVariant::StringList))
+    if (!data.canConvert<QStringList>())
         return false;
 
     QStringList list = data.toStringList();
@@ -597,7 +598,7 @@ void UPNPScanner::replyFinished(QNetworkReply *reply)
     {
         LOG(VB_UPNP, LOG_ERR, LOC +
             QString("Network request for '%1' returned error '%2'")
-                .arg(url.toString()).arg(reply->errorString()));
+                .arg(url.toString(), reply->errorString()));
     }
 
     bool description = false;
@@ -670,7 +671,7 @@ void UPNPScanner::customEvent(QEvent *event)
             {
                 url = m_servers[usn]->m_controlURL;
                 LOG(VB_GENERAL, LOG_INFO, QString("UPNP_BROWSEOBJECT: %1->%2")
-                    .arg(m_servers[usn]->m_friendlyName).arg(objectid));
+                    .arg(m_servers[usn]->m_friendlyName, objectid));
             }
             m_lock.unlock();
             if (!url.isEmpty())
@@ -699,7 +700,7 @@ void UPNPScanner::customEvent(QEvent *event)
             {
                 m_scanComplete &= m_servers[usn]->ResetContent(newid);
                 LOG(VB_GENERAL, LOG_INFO, LOC +
-                    QString("New SystemUpdateID '%1' for %2").arg(id).arg(usn));
+                    QString("New SystemUpdateID '%1' for %2").arg(id, usn));
                 Debug();
             }
         }
@@ -810,10 +811,10 @@ void UPNPScanner::Debug(void)
         LOG(VB_UPNP, LOG_INFO, LOC +
             QString("'%1' Connected: %2 Subscribed: %3 SystemUpdateID: "
                     "%4 timerId: %5")
-                .arg(it.value()->m_friendlyName).arg(status)
-                .arg(it.value()->m_subscribed ? "Yes" : "No")
-                .arg(it.value()->m_systemUpdateID)
-                .arg(it.value()->m_renewalTimerId));
+                .arg(it.value()->m_friendlyName, status,
+                     it.value()->m_subscribed ? "Yes" : "No",
+                     QString::number(it.value()->m_systemUpdateID),
+                     QString::number(it.value()->m_renewalTimerId)));
     }
     m_lock.unlock();
 }
@@ -1288,9 +1289,9 @@ bool UPNPScanner::ParseDescription(const QUrl &url, QNetworkReply *reply)
     QString fulleventURL = URLBase + "/" + eventURL;
 
     LOG(VB_UPNP, LOG_INFO, LOC + QString("Control URL for %1 at %2")
-            .arg(friendlyName).arg(controlURL));
+            .arg(friendlyName, controlURL));
     LOG(VB_UPNP, LOG_INFO, LOC + QString("Event URL for %1 at %2")
-            .arg(friendlyName).arg(fulleventURL));
+            .arg(friendlyName, fulleventURL));
 
     // update the server details. If the server has gone away since the request
     // was posted, this will silently fail and we won't try again

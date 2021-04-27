@@ -38,7 +38,7 @@ bool HttpConfig::ProcessRequest(HTTPRequest *request)
     LOG(VB_UPNP, LOG_INFO,
         QString("HttpConfig::ProcessRequest(): m_sBaseURL: '%1',"
                 "m_sMethod: '%2'")
-            .arg(request->m_sBaseUrl).arg(request->m_sMethod));
+            .arg(request->m_sBaseUrl, request->m_sMethod));
     if (!request->m_sBaseUrl.startsWith("/Config"))
     {
         return false;
