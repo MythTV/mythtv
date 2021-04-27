@@ -5963,10 +5963,10 @@ bool LoadFromRecorded(
         // sanity check the fields are one of the above fields
         QString sSortBy;
         QStringList fields = sortBy.split(",");
-        for (int x = 0; x < fields.size(); x++)
+        for (const QString& oneField : qAsConst(fields))
         {
             bool ascending = true;
-            QString field = fields.at(x).simplified().toLower();
+            QString field = oneField.simplified().toLower();
 
             if (field.endsWith("desc"))
             {
@@ -6000,7 +6000,7 @@ bool LoadFromRecorded(
             }
             else
             {
-                LOG(VB_GENERAL, LOG_WARNING, QString("ProgramInfo::LoadFromRecorded() got an unknown sort field '%1' - ignoring").arg(fields.at(x)));
+                LOG(VB_GENERAL, LOG_WARNING, QString("ProgramInfo::LoadFromRecorded() got an unknown sort field '%1' - ignoring").arg(oneField));
             }
         }
 
