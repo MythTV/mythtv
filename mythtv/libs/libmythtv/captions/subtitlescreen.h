@@ -35,6 +35,7 @@ public:
     FormattedTextChunk(QString t,
                        CC708CharacterAttribute formatting,
                        SubtitleScreen *p)
+        // NOLINTNEXTLINE(performance-move-const-arg)
         : m_text(std::move(t)), m_format(std::move(formatting)), m_parent(p) {}
     FormattedTextChunk(void) = default;
 
