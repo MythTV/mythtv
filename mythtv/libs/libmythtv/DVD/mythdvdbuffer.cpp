@@ -522,7 +522,7 @@ int MythDVDBuffer::SafeRead(void *Buffer, uint Size)
     int   needed       = static_cast<int>(Size);
     char* dest         = static_cast<char*>(Buffer);
     int   offset       = 0;
-    bool  reprocessing = false;
+    bool  reprocessing { false };
     bool  waiting      = false;
 
     if (m_gotStop)
