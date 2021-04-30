@@ -60,6 +60,10 @@
 #include "httpstatus.h"
 #include "mythlogging.h"
 
+// New webserver
+#include "libmythbase/http/mythhttproot.h"
+#include "libmythbase/http/mythhttpinstance.h"
+
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")
 #define LOC_ERR  QString("MythBackend, Error: ")
@@ -729,6 +733,9 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         httpStatus = new HttpStatus( &tvList, sched, expirer, ismaster );
         pHS->RegisterExtension( httpStatus );
     }
+
+    auto root = std::bind(&MythHTTPRoot::RedirectRoot, std::placeholders::_1, "mythbackend.html");
+    MythHTTPScopedInstance webserver({{ "/", root}});
 
     be_sd_notify("STATUS=Creating main server");
     mainServer = new MainServer(
