@@ -1407,6 +1407,9 @@ QString VideoDialog::RemoteImageCheck(const QString& host, const QString& filena
  */
 QString VideoDialog::GetCoverImage(MythGenericTree *node)
 {
+    if (!node)
+        return QString();
+
     int nodeInt = node->getInt();
 
     QString icon_file;
@@ -1414,7 +1417,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
     if (nodeInt  == kSubFolder)  // subdirectory
     {
         // First validate that the data can be converted
-        if (!node || !node->GetData().canConvert<TreeNodeData>())
+        if (!node->GetData().canConvert<TreeNodeData>())
             return icon_file;
 
         // load folder icon
@@ -1654,7 +1657,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, const QString& type,
     if (list_count > 0)
     {
         QList<MythGenericTree *> subDirs;
-        int maxRecurse = 1;
+        static constexpr int maxRecurse { 1 };
 
         for (int i = 0; i < list_count; i++)
         {
