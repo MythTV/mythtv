@@ -72,7 +72,7 @@ class VolumeWriteBackThread : public MThread
 
             // Ignore further volume changes for the holdoff period
             setTerminationEnabled(true);
-            usleep(holdoff);
+            usleep(holdoff); // cppcheck-suppress usleepCalled
             setTerminationEnabled(false);
 
             lock.relock();
