@@ -2337,6 +2337,10 @@ bool MythPlayer::FastForward(float seconds)
     if (!m_videoOutput)
         return false;
 
+    // Update m_totalFrames so we know how far we can skip
+    if (m_decoder)
+        m_decoder->SyncPositionMap();
+
     if (m_ffTime <= 0)
     {
         float current   = ComputeSecs(m_framesPlayed, true);
