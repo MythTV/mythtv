@@ -383,7 +383,7 @@ QString MPEGDescriptor::DescriptorTagString(void) const
     }
 
     if (str.isEmpty())
-        str = QString("Unknown(%1)").arg(DescriptorTag());
+        str = QString("Unknown");
 
     return str;
 }
@@ -395,7 +395,7 @@ QString MPEGDescriptor::DescriptorTagString(void) const
 QString MPEGDescriptor::descrDump(const QString &name) const
 {
     QString str;
-    str = QString("%1 Descriptor (0x%2) length(%3).")
+    str = QString("%1 Descriptor tag(0x%2) length(%3)")
             .arg(name)
             .arg(DescriptorTag(),2,16,QChar('0'))
             .arg(DescriptorLength());
@@ -452,6 +452,10 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     {
         SET_STRING(MaximumBitrateDescriptor);
     }
+    else if (DescriptorID::smoothing_buffer == DescriptorTag())
+    {
+        SET_STRING(SmoothingBufferDescriptor);
+    }
     else if (DescriptorID::avc_video == DescriptorTag())
     {
         SET_STRING(AVCVideoDescriptor);
@@ -500,6 +504,10 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     {
         SET_STRING(TeletextDescriptor);
     }
+    else if (DescriptorID::subtitling == DescriptorTag())
+    {
+        SET_STRING(SubtitlingDescriptor);
+    }
     else if (DescriptorID::terrestrial_delivery_system == DescriptorTag())
     {
         SET_STRING(TerrestrialDeliverySystemDescriptor);
@@ -512,10 +520,18 @@ QString MPEGDescriptor::toStringPD(uint priv_dsid) const
     {
         SET_STRING(ScramblingDescriptor);
     }
+    else if (DescriptorID::ac3 == DescriptorTag())
+    {
+        SET_STRING(AC3Descriptor);
+    }
     //else if (DescriptorID::ancillary_data == DescriptorTag())
     //{
     //    SET_STRING(AncillaryDataDescriptor);
     //}
+    else if (DescriptorID::application_signalling == DescriptorTag())
+    {
+        SET_STRING(ApplicationSignallingDescriptor);
+    }
     else if (DescriptorID::adaptation_field_data == DescriptorTag())
     {
         SET_STRING(AdaptationFieldDataDescriptor);
@@ -883,9 +899,25 @@ QString SystemClockDescriptor::toString() const
 
 QString MaximumBitrateDescriptor::toString() const
 {
-    return QString("Maximum Bitrate Descriptor: maximum_bitrate(0x%1) %2 Mbits/second")
+    return QString("Maximum Bitrate Descriptor: maximum_bitrate(0x%1) %2 Mbit/s")
         .arg(MaximumBitrate(),6,16,QChar('0'))
         .arg(MaximumBitrate() * 1.0 * 50 * 8 / 1e6);
+}
+
+QString SmoothingBufferDescriptor::toString() const
+{
+    QString str = QString("Smoothing Buffer Descriptor ");
+    str += QString("tag(0x%1) ").arg(DescriptorTag(),2,16,QChar('0'));
+    str += QString("length(%1) ").arg(DescriptorLength());
+
+    str +=
+        QString("sb_leak_rate(0x%1) %2 kB/s ")
+            .arg(SBLeakRate(),6,16,QChar('0'))
+            .arg(SBLeakRate() * 400.0 / (8 * 1e3)) +
+        QString("sb_size(0x%1) %2 kB")
+            .arg(SBSize(),6,16,QChar('0'))
+            .arg(SBSize() / 1e3);
+    return str;
 }
 
 QString AVCVideoDescriptor::toString() const
