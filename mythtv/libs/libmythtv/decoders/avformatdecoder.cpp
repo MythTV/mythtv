@@ -6,8 +6,12 @@
 #include <iostream>
 #include <unistd.h>
 
-#include <QTextCodec>
 #include <QFileInfo>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+#include <QTextCodec>
+#else
+#include <QStringDecoder>
+#endif
 
 #ifdef USING_MEDIACODEC
 extern "C" {
@@ -4036,8 +4040,13 @@ bool AvFormatDecoder::ProcessRawTextPacket(AVPacket* Packet)
     if (!m_parent->GetSubReader(id))
         return false;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     const auto * codec = QTextCodec::codecForName("utf-8");
     auto text = codec->toUnicode(reinterpret_cast<const char *>(Packet->data), Packet->size - 1);
+#else
+    auto toUtf16 = QStringDecoder(QStringDecoder::Utf8);
+    QString text = toUtf16.decode(Packet->data);
+#endif
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     auto list = text.split('\n', QString::SkipEmptyParts);
 #else
