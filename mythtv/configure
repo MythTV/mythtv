@@ -6609,6 +6609,10 @@ enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
 case $ID in
     fedora|debian)
         EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
+    ubuntu)
+        case $VERSION_ID in
+            21*) EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
+       esac
 esac
 
 enabled vulkan && enabled libglslang && require_cpp libglslang glslang/SPIRV/GlslangToSpv.h "glslang::TIntermediate*" -lglslang ${EXTRA_GLSLANG_LIBS:-} -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lSPIRV -lSPIRV-Tools-opt -lSPIRV-Tools -lpthread
