@@ -135,7 +135,7 @@ def buildSingle(inetref, opts):
         print("locale_language : ", locale_language)
 
     loc_posters = movie.posters
-    if loc_posters[0].language != locale_language \
+    if len(loc_posters) and loc_posters[0].language != locale_language \
                     and locale_language != system_language:
         if opts.debug:
             print("1: No poster found for language '%s', trying to sort posters by '%s' :"
@@ -143,7 +143,7 @@ def buildSingle(inetref, opts):
         loc_posters = sorted(movie.posters,
                     key = lambda x: x.language==system_language, reverse = True)
 
-    if loc_posters[0].language != system_language \
+    if len(loc_posters) and loc_posters[0].language != system_language \
                     and loc_posters[0].language != locale_language:
         if opts.debug:
             print("2: No poster found for language '%s', trying to sort posters by '%s' :"
