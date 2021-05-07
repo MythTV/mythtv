@@ -63,6 +63,11 @@ class TestMPEGTables: public QObject
      */
     static void TestUCS2 (void);
 
+    /** test vauious ISO-8859 character sets
+     */
+    static void TestISO8859_data (void);
+    static void TestISO8859 (void);
+
     /** test ParentalRatingDescriptor, #12553
      */
     static void ParentalRatingDescriptor_test (void);

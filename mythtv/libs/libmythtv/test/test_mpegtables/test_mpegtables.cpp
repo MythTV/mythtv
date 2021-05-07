@@ -20,10 +20,29 @@
 
 #include "test_mpegtables.h"
 
+#include <iconv.h>
+#include <iostream>
+
 #include "atsctables.h"
 #include "atsc_huffman.h"
 #include "mpegtables.h"
 #include "dvbtables.h"
+
+static std::array<uint8_t,3+8*12> high8 {
+    0x10, 0x00, 0x00,
+    0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7,
+    0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF,
+    0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7,
+    0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF,
+    0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,
+    0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF,
+    0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7,
+    0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF,
+    0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7,
+    0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF,
+    0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7,
+    0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF,
+};
 
 void TestMPEGTables::pat_test(void)
 {
@@ -304,6 +323,110 @@ void TestMPEGTables::TestUCS2 (void)
     QString ucs2 = dvb_decode_text (&ucs2_data[1], ucs2_data[0], {});
     QCOMPARE (ucs2.length(), (int) (ucs2_data[0] - 1) / 2);
     QCOMPARE (ucs2, QString::fromWCharArray (wchar_data.data()));
+}
+
+void TestMPEGTables::TestISO8859_data (void)
+{
+    QTest::addColumn<int>("iso");
+    QTest::addColumn<QString>("expected");
+
+    QTest::newRow("iso-8859-1") << 1 <<
+        QStringLiteral(u" ¡¢£¤¥¦§¨©ª«¬­®¯" \
+                        "°±²³´µ¶·¸¹º»¼½¾¿" \
+                        "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ" \
+                        "ÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß" \
+                        "àáâãäåæçèéêëìíîï" \
+                        "ðñòóôõö÷øùúûüýþÿ" );
+    QTest::newRow("iso-8859-2") << 2 <<
+        QStringLiteral(u" Ą˘Ł¤ĽŚ§¨ŠŞŤŹ­ŽŻ" \
+                        "°ą˛ł´ľśˇ¸šşťź˝žż" \
+                        "ŔÁÂĂÄĹĆÇČÉĘËĚÍÎĎ" \
+                        "ĐŃŇÓÔŐÖ×ŘŮÚŰÜÝŢß" \
+                        "ŕáâăäĺćçčéęëěíîď" \
+                        "đńňóôőö÷řůúűüýţ˙" );
+    QTest::newRow("iso-8859-3") << 3 <<
+        QStringLiteral(u" Ħ˘£¤�Ĥ§¨İŞĞĴ­�Ż" \
+                        "°ħ²³´µĥ·¸ışğĵ½�ż" \
+                        "ÀÁÂ�ÄĊĈÇÈÉÊËÌÍÎÏ" \
+                        "�ÑÒÓÔĠÖ×ĜÙÚÛÜŬŜß" \
+                        "àáâ�äċĉçèéêëìíîï" \
+                        "�ñòóôġö÷ĝùúûüŭŝ˙" );
+    QTest::newRow("iso-8859-4") << 4 <<
+        QStringLiteral(u" ĄĸŖ¤ĨĻ§¨ŠĒĢŦ­Ž¯" \
+                        "°ą˛ŗ´ĩļˇ¸šēģŧŊžŋ" \
+                        "ĀÁÂÃÄÅÆĮČÉĘËĖÍÎĪ" \
+                        "ĐŅŌĶÔÕÖ×ØŲÚÛÜŨŪß" \
+                        "āáâãäåæįčéęëėíîī" \
+                        "đņōķôõö÷øųúûüũū˙" );
+    QTest::newRow("iso-8859-5") << 5 <<
+        QStringLiteral(u" ЁЂЃЄЅІЇЈЉЊЋЌ­ЎЏ" \
+                        "АБВГДЕЖЗИЙКЛМНОП" \
+                        "РСТУФХЦЧШЩЪЫЬЭЮЯ" \
+                        "абвгдежзийклмноп" \
+                        "рстуфхцчшщъыьэюя" \
+                        "№ёђѓєѕіїјљњћќ§ўџ" );
+    // iso-8859-6: latin/arabic
+    QTest::newRow("iso-8859-7") << 7 <<
+        QStringLiteral(u" ‘’£€₯¦§¨©ͺ«¬­�―" \
+                        "°±²³΄΅Ά·ΈΉΊ»Ό½ΎΏ" \
+                        "ΐΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟ" \
+                        "ΠΡ�ΣΤΥΦΧΨΩΪΫάέήί" \
+                        "ΰαβγδεζηθικλμνξο" \
+                        "πρςστυφχψωϊϋόύώ�" );
+    // iso-8859-6: latin/hebrew
+    QTest::newRow("iso-8859-9") << 9 <<
+        QStringLiteral(u" ¡¢£¤¥¦§¨©ª«¬­®¯" \
+                        "°±²³´µ¶·¸¹º»¼½¾¿" \
+                        "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ" \
+                        "ĞÑÒÓÔÕÖ×ØÙÚÛÜİŞß" \
+                        "àáâãäåæçèéêëìíîï" \
+                        "ğñòóôõö÷øùúûüışÿ" );
+    QTest::newRow("iso-8859-10") << 10 <<
+        QStringLiteral(u" ĄĒĢĪĨĶ§ĻĐŠŦŽ­ŪŊ" \
+                        "°ąēģīĩķ·ļđšŧž―ūŋ" \
+                        "ĀÁÂÃÄÅÆĮČÉĘËĖÍÎÏ" \
+                        "ÐŅŌÓÔÕÖŨØŲÚÛÜÝÞß" \
+                        "āáâãäåæįčéęëėíîï" \
+                        "ðņōóôõöũøųúûüýþĸ" );
+    QTest::newRow("iso-8859-11") << 11 <<
+        QStringLiteral(u" กขฃคฅฆงจฉชซฌญฎฏ" \
+                        "ฐฑฒณดตถทธนบปผฝพฟ" \
+                        "ภมยรฤลฦวศษสหฬอฮฯ" \
+                        "ะัาำิีึืฺุู����฿" \
+                        "เแโใไๅๆ็่้๊๋์ํ๎๏" \
+                        "๐๑๒๓๔๕๖๗๘๙๚๛����" );
+    // iso-8859-12 was abandoned
+    QTest::newRow("iso-8859-13") << 13 <<
+        QStringLiteral(u" ”¢£¤„¦§Ø©Ŗ«¬­®Æ" \
+                        "°±²³“µ¶·ø¹ŗ»¼½¾æ" \
+                        "ĄĮĀĆÄÅĘĒČÉŹĖĢĶĪĻ" \
+                        "ŠŃŅÓŌÕÖ×ŲŁŚŪÜŻŽß" \
+                        "ąįāćäåęēčéźėģķīļ" \
+                        "šńņóōõö÷ųłśūüżž’" );
+    QTest::newRow("iso-8859-14") << 14 <<
+        QStringLiteral(u" Ḃḃ£ĊċḊ§Ẁ©ẂḋỲ­®Ÿ" \
+                        "ḞḟĠġṀṁ¶ṖẁṗẃṠỳẄẅṡ" \
+                        "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ" \
+                        "ŴÑÒÓÔÕÖṪØÙÚÛÜÝŶß" \
+                        "àáâãäåæçèéêëìíîï" \
+                        "ŵñòóôõöṫøùúûüýŷÿ" );
+    QTest::newRow("iso-8859-15") << 15 <<
+        QStringLiteral(u" ¡¢£€¥Š§š©ª«¬­®¯" \
+                        "°±²³Žµ¶·ž¹º»ŒœŸ¿" \
+                        "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ" \
+                        "ÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß" \
+                        "àáâãäåæçèéêëìíîï" \
+                        "ðñòóôõö÷øùúûüýþÿ" );
+}
+
+void TestMPEGTables::TestISO8859 (void)
+{
+    QFETCH(int, iso);
+    QFETCH(QString, expected);
+
+    high8[2] = iso;
+    QString actual = dvb_decode_text(high8.data(), high8.size());
+    QCOMPARE (actual, expected);
 }
 
 void TestMPEGTables::ParentalRatingDescriptor_test (void)
