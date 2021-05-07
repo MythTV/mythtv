@@ -1,9 +1,10 @@
 // C headers
+#include <iconv.h>
 #include <unistd.h>
 #include <algorithm>
+#include <cerrno>
 
 // Qt headers
-#include <QTextCodec>
 #include <QCoreApplication>
 
 // MythTV headers
@@ -47,6 +48,69 @@ static QString decode_iso6937(const unsigned char *buf, uint length)
         }
         result += QChar(ch);
     }
+    return result;
+}
+
+// Set up a context for iconv, and call it repeatedly until finished.
+// The iconv function stops whenever an unknown character is seen in
+// the input stream. Handle inserting a � character and continuing, so
+// that the resulting output is the same as QTextCodec::toUnicode.
+static QString iconv_helper(int which, char *buf, size_t length)
+{
+    QString codec = QString("iso-8859-%1").arg(which);
+    iconv_t conv = iconv_open("utf-16", qPrintable(codec));
+    if (conv == (iconv_t) -1)
+        return "";
+
+    // Allocate room for the output, including space for the Byte
+    // Order Mark.
+    size_t outmaxlen = length * 2 + 2;
+    QByteArray outbytes;
+    outbytes.resize(outmaxlen);
+    char *outp = outbytes.data();
+    size_t outremain = outmaxlen;
+
+    // Conversion loop
+    while (length > 0)
+    {
+        size_t ret = iconv(conv, &buf, &length, &outp, &outremain);
+        if (ret == size_t(-1))
+        {
+            if (errno == EILSEQ)
+            {
+                buf++; length -= 1;
+                // Invalid Unicode character. Stuff a U+FFFD �
+                // replacement character into the output like Qt.
+                // Need to check the Byte Order Mark U+FEFF set by
+                // iconv and match the ordering being used. (This
+                // doesn't necessarily follow HAVE_BIGENDIAN.)
+                if (outbytes[0] == static_cast<char>(0xFE))
+                {   // Big endian
+                    *outp++ = 0xFF; *outp++ = 0xFD;
+                }
+                else
+                {
+                    *outp++ = 0xFD; *outp++ = 0xFF;
+                }
+                outremain -= 2;
+            }
+            else
+            {
+                // Invalid or incomplete multibyte character in
+                // input. Should never happen when converting from
+                // iso-8859.
+                length = 0;
+            }
+        }
+    }
+
+    // Remove the Byte Order Mark for compatability with
+    // QTextCodec::toUnicode. Do not replace the ::fromUtf16 call with
+    // the faster QString constructor, as the latter doesn't read the
+    // BOM and convert the string to host byte order.
+    QString result =
+        QString::fromUtf16(reinterpret_cast<char16_t*>(outbytes.data()),
+                           (outmaxlen-outremain)/2);
     return result;
 }
 
@@ -118,28 +182,6 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 
 static QString decode_text(const unsigned char *buf, uint length)
 {
-    // Only some of the QTextCodec calls are reentrant.
-    // If you use this please verify that you are using a reentrant call.
-    static const std::array<QTextCodec *,16>s_iso8859Codecs
-    {
-        QTextCodec::codecForName("Latin1"),
-        QTextCodec::codecForName("ISO8859-1"),  // Western
-        QTextCodec::codecForName("ISO8859-2"),  // Central European
-        QTextCodec::codecForName("ISO8859-3"),  // Central European
-        QTextCodec::codecForName("ISO8859-4"),  // Baltic
-        QTextCodec::codecForName("ISO8859-5"),  // Cyrillic
-        QTextCodec::codecForName("ISO8859-6"),  // Arabic
-        QTextCodec::codecForName("ISO8859-7"),  // Greek
-        QTextCodec::codecForName("ISO8859-8"),  // Hebrew, visually ordered
-        QTextCodec::codecForName("ISO8859-9"),  // Turkish
-        QTextCodec::codecForName("ISO8859-10"),
-        QTextCodec::codecForName("ISO8859-11"),
-        QTextCodec::codecForName("ISO8859-12"),
-        QTextCodec::codecForName("ISO8859-13"),
-        QTextCodec::codecForName("ISO8859-14"),
-        QTextCodec::codecForName("ISO8859-15"), // Western
-    };
-
     // Decode using the correct text codec
     if (buf[0] >= 0x20)
     {
@@ -147,7 +189,7 @@ static QString decode_text(const unsigned char *buf, uint length)
     }
     if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
     {
-        return s_iso8859Codecs[4 + buf[0]]->toUnicode((char*)(buf + 1), length - 1);
+        return iconv_helper(4 + buf[0], (char*)(buf + 1), length - 1);
     }
     if (buf[0] == 0x10)
     {
@@ -159,7 +201,7 @@ static QString decode_text(const unsigned char *buf, uint length)
 
         uint code = buf[1] << 8 | buf[2];
         if (code <= 15)
-            return s_iso8859Codecs[code]->toUnicode((char*)(buf + 3), length - 3);
+            return iconv_helper(code, (char*)(buf + 3), length - 3);
         return QString::fromLocal8Bit((char*)(buf + 3), length - 3);
     }
     if (buf[0] == 0x15) // Already Unicode
