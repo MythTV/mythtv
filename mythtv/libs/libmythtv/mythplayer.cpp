@@ -1145,6 +1145,11 @@ void MythPlayer::DecoderLoop(bool pause)
     m_decoderSeek = -1;
 }
 
+static float ffrewScaleAdjust = 0.10f;
+static float ffrewSkipThresh = 0.60f;
+static float ffrewScaleLowest = 1.00f;
+static float ffrewScaleHighest = 2.50f;
+
 bool MythPlayer::DecoderGetFrameFFREW(void)
 {
     if (!m_decoder)
@@ -1156,11 +1161,23 @@ bool MythPlayer::DecoderGetFrameFFREW(void)
         long long real_skip = CalcMaxFFTime(m_ffrewSkip - m_ffrewAdjust + delta) - delta;
         long long target_frame = m_decoder->GetFramesRead() + real_skip;
         if (real_skip >= 0)
-        {
             m_decoder->DoFastForward(target_frame, false);
-        }
-        long long seek_frame  = m_decoder->GetFramesRead();
+
+        long long seek_frame = m_decoder->GetFramesRead();
         m_ffrewAdjust = seek_frame - target_frame;
+        float adjustRatio = float(m_ffrewAdjust) / m_ffrewSkip;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("skip %1, adjust %2, ratio %3")
+            .arg(m_ffrewSkip).arg(m_ffrewAdjust).arg(adjustRatio));
+
+        // If the needed adjustment is too large either way, adjust
+        // the scale factor up or down accordingly.
+        if (adjustRatio > ffrewSkipThresh
+            && m_ffrewScale < (ffrewScaleHighest - 0.01f))
+            UpdateFFRewSkip(m_ffrewScale + ffrewScaleAdjust);
+        else if (adjustRatio  < -ffrewSkipThresh
+                 && m_ffrewScale > (ffrewScaleLowest + 0.01f))
+            UpdateFFRewSkip(m_ffrewScale - ffrewScaleAdjust);
     }
     else if (CalcRWTime(-m_ffrewSkip) >= 0)
     {
@@ -1176,8 +1193,22 @@ bool MythPlayer::DecoderGetFrameREW(void)
     long long real_skip    = (toBegin) ? -cur_frame : m_ffrewSkip + m_ffrewAdjust;
     long long target_frame = cur_frame + real_skip;
     bool ret = m_decoder->DoRewind(target_frame, false);
+
     long long seek_frame  = m_decoder->GetFramesPlayed();
     m_ffrewAdjust = target_frame - seek_frame;
+    float adjustRatio = float(m_ffrewAdjust) / m_ffrewSkip;
+    LOG(VB_PLAYBACK, LOG_INFO, LOC +
+        QString("skip %1, adjust, %2, ratio %3")
+        .arg(m_ffrewSkip).arg(m_ffrewAdjust).arg(adjustRatio));
+
+    // If the needed adjustment is too large either way, adjust the
+    // scale factor up or down accordingly.
+    if (adjustRatio < -ffrewSkipThresh
+        && m_ffrewScale < (ffrewScaleHighest - 0.01f))
+        UpdateFFRewSkip(m_ffrewScale + ffrewScaleAdjust);
+    else if (adjustRatio  > ffrewSkipThresh
+             && m_ffrewScale > (ffrewScaleLowest + 0.01f))
+        UpdateFFRewSkip(m_ffrewScale - ffrewScaleAdjust);
     return ret;
 }
 
@@ -1299,7 +1330,7 @@ uint64_t MythPlayer::GetBookmark(void)
     return bookmark;
 }
 
-bool MythPlayer::UpdateFFRewSkip(void)
+bool MythPlayer::UpdateFFRewSkip(float ffrewScale)
 {
     bool skip_changed = false;
 
@@ -1317,21 +1348,21 @@ bool MythPlayer::UpdateFFRewSkip(void)
     else
     {
         skip_changed = true;
-        m_frameInterval = 200000us;
-        m_frameInterval = (fabs(m_playSpeed) >=   3.0F) ? 133466us : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=   5.0F) ? 133466us : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=   8.0F) ? 250250us : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  10.0F) ? 133466us : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  16.0F) ? 187687us : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  20.0F) ? 150150us : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  30.0F) ? 133466us : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >=  60.0F) ? 133466us : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >= 120.0F) ? 133466us : m_frameInterval;
-        m_frameInterval = (fabs(m_playSpeed) >= 180.0F) ? 133466us : m_frameInterval;
+        m_ffrewScale = ffrewScale;
+        if (fabs(m_playSpeed) <= 10.0f)
+            m_frameInterval = 200000us; // 5.00 fps
+        else if (fabs(m_playSpeed) <= 20.0f)
+            m_frameInterval = 160000us; // 6.25 fps
+        else
+            m_frameInterval = 133333us; // 7.50 fps
+        m_frameInterval = chronomult(m_frameInterval, m_ffrewScale);
         float ffw_fps = fabs(static_cast<double>(m_playSpeed)) * m_videoFrameRate;
         float dis_fps = 1000000.0F / m_frameInterval.count();
         m_ffrewSkip = (int)ceil(ffw_fps / dis_fps);
         m_ffrewSkip = m_playSpeed < 0.0F ? -m_ffrewSkip : m_ffrewSkip;
+        LOG(VB_PLAYBACK, LOG_INFO, LOC +
+            QString("new skip %1, interval %2, scale %3")
+            .arg(m_ffrewSkip).arg(m_frameInterval.count()).arg(m_ffrewScale));
         m_ffrewAdjust = 0;
     }
 
