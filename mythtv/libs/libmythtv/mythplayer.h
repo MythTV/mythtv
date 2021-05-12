@@ -342,7 +342,7 @@ class MTV_PUBLIC MythPlayer : public QObject
     bool         DoGetFrame(DecodeType DecodeType);
 
     // These actually execute commands requested by public members
-    bool UpdateFFRewSkip(void);
+    bool UpdateFFRewSkip(float ffrewScale = 1.0f);
     virtual void ChangeSpeed(void);
     // The "inaccuracy" argument is generally one of the kInaccuracy* values.
     bool DoFastForward(uint64_t frames, double inaccuracy);
@@ -498,7 +498,8 @@ class MTV_PUBLIC MythPlayer : public QObject
         {microsecondsFromFloat(1000000.0F / 30)};///< always adjusted for play_speed
     int        m_fpsMultiplier            {1}; ///< used to detect changes
     int        m_ffrewSkip                {1};
-    int        m_ffrewAdjust              {0};
+    int        m_ffrewAdjust              {0}; ///< offset after last skip
+    float      m_ffrewScale               {1.0f}; ///< scale skip for large gops
     bool       m_fileChanged              {false};
     bool       m_nextNormalSpeed          {true};
     bool       m_normalSpeed              {true};

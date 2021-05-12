@@ -537,7 +537,7 @@ bool RadioStreamUpdateTask::DoRun(void)
         return false;
     }
 
-    LOG(VB_GENERAL, LOG_INFO, QString("Radio Stream Update Complete"));
+    LOG(VB_GENERAL, LOG_INFO, QString("Radio Streams Update Complete"));
     return true;
 }
 
@@ -550,7 +550,11 @@ RadioStreamUpdateTask::~RadioStreamUpdateTask(void)
 bool RadioStreamUpdateTask::DoCheckRun(const QDateTime& now)
 {
     // we are only interested in the global setting so remove any local host setting just in case
-    GetMythDB()->ClearSetting("MusicStreamListModified");
+    QString setting = GetMythDB()->GetSettingOnHost("MusicStreamListModified", gCoreContext->GetHostName(), "");
+    if (!setting.isEmpty())
+    {
+        GetMythDB()->ClearSetting("MusicStreamListModified");
+    }
 
     // check we are not already running a radio stream update
     return gCoreContext->GetSetting("MusicStreamListModified") == "Updating" &&

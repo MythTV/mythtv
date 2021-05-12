@@ -58,27 +58,32 @@ void XmlPListSerializer::RenderValue(const QString &sName,
         return;
     }
 
-    switch(vValue.type())
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto type = static_cast<QMetaType::Type>(vValue.type());
+#else
+    auto type = vValue.typeId();
+#endif
+    switch( type )
     {
-        case QVariant::List:
+        case QMetaType::QVariantList:
         {
             RenderList(sName, vValue.toList());
             break;
         }
 
-        case QVariant::StringList:
+        case QMetaType::QStringList:
         {
             RenderStringList(sName, vValue.toStringList());
             break;
         }
 
-        case QVariant::Map:
+        case QMetaType::QVariantMap:
         {
             RenderMap(sName, vValue.toMap());
             break;
         }
 
-        case QVariant::DateTime:
+        case QMetaType::QDateTime:
         {
             if (vValue.toDateTime().isValid())
             {
@@ -90,7 +95,7 @@ void XmlPListSerializer::RenderValue(const QString &sName,
             break;
         }
 
-        case QVariant::ByteArray:
+        case QMetaType::QByteArray:
         {
             if (!vValue.toByteArray().isNull())
             {
@@ -102,7 +107,7 @@ void XmlPListSerializer::RenderValue(const QString &sName,
             break;
         }
 
-        case QVariant::Bool:
+        case QMetaType::Bool:
         {
             if (needKey)
                 m_pXmlWriter->writeTextElement("key", sName);
@@ -111,8 +116,8 @@ void XmlPListSerializer::RenderValue(const QString &sName,
             break;
         }
 
-        case QVariant::UInt:
-        case QVariant::ULongLong:
+        case QMetaType::UInt:
+        case QMetaType::ULongLong:
         {
             if (needKey)
                 m_pXmlWriter->writeTextElement("key", sName);
@@ -121,9 +126,9 @@ void XmlPListSerializer::RenderValue(const QString &sName,
             break;
         }
 
-        case QVariant::Int:
-        case QVariant::LongLong:
-        case QVariant::Double:
+        case QMetaType::Int:
+        case QMetaType::LongLong:
+        case QMetaType::Double:
         {
             if (needKey)
                 m_pXmlWriter->writeTextElement("key", sName);
@@ -133,7 +138,7 @@ void XmlPListSerializer::RenderValue(const QString &sName,
         }
 
         // anything else will be unrecognised, so wrap in a string
-        case QVariant::String:
+        case QMetaType::QString:
         default:
         {
             if (needKey)
@@ -150,16 +155,16 @@ void XmlPListSerializer::RenderList(const QString &sName,
     bool array = true;
     if (!list.isEmpty())
     {
-        QVariant::Type t = list[0].type();
-        QListIterator<QVariant> it(list);
-        while (it.hasNext())
-        {
-            if (it.next().type() != t)
-            {
-                array = false;
-                break;
-            }
-        }
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        auto t = static_cast<QMetaType::Type>(list[0].type());
+        array = std::all_of(list.cbegin(), list.cend(),
+                            [t](const QVariant& v)
+                                { return t == static_cast<QMetaType::Type>(v.type()); } );
+#else
+        auto t = list[0].typeId();
+        array = std::all_of(list.cbegin(), list.cend(),
+                            [t](const QVariant& v) { return t == v.typeId(); } );
+#endif
     }
 
     QString sItemName = GetItemName(sName);

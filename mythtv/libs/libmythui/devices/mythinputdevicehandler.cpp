@@ -225,12 +225,10 @@ void MythInputDeviceHandler::customEvent(QEvent* Event)
         if (!jke)
             return;
 
-        int keycode = jke->getKeycode();
+        int keycode = jke->key();
         if (keycode)
         {
-            key.reset(new QKeyEvent(jke->isKeyDown() ? QEvent::KeyPress : QEvent::KeyRelease,
-                                  (keycode & static_cast<int>(~Qt::MODIFIER_MASK)),
-                                  Qt::KeyboardModifiers(keycode & static_cast<int>(Qt::MODIFIER_MASK))));
+            key.reset(new QKeyEvent(jke->keyAction(), keycode, jke->keyModifiers()));
             target = m_parent->GetTarget(*key);
         }
         else

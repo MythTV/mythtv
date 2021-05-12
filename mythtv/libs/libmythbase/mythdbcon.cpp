@@ -658,7 +658,12 @@ bool MSqlQuery::exec()
         // NOLINTNEXTLINE(modernize-loop-convert)
         for (auto it = tmp.begin(); it != tmp.end(); ++it)
         {
-            if (it->type() != QVariant::String)
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            auto type = static_cast<QMetaType::Type>(it->type());
+#else
+            auto type = it->typeId();
+#endif
+            if (type != QMetaType::QString)
                 continue;
             if (it->isNull() || it->toString().isNull())
             {
@@ -892,7 +897,12 @@ void MSqlQuery::bindValue(const QString &placeholder, const QVariant &val)
 
 void MSqlQuery::bindValueNoNull(const QString &placeholder, const QVariant &val)
 {
-    if ((val.type() == QVariant::String) && val.isNull())
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto type = static_cast<QMetaType::Type>(val.type());
+#else
+    auto type = val.typeId();
+#endif
+    if (type == QMetaType::QString && val.toString().isNull())
     {
         QSqlQuery::bindValue(placeholder, QString(""), QSql::In);
         return;
@@ -981,7 +991,11 @@ void MSqlEscapeAsAQuery(QString &query, const MSqlBindings &bindings)
     {
         holder = holders[(uint)i].m_holderName;
         val = bindings[holder];
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         QSqlField f("", val.type());
+#else
+        QSqlField f("", val.metaType());
+#endif
         if (val.isNull())
             f.clear();
         else

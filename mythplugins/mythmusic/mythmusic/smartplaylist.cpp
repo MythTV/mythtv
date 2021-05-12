@@ -103,7 +103,11 @@ static const SmartPLField *lookupField(const QString& name)
 
 QString formattedFieldValue(const QVariant &value)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QSqlField field("", value.type());
+#else
+    QSqlField field("", value.metaType());
+#endif
     if (value.isNull())
         field.clear();
     else

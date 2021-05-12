@@ -836,6 +836,7 @@ void ImportMusicDialog::setTitleWordCaps(void)
     QString title = locale.toLower(data->Title().simplified());
     QStringList title_words = title.split(' ');
 
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (int x = 0; x < title_words.size(); ++x)
         title_words[x][0] = title_words[x][0].toUpper();
 

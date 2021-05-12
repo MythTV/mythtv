@@ -133,7 +133,13 @@ QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
         {
             val = "NULL";
         }
-        else if (it->type() == QVariant::String)
+        else if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            it->type() == QVariant::String
+#else
+            it->typeId() == QMetaType::QString
+#endif
+            )
         {
             val = (it->toString().isNull()) ?
                 "NULL" : QString("\"%1\"").arg(val);

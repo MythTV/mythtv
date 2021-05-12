@@ -232,16 +232,16 @@ bool MythUISpinBox::keyPressEvent(QKeyEvent *event)
     if (!isNumber)
         return MythUIButtonList::keyPressEvent(event);
 
-    for (int i = 0; i < actions.size(); ++i)
+    for (const QString& action : qAsConst(actions))
     {
-        if (actions[i] >= ACTION_0 && actions[i] <= ACTION_9)
+        if (action >= ACTION_0 && action <= ACTION_9)
         {
             if (!m_hasTemplate)
-                initialEntry = actions[i];
+                initialEntry = action;
             doEntry=true;
             break;
         }
-        if (actions[i] == ACTION_SELECT || actions[i] == "SEARCH")
+        if (action == ACTION_SELECT || action == "SEARCH")
         {
             doEntry=true;
             break;

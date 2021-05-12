@@ -90,12 +90,12 @@ static int SetMarkupList(const MythUtilCommandLineParser &cmdline,
     if (newList.isEmpty())
         newList = "(EMPTY)";
 
-    for (int i = 0; i < tokens.size(); i++)
+    for (const QString& token : qAsConst(tokens))
     {
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-        QStringList cutpair = tokens[i].split("-", QString::SkipEmptyParts);
+        QStringList cutpair = token.split("-", QString::SkipEmptyParts);
 #else
-        QStringList cutpair = tokens[i].split("-", Qt::SkipEmptyParts);
+        QStringList cutpair = token.split("-", Qt::SkipEmptyParts);
 #endif
         if (isCutlist)
         {

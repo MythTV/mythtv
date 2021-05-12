@@ -209,25 +209,16 @@ void FileSelector::OKPressed()
     if (m_selectorType == FSTYPE_FILELIST && m_archiveList)
     {
         // loop though selected files and add them to the list
-        QString f;
 
         // remove any items that have been removed from the list
         QList<ArchiveItem *> tempAList;
         for (auto *a : qAsConst(*m_archiveList))
         {
-            bool found = false;
-
-            for (int y = 0; y < m_selectedList.size(); y++)
-            {
-                f = m_selectedList.at(y);
-                if (a->type != "File" || a->filename == f)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
+            if (a->type != "File")
+                continue;
+            if (std::none_of(m_selectedList.cbegin(), m_selectedList.cend(),
+                             [a](const auto & f)
+                                 {return a->filename == f; } ))
                 tempAList.append(a);
         }
 
@@ -236,23 +227,19 @@ void FileSelector::OKPressed()
 
         // remove any items that are already in the list
         QStringList tempSList;
-        for (int x = 0; x < m_selectedList.size(); x++)
+        for (const QString & f : qAsConst(m_selectedList))
         {
-            f = m_selectedList.at(x);
-
             auto namematch = [f](const auto *a){ return a->filename == f; };
             if (std::any_of(m_archiveList->cbegin(), m_archiveList->cend(), namematch))
                 tempSList.append(f);
         }
 
-        for (int x = 0; x < tempSList.size(); x++)
-            m_selectedList.removeAll(tempSList.at(x));
+        for (const auto & name : qAsConst(tempSList))
+            m_selectedList.removeAll(name);
 
         // add all that are left
-        for (int x = 0; x < m_selectedList.size(); x++)
+        for (const auto & f : qAsConst(m_selectedList))
         {
-            f = m_selectedList.at(x);
-
             QFile file(f);
             if (file.exists())
             {

@@ -490,8 +490,6 @@ void CetonRTSP::StopKeepAlive()
 
 void CetonRTSP::timerEvent(QTimerEvent* /*event*/)
 {
-    QStringList dummy;
-
     LOG(VB_RECORD, LOG_DEBUG, LOC + "Sending KeepAlive");
     if (m_canGetParameter)
     {

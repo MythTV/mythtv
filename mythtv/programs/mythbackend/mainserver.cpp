@@ -1165,8 +1165,12 @@ void MainServer::customEvent(QEvent *e)
                 extra.push_back(msg);
                 extra.push_back(datetime);
                 extra.push_back(QString::number(data.size()));
-                extra.push_back(
-                    QString::number(qChecksum(data.constData(), data.size())));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                quint16 checksum = qChecksum(data.constData(), data.size());
+#else
+                quint16 checksum = qChecksum(data);
+#endif
+                extra.push_back(QString::number(checksum));
                 extra.push_back(QString(data.toBase64()));
 
                 for (uint i = 4 ; i < (uint) me->ExtraDataCount(); i++)
@@ -4048,11 +4052,11 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
             }
 
             QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
-            for (int x = 0; x < filteredFiles.size(); x++)
+            for (const QString& file : qAsConst(filteredFiles))
             {
                 fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
                                                         gCoreContext->GetBackendServerPort(),
-                                                        fi.path() + '/' + filteredFiles[x],
+                                                        fi.path() + '/' + file,
                                                         storageGroup);
             }
         }
@@ -4136,11 +4140,11 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
 
                     QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
 
-                    for (int x = 0; x < filteredFiles.size(); x++)
+                    for (const QString& file : qAsConst(filteredFiles))
                     {
                         fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
                                                                 gCoreContext->GetBackendServerPort(),
-                                                                fi.path() + '/' + filteredFiles[x],
+                                                                fi.path() + '/' + file,
                                                                 storageGroup);
                     }
                 }
@@ -6235,9 +6239,9 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
     fi.setFile(mdata->Filename(false));
     QString startDir = fi.path();
 
-    for (int x = 0; x < files.size(); x++)
+    for (const QString& file : qAsConst(files))
     {
-        fi.setFile(files.at(x));
+        fi.setFile(file);
         auto *image = new AlbumArtImage();
         image->m_filename = startDir + '/' + fi.fileName();
         image->m_hostname = gCoreContext->GetHostName();
@@ -7649,8 +7653,12 @@ void MainServer::HandlePixmapGetIfModified(
                     else
                         strlist += QString::number(UINT_MAX);
                     strlist += QString::number(data.size());
-                    strlist += QString::number(qChecksum(data.constData(),
-                                               data.size()));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                    quint16 checksum = qChecksum(data.constData(), data.size());
+#else
+                    quint16 checksum = qChecksum(data);
+#endif
+                    strlist += QString::number(checksum);
                     strlist += QString(data.toBase64());
                 }
                 else

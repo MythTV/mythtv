@@ -534,7 +534,8 @@ void MythUIVirtualKeyboard::returnClicked(void)
     if (m_shift)
     {
         emit keyPressed("{NEWLINE}");
-        auto *event = new QKeyEvent(QEvent::KeyPress, m_newlineKey.keyCode, m_newlineKey.modifiers, "");
+        auto *event = new QKeyEvent(QEvent::KeyPress, m_newlineKey.key(),
+                                    m_newlineKey.keyboardModifiers(), "");
         m_parentEdit->keyPressEvent(event);
     }
     else
@@ -548,13 +549,15 @@ void MythUIVirtualKeyboard::moveleftClicked(void)
         if (m_shift)
         {
             emit keyPressed("{MOVEUP}");
-            auto *event = new QKeyEvent(QEvent::KeyPress, m_upKey.keyCode, m_upKey.modifiers, "");
+            auto *event = new QKeyEvent(QEvent::KeyPress, m_upKey.key(),
+                                        m_upKey.keyboardModifiers(), "");
             m_parentEdit->keyPressEvent(event);
         }
         else
         {
             emit keyPressed("{MOVELEFT}");
-            auto *event = new QKeyEvent(QEvent::KeyPress, m_leftKey.keyCode, m_leftKey.modifiers,"");
+            auto *event = new QKeyEvent(QEvent::KeyPress, m_leftKey.key(),
+                                        m_leftKey.keyboardModifiers(), "");
             m_parentEdit->keyPressEvent(event);
         }
     }
@@ -567,13 +570,15 @@ void MythUIVirtualKeyboard::moverightClicked(void)
         if (m_shift)
         {
             emit keyPressed("{MOVEDOWN}");
-            auto *event = new QKeyEvent(QEvent::KeyPress, m_downKey.keyCode, m_downKey.modifiers, "");
+            auto *event = new QKeyEvent(QEvent::KeyPress, m_downKey.key(),
+                                        m_downKey.keyboardModifiers(), "");
             m_parentEdit->keyPressEvent(event);
         }
         else
         {
             emit keyPressed("{MOVERIGHT}");
-            auto *event = new QKeyEvent(QEvent::KeyPress, m_rightKey.keyCode, m_rightKey.modifiers,"");
+            auto *event = new QKeyEvent(QEvent::KeyPress, m_rightKey.key(),
+                                        m_rightKey.keyboardModifiers(), "");
             m_parentEdit->keyPressEvent(event);
         }
     }
@@ -628,7 +633,13 @@ QString MythUIVirtualKeyboard::getKeyText(const KeyDefinition& key) const
     return key.normal;
 }
 
-void MythUIVirtualKeyboard::loadEventKeyDefinitions(KeyEventDefinition *keyDef, const QString &action)
+void MythUIVirtualKeyboard::loadEventKeyDefinitions(
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    KeyEventDefinition *keyDef,
+#else
+    QKeyCombination *keyDef,
+#endif
+    const QString &action)
 {
     QString keylist = MythMainWindow::GetKey("Global", action);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -647,6 +658,7 @@ void MythUIVirtualKeyboard::loadEventKeyDefinitions(KeyEventDefinition *keyDef, 
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     keyDef->keyCode = a[0];
 
     Qt::KeyboardModifiers modifiers = Qt::NoModifier;
@@ -664,4 +676,7 @@ void MythUIVirtualKeyboard::loadEventKeyDefinitions(KeyEventDefinition *keyDef, 
     }
 
     keyDef->modifiers = modifiers;
+#else
+    *keyDef = a[0];
+#endif
 }

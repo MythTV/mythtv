@@ -421,7 +421,6 @@ bool FileServerHandler::HandleQueryFreeSpaceList(SocketHandler *socket)
     QStringList hosts;
 
     QList<FileSystemInfo> disks = QueryAllFileSystems();
-    QList<FileSystemInfo>::const_iterator i;
     for (const auto & disk : qAsConst(disks))
         if (!hosts.contains(disk.getHostname()))
             hosts << disk.getHostname();
@@ -458,7 +457,6 @@ bool FileServerHandler::HandleQueryFreeSpaceSummary(SocketHandler *socket)
     // TODO: get max bitrate from encoderlink
     FileSystemInfo::Consolidate(disks, true, 14000);
 
-    QList<FileSystemInfo>::const_iterator i;
     long long total = 0;
     long long used = 0;
     for (const auto & disk : qAsConst(disks))
@@ -1079,7 +1077,6 @@ bool FileServerHandler::HandleDownloadFile(SocketHandler *socket,
     StorageGroup sgroup(storageGroup, gCoreContext->GetHostName(), false);
     QString outDir = sgroup.FindNextDirMostFree();
     QString outFile;
-    QStringList retlist;
 
     if (filename.isEmpty())
     {

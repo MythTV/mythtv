@@ -111,6 +111,7 @@ class CC708CharacterAttribute
         m_underline(isUnderline),
         m_italics(isItalic),
         m_boldface(isBold),
+        // NOLINTNEXTLINE(performance-move-const-arg)
         m_actualFgColor(std::move(fgColor))
     {
     }

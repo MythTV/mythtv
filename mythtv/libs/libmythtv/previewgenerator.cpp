@@ -480,7 +480,12 @@ bool PreviewGenerator::event(QEvent *e)
     }
     data.resize(length);
 
-    if (checksum16 != qChecksum(data.constData(), data.size()))
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    quint16 calculated = qChecksum(data.constData(), data.size());
+#else
+    quint16 calculated = qChecksum(data);
+#endif
+    if (checksum16 != calculated)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Preview checksum failed");
         data.clear();

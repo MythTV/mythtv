@@ -64,7 +64,7 @@
  *  \brief Definition for a single task to be run by the HouseKeeper
  *
  *  This class contains instructions for tasks to be run periodically by the
- *  housekeeper. Each task requires an indentification tag, and can be given
+ *  housekeeper. Each task requires an identification tag, and can be given
  *  a two options to control scope and startup behavior. Each child class
  *  should override at least two methods: DoCheckRun() and DoRun().
  *

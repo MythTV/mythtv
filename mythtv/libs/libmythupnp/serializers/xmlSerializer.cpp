@@ -181,27 +181,32 @@ void XmlSerializer::RenderValue( const QString &sName, const QVariant &vValue )
     // Handle QVariant special cases...
     // -----------------------------------------------------------------------
 
-    switch( vValue.type() )
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto type = static_cast<QMetaType::Type>(vValue.type());
+#else
+    auto type = vValue.typeId();
+#endif
+    switch( type )
     {
-        case QVariant::List:
+        case QMetaType::QVariantList:
         {
             RenderList( sName, vValue.toList() );
             break;
         }
 
-        case QVariant::StringList:
+        case QMetaType::QStringList:
         {
             RenderStringList( sName, vValue.toStringList() );
             break;
         }
 
-        case QVariant::Map:
+        case QMetaType::QVariantMap:
         {
             RenderMap( sName, vValue.toMap() );
             break;
         }
 
-        case QVariant::DateTime:
+        case QMetaType::QDateTime:
         {
             QDateTime dt( vValue.toDateTime() );
 
@@ -364,10 +369,10 @@ QString XmlSerializer::FindOptionValue( const QStringList &sOptions, const QStri
 {
     QString sKey = sName + "=";
 
-    for (int nIdx = 0; nIdx < sOptions.size(); ++nIdx)
+    for (const QString& option : qAsConst(sOptions))
     {
-        if (sOptions.at( nIdx ).startsWith( sKey ))
-            return sOptions.at( nIdx ).mid( sKey.length() );
+        if (option.startsWith( sKey ))
+            return option.mid( sKey.length() );
     }
 
     return QString();

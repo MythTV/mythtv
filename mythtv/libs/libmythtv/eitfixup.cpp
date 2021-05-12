@@ -1445,8 +1445,8 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event)
         QStringList actors = match.captured(4).split("/");
         /* Possible TODO: if EIT inlcude the priority and/or character
          * names for the actors, include them in AddPerson call. */
-        for (int i = 0; i < actors.size(); ++i)
-            event.AddPerson(DBPerson::kActor, actors.at(i));
+        for (const QString& actor : qAsConst(actors))
+            event.AddPerson(DBPerson::kActor, actor);
         event.m_description = match.captured(1);
         return;
     }
@@ -1458,8 +1458,8 @@ void EITFixUp::FixAUFreeview(DBEventEIT &event)
         QStringList actors = match.captured(3).split("/");
         /* Possible TODO: if EIT inlcude the priority and/or character
          * names for the actors, include them in AddPerson call. */
-        for (int i = 0; i < actors.size(); ++i)
-            event.AddPerson(DBPerson::kActor, actors.at(i));
+        for (const QString& actor : qAsConst(actors))
+            event.AddPerson(DBPerson::kActor, actor);
         event.m_description = match.captured(1);
     }
 }

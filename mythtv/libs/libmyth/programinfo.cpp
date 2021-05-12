@@ -4186,7 +4186,14 @@ void ProgramInfo::SaveAspect(
     if (type == MARK_ASPECT_CUSTOM)
         query.bindValue(":DATA", customAspect);
     else
-        query.bindValue(":DATA", QVariant::UInt);
+    {
+        // create NULL value
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        query.bindValue(":DATA", QVariant(QVariant::UInt));
+#else
+        query.bindValue(":DATA", QVariant(QMetaType(QMetaType::UInt)));
+#endif
+    }
 
     if (!query.exec())
         MythDB::DBError("aspect ratio change insert", query);
@@ -5956,10 +5963,10 @@ bool LoadFromRecorded(
         // sanity check the fields are one of the above fields
         QString sSortBy;
         QStringList fields = sortBy.split(",");
-        for (int x = 0; x < fields.size(); x++)
+        for (const QString& oneField : qAsConst(fields))
         {
             bool ascending = true;
-            QString field = fields.at(x).simplified().toLower();
+            QString field = oneField.simplified().toLower();
 
             if (field.endsWith("desc"))
             {
@@ -5993,7 +6000,7 @@ bool LoadFromRecorded(
             }
             else
             {
-                LOG(VB_GENERAL, LOG_WARNING, QString("ProgramInfo::LoadFromRecorded() got an unknown sort field '%1' - ignoring").arg(fields.at(x)));
+                LOG(VB_GENERAL, LOG_WARNING, QString("ProgramInfo::LoadFromRecorded() got an unknown sort field '%1' - ignoring").arg(oneField));
             }
         }
 

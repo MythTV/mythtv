@@ -581,7 +581,7 @@ bool RecorderBase::GetKeyframeDurations(
 }
 
 /**
- *  \brief This saves the postition map delta to the database if force
+ *  \brief This saves the position map delta to the database if force
  *         is true or there are 30 frames in the map or there are five
  *         frames in the map with less than 30 frames in the non-delta
  *         position map.

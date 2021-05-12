@@ -3160,11 +3160,17 @@ QList<QKeyEvent*> TV::ConvertScreenPressKeyMap(const QString &KeyList)
     for (const auto & str : qAsConst(stringKeyList))
     {
         QKeySequence keySequence(str);
-        for(i = 0; i < keySequence.count(); i++)
+        for (i = 0; i < keySequence.count(); i++)
         {
-            uint keynum = static_cast<uint>(keySequence[static_cast<uint>(i)]);
-            auto * keyEvent = new QKeyEvent(QEvent::None, keynum & ~Qt::KeyboardModifierMask,
-                               static_cast<Qt::KeyboardModifiers>(keynum & Qt::KeyboardModifierMask));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            int keynum = keySequence[i];
+            int keyCode = keynum & ~Qt::KeyboardModifierMask;
+            auto modifiers = static_cast<Qt::KeyboardModifiers>(keynum & Qt::KeyboardModifierMask);
+#else
+            int keyCode = keySequence[i].key();
+            Qt::KeyboardModifiers modifiers = keySequence[i].keyboardModifiers();
+#endif
+            auto * keyEvent = new QKeyEvent(QEvent::None, keyCode, modifiers);
             keyPressList.append(keyEvent);
         }
     }
@@ -3378,9 +3384,9 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
         if (!handled && !tt_actions.isEmpty())
         {
-            for (int i = 0; i < tt_actions.size(); i++)
+            for (const QString& action : qAsConst(tt_actions))
             {
-                emit HandleTeletextAction(tt_actions[i], handled);
+                emit HandleTeletextAction(action, handled);
                 if (handled)
                     return true;
             }
@@ -3398,9 +3404,9 @@ bool TV::ProcessKeypressOrGesture(QEvent* Event)
 
         if (!handled && !actions.isEmpty())
         {
-            for (int i = 0; i < actions.size(); i++)
+            for (const QString& action : qAsConst(actions))
             {
-                emit HandleITVAction(actions[i], handled);
+                emit HandleITVAction(action, handled);
                 if (handled)
                     return true;
             }

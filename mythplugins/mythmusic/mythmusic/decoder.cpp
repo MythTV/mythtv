@@ -79,7 +79,7 @@ QStringList Decoder::all()
 
     return std::accumulate(factories->cbegin(), factories->cend(),
                            QStringList(),
-                           [](QStringList l, const auto & factory)
+                           [](QStringList& l, const auto & factory)
                                { return l += factory->description(); } );
 }
 

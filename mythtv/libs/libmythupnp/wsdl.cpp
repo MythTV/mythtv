@@ -461,7 +461,11 @@ QDomElement Wsdl::CreateMethodType( MethodInfo   &oInfo,
 
 bool Wsdl::IsCustomType( QString &sTypeName )
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     int id = QMetaType::type( sTypeName.toUtf8() );
+#else
+    int id = QMetaType::fromName( sTypeName.toUtf8() ).id();
+#endif
 
     switch( id )
     {

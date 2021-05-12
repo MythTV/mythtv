@@ -78,7 +78,7 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
     // need documentation for this one
     add("--cardtype", "cardtype", "", "", "No information.");
 
-    add("--refresh", "refresh", QVariant::StringList,
+    add("--refresh", "refresh", QMetaType::QStringList,
             "Provide a day or range of days to refresh. Can be "
             "used repeatedly.",
             "Provide days to refresh during the grabber run.  Multiple \n"
@@ -118,7 +118,7 @@ void MythFillDatabaseCommandLineParser::LoadArguments(void)
             "be used in combination with other --refresh-<n> options.")
         ->SetDeprecated("use --refresh instead")
         ->SetGroup("Filtering");
-    add("--refresh-day", "refreshday", QVariant::StringList, "",
+    add("--refresh-day", "refreshday", QMetaType::QStringList, "",
             "This option is only valid for selected grabbers.\n"
             "Force a refresh for guide data on a specific day. This can "
             "be used in combination with other --refresh-<n> options.")

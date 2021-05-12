@@ -1525,13 +1525,13 @@ RawHash MythRAOPConnection::FindTags(const QStringList &lines)
     if (lines.isEmpty())
         return result;
 
-    for (int i = 0; i < lines.size(); i++)
+    for (const QString& line : qAsConst(lines))
     {
-        int index = lines[i].indexOf(":");
+        int index = line.indexOf(":");
         if (index > 0)
         {
-            result.insert(lines[i].left(index).trimmed(),
-                          lines[i].mid(index + 1).trimmed());
+            result.insert(line.left(index).trimmed(),
+                          line.mid(index + 1).trimmed());
         }
     }
     return result;

@@ -42,10 +42,10 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
 
     bool all_v4l = !cardtypes.empty();
     bool all_asi = !cardtypes.empty();
-    for (uint i = 0; i < (uint) cardtypes.size(); i++)
+    for (const QString& cardtype : qAsConst(cardtypes))
     {
-        all_v4l &= CardUtil::IsV4L(cardtypes[i]);
-        all_asi &= cardtypes[i] == "ASI";
+        all_v4l &= CardUtil::IsV4L(cardtype);
+        all_asi &= cardtype == "ASI";
     }
 
     auto *common = new ChannelOptionsCommon(*m_cid, default_sourceid,!all_v4l);

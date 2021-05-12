@@ -197,8 +197,6 @@ bool WeatherSource::ProbeInfo(ScriptInfo &info)
  */
 ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
 {
-    QStringList temp;
-
     if (!fi.isReadable() || !fi.isExecutable())
         return nullptr;
 

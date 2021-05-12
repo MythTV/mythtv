@@ -688,10 +688,9 @@ bool FillData::Run(SourceList &sourcelist)
 
     if (!m_fatalErrors.empty())
     {
-        for (int i = 0; i < m_fatalErrors.size(); i++)
+        for (const QString& error : qAsConst(m_fatalErrors))
         {
-            LOG(VB_GENERAL, LOG_CRIT, LOC + "Encountered Fatal Error: " +
-                    m_fatalErrors[i]);
+            LOG(VB_GENERAL, LOG_CRIT, LOC + "Encountered Fatal Error: " + error);
         }
         return false;
     }

@@ -263,11 +263,11 @@ void ScreenSetup::loadData()
         si->m_units = ENG_UNITS;
 
         QStringList type_strs;
-        for (int typei = 0; typei < types.size(); ++typei)
+        for (const QString& type : qAsConst(types))
         {
-            TypeListInfo ti(types[typei]);
-            si->m_types.insert(types[typei], ti);
-            type_strs << types[typei];
+            TypeListInfo ti(type);
+            si->m_types.insert(type, ti);
+            type_strs << type;
         }
 
         QList<ScriptInfo *> scriptList;

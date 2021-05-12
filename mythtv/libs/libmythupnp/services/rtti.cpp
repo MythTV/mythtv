@@ -58,6 +58,7 @@ DTC::Enum* Rtti::GetEnum( const QString &sFQN )
     // Create Parent object so we can get to its metaObject
     // ----------------------------------------------------------------------
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     int nParentId = QMetaType::type( sParentFQN.toUtf8() );
 
     if ((nParentId == 0) && !sParentFQN.startsWith( "DTC::" ))
@@ -73,6 +74,12 @@ DTC::Enum* Rtti::GetEnum( const QString &sFQN )
     const QMetaObject *pMetaObject = pParentClass->metaObject();
 
     QMetaType::destroy( nParentId, pParentClass );
+#else
+    const QMetaObject *pMetaObject =
+        QMetaType::fromName( sParentFQN.toUtf8() ).metaObject();
+    if (pMetaObject == nullptr)
+        pMetaObject = QMetaType::fromName( "DTC::" + sParentFQN.toUtf8() ).metaObject();
+#endif
 
     // ----------------------------------------------------------------------
     // Now look up enum

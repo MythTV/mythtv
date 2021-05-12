@@ -122,12 +122,17 @@ void JSONSerializer::RenderValue( const QVariant &vValue )
     // Handle QVariant special cases...
     // -----------------------------------------------------------------------
 
-    switch( vValue.type() )
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto type = static_cast<QMetaType::Type>(vValue.type());
+#else
+    auto type = vValue.typeId();
+#endif
+    switch( type )
     {
-        case QVariant::List:        RenderList      ( vValue.toList()       );  break;
-        case QVariant::StringList:  RenderStringList( vValue.toStringList() );  break;
-        case QVariant::Map:         RenderMap       ( vValue.toMap()        );  break;
-        case QVariant::DateTime:
+        case QMetaType::QVariantList: RenderList      ( vValue.toList()       );  break;
+        case QMetaType::QStringList:  RenderStringList( vValue.toStringList() );  break;
+        case QMetaType::QVariantMap:  RenderMap       ( vValue.toMap()        );  break;
+        case QMetaType::QDateTime:
         {
             m_stream << "\"" << Encode( 
                 MythDate::toString( vValue.toDateTime(), MythDate::ISODate ) )

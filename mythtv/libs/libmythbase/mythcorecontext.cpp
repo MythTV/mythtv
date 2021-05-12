@@ -1410,7 +1410,6 @@ bool MythCoreContext::SendReceiveStringList(
 
     if (d->m_serverSock)
     {
-        QStringList sendstrlist = strlist;
         std::chrono::milliseconds timeout = quickTimeout ?
             MythSocket::kShortTimeout : MythSocket::kLongTimeout;
         ok = d->m_serverSock->SendReceiveStringList(strlist, 0, timeout);

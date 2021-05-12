@@ -973,8 +973,8 @@ class VBIDevice : public CaptureCardComboBoxSetting
         }
 
         QString sel = getValue();
-        for (uint i = 0; i < (uint) devices.size(); i++)
-            addSelection(devices[i], devices[i], devices[i] == sel);
+        for (const QString& device : qAsConst(devices))
+            addSelection(device, device, device == sel);
 
         return (uint) devices.size();
     }
@@ -1148,11 +1148,10 @@ class DVBCardNum : public CaptureCardComboBoxSetting
 
         QMap<QString,bool> in_use;
         QString sel = current;
-        for (uint i = 0; i < (uint)sdevs.size(); i++)
+        for (const QString& dev : qAsConst(sdevs))
         {
-            const QString dev = sdevs[i];
-            in_use[sdevs[i]] = std::find(db.begin(), db.end(), dev) != db.end();
-            if (sel.isEmpty() && !in_use[sdevs[i]])
+            in_use[dev] = std::find(db.begin(), db.end(), dev) != db.end();
+            if (sel.isEmpty() && !in_use[dev])
                 sel = dev;
         }
 
@@ -1162,11 +1161,10 @@ class DVBCardNum : public CaptureCardComboBoxSetting
         QString usestr = QString(" -- ");
         usestr += QObject::tr("Warning: already in use");
 
-        for (uint i = 0; i < (uint)sdevs.size(); i++)
+        for (const QString& dev : qAsConst(sdevs))
         {
-            const QString dev = sdevs[i];
-            QString desc = dev + (in_use[sdevs[i]] ? usestr : "");
-            desc = (current == sdevs[i]) ? dev : desc;
+            QString desc = dev + (in_use[dev] ? usestr : "");
+            desc = (current == dev) ? dev : desc;
             addSelection(desc, dev, dev == sel);
         }
     }
@@ -1541,12 +1539,12 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
 void HDHomeRunConfigurationGroup::SetDeviceCheckBoxes(const QString& devices)
 {
     QStringList devstrs = devices.split(",");
-    for (int i = 0; i < devstrs.size(); ++i)
+    for (const QString& devstr : qAsConst(devstrs))
     {
         // Get the HDHomeRun device ID using libhdhomerun.  We need to
         // do it this way because legacy configurations could use an
         // IP address and a tuner nubmer.
-        QByteArray ba = devstrs[i].toUtf8();
+        QByteArray ba = devstr.toUtf8();
         hdhomerun_device_t *device = hdhomerun_device_create_from_str(
             ba.data(), nullptr);
         if (!device)
@@ -1844,11 +1842,10 @@ class ASIDevice : public CaptureCardComboBoxSetting
         // for new configs (preferring non-conflicing devices).
         QMap<QString,bool> in_use;
         QString sel = current;
-        for (uint i = 0; i < (uint)sdevs.size(); ++i)
+        for (const QString& dev : qAsConst(sdevs))
         {
-            const QString dev = sdevs[i];
-            in_use[sdevs[i]] = std::find(db.begin(), db.end(), dev) != db.end();
-            if (sel.isEmpty() && !in_use[sdevs[i]])
+            in_use[dev] = std::find(db.begin(), db.end(), dev) != db.end();
+            if (sel.isEmpty() && !in_use[dev])
                 sel = dev;
         }
 
@@ -1861,11 +1858,10 @@ class ASIDevice : public CaptureCardComboBoxSetting
 
         // Add the devices to the UI
         bool found = false;
-        for (uint i = 0; i < (uint)sdevs.size(); ++i)
+        for (const QString& dev : qAsConst(sdevs))
         {
-            const QString dev = sdevs[i];
-            QString desc = dev + (in_use[sdevs[i]] ? usestr : "");
-            desc = (current == sdevs[i]) ? dev : desc;
+            QString desc = dev + (in_use[dev] ? usestr : "");
+            desc = (current == dev) ? dev : desc;
             addSelection(desc, dev, dev == sel);
             found |= (dev == sel);
         }

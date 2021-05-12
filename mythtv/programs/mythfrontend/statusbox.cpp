@@ -264,7 +264,6 @@ void StatusBox::clicked(MythUIButtonListItem *item)
     //        breaks everything and it's inefficient
     if (currentItem == tr("Job Queue"))
     {
-        QStringList msgs;
         int jobStatus = JobQueue::GetJobStatus(logline.m_data.toInt());
 
         if (jobStatus == JOB_QUEUED)

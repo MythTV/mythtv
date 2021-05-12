@@ -855,9 +855,14 @@ ResultItem::resultList getRSSArticles(const QString &feedtitle,
 QString GetDownloadFilename(const QString& title, const QString& url)
 {
     QByteArray urlarr(url.toLatin1());
-    quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());
     QByteArray titlearr(title.toLatin1());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    quint16 urlChecksum = qChecksum(urlarr.data(), urlarr.length());
     quint16 titleChecksum = qChecksum(titlearr.data(), titlearr.length());
+#else
+    quint16 urlChecksum = qChecksum(urlarr);
+    quint16 titleChecksum = qChecksum(titlearr);
+#endif
     QUrl qurl(url);
     QString ext = QFileInfo(qurl.path()).suffix();
     QString basefilename = QString("download_%1_%2.%3")
