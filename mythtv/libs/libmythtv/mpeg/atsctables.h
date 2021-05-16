@@ -3,6 +3,8 @@
 #ifndef ATSC_TABLES_H
 #define ATSC_TABLES_H
 
+#include "mythconfig.h"
+
 #include <cstdint>  // uint32_t
 #if HAVE_SYS_ENDIAN_H
 #include <sys/endian.h>
