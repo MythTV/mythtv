@@ -111,6 +111,8 @@ static QString iconv_helper(int which, char *buf, size_t length)
     QString result =
         QString::fromUtf16(reinterpret_cast<char16_t*>(outbytes.data()),
                            (outmaxlen-outremain)/2);
+
+    iconv_close(conv);
     return result;
 }
 
