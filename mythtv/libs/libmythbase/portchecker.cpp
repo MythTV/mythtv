@@ -88,7 +88,6 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
 #endif
     if (linkLocalOnly)
     {
-        // cppcheck-suppress knownConditionTrueFalse
         if (islinkLocal)
         {
             // If we already know the scope, set it here and return
@@ -101,7 +100,6 @@ bool PortChecker::checkPort(QString &host, int port, std::chrono::milliseconds t
         else
             return false;
     }
-    // cppcheck-suppress unreadVariable
     QList<QNetworkInterface> cards = QNetworkInterface::allInterfaces();
 #ifndef _WIN32
     QListIterator<QNetworkInterface> iCard = cards;
