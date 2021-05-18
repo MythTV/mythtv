@@ -3831,11 +3831,11 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1369")
     {
         DBUpdates updates {
-            "ALTER TABLE programrating MODIFY COLUMN system "
+            "ALTER TABLE programrating MODIFY COLUMN `system` "
             "    varchar(128);",
             "ALTER TABLE programrating MODIFY COLUMN rating "
             "    varchar(128);",
-            "ALTER TABLE recordedrating MODIFY COLUMN system "
+            "ALTER TABLE recordedrating MODIFY COLUMN `system` "
             "    varchar(128);",
             "ALTER TABLE recordedrating MODIFY COLUMN rating "
             "    varchar(128);",
