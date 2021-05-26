@@ -948,10 +948,8 @@ bool MSqlQuery::lostConnectionCheck()
 
     // If the query failed with any of the error codes that say the server
     // is gone, close and reopen the database connection.
-    if (kLostConnectionCodes.contains(error_code) && Reconnect())
-        return true;
+    return (kLostConnectionCodes.contains(error_code) && Reconnect());
 
-    return false;
 }
 
 void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)
