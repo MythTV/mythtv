@@ -28,7 +28,7 @@ if test -e $GITTREEDIR/DESCRIBE ; then
     echo "BRANCH: $BRANCH"
     echo "SOURCE_VERSION: $SOURCE_VERSION"
 else
-    # get the branch and version from git or fall back to EXPORTED_VERSION then VERSION as last resort
+    # get the branch and version from git or fall back to EXPORTED_VERSION then SRC_VERSION as last resort
     git status > /dev/null 2>&1
     SOURCE_VERSION=$(git describe --dirty || git describe || echo Unknown)
     echo "SOURCE_VERSION: $SOURCE_VERSION"
@@ -57,14 +57,14 @@ else
                 SOURCE_VERSION="$BRANCH"
                 SOURCE_VERSION=`echo "$SOURCE_VERSION" | sed "s/tag: *//"`
                 if ! echo "$SOURCE_VERSION" | grep "^v[0-9]" ; then
-                    . $GITTREEDIR/VERSION
+                    . $GITTREEDIR/SRC_VERSION
                 fi
                 SOURCE_VERSION="${SOURCE_VERSION}-${hash}"
                 echo "Source Version created as $SOURCE_VERSION"
                 echo "Branch created as $BRANCH"
-            elif test -e $GITTREEDIR/VERSION ; then
-                echo "Using $GITTREEDIR/VERSION"
-                . $GITTREEDIR/VERSION
+            elif test -e $GITTREEDIR/SRC_VERSION ; then
+                echo "Using $GITTREEDIR/SRC_VERSION"
+                . $GITTREEDIR/SRC_VERSION
                 echo "BRANCH: $BRANCH"
                 echo "SOURCE_VERSION: $SOURCE_VERSION"
             fi
@@ -81,9 +81,9 @@ else
 fi
 
 if ! echo "${SOURCE_VERSION}" | egrep -i "v[0-9]+.*"   ; then
-    # Invalid version - use VERSION file
-    echo "WARNING: Invalid source version ${SOURCE_VERSION}, must start with v and a number, will use VERSION file instead"
-    . $GITTREEDIR/VERSION
+    # Invalid version - use SRC_VERSION file
+    echo "WARNING: Invalid source version ${SOURCE_VERSION}, must start with v and a number, will use SRC_VERSION file instead"
+    . $GITTREEDIR/SRC_VERSION
 fi
 
 src_vn=`echo "${SOURCE_VERSION}" | sed "s/^[Vv]// ; s/-.*// ; s/\..*//"`
