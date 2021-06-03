@@ -638,12 +638,7 @@ bool MSqlQuery::exec()
     bool result = QSqlQuery::exec();
     qint64 elapsed = timer.elapsed();
 
-    // if the query failed with "MySQL server has gone away"
-    // Close and reopen the database connection and retry the query if it
-    // connects again
-    if (!result
-        && QSqlQuery::lastError().nativeErrorCode() == "2006"
-        && Reconnect())
+    if (!result && lostConnectionCheck())
         result = QSqlQuery::exec();
 
     if (!result)
@@ -756,12 +751,7 @@ bool MSqlQuery::exec(const QString &query)
 
     bool result = QSqlQuery::exec(query);
 
-    // if the query failed with "MySQL server has gone away"
-    // Close and reopen the database connection and retry the query if it
-    // connects again
-    if (!result
-        && QSqlQuery::lastError().nativeErrorCode() == "2006"
-        && Reconnect())
+    if (!result && lostConnectionCheck())
         result = QSqlQuery::exec(query);
 
     LOG(VB_DATABASE, LOG_INFO,
@@ -859,12 +849,7 @@ bool MSqlQuery::prepare(const QString& query)
 
     bool ok = QSqlQuery::prepare(query);
 
-    // if the prepare failed with "MySQL server has gone away"
-    // Close and reopen the database connection and retry the query if it
-    // connects again
-    if (!ok
-        && QSqlQuery::lastError().nativeErrorCode() == "2006"
-        && Reconnect())
+    if (!ok && lostConnectionCheck())
         ok = true;
 
     if (!ok && !(GetMythDB()->SuppressDBMessages()))
@@ -944,6 +929,27 @@ bool MSqlQuery::Reconnect(void)
 #endif
     }
     return true;
+}
+
+bool MSqlQuery::lostConnectionCheck()
+{
+    // MySQL: Error number: 2006; Symbol: CR_SERVER_GONE_ERROR
+    // MySQL: Error number: 2013; Symbol: CR_SERVER_LOST
+    // MySQL: Error number: 4031; Symbol: ER_CLIENT_INTERACTION_TIMEOUT
+    // Note: In MariaDB, 4031 = ER_REFERENCED_TRG_DOES_NOT_EXIST
+
+    static QStringList kLostConnectionCodes = { "2006", "2013", "4031" };
+
+    QString error_code = QSqlQuery::lastError().nativeErrorCode();
+
+    // Make capturing of new 'lost connection' like error codes easy.
+    LOG(VB_GENERAL, LOG_DEBUG, QString("SQL Native Error Code: %1")
+        .arg(error_code));
+
+    // If the query failed with any of the error codes that say the server
+    // is gone, close and reopen the database connection.
+    return (kLostConnectionCodes.contains(error_code) && Reconnect());
+
 }
 
 void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)
