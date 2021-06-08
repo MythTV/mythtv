@@ -1616,8 +1616,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["director"] = m_director;
 
     progMap["callsign"] = m_chanSign;
-    progMap["commfree"] = QChar((m_programFlags & FL_CHANCOMMFREE) ? 1 : 0);
-    progMap["commfree_str"] = (m_programFlags & FL_CHANCOMMFREE) ? "1" : "0";
+    progMap["commfree"] = (m_programFlags & FL_CHANCOMMFREE) ? "1" : "0";
     progMap["outputfilters"] = m_chanPlaybackFilters;
     if (IsVideo())
     {
@@ -1687,14 +1686,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         MythDate::toString(m_lastModified, date_format | kDateTimeFull | kSimplify);
 
     if (m_recordedId)
-    {
-        progMap["recordedid"] = QChar(m_recordedId);
-        progMap["recordedid_str"] = QString::number(m_recordedId);
-    }
+        progMap["recordedid"] = QString::number(m_recordedId);
 
     progMap["channum"] = m_chanStr;
-    progMap["chanid"] = QChar(m_chanId);
-    progMap["chanid_str"] = QString::number(m_chanId);
+    progMap["chanid"] = QString::number(m_chanId);
     progMap["channame"] = m_chanName;
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
@@ -1762,10 +1757,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["inputname"] = m_inputName;
     // Don't add bookmarkupdate to progMap, for now.
 
-    progMap["recpriority"] = QChar(m_recPriority);
-    progMap["recpriority2"] = QChar(m_recPriority2);
-    progMap["recpriority_str"]  = QString::number(m_recPriority);
-    progMap["recpriority2_str"] = QString::number(m_recPriority2);
+    progMap["recpriority"]  = QString::number(m_recPriority);
+    progMap["recpriority2"] = QString::number(m_recPriority2);
     progMap["recordinggroup"] = (m_recGroup == "Default")
         ? QObject::tr("Default") : m_recGroup;
     progMap["playgroup"] = m_playGroup;
@@ -1784,14 +1777,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["storagegroup"] = m_storageGroup;
     }
 
-    progMap["programflags"]    = QChar(m_programFlags);
-    progMap["audioproperties"] = QChar(m_audioProperties);
-    progMap["videoproperties"] = QChar(m_videoProperties);
-    progMap["subtitleType"]    = QChar(m_subtitleProperties);
-    progMap["programflags_str"]    = QString::number(m_programFlags);
-    progMap["audioproperties_str"] = QString::number(m_audioProperties);
-    progMap["videoproperties_str"] = QString::number(m_videoProperties);
-    progMap["subtitleType_str"]    = QString::number(m_subtitleProperties);
+    progMap["programflags"]    = QString::number(m_programFlags);
+    progMap["audioproperties"] = QString::number(m_audioProperties);
+    progMap["videoproperties"] = QString::number(m_videoProperties);
+    progMap["subtitleType"]    = QString::number(m_subtitleProperties);
     progMap["programflags_names"]    = GetProgramFlagNames();
     progMap["audioproperties_names"] = GetAudioPropertyNames();
     progMap["videoproperties_names"] = GetVideoPropertyNames();

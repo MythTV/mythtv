@@ -575,8 +575,7 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
         endtm, date_format | MythDate::kDateFull | MythDate::kSimplify);
 
     infoMap["inetref"] = m_inetref;
-    infoMap["chanid"] = QChar(m_channelid);
-    infoMap["chanid_str"] = QString::number(m_channelid);
+    infoMap["chanid"] = QString::number(m_channelid);
     infoMap["channel"] = m_station;
 
     QDateTime startts(m_startdate, m_starttime, Qt::UTC);
