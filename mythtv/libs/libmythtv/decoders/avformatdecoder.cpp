@@ -4128,7 +4128,12 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
                     if (par->codec_id == AV_CODEC_ID_MP3)
                         msg += QString(" MP3");
                     else if (ctx && ctx->codec)
+                    {
                         msg += QString(" %1").arg(ctx->codec->name).toUpper();
+                        AVDictionaryEntry *entry = av_dict_get(stream->metadata, "title", NULL, 0);
+                        if (entry)
+                            msg += QString(R"( "%1")").arg(entry->value);
+                    }
 
                     int channels = 0;
                     if (m_ringBuffer->IsDVD() || par->channels)
