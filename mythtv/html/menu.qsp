@@ -70,6 +70,8 @@
             <li><a href='/Content/wsdl'><i18n>Content Service</i18n></a></li>
             <li><a href='/Dvr/wsdl'><i18n>DVR Service</i18n></a></li>
             <li><a href='/Guide/wsdl'><i18n>Guide Service</i18n></a></li>
+            <li><a href='/Image/wsdl'><i18n>Image Service</i18n></a></li>
+            <li><a href='/Music/wsdl'><i18n>Music Service</i18n></a></li>
             <li><a href='/Myth/wsdl'><i18n>Myth Service</i18n></a></li>
             <li><a href='/Video/wsdl'><i18n>Video Library Service</i18n></a></li>
           </ul>
