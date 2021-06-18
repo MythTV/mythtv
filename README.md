@@ -14,8 +14,8 @@
    * [Forums](https://forum.mythtv.org)
    * [Mailing lists](https://lists.mythtv.org/mailman/listinfo)
    * IRC
-      * Users: irc://freenode.net/mythtv-users (Freenode.net, #mythtv-users)
-      * Developers: irc://freenode.net/mythtv-users (Freenode.net, #mythtv)
+      * Users: ircs://irc.libera.chat:6697/mythtv-users (Libera.​Chat, #mythtv-users)
+      * Developers: ircs://irc.libera.chat:6697/mythtv  (Libera.​Chat, #mythtv)
 
 * Contributions
    * If you have patches for a new feature or a bug fix, please consider forking the project on ![Github](https://github.com/MythTV/mythtv) and creating a pull request.

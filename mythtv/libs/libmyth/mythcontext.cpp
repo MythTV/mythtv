@@ -833,8 +833,8 @@ QString MythContextPrivate::TestDBconnection(bool prompt)
         {"start","dbAwake","dbStarted","dbConnects","beWOL","beAwake",
             "success" };
 
-    auto msStartupScreenDelay =
-        gCoreContext->GetDurSetting<std::chrono::milliseconds>("StartupScreenDelay",2s);
+    auto secondsStartupScreenDelay = gCoreContext->GetDurSetting<std::chrono::seconds>("StartupScreenDelay",2s);
+    auto msStartupScreenDelay = std::chrono::duration_cast<std::chrono::milliseconds>(secondsStartupScreenDelay);
     do
     {
         QElapsedTimer timer;
