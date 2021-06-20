@@ -55,6 +55,13 @@ SOURCES += services/dvr.cpp services/channel.cpp services/video.cpp
 SOURCES += services/serviceUtil.cpp services/capture.cpp
 SOURCES += services/image.cpp services/music.cpp
 
+HEADERS += servicesv2/v2video.h servicesv2/v2videoMetadataInfo.h
+HEADERS += servicesv2/v2artworkInfo.h servicesv2/v2artworkInfoList.h
+HEADERS += servicesv2/v2genre.h servicesv2/v2genreList.h
+HEADERS += servicesv2/v2castMember.h servicesv2/v2castMemberList.h
+SOURCES += servicesv2/v2video.cpp
+SOURCES += servicesv2/v2serviceUtil.cpp
+
 using_oss:DEFINES += USING_OSS
 
 using_dvb:DEFINES += USING_DVB
