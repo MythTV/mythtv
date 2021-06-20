@@ -18,7 +18,10 @@ MythXMLPListSerialiser::MythXMLPListSerialiser(const QString& Name, const QVaria
     m_writer.writeStartElement("dict");
     m_writer.writeTextElement("key", "serializerversion");
     m_writer.writeTextElement("string", XML_PLIST_SERIALIZER_VERSION);
-    AddObject(Name, Value);
+    QString name = Name;
+    if (name.startsWith("V2"))
+        name.remove(0,2);
+    AddObject(name, Value);
     m_writer.writeEndElement();
     m_writer.writeEndElement();
     m_writer.writeEndDocument();

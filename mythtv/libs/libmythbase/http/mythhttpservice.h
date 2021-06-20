@@ -45,6 +45,55 @@ class MBASE_PUBLIC MythHTTPService : public QObject
     Q_PROPERTY(Type Name READ Get##Name MEMBER m_##name USER true) \
     public:                                              \
         Type Get##Name() const { return m_##name; }      \
+        void set##Name(Type value) { m_##name = value; } \
     private:                                             \
     Type m_##name { };
+
+#define SERVICE_PROPERTY2(Type, Name)               \
+    Q_PROPERTY(Type Name READ Get##Name MEMBER m_##Name USER true) \
+    public:                                              \
+        Type Get##Name() const { return m_##Name; }      \
+        void set##Name(Type value) { m_##Name = value; } \
+    private:                                             \
+    Type m_##Name { };
+
+#define SERVICE_PROPERTY_RO_REF( type, name ) \
+    private: type m_##name;              \
+    public:                              \
+    type &name()                           /* NOLINT(bugprone-macro-parentheses) */ \
+    {                                    \
+        return m_##name;                 \
+    }
+
+#define SERVICE_PROPERTY_PTR( type, name )   \
+    private: type* m_##name;              /* NOLINT(bugprone-macro-parentheses) */ \
+    public:                             \
+    type* name()                          /* NOLINT(bugprone-macro-parentheses) */ \
+    {                                   \
+        if (m_##name == nullptr)        \
+            m_##name = new type( this );\
+        return m_##name;                \
+    }
+
+template< class T >
+void CopyListContents( QObject *pParent, QVariantList &dst, const QVariantList &src )
+{
+    for (const auto& vValue : qAsConst(src))
+    {
+        if ( vValue.canConvert< QObject* >())
+        {
+            const QObject *pObject = vValue.value< QObject* >();
+
+            if (pObject != nullptr)
+            {
+                QObject *pNew = new T( pParent );
+
+                ((T *)pNew)->Copy( (const T *)pObject );
+
+                dst.append( QVariant::fromValue<QObject *>( pNew ));
+            }
+        }
+    }
+}
+
 #endif

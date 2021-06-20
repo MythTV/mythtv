@@ -10,7 +10,10 @@ MythXMLSerialiser::MythXMLSerialiser(const QString& Name, const QVariant& Value)
 {
     m_writer.setDevice(&m_buffer);
     m_writer.writeStartDocument("1.0");
-    AddObject(Name, Value);
+    QString name = Name;
+    if (name.startsWith("V2"))
+        name.remove(0,2);
+    AddObject(name, Value);
     m_writer.writeEndDocument();
 }
 
@@ -146,7 +149,8 @@ void MythXMLSerialiser::AddMap(const QString& Name, const QVariantMap& Map)
 QString MythXMLSerialiser::GetItemName(const QString& Name)
 {
     QString name = Name.startsWith("Q") ? Name.mid(1) : Name;
-    name.remove("DTC::");
+    if (name.startsWith("V2"))
+        name.remove(0,2);
     name.remove(QChar('*'));
     return name;
 }

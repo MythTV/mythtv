@@ -10,7 +10,10 @@ MythJSONSerialiser::MythJSONSerialiser(const QString& Name, const QVariant& Valu
 {
     m_first.push(true);
     m_writer.setDevice(&m_buffer);
-    AddObject(Name, Value);
+    QString name = Name;
+    if (name.startsWith("V2"))
+        name.remove(0,2);
+    AddObject(name, Value);
     m_writer.flush();
 }
 

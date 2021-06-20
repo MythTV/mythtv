@@ -10,7 +10,10 @@
 MythCBORSerialiser::MythCBORSerialiser(const QString& Name, const QVariant& Value)
 {
     m_writer = new QCborStreamWriter(&m_buffer);
-    AddObject(Name, Value);
+    QString name = Name;
+    if (name.startsWith("V2"))
+        name.remove(0,2);
+    AddObject(name, Value);
 }
 
 void MythCBORSerialiser::AddObject(const QString& Name, const QVariant& Value)
