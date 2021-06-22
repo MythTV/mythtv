@@ -555,9 +555,9 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
 //#define DEBUG_DVB_OFFSETS
 #ifdef DEBUG_DVB_OFFSETS
-    // UHF 14-51
+    // UHF 24-36
     fmap["atsc_vsb8_us0"] = new FrequencyTable(
-        533000000, 695000000, 6000000, "xATSC Channel %1", 24,
+        533000000, 605000000, 6000000, "xATSC Channel %1", 24,
         DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
@@ -578,9 +578,9 @@ static void init_freq_tables(freq_table_map_t &fmap)
     fmap["atsc_vsb8_us2"] = new FrequencyTable(
         "ATSC Channel %1",  7, 177000000, 213000000, 6000000,
         DTVModulation::kModulation8VSB);
-    // UHF 14-51
+    // UHF 14-36
     fmap["atsc_vsb8_us3"] = new FrequencyTable(
-        "ATSC Channel %1", 14, 473000000, 695000000, 6000000,
+        "ATSC Channel %1", 14, 473000000, 605000000, 6000000,
         DTVModulation::kModulation8VSB);
 #endif // !DEBUG_DVB_OFFSETS
 
