@@ -63,6 +63,7 @@
 // New webserver
 #include "libmythbase/http/mythhttproot.h"
 #include "libmythbase/http/mythhttpinstance.h"
+#include "servicesv2/v2myth.h"
 #include "servicesv2/v2video.h"
 
 #define LOC      QString("MythBackend: ")
@@ -736,6 +737,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     }
 
     MythHTTPInstance::Addservices({{ VIDEO_SERVICE, &MythHTTPService::Create<V2Video> }});
+    MythHTTPInstance::Addservices({{ MYTH_SERVICE, &MythHTTPService::Create<V2Myth> }});
     auto root = std::bind(&MythHTTPRoot::RedirectRoot, std::placeholders::_1, "mythbackend.html");
     MythHTTPScopedInstance webserver({{ "/", root}});
 
