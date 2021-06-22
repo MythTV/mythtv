@@ -130,19 +130,17 @@ void ProgramInfoCache::Refresh(void)
         m_nextCache = nullptr;
         return;
     }
-    locker.unlock();
 
-    Cache::iterator it = m_cache.begin();
-    Cache::iterator nit = it;
-    for (; it != m_cache.end(); it = nit)
+    for (auto it = m_cache.begin(); it != m_cache.end(); )
     {
-        nit = it;
-        ++nit;
-
         if ((*it)->GetAvailableStatus() == asDeleted)
         {
             delete (*it);
-            m_cache.erase(it);
+            it = m_cache.erase(it);
+        }
+        else
+        {
+            it++;
         }
     }
 }
