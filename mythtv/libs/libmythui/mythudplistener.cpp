@@ -172,7 +172,15 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
 
 void MythUDP::EnableUDPListener(bool Enable)
 {
-    emit Instance().m_listener->EnableUDPListener(Enable);
+    if (Instance().m_thread && Instance().m_listener)
+    {
+        emit Instance().m_listener->EnableUDPListener(Enable);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            "EnableUDPListener called after MythUDPListener instance is deleted");
+    }
 }
 
 MythUDP& MythUDP::Instance()
