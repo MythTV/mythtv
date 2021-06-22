@@ -11,6 +11,7 @@
 class V2Video : public MythHTTPService
 {
     Q_OBJECT
+    Q_CLASSINFO("Version",      "1.0")
 
   public:
     V2Video();
@@ -20,6 +21,8 @@ class V2Video : public MythHTTPService
   public slots:
 
     V2VideoMetadataInfo*   GetVideo   (int Id);
+    V2VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  );
+    long                   GetSavedBookmark (int Id );
 
   private:
     Q_DISABLE_COPY(V2Video)
