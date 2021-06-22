@@ -6,6 +6,7 @@ TARGET = mythbase-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
+QT += xml
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 

@@ -7,6 +7,9 @@
 #include "http/mythhttpresponse.h"
 #include "http/mythhttpencoding.h"
 
+// Qt
+#include <QDomDocument>
+
 #define LOC QString("HTTPEnc: ")
 
 /*! \brief Parse the incoming HTTP 'Accept' header and return an ordered list of preferences.
@@ -92,6 +95,9 @@ void MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
         Request->m_content->m_mimeType = mime;
         if (mime.Name() == "application/x-www-form-urlencoded")
             GetURLEncodedParameters(Request);
+        if (mime.Name() == "text/xml" || mime.Name() == "application/xml")
+            GetXMLEncodedParameters(Request);
+
     }
 }
 
@@ -123,6 +129,57 @@ void MythHTTPEncoding::GetURLEncodedParameters(MythHTTPRequest* Request)
                 name  = QUrl::fromPercentEncoding(name.toUtf8());
                 value = QUrl::fromPercentEncoding(value.toUtf8());
                 Request->m_queries.insert(name.trimmed(), value);
+            }
+        }
+    }
+}
+
+void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
+{
+    LOG(VB_HTTP, LOG_DEBUG, "Inspecting XML payload");
+    if (!Request || !Request->m_content.get())
+        return;
+
+    auto payload = QDomDocument();
+    QString err_msg;
+    int err_line, err_col;
+    if (!payload.setContent(static_cast<QByteArray>(Request->m_content->constData()),
+                            true, &err_msg, &err_line, &err_col))
+    {
+        LOG(VB_HTTP, LOG_WARNING, "Unable to parse XML request body");
+        LOG(VB_HTTP, LOG_WARNING, QString("- Error at line %1, column %2, msg: %3")
+                                          .arg(err_line).arg(err_col).arg(err_msg));
+        return;
+    }
+    QString doc_name = payload.documentElement().nodeName();
+    if (doc_name.compare("soapenv:envelope", Qt::CaseInsensitive) == 0)
+    {
+        LOG(VB_HTTP, LOG_DEBUG, "Found SOAP XML message envelope");
+        auto doc_body = payload.documentElement().namedItem("Body");
+        if (doc_body.isNull() || !doc_body.hasChildNodes()) // None or empty body
+        {
+            LOG(VB_HTTP, LOG_DEBUG, "Missing or empty SOAP body");
+            return;
+        }
+        auto body_contents = doc_body.firstChild();
+        if (body_contents.prefix() == "myt")
+        {
+            // Requested method should be the localname
+            Request->m_fileName = body_contents.localName();
+            LOG(VB_HTTP, LOG_DEBUG, QString("Found method call (%1)").arg(body_contents.localName()));
+            if (body_contents.hasChildNodes()) // params for the method
+            {
+                for (QDomNode node = body_contents.firstChild(); !node.isNull(); node = node.nextSibling())
+                {
+                    QString name = node.localName();
+                    QString value = node.toElement().text();
+                    if (!name.isEmpty())
+                    {
+                        // TODO: html decode entities if required
+                        Request->m_queries.insert(name.trimmed(), value);
+                        LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(name).arg(value));
+                    }
+                }
             }
         }
     }
