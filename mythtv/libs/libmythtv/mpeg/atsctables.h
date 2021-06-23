@@ -6,15 +6,8 @@
 #include "mythconfig.h"
 
 #include <cstdint>  // uint32_t
-#if HAVE_SYS_ENDIAN_H
-#include <sys/endian.h>
-#elif !CONFIG_DARWIN
-#include <endian.h>
-#else
-#include <libkern/OSByteOrder.h>
-#define be16toh(x) OSSwapBigToHostInt16(x)
-#endif
 #include <QString>
+#include <QtEndian>
 
 #include "atscdescriptors.h"
 #include "mythmiscutil.h" // for xml_indent
@@ -241,7 +234,7 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
         const auto* ustr = reinterpret_cast<const unsigned short*>(m_ptrs[i]);
         for (int j=0; j<7; j++)
         {
-            QChar c(be16toh(ustr[j]));
+            QChar c(qFromBigEndian(ustr[j]));
             if (c != QChar('\0')) str.append(c);
         }
         return str.simplified();
