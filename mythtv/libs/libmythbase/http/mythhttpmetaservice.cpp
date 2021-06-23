@@ -153,7 +153,7 @@ int MythHTTPMetaService::ParseRequestTypes(const QMetaObject& Meta, const QStrin
     }
     else if (Method.startsWith(QStringLiteral("Get"), Qt::CaseInsensitive))
     {
-        allowed |= HTTPGet | HTTPHead;
+        allowed |= HTTPGet | HTTPHead | HTTPPost;
     }
     else if (Method.startsWith(QStringLiteral("Set"), Qt::CaseInsensitive))
     {
