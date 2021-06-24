@@ -3,7 +3,7 @@
 
 #include "libmythbase/http/mythhttpservice.h"
 #include "videometadatalistmanager.h"
-#include "v2videoMetadataInfo.h"
+#include "v2videoMetadataInfoList.h"
 
 #define VIDEO_SERVICE QString("/Video/")
 #define VIDEO_HANDLE  QString("Video")
@@ -23,6 +23,11 @@ class V2Video : public MythHTTPService
     V2VideoMetadataInfo*   GetVideo   (int Id);
     V2VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  );
     long                   GetSavedBookmark (int Id );
+    V2VideoMetadataInfoList*  GetVideoList    ( const QString  &Folder,
+                                                       const QString  &Sort,
+                                                       bool           Descending,
+                                                       int            StartIndex,
+                                                       int            Count      );
 
   private:
     Q_DISABLE_COPY(V2Video)

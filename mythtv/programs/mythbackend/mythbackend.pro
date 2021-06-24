@@ -60,7 +60,8 @@ HEADERS += servicesv2/v2databaseInfo.h servicesv2/v2versionInfo.h
 HEADERS += servicesv2/v2storageGroupDir.h servicesv2/v2storageGroupDirList.h
 HEADERS += servicesv2/v2timeZoneInfo.h
 
-HEADERS += servicesv2/v2video.h servicesv2/v2videoMetadataInfo.h
+HEADERS += servicesv2/v2video.h
+HEADERS += servicesv2/v2videoMetadataInfo.h servicesv2/v2videoMetadataInfoList.h
 HEADERS += servicesv2/v2artworkInfo.h servicesv2/v2artworkInfoList.h
 HEADERS += servicesv2/v2genre.h servicesv2/v2genreList.h
 HEADERS += servicesv2/v2castMember.h servicesv2/v2castMemberList.h

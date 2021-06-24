@@ -72,6 +72,21 @@ class V2VideoMetadataInfo : public QObject
         {
         }
 
+        void Copy( const V2VideoMetadataInfo *src )
+        {
+            m_Id               = src->m_Id;
+
+            if ( src->m_Artwork != nullptr)
+                Artwork()->Copy( src->m_Artwork );
+
+            if (src->m_Cast != nullptr)
+                Cast()->Copy( src->m_Cast );
+
+            if (src->m_Genres != nullptr)
+                Genres()->Copy( src->m_Genres );
+
+        }
+
 
 };
 
