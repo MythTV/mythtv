@@ -13,6 +13,7 @@ class SERVICE_PUBLIC FrontendServices : public Service
     Q_CLASSINFO( "SendNotification_Method",       "POST" )
     Q_CLASSINFO( "SendAction_Method",             "POST" )
     Q_CLASSINFO( "PlayRecording_Method",          "POST" )
+    Q_CLASSINFO( "PlayLiveTV_Method",             "POST" )
     Q_CLASSINFO( "PlayVideo_Method",              "POST" )
     Q_CLASSINFO( "SendKey_Method",                "POST" )
 
@@ -47,6 +48,7 @@ class SERVICE_PUBLIC FrontendServices : public Service
                                             uint Width, uint Height) = 0;
     virtual bool                 PlayRecording(int RecordedId, int ChanId,
                                                const QDateTime &StartTime) = 0;
+    virtual bool                 PlayLiveTV(int ChanId) = 0;
     virtual bool                 PlayVideo(const QString &Id,
                                            bool  UseBookmark) = 0;
     virtual QStringList          GetContextList(void) = 0;

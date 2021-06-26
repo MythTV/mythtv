@@ -36,6 +36,7 @@ class Frontend : public FrontendServices
                                     uint Width, uint Height) override; // FrontendServices
     bool                 PlayRecording(int RecordedId, int ChanId,
                                        const QDateTime &StartTime) override; // FrontendServices
+    bool                 PlayLiveTV(int ChanId) override; // FrontendServices
     bool                 PlayVideo(const QString &Id, bool UseBookmark) override; // FrontendServices
     QStringList          GetContextList(void) override; // FrontendServices
     DTC::FrontendActionList* GetActionList(const QString &Context) override; // FrontendServices
