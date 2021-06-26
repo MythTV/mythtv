@@ -3,6 +3,7 @@
 
 #include <QCoreApplication>
 #include <QDomDocument>
+#include <QInputMethodEvent>
 #include <QRunnable>
 
 #include "mythcorecontext.h"
@@ -430,6 +431,14 @@ void MythScreenType::Close(void)
 void MythScreenType::ShowMenu(void)
 {
     // Virtual
+}
+
+bool MythScreenType::inputMethodEvent(QInputMethodEvent *event)
+{
+    if (!GetMythMainWindow()->IsExitingToMain() && m_CurrentFocusWidget &&
+        m_CurrentFocusWidget->inputMethodEvent(event))
+        return true;
+	return false;
 }
 
 bool MythScreenType::keyPressEvent(QKeyEvent *event)

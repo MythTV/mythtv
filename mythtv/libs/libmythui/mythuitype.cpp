@@ -5,6 +5,7 @@
 // QT headers
 #include <QEvent>
 #include <QKeyEvent>
+#include <QInputMethodEvent>
 #include <QDomDocument>
 
 // XML headers
@@ -995,6 +996,14 @@ bool MythUIType::keyPressEvent(QKeyEvent * /*event*/)
     return false;
 }
 
+/** \brief Input Method event handler
+ *
+ *  \param event Input Method event
+ */
+bool MythUIType::inputMethodEvent(QInputMethodEvent * /*event*/)
+{
+	return false;
+}
 
 void MythUIType::customEvent(QEvent * /*event*/)
 {
