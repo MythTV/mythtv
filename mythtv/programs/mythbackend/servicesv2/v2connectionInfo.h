@@ -11,8 +11,6 @@ class V2ConnectionInfo : public QObject
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.1" );
 
-    SERVICE_PROPERTY2( QString , Pin );
-
     Q_PROPERTY( QObject*  Version  READ Version  USER true )
     Q_PROPERTY( QObject*  Database READ Database USER true )
     Q_PROPERTY( QObject*  WOL      READ WOL      USER true )

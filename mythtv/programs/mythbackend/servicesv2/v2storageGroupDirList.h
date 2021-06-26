@@ -2,30 +2,31 @@
 #define V2STORAGEGROUPDIRLIST_H_
 
 #include <QVariantList>
-
 #include "libmythbase/http/mythhttpservice.h"
 #include "v2storageGroupDir.h"
-
+#if SGDL
 class V2StorageGroupDirList : public QObject
 {
     Q_OBJECT
     Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "StorageGroupDirs", "type=V2StorageGroupDir");
 
-    SERVICE_PROPERTY2( QString , GroupName )
-    SERVICE_PROPERTY2( QString , HostName  )
+    Q_PROPERTY( QObject* ServiceGroupDir READ ServiceGroupDir USER true)
+
+    SERVICE_PROPERTY2   (QVariantList, StorageGroupDir)
 
     public:
 
         V2StorageGroupDirList(QObject *parent = nullptr)
-                              : QObject( parent )
+                              : QObject( parent ),
+                              m_StorageGroupDir ( nullptr )
         {
         }
 
-/*
-        void Copy( const V2StorageGroupDirList *src )
+        void Copy( const V2StorageGroupDir *src )
         {
-            m_GroupName = src->m_GroupName     ;
-            m_HostName  = src->m_HostName      ;
+            if ( src->mStorageGroupDir != nullprt )
+                StorageGroupDir()->Copy( src->m_StorageGroupDir );
         }
 
         V2StorageGroupDir *AddNewStorageGroupDir()
@@ -34,16 +35,13 @@ class V2StorageGroupDirList : public QObject
             // a parent of 'this'
 
             auto *pObject = new V2StorageGroupDir( this );
-            V2StorageGroupDir.append( QVariant::fromValue<QObject *>( pObject ));
-            // WAS: m_StorageGroupDirs.append( QVariant::fromValue<QObject *>( pObject ));
+            m_StorageGroupDirs.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;
         }
-*/
-    private:
-        Q_DISABLE_COPY(V2StorageGroupDirList)
+
 };
 
 Q_DECLARE_METATYPE(V2StorageGroupDirList*)
-
+#endif // SGDL
 #endif // V2STORAGEGROUPDIRLIST_H_

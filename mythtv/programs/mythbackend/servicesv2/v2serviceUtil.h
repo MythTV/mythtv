@@ -4,6 +4,11 @@
 #include "videometadatalistmanager.h"
 #include "v2videoMetadataInfo.h"
 
+#define HAS_PARAM(p) m_parsedParams.contains(p)
+
+const QStringList KnownServices = { "Capture", "Channel", "Content", \
+                                    "Dvr",     "Guide",   "Music",   \
+                                    "Myth",    "Video" };
 void V2FillVideoMetadataInfo (
                       V2VideoMetadataInfo *pVideoMetadataInfo,
                       const VideoMetadataListManager::VideoMetadataPtr& pMetadata,

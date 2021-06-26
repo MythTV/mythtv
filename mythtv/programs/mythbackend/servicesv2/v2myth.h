@@ -4,7 +4,7 @@
 #include "libmythbase/http/mythhttpservice.h"
 #include "v2connectionInfo.h"
 #include "v2storageGroupDirList.h"
-#include "v2timeZoneInfo.h" // ???????????????????????????????????????
+#include "v2timeZoneInfo.h"
 
 #define MYTH_SERVICE QString("/Myth/")
 #define MYTH_HANDLE  QString("Myth")
@@ -36,36 +36,40 @@ class V2Myth : public MythHTTPService
 
   public slots:
 
-
-/* #################################################################
-################################################################## */
     V2ConnectionInfo*   GetConnectionInfo   ( const QString   &Pin );
 
     QString             GetHostName         ( );
+
     QStringList         GetHosts            ( );
 
     QStringList         GetKeys             ( );
- /*
+
+#define SGDL 0
+#if SGDL
     V2StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
                                                   const QString   &HostName );
-*/
+
+#endif // SGDL
     bool                AddStorageGroupDir  ( const QString   &GroupName,
                                               const QString   &DirName,
                                               const QString   &HostName );
-/*
+
     bool                RemoveStorageGroupDir( const QString   &GroupName,
                                                const QString   &DirName,
                                                const QString   &HostName );
-*/
-    V2TimeZoneInfo*  GetTimeZone         ( );
-/*
+
+    V2TimeZoneInfo*     GetTimeZone         ( );
+
     QString             GetFormatDate       ( const QDateTime &Date,
                                               bool            ShortDate );
+
     QString             GetFormatDateTime   ( const QDateTime &DateTime,
                                               bool            ShortDate );
-    QString             GetFormatTime       ( const QDateTime &Time );
-    QDateTime           ParseISODateString  ( const QString   &DateTime );
 
+    QString             GetFormatTime       ( const QDateTime &Time );
+
+    QDateTime           ParseISODateString  ( const QString   &DateTime );
+/*
     DTC::LogMessageList* GetLogs            ( const QString   &HostName,
                                               const QString   &Application,
                                               int             PID,
@@ -82,13 +86,13 @@ class V2Myth : public MythHTTPService
 
 
     DTC::FrontendList*  GetFrontends        ( bool OnLine );
-
+*/
     QString             GetSetting          ( const QString   &HostName,
                                               const QString   &Key,
                                               const QString   &Default );
-
+/*
     DTC::SettingList*   GetSettingList      ( const QString   &HostName );
-
+*/
     bool                PutSetting          ( const QString   &HostName,
                                               const QString   &Key,
                                               const QString   &Value   );
@@ -139,9 +143,9 @@ class V2Myth : public MythHTTPService
     QString             ProfileUpdated      ( void );
 
     QString             ProfileText         ( void );
-
+/*
     DTC::BackendInfo*   GetBackendInfo      ( void );
-
+*/
     bool                ManageDigestUser    ( const QString &Action,
                                               const QString &UserName,
                                               const QString &Password,
@@ -150,7 +154,7 @@ class V2Myth : public MythHTTPService
 
     bool                ManageUrlProtection ( const QString &Services,
                                               const QString &AdminPassword );
-*/
+
   private:
     Q_DISABLE_COPY(V2Myth)
 

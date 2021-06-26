@@ -24,21 +24,24 @@
 #include "v2serviceUtil.h"
 #include "scheduler.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+#define qEnvironmentVariable getenv
+#endif
+
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
     (MYTH_HANDLE, V2Myth::staticMetaObject, std::bind(&V2Myth::RegisterCustomTypes)))
 
 void V2Myth::RegisterCustomTypes()
 {
-/* #################################################################
-################################################################## */
     qRegisterMetaType<V2ConnectionInfo*>("V2ConnectionInfo");
     // qRegisterMetaType<V2BackendInfo*>("V2BackendInfo");
     // qRegisterMetaType<V2FrontendList*>("V2FrontendList");
     // qRegisterMetaType<V2LogMessageList*>("V2LogMessageList");
     // qRegisterMetaType<V2SettingList*>("V2SettingList");
-    // qRegisterMetaType<V2StorageGroupDir*>("V2StorageGroupDir");
+#if SGDL
     qRegisterMetaType<V2StorageGroupDirList*>("V2StorageGroupDirList");
+#endif // SGDL
     qRegisterMetaType<V2TimeZoneInfo*>("V2TimeZoneInfo");
 }
 
@@ -48,15 +51,10 @@ V2Myth::V2Myth()
 {
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-/* #################################################################
-################################################################## */
+
 V2ConnectionInfo* V2Myth::GetConnectionInfo( const QString  &sPin )
 {
     QString sSecurityPin = gCoreContext->GetSetting( "SecurityPin", "");
@@ -133,6 +131,7 @@ V2ConnectionInfo* V2Myth::GetConnectionInfo( const QString  &sPin )
 
     return pInfo;
 }
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -217,7 +216,7 @@ QStringList V2Myth::GetKeys()
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-/*
+#if SGDL
 V2StorageGroupDirList* V2Myth::GetStorageGroupDirs( const QString &sGroupName,
                                                     const QString &sHostName )
 {
@@ -293,11 +292,11 @@ V2StorageGroupDirList* V2Myth::GetStorageGroupDirs( const QString &sGroupName,
 
     return pList;
 }
-*/
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-
+#endif // SGDL
 bool V2Myth::AddStorageGroupDir( const QString &sGroupName,
                                  const QString &sDirName,
                                  const QString &sHostName )
@@ -359,10 +358,10 @@ bool V2Myth::AddStorageGroupDir( const QString &sGroupName,
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-/*
-bool Myth::RemoveStorageGroupDir( const QString &sGroupName,
-                                  const QString &sDirName,
-                                  const QString &sHostName )
+
+bool V2Myth::RemoveStorageGroupDir( const QString &sGroupName,
+                                    const QString &sDirName,
+                                    const QString &sHostName )
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -400,7 +399,7 @@ bool Myth::RemoveStorageGroupDir( const QString &sGroupName,
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-*/
+
 V2TimeZoneInfo* V2Myth::GetTimeZone(  )
 {
     auto *pResults = new V2TimeZoneInfo();
@@ -411,12 +410,12 @@ V2TimeZoneInfo* V2Myth::GetTimeZone(  )
 
     return pResults;
 }
-/*
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::GetFormatDate(const QDateTime &Date, bool ShortDate)
+QString V2Myth::GetFormatDate(const QDateTime &Date, bool ShortDate)
 {
     uint dateFormat = MythDate::kDateFull | MythDate::kSimplify | MythDate::kAutoYear;
     if (ShortDate)
@@ -429,7 +428,7 @@ QString Myth::GetFormatDate(const QDateTime &Date, bool ShortDate)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::GetFormatDateTime(const QDateTime &DateTime, bool ShortDate)
+QString V2Myth::GetFormatDateTime(const QDateTime &DateTime, bool ShortDate)
 {
     uint dateFormat = MythDate::kDateTimeFull | MythDate::kSimplify | MythDate::kAutoYear;
     if (ShortDate)
@@ -442,7 +441,7 @@ QString Myth::GetFormatDateTime(const QDateTime &DateTime, bool ShortDate)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::GetFormatTime(const QDateTime &Time)
+QString V2Myth::GetFormatTime(const QDateTime &Time)
 {
     return MythDate::toString(Time, MythDate::kTime);
 }
@@ -451,7 +450,7 @@ QString Myth::GetFormatTime(const QDateTime &Time)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QDateTime Myth::ParseISODateString(const QString& DateTimeString)
+QDateTime V2Myth::ParseISODateString(const QString& DateTimeString)
 {
     QDateTime dateTime = QDateTime::fromString(DateTimeString, Qt::ISODate);
 
@@ -464,8 +463,8 @@ QDateTime Myth::ParseISODateString(const QString& DateTimeString)
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-
-DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
+/*
+V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
                                      const QString   &Application,
                                      int             PID,
                                      int             TID,
@@ -598,7 +597,7 @@ DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-DTC::FrontendList *Myth::GetFrontends( bool OnLine )
+V2FrontendList* V2Myth::GetFrontends( bool OnLine )
 {
     auto *pList = new DTC::FrontendList();
     QMap<QString, Frontend*> frontends;
@@ -620,14 +619,14 @@ DTC::FrontendList *Myth::GetFrontends( bool OnLine )
 
     return pList;
 }
-
+*/
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::GetSetting( const QString &sHostName,
-                          const QString &sKey,
-                          const QString &sDefault )
+QString V2Myth::GetSetting( const QString &sHostName,
+                            const QString &sKey,
+                            const QString &sDefault )
 {
     if (sKey.isEmpty())
         throw( QString("Missing or empty Key (settings.value)") );
@@ -662,8 +661,8 @@ QString Myth::GetSetting( const QString &sHostName,
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-
-DTC::SettingList *Myth::GetSettingList(const QString &sHostName)
+/*
+V2SettingList* V2Myth::GetSettingList(const QString &sHostName)
 {
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -711,12 +710,12 @@ DTC::SettingList *Myth::GetSettingList(const QString &sHostName)
 
     return pList;
 }
-
+*/
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::PutSetting( const QString &sHostName,
+bool V2Myth::PutSetting( const QString &sHostName,
                        const QString &sKey,
                        const QString &sValue )
 {
@@ -732,9 +731,9 @@ bool Myth::PutSetting( const QString &sHostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::ChangePassword( const QString   &sUserName,
-                           const QString   &sOldPassword,
-                           const QString   &sNewPassword )
+bool V2Myth::ChangePassword( const QString   &sUserName,
+                             const QString   &sOldPassword,
+                             const QString   &sNewPassword )
 {
     LOG(VB_GENERAL, LOG_NOTICE, "ChangePassword is deprecated, use "
                                 "ManageDigestUser.");
@@ -747,11 +746,11 @@ bool Myth::ChangePassword( const QString   &sUserName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::TestDBSettings( const QString &sHostName,
-                           const QString &sUserName,
-                           const QString &sPassword,
-                           const QString &sDBName,
-                           int   dbPort)
+bool V2Myth::TestDBSettings( const QString &sHostName,
+                             const QString &sUserName,
+                             const QString &sPassword,
+                             const QString &sDBName,
+                             int   dbPort)
 {
     bool bResult = false;
 
@@ -773,10 +772,10 @@ bool Myth::TestDBSettings( const QString &sHostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::SendMessage( const QString &sMessage,
-                        const QString &sAddress,
-                        int   udpPort,
-                        int   Timeout)
+bool V2Myth::SendMessage( const QString &sMessage,
+                          const QString &sAddress,
+                          int   udpPort,
+                          int   Timeout)
 {
     bool bResult = false;
 
@@ -827,21 +826,21 @@ bool Myth::SendMessage( const QString &sMessage,
     return bResult;
 }
 
-bool Myth::SendNotification( bool  bError,
-                             const QString &Type,
-                             const QString &sMessage,
-                             const QString &sOrigin,
-                             const QString &sDescription,
-                             const QString &sImage,
-                             const QString &sExtra,
-                             const QString &sProgressText,
-                             float fProgress,
-                             int   Duration,
-                             bool  bFullscreen,
-                             uint  Visibility,
-                             uint  Priority,
-                             const QString &sAddress,
-                             int   udpPort )
+bool V2Myth::SendNotification( bool  bError,
+                               const QString &Type,
+                               const QString &sMessage,
+                               const QString &sOrigin,
+                               const QString &sDescription,
+                               const QString &sImage,
+                               const QString &sExtra,
+                               const QString &sProgressText,
+                               float fProgress,
+                               int   Duration,
+                               bool  bFullscreen,
+                               uint  Visibility,
+                               uint  Priority,
+                               const QString &sAddress,
+                               int   udpPort )
 {
     bool bResult = false;
 
@@ -905,7 +904,7 @@ bool Myth::SendNotification( bool  bError,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::BackupDatabase(void)
+bool V2Myth::BackupDatabase(void)
 {
     bool bResult = false;
 
@@ -932,7 +931,7 @@ bool Myth::BackupDatabase(void)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::CheckDatabase( bool repair )
+bool V2Myth::CheckDatabase( bool repair )
 {
     LOG(VB_GENERAL, LOG_NOTICE, "Performing API invoked DB Check.");
 
@@ -946,7 +945,7 @@ bool Myth::CheckDatabase( bool repair )
     return bResult;
 }
 
-bool Myth::DelayShutdown( void )
+bool V2Myth::DelayShutdown( void )
 {
     auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
     scheduler->DelayShutdown();
@@ -958,7 +957,7 @@ bool Myth::DelayShutdown( void )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::ProfileSubmit()
+bool V2Myth::ProfileSubmit()
 {
     HardwareProfile profile;
     LOG(VB_GENERAL, LOG_NOTICE, "Profile Submission...");
@@ -974,7 +973,7 @@ bool Myth::ProfileSubmit()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::ProfileDelete()
+bool V2Myth::ProfileDelete()
 {
     HardwareProfile profile;
     LOG(VB_GENERAL, LOG_NOTICE, "Profile Deletion...");
@@ -990,7 +989,7 @@ bool Myth::ProfileDelete()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::ProfileURL()
+QString V2Myth::ProfileURL()
 {
     QString sProfileURL;
 
@@ -1006,7 +1005,7 @@ QString Myth::ProfileURL()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::ProfileUpdated()
+QString V2Myth::ProfileUpdated()
 {
     QString sProfileUpdate;
 
@@ -1024,7 +1023,7 @@ QString Myth::ProfileUpdated()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString Myth::ProfileText()
+QString V2Myth::ProfileText()
 {
     QString sProfileText;
 
@@ -1037,8 +1036,8 @@ QString Myth::ProfileText()
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-
-DTC::BackendInfo* Myth::GetBackendInfo( void )
+/*
+V2BackendInfo* V2Myth::GetBackendInfo( void )
 {
 
     // ----------------------------------------------------------------------
@@ -1067,16 +1066,16 @@ DTC::BackendInfo* Myth::GetBackendInfo( void )
     return pInfo;
 
 }
-
+*/
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::ManageDigestUser( const QString &sAction,
-                             const QString &sUserName,
-                             const QString &sPassword,
-                             const QString &sNewPassword,
-                             const QString &sAdminPassword )
+bool V2Myth::ManageDigestUser( const QString &sAction,
+                               const QString &sUserName,
+                               const QString &sPassword,
+                               const QString &sNewPassword,
+                               const QString &sAdminPassword )
 {
 
     DigestUserActions sessionAction = DIGEST_USER_ADD;
@@ -1104,8 +1103,8 @@ bool Myth::ManageDigestUser( const QString &sAction,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool Myth::ManageUrlProtection( const QString &sServices,
-                                const QString &sAdminPassword )
+bool V2Myth::ManageUrlProtection( const QString &sServices,
+                                  const QString &sAdminPassword )
 {
     if (!MythSessionManager::IsValidUser("admin"))
     {
@@ -1158,4 +1157,3 @@ bool Myth::ManageUrlProtection( const QString &sServices,
     return gCoreContext->SaveSettingOnHost("HTTP/Protected/Urls",
                                            protectedURLs.join(';'), "");
 }
-*/

@@ -2,11 +2,8 @@
 #define V2STORAGEGROUPDIR_H_
 
 #include <QString>
-
 #include "libmythbase/http/mythhttpservice.h"
-//////////////// #include "serviceexp.h"
-//////////////// #include "datacontracthelper.h"
-
+#if SGDL
 class V2StorageGroupDir : public QObject
 {
     Q_OBJECT
@@ -30,10 +27,22 @@ class V2StorageGroupDir : public QObject
 
         {
         }
+
+    void Copy( const V2StorageGroupDir *src )
+    {
+        m_Id        = src->m_Id            ;
+        m_GroupName = src->m_GroupName     ;
+        m_HostName  = src->m_HostName      ;
+        m_DirName   = src->m_DirName       ;
+        m_DirRead   = src->m_DirRead       ;
+        m_DirWrite  = src->m_DirWrite      ;
+        m_KiBFree   = src->m_KiBFree       ;
+    }
+
     private:
         Q_DISABLE_COPY(V2StorageGroupDir)
 };
 
 Q_DECLARE_METATYPE(V2StorageGroupDir*)
-
+#endif // SGDL
 #endif // V2STORAGEGROUPDIR_H_
