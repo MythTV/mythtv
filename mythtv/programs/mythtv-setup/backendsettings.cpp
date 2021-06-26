@@ -49,6 +49,19 @@ static HostCheckBoxSetting *AllowConnFromAll()
     return gc;
 };
 
+static HostTextEditSetting *AllowConnFromSubnets()
+{
+    auto *gc = new HostTextEditSetting("AllowConnFromSubnets");
+    gc->setLabel(QObject::tr("Allow Connections from specific Subnets"));
+    gc->setValue("");
+    gc->setHelpText(QObject::tr(
+                        "Allow this backend to receive connections from subnets "
+                        "other than the ones available directly on the host's "
+                        "interfaces. Each subnet is in `network/prefix-length` "
+                        "form separated by semi-colons."));
+    return gc;
+}
+
 static HostComboBoxSetting *LocalServerIP()
 {
     auto *gc = new HostComboBoxSetting("BackendServerIP");
@@ -889,7 +902,12 @@ BackendSettings::BackendSettings()
     server->addChild(m_localServerPort);
     server->addChild(LocalStatusPort());
     server->addChild(LocalSecurityPin());
-    server->addChild(AllowConnFromAll());
+    m_allowConnFromAll = AllowConnFromAll();
+    server->addChild(m_allowConnFromAll);
+    m_allowConnFromSubnets = AllowConnFromSubnets();
+    server->addChild(m_allowConnFromSubnets);
+    connect(m_allowConnFromAll, qOverload<bool>(&HostCheckBoxSetting::valueChanged),
+             this, &BackendSettings::allowConnFromAllChanged);
     //+++ IP Addresses +++
     m_ipAddressSettings = new IpAddressSettings();
     server->addChild(m_ipAddressSettings);
@@ -1089,6 +1107,13 @@ void BackendSettings::listenChanged()
     m_backendServerAddr->setChanged(addrChanged);
 }
 
+void BackendSettings::allowConnFromAllChanged(bool allowAll)
+ {
+     if (!m_isLoaded)
+         return;
+     // Field is enabled if allowFromAll is disabled
+     m_allowConnFromSubnets->setEnabled(!allowAll);
+ }
 
 void BackendSettings::Load(void)
 {
