@@ -67,7 +67,7 @@ void TestFrequencies::test_get_tables_data(void)
     QTest::newRow("qam256 uscable") << "atsc" << "qam256" << "uscable" << 8 << 98 << 111000000;
 
     // Entries build from old tables
-    QTest::newRow("us bcast")     << "analog" << "analog" << "us-bcast"     <<  50 << 12 << 207000000;
+    QTest::newRow("us bcast")     << "analog" << "analog" << "us-bcast"     <<  35 << 12 << 207000000;
     QTest::newRow("us cable hrc") << "analog" << "analog" << "us-cable-hrc" << 125 << 99 << 109755000;
     QTest::newRow("france")       << "analog" << "analog" << "france"       <<  94 << 28 << 305000000;
 
