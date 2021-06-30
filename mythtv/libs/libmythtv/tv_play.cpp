@@ -1635,10 +1635,8 @@ void TV::ShowOSDAskAllow()
     // eliminate timed out programs
     QDateTime timeNow = MythDate::current();
     QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.begin();
-    QMap<QString,AskProgramInfo>::iterator next = it;
     while (it != m_askAllowPrograms.end())
     {
-        next = it; ++next;
         if ((*it).m_expiry <= timeNow)
         {
 #if 0
@@ -1646,9 +1644,12 @@ void TV::ShowOSDAskAllow()
                 QString("removing '%1'").arg((*it).m_info->m_title));
 #endif
             delete (*it).m_info;
-            m_askAllowPrograms.erase(it);
+            it = m_askAllowPrograms.erase(it);
         }
-        it = next;
+        else
+        {
+            it++;
+        }
     }
     std::chrono::milliseconds timeuntil = 0ms;
     QString      message;
