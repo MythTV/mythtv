@@ -118,21 +118,21 @@ removeShortBreaks(FrameAnalyzer::FrameMap *breakMap, float fps, int minbreaklen,
         }
 
         /* Don't remove the final commercial break, no matter how short. */
-        FrameAnalyzer::FrameMap::Iterator bb1 = bb;
-        ++bb;
-        if (bb == breakMap->end())
+        FrameAnalyzer::FrameMap::Iterator bbNext = bb;
+        ++bbNext;
+        if (bbNext == breakMap->end())
             continue;
 
         if (verbose)
         {
-            long long start = bb1.key();
-            long long end = start + *bb1 - 1;
+            long long start = bb.key();
+            long long end = start + *bb - 1;
             LOG(VB_COMMFLAG, LOG_INFO, QString("Removing break %1-%2 (%3-%4)")
                 .arg(frameToTimestamp(start, fps),
                      frameToTimestamp(end, fps))
                 .arg(start + 1).arg(end + 1));
         }
-        breakMap->erase(bb1);
+        bb = breakMap->erase(bb);
         removed = true;
     }
 
