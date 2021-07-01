@@ -16,5 +16,6 @@ void V2FillVideoMetadataInfo (
 
 void V2FillGenreList( V2GenreList *pGenreList, int videoID);
 
+bool arrayContains(std::vector<QString> names, QString entry);
 
 #endif //V2SERVICEUTIL_H

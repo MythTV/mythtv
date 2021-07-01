@@ -15,6 +15,10 @@ class V2Video : public MythHTTPService
     Q_CLASSINFO("Version",      "1.0")
     Q_CLASSINFO("LookupVideo",  "methods=GET,POST,HEAD")
     Q_CLASSINFO("GetSavedBookmark",  "name=long")
+    Q_CLASSINFO("RemoveVideoFromDB",  "methods=POST;name=bool")
+    Q_CLASSINFO("AddVideo",  "methods=POST;name=bool")
+    Q_CLASSINFO("UpdateVideoWatchedStatus",  "methods=POST;name=bool")
+    Q_CLASSINFO("UpdateVideoMetadata",  "methods=POST;name=bool")
 
   public:
     V2Video();
@@ -38,6 +42,51 @@ class V2Video : public MythHTTPService
                                                     int              Episode,
                                                     const QString    &GrabberType,
                                                     bool             AllowGeneric );
+    bool                    RemoveVideoFromDB  ( int      Id );
+    bool                    AddVideo           ( const QString  &FileName,
+                                                    const QString  &HostName  );
+
+    bool                    UpdateVideoWatchedStatus ( int  Id,
+                                                    bool Watched );
+    bool                    UpdateVideoMetadata      ( int           Id,
+                                                    const QString &Title,
+                                                    const QString &SubTitle,
+                                                    const QString &TagLine,
+                                                    const QString &Director,
+                                                    const QString &Studio,
+                                                    const QString &Plot,
+                                                    const QString &Rating,
+                                                    const QString &Inetref,
+                                                    int           CollectionRef,
+                                                    const QString &HomePage,
+                                                    int           Year,
+                                                    const QDate   &ReleaseDate,
+                                                    float         UserRating,
+                                                    int           Length,
+                                                    int           PlayCount,
+                                                    int           Season,
+                                                    int           Episode,
+                                                    int           ShowLevel,
+                                                    const QString &FileName,
+                                                    const QString &Hash,
+                                                    const QString &CoverFile,
+                                                    int           ChildID,
+                                                    bool          Browse,
+                                                    bool          Watched,
+                                                    bool          Processed,
+                                                    const QString &PlayCommand,
+                                                    int           Category,
+                                                    const QString &Trailer,
+                                                    const QString &Host,
+                                                    const QString &Screenshot,
+                                                    const QString &Banner,
+                                                    const QString &Fanart,
+                                                    const QDate   &InsertDate,
+                                                    const QString &ContentType,
+                                                    const QString &Genres,
+                                                    const QString &Cast,
+                                                    const QString &Countries
+    );
 
   private:
     Q_DISABLE_COPY(V2Video)

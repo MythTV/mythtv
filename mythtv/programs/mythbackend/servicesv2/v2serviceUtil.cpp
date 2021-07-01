@@ -123,3 +123,14 @@ void V2FillGenreList(V2GenreList* pGenreList, int videoID)
         }
     }
 }
+
+// array search tool for use with parameters
+bool arrayContains(std::vector<QString> names, QString entry)
+{
+    for (std::vector<QString>::size_type ix = 0 ; ix < names.size(); ix++)
+    {
+        if (names[ix].compare(entry,Qt::CaseInsensitive) == 0)
+            return true;
+    }
+    return false;
+}

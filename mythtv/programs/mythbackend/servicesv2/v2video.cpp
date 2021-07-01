@@ -3,11 +3,16 @@
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "videometadata.h"
 #include "metadatafactory.h"
+#include "storagegroup.h"
+#include "globals.h"
 #include "programinfo.h"
+#include "mythmiscutil.h"
 #include "v2serviceUtil.h"
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
+// #include <vector>
+
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
@@ -302,4 +307,443 @@ V2VideoLookupList* V2Video::LookupVideo( const QString    &Title,
     delete factory;
 
     return pVideoLookups;
+}
+
+
+bool V2Video::RemoveVideoFromDB( int Id )
+{
+    bool bResult = false;
+
+    VideoMetadataListManager::metadata_list videolist;
+    VideoMetadataListManager::loadAllFromDatabase(videolist);
+    QScopedPointer<VideoMetadataListManager> mlm(new VideoMetadataListManager());
+    mlm->setList(videolist);
+    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(Id);
+
+    if (metadata)
+        bResult = metadata->DeleteFromDatabase();
+
+    return bResult;
+}
+
+bool V2Video::AddVideo( const QString &sFileName,
+                      const QString &sHostName )
+{
+    if ( sHostName.isEmpty() )
+        throw( QString( "Host not provided! Local storage is deprecated and "
+                        "is not supported by the API." ));
+
+    if ( sFileName.isEmpty() ||
+        (sFileName.contains("/../")) ||
+        (sFileName.startsWith("../")) )
+    {
+        throw( QString( "Filename not provided, or fails sanity checks!" ));
+    }
+
+    StorageGroup sgroup("Videos", sHostName);
+
+    QString fullname = sgroup.FindFile(sFileName);
+
+    if ( !QFile::exists(fullname) )
+        throw( QString( "Provided filename does not exist!" ));
+
+    QString hash = FileHash(fullname);
+
+    if (hash == "NULL")
+    {
+        LOG(VB_GENERAL, LOG_ERR, "Video Hash Failed. Unless this is a DVD or "
+                                 "Blu-ray, something has probably gone wrong.");
+        hash = "";
+    }
+
+    VideoMetadata newFile(sFileName, QString(), hash,
+                          VIDEO_TRAILER_DEFAULT,
+                          VIDEO_COVERFILE_DEFAULT,
+                          VIDEO_SCREENSHOT_DEFAULT,
+                          VIDEO_BANNER_DEFAULT,
+                          VIDEO_FANART_DEFAULT,
+                          QString(), QString(), QString(), QString(),
+                          QString(), VIDEO_YEAR_DEFAULT,
+                          QDate::fromString("0000-00-00","YYYY-MM-DD"),
+                          VIDEO_INETREF_DEFAULT, 0, QString(),
+                          VIDEO_DIRECTOR_DEFAULT, QString(), VIDEO_PLOT_DEFAULT,
+                          0.0, VIDEO_RATING_DEFAULT, 0, 0,
+                          0, 0,
+                          MythDate::current().date(), 0,
+                          ParentalLevel::plLowest);
+
+    newFile.SetHost(sHostName);
+    newFile.SaveToDatabase();
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool V2Video::UpdateVideoWatchedStatus ( int  nId,
+                                       bool bWatched )
+{
+    VideoMetadataListManager::metadata_list videolist;
+    VideoMetadataListManager::loadAllFromDatabase(videolist);
+    QScopedPointer<VideoMetadataListManager> mlm(new VideoMetadataListManager());
+    mlm->setList(videolist);
+    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(nId);
+
+    if ( !metadata )
+        return false;
+
+    metadata->SetWatched(bWatched);
+    metadata->UpdateDatabase();
+
+    return true;
+}
+
+bool V2Video::UpdateVideoMetadata ( int           nId,
+                                  const QString &sTitle,
+                                  const QString &sSubTitle,
+                                  const QString &sTagLine,
+                                  const QString &sDirector,
+                                  const QString &sStudio,
+                                  const QString &sPlot,
+                                  const QString &sRating,
+                                  const QString &sInetref,
+                                  int           nCollectionRef,
+                                  const QString &sHomePage,
+                                  int           nYear,
+                                  const QDate   &sReleasedate,
+                                  float         fUserRating,
+                                  int           nLength,
+                                  int           nPlayCount,
+                                  int           nSeason,
+                                  int           nEpisode,
+                                  int           nShowLevel,
+                                  const QString &sFileName,
+                                  const QString &sHash,
+                                  const QString &sCoverFile,
+                                  int           nChildID,
+                                  bool          bBrowse,
+                                  bool          bWatched,
+                                  bool          bProcessed,
+                                  const QString &sPlayCommand,
+                                  int           nCategory,
+                                  const QString &sTrailer,
+                                  const QString &sHost,
+                                  const QString &sScreenshot,
+                                  const QString &sBanner,
+                                  const QString &sFanart,
+                                  const QDate   &sInsertDate,
+                                  const QString &sContentType,
+                                  const QString &sGenres,
+                                  const QString &sCast,
+                                  const QString &sCountries)
+{
+    bool update_required = false;
+    VideoMetadataListManager::metadata_list videolist;
+    VideoMetadataListManager::loadAllFromDatabase(videolist);
+    QScopedPointer<VideoMetadataListManager> mlm(new VideoMetadataListManager());
+    mlm->setList(videolist);
+    VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(nId);
+
+    if (!metadata)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: Id=%1 not found")
+            .arg(nId));
+        return false;
+    }
+    // Find the method parameters
+    HTTPMethodPtr handler = nullptr;
+    for (auto & [path, handle] : m_staticMetaService->m_slots)
+        if (path == "UpdateVideoMetadata") { handler = handle; break; }
+
+    if (handler == nullptr)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: handler not found"));
+        return false;
+    }
+
+    auto names  = handler->m_names;
+
+    if (arrayContains(names,"title"))
+    {
+        metadata->SetTitle(sTitle);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"subtitle"))
+    {
+        metadata->SetSubtitle(sSubTitle);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"tagline"))
+    {
+        metadata->SetTagline(sTagLine);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"director"))
+    {
+        metadata->SetDirector(sDirector);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"studio"))
+    {
+        metadata->SetStudio(sStudio);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"plot"))
+    {
+        metadata->SetPlot(sPlot);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"userrating"))
+    {
+        metadata->SetUserRating(fUserRating);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"inetref"))
+    {
+        metadata->SetInetRef(sInetref);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"collectionref"))
+    {
+        metadata->SetCollectionRef(nCollectionRef);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"homepage"))
+    {
+        metadata->SetHomepage(sHomePage);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"year"))
+    {
+        metadata->SetYear(nYear);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"releasedate"))
+    {
+        metadata->SetReleaseDate(sReleasedate);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"rating"))
+    {
+        metadata->SetRating(sRating);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"length"))
+    {
+        metadata->SetLength(std::chrono::minutes(nLength));
+        update_required = true;
+    }
+
+    if (arrayContains(names,"playcount"))
+    {
+        metadata->SetPlayCount(nPlayCount);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"season"))
+    {
+        metadata->SetSeason(nSeason);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"episode"))
+    {
+        metadata->SetEpisode(nEpisode);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"showlevel"))
+    {
+        metadata->SetShowLevel(ParentalLevel::Level(nShowLevel));
+        update_required = true;
+    }
+
+    if (arrayContains(names,"filename"))
+    {
+        metadata->SetFilename(sFileName);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"hash"))
+    {
+        metadata->SetHash(sHash);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"coverfile"))
+    {
+        metadata->SetCoverFile(sCoverFile);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"childid"))
+    {
+        metadata->SetChildID(nChildID);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"browse"))
+    {
+        metadata->SetBrowse(bBrowse);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"watched"))
+    {
+        metadata->SetWatched(bWatched);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"processed"))
+    {
+        metadata->SetProcessed(bProcessed);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"playcommand"))
+    {
+        metadata->SetPlayCommand(sPlayCommand);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"category"))
+    {
+        metadata->SetCategoryID(nCategory);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"trailer"))
+    {
+        metadata->SetTrailer(sTrailer);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"host"))
+    {
+        metadata->SetHost(sHost);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"screenshot"))
+    {
+        metadata->SetScreenshot(sScreenshot);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"banner"))
+    {
+        metadata->SetBanner(sBanner);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"fanart"))
+    {
+        metadata->SetFanart(sFanart);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"insertdate"))
+    {
+        metadata->SetInsertdate(sInsertDate);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"contenttype"))
+    {
+        // valid values for ContentType are 'MOVIE','TELEVISION','ADULT','MUSICVIDEO','HOMEVIDEO'
+        VideoContentType contentType = kContentUnknown;
+        if (sContentType == "MOVIE")
+            contentType = kContentMovie;
+
+        if (sContentType == "TELEVISION")
+            contentType = kContentTelevision;
+
+        if (sContentType == "ADULT")
+            contentType = kContentAdult;
+
+        if (sContentType == "MUSICVIDEO")
+            contentType = kContentMusicVideo;
+
+        if (sContentType == "HOMEVIDEO")
+            contentType = kContentHomeMovie;
+
+        if (contentType != kContentUnknown)
+        {
+            metadata->SetContentType(contentType);
+            update_required = true;
+        }
+        else
+            LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: Ignoring unknown ContentType: %1").arg(sContentType));
+    }
+
+    if (arrayContains(names,"genres"))
+    {
+        VideoMetadata::genre_list genres;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+        QStringList genresList = sGenres.split(',', QString::SkipEmptyParts);
+#else
+        QStringList genresList = sGenres.split(',', Qt::SkipEmptyParts);
+#endif
+
+        std::transform(genresList.cbegin(), genresList.cend(), std::back_inserter(genres),
+                       [](const QString& name)
+                           {return VideoMetadata::genre_list::value_type(-1, name.simplified());} );
+
+        metadata->SetGenres(genres);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"cast"))
+    {
+        VideoMetadata::cast_list cast;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+        QStringList castList = sCast.split(',', QString::SkipEmptyParts);
+#else
+        QStringList castList = sCast.split(',', Qt::SkipEmptyParts);
+#endif
+
+        std::transform(castList.cbegin(), castList.cend(), std::back_inserter(cast),
+                       [](const QString& name)
+                           {return VideoMetadata::cast_list::value_type(-1, name.simplified());} );
+
+        metadata->SetCast(cast);
+        update_required = true;
+    }
+
+    if (arrayContains(names,"countries"))
+    {
+        VideoMetadata::country_list countries;
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+        QStringList countryList = sCountries.split(',', QString::SkipEmptyParts);
+#else
+        QStringList countryList = sCountries.split(',', Qt::SkipEmptyParts);
+#endif
+
+        std::transform(countryList.cbegin(), countryList.cend(), std::back_inserter(countries),
+                       [](const QString& name)
+                           {return VideoMetadata::country_list::value_type(-1, name.simplified());} );
+
+        metadata->SetCountries(countries);
+        update_required = true;
+    }
+
+    if (update_required)
+        metadata->UpdateDatabase();
+
+    return true;
 }
