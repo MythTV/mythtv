@@ -2928,7 +2928,28 @@ void TV::HandleSpeedChangeTimerEvent()
     ReturnPlayerLock();
 }
 
-/// This selectively blocks KeyPress and Resize events
+///
+//  \brief Prevent events from being sent to another object.
+//
+//  Selectively block certain KeyPress and Resize events from being sent to
+//  the specified object. This function is called by Qt before it calls
+//  Object->event(Event). It can be used by the TV object to either block
+//  events from being sent to the specified object, or for it to handle the
+//  events instead of sending them to the specified object.  As of mid
+//  2021, this filter is only used to redirect some events from the
+//  MythMainWindow object to the TV object.
+//
+//  \warning If an event will be received by both the MythMainWindow object
+//  and the TV object, block it instead of redirecting it. Redirecting it
+//  just causes the event to be handled twice, once in the direct call from
+//  Qt to TV::event and once in the call from Qt to this function to
+//  TV::event.
+//
+//  \param  Object The QObject whose events are being filtered.
+//  \param  Event  The QEvent that is about to be passed to Object->event().
+//  \return        True if the event should be dropped. False if the Qt
+//                 code should call Object->event(Event).
+//
 bool TV::eventFilter(QObject* Object, QEvent* Event)
 {
     // We want to intercept all resize events sent to the main window
@@ -2957,7 +2978,8 @@ bool TV::eventFilter(QObject* Object, QEvent* Event)
         Event->type() == MythEvent::kUpdateTvProgressEventType ||
         Event->type() == MythMediaEvent::kEventType)
     {
-        customEvent(Event);
+        // DO NOT call TV::customEvent here!
+        // customEvent(Event);
         return true;
     }
 
@@ -2983,6 +3005,9 @@ bool TV::event(QEvent* Event)
 
     if (QEvent::Resize == Event->type())
     {
+        // These events probably aren't received by a direct call from
+        // the Qt event dispacther, but are received by way of the event
+        // dispatcher calling TV::eventFilter(MainWindow, Event).
         const auto *qre = dynamic_cast<const QResizeEvent*>(Event);
         if (qre)
             emit WindowResized(qre->size());
@@ -2991,6 +3016,9 @@ bool TV::event(QEvent* Event)
 
     if (QEvent::KeyPress == Event->type() || MythGestureEvent::kEventType == Event->type())
     {
+        // These events aren't received by a direct call from the Qt
+        // event dispacther, but are received by way of the event
+        // dispatcher calling TV::eventFilter(MainWindow, Event).
 #if DEBUG_ACTIONS
         if (QEvent::KeyPress == Event->type())
         {
@@ -3026,6 +3054,9 @@ bool TV::event(QEvent* Event)
         case QEvent::Paint:
         case QEvent::UpdateRequest:
         case QEvent::Enter:
+            // These events aren't received by a direct call from the Qt
+            // event dispacther, but are received by way of the event
+            // dispatcher calling TV::eventFilter(MainWindow, Event).
             return true;
         default:
             break;
