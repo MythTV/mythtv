@@ -452,218 +452,206 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
             .arg(nId));
         return false;
     }
-    // Find the method parameters
-    HTTPMethodPtr handler = nullptr;
-    for (auto & [path, handle] : m_staticMetaService->m_slots)
-        if (path == "UpdateVideoMetadata") { handler = handle; break; }
 
-    if (handler == nullptr)
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: handler not found"));
-        return false;
-    }
-
-    auto names  = handler->m_names;
-
-    if (arrayContains(names,"title"))
+    if (m_request->m_queries.contains("Title"))
     {
         metadata->SetTitle(sTitle);
         update_required = true;
     }
 
-    if (arrayContains(names,"subtitle"))
+    if (m_request->m_queries.contains("SubTitle"))
     {
         metadata->SetSubtitle(sSubTitle);
         update_required = true;
     }
 
-    if (arrayContains(names,"tagline"))
+    if (m_request->m_queries.contains("TagLine"))
     {
         metadata->SetTagline(sTagLine);
         update_required = true;
     }
 
-    if (arrayContains(names,"director"))
+    if (m_request->m_queries.contains("Director"))
     {
         metadata->SetDirector(sDirector);
         update_required = true;
     }
 
-    if (arrayContains(names,"studio"))
+    if (m_request->m_queries.contains("Studio"))
     {
         metadata->SetStudio(sStudio);
         update_required = true;
     }
 
-    if (arrayContains(names,"plot"))
+    if (m_request->m_queries.contains("Plot"))
     {
         metadata->SetPlot(sPlot);
         update_required = true;
     }
 
-    if (arrayContains(names,"userrating"))
+    if (m_request->m_queries.contains("UserRating"))
     {
         metadata->SetUserRating(fUserRating);
         update_required = true;
     }
 
-    if (arrayContains(names,"inetref"))
+    if (m_request->m_queries.contains("Inetref"))
     {
         metadata->SetInetRef(sInetref);
         update_required = true;
     }
 
-    if (arrayContains(names,"collectionref"))
+    if (m_request->m_queries.contains("CollectionRef"))
     {
         metadata->SetCollectionRef(nCollectionRef);
         update_required = true;
     }
 
-    if (arrayContains(names,"homepage"))
+    if (m_request->m_queries.contains("HomePage"))
     {
         metadata->SetHomepage(sHomePage);
         update_required = true;
     }
 
-    if (arrayContains(names,"year"))
+    if (m_request->m_queries.contains("Year"))
     {
         metadata->SetYear(nYear);
         update_required = true;
     }
 
-    if (arrayContains(names,"releasedate"))
+    if (m_request->m_queries.contains("ReleaseDate"))
     {
         metadata->SetReleaseDate(sReleasedate);
         update_required = true;
     }
 
-    if (arrayContains(names,"rating"))
+    if (m_request->m_queries.contains("Rating"))
     {
         metadata->SetRating(sRating);
         update_required = true;
     }
 
-    if (arrayContains(names,"length"))
+    if (m_request->m_queries.contains("Length"))
     {
         metadata->SetLength(std::chrono::minutes(nLength));
         update_required = true;
     }
 
-    if (arrayContains(names,"playcount"))
+    if (m_request->m_queries.contains("PlayCount"))
     {
         metadata->SetPlayCount(nPlayCount);
         update_required = true;
     }
 
-    if (arrayContains(names,"season"))
+    if (m_request->m_queries.contains("Season"))
     {
         metadata->SetSeason(nSeason);
         update_required = true;
     }
 
-    if (arrayContains(names,"episode"))
+    if (m_request->m_queries.contains("Episode"))
     {
         metadata->SetEpisode(nEpisode);
         update_required = true;
     }
 
-    if (arrayContains(names,"showlevel"))
+    if (m_request->m_queries.contains("ShowLevel"))
     {
         metadata->SetShowLevel(ParentalLevel::Level(nShowLevel));
         update_required = true;
     }
 
-    if (arrayContains(names,"filename"))
+    if (m_request->m_queries.contains("FileName"))
     {
         metadata->SetFilename(sFileName);
         update_required = true;
     }
 
-    if (arrayContains(names,"hash"))
+    if (m_request->m_queries.contains("Hash"))
     {
         metadata->SetHash(sHash);
         update_required = true;
     }
 
-    if (arrayContains(names,"coverfile"))
+    if (m_request->m_queries.contains("CoverFile"))
     {
         metadata->SetCoverFile(sCoverFile);
         update_required = true;
     }
 
-    if (arrayContains(names,"childid"))
+    if (m_request->m_queries.contains("ChildID"))
     {
         metadata->SetChildID(nChildID);
         update_required = true;
     }
 
-    if (arrayContains(names,"browse"))
+    if (m_request->m_queries.contains("Browse"))
     {
         metadata->SetBrowse(bBrowse);
         update_required = true;
     }
 
-    if (arrayContains(names,"watched"))
+    if (m_request->m_queries.contains("Watched"))
     {
         metadata->SetWatched(bWatched);
         update_required = true;
     }
 
-    if (arrayContains(names,"processed"))
+    if (m_request->m_queries.contains("Processed"))
     {
         metadata->SetProcessed(bProcessed);
         update_required = true;
     }
 
-    if (arrayContains(names,"playcommand"))
+    if (m_request->m_queries.contains("PlayCommand"))
     {
         metadata->SetPlayCommand(sPlayCommand);
         update_required = true;
     }
 
-    if (arrayContains(names,"category"))
+    if (m_request->m_queries.contains("Category"))
     {
         metadata->SetCategoryID(nCategory);
         update_required = true;
     }
 
-    if (arrayContains(names,"trailer"))
+    if (m_request->m_queries.contains("Trailer"))
     {
         metadata->SetTrailer(sTrailer);
         update_required = true;
     }
 
-    if (arrayContains(names,"host"))
+    if (m_request->m_queries.contains("Host"))
     {
         metadata->SetHost(sHost);
         update_required = true;
     }
 
-    if (arrayContains(names,"screenshot"))
+    if (m_request->m_queries.contains("Screenshot"))
     {
         metadata->SetScreenshot(sScreenshot);
         update_required = true;
     }
 
-    if (arrayContains(names,"banner"))
+    if (m_request->m_queries.contains("Banner"))
     {
         metadata->SetBanner(sBanner);
         update_required = true;
     }
 
-    if (arrayContains(names,"fanart"))
+    if (m_request->m_queries.contains("Fanart"))
     {
         metadata->SetFanart(sFanart);
         update_required = true;
     }
 
-    if (arrayContains(names,"insertdate"))
+    if (m_request->m_queries.contains("InsertDate"))
     {
         metadata->SetInsertdate(sInsertDate);
         update_required = true;
     }
 
-    if (arrayContains(names,"contenttype"))
+    if (m_request->m_queries.contains("ContentType"))
     {
         // valid values for ContentType are 'MOVIE','TELEVISION','ADULT','MUSICVIDEO','HOMEVIDEO'
         VideoContentType contentType = kContentUnknown;
@@ -691,7 +679,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
             LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: Ignoring unknown ContentType: %1").arg(sContentType));
     }
 
-    if (arrayContains(names,"genres"))
+    if (m_request->m_queries.contains("Genres"))
     {
         VideoMetadata::genre_list genres;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -708,7 +696,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
         update_required = true;
     }
 
-    if (arrayContains(names,"cast"))
+    if (m_request->m_queries.contains("Cast"))
     {
         VideoMetadata::cast_list cast;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -725,7 +713,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
         update_required = true;
     }
 
-    if (arrayContains(names,"countries"))
+    if (m_request->m_queries.contains("Countries"))
     {
         VideoMetadata::country_list countries;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)

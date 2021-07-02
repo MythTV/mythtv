@@ -39,6 +39,7 @@ class MBASE_PUBLIC MythHTTPService : public QObject
   protected:
     QString m_name;
     MythHTTPMetaService* m_staticMetaService { nullptr };
+    HTTPRequest2 m_request{nullptr};
 };
 
 #define SERVICE_PROPERTY(Type, Name, name)               \

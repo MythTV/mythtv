@@ -31,7 +31,7 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
     QString& method = Request->m_fileName;
     if (method.isEmpty())
         return nullptr;
-
+    m_request = Request;
     // WSDL
     if (method == "wsdl")
         return MythWSDL::GetWSDL(Request, m_staticMetaService);
