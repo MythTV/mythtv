@@ -3,6 +3,7 @@
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "videometadata.h"
 #include "metadatafactory.h"
+#include "bluraymetadata.h"
 #include "storagegroup.h"
 #include "globals.h"
 #include "programinfo.h"
@@ -11,6 +12,8 @@
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
+#include "mythcorecontext.h"
+#include "mythavutil.h"
 // #include <vector>
 
 
@@ -23,6 +26,8 @@ void V2Video::RegisterCustomTypes()
     qRegisterMetaType<V2VideoMetadataInfo*>("V2VideoMetadataInfo");
     qRegisterMetaType<V2VideoMetadataInfoList*>("V2VideoMetadataInfoList");
     qRegisterMetaType<V2VideoLookupList*>("V2VideoLookupList");
+    qRegisterMetaType<V2BlurayInfo*>("V2BlurayInfo");
+    qRegisterMetaType<V2VideoStreamInfoList*>("V2VideoStreamInfoList");
 }
 
 V2Video::V2Video()
@@ -734,4 +739,154 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
         metadata->UpdateDatabase();
 
     return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Set bookmark of a video as a frame number.
+/////////////////////////////////////////////////////////////////////////////
+
+bool V2Video::SetSavedBookmark( int  Id, long Offset )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT filename "
+                  "FROM videometadata "
+                  "WHERE intid = :ID ");
+    query.bindValue(":ID", Id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("Video::SetSavedBookmark", query);
+        return false;
+    }
+
+    QString fileName;
+
+    if (query.next())
+        fileName = query.value(0).toString();
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Video/SetSavedBookmark Video id %1 Not found.").arg(Id));
+        return false;
+    }
+
+    ProgramInfo pi(fileName,
+                         nullptr, // _plot,
+                         nullptr, // _title,
+                         nullptr, // const QString &_sortTitle,
+                         nullptr, // const QString &_subtitle,
+                         nullptr, // const QString &_sortSubtitle,
+                         nullptr, // const QString &_director,
+                         0, // int _season,
+                         0, // int _episode,
+                         nullptr, // const QString &_inetref,
+                         0min, // uint _length_in_minutes,
+                         0, // uint _year,
+                         nullptr); //const QString &_programid);
+
+    pi.SaveBookmark(Offset);
+    return true;
+}
+
+
+V2BlurayInfo* V2Video::GetBluray( const QString &sPath )
+{
+    QString path = sPath;
+
+    if (sPath.isEmpty())
+        path = gCoreContext->GetSetting( "BluRayMountpoint", "/media/cdrom");
+
+    LOG(VB_GENERAL, LOG_NOTICE,
+        QString("Parsing Blu-ray at path: %1 ").arg(path));
+
+    auto *bdmeta = new BlurayMetadata(path);
+
+    if ( !bdmeta )
+        throw( QString( "Unable to open Blu-ray Metadata Parser!" ));
+
+    if ( !bdmeta->OpenDisc() )
+        throw( QString( "Unable to open Blu-ray Disc/Path!" ));
+
+    if ( !bdmeta->ParseDisc() )
+        throw( QString( "Unable to parse metadata from Blu-ray Disc/Path!" ));
+
+    auto *pBlurayInfo = new V2BlurayInfo();
+
+    pBlurayInfo->setPath(path);
+    pBlurayInfo->setTitle(bdmeta->GetTitle());
+    pBlurayInfo->setAltTitle(bdmeta->GetAlternateTitle());
+    pBlurayInfo->setDiscLang(bdmeta->GetDiscLanguage());
+    pBlurayInfo->setDiscNum(bdmeta->GetCurrentDiscNumber());
+    pBlurayInfo->setTotalDiscNum(bdmeta->GetTotalDiscNumber());
+    pBlurayInfo->setTitleCount(bdmeta->GetTitleCount());
+    pBlurayInfo->setThumbCount(bdmeta->GetThumbnailCount());
+    pBlurayInfo->setTopMenuSupported(bdmeta->GetTopMenuSupported());
+    pBlurayInfo->setFirstPlaySupported(bdmeta->GetFirstPlaySupported());
+    pBlurayInfo->setNumHDMVTitles(bdmeta->GetNumHDMVTitles());
+    pBlurayInfo->setNumBDJTitles(bdmeta->GetNumBDJTitles());
+    pBlurayInfo->setNumUnsupportedTitles(bdmeta->GetNumUnsupportedTitles());
+    pBlurayInfo->setAACSDetected(bdmeta->GetAACSDetected());
+    pBlurayInfo->setLibAACSDetected(bdmeta->GetLibAACSDetected());
+    pBlurayInfo->setAACSHandled(bdmeta->GetAACSHandled());
+    pBlurayInfo->setBDPlusDetected(bdmeta->GetBDPlusDetected());
+    pBlurayInfo->setLibBDPlusDetected(bdmeta->GetLibBDPlusDetected());
+    pBlurayInfo->setBDPlusHandled(bdmeta->GetBDPlusHandled());
+
+    QStringList thumbs = bdmeta->GetThumbnails();
+    if (!thumbs.empty())
+        pBlurayInfo->setThumbPath(thumbs.at(0));
+
+    delete bdmeta;
+
+    return pBlurayInfo;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Jun 3, 2020
+// Service to get stream info for all streams in a media file.
+// This gets some basic info. If anything more is needed it can be added,
+// depending on whether it is available from ffmpeg avformat apis.
+// See the MythStreamInfoList class for the code that uses avformat to
+// extract the information.
+/////////////////////////////////////////////////////////////////////////////
+
+V2VideoStreamInfoList* V2Video::GetStreamInfo
+           ( const QString &storageGroup,
+             const QString &FileName  )
+{
+
+    // Search for the filename
+
+    StorageGroup storage( storageGroup );
+    QString sFullFileName = storage.FindFile( FileName );
+    MythStreamInfoList infos(sFullFileName);
+
+    // The constructor of this class reads the file and gets the needed
+    // information.
+    auto *pVideoStreamInfos = new V2VideoStreamInfoList();
+
+    pVideoStreamInfos->setCount         ( infos.m_streamInfoList.size() );
+    pVideoStreamInfos->setAsOf          ( MythDate::current() );
+    pVideoStreamInfos->setVersion       ( MYTH_BINARY_VERSION );
+    pVideoStreamInfos->setProtoVer      ( MYTH_PROTO_VERSION  );
+    pVideoStreamInfos->setErrorCode     ( infos.m_errorCode   );
+    pVideoStreamInfos->setErrorMsg      ( infos.m_errorMsg    );
+
+    for (const auto & info : qAsConst(infos.m_streamInfoList))
+    {
+        V2VideoStreamInfo *pVideoStreamInfo = pVideoStreamInfos->AddNewVideoStreamInfo();
+        pVideoStreamInfo->setCodecType       ( QString(QChar(info.m_codecType)) );
+        pVideoStreamInfo->setCodecName       ( info.m_codecName   );
+        pVideoStreamInfo->setWidth           ( info.m_width 			   );
+        pVideoStreamInfo->setHeight          ( info.m_height 			   );
+        pVideoStreamInfo->setAspectRatio     ( info.m_SampleAspectRatio    );
+        pVideoStreamInfo->setFieldOrder      ( info.m_fieldOrder           );
+        pVideoStreamInfo->setFrameRate       ( info.m_frameRate            );
+        pVideoStreamInfo->setAvgFrameRate    ( info.m_avgFrameRate 		   );
+        pVideoStreamInfo->setChannels        ( info.m_channels   );
+        pVideoStreamInfo->setDuration        ( info.m_duration   );
+
+    }
+    return pVideoStreamInfos;
 }

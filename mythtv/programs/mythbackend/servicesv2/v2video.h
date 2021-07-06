@@ -5,6 +5,8 @@
 #include "videometadatalistmanager.h"
 #include "v2videoMetadataInfoList.h"
 #include "v2videoLookupInfoList.h"
+#include "v2blurayInfo.h"
+#include "v2videoStreamInfoList.h"
 
 #define VIDEO_SERVICE QString("/Video/")
 #define VIDEO_HANDLE  QString("Video")
@@ -87,6 +89,16 @@ class V2Video : public MythHTTPService
                                                     const QString &Cast,
                                                     const QString &Countries
     );
+
+    bool                   SetSavedBookmark (         int   Id,
+                                                          long  Offset );
+
+    V2BlurayInfo*          GetBluray          ( const QString  &Path      );
+
+    V2VideoStreamInfoList* GetStreamInfo ( const QString &StorageGroup,
+                                                  const QString &FileName  );
+
+
 
   private:
     Q_DISABLE_COPY(V2Video)

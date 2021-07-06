@@ -66,6 +66,8 @@ HEADERS += servicesv2/v2artworkInfo.h servicesv2/v2artworkInfoList.h
 HEADERS += servicesv2/v2genre.h servicesv2/v2genreList.h
 HEADERS += servicesv2/v2castMember.h servicesv2/v2castMemberList.h
 HEADERS += servicesv2/v2videoLookupInfo.h servicesv2/v2videoLookupInfoList.h
+HEADERS += servicesv2/v2videoStreamInfo.h servicesv2/v2videoStreamInfoList.h
+HEADERS += servicesv2/v2blurayInfo.h
 
 SOURCES += servicesv2/v2myth.cpp
 SOURCES += servicesv2/v2video.cpp
