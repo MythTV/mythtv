@@ -69,8 +69,14 @@ HEADERS += servicesv2/v2videoLookupInfo.h servicesv2/v2videoLookupInfoList.h
 HEADERS += servicesv2/v2videoStreamInfo.h servicesv2/v2videoStreamInfoList.h
 HEADERS += servicesv2/v2blurayInfo.h
 
+HEADERS += servicesv2/v2dvr.h servicesv2/v2recording.h
+HEADERS += servicesv2/v2programAndChannel.h servicesv2/v2programList.h
+HEADERS += servicesv2/v2channelGroup.h servicesv2/v2channelGroupList.h
+HEADERS += servicesv2/v2recRule.h servicesv2/v2recording.h
+
 SOURCES += servicesv2/v2myth.cpp
 SOURCES += servicesv2/v2video.cpp
+SOURCES += servicesv2/v2dvr.cpp
 SOURCES += servicesv2/v2serviceUtil.cpp
 
 using_oss:DEFINES += USING_OSS

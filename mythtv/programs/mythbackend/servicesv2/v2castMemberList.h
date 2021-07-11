@@ -20,9 +20,7 @@ class V2CastMemberList : public QObject
 
     Q_CLASSINFO( "CastMembers", "type=V2CastMember");
 
-    Q_PROPERTY( QVariantList CastMembers READ CastMembers )
-
-    SERVICE_PROPERTY_RO_REF( QVariantList, CastMembers );
+    SERVICE_PROPERTY2( QVariantList, CastMembers );
 
     public:
 

@@ -29,9 +29,7 @@ class V2ArtworkInfoList : public QObject
 
     Q_CLASSINFO( "ArtworkInfos", "type=V2ArtworkInfo");
 
-    Q_PROPERTY( QVariantList ArtworkInfos     READ ArtworkInfos USER true)
-
-    SERVICE_PROPERTY_RO_REF( QVariantList, ArtworkInfos );
+    SERVICE_PROPERTY2( QVariantList, ArtworkInfos );
 
     public:
 
