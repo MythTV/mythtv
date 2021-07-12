@@ -9,6 +9,7 @@
 #include "channelinfo.h"
 #include "channelgroup.h"
 #include "recordingrule.h"
+#include "programdata.h"
 
 #define HAS_PARAM(p) m_parsedParams.contains(p)
 
@@ -48,5 +49,6 @@ void V2FillArtworkInfoList( V2ArtworkInfoList *pArtworkInfoList,
                           const QString        &sInetref,
                           uint                  nSeason );
 
+DBCredits * V2jsonCastToCredits(const QJsonObject &cast);
 
 #endif //V2SERVICEUTIL_H

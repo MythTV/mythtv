@@ -527,3 +527,24 @@ void V2FillArtworkInfoList( V2ArtworkInfoList *pArtworkInfoList,
         }
     }
 }
+
+
+DBCredits * V2jsonCastToCredits(const QJsonObject &cast)
+{
+    int priority = 1;
+    auto* credits = new DBCredits;
+
+    QJsonArray members = cast["CastMembers"].toArray();
+    for (const auto & m : members)
+    {
+        QJsonObject actor     = m.toObject();
+        QString     name      = actor.value("Name").toString("");
+        QString     character = actor.value("CharacterName").toString("");
+        QString     role      = actor.value("Role").toString("");
+
+        credits->push_back(DBPerson(role, name, priority, character));
+        ++priority;
+    }
+
+    return credits;
+}

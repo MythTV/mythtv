@@ -36,15 +36,28 @@ class V2Dvr : public MythHTTPService
 {
     Q_OBJECT
     Q_CLASSINFO("Version",      "1.0")
+    Q_CLASSINFO("AddRecordedCredits",  "methods=POST;name=bool")
+    Q_CLASSINFO("AddRecordedProgram",  "methods=POST;name=int")
+    Q_CLASSINFO("RemoveRecorded",      "methods=POST;name=bool")
+    Q_CLASSINFO("DeleteRecording",     "methods=POST;name=bool")
+    Q_CLASSINFO("UnDeleteRecording",   "methods=POST;name=bool")
+    Q_CLASSINFO("StopRecording",       "methods=POST;name=bool")
+    Q_CLASSINFO("ReactivateRecording", "methods=POST;name=bool")
+    Q_CLASSINFO("RescheduleRecordings","methods=POST;name=bool")
+    Q_CLASSINFO("AllowReRecord",       "methods=POST;name=bool")
+    Q_CLASSINFO("UpdateRecordedWatchedStatus",  "methods=POST;name=bool")
+    Q_CLASSINFO("GetSavedBookmark",    "name=long")
+    Q_CLASSINFO("SetSavedBookmark",    "name=bool")
+
   public:
     V2Dvr();
-   ~V2Dvr() override = default;
+   ~V2Dvr()  = default;
     static void RegisterCustomTypes();
 
   public slots:
 
     V2ProgramList* GetExpiringList     ( int              StartIndex,
-                                            int              Count      ) ;
+                                            int              Count      );
 
     V2ProgramList* GetRecordedList     ( bool             Descending,
                                             int              StartIndex,
@@ -53,7 +66,7 @@ class V2Dvr : public MythHTTPService
                                             const QString   &RecGroup,
                                             const QString   &StorageGroup,
                                             const QString   &Category,
-                                            const QString   &Sort) ;
+                                            const QString   &Sort);
 
     V2ProgramList* GetOldRecordedList  ( bool             Descending,
                                             int              StartIndex,
@@ -63,11 +76,59 @@ class V2Dvr : public MythHTTPService
                                             const QString   &Title,
                                             const QString   &SeriesId,
                                             int              RecordId,
-                                            const QString   &Sort) ;
+                                            const QString   &Sort);
 
     V2Program*     GetRecorded         ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &recstarttsRaw  ) ;
+                                            const QDateTime &recstarttsRaw  );
+
+    bool              AddRecordedCredits  ( int RecordedId,
+                                            const QJsonObject & json);
+
+    int               AddRecordedProgram  ( const QJsonObject & json);
+
+    bool              RemoveRecorded      ( int              RecordedId,
+                                            int              ChanId,
+                                            const QDateTime &recstarttsRaw,
+                                            bool             ForceDelete,
+                                            bool             AllowRerecord  );
+
+    bool              DeleteRecording     ( int              RecordedId,
+                                            int              ChanId,
+                                            const QDateTime &recstarttsRaw,
+                                            bool             ForceDelete,
+                                            bool             AllowRerecord  );
+
+    bool              UnDeleteRecording   ( int              RecordedId,
+                                            int              ChanId,
+                                            const QDateTime &recstarttsRaw );
+
+    bool              StopRecording       ( int              RecordedId );
+
+    bool              ReactivateRecording ( int              RecordedId,
+                                            int              ChanId,
+                                            const QDateTime &recstarttsRaw );
+
+    bool              RescheduleRecordings( void );
+
+    bool              AllowReRecord       ( int             RecordedId );
+
+    bool              UpdateRecordedWatchedStatus ( int   RecordedId,
+                                                    int   ChanId,
+                                                    const QDateTime &recstarttsRaw,
+                                                    bool  Watched);
+
+    long              GetSavedBookmark     ( int              RecordedId,
+                                            int              ChanId,
+                                            const QDateTime &recstarttsRaw,
+                                            const QString   &OffsetType );
+
+    bool              SetSavedBookmark     ( int              RecordedId,
+                                            int              ChanId,
+                                            const QDateTime &recstarttsRaw,
+                                            const QString   &OffsetType,
+                                            long             Offset
+                                            );
 
   private:
     Q_DISABLE_COPY(V2Dvr)
