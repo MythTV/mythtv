@@ -1563,7 +1563,6 @@ void TVRec::HandlePendingRecordings(void)
 
     for (auto it = m_pendingRecordings.begin(); it != m_pendingRecordings.end();)
     {
-        auto next = it; ++next;
         if (MythDate::current() > (*it).m_recordingStart.addSecs(30))
         {
             LOG(VB_RECORD, LOG_INFO, LOC + "Deleting stale pending recording " +
@@ -1572,9 +1571,12 @@ void TVRec::HandlePendingRecordings(void)
                     .arg((*it).m_info->GetTitle()));
 
             delete (*it).m_info;
-            m_pendingRecordings.erase(it);
+            it = m_pendingRecordings.erase(it);
         }
-        it = next;
+        else
+        {
+            it++;
+        }
     }
 
     if (m_pendingRecordings.empty())

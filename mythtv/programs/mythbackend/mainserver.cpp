@@ -5308,7 +5308,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                 it1->getHostname().section(".", 0, 0) + ":" + it1->getPath());
         }
 
-        for (auto it2 = it1 + 1; it2 != fsInfos.end(); ++it2)
+        for (auto it2 = it1 + 1; it2 != fsInfos.end(); )
         {
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
@@ -5327,8 +5327,11 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
                     it1->setHostname(it1->getHostname() + "," + it2->getHostname());
                 it1->setPath(it1->getPath() + "," +
                     it2->getHostname().section(".", 0, 0) + ":" + it2->getPath());
-                fsInfos.erase(it2);
-                it2 = it1;
+                it2 = fsInfos.erase(it2);
+            }
+            else
+            {
+                it2++;
             }
         }
     }

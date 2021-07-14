@@ -259,7 +259,7 @@ void MythRAOPDevice::deleteClient(void)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + "Removing client connection.");
             delete *it;
-            m_clients.erase(it);
+            it = m_clients.erase(it);
             break;
         }
         ++it;
