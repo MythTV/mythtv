@@ -6,10 +6,14 @@
 #include "v2programList.h"
 #include "v2channelGroup.h"
 #include "v2recRule.h"
+#include "v2cutList.h"
+#include "v2input.h"
 #include "channelinfo.h"
 #include "channelgroup.h"
 #include "recordingrule.h"
+#include "recordinginfo.h"
 #include "programdata.h"
+#include "inputinfo.h"
 
 #define HAS_PARAM(p) m_parsedParams.contains(p)
 
@@ -50,5 +54,13 @@ void V2FillArtworkInfoList( V2ArtworkInfoList *pArtworkInfoList,
                           uint                  nSeason );
 
 DBCredits * V2jsonCastToCredits(const QJsonObject &cast);
+
+void V2FillCutList( V2CutList* pCutList, RecordingInfo* rInfo, int marktype);
+
+void V2FillCommBreak( V2CutList* pCutList, RecordingInfo* rInfo, int marktype);
+
+void V2FillSeek(V2CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype);
+
+void V2FillInputInfo( V2Input *input, const InputInfo& inputInfo);
 
 #endif //V2SERVICEUTIL_H

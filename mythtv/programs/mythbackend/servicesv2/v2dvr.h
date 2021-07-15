@@ -28,6 +28,12 @@
 
 #include "libmythbase/http/mythhttpservice.h"
 #include "v2programList.h"
+#include "v2cutList.h"
+#include "v2markupList.h"
+#include "v2encoderList.h"
+#include "v2inputList.h"
+#include "v2recRuleFilterList.h"
+#include "v2titleInfoList.h"
 
 #define DVR_SERVICE QString("/Dvr/")
 #define DVR_HANDLE  QString("Dvr")
@@ -48,6 +54,7 @@ class V2Dvr : public MythHTTPService
     Q_CLASSINFO("UpdateRecordedWatchedStatus",  "methods=POST;name=bool")
     Q_CLASSINFO("GetSavedBookmark",    "name=long")
     Q_CLASSINFO("SetSavedBookmark",    "name=bool")
+    Q_CLASSINFO("SetRecordedMarkup",   "name=bool")
 
   public:
     V2Dvr();
@@ -129,6 +136,52 @@ class V2Dvr : public MythHTTPService
                                             const QString   &OffsetType,
                                             long             Offset
                                             );
+
+    V2CutList*     GetRecordedCutList  ( int              RecordedId,
+                                            int              ChanId,
+                                            const QDateTime &recstarttsRaw,
+                                            const QString   &OffsetType );
+
+    V2CutList*     GetRecordedCommBreak ( int              RecordedId,
+                                              int              ChanId,
+                                              const QDateTime &recstarttsRaw,
+                                              const QString   &OffsetType );
+
+    V2CutList*     GetRecordedSeek      ( int              RecordedId,
+                                              const QString   &OffsetType );
+
+    V2MarkupList*  GetRecordedMarkup ( int                RecordedId );
+
+    bool              SetRecordedMarkup     ( int            RecordedId,
+                                              const QJsonObject & json );
+
+    V2ProgramList* GetConflictList     ( int              StartIndex,
+                                            int              Count,
+                                            int              RecordId );
+
+    V2ProgramList* GetUpcomingList     ( int              StartIndex,
+                                            int              Count,
+                                            bool             ShowAll,
+                                            int              RecordId,
+                                            int              RecStatus );
+
+    V2EncoderList* GetEncoderList      ( );
+
+    V2InputList*   GetInputList        ( );
+
+    QStringList       GetRecGroupList     ( );
+
+    QStringList       GetProgramCategories   ( bool OnlyRecorded );
+
+    QStringList       GetRecStorageGroupList ( );
+
+    QStringList       GetPlayGroupList    ( );
+
+    V2RecRuleFilterList* GetRecRuleFilterList ( );
+
+    QStringList       GetTitleList        ( const QString   &RecGroup );
+
+    V2TitleInfoList* GetTitleInfoList  ( );
 
   private:
     Q_DISABLE_COPY(V2Dvr)

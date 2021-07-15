@@ -73,6 +73,12 @@ HEADERS += servicesv2/v2dvr.h servicesv2/v2recording.h
 HEADERS += servicesv2/v2programAndChannel.h servicesv2/v2programList.h
 HEADERS += servicesv2/v2channelGroup.h servicesv2/v2channelGroupList.h
 HEADERS += servicesv2/v2recRule.h servicesv2/v2recording.h
+HEADERS += servicesv2/v2cutting.h servicesv2/v2cutList.h
+HEADERS += servicesv2/v2markup.h servicesv2/v2markupList.h
+HEADERS += servicesv2/v2encoder.h servicesv2/v2encoderList.h
+HEADERS += servicesv2/v2input.h servicesv2/v2inputList.h
+HEADERS += servicesv2/v2recRuleFilter.h servicesv2/v2recRuleFilterList.h
+HEADERS += servicesv2/v2titleInfo.h servicesv2/v2titleInfoList.h
 
 SOURCES += servicesv2/v2myth.cpp
 SOURCES += servicesv2/v2video.cpp

@@ -548,3 +548,122 @@ DBCredits * V2jsonCastToCredits(const QJsonObject &cast)
 
     return credits;
 }
+
+void V2FillCutList(V2CutList* pCutList, RecordingInfo* rInfo, int marktype)
+{
+    frm_dir_map_t markMap;
+    frm_dir_map_t::const_iterator it;
+
+    if (rInfo && rInfo->GetChanID())
+    {
+        rInfo->QueryCutList(markMap);
+
+        for (it = markMap.cbegin(); it != markMap.cend(); ++it)
+        {
+            bool isend = (*it) == MARK_CUT_END || (*it) == MARK_COMM_END;
+            if (marktype == 0)
+            {
+                V2Cutting *pCutting = pCutList->AddNewCutting();
+                pCutting->setMark(*it);
+                pCutting->setOffset(it.key());
+            }
+            else if (marktype == 1)
+            {
+                uint64_t offset = 0;
+                if (rInfo->QueryKeyFramePosition(&offset, it.key(), isend))
+                {
+                  V2Cutting *pCutting = pCutList->AddNewCutting();
+                  pCutting->setMark(*it);
+                  pCutting->setOffset(offset);
+                }
+            }
+            else if (marktype == 2)
+            {
+                uint64_t offset = 0;
+                if (rInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
+                {
+                  V2Cutting *pCutting = pCutList->AddNewCutting();
+                  pCutting->setMark(*it);
+                  pCutting->setOffset(offset);
+                }
+            }
+        }
+    }
+}
+
+void V2FillCommBreak(V2CutList* pCutList, RecordingInfo* rInfo, int marktype)
+{
+    frm_dir_map_t markMap;
+    frm_dir_map_t::const_iterator it;
+
+    if (rInfo && rInfo->GetChanID())
+    {
+        rInfo->QueryCommBreakList(markMap);
+
+        for (it = markMap.cbegin(); it != markMap.cend(); ++it)
+        {
+            bool isend = (*it) == MARK_CUT_END || (*it) == MARK_COMM_END;
+            if (marktype == 0)
+            {
+                V2Cutting *pCutting = pCutList->AddNewCutting();
+                pCutting->setMark(*it);
+                pCutting->setOffset(it.key());
+            }
+            else if (marktype == 1)
+            {
+                uint64_t offset = 0;
+                if (rInfo->QueryKeyFramePosition(&offset, it.key(), isend))
+                {
+                  V2Cutting *pCutting = pCutList->AddNewCutting();
+                  pCutting->setMark(*it);
+                  pCutting->setOffset(offset);
+                }
+            }
+            else if (marktype == 2)
+            {
+                uint64_t offset = 0;
+                if (rInfo->QueryKeyFrameDuration(&offset, it.key(), isend))
+                {
+                  V2Cutting *pCutting = pCutList->AddNewCutting();
+                  pCutting->setMark(*it);
+                  pCutting->setOffset(offset);
+                }
+            }
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void V2FillSeek(V2CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype)
+{
+    frm_pos_map_t markMap;
+    frm_pos_map_t::const_iterator it;
+
+    if (rInfo && rInfo->GetChanID())
+    {
+        rInfo->QueryPositionMap(markMap, marktype);
+
+        for (it = markMap.cbegin(); it != markMap.cend(); ++it)
+        {
+            V2Cutting *pCutting = pCutList->AddNewCutting();
+            pCutting->setMark(it.key());
+            pCutting->setOffset(it.value());
+        }
+    }
+}
+
+void V2FillInputInfo(V2Input* input, const InputInfo& inputInfo)
+{
+    input->setId(inputInfo.m_inputId);
+    input->setInputName(inputInfo.m_name);
+    input->setCardId(inputInfo.m_inputId);
+    input->setSourceId(inputInfo.m_sourceId);
+    input->setDisplayName(inputInfo.m_displayName);
+    input->setLiveTVOrder(inputInfo.m_liveTvOrder);
+    input->setScheduleOrder(inputInfo.m_scheduleOrder);
+    input->setRecPriority(inputInfo.m_recPriority);
+    input->setQuickTune(inputInfo.m_quickTune);
+}

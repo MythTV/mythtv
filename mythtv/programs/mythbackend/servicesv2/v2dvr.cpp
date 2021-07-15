@@ -35,6 +35,11 @@
 #include "mythscheduler.h"
 #include "jobqueue.h"
 #include "v2serviceUtil.h"
+#include "tv_rec.h"
+#include "cardutil.h"
+#include "encoderlink.h"
+#include "storagegroup.h"
+#include "playgroup.h"
 
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire  *expirer;
@@ -47,6 +52,12 @@ void V2Dvr::RegisterCustomTypes()
 {
     qRegisterMetaType<V2ProgramList*>("V2ProgramList");
     qRegisterMetaType<V2Program*>("V2Program");
+    qRegisterMetaType<V2CutList*>("V2CutList");
+    qRegisterMetaType<V2MarkupList*>("V2MarkupList");
+    qRegisterMetaType<V2EncoderList*>("V2EncoderList");
+    qRegisterMetaType<V2InputList*>("V2InputList");
+    qRegisterMetaType<V2RecRuleFilterList*>("V2RecRuleFilterList");
+    qRegisterMetaType<V2TitleInfoList*>("V2TitleInfoList");
 }
 
 V2Dvr::V2Dvr()
@@ -766,4 +777,587 @@ bool V2Dvr::SetSavedBookmark( int RecordedId,
         position = Offset;
     ri.SaveBookmark(position);
     return true;
+}
+
+V2CutList* V2Dvr::GetRecordedCutList ( int RecordedId,
+                                        int chanid,
+                                        const QDateTime &recstarttsRaw,
+                                        const QString &offsettype )
+{
+    int marktype = 0;
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+
+    auto* pCutList = new V2CutList();
+    if (offsettype.toLower() == "position")
+        marktype = 1;
+    else if (offsettype.toLower() == "duration")
+        marktype = 2;
+    else
+        marktype = 0;
+
+    V2FillCutList(pCutList, &ri, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+V2CutList* V2Dvr::GetRecordedCommBreak ( int RecordedId,
+                                          int chanid,
+                                          const QDateTime &recstarttsRaw,
+                                          const QString &offsettype )
+{
+    int marktype = 0;
+    if ((RecordedId <= 0) &&
+        (chanid <= 0 || !recstarttsRaw.isValid()))
+        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+
+    RecordingInfo ri;
+    if (RecordedId > 0)
+        ri = RecordingInfo(RecordedId);
+    else
+        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+
+    auto* pCutList = new V2CutList();
+    if (offsettype.toLower() == "position")
+        marktype = 1;
+    else if (offsettype.toLower() == "duration")
+        marktype = 2;
+    else
+        marktype = 0;
+
+    V2FillCommBreak(pCutList, &ri, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+V2CutList* V2Dvr::GetRecordedSeek ( int RecordedId,
+                                     const QString &offsettype )
+{
+    MarkTypes marktype = MARK_UNSET;
+    if (RecordedId <= 0)
+        throw QString("Recorded ID appears invalid.");
+
+    RecordingInfo ri;
+    ri = RecordingInfo(RecordedId);
+
+    auto* pCutList = new V2CutList();
+    if (offsettype.toLower() == "bytes")
+        marktype = MARK_GOP_BYFRAME;
+    else if (offsettype.toLower() == "duration")
+        marktype = MARK_DURATION_MS;
+    else
+    {
+        delete pCutList;
+        throw QString("Type must be 'BYTES' or 'DURATION'.");
+    }
+
+    V2FillSeek(pCutList, &ri, marktype);
+
+    return pCutList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+V2MarkupList* V2Dvr::GetRecordedMarkup ( int RecordedId )
+{
+    RecordingInfo ri;
+    ri = RecordingInfo(RecordedId);
+
+    if (!ri.HasPathname())
+        throw QString("Invalid RecordedId %1").arg(RecordedId);
+
+    QVector<ProgramInfo::MarkupEntry> mapMark;
+    QVector<ProgramInfo::MarkupEntry> mapSeek;
+
+    ri.QueryMarkup(mapMark, mapSeek);
+
+    auto* pMarkupList = new V2MarkupList();
+    for (auto entry : qAsConst(mapMark))
+    {
+        V2Markup *pMarkup = pMarkupList->AddNewMarkup();
+        QString typestr = toString(static_cast<MarkTypes>(entry.type));
+        pMarkup->setType(typestr);
+        pMarkup->setFrame(entry.frame);
+        if (entry.isDataNull)
+            pMarkup->setData("NULL");
+        else
+            pMarkup->setData(QString::number(entry.data));
+    }
+    for (auto entry : qAsConst(mapSeek))
+    {
+        V2Markup *pSeek = pMarkupList->AddNewSeek();
+        QString typestr = toString(static_cast<MarkTypes>(entry.type));
+        pSeek->setType(typestr);
+        pSeek->setFrame(entry.frame);
+        if (entry.isDataNull)
+            pSeek->setData("NULL");
+        else
+            pSeek->setData(QString::number(entry.data));
+    }
+
+
+    return pMarkupList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+bool V2Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
+{
+    RecordingInfo ri;
+    ri = RecordingInfo(RecordedId);
+
+    if (!ri.HasPathname())
+        throw QString("Invalid RecordedId %1").arg(RecordedId);
+
+    QVector<ProgramInfo::MarkupEntry> mapMark;
+    QVector<ProgramInfo::MarkupEntry> mapSeek;
+
+    QJsonObject markuplist = jsonObj["MarkupList"].toObject();
+
+    QJsonArray  marks = markuplist["Mark"].toArray();
+    for (const auto & m : marks)
+    {
+        QJsonObject markup = m.toObject();
+        ProgramInfo::MarkupEntry entry;
+
+        QString typestr = markup.value("Type").toString("");
+        entry.type  = markTypeFromString(typestr);
+        entry.frame = markup.value("Frame").toString("-1").toLongLong();
+        QString data  = markup.value("Data").toString("NULL");
+        entry.isDataNull = (data == "NULL");
+        if (!entry.isDataNull)
+            entry.data = data.toLongLong();
+
+        mapMark.append(entry);
+    }
+
+    QJsonArray  seeks = markuplist["Seek"].toArray();
+    for (const auto & m : seeks)
+    {
+        QJsonObject markup = m.toObject();
+        ProgramInfo::MarkupEntry entry;
+
+        QString typestr = markup.value("Type").toString("");
+        entry.type  = markTypeFromString(typestr);
+        entry.frame = markup.value("Frame").toString("-1").toLongLong();
+        QString data  = markup.value("Data").toString("NULL");
+        entry.isDataNull = (data == "NULL");
+        if (!entry.isDataNull)
+            entry.data = data.toLongLong();
+
+        mapSeek.append(entry);
+    }
+
+    ri.SaveMarkup(mapMark, mapSeek);
+
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+V2EncoderList* V2Dvr::GetEncoderList()
+{
+    auto* pList = new V2EncoderList();
+
+    QReadLocker tvlocker(&TVRec::s_inputsLock);
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
+    for (auto * elink : qAsConst(tvList))
+    {
+        if (elink != nullptr)
+        {
+            V2Encoder *pEncoder = pList->AddNewEncoder();
+
+            pEncoder->setId            ( elink->GetInputID()      );
+            pEncoder->setState         ( elink->GetState()        );
+            pEncoder->setLocal         ( elink->IsLocal()         );
+            pEncoder->setConnected     ( elink->IsConnected()     );
+            pEncoder->setSleepStatus   ( elink->GetSleepStatus()  );
+
+            if (pEncoder->GetLocal())
+                pEncoder->setHostName( gCoreContext->GetHostName() );
+            else
+                pEncoder->setHostName( elink->GetHostName() );
+
+            for (const auto & inputInfo : qAsConst(inputInfoList))
+            {
+                if (inputInfo.m_inputId == static_cast<uint>(elink->GetInputID()))
+                {
+                    V2Input *input = pEncoder->AddNewInput();
+                    V2FillInputInfo(input, inputInfo);
+                }
+            }
+
+            switch ( pEncoder->GetState() )
+            {
+                case kState_WatchingLiveTV:
+                case kState_RecordingOnly:
+                case kState_WatchingRecording:
+                {
+                    ProgramInfo  *pInfo = elink->GetRecording();
+
+                    if (pInfo)
+                    {
+                        V2Program *pProgram = pEncoder->Recording();
+
+                        V2FillProgramInfo( pProgram, pInfo, true, true );
+
+                        delete pInfo;
+                    }
+
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+    }
+    return pList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+V2InputList* V2Dvr::GetInputList()
+{
+    auto *pList = new V2InputList();
+
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
+    for (const auto & inputInfo : qAsConst(inputInfoList))
+    {
+        V2Input *input = pList->AddNewInput();
+        V2FillInputInfo(input, inputInfo);
+    }
+
+    return pList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList V2Dvr::GetRecGroupList()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT recgroup FROM recgroups WHERE recgroup <> 'Deleted' "
+                  "ORDER BY recgroup");
+
+    QStringList result;
+    if (!query.exec())
+    {
+        MythDB::DBError("GetRecGroupList", query);
+        return result;
+    }
+
+    while (query.next())
+        result << query.value(0).toString();
+
+    return result;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList V2Dvr::GetProgramCategories( bool OnlyRecorded )
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (OnlyRecorded)
+        query.prepare("SELECT DISTINCT category FROM recorded ORDER BY category");
+    else
+        query.prepare("SELECT DISTINCT category FROM program ORDER BY category");
+
+    QStringList result;
+    if (!query.exec())
+    {
+        MythDB::DBError("GetProgramCategories", query);
+        return result;
+    }
+
+    while (query.next())
+        result << query.value(0).toString();
+
+    return result;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList V2Dvr::GetRecStorageGroupList()
+{
+    return StorageGroup::getRecordingsGroups();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList V2Dvr::GetPlayGroupList()
+{
+    return PlayGroup::GetNames();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+V2RecRuleFilterList* V2Dvr::GetRecRuleFilterList()
+{
+    auto* filterList = new V2RecRuleFilterList();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT filterid, description, newruledefault "
+                    "FROM recordfilter ORDER BY filterid");
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            V2RecRuleFilter* ruleFilter = filterList->AddNewRecRuleFilter();
+            ruleFilter->setId(query.value(0).toInt());
+            ruleFilter->setDescription(QObject::tr(query.value(1).toString()
+                                         .toUtf8().constData()));
+        }
+    }
+
+    return filterList;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+QStringList V2Dvr::GetTitleList(const QString& RecGroup)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = "SELECT DISTINCT title FROM recorded "
+                       "WHERE deletepending = 0";
+
+    if (!RecGroup.isEmpty())
+        querystr += " AND recgroup = :RECGROUP";
+    else
+        querystr += " AND recgroup != 'Deleted'";
+
+    querystr += " ORDER BY title";
+
+    query.prepare(querystr);
+
+    if (!RecGroup.isEmpty())
+        query.bindValue(":RECGROUP", RecGroup);
+
+    QStringList result;
+    if (!query.exec())
+    {
+        MythDB::DBError("GetTitleList recorded", query);
+        return result;
+    }
+
+    while (query.next())
+        result << query.value(0).toString();
+
+    return result;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+V2TitleInfoList* V2Dvr::GetTitleInfoList()
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = QString(
+        "SELECT title, inetref, count(title) as count "
+        "    FROM recorded AS r "
+        "    JOIN recgroups AS g ON r.recgroupid = g.recgroupid "
+        "    WHERE g.recgroup NOT IN ('Deleted', 'LiveTV') "
+        "    AND r.deletepending = 0 "
+        "    GROUP BY title, inetref "
+        "    ORDER BY title");
+
+    query.prepare(querystr);
+
+    auto *pTitleInfos = new V2TitleInfoList();
+    if (!query.exec())
+    {
+        MythDB::DBError("GetTitleList recorded", query);
+        return pTitleInfos;
+    }
+
+    while (query.next())
+    {
+        V2TitleInfo *pTitleInfo = pTitleInfos->AddNewTitleInfo();
+
+        pTitleInfo->setTitle(query.value(0).toString());
+        pTitleInfo->setInetref(query.value(1).toString());
+        pTitleInfo->setCount(query.value(2).toInt());
+    }
+
+    return pTitleInfos;
+}
+
+
+V2ProgramList* V2Dvr::GetConflictList( int  nStartIndex,
+                                        int  nCount,
+                                        int  nRecordId       )
+{
+    RecordingList  recordingList; // Auto-delete deque
+    RecList  tmpList; // Standard deque, objects must be deleted
+
+    if (nRecordId <= 0)
+        nRecordId = -1;
+
+    // NOTE: Fetching this information directly from the schedule is
+    //       significantly faster than using ProgramInfo::LoadFromScheduler()
+    auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler)
+        scheduler->GetAllPending(tmpList, nRecordId);
+
+    // Sort the upcoming into only those which are conflicts
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = tmpList.begin(); it < tmpList.end(); ++it)
+    {
+        if (((*it)->GetRecordingStatus() == RecStatus::Conflict) &&
+            ((*it)->GetRecordingStartTime() >= MythDate::current()))
+        {
+            recordingList.push_back(new RecordingInfo(**it));
+        }
+        delete *it;
+        *it = nullptr;
+    }
+
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
+
+    auto *pPrograms = new V2ProgramList();
+
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)recordingList.size() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, (int)recordingList.size() ) : recordingList.size();
+    int nEndIndex = std::min((nStartIndex + nCount), (int)recordingList.size() );
+
+    for( int n = nStartIndex; n < nEndIndex; n++)
+    {
+        ProgramInfo *pInfo = recordingList[ n ];
+
+        V2Program *pProgram = pPrograms->AddNewProgram();
+
+        V2FillProgramInfo( pProgram, pInfo, true );
+    }
+
+    // ----------------------------------------------------------------------
+
+    pPrograms->setStartIndex    ( nStartIndex     );
+    pPrograms->setCount         ( nCount          );
+    pPrograms->setTotalAvailable( recordingList.size() );
+    pPrograms->setAsOf          ( MythDate::current() );
+    pPrograms->setVersion       ( MYTH_BINARY_VERSION );
+    pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
+
+    return pPrograms;
+}
+
+V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
+                                        int  nCount,
+                                        bool bShowAll,
+                                        int  nRecordId,
+                                        int  nRecStatus )
+{
+    RecordingList  recordingList; // Auto-delete deque
+    RecList  tmpList; // Standard deque, objects must be deleted
+
+    if (nRecordId <= 0)
+        nRecordId = -1;
+
+    // NOTE: Fetching this information directly from the schedule is
+    //       significantly faster than using ProgramInfo::LoadFromScheduler()
+    auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler)
+        scheduler->GetAllPending(tmpList, nRecordId);
+
+    // Sort the upcoming into only those which will record
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = tmpList.begin(); it < tmpList.end(); ++it)
+    {
+        if ((nRecStatus != 0) &&
+            ((*it)->GetRecordingStatus() != nRecStatus))
+        {
+            delete *it;
+            *it = nullptr;
+            continue;
+        }
+
+        if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Pending) &&
+                           ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
+                          ((*it)->GetRecordingStatus() == RecStatus::Recorded) ||
+                          ((*it)->GetRecordingStatus() == RecStatus::Conflict)) &&
+            ((*it)->GetRecordingEndTime() > MythDate::current()))
+        {   // NOLINT(bugprone-branch-clone)
+            recordingList.push_back(new RecordingInfo(**it));
+        }
+        else if (bShowAll &&
+                 ((*it)->GetRecordingEndTime() > MythDate::current()))
+        {
+            recordingList.push_back(new RecordingInfo(**it));
+        }
+
+        delete *it;
+        *it = nullptr;
+    }
+
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
+
+    auto *pPrograms = new V2ProgramList();
+
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)recordingList.size() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, (int)recordingList.size() ) : recordingList.size();
+    int nEndIndex = std::min((nStartIndex + nCount), (int)recordingList.size() );
+
+    for( int n = nStartIndex; n < nEndIndex; n++)
+    {
+        ProgramInfo *pInfo = recordingList[ n ];
+
+        V2Program *pProgram = pPrograms->AddNewProgram();
+
+        V2FillProgramInfo( pProgram, pInfo, true );
+    }
+
+    // ----------------------------------------------------------------------
+
+    pPrograms->setStartIndex    ( nStartIndex     );
+    pPrograms->setCount         ( nCount          );
+    pPrograms->setTotalAvailable( recordingList.size() );
+    pPrograms->setAsOf          ( MythDate::current() );
+    pPrograms->setVersion       ( MYTH_BINARY_VERSION );
+    pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
+
+    return pPrograms;
 }
