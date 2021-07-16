@@ -60,7 +60,7 @@ PrivTcpServer::PrivTcpServer(QObject *parent, PoolServerType type)
 {
 }
 
-void PrivTcpServer::incomingConnection(qt_socket_fd_t socket)
+void PrivTcpServer::incomingConnection(qintptr socket)
 {
     emit newConnection(socket);
 }
@@ -669,7 +669,7 @@ qint64 ServerPool::writeDatagram(const QByteArray &datagram,
     return writeDatagram(datagram.data(), datagram.size(), addr, port);
 }
 
-void ServerPool::newTcpConnection(qt_socket_fd_t socket)
+void ServerPool::newTcpConnection(qintptr socket)
 {
     // Ignore connections from an SSL server for now, these are only handled
     // by HttpServer which overrides newTcpConnection

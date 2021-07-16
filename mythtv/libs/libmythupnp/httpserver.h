@@ -35,7 +35,6 @@
 #include <QSslSocket>
 
 // MythTV headers
-#include "mythqtcompat.h"
 #include "serverpool.h"
 #include "httprequest.h"
 #include "mthreadpool.h"
@@ -158,7 +157,7 @@ class UPNP_PUBLIC HttpServer : public ServerPool
     const QString m_privateToken; // Private token; Used to salt digest auth nonce, changes on backend restart
 
   protected slots:
-    void newTcpConnection(qt_socket_fd_t socket) override; // QTcpServer
+    void newTcpConnection(qintptr socket) override; // QTcpServer
 
   private:
     void LoadSSLConfig();
@@ -182,7 +181,7 @@ class HttpWorker : public QRunnable
      * \param type       The type of connection - Plain TCP, SSL or other?
      * \param sslConfig  The SSL configuration (for SSL sockets)
      */
-    HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock, PoolServerType type
+    HttpWorker(HttpServer &httpServer, qintptr sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
                , const QSslConfiguration& sslConfig
 #endif
@@ -192,7 +191,7 @@ class HttpWorker : public QRunnable
 
   protected:
     HttpServer &m_httpServer; 
-    qt_socket_fd_t m_socket;
+    qintptr m_socket;
     std::chrono::milliseconds m_socketTimeout;
     PoolServerType m_connectionType;
 

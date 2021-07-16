@@ -295,7 +295,7 @@ QString HttpServer::GetServerVersion(void)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HttpServer::newTcpConnection(qt_socket_fd_t socket)
+void HttpServer::newTcpConnection(qintptr socket)
 {
     PoolServerType type = kTCPServer;
     auto *server = qobject_cast<PrivTcpServer *>(QObject::sender());
@@ -442,7 +442,7 @@ uint HttpServer::GetSocketTimeout(HTTPRequest* pRequest) const
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-HttpWorker::HttpWorker(HttpServer &httpServer, qt_socket_fd_t sock,
+HttpWorker::HttpWorker(HttpServer &httpServer, qintptr sock,
                        PoolServerType type
 #ifndef QT_NO_OPENSSL
                        , const QSslConfiguration& sslConfig

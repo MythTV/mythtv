@@ -9,7 +9,6 @@
 #include <QUdpSocket>
 #include <QStringList>
 
-#include "mythqtcompat.h"
 #include "mythbaseexp.h"
 
 /** \class ServerPool
@@ -47,10 +46,10 @@ class MBASE_PUBLIC PrivTcpServer : public QTcpServer
    PoolServerType GetServerType(void) { return m_serverType; }
 
   signals:
-    void newConnection(qt_socket_fd_t socket);
+    void newConnection(qintptr socket);
 
   protected:
-    void incomingConnection(qt_socket_fd_t socket) override; // QTcpServer
+    void incomingConnection(qintptr socket) override; // QTcpServer
 
   private:
     PoolServerType m_serverType;
@@ -113,7 +112,7 @@ class MBASE_PUBLIC ServerPool : public QObject
 
   protected slots:
     virtual void newUdpDatagram(void);
-    virtual void newTcpConnection(qt_socket_fd_t socket);
+    virtual void newTcpConnection(qintptr socket);
 
   private:
     static void SelectDefaultListen(bool force=false);

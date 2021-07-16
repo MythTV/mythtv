@@ -51,7 +51,7 @@ class UPNP_PUBLIC WebSocketServer : public ServerPool
     }
 
   protected slots:
-    void newTcpConnection(qt_socket_fd_t socket) override; // QTcpServer
+    void newTcpConnection(qintptr socket) override; // QTcpServer
 
   protected:
     mutable QReadWriteLock  m_rwlock;
@@ -157,7 +157,7 @@ class WebSocketExtension : public QObject
 class WebSocketWorkerThread : public QRunnable
 {
   public:
-    WebSocketWorkerThread(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
+    WebSocketWorkerThread(WebSocketServer &webSocketServer, qintptr sock,
                           PoolServerType type
 #ifndef QT_NO_OPENSSL
                           , const QSslConfiguration& sslConfig
@@ -169,7 +169,7 @@ class WebSocketWorkerThread : public QRunnable
 
   private:
     WebSocketServer  &m_webSocketServer;
-    qt_socket_fd_t    m_socketFD;
+    qintptr           m_socketFD;
     PoolServerType    m_connectionType;
 #ifndef QT_NO_OPENSSL
     QSslConfiguration m_sslConfig;
@@ -206,7 +206,7 @@ class WebSocketWorker : public QObject
      * \param type       The type of connection - Plain TCP or TLS?
      * \param sslConfig  The TLS (ssl) configuration (for TLS sockets)
      */
-    WebSocketWorker(WebSocketServer &webSocketServer, qt_socket_fd_t sock,
+    WebSocketWorker(WebSocketServer &webSocketServer, qintptr sock,
                     PoolServerType type
 #ifndef QT_NO_OPENSSL
                     , const QSslConfiguration& sslConfig
@@ -272,7 +272,7 @@ class WebSocketWorker : public QObject
 
     QEventLoop     *m_eventLoop    {nullptr};
     WebSocketServer &m_webSocketServer;
-    qt_socket_fd_t m_socketFD;
+    qintptr        m_socketFD;
     QTcpSocket    *m_socket        {nullptr};
     PoolServerType m_connectionType;
 
