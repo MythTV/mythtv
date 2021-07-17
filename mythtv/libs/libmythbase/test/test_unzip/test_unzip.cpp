@@ -58,7 +58,7 @@ void TestUnzip::test_text_file(void)
     QCOMPARE(fi.exists(), true);
     QCOMPARE(fi.size(), 755);
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
-    auto actualDateTime = QDateTime(QDate(2021,6,24),QTime(13,55,16),Qt::UTC);
+    auto actualDateTime = QDateTime(QDate(2021,6,24),QTime(9,55,16));
     QCOMPARE(fi.lastModified(), actualDateTime);
 #endif
 
@@ -82,7 +82,7 @@ void TestUnzip::test_theme_file(void)
     QCOMPARE(fi.exists(), true);
     QCOMPARE(fi.size(), 1461);
 #if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
-    auto actualDateTime = QDateTime(QDate(2013,7,14),QTime(20,00,56),Qt::UTC);
+    auto actualDateTime = QDateTime(QDate(2013,7,14),QTime(16,00,56));
     QCOMPARE(fi.lastModified(), actualDateTime);
 #endif
 
