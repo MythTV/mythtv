@@ -100,14 +100,25 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
     if (count == typecount)
     {
         // Invoke
-        if (qt_metacall(QMetaObject::InvokeMetaMethod, handler->m_index, param.data()) >= 0)
-            LOG(VB_GENERAL, LOG_WARNING, "qt_metacall error");
+        QVariant returnvalue;
+        try {
+            if (qt_metacall(QMetaObject::InvokeMetaMethod, handler->m_index, param.data()) >= 0)
+                LOG(VB_GENERAL, LOG_ERR, "qt_metacall error");
+            else
+            {
+                // Retrieve result
+                returnvalue = handler->CreateReturnValue(types[0], param[0]);
+            }
+        }
+        catch( QString &msg ) {
+            LOG(VB_GENERAL, LOG_ERR, "Service Exception: " + msg);
+            result = MythHTTPResponse::ErrorResponse(Request, msg);
+        }
 
-        // Retrieve result
-        QVariant returnvalue = handler->CreateReturnValue(types[0], param[0]);
         if (!returnvalue.isValid())
         {
-            result = MythHTTPResponse::EmptyResponse(Request);
+            if (!result)
+                result = MythHTTPResponse::ErrorResponse(Request, "Unknown Failure");
         }
         else
         {
