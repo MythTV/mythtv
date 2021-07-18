@@ -715,22 +715,14 @@ void MythMainWindow::Init(bool MayReInit)
 
     move(m_screenRect.topLeft());
 
-    if (m_painterWin)
-    {
-        m_oldPainterWin = m_painterWin;
-        m_painterWin = nullptr;
-    }
-
-    if (m_painter)
-    {
-        m_oldPainter = m_painter;
-        m_painter = nullptr;
-    }
-
     QString warningmsg;
-    if (!m_painter && !m_painterWin)
+    if (m_painter || m_painterWin)
+    {
+        LOG(VB_GENERAL, LOG_INFO, "Destroying painter and painter window");
+        MythPainterWindow::DestroyPainters(m_painterWin, m_painter);
         warningmsg = MythPainterWindow::CreatePainters(this, m_painterWin, m_painter);
-
+    }
+    
     if (!m_painterWin)
     {
         LOG(VB_GENERAL, LOG_ERR, "MythMainWindow failed to create a painter window.");
@@ -954,13 +946,6 @@ void MythMainWindow::ReloadKeys()
     ClearKeyContext("Browser");
     ClearKeyContext("Main Menu");
     InitKeys();
-}
-
-void MythMainWindow::ReinitDone()
-{
-    MythPainterWindow::DestroyPainters(m_oldPainterWin, m_oldPainter);
-    ShowPainterWindow();
-    MoveResize(m_screenRect);
 }
 
 void MythMainWindow::Show()
