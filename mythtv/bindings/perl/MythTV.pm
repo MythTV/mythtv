@@ -390,7 +390,7 @@ EOF
         $self->{'master_port'} = $self->backend_setting('BackendServerPort',"$mastname");
 
         if (!$self->{'master_host'} || !$self->{'master_port'}) {
-            die "MasterServerIP or MasterServerPort not found!\n"
+            die "BackendServerAddr or BackendServerPort not found!\n"
                ."You may need to check your settings.php file or re-run mythtv-setup.\n";
         }
 
