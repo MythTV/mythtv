@@ -8,7 +8,7 @@
 #define LOC (QString("%1: ").arg(objectName()))
 
 MythHTTPThread::MythHTTPThread(MythHTTPServer* Server, const MythHTTPConfig &Config,
-                               const QString& ThreadName, qt_socket_fd_t Socket, bool Ssl)
+                               const QString& ThreadName, qintptr Socket, bool Ssl)
   : MThread(ThreadName),
     m_server(Server),
     m_config(Config),

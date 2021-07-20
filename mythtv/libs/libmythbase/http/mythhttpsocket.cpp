@@ -24,7 +24,7 @@ using namespace std::chrono_literals;
 
 #define LOC QString(m_peer + ": ")
 
-MythHTTPSocket::MythHTTPSocket(qt_socket_fd_t Socket, bool SSL, const MythHTTPConfig& Config)
+MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& Config)
   : m_socketFD(Socket),
     m_config(Config)
 {
@@ -382,7 +382,7 @@ void MythHTTPSocket::Respond(HTTPResponse Response)
  *
  * This is used to send 503 Service Unavailable
 */
-void MythHTTPSocket::RespondDirect(qt_socket_fd_t Socket, HTTPResponse Response, const MythHTTPConfig &Config)
+void MythHTTPSocket::RespondDirect(qintptr Socket, HTTPResponse Response, const MythHTTPConfig &Config)
 {
     if (!(Socket && Response))
         return;

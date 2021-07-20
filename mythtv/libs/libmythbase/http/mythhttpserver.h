@@ -34,7 +34,7 @@ class MythHTTPServer : public MythHTTPThreadPool
     void HostResolved   (QHostInfo Info);
 
   protected slots:
-    void newTcpConnection (qt_socket_fd_t Socket) override;
+    void newTcpConnection (qintptr Socket) override;
     void EnableDisable  (bool Enable);
     void NewPaths       (const QStringList& Paths);
     void StalePaths     (const QStringList& Paths);

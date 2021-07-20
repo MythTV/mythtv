@@ -3,7 +3,6 @@
 
 // MythTV
 #include "serverpool.h"
-#include "mythqtcompat.h"
 
 class MythHTTPThread;
 

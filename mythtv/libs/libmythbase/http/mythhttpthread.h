@@ -3,7 +3,6 @@
 
 // MythTV
 #include "mthread.h"
-#include "mythqtcompat.h"
 #include "http/mythhttptypes.h"
 
 class MythHTTPSocket;
@@ -14,7 +13,7 @@ class MythHTTPThread : public MThread
 {
   public:
     MythHTTPThread(MythHTTPServer* Server, const MythHTTPConfig& Config,
-                   const QString& ThreadName, qt_socket_fd_t Socket, bool Ssl);
+                   const QString& ThreadName, qintptr Socket, bool Ssl);
     void Quit();
 
   protected:
@@ -25,7 +24,7 @@ class MythHTTPThread : public MThread
 
     MythHTTPServer* m_server { nullptr };
     MythHTTPConfig  m_config;
-    qt_socket_fd_t  m_socketFD { 0 };
+    qintptr         m_socketFD { 0 };
     MythHTTPSocket* m_socket { nullptr };
     bool            m_ssl    { false };
 };

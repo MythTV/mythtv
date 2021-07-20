@@ -7,7 +7,6 @@
 #include <QElapsedTimer>
 
 // MythTV
-#include "mythqtcompat.h"
 #include "http/mythhttptypes.h"
 #include "http/mythhttpparser.h"
 
@@ -35,10 +34,10 @@ class MythHTTPSocket : public QObject
     void NewBinaryMessage (const DataPayloads& Payloads);
 
   public:
-    explicit MythHTTPSocket(qt_socket_fd_t Socket, bool SSL, const MythHTTPConfig& Config);
+    explicit MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& Config);
    ~MythHTTPSocket() override;
     void Respond(HTTPResponse Response);
-    static void RespondDirect(qt_socket_fd_t Socket, HTTPResponse Response, const MythHTTPConfig& Config);
+    static void RespondDirect(qintptr Socket, HTTPResponse Response, const MythHTTPConfig& Config);
 
   protected slots:
     void Disconnected();
@@ -52,7 +51,7 @@ class MythHTTPSocket : public QObject
     Q_DISABLE_COPY(MythHTTPSocket)
     void SetupWebSocket();
 
-    qt_socket_fd_t  m_socketFD       { 0 };
+    qintptr         m_socketFD       { 0 };
     MythHTTPConfig  m_config;
     HTTPServicePtrs m_activeServices;
     bool            m_stopping       { false };

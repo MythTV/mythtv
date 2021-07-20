@@ -238,7 +238,7 @@ void MythHTTPServer::Stopped()
 #endif
 }
 
-void MythHTTPServer::newTcpConnection(qt_socket_fd_t Socket)
+void MythHTTPServer::newTcpConnection(qintptr Socket)
 {
     if (!Socket)
         return;
