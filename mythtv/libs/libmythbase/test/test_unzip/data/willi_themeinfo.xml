@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "http://www.mythtv.org/schema/mythuitheme.dtd">
+<themeinfo>
+  <name>Willi</name>
+  <aspect>16:9</aspect>
+  <author>
+    <name>Elkin Fricke</name>
+    <email>managementboy@gmail.com</email>
+  </author>
+  <!-- The Theme Types (Required) -->
+  <types>
+    <!-- Type. Legal Values are one or more of: UI, OSD and Menu -->
+    <type>UI</type>
+    <type>OSD</type>
+  </types>
+  <baseres>1920x1080</baseres>
+  <version>
+    <major>2</major>
+    <minor>28</minor>
+  </version>
+  <detail>
+    <thumbnail name="preview">preview.jpg</thumbnail>
+    <description>A UI and OSD theme with focus on fanart, banners and cover display.</description>
+    <!-- What is not available -->
+    <errata>Supported: Recording/ Scheduling/ Video/ Gallery/ Music/ Stream/ Information/ Notification. Not yet suported: everything else.</errata>
+    <downloadurl>http://ftp.osuosl.org/pub/mythtv/themes/trunk/Willi-2.28_trunk.zip</downloadurl>
+  </detail>
+  <downloadinfo>
+    <url>http://ftp.osuosl.org/pub/mythtv/themes/trunk/Willi-2.28_trunk.zip</url>
+    <size>5252813</size>
+    <md5sum>dcfd19d5763b6e833781c19a2e0bb617</md5sum>
+    <packagedate>2021-04-28 16:18:58 UTC</packagedate>
+    <infourl>http://themes.mythtv.org/themes/repository/trunk/Willi/themeinfo.xml</infourl>
+    <sourceurl>git://github.com/MythTV-Themes/Willi.git</sourceurl>
+    <installedsize>9612919</installedsize>
+  </downloadinfo>
+</themeinfo>

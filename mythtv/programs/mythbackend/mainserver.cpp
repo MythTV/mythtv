@@ -428,7 +428,7 @@ void MainServer::autoexpireUpdate(void)
     AutoExpire::Update(false);
 }
 
-void MainServer::NewConnection(qt_socket_fd_t socketDescriptor)
+void MainServer::NewConnection(qintptr socketDescriptor)
 {
     QWriteLocker locker(&m_sockListLock);
     auto *ms =  new MythSocket(socketDescriptor, this);

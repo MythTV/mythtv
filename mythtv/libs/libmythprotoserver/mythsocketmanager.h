@@ -13,7 +13,6 @@
 // MythTV
 #include "socketrequesthandler.h"
 #include "sockethandler.h"
-#include "mythqtcompat.h"
 #include "mthreadpool.h"
 #include "mythsocket.h"
 #include "serverpool.h"
@@ -25,10 +24,10 @@ class MythServer : public ServerPool
     explicit MythServer(QObject *parent=nullptr);
 
   signals:
-    void newConnection(qt_socket_fd_t socket);
+    void newConnection(qintptr socket);
 
   protected slots:
-    void newTcpConnection(qt_socket_fd_t socket) override; // ServerPool
+    void newTcpConnection(qintptr socket) override; // ServerPool
 };
 
 class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCBs
@@ -56,7 +55,7 @@ class PROTOSERVER_PUBLIC MythSocketManager : public QObject, public MythSocketCB
     bool Listen(int port);
 
   public slots:
-    void newConnection(qt_socket_fd_t sd);
+    void newConnection(qintptr sd);
 
   private:
     void ProcessRequestWork(MythSocket *socket);

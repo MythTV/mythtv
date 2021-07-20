@@ -36,10 +36,6 @@ class MediaRenderer : public UPnp
     public:
                  MediaRenderer();
         ~MediaRenderer() override;
-
-        DeviceLocation *GetDefaultMaster();
-        void            SetDefaultMaster( DeviceLocation *pDeviceLoc,
-                                          const QString  &sPin );
 };
 
 #endif // MEDIARENDERER_H

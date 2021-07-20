@@ -1,7 +1,7 @@
 #include "server.h"
 #include "mythlogging.h"
 
-void MythServer::newTcpConnection(qt_socket_fd_t socket)
+void MythServer::newTcpConnection(qintptr socket)
 {
     emit NewConnection(socket);
 }
