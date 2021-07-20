@@ -112,6 +112,7 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
         }
         catch( QString &msg ) {
             LOG(VB_GENERAL, LOG_ERR, "Service Exception: " + msg);
+            Request->m_status = HTTPBadRequest;
             result = MythHTTPResponse::ErrorResponse(Request, msg);
         }
 
