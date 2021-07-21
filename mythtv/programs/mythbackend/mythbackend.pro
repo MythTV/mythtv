@@ -79,6 +79,7 @@ HEADERS += servicesv2/v2encoder.h servicesv2/v2encoderList.h
 HEADERS += servicesv2/v2input.h servicesv2/v2inputList.h
 HEADERS += servicesv2/v2recRuleFilter.h servicesv2/v2recRuleFilterList.h
 HEADERS += servicesv2/v2titleInfo.h servicesv2/v2titleInfoList.h
+HEADERS += servicesv2/v2recRuleList.h
 
 SOURCES += servicesv2/v2myth.cpp
 SOURCES += servicesv2/v2video.cpp

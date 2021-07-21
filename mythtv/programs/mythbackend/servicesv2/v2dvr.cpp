@@ -58,6 +58,8 @@ void V2Dvr::RegisterCustomTypes()
     qRegisterMetaType<V2InputList*>("V2InputList");
     qRegisterMetaType<V2RecRuleFilterList*>("V2RecRuleFilterList");
     qRegisterMetaType<V2TitleInfoList*>("V2TitleInfoList");
+    qRegisterMetaType<V2RecRule*>("V2RecRule");
+    qRegisterMetaType<V2RecRuleList*>("V2RecRuleList");
 }
 
 V2Dvr::V2Dvr()
@@ -1360,4 +1362,711 @@ V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
 
     return pPrograms;
+}
+
+uint V2Dvr::AddRecordSchedule   (
+                               const QString&   sTitle,
+                               const QString&   sSubtitle,
+                               const QString&   sDescription,
+                               const QString&   sCategory,
+                               const QDateTime& recstarttsRaw,
+                               const QDateTime& recendtsRaw,
+                               const QString&   sSeriesId,
+                               const QString&   sProgramId,
+                               int       nChanId,
+                               const QString&   sStation,
+                               int       nFindDay,
+                               QTime     tFindTime,
+                               int       nParentId,
+                               bool      bInactive,
+                               uint      nSeason,
+                               uint      nEpisode,
+                               const QString&   sInetref,
+                               QString   sType,
+                               QString   sSearchType,
+                               int       nRecPriority,
+                               uint      nPreferredInput,
+                               int       nStartOffset,
+                               int       nEndOffset,
+                               const QDateTime& lastrectsRaw,
+                               QString   sDupMethod,
+                               QString   sDupIn,
+                               bool      bNewEpisOnly,
+                               uint      nFilter,
+                               QString   sRecProfile,
+                               QString   sRecGroup,
+                               QString   sStorageGroup,
+                               QString   sPlayGroup,
+                               bool      bAutoExpire,
+                               int       nMaxEpisodes,
+                               bool      bMaxNewest,
+                               bool      bAutoCommflag,
+                               bool      bAutoTranscode,
+                               bool      bAutoMetaLookup,
+                               bool      bAutoUserJob1,
+                               bool      bAutoUserJob2,
+                               bool      bAutoUserJob3,
+                               bool      bAutoUserJob4,
+                               int       nTranscoder)
+{
+    QDateTime recstartts = recstarttsRaw.toUTC();
+    QDateTime recendts = recendtsRaw.toUTC();
+    QDateTime lastrects = lastrectsRaw.toUTC();
+    RecordingRule rule;
+    rule.LoadTemplate("Default");
+
+    if (sType.isEmpty())
+        sType = "single";
+
+    if (sSearchType.isEmpty())
+        sSearchType = "none";
+
+    if (sDupMethod.isEmpty())
+        sDupMethod = "subtitleanddescription";
+
+    if (sDupIn.isEmpty())
+        sDupIn = "all";
+
+    rule.m_title = sTitle;
+    rule.m_subtitle = sSubtitle;
+    rule.m_description = sDescription;
+
+    rule.m_startdate = recstartts.date();
+    rule.m_starttime = recstartts.time();
+    rule.m_enddate = recendts.date();
+    rule.m_endtime = recendts.time();
+
+    rule.m_type = recTypeFromString(sType);
+    rule.m_searchType = searchTypeFromString(sSearchType);
+    if (rule.m_searchType == kManualSearch)
+        rule.m_dupMethod = kDupCheckNone;
+    else
+        rule.m_dupMethod = dupMethodFromString(sDupMethod);
+    rule.m_dupIn = dupInFromStringAndBool(sDupIn, bNewEpisOnly);
+
+    if (sRecProfile.isEmpty())
+        sRecProfile = "Default";
+
+    if (sRecGroup.isEmpty())
+        sRecGroup = "Default";
+
+    if (sStorageGroup.isEmpty())
+        sStorageGroup = "Default";
+
+    if (sPlayGroup.isEmpty())
+        sPlayGroup = "Default";
+
+    rule.m_category = sCategory;
+    rule.m_seriesid = sSeriesId;
+    rule.m_programid = sProgramId;
+
+    rule.m_channelid = nChanId;
+    rule.m_station = sStation;
+
+    rule.m_findday = nFindDay;
+    rule.m_findtime = tFindTime;
+
+    rule.m_recProfile = sRecProfile;
+    rule.m_recGroupID = RecordingInfo::GetRecgroupID(sRecGroup);
+    if (rule.m_recGroupID == 0)
+    {
+        rule.m_recGroupID = V2CreateRecordingGroup(sRecGroup);
+        if (rule.m_recGroupID <= 0)
+            rule.m_recGroupID = RecordingInfo::kDefaultRecGroup;
+    }
+    rule.m_storageGroup = sStorageGroup;
+    rule.m_playGroup = sPlayGroup;
+
+    rule.m_parentRecID = nParentId;
+    rule.m_isInactive = bInactive;
+
+    rule.m_season = nSeason;
+    rule.m_episode = nEpisode;
+    rule.m_inetref = sInetref;
+
+    rule.m_recPriority = nRecPriority;
+    rule.m_prefInput = nPreferredInput;
+    rule.m_startOffset = nStartOffset;
+    rule.m_endOffset = nEndOffset;
+    rule.m_filter = nFilter;
+
+    rule.m_autoExpire = bAutoExpire;
+    rule.m_maxEpisodes = nMaxEpisodes;
+    rule.m_maxNewest = bMaxNewest;
+
+    rule.m_autoCommFlag = bAutoCommflag;
+    rule.m_autoTranscode = bAutoTranscode;
+    rule.m_autoMetadataLookup = bAutoMetaLookup;
+
+    rule.m_autoUserJob1 = bAutoUserJob1;
+    rule.m_autoUserJob2 = bAutoUserJob2;
+    rule.m_autoUserJob3 = bAutoUserJob3;
+    rule.m_autoUserJob4 = bAutoUserJob4;
+
+    rule.m_transcoder = nTranscoder;
+
+    rule.m_lastRecorded = lastrects;
+
+    QString msg;
+    if (!rule.IsValid(msg))
+        throw QString(msg);
+
+    rule.Save();
+
+    uint recid = rule.m_recordID;
+
+    return recid;
+}
+
+bool V2Dvr::UpdateRecordSchedule ( uint      nRecordId,
+                                 const QString&   sTitle,
+                                 const QString&   sSubtitle,
+                                 const QString&   sDescription,
+                                 const QString&   sCategory,
+                                 const QDateTime& dStartTimeRaw,
+                                 const QDateTime& dEndTimeRaw,
+                                 const QString&   sSeriesId,
+                                 const QString&   sProgramId,
+                                 int       nChanId,
+                                 const QString&   sStation,
+                                 int       nFindDay,
+                                 QTime     tFindTime,
+                                 bool      bInactive,
+                                 uint      nSeason,
+                                 uint      nEpisode,
+                                 const QString&   sInetref,
+                                 QString   sType,
+                                 QString   sSearchType,
+                                 int       nRecPriority,
+                                 uint      nPreferredInput,
+                                 int       nStartOffset,
+                                 int       nEndOffset,
+                                 QString   sDupMethod,
+                                 QString   sDupIn,
+                                 bool      bNewEpisOnly,
+                                 uint      nFilter,
+                                 QString   sRecProfile,
+                                 QString   sRecGroup,
+                                 QString   sStorageGroup,
+                                 QString   sPlayGroup,
+                                 bool      bAutoExpire,
+                                 int       nMaxEpisodes,
+                                 bool      bMaxNewest,
+                                 bool      bAutoCommflag,
+                                 bool      bAutoTranscode,
+                                 bool      bAutoMetaLookup,
+                                 bool      bAutoUserJob1,
+                                 bool      bAutoUserJob2,
+                                 bool      bAutoUserJob3,
+                                 bool      bAutoUserJob4,
+                                 int       nTranscoder)
+{
+    if (nRecordId == 0 )
+        throw QString("Record ID is invalid.");
+
+    RecordingRule pRule;
+    pRule.m_recordID = nRecordId;
+    pRule.Load();
+
+    if (!pRule.IsLoaded())
+        throw QString("Record ID does not exist.");
+
+    QDateTime recstartts = dStartTimeRaw.toUTC();
+    QDateTime recendts = dEndTimeRaw.toUTC();
+
+    pRule.m_isInactive = bInactive;
+    if (sType.isEmpty())
+        sType = "single";
+
+    if (sSearchType.isEmpty())
+        sSearchType = "none";
+
+    if (sDupMethod.isEmpty())
+        sDupMethod = "subtitleanddescription";
+
+    if (sDupIn.isEmpty())
+        sDupIn = "all";
+
+    pRule.m_type = recTypeFromString(sType);
+    pRule.m_searchType = searchTypeFromString(sSearchType);
+    if (pRule.m_searchType == kManualSearch)
+        pRule.m_dupMethod = kDupCheckNone;
+    else
+        pRule.m_dupMethod = dupMethodFromString(sDupMethod);
+    pRule.m_dupIn = dupInFromStringAndBool(sDupIn, bNewEpisOnly);
+
+    if (sRecProfile.isEmpty())
+        sRecProfile = "Default";
+
+    if (sRecGroup.isEmpty())
+        sRecGroup = "Default";
+
+    if (sStorageGroup.isEmpty())
+        sStorageGroup = "Default";
+
+    if (sPlayGroup.isEmpty())
+        sPlayGroup = "Default";
+
+    if (!sTitle.isEmpty())
+        pRule.m_title = sTitle;
+
+    if (!sSubtitle.isEmpty())
+        pRule.m_subtitle = sSubtitle;
+
+    if(!sDescription.isEmpty())
+        pRule.m_description = sDescription;
+
+    if (!sCategory.isEmpty())
+        pRule.m_category = sCategory;
+
+    if (!sSeriesId.isEmpty())
+        pRule.m_seriesid = sSeriesId;
+
+    if (!sProgramId.isEmpty())
+        pRule.m_programid = sProgramId;
+
+    if (nChanId)
+        pRule.m_channelid = nChanId;
+    if (!sStation.isEmpty())
+        pRule.m_station = sStation;
+
+    pRule.m_startdate = recstartts.date();
+    pRule.m_starttime = recstartts.time();
+    pRule.m_enddate = recendts.date();
+    pRule.m_endtime = recendts.time();
+
+    pRule.m_findday = nFindDay;
+    pRule.m_findtime = tFindTime;
+
+    pRule.m_recProfile = sRecProfile;
+    pRule.m_recGroupID = RecordingInfo::GetRecgroupID(sRecGroup);
+    if (pRule.m_recGroupID == 0)
+    {
+        pRule.m_recGroupID = V2CreateRecordingGroup(sRecGroup);
+        if (pRule.m_recGroupID <= 0)
+            pRule.m_recGroupID = RecordingInfo::kDefaultRecGroup;
+    }
+    pRule.m_storageGroup = sStorageGroup;
+    pRule.m_playGroup = sPlayGroup;
+
+    pRule.m_isInactive = bInactive;
+
+    pRule.m_season = nSeason;
+    pRule.m_episode = nEpisode;
+    pRule.m_inetref = sInetref;
+
+    pRule.m_recPriority = nRecPriority;
+    pRule.m_prefInput = nPreferredInput;
+    pRule.m_startOffset = nStartOffset;
+    pRule.m_endOffset = nEndOffset;
+    pRule.m_filter = nFilter;
+
+    pRule.m_autoExpire = bAutoExpire;
+    pRule.m_maxEpisodes = nMaxEpisodes;
+    pRule.m_maxNewest = bMaxNewest;
+
+    pRule.m_autoCommFlag = bAutoCommflag;
+    pRule.m_autoTranscode = bAutoTranscode;
+    pRule.m_autoMetadataLookup = bAutoMetaLookup;
+
+    pRule.m_autoUserJob1 = bAutoUserJob1;
+    pRule.m_autoUserJob2 = bAutoUserJob2;
+    pRule.m_autoUserJob3 = bAutoUserJob3;
+    pRule.m_autoUserJob4 = bAutoUserJob4;
+
+    pRule.m_transcoder = nTranscoder;
+
+    QString msg;
+    if (!pRule.IsValid(msg))
+        throw QString(msg);
+
+    bool bResult = pRule.Save();
+
+    return bResult;
+}
+
+bool V2Dvr::RemoveRecordSchedule ( uint nRecordId )
+{
+    bool bResult = false;
+
+    if (nRecordId == 0 )
+        throw QString("Record ID does not exist.");
+
+    RecordingRule pRule;
+    pRule.m_recordID = nRecordId;
+
+    bResult = pRule.Delete();
+
+    return bResult;
+}
+
+bool V2Dvr::AddDontRecordSchedule(int nChanId, const QDateTime &dStartTime,
+                                bool bNeverRecord)
+{
+    bool bResult = true;
+
+    if (nChanId <= 0 || !dStartTime.isValid())
+        throw QString("Program does not exist.");
+
+    ProgramInfo *pi = LoadProgramFromProgram(nChanId, dStartTime.toUTC());
+
+    if (!pi)
+        throw QString("Program does not exist.");
+
+    // Why RecordingInfo instead of ProgramInfo? Good question ...
+    RecordingInfo recInfo = RecordingInfo(*pi);
+
+    delete pi;
+
+    if (bNeverRecord)
+    {
+        recInfo.ApplyNeverRecord();
+    }
+    else
+        recInfo.ApplyRecordStateChange(kDontRecord);
+
+    return bResult;
+}
+
+V2RecRuleList* V2Dvr::GetRecordScheduleList( int nStartIndex,
+                                              int nCount,
+                                              const QString  &Sort,
+                                              bool Descending )
+{
+    Scheduler::SchedSortColumn sortingColumn = Scheduler::kSortTitle;
+    if (Sort.toLower() == "lastrecorded")
+        sortingColumn = Scheduler::kSortLastRecorded;
+    else if (Sort.toLower() == "nextrecording")
+        sortingColumn = Scheduler::kSortNextRecording;
+    else if (Sort.toLower() == "title")
+        sortingColumn = Scheduler::kSortTitle;    // NOLINT(bugprone-branch-clone)
+    else if (Sort.toLower() == "priority")
+        sortingColumn = Scheduler::kSortPriority;
+    else if (Sort.toLower() == "type")
+        sortingColumn = Scheduler::kSortType;
+    else
+        sortingColumn = Scheduler::kSortTitle;
+
+    RecList recList;
+    Scheduler::GetAllScheduled(recList, sortingColumn, !Descending);
+
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
+
+    auto *pRecRules = new V2RecRuleList();
+
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)recList.size() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, (int)recList.size() ) : recList.size();
+    int nEndIndex = std::min((nStartIndex + nCount), (int)recList.size() );
+
+    for( int n = nStartIndex; n < nEndIndex; n++)
+    {
+        RecordingInfo *info = recList[n];
+
+        if (info != nullptr)
+        {
+            V2RecRule *pRecRule = pRecRules->AddNewRecRule();
+
+            V2FillRecRuleInfo( pRecRule, info->GetRecordingRule() );
+        }
+    }
+
+    // ----------------------------------------------------------------------
+
+    pRecRules->setStartIndex    ( nStartIndex     );
+    pRecRules->setCount         ( nCount          );
+    pRecRules->setTotalAvailable( recList.size() );
+    pRecRules->setAsOf          ( MythDate::current() );
+    pRecRules->setVersion       ( MYTH_BINARY_VERSION );
+    pRecRules->setProtoVer      ( MYTH_PROTO_VERSION  );
+
+    while (!recList.empty())
+    {
+        delete recList.back();
+        recList.pop_back();
+    }
+
+    return pRecRules;
+}
+
+V2RecRule* V2Dvr::GetRecordSchedule( uint      nRecordId,
+                                      const QString&   sTemplate,
+                                      int       nRecordedId,
+                                      int       nChanId,
+                                      const QDateTime& dStartTimeRaw,
+                                      bool      bMakeOverride )
+{
+    RecordingRule rule;
+    QDateTime dStartTime = dStartTimeRaw.toUTC();
+
+    if (nRecordId > 0)
+    {
+        rule.m_recordID = nRecordId;
+        if (!rule.Load())
+            throw QString("Record ID does not exist.");
+    }
+    else if (!sTemplate.isEmpty())
+    {
+        if (!rule.LoadTemplate(sTemplate))
+            throw QString("Template does not exist.");
+    }
+    else if (nRecordedId > 0) // Loads from the Recorded/Recorded Program Table
+    {
+        // Despite the use of ProgramInfo, this only applies to Recordings.
+        ProgramInfo recInfo(nRecordedId);
+        if (!rule.LoadByProgram(&recInfo))
+            throw QString("Recording does not exist");
+    }
+    else if (nChanId > 0 && dStartTime.isValid()) // Loads from Program Table, should NOT be used with recordings
+    {
+        // Despite the use of RecordingInfo, this only applies to programs in the
+        // present or future, not to recordings? Confused yet?
+        RecordingInfo::LoadStatus status = RecordingInfo::kNoProgram;
+        RecordingInfo info(nChanId, dStartTime, false, 0h, &status);
+        if (status != RecordingInfo::kFoundProgram)
+            throw QString("Program does not exist.");
+        RecordingRule *pRule = info.GetRecordingRule();
+        if (bMakeOverride && rule.m_type != kSingleRecord &&
+            rule.m_type != kOverrideRecord && rule.m_type != kDontRecord)
+            pRule->MakeOverride();
+        rule = *pRule;
+    }
+    else
+    {
+        throw QString("Invalid request.");
+    }
+
+    auto *pRecRule = new V2RecRule();
+    V2FillRecRuleInfo( pRecRule, &rule );
+
+    return pRecRule;
+}
+
+bool V2Dvr::EnableRecordSchedule ( uint nRecordId )
+{
+    bool bResult = false;
+
+    if (nRecordId == 0 )
+        throw QString("Record ID appears invalid.");
+
+    RecordingRule pRule;
+    pRule.m_recordID = nRecordId;
+    pRule.Load();
+
+    if (pRule.IsLoaded())
+    {
+        pRule.m_isInactive = false;
+        bResult = pRule.Save();
+    }
+
+    return bResult;
+}
+
+bool V2Dvr::DisableRecordSchedule( uint nRecordId )
+{
+    bool bResult = false;
+
+    if (nRecordId == 0 )
+        throw QString("Record ID appears invalid.");
+
+    RecordingRule pRule;
+    pRule.m_recordID = nRecordId;
+    pRule.Load();
+
+    if (pRule.IsLoaded())
+    {
+        pRule.m_isInactive = true;
+        bResult = pRule.Save();
+    }
+
+    return bResult;
+}
+
+int V2Dvr::RecordedIdForKey(int chanid, const QDateTime &recstarttsRaw)
+{
+    int recordedid = 0;
+
+    if (!RecordingInfo::QueryRecordedIdForKey(recordedid, chanid,
+                                              recstarttsRaw))
+        return -1;
+
+    return recordedid;
+}
+
+int V2Dvr::RecordedIdForPathname(const QString & pathname)
+{
+    uint recordedid = 0;
+
+    if (!ProgramInfo::QueryRecordedIdFromPathname(pathname, recordedid))
+        return -1;
+
+    return recordedid;
+}
+
+QString V2Dvr::RecStatusToString(int RecStatus)
+{
+    auto type = static_cast<RecStatus::Type>(RecStatus);
+    return RecStatus::toString(type);
+}
+
+QString V2Dvr::RecStatusToDescription(int RecStatus, int recType,
+                                    const QDateTime &StartTime)
+{
+    //if (!StartTime.isValid())
+    //    throw QString("StartTime appears invalid.");
+    auto rsType = static_cast<RecStatus::Type>(RecStatus);
+    auto recordingType = static_cast<RecordingType>(recType);
+    return RecStatus::toDescription(rsType, recordingType, StartTime);
+}
+
+QString V2Dvr::RecTypeToString(const QString& recType)
+{
+    bool ok = false;
+    auto enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
+    if (ok)
+        return toString(enumType);
+    // RecordingType type = static_cast<RecordingType>(recType);
+    return toString(recTypeFromString(recType));
+}
+
+QString V2Dvr::RecTypeToDescription(const QString& recType)
+{
+    bool ok = false;
+    auto enumType = static_cast<RecordingType>(recType.toInt(&ok, 10));
+    if (ok)
+        return toDescription(enumType);
+    // RecordingType type = static_cast<RecordingType>(recType);
+    return toDescription(recTypeFromString(recType));
+}
+
+QString V2Dvr::DupInToString(const QString& DupIn)
+{
+    // RecordingDupInType type= static_cast<RecordingDupInType>(DupIn);
+    // return toString(type);
+    return toString(dupInFromString(DupIn));
+}
+
+QString V2Dvr::DupInToDescription(const QString& DupIn)
+{
+    // RecordingDupInType type= static_cast<RecordingDupInType>(DupIn);
+    //return toDescription(type);
+    return toDescription(dupInFromString(DupIn));
+}
+
+QString V2Dvr::DupMethodToString(const QString& DupMethod)
+{
+    // RecordingDupMethodType method = static_cast<RecordingDupMethodType>(DupMethod);
+    return toString(dupMethodFromString(DupMethod));
+}
+
+QString V2Dvr::DupMethodToDescription(const QString& DupMethod)
+{
+    // RecordingDupMethodType method = static_cast<RecordingDupMethodType>(DupMethod);
+    return toDescription(dupMethodFromString(DupMethod));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+int V2Dvr::ManageJobQueue( const QString   &sAction,
+                         const QString   &sJobName,
+                         int              nJobId,
+                         int              nRecordedId,
+                               QDateTime  jobstarttsRaw,
+                               QString    sRemoteHost,
+                               QString    sJobArgs )
+{
+    int nReturn = -1;
+
+    if (!m_request->m_queries.contains("JobName") ||
+        !m_request->m_queries.contains("RecordedId") )
+    {
+        LOG(VB_GENERAL, LOG_ERR, "JobName and RecordedId are required.");
+        return nReturn;
+    }
+
+    if (sRemoteHost.isEmpty())
+        sRemoteHost = gCoreContext->GetHostName();
+
+    int jobType = JobQueue::GetJobTypeFromName(sJobName);
+
+    if (jobType == JOB_NONE)
+        return nReturn;
+
+    RecordingInfo ri = RecordingInfo(nRecordedId);
+
+    if (!ri.GetChanID())
+        return nReturn;
+
+    if ( sAction == "Remove")
+    {
+        if (!m_request->m_queries.contains("JobId") || nJobId < 0)
+        {
+            LOG(VB_GENERAL, LOG_ERR, "For Remove, a valid JobId is required.");
+            return nReturn;
+        }
+
+        if (!JobQueue::SafeDeleteJob(nJobId, jobType, ri.GetChanID(),
+                                     ri.GetRecordingStartTime()))
+            return nReturn;
+
+        return nJobId;
+    }
+
+    if ( sAction != "Add")
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Illegal Action name '%1'. Use: Add, "
+                                         "or Remove").arg(sAction));
+        return nReturn;
+    }
+
+    if (((jobType & JOB_USERJOB) != 0) &&
+         gCoreContext->GetSetting(sJobName, "").isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been defined.")
+            .arg(sJobName));
+        return nReturn;
+    }
+
+    if (!gCoreContext->GetBoolSettingOnHost(QString("JobAllow%1").arg(sJobName),
+                                            sRemoteHost, false))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 hasn't been allowed on host %2.")
+                                         .arg(sJobName, sRemoteHost));
+        return nReturn;
+    }
+
+    if (!jobstarttsRaw.isValid())
+        jobstarttsRaw = QDateTime::currentDateTime();
+
+    if (!JobQueue::InJobRunWindow(jobstarttsRaw))
+        return nReturn;
+
+    if (sJobArgs.isNull())
+        sJobArgs = "";
+
+    bool bReturn = JobQueue::QueueJob(jobType,
+                                 ri.GetChanID(),
+                                 ri.GetRecordingStartTime(),
+                                 sJobArgs,
+                                 QString("Dvr/ManageJobQueue"), // comment col.
+                                 sRemoteHost,
+                                 JOB_NO_FLAGS,
+                                 JOB_QUEUED,
+                                 jobstarttsRaw.toUTC());
+
+    if (!bReturn)
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("%1 job wasn't queued because of a "
+                                         "database error or because it was "
+                                         "already running/stopping etc.")
+                                         .arg(sJobName));
+
+        return nReturn;
+    }
+
+    return JobQueue::GetJobID(jobType, ri.GetChanID(),
+                              ri.GetRecordingStartTime());
 }

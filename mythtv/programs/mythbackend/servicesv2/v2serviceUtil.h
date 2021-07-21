@@ -63,4 +63,6 @@ void V2FillSeek(V2CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype);
 
 void V2FillInputInfo( V2Input *input, const InputInfo& inputInfo);
 
+int V2CreateRecordingGroup(const QString& groupName);
+
 #endif //V2SERVICEUTIL_H

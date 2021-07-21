@@ -34,6 +34,7 @@
 #include "v2inputList.h"
 #include "v2recRuleFilterList.h"
 #include "v2titleInfoList.h"
+#include "v2recRuleList.h"
 
 #define DVR_SERVICE QString("/Dvr/")
 #define DVR_HANDLE  QString("Dvr")
@@ -51,10 +52,27 @@ class V2Dvr : public MythHTTPService
     Q_CLASSINFO("ReactivateRecording", "methods=POST;name=bool")
     Q_CLASSINFO("RescheduleRecordings","methods=POST;name=bool")
     Q_CLASSINFO("AllowReRecord",       "methods=POST;name=bool")
-    Q_CLASSINFO("UpdateRecordedWatchedStatus",  "methods=POST;name=bool")
+    Q_CLASSINFO("UpdateRecordedWatchedStatus","methods=POST;name=bool")
     Q_CLASSINFO("GetSavedBookmark",    "name=long")
     Q_CLASSINFO("SetSavedBookmark",    "name=bool")
     Q_CLASSINFO("SetRecordedMarkup",   "name=bool")
+    Q_CLASSINFO("AddRecordSchedule",   "methods=POST;name=uint")
+    Q_CLASSINFO("UpdateRecordSchedule","methods=POST;name=bool")
+    Q_CLASSINFO("RemoveRecordSchedule","methods=POST;name=bool")
+    Q_CLASSINFO("AddDontRecordSchedule","methods=POST;name=bool")
+    Q_CLASSINFO("EnableRecordSchedule", "methods=POST;name=bool")
+    Q_CLASSINFO("DisableRecordSchedule","methods=POST;name=bool")
+    Q_CLASSINFO("RecordedIdForKey",     "methods=GET,POST,HEAD;name=int")
+    Q_CLASSINFO("RecordedIdForPathname","methods=GET,POST,HEAD;name=int")
+    Q_CLASSINFO("RecStatusToString",    "methods=GET,POST,HEAD;name=String")
+    Q_CLASSINFO("RecStatusToDescription","methods=GET,POST,HEAD;name=String")
+    Q_CLASSINFO("RecTypeToString",      "methods=GET,POST,HEAD;name=String")
+    Q_CLASSINFO("RecTypeToDescription", "methods=GET,POST,HEAD;name=String")
+    Q_CLASSINFO("DupMethodToString",    "methods=GET,POST,HEAD;name=String")
+    Q_CLASSINFO("DupMethodToDescription","methods=GET,POST,HEAD;name=String")
+    Q_CLASSINFO("DupInToString",        "methods=GET,POST,HEAD;name=String")
+    Q_CLASSINFO("DupInToDescription",   "methods=GET,POST,HEAD;name=String")
+    Q_CLASSINFO("ManageJobQueue",       "methods=POST;name=int")
 
   public:
     V2Dvr();
@@ -182,6 +200,150 @@ class V2Dvr : public MythHTTPService
     QStringList       GetTitleList        ( const QString   &RecGroup );
 
     V2TitleInfoList* GetTitleInfoList  ( );
+
+    // Recording Rules
+
+    uint              AddRecordSchedule   ( const QString&   Title,
+                                            const QString&   Subtitle,
+                                            const QString&   Description,
+                                            const QString&   Category,
+                                            const QDateTime& recstarttsRaw,
+                                            const QDateTime& recendtsRaw,
+                                            const QString&   SeriesId,
+                                            const QString&   ProgramId,
+                                            int       ChanId,
+                                            const QString&   Station,
+                                            int       FindDay,
+                                            QTime     FindTime,
+                                            int       ParentId,
+                                            bool      Inactive,
+                                            uint      Season,
+                                            uint      Episode,
+                                            const QString&   Inetref,
+                                            QString   Type,
+                                            QString   SearchType,
+                                            int       RecPriority,
+                                            uint      PreferredInput,
+                                            int       StartOffset,
+                                            int       EndOffset,
+                                            const QDateTime& lastrectsRaw,
+                                            QString   DupMethod,
+                                            QString   DupIn,
+                                            bool      NewEpisOnly,
+                                            uint      Filter,
+                                            QString   RecProfile,
+                                            QString   RecGroup,
+                                            QString   StorageGroup,
+                                            QString   PlayGroup,
+                                            bool      AutoExpire,
+                                            int       MaxEpisodes,
+                                            bool      MaxNewest,
+                                            bool      AutoCommflag,
+                                            bool      AutoTranscode,
+                                            bool      AutoMetaLookup,
+                                            bool      AutoUserJob1,
+                                            bool      AutoUserJob2,
+                                            bool      AutoUserJob3,
+                                            bool      AutoUserJob4,
+                                            int       Transcoder);
+
+    bool               UpdateRecordSchedule ( uint    RecordId,
+                                              const QString&   Title,
+                                              const QString&   Subtitle,
+                                              const QString&   Description,
+                                              const QString&   Category,
+                                              const QDateTime& dStartTimeRaw,
+                                              const QDateTime& dEndTimeRaw,
+                                              const QString&   SeriesId,
+                                              const QString&   ProgramId,
+                                              int       ChanId,
+                                              const QString&   Station,
+                                              int       FindDay,
+                                              QTime     FindTime,
+                                              bool      Inactive,
+                                              uint      Season,
+                                              uint      Episode,
+                                              const QString&   Inetref,
+                                              QString   Type,
+                                              QString   SearchType,
+                                              int       RecPriority,
+                                              uint      PreferredInput,
+                                              int       StartOffset,
+                                              int       EndOffset,
+                                              QString   DupMethod,
+                                              QString   DupIn,
+                                              bool      NewEpisOnly,
+                                              uint      Filter,
+                                              QString   RecProfile,
+                                              QString   RecGroup,
+                                              QString   StorageGroup,
+                                              QString   PlayGroup,
+                                              bool      AutoExpire,
+                                              int       MaxEpisodes,
+                                              bool      MaxNewest,
+                                              bool      AutoCommflag,
+                                              bool      AutoTranscode,
+                                              bool      AutoMetaLookup,
+                                              bool      AutoUserJob1,
+                                              bool      AutoUserJob2,
+                                              bool      AutoUserJob3,
+                                              bool      AutoUserJob4,
+                                              int       Transcoder);
+
+    bool              RemoveRecordSchedule ( uint             RecordId   );
+
+    bool              AddDontRecordSchedule( int              ChanId,
+                                              const QDateTime &StartTime,
+                                              bool             NeverRecord );
+
+    V2RecRuleList* GetRecordScheduleList( int              StartIndex,
+                                              int              Count,
+                                              const            QString  &Sort,
+                                              bool             Descending );
+
+    V2RecRule*     GetRecordSchedule    ( uint             RecordId,
+                                              const QString&   Template,
+                                              int              nRecordedId,
+                                              int              ChanId,
+                                              const QDateTime& dStartTimeRaw,
+                                              bool             MakeOverride );
+
+    bool              EnableRecordSchedule ( uint             RecordId   );
+
+    bool              DisableRecordSchedule( uint             RecordId   );
+
+    int               RecordedIdForKey( int              ChanId,
+                                        const QDateTime &recstarttsRaw );
+
+    int               RecordedIdForPathname( const QString   &pathname );
+
+    QString           RecStatusToString    ( int              RecStatus );
+
+    QString           RecStatusToDescription ( int            RecStatus,
+                                                int            RecType,
+                                                const QDateTime &StartTime );
+
+    QString           RecTypeToString      ( const QString&   RecType   );
+
+    QString           RecTypeToDescription ( const QString&   RecType   );
+
+    QString           DupMethodToString    ( const QString&   DupMethod );
+
+    QString           DupMethodToDescription ( const QString& DupMethod );
+
+    QString           DupInToString        ( const QString&   DupIn     );
+
+    QString           DupInToDescription   ( const QString&   DupIn     );
+
+    int               ManageJobQueue       ( const QString   &Action,
+                                              const QString   &JobName,
+                                              int              JobId,
+                                              int              RecordedId,
+                                                    QDateTime  jobstarttsRaw,
+                                                    QString    RemoteHost,
+                                                    QString    JobArgs   );
+
+
 
   private:
     Q_DISABLE_COPY(V2Dvr)

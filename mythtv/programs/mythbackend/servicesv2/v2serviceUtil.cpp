@@ -667,3 +667,23 @@ void V2FillInputInfo(V2Input* input, const InputInfo& inputInfo)
     input->setRecPriority(inputInfo.m_recPriority);
     input->setQuickTune(inputInfo.m_quickTune);
 }
+
+int V2CreateRecordingGroup(const QString& groupName)
+{
+    int groupID = -1;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO recgroups SET recgroup = :NAME, "
+                  "displayname = :DISPLAYNAME");
+    query.bindValue(":NAME", groupName);
+    query.bindValue(":DISPLAYNAME", groupName);
+
+    if (query.exec())
+        groupID = query.lastInsertId().toInt();
+
+    if (groupID <= 0)
+        LOG(VB_GENERAL, LOG_ERR, QString("Could not create recording group (%1). "
+                                         "Does it already exist?").arg(groupName));
+
+    return groupID;
+}
