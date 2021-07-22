@@ -5,7 +5,10 @@
 # Author: Raymond Wagner
 #-----------------------
 
-from collections import Sequence, Iterator
+try:
+    from collections.abc import Sequence, Iterator
+except ImportError:
+    from collections import Sequence, Iterator
 
 try:
     xrange
