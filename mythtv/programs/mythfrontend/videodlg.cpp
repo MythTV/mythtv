@@ -864,6 +864,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, const QString& lname,
                             ParentalLevel::plLowest)));
 
     StorageGroup::ClearGroupToUseCache();
+    MythCoreContext::ClearBackendServerPortCache();
 }
 
 VideoDialog::~VideoDialog()

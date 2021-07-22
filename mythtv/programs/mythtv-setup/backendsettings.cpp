@@ -144,14 +144,20 @@ class IpAddressSettings : public HostCheckBoxSetting
 };
 
 
+void BackendSettings::LocalServerPortChanged ()
+{
+    MythCoreContext::ClearBackendServerPortCache();
+}
 
-static HostTextEditSetting *LocalServerPort()
+HostTextEditSetting *BackendSettings::LocalServerPort() const
 {
     auto *gc = new HostTextEditSetting("BackendServerPort");
     gc->setLabel(QObject::tr("Port"));
     gc->setValue("6543");
     gc->setHelpText(QObject::tr("Unless you've got good reason, don't "
                     "change this."));
+    connect(gc,   &StandardSetting::ChangeSaved,
+            this, &BackendSettings::LocalServerPortChanged);
     return gc;
 };
 

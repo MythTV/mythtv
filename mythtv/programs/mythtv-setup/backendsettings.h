@@ -14,6 +14,8 @@ class BackendSettings : public GroupSetting
     ~BackendSettings() override;
 
   private:
+    HostTextEditSetting *LocalServerPort(void) const;
+
     TransMythUICheckBoxSetting *m_isMasterBackend   {nullptr};
     HostTextEditSetting        *m_localServerPort   {nullptr};
     HostComboBoxSetting        *m_backendServerAddr {nullptr};
@@ -29,7 +31,7 @@ class BackendSettings : public GroupSetting
   private slots:
     void masterBackendChanged(void);
     void listenChanged(void);
+    static void LocalServerPortChanged(void);
 };
 
 #endif
-
