@@ -66,6 +66,7 @@
 #include "servicesv2/v2myth.h"
 #include "servicesv2/v2video.h"
 #include "servicesv2/v2dvr.h"
+#include "servicesv2/v2content.h"
 
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")
@@ -740,6 +741,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     MythHTTPInstance::Addservices({{ VIDEO_SERVICE, &MythHTTPService::Create<V2Video> }});
     MythHTTPInstance::Addservices({{ MYTH_SERVICE, &MythHTTPService::Create<V2Myth> }});
     MythHTTPInstance::Addservices({{ DVR_SERVICE, &MythHTTPService::Create<V2Dvr> }});
+    MythHTTPInstance::Addservices({{ CONTENT_SERVICE, &MythHTTPService::Create<V2Content> }});
     auto root = std::bind(&MythHTTPRoot::RedirectRoot, std::placeholders::_1, "mythbackend.html");
     MythHTTPScopedInstance webserver({{ "/", root}});
 

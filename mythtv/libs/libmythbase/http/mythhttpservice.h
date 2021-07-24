@@ -42,6 +42,20 @@ class MBASE_PUBLIC MythHTTPService : public QObject
     HTTPRequest2 m_request{nullptr};
 };
 
+class MBASE_PUBLIC V2HttpRedirectException
+{
+    public:
+
+        QString m_hostName;
+
+        explicit V2HttpRedirectException( QString sHostName = "")
+               : m_hostName(std::move( sHostName ))
+        {}
+
+        ~V2HttpRedirectException() = default;
+};
+
+
 #define SERVICE_PROPERTY(Type, Name, name)               \
     Q_PROPERTY(Type Name READ Get##Name MEMBER m_##name USER true) \
     public:                                              \

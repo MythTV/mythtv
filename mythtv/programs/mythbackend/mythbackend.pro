@@ -80,10 +80,13 @@ HEADERS += servicesv2/v2input.h servicesv2/v2inputList.h
 HEADERS += servicesv2/v2recRuleFilter.h servicesv2/v2recRuleFilterList.h
 HEADERS += servicesv2/v2titleInfo.h servicesv2/v2titleInfoList.h
 HEADERS += servicesv2/v2recRuleList.h
+HEADERS += servicesv2/v2content.h
+HEADERS += servicesv2/v2liveStreamInfo.h servicesv2/v2liveStreamInfoList.h
 
 SOURCES += servicesv2/v2myth.cpp
 SOURCES += servicesv2/v2video.cpp
 SOURCES += servicesv2/v2dvr.cpp
+SOURCES += servicesv2/v2content.cpp
 SOURCES += servicesv2/v2serviceUtil.cpp
 
 using_oss:DEFINES += USING_OSS

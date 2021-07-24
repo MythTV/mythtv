@@ -115,6 +115,9 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
             Request->m_status = HTTPBadRequest;
             result = MythHTTPResponse::ErrorResponse(Request, msg);
         }
+        catch (V2HttpRedirectException &ex) {
+            result = MythHTTPResponse::RedirectionResponse(Request, ex.m_hostName);
+        }
 
         if (!returnvalue.isValid())
         {
