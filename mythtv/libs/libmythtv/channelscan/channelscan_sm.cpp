@@ -2179,7 +2179,12 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t transport)
         return channel->TuneMultiplex(item.m_mplexid, m_inputName);
 
     if (item.m_tuning.m_sistandard == "MPEG")
-        return channel->Tune(item.m_iptvTuning, true);
+    {
+        IPTVTuningData tuning = item.m_iptvTuning;
+        if (tuning.GetProtocol() == IPTVTuningData::inValid)
+            tuning.GuessProtocol();
+        return channel->Tune(tuning, true);
+    }
 
     const uint64_t freq = item.freq_offset(transport.offset());
     DTVMultiplex tuning = item.m_tuning;
