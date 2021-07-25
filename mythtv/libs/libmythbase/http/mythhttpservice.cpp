@@ -1,5 +1,8 @@
+#include <QFileInfo>
+
 // MythTV
 #include "mythlogging.h"
+#include "mythdate.h"
 #include "http/mythwsdl.h"
 #include "http/mythhttpservice.h"
 #include "http/mythhttprequest.h"
@@ -123,6 +126,39 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
         {
             if (!result)
                 result = MythHTTPResponse::ErrorResponse(Request, "Unknown Failure");
+        }
+        else if (returnvalue.canConvert<QFileInfo>())
+        {
+            if (!result)
+            {
+                QFileInfo info = returnvalue.value<QFileInfo>();
+                QString file = info.absoluteFilePath();
+                if (file.size() == 0)
+                {
+                    LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Invalid request for unknown file"));
+                    Request->m_status = HTTPNotFound;
+                    result =  MythHTTPResponse::ErrorResponse(Request);
+                }
+                else
+                {
+                    HTTPFile httpfile = MythHTTPFile::Create(info.fileName(),file);
+                    if (!httpfile->open(QIODevice::ReadOnly))
+                    {
+                        LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Failed to open '%1'").arg(file));
+                        Request->m_status = HTTPNotFound;
+                        result =  MythHTTPResponse::ErrorResponse(Request);
+                    }
+                    else
+                    {
+                        httpfile->m_lastModified = info.lastModified();
+                        httpfile->m_cacheType = HTTPLastModified | HTTPLongLife;
+                        LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Last modified: %2")
+                            .arg(MythDate::toString(httpfile->m_lastModified, MythDate::kOverrideUTC | MythDate::kRFC822)));
+                        // Create our response
+                        result = MythHTTPResponse::FileResponse(Request, httpfile);
+                    }
+                }
+            }
         }
         else
         {
