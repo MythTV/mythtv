@@ -139,7 +139,6 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     // Pull in DB info in transports
     // Channels not found in scan but only in DB are returned in db_trans
-    sourceid = transports[0].m_channels[0].m_sourceId;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
     msg = "";
     ssMsg << QT_ENDL;
