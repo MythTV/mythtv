@@ -45,9 +45,13 @@ MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, const QString &Me
         return;
     }
 
+    // Note
+    // tokens[0] = GET, POST, etc
+    // tokens[1] = rest of URL
+    // tokens[2] = HTTP/1.1
+
     m_type   = MythHTTP::RequestFromString(tokens[0]);
-    m_rawURL = tokens[1].toUtf8();
-    m_url    = QUrl::fromPercentEncoding(m_rawURL);
+    m_url = tokens[1];
 
     // If no version, assume HTTP/1.1
     m_version = HTTPOneDotOne;
@@ -87,14 +91,20 @@ MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, const QString &Me
     // If a host is provided, ensure we recognise it. This may be over zealous:)
     if (havehost)
     {
+
+        // Commented this check because people should be able to set up something in their
+        // hosts file that does not match the server. Then the host name in the request
+        // may not match.
+
         // N.B. host port is optional - but our host list has both versions
-        QString host = MythHTTP::GetHeader(m_headers, "host").toLower();
-        if (!Config.m_hosts.contains(host))
-        {
-            LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Invalid 'Host' header. '%1' not recognised")
-                .arg(host));
-            return;
-        }
+        // QString host = MythHTTP::GetHeader(m_headers, "host").toLower();
+        // QStringList hostParts = host.split(":");
+        // if (!Config.m_hosts.contains(hostParts[0]))
+        // {
+        //     LOG(VB_GENERAL, LOG_WARNING, LOC + QString("Invalid 'Host' header. '%1' not recognised")
+        //         .arg(host));
+        //     return;
+        // }
 
         // TODO Ensure the host address has a port - as below when we add one manually
     }
@@ -151,6 +161,8 @@ HTTPQueries MythHTTPRequest::ParseQuery(const QString &Query)
     {
         QString key   = param.section('=', 0, 0);
         QString value = param.section('=', 1);
+        QByteArray rawvalue = value.toUtf8();
+        value = QUrl::fromPercentEncoding(rawvalue);
         value.replace("+", " ");
         if (!key.isEmpty())
             result.insert(key.trimmed(), value);

@@ -21,7 +21,6 @@ class MBASE_PUBLIC MythHTTPRequest
     HTTPData    m_content { nullptr };
 
     MythHTTPStatus      m_status     { HTTPBadRequest };
-    QByteArray          m_rawURL;
     QUrl                m_url;
     QString             m_root;
     QString             m_path;
