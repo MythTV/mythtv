@@ -24,11 +24,6 @@ class SatIPRecorder : public DTVRecorder
 
     QString GetSIStandard(void) const override; // DTVRecorder
 
-    void SetOptionsFromProfile(RecordingProfile *profile,
-                               const QString &videodev,
-                               const QString &audiodev,
-                               const QString &vbidev) override; // RecorderBase
-
   private:
     bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override;  // RecorderBase
 
