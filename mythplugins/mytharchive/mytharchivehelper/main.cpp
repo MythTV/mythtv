@@ -566,7 +566,7 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
 
     // add the recordedseek table
     QDomElement recordedseek = doc.createElement("recordedseek");
-    query.prepare("SELECT chanid, starttime, mark, offset, type "
+    query.prepare("SELECT chanid, starttime, mark, `offset`, type "
             "FROM recordedseek "
             "WHERE chanid = :CHANID and starttime = :STARTTIME;");
     query.bindValue(":CHANID", chanID);
@@ -1110,7 +1110,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
                 QDomNode n6 = nodeList.item(x);
                 QDomElement e = n6.toElement();
                 query.prepare("INSERT INTO recordedseek (chanid, starttime, "
-                        "mark, offset, type)"
+                        "mark, `offset`, type)"
                         "VALUES(:CHANID,:STARTTIME,:MARK,:OFFSET,:TYPE);");
                 query.bindValue(":CHANID", chanID);
                 query.bindValue(":STARTTIME", startTime);
