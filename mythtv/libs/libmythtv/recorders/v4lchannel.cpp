@@ -16,7 +16,7 @@
 #include <iostream>
 using namespace std;
 
-#include <linux/videodev2.h>
+#include "videodev2.h" // our copy
 
 // MythTV headers
 #include "v4lchannel.h"
