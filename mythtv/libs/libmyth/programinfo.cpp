@@ -3618,14 +3618,14 @@ void ProgramInfo::QueryPositionMap(
 
     if (IsVideo())
     {
-        query.prepare("SELECT mark, offset FROM filemarkup"
+        query.prepare("SELECT mark, `offset` FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type = :TYPE ;");
         query.bindValue(":PATH", StorageGroup::GetRelativePathname(m_pathname));
     }
     else if (IsRecording())
     {
-        query.prepare("SELECT mark, offset FROM recordedseek"
+        query.prepare("SELECT mark, `offset` FROM recordedseek"
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE ;");
@@ -3783,7 +3783,7 @@ void ProgramInfo::SavePositionMap(
     QString qfields;
     if (IsVideo())
     {
-        q << "filemarkup (filename, type, mark, offset)";
+        q << "filemarkup (filename, type, mark, `offset`)";
         qfields = QString("('%1',%2,") .
             // ideally, this should be escaped
             arg(videoPath) .
@@ -3791,7 +3791,7 @@ void ProgramInfo::SavePositionMap(
     }
     else // if (IsRecording())
     {
-        q << "recordedseek (chanid, starttime, type, mark, offset)";
+        q << "recordedseek (chanid, starttime, type, mark, `offset`)";
         qfields = QString("(%1,'%2',%3,") .
             arg(m_chanId) .
             arg(m_recStartTs.toString(Qt::ISODate)) .
@@ -3851,7 +3851,7 @@ void ProgramInfo::SavePositionMapDelta(
     QString qfields;
     if (IsVideo())
     {
-        q << "filemarkup (filename, type, mark, offset)";
+        q << "filemarkup (filename, type, mark, `offset`)";
         qfields = QString("('%1',%2,") .
             // ideally, this should be escaped
             arg(StorageGroup::GetRelativePathname(m_pathname)) .
@@ -3859,7 +3859,7 @@ void ProgramInfo::SavePositionMapDelta(
     }
     else if (IsRecording())
     {
-        q << "recordedseek (chanid, starttime, type, mark, offset)";
+        q << "recordedseek (chanid, starttime, type, mark, `offset`)";
         qfields = QString("(%1,'%2',%3,") .
             arg(m_chanId) .
             arg(m_recStartTs.toString(Qt::ISODate)) .
@@ -3898,56 +3898,56 @@ void ProgramInfo::SavePositionMapDelta(
 }
 
 static const char *from_filemarkup_offset_asc =
-    "SELECT mark, offset FROM filemarkup"
+    "SELECT mark, `offset` FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
     " AND mark >= :QUERY_ARG"
     " ORDER BY filename ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_filemarkup_offset_desc =
-    "SELECT mark, offset FROM filemarkup"
+    "SELECT mark, `offset` FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
     " AND mark <= :QUERY_ARG"
     " ORDER BY filename DESC, type DESC, mark DESC LIMIT 1;";
 static const char *from_recordedseek_offset_asc =
-    "SELECT mark, offset FROM recordedseek"
+    "SELECT mark, `offset` FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
     " AND mark >= :QUERY_ARG"
     " ORDER BY chanid ASC, starttime ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_recordedseek_offset_desc =
-    "SELECT mark, offset FROM recordedseek"
+    "SELECT mark, `offset` FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
     " AND mark <= :QUERY_ARG"
     " ORDER BY chanid DESC, starttime DESC, type DESC, mark DESC LIMIT 1;";
 static const char *from_filemarkup_mark_asc =
-    "SELECT offset,mark FROM filemarkup"
+    "SELECT `offset`,mark FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
-    " AND offset >= :QUERY_ARG"
+    " AND `offset` >= :QUERY_ARG"
     " ORDER BY filename ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_filemarkup_mark_desc =
-    "SELECT offset,mark FROM filemarkup"
+    "SELECT `offset`,mark FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
-    " AND offset <= :QUERY_ARG"
+    " AND `offset` <= :QUERY_ARG"
     " ORDER BY filename DESC, type DESC, mark DESC LIMIT 1;";
 static const char *from_recordedseek_mark_asc =
-    "SELECT offset,mark FROM recordedseek"
+    "SELECT `offset`,mark FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
-    " AND offset >= :QUERY_ARG"
+    " AND `offset` >= :QUERY_ARG"
     " ORDER BY chanid ASC, starttime ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_recordedseek_mark_desc =
-    "SELECT offset,mark FROM recordedseek"
+    "SELECT `offset`,mark FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
-    " AND offset <= :QUERY_ARG"
+    " AND `offset` <= :QUERY_ARG"
     " ORDER BY chanid DESC, starttime DESC, type DESC, mark DESC LIMIT 1;";
 
 bool ProgramInfo::QueryKeyFrameInfo(uint64_t * result,
@@ -4368,7 +4368,7 @@ void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
     // Get the markup
     if (IsVideo())
     {
-        query.prepare("SELECT type, mark, offset FROM filemarkup"
+        query.prepare("SELECT type, mark, `offset` FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type NOT IN (:KEYFRAME,:DURATION)"
                       " ORDER BY mark, type;");
@@ -4408,7 +4408,7 @@ void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
     // Get the seektable
     if (IsVideo())
     {
-        query.prepare("SELECT type, mark, offset FROM filemarkup"
+        query.prepare("SELECT type, mark, `offset` FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type IN (:KEYFRAME,:DURATION)"
                       " ORDER BY mark, type;");
@@ -4418,7 +4418,7 @@ void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
     }
     else if (IsRecording())
     {
-        query.prepare("SELECT type, mark, offset FROM recordedseek"
+        query.prepare("SELECT type, mark, `offset` FROM recordedseek"
                       " WHERE chanid = :CHANID"
                       " AND STARTTIME = :STARTTIME"
                       " ORDER BY mark, type");
@@ -4481,7 +4481,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 else
                 {
                     query.prepare("INSERT INTO filemarkup"
-                                  " (filename,type,mark,offset)"
+                                  " (filename,type,mark,`offset`)"
                                   " VALUES (:PATH,:TYPE,:MARK,:OFFSET)");
                     query.bindValue(":OFFSET", (quint64)entry.data);
                 }
@@ -4524,7 +4524,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 }
                 const MarkupEntry &entry = mapSeek[i];
                 query.prepare("INSERT INTO filemarkup"
-                              " (filename,type,mark,offset)"
+                              " (filename,type,mark,`offset`)"
                               " VALUES (:PATH,:TYPE,:MARK,:OFFSET)");
                 query.bindValue(":PATH", path);
                 query.bindValue(":TYPE", entry.type);
@@ -4613,7 +4613,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 }
                 const MarkupEntry &entry = mapSeek[i];
                 query.prepare("INSERT INTO recordedseek"
-                              " (chanid,starttime,type,mark,offset)"
+                              " (chanid,starttime,type,mark,`offset`)"
                               " VALUES (:CHANID,:STARTTIME,"
                               "         :TYPE,:MARK,:OFFSET)");
                 query.bindValue(":CHANID", m_chanId);
