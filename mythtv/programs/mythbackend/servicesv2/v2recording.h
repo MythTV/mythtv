@@ -36,9 +36,12 @@ class V2RecordingInfo : public QObject
     SERVICE_PROPERTY2( QString                , RecGroup    )
     SERVICE_PROPERTY2( QString                , StorageGroup)
     SERVICE_PROPERTY2( QString                , PlayGroup   )
-    SERVICE_PROPERTY2( RecordingType          , RecType     )
-    SERVICE_PROPERTY2( RecordingDupInType     , DupInType   )
-    SERVICE_PROPERTY2( RecordingDupMethodType , DupMethod   )
+    // This is actually enum type RecordingType
+    SERVICE_PROPERTY2( int                    , RecType     )
+    // This is actually enum type RecordingDupInType
+    SERVICE_PROPERTY2( int                    , DupInType   )
+    // This is actually enum type RecordingDupMethodType
+    SERVICE_PROPERTY2( int                    , DupMethod   )
     SERVICE_PROPERTY2( int                    , EncoderId   )
     SERVICE_PROPERTY2( QString                , EncoderName )
     SERVICE_PROPERTY2( QString                , Profile     )
