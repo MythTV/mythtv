@@ -44,7 +44,7 @@ jobs:
         sudo apt install libavahi-compat-libdnssd-dev libasound2-dev liblzo2-dev libhdhomerun-dev libsamplerate0-dev libva-dev libdrm-dev libvdpau-dev
         sudo apt install libass-dev libpulse-dev libcec-dev libfftw3-dev libssl-dev libtag1-dev libbluray-dev libbluray-bdj libgnutls28-dev libqt5webkit5-dev
         sudo apt install libvpx-dev python3-mysqldb python3-lxml python3-simplejson python3-future libdbi-perl libdbd-mysql-perl libnet-upnp-perl
-        sudo apt install libio-socket-inet6-perl libxml-simple-perl libqt5sql5-mysql libwayland-dev qtbase5-private-dev
+        sudo apt install libio-socket-inet6-perl libxml-simple-perl libqt5sql5-mysql libwayland-dev qtbase5-private-dev libzip-dev
       if: runner.os == 'Linux'
       
     - name: Install core dependencies (macOS)

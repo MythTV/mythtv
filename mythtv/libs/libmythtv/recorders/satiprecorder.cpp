@@ -182,14 +182,3 @@ QString SatIPRecorder::GetSIStandard(void) const
 {
     return m_channel->GetSIStandard();
 }
-
-void SatIPRecorder::SetOptionsFromProfile(RecordingProfile *profile,
-                                          const QString &videodev,
-                                          const QString &/*audiodev*/,
-                                          const QString &/*vbidev*/)
-{
-    // We don't want to call DTVRecorder::SetOptionsFromProfile() since
-    // we do not have a "recordingtype" in our profile.
-    DTVRecorder::SetOption("videodevice", videodev);
-    SetIntOption(profile, "recordmpts");
-}

@@ -88,6 +88,8 @@ QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 
 #define kDecryptionTimeout 4250
 
+static const QString kATSCChannelFormat = "%1_%2";
+
 class ScannedChannelInfo
 {
   public:
@@ -141,20 +143,20 @@ class ScannedChannelInfo
  *
  */
 
-ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
-                             const QString &_cardtype, ChannelBase *_channel,
-                             int _sourceID, std::chrono::milliseconds signal_timeout,
-                             std::chrono::milliseconds channel_timeout, QString _inputname,
+ChannelScanSM::ChannelScanSM(ScanMonitor *scan_monitor,
+                             const QString &cardtype, ChannelBase *channel,
+                             int sourceID, std::chrono::milliseconds signal_timeout,
+                             std::chrono::milliseconds channel_timeout, QString inputname,
                              bool test_decryption)
     : // Set in constructor
-      m_scanMonitor(_scan_monitor),
-      m_channel(_channel),
-      m_signalMonitor(SignalMonitor::Init(_cardtype, m_channel->GetInputID(),
-                                          _channel, true)),
-      m_sourceID(_sourceID),
+      m_scanMonitor(scan_monitor),
+      m_channel(channel),
+      m_signalMonitor(SignalMonitor::Init(cardtype, m_channel->GetInputID(),
+                                          channel, true)),
+      m_sourceID(sourceID),
       m_signalTimeout(signal_timeout),
       m_channelTimeout(channel_timeout),
-      m_inputName(std::move(_inputname)),
+      m_inputName(std::move(inputname)),
       m_testDecryption(test_decryption),
       // Misc
       m_analogSignalHandler(new AnalogSignalHandler(this))
@@ -173,7 +175,7 @@ ChannelScanSM::ChannelScanSM(ScanMonitor *_scan_monitor,
                 "SELECT dvb_nit_id, bouquet_id, region_id, lcnoffset "
                 "FROM videosource "
                 "WHERE videosource.sourceid = :SOURCEID");
-        query.bindValue(":SOURCEID", _sourceID);
+        query.bindValue(":SOURCEID", m_sourceID);
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("ChannelScanSM", query);
@@ -1055,9 +1057,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         {
             TransportScanItem &item = *m_current;
             item.m_tuning.m_frequency = item.freq_offset(m_current.offset());
-            item.m_signalStrength = m_signalMonitor->GetSignalStrength();
-            item.m_networkID = dtv_sm->GetNetworkID();
-            item.m_transportID = dtv_sm->GetTransportID();
+            item.m_signalStrength     = m_signalMonitor->GetSignalStrength();
+            item.m_networkID          = dtv_sm->GetNetworkID();
+            item.m_transportID        = dtv_sm->GetTransportID();
 
             if (m_scanDTVTunerType == DTVTunerType::kTunerTypeDVBC)
             {
@@ -1201,7 +1203,7 @@ static void update_info(ChannelInsertInfo &info,
                         const ServiceDescriptionTable *sdt, uint i,
                         const QMap<uint64_t, QString> &defAuthorities)
 {
-    // HACK beg -- special exception for these networks
+    // HACK begin -- special exception for these networks
     // this enables useonairguide by default for all matching channels
     //             (dbver == "1067")
     bool force_guide_present = (
@@ -1448,6 +1450,10 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             {
                 info.m_chanNum = QString::number(((info.m_atscMajorChannel & 0x00F) << 10) + info.m_atscMinorChannel);
             }
+            else
+            {
+                info.m_chanNum = kATSCChannelFormat.arg(info.m_atscMajorChannel).arg(info.m_atscMinorChannel);
+            }
         }
     }
 
@@ -1459,6 +1465,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             uint pnum = tvct->ProgramNumber(i);
             PCM_INFO_INIT("atsc");
             update_info(info, tvct, i);
+            info.m_chanNum = kATSCChannelFormat.arg(info.m_atscMajorChannel).arg(info.m_atscMinorChannel);
         }
     }
 
@@ -1698,23 +1705,6 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     // ------------------------------------------------------------------------
 
-    // Get IPTV channel numbers
-    for (dbchan_it = pnum_to_dbchan.begin();
-         dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
-    {
-        ChannelInsertInfo &info = *dbchan_it;
-
-        if (!info.m_chanNum.isEmpty())
-            continue;
-
-        if (!iptv_channel.isEmpty())
-        {
-            info.m_chanNum = iptv_channel;
-            if (info.m_serviceId)
-                info.m_chanNum += "-" + QString::number(info.m_serviceId);
-        }
-    }
-
     // Get DVB Logical Channel Numbers
     for (dbchan_it = pnum_to_dbchan.begin();
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
@@ -1797,6 +1787,23 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                     .arg(info.m_freqId)
                     .arg(info.m_serviceId);
             }
+        }
+    }
+
+    // Get IPTV channel numbers
+    for (dbchan_it = pnum_to_dbchan.begin();
+         dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
+    {
+        ChannelInsertInfo &info = *dbchan_it;
+
+        if (!info.m_chanNum.isEmpty())
+            continue;
+
+        if (!iptv_channel.isEmpty())
+        {
+            info.m_chanNum = iptv_channel;
+            if (info.m_serviceId)
+                info.m_chanNum += "-" + QString::number(info.m_serviceId);
         }
     }
 
@@ -2179,7 +2186,12 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t transport)
         return channel->TuneMultiplex(item.m_mplexid, m_inputName);
 
     if (item.m_tuning.m_sistandard == "MPEG")
-        return channel->Tune(item.m_iptvTuning, true);
+    {
+        IPTVTuningData tuning = item.m_iptvTuning;
+        if (tuning.GetProtocol() == IPTVTuningData::inValid)
+            tuning.GuessProtocol();
+        return channel->Tune(tuning, true);
+    }
 
     const uint64_t freq = item.freq_offset(transport.offset());
     DTVMultiplex tuning = item.m_tuning;

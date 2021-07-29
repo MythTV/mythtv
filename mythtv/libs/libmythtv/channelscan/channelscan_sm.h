@@ -91,10 +91,10 @@ class ChannelScanSM : public MPEGStreamListener,
     friend class AnalogSignalHandler;
 
   public:
-    ChannelScanSM(ScanMonitor *_scan_monitor,
-                  const QString &_cardtype, ChannelBase* _channel, int _sourceID,
+    ChannelScanSM(ScanMonitor *scan_monitor,
+                  const QString &cardtype, ChannelBase* channel, int sourceID,
                   std::chrono::milliseconds signal_timeout, std::chrono::milliseconds channel_timeout,
-                  QString _inputname, bool test_decryption);
+                  QString inputname, bool test_decryption);
     ~ChannelScanSM() override;
 
     void StartScanner(void);
