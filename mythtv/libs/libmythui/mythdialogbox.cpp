@@ -137,7 +137,7 @@ bool MythDialogBox::Create(void)
         return false;
 
     bool err = false;
-    if (m_titlearea)
+    if (m_fullscreen)
         UIUtilW::Assign(this, m_titlearea, "title");
     UIUtilE::Assign(this, m_textarea, "messagearea", &err);
     UIUtilE::Assign(this, m_buttonList, "list", &err);
