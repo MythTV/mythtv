@@ -10,6 +10,7 @@
 #include "remoteutil.h"
 
 // libmythtv
+#include "channelutil.h"
 #include "recordinginfo.h"
 #include "tvremoteutil.h"
 
@@ -287,50 +288,50 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
 
     QString timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
-    QString message = recinfo.toString(ProgramInfo::kTitleSubtitle, " - ");
+    QString message = QString("%1 - %2  %3\n")
+        .arg(recinfo.GetRecordingStartTime().toLocalTime().toString(timeFormat),
+             recinfo.GetRecordingEndTime().toLocalTime().toString(timeFormat),
+             recinfo.toString(ProgramInfo::kTitleSubtitle, " - "));
 
-    message += "\n\n";
+    message += "\n";
     message += RecStatus::toDescription(recinfo.GetRecordingStatus(),
-                             recinfo.GetRecordingRuleType(),
-                             recinfo.GetRecordingStartTime());
+                                        recinfo.GetRecordingRuleType(),
+                                        recinfo.GetRecordingStartTime());
 
+    QString messageConflict;
     if (recinfo.GetRecordingStatus() == RecStatus::Conflict ||
         recinfo.GetRecordingStatus() == RecStatus::LaterShowing)
     {
         vector<ProgramInfo *> *confList = RemoteGetConflictList(&recinfo);
+        uint chanid = recinfo.GetChanID();
+        uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
 
-        if (!confList->empty())
+        for (auto *p : *confList)
         {
-            message += " ";
-            message += tr("The following programs will be recorded instead:");
-            message += "\n";
-        }
-
-        uint maxi = 0;
-        for (; confList->begin() != confList->end() && maxi < 4; maxi++)
-        {
-            ProgramInfo *p = *confList->begin();
-            message += QString("%1 - %2  %3\n")
-                .arg(p->GetRecordingStartTime()
-                     .toLocalTime().toString(timeFormat),
-                     p->GetRecordingEndTime()
-                     .toLocalTime().toString(timeFormat),
-                     p->toString(ProgramInfo::kTitleSubtitle, " - "));
+            if (sourceid == p->GetSourceID())
+            {
+                messageConflict += QString("%1 - %2  %3\n")
+                    .arg(p->GetRecordingStartTime().toLocalTime().toString(timeFormat),
+                         p->GetRecordingEndTime().toLocalTime().toString(timeFormat),
+                         p->toString(ProgramInfo::kTitleSubtitle, " - "));
+            }
             delete p;
-            confList->erase(confList->begin());
-        }
-        message += "\n";
-        while (!confList->empty())
-        {
-            delete confList->back();
-            confList->pop_back();
         }
         delete confList;
     }
 
+    if (!messageConflict.isEmpty())
+    {
+        message += " ";
+        message += tr("The following programs will be recorded instead:");
+        message += "\n";
+        message += messageConflict;
+        message += "\n";
+    }
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    auto *menuPopup = new MythDialogBox(message, popupStack,
-                                        "recOptionPopup", true);
+    auto *menuPopup = new MythDialogBox(message, popupStack, "recOptionPopup", true);
+
     if (!menuPopup->Create())
     {
         delete menuPopup;
