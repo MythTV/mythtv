@@ -995,7 +995,7 @@ bool RecordingInfo::InsertRecording(const QString &ext, bool force_match)
 #if 1
     if (!dirname.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("InsertRecording: m_pathname was '%1'. "
                     "This is usually blank.").arg(dirname));
     }
