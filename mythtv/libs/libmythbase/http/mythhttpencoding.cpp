@@ -244,7 +244,7 @@ MythHTTPEncode MythHTTPEncoding::Compress(MythHTTPResponse* Response, int64_t& S
     // We need something to compress/chunk
     auto data = std::get_if<HTTPData>(&Response->m_response);
     auto file = std::get_if<HTTPFile>(&Response->m_response);
-    if (!(data || file))
+    if (!data || file)
         return result;
 
     // Don't touch range requests. They do not work with compression and there
