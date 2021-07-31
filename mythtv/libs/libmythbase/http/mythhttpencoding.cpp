@@ -244,7 +244,7 @@ MythHTTPEncode MythHTTPEncoding::Compress(MythHTTPResponse* Response, int64_t& S
     // We need something to compress/chunk
     auto data = std::get_if<HTTPData>(&Response->m_response);
     auto file = std::get_if<HTTPFile>(&Response->m_response);
-    if (!data || file)
+    if (!(data || file))
         return result;
 
     // Don't touch range requests. They do not work with compression and there
@@ -260,6 +260,10 @@ MythHTTPEncode MythHTTPEncoding::Compress(MythHTTPResponse* Response, int64_t& S
 
     // Chunking is HTTP/1.1 only - and must be supported
     bool chunkable = Response->m_version == HTTPOneDotOne;
+
+    // Has the client requested no chunking by specifying identity?
+    bool allowchunk = ! MythHTTP::GetHeader(Response->m_requestHeaders, "accept-encoding").toLower().contains("identity");
+
     // and restrict to 'chunky' files
     bool chunky = Size > 102400; // 100KB
 
@@ -275,14 +279,13 @@ MythHTTPEncode MythHTTPEncoding::Compress(MythHTTPResponse* Response, int64_t& S
 
     // Decision time
     bool gzip  = wantgzip && gzipsize && compressable;
-    bool chunk = chunkable && chunky;
+    bool chunk = chunkable && chunky && allowchunk;
 
     if (!gzip)
     {
         // Chunking happens as we write to the socket, so flag it as required
         if (chunk)
         {
-            // Disabled for now
             result = HTTPChunked;
             if (data) (*data)->m_encoding = result;
             if (file) (*file)->m_encoding = result;
