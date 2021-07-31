@@ -5910,6 +5910,8 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
  *  \param sort            sort order, negative for descending, 0 for
  *                         unsorted, positive for ascending
  *  \param sortBy          comma separated list of fields to sort by
+ *  \param ignoreLiveTV    don't return LiveTV recordings
+ *  \param ignoreDeleted   don't return deleted recordings
  *  \return true if it succeeds, false if it fails.
  *  \sa QueryInUseMap(void)
  *      QueryJobsRunning(int)
@@ -5922,7 +5924,9 @@ bool LoadFromRecorded(
     const QMap<QString,bool> &isJobRunning,
     const QMap<QString, ProgramInfo*> &recMap,
     int sort,
-    const QString &sortBy)
+    const QString &sortBy,
+    bool ignoreLiveTV,
+    bool ignoreDeleted)
 {
     destination.clear();
 
@@ -5932,8 +5936,19 @@ bool LoadFromRecorded(
     // ----------------------------------------------------------------------
 
     QString thequery = ProgramInfo::kFromRecordedQuery;
-    if (possiblyInProgressRecordingsOnly)
-        thequery += "WHERE r.endtime >= NOW() AND r.starttime <= NOW() ";
+    if (possiblyInProgressRecordingsOnly || ignoreLiveTV || ignoreDeleted)
+    {
+        thequery += "WHERE ";
+        if (possiblyInProgressRecordingsOnly)
+            thequery += "(r.endtime >= NOW() AND r.starttime <= NOW()) ";
+        if (ignoreLiveTV)
+            thequery += QString("%1 r.recgroup != 'LiveTV' ")
+                                .arg(possiblyInProgressRecordingsOnly ? "AND" : "");
+        if (ignoreDeleted)
+            thequery += QString("%1 r.recgroup != 'Deleted' ")
+                            .arg((possiblyInProgressRecordingsOnly || ignoreLiveTV)
+                            ? "AND" : "");
+    }
 
     if (sortBy.isEmpty())
     {
