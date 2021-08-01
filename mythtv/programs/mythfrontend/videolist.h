@@ -61,6 +61,9 @@ class VideoList
     class VideoListImp *m_imp;
 };
 
+int AddFileNode(MythGenericTree *where_to_add, const QString& name,
+                VideoMetadata *metadata);
+
 class VideoMetadata;
 class TreeNodeData
 {
