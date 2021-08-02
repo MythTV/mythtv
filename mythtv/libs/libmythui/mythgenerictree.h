@@ -17,6 +17,13 @@
 
 class SortableMythGenericTreeList;
 
+using mgtCbFn = QString (*)(const QString &name, void *data);
+struct mgtCbInfo
+{
+    mgtCbFn fn   {nullptr};
+    void*   data {nullptr};
+};
+
 class MUI_PUBLIC MythGenericTree
 {
     using IntVector = QVector<int>;
@@ -71,6 +78,7 @@ class MUI_PUBLIC MythGenericTree
     void SetText(const QString &text, const QString &name="",
                  const QString &state="");
     void SetTextFromMap(const InfoMap &infoMap, const QString &state="");
+    void SetTextCb(mgtCbFn fn, void *data);
     QString GetText(const QString &name="") const;
 
     QString GetSortText() const { return m_sortText; }
@@ -78,10 +86,12 @@ class MUI_PUBLIC MythGenericTree
 
     void SetImage(const QString &filename, const QString &name="");
     void SetImageFromMap(const InfoMap &infoMap);
+    void SetImageCb(mgtCbFn fn, void *data);
     QString GetImage(const QString &name="") const;
 
     void DisplayState(const QString &state, const QString &name="");
     void DisplayStateFromMap(const InfoMap &infoMap);
+    void SetStateCb(mgtCbFn fn, void *data);
     QString GetState(const QString &name="") const;
 
     void SetData(QVariant data) { m_data = std::move(data); }
@@ -122,6 +132,9 @@ class MUI_PUBLIC MythGenericTree
     QMap<QString, TextProperties> m_strings;
     InfoMap m_imageFilenames;
     InfoMap m_states;
+    mgtCbInfo m_textCb;
+    mgtCbInfo m_imageCb;
+    mgtCbInfo m_stateCb;
     int      m_int                          {0};
     QVariant m_data                         {0};
     uint     m_visibleCount                 {0};

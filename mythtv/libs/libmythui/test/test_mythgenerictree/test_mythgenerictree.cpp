@@ -94,6 +94,87 @@ void TestMythGenericTree::test_state(void)
     QCOMPARE(QString("tres"), node.GetState("three"));
 }
 
+static QString test_cb_fn(const QString &name, void *data)
+{
+    Q_UNUSED(data);
+    if (name == QStringLiteral("key2"))
+        return QStringLiteral("beta");
+    if (name == QStringLiteral("key3"))
+        return QStringLiteral("gamma");
+    if (name == QStringLiteral("two"))
+        return QStringLiteral("dos");
+    if (name == QStringLiteral("three"))
+        return QStringLiteral("tres");
+    return QString();
+}
+
+void TestMythGenericTree::test_text_cb(void)
+{
+    MythGenericTree node("title");
+    node.SetTextCb(test_cb_fn, nullptr);
+
+    QCOMPARE(QString("title"), node.GetText());
+
+    node.SetText("new title");
+    QCOMPARE(QString("new title"), node.GetText());
+
+    node.SetText("alpha", "key1");
+    QCOMPARE(QString("alpha"), node.GetText("key1"));
+    QCOMPARE(QString("beta"),  node.GetText("key2"));
+    QCOMPARE(QString("gamma"), node.GetText("key3"));
+
+    node.SetText("delta", "key1");
+    QCOMPARE(QString("delta"), node.GetText("key1"));
+
+    InfoMap map = {{"one", "uno"}};
+    node.SetTextFromMap(map);
+    QCOMPARE(QString("uno"),  node.GetText("one"));
+    QCOMPARE(QString("dos"),  node.GetText("two"));
+    QCOMPARE(QString("tres"), node.GetText("three"));
+}
+
+void TestMythGenericTree::test_image_cb(void)
+{
+    MythGenericTree node("no title");
+
+    node.SetImageCb(test_cb_fn, nullptr);
+
+    node.SetImage("alpha", "key1");
+    QCOMPARE(QString("alpha"), node.GetImage("key1"));
+    QCOMPARE(QString("beta"),  node.GetImage("key2"));
+    QCOMPARE(QString("gamma"), node.GetImage("key3"));
+
+    node.SetImage("delta", "key1");
+    QCOMPARE(QString("delta"), node.GetImage("key1"));
+
+    InfoMap map = {{"one", "uno"}};
+    node.SetImageFromMap(map);
+    QCOMPARE(QString("uno"),  node.GetImage("one"));
+    QCOMPARE(QString("dos"),  node.GetImage("two"));
+    QCOMPARE(QString("tres"), node.GetImage("three"));
+}
+
+void TestMythGenericTree::test_state_cb(void)
+{
+    MythGenericTree node("no title");
+
+    node.SetStateCb(test_cb_fn, nullptr);
+
+    node.DisplayState("alpha", "key1");
+    QCOMPARE(QString("alpha"), node.GetState("key1"));
+    QCOMPARE(QString("beta"),  node.GetState("key2"));
+    QCOMPARE(QString("gamma"), node.GetState("key3"));
+
+    node.DisplayState("delta", "key1");
+    QCOMPARE(QString("delta"), node.GetState("key1"));
+
+    InfoMap map = {{"one", "uno"}};
+    node.DisplayStateFromMap(map);
+    QCOMPARE(QString("uno"),  node.GetState("one"));
+    QCOMPARE(QString("dos"),  node.GetState("two"));
+    QCOMPARE(QString("tres"), node.GetState("three"));
+}
+
 void TestMythGenericTree::cleanupTestCase()
 {
 }

@@ -301,30 +301,19 @@ int AddFileNode(MythGenericTree *where_to_add, const QString& name,
 {
     MythGenericTree *sub_node = where_to_add->addNode(name, 0, true);
     sub_node->SetData(QVariant::fromValue(TreeNodeData(metadata)));
-
-    // Text
-    InfoMap textMap;
-    metadata->toMap(textMap);
-    sub_node->SetTextFromMap(textMap);
-
-    // Images
-    InfoMap imageMap;
-    metadata->GetImageMap(imageMap);
-    sub_node->SetImageFromMap(imageMap);
-    sub_node->SetImage("buttonimage", imageMap["smartimage"]);
+    sub_node->SetTextCb( &VideoMetadata::MetadataGetTextCb, metadata);
+    sub_node->SetImageCb(&VideoMetadata::MetadataGetImageCb, metadata);
+    sub_node->SetStateCb(&VideoMetadata::MetadataGetStateCb, metadata);
 
     // Assign images to parent node if this is the first child
     if (where_to_add->visibleChildCount() == 1 &&
         where_to_add->getInt() == kSubFolder)
     {
+        InfoMap imageMap;
+        metadata->GetImageMap(imageMap);
         where_to_add->SetImageFromMap(imageMap);
         where_to_add->SetImage("buttonimage", imageMap["smartimage"]);
     }
-
-    // Statetypes
-    InfoMap stateMap;
-    metadata->GetStateMap(stateMap);
-    sub_node->DisplayStateFromMap(stateMap);
 
     return 1;
 }

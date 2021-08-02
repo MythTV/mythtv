@@ -31,5 +31,10 @@ private slots:
     static void test_text(void);
     static void test_image(void);
     static void test_state(void);
+
+    static void test_text_cb(void);
+    static void test_image_cb(void);
+    static void test_state_cb(void);
+
     static void cleanupTestCase();
 };

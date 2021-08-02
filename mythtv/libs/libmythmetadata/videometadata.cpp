@@ -331,6 +331,7 @@ class VideoMetadataImp
     bool IsHostSet() const;
 
     void GetImageMap(InfoMap &imageMap) const;
+    QString GetImage(const QString &name) const;
 
   private:
     void fillCountries();
@@ -954,6 +955,71 @@ void VideoMetadataImp::GetImageMap(InfoMap &imageMap) const
     imageMap["smartimage"] = smartimage;
 }
 
+// This should be the equivalent of GetImageMap, only the image names
+// are computed one at a time as needed.
+QString VideoMetadataImp::GetImage(const QString& name) const
+{
+    if ((name == QStringLiteral(u"coverfile")) ||
+        (name == QStringLiteral(u"coverart")))
+    {
+        QString coverfile = GetCoverFile();
+        if (IsHostSet()
+            && !coverfile.startsWith(u'/')
+            && !coverfile.isEmpty()
+            && !IsDefaultCoverFile(coverfile))
+            return generate_file_url(QStringLiteral(u"Coverart"), GetHost(),
+                                     coverfile);
+        return coverfile;
+    }
+
+    if ((name == QStringLiteral(u"screenshotfile")) ||
+        (name == QStringLiteral(u"screenshot")))
+    {
+        QString screenshot = GetScreenshot();
+        if (IsHostSet() && !screenshot.startsWith(u'/')
+            && !screenshot.isEmpty())
+            return generate_file_url(QStringLiteral(u"Screenshots"),
+                                     GetHost(), screenshot);
+        return screenshot;
+    }
+
+    if ((name == QStringLiteral(u"bannerfile")) ||
+        (name == QStringLiteral(u"banner")))
+    {
+        QString bannerfile = GetBanner();
+        if (IsHostSet() && !bannerfile.startsWith(u'/')
+            && !bannerfile.isEmpty())
+            return generate_file_url(QStringLiteral(u"Banners"), GetHost(),
+                                     bannerfile);
+        return bannerfile;
+    }
+
+    if ((name == QStringLiteral(u"fanartfile")) ||
+        (name == QStringLiteral(u"fanart")))
+    {
+        QString fanartfile = GetFanart();
+        if (IsHostSet() && !fanartfile.startsWith('/')
+            && !fanartfile.isEmpty())
+            return generate_file_url(QStringLiteral(u"Fanart"), GetHost(),
+                                     fanartfile);
+        return fanartfile;
+    }
+
+    if ((name == QStringLiteral(u"smartimage")) ||
+        (name == QStringLiteral(u"buttonimage")))
+    {
+        if (GetSeason() > 0 || GetEpisode() > 0)
+        {
+            QString screenshotfile = GetImage("screenshot");
+            if (!screenshotfile.isEmpty())
+                return screenshotfile;
+        }
+        return GetImage("coverart");
+    }
+
+    return QString();
+}
+
 ////////////////////////////////////////
 //// Metadata
 ////////////////////////////////////////
@@ -1265,6 +1331,93 @@ void VideoMetadata::toMap(InfoMap &metadataMap)
     metadataMap["category"] = GetCategory();
 }
 
+// This should be the equivalent of toMap, only the text strings
+// are computed one at a time as needed.
+QString VideoMetadata::GetText(const QString& name) const
+{
+    if (name == QStringLiteral(u"filename"))
+        return GetFilename();
+    if (name == QStringLiteral(u"sortfilename"))
+        return GetSortFilename();
+    if (name == QStringLiteral(u"title"))
+        return GetTitle();
+    if (name == QStringLiteral(u"sorttitle"))
+        return GetSortTitle();
+    if (name == QStringLiteral(u"subtitle"))
+        return GetSubtitle();
+    if (name == QStringLiteral(u"sortsubtitle"))
+        return GetSortSubtitle();
+    if (name == QStringLiteral(u"tagline"))
+        return GetTagline();
+    if (name == QStringLiteral(u"director"))
+        return GetDirector();
+    if (name == QStringLiteral(u"studio"))
+        return GetStudio();
+    if ((name == QStringLiteral(u"description")) ||
+        (name == QStringLiteral(u"description0")))
+        return GetPlot();
+    if (name == QStringLiteral(u"genres"))
+        return GetDisplayGenres(*this);
+    if (name == QStringLiteral(u"countries"))
+        return GetDisplayCountries(*this);
+    if (name == QStringLiteral(u"cast"))
+        return GetDisplayCast(*this).join(", ");
+    if (name == QStringLiteral(u"rating"))
+        return GetDisplayRating(GetRating());
+    if (name == QStringLiteral(u"length"))
+        return GetDisplayLength(GetLength());
+    if (name == QStringLiteral(u"playcount"))
+        return QString::number(GetPlayCount());
+    if (name == QStringLiteral(u"year"))
+        return GetDisplayYear(GetYear());
+
+    if (name == QStringLiteral(u"releasedate"))
+        return MythDate::toString(GetReleaseDate(), MythDate::kDateFull | MythDate::kAddYear);
+
+    if (name == QStringLiteral(u"userrating"))
+        return GetDisplayUserRating(GetUserRating());
+
+    if (GetSeason() > 0 || GetEpisode() > 0)
+    {
+        if (name == QStringLiteral(u"season"))
+            return format_season_and_episode(GetSeason(), 1);
+        if (name == QStringLiteral(u"episode"))
+            return format_season_and_episode(GetEpisode(), 1);
+        if ((name == QStringLiteral(u"s##e##")) ||
+            (name == QStringLiteral(u"s00e00")))
+        {
+            return QStringLiteral(u"s%1e%2")
+                .arg(format_season_and_episode(GetSeason(), 2),
+                     format_season_and_episode(GetEpisode(), 2));
+        }
+        if ((name == QStringLiteral(u"##x##")) ||
+            (name == QStringLiteral(u"00x00")))
+        {
+            return QStringLiteral(u"%1x%2")
+                .arg(format_season_and_episode(GetSeason(), 1),
+                     format_season_and_episode(GetEpisode(), 2));
+        }
+    }
+
+    if (name == QStringLiteral(u"insertdate"))
+        return MythDate::toString(
+            GetInsertdate(), MythDate::kDateFull | MythDate::kAddYear);
+    if (name == QStringLiteral(u"inetref"))
+        return GetInetRef();
+    if (name == QStringLiteral(u"homepage"))
+        return GetHomepage();
+    if (name == QStringLiteral(u"child_id"))
+        return QString::number(GetChildID());
+    if (name == QStringLiteral(u"browseable"))
+        return GetDisplayBrowse(GetBrowse());
+    if (name == QStringLiteral(u"watched"))
+        return GetDisplayWatched(GetWatched());
+    if (name == QStringLiteral(u"processed"))
+        return GetDisplayProcessed(GetProcessed());
+    if (name == QStringLiteral(u"category"))
+        return GetCategory();
+    return QString();
+}
 
 void VideoMetadata::GetStateMap(InfoMap &stateMap) const
 {
@@ -1275,9 +1428,29 @@ void VideoMetadata::GetStateMap(InfoMap &stateMap) const
     stateMap["videolevel"] = ParentalLevelToState(GetShowLevel());
 }
 
+// This should be the equivalent of GetStateMap, only the state strings
+// are computed one at a time as needed.
+QString VideoMetadata::GetState(const QString& name) const
+{
+    if (name == QStringLiteral(u"trailerstate"))
+        return TrailerToState(GetTrailer());
+    if (name == QStringLiteral(u"userratingstate"))
+        return QString::number((int)(GetUserRating()));
+    if (name == QStringLiteral(u"watchedstate"))
+        return WatchedToState(GetWatched());
+    if (name == QStringLiteral(u"videolevel"))
+        return ParentalLevelToState(GetShowLevel());
+    return QString();
+}
+
 void VideoMetadata::GetImageMap(InfoMap &imageMap)
 {
     m_imp->GetImageMap(imageMap);
+}
+
+QString VideoMetadata::GetImage(const QString& name) const
+{
+    return m_imp->GetImage(name);
 }
 
 void ClearMap(InfoMap &metadataMap)
@@ -1322,6 +1495,36 @@ void ClearMap(InfoMap &metadataMap)
     metadataMap["watched"] = "";
     metadataMap["category"] = "";
     metadataMap["processed"] = "";
+}
+
+QString VideoMetadata::MetadataGetTextCb(const QString& name, void *data)
+{
+    if (data == nullptr)
+        return QString();
+    auto *metadata = static_cast<VideoMetadata *>(data);
+    QString result = metadata->GetText(name);
+    if (!result.isEmpty())
+        return result;
+    result = metadata->GetImage(name);
+    if (!result.isEmpty())
+        return result;
+    return metadata->GetState(name);
+}
+
+QString VideoMetadata::MetadataGetImageCb(const QString& name, void *data)
+{
+    if (data == nullptr)
+        return QString();
+    auto *metadata = static_cast<VideoMetadata *>(data);
+    return metadata->GetImage(name);
+}
+
+QString VideoMetadata::MetadataGetStateCb(const QString& name, void *data)
+{
+    if (data == nullptr)
+        return QString();
+    auto *metadata = static_cast<VideoMetadata *>(data);
+    return metadata->GetState(name);
 }
 
 const QString &VideoMetadata::GetPrefix() const
