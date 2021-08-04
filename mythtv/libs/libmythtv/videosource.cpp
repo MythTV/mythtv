@@ -589,9 +589,9 @@ void TransFreqTableSelector::Save(void)
     }
 }
 
-void TransFreqTableSelector::SetSourceID(uint _sourceid)
+void TransFreqTableSelector::SetSourceID(uint sourceid)
 {
-    m_sourceId = _sourceid;
+    m_sourceId = sourceid;
     Load();
 }
 

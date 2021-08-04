@@ -101,14 +101,14 @@ protected:
 class TransFreqTableSelector : public TransMythUIComboBoxSetting
 {
   public:
-    explicit TransFreqTableSelector(uint _sourceid);
+    explicit TransFreqTableSelector(uint sourceid);
 
     void Load(void) override; // StandardSetting
 
     void Save(void) override; // StandardSetting
     virtual void Save(const QString& /*destination*/) { Save(); }
 
-    void SetSourceID(uint _sourceid);
+    void SetSourceID(uint sourceid);
 
   private:
     uint    m_sourceId;
