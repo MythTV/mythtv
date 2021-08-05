@@ -19,6 +19,8 @@ class BackendSettings : public GroupSetting
     HostComboBoxSetting        *m_backendServerAddr {nullptr};
     GlobalTextEditSetting      *m_masterServerName  {nullptr};
     IpAddressSettings          *m_ipAddressSettings {nullptr};
+    HostCheckBoxSetting        *m_allowConnFromAll  {nullptr};
+    HostTextEditSetting        *m_allowConnFromSubnets {nullptr};
     bool                        m_isLoaded          {false};
     QString                     m_priorMasterName;
 
@@ -29,6 +31,7 @@ class BackendSettings : public GroupSetting
   private slots:
     void masterBackendChanged(void);
     void listenChanged(void);
+    void allowConnFromAllChanged(bool);
 };
 
 #endif
