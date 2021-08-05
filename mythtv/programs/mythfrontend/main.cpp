@@ -1946,6 +1946,11 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    int maxImageSize = gCoreContext->GetNumSetting("ImageMaximumSize", -1);
+    if (maxImageSize >=0)
+        QImageReader::setAllocationLimit(maxImageSize);
+#endif
     QCoreApplication::setSetuidAllowed(true);
 
     if (revokeRoot() != 0)
