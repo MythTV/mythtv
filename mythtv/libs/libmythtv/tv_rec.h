@@ -271,8 +271,6 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
                            DVBDBOptions       &dvb_opts,
                            FireWireDBOptions  &firewire_opts);
 
-    static QString GetStartChannel(uint inputid);
-
     void TeardownRecorder(uint request_flags);
     DTVRecorder  *GetDTVRecorder(void);
 

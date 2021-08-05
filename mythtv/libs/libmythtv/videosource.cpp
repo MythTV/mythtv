@@ -3083,7 +3083,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     if (storage == nullptr)
         return;
     int inputId = storage->getInputID();
-    QString startChan = CardUtil::GetStartingChannel(inputId);
+    QString startChan = CardUtil::GetStartChannel(inputId);
 
     ChannelInfoList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
 

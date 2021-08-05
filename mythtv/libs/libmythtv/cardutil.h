@@ -329,7 +329,7 @@ class MTV_PUBLIC CardUtil
                                      std::vector<uint> *groupids = nullptr);
     static QList<InputInfo> GetAllInputInfo();
     static QString      GetInputName(uint inputid);
-    static QString      GetStartingChannel(uint inputid);
+    static QString      GetStartChannel(uint inputid);
     static QString      GetDisplayName(uint inputid);
     static bool         IsUniqueDisplayName(const QString &name,
                                             uint exclude_inputid);
