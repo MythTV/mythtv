@@ -883,9 +883,9 @@ class StartingChannel : public MythUIComboBoxSetting
                               false)
     {
         setLabel(QObject::tr("Starting channel"));
-        setHelpText(QObject::tr("Starting Live TV channel.") + " " +
-                    QObject::tr("This is updated on every successful "
-                                "channel change."));
+        setHelpText(QObject::tr("This channel is shown when 'Watch TV' is selected on the main menu. "
+                                "It is updated on every Live TV channel change. "
+                                "When the value is not valid a suitable default will be chosen."));
     }
     static void fillSelections(void) {;}
   public slots:
