@@ -217,11 +217,15 @@ bool checkChannelPresets(QStringList &probs)
                     QString("start channel from %1 to %2 ").arg(startchan).arg(newchan) +
                     QString("for card %1 (%2)").arg(cardid).arg(query.value(3).toString());
                 if (stat)
+                {
                     LOG(VB_GENERAL, LOG_INFO,
                         QString("CheckSetup[%1]: ").arg(cardid) + "Changed " + msg);
+                }
                 else
+                {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("CheckSetup[%1]: ").arg(cardid)  + "Failed to change " + msg);
+                }
             }
         }
         else
