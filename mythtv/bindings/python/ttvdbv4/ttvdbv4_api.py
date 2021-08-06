@@ -1,5 +1,11 @@
 # -*- coding: UTF-8 -*-
 
+# ---------------------------------------
+# Author:  Roland Ernst
+# Purpose: MythTV Bindings for TheTVDB v4
+# ---------------------------------------
+
+
 import sys
 from requests import codes as requestcodes
 from urllib.parse import urlencode, quote_plus, quote

@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
 
-# --------------------------------------
-# Author: Roland Ernst
-# Name: MythTV Bindings for TheTVDB v4
-# --------------------------------------
+# ---------------------------------------
+# Author:  Roland Ernst
+# Purpose: MythTV Bindings for TheTVDB v4
+# ---------------------------------------
+
 
 import sys
 import json

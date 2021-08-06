@@ -4,7 +4,7 @@
 # Python Library
 # Author: Raymond Wagner
 #-----------------------
-# Name: Roland Ernst
+# Author: Roland Ernst
 # Modifications:
 #   - Added ISO931-2T/2B
 #   - Added ISO-3166 alpha-3

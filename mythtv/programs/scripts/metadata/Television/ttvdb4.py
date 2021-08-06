@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
+# ---------------------------------------
+# Author:  Roland Ernst
+# Purpose: MythTV Bindings for TheTVDB v4
+# ---------------------------------------
+
+
 import argparse
 import sys
 import os

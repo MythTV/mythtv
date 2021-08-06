@@ -1,5 +1,11 @@
 # -*- coding: UTF-8 -*-
 
+# ---------------------------------------
+# Author:  Roland Ernst
+# Purpose: MythTV Bindings for TheTVDB v4
+# ---------------------------------------
+
+
 from datetime import datetime
 import sys
 
