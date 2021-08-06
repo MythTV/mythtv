@@ -207,8 +207,7 @@ class Myth4TTVDBv4(object):
 
         self.session.headers.update({'Accept': 'application/json',
                                      'Accept-Language': self.language,
-                                     ### XXX ToDo define User Agent
-                                     # 'User-Agent': 'mythtv ttvdb4 grabber %s' % __version__,
+                                     'User-Agent': 'mythtv.org ttvdb v.4 grabber',
                                      'Authorization': "%s" % (token)
                                      })
         # set the session for the tvbd4 api, enable json debug logs
