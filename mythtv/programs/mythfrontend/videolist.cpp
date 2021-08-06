@@ -25,6 +25,12 @@
 
 #include "upnpscanner.h"
 
+// Sorting or not sorting the metadata list doesn't seem to have any
+// effect. The metadataViewFlat and metadataViewTree that are
+// constructed from this list get sorted, and those are what is used
+// to build the UI screens.
+#undef SORT_METADATA_LIST
+
 class TreeNodeDataPrivate
 {
   public:
@@ -783,8 +789,10 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     transform(m_metadata.getList().begin(), m_metadata.getList().end(),
               mli, to_metadata_ptr());
 
+#ifdef SORT_METADATA_LIST
     metadata_path_sort mps = metadata_path_sort();
     std::sort(mlist.begin(), mlist.end(), mps);
+#endif
 
     using group_to_node_map = std::map<QString, meta_dir_node *>;
     group_to_node_map gtnm;
@@ -904,8 +912,10 @@ void VideoListImp::buildTVList(void)
     transform(m_metadata.getList().begin(), m_metadata.getList().end(),
               mli, to_metadata_ptr());
 
+#ifdef SORT_METADATA_LIST
     metadata_path_sort mps = metadata_path_sort();
     sort(mlist.begin(), mlist.end(), mps);
+#endif
 
     meta_dir_node *video_root = &m_metadataTree;
 
@@ -950,8 +960,10 @@ void VideoListImp::buildDbList()
 
 //    print_meta_list(mlist);
 
+#ifdef SORT_METADATA_LIST
     metadata_path_sort mps = metadata_path_sort();
     std::sort(mlist.begin(), mlist.end(), mps);
+#endif
 
     // TODO: break out the prefix in the DB so this isn't needed
     using prefix_to_node_map = std::map<QString, meta_dir_node *>;
