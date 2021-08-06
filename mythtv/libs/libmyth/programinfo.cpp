@@ -5940,14 +5940,20 @@ bool LoadFromRecorded(
     {
         thequery += "WHERE ";
         if (possiblyInProgressRecordingsOnly)
+        {
             thequery += "(r.endtime >= NOW() AND r.starttime <= NOW()) ";
+        }
         if (ignoreLiveTV)
+        {
             thequery += QString("%1 r.recgroup != 'LiveTV' ")
                                 .arg(possiblyInProgressRecordingsOnly ? "AND" : "");
+        }
         if (ignoreDeleted)
+        {
             thequery += QString("%1 r.recgroup != 'Deleted' ")
                             .arg((possiblyInProgressRecordingsOnly || ignoreLiveTV)
                             ? "AND" : "");
+        }
     }
 
     if (sortBy.isEmpty())
