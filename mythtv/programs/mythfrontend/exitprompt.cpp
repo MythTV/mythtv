@@ -25,6 +25,10 @@ ExitPrompter::ExitPrompter()
 
 ExitPrompter::~ExitPrompter()
 {
+    // Ensure additional actions are not processed after we are deleted
+    if (m_dialog)
+        m_dialog->SetReturnEvent(nullptr, QString());
+
     if (m_power)
         MythPower::AcquireRelease(this, false);
     LOG(VB_GENERAL, LOG_INFO, "Deleted ExitPrompter");
@@ -32,10 +36,6 @@ ExitPrompter::~ExitPrompter()
 
 void ExitPrompter::DoQuit()
 {
-    // Ensure additional actions are not processed after we are deleted
-    if (m_dialog)
-        m_dialog->SetReturnEvent(nullptr, QString());
-
     qApp->exit();
     deleteLater();
 }
