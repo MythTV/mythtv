@@ -8,7 +8,7 @@ from pprint import pprint
 from .definitions import *
 
 
-MYTHTV_TTVDBV4_API_VERSION = "4.3.7.0"
+MYTHTV_TTVDBV4_API_VERSION = "4.3.8.0"
 
 # set this to true for showing raw json data
 #JSONDEBUG = True
@@ -46,8 +46,9 @@ def _query_api(url, params=None):
         print(res.url)
         print(res.request.headers)
     if res.status_code != requestcodes.OK:
-        print('http request was unsuccessful: ' + str(res.status_code), res.reason, res.url)
-        #sys.exit(1)
+        if JSONDEBUG:
+            print('http request was unsuccessful: ' + str(res.status_code), res.reason, res.url)
+            #sys.exit(1)
         return {}
     # res is a dictionary with 'data', 'status' and 'links' dicts
     resjson = res.json()
@@ -83,7 +84,7 @@ def _query_yielded(record, path, params, listname=None):
 
 
 
-"""Generated API for thetvdb.com TVDB API V4 v 4.3.7"""
+"""Generated API for thetvdb.com TVDB API V4 v 4.3.8"""
 # modifications marked with '### XXX'
 
 

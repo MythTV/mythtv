@@ -33,7 +33,7 @@ def _handle_list(handle, data):
 
 
 
-"""Generated API for thetvdb.com TVDB API V4 v 4.3.7"""
+"""Generated API for thetvdb.com TVDB API V4 v 4.3.8"""
 # modifications marked with '### XXX'
 
 
@@ -408,6 +408,7 @@ class MovieExtendedRecord(object):
         self.subtitleLanguages = _get_list(data, 'subtitleLanguages')
         self.trailers = _handle_list(Trailer, data.get('trailers'))
         # additional attributes needed by the mythtv grabber script:
+        # self.translations = []                                             # ### XXX
         self.translations = _get_list(data, 'Translations')                  # ### XXX
         self.name_similarity = 0.0
 

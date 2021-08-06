@@ -294,7 +294,7 @@ class Myth4TTVDBv4(object):
         m.inetref = check_item(m, ("inetref", str(ser_x.id)), ignore=False)
         # try to get title and description for the preferred language list:
         # note: there could be a title but no description:
-        ### XXX $ ttvdb4.py -l ja -C 360893 --debug
+        #       $ ttvdb4.py -l ja -C 360893 --debug
 
         # get series name and overview:
         ser_title, desc = self._get_info_from_translations(ser_x.translations)
@@ -409,8 +409,8 @@ class Myth4TTVDBv4(object):
         for season and episode for that series-id.
         """
         # option -D inetref season episode
-        ### XXX $ ttvdb4.py -D 76568 2 8 --debug
-        ### XXX $ ttvdb4.py -l de -D 76568 2 8 --debug
+        # $ ttvdb4.py -D 76568 2 8 --debug
+        # $ ttvdb4.py -l de -D 76568 2 8 --debug
 
         if self.debug:
             print("\nQuery 'buildSingle' called with '%s'"
@@ -482,10 +482,10 @@ class Myth4TTVDBv4(object):
         The 'other_inetref' option overrides the default 'inetref' from the command line.
         """
         # option -C inetref
-        ### XXX $ ttvdb4.py -l en -C 360893 --debug
-        ### XXX $ ttvdb4.py -l de -C 360893 --debug
-        ### XXX $ ttvdb4.py -l ja -C 360893 --debug  (missing Japanese overview)
-        ### XXX $ ttvdb4.py -l fr -C 76568 --debug
+        # $ ttvdb4.py -l en -C 360893 --debug
+        # $ ttvdb4.py -l de -C 360893 --debug
+        # $ ttvdb4.py -l ja -C 360893 --debug  (missing Japanese overview)
+        # $ ttvdb4.py -l fr -C 76568 --debug
 
         if other_inetref:
             tvinetref = other_inetref
@@ -541,11 +541,9 @@ class Myth4TTVDBv4(object):
         # $ ttvdb4.py -l de -M "Chernobyl:" --debug  --> multiple matches
         # $ ttvdb4.py -l de -M "Die Munsters"  --> single match
         # $ ttvdb4.py -l en -M "The Munsters"  --> single match
-        # $ ttvdb4.py -l de -M "Hawaii Five-0" --> single match     ---> inetref  164541
-        # $ ttvdb4.py -l de -M "Hawaii Five-O" --> multiple matches  (164541, 71223)
-        # $ ttvdb4.py -l de -M "Hawaii Five-2" --debug  --> multiple matches
-        # $ ttvdb4.py -l en -M "Hawaii Five-2" --debug  --> multiple matches
-        # $ ttvdb4.py -l en -M "Hawaii Five-O (2010)" --debug  ---> inetref 164541
+        # $ ttvdb4.py -l de -M "Hawaii Five-0" --> single match    ---> inetref  164541
+        # $ ttvdb4.py -l de -M "Hawaii Five-O" --> single match    ---> interef   71223
+        # $ ttvdb4.py -l en -M "Hawaii Five-0 (2010)" --debug  ---> inetref 164541
         # $ ttvdb4.py -l el -M "Star Trek Discovery" (see pull request #180)
         # $ ttvdb4.py -l en -M "Marvel's Agents of S H I E L D" returns nothing, see #247
         #                       see override in ttvdbv4.ini
@@ -616,14 +614,17 @@ class Myth4TTVDBv4(object):
             if self.debug:
                 print("\nChosen series record according 'overall name similarity': '%0.2f':"
                       % s.name_similarity)
-            ser_x = self.buildCollection(other_inetref=int(s.tvdb_id), xml_output=False)
-            ser_x_list.append(ser_x)
-            if self.debug:
-                # re-use name similarity from SearchResult
-                print("    ", "name_similarity", " : ", "%0.2f" % s.name_similarity)
-            if xml_output:
-                self._format_xml(ser_x)
-
+            try:
+                ser_x = self.buildCollection(other_inetref=int(s.tvdb_id), xml_output=False)
+                ser_x_list.append(ser_x)
+                if self.debug:
+                    # re-use name similarity from SearchResult
+                    print("    ", "name_similarity", " : ", "%0.2f" % s.name_similarity)
+                if xml_output:
+                    self._format_xml(ser_x)
+            except:
+                # ser_x could be 'None'
+                pass
         return ser_x_list
 
     def buildNumbers(self):
@@ -640,21 +641,21 @@ class Myth4TTVDBv4(object):
         # or  option -N title subtitle     # note: title may include a trailing ' (year)'
         # or  option -N title timestamp    ### XXX ToDo implement me
         ### XXX this takes very long: several minutes
-        ### XXX $ ttvdb4.py -l de -N 76568 "Emily in Nöten" --debug
-        ### XXX $ ttvdb4.py -l en -N 76568 "The Road Trip to Harvard" --debug
-        ### XXX $ ttvdb4.py -l de -N "Die Munsters" "Der Liebestrank" --debug
-        ### XXX $ ttvdb4.py -l de -N "Hawaii Five-0" "Geflügelsalat" --debug
-        ### XXX $ ttvdb4.py -l en -N "The Munsters" 'My Fair Munster' --debug
-        ### XXX $ ttvdb4.py -l en -N "The Forsyte Saga (2002)" "Episode 1" --debug --> multiple episodes
-        ### XXX $ ttvdb4.py -l en -N "The Forsyte Saga" "A Silent Wooing" --debug
-        ### XXX $ ttvdb4.py -l en -N "The Forsyte Saga" "Episode 1" --debug
-        ### XXX $ ttvdb4.py -l en -N "The Forsyte Saga (2002)" "A Silent Wooing" --debug
-        ### XXX $ ttvdb4.py -l de -N "Es war einmal... Das Leben" "Ein ganz besonderer Saft / Das Blut" --> single match
-        ### XXX $ ttvdb4.py -l de -N "Es war einmal Das Leben" "Ein ganz besonderer Saft / Das Blut" --> single match
-        ### XXX $ ttvdb4.py -l de -N "Es war einmal Das Leben" "Das Blut" --> no matches
-        ### XXX $ ttvdb4.py -l en -N "Once Upon a Time Life" "The Blood" --> single match
-        ### XXX $ ttvdb4.py -l en -N "Marvel's Agents of S H I E L D" "Shadows"   only with override in ttvdb4.ini
-        ### XXX $ ttvdb4.py -l en -N "Eleventh Hour" "Frozen" works with and without override in ttvdb4.ini
+        # $ ttvdb4.py -l de -N 76568 "Emily in Nöten" --debug
+        # $ ttvdb4.py -l en -N 76568 "The Road Trip to Harvard" --debug
+        # $ ttvdb4.py -l de -N "Die Munsters" "Der Liebestrank" --debug
+        # $ ttvdb4.py -l de -N "Hawaii Five-0" "Geflügelsalat" --debug
+        # $ ttvdb4.py -l en -N "The Munsters" 'My Fair Munster' --debug
+        # $ ttvdb4.py -l en -N "The Forsyte Saga (2002)" "Episode 1" --debug --> multiple episodes
+        # $ ttvdb4.py -l en -N "The Forsyte Saga" "A Silent Wooing" --debug
+        # $ ttvdb4.py -l en -N "The Forsyte Saga" "Episode 1" --debug --> multiple episodes
+        # $ ttvdb4.py -l en -N "The Forsyte Saga (2002)" "A Silent Wooing" --debug  --> no match
+        # $ ttvdb4.py -l de -N "Es war einmal... Das Leben" "Ein ganz besonderer Saft / Das Blut" --> single match
+        # $ ttvdb4.py -l de -N "Es war einmal Das Leben" "Ein ganz besonderer Saft / Das Blut" --> single match
+        # $ ttvdb4.py -l de -N "Es war einmal Das Leben" "Das Blut" --> no matches
+        # $ ttvdb4.py -l en -N "Once Upon a Time Life" "The Blood" --> single match
+        # $ ttvdb4.py -l en -N "Marvel's Agents of S H I E L D" "Shadows"   only with override in ttvdb4.ini
+        # $ ttvdb4.py -l en -N "Eleventh Hour" "Frozen" works with and without override in ttvdb4.ini
 
         if self.debug:
             print("\nQuery buildNumbers called with '%s' '%s'"
@@ -715,7 +716,7 @@ class Myth4TTVDBv4(object):
             # sort the list by name_similarity, generate xml output for max. 10 items
             sorted_episodes = sort_list_by_key(episodes, 'name_similarity', 0.0)
             for epi in sorted_episodes[:10]:
-                ## apply minimum threshold for name similarity
+                # apply minimum threshold for name similarity
                 if epi.name_similarity < self.ThresholdStart:
                     break
                 # get episode and season data for that episode

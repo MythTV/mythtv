@@ -12,7 +12,7 @@ from configparser import ConfigParser
 
 __title__ = "TheTVDatabaseV4"
 __author__ = "Roland Ernst"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 
 def print_etree(etostr):

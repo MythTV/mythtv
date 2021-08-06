@@ -91,7 +91,7 @@
 </metadata>
 
 
-# ttvdb4.py ttvdb4.py -D 76568 2 8
+# ttvdb4.py -D 76568 2 8
 >>> sys.argv = shlex.split('ttvdb4 -D 76568 2 8')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
@@ -140,7 +140,7 @@
 </metadata>
 
 
-# ttvdb4.py ttvdb4.py -l de -D 76568 3 9
+# ttvdb4.py -l de -D 76568 3 9
 >>> sys.argv = shlex.split('ttvdb4 -l de -D 76568 3 9')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
@@ -190,8 +190,8 @@
 
 
 # Single match with year:
-# ttvdb4.py -l en -M "Hawaii Five-O (2010)"
->>> sys.argv = shlex.split('ttvdb4 -l en -M "Hawaii Five-O (2010)"')
+# ttvdb4.py -l en -M "Hawaii Five-0 (2010)"
+>>> sys.argv = shlex.split('ttvdb4 -l en -M "Hawaii Five-0 (2010)"')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
@@ -199,7 +199,6 @@
     <title>Hawaii Five-0</title>
     <description>Detective Steve McGarrett, a decorated Naval officer turned cop, returned to Oahu after Hawaii's former governor persuaded him to head up the new team: his rules, no red tape and full blanket authority to hunt down the biggest "game" in town. Joining McGarrett are Detective Danny "Danno" Williams, a relocated ex-New Jersey cop; Captain Lou Grover, who formerly headed Hawaii's SWAT unit; Jerry Ortega, the islands' local conspiracy theorist; and Tani Rey, a bold, recent police academy graduate. Helping them is Adam Noshimuri, a friend with old ties to a deadly crime family; Junior Reigns, a former SEAL; Kamekona, a local entrepreneur who has his pulse on the Island; Sgt. Duke Lukela, a trusted member of the HPD; and medical examiner Dr. Noelani Cunha. The state's brash Five-0 unit, who may spar and jest among themselves, remain determined to eliminate the seedy elements from the 50th state.</description>
     <inetref>164541</inetref>
-    <homepage></homepage>
     <language>en</language>
     <userrating>8.100000</userrating>
     <year>2010</year>
@@ -237,51 +236,12 @@
 </metadata>
 
 
-# Multiple matches:
+# Single match:
 # ttvdb4.py -l de -M "Hawaii Five-O"
 >>> sys.argv = shlex.split('ttvdb4 -l de -M "Hawaii Five-O"')
 >>> main()
 <?xml version='1.0' encoding='UTF-8'?>
 <metadata>
-  <item>
-    <title>Hawaii Five-0</title>
-    <description>Im Mittelpunkt der Serie steht der hochdekorierte ehemalige Marineoffizier Steve McGarrett, der von der Gouverneurin von Hawaii mit der Bildung einer Sondereinheit zur Bekämpfung des organisierten Verbrechens beauftragt wird. Er rekrutiert den ehemaligen Polizisten Chin Ho Kelly, der nach ungerechtfertigten Bestechungsvorwürfen die Polizei verlassen musste, den Polizisten Danny „Danno“ Williams, der seiner geschiedenen Frau und deren Tochter von New Jersey nach Hawaii gefolgt ist, und die junge Polizistin Kona „Kono“ Kalakaua, die gerade ihre Ausbildung beendet hat und die Cousine von Chin ist. Sie nennen sich Five-0 und arbeiten gemeinsam an einer Vielzahl unterschiedlicher Kriminalfälle.</description>
-    <inetref>164541</inetref>
-    <homepage></homepage>
-    <language>en</language>
-    <userrating>8.100000</userrating>
-    <year>2010</year>
-    <categories>
-      <category name="Crime"/>
-    </categories>
-    <countries>
-      <country name="USA"/>
-    </countries>
-    <people>
-      <person name="Alex O'Loughlin" job="Actor" url="https://thetvdb.com/people/334781" character="Steve McGarrett"/>
-      <person name="Scott Caan" job="Actor" url="https://thetvdb.com/people/327319" character="Danny &quot;Danno&quot; Williams"/>
-      <person name="Daniel Dae Kim" job="Actor" url="https://thetvdb.com/people/268546" character="Chin Ho Kelly"/>
-      <person name="Grace Park" job="Actor" url="https://thetvdb.com/people/295725" character="Kono Kalakaua"/>
-...
-    </people>
-    <images>
-      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/164541-1.jpg" thumb="https://artworks.thetvdb.com/banners/posters/164541-1_t.jpg"/>
-      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/164541-8.jpg" thumb="https://artworks.thetvdb.com/banners/posters/164541-8_t.jpg"/>
-      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/164541-10.jpg" thumb="https://artworks.thetvdb.com/banners/posters/164541-10_t.jpg"/>
-      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/164541-5.jpg" thumb="https://artworks.thetvdb.com/banners/posters/164541-5_t.jpg"/>
-...
-      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/164541-1.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/164541-1_t.jpg"/>
-      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/164541-5.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/164541-5_t.jpg"/>
-      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/164541-16.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/164541-16_t.jpg"/>
-      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/164541-12.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/164541-12_t.jpg"/>
-...
-      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/164541-g3.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/164541-g3_t.jpg"/>
-      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/164541-g5.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/164541-g5_t.jpg"/>
-      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/164541-g4.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/164541-g4_t.jpg"/>
-      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/164541-g8.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/164541-g8_t.jpg"/>
-...
-    </images>
-  </item>
   <item>
     <title>Hawaii Fünf-Null</title>
     <description>Steve McGarrett ist der Leiter einer Polizei-Spezialeinheit, deren Aufgabe es ist, gegen das organisierte Verbrechen auf der Insel Hawaii vorzugehen. Dabei sind er und sein Assistent Danny Williams direkt dem Gouverneur von Hawaii unterstellt. Bei ihren Ermittlungen und Einsätzen werden sie durch Kollegen von der Polizei von Honolulu unterstützt.</description>
@@ -302,12 +262,16 @@
       <person name="Peggy Ryan" job="Actor" url="https://thetvdb.com/people/287834" character="Jenny"/>
       <person name="William Smith" job="Actor" url="https://thetvdb.com/people/256501"/>
       <person name="James MacArthur" job="Actor" url="https://thetvdb.com/people/263175" character="Det. Danny Williams"/>
+      <person name="Morgan White" job="Actor" url="https://thetvdb.com/people/287835"/>
 ...
     </people>
     <images>
       <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/71223-1.jpg" thumb="https://artworks.thetvdb.com/banners/posters/71223-1_t.jpg"/>
       <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/71223-2.jpg" thumb="https://artworks.thetvdb.com/banners/posters/71223-2_t.jpg"/>
       <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/71223-3.jpg" thumb="https://artworks.thetvdb.com/banners/posters/71223-3_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/71223-2.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/71223-2_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/71223-3.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/71223-3_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/71223-1.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/71223-1_t.jpg"/>
 ...
       <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/71223-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/71223-g_t.jpg"/>
       <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/1277-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/1277-g_t.jpg"/>
@@ -472,7 +436,6 @@
     <season>1</season>
     <episode>2</episode>
     <inetref>77280</inetref>
-    <homepage></homepage>
     <language>en</language>
     <userrating>8.300000</userrating>
     <year>1964</year>
