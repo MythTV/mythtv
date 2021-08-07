@@ -87,10 +87,12 @@ def performSelfTest(args):
         print("Failed to import Py TTVDB4 library. This should have been included "
               "with the python MythTV bindings.")
     try:
+        inipath = os.path.abspath(os.path.dirname(sys.argv[0]))
+        inifile = os.path.join(inipath, "ttvdb4.ini")
         config = ConfigParser()
         # preserve capital letters:
         config.optionxform = str
-        config.read("./ttvdb4.ini", 'UTF-8')
+        config.read(inifile, 'UTF-8')
         config_dict = _parse_config(config)
         config_version = config_dict['ConfigVersion']['TTVDBv4ConfigVersion']
         if args.debug:
@@ -191,11 +193,13 @@ def main():
     # Add config from config file to cmd_args:
     config_dict = {}
     # read global config
+    inipath = os.path.abspath(os.path.dirname(sys.argv[0]))
+    inifile = os.path.join(inipath, "ttvdb4.ini")
     try:
         global_config = ConfigParser()
         # preserve capital letters:
         global_config.optionxform = str
-        global_config.read("./ttvdb4.ini", 'UTF-8')
+        global_config.read(inifile, 'UTF-8')
         config_dict = _parse_config(global_config)
         if args.debug:
             print("Global Config File parsed successfully.")
@@ -204,7 +208,7 @@ def main():
             print("Parsing Global Config File failed.")
     # read local config, which overrides the global one
     if args.inifile:
-        local_config_file = os.path.join(confdir, 'ttvdb4.ini')
+        local_config_file = os.path.join(confdir, args.inifile)
         if os.path.isfile(local_config_file):
             try:
                 local_config = ConfigParser()
@@ -215,15 +219,16 @@ def main():
                     for k,v in local_config[section].items():
                         config_dict[section][k] = v
                 if args.debug:
-                    print("Local Config File parsed successfully.")
+                    print("Local Config File '%s' parsed successfully."
+                           % local_config_file)
             except KeyError:
                 if args.debug:
                     print("Parsing Local Config File failed.")
         else:
             # create local config with values from global config
-            shutil.copy("./ttvdb4.ini", confdir)
+            shutil.copy(inifile, local_config_file)
             if args.debug:
-                print("Local config file 'ttvdbv4.ini' created.")
+                print("Local config file '%s' created." % local_config_file)
     cmd_args["config"] = config_dict
     if args.debug:
         print("Using this configuration:")
