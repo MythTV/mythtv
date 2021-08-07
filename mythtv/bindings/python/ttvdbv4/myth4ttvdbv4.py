@@ -682,7 +682,7 @@ class Myth4TTVDBv4(object):
         # loop over the list and calculate name_similarity of series and episode
         found_items = []
         for ser_x in ser_x_list:
-            if self.debug:
+            if self.debug and ser_x.translations:
                 print("Checking series named '%s' with inetref '%s':"
                       % (ser_x.translations[0].name, ser_x.id))
             # get all episodes for every season, and calculate the name similarity
@@ -747,7 +747,7 @@ class Myth4TTVDBv4(object):
         last_similarity = 2 * self.ThresholdStart
         for (ser_x, sea_x, epi_x) in found_items:
             overall_similarity = epi_x.name_similarity + ser_x.name_similarity
-            if self.debug:
+            if self.debug and ser_x.translations:
                 print("Found item series: '%s', season: '%s', episode: '%s' "
                       "with overall similarity: %0.2f"
                       % (ser_x.translations[0].name, sea_x.number, epi_x.translations[0].name,
