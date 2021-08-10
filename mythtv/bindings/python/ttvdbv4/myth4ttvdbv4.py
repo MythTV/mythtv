@@ -13,6 +13,7 @@ import requests
 import operator
 from lxml import etree
 from collections import OrderedDict
+from enum import IntEnum
 from MythTV.ttvdbv4 import ttvdbv4_api as ttvdb
 from MythTV.ttvdbv4.locales import Language
 from MythTV.ttvdbv4.utils import convert_date, strip_tags
@@ -97,6 +98,24 @@ def _name_match_quality(name, tvtitle):
     else:
         match_quality = float(len(name) - distance) / len(name)
     return match_quality
+
+
+class People(IntEnum):
+    """
+    Static definitions of 'people' type according API function
+    'getAllPeopleTypes' to speed up queries.
+    """
+    Director           =  1
+    Writer             =  2
+    Actor              =  3
+    Guest_Star         =  4
+    Crew               =  5
+    Creator            =  6
+    Producer           =  7
+    Showrunner         =  8
+    Musical_Guest      =  9
+    Host               = 10
+    Executive_Producer = 11
 
 
 class Myth4TTVDBv4(object):
@@ -347,12 +366,9 @@ class Myth4TTVDBv4(object):
             pass
 
         if self.ShowPeople:
-            # add characters: see getAllPeopleTypes
-            ## type: 3: Actor, 2: Writer, 1: Director, 4: Guest Star, 5: Crew, 6: Creator
-            ## 7: Producer, 8: Showrunner, 9: Musical Guest, 10: Host, 11: Executive Producer
-
+            # add characters: see class 'People'
             # characters of type 'Actor' are sorted in ascending order
-            actors = [c for c in ser_x.characters if c.type == 3]
+            actors = [c for c in ser_x.characters if c.type == People.Actor]
             actors_sorted = sort_list_by_key(actors, "sort", 99, reverse=False)
             # prefer actors that are sorted, i.e.: 'sort' > 0
             actors_s_1 = [x for x in actors_sorted if x.sort > 0]
@@ -362,11 +378,11 @@ class Myth4TTVDBv4(object):
 
             # on episodes, characters of type 'Guest Star' are sorted in ascending order
             if epi_x:
-                guests = [c for c in epi_x.characters if c.type == 4]
+                guests = [c for c in epi_x.characters if c.type == People.Guest_Star]
                 guests_sorted = sort_list_by_key(guests, "sort", 99, reverse=False)
                 m.people.extend(self._get_crew_for_xml(guests_sorted, 'Guest Star'))
 
-                directors = [c for c in epi_x.characters if c.type == 8]
+                directors = [c for c in epi_x.characters if c.type == People.Showrunner]
                 directors_sorted = sort_list_by_key(directors, "sort", 99, reverse=False)
                 m.people.extend(self._get_crew_for_xml(directors_sorted, 'Director'))
 
