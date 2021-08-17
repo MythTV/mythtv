@@ -46,9 +46,6 @@ class V2RecordingInfo : public QObject
     SERVICE_PROPERTY2( QString                , EncoderName )
     SERVICE_PROPERTY2( QString                , Profile     )
 
-    // Used only by Serializer
-    SERVICE_PROPERTY2( bool, SerializeDetails );
-
     public:
 
         explicit V2RecordingInfo(QObject *parent = nullptr)
@@ -61,8 +58,7 @@ class V2RecordingInfo : public QObject
               m_RecType         ( kNotRecording      ),
               m_DupInType       ( kDupsInRecorded    ),
               m_DupMethod       ( kDupCheckNone      ),
-              m_EncoderId       ( 0                  ),
-              m_SerializeDetails( true               )
+              m_EncoderId       ( 0                  )
         {
         }
 
@@ -87,7 +83,6 @@ class V2RecordingInfo : public QObject
             m_EncoderId       = src->m_EncoderId        ;
             m_EncoderName     = src->m_EncoderName      ;
             m_Profile         = src->m_Profile          ;
-            m_SerializeDetails= src->m_SerializeDetails ;
         }
 
     private:

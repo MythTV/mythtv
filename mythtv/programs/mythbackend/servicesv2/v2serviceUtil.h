@@ -15,7 +15,7 @@
 #include "programdata.h"
 #include "inputinfo.h"
 
-#define HAS_PARAM(p) m_parsedParams.contains(p)
+// #define HAS_PARAM(p) m_parsedParams.contains(p)
 
 const QStringList KnownServices = { "Capture", "Channel", "Content", \
                                     "Dvr",     "Guide",   "Music",   \

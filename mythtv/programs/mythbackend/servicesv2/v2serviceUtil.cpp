@@ -153,8 +153,6 @@ void V2FillProgramInfo( V2Program *pProgram,
     pProgram->setSubProps  (  pInfo->GetSubtitleType()      );
     pProgram->setSubPropNames( pInfo->GetSubtitleTypeNames() );
 
-    pProgram->setSerializeDetails( bDetails );
-
     if (bDetails)
     {
         pProgram->setSeriesId    ( pInfo->GetSeriesID()         );
@@ -187,13 +185,10 @@ void V2FillProgramInfo( V2Program *pProgram,
         pProgram->setTotalEpisodes( pInfo->GetEpisodeTotal() );
     }
 
-    pProgram->setSerializeCast(bIncCast);
     if (bIncCast)
     {
         V2FillCastMemberList( pProgram->Cast(), pInfo );
     }
-
-    pProgram->setSerializeChannel( bIncChannel );
 
     if ( bIncChannel )
     {
@@ -211,8 +206,6 @@ void V2FillProgramInfo( V2Program *pProgram,
 
     if ( pInfo->GetRecordingStatus() != RecStatus::Unknown )
     {
-        pProgram->setSerializeRecording( true );
-
         V2RecordingInfo *pRecording = pProgram->Recording();
 
         const RecordingInfo pRecInfo(*pInfo);
@@ -222,8 +215,6 @@ void V2FillProgramInfo( V2Program *pProgram,
         pRecording->setPriority( pRecInfo.GetRecordingPriority()  );
         pRecording->setStartTs ( pRecInfo.GetRecordingStartTime() );
         pRecording->setEndTs   ( pRecInfo.GetRecordingEndTime()   );
-
-        pRecording->setSerializeDetails( bDetails );
 
         if (bDetails)
         {
@@ -247,8 +238,6 @@ void V2FillProgramInfo( V2Program *pProgram,
 
     if (!pInfo->GetInetRef().isEmpty() )
     {
-        pProgram->setSerializeArtwork( true );
-
         V2FillArtworkInfoList( pProgram->Artwork(), pInfo->GetInetRef(),
                              pInfo->GetSeason());
     }
@@ -294,8 +283,6 @@ bool V2FillChannelInfo( V2ChannelInfo *pChannel,
     pChannel->setChannelName(channelInfo.m_name);
     pChannel->setVisible(channelInfo.m_visible > kChannelNotVisible);
     pChannel->setExtendedVisible(toRawString(channelInfo.m_visible));
-
-    pChannel->setSerializeDetails( bDetails );
 
     if (bDetails)
     {

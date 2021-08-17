@@ -60,9 +60,6 @@ class V2ChannelInfo : public QObject
     SERVICE_PROPERTY2( uint        , ServiceType    )
     SERVICE_PROPERTY2( QVariantList, Programs       )
 
-    // Used only by Serializer
-    SERVICE_PROPERTY2( bool, SerializeDetails )
-
     public:
 
         explicit V2ChannelInfo(QObject *parent = nullptr)
@@ -78,8 +75,7 @@ class V2ChannelInfo : public QObject
               m_CommFree        ( false  ),
               m_UseEIT          ( false  ),
               m_Visible         ( true   ),
-              m_ServiceType     ( 0      ),
-              m_SerializeDetails( true   )
+              m_ServiceType     ( 0      )
         {
         }
 
@@ -163,13 +159,6 @@ class V2Program : public QObject
     SERVICE_PROPERTY_PTR( V2ArtworkInfoList, Artwork     )
     SERVICE_PROPERTY_PTR( V2CastMemberList , Cast        )
 
-    // Used only by Serializer
-    SERVICE_PROPERTY2( bool, SerializeDetails )
-    SERVICE_PROPERTY2( bool, SerializeChannel )
-    SERVICE_PROPERTY2( bool, SerializeRecording )
-    SERVICE_PROPERTY2( bool, SerializeArtwork )
-    SERVICE_PROPERTY2( bool, SerializeCast );
-
     public:
 
         Q_INVOKABLE explicit V2Program(QObject *parent = nullptr)
@@ -187,12 +176,7 @@ class V2Program : public QObject
               m_Channel             ( nullptr ),
               m_Recording           ( nullptr ),
               m_Artwork             ( nullptr ),
-              m_Cast                ( nullptr ),
-              m_SerializeDetails    ( true   ),
-              m_SerializeChannel    ( true   ),
-              m_SerializeRecording  ( true   ),
-              m_SerializeArtwork    ( true   ),
-              m_SerializeCast       ( true   )
+              m_Cast                ( nullptr )
         {
         }
 
@@ -223,12 +207,6 @@ class V2Program : public QObject
             m_FileSize          = src->m_FileSize;
             m_FileName          = src->m_FileName;
             m_HostName          = src->m_HostName;
-            // ----
-            m_SerializeDetails  = src->m_SerializeDetails;
-            m_SerializeChannel  = src->m_SerializeChannel;
-            m_SerializeRecording= src->m_SerializeRecording;
-            m_SerializeArtwork  = src->m_SerializeArtwork;
-            m_SerializeCast     = src->m_SerializeCast;
 
             if ( src->m_Channel != nullptr)
                 Channel()->Copy( src->m_Channel );
