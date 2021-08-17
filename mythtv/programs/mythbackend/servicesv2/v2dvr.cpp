@@ -112,14 +112,16 @@ V2ProgramList* V2Dvr::GetExpiringList( int nStartIndex,
 }
 
 V2ProgramList* V2Dvr::GetRecordedList( bool           bDescending,
-                                        int            nStartIndex,
-                                        int            nCount,
-                                        const QString &sTitleRegEx,
-                                        const QString &sRecGroup,
-                                        const QString &sStorageGroup,
-                                        const QString &sCategory,
-                                        const QString &sSort
-                                      )
+                                       int            nStartIndex,
+                                       int            nCount,
+                                       const QString &sTitleRegEx,
+                                       const QString &sRecGroup,
+                                       const QString &sStorageGroup,
+                                       const QString &sCategory,
+                                       const QString &sSort,
+                                       bool           bIgnoreLiveTV,
+                                       bool           bIgnoreDeleted
+                                     )
 {
     QMap< QString, ProgramInfo* > recMap;
 
@@ -135,7 +137,22 @@ V2ProgramList* V2Dvr::GetRecordedList( bool           bDescending,
     if (bDescending)
         desc = -1;
 
-    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, desc, sSort );
+    if (bIgnoreLiveTV && (sRecGroup == "LiveTV"))
+    {
+        bIgnoreLiveTV = false;
+        LOG(VB_GENERAL, LOG_ERR, QString("Setting Ignore%1=false because RecGroup=%1")
+                                         .arg(sRecGroup));
+    }
+
+    if (bIgnoreDeleted && (sRecGroup == "Deleted"))
+    {
+        bIgnoreDeleted = false;
+        LOG(VB_GENERAL, LOG_ERR, QString("Setting Ignore%1=false because RecGroup=%1")
+                                         .arg(sRecGroup));
+    }
+
+    LoadFromRecorded( progList, false, inUseMap, isJobRunning, recMap, desc,
+                      sSort, bIgnoreLiveTV, bIgnoreDeleted );
 
     QMap< QString, ProgramInfo* >::iterator mit = recMap.begin();
 

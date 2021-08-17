@@ -84,14 +84,16 @@ class V2Dvr : public MythHTTPService
     V2ProgramList* GetExpiringList     ( int              StartIndex,
                                             int              Count      );
 
-    V2ProgramList* GetRecordedList     ( bool             Descending,
-                                            int              StartIndex,
-                                            int              Count,
-                                            const QString   &TitleRegEx,
-                                            const QString   &RecGroup,
-                                            const QString   &StorageGroup,
-                                            const QString   &Category,
-                                            const QString   &Sort);
+    V2ProgramList* GetRecordedList     ( bool           Descending,
+                                         int            StartIndex,
+                                         int            Count,
+                                         const QString &TitleRegEx,
+                                         const QString &RecGroup,
+                                         const QString &StorageGroup,
+                                         const QString &Category,
+                                         const QString &Sort,
+                                         bool           IgnoreLiveTV,
+                                         bool           IgnoreDeleted);
 
     V2ProgramList* GetOldRecordedList  ( bool             Descending,
                                             int              StartIndex,
