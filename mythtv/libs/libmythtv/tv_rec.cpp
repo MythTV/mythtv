@@ -143,7 +143,9 @@ bool TVRec::Init(void)
     SetRecordingStatus(RecStatus::Unknown, __LINE__);
 
     // configure the Channel instance
-    QString startchannel = GetStartChannel(m_inputId);
+    QString startchannel = CardUtil::GetStartChannel(m_inputId);
+    if (startchannel.isEmpty())
+        return false;
     if (!CreateChannel(startchannel, true))
         return false;
 
@@ -1720,94 +1722,6 @@ bool TVRec::GetDevices(uint inputid,
     parentid = query.value(15).toUInt();
 
     return true;
-}
-
-QString TVRec::GetStartChannel(uint inputid)
-{
-    QString startchan;
-
-    LOG(VB_RECORD, LOG_INFO, LOC2 + QString("GetStartChannel for input %1")
-        .arg(inputid));
-
-    // Get last tuned channel from database, to use as starting channel
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT startchan "
-        "FROM capturecard "
-        "WHERE capturecard.cardid = :INPUTID");
-    query.bindValue(":INPUTID",    inputid);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("getstartchan", query);
-    }
-    else if (query.next())
-    {
-        startchan = query.value(0).toString();
-        if (!startchan.isEmpty())
-        {
-            LOG(VB_CHANNEL, LOG_INFO, LOC2 + QString("Start channel: %1")
-                    .arg(startchan));
-            return startchan;
-        }
-    }
-
-    // If we failed to get the last tuned channel,
-    // get a valid channel on our current input.
-    query.prepare(
-        "SELECT channum "
-        "FROM capturecard, channel "
-        "WHERE deleted            IS NULL AND "
-        "      channel.sourceid   = capturecard.sourceid AND "
-        "      capturecard.cardid = :INPUTID");
-    query.bindValue(":INPUTID",    inputid);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("getstartchan2", query);
-    }
-    while (query.next())
-    {
-        startchan = query.value(0).toString();
-        if (!startchan.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC2 + QString("Start channel from DB is "
-                    "empty, setting to '%1' instead.").arg(startchan));
-            return startchan;
-        }
-    }
-
-    // If we failed to get a channel on our current input,
-    // widen search to any input.
-    query.prepare(
-        "SELECT channum, inputname "
-        "FROM capturecard, channel "
-        "WHERE deleted            IS NULL AND "
-        "      channel.sourceid   = capturecard.sourceid AND "
-        "      capturecard.cardid = :INPUTID");
-    query.bindValue(":INPUTID", inputid);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("getstartchan3", query);
-    }
-    while (query.next())
-    {
-        startchan = query.value(0).toString();
-        if (!startchan.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC2 + QString("Start channel invalid, "
-                    "setting to '%1' on input %2 instead.")
-                    .arg(startchan, query.value(1).toString()));
-            return startchan;
-        }
-    }
-
-    // If there are no valid channels, just use a random channel
-    startchan = "3";
-    LOG(VB_GENERAL, LOG_ERR, LOC2 + QString("Problem finding starting channel, "
-            "setting to default of '%1'.").arg(startchan));
-    return startchan;
 }
 
 static void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
@@ -3432,7 +3346,7 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
         else
         {
             input   = CardUtil::GetInputName(m_inputId);
-            channum = GetStartChannel(m_inputId);
+            channum = CardUtil::GetStartChannel(m_inputId);
         }
     }
     if (request.m_flags & kFlagLiveTV)

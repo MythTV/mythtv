@@ -924,7 +924,9 @@ void ThemeChooser::customEvent(QEvent *e)
             m_downloadState = dsIdle;
             CloseBusyPopup();
             QStringList args = me->ExtraDataList();
-            QFile::remove(args[0]);
+
+            if (!args.isEmpty() && !args[0].isEmpty())
+                QFile::remove(args[0]);
 
             QString event = QString("THEME_INSTALLED PATH %1")
                                     .arg(m_userThemeDir +

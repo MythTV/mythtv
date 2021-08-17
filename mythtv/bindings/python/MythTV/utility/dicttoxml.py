@@ -14,7 +14,10 @@ __version__ = '1.7.4'
 version = __version__
 
 from random import randint
-import collections
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 import numbers
 import logging
 from xml.dom.minidom import parseString
@@ -95,7 +98,7 @@ def get_xml_type(val):
         return 'null'
     if isinstance(val, dict):
         return 'dict'
-    if isinstance(val, collections.Iterable):
+    if isinstance(val, Iterable):
         return 'list'
     return type(val).__name__
 
@@ -187,7 +190,7 @@ def convert(obj, ids, attr_type, item_func, cdata, parent='root'):
     if isinstance(obj, dict):
         return convert_dict(obj, ids, parent, attr_type, item_func, cdata)
 
-    if isinstance(obj, collections.Iterable):
+    if isinstance(obj, Iterable):
         return convert_list(obj, ids, parent, attr_type, item_func, cdata)
 
     raise TypeError('Unsupported data type: %s (%s)' % (obj, type(obj).__name__))
@@ -231,7 +234,7 @@ def convert_dict(obj, ids, parent, attr_type, item_func, cdata):
                 )
             )
 
-        elif isinstance(val, collections.Iterable):
+        elif isinstance(val, Iterable):
             if attr_type:
                 attr['type'] = get_xml_type(val)
             addline('<%s%s>%s</%s>' % (
@@ -294,7 +297,7 @@ def convert_list(items, ids, parent, attr_type, item_func, cdata):
                     )
                 )
 
-        elif isinstance(item, collections.Iterable):
+        elif isinstance(item, Iterable):
             if not attr_type:
                 addline('<%s %s>%s</%s>' % (
                     item_name, make_attrstring(attr),

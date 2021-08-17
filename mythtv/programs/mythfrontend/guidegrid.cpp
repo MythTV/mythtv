@@ -462,7 +462,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
     {
         vector<uint> inputIDs = RemoteRequestFreeInputList(0);
         if (!inputIDs.empty())
-            actualChannum = CardUtil::GetStartingChannel(inputIDs[0]);
+            actualChannum = CardUtil::GetStartChannel(inputIDs[0]);
     }
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();

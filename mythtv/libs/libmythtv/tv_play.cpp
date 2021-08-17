@@ -5607,7 +5607,7 @@ void TV::SwitchInputs(uint ChanID, QString ChanNum, uint InputID)
         if (ChanNum.isEmpty() && ChanID)
             ChanNum = ChannelUtil::GetChanNum(static_cast<int>(ChanID));
         if (ChanNum.isEmpty() && InputID)
-            ChanNum = CardUtil::GetStartingChannel(InputID);
+            ChanNum = CardUtil::GetStartChannel(InputID);
         m_playerContext.m_recorder->SpawnLiveTV(m_playerContext.m_tvchain->GetID(), false, ChanNum);
 
         if (!m_playerContext.ReloadTVChain())
@@ -10129,31 +10129,21 @@ OSD *TV::GetOSDL()
     return nullptr;
 }
 
-void TV::ReturnOSDLock()
+void TV::ReturnOSDLock() const
 {
     if (m_player)
         m_player->UnlockOSD();
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
 }
 
-void TV::GetPlayerWriteLock()
+void TV::GetPlayerWriteLock() const
 {
     m_playerLock.lockForWrite();
-}
-
-void TV::GetPlayerReadLock()
-{
-    m_playerLock.lockForRead();
 }
 
 void TV::GetPlayerReadLock() const
 {
     m_playerLock.lockForRead();
-}
-
-void TV::ReturnPlayerLock()
-{
-    m_playerLock.unlock();
 }
 
 void TV::ReturnPlayerLock() const

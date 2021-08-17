@@ -262,11 +262,9 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
 
     // Lock handling
     OSD* GetOSDL();
-    void ReturnOSDLock();
-    void GetPlayerWriteLock();
-    void GetPlayerReadLock();
+    void ReturnOSDLock() const;
+    void GetPlayerWriteLock() const;
     void GetPlayerReadLock() const;
-    void ReturnPlayerLock();
     void ReturnPlayerLock() const;
 
     // Other toggles

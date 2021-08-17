@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 #endif
 
 #if CONFIG_SYSTEMD_NOTIFY
-    (void)sd_notify(0, "STATUS=Connecting to databse.");
+    (void)sd_notify(0, "STATUS=Connecting to database.");
 #endif
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

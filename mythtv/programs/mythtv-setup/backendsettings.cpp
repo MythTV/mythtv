@@ -289,7 +289,7 @@ static GlobalCheckBoxSetting *DeletesFollowLinks()
 static GlobalSpinBoxSetting *HDRingbufferSize()
 {
     auto *bs = new GlobalSpinBoxSetting(
-        "HDRingbufferSize", 25*188, 512*188, 25*188);
+        "HDRingbufferSize", 25*188, 500*188, 25*188);
     bs->setLabel(QObject::tr("HD ringbuffer size (kB)"));
     bs->setHelpText(QObject::tr("The HD device ringbuffer allows the "
                     "backend to weather moments of stress. "
