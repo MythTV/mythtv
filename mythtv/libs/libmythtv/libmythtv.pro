@@ -60,6 +60,8 @@ INCLUDEPATH += $$DEPENDPATH
     QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
 }
 
+mingw: LIBS += -liconv
+
 macx {
     OBJECTIVE_HEADERS += util-osx.h
     OBJECTIVE_SOURCES += util-osx.mm
@@ -360,6 +362,10 @@ using_frontend {
     LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
     !win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
 }
+using_libbluray_external:mingw {
+    LIBS += -lbluray
+}
+
 using_libbluray_external:android {
     LIBS += -lbluray -lxml2
 }
@@ -1116,16 +1122,16 @@ use_hidesyms {
 
 mingw:DEFINES += USING_MINGW
 
-mingw | win32-msvc* {
+mingw || win32-msvc* {
 
-    HEADERS += videoout_d3d.h
-    SOURCES += videoout_d3d.cpp
+    #HEADERS += videoout_d3d.h
+    #SOURCES += videoout_d3d.cpp
 
     using_dxva2: DEFINES += USING_DXVA2
     using_dxva2: HEADERS += dxva2decoder.h
     using_dxva2: SOURCES += dxva2decoder.cpp
 
-    LIBS += -lws2_32
+    LIBS += -lws2_32 -lfreetype -lz
 }
 
 win32-msvc* {
@@ -1165,7 +1171,7 @@ using_backend:using_mp3lame: LIBS += -lmp3lame
 using_backend: LIBS += -llzo2
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
-!win32-msvc* {
+!mingw || win32-msvc* {
     POST_TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
     POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)

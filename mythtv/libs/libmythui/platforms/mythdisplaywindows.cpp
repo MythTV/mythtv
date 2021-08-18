@@ -1,5 +1,8 @@
+#include "windows.h"
+
 // MythTV
 #include "mythdisplaywindows.h"
+#include "mythmainwindow.h"
 
 MythDisplayWindows::MythDisplayWindows()
   : MythDisplay()
@@ -13,7 +16,22 @@ MythDisplayWindows::~MythDisplayWindows()
 
 void MythDisplayWindows::UpdateCurrentMode(void)
 {
-    HDC hdc = GetDC((HWND)GetWindowID());
+    QWidget* widget = m_widget;
+
+    if (!widget)
+    {
+        if (!HasMythMainWindow())
+        {
+            MythDisplay::UpdateCurrentMode();
+            return;
+        }
+        widget = qobject_cast<QWidget*>(MythMainWindow::getMainWindow());
+    }
+    WId win = 0;
+    if (widget)
+        win = widget->winId();
+
+    HDC hdc = GetDC((HWND)win);
     if (!hdc)
     {
         MythDisplay::UpdateCurrentMode();

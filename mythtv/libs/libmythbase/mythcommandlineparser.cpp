@@ -80,6 +80,10 @@
 
 #define TERMWIDTH 79
 
+#ifdef _WIN32
+    using namespace std;
+#endif
+
 bool openPidfile(std::ofstream &pidfs, const QString &pidfile);
 bool setUser(const QString &username);
 int GetTermWidth(void);

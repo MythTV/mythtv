@@ -459,7 +459,11 @@ void MythSystemLegacySignalManager::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
     while( run_system )
     {
-        usleep(50000); // sleep 50ms
+        #ifndef _WIN32
+            usleep(50000);
+        #else
+            sleep(50);
+        #endif
         while( run_system )
         {
             // handle cleanup and signalling for closed processes
@@ -569,8 +573,8 @@ void MythSystemLegacyWindows::Term(bool force)
     if( force )
     {
         // send KILL if it does not exit within one second
-        if( m_parent->Wait(1) == GENERIC_EXIT_RUNNING )
-            Signal(SIGKILL);
+        sleep(1000);
+        Signal(SIGKILL);
     }
 }
 
@@ -707,14 +711,20 @@ void MythSystemLegacyWindows::Fork(std::chrono::seconds timeout)
     if (dir.length() > 0)
         pDir = (LPCWSTR)dir.utf16();
 
+    char sCmdChar[256];
+    sprintf(sCmdChar, "%ls", (LPWSTR)sCmd.utf16() );
+
+    char pDirChar[256];
+    sprintf(pDirChar, "%ls", pDir);
+
     bool success = CreateProcess( nullptr,
-                          (LPWSTR)sCmd.utf16(),       // command line
+                          sCmdChar,       // command line
                           nullptr,       // process security attributes
                           nullptr,       // primary thread security attributes
                           bInherit,      // handles are inherited
                           0,             // creation flags
                           nullptr,       // use parent's environment
-                          pDir,          // use parent's current directory
+                          pDirChar,          // use parent's current directory
                           &si,            // STARTUPINFO pointer
                           &pi);           // receives PROCESS_INFORMATION
 

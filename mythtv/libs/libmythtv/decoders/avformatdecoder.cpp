@@ -35,6 +35,10 @@ extern "C" {
 #include "libavutil/display.h"
 }
 
+#ifdef _WIN32
+    #undef mkdir
+#endif
+
 // MythTV headers
 #include "mythtvexp.h"
 #include "mythconfig.h"

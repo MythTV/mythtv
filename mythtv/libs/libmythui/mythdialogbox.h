@@ -16,6 +16,9 @@
 #include "mythmainwindow.h"
 #include "mythlogging.h"
 
+#ifdef _WIN32
+    # define MUI_PUBLIC Q_DECL_EXPORT
+#endif
 
 class QTimer;
 
@@ -491,6 +494,7 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
     QObject          *m_retObject;
     QString           m_id;
 };
+
 
 MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, bool showCancel = false);
 template <class OBJ, typename FUNC>

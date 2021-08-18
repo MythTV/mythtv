@@ -330,8 +330,10 @@ bool EncoderLink::CheckFile(ProgramInfo *pginfo)
         ReferenceLocker rlocker(m_sock);
         return m_sock->CheckFile(pginfo);
     }
+    #ifndef _WIN32 // Needs fixing for Windows
+        pginfo->SetPathname(GetPlaybackURL(pginfo));
+    #endif
 
-    pginfo->SetPathname(GetPlaybackURL(pginfo));
     return pginfo->IsLocal();
 }
 

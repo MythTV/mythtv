@@ -6,7 +6,11 @@
 #ifndef RTP_DATA_PACKET_H
 #define RTP_DATA_PACKET_H
 
-#include <arpa/inet.h> // for ntohs()/ntohl()
+#ifdef _WIN32
+    #include <winsock2.h>
+#else
+    #include <arpa/inet.h> // for ntohs()/ntohl()
+#endif
 
 #include "udppacket.h"
 #include "mythlogging.h"

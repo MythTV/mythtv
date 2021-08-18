@@ -160,4 +160,11 @@ int main(int argc, char **argv)
     return retval;
 }
 
+#ifdef _WIN32 // Needs fixing for Windows
+    QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
+    {
+        return "";
+    }
+#endif
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

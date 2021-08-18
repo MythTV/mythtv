@@ -50,11 +50,13 @@
 #    include <sys/wait.h>     // For WIFEXITED on Mac OS X
 #endif
 
-#ifdef _WIN32
-#    include <cstdlib>       // for rand()
-#    include <ctime>
-#    include <sys/time.h>
+#if defined(_WIN32 ) && defined(__cplusplus)
+    #include <cstdlib>       // for rand()
+    #include <ctime>
+    #include <time.h>
 #endif
+
+//#include <stdlib.h>       // for rand() //#include <time.h> //custom
 
 #ifdef _MSC_VER
     // Turn off the visual studio warnings (identifier was truncated)
@@ -137,13 +139,17 @@
 //used in videodevice only - that code is not windows-compatible anyway
 #    define minor(X) 0
 
-    using uint = unsigned int;
+	#if defined(__cplusplus)
+            using uint = unsigned int;
+        #else
+            typedef unsigned int uint;
+   #endif
 #endif
 
 #if defined(__cplusplus) && defined(_WIN32)
 #   include <QtGlobal>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0) && !defined(USING_MINGW)
     #include <QRandomGenerator>
     static inline void srandom(unsigned int /*seed*/) { }
     static inline long int random(void)
@@ -157,11 +163,25 @@
 #   define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #   define unsetenv(x) 0
 
-    inline unsigned sleep(unsigned int x)
-    {
-        Sleep(x * 1000);
-        return 0;
-    }
+#ifndef __cplusplus
+	inline void usleep(int usec)
+	{
+		HANDLE timer;
+		LARGE_INTEGER ft;
+
+		ft.QuadPart = -(10*usec); // Convert to 100 nanosecond interval, negative value indicates relative time
+
+		timer = CreateWaitableTimer(NULL, TRUE, NULL);
+		SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
+		WaitForSingleObject(timer, INFINITE);
+		CloseHandle(timer);
+	}
+
+   inline void usleep(long long int usec)
+   {
+       usleep(usec);
+   }
+#endif
 
     struct statfs {
     //   long    f_type;     /* type of filesystem */
@@ -264,7 +284,7 @@
 #    define seteuid(x) 0
 #endif // _WIN32
 
-#if defined(_WIN32) && !defined(gmtime_r)
+#if defined(_WIN32) && !defined(gmtime_r) && defined(__cplusplus)
 // FFmpeg libs already have a workaround, use it if the headers are included,
 // use this otherwise.
 static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
@@ -281,7 +301,7 @@ static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
 }
 #endif
 
-#if defined(_WIN32) && !defined(localtime_r)
+#if defined(_WIN32) && !defined(localtime_r) && defined(__cplusplus)
 // FFmpeg libs already have a workaround, use it if the headers are included,
 // use this otherwise.
 static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
@@ -335,7 +355,7 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #    define ftello(stream) ftello64(stream)
 #endif
 
-#if defined(USING_MINGW) && defined(FILENAME_MAX)
+#if defined(USING_MINGW) && defined(FILENAME_MAX) && defined(__cplusplus)
 #    include <cerrno>
 #    include <cstddef>
 #    include <cstring>
