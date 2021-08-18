@@ -7,129 +7,6 @@
 #include "channelinfo.h"
 #include "channelgroup.h"
 
-void V2FillVideoMetadataInfo (
-                      V2VideoMetadataInfo *pVideoMetadataInfo,
-                      const VideoMetadataListManager::VideoMetadataPtr& pMetadata,
-                      bool          bDetails)
-{
-    pVideoMetadataInfo->setId(pMetadata->GetID());
-    pVideoMetadataInfo->setTitle(pMetadata->GetTitle());
-    pVideoMetadataInfo->setSubTitle(pMetadata->GetSubtitle());
-    pVideoMetadataInfo->setTagline(pMetadata->GetTagline());
-    pVideoMetadataInfo->setDirector(pMetadata->GetDirector());
-    pVideoMetadataInfo->setStudio(pMetadata->GetStudio());
-    pVideoMetadataInfo->setDescription(pMetadata->GetPlot());
-    pVideoMetadataInfo->setCertification(pMetadata->GetRating());
-    pVideoMetadataInfo->setInetref(pMetadata->GetInetRef());
-    pVideoMetadataInfo->setCollectionref(pMetadata->GetCollectionRef());
-    pVideoMetadataInfo->setHomePage(pMetadata->GetHomepage());
-    pVideoMetadataInfo->setReleaseDate(
-        QDateTime(pMetadata->GetReleaseDate(),
-                  QTime(0,0),Qt::LocalTime).toUTC());
-    pVideoMetadataInfo->setAddDate(
-        QDateTime(pMetadata->GetInsertdate(),
-                  QTime(0,0),Qt::LocalTime).toUTC());
-    pVideoMetadataInfo->setUserRating(pMetadata->GetUserRating());
-    pVideoMetadataInfo->setChildID(pMetadata->GetChildID());
-    pVideoMetadataInfo->setLength(pMetadata->GetLength().count());
-    pVideoMetadataInfo->setPlayCount(pMetadata->GetPlayCount());
-    pVideoMetadataInfo->setSeason(pMetadata->GetSeason());
-    pVideoMetadataInfo->setEpisode(pMetadata->GetEpisode());
-    pVideoMetadataInfo->setParentalLevel(pMetadata->GetShowLevel());
-    pVideoMetadataInfo->setVisible(pMetadata->GetBrowse());
-    pVideoMetadataInfo->setWatched(pMetadata->GetWatched());
-    pVideoMetadataInfo->setProcessed(pMetadata->GetProcessed());
-    pVideoMetadataInfo->setContentType(ContentTypeToString(
-                                       pMetadata->GetContentType()));
-    pVideoMetadataInfo->setFileName(pMetadata->GetFilename());
-    pVideoMetadataInfo->setHash(pMetadata->GetHash());
-    pVideoMetadataInfo->setHostName(pMetadata->GetHost());
-    pVideoMetadataInfo->setCoverart(pMetadata->GetCoverFile());
-    pVideoMetadataInfo->setFanart(pMetadata->GetFanart());
-    pVideoMetadataInfo->setBanner(pMetadata->GetBanner());
-    pVideoMetadataInfo->setScreenshot(pMetadata->GetScreenshot());
-    pVideoMetadataInfo->setTrailer(pMetadata->GetTrailer());
-
-    if (bDetails)
-    {
-        if (!pMetadata->GetFanart().isEmpty())
-        {
-            V2ArtworkInfo *pArtInfo =
-                pVideoMetadataInfo->Artwork()->AddNewArtworkInfo();
-            pArtInfo->setStorageGroup("Fanart");
-            pArtInfo->setType("fanart");
-            pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                      "&FileName=%2")
-                      .arg("Fanart",
-                           QString(
-                           QUrl::toPercentEncoding(pMetadata->GetFanart()))));
-        }
-        if (!pMetadata->GetCoverFile().isEmpty())
-        {
-            V2ArtworkInfo *pArtInfo =
-                pVideoMetadataInfo->Artwork()->AddNewArtworkInfo();
-            pArtInfo->setStorageGroup("Coverart");
-            pArtInfo->setType("coverart");
-            pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                      "&FileName=%2")
-                      .arg("Coverart",
-                           QString(
-                           QUrl::toPercentEncoding(pMetadata->GetCoverFile()))));
-        }
-        if (!pMetadata->GetBanner().isEmpty())
-        {
-            V2ArtworkInfo *pArtInfo =
-                    pVideoMetadataInfo->Artwork()->AddNewArtworkInfo();
-            pArtInfo->setStorageGroup("Banners");
-            pArtInfo->setType("banner");
-            pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                      "&FileName=%2")
-                      .arg("Banners",
-                           QString(
-                           QUrl::toPercentEncoding(pMetadata->GetBanner()))));
-        }
-        if (!pMetadata->GetScreenshot().isEmpty())
-        {
-            V2ArtworkInfo *pArtInfo =
-                    pVideoMetadataInfo->Artwork()->AddNewArtworkInfo();
-            pArtInfo->setStorageGroup("Screenshots");
-            pArtInfo->setType("screenshot");
-            pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                      "&FileName=%2")
-                      .arg("Screenshots",
-                           QString(
-                           QUrl::toPercentEncoding(pMetadata->GetScreenshot()))));
-        }
-    }
-
-    V2FillGenreList(pVideoMetadataInfo->Genres(), pVideoMetadataInfo->GetId());
-}
-
-
-void V2FillGenreList(V2GenreList* pGenreList, int videoID)
-{
-    if (!pGenreList)
-        return;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT genre from videogenre "
-                  "LEFT JOIN videometadatagenre ON videometadatagenre.idgenre = videogenre.intid "
-                  "WHERE idvideo = :ID "
-                  "ORDER BY genre;");
-    query.bindValue(":ID",    videoID);
-
-    if (query.exec() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            V2Genre *pGenre = pGenreList->AddNewGenre();
-            QString genre = query.value(0).toString();
-            pGenre->setName(genre);
-        }
-    }
-}
-
-
 void V2FillProgramInfo( V2Program *pProgram,
                       ProgramInfo  *pInfo,
                       bool          bIncChannel /* = true */,
@@ -398,6 +275,214 @@ void V2FillRecRuleInfo( V2RecRule  *pRecRule,
     pRecRule->setAverageDelay   (  pRule->m_averageDelay           );
 }
 
+void V2FillArtworkInfoList( V2ArtworkInfoList *pArtworkInfoList,
+                          const QString        &sInetref,
+                          uint                  nSeason )
+{
+    ArtworkMap map = GetArtwork(sInetref, nSeason);
+    for (auto i = map.cbegin(); i != map.cend(); ++i)
+    {
+        V2ArtworkInfo *pArtInfo = pArtworkInfoList->AddNewArtworkInfo();
+        pArtInfo->setFileName(i.value().url);
+        switch (i.key())
+        {
+            case kArtworkFanart:
+                pArtInfo->setStorageGroup("Fanart");
+                pArtInfo->setType("fanart");
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                    "&FileName=%2")
+                    .arg("Fanart",
+                         QString(QUrl::toPercentEncoding(
+                            QUrl(i.value().url).path()))));
+                break;
+            case kArtworkBanner:
+                pArtInfo->setStorageGroup("Banners");
+                pArtInfo->setType("banner");
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                    "&FileName=%2")
+                    .arg("Banners",
+                         QString(QUrl::toPercentEncoding(
+                            QUrl(i.value().url).path()))));
+                break;
+            case kArtworkCoverart:
+            default:
+                pArtInfo->setStorageGroup("Coverart");
+                pArtInfo->setType("coverart");
+                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                    "&FileName=%2")
+                    .arg("Coverart",
+                         QString(QUrl::toPercentEncoding(
+                            QUrl(i.value().url).path()))));
+                break;
+        }
+    }
+}
+
+void V2FillGenreList(V2GenreList* pGenreList, int videoID)
+{
+    if (!pGenreList)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT genre from videogenre "
+                  "LEFT JOIN videometadatagenre ON videometadatagenre.idgenre = videogenre.intid "
+                  "WHERE idvideo = :ID "
+                  "ORDER BY genre;");
+    query.bindValue(":ID",    videoID);
+
+    if (query.exec() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            V2Genre *pGenre = pGenreList->AddNewGenre();
+            QString genre = query.value(0).toString();
+            pGenre->setName(genre);
+        }
+    }
+}
+
+
+void V2FillVideoMetadataInfo (
+                      V2VideoMetadataInfo *pVideoMetadataInfo,
+                      const VideoMetadataListManager::VideoMetadataPtr& pMetadata,
+                      bool          bDetails)
+{
+    pVideoMetadataInfo->setId(pMetadata->GetID());
+    pVideoMetadataInfo->setTitle(pMetadata->GetTitle());
+    pVideoMetadataInfo->setSubTitle(pMetadata->GetSubtitle());
+    pVideoMetadataInfo->setTagline(pMetadata->GetTagline());
+    pVideoMetadataInfo->setDirector(pMetadata->GetDirector());
+    pVideoMetadataInfo->setStudio(pMetadata->GetStudio());
+    pVideoMetadataInfo->setDescription(pMetadata->GetPlot());
+    pVideoMetadataInfo->setCertification(pMetadata->GetRating());
+    pVideoMetadataInfo->setInetref(pMetadata->GetInetRef());
+    pVideoMetadataInfo->setCollectionref(pMetadata->GetCollectionRef());
+    pVideoMetadataInfo->setHomePage(pMetadata->GetHomepage());
+    pVideoMetadataInfo->setReleaseDate(
+        QDateTime(pMetadata->GetReleaseDate(),
+                  QTime(0,0),Qt::LocalTime).toUTC());
+    pVideoMetadataInfo->setAddDate(
+        QDateTime(pMetadata->GetInsertdate(),
+                  QTime(0,0),Qt::LocalTime).toUTC());
+    pVideoMetadataInfo->setUserRating(pMetadata->GetUserRating());
+    pVideoMetadataInfo->setChildID(pMetadata->GetChildID());
+    pVideoMetadataInfo->setLength(pMetadata->GetLength().count());
+    pVideoMetadataInfo->setPlayCount(pMetadata->GetPlayCount());
+    pVideoMetadataInfo->setSeason(pMetadata->GetSeason());
+    pVideoMetadataInfo->setEpisode(pMetadata->GetEpisode());
+    pVideoMetadataInfo->setParentalLevel(pMetadata->GetShowLevel());
+    pVideoMetadataInfo->setVisible(pMetadata->GetBrowse());
+    pVideoMetadataInfo->setWatched(pMetadata->GetWatched());
+    pVideoMetadataInfo->setProcessed(pMetadata->GetProcessed());
+    pVideoMetadataInfo->setContentType(ContentTypeToString(
+                                       pMetadata->GetContentType()));
+    pVideoMetadataInfo->setFileName(pMetadata->GetFilename());
+    pVideoMetadataInfo->setHash(pMetadata->GetHash());
+    pVideoMetadataInfo->setHostName(pMetadata->GetHost());
+    pVideoMetadataInfo->setCoverart(pMetadata->GetCoverFile());
+    pVideoMetadataInfo->setFanart(pMetadata->GetFanart());
+    pVideoMetadataInfo->setBanner(pMetadata->GetBanner());
+    pVideoMetadataInfo->setScreenshot(pMetadata->GetScreenshot());
+    pVideoMetadataInfo->setTrailer(pMetadata->GetTrailer());
+
+    if (bDetails)
+    {
+        if (!pMetadata->GetFanart().isEmpty())
+        {
+            V2ArtworkInfo *pArtInfo =
+                pVideoMetadataInfo->Artwork()->AddNewArtworkInfo();
+            pArtInfo->setStorageGroup("Fanart");
+            pArtInfo->setType("fanart");
+            pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                      "&FileName=%2")
+                      .arg("Fanart",
+                           QString(
+                           QUrl::toPercentEncoding(pMetadata->GetFanart()))));
+        }
+        if (!pMetadata->GetCoverFile().isEmpty())
+        {
+            V2ArtworkInfo *pArtInfo =
+                pVideoMetadataInfo->Artwork()->AddNewArtworkInfo();
+            pArtInfo->setStorageGroup("Coverart");
+            pArtInfo->setType("coverart");
+            pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                      "&FileName=%2")
+                      .arg("Coverart",
+                           QString(
+                           QUrl::toPercentEncoding(pMetadata->GetCoverFile()))));
+        }
+        if (!pMetadata->GetBanner().isEmpty())
+        {
+            V2ArtworkInfo *pArtInfo =
+                    pVideoMetadataInfo->Artwork()->AddNewArtworkInfo();
+            pArtInfo->setStorageGroup("Banners");
+            pArtInfo->setType("banner");
+            pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                      "&FileName=%2")
+                      .arg("Banners",
+                           QString(
+                           QUrl::toPercentEncoding(pMetadata->GetBanner()))));
+        }
+        if (!pMetadata->GetScreenshot().isEmpty())
+        {
+            V2ArtworkInfo *pArtInfo =
+                    pVideoMetadataInfo->Artwork()->AddNewArtworkInfo();
+            pArtInfo->setStorageGroup("Screenshots");
+            pArtInfo->setType("screenshot");
+            pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
+                      "&FileName=%2")
+                      .arg("Screenshots",
+                           QString(
+                           QUrl::toPercentEncoding(pMetadata->GetScreenshot()))));
+        }
+    }
+
+    V2FillGenreList(pVideoMetadataInfo->Genres(), pVideoMetadataInfo->GetId());
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+// void V2FillMusicMetadataInfo (V2MusicMetadataInfo *pVideoMetadataInfo,
+//                             MusicMetadata *pMetadata, bool bDetails)
+// {
+//     pVideoMetadataInfo->setId(pMetadata->ID());
+//     pVideoMetadataInfo->setArtist(pMetadata->Artist());
+//     pVideoMetadataInfo->setCompilationArtist(pMetadata->CompilationArtist());
+//     pVideoMetadataInfo->setAlbum(pMetadata->Album());
+//     pVideoMetadataInfo->setTitle(pMetadata->Title());
+//     pVideoMetadataInfo->setTrackNo(pMetadata->Track());
+//     pVideoMetadataInfo->setGenre(pMetadata->Genre());
+//     pVideoMetadataInfo->setYear(pMetadata->Year());
+//     pVideoMetadataInfo->setPlayCount(pMetadata->PlayCount());
+//     pVideoMetadataInfo->setLength(pMetadata->Length().count());
+//     pVideoMetadataInfo->setRating(pMetadata->Rating());
+//     pVideoMetadataInfo->setFileName(pMetadata->Filename());
+//     pVideoMetadataInfo->setHostName(pMetadata->Hostname());
+//     pVideoMetadataInfo->setLastPlayed(pMetadata->LastPlay());
+//     pVideoMetadataInfo->setCompilation(pMetadata->Compilation());
+
+//     if (bDetails)
+//     {
+//         //TODO add coverart here
+//     }
+// }
+
+void V2FillInputInfo(V2Input* input, const InputInfo& inputInfo)
+{
+    input->setId(inputInfo.m_inputId);
+    input->setInputName(inputInfo.m_name);
+    input->setCardId(inputInfo.m_inputId);
+    input->setSourceId(inputInfo.m_sourceId);
+    input->setDisplayName(inputInfo.m_displayName);
+    input->setLiveTVOrder(inputInfo.m_liveTvOrder);
+    input->setScheduleOrder(inputInfo.m_scheduleOrder);
+    input->setRecPriority(inputInfo.m_recPriority);
+    input->setQuickTune(inputInfo.m_quickTune);
+}
+
+
 
 void V2FillCastMemberList(V2CastMemberList* pCastMemberList,
                         ProgramInfo* pInfo)
@@ -472,69 +557,6 @@ void V2FillCastMemberList(V2CastMemberList* pCastMemberList,
 
 }
 
-void V2FillArtworkInfoList( V2ArtworkInfoList *pArtworkInfoList,
-                          const QString        &sInetref,
-                          uint                  nSeason )
-{
-    ArtworkMap map = GetArtwork(sInetref, nSeason);
-    for (auto i = map.cbegin(); i != map.cend(); ++i)
-    {
-        V2ArtworkInfo *pArtInfo = pArtworkInfoList->AddNewArtworkInfo();
-        pArtInfo->setFileName(i.value().url);
-        switch (i.key())
-        {
-            case kArtworkFanart:
-                pArtInfo->setStorageGroup("Fanart");
-                pArtInfo->setType("fanart");
-                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                    "&FileName=%2")
-                    .arg("Fanart",
-                         QString(QUrl::toPercentEncoding(
-                            QUrl(i.value().url).path()))));
-                break;
-            case kArtworkBanner:
-                pArtInfo->setStorageGroup("Banners");
-                pArtInfo->setType("banner");
-                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                    "&FileName=%2")
-                    .arg("Banners",
-                         QString(QUrl::toPercentEncoding(
-                            QUrl(i.value().url).path()))));
-                break;
-            case kArtworkCoverart:
-            default:
-                pArtInfo->setStorageGroup("Coverart");
-                pArtInfo->setType("coverart");
-                pArtInfo->setURL(QString("/Content/GetImageFile?StorageGroup=%1"
-                    "&FileName=%2")
-                    .arg("Coverart",
-                         QString(QUrl::toPercentEncoding(
-                            QUrl(i.value().url).path()))));
-                break;
-        }
-    }
-}
-
-
-DBCredits * V2jsonCastToCredits(const QJsonObject &cast)
-{
-    int priority = 1;
-    auto* credits = new DBCredits;
-
-    QJsonArray members = cast["CastMembers"].toArray();
-    for (const auto & m : members)
-    {
-        QJsonObject actor     = m.toObject();
-        QString     name      = actor.value("Name").toString("");
-        QString     character = actor.value("CharacterName").toString("");
-        QString     role      = actor.value("Role").toString("");
-
-        credits->push_back(DBPerson(role, name, priority, character));
-        ++priority;
-    }
-
-    return credits;
-}
 
 void V2FillCutList(V2CutList* pCutList, RecordingInfo* rInfo, int marktype)
 {
@@ -642,19 +664,6 @@ void V2FillSeek(V2CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype)
     }
 }
 
-void V2FillInputInfo(V2Input* input, const InputInfo& inputInfo)
-{
-    input->setId(inputInfo.m_inputId);
-    input->setInputName(inputInfo.m_name);
-    input->setCardId(inputInfo.m_inputId);
-    input->setSourceId(inputInfo.m_sourceId);
-    input->setDisplayName(inputInfo.m_displayName);
-    input->setLiveTVOrder(inputInfo.m_liveTvOrder);
-    input->setScheduleOrder(inputInfo.m_scheduleOrder);
-    input->setRecPriority(inputInfo.m_recPriority);
-    input->setQuickTune(inputInfo.m_quickTune);
-}
-
 int V2CreateRecordingGroup(const QString& groupName)
 {
     int groupID = -1;
@@ -673,4 +682,24 @@ int V2CreateRecordingGroup(const QString& groupName)
                                          "Does it already exist?").arg(groupName));
 
     return groupID;
+}
+
+DBCredits * V2jsonCastToCredits(const QJsonObject &cast)
+{
+    int priority = 1;
+    auto* credits = new DBCredits;
+
+    QJsonArray members = cast["CastMembers"].toArray();
+    for (const auto & m : members)
+    {
+        QJsonObject actor     = m.toObject();
+        QString     name      = actor.value("Name").toString("");
+        QString     character = actor.value("CharacterName").toString("");
+        QString     role      = actor.value("Role").toString("");
+
+        credits->push_back(DBPerson(role, name, priority, character));
+        ++priority;
+    }
+
+    return credits;
 }

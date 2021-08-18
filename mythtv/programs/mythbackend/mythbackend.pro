@@ -83,12 +83,17 @@ HEADERS += servicesv2/v2recRuleList.h
 HEADERS += servicesv2/v2content.h
 HEADERS += servicesv2/v2liveStreamInfo.h servicesv2/v2liveStreamInfoList.h
 HEADERS += servicesv2/v2guide.h servicesv2/v2programGuide.h
+HEADERS += servicesv2/v2channel.h
+HEADERS += servicesv2/v2channelInfoList.h servicesv2/v2lineup.h
+HEADERS += servicesv2/v2videoSource.h servicesv2/v2videoSourceList.h
+HEADERS += servicesv2/v2videoMultiplex.h servicesv2/v2videoMultiplexList.h
 
 SOURCES += servicesv2/v2myth.cpp
 SOURCES += servicesv2/v2video.cpp
 SOURCES += servicesv2/v2dvr.cpp
 SOURCES += servicesv2/v2content.cpp
 SOURCES += servicesv2/v2guide.cpp
+SOURCES += servicesv2/v2channel.cpp
 SOURCES += servicesv2/v2serviceUtil.cpp
 
 using_oss:DEFINES += USING_OSS
