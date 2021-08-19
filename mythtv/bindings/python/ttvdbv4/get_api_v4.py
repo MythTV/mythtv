@@ -1,16 +1,17 @@
 # -*- coding: UTF-8 -*-
 
-# ---------------------------------------
-# Author:  Roland Ernst
-# Purpose: MythTV Bindings for TheTVDB v4
-# ---------------------------------------
+# ----------------------------------------------------
+# Purpose:   MythTV Python Bindings for TheTVDB v4 API
+# Copyright: (c) 2021 Roland Ernst
+# License:   GPL v2 or later, see COPYING for details
+# ----------------------------------------------------
 
-# Purpose:
-#   Parse openapi specification for ttvdb v 4 .
-#   Create definitions and api for the files
-#     - definitions.py
-#     - ttvdbv4_api.py
-
+"""
+Parse openapi specification for ttvdb v4.
+Create definitions and api for the files
+     - definitions.py
+     - ttvdbv4_api.py
+"""
 
 import sys
 import os

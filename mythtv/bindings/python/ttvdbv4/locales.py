@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 #-----------------------
 # Name: locales.py    Stores locale information for filtering results
 # Python Library

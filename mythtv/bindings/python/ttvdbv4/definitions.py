@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
 
-# ---------------------------------------
-# Author:  Roland Ernst
-# Purpose: MythTV Bindings for TheTVDB v4
-# ---------------------------------------
+# ----------------------------------------------------
+# Purpose:   MythTV Python Bindings for TheTVDB v4 API
+# Copyright: (c) 2021 Roland Ernst
+# License:   GPL v2 or later, see COPYING for details
+# ----------------------------------------------------
 
 
 def _get_list(item, name):
