@@ -8,6 +8,7 @@
 
 """
 Parse openapi specification for ttvdb v4.
+See https://github.com/thetvdb/v4-api/blob/main/docs/swagger.yml
 Create definitions and api for the files
      - definitions.py
      - ttvdbv4_api.py
@@ -15,7 +16,7 @@ Create definitions and api for the files
 
 import sys
 import os
-import json
+import yaml
 import re
 
 
@@ -53,9 +54,9 @@ defaults = {'string':  "''",
 pathlist = []
 
 
-def read_json_from_file(jsonfile):
-    with open(jsonfile) as f:
-        data = json.load(f)
+def read_yaml_from_file(api_spec):
+    with open(api_spec) as f:
+        data = yaml.load(f)
     return data
 
 
@@ -246,18 +247,14 @@ def print_definition(name, defitem, setdefaults=False):
 
 if __name__ == '__main__':
     """
-    Go to https://api.swaggerhub.com/apis/thetvdb/tvdb-api_v_4/
-    and select the latest api version.
-    Download it by
-    curl https://api.swaggerhub.com/apis/thetvdb/tvdb-api_v_4/4.x.y --output ./thetvdb-api_v4_4_x_y.json
-    curl -H "Accept: application/yaml" https://api.swaggerhub.com/apis/thetvdb/tvdb-api_v_4/4.x.y --output ./thetvdb-api_v4_4_x_y.yaml
+    Download the latest api specification from the TheTVDB official repo:
+    https://github.com/thetvdb/v4-api/blob/main/docs/swagger.yml
     """
-    #jsonfile = "./thetvdb-api_v4_4_3_7.json"         # openapi 3.0
-    jsonfile = sys.argv[1]
-    if not os.path.isfile(jsonfile):
-        print("Error: main() needs to be called with an OAS3 spec file (json)")
+    api_spec = sys.argv[1]
+    if not os.path.isfile(api_spec):
+        print("Error: main() needs to be called with an OAS3 spec file (yaml)")
         sys.exit(1)
-    apidata = read_json_from_file(jsonfile)
+    apidata = read_yaml_from_file(api_spec)
     api_title = apidata['info']['title']
     api_version = apidata['info']['version']
     apiv4_basepath = apidata['servers'][0]['url']

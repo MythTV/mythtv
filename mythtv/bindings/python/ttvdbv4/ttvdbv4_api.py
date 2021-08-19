@@ -15,7 +15,7 @@ from pprint import pprint
 from .definitions import *
 
 
-MYTHTV_TTVDBV4_API_VERSION = "4.3.8.0"
+MYTHTV_TTVDBV4_API_VERSION = "4.3.17.0"
 
 # set this to true for showing raw json data
 #JSONDEBUG = True
@@ -91,7 +91,7 @@ def _query_yielded(record, path, params, listname=None):
 
 
 
-"""Generated API for thetvdb.com TVDB API V4 v 4.3.8"""
+"""Generated API for thetvdb.com TVDB API V4 v 4.3.17"""
 # modifications marked with '### XXX'
 
 
@@ -134,6 +134,7 @@ getPeopleBase_path = TTVDBV4_path + "/people/{id}"
 getPeopleExtended_path = TTVDBV4_path + "/people/{id}/extended"
 getPeopleTranslation_path = TTVDBV4_path + "/people/{id}/translations/{language}"
 getSearchResults_path = TTVDBV4_path + "/search"
+getAllSeasons_path = TTVDBV4_path + "/seasons"
 getSeasonBase_path = TTVDBV4_path + "/seasons/{id}"
 getSeasonExtended_path = TTVDBV4_path + "/seasons/{id}/extended"
 getSeasonTypes_path = TTVDBV4_path + "/seasons/types"
@@ -435,7 +436,7 @@ def getPeopleTranslation(id, language):
     return( Translation(data) if data is not None else None )
 
 
-def getSearchResults(q=None, query=None, type=None, year=None, offset=None):
+def getSearchResults(q=None, query=None, type=None, year=None, offset=None, limit=None):
     params = {}
     if q is not None:
         params['q'] = q
@@ -447,10 +448,25 @@ def getSearchResults(q=None, query=None, type=None, year=None, offset=None):
         params['year'] = year
     if offset is not None:
         params['offset'] = offset
+    if limit is not None:
+        params['limit'] = limit
     path = getSearchResults_path.format()
     res = _query_api(path, params)
     data = res['data'] if res.get('data') is not None else None
     return( [SearchResult(x) for x in data] if data is not None else [] )
+
+
+def getAllSeasons(page=0, yielded=False):
+    params = {}
+    if page is not None:
+        params['page'] = page
+    path = getAllSeasons_path.format()
+    if yielded:
+        return _query_yielded(SeasonBaseRecord, path, params, listname=None)
+    else:
+        res = _query_api(path, params)
+        data = res['data'] if res.get('data') is not None else None
+        return( [SeasonBaseRecord(x) for x in data] if data is not None else [] )
 
 
 def getSeasonBase(id):
@@ -546,8 +562,13 @@ def getAllSourceTypes():
     return( [SourceType(x) for x in data] if data is not None else [] )
 
 
-def updates(since):
+def updates(since, type=None, action=None):
+    params = {}
+    if type is not None:
+        params['type'] = type
+    if action is not None:
+        params['action'] = action
     path = updates_path.format(since=since)
-    res = _query_api(path)
+    res = _query_api(path, params)
     data = res['data'] if res.get('data') is not None else None
     return( [EntityUpdate(x) for x in data] if data is not None else [] )

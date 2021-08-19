@@ -479,10 +479,8 @@ class Myth4TTVDBv4(object):
         # get season information:
         sea_x = None
         for s in epi_x.seasons:
-            # some hiccup in the OAS 3.0 spec for theTVDBapiv4:
-            if s.type == ser_x.defaultSeasonType or s.type['id'] == ser_x.defaultSeasonType:
+            if s.type.id == ser_x.defaultSeasonType:
                 sea_x = ttvdb.getSeasonExtended(s.id)
-                # s_id = sea_x.                                        ### XXX not needed
                 if self.debug:
                     print("Season Information for %s : %s" % (inetref, season))
                     _print_class_content(sea_x)
@@ -706,7 +704,7 @@ class Myth4TTVDBv4(object):
             episodes = []
             # get the default season type and search only for that:
             def_season_type = ser_x.defaultSeasonType
-            for sea_id in [x.id for x in ser_x.seasons if x.type['id'] == def_season_type]:
+            for sea_id in [x.id for x in ser_x.seasons if x.type.id == def_season_type]:
                 sea_x = ttvdb.getSeasonExtended(sea_id)
                 epi_id_list = []
                 for epi in sea_x.episodes:
@@ -744,9 +742,7 @@ class Myth4TTVDBv4(object):
 
                 sea_x = None
                 for s in epi_x.seasons:
-                    # some hiccup in the OAS 3.0 for theTVDBapiv4:
-                    if s.type == ser_x.defaultSeasonType or \
-                       s.type['id'] == ser_x.defaultSeasonType:
+                    if s.type.id == ser_x.defaultSeasonType:
                         sea_x = ttvdb.getSeasonExtended(s.id)
                         break
                 if self.debug:
