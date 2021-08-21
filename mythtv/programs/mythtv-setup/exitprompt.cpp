@@ -67,7 +67,8 @@ void ExitPrompter::handleExit()
     {
         // Only report the first 4 problems
         QStringList problems;
-        for (int i = 0; i < std::min(4, allproblems.size()); ++i)
+        int limit = std::min(4, static_cast<int>(allproblems.size()));
+        for (int i = 0; i < limit; ++i)
         {
             problems.push_back(allproblems[i]);
         }
