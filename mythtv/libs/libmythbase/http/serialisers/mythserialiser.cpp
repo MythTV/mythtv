@@ -1,3 +1,5 @@
+// Qt
+#include <QMetaProperty>
 // MythTV
 #include "mythlogging.h"
 #include "http/mythmimedatabase.h"
@@ -59,6 +61,47 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
         MythMimeDatabase().MimeTypeForName("application/x-plist"),
         MythMimeDatabase().MimeTypeForName("application/x-apple-binary-plist")
     };
+
+    // Check for preformatted xml or html
+    if (Value.value<QObject*>())
+    {
+        QObject* Object = Value.value<QObject*>();
+        const auto * meta = Object->metaObject();
+        int index = meta->indexOfClassInfo("preformat");
+        if (index >= 0
+            && QString("true") == meta->classInfo(index).value())
+        {
+            HTTPData result = MythHTTPData::Create();
+            QBuffer buffer;
+            buffer.setBuffer(static_cast<QByteArray*>(result.get()));
+            buffer.open(QIODevice::WriteOnly);
+            QString mimetype;
+            int count = meta->propertyCount();
+            for (int ix = 0; ix  < count; ++ix  )
+            {
+                QMetaProperty metaproperty = meta->property(ix);
+                if (metaproperty.isUser(Object))
+                {
+                    const char *rawname = metaproperty.name();
+                    QString name(rawname);
+                    QVariant value(Object->property(rawname));
+                    if (name.compare("mimetype") == 0)
+                    {
+                        mimetype = value.toString();
+                        continue;
+                    }
+                    if (name.compare("buffer") == 0)
+                    {
+                        buffer.write(value.toString().toUtf8());
+                        continue;
+                    }
+                }
+            }
+            MythMimeType reqType = MythMimeDatabase().MimeTypeForName(mimetype);
+            auto alias = reqType.Aliases().indexOf(mimetype);
+            return WrapData(result, reqType, reqType.Aliases().at(alias));
+        }
+    }
 
     for (const auto & mime : Accept)
     {
