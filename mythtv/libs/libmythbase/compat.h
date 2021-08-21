@@ -405,4 +405,8 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #   define LZO_COMPILE_TIME_ASSERT( a )
 #endif
 
+#ifndef O_NONBLOCK
+#   define O_NONBLOCK    04000
+#endif
+
 #endif // COMPAT_H

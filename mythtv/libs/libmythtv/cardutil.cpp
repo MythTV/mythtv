@@ -1212,11 +1212,7 @@ int CardUtil::OpenVideoDevice(const QString &device)
 
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     QByteArray dev = dvbdev.toLatin1();
-    #ifdef _WIN32
-        int fd_frontend = open(dev.constData(), O_RDWR);
-    #else
-        int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
-    #endif
+    int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
 
     if (fd_frontend < 0)
     {
