@@ -56,8 +56,6 @@
     #include <time.h>
 #endif
 
-//#include <stdlib.h>       // for rand() //#include <time.h> //custom
-
 #ifdef _MSC_VER
     // Turn off the visual studio warnings (identifier was truncated)
     #pragma warning(disable:4786)
