@@ -139,7 +139,7 @@ cd ..
 sudo chmod -R 777 $buildPath/install
 cd mythplugins
 
-./configure -cross-prefix=i686-w64-mingw32.shared- --disable-mytharchive
+./configure --prefix="$buildPath/install" -cross-prefix=i686-w64-mingw32.shared- --disable-mytharchive
 make -j$(nproc) install
 cd ..
 
