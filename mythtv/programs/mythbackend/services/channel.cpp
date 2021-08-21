@@ -189,7 +189,7 @@ bool Channel::UpdateDBChannel( uint          MplexID,
     if (HAS_PARAM("useeit"))
         channel.m_useOnAirGuide = UseEIT;
 
-    #ifndef _WIN32 // Needs fixing for Windows
+    #ifndef _WIN32 // TODO Does not compile on Windows
         if (HAS_PARAM("extendedvisible"))
             channel.m_visible = channelVisibleTypeFromString(ExtendedVisible);
     #endif
@@ -253,7 +253,7 @@ bool Channel::AddDBChannel( uint          MplexID,
 {
     ChannelVisibleType chan_visible = kChannelVisible;
 
-    #ifdef _WIN32 // Needs fixing for Windows
+    #ifdef _WIN32 // TODO Needs fixing for Windows
         chan_visible = (Visible ? kChannelVisible : kChannelNotVisible);
     #else
         if (HAS_PARAM("extendedvisible"))

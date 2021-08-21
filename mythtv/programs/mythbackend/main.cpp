@@ -160,7 +160,7 @@ int main(int argc, char **argv)
     return retval;
 }
 
-#ifdef _WIN32 // Needs fixing for Windows
+#ifdef _WIN32 // TODO Needs fixing for Windows
     QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
     {
         return "";
