@@ -337,35 +337,6 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #    define ftello(stream) ftello64(stream)
 #endif
 
-#if defined(USING_MINGW) && defined(FILENAME_MAX) && defined(__cplusplus)
-#    include <cerrno>
-#    include <cstddef>
-#    include <cstring>
-#    include <dirent.h>
-    static inline int readdir_r(
-        DIR *dirp, struct dirent *entry, struct dirent **result)
-    {
-        errno = 0;
-        struct dirent *tmp = readdir(dirp);
-        if (tmp && entry)
-        {
-            int offset = offsetof(struct dirent, d_name);
-            memcpy(entry, tmp, offset);
-            strncpy(entry->d_name, tmp->d_name, FILENAME_MAX);
-            tmp->d_name[strlen(entry->d_name)] = '\0';
-            if (result)
-                *result = entry;
-            return 0;
-        }
-        else
-        {
-            if (result)
-                *result = nullptr;
-            return errno;
-        }
-    }
-#endif
-
 #ifdef Q_OS_ANDROID
 #ifndef S_IREAD
 #define S_IREAD S_IRUSR
