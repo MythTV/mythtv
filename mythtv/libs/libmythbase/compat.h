@@ -50,9 +50,12 @@
 #    include <sys/wait.h>     // For WIFEXITED on Mac OS X
 #endif
 
-#if defined(_WIN32 ) && defined(__cplusplus)
+#ifdef _MSC_VER
     #include <cstdlib>       // for rand()
     #include <ctime>
+    #include <sys/time.h>
+#endif
+#if defined(USING_MINGW)
     #include <time.h>
 #endif
 
@@ -263,7 +266,7 @@
 #    define seteuid(x) 0
 #endif // _WIN32
 
-#if defined(_WIN32) && !defined(gmtime_r) && defined(__cplusplus)
+#if _MSC_VER && !defined(gmtime_r)
 // FFmpeg libs already have a workaround, use it if the headers are included,
 // use this otherwise.
 static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
@@ -280,7 +283,7 @@ static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
 }
 #endif
 
-#if defined(_WIN32) && !defined(localtime_r) && defined(__cplusplus)
+#if  _MSC_VER && !defined(localtime_r)
 // FFmpeg libs already have a workaround, use it if the headers are included,
 // use this otherwise.
 static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
