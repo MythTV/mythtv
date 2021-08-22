@@ -161,25 +161,6 @@
 #   define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #   define unsetenv(x) 0
 
-#ifndef __cplusplus
-	inline void usleep(int usec)
-	{
-		HANDLE timer;
-		LARGE_INTEGER ft;
-
-		ft.QuadPart = -(10*usec); // Convert to 100 nanosecond interval, negative value indicates relative time
-
-		timer = CreateWaitableTimer(NULL, TRUE, NULL);
-		SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
-		WaitForSingleObject(timer, INFINITE);
-		CloseHandle(timer);
-	}
-
-   inline void usleep(long long int usec)
-   {
-       usleep(usec);
-   }
-#endif
 
     struct statfs {
     //   long    f_type;     /* type of filesystem */

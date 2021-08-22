@@ -459,11 +459,7 @@ void MythSystemLegacySignalManager::run(void)
     LOG(VB_GENERAL, LOG_INFO, "Starting process signal handler");
     while( run_system )
     {
-        #ifndef _WIN32
-            usleep(50000);
-        #else
-            sleep(50);
-        #endif
+        usleep(50ms);
         while( run_system )
         {
             // handle cleanup and signalling for closed processes
