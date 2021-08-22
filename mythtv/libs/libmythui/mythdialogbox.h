@@ -495,7 +495,6 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
     QString           m_id;
 };
 
-
 MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, bool showCancel = false);
 template <class OBJ, typename FUNC>
 MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, const OBJ *parent,
