@@ -569,8 +569,8 @@ void MythSystemLegacyWindows::Term(bool force)
     if( force )
     {
         // send KILL if it does not exit within one second
-        sleep(1000);
-        Signal(SIGKILL);
+        if( m_parent->Wait(1s) == GENERIC_EXIT_RUNNING )
+            Signal(SIGKILL);
     }
 }
 
