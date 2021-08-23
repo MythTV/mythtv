@@ -7160,8 +7160,8 @@ map 'enabled $v && intrinsics=${v#intrinsics_}' $INTRINSICS_LIST
 for thread in $THREADS_LIST; do
     if enabled $thread; then
         test -n "$thread_type" &&
-        die "ERROR: Only one thread type must be selected."
-        thread_type="$thread"
+            die "ERROR: Only one thread type must be selected." ||
+            thread_type="$thread"
     fi
 done
 
