@@ -96,6 +96,7 @@ win32 {
         MOC_DIR         = release/moc
         OBJECTS_DIR     = release/obj
     }
+    mingw:DEFINES += MUI_API
 } else {
     MOC_DIR         = moc
     OBJECTS_DIR     = obj
