@@ -7160,10 +7160,8 @@ map 'enabled $v && intrinsics=${v#intrinsics_}' $INTRINSICS_LIST
 for thread in $THREADS_LIST; do
     if enabled $thread; then
         test -n "$thread_type" &&
-        if test x"$target_os" != x"mingw32" ; then
-		    die "ERROR: Only one thread type must be selected." ||
-            thread_type="$thread"
-        fi
+        die "ERROR: Only one thread type must be selected."
+        thread_type="$thread"
     fi
 done
 
