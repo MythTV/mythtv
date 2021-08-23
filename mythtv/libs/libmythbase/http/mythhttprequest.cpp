@@ -165,7 +165,7 @@ HTTPQueries MythHTTPRequest::ParseQuery(const QString &Query)
         value = QUrl::fromPercentEncoding(rawvalue);
         value.replace("+", " ");
         if (!key.isEmpty())
-            result.insert(key.trimmed(), value);
+            result.insert(key.trimmed().toLower(), value);
     }
     return result;
 }

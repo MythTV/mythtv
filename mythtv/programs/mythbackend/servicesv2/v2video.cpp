@@ -458,205 +458,205 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
         return false;
     }
 
-    if (m_request->m_queries.contains("Title"))
+    if (HAS_PARAM("Title"))
     {
         metadata->SetTitle(sTitle);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("SubTitle"))
+    if (HAS_PARAM("SubTitle"))
     {
         metadata->SetSubtitle(sSubTitle);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("TagLine"))
+    if (HAS_PARAM("TagLine"))
     {
         metadata->SetTagline(sTagLine);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Director"))
+    if (HAS_PARAM("Director"))
     {
         metadata->SetDirector(sDirector);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Studio"))
+    if (HAS_PARAM("Studio"))
     {
         metadata->SetStudio(sStudio);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Plot"))
+    if (HAS_PARAM("Plot"))
     {
         metadata->SetPlot(sPlot);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("UserRating"))
+    if (HAS_PARAM("UserRating"))
     {
         metadata->SetUserRating(fUserRating);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Inetref"))
+    if (HAS_PARAM("Inetref"))
     {
         metadata->SetInetRef(sInetref);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("CollectionRef"))
+    if (HAS_PARAM("CollectionRef"))
     {
         metadata->SetCollectionRef(nCollectionRef);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("HomePage"))
+    if (HAS_PARAM("HomePage"))
     {
         metadata->SetHomepage(sHomePage);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Year"))
+    if (HAS_PARAM("Year"))
     {
         metadata->SetYear(nYear);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("ReleaseDate"))
+    if (HAS_PARAM("ReleaseDate"))
     {
         metadata->SetReleaseDate(sReleasedate);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Rating"))
+    if (HAS_PARAM("Rating"))
     {
         metadata->SetRating(sRating);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Length"))
+    if (HAS_PARAM("Length"))
     {
         metadata->SetLength(std::chrono::minutes(nLength));
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("PlayCount"))
+    if (HAS_PARAM("PlayCount"))
     {
         metadata->SetPlayCount(nPlayCount);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Season"))
+    if (HAS_PARAM("Season"))
     {
         metadata->SetSeason(nSeason);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Episode"))
+    if (HAS_PARAM("Episode"))
     {
         metadata->SetEpisode(nEpisode);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("ShowLevel"))
+    if (HAS_PARAM("ShowLevel"))
     {
         metadata->SetShowLevel(ParentalLevel::Level(nShowLevel));
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("FileName"))
+    if (HAS_PARAM("FileName"))
     {
         metadata->SetFilename(sFileName);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Hash"))
+    if (HAS_PARAM("Hash"))
     {
         metadata->SetHash(sHash);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("CoverFile"))
+    if (HAS_PARAM("CoverFile"))
     {
         metadata->SetCoverFile(sCoverFile);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("ChildID"))
+    if (HAS_PARAM("ChildID"))
     {
         metadata->SetChildID(nChildID);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Browse"))
+    if (HAS_PARAM("Browse"))
     {
         metadata->SetBrowse(bBrowse);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Watched"))
+    if (HAS_PARAM("Watched"))
     {
         metadata->SetWatched(bWatched);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Processed"))
+    if (HAS_PARAM("Processed"))
     {
         metadata->SetProcessed(bProcessed);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("PlayCommand"))
+    if (HAS_PARAM("PlayCommand"))
     {
         metadata->SetPlayCommand(sPlayCommand);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Category"))
+    if (HAS_PARAM("Category"))
     {
         metadata->SetCategoryID(nCategory);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Trailer"))
+    if (HAS_PARAM("Trailer"))
     {
         metadata->SetTrailer(sTrailer);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Host"))
+    if (HAS_PARAM("Host"))
     {
         metadata->SetHost(sHost);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Screenshot"))
+    if (HAS_PARAM("Screenshot"))
     {
         metadata->SetScreenshot(sScreenshot);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Banner"))
+    if (HAS_PARAM("Banner"))
     {
         metadata->SetBanner(sBanner);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Fanart"))
+    if (HAS_PARAM("Fanart"))
     {
         metadata->SetFanart(sFanart);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("InsertDate"))
+    if (HAS_PARAM("InsertDate"))
     {
         metadata->SetInsertdate(sInsertDate);
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("ContentType"))
+    if (HAS_PARAM("ContentType"))
     {
         // valid values for ContentType are 'MOVIE','TELEVISION','ADULT','MUSICVIDEO','HOMEVIDEO'
         VideoContentType contentType = kContentUnknown;
@@ -684,7 +684,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
             LOG(VB_GENERAL, LOG_ERR, QString("UpdateVideoMetadata: Ignoring unknown ContentType: %1").arg(sContentType));
     }
 
-    if (m_request->m_queries.contains("Genres"))
+    if (HAS_PARAM("Genres"))
     {
         VideoMetadata::genre_list genres;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -701,7 +701,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Cast"))
+    if (HAS_PARAM("Cast"))
     {
         VideoMetadata::cast_list cast;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
@@ -718,7 +718,7 @@ bool V2Video::UpdateVideoMetadata ( int           nId,
         update_required = true;
     }
 
-    if (m_request->m_queries.contains("Countries"))
+    if (HAS_PARAM("Countries"))
     {
         VideoMetadata::country_list countries;
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)

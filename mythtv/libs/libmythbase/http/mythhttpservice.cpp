@@ -84,7 +84,7 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
     while (count < typecount)
     {
         auto name  = handler->m_names[count];
-        auto value = Request->m_queries.value(name, "");
+        auto value = Request->m_queries.value(name.toLower(), "");
         auto type  = handler->m_types[count];
         types[count] = type;
         // These should be filtered out in MythHTTPMetaMethod

@@ -1997,8 +1997,8 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
 {
     int nReturn = -1;
 
-    if (!m_request->m_queries.contains("JobName") ||
-        !m_request->m_queries.contains("RecordedId") )
+    if (!HAS_PARAM("JobName") ||
+        !HAS_PARAM("RecordedId") )
     {
         LOG(VB_GENERAL, LOG_ERR, "JobName and RecordedId are required.");
         return nReturn;
@@ -2019,7 +2019,7 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
 
     if ( sAction == "Remove")
     {
-        if (!m_request->m_queries.contains("JobId") || nJobId < 0)
+        if (!HAS_PARAM("JobId") || nJobId < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, "For Remove, a valid JobId is required.");
             return nReturn;

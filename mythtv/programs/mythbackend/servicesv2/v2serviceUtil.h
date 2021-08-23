@@ -20,7 +20,7 @@
     (bindvar)[QString(":").append(api_param)] = val; \
     }
 
-#define HAS_PARAM(p) m_request->m_queries.contains(p)
+#define HAS_PARAM(p) m_request->m_queries.contains(QString(p).toLower())
 
 const QStringList KnownServices = { "Capture", "Channel", "Content", \
                                     "Dvr",     "Guide",   "Music",   \

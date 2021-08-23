@@ -128,7 +128,7 @@ void MythHTTPEncoding::GetURLEncodedParameters(MythHTTPRequest* Request)
             {
                 name  = QUrl::fromPercentEncoding(name.toUtf8());
                 value = QUrl::fromPercentEncoding(value.toUtf8());
-                Request->m_queries.insert(name.trimmed(), value);
+                Request->m_queries.insert(name.trimmed().toLower(), value);
             }
         }
     }
@@ -176,7 +176,7 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
                     if (!name.isEmpty())
                     {
                         // TODO: html decode entities if required
-                        Request->m_queries.insert(name.trimmed(), value);
+                        Request->m_queries.insert(name.trimmed().toLower(), value);
                         LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(name).arg(value));
                     }
                 }
