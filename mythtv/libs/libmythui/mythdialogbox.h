@@ -16,9 +16,6 @@
 #include "mythmainwindow.h"
 #include "mythlogging.h"
 
-#ifdef _WIN32
-    # define MUI_PUBLIC Q_DECL_EXPORT
-#endif
 
 class QTimer;
 

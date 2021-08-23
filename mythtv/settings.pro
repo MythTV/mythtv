@@ -186,6 +186,8 @@ win32 {
             QMAKE_EXTENSION_LIB=a
         }
         MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
+        
+        DEFINES += MUI_API
     }
 
     # if CYGWIN compile, set up flag in CONFIG
