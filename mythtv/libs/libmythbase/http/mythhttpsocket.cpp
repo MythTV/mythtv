@@ -171,6 +171,7 @@ void MythHTTPSocket::Timeout()
             return;
         }
         Respond(MythHTTPResponse::ErrorResponse(HTTPRequestTimeout, m_config.m_serverName));
+        Stop();
     }
 }
 
