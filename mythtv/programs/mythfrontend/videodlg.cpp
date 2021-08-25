@@ -191,8 +191,10 @@ namespace
                 }
                 else
                 {
-                sfn += hntm.arg(base_name + "_%1", suffix, ext);
-                sfn += hntm.arg(video_uid + "_%1", suffix, ext);
+                sfn += hntm.arg(base_name + QString("_%1").arg(suffix),
+                                ext);
+                sfn += hntm.arg(video_uid + QString("_%1").arg(suffix),
+                                ext);
                 }
 
                 for (const auto & str : qAsConst(sfn))
