@@ -1012,6 +1012,7 @@
             <buttonarea>0,0,344,370</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,344,38</area>
+                <state name="active">
                     <textarea name="buttontext" from="basetextarea">
                         <area>8,0,328,38</area>
                         <font>basesmallgrey</font>
@@ -1610,12 +1611,12 @@
         </spinbox>
 
         <buttonlist name="input" from="basewideselector">
-            <position>40,160</position>
+            <position>40,150</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="startoffset" from="basewidespinbox">
-            <position>40,220</position>
+            <position>40,200</position>
             <helptext></helptext>
             <template type="negative">Start recording %n minute(s) late</template>
             <template type="zero">Start recording on time</template>
@@ -1623,7 +1624,7 @@
         </spinbox>
 
         <spinbox name="endoffset" from="basewidespinbox">
-            <position>40,280</position>
+            <position>40,250</position>
             <helptext></helptext>
             <template type="negative">End recording %n minute(s) early</template>
             <template type="zero">End recording on time</template>
@@ -1631,11 +1632,16 @@
         </spinbox>
 
         <buttonlist name="dupmethod" from="basewideselector">
-            <position>40,340</position>
+            <position>40,300</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="dupscope" from="basewideselector">
+            <position>40,350</position>
+            <helptext></helptext>
+        </buttonlist>
+
+        <buttonlist name="autoextend" from="basewideselector">
             <position>40,400</position>
             <helptext></helptext>
         </buttonlist>

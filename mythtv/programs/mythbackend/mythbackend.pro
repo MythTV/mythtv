@@ -31,6 +31,7 @@ HEADERS += playbacksock.h scheduler.h server.h backendhousekeeper.h
 HEADERS += upnpcdstv.h upnpcdsmusic.h upnpcdsvideo.h mediaserver.h
 HEADERS += internetContent.h main_helpers.h backendcontext.h
 HEADERS += httpconfig.h mythsettings.h commandlineparser.h
+HEADERS += recordingextender.h
 
 HEADERS += serviceHosts/mythServiceHost.h    serviceHosts/guideServiceHost.h
 HEADERS += serviceHosts/contentServiceHost.h serviceHosts/dvrServiceHost.h
@@ -49,6 +50,7 @@ SOURCES += backendhousekeeper.cpp
 SOURCES += upnpcdstv.cpp upnpcdsmusic.cpp upnpcdsvideo.cpp mediaserver.cpp
 SOURCES += internetContent.cpp main_helpers.cpp backendcontext.cpp
 SOURCES += httpconfig.cpp mythsettings.cpp commandlineparser.cpp
+SOURCES += recordingextender.cpp
 
 SOURCES += services/myth.cpp services/guide.cpp services/content.cpp 
 SOURCES += services/dvr.cpp services/channel.cpp services/video.cpp

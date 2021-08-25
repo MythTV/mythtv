@@ -45,6 +45,7 @@
 #include "mythlogging.h"
 #include "tv_rec.h"
 #include "jobqueue.h"
+#include "recordingextender.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_WARN QString("Scheduler, Warning: ")
@@ -2861,6 +2862,8 @@ bool Scheduler::HandleRecording(
             // activate auto expirer
             if (m_expirer && recStatus == RecStatus::Tuning)
                 AutoExpire::Update(ri.GetInputID(), fsID, false);
+
+            RecordingExtender::create(this, ri);
         }
     }
 

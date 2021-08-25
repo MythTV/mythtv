@@ -342,3 +342,49 @@ RecSearchType searchTypeFromString(const QString& type)
         return kManualSearch;
     return kNoSearch;
 }
+
+QString toString(AutoExtendType extType)
+{
+    switch (extType)
+    {
+        default:
+            return QString();
+        case AutoExtendType::None:
+            return QStringLiteral(u"None");
+        case AutoExtendType::ESPN:
+            return QStringLiteral(u"ESPN");
+        case AutoExtendType::MLB:
+            return QStringLiteral(u"MLB");
+    }
+}
+
+QString toDescription(AutoExtendType extType)
+{
+    switch (extType)
+    {
+        default:
+            return QString();
+        case AutoExtendType::None:
+            return QObject::tr("Do not automatically extend recording");
+        case AutoExtendType::ESPN:
+            return QObject::tr("Automatically extend recording using ESPN");
+        case AutoExtendType::MLB:
+            return QObject::tr("Automatically extend recording using MLB");
+    }
+}
+
+AutoExtendType autoExtendTypeFromInt(uint8_t type)
+{
+    if (type >= static_cast<uint8_t>(AutoExtendType::Last))
+        return AutoExtendType::None;
+    return static_cast<AutoExtendType>(type);
+}
+
+AutoExtendType autoExtendTypeFromString(const QString& type)
+{
+    if (type.toLower() == "espn")
+        return AutoExtendType::ESPN;
+    if (type.toLower() == "mlb")
+        return AutoExtendType::MLB;
+    return AutoExtendType::None;
+}

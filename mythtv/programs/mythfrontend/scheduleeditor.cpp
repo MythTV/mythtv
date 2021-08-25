@@ -1956,6 +1956,11 @@ void SchedOptMixin::Create(bool *err)
     else
         UIUtilW::Assign(m_screen, m_dupscopeList, "dupscope");
 
+    if (m_other && !m_other->m_autoExtendList)
+        UIUtilE::Assign(m_screen, m_autoExtendList, "autoextend", err);
+    else
+        UIUtilW::Assign(m_screen, m_autoExtendList, "autoextend");
+
     if (m_other && !m_other->m_inputList)
         UIUtilE::Assign(m_screen, m_inputList, "input", err);
     else
@@ -2051,6 +2056,24 @@ void SchedOptMixin::Load(void)
         m_dupscopeList->SetValueByData(ENUM_TO_QVARIANT(m_rule->m_dupIn));
     }
 
+    // Auto Extend Services
+    if (m_autoExtendList)
+    {
+        if (!m_loaded)
+        {
+            new MythUIButtonListItem(m_autoExtendList,
+                                     toDescription(AutoExtendType::None),
+                                     ENUM_TO_QVARIANT(AutoExtendType::None));
+            new MythUIButtonListItem(m_autoExtendList,
+                                     toDescription(AutoExtendType::ESPN),
+                                     ENUM_TO_QVARIANT(AutoExtendType::ESPN));
+            new MythUIButtonListItem(m_autoExtendList,
+                                     toDescription(AutoExtendType::MLB),
+                                     ENUM_TO_QVARIANT(AutoExtendType::MLB));
+        }
+        m_autoExtendList->SetValueByData(ENUM_TO_QVARIANT(m_rule->m_autoExtend));
+    }
+
     // Preferred Input
     if (m_inputList)
     {
@@ -2119,6 +2142,11 @@ void SchedOptMixin::Save(void)
         int val = ((m_rule->m_dupIn & ~mask) |
                    m_dupscopeList->GetDataValue().toInt());
         m_rule->m_dupIn = static_cast<RecordingDupInType>(val);
+    }
+    if (m_autoExtendList)
+    {
+        int val = m_autoExtendList->GetDataValue().toInt();
+        m_rule->m_autoExtend = static_cast<AutoExtendType>(val);
     }
     if (m_inputList)
         m_rule->m_prefInput = m_inputList->GetDataValue().toInt();

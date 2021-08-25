@@ -1,0 +1,1 @@
+{"$ref":"http://sports.core.api.espn.com/v2/sports/soccer/leagues/usa.ncaa.w.1/events/617628/competitions/617628/status?lang=en&region=us","clock":5210.0,"addedClock":0.0,"displayClock":"87'","period":2,"type":{"id":"26","name":"STATUS_SECOND_HALF","state":"in","completed":false,"description":"Second Half","detail":"87'","shortDetail":"87'"}}

@@ -69,7 +69,8 @@ bool RecordingRule::Load(bool asTemplate)
     "autometadata, parentid, title, subtitle, description, season, episode, " // 23-29
     "category, starttime, startdate, endtime, enddate, seriesid, programid, " // 30-36
     "inetref, chanid, station, findday, findtime, findid, " // 37-42
-    "next_record, last_record, last_delete, avg_delay, filter, recgroupid " // 43-48
+    "next_record, last_record, last_delete, avg_delay, filter, recgroupid, " // 43-48
+    "autoextend " // 49
     "FROM record WHERE recordid = :RECORDID ;");
 
     query.bindValue(":RECORDID", m_recordID);
@@ -98,6 +99,7 @@ bool RecordingRule::Load(bool asTemplate)
     m_dupIn = static_cast<RecordingDupInType>(query.value(7).toInt());
     m_filter = query.value(47).toUInt();
     m_isInactive = query.value(8).toBool();
+    m_autoExtend = static_cast<AutoExtendType>(query.value(49).toUInt());
 
     // Storage
     m_recProfile = query.value(9).toString();
@@ -385,7 +387,7 @@ bool RecordingRule::Save(bool sendSig)
                     "recpriority = :RECPRIORITY, prefinput = :INPUT, "
                     "startoffset = :STARTOFFSET, endoffset = :ENDOFFSET, "
                     "dupmethod = :DUPMETHOD, dupin = :DUPIN, "
-                    "filter = :FILTER, "
+                    "filter = :FILTER, autoextend = :AUTOEXTEND, "
                     "inactive = :INACTIVE, profile = :RECPROFILE, "
                     "recgroup = :RECGROUP, "
                     "recgroupid = :RECGROUPID, "
@@ -432,6 +434,7 @@ bool RecordingRule::Save(bool sendSig)
     query.bindValue(":DUPMETHOD", m_dupMethod);
     query.bindValue(":DUPIN", m_dupIn);
     query.bindValue(":FILTER", m_filter);
+    query.bindValue(":AUTOEXTEND", static_cast<int>(m_autoExtend));
     query.bindValue(":INACTIVE", m_isInactive);
     query.bindValue(":RECPROFILE", null_to_empty(m_recProfile));
     // Temporary, remove once transition to recgroupid is complete
@@ -655,6 +658,7 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
 
     infoMap["ruletype"] = toString(m_type);
     infoMap["rectype"] = toString(m_type);
+    infoMap["autoextend"] = toString(m_autoExtend);
 
     if (m_template == "Default")
         infoMap["template"] = tr("Default", "Default template");
@@ -1016,6 +1020,12 @@ bool RecordingRule::IsValid(QString &msg) const
     if (m_transcoder < 0)
     {
         msg = QString("Invalid transcoder value.");
+        return false;
+    }
+
+    if (m_autoExtend >= AutoExtendType::Last)
+    {
+        msg = QString("Invalid auto extend value.");
         return false;
     }
 

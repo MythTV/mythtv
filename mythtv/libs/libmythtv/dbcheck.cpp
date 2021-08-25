@@ -6,7 +6,6 @@
 #include <QString>
 #include <QSqlError>
 #include "dbcheck.h"
-#include "mythdbcheck.h"
 
 #include "mythversion.h"
 #include "dbutil.h"
@@ -3857,6 +3856,19 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1371")
+    {
+        // Create the new tables first.
+        DBUpdates updates = getRecordingExtenderDbInfo(1);
+        if (!performUpdateSeries("MythtTV", updates))
+            return false;
+
+        // If that worked, modify existing tables.
+        updates = getRecordingExtenderDbInfo(0);
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1372", dbver))
+            return false;
+    }
 
     return true;
 }
@@ -5205,6 +5217,497 @@ R"(INSERT INTO recordfilter VALUES (6,'This episode','(RECTABLE.programid <> \'\
     GetMythDB()->SetHaveSchema(true);
 
     return true;
+}
+
+DBUpdates getRecordingExtenderDbInfo (int version)
+{
+    switch (version)
+    {
+      case 0:
+        return {
+            R"(ALTER TABLE record ADD COLUMN autoextend
+                TINYINT UNSIGNED DEFAULT 0;)",
+        };
+
+      case 1:
+        return {
+            R"(CREATE TABLE sportsapi (
+              id INT UNSIGNED PRIMARY KEY,
+              provider TINYINT UNSIGNED DEFAULT 0,
+              name VARCHAR(128) NOT NULL,
+              key1 VARCHAR(256) NOT NULL,
+              key2 VARCHAR(256) NOT NULL,
+              UNIQUE(provider,key1,key2)
+              );)",
+            R"(INSERT INTO sportsapi
+            VALUES
+              (   1,1,"Major League Baseball","baseball","mlb"),
+              (   2,1,"NCAA Men's Baseball","baseball","college-baseball"),
+              (   3,1,"NCAA Women's Softball","baseball","college-softball"),
+              (   4,1,"Olympic Men's Baseball","baseball","olympics-baseball"),
+              (   5,1,"World Baseball Classic","baseball","world-baseball-classic"),
+              (   6,1,"Little League Baseball","baseball","llb"),
+              (   7,1,"Caribbean Series","baseball","caribbean-series"),
+              (   8,1,"Dominican Winter League","baseball","dominican-winter-league"),
+              (   9,1,"Venezuelan Winter League","baseball","venezuelan-winter-league"),
+              (  10,1,"Mexican League","baseball","mexican-winter-league"),
+              (  11,1,"Puerto Rican Winter League","baseball","puerto-rican-winter-league");)",
+
+            R"(INSERT INTO sportsapi
+            VALUES
+              (  20,1,"National Football League","football","nfl"),
+              (  21,1,"NCAA - Football","football","college-football"),
+              (  22,1,"XFL","football","xfl"),
+              (  23,1,"Canadian Football League","football","cfl");)",
+
+            R"(INSERT INTO sportsapi
+            VALUES
+              (  40,1,"National Basketball Association","basketball","nba"),
+              (  41,1,"Women's National Basketball Association","basketball","wnba"),
+              (  42,1,"NCAA Men's Basketball","basketball","mens-college-basketball"),
+              (  43,1,"NCAA Women's Basketball","basketball","womens-college-basketball"),
+              (  44,1,"Olympics Men's Basketball","basketball","mens-olympic-basketball"),
+              (  45,1,"Olympics Women's Basketball","basketball","womens-olympic-basketball"),
+              (  46,1,"National Basketball Association Summer League Las Vegas","basketball","nba-summer-las-vegas"),
+              (  47,1,"National Basketball Association Summer League Utah","basketball","nba-summer-utah"),
+              (  48,1,"National Basketball Association Summer League Orlando","basketball","nba-summer-orlando"),
+              (  49,1,"National Basketball Association Summer League Sacramento","basketball","nba-summer-sacramento"),
+              (  50,1,"NBA G League","basketball","nba-development"),
+              (  51,1,"International Basketball Federation","basketball","fiba");)",
+
+            R"(INSERT INTO sportsapi
+            VALUES
+              (  60,1,"National Hockey League","hockey","nfl"),
+              (  61,1,"NCAA Men's Ice Hockey","hockey","mens-college-hockey"),
+              (  62,1,"NCAA Women's Hockey","hockey","womens-college-hockey"),
+              (  63,1,"World Cup of Hockey","hockey","hockey-world-cup"),
+              (  64,1,"Men's Olympic Ice Hockey","hockey","mens-olympic-hockey"),
+              (  65,1,"Women's Olympic Ice Hockey","hockey","womens-olympic-hockey"),
+              (  66,1,"NCAA Women's Field Hockey","field-hockey","womens-college-field-hockey");)",
+
+            R"(INSERT INTO sportsapi
+            VALUES
+              (  80,1,"NCAA Men's Volleyball","volleyball","mens-college-volleyball"),
+              (  81,1,"NCAA Women's Volleyball","volleyball","womens-college-volleyball");)",
+
+            R"(INSERT INTO sportsapi
+            VALUES
+              ( 100,1,"NCAA Men's Lacrosse","lacrosse","mens-college-lacrosse"),
+              ( 101,1,"NCAA Women's Lacrosse","lacrosse","womens-college-lacrosse");)",
+
+            R"(INSERT INTO sportsapi
+            VALUES
+              ( 120,1,"NCAA Men's Water Polo","water-polo","mens-college-water-polo"),
+              ( 121,1,"NCAA Women's Water Polo","water-polo","womens-college-water-polo");)",
+
+            R"(INSERT INTO sportsapi
+            VALUES
+              ( 200,1,"NCAA Men's Soccer","soccer","usa.ncaa.m.1"),
+              ( 201,1,"NCAA Women's Soccer","soccer","usa.ncaa.w.1"),
+              ( 202,1,"Major League Soccer","soccer","usa.1"),
+              ( 203,1,"English Premier League","soccer","eng.1"),
+              ( 204,1,"English League Championship","soccer","eng.2"),
+              ( 205,1,"Italian Serie A","soccer","ita.1"),
+              ( 206,1,"French Ligue 1","soccer","fra.1"),
+              ( 207,1,"French Ligue 2","soccer","fra.2"),
+              ( 208,1,"Spanish LaLiga","soccer","esp.1"),
+              ( 209,1,"German Bundesliga","soccer","ger.1"),
+              ( 210,1,"German 2. Bundesliga","soccer","ger.2"),
+              ( 211,1,"Mexican Liga BBVA MX","soccer","mex.1"),
+              ( 212,1,"Copa Do Brasil","soccer","bra.copa_do_brazil"),
+              ( 213,1,"CONCACAF Leagues Cup","soccer","concacaf.leagues.cup"),
+              ( 214,1,"CONCACAF League","soccer","concacaf.league"),
+              ( 215,1,"CONCACAF Champions League","soccer","concacaf.champions"),
+              ( 216,1,"CONCACAF Nations League","soccer","concacaf.nations.league"),
+              ( 217,1,"CONCACAF Gold Cup","soccer","concacaf.gold"),
+              ( 218,1,"FIFA World Cup","soccer","fifa.world"),
+              ( 219,1,"FIFA World Cup Qualifying - UEFA","soccer","fifa.worldq.uefa"),
+              ( 220,1,"FIFA World Cup Qualifying - CONCACAF","soccer","fifa.worldq.concacaf"),
+              ( 221,1,"FIFA World Cup Qualifying - CONMEBOL","soccer","fifa.worldq.conmebol"),
+              ( 222,1,"FIFA World Cup Qualifying - AFC","soccer","fifa.worldq.afc"),
+              ( 223,1,"FIFA World Cup Qualifying - CAF","soccer","fifa.worldq.caf"),
+              ( 224,1,"FIFA World Cup Qualifying - OFC","soccer","fifa.worldq.ofc"),
+              ( 225,1,"UEFA Champions League","soccer","uefa.champions"),
+              ( 226,1,"UEFA Europa League","soccer","uefa.europa"),
+              ( 227,1,"UEFA Europa Conference League","soccer","uefa.europa.conf"),
+              ( 228,1,"English Carabao Cup","soccer","eng.league_cup"),
+              ( 229,1,"USL Championship","soccer","usa.usl.1"),
+              ( 230,1,"United States NWSL","soccer","usa.nwsl"),
+              ( 231,1,"FA Women's Super League","soccer","eng.w.1"),
+              ( 232,1,"English FA Cup","soccer","eng.fa"),
+              ( 233,1,"Spanish Copa del Rey","soccer","esp.copa_del_rey"),
+              ( 234,1,"German DFB Pokal","soccer","ger.dfb_pokal"),
+              ( 235,1,"Italian Coppa Italia","soccer","ita.coppa_italia"),
+              ( 236,1,"French Coupe de France","soccer","fra.coupe_de_france"),
+              ( 237,1,"AFC Champions League","soccer","afc.champions"),
+              ( 238,1,"Dutch KNVB Beker","soccer","ned.cup"),
+              ( 239,1,"Dutch Eredivisie","soccer","ned.1"),
+              ( 240,1,"Portuguese Liga","soccer","por.1"),
+              ( 241,1,"Russian Premier League","soccer","rus.1"),
+              ( 242,1,"Mexican Liga de Expansión MX","soccer","mex.2"),
+              ( 243,1,"Mexican Copa MX","soccer","mex.copa_mx"),
+              ( 244,1,"Campeones Cup","soccer","campeones.cup"),
+              ( 245,1,"United States Open Cup","soccer","usa.open"),
+              ( 246,1,"USL League One","soccer","usa.usl.l1"),
+              ( 247,1,"Scottish Premiership","soccer","sco.1"),
+              ( 248,1,"Chinese Super League","soccer","chn.1"),
+              ( 249,1,"Australian A-League","soccer","aus.1"),
+              ( 250,1,"International Friendly","soccer","fifa.friendly"),
+              ( 251,1,"Women's International Friendly","soccer","fifa.friendly.w"),
+              ( 252,1,"UEFA European Under-21 Championship Qualifying","soccer","uefa.euro_u21_qual"),
+              ( 253,1,"FIFA Women's World Cup","soccer","fifa.wwc"),
+              ( 254,1,"FIFA Club World Cup","soccer","fifa.cwc"),
+              ( 255,1,"CONCACAF Gold Cup Qualifying","soccer","concacaf.gold_qual"),
+              ( 256,1,"CONCACAF Nations League Qualifying","soccer","concacaf.nations.league_qual"),
+              ( 257,1,"CONCACAF Cup","soccer","concacaf.confederations_playoff"),
+              ( 258,1,"UEFA Nations League","soccer","uefa.nations"),
+              ( 259,1,"UEFA European Championship","soccer","uefa.euro"),
+              ( 260,1,"UEFA European Championship Qualifying","soccer","uefa.euroq"),
+              ( 261,1,"Copa America","soccer","conmebol.america"),
+              ( 262,1,"AFC Asian Cup","soccer","afc.asian.cup"),
+              ( 263,1,"AFC Asian Cup Qualifiers","soccer","afc.cupq"),
+              ( 264,1,"Africa Cup of Nations qualifying","soccer","caf.nations_qual"),
+              ( 265,1,"Africa Cup of Nations","soccer","caf.nations"),
+              ( 266,1,"Africa Nations Championship","soccer","caf.championship"),
+              ( 267,1,"WAFU Cup of Nations","soccer","wafu.nations"),
+              ( 268,1,"SheBelieves Cup","soccer","fifa.shebelieves"),
+              ( 269,1,"FIFA Confederations Cup","soccer","fifa.confederations"),
+              ( 270,1,"Non-FIFA Friendly","soccer","nonfifa"),
+              ( 271,1,"Spanish LaLiga 2","soccer","esp.2"),
+              ( 272,1,"Spanish Supercopa","soccer","esp.super_cup"),
+              ( 273,1,"Portuguese Liga Promotion/Relegation Playoffs","soccer","por.1.promotion.relegation"),
+              ( 274,1,"Belgian First Division A - Promotion/Relegation Playoffs","soccer","bel.promotion.relegation"),
+              ( 275,1,"Belgian First Division A","soccer","bel.1"),
+              ( 276,1,"Austrian Bundesliga","soccer","aut.1"),
+              ( 277,1,"Turkish Super Lig","soccer","tur.1"),
+              ( 278,1,"Austrian Bundesliga Promotion/Relegation Playoffs","soccer","aut.promotion.relegation"),
+              ( 279,1,"Greek Super League","soccer","gre.1"),
+              ( 280,1,"Greek Super League Promotion/Relegation Playoffs","soccer","gre.1.promotion.relegation"),
+              ( 281,1,"Swiss Super League","soccer","sui.1"),
+              ( 282,1,"Swiss Super League Promotion/Relegation Playoffs","soccer","sui.1.promotion.relegation"),
+              ( 283,1,"UEFA Women's Champions League","soccer","uefa.wchampions"),
+              ( 284,1,"International Champions Cup","soccer","global.champs_cup"),
+              ( 285,1,"Women's International Champions Cup","soccer","global.wchamps_cup"),
+              ( 286,1,"Club Friendly","soccer","club.friendly"),
+              ( 287,1,"UEFA Champions League Qualifying","soccer","uefa.champions_qual"),
+              ( 288,1,"UEFA Europa Conference League Qualifying","soccer","uefa.europa.conf_qual"),
+              ( 289,1,"UEFA Europa League Qualifying","soccer","uefa.europa_qual"),
+              ( 290,1,"UEFA Super Cup","soccer","uefa.super_cup"),
+              ( 291,1,"English FA Community Shield","soccer","eng.charity"),
+              ( 292,1,"Supercoppa Italiana","soccer","ita.super_cup"),
+              ( 293,1,"French Trophee des Champions","soccer","fra.super_cup"),
+              ( 294,1,"Dutch Johan Cruyff Shield","soccer","ned.supercup"),
+              ( 295,1,"Trofeo Joan Gamper","soccer","esp.joan_gamper"),
+              ( 296,1,"German DFL-Supercup","soccer","ger.super_cup"),
+              ( 297,1,"Audi Cup","soccer","ger.audi_cup"),
+              ( 298,1,"Premier League Asia Trophy","soccer","eng.asia_trophy"),
+              ( 299,1,"Emirates Cup","soccer","friendly.emirates_cup"),
+              ( 300,1,"Japanese J League World Challenge","soccer","jpn.world_challenge"),
+              ( 301,1,"SuperCopa Euroamericana","soccer","euroamericana.supercopa"),
+              ( 302,1,"Men's Olympic Tournament","soccer","fifa.olympics"),
+              ( 303,1,"Women's Olympic Tournament","soccer","fifa.w.olympics"),
+              ( 304,1,"CONMEBOL Pre-Olympic Tournament","soccer","fifa.conmebol.olympicsq"),
+              ( 305,1,"CONCACAF Men's Olympic Qualifying","soccer","fifa.concacaf.olympicsq"),
+              ( 306,1,"CONCACAF Women's Olympic Qualifying Tournament","soccer","fifa.w.concacaf.olympicsq"),
+              ( 307,1,"CONCACAF Women's Championship","soccer","concacaf.womens.championship"),
+              ( 308,1,"FIFA Under-20 World Cup","soccer","fifa.world.u20"),
+              ( 309,1,"FIFA Under-17 World Cup","soccer","fifa.world.u17"),
+              ( 310,1,"Toulon Tournament","soccer","global.toulon"),
+              ( 311,1,"UEFA European Under-21 Championship","soccer","uefa.euro_u21"),
+              ( 312,1,"UEFA European Under-19 Championship","soccer","uefa.euro.u19"),
+              ( 313,1,"Under-21 International Friendly","soccer","fifa.friendly_u21"),
+              ( 314,1,"UEFA Women's European Championship","soccer","uefa.weuro"),
+              ( 315,1,"German Bundesliga Promotion/Relegation Playoff","soccer","ger.playoff.relegation"),
+              ( 316,1,"German 2. Bundesliga Promotion/Relegation Playoffs","soccer","ger.2.promotion.relegation"),
+              ( 317,1,"English Women's FA Cup","soccer","eng.w.fa"),
+              ( 318,1,"English Women's FA Community Shield","soccer","eng.w.charity"),
+              ( 319,1,"English EFL Trophy","soccer","eng.trophy"),
+              ( 320,1,"English National League","soccer","eng.5"),
+              ( 321,1,"English League One","soccer","eng.3"),
+              ( 322,1,"English League Two","soccer","eng.4"),
+              ( 323,1,"Scottish Cup","soccer","sco.tennents"),
+              ( 324,1,"Scottish League Cup","soccer","sco.cis"),
+              ( 325,1,"Scottish Premiership Promotion/Relegation Playoffs","soccer","sco.1.promotion.relegation"),
+              ( 326,1,"Scottish League One","soccer","sco.3"),
+              ( 327,1,"Scottish Championship","soccer","sco.2"),
+              ( 328,1,"Scottish Championship Promotion/Relegation Playoffs","soccer","sco.2.promotion.relegation"),
+              ( 329,1,"Scottish League One Promotion/Relegation Playoffs","soccer","sco.3.promotion.relegation"),
+              ( 330,1,"Scottish League Two Promotion/Relegation Playoffs","soccer","sco.4.promotion.relegation"),
+              ( 331,1,"Scottish League Two","soccer","sco.4"),
+              ( 332,1,"Scottish League Challenge Cup","soccer","sco.challenge"),
+              ( 333,1,"Dutch Eredivisie Promotion/Relegation Playoffs","soccer","ned.playoff.relegation"),
+              ( 334,1,"Dutch Eredivisie Cup","soccer","ned.w.eredivisie_cup"),
+              ( 335,1,"Dutch Keuken Kampioen Divisie","soccer","ned.2"),
+              ( 336,1,"Dutch Tweede Divisie","soccer","ned.3"),
+              ( 337,1,"Dutch KNVB Beker Vrouwen","soccer","ned.w.knvb_cup"),
+              ( 338,1,"Dutch Vrouwen Eredivisie","soccer","ned.w.1"),
+              ( 339,1,"Italian Serie B","soccer","ita.2"),
+              ( 340,1,"French Ligue 1 Promotion/Relegation Playoffs","soccer","fra.1.promotion.relegation"),
+              ( 341,1,"French Ligue 2 Promotion/Relegation Playoffs","soccer","fra.2.promotion.relegation"),
+              ( 342,1,"Swedish Allsvenskan","soccer","swe.1"),
+              ( 343,1,"Swedish Allsvenskanliga Promotion/Relegation Playoffs","soccer","swe.1.promotion.relegation"),
+              ( 344,1,"Danish Superliga","soccer","den.1"),
+              ( 345,1,"Danish SAS-Ligaen Promotion/Relegation Playoffs","soccer","den.promotion.relegation"),
+              ( 346,1,"Romanian Liga 1 Promotion/Relegation Playoffs","soccer","rou.1.promotion.relegation"),
+              ( 347,1,"Romanian Liga 1","soccer","rou.1"),
+              ( 348,1,"Norwegian Eliteserien Promotion/Relegation Playoffs","soccer","nor.1.promotion.relegation"),
+              ( 349,1,"Norwegian Eliteserien","soccer","nor.1"),
+              ( 350,1,"Maltese Premier League","soccer","mlt.1"),
+              ( 351,1,"Israeli Premier League","soccer","isr.1"),
+              ( 352,1,"Irish Premier Division Promotion/Relegation Playoffs","soccer","ir1.1.promotion.relegation"),
+              ( 353,1,"Irish Premier Division","soccer","irl.1"),
+              ( 354,1,"Welsh Premier League","soccer","wal.1"),
+              ( 355,1,"Northern Irish Premiership","soccer","nir.1"),
+              ( 356,1,"CONMEBOL Copa Libertadores","soccer","conmebol.libertadores"),
+              ( 357,1,"CONMEBOL Copa Sudamericana","soccer","conmebol.sudamericana"),
+              ( 358,1,"CONMEBOL Recopa Sudamericana","soccer","conmebol.recopa"),
+              ( 359,1,"Argentine Liga Profesional de Fútbol","soccer","arg.1"),
+              ( 360,1,"Copa Argentina","soccer","arg.copa"),
+              ( 361,1,"Argentine Copa de la Liga Profesional","soccer","arg.copa_lpf"),
+              ( 362,1,"Argentine Copa de la Superliga","soccer","arg.copa_de_la_superliga"),
+              ( 363,1,"Argentine Trofeo de Campeones de la Superliga","soccer","arg.trofeo_de_la_campeones"),
+              ( 364,1,"Argentine Supercopa","soccer","arg.supercopa"),
+              ( 365,1,"Argentine Nacional B","soccer","arg.2"),
+              ( 366,1,"Argentine Primera B","soccer","arg.3"),
+              ( 367,1,"Argentine Primera C","soccer","arg.4"),
+              ( 368,1,"Argentine Primera D","soccer","arg.5"),
+              ( 369,1,"Supercopa Do Brazil","soccer","bra.supercopa_do_brazil"),
+              ( 370,1,"Brazilian Serie A","soccer","bra.1"),
+              ( 371,1,"Brazilian Serie B","soccer","bra.2"),
+              ( 372,1,"Brazilian Serie C","soccer","bra.3"),
+              ( 373,1,"Copa Do Nordeste","soccer","bra.copa_do_nordeste"),
+              ( 374,1,"Brazilian Campeonato Carioca","soccer","bra.camp.carioca"),
+              ( 375,1,"Brazilian Campeonato Paulista","soccer","bra.camp.paulista"),
+              ( 376,1,"Brazilian Campeonato Gaucho","soccer","bra.camp.gaucho"),
+              ( 377,1,"Brazilian Campeonato Mineiro","soccer","bra.camp.mineiro"),
+              ( 378,1,"Chilean Primera División","soccer","chi.1"),
+              ( 379,1,"Copa Chile","soccer","chi.copa_chi"),
+              ( 380,1,"International U20 Friendly","soccer","fifa.u20.friendly"),
+              ( 381,1,"Segunda División de Chile","soccer","chi.2"),
+              ( 382,1,"Chilean Supercopa","soccer","chi.super_cup"),
+              ( 383,1,"Uruguayan Primera Division","soccer","uru.1"),
+              ( 384,1,"Segunda División de Uruguay","soccer","uru.2"),
+              ( 385,1,"Colombian SuperLiga","soccer","col.superliga"),
+              ( 386,1,"Colombian Primera A","soccer","col.1"),
+              ( 387,1,"Colombian Primera B","soccer","col.2"),
+              ( 388,1,"Peruvian Supercopa","soccer","per.supercopa"),
+              ( 389,1,"Copa Colombia","soccer","col.copa"),
+              ( 390,1,"Peruvian Primera Profesional","soccer","per.1"),
+              ( 391,1,"Paraguayan Primera Division","soccer","par.1"),
+              ( 392,1,"Ecuadoran Primera A","soccer","ecu.1"),
+              ( 393,1,"Ecuadoran Supercopa","soccer","ecu.supercopa"),
+              ( 394,1,"Ecuador Serie B","soccer","ecu.2"),
+              ( 395,1,"Venezuelan Primera Profesional","soccer","ven.1"),
+              ( 396,1,"United States NWSL Challenge Cup","soccer","usa.nwsl.cup"),
+              ( 397,1,"Segunda División de Venezuela","soccer","ven.2"),
+              ( 398,1,"Bolivian Liga Profesional","soccer","bol.1"),
+              ( 399,1,"Mexican Supercopa MX","soccer","mex.supercopa"),
+              ( 400,1,"Mexican Campeon de Campeones","soccer","mex.campeon"),
+              ( 401,1,"CONCACAF Champions Cup","soccer","concacaf.champions_cup"),
+              ( 402,1,"CONCACAF U23 Tournament","soccer","concacaf.u23"),
+              ( 403,1,"Honduran Primera Division","soccer","hon.1"),
+              ( 404,1,"Costa Rican Primera Division","soccer","crc.1"),
+              ( 405,1,"Jamaican Premier League","soccer","jam.1"),
+              ( 406,1,"Guatemalan Liga Nacional","soccer","gua.1"),
+              ( 407,1,"Australian W-League","soccer","aus.w.1"),
+              ( 408,1,"Salvadoran Primera Division","soccer","slv.1"),
+              ( 409,1,"AFF Cup","soccer","aff.championship"),
+              ( 410,1,"AFC Cup","soccer","afc.cup"),
+              ( 411,1,"SAFF Championship","soccer","afc.saff.championship"),
+              ( 412,1,"Chinese Super League Promotion/Relegation Playoffs","soccer","chn.1.promotion.relegation"),
+              ( 413,1,"Japanese J League","soccer","jpn.1"),
+              ( 414,1,"Indonesian Liga 1","soccer","idn.1"),
+              ( 415,1,"Indian Super League","soccer","ind.1"),
+              ( 416,1,"Indian I-League","soccer","ind.2"),
+              ( 417,1,"Malaysian Super League","soccer","mys.1"),
+              ( 418,1,"Singaporean Premier League","soccer","sgp.1"),
+              ( 419,1,"Thai League 1","soccer","tha.1"),
+              ( 420,1,"Bangabandhu Cup","soccer","bangabandhu.cup"),
+              ( 421,1,"COSAFA Cup","soccer","caf.cosafa"),
+              ( 422,1,"CAF Champions League","soccer","caf.champions"),
+              ( 423,1,"South African Premiership Promotion/Relegation Playoffs","soccer","rsa.1.promotion.relegation"),
+              ( 424,1,"CAF Confederations Cup","soccer","caf.confed"),
+              ( 425,1,"South African Premiership","soccer","rsa.1"),
+              ( 426,1,"South African First Division","soccer","rsa.2"),
+              ( 427,1,"South African Telkom Knockout","soccer","rsa.telkom_knockout"),
+              ( 428,1,"South African Nedbank Cup","soccer","rsa.nedbank"),
+              ( 429,1,"MTN 8 Cup","soccer","rsa.mtn8"),
+              ( 430,1,"Nigerian Professional League","soccer","nga.1"),
+              ( 431,1,"Ghanaian Premier League","soccer","gha.1"),
+              ( 432,1,"Zambian Super League","soccer","zam.1"),
+              ( 433,1,"Kenyan Premier League","soccer","ken.1"),
+              ( 434,1,"Zimbabwean Premier Soccer League","soccer","zim.1"),
+              ( 435,1,"Ugandan Premier League","soccer","uga.1"),
+              ( 436,1,"Misc. U.S. Soccer Games","soccer","generic.ussf");)",
+
+            R"(INSERT INTO sportsapi
+            VALUES
+              (1000,2,"Major League Baseball","baseball","mlb");)",
+
+            R"(CREATE TABLE sportslisting (
+              id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+              api INT UNSIGNED NOT NULL,
+              title VARCHAR(128) NOT NULL,
+              FOREIGN KEY(api) REFERENCES sportsapi(id)
+            );)",
+
+            R"(INSERT INTO sportslisting (api,title)
+            VALUES
+              (   1, "\\A(?:MLB Baseball)\\z"),
+              (   1, "\\A(?:Béisbol MLB)\\z"),
+              (   1, "\\A(?:MLB All-Star Game)\\z"),
+              (   1, "\\A(?:World Series)\\z"),
+              (   2, "\\A(?:College Baseball)\\z"),
+              (   2, "\\A(?:College World Series)\\z"),
+              (   3, "\\A(?:College Softball)\\z"),
+              (   4, "\\A(?:Women's College World Series)\\z"),
+              (  10, "\\A(?:Béisbol Liga Mexicana)\\z"),
+
+              (  20, "\\A(?:N\\w+ Football)\\z"),
+              (  20, "\\A(?:Super Bowl( [CLXVI]+)?)\\z"),
+              (  20, "\\A(?:Fútbol Americano NFL)\\z"),
+              (  21, "\\A(?:College Football)\\z"),
+              (  21, "\\A(?:\\w+ Bowl)\\z"),
+              (  21, "\\A(?:Fútbol Americano de Universitario)\\z"),
+
+              (  40, "\\A(?:NBA Basketball)\\z"),
+              (  40, "\\A(?:NBA Finals)\\z"),
+              (  41, "\\A(?:WNBA Basketball)\\z"),
+              (  41, "\\A(?:WNBA Finals)\\z"),
+              (  42, "\\A(?:College Basketball)\\z"),
+              (  42, "\\A(?:NCAA Basketball Tournament)\\z"),
+              (  43, "\\A(?:Women's College Basketball)\\z"),
+              (  43, "\\A(?:NCAA Women's Basketball Tournament)\\z"),
+
+              (  60, "\\A(?:NHL Hockey)\\z"),
+              (  60, "\\A(?:NHL Winter Classic)\\z"),
+              (  60, "\\A(?:NHL \\w+ Conference Final)\\z"),
+              (  60, "\\A(?:Stanley Cup Finals)\\z"),
+              (  61, "\\A(?:College Hockey)\\z"),
+              (  61, "\\A(?:Frozen Four)\\z"),
+              (  62, "\\A(?:Women's College Hockey)\\z"),
+              (  66, "\\A(?:College Field Hockey)\\z"),
+
+              (  80, "\\A(?:College Volleyball)\\z"),
+              (  81, "\\A(?:Women's College Volleyball)\\z"),
+
+              ( 100, "\\A(?:College Lacrosse)\\z"),
+              ( 101, "\\A(?:Women's College Lacrosse)\\z"),
+
+              ( 120, "\\A(?:College Water Polo)\\z"),
+              ( 121, "\\A(?:Women's College Water Polo)\\z"),
+
+              ( 200, "\\A(?:College Soccer)\\z"),
+              ( 201, "\\A(?:Women's College Soccer)\\z"),
+              ( 202, "\\A(?:MLS Soccer|Fútbol MLS)\\z"),
+              ( 203, "\\A(?:(Premier League|EPL) Soccer)\\z"),
+              ( 203, "\\A(?:English Premier League)\\z"),
+              ( 203, "\\A(?:Fútbol Premier League)\\z"),
+              ( 205, "\\A(?:Italian Serie A Soccer)\\z"),
+              ( 339, "\\A(?:Italian Serie B Soccer)\\z"),
+              ( 206, "\\A(?:French Ligue 1 Soccer|Fútbol Ligue 1|Fútbol Liga 1)\\z"),
+              ( 207, "\\A(?:French Ligue 2 Soccer|Fútbol Ligue 2|Fútbol Liga 2)\\z"),
+              ( 208, "\\A(?:Fútbol LaLiga)\\z"),
+              ( 208, "\\A(?:Fútbol Español Primera Division)\\z"),
+              ( 208, "\\A(?:Spanish Primera Division Soccer)\\z"),
+              ( 209, "\\A(?:(German )?Bundesliga Soccer)\\z"),
+              ( 209, "\\A(?:Fútbol Bundesliga)\\z"),
+              ( 209, "\\A(?:Fútbol Copa de Alemania)\\z"),
+              ( 210, "\\A(?:German 2. Bundesliga Soccer)\\z"),
+              ( 211, "\\A(?:Fútbol Mexicano Primera División|Fútbol Mexicano Liga Premier|Fútbol Mexicano)\\z"),
+              ( 211, "\\A(?:Mexico Primera Division Soccer)\\z"),
+              ( 212, "\\A(?:Copa do Brazil Soccer)\\z"),
+              ( 214, "\\A(?:CONCACAF League Soccer)\\z"),
+              ( 215, "\\A(?:CONCACAF Champions League Soccer)\\z"),
+              ( 216, "\\A(?:CONCACAF Nations League Soccer)\\z"),
+              ( 217, "\\A(?:CONCACAF Gold Cup Soccer)\\z"),
+              ( 218, "\\A(?:FIFA World Cup Soccer)\\z"),
+              ( 219, "\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\z"),
+              ( 220, "\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\z"),
+              ( 221, "\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\z"),
+              ( 222, "\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\z"),
+              ( 223, "\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\z"),
+              ( 224, "\\A(?:FIFA World Cup Qualifying( Soccer)?|FIFA Eliminatorias Copa Mundial)\\z"),
+              ( 225, "\\A(?:Fútbol UEFA Champions League)\\z"),
+              ( 225, "\\A(?:UEFA Champions League Soccer)\\z"),
+              ( 226, "\\A(?:Fútbol UEFA Europa League)\\z"),
+              ( 229, "\\A(?:Fútbol USL Championship)\\z"),
+              ( 229, "\\A(?:USL Championship Soccer)\\z"),
+              ( 230, "\\A(?:NWSL Soccer)\\z"),
+              ( 231, "\\A(?:FA Women's Super League)\\z"),
+              ( 242, "\\A(?:Fútbol Mexicano Liga Expansión)\\z"),
+              ( 258, "\\A(?:UEFA Nations League Soccer)\\z"),
+              ( 258, "\\A(?:Fútbol UEFA Nations League)\\z"),
+              ( 271, "\\A(?:Fútbol Español Segunda Division)\\z"),
+              ( 277, "\\A(?:Fútbol Turco Superliga)\\z"),
+              ( 277, "\\A(?:Turkish Super Lig Soccer)\\z"),
+              ( 279, "\\A(?:Superleague Greek Soccer)\\z"),
+              ( 356, "\\A(?:Fútbol CONMEBOL Libertadores)\\z"),
+              ( 357, "\\A(?:Fútbol CONMEBOL Sudamericana)\\z"),
+              ( 359, "\\A(?:Fútbol Argentino Primera División)\\z"),
+              ( 360, "\\A(?:Fútbol Copa Argentina)\\z"),
+              ( 365, "\\A(?:Fútbol Argentino Primera Nacional( B)?)\\z"),
+              ( 366, "\\A(?:Fútbol Argentino Primera B)\\z"),
+              ( 367, "\\A(?:Fútbol Argentino Primera C)\\z"),
+              ( 368, "\\A(?:Fútbol Argentino Primera D)\\z"),
+              ( 386, "\\A(?:Fútbol Columbiano Primera División)\\z"),
+              ( 403, "\\A(?:Fútbol Hondureño Primera División)\\z"),
+              ( 404, "\\A(?:Fútbol Costarricense Primera División)\\z"),
+
+              (1000, "\\A(?:MLB Baseball)\\z"),
+              (1000, "\\A(?:Béisbol MLB)\\z");
+              )",
+
+            R"(CREATE TABLE sportscleanup (
+              id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+              provider TINYINT UNSIGNED DEFAULT 0,
+              weight INT UNSIGNED NOT NULL,
+              key1 VARCHAR(256) NOT NULL,
+              name VARCHAR(256) NOT NULL,
+              pattern VARCHAR(256) NOT NULL,
+              nth TINYINT UNSIGNED NOT NULL,
+              replacement VARCHAR(128) NOT NULL
+            );)",
+
+            // Sigh. It would be nice if these patterns could use the
+            // '\b' boundary matching sequence in the first part of
+            // the match, but the period is not part of the set of
+            // characters that make up a word, so trying to optionally
+            // match the final period in the string "F.C. Foo" with
+            // the pattern "\.?\b" always fails because period and
+            // space are both non-word characters and therefore there
+            // is no word boundary between them. This will always
+            // match on "F.C" and never on "F.C.".
+            //
+            // I have also seen a TV listing where the team name was
+            // "F.C.Something" without a space, so the first part of
+            // these patterns doesn't require a following space in
+            // order to match. These patterns are case sensitive, so
+            // the first part shouldn't match part of an ordinary team
+            // name unless the team name is in all caps.
+            R"A(INSERT INTO sportscleanup (provider,weight,key1,name,pattern,nth,replacement)
+            VALUES
+              (1,1000,"soccer", "(SE)",     "\\(\\w+\\)", 0, ""),
+              (1,1000,"soccer", "AFC",      "\\AA\\.?F\\.?C\\.?|\\bA\\.?F\\.?C\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "AC etc.",  "\\AA\\.?[AC]\\.?|\\bA\\.?[AC]\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "BK",       "\\AB\\.?K\\.?|\\bB\\.?K\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "BSC",      "\\AB\\.?S\\.?C\\.?|\\bB\\.?S\\.?C\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "CSyD",     "\\AC\\.?S\\.?( y )?D\\.?|\\bC\\.?S\\.?( y )?D\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "CD etc.",  "\\AC\\.?[ADFRS]\\.?|\\bC\\.?[ADFRS]\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "FC",       "\\AF\\.?C\\.?|\\bF\\.?C\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "HSC",      "\\AH\\.?S\\.?C\\.?|\\bH\\.?S\\.?C\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "RC etc.",  "\\AR\\.?[BC]\\.?|\\bR\\.?[BC]\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "SC etc.",  "\\AS\\.?[ACV]\\.?|\\bS\\.?[ACV]\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "TSG",      "\\AT\\.?S\\.?G\\.?|\\bT\\.?S\\.?G\\.?\\Z", 0, ""),
+              (1,1000,"soccer", "VFB etc.", "\\AV\\.?F\\.?[BL]\\.?|\\bV\\.?F\\.?[BL]\\.?\\Z", 0, ""),
+              (1,2000,"all",    "",         "Inglaterra", 0, "England"),
+              (1,2000,"all",    "",         "Munchen", 0, "Munich");
+              )A",
+        };
+
+      default:
+        return {};
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

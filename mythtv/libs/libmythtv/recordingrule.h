@@ -115,6 +115,7 @@ class MTV_PUBLIC RecordingRule
     RecordingDupMethodType m_dupMethod          {kDupCheckSubThenDesc};
     RecordingDupInType     m_dupIn              {kDupsInAll};
     unsigned               m_filter             {0};
+    AutoExtendType         m_autoExtend         {AutoExtendType::None};
 
     // Storage Options
     // TODO: These should all be converted to integer IDs instead

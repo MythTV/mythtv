@@ -1,0 +1,1 @@
+{"$ref":"http://sports.core.api.espn.com/v2/sports/soccer/leagues/fifa.worldq.ofc/events/495540/competitions/495540/status?lang=en&region=us","clock":5400.0,"addedClock":0.0,"displayClock":"90'","period":2,"type":{"id":"28","name":"STATUS_FULL_TIME","state":"post","completed":true,"description":"Full Time","detail":"FT","shortDetail":"FT"}}
