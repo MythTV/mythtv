@@ -10,7 +10,7 @@
 class V2LiveStreamInfoList : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "Version", "1.0" );
     Q_CLASSINFO( "LiveStreamInfos", "type=V2LiveStreamInfo");
 
     SERVICE_PROPERTY2( QVariantList, LiveStreamInfos );

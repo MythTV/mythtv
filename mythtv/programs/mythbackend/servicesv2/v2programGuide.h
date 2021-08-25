@@ -31,7 +31,7 @@
 class V2ProgramGuide : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "Version", "1.0" );
 
     // Q_CLASSINFO Used to augment Metadata for properties.
     // See datacontracthelper.h for details

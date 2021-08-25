@@ -19,7 +19,7 @@
 class V2Cutting : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "Version"    , "1.0" );
 
     SERVICE_PROPERTY2 ( int        , Mark   )
     SERVICE_PROPERTY2 ( qlonglong  , Offset )

@@ -21,7 +21,7 @@
 class V2CutList : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "Version", "1.0" );
     Q_CLASSINFO( "Cuttings", "type=V2Cutting");
 
     SERVICE_PROPERTY2( QVariantList, Cuttings );

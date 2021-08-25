@@ -13,7 +13,7 @@
 class V2CastMemberList : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "0.99" );
+    Q_CLASSINFO( "Version", "0.99" );
 
     // Q_CLASSINFO Used to augment Metadata for properties.
     // See mythhttpservice.h for details

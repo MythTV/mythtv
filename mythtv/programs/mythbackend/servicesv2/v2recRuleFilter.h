@@ -12,7 +12,7 @@
 class V2RecRuleFilter : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "Version"    , "1.0" );
 
     SERVICE_PROPERTY2( int        , Id             )
     SERVICE_PROPERTY2( QString    , Description    )

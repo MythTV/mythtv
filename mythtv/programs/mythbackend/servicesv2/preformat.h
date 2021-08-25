@@ -19,7 +19,7 @@
 class Preformat  : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "Version", "1.0" );
     Q_CLASSINFO( "preformat", "true" );
 
     SERVICE_PROPERTY2   ( QString   , mimetype)

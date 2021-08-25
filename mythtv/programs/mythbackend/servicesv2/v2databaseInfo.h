@@ -7,7 +7,7 @@
 class V2DatabaseInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "Version", "1.0" );
 
     SERVICE_PROPERTY2( QString , Host          )
     SERVICE_PROPERTY2( bool    , Ping          )

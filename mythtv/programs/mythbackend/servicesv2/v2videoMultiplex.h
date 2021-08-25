@@ -12,7 +12,7 @@
 class V2VideoMultiplex : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.1" );
+    Q_CLASSINFO( "Version"    , "1.1" );
 
     SERVICE_PROPERTY2( int        , MplexId          )
     SERVICE_PROPERTY2( int        , SourceId         )

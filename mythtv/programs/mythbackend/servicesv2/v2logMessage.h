@@ -14,7 +14,7 @@
 class LogMessage : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "Version"    , "1.0" );
 
     Q_PROPERTY( QString    HostName        READ HostName
                                            WRITE setHostName    )

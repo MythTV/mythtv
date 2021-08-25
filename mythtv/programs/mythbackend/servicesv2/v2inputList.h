@@ -20,7 +20,7 @@
 class V2InputList : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "Version", "1.0" );
     Q_CLASSINFO( "Inputs", "type=V2Input");
 
     SERVICE_PROPERTY2( QVariantList, Inputs );

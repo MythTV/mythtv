@@ -7,7 +7,7 @@
 class V2VersionInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "Version"    , "1.0" );
 
     SERVICE_PROPERTY2( QString , Version  )
     SERVICE_PROPERTY2( QString , Branch   )

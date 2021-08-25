@@ -17,7 +17,7 @@ class LogInfo : public QObject
 {
     Q_OBJECT
 
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "Version"    , "1.0" );
     Q_CLASSINFO( "defaultProp", "LogArgs" );
 
     Q_PROPERTY( QString  LogArgs      READ LogArgs   WRITE setLogArgs   )

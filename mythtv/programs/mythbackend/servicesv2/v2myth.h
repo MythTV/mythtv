@@ -12,7 +12,7 @@
 class V2Myth : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "5.2" )
+    Q_CLASSINFO( "Version"    , "5.2" )
     Q_CLASSINFO( "AddStorageGroupDir",    "methods=POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir", "methods=POST" )
     Q_CLASSINFO( "PutSetting",            "methods=POST" )

@@ -21,7 +21,7 @@
 class V2VideoStreamInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.00" );
+    Q_CLASSINFO( "Version"    , "1.00" );
 
     SERVICE_PROPERTY2( QString    , CodecType      )
     SERVICE_PROPERTY2( QString    , CodecName      )

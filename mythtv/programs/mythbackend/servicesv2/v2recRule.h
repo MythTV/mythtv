@@ -12,7 +12,7 @@
 class  V2RecRule : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.10" );
+    Q_CLASSINFO( "Version"    , "2.10" );
 
     SERVICE_PROPERTY2( int        , Id             )
     SERVICE_PROPERTY2( int        , ParentId       )

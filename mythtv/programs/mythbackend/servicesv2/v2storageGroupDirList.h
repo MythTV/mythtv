@@ -8,7 +8,7 @@
 class V2StorageGroupDirList : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "Version"    , "1.0" );
     Q_CLASSINFO( "StorageGroupDirs", "type=V2StorageGroupDir");
 
     Q_PROPERTY( QObject* ServiceGroupDir READ ServiceGroupDir USER true)

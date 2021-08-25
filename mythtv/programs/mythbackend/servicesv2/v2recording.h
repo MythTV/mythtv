@@ -21,7 +21,7 @@
 class V2RecordingInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.3" );
+    Q_CLASSINFO( "Version", "1.3" );
 
     SERVICE_PROPERTY2( uint                   , RecordedId  )
     SERVICE_PROPERTY2( RecStatus::Type        , Status      )

@@ -22,7 +22,7 @@
 class V2ArtworkItem : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.02" );
+    Q_CLASSINFO( "Version"    , "1.02" );
 
     SERVICE_PROPERTY2 ( QString    , Type           )
     SERVICE_PROPERTY2 ( QString    , Url            )
@@ -58,7 +58,7 @@ class V2ArtworkItem : public QObject
 class V2VideoLookup : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.0" );
+    Q_CLASSINFO( "Version"    , "1.0" );
 
     Q_CLASSINFO( "Artwork", "type=V2ArtworkItem");
 

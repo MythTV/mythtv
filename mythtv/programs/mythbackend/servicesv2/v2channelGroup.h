@@ -19,7 +19,7 @@
 class  V2ChannelGroup : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "0.99" );
+    Q_CLASSINFO( "Version", "0.99" );
 
 
     SERVICE_PROPERTY2( uint        , GroupId        )

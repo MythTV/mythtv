@@ -11,7 +11,7 @@
 class V2RecRuleList : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.0" );
+    Q_CLASSINFO( "Version", "1.0" );
 
     Q_CLASSINFO( "RecRules", "type=V2RecRule");
     Q_CLASSINFO( "AsOf"    , "transient=true"   );

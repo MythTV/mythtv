@@ -27,7 +27,7 @@ class V2Program;
 class V2ChannelInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "2.2" );
+    Q_CLASSINFO( "Version", "2.2" );
 
     // Q_CLASSINFO Used to augment Metadata for properties.
     // See datacontracthelper.h for details
@@ -109,7 +109,7 @@ Q_DECLARE_METATYPE(V2ChannelInfo*)
 class V2Program : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "1.12" );
+    Q_CLASSINFO( "Version"    , "1.12" );
     Q_CLASSINFO( "defaultProp", "Description" );
     Q_CLASSINFO( "deprecated" , "FileSize,FileName,HostName");
 

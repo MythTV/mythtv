@@ -9,7 +9,7 @@
 class V2VideoMetadataInfo : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version"    , "2.01" );
+    Q_CLASSINFO( "Version"    , "2.01" );
 
     SERVICE_PROPERTY2( int        , Id             )
     SERVICE_PROPERTY2( QString    , Title          )

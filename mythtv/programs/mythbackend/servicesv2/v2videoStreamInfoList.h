@@ -20,7 +20,7 @@
 class V2VideoStreamInfoList : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO( "version", "1.00" );
+    Q_CLASSINFO( "Version", "1.00" );
 
     // Q_CLASSINFO Used to augment Metadata for properties.
 
