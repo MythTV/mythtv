@@ -53,6 +53,12 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
         return nullptr;
     }
 
+    // Authentication required
+    if (handler->m_protected)
+    {
+        LOG(VB_HTTP, LOG_INFO, LOC + "Authentication required for this call");
+    }
+
     // Sanity check type count (handler should have the return type at least)
     if (handler->m_types.size() < 1)
         return nullptr;

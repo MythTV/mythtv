@@ -95,6 +95,7 @@ MythHTTPMetaService::MythHTTPMetaService(const QString& Name, const QMetaObject&
                     auto newmethod = MythHTTPMetaMethod::Create(i, method, types, returnname);
                     if (newmethod)
                     {
+                        newmethod->m_protected = isProtected(Meta, name);
                         RemoveExisting(m_slots, newmethod, name);
                         m_slots.emplace(name, newmethod);
                     }
@@ -166,4 +167,23 @@ int MythHTTPMetaService::ParseRequestTypes(const QMetaObject& Meta, const QStrin
         return HTTPUnknown;
     }
     return allowed;
+}
+
+bool MythHTTPMetaService::isProtected(const QMetaObject& Meta, const QString& Method)
+{
+    int index = Meta.indexOfClassInfo(Method.toLatin1());
+    if (index > -1)
+    {
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+        QStringList infos = QString(Meta.classInfo(index).value()).split(';', QString::SkipEmptyParts);
+#else
+        QStringList infos = QString(Meta.classInfo(index).value()).split(';', Qt::SkipEmptyParts);
+#endif
+        foreach (const QString &info, infos)
+        {
+            if (info.startsWith(QStringLiteral("AuthRequired=")))
+                return true;
+        }
+    }
+    return false;
 }

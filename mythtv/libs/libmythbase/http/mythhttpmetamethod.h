@@ -24,6 +24,7 @@ class MBASE_PUBLIC MythHTTPMetaMethod
     QVariant CreateReturnValue    (int Type, void* Value);
 
     bool                    m_valid         { false };
+    bool                    m_protected     { false };
     int                     m_index         { 0 };
     int                     m_requestTypes  { HTTPUnknown };
     QMetaMethod             m_method;

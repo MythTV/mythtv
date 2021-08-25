@@ -15,6 +15,7 @@ class MBASE_PUBLIC MythHTTPMetaService
                         const QString& MethodsToHide = {});
 
     static int ParseRequestTypes(const QMetaObject& Meta, const QString& Method, QString& ReturnName);
+    static bool isProtected(const QMetaObject& Meta, const QString& Method);
 
     const QMetaObject& m_meta;
     QString        m_name;
