@@ -106,7 +106,7 @@ void MythXMLPListSerialiser::AddQObject(const QString &Name, const QObject* Obje
     m_writer.writeStartElement("dict");
 
     const auto * meta = Object->metaObject();
-    if (int index = meta->indexOfClassInfo("version"); index >= 0)
+    if (int index = meta->indexOfClassInfo("Version"); index >= 0)
     {
         m_writer.writeTextElement("key", "version");
         m_writer.writeTextElement("string", meta->classInfo(index).value());

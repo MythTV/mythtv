@@ -70,7 +70,7 @@ void MythXMLSerialiser::AddQObject(const QObject* Object)
         return;
 
     const auto * meta = Object->metaObject();
-    if (int index = meta->indexOfClassInfo("version"); index >= 0)
+    if (int index = meta->indexOfClassInfo("Version"); index >= 0)
         m_writer.writeAttribute("version", meta->classInfo(index).value());
 
     int count = meta->propertyCount();
