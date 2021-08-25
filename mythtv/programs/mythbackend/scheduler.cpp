@@ -612,7 +612,7 @@ void Scheduler::PrintRec(const RecordingInfo *p, const QString &prefix)
     QString episode = p->toString(ProgramInfo::kTitleSubtitle, " - ", "")
         .leftJustified(34 - prefix.length(), ' ', true);
 
-    outstr += QString("%1 %2 %3 %4-%5  %6 %7  ")
+    outstr += QString("%1 %2 %3  %4-%5  %6 %7  ")
         .arg(episode,
              p->GetChanNum().rightJustified(5, ' '),
              p->GetChannelSchedulingID().leftJustified(7, ' ', true),
