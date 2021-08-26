@@ -1110,6 +1110,10 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
         query.bindValue(":ORIGAIRDATE", pg->m_originalAirDate);
     // If there is no originalairdate use "year"
     }
+    else if (pg->m_year == pg->m_recStartTs.date().year())
+    {
+        query.bindValue(":ORIGAIRDATE", pg->m_recStartTs.date());
+    }
     else if (pg->m_year >= 1895)
     {
         query.bindValue(":ORIGAIRDATE", QDate(pg->m_year,1,1));

@@ -214,7 +214,7 @@ bool checkChannelPresets(QStringList &probs)
             {
                 bool stat = CardUtil::SetStartChannel(cardid, newchan);
                 QString msg =
-                    QString("start channel from %1 to %2 ").arg(startchan).arg(newchan) +
+                    QString("start channel from %1 to %2 ").arg(startchan, newchan) +
                     QString("for card %1 (%2)").arg(cardid).arg(query.value(3).toString());
                 if (stat)
                 {

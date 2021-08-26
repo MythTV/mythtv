@@ -137,6 +137,7 @@ class StreamHandler : protected MThread, public DeviceReaderCB
     std::vector<uint>   m_eitPids;
     PIDInfoMap          m_pidInfo;
     uint                m_openPidFilters        {0};
+    bool                m_filtersChanged        {false};
     MythTimer           m_cycleTimer;
 
     ThreadedFileWriter *m_mptsTfw               {nullptr};

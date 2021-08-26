@@ -196,6 +196,8 @@ bool StreamHandler::AddPIDFilter(PIDInfo *info)
     QMutexLocker writing_locker(&m_pidLock);
     m_pidInfo[info->m_pid] = info;
 
+    m_filtersChanged = true;
+
     CycleFiltersByPriority();
 
     return true;
@@ -227,6 +229,8 @@ bool StreamHandler::RemovePIDFilter(uint pid)
     }
 
     delete tmp;
+
+    m_filtersChanged = true;
 
     return ok;
 }
