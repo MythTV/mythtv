@@ -722,6 +722,10 @@ void MythMainWindow::Init(bool MayReInit)
     }
 
     QString warningmsg = MythPainterWindow::CreatePainters(this, m_painterWin, m_painter);
+    if (!warningmsg.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_WARNING, warningmsg);
+    }
 
     if (!m_painterWin)
     {
