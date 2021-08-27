@@ -42,7 +42,6 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
 
   public:
     void Init(bool MayReInit = true);
-    void ReinitDone();
     void Show();
     void MoveResize(QRect& Geometry);
 

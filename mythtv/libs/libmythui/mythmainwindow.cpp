@@ -952,12 +952,6 @@ void MythMainWindow::ReloadKeys()
     InitKeys();
 }
 
-void MythMainWindow::ReinitDone()
-{
-    ShowPainterWindow();
-    MoveResize(m_screenRect);
-}
-
 void MythMainWindow::Show()
 {
     bool inwindow = m_wantWindow && !m_qtFullScreen;
