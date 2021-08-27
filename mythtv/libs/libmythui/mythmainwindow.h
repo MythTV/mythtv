@@ -166,9 +166,7 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
     QTimer             m_refreshTimer;
     MythThemeBase*     m_themeBase     { nullptr };
     MythPainter*       m_painter       { nullptr };
-    MythPainter*       m_oldPainter    { nullptr };
     MythPainterWindow* m_painterWin    { nullptr };
-    MythPainterWindow* m_oldPainterWin { nullptr };
     MythInputDeviceHandler* m_deviceHandler { nullptr };
     MythScreenSaverControl* m_screensaver   { nullptr };
     QTimer             m_idleTimer;
