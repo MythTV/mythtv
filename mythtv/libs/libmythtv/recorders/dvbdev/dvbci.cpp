@@ -503,7 +503,8 @@ int cCiTransportConnection::RecvTPDU(void)
      }
   else {
      esyslog("ERROR: CAM: Read failed: slot %d, tcid %d\n", m_slot, m_tcid);
-     Init(-1, m_slot, m_tcid);
+     if (m_tpdu->Tcid() == m_tcid)
+        Init(-1, m_slot, m_tcid);
      }
   return m_lastResponse;
 }
