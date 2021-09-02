@@ -494,8 +494,8 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
 
 MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, bool showCancel = false);
 template <class OBJ, typename FUNC>
-MUI_PUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, const OBJ *parent,
-                                                FUNC slot, bool showCancel = false)
+MythConfirmationDialog  *ShowOkPopup(const QString &message, const OBJ *parent,
+                                     FUNC slot, bool showCancel = false)
 {
     QString                  LOC = "ShowOkPopup('" + message + "') - ";
     MythScreenStack         *stk = nullptr;

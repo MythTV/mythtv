@@ -47,7 +47,7 @@ QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../libmythfreemheg
 !using_libexiv_external {
     LIBS += -L../../../../external/libexiv2 -lmythexiv2-0.28
     QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libexiv2 -lexpat
-    freebsd: LIBS += -lprocstat
+    freebsd: LIBS += -lprocstat -liconv
     darwin: LIBS += -liconv -lz
 }
 
