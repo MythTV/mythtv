@@ -80,7 +80,7 @@ win32 {
     CONFIG += console
 }
 
-!win32-msvc* {
+!mingw || win32-msvc* {
     POST_TARGETDEPS += ../../libs/libmythui/libmythui-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmyth/libmyth-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythtv/libmythtv-$${MYTH_SHLIB_EXT}

@@ -53,9 +53,6 @@
 #include "mythscreensaver.h"
 #include "devices/mythinputdevicehandler.h"
 
-#ifdef _WIN32
-#include "mythpainter_d3d9.h"
-#endif
 
 #ifdef Q_OS_ANDROID
 #include <QtAndroid>

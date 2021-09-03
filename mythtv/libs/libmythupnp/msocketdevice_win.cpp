@@ -910,8 +910,7 @@ qint64 MSocketDevice::bytesAvailable() const
     return nbytes;
 }
 
-
-qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
+qint64 MSocketDevice::waitForMore(std::chrono::milliseconds msecs, bool *timeout) const
 {
     if (!isValid())
         return -1;
@@ -924,13 +923,13 @@ qint64 MSocketDevice::waitForMore(int msecs, bool *timeout) const
 
     fds.fd_array[0] = m_fd;
 
-    struct timeval tv;
+    struct timeval tv {};
 
-    tv.tv_sec = msecs / 1000;
+    tv.tv_sec = msecs.count() / 1000;
 
-    tv.tv_usec = (msecs % 1000) * 1000;
+    tv.tv_usec = (msecs.count() % 1000) * 1000;
 
-    int rv = select(m_fd + 1, &fds, nullptr, nullptr, msecs < 0 ? nullptr : &tv);
+    int rv = select(m_fd + 1, &fds, nullptr, nullptr, msecs < 0ms ? nullptr : &tv);
 
     if (rv < 0)
         return -1;

@@ -75,6 +75,7 @@ unix {
 mingw | win32-msvc* {
     SOURCES += mythsystemwindows.cpp
     HEADERS += mythsystemwindows.h
+    LIBS += -lzip
 }
 
 # Install headers to same location as libmyth to make things easier
@@ -150,7 +151,7 @@ using_libdns_sd {
 
 using_x11:DEFINES += USING_X11
 
-mingw:LIBS += -lws2_32
+mingw:LIBS += -lws2_32 -lz
 
 win32-msvc* {
 

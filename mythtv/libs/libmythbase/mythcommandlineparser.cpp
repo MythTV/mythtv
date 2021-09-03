@@ -2863,7 +2863,7 @@ bool setUser(const QString &username)
         return true;
 
 #ifdef _WIN32
-    cerr << "--user option is not supported on Windows" << endl;
+    std::cerr << "--user option is not supported on Windows" << std::endl;
     return false;
 #else // ! _WIN32
 #if defined(__linux__) || defined(__LINUX__)

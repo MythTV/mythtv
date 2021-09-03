@@ -204,7 +204,9 @@ bool FillChannelInfo( DTC::ChannelInfo *pChannel,
     }
     pChannel->setChannelName(channelInfo.m_name);
     pChannel->setVisible(channelInfo.m_visible > kChannelNotVisible);
-    pChannel->setExtendedVisible(toRawString(channelInfo.m_visible));
+    #ifndef _WIN32 // Needs fixing for Windows
+        pChannel->setExtendedVisible(toRawString(channelInfo.m_visible));
+    #endif
 
     pChannel->setSerializeDetails( bDetails );
 
