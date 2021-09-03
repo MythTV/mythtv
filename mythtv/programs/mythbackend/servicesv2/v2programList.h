@@ -75,4 +75,6 @@ class V2ProgramList : public QObject
         Q_DISABLE_COPY(V2ProgramList);
 };
 
+Q_DECLARE_METATYPE(V2ProgramList*)
+
 #endif

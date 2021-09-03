@@ -161,7 +161,7 @@ class V2Program : public QObject
 
     public:
 
-        Q_INVOKABLE explicit V2Program(QObject *parent = nullptr)
+        explicit V2Program(QObject *parent = nullptr)
             : QObject               ( parent ),
               m_Repeat              ( false  ),
               m_Stars               ( 0      ),
@@ -221,6 +221,8 @@ class V2Program : public QObject
                 Cast()->Copy( src->m_Cast );
         }
 
+    private:
+        Q_DISABLE_COPY(V2Program);
 };
 
 inline V2Program *V2ChannelInfo::AddNewProgram()
