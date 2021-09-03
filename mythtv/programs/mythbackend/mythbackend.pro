@@ -89,6 +89,8 @@ HEADERS += servicesv2/v2videoSource.h servicesv2/v2videoSourceList.h
 HEADERS += servicesv2/v2videoMultiplex.h servicesv2/v2videoMultiplexList.h
 HEADERS += servicesv2/v2status.h
 HEADERS += servicesv2/preformat.h
+HEADERS += servicesv2/v2capture.h
+HEADERS += servicesv2/v2captureCard.h servicesv2/v2captureCardList.h
 
 SOURCES += servicesv2/v2myth.cpp
 SOURCES += servicesv2/v2video.cpp
@@ -97,6 +99,7 @@ SOURCES += servicesv2/v2content.cpp
 SOURCES += servicesv2/v2guide.cpp
 SOURCES += servicesv2/v2channel.cpp
 SOURCES += servicesv2/v2status.cpp
+SOURCES += servicesv2/v2capture.cpp
 SOURCES += servicesv2/v2serviceUtil.cpp
 
 using_oss:DEFINES += USING_OSS
