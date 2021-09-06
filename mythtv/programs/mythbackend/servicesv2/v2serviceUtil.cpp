@@ -444,30 +444,30 @@ void V2FillVideoMetadataInfo (
 //
 /////////////////////////////////////////////////////////////////////////////
 
-// void V2FillMusicMetadataInfo (V2MusicMetadataInfo *pVideoMetadataInfo,
-//                             MusicMetadata *pMetadata, bool bDetails)
-// {
-//     pVideoMetadataInfo->setId(pMetadata->ID());
-//     pVideoMetadataInfo->setArtist(pMetadata->Artist());
-//     pVideoMetadataInfo->setCompilationArtist(pMetadata->CompilationArtist());
-//     pVideoMetadataInfo->setAlbum(pMetadata->Album());
-//     pVideoMetadataInfo->setTitle(pMetadata->Title());
-//     pVideoMetadataInfo->setTrackNo(pMetadata->Track());
-//     pVideoMetadataInfo->setGenre(pMetadata->Genre());
-//     pVideoMetadataInfo->setYear(pMetadata->Year());
-//     pVideoMetadataInfo->setPlayCount(pMetadata->PlayCount());
-//     pVideoMetadataInfo->setLength(pMetadata->Length().count());
-//     pVideoMetadataInfo->setRating(pMetadata->Rating());
-//     pVideoMetadataInfo->setFileName(pMetadata->Filename());
-//     pVideoMetadataInfo->setHostName(pMetadata->Hostname());
-//     pVideoMetadataInfo->setLastPlayed(pMetadata->LastPlay());
-//     pVideoMetadataInfo->setCompilation(pMetadata->Compilation());
+void V2FillMusicMetadataInfo (V2MusicMetadataInfo *pVideoMetadataInfo,
+                            MusicMetadata *pMetadata, bool bDetails)
+{
+    pVideoMetadataInfo->setId(pMetadata->ID());
+    pVideoMetadataInfo->setArtist(pMetadata->Artist());
+    pVideoMetadataInfo->setCompilationArtist(pMetadata->CompilationArtist());
+    pVideoMetadataInfo->setAlbum(pMetadata->Album());
+    pVideoMetadataInfo->setTitle(pMetadata->Title());
+    pVideoMetadataInfo->setTrackNo(pMetadata->Track());
+    pVideoMetadataInfo->setGenre(pMetadata->Genre());
+    pVideoMetadataInfo->setYear(pMetadata->Year());
+    pVideoMetadataInfo->setPlayCount(pMetadata->PlayCount());
+    pVideoMetadataInfo->setLength(pMetadata->Length().count());
+    pVideoMetadataInfo->setRating(pMetadata->Rating());
+    pVideoMetadataInfo->setFileName(pMetadata->Filename());
+    pVideoMetadataInfo->setHostName(pMetadata->Hostname());
+    pVideoMetadataInfo->setLastPlayed(pMetadata->LastPlay());
+    pVideoMetadataInfo->setCompilation(pMetadata->Compilation());
 
-//     if (bDetails)
-//     {
-//         //TODO add coverart here
-//     }
-// }
+    if (bDetails)
+    {
+        //TODO add coverart here
+    }
+}
 
 void V2FillInputInfo(V2Input* input, const InputInfo& inputInfo)
 {

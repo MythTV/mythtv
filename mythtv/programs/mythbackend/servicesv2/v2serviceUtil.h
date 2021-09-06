@@ -8,12 +8,14 @@
 #include "v2recRule.h"
 #include "v2cutList.h"
 #include "v2input.h"
+#include "v2musicMetadataInfoList.h"
 #include "channelinfo.h"
 #include "channelgroup.h"
 #include "recordingrule.h"
 #include "recordinginfo.h"
 #include "programdata.h"
 #include "inputinfo.h"
+#include "musicmetadata.h"
 
 #define ADD_SQL(settings_var, bindvar, col, api_param, val) { \
     (settings_var) += QString("%1=:%2, ").arg(col, api_param); \
@@ -29,6 +31,9 @@ void V2FillVideoMetadataInfo (
                       V2VideoMetadataInfo *pVideoMetadataInfo,
                       const VideoMetadataListManager::VideoMetadataPtr& pMetadata,
                       bool          bDetails);
+
+void V2FillMusicMetadataInfo (V2MusicMetadataInfo *pVideoMetadataInfo,
+                            MusicMetadata *pMetadata, bool bDetails);
 
 void V2FillGenreList( V2GenreList *pGenreList, int videoID);
 
