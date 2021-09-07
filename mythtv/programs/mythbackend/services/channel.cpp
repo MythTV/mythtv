@@ -189,10 +189,12 @@ bool Channel::UpdateDBChannel( uint          MplexID,
     if (HAS_PARAM("useeit"))
         channel.m_useOnAirGuide = UseEIT;
 
-    #ifndef _WIN32 // TODO Does not compile on Windows
-        if (HAS_PARAM("extendedvisible"))
-            channel.m_visible = channelVisibleTypeFromString(ExtendedVisible);
-    #endif
+    if (HAS_PARAM("extendedvisible"))
+    {
+#ifndef _WIN32 // TODO Does not compile on Windows
+        channel.m_visible = channelVisibleTypeFromString(ExtendedVisible);
+#endif
+    }
     else if (HAS_PARAM("visible"))
     {
         if (channel.m_visible == kChannelVisible ||
