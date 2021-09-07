@@ -19,13 +19,6 @@ class MythHTTPMetaService;
 class MBASE_PUBLIC MythHTTPService : public QObject
 {
     Q_OBJECT
-    Q_CLASSINFO("Subscribe",   "methods=GET")
-    Q_CLASSINFO("Unsubscribe", "methods=GET")
-
-  public slots:
-    bool Subscribe();
-    void Unsubscribe();
-    QVariantMap GetServiceDescription();
 
   public:
     template<class T> static inline HTTPServicePtr Create() { return std::shared_ptr<MythHTTPService>(new T); }

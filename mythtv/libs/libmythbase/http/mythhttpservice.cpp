@@ -36,8 +36,10 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
         return nullptr;
     m_request = Request;
     // WSDL
-    if (method == "wsdl")
-        return MythWSDL::GetWSDL(Request, m_staticMetaService);
+    if (method == "wsdl") {
+        MythWSDL wsdl( m_staticMetaService );
+        return wsdl.GetWSDL( Request );
+    }
 
     // Find the method
     LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Looking for method '%1'").arg(method));
@@ -200,22 +202,8 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
     return result;
 }
 
-bool MythHTTPService::Subscribe()
-{
-    return false;
-}
-
-void MythHTTPService::Unsubscribe()
-{
-}
 
 QString& MythHTTPService::Name()
 {
     return m_name;
 }
-
-QVariantMap MythHTTPService::GetServiceDescription()
-{
-    return {};
-}
-
