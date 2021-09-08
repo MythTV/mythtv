@@ -38,7 +38,7 @@ class V2VideoStreamInfoList : public QObject
 
     public:
 
-        V2VideoStreamInfoList(QObject *parent = nullptr)
+        Q_INVOKABLE V2VideoStreamInfoList(QObject *parent = nullptr)
             : QObject( parent ),
               m_Count         ( 0      )
         {

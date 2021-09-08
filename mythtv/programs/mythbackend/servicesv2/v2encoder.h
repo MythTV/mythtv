@@ -40,7 +40,7 @@ class V2Encoder : public QObject
 
     public:
 
-        V2Encoder(QObject *parent = nullptr)
+        Q_INVOKABLE V2Encoder(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_Local         ( true   ),

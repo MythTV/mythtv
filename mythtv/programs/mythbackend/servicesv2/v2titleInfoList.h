@@ -28,7 +28,7 @@ class V2TitleInfoList : public QObject
 
     public:
 
-        V2TitleInfoList(QObject *parent = nullptr)
+        Q_INVOKABLE V2TitleInfoList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

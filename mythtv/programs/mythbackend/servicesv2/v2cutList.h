@@ -30,7 +30,7 @@ class V2CutList : public QObject
 
         static inline void InitializeCustomTypes();
 
-        V2CutList(QObject *parent = nullptr)
+        Q_INVOKABLE V2CutList(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }

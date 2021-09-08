@@ -33,7 +33,7 @@ class V2CastMember : public QObject
 
     public:
 
-        explicit V2CastMember(QObject *parent = nullptr)
+        Q_INVOKABLE V2CastMember(QObject *parent = nullptr)
             : QObject           ( parent )
         {
         }

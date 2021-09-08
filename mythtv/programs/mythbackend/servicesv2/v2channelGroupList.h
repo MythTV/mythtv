@@ -24,7 +24,7 @@ class  V2ChannelGroupList : public QObject
 
     public:
 
-        V2ChannelGroupList(QObject *parent = nullptr)
+        Q_INVOKABLE V2ChannelGroupList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

@@ -35,7 +35,7 @@ class  V2GenreList : public QObject
 
     public:
 
-        V2GenreList(QObject *parent = nullptr)
+        Q_INVOKABLE V2GenreList(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }

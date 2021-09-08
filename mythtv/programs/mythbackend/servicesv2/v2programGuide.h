@@ -52,7 +52,7 @@ class V2ProgramGuide : public QObject
 
     public:
 
-        V2ProgramGuide(QObject *parent = nullptr)
+        Q_INVOKABLE V2ProgramGuide(QObject *parent = nullptr)
             : QObject           ( parent ),
               m_Details         ( false  ),
               m_StartIndex      ( 0      ),

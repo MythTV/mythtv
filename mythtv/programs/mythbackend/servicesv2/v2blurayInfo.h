@@ -45,7 +45,7 @@ class V2BlurayInfo : public QObject
 
     public:
 
-        V2BlurayInfo(QObject *parent = nullptr)
+        Q_INVOKABLE V2BlurayInfo(QObject *parent = nullptr)
                  : QObject                ( parent    ),
                    m_Path                 ( QString() ),
                    m_Title                ( QString() ),

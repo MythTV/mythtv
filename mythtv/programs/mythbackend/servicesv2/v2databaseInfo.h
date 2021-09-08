@@ -21,7 +21,7 @@ class V2DatabaseInfo : public QObject
 
     public:
 
-        V2DatabaseInfo(QObject *parent = nullptr)
+        Q_INVOKABLE V2DatabaseInfo(QObject *parent = nullptr)
                        : QObject         ( parent ),
                        m_Ping            ( false  ),
                        m_Port            ( 0      ),

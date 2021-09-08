@@ -25,7 +25,7 @@ class V2VideoSourceList : public QObject
 
     public:
 
-        V2VideoSourceList(QObject *parent = nullptr)
+        Q_INVOKABLE V2VideoSourceList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

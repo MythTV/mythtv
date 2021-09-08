@@ -62,7 +62,7 @@ class V2ChannelInfo : public QObject
 
     public:
 
-        explicit V2ChannelInfo(QObject *parent = nullptr)
+        Q_INVOKABLE V2ChannelInfo(QObject *parent = nullptr)
             : QObject           ( parent ),
               m_ChanId          ( 0      ),
               m_MplexId         ( 0      ),
@@ -161,7 +161,7 @@ class V2Program : public QObject
 
     public:
 
-        explicit V2Program(QObject *parent = nullptr)
+        Q_INVOKABLE V2Program(QObject *parent = nullptr)
             : QObject               ( parent ),
               m_Repeat              ( false  ),
               m_Stars               ( 0      ),

@@ -27,7 +27,7 @@ class  V2ChannelInfoList : public QObject
 
     public:
 
-        V2ChannelInfoList(QObject *parent = nullptr)
+        Q_INVOKABLE V2ChannelInfoList(QObject *parent = nullptr)
             : QObject( parent ),
               m_StartIndex    ( 0      ),
               m_Count         ( 0      ),

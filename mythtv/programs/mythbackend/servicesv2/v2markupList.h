@@ -33,7 +33,7 @@ class V2MarkupList : public QObject
 
     public:
 
-        V2MarkupList(QObject *parent = nullptr)
+        Q_INVOKABLE V2MarkupList(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }

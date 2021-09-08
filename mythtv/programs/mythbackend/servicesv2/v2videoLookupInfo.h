@@ -33,7 +33,7 @@ class V2ArtworkItem : public QObject
     public:
 
 
-        V2ArtworkItem(QObject *parent = nullptr)
+        Q_INVOKABLE V2ArtworkItem(QObject *parent = nullptr)
                         : QObject         ( parent )
         {
             m_Width            = 0                      ;
@@ -88,7 +88,7 @@ class V2VideoLookup : public QObject
     public:
 
 
-        V2VideoLookup(QObject *parent = nullptr)
+        Q_INVOKABLE V2VideoLookup(QObject *parent = nullptr)
                         : QObject         ( parent )
         {
             m_Season           = 0                      ;

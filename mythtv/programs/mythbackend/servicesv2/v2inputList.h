@@ -27,7 +27,7 @@ class V2InputList : public QObject
 
     public:
 
-        V2InputList(QObject *parent = nullptr)
+        Q_INVOKABLE V2InputList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

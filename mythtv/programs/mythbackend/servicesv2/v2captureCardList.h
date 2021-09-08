@@ -28,7 +28,7 @@ class V2CaptureCardList : public QObject
 
     public:
 
-        V2CaptureCardList(QObject *parent = nullptr)
+        Q_INVOKABLE V2CaptureCardList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

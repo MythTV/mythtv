@@ -68,7 +68,7 @@ class V2CaptureCard : public QObject
 
     public:
 
-        V2CaptureCard(QObject *parent = nullptr)
+        Q_INVOKABLE V2CaptureCard(QObject *parent = nullptr)
             : QObject         ( parent ), m_CardId(0), m_ParentId(0),
             m_AudioRateLimit(0), m_DVBSWFilter(0),
             m_DVBSatType(0), m_DVBWaitForSeqStart(false),

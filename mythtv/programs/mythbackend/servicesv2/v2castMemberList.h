@@ -24,7 +24,7 @@ class V2CastMemberList : public QObject
 
     public:
 
-        explicit V2CastMemberList(QObject *parent = nullptr)
+        Q_INVOKABLE V2CastMemberList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

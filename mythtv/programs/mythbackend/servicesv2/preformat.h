@@ -26,7 +26,7 @@ class Preformat  : public QObject
     SERVICE_PROPERTY2   ( QString   , buffer )
 
     public:
-        Preformat(QObject *parent = nullptr)
+        Q_INVOKABLE Preformat(QObject *parent = nullptr)
         : QObject ( parent )
         {
         }

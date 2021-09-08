@@ -34,7 +34,7 @@ class V2Input : public QObject
 
     public:
 
-        V2Input(QObject *parent = nullptr)
+        Q_INVOKABLE V2Input(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_CardId        ( 0      ),

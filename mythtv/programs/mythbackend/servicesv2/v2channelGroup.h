@@ -28,7 +28,7 @@ class  V2ChannelGroup : public QObject
 
     public:
 
-        V2ChannelGroup(QObject *parent = nullptr)
+        Q_INVOKABLE V2ChannelGroup(QObject *parent = nullptr)
             : QObject           ( parent ),
               m_GroupId         ( 0      )
         {

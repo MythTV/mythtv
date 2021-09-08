@@ -30,7 +30,7 @@ class V2ArtworkInfo : public QObject
 
     public:
 
-        V2ArtworkInfo(QObject *parent = nullptr)
+        Q_INVOKABLE V2ArtworkInfo(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }

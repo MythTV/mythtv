@@ -17,7 +17,7 @@ class V2LiveStreamInfoList : public QObject
 
     public:
 
-        explicit V2LiveStreamInfoList(QObject *parent = nullptr)
+        Q_INVOKABLE V2LiveStreamInfoList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

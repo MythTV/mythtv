@@ -31,7 +31,7 @@ class V2EncoderList : public QObject
 
     public:
 
-        V2EncoderList(QObject *parent = nullptr)
+        Q_INVOKABLE V2EncoderList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }

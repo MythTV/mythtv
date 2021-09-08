@@ -26,7 +26,7 @@ class V2Cutting : public QObject
 
     public:
 
-        V2Cutting(QObject *parent = nullptr)
+        Q_INVOKABLE V2Cutting(QObject *parent = nullptr)
             : QObject( parent ), m_Mark(0), m_Offset(0)
         {
         }

@@ -17,7 +17,7 @@ class V2VersionInfo : public QObject
 
     public:
 
-        V2VersionInfo(QObject *parent = nullptr)
+        Q_INVOKABLE V2VersionInfo(QObject *parent = nullptr)
                       : QObject         ( parent )
         {
         }

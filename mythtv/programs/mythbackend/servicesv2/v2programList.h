@@ -37,7 +37,7 @@ class V2ProgramList : public QObject
 
     public:
 
-        explicit V2ProgramList(QObject *parent = nullptr)
+        Q_INVOKABLE V2ProgramList(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_StartIndex    ( 0      ),
               m_Count         ( 0      ),

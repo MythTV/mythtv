@@ -64,7 +64,7 @@ class  V2RecRule : public QObject
 
     public:
 
-        explicit V2RecRule(QObject *parent = nullptr)
+        Q_INVOKABLE V2RecRule(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_ParentId      ( 0      ),

@@ -29,7 +29,7 @@ class V2VideoSource : public QObject
 
     public:
 
-        V2VideoSource(QObject *parent = nullptr)
+        Q_INVOKABLE V2VideoSource(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_Id            ( 0      ),
               m_UseEIT        ( false  ),

@@ -42,7 +42,7 @@ class V2MusicMetadataInfo : public QObject
 
     public:
 
-        V2MusicMetadataInfo(QObject *parent = nullptr)
+        Q_INVOKABLE V2MusicMetadataInfo(QObject *parent = nullptr)
                         : QObject         ( parent ),
                           m_Id            ( 0      ),
                           m_TrackNo       ( 0      ),

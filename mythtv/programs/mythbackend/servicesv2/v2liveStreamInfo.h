@@ -40,7 +40,7 @@ class V2LiveStreamInfo : public QObject
 
     public:
 
-        explicit V2LiveStreamInfo(QObject *parent = nullptr)
+        Q_INVOKABLE V2LiveStreamInfo(QObject *parent = nullptr)
             : QObject            ( parent ),
               m_Id               ( 0      ),
               m_Width            ( 0      ),

@@ -32,7 +32,7 @@ class V2Lineup : public QObject
 
     public:
 
-        V2Lineup(QObject *parent = nullptr)
+        Q_INVOKABLE V2Lineup(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }

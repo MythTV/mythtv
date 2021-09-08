@@ -29,7 +29,7 @@ class V2Genre : public QObject
 
         // static inline void InitializeCustomTypes();
 
-        V2Genre(QObject *parent = nullptr)
+        Q_INVOKABLE V2Genre(QObject *parent = nullptr)
             : QObject         ( parent )
         {
         }

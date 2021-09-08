@@ -41,7 +41,7 @@ class V2VideoMultiplex : public QObject
 
     public:
 
-        V2VideoMultiplex(QObject *parent = nullptr)
+        Q_INVOKABLE V2VideoMultiplex(QObject *parent = nullptr)
             : QObject         ( parent ),
               m_MplexId       ( 0      ),
               m_SourceId      ( 0      ),

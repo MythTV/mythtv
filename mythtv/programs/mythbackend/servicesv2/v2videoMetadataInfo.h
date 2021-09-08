@@ -52,7 +52,7 @@ class V2VideoMetadataInfo : public QObject
     SERVICE_PROPERTY_PTR( V2GenreList       , Genres    )
 
   public:
-    V2VideoMetadataInfo(QObject *parent = nullptr)
+    Q_INVOKABLE V2VideoMetadataInfo(QObject *parent = nullptr)
                         : QObject         ( parent ),
                           m_Id            ( 0      ),
                           m_Collectionref ( 0      ),

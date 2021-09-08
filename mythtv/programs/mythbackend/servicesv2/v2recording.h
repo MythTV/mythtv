@@ -48,7 +48,7 @@ class V2RecordingInfo : public QObject
 
     public:
 
-        explicit V2RecordingInfo(QObject *parent = nullptr)
+        Q_INVOKABLE V2RecordingInfo(QObject *parent = nullptr)
             : QObject           ( parent             ),
               m_RecordedId      ( 0                  ),
               m_Status          ( RecStatus::Unknown ),
