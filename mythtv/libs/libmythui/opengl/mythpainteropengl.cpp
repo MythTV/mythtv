@@ -58,7 +58,7 @@ void MythOpenGLPainter::DeleteTextures(void)
     if (!m_render || m_textureDeleteList.empty())
         return;
 
-    QMutexLocker gllocker(&m_textureDeleteLock);
+    QMutexLocker gllocker(&m_imageAndTextureLock);
     OpenGLLocker locker(m_render);
     while (!m_textureDeleteList.empty())
     {
@@ -73,7 +73,7 @@ void MythOpenGLPainter::ClearCache(void)
 {
     LOG(VB_GENERAL, LOG_INFO, "Clearing OpenGL painter cache.");
 
-    QMutexLocker locker(&m_textureDeleteLock);
+    QMutexLocker locker(&m_imageAndTextureLock);
     QMapIterator<MythImage *, MythGLTexture*> it(m_imageToTextureMap);
     while (it.hasNext())
     {
@@ -170,6 +170,7 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
     if (!m_render)
         return nullptr;
 
+    QMutexLocker locker(&m_imageAndTextureLock);
     if (m_imageToTextureMap.contains(Image))
     {
         if (!Image->IsChanged())
@@ -180,6 +181,7 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
         }
         DeleteFormatImagePriv(Image);
     }
+    locker.unlock();
 
     Image->SetChanged(false);
 
@@ -203,6 +205,7 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
         LOG(VB_GENERAL, LOG_NOTICE, QString("Shrinking UIPainterMaxCacheHW to %1KB")
             .arg(m_maxHardwareCacheSize / 1024));
 
+        locker.relock();
         while (m_hardwareCacheSize > m_maxHardwareCacheSize)
         {
             MythImage *expiredIm = m_imageExpireList.front();
@@ -210,10 +213,12 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
             DeleteFormatImagePriv(expiredIm);
             DeleteTextures();
         }
+        locker.unlock();
     }
 
     CheckFormatImage(Image);
     m_hardwareCacheSize += MythRenderOpenGL::GetTextureDataSize(texture);
+    locker.relock();
     m_imageToTextureMap[Image] = texture;
     m_imageExpireList.push_back(Image);
 
@@ -308,9 +313,9 @@ void MythOpenGLPainter::DrawRoundRect(const QRect Area, int CornerRadius,
 
 void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *Image)
 {
+    QMutexLocker locker(&m_imageAndTextureLock);
     if (m_imageToTextureMap.contains(Image))
     {
-        QMutexLocker locker(&m_textureDeleteLock);
         m_textureDeleteList.push_back(m_imageToTextureMap[Image]);
         m_imageToTextureMap.remove(Image);
         m_imageExpireList.remove(Image);
