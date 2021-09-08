@@ -54,8 +54,8 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
     QStringList renderers;
 
 #ifdef _WIN32
-    if (render->Type() == kRenderDirect3D9)
-        renderers += VideoOutputD3D::GetAllowedRenderers(CodecID, VideoDispDim);
+//    if (render->Type() == kRenderDirect3D9)
+//        renderers += VideoOutputD3D::GetAllowedRenderers(CodecID, VideoDispDim);
 #endif
 
 #ifdef USING_OPENGL
@@ -132,8 +132,8 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
         MythVideoOutputGPU* video = nullptr;
 
 #ifdef _WIN32
-        if (renderer == "direct3d")
-            video = new VideoOutputD3D();
+//        if (renderer == "direct3d")
+//            video = new VideoOutputD3D();
 #endif
 #ifdef USING_OPENGL
         if (!video && renderer.contains("opengl") && openglrender)

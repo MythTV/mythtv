@@ -6,7 +6,8 @@ TEMPLATE = subdirs
 using_frontend {
     SUBDIRS += mythavtest mythfrontend mythcommflag
     SUBDIRS += mythjobqueue mythlcdserver
-    SUBDIRS += mythwelcome mythshutdown mythutil
+    SUBDIRS += mythshutdown mythutil
+    !win32-*: SUBDIRS += mythwelcome
     SUBDIRS += mythpreviewgen mythmediaserver mythccextractor
     SUBDIRS += mythscreenwizard
     !mingw:!win32-msvc*: SUBDIRS += mythtranscode/external/replex

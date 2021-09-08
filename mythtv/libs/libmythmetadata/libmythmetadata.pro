@@ -92,6 +92,7 @@ using_mheg:LIBS += -L../libmythfreemheg        -lmythfreemheg-$${LIBVERSION}
 using_live:LIBS += -L../libmythlivemedia        -lmythlivemedia-$${LIBVERSION}
 
 mingw:LIBS += -lws2_32
+mingw:LIBS += libbluray
 
 win32-msvc* {
 

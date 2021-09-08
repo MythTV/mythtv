@@ -34,6 +34,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <signal.h>
+
 // QT headers
 #include <QCoreApplication>
 
@@ -300,6 +302,9 @@ void MythSystemLegacy::Signal(MythSignal sig)
     if (m_status != GENERIC_EXIT_RUNNING)
         return;
 
+#ifndef SIGTRAP /* For Mingw */
+#define SIGTRAP -1
+#endif
     int posix_signal = SIGTRAP;
     switch (sig)
     {

@@ -72,7 +72,7 @@ using_taglib: LIBS += $$CONFIG_TAGLIB_LIBS
 
 !using_libexiv2_external {
     LIBS += -L../../external/libexiv2 -lmythexiv2-0.28 -lexpat
-    freebsd: LIBS += -lprocstat
+    freebsd: LIBS += -lprocstat -liconv
     darwin: LIBS += -liconv -lz
 }
 
@@ -80,7 +80,7 @@ win32 {
     CONFIG += console
 }
 
-!win32-msvc* {
+!mingw || win32-msvc* {
     POST_TARGETDEPS += ../../libs/libmythui/libmythui-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmyth/libmyth-$${MYTH_SHLIB_EXT}
     POST_TARGETDEPS += ../../libs/libmythtv/libmythtv-$${MYTH_SHLIB_EXT}
