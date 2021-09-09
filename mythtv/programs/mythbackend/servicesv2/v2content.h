@@ -30,7 +30,6 @@
 
 #include "libmythbase/http/mythhttpservice.h"
 #include "v2artworkInfoList.h"
-#include "v2liveStreamInfoList.h"
 
 #define CONTENT_SERVICE QString("/Content/")
 #define CONTENT_HANDLE  QString("Content")

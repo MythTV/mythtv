@@ -81,7 +81,6 @@ HEADERS += servicesv2/v2recRuleFilter.h servicesv2/v2recRuleFilterList.h
 HEADERS += servicesv2/v2titleInfo.h servicesv2/v2titleInfoList.h
 HEADERS += servicesv2/v2recRuleList.h
 HEADERS += servicesv2/v2content.h
-HEADERS += servicesv2/v2liveStreamInfo.h servicesv2/v2liveStreamInfoList.h
 HEADERS += servicesv2/v2guide.h servicesv2/v2programGuide.h
 HEADERS += servicesv2/v2channel.h
 HEADERS += servicesv2/v2channelInfoList.h servicesv2/v2lineup.h
