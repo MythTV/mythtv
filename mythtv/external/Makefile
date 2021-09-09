@@ -1,7 +1,10 @@
 include ../config.mak
 
 SUBDIRS = FFmpeg libmythdvdnav libudfread
+
+ifneq ($(CONFIG_SOUNDTOUCH_EXTERNAL),yes)
 SUBDIRS += libmythsoundtouch
+endif
 
 ifneq ($(CONFIG_LIBEXIV2_EXTERNAL),yes)
     SUBDIRS += libexiv2
