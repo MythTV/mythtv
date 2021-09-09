@@ -40,6 +40,14 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
         MythWSDL wsdl( m_staticMetaService );
         return wsdl.GetWSDL( Request );
     }
+    if ( method == "xsd" )
+    {
+        MythXSD xsd;
+        if (Request->m_queries.contains( "type" ))
+            return xsd.GetXSD( Request, Request->m_queries.value("type"));
+        else
+            return xsd.GetEnumXSD( Request, Request->m_queries.value("enum"));
+    }
 
     // Find the method
     LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Looking for method '%1'").arg(method));

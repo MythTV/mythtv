@@ -13,7 +13,6 @@
 #include <QFileInfo>
 
 #include "mythwsdl.h"
-// #include "xsd.h"
 
 #include "http/mythmimedatabase.h"
 #include "http/mythhttpmetaservice.h"
@@ -405,9 +404,7 @@ QDomElement MythWSDL::CreateMethodType( HTTPMethodPtr handler,
         oNode.setAttribute( "nillable" , static_cast<int>(true)    );   //-=>TODO: This may need to be determined by sParamType
 
         bool bCustomType = IsCustomType( sType );
-#if 0
-        sType = Xsd::ConvertTypeToXSD( sType, bCustomType );
-#endif
+        sType = MythXSD::ConvertTypeToXSD( sType, bCustomType );
         QString sPrefix = "xs:";
 
         if (sType.startsWith("V2"))
@@ -452,9 +449,7 @@ QDomElement MythWSDL::CreateMethodType( HTTPMethodPtr handler,
             QString sParamType = paramTypes[ nIdx ];
 
             bool bCustomType = IsCustomType( sParamType );
-#if 0
-            sParamType = Xsd::ConvertTypeToXSD( sParamType, bCustomType );
-#endif
+            sParamType = MythXSD::ConvertTypeToXSD( sParamType, bCustomType );
             QString sPrefix = "xs:";
 
             if (bCustomType)
