@@ -9,6 +9,10 @@
 #include "programinfo.h"
 #include "mythmiscutil.h"
 #include "v2serviceUtil.h"
+#include "v2artworkInfoList.h"
+#include "v2castMemberList.h"
+#include "v2genreList.h"
+#include "v2artworkInfoList.h"
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
@@ -28,6 +32,16 @@ void V2Video::RegisterCustomTypes()
     qRegisterMetaType<V2VideoLookupList*>("V2VideoLookupList");
     qRegisterMetaType<V2BlurayInfo*>("V2BlurayInfo");
     qRegisterMetaType<V2VideoStreamInfoList*>("V2VideoStreamInfoList");
+    qRegisterMetaType<V2VideoStreamInfo*>("V2VideoStreamInfo");
+    qRegisterMetaType<V2ArtworkInfoList*>("V2ArtworkInfoList");
+    qRegisterMetaType<V2ArtworkInfo*>("V2ArtworkInfo");
+    qRegisterMetaType<V2CastMemberList*>("V2CastMemberList");
+    qRegisterMetaType<V2CastMember*>("V2CastMember");
+    qRegisterMetaType<V2GenreList*>("V2GenreList");
+    qRegisterMetaType<V2Genre*>("V2Genre");
+    qRegisterMetaType<V2VideoLookupList*>("V2VideoLookupList");
+    qRegisterMetaType<V2VideoLookup*>("V2VideoLookup");
+    qRegisterMetaType<V2ArtworkItem*>("V2ArtworkItem");
 }
 
 V2Video::V2Video()

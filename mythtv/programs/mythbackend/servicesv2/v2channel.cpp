@@ -30,6 +30,10 @@
 
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "v2channel.h"
+#include "v2programAndChannel.h"
+#include "v2recording.h"
+#include "v2artworkInfoList.h"
+#include "v2castMemberList.h"
 
 #include "compat.h"
 #include "mythdbcon.h"
@@ -59,6 +63,12 @@ void V2Channel::RegisterCustomTypes()
     qRegisterMetaType<V2LineupList*>("V2LineupList");
     qRegisterMetaType<V2VideoMultiplexList*>("V2VideoMultiplexList");
     qRegisterMetaType<V2VideoMultiplex*>("V2VideoMultiplex");
+    qRegisterMetaType<V2Program*>("V2Program");
+    qRegisterMetaType<V2RecordingInfo*>("V2RecordingInfo");
+    qRegisterMetaType<V2ArtworkInfoList*>("V2ArtworkInfoList");
+    qRegisterMetaType<V2ArtworkInfo*>("V2ArtworkInfo");
+    qRegisterMetaType<V2CastMemberList*>("V2CastMemberList");
+    qRegisterMetaType<V2CastMember*>("V2CastMember");
 }
 
 V2Channel::V2Channel() : MythHTTPService(s_service)

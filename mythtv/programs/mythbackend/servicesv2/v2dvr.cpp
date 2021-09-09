@@ -25,6 +25,7 @@
 
 #include "v2dvr.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
+#include "v2titleInfoList.h"
 #include "autoexpire.h"
 #include "programinfo.h"
 #include "programdata.h"
@@ -53,13 +54,25 @@ void V2Dvr::RegisterCustomTypes()
     qRegisterMetaType<V2ProgramList*>("V2ProgramList");
     qRegisterMetaType<V2Program*>("V2Program");
     qRegisterMetaType<V2CutList*>("V2CutList");
+    qRegisterMetaType<V2Cutting*>("V2Cutting");
     qRegisterMetaType<V2MarkupList*>("V2MarkupList");
+    qRegisterMetaType<V2Markup*>("V2Markup");
     qRegisterMetaType<V2EncoderList*>("V2EncoderList");
+    qRegisterMetaType<V2Encoder*>("V2Encoder");
     qRegisterMetaType<V2InputList*>("V2InputList");
+    qRegisterMetaType<V2Input*>("V2Input");
     qRegisterMetaType<V2RecRuleFilterList*>("V2RecRuleFilterList");
+    qRegisterMetaType<V2RecRuleFilter*>("V2RecRuleFilter");
     qRegisterMetaType<V2TitleInfoList*>("V2TitleInfoList");
+    qRegisterMetaType<V2TitleInfo*>("V2TitleInfo");
     qRegisterMetaType<V2RecRule*>("V2RecRule");
     qRegisterMetaType<V2RecRuleList*>("V2RecRuleList");
+    qRegisterMetaType<V2ChannelInfo*>("V2ChannelInfo");
+    qRegisterMetaType<V2RecordingInfo*>("V2RecordingInfo");
+    qRegisterMetaType<V2ArtworkInfoList*>("V2ArtworkInfoList");
+    qRegisterMetaType<V2ArtworkInfo*>("V2ArtworkInfo");
+    qRegisterMetaType<V2CastMemberList*>("V2CastMemberList");
+    qRegisterMetaType<V2CastMember*>("V2CastMember");
 }
 
 V2Dvr::V2Dvr()

@@ -26,6 +26,8 @@
 #include <cmath>
 
 #include "v2guide.h"
+#include "v2artworkInfoList.h"
+#include "v2castMemberList.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
 #include "compat.h"
 #include "mythversion.h"
@@ -55,6 +57,13 @@ void V2Guide::RegisterCustomTypes()
     qRegisterMetaType<V2ProgramList*>("V2ProgramList");
     qRegisterMetaType<V2Program*>("V2Program");
     qRegisterMetaType<V2ChannelGroupList*>("V2ChannelGroupList");
+    qRegisterMetaType<V2ChannelGroup*>("V2ChannelGroup");
+    qRegisterMetaType<V2ChannelInfo*>("V2ChannelInfo");
+    qRegisterMetaType<V2RecordingInfo*>("V2RecordingInfo");
+    qRegisterMetaType<V2ArtworkInfoList*>("V2ArtworkInfoList");
+    qRegisterMetaType<V2ArtworkInfo*>("V2ArtworkInfo");
+    qRegisterMetaType<V2CastMemberList*>("V2CastMemberList");
+    qRegisterMetaType<V2CastMember*>("V2CastMember");
 }
 
 V2Guide::V2Guide() : MythHTTPService(s_service)

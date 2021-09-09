@@ -22,6 +22,9 @@
 #include "mythdate.h"
 #include "mythversion.h"
 #include "v2serviceUtil.h"
+#include "v2versionInfo.h"
+#include "v2databaseInfo.h"
+#include "v2wolInfo.h"
 #include "scheduler.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
@@ -35,10 +38,9 @@ Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
 void V2Myth::RegisterCustomTypes()
 {
     qRegisterMetaType<V2ConnectionInfo*>("V2ConnectionInfo");
-    // qRegisterMetaType<V2BackendInfo*>("V2BackendInfo");
-    // qRegisterMetaType<V2FrontendList*>("V2FrontendList");
-    // qRegisterMetaType<V2LogMessageList*>("V2LogMessageList");
-    // qRegisterMetaType<V2SettingList*>("V2SettingList");
+    qRegisterMetaType<V2VersionInfo*>("V2VersionInfo");
+    qRegisterMetaType<V2DatabaseInfo*>("V2DatabaseInfo");
+    qRegisterMetaType<V2WOLInfo*>("V2WOLInfo");
 #if SGDL
     qRegisterMetaType<V2StorageGroupDirList*>("V2StorageGroupDirList");
 #endif // SGDL
