@@ -1787,6 +1787,16 @@ QMap<QString,ProgramInfo*> Scheduler::GetRecording(void) const
     return recMap;
 }
 
+RecordingInfo* Scheduler::GetRecording(uint recordedid) const
+{
+    QMutexLocker lockit(&m_schedLock);
+
+    for (auto *p : m_recList)
+        if (recordedid == p->GetRecordingID())
+            return new RecordingInfo(*p);
+    return nullptr;
+}
+
 RecStatus::Type Scheduler::GetRecStatus(const ProgramInfo &pginfo)
 {
     QMutexLocker lockit(&m_schedLock);
