@@ -413,7 +413,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
                                                      sPropName, 
                                                      "type" );
 
-                if (sContentType.at(0) == 'Q')
+                if (sContentType.startsWith('Q'))
                     sContentType = sContentType.mid( 1 );
 
                 sContentType.remove( "DTC::"    );
@@ -905,7 +905,7 @@ QString Xsd::ConvertTypeToXSD( const QString &sType, bool bCustomType )
     if (sType == "QFileInfo" )
         return "string";        // temp solution
 
-    if (sType.at(0) == 'Q')
+    if (sType.startsWith('Q'))
         return sType.mid( 1 ).toLower();
 
     return sType.toLower();
