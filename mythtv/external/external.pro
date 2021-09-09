@@ -10,6 +10,6 @@ win32-msvc* {
 !using_libbluray_external: SUBDIRS += libmythbluray
 SUBDIRS += libmythdvdnav
 SUBDIRS += libudfread
-SUBDIRS += libmythsoundtouch
+!using_soundtouch_external: SUBDIRS += libmythsoundtouch
 
 }

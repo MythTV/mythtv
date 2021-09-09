@@ -89,20 +89,21 @@ HEADERS += netgrabbermanager.h
 SOURCES += mythrssmanager.cpp           netutils.cpp
 SOURCES += netgrabbermanager.cpp
 
-INCLUDEPATH += ../../external/libmythsoundtouch ../libmythfreesurround
+!using_soundtouch_external:INCLUDEPATH += ../../external/libmythsoundtouch
+INCLUDEPATH += ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 INCLUDEPATH += ../.. ../../external/FFmpeg
 INCLUDEPATH += ../libmythservicecontracts
 INCLUDEPATH += $${POSTINC}
-DEPENDPATH += ../../external/libmythsoundtouch
+!using_soundtouch_external:DEPENDPATH += ../../external/libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp
 DEPENDPATH += ./audio
 DEPENDPATH += ../libmythservicecontracts
 
-LIBS += -L../../external/libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
+!using_soundtouch_external:LIBS += -L../../external/libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
@@ -120,7 +121,7 @@ LIBS += -L../libmythservicecontracts         -lmythservicecontracts-$${LIBVERSIO
 
 !win32-msvc* {
     !using_libbluray_external:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
-    POST_TARGETDEPS += ../../external/libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
+    !using_soundtouch_external:POST_TARGETDEPS += ../../external/libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
     POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
     POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
