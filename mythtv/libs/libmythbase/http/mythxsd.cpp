@@ -928,6 +928,12 @@ QString MythXSD::ConvertTypeToXSD( const QString &sType, bool bCustomType )
     if (sType == "qlonglong" )
         return "long";
 
+    if (sType == "qulonglong" )
+        return "unsignedLong";
+
+    if (sType == "QJsonObject" )
+        return "string";
+
     if (sType == "long long" )
         return "long";
 

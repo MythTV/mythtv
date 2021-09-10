@@ -93,7 +93,9 @@ enum MythHTTPRequestType
     HTTPOptions = 0x0020
 };
 
-#define HTTP_DEFAULT_ALLOWED (HTTPHead | HTTPGet | HTTPOptions)
+// POST is needed here because all services are invoked with POST when using
+// SOAP, regardless of whether they require POST or not
+#define HTTP_DEFAULT_ALLOWED (HTTPHead | HTTPGet | HTTPOptions | HTTPPost)
 
 enum MythHTTPStatus
 {
