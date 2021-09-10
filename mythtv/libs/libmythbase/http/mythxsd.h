@@ -62,7 +62,7 @@ class MythXSD : public QDomDocument
     public:
 
         HTTPResponse GetXSD    ( HTTPRequest2 pRequest, QString sTypeName );
-        HTTPResponse GetEnumXSD( HTTPRequest2 pRequest, const QString& sEnumName );
+        // HTTPResponse GetEnumXSD( HTTPRequest2 pRequest, const QString& sEnumName );
 
         static QString ConvertTypeToXSD( const QString &sType, bool bCustomType = false );
 };

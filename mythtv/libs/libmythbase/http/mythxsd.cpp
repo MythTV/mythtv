@@ -24,180 +24,183 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HTTPResponse MythXSD::GetEnumXSD( HTTPRequest2 pRequest, const QString& sEnumName )
-{
-    if (sEnumName.isEmpty())
-        return Error(pRequest, QString( "XSD request on empty invalid enum name"));
+// The code for  creating the enum in xsd does not work
+// Since there is only one enum n the entire system, treat it as a string
 
-    // ----------------------------------------------------------------------
-    // sEnumName needs to be in class.enum format
-    // ----------------------------------------------------------------------
+// HTTPResponse MythXSD::GetEnumXSD( HTTPRequest2 pRequest, const QString& sEnumName )
+// {
+//     if (sEnumName.isEmpty())
+//         return Error(pRequest, QString( "XSD request on empty invalid enum name"));
 
-    if (sEnumName.count('.') != 1 )
-        return Error(pRequest, QString( "XSD request invalid enum name %1").arg(sEnumName));
+//     // ----------------------------------------------------------------------
+//     // sEnumName needs to be in class.enum format
+//     // ----------------------------------------------------------------------
 
-    QStringList lstTypeParts = sEnumName.split( '.' );
+//     if (sEnumName.count('.') != 1 )
+//         return Error(pRequest, QString( "XSD request invalid enum name %1").arg(sEnumName));
 
-    // ----------------------------------------------------------------------
-    // Create Parent object so we can get to its metaObject
-    // ----------------------------------------------------------------------
+//     QStringList lstTypeParts = sEnumName.split( '.' );
 
-    QString sParentFQN = lstTypeParts[0];
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-    int nParentId = QMetaType::type( sParentFQN.toUtf8() );
+//     // ----------------------------------------------------------------------
+//     // Create Parent object so we can get to its metaObject
+//     // ----------------------------------------------------------------------
 
-    // ----------------------------------------------------------------------
-    // Check for things that were formerly registered as both 'Foo' and 'Foo*'
-    // ----------------------------------------------------------------------
-    if (nParentId == QMetaType::UnknownType)
-    {
-        QString sFQN = sParentFQN + "*";
-        nParentId = QMetaType::type( sFQN.toUtf8() );
-    }
+//     QString sParentFQN = lstTypeParts[0];
+// #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+//     int nParentId = QMetaType::type( sParentFQN.toUtf8() );
 
-    // ----------------------------------------------------------------------
-    // if a DataContract type, we need to prefix name with DTC::
-    // These types are all pointers to objects, so we also need to add "*"
-    // ----------------------------------------------------------------------
+//     // ----------------------------------------------------------------------
+//     // Check for things that were formerly registered as both 'Foo' and 'Foo*'
+//     // ----------------------------------------------------------------------
+//     if (nParentId == QMetaType::UnknownType)
+//     {
+//         QString sFQN = sParentFQN + "*";
+//         nParentId = QMetaType::type( sFQN.toUtf8() );
+//     }
 
-    if (nParentId == QMetaType::UnknownType)
-    {
-        QString sFQN = "V2" + sParentFQN + "*";
-        nParentId = QMetaType::type( sFQN.toUtf8() );
-    }
+//     // ----------------------------------------------------------------------
+//     // if a DataContract type, we need to prefix name with DTC::
+//     // These types are all pointers to objects, so we also need to add "*"
+//     // ----------------------------------------------------------------------
 
-    if (nParentId == QMetaType::UnknownType)
-        return Error(pRequest, QString( "XSD request unknown enum name %1").arg(sEnumName));
-    const QMetaObject *pMetaObject = QMetaType::metaObjectForType(nParentId);
-#else
-    QMetaType metaType = QMetaType::fromName( sParentFQN.toUtf8() );
-    if (metaType.id() == QMetaType::UnknownType)
-        metaType = QMetaType::fromName( sParentFQN.toUtf8() + "*" );
-    if (metaType.id() == QMetaType::UnknownType)
-        metaType = QMetaType::fromName( "V2" + sParentFQN.toUtf8() + "*" );
-    if (metaType.id() == QMetaType::UnknownType)
-        return Error(pRequest, QString( "XSD request unknown enum name %1").arg(sEnumName));
-    const QMetaObject *pMetaObject = metaType.metaObject();
-#endif
+//     if (nParentId == QMetaType::UnknownType)
+//     {
+//         QString sFQN = "V2" + sParentFQN + "*";
+//         nParentId = QMetaType::type( sFQN.toUtf8() );
+//     }
 
-    if (pMetaObject == nullptr)
-        return Error(pRequest, QString( "XSD cannot find enum name %1").arg(sEnumName));
+//     if (nParentId == QMetaType::UnknownType)
+//         return Error(pRequest, QString( "XSD request unknown enum name %1").arg(sEnumName));
+//     const QMetaObject *pMetaObject = QMetaType::metaObjectForType(nParentId);
+// #else
+//     QMetaType metaType = QMetaType::fromName( sParentFQN.toUtf8() );
+//     if (metaType.id() == QMetaType::UnknownType)
+//         metaType = QMetaType::fromName( sParentFQN.toUtf8() + "*" );
+//     if (metaType.id() == QMetaType::UnknownType)
+//         metaType = QMetaType::fromName( "V2" + sParentFQN.toUtf8() + "*" );
+//     if (metaType.id() == QMetaType::UnknownType)
+//         return Error(pRequest, QString( "XSD request unknown enum name %1").arg(sEnumName));
+//     const QMetaObject *pMetaObject = metaType.metaObject();
+// #endif
 
-    // ----------------------------------------------------------------------
-    // Now look up enum
-    // ----------------------------------------------------------------------
+//     if (pMetaObject == nullptr)
+//         return Error(pRequest, QString( "XSD cannot find enum name %1").arg(sEnumName));
 
-    int nEnumIdx = pMetaObject->indexOfEnumerator( lstTypeParts[1].toUtf8() );
+//     // ----------------------------------------------------------------------
+//     // Now look up enum
+//     // ----------------------------------------------------------------------
 
-    if (nEnumIdx < 0 )
-        return Error(pRequest, QString( "XSD cannot find values for enum name %1").arg(sEnumName));
+//     int nEnumIdx = pMetaObject->indexOfEnumerator( lstTypeParts[1].toUtf8() );
 
-    QMetaEnum metaEnum = pMetaObject->enumerator( nEnumIdx );
+//     if (nEnumIdx < 0 )
+//         return Error(pRequest, QString( "XSD cannot find values for enum name %1").arg(sEnumName));
 
-    // ----------------------------------------------------------------------
-    // render xsd for this enum
-    //
-    //    <xs:simpleType name="RecordingInfo.RecordingDupMethodEnum">
-    //        <xs:restriction base="xs:string">
-    //            <xs:enumeration value="kDupCheckNone">
-    //                <xs:annotation>
-    //                    <xs:appinfo>
-    //                        <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
-    //                    </xs:appinfo>
-    //                </xs:annotation>
-    //            </xs:enumeration>
-    //            <xs:enumeration value="kDupCheckSub">
-    //                <xs:annotation>
-    //                    <xs:appinfo>
-    //                        <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
-    //                    </xs:appinfo>
-    //                </xs:annotation>
-    //            </xs:enumeration>
-    //        </xs:restriction>
-    //    </xs:simpleType>
-    //
-    //    <xs:element name="RecordingInfo.RecordingDupMethodEnum" type="tns:RecordingInfo.RecordingDupMethodEnum" nillable="true"/>
-    // ----------------------------------------------------------------------
+//     QMetaEnum metaEnum = pMetaObject->enumerator( nEnumIdx );
 
-    if (!pRequest->m_queries.contains( "raw" ))
-    {
-        appendChild( createProcessingInstruction( "xml-stylesheet",
-                        R"(type="text/xsl" href="/xslt/enum.xslt")" ));
-    }
+//     // ----------------------------------------------------------------------
+//     // render xsd for this enum
+//     //
+//     //    <xs:simpleType name="RecordingInfo.RecordingDupMethodEnum">
+//     //        <xs:restriction base="xs:string">
+//     //            <xs:enumeration value="kDupCheckNone">
+//     //                <xs:annotation>
+//     //                    <xs:appinfo>
+//     //                        <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
+//     //                    </xs:appinfo>
+//     //                </xs:annotation>
+//     //            </xs:enumeration>
+//     //            <xs:enumeration value="kDupCheckSub">
+//     //                <xs:annotation>
+//     //                    <xs:appinfo>
+//     //                        <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
+//     //                    </xs:appinfo>
+//     //                </xs:annotation>
+//     //            </xs:enumeration>
+//     //        </xs:restriction>
+//     //    </xs:simpleType>
+//     //
+//     //    <xs:element name="RecordingInfo.RecordingDupMethodEnum" type="tns:RecordingInfo.RecordingDupMethodEnum" nillable="true"/>
+//     // ----------------------------------------------------------------------
 
-    // ----------------------------------------------------------------------
-    // Create xs:simpleType structure
-    // ----------------------------------------------------------------------
+//     if (!pRequest->m_queries.contains( "raw" ))
+//     {
+//         appendChild( createProcessingInstruction( "xml-stylesheet",
+//                         R"(type="text/xsl" href="/xslt/enum.xslt")" ));
+//     }
 
-    QDomElement oTypeNode     = createElement( "xs:simpleType"  );
-    QDomElement oRestrictNode = createElement( "xs:restriction" );
+//     // ----------------------------------------------------------------------
+//     // Create xs:simpleType structure
+//     // ----------------------------------------------------------------------
 
-    oTypeNode    .setAttribute( "name", sEnumName   );
-    oRestrictNode.setAttribute( "base", "xs:string" );
+//     QDomElement oTypeNode     = createElement( "xs:simpleType"  );
+//     QDomElement oRestrictNode = createElement( "xs:restriction" );
 
-    oTypeNode.appendChild( oRestrictNode  );
+//     oTypeNode    .setAttribute( "name", sEnumName   );
+//     oRestrictNode.setAttribute( "base", "xs:string" );
 
-    for( int nIdx = 0; nIdx < metaEnum.keyCount(); nIdx++)
-    {
-        QDomElement oEnum = createElement( "xs:enumeration" );
+//     oTypeNode.appendChild( oRestrictNode  );
 
-        oEnum.setAttribute( "value", metaEnum.key( nIdx ));
+//     for( int nIdx = 0; nIdx < metaEnum.keyCount(); nIdx++)
+//     {
+//         QDomElement oEnum = createElement( "xs:enumeration" );
 
-        // ------------------------------------------------------------------
-        // Add appInfo to store numerical value & translated text
-        // ------------------------------------------------------------------
+//         oEnum.setAttribute( "value", metaEnum.key( nIdx ));
 
-        QDomElement oAnn      = createElement( "xs:annotation"    );
-        QDomElement oApp      = createElement( "xs:appinfo"       );
-        QDomElement oEnumVal  = createElement( "EnumerationValue" );
-        QDomElement oEnumDesc = createElement( "EnumerationDesc"  );
+//         // ------------------------------------------------------------------
+//         // Add appInfo to store numerical value & translated text
+//         // ------------------------------------------------------------------
 
-        // The following namespace is needed for visual studio to generate negative enums correctly.
-        oEnumVal.setAttribute("xmlns", "http://schemas.microsoft.com/2003/10/Serialization/");
+//         QDomElement oAnn      = createElement( "xs:annotation"    );
+//         QDomElement oApp      = createElement( "xs:appinfo"       );
+//         QDomElement oEnumVal  = createElement( "EnumerationValue" );
+//         QDomElement oEnumDesc = createElement( "EnumerationDesc"  );
 
-        oEnum.appendChild( oAnn      );
-        oAnn .appendChild( oApp      );
-        oApp .appendChild( oEnumVal  );
-        oApp .appendChild( oEnumDesc );
+//         // The following namespace is needed for visual studio to generate negative enums correctly.
+//         oEnumVal.setAttribute("xmlns", "http://schemas.microsoft.com/2003/10/Serialization/");
 
-        QString sFQNKey = sEnumName + "." + metaEnum.key( nIdx );
+//         oEnum.appendChild( oAnn      );
+//         oAnn .appendChild( oApp      );
+//         oApp .appendChild( oEnumVal  );
+//         oApp .appendChild( oEnumDesc );
 
-        oEnumVal .appendChild( createTextNode( QString::number( metaEnum.value( nIdx ))));
-        oEnumDesc.appendChild( createTextNode( QCoreApplication::translate("Enums",
-                                                                           sFQNKey.toUtf8() )));
+//         QString sFQNKey = sEnumName + "." + metaEnum.key( nIdx );
 
-        oRestrictNode.appendChild( oEnum );
-    }
+//         oEnumVal .appendChild( createTextNode( QString::number( metaEnum.value( nIdx ))));
+//         oEnumDesc.appendChild( createTextNode( QCoreApplication::translate("Enums",
+//                                                                            sFQNKey.toUtf8() )));
 
-    // ----------------------------------------------------------------------
+//         oRestrictNode.appendChild( oEnum );
+//     }
 
-    QDomElement oElementNode = createElement( "xs:element" );
+//     // ----------------------------------------------------------------------
 
-    oElementNode.setAttribute( "name"    , sEnumName );
-    oElementNode.setAttribute( "type"    , "tns:" + sEnumName );
-    oElementNode.setAttribute( "nillable", "true" );
+//     QDomElement oElementNode = createElement( "xs:element" );
 
-    // ----------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------
+//     oElementNode.setAttribute( "name"    , sEnumName );
+//     oElementNode.setAttribute( "type"    , "tns:" + sEnumName );
+//     oElementNode.setAttribute( "nillable", "true" );
 
-    QDomElement oRoot = CreateSchemaRoot();
+//     // ----------------------------------------------------------------------
+//     //
+//     // ----------------------------------------------------------------------
 
-    oRoot.appendChild( oTypeNode    );
-    oRoot.appendChild( oElementNode );
+//     QDomElement oRoot = CreateSchemaRoot();
 
-    appendChild( oRoot );
+//     oRoot.appendChild( oTypeNode    );
+//     oRoot.appendChild( oElementNode );
 
-    // ----------------------------------------------------------------------
-    // Return xsd doc to caller
-    // ----------------------------------------------------------------------
+//     appendChild( oRoot );
 
-    // Create the XML result
-    auto data = MythHTTPData::Create(toByteArray());
-    data->m_mimeType = MythMimeDatabase().MimeTypeForName("application/xml");
-    data->m_cacheType = HTTPETag | HTTPShortLife;
-    return MythHTTPResponse::DataResponse(pRequest, data);
-}
+//     // ----------------------------------------------------------------------
+//     // Return xsd doc to caller
+//     // ----------------------------------------------------------------------
+
+//     // Create the XML result
+//     auto data = MythHTTPData::Create(toByteArray());
+//     data->m_mimeType = MythMimeDatabase().MimeTypeForName("application/xml");
+//     data->m_cacheType = HTTPETag | HTTPShortLife;
+//     return MythHTTPResponse::DataResponse(pRequest, data);
+// }
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -457,19 +460,18 @@ bool MythXSD::RenderXSD( HTTPRequest2 pRequest, QObject *pClass )
             }
             else if (IsEnum( metaProperty, sType ))
             {
-                sCustomAttr = "enum";
-
-                if (sType.startsWith("V2"))
-                    sType.remove(0,2);
-
-                // if sType still contains "::", then no need to prefix with sClassName
-
-                if (sType.contains( "::" ))
-                    sType = sType.replace( "::", "." );
-                else
-                    sType = sClassName + "." + sType;
-
-                bCustomType = true;
+                // The code for  creating the enum in xsd does not work
+                // Since there is only one enum, treat it as a string
+                // sCustomAttr = "enum";
+                // if (sType.startsWith("V2"))
+                //     sType.remove(0,2);
+                // // if sType still contains "::", then no need to prefix with sClassName
+                // if (sType.contains( "::" ))
+                //     sType = sType.replace( "::", "." );
+                // else
+                //     sType = sClassName + "." + sType;
+                // bCustomType = true;
+                sType="string";
             }
 
             QString sNewPropName( metaProperty.name() );

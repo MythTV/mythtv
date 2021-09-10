@@ -45,8 +45,9 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
         MythXSD xsd;
         if (Request->m_queries.contains( "type" ))
             return xsd.GetXSD( Request, Request->m_queries.value("type"));
-        else
-            return xsd.GetEnumXSD( Request, Request->m_queries.value("enum"));
+        // The xsd for enums does not work, so it is commented for now.
+        // else
+        //     return xsd.GetEnumXSD( Request, Request->m_queries.value("enum"));
     }
 
     // Find the method
