@@ -30,6 +30,7 @@ QT += core5compat
 }
 CONFIG += $$CCONFIG
 CONFIG += c++17
+CONFIG += no_qt_rpath
 
 # Make sure all the Qt header files are marked as system headers
 QMAKE_DEFAULT_INCDIRS += $$[QT_INSTALL_HEADERS]
