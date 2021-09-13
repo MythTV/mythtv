@@ -496,6 +496,8 @@ bool MythWSDL::IsCustomType( QString &sTypeName )
             // for now, treat QFileInfo as a string.  Need to turn into MTOM later.
             if (id == qMetaTypeId<QFileInfo>())
                 return false;
+            if (sTypeName == "std::chrono::seconds")
+                return false;
             break;
     }
 

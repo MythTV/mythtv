@@ -23,6 +23,8 @@ class FrontendStatus : public QObject
     SERVICE_PROPERTY(QVariantMap,  AudioTracks,    audioTracks)
 
   public:
+    Q_INVOKABLE FrontendStatus(QObject *parent = nullptr)
+      : QObject  ( parent ) {};
     FrontendStatus(const QString& Name, const QString& Version, const QVariantMap& State);
 };
 
@@ -36,6 +38,8 @@ class FrontendActionList : public QObject
     SERVICE_PROPERTY(QVariantMap, ActionList, actionList)
 
   public:
+    Q_INVOKABLE FrontendActionList(QObject *parent = nullptr)
+      : QObject  ( parent ) {};
     FrontendActionList(const QVariantMap& List);
 };
 

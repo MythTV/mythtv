@@ -928,6 +928,9 @@ QString MythXSD::ConvertTypeToXSD( const QString &sType, bool bCustomType )
     if (sType == "qlonglong" )
         return "long";
 
+    if (sType == "std::chrono::seconds" )
+        return "long";
+
     if (sType == "qulonglong" )
         return "unsignedLong";
 
