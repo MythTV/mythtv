@@ -174,26 +174,20 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
             return;
         }
         auto body_contents = doc_body.firstChild();
-        // if (body_contents.prefix() == "myt")
-        // {
-            // Requested method should be the localname
-            // Request->m_fileName = body_contents.localName();
-            // LOG(VB_HTTP, LOG_DEBUG, QString("Found method call (%1)").arg(body_contents.localName()));
-            if (body_contents.hasChildNodes()) // params for the method
+        if (body_contents.hasChildNodes()) // params for the method
+        {
+            for (QDomNode node = body_contents.firstChild(); !node.isNull(); node = node.nextSibling())
             {
-                for (QDomNode node = body_contents.firstChild(); !node.isNull(); node = node.nextSibling())
+                QString name = node.localName();
+                QString value = node.toElement().text();
+                if (!name.isEmpty())
                 {
-                    QString name = node.localName();
-                    QString value = node.toElement().text();
-                    if (!name.isEmpty())
-                    {
-                        // TODO: html decode entities if required
-                        Request->m_queries.insert(name.trimmed().toLower(), value);
-                        LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(name).arg(value));
-                    }
+                    // TODO: html decode entities if required
+                    Request->m_queries.insert(name.trimmed().toLower(), value);
+                    LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(name).arg(value));
                 }
             }
-        // }
+        }
     }
 }
 
