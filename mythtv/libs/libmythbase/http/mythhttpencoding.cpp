@@ -95,7 +95,8 @@ void MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
         Request->m_content->m_mimeType = mime;
         if (mime.Name() == "application/x-www-form-urlencoded")
             GetURLEncodedParameters(Request);
-        if (mime.Name() == "text/xml" || mime.Name() == "application/xml")
+        if (mime.Name() == "text/xml" || mime.Name() == "application/xml"
+            || mime.Name() == "application/soap+xml")
             GetXMLEncodedParameters(Request);
 
     }
@@ -140,6 +141,17 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
     if (!Request || !Request->m_content.get())
         return;
 
+    // soapaction is formatted like "\"http://mythtv.org/Dvr/GetRecordedList\""
+    QString soapaction = Request->m_headers->value("soapaction");
+    soapaction.remove('"');
+    int lastSlashPos= soapaction.lastIndexOf('/');
+    if (lastSlashPos < 0)
+        return;
+    if (Request->m_path == "/")
+        Request->m_path.append(Request->m_fileName).append("/");
+    Request->m_fileName = soapaction.right(soapaction.size()-lastSlashPos-1);
+    LOG(VB_HTTP, LOG_DEBUG, QString("Found method call (%1)").arg(Request->m_fileName));
+
     auto payload = QDomDocument();
     QString err_msg;
     int err_line, err_col;
@@ -151,8 +163,8 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
                                           .arg(err_line).arg(err_col).arg(err_msg));
         return;
     }
-    QString doc_name = payload.documentElement().nodeName();
-    if (doc_name.compare("soapenv:envelope", Qt::CaseInsensitive) == 0)
+    QString doc_name = payload.documentElement().localName();
+    if (doc_name.compare("envelope", Qt::CaseInsensitive) == 0)
     {
         LOG(VB_HTTP, LOG_DEBUG, "Found SOAP XML message envelope");
         auto doc_body = payload.documentElement().namedItem("Body");
@@ -162,11 +174,11 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
             return;
         }
         auto body_contents = doc_body.firstChild();
-        if (body_contents.prefix() == "myt")
-        {
+        // if (body_contents.prefix() == "myt")
+        // {
             // Requested method should be the localname
-            Request->m_fileName = body_contents.localName();
-            LOG(VB_HTTP, LOG_DEBUG, QString("Found method call (%1)").arg(body_contents.localName()));
+            // Request->m_fileName = body_contents.localName();
+            // LOG(VB_HTTP, LOG_DEBUG, QString("Found method call (%1)").arg(body_contents.localName()));
             if (body_contents.hasChildNodes()) // params for the method
             {
                 for (QDomNode node = body_contents.firstChild(); !node.isNull(); node = node.nextSibling())
@@ -181,7 +193,7 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
                     }
                 }
             }
-        }
+        // }
     }
 }
 
