@@ -12,6 +12,6 @@ export class MythService {
   constructor(private httpClient: HttpClient) { }
 
   public GetHostName() : Observable<MythHostName> {
-    return this.httpClient.get<MythHostName>('http://localhost:7744/Myth/GetHostName');
+    return this.httpClient.get<MythHostName>('/Myth/GetHostName');
   }
 }
