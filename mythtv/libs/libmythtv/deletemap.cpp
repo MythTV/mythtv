@@ -703,7 +703,7 @@ void DeleteMap::CleanMap(void)
 
         // Delete the unwanted frame marks safely, and not while iterating over
         // the map which would lead to a crash
-        for (const long & dit : qAsConst(deleteList))
+        for (const int64_t & dit : qAsConst(deleteList))
         {
             Delete(dit);
         }
