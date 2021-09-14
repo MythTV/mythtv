@@ -630,6 +630,18 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     sysEventHandler = new MythSystemEventHandler();
 
+    MythHTTPInstance::Addservices({{ VIDEO_SERVICE, &MythHTTPService::Create<V2Video> }});
+    MythHTTPInstance::Addservices({{ MYTH_SERVICE, &MythHTTPService::Create<V2Myth> }});
+    MythHTTPInstance::Addservices({{ DVR_SERVICE, &MythHTTPService::Create<V2Dvr> }});
+    MythHTTPInstance::Addservices({{ CONTENT_SERVICE, &MythHTTPService::Create<V2Content> }});
+    MythHTTPInstance::Addservices({{ GUIDE_SERVICE, &MythHTTPService::Create<V2Guide> }});
+    MythHTTPInstance::Addservices({{ CHANNEL_SERVICE, &MythHTTPService::Create<V2Channel> }});
+    MythHTTPInstance::Addservices({{ STATUS_SERVICE, &MythHTTPService::Create<V2Status> }});
+    MythHTTPInstance::Addservices({{ CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> }});
+    MythHTTPInstance::Addservices({{ MUSIC_SERVICE, &MythHTTPService::Create<V2Music> }});
+    auto root = std::bind(&MythHTTPRoot::RedirectRoot, std::placeholders::_1, "mythbackend.html");
+    MythHTTPScopedInstance webserver({{ "/", root}});
+
     if (ismaster)
     {
         LOG(VB_GENERAL, LOG_NOTICE, LOC + "Starting up as the master server.");
@@ -742,18 +754,6 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         httpStatus = new HttpStatus( &tvList, sched, expirer, ismaster );
         pHS->RegisterExtension( httpStatus );
     }
-
-    MythHTTPInstance::Addservices({{ VIDEO_SERVICE, &MythHTTPService::Create<V2Video> }});
-    MythHTTPInstance::Addservices({{ MYTH_SERVICE, &MythHTTPService::Create<V2Myth> }});
-    MythHTTPInstance::Addservices({{ DVR_SERVICE, &MythHTTPService::Create<V2Dvr> }});
-    MythHTTPInstance::Addservices({{ CONTENT_SERVICE, &MythHTTPService::Create<V2Content> }});
-    MythHTTPInstance::Addservices({{ GUIDE_SERVICE, &MythHTTPService::Create<V2Guide> }});
-    MythHTTPInstance::Addservices({{ CHANNEL_SERVICE, &MythHTTPService::Create<V2Channel> }});
-    MythHTTPInstance::Addservices({{ STATUS_SERVICE, &MythHTTPService::Create<V2Status> }});
-    MythHTTPInstance::Addservices({{ CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> }});
-    MythHTTPInstance::Addservices({{ MUSIC_SERVICE, &MythHTTPService::Create<V2Music> }});
-    auto root = std::bind(&MythHTTPRoot::RedirectRoot, std::placeholders::_1, "mythbackend.html");
-    MythHTTPScopedInstance webserver({{ "/", root}});
 
     be_sd_notify("STATUS=Creating main server");
     mainServer = new MainServer(
