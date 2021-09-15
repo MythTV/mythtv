@@ -3,7 +3,7 @@
  # pxsup2dast.c version YYYY-MM-DD (take from most recent change below).
  #
  # Project X sup to dvdauthor subtitle xml file.
- # too ‰t iki piste fi
+ # too √§t iki piste fi
  #
  # -------------------------------------------------
  #
@@ -16,7 +16,7 @@
  # it anymore...
  #
  # Change 2009-08-09: Renamed getline() as getpixelline() (to avoid function
- # name collision. Fixed GPL version to 2 (only). Thanks Ville Skytt‰.
+ # name collision. Fixed GPL version to 2 (only). Thanks Ville Skytt√§.
  #
  # Change 2009-01-10: Added subtitle indexing change (fix) from patch
  # sent by Ian Stewart.

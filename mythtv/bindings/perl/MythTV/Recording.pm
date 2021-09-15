@@ -359,10 +359,10 @@ package MythTV::Recording;
             $info{'mpeg_stream_type'} = 'ts';
         }
     # French localisation
-        elsif ($data =~ m/Fichier de type MPEG-(PE?S) détecté./m) {
+        elsif ($data =~ m/Fichier de type MPEG-(PE?S) dÃ©tectÃ©./m) {
             $info{'mpeg_stream_type'} = lc($1);
         }
-        elsif ($data =~ m/Fichier de type TS détecté./m) {
+        elsif ($data =~ m/Fichier de type TS dÃ©tectÃ©./m) {
             $info{'mpeg_stream_type'} = 'ts';
         }
     # No matches on stream type?

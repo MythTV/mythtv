@@ -3,10 +3,10 @@
 * creation : 01/10/2000
 *  -ajout de sinFilter()
 *  -ajout de zoomFilter()
-*  -copie de zoomFilter() en zoomFilterRGB(), gérant les 3 couleurs
+*  -copie de zoomFilter() en zoomFilterRGB(), gÃ©rant les 3 couleurs
 *  -optimisation de sinFilter (utilisant une table de sin)
 *	-asm
-*	-optimisation de la procedure de génération du buffer de transformation
+*	-optimisation de la procedure de gÃ©nÃ©ration du buffer de transformation
 *		la vitesse est maintenant comprise dans [0..128] au lieu de [0..100]
 */
 
@@ -98,7 +98,7 @@ unsigned int *coeffs = nullptr, *freecoeffs = nullptr;
 
 signed int *brutS = nullptr, *freebrutS = nullptr;	// source
 signed int *brutD = nullptr, *freebrutD = nullptr;	// dest
-signed int *brutT = nullptr, *freebrutT = nullptr;	// temp (en cours de génération)
+signed int *brutT = nullptr, *freebrutT = nullptr;	// temp (en cours de gÃ©nÃ©ration)
 
 // TODO : virer
 guint32 *expix1 = nullptr;				// pointeur exporte vers p1
@@ -141,7 +141,7 @@ static int *firedec = nullptr;
 // retourne x>>s , en testant le signe de x
 #define ShiftRight(_x,_s) (((_x)<0) ? -(-(_x)>>(_s)) : ((_x)>>(_s)))
 
-/** modif d'optim by Jeko : precalcul des 4 coefs résultant des 2 pos */
+/** modif d'optim by Jeko : precalcul des 4 coefs rÃ©sultant des 2 pos */
 GoomCoefficients precalCoef = {};
 
 /* Prototypes to keep gcc from spewing warnings */
@@ -533,7 +533,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 	/** changement de config **/
 	if (zf) {
-		static bool s_reverse = false;	// vitesse inversé..(zoom out)
+		static bool s_reverse = false;	// vitesse inversÃ©..(zoom out)
 		s_reverse = zf->reverse;
 		vitesse = zf->vitesse;
 		if (s_reverse)

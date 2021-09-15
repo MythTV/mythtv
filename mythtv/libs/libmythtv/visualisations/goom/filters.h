@@ -14,7 +14,7 @@ struct ZoomFilterData
 	unsigned char sqrtperte;
 	int     middleX, middleY;	/* milieu de l'effet */
 	bool    reverse;		/* inverse la vitesse */
-	char    mode;			/* type d'effet à appliquer (cf les #define) */
+	char    mode;			/* type d'effet Ã  appliquer (cf les #define) */
 	/** @since June 2001 */
 	int     hPlaneEffect;		/* deviation horitontale */
 	int     vPlaneEffect;		/* deviation verticale */
