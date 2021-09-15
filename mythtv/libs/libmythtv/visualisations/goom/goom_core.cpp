@@ -152,14 +152,14 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	// des points
 	static int s_ifsIncr = 1;		// dessiner l'ifs (0 = non: > = increment)
 	static int s_decayIfs = 0;		// disparition de l'ifs
-	static int s_recayIfs = 0;		// dédisparition de l'ifs
+	static int s_recayIfs = 0;		// dÃ©disparition de l'ifs
 
 #define SWITCHMULT (29.0F/30.0F)
 #define SWITCHINCR 0x7f
 	static float s_switchMult = 1.0F;
 	static int s_switchIncr = SWITCHINCR;
 
-	static char s_goomLimit = 2;		// sensibilité du goom
+	static char s_goomLimit = 2;		// sensibilitÃ© du goom
 	static ZoomFilterData s_zfd = {
 		127, 8, 16,
 		1, 1, false, NORMAL_MODE,
@@ -211,7 +211,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 
 	/* ! calcul du deplacement des petits points ... */
 
-        // largfactor: elargissement de l'intervalle d'évolution
+        // largfactor: elargissement de l'intervalle d'Ã©volution
 	float largfactor = ((float) s_speedVar / 40.0F + (float) incvar / 50000.0F) / 1.5F;
 	if (largfactor > 1.5F)
 		largfactor = 1.5F;
@@ -260,7 +260,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
                                      66.0F, 74.0F, s_loopVar + i * 500); }
 	}
 
-	// par défaut pas de changement de zoom
+	// par dÃ©faut pas de changement de zoom
 	pzfd = nullptr;
 
 	/* 
@@ -605,7 +605,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	}
 
 	/*
-	 * arreter de decrémenter au bout d'un certain temps
+	 * arreter de decrÃ©menter au bout d'un certain temps
 	 */
 	if ((cycle % 101 == 0) && (s_zfd.pertedec == 7)) {
 		pzfd = &s_zfd;
@@ -829,7 +829,7 @@ guint32 * goom_update (GoomDualData& data, int forceMode) {
 	// affichage et swappage des buffers..
 	cycle++;
 
-	// toute les 2 secondes : vérifier si le taux de goom est correct
+	// toute les 2 secondes : vÃ©rifier si le taux de goom est correct
 	// et le modifier sinon..
 	if (!(cycle % 64)) {
 		if (s_speedVar<1)

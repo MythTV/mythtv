@@ -231,7 +231,7 @@ void zoom_filter_xmmx (int prevX, int prevY,
 			pmullw_r2r (mm4, mm1);
 			pmullw_r2r (mm5, mm2);
 			   
-			/* ajout des valeurs obtenues à la valeur finale */
+			/* ajout des valeurs obtenues Ã  la valeur finale */
 			paddw_r2r (mm1, mm0);
 			paddw_r2r (mm2, mm0);
 			   
