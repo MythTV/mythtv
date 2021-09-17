@@ -34,8 +34,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <signal.h>
-
 // QT headers
 #include <QCoreApplication>
 

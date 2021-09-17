@@ -61,15 +61,15 @@ bool RecordingRule::Load(bool asTemplate)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT type, search, "
-    "recpriority, prefinput, startoffset, endoffset, dupmethod, dupin, "
-    "inactive, profile, recgroup, storagegroup, playgroup, autoexpire, "
-    "maxepisodes, maxnewest, autocommflag, autotranscode, transcoder, "
-    "autouserjob1, autouserjob2, autouserjob3, autouserjob4, "
-    "autometadata, parentid, title, subtitle, description, season, episode, "
-    "category, starttime, startdate, endtime, enddate, seriesid, programid, "
-    "inetref, chanid, station, findday, findtime, findid, "
-    "next_record, last_record, last_delete, avg_delay, filter, recgroupid "
+    query.prepare("SELECT type, search, " // 00-01
+    "recpriority, prefinput, startoffset, endoffset, dupmethod, dupin, " // 02-07
+    "inactive, profile, recgroup, storagegroup, playgroup, autoexpire, " // 08-13
+    "maxepisodes, maxnewest, autocommflag, autotranscode, transcoder, " // 14-18
+    "autouserjob1, autouserjob2, autouserjob3, autouserjob4, " // 19-22
+    "autometadata, parentid, title, subtitle, description, season, episode, " // 23-29
+    "category, starttime, startdate, endtime, enddate, seriesid, programid, " // 30-36
+    "inetref, chanid, station, findday, findtime, findid, " // 37-42
+    "next_record, last_record, last_delete, avg_delay, filter, recgroupid " // 43-48
     "FROM record WHERE recordid = :RECORDID ;");
 
     query.bindValue(":RECORDID", m_recordID);

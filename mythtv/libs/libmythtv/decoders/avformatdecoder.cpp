@@ -4115,6 +4115,13 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
     bool forced = m_tracks[type][TrackNo].m_forced;
     int lang_key = m_tracks[type][TrackNo].m_language;
     QString forcedString = forced ? QObject::tr(" (forced)") : "";
+
+    int av_index = m_tracks[type][TrackNo].m_av_stream_index;
+    AVStream *stream = m_ic->streams[av_index];
+    AVDictionaryEntry *entry =
+        stream ? av_dict_get(stream->metadata, "title", NULL, 0) : nullptr;
+    QString user_title = entry ? QString(R"( "%1")").arg(entry->value) : "";
+
     if (kTrackTypeAudio == type)
     {
         QString msg = iso639_key_toName(lang_key);
@@ -4123,8 +4130,6 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
         {
             case kAudioTypeNormal :
             {
-                int av_index = m_tracks[kTrackTypeAudio][TrackNo].m_av_stream_index;
-                AVStream *stream = m_ic->streams[av_index];
                 if (stream)
                 {
                     AVCodecParameters *par = stream->codecpar;
@@ -4132,12 +4137,9 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
                     if (par->codec_id == AV_CODEC_ID_MP3)
                         msg += QString(" MP3");
                     else if (ctx && ctx->codec)
-                    {
                         msg += QString(" %1").arg(ctx->codec->name).toUpper();
-                        AVDictionaryEntry *entry = av_dict_get(stream->metadata, "title", NULL, 0);
-                        if (entry)
-                            msg += QString(R"( "%1")").arg(entry->value);
-                    }
+                    if (!user_title.isEmpty())
+                        msg += user_title;
 
                     int channels = 0;
                     if (m_ringBuffer->IsDVD() || par->channels)
@@ -4158,7 +4160,10 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
             case kAudioTypeCleanEffects :
             case kAudioTypeSpokenSubs :
             default :
-                msg += QString(" (%1)")
+                if (!user_title.isEmpty())
+                    msg += user_title;
+                else
+                    msg += QString(" (%1)")
                             .arg(toString(m_tracks[type][TrackNo].m_audio_type));
                 break;
         }
@@ -4166,9 +4171,10 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint TrackNo)
     }
     if (kTrackTypeSubtitle == type)
     {
-        return QObject::tr("Subtitle") + QString(" %1: %2%3")
+        return QObject::tr("Subtitle") + QString(" %1: %2%3%4")
             .arg(QString::number(TrackNo + 1),
                  iso639_key_toName(lang_key),
+                 user_title,
                  forcedString);
     }
     if (forced && kTrackTypeRawText == type)

@@ -114,7 +114,7 @@ void zoom_filter_mmx (int prevX, int prevY,
         pmullw_r2r(mm4, mm1);
         pmullw_r2r(mm5, mm2);
         
-        /* ajout des valeurs obtenues de iso8859-15 à la valeur finale */
+        /* ajout des valeurs obtenues de iso8859-15 Ã  la valeur finale */
         paddw_r2r(mm1, mm0);
         paddw_r2r(mm2, mm0);
         

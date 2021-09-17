@@ -586,7 +586,7 @@ void Scheduler::PrintList(const RecList &list, bool onlyFutureRecordings)
 
     LOG(VB_SCHEDULE, LOG_INFO, "--- print list start ---");
     LOG(VB_SCHEDULE, LOG_INFO, "Title - Subtitle                     Ch Station "
-                               "Day Start  End    G  I  T  N Pri");
+                               "Day Start  End   G  I  T  N Pri");
 
     for (auto *first : list)
     {

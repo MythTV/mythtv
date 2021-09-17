@@ -1090,12 +1090,24 @@ int MythCoreContext::GetBackendServerPort(void)
     return GetBackendServerPort(d->m_localHostname);
 }
 
+QHash<QString,int> MythCoreContext::s_serverPortCache;
+
+void MythCoreContext::ClearBackendServerPortCache()
+{
+    s_serverPortCache.clear();
+}
+
 /**
  * Returns the backend "hosts"'s control port
  */
 int MythCoreContext::GetBackendServerPort(const QString &host)
 {
-    return GetNumSettingOnHost("BackendServerPort", host, 6543);
+    int port = s_serverPortCache.value(host, -1);
+    if (port != -1)
+        return port;
+    port = GetNumSettingOnHost("BackendServerPort", host, 6543);
+    s_serverPortCache[host] = port;
+    return port;
 }
 
 /**
