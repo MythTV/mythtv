@@ -87,6 +87,9 @@ class V2VideoMetadataInfo : public QObject
 
         }
 
+    private:
+        Q_DISABLE_COPY(V2VideoMetadataInfo);
+
 
 };
 

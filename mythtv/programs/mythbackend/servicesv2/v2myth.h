@@ -5,6 +5,13 @@
 #include "v2connectionInfo.h"
 #include "v2storageGroupDirList.h"
 #include "v2timeZoneInfo.h"
+#include "v2logMessageList.h"
+#include "v2frontendList.h"
+#include "v2settingList.h"
+#include "v2backendInfo.h"
+#include "v2buildInfo.h"
+#include "v2envInfo.h"
+#include "v2logInfo.h"
 
 #define MYTH_SERVICE QString("/Myth/")
 #define MYTH_HANDLE  QString("Myth")
@@ -44,12 +51,9 @@ class V2Myth : public MythHTTPService
 
     QStringList         GetKeys             ( );
 
-#define SGDL 0
-#if SGDL
     V2StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
                                                   const QString   &HostName );
 
-#endif // SGDL
     bool                AddStorageGroupDir  ( const QString   &GroupName,
                                               const QString   &DirName,
                                               const QString   &HostName );
@@ -69,8 +73,7 @@ class V2Myth : public MythHTTPService
     QString             GetFormatTime       ( const QDateTime &Time );
 
     QDateTime           ParseISODateString  ( const QString   &DateTime );
-/*
-    DTC::LogMessageList* GetLogs            ( const QString   &HostName,
+    V2LogMessageList*   GetLogs            ( const QString   &HostName,
                                               const QString   &Application,
                                               int             PID,
                                               int             TID,
@@ -85,14 +88,11 @@ class V2Myth : public MythHTTPService
                                             );
 
 
-    DTC::FrontendList*  GetFrontends        ( bool OnLine );
-*/
+    V2FrontendList*     GetFrontends        ( bool OnLine );
     QString             GetSetting          ( const QString   &HostName,
                                               const QString   &Key,
                                               const QString   &Default );
-/*
-    DTC::SettingList*   GetSettingList      ( const QString   &HostName );
-*/
+    V2SettingList*      GetSettingList      ( const QString   &HostName );
     bool                PutSetting          ( const QString   &HostName,
                                               const QString   &Key,
                                               const QString   &Value   );
@@ -143,9 +143,7 @@ class V2Myth : public MythHTTPService
     QString             ProfileUpdated      ( void );
 
     QString             ProfileText         ( void );
-/*
-    DTC::BackendInfo*   GetBackendInfo      ( void );
-*/
+    V2BackendInfo*      GetBackendInfo      ( void );
     bool                ManageDigestUser    ( const QString &Action,
                                               const QString &UserName,
                                               const QString &Password,

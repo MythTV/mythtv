@@ -41,10 +41,19 @@ void V2Myth::RegisterCustomTypes()
     qRegisterMetaType<V2VersionInfo*>("V2VersionInfo");
     qRegisterMetaType<V2DatabaseInfo*>("V2DatabaseInfo");
     qRegisterMetaType<V2WOLInfo*>("V2WOLInfo");
-#if SGDL
     qRegisterMetaType<V2StorageGroupDirList*>("V2StorageGroupDirList");
-#endif // SGDL
+    qRegisterMetaType<V2StorageGroupDir*>("V2StorageGroupDir");
     qRegisterMetaType<V2TimeZoneInfo*>("V2TimeZoneInfo");
+    qRegisterMetaType<V2LogMessage*>("V2LogMessage");
+    qRegisterMetaType<V2LogMessageList*>("V2LogMessageList");
+    qRegisterMetaType<V2LabelValue*>("V2LabelValue");
+    qRegisterMetaType<V2Frontend*>("V2Frontend");
+    qRegisterMetaType<V2FrontendList*>("V2FrontendList");
+    qRegisterMetaType<V2SettingList*>("V2SettingList");
+    qRegisterMetaType<V2BackendInfo*>("V2BackendInfo");
+    qRegisterMetaType<V2EnvInfo*>("V2EnvInfo");
+    qRegisterMetaType<V2LogInfo*>("V2LogInfo");
+    qRegisterMetaType<V2BuildInfo*>("V2BuildInfo");
 }
 
 
@@ -218,7 +227,6 @@ QStringList V2Myth::GetKeys()
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-#if SGDL
 V2StorageGroupDirList* V2Myth::GetStorageGroupDirs( const QString &sGroupName,
                                                     const QString &sHostName )
 {
@@ -298,7 +306,7 @@ V2StorageGroupDirList* V2Myth::GetStorageGroupDirs( const QString &sGroupName,
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-#endif // SGDL
+
 bool V2Myth::AddStorageGroupDir( const QString &sGroupName,
                                  const QString &sDirName,
                                  const QString &sHostName )
@@ -465,7 +473,7 @@ QDateTime V2Myth::ParseISODateString(const QString& DateTimeString)
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-/*
+
 V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
                                      const QString   &Application,
                                      int             PID,
@@ -479,7 +487,7 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
                                      const QString   &Level,
                                      const QString   &MsgContains )
 {
-    auto *pList = new DTC::LogMessageList();
+    auto *pList = new V2LogMessageList();
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -493,7 +501,7 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
     }
     while (query.next())
     {
-        DTC::LabelValue *pLabelValue = pList->AddNewHostName();
+        V2LabelValue *pLabelValue = pList->AddNewHostName();
         QString availableHostName = query.value(0).toString();
         pLabelValue->setValue   ( availableHostName );
         pLabelValue->setActive  ( availableHostName == HostName );
@@ -509,7 +517,7 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
     }
     while (query.next())
     {
-        DTC::LabelValue *pLabelValue = pList->AddNewApplication();
+        V2LabelValue *pLabelValue = pList->AddNewApplication();
         QString availableApplication = query.value(0).toString();
         pLabelValue->setValue   ( availableApplication );
         pLabelValue->setActive  ( availableApplication == Application );
@@ -575,7 +583,7 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
 
         while (query.next())
         {
-            DTC::LogMessage *pLogMessage = pList->AddNewLogMessage();
+            V2LogMessage *pLogMessage = pList->AddNewLogMessage();
 
             pLogMessage->setHostName( query.value(0).toString() );
             pLogMessage->setApplication( query.value(1).toString() );
@@ -601,7 +609,7 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
 
 V2FrontendList* V2Myth::GetFrontends( bool OnLine )
 {
-    auto *pList = new DTC::FrontendList();
+    auto *pList = new V2FrontendList();
     QMap<QString, Frontend*> frontends;
     if (OnLine)
         frontends = gBackendContext->GetConnectedFrontends();
@@ -610,7 +618,7 @@ V2FrontendList* V2Myth::GetFrontends( bool OnLine )
 
     for (auto * fe : qAsConst(frontends))
     {
-        DTC::Frontend *pFrontend = pList->AddNewFrontend();
+        V2Frontend *pFrontend = pList->AddNewFrontend();
         pFrontend->setName(fe->m_name);
         pFrontend->setIP(fe->m_ip.toString());
         int port = gCoreContext->GetNumSettingOnHost("FrontendStatusPort",
@@ -621,7 +629,7 @@ V2FrontendList* V2Myth::GetFrontends( bool OnLine )
 
     return pList;
 }
-*/
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -663,7 +671,7 @@ QString V2Myth::GetSetting( const QString &sHostName,
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-/*
+
 V2SettingList* V2Myth::GetSettingList(const QString &sHostName)
 {
 
@@ -675,9 +683,8 @@ V2SettingList* V2Myth::GetSettingList(const QString &sHostName)
                   .arg( sHostName ));
     }
 
-    auto *pList = new DTC::SettingList();
+    auto *pList = new V2SettingList();
 
-    //pList->setObjectName( "Settings" );
     pList->setHostName  ( sHostName  );
 
     // ------------------------------------------------------------------
@@ -712,7 +719,7 @@ V2SettingList* V2Myth::GetSettingList(const QString &sHostName)
 
     return pList;
 }
-*/
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -1038,7 +1045,7 @@ QString V2Myth::ProfileText()
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
-/*
+
 V2BackendInfo* V2Myth::GetBackendInfo( void )
 {
 
@@ -1046,10 +1053,10 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     // Create and populate a Configuration object
     // ----------------------------------------------------------------------
 
-    auto                   *pInfo      = new DTC::BackendInfo();
-    DTC::BuildInfo         *pBuild     = pInfo->Build();
-    DTC::EnvInfo           *pEnv       = pInfo->Env();
-    DTC::LogInfo           *pLog       = pInfo->Log();
+    auto                   *pInfo      = new V2BackendInfo();
+    V2BuildInfo         *pBuild     = pInfo->Build();
+    V2EnvInfo           *pEnv       = pInfo->Env();
+    V2LogInfo           *pLog       = pInfo->Log();
 
     pBuild->setVersion     ( MYTH_SOURCE_VERSION   );
     pBuild->setLibX264     ( CONFIG_LIBX264        );
@@ -1068,7 +1075,7 @@ V2BackendInfo* V2Myth::GetBackendInfo( void )
     return pInfo;
 
 }
-*/
+
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////

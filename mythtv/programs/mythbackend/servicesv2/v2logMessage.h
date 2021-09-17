@@ -5,57 +5,31 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef LOGMESSAGE_H_
-#define LOGMESSAGE_H_
+#ifndef V2LOGMESSAGE_H_
+#define V2LOGMESSAGE_H_
 
-#include <QString>
-#include <QDateTime>
+#include "libmythbase/http/mythhttpservice.h"
 
-class LogMessage : public QObject
+class V2LogMessage : public QObject
 {
     Q_OBJECT
     Q_CLASSINFO( "Version"    , "1.0" );
 
-    Q_PROPERTY( QString    HostName        READ HostName
-                                           WRITE setHostName    )
-    Q_PROPERTY( QString    Application     READ Application
-                                           WRITE setApplication )
-    Q_PROPERTY( int        PID             READ PID
-                                           WRITE setPID         )
-    Q_PROPERTY( int        TID             READ TID
-                                           WRITE setTID         )
-    Q_PROPERTY( QString    Thread          READ Thread
-                                           WRITE setThread      )
-    Q_PROPERTY( QString    Filename        READ Filename
-                                           WRITE setFilename    )
-    Q_PROPERTY( int        Line            READ Line
-                                           WRITE setLine        )
-    Q_PROPERTY( QString    Function        READ Function
-                                           WRITE setFunction    )
-    Q_PROPERTY( QDateTime  Time            READ Time
-                                           WRITE setTime        )
-    Q_PROPERTY( QString    Level           READ Level
-                                           WRITE setLevel       )
-    Q_PROPERTY( QString    Message         READ Message
-                                           WRITE setMessage     )
-
-    PROPERTYIMP_REF( QString  , HostName    )
-    PROPERTYIMP_REF( QString  , Application )
-    PROPERTYIMP    ( int      , PID         )
-    PROPERTYIMP    ( int      , TID         )
-    PROPERTYIMP_REF( QString  , Thread      )
-    PROPERTYIMP_REF( QString  , Filename    )
-    PROPERTYIMP    ( int      , Line        )
-    PROPERTYIMP_REF( QString  , Function    )
-    PROPERTYIMP_REF( QDateTime, Time        )
-    PROPERTYIMP_REF( QString  , Level       )
-    PROPERTYIMP_REF( QString  , Message     );
+    SERVICE_PROPERTY2( QString  , HostName    )
+    SERVICE_PROPERTY2( QString  , Application )
+    SERVICE_PROPERTY2( int      , PID         )
+    SERVICE_PROPERTY2( int      , TID         )
+    SERVICE_PROPERTY2( QString  , Thread      )
+    SERVICE_PROPERTY2( QString  , Filename    )
+    SERVICE_PROPERTY2( int      , Line        )
+    SERVICE_PROPERTY2( QString  , Function    )
+    SERVICE_PROPERTY2( QDateTime, Time        )
+    SERVICE_PROPERTY2( QString  , Level       )
+    SERVICE_PROPERTY2( QString  , Message     );
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-        Q_INVOKABLE LogMessage(QObject *parent = nullptr)
+        Q_INVOKABLE V2LogMessage(QObject *parent = nullptr)
             : QObject       ( parent ),
               m_HostName    (        ),
               m_Application (        ),
@@ -70,7 +44,7 @@ class LogMessage : public QObject
         {
         }
 
-        void Copy( const LogMessage *src )
+        void Copy( const V2LogMessage *src )
         {
             m_HostName        = src->m_HostName       ;
             m_Application     = src->m_Application    ;
@@ -86,12 +60,9 @@ class LogMessage : public QObject
         }
 
     private:
-        Q_DISABLE_COPY(LogMessage);
+        Q_DISABLE_COPY(V2LogMessage);
 };
 
-inline void LogMessage::InitializeCustomTypes()
-{
-    qRegisterMetaType< LogMessage* >();
-}
+Q_DECLARE_METATYPE(V2LogMessage*)
 
-#endif // LOGMESSAGE_H_
+#endif // V2LOGMESSAGE_H_

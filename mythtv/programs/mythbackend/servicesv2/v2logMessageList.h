@@ -1,12 +1,13 @@
-#ifndef LOGMESSAGELIST_H_
-#define LOGMESSAGELIST_H_
+#ifndef V2LOGMESSAGELIST_H_
+#define V2LOGMESSAGELIST_H_
 
 #include <QVariantList>
 
-#include "serviceexp.h"
-#include "datacontracthelper.h"
+#include "libmythbase/http/mythhttpservice.h"
+#include "v2logMessage.h"
+#include "v2labelValue.h"
 
-class LogMessageList : public QObject
+class V2LogMessageList : public QObject
 {
     Q_OBJECT
     Q_CLASSINFO( "Version", "1.0" );
@@ -14,80 +15,68 @@ class LogMessageList : public QObject
     // Q_CLASSINFO Used to augment Metadata for properties. 
     // See datacontracthelper.h for details
 
-    Q_CLASSINFO( "HostNames", "type=DTC::LabelValue");
-    Q_CLASSINFO( "Applications", "type=DTC::LabelValue");
-    Q_CLASSINFO( "LogMessages", "type=DTC::LogMessage");
+    Q_CLASSINFO( "HostNames", "type=V2LabelValue");
+    Q_CLASSINFO( "Applications", "type=V2LabelValue");
+    Q_CLASSINFO( "LogMessages", "type=V2LogMessage");
 
-    Q_PROPERTY( QVariantList HostNames    READ HostNames    )
-    Q_PROPERTY( QVariantList Applications READ Applications )
-    Q_PROPERTY( QVariantList LogMessages  READ LogMessages  )
-
-    PROPERTYIMP_RO_REF( QVariantList, HostNames    )
-    PROPERTYIMP_RO_REF( QVariantList, Applications )
-    PROPERTYIMP_RO_REF( QVariantList, LogMessages  );
+    SERVICE_PROPERTY2( QVariantList, HostNames    )
+    SERVICE_PROPERTY2( QVariantList, Applications )
+    SERVICE_PROPERTY2( QVariantList, LogMessages  );
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-        Q_INVOKABLE LogMessageList(QObject *parent = nullptr)
+        Q_INVOKABLE V2LogMessageList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }
 
-        void Copy( const LogMessageList *src )
+        void Copy( const V2LogMessageList *src )
         {
-            CopyListContents< LabelValue >( this, m_HostNames,
+            CopyListContents< V2LabelValue >( this, m_HostNames,
                                             src->m_HostNames );
-            CopyListContents< LabelValue >( this, m_Applications,
+            CopyListContents< V2LabelValue >( this, m_Applications,
                                             src->m_Applications );
-            CopyListContents< LogMessage >( this, m_LogMessages,
+            CopyListContents< V2LogMessage >( this, m_LogMessages,
                                             src->m_LogMessages );
         }
 
-        LabelValue *AddNewHostName()
+        V2LabelValue *AddNewHostName()
         {
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            auto *pObject = new LabelValue( this );
+            auto *pObject = new V2LabelValue( this );
             m_HostNames.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;
         }
 
-        LabelValue *AddNewApplication()
+        V2LabelValue *AddNewApplication()
         {
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            auto *pObject = new LabelValue( this );
+            auto *pObject = new V2LabelValue( this );
             m_Applications.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;
         }
 
-        LogMessage *AddNewLogMessage()
+        V2LogMessage *AddNewLogMessage()
         {
             // We must make sure the object added to the QVariantList has
             // a parent of 'this'
 
-            auto *pObject = new LogMessage( this );
+            auto *pObject = new V2LogMessage( this );
             m_LogMessages.append( QVariant::fromValue<QObject *>( pObject ));
 
             return pObject;
         }
 
     private:
-        Q_DISABLE_COPY(LogMessageList);
+        Q_DISABLE_COPY(V2LogMessageList);
 };
 
-inline void LogMessageList::InitializeCustomTypes()
-{
-    qRegisterMetaType< LogMessageList*  >();
+Q_DECLARE_METATYPE(V2LogMessageList*)
 
-    LogMessage::InitializeCustomTypes();
-    LabelValue::InitializeCustomTypes();
-}
-
-#endif // LOGMESSAGELIST_H_
+#endif // V2LOGMESSAGELIST_H_

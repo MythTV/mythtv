@@ -59,6 +59,10 @@ HEADERS += servicesv2/v2myth.h servicesv2/v2connectionInfo.h servicesv2/v2wolInf
 HEADERS += servicesv2/v2databaseInfo.h servicesv2/v2versionInfo.h
 HEADERS += servicesv2/v2storageGroupDir.h servicesv2/v2storageGroupDirList.h
 HEADERS += servicesv2/v2timeZoneInfo.h
+HEADERS += servicesv2/v2LabelValue.h servicesv2/v2logMessage.h servicesv2/v2logMessageList.h
+HEADERS += servicesv2/v2frontend.h servicesv2/v2frontendList.h servicesv2/v2settingList.h
+HEADERS += servicesv2/v2backendInfo.h servicesv2/v2buildInfo.h servicesv2/v2envInfo.h
+HEADERS += servicesv2/v2logInfo.h
 
 HEADERS += servicesv2/v2video.h
 HEADERS += servicesv2/v2videoMetadataInfo.h servicesv2/v2videoMetadataInfoList.h

@@ -8,46 +8,39 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef LOGINFO_H_
-#define LOGINFO_H_
+#ifndef V2LOGINFO_H_
+#define V2LOGINFO_H_
 
-#include <QString>
+#include "libmythbase/http/mythhttpservice.h"
 
-class LogInfo : public QObject
+class V2LogInfo : public QObject
 {
     Q_OBJECT
 
     Q_CLASSINFO( "Version"    , "1.0" );
     Q_CLASSINFO( "defaultProp", "LogArgs" );
 
-    Q_PROPERTY( QString  LogArgs      READ LogArgs   WRITE setLogArgs   )
-
-    PROPERTYIMP_REF( QString,  LogArgs   );
+    SERVICE_PROPERTY2( QString,  LogArgs   );
 
     public:
 
-        static inline void InitializeCustomTypes();
-
-        Q_INVOKABLE LogInfo(QObject *parent = nullptr)
+        Q_INVOKABLE V2LogInfo(QObject *parent = nullptr)
             : QObject    ( parent ),
               m_LogArgs  ( ""     )
         {
         }
 
-        void Copy( const LogInfo *src )
+        void Copy( const V2LogInfo *src )
         {
             m_LogArgs   = src->m_LogArgs  ;
         }
 
     private:
-        Q_DISABLE_COPY(LogInfo);
+        Q_DISABLE_COPY(V2LogInfo);
 };
 
-using LogInfoPtr = LogInfo*;
+using LogInfoPtr = V2LogInfo*;
 
-inline void LogInfo::InitializeCustomTypes()
-{
-    qRegisterMetaType< LogInfo* >();
-}
+Q_DECLARE_METATYPE(V2LogInfo*)
 
 #endif // LOGINFO_H_

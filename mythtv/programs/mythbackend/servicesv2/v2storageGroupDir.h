@@ -3,7 +3,6 @@
 
 #include <QString>
 #include "libmythbase/http/mythhttpservice.h"
-#if SGDL
 class V2StorageGroupDir : public QObject
 {
     Q_OBJECT
@@ -44,5 +43,5 @@ class V2StorageGroupDir : public QObject
 };
 
 Q_DECLARE_METATYPE(V2StorageGroupDir*)
-#endif // SGDL
+
 #endif // V2STORAGEGROUPDIR_H_
