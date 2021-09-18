@@ -506,6 +506,9 @@ MythUIButtonListItem *MythGenericTree::CreateListButton(MythUIButtonList *list)
     item->SetTextFromMap(m_strings);
     item->SetImageFromMap(m_imageFilenames);
     item->SetStatesFromMap(m_states);
+    item->SetTextCb(m_textCb.fn, m_textCb.data);
+    item->SetImageCb(m_imageCb.fn, m_imageCb.data);
+    item->SetStateCb(m_stateCb.fn, m_stateCb.data);
 
     if (visibleChildCount() > 0)
         item->setDrawArrow(true);

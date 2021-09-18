@@ -3309,13 +3309,40 @@ void MythUIButtonListItem::SetTextFromMap(const QMap<QString, TextProperties> &s
     m_strings = stringMap;
 }
 
+void MythUIButtonListItem::SetTextCb(muibCbFn fn, void *data)
+{
+    m_textCb.fn = fn;
+    m_textCb.data = data;
+}
+
 QString MythUIButtonListItem::GetText(const QString &name) const
 {
     if (name.isEmpty())
         return m_text;
+    if (m_textCb.fn != nullptr)
+    {
+        QString result = m_textCb.fn(name, m_textCb.data);
+        if (!result.isEmpty())
+            return result;
+    }
     if (m_strings.contains(name))
         return m_strings[name].text;
     return QString();
+}
+
+TextProperties MythUIButtonListItem::GetTextProp(const QString &name) const
+{
+    if (name.isEmpty())
+        return {m_text, ""};
+    if (m_textCb.fn != nullptr)
+    {
+        QString result = m_textCb.fn(name, m_textCb.data);
+        if (!result.isEmpty())
+            return {result, ""};
+    }
+    if (m_strings.contains(name))
+        return m_strings[name];
+    return {};
 }
 
 bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fieldList,
@@ -3440,6 +3467,12 @@ void MythUIButtonListItem::SetImageFromMap(const InfoMap &imageMap)
     m_imageFilenames = imageMap;
 }
 
+void MythUIButtonListItem::SetImageCb(muibCbFn fn, void *data)
+{
+    m_imageCb.fn = fn;
+    m_imageCb.data = data;
+}
+
 MythImage *MythUIButtonListItem::GetImage(const QString &name)
 {
     if (!name.isEmpty())
@@ -3495,6 +3528,13 @@ QString MythUIButtonListItem::GetImageFilename(const QString &name) const
     if (name.isEmpty())
         return m_imageFilename;
 
+    if (m_imageCb.fn != nullptr)
+    {
+        QString result = m_imageCb.fn(name, m_imageCb.data);
+        if (!result.isEmpty())
+            return result;
+    }
+
     InfoMap::const_iterator it = m_imageFilenames.find(name);
 
     if (it != m_imageFilenames.end())
@@ -3531,6 +3571,27 @@ void MythUIButtonListItem::SetStatesFromMap(const InfoMap &stateMap)
 {
     m_states.clear();
     m_states = stateMap;
+}
+
+void MythUIButtonListItem::SetStateCb(muibCbFn fn, void *data)
+{
+    m_stateCb.fn = fn;
+    m_stateCb.data = data;
+}
+
+QString MythUIButtonListItem::GetState(const QString &name)
+{
+    if (name.isEmpty())
+        return QString();
+    if (m_stateCb.fn != nullptr)
+    {
+        QString result = m_stateCb.fn(name, m_textCb.data);
+        if (!result.isEmpty())
+            return result;
+    }
+    if (m_states.contains(name))
+        return m_states[name];
+    return QString();
 }
 
 bool MythUIButtonListItem::checkable() const
@@ -3664,14 +3725,14 @@ void MythUIButtonListItem::DoButtonLookupText (MythUIText *text,
             QRegularExpressionMatch match = i.next();
             QString key = match.captured(4).toLower().trimmed();
             QString replacement;
-            QString value = m_strings.value(key).text;
+            QString value = GetText(key);
 
             if (!value.isEmpty())
             {
                 replacement = QString("%1%2%3%4")
                     .arg(match.captured(2),
                          match.captured(3),
-                         m_strings.value(key).text,
+                         value,
                          match.captured(6));
             }
 
@@ -3774,72 +3835,33 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
     buttonstate->Reset();
 
-    MythUIText *buttontext = dynamic_cast<MythUIText *>
-                             (buttonstate->GetChild("buttontext"));
-
-    if (buttontext)
-        DoButtonText(buttontext);
-
-    MythUIImage *buttonimage = dynamic_cast<MythUIImage *>
-                               (buttonstate->GetChild("buttonimage"));
-
-    if (buttonimage)
-        DoButtonImage(buttonimage);
-
-    MythUIImage *buttonarrow = dynamic_cast<MythUIImage *>
-                               (buttonstate->GetChild("buttonarrow"));
-
-    if (buttonarrow)
-        DoButtonArrow(buttonarrow);
-
-    MythUIStateType *buttoncheck = dynamic_cast<MythUIStateType *>
-                                   (buttonstate->GetChild("buttoncheck"));
-
-    if (buttoncheck)
-        DoButtonCheck(buttoncheck);
-
-    QMap<QString, TextProperties>::iterator string_it = m_strings.begin();
-
-    while (string_it != m_strings.end())
+    QList<MythUIType *> descendants = buttonstate->GetAllDescendants();
+    for (MythUIType *obj : descendants)
     {
-        auto *text = dynamic_cast<MythUIText *>
-               (buttonstate->GetChild(string_it.key()));
-        if (text)
-            DoButtonLookupText(text, string_it.value());
-        ++string_it;
-    }
+        QString name = obj->objectName();
+        if (name == "buttontext")
+            DoButtonText(dynamic_cast<MythUIText *>(obj));
+        else if (name == "buttonimage")
+            DoButtonImage(dynamic_cast<MythUIImage *>(obj));
+        else if (name == "buttonarrow")
+            DoButtonArrow(dynamic_cast<MythUIImage *>(obj));
+        else if (name == "buttoncheck")
+            DoButtonCheck(dynamic_cast<MythUIStateType *>(obj));
 
-    InfoMap::iterator imagefile_it = m_imageFilenames.begin();
+        TextProperties textprop = GetTextProp(name);
+        if (!textprop.text.isEmpty())
+            DoButtonLookupText(dynamic_cast<MythUIText *>(obj), textprop);
 
-    while (imagefile_it != m_imageFilenames.end())
-    {
-        auto *image = dynamic_cast<MythUIImage *>
-                (buttonstate->GetChild(imagefile_it.key()));
-        if (image)
-            DoButtonLookupFilename(image, imagefile_it.value());
-        ++imagefile_it;
-    }
+        QString filename = GetImageFilename(name);
+        if (!filename.isEmpty())
+            DoButtonLookupFilename (dynamic_cast<MythUIImage *>(obj), filename);
 
-    QMap<QString, MythImage *>::iterator image_it = m_images.begin();
+        if (m_images.contains(name))
+            DoButtonLookupImage(dynamic_cast<MythUIImage *>(obj), m_images[name]);
 
-    while (image_it != m_images.end())
-    {
-        auto *uiimage = dynamic_cast<MythUIImage *>
-                (buttonstate->GetChild(image_it.key()));
-        if (uiimage)
-            DoButtonLookupImage (uiimage, image_it.value());
-        ++image_it;
-    }
-
-    InfoMap::iterator state_it = m_states.begin();
-
-    while (state_it != m_states.end())
-    {
-        auto *statetype = dynamic_cast<MythUIStateType *>
-                    (buttonstate->GetChild(state_it.key()));
-        if (statetype)
-            DoButtonLookupState (statetype, state_it.value());
-        ++state_it;
+        QString luState = GetState(name);
+        if (!luState.isEmpty())
+            DoButtonLookupState(dynamic_cast<MythUIStateType *>(obj), luState);
     }
 
     // There is no need to check the return value here, since we already
