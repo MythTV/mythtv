@@ -117,6 +117,16 @@ class MUI_PUBLIC MythUIButtonListItem
 
     virtual void SetToRealButton(MythUIStateType *button, bool selected);
 
+  private:
+    void DoButtonText(MythUIText *buttontext);
+    void DoButtonImage(MythUIImage *buttonimage);
+    void DoButtonArrow(MythUIImage *buttonarrow) const;
+    void DoButtonCheck(MythUIStateType *buttoncheck);
+    void DoButtonLookupText(MythUIText *text, const TextProperties& textprop);
+    static void DoButtonLookupFilename(MythUIImage *image, const QString& filename);
+    static void DoButtonLookupImage(MythUIImage *uiimage, MythImage *image);
+    static void DoButtonLookupState(MythUIStateType *statetype, const QString& name);
+
   protected:
     MythUIButtonList *m_parent      {nullptr};
     QString         m_text;

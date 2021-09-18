@@ -3596,6 +3596,135 @@ bool MythUIButtonListItem::MoveUpDown(bool flag)
     return false;
 }
 
+void MythUIButtonListItem::DoButtonText (MythUIText *buttontext)
+{
+    if (!buttontext)
+        return;
+
+    buttontext->SetText(m_text);
+    buttontext->SetFontState(m_fontState);
+}
+
+void MythUIButtonListItem::DoButtonImage (MythUIImage *buttonimage)
+{
+    if (!buttonimage)
+        return;
+
+    if (!m_imageFilename.isEmpty())
+    {
+        buttonimage->SetFilename(m_imageFilename);
+        buttonimage->Load();
+    }
+    else if (m_image)
+        buttonimage->SetImage(m_image);
+}
+
+void MythUIButtonListItem::DoButtonArrow (MythUIImage *buttonarrow) const
+{
+    if (!buttonarrow)
+        return;
+    buttonarrow->SetVisible(m_showArrow);
+}
+
+void MythUIButtonListItem::DoButtonCheck (MythUIStateType *buttoncheck)
+{
+    if (!buttoncheck)
+        return;
+
+    buttoncheck->SetVisible(m_checkable);
+
+    if (!m_checkable)
+        return;
+
+    if (m_state == NotChecked)
+        buttoncheck->DisplayState(MythUIStateType::Off);
+    else if (m_state == HalfChecked)
+        buttoncheck->DisplayState(MythUIStateType::Half);
+    else
+        buttoncheck->DisplayState(MythUIStateType::Full);
+}
+
+void MythUIButtonListItem::DoButtonLookupText (MythUIText *text,
+                                               const TextProperties& textprop)
+{
+    if (!text)
+        return;
+
+    QString newText = text->GetTemplateText();
+
+    QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
+        QRegularExpression::DotMatchesEverythingOption};
+
+    if (!newText.isEmpty() && newText.contains(re))
+    {
+        QString tempString = newText;
+
+        QRegularExpressionMatchIterator i = re.globalMatch(newText);
+        while (i.hasNext()) {
+            QRegularExpressionMatch match = i.next();
+            QString key = match.captured(4).toLower().trimmed();
+            QString replacement;
+            QString value = m_strings.value(key).text;
+
+            if (!value.isEmpty())
+            {
+                replacement = QString("%1%2%3%4")
+                    .arg(match.captured(2),
+                         match.captured(3),
+                         m_strings.value(key).text,
+                         match.captured(6));
+            }
+
+            tempString.replace(match.captured(0), replacement);
+        }
+
+        newText = tempString;
+    }
+    else
+        newText = textprop.text;
+
+    if (newText.isEmpty())
+        text->Reset();
+    else
+        text->SetText(newText);
+
+    text->SetFontState(textprop.state.isEmpty() ? m_fontState : textprop.state);
+}
+
+void MythUIButtonListItem::DoButtonLookupFilename (MythUIImage *image, const QString& filename)
+{
+    if (!image)
+        return;
+
+    if (!filename.isEmpty())
+    {
+        image->SetFilename(filename);
+        image->Load();
+    }
+    else
+        image->Reset();
+}
+
+void MythUIButtonListItem::DoButtonLookupImage (MythUIImage *uiimage, MythImage *image)
+{
+    if (!uiimage)
+        return;
+
+    if (image)
+        uiimage->SetImage(image);
+    else
+        uiimage->Reset();
+}
+
+void MythUIButtonListItem::DoButtonLookupState (MythUIStateType *statetype, const QString& name)
+{
+    if (!statetype)
+        return;
+
+    if (!statetype->DisplayState(name))
+        statetype->Reset();
+}
+
 void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selected)
 {
     if (!m_parent)
@@ -3649,48 +3778,25 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
                              (buttonstate->GetChild("buttontext"));
 
     if (buttontext)
-    {
-        buttontext->SetText(m_text);
-        buttontext->SetFontState(m_fontState);
-    }
+        DoButtonText(buttontext);
 
     MythUIImage *buttonimage = dynamic_cast<MythUIImage *>
                                (buttonstate->GetChild("buttonimage"));
 
     if (buttonimage)
-    {
-        if (!m_imageFilename.isEmpty())
-        {
-            buttonimage->SetFilename(m_imageFilename);
-            buttonimage->Load();
-        }
-        else if (m_image)
-            buttonimage->SetImage(m_image);
-    }
+        DoButtonImage(buttonimage);
 
     MythUIImage *buttonarrow = dynamic_cast<MythUIImage *>
                                (buttonstate->GetChild("buttonarrow"));
 
     if (buttonarrow)
-        buttonarrow->SetVisible(m_showArrow);
+        DoButtonArrow(buttonarrow);
 
     MythUIStateType *buttoncheck = dynamic_cast<MythUIStateType *>
                                    (buttonstate->GetChild("buttoncheck"));
 
     if (buttoncheck)
-    {
-        buttoncheck->SetVisible(m_checkable);
-
-        if (m_checkable)
-        {
-            if (m_state == NotChecked)
-                buttoncheck->DisplayState(MythUIStateType::Off);
-            else if (m_state == HalfChecked)
-                buttoncheck->DisplayState(MythUIStateType::Half);
-            else
-                buttoncheck->DisplayState(MythUIStateType::Full);
-        }
-    }
+        DoButtonCheck(buttoncheck);
 
     QMap<QString, TextProperties>::iterator string_it = m_strings.begin();
 
@@ -3698,52 +3804,8 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     {
         auto *text = dynamic_cast<MythUIText *>
                (buttonstate->GetChild(string_it.key()));
-
         if (text)
-        {
-            TextProperties textprop = string_it.value();
-
-            QString newText = text->GetTemplateText();
-
-            QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
-                                   QRegularExpression::DotMatchesEverythingOption};
-
-            if (!newText.isEmpty() && newText.contains(re))
-            {
-                QString tempString = newText;
-
-                QRegularExpressionMatchIterator i = re.globalMatch(newText);
-                while (i.hasNext()) {
-                    QRegularExpressionMatch match = i.next();
-                    QString key = match.captured(4).toLower().trimmed();
-                    QString replacement;
-                    QString value = m_strings.value(key).text;
-
-                    if (!value.isEmpty())
-                    {
-                        replacement = QString("%1%2%3%4")
-                                      .arg(match.captured(2),
-                                           match.captured(3),
-                                           m_strings.value(key).text,
-                                           match.captured(6));
-                    }
-
-                    tempString.replace(match.captured(0), replacement);
-                }
-
-                newText = tempString;
-            }
-            else
-                newText = textprop.text;
-
-            if (newText.isEmpty())
-                text->Reset();
-            else
-                text->SetText(newText);
-
-            text->SetFontState(textprop.state.isEmpty() ? m_fontState : textprop.state);
-        }
-
+            DoButtonLookupText(text, string_it.value());
         ++string_it;
     }
 
@@ -3754,16 +3816,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         auto *image = dynamic_cast<MythUIImage *>
                 (buttonstate->GetChild(imagefile_it.key()));
         if (image)
-        {
-            if (!imagefile_it.value().isEmpty())
-            {
-                image->SetFilename(imagefile_it.value());
-                image->Load();
-            }
-            else
-                image->Reset();
-        }
-
+            DoButtonLookupFilename(image, imagefile_it.value());
         ++imagefile_it;
     }
 
@@ -3771,16 +3824,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
     while (image_it != m_images.end())
     {
-        auto *image = dynamic_cast<MythUIImage *>
+        auto *uiimage = dynamic_cast<MythUIImage *>
                 (buttonstate->GetChild(image_it.key()));
-        if (image)
-        {
-            if (image_it.value())
-                image->SetImage(image_it.value());
-            else
-                image->Reset();
-        }
-
+        if (uiimage)
+            DoButtonLookupImage (uiimage, image_it.value());
         ++image_it;
     }
 
@@ -3791,11 +3838,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         auto *statetype = dynamic_cast<MythUIStateType *>
                     (buttonstate->GetChild(state_it.key()));
         if (statetype)
-        {
-            if (!statetype->DisplayState(state_it.value()))
-                statetype->Reset();
-        }
-
+            DoButtonLookupState (statetype, state_it.value());
         ++state_it;
     }
 
