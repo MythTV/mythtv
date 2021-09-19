@@ -15,7 +15,7 @@ from pprint import pprint
 from .definitions import *
 
 
-MYTHTV_TTVDBV4_API_VERSION = "4.3.17.0"
+MYTHTV_TTVDBV4_API_VERSION = "4.4.0.0"
 
 # set this to true for showing raw json data
 #JSONDEBUG = True
@@ -90,22 +90,20 @@ def _query_yielded(record, path, params, listname=None):
         params['page'] = curr_page
 
 
-
-"""Generated API for thetvdb.com TVDB API V4 v 4.3.17"""
+"""Generated API for thetvdb.com TVDB API V4 v 4.4.0"""
 # modifications marked with '### XXX'
 
 
 TTVDBV4_path = "https://api4.thetvdb.com/v4"
-getAllArtworkStatuses_path = TTVDBV4_path + "/artwork/statuses"
-getAllArtworkTypes_path = TTVDBV4_path + "/artwork/types"
 getArtworkBase_path = TTVDBV4_path + "/artwork/{id}"
 getArtworkExtended_path = TTVDBV4_path + "/artwork/{id}/extended"
-getArtworkTranslation_path = TTVDBV4_path + "/artwork/{id}/translations/{language}"
-getAwardCategory_path = TTVDBV4_path + "/awards/categories/{id}"
-getAwardCategoryExtended_path = TTVDBV4_path + "/awards/categories/{id}/extended"
+getAllArtworkStatuses_path = TTVDBV4_path + "/artwork/statuses"
+getAllArtworkTypes_path = TTVDBV4_path + "/artwork/types"
 getAllAwards_path = TTVDBV4_path + "/awards"
 getAward_path = TTVDBV4_path + "/awards/{id}"
 getAwardExtended_path = TTVDBV4_path + "/awards/{id}/extended"
+getAwardCategory_path = TTVDBV4_path + "/awards/categories/{id}"
+getAwardCategoryExtended_path = TTVDBV4_path + "/awards/categories/{id}/extended"
 getCharacterBase_path = TTVDBV4_path + "/characters/{id}"
 getAllCompanies_path = TTVDBV4_path + "/companies"
 getCompanyTypes_path = TTVDBV4_path + "/companies/types"
@@ -116,23 +114,24 @@ getEntityTypes_path = TTVDBV4_path + "/entities/types"
 getEpisodeBase_path = TTVDBV4_path + "/episodes/{id}"
 getEpisodeExtended_path = TTVDBV4_path + "/episodes/{id}/extended"
 getEpisodeTranslation_path = TTVDBV4_path + "/episodes/{id}/translations/{language}"
-getListTranslation_path = TTVDBV4_path + "/lists/{id}/translations/{language}"
 getAllGenders_path = TTVDBV4_path + "/genders"
 getAllGenres_path = TTVDBV4_path + "/genres"
 getGenreBase_path = TTVDBV4_path + "/genres/{id}"
+getAllInspirationTypes_path = TTVDBV4_path + "/inspiration/types"
 getAllLanguages_path = TTVDBV4_path + "/languages"
 getAllLists_path = TTVDBV4_path + "/lists"
 getList_path = TTVDBV4_path + "/lists/{id}"
 getListExtended_path = TTVDBV4_path + "/lists/{id}/extended"
-getAllMovieStatuses_path = TTVDBV4_path + "/movies/statuses"
+getListTranslation_path = TTVDBV4_path + "/lists/{id}/translations/{language}"
 getAllMovie_path = TTVDBV4_path + "/movies"
 getMovieBase_path = TTVDBV4_path + "/movies/{id}"
 getMovieExtended_path = TTVDBV4_path + "/movies/{id}/extended"
 getMovieTranslation_path = TTVDBV4_path + "/movies/{id}/translations/{language}"
-getAllPeopleTypes_path = TTVDBV4_path + "/people/types"
+getAllMovieStatuses_path = TTVDBV4_path + "/movies/statuses"
 getPeopleBase_path = TTVDBV4_path + "/people/{id}"
 getPeopleExtended_path = TTVDBV4_path + "/people/{id}/extended"
 getPeopleTranslation_path = TTVDBV4_path + "/people/{id}/translations/{language}"
+getAllPeopleTypes_path = TTVDBV4_path + "/people/types"
 getSearchResults_path = TTVDBV4_path + "/search"
 getAllSeasons_path = TTVDBV4_path + "/seasons"
 getSeasonBase_path = TTVDBV4_path + "/seasons/{id}"
@@ -140,28 +139,15 @@ getSeasonExtended_path = TTVDBV4_path + "/seasons/{id}/extended"
 getSeasonTypes_path = TTVDBV4_path + "/seasons/types"
 getSeasonTranslation_path = TTVDBV4_path + "/seasons/{id}/translations/{language}"
 getAllSeries_path = TTVDBV4_path + "/series"
-getAllSeriesStatuses_path = TTVDBV4_path + "/series/statuses"
 getSeriesBase_path = TTVDBV4_path + "/series/{id}"
 getSeriesExtended_path = TTVDBV4_path + "/series/{id}/extended"
 getSeriesEpisodes_path = TTVDBV4_path + "/series/{id}/episodes/{season_type}"
+getSeriesSeasonEpisodesTranslated_path = TTVDBV4_path + "/series/{id}/episodes/{season_type}/{lang}"
 getSeriesTranslation_path = TTVDBV4_path + "/series/{id}/translations/{language}"
+getAllSeriesStatuses_path = TTVDBV4_path + "/series/statuses"
 getAllSourceTypes_path = TTVDBV4_path + "/sources/types"
 updates_path = TTVDBV4_path + "/updates"
 
-
-
-def getAllArtworkStatuses():
-    path = getAllArtworkStatuses_path.format()
-    res = _query_api(path)
-    data = res['data'] if res.get('data') is not None else None
-    return( [ArtworkStatus(x) for x in data] if data is not None else [] )
-
-
-def getAllArtworkTypes():
-    path = getAllArtworkTypes_path.format()
-    res = _query_api(path)
-    data = res['data'] if res.get('data') is not None else None
-    return( [ArtworkType(x) for x in data] if data is not None else [] )
 
 
 def getArtworkBase(id):
@@ -178,25 +164,18 @@ def getArtworkExtended(id):
     return( ArtworkExtendedRecord(data) if data is not None else None )
 
 
-def getArtworkTranslation(id, language):
-    path = getArtworkTranslation_path.format(id=str(id), language=language)
+def getAllArtworkStatuses():
+    path = getAllArtworkStatuses_path.format()
     res = _query_api(path)
     data = res['data'] if res.get('data') is not None else None
-    return( Translation(data) if data is not None else None )
+    return( [ArtworkStatus(x) for x in data] if data is not None else [] )
 
 
-def getAwardCategory(id):
-    path = getAwardCategory_path.format(id=str(id))
+def getAllArtworkTypes():
+    path = getAllArtworkTypes_path.format()
     res = _query_api(path)
     data = res['data'] if res.get('data') is not None else None
-    return( AwardCategoryBaseRecord(data) if data is not None else None )
-
-
-def getAwardCategoryExtended(id):
-    path = getAwardCategoryExtended_path.format(id=str(id))
-    res = _query_api(path)
-    data = res['data'] if res.get('data') is not None else None
-    return( AwardCategoryExtendedRecord(data) if data is not None else None )
+    return( [ArtworkType(x) for x in data] if data is not None else [] )
 
 
 def getAllAwards():
@@ -218,6 +197,20 @@ def getAwardExtended(id):
     res = _query_api(path)
     data = res['data'] if res.get('data') is not None else None
     return( AwardExtendedRecord(data) if data is not None else None )
+
+
+def getAwardCategory(id):
+    path = getAwardCategory_path.format(id=str(id))
+    res = _query_api(path)
+    data = res['data'] if res.get('data') is not None else None
+    return( AwardCategoryBaseRecord(data) if data is not None else None )
+
+
+def getAwardCategoryExtended(id):
+    path = getAwardCategoryExtended_path.format(id=str(id))
+    res = _query_api(path)
+    data = res['data'] if res.get('data') is not None else None
+    return( AwardCategoryExtendedRecord(data) if data is not None else None )
 
 
 def getCharacterBase(id):
@@ -299,13 +292,6 @@ def getEpisodeTranslation(id, language):
     return( Translation(data) if data is not None else None )
 
 
-def getListTranslation(id, language):
-    path = getListTranslation_path.format(id=str(id), language=language)
-    res = _query_api(path)
-    data = res['data'] if res.get('data') is not None else None
-    return( Translation(data) if data is not None else None )
-
-
 def getAllGenders():
     path = getAllGenders_path.format()
     res = _query_api(path)
@@ -325,6 +311,13 @@ def getGenreBase(id):
     res = _query_api(path)
     data = res['data'] if res.get('data') is not None else None
     return( GenreBaseRecord(data) if data is not None else None )
+
+
+def getAllInspirationTypes():
+    path = getAllInspirationTypes_path.format()
+    res = _query_api(path)
+    data = res['data'] if res.get('data') is not None else None
+    return( [InspirationType(x) for x in data] if data is not None else [] )
 
 
 def getAllLanguages():
@@ -361,11 +354,11 @@ def getListExtended(id):
     return( ListExtendedRecord(data) if data is not None else None )
 
 
-def getAllMovieStatuses():
-    path = getAllMovieStatuses_path.format()
+def getListTranslation(id, language):
+    path = getListTranslation_path.format(id=str(id), language=language)
     res = _query_api(path)
     data = res['data'] if res.get('data') is not None else None
-    return( [Status(x) for x in data] if data is not None else [] )
+    return( Translation(data) if data is not None else None )
 
 
 def getAllMovie(page=0, yielded=False):
@@ -405,11 +398,11 @@ def getMovieTranslation(id, language):
     return( Translation(data) if data is not None else None )
 
 
-def getAllPeopleTypes():
-    path = getAllPeopleTypes_path.format()
+def getAllMovieStatuses():
+    path = getAllMovieStatuses_path.format()
     res = _query_api(path)
     data = res['data'] if res.get('data') is not None else None
-    return( [PeopleType(x) for x in data] if data is not None else [] )
+    return( [Status(x) for x in data] if data is not None else [] )
 
 
 def getPeopleBase(id):
@@ -436,7 +429,14 @@ def getPeopleTranslation(id, language):
     return( Translation(data) if data is not None else None )
 
 
-def getSearchResults(q=None, query=None, type=None, year=None, offset=None, limit=None):
+def getAllPeopleTypes():
+    path = getAllPeopleTypes_path.format()
+    res = _query_api(path)
+    data = res['data'] if res.get('data') is not None else None
+    return( [PeopleType(x) for x in data] if data is not None else [] )
+
+
+def getSearchResults(q=None, query=None, type=None, remote_id=None, year=None, offset=None, limit=None):
     params = {}
     if q is not None:
         params['q'] = q
@@ -444,6 +444,8 @@ def getSearchResults(q=None, query=None, type=None, year=None, offset=None, limi
         params['query'] = query
     if type is not None:
         params['type'] = type
+    if remote_id is not None:
+        params['remote_id'] = remote_id
     if year is not None:
         params['year'] = year
     if offset is not None:
@@ -510,13 +512,6 @@ def getAllSeries(page=0, yielded=False):
         return( [SeriesBaseRecord(x) for x in data] if data is not None else [] )
 
 
-def getAllSeriesStatuses():
-    path = getAllSeriesStatuses_path.format()
-    res = _query_api(path)
-    data = res['data'] if res.get('data') is not None else None
-    return( [Status(x) for x in data] if data is not None else [] )
-
-
 def getSeriesBase(id):
     path = getSeriesBase_path.format(id=str(id))
     res = _query_api(path)
@@ -534,11 +529,27 @@ def getSeriesExtended(id, meta=None):
     return( SeriesExtendedRecord(data) if data is not None else None )
 
 
-def getSeriesEpisodes(id, season_type, page=0, yielded=False):
+def getSeriesEpisodes(id, season_type, season=None, page=0, yielded=False):
     params = {}
+    if season is not None:
+        params['season'] = season
     if page is not None:
         params['page'] = page
     path = getSeriesEpisodes_path.format(id=str(id), season_type=season_type)
+    if yielded:
+        return _query_yielded(EpisodeBaseRecord, path, params, listname='episodes')
+    else:
+        res = _query_api(path, params)
+        data = res['data'] if res.get('data') is not None else None
+        return( SeriesExtendedRecord(data['series']) if data is not None else None,
+                [EpisodeBaseRecord(x) for x in data['episodes']] if data is not None else [] )
+
+
+def getSeriesSeasonEpisodesTranslated(id, season_type, lang, page=0, yielded=False):
+    params = {}
+    if page is not None:
+        params['page'] = page
+    path = getSeriesSeasonEpisodesTranslated_path.format(id=str(id), season_type=season_type, lang=lang)
     if yielded:
         return _query_yielded(EpisodeBaseRecord, path, params, listname='episodes')
     else:
@@ -555,6 +566,13 @@ def getSeriesTranslation(id, language):
     return( Translation(data) if data is not None else None )
 
 
+def getAllSeriesStatuses():
+    path = getAllSeriesStatuses_path.format()
+    res = _query_api(path)
+    data = res['data'] if res.get('data') is not None else None
+    return( [Status(x) for x in data] if data is not None else [] )
+
+
 def getAllSourceTypes():
     path = getAllSourceTypes_path.format()
     res = _query_api(path)
@@ -562,13 +580,19 @@ def getAllSourceTypes():
     return( [SourceType(x) for x in data] if data is not None else [] )
 
 
-def updates(since, type=None, action=None):
+def updates(since, type=None, action=None, page=0, yielded=False):
     params = {}
     if type is not None:
         params['type'] = type
     if action is not None:
         params['action'] = action
+    if page is not None:
+        params['page'] = page
     path = updates_path.format(since=since)
-    res = _query_api(path, params)
-    data = res['data'] if res.get('data') is not None else None
-    return( [EntityUpdate(x) for x in data] if data is not None else [] )
+    if yielded:
+        return _query_yielded(EntityUpdate, path, params, listname=None)
+    else:
+        res = _query_api(path, params)
+        data = res['data'] if res.get('data') is not None else None
+        return( [EntityUpdate(x) for x in data] if data is not None else [] )
+

@@ -56,7 +56,7 @@ pathlist = []
 
 def read_yaml_from_file(api_spec):
     with open(api_spec) as f:
-        data = yaml.load(f)
+        data = yaml.safe_load(f)
     return data
 
 

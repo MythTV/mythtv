@@ -262,14 +262,11 @@ class Myth4TTVDBv4(object):
         except:
             return title
 
-    def _get_names_translated(self, json_obj):
-        # SearchRecord: 'name_translated' is a json object,
-        # containing '"lang" : "name_translated"'
+    def _get_names_translated(self, translations):
         name_dict = OrderedDict()
-        nt = json.loads(json_obj)
         for lang in self.languagelist:
-            if nt.get(lang) is not None:
-                name_dict[lang] = nt.get(lang)
+            if translations.get(lang) is not None:
+                name_dict[lang] = translations.get(lang)
         return name_dict
 
     def _get_info_from_translations(self, translations):
@@ -591,7 +588,7 @@ class Myth4TTVDBv4(object):
         series = []
         for item in so:
             # check if we can find exact match for 'tvtitle'
-            translated_names = self._get_names_translated(item.name_translated)
+            translated_names = self._get_names_translated(item.translations)
             if item.name == tvtitle or tvtitle in item.aliases or \
                     tvtitle in translated_names.values() or \
                     item.name == title_wo_year or title_wo_year in item.aliases or \
@@ -617,7 +614,7 @@ class Myth4TTVDBv4(object):
                 # select only items with preferred languages and calculate name similarity
                 all_names = [item.name]
                 all_names.extend(item.aliases)
-                all_names.extend(self._get_names_translated(item.name_translated).values())
+                all_names.extend(self._get_names_translated(item.translations).values())
                 item.name_similarity = \
                             max([_name_match_quality(x, title_wo_year) for x in all_names])
                 series.append(item)
@@ -630,16 +627,24 @@ class Myth4TTVDBv4(object):
                 print("\nChosen series record according 'overall name similarity': '%0.2f':"
                       % s.name_similarity)
             try:
-                ser_x = self.buildCollection(other_inetref=int(s.tvdb_id), xml_output=False)
+                if s.tvdb_id:     # sometimes, this is empty
+                    sid = s.tvdb_id
+                elif s.id:
+                    sid = s.id.split('-')[1]
+                else:
+                    sid = None
+                ser_x = self.buildCollection(other_inetref=int(sid), xml_output=False)
+                # re-use name similarity from SearchResult
+                ser_x.name_similarity = s.name_similarity
                 ser_x_list.append(ser_x)
                 if self.debug:
-                    # re-use name similarity from SearchResult
                     print("    ", "name_similarity", " : ", "%0.2f" % s.name_similarity)
                 if xml_output:
                     self._format_xml(ser_x)
             except:
                 # ser_x could be 'None'
                 pass
+
         return ser_x_list
 
     def buildNumbers(self):
@@ -707,6 +712,8 @@ class Myth4TTVDBv4(object):
             for sea_id in [x.id for x in ser_x.seasons if x.type.id == def_season_type]:
                 sea_x = ttvdb.getSeasonExtended(sea_id)
                 epi_id_list = []
+                if sea_x is None:
+                    continue
                 for epi in sea_x.episodes:
                     # an episode may be listed multiple times, include it only once:
                     # ### XXX Note: this is a bug in TVDBv4 API
@@ -714,6 +721,8 @@ class Myth4TTVDBv4(object):
                         all_names = []
                         for lang in self._select_preferred_langs(epi.nameTranslations):
                             translation = ttvdb.getEpisodeTranslation(epi.id, lang)
+                            if translation is None:
+                                continue
                             all_names.append(translation.name)
                             all_names.extend(translation.aliases)
                             epi.name_similarity = \
