@@ -19,7 +19,7 @@ from configparser import ConfigParser
 
 __title__ = "TheTVDatabaseV4"
 __author__ = "Roland Ernst"
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 
 def print_etree(etostr):
@@ -169,8 +169,9 @@ def main():
     # assemble arguments
     cmd_args = vars(args)
     if args.debug:
-        print("cmd_args: ", cmd_args)
+        print("0000: Init: cmd_args: ", cmd_args)
 
+    # read the ini files
     import requests
     confdir = os.environ.get('MYTHCONFDIR', '')
     if (not confdir) or (confdir == '/'):
@@ -203,10 +204,10 @@ def main():
         global_config.read(inifile, 'UTF-8')
         config_dict = _parse_config(global_config)
         if args.debug:
-            print("Global Config File parsed successfully.")
+            print("0000: Init: Global Config File parsed successfully.")
     except KeyError:
         if args.debug:
-            print("Parsing Global Config File failed.")
+            print("0000: Init: Parsing Global Config File failed.")
     # read local config, which overrides the global one
     if args.inifile:
         local_config_file = os.path.join(confdir, args.inifile)
@@ -220,19 +221,19 @@ def main():
                     for k,v in local_config[section].items():
                         config_dict[section][k] = v
                 if args.debug:
-                    print("Local Config File '%s' parsed successfully."
-                           % local_config_file)
+                    print("0000: Init: Local Config File '%s' parsed successfully."
+                          % local_config_file)
             except KeyError:
                 if args.debug:
-                    print("Parsing Local Config File failed.")
+                    print("0000: Init: Parsing Local Config File failed.")
         else:
             # create local config with values from global config
             shutil.copy(inifile, local_config_file)
             if args.debug:
-                print("Local config file '%s' created." % local_config_file)
+                print("0000: Init: Local config file '%s' created." % local_config_file)
     cmd_args["config"] = config_dict
     if args.debug:
-        print("Using this configuration:")
+        print("0000: Init: Using this configuration:")
         pprint(cmd_args["config"])
 
     if args.doctest:

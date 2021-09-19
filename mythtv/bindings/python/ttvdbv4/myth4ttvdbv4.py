@@ -12,6 +12,7 @@ import json
 import re
 import requests
 import operator
+import time
 from lxml import etree
 from collections import OrderedDict
 from enum import IntEnum
@@ -136,6 +137,8 @@ class Myth4TTVDBv4(object):
             setattr(self, k, v)
             # print("Init : ", k,v)
 
+        self.starttime = time.time()
+
         # Authorization:
         TTVDBv4Key = '708401c2-b73e-4ce0-97ec-8ef3a5038c3a'
         TTVDBv4Pin = None
@@ -161,8 +164,8 @@ class Myth4TTVDBv4(object):
             # considered as nice to have
             pass
         if self.debug:
-            print("Using these languages to search: '%s'"
-                  % " ".join(self.languagelist))
+            print("%04d: Init: Using these languages to search: '%s'"
+                  % (self._get_ellapsed_time(), " ".join(self.languagelist)))
 
         # get preferences:
         for pref in self.config['Preferences'].keys():
@@ -175,7 +178,8 @@ class Myth4TTVDBv4(object):
                 # considered a nice to have
                 setattr(self, pref, False)
         if self.debug:
-            print("Using these preferences to search:")
+            print("%04d: Init: Using these preferences to search:"
+                  % self._get_ellapsed_time())
             for pref in self.config['Preferences'].keys():
                 print("  '%s' : '%s'" % (pref, getattr(self, pref)))
 
@@ -188,13 +192,15 @@ class Myth4TTVDBv4(object):
                 self.ThresholdStart = 0.50
                 self.ThresholdDecrease = 0.1
         if self.debug:
-            print("Using these thresholds for name searching:")
+            print("%04d: Init: Using these thresholds for name searching:"
+                  % self._get_ellapsed_time())
             for t in ('NameThreshold', 'ThresholdStart', 'ThresholdDecrease'):
                 print("  '%s' : '%0.2f'" % (t, getattr(self, t)))
 
         # get title conversions and inetref conversions
         if self.debug:
-            print("Title and Inetref Conversions:")
+            print("%04d: Init: Title and Inetref Conversions:"
+                  % self._get_ellapsed_time())
             for k in self.config['TitleConversions'].keys():
                 print("  %s: %s" % (k, self.config['TitleConversions'][k]))
             for k in self.config['InetrefConversions'].keys():
@@ -236,6 +242,9 @@ class Myth4TTVDBv4(object):
 
         # prepare the resulting xml tree
         self.tree = etree.XML(u'<metadata></metadata>')
+
+    def _get_ellapsed_time(self):
+        return (int(time.time() - self.starttime))
 
     def _select_preferred_langs(self, languages):
         pref_langs = []
@@ -427,8 +436,8 @@ class Myth4TTVDBv4(object):
         # $ ttvdb4.py -l de -D 76568 2 8 --debug
 
         if self.debug:
-            print("\nQuery 'buildSingle' called with '%s'"
-                  % (" ".join([str(x) for x in self.tvdata])))
+            print("\n%04d: buildSingle: Query 'buildSingle' called with '%s'"
+                  % (self._get_ellapsed_time(), " ".join([str(x) for x in self.tvdata])))
         inetref = self.tvdata[0]
         season = self.tvdata[1]
         episode = self.tvdata[2]
@@ -450,7 +459,8 @@ class Myth4TTVDBv4(object):
                 ser_x.translations.append(translation)
 
         if self.debug:
-            print("Series information for %s:" % inetref)
+            print("%04d: buildSingle: Series information for %s:"
+                  % (self._get_ellapsed_time(), inetref))
             _print_class_content(ser_x)
 
         # get episode information:
@@ -470,7 +480,8 @@ class Myth4TTVDBv4(object):
             translation = ttvdb.getEpisodeTranslation(epi_x.id, lang)
             epi_x.translations.append(translation)
         if self.debug:
-            print("Episode Information for %s : %s : %s" % (inetref, season, episode))
+            print("%04d: buildSingle: Episode Information for %s : %s : %s"
+                  % (self._get_ellapsed_time(), inetref, season, episode))
             _print_class_content(epi_x)
 
         # get season information:
@@ -479,7 +490,8 @@ class Myth4TTVDBv4(object):
             if s.type.id == ser_x.defaultSeasonType:
                 sea_x = ttvdb.getSeasonExtended(s.id)
                 if self.debug:
-                    print("Season Information for %s : %s" % (inetref, season))
+                    print("%04d: buildSingle: Season Information for %s : %s"
+                          % (self._get_ellapsed_time(), inetref, season))
                     _print_class_content(sea_x)
                 break
 
@@ -505,8 +517,9 @@ class Myth4TTVDBv4(object):
             tvinetref = self.collectionref[0]
 
         if self.debug:
-            print("\nQuery 'buildCollection' called with '%s', xml_output = %s"
-                  % (tvinetref, xml_output))
+            print("\n%04d: buildCollection: Query 'buildCollection' called with "
+                  "'%s', xml_output = %s"
+                  % (self._get_ellapsed_time(), tvinetref, xml_output))
 
         # get data for passed inetref and preferred translations
         ser_x = ttvdb.getSeriesExtended(tvinetref, meta='translations')
@@ -527,7 +540,8 @@ class Myth4TTVDBv4(object):
         ser_x.name_similarity = 1.0
 
         if self.debug:
-            print("Series information for %s:" % tvinetref)
+            print("%04d: buildCollection: Series information for %s:"
+                  % (self._get_ellapsed_time(), tvinetref))
             _print_class_content(ser_x)
 
         if xml_output:
@@ -567,8 +581,8 @@ class Myth4TTVDBv4(object):
             tvtitle = self._get_title_conversion(self.tvtitle[0])
 
         if self.debug:
-            print("\nQuery 'buildList' called with '%s', xml_output = %s"
-                  % (tvtitle, xml_output))
+            print("\n%04d: buildList: Query 'buildList' called with '%s', xml_output = %s"
+                  % (self._get_ellapsed_time(), tvtitle, xml_output))
 
         # separate trailing ' (year)' from title
         pattern = r".* \((?P<year>(?:19|20)[0-9][0-9])\)$"
@@ -598,16 +612,20 @@ class Myth4TTVDBv4(object):
                 exact = True
         if exact:
             if self.debug:
+                te = self._get_ellapsed_time()
                 if len(series) == 1:
-                    print("Found unique match for '%s': %s" % (tvtitle, series[0].tvdb_id))
+                    print("%04d: buildList: Found unique match for '%s': %s"
+                          % (te, tvtitle, series[0].tvdb_id))
                 else:
-                    print("Found multiple exact matches for '%s':" % tvtitle)
+                    print("%04d: buildList: Found multiple exact matches for '%s':"
+                          % (te, tvtitle))
                     for i in series:
                         print("    %s" % i.tvdb_id)
         if get_all or not exact:
             # if no exact match was found, append all series for given languages:
             if self.debug and not exact:
-                print("Found no exact match for '%s', return a sorted list." % tvtitle)
+                print("%04d: buildList: Found no exact match for '%s', return a sorted list."
+                      % (self._get_ellapsed_time(), tvtitle))
             for item in so:
                 if item in series:
                     continue
@@ -624,8 +642,9 @@ class Myth4TTVDBv4(object):
         ser_x_list = []
         for s in series:
             if self.debug:
-                print("\nChosen series record according 'overall name similarity': '%0.2f':"
-                      % s.name_similarity)
+                print("\n%04d: buildList: Chosen series record according "
+                      "'overall name similarity': '%0.2f':"
+                      % (self._get_ellapsed_time(), s.name_similarity))
             try:
                 if s.tvdb_id:     # sometimes, this is empty
                     sid = s.tvdb_id
@@ -678,8 +697,8 @@ class Myth4TTVDBv4(object):
         # $ ttvdb4.py -l en -N "Eleventh Hour" "Frozen" works with and without override in ttvdb4.ini
 
         if self.debug:
-            print("\nQuery buildNumbers called with '%s' '%s'"
-                  % (self.tvnumbers[0], self.tvnumbers[1]))
+            print("\n%04d: buildNumbers: Query 'buildNumbers' called with '%s' '%s'"
+                  % (self._get_ellapsed_time(), self.tvnumbers[0], self.tvnumbers[1]))
         # ToDo:
         # below check shows a deficiency of the MythTV grabber API itself:
         # TV-Shows or Movies with an integer as title are not recognized correctly.
@@ -703,8 +722,8 @@ class Myth4TTVDBv4(object):
         found_items = []
         for ser_x in ser_x_list:
             if self.debug and ser_x.translations:
-                print("Checking series named '%s' with inetref '%s':"
-                      % (ser_x.translations[0].name, ser_x.id))
+                print("%04d: buildNumbers: Checking series named '%s' with inetref '%s':"
+                      % (self._get_ellapsed_time(), ser_x.translations[0].name, ser_x.id))
             # get all episodes for every season, and calculate the name similarity
             episodes = []
             # get the default season type and search only for that:
@@ -731,8 +750,9 @@ class Myth4TTVDBv4(object):
                         episodes.append(epi)
                         epi_id_list.append(epi.id)
                         if self.debug:
-                            print("Found episode names: '%s'"
-                                  % '; '.join([n.name for n in epi.translations]))
+                            print("%04d: buildNumbers: Found episode names: '%s'"
+                                  % (self._get_ellapsed_time(),
+                                     '; '.join([n.name for n in epi.translations])))
                             print("    with name similarity : %0.2f" % epi.name_similarity)
                             print("    with inetref %s : season# %d : episode# %d "
                                   % (ser_x.id, epi.seasonNumber, epi.number))
@@ -755,8 +775,9 @@ class Myth4TTVDBv4(object):
                         sea_x = ttvdb.getSeasonExtended(s.id)
                         break
                 if self.debug:
-                    print("Selected episode names: '%s'"
-                          % '; '.join([n.name for n in epi_x.translations]))
+                    print("%04d: buildNumbers: Selected episode names: '%s'"
+                          % (self._get_ellapsed_time(),
+                             '; '.join([n.name for n in epi_x.translations])))
                     print("    with name similarity : %0.2f" % epi.name_similarity)
 
                 found_items.append((ser_x, sea_x, epi_x))
@@ -770,10 +791,10 @@ class Myth4TTVDBv4(object):
         for (ser_x, sea_x, epi_x) in found_items:
             overall_similarity = epi_x.name_similarity + ser_x.name_similarity
             if self.debug and ser_x.translations:
-                print("Found item series: '%s', season: '%s', episode: '%s' "
-                      "with overall similarity: %0.2f"
-                      % (ser_x.translations[0].name, sea_x.number, epi_x.translations[0].name,
-                         overall_similarity))
+                print("%04d: buildNumbers: Found item series: '%s', season: '%s', "
+                      "episode: '%s' with overall similarity: %0.2f"
+                      % (self._get_ellapsed_time(), ser_x.translations[0].name,
+                         sea_x.number, epi_x.translations[0].name, overall_similarity))
             # stop if match similarity decreases
             if overall_similarity > 2 * self.NameThreshold:      # default 1.98
                 exact_match_count += 1
