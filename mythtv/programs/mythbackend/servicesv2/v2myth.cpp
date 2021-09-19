@@ -740,21 +740,6 @@ bool V2Myth::PutSetting( const QString &sHostName,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool V2Myth::ChangePassword( const QString   &sUserName,
-                             const QString   &sOldPassword,
-                             const QString   &sNewPassword )
-{
-    LOG(VB_GENERAL, LOG_NOTICE, "ChangePassword is deprecated, use "
-                                "ManageDigestUser.");
-
-    return ( ManageDigestUser("ChangePassword", sUserName, sOldPassword,
-                              sNewPassword, "") );
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
 bool V2Myth::TestDBSettings( const QString &sHostName,
                              const QString &sUserName,
                              const QString &sPassword,
@@ -1115,6 +1100,9 @@ bool V2Myth::ManageDigestUser( const QString &sAction,
 bool V2Myth::ManageUrlProtection( const QString &sServices,
                                   const QString &sAdminPassword )
 {
+    LOG(VB_GENERAL, LOG_WARNING, QString("ManageUrlProtection is deprecated."
+                                         "Protection unavailable in API V2."));
+
     if (!MythSessionManager::IsValidUser("admin"))
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Backend has no '%1' user!")

@@ -23,7 +23,6 @@ class V2Myth : public MythHTTPService
     Q_CLASSINFO( "AddStorageGroupDir",    "methods=POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir", "methods=POST" )
     Q_CLASSINFO( "PutSetting",            "methods=POST" )
-    Q_CLASSINFO( "ChangePassword",        "methods=POST" )
     Q_CLASSINFO( "TestDBSettings",        "methods=POST" )
     Q_CLASSINFO( "SendMessage",           "methods=POST" )
     Q_CLASSINFO( "SendNotification",      "methods=POST" )
@@ -97,10 +96,6 @@ class V2Myth : public MythHTTPService
                                               const QString   &Key,
                                               const QString   &Value   );
 
-    bool                ChangePassword      ( const QString   &UserName,
-                                              const QString   &OldPassword,
-                                              const QString   &NewPassword );
-
     bool                TestDBSettings      ( const QString &HostName,
                                               const QString &UserName,
                                               const QString &Password,
@@ -143,7 +138,9 @@ class V2Myth : public MythHTTPService
     QString             ProfileUpdated      ( void );
 
     QString             ProfileText         ( void );
+
     V2BackendInfo*      GetBackendInfo      ( void );
+
     bool                ManageDigestUser    ( const QString &Action,
                                               const QString &UserName,
                                               const QString &Password,
