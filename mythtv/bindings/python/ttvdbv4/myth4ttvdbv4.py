@@ -189,7 +189,7 @@ class Myth4TTVDBv4(object):
                 setattr(self, t, float(self.config['Thresholds'][t]))
             except:
                 self.NameThreshold = 0.99
-                self.ThresholdStart = 0.50
+                self.ThresholdStart = 0.60
                 self.ThresholdDecrease = 0.1
         if self.debug:
             print("%04d: Init: Using these thresholds for name searching:"
@@ -270,6 +270,18 @@ class Myth4TTVDBv4(object):
                 return title
         except:
             return title
+
+    def _split_title(self, title):
+        """ separate trailing ' (year)' from title """
+        rs = r'(?P<rtitle>.*) \((?P<ryear>(?:19|20)[0-9][0-9])\)$'
+        match = re.search(rs, title)
+        try:
+            title_wo_year = match.group('rtitle')
+            year = match.group('ryear')
+        except:
+            year = None
+            title_wo_year = title
+        return (title_wo_year, year)
 
     def _get_names_translated(self, translations):
         name_dict = OrderedDict()
@@ -561,16 +573,16 @@ class Myth4TTVDBv4(object):
         Returns a sorted list according preferred languages and 'name_similarity'.
         """
         # option -M title
-        # ### XXX this works on:
+        # this works on:
         # $ ttvdb4.py -l de -M "Chernobyl" --debug  --> exact match
         # $ ttvdb4.py -l en -M "Chernobyl" --debug  --> exact match  (inetref 360893)
         # $ ttvdb4.py -l de -M "Chernobyl:" --debug  --> multiple matches
         # $ ttvdb4.py -l de -M "Die Munsters"  --> single match
         # $ ttvdb4.py -l en -M "The Munsters"  --> single match
         # $ ttvdb4.py -l de -M "Hawaii Five-0" --> single match    ---> inetref  164541
-        # $ ttvdb4.py -l de -M "Hawaii Five-O" --> single match    ---> interef   71223
+        # $ ttvdb4.py -l de -M "Hawaii Five-O" --> multiple matches (71223 and 164541)
         # $ ttvdb4.py -l en -M "Hawaii Five-0 (2010)" --debug  ---> inetref 164541
-        # $ ttvdb4.py -l el -M "Star Trek Discovery" (see pull request #180)
+        # $ ttvdb4.py -l el -M "Star Trek Discovery" ok (see pull request #180)
         # $ ttvdb4.py -l en -M "Marvel's Agents of S H I E L D" returns nothing, see #247
         #                       see override in ttvdbv4.ini
 
@@ -585,14 +597,7 @@ class Myth4TTVDBv4(object):
                   % (self._get_ellapsed_time(), tvtitle, xml_output))
 
         # separate trailing ' (year)' from title
-        pattern = r".* \((?P<year>(?:19|20)[0-9][0-9])\)$"
-        years = re.findall(pattern, tvtitle)
-        if years:
-            year = int(years[-1])
-            title_wo_year = tvtitle[:-7]
-        else:
-            year = None
-            title_wo_year = tvtitle
+        title_wo_year, year = self._split_title(tvtitle)
 
         # get series overview
         so = ttvdb.getSearchResults(query=title_wo_year, type='series', year=year)
@@ -603,10 +608,15 @@ class Myth4TTVDBv4(object):
         for item in so:
             # check if we can find exact match for 'tvtitle'
             translated_names = self._get_names_translated(item.translations)
-            if item.name == tvtitle or tvtitle in item.aliases or \
-                    tvtitle in translated_names.values() or \
-                    item.name == title_wo_year or title_wo_year in item.aliases or \
-                    title_wo_year in translated_names.values():
+            # ttvdb returns sometimes '<tvtitle> (<year>)' like "The Forsyte Saga (2002)"
+            translated_names_wo_year = \
+                            [self._split_title(x)[0] for x in translated_names.values()]
+            if (item.name == tvtitle or item.name == title_wo_year or
+                    tvtitle in item.aliases or
+                    tvtitle in translated_names.values() or
+                    tvtitle in translated_names_wo_year or
+                    title_wo_year in item.aliases or
+                    title_wo_year in translated_names.values()):
                 item.name_similarity = 1.0
                 series.append(item)
                 exact = True
@@ -679,7 +689,7 @@ class Myth4TTVDBv4(object):
         # either option -N inetref subtitle
         # or  option -N title subtitle     # note: title may include a trailing ' (year)'
         # or  option -N title timestamp    ### XXX ToDo implement me
-        ### XXX this takes very long: several minutes
+        # this may take several minutes
         # $ ttvdb4.py -l de -N 76568 "Emily in Nöten" --debug
         # $ ttvdb4.py -l en -N 76568 "The Road Trip to Harvard" --debug
         # $ ttvdb4.py -l de -N "Die Munsters" "Der Liebestrank" --debug
@@ -716,8 +726,12 @@ class Myth4TTVDBv4(object):
             tvtitle = self._get_title_conversion(self.tvnumbers[0])
             tvsubtitle = self.tvnumbers[1]
             inetref = None
-            ser_x_list = self.buildList(other_title=tvtitle, xml_output=False, get_all=True)
-
+            ser_b_list = self.buildList(other_title=tvtitle, xml_output=False, get_all=True)
+            # reduce list according name similarity
+            if ser_b_list:
+                ser_x_list = [x for x in ser_b_list if x.name_similarity > self.ThresholdStart]
+            else:
+                ser_x_list = []
         # loop over the list and calculate name_similarity of series and episode
         found_items = []
         for ser_x in ser_x_list:
