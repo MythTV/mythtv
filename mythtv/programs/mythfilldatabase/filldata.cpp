@@ -95,14 +95,24 @@ bool FillData::GrabDataFromFile(int id, const QString &filename)
         return false;
 
     m_chanData.handleChannels(id, &chanlist);
-    if (proglist.count() == 0)
+    if (m_onlyUpdateChannels)
     {
-        LOG(VB_GENERAL, LOG_INFO, "No programs found in data.");
-        m_endOfData = true;
+        if (proglist.count() != 0)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Skipping program guide updates");
+        }
     }
     else
     {
-        ProgramData::HandlePrograms(id, proglist);
+        if (proglist.count() == 0)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "No programs found in data.");
+            m_endOfData = true;
+        }
+        else
+        {
+            ProgramData::HandlePrograms(id, proglist);
+        }
     }
     return true;
 }
