@@ -8,18 +8,21 @@
 
 
 import sys
+import os
 import json
 import re
 import requests
 import operator
 import time
+import pickle
 from lxml import etree
 from collections import OrderedDict
 from enum import IntEnum
+from datetime import timedelta, datetime
 from MythTV.ttvdbv4 import ttvdbv4_api as ttvdb
 from MythTV.ttvdbv4.locales import Language
 from MythTV.ttvdbv4.utils import convert_date, strip_tags
-from MythTV import VideoMetadata, datetime
+from MythTV import VideoMetadata
 from MythTV.utility import levenshtein
 
 
@@ -152,6 +155,15 @@ class Myth4TTVDBv4(object):
                         "pin": TTVDBv4Pin,
                         }
 
+        # get the lifetime of the access token from local config
+        try:
+            self.token_lifetime = int(self.config['AccessToken']['Lifetime'])
+        except:
+            self.token_lifetime = 1
+        if self.debug:
+            print("%04d: Init: Using this lifetime for the access token: '%d' day(s)."
+                  % (self._get_ellapsed_time(), self.token_lifetime))
+
         # prepare list of preferred languages
         input_language = Language.getstored(self.language).ISO639_2T
         self.languagelist = [input_language]
@@ -205,31 +217,75 @@ class Myth4TTVDBv4(object):
                 print("  %s: %s" % (k, self.config['TitleConversions'][k]))
             for k in self.config['InetrefConversions'].keys():
                 print("  %s: %s" % (k, self.config['InetrefConversions'][k]))
+            print("  Done")
 
-        # start html session
-        self.session = requests.Session()
-        r = self.session.post('https://api4.thetvdb.com/v4/login', json=auth_payload)
-        r_json = r.json()
-        # if self.debug:
-        #    print(r_json)
-        error = r_json.get('message')
-        if error:
-            if error == 'Unauthorized':
-                print("tvdb_notauthorized: Error occured")
-                sys.exit(1)
-        status = r_json.get('status')
-        if status:
-            if status != 'success':
-                print("tvdb_notauthorized: Wrong status")
-                sys.exit(1)
-        try:
-            token = "Bearer %s" % (r_json['data'].get('token'))
-            # print(token)
-        except:
-            print("tvdb_notauthorized: No token")
-            sys.exit(1)
+        # read cached authorization token
         if self.debug:
-            print("Bearer Authentication passed with '%s'." % status)
+            print("%04d: Init: Bearer Authentication:"
+                  % self._get_ellapsed_time())
+        auth_tuple = tuple()
+        auth_pfile = self.config.get('auth_file')
+        if auth_pfile and os.path.isfile(auth_pfile):
+            try:
+                with open(self.config['auth_file'], 'rb') as f:
+                    auth_tuple = pickle.load(f)
+            except:
+                if self.debug:
+                    print("  Reading cache-authentication file failed.")
+        # validate authorization token (valid one day)
+        token = None
+        if auth_tuple:
+            try:
+                auth_time = auth_tuple[0]
+                ptoken = auth_tuple[1]
+                if ptoken and \
+                        auth_time + timedelta(days=self.token_lifetime) > datetime.now():
+                    if self.debug:
+                        print("  Cached authentication token is valid.")
+                    token = ptoken
+                else:
+                    if self.debug:
+                        print("  Cached authentication token is invalid.")
+                # print(token)
+            except:
+                if self.debug:
+                    print("  Reading cached authentication failed.")
+
+        # start html session, re-use token if cached
+        self.session = requests.Session()
+        if not token or self.debug:
+            r = self.session.post('https://api4.thetvdb.com/v4/login', json=auth_payload)
+            r_json = r.json()
+            # if self.debug:
+            #    print(r_json)
+            error = r_json.get('message')
+            if error:
+                if error == 'Unauthorized':
+                    print("tvdb_notauthorized: Error occured")
+                    sys.exit(1)
+            status = r_json.get('status')
+            if status:
+                if status != 'success':
+                    print("tvdb_notauthorized: Wrong status")
+                    sys.exit(1)
+            try:
+                token = "Bearer %s" % (r_json['data'].get('token'))
+                # print(token)
+            except:
+                print("tvdb_notauthorized: No token")
+                sys.exit(1)
+            if self.debug:
+                print("  Bearer Authentication passed with '%s'." % status)
+
+            if auth_pfile:
+                now = datetime.now()
+                auth_tuple = (now, token)
+                try:
+                    with open(auth_pfile, 'wb') as f:
+                        pickle.dump(auth_tuple, f, -1)
+                except:
+                    if self.debug:
+                        print("  Writing cache-authentication file failed.")
 
         self.session.headers.update({'Accept': 'application/json',
                                      'Accept-Language': self.language,

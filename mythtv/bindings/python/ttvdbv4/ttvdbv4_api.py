@@ -9,7 +9,8 @@
 
 import sys
 from requests import codes as requestcodes
-from urllib.parse import urlencode, quote_plus, quote
+if 0:
+    from urllib.parse import urlencode, quote_plus, quote
 from pprint import pprint
 
 from .definitions import *
@@ -147,7 +148,6 @@ getSeriesTranslation_path = TTVDBV4_path + "/series/{id}/translations/{language}
 getAllSeriesStatuses_path = TTVDBV4_path + "/series/statuses"
 getAllSourceTypes_path = TTVDBV4_path + "/sources/types"
 updates_path = TTVDBV4_path + "/updates"
-
 
 
 def getArtworkBase(id):

@@ -19,7 +19,7 @@ from configparser import ConfigParser
 
 __title__ = "TheTVDatabaseV4"
 __author__ = "Roland Ernst"
-__version__ = "0.3.2"
+__version__ = "0.3.3"
 
 
 def print_etree(etostr):
@@ -181,10 +181,11 @@ def main():
             sys.exit(1)
         confdir = os.path.join(confdir, '.mythtv')
 
+    cachedir = os.path.join(confdir, 'cache')
+    if not os.path.exists(cachedir):
+        os.makedirs(cachedir)
+
     if not args.debug and not args.doctest:
-        cachedir = os.path.join(confdir, 'cache')
-        if not os.path.exists(cachedir):
-            os.makedirs(cachedir)
         if sys.version_info[0] == 2:
             cache_name = os.path.join(cachedir, 'py2ttvdb4')
         else:
@@ -231,6 +232,13 @@ def main():
             shutil.copy(inifile, local_config_file)
             if args.debug:
                 print("0000: Init: Local config file '%s' created." % local_config_file)
+
+    # storage for authentication bearer token
+    if sys.version_info[0] == 2:
+        config_dict['auth_file'] = os.path.join(cachedir, "py2ttvdb4_bearer.pickle")
+    else:
+        config_dict['auth_file'] = os.path.join(cachedir, "py3ttvdb4_bearer.pickle")
+
     cmd_args["config"] = config_dict
     if args.debug:
         print("0000: Init: Using this configuration:")
