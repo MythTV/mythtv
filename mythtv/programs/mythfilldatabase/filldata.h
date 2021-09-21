@@ -33,6 +33,8 @@ struct Source
     bool    xmltvgrabber_baseline     {false};
     bool    xmltvgrabber_manualconfig {false};
     bool    xmltvgrabber_cache        {false};
+    bool    xmltvgrabber_apiconfig    {false};
+    bool    xmltvgrabber_lineups      {false};
     QString xmltvgrabber_prefmethod;
 };
 using SourceList = std::vector<Source>;
