@@ -155,7 +155,7 @@ bool FillData::GrabData(const Source& source, int offset)
         .arg(xmltv_grabber, configfile, filename);
 
 
-    if (source.xmltvgrabber_prefmethod != "allatonce"  || m_noAllAtOnce)
+    if (source.xmltvgrabber_prefmethod != "allatonce"  || m_noAllAtOnce || m_onlyUpdateChannels)
     {
         // XMLTV Docs don't recommend grabbing one day at a
         // time but the current MythTV code is heavily geared
@@ -436,7 +436,7 @@ bool FillData::Run(SourceList &sourcelist)
 
         m_needPostGrabProc |= true;
 
-        if ((*it).xmltvgrabber_prefmethod == "allatonce" && !m_noAllAtOnce)
+        if ((*it).xmltvgrabber_prefmethod == "allatonce" && !m_noAllAtOnce && !m_onlyUpdateChannels)
         {
             if (!GrabData(*it, 0))
                 ++failures;
