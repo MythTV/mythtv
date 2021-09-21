@@ -154,8 +154,11 @@ bool FillData::GrabData(const Source& source, int offset)
     QString command = QString("nice %1 --config-file '%2' --output %3")
         .arg(xmltv_grabber, configfile, filename);
 
-
-    if (source.xmltvgrabber_prefmethod != "allatonce"  || m_noAllAtOnce || m_onlyUpdateChannels)
+    if (m_onlyUpdateChannels && source.xmltvgrabber_apiconfig)
+    {
+        command += " --list-channels";
+    }
+    else if (source.xmltvgrabber_prefmethod != "allatonce"  || m_noAllAtOnce || m_onlyUpdateChannels)
     {
         // XMLTV Docs don't recommend grabbing one day at a
         // time but the current MythTV code is heavily geared
