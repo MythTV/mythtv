@@ -385,6 +385,12 @@ bool FillData::Run(SourceList &sourcelist)
                     if (capability == "cache")
                         (*it).xmltvgrabber_cache = true;
 
+                    if (capability == "apiconfig")
+                        (*it).xmltvgrabber_apiconfig = true;
+
+                    if (capability == "lineups")
+                        (*it).xmltvgrabber_lineups = true;
+
                     if (capability == "preferredmethod")
                         hasprefmethod = true;
                 }
