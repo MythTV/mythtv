@@ -5948,8 +5948,8 @@ if enabled libbluray_external; then
                 # following case statement.  This list should only
                 # shrink over time.
                 case $ID in
-                    centos)
-                        if test $VERSION_ID -gt 8; then
+                    centos|rocky|almalinux)
+                        if test ${VERSION_ID%\.*} -gt 8; then
                             die "ERROR: can not find libbluray."
                         fi
                         ;;
