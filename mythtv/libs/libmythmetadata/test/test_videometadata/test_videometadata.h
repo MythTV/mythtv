@@ -351,13 +351,13 @@ class Testvideometadata: public QObject
         QCOMPARE (GuessLookupType (&recinfo), kProbableMovie);
 
         proginfo = ProgramInfo ("", "", "Test Series", "", "Test Episode", "",
-                                "", 1, 15, "ttvdb.py_1234", 0min, 0, "");
+                                "", 1, 15, "ttvdb4.py_1234", 0min, 0, "");
         recinfo = proginfo;
-        QCOMPARE (recinfo.GetInetRef(), QString("ttvdb.py_1234"));
+        QCOMPARE (recinfo.GetInetRef(), QString("ttvdb4.py_1234"));
         QCOMPARE (GuessLookupType (&recinfo), kProbableTelevision);
 
         //QCOMPARE (GuessLookupType (QString ("tmdb3.py_1234")), kProbableMovie);
-        //QCOMPARE (GuessLookupType (QString ("ttvdb.py_1234")), kProbableTelevision);
+        //QCOMPARE (GuessLookupType (QString ("ttvdb4.py_1234")), kProbableTelevision);
     }
 
     static void testEmbeddedFilnameToMetadata ()

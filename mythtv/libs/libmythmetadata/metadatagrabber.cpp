@@ -38,7 +38,7 @@ static const QMap<GrabberType, GrabberOpts> grabberTypes {
                             "metadata/Movie/tmdb3.py" } },
     { kGrabberTelevision, { "%1metadata/Television/",
                             "TelevisionGrabber",
-                            "metadata/Television/ttvdb.py" } },
+                            "metadata/Television/ttvdb4.py" } },
     { kGrabberGame,       { "%1metadata/Game/",
                             "mythgame.MetadataGrabber",
                             "metadata/Game/giantbomb.py" } },
