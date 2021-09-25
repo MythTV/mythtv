@@ -76,7 +76,6 @@ static bool resetTheme(QString themedir, const QString badtheme)
     MythTranslation::reload();
     GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
-    GetMythMainWindow()->ReinitDone();
 
     return RunMenu(themedir, themename);
 }

@@ -203,7 +203,6 @@ static bool resetTheme(QString themedir, const QString &badtheme)
 
     MythTranslation::reload();
     GetMythMainWindow()->Init();
-    GetMythMainWindow()->ReinitDone();
 
     return RunMenu(themedir, themename);
 }
@@ -226,7 +225,6 @@ static int reloadTheme(void)
     if (menu)
         menu->Close();
     GetMythMainWindow()->Init();
-    GetMythMainWindow()->ReinitDone();
     GetMythMainWindow()->SetEffectsEnabled(true);
 
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
