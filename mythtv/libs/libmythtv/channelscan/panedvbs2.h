@@ -17,6 +17,7 @@ class PaneDVBS2 : public GroupSetting
         setVisible(false);
         setting->addTargetedChildren(target,
                                      {this,
+                                      m_transponder = new ScanTransponder(),
                                       m_pfrequency  = new ScanFrequencykHz(),
                                       m_ppolarity   = new ScanPolarity(),
                                       m_psymbolrate = new ScanDVBSSymbolRate(),
@@ -25,6 +26,10 @@ class PaneDVBS2 : public GroupSetting
                                       m_pfec        = new ScanFec(),
                                       m_pinversion  = new ScanInversion(),
                                       m_prolloff    = new ScanRollOff()});
+
+        // Update default tuning parameters when reference transponder is selected
+        connect(m_transponder, qOverload<StandardSetting *>(&StandardSetting::valueChanged),
+                this, &PaneDVBS2::SetTuningParameters);
     }
 
     QString frequency(void)  const { return m_pfrequency->getValue();  }
@@ -45,7 +50,11 @@ class PaneDVBS2 : public GroupSetting
     void setPolarity(const QString& polarity)     { m_ppolarity->setValue(polarity);    }
     void setRolloff(const QString& rolloff)       { m_prolloff->setValue(rolloff);      }
 
+  public slots:
+    void SetTuningParameters(StandardSetting *setting);
+
   protected:
+    ScanTransponder    *m_transponder {nullptr};  // KdW test
     ScanFrequencykHz   *m_pfrequency  {nullptr};
     ScanDVBSSymbolRate *m_psymbolrate {nullptr};
     ScanDVBSModulation *m_pmodulation {nullptr};
@@ -55,5 +64,21 @@ class PaneDVBS2 : public GroupSetting
     ScanInversion      *m_pinversion  {nullptr};
     ScanRollOff        *m_prolloff    {nullptr};
 };
+
+// Update default tuning parameters from reference transponder
+void PaneDVBS2::SetTuningParameters(StandardSetting *setting)
+{
+  QString sat = setting->getValue();
+  QString frequency = m_transponder->getFrequency(sat);
+  if (!frequency.isEmpty())
+  {
+    setFrequency(frequency.toUInt());
+    setPolarity(m_transponder->getPolarity(sat));
+    setSymbolrate(m_transponder->getSymbolrate(sat));
+    setModulation(m_transponder->getModulation(sat));
+    setModSys(m_transponder->getModSys(sat));
+    setFec(m_transponder->getFec(sat));
+  }
+}
 
 #endif // PANE_DVBS2_H

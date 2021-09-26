@@ -1399,7 +1399,6 @@ static bool resetTheme(QString themedir, const QString &badtheme)
     MythTranslation::reload();
     gCoreContext->ReInitLocale();
     GetMythMainWindow()->Init();
-    GetMythMainWindow()->ReinitDone();
 
     return RunMenu(themedir, themename);
 }
@@ -1470,7 +1469,6 @@ static int reloadTheme(void)
     if (g_menu)
         g_menu->Close();
     GetMythMainWindow()->Init();
-    GetMythMainWindow()->ReinitDone();
     GetMythMainWindow()->SetEffectsEnabled(true);
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
         return GENERIC_EXIT_NO_THEME;
@@ -2096,7 +2094,6 @@ int main(int argc, char **argv)
 #if CONFIG_DARWIN
     GetMythMainWindow()->SetEffectsEnabled(false);
     GetMythMainWindow()->Init();
-    GetMythMainWindow()->ReinitDone();
     GetMythMainWindow()->SetEffectsEnabled(true);
     gLoaded = true;
 #endif

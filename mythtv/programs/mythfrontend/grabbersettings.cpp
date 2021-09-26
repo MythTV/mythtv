@@ -114,7 +114,7 @@ void GrabberSettings::Init(void)
     // TODO
     // pull these values from MetaGrabberScript so we're not defining them in multiple locations
     QString currentTVGrabber = gCoreContext->GetSetting("TelevisionGrabber",
-                                         "metadata/Television/ttvdb.py");
+                                         "metadata/Television/ttvdb4.py");
     QString currentMovieGrabber = gCoreContext->GetSetting("MovieGrabber",
                                          "metadata/Movie/tmdb3.py");
     QString currentGameGrabber = gCoreContext->GetSetting("mythgame.MetadataGrabber",

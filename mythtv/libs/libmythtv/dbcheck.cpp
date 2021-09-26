@@ -3845,6 +3845,18 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1370")
+    {
+        // Migrate users from ttvdb.py to ttvdb4.py
+        DBUpdates updates {
+            "UPDATE settings SET data=REPLACE(data, 'ttvdb.py', 'ttvdb4.py') "
+             "WHERE value='TelevisionGrabber'"
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1371", dbver))
+            return false;
+    }
+
 
     return true;
 }
