@@ -56,8 +56,9 @@ class ScreenSaverDBusPrivate
     {
         if (!m_interface->isValid())
         {
-            LOG(VB_GENERAL, LOG_DEBUG, LOC + "Could not connect to dbus: " +
-                m_interface->lastError().message());
+            LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                QString("Could not connect to dbus service %1: %2")
+                .arg(dbusService, m_interface->lastError().message()));
         }
         else
         {
@@ -68,7 +69,7 @@ class ScreenSaverDBusPrivate
     {
         delete m_interface;
     }
-    void Inhibit()
+    void Inhibit(QString* errout = nullptr)
     {
         if (m_interface->isValid())
         {
@@ -85,11 +86,19 @@ class ScreenSaverDBusPrivate
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("Successfully inhibited screensaver via %1. cookie %2. nom nom")
                     .arg(m_serviceUsed).arg(m_cookie));
+                return;
             }
-            else // msg.type() == QDBusMessage::ErrorMessage
+
+            // msg.type() == QDBusMessage::ErrorMessage
+            if (errout != nullptr)
             {
-                LOG(VB_GENERAL, LOG_WARNING, LOC + "Failed to disable screensaver: " +
-                    msg.errorMessage());
+                *errout = msg.errorMessage();
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_WARNING, LOC +
+                    QString("Failed to disable screensaver via %1: %2")
+                    .arg(m_serviceUsed, msg.errorMessage()));
             }
         }
     }
@@ -109,6 +118,7 @@ class ScreenSaverDBusPrivate
         }
     }
     void SetUnInhibit(const QString &method) { m_unInhibit = method; }
+    bool isValid() const { return m_interface ? m_interface->isValid() : false; };
 
   protected:
     bool            m_inhibited  {false};
@@ -130,7 +140,25 @@ MythScreenSaverDBus::MythScreenSaverDBus(QObject *Parent)
     for (uint i=0; i < NUM_DBUS_METHODS; i++)
     {
         auto *ssdbp = new ScreenSaverDBusPrivate(kDbusService[i], kDbusPath[i], kDbusService[i], &m_bus);
+        if (!ssdbp->isValid())
+        {
+            delete ssdbp;
+            continue;
+        }
         ssdbp->SetUnInhibit(kDbusUnInhibit[i]);
+
+        // Possible control. Does it work without error?
+        QString dbuserr;
+        ssdbp->Inhibit(&dbuserr);
+        ssdbp->UnInhibit();
+        if (!dbuserr.isEmpty())
+        {
+            LOG(VB_GENERAL, LOG_DEBUG, LOC +
+                QString("Error testing disable screensaver via %1: %2")
+                .arg(kDbusService[i], dbuserr));
+            delete ssdbp;
+            continue;
+        }
         m_dbusPrivateInterfaces.push_back(ssdbp);
     }
 }
