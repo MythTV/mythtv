@@ -118,6 +118,17 @@ make -j$(nproc)
 make install
 cd ..
 
+echo "Compiling SoundTouch"
+git clone https://gitlab.com/soundtouch/soundtouch.git
+sudo -E chmod -R 777 $buildPath/soundtouch
+cd soundtouch
+./bootstrap
+./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --host=i686-w64-mingw32.shared
+sed -i 's/LDFLAGS = /LDFLAGS = -no-undefined/' $buildPath/soundtouch/source/SoundTouch/Makefile
+make -j$(nproc)
+make install
+cd ..
+
 echo "Install endian.h"
 git clone https://gist.github.com/PkmX/63dd23f28ba885be53a5
 sudo -E cp $buildPath/63dd23f28ba885be53a5/portable_endian.h $buildPath/mxe/usr/i686-w64-mingw32.shared/include/endian.h
