@@ -1616,8 +1616,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["director"] = m_director;
 
     progMap["callsign"] = m_chanSign;
-    progMap["commfree"] = QChar((m_programFlags & FL_CHANCOMMFREE) ? 1 : 0);
-    progMap["commfree_str"] = (m_programFlags & FL_CHANCOMMFREE) ? "1" : "0";
+    progMap["commfree"] = (m_programFlags & FL_CHANCOMMFREE) ? "1" : "0";
     progMap["outputfilters"] = m_chanPlaybackFilters;
     if (IsVideo())
     {
@@ -1687,14 +1686,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         MythDate::toString(m_lastModified, date_format | kDateTimeFull | kSimplify);
 
     if (m_recordedId)
-    {
-        progMap["recordedid"] = QChar(m_recordedId);
-        progMap["recordedid_str"] = QString::number(m_recordedId);
-    }
+        progMap["recordedid"] = QString::number(m_recordedId);
 
     progMap["channum"] = m_chanStr;
-    progMap["chanid"] = QChar(m_chanId);
-    progMap["chanid_str"] = QString::number(m_chanId);
+    progMap["chanid"] = QString::number(m_chanId);
     progMap["channame"] = m_chanName;
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
@@ -1762,10 +1757,8 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["inputname"] = m_inputName;
     // Don't add bookmarkupdate to progMap, for now.
 
-    progMap["recpriority"] = QChar(m_recPriority);
-    progMap["recpriority2"] = QChar(m_recPriority2);
-    progMap["recpriority_str"]  = QString::number(m_recPriority);
-    progMap["recpriority2_str"] = QString::number(m_recPriority2);
+    progMap["recpriority"]  = QString::number(m_recPriority);
+    progMap["recpriority2"] = QString::number(m_recPriority2);
     progMap["recordinggroup"] = (m_recGroup == "Default")
         ? QObject::tr("Default") : m_recGroup;
     progMap["playgroup"] = m_playGroup;
@@ -1784,14 +1777,10 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["storagegroup"] = m_storageGroup;
     }
 
-    progMap["programflags"]    = QChar(m_programFlags);
-    progMap["audioproperties"] = QChar(m_audioProperties);
-    progMap["videoproperties"] = QChar(m_videoProperties);
-    progMap["subtitleType"]    = QChar(m_subtitleProperties);
-    progMap["programflags_str"]    = QString::number(m_programFlags);
-    progMap["audioproperties_str"] = QString::number(m_audioProperties);
-    progMap["videoproperties_str"] = QString::number(m_videoProperties);
-    progMap["subtitleType_str"]    = QString::number(m_subtitleProperties);
+    progMap["programflags"]    = QString::number(m_programFlags);
+    progMap["audioproperties"] = QString::number(m_audioProperties);
+    progMap["videoproperties"] = QString::number(m_videoProperties);
+    progMap["subtitleType"]    = QString::number(m_subtitleProperties);
     progMap["programflags_names"]    = GetProgramFlagNames();
     progMap["audioproperties_names"] = GetAudioPropertyNames();
     progMap["videoproperties_names"] = GetVideoPropertyNames();
@@ -3714,14 +3703,14 @@ void ProgramInfo::QueryPositionMap(
 
     if (IsVideo())
     {
-        query.prepare("SELECT mark, offset FROM filemarkup"
+        query.prepare("SELECT mark, `offset` FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type = :TYPE ;");
         query.bindValue(":PATH", StorageGroup::GetRelativePathname(m_pathname));
     }
     else if (IsRecording())
     {
-        query.prepare("SELECT mark, offset FROM recordedseek"
+        query.prepare("SELECT mark, `offset` FROM recordedseek"
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE ;");
@@ -3879,7 +3868,7 @@ void ProgramInfo::SavePositionMap(
     QString qfields;
     if (IsVideo())
     {
-        q << "filemarkup (filename, type, mark, offset)";
+        q << "filemarkup (filename, type, mark, `offset`)";
         qfields = QString("('%1',%2,") .
             // ideally, this should be escaped
             arg(videoPath) .
@@ -3887,7 +3876,7 @@ void ProgramInfo::SavePositionMap(
     }
     else // if (IsRecording())
     {
-        q << "recordedseek (chanid, starttime, type, mark, offset)";
+        q << "recordedseek (chanid, starttime, type, mark, `offset`)";
         qfields = QString("(%1,'%2',%3,") .
             arg(m_chanId) .
             arg(m_recStartTs.toString(Qt::ISODate)) .
@@ -3947,7 +3936,7 @@ void ProgramInfo::SavePositionMapDelta(
     QString qfields;
     if (IsVideo())
     {
-        q << "filemarkup (filename, type, mark, offset)";
+        q << "filemarkup (filename, type, mark, `offset`)";
         qfields = QString("('%1',%2,") .
             // ideally, this should be escaped
             arg(StorageGroup::GetRelativePathname(m_pathname)) .
@@ -3955,7 +3944,7 @@ void ProgramInfo::SavePositionMapDelta(
     }
     else if (IsRecording())
     {
-        q << "recordedseek (chanid, starttime, type, mark, offset)";
+        q << "recordedseek (chanid, starttime, type, mark, `offset`)";
         qfields = QString("(%1,'%2',%3,") .
             arg(m_chanId) .
             arg(m_recStartTs.toString(Qt::ISODate)) .
@@ -3994,56 +3983,56 @@ void ProgramInfo::SavePositionMapDelta(
 }
 
 static const char *from_filemarkup_offset_asc =
-    "SELECT mark, offset FROM filemarkup"
+    "SELECT mark, `offset` FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
     " AND mark >= :QUERY_ARG"
     " ORDER BY filename ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_filemarkup_offset_desc =
-    "SELECT mark, offset FROM filemarkup"
+    "SELECT mark, `offset` FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
     " AND mark <= :QUERY_ARG"
     " ORDER BY filename DESC, type DESC, mark DESC LIMIT 1;";
 static const char *from_recordedseek_offset_asc =
-    "SELECT mark, offset FROM recordedseek"
+    "SELECT mark, `offset` FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
     " AND mark >= :QUERY_ARG"
     " ORDER BY chanid ASC, starttime ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_recordedseek_offset_desc =
-    "SELECT mark, offset FROM recordedseek"
+    "SELECT mark, `offset` FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
     " AND mark <= :QUERY_ARG"
     " ORDER BY chanid DESC, starttime DESC, type DESC, mark DESC LIMIT 1;";
 static const char *from_filemarkup_mark_asc =
-    "SELECT offset,mark FROM filemarkup"
+    "SELECT `offset`,mark FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
-    " AND offset >= :QUERY_ARG"
+    " AND `offset` >= :QUERY_ARG"
     " ORDER BY filename ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_filemarkup_mark_desc =
-    "SELECT offset,mark FROM filemarkup"
+    "SELECT `offset`,mark FROM filemarkup"
     " WHERE filename = :PATH"
     " AND type = :TYPE"
-    " AND offset <= :QUERY_ARG"
+    " AND `offset` <= :QUERY_ARG"
     " ORDER BY filename DESC, type DESC, mark DESC LIMIT 1;";
 static const char *from_recordedseek_mark_asc =
-    "SELECT offset,mark FROM recordedseek"
+    "SELECT `offset`,mark FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
-    " AND offset >= :QUERY_ARG"
+    " AND `offset` >= :QUERY_ARG"
     " ORDER BY chanid ASC, starttime ASC, type ASC, mark ASC LIMIT 1;";
 static const char *from_recordedseek_mark_desc =
-    "SELECT offset,mark FROM recordedseek"
+    "SELECT `offset`,mark FROM recordedseek"
     " WHERE chanid = :CHANID"
     " AND starttime = :STARTTIME"
     " AND type = :TYPE"
-    " AND offset <= :QUERY_ARG"
+    " AND `offset` <= :QUERY_ARG"
     " ORDER BY chanid DESC, starttime DESC, type DESC, mark DESC LIMIT 1;";
 
 bool ProgramInfo::QueryKeyFrameInfo(uint64_t * result,
@@ -4504,7 +4493,7 @@ void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
     // Get the markup
     if (IsVideo())
     {
-        query.prepare("SELECT type, mark, offset FROM filemarkup"
+        query.prepare("SELECT type, mark, `offset` FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type NOT IN (:KEYFRAME,:DURATION)"
                       " ORDER BY mark, type;");
@@ -4544,7 +4533,7 @@ void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
     // Get the seektable
     if (IsVideo())
     {
-        query.prepare("SELECT type, mark, offset FROM filemarkup"
+        query.prepare("SELECT type, mark, `offset` FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type IN (:KEYFRAME,:DURATION)"
                       " ORDER BY mark, type;");
@@ -4554,7 +4543,7 @@ void ProgramInfo::QueryMarkup(QVector<MarkupEntry> &mapMark,
     }
     else if (IsRecording())
     {
-        query.prepare("SELECT type, mark, offset FROM recordedseek"
+        query.prepare("SELECT type, mark, `offset` FROM recordedseek"
                       " WHERE chanid = :CHANID"
                       " AND STARTTIME = :STARTTIME"
                       " ORDER BY mark, type");
@@ -4617,7 +4606,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 else
                 {
                     query.prepare("INSERT INTO filemarkup"
-                                  " (filename,type,mark,offset)"
+                                  " (filename,type,mark,`offset`)"
                                   " VALUES (:PATH,:TYPE,:MARK,:OFFSET)");
                     query.bindValue(":OFFSET", (quint64)entry.data);
                 }
@@ -4660,7 +4649,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 }
                 const MarkupEntry &entry = mapSeek[i];
                 query.prepare("INSERT INTO filemarkup"
-                              " (filename,type,mark,offset)"
+                              " (filename,type,mark,`offset`)"
                               " VALUES (:PATH,:TYPE,:MARK,:OFFSET)");
                 query.bindValue(":PATH", path);
                 query.bindValue(":TYPE", entry.type);
@@ -4749,7 +4738,7 @@ void ProgramInfo::SaveMarkup(const QVector<MarkupEntry> &mapMark,
                 }
                 const MarkupEntry &entry = mapSeek[i];
                 query.prepare("INSERT INTO recordedseek"
-                              " (chanid,starttime,type,mark,offset)"
+                              " (chanid,starttime,type,mark,`offset`)"
                               " VALUES (:CHANID,:STARTTIME,"
                               "         :TYPE,:MARK,:OFFSET)");
                 query.bindValue(":CHANID", m_chanId);
@@ -5921,6 +5910,8 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
  *  \param sort            sort order, negative for descending, 0 for
  *                         unsorted, positive for ascending
  *  \param sortBy          comma separated list of fields to sort by
+ *  \param ignoreLiveTV    don't return LiveTV recordings
+ *  \param ignoreDeleted   don't return deleted recordings
  *  \return true if it succeeds, false if it fails.
  *  \sa QueryInUseMap(void)
  *      QueryJobsRunning(int)
@@ -5933,7 +5924,9 @@ bool LoadFromRecorded(
     const QMap<QString,bool> &isJobRunning,
     const QMap<QString, ProgramInfo*> &recMap,
     int sort,
-    const QString &sortBy)
+    const QString &sortBy,
+    bool ignoreLiveTV,
+    bool ignoreDeleted)
 {
     destination.clear();
 
@@ -5943,8 +5936,25 @@ bool LoadFromRecorded(
     // ----------------------------------------------------------------------
 
     QString thequery = ProgramInfo::kFromRecordedQuery;
-    if (possiblyInProgressRecordingsOnly)
-        thequery += "WHERE r.endtime >= NOW() AND r.starttime <= NOW() ";
+    if (possiblyInProgressRecordingsOnly || ignoreLiveTV || ignoreDeleted)
+    {
+        thequery += "WHERE ";
+        if (possiblyInProgressRecordingsOnly)
+        {
+            thequery += "(r.endtime >= NOW() AND r.starttime <= NOW()) ";
+        }
+        if (ignoreLiveTV)
+        {
+            thequery += QString("%1 r.recgroup != 'LiveTV' ")
+                                .arg(possiblyInProgressRecordingsOnly ? "AND" : "");
+        }
+        if (ignoreDeleted)
+        {
+            thequery += QString("%1 r.recgroup != 'Deleted' ")
+                            .arg((possiblyInProgressRecordingsOnly || ignoreLiveTV)
+                            ? "AND" : "");
+        }
+    }
 
     if (sortBy.isEmpty())
     {

@@ -518,7 +518,7 @@ DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
     {
         // Get log messages
         sql = "SELECT host, application, pid, tid, thread, filename, "
-              "       line, function, msgtime, level, message "
+              "       line, `function`, msgtime, level, message "
               "  FROM logging "
               " WHERE host = COALESCE(:HOSTNAME, host) "
               "   AND application = COALESCE(:APPLICATION, application) "
@@ -527,7 +527,7 @@ DTC::LogMessageList *Myth::GetLogs(  const QString   &HostName,
               "   AND thread = COALESCE(:THREAD, thread) "
               "   AND filename = COALESCE(:FILENAME, filename) "
               "   AND line = COALESCE(:LINE, line) "
-              "   AND function = COALESCE(:FUNCTION, function) "
+              "   AND `function` = COALESCE(:FUNCTION, `function`) "
               "   AND msgtime >= COALESCE(:FROMTIME, msgtime) "
               "   AND msgtime <= COALESCE(:TOTIME, msgtime) "
               "   AND level <= COALESCE(:LEVEL, level) "

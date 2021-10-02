@@ -64,12 +64,12 @@ RecordingQuality::RecordingQuality(
 
     // account for late start
     int start_gap = (first.isValid()) ? start.secsTo(first) : 0;
-    if (start_gap > 15)
+    if (start_gap >  gCoreContext->GetNumSetting("MaxStartGap", 15))
         m_recordingGaps.push_front(RecordingGap(start, first));
 
     // account for missing end
     int end_gap = (latest.isValid()) ? latest.secsTo(end) : 0;
-    if (end_gap > 15)
+    if (end_gap > gCoreContext->GetNumSetting("MaxEndGap", 15))
         m_recordingGaps.push_back(RecordingGap(latest, end));
 
     std::stable_sort(m_recordingGaps.begin(), m_recordingGaps.end());

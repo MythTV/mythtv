@@ -111,9 +111,10 @@ void HDHRSignalMonitor::UpdateValues(void)
         // Get info from card
         uint sig = status.signal_strength;
         uint snq = status.signal_to_noise_quality;
+        uint seq = status.symbol_error_quality;
 
-        LOG(VB_RECORD, LOG_DEBUG, LOC + "Tuner status: " + QString("'sig:%1 snq:%2'")
-            .arg(sig).arg(snq));
+        LOG(VB_RECORD, LOG_DEBUG, LOC + "Tuner status: " + QString("'sig:%1 snq:%2 seq:%3'")
+            .arg(sig).arg(snq).arg(seq));
 
         // Set SignalMonitorValues from info from card.
         {
@@ -132,8 +133,6 @@ void HDHRSignalMonitor::UpdateValues(void)
     uint sig = status.signal_strength;
     uint snq = status.signal_to_noise_quality;
     uint seq = status.symbol_error_quality;
-
-    (void) seq; // TODO should report this...
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + "Tuner status: " + QString("'sig:%1 snq:%2 seq:%3'")
             .arg(sig).arg(snq).arg(seq));

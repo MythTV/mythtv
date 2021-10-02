@@ -607,7 +607,17 @@ void Scheduler::PrintRec(const RecordingInfo *p, const QString &prefix)
     if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE, LOG_DEBUG))
         return;
 
-    QString outstr = prefix;
+    // Hack to fix alignment for debug builds where the function name
+    // is included.  Because PrintList is 1 character longer than
+    // PrintRec, the output is off by 1 character.  To compensate,
+    // initialize outstr to 1 space in those cases.
+#if CONFIG_DEBUGTYPE
+    static QString initialOutstr = " ";
+#else
+    static QString initialOutstr = "";
+#endif
+
+    QString outstr = initialOutstr + prefix;
 
     QString episode = p->toString(ProgramInfo::kTitleSubtitle, " - ", "")
         .leftJustified(34 - prefix.length(), ' ', true);

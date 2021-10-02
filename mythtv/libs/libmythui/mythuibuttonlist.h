@@ -24,6 +24,13 @@ struct TextProperties {
     QString state;
 };
 
+using muibCbFn = QString (*)(const QString &name, void *data);
+struct muibCbInfo
+{
+    muibCbFn fn   {nullptr};
+    void*    data {nullptr};
+};
+
 class MUI_PUBLIC MythUIButtonListItem
 {
   public:
@@ -56,7 +63,9 @@ class MUI_PUBLIC MythUIButtonListItem
                  const QString &state="");
     void SetTextFromMap(const InfoMap &infoMap, const QString &state="");
     void SetTextFromMap(const QMap<QString, TextProperties> &stringMap);
+    void SetTextCb(muibCbFn fn, void *data);
     QString GetText(const QString &name="") const;
+    TextProperties GetTextProp(const QString &name = "") const;
 
     bool FindText(const QString &searchStr, const QString &fieldList = "**ALL**",
                   bool startsWith = false) const;
@@ -91,10 +100,13 @@ class MUI_PUBLIC MythUIButtonListItem
     void SetImage(const QString &filename, const QString &name="",
                   bool force_reload = false);
     void SetImageFromMap(const InfoMap &imageMap);
+    void SetImageCb(muibCbFn fn, void *data);
     QString GetImageFilename(const QString &name="") const;
 
     void DisplayState(const QString &state, const QString &name);
     void SetStatesFromMap(const InfoMap &stateMap);
+    void SetStateCb(muibCbFn fn, void *data);
+    QString GetState(const QString &name);
 
     bool isVisible() const { return m_isVisible; }
     void setVisible(bool flag) { m_isVisible = flag; }
@@ -117,6 +129,16 @@ class MUI_PUBLIC MythUIButtonListItem
 
     virtual void SetToRealButton(MythUIStateType *button, bool selected);
 
+  private:
+    void DoButtonText(MythUIText *buttontext);
+    void DoButtonImage(MythUIImage *buttonimage);
+    void DoButtonArrow(MythUIImage *buttonarrow) const;
+    void DoButtonCheck(MythUIStateType *buttoncheck);
+    void DoButtonLookupText(MythUIText *text, const TextProperties& textprop);
+    static void DoButtonLookupFilename(MythUIImage *image, const QString& filename);
+    static void DoButtonLookupImage(MythUIImage *uiimage, MythImage *image);
+    static void DoButtonLookupState(MythUIStateType *statetype, const QString& name);
+
   protected:
     MythUIButtonList *m_parent      {nullptr};
     QString         m_text;
@@ -129,11 +151,15 @@ class MUI_PUBLIC MythUIButtonListItem
     bool            m_showArrow     {false};
     bool            m_isVisible     {false};
     bool            m_enabled       {true};
+    bool            m_debugme       {false};
 
     QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;
     InfoMap m_imageFilenames;
     InfoMap m_states;
+    muibCbInfo m_textCb;
+    muibCbInfo m_imageCb;
+    muibCbInfo m_stateCb;
 
     friend class MythUIButtonList;
     friend class MythGenericTree;

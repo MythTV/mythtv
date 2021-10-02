@@ -98,8 +98,6 @@ void BlurayMetadata::toMap(InfoMap &metadataMap)
                                                             .arg(m_discnumber)
                                                             .arg(m_disctotal);
 
-    metadataMap["numtitles"] = QChar(static_cast<int>(m_titles.count()));
-    metadataMap["numthumbs"] = QChar(static_cast<int>(m_images.count()));
-    metadataMap["numtitles_str"] = QString::number(m_titles.count());
-    metadataMap["numthumbs_str"] = QString::number(m_images.count());
+    metadataMap["numtitles"] = QString::number(m_titles.count());
+    metadataMap["numthumbs"] = QString::number(m_images.count());
 }

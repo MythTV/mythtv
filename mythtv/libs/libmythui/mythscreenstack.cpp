@@ -343,8 +343,7 @@ void MythScreenStack::CheckDeletes(bool force)
             if (*it == m_newTop)
                 m_newTop = nullptr;
             delete (*it);
-            m_toDelete.erase(it);
-            it = m_toDelete.begin();
+            it = m_toDelete.erase(it);
             changed = true;
             continue;
         }

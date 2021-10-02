@@ -53,7 +53,9 @@ class Dvr : public DvrServices
                                                 const QString   &RecGroup,
                                                 const QString   &StorageGroup,
                                                 const QString   &Category,
-                                                const QString   &Sort) override; // DvrServices
+                                                const QString   &Sort,
+                                                bool             IgnoreLiveTV,
+                                                bool             IgnoreDeleted) override; // DvrServices
 
         DTC::ProgramList* GetOldRecordedList  ( bool             Descending,
                                                 int              StartIndex,
@@ -358,13 +360,16 @@ class ScriptableDvr : public QObject
                                        const QString   &RecGroup,
                                        const QString   &StorageGroup,
                                        const QString   &Category,
-                                       const QString   &Sort
+                                       const QString   &Sort,
+                                       bool             IgnoreLiveTV,
+                                       bool             IgnoreDeleted
                                      )
         {
             SCRIPT_CATCH_EXCEPTION( nullptr,
                 return m_obj.GetRecordedList( Descending, StartIndex, Count,
                                               TitleRegEx, RecGroup,
-                                              StorageGroup, Category, Sort);
+                                              StorageGroup, Category, Sort,
+                                              IgnoreLiveTV, IgnoreDeleted);
             )
         }
 

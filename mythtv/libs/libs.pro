@@ -45,6 +45,12 @@ libmythbase-test.target = buildtestmythbase
 libmythbase-test.commands = cd libmythbase/test && $(QMAKE) && $(MAKE)
 unix:QMAKE_EXTRA_TARGETS += libmythbase-test
 
+# unit tests libmythui
+libmythui-test.depends = sub-libmythui
+libmythui-test.target = buildtestmythui
+libmythui-test.commands = cd libmythui/test && $(QMAKE) && $(MAKE)
+unix:QMAKE_EXTRA_TARGETS += libmythui-test
+
 # unit tests libmythtv
 libmythtv-test.depends = sub-libmythtv
 libmythtv-test.target = buildtestmythtv
@@ -63,7 +69,7 @@ libmythservicecontracts-test.target = buildtestmythservicecontracts
 libmythservicecontracts-test.commands = cd libmythservicecontracts/test && $(QMAKE) && $(MAKE)
 unix:QMAKE_EXTRA_TARGETS += libmythservicecontracts-test
 
-unittest.depends = libmyth-test libmythbase-test libmythtv-test libmythmetadata-test libmythservicecontracts-test
+unittest.depends = libmyth-test libmythbase-test libmythui-test libmythtv-test libmythmetadata-test libmythservicecontracts-test
 unittest.target = test
 unittest.commands = ../programs/scripts/unittests.sh
 unix:QMAKE_EXTRA_TARGETS += unittest

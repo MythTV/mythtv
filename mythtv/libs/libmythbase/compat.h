@@ -50,10 +50,13 @@
 #    include <sys/wait.h>     // For WIFEXITED on Mac OS X
 #endif
 
-#ifdef _WIN32
-#    include <cstdlib>       // for rand()
-#    include <ctime>
-#    include <sys/time.h>
+#ifdef _MSC_VER
+    #include <cstdlib>       // for rand()
+    #include <ctime>
+    #include <sys/time.h>
+#endif
+#if defined(USING_MINGW)
+    #include <time.h>
 #endif
 
 #ifdef _MSC_VER
@@ -137,13 +140,17 @@
 //used in videodevice only - that code is not windows-compatible anyway
 #    define minor(X) 0
 
-    using uint = unsigned int;
+	#if defined(__cplusplus)
+            using uint = unsigned int;
+        #else
+            typedef unsigned int uint;
+   #endif
 #endif
 
 #if defined(__cplusplus) && defined(_WIN32)
 #   include <QtGlobal>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0) && !defined(USING_MINGW)
     #include <QRandomGenerator>
     static inline void srandom(unsigned int /*seed*/) { }
     static inline long int random(void)
@@ -157,11 +164,6 @@
 #   define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #   define unsetenv(x) 0
 
-    inline unsigned sleep(unsigned int x)
-    {
-        Sleep(x * 1000);
-        return 0;
-    }
 
     struct statfs {
     //   long    f_type;     /* type of filesystem */
@@ -264,7 +266,7 @@
 #    define seteuid(x) 0
 #endif // _WIN32
 
-#if defined(_WIN32) && !defined(gmtime_r)
+#if _MSC_VER && !defined(gmtime_r)
 // FFmpeg libs already have a workaround, use it if the headers are included,
 // use this otherwise.
 static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
@@ -281,7 +283,7 @@ static __inline struct tm *gmtime_r(const time_t *timep, struct tm *result)
 }
 #endif
 
-#if defined(_WIN32) && !defined(localtime_r)
+#if  _MSC_VER && !defined(localtime_r)
 // FFmpeg libs already have a workaround, use it if the headers are included,
 // use this otherwise.
 static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
@@ -335,35 +337,6 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #    define ftello(stream) ftello64(stream)
 #endif
 
-#if defined(USING_MINGW) && defined(FILENAME_MAX)
-#    include <cerrno>
-#    include <cstddef>
-#    include <cstring>
-#    include <dirent.h>
-    static inline int readdir_r(
-        DIR *dirp, struct dirent *entry, struct dirent **result)
-    {
-        errno = 0;
-        struct dirent *tmp = readdir(dirp);
-        if (tmp && entry)
-        {
-            int offset = offsetof(struct dirent, d_name);
-            memcpy(entry, tmp, offset);
-            strncpy(entry->d_name, tmp->d_name, FILENAME_MAX);
-            tmp->d_name[strlen(entry->d_name)] = '\0';
-            if (result)
-                *result = entry;
-            return 0;
-        }
-        else
-        {
-            if (result)
-                *result = nullptr;
-            return errno;
-        }
-    }
-#endif
-
 #ifdef Q_OS_ANDROID
 #ifndef S_IREAD
 #define S_IREAD S_IRUSR
@@ -385,6 +358,10 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #   endif
 
 #   define LZO_COMPILE_TIME_ASSERT( a )
+#endif
+
+#ifndef O_NONBLOCK
+#   define O_NONBLOCK    04000
 #endif
 
 #endif // COMPAT_H

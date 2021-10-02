@@ -66,7 +66,6 @@ class SyslogLogger : public LoggerBase
     Q_OBJECT
 
   public:
-    SyslogLogger();
     explicit SyslogLogger(bool open);
     ~SyslogLogger() override;
     bool logmsg(LoggingItem *item) override; // LoggerBase

@@ -1631,7 +1631,9 @@ void RecordingProfile::CompleteLoad(int profileId, const QString &type,
                     this,         &RecordingProfile::FiltersChanged);
         }
     }
-    else if (type.toUpper() == "DVB")
+
+    // Cards that can receive additional streams such as EIT and MHEG
+    if (CardUtil::IsEITCapable(type))
     {
         addChild(new RecordingTypeStream(*this));
     }

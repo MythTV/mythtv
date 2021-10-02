@@ -24,7 +24,14 @@ MythPlayerVisualiserUI::MythPlayerVisualiserUI(MythMainWindow *MainWindow, TV *T
 
     m_defaultVisualiser = gCoreContext->GetSetting("AudioVisualiser", "");
     m_uiScreenRect = m_mainWindow->GetUIScreenRect();
-    m_visualiserState.m_visualiserList = VideoVisual::GetVisualiserList(m_render->Type());
+    if (m_render)
+    {
+        m_visualiserState.m_visualiserList = VideoVisual::GetVisualiserList(m_render->Type());
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise m_visualiserList, m_render null");
+    }
 }
 
 /// \brief Set initial state and update player

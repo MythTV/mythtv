@@ -9,6 +9,10 @@
 #include <QString>
 #include <QDir>
 
+#ifdef _WIN32
+    #undef mkdir
+#endif
+
 #include "mythbaseexp.h"
 #include "mythsystem.h"
 

@@ -46,7 +46,7 @@ WebSocketServer::~WebSocketServer()
     m_threadPool.Stop();
 }
 
-void WebSocketServer::newTcpConnection(qt_socket_fd_t socket)
+void WebSocketServer::newTcpConnection(qintptr socket)
 {
 
     PoolServerType type = kTCPServer;
@@ -68,7 +68,7 @@ void WebSocketServer::newTcpConnection(qt_socket_fd_t socket)
 /////////////////////////////////////////////////////////////////////////////
 
 WebSocketWorkerThread::WebSocketWorkerThread(WebSocketServer& webSocketServer,
-                                 qt_socket_fd_t sock, PoolServerType type
+                                 qintptr sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
                                  , const QSslConfiguration& sslConfig
 #endif
@@ -100,7 +100,7 @@ void WebSocketWorkerThread::run(void)
 /////////////////////////////////////////////////////////////////////////////
 
 WebSocketWorker::WebSocketWorker(WebSocketServer& webSocketServer,
-                                 qt_socket_fd_t sock, PoolServerType type
+                                 qintptr sock, PoolServerType type
 #ifndef QT_NO_OPENSSL
                                  , const QSslConfiguration& sslConfig
 #endif

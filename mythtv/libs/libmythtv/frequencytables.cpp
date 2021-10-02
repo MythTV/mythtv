@@ -555,9 +555,9 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
 //#define DEBUG_DVB_OFFSETS
 #ifdef DEBUG_DVB_OFFSETS
-    // UHF 14-51
+    // UHF 24-36
     fmap["atsc_vsb8_us0"] = new FrequencyTable(
-        533000000, 695000000, 6000000, "xATSC Channel %1", 24,
+        533000000, 605000000, 6000000, "xATSC Channel %1", 24,
         DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
@@ -578,9 +578,9 @@ static void init_freq_tables(freq_table_map_t &fmap)
     fmap["atsc_vsb8_us2"] = new FrequencyTable(
         "ATSC Channel %1",  7, 177000000, 213000000, 6000000,
         DTVModulation::kModulation8VSB);
-    // UHF 14-51
+    // UHF 14-36
     fmap["atsc_vsb8_us3"] = new FrequencyTable(
-        "ATSC Channel %1", 14, 473000000, 695000000, 6000000,
+        "ATSC Channel %1", 14, 473000000, 605000000, 6000000,
         DTVModulation::kModulation8VSB);
 #endif // !DEBUG_DVB_OFFSETS
 
@@ -599,34 +599,34 @@ static void init_freq_tables(freq_table_map_t &fmap)
         new FrequencyTable((C)+(D), E, F, G, H, I);
 
 // The maximum channel defined in the US frequency tables (standard, HRC, IRC)
-#define US_MAX_CHAN 159
+#define US_MAX_CHAN 158
 // Equation for computing EIA-542 frequency of channels > 99
 // A = bandwidth, B = offset, C = channel designation (number)
 #define EIA_542_FREQUENCY(A,B,C) ( ( (A) * ( 8 + (C) ) ) + (B) )
 
     for (uint i = 0; i < 4; i++)
     {
-        // USA Cable, ch 2 to US_MAX_CHAN and T.7 to T.14
-        FREQ(modStr[i], "cable0", desc[i], "Channel %1",
-             2,    57000000,   69000000, 6000000, mod[i]); // 2-4
+        // USA Cable, T13 to T14 and ch 2 to US_MAX_CHAN
+        FREQ(modStr[i], "cable0", desc[i], "Channel T-%1",
+             13,   44750000,   50750000, 6000000, mod[i]); // T13-T14
         FREQ(modStr[i], "cable1", desc[i], "Channel %1",
-             5,    79000000,   85000000, 6000000, mod[i]); // 5-6
+             2,    57000000,   69000000, 6000000, mod[i]); // 2-4
         FREQ(modStr[i], "cable2", desc[i], "Channel %1",
-             7,   177000000,  213000000, 6000000, mod[i]); // 7-13
+             5,    79000000,   85000000, 6000000, mod[i]); // 5-6
         FREQ(modStr[i], "cable3", desc[i], "Channel %1",
-             14,  123000000,  171000000, 6000000, mod[i]); // 14-22
+             7,   177000000,  213000000, 6000000, mod[i]); // 7-13
         FREQ(modStr[i], "cable4", desc[i], "Channel %1",
-             23,  219000000,  645000000, 6000000, mod[i]); // 23-94
+             14,  123000000,  171000000, 6000000, mod[i]); // 14-22
         FREQ(modStr[i], "cable5", desc[i], "Channel %1",
+             23,  219000000,  645000000, 6000000, mod[i]); // 23-94
+        FREQ(modStr[i], "cable6", desc[i], "Channel %1",
              95,   93000000,  117000000, 6000000, mod[i]); // 95-99
         // The center frequency of any EIA-542 std cable channel over 99 is
         // Frequency_MHz = ( 6 * ( 8 + channel_designation ) ) + 3
-        FREQ(modStr[i], "cable6", desc[i], "Channel %1",
-             100, 651000000,
-             EIA_542_FREQUENCY(6000000, 3000000, US_MAX_CHAN),
-             6000000, mod[i]);                             // 100-US_MAX_CHAN
-        FREQ(modStr[i], "cable7", desc[i], "Channel T-%1",
-             7,    8750000,   50750000, 6000000, mod[i]); // T7-14
+        FREQ(modStr[i], "cable7", desc[i], "Channel %1",
+            100, 651000000,
+            EIA_542_FREQUENCY(6000000, 3000000, US_MAX_CHAN),
+            6000000, mod[i]);                             // 100-US_MAX_CHAN
 
         // USA Cable, QAM 256 ch 78 to US_MAX_CHAN
         FREQ(modStr[i], "cablehigh0", desc[i], "Channel %1",

@@ -116,7 +116,7 @@ package MythTV;
 # schema version supported in the main code.  We need to check that the schema
 # version in the database is as expected by the bindings, which are expected
 # to be kept in sync with the main code.
-    our $SCHEMA_VERSION = "1369";
+    our $SCHEMA_VERSION = "1371";
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by
@@ -390,7 +390,7 @@ EOF
         $self->{'master_port'} = $self->backend_setting('BackendServerPort',"$mastname");
 
         if (!$self->{'master_host'} || !$self->{'master_port'}) {
-            die "MasterServerIP or MasterServerPort not found!\n"
+            die "BackendServerAddr or BackendServerPort not found!\n"
                ."You may need to check your settings.php file or re-run mythtv-setup.\n";
         }
 

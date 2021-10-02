@@ -30,6 +30,7 @@ QT += core5compat
 }
 CONFIG += $$CCONFIG
 CONFIG += c++17
+CONFIG += no_qt_rpath
 
 # Make sure all the Qt header files are marked as system headers
 QMAKE_DEFAULT_INCDIRS += $$[QT_INSTALL_HEADERS]
@@ -181,6 +182,11 @@ win32 {
         # This corrects the moc tool path from a DOS-style to a unix style:
         QMAKE_MOC = $$[QT_INSTALL_BINS]/moc
         QMAKE_EXTENSION_SHLIB = dll
+
+        isEmpty(QMAKE_EXTENSION_LIB) {
+            QMAKE_EXTENSION_LIB=a
+        }
+        MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
     }
 
     # if CYGWIN compile, set up flag in CONFIG

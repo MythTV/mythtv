@@ -8,10 +8,11 @@
 
 #include <QDir>
 
-#include "mythdb.h"
+#include "cardutil.h"
+#include "checksetup.h"
 #include "mythcorecontext.h"
 #include "mythdate.h"
-#include "checksetup.h"
+#include "mythdb.h"
 
 /// Check that a directory path exists and is writable
 
@@ -199,36 +200,38 @@ bool checkChannelPresets(QStringList &probs)
 
         if (0 == sourceid)
         {
-            probs.push_back(QObject::tr("Card %1 (type %2) is not connected "
-                            "to a video source.")
+            probs.push_back(QObject::tr("Card %1 (%2) No video source connected")
                     .arg(cardid).arg(query.value(3).toString()));
             problemFound = true;
             continue;
         }
 
-        if (query.value(1).toString().isEmpty())    // Logic from tv_rec.cpp
-            startchan = "3";
-
-        MSqlQuery channelExists(MSqlQuery::InitCon());
-        QString   channelQuery;
-        channelQuery = QString("SELECT chanid FROM channel"
-                               " WHERE deleted IS NULL AND "
-                               "       channum = '%1' AND "
-                               "       sourceid = %2;")
-                              .arg(startchan).arg(sourceid);
-        channelExists.prepare(channelQuery);
-
-        if (!channelExists.exec() || !channelExists.isActive())
+        // Check the start channel and fix it here if needed and if we can.
+        QString newchan = CardUtil::GetStartChannel(cardid);
+        if (!newchan.isEmpty())
         {
-            MythDB::DBError("checkChannelPresets", channelExists);
-            return problemFound;
+            if (newchan.compare(startchan) != 0)
+            {
+                bool stat = CardUtil::SetStartChannel(cardid, newchan);
+                QString msg =
+                    QString("start channel from %1 to %2 ").arg(startchan, newchan) +
+                    QString("for card %1 (%2)").arg(cardid).arg(query.value(3).toString());
+                if (stat)
+                {
+                    LOG(VB_GENERAL, LOG_INFO,
+                        QString("CheckSetup[%1]: ").arg(cardid) + "Changed " + msg);
+                }
+                else
+                {
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("CheckSetup[%1]: ").arg(cardid)  + "Failed to change " + msg);
+                }
+            }
         }
-
-        if (channelExists.size() == 0)
+        else
         {
-            probs.push_back(QObject::tr("Card %1 (type %2) is set to start on "
-                            "channel %3, which does not exist.")
-                    .arg(cardid).arg(query.value(3).toString(), startchan));
+            probs.push_back(QObject::tr("Card %1 (%2) No visible channels found")
+                    .arg(cardid).arg(query.value(3).toString()));
             problemFound = true;
         }
     }

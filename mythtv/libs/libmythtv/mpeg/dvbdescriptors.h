@@ -202,6 +202,29 @@ class LinkageDescriptor : public MPEGDescriptor
     uint m_offset;
 };
 
+// ETSI TS 102 809 V1.3.1 (2017-06) p 36
+class ApplicationSignallingDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit ApplicationSignallingDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::application_signalling) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x6F
+    // descriptor_length        8   1.0
+    // for( i=0; i<N; i++ ){
+    //   reserved_future_use    1   2.0
+    //   application_type      15   2.1
+    //   reserved_future_use    3   4.0
+    //   AIT_version_number     5   4.3
+    //  }
+    uint Count() const { return DescriptorLength() / 3; }
+    uint ApplicationType(uint i) const
+        { return (m_data[2 + i*3] & 0x7F) << 8 | m_data[2 + i*3 + 1] ; }
+    uint AITVersionNumber(uint i) const
+        { return m_data[2 + i*3 + 2] & 0x1F ; }
+    QString toString(void) const override; // MPEGDescriptor
+};
+
 // DVB Bluebook A038 (Sept 2011) p 38
 class AdaptationFieldDataDescriptor : public MPEGDescriptor
 {
@@ -2274,6 +2297,7 @@ class SubtitlingDescriptor : public MPEGDescriptor
     uint AncillaryPageID(uint i) const
         { return (m_data[8 + (i<<3)] << 8) | m_data[9 + (i<<3)]; }
     // }                            8.0
+    QString toString(void) const override; // MPEGDescriptor
 };
 
 // DVB Bluebook A038 (Sept 2011) p 87
@@ -2438,7 +2462,7 @@ class VBITeletextDescriptor : public MPEGDescriptor
     // }                            5.0
 };
 
-// DVB Bluebook A038 (Sept 2011) p 119
+// DVB Bluebook A038 (Feb 2019) p 125
 class PartialTransportStreamDescriptor : public MPEGDescriptor
 {
   public:
@@ -2451,19 +2475,20 @@ class PartialTransportStreamDescriptor : public MPEGDescriptor
     // DVB_reserved_future_use  2   2.0
     // peak_rate               22   2.2
     uint PeakRate(void) const
-        { return (m_data[2] & 0x3f) << 16 | m_data[3] | m_data[4]; }
-    // DVB_reserved_future_use  2   5.0
-    // min_overall_smooth_rate 22   5.2
+        { return (m_data[2] & 0x3f) << 16 | m_data[3] << 8 | m_data[4]; }
+    // DVB_reserved_future_use            2   5.0
+    // minimum_overall_smoothing_rate    22   5.2
     uint SmoothRate(void) const
-        { return (m_data[5] & 0x3f) << 16 | m_data[6] | m_data[7]; }
-    // DVB_reserved_future_use  2   8.0
-    // max_overall_smooth_buf  14   8.2
+        { return (m_data[5] & 0x3f) << 16 | m_data[6] << 8 | m_data[7]; }
+    // DVB_reserved_future_use            2   8.0
+    // maximum_overall_smoothing_buffer  14   8.2
     uint SmoothBuf(void) const { return ((m_data[8] & 0x3f) << 8) | m_data[9]; }
     QString toString(void) const override; // MPEGDescriptor
 };
 
 
 // a_52a.pdf p125 Table A7 (for DVB)
+// DVB Bluebook A038 (Feb 2019) p 145
 class AC3Descriptor : public MPEGDescriptor
 {
   public:

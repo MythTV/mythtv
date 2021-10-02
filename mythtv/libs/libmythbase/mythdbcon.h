@@ -193,6 +193,10 @@ class MBASE_PUBLIC MSqlQuery : private QSqlQuery
     /// query.
     bool Reconnect(void);
 
+    /// lostConnectionCheck tests for SQL error codes that indicate the
+    /// connection to the server has been lost.
+    bool lostConnectionCheck(void);
+
     // Thunks that allow us to make QSqlQuery private
     QVariant value(int i) const { return QSqlQuery::value(i); }
     QString executedQuery(void) const { return QSqlQuery::executedQuery(); }

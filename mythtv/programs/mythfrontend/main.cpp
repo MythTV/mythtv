@@ -1395,7 +1395,6 @@ static bool resetTheme(QString themedir, const QString &badtheme)
     MythTranslation::reload();
     gCoreContext->ReInitLocale();
     GetMythMainWindow()->Init();
-    GetMythMainWindow()->ReinitDone();
 
     return RunMenu(themedir, themename);
 }
@@ -1466,7 +1465,6 @@ static int reloadTheme(void)
     if (g_menu)
         g_menu->Close();
     GetMythMainWindow()->Init();
-    GetMythMainWindow()->ReinitDone();
     GetMythMainWindow()->SetEffectsEnabled(true);
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
         return GENERIC_EXIT_NO_THEME;
@@ -1946,6 +1944,11 @@ int main(int argc, char **argv)
         return GENERIC_EXIT_OK;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    int maxImageSize = gCoreContext->GetNumSetting("ImageMaximumSize", -1);
+    if (maxImageSize >=0)
+        QImageReader::setAllocationLimit(maxImageSize);
+#endif
     QCoreApplication::setSetuidAllowed(true);
 
     if (revokeRoot() != 0)
@@ -2087,7 +2090,6 @@ int main(int argc, char **argv)
 #if CONFIG_DARWIN
     GetMythMainWindow()->SetEffectsEnabled(false);
     GetMythMainWindow()->Init();
-    GetMythMainWindow()->ReinitDone();
     GetMythMainWindow()->SetEffectsEnabled(true);
     gLoaded = true;
 #endif

@@ -886,8 +886,9 @@ MPUBLIC bool LoadFromRecorded(
     const QMap<QString,bool> &isJobRunning,
     const QMap<QString, ProgramInfo*> &recMap,
     int                 sort = 0,
-    const QString      &sortBy = "");
-
+    const QString      &sortBy = "",
+    bool                ignoreLiveTV = false,
+    bool                ignoreDeleted = false);
 
 template<typename TYPE>
 bool LoadFromScheduler(

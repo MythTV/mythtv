@@ -1482,7 +1482,7 @@ void RTjpeg::DctY(uint8_t *idata, int rskip)
         paddw_r2r(mm4, mm3);                                            // y5
 
    movq_r2m(mm5, *(dataptr+7));                         //save y3
-        psubw_r2r(mm2, mm0);                                            // yè=z11 - z4
+        psubw_r2r(mm2, mm0);                                            // y7=z11 - z4
 
    movq_r2m(mm3, *(dataptr+11));                //save y5
 

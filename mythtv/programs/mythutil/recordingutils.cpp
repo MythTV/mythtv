@@ -19,25 +19,30 @@
 // Local includes
 #include "recordingutils.h"
 
-static QString formatSize(int64_t sizeKB, int prec)
+static QString formatSize(int64_t size, int prec)
 {
-    if (sizeKB>1024*1024*1024) // Terabytes
+    if (size>int64_t(1024)*1024*1024*1024) // Terabytes
     {
-        double sizeGB = sizeKB/(1024*1024*1024.0);
-        return QString("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
+        double sizeTB = size/(1024*1024*1024*1024.0);
+        return QString("%1 TB").arg(sizeTB, 0, 'f', (sizeTB>10)?0:prec);
     }
-    if (sizeKB>1024*1024) // Gigabytes
+    if (size>1024*1024*1024) // Gigabytes
     {
-        double sizeGB = sizeKB/(1024*1024.0);
+        double sizeGB = size/(1024*1024*1024.0);
         return QString("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
-    if (sizeKB>1024) // Megabytes
+    if (size>1024*1024) // Megabytes
     {
-        double sizeMB = sizeKB/1024.0;
+        double sizeMB = size/(1024*1024.0);
         return QString("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
     }
-    // Kilobytes
-    return QString("%1 KB").arg(sizeKB);
+    if (size>1024) // kilobytes
+    {
+        double sizekB = size/1024.0;
+        return QString("%1 kB").arg(sizekB, 0, 'f', (sizekB>10)?0:prec);
+    }
+    // Bytes
+    return QString("%1 B").arg(size);
 }
 
 static QString CreateProgramInfoString(const ProgramInfo &pginfo)

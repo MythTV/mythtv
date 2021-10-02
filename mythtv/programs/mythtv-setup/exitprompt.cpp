@@ -60,17 +60,32 @@ void ExitPrompter::masterPromptExit()
 
 void ExitPrompter::handleExit()
 {
-    QStringList problems;
+    QStringList allproblems;
 
     // Look for common problems
-    if (CheckSetup(problems))
+    if (CheckSetup(allproblems))
     {
-        problems.push_back(QString());
+        // Only report the first 4 problems
+        QStringList problems;
+        int limit = std::min(4, static_cast<int>(allproblems.size()));
+        for (int i = 0; i < limit; ++i)
+        {
+            problems.push_back(allproblems[i]);
+        }
+        if (problems.size() < allproblems.size())
+        {
+            problems.push_back(tr("...and more..."));
+        }
+        else
+        {
+            problems.push_back(QString());
+        }
+
         problems.push_back(tr("Do you want to go back and fix this(these) "
                               "problem(s)?", nullptr, problems.size()));
 
-        auto *dia = new MythDialogBox(problems.join("\n"),
-                                      m_d->m_stk, "exit prompt");
+        auto *dia = new MythDialogBox(tr("Configuration Problems"), problems.join("\n"),
+                                      m_d->m_stk, "exit prompt", true);
         if (!dia->Create())
         {
             LOG(VB_GENERAL, LOG_ERR, "Can't create Exit Prompt dialog?");

@@ -216,7 +216,7 @@ die(){
 
 If you think configure made a mistake, make sure that you are using the latest
 version of MythTV from git.  If the latest version fails, report the problem to the
-mythtv-dev@mythtv.org mailing list or IRC #mythtv on irc.freenode.net
+mythtv-dev@mythtv.org mailing list or IRC #mythtv on irc.libera.chat
 EOF
     if disabled logging; then
         cat <<EOF
@@ -2001,6 +2001,7 @@ MYTHTV_CONFIG_LIST='
     x11
     libexiv2_external
     libbluray_external
+    soundtouch_external
     profiletype
     debugtype
     systemd_notify
@@ -2805,6 +2806,7 @@ enable systemd_notify
 enable systemd_journal
 enable libexiv2_external
 enable libbluray_external
+enable soundtouch_external
 enable waylandextras
 
 # mythtv paths
@@ -5931,6 +5933,17 @@ if enabled libexiv2_external ; then
     fi
 fi
 
+# soundtouch
+if enabled soundtouch_external ; then
+    if $($pkg_config --atleast-version="1.8.0" soundtouch); then
+        # use_pkg_config does not add cxxflags
+        add_cxxflags $($pkg_config --cflags soundtouch)
+        add_extralibs $($pkg_config --libs soundtouch)
+    else
+        disable soundtouch_external
+    fi
+fi
+
 if [ $target_os = "linux" ] ; then
     . /etc/os-release
 fi
@@ -5948,8 +5961,8 @@ if enabled libbluray_external; then
                 # following case statement.  This list should only
                 # shrink over time.
                 case $ID in
-                    centos)
-                        if test $VERSION_ID -gt 8; then
+                    centos|rocky|almalinux)
+                        if test ${VERSION_ID%\.*} -gt 8; then
                             die "ERROR: can not find libbluray."
                         fi
                         ;;
@@ -6018,7 +6031,8 @@ fi
 enabled pthreads &&
     check_builtin sem_timedwait semaphore.h "sem_t *s; sem_init(s,0,0); sem_timedwait(s,0); sem_destroy(s)"
 
-enabled  zlib && check_lib zlib   zlib.h      zlibVersion    -lz
+require zlib zlib.h zlibVersion -lz
+require zip zip.h zip_open -lzip
 
 # On some systems dynamic loading requires no extra linker flags
 check_lib libdl dlfcn.h "dlopen dlsym" || check_lib libdl dlfcn.h "dlopen dlsym" -ldl
@@ -7573,6 +7587,11 @@ if enabled libbluray_external; then
 else
     echo "bluray support            yes (internal)"
 fi
+if enabled soundtouch_external; then
+    echo "soundtouch support        yes (system)"
+else
+    echo "soundtouch support        yes (internal)"
+fi
 echo "BD-J (Bluray java)        ${bdjava-no}"
 echo "BD-J type                 ${bdj_type}"
 echo "systemd_notify            ${systemd_notify-no}"
@@ -8059,8 +8078,10 @@ echo "Configuring libmythdvdnav..."
 echo "Configuring libudfread..."
 (cd external/libudfread ; \
        ${qmakeconf} -o Makefile)
-echo "Configuring libmythsoundtouch..."
-(cd external/libmythsoundtouch ;
-       ${qmakeconf} -o Makefile)
+if ! enabled soundtouch_external; then
+    echo "Configuring libmythsoundtouch..."
+    (cd external/libmythsoundtouch ;
+           ${qmakeconf} -o Makefile)
+fi
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0

@@ -3309,13 +3309,40 @@ void MythUIButtonListItem::SetTextFromMap(const QMap<QString, TextProperties> &s
     m_strings = stringMap;
 }
 
+void MythUIButtonListItem::SetTextCb(muibCbFn fn, void *data)
+{
+    m_textCb.fn = fn;
+    m_textCb.data = data;
+}
+
 QString MythUIButtonListItem::GetText(const QString &name) const
 {
     if (name.isEmpty())
         return m_text;
+    if (m_textCb.fn != nullptr)
+    {
+        QString result = m_textCb.fn(name, m_textCb.data);
+        if (!result.isEmpty())
+            return result;
+    }
     if (m_strings.contains(name))
         return m_strings[name].text;
     return QString();
+}
+
+TextProperties MythUIButtonListItem::GetTextProp(const QString &name) const
+{
+    if (name.isEmpty())
+        return {m_text, ""};
+    if (m_textCb.fn != nullptr)
+    {
+        QString result = m_textCb.fn(name, m_textCb.data);
+        if (!result.isEmpty())
+            return {result, ""};
+    }
+    if (m_strings.contains(name))
+        return m_strings[name];
+    return {};
 }
 
 bool MythUIButtonListItem::FindText(const QString &searchStr, const QString &fieldList,
@@ -3440,6 +3467,12 @@ void MythUIButtonListItem::SetImageFromMap(const InfoMap &imageMap)
     m_imageFilenames = imageMap;
 }
 
+void MythUIButtonListItem::SetImageCb(muibCbFn fn, void *data)
+{
+    m_imageCb.fn = fn;
+    m_imageCb.data = data;
+}
+
 MythImage *MythUIButtonListItem::GetImage(const QString &name)
 {
     if (!name.isEmpty())
@@ -3495,6 +3528,13 @@ QString MythUIButtonListItem::GetImageFilename(const QString &name) const
     if (name.isEmpty())
         return m_imageFilename;
 
+    if (m_imageCb.fn != nullptr)
+    {
+        QString result = m_imageCb.fn(name, m_imageCb.data);
+        if (!result.isEmpty())
+            return result;
+    }
+
     InfoMap::const_iterator it = m_imageFilenames.find(name);
 
     if (it != m_imageFilenames.end())
@@ -3531,6 +3571,27 @@ void MythUIButtonListItem::SetStatesFromMap(const InfoMap &stateMap)
 {
     m_states.clear();
     m_states = stateMap;
+}
+
+void MythUIButtonListItem::SetStateCb(muibCbFn fn, void *data)
+{
+    m_stateCb.fn = fn;
+    m_stateCb.data = data;
+}
+
+QString MythUIButtonListItem::GetState(const QString &name)
+{
+    if (name.isEmpty())
+        return QString();
+    if (m_stateCb.fn != nullptr)
+    {
+        QString result = m_stateCb.fn(name, m_textCb.data);
+        if (!result.isEmpty())
+            return result;
+    }
+    if (m_states.contains(name))
+        return m_states[name];
+    return QString();
 }
 
 bool MythUIButtonListItem::checkable() const
@@ -3596,6 +3657,135 @@ bool MythUIButtonListItem::MoveUpDown(bool flag)
     return false;
 }
 
+void MythUIButtonListItem::DoButtonText (MythUIText *buttontext)
+{
+    if (!buttontext)
+        return;
+
+    buttontext->SetText(m_text);
+    buttontext->SetFontState(m_fontState);
+}
+
+void MythUIButtonListItem::DoButtonImage (MythUIImage *buttonimage)
+{
+    if (!buttonimage)
+        return;
+
+    if (!m_imageFilename.isEmpty())
+    {
+        buttonimage->SetFilename(m_imageFilename);
+        buttonimage->Load();
+    }
+    else if (m_image)
+        buttonimage->SetImage(m_image);
+}
+
+void MythUIButtonListItem::DoButtonArrow (MythUIImage *buttonarrow) const
+{
+    if (!buttonarrow)
+        return;
+    buttonarrow->SetVisible(m_showArrow);
+}
+
+void MythUIButtonListItem::DoButtonCheck (MythUIStateType *buttoncheck)
+{
+    if (!buttoncheck)
+        return;
+
+    buttoncheck->SetVisible(m_checkable);
+
+    if (!m_checkable)
+        return;
+
+    if (m_state == NotChecked)
+        buttoncheck->DisplayState(MythUIStateType::Off);
+    else if (m_state == HalfChecked)
+        buttoncheck->DisplayState(MythUIStateType::Half);
+    else
+        buttoncheck->DisplayState(MythUIStateType::Full);
+}
+
+void MythUIButtonListItem::DoButtonLookupText (MythUIText *text,
+                                               const TextProperties& textprop)
+{
+    if (!text)
+        return;
+
+    QString newText = text->GetTemplateText();
+
+    QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
+        QRegularExpression::DotMatchesEverythingOption};
+
+    if (!newText.isEmpty() && newText.contains(re))
+    {
+        QString tempString = newText;
+
+        QRegularExpressionMatchIterator i = re.globalMatch(newText);
+        while (i.hasNext()) {
+            QRegularExpressionMatch match = i.next();
+            QString key = match.captured(4).toLower().trimmed();
+            QString replacement;
+            QString value = GetText(key);
+
+            if (!value.isEmpty())
+            {
+                replacement = QString("%1%2%3%4")
+                    .arg(match.captured(2),
+                         match.captured(3),
+                         value,
+                         match.captured(6));
+            }
+
+            tempString.replace(match.captured(0), replacement);
+        }
+
+        newText = tempString;
+    }
+    else
+        newText = textprop.text;
+
+    if (newText.isEmpty())
+        text->Reset();
+    else
+        text->SetText(newText);
+
+    text->SetFontState(textprop.state.isEmpty() ? m_fontState : textprop.state);
+}
+
+void MythUIButtonListItem::DoButtonLookupFilename (MythUIImage *image, const QString& filename)
+{
+    if (!image)
+        return;
+
+    if (!filename.isEmpty())
+    {
+        image->SetFilename(filename);
+        image->Load();
+    }
+    else
+        image->Reset();
+}
+
+void MythUIButtonListItem::DoButtonLookupImage (MythUIImage *uiimage, MythImage *image)
+{
+    if (!uiimage)
+        return;
+
+    if (image)
+        uiimage->SetImage(image);
+    else
+        uiimage->Reset();
+}
+
+void MythUIButtonListItem::DoButtonLookupState (MythUIStateType *statetype, const QString& name)
+{
+    if (!statetype)
+        return;
+
+    if (!statetype->DisplayState(name))
+        statetype->Reset();
+}
+
 void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selected)
 {
     if (!m_parent)
@@ -3645,158 +3835,33 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
     buttonstate->Reset();
 
-    MythUIText *buttontext = dynamic_cast<MythUIText *>
-                             (buttonstate->GetChild("buttontext"));
-
-    if (buttontext)
+    QList<MythUIType *> descendants = buttonstate->GetAllDescendants();
+    for (MythUIType *obj : descendants)
     {
-        buttontext->SetText(m_text);
-        buttontext->SetFontState(m_fontState);
-    }
+        QString name = obj->objectName();
+        if (name == "buttontext")
+            DoButtonText(dynamic_cast<MythUIText *>(obj));
+        else if (name == "buttonimage")
+            DoButtonImage(dynamic_cast<MythUIImage *>(obj));
+        else if (name == "buttonarrow")
+            DoButtonArrow(dynamic_cast<MythUIImage *>(obj));
+        else if (name == "buttoncheck")
+            DoButtonCheck(dynamic_cast<MythUIStateType *>(obj));
 
-    MythUIImage *buttonimage = dynamic_cast<MythUIImage *>
-                               (buttonstate->GetChild("buttonimage"));
+        TextProperties textprop = GetTextProp(name);
+        if (!textprop.text.isEmpty())
+            DoButtonLookupText(dynamic_cast<MythUIText *>(obj), textprop);
 
-    if (buttonimage)
-    {
-        if (!m_imageFilename.isEmpty())
-        {
-            buttonimage->SetFilename(m_imageFilename);
-            buttonimage->Load();
-        }
-        else if (m_image)
-            buttonimage->SetImage(m_image);
-    }
+        QString filename = GetImageFilename(name);
+        if (!filename.isEmpty())
+            DoButtonLookupFilename (dynamic_cast<MythUIImage *>(obj), filename);
 
-    MythUIImage *buttonarrow = dynamic_cast<MythUIImage *>
-                               (buttonstate->GetChild("buttonarrow"));
+        if (m_images.contains(name))
+            DoButtonLookupImage(dynamic_cast<MythUIImage *>(obj), m_images[name]);
 
-    if (buttonarrow)
-        buttonarrow->SetVisible(m_showArrow);
-
-    MythUIStateType *buttoncheck = dynamic_cast<MythUIStateType *>
-                                   (buttonstate->GetChild("buttoncheck"));
-
-    if (buttoncheck)
-    {
-        buttoncheck->SetVisible(m_checkable);
-
-        if (m_checkable)
-        {
-            if (m_state == NotChecked)
-                buttoncheck->DisplayState(MythUIStateType::Off);
-            else if (m_state == HalfChecked)
-                buttoncheck->DisplayState(MythUIStateType::Half);
-            else
-                buttoncheck->DisplayState(MythUIStateType::Full);
-        }
-    }
-
-    QMap<QString, TextProperties>::iterator string_it = m_strings.begin();
-
-    while (string_it != m_strings.end())
-    {
-        auto *text = dynamic_cast<MythUIText *>
-               (buttonstate->GetChild(string_it.key()));
-
-        if (text)
-        {
-            TextProperties textprop = string_it.value();
-
-            QString newText = text->GetTemplateText();
-
-            QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
-                                   QRegularExpression::DotMatchesEverythingOption};
-
-            if (!newText.isEmpty() && newText.contains(re))
-            {
-                QString tempString = newText;
-
-                QRegularExpressionMatchIterator i = re.globalMatch(newText);
-                while (i.hasNext()) {
-                    QRegularExpressionMatch match = i.next();
-                    QString key = match.captured(4).toLower().trimmed();
-                    QString replacement;
-                    QString value = m_strings.value(key).text;
-
-                    if (!value.isEmpty())
-                    {
-                        replacement = QString("%1%2%3%4")
-                                      .arg(match.captured(2),
-                                           match.captured(3),
-                                           m_strings.value(key).text,
-                                           match.captured(6));
-                    }
-
-                    tempString.replace(match.captured(0), replacement);
-                }
-
-                newText = tempString;
-            }
-            else
-                newText = textprop.text;
-
-            if (newText.isEmpty())
-                text->Reset();
-            else
-                text->SetText(newText);
-
-            text->SetFontState(textprop.state.isEmpty() ? m_fontState : textprop.state);
-        }
-
-        ++string_it;
-    }
-
-    InfoMap::iterator imagefile_it = m_imageFilenames.begin();
-
-    while (imagefile_it != m_imageFilenames.end())
-    {
-        auto *image = dynamic_cast<MythUIImage *>
-                (buttonstate->GetChild(imagefile_it.key()));
-        if (image)
-        {
-            if (!imagefile_it.value().isEmpty())
-            {
-                image->SetFilename(imagefile_it.value());
-                image->Load();
-            }
-            else
-                image->Reset();
-        }
-
-        ++imagefile_it;
-    }
-
-    QMap<QString, MythImage *>::iterator image_it = m_images.begin();
-
-    while (image_it != m_images.end())
-    {
-        auto *image = dynamic_cast<MythUIImage *>
-                (buttonstate->GetChild(image_it.key()));
-        if (image)
-        {
-            if (image_it.value())
-                image->SetImage(image_it.value());
-            else
-                image->Reset();
-        }
-
-        ++image_it;
-    }
-
-    InfoMap::iterator state_it = m_states.begin();
-
-    while (state_it != m_states.end())
-    {
-        auto *statetype = dynamic_cast<MythUIStateType *>
-                    (buttonstate->GetChild(state_it.key()));
-        if (statetype)
-        {
-            if (!statetype->DisplayState(state_it.value()))
-                statetype->Reset();
-        }
-
-        ++state_it;
+        QString luState = GetState(name);
+        if (!luState.isEmpty())
+            DoButtonLookupState(dynamic_cast<MythUIStateType *>(obj), luState);
     }
 
     // There is no need to check the return value here, since we already

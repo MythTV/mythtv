@@ -159,7 +159,7 @@ class MainServer : public QObject, public MythSocketCBs
     static void autoexpireUpdate(void);
 
   private slots:
-    void NewConnection(qt_socket_fd_t socketDescriptor);
+    void NewConnection(qintptr socketDescriptor);
 
   private:
 

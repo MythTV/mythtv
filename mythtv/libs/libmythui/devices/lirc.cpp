@@ -166,8 +166,11 @@ bool LIRC::Init(void)
     if (m_lircdDevice.startsWith('/'))
     {
         // Connect the unix socket
+        struct sockaddr_un addr {};
+        addr.sun_family = AF_UNIX;
+        static constexpr int max_copy = sizeof(addr.sun_path) - 1;
         QByteArray dev = m_lircdDevice.toLocal8Bit();
-        if (dev.size() > 107)
+        if (dev.size() > max_copy)
         {
             LOG(vtype, LOG_ERR, LOC +
                 QString("m_lircdDevice '%1'").arg(m_lircdDevice) +
@@ -185,9 +188,7 @@ bool LIRC::Init(void)
             return false;
         }
 
-        struct sockaddr_un addr {};
-        addr.sun_family = AF_UNIX;
-        strncpy(addr.sun_path, dev.constData(),107);
+        strncpy(addr.sun_path, dev.constData(), max_copy);
 
         int ret = ::connect(lircd_socket, (struct sockaddr*) &addr,
                             sizeof(addr));

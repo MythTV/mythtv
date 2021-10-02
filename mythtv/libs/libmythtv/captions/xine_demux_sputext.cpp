@@ -57,6 +57,30 @@
 #define LINE_LEN      1000
 #define LINE_LEN_QUOT "1000"
 
+#ifdef _WIN32
+    #include <stdlib.h>
+    #include <ctype.h>
+
+    char *strcasestr(const char *str, const char *pattern) {
+        size_t i;
+
+        if (!*pattern)
+            return (char*)str;
+
+        for (; *str; str++) {
+            if (toupper((unsigned char)*str) == toupper((unsigned char)*pattern)) {
+                for (i = 1;; i++) {
+                    if (!pattern[i])
+                        return (char*)str;
+                    if (toupper((unsigned char)str[i]) != toupper((unsigned char)pattern[i]))
+                        break;
+                }
+            }
+        }
+        return NULL;
+    }
+#endif
+
 /*
  * Demuxer code start
  */

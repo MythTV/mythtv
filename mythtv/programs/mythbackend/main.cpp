@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 #endif
 
 #if CONFIG_SYSTEMD_NOTIFY
-    (void)sd_notify(0, "STATUS=Connecting to databse.");
+    (void)sd_notify(0, "STATUS=Connecting to database.");
 #endif
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -159,5 +159,12 @@ int main(int argc, char **argv)
     retval = run_backend(cmdline);
     return retval;
 }
+
+#ifdef _WIN32 // TODO Needs fixing for Windows
+    QString GetPlaybackURL(ProgramInfo *pginfo, bool storePath)
+    {
+        return "";
+    }
+#endif
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

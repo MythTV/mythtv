@@ -30,7 +30,7 @@
 // libmythbase headers
 #include "mythcorecontext.h"
 #include "mythlogging.h"
-#include "unzip.h"
+#include "unzip2.h"
 
 #include "version.h"
 #include "mythversion.h"
@@ -71,32 +71,10 @@ int64_t getDiskSpace(const QString &file_on_disk,
     return freespace;
 }
 
-bool extractZIP(const QString &zipFile, const QString &outDir)
+bool extractZIP(QString &zipFile, const QString &outDir)
 {
-    UnZip uz;
-    UnZip::ErrorCode ec = uz.openArchive(zipFile);
-
-    if (ec != UnZip::Ok)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("extractZIP(): Unable to open ZIP file %1")
-                        .arg(zipFile));
-        return false;
-    }
-
-    ec = uz.extractAll(outDir);
-
-    if (ec != UnZip::Ok)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-                QString("extractZIP(): Error extracting ZIP file %1")
-                        .arg(zipFile));
-        return false;
-    }
-
-    uz.closeArchive();
-
-    return true;
+    UnZip unzip(zipFile);
+    return unzip.extractFile(outDir);
 }
 
 bool gzipFile(const QString &inFilename, const QString &gzipFilename)

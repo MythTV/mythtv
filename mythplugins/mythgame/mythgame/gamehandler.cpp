@@ -469,21 +469,21 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
                           ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PLOT, :PUBLISHER, :VERSION, "
                           ":FANART, :BOXART, :SCREENSHOT)");
 
-            query.bindValue(":SYSTEM",handler->SystemName());
-            query.bindValue(":ROMNAME",game.Rom());
-            query.bindValue(":GAMENAME",GameName);
-            query.bindValue(":GENRE",Genre);
-            query.bindValue(":YEAR",Year);
-            query.bindValue(":GAMETYPE",handler->GameType());
-            query.bindValue(":ROMPATH",game.RomPath());
-            query.bindValue(":COUNTRY",Country);
-            query.bindValue(":CRC32", CRC32);
-            query.bindValue(":PLOT", Plot);
-            query.bindValue(":PUBLISHER", Publisher);
-            query.bindValue(":VERSION", Version);
-            query.bindValue(":FANART", Fanart);
-            query.bindValue(":BOXART", Boxart);
-            query.bindValue(":SCREENSHOT", ScreenShot);
+            query.bindValueNoNull(":SYSTEM",handler->SystemName());
+            query.bindValueNoNull(":ROMNAME",game.Rom());
+            query.bindValueNoNull(":GAMENAME",GameName);
+            query.bindValueNoNull(":GENRE",Genre);
+            query.bindValueNoNull(":YEAR",Year);
+            query.bindValueNoNull(":GAMETYPE",handler->GameType());
+            query.bindValueNoNull(":ROMPATH",game.RomPath());
+            query.bindValueNoNull(":COUNTRY",Country);
+            query.bindValueNoNull(":CRC32", CRC32);
+            query.bindValueNoNull(":PLOT", Plot);
+            query.bindValueNoNull(":PUBLISHER", Publisher);
+            query.bindValueNoNull(":VERSION", Version);
+            query.bindValueNoNull(":FANART", Fanart);
+            query.bindValueNoNull(":BOXART", Boxart);
+            query.bindValueNoNull(":SCREENSHOT", ScreenShot);
 
             if (!query.exec())
                 MythDB::DBError("GameHandler::UpdateGameDB - "

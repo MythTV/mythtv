@@ -178,16 +178,83 @@ bool DTVMultiplex::ParseDVB_T(
         ok = true;
     }
 
-    ok &= m_modSys.Parse("DVB-T");
-    ok &= m_bandwidth.Parse(_bandwidth);
-    ok &= m_hpCodeRate.Parse(_coderate_hp);
-    ok &= m_lpCodeRate.Parse(_coderate_lp);
-    ok &= m_modulation.Parse(_modulation);
-    ok &= m_transMode.Parse(_trans_mode);
-    ok &= m_hierarchy.Parse(_hierarchy);
-    ok &= m_guardInterval.Parse(_guard_interval);
+    m_frequency = _frequency.toUInt(&ok);
+    if (!ok)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid frequency parameter " + _frequency);
+    }
+
     if (ok)
-        m_frequency = _frequency.toInt(&ok);
+    {
+        ok &= m_modSys.Parse("DVB-T");
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid modulation system parameter " + "DVB-T");
+        }
+    }
+
+    if (ok)
+    {
+        ok &= m_bandwidth.Parse(_bandwidth);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid modulation system parameter " + _bandwidth);
+        }
+    }
+
+    if (ok)
+    {
+        ok &= m_hpCodeRate.Parse(_coderate_hp);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid coderate_hp parameter " + _coderate_hp);
+        }
+    }
+
+    if (ok)
+    {
+        ok &= m_lpCodeRate.Parse(_coderate_lp);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid coderate_lp parameter " + _coderate_lp);
+        }
+    }
+
+    if (ok)
+    {
+        ok &= m_modulation.Parse(_modulation);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid modulation parameter " + _modulation);
+        }
+    }
+
+    if (ok)
+    {
+        ok &= m_transMode.Parse(_trans_mode);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid transmission mode parameter " + _trans_mode);
+        }
+    }
+
+    if (ok)
+    {
+        ok &= m_hierarchy.Parse(_hierarchy);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid hierarchy parameter " + _hierarchy);
+        }
+    }
+
+    if (ok)
+    {
+        ok &= m_guardInterval.Parse(_guard_interval);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid guard interval parameter " + _guard_interval);
+        }
+    }
 
     return ok;
 }
@@ -207,7 +274,7 @@ bool DTVMultiplex::ParseDVB_S_and_C(
         ok = true;
     }
 
-    m_symbolRate = _symbol_rate.toInt();
+    m_symbolRate = _symbol_rate.toUInt();
     if (!m_symbolRate)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid symbol rate " +
@@ -216,14 +283,44 @@ bool DTVMultiplex::ParseDVB_S_and_C(
         return false;
     }
 
-    ok &= m_fec.Parse(_fec_inner);
-    ok &= m_modulation.Parse(_modulation);
-
-    if (!_polarity.isEmpty())
-        m_polarity.Parse(_polarity.toLower());
+    if (ok)
+    {
+        ok &= m_fec.Parse(_fec_inner);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid fec parameter " + _fec_inner);
+        }
+    }
 
     if (ok)
-        m_frequency = _frequency.toInt(&ok);
+    {
+        ok &= m_modulation.Parse(_modulation.toLower());
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid modulation parameter " + _modulation);
+        }
+    }
+
+    if (ok)
+    {
+        if (!_polarity.isEmpty())
+        {
+            ok = m_polarity.Parse(_polarity.toLower());
+            if (!ok)
+            {
+                LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid polarity parameter " + _polarity);
+            }
+        }
+    }
+
+    if (ok)
+    {
+        m_frequency = _frequency.toUInt(&ok);
+        if (!ok)
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid frequency parameter " + _frequency);
+        }
+    }
 
     return ok;
 }
@@ -274,6 +371,16 @@ bool DTVMultiplex::ParseDVB_S2(
     const QString &_modulation,  const QString &_polarity,
     const QString &_mod_sys,     const QString &_rolloff)
 {
+    LOG(VB_GENERAL, LOG_DEBUG, LOC + "ParseDVB_S2" +
+        " frequency:"   + _frequency +
+        " inversion:"   + _inversion +
+        " symbol_rate:" + _symbol_rate +
+        " fec_inner:"   + _fec_inner +
+        " modulation:"  + _modulation +
+        " polarity:"    + _polarity +
+        " mod_sys:"     + _mod_sys +
+        " rolloff:"     + _rolloff);
+
     bool ok = ParseDVB_S_and_C(_frequency, _inversion, _symbol_rate,
                                _fec_inner, _modulation, _polarity);
 

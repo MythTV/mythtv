@@ -54,10 +54,7 @@ void FirewireDevice::RemoveListener(TSDataListener *listener)
     {
         it = find(m_listeners.begin(), m_listeners.end(), listener);
         if (it != m_listeners.end())
-        {
-            m_listeners.erase(it);
-            it = m_listeners.begin();
-        }
+            it = m_listeners.erase(it);
     }
     while (it != m_listeners.end());
 

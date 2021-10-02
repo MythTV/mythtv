@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
 /** TextSubtitles
- *  Copyright (c) 2006 by Pekka J‰‰skel‰inen
+ *  Copyright (c) 2006 by Pekka J√§√§skel√§inen
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 

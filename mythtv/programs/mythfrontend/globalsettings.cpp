@@ -627,6 +627,51 @@ static GlobalSpinBoxSetting *RecordOverTime()
     return bs;
 }
 
+static GlobalSpinBoxSetting *MaxStartGap()
+{
+    auto *bs = new GlobalSpinBoxSetting("MaxStartGap", 0, 300, 1, 15);
+
+    bs->setLabel(GeneralSettings::tr("Maximum Start Gap (secs)"));
+
+    bs->setValue(15);
+
+    bs->setHelpText(GeneralSettings::tr("If more than this number of seconds "
+                                        "is missing at the start of a recording "
+                                        "that will be regarded as a gap for "
+                                        "assessing recording quality. The recording "
+                                        "may be marked as damaged."));
+    return bs;
+}
+
+static GlobalSpinBoxSetting *MaxEndGap()
+{
+    auto *bs = new GlobalSpinBoxSetting("MaxEndGap", 0, 300, 1, 15);
+
+    bs->setLabel(GeneralSettings::tr("Maximum End Gap (secs)"));
+
+    bs->setValue(15);
+
+    bs->setHelpText(GeneralSettings::tr("If more than this number of seconds "
+                                        "is missing at the end of a recording "
+                                        "that will be regarded as a gap for "
+                                        "assessing recording quality. The recording "
+                                        "may be marked as damaged."));
+    return bs;
+}
+
+static GlobalSpinBoxSetting *MinimumRecordingQuality()
+{
+    auto *bs = new GlobalSpinBoxSetting("MinimumRecordingQuality", 0, 100, 1, 10);
+
+    bs->setLabel(GeneralSettings::tr("Minimum Recording Quality (percent)"));
+
+    bs->setValue(95);
+
+    bs->setHelpText(GeneralSettings::tr("If recording quality is below this value the "
+                                        "recording is marked as damaged."));
+    return bs;
+}
+
 static GlobalComboBoxSetting *OverTimeCategory()
 {
     auto *gc = new GlobalComboBoxSetting("OverTimeCategory");
@@ -4500,6 +4545,9 @@ GeneralSettings::GeneralSettings()
 
     general2->addChild(RecordPreRoll());
     general2->addChild(RecordOverTime());
+    general2->addChild(MaxStartGap());
+    general2->addChild(MaxEndGap());
+    general2->addChild(MinimumRecordingQuality());
     general2->addChild(CategoryOverTimeSettings());
     addChild(general2);
 

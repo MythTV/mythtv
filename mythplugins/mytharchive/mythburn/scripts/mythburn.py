@@ -5271,7 +5271,7 @@ def main():
     else:
         write( "Setting ionice level to idle")
         p = psutil.Process(os.getpid())
-        p.set_ionice(psutil.IOPRIO_CLASS_IDLE)
+        p.ionice(psutil.IOPRIO_CLASS_IDLE)
 
     import errno
 

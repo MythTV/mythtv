@@ -346,9 +346,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
     {
         long long iib = iibreak.key();
         long long iie = iib + *iibreak;
-        FrameAnalyzer::FrameMap::iterator jjbreak = iibreak;
-        ++jjbreak;
-        breakMap->erase(iibreak);
+        iibreak = breakMap->erase(iibreak);
 
         /* Trim leading blanks from commercial break. */
         long long addb = *blankMap->find(iib);
@@ -364,7 +362,6 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
             sube = MAX_BLANK_FRAMES;
         iie -= sube;
         breakMap->insert(iib, iie - iib);
-        iibreak = jjbreak;
     }
 }
 
@@ -578,8 +575,6 @@ BlankFrameDetector::computeForLogoSurplus(
         {
             long long jjbb = jj.key();
             long long jjee = jjbb + *jj;
-            FrameAnalyzer::FrameMap::Iterator jjnext = jj;
-            ++jjnext;
 
             if (iiee < jjbb)
             {
@@ -595,10 +590,11 @@ BlankFrameDetector::computeForLogoSurplus(
             {
                 /* End of logo break includes beginning of blank-frame break. */
                 overlap = true;
-                m_breakMap.erase(jj);
+                jj = m_breakMap.erase(jj);
                 m_breakMap.insert(iibb, std::max(iiee, jjee) - iibb);
+                continue;
             }
-            else if (jjbb < iibb && iibb < jjee)
+            if (jjbb < iibb && iibb < jjee)
             {
                 /* End of blank-frame break includes beginning of logo break. */
                 overlap = true;
@@ -609,7 +605,7 @@ BlankFrameDetector::computeForLogoSurplus(
                 }
             }
 
-            jj = jjnext;
+            jj++;
         }
     }
 

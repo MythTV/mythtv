@@ -50,7 +50,7 @@ MythServer::MythServer(QObject *parent) : ServerPool(parent)
 {
 }
 
-void MythServer::newTcpConnection(qt_socket_fd_t socket)
+void MythServer::newTcpConnection(qintptr socket)
 {
     emit newConnection(socket);
 }
@@ -102,7 +102,7 @@ bool MythSocketManager::Listen(int port)
     return true;
 }
 
-void MythSocketManager::newConnection(qt_socket_fd_t sd)
+void MythSocketManager::newConnection(qintptr sd)
 {
     QMutexLocker locker(&m_socketListLock);
     auto *ms = new MythSocket(sd, this);

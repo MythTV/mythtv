@@ -217,6 +217,53 @@ class TrustEncSISetting : public TransMythUICheckBoxSetting
     }
 };
 
+// Scan data reference transponder
+class ScanTransponder: public TransMythUIComboBoxSetting
+{
+  public:
+    ScanTransponder() : TransMythUIComboBoxSetting(false)
+    {
+        setLabel(QObject::tr("Satellite tuning data"));
+        setHelpText(
+             QObject::tr(
+                "Select a satellite from this list for the "
+                "tuning data of the reference transponder."));
+        addSelection("(Select Satellite)", "Select", true);
+
+        // Satellite tuning data
+        tdm["Hotbird"] = { "Hotbird", "Hotbird   13.0E", "12015000", "h", "27500000", "8PSK", "DVB-S2", "3/4" };
+        tdm["Astra-1"] = { "Astra-1", "Astra-1   19.2E", "11229000", "v", "22000000", "8PSK", "DVB-S2", "2/3" };
+        tdm["Astra-3"] = { "Astra-3", "Astra-3   23.5E", "12031500", "h", "27500000", "QPSK", "DVB-S2", "auto"};
+        tdm["Astra-2"] = { "Astra-2", "Astra-2   28.2E", "10714000", "h", "22000000", "QPSK", "DVB-S",  "5/6" };
+
+        for (auto &td: tdm)
+        {
+            addSelection(td.fullname, td.name);
+        }
+    }
+
+  private:
+    struct tuningdata {
+        QString name;
+        QString fullname;
+        QString frequency;
+        QString polarity;
+        QString symbolrate;
+        QString modulation;
+        QString modSys;
+        QString fec;
+    };
+    QMap<QString, struct tuningdata> tdm;
+
+  public:
+    QString getFrequency (QString &satname) {return tdm[satname].frequency; }
+    QString getPolarity  (QString &satname) {return tdm[satname].polarity;  }
+    QString getSymbolrate(QString &satname) {return tdm[satname].symbolrate;}
+    QString getModulation(QString &satname) {return tdm[satname].modulation;}
+    QString getModSys    (QString &satname) {return tdm[satname].modSys;    }
+    QString getFec       (QString &satname) {return tdm[satname].fec;       }
+};
+
 class ScanFrequencykHz: public TransTextEditSetting
 {
   public:

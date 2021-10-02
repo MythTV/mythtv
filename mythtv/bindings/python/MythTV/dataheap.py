@@ -1226,7 +1226,7 @@ class VideoGrabber( Grabber ):
 
     def __init__(self, mode, lang='en', db=None):
         dbvalue = {'tv':'TelevisionGrabber', 'movie':'MovieGrabber'}
-        path = {'tv':'metadata/Television/ttvdb.py',
+        path = {'tv':'metadata/Television/ttvdb4.py',
                 'movie':'metadata/Movie/tmdb3.py'}
         self.mode = mode.lower()
         try:

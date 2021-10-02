@@ -39,6 +39,17 @@ static QString map_str(QString str)
     return str;
 }
 
+// Use the service ID as default channel number when there is no
+// DVB logical channel number or ATSC channel number found in the scan.
+//
+static void channum_not_empty(ChannelInsertInfo &chan)
+{
+    if (chan.m_chanNum.isEmpty())
+    {
+        chan.m_chanNum = QString("%1").arg(chan.m_serviceId);
+    }
+}
+
 void ChannelImporter::Process(const ScanDTVTransportList &_transports,
                               int sourceid)
 {
@@ -139,7 +150,6 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports,
 
     // Pull in DB info in transports
     // Channels not found in scan but only in DB are returned in db_trans
-    sourceid = transports[0].m_channels[0].m_sourceId;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
     msg = "";
     ssMsg << QT_ENDL;
@@ -575,21 +585,7 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
             if (handle)
             {
                 bool conflicting = false;
-
-                if (chan.m_chanNum.isEmpty())
-                {
-                    if ((kATSCNonConflicting == type) ||
-                        (kATSCConflicting    == type))
-                    {
-                        chan.m_chanNum = kATSCChannelFormat
-                            .arg(chan.m_atscMajorChannel)
-                            .arg(chan.m_atscMinorChannel);
-                    }
-                    else
-                    {
-                        chan.m_chanNum = QString("%1").arg(chan.m_serviceId);
-                    }
-                }
+                channum_not_empty(chan);
                 conflicting = ChannelUtil::IsConflicting(
                     chan.m_chanNum, chan.m_sourceId);
 
@@ -769,20 +765,7 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 {
                     ChannelUtil::UpdateChannelNumberFromDB(chan);
                 }
-                if (chan.m_chanNum.isEmpty())
-                {
-                    if ((kATSCNonConflicting == type) ||
-                        (kATSCConflicting    == type))
-                    {
-                        chan.m_chanNum = kATSCChannelFormat
-                            .arg(chan.m_atscMajorChannel)
-                            .arg(chan.m_atscMinorChannel);
-                    }
-                    else
-                    {
-                        chan.m_chanNum = QString("%1").arg(chan.m_serviceId);
-                    }
-                }
+                channum_not_empty(chan);
                 conflicting = ChannelUtil::IsConflicting(
                     chan.m_chanNum, chan.m_sourceId, chan.m_channelId);
 
@@ -1474,7 +1457,6 @@ QString ChannelImporter::SimpleFormatChannel(
 
     if (si_standard == "atsc" || si_standard == "scte")
     {
-
         if (si_standard == "atsc")
         {
             ssMsg << (kATSCChannelFormat

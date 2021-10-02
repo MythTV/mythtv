@@ -73,7 +73,7 @@ class MTV_PUBLIC TransportListEditor : public GroupSetting
     explicit TransportListEditor(uint initial_sourceid);
     void Load(void) override; // StandardSetting
 
-    void SetSourceID(uint _sourceid);
+    void SetSourceID(uint sourceid);
 
   public slots:
     void SetSourceID(const QString &name);

@@ -99,6 +99,7 @@ uninstall: $(addsuffix _uninstall,$(SUBDIRS))
 
 test: libs/libmythbase/version.h subdirs
 	cd libs ; $(MAKE) test
+	cd programs ; $(MAKE) test
 
 ctags tags:
 	@echo "Making tags..."

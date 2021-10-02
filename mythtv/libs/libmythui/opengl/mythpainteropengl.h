@@ -3,6 +3,9 @@
 
 // Qt
 #include <QMutex>
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#include <QRecursiveMutex>
+#endif
 #include <QQueue>
 
 // MythTV
@@ -55,10 +58,14 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainterGPU
   protected:
     MythRenderOpenGL *m_render { nullptr };
 
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+    QMutex                     m_imageAndTextureLock { QMutex::Recursive };
+#else
+    QRecursiveMutex            m_imageAndTextureLock;
+#endif
     QMap<MythImage *, MythGLTexture*> m_imageToTextureMap;
     std::list<MythImage *>     m_imageExpireList;
     std::list<MythGLTexture*>  m_textureDeleteList;
-    QMutex                     m_textureDeleteLock;
 
     QVector<MythGLTexture*>    m_mappedTextures;
     std::array<QOpenGLBuffer*,MAX_BUFFER_POOL> m_mappedBufferPool { nullptr };

@@ -450,7 +450,7 @@ class _Mythtv_data(object):
             config_file= open(smoltfile)
             for line in config_file:
                 line = line.strip()
-                if line and line[0] is not "#" and line[-1] is not "=":
+                if line and line[0] != "#" and line[-1] != "=":
                     var,val = line.rsplit("=",1)
                     config[var.strip()] = val.strip("\"")
         except:

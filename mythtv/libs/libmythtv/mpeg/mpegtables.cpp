@@ -881,7 +881,7 @@ QString ProgramMapTable::toString(void) const
     QString str =
         QString("Program Map Section"
                 "\n%1"
-                "       pnum(%2) pid(0x%3) pcrpid(0x%4)\n")
+                "       pnum(%2) pid(0x%3) pcrpid(0x%4)")
         .arg(PSIPTable::toString())
         .arg(ProgramNumber())
         .arg(tsheader()->PID(),0,16)
@@ -891,20 +891,20 @@ QString ProgramMapTable::toString(void) const
         MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
     for (auto & d : desc)
     {
-        str.append(QString("  %1\n")
+        str.append(QString("\n  %1")
                    .arg(MPEGDescriptor(d, 300).toString()));
     }
 
     for (uint i = 0; i < StreamCount(); i++)
     {
-        str.append(QString("  Stream #%1 pid(0x%2) type(0x%3 %4)\n")
+        str.append(QString("\n  Stream #%1 pid(0x%2) type(0x%3 %4)")
                    .arg(i).arg(StreamPID(i), 0, 16)
                    .arg(StreamType(i), 2, 16, QChar('0'))
                    .arg(StreamTypeString(i)));
         desc = MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
         for (auto & d : desc)
         {
-            str.append(QString("    %1\n")
+            str.append(QString("\n    %1")
                        .arg(MPEGDescriptor(d, 300).toString()));
         }
     }

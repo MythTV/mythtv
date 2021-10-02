@@ -197,6 +197,21 @@ QList<MythUIType *> *MythUIType::GetAllChildren(void)
     return &m_childrenList;
 }
 
+QList<MythUIType *> MythUIType::GetAllDescendants(void)
+{
+    QList<MythUIType *> descendants {};
+
+    for (auto child_it = m_childrenList.begin();
+         child_it != m_childrenList.end();
+         child_it++)
+    {
+        MythUIType *item = *child_it;
+        descendants += item;
+        descendants += item->GetAllDescendants();
+    }
+    return descendants;
+}
+
 /**
  *  \brief Delete all child widgets
  */

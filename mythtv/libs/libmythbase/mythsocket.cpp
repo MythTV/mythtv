@@ -76,7 +76,7 @@ static QString to_sample(const QByteArray &payload)
 }
 
 MythSocket::MythSocket(
-    qt_socket_fd_t socket, MythSocketCBs *cb, bool use_shared_thread) :
+    qintptr socket, MythSocketCBs *cb, bool use_shared_thread) :
     ReferenceCounter(QString("MythSocket(%1)").arg(socket)),
     m_tcpSocket(new QTcpSocket()),
     m_callback(cb),

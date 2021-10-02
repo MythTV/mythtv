@@ -249,6 +249,11 @@ bool HDHRStreamHandler::UpdateFilters(void)
 #endif // DEBUG_PID_FILTERS
     QMutexLocker locker(&m_pidLock);
 
+    if (!m_filtersChanged)
+    {
+        return true;
+    }
+
     QString filter = "";
 
     std::vector<uint> range_min;
@@ -290,6 +295,8 @@ bool HDHRStreamHandler::UpdateFilters(void)
 
     LOG(VB_RECORD, LOG_DEBUG, LOC + msg);
 #endif // DEBUG_PID_FILTERS
+
+    m_filtersChanged = false;
 
     return filter == new_filter;
 }

@@ -319,8 +319,8 @@ DatabaseLogger::DatabaseLogger(const char *table) :
 {
     m_query = QString(
         "INSERT INTO %1 "
-        "    (host, application, pid, tid, thread, filename, "
-        "     line, function, msgtime, level, message) "
+        "    (`host`, `application`, `pid`, `tid`, `thread`, `filename`, "
+        "     `line`, `function`, `msgtime`, `level`, `message`) "
         "VALUES (:HOST, :APP, :PID, :TID, :THREAD, :FILENAME, "
         "        :LINE, :FUNCTION, :MSGTIME, :LEVEL, :MESSAGE)")
         .arg(m_handle);

@@ -694,13 +694,13 @@ bool XMLTVParser::parseFile(
                                 pginfo->m_inetref = inetref;
                             }
                         }
-                        else if ((system == "thetvdb.com") && (m_tvGrabberPath.endsWith(QString("/ttvdb.py"))))
+                        else if ((system == "thetvdb.com") && (m_tvGrabberPath.endsWith(QString("/ttvdb4.py"))))
                         {
                             // text is series/<inetref>
                             QString inetrefRaw(xml.readElementText(QXmlStreamReader::SkipChildElements));
                             if (inetrefRaw.startsWith(QString("series/")))
                             {
-                                QString inetref(QString ("ttvdb.py_") + inetrefRaw.section('/',1,1).trimmed());
+                                QString inetref(QString ("ttvdb4.py_") + inetrefRaw.section('/',1,1).trimmed());
                                 pginfo->m_inetref = inetref;
                                 // ProgInfo does not have a collectionref, so we don't set any
                             }

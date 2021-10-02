@@ -1705,20 +1705,100 @@ QString CardUtil::GetInputName(uint inputid)
     return info.m_name;
 }
 
-QString CardUtil::GetStartingChannel(uint inputid)
+// Get start channel for a capture card
+//
+// The start channel is:
+// - the last channel used for Live TV as found in field startchan
+// - if that is not filled in, the first visible channel from
+//   the video source of the capture card
+//
+// The start channel is maintained per capture card instance so
+// different capture cards connected to the same video source
+// and different multirec instances of the same capture card
+// can have a different starting channel value.
+//
+QString CardUtil::GetStartChannel(uint inputid)
 {
+    QString startchan;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT startchan "
                   "FROM capturecard "
                   "WHERE cardid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
 
-    if (!query.exec())
-        MythDB::DBError("CardUtil::GetStartingChannel(uint)", query);
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("CardUtil::GetStartChannel#1", query);
+    }
     else if (query.next())
-        return query.value(0).toString();
+    {
+        startchan = query.value(0).toString();
+    }
 
-    return QString();
+    // Check if starting channel is valid; skip invisible channels.
+    if (!startchan.isEmpty())
+    {
+        query.prepare("SELECT channel.chanid "
+                      "FROM capturecard, channel "
+                      "WHERE capturecard.cardid   = :INPUTID         AND "
+                      "      capturecard.sourceid = channel.sourceid AND "
+                      "      channel.deleted      IS NULL AND "
+                      "      channel.visible      > 0     AND "
+                      "      channel.channum      = :CHANNUM");
+        query.bindValue(":INPUTID", inputid);
+        query.bindValue(":CHANNUM", startchan);
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythDB::DBError("CardUtil::GetStartChannel#2", query);
+        }
+        else if (!query.next())
+        {
+            LOG(VB_GENERAL, LOG_DEBUG,
+                QString("CardUtil[%1]: ").arg(inputid) +
+                QString("Channel %1 on inputid %2 is invalid").arg(startchan).arg(inputid));
+            startchan.clear();
+        }
+    }
+
+    // If we do not have a start channel yet then use the first one available.
+    // Any visible channel will do so there is no "order by" done.
+    if (startchan.isEmpty())
+    {
+        query.prepare("SELECT channel.channum "
+                      "FROM capturecard, channel "
+                      "WHERE capturecard.cardid   = :INPUTID         AND "
+                      "      capturecard.sourceid = channel.sourceid AND "
+                      "      channel.deleted      IS NULL AND "
+                      "      channel.visible      > 0 "
+                      "LIMIT 1");
+        query.bindValue(":INPUTID", inputid);
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythDB::DBError("CardUtil::GetStartChannel#3", query);
+        }
+        else if (query.next())
+        {
+            startchan = query.value(0).toString();
+        }
+    }
+
+    if (startchan.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("CardUtil[%1]: ").arg(inputid) +
+            QString("No start channel found on inputid %1").arg(inputid));
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("CardUtil[%1]: ").arg(inputid) +
+            QString("Start channel %1 on inputid %2").arg(startchan).arg(inputid));
+    }
+
+    return startchan;
 }
 
 QString CardUtil::GetDisplayName(uint inputid)
@@ -3235,7 +3315,7 @@ bool CardUtil::IsVBoxPresent(uint inputid)
 
     // get sourceid and startchan from table capturecard for inputid
     uint chanid = 0;
-    chanid = ChannelUtil::GetChannelValueInt("chanid",GetSourceID(inputid),GetStartingChannel(inputid));
+    chanid = ChannelUtil::GetChannelValueInt("chanid",GetSourceID(inputid),GetStartChannel(inputid));
     if (!chanid)
     {
         // no chanid, presume bad setup

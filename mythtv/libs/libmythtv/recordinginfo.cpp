@@ -995,7 +995,7 @@ bool RecordingInfo::InsertRecording(const QString &ext, bool force_match)
 #if 1
     if (!dirname.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
+        LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("InsertRecording: m_pathname was '%1'. "
                     "This is usually blank.").arg(dirname));
     }
@@ -1109,6 +1109,10 @@ bool RecordingInfo::InsertProgram(RecordingInfo *pg,
     {
         query.bindValue(":ORIGAIRDATE", pg->m_originalAirDate);
     // If there is no originalairdate use "year"
+    }
+    else if (pg->m_year == pg->m_recStartTs.date().year())
+    {
+        query.bindValue(":ORIGAIRDATE", pg->m_recStartTs.date());
     }
     else if (pg->m_year >= 1895)
     {

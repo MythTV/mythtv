@@ -1125,7 +1125,7 @@ int DVBChannel::GetChanID() const
 
     if (idlist.isEmpty())
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC +
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
             QString("No visible channel ID for %1")
             .arg(m_curChannelName));
     }
@@ -1139,13 +1139,13 @@ int DVBChannel::GetChanID() const
             {
                 sl.append(QString::number(chanid));
             }
-            LOG(VB_CHANNEL, LOG_INFO, LOC +
+            LOG(VB_CHANNEL, LOG_DEBUG, LOC +
                 QString("Found for '%1' multiple visible channel IDs: %2")
                 .arg(m_curChannelName, sl.join(" ")));
         }
         else
         {
-            LOG(VB_CHANNEL, LOG_INFO, LOC +
+            LOG(VB_CHANNEL, LOG_DEBUG, LOC +
                 QString("Found visible channel ID %1 for '%2'")
                 .arg(id).arg(m_curChannelName));
         }

@@ -202,8 +202,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     int GetMasterServerStatusPort(void);
     int GetBackendServerPort(void);
     int GetBackendServerPort(const QString &host);
+    static void ClearBackendServerPortCache();
     int GetBackendStatusPort(void);
     int GetBackendStatusPort(const QString &host);
+    static QHash<QString,int> s_serverPortCache;
 
     bool GetScopeForAddress(QHostAddress &addr) const;
     void SetScopeForAddress(const QHostAddress &addr);

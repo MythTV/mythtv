@@ -188,8 +188,13 @@ bool Channel::UpdateDBChannel( uint          MplexID,
         channel.m_atscMinorChan = ATSCMinorChannel;
     if (HAS_PARAM("useeit"))
         channel.m_useOnAirGuide = UseEIT;
+
     if (HAS_PARAM("extendedvisible"))
+    {
+#ifndef _WIN32 // TODO Does not compile on Windows
         channel.m_visible = channelVisibleTypeFromString(ExtendedVisible);
+#endif
+    }
     else if (HAS_PARAM("visible"))
     {
         if (channel.m_visible == kChannelVisible ||
@@ -249,10 +254,16 @@ bool Channel::AddDBChannel( uint          MplexID,
                             uint          ServiceType )
 {
     ChannelVisibleType chan_visible = kChannelVisible;
-    if (HAS_PARAM("extendedvisible"))
-        chan_visible = channelVisibleTypeFromString(ExtendedVisible);
-    else if (HAS_PARAM("visible"))
+
+    #ifdef _WIN32 // TODO Needs fixing for Windows
         chan_visible = (Visible ? kChannelVisible : kChannelNotVisible);
+    #else
+        if (HAS_PARAM("extendedvisible"))
+            chan_visible = channelVisibleTypeFromString(ExtendedVisible);
+        else if (HAS_PARAM("visible"))
+            chan_visible = (Visible ? kChannelVisible : kChannelNotVisible);
+    #endif
+
     
     bool bResult = ChannelUtil::CreateChannel( MplexID, SourceID, ChannelID,
                              CallSign, ChannelName, ChannelNumber,

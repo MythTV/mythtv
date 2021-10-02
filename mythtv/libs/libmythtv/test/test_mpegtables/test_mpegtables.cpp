@@ -21,7 +21,6 @@
 #include "test_mpegtables.h"
 
 #include <iconv.h>
-#include <iostream>
 
 #include "atsctables.h"
 #include "atsc_huffman.h"

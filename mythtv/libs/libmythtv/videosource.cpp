@@ -589,9 +589,9 @@ void TransFreqTableSelector::Save(void)
     }
 }
 
-void TransFreqTableSelector::SetSourceID(uint _sourceid)
+void TransFreqTableSelector::SetSourceID(uint sourceid)
 {
-    m_sourceId = _sourceid;
+    m_sourceId = sourceid;
     Load();
 }
 
@@ -3083,7 +3083,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     if (storage == nullptr)
         return;
     int inputId = storage->getInputID();
-    QString startChan = CardUtil::GetStartingChannel(inputId);
+    QString startChan = CardUtil::GetStartChannel(inputId);
 
     ChannelInfoList channels = ChannelUtil::GetAllChannels(sourceid.toUInt());
 

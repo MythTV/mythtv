@@ -25,6 +25,12 @@
 
 #include "upnpscanner.h"
 
+// Sorting or not sorting the metadata list doesn't seem to have any
+// effect. The metadataViewFlat and metadataViewTree that are
+// constructed from this list get sorted, and those are what is used
+// to build the UI screens.
+#undef SORT_METADATA_LIST
+
 class TreeNodeDataPrivate
 {
   public:
@@ -296,35 +302,24 @@ static MythGenericTree *AddDirNode(
     return sub_node;
 }
 
-static int AddFileNode(MythGenericTree *where_to_add, const QString& name,
+int AddFileNode(MythGenericTree *where_to_add, const QString& name,
                        VideoMetadata *metadata)
 {
     MythGenericTree *sub_node = where_to_add->addNode(name, 0, true);
     sub_node->SetData(QVariant::fromValue(TreeNodeData(metadata)));
-
-    // Text
-    InfoMap textMap;
-    metadata->toMap(textMap);
-    sub_node->SetTextFromMap(textMap);
-
-    // Images
-    InfoMap imageMap;
-    metadata->GetImageMap(imageMap);
-    sub_node->SetImageFromMap(imageMap);
-    sub_node->SetImage("buttonimage", imageMap["smartimage"]);
+    sub_node->SetTextCb( &VideoMetadata::MetadataGetTextCb, metadata);
+    sub_node->SetImageCb(&VideoMetadata::MetadataGetImageCb, metadata);
+    sub_node->SetStateCb(&VideoMetadata::MetadataGetStateCb, metadata);
 
     // Assign images to parent node if this is the first child
     if (where_to_add->visibleChildCount() == 1 &&
         where_to_add->getInt() == kSubFolder)
     {
+        InfoMap imageMap;
+        metadata->GetImageMap(imageMap);
         where_to_add->SetImageFromMap(imageMap);
         where_to_add->SetImage("buttonimage", imageMap["smartimage"]);
     }
-
-    // Statetypes
-    InfoMap stateMap;
-    metadata->GetStateMap(stateMap);
-    sub_node->DisplayStateFromMap(stateMap);
 
     return 1;
 }
@@ -794,8 +789,10 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     transform(m_metadata.getList().begin(), m_metadata.getList().end(),
               mli, to_metadata_ptr());
 
+#ifdef SORT_METADATA_LIST
     metadata_path_sort mps = metadata_path_sort();
     std::sort(mlist.begin(), mlist.end(), mps);
+#endif
 
     using group_to_node_map = std::map<QString, meta_dir_node *>;
     group_to_node_map gtnm;
@@ -915,8 +912,10 @@ void VideoListImp::buildTVList(void)
     transform(m_metadata.getList().begin(), m_metadata.getList().end(),
               mli, to_metadata_ptr());
 
+#ifdef SORT_METADATA_LIST
     metadata_path_sort mps = metadata_path_sort();
     sort(mlist.begin(), mlist.end(), mps);
+#endif
 
     meta_dir_node *video_root = &m_metadataTree;
 
@@ -961,8 +960,10 @@ void VideoListImp::buildDbList()
 
 //    print_meta_list(mlist);
 
+#ifdef SORT_METADATA_LIST
     metadata_path_sort mps = metadata_path_sort();
     std::sort(mlist.begin(), mlist.end(), mps);
+#endif
 
     // TODO: break out the prefix in the DB so this isn't needed
     using prefix_to_node_map = std::map<QString, meta_dir_node *>;

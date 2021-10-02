@@ -93,7 +93,9 @@ class SERVICE_PUBLIC DvrServices : public Service  //, public QScriptable ???
                                                            const QString   &RecGroup,
                                                            const QString   &StorageGroup,
                                                            const QString   &Category,
-                                                           const QString   &Sort) = 0;
+                                                           const QString   &Sort,
+                                                           bool             IgnoreLiveTV,
+                                                           bool             IgnoreDeleted ) = 0;
 
         virtual DTC::ProgramList* GetOldRecordedList     ( bool             Descending,
                                                            int              StartIndex,

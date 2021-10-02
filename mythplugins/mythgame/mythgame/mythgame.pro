@@ -32,8 +32,6 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
-LIBS += -lz -lminizip
-
 QT += xml sql opengl network widgets
 
 android {

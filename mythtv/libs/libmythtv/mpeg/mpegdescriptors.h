@@ -535,12 +535,33 @@ class MaximumBitrateDescriptor : public MPEGDescriptor
         MPEGDescriptor(data, len, DescriptorID::maximum_bitrate) { }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x0E
-    // descriptor_length        8   1.0
+    // descriptor_length        8   1.0       0x03
     // reserved                 2   2.0
     // maximum_bitrate         22   2.2
-    uint MaximumBitrate(void) const { return (m_data[2]<<16 | m_data[3]<<8 | m_data[4]) & 0x3FFFFF; }
-
+    uint MaximumBitrate(void) const
+        { return (m_data[2] & 0x3f) << 16 | m_data[3]<<8 | m_data[4]; }
     QString toString() const override; // MPEGDescriptor
+};
+
+// ISO/IEC 13818-1:2019 (E) p87
+class SmoothingBufferDescriptor : public MPEGDescriptor
+{
+  public:
+    explicit SmoothingBufferDescriptor(const unsigned char *data, int len = 300) :
+        MPEGDescriptor(data, len, DescriptorID::smoothing_buffer) { }
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x10
+    // descriptor_length        8   1.0       0x06
+
+    // reserved                 2   2.0
+    // sb_leak_rate            22   2.2
+    uint SBLeakRate(void) const
+        { return (m_data[2] & 0x3f) << 16 | m_data[3]<<8 | m_data[4]; }
+    // reserved                 2   5.0
+    // sb_size                  2   5.2
+    uint SBSize(void) const
+        { return (m_data[5] & 0x3f) << 16 | m_data[6]<<8 | m_data[7]; }
+    QString toString(void) const override; // MPEGDescriptor
 };
 
 /// ISO 13818-1:2000/Amd.3:2004 page 11
@@ -575,6 +596,7 @@ class AVCVideoDescriptor : public MPEGDescriptor
 };
 
 /// ISO 13818-1:2000/Amd.3:2004 page 12
+/// ISO/IEC 13818-1:2019 (E) p 103
 class AVCTimingAndHRDDescriptor : public MPEGDescriptor
 {
   public:
@@ -604,6 +626,7 @@ class AVCTimingAndHRDDescriptor : public MPEGDescriptor
 };
 
 /// ISO 13818-1:2013/FDAM 3 (E) page 7
+/// ISO/IEC 13818-1:2019 (E) page 121
 class HEVCVideoDescriptor : public MPEGDescriptor
 {
   public:
@@ -642,5 +665,14 @@ class HEVCVideoDescriptor : public MPEGDescriptor
 
     QString toString() const override; // MPEGDescriptor
 };
+
+// class HEVCTimingAndHRDDescriptor : public MPEGDescriptor
+// {
+//     explicit HEVCTimingAndHRDDescriptor(const unsigned char *data, int len = 300) :
+//         MPEGDescriptor(data, len, DescriptorID::hevc_timing_and_hrd) { }
+//     //       Name                      bits  loc  expected value
+//     // descriptor_tag                    8   0.0       0x38
+//     // descriptor_length                 8   1.0
+// };
 
 #endif // MPEG_DESCRIPTORS_H

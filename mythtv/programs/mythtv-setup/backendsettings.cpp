@@ -144,14 +144,20 @@ class IpAddressSettings : public HostCheckBoxSetting
 };
 
 
+void BackendSettings::LocalServerPortChanged ()
+{
+    MythCoreContext::ClearBackendServerPortCache();
+}
 
-static HostTextEditSetting *LocalServerPort()
+HostTextEditSetting *BackendSettings::LocalServerPort() const
 {
     auto *gc = new HostTextEditSetting("BackendServerPort");
     gc->setLabel(QObject::tr("Port"));
     gc->setValue("6543");
     gc->setHelpText(QObject::tr("Unless you've got good reason, don't "
                     "change this."));
+    connect(gc,   &StandardSetting::ChangeSaved,
+            this, &BackendSettings::LocalServerPortChanged);
     return gc;
 };
 
@@ -289,7 +295,7 @@ static GlobalCheckBoxSetting *DeletesFollowLinks()
 static GlobalSpinBoxSetting *HDRingbufferSize()
 {
     auto *bs = new GlobalSpinBoxSetting(
-        "HDRingbufferSize", 25*188, 512*188, 25*188);
+        "HDRingbufferSize", 25*188, 500*188, 25*188);
     bs->setLabel(QObject::tr("HD ringbuffer size (kB)"));
     bs->setHelpText(QObject::tr("The HD device ringbuffer allows the "
                     "backend to weather moments of stress. "
