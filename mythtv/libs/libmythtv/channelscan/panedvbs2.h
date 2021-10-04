@@ -54,7 +54,7 @@ class PaneDVBS2 : public GroupSetting
     void SetTuningParameters(StandardSetting *setting);
 
   protected:
-    ScanTransponder    *m_transponder {nullptr};  // KdW test
+    ScanTransponder    *m_transponder {nullptr};
     ScanFrequencykHz   *m_pfrequency  {nullptr};
     ScanDVBSSymbolRate *m_psymbolrate {nullptr};
     ScanDVBSModulation *m_pmodulation {nullptr};
