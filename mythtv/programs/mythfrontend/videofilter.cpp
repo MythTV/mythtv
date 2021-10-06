@@ -316,14 +316,17 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
 bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
                                          const VideoMetadata &rhs) const
 {
-    bool ret = false;
     switch (m_orderBy)
     {
-        case kOrderByTitle:
-        {
-            ret = lhs.sortBefore(rhs);
-            break;
-        }
+        case kOrderByTitle:                 return lhs.sortBefore(rhs);
+        case kOrderByYearDescending:        return lhs.GetYear()        > rhs.GetYear();
+        case kOrderByUserRatingDescending:  return lhs.GetUserRating()  > rhs.GetUserRating();
+        case kOrderByDateAddedDescending:   return lhs.GetInsertdate()  > rhs.GetInsertdate();
+        case kOrderByLength:                return lhs.GetLength()      < rhs.GetLength();
+        case kOrderByID:                    return lhs.GetID()          < rhs.GetID();
+        case kOrderByFilename:
+            return naturalCompare(lhs.GetSortFilename(),
+                                  rhs.GetSortFilename()) < 0;
         case kOrderBySeasonEp:
         {
             if ((lhs.GetSeason() == rhs.GetSeason())
@@ -333,55 +336,22 @@ bool VideoFilterSettings::meta_less_than(const VideoMetadata &lhs,
                 && (lhs.GetEpisode() == 0)
                 && (rhs.GetEpisode() == 0))
             {
-                ret = lhs.sortBefore(rhs);
+                return lhs.sortBefore(rhs);
             }
-            else if ((lhs.GetSeason() == rhs.GetSeason())
-                     && (lhs.GetTitle() == rhs.GetTitle()))
-                ret = (lhs.GetEpisode() < rhs.GetEpisode());
-            else
-                ret = (lhs.GetSeason() < rhs.GetSeason());
-            break;
-        }
-        case kOrderByYearDescending:
-        {
-            ret = (lhs.GetYear() > rhs.GetYear());
-            break;
-        }
-        case kOrderByUserRatingDescending:
-        {
-            ret = (lhs.GetUserRating() > rhs.GetUserRating());
-            break;
-        }
-        case kOrderByLength:
-        {
-            ret = (lhs.GetLength() < rhs.GetLength());
-            break;
-        }
-        case kOrderByFilename:
-        {
-            const QString& lhsfn = lhs.GetSortFilename();
-            const QString& rhsfn = rhs.GetSortFilename();
-            ret = naturalCompare(lhsfn, rhsfn) < 0;
-            break;
-        }
-        case kOrderByID:
-        {
-            ret = (lhs.GetID() < rhs.GetID());
-            break;
-        }
-        case kOrderByDateAddedDescending:
-        {
-            ret = (lhs.GetInsertdate() > rhs.GetInsertdate());
-            break;
+            if ((lhs.GetSeason() == rhs.GetSeason())
+                && (lhs.GetTitle() == rhs.GetTitle()))
+            {
+                return (lhs.GetEpisode() < rhs.GetEpisode());
+            }
+            return (lhs.GetSeason() < rhs.GetSeason());
         }
         default:
         {
             LOG(VB_GENERAL, LOG_ERR, QString("Error: unknown sort type %1")
                     .arg(m_orderBy));
+            return false;
         }
     }
-
-    return ret;
 }
 
 void VideoFilterSettings::setTextFilter(const QString& val)
