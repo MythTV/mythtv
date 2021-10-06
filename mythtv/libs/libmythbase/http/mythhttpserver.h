@@ -3,6 +3,7 @@
 
 // Qt
 #include <QHostInfo>
+#include <QQueue>
 
 // MythTV
 #include "http/mythhttptypes.h"
@@ -33,8 +34,12 @@ class MythHTTPServer : public MythHTTPThreadPool
     void MasterResolved (QHostInfo Info);
     void HostResolved   (QHostInfo Info);
 
+  public slots:
+    void ThreadFinished ();
+    void ProcessTCPQueue();
+
   protected slots:
-    void newTcpConnection (qintptr Socket) override;
+    virtual void newTcpConnection(qintptr socket);
     void EnableDisable  (bool Enable);
     void NewPaths       (const QStringList& Paths);
     void StalePaths     (const QStringList& Paths);
@@ -71,6 +76,7 @@ class MythHTTPServer : public MythHTTPThreadPool
     int               m_masterStatusPort { 0 };
     int               m_masterSSLPort    { 0 };
     QString           m_masterIPAddress  { };
+    QQueue<qintptr>   m_connectionQueue;
 };
 
 #endif

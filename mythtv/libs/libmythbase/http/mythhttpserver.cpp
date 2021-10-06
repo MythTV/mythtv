@@ -238,29 +238,42 @@ void MythHTTPServer::Stopped()
 #endif
 }
 
-void MythHTTPServer::newTcpConnection(qintptr Socket)
+void MythHTTPServer::ThreadFinished()
 {
-    if (!Socket)
-        return;
+    if (!m_connectionQueue.empty())
+    {
+        emit ProcessTCPQueue();
+    }
+}
 
+void MythHTTPServer::ProcessTCPQueue()
+{
     if (AvailableThreads() > 0)
     {
+        auto Socket = m_connectionQueue.dequeue();
         auto * server = qobject_cast<PrivTcpServer*>(QObject::sender());
         auto ssl = server ? server->GetServerType() == kSSLServer : false;
         auto name = QString("HTTP%1%2").arg(ssl ? "S" : "").arg(ThreadCount());
         auto * newthread = new MythHTTPThread(this, m_config, name, Socket, ssl);
         AddThread(newthread);
         connect(newthread->qthread(), &QThread::finished, this, &MythHTTPThreadPool::ThreadFinished);
+        connect(newthread->qthread(), &QThread::finished, this, &MythHTTPServer::ThreadFinished);
         newthread->start();
         return;
     }
-
     LOG(VB_GENERAL, LOG_ERR, LOC + QString("No HTTP threads available (Have: %1 Max: %2)")
         .arg(AvailableThreads()).arg(MaxThreads()));
+    LOG(VB_GENERAL, LOG_ERR, LOC + QString("  Queue empty? (%1)").arg(m_connectionQueue.empty()));
+}
 
-    // Play nicely when we are busy
-    auto response = MythHTTPResponse::ErrorResponse(HTTPServiceUnavailable, m_config.m_serverName);
-    MythHTTPSocket::RespondDirect(Socket, response, m_config);
+void MythHTTPServer::newTcpConnection(qintptr Socket)
+{
+    if (!Socket)
+        return;
+
+    m_connectionQueue.enqueue(Socket);
+    emit ProcessTCPQueue();
+    return;
 }
 
 bool MythHTTPServer::ReservedPath(const QString& Path)
