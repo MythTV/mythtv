@@ -261,9 +261,6 @@ void MythHTTPServer::ProcessTCPQueue()
         newthread->start();
         return;
     }
-    LOG(VB_GENERAL, LOG_ERR, LOC + QString("No HTTP threads available (Have: %1 Max: %2)")
-        .arg(AvailableThreads()).arg(MaxThreads()));
-    LOG(VB_GENERAL, LOG_ERR, LOC + QString("  Queue empty? (%1)").arg(m_connectionQueue.empty()));
 }
 
 void MythHTTPServer::newTcpConnection(qintptr Socket)
