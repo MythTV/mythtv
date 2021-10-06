@@ -97,8 +97,8 @@ class MTV_PUBLIC RecordingRule
     uint                   m_episode            {0};
 
     // Associated data for rule types
-    int                    m_channelid          {0};
     QString                m_station;     /// callsign?
+    int                    m_channelid          {0};
     /// Time for timeslot rules
     QTime                  m_findtime;
     int                    m_findid;
