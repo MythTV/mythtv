@@ -10,7 +10,7 @@
 #endif
 
 // QOpenGLTimeMonitor is not available with Qt GLES2 builds
-#if defined(QT_OPENGL_ES_2)
+#if defined(QT_OPENGL_ES_2) || (QT_FEATURE_opengles2 == 1)
 
 #ifndef GLuint64
 using GLuint64 = uint64_t;

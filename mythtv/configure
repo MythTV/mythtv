@@ -6558,7 +6558,7 @@ qt_opengles_check() {
     check_ecxx ${qt_inc} <<EOF
 #include <QtCore/QtCore>
 #include <QtGui/qtguiglobal.h>
-#if !defined(QT_OPENGL_ES_2)
+#if !defined(QT_OPENGL_ES_2) && (QT_FEATURE_opengles2 < 1)
 No OpenGL ES here!
 #endif
 int x;
