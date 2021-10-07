@@ -187,7 +187,7 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
             // If the return type is QObject* we need to cleanup
             if (returnvalue.canConvert<QObject*>())
             {
-                LOG(VB_GENERAL, LOG_INFO, LOC + "Deleting object");
+                LOG(VB_HTTP, LOG_DEBUG, LOC + "Deleting object");
                 auto * object = returnvalue.value<QObject*>();
                 delete object;
             }
