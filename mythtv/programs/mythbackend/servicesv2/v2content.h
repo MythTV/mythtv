@@ -74,7 +74,7 @@ class V2Content : public MythHTTPService
         V2ArtworkInfoList*
                             GetRecordingArtworkList( int              RecordedId,
                                                      int              ChanId,
-                                                     const QDateTime &recstarttsRaw  );
+                                                     const QDateTime &StartTime  );
 
         V2ArtworkInfoList*
                             GetProgramArtworkList( const QString &Inetref,
@@ -87,7 +87,7 @@ class V2Content : public MythHTTPService
 
         QFileInfo           GetPreviewImage     ( int              RecordedId,
                                                   int              ChanId,
-                                                  const QDateTime &recstarttsRaw,
+                                                  const QDateTime &StartTime,
                                                   int              Width,
                                                   int              Height,
                                                   int              SecsIn,
@@ -95,7 +95,7 @@ class V2Content : public MythHTTPService
 
         QFileInfo           GetRecording        ( int              RecordedId,
                                                   int              ChanId,
-                                                  const QDateTime &recstarttsRaw );
+                                                  const QDateTime &StartTime );
 
         QFileInfo           GetMusic            ( int Id );
         QFileInfo           GetVideo            ( int Id );
@@ -119,7 +119,7 @@ class V2Content : public MythHTTPService
 
         // V2LiveStreamInfo     *AddRecordingLiveStream ( int              RecordedId,
         //                                                   int              ChanId,
-        //                                                   const QDateTime &recstarttsRaw,
+        //                                                   const QDateTime &StartTime,
         //                                                   int              MaxSegments,
         //                                                   int              Width,
         //                                                   int              Height,
