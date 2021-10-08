@@ -107,7 +107,7 @@ class V2Dvr : public MythHTTPService
 
     V2Program*     GetRecorded         ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &recstarttsRaw  );
+                                            const QDateTime &StartTime  );
 
     bool              AddRecordedCredits  ( int RecordedId,
                                             const QJsonObject & json);
@@ -116,25 +116,25 @@ class V2Dvr : public MythHTTPService
 
     bool              RemoveRecorded      ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &recstarttsRaw,
+                                            const QDateTime &StartTime,
                                             bool             ForceDelete,
                                             bool             AllowRerecord  );
 
     bool              DeleteRecording     ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &recstarttsRaw,
+                                            const QDateTime &StartTime,
                                             bool             ForceDelete,
                                             bool             AllowRerecord  );
 
     bool              UnDeleteRecording   ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &recstarttsRaw );
+                                            const QDateTime &StartTime );
 
     bool              StopRecording       ( int              RecordedId );
 
     bool              ReactivateRecording ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &recstarttsRaw );
+                                            const QDateTime &StartTime );
 
     bool              RescheduleRecordings( void );
 
@@ -142,29 +142,29 @@ class V2Dvr : public MythHTTPService
 
     bool              UpdateRecordedWatchedStatus ( int   RecordedId,
                                                     int   ChanId,
-                                                    const QDateTime &recstarttsRaw,
+                                                    const QDateTime &StartTime,
                                                     bool  Watched);
 
     long              GetSavedBookmark     ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &recstarttsRaw,
+                                            const QDateTime &StartTime,
                                             const QString   &OffsetType );
 
     bool              SetSavedBookmark     ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &recstarttsRaw,
+                                            const QDateTime &StartTime,
                                             const QString   &OffsetType,
                                             long             Offset
                                             );
 
     V2CutList*     GetRecordedCutList  ( int              RecordedId,
                                             int              ChanId,
-                                            const QDateTime &recstarttsRaw,
+                                            const QDateTime &StartTime,
                                             const QString   &OffsetType );
 
     V2CutList*     GetRecordedCommBreak ( int              RecordedId,
                                               int              ChanId,
-                                              const QDateTime &recstarttsRaw,
+                                              const QDateTime &StartTime,
                                               const QString   &OffsetType );
 
     V2CutList*     GetRecordedSeek      ( int              RecordedId,
@@ -315,7 +315,7 @@ class V2Dvr : public MythHTTPService
     bool              DisableRecordSchedule( uint             RecordId   );
 
     int               RecordedIdForKey( int              ChanId,
-                                        const QDateTime &recstarttsRaw );
+                                        const QDateTime &StartTime );
 
     int               RecordedIdForPathname( const QString   &pathname );
 
