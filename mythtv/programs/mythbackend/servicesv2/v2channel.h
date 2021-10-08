@@ -147,9 +147,9 @@ class V2Channel : public MythHTTPService
 
         bool                      RemoveVideoSource      ( uint SourceID );
 
-        V2LineupList*          GetDDLineupList        ( const QString &/*Source*/,
-                                                           const QString &/*UserId*/,
-                                                           const QString &/*Password*/ );
+        V2LineupList*             GetDDLineupList        ( const QString &Source,
+                                                           const QString &UserId,
+                                                           const QString &Password );
 
         int                       FetchChannelsFromSource( uint       SourceId,
                                                            uint       CardId,
