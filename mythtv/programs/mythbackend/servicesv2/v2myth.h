@@ -116,7 +116,7 @@ class V2Myth : public MythHTTPService
                                               const QString &Extra,
                                               const QString &ProgressText,
                                               float Progress,
-                                              int   Duration,
+                                              int   Timeout,
                                               bool  Fullscreen,
                                               uint  Visibility,
                                               uint  Priority,
