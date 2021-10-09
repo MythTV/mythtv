@@ -15,9 +15,9 @@
 * User and developer discussion
    * [Forums](https://forum.mythtv.org)
    * [Mailing lists](https://lists.mythtv.org/mailman/listinfo)
-   * IRC
-      * Users: ircs://irc.libera.chat:6697/mythtv-users (Libera.​Chat, #mythtv-users)
-      * Developers: ircs://irc.libera.chat:6697/mythtv  (Libera.​Chat, #mythtv)
+   * [IRC](https://www.mythtv.org/wiki/IRC)
+      * [Users](https://web.libera.chat/?nick=Guest?#mythtv-users): ircs://irc.libera.chat:6697/mythtv-users (Libera.​Chat, #mythtv-users)
+      * [Developers](https://web.libera.chat/?nick=Guest?#mythtv): ircs://irc.libera.chat:6697/mythtv  (Libera.​Chat, #mythtv)
 
 * License
    * MythTV is licensed under the GPLv2, see LICENSE for details
@@ -32,7 +32,7 @@
 
 * Development
    * [Source code documentation (doxygen)](https://code.mythtv.org/doxygen)
-   * [Coding standards](http://www.mythtv.org/wiki/Coding_Standards)
+   * [Coding standards](https://www.mythtv.org/wiki/Coding_Standards)
    * [Buildbot status](https://code.mythtv.org/buildbot)
    * [Github workflows](https://github.com/MythTV/mythtv/actions)
    * [cppcheck report](https://code.mythtv.org/cppcheck)
