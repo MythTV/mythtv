@@ -9,6 +9,8 @@
 
 * Documentation
    * [Documentation/Wiki](https://www.mythtv.org/wiki)
+   * [User Manual](https://www.mythtv.org/wiki/User_Manual:Index)
+   * [FAQ](https://www.mythtv.org/wiki/Frequently_Asked_Questions)
 
 * User and developer discussion
    * [Forums](https://forum.mythtv.org)
@@ -16,6 +18,10 @@
    * IRC
       * Users: ircs://irc.libera.chat:6697/mythtv-users (Libera.​Chat, #mythtv-users)
       * Developers: ircs://irc.libera.chat:6697/mythtv  (Libera.​Chat, #mythtv)
+
+* License
+   * MythTV is licensed under the GPLv2, see LICENSE for details
+   * This applies to all code unless otherwise stated in the source files or to code in an external/ directory
 
 * Contributions
    * If you have patches for a new feature or a bug fix, please consider forking the project on ![Github](https://github.com/MythTV/mythtv) and creating a pull request.
