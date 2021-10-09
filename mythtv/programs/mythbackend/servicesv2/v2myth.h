@@ -22,6 +22,7 @@ class V2Myth : public MythHTTPService
     Q_CLASSINFO( "Version"    , "5.2" )
     Q_CLASSINFO( "AddStorageGroupDir",    "methods=POST" )
     Q_CLASSINFO( "RemoveStorageGroupDir", "methods=POST" )
+    Q_CLASSINFO( "ParseISODateString",    "methods=GET"  )
     Q_CLASSINFO( "PutSetting",            "methods=POST" )
     Q_CLASSINFO( "TestDBSettings",        "methods=POST" )
     Q_CLASSINFO( "SendMessage",           "methods=POST" )
@@ -31,6 +32,9 @@ class V2Myth : public MythHTTPService
     Q_CLASSINFO( "DelayShutdown",         "methods=POST" )
     Q_CLASSINFO( "ProfileSubmit",         "methods=POST" )
     Q_CLASSINFO( "ProfileDelete",         "methods=POST" )
+    Q_CLASSINFO( "ProfileURL",            "methods=GET"  )
+    Q_CLASSINFO( "ProfileUpdated",        "methods=GET"  )
+    Q_CLASSINFO( "ProfileText",           "methods=GET"  )
     Q_CLASSINFO( "ManageDigestUser",      "methods=POST" )
     Q_CLASSINFO( "ManageUrlProtection",   "methods=POST" )
 
@@ -72,7 +76,8 @@ class V2Myth : public MythHTTPService
     QString             GetFormatTime       ( const QDateTime &Time );
 
     QDateTime           ParseISODateString  ( const QString   &DateTime );
-    V2LogMessageList*   GetLogs            ( const QString   &HostName,
+
+    V2LogMessageList*   GetLogs             ( const QString   &HostName,
                                               const QString   &Application,
                                               int             PID,
                                               int             TID,

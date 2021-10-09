@@ -460,12 +460,12 @@ QString V2Myth::GetFormatTime(const QDateTime &Time)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QDateTime V2Myth::ParseISODateString(const QString& DateTimeString)
+QDateTime V2Myth::ParseISODateString(const QString& DateTime)
 {
-    QDateTime dateTime = QDateTime::fromString(DateTimeString, Qt::ISODate);
+    auto dateTime = QDateTime::fromString(DateTime, Qt::ISODate);
 
     if (!dateTime.isValid())
-        throw QString( "Unable to parse DateTimeString" );
+        throw QString( "Unable to parse DateTime" );
 
     return dateTime;
 }
