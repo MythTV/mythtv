@@ -2001,7 +2001,6 @@ MYTHTV_CONFIG_LIST='
     x11
     libexiv2_external
     libbluray_external
-    soundtouch_external
     profiletype
     debugtype
     systemd_notify
@@ -2806,7 +2805,6 @@ enable systemd_notify
 enable systemd_journal
 enable libexiv2_external
 enable libbluray_external
-enable soundtouch_external
 enable waylandextras
 
 # mythtv paths
@@ -5934,14 +5932,12 @@ if enabled libexiv2_external ; then
 fi
 
 # soundtouch
-if enabled soundtouch_external ; then
-    if $($pkg_config --atleast-version="1.8.0" soundtouch); then
-        # use_pkg_config does not add cxxflags
-        add_cxxflags $($pkg_config --cflags soundtouch)
-        add_extralibs $($pkg_config --libs soundtouch)
-    else
-        disable soundtouch_external
-    fi
+if $($pkg_config --atleast-version="1.8.0" soundtouch); then
+    # use_pkg_config does not add cxxflags
+    add_cxxflags $($pkg_config --cflags soundtouch)
+    add_extralibs $($pkg_config --libs soundtouch)
+else
+    die "ERROR: cannot find soundtouch 1.8.0 or later."
 fi
 
 if [ $target_os = "linux" ] ; then
@@ -7481,7 +7477,6 @@ if enabled source_path_used; then
         external/libmythbluray
         external/libmythdvdnav
         external/libudfread
-        external/libmythsoundtouch
     "
     FILES="
         Makefile
@@ -7499,7 +7494,6 @@ if enabled source_path_used; then
         external/libmythbluray/Makefile
         external/libmythdvdnav/Makefile
         external/libudfread/Makefile
-        external/libmythsoundtouch/Makefile
     "
     map 'mkdir -p $v' $DIRS;
     map 'test -f "$source_path/$v" && $ln_s "$source_path/$v" $v' $FILES
@@ -7586,11 +7580,6 @@ if enabled libbluray_external; then
     echo "bluray support            yes (system)"
 else
     echo "bluray support            yes (internal)"
-fi
-if enabled soundtouch_external; then
-    echo "soundtouch support        yes (system)"
-else
-    echo "soundtouch support        yes (internal)"
 fi
 echo "BD-J (Bluray java)        ${bdjava-no}"
 echo "BD-J type                 ${bdj_type}"
@@ -8078,10 +8067,5 @@ echo "Configuring libmythdvdnav..."
 echo "Configuring libudfread..."
 (cd external/libudfread ; \
        ${qmakeconf} -o Makefile)
-if ! enabled soundtouch_external; then
-    echo "Configuring libmythsoundtouch..."
-    (cd external/libmythsoundtouch ;
-           ${qmakeconf} -o Makefile)
-fi
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0

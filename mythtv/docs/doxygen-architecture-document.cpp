@@ -97,8 +97,8 @@ There are also a few simple \ref testing "testing shortcuts".
       and some old UI widgets are implemented by libmyth.
 
       This library depends on libav*, \ref libmythbase "libmythbase",
-      \ref libmythui "libmythui", \ref libmythupnp "libmythupnp",
-      libmythsoundtouch and libmythfreesurround.
+      \ref libmythui "libmythui", \ref libmythupnp "libmythupnp"
+      and libmythfreesurround.
 
       Any changes to this library's ABI may trigger a %MythTV binary version
       change because the plugins depend on it.
@@ -138,13 +138,6 @@ There are also a few simple \ref testing "testing shortcuts".
       an option for software decoding of MPEG-1 and MPEG-2 files.
       FFmpeg is still used for decoding MPEG still frames when this
       library is selected for playback.
-
-      This library does not depend on any of our libraries.
-
-  <dt>libmythsoundtouch
-      <dd>Pitch preserving audio resampling library.
-      <a href="http://www.surina.net/soundtouch/">External Website</a>.
-      We use this for the time-stretch feature.
 
       This library does not depend on any of our libraries.
 
