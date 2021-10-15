@@ -8378,7 +8378,7 @@ bool TV::MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDia
     if (category == kMenuCategoryMenu)
     {
         result = Context.m_menu.Show(Context.m_node, QDomNode(), *this, Menu, false);
-        if (result && Context.m_doDisplay)
+        if (result && Context.m_visible)
         {
             QVariant v;
             v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id,
@@ -8515,7 +8515,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
     if (category == kMenuCategoryMenu)
     {
         result = Context.m_menu.Show(Context.m_node, QDomNode(), *this, Menu, false);
-        if (result && Context.m_doDisplay)
+        if (result && Context.m_visible)
         {
             QVariant v;
             v.setValue(MythTVMenuNodeTuple(Context.m_menu.m_id,

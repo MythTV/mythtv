@@ -70,7 +70,7 @@ class MythTVMenuItemContext
     MenuCurrentContext m_currentContext { kMenuCurrentDefault };
     const QString      m_action;
     const QString      m_actionText;
-    bool               m_doDisplay      { false };
+    bool               m_visible        { false };
 };
 
 class MythTVMenuItemDisplayer
@@ -98,7 +98,7 @@ class MTV_PUBLIC MythTVMenu
     QString     Translate(const QString& Text) const;
     bool        Show(const QDomNode& Node, const QDomNode& Selected,
                      MythTVMenuItemDisplayer& Displayer, MythOSDDialogData* Menu,
-                     bool Display = true) const;
+                     bool Visible = true) const;
     QString     GetName() const;
     const char* GetTranslationContext() const;
     const QString& GetKeyBindingContext() const;

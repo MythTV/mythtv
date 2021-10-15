@@ -17,7 +17,6 @@ win32-msvc* {
 }
 
 !using_libbluray_external:INCLUDEPATH += ../../external/libmythbluray/src
-INCLUDEPATH += ../../external/libmythsoundtouch
 INCLUDEPATH += ../../external/libudfread
 INCLUDEPATH += ../../libs/libmythtv/mpeg
 INCLUDEPATH += ../../libs/libmythtv/vbitext

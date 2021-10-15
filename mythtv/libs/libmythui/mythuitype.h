@@ -95,6 +95,7 @@ class MUI_PUBLIC MythUIType : public QObject, public XMLParseBase
     MythUIType *GetChildAt(QPoint p, bool recursive=true,
                            bool focusable=true) const;
     QList<MythUIType *> *GetAllChildren(void);
+    QList<MythUIType *> GetAllDescendants(void);
 
     void DeleteChild(const QString &name);
     void DeleteChild(MythUIType *child);

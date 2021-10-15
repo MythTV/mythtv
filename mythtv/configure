@@ -5931,6 +5931,15 @@ if enabled libexiv2_external ; then
     fi
 fi
 
+# soundtouch
+if $($pkg_config --atleast-version="1.8.0" soundtouch); then
+    # use_pkg_config does not add cxxflags
+    add_cxxflags $($pkg_config --cflags soundtouch)
+    add_extralibs $($pkg_config --libs soundtouch)
+else
+    die "ERROR: cannot find soundtouch 1.8.0 or later."
+fi
+
 if [ $target_os = "linux" ] ; then
     . /etc/os-release
 fi
@@ -6545,7 +6554,7 @@ qt_opengles_check() {
     check_ecxx ${qt_inc} <<EOF
 #include <QtCore/QtCore>
 #include <QtGui/qtguiglobal.h>
-#if !defined(QT_OPENGL_ES_2)
+#if !defined(QT_OPENGL_ES_2) && (QT_FEATURE_opengles2 < 1)
 No OpenGL ES here!
 #endif
 int x;
@@ -7468,7 +7477,6 @@ if enabled source_path_used; then
         external/libmythbluray
         external/libmythdvdnav
         external/libudfread
-        external/libmythsoundtouch
     "
     FILES="
         Makefile
@@ -7486,7 +7494,6 @@ if enabled source_path_used; then
         external/libmythbluray/Makefile
         external/libmythdvdnav/Makefile
         external/libudfread/Makefile
-        external/libmythsoundtouch/Makefile
     "
     map 'mkdir -p $v' $DIRS;
     map 'test -f "$source_path/$v" && $ln_s "$source_path/$v" $v' $FILES
@@ -8059,9 +8066,6 @@ echo "Configuring libmythdvdnav..."
        ${qmakeconf} -o Makefile)
 echo "Configuring libudfread..."
 (cd external/libudfread ; \
-       ${qmakeconf} -o Makefile)
-echo "Configuring libmythsoundtouch..."
-(cd external/libmythsoundtouch ;
        ${qmakeconf} -o Makefile)
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0

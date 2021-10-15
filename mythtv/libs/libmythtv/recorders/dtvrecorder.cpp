@@ -1270,6 +1270,21 @@ void DTVRecorder::HandlePAT(const ProgramAssociationTable *_pat)
     int progNum = m_streamData->DesiredProgram();
     uint pmtpid = _pat->FindPID(progNum);
 
+    // If we have not found the desired program in the PAT and this happens to be
+    // an SPTS then update the desired program to the one that is present in the PAT.
+    if (!pmtpid)
+    {
+        if (_pat->ProgramCount() == 1)
+        {
+            int oldProgNum = progNum;
+            progNum = _pat->ProgramNumber(0);
+            LOG(VB_GENERAL, LOG_INFO, LOC +
+                QString("Update desired program found in SPTS PAT from %1 to %2")
+                .arg(oldProgNum).arg(progNum));
+            GetStreamData()->SetDesiredProgram(progNum);
+            pmtpid = _pat->FindPID(progNum);
+        }
+    }
     if (!pmtpid)
     {
         LOG(VB_RECORD, LOG_ERR, LOC +

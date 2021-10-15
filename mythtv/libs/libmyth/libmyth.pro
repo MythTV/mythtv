@@ -89,20 +89,18 @@ HEADERS += netgrabbermanager.h
 SOURCES += mythrssmanager.cpp           netutils.cpp
 SOURCES += netgrabbermanager.cpp
 
-INCLUDEPATH += ../../external/libmythsoundtouch ../libmythfreesurround
+INCLUDEPATH += ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
 INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 INCLUDEPATH += ../.. ../../external/FFmpeg
 INCLUDEPATH += ../libmythservicecontracts
 INCLUDEPATH += $${POSTINC}
-DEPENDPATH += ../../external/libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../ ../libmythui ../libmythbase
 DEPENDPATH += ../libmythupnp
 DEPENDPATH += ./audio
 DEPENDPATH += ../libmythservicecontracts
 
-LIBS += -L../../external/libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
@@ -120,7 +118,6 @@ LIBS += -L../libmythservicecontracts         -lmythservicecontracts-$${LIBVERSIO
 
 !win32-msvc* {
     !using_libbluray_external:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
-    POST_TARGETDEPS += ../../external/libmythsoundtouch/libmythsoundtouch-$${MYTH_LIB_EXT}
     POST_TARGETDEPS += ../../external/FFmpeg/libswresample/$$avLibName(swresample)
     POST_TARGETDEPS += ../../external/FFmpeg/libavutil/$$avLibName(avutil)
     POST_TARGETDEPS += ../../external/FFmpeg/libavcodec/$$avLibName(avcodec)
@@ -204,7 +201,7 @@ mingw | win32-msvc* {
     SOURCES += audio/audiooutputdx.cpp
     HEADERS += mediamonitor-windows.h   audio/audiooutputwin.h
     HEADERS += audio/audiooutputdx.h
-    LIBS += -lwinmm -lws2_32 -luser32 -lsamplerate
+    LIBS += -lwinmm -lws2_32 -luser32 -lsamplerate -lSoundTouch
 }
 
 macx {
