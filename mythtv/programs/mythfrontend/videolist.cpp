@@ -194,7 +194,7 @@ struct metadata_path_sort
 
     static bool sort(const QString &lhs, const QString &rhs)
     {
-        return StringUtil::naturalCompare(lhs, rhs) < 0;
+        return StringUtil::naturalSortCompare(lhs, rhs);
     }
 };
 
