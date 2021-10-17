@@ -7,6 +7,8 @@
 
 #include <climits> // for CHAR_BIT
 
+#include "ternarycompare.h"
+
 #if defined(__cpp_lib_bitops) && __cpp_lib_bitops >= 201907L
 using std::countl_one;
 #else
@@ -215,7 +217,7 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
         // compare these sequences
         const QString& subA(a.mid(begSeqA - a.unicode(), currA - begSeqA));
         const QString& subB(b.mid(begSeqB - b.unicode(), currB - begSeqB));
-        const int cmp = QString::localeAwareCompare(subA, subB);
+        int cmp = QString::localeAwareCompare(subA, subB);
 
         if (cmp != 0)
         {
@@ -231,9 +233,10 @@ int StringUtil::naturalCompare(const QString &_a, const QString &_b, Qt::CaseSen
         while ((currA->isPunct() || currA->isSpace()) &&
                (currB->isPunct() || currB->isSpace()))
         {
-            if (*currA != *currB)
+            cmp = ternary_compare(*currA, *currB);
+            if (cmp != 0)
             {
-                return (*currA < *currB) ? -1 : +1;
+                return cmp;
             }
             ++currA;
             ++currB;
