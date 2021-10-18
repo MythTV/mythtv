@@ -72,9 +72,9 @@ using SystemTime = std::chrono::time_point<SystemClock>;
 //
 
 /// @brief Helper function for convert a floating point number to a duration.
-//
-//  \param  value A floating point number that represents a time in seconds.
-//  \returns The same number of seconds as a std::chrono::seconds.
+///
+/// \param  value A floating point number that represents a time in seconds.
+/// \returns The same number of seconds as a std::chrono::seconds.
 template <typename T>
 typename std::enable_if_t<std::is_floating_point_v<T>, std::chrono::seconds>
 secondsFromFloat (T value)
@@ -83,9 +83,9 @@ secondsFromFloat (T value)
 }
 
 /// @brief Helper function for convert a floating point number to a duration.
-//
-//  \param  value A floating point number that represents a time in milliseconds.
-//  \returns The same number of seconds as a std::chrono::milliseconds.
+///
+/// \param  value A floating point number that represents a time in milliseconds.
+/// \returns The same number of seconds as a std::chrono::milliseconds.
 template <typename T>
 typename std::enable_if_t<std::is_floating_point_v<T>, std::chrono::milliseconds>
 millisecondsFromFloat (T value)
@@ -94,9 +94,9 @@ millisecondsFromFloat (T value)
 }
 
 /// @brief Helper function for convert a floating point number to a duration.
-//
-//  \param  value A floating point number that represents a time in microseconds.
-//  \returns The same number of seconds as a std::chrono::microseconds.
+///
+/// \param  value A floating point number that represents a time in microseconds.
+/// \returns The same number of seconds as a std::chrono::microseconds.
 template <typename T>
 typename std::enable_if_t<std::is_floating_point_v<T>, std::chrono::microseconds>
 microsecondsFromFloat (T value)
@@ -116,12 +116,12 @@ std::chrono::milliseconds millisecondsFromParts (int hours, int minutes = 0,
 }
 
 /// @brief Convert a timeval to a duration.
-//
-//  Always specify the desired precision when calling this function.
-//  I.E. Always call in the form:
-//  durationFromTimeval<std::chrono::milliseconds>(t);
-//
-//  Timevals can support a precision as small as microseconds.
+///
+/// Always specify the desired precision when calling this function.
+/// I.E. Always call in the form:
+/// durationFromTimeval<std::chrono::milliseconds>(t);
+///
+/// Timevals can support a precision as small as microseconds.
 template <typename T>
 constexpr T durationFromTimeval (timeval t)
 {
@@ -133,12 +133,12 @@ constexpr T durationFromTimeval (timeval t)
 }
 
 /// @brief Compute delta between timevals and convert to a duration.
-//
-//  Always specify the desired precision when calling this function.
-//  I.E. Always call in the form:
-//  durationFromTimevalDelta<std::chrono::milliseconds>(t);
-//
-//  Timevals can support a precision as small as microseconds.
+///
+/// Always specify the desired precision when calling this function.
+/// I.E. Always call in the form:
+/// durationFromTimevalDelta<std::chrono::milliseconds>(t);
+///
+/// Timevals can support a precision as small as microseconds.
 template <typename T>
 constexpr T durationFromTimevalDelta (timeval a, timeval b)
 {
@@ -150,12 +150,12 @@ constexpr T durationFromTimevalDelta (timeval a, timeval b)
 }
 
 /// @brief Convert a timespec to a duration.
-//
-//  Always specify the desired precision when calling this function.
-//  I.E. Always call in the form:
-//  durationFromTimespec<std::chrono::milliseconds>(t);
-//
-//  Timevals can support a precision as small as nanoseconds.
+///
+/// Always specify the desired precision when calling this function.
+/// I.E. Always call in the form:
+/// durationFromTimespec<std::chrono::milliseconds>(t);
+///
+/// Timevals can support a precision as small as nanoseconds.
 template <typename T>
 constexpr T durationFromTimespec (struct timespec time)
 {
@@ -172,13 +172,13 @@ constexpr T durationFromTimespec (struct timespec time)
 //
 
 /// @brief Get the currenttime as a duration.
-//
-//  Always specify the desired precision when calling this function.
-//  I.E. Always call in the form:
-//  nowAsDuration<std::chrono::milliseconds>(t);
-//
-//  This function is based upon the gettimeoday function, so can
-//  return precisions as small as microseconds.
+///
+/// Always specify the desired precision when calling this function.
+/// I.E. Always call in the form:
+/// nowAsDuration<std::chrono::milliseconds>(t);
+///
+/// This function is based upon the gettimeoday function, so can
+/// return precisions as small as microseconds.
 template <typename T>
 T nowAsDuration (bool adjustForTZ = false)
 {

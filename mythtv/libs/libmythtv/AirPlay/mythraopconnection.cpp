@@ -578,14 +578,14 @@ void MythRAOPConnection::timevalToNTP(timeval t, uint32_t &ntpSec, uint32_t &ntp
 
 
 ///
-// \param buf       A pointer to the received data.
-// \param type      The type of this packet.
-// \param seq       The sequence number of this packet. This value is not
-//                  always set.
-// \param timestamp The frame number of the first frame in this
-//                  packet.  NOT milliseconds. This value is not
-//                  always set.
-// \returns true if the packet header was successfully parsed.
+/// \param buf       A pointer to the received data.
+/// \param type      The type of this packet.
+/// \param seq       The sequence number of this packet. This value is not
+///                  always set.
+/// \param timestamp The frame number of the first frame in this
+///                  packet.  NOT milliseconds. This value is not
+///                  always set.
+/// \returns true if the packet header was successfully parsed.
 bool MythRAOPConnection::GetPacketType(const QByteArray &buf, uint8_t &type,
                                        uint16_t &seq, uint64_t &timestamp)
 {
