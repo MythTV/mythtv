@@ -8,12 +8,15 @@
 #include <QHash>
 #include <QDir>
 #include <QRegularExpression>
+#include <QStandardPaths>
 
+#include "mythconfig.h"
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
 #include "mythdirs.h"
 #include "mythcorecontext.h"
+#include "mythmiscutil.h"
 
 static MythDB *mythdb = nullptr;
 static QMutex dbLock;
@@ -51,6 +54,29 @@ MythDB *GetMythDB(void)
 void DestroyMythDB(void)
 {
     MythDB::destroyMythDB();
+}
+
+MythDB *GetMythTestDB(const QString& testname)
+{
+    auto * db = MythDB::getMythDB();
+
+    DatabaseParams params {};
+    params.m_dbHostName = "localhost";
+    params.m_dbHostPing = false;
+#if CONFIG_DEBUGTYPE
+    params.m_dbName =
+        QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
+        QDir::separator() +
+        QString("mythtv_%1.%2.sqlite3")
+        .arg(testname).arg(MythRandom(),8,16,QLatin1Char('0'));
+#else
+    Q_UNUSED(testname);
+    params.m_dbName = ":memory:";
+#endif
+    params.m_dbType = "QSQLITE";
+    db->SetDatabaseParams(params);
+
+    return db;
 }
 
 struct SingleSetting
