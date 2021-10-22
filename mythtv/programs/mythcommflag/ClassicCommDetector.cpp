@@ -1883,6 +1883,9 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
 {
     LOG(VB_COMMFLAG, LOG_INFO, "CommDetect::BuildBlankFrameCommList()");
 
+    if (m_blankFrameMap.count() == 0)
+        return;
+
     auto *bframes = new long long[m_blankFrameMap.count()*2];
     auto *c_start = new long long[m_blankFrameMap.count()];
     auto *c_end   = new long long[m_blankFrameMap.count()];
@@ -1893,14 +1896,6 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
 
     for (auto it = m_blankFrameMap.begin(); it != m_blankFrameMap.end(); ++it)
         bframes[frames++] = it.key();
-
-    if (frames == 0)
-    {
-        delete[] c_start;
-        delete[] c_end;
-        delete[] bframes;
-        return;
-    }
 
     // detect individual commercials from blank frames
     // commercial end is set to frame right before ending blank frame to
