@@ -1864,7 +1864,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
             // 0x00 - undefined
             return -1;
         }
-        if ((rawRating >= 0x01) && (rawRating <= 0x0F))
+        if (rawRating <= 0x0F)
         {
             // 0x01 to 0x0F - minumum age = rating + 3 years
             return rawRating + 3;
