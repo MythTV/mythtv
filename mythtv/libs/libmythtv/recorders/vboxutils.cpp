@@ -400,7 +400,7 @@ bool VBox::sendQuery(const QString& query, QDomDocument* xmlDoc)
     return true;
 }
 
-QString VBox::getStrValue(QDomElement &element, const QString &name, int index)
+QString VBox::getStrValue(const QDomElement &element, const QString &name, int index)
 {
     QDomNodeList nodes = element.elementsByTagName(name);
     if (!nodes.isEmpty())
@@ -414,7 +414,7 @@ QString VBox::getStrValue(QDomElement &element, const QString &name, int index)
     return QString();
 }
 
-int VBox::getIntValue(QDomElement &element, const QString &name, int index)
+int VBox::getIntValue(const QDomElement &element, const QString &name, int index)
 {
     QString value = getStrValue(element, name, index);
 

@@ -43,7 +43,7 @@ AudioSettings::AudioSettings(
     bool                        set_initial_vol,
     bool                        use_passthru,
     int                         upmixer_startup,
-    AudioOutputSettings        *custom) :
+    const AudioOutputSettings  *custom) :
     m_mainDevice(std::move(main_device)),
     m_passthruDevice(std::move(passthru_device)),
     m_format(format),

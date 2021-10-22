@@ -1538,7 +1538,7 @@ void NetworkControl::notifyDataAvailable(void)
 }
 
 void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
-                                       QString &reply)
+                                       const QString &reply)
 {
     if (!m_clients.contains(ncc))
     {

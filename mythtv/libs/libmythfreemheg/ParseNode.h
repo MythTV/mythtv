@@ -125,7 +125,7 @@ class MHPBool: public MHParseNode
 class MHPString: public MHParseNode
 {
   public:
-    explicit MHPString(MHOctetString &pSrc): MHParseNode(PNString) { m_Value.Copy(pSrc); }
+    explicit MHPString(const MHOctetString &pSrc): MHParseNode(PNString) { m_Value.Copy(pSrc); }
 
   public:
     MHOctetString m_Value;

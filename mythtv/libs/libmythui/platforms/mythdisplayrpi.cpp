@@ -176,7 +176,7 @@ const MythDisplayModes& MythDisplayRPI::GetVideoModes(void)
     m_videoModes.clear();
     m_modeMap.clear();
     DisplayModeMap screenmap;
-    HDMI_RES_GROUP_T groups[2] = { HDMI_RES_GROUP_CEA, HDMI_RES_GROUP_DMT };
+    const HDMI_RES_GROUP_T groups[2] = { HDMI_RES_GROUP_CEA, HDMI_RES_GROUP_DMT };
 
     for (int i = 0; i < 2; ++i)
     {
