@@ -1145,7 +1145,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
                 frameRate = frameRateMap[(bufptr[3] & 0x0000000f)];
             }
         }
-        else if (!m_videoBytesRemaining && !m_audioBytesRemaining)
+        else if (!m_audioBytesRemaining)
         {
             if ((stream_id >= PESStreamID::MPEGVideoStreamBegin) &&
                 (stream_id <= PESStreamID::MPEGVideoStreamEnd))
