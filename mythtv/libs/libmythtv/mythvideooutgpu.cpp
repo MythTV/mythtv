@@ -136,6 +136,7 @@ MythVideoOutputGPU *MythVideoOutputGPU::Create(MythMainWindow* MainWindow, MythR
 //            video = new VideoOutputD3D();
 #endif
 #ifdef USING_OPENGL
+        // cppcheck-suppress knownConditionTrueFalse
         if (!video && renderer.contains("opengl") && openglrender)
         {
             video = new MythVideoOutputOpenGL(MainWindow, openglrender,
