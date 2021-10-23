@@ -1011,60 +1011,7 @@ bool V2Dvr::SetRecordedMarkup (int RecordedId, const QJsonObject &jsonObj)
 V2EncoderList* V2Dvr::GetEncoderList()
 {
     auto* pList = new V2EncoderList();
-
-    QReadLocker tvlocker(&TVRec::s_inputsLock);
-    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
-    for (auto * elink : qAsConst(tvList))
-    {
-        if (elink != nullptr)
-        {
-            V2Encoder *pEncoder = pList->AddNewEncoder();
-
-            pEncoder->setId            ( elink->GetInputID()      );
-            pEncoder->setState         ( elink->GetState()        );
-            pEncoder->setLocal         ( elink->IsLocal()         );
-            pEncoder->setConnected     ( elink->IsConnected()     );
-            pEncoder->setSleepStatus   ( elink->GetSleepStatus()  );
-
-            if (pEncoder->GetLocal())
-                pEncoder->setHostName( gCoreContext->GetHostName() );
-            else
-                pEncoder->setHostName( elink->GetHostName() );
-
-            for (const auto & inputInfo : qAsConst(inputInfoList))
-            {
-                if (inputInfo.m_inputId == static_cast<uint>(elink->GetInputID()))
-                {
-                    V2Input *input = pEncoder->AddNewInput();
-                    V2FillInputInfo(input, inputInfo);
-                }
-            }
-
-            switch ( pEncoder->GetState() )
-            {
-                case kState_WatchingLiveTV:
-                case kState_RecordingOnly:
-                case kState_WatchingRecording:
-                {
-                    ProgramInfo  *pInfo = elink->GetRecording();
-
-                    if (pInfo)
-                    {
-                        V2Program *pProgram = pEncoder->Recording();
-
-                        V2FillProgramInfo( pProgram, pInfo, true, true );
-
-                        delete pInfo;
-                    }
-
-                    break;
-                }
-
-                default:
-                    break;
-            }
-        }
-    }
+    FillEncoderList(pList->GetEncoders(), pList);
     return pList;
 }
 
@@ -1259,55 +1206,17 @@ V2ProgramList* V2Dvr::GetConflictList( int  nStartIndex,
                                         int  nCount,
                                         int  nRecordId       )
 {
-    RecordingList  recordingList; // Auto-delete deque
-    RecList  tmpList; // Standard deque, objects must be deleted
-
-    if (nRecordId <= 0)
-        nRecordId = -1;
-
-    // NOTE: Fetching this information directly from the schedule is
-    //       significantly faster than using ProgramInfo::LoadFromScheduler()
-    auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
-    if (scheduler)
-        scheduler->GetAllPending(tmpList, nRecordId);
-
-    // Sort the upcoming into only those which are conflicts
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = tmpList.begin(); it < tmpList.end(); ++it)
-    {
-        if (((*it)->GetRecordingStatus() == RecStatus::Conflict) &&
-            ((*it)->GetRecordingStartTime() >= MythDate::current()))
-        {
-            recordingList.push_back(new RecordingInfo(**it));
-        }
-        delete *it;
-        *it = nullptr;
-    }
-
-    // ----------------------------------------------------------------------
-    // Build Response
-    // ----------------------------------------------------------------------
-
     auto *pPrograms = new V2ProgramList();
-
-    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)recordingList.size() ) : 0;
-    nCount        = (nCount > 0) ? std::min( nCount, (int)recordingList.size() ) : recordingList.size();
-    int nEndIndex = std::min((nStartIndex + nCount), (int)recordingList.size() );
-
-    for( int n = nStartIndex; n < nEndIndex; n++)
-    {
-        ProgramInfo *pInfo = recordingList[ n ];
-
-        V2Program *pProgram = pPrograms->AddNewProgram();
-
-        V2FillProgramInfo( pProgram, pInfo, true );
-    }
-
-    // ----------------------------------------------------------------------
+    int size = FillUpcomingList(pPrograms->GetPrograms(), pPrograms,
+                                         nStartIndex,
+                                         nCount,
+                                         true, // bShowAll,
+                                         nRecordId,
+                                         RecStatus::Conflict); // nRecStatus );
 
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );
-    pPrograms->setTotalAvailable( recordingList.size() );
+    pPrograms->setTotalAvailable( size );
     pPrograms->setAsOf          ( MythDate::current() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );
@@ -1321,72 +1230,17 @@ V2ProgramList* V2Dvr::GetUpcomingList( int  nStartIndex,
                                         int  nRecordId,
                                         int  nRecStatus )
 {
-    RecordingList  recordingList; // Auto-delete deque
-    RecList  tmpList; // Standard deque, objects must be deleted
-
-    if (nRecordId <= 0)
-        nRecordId = -1;
-
-    // NOTE: Fetching this information directly from the schedule is
-    //       significantly faster than using ProgramInfo::LoadFromScheduler()
-    auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
-    if (scheduler)
-        scheduler->GetAllPending(tmpList, nRecordId);
-
-    // Sort the upcoming into only those which will record
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = tmpList.begin(); it < tmpList.end(); ++it)
-    {
-        if ((nRecStatus != 0) &&
-            ((*it)->GetRecordingStatus() != nRecStatus))
-        {
-            delete *it;
-            *it = nullptr;
-            continue;
-        }
-
-        if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Pending) &&
-                           ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
-                          ((*it)->GetRecordingStatus() == RecStatus::Recorded) ||
-                          ((*it)->GetRecordingStatus() == RecStatus::Conflict)) &&
-            ((*it)->GetRecordingEndTime() > MythDate::current()))
-        {   // NOLINT(bugprone-branch-clone)
-            recordingList.push_back(new RecordingInfo(**it));
-        }
-        else if (bShowAll &&
-                 ((*it)->GetRecordingEndTime() > MythDate::current()))
-        {
-            recordingList.push_back(new RecordingInfo(**it));
-        }
-
-        delete *it;
-        *it = nullptr;
-    }
-
-    // ----------------------------------------------------------------------
-    // Build Response
-    // ----------------------------------------------------------------------
-
     auto *pPrograms = new V2ProgramList();
-
-    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)recordingList.size() ) : 0;
-    nCount        = (nCount > 0) ? std::min( nCount, (int)recordingList.size() ) : recordingList.size();
-    int nEndIndex = std::min((nStartIndex + nCount), (int)recordingList.size() );
-
-    for( int n = nStartIndex; n < nEndIndex; n++)
-    {
-        ProgramInfo *pInfo = recordingList[ n ];
-
-        V2Program *pProgram = pPrograms->AddNewProgram();
-
-        V2FillProgramInfo( pProgram, pInfo, true );
-    }
-
-    // ----------------------------------------------------------------------
+    int size = FillUpcomingList(pPrograms->GetPrograms(), pPrograms,
+                                         nStartIndex,
+                                         nCount,
+                                         bShowAll,
+                                         nRecordId,
+                                         nRecStatus );
 
     pPrograms->setStartIndex    ( nStartIndex     );
     pPrograms->setCount         ( nCount          );
-    pPrograms->setTotalAvailable( recordingList.size() );
+    pPrograms->setTotalAvailable( size );
     pPrograms->setAsOf          ( MythDate::current() );
     pPrograms->setVersion       ( MYTH_BINARY_VERSION );
     pPrograms->setProtoVer      ( MYTH_PROTO_VERSION  );

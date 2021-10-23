@@ -6,6 +6,16 @@
 #include "channelutil.h"
 #include "channelinfo.h"
 #include "channelgroup.h"
+#include "v2encoder.h"
+#include "tv_rec.h"
+#include "cardutil.h"
+#include "encoderlink.h"
+#include "mythscheduler.h"
+#include "scheduler.h"
+#include "v2frontend.h"
+#include "backendcontext.h"
+
+extern QMap<int, EncoderLink *> tvList;
 
 void V2FillProgramInfo( V2Program *pProgram,
                       ProgramInfo  *pInfo,
@@ -663,6 +673,159 @@ void V2FillSeek(V2CutList* pCutList, RecordingInfo* rInfo, MarkTypes marktype)
         }
     }
 }
+
+void FillEncoderList(QVariantList &list, QObject* parent)
+{
+    QReadLocker tvlocker(&TVRec::s_inputsLock);
+    QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
+    for (auto * elink : qAsConst(tvList))
+    {
+        if (elink != nullptr)
+        {
+            // V2Encoder *pEncoder = list->AddNewEncoder();
+            V2Encoder *pEncoder = new V2Encoder( parent );
+            list.append( QVariant::fromValue<QObject *>( pEncoder ));
+
+            pEncoder->setId            ( elink->GetInputID()      );
+            pEncoder->setState         ( elink->GetState()        );
+            pEncoder->setLocal         ( elink->IsLocal()         );
+            pEncoder->setConnected     ( elink->IsConnected()     );
+            pEncoder->setSleepStatus   ( elink->GetSleepStatus()  );
+
+            if (pEncoder->GetLocal())
+                pEncoder->setHostName( gCoreContext->GetHostName() );
+            else
+                pEncoder->setHostName( elink->GetHostName() );
+
+            for (const auto & inputInfo : qAsConst(inputInfoList))
+            {
+                if (inputInfo.m_inputId == static_cast<uint>(elink->GetInputID()))
+                {
+                    V2Input *input = pEncoder->AddNewInput();
+                    V2FillInputInfo(input, inputInfo);
+                }
+            }
+
+            switch ( pEncoder->GetState() )
+            {
+                case kState_WatchingLiveTV:
+                case kState_RecordingOnly:
+                case kState_WatchingRecording:
+                {
+                    ProgramInfo  *pInfo = elink->GetRecording();
+
+                    if (pInfo)
+                    {
+                        V2Program *pProgram = pEncoder->Recording();
+
+                        V2FillProgramInfo( pProgram, pInfo, true, true );
+
+                        delete pInfo;
+                    }
+
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+// Note - special value -999 for nRecStatus means all values less than 0.
+// This is needed by BackendStatus API
+int FillUpcomingList(QVariantList &list, QObject* parent,
+                                        int& nStartIndex,
+                                        int& nCount,
+                                        bool bShowAll,
+                                        int  nRecordId,
+                                        int  nRecStatus )
+{
+    RecordingList  recordingList; // Auto-delete deque
+    RecList  tmpList; // Standard deque, objects must be deleted
+
+    if (nRecordId <= 0)
+        nRecordId = -1;
+
+    // NOTE: Fetching this information directly from the schedule is
+    //       significantly faster than using ProgramInfo::LoadFromScheduler()
+    auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
+    if (scheduler)
+        scheduler->GetAllPending(tmpList, nRecordId);
+
+    // Sort the upcoming into only those which will record
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = tmpList.begin(); it < tmpList.end(); ++it)
+    {
+        if ((nRecStatus == -999
+               && (*it)->GetRecordingStatus() >= 0)
+         || (nRecStatus != 0 && nRecStatus != -999
+               && (*it)->GetRecordingStatus() != nRecStatus))
+        {
+            delete *it;
+            *it = nullptr;
+            continue;
+        }
+
+        if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Pending) &&
+                           ((*it)->GetRecordingStatus() <= RecStatus::WillRecord)) ||
+                          ((*it)->GetRecordingStatus() == RecStatus::Recorded) ||
+                          ((*it)->GetRecordingStatus() == RecStatus::Conflict)) &&
+            ((*it)->GetRecordingEndTime() > MythDate::current()))
+        {   // NOLINT(bugprone-branch-clone)
+            recordingList.push_back(new RecordingInfo(**it));
+        }
+        else if (bShowAll &&
+                 ((*it)->GetRecordingEndTime() > MythDate::current()))
+        {
+            recordingList.push_back(new RecordingInfo(**it));
+        }
+
+        delete *it;
+        *it = nullptr;
+    }
+
+    // ----------------------------------------------------------------------
+    // Build Response
+    // ----------------------------------------------------------------------
+
+    nStartIndex   = (nStartIndex > 0) ? std::min( nStartIndex, (int)recordingList.size() ) : 0;
+    nCount        = (nCount > 0) ? std::min( nCount, (int)recordingList.size() ) : recordingList.size();
+    int nEndIndex = std::min((nStartIndex + nCount), (int)recordingList.size() );
+
+    for( int n = nStartIndex; n < nEndIndex; n++)
+    {
+        ProgramInfo *pInfo = recordingList[ n ];
+        V2Program *pProgram = new V2Program( parent );
+        list.append( QVariant::fromValue<QObject *>( pProgram ));
+        V2FillProgramInfo( pProgram, pInfo, true );
+    }
+
+    return recordingList.size();
+}
+
+void FillFrontendList(QVariantList &list, QObject* parent, bool OnLine)
+{
+    QMap<QString, Frontend*> frontends;
+    if (OnLine)
+        frontends = gBackendContext->GetConnectedFrontends();
+    else
+        frontends = gBackendContext->GetFrontends();
+
+    for (auto * fe : qAsConst(frontends))
+    {
+        V2Frontend *pFrontend = new V2Frontend( parent );
+        list.append( QVariant::fromValue<QObject *>( pFrontend ));
+        pFrontend->setName(fe->m_name);
+        pFrontend->setIP(fe->m_ip.toString());
+        int port = gCoreContext->GetNumSettingOnHost("FrontendStatusPort",
+                                                        fe->m_name, 6547);
+        pFrontend->setPort(port);
+        pFrontend->setOnLine(fe->m_connectionCount > 0);
+    }
+}
+
 
 int V2CreateRecordingGroup(const QString& groupName)
 {

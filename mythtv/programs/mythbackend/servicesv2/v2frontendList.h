@@ -39,6 +39,9 @@ class V2FrontendList : public QObject
             CopyListContents< V2Frontend >( this, m_Frontends, src->m_Frontends );
         }
 
+        // This is needed so that common routines can get a non-const m_Encoders
+        // reference
+        QVariantList& GetFrontends() {return m_Frontends;}
         V2Frontend *AddNewFrontend()
         {
             // We must make sure the object added to the QVariantList has

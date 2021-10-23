@@ -75,4 +75,15 @@ void V2FillInputInfo( V2Input *input, const InputInfo& inputInfo);
 
 int V2CreateRecordingGroup(const QString& groupName);
 
+void FillEncoderList(QVariantList& list, QObject* parent);
+
+int FillUpcomingList(QVariantList& list, QObject* parent,
+                                        int& nStartIndex,
+                                        int& nCount,
+                                        bool bShowAll,
+                                        int  nRecordId,
+                                        int  nRecStatus );
+
+void FillFrontendList(QVariantList &list, QObject* parent, bool OnLine);
+
 #endif //V2SERVICEUTIL_H

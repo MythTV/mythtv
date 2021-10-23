@@ -15,13 +15,13 @@
 #include <QMutex>
 #include <QMap>
 
-// #include "httpserver.h"
 #include "libmythbase/http/mythhttpservice.h"
 #include "http/mythmimedatabase.h"
 #include "http/mythhttpdata.h"
 #include "preformat.h"
 
 #include "programinfo.h"
+#include "v2backendStatus.h"
 
 class Scheduler;
 class AutoExpire;
@@ -38,6 +38,7 @@ class V2Status : public MythHTTPService
     Q_CLASSINFO("Version",      "1.0")
     Q_CLASSINFO("Status",       "methods=GET,POST,HEAD")
     Q_CLASSINFO("xml",          "methods=GET,POST,HEAD")
+    Q_CLASSINFO("GetBackendStatus", "methods=GET,POST,HEAD")
 
     public:
         V2Status();
@@ -49,13 +50,13 @@ class V2Status : public MythHTTPService
         Preformat*         GetStatusHTML  ( ); // HTML
         Preformat*         GetStatus ();  // XML
         Preformat*         xml ();        // XML
+        V2BackendStatus*   GetBackendStatus(); // Standardized version of GetStatus
 
     private:
 
-        Scheduler                   *m_pSched;
+        Scheduler                   *m_pSched       {nullptr};
         QMap<int, EncoderLink *>    *m_pEncoders;
-        AutoExpire                  *m_pExpirer;
-        MainServer                  *m_pMainServer;
+        MainServer                  *m_pMainServer  {nullptr};
         bool                         m_bIsMaster;
         int                          m_nPreRollSeconds;
         QMutex                       m_settingLock;
@@ -82,6 +83,7 @@ class V2Status : public MythHTTPService
         static void    FillChannelInfo   ( QDomElement  &channel,
                                            ProgramInfo  *pInfo,
                                            bool          bDetails = true );
+        void FillDriveSpace(V2MachineInfo* pMachineInfo);
 };
 
 #endif

@@ -610,23 +610,9 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
 V2FrontendList* V2Myth::GetFrontends( bool OnLine )
 {
     auto *pList = new V2FrontendList();
-    QMap<QString, Frontend*> frontends;
-    if (OnLine)
-        frontends = gBackendContext->GetConnectedFrontends();
-    else
-        frontends = gBackendContext->GetFrontends();
 
-    for (auto * fe : qAsConst(frontends))
-    {
-        V2Frontend *pFrontend = pList->AddNewFrontend();
-        pFrontend->setName(fe->m_name);
-        pFrontend->setIP(fe->m_ip.toString());
-        int port = gCoreContext->GetNumSettingOnHost("FrontendStatusPort",
-                                                        fe->m_name, 6547);
-        pFrontend->setPort(port);
-        pFrontend->setOnLine(fe->m_connectionCount > 0);
-    }
-
+    FillFrontendList(pList->GetFrontends(), pList,
+                                        OnLine);
     return pList;
 }
 

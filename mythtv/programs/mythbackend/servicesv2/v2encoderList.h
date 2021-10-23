@@ -40,7 +40,9 @@ class V2EncoderList : public QObject
         {
             CopyListContents< V2Encoder >( this, m_Encoders, src->m_Encoders );
         }
-
+        // This is needed so that common routines can get a non-const m_Encoders
+        // reference
+        QVariantList& GetEncoders() {return m_Encoders;}
         V2Encoder *AddNewEncoder()
         {
             // We must make sure the object added to the QVariantList has

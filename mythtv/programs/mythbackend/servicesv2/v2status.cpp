@@ -26,6 +26,8 @@
 // MythTV headers
 #include "v2status.h"
 #include "libmythbase/http/mythhttpmetaservice.h"
+#include "v2backendStatus.h"
+#include "v2serviceUtil.h"
 
 #include "mythcorecontext.h"
 #include "mythversion.h"
@@ -54,16 +56,31 @@ Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
 void V2Status::RegisterCustomTypes()
 {
     qRegisterMetaType<Preformat*>("Preformat");
+    qRegisterMetaType<V2MachineInfo*>("V2MachineInfo");
+    qRegisterMetaType<V2BackendStatus*>("V2BackendStatus");
+    qRegisterMetaType<V2Encoder*>("V2Encoder");
+    qRegisterMetaType<V2Program*>("V2Program");
+    qRegisterMetaType<V2Frontend*>("V2Frontend");
+    qRegisterMetaType<V2StorageGroup*>("V2StorageGroup");
+    qRegisterMetaType<V2Job*>("V2Job");
+    qRegisterMetaType<V2ChannelInfo*>("V2ChannelInfo");
+    qRegisterMetaType<V2RecordingInfo*>("V2RecordingInfo");
+    qRegisterMetaType<V2ArtworkInfoList*>("V2ArtworkInfoList");
+    qRegisterMetaType<V2ArtworkInfo*>("V2ArtworkInfo");
+    qRegisterMetaType<V2CastMemberList*>("V2CastMemberList");
+    qRegisterMetaType<V2CastMember*>("V2CastMember");
+    qRegisterMetaType<V2Input*>("V2Input");
+    qRegisterMetaType<V2Backend*>("V2Backend");
 }
 
 V2Status::V2Status () : MythHTTPService(s_service)
 {
     m_pEncoders = &tvList;  // extern
     m_pSched    =  dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
-    m_pExpirer  = m_pSched->GetExpirer();;
+    if (m_pSched)
+        m_pMainServer = m_pSched->GetMainServer();
     m_bIsMaster = gCoreContext->IsMasterHost();
     m_nPreRollSeconds = gCoreContext->GetNumSetting("RecordPreRoll", 0);
-    m_pMainServer = m_pSched->GetMainServer();
 }
 
 // HTML
@@ -113,6 +130,239 @@ static QString setting_to_localtime(const char *setting)
     QString origDateString = gCoreContext->GetSetting(setting);
     QDateTime origDate = MythDate::fromString(origDateString);
     return MythDate::toString(origDate, MythDate::kDateTimeFull);
+}
+
+static QDateTime setting_to_qdatetime(const char *setting)
+{
+    QString origDateString = gCoreContext->GetSetting(setting);
+    QDateTime origDate = MythDate::fromString(origDateString);
+    return origDate;
+}
+
+// Standardized version of GetStatus that supports xml, json, etc.
+V2BackendStatus*  V2Status::GetBackendStatus()
+{
+    auto* pStatus = new V2BackendStatus();
+    pStatus->setAsOf          ( MythDate::current() );
+    pStatus->setVersion       ( MYTH_BINARY_VERSION );
+    pStatus->setProtoVer      ( MYTH_PROTO_VERSION  );
+    // Encoders
+    FillEncoderList(pStatus->GetEncoders(), pStatus);
+    // Upcoming recordings
+    int nStartIndex = 0;
+    int nCount = 10;
+    // Scheduled Recordings
+    FillUpcomingList(pStatus->GetScheduled(), pStatus,
+                                        nStartIndex,
+                                        nCount,
+                                        true,   // bShowAll,
+                                        -1,     // nRecordId,
+                                        -999);  // nRecStatus )
+    // Frontends
+    FillFrontendList(pStatus->GetFrontends(), pStatus,
+                                        false);  // OnLine)
+    // Backends
+    V2Backend *backend;
+
+    // Add this host
+    backend = pStatus->AddNewBackend();
+    QString thisHost = gCoreContext->GetHostName();
+    backend->setName(thisHost);
+    backend->setIP(gCoreContext->GetBackendServerIP());
+
+    if (m_pMainServer)
+    {
+        backend->setType("Master");
+        QStringList backends;
+        m_pMainServer->GetActiveBackends(backends);
+        for (const QString& hostname : backends)
+        {
+            if (hostname != thisHost)
+            {
+                PlaybackSock * pSock = m_pMainServer->GetMediaServerByHostname(hostname);
+                backend = pStatus->AddNewBackend();
+                backend->setName(hostname);
+                backend->setType("Slave");
+                if (pSock)
+                {
+                    backend->setIP(pSock->getIP());
+                }
+            }
+        }
+    }
+    else
+    {
+        backend->setType("Slave");
+        QString masterhost = gCoreContext->GetMasterHostName();
+        QString masterip   = gCoreContext->GetMasterServerIP();
+        backend = pStatus->AddNewBackend();
+        backend->setName(masterhost);
+        backend->setIP(masterip);
+        backend->setType("Master");
+    }
+
+    // Add Job Queue Entries
+    QMap<int, JobQueueEntry> jobs;
+    QMap<int, JobQueueEntry>::Iterator it;
+
+    JobQueue::GetJobsInQueue(jobs,
+                             JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
+                             JOB_LIST_RECENT);
+
+    for (it = jobs.begin(); it != jobs.end(); ++it)
+    {
+        ProgramInfo pginfo((*it).chanid, (*it).recstartts);
+        if (!pginfo.GetChanID())
+            continue;
+
+        V2Job * pJob = pStatus->AddNewJob();
+
+        pJob->setId( (*it).id );
+        pJob->setChanId((*it).chanid );
+        pJob->setStartTime( (*it).recstartts);
+        pJob->setStartTs( (*it).startts    );
+        pJob->setInsertTime((*it).inserttime);
+        pJob->setType( (*it).type       );
+        pJob->setCmds( (*it).cmds       );
+        pJob->setFlags( (*it).flags      );
+        pJob->setStatus( (*it).status     );
+        pJob->setStatusTime( (*it).statustime);
+        pJob->setSchedRunTime( (*it).schedruntime);
+        pJob->setArgs( (*it).args       );
+        if ((*it).hostname.isEmpty())
+            pJob->setHostName( QObject::tr("master"));
+        else
+            pJob->setHostName((*it).hostname);
+        pJob->setComment((*it).comment);
+        V2Program *pProgram = pJob->Program();
+        V2FillProgramInfo( pProgram, &pginfo, true, false, false);
+    }
+
+    // Machine Info
+    V2MachineInfo *pMachineInfo = pStatus->MachineInfo();
+    FillDriveSpace(pMachineInfo);
+    // load average
+    loadArray rgdAverages = getLoadAvgs();
+    if (rgdAverages[0] != -1)
+    {
+        pMachineInfo->setLoadAvg1(rgdAverages[0]);
+        pMachineInfo->setLoadAvg2(rgdAverages[1]);
+        pMachineInfo->setLoadAvg3(rgdAverages[2]);
+    }
+
+    // Guide Data
+    QDateTime GuideDataThrough;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT MAX(endtime) FROM program WHERE manualid = 0;");
+    if (query.exec() && query.next())
+    {
+        GuideDataThrough = MythDate::fromString(query.value(0).toString());
+    }
+    pMachineInfo->setGuideStart
+                       (setting_to_qdatetime("mythfilldatabaseLastRunStart"));
+    pMachineInfo->setGuideEnd(
+                       setting_to_qdatetime("mythfilldatabaseLastRunEnd"));
+    pMachineInfo->setGuideStatus(
+        gCoreContext->GetSetting("mythfilldatabaseLastRunStatus"));
+    if (gCoreContext->GetBoolSetting("MythFillGrabberSuggestsTime", false))
+    {
+        pMachineInfo->setGuideNext(
+            gCoreContext->GetSetting("MythFillSuggestedRunTime"));
+    }
+
+    if (!GuideDataThrough.isNull())
+    {
+        QDateTime qdtNow          = MythDate::current();
+        pMachineInfo->setGuideThru(GuideDataThrough);
+        pMachineInfo->setGuideDays(qdtNow.daysTo(GuideDataThrough));
+    }
+
+    // Add Miscellaneous information
+    QString info_script = gCoreContext->GetSetting("MiscStatusScript");
+    if ((!info_script.isEmpty()) && (info_script != "none"))
+    {
+        uint flags = kMSRunShell | kMSStdOut;
+        MythSystemLegacy ms(info_script, flags);
+        ms.Run(10s);
+        if (ms.Wait() != GENERIC_EXIT_OK)
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Error running miscellaneous "
+                        "status information script: %1").arg(info_script));
+        }
+
+        QByteArray input = ms.ReadAll();
+        pStatus->setMiscellaneous(QString(input));
+    }
+    return pStatus;
+}
+
+void V2Status::FillDriveSpace(V2MachineInfo* pMachineInfo)
+{
+    QStringList strlist;
+    QString hostname;
+    QString directory;
+    QString isLocalstr;
+    QString fsID;
+
+    if (m_pMainServer)
+        m_pMainServer->BackendQueryDiskSpace(strlist, true, m_bIsMaster);
+
+    QStringList::const_iterator sit = strlist.cbegin();
+    while (sit != strlist.cend())
+    {
+        hostname   = *(sit++);
+        directory  = *(sit++);
+        isLocalstr = *(sit++);
+        fsID       = *(sit++);
+        ++sit; // ignore dirID
+        ++sit; // ignore blocksize
+        long long iTotal     = (*(sit++)).toLongLong();
+        long long iUsed      = (*(sit++)).toLongLong();;
+        long long iAvail     = iTotal - iUsed;
+
+        if (fsID == "-2")
+            fsID = "total";
+
+        V2StorageGroup* group = pMachineInfo->AddNewStorageGroup();
+        group->setId (fsID);
+        group->setTotal((int)(iTotal>>10));
+        group->setUsed((int)(iUsed>>10));
+        group->setFree((int)(iAvail>>10));
+        group->setDirectory(directory);
+
+        if (fsID == "total")
+        {
+            long long iLiveTV = -1;
+            long long iDeleted = -1;
+            long long iExpirable = -1;
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT SUM(filesize) FROM recorded "
+                          " WHERE recgroup = :RECGROUP;");
+
+            query.bindValue(":RECGROUP", "LiveTV");
+            if (query.exec() && query.next())
+            {
+                iLiveTV = query.value(0).toLongLong();
+            }
+            query.bindValue(":RECGROUP", "Deleted");
+            if (query.exec() && query.next())
+            {
+                iDeleted = query.value(0).toLongLong();
+            }
+            query.prepare("SELECT SUM(filesize) FROM recorded "
+                          " WHERE autoexpire = 1 "
+                          "   AND recgroup NOT IN ('LiveTV', 'Deleted');");
+            if (query.exec() && query.next())
+            {
+                iExpirable = query.value(0).toLongLong();
+            }
+            group->setLiveTV( (int)(iLiveTV>>20) );
+            group->setDeleted( (int)(iDeleted>>20) );
+            group->setExpirable ( (int)(iExpirable>>20) );
+        }
+    }
+
 }
 
 void V2Status::FillStatusXML( QDomDocument *pDoc )
