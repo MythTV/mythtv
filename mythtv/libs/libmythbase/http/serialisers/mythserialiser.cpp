@@ -121,7 +121,7 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
         if (const auto & alias = s_cbor.Aliases().indexOf(mime); alias >= 0)
-            if (MythXMLSerialiser cbor(Name, Value); cbor.Result() != nullptr)
+            if (MythCBORSerialiser cbor(Name, Value); cbor.Result() != nullptr)
                 return WrapData(cbor.Result(), s_cbor, s_cbor.Aliases().at(alias));
 #endif
     }
