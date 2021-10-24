@@ -1,5 +1,6 @@
 // Qt
 #include <QMetaProperty>
+#include <QRegularExpression>
 
 // MythTV
 #include "mythdate.h"
@@ -45,7 +46,12 @@ void MythXMLSerialiser::AddValue(const QString& Name, const QVariant& Value)
         return;
     }
 
-    switch (Value.type())
+    // The QT documentation states that Value.type() returns
+    // a QVariant::Type which should be treated as a QMetaType::Type.
+    // There is no QVariant::Float only a QMetaType::Float so we
+    // need to cast it here so we can use QMetaType::Float without
+    // warning messages.
+    switch (static_cast<QMetaType::Type>(Value.type()))
     {
         case QVariant::StringList: AddStringList(Value); break;
         case QVariant::List:       AddList(Name, Value); break;
@@ -59,6 +65,18 @@ void MythXMLSerialiser::AddValue(const QString& Name, const QVariant& Value)
                     m_writer.writeCharacters(MythDate::toString(dt, MythDate::ISODate));
             }
             break;
+        case QMetaType::Float:
+        {
+            // Set max 5 decimals and remove excess zeroes
+            // This is to avoid very long decimal results with a lot of
+            // garbage extra numbers at the back, especially in the Load
+            // Average values in GetBackendStatus.
+            QString tempstr;
+            tempstr = QString::number(Value.toFloat(),'f',5);
+            tempstr.replace(QRegularExpression("0+$"),"0");
+            m_writer.writeCharacters(tempstr);
+            break;
+        }
         default:
             m_writer.writeCharacters(Value.toString());
     }
