@@ -21,7 +21,7 @@
 #include "upnpexp.h"
 #include "videometadatalistmanager.h"
 
-class MediaServer;
+class UpnpMediaServer;
 class UPNPSubscription;
 class meta_dir_node;
 
@@ -124,7 +124,7 @@ class UPNPScanner : public QObject
 #else
     QRecursiveMutex  m_lock;
 #endif
-    QHash<QString,MediaServer*> m_servers;
+    QHash<QString,UpnpMediaServer*> m_servers;
     QNetworkAccessManager *m_network {nullptr};
     // TODO Move to QMultiHash when we move to Qt >=4.7
     // QHash(QUrl) unsupported on < 4.7
