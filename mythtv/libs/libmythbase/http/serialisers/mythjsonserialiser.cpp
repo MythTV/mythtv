@@ -41,13 +41,25 @@ void MythJSONSerialiser::AddValue(const QVariant& Value)
         return;
     }
 
-    switch (Value.type())
+    // The QT documentation states that Value.type() returns
+    // a QVariant::Type which should be treated as a QMetaType::Type.
+    // There is no QVariant::Float only a QMetaType::Float so we
+    // need to cast it here so we can use QMetaType::Float without
+    // warning messages.
+    switch (static_cast<QMetaType::Type>(Value.type()))
     {
         case QVariant::Int:
         case QVariant::UInt:
         case QVariant::LongLong:
         case QVariant::ULongLong:
-        case QVariant::Double:     m_writer << Value.toString(); break;
+            m_writer << Value.toString();
+            break;
+        case QVariant::Double:
+            m_writer << QString::number(Value.toDouble(),'f',6);
+            break;
+        case QMetaType::Float:
+            m_writer << QString::number(Value.toFloat(),'f',6);
+            break;
         case QVariant::Bool:       m_writer << (Value.toBool() ? "true" : "false"); break;
         case QVariant::StringList: AddStringList(Value); break;
         case QVariant::List:       AddList(Value); break;

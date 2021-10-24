@@ -1,6 +1,5 @@
 // Qt
 #include <QMetaProperty>
-#include <QRegularExpression>
 
 // MythTV
 #include "mythdate.h"
@@ -65,18 +64,12 @@ void MythXMLSerialiser::AddValue(const QString& Name, const QVariant& Value)
                     m_writer.writeCharacters(MythDate::toString(dt, MythDate::ISODate));
             }
             break;
-        case QMetaType::Float:
-        {
-            // Set max 5 decimals and remove excess zeroes
-            // This is to avoid very long decimal results with a lot of
-            // garbage extra numbers at the back, especially in the Load
-            // Average values in GetBackendStatus.
-            QString tempstr;
-            tempstr = QString::number(Value.toFloat(),'f',5);
-            tempstr.replace(QRegularExpression("0+$"),"0");
-            m_writer.writeCharacters(tempstr);
+        case QVariant::Double:
+            m_writer.writeCharacters(QString::number(Value.toDouble(),'f',6));
             break;
-        }
+        case QMetaType::Float:
+            m_writer.writeCharacters(QString::number(Value.toFloat(),'f',6));
+            break;
         default:
             m_writer.writeCharacters(Value.toString());
     }
