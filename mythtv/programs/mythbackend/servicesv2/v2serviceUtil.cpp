@@ -706,6 +706,8 @@ void FillEncoderList(QVariantList &list, QObject* parent)
                 }
             }
 
+            bool progFound = false;
+            V2Program *pProgram = pEncoder->Recording();
             switch ( pEncoder->GetState() )
             {
                 case kState_WatchingLiveTV:
@@ -716,10 +718,8 @@ void FillEncoderList(QVariantList &list, QObject* parent)
 
                     if (pInfo)
                     {
-                        V2Program *pProgram = pEncoder->Recording();
-
+                        progFound= true;
                         V2FillProgramInfo( pProgram, pInfo, true, true );
-
                         delete pInfo;
                     }
 
@@ -729,6 +729,8 @@ void FillEncoderList(QVariantList &list, QObject* parent)
                 default:
                     break;
             }
+            if (!progFound)
+                pProgram->setProperty("isNull",QVariant(true));
         }
     }
 }

@@ -35,9 +35,13 @@ void MythXMLPListSerialiser::AddObject(const QString& Name, const QVariant& Valu
 
 void MythXMLPListSerialiser::AddValue(const QString& Name, const QVariant& Value, bool NeedKey)
 {
-    if (Value.value<QObject*>())
+    QObject* object = Value.value<QObject*>();
+    if (object)
     {
-        AddQObject(Name, Value.value<QObject*>());
+        QVariant isNull = object->property("isNull");
+        if (isNull.value<bool>())
+            return;
+        AddQObject(Name, object);
         return;
     }
 
@@ -206,6 +210,8 @@ QString MythXMLPListSerialiser::GetItemName(const QString& Name)
 {
     QString name = Name.startsWith("Q") ? Name.mid(1) : Name;
     name.remove("DTC::");
+    if (name.startsWith("V2"))
+        name.remove(0,2);
     name.remove(QChar('*'));
     return name;
 }

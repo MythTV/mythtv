@@ -39,9 +39,13 @@ void MythXMLSerialiser::AddValue(const QString& Name, const QVariant& Value)
         return;
     }
 
-    if (Value.value<QObject*>())
+    QObject* object = Value.value<QObject*>();
+    if (object)
     {
-        AddQObject(Value.value<QObject*>());
+        QVariant isNull = object->property("isNull");
+        if (isNull.value<bool>())
+            return;
+        AddQObject(object);
         return;
     }
 
