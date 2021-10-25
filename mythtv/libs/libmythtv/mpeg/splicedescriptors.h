@@ -237,7 +237,9 @@ class SegmentationDescriptor : public SpliceDescriptor
     //   segmentation_upid()      ? _ptrs[1]+2
     const unsigned char *SegmentationUPID(void) const
     {
-        return _ptrs[1]+2;
+        // Access the array in two steps so cppcheck doesn't get confused.
+        unsigned char const *p = _ptrs[1];
+        return p+2;
     }
     QString SegmentationUPIDString(void) const
     {
