@@ -8,8 +8,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef BACKENDSTATUS_H_
-#define BACKENDSTATUS_H_
+#ifndef V2BACKENDSTATUS_H_
+#define V2BACKENDSTATUS_H_
 
 #include <QDateTime>
 #include <QString>
@@ -214,4 +214,4 @@ class V2BackendStatus : public QObject
 };
 Q_DECLARE_METATYPE(V2BackendStatus*)
 
-#endif
+#endif // V2BACKENDSTATUS_H_
