@@ -2,6 +2,8 @@ include ../../config.mak
 
 ifdef INSTALL_ROOT
 	ROOT_FLAGS = --root="$(INSTALL_ROOT)"
+else
+	ROOT_FLAGS = --root="/"
 endif
 
 REAL_PREFIX = $(PREFIX)
