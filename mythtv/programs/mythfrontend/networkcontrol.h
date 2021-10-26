@@ -123,7 +123,7 @@ class NetworkControl : public ServerPool, public QRunnable
     QString processHelp(NetworkCommand *nc);
 
     void notifyDataAvailable(void);
-    void sendReplyToClient(NetworkControlClient *ncc, QString &reply);
+    void sendReplyToClient(NetworkControlClient *ncc, const QString &reply);
     void customEvent(QEvent *e) override; // QObject
 
     static QString listRecordings(const QString& chanid = "", const QString& starttime = "");

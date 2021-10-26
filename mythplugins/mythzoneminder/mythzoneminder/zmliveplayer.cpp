@@ -466,7 +466,7 @@ Player::~Player()
         free(m_rgba);
 }
 
-void Player::setMonitor(Monitor *mon)
+void Player::setMonitor(const Monitor *mon)
 {
     m_monitor = *mon;
 

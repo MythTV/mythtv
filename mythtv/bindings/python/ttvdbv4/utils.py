@@ -3,7 +3,7 @@
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
 # Copyright: (c) 2021 Roland Ernst
-# License:   GPL v2 or later, see COPYING for details
+# License:   GPL v2 or later, see LICENSE for details
 # ----------------------------------------------------
 
 

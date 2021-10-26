@@ -298,7 +298,6 @@ static void UpdateGameCounts(const QStringList& updatelist)
     MSqlQuery query(MSqlQuery::InitCon());
 
     static const QRegularExpression multiDiskRGXP { "[0-4]$" };
-    int pos = 0;
 
     QString lastrom;
     QString firstname;
@@ -331,7 +330,7 @@ static void UpdateGameCounts(const QStringList& updatelist)
                 {
                     int diskcount = 0;
                     int extlength = 0;
-                    pos = RomName.lastIndexOf(".");
+                    int pos = RomName.lastIndexOf(".");
                     if (pos > 1)
                     {
                         extlength = RomName.length() - pos;

@@ -3565,7 +3565,7 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
                 jobType, tmpItem->GetChanID(),
                 tmpItem->GetRecordingStartTime(), JOB_STOP);
 
-            if ((jobType & JOB_COMMFLAG) && (tmpItem))
+            if (jobType & JOB_COMMFLAG)
             {
                 tmpItem->SetEditing(false);
                 tmpItem->SetFlagging(false);

@@ -52,7 +52,7 @@ class VBox
   private:
     static QStringList doUPNPSearch(void);
     static QString getFirstText(QDomElement &element);
-    static QString getStrValue(QDomElement &element, const QString &name, int index = 0);
-    static int getIntValue(QDomElement &element, const QString &name, int index = 0);
+    static QString getStrValue(const QDomElement &element, const QString &name, int index = 0);
+    static int getIntValue(const QDomElement &element, const QString &name, int index = 0);
 };
 #endif // VBOX_UTILS_H
