@@ -25,7 +25,9 @@ MythVideoGPU::MythVideoGPU(MythRender *Render, MythVideoColourSpace* ColourSpace
     if (m_videoColourSpace)
     {
         m_videoColourSpace->IncrRef();
-        connect(m_videoColourSpace, &MythVideoColourSpace::Updated, this, &MythVideoGPU::UpdateColourSpace);
+        // Not a call to UpdateColourSpace. Only a callback registration.
+        connect(m_videoColourSpace, &MythVideoColourSpace::Updated,
+                this, &MythVideoGPU::UpdateColourSpace);
     }
 
     m_stereoMode = gCoreContext->GetBoolSetting("DiscardStereo3D", true) ?
