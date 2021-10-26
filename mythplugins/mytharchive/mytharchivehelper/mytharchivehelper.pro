@@ -28,7 +28,6 @@ LIBS += -lmythavfilter
 LIBS += -lz
 LIBS += -lmythtv-$$LIBVERSION
 # libmythtv dependencies
-using_live: LIBS += -lmythlivemedia-$$LIBVERSION
 using_mheg: LIBS += -lmythfreemheg-$$LIBVERSION
 using_hdhomerun: LIBS += -lhdhomerun
 
