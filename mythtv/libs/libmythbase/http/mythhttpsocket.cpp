@@ -17,6 +17,7 @@
 #include "http/mythhttprequest.h"
 #include "http/mythhttpranges.h"
 #include "http/mythhttpservices.h"
+#include "http/mythwebsocketevent.h"
 
 // Std
 #include <chrono>
@@ -90,6 +91,7 @@ MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& C
 
 MythHTTPSocket::~MythHTTPSocket()
 {
+    delete m_websocketevent;
     delete m_websocket;
     if (m_socket)
         m_socket->close();
@@ -579,10 +581,22 @@ void MythHTTPSocket::SetupWebSocket()
         Stop();
         return;
     }
+    // Create event listener
+    m_websocketevent = new MythWebSocketEvent();
+    if (!m_websocketevent)
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create websocket event listener");
+        Stop();
+        return;
+    }
 
     // Listen for messages
     connect(m_websocket, &MythWebSocket::NewTextMessage,   this, &MythHTTPSocket::NewTextMessage);
+    connect(m_websocket, &MythWebSocket::NewRawTextMessage,this, &MythHTTPSocket::NewRawTextMessage);
     connect(m_websocket, &MythWebSocket::NewBinaryMessage, this, &MythHTTPSocket::NewBinaryMessage);
+
+    // Sending messages
+    connect(m_websocketevent, &MythWebSocketEvent::SendTextMessage, m_websocket, &MythWebSocket::SendTextFrame);
 
     // Add this thread to the list of upgraded threads, so we free up slots
     // for regular HTTP sockets.
@@ -593,12 +607,14 @@ void MythHTTPSocket::NewTextMessage(const StringPayload& Text)
 {
     if (!Text)
         return;
+    m_websocketevent->HandleTextMessage(Text);
 }
 
 void MythHTTPSocket::NewRawTextMessage(const DataPayloads& Payloads)
 {
     if (Payloads.empty())
         return;
+    m_websocketevent->HandleRawTextMessage(Payloads);
 }
 
 void MythHTTPSocket::NewBinaryMessage(const DataPayloads& Payloads)

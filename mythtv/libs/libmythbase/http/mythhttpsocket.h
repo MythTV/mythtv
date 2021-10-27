@@ -13,6 +13,7 @@
 class QTcpSocket;
 class QSslSocket;
 class MythWebSocket;
+class MythWebSocketEvent;
 
 class MythHTTPSocket : public QObject
 {
@@ -69,7 +70,8 @@ class MythHTTPSocket : public QObject
     MythHTTPConnection m_nextConnection { HTTPConnectionClose };
     MythSocketProtocol m_protocol    { ProtHTTP };
     // WebSockets only
-    bool            m_testSocket     { false };
+    bool                m_testSocket     { false };
+    MythWebSocketEvent* m_websocketevent { nullptr };
 };
 
 #endif
