@@ -4372,41 +4372,49 @@ void Scheduler::AddNewRecords(void)
 
     if (prefinputpri)
         pwrpri += QString(" + "
-        "(capturecard.cardid = RECTABLE.prefinput) * %1").arg(prefinputpri);
+        "IF(capturecard.cardid = RECTABLE.prefinput, 1, 0) * %1")
+            .arg(prefinputpri);
 
     if (hdtvpriority)
-        pwrpri += QString(" + (program.hdtv > 0 OR "
-        "FIND_IN_SET('HDTV', program.videoprop) > 0) * %1").arg(hdtvpriority);
+        pwrpri += QString(" + IF(program.hdtv > 0 OR "
+        "FIND_IN_SET('HDTV', program.videoprop) > 0, 1, 0) * %1")
+            .arg(hdtvpriority);
 
     if (wspriority)
         pwrpri += QString(" + "
-        "(FIND_IN_SET('WIDESCREEN', program.videoprop) > 0) * %1").arg(wspriority);
+        "IF(FIND_IN_SET('WIDESCREEN', program.videoprop) > 0, 1, 0) * %1")
+            .arg(wspriority);
 
     if (slpriority)
         pwrpri += QString(" + "
-        "(FIND_IN_SET('SIGNED', program.subtitletypes) > 0) * %1").arg(slpriority);
+        "IF(FIND_IN_SET('SIGNED', program.subtitletypes) > 0, 1, 0) * %1")
+            .arg(slpriority);
 
     if (onscrpriority)
         pwrpri += QString(" + "
-        "(FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0) * %1").arg(onscrpriority);
+        "IF(FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0, 1, 0) * %1")
+            .arg(onscrpriority);
 
     if (ccpriority)
     {
         pwrpri += QString(" + "
-        "(FIND_IN_SET('NORMAL', program.subtitletypes) > 0 OR "
-        "program.closecaptioned > 0 OR program.subtitled > 0) * %1").arg(ccpriority);
+        "IF(FIND_IN_SET('NORMAL', program.subtitletypes) > 0 OR "
+        "program.closecaptioned > 0 OR program.subtitled > 0, 1, 0) * %1")
+            .arg(ccpriority);
     }
 
     if (hhpriority)
     {
         pwrpri += QString(" + "
-        "(FIND_IN_SET('HARDHEAR', program.subtitletypes) > 0 OR "
-        "FIND_IN_SET('HARDHEAR', program.audioprop) > 0) * %1").arg(hhpriority);
+        "IF(FIND_IN_SET('HARDHEAR', program.subtitletypes) > 0 OR "
+        "FIND_IN_SET('HARDHEAR', program.audioprop) > 0, 1, 0) * %1")
+            .arg(hhpriority);
     }
 
     if (adpriority)
         pwrpri += QString(" + "
-        "(FIND_IN_SET('VISUALIMPAIR', program.audioprop) > 0) * %1").arg(adpriority);
+        "IF(FIND_IN_SET('VISUALIMPAIR', program.audioprop) > 0, 1, 0) * %1")
+            .arg(adpriority);
 
     MSqlQuery result(m_dbConn);
 
