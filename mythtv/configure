@@ -1996,7 +1996,6 @@ MYTHTV_CONFIG_LIST='
     taglib
     v4l2
     v4l2prime
-    v4l1
     valgrind
     x11
     libexiv2_external
@@ -2629,7 +2628,6 @@ opengles_deps="GLES2_gl2_h"
 egl_deps="EGL_egl_h"
 v4l2_deps="linux_videodev2_h"
 v4l2prime_deps="v4l2 drm"
-v4l1_deps="backend v4l2 linux_videodev_h"
 vulkan_deps="vulkan_vulkan_core_h"
 asi_deps="backend"
 waylandextras_deps="wayland_client_h"
@@ -2794,7 +2792,6 @@ enable opengl
 enable egl
 enable symbol_visibility
 enable deprecation_warnings
-enable v4l1
 enable v4l2
 enable v4l2prime
 enable x11
@@ -4761,7 +4758,6 @@ case $target_os in
         enable  darwin
         enable  videotoolbox
         disable dvb
-        disable v4l1
         disable v4l2
         disable v4l2prime
         disable x11
@@ -4811,7 +4807,6 @@ case $target_os in
             disable protocols
         fi
         disable symver
-        disable v4l1
         disable v4l2
         disable v4l2prime
         enable  windows
