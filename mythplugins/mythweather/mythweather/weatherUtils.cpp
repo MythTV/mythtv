@@ -102,10 +102,8 @@ bool doLoadScreens(const QString &filename, ScreenListMap &screens)
                 screens[e.attribute("name")].m_title =
                                             getScreenTitle(e.attribute("name"));
                 QString hasUnits = e.attribute("hasunits");
-                if (hasUnits.toLower() == "no")
-                    screens[e.attribute("name")].m_hasUnits = false;
-                else
-                    screens[e.attribute("name")].m_hasUnits = true;
+                screens[e.attribute("name")].m_hasUnits =
+                    hasUnits.toLower() != "no";
                 screens[e.attribute("name")].m_dataTypes = loadScreen(e);
             }
         }
