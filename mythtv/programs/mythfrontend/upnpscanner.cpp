@@ -85,13 +85,12 @@ class UpnpMediaServer : public MediaServerItem
   public:
     UpnpMediaServer()
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_eventSubPath(QString()),
        m_friendlyName(QString("Unknown"))
     {
     }
     explicit UpnpMediaServer(QUrl URL)
      : MediaServerItem(QString("0"), QString(), QString(), QString()),
-       m_serverURL(std::move(URL)), m_eventSubPath(QString()),
+       m_serverURL(std::move(URL)),
        m_friendlyName(QString("Unknown"))
     {
     }
