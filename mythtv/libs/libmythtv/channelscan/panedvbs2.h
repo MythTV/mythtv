@@ -65,20 +65,4 @@ class PaneDVBS2 : public GroupSetting
     ScanRollOff        *m_prolloff    {nullptr};
 };
 
-// Update default tuning parameters from reference transponder
-void PaneDVBS2::SetTuningParameters(StandardSetting *setting)
-{
-  QString sat = setting->getValue();
-  QString frequency = m_transponder->getFrequency(sat);
-  if (!frequency.isEmpty())
-  {
-    setFrequency(frequency.toUInt());
-    setPolarity(m_transponder->getPolarity(sat));
-    setSymbolrate(m_transponder->getSymbolrate(sat));
-    setModulation(m_transponder->getModulation(sat));
-    setModSys(m_transponder->getModSys(sat));
-    setFec(m_transponder->getFec(sat));
-  }
-}
-
 #endif // PANE_DVBS2_H
