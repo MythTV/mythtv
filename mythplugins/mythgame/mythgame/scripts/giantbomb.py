@@ -30,11 +30,11 @@
 #-------------------------------------
 __title__ ="GiantBomb Query";
 __author__="R.D. Vaughan"
-__version__="0.11"
+__version__="0.20"
 # 0.10  Initial development
 # 0.11  Added the -l option to conform to grabber standards. Currently www.giantbomb.com does not support
 #       multiple languages.
-
+# 0.2.0 R. Ernst: Added python3 compatibility
 
 __usage_examples__='''
 Request giantbomb.py verison number:
@@ -127,7 +127,28 @@ Request game details using a GiantBomb#:
 import sys, os
 from optparse import OptionParser
 import re
-from string import capitalize
+
+
+IS_PY2 = sys.version_info[0] == 2
+
+try:
+    if IS_PY2:
+        from StringIO import StringIO
+    else:
+        from io import StringIO
+    from lxml import etree
+except Exception as e:
+    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+    sys.exit(1)
+
+
+if IS_PY2:
+    stdio_type = file
+else:
+    import io
+    stdio_type = io.TextIOWrapper
+    unicode = str
+    unichr = chr
 
 
 class OutStreamEncoder(object):
@@ -143,24 +164,19 @@ class OutStreamEncoder(object):
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
         if isinstance(obj, unicode):
-            self.out.write(obj.encode(self.encoding))
-        else:
+            obj = obj.encode(self.encoding)
+        if IS_PY2:
             self.out.write(obj)
+        else:
+            self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-# Sub class sys.stdout and sys.stderr as a utf8 stream. Deals with print and stdout unicode issues
-sys.stdout = OutStreamEncoder(sys.stdout)
-sys.stderr = OutStreamEncoder(sys.stderr)
+if isinstance(sys.stdout, stdio_type):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
-
-try:
-    from StringIO import StringIO
-    from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
-    sys.exit(1)
 
 # Check that the lxml library is current enough
 # From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
@@ -183,7 +199,7 @@ if version < '2.7.2':
 
 try:
     import giantbomb.giantbomb_api as giantbomb_api
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The subdirectory "giantbomb" containing the modules giantbomb_api.py (v0.1.0 or greater) and
 giantbomb_exceptions.py must have been installed with the MythTV gaming plugin.
@@ -223,8 +239,10 @@ def main():
 
     # Make all command line arguments unicode utf8
     for index in range(len(args)):
-        args[index] = unicode(args[index], 'utf8')
-
+        try:       # python2
+            args[index] = unicode(args[index], 'utf8')
+        except:    # python3
+             args[index] = str(args[index])
     if opts.debug:
         sys.stdout.write("\nopts: %s\n" % opts)
         sys.stdout.write("\nargs: %s\n\n" % args)
