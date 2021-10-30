@@ -575,7 +575,7 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
             if (device.GetTotalOutputChannels() == 0)
                 continue;
             QString *name = device.GetName();
-            if (name && name == deviceName)
+            if (name && *name == deviceName)
             {
                 Debug(QString("GetDeviceWithName: Found: %1").arg(*name));
                 deviceID = pDevices[dev];
