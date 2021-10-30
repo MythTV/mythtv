@@ -57,7 +57,7 @@ void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
     QKeySequence a(code);
     for (int i = 0; i < a.count(); i++)
     {
-        int keycode = a[i];
+        int keycode = a[i].toCombined();
 
         if (pressedDown)
             QCoreApplication::postEvent(mainWindow, new LircKeycodeEvent(
