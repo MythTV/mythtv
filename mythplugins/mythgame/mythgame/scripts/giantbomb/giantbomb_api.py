@@ -7,10 +7,10 @@
 # Purpose:  This python script is intended to perform a variety of utility functions to search and
 #           access text metadata and image URLs from GiantBomb. These routines are based on the
 #           GiantBomb api. Specifications for this api are published at:
-#           http://api.giantbomb.com/documentation/
+#           https://www.giantbomb.com/api/documentation/
 #
 # License:Creative Commons GNU GPL v2
-# (http://creativecommons.org/licenses/GPL/2.0/)
+# (https://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
 __title__ ="giantbomb_api - Simple-to-use Python interface to The GiantBomb's API (www.giantbomb.com/api)";
 __author__="R.D. Vaughan"
@@ -72,7 +72,7 @@ except Exception as e:
     sys.exit(1)
 
 # Check that the lxml library is current enough
-# From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
+# From the lxml documents it states: (https://lxml.de/installation.html)
 # "If you want to use XPath, do not use libxml2 2.6.27. We recommend libxml2 2.7.2 or later"
 # Testing was performed with the Ubuntu 9.10 "python-lxml" version "2.1.5-1ubuntu2" repository package
 version = ''
@@ -97,7 +97,7 @@ class gamedbQueries():
                 ):
         """apikey (str/unicode):
             Specify the api.giantbomb.com API key. Applications need their own key.
-            See http://api.giantbomb.com to get your own API key
+            See https://www.giantbomb.com/api/ to get your own API key
 
         debug (True/False):
              shows verbose debugging information
@@ -106,8 +106,8 @@ class gamedbQueries():
 
         self.config['apikey'] = apikey
         self.config['debug'] = debug
-        self.config['searchURL'] = u'http://www.giantbomb.com/api/search'
-        self.config['dataURL'] = u'http://www.giantbomb.com/api/game/%s'
+        self.config['searchURL'] = u'https://www.giantbomb.com/api/search'
+        self.config['dataURL'] = u'https://www.giantbomb.com/api/game/%s'
         # giantbomb.com now requires a unique 'User-Agent':
         self.config['headers'] = {"User-Agent": 'MythTV giantbomb grabber 0.2'}
 
@@ -408,7 +408,7 @@ class gamedbQueries():
 
     def gameSearch(self, gameTitle):
         """Display a Game query in XML format:
-        http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+        https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
         Returns nothing
         """
         with requests.Session() as ReqSession:
@@ -432,7 +432,7 @@ class gamedbQueries():
             sys.exit(1)
 
         queryXslt = etree.XSLT(etree.parse(u'%s/XSLT/giantbombQuery.xsl' % self.baseProcessingDir))
-        gamebombXpath = etree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
+        gamebombXpath = etree.FunctionNamespace('https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
         gamebombXpath.prefix = 'gamebombXpath'
         self.buildFuncDict()
         for key in list(self.FuncDict.keys()):
@@ -448,7 +448,7 @@ class gamedbQueries():
 
     def gameData(self, gameId):
         """Display a Game details in XML format:
-        http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+        https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
         Returns nothing
         """
         with requests.Session() as ReqSession:
@@ -469,7 +469,7 @@ class gamedbQueries():
             sys.exit(1)
 
         gameXslt = etree.XSLT(etree.parse(u'%s/XSLT/giantbombGame.xsl' % self.baseProcessingDir))
-        gamebombXpath = etree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
+        gamebombXpath = etree.FunctionNamespace('https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
         gamebombXpath.prefix = 'gamebombXpath'
         self.buildFuncDict()
         for key in list(self.FuncDict.keys()):

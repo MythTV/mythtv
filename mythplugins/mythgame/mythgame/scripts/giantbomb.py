@@ -6,15 +6,15 @@
 # Author: R.D. Vaughan
 # Purpose:
 #   This python script is intended to perform Game data lookups
-#   based on information found on the http://www.giantbomb.com/ website. It
+#   based on information found on the https://www.giantbomb.com website. It
 #   follows the MythTV Univeral standards set for grabbers
-#   http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+#   https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 #   This script uses the python module giantbomb_api.py which should be included
 #   with this script.
 #   The giantbomb_api.py module uses the full access XML api published by
-#   api.giantbomb.com see: http://api.giantbomb.com/documentation/
+#   api.giantbomb.com see: https://www.giantbomb.com/api/documentation/
 #   Users of this script are encouraged to populate www.giantbomb.com with Game
-#   informationand images. The richer the source the more
+#   information and images. The richer the source the more
 #   valuable the script.
 # Command example:
 # See help (-u and -h) options
@@ -26,7 +26,7 @@
 #
 #
 # License:Creative Commons GNU GPL v2
-# (http://creativecommons.org/licenses/GPL/2.0/)
+# (https://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
 __title__ ="GiantBomb Query";
 __author__="R.D. Vaughan"
@@ -179,7 +179,7 @@ if isinstance(sys.stdout, stdio_type):
 
 
 # Check that the lxml library is current enough
-# From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
+# From the lxml documents it states: (https://lxml.de/installation.html)
 # "If you want to use XPath, do not use libxml2 2.6.27. We recommend libxml2 2.7.2 or later"
 # Testing was performed with the Ubuntu 9.10 "python-lxml" version "2.1.5-1ubuntu2" repository package
 version = ''
@@ -218,7 +218,7 @@ def main():
     # api.giantbomb.com api key provided for Mythtv
     apikey = "b5883a902a8ed88b15ce21d07787c94fd6ad9f33"
 
-    parser = OptionParser(usage=u"%prog usage: giantbomb -hdluvMD [parameters]\n <game name or gameid number>\n\nFor details on using giantbomb from the command execute './giantbomb.py -u'. For details on the meaning of the XML element tags see the wiki page at:\nhttp://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format")
+    parser = OptionParser(usage=u"%prog usage: giantbomb -hdluvMD [parameters]\n <game name or gameid number>\n\nFor details on using giantbomb from the command execute './giantbomb.py -u'. For details on the meaning of the XML element tags see the wiki page at:\nhttps://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format")
 
     parser.add_option(  "-d", "--debug", action="store_true", default=False, dest="debug",
                         help=u"Show debugging info")
