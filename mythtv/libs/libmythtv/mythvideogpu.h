@@ -37,8 +37,6 @@ class MythVideoGPU : public QObject
 
     static QString VideoResizeToString(VideoResizing Resize);
 
-    MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,
-                 MythVideoBounds* Bounds, const MythVideoProfilePtr& VideoProfile, QString Profile);
    ~MythVideoGPU() override;
 
     virtual void StartFrame        () = 0;
@@ -66,6 +64,14 @@ class MythVideoGPU : public QObject
     void         UpscalerChanged   (const QString& Upscaler);
 
   protected:
+    // Protecting this function means its not possible to create an
+    // instance of this base class. Because ColourSpaceUpdate is a
+    // pure virtual all sub-classes must override this function, which
+    // should make it safe to quiet the cppcheck warning about the
+    // constructor calling ColourSpaceUpdate.
+    MythVideoGPU(MythRender* Render, MythVideoColourSpace* ColourSpace,
+                 MythVideoBounds* Bounds, const MythVideoProfilePtr& VideoProfile, QString Profile);
+    // cppcheck-suppress pureVirtualCall
     virtual void ColourSpaceUpdate (bool PrimariesChanged) = 0;
 
     MythRender*       m_render               { nullptr };

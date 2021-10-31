@@ -365,7 +365,10 @@ bool XMLTVParser::parseFile(
                 do
                 {
                     if (!readNextWithErrorCheck(xml))
+                    {
+                        delete pginfo;
                         return false;
+                    }
                     if (xml.name() == QString("title"))
                     {
                         QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);

@@ -619,7 +619,7 @@ bool DVBStreamData::HasCachedAnyNIT(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    return (bool)(m_cachedNit.size());
+    return !m_cachedNit.empty();
 }
 
 bool DVBStreamData::HasCachedAllNIT(bool current) const

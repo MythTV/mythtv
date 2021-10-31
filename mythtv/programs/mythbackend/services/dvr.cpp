@@ -327,6 +327,7 @@ bool Dvr::AddRecordedCredits(int RecordedId, const QJsonObject &jsonObj)
                           "%1 to DB").arg(person.toString());
     }
 
+    delete credits;
     return true;
 }
 

@@ -33,7 +33,7 @@ class Subscription
 {
   public:
     Subscription(QUrl url, QString path)
-      : m_url(std::move(url)), m_path(std::move(path)), m_uuid(QString()) { }
+      : m_url(std::move(url)), m_path(std::move(path)) { }
     QUrl    m_url;
     QString m_path;
     QString m_uuid;

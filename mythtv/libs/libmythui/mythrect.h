@@ -90,7 +90,7 @@ class MUI_PUBLIC MythPoint : public QPoint
 
   public:
     MythPoint()
-        : QPoint(), m_valid(false) {};
+        : m_valid(false) {};
     MythPoint(int x, int y)
         : QPoint(x, y) {}
     MythPoint(const QString &sX, const QString &sY);

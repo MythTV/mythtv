@@ -149,7 +149,8 @@ NVControl MythNVControl::Create()
             auto queryversion = reinterpret_cast<bool(*)(Display*,int,int)>(lib.resolve("XNVCTRLQueryVersion"));
             if (isnvscreen && queryversion)
             {
-                if (auto * xdisplay = MythXDisplay::OpenMythXDisplay(false); xdisplay && xdisplay->GetDisplay())
+                auto * xdisplay = MythXDisplay::OpenMythXDisplay(false);
+                if (xdisplay && xdisplay->GetDisplay())
                 {
                     int major = 0;
                     int minor = 0;
@@ -162,8 +163,8 @@ NVControl MythNVControl::Create()
                             return res;
                         }
                     }
-                    delete xdisplay;
                 }
+                delete xdisplay;
             }
             lib.unload();
         }

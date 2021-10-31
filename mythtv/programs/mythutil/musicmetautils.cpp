@@ -133,6 +133,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     if (!image->m_embedded || !tagger->supportsEmbeddedImages())
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Either the image isn't embedded or the tagger doesn't support embedded images"));
+        delete tagger;
         return GENERIC_EXIT_NOT_OK;
     }
 
@@ -150,6 +151,7 @@ static int ExtractImage(const MythUtilCommandLineParser &cmdline)
     if (!QDir(path).exists())
     {
         LOG(VB_GENERAL, LOG_ERR, "Cannot find a directory in the 'MusicArt' storage group to save to");
+        delete tagger;
         return GENERIC_EXIT_NOT_OK;
     }
 

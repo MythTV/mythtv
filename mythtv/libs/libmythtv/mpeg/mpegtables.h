@@ -748,7 +748,7 @@ class MTV_PUBLIC ProgramMapTable : public PSIPTable
         { return m_ptrs[i] + 5; }
 
     uint StreamCount(void) const
-        { return (m_ptrs.size()) ? m_ptrs.size()-1 : 0; }
+        { return (!m_ptrs.empty()) ? m_ptrs.size()-1 : 0; }
 
     // sets
     void SetPCRPID(uint pid)

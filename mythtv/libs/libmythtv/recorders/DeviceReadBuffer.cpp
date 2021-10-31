@@ -304,7 +304,7 @@ void DeviceReadBuffer::run(void)
 
     uint      errcnt = 0;
     uint      cnt = 0;
-    ssize_t   len = 0;
+    ssize_t   read_len = 0;
     size_t    total = 0;
     size_t    throttle = m_devReadSize * m_devBufferCount / 2;
 
@@ -340,8 +340,8 @@ void DeviceReadBuffer::run(void)
 
         /* Some device drivers segment their buffer into small pieces,
          * So allow for the reading of multiple buffers */
-        for (cnt = 0, len = 0, total = 0;
-             m_doRun && len >= 0 && cnt < m_devBufferCount; ++cnt)
+        for (cnt = 0, read_len = 0, total = 0;
+             m_doRun && read_len >= 0 && cnt < m_devBufferCount; ++cnt)
         {
             // Limit read size for faster return from read
             auto unused = static_cast<size_t>(WaitForUnused(m_readQuanta));
@@ -350,17 +350,17 @@ void DeviceReadBuffer::run(void)
             // if read_size > 0 do the read...
             if (read_size)
             {
-                len = read(m_streamFd, m_writePtr, read_size);
-                if (!CheckForErrors(len, read_size, errcnt))
+                read_len = read(m_streamFd, m_writePtr, read_size);
+                if (!CheckForErrors(read_len, read_size, errcnt))
                     break;
                 errcnt = 0;
 
                 // if we wrote past the official end of the buffer,
                 // copy to start
-                if (m_writePtr + len > m_endPtr)
-                    memcpy(m_buffer, m_endPtr, m_writePtr + len - m_endPtr);
-                IncrWritePointer(len);
-                total += len;
+                if (m_writePtr + read_len > m_endPtr)
+                    memcpy(m_buffer, m_endPtr, m_writePtr + read_len - m_endPtr);
+                IncrWritePointer(read_len);
+                total += read_len;
             }
         }
         if (errcnt > 5)
