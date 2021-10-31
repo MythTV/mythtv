@@ -125,8 +125,8 @@ static const char *read_ts(JACOsubContext *jacosub, const char *buf,
     return NULL;
 
 shift_and_ret:
-    ts_start64  = (ts_start + jacosub->shift) * 100LL / jacosub->timeres;
-    ts_end64    = (ts_end   + jacosub->shift) * 100LL / jacosub->timeres;
+    ts_start64  = (ts_start + (int64_t)jacosub->shift) * 100LL / jacosub->timeres;
+    ts_end64    = (ts_end   + (int64_t)jacosub->shift) * 100LL / jacosub->timeres;
     *start    = ts_start64;
     *duration = ts_end64 - ts_start64;
     return buf + len;
@@ -140,6 +140,9 @@ static int get_shift(int timeres, const char *buf)
 #define SSEP "%*1[.:]"
     int n = sscanf(buf, "%d"SSEP"%d"SSEP"%d"SSEP"%d", &a, &b, &c, &d);
 #undef SSEP
+
+    if (a == INT_MIN)
+        return 0;
 
     if (*buf == '-' || a < 0) {
         sign = -1;
@@ -199,6 +202,7 @@ static int jacosub_read_header(AVFormatContext *s)
 
             sub = ff_subtitles_queue_insert(&jacosub->q, line, len, merge_line);
             if (!sub) {
+                av_bprint_finalize(&header, NULL);
                 ret = AVERROR(ENOMEM);
                 goto fail;
             }
@@ -250,7 +254,7 @@ static int jacosub_read_header(AVFormatContext *s)
     /* SHIFT and TIMERES affect the whole script so packet timing can only be
      * done in a second pass */
     for (i = 0; i < jacosub->q.nb_subs; i++) {
-        AVPacket *sub = &jacosub->q.subs[i];
+        AVPacket *sub = jacosub->q.subs[i];
         read_ts(jacosub, sub->data, &sub->pts, &sub->duration);
     }
     ff_subtitles_queue_finalize(s, &jacosub->q);

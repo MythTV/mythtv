@@ -1,0 +1,2112 @@
+libavformat/rdt.h:35: *              demuxer context's ic->streams array that is part of this
+libavformat/flic.c:96:    flic->frame_number = 0;
+libavformat/flic.c:111:    flic->video_stream_index = st->index;
+libavformat/flic.c:152:        flic->audio_stream_index = ast->index;
+libavformat/flic.c:222:            pkt->stream_index = flic->video_stream_index;
+libavformat/flic.c:230:            pkt->flags = flic->frame_number == 0 ? AV_PKT_FLAG_KEY : 0;
+libavformat/flic.c:231:            pkt->pts = flic->frame_number;
+libavformat/flic.c:232:            if (flic->frame_number == 0)
+libavformat/flic.c:233:                av_add_index_entry(s->streams[flic->video_stream_index], pkt->pos, pkt->pts, pkt->size, 0, AVINDEX_KEYFRAME);
+libavformat/flic.c:235:            flic->frame_number++;
+libavformat/flic.c:243:            pkt->stream_index = flic->audio_stream_index;
+libavformat/flic.c:271:    if (!st->index_entries || stream_index != flic->video_stream_index)
+libavformat/flic.c:283:    flic->frame_number = ts;
+libavformat/dump.c:512:    int flags = (is_output ? ic->oformat->flags : ic->iformat->flags);
+libavformat/dump.c:513:    const AVStream *st = ic->streams[i];
+libavformat/dump.c:515:    const char *separator = ic->dump_separator;
+libavformat/dump.c:644:    uint8_t *printed = ic->nb_streams ? av_mallocz(ic->nb_streams) : NULL;
+libavformat/dump.c:645:    if (ic->nb_streams && !printed)
+libavformat/dump.c:651:           is_output ? ic->oformat->name : ic->iformat->name,
+libavformat/dump.c:653:    dump_metadata(NULL, ic->metadata, "  ");
+libavformat/dump.c:657:        if (ic->duration != AV_NOPTS_VALUE) {
+libavformat/dump.c:659:            int64_t duration = ic->duration + (ic->duration <= INT64_MAX - 5000 ? 5000 : 0);
+libavformat/dump.c:671:        if (ic->start_time != AV_NOPTS_VALUE) {
+libavformat/dump.c:674:            secs = llabs(ic->start_time / AV_TIME_BASE);
+libavformat/dump.c:675:            us   = llabs(ic->start_time % AV_TIME_BASE);
+libavformat/dump.c:677:                   ic->start_time >= 0 ? "" : "-",
+libavformat/dump.c:682:        if (ic->bit_rate)
+libavformat/dump.c:683:            av_log(NULL, AV_LOG_INFO, "%"PRId64" kb/s", ic->bit_rate / 1000);
+libavformat/dump.c:689:    if (ic->nb_chapters)
+libavformat/dump.c:691:    for (i = 0; i < ic->nb_chapters; i++) {
+libavformat/dump.c:692:        const AVChapter *ch = ic->chapters[i];
+libavformat/dump.c:702:    if (ic->nb_programs) {
+libavformat/dump.c:704:        for (j = 0; j < ic->nb_programs; j++) {
+libavformat/dump.c:705:            const AVProgram *program = ic->programs[j];
+libavformat/dump.c:718:        if (total < ic->nb_streams)
+libavformat/dump.c:722:    for (i = 0; i < ic->nb_streams; i++)
+libavformat/rtsp.h:381:    /** Whether the server accepts the x-Dynamic-Rate header */
+libavformat/id3v2.c:571:    av_buffer_unref(&apic->buf);
+libavformat/id3v2.c:572:    av_freep(&apic->description);
+libavformat/id3v2.c:632:    apic->id = id;
+libavformat/id3v2.c:642:    apic->type = ff_id3v2_picture_types[pic_type];
+libavformat/id3v2.c:645:    if (decode_str(s, pb, enc, &apic->description, &taglen) < 0) {
+libavformat/id3v2.c:651:    apic->buf = av_buffer_alloc(taglen + AV_INPUT_BUFFER_PADDING_SIZE);
+libavformat/id3v2.c:652:    if (!apic->buf || !taglen || avio_read(pb, apic->buf->data, taglen) != taglen)
+libavformat/id3v2.c:654:    memset(apic->buf->data + taglen, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+libavformat/id3v2.c:662:    rstrip_spaces(apic->description);
+libavformat/id3v2.c:1159:        st->codecpar->codec_id   = apic->id;
+libavformat/id3v2.c:1161:        if (AV_RB64(apic->buf->data) == PNGSIG)
+libavformat/id3v2.c:1164:        if (apic->description[0])
+libavformat/id3v2.c:1165:            av_dict_set(&st->metadata, "title", apic->description, 0);
+libavformat/id3v2.c:1167:        av_dict_set(&st->metadata, "comment", apic->type, 0);
+libavformat/id3v2.c:1170:        st->attached_pic.buf          = apic->buf;
+libavformat/id3v2.c:1171:        st->attached_pic.data         = apic->buf->data;
+libavformat/id3v2.c:1172:        st->attached_pic.size         = apic->buf->size - AV_INPUT_BUFFER_PADDING_SIZE;
+libavformat/id3v2.c:1176:        apic->buf = NULL;
+libavformat/rdt.c:63:    s->streams = &ic->streams[first_stream_of_set_idx];
+libavformat/rdt.c:66:    } while (first_stream_of_set_idx + s->n_streams < ic->nb_streams &&
+libavformat/rtsp.c:1143:    } else if (av_stristart(p, "x-Accept-Dynamic-Rate:", &p) && rt) {
+libavformat/rtsp.c:1577:            av_strlcat(cmd, "x-Dynamic-Rate: 0\r\n", sizeof(cmd));
+libavformat/hls.c:541:        if (!strcmp(characteristic, "public.accessibility.describes-music-and-sound"))
+libavformat/hls.c:1076:        if (size != apic->buf->size - AV_INPUT_BUFFER_PADDING_SIZE)
+libavformat/hls.c:1079:        if (memcmp(apic->buf->data, pls->ctx->streams[1]->attached_pic.data, size) != 0)
+libavformat/utils.c:414:    if (ic->format_whitelist && av_match_list(ic->iformat->name, ic->format_whitelist, ',') <= 0) {
+libavformat/utils.c:415:        av_log(ic, AV_LOG_ERROR, "Format not on whitelist \'%s\'\n", ic->format_whitelist);
+libavformat/utils.c:419:    if (ic->iformat->read_header) {
+libavformat/utils.c:420:        err = ic->iformat->read_header(ic);
+libavformat/utils.c:425:    if (ic->pb && !ic->internal->data_offset)
+libavformat/utils.c:426:        ic->internal->data_offset = avio_tell(ic->pb);
+libavformat/utils.c:2620:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2621:        st = ic->streams[i];
+libavformat/utils.c:2625:    if (ic->duration != AV_NOPTS_VALUE)
+libavformat/utils.c:2649:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2650:        AVStream *st = ic->streams[i];
+libavformat/utils.c:2702:        ic->start_time = start_time;
+libavformat/utils.c:2704:            if (ic->nb_programs > 1) {
+libavformat/utils.c:2705:                for (i = 0; i < ic->nb_programs; i++) {
+libavformat/utils.c:2706:                    p = ic->programs[i];
+libavformat/utils.c:2717:    if (duration != INT64_MIN && duration > 0 && ic->duration == AV_NOPTS_VALUE) {
+libavformat/utils.c:2718:        ic->duration = duration;
+libavformat/utils.c:2720:    if (ic->pb && (filesize = avio_size(ic->pb)) > 0 && ic->duration > 0) {
+libavformat/utils.c:2723:                         (double) ic->duration;
+libavformat/utils.c:2725:            ic->bit_rate = bitrate;
+libavformat/utils.c:2735:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2736:        st = ic->streams[i];
+libavformat/utils.c:2738:            if (ic->start_time != AV_NOPTS_VALUE)
+libavformat/utils.c:2739:                st->start_time = av_rescale_q(ic->start_time, AV_TIME_BASE_Q,
+libavformat/utils.c:2741:            if (ic->duration != AV_NOPTS_VALUE)
+libavformat/utils.c:2742:                st->duration = av_rescale_q(ic->duration, AV_TIME_BASE_Q,
+libavformat/utils.c:2755:    if (ic->bit_rate <= 0) {
+libavformat/utils.c:2757:        for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2758:            st = ic->streams[i];
+libavformat/utils.c:2774:        ic->bit_rate = bit_rate;
+libavformat/utils.c:2778:    if (ic->duration == AV_NOPTS_VALUE &&
+libavformat/utils.c:2779:        ic->bit_rate != 0) {
+libavformat/utils.c:2780:        filesize = ic->pb ? avio_size(ic->pb) : 0;
+libavformat/utils.c:2781:        if (filesize > ic->internal->data_offset) {
+libavformat/utils.c:2782:            filesize -= ic->internal->data_offset;
+libavformat/utils.c:2783:            for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2784:                st      = ic->streams[i];
+libavformat/utils.c:2785:                if (   st->time_base.num <= INT64_MAX / ic->bit_rate
+libavformat/utils.c:2788:                                          ic->bit_rate *
+libavformat/utils.c:2812:    AVPacket *pkt = ic->internal->pkt;
+libavformat/utils.c:2823:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2824:        st = ic->streams[i];
+libavformat/utils.c:2837:    if (ic->skip_estimate_duration_from_pts) {
+libavformat/utils.c:2845:    filesize = ic->pb ? avio_size(ic->pb) : 0;
+libavformat/utils.c:2852:        avio_seek(ic->pb, offset, SEEK_SET);
+libavformat/utils.c:2865:            if (pkt->stream_index >= ic->nb_streams)
+libavformat/utils.c:2871:            st         = ic->streams[pkt->stream_index];
+libavformat/utils.c:2903:            for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2904:                st = ic->streams[i];
+libavformat/utils.c:2920:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2921:        st = ic->streams[i];
+libavformat/utils.c:2936:    avio_seek(ic->pb, old_offset, SEEK_SET);
+libavformat/utils.c:2937:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2940:        st              = ic->streams[i];
+libavformat/utils.c:2966:    if (ic->iformat->flags & AVFMT_NOFILE) {
+libavformat/utils.c:2969:        file_size = avio_size(ic->pb);
+libavformat/utils.c:2973:    if ((!strcmp(ic->iformat->name, "mpeg") ||
+libavformat/utils.c:2974:         !strcmp(ic->iformat->name, "mpegts")) &&
+libavformat/utils.c:2975:        file_size && (ic->pb->seekable & AVIO_SEEKABLE_NORMAL)) {
+libavformat/utils.c:2978:        ic->duration_estimation_method = AVFMT_DURATION_FROM_PTS;
+libavformat/utils.c:2984:        if(!strcmp(ic->iformat->name, "nut"))
+libavformat/utils.c:2985:            ic->duration_estimation_method = AVFMT_DURATION_FROM_PTS;
+libavformat/utils.c:2987:            ic->duration_estimation_method = AVFMT_DURATION_FROM_STREAM;
+libavformat/utils.c:2991:        ic->duration_estimation_method = AVFMT_DURATION_FROM_BITRATE;
+libavformat/utils.c:2998:        for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:2999:            st = ic->streams[i];
+libavformat/utils.c:3007:               av_ts2timestr(ic->start_time, &AV_TIME_BASE_Q),
+libavformat/utils.c:3008:               av_ts2timestr(ic->duration, &AV_TIME_BASE_Q),
+libavformat/utils.c:3009:               duration_estimate_name(ic->duration_estimation_method),
+libavformat/utils.c:3010:               (int64_t)ic->bit_rate / 1000);
+libavformat/utils.c:3457:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:3458:        AVStream *st = ic->streams[i];
+libavformat/utils.c:3659:    AVPacket *pkt1 = ic->internal->pkt;
+libavformat/utils.c:3660:    int64_t old_offset  = avio_tell(ic->pb);
+libavformat/utils.c:3662:    int orig_nb_streams = ic->nb_streams;
+libavformat/utils.c:3664:    int64_t max_analyze_duration = ic->max_analyze_duration;
+libavformat/utils.c:3667:    int64_t probesize = ic->probesize;
+libavformat/utils.c:3669:    int *missing_streams = av_opt_ptr(ic->iformat->priv_class, ic->priv_data, "missing_streams");
+libavformat/utils.c:3681:        if (!strcmp(ic->iformat->name, "flv"))
+libavformat/utils.c:3683:        if (!strcmp(ic->iformat->name, "mpeg") || !strcmp(ic->iformat->name, "mpegts"))
+libavformat/utils.c:3691:    if (ic->pb)
+libavformat/utils.c:3693:               avio_tell(ic->pb), ic->pb->bytes_read, ic->pb->seek_count, ic->nb_streams);
+libavformat/utils.c:3695:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:3698:        st = ic->streams[i];
+libavformat/utils.c:3720:        if (!st->parser && !(ic->flags & AVFMT_FLAG_NOPARSE) && st->internal->request_probe <= 0) {
+libavformat/utils.c:3754:        if (ic->codec_whitelist)
+libavformat/utils.c:3755:            av_dict_set(options ? &options[i] : &thread_opt, "codec_whitelist", ic->codec_whitelist, 0);
+libavformat/utils.c:3776:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:3777:        if (ic->streams[i]->info )
+libavformat/utils.c:3780:        ic->streams[i]->internal->info->last_dts = AV_NOPTS_VALUE;
+libavformat/utils.c:3783:        ic->streams[i]->info->fps_first_dts = AV_NOPTS_VALUE;
+libavformat/utils.c:3784:        ic->streams[i]->info->fps_last_dts  = AV_NOPTS_VALUE;
+libavformat/utils.c:3787:        ic->streams[i]->internal->info->fps_first_dts = AV_NOPTS_VALUE;
+libavformat/utils.c:3788:        ic->streams[i]->internal->info->fps_last_dts  = AV_NOPTS_VALUE;
+libavformat/utils.c:3796:        if (ff_check_interrupt(&ic->interrupt_callback)) {
+libavformat/utils.c:3803:        for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:3807:            st = ic->streams[i];
+libavformat/utils.c:3817:            if (ic->fps_probe_size >= 0)
+libavformat/utils.c:3818:                fps_analyze_framecount = ic->fps_probe_size;
+libavformat/utils.c:3822:            count = (ic->iformat->flags & AVFMT_NOTIMESTAMPS) ?
+libavformat/utils.c:3840:                !(ic->iformat->flags & AVFMT_NOTIMESTAMPS) &&
+libavformat/utils.c:3841:                st->codec_info_nb_frames < ((st->disposition & AV_DISPOSITION_ATTACHED_PIC) ? 1 : ic->max_ts_probe) &&
+libavformat/utils.c:3851:            if (i == ic->nb_streams) {
+libavformat/utils.c:3856:                if (!(ic->ctx_flags & AVFMTCTX_NOHEADER) ||
+libavformat/utils.c:3866:                if (i == 1 && ic->streams[0]->codecpar->codec_id == AV_CODEC_ID_DSMCC_B)
+libavformat/utils.c:3878:            for (i = 0; i < ic->nb_streams; i++)
+libavformat/utils.c:3879:                if (!ic->streams[i]->r_frame_rate.num &&
+libavformat/utils.c:3880:                    ic->streams[i]->internal->info->duration_count <= 1 &&
+libavformat/utils.c:3881:                    ic->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
+libavformat/utils.c:3882:                    strcmp(ic->iformat->name, "image2"))
+libavformat/utils.c:3904:        if (!(ic->flags & AVFMT_FLAG_NOBUFFER)) {
+libavformat/utils.c:3905:            ret = avpriv_packet_list_put(&ic->internal->packet_buffer,
+libavformat/utils.c:3906:                                     &ic->internal->packet_buffer_end,
+libavformat/utils.c:3911:            pkt = &ic->internal->packet_buffer_end->pkt;
+libavformat/utils.c:3916:        st = ic->streams[pkt->stream_index];
+libavformat/utils.c:3992:                if (ic->flags & AVFMT_FLAG_NOBUFFER)
+libavformat/utils.c:4031:        if (ic->flags & AVFMT_FLAG_NOBUFFER)
+libavformat/utils.c:4040:        for (stream_index = 0; stream_index < ic->nb_streams; stream_index++) {
+libavformat/utils.c:4041:            st = ic->streams[stream_index];
+libavformat/utils.c:4047:                    if (ic->codec_whitelist)
+libavformat/utils.c:4048:                        av_dict_set(&opts, "codec_whitelist", ic->codec_whitelist, 0);
+libavformat/utils.c:4058:            if (ic->internal->packet_buffer && !has_decode_delay_been_guessed(st)) {
+libavformat/utils.c:4059:                update_dts_from_pts(ic, stream_index, ic->internal->packet_buffer);
+libavformat/utils.c:4065:        AVPacket *empty_pkt = ic->internal->pkt;
+libavformat/utils.c:4069:        for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:4071:            st = ic->streams[i];
+libavformat/utils.c:4091:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:4092:        st = ic->streams[i];
+libavformat/utils.c:4129:                    if (ic->internal->prefer_codec_framerate && codec_frame_rate.num > 0 && codec_frame_rate.den > 0) {
+libavformat/utils.c:4188:    if (ret >= 0 && ic->nb_streams)
+libavformat/utils.c:4191:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:4193:        st = ic->streams[i];
+libavformat/utils.c:4210:                   i, buf, errmsg, ic->max_analyze_duration, ic->probesize);
+libavformat/utils.c:4221:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:4222:        st = ic->streams[i];
+libavformat/utils.c:4273:    for (i = 0; i < ic->nb_streams; i++) {
+libavformat/utils.c:4274:        st = ic->streams[i];
+libavformat/utils.c:4277:        avcodec_close(ic->streams[i]->internal->avctx);
+libavformat/utils.c:4278:        av_freep(&ic->streams[i]->internal->info);
+libavformat/utils.c:4279:        av_bsf_free(&ic->streams[i]->internal->extract_extradata.bsf);
+libavformat/utils.c:4280:        av_packet_free(&ic->streams[i]->internal->extract_extradata.pkt);
+libavformat/utils.c:4282:    if (ic->pb)
+libavformat/utils.c:4284:               avio_tell(ic->pb), ic->pb->bytes_read, ic->pb->seek_count, count);
+libavformat/utils.c:4296:    for (i = 0; i < ic->nb_programs; i++) {
+libavformat/utils.c:4297:        if (ic->programs[i] == last) {
+libavformat/utils.c:4301:                for (j = 0; j < ic->programs[i]->nb_stream_indexes; j++)
+libavformat/utils.c:4302:                    if (ic->programs[i]->stream_index[j] == s)
+libavformat/utils.c:4303:                        return ic->programs[i];
+libavformat/utils.c:4313:    int i, nb_streams = ic->nb_streams;
+libavformat/utils.c:4331:        AVStream *st          = ic->streams[real_stream_index];
+libavformat/utils.c:4365:            nb_streams = ic->nb_streams;
+libavformat/tests/seek.c:82:                ic->flags |= AVFMT_FLAG_FAST_SEEK;
+libavformat/tests/seek.c:129:                st= ic->streams[pkt.stream_index];
+libavformat/tests/seek.c:142:        stream_id= (i>>1)%(ic->nb_streams+1) - 1;
+libavformat/tests/seek.c:145:            st= ic->streams[stream_id];
+libavformat/options.c:233:    ic->internal = internal;
+libavformat/options.c:234:    ic->internal->offset = AV_NOPTS_VALUE;
+libavformat/options.c:235:    ic->internal->raw_packet_buffer_remaining_size = RAW_PACKET_BUFFER_SIZE;
+libavformat/options.c:236:    ic->internal->shortest_end = AV_NOPTS_VALUE;
+libavformat/movenc.c:2023:    // https://developer.apple.com/av-foundation/High-Dynamic-Range-Metadata-for-Apple-Devices.pdf
+libavformat/rtpdec.c:636:    if (s->last_rtcp_ntp_time != AV_NOPTS_VALUE && s->ic->nb_streams > 1) {
+libavcodec/v210x.c:61:    ydst = (uint16_t *)pic->data[0];
+libavcodec/v210x.c:62:    udst = (uint16_t *)pic->data[1];
+libavcodec/v210x.c:63:    vdst = (uint16_t *)pic->data[2];
+libavcodec/v210x.c:65:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/v210x.c:66:    pic->key_frame = 1;
+libavcodec/v210x.c:78:            ydst += pic->linesize[0] / 2 - width;
+libavcodec/v210x.c:79:            udst += pic->linesize[1] / 2 - width / 2;
+libavcodec/v210x.c:80:            vdst += pic->linesize[2] / 2 - width / 2;
+libavcodec/v210x.c:94:            ydst += pic->linesize[0] / 2 - width;
+libavcodec/v210x.c:95:            udst += pic->linesize[1] / 2 - width / 2;
+libavcodec/v210x.c:96:            vdst += pic->linesize[2] / 2 - width / 2;
+libavcodec/v210x.c:109:            ydst += pic->linesize[0] / 2 - width;
+libavcodec/v210x.c:110:            udst += pic->linesize[1] / 2 - width / 2;
+libavcodec/v210x.c:111:            vdst += pic->linesize[2] / 2 - width / 2;
+libavcodec/v210dec.c:184:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/v210dec.c:185:    pic->key_frame = 1;
+libavcodec/v210dec.c:193:        pic->interlaced_frame = 1;
+libavcodec/v210dec.c:195:            pic->top_field_first = 1;
+libavcodec/vaapi_encode_vp9.c:69:    vpic->frame_width_src  = avctx->width;
+libavcodec/vaapi_encode_vp9.c:70:    vpic->frame_height_src = avctx->height;
+libavcodec/vaapi_encode_vp9.c:71:    vpic->frame_width_dst  = avctx->width;
+libavcodec/vaapi_encode_vp9.c:72:    vpic->frame_height_dst = avctx->height;
+libavcodec/vaapi_encode_vp9.c:82:    VAAPIEncodeVP9Picture          *hpic = pic->priv_data;
+libavcodec/vaapi_encode_vp9.c:83:    VAEncPictureParameterBufferVP9 *vpic = pic->codec_picture_params;
+libavcodec/vaapi_encode_vp9.c:86:    vpic->reconstructed_frame = pic->recon_surface;
+libavcodec/vaapi_encode_vp9.c:87:    vpic->coded_buf = pic->output_buffer;
+libavcodec/vaapi_encode_vp9.c:89:    switch (pic->type) {
+libavcodec/vaapi_encode_vp9.c:91:        av_assert0(pic->nb_refs == 0);
+libavcodec/vaapi_encode_vp9.c:92:        vpic->ref_flags.bits.force_kf = 1;
+libavcodec/vaapi_encode_vp9.c:93:        vpic->refresh_frame_flags = 0xff;
+libavcodec/vaapi_encode_vp9.c:94:        hpic->slot = 0;
+libavcodec/vaapi_encode_vp9.c:97:        av_assert0(pic->nb_refs == 1);
+libavcodec/vaapi_encode_vp9.c:99:            VAAPIEncodeVP9Picture *href = pic->refs[0]->priv_data;
+libavcodec/vaapi_encode_vp9.c:103:                hpic->slot = !href->slot;
+libavcodec/vaapi_encode_vp9.c:104:                vpic->refresh_frame_flags = 1 << hpic->slot | 0xfc;
+libavcodec/vaapi_encode_vp9.c:106:                hpic->slot = 0;
+libavcodec/vaapi_encode_vp9.c:107:                vpic->refresh_frame_flags = 0xff;
+libavcodec/vaapi_encode_vp9.c:109:            vpic->ref_flags.bits.ref_frame_ctrl_l0  = 1;
+libavcodec/vaapi_encode_vp9.c:110:            vpic->ref_flags.bits.ref_last_idx       = href->slot;
+libavcodec/vaapi_encode_vp9.c:111:            vpic->ref_flags.bits.ref_last_sign_bias = 1;
+libavcodec/vaapi_encode_vp9.c:115:        av_assert0(pic->nb_refs == 2);
+libavcodec/vaapi_encode_vp9.c:117:            VAAPIEncodeVP9Picture *href0 = pic->refs[0]->priv_data,
+libavcodec/vaapi_encode_vp9.c:118:                                  *href1 = pic->refs[1]->priv_data;
+libavcodec/vaapi_encode_vp9.c:119:            av_assert0(href0->slot < pic->b_depth + 1 &&
+libavcodec/vaapi_encode_vp9.c:120:                       href1->slot < pic->b_depth + 1);
+libavcodec/vaapi_encode_vp9.c:122:            if (pic->b_depth == ctx->max_b_depth) {
+libavcodec/vaapi_encode_vp9.c:124:                vpic->refresh_frame_flags = 0x00;
+libavcodec/vaapi_encode_vp9.c:125:                hpic->slot = 8;
+libavcodec/vaapi_encode_vp9.c:127:                vpic->refresh_frame_flags = 0xfe << pic->b_depth & 0xff;
+libavcodec/vaapi_encode_vp9.c:128:                hpic->slot = 1 + pic->b_depth;
+libavcodec/vaapi_encode_vp9.c:130:            vpic->ref_flags.bits.ref_frame_ctrl_l0  = 1;
+libavcodec/vaapi_encode_vp9.c:131:            vpic->ref_flags.bits.ref_frame_ctrl_l1  = 2;
+libavcodec/vaapi_encode_vp9.c:132:            vpic->ref_flags.bits.ref_last_idx       = href0->slot;
+libavcodec/vaapi_encode_vp9.c:133:            vpic->ref_flags.bits.ref_last_sign_bias = 1;
+libavcodec/vaapi_encode_vp9.c:134:            vpic->ref_flags.bits.ref_gf_idx         = href1->slot;
+libavcodec/vaapi_encode_vp9.c:135:            vpic->ref_flags.bits.ref_gf_sign_bias   = 0;
+libavcodec/vaapi_encode_vp9.c:141:    if (vpic->refresh_frame_flags == 0x00) {
+libavcodec/vaapi_encode_vp9.c:143:               pic->display_order);
+libavcodec/vaapi_encode_vp9.c:146:               pic->display_order, hpic->slot);
+libavcodec/vaapi_encode_vp9.c:149:    for (i = 0; i < FF_ARRAY_ELEMS(vpic->reference_frames); i++)
+libavcodec/vaapi_encode_vp9.c:150:        vpic->reference_frames[i] = VA_INVALID_SURFACE;
+libavcodec/vaapi_encode_vp9.c:152:    for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode_vp9.c:153:        VAAPIEncodePicture *ref_pic = pic->refs[i];
+libavcodec/vaapi_encode_vp9.c:155:        slot = ((VAAPIEncodeVP9Picture*)ref_pic->priv_data)->slot;
+libavcodec/vaapi_encode_vp9.c:156:        av_assert0(vpic->reference_frames[slot] == VA_INVALID_SURFACE);
+libavcodec/vaapi_encode_vp9.c:157:        vpic->reference_frames[slot] = ref_pic->recon_surface;
+libavcodec/vaapi_encode_vp9.c:160:    vpic->pic_flags.bits.frame_type = (pic->type != PICTURE_TYPE_IDR);
+libavcodec/vaapi_encode_vp9.c:161:    vpic->pic_flags.bits.show_frame = pic->display_order <= pic->encode_order;
+libavcodec/vaapi_encode_vp9.c:163:    if (pic->type == PICTURE_TYPE_IDR)
+libavcodec/vaapi_encode_vp9.c:164:        vpic->luma_ac_qindex     = priv->q_idx_idr;
+libavcodec/vaapi_encode_vp9.c:165:    else if (pic->type == PICTURE_TYPE_P)
+libavcodec/vaapi_encode_vp9.c:166:        vpic->luma_ac_qindex     = priv->q_idx_p;
+libavcodec/vaapi_encode_vp9.c:168:        vpic->luma_ac_qindex     = priv->q_idx_b;
+libavcodec/vaapi_encode_vp9.c:169:    vpic->luma_dc_qindex_delta   = 0;
+libavcodec/vaapi_encode_vp9.c:170:    vpic->chroma_ac_qindex_delta = 0;
+libavcodec/vaapi_encode_vp9.c:171:    vpic->chroma_dc_qindex_delta = 0;
+libavcodec/vaapi_encode_vp9.c:173:    vpic->filter_level    = priv->loop_filter_level;
+libavcodec/vaapi_encode_vp9.c:174:    vpic->sharpness_level = priv->loop_filter_sharpness;
+libavcodec/tscc2.c:196:            off = mb_x * 16 + mb_y * 8 * c->pic->linesize[i];
+libavcodec/tscc2.c:198:                                  c->pic->data[i] + off, c->pic->linesize[i], i);
+libavcodec/ratecontrol.c:761:        float temp_cplx = sqrt(pic->mc_mb_var[mb_xy]); // FIXME merge in pow()
+libavcodec/ratecontrol.c:762:        float spat_cplx = sqrt(pic->mb_var[mb_xy]);
+libavcodec/ratecontrol.c:763:        const int lumi  = pic->mb_mean[mb_xy];
+libavcodec/ratecontrol.c:923:        if (!dts_pic || dts_pic->f->pts == AV_NOPTS_VALUE)
+libavcodec/ratecontrol.c:926:            wanted_bits = (uint64_t)(s->bit_rate * (double)dts_pic->f->pts / fps);
+libavcodec/ratecontrol.c:934:    var = pict_type == AV_PICTURE_TYPE_I ? pic->mb_var_sum : pic->mc_mb_var_sum;
+libavcodec/ratecontrol.c:947:        rce->mc_mb_var_sum = pic->mc_mb_var_sum;
+libavcodec/ratecontrol.c:948:        rce->mb_var_sum    = pic->mb_var_sum;
+libavcodec/ratecontrol.c:1008:               pic->mb_var_sum, pic->mc_mb_var_sum,
+libavcodec/ratecontrol.c:1024:        rcc->last_mc_mb_var_sum = pic->mc_mb_var_sum;
+libavcodec/ratecontrol.c:1025:        rcc->last_mb_var_sum    = pic->mb_var_sum;
+libavcodec/h264_slice.c:191:    av_assert0(!pic->f->data[0]);
+libavcodec/h264_slice.c:193:    pic->tf.f = pic->f;
+libavcodec/h264_slice.c:194:    ret = ff_thread_get_buffer(h->avctx, &pic->tf, pic->reference ?
+libavcodec/h264_slice.c:201:        av_assert0(!pic->hwaccel_picture_private);
+libavcodec/h264_slice.c:203:            pic->hwaccel_priv_buf = av_buffer_allocz(hwaccel->frame_priv_data_size);
+libavcodec/h264_slice.c:204:            if (!pic->hwaccel_priv_buf)
+libavcodec/h264_slice.c:206:            pic->hwaccel_picture_private = pic->hwaccel_priv_buf->data;
+libavcodec/h264_slice.c:209:    if (CONFIG_GRAY && !h->avctx->hwaccel && h->flags & AV_CODEC_FLAG_GRAY && pic->f->data[2]) {
+libavcodec/h264_slice.c:211:        av_pix_fmt_get_chroma_sub_sample(pic->f->format,
+libavcodec/h264_slice.c:214:        for(i=0; i<AV_CEIL_RSHIFT(pic->f->height, v_chroma_shift); i++) {
+libavcodec/h264_slice.c:215:            memset(pic->f->data[1] + pic->f->linesize[1]*i,
+libavcodec/h264_slice.c:216:                   0x80, AV_CEIL_RSHIFT(pic->f->width, h_chroma_shift));
+libavcodec/h264_slice.c:217:            memset(pic->f->data[2] + pic->f->linesize[2]*i,
+libavcodec/h264_slice.c:218:                   0x80, AV_CEIL_RSHIFT(pic->f->width, h_chroma_shift));
+libavcodec/h264_slice.c:228:    pic->qscale_table_buf = av_buffer_pool_get(h->qscale_table_pool);
+libavcodec/h264_slice.c:229:    pic->mb_type_buf      = av_buffer_pool_get(h->mb_type_pool);
+libavcodec/h264_slice.c:230:    if (!pic->qscale_table_buf || !pic->mb_type_buf)
+libavcodec/h264_slice.c:233:    pic->mb_type      = (uint32_t*)pic->mb_type_buf->data + 2 * h->mb_stride + 1;
+libavcodec/h264_slice.c:234:    pic->qscale_table = pic->qscale_table_buf->data + 2 * h->mb_stride + 1;
+libavcodec/h264_slice.c:237:        pic->motion_val_buf[i] = av_buffer_pool_get(h->motion_val_pool);
+libavcodec/h264_slice.c:238:        pic->ref_index_buf[i]  = av_buffer_pool_get(h->ref_index_pool);
+libavcodec/h264_slice.c:239:        if (!pic->motion_val_buf[i] || !pic->ref_index_buf[i])
+libavcodec/h264_slice.c:242:        pic->motion_val[i] = (int16_t (*)[2])pic->motion_val_buf[i]->data + 4;
+libavcodec/h264_slice.c:243:        pic->ref_index[i]  = pic->ref_index_buf[i]->data;
+libavcodec/h264_slice.c:246:    pic->pps_buf = av_buffer_ref(h->ps.pps_ref);
+libavcodec/h264_slice.c:247:    if (!pic->pps_buf)
+libavcodec/h264_slice.c:249:    pic->pps = (const PPS*)pic->pps_buf->data;
+libavcodec/h264_slice.c:251:    pic->mb_width  = h->mb_width;
+libavcodec/h264_slice.c:252:    pic->mb_height = h->mb_height;
+libavcodec/h264_slice.c:253:    pic->mb_stride = h->mb_stride;
+libavcodec/h264_slice.c:488:    pic->reference              = h->droppable ? 0 : h->picture_structure;
+libavcodec/h264_slice.c:489:    pic->f->coded_picture_number = h->coded_picture_number++;
+libavcodec/h264_slice.c:490:    pic->field_picture          = h->picture_structure != PICT_FRAME;
+libavcodec/h264_slice.c:491:    pic->frame_num               = h->poc.frame_num;
+libavcodec/h264_slice.c:497:    pic->f->key_frame = 0;
+libavcodec/h264_slice.c:498:    pic->mmco_reset  = 0;
+libavcodec/h264_slice.c:499:    pic->recovered   = 0;
+libavcodec/h264_slice.c:500:    pic->invalid_gap = 0;
+libavcodec/h264_slice.c:501:    pic->sei_recovery_frame_cnt = h->sei.recovery_point.recovery_frame_cnt;
+libavcodec/h264_slice.c:503:    pic->f->pict_type = h->slice_ctx[0].slice_type;
+libavcodec/h264_slice.c:505:    pic->f->crop_left   = h->crop_left;
+libavcodec/h264_slice.c:506:    pic->f->crop_right  = h->crop_right;
+libavcodec/h264_slice.c:507:    pic->f->crop_top    = h->crop_top;
+libavcodec/h264_slice.c:508:    pic->f->crop_bottom = h->crop_bottom;
+libavcodec/h264_slice.c:534:        h->block_offset[i]           = (4 * ((scan8[i] - scan8[0]) & 7) << pixel_shift) + 4 * pic->f->linesize[0] * ((scan8[i] - scan8[0]) >> 3);
+libavcodec/h264_slice.c:535:        h->block_offset[48 + i]      = (4 * ((scan8[i] - scan8[0]) & 7) << pixel_shift) + 8 * pic->f->linesize[0] * ((scan8[i] - scan8[0]) >> 3);
+libavcodec/h264_slice.c:539:        h->block_offset[32 + i]      = (4 * ((scan8[i] - scan8[0]) & 7) << pixel_shift) + 4 * pic->f->linesize[1] * ((scan8[i] - scan8[0]) >> 3);
+libavcodec/h264_slice.c:541:        h->block_offset[48 + 32 + i] = (4 * ((scan8[i] - scan8[0]) & 7) << pixel_shift) + 8 * pic->f->linesize[1] * ((scan8[i] - scan8[0]) >> 3);
+libavcodec/motion_est.c:918:    pic->mb_mean[s->mb_stride * mb_y + mb_x] = (sum+128)>>8;
+libavcodec/motion_est.c:919:    pic->mb_var [s->mb_stride * mb_y + mb_x] = (varc+128)>>8;
+libavcodec/motion_est.c:966:    pic->mc_mb_var[s->mb_stride * mb_y + mb_x] = (vard+128)>>8;
+libavcodec/v210_template.c:43:    const TYPE *y = (const TYPE *)pic->data[0];
+libavcodec/v210_template.c:44:    const TYPE *u = (const TYPE *)pic->data[1];
+libavcodec/v210_template.c:45:    const TYPE *v = (const TYPE *)pic->data[2];
+libavcodec/v210_template.c:86:        y += pic->linesize[0] / BYTES_PER_PIXEL - avctx->width;
+libavcodec/v210_template.c:87:        u += pic->linesize[1] / BYTES_PER_PIXEL - avctx->width / 2;
+libavcodec/v210_template.c:88:        v += pic->linesize[2] / BYTES_PER_PIXEL - avctx->width / 2;
+libavcodec/vdpau_internal.h:40:    return (uintptr_t)pic->data[3];
+libavcodec/proresenc_anatoliy.c:556:    luma_stride   = pic->linesize[0];
+libavcodec/proresenc_anatoliy.c:557:    chroma_stride = pic->linesize[1];
+libavcodec/proresenc_anatoliy.c:560:        alpha_stride = pic->linesize[3];
+libavcodec/proresenc_anatoliy.c:563:        dest_y = pic->data[0] + (mb_y << 4) * luma_stride   + (mb_x << 5);
+libavcodec/proresenc_anatoliy.c:564:        dest_u = pic->data[1] + (mb_y << 4) * chroma_stride + (mb_x << (5 - ctx->is_422));
+libavcodec/proresenc_anatoliy.c:565:        dest_v = pic->data[2] + (mb_y << 4) * chroma_stride + (mb_x << (5 - ctx->is_422));
+libavcodec/proresenc_anatoliy.c:567:        dest_y = pic->data[0] + (mb_y << 4) * luma_stride * 2   + (mb_x << 5);
+libavcodec/proresenc_anatoliy.c:568:        dest_u = pic->data[1] + (mb_y << 4) * chroma_stride * 2 + (mb_x << (5 - ctx->is_422));
+libavcodec/proresenc_anatoliy.c:569:        dest_v = pic->data[2] + (mb_y << 4) * chroma_stride * 2 + (mb_x << (5 - ctx->is_422));
+libavcodec/proresenc_anatoliy.c:578:        subimage_with_fill((uint16_t *) pic->data[0], mb_x << 4, mb_y << 4,
+libavcodec/proresenc_anatoliy.c:581:        subimage_with_fill((uint16_t *) pic->data[1], mb_x << (4 - ctx->is_422), mb_y << 4,
+libavcodec/proresenc_anatoliy.c:584:        subimage_with_fill((uint16_t *) pic->data[2], mb_x << (4 - ctx->is_422), mb_y << 4,
+libavcodec/proresenc_anatoliy.c:641:        subimage_alpha_with_fill((uint16_t *) pic->data[3], mb_x << 4, mb_y << 4,
+libavcodec/vaapi_encode_mpeg2.c:423:    VAEncPictureParameterBufferMPEG2 *vpic = pic->codec_picture_params;
+libavcodec/vaapi_encode_mpeg2.c:425:    if (pic->type == PICTURE_TYPE_IDR || pic->type == PICTURE_TYPE_I) {
+libavcodec/vaapi_encode_mpeg2.c:428:        priv->last_i_frame = pic->display_order;
+libavcodec/vaapi_encode_mpeg2.c:430:        ph->temporal_reference = pic->display_order - priv->last_i_frame;
+libavcodec/vaapi_encode_mpeg2.c:431:        ph->picture_coding_type = pic->type == PICTURE_TYPE_B ? 3 : 2;
+libavcodec/vaapi_encode_mpeg2.c:434:    if (pic->type == PICTURE_TYPE_P || pic->type == PICTURE_TYPE_B) {
+libavcodec/vaapi_encode_mpeg2.c:441:    if (pic->type == PICTURE_TYPE_B) {
+libavcodec/vaapi_encode_mpeg2.c:449:    vpic->reconstructed_picture = pic->recon_surface;
+libavcodec/vaapi_encode_mpeg2.c:450:    vpic->coded_buf             = pic->output_buffer;
+libavcodec/vaapi_encode_mpeg2.c:452:    switch (pic->type) {
+libavcodec/vaapi_encode_mpeg2.c:455:        vpic->picture_type = VAEncPictureTypeIntra;
+libavcodec/vaapi_encode_mpeg2.c:458:        vpic->picture_type = VAEncPictureTypePredictive;
+libavcodec/vaapi_encode_mpeg2.c:459:        vpic->forward_reference_picture = pic->refs[0]->recon_surface;
+libavcodec/vaapi_encode_mpeg2.c:462:        vpic->picture_type = VAEncPictureTypeBidirectional;
+libavcodec/vaapi_encode_mpeg2.c:463:        vpic->forward_reference_picture  = pic->refs[0]->recon_surface;
+libavcodec/vaapi_encode_mpeg2.c:464:        vpic->backward_reference_picture = pic->refs[1]->recon_surface;
+libavcodec/vaapi_encode_mpeg2.c:470:    vpic->temporal_reference = ph->temporal_reference;
+libavcodec/vaapi_encode_mpeg2.c:471:    vpic->f_code[0][0]       = pce->f_code[0][0];
+libavcodec/vaapi_encode_mpeg2.c:472:    vpic->f_code[0][1]       = pce->f_code[0][1];
+libavcodec/vaapi_encode_mpeg2.c:473:    vpic->f_code[1][0]       = pce->f_code[1][0];
+libavcodec/vaapi_encode_mpeg2.c:474:    vpic->f_code[1][1]       = pce->f_code[1][1];
+libavcodec/vaapi_encode_mpeg2.c:490:    switch (pic->type) {
+libavcodec/vaapi_encode_mpeg2.c:506:    vslice->is_intra_slice = (pic->type == PICTURE_TYPE_IDR ||
+libavcodec/vaapi_encode_mpeg2.c:507:                              pic->type == PICTURE_TYPE_I);
+libavcodec/mss4.c:237:            ff_mss34_dct_put(out + xpos * 8, c->pic->linesize[0],
+libavcodec/mss4.c:240:        out += 8 * c->pic->linesize[0];
+libavcodec/mss4.c:260:            out += c->pic->linesize[i];
+libavcodec/mss4.c:421:            memcpy(picdst[i] + mb_x * 16 + j * ctx->pic->linesize[i],
+libavcodec/mss4.c:501:    c->pic->key_frame = (frame_type == INTRA_FRAME);
+libavcodec/mss4.c:502:    c->pic->pict_type = (frame_type == INTRA_FRAME) ? AV_PICTURE_TYPE_I
+libavcodec/mss4.c:520:    dst[0] = c->pic->data[0];
+libavcodec/mss4.c:521:    dst[1] = c->pic->data[1];
+libavcodec/mss4.c:522:    dst[2] = c->pic->data[2];
+libavcodec/mss4.c:556:        dst[0] += c->pic->linesize[0] * 16;
+libavcodec/mss4.c:557:        dst[1] += c->pic->linesize[1] * 16;
+libavcodec/mss4.c:558:        dst[2] += c->pic->linesize[2] * 16;
+libavcodec/dxva2_vp9.c:40:    pic->bPicEntry = index | (flag << 7);
+libavcodec/dxva2_vp9.c:199:    if (ctx_pic->slice.SliceBytesInBuffer > dxva_size) {
+libavcodec/dxva2_vp9.c:204:    memcpy(dxva_data, ctx_pic->bitstream, ctx_pic->slice.SliceBytesInBuffer);
+libavcodec/dxva2_vp9.c:206:    padding = FFMIN(128 - ((ctx_pic->slice.SliceBytesInBuffer) & 127), dxva_size - ctx_pic->slice.SliceBytesInBuffer);
+libavcodec/dxva2_vp9.c:208:        memset(dxva_data + ctx_pic->slice.SliceBytesInBuffer, 0, padding);
+libavcodec/dxva2_vp9.c:209:        ctx_pic->slice.SliceBytesInBuffer += padding;
+libavcodec/dxva2_vp9.c:228:        dsc11->DataSize             = ctx_pic->slice.SliceBytesInBuffer;
+libavcodec/dxva2_vp9.c:239:        dsc2->DataSize             = ctx_pic->slice.SliceBytesInBuffer;
+libavcodec/dxva2_vp9.c:248:                                  &ctx_pic->slice, sizeof(ctx_pic->slice), 0);
+libavcodec/dxva2_vp9.c:265:    if (fill_picture_parameters(avctx, ctx, h, &ctx_pic->pp) < 0)
+libavcodec/dxva2_vp9.c:268:    ctx_pic->bitstream_size = 0;
+libavcodec/dxva2_vp9.c:269:    ctx_pic->bitstream      = NULL;
+libavcodec/dxva2_vp9.c:281:    if (!ctx_pic->bitstream)
+libavcodec/dxva2_vp9.c:282:        ctx_pic->bitstream = buffer;
+libavcodec/dxva2_vp9.c:283:    ctx_pic->bitstream_size += size;
+libavcodec/dxva2_vp9.c:285:    position = buffer - ctx_pic->bitstream;
+libavcodec/dxva2_vp9.c:286:    fill_slice_short(&ctx_pic->slice, position, size);
+libavcodec/dxva2_vp9.c:297:    if (ctx_pic->bitstream_size <= 0)
+libavcodec/dxva2_vp9.c:301:                                    &ctx_pic->pp, sizeof(ctx_pic->pp),
+libavcodec/y41pdec.c:54:    pic->key_frame = 1;
+libavcodec/y41pdec.c:55:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/y41pdec.c:58:        y = &pic->data[0][i * pic->linesize[0]];
+libavcodec/y41pdec.c:59:        u = &pic->data[1][i * pic->linesize[1]];
+libavcodec/y41pdec.c:60:        v = &pic->data[2][i * pic->linesize[2]];
+libavcodec/yuv4enc.c:37:    y = pic->data[0];
+libavcodec/yuv4enc.c:38:    u = pic->data[1];
+libavcodec/yuv4enc.c:39:    v = pic->data[2];
+libavcodec/yuv4enc.c:47:            *dst++ = y[pic->linesize[0] + 2 * j    ];
+libavcodec/yuv4enc.c:48:            *dst++ = y[pic->linesize[0] + 2 * j + 1];
+libavcodec/yuv4enc.c:50:        y += 2 * pic->linesize[0];
+libavcodec/yuv4enc.c:51:        u +=     pic->linesize[1];
+libavcodec/yuv4enc.c:52:        v +=     pic->linesize[2];
+libavcodec/hqx.c:90:    int lsize = ctx->pic->linesize[plane];
+libavcodec/hqx.c:91:    uint8_t *p = ctx->pic->data[plane] + x * 2;
+libavcodec/hqx.c:508:    ctx->pic->key_frame = 1;
+libavcodec/hqx.c:509:    ctx->pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/vaapi_encode.c:53:    tmp = av_realloc_array(pic->param_buffers, sizeof(*tmp), pic->nb_param_buffers + 2);
+libavcodec/vaapi_encode.c:56:    pic->param_buffers = tmp;
+libavcodec/vaapi_encode.c:67:    pic->param_buffers[pic->nb_param_buffers++] = param_buffer;
+libavcodec/vaapi_encode.c:78:    pic->param_buffers[pic->nb_param_buffers++] = data_buffer;
+libavcodec/vaapi_encode.c:94:    tmp = av_realloc_array(pic->param_buffers, sizeof(*tmp), pic->nb_param_buffers + 1);
+libavcodec/vaapi_encode.c:97:    pic->param_buffers = tmp;
+libavcodec/vaapi_encode.c:106:    pic->param_buffers[pic->nb_param_buffers++] = buffer;
+libavcodec/vaapi_encode.c:142:    av_assert0(pic->encode_issued);
+libavcodec/vaapi_encode.c:144:    if (pic->encode_complete) {
+libavcodec/vaapi_encode.c:150:           "(input surface %#x).\n", pic->display_order,
+libavcodec/vaapi_encode.c:151:           pic->encode_order, pic->input_surface);
+libavcodec/vaapi_encode.c:153:    vas = vaSyncSurface(ctx->hwctx->display, pic->input_surface);
+libavcodec/vaapi_encode.c:161:    av_frame_free(&pic->input_image);
+libavcodec/vaapi_encode.c:163:    pic->encode_complete = 1;
+libavcodec/vaapi_encode.c:174:    for (i = 0; i < pic->nb_slices; i++)
+libavcodec/vaapi_encode.c:175:        pic->slices[i].row_size = ctx->slice_size;
+libavcodec/vaapi_encode.c:180:        av_assert0(rounding < pic->nb_slices);
+libavcodec/vaapi_encode.c:186:                ++pic->slices[i].row_size;
+libavcodec/vaapi_encode.c:189:                ++pic->slices[pic->nb_slices - i - 1].row_size;
+libavcodec/vaapi_encode.c:191:                ++pic->slices[i].row_size;
+libavcodec/vaapi_encode.c:196:        pic->slices[pic->nb_slices - 1].row_size += rounding;
+libavcodec/vaapi_encode.c:199:    for (i = 0; i < pic->nb_slices; i++) {
+libavcodec/vaapi_encode.c:200:        slice = &pic->slices[i];
+libavcodec/vaapi_encode.c:206:            const VAAPIEncodeSlice *prev = &pic->slices[i - 1];
+libavcodec/vaapi_encode.c:232:            slice        = &pic->slices[index];
+libavcodec/vaapi_encode.c:235:            pic->slices[index].block_start = ctx->col_bd[i] +
+libavcodec/vaapi_encode.c:237:            pic->slices[index].block_size  = ctx->row_height[j] * ctx->col_width[i];
+libavcodec/vaapi_encode.c:261:           "as type %s.\n", pic->display_order, pic->encode_order,
+libavcodec/vaapi_encode.c:262:           picture_type_name[pic->type]);
+libavcodec/vaapi_encode.c:263:    if (pic->nb_refs == 0) {
+libavcodec/vaapi_encode.c:267:        for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode.c:269:                   pic->refs[i]->display_order, pic->refs[i]->encode_order);
+libavcodec/vaapi_encode.c:274:    av_assert0(!pic->encode_issued);
+libavcodec/vaapi_encode.c:275:    for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode.c:276:        av_assert0(pic->refs[i]);
+libavcodec/vaapi_encode.c:277:        av_assert0(pic->refs[i]->encode_issued);
+libavcodec/vaapi_encode.c:280:    av_log(avctx, AV_LOG_DEBUG, "Input surface is %#x.\n", pic->input_surface);
+libavcodec/vaapi_encode.c:282:    pic->recon_image = av_frame_alloc();
+libavcodec/vaapi_encode.c:283:    if (!pic->recon_image) {
+libavcodec/vaapi_encode.c:288:    err = av_hwframe_get_buffer(ctx->recon_frames_ref, pic->recon_image, 0);
+libavcodec/vaapi_encode.c:293:    pic->recon_surface = (VASurfaceID)(uintptr_t)pic->recon_image->data[3];
+libavcodec/vaapi_encode.c:294:    av_log(avctx, AV_LOG_DEBUG, "Recon surface is %#x.\n", pic->recon_surface);
+libavcodec/vaapi_encode.c:296:    pic->output_buffer_ref = av_buffer_pool_get(ctx->output_buffer_pool);
+libavcodec/vaapi_encode.c:297:    if (!pic->output_buffer_ref) {
+libavcodec/vaapi_encode.c:301:    pic->output_buffer = (VABufferID)(uintptr_t)pic->output_buffer_ref->data;
+libavcodec/vaapi_encode.c:303:           pic->output_buffer);
+libavcodec/vaapi_encode.c:306:        pic->codec_picture_params = av_malloc(ctx->codec->picture_params_size);
+libavcodec/vaapi_encode.c:307:        if (!pic->codec_picture_params)
+libavcodec/vaapi_encode.c:309:        memcpy(pic->codec_picture_params, ctx->codec_picture_params,
+libavcodec/vaapi_encode.c:315:    pic->nb_param_buffers = 0;
+libavcodec/vaapi_encode.c:317:    if (pic->type == PICTURE_TYPE_IDR && ctx->codec->init_sequence_params) {
+libavcodec/vaapi_encode.c:326:    if (pic->type == PICTURE_TYPE_IDR) {
+libavcodec/vaapi_encode.c:346:                                             pic->codec_picture_params,
+libavcodec/vaapi_encode.c:352:    if (pic->type == PICTURE_TYPE_IDR) {
+libavcodec/vaapi_encode.c:429:    if (pic->nb_slices == 0)
+libavcodec/vaapi_encode.c:430:        pic->nb_slices = ctx->nb_slices;
+libavcodec/vaapi_encode.c:431:    if (pic->nb_slices > 0) {
+libavcodec/vaapi_encode.c:432:        pic->slices = av_mallocz_array(pic->nb_slices, sizeof(*pic->slices));
+libavcodec/vaapi_encode.c:433:        if (!pic->slices) {
+libavcodec/vaapi_encode.c:444:    for (i = 0; i < pic->nb_slices; i++) {
+libavcodec/vaapi_encode.c:445:        slice = &pic->slices[i];
+libavcodec/vaapi_encode.c:492:    sd = av_frame_get_side_data(pic->input_image,
+libavcodec/vaapi_encode.c:514:        pic->roi = av_mallocz_array(nb_roi, sizeof(*pic->roi));
+libavcodec/vaapi_encode.c:515:        if (!pic->roi) {
+libavcodec/vaapi_encode.c:528:            pic->roi[i] = (VAEncROI) {
+libavcodec/vaapi_encode.c:543:            .roi          = pic->roi,
+libavcodec/vaapi_encode.c:557:                         pic->input_surface);
+libavcodec/vaapi_encode.c:566:                          pic->param_buffers, pic->nb_param_buffers);
+libavcodec/vaapi_encode.c:590:        for (i = 0; i < pic->nb_param_buffers; i++) {
+libavcodec/vaapi_encode.c:592:                                  pic->param_buffers[i]);
+libavcodec/vaapi_encode.c:596:                       pic->param_buffers[i], vas, vaErrorStr(vas));
+libavcodec/vaapi_encode.c:602:    pic->encode_issued = 1;
+libavcodec/vaapi_encode.c:609:    for(i = 0; i < pic->nb_param_buffers; i++)
+libavcodec/vaapi_encode.c:610:        vaDestroyBuffer(ctx->hwctx->display, pic->param_buffers[i]);
+libavcodec/vaapi_encode.c:611:    if (pic->slices) {
+libavcodec/vaapi_encode.c:612:        for (i = 0; i < pic->nb_slices; i++)
+libavcodec/vaapi_encode.c:613:            av_freep(&pic->slices[i].codec_slice_params);
+libavcodec/vaapi_encode.c:616:    av_freep(&pic->codec_picture_params);
+libavcodec/vaapi_encode.c:617:    av_freep(&pic->param_buffers);
+libavcodec/vaapi_encode.c:618:    av_freep(&pic->slices);
+libavcodec/vaapi_encode.c:619:    av_freep(&pic->roi);
+libavcodec/vaapi_encode.c:620:    av_frame_free(&pic->recon_image);
+libavcodec/vaapi_encode.c:621:    av_buffer_unref(&pic->output_buffer_ref);
+libavcodec/vaapi_encode.c:622:    pic->output_buffer = VA_INVALID_ID;
+libavcodec/vaapi_encode.c:641:    vas = vaMapBuffer(ctx->hwctx->display, pic->output_buffer,
+libavcodec/vaapi_encode.c:667:    if (pic->type == PICTURE_TYPE_IDR)
+libavcodec/vaapi_encode.c:670:    pkt->pts = pic->pts;
+libavcodec/vaapi_encode.c:672:    vas = vaUnmapBuffer(ctx->hwctx->display, pic->output_buffer);
+libavcodec/vaapi_encode.c:680:    av_buffer_unref(&pic->output_buffer_ref);
+libavcodec/vaapi_encode.c:681:    pic->output_buffer = VA_INVALID_ID;
+libavcodec/vaapi_encode.c:684:           pic->display_order, pic->encode_order);
+libavcodec/vaapi_encode.c:688:    vaUnmapBuffer(ctx->hwctx->display, pic->output_buffer);
+libavcodec/vaapi_encode.c:690:    av_buffer_unref(&pic->output_buffer_ref);
+libavcodec/vaapi_encode.c:691:    pic->output_buffer = VA_INVALID_ID;
+libavcodec/vaapi_encode.c:700:    if (pic->output_buffer_ref) {
+libavcodec/vaapi_encode.c:703:               pic->display_order, pic->encode_order);
+libavcodec/vaapi_encode.c:705:        av_buffer_unref(&pic->output_buffer_ref);
+libavcodec/vaapi_encode.c:706:        pic->output_buffer = VA_INVALID_ID;
+libavcodec/vaapi_encode.c:722:        pic->priv_data = av_mallocz(ctx->codec->picture_priv_data_size);
+libavcodec/vaapi_encode.c:723:        if (!pic->priv_data) {
+libavcodec/vaapi_encode.c:729:    pic->input_surface = VA_INVALID_ID;
+libavcodec/vaapi_encode.c:730:    pic->recon_surface = VA_INVALID_ID;
+libavcodec/vaapi_encode.c:731:    pic->output_buffer = VA_INVALID_ID;
+libavcodec/vaapi_encode.c:741:    if (pic->encode_issued)
+libavcodec/vaapi_encode.c:744:    if (pic->slices) {
+libavcodec/vaapi_encode.c:745:        for (i = 0; i < pic->nb_slices; i++)
+libavcodec/vaapi_encode.c:746:            av_freep(&pic->slices[i].codec_slice_params);
+libavcodec/vaapi_encode.c:748:    av_freep(&pic->codec_picture_params);
+libavcodec/vaapi_encode.c:750:    av_frame_free(&pic->input_image);
+libavcodec/vaapi_encode.c:751:    av_frame_free(&pic->recon_image);
+libavcodec/vaapi_encode.c:753:    av_freep(&pic->param_buffers);
+libavcodec/vaapi_encode.c:754:    av_freep(&pic->slices);
+libavcodec/vaapi_encode.c:756:    av_assert0(pic->output_buffer == VA_INVALID_ID);
+libavcodec/vaapi_encode.c:758:    av_freep(&pic->priv_data);
+libavcodec/vaapi_encode.c:759:    av_freep(&pic->codec_picture_params);
+libavcodec/vaapi_encode.c:760:    av_freep(&pic->roi);
+libavcodec/vaapi_encode.c:776:        av_assert0(pic->nb_refs < MAX_PICTURE_REFERENCES);
+libavcodec/vaapi_encode.c:777:        pic->refs[pic->nb_refs++] = target;
+libavcodec/vaapi_encode.c:782:        av_assert0(pic->nb_dpb_pics < MAX_DPB_SIZE);
+libavcodec/vaapi_encode.c:783:        pic->dpb[pic->nb_dpb_pics++] = target;
+libavcodec/vaapi_encode.c:788:        av_assert0(!pic->prev);
+libavcodec/vaapi_encode.c:789:        pic->prev = target;
+libavcodec/vaapi_encode.c:803:    if (pic->ref_removed[level])
+libavcodec/vaapi_encode.c:806:    for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode.c:807:        av_assert0(pic->refs[i]);
+libavcodec/vaapi_encode.c:808:        --pic->refs[i]->ref_count[level];
+libavcodec/vaapi_encode.c:809:        av_assert0(pic->refs[i]->ref_count[level] >= 0);
+libavcodec/vaapi_encode.c:812:    for (i = 0; i < pic->nb_dpb_pics; i++) {
+libavcodec/vaapi_encode.c:813:        av_assert0(pic->dpb[i]);
+libavcodec/vaapi_encode.c:814:        --pic->dpb[i]->ref_count[level];
+libavcodec/vaapi_encode.c:815:        av_assert0(pic->dpb[i]->ref_count[level] >= 0);
+libavcodec/vaapi_encode.c:818:    av_assert0(pic->prev || pic->type == PICTURE_TYPE_IDR);
+libavcodec/vaapi_encode.c:819:    if (pic->prev) {
+libavcodec/vaapi_encode.c:820:        --pic->prev->ref_count[level];
+libavcodec/vaapi_encode.c:821:        av_assert0(pic->prev->ref_count[level] >= 0);
+libavcodec/vaapi_encode.c:824:    pic->ref_removed[level] = 1;
+libavcodec/vaapi_encode.c:844:        for (pic = start->next; pic; pic = pic->next) {
+libavcodec/vaapi_encode.c:847:            pic->type    = PICTURE_TYPE_B;
+libavcodec/vaapi_encode.c:848:            pic->b_depth = current_depth;
+libavcodec/vaapi_encode.c:863:        for (pic = start->next; pic != end; pic = pic->next)
+libavcodec/vaapi_encode.c:865:        for (pic = start->next, i = 1; 2 * i < len; pic = pic->next, i++);
+libavcodec/vaapi_encode.c:867:        pic->type    = PICTURE_TYPE_B;
+libavcodec/vaapi_encode.c:868:        pic->b_depth = current_depth;
+libavcodec/vaapi_encode.c:870:        pic->is_reference = 1;
+libavcodec/vaapi_encode.c:901:    for (pic = ctx->pic_start; pic; pic = pic->next) {
+libavcodec/vaapi_encode.c:902:        if (pic->encode_issued)
+libavcodec/vaapi_encode.c:904:        if (pic->type != PICTURE_TYPE_B)
+libavcodec/vaapi_encode.c:906:        for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode.c:907:            if (!pic->refs[i]->encode_issued)
+libavcodec/vaapi_encode.c:910:        if (i == pic->nb_refs)
+libavcodec/vaapi_encode.c:916:               "encode next.\n", pic->b_depth);
+libavcodec/vaapi_encode.c:928:        next = pic->next;
+libavcodec/vaapi_encode.c:929:        if (pic->encode_issued) {
+libavcodec/vaapi_encode.c:935:        if (pic->force_idr)
+libavcodec/vaapi_encode.c:954:        if (pic->encode_issued)
+libavcodec/vaapi_encode.c:969:    if (pic->force_idr) {
+libavcodec/vaapi_encode.c:972:        pic->type = PICTURE_TYPE_IDR;
+libavcodec/vaapi_encode.c:980:            pic->type = PICTURE_TYPE_IDR;
+libavcodec/vaapi_encode.c:985:            pic->type = PICTURE_TYPE_I;
+libavcodec/vaapi_encode.c:998:        pic->type = PICTURE_TYPE_P;
+libavcodec/vaapi_encode.c:1002:    pic->is_reference = 1;
+libavcodec/vaapi_encode.c:1006:    if (pic->type != PICTURE_TYPE_IDR) {
+libavcodec/vaapi_encode.c:1008:                             pic->type == PICTURE_TYPE_P,
+libavcodec/vaapi_encode.c:1033:    for (pic = ctx->pic_start; pic; pic = pic->next) {
+libavcodec/vaapi_encode.c:1034:        if (pic->encode_complete && pic->next)
+libavcodec/vaapi_encode.c:1039:    for (pic = ctx->pic_start; pic; pic = pic->next) {
+libavcodec/vaapi_encode.c:1040:        if (pic->encode_complete && pic->ref_count[0] == 0)
+libavcodec/vaapi_encode.c:1047:        next = pic->next;
+libavcodec/vaapi_encode.c:1048:        if (pic->encode_complete && pic->ref_count[1] == 0) {
+libavcodec/vaapi_encode.c:1049:            av_assert0(pic->ref_removed[0] && pic->ref_removed[1]);
+libavcodec/vaapi_encode.c:1107:        pic->input_image = av_frame_alloc();
+libavcodec/vaapi_encode.c:1108:        if (!pic->input_image) {
+libavcodec/vaapi_encode.c:1114:            pic->force_idr = 1;
+libavcodec/vaapi_encode.c:1116:        pic->input_surface = (VASurfaceID)(uintptr_t)frame->data[3];
+libavcodec/vaapi_encode.c:1117:        pic->pts = frame->pts;
+libavcodec/vaapi_encode.c:1119:        av_frame_move_ref(pic->input_image, frame);
+libavcodec/vaapi_encode.c:1122:            ctx->first_pts = pic->pts;
+libavcodec/vaapi_encode.c:1124:            ctx->dts_pts_diff = pic->pts - ctx->first_pts;
+libavcodec/vaapi_encode.c:1126:            ctx->ts_ring[ctx->input_order % (3 * ctx->output_delay)] = pic->pts;
+libavcodec/vaapi_encode.c:1128:        pic->display_order = ctx->input_order;
+libavcodec/vaapi_encode.c:1186:    pic->encode_order = ctx->encode_order++;
+libavcodec/vaapi_encode.c:1202:    } else if (pic->encode_order < ctx->decode_delay) {
+libavcodec/vaapi_encode.c:1203:        if (ctx->ts_ring[pic->encode_order] < INT64_MIN + ctx->dts_pts_diff)
+libavcodec/vaapi_encode.c:1206:            pkt->dts = ctx->ts_ring[pic->encode_order] - ctx->dts_pts_diff;
+libavcodec/vaapi_encode.c:1208:        pkt->dts = ctx->ts_ring[(pic->encode_order - ctx->decode_delay) %
+libavcodec/vaapi_encode.c:1214:    ctx->output_order = pic->encode_order;
+libavcodec/vaapi_encode.c:2535:        next = pic->next;
+libavcodec/mjpeg.h:58:    DAC   = 0xcc,       /* define arithmetic-coding conditioning */
+libavcodec/clearvideo.c:184:    off = x * 16 + y * 16 * c->pic->linesize[0];
+libavcodec/clearvideo.c:198:            off += c->pic->linesize[0] * 8;
+libavcodec/clearvideo.c:200:                                   c->pic->data[0] + off + (i & 1) * 8,
+libavcodec/clearvideo.c:201:                                   c->pic->linesize[0]);
+libavcodec/clearvideo.c:204:    off = x * 8 + y * 8 * c->pic->linesize[1];
+libavcodec/clearvideo.c:217:        c->idsp.put_pixels_clamped(c->block, c->pic->data[i] + off,
+libavcodec/clearvideo.c:218:                                   c->pic->linesize[i]);
+libavcodec/clearvideo.c:532:        c->pic->key_frame = 1;
+libavcodec/clearvideo.c:533:        c->pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/clearvideo.c:636:        c->pic->key_frame = 0;
+libavcodec/clearvideo.c:637:        c->pic->pict_type = AV_PICTURE_TYPE_P;
+libavcodec/libx265.c:424:            int qp_range = 51 + 6 * (pic->bitDepth - 8);
+libavcodec/libx265.c:468:            pic->quantOffsets = qoffsets;
+libavcodec/libx265.c:492:           x265pic.planes[i] = pic->data[i];
+libavcodec/libx265.c:493:           x265pic.stride[i] = pic->linesize[i];
+libavcodec/libx265.c:496:        x265pic.pts      = pic->pts;
+libavcodec/libx265.c:499:        x265pic.sliceType = pic->pict_type == AV_PICTURE_TYPE_I ?
+libavcodec/libx265.c:501:                            pic->pict_type == AV_PICTURE_TYPE_P ? X265_TYPE_P :
+libavcodec/libx265.c:502:                            pic->pict_type == AV_PICTURE_TYPE_B ? X265_TYPE_B :
+libavcodec/libx265.c:509:        if (pic->reordered_opaque) {
+libavcodec/libx265.c:510:            x265pic.userData = av_malloc(sizeof(pic->reordered_opaque));
+libavcodec/libx265.c:516:            memcpy(x265pic.userData, &pic->reordered_opaque, sizeof(pic->reordered_opaque));
+libavcodec/h264_refs.c:43:    for (i = 0; i < FF_ARRAY_ELEMS(pic->data); ++i) {
+libavcodec/h264_refs.c:45:            pic->data[i]   += pic->linesize[i];
+libavcodec/h264_refs.c:46:        pic->reference      = parity;
+libavcodec/h264_refs.c:47:        pic->linesize[i] *= 2;
+libavcodec/h264_refs.c:49:    pic->poc = pic->parent->field_poc[parity == PICT_BOTTOM_FIELD];
+libavcodec/h264_refs.c:129:    const AVFrame *f = pic->f;
+libavcodec/h264_refs.c:228:                   i, pic->frame_num, pic->poc, pic->f->data[0]);
+libavcodec/h264_refs.c:245:                       i, pic->frame_num, pic->poc, pic->f->data[0]);
+libavcodec/h264_refs.c:472:    if (pic->reference &= refmask) {
+libavcodec/h264_refs.c:477:                pic->reference = DELAYED_PIC_REF;
+libavcodec/h264_refs.c:499:            av_log(h->avctx, AV_LOG_DEBUG, "%d %d %p\n", i, pic->frame_num, pic);
+libavcodec/h264_refs.c:500:        if (pic->frame_num == frame_num) {
+libavcodec/h264_refs.c:774:                remove_short(h, pic->frame_num, 0);
+libavcodec/h264_refs.c:801:            remove_short(h, pic->frame_num, 0);
+libavcodec/h264_refs.c:807:        if (pic->invalid_gap) {
+libavcodec/h264_refs.c:808:            int d = av_mod_uintp2(h->cur_pic_ptr->frame_num - pic->frame_num, h->ps.sps->log2_max_frame_num);
+libavcodec/h264_refs.c:810:                remove_short(h, pic->frame_num, 0);
+libavcodec/pafvideo.c:296:        memset(c->pic->data[1], 0, AVPALETTE_SIZE);
+libavcodec/pafvideo.c:298:        c->pic->key_frame = 1;
+libavcodec/pafvideo.c:299:        c->pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/pafvideo.c:301:        c->pic->key_frame = 0;
+libavcodec/pafvideo.c:302:        c->pic->pict_type = AV_PICTURE_TYPE_P;
+libavcodec/pafvideo.c:306:        uint32_t *out = (uint32_t *)c->pic->data[1];
+libavcodec/pafvideo.c:329:        c->pic->palette_has_changed = 1;
+libavcodec/pafvideo.c:397:    av_image_copy_plane(c->pic->data[0], c->pic->linesize[0],
+libavcodec/v410dec.c:65:    y = (uint16_t*)pic->data[0] + slice_start * (pic->linesize[0] >> 1);
+libavcodec/v410dec.c:66:    u = (uint16_t*)pic->data[1] + slice_start * (pic->linesize[1] >> 1);
+libavcodec/v410dec.c:67:    v = (uint16_t*)pic->data[2] + slice_start * (pic->linesize[2] >> 1);
+libavcodec/v410dec.c:80:        y += pic->linesize[0] >> 1;
+libavcodec/v410dec.c:81:        u += pic->linesize[1] >> 1;
+libavcodec/v410dec.c:82:        v += pic->linesize[2] >> 1;
+libavcodec/v410dec.c:107:    pic->key_frame = 1;
+libavcodec/v410dec.c:108:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/mpegpicture.c:38:    if (pic->table &&\
+libavcodec/mpegpicture.c:39:       (ret = av_buffer_make_writable(&pic->table)) < 0)\
+libavcodec/mpegpicture.c:106:    pic->tf.f = pic->f;
+libavcodec/mpegpicture.c:111:            pic->f->width  = avctx->width  + 2 * EDGE_WIDTH;
+libavcodec/mpegpicture.c:112:            pic->f->height = avctx->height + 2 * EDGE_WIDTH;
+libavcodec/mpegpicture.c:115:        r = ff_thread_get_buffer(avctx, &pic->tf,
+libavcodec/mpegpicture.c:116:                                 pic->reference ? AV_GET_BUFFER_FLAG_REF : 0);
+libavcodec/mpegpicture.c:118:        pic->f->width  = avctx->width;
+libavcodec/mpegpicture.c:119:        pic->f->height = avctx->height;
+libavcodec/mpegpicture.c:120:        pic->f->format = avctx->pix_fmt;
+libavcodec/mpegpicture.c:121:        r = avcodec_default_get_buffer2(avctx, pic->f, 0);
+libavcodec/mpegpicture.c:124:    if (r < 0 || !pic->f->buf[0]) {
+libavcodec/mpegpicture.c:126:               r, pic->f->data[0]);
+libavcodec/mpegpicture.c:132:        for (i = 0; pic->f->data[i]; i++) {
+libavcodec/mpegpicture.c:134:                         pic->f->linesize[i] +
+libavcodec/mpegpicture.c:136:            pic->f->data[i] += offset;
+libavcodec/mpegpicture.c:138:        pic->f->width  = avctx->width;
+libavcodec/mpegpicture.c:139:        pic->f->height = avctx->height;
+libavcodec/mpegpicture.c:143:        assert(!pic->hwaccel_picture_private);
+libavcodec/mpegpicture.c:145:            pic->hwaccel_priv_buf = av_buffer_allocz(avctx->hwaccel->frame_priv_data_size);
+libavcodec/mpegpicture.c:146:            if (!pic->hwaccel_priv_buf) {
+libavcodec/mpegpicture.c:150:            pic->hwaccel_picture_private = pic->hwaccel_priv_buf->data;
+libavcodec/mpegpicture.c:154:    if ((linesize   &&   linesize != pic->f->linesize[0]) ||
+libavcodec/mpegpicture.c:155:        (uvlinesize && uvlinesize != pic->f->linesize[1])) {
+libavcodec/mpegpicture.c:158:               linesize,   pic->f->linesize[0],
+libavcodec/mpegpicture.c:159:               uvlinesize, pic->f->linesize[1]);
+libavcodec/mpegpicture.c:164:    if (av_pix_fmt_count_planes(pic->f->format) > 2 &&
+libavcodec/mpegpicture.c:165:        pic->f->linesize[1] != pic->f->linesize[2]) {
+libavcodec/mpegpicture.c:174:                                       pic->f->linesize[0])) < 0) {
+libavcodec/mpegpicture.c:193:    pic->mbskip_table_buf = av_buffer_allocz(mb_array_size + 2);
+libavcodec/mpegpicture.c:194:    pic->qscale_table_buf = av_buffer_allocz(big_mb_num + mb_stride);
+libavcodec/mpegpicture.c:195:    pic->mb_type_buf      = av_buffer_allocz((big_mb_num + mb_stride) *
+libavcodec/mpegpicture.c:197:    if (!pic->mbskip_table_buf || !pic->qscale_table_buf || !pic->mb_type_buf)
+libavcodec/mpegpicture.c:201:        pic->mb_var_buf    = av_buffer_allocz(mb_array_size * sizeof(int16_t));
+libavcodec/mpegpicture.c:202:        pic->mc_mb_var_buf = av_buffer_allocz(mb_array_size * sizeof(int16_t));
+libavcodec/mpegpicture.c:203:        pic->mb_mean_buf   = av_buffer_allocz(mb_array_size);
+libavcodec/mpegpicture.c:204:        if (!pic->mb_var_buf || !pic->mc_mb_var_buf || !pic->mb_mean_buf)
+libavcodec/mpegpicture.c:214:            pic->motion_val_buf[i] = av_buffer_allocz(mv_size);
+libavcodec/mpegpicture.c:215:            pic->ref_index_buf[i]  = av_buffer_allocz(ref_index_size);
+libavcodec/mpegpicture.c:216:            if (!pic->motion_val_buf[i] || !pic->ref_index_buf[i])
+libavcodec/mpegpicture.c:221:    pic->alloc_mb_width  = mb_width;
+libavcodec/mpegpicture.c:222:    pic->alloc_mb_height = mb_height;
+libavcodec/mpegpicture.c:223:    pic->alloc_mb_stride = mb_stride;
+libavcodec/mpegpicture.c:240:    if (pic->qscale_table_buf)
+libavcodec/mpegpicture.c:241:        if (   pic->alloc_mb_width  != mb_width
+libavcodec/mpegpicture.c:242:            || pic->alloc_mb_height != mb_height)
+libavcodec/mpegpicture.c:246:        av_assert0(pic->f->data[0]);
+libavcodec/mpegpicture.c:247:        pic->shared = 1;
+libavcodec/mpegpicture.c:249:        av_assert0(!pic->f->buf[0]);
+libavcodec/mpegpicture.c:255:        *linesize   = pic->f->linesize[0];
+libavcodec/mpegpicture.c:256:        *uvlinesize = pic->f->linesize[1];
+libavcodec/mpegpicture.c:259:    if (!pic->qscale_table_buf)
+libavcodec/mpegpicture.c:268:        pic->mb_var    = (uint16_t*)pic->mb_var_buf->data;
+libavcodec/mpegpicture.c:269:        pic->mc_mb_var = (uint16_t*)pic->mc_mb_var_buf->data;
+libavcodec/mpegpicture.c:270:        pic->mb_mean   = pic->mb_mean_buf->data;
+libavcodec/mpegpicture.c:273:    pic->mbskip_table = pic->mbskip_table_buf->data;
+libavcodec/mpegpicture.c:274:    pic->qscale_table = pic->qscale_table_buf->data + 2 * mb_stride + 1;
+libavcodec/mpegpicture.c:275:    pic->mb_type      = (uint32_t*)pic->mb_type_buf->data + 2 * mb_stride + 1;
+libavcodec/mpegpicture.c:277:    if (pic->motion_val_buf[0]) {
+libavcodec/mpegpicture.c:279:            pic->motion_val[i] = (int16_t (*)[2])pic->motion_val_buf[i]->data + 4;
+libavcodec/mpegpicture.c:280:            pic->ref_index[i]  = pic->ref_index_buf[i]->data;
+libavcodec/mpegpicture.c:297:    int off = offsetof(Picture, mb_mean) + sizeof(pic->mb_mean);
+libavcodec/mpegpicture.c:299:    pic->tf.f = pic->f;
+libavcodec/mpegpicture.c:305:        ff_thread_release_buffer(avctx, &pic->tf);
+libavcodec/mpegpicture.c:306:    else if (pic->f)
+libavcodec/mpegpicture.c:307:        av_frame_unref(pic->f);
+libavcodec/mpegpicture.c:309:    av_buffer_unref(&pic->hwaccel_priv_buf);
+libavcodec/mpegpicture.c:311:    if (pic->needs_realloc)
+libavcodec/mpegpicture.c:400:    if (!pic->f->buf[0])
+libavcodec/mpegpicture.c:402:    if (pic->needs_realloc && !(pic->reference & DELAYED_PIC_REF))
+libavcodec/mpegpicture.c:458:    pic->alloc_mb_width  =
+libavcodec/mpegpicture.c:459:    pic->alloc_mb_height = 0;
+libavcodec/mpegpicture.c:461:    av_buffer_unref(&pic->mb_var_buf);
+libavcodec/mpegpicture.c:462:    av_buffer_unref(&pic->mc_mb_var_buf);
+libavcodec/mpegpicture.c:463:    av_buffer_unref(&pic->mb_mean_buf);
+libavcodec/mpegpicture.c:464:    av_buffer_unref(&pic->mbskip_table_buf);
+libavcodec/mpegpicture.c:465:    av_buffer_unref(&pic->qscale_table_buf);
+libavcodec/mpegpicture.c:466:    av_buffer_unref(&pic->mb_type_buf);
+libavcodec/mpegpicture.c:469:        av_buffer_unref(&pic->motion_val_buf[i]);
+libavcodec/mpegpicture.c:470:        av_buffer_unref(&pic->ref_index_buf[i]);
+libavcodec/h264_picture.c:46:    int off = offsetof(H264Picture, tf) + sizeof(pic->tf);
+libavcodec/h264_picture.c:49:    if (!pic->f || !pic->f->buf[0])
+libavcodec/h264_picture.c:52:    ff_thread_release_buffer(h->avctx, &pic->tf);
+libavcodec/h264_picture.c:53:    av_buffer_unref(&pic->hwaccel_priv_buf);
+libavcodec/h264_picture.c:55:    av_buffer_unref(&pic->qscale_table_buf);
+libavcodec/h264_picture.c:56:    av_buffer_unref(&pic->mb_type_buf);
+libavcodec/h264_picture.c:57:    av_buffer_unref(&pic->pps_buf);
+libavcodec/h264_picture.c:59:        av_buffer_unref(&pic->motion_val_buf[i]);
+libavcodec/h264_picture.c:60:        av_buffer_unref(&pic->ref_index_buf[i]);
+libavcodec/vmnc.c:345:    c->pic->key_frame = 0;
+libavcodec/vmnc.c:346:    c->pic->pict_type = AV_PICTURE_TYPE_P;
+libavcodec/vmnc.c:368:            outptr = c->pic->data[0] + dx * c->bpp2 + dy * c->pic->linesize[0];
+libavcodec/vmnc.c:372:                outptr += c->pic->linesize[0];
+libavcodec/vmnc.c:393:        outptr = c->pic->data[0] + dx * c->bpp2 + dy * c->pic->linesize[0];
+libavcodec/vmnc.c:447:            c->pic->key_frame = 1;
+libavcodec/vmnc.c:448:            c->pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/vmnc.c:477:                      c->pic->linesize[0]);
+libavcodec/vmnc.c:480:            res = decode_hextile(c, outptr, gb, w, h, c->pic->linesize[0]);
+libavcodec/vmnc.c:509:            outptr = c->pic->data[0] + dx * c->bpp2 + dy * c->pic->linesize[0];
+libavcodec/vmnc.c:513:                outptr += c->pic->linesize[0];
+libavcodec/vmnc.c:515:            outptr = c->pic->data[0];
+libavcodec/vmnc.c:516:            put_cursor(outptr, c->pic->linesize[0], c, c->cur_x, c->cur_y);
+libavcodec/nuv.c:284:        memset(c->pic->data[0], 0,    avctx->height * c->pic->linesize[0]);
+libavcodec/nuv.c:285:        memset(c->pic->data[1], 0x80, avctx->height * c->pic->linesize[1] / 2);
+libavcodec/nuv.c:286:        memset(c->pic->data[2], 0x80, avctx->height * c->pic->linesize[2] / 2);
+libavcodec/nuv.c:289:    c->pic->pict_type = keyframe ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
+libavcodec/nuv.c:290:    c->pic->key_frame = keyframe;
+libavcodec/nuv.c:311:        memset(c->pic->data[0], 0, c->width * c->height);
+libavcodec/nuv.c:312:        memset(c->pic->data[1], 128, c->width * c->height / 4);
+libavcodec/nuv.c:313:        memset(c->pic->data[2], 128, c->width * c->height / 4);
+libavcodec/mpegvideo_enc.c:1240:        pic->reference = 3;
+libavcodec/mpegvideo_enc.c:1243:            if ((ret = av_frame_ref(pic->f, pic_arg)) < 0)
+libavcodec/mpegvideo_enc.c:1251:            if (pic->f->data[0] + INPLACE_OFFSET == pic_arg->data[0] &&
+libavcodec/mpegvideo_enc.c:1252:                pic->f->data[1] + INPLACE_OFFSET == pic_arg->data[1] &&
+libavcodec/mpegvideo_enc.c:1253:                pic->f->data[2] + INPLACE_OFFSET == pic_arg->data[2]) {
+libavcodec/mpegvideo_enc.c:1269:                    uint8_t *dst = pic->f->data[i];
+libavcodec/mpegvideo_enc.c:1302:        ret = av_frame_copy_props(pic->f, pic_arg);
+libavcodec/mpegvideo_enc.c:1306:        pic->f->display_picture_number = display_picture_number;
+libavcodec/mpegvideo_enc.c:1307:        pic->f->pts = pts; // we set this here to avoid modifying pic_arg
+libavcodec/mpegvideo_enc.c:1684:            pic->reference = s->reordered_input_picture[0]->reference;
+libavcodec/mpegvideo_enc.c:1689:            ret = av_frame_copy_props(pic->f, s->reordered_input_picture[0]->f);
+libavcodec/mpeg4videoenc.c:655:                        if (!pic || pic->f->pict_type != AV_PICTURE_TYPE_B)
+libavcodec/mpeg4videoenc.c:658:                        b_pic = pic->f->data[0] + offset;
+libavcodec/mpeg4videoenc.c:659:                        if (!pic->shared)
+libavcodec/mss2.c:532:    if (ctx->last_pic->format != avctx->pix_fmt)
+libavcodec/mss2.c:610:        if (ctx->last_pic->data[0]) {
+libavcodec/mss2.c:611:            av_assert0(frame->linesize[0] == ctx->last_pic->linesize[0]);
+libavcodec/mss2.c:612:            c->last_rgb_pic = ctx->last_pic->data[0] +
+libavcodec/mss2.c:613:                              ctx->last_pic->linesize[0] * (avctx->height - 1);
+libavcodec/avuienc.c:76:            src = pic->data[0] + (1 - i) * pic->linesize[0];
+libavcodec/avuienc.c:78:            src = pic->data[0] + i * pic->linesize[0];
+libavcodec/avuienc.c:84:            src += (interlaced + 1) * pic->linesize[0];
+libavcodec/libwebpenc_common.c:109:    pic->width  = avctx->width;
+libavcodec/libwebpenc_common.c:110:    pic->height = avctx->height;
+libavcodec/libwebpenc_common.c:124:        pic->use_argb    = 1;
+libavcodec/libwebpenc_common.c:125:        pic->argb        = (uint32_t *)frame->data[0];
+libavcodec/libwebpenc_common.c:126:        pic->argb_stride = frame->linesize[0] / 4;
+libavcodec/libwebpenc_common.c:205:        pic->use_argb  = 0;
+libavcodec/libwebpenc_common.c:206:        pic->y         = frame->data[0];
+libavcodec/libwebpenc_common.c:207:        pic->u         = frame->data[1];
+libavcodec/libwebpenc_common.c:208:        pic->v         = frame->data[2];
+libavcodec/libwebpenc_common.c:209:        pic->y_stride  = frame->linesize[0];
+libavcodec/libwebpenc_common.c:210:        pic->uv_stride = frame->linesize[1];
+libavcodec/libwebpenc_common.c:212:            pic->colorspace = WEBP_YUV420A;
+libavcodec/libwebpenc_common.c:213:            pic->a          = frame->data[3];
+libavcodec/libwebpenc_common.c:214:            pic->a_stride   = frame->linesize[3];
+libavcodec/libwebpenc_common.c:218:            pic->colorspace = WEBP_YUV420;
+libavcodec/libwebpenc_common.c:239:            pic->memory_ = (void*)1;  /* something non-null */
+libavcodec/libwebpenc_common.c:244:                       pic->error_code);
+libavcodec/libwebpenc_common.c:245:                ret = libwebp_error_to_averror(pic->error_code);
+libavcodec/libwebpenc_common.c:248:            pic->memory_ = NULL;  /* restore pointer */
+libavcodec/mss3.c:478:    vec_size = rac_get_model_sym(c, &ic->vec_size_model) + 2;
+libavcodec/mss3.c:480:        vec[i] = rac_get_model256_sym(c, &ic->vec_entry_model);
+libavcodec/mss3.c:491:            A = rac_get_model_sym(c, &ic->vq_model[A + B * 5 + C * 25]);
+libavcodec/mss3.c:497:               dst[i] = rac_get_model256_sym(c, &ic->esc_model);
+libavcodec/mss3.c:742:    c->pic->key_frame = keyframe;
+libavcodec/mss3.c:743:    c->pic->pict_type = keyframe ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
+libavcodec/mss3.c:758:    dst[0] = c->pic->data[0] + dec_x     +  dec_y      * c->pic->linesize[0];
+libavcodec/mss3.c:759:    dst[1] = c->pic->data[1] + dec_x / 2 + (dec_y / 2) * c->pic->linesize[1];
+libavcodec/mss3.c:760:    dst[2] = c->pic->data[2] + dec_x / 2 + (dec_y / 2) * c->pic->linesize[2];
+libavcodec/mss3.c:771:                                      c->pic->linesize[i], blk_size);
+libavcodec/mss3.c:776:                                       c->pic->linesize[i], blk_size);
+libavcodec/mss3.c:781:                                     c->pic->linesize[i], blk_size,
+libavcodec/mss3.c:787:                                      c->pic->linesize[i], blk_size,
+libavcodec/mss3.c:799:        dst[0] += c->pic->linesize[0] * 16;
+libavcodec/mss3.c:800:        dst[1] += c->pic->linesize[1] * 8;
+libavcodec/mss3.c:801:        dst[2] += c->pic->linesize[2] * 8;
+libavcodec/vaapi_mpeg4.c:54:    pic->output_surface = ff_vaapi_get_surface_id(s->current_picture_ptr->f);
+libavcodec/vaapi_encode_h265.c:677:        for (i = 0; i <= vpic->num_tile_rows_minus1; i++)
+libavcodec/vaapi_encode_h265.c:678:            vpic->row_height_minus1[i]   = pps->row_height_minus1[i];
+libavcodec/vaapi_encode_h265.c:679:        for (i = 0; i <= vpic->num_tile_columns_minus1; i++)
+libavcodec/vaapi_encode_h265.c:680:            vpic->column_width_minus1[i] = pps->column_width_minus1[i];
+libavcodec/vaapi_encode_h265.c:691:    VAAPIEncodeH265Picture          *hpic = pic->priv_data;
+libavcodec/vaapi_encode_h265.c:692:    VAAPIEncodePicture              *prev = pic->prev;
+libavcodec/vaapi_encode_h265.c:694:    VAEncPictureParameterBufferHEVC *vpic = pic->codec_picture_params;
+libavcodec/vaapi_encode_h265.c:697:    if (pic->type == PICTURE_TYPE_IDR) {
+libavcodec/vaapi_encode_h265.c:698:        av_assert0(pic->display_order == pic->encode_order);
+libavcodec/vaapi_encode_h265.c:700:        hpic->last_idr_frame = pic->display_order;
+libavcodec/vaapi_encode_h265.c:702:        hpic->slice_nal_unit = HEVC_NAL_IDR_W_RADL;
+libavcodec/vaapi_encode_h265.c:703:        hpic->slice_type     = HEVC_SLICE_I;
+libavcodec/vaapi_encode_h265.c:704:        hpic->pic_type       = 0;
+libavcodec/vaapi_encode_h265.c:707:        hpic->last_idr_frame = hprev->last_idr_frame;
+libavcodec/vaapi_encode_h265.c:709:        if (pic->type == PICTURE_TYPE_I) {
+libavcodec/vaapi_encode_h265.c:710:            hpic->slice_nal_unit = HEVC_NAL_CRA_NUT;
+libavcodec/vaapi_encode_h265.c:711:            hpic->slice_type     = HEVC_SLICE_I;
+libavcodec/vaapi_encode_h265.c:712:            hpic->pic_type       = 0;
+libavcodec/vaapi_encode_h265.c:713:        } else if (pic->type == PICTURE_TYPE_P) {
+libavcodec/vaapi_encode_h265.c:714:            av_assert0(pic->refs[0]);
+libavcodec/vaapi_encode_h265.c:715:            hpic->slice_nal_unit = HEVC_NAL_TRAIL_R;
+libavcodec/vaapi_encode_h265.c:716:            hpic->slice_type     = HEVC_SLICE_P;
+libavcodec/vaapi_encode_h265.c:717:            hpic->pic_type       = 1;
+libavcodec/vaapi_encode_h265.c:720:            av_assert0(pic->refs[0] && pic->refs[1]);
+libavcodec/vaapi_encode_h265.c:725:            if (pic->b_depth == ctx->max_b_depth) {
+libavcodec/vaapi_encode_h265.c:726:                hpic->slice_nal_unit = irap_ref ? HEVC_NAL_RASL_N
+libavcodec/vaapi_encode_h265.c:729:                hpic->slice_nal_unit = irap_ref ? HEVC_NAL_RASL_R
+libavcodec/vaapi_encode_h265.c:732:            hpic->slice_type = HEVC_SLICE_B;
+libavcodec/vaapi_encode_h265.c:733:            hpic->pic_type   = 2;
+libavcodec/vaapi_encode_h265.c:736:    hpic->pic_order_cnt = pic->display_order - hpic->last_idr_frame;
+libavcodec/vaapi_encode_h265.c:746:            .pic_type = hpic->pic_type,
+libavcodec/vaapi_encode_h265.c:758:        (pic->type == PICTURE_TYPE_I || pic->type == PICTURE_TYPE_IDR)) {
+libavcodec/vaapi_encode_h265.c:760:            av_frame_get_side_data(pic->input_image,
+libavcodec/vaapi_encode_h265.c:806:        (pic->type == PICTURE_TYPE_I || pic->type == PICTURE_TYPE_IDR)) {
+libavcodec/vaapi_encode_h265.c:808:            av_frame_get_side_data(pic->input_image,
+libavcodec/vaapi_encode_h265.c:824:    vpic->decoded_curr_pic = (VAPictureHEVC) {
+libavcodec/vaapi_encode_h265.c:825:        .picture_id    = pic->recon_surface,
+libavcodec/vaapi_encode_h265.c:826:        .pic_order_cnt = hpic->pic_order_cnt,
+libavcodec/vaapi_encode_h265.c:830:    for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode_h265.c:831:        VAAPIEncodePicture      *ref = pic->refs[i];
+libavcodec/vaapi_encode_h265.c:834:        av_assert0(ref && ref->encode_order < pic->encode_order);
+libavcodec/vaapi_encode_h265.c:837:        vpic->reference_frames[i] = (VAPictureHEVC) {
+libavcodec/vaapi_encode_h265.c:840:            .flags = (ref->display_order < pic->display_order ?
+libavcodec/vaapi_encode_h265.c:842:                     (ref->display_order > pic->display_order ?
+libavcodec/vaapi_encode_h265.c:846:    for (; i < FF_ARRAY_ELEMS(vpic->reference_frames); i++) {
+libavcodec/vaapi_encode_h265.c:847:        vpic->reference_frames[i] = (VAPictureHEVC) {
+libavcodec/vaapi_encode_h265.c:853:    vpic->coded_buf = pic->output_buffer;
+libavcodec/vaapi_encode_h265.c:855:    vpic->nal_unit_type = hpic->slice_nal_unit;
+libavcodec/vaapi_encode_h265.c:857:    switch (pic->type) {
+libavcodec/vaapi_encode_h265.c:859:        vpic->pic_fields.bits.idr_pic_flag       = 1;
+libavcodec/vaapi_encode_h265.c:860:        vpic->pic_fields.bits.coding_type        = 1;
+libavcodec/vaapi_encode_h265.c:861:        vpic->pic_fields.bits.reference_pic_flag = 1;
+libavcodec/vaapi_encode_h265.c:864:        vpic->pic_fields.bits.idr_pic_flag       = 0;
+libavcodec/vaapi_encode_h265.c:865:        vpic->pic_fields.bits.coding_type        = 1;
+libavcodec/vaapi_encode_h265.c:866:        vpic->pic_fields.bits.reference_pic_flag = 1;
+libavcodec/vaapi_encode_h265.c:869:        vpic->pic_fields.bits.idr_pic_flag       = 0;
+libavcodec/vaapi_encode_h265.c:870:        vpic->pic_fields.bits.coding_type        = 2;
+libavcodec/vaapi_encode_h265.c:871:        vpic->pic_fields.bits.reference_pic_flag = 1;
+libavcodec/vaapi_encode_h265.c:874:        vpic->pic_fields.bits.idr_pic_flag       = 0;
+libavcodec/vaapi_encode_h265.c:875:        vpic->pic_fields.bits.coding_type        = 3;
+libavcodec/vaapi_encode_h265.c:876:        vpic->pic_fields.bits.reference_pic_flag = 0;
+libavcodec/vaapi_encode_h265.c:890:    VAAPIEncodeH265Picture           *hpic = pic->priv_data;
+libavcodec/vaapi_encode_h265.c:894:    VAEncPictureParameterBufferHEVC  *vpic = pic->codec_picture_params;
+libavcodec/vaapi_encode_h265.c:899:        .nal_unit_type         = hpic->slice_nal_unit,
+libavcodec/vaapi_encode_h265.c:909:    sh->slice_type = hpic->slice_type;
+libavcodec/vaapi_encode_h265.c:911:    sh->slice_pic_order_cnt_lsb = hpic->pic_order_cnt &
+libavcodec/vaapi_encode_h265.c:914:    if (pic->type != PICTURE_TYPE_IDR) {
+libavcodec/vaapi_encode_h265.c:927:        for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode_h265.c:928:            strp = pic->refs[i]->priv_data;
+libavcodec/vaapi_encode_h265.c:933:        for (i = 0; i < pic->nb_dpb_pics; i++) {
+libavcodec/vaapi_encode_h265.c:934:            if (pic->dpb[i] == pic)
+libavcodec/vaapi_encode_h265.c:936:            for (j = 0; j < pic->nb_refs; j++) {
+libavcodec/vaapi_encode_h265.c:937:                if (pic->dpb[i] == pic->refs[j])
+libavcodec/vaapi_encode_h265.c:940:            if (j < pic->nb_refs)
+libavcodec/vaapi_encode_h265.c:942:            strp = pic->dpb[i]->priv_data;
+libavcodec/vaapi_encode_h265.c:959:               hpic->pic_order_cnt);
+libavcodec/vaapi_encode_h265.c:967:            av_assert0(rps_poc[i] != hpic->pic_order_cnt);
+libavcodec/vaapi_encode_h265.c:968:            if (rps_poc[i] > hpic->pic_order_cnt)
+libavcodec/vaapi_encode_h265.c:973:        poc = hpic->pic_order_cnt;
+libavcodec/vaapi_encode_h265.c:981:        poc = hpic->pic_order_cnt;
+libavcodec/vaapi_encode_h265.c:1006:    if (pic->type == PICTURE_TYPE_B)
+libavcodec/vaapi_encode_h265.c:1008:    else if (pic->type == PICTURE_TYPE_P)
+libavcodec/vaapi_encode_h265.c:1037:            .last_slice_of_pic_flag       = slice->index == pic->nb_slices - 1,
+libavcodec/vaapi_encode_h265.c:1063:    av_assert0(pic->nb_refs <= 2);
+libavcodec/vaapi_encode_h265.c:1064:    if (pic->nb_refs >= 1) {
+libavcodec/vaapi_encode_h265.c:1066:        av_assert0(pic->type == PICTURE_TYPE_P ||
+libavcodec/vaapi_encode_h265.c:1067:                   pic->type == PICTURE_TYPE_B);
+libavcodec/vaapi_encode_h265.c:1068:        vslice->ref_pic_list0[0] = vpic->reference_frames[0];
+libavcodec/vaapi_encode_h265.c:1070:    if (pic->nb_refs >= 2) {
+libavcodec/vaapi_encode_h265.c:1072:        av_assert0(pic->type == PICTURE_TYPE_B);
+libavcodec/vaapi_encode_h265.c:1073:        vslice->ref_pic_list1[0] = vpic->reference_frames[1];
+libavcodec/g2meet.c:1564:        pic->key_frame = got_header;
+libavcodec/g2meet.c:1565:        pic->pict_type = got_header ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
+libavcodec/g2meet.c:1568:            memcpy(pic->data[0] + i * pic->linesize[0],
+libavcodec/g2meet.c:1571:        g2m_paint_cursor(c, pic->data[0], pic->linesize[0]);
+libavcodec/012v.c:67:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/012v.c:68:    pic->key_frame = 1;
+libavcodec/012v.c:76:        y = (uint16_t *)(pic->data[0] + line * pic->linesize[0]);
+libavcodec/012v.c:77:        u = (uint16_t *)(pic->data[1] + line * pic->linesize[1]);
+libavcodec/012v.c:78:        v = (uint16_t *)(pic->data[2] + line * pic->linesize[2]);
+libavcodec/012v.c:130:            y = x   + (uint16_t *)(pic->data[0] + line * pic->linesize[0]);
+libavcodec/012v.c:131:            u = x/2 + (uint16_t *)(pic->data[1] + line * pic->linesize[1]);
+libavcodec/012v.c:132:            v = x/2 + (uint16_t *)(pic->data[2] + line * pic->linesize[2]);
+libavcodec/decode.c:1651:    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pic->format);
+libavcodec/decode.c:1654:    if (pic->data[0] || pic->data[1] || pic->data[2] || pic->data[3]) {
+libavcodec/decode.c:1655:        av_log(s, AV_LOG_ERROR, "pic->data[*]!=NULL in avcodec_default_get_buffer\n");
+libavcodec/decode.c:1662:            av_get_pix_fmt_name(pic->format));
+libavcodec/decode.c:1666:    memset(pic->data, 0, sizeof(pic->data));
+libavcodec/decode.c:1667:    pic->extended_data = pic->data;
+libavcodec/decode.c:1670:        pic->linesize[i] = pool->linesize[i];
+libavcodec/decode.c:1672:        pic->buf[i] = av_buffer_pool_get(pool->pools[i]);
+libavcodec/decode.c:1673:        if (!pic->buf[i])
+libavcodec/decode.c:1676:        pic->data[i] = pic->buf[i]->data;
+libavcodec/decode.c:1679:        pic->data[i] = NULL;
+libavcodec/decode.c:1680:        pic->linesize[i] = 0;
+libavcodec/decode.c:1683:        ((desc->flags & FF_PSEUDOPAL) && pic->data[1]))
+libavcodec/decode.c:1684:        avpriv_set_systematic_pal2((uint32_t *)pic->data[1], pic->format);
+libavcodec/decode.c:1921:            av_log(avctx, AV_LOG_ERROR, "pic->data[*]!=NULL in get_buffer_internal\n");
+libavcodec/vdpau_hevc.c:40:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/v408enc.c:46:    y = pic->data[0];
+libavcodec/v408enc.c:47:    u = pic->data[1];
+libavcodec/v408enc.c:48:    v = pic->data[2];
+libavcodec/v408enc.c:49:    a = pic->data[3];
+libavcodec/v408enc.c:65:        y += pic->linesize[0];
+libavcodec/v408enc.c:66:        u += pic->linesize[1];
+libavcodec/v408enc.c:67:        v += pic->linesize[2];
+libavcodec/v408enc.c:68:        a += pic->linesize[3];
+libavcodec/vdpau_h264.c:56:    VdpVideoSurface surface = ff_vdpau_get_surface_id(pic->f);
+libavcodec/vdpau_h264.c:59:        pic_structure = pic->reference;
+libavcodec/vdpau_h264.c:62:    rf->is_long_term        = pic->reference && pic->long_ref;
+libavcodec/vdpau_h264.c:65:    rf->field_order_cnt[0]  = h264_foc(pic->field_poc[0]);
+libavcodec/vdpau_h264.c:66:    rf->field_order_cnt[1]  = h264_foc(pic->field_poc[1]);
+libavcodec/vdpau_h264.c:67:    rf->frame_idx           = pic->long_ref ? pic->pic_id : pic->frame_num;
+libavcodec/vdpau_h264.c:90:            if (!pic || !pic->reference)
+libavcodec/vdpau_h264.c:92:            pic_frame_idx = pic->long_ref ? pic->pic_id : pic->frame_num;
+libavcodec/vdpau_h264.c:93:            surface_ref = ff_vdpau_get_surface_id(pic->f);
+libavcodec/vdpau_h264.c:98:                    (rf2->is_long_term == pic->long_ref) &&
+libavcodec/vdpau_h264.c:104:                rf2->top_is_reference    |= (pic->reference & PICT_TOP_FIELD)    ? VDP_TRUE : VDP_FALSE;
+libavcodec/vdpau_h264.c:105:                rf2->bottom_is_reference |= (pic->reference & PICT_BOTTOM_FIELD) ? VDP_TRUE : VDP_FALSE;
+libavcodec/vdpau_h264.c:112:            vdpau_h264_set_rf(rf, pic, pic->reference);
+libavcodec/vdpau_h264.c:128:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/vdpau_h264.c:136:    info->field_order_cnt[0]                     = h264_foc(pic->field_poc[0]);
+libavcodec/vdpau_h264.c:137:    info->field_order_cnt[1]                     = h264_foc(pic->field_poc[1]);
+libavcodec/vdpau_h264.c:187:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/vdpau_h264.c:207:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/vdpau_h264.c:210:    val = ff_vdpau_common_end_frame(avctx, pic->f, pic_ctx);
+libavcodec/escape130.c:316:    dstY   = pic->data[0];
+libavcodec/escape130.c:317:    dstU   = pic->data[1];
+libavcodec/escape130.c:318:    dstV   = pic->data[2];
+libavcodec/escape130.c:322:        dstY  += pic->linesize[0];
+libavcodec/escape130.c:330:        dstU   += pic->linesize[1];
+libavcodec/escape130.c:331:        dstV   += pic->linesize[2];
+libavcodec/libwebpenc_animencoder.c:100:                   pic->error_code);
+libavcodec/libwebpenc_animencoder.c:101:            ret = ff_libwebp_error_to_averror(pic->error_code);
+libavcodec/vaapi_vp9.c:47:    pic->output_surface = vaapi_vp9_surface_id(&h->frames[CUR_FRAME]);
+libavcodec/v308dec.c:51:    pic->key_frame = 1;
+libavcodec/v308dec.c:52:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/v308dec.c:54:    y = pic->data[0];
+libavcodec/v308dec.c:55:    u = pic->data[1];
+libavcodec/v308dec.c:56:    v = pic->data[2];
+libavcodec/v308dec.c:65:        y += pic->linesize[0];
+libavcodec/v308dec.c:66:        u += pic->linesize[1];
+libavcodec/v308dec.c:67:        v += pic->linesize[2];
+libavcodec/proresdec2.c:663:        luma_stride   = pic->linesize[0];
+libavcodec/proresdec2.c:664:        chroma_stride = pic->linesize[1];
+libavcodec/proresdec2.c:666:        luma_stride   = pic->linesize[0] << 1;
+libavcodec/proresdec2.c:667:        chroma_stride = pic->linesize[1] << 1;
+libavcodec/proresdec2.c:680:    dest_y = pic->data[0] + offset;
+libavcodec/proresdec2.c:681:    dest_u = pic->data[1] + (slice->mb_y << 4) * chroma_stride + (slice->mb_x << mb_x_shift);
+libavcodec/proresdec2.c:682:    dest_v = pic->data[2] + (slice->mb_y << 4) * chroma_stride + (slice->mb_x << mb_x_shift);
+libavcodec/proresdec2.c:685:        dest_y += pic->linesize[0];
+libavcodec/proresdec2.c:686:        dest_u += pic->linesize[1];
+libavcodec/proresdec2.c:687:        dest_v += pic->linesize[2];
+libavcodec/proresdec2.c:688:        offset += pic->linesize[3];
+libavcodec/proresdec2.c:725:    if (ctx->alpha_info && pic->data[3] && a_data_size) {
+libavcodec/proresdec2.c:726:        uint8_t *dest_a = pic->data[3] + offset;
+libavcodec/elsdec.c:2: * ELS (Entropy Logarithmic-Scale) decoder
+libavcodec/elsdec.c:25: * Entropy Logarithmic-Scale binary arithmetic decoder
+libavcodec/libaomenc.c:1265:    { "static-thresh",    "A change threshold on blocks below which they will be skipped by the encoder", OFFSET(static_thresh), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, VE },
+libavcodec/targa_y216dec.c:50:    pic->key_frame = 1;
+libavcodec/targa_y216dec.c:51:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/targa_y216dec.c:53:    y = (uint16_t *)pic->data[0];
+libavcodec/targa_y216dec.c:54:    u = (uint16_t *)pic->data[1];
+libavcodec/targa_y216dec.c:55:    v = (uint16_t *)pic->data[2];
+libavcodec/targa_y216dec.c:65:        y += pic->linesize[0] >> 1;
+libavcodec/targa_y216dec.c:66:        u += pic->linesize[1] >> 1;
+libavcodec/targa_y216dec.c:67:        v += pic->linesize[2] >> 1;
+libavcodec/cscd.c:113:        c->pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/cscd.c:114:        c->pic->key_frame = 1;
+libavcodec/cscd.c:118:        c->pic->pict_type = AV_PICTURE_TYPE_P;
+libavcodec/cscd.c:119:        c->pic->key_frame = 0;
+libavcodec/targaenc.c:59:        ret = ff_rle_encode(out, out_size, pic->data[0] + pic->linesize[0] * y, bpp, w, 0x7f, 0, -1, 0);
+libavcodec/targaenc.c:74:    uint8_t *ptr = pic->data[0];
+libavcodec/targaenc.c:79:        ptr += pic->linesize[0];
+libavcodec/v408dec.c:48:    pic->key_frame = 1;
+libavcodec/v408dec.c:49:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/v408dec.c:51:    y = pic->data[0];
+libavcodec/v408dec.c:52:    u = pic->data[1];
+libavcodec/v408dec.c:53:    v = pic->data[2];
+libavcodec/v408dec.c:54:    a = pic->data[3];
+libavcodec/v408dec.c:71:        y += pic->linesize[0];
+libavcodec/v408dec.c:72:        u += pic->linesize[1];
+libavcodec/v408dec.c:73:        v += pic->linesize[2];
+libavcodec/v408dec.c:74:        a += pic->linesize[3];
+libavcodec/vaapi_encode_h264.c:230:            if (pic->type == PICTURE_TYPE_IDR) {
+libavcodec/vaapi_encode_h264.c:605:    VAAPIEncodeH264Picture          *hpic = pic->priv_data;
+libavcodec/vaapi_encode_h264.c:606:    VAAPIEncodePicture              *prev = pic->prev;
+libavcodec/vaapi_encode_h264.c:608:    VAEncPictureParameterBufferH264 *vpic = pic->codec_picture_params;
+libavcodec/vaapi_encode_h264.c:611:    if (pic->type == PICTURE_TYPE_IDR) {
+libavcodec/vaapi_encode_h264.c:612:        av_assert0(pic->display_order == pic->encode_order);
+libavcodec/vaapi_encode_h264.c:614:        hpic->frame_num      = 0;
+libavcodec/vaapi_encode_h264.c:615:        hpic->last_idr_frame = pic->display_order;
+libavcodec/vaapi_encode_h264.c:616:        hpic->idr_pic_id     = hprev ? hprev->idr_pic_id + 1 : 0;
+libavcodec/vaapi_encode_h264.c:618:        hpic->primary_pic_type = 0;
+libavcodec/vaapi_encode_h264.c:619:        hpic->slice_type       = 7;
+libavcodec/vaapi_encode_h264.c:623:        hpic->frame_num = hprev->frame_num + prev->is_reference;
+libavcodec/vaapi_encode_h264.c:625:        hpic->last_idr_frame = hprev->last_idr_frame;
+libavcodec/vaapi_encode_h264.c:626:        hpic->idr_pic_id     = hprev->idr_pic_id;
+libavcodec/vaapi_encode_h264.c:628:        if (pic->type == PICTURE_TYPE_I) {
+libavcodec/vaapi_encode_h264.c:629:            hpic->slice_type       = 7;
+libavcodec/vaapi_encode_h264.c:630:            hpic->primary_pic_type = 0;
+libavcodec/vaapi_encode_h264.c:631:        } else if (pic->type == PICTURE_TYPE_P) {
+libavcodec/vaapi_encode_h264.c:632:            hpic->slice_type       = 5;
+libavcodec/vaapi_encode_h264.c:633:            hpic->primary_pic_type = 1;
+libavcodec/vaapi_encode_h264.c:635:            hpic->slice_type       = 6;
+libavcodec/vaapi_encode_h264.c:636:            hpic->primary_pic_type = 2;
+libavcodec/vaapi_encode_h264.c:639:    hpic->pic_order_cnt = pic->display_order - hpic->last_idr_frame;
+libavcodec/vaapi_encode_h264.c:640:    hpic->dpb_delay     = pic->display_order - pic->encode_order + ctx->max_b_depth;
+libavcodec/vaapi_encode_h264.c:641:    hpic->cpb_delay     = pic->encode_order - hpic->last_idr_frame;
+libavcodec/vaapi_encode_h264.c:649:            .primary_pic_type  = hpic->primary_pic_type,
+libavcodec/vaapi_encode_h264.c:657:    if (priv->sei & SEI_IDENTIFIER && pic->encode_order == 0)
+libavcodec/vaapi_encode_h264.c:666:            .cpb_removal_delay = 2 * hpic->cpb_delay,
+libavcodec/vaapi_encode_h264.c:667:            .dpb_output_delay  = 2 * hpic->dpb_delay,
+libavcodec/vaapi_encode_h264.c:673:    if (priv->sei & SEI_RECOVERY_POINT && pic->type == PICTURE_TYPE_I) {
+libavcodec/vaapi_encode_h264.c:683:    vpic->CurrPic = (VAPictureH264) {
+libavcodec/vaapi_encode_h264.c:684:        .picture_id          = pic->recon_surface,
+libavcodec/vaapi_encode_h264.c:685:        .frame_idx           = hpic->frame_num,
+libavcodec/vaapi_encode_h264.c:687:        .TopFieldOrderCnt    = hpic->pic_order_cnt,
+libavcodec/vaapi_encode_h264.c:688:        .BottomFieldOrderCnt = hpic->pic_order_cnt,
+libavcodec/vaapi_encode_h264.c:691:    for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode_h264.c:692:        VAAPIEncodePicture      *ref = pic->refs[i];
+libavcodec/vaapi_encode_h264.c:695:        av_assert0(ref && ref->encode_order < pic->encode_order);
+libavcodec/vaapi_encode_h264.c:698:        vpic->ReferenceFrames[i] = (VAPictureH264) {
+libavcodec/vaapi_encode_h264.c:706:    for (; i < FF_ARRAY_ELEMS(vpic->ReferenceFrames); i++) {
+libavcodec/vaapi_encode_h264.c:707:        vpic->ReferenceFrames[i] = (VAPictureH264) {
+libavcodec/vaapi_encode_h264.c:713:    vpic->coded_buf = pic->output_buffer;
+libavcodec/vaapi_encode_h264.c:715:    vpic->frame_num = hpic->frame_num;
+libavcodec/vaapi_encode_h264.c:717:    vpic->pic_fields.bits.idr_pic_flag       = (pic->type == PICTURE_TYPE_IDR);
+libavcodec/vaapi_encode_h264.c:718:    vpic->pic_fields.bits.reference_pic_flag = (pic->type != PICTURE_TYPE_B);
+libavcodec/vaapi_encode_h264.c:733:    prev = pic->prev;
+libavcodec/vaapi_encode_h264.c:735:    hp = pic->priv_data;
+libavcodec/vaapi_encode_h264.c:737:    for (i = 0; i < pic->prev->nb_dpb_pics; i++) {
+libavcodec/vaapi_encode_h264.c:741:        if (pic->type == PICTURE_TYPE_P) {
+libavcodec/vaapi_encode_h264.c:751:        } else if (pic->type == PICTURE_TYPE_B) {
+libavcodec/vaapi_encode_h264.c:786:    if (pic->type == PICTURE_TYPE_B) {
+libavcodec/vaapi_encode_h264.c:795:    if (pic->type == PICTURE_TYPE_P ||
+libavcodec/vaapi_encode_h264.c:796:        pic->type == PICTURE_TYPE_B) {
+libavcodec/vaapi_encode_h264.c:806:    if (pic->type == PICTURE_TYPE_B) {
+libavcodec/vaapi_encode_h264.c:825:    VAAPIEncodeH264Picture          *hpic = pic->priv_data;
+libavcodec/vaapi_encode_h264.c:826:    VAAPIEncodePicture              *prev = pic->prev;
+libavcodec/vaapi_encode_h264.c:830:    VAEncPictureParameterBufferH264 *vpic = pic->codec_picture_params;
+libavcodec/vaapi_encode_h264.c:834:    if (pic->type == PICTURE_TYPE_IDR) {
+libavcodec/vaapi_encode_h264.c:839:        sh->nal_unit_header.nal_ref_idc   = pic->is_reference;
+libavcodec/vaapi_encode_h264.c:843:    sh->slice_type        = hpic->slice_type;
+libavcodec/vaapi_encode_h264.c:847:    sh->frame_num = hpic->frame_num &
+libavcodec/vaapi_encode_h264.c:849:    sh->idr_pic_id = hpic->idr_pic_id;
+libavcodec/vaapi_encode_h264.c:850:    sh->pic_order_cnt_lsb = hpic->pic_order_cnt &
+libavcodec/vaapi_encode_h264.c:855:    if (pic->type == PICTURE_TYPE_B)
+libavcodec/vaapi_encode_h264.c:857:    else if (pic->type == PICTURE_TYPE_P)
+libavcodec/vaapi_encode_h264.c:862:    if (pic->is_reference && pic->type != PICTURE_TYPE_IDR) {
+libavcodec/vaapi_encode_h264.c:869:            for (j = 0; j < pic->nb_dpb_pics; j++) {
+libavcodec/vaapi_encode_h264.c:870:                if (prev->dpb[i] == pic->dpb[j])
+libavcodec/vaapi_encode_h264.c:873:            if (j == pic->nb_dpb_pics) {
+libavcodec/vaapi_encode_h264.c:888:                av_assert0(old->frame_num < hpic->frame_num);
+libavcodec/vaapi_encode_h264.c:891:                    hpic->frame_num - old->frame_num - 1;
+libavcodec/vaapi_encode_h264.c:898:    // by default, use ref-pic-list-modification to move them there.
+libavcodec/vaapi_encode_h264.c:899:    if (pic->type == PICTURE_TYPE_P || pic->type == PICTURE_TYPE_B) {
+libavcodec/vaapi_encode_h264.c:907:        if (pic->type == PICTURE_TYPE_P) {
+libavcodec/vaapi_encode_h264.c:909:            for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode_h264.c:910:                av_assert0(pic->refs[i]);
+libavcodec/vaapi_encode_h264.c:911:                if (pic->refs[i] != def_l0[i])
+libavcodec/vaapi_encode_h264.c:917:                int pic_num = hpic->frame_num;
+libavcodec/vaapi_encode_h264.c:918:                for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode_h264.c:919:                    href = pic->refs[i]->priv_data;
+libavcodec/vaapi_encode_h264.c:938:            for (i = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode_h264.c:939:                av_assert0(pic->refs[i]);
+libavcodec/vaapi_encode_h264.c:940:                href = pic->refs[i]->priv_data;
+libavcodec/vaapi_encode_h264.c:941:                av_assert0(href->pic_order_cnt != hpic->pic_order_cnt);
+libavcodec/vaapi_encode_h264.c:942:                if (href->pic_order_cnt < hpic->pic_order_cnt) {
+libavcodec/vaapi_encode_h264.c:943:                    if (pic->refs[i] != def_l0[n0])
+libavcodec/vaapi_encode_h264.c:947:                    if (pic->refs[i] != def_l1[n1])
+libavcodec/vaapi_encode_h264.c:955:                int pic_num = hpic->frame_num;
+libavcodec/vaapi_encode_h264.c:956:                for (i = j = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode_h264.c:957:                    href = pic->refs[i]->priv_data;
+libavcodec/vaapi_encode_h264.c:958:                    if (href->pic_order_cnt > hpic->pic_order_cnt)
+libavcodec/vaapi_encode_h264.c:979:                int pic_num = hpic->frame_num;
+libavcodec/vaapi_encode_h264.c:980:                for (i = j = 0; i < pic->nb_refs; i++) {
+libavcodec/vaapi_encode_h264.c:981:                    href = pic->refs[i]->priv_data;
+libavcodec/vaapi_encode_h264.c:982:                    if (href->pic_order_cnt < hpic->pic_order_cnt)
+libavcodec/vaapi_encode_h264.c:1023:    av_assert0(pic->nb_refs <= 2);
+libavcodec/vaapi_encode_h264.c:1024:    if (pic->nb_refs >= 1) {
+libavcodec/vaapi_encode_h264.c:1026:        av_assert0(pic->type == PICTURE_TYPE_P ||
+libavcodec/vaapi_encode_h264.c:1027:                   pic->type == PICTURE_TYPE_B);
+libavcodec/vaapi_encode_h264.c:1028:        vslice->RefPicList0[0] = vpic->ReferenceFrames[0];
+libavcodec/vaapi_encode_h264.c:1030:    if (pic->nb_refs >= 2) {
+libavcodec/vaapi_encode_h264.c:1032:        av_assert0(pic->type == PICTURE_TYPE_B);
+libavcodec/vaapi_encode_h264.c:1033:        vslice->RefPicList1[0] = vpic->ReferenceFrames[1];
+libavcodec/dxva2_av1.c:281:    if (fill_picture_parameters(avctx, ctx, h, &ctx_pic->pp) < 0)
+libavcodec/dxva2_av1.c:284:    ctx_pic->bitstream_size = 0;
+libavcodec/dxva2_av1.c:285:    ctx_pic->bitstream      = NULL;
+libavcodec/dxva2_av1.c:299:    ctx_pic->tile_count = frame_header->tile_cols * frame_header->tile_rows;
+libavcodec/dxva2_av1.c:302:    if (ctx_pic->tile_count > MAX_TILES)
+libavcodec/dxva2_av1.c:306:    if (ctx_pic->tile_count == h->tg_end - h->tg_start + 1) {
+libavcodec/dxva2_av1.c:307:        ctx_pic->bitstream = (uint8_t *)buffer;
+libavcodec/dxva2_av1.c:308:        ctx_pic->bitstream_size = size;
+libavcodec/dxva2_av1.c:310:        for (uint32_t tile_num = 0; tile_num < ctx_pic->tile_count; tile_num++) {
+libavcodec/dxva2_av1.c:311:            ctx_pic->tiles[tile_num].DataOffset   = h->tile_group_info[tile_num].tile_offset;
+libavcodec/dxva2_av1.c:312:            ctx_pic->tiles[tile_num].DataSize     = h->tile_group_info[tile_num].tile_size;
+libavcodec/dxva2_av1.c:313:            ctx_pic->tiles[tile_num].row          = h->tile_group_info[tile_num].tile_row;
+libavcodec/dxva2_av1.c:314:            ctx_pic->tiles[tile_num].column       = h->tile_group_info[tile_num].tile_column;
+libavcodec/dxva2_av1.c:315:            ctx_pic->tiles[tile_num].anchor_frame = 0xFF;
+libavcodec/dxva2_av1.c:323:                          ctx_pic->bitstream_size + size);
+libavcodec/dxva2_av1.c:327:    ctx_pic->bitstream = ctx->bitstream_cache = tmp;
+libavcodec/dxva2_av1.c:329:    memcpy(ctx_pic->bitstream + ctx_pic->bitstream_size, buffer, size);
+libavcodec/dxva2_av1.c:332:        ctx_pic->tiles[tile_num].DataOffset   = ctx_pic->bitstream_size + h->tile_group_info[tile_num].tile_offset;
+libavcodec/dxva2_av1.c:333:        ctx_pic->tiles[tile_num].DataSize     = h->tile_group_info[tile_num].tile_size;
+libavcodec/dxva2_av1.c:334:        ctx_pic->tiles[tile_num].row          = h->tile_group_info[tile_num].tile_row;
+libavcodec/dxva2_av1.c:335:        ctx_pic->tiles[tile_num].column       = h->tile_group_info[tile_num].tile_column;
+libavcodec/dxva2_av1.c:336:        ctx_pic->tiles[tile_num].anchor_frame = 0xFF;
+libavcodec/dxva2_av1.c:339:    ctx_pic->bitstream_size += size;
+libavcodec/dxva2_av1.c:379:    if (ctx_pic->bitstream_size > dxva_size) {
+libavcodec/dxva2_av1.c:384:    memcpy(dxva_data, ctx_pic->bitstream, ctx_pic->bitstream_size);
+libavcodec/dxva2_av1.c:386:    padding = FFMIN(128 - ((ctx_pic->bitstream_size) & 127), dxva_size - ctx_pic->bitstream_size);
+libavcodec/dxva2_av1.c:388:        memset(dxva_data + ctx_pic->bitstream_size, 0, padding);
+libavcodec/dxva2_av1.c:389:        ctx_pic->bitstream_size += padding;
+libavcodec/dxva2_av1.c:408:        dsc11->DataSize             = ctx_pic->bitstream_size;
+libavcodec/dxva2_av1.c:419:        dsc2->DataSize             = ctx_pic->bitstream_size;
+libavcodec/dxva2_av1.c:427:                                  ctx_pic->tiles, sizeof(*ctx_pic->tiles) * ctx_pic->tile_count, 0);
+libavcodec/dxva2_av1.c:436:    if (ctx_pic->bitstream_size <= 0)
+libavcodec/dxva2_av1.c:440:                                    &ctx_pic->pp, sizeof(ctx_pic->pp),
+libavcodec/msrledec.c:83:                    pic->data[0][line * pic->linesize[0] + pixel_ptr] = stream_byte >> 4;
+libavcodec/msrledec.c:89:                    pic->data[0][line * pic->linesize[0] + pixel_ptr] = stream_byte & 0x0F;
+libavcodec/msrledec.c:109:                    pic->data[0][line * pic->linesize[0] + pixel_ptr] = stream_byte >> 4;
+libavcodec/msrledec.c:111:                    pic->data[0][line * pic->linesize[0] + pixel_ptr] = stream_byte & 0x0F;
+libavcodec/msrledec.c:136:    unsigned int width= FFABS(pic->linesize[0]) / (depth >> 3);
+libavcodec/msrledec.c:138:    output     = pic->data[0] + (avctx->height - 1) * pic->linesize[0];
+libavcodec/msrledec.c:139:    output_end = output + FFABS(pic->linesize[0]);
+libavcodec/msrledec.c:156:                output = pic->data[0] + line * pic->linesize[0];
+libavcodec/msrledec.c:157:                output_end = output + FFABS(pic->linesize[0]);
+libavcodec/msrledec.c:171:                output = pic->data[0] + line * pic->linesize[0] + pos * (depth >> 3);
+libavcodec/msrledec.c:172:                output_end = pic->data[0] + line * pic->linesize[0] + FFABS(pic->linesize[0]);
+libavcodec/dxva2_vc1.c:226:    for (i = 0; i < ctx_pic->slice_count; i++) {
+libavcodec/dxva2_vc1.c:228:        slice    = &ctx_pic->slice[i];
+libavcodec/dxva2_vc1.c:237:        if (i < ctx_pic->slice_count - 1)
+libavcodec/dxva2_vc1.c:256:        memcpy(current, &ctx_pic->bitstream[position], size);
+libavcodec/dxva2_vc1.c:276:    if (i < ctx_pic->slice_count)
+libavcodec/dxva2_vc1.c:304:                                  ctx_pic->slice,
+libavcodec/dxva2_vc1.c:305:                                  ctx_pic->slice_count * sizeof(*ctx_pic->slice),
+libavcodec/dxva2_vc1.c:321:    fill_picture_parameters(avctx, ctx, v, &ctx_pic->pp);
+libavcodec/dxva2_vc1.c:323:    ctx_pic->slice_count    = 0;
+libavcodec/dxva2_vc1.c:324:    ctx_pic->bitstream_size = 0;
+libavcodec/dxva2_vc1.c:325:    ctx_pic->bitstream      = NULL;
+libavcodec/dxva2_vc1.c:338:    if (ctx_pic->slice_count >= MAX_SLICES) {
+libavcodec/dxva2_vc1.c:340:                              ctx_pic->slice_count);
+libavcodec/dxva2_vc1.c:350:    if (!ctx_pic->bitstream)
+libavcodec/dxva2_vc1.c:351:        ctx_pic->bitstream = buffer;
+libavcodec/dxva2_vc1.c:352:    ctx_pic->bitstream_size += size;
+libavcodec/dxva2_vc1.c:354:    position = buffer - ctx_pic->bitstream;
+libavcodec/dxva2_vc1.c:355:    fill_slice(avctx, &ctx_pic->slice[ctx_pic->slice_count++], position, size);
+libavcodec/dxva2_vc1.c:365:    if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
+libavcodec/dxva2_vc1.c:369:                                    &ctx_pic->pp, sizeof(ctx_pic->pp),
+libavcodec/cfhd.c:961:                dst_linesize = pic->linesize[act_plane];
+libavcodec/cfhd.c:963:                dst_linesize = pic->linesize[act_plane] / 2;
+libavcodec/cfhd.c:1066:                dst = (int16_t *)pic->data[act_plane];
+libavcodec/cfhd.c:1071:                        dst += pic->linesize[act_plane] >> 1;
+libavcodec/cfhd.c:1093:                av_log(avctx, AV_LOG_DEBUG, "interlaced frame ? %d", pic->interlaced_frame);
+libavcodec/cfhd.c:1094:                pic->interlaced_frame = 1;
+libavcodec/cfhd.c:1105:                dst  = (int16_t *)pic->data[act_plane];
+libavcodec/cfhd.c:1109:                    interlaced_vertical_filter(dst, low, high, lowpass_width * 2,  pic->linesize[act_plane]/2, act_plane);
+libavcodec/cfhd.c:1112:                    dst  += pic->linesize[act_plane];
+libavcodec/cfhd.c:1128:                dst_linesize = pic->linesize[act_plane];
+libavcodec/cfhd.c:1130:                dst_linesize = pic->linesize[act_plane] / 2;
+libavcodec/cfhd.c:1265:                dst = (int16_t *)pic->data[act_plane];
+libavcodec/cfhd.c:1270:                        dst += pic->linesize[act_plane] >> 1;
+libavcodec/cfhd.c:1290:                pic->interlaced_frame = 1;
+libavcodec/cfhd.c:1314:                dst  = (int16_t *)pic->data[act_plane];
+libavcodec/cfhd.c:1318:                    interlaced_vertical_filter(dst, low, high, lowpass_width * 2,  pic->linesize[act_plane]/2, act_plane);
+libavcodec/cfhd.c:1321:                    dst  += pic->linesize[act_plane];
+libavcodec/cfhd.c:1337:                dst_linesize = pic->linesize[act_plane];
+libavcodec/cfhd.c:1339:                dst_linesize = pic->linesize[act_plane] / 2;
+libavcodec/cfhd.c:1355:                dst = (int16_t *)pic->data[act_plane];
+libavcodec/cfhd.c:1363:                        dst += pic->linesize[act_plane] >> 1;
+libavcodec/cfhd.c:1381:                dst  = (int16_t *)pic->data[act_plane];
+libavcodec/cfhd.c:1385:                    interlaced_vertical_filter(dst, low, high, lowpass_width * 2,  pic->linesize[act_plane]/2, act_plane);
+libavcodec/cfhd.c:1388:                    dst  += pic->linesize[act_plane];
+libavcodec/svq3.c:435:    int linesize   = s->cur_pic->f->linesize[0];
+libavcodec/svq3.c:436:    int uvlinesize = s->cur_pic->f->linesize[1];
+libavcodec/svq3.c:449:    dest = s->cur_pic->f->data[0] + x + y * linesize;
+libavcodec/svq3.c:450:    src  = pic->f->data[0] + mx + my * linesize;
+libavcodec/svq3.c:476:            dest = s->cur_pic->f->data[i] + (x >> 1) + (y >> 1) * uvlinesize;
+libavcodec/svq3.c:477:            src  = pic->f->data[i] + mx + my * uvlinesize;
+libavcodec/svq3.c:524:                mx = s->next_pic->motion_val[0][b_xy][0] * 2;
+libavcodec/svq3.c:525:                my = s->next_pic->motion_val[0][b_xy][1] * 2;
+libavcodec/svq3.c:606:            fill_rectangle(s->cur_pic->motion_val[dir][b_xy],
+libavcodec/svq3.c:673:    const int mb_type = s->cur_pic->mb_type[mb_xy];
+libavcodec/svq3.c:680:    linesize   = s->cur_pic->f->linesize[0];
+libavcodec/svq3.c:681:    uvlinesize = s->cur_pic->f->linesize[1];
+libavcodec/svq3.c:683:    dest_y  = s->cur_pic->f->data[0] + (mb_x     + mb_y * linesize)  * 16;
+libavcodec/svq3.c:684:    dest_cb = s->cur_pic->f->data[1] +  mb_x * 8 + mb_y * uvlinesize * block_h;
+libavcodec/svq3.c:685:    dest_cr = s->cur_pic->f->data[2] +  mb_x * 8 + mb_y * uvlinesize * block_h;
+libavcodec/svq3.c:731:            s->next_pic->mb_type[mb_xy] == -1) {
+libavcodec/svq3.c:741:            mb_type = FFMIN(s->next_pic->mb_type[mb_xy], 6);
+libavcodec/svq3.c:771:                              s->cur_pic->motion_val[m][b_xy - 1 + i * s->b_stride]);
+libavcodec/svq3.c:778:                       s->cur_pic->motion_val[m][b_xy - s->b_stride],
+libavcodec/svq3.c:785:                              s->cur_pic->motion_val[m][b_xy - s->b_stride + 4]);
+libavcodec/svq3.c:793:                              s->cur_pic->motion_val[m][b_xy - s->b_stride - 1]);
+libavcodec/svq3.c:816:                    memset(s->cur_pic->motion_val[0][b_xy + i * s->b_stride],
+libavcodec/svq3.c:824:                    memset(s->cur_pic->motion_val[1][b_xy + i * s->b_stride],
+libavcodec/svq3.c:916:            memset(s->cur_pic->motion_val[0][b_xy + i * s->b_stride],
+libavcodec/svq3.c:920:                memset(s->cur_pic->motion_val[1][b_xy + i * s->b_stride],
+libavcodec/svq3.c:1006:    s->cur_pic->mb_type[mb_xy] = mb_type;
+libavcodec/svq3.c:1137:    s->cur_pic->f  = av_frame_alloc();
+libavcodec/svq3.c:1138:    s->last_pic->f = av_frame_alloc();
+libavcodec/svq3.c:1139:    s->next_pic->f = av_frame_alloc();
+libavcodec/svq3.c:1140:    if (!s->cur_pic->f || !s->last_pic->f || !s->next_pic->f)
+libavcodec/svq3.c:1328:        av_freep(&pic->motion_val_buf[i]);
+libavcodec/svq3.c:1330:    av_freep(&pic->mb_type_buf);
+libavcodec/svq3.c:1332:    av_frame_unref(pic->f);
+libavcodec/svq3.c:1343:    if (!pic->motion_val_buf[0]) {
+libavcodec/svq3.c:1346:        pic->mb_type_buf = av_calloc(big_mb_num + s->mb_stride, sizeof(uint32_t));
+libavcodec/svq3.c:1347:        if (!pic->mb_type_buf)
+libavcodec/svq3.c:1349:        pic->mb_type = pic->mb_type_buf + 2 * s->mb_stride + 1;
+libavcodec/svq3.c:1352:            pic->motion_val_buf[i] = av_calloc(b4_array_size + 4, 2 * sizeof(int16_t));
+libavcodec/svq3.c:1353:            if (!pic->motion_val_buf[i]) {
+libavcodec/svq3.c:1358:            pic->motion_val[i] = pic->motion_val_buf[i] + 4;
+libavcodec/svq3.c:1362:    ret = ff_get_buffer(avctx, pic->f,
+libavcodec/svq3.c:1369:        s->edge_emu_buffer = av_mallocz_array(pic->f->linesize[0], 17);
+libavcodec/svq3.c:1391:        if (s->next_pic->f->data[0] && !s->low_delay && !s->last_frame_output) {
+libavcodec/svq3.c:1392:            ret = av_frame_ref(data, s->next_pic->f);
+libavcodec/svq3.c:1425:    av_frame_unref(s->cur_pic->f);
+libavcodec/svq3.c:1428:    s->cur_pic->f->pict_type = s->pict_type;
+libavcodec/svq3.c:1429:    s->cur_pic->f->key_frame = (s->pict_type == AV_PICTURE_TYPE_I);
+libavcodec/svq3.c:1436:        s->block_offset[i]           = (4 * ((scan8[i] - scan8[0]) & 7)) + 4 * s->cur_pic->f->linesize[0] * ((scan8[i] - scan8[0]) >> 3);
+libavcodec/svq3.c:1437:        s->block_offset[48 + i]      = (4 * ((scan8[i] - scan8[0]) & 7)) + 8 * s->cur_pic->f->linesize[0] * ((scan8[i] - scan8[0]) >> 3);
+libavcodec/svq3.c:1441:        s->block_offset[32 + i]      = (4 * ((scan8[i] - scan8[0]) & 7)) + 4 * s->cur_pic->f->linesize[1] * ((scan8[i] - scan8[0]) >> 3);
+libavcodec/svq3.c:1443:        s->block_offset[48 + 32 + i] = (4 * ((scan8[i] - scan8[0]) & 7)) + 8 * s->cur_pic->f->linesize[1] * ((scan8[i] - scan8[0]) >> 3);
+libavcodec/svq3.c:1447:        if (!s->last_pic->f->data[0]) {
+libavcodec/svq3.c:1449:            av_frame_unref(s->last_pic->f);
+libavcodec/svq3.c:1453:            memset(s->last_pic->f->data[0], 0, avctx->height * s->last_pic->f->linesize[0]);
+libavcodec/svq3.c:1454:            memset(s->last_pic->f->data[1], 0x80, (avctx->height / 2) *
+libavcodec/svq3.c:1455:                   s->last_pic->f->linesize[1]);
+libavcodec/svq3.c:1456:            memset(s->last_pic->f->data[2], 0x80, (avctx->height / 2) *
+libavcodec/svq3.c:1457:                   s->last_pic->f->linesize[2]);
+libavcodec/svq3.c:1460:        if (s->pict_type == AV_PICTURE_TYPE_B && !s->next_pic->f->data[0]) {
+libavcodec/svq3.c:1462:            av_frame_unref(s->next_pic->f);
+libavcodec/svq3.c:1466:            memset(s->next_pic->f->data[0], 0, avctx->height * s->next_pic->f->linesize[0]);
+libavcodec/svq3.c:1467:            memset(s->next_pic->f->data[1], 0x80, (avctx->height / 2) *
+libavcodec/svq3.c:1468:                   s->next_pic->f->linesize[1]);
+libavcodec/svq3.c:1469:            memset(s->next_pic->f->data[2], 0x80, (avctx->height / 2) *
+libavcodec/svq3.c:1470:                   s->next_pic->f->linesize[2]);
+libavcodec/svq3.c:1557:                s->cur_pic->mb_type[s->mb_x + s->mb_y * s->mb_stride] =
+libavcodec/svq3.c:1561:        ff_draw_horiz_band(avctx, s->cur_pic->f,
+libavcodec/svq3.c:1562:                           s->last_pic->f->data[0] ? s->last_pic->f : NULL,
+libavcodec/svq3.c:1580:        ret = av_frame_ref(data, s->cur_pic->f);
+libavcodec/svq3.c:1581:    else if (s->last_pic->f->data[0])
+libavcodec/svq3.c:1582:        ret = av_frame_ref(data, s->last_pic->f);
+libavcodec/svq3.c:1587:    if (s->last_pic->f->data[0] || s->low_delay)
+libavcodec/svq3.c:1593:        av_frame_unref(s->cur_pic->f);
+libavcodec/svq3.c:1606:    av_frame_free(&s->cur_pic->f);
+libavcodec/svq3.c:1607:    av_frame_free(&s->next_pic->f);
+libavcodec/svq3.c:1608:    av_frame_free(&s->last_pic->f);
+libavcodec/proresenc_kostya.c:570:        line_add = ctx->cur_picture_idx ^ !pic->top_field_first;
+libavcodec/proresenc_kostya.c:604:        linesize = pic->linesize[i] * ctx->pictures_per_frame;
+libavcodec/proresenc_kostya.c:605:        src = (const uint16_t*)(pic->data[i] + yp * linesize +
+libavcodec/proresenc_kostya.c:606:                                line_add * pic->linesize[i]) + xp;
+libavcodec/proresenc_kostya.c:829:        line_add = ctx->cur_picture_idx ^ !ctx->pic->top_field_first;
+libavcodec/proresenc_kostya.c:849:        linesize[i] = ctx->pic->linesize[i] * ctx->pictures_per_frame;
+libavcodec/proresenc_kostya.c:850:        src = (const uint16_t *)(ctx->pic->data[i] + yp * linesize[i] +
+libavcodec/proresenc_kostya.c:851:                                 line_add * ctx->pic->linesize[i]) + xp;
+libavcodec/proresenc_kostya.c:1036:        frame_flags |= pic->top_field_first ? 0x04 : 0x08;
+libavcodec/proresenc_kostya.c:1040:    bytestream_put_byte  (&buf, pic->color_primaries);
+libavcodec/proresenc_kostya.c:1041:    bytestream_put_byte  (&buf, pic->color_trc);
+libavcodec/proresenc_kostya.c:1042:    bytestream_put_byte  (&buf, pic->colorspace);
+libavcodec/r210dec.c:58:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/r210dec.c:59:    pic->key_frame = 1;
+libavcodec/r210dec.c:60:    g_line = pic->data[0];
+libavcodec/r210dec.c:61:    b_line = pic->data[1];
+libavcodec/r210dec.c:62:    r_line = pic->data[2];
+libavcodec/r210dec.c:94:        g_line += pic->linesize[0];
+libavcodec/r210dec.c:95:        b_line += pic->linesize[1];
+libavcodec/r210dec.c:96:        r_line += pic->linesize[2];
+libavcodec/frwu.c:65:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/frwu.c:66:    pic->key_frame = 1;
+libavcodec/frwu.c:72:        uint8_t *dst = pic->data[0];
+libavcodec/frwu.c:86:            dst += pic->linesize[0];
+libavcodec/frwu.c:88:            dst += 2 * pic->linesize[0];
+libavcodec/frwu.c:92:                dst = pic->data[0];
+libavcodec/frwu.c:95:            dst += pic->linesize[0] << 1;
+libavcodec/vdpau_mpeg4.c:38:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/v210enc.c:134:    if (pic->format == AV_PIX_FMT_YUV422P10)
+libavcodec/v210enc.c:136:    else if(pic->format == AV_PIX_FMT_YUV422P)
+libavcodec/vaapi_encode_vp8.c:49:#define vpic_var(name)     vpic->name, name
+libavcodec/vaapi_encode_vp8.c:50:#define vpic_field(name)   vpic->pic_fields.bits.name, name
+libavcodec/vaapi_encode_vp8.c:79:    VAEncPictureParameterBufferVP8 *vpic = pic->codec_picture_params;
+libavcodec/vaapi_encode_vp8.c:82:    vpic->reconstructed_frame = pic->recon_surface;
+libavcodec/vaapi_encode_vp8.c:84:    vpic->coded_buf = pic->output_buffer;
+libavcodec/vaapi_encode_vp8.c:86:    switch (pic->type) {
+libavcodec/vaapi_encode_vp8.c:89:        av_assert0(pic->nb_refs == 0);
+libavcodec/vaapi_encode_vp8.c:90:        vpic->ref_flags.bits.force_kf = 1;
+libavcodec/vaapi_encode_vp8.c:91:        vpic->ref_last_frame =
+libavcodec/vaapi_encode_vp8.c:92:        vpic->ref_gf_frame   =
+libavcodec/vaapi_encode_vp8.c:93:        vpic->ref_arf_frame  =
+libavcodec/vaapi_encode_vp8.c:97:        av_assert0(pic->nb_refs == 1);
+libavcodec/vaapi_encode_vp8.c:98:        vpic->ref_flags.bits.no_ref_last = 0;
+libavcodec/vaapi_encode_vp8.c:99:        vpic->ref_flags.bits.no_ref_gf   = 1;
+libavcodec/vaapi_encode_vp8.c:100:        vpic->ref_flags.bits.no_ref_arf  = 1;
+libavcodec/vaapi_encode_vp8.c:101:        vpic->ref_last_frame =
+libavcodec/vaapi_encode_vp8.c:102:        vpic->ref_gf_frame   =
+libavcodec/vaapi_encode_vp8.c:103:        vpic->ref_arf_frame  =
+libavcodec/vaapi_encode_vp8.c:104:            pic->refs[0]->recon_surface;
+libavcodec/vaapi_encode_vp8.c:110:    vpic->pic_flags.bits.frame_type = (pic->type != PICTURE_TYPE_IDR);
+libavcodec/vaapi_encode_vp8.c:111:    vpic->pic_flags.bits.show_frame = 1;
+libavcodec/vaapi_encode_vp8.c:113:    vpic->pic_flags.bits.refresh_last            = 1;
+libavcodec/vaapi_encode_vp8.c:114:    vpic->pic_flags.bits.refresh_golden_frame    = 1;
+libavcodec/vaapi_encode_vp8.c:115:    vpic->pic_flags.bits.refresh_alternate_frame = 1;
+libavcodec/vaapi_encode_vp8.c:117:    vpic->pic_flags.bits.version = 0;
+libavcodec/vaapi_encode_vp8.c:118:    vpic->pic_flags.bits.loop_filter_type = 0;
+libavcodec/vaapi_encode_vp8.c:120:        vpic->loop_filter_level[i] = priv->loop_filter_level;
+libavcodec/vaapi_encode_vp8.c:121:    vpic->sharpness_level = priv->loop_filter_sharpness;
+libavcodec/vaapi_encode_vp8.c:123:    vpic->clamp_qindex_low  = 0;
+libavcodec/vaapi_encode_vp8.c:124:    vpic->clamp_qindex_high = 127;
+libavcodec/vaapi_encode_vp8.c:148:    if (pic->type == PICTURE_TYPE_P)
+libavcodec/hq_hqa.c:54:    uint8_t *p = pic->data[plane] + x;
+libavcodec/hq_hqa.c:56:    c->hqhqadsp.idct_put(p + y * pic->linesize[plane],
+libavcodec/hq_hqa.c:57:                         pic->linesize[plane] << ilace, block0);
+libavcodec/hq_hqa.c:58:    c->hqhqadsp.idct_put(p + (y + (ilace ? 1 : 8)) * pic->linesize[plane],
+libavcodec/hq_hqa.c:59:                         pic->linesize[plane] << ilace, block1);
+libavcodec/hq_hqa.c:356:    pic->key_frame = 1;
+libavcodec/hq_hqa.c:357:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/vdpau_mpeg12.c:37:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/vdpau_mpeg12.c:88:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/dxtory.c:60:    switch (pic->format) {
+libavcodec/dxtory.c:62:        pic->data[1] += (avctx->height - 1) * pic->linesize[1];
+libavcodec/dxtory.c:63:        pic->linesize[1] = -pic->linesize[1];
+libavcodec/dxtory.c:64:        pic->data[2] += (avctx->height - 1) * pic->linesize[2];
+libavcodec/dxtory.c:65:        pic->linesize[2] = -pic->linesize[2];
+libavcodec/dxtory.c:70:        pic->data[0] += (avctx->height - 1) * pic->linesize[0];
+libavcodec/dxtory.c:71:        pic->linesize[0] = -pic->linesize[0];
+libavcodec/dxtory.c:74:        pic->data[0] += (avctx->height - 1) * pic->linesize[0];
+libavcodec/dxtory.c:75:        pic->linesize[0] = -pic->linesize[0];
+libavcodec/dxtory.c:76:        pic->data[1] += (AV_CEIL_RSHIFT(avctx->height, 2) - 1) * pic->linesize[1];
+libavcodec/dxtory.c:77:        pic->linesize[1] = -pic->linesize[1];
+libavcodec/dxtory.c:78:        pic->data[2] += (AV_CEIL_RSHIFT(avctx->height, 2) - 1) * pic->linesize[2];
+libavcodec/dxtory.c:79:        pic->linesize[2] = -pic->linesize[2];
+libavcodec/dxtory.c:82:        pic->data[0] += (avctx->height - 1) * pic->linesize[0];
+libavcodec/dxtory.c:83:        pic->linesize[0] = -pic->linesize[0];
+libavcodec/dxtory.c:84:        pic->data[1] += (AV_CEIL_RSHIFT(avctx->height, 1) - 1) * pic->linesize[1];
+libavcodec/dxtory.c:85:        pic->linesize[1] = -pic->linesize[1];
+libavcodec/dxtory.c:86:        pic->data[2] += (AV_CEIL_RSHIFT(avctx->height, 1) - 1) * pic->linesize[2];
+libavcodec/dxtory.c:87:        pic->linesize[2] = -pic->linesize[2];
+libavcodec/dxtory.c:112:    dst = pic->data[0];
+libavcodec/dxtory.c:116:        dst += pic->linesize[0];
+libavcodec/dxtory.c:152:    Y1 = pic->data[0];
+libavcodec/dxtory.c:153:    Y2 = pic->data[0] + pic->linesize[0];
+libavcodec/dxtory.c:154:    Y3 = pic->data[0] + pic->linesize[0] * 2;
+libavcodec/dxtory.c:155:    Y4 = pic->data[0] + pic->linesize[0] * 3;
+libavcodec/dxtory.c:156:    U  = pic->data[1];
+libavcodec/dxtory.c:157:    V  = pic->data[2];
+libavcodec/dxtory.c:180:        Y1 += pic->linesize[0] * 4;
+libavcodec/dxtory.c:181:        Y2 += pic->linesize[0] * 4;
+libavcodec/dxtory.c:182:        Y3 += pic->linesize[0] * 4;
+libavcodec/dxtory.c:183:        Y4 += pic->linesize[0] * 4;
+libavcodec/dxtory.c:184:        U  += pic->linesize[1];
+libavcodec/dxtory.c:185:        V  += pic->linesize[2];
+libavcodec/dxtory.c:248:    Y1 = pic->data[0];
+libavcodec/dxtory.c:249:    Y2 = pic->data[0] + pic->linesize[0];
+libavcodec/dxtory.c:250:    U  = pic->data[1];
+libavcodec/dxtory.c:251:    V  = pic->data[2];
+libavcodec/dxtory.c:267:        Y1 += pic->linesize[0] * 2;
+libavcodec/dxtory.c:268:        Y2 += pic->linesize[0] * 2;
+libavcodec/dxtory.c:269:        U  += pic->linesize[1];
+libavcodec/dxtory.c:270:        V  += pic->linesize[2];
+libavcodec/dxtory.c:313:    Y = pic->data[0];
+libavcodec/dxtory.c:314:    U = pic->data[1];
+libavcodec/dxtory.c:315:    V = pic->data[2];
+libavcodec/dxtory.c:322:        Y += pic->linesize[0];
+libavcodec/dxtory.c:323:        U += pic->linesize[1];
+libavcodec/dxtory.c:324:        V += pic->linesize[2];
+libavcodec/dxtory.c:872:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/dxtory.c:873:    pic->key_frame = 1;
+libavcodec/vaapi_vp8.c:45:    pic->output_surface = vaapi_vp8_surface_id(s->framep[VP56_FRAME_CURRENT]);
+libavcodec/vaapi_decode.h:37:    return (uintptr_t)pic->data[3];
+libavcodec/vaapi_decode.c:40:    av_assert0(pic->nb_param_buffers + 1 <= MAX_PARAM_BUFFERS);
+libavcodec/vaapi_decode.c:51:    pic->param_buffers[pic->nb_param_buffers++] = buffer;
+libavcodec/vaapi_decode.c:70:    av_assert0(pic->nb_slices <= pic->slices_allocated);
+libavcodec/vaapi_decode.c:71:    if (pic->nb_slices == pic->slices_allocated) {
+libavcodec/vaapi_decode.c:72:        if (pic->slices_allocated > 0)
+libavcodec/vaapi_decode.c:73:            pic->slices_allocated *= 2;
+libavcodec/vaapi_decode.c:75:            pic->slices_allocated = 64;
+libavcodec/vaapi_decode.c:77:        pic->slice_buffers =
+libavcodec/vaapi_decode.c:78:            av_realloc_array(pic->slice_buffers,
+libavcodec/vaapi_decode.c:79:                             pic->slices_allocated,
+libavcodec/vaapi_decode.c:80:                             2 * sizeof(*pic->slice_buffers));
+libavcodec/vaapi_decode.c:81:        if (!pic->slice_buffers)
+libavcodec/vaapi_decode.c:84:    av_assert0(pic->nb_slices + 1 <= pic->slices_allocated);
+libavcodec/vaapi_decode.c:86:    index = 2 * pic->nb_slices;
+libavcodec/vaapi_decode.c:91:                         &pic->slice_buffers[index]);
+libavcodec/vaapi_decode.c:99:           "is %#x.\n", pic->nb_slices, params_size,
+libavcodec/vaapi_decode.c:100:           pic->slice_buffers[index]);
+libavcodec/vaapi_decode.c:105:                         &pic->slice_buffers[index + 1]);
+libavcodec/vaapi_decode.c:111:                        pic->slice_buffers[index]);
+libavcodec/vaapi_decode.c:116:           "is %#x.\n", pic->nb_slices, slice_size,
+libavcodec/vaapi_decode.c:117:           pic->slice_buffers[index + 1]);
+libavcodec/vaapi_decode.c:119:    ++pic->nb_slices;
+libavcodec/vaapi_decode.c:130:    for (i = 0; i < pic->nb_param_buffers; i++) {
+libavcodec/vaapi_decode.c:132:                              pic->param_buffers[i]);
+libavcodec/vaapi_decode.c:136:                   pic->param_buffers[i], vas, vaErrorStr(vas));
+libavcodec/vaapi_decode.c:140:    for (i = 0; i < 2 * pic->nb_slices; i++) {
+libavcodec/vaapi_decode.c:142:                              pic->slice_buffers[i]);
+libavcodec/vaapi_decode.c:146:                   pic->slice_buffers[i], vas, vaErrorStr(vas));
+libavcodec/vaapi_decode.c:159:           pic->output_surface);
+libavcodec/vaapi_decode.c:162:                         pic->output_surface);
+libavcodec/vaapi_decode.c:171:                          pic->param_buffers, pic->nb_param_buffers);
+libavcodec/vaapi_decode.c:180:                          pic->slice_buffers, 2 * pic->nb_slices);
+libavcodec/vaapi_decode.c:217:    pic->nb_param_buffers = 0;
+libavcodec/vaapi_decode.c:218:    pic->nb_slices        = 0;
+libavcodec/vaapi_decode.c:219:    pic->slices_allocated = 0;
+libavcodec/vaapi_decode.c:220:    av_freep(&pic->slice_buffers);
+libavcodec/vaapi_decode.c:230:    pic->nb_param_buffers = 0;
+libavcodec/vaapi_decode.c:231:    pic->nb_slices        = 0;
+libavcodec/vaapi_decode.c:232:    pic->slices_allocated = 0;
+libavcodec/vaapi_decode.c:233:    av_freep(&pic->slice_buffers);
+libavcodec/libdavs2.c:66:    int bytes_per_sample = pic->bytes_per_sample;
+libavcodec/libdavs2.c:86:    switch (pic->type) {
+libavcodec/libdavs2.c:107:        int size_line = pic->widths[plane] * bytes_per_sample;
+libavcodec/libdavs2.c:108:        frame->buf[plane]  = av_buffer_alloc(size_line * pic->lines[plane]);
+libavcodec/libdavs2.c:118:        for (line = 0; line < pic->lines[plane]; ++line)
+libavcodec/libdavs2.c:120:                   pic->planes[plane] + line * pic->strides[plane],
+libavcodec/libdavs2.c:121:                   pic->widths[plane] * bytes_per_sample);
+libavcodec/vaapi_hevc.c:49:    va_pic->picture_id    = VA_INVALID_ID;
+libavcodec/vaapi_hevc.c:50:    va_pic->flags         = VA_PICTURE_HEVC_INVALID;
+libavcodec/vaapi_hevc.c:51:    va_pic->pic_order_cnt = 0;
+libavcodec/vaapi_hevc.c:56:    va_pic->picture_id    = ff_vaapi_get_surface_id(pic->frame);
+libavcodec/vaapi_hevc.c:57:    va_pic->pic_order_cnt = pic->poc;
+libavcodec/vaapi_hevc.c:58:    va_pic->flags         = rps_type;
+libavcodec/vaapi_hevc.c:60:    if (pic->flags & HEVC_FRAME_FLAG_LONG_REF)
+libavcodec/vaapi_hevc.c:61:        va_pic->flags |= VA_PICTURE_HEVC_LONG_TERM_REFERENCE;
+libavcodec/vaapi_hevc.c:63:    if (pic->frame->interlaced_frame) {
+libavcodec/vaapi_hevc.c:64:        va_pic->flags |= VA_PICTURE_HEVC_FIELD_PIC;
+libavcodec/vaapi_hevc.c:66:        if (!pic->frame->top_field_first)
+libavcodec/vaapi_hevc.c:67:            va_pic->flags |= VA_PICTURE_HEVC_BOTTOM_FIELD;
+libavcodec/vaapi_hevc.c:73:    VASurfaceID pic_surf = ff_vaapi_get_surface_id(pic->frame);
+libavcodec/vaapi_hevc.c:129:    VAPictureParameterBufferHEVC *pic_param = (VAPictureParameterBufferHEVC *)&pic->pic_param;
+libavcodec/vaapi_hevc.c:131:    pic->pic.output_surface = ff_vaapi_get_surface_id(h->ref->frame);
+libavcodec/vaapi_hevc.c:222:        pic->pic_param.rext = (VAPictureParameterBufferHEVCRext) {
+libavcodec/vaapi_hevc.c:244:            pic->pic_param.rext.cb_qp_offset_list[i]        = pps->cb_qp_offset_list[i];
+libavcodec/vaapi_hevc.c:246:            pic->pic_param.rext.cr_qp_offset_list[i]        = pps->cr_qp_offset_list[i];
+libavcodec/vaapi_hevc.c:250:                            sizeof(pic->pic_param) : sizeof(VAPictureParameterBufferHEVC);
+libavcodec/vaapi_hevc.c:252:    err = ff_vaapi_decode_make_param_buffer(avctx, &pic->pic,
+libavcodec/vaapi_hevc.c:254:                                            &pic->pic_param, pic_param_size);
+libavcodec/vaapi_hevc.c:281:        err = ff_vaapi_decode_make_param_buffer(avctx, &pic->pic,
+libavcodec/vaapi_hevc.c:291:    ff_vaapi_decode_cancel(avctx, &pic->pic);
+libavcodec/vaapi_hevc.c:299:    VASliceParameterBufferHEVC *last_slice_param = (VASliceParameterBufferHEVC *)&pic->last_slice_param;
+libavcodec/vaapi_hevc.c:303:                            sizeof(pic->last_slice_param) : sizeof(VASliceParameterBufferHEVC);
+libavcodec/vaapi_hevc.c:305:    if (pic->last_size) {
+libavcodec/vaapi_hevc.c:307:        ret = ff_vaapi_decode_make_slice_buffer(avctx, &pic->pic,
+libavcodec/vaapi_hevc.c:308:                                                &pic->last_slice_param, slice_param_size,
+libavcodec/vaapi_hevc.c:309:                                                pic->last_buffer, pic->last_size);
+libavcodec/vaapi_hevc.c:315:    ret = ff_vaapi_decode_issue(avctx, &pic->pic);
+libavcodec/vaapi_hevc.c:321:    ff_vaapi_decode_cancel(avctx, &pic->pic);
+libavcodec/vaapi_hevc.c:378:    VAPictureParameterBufferHEVC *pp = (VAPictureParameterBufferHEVC *)&pic->pic_param;
+libavcodec/vaapi_hevc.c:401:    VASliceParameterBufferHEVC *last_slice_param = (VASliceParameterBufferHEVC *)&pic->last_slice_param;
+libavcodec/vaapi_hevc.c:404:                            sizeof(pic->last_slice_param) : sizeof(VASliceParameterBufferHEVC);
+libavcodec/vaapi_hevc.c:412:        err = ff_vaapi_decode_make_slice_buffer(avctx, &pic->pic,
+libavcodec/vaapi_hevc.c:413:                                                &pic->last_slice_param, slice_param_size,
+libavcodec/vaapi_hevc.c:414:                                                pic->last_buffer, pic->last_size);
+libavcodec/vaapi_hevc.c:415:        pic->last_buffer = NULL;
+libavcodec/vaapi_hevc.c:416:        pic->last_size   = 0;
+libavcodec/vaapi_hevc.c:418:            ff_vaapi_decode_cancel(avctx, &pic->pic);
+libavcodec/vaapi_hevc.c:469:        pic->last_slice_param.rext = (VASliceParameterBufferHEVCRext) {
+libavcodec/vaapi_hevc.c:475:        memcpy(pic->last_slice_param.rext.luma_offset_l0, pic->last_slice_param.base.luma_offset_l0,
+libavcodec/vaapi_hevc.c:476:                                                    sizeof(pic->last_slice_param.base.luma_offset_l0));
+libavcodec/vaapi_hevc.c:477:        memcpy(pic->last_slice_param.rext.luma_offset_l1, pic->last_slice_param.base.luma_offset_l1,
+libavcodec/vaapi_hevc.c:478:                                                    sizeof(pic->last_slice_param.base.luma_offset_l1));
+libavcodec/vaapi_hevc.c:479:        memcpy(pic->last_slice_param.rext.ChromaOffsetL0, pic->last_slice_param.base.ChromaOffsetL0,
+libavcodec/vaapi_hevc.c:480:                                                    sizeof(pic->last_slice_param.base.ChromaOffsetL0));
+libavcodec/vaapi_hevc.c:481:        memcpy(pic->last_slice_param.rext.ChromaOffsetL1, pic->last_slice_param.base.ChromaOffsetL1,
+libavcodec/vaapi_hevc.c:482:                                                    sizeof(pic->last_slice_param.base.ChromaOffsetL1));
+libavcodec/vaapi_hevc.c:486:    pic->last_buffer = buffer;
+libavcodec/vaapi_hevc.c:487:    pic->last_size   = size;
+libavcodec/v410enc.c:61:    y = (uint16_t *)pic->data[0];
+libavcodec/v410enc.c:62:    u = (uint16_t *)pic->data[1];
+libavcodec/v410enc.c:63:    v = (uint16_t *)pic->data[2];
+libavcodec/v410enc.c:73:        y += pic->linesize[0] >> 1;
+libavcodec/v410enc.c:74:        u += pic->linesize[1] >> 1;
+libavcodec/v410enc.c:75:        v += pic->linesize[2] >> 1;
+libavcodec/cllc.c:229:    dst = pic->data[0];
+libavcodec/cllc.c:250:        dst += pic->linesize[0];
+libavcodec/cllc.c:272:    dst = pic->data[0];
+libavcodec/cllc.c:294:        dst += pic->linesize[0];
+libavcodec/cllc.c:317:    dst[0] = pic->data[0];
+libavcodec/cllc.c:318:    dst[1] = pic->data[1];
+libavcodec/cllc.c:319:    dst[2] = pic->data[2];
+libavcodec/cllc.c:349:            dst[j] += pic->linesize[j];
+libavcodec/cllc.c:465:    pic->key_frame = 1;
+libavcodec/cllc.c:466:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/libxavs2.c:134:        p_plane = (uint16_t *)pic->img.img_planes[plane];
+libavcodec/libxavs2.c:136:        for (hIdx = 0; hIdx < pic->img.i_lines[plane]; hIdx++) {
+libavcodec/libxavs2.c:137:            memset(p_plane, 0, pic->img.i_stride[plane]);
+libavcodec/libxavs2.c:138:            for (wIdx = 0; wIdx < pic->img.i_width[plane]; wIdx++) {
+libavcodec/libxavs2.c:141:            p_plane += pic->img.i_stride[plane];
+libavcodec/libxavs2.c:156:        p_plane = pic->img.img_planes[plane];
+libavcodec/libxavs2.c:158:        stride = pic->img.i_width[plane] * pic->img.in_sample_size;
+libavcodec/libxavs2.c:159:        for (hIdx = 0; hIdx < pic->img.i_lines[plane]; hIdx++) {
+libavcodec/libxavs2.c:161:            p_plane += pic->img.i_stride[plane];
+libavcodec/h264_mb.c:171:                int ref_field         = ref_pic->reference - 1;
+libavcodec/h264_mb.c:172:                int ref_field_picture = ref_pic->parent->field_picture;
+libavcodec/h264_mb.c:179:                    av_assert2((ref_pic->parent->reference & 3) == 3);
+libavcodec/h264_mb.c:180:                    ff_thread_await_progress(&ref_pic->parent->tf,
+libavcodec/h264_mb.c:184:                    ff_thread_await_progress(&ref_pic->parent->tf,
+libavcodec/h264_mb.c:188:                    ff_thread_await_progress(&ref_pic->parent->tf,
+libavcodec/h264_mb.c:193:                    ff_thread_await_progress(&ref_pic->parent->tf,
+libavcodec/h264_mb.c:197:                    ff_thread_await_progress(&ref_pic->parent->tf,
+libavcodec/h264_mb.c:220:    uint8_t *src_y    = pic->data[0] + offset;
+libavcodec/h264_mb.c:257:        src_cb = pic->data[1] + offset;
+libavcodec/h264_mb.c:271:        src_cr = pic->data[2] + offset;
+libavcodec/h264_mb.c:290:        my  += 2 * ((sl->mb_y & 1) - (pic->reference - 1));
+libavcodec/h264_mb.c:294:    src_cb = pic->data[1] + ((mx >> 3) * (1 << pixel_shift)) +
+libavcodec/h264_mb.c:296:    src_cr = pic->data[2] + ((mx >> 3) * (1 << pixel_shift)) +
+libavcodec/avuidec.c:74:    pic->key_frame = 1;
+libavcodec/avuidec.c:75:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/avuidec.c:86:            y = pic->data[0] + (1 - i) * pic->linesize[0];
+libavcodec/avuidec.c:87:            u = pic->data[1] + (1 - i) * pic->linesize[1];
+libavcodec/avuidec.c:88:            v = pic->data[2] + (1 - i) * pic->linesize[2];
+libavcodec/avuidec.c:89:            a = pic->data[3] + (1 - i) * pic->linesize[3];
+libavcodec/avuidec.c:91:            y = pic->data[0] + i * pic->linesize[0];
+libavcodec/avuidec.c:92:            u = pic->data[1] + i * pic->linesize[1];
+libavcodec/avuidec.c:93:            v = pic->data[2] + i * pic->linesize[2];
+libavcodec/avuidec.c:94:            a = pic->data[3] + i * pic->linesize[3];
+libavcodec/avuidec.c:109:            y += (interlaced + 1) * pic->linesize[0];
+libavcodec/avuidec.c:110:            u += (interlaced + 1) * pic->linesize[1];
+libavcodec/avuidec.c:111:            v += (interlaced + 1) * pic->linesize[2];
+libavcodec/avuidec.c:112:            a += (interlaced + 1) * pic->linesize[3];
+libavcodec/mss1.c:160:    c->pal_pic    =  ctx->pic->data[0] + ctx->pic->linesize[0] * (avctx->height - 1);
+libavcodec/mss1.c:161:    c->pal_stride = -ctx->pic->linesize[0];
+libavcodec/mss1.c:167:        ctx->pic->key_frame = 1;
+libavcodec/mss1.c:168:        ctx->pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/mss1.c:172:        ctx->pic->key_frame = 0;
+libavcodec/mss1.c:173:        ctx->pic->pict_type = AV_PICTURE_TYPE_P;
+libavcodec/mss1.c:179:    memcpy(ctx->pic->data[1], c->pal, AVPALETTE_SIZE);
+libavcodec/mss1.c:180:    ctx->pic->palette_has_changed = pal_changed;
+libavcodec/mpegvideo.c:1232:    pic->reference = 0;
+libavcodec/mpegvideo.c:1235:            pic->reference = 3;
+libavcodec/mpegvideo.c:1240:    memcpy(pic->f->atsc_cc_buf, s->tmp_atsc_cc_buf, s->tmp_atsc_cc_len);
+libavcodec/mpegvideo.c:1241:    pic->f->atsc_cc_len = s->tmp_atsc_cc_len;
+libavcodec/mpegvideo.c:1243:    memcpy(pic->f->scte_cc_buf, s->tmp_scte_cc_buf, s->tmp_scte_cc_len);
+libavcodec/mpegvideo.c:1244:    pic->f->scte_cc_len = s->tmp_scte_cc_len;
+libavcodec/mpegvideo.c:1248:    pic->f->coded_picture_number = s->coded_picture_number++;
+libavcodec/smacker.c:393:    pal = (uint32_t*)smk->pic->data[1];
+libavcodec/smacker.c:396:    smk->pic->palette_has_changed = flags & 1;
+libavcodec/smacker.c:397:    smk->pic->key_frame = !!(flags & 2);
+libavcodec/smacker.c:398:    if (smk->pic->key_frame)
+libavcodec/smacker.c:399:        smk->pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/smacker.c:401:        smk->pic->pict_type = AV_PICTURE_TYPE_P;
+libavcodec/smacker.c:417:    stride = smk->pic->linesize[0];
+libavcodec/smacker.c:433:                out = smk->pic->data[0] + (blk / bw) * (stride * 4) + (blk % bw) * 4;
+libavcodec/smacker.c:456:                out = smk->pic->data[0] + (blk / bw) * (stride * 4) + (blk % bw) * 4;
+libavcodec/smacker.c:507:                out = smk->pic->data[0] + (blk / bw) * (stride * 4) + (blk % bw) * 4;
+libavcodec/c93.c:142:    stride = newpic->linesize[0];
+libavcodec/c93.c:147:        newpic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/c93.c:148:        newpic->key_frame = 1;
+libavcodec/c93.c:150:        newpic->pict_type = AV_PICTURE_TYPE_P;
+libavcodec/c93.c:151:        newpic->key_frame = 0;
+libavcodec/c93.c:155:        out = newpic->data[0] + y * stride;
+libavcodec/c93.c:157:            uint8_t *copy_from = oldpic->data[0];
+libavcodec/c93.c:174:                copy_from = newpic->data[0];
+libavcodec/c93.c:243:        uint32_t *palette = (uint32_t *) newpic->data[1];
+libavcodec/c93.c:247:        newpic->palette_has_changed = 1;
+libavcodec/c93.c:249:        if (oldpic->data[1])
+libavcodec/c93.c:250:            memcpy(newpic->data[1], oldpic->data[1], 256 * 4);
+libavcodec/indeo2.c:241:    ic->avctx = avctx;
+libavcodec/indeo2.c:245:    ic->picture = av_frame_alloc();
+libavcodec/indeo2.c:246:    if (!ic->picture)
+libavcodec/indeo2.c:258:    av_frame_free(&ic->picture);
+libavcodec/libaomdec.c:63:    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pic->format);
+libavcodec/libaomdec.c:78:            uint8_t *dst = pic->data[i] + y * pic->linesize[i];
+libavcodec/r210enc.c:52:    srcg_line = pic->data[0];
+libavcodec/r210enc.c:53:    srcb_line = pic->data[1];
+libavcodec/r210enc.c:54:    srcr_line = pic->data[2];
+libavcodec/r210enc.c:77:        srcr_line += pic->linesize[2];
+libavcodec/r210enc.c:78:        srcg_line += pic->linesize[0];
+libavcodec/r210enc.c:79:        srcb_line += pic->linesize[1];
+libavcodec/utvideoenc.c:584:        mangle_rgb_planes(c->slice_buffer, c->slice_stride, pic->data,
+libavcodec/utvideoenc.c:585:                          c->planes, pic->linesize, width, height);
+libavcodec/utvideoenc.c:604:            ret = encode_plane(avctx, pic->data[i], c->slice_buffer[0],
+libavcodec/utvideoenc.c:605:                               pic->linesize[i], i, width, height, &pb);
+libavcodec/utvideoenc.c:615:            ret = encode_plane(avctx, pic->data[i], c->slice_buffer[0],
+libavcodec/utvideoenc.c:616:                               pic->linesize[i], i, width >> !!i, height, &pb);
+libavcodec/utvideoenc.c:626:            ret = encode_plane(avctx, pic->data[i], c->slice_buffer[0],
+libavcodec/utvideoenc.c:627:                               pic->linesize[i], i, width >> !!i, height >> !!i,
+libavcodec/dxva2_h264.c:45:    pic->bPicEntry = index | (flag << 7);
+libavcodec/dxva2_h264.c:341:    for (i = 0; i < ctx_pic->slice_count; i++) {
+libavcodec/dxva2_h264.c:352:            slice = &ctx_pic->slice_short[i];
+libavcodec/dxva2_h264.c:354:            slice = (DXVA_Slice_H264_Short*)&ctx_pic->slice_long[i];
+libavcodec/dxva2_h264.c:368:            if (i < ctx_pic->slice_count - 1)
+libavcodec/dxva2_h264.c:378:        memcpy(current, &ctx_pic->bitstream[position], size);
+libavcodec/dxva2_h264.c:398:    if (i < ctx_pic->slice_count)
+libavcodec/dxva2_h264.c:429:        slice_data = ctx_pic->slice_short;
+libavcodec/dxva2_h264.c:430:        slice_size = ctx_pic->slice_count * sizeof(*ctx_pic->slice_short);
+libavcodec/dxva2_h264.c:432:        slice_data = ctx_pic->slice_long;
+libavcodec/dxva2_h264.c:433:        slice_size = ctx_pic->slice_count * sizeof(*ctx_pic->slice_long);
+libavcodec/dxva2_h264.c:454:    fill_picture_parameters(avctx, ctx, h, &ctx_pic->pp);
+libavcodec/dxva2_h264.c:457:    fill_scaling_lists(avctx, ctx, h, &ctx_pic->qm);
+libavcodec/dxva2_h264.c:459:    ctx_pic->slice_count    = 0;
+libavcodec/dxva2_h264.c:460:    ctx_pic->bitstream_size = 0;
+libavcodec/dxva2_h264.c:461:    ctx_pic->bitstream      = NULL;
+libavcodec/dxva2_h264.c:476:    if (ctx_pic->slice_count >= MAX_SLICES)
+libavcodec/dxva2_h264.c:479:    if (!ctx_pic->bitstream)
+libavcodec/dxva2_h264.c:480:        ctx_pic->bitstream = buffer;
+libavcodec/dxva2_h264.c:481:    ctx_pic->bitstream_size += size;
+libavcodec/dxva2_h264.c:483:    position = buffer - ctx_pic->bitstream;
+libavcodec/dxva2_h264.c:485:        fill_slice_short(&ctx_pic->slice_short[ctx_pic->slice_count],
+libavcodec/dxva2_h264.c:488:        fill_slice_long(avctx, &ctx_pic->slice_long[ctx_pic->slice_count],
+libavcodec/dxva2_h264.c:489:                        &ctx_pic->pp, position, size);
+libavcodec/dxva2_h264.c:490:    ctx_pic->slice_count++;
+libavcodec/dxva2_h264.c:493:        ctx_pic->pp.wBitFields &= ~(1 << 15); /* Set IntraPicFlag to 0 */
+libavcodec/dxva2_h264.c:505:    if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
+libavcodec/dxva2_h264.c:508:                                    &ctx_pic->pp, sizeof(ctx_pic->pp),
+libavcodec/dxva2_h264.c:509:                                    &ctx_pic->qm, sizeof(ctx_pic->qm),
+libavcodec/v308enc.c:51:    y = pic->data[0];
+libavcodec/v308enc.c:52:    u = pic->data[1];
+libavcodec/v308enc.c:53:    v = pic->data[2];
+libavcodec/v308enc.c:61:        y += pic->linesize[0];
+libavcodec/v308enc.c:62:        u += pic->linesize[1];
+libavcodec/v308enc.c:63:        v += pic->linesize[2];
+libavcodec/vdpau_vc1.c:38:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/vdpau_vc1.c:106:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/rv34.c:554:    int type = cur_pic->mb_type[mb_pos];
+libavcodec/rv34.c:557:        A[0] = cur_pic->motion_val[dir][mv_pos - 1][0];
+libavcodec/rv34.c:558:        A[1] = cur_pic->motion_val[dir][mv_pos - 1][1];
+libavcodec/rv34.c:562:        B[0] = cur_pic->motion_val[dir][mv_pos - s->b8_stride][0];
+libavcodec/rv34.c:563:        B[1] = cur_pic->motion_val[dir][mv_pos - s->b8_stride][1];
+libavcodec/rv34.c:567:        C[0] = cur_pic->motion_val[dir][mv_pos - s->b8_stride + 2][0];
+libavcodec/rv34.c:568:        C[1] = cur_pic->motion_val[dir][mv_pos - s->b8_stride + 2][1];
+libavcodec/rv34.c:571:        C[0] = cur_pic->motion_val[dir][mv_pos - s->b8_stride - 1][0];
+libavcodec/rv34.c:572:        C[1] = cur_pic->motion_val[dir][mv_pos - s->b8_stride - 1][1];
+libavcodec/rv34.c:583:            cur_pic->motion_val[dir][mv_pos + i + j*s->b8_stride][0] = mx;
+libavcodec/rv34.c:584:            cur_pic->motion_val[dir][mv_pos + i + j*s->b8_stride][1] = my;
+libavcodec/rv34.c:588:        ZERO8x2(cur_pic->motion_val[!dir][mv_pos], s->b8_stride);
+libavcodec/libvpxenc.c:1760:    { "static-thresh",    "A change threshold on blocks below which they will be skipped by the encoder", OFFSET(static_thresh), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, VE }, \
+libavcodec/zerocodec.c:37:    uint8_t *prev        = prev_pic->data[0];
+libavcodec/zerocodec.c:42:        pic->key_frame = 1;
+libavcodec/zerocodec.c:43:        pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/zerocodec.c:50:        prev += (avctx->height - 1) * prev_pic->linesize[0];
+libavcodec/zerocodec.c:52:        pic->key_frame = 0;
+libavcodec/zerocodec.c:53:        pic->pict_type = AV_PICTURE_TYPE_P;
+libavcodec/zerocodec.c:68:    dst = pic->data[0] + (avctx->height - 1) * pic->linesize[0];
+libavcodec/zerocodec.c:90:        prev -= prev_pic->linesize[0];
+libavcodec/zerocodec.c:91:        dst  -= pic->linesize[0];
+libavcodec/vble.c:89:    uint8_t *dst = pic->data[plane];
+libavcodec/vble.c:91:    int stride = pic->linesize[plane];
+libavcodec/vble.c:140:    pic->key_frame = 1;
+libavcodec/vble.c:141:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/dxva2_hevc.c:44:    pic->bPicEntry = index | (flag << 7);
+libavcodec/dxva2_hevc.c:280:    for (i = 0; i < ctx_pic->slice_count; i++) {
+libavcodec/dxva2_hevc.c:285:        slice = &ctx_pic->slice_short[i];
+libavcodec/dxva2_hevc.c:300:        memcpy(current, &ctx_pic->bitstream[position], size);
+libavcodec/dxva2_hevc.c:320:    if (i < ctx_pic->slice_count)
+libavcodec/dxva2_hevc.c:346:    slice_data = ctx_pic->slice_short;
+libavcodec/dxva2_hevc.c:347:    slice_size = ctx_pic->slice_count * sizeof(*ctx_pic->slice_short);
+libavcodec/dxva2_hevc.c:369:    fill_picture_parameters(avctx, ctx, h, &ctx_pic->pp);
+libavcodec/dxva2_hevc.c:372:    fill_scaling_lists(ctx, h, &ctx_pic->qm);
+libavcodec/dxva2_hevc.c:374:    ctx_pic->slice_count    = 0;
+libavcodec/dxva2_hevc.c:375:    ctx_pic->bitstream_size = 0;
+libavcodec/dxva2_hevc.c:376:    ctx_pic->bitstream      = NULL;
+libavcodec/dxva2_hevc.c:389:    if (ctx_pic->slice_count >= MAX_SLICES)
+libavcodec/dxva2_hevc.c:392:    if (!ctx_pic->bitstream)
+libavcodec/dxva2_hevc.c:393:        ctx_pic->bitstream = buffer;
+libavcodec/dxva2_hevc.c:394:    ctx_pic->bitstream_size += size;
+libavcodec/dxva2_hevc.c:396:    position = buffer - ctx_pic->bitstream;
+libavcodec/dxva2_hevc.c:397:    fill_slice_short(&ctx_pic->slice_short[ctx_pic->slice_count], position, size);
+libavcodec/dxva2_hevc.c:398:    ctx_pic->slice_count++;
+libavcodec/dxva2_hevc.c:407:    int scale = ctx_pic->pp.dwCodingParamToolFlags & 1;
+libavcodec/dxva2_hevc.c:410:    if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
+libavcodec/dxva2_hevc.c:414:                                    &ctx_pic->pp, sizeof(ctx_pic->pp),
+libavcodec/dxva2_hevc.c:415:                                    scale ? &ctx_pic->qm : NULL, scale ? sizeof(ctx_pic->qm) : 0,
+libavcodec/vaapi_mpeg2.c:50:    pic->output_surface = ff_vaapi_get_surface_id(s->current_picture_ptr->f);
+libavcodec/libkvazaar.c:219:            av_image_copy(input_pic->data, dst_linesizes,
+libavcodec/libkvazaar.c:224:        input_pic->pts = frame->pts;
+libavcodec/libkvazaar.c:255:        avpkt->pts = recon_pic->pts;
+libavcodec/libkvazaar.c:256:        avpkt->dts = recon_pic->dts;
+libavcodec/mpegvideo.h:125:    int input_picture_number;  ///< used to set pic->display_picture_number, should not be used for/by anything else
+libavcodec/mpegvideo.h:126:    int coded_picture_number;  ///< used to set pic->coded_picture_number, should not be used for/by anything else
+libavcodec/vaapi_mjpeg.c:35:    pic->output_surface = ff_vaapi_get_surface_id(s->picture_ptr);
+libavcodec/snowenc.c:1600:    pic->pict_type = pict->pict_type;
+libavcodec/snowenc.c:1601:    pic->quality = pict->quality;
+libavcodec/snowenc.c:1605:        s->m.pict_type = pic->pict_type = s->m.rc_context.entry[avctx->frame_number].new_pict_type;
+libavcodec/snowenc.c:1606:        s->keyframe = pic->pict_type == AV_PICTURE_TYPE_I;
+libavcodec/snowenc.c:1608:            pic->quality = ff_rate_estimate_qscale(&s->m, 0);
+libavcodec/snowenc.c:1609:            if (pic->quality < 0)
+libavcodec/snowenc.c:1614:        s->m.pict_type = pic->pict_type = s->keyframe ? AV_PICTURE_TYPE_I : AV_PICTURE_TYPE_P;
+libavcodec/snowenc.c:1618:        pic->quality = 2*FF_QP2LAMBDA;
+libavcodec/snowenc.c:1619:    if (pic->quality) {
+libavcodec/snowenc.c:1620:        s->qlog   = qscale2qlog(pic->quality);
+libavcodec/snowenc.c:1621:        s->lambda = pic->quality * 3/2;
+libavcodec/snowenc.c:1623:    if (s->qlog < 0 || (!pic->quality && (avctx->flags & AV_CODEC_FLAG_QSCALE))) {
+libavcodec/snowenc.c:1670:    if(pic->pict_type == AV_PICTURE_TYPE_P){
+libavcodec/snowenc.c:1691:        s->m.pict_type = pic->pict_type;
+libavcodec/snowenc.c:1729:    s->m.pict_type = pic->pict_type;
+libavcodec/snowenc.c:1730:    s->qbias = pic->pict_type == AV_PICTURE_TYPE_P ? 2 : 0;
+libavcodec/snowenc.c:1770:               && pic->pict_type == AV_PICTURE_TYPE_P
+libavcodec/snowenc.c:1775:                pic->pict_type= AV_PICTURE_TYPE_I;
+libavcodec/snowenc.c:1817:                        decorrelate(s, b, b->ibuf, b->stride, pic->pict_type == AV_PICTURE_TYPE_P, 0);
+libavcodec/snowenc.c:1845:            if(pic->pict_type == AV_PICTURE_TYPE_I){
+libavcodec/snowenc.c:1879:    s->current_picture->pict_type = pic->pict_type;
+libavcodec/snowenc.c:1880:    s->current_picture->quality = pic->quality;
+libavcodec/snowenc.c:1885:    s->m.current_picture.f->quality                = pic->quality;
+libavcodec/vaapi_av1.c:67:    pic->output_surface = vaapi_av1_surface_id(&s->cur_frame);
+libavcodec/vaapi_av1.c:78:        .current_frame           = pic->output_surface,
+libavcodec/vaapi_av1.c:79:        .current_display_picture = pic->output_surface,
+libavcodec/xxan.c:215:    U = s->pic->data[1];
+libavcodec/xxan.c:216:    V = s->pic->data[2];
+libavcodec/xxan.c:235:            U += s->pic->linesize[1];
+libavcodec/xxan.c:236:            V += s->pic->linesize[2];
+libavcodec/xxan.c:239:            memcpy(U, U - s->pic->linesize[1], avctx->width >> 1);
+libavcodec/xxan.c:240:            memcpy(V, V - s->pic->linesize[2], avctx->width >> 1);
+libavcodec/xxan.c:243:        uint8_t *U2 = U + s->pic->linesize[1];
+libavcodec/xxan.c:244:        uint8_t *V2 = V + s->pic->linesize[2];
+libavcodec/xxan.c:261:            U  += s->pic->linesize[1] * 2;
+libavcodec/xxan.c:262:            V  += s->pic->linesize[2] * 2;
+libavcodec/xxan.c:263:            U2 += s->pic->linesize[1] * 2;
+libavcodec/xxan.c:264:            V2 += s->pic->linesize[2] * 2;
+libavcodec/xxan.c:269:            memcpy(U, U - lines * s->pic->linesize[1], lines * s->pic->linesize[1]);
+libavcodec/xxan.c:270:            memcpy(V, V - lines * s->pic->linesize[2], lines * s->pic->linesize[2]);
+libavcodec/xxan.c:345:    ybuf = s->pic->data[0];
+libavcodec/xxan.c:350:        ybuf += s->pic->linesize[0];
+libavcodec/xxan.c:390:    ybuf = s->pic->data[0];
+libavcodec/xxan.c:395:        ybuf += s->pic->linesize[0];
+libavcodec/vdpau.c:369:    struct vdpau_picture_context *pic_ctx = pic->hwaccel_picture_private;
+libavcodec/vdpau.c:372:    val = ff_vdpau_common_end_frame(avctx, pic->f, pic_ctx);
+libavcodec/vaapi_encode_mjpeg.c:228:    VAEncPictureParameterBufferJPEG *vpic = pic->codec_picture_params;
+libavcodec/vaapi_encode_mjpeg.c:235:    av_assert0(pic->type == PICTURE_TYPE_IDR);
+libavcodec/vaapi_encode_mjpeg.c:264:        AVRational sar = pic->input_image->sample_aspect_ratio;
+libavcodec/vaapi_encode_mjpeg.c:380:        .reconstructed_picture = pic->recon_surface,
+libavcodec/vaapi_encode_mjpeg.c:381:        .coded_buf             = pic->output_buffer,
+libavcodec/vaapi_encode_mjpeg.c:405:        vpic->component_id[i]             = fh->C[i];
+libavcodec/vaapi_encode_mjpeg.c:406:        vpic->quantiser_table_selector[i] = fh->Tq[i];
+libavcodec/vaapi_encode_mjpeg.c:409:    pic->nb_slices = 1;
+libavcodec/libwebpenc.c:49:    pic->custom_ptr = &mw;
+libavcodec/libwebpenc.c:50:    pic->writer     = WebPMemoryWrite;
+libavcodec/libwebpenc.c:55:               pic->error_code);
+libavcodec/libwebpenc.c:56:        ret = ff_libwebp_error_to_averror(pic->error_code);
+libavcodec/diracdec.c:2057:                retire_pic->reference &= DELAYED_PIC_REF;
+libavcodec/diracdec.c:2211:        av_frame_unref(pic->avframe);
+libavcodec/diracdec.c:2226:        pic->reference   = (parse_code & 0x0C) == 0x0C;          /* [DIRAC_STD] is_reference()        */
+libavcodec/diracdec.c:2227:        pic->avframe->key_frame = s->num_refs == 0;              /* [DIRAC_STD] is_intra()            */
+libavcodec/diracdec.c:2228:        pic->avframe->pict_type = s->num_refs + 1;               /* Definition of AVPictureType in avutil.h */
+libavcodec/diracdec.c:2239:        if ((ret = get_buffer_with_edge(avctx, pic->avframe, (parse_code & 0x0C) == 0x0C ? AV_GET_BUFFER_FLAG_REF : 0)) < 0)
+libavcodec/diracdec.c:2242:        s->plane[0].stride = pic->avframe->linesize[0];
+libavcodec/diracdec.c:2243:        s->plane[1].stride = pic->avframe->linesize[1];
+libavcodec/diracdec.c:2244:        s->plane[2].stride = pic->avframe->linesize[2];
+libavcodec/y41penc.c:52:        y = &pic->data[0][i * pic->linesize[0]];
+libavcodec/y41penc.c:53:        u = &pic->data[1][i * pic->linesize[1]];
+libavcodec/y41penc.c:54:        v = &pic->data[2][i * pic->linesize[2]];
+libavcodec/dpxenc.c:97:    const uint8_t *src = pic->data[0];
+libavcodec/dpxenc.c:115:        src += pic->linesize[0];
+libavcodec/dpxenc.c:122:    const uint8_t *src[3] = {pic->data[0], pic->data[1], pic->data[2]};
+libavcodec/dpxenc.c:141:            src[i] += pic->linesize[i];
+libavcodec/dpxenc.c:148:    const uint16_t *src[3] = {(uint16_t*)pic->data[0],
+libavcodec/dpxenc.c:149:                              (uint16_t*)pic->data[1],
+libavcodec/dpxenc.c:150:                              (uint16_t*)pic->data[2]};
+libavcodec/dpxenc.c:172:            src[i] += pic->linesize[i]/2;
+libavcodec/vaapi_h264.c:41:    va_pic->picture_id          = VA_INVALID_ID;
+libavcodec/vaapi_h264.c:42:    va_pic->flags               = VA_PICTURE_H264_INVALID;
+libavcodec/vaapi_h264.c:43:    va_pic->TopFieldOrderCnt    = 0;
+libavcodec/vaapi_h264.c:44:    va_pic->BottomFieldOrderCnt = 0;
+libavcodec/vaapi_h264.c:60:        pic_structure = pic->reference;
+libavcodec/vaapi_h264.c:63:    va_pic->picture_id = ff_vaapi_get_surface_id(pic->f);
+libavcodec/vaapi_h264.c:64:    va_pic->frame_idx  = pic->long_ref ? pic->pic_id : pic->frame_num;
+libavcodec/vaapi_h264.c:66:    va_pic->flags      = 0;
+libavcodec/vaapi_h264.c:68:        va_pic->flags |= (pic_structure & PICT_TOP_FIELD) ? VA_PICTURE_H264_TOP_FIELD : VA_PICTURE_H264_BOTTOM_FIELD;
+libavcodec/vaapi_h264.c:69:    if (pic->reference)
+libavcodec/vaapi_h264.c:70:        va_pic->flags |= pic->long_ref ? VA_PICTURE_H264_LONG_TERM_REFERENCE : VA_PICTURE_H264_SHORT_TERM_REFERENCE;
+libavcodec/vaapi_h264.c:72:    va_pic->TopFieldOrderCnt = 0;
+libavcodec/vaapi_h264.c:73:    if (pic->field_poc[0] != INT_MAX)
+libavcodec/vaapi_h264.c:74:        va_pic->TopFieldOrderCnt = pic->field_poc[0];
+libavcodec/vaapi_h264.c:76:    va_pic->BottomFieldOrderCnt = 0;
+libavcodec/vaapi_h264.c:77:    if (pic->field_poc[1] != INT_MAX)
+libavcodec/vaapi_h264.c:78:        va_pic->BottomFieldOrderCnt = pic->field_poc[1];
+libavcodec/vaapi_h264.c:103:        if (va_pic->picture_id == ff_vaapi_get_surface_id(pic->f)) {
+libavcodec/vaapi_h264.c:107:            if ((temp_va_pic.flags ^ va_pic->flags) & (VA_PICTURE_H264_TOP_FIELD | VA_PICTURE_H264_BOTTOM_FIELD)) {
+libavcodec/vaapi_h264.c:108:                va_pic->flags |= temp_va_pic.flags & (VA_PICTURE_H264_TOP_FIELD | VA_PICTURE_H264_BOTTOM_FIELD);
+libavcodec/vaapi_h264.c:111:                    va_pic->TopFieldOrderCnt    = temp_va_pic.TopFieldOrderCnt;
+libavcodec/vaapi_h264.c:113:                    va_pic->BottomFieldOrderCnt = temp_va_pic.BottomFieldOrderCnt;
+libavcodec/vaapi_h264.c:139:        if (pic && pic->reference && dpb_add(&dpb, pic) < 0)
+libavcodec/vaapi_h264.c:145:        if (pic && pic->reference && dpb_add(&dpb, pic) < 0)
+libavcodec/vaapi_h264.c:238:    pic->output_surface = ff_vaapi_get_surface_id(h->cur_pic_ptr->f);
+libavcodec/dxva2_mpeg2.c:190:    for (i = 0; i < ctx_pic->slice_count; i++) {
+libavcodec/dxva2_mpeg2.c:191:        DXVA_SliceInfo *slice = &ctx_pic->slice[i];
+libavcodec/dxva2_mpeg2.c:200:        if (i < ctx_pic->slice_count - 1)
+libavcodec/dxva2_mpeg2.c:207:        memcpy(current, &ctx_pic->bitstream[position], size);
+libavcodec/dxva2_mpeg2.c:220:    if (i < ctx_pic->slice_count)
+libavcodec/dxva2_mpeg2.c:248:                                  ctx_pic->slice,
+libavcodec/dxva2_mpeg2.c:249:                                  ctx_pic->slice_count * sizeof(*ctx_pic->slice),
+libavcodec/dxva2_mpeg2.c:266:    fill_picture_parameters(avctx, ctx, s, &ctx_pic->pp);
+libavcodec/dxva2_mpeg2.c:267:    fill_quantization_matrices(avctx, ctx, s, &ctx_pic->qm);
+libavcodec/dxva2_mpeg2.c:269:    ctx_pic->slice_count    = 0;
+libavcodec/dxva2_mpeg2.c:270:    ctx_pic->bitstream_size = 0;
+libavcodec/dxva2_mpeg2.c:271:    ctx_pic->bitstream      = NULL;
+libavcodec/dxva2_mpeg2.c:283:    if (ctx_pic->slice_count >= MAX_SLICES) {
+libavcodec/dxva2_mpeg2.c:285:                              ctx_pic->slice_count);
+libavcodec/dxva2_mpeg2.c:288:    if (!ctx_pic->bitstream)
+libavcodec/dxva2_mpeg2.c:289:        ctx_pic->bitstream = buffer;
+libavcodec/dxva2_mpeg2.c:290:    ctx_pic->bitstream_size += size;
+libavcodec/dxva2_mpeg2.c:292:    position = buffer - ctx_pic->bitstream;
+libavcodec/dxva2_mpeg2.c:293:    fill_slice(avctx, s, &ctx_pic->slice[ctx_pic->slice_count++], position,
+libavcodec/dxva2_mpeg2.c:305:    if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
+libavcodec/dxva2_mpeg2.c:308:                                    &ctx_pic->pp, sizeof(ctx_pic->pp),
+libavcodec/dxva2_mpeg2.c:309:                                    &ctx_pic->qm, sizeof(ctx_pic->qm),
+libavcodec/cavs.c:402:    uint8_t *src_y       = pic->data[0] + (mx >> 2) + (my >> 2) * h->l_stride;
+libavcodec/cavs.c:403:    uint8_t *src_cb      = pic->data[1] + (mx >> 3) + (my >> 3) * h->c_stride;
+libavcodec/cavs.c:404:    uint8_t *src_cr      = pic->data[2] + (mx >> 3) + (my >> 3) * h->c_stride;
+libavcodec/cavs.c:413:    if (!pic->data[0])
+libavcodec/yuv4dec.c:49:    pic->key_frame = 1;
+libavcodec/yuv4dec.c:50:    pic->pict_type = AV_PICTURE_TYPE_I;
+libavcodec/yuv4dec.c:52:    y = pic->data[0];
+libavcodec/yuv4dec.c:53:    u = pic->data[1];
+libavcodec/yuv4dec.c:54:    v = pic->data[2];
+libavcodec/yuv4dec.c:62:            y[pic->linesize[0] + 2 * j    ] = *src++;
+libavcodec/yuv4dec.c:63:            y[pic->linesize[0] + 2 * j + 1] = *src++;
+libavcodec/yuv4dec.c:66:        y += 2 * pic->linesize[0];
+libavcodec/yuv4dec.c:67:        u +=     pic->linesize[1];
+libavcodec/yuv4dec.c:68:        v +=     pic->linesize[2];
+libavcodec/mjpegenc.c:566:        pic->data[i] += pic->linesize[i] * (vsample * s->height / V_MAX - 1);
+libavcodec/mjpegenc.c:567:        pic->linesize[i] *= -1;
+libavcodec/vaapi_vc1.c:258:    pic->output_surface = ff_vaapi_get_surface_id(s->current_picture_ptr->f);
+libavcodec/elsdec.h:2: * ELS (Entropy Logarithmic-Scale) decoder
+libavcodec/elsdec.h:25: * Entropy Logarithmic-Scale binary arithmetic coder
+libavfilter/vf_deshake_opencl.c:746:// See http://frederic-wang.fr/decomposition-of-2d-transform-matrices.html
+libavfilter/vf_sab.c:295:    blur(outpic->data[0], outpic->linesize[0], inpic->data[0],  inpic->linesize[0],
+libavfilter/vf_sab.c:297:    if (inpic->data[2]) {
+libavfilter/vf_sab.c:300:        blur(outpic->data[1], outpic->linesize[1], inpic->data[1], inpic->linesize[1], cw, ch, &s->chroma);
+libavfilter/vf_sab.c:301:        blur(outpic->data[2], outpic->linesize[2], inpic->data[2], inpic->linesize[2], cw, ch, &s->chroma);
+libavfilter/vf_mcdeint.c:190:    inpic->quality = mcdeint->qp * FF_QP2LAMBDA;
+libavfilter/vf_mcdeint.c:272:                    outpic   ->data[i][x + y*dsts] = inpic->data[i][x + y*srcs];
+libavfilter/avf_showvolume.c:243:                uint8_t *p = pic->data[0] + (y + i * 10) * pic->linesize[0] + x * 4;
+libavfilter/avf_showvolume.c:247:                    p += pic->linesize[0];
+libavfilter/avf_showvolume.c:251:            uint8_t *p = pic->data[0] + y * pic->linesize[0] + (x + i * 8) * 4;
+libavfilter/avf_showvolume.c:258:                p += pic->linesize[0] - 8 * 4;
+libavfilter/framesync.c:388:    mainpic->pts = av_rescale_q(fs->pts, fs->time_base, ctx->outputs[0]->time_base);
+libavfilter/af_aiir.c:1063:        uint8_t *p = pic->data[0] + y * pic->linesize[0] + (x + i * 8) * 4;
+libavfilter/af_aiir.c:1070:            p += pic->linesize[0] - 8 * 4;
+libavfilter/f_graphmonitor.c:129:    if (y + 8 >= pic->height ||
+libavfilter/f_graphmonitor.c:130:        x + strlen(txt) * 8 >= pic->width)
+libavfilter/f_graphmonitor.c:136:        uint8_t *p = pic->data[0] + y*pic->linesize[0] + (x + i*8)*4;
+libavfilter/f_graphmonitor.c:146:            p += pic->linesize[0] - 8 * 4;
+libavfilter/vf_signature.c:94:    StreamContext *sc = &(sic->streamcontexts[FF_INLINK_IDX(inlink)]);
+libavfilter/vf_signature.c:154:    StreamContext *sc = &(sic->streamcontexts[FF_INLINK_IDX(inlink)]);
+libavfilter/vf_signature.c:575:    if (sic->nb_inputs > 1) {
+libavfilter/vf_signature.c:577:        av_assert0(av_get_frame_filename(filename, sizeof(filename), sic->filename, input) == 0);
+libavfilter/vf_signature.c:579:        if (av_strlcpy(filename, sic->filename, sizeof(filename)) >= sizeof(filename))
+libavfilter/vf_signature.c:582:    if (sic->format == FORMAT_XML) {
+libavfilter/vf_signature.c:599:    for (i = 0; i < sic->nb_inputs; i++){
+libavfilter/vf_signature.c:600:        sc = &(sic->streamcontexts[i]);
+libavfilter/vf_signature.c:611:            if (strlen(sic->filename) > 0) {
+libavfilter/vf_signature.c:621:    if (lookup && sic->mode != MODE_OFF) {
+libavfilter/vf_signature.c:623:        for (i = 0; i < sic->nb_inputs; i++) {
+libavfilter/vf_signature.c:624:            sc = &(sic->streamcontexts[i]);
+libavfilter/vf_signature.c:625:            for (j = i+1; j < sic->nb_inputs; j++) {
+libavfilter/vf_signature.c:626:                sc2 = &(sic->streamcontexts[j]);
+libavfilter/vf_signature.c:627:                match = lookup_signatures(ctx, sic, sc, sc2, sic->mode);
+libavfilter/vf_signature.c:653:    sic->streamcontexts = av_mallocz(sic->nb_inputs * sizeof(StreamContext));
+libavfilter/vf_signature.c:654:    if (!sic->streamcontexts)
+libavfilter/vf_signature.c:657:    for (i = 0; i < sic->nb_inputs; i++) {
+libavfilter/vf_signature.c:672:        sc = &(sic->streamcontexts[i]);
+libavfilter/vf_signature.c:690:    if (sic->nb_inputs > 1 && strlen(sic->filename) > 0 && av_get_frame_filename(tmp, sizeof(tmp), sic->filename, 0) == -1) {
+libavfilter/vf_signature.c:711:    if (sic->streamcontexts != NULL) {
+libavfilter/vf_signature.c:712:        for (i = 0; i < sic->nb_inputs; i++) {
+libavfilter/vf_signature.c:713:            sc = &(sic->streamcontexts[i]);
+libavfilter/vf_signature.c:731:        av_freep(&sic->streamcontexts);
+libavfilter/vf_overlay.c:1007:        int64_t pos = mainpic->pkt_pos;
+libavfilter/vf_overlay.c:1010:        s->var_values[VAR_T] = mainpic->pts == AV_NOPTS_VALUE ?
+libavfilter/vf_overlay.c:1011:            NAN : mainpic->pts * av_q2d(inlink->time_base);
+libavfilter/vf_overlay.c:1016:        s->var_values[VAR_MAIN_W   ] = s->var_values[VAR_MW] = mainpic->width;
+libavfilter/vf_overlay.c:1017:        s->var_values[VAR_MAIN_H   ] = s->var_values[VAR_MH] = mainpic->height;
+libavfilter/vf_overlay.c:1026:    if (s->x < mainpic->width  && s->x + second->width  >= 0 &&
+libavfilter/vf_overlay.c:1027:        s->y < mainpic->height && s->y + second->height >= 0) {
+libavfilter/vf_overlay.c:1032:        ctx->internal->execute(ctx, s->blend_slice, &td, NULL, FFMIN(FFMAX(1, FFMIN3(s->y + second->height, FFMIN(second->height, mainpic->height), mainpic->height - s->y)),
+libavfilter/af_firequalizer.c:138:        { "linlog", "linear-freq logarithmic-gain", 0, AV_OPT_TYPE_CONST, { .i64 = SCALE_LINLOG }, 0, 0, FLAGS, "scale" },
+libavfilter/af_firequalizer.c:139:        { "loglin", "logarithmic-freq linear-gain", 0, AV_OPT_TYPE_CONST, { .i64 = SCALE_LOGLIN }, 0, 0, FLAGS, "scale" },
+libavfilter/af_firequalizer.c:140:        { "loglog", "logarithmic-freq logarithmic-gain", 0, AV_OPT_TYPE_CONST, { .i64 = SCALE_LOGLOG }, 0, 0, FLAGS, "scale" },
+libavfilter/vf_histeq.c:157:    src = inpic->data[0];
+libavfilter/vf_histeq.c:158:    dst = outpic->data[0];
+libavfilter/vf_histeq.c:166:        src += inpic->linesize[0];
+libavfilter/vf_histeq.c:167:        dst += outpic->linesize[0];
+libavfilter/vf_histeq.c:194:    src = inpic->data[0];
+libavfilter/vf_histeq.c:195:    dst = outpic->data[0];
+libavfilter/vf_histeq.c:243:        src += inpic->linesize[0];
+libavfilter/vf_histeq.c:244:        dst += outpic->linesize[0];
+libavfilter/vf_smartblur.c:256:    blur(outpic->data[0], outpic->linesize[0],
+libavfilter/vf_smartblur.c:257:         inpic->data[0],  inpic->linesize[0],
+libavfilter/vf_smartblur.c:261:    if (inpic->data[2]) {
+libavfilter/vf_smartblur.c:262:        blur(outpic->data[1], outpic->linesize[1],
+libavfilter/vf_smartblur.c:263:             inpic->data[1],  inpic->linesize[1],
+libavfilter/vf_smartblur.c:266:        blur(outpic->data[2], outpic->linesize[2],
+libavfilter/vf_smartblur.c:267:             inpic->data[2],  inpic->linesize[2],
+libavfilter/vf_yadif.c:241:        int w = dstpic->width;
+libavfilter/vf_yadif.c:242:        int h = dstpic->height;
+libavfilter/vf_bwdif.c:271:        int w = dstpic->width;
+libavfilter/vf_bwdif.c:272:        int h = dstpic->height;
+libavfilter/vf_scale.c:636:         in_stride[i] = cur_pic->linesize[i] * mul;
+libavfilter/vf_scale.c:638:         in[i] = FF_PTR_ADD(cur_pic->data[i], ((y>>vsub)+field) * cur_pic->linesize[i]);
+libavfilter/vf_scale.c:642:         in[1] = cur_pic->data[1];
+libavfilter/vf_hue.c:390:    hue->var_values[VAR_T]   = TS2T(inpic->pts, inlink->time_base);
+libavfilter/vf_hue.c:391:    hue->var_values[VAR_PTS] = TS2D(inpic->pts);
+libavfilter/vf_hue.c:437:            av_image_copy_plane(outpic->data[0], outpic->linesize[0],
+libavfilter/vf_hue.c:438:                                inpic->data[0],   inpic->linesize[0],
+libavfilter/vf_hue.c:440:        if (inpic->data[3])
+libavfilter/vf_hue.c:441:            av_image_copy_plane(outpic->data[3], outpic->linesize[3],
+libavfilter/vf_hue.c:442:                                inpic->data[3],   inpic->linesize[3],
+libavfilter/vf_hue.c:447:        apply_lut10(hue, (uint16_t*)outpic->data[1], (uint16_t*)outpic->data[2], outpic->linesize[1]/2,
+libavfilter/vf_hue.c:448:                         (uint16_t*) inpic->data[1], (uint16_t*) inpic->data[2],  inpic->linesize[1]/2,
+libavfilter/vf_hue.c:452:            apply_luma_lut10(hue, (uint16_t*)outpic->data[0], outpic->linesize[0]/2,
+libavfilter/vf_hue.c:453:                                  (uint16_t*) inpic->data[0],  inpic->linesize[0]/2, inlink->w, inlink->h);
+libavfilter/vf_hue.c:455:        apply_lut(hue, outpic->data[1], outpic->data[2], outpic->linesize[1],
+libavfilter/vf_hue.c:456:                       inpic->data[1],   inpic->data[2],  inpic->linesize[1],
+libavfilter/vf_hue.c:460:            apply_luma_lut(hue, outpic->data[0], outpic->linesize[0],
+libavfilter/vf_hue.c:461:                                inpic->data[0],  inpic->linesize[0], inlink->w, inlink->h);
+libavfilter/avf_showspectrum.c:490:                uint8_t *p = pic->data[0] + (y + i * 10) * pic->linesize[0] + x;
+libavfilter/avf_showspectrum.c:494:                    p += pic->linesize[0];
+libavfilter/avf_showspectrum.c:498:            uint8_t *p = pic->data[0] + y*pic->linesize[0] + (x + i*8);
+libavfilter/avf_showspectrum.c:505:                p += pic->linesize[0] - 8;
+libavfilter/af_afir.c:251:        uint8_t *p = pic->data[0] + y * pic->linesize[0] + (x + i * 8) * 4;
+libavfilter/af_afir.c:258:            p += pic->linesize[0] - 8 * 4;
+libavfilter/vf_displace.c:95:        const int xlinesize = xpic->linesize[plane];
+libavfilter/vf_displace.c:96:        const int ylinesize = ypic->linesize[plane];
+libavfilter/vf_displace.c:98:        const uint8_t *ysrc = ypic->data[plane];
+libavfilter/vf_displace.c:99:        const uint8_t *xsrc = xpic->data[plane];
+libavfilter/vf_displace.c:169:    const int xlinesize = xpic->linesize[0];
+libavfilter/vf_displace.c:170:    const int ylinesize = ypic->linesize[0];
+libavfilter/vf_displace.c:172:    const uint8_t *ysrc = ypic->data[0];
+libavfilter/vf_displace.c:173:    const uint8_t *xsrc = xpic->data[0];
+libavfilter/f_ebur128.c:265:        uint8_t *p = pic->data[0] + y*pic->linesize[0] + (x + i*8)*3;
+libavfilter/f_ebur128.c:275:            p += pic->linesize[0] - 8*3;
+libavfilter/f_ebur128.c:283:    uint8_t *p = pic->data[0] + y*pic->linesize[0] + x*3;
+libavfilter/f_ebur128.c:785:                p = pic->data[0] + ebur128->graph.y*pic->linesize[0] + ebur128->graph.x*3;
+libavfilter/f_ebur128.c:791:                    p += pic->linesize[0];
+libavfilter/f_ebur128.c:795:                p = pic->data[0] + ebur128->gauge.y*pic->linesize[0] + ebur128->gauge.x*3;
+libavfilter/f_ebur128.c:801:                    p += pic->linesize[0];
+libavfilter/f_ebur128.c:818:                pic->pts = pts;
+libavfilter/vf_kerndeint.c:152:    outpic->interlaced_frame = 0;
+libavfilter/vf_kerndeint.c:154:    for (plane = 0; plane < 4 && inpic->data[plane] && inpic->linesize[plane]; plane++) {
+libavfilter/vf_kerndeint.c:158:        srcp_saved        = inpic->data[plane];
+libavfilter/vf_kerndeint.c:159:        src_linesize      = inpic->linesize[plane];
+libavfilter/vf_kerndeint.c:161:        dstp_saved        = outpic->data[plane];
+libavfilter/vf_kerndeint.c:162:        dst_linesize      = outpic->linesize[plane];
+libavfilter/vf_kerndeint.c:282:        srcp = inpic->data[plane];
+libavfilter/vf_convolve.c:484:                    const uint8_t *src = (const uint8_t *)(impulsepic->data[plane] + y * impulsepic->linesize[plane]) ;
+libavfilter/vf_convolve.c:491:                    const uint16_t *src = (const uint16_t *)(impulsepic->data[plane] + y * impulsepic->linesize[plane]) ;
+fftools/ffmpeg_opt.c:698:        for (i = 0; i < ic->nb_streams; i++) {
+fftools/ffmpeg_opt.c:699:            if ((ret = check_stream_specifier(ic, ic->streams[i], istream_spec)) > 0) {
+fftools/ffmpeg_opt.c:700:                meta_in = &ic->streams[i]->metadata;
+fftools/ffmpeg_opt.c:788:    for (i = 0; i < ic->nb_streams; i++) {
+fftools/ffmpeg_opt.c:789:        AVStream *st = ic->streams[i];
+fftools/ffmpeg_opt.c:1151:        ic->video_codec    = find_codec_or_die(video_codec_name   , AVMEDIA_TYPE_VIDEO   , 0);
+fftools/ffmpeg_opt.c:1153:        ic->audio_codec    = find_codec_or_die(audio_codec_name   , AVMEDIA_TYPE_AUDIO   , 0);
+fftools/ffmpeg_opt.c:1155:        ic->subtitle_codec = find_codec_or_die(subtitle_codec_name, AVMEDIA_TYPE_SUBTITLE, 0);
+fftools/ffmpeg_opt.c:1157:        ic->data_codec     = find_codec_or_die(data_codec_name    , AVMEDIA_TYPE_DATA    , 0);
+fftools/ffmpeg_opt.c:1159:    ic->video_codec_id     = video_codec_name    ? ic->video_codec->id    : AV_CODEC_ID_NONE;
+fftools/ffmpeg_opt.c:1160:    ic->audio_codec_id     = audio_codec_name    ? ic->audio_codec->id    : AV_CODEC_ID_NONE;
+fftools/ffmpeg_opt.c:1161:    ic->subtitle_codec_id  = subtitle_codec_name ? ic->subtitle_codec->id : AV_CODEC_ID_NONE;
+fftools/ffmpeg_opt.c:1162:    ic->data_codec_id      = data_codec_name     ? ic->data_codec->id     : AV_CODEC_ID_NONE;
+fftools/ffmpeg_opt.c:1164:    ic->flags |= AVFMT_FLAG_NONBLOCK;
+fftools/ffmpeg_opt.c:1166:        ic->flags |= AVFMT_FLAG_BITEXACT;
+fftools/ffmpeg_opt.c:1167:    ic->interrupt_callback = int_cb;
+fftools/ffmpeg_opt.c:1187:    for (i = 0; i < ic->nb_streams; i++)
+fftools/ffmpeg_opt.c:1188:        choose_decoder(o, ic, ic->streams[i]);
+fftools/ffmpeg_opt.c:1192:        int orig_nb_streams = ic->nb_streams;
+fftools/ffmpeg_opt.c:1204:            if (ic->nb_streams == 0) {
+fftools/ffmpeg_opt.c:1221:        if (ic->duration > 0) {
+fftools/ffmpeg_opt.c:1222:            o->start_time = o->start_time_eof + ic->duration;
+fftools/ffmpeg_opt.c:1232:    if (!o->seek_timestamp && ic->start_time != AV_NOPTS_VALUE)
+fftools/ffmpeg_opt.c:1233:        timestamp += ic->start_time;
+fftools/ffmpeg_opt.c:1239:        if (!(ic->iformat->flags & AVFMT_SEEK_TO_PTS)) {
+fftools/ffmpeg_opt.c:1241:            for (i=0; i<ic->nb_streams; i++) {
+fftools/ffmpeg_opt.c:1242:                const AVCodecParameters *par = ic->streams[i]->codecpar;
+fftools/ffmpeg_opt.c:1272:    f->ist_index  = nb_input_streams - ic->nb_streams;
+fftools/ffmpeg_opt.c:1276:    f->ts_offset  = o->input_ts_offset - (copy_ts ? (start_at_zero && ic->start_time != AV_NOPTS_VALUE ? ic->start_time : 0) : timestamp);
+fftools/ffmpeg_opt.c:1277:    f->nb_streams = ic->nb_streams;
+fftools/ffmpeg_opt.c:1331:        for (j = 0; j < ic->nb_streams; j++) {
+fftools/ffmpeg_opt.c:1332:            AVStream *st = ic->streams[j];
+fftools/ffplay.c:1210:    if (stream_index < 0 || stream_index >= ic->nb_streams)
+fftools/ffplay.c:1212:    codecpar = ic->streams[stream_index]->codecpar;
+fftools/ffplay.c:1243:    ic->streams[stream_index]->discard = AVDISCARD_ALL;
+fftools/ffplay.c:2585:    if (stream_index < 0 || stream_index >= ic->nb_streams)
+fftools/ffplay.c:2592:    ret = avcodec_parameters_to_context(avctx, ic->streams[stream_index]->codecpar);
+fftools/ffplay.c:2595:    avctx->pkt_timebase = ic->streams[stream_index]->time_base;
+fftools/ffplay.c:2626:    opts = filter_codec_opts(codec_opts, avctx->codec_id, ic, ic->streams[stream_index], codec);
+fftools/ffplay.c:2641:    ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
+fftools/ffplay.c:2681:        is->audio_st = ic->streams[stream_index];
+fftools/ffplay.c:2685:        if ((is->ic->iformat->flags & (AVFMT_NOBINSEARCH | AVFMT_NOGENSEARCH | AVFMT_NO_BYTE_SEEK)) && !is->ic->iformat->read_seek) {
+fftools/ffplay.c:2695:        is->video_st = ic->streams[stream_index];
+fftools/ffplay.c:2705:        is->subtitle_st = ic->streams[stream_index];
+fftools/ffplay.c:2790:    ic->interrupt_callback.callback = decode_interrupt_cb;
+fftools/ffplay.c:2791:    ic->interrupt_callback.opaque = is;
+fftools/ffplay.c:2813:        ic->flags |= AVFMT_FLAG_GENPTS;
+fftools/ffplay.c:2819:        int orig_nb_streams = ic->nb_streams;
+fftools/ffplay.c:2835:    if (ic->pb)
+fftools/ffplay.c:2836:        ic->pb->eof_reached = 0; // FIXME hack, ffplay maybe should not use avio_feof() to test for the end
+fftools/ffplay.c:2839:        seek_by_bytes = !!(ic->iformat->flags & AVFMT_TS_DISCONT) && strcmp("ogg", ic->iformat->name);
+fftools/ffplay.c:2841:    is->max_frame_duration = (ic->iformat->flags & AVFMT_TS_DISCONT) ? 10.0 : 3600.0;
+fftools/ffplay.c:2843:    if (!window_title && (t = av_dict_get(ic->metadata, "title", NULL, 0)))
+fftools/ffplay.c:2852:        if (ic->start_time != AV_NOPTS_VALUE)
+fftools/ffplay.c:2853:            timestamp += ic->start_time;
+fftools/ffplay.c:2866:    for (i = 0; i < ic->nb_streams; i++) {
+fftools/ffplay.c:2867:        AVStream *st = ic->streams[i];
+fftools/ffplay.c:2902:        AVStream *st = ic->streams[st_index[AVMEDIA_TYPE_VIDEO]];
+fftools/ffplay.c:2947:                (!strcmp(ic->iformat->name, "rtsp") ||
+fftools/ffplay.c:2948:                 (ic->pb && !strncmp(input_filename, "mmsh:", 5)))) {
+fftools/ffplay.c:2965:                       "%s: error while seeking\n", is->ic->url);
+fftools/ffplay.c:3019:            if ((ret == AVERROR_EOF || avio_feof(ic->pb)) && !is->eof) {
+fftools/ffplay.c:3028:            if (ic->pb && ic->pb->error) {
+fftools/ffplay.c:3042:        stream_start_time = ic->streams[pkt->stream_index]->start_time;
+fftools/ffplay.c:3046:                av_q2d(ic->streams[pkt->stream_index]->time_base) -
+fftools/ffplay.c:3143:    int nb_streams = is->ic->nb_streams;
+fftools/ffplay.c:3185:        st = is->ic->streams[p ? p->stream_index[stream_index] : stream_index];
+fftools/ffplay.c:3255:    if (!is->ic->nb_chapters)
+fftools/ffplay.c:3259:    for (i = 0; i < is->ic->nb_chapters; i++) {
+fftools/ffplay.c:3260:        AVChapter *ch = is->ic->chapters[i];
+fftools/ffplay.c:3269:    if (i >= is->ic->nb_chapters)
+fftools/ffplay.c:3273:    stream_seek(is, av_rescale_q(is->ic->chapters[i]->start, is->ic->chapters[i]->time_base,
+fftools/ffplay.c:3346:                if (cur_stream->ic->nb_chapters <= 1) {
+fftools/ffplay.c:3353:                if (cur_stream->ic->nb_chapters <= 1) {
+fftools/ffplay.c:3378:                            pos = avio_tell(cur_stream->ic->pb);
+fftools/ffplay.c:3379:                        if (cur_stream->ic->bit_rate)
+fftools/ffplay.c:3380:                            incr *= cur_stream->ic->bit_rate / 8.0;
+fftools/ffplay.c:3390:                        if (cur_stream->ic->start_time != AV_NOPTS_VALUE && pos < cur_stream->ic->start_time / (double)AV_TIME_BASE)
+fftools/ffplay.c:3391:                            pos = cur_stream->ic->start_time / (double)AV_TIME_BASE;
+fftools/ffplay.c:3429:                if (seek_by_bytes || cur_stream->ic->duration <= 0) {
+fftools/ffplay.c:3430:                    uint64_t size =  avio_size(cur_stream->ic->pb);
+fftools/ffplay.c:3436:                    tns  = cur_stream->ic->duration / 1000000LL;
+fftools/ffplay.c:3448:                    ts = frac * cur_stream->ic->duration;
+fftools/ffplay.c:3449:                    if (cur_stream->ic->start_time != AV_NOPTS_VALUE)
+fftools/ffplay.c:3450:                        ts += cur_stream->ic->start_time;

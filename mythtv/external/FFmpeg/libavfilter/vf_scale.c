@@ -358,7 +358,7 @@ static int query_formats(AVFilterContext *ctx)
                 return ret;
             }
         }
-        if ((ret = ff_formats_ref(formats, &ctx->inputs[0]->out_formats)) < 0)
+        if ((ret = ff_formats_ref(formats, &ctx->inputs[0]->outcfg.formats)) < 0)
             return ret;
     }
     if (ctx->outputs[0]) {
@@ -372,7 +372,7 @@ static int query_formats(AVFilterContext *ctx)
                 return ret;
             }
         }
-        if ((ret = ff_formats_ref(formats, &ctx->outputs[0]->in_formats)) < 0)
+        if ((ret = ff_formats_ref(formats, &ctx->outputs[0]->incfg.formats)) < 0)
             return ret;
     }
 
@@ -635,8 +635,8 @@ static int scale_slice(AVFilterLink *link, AVFrame *out_buf, AVFrame *cur_pic, s
         int vsub= ((i+1)&2) ? scale->vsub : 0;
          in_stride[i] = cur_pic->linesize[i] * mul;
         out_stride[i] = out_buf->linesize[i] * mul;
-         in[i] = cur_pic->data[i] + ((y>>vsub)+field) * cur_pic->linesize[i];
-        out[i] = out_buf->data[i] +            field  * out_buf->linesize[i];
+         in[i] = FF_PTR_ADD(cur_pic->data[i], ((y>>vsub)+field) * cur_pic->linesize[i]);
+        out[i] = FF_PTR_ADD(out_buf->data[i],            field  * out_buf->linesize[i]);
     }
     if (scale->input_is_pal)
          in[1] = cur_pic->data[1];
@@ -646,8 +646,6 @@ static int scale_slice(AVFilterLink *link, AVFrame *out_buf, AVFrame *cur_pic, s
     return sws_scale(sws, in, in_stride, y/mul, h,
                          out,out_stride);
 }
-
-#define TS2T(ts, tb) ((ts) == AV_NOPTS_VALUE ? NAN : (double)(ts) * av_q2d(tb))
 
 static int scale_frame(AVFilterLink *link, AVFrame *in, AVFrame **frame_out)
 {
@@ -740,6 +738,18 @@ scale:
     av_frame_copy_props(out, in);
     out->width  = outlink->w;
     out->height = outlink->h;
+
+    // Sanity checks:
+    //   1. If the output is RGB, set the matrix coefficients to RGB.
+    //   2. If the output is not RGB and we've got the RGB/XYZ (identity)
+    //      matrix configured, unset the matrix.
+    //   In theory these should be in swscale itself as the AVFrame
+    //   based API gets in, so that not every swscale API user has
+    //   to go through duplicating such sanity checks.
+    if (av_pix_fmt_desc_get(out->format)->flags & AV_PIX_FMT_FLAG_RGB)
+        out->colorspace = AVCOL_SPC_RGB;
+    else if (out->colorspace == AVCOL_SPC_RGB)
+        out->colorspace = AVCOL_SPC_UNSPECIFIED;
 
     if (scale->output_is_pal)
         avpriv_set_systematic_pal2((uint32_t*)out->data[1], outlink->format == AV_PIX_FMT_PAL8 ? AV_PIX_FMT_BGR8 : outlink->format);
@@ -882,9 +892,18 @@ static int process_command(AVFilterContext *ctx, const char *cmd, const char *ar
     return ret;
 }
 
+#if FF_API_CHILD_CLASS_NEXT
 static const AVClass *child_class_next(const AVClass *prev)
 {
     return prev ? NULL : sws_get_class();
+}
+#endif
+
+static const AVClass *child_class_iterate(void **iter)
+{
+    const AVClass *c = *iter ? NULL : sws_get_class();
+    *iter = (void*)(uintptr_t)c;
+    return c;
 }
 
 #define OFFSET(x) offsetof(ScaleContext, x)
@@ -944,7 +963,10 @@ static const AVClass scale_class = {
     .option           = scale_options,
     .version          = LIBAVUTIL_VERSION_INT,
     .category         = AV_CLASS_CATEGORY_FILTER,
+#if FF_API_CHILD_CLASS_NEXT
     .child_class_next = child_class_next,
+#endif
+    .child_class_iterate = child_class_iterate,
 };
 
 static const AVFilterPad avfilter_vf_scale_inputs[] = {
@@ -984,7 +1006,10 @@ static const AVClass scale2ref_class = {
     .option           = scale_options,
     .version          = LIBAVUTIL_VERSION_INT,
     .category         = AV_CLASS_CATEGORY_FILTER,
+#if FF_API_CHILD_CLASS_NEXT
     .child_class_next = child_class_next,
+#endif
+    .child_class_iterate = child_class_iterate,
 };
 
 static const AVFilterPad avfilter_vf_scale2ref_inputs[] = {

@@ -660,6 +660,8 @@ static AVStream * parse_media_type(AVFormatContext *s, AVStream *st, int sid,
         avio_skip(pb, size - 32);
         ff_get_guid(pb, &actual_subtype);
         ff_get_guid(pb, &actual_formattype);
+        if (avio_feof(pb))
+            return NULL;
         avio_seek(pb, -size, SEEK_CUR);
 
         st = parse_media_type(s, st, sid, mediatype, actual_subtype, actual_formattype, size - 32);
@@ -817,6 +819,8 @@ static int parse_chunks(AVFormatContext *s, int mode, int64_t seekts, int *len_p
                 avio_skip(pb, 12);
                 ff_get_guid(pb, &formattype);
                 size = avio_rl32(pb);
+                if (size < 0 || size > INT_MAX - 92 - consumed)
+                    return AVERROR_INVALIDDATA;
                 parse_media_type(s, 0, sid, mediatype, subtype, formattype, size);
                 consumed += 92 + size;
             }
@@ -831,6 +835,8 @@ static int parse_chunks(AVFormatContext *s, int mode, int64_t seekts, int *len_p
                 avio_skip(pb, 12);
                 ff_get_guid(pb, &formattype);
                 size = avio_rl32(pb);
+                if (size < 0 || size > INT_MAX - 76 - consumed)
+                    return AVERROR_INVALIDDATA;
                 parse_media_type(s, s->streams[stream_index], sid, mediatype, subtype, formattype, size);
                 consumed += 76 + size;
             }
@@ -952,6 +958,9 @@ static int parse_chunks(AVFormatContext *s, int mode, int64_t seekts, int *len_p
             //ignore known guids
         } else
             av_log(s, AV_LOG_WARNING, "unsupported chunk:"FF_PRI_GUID"\n", FF_ARG_GUID(g));
+
+        if (avio_feof(pb))
+            break;
 
         avio_skip(pb, WTV_PAD8(len) - consumed);
     }

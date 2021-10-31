@@ -158,9 +158,8 @@ static av_cold int peak_init_writer(AVFormatContext *s)
         par->codec_id != AV_CODEC_ID_PCM_S16LE &&
         par->codec_id != AV_CODEC_ID_PCM_U8 &&
         par->codec_id != AV_CODEC_ID_PCM_U16LE) {
-        AVCodec *codec = avcodec_find_decoder(s->streams[0]->codecpar->codec_id);
-        av_log(s, AV_LOG_ERROR, "%s codec not supported for Peak Chunk\n",
-               codec ? codec->name : "NONE");
+        av_log(s, AV_LOG_ERROR, "Codec %s not supported for Peak Chunk\n",
+               avcodec_get_name(par->codec_id));
         return -1;
     }
 
@@ -328,9 +327,8 @@ static int wav_write_header(AVFormatContext *s)
         /* format header */
         fmt = ff_start_tag(pb, "fmt ");
         if (ff_put_wav_header(s, pb, s->streams[0]->codecpar, 0) < 0) {
-            const AVCodecDescriptor *desc = avcodec_descriptor_get(s->streams[0]->codecpar->codec_id);
-            av_log(s, AV_LOG_ERROR, "%s codec not supported in WAVE format\n",
-                   desc ? desc->name : "unknown");
+            av_log(s, AV_LOG_ERROR, "Codec %s not supported in WAVE format\n",
+                   avcodec_get_name(s->streams[0]->codecpar->codec_id));
             return AVERROR(ENOSYS);
         }
         ff_end_tag(pb, fmt);
@@ -519,7 +517,7 @@ AVOutputFormat ff_wav_muxer = {
     .write_trailer     = wav_write_trailer,
     .deinit            = wav_deinit,
     .flags             = AVFMT_TS_NONSTRICT,
-    .codec_tag         = (const AVCodecTag* const []){ ff_codec_wav_tags, 0 },
+    .codec_tag         = ff_wav_codec_tags_list,
     .priv_class        = &wav_muxer_class,
 };
 #endif /* CONFIG_WAV_MUXER */
@@ -558,9 +556,8 @@ static int w64_write_header(AVFormatContext *s)
     avio_write(pb, ff_w64_guid_wave, sizeof(ff_w64_guid_wave));
     start_guid(pb, ff_w64_guid_fmt, &start);
     if ((ret = ff_put_wav_header(s, pb, s->streams[0]->codecpar, 0)) < 0) {
-        AVCodec *codec = avcodec_find_decoder(s->streams[0]->codecpar->codec_id);
-        av_log(s, AV_LOG_ERROR, "%s codec not supported\n",
-               codec ? codec->name : "NONE");
+        av_log(s, AV_LOG_ERROR, "Codec %s not supported\n",
+               avcodec_get_name(s->streams[0]->codecpar->codec_id));
         return ret;
     }
     end_guid(pb, start);
@@ -617,6 +614,6 @@ AVOutputFormat ff_w64_muxer = {
     .write_packet      = wav_write_packet,
     .write_trailer     = w64_write_trailer,
     .flags             = AVFMT_TS_NONSTRICT,
-    .codec_tag         = (const AVCodecTag* const []){ ff_codec_wav_tags, 0 },
+    .codec_tag         = ff_wav_codec_tags_list,
 };
 #endif /* CONFIG_W64_MUXER */

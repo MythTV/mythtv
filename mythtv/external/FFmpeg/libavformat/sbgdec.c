@@ -476,6 +476,8 @@ static int parse_timestamp(struct sbg_parser *p,
     while (lex_char(p, '+')) {
         if (!lex_time(p, &dt))
             return AVERROR_INVALIDDATA;
+        if (av_sat_add64(rel, dt) - dt != rel)
+            return AVERROR_INVALIDDATA;
         rel += dt;
         r = 1;
     }
@@ -889,7 +891,7 @@ fail:
     return size;
 }
 
-static void expand_timestamps(void *log, struct sbg_script *s)
+static int expand_timestamps(void *log, struct sbg_script *s)
 {
     int i, nb_rel = 0;
     int64_t now, cur_ts, delta = 0;
@@ -933,14 +935,20 @@ static void expand_timestamps(void *log, struct sbg_script *s)
     }
     if (s->start_ts == AV_NOPTS_VALUE)
         s->start_ts = (s->opt_start_at_first && s->tseq) ? s->tseq[0].ts.t : now;
+    if (s->start_ts > INT64_MAX - s->opt_duration)
+        return AVERROR_INVALIDDATA;
+
     s->end_ts = s->opt_duration ? s->start_ts + s->opt_duration :
                 AV_NOPTS_VALUE; /* may be overridden later by -E option */
     cur_ts = now;
     for (i = 0; i < s->nb_tseq; i++) {
+        if (av_sat_add64(s->tseq[i].ts.t, delta) != s->tseq[i].ts.t + (uint64_t)delta)
+            return AVERROR_INVALIDDATA;
         if (s->tseq[i].ts.t + delta < cur_ts)
             delta += DAY_TS;
         cur_ts = s->tseq[i].ts.t += delta;
     }
+    return 0;
 }
 
 static int expand_tseq(void *log, struct sbg_script *s, int *nb_ev_max,
@@ -956,6 +964,9 @@ static int expand_tseq(void *log, struct sbg_script *s, int *nb_ev_max,
                tseq->name_len, tseq->name);
         return AVERROR(EINVAL);
     }
+    if (t0 + (uint64_t)tseq->ts.t != av_sat_add64(t0, tseq->ts.t))
+        return AVERROR(EINVAL);
+
     t0 += tseq->ts.t;
     for (i = 0; i < s->nb_def; i++) {
         if (s->def[i].name_len == tseq->name_len &&
@@ -993,7 +1004,9 @@ static int expand_script(void *log, struct sbg_script *s)
 {
     int i, r, nb_events_max = 0;
 
-    expand_timestamps(log, s);
+    r = expand_timestamps(log, s);
+    if (r < 0)
+        return r;
     for (i = 0; i < s->nb_tseq; i++) {
         r = expand_tseq(log, s, &nb_events_max, 0, &s->tseq[i]);
         if (r < 0)
@@ -1284,6 +1297,10 @@ static int generate_intervals(void *log, struct sbg_script *s, int sample_rate,
         ev1 = &s->events[i];
         ev2 = &s->events[(i + 1) % s->nb_events];
         ev1->ts_int   = ev1->ts;
+
+        if (!ev1->fade.slide && ev1 >= ev2 && ev2->ts > INT64_MAX - period)
+            return AVERROR_INVALIDDATA;
+
         ev1->ts_trans = ev1->fade.slide ? ev1->ts
                                         : ev2->ts + (ev1 < ev2 ? 0 : period);
     }
