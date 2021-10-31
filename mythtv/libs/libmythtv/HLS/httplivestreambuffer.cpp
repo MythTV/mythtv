@@ -1719,8 +1719,8 @@ bool HLSRingBuffer::TestForHTTPLiveStreaming(const QString &filename)
 
     // Do a peek on the URL to test the format
     MythMediaBuffer::AVFormatInitNetwork();
-    int ret = ffurl_open(&context, filename.toLatin1(),
-                         AVIO_FLAG_READ, nullptr, nullptr);
+    int ret = ffurl_open_whitelist(&context, filename.toLatin1(),
+        AVIO_FLAG_READ, nullptr, nullptr, nullptr, nullptr, nullptr);
     if (ret >= 0)
     {
         std::array<uint8_t,1024> buffer {};
