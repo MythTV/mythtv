@@ -4436,8 +4436,8 @@ void Scheduler::AddNewRecords(void)
             QString sclause = result.value(1).toString();
             sclause.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
             sclause.remove(';');
-            pwrpri += QString(" + (%1) * %2").arg(sclause)
-                                             .arg(result.value(0).toInt());
+            pwrpri += QString(" + IF(%1, 1, 0) * %2")
+                              .arg(sclause).arg(result.value(0).toInt());
         }
     }
     pwrpri += QString(" AS powerpriority ");
