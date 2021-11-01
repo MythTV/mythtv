@@ -4,6 +4,11 @@
 
 #include <cstdint>
 
+extern "C" {
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+}
+
 #include <QString>
 #include <QMap>
 #include <QList>
@@ -18,13 +23,6 @@
 #include "AVCParser.h"
 #include "mythcodeccontext.h"
 #include "mythplayer.h"
-
-extern "C" {
-#include "mythframe.h"
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-}
-
 #include "io/mythavformatbuffer.h"
 
 class TeletextDecoder;
@@ -32,7 +30,6 @@ class CC608Decoder;
 class CC708Decoder;
 class SubtitleReader;
 class InteractiveTV;
-class ProgramInfo;
 class MythSqlDatabase;
 
 struct SwsContext;
