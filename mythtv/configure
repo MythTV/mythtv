@@ -127,7 +127,6 @@ Advanced options (experts only):
   --disable-satip          disable support for Sat>IP
   --disable-v4l2           disable Video4Linux support
   --disable-ivtv           disable ivtv support (PVR-x50) req. v4l2 support
-  --disable-hdpvr          disable HD-PVR support
   --disable-dvb            disable DVB support
   --dvb-path=HDRLOC        location of directory containing
                            'linux/dvb/frontend.h', not the
@@ -1974,7 +1973,6 @@ MYTHTV_CONFIG_LIST='
     satip
     vbox
     ceton
-    hdpvr
     ivtv
     asi
     joystick_menu
@@ -2616,7 +2614,6 @@ audio_oss_deps_any="soundcard_h sys_soundcard_h"
 dvb_deps="backend"
 firewire_deps="backend"
 ivtv_deps="backend v4l2"
-hdpvr_deps="backend v4l2"
 hdhomerun_deps="backend"
 satip_deps="backend"
 vbox_deps="backend"
@@ -2769,7 +2766,6 @@ enable hdhomerun
 enable satip
 enable vbox
 enable ceton
-enable hdpvr
 enable ivtv
 enable asi
 enable lamemp3
@@ -7502,7 +7498,6 @@ config_files="$TMPH $TMPMAK doc/config.texi"
 if enabled backend; then
   echo "Video4Linux support       ${v4l2-no}"
   echo "ivtv support              ${ivtv-no}"
-  echo "HD-PVR support            ${hdpvr-no}"
   echo "FireWire support          ${firewire-no}"
   echo "DVB support               ${dvb-no} [$dvb_path]"
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"

@@ -2532,10 +2532,8 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
 #endif // USING_DVB
 
 #ifdef USING_V4L2
-# ifdef USING_HDPVR
     cardtype->addTargetedChild("HDPVR",
                                new HDPVRConfigurationGroup(parent, *cardtype));
-# endif // USING_HDPVR
 #endif // USING_V4L2
 
 #ifdef USING_HDHOMERUN
@@ -2733,10 +2731,8 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 #ifdef USING_V4L2
     setting->addSelection(
         QObject::tr("V4L2 encoder"), "V4L2ENC");
-#ifdef USING_HDPVR
     setting->addSelection(
         QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
-#endif // USING_HDPVR
 #endif // USING_V4L2
 
 #ifdef USING_HDHOMERUN

@@ -877,6 +877,10 @@ using_backend {
         SOURCES += recorders/v4l2encstreamhandler.cpp
         HEADERS += recorders/v4l2encsignalmonitor.h
         SOURCES += recorders/v4l2encsignalmonitor.cpp
+
+        HEADERS += recorders/mpegrecorder.h
+        SOURCES += recorders/mpegrecorder.cpp
+
     }
 
     # Support for cable boxes that provide Firewire out
@@ -1038,11 +1042,6 @@ using_backend {
     using_ivtv:HEADERS *= recorders/mpegrecorder.h
     using_ivtv:SOURCES *= recorders/mpegrecorder.cpp
     using_ivtv:DEFINES += USING_IVTV
-
-    # Support for HD-PVR on Linux
-    using_hdpvr:HEADERS *= recorders/mpegrecorder.h
-    using_hdpvr:SOURCES *= recorders/mpegrecorder.cpp
-    using_hdpvr:DEFINES += USING_HDPVR
 
     # External recorder
     HEADERS += recorders/ExternalChannel.h
