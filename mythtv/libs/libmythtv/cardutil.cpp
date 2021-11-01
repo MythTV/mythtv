@@ -65,9 +65,7 @@ QString CardUtil::GetScanableInputTypes(void)
 
 #ifdef USING_V4L2
     inputTypes += "'V4L'";
-# ifdef USING_IVTV
     inputTypes += "'MPEG'";
-# endif // USING_IVTV
 #endif // USING_V4L2
 
 #ifdef USING_IPTV

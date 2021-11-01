@@ -880,7 +880,6 @@ using_backend {
 
         HEADERS += recorders/mpegrecorder.h
         SOURCES += recorders/mpegrecorder.cpp
-
     }
 
     # Support for cable boxes that provide Firewire out
@@ -1037,11 +1036,6 @@ using_backend {
 
         DEFINES += USING_CETON
     }
-
-    # Support for PVR-150/250/350/500, etc. on Linux
-    using_ivtv:HEADERS *= recorders/mpegrecorder.h
-    using_ivtv:SOURCES *= recorders/mpegrecorder.cpp
-    using_ivtv:DEFINES += USING_IVTV
 
     # External recorder
     HEADERS += recorders/ExternalChannel.h

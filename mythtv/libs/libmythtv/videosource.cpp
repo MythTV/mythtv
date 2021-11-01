@@ -2571,10 +2571,8 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
                                new V4LConfigurationGroup(parent, *cardtype, "MJPEG"));
     cardtype->addTargetedChild("GO7007",
                                new V4LConfigurationGroup(parent, *cardtype, "GO7007"));
-# ifdef USING_IVTV
     cardtype->addTargetedChild("MPEG",
                                new MPEGConfigurationGroup(parent, *cardtype));
-# endif // USING_IVTV
 #endif // USING_V4L2
 
 #ifdef USING_ASI
@@ -2765,10 +2763,8 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 #endif // USING_IPTV
 
 #ifdef USING_V4L2
-#ifdef USING_IVTV
     setting->addSelection(
         QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
-#endif // USING_IVTV
     setting->addSelection(
         QObject::tr("Analog to MJPEG encoder card (Matrox G200, DC10, etc)"), "MJPEG");
     setting->addSelection(
