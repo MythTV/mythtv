@@ -126,7 +126,6 @@ Advanced options (experts only):
   --disable-ceton          disable support for Ceton cards
   --disable-satip          disable support for Sat>IP
   --disable-v4l2           disable Video4Linux support
-  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l2 support
   --disable-dvb            disable DVB support
   --dvb-path=HDRLOC        location of directory containing
                            'linux/dvb/frontend.h', not the
@@ -1973,7 +1972,6 @@ MYTHTV_CONFIG_LIST='
     satip
     vbox
     ceton
-    ivtv
     asi
     joystick_menu
     libcec
@@ -2613,7 +2611,6 @@ ffserver_select="ffm_muxer rtp_protocol rtsp_demuxer"
 audio_oss_deps_any="soundcard_h sys_soundcard_h"
 dvb_deps="backend"
 firewire_deps="backend"
-ivtv_deps="backend v4l2"
 hdhomerun_deps="backend"
 satip_deps="backend"
 vbox_deps="backend"
@@ -2766,7 +2763,6 @@ enable hdhomerun
 enable satip
 enable vbox
 enable ceton
-enable ivtv
 enable asi
 enable lamemp3
 enable libaom
@@ -4739,7 +4735,7 @@ case $target_os in
         append CCONFIG "freebsd"
         # Workaround compile errors from missing u_int/uint def
         CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
-        disable ivtv
+        # disable ivtv
         enable backend
         enable pic
         enable drm
@@ -7497,7 +7493,6 @@ config_files="$TMPH $TMPMAK doc/config.texi"
 
 if enabled backend; then
   echo "Video4Linux support       ${v4l2-no}"
-  echo "ivtv support              ${ivtv-no}"
   echo "FireWire support          ${firewire-no}"
   echo "DVB support               ${dvb-no} [$dvb_path]"
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
