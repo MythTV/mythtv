@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     api.giantbomb.com Game data conversion to MythTV Universal Metadata Format
-    See: http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+    See: https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
 -->
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:gamebombXpath="http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format">
+    xmlns:gamebombXpath="https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format">
 
     <xsl:output method="xml" indent="yes" version="1.0" encoding="UTF-8" omit-xml-declaration="yes"/>
 

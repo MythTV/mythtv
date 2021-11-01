@@ -7,7 +7,7 @@
 # Purpose:  Custom exceptions used or raised by giantbomb_api
 #
 # License:Creative Commons GNU GPL v2
-# (http://creativecommons.org/licenses/GPL/2.0/)
+# (https://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
 __title__ ="giantbomb_exceptions - Custom exceptions used or raised by giantbomb_api";
 __author__="R.D. Vaughan"
