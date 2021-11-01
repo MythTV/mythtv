@@ -165,8 +165,8 @@ const MythDisplayModes& MythDisplayX11::GetVideoModes()
         }
     }
 
-    for (auto it = screenmap.begin(); screenmap.end() != it; ++it)
-        m_videoModes.push_back(it->second);
+    for (auto & it : screenmap)
+        m_videoModes.push_back(it.second);
 
     DebugModes();
     XRRFreeOutputInfo(output);
