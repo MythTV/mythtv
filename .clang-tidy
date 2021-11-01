@@ -54,7 +54,7 @@ Checks: '-*,
         # New in clang13. 4533 warnings. ,
        -bugprone-easily-swappable-parameters,
         # New in clang13. 979 warnings. ,
-       -bugprone-implicit-widening-of-multiplication-result
+       -bugprone-implicit-widening-of-multiplication-result,
 
     cert-*,
 
