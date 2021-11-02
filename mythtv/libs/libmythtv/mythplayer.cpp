@@ -709,8 +709,11 @@ bool MythPlayer::PrebufferEnoughFrames(int min_buffers)
     if (!m_videoOutput)
         return false;
 
-    if (!(min_buffers ? (m_videoOutput->ValidVideoFrames() >= min_buffers) :
-                        (GetEof() != kEofStateNone) || m_videoOutput->EnoughDecodedFrames()))
+    if (!(min_buffers
+          ? (m_videoOutput->ValidVideoFrames() >= min_buffers)
+          : (GetEof() != kEofStateNone
+             || m_videoOutput->EnoughDecodedFrames()
+             || (m_ffrewSkip != 0 && m_ffrewSkip != 1))))
     {
         SetBuffering(true);
 
