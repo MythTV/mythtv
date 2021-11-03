@@ -418,7 +418,7 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     query.bindValue(":PATH", path);
     query.bindValue(":PATHTHUMB", paththumb);
     query.bindValue(":TITLE", item->GetTitle());
-    query.bindValue(":SUBTITLE", item->GetSubtitle().isNull() ? "" : item->GetSubtitle());
+    query.bindValueNoNull(":SUBTITLE", item->GetSubtitle());
     query.bindValue(":DESCRIPTION", item->GetDescription());
     query.bindValue(":URL", item->GetURL());
     query.bindValue(":TYPE", type);
@@ -434,16 +434,15 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     query.bindValue(":TIME", time);
     query.bindValue(":RATING", item->GetRating());
     query.bindValue(":FILESIZE", (qulonglong)item->GetFilesize());
-    query.bindValue(":PLAYER", item->GetPlayer().isNull() ? "" : item->GetPlayer());
+    query.bindValueNoNull(":PLAYER", item->GetPlayer());
     query.bindValue(":PLAYERARGS", item->GetPlayerArguments().isEmpty() ? "" :
                                    item->GetPlayerArguments().join(" "));
-    query.bindValue(":DOWNLOAD", item->GetDownloader().isNull() ? "" :
-                                 item->GetDownloader());
+    query.bindValueNoNull(":DOWNLOAD", item->GetDownloader());
     query.bindValue(":DOWNLOADARGS", item->GetDownloaderArguments().isEmpty() ? "" :
                                      item->GetDownloaderArguments().join(" "));
     query.bindValue(":WIDTH", item->GetWidth());
     query.bindValue(":HEIGHT", item->GetHeight());
-    query.bindValue(":LANGUAGE", item->GetLanguage().isNull() ? "" : item->GetLanguage());
+    query.bindValueNoNull(":LANGUAGE", item->GetLanguage());
     query.bindValue(":PODCAST", false);
     query.bindValue(":DOWNLOADABLE", item->GetDownloadable());
     query.bindValue(":CUSTOMHTML", item->GetCustomHTML());
@@ -773,16 +772,15 @@ bool insertRSSArticleInDB(const QString &feedtitle, ResultItem *item,
     query.bindValue(":TIME", time);
     query.bindValue(":RATING", item->GetRating());
     query.bindValue(":FILESIZE", (qulonglong)item->GetFilesize());
-    query.bindValue(":PLAYER", item->GetPlayer().isNull() ? "" : item->GetPlayer());
+    query.bindValueNoNull(":PLAYER", item->GetPlayer());
     query.bindValue(":PLAYERARGS", item->GetPlayerArguments().isEmpty() ? "" :
                                    item->GetPlayerArguments().join(" "));
-    query.bindValue(":DOWNLOAD", item->GetDownloader().isNull() ? "" :
-                                 item->GetDownloader());
+    query.bindValueNoNull(":DOWNLOAD", item->GetDownloader());
     query.bindValue(":DOWNLOADARGS", item->GetDownloaderArguments().isEmpty() ? "" :
                                      item->GetDownloaderArguments().join(" "));
     query.bindValue(":WIDTH", item->GetWidth());
     query.bindValue(":HEIGHT", item->GetHeight());
-    query.bindValue(":LANGUAGE", item->GetLanguage().isNull() ? "" : item->GetLanguage());
+    query.bindValueNoNull(":LANGUAGE", item->GetLanguage());
     query.bindValue(":DOWNLOADABLE", item->GetDownloadable());
     query.bindValue(":COUNTRIES", item->GetCountries());
     query.bindValue(":PODCAST", true);

@@ -1910,7 +1910,7 @@ int CardUtil::CreateCardInput(const uint inputid,
     query.bindValue(":CHANGERMODEL", changer_model);
     query.bindValue(":TUNECHAN", tunechan);
     query.bindValue(":STARTCHAN", startchan);
-    query.bindValue(":DISPLAYNAME", displayname.isNull() ? "" : displayname);
+    query.bindValueNoNull(":DISPLAYNAME", displayname);
     query.bindValue(":DISHNETEIT", dishnet_eit);
     query.bindValue(":RECPRIORITY", recpriority);
     query.bindValue(":QUICKTUNE", quicktune);

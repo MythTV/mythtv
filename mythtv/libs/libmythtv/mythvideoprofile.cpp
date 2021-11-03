@@ -625,7 +625,7 @@ bool MythVideoProfile::SaveDB(uint GroupId, vector<MythVideoProfileItem> &Items)
                 insert.bindValue(":GROUPID",   GroupId);
                 insert.bindValue(":PROFILEID", item.GetProfileID());
                 insert.bindValue(":VALUE",     lit.key());
-                insert.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
+                insert.bindValueNoNull(":DATA", *lit);
                 if (!insert.exec())
                 {
                     MythDB::DBError("save_profile 2", insert);
@@ -673,7 +673,7 @@ bool MythVideoProfile::SaveDB(uint GroupId, vector<MythVideoProfileItem> &Items)
                     update.bindValue(":GROUPID",   GroupId);
                     update.bindValue(":PROFILEID", item.GetProfileID());
                     update.bindValue(":VALUE",     lit.key());
-                    update.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
+                    update.bindValueNoNull(":DATA", *lit);
                     if (!update.exec())
                     {
                         MythDB::DBError("save_profile 5b", update);
@@ -687,7 +687,7 @@ bool MythVideoProfile::SaveDB(uint GroupId, vector<MythVideoProfileItem> &Items)
                 insert.bindValue(":GROUPID",   GroupId);
                 insert.bindValue(":PROFILEID", item.GetProfileID());
                 insert.bindValue(":VALUE",     lit.key());
-                insert.bindValue(":DATA", ((*lit).isNull()) ? "" : (*lit));
+                insert.bindValueNoNull(":DATA", *lit);
                 if (!insert.exec())
                 {
                     MythDB::DBError("save_profile 4", insert);
