@@ -46,9 +46,9 @@ import "/tv/js/tvutil.qjs"
         displayGroup = "";
 
     var PAGEINTERVAL = 10;
-    var recordingList = dvr.GetRecordedList( sortDescending, startIndex, PAGEINTERVAL, displayGroup, recGroup, "", "", "" );
+    var recordingList = dvr.GetRecordedList( sortDescending, startIndex, PAGEINTERVAL, displayGroup, recGroup, "", "", "", true, true );
 
-    var deletedList = dvr.GetRecordedList( false, 0, 1, "", "Deleted", "", "", "" );
+    var deletedList = dvr.GetRecordedList( false, 0, 1, "", "Deleted", "", "", "", true, false );
     var showDeletedLink = (deletedList.TotalAvailable > 0) ? true : false;
 
     var nextStartIndex = (startIndex + PAGEINTERVAL);
