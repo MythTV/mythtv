@@ -5104,7 +5104,7 @@ void TV::ChangeSpeed(int Direction)
     m_playerContext.m_ffRewSpeed += Direction;
 
     float time = StopFFRew();
-    float speed;
+    float speed {NAN};
 
     // Make sure these values for m_ffRewSpeed in TV::ChangeSpeed()
     // and PlayerContext::GetPlayMessage() stay in sync.
