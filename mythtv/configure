@@ -1996,8 +1996,6 @@ MYTHTV_CONFIG_LIST='
     x11
     libexiv2_external
     libbluray_external
-    profiletype
-    debugtype
     systemd_notify
     systemd_journal
     drm
@@ -2100,6 +2098,7 @@ MYTHTV_PATHS_LIST='
 '
 
 MYTHTV_CMDLINE_SET='
+    compile_type
     logging
     python
     qmake
@@ -5144,16 +5143,20 @@ if test $target_os = android ; then
 fi
 
 append CCONFIG "$compile_type"
-if test x$compile_type = x"profile" ; then
+if test x$compile_type = x"release" ; then
     add_cflags   -DNDEBUG
     add_cxxflags -DNDEBUG
+    check_cxxflags -O2
+    enable debug
+elif test x$compile_type = x"profile" ; then
+    add_cflags   -DNDEBUG
+    add_cxxflags -DNDEBUG
+    check_cxxflags -O2
     enable debug
     disable stripping
-    enable profiletype
 elif test x$compile_type = x"debug"; then
     enable debug
     disable optimizations stripping
-    enable debugtype
 fi
 
 enabled silent_cc && append CCONFIG "silent"
@@ -7570,6 +7573,7 @@ QT_MIN_VERSION_HEX=$QT_MIN_VERSION_HEX
 QT_MIN_VERSION=$QT_MIN_VERSION
 MYTHTV_CONFIGURATION=$MYTHTV_CONFIGURATION
 MYTHTV_CONFIG_MAK=1
+COMPILE_TYPE=$compile_type
 PREFIX=$prefix
 prefix=$prefix
 LIBDIRNAME=$libdir_name
@@ -7768,6 +7772,7 @@ cat > $TMPH <<EOF
 #define QT_MIN_VERSION_STR "$QT_MIN_VERSION_STR"
 #define QT_MIN_VERSION_HEX $QT_MIN_VERSION_HEX
 #define QT_MIN_VERSION $QT_MIN_VERSION
+#define COMPILE_TYPE "$compile_type"
 #define av_restrict $_restrict
 #define EXTERN_PREFIX "${extern_prefix}"
 #define EXTERN_ASM ${extern_prefix}
