@@ -6621,7 +6621,7 @@ case $ID in
         EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
     ubuntu)
         case $VERSION_ID in
-            21*) EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
+            2[1-9]*) EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
        esac
 esac
 
