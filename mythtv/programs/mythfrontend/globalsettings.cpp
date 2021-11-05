@@ -117,7 +117,7 @@ static HostTextEditSetting *VAAPIDevice()
     ge->setHelpText(help);
 
     // update VideoDisplayProfile statics if this changes
-    QObject::connect(ge, &HostTextEditSetting::ChangeSaved,
+    QObject::connect(ge, &HostTextEditSetting::ChangeSaved, ge,
         []()
         {
             QString device = gCoreContext->GetSetting("VAAPIDevice");
