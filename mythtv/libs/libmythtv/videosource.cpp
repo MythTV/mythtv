@@ -3396,7 +3396,7 @@ void CardInput::channelScanner(void)
 
     if (ssd->Create())
     {
-        connect(ssd, &StandardSettingDialog::Exiting,
+        connect(ssd, &StandardSettingDialog::Exiting, this,
                 [=]()
                 {
                     if (SourceUtil::GetChannelCount(srcid))
