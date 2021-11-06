@@ -535,7 +535,7 @@ bool XMLTVParser::parseFile(
                                     if (guest == "yes")
                                         tagname = "guest_star";
                                 }
-                                QString text2 = xml.readElementText(QXmlStreamReader::SkipChildElements);
+                                QString name = xml.readElementText(QXmlStreamReader::SkipChildElements);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
                                 QStringList roles = role.split("/", QString::SkipEmptyParts);
 #else
@@ -543,7 +543,7 @@ bool XMLTVParser::parseFile(
 #endif
                                 if (roles.isEmpty())
                                 {
-                                    pginfo->AddPerson(tagname, text2,
+                                    pginfo->AddPerson(tagname, name,
                                                       priority, role);
                                     ++priority;
                                 }
@@ -551,7 +551,7 @@ bool XMLTVParser::parseFile(
                                 {
                                     for (auto & r : roles)
                                     {
-                                        pginfo->AddPerson(tagname, text2,
+                                        pginfo->AddPerson(tagname, name,
                                                           priority,
                                                           r.simplified());
                                         ++priority;
