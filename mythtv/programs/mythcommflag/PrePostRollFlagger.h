@@ -26,7 +26,7 @@ private:
 
     void Init();
 
-    long long findBreakInrange(long long start, long long stopFrame,
+    long long findBreakInrange(long long startFrame, long long stopFrame,
                                long long totalFrames,
                                long long &framesProcessed,
                                QElapsedTimer &flagTime, bool findLast);
