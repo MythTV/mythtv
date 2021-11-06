@@ -304,8 +304,8 @@ void MythPlayer::ReinitVideo(bool ForceUpdate)
     {
         QMutexLocker locker(&m_vidExitLock);
         m_videoOutput->SetVideoFrameRate(static_cast<float>(m_videoFrameRate));
-        float aspect = (m_forcedVideoAspect > 0) ? m_forcedVideoAspect : m_videoAspect;
-        if (!m_videoOutput->InputChanged(m_videoDim, m_videoDispDim, aspect,
+        float video_aspect = (m_forcedVideoAspect > 0) ? m_forcedVideoAspect : m_videoAspect;
+        if (!m_videoOutput->InputChanged(m_videoDim, m_videoDispDim, video_aspect,
                                          m_decoder->GetVideoCodecID(), aspect_only,
                                          m_maxReferenceFrames, ForceUpdate))
         {

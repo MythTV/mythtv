@@ -124,7 +124,7 @@ void VideoOutputD3D::WindowResized(const QSize &new_size)
 
 bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
                                   const QSize &video_dim_disp,
-                                  float        aspect,
+                                  float        video_aspect,
                                   MythCodecID  av_codec_id,
                                   bool        &aspect_only,
                                   MythMultiLocker*)
@@ -138,19 +138,19 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
             .arg(toString(m_videoCodecID)).arg(cursize.width())
             .arg(cursize.height()).arg(m_window.GetVideoAspect())
             .arg(toString(av_codec_id)).arg(video_dim_disp.width())
-            .arg(video_dim_disp.height()).arg(aspect));
+            .arg(video_dim_disp.height()).arg(video_aspect));
 
 
     bool cid_changed = (m_videoCodecID != av_codec_id);
     bool res_changed = video_dim_disp != cursize;
-    bool asp_changed = aspect      != m_window.GetVideoAspect();
+    bool asp_changed = video_aspect   != m_window.GetVideoAspect();
 
     if (!res_changed && !cid_changed)
     {
         if (asp_changed)
         {
             aspect_only = true;
-            VideoAspectRatioChanged(aspect);
+            VideoAspectRatioChanged(video_aspect);
             MoveResize();
         }
         return true;
@@ -159,7 +159,7 @@ bool VideoOutputD3D::InputChanged(const QSize &video_dim_buf,
     TearDown();
     QRect disp = m_window.GetDisplayVisibleRect();
     if (Init(video_dim_buf, video_dim_disp,
-             aspect, (WId)m_hWnd, disp, av_codec_id))
+             video_aspect, (WId)m_hWnd, disp, av_codec_id))
     {
         return true;
     }
@@ -192,7 +192,7 @@ bool VideoOutputD3D::SetupContext()
 
 bool VideoOutputD3D::Init(const QSize &video_dim_buf,
                           const QSize &video_dim_disp,
-                          float aspect, WId winid,
+                          float video_aspect, WId winid,
                           const QRect &win_rect,MythCodecID codec_id)
 {
     MythPainter *painter = GetMythPainter();
@@ -203,7 +203,7 @@ bool VideoOutputD3D::Init(const QSize &video_dim_buf,
     m_hWnd      = (HWND)winid;
 
     MythVideoOutput::Init(video_dim_buf, video_dim_disp,
-                      aspect, winid, win_rect, codec_id);
+                      video_aspect, winid, win_rect, codec_id);
 
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Init with codec: %1")
                          .arg(toString(codec_id)));

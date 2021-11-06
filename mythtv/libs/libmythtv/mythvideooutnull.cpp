@@ -61,14 +61,14 @@ MythVideoOutputNull* MythVideoOutputNull::Create(QSize VideoDim, QSize VideoDisp
 
 bool MythVideoOutputNull::InputChanged(QSize        VideoDim,
                                        QSize        VideoDispDim,
-                                       float        Aspect,
+                                       float        VideoAspect,
                                        MythCodecID  CodecID,
                                        bool&        AspectOnly,
                                        int          ReferenceFrames,
                                        bool         ForceChange)
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("InputChanged(WxH = %1x%2, aspect = %3)")
-            .arg(VideoDispDim.width()).arg(VideoDispDim.height()).arg(static_cast<qreal>(Aspect)));
+            .arg(VideoDispDim.width()).arg(VideoDispDim.height()).arg(static_cast<qreal>(VideoAspect)));
 
     if (!codec_is_std(CodecID))
     {
@@ -85,7 +85,7 @@ bool MythVideoOutputNull::InputChanged(QSize        VideoDim,
     }
 
     MythVideoOutput::InputChanged(VideoDim, VideoDispDim,
-                                  Aspect, CodecID, AspectOnly,
+                                  VideoAspect, CodecID, AspectOnly,
                                   ReferenceFrames, ForceChange);
     MoveResize();
 
@@ -103,7 +103,7 @@ bool MythVideoOutputNull::InputChanged(QSize        VideoDim,
 }
 
 bool MythVideoOutputNull::Init(const QSize VideoDim, const QSize VideoDispDim,
-                               float Aspect, const QRect DisplayVisibleRect, MythCodecID CodecID)
+                               float VideoAspect, const QRect DisplayVisibleRect, MythCodecID CodecID)
 {
     if (VideoDispDim.isEmpty())
         return false;
@@ -115,7 +115,7 @@ bool MythVideoOutputNull::Init(const QSize VideoDim, const QSize VideoDispDim,
         return false;
     }
 
-    MythVideoOutput::Init(VideoDim, VideoDispDim, Aspect, DisplayVisibleRect, CodecID);
+    MythVideoOutput::Init(VideoDim, VideoDispDim, VideoAspect, DisplayVisibleRect, CodecID);
     m_videoBuffers.Init(VideoBuffers::GetNumBuffers(FMT_YV12), kNeedFreeFrames,
                         kPrebufferFramesNormal, kPrebufferFramesSmall);
 

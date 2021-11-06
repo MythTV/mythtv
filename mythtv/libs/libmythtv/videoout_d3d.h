@@ -19,7 +19,7 @@ class VideoOutputD3D : public MythVideoOutput
     VideoOutputD3D();
    ~VideoOutputD3D();
 
-    bool Init(const QSize &video_dim_buf, const QSize &video_dim_disp, float aspect,
+    bool Init(const QSize &video_dim_buf, const QSize &video_dim_disp, float video_aspect,
               WId winid, const QRect &win_rect, MythCodecID codec_id) override; // VideoOutput
     void RenderFrame(MythVideoFrame *buffer, FrameScanType, OSD *osd) override; // VideoOutput
     void PrepareFrame(MythVideoFrame *frame, const PIPMap &pipPlayers, FrameScanType scan) override; // VideoOutput
@@ -27,7 +27,7 @@ class VideoOutputD3D : public MythVideoOutput
     void WindowResized(const QSize &new_size) override; // VideoOutput
     bool InputChanged(const QSize &video_dim_buf,
                       const QSize &video_dim_disp,
-                      float        aspect,
+                      float        video_aspect,
                       MythCodecID  av_codec_id,
                       bool        &aspect_only,
                       MythMultiLocker *Locks) override; // VideoOutput
