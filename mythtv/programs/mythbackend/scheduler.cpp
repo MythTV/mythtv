@@ -5830,30 +5830,30 @@ bool Scheduler::InitInputInfoMap(void)
     return CreateConflictLists();
 }
 
-void Scheduler::AddChildInput(uint parentid, uint inputid)
+void Scheduler::AddChildInput(uint parentid, uint childid)
 {
     LOG(VB_SCHEDULE, LOG_INFO, LOC +
         QString("AddChildInput: Handling parent = %1, input = %2")
-        .arg(parentid).arg(inputid));
+        .arg(parentid).arg(childid));
 
     // This code should stay substantially similar to that above in
     // InitInputInfoMap().
-    SchedInputInfo &siinfo = m_sinputInfoMap[inputid];
-    siinfo.m_inputId = inputid;
+    SchedInputInfo &siinfo = m_sinputInfoMap[childid];
+    siinfo.m_inputId = childid;
     if (m_sinputInfoMap[parentid].m_schedGroup)
         siinfo.m_sgroupId = parentid;
     else
-        siinfo.m_sgroupId = inputid;
+        siinfo.m_sgroupId = childid;
     siinfo.m_schedGroup = false;
-    siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(inputid);
+    siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(childid);
 
     siinfo.m_conflictList = m_sinputInfoMap[parentid].m_conflictList;
 
     // Now, fixup the infos for the parent and conflicting inputs.
-    m_sinputInfoMap[parentid].m_groupInputs.push_back(inputid);
+    m_sinputInfoMap[parentid].m_groupInputs.push_back(childid);
     for (uint otherid : siinfo.m_conflictingInputs)
     {
-        m_sinputInfoMap[otherid].m_conflictingInputs.push_back(inputid);
+        m_sinputInfoMap[otherid].m_conflictingInputs.push_back(childid);
     }
 }
 
