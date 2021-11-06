@@ -169,9 +169,6 @@ Checks: '-*,
         # New in clang13. 2571 warnings. ,
        -modernize-return-braced-init-list,
 
-        # New in clang13. 204 warnings. ,
-       -readability-redundant-member-init,
-
     performance-*,
 
         # The Q_DECLARE_METATYPE macro triggers a warning from this
