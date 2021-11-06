@@ -88,6 +88,12 @@ macx {
     }
 
     LIBS += -liconv
+
+    # Qt6 moved QtGui to use metal, link in QtOpenGL until migrated fully to
+    # Metal per https://doc.qt.io/qt-6/opengl-changes-qt6.html
+    equals(QT_MAJOR_VERSION, 6) {
+        QT += opengl
+    }
 }
 
 cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
