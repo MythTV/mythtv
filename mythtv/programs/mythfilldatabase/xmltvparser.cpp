@@ -524,7 +524,7 @@ bool XMLTVParser::parseFile(
                             if (xml.isStartElement())
                             {
                                 // Character role in optional role attribute
-                                QString role = xml.attributes()
+                                QString character = xml.attributes()
                                                   .value("role").toString();
                                 QString tagname = xml.name().toString();
                                 if (tagname == "actor")
@@ -537,23 +537,23 @@ bool XMLTVParser::parseFile(
                                 }
                                 QString name = xml.readElementText(QXmlStreamReader::SkipChildElements);
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
-                                QStringList roles = role.split("/", QString::SkipEmptyParts);
+                                QStringList characters = character.split("/", QString::SkipEmptyParts);
 #else
-                                QStringList roles = role.split("/", Qt::SkipEmptyParts);
+                                QStringList characters = character.split("/", Qt::SkipEmptyParts);
 #endif
-                                if (roles.isEmpty())
+                                if (characters.isEmpty())
                                 {
                                     pginfo->AddPerson(tagname, name,
-                                                      priority, role);
+                                                      priority, character);
                                     ++priority;
                                 }
                                 else
                                 {
-                                    for (auto & r : roles)
+                                    for (auto & c : characters)
                                     {
                                         pginfo->AddPerson(tagname, name,
                                                           priority,
-                                                          r.simplified());
+                                                          c.simplified());
                                         ++priority;
                                     }
                                 }
