@@ -61,7 +61,6 @@ LIBS += -L../../external/FFmpeg/libavformat -lmythavformat
 LIBS += -L../libmyth              -lmyth-$${LIBVERSION}
 LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
-LIBS += -L../../external/libudfread -lmythudfread-$${LIBVERSION}
 
 !using_libexiv2_external {
     darwin {
