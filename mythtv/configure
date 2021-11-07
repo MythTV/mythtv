@@ -1673,11 +1673,15 @@ HEADERS_LIST="
     machine_ioctl_bt848_h
     machine_ioctl_meteor_h
     malloc_h
+    mntent_h
     opencv2_core_core_c_h
     OpenGL_gl3_h
     poll_h
+    pthread_h
     soundcard_h
     stdatomic_h
+    strings_h
+    sys_dl_h
     sys_mman_h
     sys_param_h
     sys_resource_h
@@ -1750,6 +1754,7 @@ SYSTEM_FUNCS="
     fork
     getaddrinfo
     gethrtime
+    getmntent_r
     getopt
     GetProcessAffinityMask
     GetProcessMemoryInfo
@@ -2001,6 +2006,7 @@ MYTHTV_CONFIG_LIST='
     x11
     libexiv2_external
     libbluray_external
+    libudfread_external
     systemd_notify
     systemd_journal
     drm
@@ -2008,6 +2014,7 @@ MYTHTV_CONFIG_LIST='
 
 MYTHTV_HAVE_LIST='
     byteswap_h
+    bdj_j2me
     fe_can_2g_modulation
     ftime
     getifaddrs
@@ -2676,6 +2683,7 @@ python_default="python3"
 
 #Bluray
 bdj_type="j2se"
+disable bdj_j2me
 
 # machine
 arch_default=$(uname -m)
@@ -2802,6 +2810,7 @@ enable systemd_notify
 enable systemd_journal
 enable libexiv2_external
 enable libbluray_external
+enable libudfread_external
 enable waylandextras
 
 # mythtv paths
@@ -5737,8 +5746,13 @@ check_header fcntl.h
 check_header io.h
 check_header mach/mach_time.h
 check_header malloc.h
+check_header mntent.h
+check_func_headers mntent.h getmntent_r
 check_header net/udplite.h
 check_header poll.h
+check_header pthread.h
+check_header strings.h
+check_header sys/dl.h
 check_header sys/mman.h
 check_header sys/param.h
 check_header sys/resource.h
@@ -5892,6 +5906,15 @@ fi
 
 if [ $target_os = "linux" ] ; then
     . /etc/os-release
+fi
+
+# libudfread
+if enabled libudfread_external ; then
+    if $(pkg-config --atleast-version="1.1.1" libudfread); then
+        use_pkg_config libudfread libudfread udfread/udfread.h udfread_init
+    else
+        disable libudfread_external
+    fi
 fi
 
 # libmythbluray!
@@ -7526,13 +7549,18 @@ if enabled libexiv2_external; then
 else
     echo "exiv2 support             yes (internal)"
 fi
+if enabled libudfread_external; then
+    echo "udfread support           yes (system)"
+else
+    echo "udfread support           yes (internal)"
+fi
 if enabled libbluray_external; then
     echo "bluray support            yes (system)"
 else
     echo "bluray support            yes (internal)"
+    echo "BD-J (Bluray java)        ${bdjava-no}"
+    echo "BD-J type                 ${bdj_type}"
 fi
-echo "BD-J (Bluray java)        ${bdjava-no}"
-echo "BD-J type                 ${bdj_type}"
 echo "systemd_notify            ${systemd_notify-no}"
 echo "systemd_journal           ${systemd_journal-no}"
 echo
@@ -7775,6 +7803,12 @@ if enabled waylandextras; then
     echo "LIBWAYLAND_CFLAGS=$($pkg_config --cflags $pkg_config_flags wayland-client)" >> $TMPMAK
 fi
 
+if enabled libudfread_external; then
+    # from check_pkg_config via use_pkg_config above
+    echo "LIBUDFREAD_CFLAGS=$libudfread_cflags" >> $TMPMAK
+    echo "LIBUDFREAD_LIBS=$libudfread_extralibs" >> $TMPMAK
+fi
+
 if test $target_os = darwin; then
   # Qt, by default builds .app bundles everywhere. Prevent this.
   enabled mac_bundle || echo "CONFIG-=app_bundle" >> $TMPMAK
@@ -7803,10 +7837,6 @@ cat > $TMPH <<EOF
 #define IMAGE_ALIGN $image_align
 #define PYTHON_EXE "${python}"
 EOF
-
-# Code only checks whether HAVE_BDJ_J2ME is defined, not what value
-# it has been defined as so we mustn't define it if we don't have it.
-enabled bdj_j2me && echo "#define HAVE_BDJ_J2ME 1" >>$TMPH
 
 test -n "$assert_level" &&
     echo "#define ASSERT_LEVEL $assert_level" >>$TMPH
@@ -7997,6 +8027,11 @@ if [ -e libs/libmyth/mythconfig.h ] ; then
     rm -f libs/libmyth/mythconfig.h
 fi
 
+if ! enabled libudfread_external; then
+    echo "Configuring libudfread..."
+    (cd external/libudfread ; \
+           ${qmakeconf} -o Makefile)
+fi
 if ! enabled libbluray_external; then
     echo "Configuring libmythbluray..."
     (cd external/libmythbluray ; \
@@ -8009,9 +8044,6 @@ if ! enabled libexiv2_external; then
 fi
 echo "Configuring libmythdvdnav..."
 (cd external/libmythdvdnav ; \
-       ${qmakeconf} -o Makefile)
-echo "Configuring libudfread..."
-(cd external/libudfread ; \
        ${qmakeconf} -o Makefile)
 
 test -n "$WARNINGS" && printf "\n$WARNINGS" || exit 0

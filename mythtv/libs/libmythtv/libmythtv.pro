@@ -362,10 +362,6 @@ using_libbluray_external:android {
     LIBS += -lbluray -lxml2
 }
 
-DEPENDPATH += ../../external/libudfread
-LIBS += -L../../external/libudfread
-LIBS += -lmythudfread-$$LIBVERSION
-
 #HLS stuff
 HEADERS += HLS/httplivestream.h
 SOURCES += HLS/httplivestream.cpp
