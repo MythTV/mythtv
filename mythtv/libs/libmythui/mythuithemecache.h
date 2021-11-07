@@ -62,7 +62,7 @@ class MUI_PUBLIC MythUIThemeCache
     QAtomicInt m_maxCacheSize             { 30 * 1024 * 1024 };
 #else
     QAtomicInteger<qint64> m_cacheSize    { 0 };
-    QAtomicInteger<qint64> m_maxCacheSize { 30 * 1024 * 1024 };
+    QAtomicInteger<qint64> m_maxCacheSize { 30LL * 1024 * 1024 };
 #endif
     QString m_themecachedir;
     QSize   m_cacheScreenSize;

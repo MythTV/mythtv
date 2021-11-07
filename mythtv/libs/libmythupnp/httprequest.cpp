@@ -332,7 +332,7 @@ qint64 HTTPRequest::SendResponse( void )
                 break;
             {
                 QFile file(m_sFileName);
-                if (file.exists() && file.size() < (2 * 1024 * 1024) && // For security/stability, limit size of files read into buffer to 2MiB
+                if (file.exists() && file.size() < (2LL * 1024 * 1024) && // For security/stability, limit size of files read into buffer to 2MiB
                     file.open(QIODevice::ReadOnly | QIODevice::Text))
                     m_response.buffer() = file.readAll();
 

@@ -129,7 +129,7 @@ class MUI_PUBLIC MythPainter : public QObject
 
   private:
     int64_t m_softwareCacheSize {0};
-    int64_t m_maxSoftwareCacheSize {1024 * 1024 * 48};
+    int64_t m_maxSoftwareCacheSize {48LL * 1024 * 1024};
 
     QMutex           m_allocationLock;
     QSet<MythImage*> m_allocatedImages;

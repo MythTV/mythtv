@@ -2770,7 +2770,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
 
     // Time between truncation steps in milliseconds
     constexpr std::chrono::milliseconds sleep_time = 500ms;
-    const size_t min_tps    = 8 * 1024 * 1024;
+    const size_t min_tps    = 8LL * 1024 * 1024;
     const auto calc_tps     = (size_t) (cards * 1.2 * (22200000LL / 8.0));
     const size_t tps        = std::max(min_tps, calc_tps);
     const auto increment    = (size_t) (tps * (sleep_time.count() * 0.001F));
@@ -3058,7 +3058,7 @@ void MainServer::DoHandleDeleteRecording(
     DoHandleStopRecording(recinfo, nullptr);
 
     if (justexpire && !forceMetadataDelete &&
-        recinfo.GetFilesize() > (1024 * 1024) )
+        recinfo.GetFilesize() > (1LL * 1024 * 1024) )
     {
         recinfo.ApplyRecordRecGroupChange("Deleted");
         recinfo.SaveAutoExpire(kDeletedAutoExpire, true);
