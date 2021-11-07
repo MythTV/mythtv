@@ -7050,6 +7050,9 @@ if enabled bindings_perl; then
     check_pl_lib "XML::Simple"  || disable_bindings_perl "XML::Simple"
 fi
 
+# Check for php dependencies
+# none at this time
+
 # nvdec processing
 here="$PWD"
 cd external/nv-codec-headers
@@ -7066,9 +7069,6 @@ else
     rm -rf install ffnvcodec.pc
 fi
 cd "$here"
-
-# Check for php dependencies
-# are none at this time
 
 case $target_os in
     osf1)
@@ -7348,9 +7348,9 @@ echo "DistCC                    $distcc$distcc_txt"
 echo "qmake                     $(which $qmake)"
 echo "install prefix            $prefix"
 echo "runtime prefix            $runprefix"
-
+echo
 if enabled cpu_override && test x"$cpu" != x"generic"; then
-    echo "CPU                       $arch $subarch ($cpu)"
+    echo "CPU override              $arch $subarch ($cpu)"
 elif test x"$processor" != x"" ; then
     echo "CPU                       $arch $subarch ($processor)"
 else
@@ -7401,7 +7401,7 @@ if enabled ppc; then
     echo "PPC 4xx optimizations     ${ppc4xx-no}"
     echo "dcbzl available           ${dcbzl-no}"
 fi
-
+echo
 echo "Creating configuration files ..."
 
 fi # test "$quiet" != "yes"
@@ -7474,10 +7474,10 @@ if enabled backend; then
   echo "V@Box TV Gateway support  ${vbox-no}"
   echo "Ceton support             ${ceton-no}"
   echo "DVEO ASI support          ${asi-no}"
+  echo
 fi
 
 if enabled frontend; then
-  echo
   echo "# Sound Output Support"
   echo "PulseAudio support        ${audio_pulseoutput-no}"
   echo "OSS support               ${audio_oss-no}"
@@ -7491,13 +7491,13 @@ if enabled frontend; then
   echo
   echo "# Video Output Support"
   echo "x11/xrandr support        ${x11-no}"
-if enabled x11 ; then
-  echo "VDPAU support             ${vdpau-no}"
-  echo "NVDEC support             ${nvdec-no}"
-fi
-if test x"$target_os" = x"darwin" ; then
-  echo "VideoToolBox support      ${videotoolbox-no}"
-fi
+  if enabled x11 ; then
+    echo "VDPAU support             ${vdpau-no}"
+    echo "NVDEC support             ${nvdec-no}"
+  fi
+  if test x"$target_os" = x"darwin" ; then
+    echo "VideoToolBox support      ${videotoolbox-no}"
+  fi
   echo "VAAPI support             ${vaapi-no}"
   echo "DRM support               ${drm-no}"
   if enabled drm; then
