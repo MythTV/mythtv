@@ -34,16 +34,6 @@ class UnZip
     // NOLINTNEXTLINE(readability-uppercase-literal-suffix)
     static constexpr uint64_t kSTATS_REQUIRED {ZIP_STAT_NAME|ZIP_STAT_INDEX|ZIP_STAT_SIZE|ZIP_STAT_MTIME|ZIP_STAT_ENCRYPTION_METHOD};
 
-    #define ZIP_ATTR_FILE_TYPE_MASK      0xFE000000
-    #define   ZIP_ATTR_FILE_TYPE_SYMLINK 0xA0000000
-    #define   ZIP_ATTR_FILE_TYPE_NORMAL  0x80000000
-    #define ZIP_ATTR_USER_PERM_MASK      0x01C00000
-    #define ZIP_ATTR_GROUP_PERM_MASK     0x03800000
-    #define ZIP_ATTR_OTHER_PERM_MASK     0x00700000
-    #define ZIP_ATTR_USER_PERM_SHIFT     22
-    #define ZIP_ATTR_GROUP_PERM_SHIFT    19
-    #define ZIP_ATTR_OTHER_PERM_SHIFT    16
-
   public:
     explicit UnZip(QString zipFile);
     ~UnZip();
