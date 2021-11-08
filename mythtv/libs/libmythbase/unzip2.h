@@ -45,9 +45,9 @@ class UnZip
     #define ZIP_ATTR_OTHER_PERM_SHIFT    16
 
   public:
-    UnZip(QString &zipFile);
+    explicit UnZip(QString zipFile);
     ~UnZip();
-    bool extractFile(const QString &outDir);
+    bool extractFile(QString outDir);
 
   private:
     bool isValid() { return m_zip != nullptr; };
