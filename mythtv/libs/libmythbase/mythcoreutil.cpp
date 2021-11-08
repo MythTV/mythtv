@@ -69,10 +69,10 @@ int64_t getDiskSpace(const QString &file_on_disk,
     return freespace;
 }
 
-bool extractZIP(QString &zipFile, const QString &outDir)
+bool extractZIP(QString zipFile, QString outDir)
 {
-    UnZip unzip(zipFile);
-    return unzip.extractFile(outDir);
+    UnZip unzip(std::move(zipFile));
+    return unzip.extractFile(std::move(outDir));
 }
 
 bool gzipFile(const QString &inFilename, const QString &gzipFilename)

@@ -24,7 +24,7 @@
 #include "mythdate.h"
 #include "mythlogging.h"
 
-UnZip::UnZip(QString &zipFileName)
+UnZip::UnZip(QString zipFileName)
     : m_zipFileName(std::move(zipFileName))
 {
     int err { ZIP_ER_OK };
@@ -252,7 +252,7 @@ bool UnZip::zipWriteOneFile(const zipEntry& entry)
     return true;
 }
 
-bool UnZip::extractFile(const QString &outDirName)
+bool UnZip::extractFile(QString outDirName)
 {
     if (!isValid())
         return false;
