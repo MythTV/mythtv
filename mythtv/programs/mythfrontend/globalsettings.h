@@ -74,15 +74,22 @@ class ChannelGroupSettings
 #if CONFIG_DARWIN
 class MacMainSettings : public GroupSetting
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     Q_OBJECT
-
+#else
+    Q_DECLARE_TR_FUNCTIONS(MacMainSettings);
+#endif
   public:
     MacMainSettings();
 };
 
 class MacFloatSettings : public GroupSetting
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     Q_OBJECT
+#else
+    Q_DECLARE_TR_FUNCTIONS(MacFloatSettings);
+#endif
 
   public:
     MacFloatSettings();
@@ -91,7 +98,11 @@ class MacFloatSettings : public GroupSetting
 
 class MacDockSettings : public GroupSetting
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     Q_OBJECT
+#else
+    Q_DECLARE_TR_FUNCTIONS(MacDockSettings);
+#endif
 
   public:
     MacDockSettings();
@@ -100,7 +111,11 @@ class MacDockSettings : public GroupSetting
 
 class MacDesktopSettings : public GroupSetting
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     Q_OBJECT
+#else
+    Q_DECLARE_TR_FUNCTIONS(MacDesktopSettings);
+#endif
 
   public:
     MacDesktopSettings();
