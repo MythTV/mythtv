@@ -85,6 +85,20 @@ void *AudioOutputDigitalEncoder::realloc(void *ptr,
     return new_ptr;
 }
 
+// Encode can use either ac3 (floating point) or ac3_fixed (fixed point)
+// To use ac3_fixed define AC3_FIXED 1
+
+#define AC3_FIXED 0
+#if AC3_FIXED
+#define CODECNAME "ac3_fixed"
+#define FFMPEG_SAMPLE_FORMAT AV_SAMPLE_FMT_S32P
+#define MYTH_SAMPLE_FORMAT FORMAT_S32
+#else
+#define CODECNAME "ac3"
+#define FFMPEG_SAMPLE_FORMAT AV_SAMPLE_FMT_FLTP
+#define MYTH_SAMPLE_FORMAT FORMAT_FLT
+#endif
+
 bool AudioOutputDigitalEncoder::Init(
     AVCodecID codec_id, int bitrate, int samplerate, int channels)
 {
@@ -102,7 +116,8 @@ bool AudioOutputDigitalEncoder::Init(
     // Clear digital encoder from all existing content
     Reset();
 
-    AVCodec *codec = avcodec_find_encoder_by_name("ac3_fixed");
+    LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using codec %1 to encode audio").arg(CODECNAME));
+    AVCodec *codec = avcodec_find_encoder_by_name(CODECNAME);
     if (!codec)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Could not find codec");
@@ -115,7 +130,7 @@ bool AudioOutputDigitalEncoder::Init(
     m_avContext->sample_rate    = samplerate;
     m_avContext->channels       = channels;
     m_avContext->channel_layout = av_get_default_channel_layout(channels);
-    m_avContext->sample_fmt     = AV_SAMPLE_FMT_S16P;
+    m_avContext->sample_fmt     = FFMPEG_SAMPLE_FORMAT;
 
     // open it
     int ret = avcodec_open2(m_avContext, codec, nullptr);
@@ -142,6 +157,13 @@ bool AudioOutputDigitalEncoder::Init(
     return true;
 }
 
+// buf   = 6 channel data from upconvert or speedup
+// m_in  = 6 channel data converted to S32 samples
+// m_inp = 1 frame, deinterleaved into planar format
+// m_inlen = number of bytes available in m_in
+// format = incoming sample format, normally FORMAT_FLT
+// upconvert and speedup both use floating point
+
 size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 {
     int sampleSize = AudioOutputSettings::SampleSize(format);
@@ -153,7 +175,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 
     // Check if there is enough space in incoming buffer
     int required_len = m_inlen +
-        len * AudioOutputSettings::SampleSize(FORMAT_S16) / sampleSize;
+        len * AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT) / sampleSize;
 
     if (required_len > (int)m_inSize)
     {
@@ -174,22 +196,32 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         m_in = tmp;
         m_inSize = required_len;
     }
-    if (format != FORMAT_S16)
+
+    if (format == MYTH_SAMPLE_FORMAT)
     {
-        m_inlen += AudioOutputUtil::fromFloat(FORMAT_S16, (char *)m_in + m_inlen,
+        // The input format is the same as the ffmpeg desired format so just copy the data
+        memcpy((char *)m_in + m_inlen, buf, len);
+        m_inlen += len;
+    }
+    else if (format == FORMAT_FLT)
+    {
+        // The input format is float but ffmpeg wants something else so convert it
+        m_inlen += AudioOutputUtil::fromFloat(MYTH_SAMPLE_FORMAT, (char *)m_in + m_inlen,
                                             buf, len);
     }
     else
     {
-        memcpy((char *)m_in + m_inlen, buf, len);
-        m_inlen += len;
+        LOG(VB_AUDIO, LOG_ERR, LOC +
+            QString("AC-3 encode error, cannot handle input format %1")
+            .arg(format));
+        return 0;
     }
 
-    int frames           = m_inlen / sizeof(inbuf_t) / m_samplesPerFrame;
+    int frames           = m_inlen / AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT) / m_samplesPerFrame;
     int i                = 0;
     int channels         = m_avContext->channels;
     int size_channel     = m_avContext->frame_size *
-        AudioOutputSettings::SampleSize(FORMAT_S16);
+        AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT);
     if (!m_frame)
     {
         if (!(m_frame = av_frame_alloc()))
@@ -207,13 +239,17 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     }
     m_frame->nb_samples = m_avContext->frame_size;
     m_frame->pts        = AV_NOPTS_VALUE;
+    m_frame->format         = m_avContext->sample_fmt;
+    m_frame->channel_layout = m_avContext->channel_layout;
+    m_frame->sample_rate = m_avContext->sample_rate;
+    m_frame->channels = m_avContext->channels;
 
     if (frames > 0)
     {
-            // init AVFrame for planar data (input is interleaved)
-        for (int j = 0, jj = 0; j < channels; j++, jj += m_avContext->frame_size)
+        // init AVFrame for planar data (input is interleaved)
+        for (int j = 0, jj = 0; j < channels; j++, jj += size_channel)
         {
-            m_frame->data[j] = (uint8_t*)(m_inp + jj);
+            m_frame->data[j] = (uint8_t*)m_inp + jj;
         }
     }
 
@@ -226,9 +262,9 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         bool got_packet   = false;
 
         AudioOutputUtil::DeinterleaveSamples(
-            FORMAT_S16, channels,
+            MYTH_SAMPLE_FORMAT, channels,
             (uint8_t*)m_inp,
-            (uint8_t*)(m_in + i * m_samplesPerFrame),
+            (uint8_t*)m_in + i * size_channel * channels,
             size_channel * channels);
 
         //  SUGGESTION
@@ -257,8 +293,10 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         }
         i++;
         if (!got_packet)
+        {
+            m_inlen  -= m_samplesPerFrame * AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT);
             continue;
-
+        }
         if (!m_spdifEnc)
         {
             m_spdifEnc = new SPDIFEncoder("spdif", AV_CODEC_ID_AC3);
@@ -291,10 +329,10 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         size_t data_size = 0;
         m_spdifEnc->GetData((uint8_t *)m_out + m_outlen, data_size);
         m_outlen += data_size;
-        m_inlen  -= m_samplesPerFrame * sizeof(inbuf_t);
+        m_inlen  -= m_samplesPerFrame * AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT);
     }
 
-    memmove(m_in, m_in + i * m_samplesPerFrame, m_inlen);
+    memmove(m_in, (uint8_t *)m_in + i * m_samplesPerFrame* AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT), m_inlen);
     return m_outlen;
 }
 
