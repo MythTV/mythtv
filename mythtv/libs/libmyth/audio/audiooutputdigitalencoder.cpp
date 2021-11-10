@@ -22,35 +22,35 @@ extern "C" {
 
 AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void)
 {
-    m_out = (outbuf_t *)av_mallocz(OUTBUFSIZE);
-    if (m_out)
+    m_outbuf = static_cast<uint8_t*>(av_mallocz(OUTBUFSIZE));
+    if (m_outbuf)
     {
         m_outSize = OUTBUFSIZE;
     }
-    m_in = (inbuf_t *)av_mallocz(INBUFSIZE);
-    if (m_in)
+    m_inbuf = static_cast<uint8_t*>(av_mallocz(INBUFSIZE));
+    if (m_inbuf)
     {
         m_inSize = INBUFSIZE;
     }
-    m_inp = (inbuf_t *)av_mallocz(INBUFSIZE);
+    m_framebuf = static_cast<uint8_t*>(av_mallocz(INBUFSIZE));
 }
 
 AudioOutputDigitalEncoder::~AudioOutputDigitalEncoder()
 {
     Reset();
-    if (m_out)
+    if (m_outbuf)
     {
-        av_freep(&m_out);
+        av_freep(&m_outbuf);
         m_outSize = 0;
     }
-    if (m_in)
+    if (m_inbuf)
     {
-        av_freep(&m_in);
+        av_freep(&m_inbuf);
         m_inSize = 0;
     }
-    if (m_inp)
+    if (m_framebuf)
     {
-        av_freep(&m_inp);
+        av_freep(&m_framebuf);
     }
 }
 
@@ -68,7 +68,7 @@ void AudioOutputDigitalEncoder::Reset(void)
 }
 
 void *AudioOutputDigitalEncoder::realloc(void *ptr,
-                                         size_t old_size, size_t new_size)
+                                         int old_size, int new_size)
 {
     if (!ptr)
         return ptr;
@@ -97,6 +97,7 @@ void *AudioOutputDigitalEncoder::realloc(void *ptr,
 #define CODECNAME "ac3"
 #define FFMPEG_SAMPLE_FORMAT AV_SAMPLE_FMT_FLTP
 #define MYTH_SAMPLE_FORMAT FORMAT_FLT
+#define MYTH_USE_FLOAT 1
 #endif
 
 bool AudioOutputDigitalEncoder::Init(
@@ -107,7 +108,7 @@ bool AudioOutputDigitalEncoder::Init(
             .arg(ff_codec_id_string(codec_id)) .arg(bitrate)
             .arg(samplerate) .arg(channels));
 
-    if (!(m_in || m_inp || m_out))
+    if (!(m_inbuf || m_framebuf || m_outbuf))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Memory allocation failed");
         return false;
@@ -157,14 +158,14 @@ bool AudioOutputDigitalEncoder::Init(
     return true;
 }
 
-// buf   = 6 channel data from upconvert or speedup
-// m_in  = 6 channel data converted to S32 samples
-// m_inp = 1 frame, deinterleaved into planar format
-// m_inlen = number of bytes available in m_in
+// input = 6 channel data from upconvert or speedup
+// m_inbuf = 6 channel data converted to S32 or FLT samples interleaved
+// m_framebuf = 1 frame, deinterleaved into planar format
+// m_inlen = number of bytes available in m_inbuf
 // format = incoming sample format, normally FORMAT_FLT
-// upconvert and speedup both use floating point
+// upconvert and speedup both use floating point for parameter format
 
-size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
+int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
 {
     int sampleSize = AudioOutputSettings::SampleSize(format);
     if (sampleSize <= 0)
@@ -177,38 +178,39 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     int required_len = m_inlen +
         len * AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT) / sampleSize;
 
-    if (required_len > (int)m_inSize)
+    if (required_len > m_inSize)
     {
         required_len = ((required_len / INBUFSIZE) + 1) * INBUFSIZE;
         LOG(VB_AUDIO, LOG_INFO, LOC +
             QString("low mem, reallocating in buffer from %1 to %2")
                 .arg(m_inSize) .arg(required_len));
-        auto *tmp = reinterpret_cast<inbuf_t*>
-            (realloc(m_in, m_inSize, required_len));
+        auto *tmp = static_cast<uint8_t*> (realloc(m_inbuf, m_inSize, required_len));
         if (!tmp)
         {
-            m_in = nullptr;
+            m_inbuf = nullptr;
             m_inSize = 0;
             LOG(VB_AUDIO, LOG_ERR, LOC +
                 "AC-3 encode error, insufficient memory");
             return m_outlen;
         }
-        m_in = tmp;
+        m_inbuf = tmp;
         m_inSize = required_len;
     }
 
     if (format == MYTH_SAMPLE_FORMAT)
     {
         // The input format is the same as the ffmpeg desired format so just copy the data
-        memcpy((char *)m_in + m_inlen, buf, len);
+        memcpy(m_inbuf + m_inlen, input, len);
         m_inlen += len;
     }
+#if ! MYTH_USE_FLOAT
     else if (format == FORMAT_FLT)
     {
         // The input format is float but ffmpeg wants something else so convert it
-        m_inlen += AudioOutputUtil::fromFloat(MYTH_SAMPLE_FORMAT, (char *)m_in + m_inlen,
-                                            buf, len);
+        m_inlen += AudioOutputUtil::fromFloat(MYTH_SAMPLE_FORMAT, m_inbuf + m_inlen,
+                                            input, len);
     }
+#endif
     else
     {
         LOG(VB_AUDIO, LOG_ERR, LOC +
@@ -226,7 +228,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
     {
         if (!(m_frame = av_frame_alloc()))
         {
-            m_in = nullptr;
+            m_inbuf = nullptr;
             m_inSize = 0;
             LOG(VB_AUDIO, LOG_ERR, LOC +
                 "AC-3 encode error, insufficient memory");
@@ -249,7 +251,7 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
         // init AVFrame for planar data (input is interleaved)
         for (int j = 0, jj = 0; j < channels; j++, jj += size_channel)
         {
-            m_frame->data[j] = (uint8_t*)m_inp + jj;
+            m_frame->data[j] = m_framebuf + jj;
         }
     }
 
@@ -263,8 +265,8 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 
         AudioOutputUtil::DeinterleaveSamples(
             MYTH_SAMPLE_FORMAT, channels,
-            (uint8_t*)m_inp,
-            (uint8_t*)m_in + i * size_channel * channels,
+            m_framebuf,
+            m_inbuf + i * size_channel * channels,
             size_channel * channels);
 
         //  SUGGESTION
@@ -307,45 +309,44 @@ size_t AudioOutputDigitalEncoder::Encode(void *buf, int len, AudioFormat format)
 
         // Check if output buffer is big enough
         required_len = m_outlen + m_spdifEnc->GetProcessedSize();
-        if (required_len > (int)m_outSize)
+        if (required_len > m_outSize)
         {
             required_len = ((required_len / OUTBUFSIZE) + 1) * OUTBUFSIZE;
             LOG(VB_AUDIO, LOG_WARNING, LOC +
                 QString("low mem, reallocating out buffer from %1 to %2")
                     .arg(m_outSize) .arg(required_len));
-            auto *tmp = reinterpret_cast<outbuf_t*>
-                (realloc(m_out, m_outSize, required_len));
+            auto *tmp = static_cast<uint8_t*>(realloc(m_outbuf, m_outSize, required_len));
             if (!tmp)
             {
-                m_out = nullptr;
+                m_outbuf = nullptr;
                 m_outSize = 0;
                 LOG(VB_AUDIO, LOG_ERR, LOC +
                     "AC-3 encode error, insufficient memory");
                 return m_outlen;
             }
-            m_out = tmp;
+            m_outbuf = tmp;
             m_outSize = required_len;
         }
         size_t data_size = 0;
-        m_spdifEnc->GetData((uint8_t *)m_out + m_outlen, data_size);
+        m_spdifEnc->GetData(m_outbuf + m_outlen, data_size);
         m_outlen += data_size;
         m_inlen  -= m_samplesPerFrame * AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT);
     }
 
-    memmove(m_in, (uint8_t *)m_in + i * m_samplesPerFrame* AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT), m_inlen);
+    memmove(m_inbuf, m_inbuf + i * m_samplesPerFrame* AudioOutputSettings::SampleSize(MYTH_SAMPLE_FORMAT), m_inlen);
     return m_outlen;
 }
 
-size_t AudioOutputDigitalEncoder::GetFrames(void *ptr, int maxlen)
+int AudioOutputDigitalEncoder::GetFrames(void *ptr, int maxlen)
 {
     int len = std::min(maxlen, m_outlen);
     if (len != maxlen)
     {
         LOG(VB_AUDIO, LOG_INFO, LOC + "GetFrames: getting less than requested");
     }
-    memcpy(ptr, m_out, len);
+    memcpy(ptr, m_outbuf, len);
     m_outlen -= len;
-    memmove(m_out, (char *)m_out + len, m_outlen);
+    memmove(m_outbuf, m_outbuf + len, m_outlen);
     return len;
 }
 
