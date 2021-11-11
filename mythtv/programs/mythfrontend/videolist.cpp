@@ -1074,7 +1074,7 @@ static void copy_filtered_tree(meta_dir_node &dst, meta_dir_node &src,
                                            node->GetHost(),
                                            node->GetPrefix(),
                                            node->GetData());
-        copy_filtered_tree(*sdn, *(dir->get()), filter);
+        copy_filtered_tree(*sdn, **dir, filter);
     }
 }
 

@@ -26,7 +26,7 @@ import "/js/utility.js"
 
             var oDvr = new Dvr();
             var oMyth = new Myth();
-            var list = oDvr.GetRecordedList( true, 0, 10, "", "", "", "", "" );
+            var list = oDvr.GetRecordedList( true, 0, 10, "", "", "", "", "", true, true );
 
             // For padding integer values with leading zeros
             function pad(n)

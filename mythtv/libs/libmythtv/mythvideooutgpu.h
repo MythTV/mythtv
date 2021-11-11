@@ -45,7 +45,7 @@ class MythVideoOutputGPU : public MythVideoOutput
     void            DoneDisplayingFrame   (MythVideoFrame* Frame) override;
     void            UpdatePauseFrame      (std::chrono::milliseconds& DisplayTimecode, FrameScanType Scan = kScan_Progressive) override;
     bool            InputChanged          (QSize VideoDim, QSize VideoDispDim,
-                                           float Aspect, MythCodecID CodecId, bool& AspectOnly,
+                                           float VideoAspect, MythCodecID CodecId, bool& AspectOnly,
                                            int ReferenceFrames, bool ForceChange) override;
     void            EndFrame              () override;
     void            ClearAfterSeek        () override;

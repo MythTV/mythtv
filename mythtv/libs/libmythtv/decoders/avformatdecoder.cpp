@@ -1,24 +1,13 @@
+#include "avformatdecoder.h"
+
+#include <unistd.h>
+
 // C++ headers
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <iostream>
-#include <unistd.h>
-
-#include <QFileInfo>
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-#include <QTextCodec>
-#else
-#include <QStringDecoder>
-#endif
-
-#ifdef USING_MEDIACODEC
-extern "C" {
-#include "libavcodec/jni.h"
-}
-#include <QtAndroidExtras>
-#endif
 
 extern "C" {
 #include "libavutil/avutil.h"
@@ -30,25 +19,58 @@ extern "C" {
 #include "libavformat/internal.h"
 #include "libswscale/swscale.h"
 #include "libavformat/isom.h"
-#include "ivtv_myth.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/display.h"
 }
 
+#ifdef USING_MEDIACODEC // Android
+extern "C" {
+#include "libavcodec/jni.h"
+}
+#include <QtAndroidExtras>
+#endif // Android
+
+// regardless of building with V4L2 or not, enable IVTV VBI data
+// from <linux/videodev2.h> under SPDX-License-Identifier: ((GPL-2.0+ WITH Linux-syscall-note) OR BSD-3-Clause)
+/*
+ * V4L2_MPEG_STREAM_VBI_FMT_IVTV:
+ *
+ * Structure of payload contained in an MPEG 2 Private Stream 1 PES Packet in an
+ * MPEG-2 Program Pack that contains V4L2_MPEG_STREAM_VBI_FMT_IVTV Sliced VBI
+ * data
+ *
+ * Note, the MPEG-2 Program Pack and Private Stream 1 PES packet header
+ * definitions are not included here.  See the MPEG-2 specifications for details
+ * on these headers.
+ */
+
+/* Line type IDs */
+#define V4L2_MPEG_VBI_IVTV_TELETEXT_B     (1) ///< Teletext (uses lines 6-22 for PAL, 10-21 for NTSC)
+#define V4L2_MPEG_VBI_IVTV_CAPTION_525    (4) ///< Closed Captions (line 21 NTSC, line 22 PAL)
+#define V4L2_MPEG_VBI_IVTV_WSS_625        (5) ///< Wide Screen Signal (line 20 NTSC, line 23 PAL)
+#define V4L2_MPEG_VBI_IVTV_VPS            (7) ///< Video Programming System (PAL) (line 16)
+// comments for each ID from ivtv_myth.h
+
+#include <QFileInfo>
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+#include <QTextCodec>
+#else
+#include <QStringDecoder>
+#endif // Qt 6
+
 #ifdef _WIN32
-    #undef mkdir
+#   undef mkdir
 #endif
 
 // MythTV headers
 #include "mythtvexp.h"
 #include "mythconfig.h"
-#include "avformatdecoder.h"
 #include "audiooutput.h"
 #include "audiooutpututil.h"
 #include "io/mythmediabuffer.h"
-#include "mythplayer.h"
+#include "mythframe.h"
+#include "mythchrono.h"
 #include "remoteencoder.h"
-#include "programinfo.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
 #include "iso639.h"
@@ -3836,7 +3858,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
         const uint id2 = *buf & 0xf;
         switch (id2)
         {
-            case VBI_TYPE_TELETEXT:
+            case V4L2_MPEG_VBI_IVTV_TELETEXT_B:
                 // SECAM lines  6-23
                 // PAL   lines  6-22
                 // NTSC  lines 10-21 (rare)
@@ -3851,7 +3873,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                 m_trackLock.unlock();
                 m_ttd->Decode(buf+1, VBI_IVTV);
                 break;
-            case VBI_TYPE_CC:
+            case V4L2_MPEG_VBI_IVTV_CAPTION_525:
                 // PAL   line 22 (rare)
                 // NTSC  line 21
                 if (21 == line)
@@ -3862,11 +3884,11 @@ void AvFormatDecoder::ProcessVBIDataPacket(
                     utc += 33367us;
                 }
                 break;
-            case VBI_TYPE_VPS: // Video Programming System
+            case V4L2_MPEG_VBI_IVTV_VPS: // Video Programming System
                 // PAL   line 16
                 m_ccd608->DecodeVPS(buf+1); // a.k.a. PDC
                 break;
-            case VBI_TYPE_WSS: // Wide Screen Signal
+            case V4L2_MPEG_VBI_IVTV_WSS_625: // Wide Screen Signal
                 // PAL   line 23
                 // NTSC  line 20
                 m_ccd608->DecodeWSS(buf+1);

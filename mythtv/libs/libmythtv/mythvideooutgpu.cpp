@@ -431,7 +431,8 @@ void MythVideoOutputGPU::SetReferenceFrames(int ReferenceFrames)
 }
 
 bool MythVideoOutputGPU::InputChanged(QSize VideoDim, QSize VideoDispDim,
-                                      float Aspect, MythCodecID CodecId, bool& AspectOnly, int ReferenceFrames,
+                                      float VideoAspect, MythCodecID CodecId,
+                                      bool& AspectOnly, int ReferenceFrames,
                                       bool ForceChange)
 {
     QSize currentvideodim     = GetVideoDim();
@@ -455,7 +456,7 @@ bool MythVideoOutputGPU::InputChanged(QSize VideoDim, QSize VideoDispDim,
         .arg(toString(currentcodec)).arg(static_cast<double>(currentaspect))
         .arg(VideoDispDim.width()).arg(VideoDispDim.height())
         .arg(VideoDim.width()).arg(VideoDim.height())
-        .arg(toString(CodecId)).arg(static_cast<double>(Aspect))
+        .arg(toString(CodecId)).arg(static_cast<double>(VideoAspect))
         .arg(m_maxReferenceFrames).arg(ReferenceFrames));
 
     bool cidchanged = (CodecId != currentcodec);
@@ -483,7 +484,7 @@ bool MythVideoOutputGPU::InputChanged(QSize VideoDim, QSize VideoDispDim,
     m_newCodecId= CodecId;
     m_newVideoDim = VideoDim;
     m_newVideoDispDim = VideoDispDim;
-    m_newAspect = Aspect;
+    m_newAspect = VideoAspect;
     return true;
 }
 

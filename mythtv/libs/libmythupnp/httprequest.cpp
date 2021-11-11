@@ -758,7 +758,9 @@ void HTTPRequest::FormatErrorResponse( bool  bServerError,
     }
 
     if (m_bSOAPRequest)
+    {
         stream << "</s:Fault>" << SOAP_ENVELOPE_END;
+    }
 
     stream.flush();
 }

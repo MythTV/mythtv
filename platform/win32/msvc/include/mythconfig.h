@@ -1576,7 +1576,6 @@
 #define CONFIG_SDL 1
 #define CONFIG_TAGLIB 1
 #define CONFIG_V4L2 1
-#define CONFIG_V4L1 0
 #define CONFIG_VALGRIND 0
 #define CONFIG_X11 1
 #define CONFIG_XRANDR 0

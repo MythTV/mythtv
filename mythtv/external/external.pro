@@ -9,6 +9,6 @@ win32-msvc* {
 !using_exiv2_external: SUBDIRS += libexiv2
 !using_libbluray_external: SUBDIRS += libmythbluray
 SUBDIRS += libmythdvdnav
-SUBDIRS += libudfread
+!using_libudfread_external: SUBDIRS += libudfread
 
 }

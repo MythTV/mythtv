@@ -80,6 +80,12 @@ macx {
     }
 
     LIBS += -liconv
+
+    # Qt6 moved QtGui to use metal, link in QtOpenGL until migrated fully to
+    # Metal per https://doc.qt.io/qt-6/opengl-changes-qt6.html
+    equals(QT_MAJOR_VERSION, 6) {
+        QT += opengl
+    }
 }
 
 cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
@@ -361,10 +367,6 @@ using_libbluray_external:mingw {
 using_libbluray_external:android {
     LIBS += -lbluray -lxml2
 }
-
-DEPENDPATH += ../../external/libudfread
-LIBS += -L../../external/libudfread
-LIBS += -lmythudfread-$$LIBVERSION
 
 #HLS stuff
 HEADERS += HLS/httplivestream.h
@@ -877,6 +879,9 @@ using_backend {
         SOURCES += recorders/v4l2encstreamhandler.cpp
         HEADERS += recorders/v4l2encsignalmonitor.h
         SOURCES += recorders/v4l2encsignalmonitor.cpp
+
+        HEADERS += recorders/mpegrecorder.h
+        SOURCES += recorders/mpegrecorder.cpp
     }
 
     # Support for cable boxes that provide Firewire out
@@ -1033,16 +1038,6 @@ using_backend {
 
         DEFINES += USING_CETON
     }
-
-    # Support for PVR-150/250/350/500, etc. on Linux
-    using_ivtv:HEADERS *= recorders/mpegrecorder.h
-    using_ivtv:SOURCES *= recorders/mpegrecorder.cpp
-    using_ivtv:DEFINES += USING_IVTV
-
-    # Support for HD-PVR on Linux
-    using_hdpvr:HEADERS *= recorders/mpegrecorder.h
-    using_hdpvr:SOURCES *= recorders/mpegrecorder.cpp
-    using_hdpvr:DEFINES += USING_HDPVR
 
     # External recorder
     HEADERS += recorders/ExternalChannel.h

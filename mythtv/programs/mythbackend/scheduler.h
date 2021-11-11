@@ -116,7 +116,7 @@ class Scheduler : public MThread, public MythScheduler
 
     int GetError(void) const { return m_error; }
 
-    void AddChildInput(uint parentid, uint inputid);
+    void AddChildInput(uint parentid, uint childid);
     void DelayShutdown();
 
   protected:

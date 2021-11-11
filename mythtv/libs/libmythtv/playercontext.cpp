@@ -425,21 +425,26 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
 QString PlayerContext::GetPlayMessage(void) const
 {
     QString mesg = QObject::tr("Play");
-    if (m_tsNormal != 1.0F)
+    if (m_ffRewState < 0)
     {
-        if (m_tsNormal == 0.5F)
-            mesg += QString(" 1/2x");
-        else if (0.32F < m_tsNormal && m_tsNormal < 0.34F)
-            mesg += QString(" 1/3x");
-        else if (m_tsNormal == 0.25F)
-            mesg += QString(" 1/4x");
-        else if (m_tsNormal == 0.125F)
-            mesg += QString(" 1/8x");
-        else if (m_tsNormal == 0.0625F)
-            mesg += QString(" 1/16x");
-        else
-            mesg += QString(" %1x").arg(m_tsNormal);
+        mesg = QObject::tr("Rewind");
+        mesg += QString(" %1X").arg(-m_ffRewSpeed);
     }
+    else if (m_ffRewState > 0)
+    {
+        mesg = QObject::tr("Forward");
+        mesg += QString(" %1X").arg(m_ffRewSpeed);
+    }
+    // Make sure these values for m_ffRewSpeed in TV::ChangeSpeed()
+    // and PlayerContext::GetPlayMessage() stay in sync.
+    else if (m_ffRewSpeed == 0)
+        mesg += QString(" %1X").arg(m_tsNormal);
+    else if (m_ffRewSpeed == -1)
+        mesg += QString(" 1/3X");
+    else if (m_ffRewSpeed == -2)
+        mesg += QString(" 1/8X");
+    else if (m_ffRewSpeed == -3)
+        mesg += QString(" 1/16X");
 
     return mesg;
 }

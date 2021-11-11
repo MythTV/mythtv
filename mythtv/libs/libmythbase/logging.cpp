@@ -405,7 +405,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
         QString timestamp = item->getTimestampUs();
         char shortname = item->getLevelChar();
 
-#if CONFIG_DEBUGTYPE
+#ifndef NDEBUG
         if (item->tid())
         {
             line = qPrintable(QString("%1 %2 [%3/%4] %5 %6:%7:%8  %9\n")
@@ -466,7 +466,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
         aprio = ANDROID_LOG_UNKNOWN;
         break;
     }
-#if CONFIG_DEBUGTYPE
+#ifndef NDEBUG
     __android_log_print(aprio, "mfe", "%s:%d:%s  %s", qPrintable(item->m_file),
                         item->m_line, qPrintable(item->m_function),
                         qPrintable(item->m_message));

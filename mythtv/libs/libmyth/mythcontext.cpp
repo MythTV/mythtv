@@ -74,7 +74,8 @@ class MythContextPrivate : public QObject
    ~MythContextPrivate() override;
 
     bool Init        (bool gui,
-                      bool prompt, bool noPrompt,
+                      bool promptForBackend,
+                      bool disableAutoDiscovery,
                       bool ignoreDB);
     bool FindDatabase(bool prompt, bool noAutodetect);
 
@@ -334,7 +335,7 @@ bool MythContextPrivate::checkPort(QString &host, int port, std::chrono::seconds
 
 bool MythContextPrivate::Init(const bool gui,
                               const bool promptForBackend,
-                              const bool noPrompt,
+                              const bool disableAutoDiscovery,
                               const bool ignoreDB)
 {
     gCoreContext->GetDB()->IgnoreDatabase(ignoreDB);
@@ -353,7 +354,7 @@ bool MythContextPrivate::Init(const bool gui,
 
     // ---- database connection stuff ----
 
-    if (!ignoreDB && !FindDatabase(promptForBackend, noPrompt))
+    if (!ignoreDB && !FindDatabase(promptForBackend, disableAutoDiscovery))
     {
         EndTempWindow();
         return false;

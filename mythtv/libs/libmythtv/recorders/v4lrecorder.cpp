@@ -1,9 +1,5 @@
 // -*- Mode: c++ -*-
 
-#ifdef USING_V4L1
-#include <linux/videodev.h> // for vbi_format
-#endif // USING_V4L1
-
 #ifdef USING_V4L2
 #include <linux/videodev2.h>
 #endif // USING_V4L2
@@ -143,31 +139,9 @@ int V4LRecorder::OpenVBIDevice(void)
         fmt.type = V4L2_BUF_TYPE_VBI_CAPTURE;
         if (0 != ioctl(fd, VIDIOC_G_FMT, &fmt))
         {
-#ifdef USING_V4L1
-            LOG(VB_RECORD, LOG_INFO, "V4L2 VBI setup failed, trying v1 ioctl");
-            // Try V4L v1 VBI ioctls, iff V4L v2 fails
-            struct vbi_format old_fmt;
-            memset(&old_fmt, 0, sizeof(vbi_format));
-            if (ioctl(fd, VIDIOCGVBIFMT, &old_fmt) < 0)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "Failed to query vbi capabilities (V4L1)");
-                close(fd);
-                return -1;
-            }
-            fmt.fmt.vbi.sampling_rate    = old_fmt.sampling_rate;
-            fmt.fmt.vbi.offset           = 0;
-            fmt.fmt.vbi.samples_per_line = old_fmt.samples_per_line;
-            fmt.fmt.vbi.start[0]         = old_fmt.start[0];
-            fmt.fmt.vbi.start[1]         = old_fmt.start[1];
-            fmt.fmt.vbi.count[0]         = old_fmt.count[0];
-            fmt.fmt.vbi.count[1]         = old_fmt.count[1];
-            fmt.fmt.vbi.flags            = old_fmt.flags;
-#else // if !USING_V4L1
             LOG(VB_RECORD, LOG_ERR, "V4L2 VBI setup failed");
             close(fd);
             return -1;
-#endif // !USING_V4L1
         }
         LOG(VB_RECORD, LOG_INFO, LOC +
             QString("vbi_format  rate: %1"

@@ -1,21 +1,28 @@
+#include "mythcdrom.h"
+
+#ifdef HAVE_LIBUDFREAD
+#include <udfread/udfread.h>
+#include <udfread/blockinput.h>
+#else
+#include "udfread.h"
+#include "blockinput.h"
+#endif
+
 #include <QDir>
 #include <QFileInfo>
 
 #include "compat.h"
-#include "mythcdrom.h"
 #include "mythconfig.h"
-#include "remotefile.h"
-#include "blockinput.h"
-#include "udfread.h"
-#ifdef linux
-#include "mythcdrom-linux.h"
-#elif defined(__FreeBSD__)
-#include "mythcdrom-freebsd.h"
-#elif CONFIG_DARWIN
-#include "mythcdrom-darwin.h"
-#endif
 #include "mythlogging.h"
+#include "remotefile.h"
 
+#ifdef linux
+#   include "mythcdrom-linux.h"
+#elif defined(__FreeBSD__)
+#   include "mythcdrom-freebsd.h"
+#elif CONFIG_DARWIN
+#   include "mythcdrom-darwin.h"
+#endif
 
 // If your DVD has directories in lowercase, then it is wrongly mounted!
 // DVDs use the UDF filesystem, NOT ISO9660. Fix your /etc/fstab.

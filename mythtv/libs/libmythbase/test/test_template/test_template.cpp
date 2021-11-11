@@ -55,6 +55,7 @@ void TestTemplate::example_benchmark_test(void)
         int sum = 0;
         for (int i = 0; i < 999; i++)
             sum += i;
+        Q_UNUSED(sum);
     }
 }
 

@@ -5104,30 +5104,31 @@ void TV::ChangeSpeed(int Direction)
     m_playerContext.m_ffRewSpeed += Direction;
 
     float time = StopFFRew();
-    float speed = NAN;
-    QString mesg;
+    float speed {NAN};
 
-    switch (m_playerContext.m_ffRewSpeed)
+    // Make sure these values for m_ffRewSpeed in TV::ChangeSpeed()
+    // and PlayerContext::GetPlayMessage() stay in sync.
+    if (m_playerContext.m_ffRewSpeed ==  0)
+        speed = m_playerContext.m_tsNormal;
+    else if (m_playerContext.m_ffRewSpeed == -1)
+        speed = 1.0F / 3;
+    else if (m_playerContext.m_ffRewSpeed == -2)
+        speed = 1.0F / 8;
+    else if (m_playerContext.m_ffRewSpeed == -3)
+        speed = 1.0F / 16;
+    else if (m_playerContext.m_ffRewSpeed == -4)
     {
-        case  4: speed = 16.0F;     mesg = tr("Speed 16X");   break;
-        case  3: speed = 8.0F;      mesg = tr("Speed 8X");    break;
-        case  2: speed = 3.0F;      mesg = tr("Speed 3X");    break;
-        case  1: speed = 2.0F;      mesg = tr("Speed 2X");    break;
-        case  0: speed = 1.0F;      mesg = m_playerContext.GetPlayMessage(); break;
-        case -1: speed = 1.0F / 3;  mesg = tr("Speed 1/3X");  break;
-        case -2: speed = 1.0F / 8;  mesg = tr("Speed 1/8X");  break;
-        case -3: speed = 1.0F / 16; mesg = tr("Speed 1/16X"); break;
-        case -4:
-            DoTogglePause(true);
-            return;
-        default:
-            m_playerContext.m_ffRewSpeed = old_speed;
-            return;
+        DoTogglePause(true);
+        return;
     }
-
+    else
+    {
+        m_playerContext.m_ffRewSpeed = old_speed;
+        return;
+    }
+     
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
-    if (m_player && !m_player->Play(
-            (!m_playerContext.m_ffRewSpeed) ? m_playerContext.m_tsNormal: speed, m_playerContext.m_ffRewSpeed == 0))
+    if (m_player && !m_player->Play(speed, m_playerContext.m_ffRewSpeed == 0))
     {
         m_playerContext.m_ffRewSpeed = old_speed;
         m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
@@ -5135,6 +5136,7 @@ void TV::ChangeSpeed(int Direction)
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     DoPlayerSeek(time);
+    QString mesg = m_playerContext.GetPlayMessage();
     UpdateOSDSeekMessage(mesg, kOSDTimeout_Med);
 
     SetSpeedChangeTimer(0ms, __LINE__);

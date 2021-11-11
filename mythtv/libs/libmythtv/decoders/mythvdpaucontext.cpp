@@ -68,7 +68,7 @@ int MythVDPAUContext::InitialiseContext(AVCodecContext* Context)
         return -1;
     }
 
-    // allocate the hardware frames context
+    // Allocate the hardware frames context
     Context->hw_frames_ctx = av_hwframe_ctx_alloc(hwdeviceref);
     if (!Context->hw_frames_ctx)
     {
@@ -137,7 +137,7 @@ MythCodecID MythVDPAUContext::GetSupportedCodec(AVCodecContext **Context,
 
     // VDPAU only supports 8bit 420p:(
     VideoFrameType type = MythAVUtil::PixelFormatToFrameType((*Context)->pix_fmt);
-    bool vdpau = (type == FMT_YV12) && MythVDPAUHelper::HaveVDPAU() &&
+    bool vdpau = (type == FMT_YV12 || type == FMT_VDPAU) && MythVDPAUHelper::HaveVDPAU() &&
                  (decodeonly ? codec_is_vdpau_dechw(success) : codec_is_vdpau_hw(success));
 
     if (vdpau)

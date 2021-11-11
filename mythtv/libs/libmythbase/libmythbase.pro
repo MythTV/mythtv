@@ -171,7 +171,7 @@ inc2.files = $${inc.files}
 
 INSTALLS += inc inc2
 
-INCLUDEPATH += ../../external/qjsonwrapper/ ../../external/libudfread ./platforms
+INCLUDEPATH += ../../external/qjsonwrapper/ ./platforms
 INCLUDEPATH += ./http ./http/serialisers
 DEPENDPATH  +=  ../../external/libudfread ./http ./http/serialisers
 
@@ -240,7 +240,16 @@ QT += xml sql network widgets
 
 include ( ../libs-targetfix.pro )
 
-LIBS += -L../../external/libudfread -lmythudfread-$$LIBVERSION
+using_libudfread_external: {
+    DEFINES += HAVE_LIBUDFREAD
+    QMAKE_CXXFLAGS += $$LIBUDFREAD_CFLAGS
+    LIBS           += $$LIBUDFREAD_LIBS
+} else {
+    INCLUDEPATH += ../../external/libudfread
+    DEPENDPATH  += ../../external/libudfread
+    LIBS        += -L../../external/libudfread -lmythudfread-$$LIBVERSION
+}
+
 LIBS += $$EXTRA_LIBS $$LATE_LIBS
 
 test_clean.commands = -cd test/ && $(MAKE) -f Makefile clean

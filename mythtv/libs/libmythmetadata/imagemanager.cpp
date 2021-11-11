@@ -834,7 +834,7 @@ int ImageDb<FS>::InsertDbImage(ImageItemK &im, bool checkForDuplicate) const
     query.bindValue(":EXTENSION", im.m_extension);
     query.bindValue(":DATE",      static_cast<qint64>(im.m_date.count()));
     query.bindValue(":ORIENT",    im.m_orientation);
-    query.bindValue(":COMMENT",   im.m_comment.isNull() ? "" : im.m_comment);
+    query.bindValueNoNull(":COMMENT", im.m_comment);
     query.bindValue(":HIDDEN",    im.m_isHidden);
     query.bindValue(":COVER",     FS::DbId(im.m_userThumbnail));
 
@@ -878,7 +878,7 @@ bool ImageDb<FS>::UpdateDbImage(ImageItemK &im) const
     query.bindValue(":HIDDEN",    im.m_isHidden);
     query.bindValue(":ORIENT",    im.m_orientation);
     query.bindValue(":COVER",     FS::DbId(im.m_userThumbnail));
-    query.bindValue(":COMMENT",   im.m_comment.isNull() ? "" : im.m_comment);
+    query.bindValueNoNull(":COMMENT", im.m_comment);
 
     if (query.exec())
         return true;

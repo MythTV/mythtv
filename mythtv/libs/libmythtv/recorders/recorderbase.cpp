@@ -860,23 +860,21 @@ RecorderBase *RecorderBase::CreateRecorder(
     RecorderBase *recorder = nullptr;
     if (genOpt.m_inputType == "MPEG")
     { // NOLINTNEXTLINE(bugprone-branch-clone)
-#ifdef USING_IVTV
+#ifdef USING_V4L2
         recorder = new MpegRecorder(tvrec);
-#endif // USING_IVTV
+#endif // USING_V4L2
     }
-#ifdef USING_HDPVR
+#ifdef USING_V4L2
     else if (genOpt.m_inputType == "HDPVR")
     {
         recorder = new MpegRecorder(tvrec);
     }
-#endif // USING_HDPVR
-#ifdef USING_V4L2
     else if (genOpt.m_inputType == "V4L2ENC")
     {
         if (dynamic_cast<V4LChannel*>(channel))
             recorder = new V4L2encRecorder(tvrec, dynamic_cast<V4LChannel*>(channel));
     }
-#endif
+#endif // USING_V4L2
 #ifdef USING_FIREWIRE
     else if (genOpt.m_inputType == "FIREWIRE")
     {
@@ -954,7 +952,7 @@ RecorderBase *RecorderBase::CreateRecorder(
     }
     else if (genOpt.m_inputType == "DEMO")
     {
-#ifdef USING_IVTV
+#ifdef USING_V4L2
         recorder = new MpegRecorder(tvrec);
 #else
         recorder = new ImportRecorder(tvrec);

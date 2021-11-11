@@ -201,11 +201,8 @@ QList<MythUIType *> MythUIType::GetAllDescendants(void)
 {
     QList<MythUIType *> descendants {};
 
-    for (auto child_it = m_childrenList.begin();
-         child_it != m_childrenList.end();
-         child_it++)
+    for (const auto & item :qAsConst(m_childrenList))
     {
-        MythUIType *item = *child_it;
         descendants += item;
         descendants += item->GetAllDescendants();
     }

@@ -334,8 +334,8 @@ const MythDisplayModes& MythDisplayMutter::GetVideoModes()
         m_modeMap.insert(MythDisplayMode::CalcKey(resolution, rate), mmode.id);
     }
 
-    for (auto it = screenmap.begin(); screenmap.end() != it; ++it)
-        m_videoModes.push_back(it->second);
+    for (auto & it : screenmap)
+        m_videoModes.push_back(it.second);
 
     DebugModes();
     return m_videoModes;
