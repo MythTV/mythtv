@@ -64,8 +64,8 @@ static constexpr std::chrono::milliseconds LONGPRESS_INTERVAL { 1s    };
 
 #define LOC QString("MythMainWindow: ")
 
-static MythMainWindow *mainWin = nullptr;
-static QMutex mainLock;
+static MythMainWindow *s_mainWin = nullptr;
+static QMutex s_mainLock;
 
 /**
  * \brief Return the existing main window, or create one
@@ -76,26 +76,26 @@ static QMutex mainLock;
  */
 MythMainWindow *MythMainWindow::getMainWindow(const bool UseDB)
 {
-    if (mainWin)
-        return mainWin;
+    if (s_mainWin)
+        return s_mainWin;
 
-    QMutexLocker lock(&mainLock);
+    QMutexLocker lock(&s_mainLock);
 
-    if (!mainWin)
+    if (!s_mainWin)
     {
-        mainWin = new MythMainWindow(UseDB);
-        gCoreContext->SetGUIObject(mainWin);
+        s_mainWin = new MythMainWindow(UseDB);
+        gCoreContext->SetGUIObject(s_mainWin);
     }
 
-    return mainWin;
+    return s_mainWin;
 }
 
 void MythMainWindow::destroyMainWindow(void)
 {
     if (gCoreContext)
         gCoreContext->SetGUIObject(nullptr);
-    delete mainWin;
-    mainWin = nullptr;
+    delete s_mainWin;
+    s_mainWin = nullptr;
 }
 
 MythMainWindow *GetMythMainWindow(void)
@@ -105,7 +105,7 @@ MythMainWindow *GetMythMainWindow(void)
 
 bool HasMythMainWindow(void)
 {
-    return mainWin != nullptr;
+    return s_mainWin != nullptr;
 }
 
 void DestroyMythMainWindow(void)
@@ -120,9 +120,9 @@ MythPainter *GetMythPainter(void)
 
 MythNotificationCenter *GetNotificationCenter(void)
 {
-    if (!mainWin || !mainWin->GetCurrentNotificationCenter())
+    if (!s_mainWin || !s_mainWin->GetCurrentNotificationCenter())
         return nullptr;
-    return mainWin->GetCurrentNotificationCenter();
+    return s_mainWin->GetCurrentNotificationCenter();
 }
 
 MythMainWindow::MythMainWindow(const bool UseDB)
