@@ -28,6 +28,7 @@
 #define localtime_r(X, Y) (memcpy(Y, localtime(X), sizeof(struct tm)), Y)
 #endif
 
+#define MAX_STREAMS 100
 
 /**
  * @brief Add a stream to an MPEG media stream.
