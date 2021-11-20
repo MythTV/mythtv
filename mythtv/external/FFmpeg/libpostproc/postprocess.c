@@ -91,8 +91,6 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #include "libavutil/avstring.h"
 #include "libavutil/ppc/util_altivec.h"
 
-#include "libavutil/cpu.h"
-
 #include "libavutil/ffversion.h"
 const char postproc_ffversion[] = "FFmpeg version " FFMPEG_VERSION;
 
