@@ -1254,11 +1254,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         }
 
         m_dontSyncPositionMap = true;
-        m_ic->build_index = 1;
     }
-    // we have a position map, disable libavformat's seek index
-    else
-        m_ic->build_index = 0;
 
     av_dump_format(m_ic, 0, filename, 0);
 
