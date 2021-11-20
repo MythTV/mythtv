@@ -14,8 +14,6 @@ extern "C" {
 #include <cmath>
 #include <strings.h>
 
-static const float eps = 1E-5;
-
 /*
   Most of the comments below were cut&paste from ITU-T Rec. H.264
   as found here:  http://www.itu.int/rec/T-REC-H.264/e
@@ -478,13 +476,15 @@ uint H2645Parser::aspectRatio(void) const
             break;
     }
 
+    // TODO use an integer-based Rational number instead of floating point
+    static constexpr double eps = 1E-5;
     if (aspect == 0.0)
         return 0;
-    if (fabs(aspect - 1.3333333333333333) < static_cast<double>(eps))
+    if (fabs(aspect - 1.3333333333333333) < eps)
         return 2;
-    if (fabs(aspect - 1.7777777777777777) < static_cast<double>(eps))
+    if (fabs(aspect - 1.7777777777777777) < eps)
         return 3;
-    if (fabs(aspect - 2.21) < static_cast<double>(eps))
+    if (fabs(aspect - 2.21) < eps)
         return 4;
 
     return aspect * 1000000;
