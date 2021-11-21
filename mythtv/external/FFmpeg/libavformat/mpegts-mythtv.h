@@ -1,5 +1,5 @@
 /*
- * MPEG2 transport stream defines
+ * MPEG-2 transport stream defines
  * Copyright (c) 2003 Fabrice Bellard
  *
  * This file is part of FFmpeg.
@@ -30,17 +30,18 @@
 #define TS_MAX_PACKET_SIZE 204
 
 #define NB_PID_MAX 8192
+#define USUAL_SECTION_SIZE 1024 /* except EIT which is limited to 4096 */
 #define MAX_SECTION_SIZE 4096
 
 /* pids */
-#define PAT_PID                 0x0000
-#define SDT_PID                 0x0011
+#define PAT_PID         0x0000 /* Program Association Table */
+#define SDT_PID         0x0011 /* Service Description Table */
 
 /* table ids */
-#define PAT_TID   0x00
-#define PMT_TID   0x02
-#define M4OD_TID  0x05
-#define SDT_TID   0x42
+#define PAT_TID         0x00 /* Program Association section */
+#define PMT_TID         0x02 /* Program Map section */
+#define M4OD_TID        0x05
+#define SDT_TID         0x42 /* Service Description section - actual TS */
 
 #define DVB_CAROUSEL_ID             0x13
 #define DVB_VBI_DATA_ID             0x45
@@ -59,20 +60,24 @@
 #define STREAM_TYPE_AUDIO_AAC       0x0f
 #define STREAM_TYPE_AUDIO_AAC_LATM  0x11
 #define STREAM_TYPE_VIDEO_MPEG4     0x10
+#define STREAM_TYPE_METADATA        0x15
 #define STREAM_TYPE_VIDEO_H264      0x1b
+#define STREAM_TYPE_VIDEO_HEVC      0x24
+#define STREAM_TYPE_VIDEO_CAVS      0x42
 #define STREAM_TYPE_VIDEO_VC1       0xea
 #define STREAM_TYPE_VIDEO_DIRAC     0xd1
 
 #define STREAM_TYPE_AUDIO_AC3       0x81
-#define STREAM_TYPE_AUDIO_DTS       0x8a
-#define STREAM_TYPE_AUDIO_HDMV_AC3_PLUS      0x84
-#define STREAM_TYPE_AUDIO_HDMV_AC3_TRUE_HD   0x83
-#define STREAM_TYPE_AUDIO_HDMV_DTS           0x82
-#define STREAM_TYPE_AUDIO_HDMV_DTS_HD        0x85
-#define STREAM_TYPE_AUDIO_HDMV_DTS_HD_MASTER 0x86
+#define STREAM_TYPE_AUDIO_DTS       0x82
+#define STREAM_TYPE_AUDIO_TRUEHD    0x83
+#define STREAM_TYPE_AUDIO_EAC3      0x87
+//#define STREAM_TYPE_AUDIO_DTS       0x8a
+//#define STREAM_TYPE_AUDIO_HDMV_AC3_PLUS      0x84
+//#define STREAM_TYPE_AUDIO_HDMV_DTS_HD        0x85
+//#define STREAM_TYPE_AUDIO_HDMV_DTS_HD_MASTER 0x86
 
-#define STREAM_TYPE_SUBTITLE_DVB    0x100
-#define STREAM_TYPE_VBI_DVB         0x101
+//#define STREAM_TYPE_SUBTITLE_DVB    0x100
+//#define STREAM_TYPE_VBI_DVB         0x101
 
 typedef struct MpegTSContext MpegTSContext;
 
@@ -82,7 +87,7 @@ int avpriv_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                            const uint8_t *buf, int len);
 void avpriv_mpegts_parse_close(MpegTSContext *ts);
 
-typedef struct {
+typedef struct SLConfigDescr {
     int use_au_start;
     int use_au_end;
     int use_rand_acc_pt;
@@ -99,7 +104,7 @@ typedef struct {
     int packet_seq_num_len;
 } SLConfigDescr;
 
-typedef struct {
+typedef struct Mp4Descr {
     int es_id;
     int dec_config_descr_len;
     uint8_t *dec_config_descr;
