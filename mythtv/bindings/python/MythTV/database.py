@@ -1119,10 +1119,11 @@ class DBCache( MythSchema ):
             def __repr__(self): return py23_repr(str(self))
             def __iter__(self): return self.iterkeys()
             def __init__(self, result):
+                # remove comments in 'type' like "datetime /* mariadb-5.3 */"
                 data = [(row[0],
                          OrdDict(zip( \
-                                ('type','null','key','default','extra'),
-                                row[1:])) \
+                            ('type','null','key','default','extra'),
+                            (row[1].split('/*', 1)[0].rstrip(), ) + row[2:])) \
                          )for row in result]
                 OrdDict.__init__(self, data)
             def __getitem__(self,key):
