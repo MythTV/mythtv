@@ -336,6 +336,25 @@ static int get_canonical_lang(const char *lang_cstr)
     return iso639_key_to_canonical_key(lang);
 }
 
+/** @brief returns a human readable string for the AVMediaType enum.
+
+av_get_media_type_string() from <libavutil/avutil.h> returns NULL for unknown or
+invalid codec_type, so use this instead.
+ */
+static const char *ff_codec_type_string(enum AVMediaType codec_type)
+{
+    switch (codec_type)
+    {
+        case AVMEDIA_TYPE_UNKNOWN:       return "Unknown";
+        case AVMEDIA_TYPE_VIDEO:         return "Video";
+        case AVMEDIA_TYPE_AUDIO:         return "Audio";
+        case AVMEDIA_TYPE_DATA:          return "Data";
+        case AVMEDIA_TYPE_SUBTITLE:      return "Subtitle";
+        case AVMEDIA_TYPE_ATTACHMENT:    return "Attachment";
+        default:                         return "Invalid Codec Type";
+    }
+}
+
 AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
                                  const ProgramInfo &pginfo,
                                  PlayerFlags flags)
