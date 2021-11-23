@@ -224,21 +224,3 @@ const char *ff_codec_id_string(enum AVCodecID codec_id)
     }
     return "Unknown Codec ID";
 }
-
-/** \fn codec_type_string(enum CodecType)
- *  returns a human readable string for the CodecType enum.
- */
-const char *ff_codec_type_string(enum AVMediaType codec_type)
-{
-    switch (codec_type)
-    {
-        case AVMEDIA_TYPE_UNKNOWN:       return "Unknown";
-        case AVMEDIA_TYPE_VIDEO:         return "Video";
-        case AVMEDIA_TYPE_AUDIO:         return "Audio";
-        case AVMEDIA_TYPE_DATA:          return "Data";
-        case AVMEDIA_TYPE_SUBTITLE:      return "Subtitle";
-        case AVMEDIA_TYPE_ATTACHMENT:    return "Attachment";
-    }
-    return "Invalid Codec Type";
-};
-

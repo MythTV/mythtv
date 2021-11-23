@@ -339,6 +339,25 @@ static int get_canonical_lang(const char *lang_cstr)
     return iso639_key_to_canonical_key(lang);
 }
 
+/** @brief returns a human readable string for the AVMediaType enum.
+
+av_get_media_type_string() from <libavutil/avutil.h> returns NULL for unknown or
+invalid codec_type, so use this instead.
+ */
+static const char* AVMediaTypeToString(enum AVMediaType codec_type)
+{
+    switch (codec_type)
+    {
+        case AVMEDIA_TYPE_UNKNOWN:       return "Unknown";
+        case AVMEDIA_TYPE_VIDEO:         return "Video";
+        case AVMEDIA_TYPE_AUDIO:         return "Audio";
+        case AVMEDIA_TYPE_DATA:          return "Data";
+        case AVMEDIA_TYPE_SUBTITLE:      return "Subtitle";
+        case AVMEDIA_TYPE_ATTACHMENT:    return "Attachment";
+        default:                         return "Invalid Codec Type";
+    }
+}
+
 AvFormatDecoder::AvFormatDecoder(MythPlayer *parent,
                                  const ProgramInfo &pginfo,
                                  PlayerFlags flags)
@@ -1486,7 +1505,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InitVideoCodec ID:%1 Type:%2 Size:%3x%4")
             .arg(ff_codec_id_string(enc->codec_id),
-                 ff_codec_type_string(enc->codec_type))
+                 AVMediaTypeToString(enc->codec_type))
             .arg(enc->width).arg(enc->height));
 
     if (m_ringBuffer && m_ringBuffer->IsDVD())
@@ -1996,7 +2015,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         AVCodecParameters *par = m_ic->streams[strm]->codecpar;
         AVCodecContext *enc = nullptr;
 
-        QString codectype(ff_codec_type_string(par->codec_type));
+        QString codectype(AVMediaTypeToString(par->codec_type));
         if (par->codec_type == AVMEDIA_TYPE_VIDEO)
             codectype += QString("(%1x%2)").arg(par->width).arg(par->height);
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -2064,7 +2083,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                 "type (%3) already open, leaving it alone.")
                             .arg(reinterpret_cast<unsigned long long>(enc), 0, 16)
                             .arg(ff_codec_id_string(enc->codec_id),
-                                 ff_codec_type_string(enc->codec_type)));
+                                 AVMediaTypeToString(enc->codec_type)));
                 }
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("codec %1 has %2 channels")
@@ -2083,7 +2102,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 m_bitrate += par->bit_rate;
 
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("subtitle codec (%1)")
-                        .arg(ff_codec_type_string(par->codec_type)));
+                        .arg(AVMediaTypeToString(par->codec_type)));
                 break;
             }
             case AVMEDIA_TYPE_DATA:
@@ -2091,7 +2110,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 ScanTeletextCaptions(static_cast<int>(strm));
                 m_bitrate += par->bit_rate;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("data codec (%1)")
-                        .arg(ff_codec_type_string(par->codec_type)));
+                        .arg(AVMediaTypeToString(par->codec_type)));
                 break;
             }
             case AVMEDIA_TYPE_ATTACHMENT:
@@ -2102,7 +2121,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 m_bitrate += par->bit_rate;
                 LOG(VB_PLAYBACK, LOG_INFO, LOC +
                     QString("Attachment codec (%1)")
-                        .arg(ff_codec_type_string(par->codec_type)));
+                        .arg(AVMediaTypeToString(par->codec_type)));
                 break;
             }
             default:
@@ -2110,7 +2129,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 m_bitrate += par->bit_rate;
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
                     QString("Unknown codec type (%1)")
-                        .arg(ff_codec_type_string(par->codec_type)));
+                        .arg(AVMediaTypeToString(par->codec_type)));
                 break;
             }
         }
@@ -2320,7 +2339,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             m_tracks[kTrackTypeVideo].push_back(si);
             m_selectedTrack[kTrackTypeVideo] = si;
 
-            QString codectype(ff_codec_type_string(enc->codec_type));
+            QString codectype(AVMediaTypeToString(enc->codec_type));
             if (enc->codec_type == AVMEDIA_TYPE_VIDEO)
                 codectype += QString("(%1x%2)").arg(enc->width).arg(enc->height);
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
@@ -2543,7 +2562,7 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
             QString("Could not open codec 0x%1, id(%2) type(%3) "
                     "ignoring. reason %4").arg((uint64_t)avctx,0,16)
             .arg(ff_codec_id_string(avctx->codec_id),
-                 ff_codec_type_string(avctx->codec_type),
+                 AVMediaTypeToString(avctx->codec_type),
                  av_make_error_stdstring(error, ret)));
         return false;
     }
@@ -2552,7 +2571,7 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
         QString("Opened codec 0x%1, id(%2) type(%3)")
         .arg((uint64_t)avctx,0,16)
         .arg(ff_codec_id_string(avctx->codec_id),
-             ff_codec_type_string(avctx->codec_type)));
+             AVMediaTypeToString(avctx->codec_type)));
     return true;
 }
 
@@ -5037,7 +5056,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 LOG(VB_PLAYBACK, LOG_ERR, LOC +
                     QString("No codec for stream index %1, type(%2) id(%3:%4)")
                         .arg(pkt->stream_index)
-                    .arg(ff_codec_type_string(codec_type),
+                    .arg(AVMediaTypeToString(codec_type),
                          ff_codec_id_string(curstream->codecpar->codec_id))
                         .arg(curstream->codecpar->codec_id));
                 // Process Stream Change in case we have no audio
@@ -5098,7 +5117,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Decoding - id(%1) type(%2)")
                         .arg(ff_codec_id_string(ctx->codec_id),
-                             ff_codec_type_string(ctx->codec_type)));
+                             AVMediaTypeToString(ctx->codec_type)));
                 have_err = true;
                 break;
             }

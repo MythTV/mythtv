@@ -2104,7 +2104,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             av_log(NULL, AV_LOG_DEBUG, "mpegts_add_stream: "
                    "stream #%d, has id 0x%x and codec %s, type %s at 0x%x\n",
                    st->index, st->id, ff_codec_id_string(st->codecpar->codec_id),
-                   ff_codec_type_string(st->codecpar->codec_type), st);
+                   av_get_media_type_string(st->codecpar->codec_type), st);
         } else {
             PESContext *pes = NULL;
 
@@ -2167,7 +2167,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             av_log(NULL, AV_LOG_DEBUG, "mpegts_add_stream: "
                    "stream #%d, has id 0x%x and codec %s, type %s at 0x%x\n",
                    st->index, st->id, ff_codec_id_string(st->codecpar->codec_id),
-                   ff_codec_type_string(st->codecpar->codec_type), st);
+                   av_get_media_type_string(st->codecpar->codec_type), st);
         }
         add_pid_to_pmt(ts, id, pid);
         av_program_add_stream_index(ts->stream, id, st->index);
