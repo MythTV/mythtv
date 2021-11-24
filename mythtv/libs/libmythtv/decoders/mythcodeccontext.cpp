@@ -314,7 +314,7 @@ void MythCodecContext::InitVideoCodec(AVCodecContext *Context,
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Using software scaling to convert pixel format %1 for "
                     "codec %2").arg(av_get_pix_fmt_name(Context->pix_fmt),
-                                    ff_codec_id_string(Context->codec_id)));
+                                    avcodec_get_name(Context->codec_id)));
     }
 }
 

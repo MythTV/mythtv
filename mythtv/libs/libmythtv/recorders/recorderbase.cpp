@@ -452,7 +452,7 @@ void RecorderBase::FinishRecording(void)
             recFile->m_containerFormat = m_containerFormat;
 
             // Video
-            recFile->m_videoCodec = ff_codec_id_string(m_primaryVideoCodec);
+            recFile->m_videoCodec = avcodec_get_name(m_primaryVideoCodec);
             switch (m_curRecording->QueryAverageAspectRatio())
             {
                 case MARK_ASPECT_1_1 :
@@ -477,7 +477,7 @@ void RecorderBase::FinishRecording(void)
             recFile->m_videoFrameRate = (double)m_curRecording->QueryAverageFrameRate() / 1000.0;
 
             // Audio
-            recFile->m_audioCodec = ff_codec_id_string(m_primaryAudioCodec);
+            recFile->m_audioCodec = avcodec_get_name(m_primaryAudioCodec);
 
             recFile->Save();
         }
@@ -822,7 +822,7 @@ void RecorderBase::VideoCodecChange(AVCodecID vCodec)
 {
     if (m_curRecording && m_curRecording->GetRecordingFile())
     {
-        m_curRecording->GetRecordingFile()->m_videoCodec = ff_codec_id_string(vCodec);
+        m_curRecording->GetRecordingFile()->m_videoCodec = avcodec_get_name(vCodec);
         m_curRecording->GetRecordingFile()->Save();
     }
 }
@@ -831,7 +831,7 @@ void RecorderBase::AudioCodecChange(AVCodecID aCodec)
 {
     if (m_curRecording && m_curRecording->GetRecordingFile())
     {
-        m_curRecording->GetRecordingFile()->m_audioCodec = ff_codec_id_string(aCodec);
+        m_curRecording->GetRecordingFile()->m_audioCodec = avcodec_get_name(aCodec);
         m_curRecording->GetRecordingFile()->Save();
     }
 }

@@ -1504,7 +1504,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 {
     LOG(VB_PLAYBACK, LOG_INFO, LOC +
         QString("InitVideoCodec ID:%1 Type:%2 Size:%3x%4")
-            .arg(ff_codec_id_string(enc->codec_id),
+            .arg(avcodec_get_name(enc->codec_id),
                  AVMediaTypeToString(enc->codec_type))
             .arg(enc->width).arg(enc->height));
 
@@ -2021,7 +2021,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Stream #%1: ID: 0x%2 Codec ID: %3 Type: %4 Bitrate: %5")
                 .arg(strm).arg(static_cast<uint64_t>(m_ic->streams[strm]->id), 0, 16)
-                .arg(ff_codec_id_string(par->codec_id),
+                .arg(avcodec_get_name(par->codec_id),
                      codectype).arg(par->bit_rate));
 
         switch (par->codec_type)
@@ -2082,12 +2082,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         QString("Warning, audio codec 0x%1 id(%2) "
                                 "type (%3) already open, leaving it alone.")
                             .arg(reinterpret_cast<unsigned long long>(enc), 0, 16)
-                            .arg(ff_codec_id_string(enc->codec_id),
+                            .arg(avcodec_get_name(enc->codec_id),
                                  AVMediaTypeToString(enc->codec_type)));
                 }
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("codec %1 has %2 channels")
-                        .arg(ff_codec_id_string(par->codec_id))
+                        .arg(avcodec_get_name(par->codec_id))
                         .arg(par->channels));
 
                 m_bitrate += par->bit_rate;
@@ -2145,7 +2145,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             continue;
 
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Looking for decoder for %1")
-                .arg(ff_codec_id_string(par->codec_id)));
+                .arg(avcodec_get_name(par->codec_id)));
 
         if (par->codec_id == AV_CODEC_ID_PROBE)
         {
@@ -2164,7 +2164,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("Could not find decoder for codec (%1), ignoring.")
-                    .arg(ff_codec_id_string(par->codec_id)));
+                    .arg(avcodec_get_name(par->codec_id)));
 
             // Nigel's bogus codec-debug. Dump the list of codecs & decoders,
             // and have one last attempt to find a decoder. This is usually
@@ -2211,8 +2211,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         {
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Already opened codec not matching (%1 vs %2). Reopening")
-                .arg(ff_codec_id_string(enc->codec_id),
-                     ff_codec_id_string(enc->codec->id)));
+                .arg(avcodec_get_name(enc->codec_id),
+                     avcodec_get_name(enc->codec->id)));
             m_codecMap.FreeCodecContext(m_ic->streams[strm]);
             enc = m_codecMap.GetCodecContext(m_ic->streams[strm]);
         }
@@ -2345,7 +2345,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             LOG(VB_PLAYBACK, LOG_INFO, LOC +
                 QString("Selected track #%1: ID: 0x%2 Codec ID: %3 Profile: %4 Type: %5 Bitrate: %6")
                     .arg(selTrack).arg(static_cast<uint64_t>(stream->id), 0, 16)
-                    .arg(ff_codec_id_string(enc->codec_id),
+                    .arg(avcodec_get_name(enc->codec_id),
                          avcodec_profile_name(enc->codec_id, enc->profile),
                          codectype,
                          QString::number(enc->bit_rate)));
@@ -2561,7 +2561,7 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Could not open codec 0x%1, id(%2) type(%3) "
                     "ignoring. reason %4").arg((uint64_t)avctx,0,16)
-            .arg(ff_codec_id_string(avctx->codec_id),
+            .arg(avcodec_get_name(avctx->codec_id),
                  AVMediaTypeToString(avctx->codec_type),
                  av_make_error_stdstring(error, ret)));
         return false;
@@ -2570,7 +2570,7 @@ bool AvFormatDecoder::OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec)
     LOG(VB_GENERAL, LOG_INFO, LOC +
         QString("Opened codec 0x%1, id(%2) type(%3)")
         .arg((uint64_t)avctx,0,16)
-        .arg(ff_codec_id_string(avctx->codec_id),
+        .arg(avcodec_get_name(avctx->codec_id),
              AVMediaTypeToString(avctx->codec_type)));
     return true;
 }
@@ -5057,7 +5057,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     QString("No codec for stream index %1, type(%2) id(%3:%4)")
                         .arg(pkt->stream_index)
                     .arg(AVMediaTypeToString(codec_type),
-                         ff_codec_id_string(curstream->codecpar->codec_id))
+                         avcodec_get_name(curstream->codecpar->codec_id))
                         .arg(curstream->codecpar->codec_id));
                 // Process Stream Change in case we have no audio
                 if (codec_type == AVMEDIA_TYPE_AUDIO && !m_audio->HasAudioIn())
@@ -5116,7 +5116,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Decoding - id(%1) type(%2)")
-                        .arg(ff_codec_id_string(ctx->codec_id),
+                        .arg(avcodec_get_name(ctx->codec_id),
                              AVMediaTypeToString(ctx->codec_type)));
                 have_err = true;
                 break;
@@ -5213,7 +5213,7 @@ QString AvFormatDecoder::GetRawEncodingType(void)
     int stream = m_selectedTrack[kTrackTypeVideo].m_av_stream_index;
     if (stream < 0 || !m_ic)
         return {};
-    return ff_codec_id_string(m_ic->streams[stream]->codecpar->codec_id);
+    return avcodec_get_name(m_ic->streams[stream]->codecpar->codec_id);
 }
 
 void AvFormatDecoder::SetDisablePassThrough(bool disable)
