@@ -4182,7 +4182,6 @@ int avcodec_is_open(AVCodecContext *s);
 
 
 /* MythTV */
-const char *ff_codec_id_string(enum AVCodecID codec_id);
 const uint8_t *avpriv_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
 
 
