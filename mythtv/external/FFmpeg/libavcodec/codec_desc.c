@@ -3462,6 +3462,18 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("DVD Nav packet"),
     },
     {
+        .id        = AV_CODEC_ID_MPEG2VBI,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "mpeg2vbi",
+        .long_name = NULL_IF_CONFIG_SMALL("ivtv proprietary embedded VBI captions"),
+    },
+    {
+        .id        = AV_CODEC_ID_DVB_VBI,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "dvb_vbi",
+        .long_name = NULL_IF_CONFIG_SMALL("dvb teletext"),
+    },
+    {
         .id        = AV_CODEC_ID_DSMCC_B,
         .type      = AVMEDIA_TYPE_DATA,
         .name      = "dsmcc_b",
