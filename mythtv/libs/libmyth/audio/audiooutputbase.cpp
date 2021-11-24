@@ -636,7 +636,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     }
 
     VBAUDIO(QString("Original codec was %1, %2, %3 kHz, %4 channels")
-            .arg(ff_codec_id_string(m_codec),
+            .arg(avcodec_get_name(m_codec),
                  m_outputSettings->FormatToString(m_format))
             .arg(m_sampleRate/1000)
             .arg(m_sourceChannels));

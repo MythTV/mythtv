@@ -46,7 +46,7 @@ class MTV_PUBLIC RecordingFile
 
     AVContainer m_containerFormat  {formatUnknown};
 
-    QString     m_videoCodec; // ff_codec_id_string
+    QString     m_videoCodec; // avcodec_get_name
     QSize       m_videoResolution;
     double      m_videoAspectRatio {0.0};
     double      m_videoFrameRate   {0.0};

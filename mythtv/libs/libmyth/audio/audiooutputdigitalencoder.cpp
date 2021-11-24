@@ -104,7 +104,7 @@ bool AudioOutputDigitalEncoder::Init(
 {
     LOG(VB_AUDIO, LOG_INFO, LOC +
         QString("Init codecid=%1, br=%2, sr=%3, ch=%4")
-            .arg(ff_codec_id_string(codec_id)) .arg(bitrate)
+            .arg(avcodec_get_name(codec_id)) .arg(bitrate)
             .arg(samplerate) .arg(channels));
 
     if (!(m_inbuf || m_framebuf || m_outbuf))

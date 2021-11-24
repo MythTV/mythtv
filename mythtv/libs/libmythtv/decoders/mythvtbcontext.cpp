@@ -108,7 +108,7 @@ MythCodecID MythVTBContext::GetSupportedCodec(AVCodecContext **Context,
     if (mythprofile == MythCodecContext::NoProfile)
         return failure;
 
-    QString codec   = ff_codec_id_string((*Context)->codec_id);
+    QString codec   = avcodec_get_name((*Context)->codec_id);
     QString profile = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
     QString pixfmt  = av_get_pix_fmt_name((*Context)->pix_fmt);
 
