@@ -2855,7 +2855,7 @@ static void estimate_timings_from_pts(AVFormatContext *ic, int64_t old_offset)
 
             if (pkt->stream_index >= ic->nb_streams)
             {
-                av_free_packet(pkt);
+                av_packet_unref(pkt);
                 continue;
             }
 
