@@ -1589,10 +1589,6 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *got_frame_ptr,
         av_log(avctx, AV_LOG_ERROR, "incomplete frame\n");
         return AVERROR_INVALIDDATA;
     } else if (s->frame_size < buf_size) {
-        // FIXME, This 'if' statement can be taken out at some point in the
-        // future.  For now, it prevents people's logs filling up with these
-        // errors when they play .nuv files created by the old mythtranscode
-        if ((buf_size % s->frame_size) != 0)
         av_log(avctx, AV_LOG_DEBUG, "incorrect frame size - multiple frames in buffer?\n");
         buf_size= s->frame_size;
     }
