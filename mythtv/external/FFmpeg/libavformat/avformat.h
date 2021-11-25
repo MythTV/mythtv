@@ -1095,8 +1095,6 @@ typedef struct AVStream {
     unsigned int index_entries_allocated_size;
 
     /* mythtv addons */
-    int got_frame;
-
     int component_tag; ///< Component tag given in PMT, for MythTV MHEG
     int carousel_id;
     int data_id;
