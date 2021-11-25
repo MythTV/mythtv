@@ -1197,7 +1197,6 @@ static void update_initial_durations(AVFormatContext *s, AVStream *st,
                 cur_dts -= duration;
             }
         }
-#if 0 // Very verbose: ffmpeg ticket 1344
         if (pktl && pktl->pkt.dts != st->first_dts) {
             av_log(s, AV_LOG_DEBUG, "first_dts %s not matching first dts %s (pts %s, duration %"PRId64") in the queue\n",
                    av_ts2str(st->first_dts), av_ts2str(pktl->pkt.dts), av_ts2str(pktl->pkt.pts), pktl->pkt.duration);
@@ -1207,7 +1206,6 @@ static void update_initial_durations(AVFormatContext *s, AVStream *st,
             av_log(s, AV_LOG_DEBUG, "first_dts %s but no packet with dts in the queue\n", av_ts2str(st->first_dts));
             return;
         }
-#endif
         pktl          = s->internal->packet_buffer ? s->internal->packet_buffer : s->internal->parse_queue;
         st->first_dts = cur_dts;
     } else if (st->cur_dts != RELATIVE_TS_BASE)
