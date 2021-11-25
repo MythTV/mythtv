@@ -2651,7 +2651,7 @@ static int handle_packets(MpegTSContext *ts, int nb_packets)
     return ret;
 }
 
-static int mpegts_probe(AVProbeData *p)
+static int mpegts_probe(const AVProbeData *p)
 {
     const int size= p->buf_size;
     int maxscore=0;
