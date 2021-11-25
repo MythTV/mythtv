@@ -727,7 +727,6 @@ static int save_subtitle_set(AVCodecContext *avctx, AVSubtitle *sub, int *got_ou
     DVBSubCLUT *clut;
     uint32_t *clut_table;
     int i;
-    int offset_x=0, offset_y=0;
     int ret = 0;
 
 
