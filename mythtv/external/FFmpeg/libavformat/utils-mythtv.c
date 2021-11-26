@@ -23,63 +23,6 @@
 #include "internal.h"
 #include "mpegts-mythtv.h"
 
-#ifdef _WIN32
-#define gmtime_r(X, Y)    (memcpy(Y, gmtime(X),    sizeof(struct tm)), Y)
-#define localtime_r(X, Y) (memcpy(Y, localtime(X), sizeof(struct tm)), Y)
-#endif
-
-#define MAX_STREAMS 100
-
-/**
- * @brief Add a stream to an MPEG media stream.
- *
- * This is used by mpegts instead of av_new_stream, so we can
- * track new streams as indicated by the PMT.
- *
- * @param s MPEG media stream handle
- * @param st new media stream
- * @param id file format dependent stream id
- */
-AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id)
-{
-    int i;
-    
-    if (!st)
-    {
-        av_log(s, AV_LOG_ERROR, "av_add_stream: Error, AVStream is NULL");
-        return NULL;
-    }
-    
-    av_remove_stream(s, id, 0);
-    
-    if (s->nb_streams >= MAX_STREAMS)
-    {
-        av_log(s, AV_LOG_ERROR, "av_add_stream: Error, (s->nb_streams >= MAX_STREAMS)");
-        return NULL;
-    }
-    
-    if (s->iformat) {
-        /* no default bitrate if decoding */
-        st->codec->bit_rate = 0;
-    }
-    st->index = s->nb_streams;
-    st->id = id;
-    st->start_time = AV_NOPTS_VALUE;
-    st->duration = AV_NOPTS_VALUE;
-    st->cur_dts = AV_NOPTS_VALUE;
-    st->first_dts = AV_NOPTS_VALUE;
-    
-    /* default pts settings is MPEG like */
-    av_set_pts_info(st, 33, 1, 90000);
-    st->last_IP_pts = AV_NOPTS_VALUE;
-    for(i=0; i<MAX_REORDER_DELAY+1; i++)
-        st->internal->pts_buffer[i]= AV_NOPTS_VALUE;
-    
-    s->streams[s->nb_streams++] = st;
-    return st;
-}
-
-
 /**
  * @brief Remove a stream from a media stream.
  *
@@ -154,9 +97,4 @@ void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
         for (i=0; i<s->nb_streams; i++)
             s->streams[i]->index=i;
     }
-}
-
-void av_estimate_timings(AVFormatContext *ic, int64_t old_offset)
-{
-    return estimate_timings(ic, old_offset);
 }

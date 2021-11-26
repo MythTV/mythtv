@@ -10,14 +10,6 @@ LIBAVFORMAT_MAJOR {
         ffurl_open_whitelist;
         ffurl_close;
         ffurl_write;
-        url_*;
-        ff_timefilter_destroy;
-        ff_timefilter_new;
-        ff_timefilter_update;
-        ff_timefilter_reset;
-        get_*;
-        put_*;
-        ff_codec_get_id;
         ff_read_frame_flush;
     local:
         *;
