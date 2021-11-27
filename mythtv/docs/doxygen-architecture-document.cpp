@@ -627,7 +627,7 @@ See mythplugins/mythweb/modules/_shared/lang/translations.txt for more info.
 
  */
 
-/** \defgroup qobject_dangers QObject is dangerous for your health
+/** \page qobject_dangers QObject is dangerous for your health
 
 QObject derived classes can be quite useful, they can send and receive
 signals, get keyboard events, translate strings into another language
@@ -744,7 +744,7 @@ wrong slots.
 
 */
 
-/** \defgroup profiling_mythtv    Profiling MythTV
+/** \page profiling_mythtv    Profiling MythTV
 
 You can use any sampling profiler to profile %MythTV, the most
 popular GPL one is OProfile and this section tells you how to
@@ -898,7 +898,7 @@ an annotated versions of the code, and saving results.
 
 */
 
-/** \defgroup testing    Testing hints and shortcuts
+/** \page testing    Testing hints and shortcuts
 
 The internal video playback can be tested by the programs/mythavtest tool:
 
