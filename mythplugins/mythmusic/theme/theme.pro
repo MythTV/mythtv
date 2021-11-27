@@ -1,11 +1,7 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
-   
-QMAKE_STRIP = echo
 
-TARGET = themenop
-TEMPLATE = app
-CONFIG -= qt moc
+TEMPLATE = aux
 
 defaultfiles.path = $${PREFIX}/share/mythtv/themes/default
 defaultfiles.files = default/*.xml default/images/*.png
@@ -20,6 +16,3 @@ htmlfiles.path = $${PREFIX}/share/mythtv/themes/default/htmls
 htmlfiles.files = htmls/*.html
 
 INSTALLS += defaultfiles widefiles menufiles htmlfiles
-
-# Input
-SOURCES += ../../themedummy.c
