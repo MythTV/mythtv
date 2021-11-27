@@ -13,7 +13,7 @@
 // MythTV
 #include <mythcontext.h>
 #include <compat.h> // For random() on MINGW32
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // MythMusic
 #include "encoder.h"

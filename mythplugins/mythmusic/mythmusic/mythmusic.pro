@@ -15,7 +15,7 @@ TARGET = mythmusic
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/metadata
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmythmetadata
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/goom
 INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 

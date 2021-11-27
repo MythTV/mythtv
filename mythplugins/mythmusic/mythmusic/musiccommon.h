@@ -8,7 +8,7 @@
 // mythtv
 #include <audiooutput.h>
 #include <mythscreentype.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
 #include "playlist.h"

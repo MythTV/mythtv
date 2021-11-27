@@ -11,8 +11,8 @@
 #include <mythuihelper.h>
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
-#include <metadata/metadataimagedownload.h>
-#include <metadata/videoutils.h>
+#include <libmythmetadata/metadataimagedownload.h>
+#include <libmythmetadata/videoutils.h>
 
 #include "netbase.h"
 

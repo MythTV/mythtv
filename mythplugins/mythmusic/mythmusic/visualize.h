@@ -21,7 +21,7 @@
 
 // MythTV headers
 #include <visual.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 #include <mythbaseexp.h>
 
 // MythMusic headers

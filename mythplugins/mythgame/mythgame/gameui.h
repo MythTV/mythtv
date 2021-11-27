@@ -6,9 +6,9 @@
 
 // myth
 #include <mythscreentype.h>
-#include <metadata/metadatacommon.h>
-#include <metadata/metadatadownload.h>
-#include <metadata/metadataimagedownload.h>
+#include <libmythmetadata/metadatacommon.h>
+#include <libmythmetadata/metadatadownload.h>
+#include <libmythmetadata/metadataimagedownload.h>
 #include <mythprogressdialog.h>
 
 class MythUIButtonTree;

@@ -15,7 +15,7 @@
 #include <compat.h> // For random() on MINGW32
 #include <remotefile.h>
 #include <mythcorecontext.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 
 // mythmusic

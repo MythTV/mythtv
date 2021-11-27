@@ -22,7 +22,7 @@
 #include <mythuihelper.h>
 #include <mythprogressdialog.h>
 #include <lcddevice.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 #include <musicutils.h>
 #include <musicfilescanner.h>
 

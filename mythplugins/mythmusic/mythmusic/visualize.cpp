@@ -27,7 +27,7 @@
 #include <mythmainwindow.h>
 #include <mythuihelper.h>
 #include <remotefile.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
 #include "mainvisual.h"

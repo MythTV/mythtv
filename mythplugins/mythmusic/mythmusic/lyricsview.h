@@ -7,7 +7,7 @@
 
 // myth
 #include <mythscreentype.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 #include <lyricsdata.h>
 
 // mythmusic

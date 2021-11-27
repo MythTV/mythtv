@@ -9,7 +9,7 @@
 #include <QMap>
 
 // libmythmetadata
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
 #include "playlistcontainer.h"

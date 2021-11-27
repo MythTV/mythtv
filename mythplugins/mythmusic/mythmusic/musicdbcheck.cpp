@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 #include <mythcontext.h>
 #include <mythdbcheck.h>
 #include <mythtv/mythdb.h>

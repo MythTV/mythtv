@@ -23,7 +23,7 @@
 #include <audiooutput.h>
 #include <compat.h>
 #include <lcddevice.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 #include <mythdate.h>
 
 // MythMusic includes

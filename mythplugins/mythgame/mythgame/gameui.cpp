@@ -4,7 +4,7 @@
 
 #include <mythcontext.h>
 #include <mythuibuttontree.h>
-#include <metadata/mythuimetadataresults.h>
+#include <libmythmetadata/mythuimetadataresults.h>
 #include <mythuiimage.h>
 #include <mythuitext.h>
 #include <mythuistatetype.h>

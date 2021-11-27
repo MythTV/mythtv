@@ -20,7 +20,7 @@
 // MythTV
 #include <audiooutput.h>
 #include <mythcontext.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>

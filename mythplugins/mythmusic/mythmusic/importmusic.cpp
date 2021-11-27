@@ -6,7 +6,7 @@
 // myth
 #include <mythcontext.h>
 #include <mythdbcon.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 #include <mythdialogbox.h>
 #include <mythuitext.h>
 #include <mythuiimage.h>

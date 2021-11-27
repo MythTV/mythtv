@@ -22,7 +22,7 @@
 #include <mythuicheckbox.h>
 #include <mythdialogbox.h>
 #include <mythdate.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
 #include "musicdata.h"

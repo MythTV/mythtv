@@ -6,7 +6,7 @@
 #include <QString>
 
 // libmythmetadata
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 #include <metaioflacvorbis.h>
 
 #include "flacencoder.h"

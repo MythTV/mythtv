@@ -6,7 +6,7 @@
 #include <mythobservable.h>
 
 // libmythmetadata
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
 #include "decoderhandler.h"

@@ -9,7 +9,7 @@
 #include <QVector>
 
 // mythtv
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 #include <mythscreentype.h>
 #include <mthread.h>
 

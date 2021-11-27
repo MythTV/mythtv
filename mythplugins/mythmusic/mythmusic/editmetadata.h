@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <mythscreentype.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 class MythUIStateType;
 class MythUIImage;

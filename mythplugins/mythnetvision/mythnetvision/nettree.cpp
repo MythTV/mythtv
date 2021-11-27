@@ -14,7 +14,7 @@
 #include <mythrssmanager.h>
 #include <netgrabbermanager.h>
 #include <mythcoreutil.h>
-#include <metadata/videoutils.h>
+#include <libmythmetadata/videoutils.h>
 #include <mythuiimage.h>
 #include <mythuitext.h>
 #include <mythscreenstack.h>

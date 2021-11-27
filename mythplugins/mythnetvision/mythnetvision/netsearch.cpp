@@ -16,8 +16,8 @@
 #include <remotefile.h>
 #include <netgrabbermanager.h>
 #include <netutils.h>
-#include <metadata/metadataimagedownload.h>
-#include <metadata/videoutils.h>
+#include <libmythmetadata/metadataimagedownload.h>
+#include <libmythmetadata/videoutils.h>
 #include <rssparse.h>
 #include <mythcoreutil.h>
 #include <mythuitext.h>

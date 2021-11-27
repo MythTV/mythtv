@@ -5,7 +5,7 @@
 #include <mythscreenstack.h>
 #include <mythmainwindow.h>
 #include <mythprogressdialog.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 #include <musicfilescanner.h>
 #include <musicutils.h>
 #include <mthreadpool.h>

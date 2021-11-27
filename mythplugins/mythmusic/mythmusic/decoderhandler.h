@@ -13,7 +13,7 @@
 
 // mythtv
 #include <mythobservable.h>
-#include <musicmetadata.h>
+#include <libmythmetadata/musicmetadata.h>
 
 // mythmusic
 
