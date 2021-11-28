@@ -6,7 +6,7 @@
 //
 // Copyright (c) 2005 David Blain <dblain@mythtv.org>
 //
-// Licensed under the GPL v2 or later, see COPYING for details
+// Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -758,7 +758,9 @@ void HTTPRequest::FormatErrorResponse( bool  bServerError,
     }
 
     if (m_bSOAPRequest)
+    {
         stream << "</s:Fault>" << SOAP_ENVELOPE_END;
+    }
 
     stream.flush();
 }

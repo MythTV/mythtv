@@ -29,10 +29,6 @@
 #include "dvbtypes.h"
 #endif
 
-#ifdef USING_V4L1
-#include <linux/videodev.h>
-#endif
-
 #ifdef USING_V4L2
 #include "v4l2util.h"
 #endif
@@ -69,9 +65,7 @@ QString CardUtil::GetScanableInputTypes(void)
 
 #ifdef USING_V4L2
     inputTypes += "'V4L'";
-# ifdef USING_IVTV
     inputTypes += "'MPEG'";
-# endif // USING_IVTV
 #endif // USING_V4L2
 
 #ifdef USING_IPTV
@@ -1910,7 +1904,7 @@ int CardUtil::CreateCardInput(const uint inputid,
     query.bindValue(":CHANGERMODEL", changer_model);
     query.bindValue(":TUNECHAN", tunechan);
     query.bindValue(":STARTCHAN", startchan);
-    query.bindValue(":DISPLAYNAME", displayname.isNull() ? "" : displayname);
+    query.bindValueNoNull(":DISPLAYNAME", displayname);
     query.bindValue(":DISHNETEIT", dishnet_eit);
     query.bindValue(":RECPRIORITY", recpriority);
     query.bindValue(":QUICKTUNE", quicktune);
@@ -2256,7 +2250,6 @@ bool CardUtil::GetV4LInfo(
         return false;
 
 #ifdef USING_V4L2
-    // First try V4L2 query
     struct v4l2_capability capability {};
     if (ioctl(videofd, VIDIOC_QUERYCAP, &capability) >= 0)
     {
@@ -2265,14 +2258,6 @@ bool CardUtil::GetV4LInfo(
         version = capability.version;
         capabilities = capability.capabilities;
     }
-#ifdef USING_V4L1
-    else // Fallback to V4L1 query
-    {
-        struct video_capability capability2;
-        if (ioctl(videofd, VIDIOCGCAP, &capability2) >= 0)
-            input = QString::fromLatin1((const char*)capability2.name);
-    }
-#endif // USING_V4L1
 #endif // USING_V4L2
 
     if (!driver.isEmpty())
@@ -2291,7 +2276,6 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
 #ifdef USING_V4L2
     bool usingv4l2 = hasV4L2(videofd);
 
-    // V4L v2 query
     struct v4l2_input vin {};
     while (usingv4l2 && (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0))
     {
@@ -2304,37 +2288,6 @@ InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
         ok = true;
         return list;
     }
-
-#ifdef USING_V4L1
-    // V4L v1 query
-    struct video_capability vidcap;
-    memset(&vidcap, 0, sizeof(vidcap));
-    if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0)
-    {
-        QString msg = QObject::tr("Could not query inputs.");
-        LOG(VB_GENERAL, LOG_ERR, "ProbeV4LVideoInputs(): Error, " + msg + ENO);
-        list[-1] = msg;
-        vidcap.channels = 0;
-    }
-
-    for (int i = 0; i < vidcap.channels; i++)
-    {
-        struct video_channel test;
-        memset(&test, 0, sizeof(test));
-        test.channel = i;
-
-        if (ioctl(videofd, VIDIOCGCHAN, &test) != 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "ProbeV4LVideoInputs(): Error, " +
-                    QString("Could determine name of input #%1"
-                            "\n\t\t\tNot adding it to the list.")
-                    .arg(test.channel) + ENO);
-            continue;
-        }
-
-        list[i] = test.name;
-    }
-#endif // USING_V4L1
 
     // Create an input when none are advertised
     if (list.isEmpty())

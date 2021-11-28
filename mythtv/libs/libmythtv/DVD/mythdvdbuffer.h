@@ -93,7 +93,7 @@ class MTV_PUBLIC MythDVDBuffer : public MythOpticalBuffer
     int       GetAudioTrackNum     (uint StreamId);
     int       GetAudioTrackType    (uint Index);
     bool      GetDVDStateSnapshot  (QString& State);
-    bool      RestoreDVDStateSnapshot(QString& State);
+    bool      RestoreDVDStateSnapshot(const QString& State);
     double    GetFrameRate         (void);
     bool      StartOfTitle         (void) const;
     bool      EndOfTitle           (void) const;

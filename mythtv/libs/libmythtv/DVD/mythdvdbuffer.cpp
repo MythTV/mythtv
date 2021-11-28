@@ -1922,7 +1922,7 @@ bool MythDVDBuffer::GetDVDStateSnapshot(QString& State)
 
 /** \brief Restore a DVD VM from a snapshot
  */
-bool MythDVDBuffer::RestoreDVDStateSnapshot(QString& State)
+bool MythDVDBuffer::RestoreDVDStateSnapshot(const QString& State)
 {
     QByteArray state = State.toUtf8();
     return (dvdnav_set_state(m_dvdnav, state.constData()) == DVDNAV_STATUS_OK);

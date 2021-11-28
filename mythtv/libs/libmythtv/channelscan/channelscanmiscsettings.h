@@ -231,12 +231,12 @@ class ScanTransponder: public TransMythUIComboBoxSetting
         addSelection("(Select Satellite)", "Select", true);
 
         // Satellite tuning data
-        tdm["Hotbird"] = { "Hotbird", "Hotbird   13.0E", "12015000", "h", "27500000", "8PSK", "DVB-S2", "3/4" };
-        tdm["Astra-1"] = { "Astra-1", "Astra-1   19.2E", "11229000", "v", "22000000", "8PSK", "DVB-S2", "2/3" };
-        tdm["Astra-3"] = { "Astra-3", "Astra-3   23.5E", "12031500", "h", "27500000", "QPSK", "DVB-S2", "auto"};
-        tdm["Astra-2"] = { "Astra-2", "Astra-2   28.2E", "10714000", "h", "22000000", "QPSK", "DVB-S",  "5/6" };
+        m_tdm["Hotbird"] = { "Hotbird", "Hotbird   13.0E", "12015000", "h", "27500000", "8PSK", "DVB-S2", "3/4" };
+        m_tdm["Astra-1"] = { "Astra-1", "Astra-1   19.2E", "11229000", "v", "22000000", "8PSK", "DVB-S2", "2/3" };
+        m_tdm["Astra-3"] = { "Astra-3", "Astra-3   23.5E", "12031500", "h", "27500000", "QPSK", "DVB-S2", "auto"};
+        m_tdm["Astra-2"] = { "Astra-2", "Astra-2   28.2E", "10714000", "h", "22000000", "QPSK", "DVB-S",  "5/6" };
 
-        for (auto &td: tdm)
+        for (auto &td: m_tdm)
         {
             addSelection(td.fullname, td.name);
         }
@@ -253,15 +253,15 @@ class ScanTransponder: public TransMythUIComboBoxSetting
         QString modSys;
         QString fec;
     };
-    QMap<QString, struct tuningdata> tdm;
+    QMap<QString, struct tuningdata> m_tdm;
 
   public:
-    QString getFrequency (QString &satname) {return tdm[satname].frequency; }
-    QString getPolarity  (QString &satname) {return tdm[satname].polarity;  }
-    QString getSymbolrate(QString &satname) {return tdm[satname].symbolrate;}
-    QString getModulation(QString &satname) {return tdm[satname].modulation;}
-    QString getModSys    (QString &satname) {return tdm[satname].modSys;    }
-    QString getFec       (QString &satname) {return tdm[satname].fec;       }
+    QString getFrequency (const QString &satname) {return m_tdm[satname].frequency; }
+    QString getPolarity  (const QString &satname) {return m_tdm[satname].polarity;  }
+    QString getSymbolrate(const QString &satname) {return m_tdm[satname].symbolrate;}
+    QString getModulation(const QString &satname) {return m_tdm[satname].modulation;}
+    QString getModSys    (const QString &satname) {return m_tdm[satname].modSys;    }
+    QString getFec       (const QString &satname) {return m_tdm[satname].fec;       }
 };
 
 class ScanFrequencykHz: public TransTextEditSetting

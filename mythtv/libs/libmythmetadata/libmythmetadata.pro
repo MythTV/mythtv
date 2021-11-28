@@ -61,7 +61,6 @@ LIBS += -L../../external/FFmpeg/libavformat -lmythavformat
 LIBS += -L../libmyth              -lmyth-$${LIBVERSION}
 LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
-LIBS += -L../../external/libudfread -lmythudfread-$${LIBVERSION}
 
 !using_libexiv2_external {
     darwin {
@@ -89,7 +88,6 @@ LIBS += $${CONFIG_TAGLIB_LIBS}
 win32-msvc*:LIBS += -ltag
 
 using_mheg:LIBS += -L../libmythfreemheg        -lmythfreemheg-$${LIBVERSION}
-using_live:LIBS += -L../libmythlivemedia        -lmythlivemedia-$${LIBVERSION}
 
 mingw:LIBS += -lws2_32
 mingw:LIBS += libbluray

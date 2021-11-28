@@ -7,27 +7,33 @@
 # Purpose:  This python script is intended to perform a variety of utility functions to search and
 #           access text metadata and image URLs from GiantBomb. These routines are based on the
 #           GiantBomb api. Specifications for this api are published at:
-#           http://api.giantbomb.com/documentation/
+#           https://www.giantbomb.com/api/documentation/
 #
 # License:Creative Commons GNU GPL v2
-# (http://creativecommons.org/licenses/GPL/2.0/)
+# (https://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="giantbomb_api - Simple-to-use Python interface to The GiantBomb's API (api.giantbomb.com)";
+__title__ ="giantbomb_api - Simple-to-use Python interface to The GiantBomb's API (www.giantbomb.com/api)";
 __author__="R.D. Vaughan"
 __purpose__='''
 This python script is intended to perform a variety of utility functions to search and access text
 metadata and image URLs from GiantBomb. These routines are based on the GiantBomb api. Specifications
-for this api are published at http://api.giantbomb.com/documentation/
+for this api are published at https://www.giantbomb.com/api/documentation/
 '''
 
-__version__="v0.1.0"
+__version__="v0.2.0"
 # 0.1.0 Initial development
+# 0.2.0 R. Ernst: switched to python requests and added python3 compatibility
 
 import os, struct, sys, datetime, time, re
-import urllib
+import requests
 from copy import deepcopy
 
-from giantbomb_exceptions import (GiantBombBaseError, GiantBombHttpError, GiantBombXmlError,  GiantBombGameNotFound,)
+IS_PY2 = sys.version_info[0] == 2
+if not IS_PY2:
+    unicode = str
+    unichr = chr
+
+from .giantbomb_exceptions import (GiantBombBaseError, GiantBombHttpError, GiantBombXmlError,  GiantBombGameNotFound,)
 
 
 class OutStreamEncoder(object):
@@ -42,15 +48,11 @@ class OutStreamEncoder(object):
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
         if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
+            obj = obj.encode(self.encoding)
+        if IS_PY2:
+            self.out.write(obj)
         else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+            self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
@@ -60,14 +62,17 @@ sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 try:
-    from StringIO import StringIO
+    if IS_PY2:
+        from StringIO import StringIO
+    else:
+        from io import StringIO
     from lxml import etree
-except Exception, e:
+except Exception as e:
     sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
-# From the lxml documents it states: (http://codespeak.net/lxml/installation.html)
+# From the lxml documents it states: (https://lxml.de/installation.html)
 # "If you want to use XPath, do not use libxml2 2.6.27. We recommend libxml2 2.7.2 or later"
 # Testing was performed with the Ubuntu 9.10 "python-lxml" version "2.1.5-1ubuntu2" repository package
 version = ''
@@ -92,7 +97,7 @@ class gamedbQueries():
                 ):
         """apikey (str/unicode):
             Specify the api.giantbomb.com API key. Applications need their own key.
-            See http://api.giantbomb.com to get your own API key
+            See https://www.giantbomb.com/api/ to get your own API key
 
         debug (True/False):
              shows verbose debugging information
@@ -101,9 +106,10 @@ class gamedbQueries():
 
         self.config['apikey'] = apikey
         self.config['debug'] = debug
-
-        self.config['searchURL'] = u'http://api.giantbomb.com/search/?api_key=%s&offset=0&query=%%s&resources=game&format=xml' % self.config['apikey']
-        self.config['dataURL'] = u'http://api.giantbomb.com/game/%%s/?api_key=%s&format=xml' % self.config['apikey']
+        self.config['searchURL'] = u'https://www.giantbomb.com/api/search'
+        self.config['dataURL'] = u'https://www.giantbomb.com/api/game/%s'
+        # giantbomb.com now requires a unique 'User-Agent':
+        self.config['headers'] = {"User-Agent": 'MythTV giantbomb grabber 0.2'}
 
         self.error_messages = {'GiantBombHttpError': u"! Error: A connection error to api.giantbomb.com was raised (%s)\n", 'GiantBombXmlError': u"! Error: Invalid XML was received from api.giantbomb.com (%s)\n", 'GiantBombBaseError': u"! Error: An error was raised (%s)\n", }
 
@@ -151,8 +157,11 @@ class gamedbQueries():
                 except ValueError:
                     pass
             elif text[:1] == "&":
-                import htmlentitydefs
-                entity = htmlentitydefs.entitydefs.get(text[1:-1])
+                if IS_PY2:
+                    from htmlentitydefs import entitydefs
+                else:
+                    from html.entities import entitydefs
+                entity = entitydefs.get(text[1:-1])
                 if entity:
                     if entity[:2] == "&#":
                         try:
@@ -162,7 +171,11 @@ class gamedbQueries():
                     else:
                         return unicode(entity, "iso-8859-1")
             return text # leave as is
-        return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+        if IS_PY2:
+            text23 = self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+        else:
+            text23 = self.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace('\n',' ')
+        return text23
     # end massageText()
 
 
@@ -239,7 +252,9 @@ class gamedbQueries():
             args[0] = args[0][:index].strip()
         args[0] = args[0].replace(',', u'').replace('.', u'')
         try:
-            if len(args) > 1:
+            if len(args) > 2:
+                pubdate = time.strptime(args[0], args[2])
+            elif len(args) > 1:
                 args[1] = args[1].replace(',', u'').replace('.', u'')
                 if args[1].find('GMT') != -1:
                     args[1] = args[1][:args[1].find('GMT')].strip()
@@ -257,7 +272,7 @@ class gamedbQueries():
                     return time.strftime(self.pubDateFormat, pubdate)
             else:
                 return datetime.datetime.now().strftime(self.pubDateFormat)
-        except Exception, err:
+        except Exception as err:
             sys.stderr.write(u'! Error: pubDate variables(%s) error(%s)\n' % (args, err))
         return args[0]
     # end pubDate()
@@ -369,7 +384,7 @@ class gamedbQueries():
         '''
         name = inputArgs[0]
         name = name.lower()
-        if name in self.tagTranslations.keys():
+        if name in list(self.tagTranslations.keys()):
             return self.tagTranslations[name]
         return name
     # end translateName()
@@ -393,25 +408,34 @@ class gamedbQueries():
 
     def gameSearch(self, gameTitle):
         """Display a Game query in XML format:
-        http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+        https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
         Returns nothing
         """
-        url = self.config['searchURL'] % urllib.quote_plus(gameTitle.encode("utf-8"))
-        if self.config['debug']:
-            print "URL(%s)" % url
-            print
+        with requests.Session() as ReqSession:
+            url = self.config['searchURL']
+
+            params = {}
+            params["api_key"] = self.config['apikey']
+            params["format"] = 'xml'
+            params["page"] = 0
+            params["query"] = gameTitle
+            params["resources"] = "game"
+
+            headers = self.config['headers']
+
+            res = ReqSession.get(url, params=params, headers=headers)
 
         try:
-            queryResult = etree.parse(url, parser=self.xmlParser)
-        except Exception, errmsg:
+            queryResult = etree.fromstring(res.content)
+        except Exception as errmsg:
             sys.stderr.write(u"! Error: Invalid XML was received from www.giantbomb.com (%s)\n" % errmsg)
             sys.exit(1)
 
         queryXslt = etree.XSLT(etree.parse(u'%s/XSLT/giantbombQuery.xsl' % self.baseProcessingDir))
-        gamebombXpath = etree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
+        gamebombXpath = etree.FunctionNamespace('https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
         gamebombXpath.prefix = 'gamebombXpath'
         self.buildFuncDict()
-        for key in self.FuncDict.keys():
+        for key in list(self.FuncDict.keys()):
             gamebombXpath[key] = self.FuncDict[key]
 
         items = queryXslt(queryResult)
@@ -424,25 +448,31 @@ class gamedbQueries():
 
     def gameData(self, gameId):
         """Display a Game details in XML format:
-        http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
+        https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format
         Returns nothing
         """
-        url = self.config['dataURL'] % gameId
-        if self.config['debug']:
-            print "URL(%s)" % url
-            print
+        with requests.Session() as ReqSession:
+            url = self.config['dataURL'] % gameId
+
+            params = {}
+            params["api_key"] = self.config['apikey']
+            params["format"] = 'xml'
+
+            headers = self.config['headers']
+
+            res = ReqSession.get(url, params=params, headers=headers)
 
         try:
-            videoResult = etree.parse(url, parser=self.xmlParser)
-        except Exception, errmsg:
+            videoResult = etree.fromstring(res.content)
+        except Exception as errmsg:
             sys.stderr.write(u"! Error: Invalid XML was received from www.giantbomb.com (%s)\n" % errmsg)
             sys.exit(1)
 
         gameXslt = etree.XSLT(etree.parse(u'%s/XSLT/giantbombGame.xsl' % self.baseProcessingDir))
-        gamebombXpath = etree.FunctionNamespace('http://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
+        gamebombXpath = etree.FunctionNamespace('https://www.mythtv.org/wiki/MythTV_Universal_Metadata_Format')
         gamebombXpath.prefix = 'gamebombXpath'
         self.buildFuncDict()
-        for key in self.FuncDict.keys():
+        for key in list(self.FuncDict.keys()):
             gamebombXpath[key] = self.FuncDict[key]
         items = gameXslt(videoResult)
 
@@ -460,11 +490,11 @@ def main():
     in Universal XML format. Also gets game details using a GameBomb#.
     """
     # api.giantbomb.com api key provided for MythTV
-    apikey = "b5883a902a8ed88b15ce21d07787c94fd6ad9f33"
+    api_key = "b5883a902a8ed88b15ce21d07787c94fd6ad9f33"
     gamebomb = gamedbQueries(api_key)
     # Output a dictionary of matching movie titles
     gamebomb.gameSearch(u'Grand')
-    print
+    print()
     # Output a dictionary of matching movie details for GiantBomb number '19995'
     gamebomb.gameData(u'19995')
 # end main()

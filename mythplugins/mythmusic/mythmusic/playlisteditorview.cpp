@@ -33,7 +33,7 @@ MusicGenericTree::MusicGenericTree(MusicGenericTree *parent,
     m_action = action;
     m_showArrow = showArrow;
 
-    if (!action.isEmpty() && !action.isNull())
+    if (!action.isEmpty())
         setSelectable(true);
 
     if (parent)

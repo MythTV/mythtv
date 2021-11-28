@@ -5,19 +5,24 @@ TARGET = mythbluray-$$LIBVERSION
 CONFIG += thread staticlib warn_off
 CONFIG -= qt
 
+QMAKE_CLEAN += $(TARGET)
+
 target.path = $${LIBDIR}
 
 INCLUDEPATH += . ../../
 INCLUDEPATH += ./src
 INCLUDEPATH += ./src/libbluray
 INCLUDEPATH += ./src/libbluray/bdnav
-INCLUDEPATH += ../libudfread
-INCLUDEPATH += ../../libs/libmythbase
-INCLUDEPATH += ../../libs/libmythtv
 
-DEPENDPATH += ../libudfread
-
-DEFINES += ENABLE_UDF
+using_libudfread_external: {
+    DEFINES += HAVE_LIBUDFREAD
+    QMAKE_CFLAGS += $$LIBUDFREAD_CFLAGS
+    LIBS         += $$LIBUDFREAD_LIBS
+} else {
+    INCLUDEPATH += ../libudfread
+    DEPENDPATH  += ../libudfread
+    LIBS        += -L../libudfread -lmythudfread-$$LIBVERSION
+}
 
 bluray_major = 1
 bluray_minor = 2
@@ -30,25 +35,35 @@ DEFINES += BLURAY_VERSION_MICRO=$$bluray_micro
 DEFINES += BLURAY_VERSION_STRING=\\\"$$bluray_version\\\"
 DEFINES += VERSION=\\\"$$bluray_version\\\"
 
+DEFINES += JDK_HOME=\\\"$$JDK_HOME\\\" JAVA_ARCH=\\\"$$JAVA_ARCH\\\"
+
+# can't use config.h because code only checks if defined
+DEFINES += HAVE_CONFIG_H=0
+using_libxml2:    DEFINES += HAVE_LIBXML2
+using_freetype2:  DEFINES += HAVE_FT2
+using_fontconfig: DEFINES += HAVE_FONTCONFIG
+
+equals(HAVE_DIRENT_H,    "yes") : DEFINES += HAVE_DIRENT_H
+equals(HAVE_DLFCN_H,     "yes") : DEFINES += HAVE_DLFCN_H
+equals(HAVE_MNTENT_H,    "yes") : DEFINES += HAVE_MNTENT_H
+equals(HAVE_GETMNTENT_R, "yes") : DEFINES += HAVE_GETMNTENT_R
+equals(HAVE_PTHREAD_H,   "yes") : DEFINES += HAVE_PTHREAD_H
+equals(HAVE_STRINGS_H,   "yes") : DEFINES += HAVE_STRINGS_H
+equals(HAVE_SYS_DL_H,    "yes") : DEFINES += HAVE_SYS_DL_H
+equals(HAVE_SYS_TIME_H,  "yes") : DEFINES += HAVE_SYS_TIME_H
+
+equals(HAVE_BDJ_J2ME,    "yes") : DEFINES += HAVE_BDJ_J2ME
+
 win32-msvc* {
-    CONFIG += qt
-    DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H
+    CONFIG += qt # probably not needed?
+    INCLUDEPATH += ../../libs/libmythbase # for compat.h, also unnecessary?
 
     # needed for vcxproj
     QMAKE_CXXFLAGS += /TP "/FI compat.h"
 
     # needed for nmake
     QMAKE_CFLAGS   += /TP "/FI compat.h"
-
-} else {
-    DEFINES += HAVE_CONFIG_H DLOPEN_CRYPTO_LIBS HAVE_PTHREAD_H HAVE_DIRENT_H HAVE_STRINGS_H
 }
-
-using_libxml2 {
-DEFINES += HAVE_LIBXML2
-}
-
-QMAKE_CLEAN += $(TARGET)
 
 # bdnav
 HEADERS += src/libbluray/bluray.h src/libbluray/bluray_internal.h src/libbluray/bluray-version.h
@@ -111,20 +126,10 @@ INSTALLS += inc_bdnav
 mingw:DEFINES += STDC_HEADERS
 
 using_bdjava {
-    using_freetype2:DEFINES += HAVE_FT2
-    using_fontconfig:DEFINES += HAVE_FONTCONFIG
-
     macx:javaos = darwin
     win32:javaos = win32
     linux:javaos = linux
     freebsd:javaos = freebsd
-
-    equals(JDK_HOME, "") {
-        INCLUDEPATH += ./jni ./jni/$$javaos
-        HEADERS += ./jni/jni.h ./jni/$$javaos/jni_md.h
-    } else {
-        INCLUDEPATH += $${JDK_HOME}/include $${JDK_HOME}/include/$$javaos
-    }
 
     bdjava.depends = src/libbluray/bdj/build.xml
     bdjava.versions = -Dversion='$${BDJ_TYPE}-$$bluray_version' -Djava_version_asm=$${JAVA_CODE_VERSION} -Djava_version_bdj=$${JAVA_CODE_VERSION}
@@ -155,26 +160,13 @@ using_bdjava {
                             # but for the fallback case that we're not actually building
                             # the JAR, it doesn't provide a freebsd version of jni_md.h.
                             # Let's try using the linux version and hope for the best.
+}
 
+equals(JDK_HOME, "") {
     INCLUDEPATH += ./jni ./jni/$$javaos
     HEADERS += ./jni/jni.h ./jni/$$javaos/jni_md.h
+} else {
+    INCLUDEPATH += $${JDK_HOME}/include $${JDK_HOME}/include/$$javaos
 }
 
-mingw {
-    dll : contains( TEMPLATE, lib ) {
-
-        # Qt under Linux/UnixMac OS X builds libBlah.a and libBlah.so,
-        # but is using the Windows defaults  libBlah.a and    Blah.dll.
-        #
-        # So that our dependency targets work between SUBDIRS, override:
-        #
-        TARGET = lib$${TARGET}
-
-
-        # Windows doesn't have a nice variable like LD_LIBRARY_PATH,
-        # which means make install would be broken without extra steps.
-        # As a workaround, we store dlls with exes. Also improves debugging!
-        #
-        target.path = $${PREFIX}/bin
-    }
-}
+include (../../libs/libs-targetfix.pro)

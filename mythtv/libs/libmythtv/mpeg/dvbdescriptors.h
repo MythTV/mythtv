@@ -853,7 +853,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     uint Polarization(void)       const { return (m_data[8]>>5)&0x3; }
     QString PolarizationString()  const
     {
-        static std::array<QString,4> ps { "h", "v", "l", "r" };
+        static const std::array<const QString,4> ps { "h", "v", "l", "r" };
         return ps[Polarization()];
     }
     bool IsCircularPolarization(void) const       { return ((m_data[8]>>6)&0x1) != 0; }
@@ -871,7 +871,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     uint RollOff(void) const { return (m_data[8]>>3)&0x3; }
     QString RollOffString(void) const
     {
-        static std::array<QString,4> ro { "0.35", "0.20", "0.25", "auto" };
+        static const std::array<const QString,4> ro { "0.35", "0.20", "0.25", "auto" };
         return ro[RollOff()];
     }
     // modulation system        1   8.5
@@ -892,7 +892,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     uint Modulation(void) const { return m_data[8]&0x03; }
     QString ModulationString(void) const
     {
-        static std::array<QString,4> ms { "qpsk", "qpsk", "8psk", "qam_16" };
+        static const std::array<const QString,4> ms { "qpsk", "qpsk", "8psk", "qam_16" };
         return ms[Modulation()];
     }
     // symbol_rate             28   9.0
@@ -996,7 +996,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     /// \bug returns "a" for values >= 4 for compatibility with siparser.cpp
     QString HierarchyString(void) const
     {
-        static std::array<QString,8> hs { "n", "1", "2", "4", "a", "a", "a", "a" };
+        static const std::array<const QString,8> hs { "n", "1", "2", "4", "a", "a", "a", "a" };
         return hs[Hierarchy()];
     }
     bool NativeInterleaver(void) const { return ( m_data[7] & 0x20 ) != 0; }
@@ -1017,7 +1017,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint CodeRateHP(void) const { return m_data[7] & 0x7; }
     QString CodeRateHPString(void) const
     {
-        static std::array<QString,8> cr {
+        static const std::array<const QString,8> cr {
             "1/2", "2/3", "3/4", "5/6", "7/8", "auto", "auto", "auto"
         };
         return cr[CodeRateHP()];
@@ -1026,7 +1026,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint CodeRateLP(void) const { return (m_data[8]>>5) & 0x7; }
     QString CodeRateLPString(void) const
     {
-        static std::array<QString,8> cr {
+        static const std::array<const QString,8> cr {
             "1/2", "2/3", "3/4", "5/6", "7/8", "auto", "auto", "auto"
         };
         return cr[CodeRateLP()];
@@ -1042,7 +1042,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint GuardInterval(void) const { return (m_data[8]>>3) & 0x3; }
     QString GuardIntervalString(void) const
     {
-        static std::array<QString,4> gi { "1/32", "1/16", "1/8", "1/4" };
+        static const std::array<const QString,4> gi { "1/32", "1/16", "1/8", "1/4" };
         return gi[GuardInterval()];
     }
     // transmission_mode        2   8.5
@@ -1055,7 +1055,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint TransmissionMode(void) const { return (m_data[8]>>1) & 0x3; }
     QString TransmissionModeString(void) const
     {
-        static std::array<QString,4> tm { "2", "8", "4", "auto" };
+        static const std::array<const QString,4> tm { "2", "8", "4", "auto" };
         return tm[TransmissionMode()];
     }
     // other_frequency_flag     1   8.7
@@ -1864,7 +1864,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
             // 0x00 - undefined
             return -1;
         }
-        if ((rawRating >= 0x01) && (rawRating <= 0x0F))
+        if (rawRating <= 0x0F)
         {
             // 0x01 to 0x0F - minumum age = rating + 3 years
             return rawRating + 3;
@@ -2894,11 +2894,12 @@ class DVBContentIdentifierDescriptor : public MPEGDescriptor
     // A content identifier is a URI.  It may contain UTF-8 encoded using %XX.
     QString ContentId(size_t n=0) const
     {
-        // cppcheck-suppress AssignmentAddressToInteger
-        int length = m_crid[n][1];
+        // Access the array in two steps so cppcheck doesn't get confused.
+        const uint8_t* cridN = m_crid[n];
+        int length = cridN[1];
         int positionOfHash = length-1;
         while (positionOfHash >= 0) {
-            if (m_crid[n][2 + positionOfHash] == '#') {
+            if (cridN[2 + positionOfHash] == '#') {
                 length = positionOfHash; /* remove the hash and the following IMI */
                 break;
             }

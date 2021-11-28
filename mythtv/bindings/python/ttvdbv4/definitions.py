@@ -3,7 +3,7 @@
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
 # Copyright: (c) 2021 Roland Ernst
-# License:   GPL v2 or later, see COPYING for details
+# License:   GPL v2 or later, see LICENSE for details
 # ----------------------------------------------------
 
 
@@ -39,7 +39,7 @@ def _handle_list(handle, data):
         return l
 
 
-"""Generated API for thetvdb.com TVDB API V4 v 4.4.0"""
+"""Generated API for thetvdb.com TVDB API V4 v 4.4.0 @6c60be0 """
 # modifications marked with '### XXX'
 
 
@@ -210,8 +210,8 @@ class Company(object):
 class CompanyType(object):
     """A company type record"""
     def __init__(self, data):
-        self.id = data.get('id', 0)                                          # integer
-        self.name = data.get('name', '')                                     # string
+        self.companyTypeId = data.get('companyTypeId', 0)                    # integer
+        self.companyTypeName = data.get('companyTypeName', '')               # string
 
 
 class ContentRating(object):
@@ -604,7 +604,12 @@ class SeriesAirsDays(object):
 
 
 class SeriesBaseRecord(object):
-    """The base record for a series"""
+    """
+    The base record for a series. All series airs time like firstAired, lastAired, nextAired, etc.
+    are in US EST for US series, and for all non-US series, the time of the show’s
+    country capital or most populous city. For streaming services, is the official release time.
+    See https://support.thetvdb.com/kb/faq.php?id=29.
+    """
     def __init__(self, data):
         self.abbreviation = data.get('abbreviation', '')                     # string
         self.aliases = _handle_list(Alias, data.get('aliases'))
@@ -630,7 +635,12 @@ class SeriesBaseRecord(object):
 
 
 class SeriesExtendedRecord(object):
-    """The extended record for a series"""
+    """
+    The extended record for a series. All series airs time like firstAired, lastAired, nextAired, etc.
+    are in US EST for US series, and for all non-US series, the time of the show’s country capital
+    or most populous city. For streaming services, is the official release time.
+    See https://support.thetvdb.com/kb/faq.php?id=29.
+    """
     def __init__(self, data):
         self.abbreviation = data.get('abbreviation', '')                     # string
         self.airsDays = _handle_single(SeriesAirsDays, data.get('airsDays'))
@@ -660,8 +670,8 @@ class SeriesExtendedRecord(object):
         self.status = _handle_single(Status, data.get('status'))
         self.trailers = _handle_list(Trailer, data.get('trailers'))
         # additional attributes needed by the mythtv grabber script:
-#       self.translations = []                                               # ### XXX
-        self.translations = _handle_single(Translations, data.get('translations'))
+        self.translations = []                                               # ### XXX
+        #self.translations = _handle_single(Translations, data.get('translations'))
         self.name_similarity = 0.0
 
 
@@ -791,6 +801,7 @@ class Links(object):
         self.prev = data.get('prev', '')                                     # string
         self.self = data.get('self', '')                                     # string
         self.next = data.get('next', '')                                     # string
+
 
 # ### XXX items not in OAS API Spec:
 

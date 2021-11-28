@@ -155,7 +155,7 @@ QByteArray gzipCompress(const QByteArray& data)
     std::array <char,1024> out {};
 
     // allocate inflate state
-    z_stream strm;
+    z_stream strm {};
 
     strm.zalloc   = Z_NULL;
     strm.zfree    = Z_NULL;

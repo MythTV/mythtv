@@ -54,13 +54,13 @@ class MythTVMenuItemContext
                    bool IsMenu, const QString& TextArg) const;
 
     MythTVMenuItemContext(const MythTVMenu& Menu, const QDomNode& Node,
-                          QString Name, MenuCurrentContext Current, bool Display);
+                          QString Name, MenuCurrentContext Current, bool Visible);
     MythTVMenuItemContext(const MythTVMenu& Menu, const QDomNode& Node,
                           MenuShowContext Context, MenuCurrentContext Current,
-                          QString Action, QString ActionText, bool Display);
+                          QString Action, QString ActionText, bool Visible);
     MythTVMenuItemContext(const MythTVMenu& Menu, const QDomNode& Node,
                           MenuShowContext Context, MenuCurrentContext Current,
-                          QString Action, bool Display);
+                          QString Action, bool Visible);
 
     const MythTVMenu&  m_menu;
     const QDomNode&    m_node;

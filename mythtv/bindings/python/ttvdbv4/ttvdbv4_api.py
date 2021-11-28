@@ -3,7 +3,7 @@
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
 # Copyright: (c) 2021 Roland Ernst
-# License:   GPL v2 or later, see COPYING for details
+# License:   GPL v2 or later, see LICENSE for details
 # ----------------------------------------------------
 
 
@@ -16,7 +16,7 @@ from pprint import pprint
 from .definitions import *
 
 
-MYTHTV_TTVDBV4_API_VERSION = "4.4.0.0"
+MYTHTV_TTVDBV4_API_VERSION = "4.4.0.1"
 
 # set this to true for showing raw json data
 #JSONDEBUG = True
@@ -91,7 +91,7 @@ def _query_yielded(record, path, params, listname=None):
         params['page'] = curr_page
 
 
-"""Generated API for thetvdb.com TVDB API V4 v 4.4.0"""
+"""Generated API for thetvdb.com TVDB API V4 v 4.4.0 @6c60be0 """
 # modifications marked with '### XXX'
 
 
@@ -529,10 +529,12 @@ def getSeriesExtended(id, meta=None):
     return( SeriesExtendedRecord(data) if data is not None else None )
 
 
-def getSeriesEpisodes(id, season_type, season=None, page=0, yielded=False):
+def getSeriesEpisodes(id, season_type, season=None, episodeNumber=None, page=0, yielded=False):
     params = {}
     if season is not None:
         params['season'] = season
+    if episodeNumber is not None:
+        params['episodeNumber'] = episodeNumber
     if page is not None:
         params['page'] = page
     path = getSeriesEpisodes_path.format(id=str(id), season_type=season_type)

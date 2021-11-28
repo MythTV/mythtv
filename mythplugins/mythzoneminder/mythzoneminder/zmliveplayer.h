@@ -41,7 +41,7 @@ class Player
     void updateStatus(void);
     void updateCamera();
 
-    void setMonitor(Monitor *mon);
+    void setMonitor(const Monitor *mon);
     void setWidgets(MythUIImage *image, MythUIText *status,
                     MythUIText  *camera);
 

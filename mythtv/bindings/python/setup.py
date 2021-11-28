@@ -1,95 +1,52 @@
-##/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from distutils.core import setup
-from distutils.cmd import Command
-from distutils.sysconfig import get_python_lib, project_base
-from distutils.command.install import INSTALL_SCHEMES
-from distutils.command.build import build as pybuild
+import sys, os
+import setuptools
 
-import os
-import glob
+run_post_build_action = False
+index = 0
+mythtv_prefix = None
 
-SCRIPTS = ['scripts/mythpython', 'scripts/mythwikiscripts']
+# handle extra build option for 'mythtv-prefix'
+if sys.argv[1] == 'build':
+    for index,arg in enumerate(sys.argv):
+        if arg.startswith("--mythtv-prefix="):
+            run_post_build_action = True
+            try:
+                mythtv_prefix = arg.split("=")[1].strip()
+            except IndexError:
+                pass
+            break
 
-for scheme in INSTALL_SCHEMES.values():
-    scheme['data'] = scheme['purelib']
+    # 'mythtv-prefix' argument is not meant for setup()
+    if run_post_build_action:
+        del sys.argv[index]
 
-class uninstall(Command):
-    user_options=[('prefix=', None, 'installation prefix')]
-    def initialize_options(self):
-        self.prefix = None
-    def finalize_options(self):
-        pass
-    def run(self):
-        install_path = get_python_lib(prefix=self.prefix)
-        mythtv_path = os.path.join(install_path,'MythTV')
-        if os.access(mythtv_path, os.F_OK):
-            for path,dirs,files in os.walk(mythtv_path, topdown=False):
-                for fname in files:
-                    fname = os.path.join(path,fname)
-                    print('unlinking '+fname)
-                    os.unlink(fname)
-                print('removing folder '+path)
-                os.rmdir(path)
-            for fname in os.listdir(install_path):
-                if fname.endswith('.egg-info') and fname.startswith('MythTV'):
-                    fname = os.path.join(install_path, fname)
-                    print('unlinking '+fname)
-                    os.unlink(fname)
-            for fname in SCRIPTS:
-                fname = os.path.join(project_base, fname.split('/')[-1])
-                if os.access(fname, os.F_OK):
-                    print('unlinking '+fname)
-                    os.unlink(fname)
+# run setup() from setuptools with expected arguments
+setuptools.setup()
 
-class build(pybuild):
-    user_options = pybuild.user_options + [('mythtv-prefix=', None, 'MythTV installation prefix')]
-    def initialize_options(self):
-        pybuild.initialize_options(self)
-        self.mythtv_prefix = None
-    def run(self):
-        pybuild.run(self)
+# adapt the path to the grabber scripts according installation
+if run_post_build_action:
+    # check for alternate prefix
+    if mythtv_prefix is None or mythtv_prefix == '':
+        sys.exit(0)
 
-        # check for alternate prefix
-        if self.mythtv_prefix is None:
-            return
+    # find file
+    for path,dirs,files in os.walk('build'):
+        if 'static.py' in files:
+            break
+    else:
+        sys.exit(0)
 
-        # find file
-        for path,dirs,files in os.walk('build'):
-            if 'static.py' in files:
-                break
-        else:
-            return
+    # read in and replace existing line
+    buff = []
+    path = os.path.join(path,'static.py')
+    with open(path) as fi:
+        for line in fi:
+            if 'INSTALL_PREFIX' in line:
+                line = "INSTALL_PREFIX = '%s'\n" % mythtv_prefix
+            buff.append(line)
 
-        # read in and replace existing line
-        buff = []
-        path = os.path.join(path,'static.py')
-        with open(path) as fi:
-            for line in fi:
-                if 'INSTALL_PREFIX' in line:
-                    line = "INSTALL_PREFIX = '%s'\n" % self.mythtv_prefix
-                buff.append(line)
-
-        # push back to file
-        with open(path,'w') as fo:
-            fo.write(''.join(buff))
-
-
-
-setup(
-        name='MythTV',
-        version='32.0.-1',
-        description='MythTV Python bindings.',
-        long_description='Provides canned database and protocol access to the MythTV database, mythproto, mythxml, services_api and frontend remote control.',
-        packages=['MythTV', 'MythTV/tmdb3', 'MythTV/ttvdb', 'MythTV/tvmaze', 'MythTV/ttvdbv4',
-                  'MythTV/wikiscripts', 'MythTV/utility',
-				  'MythTV/services_api'],
-        package_dir={'MythTV/tmdb3':'./tmdb3/tmdb3', 'MythTV/tvmaze':'./tvmaze', 'MythTV/ttvdbv4':'./ttvdbv4'},
-        data_files=[('MythTV/ttvdb/XSLT', glob.glob('MythTV/ttvdb/XSLT/*'))],
-        url=['http://www.mythtv.org/'],
-        scripts=SCRIPTS,
-        requires=['MySQLdb','lxml'],
-        cmdclass={'uninstall':uninstall,
-                  'build':build},
-        )
+    # push back to file
+    with open(path,'w') as fo:
+        fo.write(''.join(buff))

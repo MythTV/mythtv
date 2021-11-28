@@ -345,11 +345,13 @@ RecordingInfo::RecordingInfo(
     QDateTime nextstart = m_startTs;
     querystr = "WHERE program.chanid    = :CHANID  AND "
                "      program.starttime > :STARTTS "
-               "GROUP BY program.starttime ORDER BY program.starttime LIMIT 1 ";
+               "GROUP BY program.starttime ORDER BY program.starttime ";
     bindings[":CHANID"]  = QString::number(_chanid);
     bindings[":STARTTS"] = desiredts.addSecs(50 - desiredts.time().second());
 
-    LoadFromProgram(progList, querystr, bindings, schedList);
+    const uint limit = 1;
+    uint count = 0;
+    LoadFromProgram(progList, querystr, bindings, schedList, 0, limit, count);
 
     if (!progList.empty())
         nextstart = (*progList.begin())->GetScheduledStartTime();

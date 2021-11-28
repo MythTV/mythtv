@@ -4,7 +4,7 @@
 //
 // Copyright (c) 2013 Stuart Morgan <smorgan@mythtv.org>
 //
-// Licensed under the GPL v2 or later, see COPYING for details
+// Licensed under the GPL v2 or later, see LICENSE for details
 //
 //////////////////////////////////////////////////////////////////////////////
 

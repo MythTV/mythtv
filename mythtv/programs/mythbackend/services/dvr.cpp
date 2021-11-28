@@ -327,6 +327,7 @@ bool Dvr::AddRecordedCredits(int RecordedId, const QJsonObject &jsonObj)
                           "%1 to DB").arg(person.toString());
     }
 
+    delete credits;
     return true;
 }
 
@@ -1943,9 +1944,9 @@ QString Dvr::RecStatusToDescription(int RecStatus, int recType,
 {
     //if (!StartTime.isValid())
     //    throw QString("StartTime appears invalid.");
-    auto rsType = static_cast<RecStatus::Type>(RecStatus);
+    auto recstatusType = static_cast<RecStatus::Type>(RecStatus);
     auto recordingType = static_cast<RecordingType>(recType);
-    return RecStatus::toDescription(rsType, recordingType, StartTime);
+    return RecStatus::toDescription(recstatusType, recordingType, StartTime);
 }
 
 QString Dvr::RecTypeToString(const QString& recType)

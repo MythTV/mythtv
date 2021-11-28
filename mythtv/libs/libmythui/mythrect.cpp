@@ -410,7 +410,6 @@ QRect MythRect::toQRect() const
 ///////////////////////////////////////////////////////////////////
 
 MythPoint::MythPoint(const QString &sX, const QString &sY)
-         : QPoint()
 {
     setX(sX);
     setY(sY);

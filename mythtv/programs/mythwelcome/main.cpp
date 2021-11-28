@@ -145,8 +145,8 @@ int main(int argc, char **argv)
         // Block by running an event loop until last screen is removed
         QEventLoop block;
         QObject::connect(mainStack, &MythScreenStack::topScreenChanged,
-                         &block, [&](MythScreenType* _screen)
-        { if (!_screen) block.quit(); });
+                         &block, [&](const MythScreenType* _screen)
+                             { if (!_screen) block.quit(); });
         block.exec();
     }
 

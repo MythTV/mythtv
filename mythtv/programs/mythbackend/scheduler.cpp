@@ -611,9 +611,9 @@ void Scheduler::PrintRec(const RecordingInfo *p, const QString &prefix)
     // is included.  Because PrintList is 1 character longer than
     // PrintRec, the output is off by 1 character.  To compensate,
     // initialize outstr to 1 space in those cases.
-#if CONFIG_DEBUGTYPE
+#ifndef NDEBUG // debug compile type
     static QString initialOutstr = " ";
-#else
+#else // defined NDEBUG
     static QString initialOutstr = "";
 #endif
 
@@ -4371,42 +4371,62 @@ void Scheduler::AddNewRecords(void)
     QString pwrpri = "channel.recpriority + capturecard.recpriority";
 
     if (prefinputpri)
+    {
         pwrpri += QString(" + "
-        "(capturecard.cardid = RECTABLE.prefinput) * %1").arg(prefinputpri);
+        "IF(capturecard.cardid = RECTABLE.prefinput, 1, 0) * %1")
+            .arg(prefinputpri);
+    }
 
     if (hdtvpriority)
-        pwrpri += QString(" + (program.hdtv > 0 OR "
-        "FIND_IN_SET('HDTV', program.videoprop) > 0) * %1").arg(hdtvpriority);
+    {
+        pwrpri += QString(" + IF(program.hdtv > 0 OR "
+        "FIND_IN_SET('HDTV', program.videoprop) > 0, 1, 0) * %1")
+            .arg(hdtvpriority);
+    }
 
     if (wspriority)
+    {
         pwrpri += QString(" + "
-        "(FIND_IN_SET('WIDESCREEN', program.videoprop) > 0) * %1").arg(wspriority);
+        "IF(FIND_IN_SET('WIDESCREEN', program.videoprop) > 0, 1, 0) * %1")
+            .arg(wspriority);
+    }
 
     if (slpriority)
+    {
         pwrpri += QString(" + "
-        "(FIND_IN_SET('SIGNED', program.subtitletypes) > 0) * %1").arg(slpriority);
+        "IF(FIND_IN_SET('SIGNED', program.subtitletypes) > 0, 1, 0) * %1")
+            .arg(slpriority);
+    }
 
     if (onscrpriority)
+    {
         pwrpri += QString(" + "
-        "(FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0) * %1").arg(onscrpriority);
+        "IF(FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0, 1, 0) * %1")
+            .arg(onscrpriority);
+    }
 
     if (ccpriority)
     {
         pwrpri += QString(" + "
-        "(FIND_IN_SET('NORMAL', program.subtitletypes) > 0 OR "
-        "program.closecaptioned > 0 OR program.subtitled > 0) * %1").arg(ccpriority);
+        "IF(FIND_IN_SET('NORMAL', program.subtitletypes) > 0 OR "
+        "program.closecaptioned > 0 OR program.subtitled > 0, 1, 0) * %1")
+            .arg(ccpriority);
     }
 
     if (hhpriority)
     {
         pwrpri += QString(" + "
-        "(FIND_IN_SET('HARDHEAR', program.subtitletypes) > 0 OR "
-        "FIND_IN_SET('HARDHEAR', program.audioprop) > 0) * %1").arg(hhpriority);
+        "IF(FIND_IN_SET('HARDHEAR', program.subtitletypes) > 0 OR "
+        "FIND_IN_SET('HARDHEAR', program.audioprop) > 0, 1, 0) * %1")
+            .arg(hhpriority);
     }
 
     if (adpriority)
+    {
         pwrpri += QString(" + "
-        "(FIND_IN_SET('VISUALIMPAIR', program.audioprop) > 0) * %1").arg(adpriority);
+        "IF(FIND_IN_SET('VISUALIMPAIR', program.audioprop) > 0, 1, 0) * %1")
+            .arg(adpriority);
+    }
 
     MSqlQuery result(m_dbConn);
 
@@ -4426,8 +4446,8 @@ void Scheduler::AddNewRecords(void)
             QString sclause = result.value(1).toString();
             sclause.remove(RecordingInfo::kReLeadingAnd);
             sclause.remove(';');
-            pwrpri += QString(" + (%1) * %2").arg(sclause)
-                                             .arg(result.value(0).toInt());
+            pwrpri += QString(" + IF(%1, 1, 0) * %2")
+                              .arg(sclause).arg(result.value(0).toInt());
         }
     }
     pwrpri += QString(" AS powerpriority ");
@@ -5810,30 +5830,30 @@ bool Scheduler::InitInputInfoMap(void)
     return CreateConflictLists();
 }
 
-void Scheduler::AddChildInput(uint parentid, uint inputid)
+void Scheduler::AddChildInput(uint parentid, uint childid)
 {
     LOG(VB_SCHEDULE, LOG_INFO, LOC +
         QString("AddChildInput: Handling parent = %1, input = %2")
-        .arg(parentid).arg(inputid));
+        .arg(parentid).arg(childid));
 
     // This code should stay substantially similar to that above in
     // InitInputInfoMap().
-    SchedInputInfo &siinfo = m_sinputInfoMap[inputid];
-    siinfo.m_inputId = inputid;
+    SchedInputInfo &siinfo = m_sinputInfoMap[childid];
+    siinfo.m_inputId = childid;
     if (m_sinputInfoMap[parentid].m_schedGroup)
         siinfo.m_sgroupId = parentid;
     else
-        siinfo.m_sgroupId = inputid;
+        siinfo.m_sgroupId = childid;
     siinfo.m_schedGroup = false;
-    siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(inputid);
+    siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(childid);
 
     siinfo.m_conflictList = m_sinputInfoMap[parentid].m_conflictList;
 
     // Now, fixup the infos for the parent and conflicting inputs.
-    m_sinputInfoMap[parentid].m_groupInputs.push_back(inputid);
+    m_sinputInfoMap[parentid].m_groupInputs.push_back(childid);
     for (uint otherid : siinfo.m_conflictingInputs)
     {
-        m_sinputInfoMap[otherid].m_conflictingInputs.push_back(inputid);
+        m_sinputInfoMap[otherid].m_conflictingInputs.push_back(childid);
     }
 }
 

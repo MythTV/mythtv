@@ -3,7 +3,7 @@
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
 # Copyright: (c) 2021 Roland Ernst
-# License:   GPL v2 or later, see COPYING for details
+# License:   GPL v2 or later, see LICENSE for details
 # ----------------------------------------------------
 
 
@@ -360,7 +360,6 @@ class Myth4TTVDBv4(object):
                                 name_found = True
                             desc = t.overview
                             if name_found and desc:
-                                # print(desc)
                                 raise StopIteration
                     except (KeyError, ValueError):
                         continue
@@ -511,38 +510,21 @@ class Myth4TTVDBv4(object):
         episode = self.tvdata[2]
 
         # get series data:
-        ser_x = ttvdb.getSeriesExtended(inetref, meta='translations')
+        ser_x = ttvdb.getSeriesExtended(inetref)
 
-        # get preferred translations if not already there (see 'meta' argument)
-        if ser_x.translations:
-            # remove unwanted translations:
-            translations = [x for x in ser_x.translations.nameTranslations
-                            if x.language in self.languagelist]
-            # sort the translations
-            ser_x.translations = sort_list_by_lang(translations, self.languagelist)
-        else:
-            ser_x.translations = []
-            for lang in self._select_preferred_langs(ser_x.nameTranslations):
-                translation = ttvdb.getSeriesTranslation(inetref, lang)
-                ser_x.translations.append(translation)
+        ser_x.translations = []
+        for lang in self._select_preferred_langs(ser_x.nameTranslations):
+            translation = ttvdb.getSeriesTranslation(inetref, lang)
+            ser_x.translations.append(translation)
 
         if self.debug:
             print("%04d: buildSingle: Series information for %s:"
                   % (self._get_ellapsed_time(), inetref))
             _print_class_content(ser_x)
 
-        # get episode information:
-        gen_episodes = ttvdb.getSeriesEpisodes(inetref, season_type='default', yielded=True)
-        try:
-            while True:
-                # get the episode and check season#
-                ep = next(gen_episodes)
-                if ep.seasonNumber == season and ep.number == episode:
-                    break
-        except StopIteration:
-            print("Nothing found")
-            raise
-
+        gen_episodes = ttvdb.getSeriesEpisodes(inetref, season_type='default', season=season,
+                                               episodeNumber=episode, yielded=True)
+        ep = next(gen_episodes)
         epi_x = ttvdb.getEpisodeExtended(ep.id)
         for lang in self._select_preferred_langs(epi_x.nameTranslations):
             translation = ttvdb.getEpisodeTranslation(epi_x.id, lang)
@@ -590,20 +572,13 @@ class Myth4TTVDBv4(object):
                   % (self._get_ellapsed_time(), tvinetref, xml_output))
 
         # get data for passed inetref and preferred translations
-        ser_x = ttvdb.getSeriesExtended(tvinetref, meta='translations')
+        ser_x = ttvdb.getSeriesExtended(tvinetref)
 
-        # get preferred translations if not already there (see 'meta' argument)
-        if ser_x.translations:
-            # remove unwanted translations:
-            translations = [x for x in ser_x.translations.nameTranslations
-                            if x.language in self.languagelist]
-            # sort the translations
-            ser_x.translations = sort_list_by_lang(translations, self.languagelist)
-        else:
-            ser_x.translations = []
-            for lang in self._select_preferred_langs(ser_x.nameTranslations):
-                translation = ttvdb.getSeriesTranslation(tvinetref, lang)
-                ser_x.translations.append(translation)
+        ser_x.translations = []
+        for lang in self._select_preferred_langs(ser_x.nameTranslations):
+            translation = ttvdb.getSeriesTranslation(tvinetref, lang)
+            ser_x.translations.append(translation)
+
         # define exact name found:
         ser_x.name_similarity = 1.0
 

@@ -6,10 +6,6 @@
 #include <sys/ioctl.h>
 #include <poll.h>
 
-#ifdef USING_V4L1
-#include <linux/videodev.h>
-#endif // USING_V4L1
-
 #include "mythlogging.h"
 #include "analogsignalmonitor.h"
 #include "v4lchannel.h"
@@ -191,22 +187,6 @@ void AnalogSignalMonitor::UpdateValues(void)
             }
         }
     }
-#ifdef USING_V4L1
-    else
-    {
-        struct video_tuner tuner;
-        memset(&tuner, 0, sizeof(tuner));
-
-        if (ioctl(videofd, VIDIOCGTUNER, &tuner, 0) < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to probe signal (v4l1)" + ENO);
-        }
-        else
-        {
-            isLocked = tuner.signal;
-        }
-    }
-#endif // USING_V4L1
 
     {
         QMutexLocker locker(&m_statusLock);

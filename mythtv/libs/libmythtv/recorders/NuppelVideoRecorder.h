@@ -146,9 +146,7 @@ class MTV_PUBLIC NuppelVideoRecorder : public V4LRecorder, public CC608Input
 
     void ProbeV4L2(void);
     bool SetFormatV4L2(void);
-    void DoV4L1(void);
     void DoV4L2(void);
-    void DoMJPEG(void);
 
     void FormatTT(struct VBIData *vbidata) override; // V4LRecorder
     void FormatCC(uint code1, uint code2) override; // V4LRecorder

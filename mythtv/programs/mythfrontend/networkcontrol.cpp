@@ -255,12 +255,15 @@ NetworkControl::~NetworkControl(void)
     }
     m_clientLock.unlock();
 
-    m_nrLock.lock();
-    m_networkControlReplies.push_back(new NetworkCommand(nullptr,
-        "mythfrontend shutting down, connection closing..."));
-    m_nrLock.unlock();
-
-    notifyDataAvailable();
+    auto * cmd = new (std::nothrow) NetworkCommand(nullptr,
+        "mythfrontend shutting down, connection closing...");
+    if (cmd != nullptr)
+    {
+        m_nrLock.lock();
+        m_networkControlReplies.push_back(cmd);
+        m_nrLock.unlock();
+        notifyDataAvailable();
+    }
 
     m_ncLock.lock();
     m_stopCommandThread = true;
@@ -1538,7 +1541,7 @@ void NetworkControl::notifyDataAvailable(void)
 }
 
 void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
-                                       QString &reply)
+                                       const QString &reply)
 {
     if (!m_clients.contains(ncc))
     {

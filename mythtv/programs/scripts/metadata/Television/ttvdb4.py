@@ -4,7 +4,7 @@
 # ----------------------------------------------------
 # Purpose:   MythTV Python Bindings for TheTVDB v4 API
 # Copyright: (c) 2021 Roland Ernst
-# License:   GPL v2 or later, see COPYING for details
+# License:   GPL v2 or later, see LICENSE for details
 # ----------------------------------------------------
 
 
@@ -19,7 +19,7 @@ from configparser import ConfigParser
 
 __title__ = "TheTVDatabaseV4"
 __author__ = "Roland Ernst"
-__version__ = "0.3.3"
+__version__ = "0.4.0"
 
 
 def print_etree(etostr):

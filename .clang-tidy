@@ -51,6 +51,11 @@ Checks: '-*,
         # line. New in clang11. ,
        -bugprone-reserved-identifier,
 
+        # New in clang13. 4533 warnings. ,
+       -bugprone-easily-swappable-parameters,
+        # New in clang13. 979 warnings. ,
+       -bugprone-implicit-widening-of-multiplication-result,
+
     cert-*,
 
 	# Aliases for bugprone-reserved-identifier,
@@ -161,6 +166,9 @@ Checks: '-*,
         # Disable newer C++14/17 tests for now. ,
        -modernize-use-nodiscard,
 
+        # New in clang13. 2571 warnings. ,
+       -modernize-return-braced-init-list,
+
     performance-*,
 
         # The Q_DECLARE_METATYPE macro triggers a warning from this
@@ -207,6 +215,7 @@ CheckOptions:
   - { key: readability-implicit-bool-conversion.AllowPointerConditions,    value: 1 }
   - { key: readability-implicit-bool-conversion.AllowIntegerConditions,    value: 1 }
   - { key: readability-inconsistent-declaration-parameter-name.strict,     value: 1 }
+  - { key: readability-redundant-member-init.IgnoreBaseInCopyConstructors, value: 1 }
   - { key: readability-redundant-declaration.IgnoreMacros,                 value: 0 }
   - { key: readability-simplify-boolean-expr.chainedconditionalreturn,     value: 1 }
   - { key: readability-simplify-boolean-expr.chainedconditionalassignment, value: 1 }

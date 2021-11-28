@@ -133,9 +133,13 @@ bool MythFIFOWriter::FIFOInit(uint Id, const QString& Desc, const QString& Name,
     {
         fifoptr->m_data = new unsigned char[static_cast<unsigned long>(m_maxBlkSize[Id])];
         if (i == m_fbCount[Id] - 1)
+        {
             fifoptr->m_next = m_fifoBuf[Id];
+        }
         else
+        {
             fifoptr->m_next = new struct MythFifoBuffer;
+        }
         fifoptr = fifoptr->m_next;
     }
     m_fbInptr[Id]  = m_fifoBuf[Id];

@@ -8,6 +8,7 @@
 #include <QApplication>
 #include <QFileInfo>
 #include <QObject>
+#include <QRegularExpression>
 
 // mythmusic
 #include "musicdata.h"
@@ -1141,8 +1142,8 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
                 continue;
 
             // Normal track
-            if (mdata->Length() > 0)
-                size_in_sec += mdata->Length();
+            if (mdata->Length() > 0ms)
+                size_in_sec += duration_cast<floatsecs>(mdata->Length()).count();
             else
                 LOG(VB_GENERAL, LOG_ERR, "Computing track lengths. "
                                          "One track <=0");
@@ -1373,16 +1374,16 @@ int Playlist::CreateCDMP3(void)
 
     connect(m_proc, &MythSystemLegacy::readDataReady, this, &Playlist::mkisofsData,
             Qt::DirectConnection);
-    connect(m_proc, &MythSystemLegacy::inished,       this, qOverload<>&Playlist::processExit,
+    connect(m_proc, &MythSystemLegacy::finished,      this, qOverload<>(&Playlist::processExit),
             Qt::DirectConnection);
-    connect(m_proc, &MythSystemLegacy::error,         this, qOverload<uint>&Playlist::processExit),
+    connect(m_proc, &MythSystemLegacy::error,         this, qOverload<uint>(&Playlist::processExit),
             Qt::DirectConnection);
 
     m_procExitVal = GENERIC_EXIT_RUNNING;
     m_proc->Run();
 
     while( m_procExitVal == GENERIC_EXIT_RUNNING )
-        usleep( 100ms );
+        usleep( 100000 );
 
     uint retval = m_procExitVal;
 
@@ -1424,14 +1425,14 @@ int Playlist::CreateCDMP3(void)
         connect(m_proc, &MythSystemLegacy::readDataReady,
                 this, &Playlist::cdrecordData, Qt::DirectConnection);
         connect(m_proc, &MythSystemLegacy::finished,
-                this, qOverload<>&Playlist::processExit, Qt::DirectConnection);
+                this, qOverload<>(&Playlist::processExit), Qt::DirectConnection);
         connect(m_proc, &MythSystemLegacy::error,
-                this, qOverload<uint>&Playlist::processExit, Qt::DirectConnection);
+                this, qOverload<uint>(&Playlist::processExit), Qt::DirectConnection);
         m_procExitVal = GENERIC_EXIT_RUNNING;
         m_proc->Run();
 
         while( m_procExitVal == GENERIC_EXIT_RUNNING )
-            usleep( 100ms );
+            usleep( 100000 );
 
         retval = m_procExitVal;
 

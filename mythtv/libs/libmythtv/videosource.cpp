@@ -2532,10 +2532,8 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
 #endif // USING_DVB
 
 #ifdef USING_V4L2
-# ifdef USING_HDPVR
     cardtype->addTargetedChild("HDPVR",
                                new HDPVRConfigurationGroup(parent, *cardtype));
-# endif // USING_HDPVR
 #endif // USING_V4L2
 
 #ifdef USING_HDHOMERUN
@@ -2573,10 +2571,8 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent)
                                new V4LConfigurationGroup(parent, *cardtype, "MJPEG"));
     cardtype->addTargetedChild("GO7007",
                                new V4LConfigurationGroup(parent, *cardtype, "GO7007"));
-# ifdef USING_IVTV
     cardtype->addTargetedChild("MPEG",
                                new MPEGConfigurationGroup(parent, *cardtype));
-# endif // USING_IVTV
 #endif // USING_V4L2
 
 #ifdef USING_ASI
@@ -2733,10 +2729,8 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 #ifdef USING_V4L2
     setting->addSelection(
         QObject::tr("V4L2 encoder"), "V4L2ENC");
-#ifdef USING_HDPVR
     setting->addSelection(
         QObject::tr("HD-PVR H.264 encoder"), "HDPVR");
-#endif // USING_HDPVR
 #endif // USING_V4L2
 
 #ifdef USING_HDHOMERUN
@@ -2769,10 +2763,8 @@ void CardType::fillSelections(MythUIComboBoxSetting* setting)
 #endif // USING_IPTV
 
 #ifdef USING_V4L2
-#ifdef USING_IVTV
     setting->addSelection(
         QObject::tr("Analog to MPEG-2 encoder card (PVR-150/250/350, etc)"), "MPEG");
-#endif // USING_IVTV
     setting->addSelection(
         QObject::tr("Analog to MJPEG encoder card (Matrox G200, DC10, etc)"), "MJPEG");
     setting->addSelection(
@@ -3396,7 +3388,7 @@ void CardInput::channelScanner(void)
 
     if (ssd->Create())
     {
-        connect(ssd, &StandardSettingDialog::Exiting,
+        connect(ssd, &StandardSettingDialog::Exiting, this,
                 [=]()
                 {
                     if (SourceUtil::GetChannelCount(srcid))

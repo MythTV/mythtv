@@ -40,14 +40,6 @@ DEPENDPATH  += ./recorders/dvbdev
 DEPENDPATH  += ./recorders/rtp
 DEPENDPATH  += ./recorders/vbitext
 DEPENDPATH  += ./recorders/HLS
-DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
-DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
-DEPENDPATH  += ../libmythlivemedia/groupsock/include
-DEPENDPATH  += ../libmythlivemedia/groupsock
-DEPENDPATH  += ../libmythlivemedia/liveMedia/include
-DEPENDPATH  += ../libmythlivemedia/liveMedia
-DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
-DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 DEPENDPATH  += ../libmythbase ../libmythui
 DEPENDPATH  += ../libmythupnp
 DEPENDPATH  += ../libmythservicecontracts
@@ -375,10 +367,6 @@ using_libbluray_external:mingw {
 using_libbluray_external:android {
     LIBS += -lbluray -lxml2
 }
-
-DEPENDPATH += ../../external/libudfread
-LIBS += -L../../external/libudfread
-LIBS += -lmythudfread-$$LIBVERSION
 
 #HLS stuff
 HEADERS += HLS/httplivestream.h
@@ -891,6 +879,9 @@ using_backend {
         SOURCES += recorders/v4l2encstreamhandler.cpp
         HEADERS += recorders/v4l2encsignalmonitor.h
         SOURCES += recorders/v4l2encsignalmonitor.cpp
+
+        HEADERS += recorders/mpegrecorder.h
+        SOURCES += recorders/mpegrecorder.cpp
     }
 
     # Support for cable boxes that provide Firewire out
@@ -1048,16 +1039,6 @@ using_backend {
         DEFINES += USING_CETON
     }
 
-    # Support for PVR-150/250/350/500, etc. on Linux
-    using_ivtv:HEADERS *= recorders/mpegrecorder.h
-    using_ivtv:SOURCES *= recorders/mpegrecorder.cpp
-    using_ivtv:DEFINES += USING_IVTV
-
-    # Support for HD-PVR on Linux
-    using_hdpvr:HEADERS *= recorders/mpegrecorder.h
-    using_hdpvr:SOURCES *= recorders/mpegrecorder.cpp
-    using_hdpvr:DEFINES += USING_HDPVR
-
     # External recorder
     HEADERS += recorders/ExternalChannel.h
     SOURCES += recorders/ExternalChannel.cpp
@@ -1172,7 +1153,6 @@ LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythbase-$$LIBVERSION
 LIBS += -lmythservicecontracts-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
-using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_backend:using_mp3lame: LIBS += -lmp3lame
 using_backend: LIBS += -llzo2
 LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
@@ -1188,7 +1168,6 @@ LIBS += $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
     POST_TARGETDEPS += ../../external/FFmpeg/libavfilter/$$avLibName(avfilter)
 
     using_mheg: POST_TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
-    using_live: POST_TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 }
 
 INCLUDEPATH += $$POSTINC
