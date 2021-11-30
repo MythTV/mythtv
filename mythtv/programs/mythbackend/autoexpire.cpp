@@ -40,11 +40,10 @@
 #include "compat.h"
 #include "mythlogging.h"
 #include "tv_rec.h"
+#include "backendcontext.h"
 
 #define LOC     QString("AutoExpire: ")
 #define LOC_ERR QString("AutoExpire Error: ")
-
-extern AutoExpire *expirer;
 
 /** If calculated desired space for 10 min freq is > SPACE_TOO_BIG_KB
  *  then we use 5 min expire frequency.
@@ -1030,7 +1029,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
  */
 void AutoExpire::Update(int encoder, int fsID, bool immediately)
 {
-    if (!expirer)
+    if (!gExpirer)
         return;
 
     if (encoder > 0)
@@ -1048,18 +1047,18 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
     {
         if (encoder > 0)
         {
-            expirer->m_instanceLock.lock();
-            expirer->m_usedEncoders[encoder] = fsID;
-            expirer->m_instanceLock.unlock();
+            gExpirer->m_instanceLock.lock();
+            gExpirer->m_usedEncoders[encoder] = fsID;
+            gExpirer->m_instanceLock.unlock();
         }
-        expirer->CalcParams();
-        expirer->m_instanceCond.wakeAll();
+        gExpirer->CalcParams();
+        gExpirer->m_instanceCond.wakeAll();
     }
     else
     {
-        expirer->m_updateLock.lock();
-        expirer->m_updateQueue.append(UpdateEntry(encoder, fsID));
-        expirer->m_updateLock.unlock();
+        gExpirer->m_updateLock.lock();
+        gExpirer->m_updateQueue.append(UpdateEntry(encoder, fsID));
+        gExpirer->m_updateLock.unlock();
     }
 }
 

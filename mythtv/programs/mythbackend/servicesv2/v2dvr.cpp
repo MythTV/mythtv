@@ -41,9 +41,7 @@
 #include "encoderlink.h"
 #include "storagegroup.h"
 #include "playgroup.h"
-
-extern QMap<int, EncoderLink *> tvList;
-extern AutoExpire  *expirer;
+#include "backendcontext.h"
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
@@ -85,8 +83,8 @@ V2ProgramList* V2Dvr::GetExpiringList( int nStartIndex,
 {
     pginfolist_t  infoList;
 
-    if (expirer)
-        expirer->GetAllExpiring( infoList );
+    if (gExpirer)
+        gExpirer->GetAllExpiring( infoList );
 
     // ----------------------------------------------------------------------
     // Build Response

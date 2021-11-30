@@ -15,8 +15,6 @@
 #include "v2frontend.h"
 #include "backendcontext.h"
 
-extern QMap<int, EncoderLink *> tvList;
-
 void V2FillProgramInfo( V2Program *pProgram,
                       ProgramInfo  *pInfo,
                       bool          bIncChannel /* = true */,
@@ -678,7 +676,7 @@ void FillEncoderList(QVariantList &list, QObject* parent)
 {
     QReadLocker tvlocker(&TVRec::s_inputsLock);
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
-    for (auto * elink : qAsConst(tvList))
+    for (auto * elink : qAsConst(gTVList))
     {
         if (elink != nullptr)
         {

@@ -75,7 +75,7 @@ void V2Status::RegisterCustomTypes()
 
 V2Status::V2Status () : MythHTTPService(s_service)
 {
-    m_pEncoders = &tvList;  // extern
+    m_pEncoders = &gTVList;  // extern
     m_pSched    =  dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
     if (m_pSched)
         m_pMainServer = m_pSched->GetMainServer();
