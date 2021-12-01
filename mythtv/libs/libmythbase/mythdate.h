@@ -1,6 +1,7 @@
 #ifndef MYTH_DATE_H
 #define MYTH_DATE_H
 
+#include <cstdint>
 #include <chrono>
 using namespace std::chrono_literals;
 
@@ -110,7 +111,7 @@ inline QDateTime fromString(const QString &str, const QString &format)
  *                  at Jan 1 1970 at 00:00:00.
  *  \return A QDateTime.
  */
-inline QDateTime fromSecsSinceEpoch(uint seconds)
+inline QDateTime fromSecsSinceEpoch(int64_t seconds)
 {
     return QDateTime::fromSecsSinceEpoch(seconds, Qt::UTC);
 }
