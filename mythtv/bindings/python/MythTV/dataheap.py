@@ -15,26 +15,13 @@ from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet,\
 
 import re
 import locale
-
-# TODO: if Python 3.3+ is in use by all distributions, use ElementTree only.
-try:
-    import xml.etree.cElementTree as etree
-except ImportError:
-    import xml.etree.ElementTree as etree
-
+import xml.etree.ElementTree as etree
 from datetime import date, time
 
 _default_datetime = datetime(1900,1,1, tzinfo=datetime.UTCTZ())
 
-# from builtins import str
-try:
-    from UserString import MutableString
-except ImportError:
-    from collections import UserString as MutableString
-    unicode = str
-    MutableString = str
 
-class Artwork( MutableString ):
+class Artwork( str ):
     _types = {'coverart':   'Coverart',
               'coverfile':  'Coverart',
               'fanart':     'Fanart',
@@ -80,11 +67,6 @@ class Artwork( MutableString ):
                 return super(Artwork, cls).__new__(cls, attr)
 
     def __init__(self, attr, parent=None, imagetype=None):
-        # replace standard MutableString init to not overwrite self.data
-        # from warnings import warnpy3k
-        # warnpy3k('the class UserString.MutableString has been removed in '
-        #             'Python 3.0', stacklevel=2)
-
         self.attr = attr
         if imagetype is None:
             imagetype = self._types[attr]
@@ -430,7 +412,7 @@ class Recorded( CMPRecord, DBDataWrite ):
                             ('R','description'), ('C','category'),
                             ('U','recgroup'), ('hn','hostname'),
                             ('c','chanid') ):
-            tmp = unicode(self[data]).replace('/','-')
+            tmp = str(self[data]).replace('/','-')
             path = path.replace('%'+tag, tmp)
         for (data, pre) in (   ('starttime','%'), ('endtime','%e'),
                                ('progstart','%p'),('progend','%pe') ):
@@ -490,8 +472,8 @@ class Recorded( CMPRecord, DBDataWrite ):
         # pull cast
         trans = {'Author':'writer'}
         for cast in metadata.people:
-            self.cast.append(unicode(cast.name),
-                             unicode(trans.get(cast.job,
+            self.cast.append(str(cast.name),
+                             str(trans.get(cast.job,
                                         cast.job.lower().replace(' ','_'))))
 
         # pull images
@@ -1111,11 +1093,11 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
         # pull actors
         for actor in [person for person in metadata.people \
                                   if person.job=='Actor']:
-            self.cast.add(unicode(actor.name))
+            self.cast.add(str(actor.name))
 
         # pull genres
         for category in metadata.categories:
-            self.genre.add(unicode(category))
+            self.genre.add(str(category))
 
         # pull images (SG content only)
         if bool(self.host):

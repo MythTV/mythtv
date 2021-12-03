@@ -4,18 +4,11 @@
 # Description: A rolling buffer class that discards handled information.
 #------------------------------
 
-try:
-    from cStringIO import StringIO
-except:
-    from io import BytesIO as StringIO
-
+from io import BytesIO
 from time import time, sleep
 from threading import Thread, Lock
 from collections import deque
-try:
-    from Queue import Queue
-except:
-    from queue import Queue
+from queue import Queue
 import weakref
 
 try:
@@ -179,7 +172,7 @@ class DequeBuffer( object ):
         """
         __slots__ = ['buffer', 'lock', 'blocksize', 'EOF', 'rpos', 'wpos']
         def __init__(self, size=2**18):
-            self.buffer = StringIO()
+            self.buffer = BytesIO()
             self.lock = Lock()
             self.blocksize = size
             self.EOF = False
@@ -250,7 +243,7 @@ class DequeBuffer( object ):
         """
         # flush existing buffer
         self._rollback_pool = []
-        data = StringIO()
+        data = BytesIO()
         while True:
             try:
                 # get first item, or return if no more blocks are avaialable
@@ -276,7 +269,7 @@ class DequeBuffer( object ):
 
     def write(self, data):
         """Write provide data into buffer."""
-        data = StringIO(data)
+        data = BytesIO(data)
         data.seek(0, 2)
         end = data.tell()
         pos = 0

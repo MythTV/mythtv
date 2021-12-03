@@ -16,20 +16,13 @@ from MythTV.utility import CMPRecord, datetime, ParseEnum, \
 
 from datetime import date
 from time import sleep
-try:
-    from thread import allocate_lock
-except ImportError:
-    from _thread import allocate_lock
+from _thread import allocate_lock
 from random import randint
 import socket
 import weakref
 import re
 import os
 
-try:
-    xrange
-except NameError:
-    xrange = range
 
 class BECache( object ):
     """
@@ -798,7 +791,7 @@ class FileOps( BECache ):
             pgrecordid = Program._field_order.index('recordid')
 
             res = self.inst.backendCommand(self.query).split(BACKEND_SEP)
-            for i in xrange(self.header_length):
+            for i in range(self.header_length):
                 res.pop(0)
             num_progs = int(res.pop(0))
             if num_progs*pgfieldcount != len(res):
