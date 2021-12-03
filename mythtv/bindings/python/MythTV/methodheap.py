@@ -17,18 +17,9 @@ from MythTV.dataheap import *
 from datetime import timedelta
 from weakref import proxy
 from collections import namedtuple
-
-try:
-    from urllib import urlopen
-except ImportError:
-    from urllib.request import urlopen
-
+from urllib.request import urlopen
 import re
 
-try:
-    xrange
-except NameError:
-    xrange = range
 
 class CaptureCard( DBData ):
     pass
@@ -299,7 +290,7 @@ class MythBE( FileOps ):
             command = 'QUERY_FREE_SPACE_LIST'
         res = self.backendCommand(command).split(BACKEND_SEP)
         l = len(FreeSpace._field_order)
-        for i in xrange(len(res)//l):
+        for i in range(len(res)//l):
             yield FreeSpace(res[i*l:i*l+l])
 
     def getFreeSpaceSummary(self):

@@ -10,21 +10,12 @@ from MythTV.utility import deadlinesocket
 
 from time import sleep, time
 from select import select
-try:
-    from thread import start_new_thread, allocate_lock, get_ident
-except ImportError:
-    from _thread import start_new_thread, allocate_lock, get_ident
+from _thread import start_new_thread, allocate_lock, get_ident
 import lxml.etree as etree
 import weakref
-try:
-    import urllib2
-except ImportError:
-    import urllib.request as urllib2
+import urllib.request
 import socket
-try:
-    import Queue
-except ImportError:
-    import queue as Queue
+import queue
 import json
 import re
 from builtins import str
@@ -350,7 +341,7 @@ class BEEventConnection( BEConnection ):
 
         self.hostname = ""
         self.threadrunning = False
-        self.eventqueue = Queue.Queue()
+        self.eventqueue = queue.Queue()
 
         super(BEEventConnection, self).__init__(backend, port, localname,
                                                 False, deadline)
@@ -439,7 +430,7 @@ class BEEventConnection( BEConnection ):
                                 raise
                             except:
                                 pass
-                except Queue.Empty:
+                except queue.Empty:
                     break
             sleep(0.1)
         self.threadrunning = False
@@ -575,8 +566,8 @@ class XMLConnection( object ):
         either 'backend' or 'port' is not defined.
     """
 
-    class _Request( urllib2.Request ):
-        def open(self): return urllib2.urlopen(self)
+    class _Request( urllib.request.Request ):
+        def open(self): return urllib.request.urlopen(self)
         def read(self): return self.open().read()
 
         def setJSON(self):
@@ -620,7 +611,7 @@ class XMLConnection( object ):
         url = 'http://{0.host}:{0.port}/{1}'.format(self, path)
         if keyvars:
             url += '?' + '&'.join(
-                        ['{0}={1}'.format(k,urllib2.quote(v))
+                        ['{0}={1}'.format(k,urllib.request.quote(v))
                                 for k,v in keyvars.items()])
         self.log(self.log.NETWORK, self.log.DEBUG, 'Generating request', url)
         return self._Request(url)

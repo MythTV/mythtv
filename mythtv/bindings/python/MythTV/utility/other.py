@@ -4,11 +4,7 @@
 from MythTV.logging import MythLog
 from MythTV.exceptions import MythDBError, MythError
 from .dt import datetime
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import BytesIO as StringIO
+from io import BytesIO
 from select import select
 from time import time
 from builtins import map
@@ -321,7 +317,7 @@ class deadlinesocket( socket.socket ):
         if deadline < 1000:
             deadline += time()
 
-        buff = StringIO()
+        buff = BytesIO()
         # loop until necessary data has been received
         while bufsize > buff.tell():
             # wait for data on the socket
@@ -353,7 +349,7 @@ class deadlinesocket( socket.socket ):
         if deadline < 1000:
             deadline += time()
 
-        buff = StringIO()
+        buff = BytesIO()
         # loop until pattern has been found
         while not pattern.search(buff.getvalue()):
             # wait for data on the socket
