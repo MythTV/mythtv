@@ -981,8 +981,7 @@ class DatabaseConfig( object ):
             if len(name):
                 self.profile = name[0]
 
-            for child in config.xpath('/Configuration/Database')[0]\
-                                                            .getchildren():
+            for child in list(config.xpath('/Configuration/Database')[0]):
                 if child.tag in self._conf_trans:
                     setattr(self, self._conf_trans[child.tag], child.text)
 
@@ -1009,8 +1008,8 @@ class DatabaseConfig( object ):
             trans = {'DBHostName':'hostname', 'DBUserName':'username',
                      'DBPassword':'password', 'DBName':'database',
                      'DBPort':'port'}
-            for child in config.xpath('/Configuration/UPnP/MythFrontend/'+\
-                                            'DefaultBackend')[0].getchildren():
+            for child in list(config.xpath('/Configuration/UPnP/MythFrontend/'+\
+                                            'DefaultBackend')[0]):
                 if child.tag in trans:
                     setattr(self, trans[child.tag], child.text)
         except:

@@ -1236,7 +1236,7 @@ class InternetSource( DictData ):
     @classmethod
     def fromEtree(cls, etree, xmlconn):
         dat = {}
-        for item in etree.getchildren():
+        for item in list(etree):
             dat[item.tag] = item.text
 
         raw = []
