@@ -7,7 +7,6 @@
 #------------------------------
 
 from builtins import int
-from future.utils import with_metaclass
 
 class EnumValue( object ):
     _next = 0
@@ -52,7 +51,7 @@ class EnumType( type ):
             return cls(cls._values[key].value)
         raise AttributeError(key)
 
-class BaseEnum( with_metaclass( EnumType, object )):
+class BaseEnum( object, metaclass=EnumType ):
 
     def __init__(self, mode):
         self.mode = mode
