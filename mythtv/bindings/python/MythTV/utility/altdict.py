@@ -4,7 +4,15 @@
 # Description: Provides various custom dict-like classes
 #------------------------------
 
+# Important Note: The classes provided by this module are considered deprecated and will be
+#                 removed after the release of MythTV v32!
+#                 Please use the class 'OrderedDict' from the module 'collections' provided
+#                 by python3.
+#                 For the classes 'DictInvert' and 'DictInvertCI', please use the imports
+#                 'from MythTV.altdict import DictInvert, DictInvertCI'
+
 from builtins import map, zip
+from warnings import warn
 
 class OrdDict( dict ):
     """
@@ -42,13 +50,16 @@ class OrdDict( dict ):
             del self[name]
 
     def __delitem__(self, key):
-        dict.__delitem(self, key)
+        dict.__delitem__(self, key)
         self._field_order.remove(key)
 
     def __iter__(self):
         return self.itervalues()
 
     def __init__(self, data=()):
+        warn("Class 'OrdDict' from this module  will be removed after MythTV v32 release, "
+             "use the class 'OrderedDict' from the module 'collections' provided by python3.",
+             DeprecationWarning, 2)
         dict.__init__(self)
         self._field_order = []
         for k,v in data:
@@ -93,9 +104,13 @@ class DictInvert(dict):
     """
 
     def __init__(self, other, mine=None):
+        warn("Classes 'DictInvert' and 'DictInvertCI' from this module  will be removed "
+             "after MythTV v32 release, "
+             "use the imports 'from MythTV.altdict import DictInvert, DictInvertCI.",
+             DeprecationWarning, 2)
         self.other = other
         if mine is None:
-            mine = dict(zip(*reversed(zip(*other.items()))))
+            mine = dict(zip(*reversed(list(zip(*other.items())))))
         dict.__init__(self, mine)
 
     @classmethod
