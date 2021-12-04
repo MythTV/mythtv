@@ -20,15 +20,12 @@ import json
 import re
 from builtins import str
 
+# Note: Support for oursql was removed in MythTV v32
 try:
-    from . import _conn_oursql as dbmodule
-    from ._conn_oursql import LoggedCursor
+    from . import _conn_mysqldb as dbmodule
+    from ._conn_mysqldb import LoggedCursor
 except:
-    try:
-        from . import _conn_mysqldb as dbmodule
-        from ._conn_mysqldb import LoggedCursor
-    except:
-        raise MythError("No viable database module found.")
+    raise MythError("No viable database module found.")
 
 class _Connection_Pool( object ):
     """
