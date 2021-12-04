@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
+#include <random>
+#include <algorithm>
 
 // QT
 #include <QCoreApplication>
