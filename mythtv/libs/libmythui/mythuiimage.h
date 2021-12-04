@@ -186,6 +186,8 @@ class MUI_PUBLIC MythUIImage : public MythUIType
 
     bool            m_showingRandomImage {false};
     QString         m_imageDirectory;
+    QStringList     m_imageList;
+    int             m_imageListIndex     {0};
 
     MythUIImagePrivate *d                {nullptr}; // NOLINT(readability-identifier-naming)
 
