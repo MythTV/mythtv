@@ -16,13 +16,17 @@ from warnings import warn
 
 class OrdDict( dict ):
     """
-    OrdData.__init__(raw) -> OrdData object
+    OrdDict.__init__(raw) -> OrdDict object
 
     A modified dictionary, that maintains the order of items.
         Data can be accessed as attributes or items.
+    Allows adding of local variables, which are not visible in the dictionary.
+    In contrast to dict, default iteration is done over values, not keys.
+    Supports pickling and unpickling.
     """
 
     _localvars = ['_field_order']
+
     def __getattr__(self, name):
         if name in self.__dict__:
             return self.__dict__[name]
@@ -38,53 +42,29 @@ class OrdDict( dict ):
         else:
             self[name] = value
 
-    def __setitem__(self, key, value):
-        if key not in self:
-            self._field_order.append(key)
-        dict.__setitem__(self, key, value)
-
     def __delattr__(self, name):
         if name in self.__dict__:
             del self.__dict__[name]
         else:
             del self[name]
 
-    def __delitem__(self, key):
-        dict.__delitem__(self, key)
-        self._field_order.remove(key)
-
     def __iter__(self):
-        return self.itervalues()
+        return iter(self.values())
+
+    @property
+    def _field_order(self):
+        return list(self.keys())
 
     def __init__(self, data=()):
         warn("Class 'OrdDict' from this module  will be removed after MythTV v32 release, "
              "use the class 'OrderedDict' from the module 'collections' provided by python3.",
              DeprecationWarning, 2)
-        dict.__init__(self)
-        self._field_order = []
+        super().__init__()
         for k,v in data:
             self[k] = v
 
-    def keys(self):
-        return list(self.iterkeys())
-
-    def iterkeys(self):
-        return iter(self._field_order)
-
-    def values(self):
-        return list(self.itervalues())
-
-    def itervalues(self):
-        return map(self.get, self.iterkeys())
-
-    def items(self):
-        return list(self.iteritems())
-
-    def iteritems(self):
-        return zip(self.iterkeys(), self.itervalues())
-
     def copy(self):
-        c = self.__class__(self.iteritems())
+        c = self.__class__(iter(self.items()))
         for attr in self._localvars:
             try:
                 c.__setattr__(attr, self.__getattr__(attr))
@@ -92,9 +72,15 @@ class OrdDict( dict ):
                 pass
         return c
 
-    def clear(self):
-        dict.clear(self)
-        self._field_order = []
+    # legacy implementations, deprecated
+    def iteritems(self):
+        return iter(self.items())
+
+    def iterkeys(self):
+        return iter(self.keys())
+
+    def itervalues(self):
+        return iter(self.values())
 
 class DictInvert(dict):
     """
