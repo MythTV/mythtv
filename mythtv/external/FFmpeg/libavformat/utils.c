@@ -581,7 +581,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
         }
     }
 
-    s->build_index = 1;
     s->duration = s->start_time = AV_NOPTS_VALUE;
 
     /* Allocate private data. */
@@ -3834,7 +3833,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
             if (i == ic->nb_streams) {
                 analyzed_all_streams = 1;
                 /* NOTE: If the format has no header, then we need to read some
-                * packets to get most of the streams, so we cannot stop here. */
+                 * packets to get most of the streams, so we cannot stop here. */
                 /* There are MythTV changes here */
                 if (!(ic->ctx_flags & AVFMTCTX_NOHEADER) ||
                     (read_size >= MAX_READ_SIZE || read_packets >= MAX_FRAMES) ||
