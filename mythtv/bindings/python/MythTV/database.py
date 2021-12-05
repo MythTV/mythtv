@@ -208,7 +208,7 @@ class DBData( DictData, MythSchema ):
         DictData.update(self, self._process(data))
 
     def copy(self):
-        return self.fromRaw(self.values(), self._db)
+        return self.fromRaw(list(self.values()), self._db)
 
     def __str__(self):
         if self._wheredat is None:
@@ -603,7 +603,7 @@ class DBDataRef( list ):
         with self._db as cursor:
             # remove old entries
             for v in (self._origdata&diff):
-                data = list(self._refdat)+v.values()
+                data = list(self._refdat)+list(v.values())
                 wf = []
                 for i,v in enumerate(data):
                     if v is None:
@@ -617,7 +617,7 @@ class DBDataRef( list ):
             data = []
             for v in (self&diff):
                 # add new entries
-                data.append(list(self._refdat)+v.values())
+                data.append(list(self._refdat)+list(v.values()))
             if len(data) > 0:
                 cursor.executemany("""INSERT INTO %s (%s) VALUES(%s)""" % \
                                     (self._table,
