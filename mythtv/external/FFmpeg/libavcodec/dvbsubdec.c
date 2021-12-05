@@ -1659,7 +1659,6 @@ static int dvbsub_decode(AVCodecContext *avctx,
     p = buf;
     p_end = buf + buf_size;
 
-    int gotpage, gotregion, gotclut, gotobject, gotdisplay = 0;
     while (p_end - p >= 6 && *p == 0x0f) {
         p += 1;
         segment_type = *p++;
@@ -1685,23 +1684,19 @@ static int dvbsub_decode(AVCodecContext *avctx,
             case DVBSUB_PAGE_SEGMENT:
                 ret = dvbsub_parse_page_segment(avctx, p, segment_length, sub, got_sub_ptr);
                 got_segment |= 1;
-                gotpage = 1;
                 break;
             case DVBSUB_REGION_SEGMENT:
                 ret = dvbsub_parse_region_segment(avctx, p, segment_length);
                 got_segment |= 2;
-                gotregion = 1;
                 break;
             case DVBSUB_CLUT_SEGMENT:
                 ret = dvbsub_parse_clut_segment(avctx, p, segment_length);
                 if (ret < 0) goto end;
                 got_segment |= 4;
-                gotclut = 1;
                 break;
             case DVBSUB_OBJECT_SEGMENT:
                 ret = dvbsub_parse_object_segment(avctx, p, segment_length);
                 got_segment |= 8;
-                gotobject = 1;
                 break;
             case DVBSUB_DISPLAYDEFINITION_SEGMENT:
                 ret = dvbsub_parse_display_definition_segment(avctx, p,
@@ -1716,7 +1711,6 @@ static int dvbsub_decode(AVCodecContext *avctx,
                     avctx->height = 576;
                 }
                 got_segment |= 16;
-                gotdisplay = 1;
                 break;
             default:
                 ff_dlog(avctx, "Subtitling segment type 0x%x, page id %d, length %d\n",
@@ -1735,11 +1729,6 @@ static int dvbsub_decode(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_DEBUG, "Missing display_end_segment, emulating\n");
         dvbsub_display_end_segment(avctx, p, 0, sub, got_sub_ptr);
     }
-
-    // Some streams do not send a display segment but if we have all the other
-    // segments then we need no further data. see #9373
-    if ((gotpage & gotregion & gotclut & gotobject) && !gotdisplay && sub)
-        dvbsub_display_end_segment(avctx, p, 0, sub, got_sub_ptr);
 
 end:
     if (ret < 0) {
