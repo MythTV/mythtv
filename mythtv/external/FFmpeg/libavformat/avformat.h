@@ -1365,8 +1365,6 @@ typedef struct AVFormatContext {
     int max_delay;
 
     /* Myth addons */
-    int build_index;
-
     /* mpeg-ts support */
     void (*streams_changed)(void*);
     void *stream_change_data;
