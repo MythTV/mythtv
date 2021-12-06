@@ -49,7 +49,9 @@ void MythOpenGLPainter::FreeResources(void)
         }
         m_mappedBufferPoolReady = false;
     }
-
+    for (auto * proc : m_procedurals)
+        delete proc;
+    m_procedurals.clear();
     MythPainterGPU::FreeResources();
 }
 
@@ -88,6 +90,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
 {
     MythPainterGPU::Begin(Parent);
 
+    m_frameTime = QTime::currentTime().msecsSinceStartOfDay();
     if (!(m_render && m_parent))
     {
         LOG(VB_GENERAL, LOG_ERR, "FATAL ERROR: No render device in 'Begin'");
@@ -274,6 +277,26 @@ void MythOpenGLPainter::DrawImage(const QRect Dest, MythImage *Image,
             m_mappedTextures.append(texture);
         }
     }
+}
+
+void MythOpenGLPainter::DrawProcedural(QRect Dest, int Alpha, ProcSource VertexSource, ProcSource FragmentSource, const QString &SourceHash)
+{
+    if (auto shader = GetProceduralShader(VertexSource, FragmentSource, SourceHash); shader && m_render)
+        m_render->DrawProcedural(Dest, Alpha, nullptr, shader, m_frameTime);
+}
+
+QOpenGLShaderProgram* MythOpenGLPainter::GetProceduralShader(ProcSource VertexSource, ProcSource FragmentSource, const QString& SourceHash)
+{
+    if (!m_render)
+        return nullptr;
+
+    if (auto program = m_procedurals.find(SourceHash); program != m_procedurals.end())
+        return *program;
+
+    auto result = m_render->CreateShaderProgram(QString(*VertexSource), QString(*FragmentSource));
+    m_procedurals.insert(SourceHash, result);
+    LOG(VB_GENERAL, LOG_INFO, QString("%1 procedural shaders cached").arg(m_procedurals.size()));
+    return result;
 }
 
 /*! \brief Draw a rectangle

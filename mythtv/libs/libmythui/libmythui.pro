@@ -54,6 +54,7 @@ HEADERS += mythhdr.h
 HEADERS += mythvrr.h
 HEADERS += mythcolourspace.h
 HEADERS += devices/mythinputdevicehandler.h
+HEADERS += mythuiprocedural.h
 
 SOURCES  = mythmainwindowprivate.cpp mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += mythpainterwindow.cpp mythpainterwindowqt.cpp
@@ -88,6 +89,7 @@ SOURCES += mythhdr.cpp
 SOURCES += mythvrr.cpp
 SOURCES += mythcolourspace.cpp
 SOURCES += devices/mythinputdevicehandler.cpp
+SOURCES += mythuiprocedural.cpp
 
 using_qtwebkit {
 HEADERS += mythuiwebbrowser.h
