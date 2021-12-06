@@ -152,6 +152,8 @@ class MainServer : public QObject, public MythSocketCBs
     int GetExitCode() const { return m_exitCode; }
 
     void UpdateSystemdStatus(void);
+    void GetActiveBackends(QStringList &hosts);
+    PlaybackSock *GetMediaServerByHostname(const QString &hostname);
 
   protected slots:
     void reconnectTimeout(void);
@@ -167,8 +169,6 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleAnnounce(QStringList &slist, QStringList commands,
                         MythSocket *socket);
     void HandleDone(MythSocket *socket);
-
-    void GetActiveBackends(QStringList &hosts);
     void HandleActiveBackendsQuery(PlaybackSock *pbs);
     void HandleIsActiveBackendQuery(const QStringList &slist, PlaybackSock *pbs);
     void HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
@@ -279,7 +279,6 @@ class MainServer : public QObject, public MythSocketCBs
     static void getGuideDataThrough(QDateTime &GuideDataThrough);
 
     PlaybackSock *GetSlaveByHostname(const QString &hostname);
-    PlaybackSock *GetMediaServerByHostname(const QString &hostname);
     PlaybackSock *GetPlaybackBySock(MythSocket *socket);
     FileTransfer *GetFileTransferByID(int id);
     FileTransfer *GetFileTransferBySock(MythSocket *socket);

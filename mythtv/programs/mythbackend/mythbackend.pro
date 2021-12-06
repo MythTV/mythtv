@@ -57,6 +57,59 @@ SOURCES += services/dvr.cpp services/channel.cpp services/video.cpp
 SOURCES += services/serviceUtil.cpp services/capture.cpp
 SOURCES += services/image.cpp services/music.cpp
 
+HEADERS += servicesv2/v2myth.h servicesv2/v2connectionInfo.h servicesv2/v2wolInfo.h
+HEADERS += servicesv2/v2databaseInfo.h servicesv2/v2versionInfo.h
+HEADERS += servicesv2/v2storageGroupDir.h servicesv2/v2storageGroupDirList.h
+HEADERS += servicesv2/v2timeZoneInfo.h
+HEADERS += servicesv2/v2LabelValue.h servicesv2/v2logMessage.h servicesv2/v2logMessageList.h
+HEADERS += servicesv2/v2frontend.h servicesv2/v2frontendList.h servicesv2/v2settingList.h
+HEADERS += servicesv2/v2backendInfo.h servicesv2/v2buildInfo.h servicesv2/v2envInfo.h
+HEADERS += servicesv2/v2logInfo.h
+
+HEADERS += servicesv2/v2video.h
+HEADERS += servicesv2/v2videoMetadataInfo.h servicesv2/v2videoMetadataInfoList.h
+HEADERS += servicesv2/v2artworkInfo.h servicesv2/v2artworkInfoList.h
+HEADERS += servicesv2/v2genre.h servicesv2/v2genreList.h
+HEADERS += servicesv2/v2castMember.h servicesv2/v2castMemberList.h
+HEADERS += servicesv2/v2videoLookupInfo.h servicesv2/v2videoLookupInfoList.h
+HEADERS += servicesv2/v2videoStreamInfo.h servicesv2/v2videoStreamInfoList.h
+HEADERS += servicesv2/v2blurayInfo.h
+
+HEADERS += servicesv2/v2dvr.h servicesv2/v2recording.h
+HEADERS += servicesv2/v2programAndChannel.h servicesv2/v2programList.h
+HEADERS += servicesv2/v2channelGroup.h servicesv2/v2channelGroupList.h
+HEADERS += servicesv2/v2recRule.h
+HEADERS += servicesv2/v2cutting.h servicesv2/v2cutList.h
+HEADERS += servicesv2/v2markup.h servicesv2/v2markupList.h
+HEADERS += servicesv2/v2encoder.h servicesv2/v2encoderList.h
+HEADERS += servicesv2/v2input.h servicesv2/v2inputList.h
+HEADERS += servicesv2/v2recRuleFilter.h servicesv2/v2recRuleFilterList.h
+HEADERS += servicesv2/v2titleInfo.h servicesv2/v2titleInfoList.h
+HEADERS += servicesv2/v2recRuleList.h
+HEADERS += servicesv2/v2content.h
+HEADERS += servicesv2/v2guide.h servicesv2/v2programGuide.h
+HEADERS += servicesv2/v2channel.h
+HEADERS += servicesv2/v2channelInfoList.h servicesv2/v2lineup.h
+HEADERS += servicesv2/v2videoSource.h servicesv2/v2videoSourceList.h
+HEADERS += servicesv2/v2videoMultiplex.h servicesv2/v2videoMultiplexList.h
+HEADERS += servicesv2/v2status.h
+HEADERS += servicesv2/preformat.h servicesv2/v2backendStatus.h
+HEADERS += servicesv2/v2capture.h
+HEADERS += servicesv2/v2captureCard.h servicesv2/v2captureCardList.h
+HEADERS += servicesv2/v2music.h
+HEADERS += servicesv2/v2musicMetadataInfo.h servicesv2/v2musicMetadataInfoList.h
+
+SOURCES += servicesv2/v2myth.cpp
+SOURCES += servicesv2/v2video.cpp
+SOURCES += servicesv2/v2dvr.cpp
+SOURCES += servicesv2/v2content.cpp
+SOURCES += servicesv2/v2guide.cpp
+SOURCES += servicesv2/v2channel.cpp
+SOURCES += servicesv2/v2status.cpp
+SOURCES += servicesv2/v2capture.cpp
+SOURCES += servicesv2/v2music.cpp
+SOURCES += servicesv2/v2serviceUtil.cpp
+
 using_oss:DEFINES += USING_OSS
 
 using_dvb:DEFINES += USING_DVB

@@ -6,6 +6,7 @@ TARGET = mythbase-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
+QT += xml
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
@@ -60,6 +61,72 @@ SOURCES += cleanupguard.cpp portchecker.cpp
 SOURCES += mythsorthelper.cpp dbcheckcommon.cpp
 SOURCES += mythpower.cpp
 
+HEADERS += http/mythhttpcommon.h
+HEADERS += http/mythhttptypes.h
+HEADERS += http/mythhttps.h
+HEADERS += http/mythhttpdata.h
+HEADERS += http/mythhttpinstance.h
+HEADERS += http/mythhttpserver.h
+HEADERS += http/mythhttpthread.h
+HEADERS += http/mythhttpthreadpool.h
+HEADERS += http/mythhttpsocket.h
+HEADERS += http/mythwebsocketevent.h
+HEADERS += http/mythwebsockettypes.h
+HEADERS += http/mythwebsocket.h
+HEADERS += http/mythhttpparser.h
+HEADERS += http/mythhttprequest.h
+HEADERS += http/mythhttpresponse.h
+HEADERS += http/mythhttpfile.h
+HEADERS += http/mythhttpencoding.h
+HEADERS += http/mythhttproot.h
+HEADERS += http/mythhttpranges.h
+HEADERS += http/mythhttpcache.h
+HEADERS += http/mythhttpservice.h
+HEADERS += http/mythhttpmetaservice.h
+HEADERS += http/mythhttpmetamethod.h
+HEADERS += http/mythhttpservices.h
+HEADERS += http/mythmimedatabase.h
+HEADERS += http/mythmimetype.h
+HEADERS += http/mythwsdl.h
+HEADERS += http/mythxsd.h
+HEADERS += http/serialisers/mythserialiser.h
+HEADERS += http/serialisers/mythjsonserialiser.h
+HEADERS += http/serialisers/mythxmlserialiser.h
+HEADERS += http/serialisers/mythxmlplistserialiser.h
+HEADERS += http/serialisers/mythcborserialiser.h
+SOURCES += http/mythhttpcommon.cpp
+SOURCES += http/mythhttps.cpp
+SOURCES += http/mythhttpdata.cpp
+SOURCES += http/mythhttpinstance.cpp
+SOURCES += http/mythhttpserver.cpp
+SOURCES += http/mythhttpthread.cpp
+SOURCES += http/mythhttpthreadpool.cpp
+SOURCES += http/mythhttpsocket.cpp
+SOURCES += http/mythwebsocketevent.cpp
+SOURCES += http/mythwebsockettypes.cpp
+SOURCES += http/mythwebsocket.cpp
+SOURCES += http/mythhttpparser.cpp
+SOURCES += http/mythhttprequest.cpp
+SOURCES += http/mythhttpresponse.cpp
+SOURCES += http/mythhttpfile.cpp
+SOURCES += http/mythhttpencoding.cpp
+SOURCES += http/mythhttproot.cpp
+SOURCES += http/mythhttpranges.cpp
+SOURCES += http/mythhttpcache.cpp
+SOURCES += http/mythhttpservice.cpp
+SOURCES += http/mythhttpmetaservice.cpp
+SOURCES += http/mythhttpmetamethod.cpp
+SOURCES += http/mythhttpservices.cpp
+SOURCES += http/mythmimedatabase.cpp
+SOURCES += http/mythmimetype.cpp
+SOURCES += http/mythwsdl.cpp
+SOURCES += http/mythxsd.cpp
+SOURCES += http/serialisers/mythserialiser.cpp
+SOURCES += http/serialisers/mythjsonserialiser.cpp
+SOURCES += http/serialisers/mythxmlserialiser.cpp
+SOURCES += http/serialisers/mythxmlplistserialiser.cpp
+SOURCES += http/serialisers/mythcborserialiser.cpp
+
 using_qtdbus {
     QT      += dbus
     DEFINES += USING_DBUS
@@ -105,6 +172,8 @@ inc2.files = $${inc.files}
 INSTALLS += inc inc2
 
 INCLUDEPATH += ../../external/qjsonwrapper/ ./platforms
+INCLUDEPATH += ./http ./http/serialisers
+DEPENDPATH  +=  ../../external/libudfread ./http ./http/serialisers
 
 DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"

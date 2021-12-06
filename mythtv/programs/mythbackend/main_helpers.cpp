@@ -60,6 +60,19 @@
 #include "httpstatus.h"
 #include "mythlogging.h"
 
+// New webserver
+#include "libmythbase/http/mythhttproot.h"
+#include "libmythbase/http/mythhttpinstance.h"
+#include "servicesv2/v2myth.h"
+#include "servicesv2/v2video.h"
+#include "servicesv2/v2dvr.h"
+#include "servicesv2/v2content.h"
+#include "servicesv2/v2guide.h"
+#include "servicesv2/v2channel.h"
+#include "servicesv2/v2status.h"
+#include "servicesv2/v2capture.h"
+#include "servicesv2/v2music.h"
+
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")
 #define LOC_ERR  QString("MythBackend, Error: ")
@@ -755,6 +768,18 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     // Provide systemd ready notification (for type=notify units)
     be_sd_notify("READY=1");
+
+    MythHTTPInstance::Addservices({{ VIDEO_SERVICE, &MythHTTPService::Create<V2Video> }});
+    MythHTTPInstance::Addservices({{ MYTH_SERVICE, &MythHTTPService::Create<V2Myth> }});
+    MythHTTPInstance::Addservices({{ DVR_SERVICE, &MythHTTPService::Create<V2Dvr> }});
+    MythHTTPInstance::Addservices({{ CONTENT_SERVICE, &MythHTTPService::Create<V2Content> }});
+    MythHTTPInstance::Addservices({{ GUIDE_SERVICE, &MythHTTPService::Create<V2Guide> }});
+    MythHTTPInstance::Addservices({{ CHANNEL_SERVICE, &MythHTTPService::Create<V2Channel> }});
+    MythHTTPInstance::Addservices({{ STATUS_SERVICE, &MythHTTPService::Create<V2Status> }});
+    MythHTTPInstance::Addservices({{ CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> }});
+    MythHTTPInstance::Addservices({{ MUSIC_SERVICE, &MythHTTPService::Create<V2Music> }});
+    auto root = std::bind(&MythHTTPRoot::RedirectRoot, std::placeholders::_1, "apps/backend/index.html");
+    MythHTTPScopedInstance webserver({{ "/", root}});
 
     ///////////////////////////////
     ///////////////////////////////

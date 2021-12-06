@@ -124,6 +124,10 @@
 #define fe_sd_notify(x)
 #endif
 
+#include "libmythbase/http/mythhttproot.h"
+#include "libmythbase/http/mythhttpinstance.h"
+#include "services/mythfrontendservice.h"
+
 static MythThemedMenu *g_menu;
 
 static MediaRenderer  *g_pUPnp   = nullptr;
@@ -2168,7 +2172,14 @@ int main(int argc, char **argv)
     fe_sd_notify("STATUS=")
     fe_sd_notify("READY=1")
 
-    int ret = QCoreApplication::exec();
+
+    int ret = 0;
+    {
+        MythHTTPInstance::Addservices({{ FRONTEND_SERVICE, &MythHTTPService::Create<MythFrontendService> }});
+        auto root = std::bind(&MythHTTPRoot::RedirectRoot, std::placeholders::_1, "mythfrontend.html");
+        MythHTTPScopedInstance webserver({{ "/", root}});
+        ret = QCoreApplication::exec();
+    }
 
     fe_sd_notify("STOPPING=1\nSTATUS=Exiting")
     if (ret==0)
