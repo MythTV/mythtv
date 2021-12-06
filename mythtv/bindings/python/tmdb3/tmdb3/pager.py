@@ -5,15 +5,7 @@
 # Author: Raymond Wagner
 #-----------------------
 
-try:
-    from collections.abc import Sequence, Iterator
-except ImportError:
-    from collections import Sequence, Iterator
-
-try:
-    xrange
-except NameError:
-    xrange = range
+from collections.abc import Sequence, Iterator
 
 
 class PagedIterator(Iterator):
@@ -70,7 +62,7 @@ class PagedList(Sequence):
 
     def __getitem__(self, index):
         if isinstance(index, slice):
-            return [self[x] for x in xrange(*index.indices(len(self)))]
+            return [self[x] for x in range(*index.indices(len(self)))]
         if index >= len(self):
             raise IndexError("list index outside range")
         if (index >= len(self._data)) \

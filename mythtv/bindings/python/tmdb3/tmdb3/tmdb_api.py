@@ -63,11 +63,11 @@ __version__ = "v0.7.1"
 # 0.7.0  Add support for television series data
 # 0.7.0.a  Added compatibility to python3, tested with python 3.6 and 2.7
 # 0.7.1 Changes to support TV series lookup.
+# 0.7.2 Removed support for python2.
 
-from . import IS_PY2
 
 from .request import set_key, Request
-from .util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr, tmdb3_repr
+from .util import Datapoint, Datalist, Datadict, Element, NameRepr, SearchRepr
 from .pager import PagedRequest
 from .locales import get_locale, set_locale
 from .tmdb_auth import get_session, set_session
@@ -270,9 +270,6 @@ class Image(Element):
         if len(self.filename) == 0:
             return False
         return True
-
-    __nonzero__  = __bool__    # for  python2
-
 
     def __repr__(self):
         # BASE62 encoded filename, no need to worry about unicode

@@ -38,10 +38,7 @@ import signal
 def print_etree(etostr):
     """lxml.etree.tostring is a bytes object in python3, and a str in python2.
     """
-    if sys.version_info[0] == 2:
-        sys.stdout.write(etostr)
-    else:
-        sys.stdout.write(etostr.decode())
+    sys.stdout.write(etostr.decode())
 
 def timeouthandler(signal, frame):
     raise RuntimeError("Timed out")
@@ -297,14 +294,7 @@ def buildEpisode(args, opts):
     from lxml import etree
     from MythTV.tmdb3 import searchSeries
 
-    query_is_numeric = False
-    try:
-       query_is_numeric = query.isnumeric()
-    except AttributeError:
-       # python2 and ascii strings
-       query_is_numeric = query.isdigit()
-
-    if query_is_numeric:
+    if query.isnumeric():
         inetref = query
     else:
         results = searchSeries(query)

@@ -1,7 +1,4 @@
 
-import sys
-IS_PY2 = sys.version_info[0] == 2
-
 from .tmdb_api import Configuration, searchMovie, searchMovieWithYear, \
                      searchPerson, searchStudio, searchList, searchCollection, \
                      searchSeries, Person, Movie, Collection, Genre, List, \

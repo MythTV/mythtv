@@ -10,7 +10,6 @@ import time
 from weakref import ref
 import sys
 
-from future.utils import with_metaclass
 
 class Engines(object):
     """
@@ -44,7 +43,7 @@ class CacheEngineType(type):
             Engines.register(cls)
 
 
-class CacheEngine(with_metaclass(CacheEngineType, object)):
+class CacheEngine(object, metaclass=CacheEngineType):
 
     name = 'unspecified'
 
