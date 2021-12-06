@@ -36,11 +36,6 @@ __xsltExtentionList__ = []
 import os, sys, re, time, datetime, shutil, urllib, string
 from copy import deepcopy
 
-IS_PY2 = sys.version_info[0] == 2
-if not IS_PY2:
-    unicode = str
-    long = int
-
 baseXsltDir = u'%s/XSLT/' % os.path.dirname(os.path.realpath(__file__))
 
 class OutStreamEncoder(object):
@@ -54,25 +49,20 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
+        if isinstance(obj, str):
             obj.encode(self.encoding)
         try:
-            if IS_PY2:
-                self.out.write(obj)
-            else:
-                self.out.buffer.write(obj)
+            self.out.buffer.write(obj)
         except IOError:
             pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-if IS_PY2:
-    stdio_type = file
-else:
-    import io
-    stdio_type = io.TextIOWrapper
-    unicode = str
+
+import io
+stdio_type = io.TextIOWrapper
+
 if isinstance(sys.stdout, stdio_type):
     sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
     sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
@@ -154,7 +144,7 @@ class xpathFunctions(object):
         Example call: tvdbXpath:ilastUpdated(string(lastupdated))
         return a date string in the standard format
         '''
-        return time.strftime(u'%a, %d %b %Y %H:%M:%S GMT', time.localtime(long(epoch)))
+        return time.strftime(u'%a, %d %b %Y %H:%M:%S GMT', time.localtime(int(epoch)))
     # end lastUpdated()
 
     def htmlToString(self, context, html):
@@ -245,7 +235,7 @@ class xpathFunctions(object):
         if text is None:
             return text
         try:
-            return unicode(text, 'utf8')
+            return str(text, 'utf8')
         except UnicodeDecodeError:
             return u''
         except (UnicodeEncodeError, TypeError):
@@ -294,7 +284,7 @@ class xpathFunctions(object):
                         except ValueError:
                             pass
                     else:
-                        return unicode(entity, "iso-8859-1")
+                        return str(entity, "iso-8859-1")
             return text # leave as is
         return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
     # end massageText()
