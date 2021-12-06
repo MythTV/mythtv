@@ -31,22 +31,10 @@ __author__ = "dbr/Ben"
 __version__ = "2.0-dev"
 
 
-IS_PY2 = sys.version_info[0] == 2
-
-if IS_PY2:
-    user_input = raw_input
-    from urllib import quote as url_quote
-else:
-    from urllib.parse import quote as url_quote
-    user_input = input
-
-
-if IS_PY2:
-    int_types = (int, long)
-    text_type = unicode
-else:
-    int_types = int
-    text_type = str
+from urllib.parse import quote as url_quote
+user_input = input
+int_types = int
+text_type = str
 
 lastTimeout = None
 
@@ -198,10 +186,7 @@ class ConsoleUI(BaseUI):
                 cshow['lid'],
                 extra
             )
-            if IS_PY2:
-                print(output.encode("UTF-8", "ignore"))
-            else:
-                print(output)
+            print(output)
 
     def selectSeries(self, allSeries):
         self._displaySeries(allSeries)
