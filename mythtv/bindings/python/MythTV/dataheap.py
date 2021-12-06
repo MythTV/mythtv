@@ -10,8 +10,7 @@ from MythTV.altdict import DictData, DictInvertCI
 from MythTV.database import *
 from MythTV.system import Grabber, InternetMetadata, VideoMetadata
 from MythTV.mythproto import ftopen, FileOps, Program
-from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet,\
-                           py23_repr
+from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
 
 import re
 import locale
@@ -155,7 +154,7 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
                                     % (self.title, self.type, hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def __init__(self, data=None, db=None, template=None):
         DBDataWrite.__init__(self, data, db)
@@ -323,7 +322,7 @@ class Recorded( CMPRecord, DBDataWrite ):
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def __init__(self, data=None, db=None):
         if data is not None:
@@ -564,7 +563,7 @@ class RecordedFile( CMPRecord, DBDataWrite ):
                 self.recordedid, hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def __init__(self, data=None, db=None):
         DBDataWrite.__init__(self, data, db)
@@ -599,7 +598,7 @@ class RecordedProgram( CMPRecord, DBDataWrite ):
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def __init__(self, data=None, db=None):
         if data is not None:
@@ -637,7 +636,7 @@ class OldRecorded( CMPRecord, DBDataWrite, RECSTATUS ):
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def __init__(self, data=None, db=None):
         if data is not None:
@@ -681,7 +680,7 @@ class RecordedArtwork( DBDataWrite ):
                         (self.inetref, self.season, hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     coverart = Artwork('coverart')
     fanart   = Artwork('fanart')
@@ -703,7 +702,7 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
         return u"<Job '%s' at %s>" % (self.id, hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def setComment(self,comment):
         """Job.setComment(comment) -> None, updates comment"""
@@ -774,7 +773,7 @@ class Channel( DBDataWrite ):
                         (self.chanid, self.name, hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
 class Guide( CMPRecord, DBData ):
     """
@@ -791,7 +790,7 @@ class Guide( CMPRecord, DBData ):
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def getRecStatus(self):
         be = FileOps(db=self._db)
@@ -936,7 +935,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
             res += u' - %dx%02d' % (self.season, self.episode)
         if self.subtitle:
             res += u' - '+self.subtitle
-        return py23_repr(u"<Video '%s' at %s>" % (res, hex(id(self))))
+        return (u"<Video '%s' at %s>" % (res, hex(id(self))))
 
     def _postinit(self):
         self._fill_cm()

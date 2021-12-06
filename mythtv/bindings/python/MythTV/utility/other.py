@@ -382,14 +382,14 @@ class deadlinesocket( socket.socket ):
         data = self.dlrecv(size, flags, deadline)
         # data is utf-8 encoded, convert to unicode for logging and ignore errors
         self.log(MythLog.SOCKET|MythLog.NETWORK, MythLog.DEBUG, \
-                            'read <-- %d' % size, py23_str(data, True))
+                            'read <-- %d' % size, py3_str(data, True))
         return data
 
     def sendheader(self, data, flags=0):
         """Send data, prepending the length in the first 8 bytes."""
         try:
             self.log(MythLog.SOCKET|MythLog.NETWORK, MythLog.DEBUG, \
-                            'write --> %d' % len(data), py23_str(data, True))
+                            'write --> %d' % len(data), py3_str(data, True))
             # build the byte array:
             length = b'%-8d' % len(data)
             data = b"".join([length, data])
@@ -581,22 +581,13 @@ def resolve_ip(host, port):
     except:
         return (None, None)
 
-def py23_str(value, ignore_errors=False):
+def py3_str(value, ignore_errors=False):
     error_methods = ('strict', 'ignore')
     error_method  = error_methods[ignore_errors]
-    try:  # Python 2
-        return unicode(value, errors=error_method, encoding='utf-8')
-    except NameError:  # Python 3
-        try:
-            return str(value, errors=error_method, encoding='utf-8')
-        except TypeError:  # Wasn't a bytes object, no need to decode
-            return str(value)
-
-def py23_repr(x):
-    if sys.version_info[0] == 2:
-        return(x.encode('utf-8'))
-    else:
-        return(x)
+    try:
+        return str(value, errors=error_method, encoding='utf-8')
+    except TypeError:  # Wasn't a bytes object, no need to decode
+        return str(value)
 
 class QuickProperty( object ):
     def __init__(self, maskedvar, default=None, handler=None):
