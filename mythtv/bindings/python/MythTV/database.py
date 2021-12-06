@@ -1230,7 +1230,7 @@ class DBCache( MythSchema ):
                                       WHERE %s""" % self._where)
                     for k,v in cursor:
                         OrdDict.__setitem__(self, k, v)
-                return self.iteritems()
+                return iter(self.items())
 
         _localvars = ['_field_order','_log','_db']
         def __str__(self): return str(list(self))
