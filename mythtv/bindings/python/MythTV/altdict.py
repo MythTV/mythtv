@@ -166,7 +166,7 @@ class DictData( OrdDict ):
 
     def copy(self):
         """Returns a deep copy of itself."""
-        return self.__class__(self.iteritems(), _process=False)
+        return self.__class__(iter(self.items()), _process=False)
 
     def __getstate__(self):
         return dict(self)
