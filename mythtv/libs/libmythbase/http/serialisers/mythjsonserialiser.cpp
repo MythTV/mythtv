@@ -1,5 +1,6 @@
 // Qt
 #include <QMetaProperty>
+#include <QSequentialIterable>
 
 // MythTV
 #include "mythdate.h"
