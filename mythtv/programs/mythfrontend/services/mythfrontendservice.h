@@ -58,15 +58,15 @@ class MythFrontendService : public MythHTTPService
     Q_CLASSINFO("GetContextList",   "name=StringList") // Consistency with old code
 
   public slots:
-    bool        SendAction      (const QString& Action, const QString& Value, uint Width, uint Height);
-    bool        SendKey         (const QString& Key);
-    FrontendActionList* GetActionList(const QString& Context);
-    QStringList GetContextList  ();
-    FrontendStatus* GetStatus   ();
-    bool        PlayVideo       (const QString& Id, bool UseBookmark);
-    bool        PlayRecording   (int RecordedId, int ChanId, const QDateTime& StartTime);
-    bool        SendMessage     (const QString& Message, uint Timeout);
-    bool        SendNotification(bool  Error,                const QString& Type,
+    static bool SendAction      (const QString& Action, const QString& Value, uint Width, uint Height);
+    static bool SendKey         (const QString& Key);
+    static FrontendActionList* GetActionList(const QString& Context);
+    static QStringList GetContextList  ();
+    static FrontendStatus* GetStatus ();
+    static bool PlayVideo       (const QString& Id, bool UseBookmark);
+    static bool PlayRecording   (int RecordedId, int ChanId, const QDateTime& StartTime);
+    static bool SendMessage     (const QString& Message, uint Timeout);
+    static bool SendNotification(bool  Error,                const QString& Type,
                                  const QString& Message,     const QString& Origin,
                                  const QString& Description, const QString& Image,
                                  const QString& Extra,       const QString& ProgressText,

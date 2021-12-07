@@ -26,8 +26,8 @@ class MythXMLSerialiser : public MythSerialiser
 
   private:
     Q_DISABLE_COPY(MythXMLSerialiser)
-    QString GetItemName(const QString& Name);
-    QString GetContentName(const QString &Name, const QMetaObject* MetaObject);
+    static QString GetItemName(const QString& Name);
+    static QString GetContentName(const QString &Name, const QMetaObject* MetaObject);
     QXmlStreamWriter m_writer;
     bool             m_first  { true };
 };

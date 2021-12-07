@@ -81,10 +81,10 @@ class V2Dvr : public MythHTTPService
 
   public slots:
 
-    V2ProgramList* GetExpiringList       (  int             StartIndex,
+    static V2ProgramList* GetExpiringList(  int             StartIndex,
                                             int             Count      );
 
-    V2ProgramList*    GetRecordedList    (  bool            Descending,
+    static V2ProgramList* GetRecordedList(  bool            Descending,
                                             int             StartIndex,
                                             int             Count,
                                             const QString   &TitleRegEx,
@@ -95,7 +95,7 @@ class V2Dvr : public MythHTTPService
                                             bool             IgnoreLiveTV,
                                             bool             IgnoreDeleted);
 
-    V2ProgramList*    GetOldRecordedList  ( bool             Descending,
+    static V2ProgramList* GetOldRecordedList( bool             Descending,
                                             int              StartIndex,
                                             int              Count,
                                             const QDateTime &StartTime,
@@ -105,107 +105,107 @@ class V2Dvr : public MythHTTPService
                                             int              RecordId,
                                             const QString   &Sort);
 
-    V2Program*        GetRecorded         ( int              RecordedId,
+    static V2Program* GetRecorded         ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime  );
 
-    bool              AddRecordedCredits  ( int RecordedId,
+    static bool       AddRecordedCredits  ( int RecordedId,
                                             const QJsonObject & json);
 
-    int               AddRecordedProgram  ( const QJsonObject & json);
+    static int        AddRecordedProgram  ( const QJsonObject & json);
 
-    bool              RemoveRecorded      ( int              RecordedId,
+    static bool       RemoveRecorded      ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime,
                                             bool             ForceDelete,
                                             bool             AllowRerecord  );
 
-    bool              DeleteRecording     ( int              RecordedId,
+    static bool       DeleteRecording     ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime,
                                             bool             ForceDelete,
                                             bool             AllowRerecord  );
 
-    bool              UnDeleteRecording   ( int              RecordedId,
+    static bool       UnDeleteRecording   ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime );
 
-    bool              StopRecording       ( int              RecordedId );
+    static bool       StopRecording       ( int              RecordedId );
 
-    bool              ReactivateRecording ( int              RecordedId,
+    static bool       ReactivateRecording ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime );
 
-    bool              RescheduleRecordings( void );
+    static bool       RescheduleRecordings( void );
 
-    bool              AllowReRecord       ( int              RecordedId );
+    static bool       AllowReRecord       ( int              RecordedId );
 
-    bool              UpdateRecordedWatchedStatus ( int   RecordedId,
+    static bool       UpdateRecordedWatchedStatus ( int   RecordedId,
                                                     int   ChanId,
                                                     const QDateTime &StartTime,
                                                     bool  Watched);
 
-    long              GetSavedBookmark    ( int              RecordedId,
+    static long       GetSavedBookmark    ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime,
                                             const QString   &OffsetType );
 
-    bool              SetSavedBookmark    ( int              RecordedId,
+    static bool       SetSavedBookmark    ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime,
                                             const QString   &OffsetType,
                                             long             Offset
                                             );
 
-    V2CutList*     GetRecordedCutList     ( int              RecordedId,
+    static V2CutList* GetRecordedCutList  ( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime,
                                             const QString   &OffsetType );
 
-    V2CutList*     GetRecordedCommBreak   ( int              RecordedId,
+    static V2CutList* GetRecordedCommBreak( int              RecordedId,
                                             int              ChanId,
                                             const QDateTime &StartTime,
                                             const QString   &OffsetType );
 
-    V2CutList*     GetRecordedSeek        ( int              RecordedId,
+    static V2CutList* GetRecordedSeek     ( int              RecordedId,
                                             const QString   &OffsetType );
 
-    V2MarkupList*  GetRecordedMarkup      ( int              RecordedId );
+    static V2MarkupList* GetRecordedMarkup( int              RecordedId );
 
-    bool           SetRecordedMarkup      ( int              RecordedId,
+    static bool    SetRecordedMarkup      ( int              RecordedId,
                                             const QJsonObject & json );
 
-    V2ProgramList* GetConflictList        ( int              StartIndex,
+    static V2ProgramList* GetConflictList ( int              StartIndex,
                                             int              Count,
                                             int              RecordId );
 
-    V2ProgramList* GetUpcomingList        ( int              StartIndex,
+    static V2ProgramList* GetUpcomingList ( int              StartIndex,
                                             int              Count,
                                             bool             ShowAll,
                                             int              RecordId,
                                             int              RecStatus );
 
-    V2EncoderList*    GetEncoderList      ( );
+    static V2EncoderList*    GetEncoderList      ( );
 
-    V2InputList*      GetInputList        ( );
+    static V2InputList*      GetInputList        ( );
 
-    QStringList       GetRecGroupList     ( );
+    static QStringList       GetRecGroupList     ( );
 
-    QStringList       GetProgramCategories   ( bool OnlyRecorded );
+    static QStringList       GetProgramCategories   ( bool OnlyRecorded );
 
-    QStringList       GetRecStorageGroupList ( );
+    static QStringList       GetRecStorageGroupList ( );
 
-    QStringList       GetPlayGroupList    ( );
+    static QStringList       GetPlayGroupList    ( );
 
-    V2RecRuleFilterList* GetRecRuleFilterList ( );
+    static V2RecRuleFilterList* GetRecRuleFilterList ( );
 
-    QStringList       GetTitleList        ( const QString   &RecGroup );
+    static QStringList       GetTitleList        ( const QString   &RecGroup );
 
-    V2TitleInfoList*  GetTitleInfoList  ( );
+    static V2TitleInfoList*  GetTitleInfoList  ( );
 
     // Recording Rules
 
-    uint              AddRecordSchedule   ( const QString&   Title,
+    static uint       AddRecordSchedule   ( const QString&   Title,
                                             const QString&   Subtitle,
                                             const QString&   Description,
                                             const QString&   Category,
@@ -249,7 +249,7 @@ class V2Dvr : public MythHTTPService
                                             bool      AutoUserJob4,
                                             int       Transcoder);
 
-    bool               UpdateRecordSchedule ( uint    RecordId,
+    static bool        UpdateRecordSchedule ( uint    RecordId,
                                               const QString&   Title,
                                               const QString&   Subtitle,
                                               const QString&   Description,
@@ -292,50 +292,50 @@ class V2Dvr : public MythHTTPService
                                               bool      AutoUserJob4,
                                               int       Transcoder);
 
-    bool              RemoveRecordSchedule ( uint             RecordId   );
+    static bool       RemoveRecordSchedule ( uint             RecordId   );
 
-    bool              AddDontRecordSchedule( int              ChanId,
+    static bool       AddDontRecordSchedule( int              ChanId,
                                              const QDateTime &StartTime,
                                              bool             NeverRecord );
 
-    V2RecRuleList*    GetRecordScheduleList( int              StartIndex,
+    static V2RecRuleList* GetRecordScheduleList( int          StartIndex,
                                              int              Count,
                                              const            QString  &Sort,
                                              bool             Descending );
 
-    V2RecRule*        GetRecordSchedule    ( uint             RecordId,
+    static V2RecRule* GetRecordSchedule    ( uint             RecordId,
                                              const QString&   Template,
                                              int              RecordedId,
                                              int              ChanId,
                                              const QDateTime& StartTime,
                                              bool             MakeOverride );
 
-    bool              EnableRecordSchedule ( uint             RecordId   );
+    static bool       EnableRecordSchedule ( uint             RecordId   );
 
-    bool              DisableRecordSchedule( uint             RecordId   );
+    static bool       DisableRecordSchedule( uint             RecordId   );
 
-    int               RecordedIdForKey     ( int              ChanId,
+    static int        RecordedIdForKey     ( int              ChanId,
                                              const QDateTime &StartTime );
 
-    int               RecordedIdForPathname( const QString   &Pathname  );
+    static int        RecordedIdForPathname( const QString   &Pathname  );
 
-    QString           RecStatusToString    ( int              RecStatus );
+    static QString    RecStatusToString    ( int              RecStatus );
 
-    QString           RecStatusToDescription ( int            RecStatus,
+    static QString    RecStatusToDescription ( int            RecStatus,
                                                int            RecType,
                                                const QDateTime &StartTime );
 
-    QString           RecTypeToString      ( const QString&   RecType   );
+    static QString    RecTypeToString      ( const QString&   RecType   );
 
-    QString           RecTypeToDescription ( const QString&   RecType   );
+    static QString    RecTypeToDescription ( const QString&   RecType   );
 
-    QString           DupMethodToString    ( const QString&   DupMethod );
+    static QString    DupMethodToString    ( const QString&   DupMethod );
 
-    QString           DupMethodToDescription ( const QString& DupMethod );
+    static QString    DupMethodToDescription ( const QString& DupMethod );
 
-    QString           DupInToString        ( const QString&   DupIn     );
+    static QString    DupInToString        ( const QString&   DupIn     );
 
-    QString           DupInToDescription   ( const QString&   DupIn     );
+    static QString    DupInToDescription   ( const QString&   DupIn     );
 
     int               ManageJobQueue       ( const QString   &Action,
                                              const QString   &JobName,

@@ -63,7 +63,7 @@ class MythHTTPServer : public MythHTTPThreadPool
     void BuildOrigins();
     void DebugHosts();
     void DebugOrigins();
-    bool ReservedPath(const QString& Path);
+    static bool ReservedPath(const QString& Path);
     static QStringList BuildAddressList(QHostInfo& Info);
 
 #ifdef USING_LIBDNS_SD

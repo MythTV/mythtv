@@ -52,7 +52,7 @@ class V2Guide : public MythHTTPService
 
     public slots:
 
-        V2ProgramGuide*  GetProgramGuide     ( const QDateTime &StartTime  ,
+        static V2ProgramGuide*  GetProgramGuide ( const QDateTime &StartTime  ,
                                                   const QDateTime &EndTime    ,
                                                   bool             Details,
                                                   int              ChannelGroupId,
@@ -60,7 +60,7 @@ class V2Guide : public MythHTTPService
                                                   int              Count,
                                                   bool             WithInvisible);
 
-        V2ProgramList*   GetProgramList      ( int              StartIndex,
+        static V2ProgramList*   GetProgramList  ( int              StartIndex,
                                                   int              Count,
                                                   const QDateTime &StartTime  ,
                                                   const QDateTime &EndTime    ,
@@ -75,23 +75,23 @@ class V2Guide : public MythHTTPService
                                                   bool             Descending,
                                                   bool             WithInvisible);
 
-        V2Program*       GetProgramDetails   ( int              ChanId,
+        static V2Program*   GetProgramDetails   ( int              ChanId,
                                                   const QDateTime &StartTime );
 
-        QFileInfo           GetChannelIcon      ( int              ChanId,
+        static QFileInfo    GetChannelIcon      ( int              ChanId,
                                                   int              Width ,
                                                   int              Height );
 
-        V2ChannelGroupList*  GetChannelGroupList ( bool         IncludeEmpty );
+        static V2ChannelGroupList*  GetChannelGroupList ( bool         IncludeEmpty );
 
-        QStringList         GetCategoryList     ( );
+        static QStringList  GetCategoryList     ( );
 
-        QStringList         GetStoredSearches( const QString   &Type );
+        static QStringList  GetStoredSearches( const QString   &Type );
 
-        bool                AddToChannelGroup   ( int              ChannelGroupId,
+        static bool         AddToChannelGroup   ( int              ChannelGroupId,
                                                   int              ChanId );
 
-        bool                RemoveFromChannelGroup ( int           ChannelGroupId,
+        static bool         RemoveFromChannelGroup ( int           ChannelGroupId,
                                                      int           ChanId );
     private:
         Q_DISABLE_COPY(V2Guide)

@@ -20,8 +20,8 @@ class MBASE_PUBLIC MythHTTPMetaMethod
   public:
     static   HTTPMethodPtr Create (int Index, QMetaMethod& Method, int RequestTypes,
                                    const QString& ReturnName = {}, bool Slot = true);
-    void*    CreateParameter      (void* Parameter, int Type, const QString& Value);
-    QVariant CreateReturnValue    (int Type, void* Value);
+    static void*  CreateParameter (void* Parameter, int Type, const QString& Value);
+    static QVariant CreateReturnValue (int Type, void* Value);
 
     bool                    m_valid         { false };
     bool                    m_protected     { false };

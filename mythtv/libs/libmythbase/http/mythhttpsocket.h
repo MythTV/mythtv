@@ -32,7 +32,7 @@ class MythHTTPSocket : public QObject
     void OriginsChanged   (const QStringList&  Origins);
     void NewTextMessage   (const StringPayload& Text);
     void NewRawTextMessage(const DataPayloads& Payloads);
-    void NewBinaryMessage (const DataPayloads& Payloads);
+    static void NewBinaryMessage (const DataPayloads& Payloads);
 
   public:
     explicit MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& Config);
