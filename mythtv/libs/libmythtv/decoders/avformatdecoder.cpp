@@ -1284,52 +1284,41 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
 
 float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Context, bool Sanitise)
 {
-    double avg_fps = 0.0;
-    double codec_fps = av_q2d(Context->framerate); // {0, 1} when unknown
-    double container_fps = 0.0;
-    double estimated_fps = 0.0;
-
-    if (Stream->avg_frame_rate.den && Stream->avg_frame_rate.num)
-        avg_fps = av_q2d(Stream->avg_frame_rate); // MKV default_duration
-    if (Stream->time_base.den && Stream->time_base.num) // tbn
-        container_fps = 1.0 / av_q2d(Stream->time_base);
-    if (Stream->r_frame_rate.den && Stream->r_frame_rate.num) // tbr
-        estimated_fps = av_q2d(Stream->r_frame_rate);
+    // MKV default_duration
+    double avg_fps       = (Stream->avg_frame_rate.den == 0) ? 0.0 : av_q2d(Stream->avg_frame_rate);
+    double codec_fps     = av_q2d(Context->framerate); // {0, 1} when unknown
+    double container_fps = (Stream->time_base.num == 0) ? 0.0 : av_q2d(av_inv_q(Stream->time_base));
+    // least common multiple of all framerates in a stream; this is a guess
+    double estimated_fps = (Stream->r_frame_rate.den == 0) ? 0.0 : av_q2d(Stream->r_frame_rate);
 
     // build a list of possible rates, best first
     std::vector<double> rates;
+    rates.reserve(7);
 
     // matroska demuxer sets the default_duration to avg_frame_rate
     // mov,mp4,m4a,3gp,3g2,mj2 demuxer sets avg_frame_rate
-    if ((QString(m_ic->iformat->name).contains("matroska") ||
-        QString(m_ic->iformat->name).contains("mov")) &&
-        avg_fps < 121.0 && avg_fps > 3.0)
+    if (QString(m_ic->iformat->name).contains("matroska") ||
+        QString(m_ic->iformat->name).contains("mov"))
     {
         rates.emplace_back(avg_fps);
     }
 
-    if (QString(m_ic->iformat->name).contains("avi") &&
-        container_fps < 121.0 && container_fps > 3.0)
+    // avi uses container fps for timestamps
+    if (QString(m_ic->iformat->name).contains("avi"))
     {
-        // avi uses container fps for timestamps
         rates.emplace_back(container_fps);
     }
 
-    if (codec_fps < 121.0 && codec_fps > 3.0)
-        rates.emplace_back(codec_fps);
-
-    if (container_fps < 121.0 && container_fps > 3.0)
-        rates.emplace_back(container_fps);
-
-    if (avg_fps < 121.0 && avg_fps > 3.0)
-        rates.emplace_back(avg_fps);
-
+    rates.emplace_back(codec_fps);
+    rates.emplace_back(container_fps);
+    rates.emplace_back(avg_fps);
     // certain H.264 interlaced streams are detected at 2x using estimated (i.e. wrong)
-    if (estimated_fps < 121.0 && estimated_fps > 3.0)
-        rates.emplace_back(estimated_fps);
-
-    // last resort
+    rates.emplace_back(estimated_fps);
+    // last resort, default to NTSC
     rates.emplace_back(30000.0 / 1001.0);
+
+    auto invalid_fps = [](double rate) { return rate < 3.0 || rate > 121.0; };
+    rates.erase(std::remove_if(rates.begin(), rates.end(), invalid_fps));
 
     auto FuzzyEquals = [](double First, double Second) { return abs(First - Second) < 0.03; };
 
@@ -1352,7 +1341,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
             120000.0 / 1001.0, 119.88, 120.0
         };
 
-        if (Rate > 1.0 && Rate < 121.0)
+        if (Rate > 23.0 && Rate < 121.0)
         {
             for (auto rate : s_normRates)
                 if (FuzzyEquals(rate, Rate))
