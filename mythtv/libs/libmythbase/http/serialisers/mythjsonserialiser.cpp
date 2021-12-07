@@ -48,30 +48,31 @@ void MythJSONSerialiser::AddValue(const QVariant& Value)
         return;
     }
 
-    // The QT documentation states that Value.type() returns
-    // a QVariant::Type which should be treated as a QMetaType::Type.
-    // There is no QVariant::Float only a QMetaType::Float so we
-    // need to cast it here so we can use QMetaType::Float without
-    // warning messages.
-    switch (static_cast<QMetaType::Type>(Value.type()))
+    switch (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        static_cast<QMetaType::Type>(Value.type())
+#else
+        static_cast<QMetaType::Type>(Value.typeId())
+#endif
+        )
     {
-        case QVariant::Int:
-        case QVariant::UInt:
-        case QVariant::LongLong:
-        case QVariant::ULongLong:
+        case QMetaType::Int:
+        case QMetaType::UInt:
+        case QMetaType::LongLong:
+        case QMetaType::ULongLong:
             m_writer << Value.toString();
             break;
-        case QVariant::Double:
+        case QMetaType::Double:
             m_writer << QString::number(Value.toDouble(),'f',6);
             break;
         case QMetaType::Float:
             m_writer << QString::number(Value.toFloat(),'f',6);
             break;
-        case QVariant::Bool:       m_writer << (Value.toBool() ? "true" : "false"); break;
-        case QVariant::StringList: AddStringList(Value); break;
-        case QVariant::List:       AddList(Value); break;
-        case QVariant::Map:        AddMap(Value.toMap()); break;
-        case QVariant::DateTime:   m_writer << "\"" << Encode(MythDate::toString(Value.toDateTime(), MythDate::ISODate)) << "\""; break;
+        case QMetaType::Bool:         m_writer << (Value.toBool() ? "true" : "false"); break;
+        case QMetaType::QStringList:  AddStringList(Value); break;
+        case QMetaType::QVariantList: AddList(Value); break;
+        case QMetaType::QVariantMap:  AddMap(Value.toMap()); break;
+        case QMetaType::QDateTime:    m_writer << "\"" << Encode(MythDate::toString(Value.toDateTime(), MythDate::ISODate)) << "\""; break;
         default:
             m_writer << "\"" << Encode(Value.toString()) << "\"";
     }

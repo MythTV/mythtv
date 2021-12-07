@@ -45,18 +45,19 @@ void MythXMLPListSerialiser::AddValue(const QString& Name, const QVariant& Value
         return;
     }
 
-    // The QT documentation states that Value.type() returns
-    // a QVariant::Type which should be treated as a QMetaType::Type.
-    // There is no QVariant::Float only a QMetaType::Float so we
-    // need to cast it here so we can use QMetaType::Float without
-    // warning messages.
-    switch (static_cast<QMetaType::Type>(Value.type()))
+    switch (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        static_cast<QMetaType::Type>(Value.type())
+#else
+        static_cast<QMetaType::Type>(Value.typeId())
+#endif
+        )
     {
-        case QVariant::StringList: AddStringList(Name, Value); break;
-        case QVariant::List:       AddList(Name, Value.toList()); break;
-        case QVariant::Map:        AddMap(Name, Value.toMap()); break;
-        case QVariant::UInt:
-        case QVariant::ULongLong:
+        case QMetaType::QStringList:  AddStringList(Name, Value); break;
+        case QMetaType::QVariantList: AddList(Name, Value.toList()); break;
+        case QMetaType::QVariantMap:  AddMap(Name, Value.toMap()); break;
+        case QMetaType::UInt:
+        case QMetaType::ULongLong:
         {
             if (NeedKey)
                 m_writer.writeTextElement("key", Name);
@@ -64,9 +65,9 @@ void MythXMLPListSerialiser::AddValue(const QString& Name, const QVariant& Value
             break;
         }
 
-        case QVariant::Int:
-        case QVariant::LongLong:
-        case QVariant::Double:
+        case QMetaType::Int:
+        case QMetaType::LongLong:
+        case QMetaType::Double:
         {
             if (NeedKey)
                 m_writer.writeTextElement("key", Name);
@@ -80,7 +81,7 @@ void MythXMLPListSerialiser::AddValue(const QString& Name, const QVariant& Value
             m_writer.writeTextElement("real", QString("%1").arg(Value.toFloat(), 0, 'f', 6));
             break;
         }
-        case QVariant::ByteArray:
+        case QMetaType::QByteArray:
         {
             if (!Value.toByteArray().isNull())
             {
@@ -90,14 +91,14 @@ void MythXMLPListSerialiser::AddValue(const QString& Name, const QVariant& Value
             }
             break;
         }
-        case QVariant::Bool:
+        case QMetaType::Bool:
         {
             if (NeedKey)
                 m_writer.writeTextElement("key", Name);
             m_writer.writeEmptyElement(Value.toBool() ? "true" : "false");
             break;
         }
-        case QVariant::DateTime:
+        case QMetaType::QDateTime:
             if (Value.toDateTime().isValid())
             {
                 if (NeedKey)
@@ -105,7 +106,7 @@ void MythXMLPListSerialiser::AddValue(const QString& Name, const QVariant& Value
                 m_writer.writeTextElement("date", Value.toDateTime().toUTC().toString("yyyy-MM-ddThh:mm:ssZ"));
             }
             break;
-        case QVariant::String:
+        case QMetaType::QString:
         default:
             if (NeedKey)
                 m_writer.writeTextElement("key", Name);
@@ -175,10 +176,20 @@ void MythXMLPListSerialiser::AddList(const QString& Name, const QVariantList &Va
     bool array = true;
     if (!Values.isEmpty())
     {
-        QVariant::Type type = Values.front().type();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        auto type = static_cast<QMetaType::Type>(Values.front().type());
+#else
+        auto type = static_cast<QMetaType::Type>(Values.front().typeId());
+#endif
         for (const auto & value : Values)
         {
-            if (value.type() != type)
+            if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                static_cast<QMetaType::Type>(value.type())
+#else
+                static_cast<QMetaType::Type>(value.typeId())
+#endif
+                != type)
             {
                 array = false;
                 break;

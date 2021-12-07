@@ -54,25 +54,31 @@ void MythCBORSerialiser::AddValue(const QVariant& Value)
     }
 
     bool ok = false;
-    switch (Value.type())
+    switch (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        static_cast<QMetaType::Type>(Value.type())
+#else
+        static_cast<QMetaType::Type>(Value.typeId())
+#endif
+        )
     {
-        case QVariant::Int:
-        case QVariant::LongLong:
+        case QMetaType::Int:
+        case QMetaType::LongLong:
             if (auto value = Value.toLongLong(&ok); ok)
                 m_writer->append(value);
             break;
-        case QVariant::UInt:
-        case QVariant::ULongLong:
+        case QMetaType::UInt:
+        case QMetaType::ULongLong:
             if (auto value = Value.toULongLong(&ok); ok)
                 m_writer->append(value);
             break;
-        case QVariant::Double:     m_writer->append(Value.toDouble()); break;
-        case QVariant::Bool:       m_writer->append(Value.toBool()); break;
-        case QVariant::StringList: AddStringList(Value); break;
-        case QVariant::List:       AddList(Value); break;
-        case QVariant::Map:        AddMap(Value.toMap()); break;
+        case QMetaType::Double:       m_writer->append(Value.toDouble()); break;
+        case QMetaType::Bool:         m_writer->append(Value.toBool()); break;
+        case QMetaType::QStringList:  AddStringList(Value); break;
+        case QMetaType::QVariantList: AddList(Value); break;
+        case QMetaType::QVariantMap:  AddMap(Value.toMap()); break;
         // TODO This
-        case QVariant::DateTime:
+        case QMetaType::QDateTime:
             {
                 QDateTime dt(Value.toDateTime());
                 if (dt.isNull())

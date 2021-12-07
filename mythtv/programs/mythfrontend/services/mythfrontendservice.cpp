@@ -367,19 +367,37 @@ FrontendStatus::FrontendStatus(const QString& Name, const QString& Version, cons
     m_version(Version),
     m_state(State)
 {
-    if (m_state.contains("chaptertimes") && m_state["chaptertimes"].type() == QVariant::List)
+    if (m_state.contains("chaptertimes") &&
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        m_state["chaptertimes"].type() == QVariant::List
+#else
+        m_state["chaptertimes"].typeId() == QMetaType::QVariantList
+#endif
+        )
     {
         m_chapterTimes = m_state["chaptertimes"].toList();
         m_state.remove("chaptertimes");
     }
 
-    if (m_state.contains("subtitletracks") && m_state["subtitletracks"].type() == QVariant::Map)
+    if (m_state.contains("subtitletracks") &&
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        m_state["subtitletracks"].type() == QVariant::Map
+#else
+        m_state["subtitletracks"].typeId() == QMetaType::QVariantMap
+#endif
+        )
     {
         m_subtitleTracks = m_state["subtitletracks"].toMap();
         m_state.remove("subtitletracks");
     }
 
-    if (m_state.contains("audiotracks") && m_state["audiotracks"].type() == QVariant::Map)
+    if (m_state.contains("audiotracks") &&
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        m_state["audiotracks"].type() == QVariant::Map
+#else
+        m_state["audiotracks"].typeId() == QMetaType::QVariantMap
+#endif
+        )
     {
         m_audioTracks = m_state["audiotracks"].toMap();
         m_state.remove("audiotracks");
