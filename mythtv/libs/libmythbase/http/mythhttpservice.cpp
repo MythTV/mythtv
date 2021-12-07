@@ -71,7 +71,7 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
     }
 
     // Sanity check type count (handler should have the return type at least)
-    if (handler->m_types.size() < 1)
+    if (handler->m_types.empty())
         return nullptr;
 
     // Handle options
