@@ -88,7 +88,7 @@ MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& C
     // service would appear again as /services/services/
     auto service = MythHTTPService::Create<MythHTTPServices>();
     m_activeServices.emplace_back(service);
-    auto services = dynamic_cast<MythHTTPServices*>(service.get());
+    auto * services = dynamic_cast<MythHTTPServices*>(service.get());
     connect(this, &MythHTTPSocket::UpdateServices, services, &MythHTTPServices::UpdateServices);
     services->UpdateServices(m_config.m_services);
 }
@@ -349,7 +349,7 @@ void MythHTTPSocket::Respond(HTTPResponse Response)
     Response->Finalise(m_config);
 
     // Queue headers
-    for (auto & header : qAsConst(Response->m_responseHeaders))
+    for (const auto & header : qAsConst(Response->m_responseHeaders))
     {
         LOG(VB_HTTP, LOG_DEBUG, header->trimmed().constData());
         m_queue.push_back(header);
@@ -364,14 +364,14 @@ void MythHTTPSocket::Respond(HTTPResponse Response)
     // Sum the expected number of bytes to be written. This is the size of the
     // data or file OR the total size of the range request. For multipart range
     // requests, add the total size of the additional headers.
-    for (auto & content : qAsConst(m_queue))
+    for (const auto & content : qAsConst(m_queue))
     {
-        if (auto data = std::get_if<HTTPData>(&content))
+        if (const auto * data = std::get_if<HTTPData>(&content))
         {
             m_totalToSend += (*data)->m_partialSize > 0 ? (*data)->m_partialSize : (*data)->size();
             m_totalToSend += (*data)->m_multipartHeaderSize;
         }
-        else if (auto file = std::get_if<HTTPFile>(&content))
+        else if (const auto * file = std::get_if<HTTPFile>(&content))
         {
             m_totalToSend += (*file)->m_partialSize > 0 ? (*file)->m_partialSize : (*file)->size();
             m_totalToSend += (*file)->m_multipartHeaderSize;
@@ -397,7 +397,7 @@ void MythHTTPSocket::RespondDirect(qintptr Socket, HTTPResponse Response, const 
     Response->Finalise(Config);
     QTcpSocket* socket = new QTcpSocket();
     socket->setSocketDescriptor(Socket);
-    for (auto & header : qAsConst(Response->m_responseHeaders))
+    for (const auto & header : qAsConst(Response->m_responseHeaders))
         socket->write(*header);
     socket->flush();
     socket->disconnectFromHost();
@@ -477,8 +477,8 @@ void MythHTTPSocket::Write(int64_t Written)
         int64_t itemsize = 0;
         int64_t towrite  = 0;
         bool chunk = false;
-        auto data = std::get_if<HTTPData>(&m_queue.front());
-        auto file = std::get_if<HTTPFile>(&m_queue.front());
+        auto * data = std::get_if<HTTPData>(&m_queue.front());
+        auto * file = std::get_if<HTTPFile>(&m_queue.front());
 
         if (data)
         {

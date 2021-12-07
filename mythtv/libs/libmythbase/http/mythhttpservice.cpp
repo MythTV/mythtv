@@ -116,9 +116,9 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
         }
 
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-        auto newparam = QMetaType::create(type);
+        auto * newparam = QMetaType::create(type);
 #else
-        auto newparam = QMetaType(type).create();
+        auto * newparam = QMetaType(type).create();
 #endif
         param[count] = handler->CreateParameter(newparam, type, value);
         count++;

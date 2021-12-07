@@ -144,10 +144,10 @@ bool MythFrontendService::SendKey(const QString& Key)
     }
 
     MythMainWindow::ResetScreensaver();
-    auto mainwindow = GetMythMainWindow();
-    auto event1 = new QKeyEvent(QEvent::KeyPress, keycode, Qt::NoModifier, "");
+    auto * mainwindow = GetMythMainWindow();
+    auto * event1 = new QKeyEvent(QEvent::KeyPress, keycode, Qt::NoModifier, "");
     QCoreApplication::postEvent(mainwindow, event1);
-    auto event2 = new QKeyEvent(QEvent::KeyRelease, keycode, Qt::NoModifier, "");
+    auto * event2 = new QKeyEvent(QEvent::KeyRelease, keycode, Qt::NoModifier, "");
     QCoreApplication::postEvent(mainwindow, event2);
     LOG(VB_HTTP, LOG_INFO, LOC + QString("Sent key: '%1'").arg(Key));
     return true;
