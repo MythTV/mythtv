@@ -174,7 +174,7 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
         case QMetaType::Bool      : *(static_cast<bool         *>(Parameter)) = ToBool(Value ); break;
         case QMetaType::Char      : *(static_cast<char         *>(Parameter)) = (Value.length() > 0) ? Value.at(0).toLatin1() : 0; break;
         case QMetaType::UChar     : *(static_cast<unsigned char*>(Parameter)) = (Value.length() > 0) ? static_cast<unsigned char>(Value.at(0).toLatin1()) : 0; break;
-        case QMetaType::QChar     : *(static_cast<QChar        *>(Parameter)) = (Value.length() > 0) ? Value.at(0) : 0; break;
+        case QMetaType::QChar     : *(static_cast<QChar        *>(Parameter)) = (Value.length() > 0) ? Value.at(0) : QChar(0); break;
         case QMetaType::Short     : *(static_cast<short        *>(Parameter)) = Value.toShort(); break;
         case QMetaType::UShort    : *(static_cast<ushort       *>(Parameter)) = Value.toUShort(); break;
         case QMetaType::Int       : *(static_cast<int          *>(Parameter)) = Value.toInt(); break;
@@ -223,6 +223,10 @@ QVariant MythHTTPMetaMethod::CreateReturnValue(int Type, void* Value)
         return QVariant::fromValue<QObject*>(object);
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     return QVariant(Type, Value);
+#else
+    return QVariant(QMetaType(Type), Value);
+#endif
 }
 
