@@ -93,7 +93,13 @@ void MythXMLSerialiser::AddQObject(const QObject* Object)
     for (int index = 0; index  < count; ++index  )
     {
         QMetaProperty metaproperty = meta->property(index);
-        if (metaproperty.isUser(Object))
+        if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            metaproperty.isUser(Object)
+#else
+            metaproperty.isUser()
+#endif
+            )
         {
             const char *rawname = metaproperty.name();
             QString name(rawname);

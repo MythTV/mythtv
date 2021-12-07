@@ -90,7 +90,13 @@ void MythJSONSerialiser::AddQObject(const QObject* Object)
     for (int index = 0; index  < count; ++index  )
     {
         QMetaProperty metaProperty = metaobject->property(index);
-        if (metaProperty.isUser(Object))
+        if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            metaProperty.isUser(Object)
+#else
+            metaProperty.isUser()
+#endif
+            )
         {
             const char *rawname = metaProperty.name();
             QString name(rawname);

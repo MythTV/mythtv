@@ -80,7 +80,12 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
             for (int ix = 0; ix  < count; ++ix  )
             {
                 QMetaProperty metaproperty = meta->property(ix);
-                if (metaproperty.isUser(Object))
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                bool user = metaproperty.isUser(Object);
+#else
+                bool user = metaproperty.isUser();
+#endif
+                if (user)
                 {
                     const char *rawname = metaproperty.name();
                     QString name(rawname);
