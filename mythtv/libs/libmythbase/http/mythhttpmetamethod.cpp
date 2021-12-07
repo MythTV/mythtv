@@ -91,7 +91,11 @@ MythHTTPMetaMethod::MythHTTPMetaMethod(int Index, QMetaMethod& Method, int Reque
     // Add type/value for each method parameter
     for (int i = 0; i < names.size(); ++i)
     {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         int type = QMetaType::type(types[i]);
+#else
+        int type = QMetaType::fromName(types[i]).id();
+#endif
 
         // Discard methods that use unsupported parameter types.
         // Note: slots only - these are supportable for signals
@@ -127,16 +131,30 @@ HTTPMethodPtr MythHTTPMetaMethod::Create(int Index, QMetaMethod &Method, int Req
 void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QString& Value)
 {
     // Enum types
-    if (auto typeflags = QMetaType::typeFlags(Type); (typeflags & QMetaType::IsEnumeration) == QMetaType::IsEnumeration)
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    auto typeflags = QMetaType::typeFlags(Type);
+#else
+    auto typeflags = QMetaType(Type).flags();
+#endif
+    if ((typeflags & QMetaType::IsEnumeration) == QMetaType::IsEnumeration)
     {
         // QMetaEnum::keyToValue will return -1 for an unrecognised enumerant, so
         // default to -1 for all error cases
         int value = -1;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         QByteArray type = QMetaType::typeName(Type);
+#else
+        QByteArray type = QMetaType(Type).name();
+#endif
         if (int index = type.lastIndexOf("::" ); index > -1)
         {
             QString enumname = type.mid(index + 2);
-            if (const auto * metaobject = QMetaType::metaObjectForType(Type); metaobject)
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            const auto * metaobject = QMetaType::metaObjectForType(Type);
+#else
+            const auto * metaobject = QMetaType(Type).metaObject();
+#endif
+            if (metaobject)
             {
                 int enumindex = metaobject->indexOfEnumerator(enumname.toUtf8());
                 if (enumindex >= 0)
@@ -190,7 +208,13 @@ QVariant MythHTTPMetaMethod::CreateReturnValue(int Type, void* Value)
 
     // This assumes any user type will be derived from QObject...
     // (Exception for QFileInfo)
-    if (Type == QMetaType::type("QFileInfo"))
+    if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        Type == QMetaType::type("QFileInfo")
+#else
+        Type == QMetaType::fromName("QFileInfo").id()
+#endif
+        )
         return QVariant::fromValue<QFileInfo>(*(static_cast<QFileInfo*>(Value)));
 
     if (Type > QMetaType::User)
