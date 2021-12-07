@@ -461,13 +461,10 @@ void MythHTTPSocket::Write(int64_t Written)
                 SetupWebSocket();
             return;
         }
-        else
-        {
-            // This is going to be unrecoverable
-            LOG(VB_GENERAL, LOG_ERR, LOC + "Write complete but queue not empty");
-            Stop();
-            return;
-        }
+        // This is going to be unrecoverable
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Write complete but queue not empty");
+        Stop();
+        return;
     }
 
     // Fill them buffers
