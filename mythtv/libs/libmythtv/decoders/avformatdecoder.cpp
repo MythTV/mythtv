@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <set>
 
 extern "C" {
 #include "libavutil/avutil.h"
@@ -1320,7 +1321,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     auto invalid_fps = [](double rate) { return rate < 3.0 || rate > 121.0; };
     rates.erase(std::remove_if(rates.begin(), rates.end(), invalid_fps));
 
-    auto FuzzyEquals = [](double First, double Second) { return abs(First - Second) < 0.03; };
+    auto FuzzyEquals = [](double First, double Second) { return std::abs(First - Second) < 0.03; };
 
     // debug
     if (!FuzzyEquals(rates.front(), m_fps))
@@ -1334,20 +1335,34 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     auto IsStandard = [&FuzzyEquals](double Rate)
     {
         // List of known, standards based frame rates
-        static const std::vector<double> s_normRates =
+        static const std::set<double> k_standard_rates =
         {
-            24000.0 / 1001.0, 23.976, 24.0, 25.0, 30000.0 / 1001.0,
-            29.97, 30.0, 50.0, 60000.0 / 1001.0, 59.94, 60.0, 100.0,
-            120000.0 / 1001.0, 119.88, 120.0
+            24000.0 / 1001.0,
+            23.976,
+            24.0,
+            25.0,
+            30000.0 / 1001.0,
+            29.97,
+            30.0,
+            50.0,
+            60000.0 / 1001.0,
+            59.94,
+            60.0,
+            100.0,
+            120000.0 / 1001.0,
+            119.88,
+            120.0
         };
 
         if (Rate > 23.0 && Rate < 121.0)
         {
-            for (auto rate : s_normRates)
-                if (FuzzyEquals(rate, Rate))
+            for (auto standard_rate : k_standard_rates)
+                if (FuzzyEquals(Rate, standard_rate))
                     return true;
         }
         return false;
+        // TODO do not convert AVRational to double
+        //return k_standard_rates.find(rate) != k_standard_rates.end();
     };
 
     // If the first choice rate is unusual, see if there is something more 'usual'
@@ -1370,7 +1385,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
                 if (rate > 33.0 && detected < 33.0)
                 {
                     double half = rate / 2.0;
-                    if (qAbs(half - detected) < (half * 0.1))
+                    if (std::abs(half - detected) < (half * 0.1))
                     {
                         LOG(VB_GENERAL, LOG_INFO, LOC +
                             QString("Assuming %1 is a better choice than %2")
