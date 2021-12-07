@@ -57,8 +57,12 @@ MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& C
     connect(m_socket, &QTcpSocket::bytesWritten, this, &MythHTTPSocket::Write);
     connect(m_socket, &QTcpSocket::disconnected, this, &MythHTTPSocket::Disconnected);
     connect(m_socket, &QTcpSocket::disconnected, QThread::currentThread(), &QThread::quit);
-    connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error),
+#if QT_VERSION < QT_VERSION_CHECK(5,15,0)
+    connect(m_socket, qOverload<QAbstractSocket::SocketError>(&QTcpSocket::error),
                                                  this, &MythHTTPSocket::Error);
+#else
+    connect(m_socket, &QTcpSocket::errorOccurred, this, &MythHTTPSocket::Error);
+#endif
     m_socket->setSocketDescriptor(m_socketFD);
 
 #ifndef QT_NO_OPENSSL
