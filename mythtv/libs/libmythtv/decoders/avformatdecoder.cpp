@@ -1285,23 +1285,12 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
 float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Context, bool Sanitise)
 {
     double avg_fps = 0.0;
-    double codec_fps = 0.0;
+    double codec_fps = av_q2d(Context->framerate); // {0, 1} when unknown
     double container_fps = 0.0;
     double estimated_fps = 0.0;
 
     if (Stream->avg_frame_rate.den && Stream->avg_frame_rate.num)
         avg_fps = av_q2d(Stream->avg_frame_rate); // MKV default_duration
-
-    if (Context->time_base.den && Context->time_base.num) // tbc
-        codec_fps = 1.0 / av_q2d(Context->time_base) / Context->ticks_per_frame;
-    // Some formats report fps waaay too high. (wrong time_base)
-    if (codec_fps > 121.0 && (Context->time_base.den > 10000) &&
-        (Context->time_base.num == 1))
-    {
-        Context->time_base.num = 1001;  // seems pretty standard
-        if (av_q2d(Context->time_base) > 0)
-            codec_fps = 1.0 / av_q2d(Context->time_base);
-    }
     if (Stream->time_base.den && Stream->time_base.num) // tbn
         container_fps = 1.0 / av_q2d(Stream->time_base);
     if (Stream->r_frame_rate.den && Stream->r_frame_rate.num) // tbr
