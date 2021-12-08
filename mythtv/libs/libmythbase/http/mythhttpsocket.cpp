@@ -109,17 +109,17 @@ MythHTTPSocket::~MythHTTPSocket()
 */
 void MythHTTPSocket::PathsChanged(const QStringList& Paths)
 {
-    m_config.m_filePaths = std::move(Paths);
+    m_config.m_filePaths = Paths;
 }
 
 void MythHTTPSocket::HandlersChanged(const HTTPHandlers& Handlers)
 {
-    m_config.m_handlers = std::move(Handlers);
+    m_config.m_handlers = Handlers;
 }
 
 void MythHTTPSocket::ServicesChanged(const HTTPServices& Services)
 {
-    m_config.m_services = std::move(Services);
+    m_config.m_services = Services;
     emit UpdateServices(m_config.m_services);
 }
 

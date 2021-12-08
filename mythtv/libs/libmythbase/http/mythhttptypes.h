@@ -159,7 +159,7 @@ static QString s_defaultHTTPPage =
 class MythHTTPContent
 {
   public:
-    explicit MythHTTPContent(const QString& Name): m_fileName(std::move(Name)) {}
+    explicit MythHTTPContent(QString Name): m_fileName(std::move(Name)) {}
     QString        m_fileName;
     HTTPRanges     m_ranges;
     int64_t        m_partialSize { 0 };
