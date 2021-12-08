@@ -39,7 +39,7 @@ class MythHTTPServer : public MythHTTPThreadPool
     void ProcessTCPQueue();
 
   protected slots:
-    virtual void newTcpConnection(qintptr socket);
+    void newTcpConnection(qintptr socket) override;
     void EnableDisable  (bool Enable);
     void NewPaths       (const QStringList& Paths);
     void StalePaths     (const QStringList& Paths);
