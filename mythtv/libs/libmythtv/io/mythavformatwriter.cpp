@@ -287,10 +287,12 @@ int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber
     AudioFormat format      = AudioOutputSettings::AVSampleFormatToFormat(avctx->sample_fmt);
     int sampleSizeOut       = AudioOutputSettings::SampleSize(format);
 
-    AVPacket pkt;
-    av_init_packet(&pkt);
-    pkt.data = nullptr;
-    pkt.size = 0;
+    AVPacket *pkt = av_packet_alloc();
+    if (pkt == nullptr)
+    {
+        LOG(VB_RECORD, LOG_ERR, "packet allocation failed");
+        return AVERROR(ENOMEM);
+    }
 
     if (av_get_packed_sample_fmt(avctx->sample_fmt) == AV_SAMPLE_FMT_FLT)
     {
@@ -324,7 +326,7 @@ int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber
     //  by 2 calls, this could be optimized
     //  into separate routines or separate threads.
     bool got_packet = false;
-    int ret = avcodec_receive_packet(avctx, &pkt);
+    int ret = avcodec_receive_packet(avctx, pkt);
     if (ret == 0)
         got_packet = true;
     if (ret == AVERROR(EAGAIN))
@@ -340,11 +342,15 @@ int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber
         std::string error;
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("audio encode error: %1 (%2)")
             .arg(av_make_error_stdstring(error, ret)).arg(got_packet));
+        av_packet_free(&pkt);
         return ret;
     }
 
     if (!got_packet)
+    {
+        av_packet_free(&pkt);
         return ret;
+    }
 
     std::chrono::milliseconds tc = Timecode;
 
@@ -356,20 +362,21 @@ int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber
     tc -= m_startingTimecodeOffset;
 
     if (m_avVideoCodec)
-        pkt.pts = tc.count() * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
+        pkt->pts = tc.count() * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
     else
-        pkt.pts = tc.count() * m_audioStream->time_base.den / m_audioStream->time_base.num / 1000;
+        pkt->pts = tc.count() * m_audioStream->time_base.den / m_audioStream->time_base.num / 1000;
 
-    pkt.dts = AV_NOPTS_VALUE;
-    pkt.flags |= AV_PKT_FLAG_KEY;
-    pkt.stream_index = m_audioStream->index;
+    pkt->dts = AV_NOPTS_VALUE;
+    pkt->flags |= AV_PKT_FLAG_KEY;
+    pkt->stream_index = m_audioStream->index;
 
-    ret = av_interleaved_write_frame(m_ctx, &pkt);
+    ret = av_interleaved_write_frame(m_ctx, pkt);
     if (ret != 0)
         LOG(VB_RECORD, LOG_ERR, LOC + "WriteAudioFrame(): av_interleaved_write_frame couldn't write Audio");
 
     Timecode = tc + m_startingTimecodeOffset;
-    av_packet_unref(&pkt);
+    av_packet_unref(pkt);
+    av_packet_free(&pkt);
     return 1;
 }
 
