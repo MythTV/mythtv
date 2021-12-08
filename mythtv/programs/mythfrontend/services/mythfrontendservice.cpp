@@ -84,6 +84,7 @@ class FrontendActions
     QHash<QString,QStringList> m_actionDescriptions;
 };
 
+//NOLINTNEXTLINE(readability-redundant-member-init)
 Q_GLOBAL_STATIC(FrontendActions, s_actions)
 
 // This will be initialised in a thread safe manner on first use

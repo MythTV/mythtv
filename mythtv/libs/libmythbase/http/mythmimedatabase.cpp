@@ -129,6 +129,7 @@ class MythMimeDatabasePriv
     MythMimeTypes m_mimes;
 };
 
+//NOLINTNEXTLINE(readability-redundant-member-init)
 Q_GLOBAL_STATIC(MythMimeDatabasePriv, s_mimeDB)
 
 /*! \class MythMimeDatabase
