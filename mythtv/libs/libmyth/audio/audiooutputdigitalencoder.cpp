@@ -257,10 +257,12 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
 
     while (i < frames)
     {
-        AVPacket pkt;
-        av_init_packet(&pkt);
-        pkt.data          = nullptr;
-        pkt.size          = 0;
+        AVPacket *pkt = av_packet_alloc();
+        if (pkt == nullptr)
+        {
+            LOG(VB_RECORD, LOG_ERR, "packet allocation failed");
+            return AVERROR(ENOMEM);
+        }
         bool got_packet   = false;
 
         AudioOutputUtil::DeinterleaveSamples(
@@ -273,7 +275,7 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
         //  Now that avcodec_encode_audio2 is deprecated and replaced
         //  by 2 calls, this could be optimized
         //  into separate routines or separate threads.
-        int ret = avcodec_receive_packet(m_avContext, &pkt);
+        int ret = avcodec_receive_packet(m_avContext, pkt);
         if (ret == 0)
             got_packet = true;
         if (ret == AVERROR(EAGAIN))
@@ -291,6 +293,7 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
                 QString("audio encode error: %1 (%2)")
                 .arg(av_make_error_stdstring(error, ret))
                 .arg(got_packet));
+            av_packet_free(&pkt);
             return ret;
         }
         i++;
@@ -304,8 +307,9 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
             m_spdifEnc = new SPDIFEncoder("spdif", AV_CODEC_ID_AC3);
         }
 
-        m_spdifEnc->WriteFrame(pkt.data, pkt.size);
-        av_packet_unref(&pkt);
+        m_spdifEnc->WriteFrame(pkt->data, pkt->size);
+        av_packet_unref(pkt);
+        av_packet_free(&pkt);
 
         // Check if output buffer is big enough
         required_len = m_outlen + m_spdifEnc->GetProcessedSize();
