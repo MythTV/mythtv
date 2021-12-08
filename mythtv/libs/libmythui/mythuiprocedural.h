@@ -21,7 +21,7 @@ class MythUIProcedural : public MythUIType
     void CreateCopy(MythUIType* Parent) override;
     void Pulse() override;
     void Finalize(void) override; // MythUIType
-    ShaderSource LoadShaderSource(const QString &filename);
+    static ShaderSource LoadShaderSource(const QString &filename);
 
   protected:
     QString      m_hash;

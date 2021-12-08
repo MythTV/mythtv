@@ -279,13 +279,13 @@ void MythOpenGLPainter::DrawImage(const QRect Dest, MythImage *Image,
     }
 }
 
-void MythOpenGLPainter::DrawProcedural(QRect Dest, int Alpha, ProcSource VertexSource, ProcSource FragmentSource, const QString &SourceHash)
+void MythOpenGLPainter::DrawProcedural(QRect Dest, int Alpha, const ProcSource& VertexSource, const ProcSource& FragmentSource, const QString &SourceHash)
 {
-    if (auto shader = GetProceduralShader(VertexSource, FragmentSource, SourceHash); shader && m_render)
+    if (auto * shader = GetProceduralShader(VertexSource, FragmentSource, SourceHash); shader && m_render)
         m_render->DrawProcedural(Dest, Alpha, nullptr, shader, m_frameTime);
 }
 
-QOpenGLShaderProgram* MythOpenGLPainter::GetProceduralShader(ProcSource VertexSource, ProcSource FragmentSource, const QString& SourceHash)
+QOpenGLShaderProgram* MythOpenGLPainter::GetProceduralShader(const ProcSource& VertexSource, const ProcSource& FragmentSource, const QString& SourceHash)
 {
     if (!m_render)
         return nullptr;
@@ -293,7 +293,7 @@ QOpenGLShaderProgram* MythOpenGLPainter::GetProceduralShader(ProcSource VertexSo
     if (auto program = m_procedurals.find(SourceHash); program != m_procedurals.end())
         return *program;
 
-    auto result = m_render->CreateShaderProgram(QString(*VertexSource), QString(*FragmentSource));
+    auto * result = m_render->CreateShaderProgram(QString(*VertexSource), QString(*FragmentSource));
     m_procedurals.insert(SourceHash, result);
     LOG(VB_GENERAL, LOG_INFO, QString("%1 procedural shaders cached").arg(m_procedurals.size()));
     return result;

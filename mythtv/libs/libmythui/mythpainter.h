@@ -63,7 +63,8 @@ class MUI_PUBLIC MythPainter : public QObject
     void DrawImage(int x, int y, MythImage *im, int alpha);
     void DrawImage(QPoint topLeft, MythImage *im, int alph);
     virtual void DrawProcedural(QRect /*Area*/, int /*Alpha*/,
-                                ProcSource /*VertexSource*/, ProcSource /*FragmentSource*/,
+                                const ProcSource& /*VertexSource*/,
+                                const ProcSource& /*FragmentSource*/,
                                 const QString& /*SourceHash*/) { }
 
     virtual void DrawText(QRect r, const QString &msg, int flags,

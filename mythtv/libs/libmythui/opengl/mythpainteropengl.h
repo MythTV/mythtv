@@ -42,7 +42,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainterGPU
     void Begin(QPaintDevice *Parent) override;
     void End() override;
     void DrawImage(QRect Dest, MythImage *Image, QRect Source, int Alpha) override;
-    void DrawProcedural(QRect Dest, int Alpha, ProcSource VertexSource, ProcSource FragmentSource, const QString& SourceHash) override;
+    void DrawProcedural(QRect Dest, int Alpha, const ProcSource& VertexSource, const ProcSource& FragmentSource, const QString& SourceHash) override;
 
     void DrawRect(QRect Area, const QBrush &FillBrush,
                   const QPen &LinePen, int Alpha) override;
@@ -54,7 +54,7 @@ class MUI_PUBLIC MythOpenGLPainter : public MythPainterGPU
   protected:
     void  ClearCache(void);
     MythGLTexture* GetTextureFromCache(MythImage *Image);
-    QOpenGLShaderProgram* GetProceduralShader(ProcSource VertexSource, ProcSource FragmentSource, const QString& SourceHash);
+    QOpenGLShaderProgram* GetProceduralShader(const ProcSource& VertexSource, const ProcSource& FragmentSource, const QString& SourceHash);
 
     MythImage* GetFormatImagePriv(void) override { return new MythImage(this); }
     void  DeleteFormatImagePriv(MythImage *Image) override;
