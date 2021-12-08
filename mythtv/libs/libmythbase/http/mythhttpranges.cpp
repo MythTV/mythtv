@@ -95,7 +95,7 @@ HTTPMulti MythHTTPRanges::HandleRangeWrite(HTTPVariant Data, int64_t Available, 
         return result;
 
     int64_t partialsize   = data ? (*data)->m_partialSize : (*file)->m_partialSize;
-    uint64_t   written    = static_cast<uint64_t>(data ? (*data)->m_written : (*file)->m_written);
+    auto written          = static_cast<uint64_t>(data ? (*data)->m_written : (*file)->m_written);
     HTTPRanges& ranges    = data ? (*data)->m_ranges : (*file)->m_ranges;
     HTTPContents& headers = data ? (*data)->m_multipartHeaders : (*file)->m_multipartHeaders;
 

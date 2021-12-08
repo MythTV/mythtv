@@ -106,7 +106,7 @@ FrontendStatus* MythFrontendService::GetStatus()
 {
     QVariantMap state;
     MythUIStateTracker::GetFreshState(state);
-    FrontendStatus* result = new FrontendStatus(gCoreContext->GetHostName(), GetMythSourceVersion(), state);
+    auto* result = new FrontendStatus(gCoreContext->GetHostName(), GetMythSourceVersion(), state);
     return result;
 }
 

@@ -414,7 +414,7 @@ void MythWebSocket::Write(int64_t Written)
             if (m_writeTotal > 100)
             {
                 auto seconds = static_cast<double>(m_writeTime.nsecsElapsed()) / 1000000000.0;
-                uint64_t rate = static_cast<uint64_t>(static_cast<double>(m_writeTotal) / seconds);
+                auto rate = static_cast<uint64_t>(static_cast<double>(m_writeTotal) / seconds);
                 LOG(VB_HTTP, LOG_INFO, LOC + QString("Wrote %1bytes in %2seconds (%3)")
                     .arg(m_writeTotal).arg(seconds, 8, 'f', 6, '0').arg(MythHTTPWS::BitrateToString(rate)));
             }

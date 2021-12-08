@@ -156,7 +156,7 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
         {
             if (!result)
             {
-                QFileInfo info = returnvalue.value<QFileInfo>();
+                auto info = returnvalue.value<QFileInfo>();
                 QString file = info.absoluteFilePath();
                 if (file.size() == 0)
                 {

@@ -40,7 +40,7 @@ void MythXMLSerialiser::AddValue(const QString& Name, const QVariant& Value)
         return;
     }
 
-    QObject* object = Value.value<QObject*>();
+    auto * object = Value.value<QObject*>();
     if (object)
     {
         QVariant isNull = object->property("isNull");
@@ -133,7 +133,7 @@ void MythXMLSerialiser::AddProperty(const QString& Name, const QVariant& Value,
 
 void MythXMLSerialiser::AddStringList(const QVariant& Values)
 {
-    QSequentialIterable values = Values.value<QSequentialIterable>();
+    auto values = Values.value<QSequentialIterable>();
     for (const auto & value : values)
     {
         m_writer.writeStartElement("String");
@@ -144,7 +144,7 @@ void MythXMLSerialiser::AddStringList(const QVariant& Values)
 
 void MythXMLSerialiser::AddList(const QString& Name, const QVariant& Values)
 {
-    QSequentialIterable values = Values.value<QSequentialIterable>();
+    auto values = Values.value<QSequentialIterable>();
     for (const auto & value : values)
     {
         m_writer.writeStartElement(Name);

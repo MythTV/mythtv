@@ -681,7 +681,7 @@ void FillEncoderList(QVariantList &list, QObject* parent)
         if (elink != nullptr)
         {
             // V2Encoder *pEncoder = list->AddNewEncoder();
-            V2Encoder *pEncoder = new V2Encoder( parent );
+            auto *pEncoder = new V2Encoder( parent );
             list.append( QVariant::fromValue<QObject *>( pEncoder ));
 
             pEncoder->setId            ( elink->GetInputID()      );
@@ -797,7 +797,7 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
     for( int n = nStartIndex; n < nEndIndex; n++)
     {
         ProgramInfo *pInfo = recordingList[ n ];
-        V2Program *pProgram = new V2Program( parent );
+        auto *pProgram = new V2Program( parent );
         list.append( QVariant::fromValue<QObject *>( pProgram ));
         V2FillProgramInfo( pProgram, pInfo, true );
     }
@@ -815,7 +815,7 @@ void FillFrontendList(QVariantList &list, QObject* parent, bool OnLine)
 
     for (auto * fe : qAsConst(frontends))
     {
-        V2Frontend *pFrontend = new V2Frontend( parent );
+        auto *pFrontend = new V2Frontend( parent );
         list.append( QVariant::fromValue<QObject *>( pFrontend ));
         pFrontend->setName(fe->m_name);
         pFrontend->setIP(fe->m_ip.toString());

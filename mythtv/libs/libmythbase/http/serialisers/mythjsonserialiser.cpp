@@ -36,7 +36,7 @@ void MythJSONSerialiser::AddValue(const QVariant& Value)
         return;
     }
 
-    QObject* object = Value.value<QObject*>();
+    auto * object = Value.value<QObject*>();
     if (object)
     {
         QVariant isNull = object->property("isNull");
@@ -117,7 +117,7 @@ void MythJSONSerialiser::AddStringList(const QVariant &Values)
 {
     QString first;
     m_writer << "[";
-    QSequentialIterable values = Values.value<QSequentialIterable>();
+    auto values = Values.value<QSequentialIterable>();
     for (const auto & value : values)
     {
         m_writer << first << "\"" << Encode(value.toString()) << "\"";
@@ -131,7 +131,7 @@ void MythJSONSerialiser::AddList(const QVariant& Values)
     m_first.push(true);
     QString first;
     m_writer << "[";
-    QSequentialIterable values = Values.value<QSequentialIterable>();
+    auto values = Values.value<QSequentialIterable>();
     for (const auto & value : values)
     {
         m_writer << first;

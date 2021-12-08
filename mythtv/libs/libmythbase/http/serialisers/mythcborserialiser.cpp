@@ -41,7 +41,7 @@ void MythCBORSerialiser::AddValue(const QVariant& Value)
         return;
     }
 
-    QObject* object = Value.value<QObject*>();
+    auto * object = Value.value<QObject*>();
     if (object)
     {
         QVariant isNull = object->property("isNull");
@@ -133,7 +133,7 @@ void MythCBORSerialiser::AddQObject(const QObject* Object)
 void MythCBORSerialiser::AddStringList(const QVariant &Values)
 {
     m_writer->startArray();
-    QSequentialIterable values = Values.value<QSequentialIterable>();
+    auto values = Values.value<QSequentialIterable>();
     for (const auto & value : values)
     {
         auto utf8 = value.toString().toUtf8();
@@ -145,7 +145,7 @@ void MythCBORSerialiser::AddStringList(const QVariant &Values)
 void MythCBORSerialiser::AddList(const QVariant& Values)
 {
     m_writer->startArray();
-    QSequentialIterable values = Values.value<QSequentialIterable>();
+    auto values = Values.value<QSequentialIterable>();
     for (const auto & value : values)
         AddValue(value);
     m_writer->endArray();

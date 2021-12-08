@@ -10,7 +10,7 @@ WSFrame MythWebSocketFrame::CreateFrame(const QByteArray &Header)
         return nullptr;
 
     bool final      = (Header[0] & 0x80) != 0;
-    WSOpCode code   = static_cast<WSOpCode>(Header[0] & 0x0F);
+    auto code       = static_cast<WSOpCode>(Header[0] & 0x0F);
     bool masked     = (Header[1] & 0x80) != 0;
     uint64_t length = (Header[1] & 0x7F);
     bool invalid    = (Header[0] & 0x70) != 0;

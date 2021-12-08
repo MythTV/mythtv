@@ -65,7 +65,7 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
     // Check for preformatted xml or html
     if (Value.value<QObject*>())
     {
-        QObject* Object = Value.value<QObject*>();
+        auto * Object = Value.value<QObject*>();
         const auto * meta = Object->metaObject();
         int index = meta->indexOfClassInfo("preformat");
         if (index >= 0
