@@ -11,7 +11,7 @@ except ImportError:
 try:
     import HTMLParser as html_parser
 except ImportError:
-	from html import parser as html_parser
+    from html import parser as html_parser
 
 from optparse import OptionParser
 
