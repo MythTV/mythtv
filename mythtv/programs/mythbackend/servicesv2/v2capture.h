@@ -49,14 +49,14 @@ class V2Capture : public MythHTTPService
     static void RegisterCustomTypes();
 
   public slots:
-    V2CaptureCardList*          GetCaptureCardList ( const QString    &HostName,
+    static V2CaptureCardList*   GetCaptureCardList ( const QString    &HostName,
                                                         const QString    &CardType  );
 
-    V2CaptureCard*              GetCaptureCard     ( int              CardId     );
+    static V2CaptureCard*       GetCaptureCard     ( int              CardId     );
 
-    bool                        RemoveCaptureCard  ( int              CardId     );
+    static bool                 RemoveCaptureCard  ( int              CardId     );
 
-    int                         AddCaptureCard     ( const QString    &VideoDevice,
+    static int                  AddCaptureCard     ( const QString    &VideoDevice,
                                                         const QString    &AudioDevice,
                                                         const QString    &VBIDevice,
                                                         const QString    &CardType,
@@ -81,15 +81,15 @@ class V2Capture : public MythHTTPService
                                                         uint             DiSEqCId,
                                                         bool             DVBEITScan);
 
-    bool                        UpdateCaptureCard  ( int              CardId,
+    static bool                 UpdateCaptureCard  ( int              CardId,
                                                         const QString    &Setting,
                                                         const QString    &Value );
 
     // Card Inputs
 
-    bool                        RemoveCardInput    ( int              CardInputId);
+    static bool                 RemoveCardInput    ( int              CardInputId);
 
-    int                         AddCardInput       ( uint       CardId,
+    static int                  AddCardInput       ( uint       CardId,
                                                         uint       SourceId,
                                                         const QString &InputName,
                                                         const QString &ExternalCommand,
@@ -105,7 +105,7 @@ class V2Capture : public MythHTTPService
                                                         uint       SchedOrder,
                                                         uint       LiveTVOrder);
 
-    bool                        UpdateCardInput    ( int              CardInputId,
+    static bool                 UpdateCardInput    ( int              CardInputId,
                                                         const QString    &Setting,
                                                         const QString    &Value );
   private:

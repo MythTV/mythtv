@@ -58,7 +58,7 @@ class V2Channel : public MythHTTPService
 
         /* Channel Methods */
 
-        V2ChannelInfoList*  GetChannelInfoList  ( uint      SourceID,
+        static V2ChannelInfoList* GetChannelInfoList ( uint      SourceID,
                                                      uint      ChannelGroupID,
                                                      uint      StartIndex,
                                                      uint      Count,
@@ -68,7 +68,7 @@ class V2Channel : public MythHTTPService
                                                      bool      GroupByCallsign,
                                                      bool      OnlyTunable );
 
-        V2ChannelInfo*      GetChannelInfo      ( uint     ChanID     );
+        static V2ChannelInfo*  GetChannelInfo      ( uint     ChanID     );
 
         bool                   UpdateDBChannel     ( uint          MplexID,
                                                      uint          SourceID,
@@ -108,13 +108,13 @@ class V2Channel : public MythHTTPService
                                                      const QString &DefaultAuthority,
                                                      uint          ServiceType );
 
-        bool                   RemoveDBChannel     ( uint          ChannelID );
+        static bool            RemoveDBChannel     ( uint          ChannelID );
 
         /* Video Source Methods */
 
-        V2VideoSourceList*     GetVideoSourceList     ( void );
+        static V2VideoSourceList* GetVideoSourceList     ( void );
 
-        V2VideoSource*         GetVideoSource         ( uint SourceID );
+        static V2VideoSource*     GetVideoSource         ( uint SourceID );
 
         bool                      UpdateVideoSource      ( uint          SourceID,
                                                            const QString &SourceName,
@@ -131,7 +131,7 @@ class V2Channel : public MythHTTPService
                                                            uint          ScanFrequency,
                                                            uint          LCNOffset );
 
-        int                       AddVideoSource         ( const QString &SourceName,
+        static int                AddVideoSource         ( const QString &SourceName,
                                                            const QString &Grabber,
                                                            const QString &UserId,
                                                            const QString &FreqTable,
@@ -145,25 +145,25 @@ class V2Channel : public MythHTTPService
                                                            uint          ScanFrequency,
                                                            uint          LCNOffset );
 
-        bool                      RemoveVideoSource      ( uint SourceID );
+        static bool               RemoveVideoSource      ( uint SourceID );
 
-        V2LineupList*             GetDDLineupList        ( const QString &Source,
+        static V2LineupList*      GetDDLineupList        ( const QString &Source,
                                                            const QString &UserId,
                                                            const QString &Password );
 
-        int                       FetchChannelsFromSource( uint       SourceId,
+        static int                FetchChannelsFromSource( uint       SourceId,
                                                            uint       CardId,
                                                            bool       WaitForFinish );
 
         /* Multiplex Methods */
 
-        V2VideoMultiplexList*  GetVideoMultiplexList  ( uint SourceID,
+        static V2VideoMultiplexList* GetVideoMultiplexList( uint SourceID,
                                                            uint StartIndex,
                                                            uint Count      );
 
-        V2VideoMultiplex*      GetVideoMultiplex      ( uint MplexID    );
+        static V2VideoMultiplex*  GetVideoMultiplex      ( uint MplexID    );
 
-        QStringList               GetXMLTVIdList         ( uint SourceID );
+        static QStringList        GetXMLTVIdList         ( uint SourceID );
 
 
     private:

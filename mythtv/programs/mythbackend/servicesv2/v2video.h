@@ -30,26 +30,26 @@ class V2Video : public MythHTTPService
 
   public slots:
 
-    V2VideoMetadataInfo*   GetVideo   (int Id);
-    V2VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  );
-    long                   GetSavedBookmark (int Id );
-    V2VideoMetadataInfoList*  GetVideoList    ( const QString  &Folder,
+    static V2VideoMetadataInfo*   GetVideo   (int Id);
+    static V2VideoMetadataInfo*   GetVideoByFileName ( const QString  &FileName  );
+    static long                   GetSavedBookmark (int Id );
+    static V2VideoMetadataInfoList*  GetVideoList    ( const QString  &Folder,
                                                        const QString  &Sort,
                                                        bool           Descending,
                                                        int            StartIndex,
                                                        int            Count      );
-    V2VideoLookupList*     LookupVideo        ( const QString    &Title,
+    static V2VideoLookupList*  LookupVideo        ( const QString    &Title,
                                                     const QString    &Subtitle,
                                                     const QString    &Inetref,
                                                     int              Season,
                                                     int              Episode,
                                                     const QString    &GrabberType,
                                                     bool             AllowGeneric );
-    bool                    RemoveVideoFromDB  ( int      Id );
-    bool                    AddVideo           ( const QString  &FileName,
+    static bool             RemoveVideoFromDB  ( int      Id );
+    static bool             AddVideo           ( const QString  &FileName,
                                                     const QString  &HostName  );
 
-    bool                    UpdateVideoWatchedStatus ( int  Id,
+    static bool             UpdateVideoWatchedStatus ( int  Id,
                                                     bool Watched );
     bool                    UpdateVideoMetadata      ( int           Id,
                                                     const QString &Title,
@@ -91,12 +91,12 @@ class V2Video : public MythHTTPService
                                                     const QString &Countries
     );
 
-    bool                   SetSavedBookmark (         int   Id,
+    static bool            SetSavedBookmark (         int   Id,
                                                           long  Offset );
 
-    V2BlurayInfo*          GetBluray          ( const QString  &Path      );
+    static V2BlurayInfo*   GetBluray          ( const QString  &Path      );
 
-    V2VideoStreamInfoList* GetStreamInfo ( const QString &StorageGroup,
+    static V2VideoStreamInfoList* GetStreamInfo ( const QString &StorageGroup,
                                                   const QString &FileName  );
 
 

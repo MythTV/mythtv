@@ -58,7 +58,7 @@ class MythXSD : public QDomDocument
         static bool        IsEnum               ( const QMetaProperty &metaProperty,
                                            const QString       &sType );
 
-        HTTPResponse Error(HTTPRequest2 pRequest, const QString &msg);
+        static HTTPResponse Error(HTTPRequest2 pRequest, const QString &msg);
     public:
 
         HTTPResponse GetXSD    ( HTTPRequest2 pRequest, QString sTypeName );

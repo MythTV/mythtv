@@ -53,38 +53,38 @@ class V2Myth : public MythHTTPService
 
   public slots:
 
-    V2ConnectionInfo*   GetConnectionInfo   ( const QString   &Pin );
+    static V2ConnectionInfo*   GetConnectionInfo   ( const QString   &Pin );
 
-    QString             GetHostName         ( );
+    static QString      GetHostName         ( );
 
-    QStringList         GetHosts            ( );
+    static QStringList  GetHosts            ( );
 
-    QStringList         GetKeys             ( );
+    static QStringList  GetKeys             ( );
 
-    V2StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
+    static V2StorageGroupDirList*  GetStorageGroupDirs ( const QString   &GroupName,
                                                   const QString   &HostName );
 
-    bool                AddStorageGroupDir  ( const QString   &GroupName,
+    static bool         AddStorageGroupDir  ( const QString   &GroupName,
                                               const QString   &DirName,
                                               const QString   &HostName );
 
-    bool                RemoveStorageGroupDir( const QString   &GroupName,
+    static bool         RemoveStorageGroupDir( const QString   &GroupName,
                                                const QString   &DirName,
                                                const QString   &HostName );
 
-    V2TimeZoneInfo*     GetTimeZone         ( );
+    static V2TimeZoneInfo* GetTimeZone      ( );
 
-    QString             GetFormatDate       ( const QDateTime &Date,
+    static QString      GetFormatDate       ( const QDateTime &Date,
                                               bool            ShortDate );
 
-    QString             GetFormatDateTime   ( const QDateTime &DateTime,
+    static QString      GetFormatDateTime   ( const QDateTime &DateTime,
                                               bool            ShortDate );
 
-    QString             GetFormatTime       ( const QDateTime &Time );
+    static QString      GetFormatTime       ( const QDateTime &Time );
 
-    QDateTime           ParseISODateString  ( const QString   &DateTime );
+    static QDateTime    ParseISODateString  ( const QString   &DateTime );
 
-    V2LogMessageList*   GetLogs             ( const QString   &HostName,
+    static V2LogMessageList*   GetLogs      ( const QString   &HostName,
                                               const QString   &Application,
                                               int             PID,
                                               int             TID,
@@ -99,27 +99,27 @@ class V2Myth : public MythHTTPService
                                             );
 
 
-    V2FrontendList*     GetFrontends        ( bool OnLine );
-    QString             GetSetting          ( const QString   &HostName,
+    static V2FrontendList* GetFrontends     ( bool OnLine );
+    static QString         GetSetting       ( const QString   &HostName,
                                               const QString   &Key,
                                               const QString   &Default );
-    V2SettingList*      GetSettingList      ( const QString   &HostName );
-    bool                PutSetting          ( const QString   &HostName,
+    static V2SettingList* GetSettingList    ( const QString   &HostName );
+    static bool           PutSetting        ( const QString   &HostName,
                                               const QString   &Key,
                                               const QString   &Value   );
 
-    bool                TestDBSettings      ( const QString &HostName,
+    static bool         TestDBSettings      ( const QString &HostName,
                                               const QString &UserName,
                                               const QString &Password,
                                               const QString &DBName,
                                               int   dbPort);
 
-    bool                SendMessage         ( const QString &Message,
+    static bool         SendMessage         ( const QString &Message,
                                               const QString &Address,
                                               int   udpPort,
                                               int   Timeout);
 
-    bool                SendNotification    ( bool  Error,
+    static bool         SendNotification    ( bool  Error,
                                               const QString &Type,
                                               const QString &Message,
                                               const QString &Origin,
@@ -135,31 +135,31 @@ class V2Myth : public MythHTTPService
                                               const QString &Address,
                                               int   udpPort );
 
-    bool                BackupDatabase      ( void );
+    static bool         BackupDatabase      ( void );
 
-    bool                CheckDatabase       ( bool Repair );
+    static bool         CheckDatabase       ( bool Repair );
 
-    bool                DelayShutdown       ( void );
+    static bool         DelayShutdown       ( void );
 
-    bool                ProfileSubmit       ( void );
+    static bool         ProfileSubmit       ( void );
 
-    bool                ProfileDelete       ( void );
+    static bool         ProfileDelete       ( void );
 
-    QString             ProfileURL          ( void );
+    static QString      ProfileURL          ( void );
 
-    QString             ProfileUpdated      ( void );
+    static QString      ProfileUpdated      ( void );
 
-    QString             ProfileText         ( void );
+    static QString      ProfileText         ( void );
 
-    V2BackendInfo*      GetBackendInfo      ( void );
+    static V2BackendInfo* GetBackendInfo     ( void );
 
-    bool                ManageDigestUser    ( const QString &Action,
+    static bool         ManageDigestUser    ( const QString &Action,
                                               const QString &UserName,
                                               const QString &Password,
                                               const QString &NewPassword,
                                               const QString &AdminPassword );
 
-    bool                ManageUrlProtection ( const QString &Services,
+    static bool         ManageUrlProtection ( const QString &Services,
                                               const QString &AdminPassword );
 
   private:
