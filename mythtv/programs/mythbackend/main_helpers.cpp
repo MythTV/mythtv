@@ -639,7 +639,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         LOG(VB_GENERAL, LOG_NOTICE, LOC + "Running as a slave backend.");
     }
 
-   if (ismaster)
+    if (ismaster)
     {
         EITCache::ClearChannelLocks();
     }
