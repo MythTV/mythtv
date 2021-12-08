@@ -22,8 +22,7 @@ HTTPData MythHTTPData::Create(const QByteArray& Other)
 }
 
 MythHTTPData::MythHTTPData()
-  : QByteArray(),
-    MythHTTPContent("")
+  : MythHTTPContent("")
 {
 }
 
