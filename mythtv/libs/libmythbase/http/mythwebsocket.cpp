@@ -615,7 +615,7 @@ void MythWebSocket::SendFrame(WSOpCode Code, const DataPayloads& Payloads)
     // Queue mask
     if (mask.get())
         m_writeQueue.emplace_back(mask);
-    for (auto & payload: Payloads)
+    for (const auto & payload: Payloads)
         m_writeQueue.emplace_back(payload);
 
     LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Queued %1 frame: payload size %2 (queue length: %3)")

@@ -39,8 +39,8 @@ MythHTTPResponse::MythHTTPResponse(const HTTPRequest2 Request)
 void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
 {
     // Remaining entity headers
-    auto data = std::get_if<HTTPData>(&m_response);
-    auto file = std::get_if<HTTPFile>(&m_response);
+    auto * data = std::get_if<HTTPData>(&m_response);
+    auto * file = std::get_if<HTTPFile>(&m_response);
     if ((data || file) && m_requestHeaders)
     {
         // Language
@@ -307,8 +307,8 @@ void MythHTTPResponse::AddDefaultHeaders()
 void MythHTTPResponse::AddContentHeaders()
 {
     // Check content type and size first
-    auto data = std::get_if<HTTPData>(&m_response);
-    auto file = std::get_if<HTTPFile>(&m_response);
+    auto * data = std::get_if<HTTPData>(&m_response);
+    auto * file = std::get_if<HTTPFile>(&m_response);
     int64_t size = data ? (*data)->size() : file ? (*file)->size() : 0;
 
     // Always add a zero length content header to keep some clients happy

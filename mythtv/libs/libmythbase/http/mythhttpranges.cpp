@@ -15,8 +15,8 @@ void MythHTTPRanges::HandleRangeRequest(MythHTTPResponse* Response, const QStrin
         return;
 
     // Check content type and size first
-    auto data = std::get_if<HTTPData>(&(Response->m_response));
-    auto file = std::get_if<HTTPFile>(&(Response->m_response));
+    auto * data = std::get_if<HTTPData>(&(Response->m_response));
+    auto * file = std::get_if<HTTPFile>(&(Response->m_response));
     int64_t size = data ? (*data)->size() : file ? (*file)->size() : 0;
     if (size < 1)
         return;
@@ -34,8 +34,8 @@ void MythHTTPRanges::BuildMultipartHeaders(MythHTTPResponse* Response)
     if (!Response || (Response->m_status != HTTPPartialContent))
         return;
 
-    auto data = std::get_if<HTTPData>(&(Response->m_response));
-    auto file = std::get_if<HTTPFile>(&(Response->m_response));
+    auto * data = std::get_if<HTTPData>(&(Response->m_response));
+    auto * file = std::get_if<HTTPFile>(&(Response->m_response));
     int64_t size = data ? (*data)->size() : file ? (*file)->size() : 0;
     if (size < 1)
         return;
@@ -89,8 +89,8 @@ QString MythHTTPRanges::GetRangeHeader(HTTPRanges& Ranges, int64_t Size)
 HTTPMulti MythHTTPRanges::HandleRangeWrite(HTTPVariant Data, int64_t Available, int64_t &ToWrite, int64_t &Offset)
 {
     HTTPMulti result { nullptr, nullptr };
-    auto data = std::get_if<HTTPData>(&Data);
-    auto file = std::get_if<HTTPFile>(&Data);
+    auto * data = std::get_if<HTTPData>(&Data);
+    auto * file = std::get_if<HTTPFile>(&Data);
     if (!(data || file))
         return result;
 

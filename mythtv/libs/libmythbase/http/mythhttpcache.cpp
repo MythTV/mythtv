@@ -51,8 +51,8 @@
 void MythHTTPCache::PreConditionCheck(HTTPResponse Response)
 {
     // Retrieve content
-    auto data = std::get_if<HTTPData>(&Response->m_response);
-    auto file = std::get_if<HTTPFile>(&Response->m_response);
+    auto * data = std::get_if<HTTPData>(&Response->m_response);
+    auto * file = std::get_if<HTTPFile>(&Response->m_response);
     if (!(file || data))
         return;
 
@@ -155,8 +155,8 @@ void MythHTTPCache::PreConditionCheck(HTTPResponse Response)
 void MythHTTPCache::PreConditionHeaders(HTTPResponse Response)
 {
     // Retrieve content
-    auto data = std::get_if<HTTPData>(&Response->m_response);
-    auto file = std::get_if<HTTPFile>(&Response->m_response);
+    auto * data = std::get_if<HTTPData>(&Response->m_response);
+    auto * file = std::get_if<HTTPFile>(&Response->m_response);
     if (!(file || data))
         return;
 

@@ -76,12 +76,12 @@ class MythMimeDatabasePriv
         MythMimeType result;
         for (const auto & mime : Types)
         {
-            if (auto bytes = std::get_if<QByteArray>(&mime.m_magic); bytes)
+            if (const auto * bytes = std::get_if<QByteArray>(&mime.m_magic); bytes)
             {
                 if (Data.contains(*bytes) && (mime.m_weight > result.m_weight))
                     result = mime;
             }
-            else if (auto string = std::get_if<QString>(&mime.m_magic); string)
+            else if (const auto * string = std::get_if<QString>(&mime.m_magic); string)
             {
                 if (QString(Data.constData()).contains(*string, Qt::CaseInsensitive) && (mime.m_weight > result.m_weight))
                     result = mime;

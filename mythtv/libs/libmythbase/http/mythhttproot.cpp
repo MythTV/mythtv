@@ -44,7 +44,7 @@ HTTPResponse MythHTTPRoot::RedirectRoot(HTTPRequest2 Request, const QString &Fil
         Request->m_fileName = File;
         result = MythHTTPFile::ProcessFile(Request);
         // Rename the file
-        if (auto file = std::get_if<HTTPFile>(&result->m_response))
+        if (auto * file = std::get_if<HTTPFile>(&result->m_response))
             (*file)->m_fileName = INDEX;
     }
     else

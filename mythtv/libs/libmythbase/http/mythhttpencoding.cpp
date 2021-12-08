@@ -195,8 +195,8 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
 */
 MythMimeType MythHTTPEncoding::GetMimeType(HTTPVariant Content)
 {
-    auto data = std::get_if<HTTPData>(&Content);
-    auto file = std::get_if<HTTPFile>(&Content);
+    auto * data = std::get_if<HTTPData>(&Content);
+    auto * file = std::get_if<HTTPFile>(&Content);
     if (!(data || file))
         return MythMimeType();
 
@@ -248,8 +248,8 @@ MythHTTPEncode MythHTTPEncoding::Compress(MythHTTPResponse* Response, int64_t& S
         return result;
 
     // We need something to compress/chunk
-    auto data = std::get_if<HTTPData>(&Response->m_response);
-    auto file = std::get_if<HTTPFile>(&Response->m_response);
+    auto * data = std::get_if<HTTPData>(&Response->m_response);
+    auto * file = std::get_if<HTTPFile>(&Response->m_response);
     if (!(data || file))
         return result;
 
