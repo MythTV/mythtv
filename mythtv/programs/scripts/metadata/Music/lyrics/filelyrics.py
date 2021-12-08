@@ -26,10 +26,7 @@ class LyricsFetcher:
     def get_lyrics(self, lyrics):
         utilities.log(debug, "%s: searching lyrics for %s - %s - %s" % (__title__, lyrics.artist, lyrics.album, lyrics.title))
 
-        if utilities.IS_PY2:
-            filename = lyrics.filename.decode("utf-8")
-        else:
-            filename = lyrics.filename
+        filename = lyrics.filename
         filename = os.path.splitext(filename)[0]
 
         # look for a file ending in .lrc with the same filename as the track minus the extension

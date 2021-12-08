@@ -7,12 +7,8 @@ ronie
 
 import sys
 import re
-try:
-    from urllib import quote_plus
-    from urllib2 import urlopen
-except ImportError:
-    from urllib.parse import quote_plus
-    from urllib.request import urlopen
+from urllib.parse import quote_plus
+from urllib.request import urlopen
 
 import socket
 import difflib
