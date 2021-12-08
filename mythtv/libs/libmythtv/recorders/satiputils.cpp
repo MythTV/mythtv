@@ -15,13 +15,15 @@
 
 #define LOC QString("SatIP: ")
 
-static constexpr std::chrono::milliseconds SEARCH_TIME_MS { 3s };
-#define SATIP_URI "urn:ses-com:device:SatIPServer:1"
+namespace {
+    const QString SATIP_URI = "urn:ses-com:device:SatIPServer:1";
+    constexpr std::chrono::milliseconds SEARCH_TIME_MS { 3s };
+}
 
 QStringList SatIP::probeDevices(void)
 {
-    const std::chrono::milliseconds milliSeconds = SEARCH_TIME_MS;
-    auto seconds = duration_cast<std::chrono::seconds>(milliSeconds);
+    const std::chrono::milliseconds totalSearchTime = SEARCH_TIME_MS;
+    auto seconds = duration_cast<std::chrono::seconds>(totalSearchTime);
 
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using UPNP to search for Sat>IP servers (%1 secs)")
         .arg(seconds.count()));
@@ -31,10 +33,10 @@ QStringList SatIP::probeDevices(void)
     MythTimer totalTime; totalTime.start();
     MythTimer searchTime; searchTime.start();
 
-    while (totalTime.elapsed() < milliSeconds)
+    while (totalTime.elapsed() < totalSearchTime)
     {
         std::this_thread::sleep_for(25ms);
-        std::chrono::milliseconds ttl = milliSeconds - totalTime.elapsed();
+        std::chrono::milliseconds ttl = totalSearchTime - totalTime.elapsed();
         if (searchTime.elapsed() > 249ms && ttl > 1s)
         {
             auto ttl_s = duration_cast<std::chrono::seconds>(ttl);

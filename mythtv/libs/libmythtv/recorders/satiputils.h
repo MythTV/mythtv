@@ -1,5 +1,5 @@
-#ifndef _SATIP_UTILS_H_
-#define _SATIP_UTILS_H_
+#ifndef SATIPUTILS_H
+#define SATIPUTILS_H
 
 // Qt headers
 #include <QString>
@@ -29,4 +29,4 @@ class SatIP
     static QStringList doUPNPsearch(void);
 };
 
-#endif // _SATIP_UTILS_H
+#endif // SATIPUTILS_H

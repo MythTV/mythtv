@@ -9,12 +9,13 @@
 // Qt includes
 #include <QObject>
 #include <QMap>
-#include <QString>
 #include <QMutex>
-#include <QUrl>
+#include <QString>
+#include <QTcpSocket>
+#include <QTime>
 #include <QTimerEvent>
 #include <QUdpSocket>
-#include <QTime>
+#include <QUrl>
 
 // MythTV includes
 #include "mythchrono.h"
@@ -22,18 +23,17 @@
 
 class SatIPRTSP;
 class SatIPStreamHandler;
-using Headers = QMap<QString, QString>;
 
-// --- SatIPRTSPReadHelper ---------------------------------------------------
+// --- SatIPReadHelper -------------------------------------------------------
 
-class SatIPRTSPReadHelper : public QObject
+class SatIPReadHelper : public QObject
 {
     friend class SatIPRTSP;
     Q_OBJECT
 
   public:
-    explicit SatIPRTSPReadHelper(SatIPRTSP *p);
-    ~SatIPRTSPReadHelper() override;
+    explicit SatIPReadHelper(SatIPRTSP *p);
+    ~SatIPReadHelper() override;
 
   public slots:
     void ReadPending(void);
@@ -45,35 +45,15 @@ class SatIPRTSPReadHelper : public QObject
     SatIPRTSP *m_parent   {nullptr};
 };
 
-// --- SatIPRTCPReadHelper ---------------------------------------------------
+// --- SatIPWriteHelper ------------------------------------------------------
 
-class SatIPRTCPReadHelper : public QObject
-{
-    friend class SatIPRTSP;
-    Q_OBJECT
-
-  public:
-    explicit SatIPRTCPReadHelper(SatIPRTSP *p);
-    ~SatIPRTCPReadHelper() override;
-
-  public slots:
-    void ReadPending(void);
-
-  protected:
-    QUdpSocket *m_socket  {nullptr};
-
-  private:
-    SatIPRTSP *m_parent   {nullptr};
-};
-
-// --- SatIPRTSPWriteHelper --------------------------------------------------
-
-class SatIPRTSPWriteHelper : public QObject
+class SatIPWriteHelper : public QObject
 {
     Q_OBJECT
 
   public:
-    SatIPRTSPWriteHelper(SatIPRTSP* parent, SatIPStreamHandler* handler);
+    explicit SatIPWriteHelper(SatIPRTSP* parent, SatIPStreamHandler* handler);
+    ~SatIPWriteHelper() override;
 
   protected:
     void timerEvent(QTimerEvent* /*event*/) override; // QObject
@@ -87,14 +67,35 @@ class SatIPRTSPWriteHelper : public QObject
     uint                m_previousLastSequenceNumber  {0};
 };
 
+// --- SatIPControlReadHelper ------------------------------------------------
+
+class SatIPControlReadHelper : public QObject
+{
+    friend class SatIPRTSP;
+    Q_OBJECT
+
+  public:
+    explicit SatIPControlReadHelper(SatIPRTSP *p);
+    ~SatIPControlReadHelper() override;
+
+  public slots:
+    void ReadPending(void);
+
+  protected:
+    QUdpSocket *m_socket  {nullptr};
+
+  private:
+    SatIPRTSP *m_parent   {nullptr};
+};
+
 // --- SatIPRTSP -------------------------------------------------------------
 
 class SatIPRTSP : public QObject
 {
-    friend class SatIPRTSPReadHelper;
-    friend class SatIPRTCPReadHelper;
-    friend class SatIPRTSPWriteHelper;
     friend class SatIPSignalMonitor;
+    friend class SatIPReadHelper;
+    friend class SatIPWriteHelper;
+    friend class SatIPControlReadHelper;
 
     Q_OBJECT
 
@@ -134,7 +135,7 @@ class SatIPRTSP : public QObject
     uint    m_cseq        {0};
     QString m_sessionid;
     QString m_streamid;
-    Headers m_headers;
+    QMap<QString, QString> m_headers;
 
     int   m_timer         {0};
     std::chrono::milliseconds m_timeout {0ms};
@@ -147,9 +148,9 @@ class SatIPRTSP : public QObject
     bool m_hasLock          {false};
     int  m_signalStrength   {0};
 
-    SatIPRTSPReadHelper  *m_readHelper        {nullptr};
-    SatIPRTSPWriteHelper *m_writeHelper       {nullptr};
-    SatIPRTCPReadHelper  *m_rtcpReadHelper    {nullptr};
+    SatIPReadHelper         *m_readHelper        {nullptr};
+    SatIPWriteHelper        *m_writeHelper       {nullptr};
+    SatIPControlReadHelper  *m_controlReadHelper {nullptr};
 };
 
 #endif // SATIPRTSP_H

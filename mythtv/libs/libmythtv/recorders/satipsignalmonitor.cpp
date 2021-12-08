@@ -101,7 +101,6 @@ void SatIPSignalMonitor::UpdateValues(void)
                 (isLocked ? "Locked" : "Lost"));
     }
 
-
     EmitStatus();
     if (IsAllGood())
     {

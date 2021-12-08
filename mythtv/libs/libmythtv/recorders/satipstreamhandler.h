@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _SATIPSTREAMHANDLER_H_
-#define _SATIPSTREAMHANDLER_H_
+#ifndef SATIPSTREAMHANDLER_H
+#define SATIPSTREAMHANDLER_H
 
 // Qt headers
 #include <QString>
@@ -27,9 +27,9 @@ class DeviceReadBuffer;
 
 class SatIPStreamHandler : public StreamHandler
 {
-    friend class SatIPRTSPWriteHelper;
-    friend class SatIPRTSPReadHelper;
     friend class SatIPSignalMonitor;
+    friend class SatIPWriteHelper;
+    friend class SatIPReadHelper;
 
   public:
     static SatIPStreamHandler *Get(const QString &devname, int inputid);
@@ -81,4 +81,4 @@ class SatIPStreamHandler : public StreamHandler
     SatIPRTSP   *m_rtsp           {nullptr};
 };
 
-#endif // _SATIPSTREAMHANDLER_H_
+#endif // SATIPSTREAMHANDLER_H
