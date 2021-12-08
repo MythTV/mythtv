@@ -1,4 +1,5 @@
 // Qt
+#include <QCryptographicHash>
 #include <QMimeDatabase>
 
 // MythTV
