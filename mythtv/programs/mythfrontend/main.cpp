@@ -2176,7 +2176,7 @@ int main(int argc, char **argv)
     int ret = 0;
     {
         MythHTTPInstance::Addservices({{ FRONTEND_SERVICE, &MythHTTPService::Create<MythFrontendService> }});
-        auto root = std::bind(&MythHTTPRoot::RedirectRoot, std::placeholders::_1, "mythfrontend.html");
+        auto root = [](auto && PH1) { return MythHTTPRoot::RedirectRoot(std::forward<decltype(PH1)>(PH1), "mythfrontend.html"); };
         MythHTTPScopedInstance webserver({{ "/", root}});
         ret = QCoreApplication::exec();
     }

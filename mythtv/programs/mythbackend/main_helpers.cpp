@@ -778,7 +778,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     MythHTTPInstance::Addservices({{ STATUS_SERVICE, &MythHTTPService::Create<V2Status> }});
     MythHTTPInstance::Addservices({{ CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> }});
     MythHTTPInstance::Addservices({{ MUSIC_SERVICE, &MythHTTPService::Create<V2Music> }});
-    auto root = std::bind(&MythHTTPRoot::RedirectRoot, std::placeholders::_1, "apps/backend/index.html");
+    auto root = [](auto && PH1) { return MythHTTPRoot::RedirectRoot(std::forward<decltype(PH1)>(PH1), "apps/backend/index.html"); };
     MythHTTPScopedInstance webserver({{ "/", root}});
 
     ///////////////////////////////
