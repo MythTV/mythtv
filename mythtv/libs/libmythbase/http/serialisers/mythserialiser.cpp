@@ -38,9 +38,9 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
         LOG(VB_GENERAL, LOG_INFO, name);
     */
 
-    static const MythMimeType s_xmlType = MythMimeDatabase().MimeTypeForName("application/xml");
-    static const MythMimeType s_xmlPList = MythMimeDatabase().MimeTypeForName("text/x-apple-plist+xml");
-    static const MythMimeType s_cbor = MythMimeDatabase().MimeTypeForName("application/cbor");
+    static const MythMimeType s_xmlType = MythMimeDatabase::MimeTypeForName("application/xml");
+    static const MythMimeType s_xmlPList = MythMimeDatabase::MimeTypeForName("text/x-apple-plist+xml");
+    static const MythMimeType s_cbor = MythMimeDatabase::MimeTypeForName("application/cbor");
 
     auto WrapData = [](HTTPData Data, const MythMimeType& Mime, const QString& Alias)
     {
@@ -52,14 +52,14 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
 
     static const std::array<MythMimeType,2> s_jsonTypes =
     {
-        MythMimeDatabase().MimeTypeForName("application/json"),
-        MythMimeDatabase().MimeTypeForName("text/javascript")
+        MythMimeDatabase::MimeTypeForName("application/json"),
+        MythMimeDatabase::MimeTypeForName("text/javascript")
     };
 
     static const std::array<MythMimeType,2> s_binaryPlists =
     {
-        MythMimeDatabase().MimeTypeForName("application/x-plist"),
-        MythMimeDatabase().MimeTypeForName("application/x-apple-binary-plist")
+        MythMimeDatabase::MimeTypeForName("application/x-plist"),
+        MythMimeDatabase::MimeTypeForName("application/x-apple-binary-plist")
     };
 
     // Check for preformatted xml or html
@@ -102,7 +102,7 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
                     }
                 }
             }
-            MythMimeType reqType = MythMimeDatabase().MimeTypeForName(mimetype);
+            MythMimeType reqType = MythMimeDatabase::MimeTypeForName(mimetype);
             auto alias = reqType.Aliases().indexOf(mimetype);
             return WrapData(result, reqType, reqType.Aliases().at(alias));
         }

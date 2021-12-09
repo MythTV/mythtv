@@ -284,7 +284,7 @@ HTTPResponse MythWSDL::GetWSDL(HTTPRequest2 Request)
 
     // Create the XML result
     auto data = MythHTTPData::Create(toByteArray());
-    data->m_mimeType = MythMimeDatabase().MimeTypeForName("application/xml");
+    data->m_mimeType = MythMimeDatabase::MimeTypeForName("application/xml");
     data->m_cacheType = HTTPETag | HTTPShortLife;
     return MythHTTPResponse::DataResponse(Request, data);
 }

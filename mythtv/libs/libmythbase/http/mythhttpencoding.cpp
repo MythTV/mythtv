@@ -90,7 +90,7 @@ void MythHTTPEncoding::GetContentType(MythHTTPRequest* Request)
         return;
 
     // Note: This can produce an invalid mime type but there is no sensible fallback
-    if (auto mime = MythMimeDatabase().MimeTypeForName(types[0].trimmed().toLower()); mime.IsValid())
+    if (auto mime = MythMimeDatabase::MimeTypeForName(types[0].trimmed().toLower()); mime.IsValid())
     {
         Request->m_content->m_mimeType = mime;
         if (mime.Name() == "application/x-www-form-urlencoded")
@@ -202,11 +202,8 @@ MythMimeType MythHTTPEncoding::GetMimeType(HTTPVariant Content)
 
     QString filename = data ? (*data)->m_fileName : file ? (*file)->m_fileName : "";
 
-    // Per docs, this is performant...
-    auto mimedb = MythMimeDatabase();
-
     // Look for unambiguous mime type
-    auto types = mimedb.MimeTypesForFileName(filename);
+    auto types = MythMimeDatabase::MimeTypesForFileName(filename);
     if (types.size() == 1)
         return types.front();
 
@@ -217,21 +214,21 @@ MythMimeType MythHTTPEncoding::GetMimeType(HTTPVariant Content)
         { "ts", "video/mp2t"}
     };
 
-    auto suffix = mimedb.SuffixForFileName(filename);
+    auto suffix = MythMimeDatabase::SuffixForFileName(filename);
     for (const auto & type : s_mimeOverrides)
         if (suffix.compare(type.first, Qt::CaseInsensitive) == 0)
-            return mimedb.MimeTypeForName(type.second);
+            return MythMimeDatabase::MimeTypeForName(type.second);
 
     // Try interrogating content as well
     if (data)
-        if (auto mime = mimedb.MimeTypeForFileNameAndData(filename, *(*data).get()); mime.IsValid())
+        if (auto mime = MythMimeDatabase::MimeTypeForFileNameAndData(filename, *(*data).get()); mime.IsValid())
             return mime;
     if (file)
-        if (auto mime = mimedb.MimeTypeForFileNameAndData(filename, (*file).get()); mime.IsValid())
+        if (auto mime = MythMimeDatabase::MimeTypeForFileNameAndData(filename, (*file).get()); mime.IsValid())
             return mime;
 
     // Default to text/plain (possibly use application/octet-stream as well?)
-    return mimedb.MimeTypeForName("text/plain");
+    return MythMimeDatabase::MimeTypeForName("text/plain");
 }
 
 /*! \brief Compress the response content under certain circumstances or mark

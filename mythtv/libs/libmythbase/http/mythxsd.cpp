@@ -325,7 +325,7 @@ HTTPResponse MythXSD::GetXSD( HTTPRequest2 pRequest, QString sTypeName )
 
     // Create the XML result
     auto data = MythHTTPData::Create(toByteArray());
-    data->m_mimeType = MythMimeDatabase().MimeTypeForName("application/xml");
+    data->m_mimeType = MythMimeDatabase::MimeTypeForName("application/xml");
     data->m_cacheType = HTTPETag | HTTPShortLife;
     return MythHTTPResponse::DataResponse(pRequest, data);
 }
