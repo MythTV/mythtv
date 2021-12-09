@@ -312,10 +312,10 @@ QFileInfo V2Content::GetRecordingArtwork ( const QString   &sType,
 
 V2ArtworkInfoList* V2Content::GetRecordingArtworkList( int        RecordedId,
                                                         int        chanid,
-                                                        const QDateTime &recstarttsRaw)
+                                                        const QDateTime &StartTime)
 {
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     // TODO Should use RecordingInfo
@@ -323,7 +323,7 @@ V2ArtworkInfoList* V2Content::GetRecordingArtworkList( int        RecordedId,
     if (RecordedId > 0)
         pginfo = ProgramInfo(RecordedId);
     else
-        pginfo = ProgramInfo(chanid, recstarttsRaw.toUTC());
+        pginfo = ProgramInfo(chanid, StartTime.toUTC());
 
     return GetProgramArtworkList(pginfo.GetInetRef(), pginfo.GetSeason());
 }
@@ -500,14 +500,14 @@ QFileInfo V2Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
 
 QFileInfo V2Content::GetPreviewImage(        int        nRecordedId,
                                            int        nChanId,
-                                     const QDateTime &recstarttsRaw,
+                                     const QDateTime &StartTime,
                                            int        nWidth,
                                            int        nHeight,
                                            int        nSecsIn,
                                      const QString   &sFormat )
 {
     if ((nRecordedId <= 0) &&
-        (nChanId <= 0 || !recstarttsRaw.isValid()))
+        (nChanId <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     if (!sFormat.isEmpty()
@@ -525,7 +525,7 @@ QFileInfo V2Content::GetPreviewImage(        int        nRecordedId,
     if (nRecordedId > 0)
         pginfo = ProgramInfo(nRecordedId);
     else
-        pginfo = ProgramInfo(nChanId, recstarttsRaw.toUTC());
+        pginfo = ProgramInfo(nChanId, StartTime.toUTC());
 
     if (!pginfo.GetChanID())
     {
@@ -674,10 +674,10 @@ QFileInfo V2Content::GetPreviewImage(        int        nRecordedId,
 
 QFileInfo V2Content::GetRecording( int              nRecordedId,
                                  int              nChanId,
-                                 const QDateTime &recstarttsRaw )
+                                 const QDateTime &StartTime )
 {
     if ((nRecordedId <= 0) &&
-        (nChanId <= 0 || !recstarttsRaw.isValid()))
+        (nChanId <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     // ------------------------------------------------------------------
@@ -689,7 +689,7 @@ QFileInfo V2Content::GetRecording( int              nRecordedId,
     if (nRecordedId > 0)
         pginfo = ProgramInfo(nRecordedId);
     else
-        pginfo = ProgramInfo(nChanId, recstarttsRaw.toUTC());
+        pginfo = ProgramInfo(nChanId, StartTime.toUTC());
 
     if (!pginfo.GetChanID())
     {
@@ -1006,7 +1006,7 @@ bool V2Content::DownloadFile( const QString &sURL, const QString &sStorageGroup 
 // V2LiveStreamInfo *V2Content::AddRecordingLiveStream(
 //     int              nRecordedId,
 //     int              nChanId,
-//     const QDateTime &recstarttsRaw,
+//     const QDateTime &StartTime,
 //     int              nMaxSegments,
 //     int              nWidth,
 //     int              nHeight,
@@ -1015,7 +1015,7 @@ bool V2Content::DownloadFile( const QString &sURL, const QString &sStorageGroup 
 //     int              nSampleRate )
 // {
 //     if ((nRecordedId <= 0) &&
-//         (nChanId <= 0 || !recstarttsRaw.isValid()))
+//         (nChanId <= 0 || !StartTime.isValid()))
 //         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
 //     // ------------------------------------------------------------------
@@ -1027,7 +1027,7 @@ bool V2Content::DownloadFile( const QString &sURL, const QString &sStorageGroup 
 //     if (nRecordedId > 0)
 //         pginfo = ProgramInfo(nRecordedId);
 //     else
-//         pginfo = ProgramInfo(nChanId, recstarttsRaw.toUTC());
+//         pginfo = ProgramInfo(nChanId, StartTime.toUTC());
 
 //     if (!pginfo.GetChanID())
 //     {
@@ -1064,7 +1064,7 @@ bool V2Content::DownloadFile( const QString &sURL, const QString &sStorageGroup 
 //     {
 //         LOG( VB_UPNP, LOG_ERR, QString("AddRecordingLiveStream - for %1, %2 failed")
 //                                     .arg( nChanId )
-//                                     .arg( recstarttsRaw.toUTC().toString() ));
+//                                     .arg( StartTime.toUTC().toString() ));
 //         return nullptr;
 //     }
 

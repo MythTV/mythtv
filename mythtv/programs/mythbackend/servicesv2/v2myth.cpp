@@ -815,7 +815,7 @@ bool V2Myth::SendNotification( bool  bError,
                                const QString &sExtra,
                                const QString &sProgressText,
                                float fProgress,
-                               int   Duration,
+                               int   Timeout,
                                bool  bFullscreen,
                                uint  Visibility,
                                uint  Priority,
@@ -827,15 +827,15 @@ bool V2Myth::SendNotification( bool  bError,
     if (sMessage.isEmpty())
         return bResult;
 
-    if (Duration < 0 || Duration > 999)
-        Duration = -1;
+    if (Timeout < 0 || Timeout > 999)
+        Timeout = -1;
 
     QString xmlMessage =
         "<mythnotification version=\"1\">\n"
         "  <text>" + sMessage + "</text>\n"
         "  <origin>" + (sOrigin.isNull() ? tr("MythServices") : sOrigin) + "</origin>\n"
         "  <description>" + sDescription + "</description>\n"
-        "  <timeout>" + QString::number(Duration) + "</timeout>\n"
+        "  <timeout>" + QString::number(Timeout) + "</timeout>\n"
         "  <image>" + sImage + "</image>\n"
         "  <extra>" + sExtra + "</extra>\n"
         "  <progress_text>" + sProgressText + "</progress_text>\n"

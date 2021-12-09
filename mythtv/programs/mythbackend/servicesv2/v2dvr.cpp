@@ -343,10 +343,10 @@ V2ProgramList* V2Dvr::GetOldRecordedList( bool             bDescending,
 /////////////////////////////////////////////////////////////////////////////
 
 V2Program* V2Dvr::GetRecorded(int RecordedId,
-                               int chanid, const QDateTime &recstarttsRaw)
+                               int chanid, const QDateTime &StartTime)
 {
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     // TODO Should use RecordingInfo
@@ -354,7 +354,7 @@ V2Program* V2Dvr::GetRecorded(int RecordedId,
     if (RecordedId > 0)
         pi = ProgramInfo(RecordedId);
     else
-        pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
+        pi = ProgramInfo(chanid, StartTime.toUTC());
 
     auto *pProgram = new V2Program();
     V2FillProgramInfo( pProgram, &pi, true );
@@ -551,20 +551,20 @@ int V2Dvr::AddRecordedProgram(const QJsonObject &jsonObj)
 /////////////////////////////////////////////////////////////////////////////
 
 bool V2Dvr::RemoveRecorded(int RecordedId,
-                         int chanid, const QDateTime &recstarttsRaw,
+                         int chanid, const QDateTime &StartTime,
                          bool forceDelete, bool allowRerecord)
 {
-    return DeleteRecording(RecordedId, chanid, recstarttsRaw, forceDelete,
+    return DeleteRecording(RecordedId, chanid, StartTime, forceDelete,
                            allowRerecord);
 }
 
 
 bool V2Dvr::DeleteRecording(int RecordedId,
-                          int chanid, const QDateTime &recstarttsRaw,
+                          int chanid, const QDateTime &StartTime,
                           bool forceDelete, bool allowRerecord)
 {
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     // TODO Should use RecordingInfo
@@ -572,7 +572,7 @@ bool V2Dvr::DeleteRecording(int RecordedId,
     if (RecordedId > 0)
         pi = ProgramInfo(RecordedId);
     else
-        pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
+        pi = ProgramInfo(chanid, StartTime.toUTC());
 
     if (pi.GetChanID() && pi.HasPathname())
     {
@@ -595,17 +595,17 @@ bool V2Dvr::DeleteRecording(int RecordedId,
 /////////////////////////////////////////////////////////////////////////////
 
 bool V2Dvr::UnDeleteRecording(int RecordedId,
-                            int chanid, const QDateTime &recstarttsRaw)
+                            int chanid, const QDateTime &StartTime)
 {
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     RecordingInfo ri;
     if (RecordedId > 0)
         ri = RecordingInfo(RecordedId);
     else
-        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+        ri = RecordingInfo(chanid, StartTime.toUTC());
 
     if (ri.GetChanID() && ri.HasPathname())
     {
@@ -652,17 +652,17 @@ bool V2Dvr::StopRecording(int RecordedId)
 /////////////////////////////////////////////////////////////////////////////
 
 bool V2Dvr::ReactivateRecording(int RecordedId,
-                              int chanid, const QDateTime &recstarttsRaw)
+                              int chanid, const QDateTime &StartTime)
 {
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     RecordingInfo ri;
     if (RecordedId > 0)
         ri = RecordingInfo(RecordedId);
     else
-        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+        ri = RecordingInfo(chanid, StartTime.toUTC());
 
     if (ri.GetChanID() && ri.HasPathname())
     {
@@ -709,11 +709,11 @@ bool V2Dvr::AllowReRecord ( int RecordedId )
 
 bool V2Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
                                         int   chanid,
-                                        const QDateTime &recstarttsRaw,
+                                        const QDateTime &StartTime,
                                         bool  watched)
 {
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     // TODO Should use RecordingInfo
@@ -721,7 +721,7 @@ bool V2Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
     if (RecordedId > 0)
         pi = ProgramInfo(RecordedId);
     else
-        pi = ProgramInfo(chanid, recstarttsRaw.toUTC());
+        pi = ProgramInfo(chanid, StartTime.toUTC());
 
     if (pi.GetChanID() && pi.HasPathname())
     {
@@ -738,18 +738,18 @@ bool V2Dvr::UpdateRecordedWatchedStatus ( int RecordedId,
 
 long V2Dvr::GetSavedBookmark( int RecordedId,
                             int chanid,
-                            const QDateTime &recstarttsRaw,
+                            const QDateTime &StartTime,
                             const QString &offsettype )
 {
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     RecordingInfo ri;
     if (RecordedId > 0)
         ri = RecordingInfo(RecordedId);
     else
-        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+        ri = RecordingInfo(chanid, StartTime.toUTC());
     uint64_t offset = 0;
     bool isend=true;
     uint64_t position = ri.QueryBookmark();
@@ -777,12 +777,12 @@ long V2Dvr::GetSavedBookmark( int RecordedId,
 
 bool V2Dvr::SetSavedBookmark( int RecordedId,
                             int chanid,
-                            const QDateTime &recstarttsRaw,
+                            const QDateTime &StartTime,
                             const QString &offsettype,
                             long Offset )
 {
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     if (Offset < 0)
@@ -792,7 +792,7 @@ bool V2Dvr::SetSavedBookmark( int RecordedId,
     if (RecordedId > 0)
         ri = RecordingInfo(RecordedId);
     else
-        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+        ri = RecordingInfo(chanid, StartTime.toUTC());
     uint64_t position = 0;
     bool isend=true;
     if (offsettype.toLower() == "position"){
@@ -811,19 +811,19 @@ bool V2Dvr::SetSavedBookmark( int RecordedId,
 
 V2CutList* V2Dvr::GetRecordedCutList ( int RecordedId,
                                         int chanid,
-                                        const QDateTime &recstarttsRaw,
+                                        const QDateTime &StartTime,
                                         const QString &offsettype )
 {
     int marktype = 0;
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     RecordingInfo ri;
     if (RecordedId > 0)
         ri = RecordingInfo(RecordedId);
     else
-        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+        ri = RecordingInfo(chanid, StartTime.toUTC());
 
     auto* pCutList = new V2CutList();
     if (offsettype.toLower() == "position")
@@ -844,19 +844,19 @@ V2CutList* V2Dvr::GetRecordedCutList ( int RecordedId,
 
 V2CutList* V2Dvr::GetRecordedCommBreak ( int RecordedId,
                                           int chanid,
-                                          const QDateTime &recstarttsRaw,
+                                          const QDateTime &StartTime,
                                           const QString &offsettype )
 {
     int marktype = 0;
     if ((RecordedId <= 0) &&
-        (chanid <= 0 || !recstarttsRaw.isValid()))
+        (chanid <= 0 || !StartTime.isValid()))
         throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
 
     RecordingInfo ri;
     if (RecordedId > 0)
         ri = RecordingInfo(RecordedId);
     else
-        ri = RecordingInfo(chanid, recstarttsRaw.toUTC());
+        ri = RecordingInfo(chanid, StartTime.toUTC());
 
     auto* pCutList = new V2CutList();
     if (offsettype.toLower() == "position")
@@ -1251,8 +1251,8 @@ uint V2Dvr::AddRecordSchedule   (
                                const QString&   sSubtitle,
                                const QString&   sDescription,
                                const QString&   sCategory,
-                               const QDateTime& recstarttsRaw,
-                               const QDateTime& recendtsRaw,
+                               const QDateTime& StartTime,
+                               const QDateTime& EndTime,
                                const QString&   sSeriesId,
                                const QString&   sProgramId,
                                int       nChanId,
@@ -1270,7 +1270,7 @@ uint V2Dvr::AddRecordSchedule   (
                                uint      nPreferredInput,
                                int       nStartOffset,
                                int       nEndOffset,
-                               const QDateTime& lastrectsRaw,
+                               const QDateTime& LastRecorded,
                                QString   sDupMethod,
                                QString   sDupIn,
                                bool      bNewEpisOnly,
@@ -1291,9 +1291,9 @@ uint V2Dvr::AddRecordSchedule   (
                                bool      bAutoUserJob4,
                                int       nTranscoder)
 {
-    QDateTime recstartts = recstarttsRaw.toUTC();
-    QDateTime recendts = recendtsRaw.toUTC();
-    QDateTime lastrects = lastrectsRaw.toUTC();
+    QDateTime recstartts = StartTime.toUTC();
+    QDateTime recendts = EndTime.toUTC();
+    QDateTime lastrects = LastRecorded.toUTC();
     RecordingRule rule;
     rule.LoadTemplate("Default");
 
@@ -1405,8 +1405,8 @@ bool V2Dvr::UpdateRecordSchedule ( uint      nRecordId,
                                  const QString&   sSubtitle,
                                  const QString&   sDescription,
                                  const QString&   sCategory,
-                                 const QDateTime& dStartTimeRaw,
-                                 const QDateTime& dEndTimeRaw,
+                                 const QDateTime& StartTime,
+                                 const QDateTime& EndTime,
                                  const QString&   sSeriesId,
                                  const QString&   sProgramId,
                                  int       nChanId,
@@ -1453,8 +1453,8 @@ bool V2Dvr::UpdateRecordSchedule ( uint      nRecordId,
     if (!pRule.IsLoaded())
         throw QString("Record ID does not exist.");
 
-    QDateTime recstartts = dStartTimeRaw.toUTC();
-    QDateTime recendts = dEndTimeRaw.toUTC();
+    QDateTime recstartts = StartTime.toUTC();
+    QDateTime recendts = EndTime.toUTC();
 
     pRule.m_isInactive = bInactive;
     if (sType.isEmpty())
@@ -1676,11 +1676,11 @@ V2RecRule* V2Dvr::GetRecordSchedule( uint      nRecordId,
                                       const QString&   sTemplate,
                                       int       nRecordedId,
                                       int       nChanId,
-                                      const QDateTime& dStartTimeRaw,
+                                      const QDateTime& StartTime,
                                       bool      bMakeOverride )
 {
     RecordingRule rule;
-    QDateTime dStartTime = dStartTimeRaw.toUTC();
+    QDateTime dStartTime = StartTime.toUTC();
 
     if (nRecordId > 0)
     {
@@ -1765,12 +1765,12 @@ bool V2Dvr::DisableRecordSchedule( uint nRecordId )
     return bResult;
 }
 
-int V2Dvr::RecordedIdForKey(int chanid, const QDateTime &recstarttsRaw)
+int V2Dvr::RecordedIdForKey(int chanid, const QDateTime &StartTime)
 {
     int recordedid = 0;
 
     if (!RecordingInfo::QueryRecordedIdForKey(recordedid, chanid,
-                                              recstarttsRaw))
+                                              StartTime))
         return -1;
 
     return recordedid;
@@ -1856,7 +1856,7 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
                          const QString   &sJobName,
                          int              nJobId,
                          int              nRecordedId,
-                               QDateTime  jobstarttsRaw,
+                               QDateTime  JobStartTime,
                                QString    sRemoteHost,
                                QString    sJobArgs )
 {
@@ -1920,10 +1920,10 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
         return nReturn;
     }
 
-    if (!jobstarttsRaw.isValid())
-        jobstarttsRaw = QDateTime::currentDateTime();
+    if (!JobStartTime.isValid())
+        JobStartTime = QDateTime::currentDateTime();
 
-    if (!JobQueue::InJobRunWindow(jobstarttsRaw))
+    if (!JobQueue::InJobRunWindow(JobStartTime))
         return nReturn;
 
     if (sJobArgs.isNull())
@@ -1937,7 +1937,7 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
                                  sRemoteHost,
                                  JOB_NO_FLAGS,
                                  JOB_QUEUED,
-                                 jobstarttsRaw.toUTC());
+                                 JobStartTime.toUTC());
 
     if (!bReturn)
     {
