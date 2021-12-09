@@ -90,7 +90,7 @@ class MythMimeDatabasePriv
         return result;
     }
 
-    MythMimeType MimeTypeForFileNameAndData(const QString& FileName, QIODevice* Device)
+    MythMimeType MimeTypeForFileNameAndData(const QString& FileName, QIODevice* Device) const
     {
         // Try and match by extension
         auto filtered = MimeTypesForFileName(FileName);
