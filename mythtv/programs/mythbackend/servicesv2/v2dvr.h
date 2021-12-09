@@ -76,7 +76,7 @@ class V2Dvr : public MythHTTPService
 
   public:
     V2Dvr();
-   ~V2Dvr()  = default;
+   ~V2Dvr() override  = default;
     static void RegisterCustomTypes();
 
   public slots:

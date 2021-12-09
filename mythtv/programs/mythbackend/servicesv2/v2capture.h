@@ -45,7 +45,7 @@ class V2Capture : public MythHTTPService
 
   public:
     V2Capture();
-   ~V2Capture()  = default;
+   ~V2Capture() override  = default;
     static void RegisterCustomTypes();
 
   public slots:

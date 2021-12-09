@@ -25,7 +25,7 @@ class V2Music : public MythHTTPService
 
   public:
     V2Music();
-   ~V2Music()  = default;
+   ~V2Music() override  = default;
     static void RegisterCustomTypes();
 
   public slots:

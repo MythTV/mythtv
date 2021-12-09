@@ -42,7 +42,7 @@ class V2Status : public MythHTTPService
 
     public:
         V2Status();
-        ~V2Status()  = default;
+        ~V2Status() override  = default;
         static void RegisterCustomTypes();
 
     public slots:

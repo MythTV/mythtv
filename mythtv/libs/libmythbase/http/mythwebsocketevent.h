@@ -9,7 +9,7 @@ class MythWebSocketEvent : public QObject
 
     public:
         MythWebSocketEvent();
-        ~MythWebSocketEvent();
+        ~MythWebSocketEvent() override;
 
         void customEvent(QEvent* /*event*/) override; // QObject
 

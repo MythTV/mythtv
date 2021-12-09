@@ -50,7 +50,7 @@ class V2Content : public MythHTTPService
     public:
 
         V2Content();
-        ~V2Content()  = default;
+        ~V2Content() override  = default;
         static void RegisterCustomTypes();
 
     public slots:

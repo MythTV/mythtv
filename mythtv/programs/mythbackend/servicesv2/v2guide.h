@@ -47,7 +47,7 @@ class V2Guide : public MythHTTPService
 
     public:
         V2Guide();
-        ~V2Guide()  = default;
+        ~V2Guide() override  = default;
         static void RegisterCustomTypes();
 
     public slots:
