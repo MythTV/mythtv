@@ -40,7 +40,7 @@
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
-    (CAPTURE_HANDLE, V2Capture::staticMetaObject, std::bind(&V2Capture::RegisterCustomTypes)))
+    (CAPTURE_HANDLE, V2Capture::staticMetaObject, &V2Capture::RegisterCustomTypes))
 
 void V2Capture::RegisterCustomTypes()
 {

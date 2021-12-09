@@ -45,7 +45,7 @@
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
-    (DVR_HANDLE, V2Dvr::staticMetaObject, std::bind(&V2Dvr::RegisterCustomTypes)))
+    (DVR_HANDLE, V2Dvr::staticMetaObject, &V2Dvr::RegisterCustomTypes))
 
 void V2Dvr::RegisterCustomTypes()
 {

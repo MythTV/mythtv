@@ -52,7 +52,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
-(CHANNEL_HANDLE, V2Channel::staticMetaObject, std::bind(&V2Channel::RegisterCustomTypes)))
+(CHANNEL_HANDLE, V2Channel::staticMetaObject, &V2Channel::RegisterCustomTypes))
 
 void V2Channel::RegisterCustomTypes()
 {

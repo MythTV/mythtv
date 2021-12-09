@@ -89,7 +89,7 @@ Q_GLOBAL_STATIC(FrontendActions, s_actions)
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
-    (FRONTEND_HANDLE, MythFrontendService::staticMetaObject, std::bind(&MythFrontendService::RegisterCustomTypes)))
+    (FRONTEND_HANDLE, MythFrontendService::staticMetaObject, &MythFrontendService::RegisterCustomTypes))
 
 void MythFrontendService::RegisterCustomTypes()
 {

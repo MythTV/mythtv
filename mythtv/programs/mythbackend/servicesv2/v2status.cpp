@@ -51,7 +51,7 @@
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
-    (STATUS_HANDLE, V2Status::staticMetaObject, std::bind(&V2Status::RegisterCustomTypes)))
+    (STATUS_HANDLE, V2Status::staticMetaObject, &V2Status::RegisterCustomTypes))
 
 void V2Status::RegisterCustomTypes()
 {

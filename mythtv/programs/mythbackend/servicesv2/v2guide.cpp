@@ -49,7 +49,7 @@ extern Scheduler   *sched;
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
-    (GUIDE_HANDLE, V2Guide::staticMetaObject, std::bind(&V2Guide::RegisterCustomTypes)))
+    (GUIDE_HANDLE, V2Guide::staticMetaObject, &V2Guide::RegisterCustomTypes))
 
 void V2Guide::RegisterCustomTypes()
 {

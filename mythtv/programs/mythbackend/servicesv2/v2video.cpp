@@ -23,7 +23,7 @@
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
-    (VIDEO_HANDLE, V2Video::staticMetaObject, std::bind(&V2Video::RegisterCustomTypes)))
+    (VIDEO_HANDLE, V2Video::staticMetaObject, &V2Video::RegisterCustomTypes))
 
 void V2Video::RegisterCustomTypes()
 {

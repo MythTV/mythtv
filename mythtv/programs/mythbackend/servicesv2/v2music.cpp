@@ -25,7 +25,7 @@
 
 // This will be initialised in a thread safe manner on first use
 Q_GLOBAL_STATIC_WITH_ARGS(MythHTTPMetaService, s_service,
-    (MUSIC_HANDLE, V2Music::staticMetaObject, std::bind(&V2Music::RegisterCustomTypes)))
+    (MUSIC_HANDLE, V2Music::staticMetaObject, &V2Music::RegisterCustomTypes))
 
 void V2Music::RegisterCustomTypes()
 {
