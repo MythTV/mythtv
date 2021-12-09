@@ -19,11 +19,6 @@ MythHTTPService::MythHTTPService(MythHTTPMetaService *MetaService)
 {
 }
 
-MythHTTPService::~MythHTTPService()
-{
-    // TODO Signal to clients that the service is closing?
-}
-
 /*! \brief Respond to a valid HTTPRequest
  *
  * \todo Error message always send an HTML version of the error message. This
