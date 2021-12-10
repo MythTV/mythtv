@@ -1,10 +1,12 @@
 # Backend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.0.3.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli).
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- Startup a copy of mythbackend, as the local dev server will proxy api calls to it.
+- Edit `src/proxy.conf.js` and ensure the `target` is set to point to the backend started in the previous step.
+- Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 
