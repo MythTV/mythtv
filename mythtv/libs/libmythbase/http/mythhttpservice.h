@@ -48,12 +48,45 @@ class MBASE_PUBLIC V2HttpRedirectException
         ~V2HttpRedirectException() = default;
 };
 
-
+/// @def SERVICE_PROPERTY(Type, Name)
+///
+/// Define a variable and its accessor functions. The variable will be
+/// called 'm_Name', the getter function will be 'GetName' and the
+/// setter will be 'SetName'.
+///
+/// @param Type The type of the variable to be defined. This also
+///             control the type used in the getter and setter
+///             functions.
+///
+/// @param Name The name of the variable to be defined. Also controls
+///             the name of the getter and setter functions.
+///
+/// This macro uses templating so it can pass parameters bby reference
+/// for complex types, and pass by value for simple types. The first
+/// template handles complex lvalue arguments, the second handles
+/// complex rvalue arguments, and the third handles simple arguments.
 #define SERVICE_PROPERTY2(Type, Name)               \
     Q_PROPERTY(Type Name READ Get##Name MEMBER m_##Name USER true) \
     public:                                              \
         Type Get##Name() const { return m_##Name; }      \
-        void set##Name(Type value) { m_##Name = value; } \
+        template <class T>                                         \
+        typename std::enable_if<std::is_same<T, QString>::value || \
+                                std::is_same<T, QDateTime>::value ||   \
+                                std::is_same<T, QVariantMap>::value || \
+                                std::is_same<T, QVariantList>::value, void>::type \
+        set##Name(T& value) { m_##Name = std::move(value); }       \
+        template <class T>                                         \
+        typename std::enable_if<std::is_same<T, QString>::value || \
+                                std::is_same<T, QDateTime>::value ||   \
+                                std::is_same<T, QVariantMap>::value || \
+                                std::is_same<T, QVariantList>::value,void>::type \
+        set##Name(const T& value) { m_##Name = value; }             \
+        template <class T>                                          \
+        typename std::enable_if<!std::is_same<T, QString>::value && \
+                                !std::is_same<T, QDateTime>::value &&   \
+                                !std::is_same<T, QVariantMap>::value && \
+                                !std::is_same<T, QVariantList>::value,void>::type \
+        set##Name(T value) { m_##Name = value; }                    \
     private:                                             \
     Type m_##Name { };
 
