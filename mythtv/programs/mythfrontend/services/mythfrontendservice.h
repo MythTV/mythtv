@@ -15,12 +15,12 @@ class FrontendStatus : public QObject
     Q_CLASSINFO("ChapterTimes",   "type=QString;name=Chapter")
     Q_CLASSINFO("SubtitleTracks", "type=QString;name=Track")
     Q_CLASSINFO("AudioTracks",    "type=QString;name=Track")
-    SERVICE_PROPERTY(QString,      Name,           name)
-    SERVICE_PROPERTY(QString,      Version,        version)
-    SERVICE_PROPERTY(QVariantMap,  State,          state)
-    SERVICE_PROPERTY(QVariantList, ChapterTimes,   chapterTimes)
-    SERVICE_PROPERTY(QVariantMap,  SubtitleTracks, subtitleTracks)
-    SERVICE_PROPERTY(QVariantMap,  AudioTracks,    audioTracks)
+    SERVICE_PROPERTY2(QString,      Name)
+    SERVICE_PROPERTY2(QString,      Version)
+    SERVICE_PROPERTY2(QVariantMap,  State)
+    SERVICE_PROPERTY2(QVariantList, ChapterTimes)
+    SERVICE_PROPERTY2(QVariantMap,  SubtitleTracks)
+    SERVICE_PROPERTY2(QVariantMap,  AudioTracks)
 
   public:
     Q_INVOKABLE FrontendStatus(QObject *parent = nullptr)
@@ -35,7 +35,7 @@ class FrontendActionList : public QObject
     Q_OBJECT
     Q_CLASSINFO("Version",    "1.0")
     Q_CLASSINFO("ActionList", "type=QString;name=Action")
-    SERVICE_PROPERTY(QVariantMap, ActionList, actionList)
+    SERVICE_PROPERTY2(QVariantMap, ActionList)
 
   public:
     Q_INVOKABLE FrontendActionList(QObject *parent = nullptr)

@@ -364,48 +364,48 @@ bool MythFrontendService::PlayVideo(const QString& Id, bool UseBookmark)
 }
 
 FrontendStatus::FrontendStatus(const QString& Name, const QString& Version, const QVariantMap& State)
-  : m_name(Name),
-    m_version(Version),
-    m_state(State)
+  : m_Name(Name),
+    m_Version(Version),
+    m_State(State)
 {
-    if (m_state.contains("chaptertimes") &&
+    if (m_State.contains("chaptertimes") &&
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-        m_state["chaptertimes"].type() == QVariant::List
+        m_State["chaptertimes"].type() == QVariant::List
 #else
-        m_state["chaptertimes"].typeId() == QMetaType::QVariantList
+        m_State["chaptertimes"].typeId() == QMetaType::QVariantList
 #endif
         )
     {
-        m_chapterTimes = m_state["chaptertimes"].toList();
-        m_state.remove("chaptertimes");
+        m_ChapterTimes = m_State["chaptertimes"].toList();
+        m_State.remove("chaptertimes");
     }
 
-    if (m_state.contains("subtitletracks") &&
+    if (m_State.contains("subtitletracks") &&
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-        m_state["subtitletracks"].type() == QVariant::Map
+        m_State["subtitletracks"].type() == QVariant::Map
 #else
-        m_state["subtitletracks"].typeId() == QMetaType::QVariantMap
+        m_State["subtitletracks"].typeId() == QMetaType::QVariantMap
 #endif
         )
     {
-        m_subtitleTracks = m_state["subtitletracks"].toMap();
-        m_state.remove("subtitletracks");
+        m_SubtitleTracks = m_State["subtitletracks"].toMap();
+        m_State.remove("subtitletracks");
     }
 
-    if (m_state.contains("audiotracks") &&
+    if (m_State.contains("audiotracks") &&
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-        m_state["audiotracks"].type() == QVariant::Map
+        m_State["audiotracks"].type() == QVariant::Map
 #else
-        m_state["audiotracks"].typeId() == QMetaType::QVariantMap
+        m_State["audiotracks"].typeId() == QMetaType::QVariantMap
 #endif
         )
     {
-        m_audioTracks = m_state["audiotracks"].toMap();
-        m_state.remove("audiotracks");
+        m_AudioTracks = m_State["audiotracks"].toMap();
+        m_State.remove("audiotracks");
     }
 }
 
 FrontendActionList::FrontendActionList(const QVariantMap& List)
-  : m_actionList(List)
+  : m_ActionList(List)
 {
 }

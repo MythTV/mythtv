@@ -49,14 +49,6 @@ class MBASE_PUBLIC V2HttpRedirectException
 };
 
 
-#define SERVICE_PROPERTY(Type, Name, name)               \
-    Q_PROPERTY(Type Name READ Get##Name MEMBER m_##name USER true) \
-    public:                                              \
-        Type Get##Name() const { return m_##name; }      \
-        void set##Name(Type value) { m_##name = value; } \
-    private:                                             \
-    Type m_##name { };
-
 #define SERVICE_PROPERTY2(Type, Name)               \
     Q_PROPERTY(Type Name READ Get##Name MEMBER m_##Name USER true) \
     public:                                              \
