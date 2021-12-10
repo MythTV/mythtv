@@ -1,5 +1,5 @@
 export interface MythHostName {
-    HostName: string;
+    String: string;  // That's what the service returns as the key
 }
 export interface MythTimeZone {
     TimeZoneInfo: {
