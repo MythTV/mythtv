@@ -17,7 +17,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.mythService.GetHostName().subscribe(data => {
       console.log(data);
-      this.hostname = data.HostName;
+      this.hostname = data.String;
     });
     this.mythService.GetTimeZone().subscribe(data => {
       console.log(data);
