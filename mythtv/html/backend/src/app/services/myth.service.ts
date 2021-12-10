@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { MythHostName, MythTimeZone } from './myth.interface';
+import { MythHostName, MythTimeZone } from './interfaces/myth.interface';
 
 @Injectable({
   providedIn: 'root'
