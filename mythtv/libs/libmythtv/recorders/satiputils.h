@@ -26,7 +26,8 @@ class SatIP
     static QString pol(DTVPolarity pol);
 
   private:
-    static QStringList doUPNPsearch(void);
+    static QStringList doUPNPsearch(bool loginfo);
+    static QStringList findServers(void);
 };
 
 #endif // SATIPUTILS_H

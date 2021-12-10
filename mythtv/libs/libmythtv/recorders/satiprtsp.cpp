@@ -84,13 +84,20 @@ SatIPRTSP::SatIPRTSP(SatIPStreamHandler *handler)
     }
     else
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "RTP UDP socket receive buffer too small\n" +
-            QString("\tRTP UDP socket receive buffer size set to %1 but requested %2\n").arg(newsize).arg(desiredsize) +
-            QString("\tTo prevent UDP packet loss increase net.core.rmem_max e.g. with this command:\n") +
-            QString("\tsudo sysctl -w net.core.rmem_max=%1\n").arg(desiredsize) +
-            QString("\tand restart mythbackend."));
+        static bool msgdone = false;
+
+        if (!msgdone)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + "RTP UDP socket receive buffer too small\n" +
+                QString("\tRTP UDP socket receive buffer size set to %1 but requested %2\n").arg(newsize).arg(desiredsize) +
+                QString("\tTo prevent UDP packet loss increase net.core.rmem_max e.g. with this command:\n") +
+                QString("\tsudo sysctl -w net.core.rmem_max=%1\n").arg(desiredsize) +
+                QString("\tand restart mythbackend."));
+            msgdone = true;
+        }
     }
 }
+
 
 SatIPRTSP::~SatIPRTSP()
 {

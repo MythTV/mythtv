@@ -220,6 +220,7 @@ class MTV_PUBLIC CardUtil
     }
 
     static bool         IsVBoxPresent(uint inputid);
+    static bool         IsSatIPPresent(uint inputid);
 
     // Card creation and deletion
 

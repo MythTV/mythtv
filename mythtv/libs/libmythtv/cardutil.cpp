@@ -3272,7 +3272,7 @@ bool CardUtil::IsVBoxPresent(uint inputid)
     if (!chanid)
     {
         // no chanid, presume bad setup
-        LOG(VB_GENERAL, LOG_ERR, QString("VBOX chanid  (%1) not found for inputid (%2) , redo mythtv-setup")
+        LOG(VB_GENERAL, LOG_ERR, QString("VBOX chanid (%1) not found for inputid (%2), redo mythtv-setup")
                 .arg(chanid).arg(inputid));
         return false;
     }
@@ -3300,17 +3300,73 @@ bool CardUtil::IsVBoxPresent(uint inputid)
     else if (query.next())
         url = query.value(0).toString();
 
-    //now get just the IP address from the url
+    // now get just the IP address from the url
     QString ip = url.host();
     LOG(VB_GENERAL, LOG_INFO, QString("VBOX IP found (%1) for inputid (%2)")
                 .arg(ip).arg(inputid));
 
     if (!ping(ip,signal_timeout))
     {
-        LOG(VB_GENERAL, LOG_ERR, QString("VBOX at IP  (%1) failed to respond to network ping for inputid (%2) timeout (%3)")
+        LOG(VB_GENERAL, LOG_ERR, QString("VBOX at IP (%1) failed to respond to network ping for inputid (%2) timeout (%3)")
             .arg(ip).arg(inputid).arg(signal_timeout.count()));
         return false;
     }
 
     return true;
+}
+
+/** \fn CardUtil::IsSatIPPresent(uint inputid)
+ *  \brief Returns true if the SatIP box responds to a ping
+ *  \param inputid  As used in DB capturecard table field cardid
+ */
+bool CardUtil::IsSatIPPresent(uint inputid)
+{
+    // Should only be called if inputtype == SATIP
+    if (!inputid )
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("SatIP inputid (%1) not valid, redo mythtv-setup")
+                .arg(inputid));
+        return false;
+    }
+
+    // Get sourceid and startchan from table capturecard for inputid
+    uint chanid = 0;
+    chanid = ChannelUtil::GetChannelValueInt("chanid", GetSourceID(inputid), GetStartChannel(inputid));
+    if (!chanid)
+    {
+        // no chanid, presume bad setup
+        LOG(VB_GENERAL, LOG_ERR, QString("SatIP chanid (%1) not found for inputid (%2), redo mythtv-setup")
+                .arg(chanid).arg(inputid));
+        return false;
+    }
+
+    // Get timeouts for inputid
+    std::chrono::milliseconds signal_timeout = 0ms;
+    std::chrono::milliseconds tuning_timeout = 0ms;
+    if (!GetTimeouts(inputid,signal_timeout,tuning_timeout))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("Failed to get timeouts for inputid (%1)")
+                .arg(inputid));
+        return false;
+    }
+
+    // Ping the SatIP box to see if it can be reached on the network
+    QString device = CardUtil::GetVideoDevice(inputid);
+    QStringList devinfo = device.split(":");
+    if (devinfo.value(0).toUpper() == "UUID")
+    {
+        QString deviceId = QString("uuid:%1").arg(devinfo.value(1));
+        QString ip = SatIP::findDeviceIP(deviceId);
+        LOG(VB_GENERAL, LOG_INFO, QString("SatIP[%1] IP address %2 device %3")
+                    .arg(inputid).arg(ip).arg(device));
+
+        if (!ping(ip, signal_timeout))
+        {
+            LOG(VB_GENERAL, LOG_ERR, QString("SatIP[%1] at IP %2 failed to respond to network ping (timeout %3)")
+                .arg(inputid).arg(ip).arg(signal_timeout.count()));
+            return false;
+        }
+        return true;
+    }
+    return false;
 }

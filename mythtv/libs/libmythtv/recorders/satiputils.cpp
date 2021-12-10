@@ -47,10 +47,10 @@ QStringList SatIP::probeDevices(void)
         }
     }
 
-    return SatIP::doUPNPsearch();
+    return SatIP::doUPNPsearch(true);
 };
 
-QStringList SatIP::doUPNPsearch(void)
+QStringList SatIP::doUPNPsearch(bool loginfo)
 {
     QStringList result;
 
@@ -63,9 +63,12 @@ QStringList SatIP::doUPNPsearch(void)
     }
 
     int count = satipservers->Count();
-    if (count)
+    if (count > 0)
     {
-        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found %1 possible Sat>IP servers").arg(count));
+        if (loginfo)
+        {
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found %1 possible Sat>IP servers").arg(count));
+        }
     }
     else
     {
@@ -113,7 +116,10 @@ QStringList SatIP::doUPNPsearch(void)
                                                  QString::number(i),
                                                  tuner.at(0));
                         result << device;
-                        LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found %1").arg(device));
+                        if (loginfo)
+                        {
+                            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Found %1").arg(device));
+                        }
                     }
                 }
             }
@@ -127,9 +133,24 @@ QStringList SatIP::doUPNPsearch(void)
     return result;
 };
 
+QStringList SatIP::findServers(void)
+{
+    QStringList devs;
+    SSDPCacheEntries *satipservers = SSDP::Find(SATIP_URI);
+    if (satipservers && satipservers->Count() > 0)
+    {
+        devs = SatIP::doUPNPsearch(false);
+    }
+    else
+    {
+        devs = SatIP::probeDevices();
+    }
+    return devs;
+}
+
 QString SatIP::findDeviceIP(const QString& deviceuuid)
 {
-    QStringList devs = SatIP::probeDevices();
+    QStringList devs = SatIP::findServers();
 
     for (const auto& dev : devs)
     {
