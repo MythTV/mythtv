@@ -48,11 +48,11 @@ static const float epsilon = 0.000001;
 static const float center_level = 0.5*sqrt(0.5);
 
 // private implementation of the surround decoder
-class decoder_impl {
+class fsurround_decoder::Impl {
 public:
     // create an instance of the decoder
     //  blocksize is fixed over the lifetime of this object for performance reasons
-    explicit decoder_impl(unsigned blocksize=8192): m_n(blocksize), m_halfN(blocksize/2) {
+    explicit Impl(unsigned blocksize=8192): m_n(blocksize), m_halfN(blocksize/2) {
 #ifdef USE_FFTW3
         // create FFTW buffers
         m_lt = (float*)fftwf_malloc(sizeof(float)*m_n);
@@ -105,7 +105,7 @@ public:
     }
 
     // destructor
-    ~decoder_impl() {
+    ~Impl() {
 #ifdef USE_FFTW3
         // clean up the FFTW stuff
         fftwf_destroy_plan(m_store);
@@ -534,14 +534,12 @@ private:
     int m_currentBuf;                    // specifies which buffer is 2nd half of input sliding buffer
     InputBufs  m_inbufs     {};          // for passing back to driver
     OutputBufs m_outbufs    {};          // for passing back to driver
-
-    friend class fsurround_decoder;
 };
 
 
 // implementation of the shell class
 
-fsurround_decoder::fsurround_decoder(unsigned blocksize): m_impl(new decoder_impl(blocksize)) { }
+fsurround_decoder::fsurround_decoder(unsigned blocksize): m_impl(new Impl(blocksize)) { }
 
 fsurround_decoder::~fsurround_decoder() { delete m_impl; }
 
