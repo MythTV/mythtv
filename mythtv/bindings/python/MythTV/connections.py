@@ -278,7 +278,7 @@ class BEConnection( object ):
 
         # return if not connected
         if not self.connected:
-            return u''
+            return ''
 
         # pull default timeout
         if deadline is None:
@@ -296,14 +296,14 @@ class BEConnection( object ):
                 timeout = (deadline-t) if (deadline-t>0) else 0.0
                 if len(select([self.socket],[],[], timeout)[0]) == 0:
                     # no data, return
-                    return u''
+                    return ''
                 res = self.socket.recvheader(deadline=deadline)
 
                 # convert to unicode
                 try:
                     res = str(b''.join([res]), 'utf-8')
                 except:
-                    res = u''.join([res])
+                    res = ''.join([res])
 
                 return res
         except MythError as e:
@@ -386,7 +386,7 @@ class BEEventConnection( BEConnection ):
                     try:
                         event = str(b''.join([event]), 'utf-8')
                     except:
-                        event = u''.join([event])
+                        event = ''.join([event])
 
                     if event[:15] == 'BACKEND_MESSAGE':
                         self.eventqueue.put(event)
@@ -537,7 +537,7 @@ class FEConnection( object ):
             except:
                 return self._res_help[mode](res)
         else:
-            self.socket.send((u"%s %s\n" % (mode, command)).encode('utf-8'))
+            self.socket.send(("%s %s\n" % (mode, command)).encode('utf-8'))
             return self._res_handler[mode](self.recv())
 
     def recv(self, deadline=None):

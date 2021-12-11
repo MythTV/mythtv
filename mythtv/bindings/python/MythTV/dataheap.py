@@ -76,7 +76,7 @@ class Artwork( str ):
             self.hostname = parent.get('hostname', parent.get('host', None))
 
     def __repr__(self):
-        return u"<{0.imagetype} '{0.data}'>".format(self)
+        return "<{0.imagetype} '{0.data}'>".format(self)
 
     def __get__(self, inst, owner):
         if inst is None:
@@ -140,8 +140,8 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
             cls._stored_templates[name] = data
         return cls._stored_templates[name]
 
-    _defaults = {'title':u'Unknown', 'subtitle':u'', 'description':u'',
-                 'category':u'', 'station':u'', 'seriesid':u'', 'inetref':u'',
+    _defaults = {'title':'Unknown', 'subtitle':'', 'description':'',
+                 'category':'', 'station':'', 'seriesid':'', 'inetref':'',
                  'season':0, 'episode':0, 'last_record':_default_datetime,
                  'next_record':_default_datetime,
                  'last_delete':_default_datetime}
@@ -149,8 +149,8 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized Record Rule at %s>" % hex(id(self))
-        return u"<Record Rule '%s', Type %d at %s>" \
+            return "<Uninitialized Record Rule at %s>" % hex(id(self))
+        return "<Record Rule '%s', Type %d at %s>" \
                                     % (self.title, self.type, hex(id(self)))
 
     def __repr__(self):
@@ -276,7 +276,7 @@ class Recorded( CMPRecord, DBDataWrite ):
             'data' is a tuple containing (chanid, storagegroup)
     """
     _key   = ['chanid','starttime']
-    _defaults = {'title':u'Unknown', 'subtitle':'',          'description':'',
+    _defaults = {'title':'Unknown', 'subtitle':'',          'description':'',
                  'category':'',      'hostname':'',          'bookmark':0,
                  'editing':0,        'cutlist':0,            'autoexpire':0,
                  'commflagged':0,    'recgroup':'Default',   'seriesid':'',
@@ -317,8 +317,8 @@ class Recorded( CMPRecord, DBDataWrite ):
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized Recorded at %s>" % hex(id(self))
-        return u"<Recorded '%s','%s' at %s>" % (self.title,
+            return "<Uninitialized Recorded at %s>" % hex(id(self))
+        return "<Recorded '%s','%s' at %s>" % (self.title,
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
@@ -551,15 +551,15 @@ class RecordedFile( CMPRecord, DBDataWrite ):
     _defaults = {'filesize':0,          'width':0,        'height':0,
                  'fps':0.0,             'aspect':0.0,     'audio_sample_rate':0,
                  'audio_channels':0,    'audio_codec':'', 'video_codec':'',
-                 'comment':u'',         'hostname':'',    'storagegroup':'',
+                 'comment':'',         'hostname':'',    'storagegroup':'',
                  'container':'',        'total_bitrate':0,
                  'video_avg_bitrate':0, 'video_max_bitrate':0,
                  'audio_avg_bitrate':0, 'audio_max_bitrate':0}
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized RecordedFile at %s>" % hex(id(self))
-        return u"<RecordedFile '%s','%d' at %s>" % (self.basename,
+            return "<Uninitialized RecordedFile at %s>" % hex(id(self))
+        return "<RecordedFile '%s','%d' at %s>" % (self.basename,
                 self.recordedid, hex(id(self)))
 
     def __repr__(self):
@@ -584,17 +584,17 @@ class RecordedProgram( CMPRecord, DBDataWrite ):
                  'stars':0,      'previouslyshown':0,    'title_pronounce':'',
                  'stereo':0,     'subtitled':0,          'hdtv':0,
                  'partnumber':0, 'closecaptioned':0,     'parttotal':0,
-                 'seriesid':'',  'originalairdate':'',   'showtype':u'',
+                 'seriesid':'',  'originalairdate':'',   'showtype':'',
                  'colorcode':'', 'syndicatedepisodenumber':'',
                  'programid':'', 'manualid':0,           'generic':0,
                  'first':0,      'listingsource':0,      'last':0,
-                 'audioprop':u'','videoprop':u'',
-                 'subtitletypes':u'', 'inputname':u''}
+                 'audioprop':'','videoprop':'',
+                 'subtitletypes':'', 'inputname':''}
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized RecordedProgram at %s>" % hex(id(self))
-        return u"<RecordedProgram '%s','%s' at %s>" % (self.title,
+            return "<Uninitialized RecordedProgram at %s>" % hex(id(self))
+        return "<RecordedProgram '%s','%s' at %s>" % (self.title,
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
@@ -631,8 +631,8 @@ class OldRecorded( CMPRecord, DBDataWrite, RECSTATUS ):
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized OldRecorded at %s>" % hex(id(self))
-        return u"<OldRecorded '%s','%s' at %s>" % (self.title,
+            return "<Uninitialized OldRecorded at %s>" % hex(id(self))
+        return "<OldRecorded '%s','%s' at %s>" % (self.title,
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
@@ -675,8 +675,8 @@ class RecordedArtwork( DBDataWrite ):
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized Artwork at %s>" % hex(id(self))
-        return u"<RecordedArtwork '%s','%d' at %s>" % \
+            return "<Uninitialized Artwork at %s>" % hex(id(self))
+        return "<RecordedArtwork '%s','%d' at %s>" % \
                         (self.inetref, self.season, hex(id(self)))
 
     def __repr__(self):
@@ -698,8 +698,8 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized Job at %s>" % hex(id(self))
-        return u"<Job '%s' at %s>" % (self.id, hex(id(self)))
+            return "<Uninitialized Job at %s>" % hex(id(self))
+        return "<Job '%s' at %s>" % (self.id, hex(id(self)))
 
     def __repr__(self):
         return str(self)
@@ -756,10 +756,10 @@ class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
 
 class Channel( DBDataWrite ):
     """Channel(chanid=None, db=None) -> Channel object"""
-    _defaults = {'icon':'none',          'videofilters':'',  'callsign':u'',
+    _defaults = {'icon':'none',          'videofilters':'',  'callsign':'',
                  'xmltvid':'',           'recpriority':0,    'contrast':32768,
                  'brightness':32768,     'colour':32768,     'hue':32768,
-                 'tvformat':u'Default',  'visible':1,        'outputfilters':'',
+                 'tvformat':'Default',  'visible':1,        'outputfilters':'',
                  'useonairguide':0,      'atsc_major_chan':0,
                  'tmoffset':0,           'default_authority':'',
                  'commmethod':-1,        'atsc_minor_chan':0,
@@ -768,8 +768,8 @@ class Channel( DBDataWrite ):
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized Channel at %s>" % hex(id(self))
-        return u"<Channel '%s','%s' at %s>" % \
+            return "<Uninitialized Channel at %s>" % hex(id(self))
+        return "<Channel '%s','%s' at %s>" % \
                         (self.chanid, self.name, hex(id(self)))
 
     def __repr__(self):
@@ -785,8 +785,8 @@ class Guide( CMPRecord, DBData ):
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized Guide at %s>" % hex(id(self))
-        return u"<Guide '%s','%s' at %s>" % (self.title,
+            return "<Uninitialized Guide at %s>" % hex(id(self))
+        return "<Guide '%s','%s' at %s>" % (self.title,
                 self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
@@ -853,14 +853,14 @@ class Guide( CMPRecord, DBData ):
 class Video( CMPVideo, VideoSchema, DBDataWrite ):
     """Video(id=None, db=None, raw=None) -> Video object"""
     _table = 'videometadata'
-    _defaults = {'subtitle':u'',             'director':u'Unknown',
-                 'rating':u'NR',             'inetref':u'00000000',
+    _defaults = {'subtitle':'',             'director':'Unknown',
+                 'rating':'NR',             'inetref':'00000000',
                  'year':1895,                'userrating':0.0,
                  'length':0,                 'showlevel':1,
-                 'coverfile':u'No Cover',    'host':u'',
-                 'homepage':u'',             'insertdate': datetime.now(),
+                 'coverfile':'No Cover',    'host':'',
+                 'homepage':'',             'insertdate': datetime.now(),
                  'watched':False,            'category':0,
-                 'browse':True,              'hash':u'',
+                 'browse':True,              'hash':'',
                  'season':0,                 'episode':0,
                  'releasedate':date(1,1,1),  'childid':-1}
     _cm_toid, _cm_toname = DictInvertCI.createPair({0:'none'})
@@ -929,13 +929,13 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
 
     def __repr__(self):
         if self._wheredat is None:
-            return u"<Uninitialized Video at %s>" % hex(id(self))
+            return "<Uninitialized Video at %s>" % hex(id(self))
         res = self.title
         if self.season and self.episode:
-            res += u' - %dx%02d' % (self.season, self.episode)
+            res += ' - %dx%02d' % (self.season, self.episode)
         if self.subtitle:
-            res += u' - '+self.subtitle
-        return (u"<Video '%s' at %s>" % (res, hex(id(self))))
+            res += ' - '+self.subtitle
+        return ("<Video '%s' at %s>" % (res, hex(id(self))))
 
     def _postinit(self):
         self._fill_cm()

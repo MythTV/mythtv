@@ -870,7 +870,7 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
                      0,      0,      0,
                      0,      3,      4  ]
     def __str__(self):
-        return u"<Program '%s','%s' at %s>" % (self.title,
+        return "<Program '%s','%s' at %s>" % (self.title,
                  self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
@@ -1004,7 +1004,7 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
                             ('R','description'), ('C','category'),
                             ('U','recgroup'), ('hn','hostname'),
                             ('c','chanid') ):
-            tmp = unicode(self[data]).replace('/','-')
+            tmp = str(self[data]).replace('/','-')
             path = path.replace('%'+tag, tmp)
 
         for (data, pre) in (   ('recstartts','%'), ('recendts','%e'),

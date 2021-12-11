@@ -165,7 +165,7 @@ class Script( object ):
                     size = len(code[i])
                     name = names[i]
                 code[i] = code[i].lstrip()
-                code[i] = code[i].replace(u'\xa0',' ')
+                code[i] = code[i].replace('\xa0',' ')
             self.code = dict(list(zip(names,code)))
             if self.info.name == 'unnamed':
                 self.info.name = name
