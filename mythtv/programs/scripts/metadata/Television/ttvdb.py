@@ -886,7 +886,6 @@ Runtime:60
 0
 
 """
-from __future__ import print_function
 
 __title__ ="TheTVDB.com";
 __author__="R.D.Vaughan"
