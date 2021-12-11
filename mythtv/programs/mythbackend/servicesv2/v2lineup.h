@@ -64,7 +64,7 @@ class V2LineupList : public QObject
 
     public:
 
-        V2LineupList(QObject *parent = nullptr)
+        Q_INVOKABLE V2LineupList(QObject *parent = nullptr)
             : QObject( parent )
         {
         }
@@ -85,6 +85,8 @@ class V2LineupList : public QObject
             return pObject;
         }
 
+    private:
+        Q_DISABLE_COPY(V2LineupList);
 };
 
 Q_DECLARE_METATYPE(V2LineupList*)

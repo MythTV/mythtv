@@ -61,6 +61,7 @@ void V2Channel::RegisterCustomTypes()
     qRegisterMetaType<V2VideoSourceList*>("V2VideoSourceList");
     qRegisterMetaType<V2VideoSource*>("V2VideoSource");
     qRegisterMetaType<V2LineupList*>("V2LineupList");
+    qRegisterMetaType<V2Lineup*>("V2Lineup");
     qRegisterMetaType<V2VideoMultiplexList*>("V2VideoMultiplexList");
     qRegisterMetaType<V2VideoMultiplex*>("V2VideoMultiplex");
     qRegisterMetaType<V2Program*>("V2Program");
