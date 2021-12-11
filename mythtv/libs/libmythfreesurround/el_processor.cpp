@@ -244,22 +244,18 @@ private:
         // 1. scale the input by the window function; this serves a dual purpose:
         // - first it improves the FFT resolution b/c boundary discontinuities (and their frequencies) get removed
         // - second it allows for smooth blending of varying filters between the blocks
+
+        // the window also includes 1.0/sqrt(n) normalization
+        // concatenate copies of input1 and input2 for some undetermined reason
+        // input1 is in the rising half of the window
+        // input2 is in the falling half of the window
+        for (unsigned k = 0; k < m_halfN; k++)
         {
-            float* pWnd = &m_wnd[0];
-            float* pLt =  &m_lt[0];
-            float* pRt =  &m_rt[0];
-            float* pIn0 = input1[0];
-            float* pIn1 = input1[1];
-            for (unsigned k=0;k<m_halfN;k++) {
-                *pLt++ = *pIn0++ * *pWnd;
-                *pRt++ = *pIn1++ * *pWnd++;
-            }
-            pIn0 = input2[0];
-            pIn1 = input2[1];
-            for (unsigned k=0;k<m_halfN;k++) {
-                *pLt++ = *pIn0++ * *pWnd;
-                *pRt++ = *pIn1++ * *pWnd++;
-            }
+            m_lt[k]             = input1[0][k] * m_wnd[k];
+            m_rt[k]             = input1[1][k] * m_wnd[k];
+
+            m_lt[k + m_halfN]   = input2[0][k] * m_wnd[k + m_halfN];
+            m_rt[k + m_halfN]   = input2[1][k] * m_wnd[k + m_halfN];
         }
 
 #ifdef USE_FFTW3
