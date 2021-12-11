@@ -24,7 +24,7 @@ class LyricsFetcher:
     def __init__( self ):
         self.clean_lyrics_regex = re.compile( "<.+?>" )
         self.normalize_lyrics_regex = re.compile( "&#[x]*(?P<name>[0-9]+);*" )
-        self.clean_br_regex = re.compile( "<br[ /]*>[\s]*", re.IGNORECASE )
+        self.clean_br_regex = re.compile( r"<br[ /]*>[\s]*", re.IGNORECASE )
         self.search_results_regex = re.compile("<a href=\"[^\"]+\">([^<]+)</a></td>[^<]+<td><a href=\"([^\"]+)\" class=\"b\">[^<]+</a></td>", re.IGNORECASE)
         self.next_results_regex = re.compile("<A href=\"([^\"]+)\" class=\"pages\">next .</A>", re.IGNORECASE)
 

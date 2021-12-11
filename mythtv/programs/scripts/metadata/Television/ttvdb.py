@@ -1325,15 +1325,15 @@ http_replace="http://www.thetvdb.com" #Keep replace code "just in case"
 
 name_parse=[
             # foo_[s01]_[e01]
-            re.compile('''^(.+?)[ \._\-]\[[Ss]([0-9]+?)\]_\[[Ee]([0-9]+?)\]?[^\\/]*$'''),
+            re.compile(r'''^(.+?)[ \._\-]\[[Ss]([0-9]+?)\]_\[[Ee]([0-9]+?)\]?[^\\/]*$'''),
             # foo.1x09*
-            re.compile('''^(.+?)[ \._\-]\[?([0-9]+)x([0-9]+)[^\\/]*$'''),
+            re.compile(r'''^(.+?)[ \._\-]\[?([0-9]+)x([0-9]+)[^\\/]*$'''),
             # foo.s01.e01, foo.s01_e01
-            re.compile('''^(.+?)[ \._\-][Ss]([0-9]+)[\.\- ]?[Ee]([0-9]+)[^\\/]*$'''),
+            re.compile(r'''^(.+?)[ \._\-][Ss]([0-9]+)[\.\- ]?[Ee]([0-9]+)[^\\/]*$'''),
             # foo.103*
-            re.compile('''^(.+)[ \._\-]([0-9]{1})([0-9]{2})[\._ -][^\\/]*$'''),
+            re.compile(r'''^(.+)[ \._\-]([0-9]{1})([0-9]{2})[\._ -][^\\/]*$'''),
             # foo.0103*
-            re.compile('''^(.+)[ \._\-]([0-9]{2})([0-9]{2,3})[\._ -][^\\/]*$'''),
+            re.compile(r'''^(.+)[ \._\-]([0-9]{2})([0-9]{2,3})[\._ -][^\\/]*$'''),
 ] # contains regex parsing filename parsing strings used to extract info from video filenames
 
 # Episode meta data that is massaged
@@ -1433,7 +1433,7 @@ class Season( tvdb_api.Season ):
 
 # modified Episode class implementing a fuzzy search
 class Episode( tvdb_api.Episode ):
-    _re_strippart = re.compile('(.*) \([0-9]+\)')
+    _re_strippart = re.compile(r'(.*) \([0-9]+\)')
     def fuzzysearch(self, term = None, key = None):
         if term is None:
             raise TypeError("must supply string to search for (contents)")
@@ -2445,7 +2445,7 @@ def main():
             if match:
                 seriesname, seasno, epno = match.groups()
                 #remove ._- characters from name (- removed only if next to end of line)
-                seriesname = re.sub("[\._]|\-(?=$)", " ", seriesname).strip()
+                seriesname = re.sub(r"[\._]|\-(?=$)", " ", seriesname).strip()
                 series_season_ep = [seriesname, seasno, epno]
                 break # Matched - to the next file!
 
