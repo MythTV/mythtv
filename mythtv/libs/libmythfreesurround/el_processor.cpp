@@ -27,8 +27,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "fftw3.h"
 #else
 extern "C" {
+#include "libavutil/mem.h"
+
 #include "libavcodec/avfft.h"
-#include "libavcodec/fft.h"
+//#include "libavcodec/fft.h"
 }
 using FFTComplexArray = FFTSample[2];
 #endif
@@ -65,17 +67,13 @@ public:
         m_store = fftwf_plan_dft_c2r_1d(m_n, m_src, m_dst,FFTW_MEASURE);
 #else
         // create lavc fft buffers
-        m_lt = (float*)av_malloc(sizeof(FFTSample)*m_n);
-        m_rt = (float*)av_malloc(sizeof(FFTSample)*m_n);
-        m_dftL = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*m_n*2);
-        m_dftR = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*m_n*2);
+        m_dftL = (FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2);
+        m_dftR = (FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2);
         m_src = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*m_n*2);
-        m_fftContextForward = (FFTContext*)av_malloc(sizeof(FFTContext));
-        memset(m_fftContextForward, 0, sizeof(FFTContext));
-        m_fftContextReverse = (FFTContext*)av_malloc(sizeof(FFTContext));
-        memset(m_fftContextReverse, 0, sizeof(FFTContext));
-        ff_fft_init(m_fftContextForward, 13, 0);
-        ff_fft_init(m_fftContextReverse, 13, 1);
+        // TODO only valid because blocksize is always 8192:
+        // (convert blocksize to log_2 (n) instead since FFmpeg only supports sizes that are powers of 2)
+        m_fftContextForward = av_fft_init(13, 0);
+        m_fftContextReverse = av_fft_init(13, 1);
 #endif
         // resize our own buffers
         m_frontR.resize(m_n);
@@ -121,15 +119,11 @@ public:
         fftwf_free(m_rt);
         fftwf_free(m_lt);
 #else
-        ff_fft_end(m_fftContextForward);
-        ff_fft_end(m_fftContextReverse);
+        av_fft_end(m_fftContextForward);
+        av_fft_end(m_fftContextReverse);
         av_free(m_src);
         av_free(m_dftR);
         av_free(m_dftL);
-        av_free(m_rt);
-        av_free(m_lt);
-        av_free(m_fftContextForward);
-        av_free(m_fftContextReverse);
 #endif
     }
 
@@ -226,6 +220,10 @@ private:
     static inline float amplitude(const float *cf) { return std::sqrt(cf[0]*cf[0] + cf[1]*cf[1]); }
     static inline float phase(const float *cf) { return std::atan2(cf[1],cf[0]); }
     static inline cfloat polar(float a, float p) { return {static_cast<float>(a*std::cos(p)),static_cast<float>(a*std::sin(p))}; }
+#ifndef USE_FFTW3
+    static inline float amplitude(FFTComplex z) { return std::sqrt(z.re * z.re + z.im * z.im); }
+    static inline float phase(FFTComplex z) { return std::atan2(z.im, z.re); }
+#endif
     static inline float sqr(float x) { return x*x; }
     // the dreaded min/max
     static inline float min(float a, float b) { return a<b?a:b; }
@@ -249,6 +247,7 @@ private:
         // concatenate copies of input1 and input2 for some undetermined reason
         // input1 is in the rising half of the window
         // input2 is in the falling half of the window
+#ifdef USE_FFTW3
         for (unsigned k = 0; k < m_halfN; k++)
         {
             m_lt[k]             = input1[0][k] * m_wnd[k];
@@ -257,17 +256,27 @@ private:
             m_lt[k + m_halfN]   = input2[0][k] * m_wnd[k + m_halfN];
             m_rt[k + m_halfN]   = input2[1][k] * m_wnd[k + m_halfN];
         }
+#else
+        for (unsigned k = 0; k < m_halfN; k++)
+        {
+            m_dftL[k]           = (FFTComplex){ .re = input1[0][k] * m_wnd[k], .im = (FFTSample)0 };
+            m_dftR[k]           = (FFTComplex){ .re = input1[1][k] * m_wnd[k], .im = (FFTSample)0 };
+
+            m_dftL[k + m_halfN] = (FFTComplex){ .re = input2[0][k] * m_wnd[k + m_halfN], .im = (FFTSample)0 };
+            m_dftR[k + m_halfN] = (FFTComplex){ .re = input2[1][k] * m_wnd[k + m_halfN], .im = (FFTSample)0 };
+        }
+#endif
 
 #ifdef USE_FFTW3
         // ... and tranform it into the frequency domain
         fftwf_execute(m_loadL);
         fftwf_execute(m_loadR);
 #else
-        ff_fft_permuteRC(m_fftContextForward, m_lt, (FFTComplex*)&m_dftL[0]);
-        av_fft_calc(m_fftContextForward, (FFTComplex*)&m_dftL[0]);
+        av_fft_permute(m_fftContextForward, m_dftL);
+        av_fft_calc(m_fftContextForward, m_dftL);
 
-        ff_fft_permuteRC(m_fftContextForward, m_rt, (FFTComplex*)&m_dftR[0]);
-        av_fft_calc(m_fftContextForward, (FFTComplex*)&m_dftR[0]);
+        av_fft_permute(m_fftContextForward, m_dftR);
+        av_fft_calc(m_fftContextForward, m_dftR);
 #endif
 
         // 2. compare amplitude and phase of each DFT bin and produce the X/Y coordinates in the sound field
@@ -372,7 +381,11 @@ private:
             m_avg[f] = m_frontL[f] + m_frontR[f];
             m_surL[f] = polar(ampL+ampR,phaseL+m_phaseOffsetL);
             m_surR[f] = polar(ampL+ampR,phaseR+m_phaseOffsetR);
+#ifdef USE_FFTW3
             m_trueavg[f] = cfloat(m_dftL[f][0] + m_dftR[f][0], m_dftL[f][1] + m_dftR[f][1]);
+#else
+            m_trueavg[f] = cfloat(m_dftL[f].re + m_dftR[f].re, m_dftL[f].im + m_dftR[f].im);
+#endif
         }
 
         // 4. distribute the unfiltered reference signals over the channels
@@ -484,47 +497,6 @@ private:
 #endif
     }
 
-#ifndef USE_FFTW3
-    /**
-     *  * Do the permutation needed BEFORE calling ff_fft_calc()
-     *  special for freesurround that also copies
-     *   */
-    void ff_fft_permuteRC(FFTContext *s, FFTSample *r, FFTComplex *z)
-    {
-        int j, k, np;
-        const uint16_t *revtab = s->revtab;
-
-        /* reverse */
-        np = 1 << s->nbits;
-        for(j=0;j<np;j++) {
-            k = revtab[j];
-            z[k].re = r[j];
-            z[k].im = 0.0;
-        }
-    }
-
-    /**
-     *  * Do the permutation needed BEFORE calling ff_fft_calc()
-     *  special for freesurround that also copies and 
-     *  discards im component as it should be 0
-     *   */
-    void ff_fft_permuteCR(FFTContext *s, FFTComplex *z, FFTSample *r)
-    {
-        int j, k, np;
-        const uint16_t *revtab = s->revtab;
-
-        /* reverse */
-        np = 1 << s->nbits;
-        for(j=0;j<np;j++) {
-            k = revtab[j];
-            if (k < j) {
-                r[k] = z[j].re;
-                r[j] = z[k].re;
-            }
-        }
-    }
-#endif
-
     unsigned int m_n;                    // the block size
     unsigned int m_halfN;                // half block size precalculated
 #ifdef USE_FFTW3
@@ -533,9 +505,12 @@ private:
     fftwf_complex *m_dftL,*m_dftR,*m_src;  // intermediate arrays (FFTs of lt & rt, processing source)
     fftwf_plan m_loadL,m_loadR,m_store;    // plans for loading the data into the intermediate format and back
 #else
-    FFTContext *m_fftContextForward, *m_fftContextReverse;
-    FFTSample *m_lt,*m_rt;                 // left total, right total (source arrays), destination array
-    FFTComplexArray *m_dftL,*m_dftR,*m_src;// intermediate arrays (FFTs of lt & rt, processing source)
+    FFTContext *m_fftContextForward {nullptr};
+    FFTContext *m_fftContextReverse {nullptr};
+    // intermediate arrays (FFTs of lt & rt, processing source)
+    FFTComplex *m_dftL {nullptr};
+    FFTComplex *m_dftR {nullptr};
+    FFTComplexArray *m_src  {nullptr};
 #endif
     // buffers
     std::vector<cfloat> m_frontL,m_frontR,m_avg,m_surL,m_surR; // the signal (phase-corrected) in the frequency domain
