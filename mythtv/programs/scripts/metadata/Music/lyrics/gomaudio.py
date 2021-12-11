@@ -82,7 +82,7 @@ class LyricsFetcher:
 
         if Page[:Page.find('>')+1] != '<lyrics_reply result="0">':
             return False
-        syncs = re.compile('<sync start="(\d+)">([^<]*)</sync>').findall(Page)
+        syncs = re.compile(r'<sync start="(\d+)">([^<]*)</sync>').findall(Page)
         lyrline = []
         lyrline.append( "[ti:%s]" %lyrics.title )
         lyrline.append( "[ar:%s]" %lyrics.artist )

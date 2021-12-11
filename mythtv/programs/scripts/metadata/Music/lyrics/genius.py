@@ -8,6 +8,11 @@ import sys
 from urllib.request import urlopen, Request
 from urllib.parse import quote
 from html import parser as html_parser
+try:
+    # may be necessary for python 3.10
+    import html
+except:
+    pass
 import socket
 import re
 from hashlib import md5
@@ -68,8 +73,12 @@ class LyricsFetcher:
             return False
 
         req.close()
-        htmlparser = html_parser.HTMLParser()
-        response = htmlparser.unescape(response.decode('utf-8'))
+        try:
+            htmlparser = html_parser.HTMLParser()
+            response = htmlparser.unescape(response.decode('utf-8'))
+        except:
+            # may be necessary for python 3.10
+            response = html.unescape(response.decode('utf-8'))
         matchcode = re.search(u'<div class="[lL]yrics.*?">(.*?)</div>', response, flags=re.DOTALL)
         try:
             lyricscode = (matchcode.group(1))

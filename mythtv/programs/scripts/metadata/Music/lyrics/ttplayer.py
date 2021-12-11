@@ -29,9 +29,9 @@ debug = False
 
 socket.setdefaulttimeout(10)
 
-LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)",
-                    "\([^\)]*mix\)", "\([^\)]*version\)",
-                    "\([^\)]*edit\)", "\(feat[^\)]*\)"]
+LYRIC_TITLE_STRIP=[r"\(live[^\)]*\)", r"\(acoustic[^\)]*\)",
+                   r"\([^\)]*mix\)", r"\([^\)]*version\)",
+                   r"\([^\)]*edit\)", r"\(feat[^\)]*\)"]
 LYRIC_TITLE_REPLACE=[("/", "-"),(" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"),(" & ", " and ")]
 
