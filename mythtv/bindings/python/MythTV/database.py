@@ -212,9 +212,9 @@ class DBData( DictData, MythSchema ):
 
     def __str__(self):
         if self._wheredat is None:
-            return u"<Uninitialized %s at %s>" % \
+            return "<Uninitialized %s at %s>" % \
                         (self.__class__.__name__, hex(id(self)))
-        return u"<%s %s at %s>" % \
+        return "<%s %s at %s>" % \
                 (self.__class__.__name__, \
                  ','.join(["'%s'" % str(v) for v in self._wheredat]), \
                  hex(id(self)))
@@ -1428,7 +1428,7 @@ class StorageGroup( DBData ):
     Represents a single storage group entry
     """
     def __str__(self):
-        return u"<StorageGroup 'myth://%s@%s%s' at %s" % \
+        return "<StorageGroup 'myth://%s@%s%s' at %s" % \
                     (self.groupname, self.hostname,
                         self.dirname, hex(id(self)))
 
