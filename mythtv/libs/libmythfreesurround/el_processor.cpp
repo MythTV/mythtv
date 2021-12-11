@@ -30,9 +30,7 @@ extern "C" {
 #include "libavutil/mem.h"
 
 #include "libavcodec/avfft.h"
-//#include "libavcodec/fft.h"
 }
-using FFTComplexArray = FFTSample[2];
 #endif
 
 
@@ -69,7 +67,7 @@ public:
         // create lavc fft buffers
         m_dftL = (FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2);
         m_dftR = (FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2);
-        m_src = (FFTComplexArray*)av_malloc(sizeof(FFTComplex)*m_n*2);
+        m_src  = (FFTComplex*)av_malloc(sizeof(FFTComplex) * m_n * 2);
         // TODO only valid because blocksize is always 8192:
         // (convert blocksize to log_2 (n) instead since FFmpeg only supports sizes that are powers of 2)
         m_fftContextForward = av_fft_init(13, 0);
@@ -448,12 +446,12 @@ private:
 
     // filter the complex source signal and add it to target
     void apply_filter(cfloat *signal, const float *flt, float *target) {
+#ifdef USE_FFTW3
         // filter the signal
         for (unsigned f=0;f<=m_halfN;f++) {
             m_src[f][0] = signal[f].real() * flt[f];
             m_src[f][1] = signal[f].imag() * flt[f];
         }
-#ifdef USE_FFTW3
         // transform into time domain
         fftwf_execute(m_store);
 
@@ -472,27 +470,28 @@ private:
             *pT2++  = *pWnd2++ * *pDst2++;
         }
 #else
-        // enforce odd symmetry
-        for (unsigned f=1;f<m_halfN;f++) {
-            m_src[m_n-f][0] = m_src[f][0];
-            m_src[m_n-f][1] = -m_src[f][1];   // complex conjugate
+        // filter the signal
+        for (unsigned f = 0; f <= m_halfN; f++)
+        {
+            m_src[f].re = signal[f].real() * flt[f];
+            m_src[f].im = signal[f].imag() * flt[f];
         }
-        av_fft_permute(m_fftContextReverse, (FFTComplex*)&m_src[0]);
-        av_fft_calc(m_fftContextReverse, (FFTComplex*)&m_src[0]);
+        // enforce odd symmetry
+        for (unsigned f = 1; f < m_halfN; f++)
+        {
+            m_src[m_n - f].re =  m_src[f].re;
+            m_src[m_n - f].im = -m_src[f].im;   // complex conjugate
+        }
+        av_fft_permute(m_fftContextReverse, m_src);
+        av_fft_calc(m_fftContextReverse, m_src);
 
-        float* pT1   = &target[m_currentBuf*m_halfN];
-        float* pWnd1 = &m_wnd[0];
-        float* pDst1 = &m_src[0][0];
-        float* pT2   = &target[(m_currentBuf^1)*m_halfN];
-        float* pWnd2 = &m_wnd[m_halfN];
-        float* pDst2 = &m_src[m_halfN][0];
         // add the result to target, windowed
-        for (unsigned int k=0;k<m_halfN;k++)
+        for (unsigned int k = 0; k < m_halfN; k++)
         {
             // 1st part is overlap add
-            *pT1++ += *pWnd1++ * *pDst1; pDst1 += 2;
+            target[m_currentBuf * m_halfN + k]      += m_src[k].re * m_wnd[k];
             // 2nd part is set as has no history
-            *pT2++  = *pWnd2++ * *pDst2; pDst2 += 2;
+            target[(m_currentBuf ^ 1) * m_halfN + k] = m_src[m_halfN + k].re * m_wnd[m_halfN + k];
         }
 #endif
     }
@@ -510,7 +509,7 @@ private:
     // intermediate arrays (FFTs of lt & rt, processing source)
     FFTComplex *m_dftL {nullptr};
     FFTComplex *m_dftR {nullptr};
-    FFTComplexArray *m_src  {nullptr};
+    FFTComplex *m_src  {nullptr};
 #endif
     // buffers
     std::vector<cfloat> m_frontL,m_frontR,m_avg,m_surL,m_surR; // the signal (phase-corrected) in the frequency domain
