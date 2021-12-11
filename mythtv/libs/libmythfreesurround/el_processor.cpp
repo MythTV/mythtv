@@ -216,11 +216,11 @@ public:
 
 private:
     // polar <-> cartesian coodinates conversion
-    static inline float amplitude(const float *cf) { return std::sqrt(cf[0]*cf[0] + cf[1]*cf[1]); }
+    static inline float amplitude(const float *cf) { return std::hypot(cf[0], cf[1]); }
     static inline float phase(const float *cf) { return std::atan2(cf[1],cf[0]); }
     static inline cfloat polar(float a, float p) { return {static_cast<float>(a*std::cos(p)),static_cast<float>(a*std::sin(p))}; }
 #ifndef USE_FFTW3
-    static inline float amplitude(FFTComplex z) { return std::sqrt(z.re * z.re + z.im * z.im); }
+    static inline float amplitude(FFTComplex z) { return std::hypot(z.re, z.im); }
     static inline float phase(FFTComplex z) { return std::atan2(z.im, z.re); }
 #endif
     static inline float sqr(float x) { return x*x; }
