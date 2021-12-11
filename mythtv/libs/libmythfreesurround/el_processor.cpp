@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "el_processor.h"
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <complex>
@@ -223,10 +224,8 @@ private:
     static inline float phase(FFTComplex z) { return std::atan2(z.im, z.re); }
 #endif
     static inline float sqr(float x) { return x*x; }
-    // the dreaded min/max
-    static inline float min(float a, float b) { return a<b?a:b; }
-    static inline float max(float a, float b) { return a>b?a:b; }
-    static inline float clamp(float x) { return max(-1,min(1,x)); }
+
+    static inline float clamp(float x) { return std::clamp(x, -1.0F, 1.0F); }
 
     // handle the output buffering for overlapped calls of block_decode
     void add_output(InputBufs input1, InputBufs input2, float center_width, float dimension, float adaption_rate, bool /*result*/=false) {
@@ -313,10 +312,11 @@ private:
                 float right = (1+m_xFs[f])/2;
                 float front = (1+m_yFs[f])/2;
                 float back = (1-m_yFs[f])/2;
-                std::array<float,5> volume {
-                    front * (left * center_width + max(0,-m_xFs[f]) * (1-center_width)),  // left
-                    front * center_level*((1-abs(m_xFs[f])) * (1-center_width)),          // center
-                    front * (right * center_width + max(0, m_xFs[f]) * (1-center_width)), // right
+                std::array<float, 5> volume
+                {
+                    front * (left  * center_width + std::max(0.0F, -m_xFs[f]) * (1.0F - center_width) ), // left
+                    front * center_level * ( (1.0F - std::abs(m_xFs[f])) * (1.0F - center_width) ),      // center
+                    front * (right * center_width + std::max(0.0F,  m_xFs[f]) * (1.0F - center_width) ), // right
                     back * m_surroundLevel * left,                                        // left surround
                     back * m_surroundLevel * right                                        // right surround
                 };
@@ -360,12 +360,13 @@ private:
                 float right = (1+m_xFs[f])/2;
                 float front = (1+m_yFs[f])/2;
                 float back = (1-m_yFs[f])/2;
-                std::array<float,5> volume {
-                    front * (left * center_width + max(0,-m_xFs[f]) * (1-center_width)),      // left
-                    front * center_level*((1-abs(m_xFs[f])) * (1-center_width)),              // center
-                    front * (right * center_width + max(0, m_xFs[f]) * (1-center_width)),     // right
-                    back * m_surroundLevel*max(0,min(1,((1-(m_xFs[f]/m_surroundBalance))/2))),// left surround
-                    back * m_surroundLevel*max(0,min(1,((1+(m_xFs[f]/m_surroundBalance))/2))) // right surround
+                std::array<float, 5> volume
+                {
+                    front * (left  * center_width + std::max(0.0F, -m_xFs[f]) * (1.0F-center_width)), // left
+                    front * center_level * ( (1.0F - std::abs(m_xFs[f])) * (1.0F - center_width) ),   // center
+                    front * (right * center_width + std::max(0.0F,  m_xFs[f]) * (1.0F-center_width)), // right
+                    back * m_surroundLevel * std::clamp( (1.0F - (m_xFs[f] / m_surroundBalance) ) / 2.0F, 0.0F, 1.0F),// left surround
+                    back * m_surroundLevel * std::clamp( (1.0F + (m_xFs[f] / m_surroundBalance) ) / 2.0F, 0.0F, 1.0F) // right surround
                 };
 
                 // adapt the prior filter
