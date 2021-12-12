@@ -204,10 +204,10 @@ QFileInfo V2Content::GetImageFile( const QString &sStorageGroup,
     float fAspect = (float)(pImage->width()) / pImage->height();
 
     if ( nWidth == 0 )
-        nWidth = (int)rint(nHeight * fAspect);
+        nWidth = (int)std::rint(nHeight * fAspect);
 
     if ( nHeight == 0 )
-        nHeight = (int)rint(nWidth / fAspect);
+        nHeight = (int)std::rint(nWidth / fAspect);
 
     QImage img = pImage->scaled( nWidth, nHeight, Qt::KeepAspectRatio,
                                 Qt::SmoothTransformation);
@@ -476,10 +476,10 @@ QFileInfo V2Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
         float fAspect = (float)(img.width()) / img.height();
 
         if ( nWidth == 0 || nWidth > img.width() )
-            nWidth = (int)rint(nHeight * fAspect);
+            nWidth = (int)std::rint(nHeight * fAspect);
 
         if ( nHeight == 0 || nHeight > img.height() )
-            nHeight = (int)rint(nWidth / fAspect);
+            nHeight = (int)std::rint(nWidth / fAspect);
 
         img = img.scaled( nWidth, nHeight, Qt::KeepAspectRatio,
                                            Qt::SmoothTransformation);
