@@ -1739,7 +1739,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         items[i].codec_type = AVMEDIA_TYPE_UNKNOWN;
 
     mpegts_cleanup_streams(ts); /* in case someone else removed streams.. */
- 
+
     av_dlog(ts->stream, "PMT: len %i\n", section_len);
     hex_dump_debug(ts->stream, (uint8_t *)section, section_len);
 
@@ -2317,7 +2317,7 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
     /* if we are looking for a particular MPEG program number,
      * and it is not in this PAT indicate this in "pmt_scan_state"
-     * and tell parser it is safe to quit. */ 
+     * and tell parser it is safe to quit. */
     if (ts->req_sid >= 0 && !found)
     {
 #ifdef DEBUG
@@ -2760,7 +2760,7 @@ static int mpegts_read_header(AVFormatContext *s)
 
         /* we don't want any PMT pid filters created on first pass */
         ts->req_sid = -1;
- 
+
         ts->scanning = 1;
         ts->pat_filter =
         mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
@@ -2785,10 +2785,10 @@ static int mpegts_read_header(AVFormatContext *s)
             av_log(ts->stream, AV_LOG_DEBUG, "Tuning to pnum: 0x%x\n",
                    ts->prg[i].id);
 #endif
-            
+
             /* now find the info for the first service if we found any,
                otherwise try to filter all PATs */
-            
+
             avio_seek(pb, pos, SEEK_SET);
             ts->req_sid = sid = ts->prg[i].id;
             handle_packets(ts, probesize / ts->raw_packet_size);
