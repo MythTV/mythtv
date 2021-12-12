@@ -112,9 +112,11 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
     {
         LOG(VB_HTTP, LOG_DEBUG, QString("Looking for serialiser for '%1'").arg(mime));
         for (const auto & jsontype : s_jsonTypes)
+        {
             if (const auto & alias = jsontype.Aliases().indexOf(mime); alias >= 0)
                 if (MythJSONSerialiser json(Name, Value); json.Result() != nullptr)
                     return WrapData(json.Result(), jsontype, jsontype.Aliases().at(alias));
+        }
 
         if (const auto & alias = s_xmlType.Aliases().indexOf(mime); alias >= 0)
             if (MythXMLSerialiser xml(Name, Value); xml.Result() != nullptr)

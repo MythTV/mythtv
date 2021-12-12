@@ -199,6 +199,7 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
 
     // Cleanup
     for (size_t i = 0; i < typecount; ++i)
+    {
         if ((param[i] != nullptr) && (types[i] != 0))
         {
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
@@ -207,6 +208,7 @@ HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
             QMetaType(types[i]).destroy(param[i]);
 #endif
         }
+    }
 
     // Return the previous error
     if (count != typecount)
