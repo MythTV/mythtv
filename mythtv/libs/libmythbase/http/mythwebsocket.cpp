@@ -502,7 +502,6 @@ void MythWebSocket::CloseReceived(DataPayload Payload)
 {
     m_closeReceived = true;
 
-    auto reply = Payload;
     WSErrorCode close = WSCloseNormal;
 
     // Incoming payload must be empty or be at least 2 bytes in size
