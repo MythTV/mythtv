@@ -154,7 +154,8 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
 
     auto payload = QDomDocument();
     QString err_msg;
-    int err_line, err_col;
+    int err_line {-1};
+    int err_col {-1};
     if (!payload.setContent(static_cast<QByteArray>(Request->m_content->constData()),
                             true, &err_msg, &err_line, &err_col))
     {

@@ -162,7 +162,7 @@ V2BackendStatus*  V2Status::GetBackendStatus()
     FillFrontendList(pStatus->GetFrontends(), pStatus,
                                         false);  // OnLine)
     // Backends
-    V2Backend *backend;
+    V2Backend *backend {nullptr};
 
     // Add this host
     backend = pStatus->AddNewBackend();
