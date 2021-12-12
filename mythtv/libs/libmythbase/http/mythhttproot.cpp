@@ -33,7 +33,7 @@ HTTPResponse MythHTTPRoot::RedirectRoot(HTTPRequest2 Request, const QString &Fil
         Request->m_fileName = INDEX;
     if (Request->m_fileName != INDEX)
         return result;
-    Request->m_allowed = HTTP_DEFAULT_ALLOWED | HTTPPut | HTTPDelete | HTTPPost;
+    Request->m_allowed = HTTP_DEFAULT_ALLOWED | HTTPPut | HTTPDelete;
 
     result = MythHTTPResponse::HandleOptions(Request);
     if (result)
