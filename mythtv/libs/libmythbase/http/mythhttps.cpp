@@ -24,19 +24,19 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
 
     auto availableCiphers = QSslConfiguration::supportedCiphers();
     QList<QSslCipher> secureCiphers;
-    for (auto it = availableCiphers.begin(); it != availableCiphers.end(); ++it)
+    for (const auto & cipher : qAsConst(availableCiphers))
     {
         // Remove weak ciphers from the cipher list
-        if ((*it).usedBits() < 128)
+        if (cipher.usedBits() < 128)
             continue;
 
-        if ((*it).name().startsWith("RC4") || // Weak cipher
-            (*it).name().startsWith("EXP") || // Weak authentication
-            (*it).name().startsWith("ADH") || // No authentication
-            (*it).name().contains("NULL"))    // No encryption
+        if (cipher.name().startsWith("RC4") || // Weak cipher
+            cipher.name().startsWith("EXP") || // Weak authentication
+            cipher.name().startsWith("ADH") || // No authentication
+            cipher.name().contains("NULL"))    // No encryption
             continue;
 
-        secureCiphers.append(*it);
+        secureCiphers.append(cipher);
     }
     Config.setCiphers(secureCiphers);
 

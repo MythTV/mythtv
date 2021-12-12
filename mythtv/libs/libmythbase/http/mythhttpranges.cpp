@@ -100,9 +100,9 @@ HTTPMulti MythHTTPRanges::HandleRangeWrite(HTTPVariant Data, int64_t Available, 
     HTTPContents& headers = data ? (*data)->m_multipartHeaders : (*file)->m_multipartHeaders;
 
     uint64_t    oldsum = 0;
-    for (size_t i = 0; i < ranges.size(); ++i)
+    for (auto range : ranges)
     {
-        uint64_t newsum = sumrange(oldsum, ranges[i]);
+        uint64_t newsum = sumrange(oldsum, range);
         if (oldsum <= written && written < newsum)
         {
             // This is the start of a multipart range. Add the start headers.
@@ -116,7 +116,7 @@ HTTPMulti MythHTTPRanges::HandleRangeWrite(HTTPVariant Data, int64_t Available, 
             ToWrite = std::min(Available, static_cast<int64_t>(newsum - written));
 
             // We need to ensure we send from the correct offset in the data
-            Offset = static_cast<int64_t>(ranges[i].first - oldsum);
+            Offset = static_cast<int64_t>(range.first - oldsum);
             if (file)
                 Offset += written;
 
