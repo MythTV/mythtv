@@ -107,7 +107,7 @@ void MythWebSocket::Read()
             m_currentFrame = MythWebSocketFrame::CreateFrame(m_socket->read(2));
             auto code = m_currentFrame->m_opCode;
             bool control = (code & 0x8) != 0;
-            bool fragmented = (m_dataFragments.size() > 0) || (m_string.get() != nullptr);
+            bool fragmented = (!m_dataFragments.empty()) || (m_string.get() != nullptr);
             bool final = m_currentFrame->m_final;
 
             // Invalid use of reserved bits
