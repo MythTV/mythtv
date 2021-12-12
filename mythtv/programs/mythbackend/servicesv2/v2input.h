@@ -28,9 +28,9 @@ class V2Input : public QObject
     SERVICE_PROPERTY2( QString    , InputName      )
     SERVICE_PROPERTY2( QString    , DisplayName    )
     SERVICE_PROPERTY2( bool       , QuickTune      )
-    SERVICE_PROPERTY2( uint       , RecPriority    )
-    SERVICE_PROPERTY2( uint       , ScheduleOrder  )
-    SERVICE_PROPERTY2( uint       , LiveTVOrder    );
+    SERVICE_PROPERTY2( int        , RecPriority    )
+    SERVICE_PROPERTY2( int        , ScheduleOrder  )
+    SERVICE_PROPERTY2( int        , LiveTVOrder    );
 
     public:
 
