@@ -883,7 +883,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
                    "Invalid stream index.\n");
 
         st = s->streams[pkt->stream_index];
-        
+
         if (!st)
             return -1;
 
@@ -962,7 +962,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
     if (!st || !st->codecpar)
         return;
-    
+
     switch (st->codecpar->codec_type) {
     case AVMEDIA_TYPE_VIDEO:
         if (st->r_frame_rate.num && !pc && s->iformat) {

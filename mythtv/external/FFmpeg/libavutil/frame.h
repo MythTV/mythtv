@@ -623,14 +623,14 @@ typedef struct AVFrame {
      */
     int channels;
 
-    /** ATSC CC data CEA-608/708 
+    /** ATSC CC data CEA-608/708
      * - encoding: unused
      * - decoding: Set by libavcodec
      */
     uint8_t atsc_cc_buf[1024];
     int atsc_cc_len;
 
-    /** SCTE CC data CEA-608 
+    /** SCTE CC data CEA-608
      * - encoding: unused
      * - decoding: Set by libavcodec
      */
