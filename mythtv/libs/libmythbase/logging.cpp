@@ -408,7 +408,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
         QString timestamp = item->getTimestampUs();
         char shortname = item->getLevelChar();
 
-#ifndef NDEBUG
+#ifdef MYTH_DEBUG
         if (item->tid())
         {
             line = qPrintable(QString("%1 %2 [%3/%4] %5 %6:%7:%8  %9\n")
@@ -432,11 +432,11 @@ bool LoggerThread::logConsole(LoggingItem *item) const
                      item->m_function,
                      item->m_message));
         }
-#else
+#else // !MYTH_DEBUG
         line = qPrintable(QString("%1 %2  %3\n")
                           .arg(timestamp, QString(shortname),
                                item->m_message));
-#endif
+#endif // MYTH_DEBUG
     }
 
     (void)write(1, line.data(), line.size());
@@ -469,14 +469,14 @@ bool LoggerThread::logConsole(LoggingItem *item) const
         aprio = ANDROID_LOG_UNKNOWN;
         break;
     }
-#ifndef NDEBUG
+#ifdef MYTH_DEBUG
     __android_log_print(aprio, "mfe", "%s:%d:%s  %s", qPrintable(item->m_file),
                         item->m_line, qPrintable(item->m_function),
                         qPrintable(item->m_message));
-#else
+#else // !MYTH_DEBUG
     __android_log_print(aprio, "mfe", "%s", qPrintable(item->m_message));
-#endif
-#endif
+#endif // MYTH_DEBUG
+#endif // Q_OS_ANDROID
 
     item->DecrRef();
 

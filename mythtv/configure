@@ -5125,6 +5125,7 @@ elif test x$compile_type = x"profile" ; then
     add_cxxflags -DNDEBUG
     check_cxxflags -O2
 elif test x$compile_type = x"debug"; then
+    add_cxxflags -DMYTH_DEBUG
     disable optimizations
 fi
 

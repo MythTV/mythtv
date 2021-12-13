@@ -64,7 +64,7 @@ MythDB *GetMythTestDB(const QString& testname)
     DatabaseParams params {};
     params.m_dbHostName = "localhost";
     params.m_dbHostPing = false;
-#ifndef NDEBUG
+#ifdef MYTH_DEBUG
     params.m_dbName =
         QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
         QDir::separator() +
