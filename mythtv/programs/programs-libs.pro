@@ -16,7 +16,7 @@ win32-msvc* {
   INCLUDEPATH += ../../external/libmythdvdnav/dvdread
 }
 
-!using_libbluray_external:INCLUDEPATH += ../../external/libmythbluray/src
+!using_system_libbluray:INCLUDEPATH += ../../external/libmythbluray/src
 INCLUDEPATH += ../../libs/libmythtv/mpeg
 INCLUDEPATH += ../../libs/libmythtv/vbitext
 INCLUDEPATH += ../../libs/libmythservicecontracts
@@ -67,7 +67,8 @@ using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -lhdhomerun
 using_taglib: LIBS += $$CONFIG_TAGLIB_LIBS
 
-!using_libexiv2_external {
+using_system_libbluray: DEFINES += HAVE_LIBBLURAY
+!using_system_libexiv2 {
     LIBS += -L../../external/libexiv2 -lmythexiv2-0.28 -lexpat
     freebsd: LIBS += -lprocstat -liconv
     darwin: LIBS += -liconv -lz

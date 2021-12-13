@@ -14,7 +14,7 @@ INCLUDEPATH += ./src
 INCLUDEPATH += ./src/libbluray
 INCLUDEPATH += ./src/libbluray/bdnav
 
-using_libudfread_external: {
+using_system_libudfread: {
     DEFINES += HAVE_LIBUDFREAD
     QMAKE_CFLAGS += $$LIBUDFREAD_CFLAGS
     LIBS         += $$LIBUDFREAD_LIBS

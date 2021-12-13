@@ -2,15 +2,15 @@ include ../config.mak
 
 SUBDIRS = FFmpeg libmythdvdnav
 
-ifneq ($(CONFIG_LIBEXIV2_EXTERNAL),yes)
+ifneq ($(CONFIG_SYSTEM_LIBEXIV2),yes)
     SUBDIRS += libexiv2
 endif
 
-ifneq ($(CONFIG_LIBBLURAY_EXTERNAL),yes)
+ifneq ($(CONFIG_SYSTEM_LIBBLURAY),yes)
     SUBDIRS += libmythbluray
 endif
 
-ifneq ($(CONFIG_LIBUDFREAD_EXTERNAL),yes)
+ifneq ($(CONFIG_SYSTEM_LIBUDFREAD),yes)
     SUBDIRS += libudfread
 endif
 

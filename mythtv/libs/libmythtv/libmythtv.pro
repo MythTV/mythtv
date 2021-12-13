@@ -354,17 +354,19 @@ using_frontend {
     HEADERS += Bluray/mythbdoverlayscreen.h
     SOURCES += Bluray/mythbdoverlayscreen.cpp
 }
-!using_libbluray_external {
+!using_system_libbluray {
     INCLUDEPATH += ../../external/libmythbluray/src
     DEPENDPATH += ../../external/libmythbluray
     LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
     !win32-msvc*:POST_TARGETDEPS += ../../external/libmythbluray/libmythbluray-$${MYTH_LIB_EXT}
+} else {
+    DEFINES += HAVE_LIBBLURAY
 }
-using_libbluray_external:mingw {
+using_system_libbluray:mingw {
     LIBS += -lbluray
 }
 
-using_libbluray_external:android {
+using_system_libbluray:android {
     LIBS += -lbluray -lxml2
 }
 

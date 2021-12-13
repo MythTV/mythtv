@@ -1,14 +1,17 @@
 #ifndef MYTHBDINFO_H
 #define MYTHBDINFO_H
 
+#ifdef HAVE_LIBBLURAY
+#include <libbluray/bluray.h>
+#else
+#include "libbluray/bluray.h"
+#endif
+
 // Qt
 #include <QCoreApplication>
 
 // MythTV
 #include "mythtvexp.h"
-
-// BluRay
-#include "libbluray/bluray.h"
 
 class MTV_PUBLIC MythBDInfo
 {

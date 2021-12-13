@@ -3,7 +3,6 @@
 #include <QCryptographicHash>
 
 // MythTV
-#include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythdirs.h"
 #include "mythcdrom.h"
@@ -15,11 +14,12 @@
 #include <fcntl.h>
 
 // BluRay
-#include "libbluray/bluray.h"
-#if CONFIG_LIBBLURAY_EXTERNAL
-#include "libbluray/log_control.h"
-#include "libbluray/meta_data.h"
+#ifdef HAVE_LIBBLURAY
+#include <libbluray/bluray.h>
+#include <libbluray/log_control.h>
+#include <libbluray/meta_data.h>
 #else
+#include "libbluray/bluray.h"
 #include "util/log_control.h"
 #include "libbluray/bdnav/meta_data.h"
 #endif

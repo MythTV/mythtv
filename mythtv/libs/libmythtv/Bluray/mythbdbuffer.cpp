@@ -26,16 +26,17 @@
 #include <fcntl.h>
 
 // BluRay
-#if CONFIG_LIBBLURAY_EXTERNAL
-#include "libbluray/log_control.h"
-#include "libbluray/meta_data.h"
-#include "libbluray/overlay.h"
+#ifdef HAVE_LIBBLURAY
+#include <libbluray/log_control.h>
+#include <libbluray/meta_data.h>
+#include <libbluray/overlay.h>
+#include <libbluray/keys.h>
 #else
 #include "util/log_control.h"
 #include "libbluray/bdnav/meta_data.h"
 #include "libbluray/decoders/overlay.h"
-#endif
 #include "libbluray/keys.h"
+#endif
 
 #define LOC QString("BDBuffer: ")
 
