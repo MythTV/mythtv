@@ -5128,6 +5128,34 @@ elif test x$compile_type = x"debug"; then
     disable optimizations
 fi
 
+if [ -z "$optflags" ]; then
+    if enabled small; then
+        optflags=$cflags_size
+    elif enabled optimizations; then
+        optflags=$cflags_speed
+    else
+        optflags=$cflags_noopt
+    fi
+fi
+
+check_optflags(){
+    check_cflags "$@"
+    enabled lto && check_ldflags "$@"
+}
+
+check_optflags $optflags
+check_optflags -fno-math-errno
+check_optflags -fno-signed-zeros
+
+if enabled lto; then
+    test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
+    check_cflags  -flto
+    check_cxxflags -flto
+    check_ldflags -flto $cpuflags
+    disable inline_asm_direct_symbol_refs
+fi
+
+
 enabled silent_cc && append CCONFIG "silent"
 
 disabled optimizations || enabled ossfuzz || check_cflags -fomit-frame-pointer
@@ -6308,16 +6336,6 @@ EOF
     fi
 fi
 
-if [ -z "$optflags" ]; then
-    if enabled small; then
-        optflags=$cflags_size
-    elif enabled optimizations; then
-        optflags=$cflags_speed
-    else
-        optflags=$cflags_noopt
-    fi
-fi
-
 if [ -z "$nvccflags" ]; then
     nvccflags=$nvccflags_default
 fi
@@ -6328,22 +6346,6 @@ else
     nvccflags="$nvccflags -m32"
 fi
 
-check_optflags(){
-    check_cflags "$@"
-    enabled lto && check_ldflags "$@"
-}
-
-check_optflags $optflags
-check_optflags -fno-math-errno
-check_optflags -fno-signed-zeros
-
-if enabled lto; then
-    test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
-    check_cflags  -flto
-    check_cxxflags -flto
-    check_ldflags -flto $cpuflags
-    disable inline_asm_direct_symbol_refs
-fi
 
 if enabled dvb; then
     [ -d "$dvb_path" ] || dvb_path="${sysroot}/usr/include"
@@ -6710,15 +6712,7 @@ if test $target_os = darwin; then
     fi
 fi
 
-if [ -n "$optflags" ]; then
-    add_cflags $optflags
-elif enabled small; then
-    add_cflags $cflags_size
-elif enabled optimizations; then
-    add_cflags $cflags_speed
-else
-    add_cflags $cflags_noopt
-fi
+
 check_cflags -fno-math-errno
 check_cflags -fno-signed-zeros
 check_cc -mno-red-zone <<EOF && noredzone_flags="-mno-red-zone"
