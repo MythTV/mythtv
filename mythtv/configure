@@ -6293,8 +6293,6 @@ if test $target_os = darwin; then
 fi
 
 
-check_cflags -fno-math-errno
-check_cflags -fno-signed-zeros
 check_cc -mno-red-zone <<EOF && noredzone_flags="-mno-red-zone"
 int x;
 EOF
