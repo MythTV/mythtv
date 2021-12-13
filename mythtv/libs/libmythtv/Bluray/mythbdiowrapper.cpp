@@ -1,5 +1,3 @@
-// Qt
-#include "mythconfig.h"
 #include "mythlogging.h"
 #include "io/mythiowrapper.h"
 #include "Bluray/mythbdiowrapper.h"
@@ -12,8 +10,8 @@
 #include <sys/types.h>
 
 // Bluray
-#if CONFIG_LIBBLURAY_EXTERNAL
-#include "libbluray/filesystem.h"
+#ifdef HAVE_LIBBLURAY
+#include <libbluray/filesystem.h>
 #else
 #include "file/filesystem.h"
 #endif

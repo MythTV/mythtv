@@ -2001,9 +2001,9 @@ MYTHTV_CONFIG_LIST='
     v4l2prime
     valgrind
     x11
-    libexiv2_external
-    libbluray_external
-    libudfread_external
+    system_libexiv2
+    system_libbluray
+    system_libudfread
     systemd_notify
     systemd_journal
     drm
@@ -2799,9 +2799,9 @@ enable libfftw3
 enable taglib
 enable systemd_notify
 enable systemd_journal
-enable libexiv2_external
-enable libbluray_external
-enable libudfread_external
+enable system_libexiv2
+enable system_libbluray
+enable system_libudfread
 enable waylandextras
 
 # mythtv paths
@@ -5877,11 +5877,11 @@ fi
 enabled libudev && check_lib udev libudev.h udev_new -ludev || disable libudev
 
 # libexiv2
-if enabled libexiv2_external ; then
+if enabled system_libexiv2 ; then
     if $(pkg-config --atleast-version="0.27.99" exiv2); then
         use_pkg_config exiv2 exiv2 exiv2/exiv2.hpp versionNumber
     elif [ $target_os != "android" ] ; then
-        disable libexiv2_external
+        disable system_libexiv2
     fi
 fi
 
@@ -5899,16 +5899,16 @@ if [ $target_os = "linux" ] ; then
 fi
 
 # libudfread
-if enabled libudfread_external ; then
+if enabled system_libudfread ; then
     if $(pkg-config --atleast-version="1.1.1" libudfread); then
         use_pkg_config libudfread libudfread udfread/udfread.h udfread_init
     else
-        disable libudfread_external
+        disable system_libudfread
     fi
 fi
 
 # libmythbluray!
-if enabled libbluray_external; then
+if enabled system_libbluray; then
     if $(pkg-config --atleast-version="0.9.3" libbluray); then
         use_pkg_config libbluray libbluray libbluray/bluray.h bd_open
     else
@@ -5941,7 +5941,7 @@ if enabled libbluray_external; then
                         die "ERROR: can not find libbluray."
                         ;;
                 esac
-                disable libbluray_external
+                disable system_libbluray
                 ;;
             *)
                 # FreeBSD provides libbluray 1.0.2
@@ -6457,7 +6457,7 @@ if enabled systemd_journal ; then
 fi
 
 # Check that all MythTV build "requirements" are met:
-if enabled libexiv2_external ; then
+if enabled system_libexiv2 ; then
     if ! $(pkg-config --exists exiv2) ; then
        die "ERROR! You must have the Exiv2 image tag reader library installed to compile MythTV."
     fi
@@ -7538,17 +7538,17 @@ fi
 echo "libdns_sd (Bonjour)       ${libdns_sd-no}"
 echo "libcrypto                 ${libcrypto-no}"
 echo "gnutls                    ${gnutls-no}"
-if enabled libexiv2_external; then
+if enabled system_libexiv2; then
     echo "exiv2 support             yes (system)"
 else
     echo "exiv2 support             yes (internal)"
 fi
-if enabled libudfread_external; then
+if enabled system_libudfread; then
     echo "udfread support           yes (system)"
 else
     echo "udfread support           yes (internal)"
 fi
-if enabled libbluray_external; then
+if enabled system_libbluray; then
     echo "bluray support            yes (system)"
 else
     echo "bluray support            yes (internal)"
@@ -7797,7 +7797,7 @@ if enabled waylandextras; then
     echo "LIBWAYLAND_CFLAGS=$($pkg_config --cflags $pkg_config_flags wayland-client)" >> $TMPMAK
 fi
 
-if enabled libudfread_external; then
+if enabled system_libudfread; then
     # from check_pkg_config via use_pkg_config above
     echo "LIBUDFREAD_CFLAGS=$libudfread_cflags" >> $TMPMAK
     echo "LIBUDFREAD_LIBS=$libudfread_extralibs" >> $TMPMAK
@@ -8021,17 +8021,17 @@ if [ -e libs/libmyth/mythconfig.h ] ; then
     rm -f libs/libmyth/mythconfig.h
 fi
 
-if ! enabled libudfread_external; then
+if ! enabled system_libudfread; then
     echo "Configuring libudfread..."
     (cd external/libudfread ; \
            ${qmakeconf} -o Makefile)
 fi
-if ! enabled libbluray_external; then
+if ! enabled system_libbluray; then
     echo "Configuring libmythbluray..."
     (cd external/libmythbluray ; \
            ${qmakeconf} -o Makefile)
 fi
-if ! enabled libexiv2_external; then
+if ! enabled system_libexiv2; then
     echo "Configuring libexiv2..."
     (cd external/libexiv2 ; \
            ${qmakeconf} -o Makefile)

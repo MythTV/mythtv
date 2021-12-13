@@ -246,7 +246,7 @@ QT += xml sql network widgets
 
 include ( ../libs-targetfix.pro )
 
-using_libudfread_external: {
+using_system_libudfread: {
     DEFINES += HAVE_LIBUDFREAD
     QMAKE_CXXFLAGS += $$LIBUDFREAD_CFLAGS
     LIBS           += $$LIBUDFREAD_LIBS

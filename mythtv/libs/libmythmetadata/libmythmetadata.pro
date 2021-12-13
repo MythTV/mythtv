@@ -62,7 +62,7 @@ LIBS += -L../libmyth              -lmyth-$${LIBVERSION}
 LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
 
-!using_libexiv2_external {
+!using_system_libexiv2 {
     darwin {
         QMAKE_CXXFLAGS = "-I../../external/libexiv2/include" $${QMAKE_CXXFLAGS}
     } else {
@@ -72,13 +72,15 @@ LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
     LIBS += -L../../external/libexiv2 -lmythexiv2-0.28
 }
 
-!using_libbluray_external {
+!using_system_libbluray {
     INCLUDEPATH += ../../external/libmythbluray/src
     DEPENDPATH += ../../external/libmythbluray
     LIBS += -L../../external/libmythbluray     -lmythbluray-$${LIBVERSION}
+} else {
+    DEFINES += HAVE_LIBBLURAY
 }
 
-using_libbluray_external:android {
+using_system_libbluray:android {
     LIBS += -lbluray -lxml2
 }
 
@@ -143,7 +145,7 @@ INCLUDEPATH += $$POSTINC
 include ( ../libs-targetfix.pro )
 
 LIBS += $$EXTRA_LIBS $$LATE_LIBS
-using_libexiv2_external {
+using_system_libexiv2 {
     LIBS += -lexiv2
 }
 

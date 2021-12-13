@@ -4,14 +4,12 @@
 // Qt
 #include <QImage>
 
-// MythTV
-#include "mythconfig.h"
-
 // BluRay
-#include "libbluray/bluray.h"
-#if CONFIG_LIBBLURAY_EXTERNAL
-#include "libbluray/overlay.h"
+#ifdef HAVE_LIBBLURAY
+#include <libbluray/bluray.h>
+#include <libbluray/overlay.h>
 #else
+#include "libbluray/bluray.h"
 #include "libbluray/decoders/overlay.h"
 #endif
 
