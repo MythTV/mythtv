@@ -440,7 +440,6 @@ QDomElement MythWSDL::CreateMethodType( HTTPMethodPtr handler,
         // Parameters
         // Iterate over the method's parameters
         size_t count = 1;
-        QString error;
         QList<QByteArray> paramNames;
         QList<QByteArray> paramTypes;
         for (count=1; count < typecount; count++)

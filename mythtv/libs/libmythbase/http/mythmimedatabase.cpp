@@ -44,7 +44,6 @@ class MythMimeDatabasePriv
 
     MythMimeType MimeTypeForName(const QString& Name) const
     {
-        auto name = Name.trimmed();
         auto found = std::find_if(m_mimes.cbegin(), m_mimes.cend(),
             [&Name](const auto & Mime) { return Name.compare(Mime.Name(), Qt::CaseInsensitive) == 0; });
         if (found != m_mimes.cend())
