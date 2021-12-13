@@ -24,7 +24,6 @@ macx {
 }
 
 using_x11:DEFINES += USING_X11
-using_xrandr:DEFINES += USING_XRANDR
 using_opengl:DEFINES += USING_OPENGL
 using_vdpau:DEFINES += USING_VDPAU
 using_vaapi:using_opengl:DEFINES += USING_VAAPI
