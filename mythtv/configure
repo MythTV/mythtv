@@ -2012,6 +2012,7 @@ MYTHTV_LIST='
     silent_cc
     symbol_visibility
     deprecation_warnings
+    ffmpeg_warnings
 '
 
 USING_LIST='
@@ -2761,6 +2762,7 @@ enable opengl
 enable egl
 enable symbol_visibility
 enable deprecation_warnings
+disable ffmpeg_warnings
 enable v4l2
 enable v4l2prime
 enable x11
@@ -7265,7 +7267,11 @@ if enabled lto; then
     ffopts="$ffopts --enable-lto"
 fi
 
-ffmpeg_extra_cflags="$extra_cflags -w"
+ffmpeg_extra_cflags="$extra_cflags"
+if disabled ffmpeg_warnings; then
+    ffmpeg_extra_cflags="$ffmpeg_extra_cflags -w"
+fi
+
 if test "$ID" = "raspbian"; then
     case $cpu in
         armv*) ffmpeg_extra_ldflags="$ffmpeg_extra_libs -latomic" ;;
