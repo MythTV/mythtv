@@ -5114,19 +5114,17 @@ if test $target_os = android ; then
     append CONFIG_INCLUDEPATH $sysinclude "${sysroot}${prefix}"
 fi
 
+enable debug
 append CCONFIG "$compile_type"
 if test x$compile_type = x"release" ; then
     add_cflags   -DNDEBUG
     add_cxxflags -DNDEBUG
     check_cxxflags -O2
-    enable debug
 elif test x$compile_type = x"profile" ; then
     add_cflags   -DNDEBUG
     add_cxxflags -DNDEBUG
     check_cxxflags -O2
-    enable debug
 elif test x$compile_type = x"debug"; then
-    enable debug
     disable optimizations
 fi
 
