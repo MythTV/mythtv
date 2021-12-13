@@ -305,7 +305,7 @@ bool MythFrontendService::PlayRecording(int RecordedId, int ChanId, const QDateT
             .arg(ChanId).arg(starttime.toString(Qt::ISODate)));
 
         QString message = QString("NETWORK_CONTROL PLAY PROGRAM %1 %2 %3")
-            .arg(ChanId).arg(starttime.toString("yyyyMMddhhmmss")).arg("12345");
+            .arg(ChanId).arg(starttime.toString("yyyyMMddhhmmss"), "12345");
 
         MythEvent me(message);
         gCoreContext->dispatch(me);

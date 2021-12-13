@@ -16,7 +16,7 @@
 #define LOC QString("HTTPResp: ")
 
 #define HEADER(KEY,VAL) { \
-    QByteArray val = QString("%1: %2\r\n").arg(KEY).arg(VAL).toUtf8(); \
+    QByteArray val = QString("%1: %2\r\n").arg(KEY, VAL).toUtf8(); \
     m_responseHeaders.emplace_back(MythHTTPData::Create(val)); \
 }
 
@@ -192,8 +192,8 @@ HTTPResponse MythHTTPResponse::HandleOptions(HTTPRequest2 Request)
     if ((Request->m_type & Request->m_allowed) != Request->m_type)
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + QString("'%1' is not allowed for '%2' (Allowed: %3)")
-            .arg(MythHTTP::RequestToString(Request->m_type)).arg(Request->m_fileName)
-            .arg(MythHTTP::AllowedRequestsToString(Request->m_allowed)));
+            .arg(MythHTTP::RequestToString(Request->m_type), Request->m_fileName,
+                 MythHTTP::AllowedRequestsToString(Request->m_allowed)));
         Request->m_status = HTTPMethodNotAllowed;
         return MythHTTPResponse::ErrorResponse(Request);
     }
@@ -288,8 +288,8 @@ void MythHTTPResponse::AddDefaultHeaders()
     if (!range.isEmpty())
         MythHTTPRanges::HandleRangeRequest(this, range);
 
-    QByteArray def = QString("%1 %2\r\n").arg(MythHTTP::VersionToString(m_version))
-                                         .arg(MythHTTP::StatusToString(m_status)).toUtf8();
+    QByteArray def = QString("%1 %2\r\n").arg(MythHTTP::VersionToString(m_version),
+                                              MythHTTP::StatusToString(m_status)).toUtf8();
     m_responseHeaders.emplace_back(MythHTTPData::Create(def));
     HEADER("Date", MythDate::toString(MythDate::current(), MythDate::kRFC822)) // RFC 822
     HEADER("Server", m_serverName)

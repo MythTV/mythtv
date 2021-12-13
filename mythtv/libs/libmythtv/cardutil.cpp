@@ -3358,7 +3358,7 @@ bool CardUtil::IsSatIPPresent(uint inputid)
         QString deviceId = QString("uuid:%1").arg(devinfo.value(1));
         QString ip = SatIP::findDeviceIP(deviceId);
         LOG(VB_GENERAL, LOG_INFO, QString("SatIP[%1] IP address %2 device %3")
-                    .arg(inputid).arg(ip).arg(device));
+                    .arg(inputid).arg(ip, device));
 
         if (!ping(ip, signal_timeout))
         {

@@ -185,7 +185,7 @@ void MythHTTPEncoding::GetXMLEncodedParameters(MythHTTPRequest* Request)
                 {
                     // TODO: html decode entities if required
                     Request->m_queries.insert(name.trimmed().toLower(), value);
-                    LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(name).arg(value));
+                    LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(name, value));
                 }
             }
         }

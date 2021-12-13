@@ -171,9 +171,9 @@ void MythHTTPServer::Init()
 #else
     struct utsname uname_info {};
     uname(&uname_info);
-    QString server = QStringLiteral("%1/%2").arg(uname_info.sysname).arg(uname_info.release);
+    QString server = QStringLiteral("%1/%2").arg(uname_info.sysname, uname_info.release);
 #endif
-    m_config.m_serverName = QString("MythTV/%1 %2 UPnP/1.0").arg(version).arg(server);
+    m_config.m_serverName = QString("MythTV/%1 %2 UPnP/1.0").arg(version, server);
 
     // Retrieve language
     m_config.m_language = gCoreContext->GetLanguageAndVariant().replace("_", "-");

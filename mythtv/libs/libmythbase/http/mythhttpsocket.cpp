@@ -255,7 +255,7 @@ void MythHTTPSocket::Read()
     if (response == nullptr)
     {
         LOG(VB_HTTP, LOG_INFO, LOC + QString("Processing: path '%1' file '%2'")
-            .arg(rpath).arg(request->m_fileName));
+            .arg(rpath, request->m_fileName));
 
         for (auto & service : m_activeServices)
         {

@@ -49,8 +49,8 @@ void MythHTTPRanges::BuildMultipartHeaders(MythHTTPResponse* Response)
     for (auto & range : ranges)
     {
         auto header = QString("\r\n--%1\r\nContent-Type: %2\r\nContent-Range: %3\r\n\r\n")
-            .arg(s_multipartBoundary).arg(MythHTTP::GetContentType(mime))
-            .arg(MythHTTPRanges::GetRangeHeader(range, size));
+            .arg(s_multipartBoundary, MythHTTP::GetContentType(mime),
+                 MythHTTPRanges::GetRangeHeader(range, size));
         headers.emplace_back(MythHTTPData::Create(qPrintable(header)));
 
     }
