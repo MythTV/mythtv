@@ -29,8 +29,7 @@ class V2TitleInfo : public QObject
     public:
 
         Q_INVOKABLE V2TitleInfo(QObject *parent = nullptr)
-            : QObject            ( parent ),
-              m_Count(0)
+            : QObject( parent )
         {
         }
 

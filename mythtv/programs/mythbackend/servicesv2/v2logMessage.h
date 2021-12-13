@@ -30,17 +30,7 @@ class V2LogMessage : public QObject
     public:
 
         Q_INVOKABLE V2LogMessage(QObject *parent = nullptr)
-            : QObject       ( parent ),
-              m_HostName    (        ),
-              m_Application (        ),
-              m_PID         ( 0      ),
-              m_TID         ( 0      ),
-              m_Thread      (        ),
-              m_Filename    (        ),
-              m_Line        ( 0      ),
-              m_Function    (        ),
-              m_Level       (        ),
-              m_Message     (        )
+            : QObject( parent )
         {
         }
 

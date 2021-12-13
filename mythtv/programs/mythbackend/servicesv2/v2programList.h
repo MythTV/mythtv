@@ -38,10 +38,7 @@ class V2ProgramList : public QObject
     public:
 
         Q_INVOKABLE V2ProgramList(QObject *parent = nullptr)
-            : QObject         ( parent ),
-              m_StartIndex    ( 0      ),
-              m_Count         ( 0      ),
-              m_TotalAvailable( 0      )
+            : QObject( parent )
         {
         }
 

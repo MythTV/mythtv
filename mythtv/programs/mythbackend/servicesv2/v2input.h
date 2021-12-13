@@ -35,14 +35,7 @@ class V2Input : public QObject
     public:
 
         Q_INVOKABLE V2Input(QObject *parent = nullptr)
-            : QObject         ( parent ),
-              m_Id            ( 0      ),
-              m_CardId        ( 0      ),
-              m_SourceId      ( 0      ),
-              m_QuickTune     ( false  ),
-              m_RecPriority   ( 0      ),
-              m_ScheduleOrder ( 0      ),
-              m_LiveTVOrder   ( 0      )
+            : QObject( parent )
         {
         }
 

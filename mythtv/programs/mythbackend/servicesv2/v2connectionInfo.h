@@ -22,10 +22,7 @@ class V2ConnectionInfo : public QObject
   public:
 
     Q_INVOKABLE V2ConnectionInfo(QObject *parent = nullptr)
-                     : QObject        ( parent ),
-                       m_Version      ( nullptr ),
-                       m_Database     ( nullptr ),
-                       m_WOL          ( nullptr )
+        : QObject( parent )
     {
     }
 

@@ -27,9 +27,7 @@ class V2BuildInfo : public QObject
 
         Q_INVOKABLE V2BuildInfo(QObject *parent = nullptr)
             : QObject    ( parent ),
-              m_Version  ( ""     ),
-              m_LibX264  ( false  ),
-              m_LibDNS_SD( false  )
+              m_Version  ( ""     )
         {
         }
 

@@ -31,10 +31,7 @@ class V2RecRuleFilterList : public QObject
     public:
 
         Q_INVOKABLE V2RecRuleFilterList(QObject *parent = nullptr)
-            : QObject          ( parent ),
-              m_StartIndex     ( 0      ),
-              m_Count          ( 0      ),
-              m_TotalAvailable ( 0      )
+            : QObject( parent )
         {
         }
 

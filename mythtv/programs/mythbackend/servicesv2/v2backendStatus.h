@@ -58,13 +58,7 @@ class V2StorageGroup : public QObject
     SERVICE_PROPERTY2(QString, Directory)
     public:
         Q_INVOKABLE V2StorageGroup(QObject *parent = nullptr)
-            : QObject         ( parent ),
-              m_Used (0),
-              m_Free(0),
-              m_Deleted(0),
-              m_Total(0),
-              m_Expirable(0),
-              m_LiveTV(0)
+            : QObject( parent )
         {
         }
     private:
@@ -90,11 +84,7 @@ class V2MachineInfo : public QObject
 
     public:
         Q_INVOKABLE V2MachineInfo(QObject *parent = nullptr)
-            : QObject         ( parent ),
-              m_LoadAvg1 (0.0),
-              m_LoadAvg2 (0.0),
-              m_LoadAvg3 (0.0),
-              m_GuideDays (0)
+            : QObject( parent )
         {
         }
         V2StorageGroup *AddNewStorageGroup()
@@ -135,14 +125,7 @@ class V2Job : public QObject
 
     public:
         Q_INVOKABLE V2Job(QObject *parent = nullptr)
-            : QObject         ( parent ),
-                        m_Id        (0),
-                        m_ChanId    (0),
-                        m_Type      (0),
-                        m_Cmds      (0),
-                        m_Flags     (0),
-                        m_Status    (0),
-                        m_Program   (nullptr)
+            : QObject( parent )
         {
         }
     private:
@@ -178,8 +161,7 @@ class V2BackendStatus : public QObject
 
     public:
         Q_INVOKABLE V2BackendStatus(QObject *parent = nullptr)
-            : QObject(parent),
-              m_MachineInfo(nullptr)
+            : QObject(parent)
         {
         }
         // These are here so that a routine in serviceutil

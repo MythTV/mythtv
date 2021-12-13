@@ -37,14 +37,7 @@ class V2VideoStreamInfo : public QObject
     public:
 
         Q_INVOKABLE V2VideoStreamInfo(QObject *parent = nullptr)
-                        : QObject         ( parent ),
-                          m_Width         ( 0      ),
-                          m_Height        ( 0      ),
-                          m_AspectRatio   ( 0      ),
-                          m_FrameRate     ( 0      ),
-                          m_AvgFrameRate  ( 0      ),
-                          m_Channels      ( 0      ),
-                          m_Duration      ( 0      )
+            : QObject( parent )
         {
         }
 

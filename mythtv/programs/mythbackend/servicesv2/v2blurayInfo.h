@@ -46,27 +46,7 @@ class V2BlurayInfo : public QObject
     public:
 
         Q_INVOKABLE V2BlurayInfo(QObject *parent = nullptr)
-                 : QObject                ( parent    ),
-                   m_Path                 ( QString() ),
-                   m_Title                ( QString() ),
-                   m_AltTitle             ( QString() ),
-                   m_DiscLang             ( QString() ),
-                   m_DiscNum              ( 0         ),
-                   m_TotalDiscNum         ( 0         ),
-                   m_TitleCount           ( 0         ),
-                   m_ThumbCount           ( 0         ),
-                   m_ThumbPath            ( QString() ),
-                   m_TopMenuSupported     ( false     ),
-                   m_FirstPlaySupported   ( false     ),
-                   m_NumHDMVTitles        ( 0         ),
-                   m_NumBDJTitles         ( 0         ),
-                   m_NumUnsupportedTitles ( 0         ),
-                   m_AACSDetected         ( false     ),
-                   m_LibAACSDetected      ( false     ),
-                   m_AACSHandled          ( false     ),
-                   m_BDPlusDetected       ( false     ),
-                   m_LibBDPlusDetected    ( false     ),
-                   m_BDPlusHandled        ( false     )
+            : QObject( parent )
         {
         }
 

@@ -53,22 +53,7 @@ class V2VideoMetadataInfo : public QObject
 
   public:
     Q_INVOKABLE V2VideoMetadataInfo(QObject *parent = nullptr)
-                        : QObject         ( parent ),
-                          m_Id            ( 0      ),
-                          m_Collectionref ( 0      ),
-                          m_UserRating    ( 0      ),
-                          m_ChildID       ( 0      ),
-                          m_Length        ( 0      ),
-                          m_PlayCount     ( 0      ),
-                          m_Season        ( 0      ),
-                          m_Episode       ( 0      ),
-                          m_ParentalLevel ( 0      ),
-                          m_Visible       ( false  ),
-                          m_Watched       ( false  ),
-                          m_Processed     ( false  ),
-                          m_Artwork       ( nullptr ),
-                          m_Cast          ( nullptr ),
-                          m_Genres        ( nullptr )
+            : QObject( parent )
         {
         }
 

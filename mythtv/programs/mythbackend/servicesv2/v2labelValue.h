@@ -24,12 +24,7 @@ class V2LabelValue : public QObject
     public:
 
         Q_INVOKABLE V2LabelValue(QObject *parent = nullptr)
-            : QObject       ( parent ),
-              m_Label       (       ),
-              m_Value       (       ),
-              m_Description (       ),
-              m_Active      ( false ),
-              m_Selected    ( false )
+            : QObject( parent )
         {
         }
 

@@ -17,10 +17,7 @@ class V2WOLInfo : public QObject
     public:
 
         Q_INVOKABLE V2WOLInfo(QObject *parent = nullptr)
-                    : QObject       ( parent ),
-                    m_Enabled       ( false  ),
-                    m_Reconnect     ( 0      ),
-                    m_Retry         ( 0      )
+            : QObject( parent )
         {
         }
 

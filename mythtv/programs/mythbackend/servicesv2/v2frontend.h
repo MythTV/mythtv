@@ -28,8 +28,7 @@ class V2Frontend : public QObject
     public:
 
         Q_INVOKABLE V2Frontend(QObject *parent = nullptr)
-            : QObject         ( parent ),
-            m_Port(0), m_OnLine(false)
+            : QObject( parent )
         {
         }
 

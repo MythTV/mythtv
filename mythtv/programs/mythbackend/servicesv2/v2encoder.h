@@ -42,13 +42,7 @@ class V2Encoder : public QObject
 
         Q_INVOKABLE V2Encoder(QObject *parent = nullptr)
             : QObject         ( parent ),
-              m_Id            ( 0      ),
-              m_Local         ( true   ),
-              m_Connected     ( false  ),
-              m_State         ( 0      ),
-              m_SleepStatus   ( 0      ),
-              m_LowOnFreeSpace( false  ),
-              m_Recording     ( nullptr )
+              m_Local         ( true   )
         {
         }
 

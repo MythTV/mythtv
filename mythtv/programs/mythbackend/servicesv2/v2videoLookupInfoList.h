@@ -39,8 +39,7 @@ class V2VideoLookupList : public QObject
     public:
 
         Q_INVOKABLE V2VideoLookupList(QObject *parent = nullptr)
-            : QObject( parent ),
-              m_Count         ( 0      )
+            : QObject( parent )
         {
         }
 

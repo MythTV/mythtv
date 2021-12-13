@@ -33,10 +33,7 @@ class V2BackendInfo : public QObject
     public:
 
         Q_INVOKABLE V2BackendInfo(QObject *parent = nullptr)
-            : QObject   ( parent  ),
-              m_Build   ( nullptr ),
-              m_Env     ( nullptr ),
-              m_Log     ( nullptr )
+            : QObject( parent )
         {
         }
 

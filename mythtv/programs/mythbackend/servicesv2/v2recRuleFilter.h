@@ -20,8 +20,7 @@ class V2RecRuleFilter : public QObject
     public:
 
         Q_INVOKABLE V2RecRuleFilter(QObject *parent = nullptr)
-            : QObject         ( parent ),
-              m_Id            ( 0      )
+            : QObject( parent )
         {
         }
 

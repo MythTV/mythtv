@@ -22,10 +22,7 @@ class V2DatabaseInfo : public QObject
     public:
 
         Q_INVOKABLE V2DatabaseInfo(QObject *parent = nullptr)
-                       : QObject         ( parent ),
-                       m_Ping            ( false  ),
-                       m_Port            ( 0      ),
-                       m_LocalEnabled    ( false  )
+            : QObject( parent )
         {
         }
 

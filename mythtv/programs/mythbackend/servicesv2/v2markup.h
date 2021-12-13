@@ -30,7 +30,7 @@ class V2Markup : public QObject
     public:
 
         Q_INVOKABLE V2Markup(QObject *parent = nullptr)
-            : QObject(parent), m_Frame(0)
+            : QObject(parent)
         {
         }
 

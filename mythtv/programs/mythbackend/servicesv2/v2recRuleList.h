@@ -27,10 +27,7 @@ class V2RecRuleList : public QObject
     public:
 
         Q_INVOKABLE V2RecRuleList(QObject *parent = nullptr)
-            : QObject          ( parent ),
-              m_StartIndex     ( 0      ),
-              m_Count          ( 0      ),
-              m_TotalAvailable ( 0      )
+            : QObject( parent )
         {
         }
 

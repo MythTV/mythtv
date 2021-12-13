@@ -38,12 +38,7 @@ class V2MusicMetadataInfoList : public QObject
     public:
 
         Q_INVOKABLE V2MusicMetadataInfoList(QObject *parent = nullptr)
-            : QObject( parent ),
-              m_StartIndex    ( 0      ),
-              m_Count         ( 0      ),
-              m_CurrentPage   ( 0      ),
-              m_TotalPages    ( 0      ),
-              m_TotalAvailable( 0      )
+            : QObject( parent )
         {
         }
 

@@ -50,15 +50,10 @@ class V2RecordingInfo : public QObject
 
         Q_INVOKABLE V2RecordingInfo(QObject *parent = nullptr)
             : QObject           ( parent             ),
-              m_RecordedId      ( 0                  ),
               m_Status          ( RecStatus::Unknown ),
-              m_Priority        ( 0                  ),
-              m_FileSize        ( 0                  ),
-              m_RecordId        ( 0                  ),
               m_RecType         ( kNotRecording      ),
               m_DupInType       ( kDupsInRecorded    ),
-              m_DupMethod       ( kDupCheckNone      ),
-              m_EncoderId       ( 0                  )
+              m_DupMethod       ( kDupCheckNone      )
         {
         }
 

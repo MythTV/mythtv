@@ -18,12 +18,7 @@ class V2StorageGroupDir : public QObject
 
   public:
     Q_INVOKABLE V2StorageGroupDir(QObject *parent = nullptr)
-                      : QObject         ( parent ),
-                      m_Id            ( 0      ),
-                      m_DirRead       ( false  ),
-                      m_DirWrite      ( false  ),
-                      m_KiBFree       ( 0      )
-
+            : QObject( parent )
         {
         }
 

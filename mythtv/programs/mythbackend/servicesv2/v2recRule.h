@@ -65,32 +65,7 @@ class  V2RecRule : public QObject
     public:
 
         Q_INVOKABLE V2RecRule(QObject *parent = nullptr)
-            : QObject         ( parent ),
-              m_Id            ( 0      ),
-              m_ParentId      ( 0      ),
-              m_Inactive      ( false  ),
-              m_Season        ( 0      ),
-              m_Episode       ( 0      ),
-              m_ChanId        ( 0      ),
-              m_FindDay       ( 0      ),
-              m_RecPriority   ( 0      ),
-              m_PreferredInput( 0      ),
-              m_StartOffset   ( 0      ),
-              m_EndOffset     ( 0      ),
-              m_NewEpisOnly   ( false  ),
-              m_Filter        ( 0      ),
-              m_AutoExpire    ( false  ),
-              m_MaxEpisodes   ( 0      ),
-              m_MaxNewest     ( false  ),
-              m_AutoCommflag  ( false  ),
-              m_AutoTranscode ( false  ),
-              m_AutoMetaLookup( false  ),
-              m_AutoUserJob1  ( false  ),
-              m_AutoUserJob2  ( false  ),
-              m_AutoUserJob3  ( false  ),
-              m_AutoUserJob4  ( false  ),
-              m_Transcoder    ( 0      ),
-              m_AverageDelay  ( 0      )
+            : QObject( parent )
         {
         }
 

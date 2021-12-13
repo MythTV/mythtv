@@ -69,18 +69,10 @@ class V2CaptureCard : public QObject
     public:
 
         Q_INVOKABLE V2CaptureCard(QObject *parent = nullptr)
-            : QObject         ( parent ), m_CardId(0), m_ParentId(0),
-            m_AudioRateLimit(0), m_DVBSWFilter(0),
-            m_DVBSatType(0), m_DVBWaitForSeqStart(false),
-            m_SkipBTAudio(false), m_DVBOnDemand(false),
-            m_DVBDiSEqCType(0), m_FirewireSpeed(0),
-            m_FirewireConnection(0), m_SignalTimeout(1000),
-            m_ChannelTimeout(3000), m_DVBTuningDelay(0),
-            m_Contrast(0), m_Brightness(0), m_Colour(0),
-            m_Hue(0), m_DiSEqCId(0), m_DVBEITScan(true),
-            m_SourceId(0), m_DishnetEit(false), m_RecPriority(0),
-            m_QuickTune(false), m_SchedOrder(0), m_LiveTVOrder(0),
-            m_RecLimit(0), m_SchedGroup(false)
+            : QObject          ( parent ),
+              m_SignalTimeout  ( 1000   ),
+              m_ChannelTimeout ( 3000   ),
+              m_DVBEITScan     ( true   )
         {
         }
 
