@@ -82,6 +82,9 @@ Advanced options (experts only):
   --sysinclude=PATH        location of cross-build system headers
   --cc=CC                  use C compiler CC [$cc_default]
   --cxx=CXX                use C++ compiler CXX [$cxx_default]
+  --optflags=OPTFLAGS      use specified optimization flags for the C compiler
+  --cxxoptflags=OPTFLAGS   use specified optimization flags for the C++ compiler
+  --enable-lto             enable Link Time Optimization
   --enable-set-cc-default  set cc_default and cxx_default to that provided by --cc= and -cxx
   --ld=LD                  use linker LD
   --qmake=QMAKE            use specified qmake [$qmake_default]
@@ -2081,6 +2084,7 @@ MYTHTV_PATHS_LIST='
 
 MYTHTV_CMDLINE_SET='
     compile_type
+    cxxoptflags
     logging
     python
     qmake
@@ -3856,23 +3860,29 @@ if $cxx -v 2>&1 | grep -qi ^gcc; then
     cxx_type=gxx
     gxx_version=$($cxx -dumpversion)
     gxx_major=$(echo $gxx_version | sed "s/\([0-9]*\).*/\\1/")
+    cxxflags_speed='-O3'
+    cxxflags_size='-Os'
+    cxxflags_opt='-O2'
+    cxxflags_noopt='-O1'
 elif $cxx --version 2>/dev/null | grep -q Intel; then
     cxx_type=icpc
     gxx_version="AV_STRINGIFY(__INTEL_COMPILER)"
     cxx_ident=$($cxx --version | head -n1)
     icpc_version=$($cxx -dumpversion)
-    speed_cxxflags='-O3'
-    size_cxxflags='-Os'
-    noopt_cxxflags='-O1'
+    cxxflags_speed='-O3'
+    cxxflags_size='-Os'
+    cxxflags_opt='-O2'
+    cxxflags_noopt='-O1'
 elif $cxx --version 2>/dev/null | grep -q clang; then
     cxx_type=clangxx
     gxx_version="AV_STRINGIFY(__CLANG_COMPILER)"
     cxx_ident=$($cxx --version | head -n1)
     clangxx_version=$($cxx -dumpversion) # GCC equivalent version
     clangxx_major=$(echo $cxx_ident | sed "s/.*version \([0-9]*\).*/\\1/")
-    speed_cxxflags='-O3'
-    size_cxxflags='-Os'
-    noopt_cxxflags='-O1'
+    cxxflags_speed='-O3'
+    cxxflags_size='-Os'
+    cxxflags_opt='-O2'
+    cxxflags_noopt='-O1'
 fi
 
 test -n "$cxx_type" && enable $cxx_type ||
@@ -5123,9 +5133,9 @@ else
     # disable <cassert> / <assert.h>
     CONFIG_DEFINES="$CONFIG_DEFINES NDEBUG"
     if test x$compile_type = x"release" ; then
-        check_cxxflags -O2
+        cxxoptflags_compile_type=$cxxflags_opt
     elif test x$compile_type = x"profile" ; then
-        check_cxxflags -O2
+        cxxoptflags_compile_type=$cxxflags_opt
     fi
 fi
 
@@ -5139,14 +5149,33 @@ if [ -z "$optflags" ]; then
     fi
 fi
 
+if [ -z "$cxxoptflags" ]; then
+    if enabled small; then
+        cxxoptflags=$cxxflags_size
+    elif [ -n "$cxxoptflags_compile_type" ]; then
+        cxxoptflags=$cxxoptflags_compile_type
+    elif enabled optimizations; then
+        cxxoptflags=$cxxflags_opt
+    else
+        cxxoptflags=$cxxflags_noopt
+    fi
+fi
+
 check_optflags(){
     check_cflags "$@"
+    enabled lto && check_ldflags "$@"
+}
+
+check_cxxoptflags(){
+    check_cxxflags "$@"
     enabled lto && check_ldflags "$@"
 }
 
 check_optflags $optflags
 check_optflags -fno-math-errno
 check_optflags -fno-signed-zeros
+
+check_cxxoptflags $cxxoptflags
 
 if enabled lto; then
     test "$cc_type" != "$ld_type" && die "LTO requires same compiler and linker"
@@ -7521,6 +7550,10 @@ echo "# Compilation Options"
 echo "C++ standard supported    ${CPP_STANDARD}"
 echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
 echo "Enforce shadowed vars     ${enforce_wshadow-no}"
+echo "## Optimization"
+echo "C++                       ${cxxoptflags}"
+echo "C                         ${optflags}"
+echo "LTO                       ${lto-no}"
 echo ""
 
 # Remove redundant elements from variables
