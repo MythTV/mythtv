@@ -1,0 +1,11 @@
+<div class="statusBox" *ngIf="backends?.length != 0; else noBackends">
+    <p>Backends:</p>
+    <ul>
+        <div *ngFor="let backend of backends">
+            <li>Backend: {{ backend.Name }} is a {{ backend.Type }} on IP {{ backend.IP }} </li>
+        </div>
+    </ul>
+</div>
+<ng-template #noBackends>
+    <p>No Backends</p>
+</ng-template>

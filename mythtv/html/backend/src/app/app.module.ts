@@ -16,6 +16,12 @@ import { SidenavComponent } from './layout/sidenav/sidenav.component';
 import { SettingsComponent } from './config/settings/settings.component';
 import { HomeComponent } from './home/home.component';
 import { StatusComponent } from './status/status.component';
+import { EncodersComponent } from './status/components/encoders/encoders.component';
+import { BackendsComponent } from './status/components/backends/backends.component';
+import { FrontendsComponent } from './status/components/frontends/frontends.component';
+import { ScheduledComponent } from './status/components/scheduled/scheduled.component';
+import { JobqueueComponent } from './status/components/jobqueue/jobqueue.component';
+import { MachineinfoComponent } from './status/components/machineinfo/machineinfo.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +30,13 @@ import { StatusComponent } from './status/status.component';
     SidenavComponent,
     SettingsComponent,
     HomeComponent,
-    StatusComponent
+    StatusComponent,
+    EncodersComponent,
+    BackendsComponent,
+    FrontendsComponent,
+    ScheduledComponent,
+    JobqueueComponent,
+    MachineinfoComponent
   ],
   imports: [
     BrowserModule,

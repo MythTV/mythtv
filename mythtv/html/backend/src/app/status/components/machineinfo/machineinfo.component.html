@@ -1,0 +1,53 @@
+<div class="statusBox" *ngIf="machineinfo; else noMachineInfo">
+    <h2>Machine Info</h2>
+    <div>
+        <p>This machine's load average</p>
+        <ul>
+            <li>1 Minute: {{ machineinfo.LoadAvg1 }}</li>
+            <li>5 Minutes: {{ machineinfo.LoadAvg2 }}</li>
+            <li>15 Minutes: {{ machineinfo.LoadAvg3 }}</li>
+        </ul>
+    </div>
+    <div *ngIf="getStorageGroupTotal(machineinfo.StorageGroups) as sg; else noDiskInfo">
+        <p>Disk Usage Summary:</p>
+        <ul>
+            <!-- pretty print values in MB/GB -->
+            <li>Total Disk Space:</li>
+            <ul>
+                <li>Total Space: {{ sg.Total }}</li>
+                <li>Space Used: {{ sg.Used }}</li>
+                <li>Space Free: {{ sg.Free }}</li>
+                <li>Space Available after Auto-expire: {{ sg.Free + sg.Expirable }}</li>
+                <ul>
+                    <li>Space Used by LiveTV: {{ sg.LiveTV }}</li>
+                    <li>Space Used by Deleted Recordings: {{ sg.Deleted }}</li>
+                    <li>Space Used by Auto-expirable Recordings: {{ sg.Expirable }}</li>
+                </ul>
+            </ul>
+        </ul>
+    </div>
+    <div>
+        <p>Disk Usage Details:</p>
+        <div *ngFor="let sg of getStorageGroupDetails(machineinfo.StorageGroups)">
+            <ng-container *ngTemplateOutlet="printStorageGroup; context: sg"></ng-container>
+        </div>
+    </div>
+</div>
+
+<ng-template #noMachineInfo>
+    <p>No Machine Info available</p>
+</ng-template>
+<ng-template #noDiskInfo>
+    <p>No Disk Info available</p>
+</ng-template>
+<ng-template #printStorageGroup let-Id=Id let-Directory=Directory let-Total=Total let-Used=Used let-Free=Free>
+    <ul>
+        <li>MythTV Drive #{{ Id }}</li>
+        <ul>
+            <li>Directories: {{ Directory }}</li>
+            <li>Total Space: {{ Total }}</li>
+            <li>Space Used: {{ Used }}</li>
+            <li>Space Free: {{ Free }}</li>
+        </ul>
+    </ul>
+</ng-template>
