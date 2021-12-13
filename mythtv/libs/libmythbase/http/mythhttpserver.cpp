@@ -567,7 +567,7 @@ void MythHTTPServer::DebugOrigins()
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Name resolution complete: %1 'Origins' found").arg(m_config.m_allowedOrigins.size()));
-        for (const auto & address : m_config.m_allowedOrigins)
+        for (const auto & address : qAsConst(m_config.m_allowedOrigins))
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Allowed origin: %1").arg(address));
     }
 }
@@ -599,7 +599,7 @@ void MythHTTPServer::DebugHosts()
     {
         LOG(VB_GENERAL, LOG_INFO, LOC +
             QString("Name resolution complete: %1 'Hosts' found").arg(m_config.m_hosts.size()));
-        for (const auto & address : m_config.m_hosts)
+        for (const auto & address : qAsConst(m_config.m_hosts))
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Host: %1").arg(address));
     }
 }

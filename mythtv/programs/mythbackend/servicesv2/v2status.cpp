@@ -175,7 +175,7 @@ V2BackendStatus*  V2Status::GetBackendStatus()
         backend->setType("Master");
         QStringList backends;
         m_pMainServer->GetActiveBackends(backends);
-        for (const QString& hostname : backends)
+        for (const QString& hostname : qAsConst(backends))
         {
             if (hostname != thisHost)
             {

@@ -64,7 +64,7 @@ class FrontendActions
         m_actions.sort();
 
         // Build actions that have an implicit value (e.g. SELECTSUBTITLE_0)
-        for (const auto & action : m_actions)
+        for (const auto & action : qAsConst(m_actions))
             if (action.startsWith("select", Qt::CaseInsensitive) && action.contains("_"))
                 m_selectActions.append(action);
 
