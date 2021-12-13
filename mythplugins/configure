@@ -290,7 +290,6 @@ flix
 "
 
 CONFIG_LIST="
-opengl
 exif
 newexif
 dcraw
@@ -570,8 +569,6 @@ ECXXFLAGS=$(cat mythconfig.mak | grep -e "^ECXXFLAGS=")
 ECXXFLAGS=${ECXXFLAGS#ECXXFLAGS=}
 CXXPPFLAGS=$(cat mythconfig.mak | grep -e "^CXXPPFLAGS=")
 CXXPPFLAGS=${CXXPPFLAGS#CXXPPFLAGS=}
-OPENGLV=$(cat mythconfig.mak | grep -e "^CONFIG_OPENGL_VIDEO=yes")
-OPENGLES=$(cat mythconfig.mak | grep -e "^HAVE_GLES2_GL2_H=yes")
 WEBKIT=$(cat mythconfig.mak | grep -e "^CONFIG_QTWEBKIT=yes")
 
 EXTRALIBS=$(cat mythconfig.mak | grep -e "^EXTRALIBS=")
@@ -595,11 +592,6 @@ qmake=$(cat mythconfig.mak | grep -e "^QMAKE=")
 qmake=${qmake#QMAKE=}
 qt_version_str=`$qmake -query QT_VERSION`
 qt_version=$(version2num $qt_version_str)
-
-# rely on what was discover during MythTV configure
-if enabled opengl && test "$OPENGLV" != "CONFIG_OPENGL_VIDEO=yes"; then
-    disable opengl
-fi
 
 if ! check_lib libexif/exif-data.h exif_loader_new -lexif ; then
     disable exif
