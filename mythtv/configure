@@ -7219,6 +7219,16 @@ ffmpeg_optenable() {
     done
 }
 
+ffmpeg_optenableif() {
+    while test -n "$1" ; do
+        val=$(eval "echo \$$1")
+        if enabled "$1" ; then
+            ffopts="$ffopts --enable-"$(echo "$1" | sed 's/_/-/g')
+        fi
+        shift
+    done
+}
+
 ffopts=
 ffmpeg_optset arch cross_prefix sysroot sysinclude cc cxx ld cpu
 ffmpeg_optset extra_cxxflags extra_ldflags target_os
@@ -7238,34 +7248,13 @@ if test $target_os = "android"; then
 else
     disable mediacodec
 fi
-if enabled vaapi; then
-    ffopts="$ffopts --enable-vaapi"
-fi
 
-if enabled mmal; then
-    ffopts="$ffopts --enable-mmal"
-fi
+ffmpeg_optenableif vaapi mmal libaom libdav1d gnutls lto
 
 if enabled drm; then
     ffopts="$ffopts --enable-libdrm"
 fi
 
-if enabled libaom; then
-    ffopts="$ffopts --enable-libaom"
-fi
-
-
-if enabled libdav1d; then
-    ffopts="$ffopts --enable-libdav1d"
-fi
-
-if enabled gnutls; then
-    ffopts="$ffopts --enable-gnutls"
-fi
-
-if enabled lto; then
-    ffopts="$ffopts --enable-lto"
-fi
 
 ffmpeg_extra_cflags="$extra_cflags"
 if disabled ffmpeg_warnings; then
