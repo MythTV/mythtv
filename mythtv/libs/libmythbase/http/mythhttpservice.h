@@ -99,7 +99,7 @@ class MBASE_PUBLIC V2HttpRedirectException
     }
 
 #define SERVICE_PROPERTY_PTR( type, name )   \
-    private: type* m_##name;              /* NOLINT(bugprone-macro-parentheses) */ \
+    private: type* m_##name {nullptr};    /* NOLINT(bugprone-macro-parentheses) */ \
     public:                             \
     type* name()                          /* NOLINT(bugprone-macro-parentheses) */ \
     {                                   \
