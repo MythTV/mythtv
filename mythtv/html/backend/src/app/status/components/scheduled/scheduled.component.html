@@ -1,14 +1,16 @@
-<div class="statusBox" *ngIf="scheduled?.length != 0; else noSchedule">
+<div class="statusBox">
     <h2>Schedule</h2>
-    <p>The next {{scheduled?.length}} show(s) that are scheduled for recording.</p>
-    <div *ngFor="let schedule of scheduled">
-        <ul>
-            <li>
-                <!-- StartTime needs converting to a "pretty" display time -->
-                <p>{{schedule.StartTime}} - {{schedule.Recording.EncoderId}} - {{schedule.Channel.CallSign}} - {{schedule.Title}} </p>
-                <!-- Add details dropdown -->
-            </li>
-        </ul>
+    <div *ngIf="scheduled?.length != 0; else noSchedule">
+        <p>The next {{scheduled?.length}} show(s) that are scheduled for recording.</p>
+        <div *ngFor="let schedule of scheduled">
+            <ul>
+                <li>
+                    <!-- StartTime needs converting to a "pretty" display time -->
+                    <p>{{schedule.StartTime}} - {{schedule.Recording.EncoderId}} - {{schedule.Channel.CallSign}} - {{schedule.Title}} </p>
+                    <!-- Add details dropdown -->
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 

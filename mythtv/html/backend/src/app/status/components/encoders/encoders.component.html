@@ -1,15 +1,17 @@
-<div class="statusBox" *ngIf="encoders?.length != 0; else noEncoders">
+<div class="statusBox">
     <h2>Encoder Status</h2>
-    <div *ngFor="let encoder of encoders">
-        <ul>
-            <!-- TODO: The details of the Capture Card need to be pulled from the /Capture API -->
-            <li>Encoder {{ encoder.Id }} is on host {{ encoder.HostName }}, State: {{ encoder.State }} </li>
-            <div *ngFor="let input of encoder.Inputs">
-                <ul>
-                    <li>Card: {{ input.CardId }}, Input: {{ input.Id }} is {{ input.InputName }}, displayname: {{ input.DisplayName }} </li>
-                </ul>
-            </div>
-        </ul>
+    <div *ngIf="encoders?.length != 0; else noEncoders">
+        <div *ngFor="let encoder of encoders">
+            <ul>
+                <!-- TODO: The details of the Capture Card need to be pulled from the /Capture API -->
+                <li>Encoder {{ encoder.Id }} is on host {{ encoder.HostName }}, State: {{ encoder.State }} </li>
+                <div *ngFor="let input of encoder.Inputs">
+                    <ul>
+                        <li>Card: {{ input.CardId }}, Input: {{ input.Id }} is {{ input.InputName }}, displayname: {{ input.DisplayName }} </li>
+                    </ul>
+                </div>
+            </ul>
+        </div>
     </div>
 </div>
 <ng-template #noEncoders>
