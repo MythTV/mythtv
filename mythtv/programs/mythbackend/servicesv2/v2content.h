@@ -37,7 +37,7 @@
 class V2Content : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.0")
+    Q_CLASSINFO("Version",      "2.0")
     Q_CLASSINFO("DownloadFile",           "methods=POST;name=bool")
     Q_CLASSINFO("AddLiveStream",          "methods=GET,POST,HEAD")
     Q_CLASSINFO("AddRecordingLiveStream", "methods=GET,POST,HEAD")

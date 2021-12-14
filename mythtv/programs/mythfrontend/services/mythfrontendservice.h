@@ -48,7 +48,7 @@ Q_DECLARE_METATYPE(FrontendActionList*)
 class MythFrontendService : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",          "1.0")
+    Q_CLASSINFO("Version",          "2.1")
     Q_CLASSINFO("SendAction",       "methods=POST")
     Q_CLASSINFO("SendKey",          "methods=POST")
     Q_CLASSINFO("PlayVideo",        "methods=POST")

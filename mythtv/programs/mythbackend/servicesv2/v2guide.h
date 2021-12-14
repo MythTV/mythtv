@@ -41,7 +41,7 @@
 class V2Guide : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.0")
+    Q_CLASSINFO("Version",      "2.4")
     Q_CLASSINFO("AddToChannelGroup",      "methods=POST;name=bool")
     Q_CLASSINFO("RemoveFromChannelGroup", "methods=POST;name=bool")
 

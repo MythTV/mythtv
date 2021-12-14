@@ -14,7 +14,7 @@
 class V2Video : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.0")
+    Q_CLASSINFO("Version",      "1.5")
     Q_CLASSINFO("description",  "Methods to access and update Video metadata and related topics")
     Q_CLASSINFO("LookupVideo",  "methods=GET,POST,HEAD")
     Q_CLASSINFO("GetSavedBookmark",  "name=long")

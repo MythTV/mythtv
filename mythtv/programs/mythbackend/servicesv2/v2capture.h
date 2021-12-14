@@ -35,7 +35,7 @@
 class V2Capture : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.0")
+    Q_CLASSINFO("Version",      "1.4")
     Q_CLASSINFO("RemoveCaptureCard",  "methods=POST;name=bool")
     Q_CLASSINFO("AddCaptureCard",     "methods=POST;name=int")
     Q_CLASSINFO("UpdateCaptureCard",  "methods=POST;name=bool")

@@ -39,7 +39,7 @@
 class V2Channel : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.0")
+    Q_CLASSINFO("Version",      "1.10")
     Q_CLASSINFO("UpdateDBChannel",        "methods=POST;name=bool")
     Q_CLASSINFO("AddDBChannel",           "methods=POST;name=bool")
     Q_CLASSINFO("RemoveDBChannel",        "methods=POST;name=bool")

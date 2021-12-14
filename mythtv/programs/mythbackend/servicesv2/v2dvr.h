@@ -42,7 +42,7 @@
 class V2Dvr : public MythHTTPService
 {
     Q_OBJECT
-    Q_CLASSINFO("Version",      "1.0")
+    Q_CLASSINFO("Version",      "7.0")
     Q_CLASSINFO("AddRecordedCredits",  "methods=POST;name=bool")
     Q_CLASSINFO("AddRecordedProgram",  "methods=POST;name=int")
     Q_CLASSINFO("RemoveRecorded",      "methods=POST;name=bool")
