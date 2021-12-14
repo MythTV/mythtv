@@ -6682,9 +6682,6 @@ if enabled libcec ; then
     else
         check_cxx -I"$libcec_path" <<EOF || { disable libcec; }
 #include <libcec/cec.h>
-#include <iostream>
-using namespace std;
-using namespace CEC;
 #include <libcec/cecloader.h>
 int main(void) {
     #if (CEC_LIB_VERSION_MAJOR < 2)
