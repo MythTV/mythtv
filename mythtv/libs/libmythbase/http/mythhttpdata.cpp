@@ -26,7 +26,7 @@ MythHTTPData::MythHTTPData()
 {
 }
 
-MythHTTPData::MythHTTPData(QString FileName, const char * Buffer)
+MythHTTPData::MythHTTPData(const QString& FileName, const char * Buffer)
   : QByteArray(Buffer),
     MythHTTPContent(FileName)
 {
