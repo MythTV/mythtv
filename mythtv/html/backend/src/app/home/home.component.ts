@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
 import { MythService } from '../services/myth.service';
+import { MythHostName, MythTimeZone } from '../services/interfaces/myth.interface';
 
 @Component({
   selector: 'app-home',
@@ -7,24 +11,18 @@ import { MythService } from '../services/myth.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  hostname = '';
-  tz_id = 'unknown';
-  tz_datetime = 'unknown';
-  tz_offset = 0;
+  m_hostname$!: Observable<MythHostName>;
+  m_timezone$!: Observable<MythTimeZone>;
 
   constructor(private mythService: MythService) { }
 
   ngOnInit(): void {
-    this.mythService.GetHostName().subscribe(data => {
-      console.log(data);
-      this.hostname = data.String;
-    });
-    this.mythService.GetTimeZone().subscribe(data => {
-      console.log(data);
-      this.tz_id = data.TimeZoneInfo.TimeZoneID;
-      this.tz_datetime = data.TimeZoneInfo.CurrentDateTime;
-      this.tz_offset = data.TimeZoneInfo.UTCOffset;
-    })
+    this.m_hostname$ = this.mythService.GetHostName().pipe(
+      tap(data => console.log(data)),
+    )
+    this.m_timezone$ = this.mythService.GetTimeZone().pipe(
+      tap(data => console.log(data)),
+    )
   }
 
 }
