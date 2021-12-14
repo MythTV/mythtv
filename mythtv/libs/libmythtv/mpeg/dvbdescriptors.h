@@ -2627,7 +2627,7 @@ class FreesatLCNDescriptor : public MPEGDescriptor
     explicit FreesatLCNDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_lcn_table)
     {
-        assert(PrivateDescriptorID::freesat_lcn_table== DescriptorTag());
+        assert(m_data && PrivateDescriptorID::freesat_lcn_table== DescriptorTag());
 
         const unsigned char *payload = &data[2];
 
@@ -2692,7 +2692,7 @@ class FreesatRegionDescriptor : public MPEGDescriptor
     explicit FreesatRegionDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_region_table)
     {
-        assert(PrivateDescriptorID::freesat_region_table == DescriptorTag());
+        assert(m_data && PrivateDescriptorID::freesat_region_table == DescriptorTag());
 
         const unsigned char *payload = &data[2];
 
@@ -2747,7 +2747,7 @@ class FreesatCallsignDescriptor : public MPEGDescriptor
     explicit FreesatCallsignDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::freesat_callsign)
     {
-        assert(PrivateDescriptorID::freesat_callsign == DescriptorTag());
+        assert(m_data && PrivateDescriptorID::freesat_callsign == DescriptorTag());
     }
 
     //       Name             bits  loc  expected value
@@ -2785,7 +2785,7 @@ class SkyLCNDescriptor : public MPEGDescriptor
     explicit SkyLCNDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, PrivateDescriptorID::sky_lcn_table)
     {
-        assert(PrivateDescriptorID::sky_lcn_table== DescriptorTag());
+        assert(m_data && PrivateDescriptorID::sky_lcn_table== DescriptorTag());
     }
     //       Name                 bits  loc  expected value
     // descriptor_tag               8   0.0       0xd3
