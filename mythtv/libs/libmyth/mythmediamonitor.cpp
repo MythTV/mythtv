@@ -7,6 +7,7 @@
 #include <typeinfo>
 
 // Qt headers
+#include <QtGlobal>
 #include <QCoreApplication>
 #include <QFile>
 #include <QList>
@@ -26,7 +27,7 @@
 
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h"
-#elif CONFIG_CYGWIN || defined(_WIN32)
+#elif defined(Q_OS_WIN)
 #include "mediamonitor-windows.h"
 #else
 #include "mediamonitor-unix.h"
@@ -87,12 +88,10 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
 
 #ifdef USING_DARWIN_DA
     s_monitor = new MediaMonitorDarwin(nullptr, MONITOR_INTERVAL, true);
-#else
-  #if CONFIG_CYGWIN || defined(_WIN32)
+#elif defined(Q_OS_WIN)
     s_monitor = new MediaMonitorWindows(nullptr, MONITOR_INTERVAL, true);
-  #else
+#else
     s_monitor = new MediaMonitorUnix(nullptr, MONITOR_INTERVAL, true);
-  #endif
 #endif
 
     return s_monitor;

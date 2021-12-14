@@ -194,7 +194,6 @@ win32 {
 
         CONFIG += cygwin
         QMAKE_EXTENSION_SHLIB=dll.a
-        DEFINES += CONFIG_CYGWIN
     }
 
 } else {
