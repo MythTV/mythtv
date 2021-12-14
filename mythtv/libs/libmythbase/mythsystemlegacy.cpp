@@ -35,6 +35,7 @@
 #include <unistd.h>
 
 // QT headers
+#include <QtGlobal>
 #include <QCoreApplication>
 
 // libmythbase headers
@@ -43,7 +44,7 @@
 #include "mythevent.h"
 #include "mythlogging.h"
 
-#if CONFIG_CYGWIN || defined(_WIN32)
+#ifdef Q_OS_WIN
 #include "mythsystemwindows.h"
 #else
 #include "mythsystemunix.h"
@@ -56,7 +57,7 @@
 
 void MythSystemLegacy::initializePrivate(void)
 {
-#if CONFIG_CYGWIN || defined(_WIN32)
+#ifdef Q_OS_WIN
     d = new MythSystemLegacyWindows(this);
 #else
     d = new MythSystemLegacyUnix(this);
