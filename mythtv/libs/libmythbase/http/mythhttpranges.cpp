@@ -7,7 +7,7 @@
 
 #define LOC QString("HTTPRange: ")
 
-auto sumrange = [](uint64_t Cum, const HTTPRange& Range) { return ((Range.second + 1) - Range.first) + Cum; };
+auto sumrange = [](uint64_t Cum, HTTPRange Range) { return ((Range.second + 1) - Range.first) + Cum; };
 
 void MythHTTPRanges::HandleRangeRequest(MythHTTPResponse* Response, const QString& Request)
 {
@@ -242,9 +242,9 @@ MythHTTPStatus MythHTTPRanges::ParseRanges(const QString& Request, int64_t Total
     static const int s_overhead = 90; // rough worst case overhead per part for multipart requests
     if (ranges.size() > 1)
     {
-        auto equals = [](const HTTPRange& First, const HTTPRange& Second)
+        auto equals = [](HTTPRange First, HTTPRange Second)
             { return (First.first == Second.first) && (First.second == Second.second); };
-        auto lessthan = [](const HTTPRange& First, const HTTPRange& Second)
+        auto lessthan = [](HTTPRange First, HTTPRange Second)
             { return First.first < Second.first; };
 
         // we MUST sort first
