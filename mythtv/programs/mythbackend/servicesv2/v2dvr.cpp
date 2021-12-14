@@ -1797,9 +1797,9 @@ QString V2Dvr::RecStatusToDescription(int RecStatus, int recType,
 {
     //if (!StartTime.isValid())
     //    throw QString("StartTime appears invalid.");
-    auto rsType = static_cast<RecStatus::Type>(RecStatus);
+    auto recstatusType = static_cast<RecStatus::Type>(RecStatus);
     auto recordingType = static_cast<RecordingType>(recType);
-    return RecStatus::toDescription(rsType, recordingType, StartTime);
+    return RecStatus::toDescription(recstatusType, recordingType, StartTime);
 }
 
 QString V2Dvr::RecTypeToString(const QString& recType)
