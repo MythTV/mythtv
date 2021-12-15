@@ -222,7 +222,7 @@ MythMimeType MythHTTPEncoding::GetMimeType(HTTPVariant Content)
 
     // Try interrogating content as well
     if (data)
-        if (auto mime = MythMimeDatabase::MimeTypeForFileNameAndData(filename, *(*data).get()); mime.IsValid())
+        if (auto mime = MythMimeDatabase::MimeTypeForFileNameAndData(filename, **data); mime.IsValid())
             return mime;
     if (file)
         if (auto mime = MythMimeDatabase::MimeTypeForFileNameAndData(filename, (*file).get()); mime.IsValid())
@@ -300,7 +300,7 @@ MythHTTPEncode MythHTTPEncoding::Compress(MythHTTPResponse* Response, int64_t& S
     // As far as I can tell, Qt's implicit sharing of data should ensure we aren't
     // copying data unnecessarily here - but I can't be sure. We could definitely
     // improve compressing files by avoiding the copy into a temporary buffer.
-    HTTPData buffer = MythHTTPData::Create(data ? gzipCompress(*data->get()) : gzipCompress((*file)->readAll()));
+    HTTPData buffer = MythHTTPData::Create(data ? gzipCompress(**data) : gzipCompress((*file)->readAll()));
 
     // Add the required header
     Response->AddHeader("Content-Encoding", "gzip");
