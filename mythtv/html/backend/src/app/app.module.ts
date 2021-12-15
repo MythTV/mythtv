@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './layout/navbar/navbar.component';
@@ -46,6 +47,7 @@ import { MachineinfoComponent } from './status/components/machineinfo/machineinf
     MatIconModule,
     MatListModule,
     MatToolbarModule,
+    MatTooltipModule,
     MatSidenavModule
   ],
   providers: [],
