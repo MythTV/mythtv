@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Encoder } from 'src/app/services/interfaces/encoder.interface';
+import { Encoder, TVState } from 'src/app/services/interfaces/encoder.interface';
 
 @Component({
   selector: 'app-status-encoders',
@@ -14,4 +14,28 @@ export class EncodersComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  EncoderStatusText(state: number) : string {
+    switch(state) {
+      case TVState.kState_Error:
+        return "Error";
+      case TVState.kState_None:
+        return "Idle";
+      case TVState.kState_WatchingLiveTV:
+        return "Watching Live TV";
+      case TVState.kState_WatchingPreRecorded:
+        return "Watching Pre Recorded";
+      case TVState.kState_WatchingVideo:
+        return "Watching Video";
+      case TVState.kState_WatchingDVD:
+        return "Watching DVD";
+      case TVState.kState_WatchingBD:
+        return "Watching BD";
+      case TVState.kState_WatchingRecording:
+        return "Recording";
+      case TVState.kState_ChangingState:
+        return "Changing State";
+      default:
+        return "unknown";
+    }
+  }
 }

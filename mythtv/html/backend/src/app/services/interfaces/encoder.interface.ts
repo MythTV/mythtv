@@ -1,3 +1,16 @@
+// Definitions from libs/libmythtv/tv.h
+export enum TVState {
+    kState_Error = -1,
+    kState_None,
+    kState_WatchingLiveTV,
+    kState_WatchingPreRecorded,
+    kState_WatchingVideo,
+    kState_WatchingDVD,
+    kState_WatchingBD,
+    kState_WatchingRecording,
+    kState_RecordingOnly,
+    kState_ChangingState,
+}
 export interface EncoderInput {
     CardId:         number;
     DisplayName:    string;

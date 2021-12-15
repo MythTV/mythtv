@@ -4,7 +4,7 @@
         <div *ngFor="let encoder of encoders">
             <ul>
                 <!-- TODO: The details of the Capture Card need to be pulled from the /Capture API -->
-                <li>Encoder {{ encoder.Id }} is on host {{ encoder.HostName }}, State: {{ encoder.State }} </li>
+                <li>Encoder {{ encoder.Id }} is on host {{ encoder.HostName }}, State: {{ EncoderStatusText(encoder.State) }} </li>
                 <div *ngFor="let input of encoder.Inputs">
                     <ul>
                         <li>Card: {{ input.CardId }}, Input: {{ input.Id }} is {{ input.InputName }}, displayname: {{ input.DisplayName }} </li>
