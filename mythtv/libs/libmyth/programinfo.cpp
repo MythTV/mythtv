@@ -4991,7 +4991,6 @@ QString ProgramInfo::DiscoverRecordingDirectory(void)
     return "";
 }
 
-#include <cassert>
 /** Tracks a recording's in use status, to prevent deletion and to
  *  allow the storage scheduler to perform IO load balancing.
  *
