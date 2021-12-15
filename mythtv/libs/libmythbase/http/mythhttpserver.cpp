@@ -271,7 +271,6 @@ void MythHTTPServer::newTcpConnection(qintptr Socket)
 
     m_connectionQueue.enqueue(Socket);
     emit ProcessTCPQueue();
-    return;
 }
 
 bool MythHTTPServer::ReservedPath(const QString& Path)
