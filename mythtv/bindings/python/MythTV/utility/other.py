@@ -371,7 +371,7 @@ class deadlinesocket( socket.socket ):
                 raise MythError(MythError.SOCKET, e.args)
             if buff.tell() == p:
                 # no data read from a 'ready' socket, connection terminated
-                raise MythError(MythError.CLOSEDSOCKET)
+                raise MythError(MythError.SOCKET, (54, 'Connection reset by peer'))
 
             if timeout == 0:
                 break
