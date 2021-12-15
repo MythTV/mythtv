@@ -1,13 +1,15 @@
+#include "audiooutput.h"
+
 #include <cstdio>
 #include <cstdlib>
 
 // Qt utils: to parse audio list
+#include <QtGlobal>
 #include <QFile>
 #include <QDateTime>
 #include <QDir>
 
-#include "mythconfig.h"
-#include "audiooutput.h"
+
 #include "mythmiscutil.h"
 #include "compat.h"
 
@@ -22,7 +24,7 @@
 #ifdef USING_ALSA
 #include "audiooutputalsa.h"
 #endif
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 #include "audiooutputca.h"
 #endif
 #ifdef USING_JACK
@@ -97,7 +99,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
                 "WARNING: ***Pulse Audio is running***");
         }
     }
-#endif
+#endif // USING_PULSE
 
     settings.FixPassThrough();
 
@@ -109,7 +111,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
         LOG(VB_GENERAL, LOG_ERR, "Audio output device is set to PulseAudio "
                                  "but PulseAudio support is not compiled in!");
         return nullptr;
-#endif
+#endif // USING_PULSEOUTPUT
     }
     if (main_device.startsWith("NULL"))
     {
@@ -140,7 +142,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
             }
             delete alsadevs;
         }
-#endif
+#endif // USING_ALSA
         if (main_device.contains("pulse", Qt::CaseInsensitive))
         {
             ispulse = true;
@@ -150,10 +152,10 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
             pulsestatus = PulseHandler::Suspend(PulseHandler::kPulseSuspend);
         }
     }
-#else // USING_PULSE
+#else // !USING_PULSE
     // Quiet warning error when not compiling with pulseaudio
     Q_UNUSED(willsuspendpa);
-#endif
+#endif // USING_PULSE
 
     if (main_device.startsWith("ALSA:"))
     {
@@ -217,7 +219,7 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
 #if defined(USING_OSS)
     else
         ret = new AudioOutputOSS(settings);
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
     else
         ret = new AudioOutputCA(settings);
 #endif
@@ -468,7 +470,7 @@ AudioOutput::ADCVect* AudioOutput::GetOutputList(void)
         }
     }
 #endif
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 
     {
         QMap<QString, QString> *devs = AudioOutputCA::GetDevices(nullptr);
