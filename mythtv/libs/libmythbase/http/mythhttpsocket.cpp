@@ -494,7 +494,7 @@ void MythHTTPSocket::Write(int64_t Written)
                 chunkheader(QStringLiteral("%1\r\n").arg(towrite, 0, 16).toLatin1().constData());
             if (multipart.first)
                 wrote += m_socket->write(multipart.first->constData());
-            wrote = m_socket->write((*data)->constData() + written + offset, towrite);
+            wrote += m_socket->write((*data)->constData() + written + offset, towrite);
             if (multipart.second)
                 wrote += m_socket->write(multipart.second->constData());
             if (chunk)
@@ -526,7 +526,7 @@ void MythHTTPSocket::Write(int64_t Written)
                     chunkheader(QStringLiteral("%1\r\n").arg(read, 0, 16).toLatin1().constData());
                 if (multipart.first)
                     wrote += m_socket->write(multipart.first->constData());
-                wrote = m_socket->write(m_writeBuffer->data(), read);
+                wrote += m_socket->write(m_writeBuffer->data(), read);
                 if (multipart.second)
                     wrote += m_socket->write(multipart.second->constData());
                 if (chunk)
