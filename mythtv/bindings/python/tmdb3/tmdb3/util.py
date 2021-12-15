@@ -14,7 +14,7 @@ from .tmdb_auth import get_session
 class NameRepr(object):
     """Mixin for __repr__ methods using 'name' attribute."""
     def __repr__(self):
-        return (u"<{0.__class__.__name__} '{0.name}'>".format(self))
+        return ("<{0.__class__.__name__} '{0.name}'>".format(self))
 
 
 class SearchRepr(object):
@@ -24,7 +24,7 @@ class SearchRepr(object):
     """
     def __repr__(self):
         name = self._name if self._name else self._request._kwargs['query']
-        return (u"<Search Results: {0}>".format(name))
+        return ("<Search Results: {0}>".format(name))
 
 
 class Poller(object):
@@ -109,7 +109,7 @@ class Data(object):
     This maps to a single key in a JSON dictionary received from the API
     """
     def __init__(self, field, initarg=None, handler=None, poller=None,
-                 raw=True, default=u'', lang=None, passthrough={}):
+                 raw=True, default='', lang=None, passthrough={}):
         """
         This defines how the dictionary value is to be processed by the
         poller
