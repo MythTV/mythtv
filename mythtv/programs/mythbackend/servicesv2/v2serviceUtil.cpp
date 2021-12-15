@@ -539,8 +539,8 @@ void V2FillCastMemberList(V2CastMemberList* pCastMemberList,
             V2CastMember *pCastMember = pCastMemberList->AddNewCastMember();
 
             QString role = query.value(0).toString();
-            pCastMember->setRole(role);
             pCastMember->setTranslatedRole(translations.value(role.toUpper()));
+            pCastMember->setRole(role); // role is invalid after this call.
             /* The people.name column uses utf8_bin collation.
                 * Qt-MySQL drivers use QVariant::ByteArray for string-type
                 * MySQL fields marked with the BINARY attribute (those using a
