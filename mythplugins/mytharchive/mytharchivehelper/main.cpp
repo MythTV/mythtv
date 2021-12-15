@@ -30,11 +30,11 @@
 #include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
 #include <unistd.h>
 
-#include <mythconfig.h>
-#if CONFIG_DARWIN or defined(__FreeBSD__)
+#include <QtGlobal>
+#if defined(Q_OS_DARWIN) or defined(__FreeBSD__)
 #include <sys/param.h>
 #include <sys/mount.h>
-#elif __linux__
+#elif defined(__linux__)
 #include <sys/vfs.h>
 #endif
 
@@ -2237,14 +2237,15 @@ static int isRemote(const QString& filename)
     if (!QFile::exists(filename))
         return 0;
 
-#if CONFIG_DARWIN
+// TODO replace with FileSystemInfo?
+#ifdef Q_OS_DARWIN
     struct statfs statbuf {};
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((!strcmp(statbuf.f_fstypename, "nfs")) ||      // NFS|FTP
             (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
             (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
         return 2;
-#elif __linux__
+#elif defined(__linux__)
     struct statfs statbuf {};
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((statbuf.f_type == 0x6969) ||      // NFS
