@@ -33,16 +33,15 @@ MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& C
     connect(this, &MythHTTPSocket::Finish, this, &MythHTTPSocket::Stop);
 
     // Create socket
-#ifndef QT_NO_OPENSSL
     QSslSocket* sslsocket = nullptr;
     if (SSL)
     {
+#ifndef QT_NO_OPENSSL
         sslsocket = new QSslSocket(this);
         m_socket = sslsocket;
+#endif
     }
     else
-#endif
-    if (!SSL)
     {
         m_socket = new QTcpSocket(this);
     }
