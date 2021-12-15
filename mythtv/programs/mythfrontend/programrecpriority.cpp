@@ -42,6 +42,8 @@ void ProgramRecPriorityInfo::clone(
         m_last_record      = other.m_last_record;
         m_avg_delay        = other.m_avg_delay;
         m_profile          = other.m_profile;
+        m_storageGroup     = other.m_storageGroup;
+        m_recordingGroup   = other.m_recordingGroup;
     }
 }
 
@@ -58,6 +60,8 @@ void ProgramRecPriorityInfo::clone(
         m_last_record      = QDateTime();
         m_avg_delay        = 0;
         m_profile.clear();
+        m_storageGroup.clear();
+        m_recordingGroup.clear();
     }
 }
 
@@ -74,6 +78,8 @@ void ProgramRecPriorityInfo::clone(
         m_last_record      = QDateTime();
         m_avg_delay        = 0;
         m_profile.clear();
+        m_storageGroup.clear();
+        m_recordingGroup.clear();
     }
 }
 
@@ -87,6 +93,8 @@ void ProgramRecPriorityInfo::clear(void)
     m_last_record      = QDateTime();
     m_avg_delay        = 0;
     m_profile.clear();
+    m_storageGroup.clear();
+    m_recordingGroup.clear();
 }
 
 void ProgramRecPriorityInfo::ToMap(InfoMap &progMap,
@@ -98,6 +106,10 @@ void ProgramRecPriorityInfo::ToMap(InfoMap &progMap,
         QObject::tr("Default (Template)") : m_title;
     progMap["category"] = (m_category == "Default") ?
         QObject::tr("Default") : m_category;
+    progMap["storagegroup"] = (m_storageGroup == "Default") ?
+        QObject::tr("Default") : m_storageGroup;
+    progMap["recordinggroup"] = (m_recordingGroup == "Default") ?
+        QObject::tr("Default") : m_recordingGroup;
 }
 
 class TitleSort
@@ -914,6 +926,8 @@ void ProgramRecPriority::scheduleChanged(int recid)
             RecStatus::Inactive : RecStatus::Unknown;
         progInfo.m_profile = record.m_recProfile;
         progInfo.m_last_record = record.m_lastRecorded;
+        progInfo.m_storageGroup = record.m_storageGroup;
+        progInfo.m_recordingGroup = RecordingInfo::GetRecgroupString(record.m_recGroupID);
 
         m_programData[recid] = progInfo;
         m_origRecPriorityData[record.m_recordID] =
@@ -1137,7 +1151,8 @@ void ProgramRecPriority::FillList(void)
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT recordid, title, chanid, starttime, startdate, "
-                   "type, inactive, last_record, avg_delay, profile "
+                   "type, inactive, last_record, avg_delay, profile, "
+                   "recgroup, storagegroup "
                    "FROM record;");
 
     if (!result.exec())
@@ -1158,6 +1173,8 @@ void ProgramRecPriority::FillList(void)
             QDateTime lastrec = MythDate::as_utc(result.value(7).toDateTime());
             int avgd = result.value(8).toInt();
             QString profile = result.value(9).toString();
+            QString recordingGroup = result.value(10).toString();
+            QString storageGroup = result.value(11).toString();
 
             // find matching program in m_programData and set
             // recType
@@ -1175,6 +1192,8 @@ void ProgramRecPriority::FillList(void)
                 progInfo->m_last_record = lastrec;
                 progInfo->m_avg_delay = avgd;
                 progInfo->m_profile = profile;
+                progInfo->m_recordingGroup  = recordingGroup;
+                progInfo->m_storageGroup = storageGroup;
 
                 if (inactive)
                     progInfo->m_recStatus = RecStatus::Inactive;
@@ -1395,6 +1414,8 @@ void ProgramRecPriority::UpdateList()
             (profile == "High Quality") || (profile == "Low Quality"))
             profile = tr(profile.toUtf8().constData());
         item->SetText(profile, "recordingprofile", state);
+        item->SetText(progInfo->m_recordingGroup, "recordinggroup", state);
+        item->SetText(progInfo->m_storageGroup, "storagegroup", state);
         item->DisplayState(state, "status");
 
         if (m_currentItem == progInfo)
@@ -1518,7 +1539,6 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
             profile = tr(profile.toUtf8().constData());
         m_recProfileText->SetText(profile);
     }
-
 }
 
 void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
