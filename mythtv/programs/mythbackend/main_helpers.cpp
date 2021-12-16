@@ -1,7 +1,4 @@
 #include "mythconfig.h"
-#if CONFIG_DARWIN
-    #include <sys/aio.h>    // O_SYNC
-#endif
 #if CONFIG_SYSTEMD_NOTIFY
     #include <systemd/sd-daemon.h>
     #define be_sd_notify(x) \

@@ -1,8 +1,3 @@
-#include "mythconfig.h"
-#if CONFIG_DARWIN
-    #include <sys/aio.h>    // O_SYNC
-#endif
-
 // C++ headers
 #include <cerrno>
 #include <csignal>
