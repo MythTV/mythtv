@@ -216,6 +216,9 @@ void MythHTTPServer::Started(bool Tcp, bool Ssl)
         m_bonjourSSL->Register(m_config.m_sslPort, QByteArrayLiteral("_https._tcp"),
             QStringLiteral("%1 on %2").arg(QCoreApplication::applicationName(), host).toLatin1().constData(), {});
     }
+#else
+    Q_UNUSED(Tcp);
+    Q_UNUSED(Ssl);
 #endif
 
     // Build our list of hosts and allowed origins.
