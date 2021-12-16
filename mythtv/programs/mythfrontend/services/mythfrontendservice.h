@@ -25,7 +25,7 @@ class FrontendStatus : public QObject
   public:
     Q_INVOKABLE FrontendStatus(QObject *parent = nullptr)
       : QObject  ( parent ) {};
-    FrontendStatus(const QString& Name, const QString& Version, const QVariantMap& State);
+    FrontendStatus(QString Name, QString Version, QVariantMap State);
 };
 
 Q_DECLARE_METATYPE(FrontendStatus*)
@@ -40,7 +40,7 @@ class FrontendActionList : public QObject
   public:
     Q_INVOKABLE FrontendActionList(QObject *parent = nullptr)
       : QObject  ( parent ) {};
-    FrontendActionList(const QVariantMap& List);
+    FrontendActionList(QVariantMap List);
 };
 
 Q_DECLARE_METATYPE(FrontendActionList*)

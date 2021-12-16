@@ -21,10 +21,10 @@
  * \note If parsing fails early, the connection type remains at 'close' and hence
  * the socket will be closed once the error response is sent.
 */
-MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, const QString &Method,
+MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, QString Method,
                                  HTTPHeaders Headers, HTTPData Content, QTcpSocket* Socket /*=nullptr*/)
   : m_serverName(Config.m_serverName),
-    m_method(Method),
+    m_method(std::move(Method)),
     m_headers(Headers),
     m_content(Content),
     m_root(Config.m_rootDir),

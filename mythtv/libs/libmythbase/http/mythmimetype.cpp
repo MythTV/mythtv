@@ -7,14 +7,14 @@ MythMimeType::MythMimeType(const QMimeType& MimeType)
     m_mime(MimeType)
 {
 }
-MythMimeType::MythMimeType(const QString& Name, const QString& Suffix,
-                           const MimeMagic& Magic, uint Weight, const QStringList &Inherits)
+MythMimeType::MythMimeType(QString Name, QString Suffix,
+                           MimeMagic Magic, uint Weight, QStringList Inherits)
   : m_valid(!Name.isEmpty()),
-    m_name(Name),
-    m_suffix(Suffix),
-    m_magic(Magic),
+    m_name(std::move(Name)),
+    m_suffix(std::move(Suffix)),
+    m_magic(std::move(Magic)),
     m_weight(Weight),
-    m_inherits(Inherits)
+    m_inherits(std::move(Inherits))
 {
 }
 

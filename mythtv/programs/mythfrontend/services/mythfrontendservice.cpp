@@ -363,10 +363,10 @@ bool MythFrontendService::PlayVideo(const QString& Id, bool UseBookmark)
     return true;
 }
 
-FrontendStatus::FrontendStatus(const QString& Name, const QString& Version, const QVariantMap& State)
-  : m_Name(Name),
-    m_Version(Version),
-    m_State(State)
+FrontendStatus::FrontendStatus(QString Name, QString Version, QVariantMap State)
+    : m_Name(std::move(Name)),
+      m_Version(std::move(Version)),
+      m_State(std::move(State))
 {
     if (m_State.contains("chaptertimes") &&
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
@@ -405,7 +405,7 @@ FrontendStatus::FrontendStatus(const QString& Name, const QString& Version, cons
     }
 }
 
-FrontendActionList::FrontendActionList(const QVariantMap& List)
-  : m_ActionList(List)
+FrontendActionList::FrontendActionList(QVariantMap List)
+    : m_ActionList(std::move(List))
 {
 }

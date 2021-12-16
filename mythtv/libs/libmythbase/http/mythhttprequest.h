@@ -12,7 +12,7 @@ class QTcpSocket;
 class MBASE_PUBLIC MythHTTPRequest
 {
   public:
-    MythHTTPRequest(const MythHTTPConfig& Config, const QString& Method,
+    MythHTTPRequest(const MythHTTPConfig& Config, QString Method,
                     HTTPHeaders Headers, HTTPData Content, QTcpSocket* Socket = nullptr);
 
     QString     m_serverName;

@@ -31,8 +31,8 @@ class MythMimeType
 
   protected:
     MythMimeType(const QMimeType& MimeType);
-    MythMimeType(const QString& Name, const QString& Suffix,
-                 const MimeMagic& Magic, uint Weight, const QStringList& Inherits);
+    MythMimeType(QString Name, QString Suffix,
+                 MimeMagic Magic, uint Weight, QStringList Inherits);
 
     bool        m_valid  { false };
     QString     m_name;
