@@ -2937,7 +2937,7 @@ int MythCommandLineParser::Daemonize(void) const
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         LOG(VB_GENERAL, LOG_WARNING, "Unable to ignore SIGPIPE");
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     if (toBool("daemon"))
     {
         std::cerr << "Daemonizing is unavailable in OSX" << std::endl;

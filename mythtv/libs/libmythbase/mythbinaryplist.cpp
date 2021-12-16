@@ -30,6 +30,7 @@
 // parse uid (and use QPair to differentiate?)
 
 // Qt
+#include <QtGlobal>
 #include <QDateTime>
 #include <QSequentialIterable>
 #include <QTextStream>
@@ -45,7 +46,7 @@
 #include <cmath>
 #if HAVE_SYS_ENDIAN_H
 #include <sys/endian.h>
-#elif !CONFIG_DARWIN
+#elif !defined(Q_OS_DARWIN)
 #include <endian.h>
 #else
 #include <libkern/OSByteOrder.h>
