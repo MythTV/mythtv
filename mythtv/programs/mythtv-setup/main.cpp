@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 
+#include <QtGlobal>
 #include <QString>
 #include <QDir>
 #include <QMap>
@@ -300,7 +301,7 @@ int main(int argc, char *argv[])
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-#if ! CONFIG_DARWIN
+#ifndef Q_OS_DARWIN
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
