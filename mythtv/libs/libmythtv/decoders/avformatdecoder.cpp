@@ -3574,11 +3574,9 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
     {
         // MythTV logic expects that only one frame is processed
         // Save the packet for later and return.
-        auto *newPkt = new AVPacket;
-        memset(newPkt, 0, sizeof(AVPacket));
-        av_init_packet(newPkt);
-        av_packet_ref(newPkt, pkt);
-        m_storedPackets.prepend(newPkt);
+        auto *newPkt = av_packet_clone(pkt);
+        if (newPkt)
+            m_storedPackets.prepend(newPkt);
     }
     return true;
 }
@@ -4639,12 +4637,10 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     int audSubIdx = m_selectedTrack[kTrackTypeAudio].m_av_substream_index;
     m_trackLock.unlock();
 
-    AVPacket tmp_pkt;
-    av_init_packet(&tmp_pkt);
-    tmp_pkt.data = pkt->data;
-    tmp_pkt.size = pkt->size;
-
-    while (tmp_pkt.size > 0)
+    AVPacket *tmp_pkt = av_packet_alloc();
+    tmp_pkt->data = pkt->data;
+    tmp_pkt->size = pkt->size;
+    while (tmp_pkt->size > 0)
     {
         bool reselectAudioTrack = false;
 
@@ -4687,7 +4683,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     ctx->channels = m_audio->GetMaxChannels();
             }
 
-            ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, &tmp_pkt);
+            ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
             decoded_size = data_size;
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
@@ -4761,7 +4757,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if (m_audio->NeedDecodingBeforePassthrough())
                 {
-                    ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, &tmp_pkt);
+                    ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
                     decoded_size = data_size;
                 }
                 else
@@ -4769,10 +4765,10 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     decoded_size = -1;
                 }
             }
-            memcpy(m_audioSamples, tmp_pkt.data, tmp_pkt.size);
-            data_size = tmp_pkt.size;
+            memcpy(m_audioSamples, tmp_pkt->data, tmp_pkt->size);
+            data_size = tmp_pkt->size;
             // We have processed all the data, there can't be any left
-            tmp_pkt.size = 0;
+            tmp_pkt->size = 0;
         }
         else
         {
@@ -4788,7 +4784,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     ctx->request_channel_layout = 0;
                 }
 
-                ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, &tmp_pkt);
+                ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
                 decoded_size = data_size;
             }
         }
@@ -4797,13 +4793,14 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown audio decoding error");
+            av_packet_free(&tmp_pkt);
             return false;
         }
 
         if (data_size <= 0)
         {
-            tmp_pkt.data += ret;
-            tmp_pkt.size -= ret;
+            tmp_pkt->data += ret;
+            tmp_pkt->size -= ret;
             continue;
         }
 
@@ -4833,11 +4830,12 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         m_allowedQuit |= m_ringBuffer->IsInStillFrame() ||
                        m_audio->IsBufferAlmostFull();
 
-        tmp_pkt.data += ret;
-        tmp_pkt.size -= ret;
+        tmp_pkt->data += ret;
+        tmp_pkt->size -= ret;
         firstloop = false;
     }
 
+    av_packet_free(&tmp_pkt);
     return true;
 }
 
@@ -4943,20 +4941,13 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
         if (!storevideoframes && m_storedPackets.count() > 0)
         {
             if (pkt)
-            {
-                av_packet_unref(pkt);
-                delete pkt;
-            }
+                av_packet_free(&pkt);
             pkt = m_storedPackets.takeFirst();
         }
         else
         {
             if (!pkt)
-            {
-                pkt = new AVPacket;
-                memset(pkt, 0, sizeof(AVPacket));
-                av_init_packet(pkt);
-            }
+                pkt = av_packet_alloc();
 
             int retval = 0;
             if (!m_ic || ((retval = ReadPacket(m_ic, pkt, storevideoframes)) < 0))
@@ -4965,7 +4956,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     continue;
 
                 SetEof(true);
-                delete pkt;
+                av_packet_free(&pkt);
                 std::string errbuf(256,'\0');
                 QString errmsg;
                 if (av_strerror_stdstring(retval, errbuf) == 0)
@@ -5028,8 +5019,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             // have a fatal error, so check for this before continuing.
             if (m_parent->IsErrored())
             {
-                av_packet_unref(pkt);
-                delete pkt;
+                av_packet_free(&pkt);
                 return false;
             }
         }
@@ -5139,7 +5129,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             break;
     }
 
-    delete pkt;
+    av_packet_free(&pkt);
     return true;
 }
 
