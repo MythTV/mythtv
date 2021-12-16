@@ -2465,10 +2465,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             if (HAVE_THREADS)
             {
-                // All of our callbacks are thread safe. This should improve
-                // concurrency with software decode
-                enc->thread_safe_callbacks = 1;
-
                 // Only use a single thread for hardware decoding. There is no
                 // performance improvement with multithreaded hardware decode
                 // and asynchronous callbacks create issues with decoders that
