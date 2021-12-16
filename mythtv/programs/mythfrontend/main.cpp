@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 
+#include <QtGlobal>
 #include <QFile>
 #include <QFileInfo>
 #include <QMap>
@@ -140,7 +141,7 @@ static void resetAllKeys(void);
 void handleSIGUSR1(void);
 void handleSIGUSR2(void);
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 static bool gLoaded = false;
 #endif
 
@@ -1863,7 +1864,7 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-#if ! CONFIG_DARWIN
+#ifndef Q_OS_DARWIN
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
@@ -2090,7 +2091,7 @@ int main(int argc, char **argv)
         }
     }
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     GetMythMainWindow()->SetEffectsEnabled(false);
     GetMythMainWindow()->Init();
     GetMythMainWindow()->SetEffectsEnabled(true);

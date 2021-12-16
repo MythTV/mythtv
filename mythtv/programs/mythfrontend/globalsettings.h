@@ -1,11 +1,11 @@
 #ifndef MYTHSETTINGS_H
 #define MYTHSETTINGS_H
 
+#include <QtGlobal>
 #include <QStringList>
 #include <QObject>
 #include <QCoreApplication>
 
-#include "mythconfig.h"
 #include "standardsettings.h"
 #include "mythcontext.h"
 #include "mythvideoprofile.h"
@@ -71,7 +71,7 @@ class ChannelGroupSettings
     Q_DECLARE_TR_FUNCTIONS(ChannelGroupSettings)
 };
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 class MacMainSettings : public GroupSetting
 {
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
@@ -120,7 +120,7 @@ class MacDesktopSettings : public GroupSetting
   public:
     MacDesktopSettings();
 };
-#endif
+#endif // Q_OS_DARWIN
 
 class OSDSettings: public GroupSetting
 {
