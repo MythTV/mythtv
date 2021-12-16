@@ -28,6 +28,7 @@
 #  endif // _WIN32
 #endif // !__linux__
 
+#include <QtGlobal>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QFile>
@@ -5216,7 +5217,7 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
 
                     if (statfs(currentDir.toLocal8Bit().constData(), &statbuf) == 0)
                     {
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
                         char *fstypename = statbuf.f_fstypename;
                         if ((!strcmp(fstypename, "nfs")) ||   // NFS|FTP
                             (!strcmp(fstypename, "afpfs")) || // ApplShr
