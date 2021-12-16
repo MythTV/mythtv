@@ -181,7 +181,7 @@ void MythHTTPCache::PreConditionHeaders(HTTPResponse Response)
 
     if ((cache & HTTPETag) == HTTPETag)
     {
-        Response->AddHeader("ETag", "\"" + (data ? (*data)->m_etag : (*file)->m_etag) + "\"");
+        Response->AddHeader("ETag", QString("\"") + (data ? (*data)->m_etag : (*file)->m_etag) + "\"");
     }
     else if ((cache & HTTPLastModified) == HTTPLastModified)
     {

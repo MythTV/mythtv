@@ -30,7 +30,24 @@ class MBASE_PUBLIC MythHTTPResponse
     static HTTPResponse UpgradeResponse     (HTTPRequest2 Request, MythSocketProtocol& Protocol, bool& Testing);
 
     void Finalise  (const MythHTTPConfig& Config);
-    void AddHeader (const QString& Key, const QString& Value);
+    template <class T>
+    typename std::enable_if<std::is_convertible<T, QString>::value
+#if QT_VERSION < QT_VERSION_CHECK(5,14,0)
+                         && !std::is_same<T, QByteArray>::value
+#endif
+        , void>::type
+    AddHeader (const QString& key, const T& val)
+    {
+        QByteArray bytes = QString("%1: %2\r\n").arg(key, val).toUtf8();
+        m_responseHeaders.emplace_back(MythHTTPData::Create(bytes));
+    }
+    template <class T>
+    typename std::enable_if<!std::is_convertible<T, QString>::value, void>::type
+    AddHeader (const QString& key, T val)
+    {
+        QByteArray bytes = QString("%1: %2\r\n").arg(key).arg(val).toUtf8();
+        m_responseHeaders.emplace_back(MythHTTPData::Create(bytes));
+    }
 
     QString             m_serverName;
     MythHTTPVersion     m_version         { HTTPOneDotOne };

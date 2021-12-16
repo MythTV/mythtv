@@ -15,11 +15,6 @@
 
 #define LOC QString("HTTPResp: ")
 
-#define HEADER(KEY,VAL) { \
-    QByteArray val = QString("%1: %2\r\n").arg(KEY, VAL).toUtf8(); \
-    m_responseHeaders.emplace_back(MythHTTPData::Create(val)); \
-}
-
 /*! \class MythHTTPResponse
 */
 MythHTTPResponse::MythHTTPResponse(const HTTPRequest2 Request)
@@ -45,7 +40,7 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
     {
         // Language
         if (!Config.m_language.isEmpty())
-            HEADER("Content-Language", Config.m_language)
+            AddHeader("Content-Language", Config.m_language);
 
         // Content disposition
         QString filename = data ? (*data)->m_fileName : (*file)->m_fileName;
@@ -57,7 +52,7 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
         // be appropriate i.e. not when streaming a file to a upnp player or browser
         // that can support it natively
         // TODO: Add support for utf8 encoding - RFC 5987
-        HEADER("Content-Disposition", QString("inline; filename=\"%2\"").arg(qPrintable(filename)))
+        AddHeader("Content-Disposition", QString("inline; filename=\"%2\"").arg(qPrintable(filename)));
 
         // TODO Should these be moved to UPnP handlers?
         // UPnP headers
@@ -73,7 +68,7 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
         }
 
         if (mode == "Streaming" || mode == "Background" || mode == "Interactive")
-            HEADER("transferMode.dlna.org", mode)
+            AddHeader("transferMode.dlna.org", mode);
 
         // See DLNA  7.4.1.3.11.4.3 Tolerance to unavailable contentFeatures.dlna.org header
         //
@@ -86,17 +81,17 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
         // HACK Temporary hack for Samsung TVs - Needs to be moved later as it's not entirely DLNA compliant
         if (!MythHTTP::GetHeader(m_requestHeaders, "getcontentFeatures.dlna.org", "").isEmpty())
         {
-            HEADER("contentFeatures.dlna.org",
-                   "DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000")
+            AddHeader("contentFeatures.dlna.org",
+                   "DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000");
         }
 
         // Security (mostly copied from previous HTTP server implementation)
         // TODO Are these all needed for all content?
 
         // Force IE into 'standards' mode
-        HEADER("X-UA-Compatible", "IE=Edge")
+        AddHeader("X-UA-Compatible", "IE=Edge");
         // SECURITY: Set X-Content-Type-Options to 'nosniff'
-        HEADER("X-Content-Type-Options", "nosniff")
+        AddHeader("X-Content-Type-Options", "nosniff");
         // SECURITY: Set Content Security Policy
         //
         // *No external content allowed*
@@ -127,10 +122,10 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
                          "frame-ancestors 'self'; ";
 
         // For standards compliant browsers
-        HEADER("Content-Security-Policy", policy)
+        AddHeader("Content-Security-Policy", policy);
         // For Internet Explorer
-        HEADER("X-Content-Security-Policy", policy)
-        HEADER("X-XSS-Protection", "1; mode=block")
+        AddHeader("X-Content-Security-Policy", policy);
+        AddHeader("X-XSS-Protection", "1; mode=block");
     }
 
     // Validate CORS requests
@@ -157,10 +152,10 @@ void MythHTTPResponse::Finalise(const MythHTTPConfig& Config)
             }
             if (allow)
             {
-                HEADER("Access-Control-Allow-Origin" ,      origin)
-                HEADER("Access-Control-Allow-Credentials" , "true")
-                HEADER("Access-Control-Allow-Headers" ,     "Content-Type, Accept, Range")
-                HEADER("Access-Control-Request-Method",     MythHTTP::AllowedRequestsToString(m_allowed))
+                AddHeader("Access-Control-Allow-Origin" ,      origin);
+                AddHeader("Access-Control-Allow-Credentials" , "true");
+                AddHeader("Access-Control-Allow-Headers" ,     "Content-Type, Accept, Range");
+                AddHeader("Access-Control-Request-Method",     MythHTTP::AllowedRequestsToString(m_allowed));
                 LOG(VB_HTTP, LOG_INFO, LOC + QString("Allowing CORS for origin: '%1'").arg(origin));
             }
             else
@@ -291,17 +286,17 @@ void MythHTTPResponse::AddDefaultHeaders()
     QByteArray def = QString("%1 %2\r\n").arg(MythHTTP::VersionToString(m_version),
                                               MythHTTP::StatusToString(m_status)).toUtf8();
     m_responseHeaders.emplace_back(MythHTTPData::Create(def));
-    HEADER("Date", MythDate::toString(MythDate::current(), MythDate::kRFC822)) // RFC 822
-    HEADER("Server", m_serverName)
+    AddHeader("Date", MythDate::toString(MythDate::current(), MythDate::kRFC822)); // RFC 822
+    AddHeader("Server", m_serverName);
     // Range requests are supported
-    HEADER("Accept-Ranges", "bytes")
-    HEADER("Connection", m_connection == HTTPConnectionClose ? "Close" : "Keep-Alive")
+    AddHeader("Accept-Ranges", "bytes");
+    AddHeader("Connection", m_connection == HTTPConnectionClose ? "Close" : "Keep-Alive");
     if (m_connection == HTTPConnectionKeepAlive)
-        HEADER("Keep-Alive", QString("timeout=%1").arg(m_timeout.count() / 1000))
+        AddHeader("Keep-Alive", QString("timeout=%1").arg(m_timeout.count() / 1000));
 
     // Required error specific headers
     if (m_status == HTTPServiceUnavailable)
-        HEADER("Retry-After", HTTP_SOCKET_TIMEOUT_MS / 1000)
+        AddHeader("Retry-After", HTTP_SOCKET_TIMEOUT_MS / 1000);
 }
 
 void MythHTTPResponse::AddContentHeaders()
@@ -314,7 +309,7 @@ void MythHTTPResponse::AddContentHeaders()
     // Always add a zero length content header to keep some clients happy
     if (size < 1)
     {
-        HEADER("Content-Length", 0)
+        AddHeader("Content-Length", 0);
         return;
     }
 
@@ -334,15 +329,15 @@ void MythHTTPResponse::AddContentHeaders()
         MythHTTPRanges::BuildMultipartHeaders(this);
 
     // Set the content type - with special handling for multipart ranges
-    HEADER("Content-Type", multipart ? MythHTTPRanges::GetRangeHeader(ranges, size) :
-                                       MythHTTP::GetContentType(mime))
+    AddHeader("Content-Type", multipart ? MythHTTPRanges::GetRangeHeader(ranges, size) :
+                                       MythHTTP::GetContentType(mime));
 
     if (m_status == HTTPRequestedRangeNotSatisfiable)
     {
         // Mandatory 416 (Range Not Satisfiable) response
         // Note - we will remove content before sending
-        HEADER("Content-Range", QString("bytes */%1").arg(size))
-        HEADER("Content-Length", 0)
+        AddHeader("Content-Range", QString("bytes */%1").arg(size));
+        AddHeader("Content-Length", 0);
         return;
     }
 
@@ -353,7 +348,7 @@ void MythHTTPResponse::AddContentHeaders()
     // header if we are
     if (encode == HTTPChunked)
     {
-        HEADER("Transfer-Encoding", "chunked")
+        AddHeader("Transfer-Encoding", "chunked");
     }
     else
     {
@@ -361,7 +356,7 @@ void MythHTTPResponse::AddContentHeaders()
         {
             // Inform the client of the (single) range being served
             if (!multipart)
-                HEADER("Content-Range", MythHTTPRanges::GetRangeHeader(ranges, size))
+                AddHeader("Content-Range", MythHTTPRanges::GetRangeHeader(ranges, size));
             // Content-Length is now the number of bytes served, not the total
             size = data ? (*data)->m_partialSize : (*file)->m_partialSize;
         }
@@ -369,13 +364,8 @@ void MythHTTPResponse::AddContentHeaders()
         // Add the size of the multipart headers to the content length
         if (multipart)
             size += data ? (*data)->m_multipartHeaderSize : (*file)->m_multipartHeaderSize;
-        HEADER("Content-Length", size)        
+        AddHeader("Content-Length", size);
     }
-}
-
-void MythHTTPResponse::AddHeader(const QString &Key, const QString &Value)
-{
-    HEADER(Key, Value)
 }
 
 HTTPResponse MythHTTPResponse::UpgradeResponse(HTTPRequest2 Request, MythSocketProtocol &Protocol, bool &Testing)
