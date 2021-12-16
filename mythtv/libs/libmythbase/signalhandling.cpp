@@ -1,3 +1,6 @@
+#include "signalhandling.h"
+
+#include <QtGlobal>
 #include <QObject>
 #include <QSocketNotifier>
 #include <QCoreApplication>
@@ -17,7 +20,7 @@
 #include "compat.h"
 #include "mythlogging.h"
 #include "exitcodes.h"
-#include "signalhandling.h"
+
 
 std::array<int,2> SignalHandler::s_sigFd;
 volatile bool SignalHandler::s_exit_program = false;
@@ -65,16 +68,16 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
         delete [] m_sigStack;
         m_sigStack = nullptr;
     }
-#endif
+#endif // _WIN32
 
     if (s_defaultHandlerList.isEmpty())
         s_defaultHandlerList << SIGINT << SIGTERM << SIGSEGV << SIGABRT
                              << SIGFPE << SIGILL;
 #ifndef _WIN32
     s_defaultHandlerList << SIGBUS;
-#if ! CONFIG_DARWIN
+#ifndef Q_OS_DARWIN
     s_defaultHandlerList << SIGRTMIN;
-#endif
+#endif // Q_OS_DARWIN
 
     if (::socketpair(AF_UNIX, SOCK_STREAM, 0, s_sigFd.data()))
     {
@@ -94,7 +97,7 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
 
         SetHandlerPrivate(signum, nullptr);
     }
-#endif
+#endif // _WIN32
 }
 
 SignalHandler::~SignalHandler()
@@ -294,7 +297,7 @@ void SignalHandler::handleSignal(void)
     SigHandlerFunc handler = nullptr;
     bool allowNullHandler = false;
 
-#if ! CONFIG_DARWIN
+#ifndef Q_OS_DARWIN
     if (signum == SIGRTMIN)
     {
         // glibc idiots seem to have made SIGRTMIN a macro that expands to a
@@ -302,7 +305,7 @@ void SignalHandler::handleSignal(void)
         // This uses the default handler to just get us here and to ignore it.
         allowNullHandler = true;
     }
-#endif
+#endif // Q_OS_DARWIN
 
     switch (signum)
     {
@@ -343,7 +346,7 @@ void SignalHandler::handleSignal(void)
     }
 
     m_notifier->setEnabled(true);
-#endif
+#endif // _WIN32
 }
 
 /*

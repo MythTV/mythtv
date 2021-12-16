@@ -1,3 +1,6 @@
+#include "logging.h"
+
+#include <QtGlobal>
 #include <QAtomicInt>
 #include <QMutex>
 #include <QMutexLocker>
@@ -13,7 +16,7 @@
 #include <iostream>
 
 #include "mythlogging.h"
-#include "logging.h"
+
 #include "loggingserver.h"
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -49,7 +52,7 @@ extern "C" {
 #include <sys/ucontext.h>
 #include <sys/thr.h>
 }
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
 #include <mach/mach.h>
 #endif
 
@@ -192,7 +195,7 @@ void LoggingItem::setThreadTid(void)
         int dummy = thr_self( &lwpid );
         (void)dummy;
         m_tid = (int64_t)lwpid;
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
         m_tid = (int64_t)mach_thread_self();
 #endif
         logThreadTidHash[m_threadId] = m_tid;

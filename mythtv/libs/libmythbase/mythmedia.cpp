@@ -1,3 +1,5 @@
+#include "mythmedia.h"
+
 // C header
 #include <fcntl.h>
 #include <unistd.h>
@@ -7,6 +9,7 @@
 #include <sys/param.h>
 
 // Qt Headers
+#include <QtGlobal>
 #include <QDir>
 #include <QFileInfo>
 #include <QFileInfoList>
@@ -14,22 +17,18 @@
 #include <QTextStream>
 
 // MythTV headers
-#include "mythmedia.h"
-#include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
-#ifdef _WIN32
-#   define O_NONBLOCK 0
-#endif
+#include "compat.h"
 
 #define LOC QString("MythMediaDevice:")
 
 static const QString PATHTO_PMOUNT("/usr/bin/pmount");
 static const QString PATHTO_PUMOUNT("/usr/bin/pumount");
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     static const QString PATHTO_MOUNT("/sbin/mount");
 #else
     static const QString PATHTO_MOUNT("/bin/mount");
@@ -37,7 +36,7 @@ static const QString PATHTO_PUMOUNT("/usr/bin/pumount");
 static const QString PATHTO_UNMOUNT("/bin/umount");
 static const QString PATHTO_MOUNTS("/proc/mounts");
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 #   define USE_MOUNT_COMMAND
 #endif
 
@@ -307,7 +306,7 @@ MythMediaError MythMediaDevice::eject(bool open_close)
 {
     (void) open_close;
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     QString  command = "diskutil eject " + m_devicePath;
 
     myth_system(command, kMSRunBackground);
@@ -419,7 +418,7 @@ bool MythMediaDevice::findMountPath()
         QStringList deviceNames;
         getSymlinkTarget(deviceName, &deviceNames);
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
         // match short-style BSD node names:
         if (m_devicePath.startsWith("disk"))
             deviceNames << deviceName.mid(5);   // remove 5 chars - /dev/

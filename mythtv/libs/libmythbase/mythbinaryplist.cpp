@@ -16,7 +16,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
-
+#include "mythbinaryplist.h"
 /**
  * \class PList
  *  A parser for binary property lists, using QVariant for internal
@@ -30,6 +30,7 @@
 // parse uid (and use QPair to differentiate?)
 
 // Qt
+#include <QtGlobal>
 #include <QDateTime>
 #include <QSequentialIterable>
 #include <QTextStream>
@@ -38,20 +39,20 @@
 // MythTV
 #include "mythconfig.h"
 #include "mythlogging.h"
-#include "mythbinaryplist.h"
+
 
 // Std
 #include <array>
 #include <cmath>
 #if HAVE_SYS_ENDIAN_H
-#include <sys/endian.h>
-#elif !CONFIG_DARWIN
-#include <endian.h>
+#   include <sys/endian.h>
+#elif !defined(Q_OS_DARWIN)
+#   include <endian.h>
 #else
-#include <libkern/OSByteOrder.h>
-#define be16toh(x) OSSwapBigToHostInt16(x)
-#define be32toh(x) OSSwapBigToHostInt32(x)
-#define be64toh(x) OSSwapBigToHostInt64(x)
+#   include <libkern/OSByteOrder.h>
+#   define be16toh(x) OSSwapBigToHostInt16(x)
+#   define be32toh(x) OSSwapBigToHostInt32(x)
+#   define be64toh(x) OSSwapBigToHostInt64(x)
 #endif
 
 #define LOC QString("PList: ")

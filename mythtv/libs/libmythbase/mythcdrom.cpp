@@ -8,6 +8,7 @@
 #include "blockinput.h"
 #endif
 
+#include <QtGlobal>
 #include <QDir>
 #include <QFileInfo>
 
@@ -20,7 +21,7 @@
 #   include "mythcdrom-linux.h"
 #elif defined(__FreeBSD__)
 #   include "mythcdrom-freebsd.h"
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
 #   include "mythcdrom-darwin.h"
 #endif
 
@@ -46,7 +47,7 @@ MythCDROM* MythCDROM::get(QObject* par, const QString& devicePath,
     return GetMythCDROMLinux(par, devicePath, SuperMount, AllowEject);
 #elif defined(__FreeBSD__)
     return GetMythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
     return GetMythCDROMDarwin(par, devicePath, SuperMount, AllowEject);
 #else
     return new MythCDROM(par, devicePath, SuperMount, AllowEject);

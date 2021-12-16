@@ -19,6 +19,7 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 */
+#include "mythcommandlineparser.h"
 
 #if defined ANDROID && __ANDROID_API__ < 24
 // ftello and fseeko do not exist in android before api level 24
@@ -68,7 +69,7 @@
   #define QT_ENDL Qt::endl
 #endif
 
-#include "mythcommandlineparser.h"
+
 #include "mythcorecontext.h"
 #include "exitcodes.h"
 #include "mythconfig.h"
@@ -2937,7 +2938,7 @@ int MythCommandLineParser::Daemonize(void) const
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         LOG(VB_GENERAL, LOG_WARNING, "Unable to ignore SIGPIPE");
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     if (toBool("daemon"))
     {
         std::cerr << "Daemonizing is unavailable in OSX" << std::endl;

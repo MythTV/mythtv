@@ -1,3 +1,6 @@
+#include "loggingserver.h"
+
+#include <QtGlobal>
 #include <QAtomicInt>
 #include <QMutex>
 #include <QMutexLocker>
@@ -14,7 +17,6 @@
 
 #include "mythlogging.h"
 #include "logging.h"
-#include "loggingserver.h"
 #include "mythdb.h"
 #include "mythcorecontext.h"
 #include "dbutil.h"
@@ -49,7 +51,7 @@ extern "C" {
 #include <sys/ucontext.h>
 #include <sys/thr.h>
 }
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
 #include <mach/mach.h>
 #endif
 
