@@ -2057,17 +2057,27 @@ int MPEG2fixup::Start()
     QMap<int, int> af_dlta_cnt;
     QMap<int, int> cutState;
 
-    AVPacket pkt;
-    AVPacket lastRealvPkt;
-
-    av_init_packet(&pkt);
-    av_init_packet(&lastRealvPkt);
+    AVPacket *pkt = av_packet_alloc();
+    AVPacket *lastRealvPkt = av_packet_alloc();
+    if ((pkt == nullptr) || (lastRealvPkt == nullptr))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
+        return GENERIC_EXIT_NOT_OK;
+    }
 
     if (!InitAV(m_infile, m_format, 0))
+    {
+        av_packet_free(&pkt);
+        av_packet_free(&lastRealvPkt);
         return GENERIC_EXIT_NOT_OK;
+    }
 
     if (!FindStart())
+    {
+        av_packet_free(&pkt);
+        av_packet_free(&lastRealvPkt);
         return GENERIC_EXIT_NOT_OK;
+    }
 
     m_ptsIncrement = m_vFrame.first()->m_mpeg2_seq.frame_period / 300;
 
@@ -2128,7 +2138,7 @@ int MPEG2fixup::Start()
     while (!m_fileEnd)
     {
         /* read packet */
-        int ret = GetFrame(&pkt);
+        int ret = GetFrame(pkt);
         if (ret < 0)
             return ret;
 
@@ -2178,6 +2188,8 @@ int MPEG2fixup::Start()
                             .arg(expectedvPTS)
                             .arg(expectedDTS)
                             .arg(m_ptsIncrement));
+                    av_packet_free(&pkt);
+                    av_packet_free(&lastRealvPkt);
                     return GENERIC_EXIT_NOT_OK;
                 }
 
@@ -2201,8 +2213,12 @@ int MPEG2fixup::Start()
                     int pos = m_vFrame.count();
                     int count = Lreorder.count();
                     while (m_vFrame.count() - frame_pos - count < 20 && !m_fileEnd)
-                        if ((ret = GetFrame(&pkt)) < 0)
+                        if ((ret = GetFrame(pkt)) < 0)
+                        {
+                            av_packet_free(&pkt);
+                            av_packet_free(&lastRealvPkt);
                             return ret;
+                        }
 
                     if (!m_fileEnd)
                     {
@@ -2259,6 +2275,8 @@ int MPEG2fixup::Start()
                             if (GetFrameTypeT(curFrame) != 'I' &&
                                 ConvertToI(&Lreorder, frame_pos))
                             {
+                                av_packet_free(&pkt);
+                                av_packet_free(&lastRealvPkt);
                                 return GENERIC_EXIT_WRITE_FRAME_ERROR;
                             }
 
@@ -2306,7 +2324,11 @@ int MPEG2fixup::Start()
                              (GetFrameTypeT(curFrame) == 'P')))
                         {
                             if (ConvertToI(&Lreorder, frame_pos))
+                            {
+                                av_packet_free(&pkt);
+                                av_packet_free(&lastRealvPkt);
                                 return GENERIC_EXIT_WRITE_FRAME_ERROR;
+                            }
                             ptsorder_eq_dtsorder = true;
                         }
                         else if (!new_discard_state &&
@@ -2332,8 +2354,8 @@ int MPEG2fixup::Start()
 
                 if (!Lreorder.isEmpty())
                 {
-                    av_packet_unref(&lastRealvPkt);
-                    av_packet_ref(&lastRealvPkt, &Lreorder.last()->m_pkt);
+                    av_packet_unref(lastRealvPkt);
+                    av_packet_ref(lastRealvPkt, &Lreorder.last()->m_pkt);
                 }
 
                 if (markedFrame || !m_discard)
@@ -2413,7 +2435,11 @@ int MPEG2fixup::Start()
                                               deltaPTS, m_ptsIncrement, 0);
                         
                         if (ret < 0)
+                        {
+                            av_packet_free(&pkt);
+                            av_packet_free(&lastRealvPkt);
                             return GENERIC_EXIT_WRITE_FRAME_ERROR;
+                        }
 
                         for (int index = frame_pos + Lreorder.count();
                              ret && index < m_vFrame.count(); index++, --ret)
@@ -2461,7 +2487,11 @@ int MPEG2fixup::Start()
                                      PtsTime(curFrame->m_pkt.dts),
                                      QString::number(curFrame->m_pkt.pos)));
                         if (AddFrame(curFrame))
+                        {
+                            av_packet_free(&pkt);
+                            av_packet_free(&lastRealvPkt);
                             return GENERIC_EXIT_DEADLOCK;
+                        }
 
                         if (curFrame == markedFrame)
                         {
@@ -2477,12 +2507,12 @@ int MPEG2fixup::Start()
                     frame_pos += Lreorder.count();
                 }
                 if (PTSdiscrep)
-                    poq.SetNextPos(add2x33(poq.Get(m_vidId, &lastRealvPkt),
-                                                   PTSdiscrep), &lastRealvPkt);
+                    poq.SetNextPos(add2x33(poq.Get(m_vidId, lastRealvPkt),
+                                                   PTSdiscrep), lastRealvPkt);
             }
 
             if (m_discard)
-                cutEndPTS = lastRealvPkt.pts;
+                cutEndPTS = lastRealvPkt->pts;
 
             if (m_fileEnd)
                 m_useSecondary = false;
@@ -2639,7 +2669,11 @@ int MPEG2fixup::Start()
                         .arg(PtsTime(af->first()->m_pkt.pts))
                         .arg(af->first()->m_pkt.pos));
                 if (AddFrame(af->first()))
+                {
+                    av_packet_free(&pkt);
+                    av_packet_free(&lastRealvPkt);
                     return GENERIC_EXIT_DEADLOCK;
+                }
                 m_framePool.enqueue(af->takeFirst());
             }
         }
@@ -2659,6 +2693,8 @@ int MPEG2fixup::Start()
       ex = REENCODE_ERROR;
     }
 
+    av_packet_free(&pkt);
+    av_packet_free(&lastRealvPkt);
     avformat_close_input(&m_inputFC);
     m_inputFC = nullptr;
     return ex;
