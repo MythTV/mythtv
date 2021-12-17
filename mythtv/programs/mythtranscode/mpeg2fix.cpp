@@ -1839,16 +1839,21 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
                             int64_t ptsIncrement, int64_t initPTS)
 {
     MPEG2frame *spare = nullptr;
-    AVPacket pkt;
-    av_init_packet(&pkt);
     int increment = 0;
     int index = 0;
+
+    AVPacket *pkt = av_packet_alloc();
+    if (pkt == nullptr)
+    {
+        LOG(VB_PROCESS, LOG_ERR, "packet allocation failed");
+        return 0;
+    }
 
     if ((spare = DecodeToFrame(frameNum, 0)) == nullptr)
         return -1;
 
-    av_packet_ref(&pkt, &spare->m_pkt);
-    //pkt.data is a newly malloced area
+    av_packet_ref(pkt, &spare->m_pkt);
+    //pkt->data is a newly malloced area
 
     {
         QString fname;
@@ -1858,7 +1863,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
                 (QString("ins%1").arg(ins_count++)) : QString());
 #endif
 
-        if (BuildFrame(&pkt, fname))
+        if (BuildFrame(pkt, fname))
             return -1;
 
         LOG(VB_GENERAL, LOG_INFO,
@@ -1867,7 +1872,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
                 .arg(GetFrameNum(spare)).arg(fname));
     }
     
-    inc2x33(&pkt.pts, ptsIncrement * GetNbFields(spare) / 2 + initPTS);
+    inc2x33(&pkt->pts, ptsIncrement * GetNbFields(spare) / 2 + initPTS);
 
     index = m_vFrame.indexOf(spare) + 1;
     while (index < m_vFrame.count() &&
@@ -1880,19 +1885,19 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     {
         index++;
         increment++;
-        pkt.dts = pkt.pts;
-        SetFrameNum(pkt.data, ++frameNum);
-        MPEG2frame *tmpFrame = GetPoolFrame(&pkt);
+        pkt->dts = pkt->pts;
+        SetFrameNum(pkt->data, ++frameNum);
+        MPEG2frame *tmpFrame = GetPoolFrame(pkt);
         if (tmpFrame == nullptr)
             return -1;
         m_vFrame.insert(index, tmpFrame);
         ProcessVideo(tmpFrame, m_headerDecoder); //process new frame
 
-        inc2x33(&pkt.pts, ptsIncrement);
+        inc2x33(&pkt->pts, ptsIncrement);
         deltaPTS -= ptsIncrement;
     }
 
-    av_packet_unref(&pkt);
+    av_packet_free(&pkt);
     // update frame # for all later frames in this group
     index++;
     RenumberFrames(index, increment);
