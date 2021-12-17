@@ -2830,7 +2830,6 @@ int MPEG2fixup::BuildKeyframeIndex(const QString &file,
 {
     LOG(VB_GENERAL, LOG_INFO, "Generating Keyframe Index");
 
-    AVPacket pkt;
     int count = 0;
 
     /*============ initialise AV ===============*/
@@ -2844,16 +2843,21 @@ int MPEG2fixup::BuildKeyframeIndex(const QString &file,
         return GENERIC_EXIT_NOT_OK;
     }
 
-    av_init_packet(&pkt);
+    AVPacket *pkt = av_packet_alloc();
+    if (pkt == nullptr)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
+        return GENERIC_EXIT_NOT_OK;
+    }
 
     uint64_t totalDuration = 0;
-    while (av_read_frame(m_inputFC, &pkt) >= 0)
+    while (av_read_frame(m_inputFC, pkt) >= 0)
     {
-        if (pkt.stream_index == m_vidId)
+        if (pkt->stream_index == m_vidId)
         {
-            if (pkt.flags & AV_PKT_FLAG_KEY)
+            if (pkt->flags & AV_PKT_FLAG_KEY)
             {
-                posMap[count] = pkt.pos;
+                posMap[count] = pkt->pos;
                 durMap[count] = totalDuration;
             }
 
@@ -2863,14 +2867,15 @@ int MPEG2fixup::BuildKeyframeIndex(const QString &file,
             // totalDuration calculation based on
             // AvFormatDecoder::PreProcessVideoPacket()
             totalDuration +=
-                av_q2d(m_inputFC->streams[pkt.stream_index]->time_base) *
-                pkt.duration * 1000; // msec
+                av_q2d(m_inputFC->streams[pkt->stream_index]->time_base) *
+                pkt->duration * 1000; // msec
             count++;
         }
-        av_packet_unref(&pkt);
+        av_packet_unref(pkt);
     }
 
     // Close input file
+    av_packet_free(&pkt);
     avformat_close_input(&m_inputFC);
     m_inputFC = nullptr;
 
