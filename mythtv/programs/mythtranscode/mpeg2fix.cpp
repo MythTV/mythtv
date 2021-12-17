@@ -1477,30 +1477,36 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
 
 bool MPEG2fixup::FindStart()
 {
-    AVPacket pkt;
     QMap <int, bool> found;
-
-    av_init_packet(&pkt);
+    AVPacket *pkt = av_packet_alloc();
+    if (pkt == nullptr)
+    {
+        LOG(VB_PROCESS, LOG_ERR, "packet allocation failed");
+        return false;
+    }
 
     do
     {
-        if (GetFrame(&pkt))
+        if (GetFrame(pkt))
+        {
+            av_packet_free(&pkt);
             return false;
+        }
 
-        if (m_vidId == pkt.stream_index)
+        if (m_vidId == pkt->stream_index)
         {
             while (!m_vFrame.isEmpty())
             {
                 if (m_vFrame.first()->m_isSequence)
                 {
-                    if (pkt.pos != m_vFrame.first()->m_pkt.pos)
+                    if (pkt->pos != m_vFrame.first()->m_pkt.pos)
                         break;
 
-                    if (pkt.pts != AV_NOPTS_VALUE ||
-                        pkt.dts != AV_NOPTS_VALUE)
+                    if (pkt->pts != AV_NOPTS_VALUE ||
+                        pkt->dts != AV_NOPTS_VALUE)
                     {
-                        if (pkt.pts == AV_NOPTS_VALUE)
-                            m_vFrame.first()->m_pkt.pts = pkt.dts;
+                        if (pkt->pts == AV_NOPTS_VALUE)
+                            m_vFrame.first()->m_pkt.pts = pkt->dts;
 
                         LOG(VB_PROCESS, LOG_INFO,
                             "Found 1st valid video frame");
@@ -1598,6 +1604,7 @@ bool MPEG2fixup::FindStart()
         }
     } while (found.count() != m_aFrame.count());
 
+    av_packet_free(&pkt);
     return true;
 }
 
