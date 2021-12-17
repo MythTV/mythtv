@@ -1235,11 +1235,6 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
     return currA->isNull() ? -1 : + 1;
 }
 
-QString MythFormatTime(std::chrono::milliseconds msecs, const QString& fmt)
-{
-    return QTime::fromMSecsSinceStartOfDay(msecs.count()).toString(fmt);
-}
-
 /*
  * States for the command line parser.
  */

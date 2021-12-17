@@ -24,6 +24,7 @@
 #include <compat.h>
 #include <lcddevice.h>
 #include <musicmetadata.h>
+#include <mythdate.h>
 
 // MythMusic includes
 #include "musicdata.h"
@@ -2140,11 +2141,11 @@ void MusicCommon::updatePlaylistStats(void)
 QString MusicCommon::getTimeString(std::chrono::seconds exTime, std::chrono::seconds maxTime)
 {
     if (maxTime <= 0ms)
-        return MythFormatTime(exTime,
+        return MythDate::formatTime(exTime,
                               (exTime >= 1h) ? "H:mm:ss" : "mm:ss");
 
     QString fmt = (maxTime >= 1h) ? "H:mm:ss" : "mm:ss";
-    return MythFormatTime(exTime, fmt) + " / " + MythFormatTime(maxTime, fmt);
+    return MythDate::formatTime(exTime, fmt) + " / " + MythDate::formatTime(maxTime, fmt);
 }
 
 void MusicCommon::searchButtonList(void)

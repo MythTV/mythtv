@@ -19,7 +19,7 @@
 #include "cardutil.h"
 #include "recordinginfo.h"
 
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythuihelper.h"
 #include "mythuibuttonlist.h"
 #include "mythuitext.h"
@@ -1122,9 +1122,9 @@ static QString uptimeStr(std::chrono::seconds uptime)
     {
         astext = QString("%1, %2")
             .arg(StatusBox::tr("%n day(s)", "", days.count()),
-                 MythFormatTime(secs, "H:mm"));
+                 MythDate::formatTime(secs, "H:mm"));
     } else {
-        astext = MythFormatTime(secs, "H:mm:ss");
+        astext = MythDate::formatTime(secs, "H:mm:ss");
     }
     return str + astext;
 }

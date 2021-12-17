@@ -34,7 +34,6 @@
 #include "osd.h"
 #include "playercontext.h"
 #include "decoders/decoderbase.h"
-#include "mythmiscutil.h"
 #include "tvbrowsehelper.h"
 #include "mythtvmenu.h"
 #include "tvplaybackstate.h"

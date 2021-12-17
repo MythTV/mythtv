@@ -105,22 +105,6 @@ MBASE_PUBLIC void setHttpProxy(void);
 MBASE_PUBLIC int naturalCompare(const QString &_a, const QString &_b,
                                 Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
 
-/**
- * \brief Format a milliseconds time value
- *
- * Convert a millisecond time value into a textual representation of the value.
- *
- * \param msecs The time value in milliseconds. Since the type of this
- *     field is std::chrono::duration, any duration of a larger
- *     interval can be passed to this function and the compiler will
- *     convert it to milliseconds.
- *
- * \param fmt A formatting string specifying how to output the time.
- *     See QTime::toString for the a definition fo valid formatting
- *     characters.
- */
-MBASE_PUBLIC QString MythFormatTime(std::chrono::milliseconds msecs, const QString& fmt);
-
 // CPU Tick timing function
 #ifdef MMX
 #ifdef _WIN32

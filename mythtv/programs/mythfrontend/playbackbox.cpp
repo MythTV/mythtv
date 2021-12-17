@@ -18,6 +18,7 @@
 #include "mythuiprogressbar.h"
 #include "mythuibuttonlist.h"
 #include "mythcorecontext.h"
+#include "mythmiscutil.h"
 #include "mythmainwindow.h"             // for GetMythMainWindow, etc
 #include "mythscreenstack.h"            // for MythScreenStack
 #include "mythuistatetype.h"

@@ -69,6 +69,7 @@ extern "C" {
 #include "io/mythmediabuffer.h"
 #include "mythframe.h"
 #include "mythchrono.h"
+#include "mythdate.h"
 #include "remoteencoder.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
@@ -1264,7 +1265,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Chapter %1 found @ [%2]->%3")
                 .arg(i + 1,   2,10,QChar('0'))
-                .arg(MythFormatTime(msec, "HH:mm:ss.zzz"))
+                .arg(MythDate::formatTime(msec, "HH:mm:ss.zzz"))
                 .arg(framenum));
     }
 

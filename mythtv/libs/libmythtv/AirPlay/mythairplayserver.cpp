@@ -18,6 +18,7 @@
 #include <QUrlQuery>
 
 #include "mthread.h"
+#include "mythmiscutil.h"
 #include "mythdate.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"

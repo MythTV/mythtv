@@ -60,6 +60,25 @@ MBASE_PUBLIC std::chrono::milliseconds currentMSecsSinceEpochAsDuration(void);
 MBASE_PUBLIC std::chrono::seconds secsInPast (const QDateTime& past);
 MBASE_PUBLIC std::chrono::seconds secsInFuture (const QDateTime& future);
 
-};
+/**
+ * \brief Format a milliseconds time value
+ *
+ * Convert a millisecond time value into a textual representation of the value.
+ *
+ * \param msecs The time value in milliseconds. Since the type of this
+ *     field is std::chrono::duration, any duration of a larger
+ *     interval can be passed to this function and the compiler will
+ *     convert it to milliseconds.
+ *
+ * \param fmt A formatting string specifying how to output the time.
+ *     See QTime::toString for the a definition fo valid formatting
+ *     characters.
+ */
+inline MBASE_PUBLIC QString formatTime(std::chrono::milliseconds msecs, const QString& fmt)
+{
+    return QTime::fromMSecsSinceStartOfDay(msecs.count()).toString(fmt);
+}
+
+} // namespace MythDate
 
 #endif // MYTH_DATE_H

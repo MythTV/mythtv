@@ -30,7 +30,7 @@
 #include <lcddevice.h>
 #include <mythmediamonitor.h>
 #include <mythdirs.h>
-#include <mythmiscutil.h>
+#include <mythdate.h>
 
 // MythUI
 #include <mythdialogbox.h>
@@ -1224,7 +1224,7 @@ void Ripper::updateTrackList(void)
 
             if (track->length >= 1s)
             {
-                item->SetText(MythFormatTime(track->length, "mm:ss"), "length");
+                item->SetText(MythDate::formatTime(track->length, "mm:ss"), "length");
             }
             else
                 item->SetText("", "length");

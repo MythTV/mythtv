@@ -11,7 +11,7 @@
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "mythlocale.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythdirs.h"
 #include "libbluray/bluray.h"
 #include "io/mythiowrapper.h"
@@ -718,7 +718,7 @@ bool MythBDBuffer::UpdateTitleInfo(void)
     m_titlesize = bd_get_title_size(m_bdnav);
     uint32_t chapter_count = GetNumChapters();
     auto total_msecs = duration_cast<std::chrono::milliseconds>(m_currentTitleLength);
-    auto duration = MythFormatTime(total_msecs, "HH:mm:ss.zzz");
+    auto duration = MythDate::formatTime(total_msecs, "HH:mm:ss.zzz");
     duration.chop(2); // Chop 2 to show tenths
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("New title info: Index %1 Playlist: %2 Duration: %3 ""Chapters: %5")
             .arg(m_currentTitle).arg(m_currentTitleInfo->playlist).arg(duration).arg(chapter_count));
@@ -731,7 +731,7 @@ bool MythBDBuffer::UpdateTitleInfo(void)
         uint64_t framenum   = GetChapterStartFrame(i);
         LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Chapter %1 found @ [%2]->%3")
             .arg(i + 1,   2, 10, QChar('0'))
-            .arg(MythFormatTime(GetChapterStartTimeMs(i), "HH:mm:ss.zzz"))
+            .arg(MythDate::formatTime(GetChapterStartTimeMs(i), "HH:mm:ss.zzz"))
             .arg(framenum));
     }
 
