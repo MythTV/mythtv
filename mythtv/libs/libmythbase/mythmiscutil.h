@@ -57,14 +57,6 @@ MBASE_PUBLIC QString getSymlinkTarget(const QString &start_file,
 
 MBASE_PUBLIC void wrapList(QStringList &list, int width);
 
-inline float clamp(float val, float minimum, float maximum)
-{
-    return std::min(std::max(val, minimum), maximum);
-}
-inline int   clamp(int val, int minimum, int maximum)
-{
-    return std::min(std::max(val, minimum), maximum);
-}
 inline float lerp(float r, float a, float b)
 {
     return ((1.0F - r) * a) + (r * b);

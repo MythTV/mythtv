@@ -7,8 +7,6 @@
 
 // C++ headers
 #include <algorithm>
-using std::max;
-using std::min;
 
 // Qt headers
 #include <QMap>
@@ -379,7 +377,7 @@ ProgramInfo::ProgramInfo(
     m_recStartTs(std::move(_recstartts)),
     m_recEndTs(std::move(_recendts)),
 
-    m_stars(clamp(_stars, 0.0F, 1.0F)),
+    m_stars(std::clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
     m_lastModified(std::move(_lastmodified)),
@@ -562,7 +560,7 @@ ProgramInfo::ProgramInfo(
     m_recStartTs(std::move(_recstartts)),
     m_recEndTs(std::move(_recendts)),
 
-    m_stars(clamp(_stars, 0.0F, 1.0F)),
+    m_stars(std::clamp(_stars, 0.0F, 1.0F)),
 
     m_originalAirDate(_originalAirDate),
     m_lastModified(m_startTs),
@@ -1891,7 +1889,7 @@ std::chrono::seconds ProgramInfo::GetSecondsInRecording(void) const
 {
     auto recsecs  = std::chrono::seconds(m_recStartTs.secsTo(m_endTs));
     auto duration = std::chrono::seconds(m_startTs.secsTo(m_endTs));
-    return (recsecs > 0s) ? recsecs : max(duration,0s);
+    return (recsecs > 0s) ? recsecs : std::max(duration, 0s);
 }
 
 /// \brief Returns catType as a string
@@ -2092,7 +2090,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     m_recStartTs   = MythDate::as_utc(query.value(24).toDateTime());
     m_recEndTs     = MythDate::as_utc(query.value(25).toDateTime());
 
-    m_stars        = clamp((float)query.value(23).toDouble(), 0.0F, 1.0F);
+    m_stars        = std::clamp((float)query.value(23).toDouble(), 0.0F, 1.0F);
 
     m_year         = query.value(26).toUInt();
     m_partNumber   = query.value(49).toUInt();

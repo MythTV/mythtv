@@ -2,7 +2,7 @@
 #include <cmath>
 
 // C++ headers
-#include <algorithm> // for min/max
+#include <algorithm> // for min/max, clamp
 #include <iostream> // for cerr
 #include <thread> // for sleep_for
 
@@ -2408,7 +2408,7 @@ void ClassicCommDetector::CleanupFrameInfo(void)
         avgHistogram.fill(0);
 
         for (uint64_t i = 1; i <= m_framesProcessed; i++)
-            avgHistogram[clamp(m_frameInfo[i].avgBrightness, 0, 255)] += 1;
+            avgHistogram[std::clamp(m_frameInfo[i].avgBrightness, 0, 255)] += 1;
 
         for (int i = 1; i <= 255 && minAvg == -1; i++)
             if (avgHistogram[i] > (m_framesProcessed * 0.0004))

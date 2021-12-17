@@ -11,7 +11,6 @@
 #include "recordinginfo.h"
 #include "recordingrule.h"
 #include "scheduledrecording.h"
-#include "mythmiscutil.h"
 #include "mythdate.h"
 #include "mythcorecontext.h"
 #include "programinfoupdater.h"
@@ -128,7 +127,7 @@ RecordingInfo::RecordingInfo(
 
     m_recPriority = _recpriority;
 
-    m_stars = clamp(_stars, 0.0F, 1.0F);
+    m_stars = std::clamp(_stars, 0.0F, 1.0F);
     m_originalAirDate = _originalAirDate;
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1895, 12, 28))
         m_originalAirDate = QDate();
