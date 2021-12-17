@@ -1777,8 +1777,12 @@ MPEG2frame *MPEG2fixup::DecodeToFrame(int frameNum, int skip_reset)
 int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
 {
     MPEG2frame *spare = nullptr;
-    AVPacket pkt;
-    av_init_packet(&pkt);
+    AVPacket *pkt = av_packet_alloc();
+    if (pkt == nullptr)
+    {
+        LOG(VB_PROCESS, LOG_ERR, "packet allocation failed");
+        return 0;
+    }
 #ifdef SPEW_FILES
     static int ins_count = 0;
 #endif
@@ -1802,8 +1806,8 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
             continue;
         
         //pkt = spare->m_pkt;
-        av_packet_ref(&pkt, &(spare->m_pkt));
-        //pkt.data is a newly malloced area
+        av_packet_ref(pkt, &(spare->m_pkt));
+        //pkt->data is a newly malloced area
 
         QString fname;
 
@@ -1812,21 +1816,22 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
             fname = QString("cnv%1").arg(ins_count++);
 #endif
 
-        if (BuildFrame(&pkt, fname))
+        if (BuildFrame(pkt, fname))
             return 1;
 
         LOG(VB_GENERAL, LOG_INFO,
             QString("Converting frame #%1 from %2 to I %3")
                 .arg(i).arg(GetFrameTypeT(spare)).arg(fname));
 
-        spare->set_pkt(&pkt);
-        av_packet_unref(&pkt);
+        spare->set_pkt(pkt);
+        av_packet_unref(pkt);
         SetFrameNum(spare->m_pkt.data, GetFrameNum(spare));
         ProcessVideo(spare, m_headerDecoder); //process this new frame
     }
 
     //reorder frames
     m_vFrame.move(headPos, headPos + orderedFrames->count() - 1);
+    av_packet_free(&pkt);
     return 0;
 }
 
