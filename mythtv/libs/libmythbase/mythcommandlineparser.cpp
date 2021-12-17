@@ -78,31 +78,26 @@
 #include "mythmiscutil.h"
 #include "mythdate.h"
 
-#define TERMWIDTH 79
-
-bool openPidfile(std::ofstream &pidfs, const QString &pidfile);
-bool setUser(const QString &username);
-int GetTermWidth(void);
-QByteArray strip_quotes (QByteArray val);
+static constexpr int k_defaultWidth = 79;
 
 /** \fn GetTermWidth(void)
  *  \brief returns terminal width, or 79 on error
  */
-int GetTermWidth(void)
+static int GetTermWidth(void)
 {
 #if defined(_WIN32) || defined(Q_OS_ANDROID)
-    return TERMWIDTH;
+    return k_defaultWidth;
 #else
     struct winsize ws {};
 
     if (ioctl(0, TIOCGWINSZ, &ws) != 0)
-        return TERMWIDTH;
+        return k_defaultWidth;
 
     return static_cast<int>(ws.ws_col);
 #endif
 }
 
-QByteArray strip_quotes (QByteArray val)
+static QByteArray strip_quotes (QByteArray val)
 {
     if (val.startsWith('"') && val.endsWith('"'))
         return val.mid(1,val.size()-2);
@@ -274,7 +269,7 @@ QString CommandLineArg::GetHelpString(int off, const QString& group, bool force)
         {
             // user is running uselessly narrow console, use a sane console
             // width instead
-            termwidth = 79;
+            termwidth = k_defaultWidth;
         }
     }
 
@@ -2841,7 +2836,7 @@ void MythCommandLineParser::ApplySettingsOverride(void)
     }
 }
 
-bool openPidfile(std::ofstream &pidfs, const QString &pidfile)
+static bool openPidfile(std::ofstream &pidfs, const QString &pidfile)
 {
     if (!pidfile.isEmpty())
     {
@@ -2857,7 +2852,7 @@ bool openPidfile(std::ofstream &pidfs, const QString &pidfile)
 
 /** \brief Drop permissions to the specified user
  */
-bool setUser(const QString &username)
+static bool setUser(const QString &username)
 {
     if (username.isEmpty())
         return true;
