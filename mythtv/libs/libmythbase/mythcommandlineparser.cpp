@@ -38,13 +38,13 @@
 // System headers
 #include <sys/types.h>
 #ifndef _WIN32
-#include <sys/ioctl.h>
-#include <pwd.h>
-#include <grp.h>
-#if defined(__linux__) || defined(__LINUX__)
-#include <sys/prctl.h>
-#endif
-#endif
+#   include <sys/ioctl.h>
+#   include <pwd.h>
+#   include <grp.h>
+#   if defined(__linux__) || defined(__LINUX__)
+#       include <sys/prctl.h>
+#   endif // linux
+#endif // not _WIN32
 
 // Qt headers
 #include <QtGlobal>
@@ -68,6 +68,7 @@
   #define QT_ENDL Qt::endl
 #endif
 
+// MythTV headers
 #include "mythcommandlineparser.h"
 #include "mythcorecontext.h"
 #include "exitcodes.h"
@@ -97,13 +98,11 @@ static int GetTermWidth(void)
 #endif
 }
 
-static QByteArray strip_quotes (QByteArray val)
+static QByteArray strip_quotes(QByteArray array)
 {
-    if (val.startsWith('"') && val.endsWith('"'))
-        return val.mid(1,val.size()-2);
-    if (val.startsWith('\'') && val.endsWith('\''))
-        return val.mid(1,val.size()-2);
-    return val;
+    return ((array.startsWith('"')  && array.endsWith('"') ) ||
+            (array.startsWith('\'') && array.endsWith('\''))
+           ) ? array.mid(1, array.size() - 2) : array;
 }
 
 static void wrapList(QStringList &list, int width)
