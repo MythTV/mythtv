@@ -2327,22 +2327,28 @@ void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
 
         if (!m_hardwareEncode)
         {
-            AVPacket packet;
-            av_init_packet(&packet);
-            packet.data = (uint8_t *)m_strm;
-            packet.size = frame->m_bufferSize;
+            AVPacket *packet = av_packet_alloc();
+            if (packet == nullptr)
+            {
+                LOG(VB_RECORD, LOG_ERR, "packet allocation failed");
+                return;
+            }
+            packet->data = (uint8_t *)m_strm;
+            packet->size = frame->m_bufferSize;
 
             int got_packet = 0;
-            tmp = avcodec_encode_video2(m_mpaVidCtx, &packet, mpa_picture, &got_packet);
+            tmp = avcodec_encode_video2(m_mpaVidCtx, packet, mpa_picture, &got_packet);
 
             if (tmp < 0 || !got_packet)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "WriteVideo : avcodec_encode_video() failed");
+                av_packet_free(&packet);
                 return;
             }
 
-            tmp = packet.size;
+            tmp = packet->size;
+            av_packet_free(&packet);
         }
     }
     else
