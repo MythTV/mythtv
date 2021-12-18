@@ -16,6 +16,7 @@
 #include "eithelper.h"
 #include "mythtimer.h"
 #include "mythdate.h"
+#include "mythrandom.h"
 #include "mthread.h"
 #include "iso639.h"
 #include "mythdb.h"
@@ -287,7 +288,12 @@ void EITScanner::StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_pe
         m_activeScanTrigTime = max_seconds_per_source;
         // Add a little randomness to trigger time so multiple
         // cards will have a staggered channel changing time.
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         m_activeScanTrigTime += std::chrono::seconds(MythRandom() % 29);
+#else
+        m_activeScanTrigTime += std::chrono::seconds(MythRandom(0, 28));
+#endif
+
         m_activeScanStopped = false;
         m_activeScan = true;
     }

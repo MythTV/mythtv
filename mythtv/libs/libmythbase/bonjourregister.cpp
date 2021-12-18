@@ -1,11 +1,12 @@
+#include "bonjourregister.h"
+
 #include <cstdlib>
 
 #include <QSocketNotifier>
 #include <QtEndian>
 
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 #include "mythlogging.h"
-#include "bonjourregister.h"
 
 #define LOC QString("Bonjour: ")
 
@@ -134,7 +135,11 @@ QByteArray BonjourRegister::RandomizeData(void)
 
     data.append(7);
     data.append("_rnd=");
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     rnd.append((MythRandom() % 80) + 33);
+#else
+    rnd.append(MythRandom(33, 33 + 80 - 1));
+#endif
     data.append(rnd.toHex());
 
     return data;

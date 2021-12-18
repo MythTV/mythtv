@@ -18,7 +18,7 @@
 #include "mythuiprogressbar.h"
 #include "mythuibuttonlist.h"
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 #include "mythmainwindow.h"             // for GetMythMainWindow, etc
 #include "mythscreenstack.h"            // for MythScreenStack
 #include "mythuistatetype.h"
@@ -2253,7 +2253,11 @@ void PlaybackBox::playSelectedPlaylist(bool Random)
         QList<uint> tmp = m_playList;
         while (!tmp.isEmpty())
         {
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
             uint i = MythRandom() % tmp.size();
+#else
+            unsigned int i = MythRandom(0, tmp.size() - 1);
+#endif
             m_playListPlay.append(tmp[i]);
             tmp.removeAll(tmp[i]);
         }

@@ -13,7 +13,7 @@
 
 // Mythbase headers
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 #include "mythmedia.h"
 
 // MythUI headers
@@ -54,7 +54,12 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
 
     m_fonts = new FontMap();
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     m_borderColor = QColor(MythRandom() % 255, MythRandom()  % 255, MythRandom()  % 255);
+#else
+    // for debugging/theming
+    m_borderColor = QColor(MythRandom(0, 255), MythRandom(0, 255), MythRandom(0, 255));
+#endif
 }
 
 MythUIType::~MythUIType()

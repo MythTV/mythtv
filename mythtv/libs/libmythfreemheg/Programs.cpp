@@ -30,7 +30,7 @@
 #include "Engine.h"
 #include "Logging.h"
 #include "freemheg.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 
 #include <QDateTime>
 #include <QLocale>
@@ -297,7 +297,14 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             {
                 int nLimit = GetInt(args.GetAt(0), engine);
                 MHParameter *pResInt = args.GetAt(1);
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
                 int r = static_cast<int>(MythRandom() % (nLimit + 1));
+#else
+                int r = MythRandom(0, nLimit);
+/* note: undefined behavior if nLimit is negative, but the above % statement
+would also be incorrect in that case
+*/
+#endif
                 engine->FindObject(
                     *(pResInt->GetReference()))->SetVariableValue(r);
                 SetSuccessFlag(success, true, engine);

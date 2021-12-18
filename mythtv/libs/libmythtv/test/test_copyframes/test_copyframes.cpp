@@ -1,6 +1,11 @@
-#include "mythcorecontext.h"
 #include "test_copyframes.h"
+
+#include <climits>
+
+#include "mythcorecontext.h"
+
 #include "mythframe.h"
+#include "mythrandom.h"
 
 void TestCopyFrames::initTestCase(void)
 {
@@ -85,8 +90,6 @@ void TestCopyFrames::TestInvalidBuffers()
     dummy2.m_buffer = nullptr;
 }
 
-#include "mythmiscutil.h"
-
 static uint64_t FillRandom(MythVideoFrame* Frame)
 {
     uint64_t sum = 0;
@@ -98,7 +101,11 @@ static uint64_t FillRandom(MythVideoFrame* Frame)
         int offset = Frame->m_offsets[plane];
         for (int i = 0; i < width; ++i)
         {
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
             unsigned char val = MythRandom() & 0xFF;
+#else
+            unsigned char val = MythRandom(0, UCHAR_MAX);
+#endif
             Frame->m_buffer[offset++] = val;
             sum += val;
             counts++;

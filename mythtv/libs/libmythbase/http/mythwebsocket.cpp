@@ -5,7 +5,7 @@
 
 // MythTV
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 #include "http/mythwebsocket.h"
 
 // Std
@@ -583,7 +583,13 @@ void MythWebSocket::SendFrame(WSOpCode Code, const DataPayloads& Payloads)
     {
         mask = MythSharedData::CreatePayload(4);
         for (int i = 0; i < 4; ++i)
+        {
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
             mask->data()[i] = static_cast<int8_t>(MythRandom() % 0x100);
+#else
+            mask->data()[i] = (int8_t)MythRandom(INT8_MIN, INT8_MAX);
+#endif
+        }
         header->data()[1] |= 0x80;
     }
 

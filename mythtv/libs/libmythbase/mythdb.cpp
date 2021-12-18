@@ -1,3 +1,5 @@
+#include "mythdb.h"
+
 #include <vector>
 
 #include <QReadWriteLock>
@@ -11,12 +13,11 @@
 #include <QStandardPaths>
 
 #include "mythconfig.h"
-#include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythlogging.h"
 #include "mythdirs.h"
 #include "mythcorecontext.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 
 static MythDB *mythdb = nullptr;
 static QMutex dbLock;

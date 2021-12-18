@@ -24,7 +24,7 @@
 #include "upnptasksearch.h"
 #include "mythversion.h"
 #include "compat.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 #include "mythdate.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
@@ -145,7 +145,11 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
 
                 pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
                                     m_nPeerPort );
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
                 std::this_thread::sleep_for( std::chrono::milliseconds( MythRandom() % 250 ));
+#else
+                std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
+#endif
                 pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
                                     m_nPeerPort );
             }

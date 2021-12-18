@@ -34,7 +34,7 @@
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 
 #define LOC QString("Preview: ")
 
