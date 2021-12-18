@@ -111,7 +111,9 @@ MythRAOPConnection::~MythRAOPConnection()
 
     if (m_id > 0)
     {
-        GetNotificationCenter()->UnRegister(this, m_id);
+        auto *nc = GetNotificationCenter();
+        if (nc)
+            nc->UnRegister(this, m_id);
     }
 }
 
