@@ -5116,17 +5116,17 @@ fi
 
 enable debug
 append CCONFIG "$compile_type"
-if test x$compile_type = x"release" ; then
-    add_cflags   -DNDEBUG
-    add_cxxflags -DNDEBUG
-    check_cxxflags -O2
-elif test x$compile_type = x"profile" ; then
-    add_cflags   -DNDEBUG
-    add_cxxflags -DNDEBUG
-    check_cxxflags -O2
-elif test x$compile_type = x"debug"; then
+if test x$compile_type = x"debug"; then
     add_cxxflags -DMYTH_DEBUG
     disable optimizations
+else
+    # disable <cassert> / <assert.h>
+    CONFIG_DEFINES="$CONFIG_DEFINES NDEBUG"
+    if test x$compile_type = x"release" ; then
+        check_cxxflags -O2
+    elif test x$compile_type = x"profile" ; then
+        check_cxxflags -O2
+    fi
 fi
 
 if [ -z "$optflags" ]; then
