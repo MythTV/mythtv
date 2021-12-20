@@ -18,7 +18,7 @@ class EnumValue( object ):
     _storage = []
     def __init__(self, name, value=None, friendly_name=None):
         warn("Class 'EnumValue' will be removed after MythTV v32 release, "
-             "use 'IntEnum' from the module 'enum' provided by python3", DeprecationWarning, 2)
+             "use 'IntEnum' from the module 'enum' provided by python3", DeprecationWarning, 1)
         self.name = self.friendly = name
         if friendly_name:
             self.friendly = friendly_name
@@ -61,12 +61,11 @@ class EnumType( type ):
 class BaseEnum( object, metaclass=EnumType ):
 
     def __init__(self, mode):
+        warn("Class 'BaseEnum' and it descendants will be removed after MythTV v32 release, "
+             "use 'IntEnum' from the module 'enum' provided by python3", DeprecationWarning, 1)
         self.mode = mode
 
-    def __int__(self):
-        warn("Class 'BaseEnum' and it descendants will be removed after MythTV v32 release, " 
-             "use 'IntEnum' from the module 'enum' provided by python3", DeprecationWarning, 2)
-        return self.mode
+    def __int__(self): return self.mode
     def __eq__(self, other): return (self.mode == int(other))
     def __ne__(self, other): return (self.mode != int(other))
 
