@@ -1,6 +1,8 @@
 #include "config.h"
 #include "rom_metadata.h"
 
+#include <array>
+
 #include <QFile>
 
 #include <mythcontext.h>

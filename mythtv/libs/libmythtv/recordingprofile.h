@@ -1,6 +1,8 @@
 #ifndef RECORDINGPROFILE_H
 #define RECORDINGPROFILE_H
 
+#include <array>
+
 #include "mythtvexp.h"
 #include "standardsettings.h"
 #include "mythdbcon.h"

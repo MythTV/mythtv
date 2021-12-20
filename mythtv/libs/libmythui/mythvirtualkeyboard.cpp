@@ -3,6 +3,7 @@
 #include "mythvirtualkeyboard.h"
 
 // c++
+#include <array>
 #include <iostream>
 
 // qt

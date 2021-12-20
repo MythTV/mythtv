@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QDateTime>
 
+#include <array>
 #include <vector>
 using std::vector;
 

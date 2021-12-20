@@ -13,6 +13,7 @@
 #include "mythimage.h"
 
 // Std
+#include <array>
 #include <list>
 
 class MythMainWindow;

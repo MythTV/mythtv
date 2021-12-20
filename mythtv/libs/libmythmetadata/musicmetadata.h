@@ -2,6 +2,7 @@
 #define MUSICMETADATA_H_
 
 // C/C++
+#include <array>
 #include <cstdint>
 #include <utility>
 

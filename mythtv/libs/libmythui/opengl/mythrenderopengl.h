@@ -2,6 +2,7 @@
 #define MYTHRENDER_OPENGL_H_
 
 // C++
+#include <array>
 #include <vector>
 
 // Qt

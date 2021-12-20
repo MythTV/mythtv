@@ -2,6 +2,7 @@
 #include "mythcoreutil.h"
 
 // POSIX
+#include <array>
 #include <unistd.h>
 #include <fcntl.h>
 

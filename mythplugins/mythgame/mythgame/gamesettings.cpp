@@ -1,3 +1,5 @@
+#include <array>
+
 #include <QCoreApplication>
 
 #include <mythdb.h>

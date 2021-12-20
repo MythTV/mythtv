@@ -13,6 +13,8 @@
 #ifndef SSDP_H
 #define SSDP_H
 
+#include <array>
+
 #include <QFile>
 
 #include "upnpexp.h"

@@ -1,5 +1,7 @@
 #include "test_mpegtables.h"
 
+#include <array>
+
 /**
  * source: german DVB-C Unitymedia (Liberty Global)
  * has IMDb Rating at the end of the synopsis " IMDb Rating: 8.9 /10" (1.0 to 10.0)

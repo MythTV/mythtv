@@ -1,6 +1,7 @@
 #ifndef MYTHUIGUIDEGRID_H_
 #define MYTHUIGUIDEGRID_H_
 
+#include <array>
 #include <utility>
 
 // QT

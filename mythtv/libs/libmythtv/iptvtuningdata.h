@@ -2,6 +2,8 @@
 #ifndef IPTV_TUNING_DATA_H
 #define IPTV_TUNING_DATA_H
 
+#include <array>
+
 // Qt headers
 #include <QApplication>
 #include <QString>

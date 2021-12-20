@@ -1,5 +1,6 @@
 #include <unistd.h>
 
+#include <array>
 #include <utility>
 
 #include "mythlogging.h"

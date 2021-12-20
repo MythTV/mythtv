@@ -17,6 +17,7 @@
 #include "http/mythhttpcommon.h"
 
 // Std
+#include <array>
 #include <deque>
 #include <chrono>
 

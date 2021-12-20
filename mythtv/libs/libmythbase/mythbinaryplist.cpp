@@ -41,6 +41,7 @@
 #include "mythbinaryplist.h"
 
 // Std
+#include <array>
 #include <cmath>
 #if HAVE_SYS_ENDIAN_H
 #include <sys/endian.h>

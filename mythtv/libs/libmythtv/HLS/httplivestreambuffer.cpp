@@ -38,6 +38,7 @@
 #include <algorithm> // for min/max
 using std::max;
 using std::min;
+#include <array>
 
 // libmythbase
 #include "mthread.h"

@@ -1,4 +1,5 @@
 
+#include <array>
 #include <sys/stat.h>
 #include <fcntl.h>
 
