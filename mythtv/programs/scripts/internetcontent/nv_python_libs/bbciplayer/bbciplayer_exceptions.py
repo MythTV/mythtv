@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: bbciplayer_exceptions - Custom exceptions used or raised by bbciplayer_api
 # Python Script

@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: tributeca_api - XPath and XSLT functions for the Tribute.ca grabber
 # Python Script
@@ -33,7 +33,7 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
 
 
@@ -48,28 +48,26 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -81,7 +79,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -109,12 +107,12 @@ class xpathFunctions(object):
         Call example: 'mnvXpath:tributecaLinkGeneration(position(), ..//a)'
         return the url link
         '''
-        downloadURL = u'http://www.tribute.ca/streamingflash/%s.flv'
+        downloadURL = 'http://www.tribute.ca/streamingflash/%s.flv'
         position = int(args[0])-1
-        webURL = u'http://www.tribute.ca%s' % args[1][position].attrib['href'].strip()
+        webURL = 'http://www.tribute.ca%s' % args[1][position].attrib['href'].strip()
 
         # If this is for the download then just return what was found for the "link" element
-        if self.persistence.has_key('tributecaLinkGeneration'):
+        if 'tributecaLinkGeneration' in self.persistence:
             if self.persistence['tributecaLinkGeneration'] is not None:
                 returnValue = self.persistence['tributecaLinkGeneration']
                 self.persistence['tributecaLinkGeneration'] = None
@@ -125,14 +123,14 @@ class xpathFunctions(object):
 
         currentTitle = self.TextTail(args[1][position]).strip()
         if position == 0:
-            previousTitle = u''
+            previousTitle = ''
         else:
            previousTitle = self.TextTail(args[1][position-1]).strip()
 
         # Rule: "IMAX: Hubble 3D": http://www.tribute.ca/streamingflash/hubble3d.flv
         titleArray = [currentTitle, previousTitle]
-        if titleArray[0].startswith(u'IMAX:'):
-            titleArray[0] = titleArray[0].replace(u'IMAX:', u'').strip()
+        if titleArray[0].startswith('IMAX:'):
+            titleArray[0] = titleArray[0].replace('IMAX:', '').strip()
         else:
             # Rule: "How to Train Your Dragon: An IMAX 3D Experience" did not even have a trailer
             #       on the Web page but stip off anything after the ":"
@@ -149,44 +147,44 @@ class xpathFunctions(object):
                         titleArray[counter] = titleArray[counter][:index].strip()
 
         # If the previous title starts with the same title as the current then this is trailer #2
-        trailer2 = u''
+        trailer2 = ''
         if titleArray[0].startswith(titleArray[1]) and titleArray[1]:
-            trailer2 = u'tr2'
+            trailer2 = 'tr2'
         if currentTitle.find(': An IMAX') != -1:
-            trailer2 = u'tr2'
-        titleArray[0] = titleArray[0].replace(u'&', u'and')
-        self.persistence['tributecaThumbnailLink'] = urllib.quote_plus(titleArray[0].lower().replace(u' ', u'_').replace(u"'", u'').replace(u'-', u'_').replace(u'?', u'').replace(u'.', u'').encode("utf-8"))
-        titleArray[0] = urllib.quote_plus(re.sub('[%s]' % re.escape(string.punctuation), '', titleArray[0].lower().replace(u' ', u'').encode("utf-8")))
+            trailer2 = 'tr2'
+        titleArray[0] = titleArray[0].replace('&', 'and')
+        self.persistence['tributecaThumbnailLink'] = urllib.parse.quote_plus(titleArray[0].lower().replace(' ', '_').replace("'", '').replace('-', '_').replace('?', '').replace('.', '').encode("utf-8"))
+        titleArray[0] = urllib.parse.quote_plus(re.sub('[%s]' % re.escape(string.punctuation), '', titleArray[0].lower().replace(' ', '').encode("utf-8")))
 
         # Verify that the FLV file url really exits. If it does not then use the Web page link.
-        videocode = u'%s%s' % (titleArray[0], trailer2)
+        videocode = '%s%s' % (titleArray[0], trailer2)
         flvURL = downloadURL % videocode
         resultCheckUrl = common.checkURL(flvURL)
-        if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != u'video/x-flv':
-            if trailer2 != u'':
+        if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != 'video/x-flv':
+            if trailer2 != '':
                 videocode = titleArray[0]
                 flvURL = downloadURL % titleArray[0]
                 resultCheckUrl = common.checkURL(flvURL) # Drop the 'tr2' this time
-                if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != u'video/x-flv':
+                if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != 'video/x-flv':
                     flvURL = webURL
             else:
-                videocode = titleArray[0]+u'tr2'
+                videocode = titleArray[0]+'tr2'
                 flvURL = downloadURL % videocode
                 resultCheckUrl = common.checkURL(flvURL) # Add the 'tr2' this time
-                if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != u'video/x-flv':
+                if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != 'video/x-flv':
                     if currentTitle.find(': An IMAX') == -1 and currentTitle.find(': ') != -1:
-                        titleArray[0] = currentTitle.replace(u'&', u'and')
-                        titleArray[0] = urllib.quote_plus(re.sub('[%s]' % re.escape(string.punctuation), '', titleArray[0].lower().replace(u' ', u'').encode("utf-8")))
+                        titleArray[0] = currentTitle.replace('&', 'and')
+                        titleArray[0] = urllib.parse.quote_plus(re.sub('[%s]' % re.escape(string.punctuation), '', titleArray[0].lower().replace(' ', '').encode("utf-8")))
                         videocode = titleArray[0]
                         flvURL = downloadURL % videocode
                         resultCheckUrl = common.checkURL(flvURL) # Add the 'tr2' this time
-                        if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != u'video/x-flv':
+                        if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != 'video/x-flv':
                             flvURL = webURL
                     else:
                         flvURL = webURL
         if flvURL != webURL:
             self.persistence['tributecaLinkGeneration'] = videocode
-            return common.linkWebPage(u'dummycontext', 'tributeca')+videocode
+            return common.linkWebPage('dummycontext', 'tributeca')+videocode
         else:
             self.persistence['tributecaLinkGeneration'] = flvURL
             return flvURL
@@ -197,16 +195,16 @@ class xpathFunctions(object):
         Call example: 'mnvXpath:tributecaThumbnailLink(string(.//img/@src))'
         return the thumbnail url
         '''
-        siteImage = u'http://www.tribute.ca/images/tribute_title.gif'
+        siteImage = 'http://www.tribute.ca/images/tribute_title.gif'
         if not len(args[0]) or not self.persistence['tributecaThumbnailLink']:
             return siteImage
 
-        if args[0].startswith(u'http:'):
+        if args[0].startswith('http:'):
             url = args[0].strip()
         else:
-            url = u'http://www.tribute.ca/tribute_objects/images/movies/%s%s' % (self.persistence['tributecaThumbnailLink'], u'/poster.jpg')
+            url = 'http://www.tribute.ca/tribute_objects/images/movies/%s%s' % (self.persistence['tributecaThumbnailLink'], '/poster.jpg')
         resultCheckUrl = common.checkURL(url)
-        if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != u'image/jpeg':
+        if not resultCheckUrl[0] or resultCheckUrl[1]['Content-Type'] != 'image/jpeg':
             return siteImage
 
         return url
@@ -222,7 +220,7 @@ class xpathFunctions(object):
 
         index = args[0].find('.')
         if index == 1:
-            return u'0'+args[0]
+            return '0'+args[0]
         else:
             return args[0]
     # end tributecaTopTenTitle()
@@ -236,7 +234,7 @@ class xpathFunctions(object):
         if self.persistence['tributecaLinkGeneration'] is None:
             return False
 
-        if self.persistence['tributecaLinkGeneration'].startswith(u'http://'):
+        if self.persistence['tributecaLinkGeneration'].startswith('http://'):
             return False
         else:
             return True
@@ -249,7 +247,7 @@ class xpathFunctions(object):
         return True if a match was found
         return False if a match was not found
         '''
-        return common.checkIfDBItem('dummy', {'feedtitle': 'Movie Trailers', 'title': arg[0].replace('Trailer', u'').strip(), 'author': arg[1], 'description': arg[2]})
+        return common.checkIfDBItem('dummy', {'feedtitle': 'Movie Trailers', 'title': arg[0].replace('Trailer', '').strip(), 'author': arg[1], 'description': arg[2]})
     # end tributecaCheckIfDBItem()
 
     def tributecaGetAnchors(self, context, *arg):
@@ -266,17 +264,17 @@ class xpathFunctions(object):
         Call example: mnvXpath:tributecaDebug(//a)
         '''
         testpath = etree.XPath(".//a", namespaces=common.namespaces)
-        print arg
+        print(arg)
         count = 0
         for x in arg:
-            sys.stdout.write(u'\nElement Count (%s):\n' % count)
+            sys.stdout.write('\nElement Count (%s):\n' % count)
 #            for y in testpath(x):
 #                sys.stdout.write(etree.tostring(y, encoding='UTF-8', pretty_print=True))
-            print "testpath(%s)" % testpath(x)
+            print("testpath(%s)" % testpath(x))
             count+=1
-        print
+        print()
 #        sys.stdout.write(etree.tostring(arg[0], encoding='UTF-8', pretty_print=True))
-        return u"========tributecaDebug Called========="
+        return "========tributecaDebug Called========="
     # end tributecaDebug()
 
 ######################################################################################################
@@ -301,7 +299,7 @@ class xsltExtExample(etree.XSLTExtension):
         seconds = 0
         for count in range(len(min_sec)):
             seconds+=int(min_sec[count])*(60*(len(min_sec)-count-1))
-        output_parent.text = u'%s' % seconds
+        output_parent.text = '%s' % seconds
 
 ######################################################################################################
 #

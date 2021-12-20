@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: rev3_exceptions - Custom exceptions used or raised by rev3_api
 # Python Script

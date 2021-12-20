@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: tedtalks_api - Simple-to-use Python interface to the TedTalks RSS feeds
 #                       (http://www.ted.com)
@@ -23,14 +23,15 @@ provided by TedTalks (http://www.ted.com). The specific TedTalks RSS feeds that 
 __version__="v0.1.0"
 # 0.1.0 Initial development
 
-import os, struct, sys, re, time, datetime, shutil, urllib
-from string import capitalize
+import os, struct, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error
+
 import logging
 from threading import Thread
 from copy import deepcopy
 from operator import itemgetter, attrgetter
 
-from tedtalks_exceptions import (TedTalksUrlError, TedTalksHttpError, TedTalksRssError, TedTalksVideoNotFound, TedTalksConfigFileError, TedTalksUrlDownloadError)
+from .tedtalks_exceptions import (TedTalksUrlError, TedTalksHttpError, TedTalksRssError, TedTalksVideoNotFound, TedTalksConfigFileError, TedTalksUrlDownloadError)
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -43,29 +44,24 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -77,7 +73,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -89,7 +85,7 @@ try:
     '''Import the python mashups support classes
     '''
     import nv_python_libs.mashups.mashups_api as mashups_api
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/mashups" containing the modules mashups_api and
 mashups_exceptions.py (v0.1.0 or greater),
@@ -163,7 +159,7 @@ class Videos(object):
         self.common = common
         self.common.debug = debug   # Set the common function debug level
 
-        self.log_name = u'TedTalks_Grabber'
+        self.log_name = 'TedTalks_Grabber'
         self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
         self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
@@ -175,18 +171,18 @@ class Videos(object):
 
         self.config['search_all_languages'] = search_all_languages
 
-        self.error_messages = {'TedTalksUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'TedTalksHttpError': u"! Error: An HTTP communications error with the TedTalks was raised (%s)\n", 'TedTalksRssError': u"! Error: Invalid RSS meta data\nwas received from the TedTalks error (%s). Skipping item.\n", 'TedTalksVideoNotFound': u"! Error: Video search with the TedTalks did not return any results (%s)\n", 'TedTalksConfigFileError': u"! Error: tedtalks_config.xml file missing\nit should be located in and named as (%s).\n", 'TedTalksUrlDownloadError': u"! Error: Downloading a RSS feed or Web page (%s).\n", }
+        self.error_messages = {'TedTalksUrlError': "! Error: The URL (%s) cause the exception error (%s)\n", 'TedTalksHttpError': "! Error: An HTTP communications error with the TedTalks was raised (%s)\n", 'TedTalksRssError': "! Error: Invalid RSS meta data\nwas received from the TedTalks error (%s). Skipping item.\n", 'TedTalksVideoNotFound': "! Error: Video search with the TedTalks did not return any results (%s)\n", 'TedTalksConfigFileError': "! Error: tedtalks_config.xml file missing\nit should be located in and named as (%s).\n", 'TedTalksUrlDownloadError': "! Error: Downloading a RSS feed or Web page (%s).\n", }
 
         # Channel details and search results
-        self.channel = {'channel_title': u'TedTalks', 'channel_link': u'http://www.ted.com', 'channel_description': u"TED is a small nonprofit devoted to Ideas Worth Spreading.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'TedTalks', 'channel_link': 'http://www.ted.com', 'channel_description': "TED is a small nonprofit devoted to Ideas Worth Spreading.", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/tedtalks.png'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/tedtalks.png'
 
-        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
+        self.config['image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
 
         # Initialize Mashups api variables
         mashups_api.common = self.common
-        self.mashups_api = mashups_api.Videos(u'')
+        self.mashups_api = mashups_api.Videos('')
         self.mashups_api.channel = self.channel
         if language:
             self.mashups_api.config['language'] = self.config['language']
@@ -205,16 +201,16 @@ class Videos(object):
         return nothing
         '''
         # Read the grabber tedtalks_config.xml configuration file
-        url = u'file://%s/nv_python_libs/configs/XML/tedtalks_config.xml' % (baseProcessingDir, )
+        url = 'file://%s/nv_python_libs/configs/XML/tedtalks_config.xml' % (baseProcessingDir, )
         if not os.path.isfile(url[7:]):
             raise TedTalksConfigFileError(self.error_messages['TedTalksConfigFileError'] % (url[7:], ))
 
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
         try:
             self.tedtalks_config = etree.parse(url)
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise TedTalksUrlError(self.error_messages['TedTalksUrlError'] % (url, errormsg))
         return
     # end getTedTalksConfig()
@@ -232,16 +228,16 @@ class Videos(object):
         # Check if the tedtalks.xml file exists
         userPreferenceFile = self.tedtalks_config.find('userPreferenceFile').text
         if userPreferenceFile[0] == '~':
-             self.tedtalks_config.find('userPreferenceFile').text = u"%s%s" % (os.path.expanduser(u"~"), userPreferenceFile[1:])
+             self.tedtalks_config.find('userPreferenceFile').text = "%s%s" % (os.path.expanduser("~"), userPreferenceFile[1:])
         if os.path.isfile(self.tedtalks_config.find('userPreferenceFile').text):
             # Read the grabber tedtalks_config.xml configuration file
-            url = u'file://%s' % (self.tedtalks_config.find('userPreferenceFile').text, )
+            url = 'file://%s' % (self.tedtalks_config.find('userPreferenceFile').text, )
             if self.config['debug_enabled']:
-                print url
-                print
+                print(url)
+                print()
             try:
                 self.userPrefs = etree.parse(url)
-            except Exception, errormsg:
+            except Exception as errormsg:
                 raise TedTalksUrlError(self.error_messages['TedTalksUrlError'] % (url, errormsg))
             create = False
         else:
@@ -256,19 +252,19 @@ class Videos(object):
         ''' Create or update the tedtalks.xml user preferences file
         return nothing
         '''
-        userDefaultFile = u'%s/nv_python_libs/configs/XML/defaultUserPrefs/tedtalks.xml' % (baseProcessingDir, )
+        userDefaultFile = '%s/nv_python_libs/configs/XML/defaultUserPrefs/tedtalks.xml' % (baseProcessingDir, )
         if os.path.isfile(userDefaultFile):
             # Read the default tedtalks.xml user preferences file
-            url = u'file://%s' % (userDefaultFile, )
+            url = 'file://%s' % (userDefaultFile, )
             if self.config['debug_enabled']:
-                print url
-                print
+                print(url)
+                print()
             try:
                 userTedTalks = etree.parse(url)
-            except Exception, e:
+            except Exception as e:
                 raise TedTalksUrlError(self.error_messages['TedTalksUrlError'] % (url, e))
         else:
-            raise Exception(u'!Error: The default TedTalk file is missing (%s)', userDefaultFile)
+            raise Exception('!Error: The default TedTalk file is missing (%s)', userDefaultFile)
 
         # If there was an existing tedtalks.xml file then add any relevant user settings
         # to this new tedtalks.xml
@@ -282,12 +278,12 @@ class Videos(object):
                     elements[0].attrib['parameter'] = showElement.attrib['parameter']
 
         if self.config['debug_enabled']:
-            print "After any merging userTedTalks:"
+            print("After any merging userTedTalks:")
             sys.stdout.write(etree.tostring(userTedTalks, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Save the tedtalks.xml file
-        prefDir = self.tedtalks_config.find('userPreferenceFile').text.replace(u'/tedtalks.xml', u'')
+        prefDir = self.tedtalks_config.find('userPreferenceFile').text.replace('/tedtalks.xml', '')
         if not os.path.isdir(prefDir):
             os.makedirs(prefDir)
         fd = open(self.tedtalks_config.find('userPreferenceFile').text, 'w')
@@ -298,7 +294,7 @@ class Videos(object):
         try:
             self.userPrefs = etree.parse(self.tedtalks_config.find('userPreferenceFile').text)
             self.mashups_api.userPrefs = self.userPrefs
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise TedTalksUrlError(self.error_messages['TedTalksUrlError'] % (url, errormsg))
         return
     # end updateTedTalks()
@@ -316,17 +312,17 @@ class Videos(object):
         '''
         searchVar = self.tedtalks_config.find('searchURLS').xpath(".//href")[0].text
         try:
-            searchVar = searchVar.replace(u'SEARCHTERM', urllib.quote_plus(title.encode("utf-8")))
-            searchVar = searchVar.replace(u'PAGENUM', unicode(pagenumber))
+            searchVar = searchVar.replace('SEARCHTERM', urllib.parse.quote_plus(title.encode("utf-8")))
+            searchVar = searchVar.replace('PAGENUM', str(pagenumber))
         except UnicodeDecodeError:
-            searchVar = u'?q=%s' % ()
-            searchVar = searchVar.replace(u'SEARCHTERM', urllib.quote_plus(title))
-            searchVar = searchVar.replace(u'PAGENUM', unicode(pagenumber))
+            searchVar = '?q=%s' % ()
+            searchVar = searchVar.replace('SEARCHTERM', urllib.parse.quote_plus(title))
+            searchVar = searchVar.replace('PAGENUM', str(pagenumber))
         url = searchVar
 
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
 
         self.tedtalks_config.find('searchURLS').xpath(".//href")[0].text = url
 
@@ -335,27 +331,27 @@ class Videos(object):
         self.common.buildFunctionDict()
         mnvXpath = etree.FunctionNamespace('http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format')
         mnvXpath.prefix = 'mnvXpath'
-        for key in self.common.functionDict.keys():
+        for key in list(self.common.functionDict.keys()):
             mnvXpath[key] = common.functionDict[key]
 
         # Add the parameter element from the User preferences file
         paraMeter = self.userPrefs.find('search').xpath("//search//sourceURL[@enabled='true']/@parameter")
         if not len(paraMeter):
-            raise Exception(u'TedTalks User preferences file "tedtalks.xml" does not have an enabled search with a "parameter" attribute.')
+            raise Exception('TedTalks User preferences file "tedtalks.xml" does not have an enabled search with a "parameter" attribute.')
         etree.SubElement(self.tedtalks_config.find('searchURLS').xpath(".//url")[0], "parameter").text = paraMeter[0]
 
         # Perform a search
         try:
             resultTree = self.common.getUrlData(self.tedtalks_config.find('searchURLS'))
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise TedTalksUrlDownloadError(self.error_messages['TedTalksUrlDownloadError'] % (errormsg))
 
         if resultTree is None:
-            raise TedTalksVideoNotFound(u"No TedTalks Video matches found for search value (%s)" % title)
+            raise TedTalksVideoNotFound("No TedTalks Video matches found for search value (%s)" % title)
 
         searchResults = resultTree.xpath('//result//item')
         if not len(searchResults):
-            raise TedTalksVideoNotFound(u"No TedTalks Video matches found for search value (%s)" % title)
+            raise TedTalksVideoNotFound("No TedTalks Video matches found for search value (%s)" % title)
 
         return searchResults
         # end searchTitle()
@@ -368,9 +364,9 @@ class Videos(object):
         self.getUserPreferences()
 
         if self.config['debug_enabled']:
-            print "self.tedtalks_config:"
+            print("self.tedtalks_config:")
             sys.stdout.write(etree.tostring(self.tedtalks_config, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Easier for debugging
 #        print self.searchTitle(title, pagenumber, self.page_limit)
@@ -379,24 +375,24 @@ class Videos(object):
 
         try:
             data = self.searchTitle(title, pagenumber, self.page_limit)
-        except TedTalksVideoNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+        except TedTalksVideoNotFound as msg:
+            sys.stderr.write("%s\n" % msg)
             sys.exit(0)
-        except TedTalksUrlError, msg:
-            sys.stderr.write(u'%s\n' % msg)
+        except TedTalksUrlError as msg:
+            sys.stderr.write('%s\n' % msg)
             sys.exit(1)
-        except TedTalksHttpError, msg:
+        except TedTalksHttpError as msg:
             sys.stderr.write(self.error_messages['TedTalksHttpError'] % msg)
             sys.exit(1)
-        except TedTalksRssError, msg:
+        except TedTalksRssError as msg:
             sys.stderr.write(self.error_messages['TedTalksRssError'] % msg)
             sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Set the paging values
         if len(data) == self.page_limit:
@@ -416,7 +412,7 @@ class Videos(object):
             channelTree.append(item)
 
         # Output the MNV search results
-        sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+        sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
         sys.exit(0)
     # end searchForVideos()
@@ -429,7 +425,7 @@ class Videos(object):
         self.mashups_api.grabber_title = self.grabber_title
         self.mashups_api.mashup_title = self.mashup_title
         self.mashups_api.channel_icon = self.channel_icon
-        self.mashups_api.mashup_title = u'tedtalks'
+        self.mashups_api.mashup_title = 'tedtalks'
 
         # Easier for debugging
 #        self.mashups_api.displayTreeView()
@@ -439,8 +435,8 @@ class Videos(object):
         try:
             self.mashups_api.Search = False
             self.mashups_api.displayTreeView()
-        except Exception, e:
-            sys.stderr.write(u"! Error: During a TedTalks Video treeview\nError(%s)\n" % (e))
+        except Exception as e:
+            sys.stderr.write("! Error: During a TedTalks Video treeview\nError(%s)\n" % (e))
             sys.exit(1)
 
         sys.exit(0)
