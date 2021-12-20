@@ -12,7 +12,7 @@
 #include <IOKit/pwr_mgt/IOPMLib.h>
 #include <IOKit/IOMessage.h>
 
-class MythPowerOSX : public MythPower
+class MythPowerOSX final : public MythPower
 {
     Q_OBJECT
 
@@ -21,13 +21,13 @@ class MythPowerOSX : public MythPower
   public:
 
   protected slots:
-    void Refresh (void) override final;
+    void Refresh (void) override;
 
   protected:
     MythPowerOSX();
-   ~MythPowerOSX() override final;
+   ~MythPowerOSX() override;
     void Init(void) override;
-    bool DoFeature (bool Delayed = false) override final;
+    bool DoFeature (bool Delayed = false) override;
 
     static void PowerCallBack       (void *Reference, io_service_t Service,
                                      natural_t Type, void *Data);
