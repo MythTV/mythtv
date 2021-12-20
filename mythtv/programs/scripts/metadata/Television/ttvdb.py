@@ -2238,7 +2238,7 @@ def main():
     parser.add_option(  "-l", "--language", metavar="LANGUAGE", default=u'en', dest="language",
                         help=u"Select data that matches the specified language fall back to english if nothing found (e.g. 'es' Español, 'de' Deutsch ... etc)")
     parser.add_option(  "-a", "--area", metavar="COUNTRY", default=u'', dest="country",
-			help=u"Select data that matches the specificed country (e.g. 'de' Germany 'gb' UK). This option is currently not used.")
+                        help=u"Select data that matches the specificed country (e.g. 'de' Germany 'gb' UK). This option is currently not used.")
     parser.add_option(  "-n", "--num_seasons", action="store_true", default=False, dest="num_seasons",
                         help=u"Return the season numbers for a series")
     parser.add_option(  "-t", action="store_true", default=False, dest="test",
