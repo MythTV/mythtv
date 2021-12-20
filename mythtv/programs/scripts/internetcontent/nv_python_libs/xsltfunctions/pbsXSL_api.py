@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: pbsXSL_api - XPath and XSLT functions for the PBS RSS/HTML itmes
 # Python Script
@@ -32,7 +32,7 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
 
 
@@ -47,28 +47,26 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -80,7 +78,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -94,15 +92,15 @@ class xpathFunctions(object):
         self.functList = ['pbsTitleSeriesEpisodeLink', 'pbsDuration', 'pbsDownloadlink']
         self.seriesEpisodeRegex = [
             # Season 8: Episode 1
-            re.compile(u'''^.+?Season\\ (?P<seasno>[0-9]+)\\:\\ Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Season\\ (?P<seasno>[0-9]+)\\:\\ Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Season 8, Episode 1
-            re.compile(u'''^.+?Season\\ (?P<seasno>[0-9]+)\\,\\ Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Season\\ (?P<seasno>[0-9]+)\\,\\ Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Episode 1:
-            re.compile(u'''^.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             ]
         self.namespaces = {
-            'media': u"http://search.yahoo.com/mrss/",
-            'xhtml': u"http://www.w3.org/1999/xhtml",
+            'media': "http://search.yahoo.com/mrss/",
+            'xhtml': "http://www.w3.org/1999/xhtml",
             'mythtv': "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format",
             'mediaad': "http://PBS/dtd/mediaad/1.0",
             }
@@ -124,7 +122,7 @@ class xpathFunctions(object):
         tmpLink = arg[1]
 
         # Set the custom HTML PBS link
-        tmpVideoCode = tmpLink.replace(u'http://video.pbs.org/video/', u'')[:-1]
+        tmpVideoCode = tmpLink.replace('http://video.pbs.org/video/', '')[:-1]
         self.persistence[tmpLink] = common.linkWebPage('dummy', 'pbs')
 
         # Parse out any Season
@@ -145,21 +143,21 @@ class xpathFunctions(object):
         if index != -1:
             tmpTitle = tmpTitle[index+1:].strip()
         if seasonNumber and episodeNumber:
-            tmpTitle = u'S%02dE%02d: %s' % (int(seasonNumber), int(episodeNumber), tmpTitle)
+            tmpTitle = 'S%02dE%02d: %s' % (int(seasonNumber), int(episodeNumber), tmpTitle)
         elif episodeNumber:
             index = tmpTitle.find(':')
             if index != -1:
                 tmpTitle = tmpTitle[index+1:].strip()
-            tmpTitle = u'Ep%02d: %s' % (int(episodeNumber), tmpTitle)
-        self.persistence[tmpLink] = common.linkWebPage('dummy', 'pbs').replace(u'TITLE', urllib.quote(tmpTitle)).replace(u'VIDEOCODE', tmpVideoCode)
+            tmpTitle = 'Ep%02d: %s' % (int(episodeNumber), tmpTitle)
+        self.persistence[tmpLink] = common.linkWebPage('dummy', 'pbs').replace('TITLE', urllib.parse.quote(tmpTitle)).replace('VIDEOCODE', tmpVideoCode)
 
         # Make the elements to include in the item
         elementTmp = etree.XML('<xml></xml>')
         etree.SubElement(elementTmp, "title").text = tmpTitle
         if seasonNumber:
-            etree.SubElement(elementTmp, "season").text = u"%s" % int(seasonNumber)
+            etree.SubElement(elementTmp, "season").text = "%s" % int(seasonNumber)
         if episodeNumber:
-            etree.SubElement(elementTmp, "episode").text = u"%s" % int(episodeNumber)
+            etree.SubElement(elementTmp, "episode").text = "%s" % int(episodeNumber)
         etree.SubElement(elementTmp, "link").text = self.persistence[tmpLink]
         return elementTmp
     # end pbsTitleSeriesEpisodeLink()
@@ -170,7 +168,7 @@ class xpathFunctions(object):
         return the video duration
         '''
         if not arg[0]:
-            return u''
+            return ''
         return arg[0][:-3]
     # end pbsDuration()
 

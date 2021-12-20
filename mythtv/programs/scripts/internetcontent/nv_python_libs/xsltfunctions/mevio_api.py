@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: mevio_api - XPath and XSLT functions for the Mevio RSS/HTML items
 # Python Script
@@ -34,9 +34,9 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
-
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -49,28 +49,26 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -82,7 +80,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -96,23 +94,23 @@ class xpathFunctions(object):
         self.functList = ['mevioLinkGeneration', 'mevioTitle', 'mevioEpisode', 'mevioCheckIfDBItem', ]
         self.episodeRegex = [
             # Episode 224
-            re.compile(u'''^.+?Episode\\ (?P<episodeno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Episode\\ (?P<episodeno>[0-9]+).*$''', re.UNICODE),
             # CrankyGeeks 136:
-            re.compile(u'''^.+?(?P<episodeno>[0-9]+)\\:.*$''', re.UNICODE),
+            re.compile('''^.+?(?P<episodeno>[0-9]+)\\:.*$''', re.UNICODE),
             ]
         self.namespaces = {
-            'atom10': u"http://www.w3.org/2005/Atom",
-            'media': u"http://search.yahoo.com/mrss/",
+            'atom10': "http://www.w3.org/2005/Atom",
+            'media': "http://search.yahoo.com/mrss/",
             'itunes':"http://www.itunes.com/dtds/podcast-1.0.dtd",
-            'xhtml': u"http://www.w3.org/1999/xhtml",
-            'feedburner': u"http://rssnamespace.org/feedburner/ext/1.0",
+            'xhtml': "http://www.w3.org/1999/xhtml",
+            'feedburner': "http://rssnamespace.org/feedburner/ext/1.0",
             'mythtv': "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format",
             'dc': "http://purl.org/dc/elements/1.1/",
             'fb': "http://www.facebook.com/2008/fbml/",
             }
         self.mediaIdFilters = [
-            [etree.XPath(".//embed/@flashvars", namespaces=self.namespaces), re.compile(u'''^.+?MediaId=(?P<videocode>[0-9]+).*$''', re.UNICODE)],
-            [etree.XPath(".//div[@class='player_wrapper']/a/@href", namespaces=self.namespaces), re.compile(u'''^.+?\\'(?P<videocode>[0-9]+)\\'\\)\\;.*$''', re.UNICODE)]
+            [etree.XPath(".//embed/@flashvars", namespaces=self.namespaces), re.compile('''^.+?MediaId=(?P<videocode>[0-9]+).*$''', re.UNICODE)],
+            [etree.XPath(".//div[@class='player_wrapper']/a/@href", namespaces=self.namespaces), re.compile('''^.+?\\'(?P<videocode>[0-9]+)\\'\\)\\;.*$''', re.UNICODE)]
             ]
     # end __init__()
 
@@ -130,8 +128,8 @@ class xpathFunctions(object):
         webURL = arg[0]
         try:
             tmpHTML = etree.parse(webURL, etree.HTMLParser())
-        except Exception, errmsg:
-            sys.stderr.write(u"Error reading url(%s) error(%s)\n" % (webURL, errmsg))
+        except Exception as errmsg:
+            sys.stderr.write("Error reading url(%s) error(%s)\n" % (webURL, errmsg))
             return webURL
 
         for index in range(len(self.mediaIdFilters)):
@@ -141,7 +139,7 @@ class xpathFunctions(object):
             match = self.mediaIdFilters[index][1].match(mediaId[0])
             if match:
                 videocode = match.groups()
-                return u'file://%s/nv_python_libs/configs/HTML/mevio.html?videocode=%s' % (common.baseProcessingDir, videocode[0])
+                return 'file://%s/nv_python_libs/configs/HTML/mevio.html?videocode=%s' % (common.baseProcessingDir, videocode[0])
         else:
             return webURL
     # end mevioLinkGeneration()
@@ -153,9 +151,9 @@ class xpathFunctions(object):
         '''
         epText = self.mevioEpisode('dummy', arg).text
         if epText:
-            epText = u'Ep %s: ' % epText
+            epText = 'Ep %s: ' % epText
         else:
-            epText = u''
+            epText = ''
         seperatorStrs = [[' | ', 'before'], [': ', 'after'], [' - ', 'before']]
         for sepStr in seperatorStrs:
             if sepStr[1] == 'after':
@@ -164,9 +162,9 @@ class xpathFunctions(object):
                 index = arg[0].rfind(sepStr[0])
             if index != -1:
                 if sepStr[1] == 'after':
-                    return u'%s%s' % (epText, arg[0][index+len(sepStr[0]):].strip())
+                    return '%s%s' % (epText, arg[0][index+len(sepStr[0]):].strip())
                 else:
-                    return u'%s%s' % (epText, arg[0][:index].strip())
+                    return '%s%s' % (epText, arg[0][:index].strip())
         else:
             if epText:
                 return epText
@@ -179,13 +177,13 @@ class xpathFunctions(object):
         Call example: 'mnvXpath:mevioEpisode(./title/text())'
         return an episode element
         '''
-        episodeNumber = u''
+        episodeNumber = ''
         for index in range(len(self.episodeRegex)):
             match = self.episodeRegex[index].match(arg[0])
             if match:
                 episodeNumber = match.groups()
                 break
-        return etree.XML(u'<episode>%s</episode>' % episodeNumber)
+        return etree.XML('<episode>%s</episode>' % episodeNumber)
     # end mevioEpisode()
 
     def mevioCheckIfDBItem(self, context, *arg):

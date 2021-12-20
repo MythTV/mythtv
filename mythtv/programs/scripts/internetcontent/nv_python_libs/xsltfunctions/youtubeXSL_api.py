@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: youtubeXSL_api - XPath and XSLT functions for the mashup grabbers
 # Python Script
@@ -32,8 +32,9 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
+import io
 
 
 class OutStreamEncoder(object):
@@ -47,28 +48,26 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -80,7 +79,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -94,9 +93,9 @@ class xpathFunctions(object):
         self.functList = ['youtubeTrailerFilter', 'youtubePaging', ]
         self.tailerNum_Patterns = [
             # "trailer 7"
-            re.compile(u'''^.+?trailer\\ (?P<trailerNum>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?trailer\\ (?P<trailerNum>[0-9]+).*$''', re.UNICODE),
             # "trailer #7"
-            re.compile(u'''^.+?trailer\\ \\#(?P<trailerNum>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?trailer\\ \\#(?P<trailerNum>[0-9]+).*$''', re.UNICODE),
             ]
     # end __init__()
 
@@ -118,7 +117,7 @@ class xpathFunctions(object):
         titleFilter = etree.XPath('.//atm:title', namespaces=common.namespaces)
 
         # Remove any leading word "The" from the search term
-        if searchTerm.startswith(u'the '):
+        if searchTerm.startswith('the '):
             searchTerm = searchTerm[4:].strip()
 
         titleDict = {}
@@ -127,46 +126,46 @@ class xpathFunctions(object):
 
         # Tag so that there is an order plus duplicates can be easily spotted
         filteredDict = {}
-        for key in titleDict.keys():
+        for key in list(titleDict.keys()):
             title = common.removePunc('dummy', key.lower())
-            if title.startswith(u'the '):
+            if title.startswith('the '):
                 title = title[4:].strip()
             if searchTerm.find('new ') == -1:
-                title = title.replace(u'new ', u'')
+                title = title.replace('new ', '')
             if searchTerm.find('official ') == -1:
-                title = title.replace(u'official ', u'')
+                title = title.replace('official ', '')
             if title.find(searchTerm) != -1:
-                addOns = u''
+                addOns = ''
                 HD = False
                 if searchTerm.find('game ') == -1:
                     if title.find('game') != -1:
-                        addOns+=u'ZZ-Game'
+                        addOns+='ZZ-Game'
                 if title.find('hd') != -1 or title.find('1080p') != -1 or title.find('720p') != -1:
                     HD = True
                 if title.startswith(searchTerm):
-                    addOns+=u'1-'
+                    addOns+='1-'
                 for regexPattern in self.tailerNum_Patterns:
                     match = regexPattern.match(title)
                     if not match:
                         continue
                     trailerNum = match.groups()
                     if int(trailerNum[0]) < 20:
-                        addOns+=u'Trailer #%s' % trailerNum[0]
-                        title = title.replace((u'trailer %s' % trailerNum[0]), u'')
+                        addOns+='Trailer #%s' % trailerNum[0]
+                        title = title.replace(('trailer %s' % trailerNum[0]), '')
                     else:
-                        addOns+=u'Trailer #1'
+                        addOns+='Trailer #1'
                     break
                 else:
                     if title.find('trailer') != -1:
-                        addOns+=u'Trailer #1'
-                if HD and not addOns.startswith(u'ZZ-Game'):
+                        addOns+='Trailer #1'
+                if HD and not addOns.startswith('ZZ-Game'):
                     if addOns:
-                        addOns=u'HD-'+addOns
+                        addOns='HD-'+addOns
                     else:
-                        addOns=u'YHD'
-                for text in [u'hd', u'trailer', u'game', u'1080p', u'720p']:
-                    title = title.replace(text, u'').replace(u'  ', u' ').strip()
-                filteredDict[(u'%s %s' % (addOns, title)).strip()] = titleDict[key]
+                        addOns='YHD'
+                for text in ['hd', 'trailer', 'game', '1080p', '720p']:
+                    title = title.replace(text, '').replace('  ', ' ').strip()
+                filteredDict[('%s %s' % (addOns, title)).strip()] = titleDict[key]
 
         # Get rid of obvious duplicates
         filtered2Dict = {}
@@ -182,7 +181,7 @@ class xpathFunctions(object):
         finalElements = []
         sortedList = sorted(filtered2Dict.keys())
         for index in range(len(sortedList)):
-            titleFilter(filtered2Dict[sortedList[index]])[0].text = u'%02d. %s' % (index+1, titleFilter(filtered2Dict[sortedList[index]])[0].text)
+            titleFilter(filtered2Dict[sortedList[index]])[0].text = '%02d. %s' % (index+1, titleFilter(filtered2Dict[sortedList[index]])[0].text)
             finalElements.append(filtered2Dict[sortedList[index]])
 
         # Set the paging values

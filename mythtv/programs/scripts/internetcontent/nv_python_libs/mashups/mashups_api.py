@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: mashups_api - Simple-to-use Python interface to Mashups of RSS feeds and HTML video data
 #
@@ -28,12 +28,13 @@ __version__="v0.1.6"
 # 0.1.5 Removed a redundant build of the common XSLT function dictionary
 # 0.1.6 Corrected a bug were a users custom setting were not being updated properly
 
-import os, struct, sys, time, datetime, shutil, urllib
+import os, struct, sys, time, datetime, shutil, urllib.request, urllib.parse, urllib.error
 from socket import gethostname, gethostbyname
 from copy import deepcopy
 import logging
 
-from mashups_exceptions import (MashupsUrlError, MashupsHttpError, MashupsRssError, MashupsVideoNotFound, MashupsConfigFileError, MashupsUrlDownloadError)
+from .mashups_exceptions import (MashupsUrlError, MashupsHttpError, MashupsRssError, MashupsVideoNotFound, MashupsConfigFileError, MashupsUrlDownloadError)
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -46,29 +47,24 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -80,7 +76,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -148,7 +144,7 @@ class Videos(object):
         self.common = common
         self.common.debug = debug   # Set the common function debug level
 
-        self.log_name = u'Mashups_Grabber'
+        self.log_name = 'Mashups_Grabber'
         self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
         self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
@@ -161,18 +157,18 @@ class Videos(object):
         if language:
             self.config['language'] = language
         else:
-            self.config['language'] = u'en'
+            self.config['language'] = 'en'
 
         self.config['search_all_languages'] = search_all_languages
 
-        self.error_messages = {'MashupsUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'MashupsHttpError': u"! Error: An HTTP communications error with the Mashups was raised (%s)\n", 'MashupsRssError': u"! Error: Invalid RSS meta data\nwas received from the Mashups error (%s). Skipping item.\n", 'MashupsVideoNotFound': u"! Error: Video search with the Mashups did not return any results (%s)\n", 'MashupsConfigFileError': u"! Error: mashups_config.xml file missing\nit should be located in and named as (%s).\n", 'MashupsUrlDownloadError': u"! Error: Downloading a RSS feed or Web page (%s).\n", }
+        self.error_messages = {'MashupsUrlError': "! Error: The URL (%s) cause the exception error (%s)\n", 'MashupsHttpError': "! Error: An HTTP communications error with the Mashups was raised (%s)\n", 'MashupsRssError': "! Error: Invalid RSS meta data\nwas received from the Mashups error (%s). Skipping item.\n", 'MashupsVideoNotFound': "! Error: Video search with the Mashups did not return any results (%s)\n", 'MashupsConfigFileError': "! Error: mashups_config.xml file missing\nit should be located in and named as (%s).\n", 'MashupsUrlDownloadError': "! Error: Downloading a RSS feed or Web page (%s).\n", }
 
         # Channel details and search results
-        self.channel = {'channel_title': u'', 'channel_link': u'http://www.mythtv.org/wiki/MythNetvision', 'channel_description': u"Mashups combines media from multiple sources to create a new work", 'channel_numresults': 0, 'channel_returned': 0, u'channel_startindex': 0}
+        self.channel = {'channel_title': '', 'channel_link': 'http://www.mythtv.org/wiki/MythNetvision', 'channel_description': "Mashups combines media from multiple sources to create a new work", 'channel_numresults': 0, 'channel_returned': 0, 'channel_startindex': 0}
 
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/mashups.png'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/mashups.png'
 
-        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
+        self.config['image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
     # end __init__()
 
 ###########################################################################################################
@@ -187,16 +183,16 @@ class Videos(object):
         '''
         self.tree_dir_icon = self.channel_icon
         if not dir_icon:
-            if not self.feed_icons.has_key(self.tree_key):
+            if self.tree_key not in self.feed_icons:
                 return self.tree_dir_icon
-            if not self.feed_icons[self.tree_key].has_key(self.feed):
+            if self.feed not in self.feed_icons[self.tree_key]:
                 return self.tree_dir_icon
             if not dir_icon:
                 return self.tree_dir_icon
             dir_icon = self.feed_icons[self.tree_key][self.feed]
             if not dir_icon:
                 return self.tree_dir_icon
-        self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
+        self.tree_dir_icon = '%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
         return self.tree_dir_icon
     # end setTreeViewIcon()
 
@@ -206,16 +202,16 @@ class Videos(object):
         return nothing
         '''
         # Read the grabber mashups_config.xml configuration file
-        url = u'%s/nv_python_libs/configs/XML/mashups_config.xml' % (baseProcessingDir, )
+        url = '%s/nv_python_libs/configs/XML/mashups_config.xml' % (baseProcessingDir, )
         if not os.path.isfile(url):
             raise MashupsConfigFileError(self.error_messages['MashupsConfigFileError'] % (url, ))
 
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
         try:
             self.mashups_config = etree.parse(url)
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise MashupsUrlError(self.error_messages['MashupsUrlError'] % (url, errormsg))
         return
     # end getMashupsConfig()
@@ -230,15 +226,15 @@ class Videos(object):
         self.getMashupsConfig()
 
         # Check if the mashups.xml file exists
-        fileName = u'%s.xml' % self.mashup_title.replace(u'treeview', u'').replace(u'search', u'')
-        userPreferenceFile = u'%s/%s' % (self.mashups_config.find('userPreferenceFile').text, fileName)
+        fileName = '%s.xml' % self.mashup_title.replace('treeview', '').replace('search', '')
+        userPreferenceFile = '%s/%s' % (self.mashups_config.find('userPreferenceFile').text, fileName)
         if userPreferenceFile[0] == '~':
-             self.mashups_config.find('userPreferenceFile').text = u"%s%s" % (os.path.expanduser(u"~"), userPreferenceFile[1:])
+             self.mashups_config.find('userPreferenceFile').text = "%s%s" % (os.path.expanduser("~"), userPreferenceFile[1:])
 
         # If the user config file does not exists then copy one from the default
         create = False
-        defaultConfig = u'%s/nv_python_libs/configs/XML/defaultUserPrefs/%s' % (baseProcessingDir, fileName, )
-        prefDir = self.mashups_config.find('userPreferenceFile').text.replace(u'/'+fileName, u'')
+        defaultConfig = '%s/nv_python_libs/configs/XML/defaultUserPrefs/%s' % (baseProcessingDir, fileName, )
+        prefDir = self.mashups_config.find('userPreferenceFile').text.replace('/'+fileName, '')
         if not os.path.isfile(self.mashups_config.find('userPreferenceFile').text):
             # Make the necessary directories if they do not already exist
             if not os.path.isdir(prefDir):
@@ -248,11 +244,11 @@ class Videos(object):
 
         # Read the grabber mashups_config.xml configuration file
         if self.config['debug_enabled']:
-            print self.mashups_config.find('userPreferenceFile').text
-            print
+            print(self.mashups_config.find('userPreferenceFile').text)
+            print()
         try:
             self.userPrefs = etree.parse(self.mashups_config.find('userPreferenceFile').text)
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise MashupsUrlError(self.error_messages['MashupsUrlError'] % (self.mashups_config.find('userPreferenceFile').text, errormsg))
 
         if create:
@@ -262,7 +258,7 @@ class Videos(object):
         # additions or changes
         try:
             defaultPrefs = etree.parse(defaultConfig)
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise MashupsUrlError(self.error_messages['MashupsUrlError'] % (defaultConfig, errormsg))
         urlFilter = etree.XPath('//sourceURL[@url=$url and @name=$name]', namespaces=self.common.namespaces)
         globalmaxFilter = etree.XPath('./../..', namespaces=self.common.namespaces)
@@ -283,13 +279,13 @@ class Videos(object):
         tagName = defaultPrefs.getroot().tag
 
         # Get the internal documentaion
-        docComment = u''
+        docComment = ''
         for element in defaultPrefs.iter(tag=etree.Comment):
             docComment+=etree.tostring(element, encoding='UTF-8', pretty_print=True)[:-1]
 
         fd = open(self.mashups_config.find('userPreferenceFile').text, 'w')
-        fd.write((u'<%s>\n' % tagName)+docComment)
-        fd.write(u''.join(etree.tostring(element, encoding='UTF-8', pretty_print=True) for element in defaultPrefs.xpath(u'/%s/*' % tagName))+(u'</%s>\n'% tagName))
+        fd.write(('<%s>\n' % tagName)+docComment)
+        fd.write(''.join(etree.tostring(element, encoding='UTF-8', pretty_print=True) for element in defaultPrefs.xpath('/%s/*' % tagName))+('</%s>\n'% tagName))
         fd.close()
 
         # Make sure that the user preferences are using the latest version
@@ -311,22 +307,22 @@ class Videos(object):
         # Get the user preferences
         try:
             self.getUserPreferences()
-        except Exception, e:
-            sys.stderr.write(u'%s' % e)
+        except Exception as e:
+            sys.stderr.write('%s' % e)
             sys.exit(1)
 
         if self.config['debug_enabled']:
-            print "self.userPrefs:"
+            print("self.userPrefs:")
             sys.stdout.write(etree.tostring(self.userPrefs, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Import the mnvsearch_api.py functions
-        fullPath = u'%s/nv_python_libs/%s' % (self.common.baseProcessingDir, 'mnvsearch')
+        fullPath = '%s/nv_python_libs/%s' % (self.common.baseProcessingDir, 'mnvsearch')
         sys.path.append(fullPath)
         try:
             exec('''import mnvsearch_api''')
-        except Exception, errmsg:
-            sys.stderr.write(u'! Error: Dynamic import of mnvsearch_api functions\nmessage(%s)\n' % (errmsg))
+        except Exception as errmsg:
+            sys.stderr.write('! Error: Dynamic import of mnvsearch_api functions\nmessage(%s)\n' % (errmsg))
             sys.exit(1)
         mnvsearch_api.common = self.common
         mnvsearch = mnvsearch_api.Videos(None, debug=self.config['debug_enabled'], language=self.config['language'])
@@ -339,11 +335,11 @@ class Videos(object):
         self.channel_icon = self.common.ampReplace(self.channel_icon)
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Add the Channel element tree
         self.channel['channel_title'] = self.grabber_title
-        self.channel_icon = self.setTreeViewIcon(dir_icon=self.mashup_title.replace(u'Mashuptreeview', u''))
+        self.channel_icon = self.setTreeViewIcon(dir_icon=self.mashup_title.replace('Mashuptreeview', ''))
         channelTree = self.common.mnvChannelElement(self.channel)
         rssTree.append(channelTree)
 
@@ -352,7 +348,7 @@ class Videos(object):
         self.common.buildFunctionDict()
         mnvXpath = etree.FunctionNamespace('http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format')
         mnvXpath.prefix = 'mnvXpath'
-        for key in self.common.functionDict.keys():
+        for key in list(self.common.functionDict.keys()):
             mnvXpath[key] = self.common.functionDict[key]
 
         # Build Search parameter dictionary
@@ -361,22 +357,22 @@ class Videos(object):
         self.common.language = self.config['language']
         self.common.searchterm = title.encode("utf-8")
         searchParms = {
-            'searchterm': urllib.quote_plus(title.encode("utf-8")),
+            'searchterm': urllib.parse.quote_plus(title.encode("utf-8")),
             'pagemax': self.page_limit,
             'language': self.config['language'],
             }
         # Create a structure of feeds that can be concurrently downloaded
         xsltFilename = etree.XPath('./@xsltFile', namespaces=self.common.namespaces)
-        sourceData = etree.XML(u'<xml></xml>')
+        sourceData = etree.XML('<xml></xml>')
         for source in self.userPrefs.xpath('//search//sourceURL[@enabled="true"]'):
             if source.attrib.get('mnvsearch'):
                 continue
             urlName = source.attrib.get('name')
             if urlName:
-                 uniqueName = u'%s;%s' % (urlName, source.attrib.get('url'))
+                 uniqueName = '%s;%s' % (urlName, source.attrib.get('url'))
             else:
-                uniqueName = u'RSS;%s' % (source.attrib.get('url'))
-            url = etree.XML(u'<url></url>')
+                uniqueName = 'RSS;%s' % (source.attrib.get('url'))
+            url = etree.XML('<url></url>')
             etree.SubElement(url, "name").text = uniqueName
             if source.attrib.get('pageFunction'):
                 searchParms['pagenum'] = self.common.functionDict[source.attrib['pageFunction']]('dummy', 'dummy')
@@ -390,21 +386,21 @@ class Videos(object):
             sourceData.append(url)
 
         if self.config['debug_enabled']:
-            print "rssData:"
+            print("rssData:")
             sys.stdout.write(etree.tostring(sourceData, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Get the source data
         if sourceData.find('url') is not None:
             # Process each directory of the user preferences that have an enabled rss feed
             try:
                 resultTree = self.common.getUrlData(sourceData)
-            except Exception, errormsg:
+            except Exception as errormsg:
                 raise MashupsUrlDownloadError(self.error_messages['MashupsUrlDownloadError'] % (errormsg))
             if self.config['debug_enabled']:
-                print "resultTree:"
+                print("resultTree:")
                 sys.stdout.write(etree.tostring(resultTree, encoding='UTF-8', pretty_print=True))
-                print
+                print()
 
             # Process the results
             itemFilter = etree.XPath('.//item', namespaces=self.common.namespaces)
@@ -419,10 +415,10 @@ class Videos(object):
         # Process any mnvsearches
         for source in self.userPrefs.xpath('//search//sourceURL[@enabled="true" and @mnvsearch]'):
             results = mnvsearch.searchForVideos(title, pagenumber, feedtitle=source.xpath('./@mnvsearch')[0])
-            if len(results[0].keys()):
-                channelTree.xpath('returned')[0].text = u'%s' % (int(channelTree.xpath('returned')[0].text)+results[1])
-                channelTree.xpath('startindex')[0].text = u'%s' % (int(channelTree.xpath('startindex')[0].text)+results[2])
-                channelTree.xpath('numresults')[0].text = u'%s' % (int(channelTree.xpath('numresults')[0].text)+results[3])
+            if len(list(results[0].keys())):
+                channelTree.xpath('returned')[0].text = '%s' % (int(channelTree.xpath('returned')[0].text)+results[1])
+                channelTree.xpath('startindex')[0].text = '%s' % (int(channelTree.xpath('startindex')[0].text)+results[2])
+                channelTree.xpath('numresults')[0].text = '%s' % (int(channelTree.xpath('numresults')[0].text)+results[3])
                 lastKey = None
                 for key in sorted(results[0].keys()):
                     if lastKey != key:
@@ -432,7 +428,7 @@ class Videos(object):
         # Check that there was at least some items
         if len(rssTree.xpath('//item')):
             # Output the MNV Mashup results
-            sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+            sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
 
         sys.exit(0)
@@ -446,24 +442,24 @@ class Videos(object):
         # Get the user preferences
         try:
             self.getUserPreferences()
-        except Exception, e:
-            sys.stderr.write(u'%s' % e)
+        except Exception as e:
+            sys.stderr.write('%s' % e)
             sys.exit(1)
 
         if self.config['debug_enabled']:
-            print "self.userPrefs:"
+            print("self.userPrefs:")
             sys.stdout.write(etree.tostring(self.userPrefs, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Massage channel icon
         self.channel_icon = self.common.ampReplace(self.channel_icon)
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Add the Channel element tree
         self.channel['channel_title'] = self.grabber_title
-        self.channel_icon = self.setTreeViewIcon(dir_icon=self.mashup_title.replace(u'Mashuptreeview', u''))
+        self.channel_icon = self.setTreeViewIcon(dir_icon=self.mashup_title.replace('Mashuptreeview', ''))
         channelTree = self.common.mnvChannelElement(self.channel)
         rssTree.append(channelTree)
         self.common.language = self.config['language']
@@ -473,19 +469,19 @@ class Videos(object):
         self.common.buildFunctionDict()
         mnvXpath = etree.FunctionNamespace('http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format')
         mnvXpath.prefix = 'mnvXpath'
-        for key in self.common.functionDict.keys():
+        for key in list(self.common.functionDict.keys()):
             mnvXpath[key] = common.functionDict[key]
 
         # Create a structure of feeds that can be concurrently downloaded
         xsltFilename = etree.XPath('./@xsltFile', namespaces=self.common.namespaces)
-        sourceData = etree.XML(u'<xml></xml>')
+        sourceData = etree.XML('<xml></xml>')
         for source in self.userPrefs.xpath('//directory//sourceURL[@enabled="true"]'):
             urlName = source.attrib.get('name')
             if urlName:
-                 uniqueName = u'%s;%s' % (urlName, source.attrib.get('url'))
+                 uniqueName = '%s;%s' % (urlName, source.attrib.get('url'))
             else:
-                uniqueName = u'RSS;%s' % (source.attrib.get('url'))
-            url = etree.XML(u'<url></url>')
+                uniqueName = 'RSS;%s' % (source.attrib.get('url'))
+            url = etree.XML('<url></url>')
             etree.SubElement(url, "name").text = uniqueName
             etree.SubElement(url, "href").text = source.attrib.get('url')
             if source.attrib.get('parameter') is not None:
@@ -497,21 +493,21 @@ class Videos(object):
             sourceData.append(url)
 
         if self.config['debug_enabled']:
-            print "rssData:"
+            print("rssData:")
             sys.stdout.write(etree.tostring(sourceData, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Get the source data
         if sourceData.find('url') is not None:
             # Process each directory of the user preferences that have an enabled rss feed
             try:
                 resultTree = self.common.getUrlData(sourceData)
-            except Exception, errormsg:
+            except Exception as errormsg:
                 raise MashupsUrlDownloadError(self.error_messages['MashupsUrlDownloadError'] % (errormsg))
             if self.config['debug_enabled']:
-                print "resultTree:"
+                print("resultTree:")
                 sys.stdout.write(etree.tostring(resultTree, encoding='UTF-8', pretty_print=True))
-                print
+                print()
             # Process the results
             categoryDir = None
             categoryElement = None
@@ -528,8 +524,8 @@ class Videos(object):
             for result in resultTree.findall('results'):
                 if len(specialDirectoriesFilter(result)):
                     for element in specialDirectoriesFilter(result)[0]:
-                        if not element.tag in specialDirectoriesDict.keys():
-                            specialDirectoriesElement = etree.XML(u'<directory></directory>')
+                        if not element.tag in list(specialDirectoriesDict.keys()):
+                            specialDirectoriesElement = etree.XML('<directory></directory>')
                             specialDirectoriesElement.attrib['name'] = element.attrib['dirname']
                             if element.attrib.get('count'):
                                 count = int(element.attrib['count'])
@@ -541,7 +537,7 @@ class Videos(object):
                                 specialDirectoriesElement.attrib['thumbnail'] = self.channel_icon
                             specialDirectoriesDict[element.tag] = [specialDirectoriesElement, element.attrib['reverse'], count]
             for result in resultTree.findall('results'):
-                names = result.find('name').text.split(u';')
+                names = result.find('name').text.split(';')
                 names[0] = self.common.massageText(names[0])
                 if len(xsltShowName(self.userPrefs, url=names[1])):
                     names[0] =  self.common.massageText(xsltShowName(self.userPrefs, url=names[1])[0].strip())
@@ -568,7 +564,7 @@ class Videos(object):
                 if names[0] != categoryDir:
                     if categoryDir is not None:
                         channelTree.append(categoryElement)
-                    categoryElement = etree.XML(u'<directory></directory>')
+                    categoryElement = etree.XML('<directory></directory>')
                     categoryElement.attrib['name'] = names[0]
                     if len(channelThumbnail(result)):
                         categoryElement.attrib['thumbnail'] = channelThumbnail(result)[0].text
@@ -577,7 +573,7 @@ class Videos(object):
                     categoryDir = names[0]
 
                 # Add the special directories videos
-                for key in specialDirectoriesDict.keys():
+                for key in list(specialDirectoriesDict.keys()):
                     sortDict = {}
                     count = 0
                     for sortData in specialDirectoriesKeyFilter(result, name=key):
@@ -585,9 +581,9 @@ class Videos(object):
                         count+=1
                     if len(sortDict):
                         if specialDirectoriesDict[key][1] == 'true':
-                            sortedKeys = sorted(sortDict.keys(), reverse=True)
+                            sortedKeys = sorted(list(sortDict.keys()), reverse=True)
                         else:
-                            sortedKeys = sorted(sortDict.keys(), reverse=False)
+                            sortedKeys = sorted(list(sortDict.keys()), reverse=False)
                         if specialDirectoriesDict[key][2] == 0:
                             number = len(sortDict)
                         else:
@@ -601,7 +597,7 @@ class Videos(object):
                     for directory in directoryFilter(result):
                         if not len(itemFilter(directory)):
                             continue
-                        tmpDirElement = etree.XML(u'<directory></directory>')
+                        tmpDirElement = etree.XML('<directory></directory>')
                         tmpDirElement.attrib['name'] = directory.attrib['name']
                         if directory.attrib.get('thumbnail'):
                             tmpDirElement.attrib['thumbnail'] = directory.attrib['thumbnail']
@@ -631,14 +627,14 @@ class Videos(object):
                 if len(itemFilter(categoryElement)):
                     channelTree.append(categoryElement)
                 # Add the special directories videos
-                for key in specialDirectoriesDict.keys():
+                for key in list(specialDirectoriesDict.keys()):
                     if len(itemFilter(specialDirectoriesDict[key][0])):
                         channelTree.append(specialDirectoriesDict[key][0])
 
         # Check that there was at least some items
         if len(rssTree.xpath('//item')):
             # Output the MNV Mashup results
-            sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+            sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
 
         sys.exit(0)

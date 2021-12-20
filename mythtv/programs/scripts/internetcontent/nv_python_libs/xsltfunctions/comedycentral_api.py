@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: comedycentral_api - XPath and XSLT functions for the Comedy Central RSS/HTML items
 # Python Script
@@ -32,9 +32,9 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
-
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -47,28 +47,26 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -80,7 +78,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -111,7 +109,7 @@ class xpathFunctions(object):
         index = tmpVideoCode.rfind('.')
         if index != -1:
             tmpVideoCode = tmpVideoCode[index+1:]
-        tmpLink = common.linkWebPage('dummy', 'comedycentral').replace(u'TITLE', urllib.quote(tmpTitle)).replace(u'VIDEOCODE', tmpVideoCode)
+        tmpLink = common.linkWebPage('dummy', 'comedycentral').replace('TITLE', urllib.parse.quote(tmpTitle)).replace('VIDEOCODE', tmpVideoCode)
         return tmpLink.strip()
     # end comedycentralMakeLink()
 

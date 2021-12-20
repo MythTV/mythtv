@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: common_api.py - Common class libraries for all MythNetvision Mashup processing
 # Python Script
@@ -53,12 +53,13 @@ __version__="v0.2.3"
 # 0.2.3 Fixed Error messages that were not unicode strings
 
 import os, struct, sys, re, datetime, time, subprocess, string
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import logging
 import telnetlib
 from threading import Thread
 
-from common_exceptions import (WebCgiUrlError, WebCgiHttpError, WebCgiRssError, WebCgiVideoNotFound, WebCgiXmlError, )
+from .common_exceptions import (WebCgiUrlError, WebCgiHttpError, WebCgiRssError, WebCgiVideoNotFound, WebCgiXmlError, )
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -71,29 +72,24 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" python library failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" python library failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -117,7 +113,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -138,12 +134,12 @@ class Common(object):
         ):
         self.logger = logger
         self.debug = debug
-        self.baseProcessingDir = os.path.dirname( os.path.realpath( __file__ )).replace(u'/nv_python_libs/common', u'')
+        self.baseProcessingDir = os.path.dirname( os.path.realpath( __file__ )).replace('/nv_python_libs/common', '')
         self.namespaces = {
-            'xsi': u"http://www.w3.org/2001/XMLSchema-instance",
-            'media': u"http://search.yahoo.com/mrss/",
-            'xhtml': u"http://www.w3.org/1999/xhtml",
-            'atm': u"http://www.w3.org/2005/Atom",
+            'xsi': "http://www.w3.org/2001/XMLSchema-instance",
+            'media': "http://search.yahoo.com/mrss/",
+            'xhtml': "http://www.w3.org/1999/xhtml",
+            'atm': "http://www.w3.org/2005/Atom",
             'mythtv': "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format",
             'itunes':"http://www.itunes.com/dtds/podcast-1.0.dtd",
             }
@@ -152,8 +148,8 @@ class Common(object):
             'html': etree.HTMLParser(remove_blank_text=True),
             'xhtml': etree.HTMLParser(remove_blank_text=True),
             }
-        self.pubDateFormat = u'%a, %d %b %Y %H:%M:%S GMT'
-        self.mnvRSS = u"""
+        self.pubDateFormat = '%a, %d %b %Y %H:%M:%S GMT'
+        self.mnvRSS = """
 <rss version="2.0"
     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
     xmlns:content="http://purl.org/rss/1.0/modules/content/"
@@ -165,7 +161,7 @@ class Common(object):
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:mythtv="http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format">
 """
-        self.mnvItem = u'''
+        self.mnvItem = '''
 <item>
     <title></title>
     <author></author>
@@ -182,37 +178,37 @@ class Common(object):
         # Season and Episode detection regex patterns
         self.s_e_Patterns = [
             # "Series 7 - Episode 4" or "Series 7 - Episode 4" or "Series 7: On Holiday: Episode 10"
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile(r'''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Series 5 - 1
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+)\\ \\-\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Series\\ (?P<seasno>[0-9]+)\\ \\-\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Series 1 - Warriors of Kudlak - Part 2
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Part\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Part\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Series 3: Programme 3
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+)\\:\\ Programme\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Series\\ (?P<seasno>[0-9]+)\\:\\ Programme\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Series 3:
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Series\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
             # Episode 1
-            re.compile(u'''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
             # Title: "s18 | e87"
-            re.compile(u'''^.+?[Ss](?P<seasno>[0-9]+).*.+?[Ee](?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?[Ss](?P<seasno>[0-9]+).*.+?[Ee](?P<epno>[0-9]+).*$''', re.UNICODE),
             # Description: "season 1, episode 5"
-            re.compile(u'''^.+?season\ (?P<seasno>[0-9]+).*.+?episode\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?season\\ (?P<seasno>[0-9]+).*.+?episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Thumbnail: "http://media.thewb.com/thewb/images/thumbs/firefly/01/firefly_01_07.jpg"
-            re.compile(u'''(?P<seriesname>[^_]+)\\_(?P<seasno>[0-9]+)\\_(?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''(?P<seriesname>[^_]+)\\_(?P<seasno>[0-9]+)\\_(?P<epno>[0-9]+).*$''', re.UNICODE),
             # Guid: "http://traffic.libsyn.com/divefilm/episode54hd.m4v"
-            re.compile(u'''^.+?episode(?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?episode(?P<epno>[0-9]+).*$''', re.UNICODE),
             # Season 3, Episode 8
-            re.compile(u'''^.+?Season\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Season\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # "Episode 1" anywhere in text
-            re.compile(u'''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
             # "Episode 1" at the start of the text
-            re.compile(u'''Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
             # "--0027--" when the episode is in the URL link
-            re.compile(u'''^.+?--(?P<seasno>[0-9]+)--.*$''', re.UNICODE),
+            re.compile('''^.+?--(?P<seasno>[0-9]+)--.*$''', re.UNICODE),
             ]
-        self.nv_python_libs_path = u'nv_python_libs'
-        self.apiSuffix = u'_api'
-        self.language = u'en'
+        self.nv_python_libs_path = 'nv_python_libs'
+        self.apiSuffix = '_api'
+        self.language = 'en'
         self.mythdb = None
         self.linksWebPage = None
         self.etree = etree
@@ -231,28 +227,28 @@ class Common(object):
             if text[:2] == "&#":
                 try:
                     if text[:3] == "&#x":
-                        return unichr(int(text[3:-1], 16))
+                        return chr(int(text[3:-1], 16))
                     else:
-                        return unichr(int(text[2:-1]))
+                        return chr(int(text[2:-1]))
                 except ValueError:
                     pass
             elif text[:1] == "&":
-                import htmlentitydefs
-                entity = htmlentitydefs.entitydefs.get(text[1:-1])
+                import html.entities
+                entity = html.entities.entitydefs.get(text[1:-1])
                 if entity:
                     if entity[:2] == "&#":
                         try:
-                            return unichr(int(entity[2:-1]))
+                            return chr(int(entity[2:-1]))
                         except ValueError:
                             pass
                     else:
-                        return unicode(entity, "iso-8859-1")
+                        return str(entity, "iso-8859-1")
             return text # leave as is
-        return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+        return self.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace('\n',' ')
     # end massageText()
 
 
-    def initLogger(self, path=sys.stderr, log_name=u'MNV_Grabber'):
+    def initLogger(self, path=sys.stderr, log_name='MNV_Grabber'):
         """Setups a logger using the logging module, returns a logger object
         """
         logger = logging.getLogger(log_name)
@@ -261,7 +257,7 @@ class Common(object):
         if path == sys.stderr:
             hdlr = logging.StreamHandler(sys.stderr)
         else:
-            hdlr = logging.FileHandler(u'%s/%s.log' % (path, log_name))
+            hdlr = logging.FileHandler('%s/%s.log' % (path, log_name))
 
         hdlr.setFormatter(formatter)
         logger.addHandler(hdlr)
@@ -279,9 +275,9 @@ class Common(object):
         if text is None:
             return text
         try:
-            return unicode(text, 'utf8')
+            return str(text, 'utf8')
         except UnicodeDecodeError:
-            return u''
+            return ''
         except (UnicodeEncodeError, TypeError):
             return text
     # end textUtf8()
@@ -292,9 +288,9 @@ class Common(object):
            entities
         '''
         text = self.textUtf8(text)
-        text = text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
-        text = text.replace(u"'", u"&apos;").replace(u'"', u'&quot;')
-        text = text.replace(u'<', u'&lt;').replace(u'>', u'&gt;')
+        text = text.replace('&amp;','~~~~~').replace('&','&amp;').replace('~~~~~', '&amp;')
+        text = text.replace("'", "&apos;").replace('"', '&quot;')
+        text = text.replace('<', '&lt;').replace('>', '&gt;')
         return text
     # end ampReplace()
 
@@ -308,9 +304,9 @@ class Common(object):
         try:
             p = subprocess.Popen(command, shell=True, bufsize=4096, stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
-        except Exception, e:
+        except Exception as e:
             if self.logger:
-                self.logger.error(u'callCommandLine Popen Exception, error(%s)' % e)
+                self.logger.error('callCommandLine Popen Exception, error(%s)' % e)
             if stderr:
                 return [[], []]
             else:
@@ -322,7 +318,7 @@ class Common(object):
                 if not data:
                     break
                 try:
-                    data = unicode(data, 'utf8')
+                    data = str(data, 'utf8')
                 except (UnicodeDecodeError):
                     continue    # Skip any line is cannot be cast as utf8 characters
                 except (UnicodeEncodeError, TypeError):
@@ -334,7 +330,7 @@ class Common(object):
             if not data:
                 break
             try:
-                data = unicode(data, 'utf8')
+                data = str(data, 'utf8')
             except (UnicodeDecodeError):
                 continue    # Skip any line that has non-utf8 characters in it
             except (UnicodeEncodeError, TypeError):
@@ -359,7 +355,7 @@ class Common(object):
         def getExternalIP():
             '''Find the external IP address of this computer.
             '''
-            url = urllib.URLopener()
+            url = urllib.request.URLopener()
             try:
                 resp = url.open('http://www.whatismyip.com/automation/n09230945.asp')
                 return resp.read()
@@ -373,15 +369,15 @@ class Common(object):
             return {}
 
         try:
-            gs = urllib.urlopen('http://blogama.org/ip_query.php?ip=%s&output=xml' % ip)
+            gs = urllib.request.urlopen('http://blogama.org/ip_query.php?ip=%s&output=xml' % ip)
             txt = gs.read()
         except:
             try:
-                gs = urllib.urlopen('http://www.seomoz.org/ip2location/look.php?ip=%s' % ip)
+                gs = urllib.request.urlopen('http://www.seomoz.org/ip2location/look.php?ip=%s' % ip)
                 txt = gs.read()
             except:
                 try:
-                    gs = urllib.urlopen('http://api.hostip.info/?ip=%s' % ip)
+                    gs = urllib.request.urlopen('http://api.hostip.info/?ip=%s' % ip)
                     txt = gs.read()
                 except:
                     logging.error('GeoIP servers not available')
@@ -392,12 +388,12 @@ class Common(object):
                 citys = re.findall(r'<City>([\w ]+)<',txt)[0]
                 lats,lons = re.findall(r'<Latitude>([\d\-\.]+)</Latitude>\s*<Longitude>([\d\-\.]+)<',txt)[0]
             elif txt.find('GLatLng') > 0:
-                citys,countrys = re.findall('<br />\s*([^<]+)<br />\s*([^<]+)<',txt)[0]
-                lats,lons = re.findall('LatLng\(([-\d\.]+),([-\d\.]+)',txt)[0]
+                citys,countrys = re.findall(r'<br />\s*([^<]+)<br />\s*([^<]+)<',txt)[0]
+                lats,lons = re.findall(r'LatLng\(([-\d\.]+),([-\d\.]+)',txt)[0]
             elif txt.find('<gml:coordinates>') > 0:
-                citys = re.findall('<Hostip>\s*<gml:name>(\w+)</gml:name>',txt)[0]
-                countrys = re.findall('<countryName>([\w ,\.]+)</countryName>',txt)[0]
-                lats,lons = re.findall('gml:coordinates>([-\d\.]+),([-\d\.]+)<',txt)[0]
+                citys = re.findall(r'<Hostip>\s*<gml:name>(\w+)</gml:name>',txt)[0]
+                countrys = re.findall(r'<countryName>([\w ,\.]+)</countryName>',txt)[0]
+                lats,lons = re.findall(r'gml:coordinates>([-\d\.]+),([-\d\.]+)<',txt)[0]
             else:
                 logging.error('error parsing IP result %s'%txt)
                 return {}
@@ -412,20 +408,20 @@ class Common(object):
         """Common name for a custom HTML display. Used to interface with MythTV plugin NetVision
         """
         embedFlashVarFilter = etree.XPath('//embed', namespaces=self.namespaces)
-        variables = self.HTMLvideocode.split(u'?')
+        variables = self.HTMLvideocode.split('?')
 
-        url = u'%s/nv_python_libs/configs/HTML/%s' % (baseProcessingDir, variables[0])
+        url = '%s/nv_python_libs/configs/HTML/%s' % (baseProcessingDir, variables[0])
         try:
             customHTML = etree.parse(url)
-        except Exception, e:
-            raise Exception(u"! Error: The Custom HTML file (%s) cause the exception error (%s)\n" % (url, errormsg))
+        except Exception as e:
+            raise Exception("! Error: The Custom HTML file (%s) cause the exception error (%s)\n" % (url, errormsg))
 
         # There may be one or more argumants to replace in the HTML code
         # Example:
         # "bbciplayer.html?AttribName1/FirstReplace=bc623bc?SecondReplace/AttribName2=wonderland/..."
         for arg in variables[1:]:
-            (attrib, key_value) = arg.split(u'/')
-            (key, value) = key_value.split(u'=')
+            (attrib, key_value) = arg.split('/')
+            (key, value) = key_value.split('=')
             embedFlashVarFilter(customHTML)[0].attrib[attrib] = embedFlashVarFilter(customHTML)[0].attrib[attrib].replace(key, value)
 
         sys.stdout.write(etree.tostring(customHTML, encoding='UTF-8', pretty_print=True))
@@ -438,7 +434,7 @@ class Common(object):
         ''' Create a MNV Channel element populated with channel details
         return the channel element
         '''
-        mnvChannel = etree.fromstring(u"""
+        mnvChannel = etree.fromstring("""
 <channel>
     <title>%(channel_title)s</title>
     <link>%(channel_link)s</link>
@@ -459,7 +455,7 @@ class Common(object):
         return True when it exists and info
         return False when it does not exist and info
         '''
-        urlOpened = urllib.urlopen(url)
+        urlOpened = urllib.request.urlopen(url)
         code = urlOpened.getcode()
         actualURL = urlOpened.geturl()
         info = urlOpened.info()
@@ -480,9 +476,9 @@ class Common(object):
         urlDictionary = {}
 
         if self.debug:
-            print "inputUrls:"
+            print("inputUrls:")
             sys.stdout.write(etree.tostring(inputUrls, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         for element in inputUrls.xpath('.//url'):
             key = element.find('name').text
@@ -499,22 +495,22 @@ class Common(object):
             if len(urlXSLT):
                 urlDictionary[key]['type'] = 'xslt'
             for index in range(len(urlXSLT)):
-                urlXSLT[index] = etree.XSLT(etree.parse(u'%s/nv_python_libs/configs/XSLT/%s.xsl' % (self.baseProcessingDir, urlXSLT[index].text)))
+                urlXSLT[index] = etree.XSLT(etree.parse('%s/nv_python_libs/configs/XSLT/%s.xsl' % (self.baseProcessingDir, urlXSLT[index].text)))
             urlDictionary[key]['xslt'] = urlXSLT
             urlDictionary[key]['pageFilter'] = pageFilter
             urlDictionary[key]['parser'] = self.parsers[element.find('parserType').text].copy()
             urlDictionary[key]['namespaces'] = self.namespaces
             urlDictionary[key]['result'] = []
-            urlDictionary[key]['morePages'] = u'false'
+            urlDictionary[key]['morePages'] = 'false'
             urlDictionary[key]['tmp'] = None
             urlDictionary[key]['tree'] = None
             if element.find('parameter') is not None:
                 urlDictionary[key]['parameter'] = element.find('parameter').text
 
         if self.debug:
-            print "urlDictionary:"
-            print urlDictionary
-            print
+            print("urlDictionary:")
+            print(urlDictionary)
+            print()
 
         thread_list = []
         getURL.urlDictionary = urlDictionary
@@ -528,7 +524,7 @@ class Common(object):
 #            current.join()
 
         # Multi-threaded
-        for key in urlDictionary.keys():
+        for key in list(urlDictionary.keys()):
             current = getURL(key, self.debug)
             thread_list.append(current)
             current.start()
@@ -536,7 +532,7 @@ class Common(object):
             thread.join()
 
         # Take the results and make the return element tree
-        root = etree.XML(u"<xml></xml>")
+        root = etree.XML("<xml></xml>")
         for key in sorted(getURL.urlDictionary.keys()):
             if not len(getURL.urlDictionary[key]['result']):
                 continue
@@ -559,9 +555,9 @@ class Common(object):
                     result.append(element)
 
         if self.debug:
-            print "root:"
+            print("root:")
             sys.stdout.write(etree.tostring(root, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         return root
     # end getShows()
@@ -608,14 +604,14 @@ class Common(object):
         ''' Dynamically add functions to the function dictionary from a specified directory
         return nothing
         '''
-        fullPath = u'%s/nv_python_libs/%s' % (self.baseProcessingDir, dirPath)
+        fullPath = '%s/nv_python_libs/%s' % (self.baseProcessingDir, dirPath)
         sys.path.append(fullPath)
         # Make a list of all functions that need to be included
         fileList = []
         for fPath in os.listdir(fullPath):
             filepath, filename = os.path.split( fPath )
             filename, ext = os.path.splitext( filename )
-            if filename == u'__init__':
+            if filename == '__init__':
                 continue
             if ext != '.py':
                 continue
@@ -634,8 +630,8 @@ for xpathClass in %(filename)s.__xpathClassList__:
         exec("self.functionDict['%%s'] = %%s" %% (func, u'xpathClass.%%s' %% func))
 for xsltExtension in %(filename)s.__xsltExtentionList__:
     exec("self.functionDict['%%s'] = %%s" %% (xsltExtension, u'%(filename)s.%%s' %% xsltExtension))''' % filename )
-            except Exception, errmsg:
-                sys.stderr.write(u'! Error: Dynamic import of (%s) XPath and XSLT extention functions\nmessage(%s)\n' % (fileName, errmsg))
+            except Exception as errmsg:
+                sys.stderr.write('! Error: Dynamic import of (%s) XPath and XSLT extention functions\nmessage(%s)\n' % (fileName, errmsg))
 
         return
     # end addDynamicFunctions()
@@ -649,17 +645,17 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         args = []
         for arg in inputArgs:
             args.append(arg)
-        if args[0] == u'':
+        if args[0] == '':
             return datetime.datetime.now().strftime(self.pubDateFormat)
         index = args[0].find('+')
         if index == -1:
             index = args[0].find('-')
         if index != -1 and index > 5:
             args[0] = args[0][:index].strip()
-        args[0] = args[0].replace(',', u'').replace('.', u'')
+        args[0] = args[0].replace(',', '').replace('.', '')
         try:
             if len(args) > 1:
-                args[1] = args[1].replace(',', u'').replace('.', u'')
+                args[1] = args[1].replace(',', '').replace('.', '')
                 if args[1].find('GMT') != -1:
                     args[1] = args[1][:args[1].find('GMT')].strip()
                     args[0] = args[0][:args[0].rfind(' ')].strip()
@@ -676,8 +672,8 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
                     return time.strftime(self.pubDateFormat, pubdate)
             else:
                 return datetime.datetime.now().strftime(self.pubDateFormat)
-        except Exception, err:
-            sys.stderr.write(u'! Error: pubDate variables(%s) error(%s)\n' % (args, err))
+        except Exception as err:
+            sys.stderr.write('! Error: pubDate variables(%s) error(%s)\n' % (args, err))
         return args[0]
     # end pubDate()
 
@@ -697,8 +693,8 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
                 s_e[1] = season_episode[1]
             else:
                 s_e[1] = season_episode[0]
-            return u'%s_%s' % (s_e[0], s_e[1])
-        return u'%s_%s' % (s_e[0], s_e[1])
+            return '%s_%s' % (s_e[0], s_e[1])
+        return '%s_%s' % (s_e[0], s_e[1])
     # end getSeasonEpisode()
 
     def convertDuration(self, context, duration):
@@ -712,7 +708,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
                 seconds+=int(min_sec[count])*(60*(len(min_sec)-count-1))
             else:
                 seconds+=int(min_sec[count])
-        return u'%s' % seconds
+        return '%s' % seconds
     # end convertDuration()
 
     def getHtmlData(self, context, *args):
@@ -736,7 +732,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
                 return filteredData[0]
             else:
                 return filteredData[0].text
-        return u''
+        return ''
     # end getHtmlData()
 
     def linkWebPage(self, context, sourceLink):
@@ -746,10 +742,10 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         '''
         # Currently there are no link specific Web pages
         if not self.linksWebPage:
-            self.linksWebPage = etree.parse(u'%s/nv_python_libs/configs/XML/customeHtmlPageList.xml' % (self.baseProcessingDir, ))
+            self.linksWebPage = etree.parse('%s/nv_python_libs/configs/XML/customeHtmlPageList.xml' % (self.baseProcessingDir, ))
         if self.linksWebPage.find(sourceLink) is not None:
-            return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, self.linksWebPage.find(sourceLink).text)
-        return u'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, 'nodownloads.html')
+            return 'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, self.linksWebPage.find(sourceLink).text)
+        return 'file://%s/nv_python_libs/configs/HTML/%s' % (self.baseProcessingDir, 'nodownloads.html')
     # end linkWebPage()
 
     def baseDir(self, context, dummy):
@@ -764,7 +760,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         return a lower case string
         '''
         if not len(data):
-            return u''
+            return ''
         return data[0].lower()
     # end stringLower()
 
@@ -773,7 +769,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         return a upper case string
         '''
         if not len(data):
-            return u''
+            return ''
         return data[0].upper()
     # end stringUpper()
 
@@ -798,11 +794,11 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         return the resulting string from a replace operation
         '''
         if not len(args):
-            return u""
+            return ""
         if len(args) == 1:
-            return urllib.quote_plus(args[0].encode("utf-8"))
+            return urllib.parse.quote_plus(args[0].encode("utf-8"))
         else :
-            return urllib.quote_plus(args[0].encode("utf-8"), args[1])
+            return urllib.parse.quote_plus(args[0].encode("utf-8"), args[1])
     # end stringEscape()
 
     def removePunc(self, context, data):
@@ -810,7 +806,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         return the resulting string
         '''
         if not len(data):
-            return u""
+            return ""
         return re.sub('[%s]' % re.escape(string.punctuation), '', data)
     # end removePunc()
 
@@ -819,8 +815,8 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         return the string without HTML tags or LFs
         '''
         if not len(html):
-            return u""
-        return self.massageText(html).strip().replace(u'\n', u' ').replace(u'', u"&apos;").replace(u'', u"&apos;")
+            return ""
+        return self.massageText(html).strip().replace('\n', ' ').replace('', "&apos;").replace('', "&apos;")
     # end htmlToString()
 
     def getLanguage(self, context, args):
@@ -871,7 +867,7 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
             self.itemThumbnail = etree.XPath('.//media:thumbnail', namespaces=self.namespaces)
             self.itemContent = etree.XPath('.//media:content', namespaces=self.namespaces)
         # Encode the search text to UTF-8
-        for key in arg[0].keys():
+        for key in list(arg[0].keys()):
             try:
                 arg[0][key] = arg[0][key].encode('UTF-8')
             except:
@@ -904,23 +900,23 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
         if result['mediaURL']:
             self.itemContent(itemElement)[0].attrib['url'] = result['mediaURL']
         if result['filesize'] > 0:
-            self.itemContent(itemElement)[0].attrib['length'] = unicode(result['filesize'])
+            self.itemContent(itemElement)[0].attrib['length'] = str(result['filesize'])
         if result['time'] > 0:
-            self.itemContent(itemElement)[0].attrib['duration'] = unicode(result['time'])
+            self.itemContent(itemElement)[0].attrib['duration'] = str(result['time'])
         if result['width'] > 0:
-            self.itemContent(itemElement)[0].attrib['width'] = unicode(result['width'])
+            self.itemContent(itemElement)[0].attrib['width'] = str(result['width'])
         if result['height'] > 0:
-            self.itemContent(itemElement)[0].attrib['height'] = unicode(result['height'])
+            self.itemContent(itemElement)[0].attrib['height'] = str(result['height'])
         if result['language']:
             self.itemContent(itemElement)[0].attrib['lang'] = result['language']
         if result['season'] > 0:
-            etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}season").text = unicode(result['season'])
+            etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}season").text = str(result['season'])
         if result['episode'] > 0:
-            etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = unicode(result['episode'])
+            etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = str(result['episode'])
         if result['customhtml'] == 1:
             etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
         if result['countries']:
-            countries = result['countries'].split(u' ')
+            countries = result['countries'].split(' ')
             for country in countries:
                 etree.SubElement(itemElement, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = country
         return itemElement
@@ -937,19 +933,19 @@ for xsltExtension in %(filename)s.__xsltExtentionList__:
                 '''
                 MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
                 self.mythdb = MythDB()
-            except MythError, e:
-                sys.stderr.write(u'\n! Error - %s\n' % e.args[0])
+            except MythError as e:
+                sys.stderr.write('\n! Error - %s\n' % e.args[0])
                 filename = os.path.expanduser("~")+'/.mythtv/config.xml'
                 if not os.path.isfile(filename):
-                    sys.stderr.write(u'\n! Error - A correctly configured (%s) file must exist\n' % filename)
+                    sys.stderr.write('\n! Error - A correctly configured (%s) file must exist\n' % filename)
                 else:
-                    sys.stderr.write(u'\n! Error - Check that (%s) is correctly configured\n' % filename)
+                    sys.stderr.write('\n! Error - Check that (%s) is correctly configured\n' % filename)
                 sys.exit(1)
-            except Exception, e:
-                sys.stderr.write(u"\n! Error - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
+            except Exception as e:
+                sys.stderr.write("\n! Error - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
                 sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"\n! Error - MythTV python bindings could not be imported. error(%s)\n" % e)
+        except Exception as e:
+            sys.stderr.write("\n! Error - MythTV python bindings could not be imported. error(%s)\n" % e)
             sys.exit(1)
     # end initializeMythDB()
 
@@ -970,30 +966,30 @@ class getURL(Thread):
 
     def run(self):
         if self.debug:
-            print u"getURL href(%s)" % (self.urlDictionary[self.urlKey]['href'], )
-            print
+            print("getURL href(%s)" % (self.urlDictionary[self.urlKey]['href'], ))
+            print()
 
         # Input the data from a url
         try:
             self.urlDictionary[self.urlKey]['tree'] = etree.parse(self.urlDictionary[self.urlKey]['href'], self.urlDictionary[self.urlKey]['parser'])
-        except Exception, errormsg:
-            sys.stderr.write(u"! Error: The URL (%s) cause the exception error (%s)\n" % (self.urlDictionary[self.urlKey]['href'], errormsg))
+        except Exception as errormsg:
+            sys.stderr.write("! Error: The URL (%s) cause the exception error (%s)\n" % (self.urlDictionary[self.urlKey]['href'], errormsg))
             return
 
         if self.debug:
-            print "Raw unfiltered URL input:"
+            print("Raw unfiltered URL input:")
             sys.stdout.write(etree.tostring(self.urlDictionary[self.urlKey]['tree'], encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         if len(self.urlDictionary[self.urlKey]['filter']):
             for index in range(len(self.urlDictionary[self.urlKey]['filter'])):
                 # Filter out the desired data
                 try:
                    self.urlDictionary[self.urlKey]['tmp'] = self.urlDictionary[self.urlKey]['tree'].xpath(self.urlDictionary[self.urlKey]['filter'][index], namespaces=self.urlDictionary[self.urlKey]['namespaces'])
-                except AssertionError, e:
-                    sys.stderr.write(u"No filter results for Name(%s)\n" % self.urlKey)
-                    sys.stderr.write(u"No filter results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
-                    sys.stderr.write(u"! Error:(%s)\n" % e)
+                except AssertionError as e:
+                    sys.stderr.write("No filter results for Name(%s)\n" % self.urlKey)
+                    sys.stderr.write("No filter results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
+                    sys.stderr.write("! Error:(%s)\n" % e)
                     if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
                         return
                     else:
@@ -1003,21 +999,21 @@ class getURL(Thread):
             for index in range(len(self.urlDictionary[self.urlKey]['xslt'])):
                 # Process the results through a XSLT stylesheet out the desired data
                 try:
-                    if self.urlDictionary[self.urlKey].has_key('parameter'):
+                    if 'parameter' in self.urlDictionary[self.urlKey]:
                         self.urlDictionary[self.urlKey]['tmp'] = self.urlDictionary[self.urlKey]['xslt'][index](self.urlDictionary[self.urlKey]['tree'], paraMeter= etree.XSLT.strparam(
 self.urlDictionary[self.urlKey]['parameter']) )
                     else:
                         self.urlDictionary[self.urlKey]['tmp'] = self.urlDictionary[self.urlKey]['xslt'][index](self.urlDictionary[self.urlKey]['tree'])
-                except Exception, e:
-                    sys.stderr.write(u"! XSLT Error:(%s) Key(%s)\n" % (e, self.urlKey))
+                except Exception as e:
+                    sys.stderr.write("! XSLT Error:(%s) Key(%s)\n" % (e, self.urlKey))
                     if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
                         return
                     else:
                         continue
                 # Was any data found?
                 if self.urlDictionary[self.urlKey]['tmp'].getroot() is None:
-                    sys.stderr.write(u"No Xslt results for Name(%s)\n" % self.urlKey)
-                    sys.stderr.write(u"No Xslt results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
+                    sys.stderr.write("No Xslt results for Name(%s)\n" % self.urlKey)
+                    sys.stderr.write("No Xslt results for url(%s)\n" % self.urlDictionary[self.urlKey]['href'])
                     if len(self.urlDictionary[self.urlKey]['filter']) == index-1:
                         return
                     else:

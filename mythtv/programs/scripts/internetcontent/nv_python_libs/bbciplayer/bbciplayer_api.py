@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: bbciplayer_api - Simple-to-use Python interface to the BBC iPlayer RSS feeds
 #                       (http://www.bbc.co.uk)
@@ -29,14 +29,15 @@ __version__="v0.1.3"
 #       Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
 # 0.1.3 Fixed search due to BBC Web site changes
 
-import os, struct, sys, re, time, datetime, shutil, urllib, re
+import os, struct, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, re
 import logging
 from socket import gethostname, gethostbyname
 from threading import Thread
 from copy import deepcopy
 from operator import itemgetter, attrgetter
 from MythTV import MythXML
-from bbciplayer_exceptions import (BBCUrlError, BBCHttpError, BBCRssError, BBCVideoNotFound, BBCConfigFileError, BBCUrlDownloadError)
+from .bbciplayer_exceptions import (BBCUrlError, BBCHttpError, BBCRssError, BBCVideoNotFound, BBCConfigFileError, BBCUrlDownloadError)
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -49,29 +50,24 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -83,7 +79,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -152,7 +148,7 @@ class Videos(object):
         self.common = common
         self.common.debug = debug   # Set the common function debug level
 
-        self.log_name = u'BBCiPlayer_Grabber'
+        self.log_name = 'BBCiPlayer_Grabber'
         self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
         self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
@@ -164,10 +160,10 @@ class Videos(object):
 
         self.config['search_all_languages'] = search_all_languages
 
-        self.error_messages = {'BBCUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'BBCHttpError': u"! Error: An HTTP communications error with the BBC was raised (%s)\n", 'BBCRssError': u"! Error: Invalid RSS meta data\nwas received from the BBC error (%s). Skipping item.\n", 'BBCVideoNotFound': u"! Error: Video search with the BBC did not return any results (%s)\n", 'BBCConfigFileError': u"! Error: bbc_config.xml file missing\nit should be located in and named as (%s).\n", 'BBCUrlDownloadError': u"! Error: Downloading a RSS feed or Web page (%s).\n", }
+        self.error_messages = {'BBCUrlError': "! Error: The URL (%s) cause the exception error (%s)\n", 'BBCHttpError': "! Error: An HTTP communications error with the BBC was raised (%s)\n", 'BBCRssError': "! Error: Invalid RSS meta data\nwas received from the BBC error (%s). Skipping item.\n", 'BBCVideoNotFound': "! Error: Video search with the BBC did not return any results (%s)\n", 'BBCConfigFileError': "! Error: bbc_config.xml file missing\nit should be located in and named as (%s).\n", 'BBCUrlDownloadError': "! Error: Downloading a RSS feed or Web page (%s).\n", }
 
         # Channel details and search results
-        self.channel = {'channel_title': u'BBC iPlayer', 'channel_link': u'http://www.bbc.co.uk', 'channel_description': u"BBC iPlayer is our service that lets you catch up with radio and television programmes from the past week.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'BBC iPlayer', 'channel_link': 'http://www.bbc.co.uk', 'channel_description': "BBC iPlayer is our service that lets you catch up with radio and television programmes from the past week.", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
         # XPath parsers used to detect a video type of item
         self.countryCodeParsers = [
@@ -179,22 +175,22 @@ class Videos(object):
         # Season and Episode detection regex patterns
         self.s_e_Patterns = [
             # "Series 7 - Episode 4" or "Series 7 - Episode 4" or "Series 7: On Holiday: Episode 10"
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile(r'''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Series 5 - 1
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+)\\ \\-\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile(r'''^.+?Series\\ (?P<seasno>[0-9]+)\\ \\-\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Series 1 - Warriors of Kudlak - Part 2
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Part\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile(r'''^.+?Series\\ (?P<seasno>[0-9]+).*.+?Part\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Series 3: Programme 3
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+)\\:\\ Programme\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile(r'''^.+?Series\\ (?P<seasno>[0-9]+)\\:\\ Programme\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Series 3:
-            re.compile(u'''^.+?Series\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            re.compile(r'''^.+?Series\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
             # Episode 1
-            re.compile(u'''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            re.compile(r'''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
             ]
 
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/bbciplayer.jpg'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/bbciplayer.jpg'
 
-        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
+        self.config['image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
     # end __init__()
 
 ###########################################################################################################
@@ -208,16 +204,16 @@ class Videos(object):
         return nothing
         '''
         # Read the grabber bbciplayer_config.xml configuration file
-        url = u'file://%s/nv_python_libs/configs/XML/bbc_config.xml' % (baseProcessingDir, )
+        url = 'file://%s/nv_python_libs/configs/XML/bbc_config.xml' % (baseProcessingDir, )
         if not os.path.isfile(url[7:]):
             raise BBCConfigFileError(self.error_messages['BBCConfigFileError'] % (url[7:], ))
 
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
         try:
             self.bbciplayer_config = etree.parse(url)
-        except Exception, e:
+        except Exception as e:
             raise BBCUrlError(self.error_messages['BBCUrlError'] % (url, errormsg))
         return
     # end getBBCConfig()
@@ -234,25 +230,25 @@ class Videos(object):
         # Check if the bbciplayer.xml file exists
         userPreferenceFile = self.bbciplayer_config.find('userPreferenceFile').text
         if userPreferenceFile[0] == '~':
-             self.bbciplayer_config.find('userPreferenceFile').text = u"%s%s" % (os.path.expanduser(u"~"), userPreferenceFile[1:])
+             self.bbciplayer_config.find('userPreferenceFile').text = "%s%s" % (os.path.expanduser("~"), userPreferenceFile[1:])
 
         # If the user config file does not exists then copy one from the default
         if not os.path.isfile(self.bbciplayer_config.find('userPreferenceFile').text):
             # Make the necessary directories if they do not already exist
-            prefDir = self.bbciplayer_config.find('userPreferenceFile').text.replace(u'/bbciplayer.xml', u'')
+            prefDir = self.bbciplayer_config.find('userPreferenceFile').text.replace('/bbciplayer.xml', '')
             if not os.path.isdir(prefDir):
                 os.makedirs(prefDir)
-            defaultConfig = u'%s/nv_python_libs/configs/XML/defaultUserPrefs/bbciplayer.xml' % (baseProcessingDir, )
+            defaultConfig = '%s/nv_python_libs/configs/XML/defaultUserPrefs/bbciplayer.xml' % (baseProcessingDir, )
             shutil.copy2(defaultConfig, self.bbciplayer_config.find('userPreferenceFile').text)
 
         # Read the grabber bbciplayer_config.xml configuration file
-        url = u'file://%s' % (self.bbciplayer_config.find('userPreferenceFile').text, )
+        url = 'file://%s' % (self.bbciplayer_config.find('userPreferenceFile').text, )
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
         try:
             self.userPrefs = etree.parse(url)
-        except Exception, e:
+        except Exception as e:
             raise BBCUrlError(self.error_messages['BBCUrlError'] % (url, errormsg))
         return
     # end getUserPreferences()
@@ -266,7 +262,7 @@ class Videos(object):
         countryCode = None
         for xpathP in self.countryCodeParsers:
             if len(xpathP(item)):
-                countryCode = u'uk'
+                countryCode = 'uk'
                 break
         return countryCode
     # end setCountry()
@@ -314,22 +310,22 @@ class Videos(object):
         orgUrl = self.bbciplayer_config.find('searchURLS').xpath(".//href")[0].text
 
         try:
-            searchVar = u'/?q=%s&page=%s' % (urllib.quote(title.encode("utf-8")), pagenumber)
+            searchVar = '/?q=%s&page=%s' % (urllib.parse.quote(title.encode("utf-8")), pagenumber)
         except UnicodeDecodeError:
-            searchVar = u'/?q=%s&page=%s' % (urllib.quote(title), pagenumber)
+            searchVar = '/?q=%s&page=%s' % (urllib.parse.quote(title), pagenumber)
 
         url = self.bbciplayer_config.find('searchURLS').xpath(".//href")[0].text+searchVar
 
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
 
         self.bbciplayer_config.find('searchURLS').xpath(".//href")[0].text = url
 
         # Perform a search
         try:
             resultTree = self.common.getUrlData(self.bbciplayer_config.find('searchURLS'), pageFilter=self.bbciplayer_config.find('searchURLS').xpath(".//pageFilter")[0].text)
-        except Exception, errormsg:
+        except Exception as errormsg:
             # Restore the origninal URL
             self.bbciplayer_config.find('searchURLS').xpath(".//href")[0].text = orgUrl
             raise BBCUrlDownloadError(self.error_messages['BBCUrlDownloadError'] % (errormsg))
@@ -338,11 +334,11 @@ class Videos(object):
         self.bbciplayer_config.find('searchURLS').xpath(".//href")[0].text = orgUrl
 
         if resultTree is None:
-            raise BBCVideoNotFound(u"No BBC Video matches found for search value (%s)" % title)
+            raise BBCVideoNotFound("No BBC Video matches found for search value (%s)" % title)
 
         searchResults = resultTree.xpath('//result//li')
         if not len(searchResults):
-            raise BBCVideoNotFound(u"No BBC Video matches found for search value (%s)" % title)
+            raise BBCVideoNotFound("No BBC Video matches found for search value (%s)" % title)
 
         # BBC iPlayer search results fo not have a pubDate so use the current data time
         # e.g. "Sun, 06 Jan 2008 21:44:36 GMT"
@@ -352,14 +348,14 @@ class Videos(object):
         if self.userPrefs.find('displayURL') is not None:
             urlType = self.userPrefs.find('displayURL').text
         else:
-            urlType = u'fullscreen'
+            urlType = 'fullscreen'
 
         # Translate the search results into MNV RSS item format
         audioFilter = etree.XPath('contains(./@class,"audio") or contains(./../../@class,"audio")')
-        linkFilter = etree.XPath(u".//div[@class='episode-info ']//a")
-        titleFilter = etree.XPath(u".//div[@class='episode-info ']//a")
-        descFilter = etree.XPath(u".//div[@class='episode-info ']//p[@class='episode-synopsis']")
-        thumbnailFilter = etree.XPath(u".//span[@class='episode-image cta-play']//img")
+        linkFilter = etree.XPath(".//div[@class='episode-info ']//a")
+        titleFilter = etree.XPath(".//div[@class='episode-info ']//a")
+        descFilter = etree.XPath(".//div[@class='episode-info ']//p[@class='episode-synopsis']")
+        thumbnailFilter = etree.XPath(".//span[@class='episode-image cta-play']//img")
         itemDict = {}
         for result in searchResults:
             tmpLink = linkFilter(result)
@@ -371,26 +367,26 @@ class Videos(object):
             # Extract and massage data
             link = tmpLink[0].attrib['href']
             if urlType == 'bigscreen':
-                link = u'http://www.bbc.co.uk/iplayer/bigscreen%s' % link.replace(u'/iplayer',u'')
+                link = 'http://www.bbc.co.uk/iplayer/bigscreen%s' % link.replace('/iplayer','')
             elif urlType == 'bbcweb':
-                link = u'http://www.bbc.co.uk'+ link
+                link = 'http://www.bbc.co.uk'+ link
             else:
                 if not audioTF:
-                    link = link.replace(u'/iplayer/episode/', u'')
-                    index = link.find(u'/')
+                    link = link.replace('/iplayer/episode/', '')
+                    index = link.find('/')
                     link = link[:index]
                     link = self.processVideoUrl(link);
                     etree.SubElement(bbciplayerItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
                 else: # Audio media will not play in the embedded HTML page
-                    link = u'http://www.bbc.co.uk'+ link
+                    link = 'http://www.bbc.co.uk'+ link
                     link = self.common.ampReplace(link)
 
             title = self.common.massageText(titleFilter(result)[0].attrib['title'].strip())
-            description = self.common.massageText(etree.tostring(descFilter(result)[0], method="text", encoding=unicode).strip())
+            description = self.common.massageText(etree.tostring(descFilter(result)[0], method="text", encoding=str).strip())
 
             # Insert data into a new item element
             bbciplayerItem.find('title').text = title
-            bbciplayerItem.find('author').text = u'BBC'
+            bbciplayerItem.find('author').text = 'BBC'
             bbciplayerItem.find('pubDate').text = pubDate
             bbciplayerItem.find('description').text = description
             bbciplayerItem.find('link').text = link
@@ -400,7 +396,7 @@ class Videos(object):
             if audioTF:
                 countCode = None
             else:
-                countCode = u'uk'
+                countCode = 'uk'
             if countCode:
                 etree.SubElement(bbciplayerItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = countCode
             s_e = self.getSeasonEpisode(title)
@@ -410,8 +406,8 @@ class Videos(object):
                 etree.SubElement(bbciplayerItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = s_e[1]
             itemDict[title.lower()] = bbciplayerItem
 
-        if not len(itemDict.keys()):
-            raise BBCVideoNotFound(u"No BBC Video matches found for search value (%s)" % title)
+        if not len(list(itemDict.keys())):
+            raise BBCVideoNotFound("No BBC Video matches found for search value (%s)" % title)
 
         # Set the number of search results returned
         self.channel['channel_numresults'] = len(itemDict)
@@ -426,14 +422,14 @@ class Videos(object):
         # Get the user preferences
         try:
             self.getUserPreferences()
-        except Exception, e:
-            sys.stderr.write(u'%s' % e)
+        except Exception as e:
+            sys.stderr.write('%s' % e)
             sys.exit(1)
 
         if self.config['debug_enabled']:
-            print "self.userPrefs:"
+            print("self.userPrefs:")
             sys.stdout.write(etree.tostring(self.userPrefs, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
 
         # Easier for debugging
@@ -443,27 +439,27 @@ class Videos(object):
 
         try:
             data = self.searchTitle(title, pagenumber, self.page_limit)
-        except BBCVideoNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+        except BBCVideoNotFound as msg:
+            sys.stderr.write("%s\n" % msg)
             sys.exit(0)
-        except BBCUrlError, msg:
-            sys.stderr.write(u'%s\n' % msg)
+        except BBCUrlError as msg:
+            sys.stderr.write('%s\n' % msg)
             sys.exit(1)
-        except BBCHttpError, msg:
+        except BBCHttpError as msg:
             sys.stderr.write(self.error_messages['BBCHttpError'] % msg)
             sys.exit(1)
-        except BBCRssError, msg:
+        except BBCRssError as msg:
             sys.stderr.write(self.error_messages['BBCRssError'] % msg)
             sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Set the paging values
-        itemCount = len(data[0].keys())
+        itemCount = len(list(data[0].keys()))
         if data[1] == 'true':
             self.channel['channel_returned'] = itemCount
             self.channel['channel_startindex'] = itemCount
@@ -484,7 +480,7 @@ class Videos(object):
                 lastKey = key
 
         # Output the MNV search results
-        sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+        sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
         sys.exit(0)
     # end searchForVideos()
@@ -496,20 +492,20 @@ class Videos(object):
         # Get the user preferences
         try:
             self.getUserPreferences()
-        except Exception, e:
-            sys.stderr.write(u'%s' % e)
+        except Exception as e:
+            sys.stderr.write('%s' % e)
             sys.exit(1)
 
         if self.config['debug_enabled']:
-            print "self.userPrefs:"
+            print("self.userPrefs:")
             sys.stdout.write(etree.tostring(self.userPrefs, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Massage channel icon
         self.channel_icon = self.common.ampReplace(self.channel_icon)
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Add the Channel element tree
         channelTree = self.common.mnvChannelElement(self.channel)
@@ -517,30 +513,30 @@ class Videos(object):
 
         # Process any user specified searches
         searchResultTree = []
-        searchFilter = etree.XPath(u"//item")
-        userSearchStrings = u'userSearchStrings'
+        searchFilter = etree.XPath("//item")
+        userSearchStrings = 'userSearchStrings'
         if self.userPrefs.find(userSearchStrings) is not None:
             userSearch = self.userPrefs.find(userSearchStrings).xpath('./userSearch')
             if len(userSearch):
                 for searchDetails in userSearch:
                     try:
                         data = self.searchTitle(searchDetails.find('searchTerm').text, 1, self.page_limit)
-                    except BBCVideoNotFound, msg:
-                        sys.stderr.write(u"%s\n" % msg)
+                    except BBCVideoNotFound as msg:
+                        sys.stderr.write("%s\n" % msg)
                         continue
-                    except BBCUrlError, msg:
-                        sys.stderr.write(u'%s\n' % msg)
+                    except BBCUrlError as msg:
+                        sys.stderr.write('%s\n' % msg)
                         continue
-                    except BBCHttpError, msg:
+                    except BBCHttpError as msg:
                         sys.stderr.write(self.error_messages['BBCHttpError'] % msg)
                         continue
-                    except BBCRssError, msg:
+                    except BBCRssError as msg:
                         sys.stderr.write(self.error_messages['BBCRssError'] % msg)
                         continue
-                    except Exception, e:
-                        sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+                    except Exception as e:
+                        sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
                         continue
-                    dirElement = etree.XML(u'<directory></directory>')
+                    dirElement = etree.XML('<directory></directory>')
                     dirElement.attrib['name'] = self.common.massageText(searchDetails.find('dirName').text)
                     dirElement.attrib['thumbnail'] = self.channel_icon
                     lastKey = None
@@ -552,8 +548,8 @@ class Videos(object):
                     continue
 
         # Create a structure of feeds that can be concurrently downloaded
-        rssData = etree.XML(u'<xml></xml>')
-        for feedType in [u'treeviewURLS', u'userFeeds']:
+        rssData = etree.XML('<xml></xml>')
+        for feedType in ['treeviewURLS', 'userFeeds']:
             if self.userPrefs.find(feedType) is None:
                 continue
             if not len(self.userPrefs.find(feedType).xpath('./url')):
@@ -564,38 +560,38 @@ class Videos(object):
                     continue
                 urlName = rssFeed.attrib.get('name')
                 if urlName:
-                     uniqueName = u'%s;%s' % (urlName, rssFeed.text)
+                     uniqueName = '%s;%s' % (urlName, rssFeed.text)
                 else:
-                    uniqueName = u'RSS;%s' % (rssFeed.text)
-                url = etree.XML(u'<url></url>')
+                    uniqueName = 'RSS;%s' % (rssFeed.text)
+                url = etree.XML('<url></url>')
                 etree.SubElement(url, "name").text = uniqueName
                 etree.SubElement(url, "href").text = rssFeed.text
-                etree.SubElement(url, "filter").text = u"atm:title"
-                etree.SubElement(url, "filter").text = u"//atm:entry"
-                etree.SubElement(url, "parserType").text = u'xml'
+                etree.SubElement(url, "filter").text = "atm:title"
+                etree.SubElement(url, "filter").text = "//atm:entry"
+                etree.SubElement(url, "parserType").text = 'xml'
                 rssData.append(url)
 
         if self.config['debug_enabled']:
-            print "rssData:"
+            print("rssData:")
             sys.stdout.write(etree.tostring(rssData, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Get the RSS Feed data
         if rssData.find('url') is not None:
             try:
                 resultTree = self.common.getUrlData(rssData)
-            except Exception, errormsg:
+            except Exception as errormsg:
                 raise BBCUrlDownloadError(self.error_messages['BBCUrlDownloadError'] % (errormsg))
             if self.config['debug_enabled']:
-                print "resultTree:"
+                print("resultTree:")
                 sys.stdout.write(etree.tostring(resultTree, encoding='UTF-8', pretty_print=True))
-                print
+                print()
 
              # Set the display type for the link (Fullscreen, Web page, Game Console)
             if self.userPrefs.find('displayURL') is not None:
                 urlType = self.userPrefs.find('displayURL').text
             else:
-                urlType = u'fullscreen'
+                urlType = 'fullscreen'
 
             # Process each directory of the user preferences that have an enabled rss feed
             feedFilter = etree.XPath('//url[text()=$url]')
@@ -612,12 +608,12 @@ class Videos(object):
             rssName = etree.XPath('atm:title', namespaces=self.common.namespaces)
             categoryDir = None
             categoryElement = None
-            itemAuthor = u'BBC'
+            itemAuthor = 'BBC'
             for result in resultTree.findall('results'):
-                names = result.find('name').text.split(u';')
+                names = result.find('name').text.split(';')
                 names[0] = self.common.massageText(names[0])
                 if names[0] == 'RSS':
-                    names[0] = self.common.massageText(rssName(result.find('result'))[0].text.replace(u'BBC iPlayer - ', u''))
+                    names[0] = self.common.massageText(rssName(result.find('result'))[0].text.replace('BBC iPlayer - ', ''))
                 count = 0
                 urlMax = None
                 url = feedFilter(self.userPrefs, url=names[1])
@@ -635,19 +631,19 @@ class Videos(object):
                     if urlMax == 0:
                         urlMax = None
                 channelThumbnail = self.channel_icon
-                channelLanguage = u'en'
+                channelLanguage = 'en'
                 # Create a new directory and/or subdirectory if required
                 if names[0] != categoryDir:
                     if categoryDir is not None:
                         channelTree.append(categoryElement)
-                    categoryElement = etree.XML(u'<directory></directory>')
+                    categoryElement = etree.XML('<directory></directory>')
                     categoryElement.attrib['name'] = names[0]
                     categoryElement.attrib['thumbnail'] = self.channel_icon
                     categoryDir = names[0]
 
                 if self.config['debug_enabled']:
-                    print "Results: #Items(%s) for (%s)" % (len(itemFilter(result)), names)
-                    print
+                    print("Results: #Items(%s) for (%s)" % (len(itemFilter(result)), names))
+                    print()
 
                 # Create a list of item elements in pubDate order to that the items are processed in
                 # date and time order
@@ -661,13 +657,13 @@ class Videos(object):
                     if len(tmpLink):   # Make sure that this result actually has a video
                         link = tmpLink[0].attrib['href']
                         if urlType == 'bigscreen':
-                            link = link.replace(u'/iplayer/', u'/iplayer/bigscreen/')
+                            link = link.replace('/iplayer/', '/iplayer/bigscreen/')
                         elif urlType == 'bbcweb':
                             pass    # Link does not need adjustments
                         else:
                             if len(mediaFilter(itemData)):
-                                link = link.replace(u'http://www.bbc.co.uk/iplayer/episode/', u'')
-                                index = link.find(u'/')
+                                link = link.replace('http://www.bbc.co.uk/iplayer/episode/', '')
+                                index = link.find('/')
                                 link = link[:index]
                                 link = self.processVideoUrl(link);
                                 etree.SubElement(bbciplayerItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
@@ -688,8 +684,8 @@ class Videos(object):
                     bbciplayerItem.find('title').text = self.common.massageText(titleFilter(itemData)[0].text.strip())
                     bbciplayerItem.find('author').text = itemAuthor
                     bbciplayerItem.find('pubDate').text = pubdate
-                    description = etree.HTML(etree.tostring(descFilter1(itemData)[0], method="text", encoding=unicode).strip())
-                    description = etree.tostring(descFilter2(description)[1], method="text", encoding=unicode).strip()
+                    description = etree.HTML(etree.tostring(descFilter1(itemData)[0], method="text", encoding=str).strip())
+                    description = etree.tostring(descFilter2(description)[1], method="text", encoding=str).strip()
                     bbciplayerItem.find('description').text = self.common.massageText(description)
                     bbciplayerItem.find('link').text = link
                     itemDwnLink(bbciplayerItem)[0].attrib['url'] = link
@@ -721,7 +717,7 @@ class Videos(object):
         # Check that there was at least some items
         if len(rssTree.xpath('//item')):
             # Output the MNV search results
-            sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+            sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
 
         sys.exit(0)

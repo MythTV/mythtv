@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: linuxAction_api - XPath and XSLT functions for the www.jupiterbroadcasting.com RSS/HTML items
 # Python Script
@@ -32,9 +32,9 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
-
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -47,28 +47,26 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -80,7 +78,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -94,9 +92,9 @@ class xpathFunctions(object):
         self.functList = ['linuxActionLinkGeneration', 'linuxActionTitleSeEp', 'linuxActioncheckIfDBItem', ]
         self.s_e_Regex = [
             # s12e05
-            re.compile(u'''^.+?[Ss](?P<seasno>[0-9]+)\\e(?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?[Ss](?P<seasno>[0-9]+)\\e(?P<epno>[0-9]+).*$''', re.UNICODE),
             # Season 11 Episode 3
-            re.compile(u'''^.+?Season\\ (?P<seasno>[0-9]+)\\ Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Season\\ (?P<seasno>[0-9]+)\\ Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             ]
         self.namespaces = {
             'atom': "http://www.w3.org/2005/Atom",
@@ -111,7 +109,7 @@ class xpathFunctions(object):
         self.mediaIdFilters = [
             [etree.XPath('//object/@id', namespaces=self.namespaces ), None],
             ]
-        self.FullScreen = u'http://linuxAction.com/show/popupPlayer?video_id=%s&quality=high&offset=0'
+        self.FullScreen = 'http://linuxAction.com/show/popupPlayer?video_id=%s&quality=high&offset=0'
         self.FullScreenParser = common.parsers['html'].copy()
     # end __init__()
 
@@ -128,14 +126,14 @@ class xpathFunctions(object):
         '''
         webURL = arg[0]
         try:
-            tmpHandle = urllib.urlopen(webURL)
-            tmpHTML = unicode(tmpHandle.read(), 'utf-8')
+            tmpHandle = urllib.request.urlopen(webURL)
+            tmpHTML = str(tmpHandle.read(), 'utf-8')
             tmpHandle.close()
-        except Exception, errmsg:
-            sys.stderr.write(u"Error reading url(%s) error(%s)\n" % (webURL, errmsg))
+        except Exception as errmsg:
+            sys.stderr.write("Error reading url(%s) error(%s)\n" % (webURL, errmsg))
             return webURL
 
-        findText = u"<embed src="
+        findText = "<embed src="
         lenText = len(findText)
         posText = tmpHTML.find(findText)
         if posText == -1:
@@ -144,9 +142,9 @@ class xpathFunctions(object):
 
         tmpLink = tmpHTML[:tmpHTML.find('"')]
         if tmpLink.find('www.youtube.com') != -1:
-            return u'%s&autoplay=1' % tmpLink
+            return '%s&autoplay=1' % tmpLink
         else:
-            return u'%s?autostart=1' % tmpLink
+            return '%s?autostart=1' % tmpLink
     # end linuxActionLinkGeneration()
 
     def linuxActionTitleSeEp(self, context, *arg):
@@ -167,18 +165,18 @@ class xpathFunctions(object):
         title = common.htmlToString('dummy', title)
 
         elementArray = []
-        seasonNumber = u''
-        episodeNumber = u''
+        seasonNumber = ''
+        episodeNumber = ''
         for index in range(len(self.s_e_Regex)):
             match = self.s_e_Regex[index].match(arg[0])
             if match:
                 (seasonNumber, episodeNumber) = match.groups()
-                seasonNumber = u'%s' % int(seasonNumber)
-                episodeNumber = u'%s' % int(episodeNumber)
-                elementArray.append(etree.XML(u"<title>%s</title>" % (u'S%02dE%02d: %s' % (int(seasonNumber), int(episodeNumber), title))))
+                seasonNumber = '%s' % int(seasonNumber)
+                episodeNumber = '%s' % int(episodeNumber)
+                elementArray.append(etree.XML("<title>%s</title>" % ('S%02dE%02d: %s' % (int(seasonNumber), int(episodeNumber), title))))
                 break
         else:
-            elementArray.append(etree.XML(u"<title>%s</title>" % title ))
+            elementArray.append(etree.XML("<title>%s</title>" % title ))
         if seasonNumber:
             tmpElement = etree.Element('{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}season')
             tmpElement.text = seasonNumber

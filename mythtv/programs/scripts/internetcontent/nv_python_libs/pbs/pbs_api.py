@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: pbs_api - Simple-to-use Python interface to the PBS RSS feeds
 #                       (http://video.pbs.org/)
@@ -24,14 +24,15 @@ __version__="v0.1.1"
 # 0.1.0 Initial development
 # 0.1.1 Debug code was should have been commented out. This has been corrected.
 
-import os, struct, sys, re, time, datetime, shutil, urllib
-from string import capitalize
+import os, struct, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error
+
 import logging
 from threading import Thread
 from copy import deepcopy
 from operator import itemgetter, attrgetter
 
-from pbs_exceptions import (PBSUrlError, PBSHttpError, PBSRssError, PBSVideoNotFound, PBSConfigFileError, PBSUrlDownloadError)
+from .pbs_exceptions import (PBSUrlError, PBSHttpError, PBSRssError, PBSVideoNotFound, PBSConfigFileError, PBSUrlDownloadError)
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -44,29 +45,24 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -78,7 +74,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -90,7 +86,7 @@ try:
     '''Import the python mashups support classes
     '''
     import nv_python_libs.mashups.mashups_api as mashups_api
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/mashups" containing the modules mashups_api and
 mashups_exceptions.py (v0.1.0 or greater),
@@ -164,7 +160,7 @@ class Videos(object):
         self.common = common
         self.common.debug = debug   # Set the common function debug level
 
-        self.log_name = u'PBS_Grabber'
+        self.log_name = 'PBS_Grabber'
         self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
         self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
@@ -176,18 +172,18 @@ class Videos(object):
 
         self.config['search_all_languages'] = search_all_languages
 
-        self.error_messages = {'PBSUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'PBSHttpError': u"! Error: An HTTP communications error with the PBS was raised (%s)\n", 'PBSRssError': u"! Error: Invalid RSS meta data\nwas received from the PBS error (%s). Skipping item.\n", 'PBSVideoNotFound': u"! Error: Video search with the PBS did not return any results (%s)\n", 'PBSConfigFileError': u"! Error: pbs_config.xml file missing\nit should be located in and named as (%s).\n", 'PBSUrlDownloadError': u"! Error: Downloading a RSS feed or Web page (%s).\n", }
+        self.error_messages = {'PBSUrlError': "! Error: The URL (%s) cause the exception error (%s)\n", 'PBSHttpError': "! Error: An HTTP communications error with the PBS was raised (%s)\n", 'PBSRssError': "! Error: Invalid RSS meta data\nwas received from the PBS error (%s). Skipping item.\n", 'PBSVideoNotFound': "! Error: Video search with the PBS did not return any results (%s)\n", 'PBSConfigFileError': "! Error: pbs_config.xml file missing\nit should be located in and named as (%s).\n", 'PBSUrlDownloadError': "! Error: Downloading a RSS feed or Web page (%s).\n", }
 
         # Channel details and search results
-        self.channel = {'channel_title': u'PBS', 'channel_link': u'http://video.pbs.org/', 'channel_description': u"Discover award-winning programming ‚Äì right at your fingertips ‚Äì on PBS Video. Catch the episodes you may have missed and watch your favorite shows whenever you want.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'PBS', 'channel_link': 'http://video.pbs.org/', 'channel_description': "Discover award-winning programming ‚Äì right at your fingertips ‚Äì on PBS Video. Catch the episodes you may have missed and watch your favorite shows whenever you want.", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/pbs.png'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/pbs.png'
 
-        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
+        self.config['image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
 
         # Initialize Mashups api variables
         mashups_api.common = self.common
-        self.mashups_api = mashups_api.Videos(u'')
+        self.mashups_api = mashups_api.Videos('')
         self.mashups_api.channel = self.channel
         if language:
             self.mashups_api.config['language'] = self.config['language']
@@ -206,16 +202,16 @@ class Videos(object):
         return nothing
         '''
         # Read the grabber pbs_config.xml configuration file
-        url = u'file://%s/nv_python_libs/configs/XML/pbs_config.xml' % (baseProcessingDir, )
+        url = 'file://%s/nv_python_libs/configs/XML/pbs_config.xml' % (baseProcessingDir, )
         if not os.path.isfile(url[7:]):
             raise PBSConfigFileError(self.error_messages['PBSConfigFileError'] % (url[7:], ))
 
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
         try:
             self.pbs_config = etree.parse(url)
-        except Exception, e:
+        except Exception as e:
             raise PBSUrlError(self.error_messages['PBSUrlError'] % (url, errormsg))
         return
     # end getPBSConfig()
@@ -233,16 +229,16 @@ class Videos(object):
         # Check if the pbs.xml file exists
         userPreferenceFile = self.pbs_config.find('userPreferenceFile').text
         if userPreferenceFile[0] == '~':
-             self.pbs_config.find('userPreferenceFile').text = u"%s%s" % (os.path.expanduser(u"~"), userPreferenceFile[1:])
+             self.pbs_config.find('userPreferenceFile').text = "%s%s" % (os.path.expanduser("~"), userPreferenceFile[1:])
         if os.path.isfile(self.pbs_config.find('userPreferenceFile').text):
             # Read the grabber pbs_config.xml configuration file
-            url = u'file://%s' % (self.pbs_config.find('userPreferenceFile').text, )
+            url = 'file://%s' % (self.pbs_config.find('userPreferenceFile').text, )
             if self.config['debug_enabled']:
-                print url
-                print
+                print(url)
+                print()
             try:
                 self.userPrefs = etree.parse(url)
-            except Exception, e:
+            except Exception as e:
                 raise PBSUrlError(self.error_messages['PBSUrlError'] % (url, errormsg))
             # Check if the pbs.xml file is too old
             nextUpdateSecs = int(self.userPrefs.find('updateDuration').text)*86400 # seconds in a day
@@ -264,7 +260,7 @@ class Videos(object):
         ''' Create or update the pbs.xml user preferences file
         return nothing
         '''
-        userPBS = u'''
+        userPBS = '''
 <userPBS>
 <!--
     All PBS shows that have represented on the http://video.pbs.org/ web page are included
@@ -319,23 +315,23 @@ class Videos(object):
         showData = self.common.getUrlData(self.pbs_config.find('treeviewUrls'))
 
         if self.config['debug_enabled']:
-            print "create(%s)" % create
-            print "showData:"
+            print("create(%s)" % create)
+            print("showData:")
             sys.stdout.write(etree.tostring(showData, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # If there is any data then add to new pbs.xml element tree
         showsDir = showData.xpath('//directory')
         if len(showsDir):
             for dirctory in showsDir:
                 userPBS+=etree.tostring(dirctory, encoding='UTF-8', pretty_print=True)
-            userPBS+=u'</userPBS>'
+            userPBS+='</userPBS>'
         userPBS = etree.XML(userPBS)
 
         if self.config['debug_enabled']:
-            print "Before any merging userPBS:"
+            print("Before any merging userPBS:")
             sys.stdout.write(etree.tostring(userPBS, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # If there was an existing pbs.xml file then add any relevant user settings to this new pbs.xml
         if not create:
@@ -345,26 +341,26 @@ class Videos(object):
                 sourceName = showElement.attrib['name']
                 elements = userPBS.xpath("//sourceURL[@name=$showName]", showName=showName, sourceName=sourceName)
                 if len(elements):
-                    elements[0].attrib['enabled'] = u'false'
+                    elements[0].attrib['enabled'] = 'false'
 
         if self.config['debug_enabled']:
-            print "After any merging userPBS:"
+            print("After any merging userPBS:")
             sys.stdout.write(etree.tostring(userPBS, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Save the pbs.xml file
-        prefDir = self.pbs_config.find('userPreferenceFile').text.replace(u'/pbs.xml', u'')
+        prefDir = self.pbs_config.find('userPreferenceFile').text.replace('/pbs.xml', '')
         if not os.path.isdir(prefDir):
             os.makedirs(prefDir)
         fd = open(self.pbs_config.find('userPreferenceFile').text, 'w')
-        fd.write(u'<userPBS>\n'+u''.join(etree.tostring(element, encoding='UTF-8', pretty_print=True) for element in userPBS)+u'</userPBS>')
+        fd.write('<userPBS>\n'+''.join(etree.tostring(element, encoding='UTF-8', pretty_print=True) for element in userPBS)+'</userPBS>')
         fd.close()
 
         # Read the refreshed user config file
         try:
             self.userPrefs = etree.parse(self.pbs_config.find('userPreferenceFile').text)
             self.mashups_api.userPrefs = self.userPrefs
-        except Exception, e:
+        except Exception as e:
             raise PBSUrlError(self.error_messages['PBSUrlError'] % (url, errormsg))
         return
     # end updatePBS()
@@ -382,7 +378,7 @@ class Videos(object):
         self.mashups_api.grabber_title = self.grabber_title
         self.mashups_api.mashup_title = self.mashup_title
         self.mashups_api.channel_icon = self.channel_icon
-        self.mashups_api.mashup_title = u'pbs'
+        self.mashups_api.mashup_title = 'pbs'
 
         # Easier for debugging
 #        self.mashups_api.searchForVideos(title, pagenumber)
@@ -393,8 +389,8 @@ class Videos(object):
             self.Search = True
             self.mashups_api.Search = True
             self.mashups_api.searchForVideos(title, pagenumber)
-        except Exception, e:
-            sys.stderr.write(u"! Error: During a PBS Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: During a PBS Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         sys.exit(0)
@@ -408,7 +404,7 @@ class Videos(object):
         self.mashups_api.grabber_title = self.grabber_title
         self.mashups_api.mashup_title = self.mashup_title
         self.mashups_api.channel_icon = self.channel_icon
-        self.mashups_api.mashup_title = u'pbs'
+        self.mashups_api.mashup_title = 'pbs'
 
         # Easier for debugging
 #        self.mashups_api.displayTreeView()
@@ -419,8 +415,8 @@ class Videos(object):
             self.Search = False
             self.mashups_api.Search = False
             self.mashups_api.displayTreeView()
-        except Exception, e:
-            sys.stderr.write(u"! Error: During a PBS Video treeview\nError(%s)\n" % (e))
+        except Exception as e:
+            sys.stderr.write("! Error: During a PBS Video treeview\nError(%s)\n" % (e))
             sys.exit(1)
 
         sys.exit(0)

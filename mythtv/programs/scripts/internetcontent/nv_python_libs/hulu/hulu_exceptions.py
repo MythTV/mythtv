@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: hulu_exceptions - Custom exceptions used or raised by hulu_api
 # Python Script

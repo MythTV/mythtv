@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: nasa_api - XPath and XSLT functions for the NASA RSS/HTML items
 # Python Script
@@ -32,8 +32,9 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
+import io
 
 
 class OutStreamEncoder(object):
@@ -47,28 +48,26 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -80,7 +79,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -93,7 +92,7 @@ class xpathFunctions(object):
     def __init__(self):
         self.functList = ['nasaTitleEp', ]
         # Show 1
-        self.regexPattern = re.compile(u'''Show\\ (?P<seasno>[0-9]+).*$''', re.UNICODE)
+        self.regexPattern = re.compile('''Show\\ (?P<seasno>[0-9]+).*$''', re.UNICODE)
     # end __init__()
 
 ######################################################################################################
@@ -110,7 +109,7 @@ class xpathFunctions(object):
         stripArray = ['HST SM4:', 'NASA 360:', 'NASA 360', 'NASA EDGE:', 'NASA EDGE', 'NE Live@', 'NE@', 'NASA Mission Update:', "NASA TV's This Week @NASA," ]
         title = arg[0]
         for stripText in stripArray:
-            title = title.replace(stripText, u'')
+            title = title.replace(stripText, '')
         title = title.strip()
         episodeNumber = None
         if title.startswith('Show'):
@@ -125,8 +124,8 @@ class xpathFunctions(object):
         NSMAP = {'mythtv' : mythtvNamespace}
         elementTmp = etree.Element(mythtv + "mythtv", nsmap=NSMAP)
         if not episodeNumber is None:
-            etree.SubElement(elementTmp, "title").text = u"EP%02d: %s" % (episodeNumber, title)
-            etree.SubElement(elementTmp, mythtv + "episode").text = u"%s" % episodeNumber
+            etree.SubElement(elementTmp, "title").text = "EP%02d: %s" % (episodeNumber, title)
+            etree.SubElement(elementTmp, mythtv + "episode").text = "%s" % episodeNumber
         else:
             etree.SubElement(elementTmp, "title").text = title
         return elementTmp
