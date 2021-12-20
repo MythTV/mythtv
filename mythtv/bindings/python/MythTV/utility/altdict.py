@@ -58,7 +58,7 @@ class OrdDict( dict ):
     def __init__(self, data=()):
         warn("Class 'OrdDict' from this module  will be removed after MythTV v32 release, "
              "use the class 'OrderedDict' from the module 'collections' provided by python3.",
-             DeprecationWarning, 2)
+             DeprecationWarning, 1)
         super().__init__()
         for k,v in data:
             self[k] = v
@@ -93,7 +93,7 @@ class DictInvert(dict):
         warn("Classes 'DictInvert' and 'DictInvertCI' from this module  will be removed "
              "after MythTV v32 release, "
              "use the imports 'from MythTV.altdict import DictInvert, DictInvertCI.",
-             DeprecationWarning, 2)
+             DeprecationWarning, 1)
         self.other = other
         if mine is None:
             mine = dict(zip(*reversed(list(zip(*other.items())))))
