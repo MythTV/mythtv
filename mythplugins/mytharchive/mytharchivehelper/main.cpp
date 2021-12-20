@@ -1764,21 +1764,25 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
 
 static int64_t getFrameCount(AVFormatContext *inputFC, int vid_id)
 {
-    AVPacket pkt;
     int64_t count = 0;
 
     LOG(VB_JOBQUEUE, LOG_INFO, "Calculating frame count");
 
-    av_init_packet(&pkt);
-
-    while (av_read_frame(inputFC, &pkt) >= 0)
+    AVPacket *pkt = av_packet_alloc();
+    if (pkt == nullptr)
     {
-        if (pkt.stream_index == vid_id)
+        LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
+        return 0;
+    }
+    while (av_read_frame(inputFC, pkt) >= 0)
+    {
+        if (pkt->stream_index == vid_id)
         {
             count++;
         }
-        av_packet_unref(&pkt);
+        av_packet_unref(pkt);
     }
+    av_packet_free(&pkt);
 
     return count;
 }

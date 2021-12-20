@@ -807,6 +807,27 @@ void MythRenderOpenGL::ClearFramebuffer(void)
     doneCurrent();
 }
 
+void MythRenderOpenGL::DrawProcedural(QRect Area, int Alpha, QOpenGLFramebufferObject* Target,
+                                      QOpenGLShaderProgram *Program, float TimeVal)
+{
+    if (!Program)
+        return;
+
+    makeCurrent();
+    BindFramebuffer(Target);
+    glEnableVertexAttribArray(VERTEX_INDEX);
+    GetCachedVBO(GL_TRIANGLE_STRIP, Area);
+    glVertexAttribPointerI(VERTEX_INDEX, VERTEX_SIZE, GL_FLOAT, GL_FALSE, VERTEX_SIZE * sizeof(GLfloat), kVertexOffset);
+    SetShaderProjection(Program);
+    Program->setUniformValue("u_time",  TimeVal);
+    Program->setUniformValue("u_alpha", static_cast<float>(Alpha / 255.0F));
+    Program->setUniformValue("u_res",   QVector2D(m_window->width(), m_window->height()));
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
+    glDisableVertexAttribArray(VERTEX_INDEX);
+    doneCurrent();
+}
+
 void MythRenderOpenGL::DrawBitmap(MythGLTexture *Texture, QOpenGLFramebufferObject *Target,
                                   const QRect Source, const QRect Destination,
                                   QOpenGLShaderProgram *Program, int Alpha, qreal Scale)

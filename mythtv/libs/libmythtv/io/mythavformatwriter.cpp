@@ -209,22 +209,29 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     m_bufferedVideoFrameTimes.push_back(Frame->m_timecode);
     m_bufferedVideoFrameTypes.push_back(m_picture->pict_type);
 
-    AVPacket pkt;
-    av_init_packet(&pkt);
-    pkt.data = nullptr;
-    pkt.size = 0;
+    AVPacket *pkt = av_packet_alloc();
+    if (pkt == nullptr)
+    {
+        LOG(VB_RECORD, LOG_ERR, "packet allocation failed");
+        return AVERROR(ENOMEM);
+    }
+
     int got_pkt = 0;
     AVCodecContext *avctx = m_codecMap.GetCodecContext(m_videoStream);
-    int ret = avcodec_encode_video2(avctx, &pkt, m_picture, &got_pkt);
+    int ret = avcodec_encode_video2(avctx, pkt, m_picture, &got_pkt);
 
     if (ret < 0)
     {
         LOG(VB_RECORD, LOG_ERR, "avcodec_encode_video2() failed");
+        av_packet_free(&pkt);
         return ret;
     }
 
     if (!got_pkt)
+    {
+        av_packet_free(&pkt);
         return ret;
+    }
 
     std::chrono::milliseconds tc = Frame->m_timecode;
 
@@ -235,24 +242,25 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     {
         int pict_type = m_bufferedVideoFrameTypes.takeFirst();
         if (pict_type == AV_PICTURE_TYPE_I)
-            pkt.flags |= AV_PKT_FLAG_KEY;
+            pkt->flags |= AV_PKT_FLAG_KEY;
     }
 
     if (m_startingTimecodeOffset == -1ms)
         m_startingTimecodeOffset = tc - 1ms;
     tc -= m_startingTimecodeOffset;
 
-    pkt.pts = tc.count() * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
-    pkt.dts = AV_NOPTS_VALUE;
-    pkt.stream_index= m_videoStream->index;
+    pkt->pts = tc.count() * m_videoStream->time_base.den / m_videoStream->time_base.num / 1000;
+    pkt->dts = AV_NOPTS_VALUE;
+    pkt->stream_index= m_videoStream->index;
 
-    ret = av_interleaved_write_frame(m_ctx, &pkt);
+    ret = av_interleaved_write_frame(m_ctx, pkt);
     if (ret != 0)
         LOG(VB_RECORD, LOG_ERR, LOC + "WriteVideoFrame(): av_interleaved_write_frame couldn't write Video");
 
     Frame->m_timecode = tc + m_startingTimecodeOffset;
     m_framesWritten++;
-    av_packet_unref(&pkt);
+    av_packet_unref(pkt);
+    av_packet_free(&pkt);
     return 1;
 }
 

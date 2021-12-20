@@ -68,7 +68,7 @@ bool MythPlayerVideoUI::InitVideo()
     connect(video, &MythVideoOutputGPU::PictureAttributesUpdated,
                                                   this, &MythPlayerVideoUI::PictureAttributesUpdated);
     connect(video, &MythVideoBounds::UpdateOSDMessage,
-                                                  this, QOverload<const QString&>::of(&MythPlayerVideoUI::UpdateOSDMessage));
+                                                  this, qOverload<const QString&>(&MythPlayerVideoUI::UpdateOSDMessage));
     connect(video, &MythVideoBounds::VideoBoundsStateChanged,
                                                   m_tv, &TV::VideoBoundsStateChanged);
     connect(m_tv,  &TV::ChangeOSDPositionUpdates, this,  &MythPlayerVideoUI::ChangeOSDPositionUpdates);

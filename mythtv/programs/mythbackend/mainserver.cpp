@@ -318,8 +318,8 @@ MainServer::MainServer(bool master, int port,
         GetFilesystemInfos(m_fsInfos, false);
         sched->SetMainServer(this);
     }
-    if (expirer)
-        expirer->SetMainServer(this);
+    if (gExpirer)
+        gExpirer->SetMainServer(this);
 
     m_metadatafactory = new MetadataFactory(this);
 

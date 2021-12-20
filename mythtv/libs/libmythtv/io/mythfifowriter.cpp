@@ -12,7 +12,6 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <fcntl.h>
-#include <cassert>
 #include <cerrno>
 #include <sys/time.h>
 #include <sys/types.h>

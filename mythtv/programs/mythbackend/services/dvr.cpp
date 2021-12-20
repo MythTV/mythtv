@@ -51,12 +51,9 @@
 #include "storagegroup.h"
 #include "playgroup.h"
 #include "recordingprofile.h"
-
+#include "backendcontext.h"
 #include "scheduler.h"
 #include "tv_rec.h"
-
-extern QMap<int, EncoderLink *> tvList;
-extern AutoExpire  *expirer;
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -956,8 +953,8 @@ DTC::ProgramList* Dvr::GetExpiringList( int nStartIndex,
 {
     pginfolist_t  infoList;
 
-    if (expirer)
-        expirer->GetAllExpiring( infoList );
+    if (gExpirer)
+        gExpirer->GetAllExpiring( infoList );
 
     // ----------------------------------------------------------------------
     // Build Response
@@ -1005,7 +1002,7 @@ DTC::EncoderList* Dvr::GetEncoderList()
 
     QReadLocker tvlocker(&TVRec::s_inputsLock);
     QList<InputInfo> inputInfoList = CardUtil::GetAllInputInfo();
-    for (auto * elink : qAsConst(tvList))
+    for (auto * elink : qAsConst(gTVList))
     {
         if (elink != nullptr)
         {

@@ -53,6 +53,7 @@ class Scheduler : public MThread, public MythScheduler
     void Wait(void) { MThread::wait(); }
 
     void SetExpirer(AutoExpire *autoExpirer) { m_expirer = autoExpirer; }
+    AutoExpire * GetExpirer() { return m_expirer; }
 
     void Reschedule(const QStringList &request);
     void RescheduleMatch(uint recordid, uint sourceid, uint mplexid,
@@ -100,6 +101,7 @@ class Scheduler : public MThread, public MythScheduler
     static void PrintRec(const RecordingInfo *p, const QString &prefix = "");
 
     void SetMainServer(MainServer *ms);
+    MainServer * GetMainServer() {return m_mainServer; };
 
     void SlaveConnected(const RecordingList &slavelist);
     void SlaveDisconnected(uint cardid);

@@ -111,7 +111,9 @@ MythRAOPConnection::~MythRAOPConnection()
 
     if (m_id > 0)
     {
-        GetNotificationCenter()->UnRegister(this, m_id);
+        auto *nc = GetNotificationCenter();
+        if (nc)
+            nc->UnRegister(this, m_id);
     }
 }
 
@@ -647,20 +649,20 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
     std::copy(data_in + aeslen, data_in + len,
               decrypted_data.data() + aeslen);
 
-    AVPacket tmp_pkt;
     AVCodecContext *ctx = m_codecContext;
-
-    av_init_packet(&tmp_pkt);
-    tmp_pkt.data = decrypted_data.data();
-    tmp_pkt.size = len;
+    AVPacket *tmp_pkt = av_packet_alloc();
+    if (tmp_pkt == nullptr)
+        return -1;
+    tmp_pkt->data = decrypted_data.data();
+    tmp_pkt->size = len;
 
     uint32_t frames_added = 0;
     auto *samples = (uint8_t *)av_mallocz(AudioOutput::kMaxSizeBuffer);
-    while (tmp_pkt.size > 0)
+    while (tmp_pkt->size > 0)
     {
         int data_size = 0;
         int ret = AudioOutputUtil::DecodeAudio(ctx, samples,
-                                               data_size, &tmp_pkt);
+                                               data_size, tmp_pkt);
         if (ret < 0)
         {
             av_free(samples);
@@ -676,9 +678,10 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
             AudioData block {samples, data_size, num_samples};
             dest->append(block);
         }
-        tmp_pkt.data += ret;
-        tmp_pkt.size -= ret;
+        tmp_pkt->data += ret;
+        tmp_pkt->size -= ret;
     }
+    av_packet_free(&tmp_pkt);
     return frames_added;
 }
 

@@ -6579,7 +6579,7 @@ enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
                 }
 
 case $ID in
-    fedora|debian)
+    fedora|debian|raspbian)
         EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
     ubuntu)
         case $VERSION_ID in
@@ -7296,6 +7296,11 @@ if enabled lto; then
 fi
 
 ffmpeg_extra_cflags="$extra_cflags -w"
+if test "$ID" = "raspbian"; then
+    case $cpu in
+        armv*) ffmpeg_extra_ldflags="$ffmpeg_extra_libs -latomic" ;;
+    esac
+fi
 
 ## Call FFmpeg configure here
 echo
@@ -7306,6 +7311,7 @@ eval ./configure \
 $ffopts \
 --extra-cflags='"$ffmpeg_extra_cflags"' \
 --extra-ldflags='"$ffmpeg_extra_ldflags"' \
+--extra-libs='"$ffmpeg_extra_ldflags"' \
 --enable-stripping \
 --strip='"echo skipping strip"' \
 --disable-manpages  \

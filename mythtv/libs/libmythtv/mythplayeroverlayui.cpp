@@ -18,7 +18,7 @@ MythPlayerOverlayUI::MythPlayerOverlayUI(MythMainWindow* MainWindow, TV* Tv, Pla
     m_positionUpdateTimer.setInterval(999ms);
     connect(&m_positionUpdateTimer, &QTimer::timeout, this, &MythPlayerOverlayUI::UpdateOSDPosition);
     connect(this, &MythPlayerOverlayUI::OverlayStateChanged, m_tv, &TV::OverlayStateChanged);
-    connect(m_tv, &TV::ChangeOSDMessage, this, QOverload<const QString&>::of(&MythPlayerOverlayUI::UpdateOSDMessage));
+    connect(m_tv, &TV::ChangeOSDMessage, this, qOverload<const QString&>(&MythPlayerOverlayUI::UpdateOSDMessage));
 
     // Signalled directly from TV to OSD
     connect(m_tv, &TV::DialogQuit,    &m_osd, &OSD::DialogQuit);

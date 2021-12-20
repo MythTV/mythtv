@@ -294,16 +294,22 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
         {
             case AVMEDIA_TYPE_AUDIO:
             {
-                AVPacket pkt;
-                av_init_packet(&pkt);
-
-                while (av_read_frame(inputFC, &pkt) >= 0)
+                AVPacket *pkt = av_packet_alloc();
+                if (pkt == nullptr)
                 {
-                    if (pkt.stream_index == (int)i)
-                        time = time + pkt.duration;
-
-                    av_packet_unref(&pkt);
+                    LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
+                    break;
                 }
+
+                while (av_read_frame(inputFC, pkt) >= 0)
+                {
+                    if (pkt->stream_index == (int)i)
+                        time = time + pkt->duration;
+
+                    av_packet_unref(pkt);
+                }
+
+                av_packet_free(&pkt);
 
                 duration = secondsFromFloat(time * av_q2d(inputFC->streams[i]->time_base));
                 break;

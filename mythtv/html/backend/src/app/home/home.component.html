@@ -1,0 +1,9 @@
+<div *ngIf="(m_hostname$ | async)?.String as hostname; else loading">
+    <p>Welcome to MythTV Backend running on host {{hostname}}</p>
+</div>
+<div *ngIf="(m_timezone$ | async)?.TimeZoneInfo as timezone; else loading">
+    <p>It is currently {{timezone.CurrentDateTime}} in timezone {{timezone.TimeZoneID}}, UTC offset {{timezone.UTCOffset}} hours</p>
+</div>
+<ng-template #loading>
+    <div>Loading...</div>
+</ng-template>

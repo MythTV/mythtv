@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include <cassert>
 #include <dlfcn.h>
 
 #include <QAndroidJniEnvironment>

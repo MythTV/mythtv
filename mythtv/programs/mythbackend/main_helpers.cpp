@@ -60,6 +60,19 @@
 #include "httpstatus.h"
 #include "mythlogging.h"
 
+// New webserver
+#include "libmythbase/http/mythhttproot.h"
+#include "libmythbase/http/mythhttpinstance.h"
+#include "servicesv2/v2myth.h"
+#include "servicesv2/v2video.h"
+#include "servicesv2/v2dvr.h"
+#include "servicesv2/v2content.h"
+#include "servicesv2/v2guide.h"
+#include "servicesv2/v2channel.h"
+#include "servicesv2/v2status.h"
+#include "servicesv2/v2capture.h"
+#include "servicesv2/v2music.h"
+
 #define LOC      QString("MythBackend: ")
 #define LOC_WARN QString("MythBackend, Warning: ")
 #define LOC_ERR  QString("MythBackend, Error: ")
@@ -194,7 +207,7 @@ bool setupTVs(bool ismaster, bool &error)
                 if (tv && tv->Init())
                 {
                     auto *enc = new EncoderLink(cardid, tv);
-                    tvList[cardid] = enc;
+                    gTVList[cardid] = enc;
                 }
                 else
                 {
@@ -215,7 +228,7 @@ bool setupTVs(bool ismaster, bool &error)
                 if (tv && tv->Init())
                 {
                     auto *enc = new EncoderLink(cardid, tv);
-                    tvList[cardid] = enc;
+                    gTVList[cardid] = enc;
                 }
                 else
                 {
@@ -227,12 +240,12 @@ bool setupTVs(bool ismaster, bool &error)
             else
             {
                 auto *enc = new EncoderLink(cardid, nullptr, host);
-                tvList[cardid] = enc;
+                gTVList[cardid] = enc;
             }
         }
     }
 
-    if (tvList.empty())
+    if (gTVList.empty())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC +
                 "No valid capture cards are defined in the database.");
@@ -252,11 +265,11 @@ void cleanup(void)
     if (gCoreContext)
         gCoreContext->SetExiting();
 
-    delete sysEventHandler;
-    sysEventHandler = nullptr;
+    delete gSysEventHandler;
+    gSysEventHandler = nullptr;
 
-    delete housekeeping;
-    housekeeping = nullptr;
+    delete gHousekeeping;
+    gHousekeeping = nullptr;
 
     if (gCoreContext)
     {
@@ -264,11 +277,11 @@ void cleanup(void)
         gCoreContext->SetScheduler(nullptr);
     }
 
-    delete expirer;
-    expirer = nullptr;
+    delete gExpirer;
+    gExpirer = nullptr;
 
-    delete jobqueue;
-    jobqueue = nullptr;
+    delete gJobQueue;
+    gJobQueue = nullptr;
 
     delete g_pUPnp;
     g_pUPnp = nullptr;
@@ -301,10 +314,10 @@ void cleanup(void)
      delete gBackendContext;
      gBackendContext = nullptr;
 
-    if (!pidfile.isEmpty())
+    if (!gPidFile.isEmpty())
     {
-        unlink(pidfile.toLatin1().constData());
-        pidfile.clear();
+        unlink(gPidFile.toLatin1().constData());
+        gPidFile.clear();
     }
 
     SignalHandler::Done();
@@ -383,7 +396,7 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
     if (cmdline.toBool("printsched") ||
         cmdline.toBool("testsched"))
     {
-        auto *sched = new Scheduler(false, &tvList);
+        auto *sched = new Scheduler(false, &gTVList);
         if (cmdline.toBool("printsched"))
         {
             if (!gCoreContext->ConnectToMasterServer())
@@ -446,8 +459,8 @@ int handle_command(const MythBackendCommandLineParser &cmdline)
 
     if (cmdline.toBool("printexpire"))
     {
-        expirer = new AutoExpire();
-        expirer->PrintExpireList(cmdline.toString("printexpire"));
+        gExpirer = new AutoExpire();
+        gExpirer->PrintExpireList(cmdline.toString("printexpire"));
         return GENERIC_EXIT_OK;
     }
 
@@ -615,7 +628,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         return GENERIC_EXIT_SETUP_ERROR;
     }
 
-    sysEventHandler = new MythSystemEventHandler();
+    gSysEventHandler = new MythSystemEventHandler();
 
     if (ismaster)
     {
@@ -626,7 +639,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         LOG(VB_GENERAL, LOG_NOTICE, LOC + "Running as a slave backend.");
     }
 
-   if (ismaster)
+    if (ismaster)
     {
         EITCache::ClearChannelLocks();
     }
@@ -644,7 +657,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         if (runsched)
         {
             be_sd_notify("STATUS=Creating scheduler");
-            sched = new Scheduler(true, &tvList);
+            sched = new Scheduler(true, &gTVList);
             int err = sched->GetError();
             if (err)
             {
@@ -658,9 +671,9 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
         if (!cmdline.toBool("noautoexpire"))
         {
-            expirer = new AutoExpire(&tvList);
+            gExpirer = new AutoExpire(&gTVList);
             if (sched)
-                sched->SetExpirer(expirer);
+                sched->SetExpirer(gExpirer);
         }
         gCoreContext->SetScheduler(sched);
     }
@@ -668,33 +681,33 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     if (!cmdline.toBool("nohousekeeper"))
     {
         be_sd_notify("STATUS=Creating housekeeper");
-        housekeeping = new HouseKeeper();
+        gHousekeeping = new HouseKeeper();
 
         if (ismaster)
         {
-            housekeeping->RegisterTask(new LogCleanerTask());
-            housekeeping->RegisterTask(new CleanupTask());
-            housekeeping->RegisterTask(new ThemeUpdateTask());
-            housekeeping->RegisterTask(new ArtworkTask());
-            housekeeping->RegisterTask(new MythFillDatabaseTask());
+            gHousekeeping->RegisterTask(new LogCleanerTask());
+            gHousekeeping->RegisterTask(new CleanupTask());
+            gHousekeeping->RegisterTask(new ThemeUpdateTask());
+            gHousekeeping->RegisterTask(new ArtworkTask());
+            gHousekeeping->RegisterTask(new MythFillDatabaseTask());
 
             // only run this task if MythMusic is installed and we have a new enough schema
             if (gCoreContext->GetNumSetting("MusicDBSchemaVer", 0) >= 1024)
-                housekeeping->RegisterTask(new RadioStreamUpdateTask());
+                gHousekeeping->RegisterTask(new RadioStreamUpdateTask());
         }
 
-        housekeeping->RegisterTask(new JobQueueRecoverTask());
+        gHousekeeping->RegisterTask(new JobQueueRecoverTask());
 #ifdef __linux__
  #ifdef CONFIG_BINDINGS_PYTHON
-        housekeeping->RegisterTask(new HardwareProfileTask());
+        gHousekeeping->RegisterTask(new HardwareProfileTask());
  #endif
 #endif
 
-        housekeeping->Start();
+        gHousekeeping->Start();
     }
 
     if (!cmdline.toBool("nojobqueue"))
-        jobqueue = new JobQueue(ismaster);
+        gJobQueue = new JobQueue(ismaster);
 
     // ----------------------------------------------------------------------
     //
@@ -726,13 +739,13 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         LOG(VB_GENERAL, LOG_INFO, "Main::Registering HttpStatus Extension");
         be_sd_notify("STATUS=Registering HttpStatus Extension");
 
-        httpStatus = new HttpStatus( &tvList, sched, expirer, ismaster );
+        httpStatus = new HttpStatus( &gTVList, sched, gExpirer, ismaster );
         pHS->RegisterExtension( httpStatus );
     }
 
     be_sd_notify("STATUS=Creating main server");
     mainServer = new MainServer(
-        ismaster, port, &tvList, sched, expirer);
+        ismaster, port, &gTVList, sched, gExpirer);
 
     int exitCode = mainServer->GetExitCode();
     if (exitCode != GENERIC_EXIT_OK)
@@ -755,6 +768,18 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     // Provide systemd ready notification (for type=notify units)
     be_sd_notify("READY=1");
+
+    MythHTTPInstance::Addservices({{ VIDEO_SERVICE, &MythHTTPService::Create<V2Video> }});
+    MythHTTPInstance::Addservices({{ MYTH_SERVICE, &MythHTTPService::Create<V2Myth> }});
+    MythHTTPInstance::Addservices({{ DVR_SERVICE, &MythHTTPService::Create<V2Dvr> }});
+    MythHTTPInstance::Addservices({{ CONTENT_SERVICE, &MythHTTPService::Create<V2Content> }});
+    MythHTTPInstance::Addservices({{ GUIDE_SERVICE, &MythHTTPService::Create<V2Guide> }});
+    MythHTTPInstance::Addservices({{ CHANNEL_SERVICE, &MythHTTPService::Create<V2Channel> }});
+    MythHTTPInstance::Addservices({{ STATUS_SERVICE, &MythHTTPService::Create<V2Status> }});
+    MythHTTPInstance::Addservices({{ CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> }});
+    MythHTTPInstance::Addservices({{ MUSIC_SERVICE, &MythHTTPService::Create<V2Music> }});
+    auto root = [](auto && PH1) { return MythHTTPRoot::RedirectRoot(std::forward<decltype(PH1)>(PH1), "apps/backend/index.html"); };
+    MythHTTPScopedInstance webserver({{ "/", root}});
 
     ///////////////////////////////
     ///////////////////////////////

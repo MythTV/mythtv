@@ -4,15 +4,14 @@
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 
-QMap<int, EncoderLink *> tvList;
-AutoExpire  *expirer      = nullptr;
-JobQueue    *jobqueue     = nullptr;
-HouseKeeper *housekeeping = nullptr;
-MediaServer *g_pUPnp      = nullptr;
+QMap<int, EncoderLink *> gTVList;
+AutoExpire  *gExpirer      = nullptr;
+JobQueue    *gJobQueue     = nullptr;
+HouseKeeper *gHousekeeping = nullptr;
+MediaServer *g_pUPnp       = nullptr;
 BackendContext *gBackendContext = nullptr;
-QString      pidfile;
-QString      logfile;
-MythSystemEventHandler *sysEventHandler = nullptr;
+QString      gPidFile;
+MythSystemEventHandler *gSysEventHandler = nullptr;
 
 BackendContext::~BackendContext()
 {

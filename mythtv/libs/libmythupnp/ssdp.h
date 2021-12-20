@@ -77,7 +77,7 @@ class UPNP_PUBLIC SSDP : public MThread
     private:
 
         // ------------------------------------------------------------------
-        // Private so the singleton pattern can be inforced.
+        // Private so the singleton pattern can be enforced.
         // ------------------------------------------------------------------
 
         SSDP   ();

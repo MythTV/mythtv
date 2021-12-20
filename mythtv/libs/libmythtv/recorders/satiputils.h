@@ -1,5 +1,5 @@
-#ifndef _SATIP_UTILS_H_
-#define _SATIP_UTILS_H_
+#ifndef SATIPUTILS_H
+#define SATIPUTILS_H
 
 // Qt headers
 #include <QString>
@@ -26,7 +26,8 @@ class SatIP
     static QString pol(DTVPolarity pol);
 
   private:
-    static QStringList doUPNPsearch(void);
+    static QStringList doUPNPsearch(bool loginfo);
+    static QStringList findServers(void);
 };
 
-#endif // _SATIP_UTILS_H
+#endif // SATIPUTILS_H

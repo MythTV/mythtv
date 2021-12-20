@@ -1,0 +1,13 @@
+div.statusBox {
+    width: auto;
+    border-top:1px solid #000000;
+    border-right:1px solid #000000;
+    border-bottom:1px solid #000000;
+    border-left:10px solid #000000;
+    padding:10px;
+    border-radius:8px 0px 0px 8px;
+    margin: 20px;
+    margin-bottom: 20px;
+    color: #000;
+    background-color: #fff;
+  }

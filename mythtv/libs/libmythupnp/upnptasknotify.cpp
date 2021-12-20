@@ -124,9 +124,12 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 
         pSocket->writeBlock( scPacket, scPacket.length(),
                              pSocket->address(), pSocket->port() );
-        std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom() % 250));
-        pSocket->writeBlock( scPacket, scPacket.length(),
-                             pSocket->address(), pSocket->port() );
+        if (m_eNTS != NTS_byebye)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom() % 250));
+            pSocket->writeBlock( scPacket, scPacket.length(),
+                                pSocket->address(), pSocket->port() );
+        }
     }
 }
 

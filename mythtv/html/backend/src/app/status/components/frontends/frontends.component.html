@@ -1,0 +1,13 @@
+<div class="statusBox">
+    <p>Frontends:</p>
+    <div *ngIf="frontends?.length != 0; else noFrontends">
+        <ul>
+            <div *ngFor="let frontend of frontends">
+                <li>Frontend: {{ frontend.Name }}, IP-Port: {{ frontend.IP }}:{{ frontend.Port }}, Online: {{ frontend.OnLine }} </li>
+            </div>
+        </ul>
+    </div>
+</div>
+<ng-template #noFrontends>
+    <p>No Frontends</p>
+</ng-template>

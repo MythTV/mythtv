@@ -119,6 +119,19 @@ bool TVRec::CreateChannel(const QString &startchannel,
         }
     }
 
+    if (m_genOpt.m_inputType == "SATIP")
+    {
+        if (!CardUtil::IsSatIPPresent(m_inputId))
+        {
+            // SatIP box presence failed, recorder is marked errored
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("CreateChannel(%1) failed due to SatIP box not responding "
+                        "to network check on inputid [%2]")
+                .arg(startchannel).arg(m_inputId));
+            m_channel = nullptr;
+        }
+    }
+
     if (!m_channel)
     {
         SetFlags(kFlagErrored, __FILE__, __LINE__);

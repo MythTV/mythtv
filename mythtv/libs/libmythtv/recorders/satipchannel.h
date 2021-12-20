@@ -1,5 +1,5 @@
-#ifndef _SATIP_CHANNEL_H_
-#define _SATIP_CHANNEL_H_
+#ifndef SATIPCHANNEL_H
+#define SATIPCHANNEL_H
 
 // Qt headers
 #include <QString>
@@ -18,6 +18,7 @@ class SatIPChannel : public DTVChannel
     // Commands
     bool Open(void) override;                       // ChannelBase
     void Close(void) override;                      // ChannelBase
+    bool EnterPowerSavingMode(void) override;       // DTVChannel
 
     using DTVChannel::Tune;
     bool Tune(const DTVMultiplex& tuning) override; // DTVChannel
@@ -41,4 +42,4 @@ class SatIPChannel : public DTVChannel
     MPEGStreamData     *m_streamData    {nullptr};
 };
 
-#endif // _SATIP_CHANNEL_H_
+#endif // SATIPCHANNEL_H

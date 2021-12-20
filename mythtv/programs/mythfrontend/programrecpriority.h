@@ -55,6 +55,8 @@ class ProgramRecPriorityInfo : public RecordingInfo
     QDateTime     m_last_record;
     int           m_avg_delay   {0};
     QString       m_profile;
+    QString       m_recordingGroup;
+    QString       m_storageGroup;
 };
 
 class ProgramRecPriority : public ScheduleCommon
