@@ -227,6 +227,7 @@ if __name__ == '__main__':
     apikey = ""
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
+    main.grabberInfo['enabled'] = True
     main.grabberInfo['title'] = __title__
     main.grabberInfo['command'] = 'bliptv.py'
     main.grabberInfo['author'] = __author__

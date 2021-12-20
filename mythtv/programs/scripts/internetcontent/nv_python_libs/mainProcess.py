@@ -21,7 +21,7 @@
 #-------------------------------------
 __title__ ="Netvision Common Query Processing";
 __author__="R.D.Vaughan"
-__version__="v0.2.5"
+__version__="v0.2.6"
 # 0.1.0 Initial development
 # 0.1.1 Refining the code like the additional of a grabber specifing the maximum number of items to return
 # 0.1.2 Added the Tree view option
@@ -32,6 +32,7 @@ __version__="v0.2.5"
 # 0.2.3 Added support of the XML version information
 # 0.2.4 Added the "command" tag to the XML version information
 # 0.2.5 Fixed a bug in the setting up of a search mashup page item maximum
+# 0.2.6 R. Ernst: Converted to python3, added option to disable a grabber script
 
 import sys, os
 from optparse import OptionParser
@@ -359,7 +360,11 @@ class mainProcess:
 
         # Process version command line requests
         if opts.version:
-            version = etree.XML('<grabber></grabber>')
+            # grabber scripts must be explicitly enabled
+            if self.grabberInfo.get('enabled', False):
+                version = etree.XML('<grabber></grabber>')
+            else:
+                version = etree.XML('<disabledgrabber></disabledgrabber>')
             etree.SubElement(version, "name").text = self.grabberInfo['title']
             etree.SubElement(version, "author").text = self.grabberInfo['author']
             etree.SubElement(version, "thumbnail").text = self.grabberInfo['thumbnail']

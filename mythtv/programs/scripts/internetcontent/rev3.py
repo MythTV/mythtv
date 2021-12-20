@@ -257,6 +257,7 @@ if __name__ == '__main__':
     target.common = common_api.Common()
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
+    main.grabberInfo['enabled'] = True
     main.grabberInfo['title'] = __title__
     main.grabberInfo['command'] = 'rev3.py'
     main.grabberInfo['mashup_title'] = __mashup_title__

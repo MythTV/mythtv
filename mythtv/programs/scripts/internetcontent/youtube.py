@@ -207,6 +207,7 @@ if __name__ == '__main__':
     target.baseProcessingDir = os.path.dirname( os.path.realpath(__file__))
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
+    main.grabberInfo['enabled'] = True
     main.grabberInfo['title'] = __title__
     main.grabberInfo['command'] = 'youtube.py'
     main.grabberInfo['author'] = __author__
