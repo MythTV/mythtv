@@ -22,7 +22,7 @@
         <xsl:element name="item">
             <title><xsl:value-of select="normalize-space(atm:title)"/></title>
             <author><xsl:value-of select="normalize-space(.//atm:name)"/></author>
-            <pubDate><xsl:value-of select="mnvXpath:pubDate(string(atm:published), '%Y-%m-%dT%H:%M:%S.%fZ')"/></pubDate>
+            <pubDate><xsl:value-of select="mnvXpath:pubDate(string(atm:published), '%Y-%m-%dT%H:%M:%SZ')"/></pubDate>
             <description><xsl:value-of select="normalize-space(atm:content)"/></description>
             <xsl:if test=".//media:content[@yt:format='5']">
                 <link><xsl:value-of select="concat(string(.//media:content[@yt:format='5']/@url), '&amp;autoplay=1')"/></link>

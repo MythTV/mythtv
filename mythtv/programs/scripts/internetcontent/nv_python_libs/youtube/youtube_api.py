@@ -449,7 +449,7 @@ class Videos(object):
                     item[key] = u''
                 elif key == 'published_parsed': # 2010-01-23T08:38:39.000Z
                     if item[key]:
-                        pub_time = time.strptime(item[key].strip(), "%Y-%m-%dT%H:%M:%S.%fZ")
+                        pub_time = time.strptime(item[key].strip(), "%Y-%m-%dT%H:%M:%SZ")
                         item[key] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
                 elif key == 'media_description' or key == 'title':
                     # Strip the HTML tags
