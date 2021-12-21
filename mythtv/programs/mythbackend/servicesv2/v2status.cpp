@@ -325,7 +325,7 @@ void V2Status::FillDriveSpace(V2MachineInfo* pMachineInfo)
             fsID = "total";
 
         V2StorageGroup* group = pMachineInfo->AddNewStorageGroup();
-        group->setId (fsID);
+        group->setId(QString(fsID));
         group->setTotal((int)(iTotal>>10));
         group->setUsed((int)(iUsed>>10));
         group->setFree((int)(iAvail>>10));
