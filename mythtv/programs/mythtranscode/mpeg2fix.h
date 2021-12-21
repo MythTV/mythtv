@@ -47,8 +47,8 @@ class MPEG2frame
   public:
     explicit MPEG2frame(int size);
     ~MPEG2frame();
-    void ensure_size(int size);
-    void set_pkt(AVPacket *newpkt);
+    void ensure_size(int size) const;
+    void set_pkt(AVPacket *newpkt) const;
 
     AVPacket         *m_pkt        {nullptr};
     bool              m_isSequence {false};

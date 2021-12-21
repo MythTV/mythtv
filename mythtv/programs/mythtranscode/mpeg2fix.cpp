@@ -108,7 +108,7 @@ MPEG2frame::~MPEG2frame()
     av_packet_free(&m_pkt);
 }
 
-void MPEG2frame::ensure_size(int size)
+void MPEG2frame::ensure_size(int size) const
 {
     if (m_pkt->size < size)
     {
@@ -124,7 +124,7 @@ void MPEG2frame::ensure_size(int size)
     }
 }
 
-void MPEG2frame::set_pkt(AVPacket *newpkt)
+void MPEG2frame::set_pkt(AVPacket *newpkt) const
 {
     // TODO: Don't free + copy, attempt to re-use existing buffer
     av_packet_unref(m_pkt);
@@ -2214,12 +2214,14 @@ int MPEG2fixup::Start()
                     int pos = m_vFrame.count();
                     int count = Lreorder.count();
                     while (m_vFrame.count() - frame_pos - count < 20 && !m_fileEnd)
+                    {
                         if ((ret = GetFrame(pkt)) < 0)
                         {
                             av_packet_free(&pkt);
                             av_packet_free(&lastRealvPkt);
                             return ret;
                         }
+                    }
 
                     if (!m_fileEnd)
                     {
