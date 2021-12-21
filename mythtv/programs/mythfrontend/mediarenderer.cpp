@@ -20,6 +20,8 @@
 #include "compat.h"
 #include "mythdate.h"
 #include "htmlserver.h"
+#include "mythcorecontext.h"
+#include "configuration.h"
 
 #include "serviceHosts/frontendServiceHost.h"
 #include "services/frontend.h"
@@ -44,13 +46,13 @@ MediaRenderer::MediaRenderer()
     // Initialize Configuration class (XML file for frontend)
     // ----------------------------------------------------------------------
 
-    SetConfiguration( new XmlConfiguration( "config.xml" ));
+    gCoreContext->SetConfiguration( new XmlConfiguration( "config.xml" ));
 
     // ----------------------------------------------------------------------
     // Create mini HTTP Server
     // ----------------------------------------------------------------------
 
-    int nPort = g_pConfig->GetValue( "UPnP/MythFrontend/ServicePort", 6547 );
+    int nPort = gCoreContext->GetConfiguration()->GetValue( "UPnP/MythFrontend/ServicePort", 6547 );
 
     auto *pHttpServer = new HttpServer();
 

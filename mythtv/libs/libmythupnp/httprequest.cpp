@@ -46,6 +46,7 @@
 #include "mythcorecontext.h"
 #include "mythtimer.h"
 #include "mythcoreutil.h"
+#include "configuration.h"
 
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"
@@ -1860,7 +1861,7 @@ QString HTTPRequest::GetETagHash(const QByteArray &data)
 
 bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
 {
-    QString sProtected = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
+    QString sProtected = gCoreContext->GetConfiguration()->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
 
     QStringList oList = sProtected.split( ';' );
 

@@ -15,10 +15,9 @@
 
 #include <QDomDocument>
 #include <QStringList>
+#include "mythbaseexp.h"
 
-#include "upnpexp.h"
-
-class UPNP_PUBLIC Configuration 
+class MBASE_PUBLIC Configuration
 {
     public:
 
@@ -57,7 +56,7 @@ class UPNP_PUBLIC Configuration
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC XmlConfiguration : public Configuration
+class MBASE_PUBLIC XmlConfiguration : public Configuration
 {
     protected:
 
@@ -95,7 +94,7 @@ class UPNP_PUBLIC XmlConfiguration : public Configuration
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC DBConfiguration : public Configuration
+class MBASE_PUBLIC DBConfiguration : public Configuration
 {
     public:
 

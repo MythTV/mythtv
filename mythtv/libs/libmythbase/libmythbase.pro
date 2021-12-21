@@ -37,6 +37,7 @@ HEADERS += ../../external/qjsonwrapper/qjsonwrapper/Json.h
 HEADERS += cleanupguard.h portchecker.h
 HEADERS += mythsorthelper.h mythdbcheck.h
 HEADERS += mythpower.h
+HEADERS += configuration.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
@@ -60,6 +61,7 @@ SOURCES += ../../external/qjsonwrapper/qjsonwrapper/Json.cpp
 SOURCES += cleanupguard.cpp portchecker.cpp
 SOURCES += mythsorthelper.cpp dbcheckcommon.cpp
 SOURCES += mythpower.cpp
+SOURCES += configuration.cpp
 
 HEADERS += http/mythhttpcommon.h
 HEADERS += http/mythhttptypes.h

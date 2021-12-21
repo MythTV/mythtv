@@ -25,18 +25,12 @@
 UPnpDeviceDesc      UPnp::g_UPnpDeviceDesc;
 QList<QHostAddress> UPnp::g_IPAddrList;
 
-Configuration   *UPnp::g_pConfig        = nullptr;
-
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //
 // UPnp Class implementaion
 //
 //////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
-//
 //////////////////////////////////////////////////////////////////////////////
 
 UPnp::UPnp()
@@ -71,26 +65,6 @@ UPnp::~UPnp()
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void UPnp::SetConfiguration( Configuration *pConfig )
-{
-    delete g_pConfig;
-    g_pConfig = pConfig;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////////////
-
-Configuration *UPnp::GetConfiguration()
-{
-    // If someone is asking for a config and it's nullptr, create a 
-    // new XmlConfiguration since we don't have database info yet.
-    
-    if (g_pConfig == nullptr)
-        g_pConfig = new XmlConfiguration( "config.xml" );
-
-    return g_pConfig;
-}
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -120,13 +94,6 @@ bool UPnp::Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort, HttpS
     {
         LOG(VB_GENERAL, LOG_ERR,
             "UPnp::Initialize - Already initialized, programmer error.");
-        return false;
-    }
-
-    if (g_pConfig == nullptr)
-    {
-        LOG(VB_GENERAL, LOG_ERR,
-            "UPnp::Initialize - Must call SetConfiguration.");
         return false;
     }
 
@@ -194,13 +161,6 @@ void UPnp::CleanUp()
     LOG(VB_UPNP, LOG_INFO, "UPnp::CleanUp() - disabling SSDP notifications");
 
     SSDP::Instance()->DisableNotifications();
-
-    if (g_pConfig)
-    {
-        delete g_pConfig;
-        g_pConfig = nullptr;
-    }
-
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -25,6 +25,8 @@
 
 #include "mmulticastsocketdevice.h"
 #include "mbroadcastsocketdevice.h"
+#include "mythcorecontext.h"
+#include "configuration.h"
 
 #include <QStringList>
 
@@ -75,7 +77,7 @@ SSDP::SSDP() :
 {
     LOG(VB_UPNP, LOG_NOTICE, "Starting up SSDP Thread..." );
 
-    Configuration *pConfig = UPnp::GetConfiguration();
+    Configuration *pConfig = gCoreContext->GetConfiguration();
 
     m_nPort       = pConfig->GetValue("UPnP/SSDP/Port"      , SSDP_PORT      );
     m_nSearchPort = pConfig->GetValue("UPnP/SSDP/SearchPort", SSDP_SEARCHPORT);
@@ -691,7 +693,7 @@ SSDPExtension::SSDPExtension( int nServicePort , const QString &sSharePath)
     m_nServicePort(nServicePort)
 {
     m_nSupportedMethods |= (RequestTypeMSearch | RequestTypeNotify);
-    m_sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
+    m_sUPnpDescPath = gCoreContext->GetConfiguration()->GetValue( "UPnP/DescXmlPath",
                                                  m_sSharePath );
 }
 

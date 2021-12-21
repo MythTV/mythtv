@@ -44,7 +44,7 @@ MMulticastSocketDevice::MMulticastSocketDevice(
     m_address(sAddress), m_port(nPort)
 {
 #if 0
-    ttl = UPnp::GetConfiguration()->GetValue( "UPnP/TTL", 4 );
+    ttl = gCoreContext->GetConfiguration()->GetValue( "UPnP/TTL", 4 );
 #endif
 
     if (ttl == 0)

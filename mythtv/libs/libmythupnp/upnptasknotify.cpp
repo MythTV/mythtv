@@ -27,6 +27,8 @@
 #include "mythversion.h"
 #include "mythmiscutil.h"
 #include "upnp.h"
+#include "mythcorecontext.h"
+#include "configuration.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -45,7 +47,7 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
 {
     m_nServicePort = nServicePort;
 
-    m_nMaxAge      = UPnp::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
+    m_nMaxAge      = gCoreContext->GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
 } 
 
 /////////////////////////////////////////////////////////////////////////////
