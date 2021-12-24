@@ -36,13 +36,10 @@ extern "C" {
 
 #include <QtGlobal>
 
-#include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythaverror.h"
 
 #define LOC QString("AudioConvert: ")
-
-#define ISALIGN(x) (((unsigned long)(x) & 0xf) == 0)
 
 #ifdef Q_PROCESSOR_X86
 // Check cpuid for SSE2 support on x86 / x86_64
@@ -76,13 +73,6 @@ static inline bool sse2_check()
     return (bool)has_sse2;
 }
 #endif //Q_PROCESSOR_X86
-
-#if !HAVE_LRINTF
-static av_always_inline av_const long int lrintf(float x)
-{
-    return (int)(rint(x));
-}
-#endif /* HAVE_LRINTF */
 
 static inline float clipcheck(float f)
 {
