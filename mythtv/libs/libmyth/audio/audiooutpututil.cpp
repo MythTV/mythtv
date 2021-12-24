@@ -4,9 +4,9 @@
 #include <cmath>
 #include <sys/types.h>
 
+#include <QtGlobal>
 #include <QtEndian>
 
-#include "mythconfig.h"
 #include "mythlogging.h"
 #include "audioconvert.h"
 #include "mythaverror.h"
@@ -20,7 +20,7 @@ extern "C" {
 
 #define ISALIGN(x) (((unsigned long)(x) & 0xf) == 0)
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
 static int has_sse2 = -1;
 
 // Check cpuid for SSE2 support on x86 / x86_64
@@ -30,7 +30,7 @@ static inline bool sse_check()
         return (bool)has_sse2;
     __asm__(
         // -fPIC - we may not clobber ebx/rbx
-#if ARCH_X86_64
+#ifdef Q_PROCESSOR_X86_64
         "push       %%rbx               \n\t"
 #else
         "push       %%ebx               \n\t"
@@ -39,7 +39,7 @@ static inline bool sse_check()
         "cpuid                          \n\t"
         "and        $0x4000000, %%edx   \n\t"
         "shr        $26, %%edx          \n\t"
-#if ARCH_X86_64
+#ifdef Q_PROCESSOR_X86_64
         "pop        %%rbx               \n\t"
 #else
         "pop        %%ebx               \n\t"
@@ -49,7 +49,7 @@ static inline bool sse_check()
     );
     return (bool)has_sse2;
 }
-#endif //ARCH_x86
+#endif //Q_PROCESSOR_X86
 
 /**
  * Returns true if platform has an FPU.
@@ -57,7 +57,7 @@ static inline bool sse_check()
  */
 bool AudioOutputUtil::has_hardware_fpu()
 {
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
     return sse_check();
 #else
     return false;
@@ -122,7 +122,7 @@ void AudioOutputUtil::AdjustVolume(void *buf, int len, int volume,
     if (g == 1.0F)
         return;
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
     if (sse_check() && samples >= 16)
     {
         int loops = samples >> 4;
@@ -153,7 +153,7 @@ void AudioOutputUtil::AdjustVolume(void *buf, int len, int volume,
             :"xmm0","xmm1","xmm2","xmm3","xmm4"
         );
     }
-#endif //ARCH_X86
+#endif //Q_PROCESSOR_X86
     for (; i < samples; i++)
         *fptr++ *= g;
 }
