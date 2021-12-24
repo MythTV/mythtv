@@ -7089,7 +7089,6 @@ enabled asm || { arch=c; disable $ARCH_LIST $ARCH_EXT_LIST; }
 check_deps $CONFIG_LIST       \
            $CONFIG_EXTRA      \
            $HAVE_LIST         \
-           $ALL_COMPONENTS    \
            $MYTHTV_LIST       \
            $MYTHTV_CONFIG_LIST \
            $MYTHTV_HAVE_LIST  \
@@ -7873,7 +7872,6 @@ print_config HAVE_   "$config_files" $HAVE_LIST
 print_config HAVE_   "$config_files" $MYTHTV_HAVE_LIST
 print_config CONFIG_ "$config_files" $CONFIG_LIST       \
                                      $CONFIG_EXTRA      \
-                                     $ALL_COMPONENTS    \
                                      $MYTHTV_LIST       \
                                      $MYTHTV_CONFIG_LIST \
 
