@@ -290,7 +290,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
         kBookmarkNever,
         kBookmarkAuto // set iff db_playback_exit_prompt==2
     };
-    void PrepareToExitPlayer(int Line, BookmarkAction Bookmark = kBookmarkAuto);
+    void PrepareToExitPlayer(int Line);
     void SetExitPlayer(bool SetIt, bool WantsTo);
 
     bool RequestNextRecorder(bool ShowDialogs, const ChannelInfoList &Selection = ChannelInfoList());
@@ -512,7 +512,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool              m_dbJumpPreferOsd {true};
     bool              m_dbUseGuiSizeForTv {false};
     bool              m_dbUseVideoModes {false};
-    bool              m_dbClearSavedPosition {false};
     bool              m_dbRunJobsOnRemote {false};
     bool              m_dbContinueEmbedded {false};
     bool              m_dbBrowseAlways {false};
@@ -543,6 +542,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     bool              m_allowRerecord {false};  ///< User wants to rerecord the last video if deleted
     bool              m_doSmartForward {false};
     bool              m_queuedTranscode {false};
+    bool              m_savePosOnExit {false};  ///< False until first timer event
     /// Picture attribute type to modify.
     PictureAdjustType m_adjustingPicture {kAdjustingPicture_None};
     /// Picture attribute to modify (on arrow left or right)

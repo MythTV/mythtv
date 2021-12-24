@@ -480,6 +480,7 @@ class MPUBLIC ProgramInfo
     bool IsCommercialFlagged(void) const { return (m_programFlags & FL_COMMFLAG) != 0U;}
     bool HasCutlist(void)       const { return (m_programFlags & FL_CUTLIST) != 0U;     }
     bool IsBookmarkSet(void)    const { return (m_programFlags & FL_BOOKMARK) != 0U;    }
+    bool IsLastPlaySet(void)    const { return (m_programFlags & FL_LASTPLAYPOS) != 0U; }
     bool IsWatched(void)        const { return (m_programFlags & FL_WATCHED) != 0U;     }
     bool IsAutoExpirable(void)  const { return (m_programFlags & FL_AUTOEXP) != 0U;     }
     bool IsPreserved(void)      const { return (m_programFlags & FL_PRESERVED) != 0U;   }
@@ -591,6 +592,7 @@ class MPUBLIC ProgramInfo
     uint64_t    QueryBookmark(void) const;
     uint64_t    QueryProgStart(void) const;
     uint64_t    QueryLastPlayPos(void) const;
+    uint64_t    QueryStartMark(void) const;
     CategoryType QueryCategoryType(void) const;
     QStringList QueryDVDBookmark(const QString &serialid) const;
     QStringList QueryBDBookmark(const QString &serialid) const;
@@ -617,6 +619,7 @@ class MPUBLIC ProgramInfo
 
     // Slow DB sets
     virtual void SaveFilesize(uint64_t fsize); /// TODO Move to RecordingInfo
+    void SaveLastPlayPos(uint64_t frame);
     void SaveBookmark(uint64_t frame);
     static void SaveDVDBookmark(const QStringList &fields) ;
     static void SaveBDBookmark(const QStringList &fields) ;
@@ -723,6 +726,8 @@ class MPUBLIC ProgramInfo
     static QStringList LoadFromScheduler(const QString &tmptable, int recordid);
 
     // Flagging map support methods
+    void UpdateMarkTimeStamp(bool bookmarked) const;
+    void UpdateLastPlayTimeStamp(bool lastplay) const;
     void QueryMarkupMap(frm_dir_map_t&marks, MarkTypes type,
                         bool merge = false) const;
     void SaveMarkupMap(const frm_dir_map_t &marks, MarkTypes type = MARK_ALL,

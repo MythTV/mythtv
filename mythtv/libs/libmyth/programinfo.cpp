@@ -70,7 +70,7 @@ const QString ProgramInfo::kFromRecordedQuery =
     "       p.syndicatedepisodenumber, p.partnumber, p.parttotal,  "//48-50
     "       p.season,           p.episode,      p.totalepisodes,   "//51-53
     "       p.category_type,    r.recordedid,   r.inputname,       "//54-56
-    "       r.bookmarkupdate                                       "//57-57
+    "       r.bookmarkupdate,   r.lastplay                         "//57-58
     "FROM recorded AS r "
     "LEFT JOIN channel AS c "
     "ON (r.chanid    = c.chanid) "
@@ -2138,6 +2138,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     set_flag(m_programFlags, FL_REALLYEDITING, query.value(39).toBool());
     set_flag(m_programFlags, FL_BOOKMARK,      query.value(40).toBool());
     set_flag(m_programFlags, FL_WATCHED,       query.value(41).toBool());
+    set_flag(m_programFlags, FL_LASTPLAYPOS,   query.value(58).toBool());
     set_flag(m_programFlags, FL_EDITING,
              ((m_programFlags & FL_REALLYEDITING) != 0U) ||
              ((m_programFlags & FL_COMMPROCESSING) != 0U));
@@ -2684,6 +2685,12 @@ void ProgramInfo::SaveBookmark(uint64_t frame)
 
     set_flag(m_programFlags, FL_BOOKMARK, is_valid);
 
+    UpdateMarkTimeStamp(is_valid);
+    SendUpdateEvent();
+}
+
+void ProgramInfo::UpdateMarkTimeStamp(bool bookmarked) const
+{
     if (IsRecording())
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -2691,17 +2698,54 @@ void ProgramInfo::SaveBookmark(uint64_t frame)
             "UPDATE recorded "
             "SET bookmarkupdate = CURRENT_TIMESTAMP, "
             "    bookmark       = :BOOKMARKFLAG "
-            "WHERE chanid    = :CHANID AND "
-            "      starttime = :STARTTIME");
+            "WHERE recordedid = :RECORDEDID");
 
-        query.bindValue(":BOOKMARKFLAG", is_valid);
-        query.bindValue(":CHANID",       m_chanId);
-        query.bindValue(":STARTTIME",    m_recStartTs);
+        query.bindValue(":BOOKMARKFLAG", bookmarked);
+        query.bindValue(":RECORDEDID",   m_recordedId);
 
         if (!query.exec())
             MythDB::DBError("bookmark flag update", query);
+    }
+}
 
-        SendUpdateEvent();
+void ProgramInfo::SaveLastPlayPos(uint64_t frame)
+{
+    ClearMarkupMap(MARK_UTIL_LASTPLAYPOS);
+
+    bool isValid = frame > 0;
+    if (isValid)
+    {
+        frm_dir_map_t lastPlayPosMap;
+        lastPlayPosMap[frame] = MARK_UTIL_LASTPLAYPOS;
+        SaveMarkupMap(lastPlayPosMap, MARK_UTIL_LASTPLAYPOS);
+    }
+
+    set_flag(m_programFlags, FL_LASTPLAYPOS, isValid);
+
+    UpdateLastPlayTimeStamp(isValid);
+    SendUpdateEvent();
+}
+
+// This function overloads the 'bookmarkupdate' field to force the UI
+// to update when the last play timestamp is updated. The alternative
+// is adding another field to the database and to the programinfo
+// serialization.
+void ProgramInfo::UpdateLastPlayTimeStamp(bool hasLastPlay) const
+{
+    if (IsRecording())
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "UPDATE recorded "
+            "SET bookmarkupdate = CURRENT_TIMESTAMP, "
+            "    lastplay       = :LASTPLAYFLAG "
+            "WHERE recordedid = :RECORDEDID");
+
+        query.bindValue(":LASTPLAYFLAG", hasLastPlay);
+        query.bindValue(":RECORDEDID",   m_recordedId);
+
+        if (!query.exec())
+            MythDB::DBError("lastplay flag update", query);
     }
 }
 
@@ -2771,6 +2815,23 @@ uint64_t ProgramInfo::QueryBookmark(uint chanid, const QDateTime &recstartts)
     return (bookmarkmap.isEmpty()) ? 0 : bookmarkmap.begin().key();
 }
 
+/** \brief Gets any lastplaypos position in database,
+ *         unless the ignore lastplaypos flag is set.
+ *
+ *  \return LastPlayPos position in frames if the query is executed
+ *          and succeeds, zero otherwise.
+ */
+uint64_t ProgramInfo::QueryLastPlayPos() const
+{
+    if (m_programFlags & FL_IGNORELASTPLAYPOS)
+        return 0;
+
+    frm_dir_map_t bookmarkmap;
+    QueryMarkupMap(bookmarkmap, MARK_UTIL_LASTPLAYPOS);
+
+    return (bookmarkmap.isEmpty()) ? 0 : bookmarkmap.begin().key();
+}
+
 /** \brief Gets any progstart position in database,
  *         unless the ignore progstart flag is set.
  *
@@ -2788,21 +2849,31 @@ uint64_t ProgramInfo::QueryProgStart(void) const
     return (bookmarkmap.isEmpty()) ? 0 : bookmarkmap.begin().key();
 }
 
-/** \brief Gets any lastplaypos position in database,
- *         unless the ignore lastplaypos flag is set.
- *
- *  \return LastPlayPos position in frames if the query is executed
- *          and succeeds, zero otherwise.
- */
-uint64_t ProgramInfo::QueryLastPlayPos(void) const
+uint64_t ProgramInfo::QueryStartMark(void) const
 {
-    if (m_programFlags & FL_IGNORELASTPLAYPOS)
-        return 0;
-
-    frm_dir_map_t bookmarkmap;
-    QueryMarkupMap(bookmarkmap, MARK_UTIL_LASTPLAYPOS);
-
-    return (bookmarkmap.isEmpty()) ? 0 : bookmarkmap.begin().key();
+    uint64_t start = 0;
+    if ((start = QueryLastPlayPos()) > 0)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Using last position @ %1").arg(start));
+    }
+    else if ((start = QueryBookmark()) > 0)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Using bookmark @ %1").arg(start));
+    }
+    else if (HasCutlist())
+    {
+        // Disable progstart if the program has a cutlist.
+        LOG(VB_PLAYBACK, LOG_INFO, "Ignoring progstart as cutlist exists");
+    }
+    else if ((start = QueryProgStart()) > 0)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, QString("Using progstart @ %1").arg(start));
+    }
+    else
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, "Using file start");
+    }
+    return start;
 }
 
 /** \brief Queries "dvdbookmark" table for bookmarking DVD serial
@@ -6071,6 +6142,7 @@ bool LoadFromRecorded(
         set_flag(flags, FL_REALLYEDITING, query.value(39).toBool());
         set_flag(flags, FL_BOOKMARK,      query.value(40).toBool());
         set_flag(flags, FL_WATCHED,       query.value(41).toBool());
+        set_flag(flags, FL_LASTPLAYPOS,   query.value(58).toBool());
 
         if (inUseMap.contains(key))
             flags |= inUseMap[key];

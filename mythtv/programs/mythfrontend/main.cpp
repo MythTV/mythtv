@@ -212,22 +212,30 @@ namespace
         ParentalLevelChangeChecker m_plcc;
     };
 
+    /// This dialog is used when playing something from the "Watch
+    /// Videos" page. Playing from the "Watch Recordings" page uses
+    /// the code in PlaybackBox::createPlayFromMenu.
     class BookmarkDialog : MythScreenType
     {
         Q_DECLARE_TR_FUNCTIONS(BookmarkDialog)
 
       public:
-        BookmarkDialog(ProgramInfo *pginfo, MythScreenStack *parent) :
+        BookmarkDialog(ProgramInfo *pginfo, MythScreenStack *parent,
+                       bool bookmarkPresent, bool lastPlayPresent) :
                 MythScreenType(parent, "bookmarkdialog"),
-                m_pgi(pginfo)
-        {
+                m_pgi(pginfo),
+                m_bookmarked(bookmarkPresent),
+                m_lastPlayed(lastPlayPresent),
+                m_btnPlayBookmark(tr("Play from bookmark")),
+                m_btnClearBookmark(tr("Clear bookmark")),
+                m_btnPlayBegin(tr("Play from beginning")),
+                m_btnPlayLast(tr("Play from last played position")),
+                m_btnClearLast(tr("Clear last played position"))       {
         }
 
         bool Create() override // MythScreenType
         {
             QString msg = tr("DVD/Video contains a bookmark");
-            QString btn0msg = tr("Play from bookmark");
-            QString btn1msg = tr("Play from beginning");
 
             auto *popup = new MythDialogBox(msg, GetScreenStack(), "bookmarkdialog");
             if (!popup->Create())
@@ -239,40 +247,51 @@ namespace
             GetScreenStack()->AddScreen(popup);
 
             popup->SetReturnEvent(this, "bookmarkdialog");
-            popup->AddButton(btn0msg);
-            popup->AddButton(btn1msg);
+            if (m_lastPlayed)
+                popup->AddButton(m_btnPlayLast);
+            if (m_bookmarked)
+                popup->AddButton(m_btnPlayBookmark);
+            popup->AddButton(m_btnPlayBegin);
+            if (m_lastPlayed)
+                popup->AddButton(m_btnClearLast);
+            if (m_bookmarked)
+                popup->AddButton(m_btnClearBookmark);
             return true;
         }
 
         void customEvent(QEvent *event) override // MythUIType
         {
-            if (event->type() == DialogCompletionEvent::kEventType)
-            {
-                auto *dce = (DialogCompletionEvent*)(event);
-                int buttonnum = dce->GetResult();
+            if (event->type() != DialogCompletionEvent::kEventType)
+                return;
 
-                if (dce->GetId() == "bookmarkdialog")
-                {
-                    uint flags = kStartTVNoFlags;
-                    if (buttonnum == 1)
-                    {
-                        flags |= kStartTVIgnoreBookmark;
-                    }
-                    else if (buttonnum != 0)
-                    {
-                        delete m_pgi;
-                        return;
-                    }
+            auto *dce = (DialogCompletionEvent*)(event);
+            QString buttonText = dce->GetResultText();
 
-                    TV::StartTV(m_pgi, flags);
+            if (dce->GetId() != "bookmarkdialog")
+                return;
 
-                    delete m_pgi;
-                }
-            }
+            if (buttonText == m_btnPlayLast)
+                TV::StartTV(m_pgi, kStartTVNoFlags);
+            else if (buttonText == m_btnPlayBookmark)
+                TV::StartTV(m_pgi, kStartTVIgnoreLastPlayPos );
+            else if (buttonText == m_btnPlayBegin)
+                TV::StartTV(m_pgi, kStartTVIgnoreLastPlayPos | kStartTVIgnoreBookmark);
+            else if (buttonText == m_btnClearBookmark)
+                m_pgi->SaveBookmark(0);
+            else if (buttonText == m_btnClearLast)
+                m_pgi->SaveLastPlayPos(0);
+            delete m_pgi;
         }
 
       private:
-        ProgramInfo* m_pgi {nullptr};
+        ProgramInfo* m_pgi              {nullptr};
+        bool         m_bookmarked       {false};
+        bool         m_lastPlayed       {false};
+        QString      m_btnPlayBookmark;
+        QString      m_btnClearBookmark;
+        QString      m_btnPlayBegin;
+        QString      m_btnPlayLast;
+        QString      m_btnClearLast;
     };
 
     void cleanup()
@@ -1297,6 +1316,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     pginfo->SetProgramInfoType(pginfo->DiscoverProgramInfoType());
 
     bool bookmarkPresent = false;
+    bool lastPlayPresent = false;
 
     if (pginfo->IsVideoDVD())
     {
@@ -1346,13 +1366,20 @@ static int internal_play_media(const QString &mrl, const QString &plot,
             return res;
         }
     }
-    else if (pginfo->IsVideo())
-        bookmarkPresent = (pginfo->QueryBookmark() > 0);
+    else if (useBookmark && pginfo->IsVideo())
+    {
+        pginfo->SetIgnoreLastPlayPos(false);
+        pginfo->SetIgnoreBookmark(false);
+        bookmarkPresent = pginfo->QueryBookmark() > 0;
+        lastPlayPresent = pginfo->QueryLastPlayPos() > 0;
+    }
 
     if (useBookmark && bookmarkPresent)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        auto *bookmarkdialog = new BookmarkDialog(pginfo, mainStack);
+        auto *bookmarkdialog = new BookmarkDialog(pginfo, mainStack,
+                                                  bookmarkPresent,
+                                                  lastPlayPresent);
         if (!bookmarkdialog->Create())
         {
             delete bookmarkdialog;

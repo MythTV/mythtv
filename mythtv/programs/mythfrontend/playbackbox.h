@@ -147,8 +147,8 @@ class PlaybackBox : public ScheduleCommon
     void ItemLoaded(MythUIButtonListItem *item);
     void selected(MythUIButtonListItem *item);
     void updateRecGroup(MythUIButtonListItem *sel_item);
-    void PlayFromBookmarkOrProgStart(MythUIButtonListItem *item);
-    void PlayFromBookmarkOrProgStart() { PlayFromBookmarkOrProgStart(nullptr); }
+    void PlayFromAnyMark(MythUIButtonListItem *item);
+    void PlayFromAnyMark() { PlayFromAnyMark(nullptr); }
     void PlayFromBookmark(MythUIButtonListItem *item);
     void PlayFromBookmark() { PlayFromBookmark(nullptr); }
     void PlayFromBeginning(MythUIButtonListItem *item);
@@ -157,6 +157,7 @@ class PlaybackBox : public ScheduleCommon
     void PlayFromLastPlayPos() { PlayFromLastPlayPos(nullptr); }
     void deleteSelected(MythUIButtonListItem *item);
     void ClearBookmark();
+    void ClearLastPlayPos();
     void SwitchList(void);
 
     void ShowGroupPopup(void);

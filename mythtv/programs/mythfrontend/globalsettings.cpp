@@ -1739,23 +1739,6 @@ static HostCheckBoxSetting *BrowseAllTuners()
     return gc;
 }
 
-static HostCheckBoxSetting *ClearSavedPosition()
-{
-    auto *gc = new HostCheckBoxSetting("ClearSavedPosition");
-
-    gc->setLabel(PlaybackSettings::tr("Clear bookmark on playback"));
-
-    gc->setValue(true);
-
-    gc->setHelpText(PlaybackSettings::tr("If enabled, automatically clear the "
-                                         "bookmark on a recording when the "
-                                         "recording is played back. If "
-                                         "disabled, you can mark the "
-                                         "beginning with rewind then save "
-                                         "position."));
-    return gc;
-}
-
 static HostCheckBoxSetting *UseProgStartMark()
 {
     auto *gc = new HostCheckBoxSetting("UseProgStartMark");
@@ -1780,7 +1763,6 @@ static HostComboBoxSetting *PlaybackExitPrompt()
     gc->setLabel(PlaybackSettings::tr("Action on playback exit"));
 
     gc->addSelection(PlaybackSettings::tr("Just exit"), "0");
-    gc->addSelection(PlaybackSettings::tr("Save position and exit"), "2");
     gc->addSelection(PlaybackSettings::tr("Always prompt (excluding Live TV)"),
                      "1");
     gc->addSelection(PlaybackSettings::tr("Always prompt (including Live TV)"),
@@ -1790,9 +1772,8 @@ static HostComboBoxSetting *PlaybackExitPrompt()
     gc->setHelpText(PlaybackSettings::tr("If set to prompt, a menu will be "
                                          "displayed when you exit playback "
                                          "mode. The options available will "
-                                         "allow you to save your position, "
-                                         "delete the recording, or continue "
-                                         "watching."));
+                                         "allow you delete the recording, "
+                                         "continue watching, or exit."));
     return gc;
 }
 
@@ -4361,7 +4342,6 @@ void PlaybackSettings::Load(void)
     auto *general = new GroupSetting();
     general->setLabel(tr("General Playback"));
     general->addChild(JumpToProgramOSD());
-    general->addChild(ClearSavedPosition());
     general->addChild(UseProgStartMark());
     general->addChild(AutomaticSetWatched());
     general->addChild(ContinueEmbeddedTVPlay());

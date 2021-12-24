@@ -20,6 +20,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     // General
     void InitialisePlayerState();
     void UpdateBookmark(bool Clear = false);
+    void UpdateLastPlayPosition(uint64_t frame);
 
     // Overlays
     void IsOSDVisible(bool& Visible);

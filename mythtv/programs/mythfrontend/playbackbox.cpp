@@ -531,7 +531,7 @@ bool PlaybackBox::Create()
     connect(m_recordingList, &MythUIButtonList::itemSelected,
             this, &PlaybackBox::ItemSelected);
     connect(m_recordingList, &MythUIButtonList::itemClicked,
-            this, qOverload<>(&PlaybackBox::PlayFromBookmarkOrProgStart));
+            this, qOverload<>(&PlaybackBox::PlayFromAnyMark));
     connect(m_recordingList, &MythUIButtonList::itemVisible,
             this, &PlaybackBox::ItemVisible);
     connect(m_recordingList, &MythUIButtonList::itemLoaded,
@@ -2271,7 +2271,7 @@ void PlaybackBox::playSelectedPlaylist(bool Random)
         this, new MythEvent("PLAY_PLAYLIST"));
 }
 
-void PlaybackBox::PlayFromBookmarkOrProgStart(MythUIButtonListItem *item)
+void PlaybackBox::PlayFromAnyMark(MythUIButtonListItem *item)
 {
     if (!item)
         item = m_recordingList->GetItemCurrent();
@@ -2283,7 +2283,7 @@ void PlaybackBox::PlayFromBookmarkOrProgStart(MythUIButtonListItem *item)
 
     const bool ignoreBookmark = false;
     const bool ignoreProgStart = false;
-    const bool ignoreLastPlayPos = true;
+    const bool ignoreLastPlayPos = false;
     const bool underNetworkControl = false;
     if (pginfo)
         PlayX(*pginfo, ignoreBookmark, ignoreProgStart, ignoreLastPlayPos,
@@ -2376,6 +2376,13 @@ void PlaybackBox::ClearBookmark()
         pginfo->SaveBookmark(0);
 }
 
+void PlaybackBox::ClearLastPlayPos()
+{
+    ProgramInfo *pginfo = GetCurrentProgram();
+    if (pginfo)
+        pginfo->SaveLastPlayPos(0);
+}
+
 void PlaybackBox::StopSelected(void)
 {
     ProgramInfo *pginfo = GetCurrentProgram();
@@ -2454,7 +2461,7 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    PlayFromBookmarkOrProgStart(item);
+    PlayFromAnyMark(item);
 }
 
 void PlaybackBox::popupClosed(const QString& which, int result)
@@ -2591,14 +2598,6 @@ bool PlaybackBox::Play(
     {
         QCoreApplication::postEvent(
             this, new MythEvent("PLAY_PLAYLIST"));
-    }
-    else
-    {
-        // User may have saved or deleted a bookmark
-        // requiring update of bookmark icon..
-        ProgramInfo *pginfo = m_programInfoCache.GetRecordingInfo(tvrec.GetRecordingID());
-        if (pginfo)
-            UpdateUIListItem(pginfo, true);
     }
 
     if (m_needUpdate)
@@ -3059,19 +3058,20 @@ MythMenu* PlaybackBox::createPlayFromMenu()
     QString title = tr("Play Options") + CreateProgramInfoString(*pginfo);
 
     auto *menu = new MythMenu(title, this, "slotmenu");
-
-    if (pginfo->IsBookmarkSet())
-        menu->AddItem(tr("Play from bookmark"),
-                      qOverload<>(&PlaybackBox::PlayFromBookmark));
-
-    if (pginfo->QueryLastPlayPos())
+    bool hasLastPlay = pginfo->IsLastPlaySet();
+    bool hasBookMark = pginfo->IsBookmarkSet();
+    if (hasLastPlay)
         menu->AddItem(tr("Play from last played position"),
                       qOverload<>(&PlaybackBox::PlayFromLastPlayPos));
-
+    if (hasBookMark)
+        menu->AddItem(tr("Play from bookmark"),
+                      qOverload<>(&PlaybackBox::PlayFromBookmark));
     menu->AddItem(tr("Play from beginning"),
                   qOverload<>(&PlaybackBox::PlayFromBeginning));
-
-    if (pginfo->IsBookmarkSet())
+    if (hasLastPlay)
+        menu->AddItem(tr("Clear last played position"),
+                      &PlaybackBox::ClearLastPlayPos);
+    if (hasBookMark)
         menu->AddItem(tr("Clear bookmark"), &PlaybackBox::ClearBookmark);
 
     return menu;
@@ -3317,11 +3317,11 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 
     if (!sameProgram)
     {
-        if (pginfo.IsBookmarkSet() || pginfo.QueryLastPlayPos())
+        if (pginfo.IsBookmarkSet() || pginfo.IsLastPlaySet())
             m_popupMenu->AddItem(tr("Play from..."), nullptr, createPlayFromMenu());
         else
             m_popupMenu->AddItem(tr("Play"),
-                                 qOverload<>(&PlaybackBox::PlayFromBookmarkOrProgStart));
+                                 qOverload<>(&PlaybackBox::PlayFromAnyMark));
     }
 
     if (!m_player)
@@ -4029,7 +4029,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             if (action == "DELETE")
                 deleteSelected(m_recordingList->GetItemCurrent());
             else if (action == ACTION_PLAYBACK)
-                PlayFromBookmarkOrProgStart();
+                PlayFromAnyMark();
             else if (action == "DETAILS" || action == "INFO")
                 ShowDetails();
             else if (action == "CUSTOMEDIT")

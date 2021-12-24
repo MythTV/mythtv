@@ -3870,6 +3870,17 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1372")
+    {
+        DBUpdates updates {
+            "ALTER TABLE recorded ADD COLUMN lastplay "
+            "    TINYINT UNSIGNED DEFAULT 0 AFTER bookmark;",
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1373", dbver))
+            return false;
+    }
+
     return true;
 }
 
