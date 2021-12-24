@@ -1,7 +1,6 @@
 #include "audiooutpututil.h"
 
 #include <cstdint>
-#include <cmath>
 
 #include <QtGlobal>
 #include <QtEndian>
@@ -16,8 +15,6 @@ extern "C" {
 #include "pink.h"
 
 #define LOC QString("AOUtil: ")
-
-#define ISALIGN(x) (((unsigned long)(x) & 0xf) == 0)
 
 #ifdef Q_PROCESSOR_X86
 // Check cpuid for SSE2 support on x86 / x86_64
