@@ -35,11 +35,14 @@ extern "C" {
 #include "libswresample/swresample.h"
 }
 
+#include <QtGlobal>
+
+
 #define LOC QString("AudioConvert: ")
 
 #define ISALIGN(x) (((unsigned long)(x) & 0xf) == 0)
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
 static int has_sse2 = -1;
 
 // Check cpuid for SSE2 support on x86 / x86_64
@@ -49,7 +52,7 @@ static inline bool sse_check()
         return (bool)has_sse2;
     __asm__(
             // -fPIC - we may not clobber ebx/rbx
-#if ARCH_X86_64
+#ifdef Q_PROCESSOR_X86_64
             "push       %%rbx               \n\t"
 #else
             "push       %%ebx               \n\t"
@@ -58,7 +61,7 @@ static inline bool sse_check()
             "cpuid                          \n\t"
             "and        $0x4000000, %%edx   \n\t"
             "shr        $26, %%edx          \n\t"
-#if ARCH_X86_64
+#ifdef Q_PROCESSOR_X86_64
             "pop        %%rbx               \n\t"
 #else
             "pop        %%ebx               \n\t"
@@ -68,7 +71,7 @@ static inline bool sse_check()
             );
     return (bool)has_sse2;
 }
-#endif //ARCH_x86
+#endif //Q_PROCESSOR_X86
 
 #if !HAVE_LRINTF
 static av_always_inline av_const long int lrintf(float x)
@@ -93,7 +96,7 @@ static int toFloat8(float* out, const uchar* in, int len)
     int i = 0;
     float f = 1.0F / ((1<<7));
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
     if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
@@ -146,7 +149,7 @@ static int toFloat8(float* out, const uchar* in, int len)
                           :"xmm0","xmm1","xmm2","xmm3","xmm4","xmm5","xmm6","xmm7"
                           );
     }
-#endif //ARCH_x86
+#endif //Q_PROCESSOR_X86
     for (; i < len; i++)
         *out++ = (*in++ - 0x80) * f;
     return len << 2;
@@ -168,7 +171,7 @@ static int fromFloat8(uchar* out, const float* in, int len)
     int i = 0;
     float f = (1<<7);
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
     if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
@@ -209,7 +212,7 @@ static int fromFloat8(uchar* out, const float* in, int len)
                           :"xmm0","xmm1","xmm2","xmm3","xmm4","xmm7"
                           );
     }
-#endif //ARCH_x86
+#endif //Q_PROCESSOR_X86
     for (;i < len; i++)
         *out++ = clip_uchar(lrintf(*in++ * f) + 0x80);
     return len;
@@ -220,7 +223,7 @@ static int toFloat16(float* out, const short* in, int len)
     int i = 0;
     float f = 1.0F / ((1<<15));
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
     if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
@@ -264,7 +267,7 @@ static int toFloat16(float* out, const short* in, int len)
                           :"xmm1","xmm2","xmm3","xmm4","xmm5","xmm6","xmm7"
                           );
     }
-#endif //ARCH_x86
+#endif //Q_PROCESSOR_X86
     for (; i < len; i++)
         *out++ = *in++ * f;
     return len << 2;
@@ -282,7 +285,7 @@ static int fromFloat16(short* out, const float* in, int len)
     int i = 0;
     float f = (1<<15);
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
     if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
@@ -318,7 +321,7 @@ static int fromFloat16(short* out, const float* in, int len)
                           :"xmm1","xmm2","xmm3","xmm4","xmm7"
                           );
     }
-#endif //ARCH_x86
+#endif //Q_PROCESSOR_X86
     for (;i < len;i++)
         *out++ = clip_short(lrintf(*in++ * f));
     return len << 1;
@@ -334,7 +337,7 @@ static int toFloat32(AudioFormat format, float* out, const int* in, int len)
     if (format == FORMAT_S24LSB)
         shift = 0;
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
     if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
@@ -375,7 +378,7 @@ static int toFloat32(AudioFormat format, float* out, const int* in, int len)
                           :"xmm1","xmm2","xmm3","xmm4","xmm6","xmm7"
                           );
     }
-#endif //ARCH_x86
+#endif //Q_PROCESSOR_X86
     for (; i < len; i++)
         *out++ = (*in++ >> shift) * f;
     return len << 2;
@@ -391,7 +394,7 @@ static int fromFloat32(AudioFormat format, int* out, const float* in, int len)
     if (format == FORMAT_S24LSB)
         shift = 0;
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
     if (sse_check() && len >= 16)
     {
         float o = 0.99999995;
@@ -448,7 +451,7 @@ static int fromFloat32(AudioFormat format, int* out, const float* in, int len)
                           :"xmm0","xmm1","xmm2","xmm3","xmm4","xmm5","xmm6","xmm7"
                           );
     }
-#endif //ARCH_x86
+#endif //Q_PROCESSOR_X86
     uint range = 1<<(bits-1);
     for (; i < len; i++)
     {
@@ -473,7 +476,7 @@ static int fromFloatFLT(float* out, const float* in, int len)
 {
     int i = 0;
 
-#if ARCH_X86
+#ifdef Q_PROCESSOR_X86
     if (sse_check() && len >= 16)
     {
         int loops = len >> 4;
@@ -514,7 +517,7 @@ static int fromFloatFLT(float* out, const float* in, int len)
                           :"xmm1","xmm2","xmm3","xmm4","xmm6","xmm7"
                           );
     }
-#endif //ARCH_x86
+#endif //Q_PROCESSOR_X86
     for (;i < len;i++)
         *out++ = clipcheck(*in++);
     return len << 2;
