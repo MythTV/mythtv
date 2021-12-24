@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <cmath>
-#include <sys/types.h>
 
 #include <QtGlobal>
 #include <QtEndian>
@@ -184,7 +183,7 @@ void AudioOutputUtil::MuteChannel(int obits, int channels, int ch,
     int frames = bytes / ((obits >> 3) * channels);
 
     if (obits == 8)
-        tMuteChannel((uchar *)buffer, channels, ch, frames);
+        tMuteChannel((uint8_t *)buffer, channels, ch, frames);
     else if (obits == 16)
         tMuteChannel((short *)buffer, channels, ch, frames);
     else
