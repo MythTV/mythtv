@@ -75,10 +75,6 @@
 #include <cstdlib>
 #include <thread>
 
-#if ! HAVE_ROUND
-#define round(x) ((int) ((x) + 0.5))
-#endif
-
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to debug channel prefixing */
 #define DEBUG_ACTIONS        0 /**< set to 1 to debug actions           */
 
@@ -9079,7 +9075,7 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
 
     m_tvmFillAutoDetect    = false;
 
-    m_tvmSpeedX100         = static_cast<int>(round(m_playerContext.m_tsNormal * 100));
+    m_tvmSpeedX100         = std::lroundf(m_playerContext.m_tsNormal * 100);
     m_tvmState             = m_playerContext.GetState();
     m_tvmIsRecording       = (m_tvmState == kState_WatchingRecording);
     m_tvmIsRecorded        = (m_tvmState == kState_WatchingPreRecorded);

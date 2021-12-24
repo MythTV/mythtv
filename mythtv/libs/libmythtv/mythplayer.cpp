@@ -55,10 +55,6 @@ extern "C" {
 
 #include "remoteencoder.h"
 
-#if ! HAVE_ROUND
-#define round(x) ((int) ((x) + 0.5))
-#endif
-
 static unsigned dbg_ident(const MythPlayer* /*player*/);
 
 #define LOC QString("Player(%1): ").arg(dbg_ident(this),0,36)

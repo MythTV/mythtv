@@ -1701,6 +1701,7 @@ INTRINSICS_LIST="
     intrinsics_neon
 "
 
+# unfortunately necessary because of internal FFmpeg header use
 COMPLEX_FUNCS="
     cabs
     cexp
