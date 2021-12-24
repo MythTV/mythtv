@@ -1530,7 +1530,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             return false;
         }
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
         if (opt.startsWith("-psn_"))
         {
             std::cerr << "Ignoring Process Serial Number from command line"

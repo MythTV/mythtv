@@ -21,7 +21,9 @@
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
 
-#include "compat.h"
+#ifdef _WIN32
+#   define O_NONBLOCK 0
+#endif
 
 #define LOC QString("MythMediaDevice:")
 
@@ -111,7 +113,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 {
     if (DoMount && isMounted())
     {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
         // Not an error - DiskArbitration has already mounted the device.
         // AddDevice calls mount() so onDeviceMounted() can get mediaType.
         onDeviceMounted();
@@ -317,7 +319,7 @@ MythMediaError MythMediaDevice::eject(bool open_close)
 
 bool MythMediaDevice::isSameDevice(const QString &path)
 {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
     // The caller may be using a raw device instead of the BSD 'leaf' name
     if (path == "/dev/r" + m_devicePath)
         return true;
