@@ -1,10 +1,12 @@
 #ifndef AUDIOOUTPUTOSS
 #define AUDIOOUTPUTOSS
 
-#if HAVE_SYS_SOUNDCARD_H
-    #include <sys/soundcard.h>
-#elif HAVE_SOUNDCARD_H
-    #include <soundcard.h>
+#if __has_include(<sys/soundcard.h>)
+#   include <sys/soundcard.h>
+#elif __has_include(<soundcard.h>)
+#   include <soundcard.h>
+#else
+#   error attemping to compile OSS support without soundcard.h
 #endif
 
 #include "audiooutputbase.h"
