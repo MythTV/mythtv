@@ -44,7 +44,7 @@
 #define LOC_WARN QString("MythPreviewGen, Warning: ")
 #define LOC_ERR  QString("MythPreviewGen, Error: ")
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // 10.6 uses some file handles for its new Grand Central Dispatch thingy
     #define UNUSED_FILENO 5
 #else
