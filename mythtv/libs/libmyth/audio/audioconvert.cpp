@@ -24,7 +24,6 @@
 
 #include <cstdint>
 #include <cmath>
-#include <sys/types.h>
 
 #include <algorithm>
 
@@ -81,7 +80,7 @@ static inline float clipcheck(float f)
  The SSE code processes 16 bytes at a time and leaves any remainder for the C
  */
 
-static int toFloat8(float* out, const uchar* in, int len)
+static int toFloat8(float* out, const uint8_t* in, int len)
 {
     int i = 0;
     float f = 1.0F / ((1<<7));
@@ -149,14 +148,14 @@ static int toFloat8(float* out, const uchar* in, int len)
  The SSE code processes 16 bytes at a time and leaves any remainder for the C
  - there is no remainder in practice */
 
-static inline uchar clip_uchar(int a)
+static inline uint8_t clip_uint8(int a)
 {
     if (a&(~0xFF))
         return (-a)>>31;
     return a;
 }
 
-static int fromFloat8(uchar* out, const float* in, int len)
+static int fromFloat8(uint8_t* out, const float* in, int len)
 {
     int i = 0;
     float f = (1<<7);
@@ -204,7 +203,7 @@ static int fromFloat8(uchar* out, const float* in, int len)
     }
 #endif //Q_PROCESSOR_X86
     for (;i < len; i++)
-        *out++ = clip_uchar(lrintf(*in++ * f) + 0x80);
+        *out++ = clip_uint8(lrintf(*in++ * f) + 0x80);
     return len;
 }
 
@@ -527,7 +526,7 @@ int AudioConvert::toFloat(AudioFormat format, void* out, const void* in,
     switch (format)
     {
         case FORMAT_U8:
-            return toFloat8((float*)out,  (uchar*)in, bytes);
+            return toFloat8((float*)out,  (uint8_t*)in, bytes);
         case FORMAT_S16:
             return toFloat16((float*)out, (short*)in, bytes >> 1);
         case FORMAT_S24:
@@ -557,7 +556,7 @@ int AudioConvert::fromFloat(AudioFormat format, void* out, const void* in,
     switch (format)
     {
         case FORMAT_U8:
-            return fromFloat8((uchar*)out, (float*)in, bytes >> 2);
+            return fromFloat8((uint8_t*)out, (float*)in, bytes >> 2);
         case FORMAT_S16:
             return fromFloat16((short*)out, (float*)in, bytes >> 2);
         case FORMAT_S24:
