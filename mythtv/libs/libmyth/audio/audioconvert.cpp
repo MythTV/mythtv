@@ -21,9 +21,11 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <cinttypes>
+#include <cstdint>
 #include <cmath>
 #include <sys/types.h>
+
+#include <algorithm>
 
 #include "mythconfig.h"
 #include "mythlogging.h"
@@ -82,9 +84,7 @@ static av_always_inline av_const long int lrintf(float x)
 
 static inline float clipcheck(float f)
 {
-    if (f > 1.0F) f = 1.0F;
-    else if (f < -1.0F) f = -1.0F;
-    return f;
+    return std::clamp(f, -1.0F, 1.0F);
 }
 
 /*
