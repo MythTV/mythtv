@@ -7360,10 +7360,6 @@ cat > $TMPH <<EOF
 #define BUILDSUF "$build_suffix"
 #define SLIBSUF "$SLIBSUF"
 #define HAVE_MMX2 HAVE_MMXEXT
-#define SWS_MAX_FILTER_SIZE $sws_max_filter_size
-#define ASMALIGN(ZEROBITS) ".p2align " #ZEROBITS "\\n\\t"
-#define SIZEOF_INT $_sizeof_int
-#define SIZEOF_LONG $_sizeof_long
 #define JDK_HOME "$JDK_HOME"
 #define JAVA_ARCH "$java_arch"
 #define IMAGE_ALIGN $image_align
