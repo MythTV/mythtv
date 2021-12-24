@@ -1424,6 +1424,7 @@ FEATURE_LIST="
     swscale_alpha
 "
 
+# needed for get_version for linking to *.so.
 LIBRARY_LIST="
     avcodec
     avdevice
@@ -1469,7 +1470,6 @@ CONFIG_LIST="
     $HWACCEL_LIBRARY_LIST
     $FEATURE_LIST
     $LICENSE_LIST
-    $LIBRARY_LIST
     $PROGRAM_LIST
     $SUBSYSTEM_LIST
     autodetect
