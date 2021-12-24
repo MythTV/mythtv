@@ -20,6 +20,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#include "audioconvert.h"
 
 #include <cstdint>
 #include <cmath>
@@ -27,11 +28,7 @@
 
 #include <algorithm>
 
-#include "mythconfig.h"
-#include "mythlogging.h"
-#include "mythaverror.h"
-#include "audioconvert.h"
-
+// FFmpeg
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libswresample/swresample.h"
@@ -39,6 +36,9 @@ extern "C" {
 
 #include <QtGlobal>
 
+#include "mythconfig.h"
+#include "mythlogging.h"
+#include "mythaverror.h"
 
 #define LOC QString("AudioConvert: ")
 
