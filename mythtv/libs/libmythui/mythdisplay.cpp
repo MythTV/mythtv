@@ -23,7 +23,7 @@
 #ifdef Q_OS_ANDROID
 #include "platforms/mythdisplayandroid.h"
 #endif
-#if defined(Q_OS_MAC)
+#ifdef Q_OS_DARWIN
 #include "platforms/mythdisplayosx.h"
 #endif
 #ifdef USING_X11
@@ -115,7 +115,7 @@ MythDisplay* MythDisplay::Create(MythMainWindow* MainWindow)
     if (!result)
         result = new MythDisplayRPI();
 #endif
-#if defined(Q_OS_MAC)
+#ifdef Q_OS_DARWIN
     if (!result)
         result = new MythDisplayOSX();
 #endif
@@ -1180,7 +1180,7 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
     format.setSwapInterval(SwapInterval);
     QSurfaceFormat::setDefaultFormat(format);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(false);

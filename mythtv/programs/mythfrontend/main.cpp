@@ -14,7 +14,7 @@
 #include <QDir>
 #include <QApplication>
 #include <QTimer>
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
 #include <QProcessEnvironment>
 #endif
 
@@ -779,7 +779,7 @@ static void playDisc()
         if ((command_string.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
             (command_string.length() < 1))
         {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
             // Convert a BSD 'leaf' name into a raw device path
             QString filename = "dvd://dev/r";   // e.g. 'dvd://dev/rdisk2'
 #elif _WIN32
@@ -1850,7 +1850,7 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
     CleanupGuard callCleanup(cleanup);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
     QString path = QCoreApplication::applicationDirPath();
     setenv("PYTHONPATH",
            QString("%1/../Resources/lib/%2/site-packages:%3")

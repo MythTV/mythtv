@@ -59,7 +59,7 @@ static QString chooseCD(void)
     if (!gCDdevice.isEmpty())
         return gCDdevice;
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
     return MediaMonitor::GetMountPath(MediaMonitor::defaultCDdevice());
 #endif
 
@@ -642,7 +642,7 @@ static void handleCDMedia(MythMediaDevice *cd)
     // save the device if valid
     if (cd->isUsable())
     {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
         newDevice = cd->getMountPath();
 #else
         newDevice = cd->getDevicePath();
