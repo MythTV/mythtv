@@ -1339,26 +1339,15 @@ is_x86_mmx() {
 # system-dependent things.
 
 AVCODEC_COMPONENTS="
-    bsfs
-    decoders
-    encoders
-    hwaccels
-    parsers
 "
 
 AVDEVICE_COMPONENTS="
-    indevs
-    outdevs
 "
 
 AVFILTER_COMPONENTS="
-    filters
 "
 
 AVFORMAT_COMPONENTS="
-    demuxers
-    muxers
-    protocols
 "
 
 AVRESAMPLE_COMPONENTS=""
