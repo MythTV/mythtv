@@ -2576,11 +2576,11 @@ bool PlaybackBox::Play(
         ignoreProgStart = true;
 
     uint flags =
-        (inPlaylist          ? kStartTVInPlayList       : kStartTVNoFlags) |
-        (underNetworkControl ? kStartTVByNetworkCommand : kStartTVNoFlags) |
-        (!ignoreLastPlayPos  ? kStartTVAllowLastPlayPos : kStartTVNoFlags) |
-        (ignoreProgStart     ? kStartTVIgnoreProgStart  : kStartTVNoFlags) |
-        (ignoreBookmark      ? kStartTVIgnoreBookmark   : kStartTVNoFlags);
+        (inPlaylist          ? kStartTVInPlayList        : kStartTVNoFlags) |
+        (underNetworkControl ? kStartTVByNetworkCommand  : kStartTVNoFlags) |
+        (ignoreLastPlayPos   ? kStartTVIgnoreLastPlayPos : kStartTVNoFlags) |
+        (ignoreProgStart     ? kStartTVIgnoreProgStart   : kStartTVNoFlags) |
+        (ignoreBookmark      ? kStartTVIgnoreBookmark    : kStartTVNoFlags);
 
     playCompleted = TV::StartTV(&tvrec, flags);
 

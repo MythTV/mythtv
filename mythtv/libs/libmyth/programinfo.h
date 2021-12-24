@@ -571,10 +571,10 @@ class MPUBLIC ProgramInfo
     /// \brief If "ignore" is true QueryLastPlayPos() will return 0, otherwise
     ///        QueryLastPlayPos() will return the last playback position
     ///        if it exists.
-    void SetAllowLastPlayPos(bool allow)
+    void SetIgnoreLastPlayPos(bool ignore)
     {
-        m_programFlags &= ~FL_ALLOWLASTPLAYPOS;
-        m_programFlags |= (allow) ? FL_ALLOWLASTPLAYPOS : 0;
+        m_programFlags &= ~FL_IGNORELASTPLAYPOS;
+        m_programFlags |= (ignore) ? FL_IGNORELASTPLAYPOS : 0;
     }
     virtual void SetRecordingID(uint _recordedid)
         { m_recordedId = _recordedid; }

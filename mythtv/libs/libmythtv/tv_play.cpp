@@ -286,7 +286,7 @@ bool TV::StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selectio
         curProgram = new ProgramInfo(*TVRec);
         curProgram->SetIgnoreBookmark((Flags & kStartTVIgnoreBookmark) != 0U);
         curProgram->SetIgnoreProgStart((Flags & kStartTVIgnoreProgStart) != 0U);
-        curProgram->SetAllowLastPlayPos((Flags & kStartTVAllowLastPlayPos) != 0U);
+        curProgram->SetIgnoreLastPlayPos((Flags & kStartTVIgnoreLastPlayPos) != 0U);
     }
 
     // Initialize TV

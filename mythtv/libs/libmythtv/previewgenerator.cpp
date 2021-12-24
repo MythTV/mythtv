@@ -634,7 +634,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
 {
     m_programInfo.MarkAsInUse(true, kPreviewGeneratorInUseID);
     m_programInfo.SetIgnoreProgStart(true);
-    m_programInfo.SetAllowLastPlayPos(false);
+    m_programInfo.SetIgnoreLastPlayPos(true);
 
     float aspect = 0;
     std::chrono::seconds captime = m_captureTime;

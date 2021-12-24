@@ -109,12 +109,12 @@ enum NoRecorderMsg
 };
 
 enum {
-    kStartTVNoFlags          = 0x00,
-    kStartTVInPlayList       = 0x02,
-    kStartTVByNetworkCommand = 0x04,
-    kStartTVIgnoreBookmark   = 0x08,
-    kStartTVIgnoreProgStart  = 0x10,
-    kStartTVAllowLastPlayPos = 0x20,
+    kStartTVNoFlags           = 0x00,
+    kStartTVInPlayList        = 0x02,
+    kStartTVByNetworkCommand  = 0x04,
+    kStartTVIgnoreBookmark    = 0x08,
+    kStartTVIgnoreProgStart   = 0x10,
+    kStartTVIgnoreLastPlayPos = 0x20,
 };
 
 class AskProgramInfo

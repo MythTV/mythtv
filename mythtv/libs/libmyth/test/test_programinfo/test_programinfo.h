@@ -159,7 +159,7 @@ class TestProgramInfo : public QObject
         {"parttotal", "133"},
         {"playgroup", "Default"},
         {"programflags", "131600"},
-        {"programflags_names", "BOOKMARK|WATCHED|ALLOWLASTPLAYPOS"},
+        {"programflags_names", "BOOKMARK|WATCHED|IGNORELASTPLAYPOS"},
         {"programid", "EP019229360055"},
         {"recenddate", "Wed 26"},
         {"recendtime", "1:02 AM"},
@@ -327,7 +327,7 @@ class TestProgramInfo : public QObject
              RecStatus::Unknown, 19890314, // recordid
              kDupsInAll, kDupCheckSubThenDesc,
              20141007, // findId
-             FL_ALLOWLASTPLAYPOS | FL_WATCHED | FL_BOOKMARK,
+             FL_IGNORELASTPLAYPOS | FL_WATCHED | FL_BOOKMARK,
              AUD_DOLBY,
              VID_DAMAGED | VID_1080 | VID_HDTV,
              SUB_HARDHEAR,
