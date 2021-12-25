@@ -1337,9 +1337,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         }
         else
         {
-            // ToDo: Change string to "BD Failure" after 0.28 is released
             ShowNotificationError(QCoreApplication::translate("(MythFrontendMain)",
-                                                  "DVD Failure"),
+                                                  "BD Failure"),
                                                   sLocation,
                                                   bd.GetLastError());
             delete pginfo;
