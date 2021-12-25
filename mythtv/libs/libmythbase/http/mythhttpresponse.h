@@ -17,7 +17,7 @@ class MBASE_PUBLIC MythHTTPResponse
 {
   public:
     MythHTTPResponse() = default;
-    explicit MythHTTPResponse(const HTTPRequest2 Request);
+    explicit MythHTTPResponse(const HTTPRequest2& Request);
 
     static HTTPResponse HandleOptions       (HTTPRequest2 Request);
     static HTTPResponse ErrorResponse       (MythHTTPStatus Status, const QString& ServerName);

@@ -17,7 +17,7 @@
 
 /*! \class MythHTTPResponse
 */
-MythHTTPResponse::MythHTTPResponse(const HTTPRequest2 Request)
+MythHTTPResponse::MythHTTPResponse(const HTTPRequest2& Request)
   : m_serverName(Request->m_serverName),
     m_version(Request->m_version),
     m_connection(Request->m_connection),
