@@ -61,8 +61,9 @@ QString LookupUDN( const QString &sDeviceType )
     }
 
     sList.removeLast();
+    Configuration *pConfig = MythCoreContext::GetConfiguration();
     QString sName = "UPnP/UDN/" + sList.last();
-    QString sUDN  = gCoreContext->GetConfiguration()->GetValue( sName, "" );
+    QString sUDN  = pConfig->GetValue( sName, "" );
 
     LOG(VB_UPNP, LOG_INFO, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
 
@@ -74,8 +75,8 @@ QString LookupUDN( const QString &sDeviceType )
         // DLNA compliant, we need to remove them
         sUDN = sUDN.mid(1, 36);
 
-        gCoreContext->GetConfiguration()->SetValue( sName, sUDN );
-        gCoreContext->GetConfiguration()->Save();
+        pConfig->SetValue( sName, sUDN );
+        pConfig->Save();
     }
 
     return( sUDN );

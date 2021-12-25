@@ -46,13 +46,13 @@ MediaRenderer::MediaRenderer()
     // Initialize Configuration class (XML file for frontend)
     // ----------------------------------------------------------------------
 
-    gCoreContext->SetConfiguration( new XmlConfiguration( "config.xml" ));
+    MythCoreContext::SetConfiguration( new XmlConfiguration( "config.xml" ));
 
     // ----------------------------------------------------------------------
     // Create mini HTTP Server
     // ----------------------------------------------------------------------
 
-    int nPort = gCoreContext->GetConfiguration()->GetValue( "UPnP/MythFrontend/ServicePort", 6547 );
+    int nPort = MythCoreContext::GetConfiguration()->GetValue( "UPnP/MythFrontend/ServicePort", 6547 );
 
     auto *pHttpServer = new HttpServer();
 

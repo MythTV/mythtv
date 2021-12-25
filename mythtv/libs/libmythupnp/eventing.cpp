@@ -77,7 +77,7 @@ Eventing::Eventing(const QString &sExtensionName,
     HttpServerExtension(sExtensionName, sSharePath),
     m_sEventMethodName(std::move(sEventMethodName)),
     m_nSubscriptionDuration(
-        gCoreContext->GetConfiguration()->GetDuration<std::chrono::seconds>("UPnP/SubscriptionDuration", 30min))
+        MythCoreContext::GetConfiguration()->GetDuration<std::chrono::seconds>("UPnP/SubscriptionDuration", 30min))
 {
     m_nSupportedMethods |= (RequestTypeSubscribe | RequestTypeUnsubscribe);
 }

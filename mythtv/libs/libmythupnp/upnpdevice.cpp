@@ -362,7 +362,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     if (pDevice == &m_rootDevice)
-        sFriendlyName = gCoreContext->GetConfiguration()->GetValue( "UPnP/FriendlyName",
+        sFriendlyName = MythCoreContext::GetConfiguration()->GetValue( "UPnP/FriendlyName",
                                                             sFriendlyName  );
 
     os << "<device>\n";
@@ -676,7 +676,7 @@ QString UPnpDeviceDesc::GetHostName() const
             LOG(VB_GENERAL, LOG_ERR,
                 "UPnpDeviceDesc: Error, could not determine host name." + ENO);
 
-        return gCoreContext->GetConfiguration()->GetValue("Settings/HostName",
+        return MythCoreContext::GetConfiguration()->GetValue("Settings/HostName",
                                                   localHostName);
     }
 

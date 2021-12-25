@@ -57,7 +57,7 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
     m_sST         = std::move(sST);
     m_sUDN        = std::move(sUDN);
     m_nServicePort= nServicePort;
-    m_nMaxAge     = gCoreContext->GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
+    m_nMaxAge     = MythCoreContext::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
 
 } 
 

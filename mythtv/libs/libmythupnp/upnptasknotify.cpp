@@ -47,7 +47,7 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
 {
     m_nServicePort = nServicePort;
 
-    m_nMaxAge      = gCoreContext->GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
+    m_nMaxAge      = MythCoreContext::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
 } 
 
 /////////////////////////////////////////////////////////////////////////////

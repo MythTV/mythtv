@@ -1861,7 +1861,7 @@ QString HTTPRequest::GetETagHash(const QByteArray &data)
 
 bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
 {
-    QString sProtected = gCoreContext->GetConfiguration()->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
+    QString sProtected = MythCoreContext::GetConfiguration()->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
 
     QStringList oList = sProtected.split( ';' );
 
