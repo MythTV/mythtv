@@ -1791,7 +1791,10 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
     //head_pos == 0 means that we are decoding B frames after a seq_header
     if (headPos == 0)
         if (PlaybackSecondary())
+        {
+            av_packet_free(&pkt);
             return 1;
+        }
 
     for (const auto & of : qAsConst(*orderedFrames))
     {
@@ -1818,7 +1821,10 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
 #endif
 
         if (BuildFrame(pkt, fname))
+        {
+            av_packet_free(&pkt);
             return 1;
+        }
 
         LOG(VB_GENERAL, LOG_INFO,
             QString("Converting frame #%1 from %2 to I %3")
@@ -1851,7 +1857,10 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
     }
 
     if ((spare = DecodeToFrame(frameNum, 0)) == nullptr)
+    {
+        av_packet_free(&pkt);
         return -1;
+    }
 
     av_packet_ref(pkt, spare->m_pkt);
     //pkt->data is a newly malloced area
@@ -1865,7 +1874,10 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
 #endif
 
         if (BuildFrame(pkt, fname))
+        {
+            av_packet_free(&pkt);
             return -1;
+        }
 
         LOG(VB_GENERAL, LOG_INFO,
             QString("Inserting %1 I-Frames after #%2 %3")
@@ -2141,7 +2153,11 @@ int MPEG2fixup::Start()
         /* read packet */
         int ret = GetFrame(pkt);
         if (ret < 0)
+        {
+            av_packet_free(&pkt);
+            av_packet_free(&lastRealvPkt);
             return ret;
+        }
 
         if (!m_vFrame.isEmpty() && (m_fileEnd || m_vFrame.last()->m_isSequence))
         {
