@@ -108,7 +108,6 @@ class ScanTypeSetting : public TransMythUIComboBoxSetting
     ScanTypeSetting()
     {
         setLabel(QObject::tr("Scan Type"));
-        setHelpText(QObject::tr("For scan type 'Full Scan' select a country to get the correct set of frequencies."));
     }
 
   protected slots:

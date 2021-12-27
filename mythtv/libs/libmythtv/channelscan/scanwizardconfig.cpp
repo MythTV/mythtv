@@ -239,6 +239,9 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
     }
 #endif // USING_SATIP
 
+    const QString fullScanHelpTextDVBT2 = QObject::tr(
+        "For DVB-T/T2 and scan type 'Full Scan' select a country to get the correct set of frequencies.");
+
     clearSelections();
 
     switch (nCardType)
@@ -259,6 +262,7 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
 //                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
+            setHelpText(fullScanHelpTextDVBT2);
             break;
         case CardUtil::DVBT2:
             addSelection(tr("Full Scan"),
@@ -269,6 +273,7 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
 //                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
+            setHelpText(fullScanHelpTextDVBT2);
             break;
         case CardUtil::DVBS:
             addSelection(tr("Full Scan (Tuned)"),
@@ -318,6 +323,7 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                              QString::number(FullScan_DVBT), true);
                 addSelection(tr("Full Scan (Tuned)"),
                              QString::number(NITAddScan_DVBT));
+                setHelpText(fullScanHelpTextDVBT2);
             }
             else
                 addSelection(tr("Full Scan"),
