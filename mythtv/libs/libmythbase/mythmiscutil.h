@@ -42,17 +42,6 @@ MBASE_PUBLIC QString getSymlinkTarget(const QString &start_file,
 
 MBASE_PUBLIC void wrapList(QStringList &list, int width);
 
-inline float lerp(float r, float a, float b)
-{
-    return ((1.0F - r) * a) + (r * b);
-}
-inline int   lerp(float r, int a, int b)
-{
-    return (int) lerp(r, (float) a, (float) b);
-}
-inline float sq(float a) { return a*a; }
-inline int   sq(int   a) { return a*a; }
-
 static inline QString xml_bool_to_string(bool val)
 {
     return (val) ? "true" : "false";
