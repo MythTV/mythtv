@@ -28,7 +28,10 @@ MBASE_PUBLIC bool hasUtf8(const char *str);
 MBASE_PUBLIC bool ping(const QString &host, std::chrono::milliseconds timeout);
 MBASE_PUBLIC bool telnet(const QString &host, int port);
 
+namespace MythFile
+{
 MBASE_PUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);
+} // namespace MythFile
 MBASE_PUBLIC QString createTempFile(
     QString name_template = "/tmp/mythtv_XXXXXX", bool dir = false);
 MBASE_PUBLIC bool makeFileAccessible(const QString& filename);

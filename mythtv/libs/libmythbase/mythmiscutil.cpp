@@ -290,7 +290,7 @@ bool telnet(const QString &host, int port)
     return connected;
 }
 
-/** \fn copy(QFile&,QFile&,uint)
+/**
  *  \brief Copies src file to dst file.
  *
  *   If the dst file is open, it must be open for writing.
@@ -311,7 +311,7 @@ bool telnet(const QString &host, int port)
  *                    otherwise the default of 16 KB will be used.
  *  \return bytes copied on success, -1 on failure.
  */
-long long copy(QFile &dst, QFile &src, uint block_size)
+long long MythFile::copy(QFile &dst, QFile &src, uint block_size)
 {
     uint buflen = (block_size < 1024) ? (16 * 1024) : block_size;
     char *buf = new char[buflen];

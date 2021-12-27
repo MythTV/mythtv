@@ -46,7 +46,7 @@
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <mythdirs.h>
-#include <mythmiscutil.h>
+#include <mythmiscutil.h> // for MythFile::copy
 #include <mythdate.h>
 #include <mythuitext.h>
 #include <mythuibutton.h>
@@ -383,7 +383,7 @@ void ThumbFinder::updateThumb(void)
     QString imageFile = thumb->filename;
     QFile dst(imageFile);
     QFile src(m_frameFile);
-    copy(dst, src);
+    MythFile::copy(dst, src);
 
     item->SetImage(imageFile, "", true);
 
