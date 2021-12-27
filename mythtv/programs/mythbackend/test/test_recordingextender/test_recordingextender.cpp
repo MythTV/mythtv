@@ -437,11 +437,11 @@ void TestRecordingExtender::test_parseProgramInfo_data(void)
                                   << "Washington Nationals @ Miami Marlins"
                                   << "Washington Nationals"
                                   << "Miami Marlins";
-    QTest::newRow("description4") << "ipsum lorem"
+    QTest::newRow("description5") << "ipsum lorem"
                                   << "Washington Nationals @ Miami Marlins. The matchup of a lifetime... or at least this week."
                                   << "Washington Nationals"
                                   << "Miami Marlins";
-    QTest::newRow("description5") << "ipsum lorem"
+    QTest::newRow("description6") << "ipsum lorem"
                                   << "Washington Nationals vs. Miami Marlins: The matchup of a lifetime... or at least this week."
                                   << "Washington Nationals"
                                   << "Miami Marlins";
@@ -449,6 +449,42 @@ void TestRecordingExtender::test_parseProgramInfo_data(void)
                                      << "The matchup of a lifetime... or at least this week."
                                      << ""
                                      << "";
+    QTest::newRow("collegebowl1") << "Quick Lane Bowl: Western Michigan vs. Nevada"
+                                  << "The Wolf Pack play the Broncos in the Quick Lane Bowl. Western Michigan seeks just its second bowl game triumph in program history. Nevada quarterback Carson Strong finished the season ranked sixth in the country with 4,186 passing yards and 36 TDs."
+                                  << "Western Michigan"
+                                  << "Nevada";
+    QTest::newRow("collegebowl2") << "R+L Carriers New Orleans Bowl: Louisiana vs. Marshall"
+                                  << "The No. 23 Ragin' Cajuns (12-1) take on the Thundering Herd (7-5) in the New Orleans Bowl. Louisiana Lafayette has won 12 in a row after capturing the Sun Belt title against Appalachian State on Dec. 4. Marshall is 7-2 in bowl games since 2009."
+                                  << "Louisiana"
+                                  << "Marshall";
+    QTest::newRow("collegebowl3") << "New Era Pinstripe Bowl: Maryland vs. Virginia Tech"
+                                  << "The 6-6 Terrapins face off against the 6-6 Hokies in the Pinstripe Bowl. Both teams became bowl eligible with season-ending victories Nov. 27. Maryland seeks its first postseason win since 2010. Virginia Tech's last bowl celebration came in 2016."
+                                  << "Maryland"
+                                  << "Virginia Tech";
+    QTest::newRow("collegebowl4") << "Lockheed Martin Armed Forces Bowl: Missouri vs. Army"
+                                  << "The Tigers play the Black Knights in the Armed Forces Bowl in Fort Worth, Texas. Army has won this postseason contest three times, most recently in 2018 when it thrashed Houston 70-14. Missouri seeks its first bowl victory since the 2014 Citrus Bowl."
+                                  << "Missouri"
+                                  << "Army";
+    QTest::newRow("collegebowl5") << "Servpro First Responder Bowl: Air Force vs. Louisville"
+                                  << "The Falcons (9-3) face Malik Cunningham and the Cardinals (6-6) in the First Responder Bowl. Cunningham led all quarterbacks with 968 rushing yards this season, adding 19 touchdowns on the ground. Air Force won its final three regular season games."
+                                  << "Air Force"
+                                  << "Louisville";
+    QTest::newRow("collegeplayoff1") << "NCAA Division III Tournament: Mary Hardin-Baylor at Wisconsin-Whitewater"
+                                     << "All the action from NCAA college football."
+                                     << "Mary Hardin-Baylor"
+                                     << "Wisconsin-Whitewater";
+    QTest::newRow("collegeplayoff2") << "NCAA Division III Tournament: North Central (Ill.) at Mount Union"
+                                     << "From Mount Union Stadium in Alliance, Ohio."
+                                     << "North Central (Ill.)"
+                                     << "Mount Union";
+    QTest::newRow("collegeplayoff3") << "NCAA Division II Championship: Valdosta State vs. Ferris State"
+                                     << "The Bulldogs try to complete a perfect season when they face the Blazers in the NCAA Division II championship. Ferris State (13-0) outscored its playoff foes 150-47 to reach the final. Valdosta State (12-1) beat Ferris State for the 2018 title."
+                                     << "Valdosta State"
+                                     << "Ferris State";
+    QTest::newRow("collegeplayoff4") << "NCAA Division III Championship: North Central (Ill.) vs. Mary Hardin-Baylor"
+                                     << "The Cardinals (13-0) face the Crusaders (14-0) in the NCAA Division III championship. Mary-Hardin Baylor beat Wisconsin-Whitewater 24-7 in the semifinals. North Central doubled up Mount Union 26-13. North Central claimed the last D-III title in 2019."
+                                     << "North Central (Ill.)"
+                                     << "Mary Hardin-Baylor";
 }
 
 void TestRecordingExtender::test_parseProgramInfo(void)
@@ -458,8 +494,6 @@ void TestRecordingExtender::test_parseProgramInfo(void)
     QFETCH(QString, expectedTeam1);
     QFETCH(QString, expectedTeam2);
 
-    SportInfo info {"title", AutoExtendType::None, "sport", "league"};
-    ActiveGame game(0, "MLB Baseball", info);
     QString team1;
     QString team2;
     bool success = parseProgramInfo(subtitle, description, team1, team2);

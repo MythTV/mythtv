@@ -37,6 +37,7 @@ static constexpr std::chrono::minutes extensionTime {10};
 static constexpr int extensionTimeInSec {
     (duration_cast<std::chrono::seconds>(extensionTime).count()) };
 static const QRegularExpression versusPattern {R"(\s(at|@|vs\.?)\s)"};
+static const QRegularExpression sentencePattern {R"(:|\.+\s)"};
 
 /// Does this recording status indicate that the recording is still ongoing.
 ///
@@ -1184,6 +1185,27 @@ void RecordingExtender::clearDownloadedInfo()
     RecExtDataSource::clearCache();
 }
 
+// Parse a single string. First split it into parts on a semi-colon or
+// 'period space', and then selectively check those parts for the
+// pattern "A vs B".
+static bool parseProgramString (const QString& string, int limit,
+                                QString& team1, QString& team2)
+{
+    QString lString = string;
+    QStringList parts = lString.replace("vs.", "vs").split(sentencePattern);
+    for (int i = 0; i < std::min(limit,static_cast<int>(parts.size())); i++)
+    {
+        QStringList words = parts[i].split(versusPattern);
+        if (words.size() == 2)
+        {
+            team1 = words[0].simplified();
+            team2 = words[1].simplified();
+            return true;
+        }
+    }
+    return false;
+}
+
 /// Parse a RecordingInfo to find the team names. Depending on the
 /// guide data source, this can be found either in the subtitle or in
 /// the description field.
@@ -1195,24 +1217,13 @@ void RecordingExtender::clearDownloadedInfo()
 bool RecordingExtender::parseProgramInfo (const QString& subtitle, const QString& description,
                                           QString& team1, QString& team2)
 {
-    QStringList words = subtitle.split(versusPattern);
-    if (words.size() != 2)
-    {
-        QString tweakedDesc = description;
-        tweakedDesc = tweakedDesc.replace("vs.", "vs");
-        QStringList parts = tweakedDesc.split(QRegularExpression("[:.]"));
-        words = parts[0].split(versusPattern);
-        if (words.size() != 2)
-        {
-            LOG(VB_GENERAL, LOG_DEBUG, LOC +
-                QString("can't find team names in subtitle or description '%1'").arg(description));
-            return false;
-        }
-    }
-
-    team1 = words[0].simplified();
-    team2 = words[1].simplified();
-    return true;
+    if (parseProgramString(subtitle, 2, team1, team2))
+        return true;
+    if (parseProgramString(description, 1, team1, team2))
+        return true;
+    LOG(VB_GENERAL, LOG_DEBUG, LOC +
+        QString("can't find team names in subtitle or description '%1'").arg(description));
+    return false;
 }
 
 /// Quick helper function for printing recording rule numbers. If
