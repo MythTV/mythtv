@@ -1,3 +1,5 @@
+#include "netgrabbermanager.h"
+
 // qt
 #include <QCoreApplication>
 #include <QDir>
@@ -6,14 +8,13 @@
 #include <utility>
 
 #include "mythdirs.h"
-#include "mythcontext.h"
+#include "mythcorecontext.h" // for GetDurSetting TODO: excise database from MythCoreContext
 #include "mythsystemlegacy.h"
 #include "exitcodes.h"
 #include "mythdate.h"
 #include "mythlogging.h"
 #include "mythsystemlegacy.h"
 
-#include "netgrabbermanager.h"
 #include "netutils.h"
 
 #define LOC      QString("NetContent: ")
