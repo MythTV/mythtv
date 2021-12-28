@@ -39,6 +39,7 @@ HEADERS += cleanupguard.h portchecker.h
 HEADERS += mythsorthelper.h mythdbcheck.h
 HEADERS += mythpower.h
 HEADERS += configuration.h
+HEADERS += unziputil.h
 
 SOURCES += mthread.cpp mthreadpool.cpp
 SOURCES += mythsocket.cpp
@@ -65,6 +66,7 @@ SOURCES += mythsorthelper.cpp dbcheckcommon.cpp
 SOURCES += mythpower.cpp
 SOURCES += configuration.cpp
 SOURCES += mythversion.cpp
+SOURCES += unziputil.cpp
 
 HEADERS += http/mythhttpcommon.h
 HEADERS += http/mythhttptypes.h
@@ -172,6 +174,7 @@ inc.files += remotefile.h mythsystemlegacy.h mythtypes.h
 inc.files += threadedfilewriter.h mythsingledownload.h mythsession.h
 inc.files += mythsorthelper.h mythdbcheck.h
 inc.files += mythrandom.h
+inc.files += unziputil.h
 
 # Allow both #include <blah.h> and #include <libmythbase/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmythbase

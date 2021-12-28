@@ -13,6 +13,7 @@
 // MythTV headers
 #include "mythcorecontext.h"
 #include "mythcoreutil.h"
+#include "unziputil.h" // for extractZIP
 #include "mthreadpool.h"
 #include "remotefile.h"
 #include "mythdownloadmanager.h"

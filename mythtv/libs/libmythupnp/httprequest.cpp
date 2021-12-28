@@ -40,7 +40,7 @@
 #include "mythdate.h"
 #include "mythcorecontext.h"
 #include "mythtimer.h"
-#include "mythcoreutil.h"
+#include "unziputil.h"
 #include "configuration.h"
 
 #include "serializers/xmlSerializer.h"
