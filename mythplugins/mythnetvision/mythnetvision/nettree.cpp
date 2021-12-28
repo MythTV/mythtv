@@ -11,7 +11,7 @@
 #include <mythprogressdialog.h>
 #include <rssparse.h>
 #include <netutils.h>
-#include <mythrssmanager.h>
+#include <rssmanager.h>
 #include <netgrabbermanager.h>
 #include <mythcoreutil.h>
 #include <metadata/videoutils.h>

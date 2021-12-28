@@ -1,4 +1,4 @@
-#include "mythrssmanager.h"
+#include "rssmanager.h"
 
 // qt
 #include <QDir>

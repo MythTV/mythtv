@@ -19,7 +19,7 @@
 #include <mythtranslation.h>
 #include <mythconfig.h>
 #include <netgrabbermanager.h>
-#include <mythrssmanager.h>
+#include <rssmanager.h>
 #include <mythcommandlineparser.h>
 #include <mythlogging.h>
 

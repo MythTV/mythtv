@@ -11,7 +11,7 @@
 #include <mythversion.h>
 #include <mythmainwindow.h>
 #include <netgrabbermanager.h>
-#include <mythrssmanager.h>
+#include <rssmanager.h>
 
 // MythNetVision headers
 #include "netsearch.h"

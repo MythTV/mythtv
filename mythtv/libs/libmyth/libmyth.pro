@@ -49,7 +49,6 @@ HEADERS += visual.h
 HEADERS += storagegroupeditor.h
 HEADERS += mythterminal.h
 HEADERS += rawsettingseditor.h
-HEADERS += rssparse.h
 HEADERS += guistartup.h
 
 SOURCES += audio/audiooutput.cpp audio/audiooutputbase.cpp
@@ -72,15 +71,7 @@ SOURCES += standardsettings.cpp
 SOURCES += storagegroupeditor.cpp
 SOURCES += mythterminal.cpp
 SOURCES += rawsettingseditor.cpp
-SOURCES += rssparse.cpp
 SOURCES += guistartup.cpp
-
-# This stuff is not Qt5 compatible..
-# Really? It builds under Qt5, so lets let it
-HEADERS += mythrssmanager.h             netutils.h
-HEADERS += netgrabbermanager.h
-SOURCES += mythrssmanager.cpp           netutils.cpp
-SOURCES += netgrabbermanager.cpp
 
 INCLUDEPATH += ../libmythfreesurround
 INCLUDEPATH += ../libmythbase
@@ -130,13 +121,7 @@ inc.files += mythaverror.h mythmediamonitor.h
 inc.files += visual.h output.h langsettings.h
 inc.files += mythexp.h storagegroupeditor.h
 inc.files += mythterminal.h
-inc.files += rssparse.h
 inc.files += standardsettings.h
-
-# This stuff is not Qt5 compatible..
-# Really? It builds under Qt5, so lets let it
-inc.files += mythrssmanager.h     netutils.h
-inc.files += netgrabbermanager.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth

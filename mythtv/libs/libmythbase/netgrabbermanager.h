@@ -12,11 +12,11 @@
 #endif
 #include <QTimer>
 
+#include "mythbaseexp.h"
 #include "rssparse.h"
-#include "mythexp.h"
 #include "mythsystemlegacy.h"
 
-class MPUBLIC GrabberScript : public QObject, public MThread
+class MBASE_PUBLIC GrabberScript : public QObject, public MThread
 {
 
     Q_OBJECT
@@ -75,7 +75,7 @@ class MPUBLIC GrabberScript : public QObject, public MThread
 };
 Q_DECLARE_METATYPE(GrabberScript *);
 
-class MPUBLIC GrabberManager : public QObject
+class MBASE_PUBLIC GrabberManager : public QObject
 {
     Q_OBJECT
 
@@ -109,7 +109,7 @@ class MPUBLIC GrabberManager : public QObject
 
 const int kGrabberUpdateEventType = QEvent::User + 5000;
 
-class MPUBLIC GrabberUpdateEvent : public QEvent
+class MBASE_PUBLIC GrabberUpdateEvent : public QEvent
 {
   public:
     GrabberUpdateEvent(void)
@@ -117,7 +117,7 @@ class MPUBLIC GrabberUpdateEvent : public QEvent
     ~GrabberUpdateEvent() override = default;
 };
 
-class MPUBLIC GrabberDownloadThread : public QObject, public MThread
+class MBASE_PUBLIC GrabberDownloadThread : public QObject, public MThread
 {
     Q_OBJECT
 
@@ -145,7 +145,7 @@ class MPUBLIC GrabberDownloadThread : public QObject, public MThread
 
 };
 
-class MPUBLIC Search : public QObject
+class MBASE_PUBLIC Search : public QObject
 {
     friend class MRSSParser;
     Q_OBJECT
@@ -196,4 +196,4 @@ class MPUBLIC Search : public QObject
     void slotProcessSearchExit(void);
 };
 
-#endif
+#endif // NETGRABBERMANAGER_H
