@@ -10,7 +10,7 @@
 #include <QMutex>                       // for QMutex
 #include <QString>                      // for QString
 
-#include "enums/recStatus.h"
+#include "recordingstatus.h"
 #include "tv.h"                         // for SleepStatus, etc
 #include "videoouttypes.h"              // for PictureAttribute
 

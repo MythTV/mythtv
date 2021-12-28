@@ -1,4 +1,4 @@
-#include "recStatus.h"
+#include "recordingstatus.h"
 #include "mythdate.h"
 
 QString RecStatus::toUIState(RecStatus::Type recstatus)

@@ -19,7 +19,7 @@
 #include "mythexp.h"
 #include "mythdate.h"
 #include "mythtypes.h"
-#include "enums/recStatus.h"
+#include "recordingstatus.h"
 
 /* If NUMPROGRAMLINES gets updated, then MYTH_PROTO_VERSION and MYTH_PROTO_TOKEN
    in mythversion.h need to be bumped, and also follow the instructions in
