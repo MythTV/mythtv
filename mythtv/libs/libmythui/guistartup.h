@@ -34,7 +34,7 @@
 #include "mythchrono.h"
 
 // MythDB headers
-#include "mythexp.h"
+#include "mythuiexp.h"
 
 // MythBase headers
 #include "mythchrono.h"
@@ -50,7 +50,7 @@ class MythUIStateType;
 class MythUIProgressBar;
 class MythTimer;
 
-class MPUBLIC GUIStartup : public MythScreenType
+class MUI_PUBLIC GUIStartup : public MythScreenType
 {
     Q_OBJECT
 

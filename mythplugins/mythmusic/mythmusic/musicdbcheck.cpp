@@ -8,7 +8,7 @@
 #include <mythcontext.h>
 #include <mythdbcheck.h>
 #include <mythtv/mythdb.h>
-#include <mythtv/schemawizard.h>
+#include <libmythui/schemawizard.h>
 
 #include "musicdbcheck.h"
 

@@ -14,7 +14,7 @@
 #endif
 
 // MythTV headers
-#include "mythexp.h"
+#include "mythuiexp.h"
 #include "mythscreentype.h"
 
 class MythUIButton;
@@ -22,7 +22,7 @@ class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUITextEdit;
 
-class MPUBLIC MythTerminal : public MythScreenType
+class MUI_PUBLIC MythTerminal : public MythScreenType
 {
     Q_OBJECT
 
