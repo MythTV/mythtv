@@ -1,3 +1,5 @@
+#include "rssparse.h"
+
 #include <QFile>
 #include <QDataStream>
 #include <QDomDocument>
@@ -9,11 +11,9 @@
 
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdirs.h"
+#include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsorthelper.h"
 #include "libmythbase/stringutil.h"
-
-#include "mythcontext.h"
-#include "rssparse.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,15,2)
 #define capturedView capturedRef
