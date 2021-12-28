@@ -19,7 +19,7 @@
 #include "exitcodes.h"
 #include "mythsystemlegacy.h"
 #include "mythversion.h"
-#include "mythcoreutil.h"
+#include "unziputil.h"
 #include "programtypes.h"
 #include "recordingtypes.h"
 #include "mythcorecontext.h"

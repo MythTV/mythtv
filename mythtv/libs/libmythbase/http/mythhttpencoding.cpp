@@ -1,6 +1,6 @@
 // MythTV
 #include "mythlogging.h"
-#include "mythcoreutil.h"
+#include "unziputil.h"
 #include "http/mythmimedatabase.h"
 #include "http/mythhttpdata.h"
 #include "http/mythhttpfile.h"

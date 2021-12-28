@@ -20,7 +20,7 @@
 #include "remotefile.h"
 #include "storagegroup.h"
 #include "mythsystem.h"
-#include "mythcoreutil.h"
+#include "unziputil.h"
 
 // mythbase
 #include "mythsorthelper.h"

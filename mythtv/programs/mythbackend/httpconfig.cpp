@@ -15,7 +15,7 @@
 #include "mythdirs.h"
 #include "storagegroup.h"
 #include "mythdownloadmanager.h"
-#include "mythcoreutil.h"
+#include "unziputil.h"
 
 HttpConfig::HttpConfig() : HttpServerExtension("HttpConfig", QString())
 {
