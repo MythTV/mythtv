@@ -64,6 +64,7 @@ SOURCES += cleanupguard.cpp portchecker.cpp
 SOURCES += mythsorthelper.cpp dbcheckcommon.cpp
 SOURCES += mythpower.cpp
 SOURCES += configuration.cpp
+SOURCES += mythversion.cpp
 
 HEADERS += http/mythhttpcommon.h
 HEADERS += http/mythhttptypes.h
