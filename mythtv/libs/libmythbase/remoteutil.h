@@ -2,18 +2,20 @@
 #define REMOTEUTIL_H_
 
 #include <ctime>
+#include <array>
+#include <chrono>
+#include <vector>
 
+#include <QString>
 #include <QStringList>
 #include <QDateTime>
-
-#include <array>
-#include <vector>
 
 #include "mythbaseexp.h"
 
 class ProgramInfo;
 class MythEvent;
 
+// TODO namespace MBASE_PUBLIC FileUtil
 using system_load_array = std::array<double,3>;
 
 MBASE_PUBLIC std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
@@ -51,6 +53,13 @@ MBASE_PUBLIC bool RemoteGetFileList(const QString& host, const QString& path, QS
                        QString sgroup, bool fileNamesOnly = false);
 MBASE_PUBLIC bool RemoteGetActiveBackends(QStringList *list);
 
-#endif
+MBASE_PUBLIC QString RemoteDownloadFile(const QString &url,
+                                   const QString &storageGroup,
+                                   const QString &filename = "");
+MBASE_PUBLIC QString RemoteDownloadFileNow(const QString &url,
+                                      const QString &storageGroup,
+                                      const QString &filename = "");
+
+#endif // REMOTEUTIL_H_
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -6,7 +6,7 @@
 #include <mythdialogbox.h>
 #include <mythcontext.h>
 #include <remotefile.h>
-#include <mythcoreutil.h>
+#include <remoteutil.h>
 #include <mythscreenstack.h>
 #include <mythuihelper.h>
 #include <mythmainwindow.h>
