@@ -13,7 +13,7 @@
 #include "mythevent.h"
 #include "mythsocket.h"
 
-vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
+std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
 {
     QString str = "QUERY_RECORDINGS ";
     if (sort < 0)
@@ -25,7 +25,7 @@ vector<ProgramInfo *> *RemoteGetRecordedList(int sort)
 
     QStringList strlist(str);
 
-    auto *info = new vector<ProgramInfo *>;
+    auto *info = new std::vector<ProgramInfo *>;
 
     if (!RemoteGetRecordingList(*info, strlist))
     {
@@ -159,20 +159,20 @@ bool RemoteUndeleteRecording(uint recordingID)
     return result;
 }
 
-void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
+void RemoteGetAllScheduledRecordings(std::vector<ProgramInfo *> &scheduledlist)
 {
     QStringList strList(QString("QUERY_GETALLSCHEDULED"));
     RemoteGetRecordingList(scheduledlist, strList);
 }
 
-void RemoteGetAllExpiringRecordings(vector<ProgramInfo *> &expiringlist)
+void RemoteGetAllExpiringRecordings(std::vector<ProgramInfo *> &expiringlist)
 {
     QStringList strList(QString("QUERY_GETEXPIRING"));
     RemoteGetRecordingList(expiringlist, strList);
 }
 
 uint RemoteGetRecordingList(
-    vector<ProgramInfo *> &reclist, QStringList &strList)
+    std::vector<ProgramInfo *> &reclist, QStringList &strList)
 {
     if (!gCoreContext->SendReceiveStringList(strList) || strList.isEmpty())
         return 0;
@@ -199,13 +199,13 @@ uint RemoteGetRecordingList(
     return ((uint) reclist.size()) - reclist_initial_size;
 }
 
-vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo)
+std::vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo)
 {
     QString cmd = QString("QUERY_GETCONFLICTING");
     QStringList strlist( cmd );
     pginfo->ToStringList(strlist);
 
-    auto *retlist = new vector<ProgramInfo *>;
+    auto *retlist = new std::vector<ProgramInfo *>;
 
     RemoteGetRecordingList(*retlist, strlist);
     return retlist;
@@ -525,14 +525,14 @@ int RemoteGetRecordingStatus(
 /**
  * \brief return list of currently recording shows
  */
-vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
+std::vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
 {
     QString str = "QUERY_RECORDINGS ";
     str += "Recording";
     QStringList strlist( str );
 
-    auto *reclist = new vector<ProgramInfo *>;
-    auto *info = new vector<ProgramInfo *>;
+    auto *reclist = new std::vector<ProgramInfo *>;
+    auto *info = new std::vector<ProgramInfo *>;
     if (!RemoteGetRecordingList(*info, strlist))
     {
         delete info;

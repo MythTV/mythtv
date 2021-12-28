@@ -6168,7 +6168,7 @@ bool LoadFromRecorded(
 
 bool GetNextRecordingList(QDateTime &nextRecordingStart,
                           bool *hasConflicts,
-                          vector<ProgramInfo> *list)
+                          std::vector<ProgramInfo> *list)
 {
     nextRecordingStart = QDateTime();
 

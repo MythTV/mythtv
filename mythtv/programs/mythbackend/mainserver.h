@@ -307,7 +307,7 @@ class MainServer : public QObject, public MythSocketCBs
                                  int fd, const QString &filename,
                                  off_t fsize);
 
-    vector<LiveTVChain*> m_liveTVChains;
+    std::vector<LiveTVChain*> m_liveTVChains;
     QMutex               m_liveTVChainsLock;
 
     QMap<int, EncoderLink *> *m_encoderList  {nullptr};
@@ -316,10 +316,10 @@ class MainServer : public QObject, public MythSocketCBs
     MetadataFactory       *m_metadatafactory {nullptr};
 
     QReadWriteLock         m_sockListLock;
-    vector<PlaybackSock *> m_playbackList;
-    vector<FileTransfer *> m_fileTransferList;
+    std::vector<PlaybackSock *> m_playbackList;
+    std::vector<FileTransfer *> m_fileTransferList;
     QSet<MythSocket*>      m_controlSocketList;
-    vector<MythSocket*>    m_decrRefSocketList;
+    std::vector<MythSocket*>    m_decrRefSocketList;
 
     QMutex                      m_masterFreeSpaceListLock;
     FreeSpaceUpdater * volatile m_masterFreeSpaceListUpdater {nullptr};

@@ -1125,7 +1125,7 @@ void ProgramRecPriority::saveRecPriority(void)
 
 void ProgramRecPriority::FillList(void)
 {
-    vector<ProgramInfo *> recordinglist;
+    std::vector<ProgramInfo *> recordinglist;
 
     m_programData.clear();
 
@@ -1306,7 +1306,7 @@ void ProgramRecPriority::UpdateList()
 
     m_programList->Reset();
 
-    vector<ProgramRecPriorityInfo*>::iterator it;
+    std::vector<ProgramRecPriorityInfo*>::iterator it;
     for (it = m_sortedProgram.begin(); it != m_sortedProgram.end(); ++it)
     {
         ProgramRecPriorityInfo *progInfo = *it;

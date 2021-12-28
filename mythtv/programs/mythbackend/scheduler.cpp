@@ -1094,7 +1094,7 @@ bool Scheduler::FindNextConflict(
 
         if (p->GetInputID() != q->GetInputID() && !ignoreinput)
         {
-            const vector <uint> &conflicting_inputs =
+            const std::vector<unsigned int> &conflicting_inputs =
                 m_sinputInfoMap[p->GetInputID()].m_conflictingInputs;
             if (find(conflicting_inputs.begin(), conflicting_inputs.end(),
                      q->GetInputID()) == conflicting_inputs.end())
@@ -1929,8 +1929,8 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 
     // now check other inputs in the same input group as the recording.
     uint inputid = rcinfo->GetInputID();
-    const vector<uint> &inputids = m_sinputInfoMap[inputid].m_conflictingInputs;
-    vector<uint> &group_inputs = m_sinputInfoMap[inputid].m_groupInputs;
+    const std::vector<unsigned int> &inputids = m_sinputInfoMap[inputid].m_conflictingInputs;
+    std::vector<unsigned int> &group_inputs = m_sinputInfoMap[inputid].m_groupInputs;
     for (uint id : inputids)
     {
         if (!m_tvList->contains(id))
@@ -2928,7 +2928,7 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
     QDateTime now = MythDate::current();
 
     // Check each child input to find the best one to use.
-    vector<uint> inputs = m_sinputInfoMap[ri.GetInputID()].m_groupInputs;
+    std::vector<unsigned int> inputs = m_sinputInfoMap[ri.GetInputID()].m_groupInputs;
     for (uint i = 0; !bestid && i < inputs.size(); ++i)
     {
         uint inputid = inputs[i];
@@ -3722,7 +3722,7 @@ void Scheduler::UpdateManuals(uint recordid)
         return;
     }
 
-    vector<uint> chanidlist;
+    std::vector<unsigned int> chanidlist;
     while (query.next())
         chanidlist.push_back(query.value(0).toUInt());
 

@@ -319,8 +319,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsle
         return;
 
     // We also need to check our input groups
-    vector<uint> inputids = CardUtil::GetConflictingInputs(
-        rcinfo->GetInputID());
+    std::vector<unsigned int> inputids = CardUtil::GetConflictingInputs(rcinfo->GetInputID());
 
     m_pendingRecordings[rcinfo->GetInputID()].m_possibleConflicts = inputids;
 
@@ -374,7 +373,7 @@ void TVRec::CancelNextRecording(bool cancel)
 
     if (cancel)
     {
-        vector<uint> &inputids = (*it).m_possibleConflicts;
+        std::vector<unsigned int> &inputids = (*it).m_possibleConflicts;
         for (uint inputid : inputids)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
@@ -487,13 +486,13 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             "Checking input group recorders - begin");
-        vector<uint> &inputids = pendinfo.m_possibleConflicts;
+        std::vector<unsigned int> &inputids = pendinfo.m_possibleConflicts;
 
         uint mplexid = 0;
         uint chanid = 0;
         uint sourceid = 0;
-        vector<uint> inputids2;
-        vector<TVState> states;
+        std::vector<unsigned int> inputids2;
+        std::vector<TVState> states;
 
         // Stop remote recordings if needed
         for (uint inputid : inputids)
@@ -1469,7 +1468,7 @@ void TVRec::run(void)
                 // a second tuner on a single card
                 s_inputsLock.lockForRead();
                 bool allow_eit = true;
-                vector<uint> inputids =
+                std::vector<unsigned int> inputids =
                     CardUtil::GetConflictingInputs(m_inputId);
                 InputInfo busy_input;
                 for (uint i = 0; i < inputids.size() && allow_eit; ++i)
@@ -2278,10 +2277,10 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         QString(" AND capturecard.cardid != '%1'").arg(m_inputId),
     };
 
-    vector<uint>    fchanid;
-    vector<QString> fchannum;
-    vector<uint>    finputid;
-    vector<QString> fspacer;
+    std::vector<unsigned int>   fchanid;
+    std::vector<QString>        fchannum;
+    std::vector<unsigned int>   finputid;
+    std::vector<QString>        fspacer;
 
     for (const auto & str : inputquery)
     {

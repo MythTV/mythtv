@@ -416,7 +416,7 @@ int main(int argc, char *argv[])
         if (!okCardID)
         {
             std::cerr << "You must enter a valid cardid to scan." << std::endl;
-            vector<uint> cardids = CardUtil::GetInputIDs();
+            std::vector<unsigned int> cardids = CardUtil::GetInputIDs();
             if (cardids.empty())
             {
                 std::cerr << "But no cards have been defined on this host"
@@ -494,7 +494,7 @@ int main(int argc, char *argv[])
 
     if (doScanList)
     {
-        vector<ScanInfo> scans = LoadScanList();
+        std::vector<ScanInfo> scans = LoadScanList();
 
         std::cout<<" scanid cardid sourceid processed        date"<<std::endl;
         for (auto & scan : scans)

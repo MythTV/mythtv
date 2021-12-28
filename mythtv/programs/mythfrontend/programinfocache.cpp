@@ -16,7 +16,7 @@
 
 #include <algorithm>
 
-using VPI_ptr = vector<ProgramInfo *> *;
+using VPI_ptr = std::vector<ProgramInfo *> *;
 static void free_vec(VPI_ptr &v)
 {
     if (v)
@@ -75,7 +75,7 @@ void ProgramInfoCache::Load(const bool updateUI)
     /**/
     // Get an unsorted list (sort = 0) from RemoteGetRecordedList
     // we sort the list later anyway.
-    vector<ProgramInfo*> *tmp = RemoteGetRecordedList(0);
+    std::vector<ProgramInfo*> *tmp = RemoteGetRecordedList(0);
     /**/
     locker.relock();
 
@@ -241,7 +241,7 @@ namespace {
     }
 }
 
-void ProgramInfoCache::GetOrdered(vector<ProgramInfo*> &list, bool newest_first)
+void ProgramInfoCache::GetOrdered(std::vector<ProgramInfo*> &list, bool newest_first)
 {
     std::copy(m_cache.cbegin(), m_cache.cend(), std::back_inserter(list));
 

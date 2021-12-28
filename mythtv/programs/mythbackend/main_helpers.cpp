@@ -147,8 +147,8 @@ bool setupTVs(bool ismaster, bool &error)
         return false;
     }
 
-    vector<uint>    cardids;
-    vector<QString> hosts;
+    std::vector<unsigned int> cardids;
+    std::vector<QString> hosts;
     while (query.next())
     {
         uint    cardid      = query.value(0).toUInt();

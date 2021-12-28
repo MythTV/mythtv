@@ -1581,7 +1581,7 @@ void MainServer::customEvent(QEvent *e)
     if (!broadcast.empty())
     {
         // Make a local copy of the list, upping the refcount as we go..
-        vector<PlaybackSock *> localPBSList;
+        std::vector<PlaybackSock *> localPBSList;
         m_sockListLock.lockForRead();
         for (auto & pbs : m_playbackList)
         {
@@ -1605,7 +1605,7 @@ void MainServer::customEvent(QEvent *e)
         bool isSystemEvent = broadcast[1].startsWith("SYSTEM_EVENT ");
         QStringList sentSetSystemEvent(gCoreContext->GetHostName());
 
-        vector<PlaybackSock*>::const_iterator iter;
+        std::vector<PlaybackSock*>::const_iterator iter;
         for (iter = localPBSList.begin(); iter != localPBSList.end(); ++iter)
         {
             PlaybackSock *pbs = *iter;
@@ -4401,8 +4401,8 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
         .arg(excluded_input));
 
     MythSocket *pbssock = pbs->getSocket();
-    vector<InputInfo> busyinputs;
-    vector<InputInfo> freeinputs;
+    std::vector<InputInfo> busyinputs;
+    std::vector<InputInfo> freeinputs;
     QMap<uint, QSet<uint> > groupids;
 
     // Lopp over each encoder and divide the inputs into busy and free
@@ -4421,7 +4421,7 @@ void MainServer::HandleGetFreeInputInfo(PlaybackSock *pbs,
             continue;
         }
 
-        vector<uint> infogroups;
+        std::vector<uint> infogroups;
         CardUtil::GetInputInfo(info, &infogroups);
         for (uint group : infogroups)
             groupids[info.m_inputId].insert(group);
@@ -8068,7 +8068,7 @@ void MainServer::DeleteChain(LiveTVChain *chain)
     if (!chain)
         return;
 
-    vector<LiveTVChain*> newChains;
+    std::vector<LiveTVChain*> newChains;
 
     for (auto & entry : m_liveTVChains)
     {

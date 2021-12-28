@@ -37,8 +37,8 @@ class SchedInputInfo
     uint          m_inputId      {0};
     uint          m_sgroupId     {0};
     bool          m_schedGroup   {false};
-    vector<uint>  m_groupInputs;
-    vector<uint>  m_conflictingInputs;
+    std::vector<unsigned int>  m_groupInputs;
+    std::vector<unsigned int>  m_conflictingInputs;
     RecList      *m_conflictList {nullptr};
 };
 
@@ -245,7 +245,7 @@ class Scheduler : public MThread, public MythScheduler
     RecList                m_workList;
     RecList                m_livetvList;
     QMap<uint, SchedInputInfo> m_sinputInfoMap;
-    vector<RecList *>      m_conflictLists;
+    std::vector<RecList *> m_conflictLists;
     QMap<uint, RecList>    m_recordIdListMap;
     QMap<QString, RecList> m_titleListMap;
 

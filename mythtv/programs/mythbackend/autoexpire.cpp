@@ -150,7 +150,7 @@ void AutoExpire::CalcParams()
                           << 20;
 
     QMap<int, uint64_t> fsMap;
-    QMap<int, vector<int> > fsEncoderMap;
+    QMap<int, std::vector<int> > fsEncoderMap;
 
     // We use this copying on purpose. The used_encoders map ensures
     // that every encoder writes only to one fs.
