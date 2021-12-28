@@ -1,12 +1,12 @@
+#include "netutils.h"
+
 #include <QDir>
 #include <QFileInfo>
 
+#include "libmythbase/mythcorecontext.h" // for GetHostName
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdb.h"
 #include "libmythbase/mythdirs.h"
-
-#include "mythcontext.h"
-#include "netutils.h"
 
 bool findTreeGrabberInDB(const QString& commandline,
                          ArticleType type)

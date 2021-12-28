@@ -1,15 +1,16 @@
+#include "mythrssmanager.h"
+
 // qt
 #include <QDir>
 #include <QFile>
 #include <QString>
 
+#include "libmythbase/mythcorecontext.h" // for GetDurSetting TODO: excise database from MythCoreContext
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythdirs.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythbase/mythsorthelper.h"
 
-#include "mythcontext.h"
-#include "mythrssmanager.h"
 #include "netutils.h"
 #include "rssparse.h"
 
