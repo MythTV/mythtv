@@ -956,7 +956,7 @@ class TV::SleepTimerInfo
     std::chrono::milliseconds milliseconds;
 };
 
-const vector<TV::SleepTimerInfo> TV::s_sleepTimes =
+const std::vector<TV::SleepTimerInfo> TV::s_sleepTimes =
 {
     { tr("Off",   "Sleep timer"),   0min },
     { tr("30m",   "Sleep timer"),  30min },
@@ -1664,7 +1664,7 @@ void TV::ShowOSDAskAllow()
     {
         // get the currently used input on our card
         bool busy_input_grps_loaded = false;
-        vector<uint> busy_input_grps;
+        std::vector<uint> busy_input_grps;
         InputInfo busy_input;
         RemoteIsBusy(cardid, busy_input);
 
@@ -1684,7 +1684,7 @@ void TV::ShowOSDAskAllow()
                 busy_input_grps_loaded = true;
             }
 
-            vector<uint> input_grps =
+            std::vector<uint> input_grps =
                 CardUtil::GetInputGroups((*it).m_info->GetInputID());
 
             for (uint grp : input_grps)

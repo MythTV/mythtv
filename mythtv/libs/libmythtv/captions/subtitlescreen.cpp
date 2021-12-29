@@ -1226,7 +1226,7 @@ void FormattedTextSubtitle608::Layout(void)
     FormattedTextSubtitle::Layout();
 }
 
-void FormattedTextSubtitle608::Init(const vector<CC608Text*> &buffers)
+void FormattedTextSubtitle608::Init(const std::vector<CC608Text*> &buffers)
 {
     static const std::array<const QColor,8> kClr
     {
@@ -1332,7 +1332,7 @@ void FormattedTextSubtitle708::Draw(void)
 }
 
 void FormattedTextSubtitle708::Init(const CC708Window &win,
-                                    const vector<CC708String*> &list,
+                                    const std::vector<CC708String*> &list,
                                     float aspect)
 {
     LOG(VB_VBI, LOG_DEBUG,LOC +
@@ -2282,7 +2282,7 @@ void SubtitleScreen::DisplayCC708Subtitles(void)
             continue;
 
         QMutexLocker locker(&win.m_lock);
-        vector<CC708String*> list = win.GetStrings();
+        std::vector<CC708String*> list = win.GetStrings();
         if (!list.empty())
         {
             auto *fsub = new FormattedTextSubtitle708(win, i, list, m_family,

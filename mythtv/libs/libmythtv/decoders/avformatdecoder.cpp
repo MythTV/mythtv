@@ -1319,7 +1319,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
         estimated_fps = av_q2d(Stream->r_frame_rate);
 
     // build a list of possible rates, best first
-    vector<double> rates;
+    std::vector<double> rates;
 
     // matroska demuxer sets the default_duration to avg_frame_rate
     // mov,mp4,m4a,3gp,3g2,mj2 demuxer sets avg_frame_rate
@@ -1367,7 +1367,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     auto IsStandard = [&FuzzyEquals](double Rate)
     {
         // List of known, standards based frame rates
-        static const vector<double> s_normRates =
+        static const std::vector<double> s_normRates =
         {
             24000.0 / 1001.0, 23.976, 24.0, 25.0, 30000.0 / 1001.0,
             29.97, 30.0, 50.0, 60000.0 / 1001.0, 59.94, 60.0, 100.0,
@@ -4278,10 +4278,10 @@ int AvFormatDecoder::AutoSelectTrack(uint type)
     return DecoderBase::AutoSelectTrack(type);
 }
 
-static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key,
-                               const vector<int> &ftype)
+static std::vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key,
+                                    const std::vector<int> &ftype)
 {
-    vector<int> ret;
+    std::vector<int> ret;
 
     for (int index : ftype)
     {
@@ -4292,9 +4292,9 @@ static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key,
     return ret;
 }
 
-static vector<int> filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
+static std::vector<int> filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
 {
-    vector<int> ret;
+    std::vector<int> ret;
 
     for (size_t i = 0; i < tracks.size(); i++)
     {
@@ -4307,7 +4307,7 @@ static vector<int> filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
 
 int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
                                    const sinfo_vec_t     &tracks,
-                                   const vector<int>     &fs,
+                                   const std::vector<int>&fs,
                                    enum AVCodecID         codecId,
                                    int                    profile)
 {
@@ -4452,7 +4452,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select audio track (w/lang)");
 
         // Filter out commentary and audio description tracks
-        vector<int> ftype = filter_type(atracks, kAudioTypeNormal);
+        std::vector<int> ftype = filter_type(atracks, kAudioTypeNormal);
 
         if (ftype.empty())
         {
@@ -4467,7 +4467,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         uint language_key = iso639_str3_to_key(language_key_convert);
         uint canonical_key = iso639_key_to_canonical_key(language_key);
 
-        vector<int> flang = filter_lang(atracks, canonical_key, ftype);
+        std::vector<int> flang = filter_lang(atracks, canonical_key, ftype);
 
         if (m_audio->CanDTSHD())
             selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,

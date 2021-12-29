@@ -302,7 +302,7 @@ void ScheduleCommon::EditRecording(bool may_watch_now)
     if (recinfo.GetRecordingStatus() == RecStatus::Conflict ||
         recinfo.GetRecordingStatus() == RecStatus::LaterShowing)
     {
-        vector<ProgramInfo *> *confList = RemoteGetConflictList(&recinfo);
+        std::vector<ProgramInfo *> *confList = RemoteGetConflictList(&recinfo);
         uint chanid = recinfo.GetChanID();
         uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
 

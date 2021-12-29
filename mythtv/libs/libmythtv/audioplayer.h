@@ -13,8 +13,6 @@
 #include <cstdint>
 #include <vector>
 
-using std::vector;
-
 class  MythPlayer;
 class  AudioOutput;
 struct AVCodecContext;
@@ -128,7 +126,7 @@ class MTV_PUBLIC AudioPlayer : public QObject
     bool         m_noAudioIn         {false};
     bool         m_noAudioOut        {true};
     bool         m_controlsVolume    {true};
-    vector<MythTV::Visual*> m_visuals;
+    std::vector<MythTV::Visual*> m_visuals;
 };
 
 #endif // AUDIOPLAYER_H

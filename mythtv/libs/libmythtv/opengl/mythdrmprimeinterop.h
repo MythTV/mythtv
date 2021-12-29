@@ -17,9 +17,10 @@ class MythDRMPRIMEInterop : public MythOpenGLInterop, public MythEGLDMABUF
     static void GetDRMTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types);
     static MythDRMPRIMEInterop* CreateDRM(MythRenderOpenGL* Context, MythPlayerUI* Player);
     void DeleteTextures(void) override;
-    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
-                                            MythVideoColourSpace *ColourSpace,
-                                            MythVideoFrame *Frame, FrameScanType Scan) override;
+    std::vector<MythVideoTextureOpenGL*>
+    Acquire(MythRenderOpenGL *Context,
+            MythVideoColourSpace *ColourSpace,
+            MythVideoFrame *Frame, FrameScanType Scan) override;
 
   protected:
     MythDRMPRIMEInterop(MythRenderOpenGL* Context, MythPlayerUI* Player, InteropType Type);

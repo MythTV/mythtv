@@ -136,7 +136,7 @@ class MTV_PUBLIC MythCCExtractorPlayer : public MythPlayer
     void Ingest708Caption(uint streamId, uint serviceIdx, uint windowIdx,
                           uint start_row, uint start_column,
                           const CC708Window &win,
-                          const vector<CC708String*> &content);
+                          const std::vector<CC708String*> &content);
     void Process708Captions(uint flags);
 
     void IngestTeletext(void);

@@ -414,7 +414,7 @@ void MythCCExtractorPlayer::Ingest708Captions(void)
                 CC708Window &win = service->m_windows[windowIdx];
                 if (win.GetChanged())
                 {
-                    vector<CC708String*> strings;
+                    std::vector<CC708String*> strings;
                     if (win.GetVisible())
                     {
                         strings = win.GetStrings();
@@ -434,7 +434,7 @@ void MythCCExtractorPlayer::Ingest708Caption(
     uint streamId, uint serviceIdx,
     uint windowIdx, uint start_row, uint start_column,
     const CC708Window &win,
-    const vector<CC708String*> &content)
+    const std::vector<CC708String*> &content)
 {
     FormattedTextSubtitle708 fsub(win, windowIdx, content);
     QStringList winContent = fsub.ToSRT();

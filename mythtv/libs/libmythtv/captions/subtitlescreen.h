@@ -131,7 +131,7 @@ private:
 class MTV_PUBLIC FormattedTextSubtitle608 : public FormattedTextSubtitle
 {
 public:
-    explicit FormattedTextSubtitle608(const vector<CC608Text*> &buffers,
+    explicit FormattedTextSubtitle608(const std::vector<CC608Text*> &buffers,
                              const QString &base = "",
                              QRect safearea = QRect(),
                              SubtitleScreen *p = nullptr) :
@@ -141,7 +141,7 @@ public:
     }
     void Layout(void) override; // FormattedTextSubtitle
 private:
-    void Init(const vector<CC608Text*> &buffers);
+    void Init(const std::vector<CC608Text*> &buffers);
 };
 
 class MTV_PUBLIC FormattedTextSubtitle708 : public FormattedTextSubtitle
@@ -149,7 +149,7 @@ class MTV_PUBLIC FormattedTextSubtitle708 : public FormattedTextSubtitle
 public:
     FormattedTextSubtitle708(const CC708Window &win,
                              int num,
-                             const vector<CC708String*> &list,
+                             const std::vector<CC708String*> &list,
                              const QString &base = "",
                              QRect safearea = QRect(),
                              SubtitleScreen *p = nullptr,
@@ -166,7 +166,7 @@ public:
         { return m_num; }
 private:
     void Init(const CC708Window &win,
-              const vector<CC708String*> &list,
+              const std::vector<CC708String*> &list,
               float aspect);
     int m_num;
     uint m_bgFillAlpha;

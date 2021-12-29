@@ -189,7 +189,7 @@ class AvFormatDecoder : public DecoderBase
     int  AutoSelectAudioTrack(void);
     int  filter_max_ch(const AVFormatContext *ic,
                        const sinfo_vec_t     &tracks,
-                       const vector<int>     &fs,
+                       const std::vector<int>&fs,
                        enum AVCodecID         codecId = AV_CODEC_ID_NONE,
                        int                    profile = -1);
 
