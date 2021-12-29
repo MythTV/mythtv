@@ -24,7 +24,6 @@
 
 // C++ headers
 #include <algorithm>
-using std::min;
 
 #define LOC     QString("PulseAudio: ")
 
@@ -243,7 +242,7 @@ void AudioOutputPulseAudio::WriteAudio(uchar *aubuf, int size)
             size_t writable = pa_stream_writable_size(m_pstream);
             if (writable > 0)
             {
-                size_t write = min(to_write, writable);
+                size_t write = std::min(to_write, writable);
                 write_status = pa_stream_write(m_pstream, buf_ptr, write,
                                                nullptr, 0, PA_SEEK_RELATIVE);
 
@@ -334,8 +333,7 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
 
 // FIXME: This code did nothing at all so has been commented out for now
 //        until it's decided whether it was ever required
-//     volume = min(100, volume);
-//     volume = max(0, volume);
+//     volume = std::clamp(volume, 0, 100);
 
     if (gCoreContext->GetSetting("MixerControl", "PCM").toLower() == "pcm")
     {

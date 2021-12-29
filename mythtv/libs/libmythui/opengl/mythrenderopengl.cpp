@@ -1,7 +1,6 @@
 // Std
 #include <algorithm>
 #include <cmath>
-using std::min;
 
 // Qt
 #include <QLibrary>
@@ -1169,8 +1168,8 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     GLfloat *data = Texture->m_vertexData.data();
     QSize    size = Texture->m_size;
 
-    int width  = Texture->m_crop ? min(Source.width(),  size.width())  : Source.width();
-    int height = Texture->m_crop ? min(Source.height(), size.height()) : Source.height();
+    int width  = Texture->m_crop ? std::min(Source.width(),  size.width())  : Source.width();
+    int height = Texture->m_crop ? std::min(Source.height(), size.height()) : Source.height();
 
     if (Texture->m_target != QOpenGLTexture::TargetRectangle)
     {
@@ -1192,8 +1191,8 @@ bool MythRenderOpenGL::UpdateTextureVertices(MythGLTexture *Texture, const QRect
     data[4 + TEX_OFFSET] = data[6 + TEX_OFFSET];
     data[5 + TEX_OFFSET] = data[1 + TEX_OFFSET];
 
-    width  = Texture->m_crop ? min(static_cast<int>(width * Scale), Destination.width())   : Destination.width();
-    height = Texture->m_crop ? min(static_cast<int>(height * Scale), Destination.height()) : Destination.height();
+    width  = Texture->m_crop ? std::min(static_cast<int>(width * Scale), Destination.width())   : Destination.width();
+    height = Texture->m_crop ? std::min(static_cast<int>(height * Scale), Destination.height()) : Destination.height();
 
     data[2] = data[0] = Destination.left();
     data[5] = data[1] = Destination.top();

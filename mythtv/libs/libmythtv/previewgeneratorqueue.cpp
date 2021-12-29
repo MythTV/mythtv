@@ -3,7 +3,6 @@
 
 // C++
 #include <algorithm>
-using std::max;
 
 // QT
 #include <QCoreApplication>
@@ -222,7 +221,7 @@ void PreviewGeneratorQueue::RemoveListener(QObject *listener)
  * generation thread.
 
  * \bug This function appears to incorrectly compute the value of
- * lastBlockTime.  The call to max() will correctly ensure that if the
+ * lastBlockTime.  The call to std::max() will correctly ensure that if the
  * old value of lastBlockTime is zero, that the new time for the first
  * "retry" will be two.  The problem is that all subsequent "retries"
  * will also be limited to two, so there is no increasing back off
@@ -310,7 +309,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             else
             {
                 (*it).m_lastBlockTime =
-                    max(m_minBlockSeconds, (*it).m_lastBlockTime * 2);
+                    std::max(m_minBlockSeconds, (*it).m_lastBlockTime * 2);
                 (*it).m_blockRetryUntil =
                     MythDate::current().addSecs((*it).m_lastBlockTime.count());
             }

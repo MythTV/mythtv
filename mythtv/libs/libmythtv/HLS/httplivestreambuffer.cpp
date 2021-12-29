@@ -36,8 +36,6 @@
 
 // C++
 #include <algorithm> // for min/max
-using std::max;
-using std::min;
 #include <array>
 
 // libmythbase
@@ -831,7 +829,7 @@ class HLSStream
             // not even size, pad with front 0
             line.insert(2, QLatin1String("0"));
         }
-        int padding = max(0, AES_BLOCK_SIZE - (static_cast<int>(line.size()) - 2));
+        int padding = std::max(0, AES_BLOCK_SIZE - (static_cast<int>(line.size()) - 2));
         QByteArray ba = QByteArray(padding, 0x0);
         ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
         std::copy(ba.cbegin(), ba.cend(), m_aesIv.begin());
@@ -2576,7 +2574,7 @@ bool HLSRingBuffer::OpenFile(const QString &lfilename, std::chrono::milliseconds
     m_streamworker = new StreamWorker(this, m_startup, PLAYBACK_READAHEAD);
     m_streamworker->start();
 
-    if (Prefetch(min(NumSegments(), PLAYBACK_MINBUFFER)) != RET_OK)
+    if (Prefetch(std::min(NumSegments(), PLAYBACK_MINBUFFER)) != RET_OK)
     {
         LOG(VB_PLAYBACK, LOG_ERR, LOC +
             "fetching first segment failed or didn't complete within 10s.");
