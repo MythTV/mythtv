@@ -11,7 +11,6 @@
 
 // C++
 #include <algorithm>
-using std::lower_bound;
 
 // Qt
 #include <QRunnable>
@@ -186,7 +185,7 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode)
     text_subtitle_t searchTarget(timecode, timecode);
 
     auto nextSubPos =
-        lower_bound(m_subtitles.begin(), m_subtitles.end(), searchTarget);
+        std::lower_bound(m_subtitles.begin(), m_subtitles.end(), searchTarget);
 
     uint64_t startCode = 0;
     uint64_t endCode = 0;
