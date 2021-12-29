@@ -6,7 +6,6 @@
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 // C/C++ lib
 #include <cstdlib>
-using std::getenv;
 #endif
 
 // Qt
@@ -55,7 +54,7 @@ MHInteractionChannel::EStatus MHInteractionChannel::status()
         return kDisabled;
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    QStringList opts = QString(getenv("MYTHMHEG")).split(':');
+    QStringList opts = QString(std::getenv("MYTHMHEG")).split(':');
 #else
     QStringList opts = qEnvironmentVariable("MYTHMHEG").split(':');
 #endif

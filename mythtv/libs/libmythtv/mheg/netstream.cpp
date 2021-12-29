@@ -6,7 +6,6 @@
 // C/C++ lib
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #include <cstdlib>
-using std::getenv;
 #endif
 #include <cstddef>
 #include <cstdio>
@@ -44,7 +43,7 @@ using std::getenv;
 #include "mythdirs.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
+#define qEnvironmentVariable std::getenv
 #endif
 
 /*
