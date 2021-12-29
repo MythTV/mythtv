@@ -1790,11 +1790,13 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
 
     //head_pos == 0 means that we are decoding B frames after a seq_header
     if (headPos == 0)
+    {
         if (PlaybackSecondary())
         {
             av_packet_free(&pkt);
             return 1;
         }
+    }
 
     for (const auto & of : qAsConst(*orderedFrames))
     {

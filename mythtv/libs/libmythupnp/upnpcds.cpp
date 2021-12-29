@@ -94,7 +94,7 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     SetValue< QString  >( "ServiceResetToken",
                           QDateTime::currentDateTimeUtc().toString(Qt::ISODate) );
 
-    QString sUPnpDescPath = gCoreContext->GetConfiguration()->GetValue( "UPnP/DescXmlPath", sSharePath );
+    QString sUPnpDescPath = MythCoreContext::GetConfiguration()->GetValue( "UPnP/DescXmlPath", sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
     m_sControlUrl          = "/CDS_Control";
