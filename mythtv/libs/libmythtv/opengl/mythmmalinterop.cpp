@@ -85,12 +85,13 @@ MMAL_BUFFER_HEADER_T* MythMMALInterop::VerifyBuffer(MythRenderOpenGL *Context, M
     return result;
 }
 
-vector<MythVideoTextureOpenGL*> MythMMALInterop::Acquire(MythRenderOpenGL *Context,
-                                                         MythVideoColourSpace *ColourSpace,
-                                                         MythVideoFrame *Frame,
-                                                         FrameScanType Scan)
+std::vector<MythVideoTextureOpenGL*>
+MythMMALInterop::Acquire(MythRenderOpenGL *Context,
+                         MythVideoColourSpace *ColourSpace,
+                         MythVideoFrame *Frame,
+                         FrameScanType Scan)
 {
-    vector<MythVideoTextureOpenGL*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
         return result;
 
@@ -134,7 +135,7 @@ vector<MythVideoTextureOpenGL*> MythMMALInterop::Acquire(MythRenderOpenGL *Conte
 
     if (m_openglTextures.isEmpty())
     {
-        vector<QSize> sizes;
+        std::vector<QSize> sizes;
         for (uint plane = 0 ; plane < count; ++plane)
         {
             QSize size(MythVideoFrame::GetWidthForPlane(format, Frame->m_width, plane),
@@ -142,7 +143,7 @@ vector<MythVideoTextureOpenGL*> MythMMALInterop::Acquire(MythRenderOpenGL *Conte
             sizes.push_back(size);
         }
 
-        vector<MythVideoTextureOpenGL*> textures =
+        std::vector<MythVideoTextureOpenGL*> textures =
             MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_MMAL, format, sizes,GL_TEXTURE_EXTERNAL_OES);
         if (textures.size() != count)
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create all textures");

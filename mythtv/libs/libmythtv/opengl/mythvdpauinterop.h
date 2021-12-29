@@ -29,8 +29,9 @@ class MythVDPAUInterop : public MythOpenGLInterop
   public:
     static void GetVDPAUTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types);
     static MythVDPAUInterop* CreateVDPAU(MythPlayerUI* Player, MythRenderOpenGL* Context, MythCodecID CodecId);
-    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
-                                            MythVideoFrame* Frame, FrameScanType Scan) override;
+    std::vector<MythVideoTextureOpenGL*>
+    Acquire(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
+            MythVideoFrame* Frame, FrameScanType Scan) override;
     bool  IsPreempted(void) const;
 
   public slots:

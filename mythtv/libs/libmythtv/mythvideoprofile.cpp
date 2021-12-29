@@ -292,7 +292,7 @@ MythVideoProfile::MythVideoProfile()
     QString cur_profile = GetDefaultProfileName(hostname);
     uint    groupid     = GetProfileGroupID(cur_profile, hostname);
 
-    vector<MythVideoProfileItem> items = LoadDB(groupid);
+    std::vector<MythVideoProfileItem> items = LoadDB(groupid);
     for (const auto & item : items)
     {
         if (auto [valid, error] = item.IsValid(); !valid)
@@ -425,7 +425,7 @@ void MythVideoProfile::SetPreference(const QString &Key, const QString &Value)
         m_currentPreferences[Key] = Value;
 }
 
-vector<MythVideoProfileItem>::const_iterator MythVideoProfile::FindMatch
+std::vector<MythVideoProfileItem>::const_iterator MythVideoProfile::FindMatch
     (const QSize Size, float Framerate, const QString &CodecName, const QStringList& DisallowedDecoders)
 {
     for (auto it = m_allowedPreferences.cbegin(); it != m_allowedPreferences.cend(); ++it)
@@ -487,10 +487,10 @@ void MythVideoProfile::LoadBestPreferences(const QSize Size, float Framerate,
         emit DeinterlacersChanged(deint1x, deint2x);
 }
 
-vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)
+std::vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)
 {
     MythVideoProfileItem tmp;
-    vector<MythVideoProfileItem> list;
+    std::vector<MythVideoProfileItem> list;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -542,7 +542,7 @@ vector<MythVideoProfileItem> MythVideoProfile::LoadDB(uint GroupId)
     return list;
 }
 
-bool MythVideoProfile::DeleteDB(uint GroupId, const vector<MythVideoProfileItem> &Items)
+bool MythVideoProfile::DeleteDB(uint GroupId, const std::vector<MythVideoProfileItem> &Items)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -568,7 +568,7 @@ bool MythVideoProfile::DeleteDB(uint GroupId, const vector<MythVideoProfileItem>
     return ok;
 }
 
-bool MythVideoProfile::SaveDB(uint GroupId, vector<MythVideoProfileItem> &Items)
+bool MythVideoProfile::SaveDB(uint GroupId, std::vector<MythVideoProfileItem> &Items)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -718,7 +718,7 @@ QStringList MythVideoProfile::GetDecoderNames()
 
 std::vector<std::pair<QString, QString> > MythVideoProfile::GetUpscalers()
 {
-    static vector<std::pair<QString,QString>> s_upscalers =
+    static std::vector<std::pair<QString,QString>> s_upscalers =
     {
         { tr("Default (Bilinear)"), UPSCALE_DEFAULT },
         { tr("Bicubic"), UPSCALE_HQ1 }

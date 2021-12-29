@@ -10,8 +10,7 @@
 #include "mythframe.h"
 
 // Std
-#include "vector"
-using std::vector;
+#include <vector>
 
 class MythRender;
 class MythPlayerUI;

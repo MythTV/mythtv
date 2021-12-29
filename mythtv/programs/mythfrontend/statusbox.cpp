@@ -1609,7 +1609,7 @@ void StatusBox::doAutoExpireList(bool updateExpList)
     long long             deletedGroupSize(0);
     int                   deletedGroupCount(0);
 
-    vector<ProgramInfo *>::iterator it;
+    std::vector<ProgramInfo *>::iterator it;
 
     if (updateExpList)
     {

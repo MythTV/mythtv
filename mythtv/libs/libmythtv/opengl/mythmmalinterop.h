@@ -15,9 +15,10 @@ class MythMMALInterop : public MythOpenGLInterop
   public:
     static void GetMMALTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types);
     static MythMMALInterop* CreateMMAL(MythRenderOpenGL* Context);
-    virtual vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
-                                                    MythVideoColourSpace *ColourSpace,
-                                                    MythVideoFrame *Frame, FrameScanType Scan) override;
+    virtual std::vector<MythVideoTextureOpenGL*>
+    Acquire(MythRenderOpenGL *Context,
+            MythVideoColourSpace *ColourSpace,
+            MythVideoFrame *Frame, FrameScanType Scan) override;
 
   protected:
     MythMMALInterop(MythRenderOpenGL *Context);

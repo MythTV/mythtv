@@ -82,12 +82,13 @@ CVPixelBufferRef MythVTBInterop::Verify(MythRenderOpenGL* Context, MythVideoColo
     return reinterpret_cast<CVPixelBufferRef>(Frame->m_buffer);
 }
 
-vector<MythVideoTextureOpenGL*> MythVTBInterop::Acquire(MythRenderOpenGL* Context,
-                                                        MythVideoColourSpace* ColourSpace,
-                                                        MythVideoFrame* Frame,
-                                                        FrameScanType)
+std::vector<MythVideoTextureOpenGL*>
+MythVTBInterop::Acquire(MythRenderOpenGL* Context,
+                        MythVideoColourSpace* ColourSpace,
+                        MythVideoFrame* Frame,
+                        FrameScanType)
 {
-    vector<MythVideoTextureOpenGL*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     OpenGLLocker locker(m_openglContext);
 
     CVPixelBufferRef buffer = Verify(Context, ColourSpace, Frame);
@@ -175,12 +176,13 @@ MythVTBSurfaceInterop::~MythVTBSurfaceInterop()
 {
 }
 
-vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL* Context,
-                                                               MythVideoColourSpace* ColourSpace,
-                                                               MythVideoFrame* Frame,
-                                                               FrameScanType Scan)
+std::vector<MythVideoTextureOpenGL*>
+MythVTBSurfaceInterop::Acquire(MythRenderOpenGL* Context,
+                               MythVideoColourSpace* ColourSpace,
+                               MythVideoFrame* Frame,
+                               FrameScanType Scan)
 {
-    vector<MythVideoTextureOpenGL*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     OpenGLLocker locker(m_openglContext);
 
     CVPixelBufferRef buffer = Verify(Context, ColourSpace, Frame);
@@ -234,7 +236,7 @@ vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::Acquire(MythRenderOpenGL*
     IOSurfaceLock(surface, kIOSurfaceLockReadOnly, nullptr);
 
     // Create raw rectangular textures
-    vector<QSize> sizes;
+    std::vector<QSize> sizes;
     for (int plane = 0; plane < planes; ++plane)
     {
         int width  = IOSurfaceGetWidthOfPlane(surface, plane);
@@ -299,9 +301,9 @@ void MythVTBSurfaceInterop::RotateReferenceFrames(IOSurfaceID Buffer)
         m_referenceFrames.pop_back();
 }
 
-vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::GetReferenceFrames(void)
+std::vector<MythVideoTextureOpenGL*> MythVTBSurfaceInterop::GetReferenceFrames(void)
 {
-    vector<MythVideoTextureOpenGL*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     int size = m_referenceFrames.size();
     if (size < 1)
         return result;

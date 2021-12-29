@@ -75,9 +75,9 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     OpenGLLocker locker(m_openglContext);
 
     // Create texture
-    vector<QSize> sizes;
+    std::vector<QSize> sizes;
     sizes.push_back(Size);
-    vector<MythVideoTextureOpenGL*> textures =
+    std::vector<MythVideoTextureOpenGL*> textures =
         MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_MEDIACODEC, FMT_RGBA32, sizes, GL_TEXTURE_EXTERNAL_OES);
     if (textures.empty())
     {
@@ -113,12 +113,13 @@ bool MythMediaCodecInterop::Initialise(QSize Size)
     return false;
 }
 
-vector<MythVideoTextureOpenGL*> MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
-                                                               MythVideoColourSpace *ColourSpace,
-                                                               MythVideoFrame *Frame,
-                                                               FrameScanType)
+std::vector<MythVideoTextureOpenGL*>
+MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
+                               MythVideoColourSpace *ColourSpace,
+                               MythVideoFrame *Frame,
+                               FrameScanType)
 {
-    vector<MythVideoTextureOpenGL*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
         return result;
 

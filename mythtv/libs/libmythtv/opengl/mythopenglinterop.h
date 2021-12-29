@@ -20,15 +20,18 @@ class MythOpenGLInterop : public MythInteropGPU
 
   public:
     static void GetTypes(MythRender* Render, MythInteropGPU::InteropMap& Types);
-    static vector<MythVideoTextureOpenGL*> Retrieve(MythRenderOpenGL *Context,
-                                                    MythVideoColourSpace *ColourSpace,
-                                                    MythVideoFrame *Frame,
-                                                    FrameScanType Scan);
+    static std::vector<MythVideoTextureOpenGL*>
+    Retrieve(MythRenderOpenGL *Context,
+             MythVideoColourSpace *ColourSpace,
+             MythVideoFrame *Frame,
+             FrameScanType Scan);
 
     ~MythOpenGLInterop() override;
-    virtual vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
-                                                    MythVideoColourSpace *ColourSpace,
-                                                    MythVideoFrame *Frame, FrameScanType Scan);
+
+    virtual std::vector<MythVideoTextureOpenGL*>
+    Acquire(MythRenderOpenGL *Context,
+            MythVideoColourSpace *ColourSpace,
+            MythVideoFrame *Frame, FrameScanType Scan);
 
   protected:
     MythOpenGLInterop(MythRenderOpenGL *Context, InteropType Type, MythPlayerUI* Player = nullptr);
@@ -36,7 +39,7 @@ class MythOpenGLInterop : public MythInteropGPU
 
   protected:
     MythRenderOpenGL* m_openglContext { nullptr };
-    QHash<unsigned long long, vector<MythVideoTextureOpenGL*> > m_openglTextures;
+    QHash<unsigned long long, std::vector<MythVideoTextureOpenGL*> > m_openglTextures;
 };
 
 #endif

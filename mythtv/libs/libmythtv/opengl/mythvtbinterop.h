@@ -12,10 +12,10 @@ class MythVTBInterop : public MythOpenGLInterop
   public:
     static void GetVTBTypes(MythRenderOpenGL* Render, MythInteropGPU::InteropMap& Types);
     static MythVTBInterop* CreateVTB(MythPlayerUI* Player, MythRenderOpenGL* Context);
-    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL*     Context,
-                                            MythVideoColourSpace* ColourSpace,
-                                            MythVideoFrame*       Frame,
-                                            FrameScanType         Scan) override;
+    std::vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL*     Context,
+                                                 MythVideoColourSpace* ColourSpace,
+                                                 MythVideoFrame*       Frame,
+                                                 FrameScanType         Scan) override;
 
   protected:
     CVPixelBufferRef Verify(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
@@ -30,15 +30,15 @@ class MythVTBSurfaceInterop : public MythVTBInterop
     explicit MythVTBSurfaceInterop(MythPlayerUI* Player, MythRenderOpenGL *Context);
    ~MythVTBSurfaceInterop() override;
 
-    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL*     Context,
-                                            MythVideoColourSpace* ColourSpace,
-                                            MythVideoFrame*       Frame,
-                                            FrameScanType         Scan) override;
+    std::vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL*     Context,
+                                                 MythVideoColourSpace* ColourSpace,
+                                                 MythVideoFrame*       Frame,
+                                                 FrameScanType         Scan) override;
 
   private:
 
     void RotateReferenceFrames(IOSurfaceID Buffer);
-    vector<MythVideoTextureOpenGL*> GetReferenceFrames(void);
+    std::vector<MythVideoTextureOpenGL*> GetReferenceFrames(void);
     QVector<IOSurfaceID> m_referenceFrames { };
 };
 

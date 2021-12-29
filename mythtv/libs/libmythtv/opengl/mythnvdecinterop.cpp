@@ -47,7 +47,7 @@ void MythNVDECInterop::DeleteTextures()
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Deleting CUDA resources");
         for (auto it = m_openglTextures.constBegin(); it != m_openglTextures.constEnd(); ++it)
         {
-            vector<MythVideoTextureOpenGL*> textures = it.value();
+            std::vector<MythVideoTextureOpenGL*> textures = it.value();
             for (auto & texture : textures)
             {
                 auto *data = reinterpret_cast<QPair<CUarray,CUgraphicsResource>*>(texture->m_data);
@@ -104,12 +104,13 @@ void MythNVDECInterop::GetNVDECTypes(MythRenderOpenGL* Render, MythInteropGPU::I
  * textures and maps the texture storage to a CUdeviceptr (if that is possible). Alternatively
  * EGL interopability may also be useful.
 */
-vector<MythVideoTextureOpenGL*> MythNVDECInterop::Acquire(MythRenderOpenGL* Context,
-                                                          MythVideoColourSpace* ColourSpace,
-                                                          MythVideoFrame* Frame,
-                                                          FrameScanType Scan)
+std::vector<MythVideoTextureOpenGL*>
+MythNVDECInterop::Acquire(MythRenderOpenGL* Context,
+                          MythVideoColourSpace* ColourSpace,
+                          MythVideoFrame* Frame,
+                          FrameScanType Scan)
 {
-    vector<MythVideoTextureOpenGL*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame || !m_cudaContext || !m_cudaFuncs)
         return result;
 
@@ -162,11 +163,11 @@ vector<MythVideoTextureOpenGL*> MythNVDECInterop::Acquire(MythRenderOpenGL* Cont
     bool p010 = MythVideoFrame::ColorDepth(type) > 8;
     if (!m_openglTextures.contains(cudabuffer))
     {
-        vector<QSize> sizes;
+        std::vector<QSize> sizes;
         sizes.emplace_back(QSize(Frame->m_width, Frame->m_height));
         sizes.emplace_back(QSize(Frame->m_width, Frame->m_height >> 1));
-        vector<MythVideoTextureOpenGL*> textures =
-                MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_NVDEC, type, sizes);
+        std::vector<MythVideoTextureOpenGL*> textures =
+            MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_NVDEC, type, sizes);
         if (textures.empty())
         {
             CUDA_CHECK(m_cudaFuncs, cuCtxPopCurrent(&dummy))

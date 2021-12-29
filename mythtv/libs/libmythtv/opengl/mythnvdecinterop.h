@@ -22,8 +22,10 @@ class MythNVDECInterop : public MythOpenGLInterop
 
     bool IsValid();
     CUcontext GetCUDAContext();
-    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
-                                            MythVideoFrame* Frame, FrameScanType Scan) override;
+
+    std::vector<MythVideoTextureOpenGL*>
+    Acquire(MythRenderOpenGL* Context, MythVideoColourSpace* ColourSpace,
+            MythVideoFrame* Frame, FrameScanType Scan) override;
 
   protected:
     MythNVDECInterop(MythPlayerUI* Player, MythRenderOpenGL* Context);
