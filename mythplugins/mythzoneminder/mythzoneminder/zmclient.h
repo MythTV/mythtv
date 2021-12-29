@@ -6,8 +6,8 @@
 #include <vector>
 
 // myth
+#include <mythpluginexport.h>
 #include <mythsocket.h>
-#include <mythbaseexp.h>
 #include <mythimage.h>
 
 // zm
@@ -15,7 +15,7 @@
 #define MAX_IMAGE_SIZE  (2048*1536*3)
 using FrameData = std::array<uint8_t,MAX_IMAGE_SIZE>;
 
-class MBASE_PUBLIC ZMClient : public QObject
+class MPLUGIN_PUBLIC ZMClient : public QObject
 {
     Q_OBJECT
 

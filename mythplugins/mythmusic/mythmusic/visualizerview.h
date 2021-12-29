@@ -5,6 +5,7 @@
 #include <QEvent>
 #include <QVector>
 
+#include <mythpluginexport.h>
 // mythui
 #include <mythscreentype.h>
 
@@ -32,7 +33,7 @@ class VisualizerView : public MusicCommon
     static void showTrackInfoPopup(void);
 };
 
-class MPUBLIC TrackInfoPopup : public MythScreenType
+class MPLUGIN_PUBLIC TrackInfoPopup : public MythScreenType
 {
   Q_OBJECT
   public:

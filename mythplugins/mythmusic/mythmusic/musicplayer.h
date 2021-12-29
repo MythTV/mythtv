@@ -1,6 +1,7 @@
 #ifndef MUSICPLAYER_H_
 #define MUSICPLAYER_H_
 
+#include <mythpluginexport.h>
 // mythtv
 #include <audiooutput.h>
 #include <mythobservable.h>
@@ -264,9 +265,9 @@ Q_DECLARE_METATYPE(MusicPlayer::RepeatMode);
 Q_DECLARE_METATYPE(MusicPlayer::ShuffleMode);
 
 // This global variable contains the MusicPlayer instance for the application
-extern MPUBLIC MusicPlayer *gPlayer;
+extern MPLUGIN_PUBLIC MusicPlayer *gPlayer;
 
  // This stores the last MythMediaDevice that was detected:
-extern MPUBLIC QString gCDdevice;
+extern MPLUGIN_PUBLIC QString gCDdevice;
 
 #endif

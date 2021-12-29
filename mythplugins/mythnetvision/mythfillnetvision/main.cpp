@@ -23,10 +23,12 @@
 #include <mythcommandlineparser.h>
 #include <mythlogging.h>
 
+#include <mythpluginexport.h>
+
 GrabberDownloadThread *gdt = nullptr;
 RSSManager *rssMan = nullptr;
 
-class MPUBLIC MythFillNVCommandLineParser : public MythCommandLineParser
+class MPLUGIN_PUBLIC MythFillNVCommandLineParser : public MythCommandLineParser
 {
   public:
     MythFillNVCommandLineParser(); 

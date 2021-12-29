@@ -6,6 +6,7 @@
 #include <QObject>
 
 // mythtv
+#include <mythpluginexport.h>
 #include <audiooutput.h>
 #include <mythscreentype.h>
 #include <musicmetadata.h>
@@ -44,7 +45,7 @@ enum MusicView
 
 Q_DECLARE_METATYPE(MusicView);
 
-class MPUBLIC MusicCommon : public MythScreenType
+class MPLUGIN_PUBLIC MusicCommon : public MythScreenType
 {
     Q_OBJECT
 
@@ -206,7 +207,7 @@ class MPUBLIC MusicCommon : public MythScreenType
     MythUIVideo           *m_visualizerVideo    {nullptr};
 };
 
-class MPUBLIC MythMusicVolumeDialog : public MythScreenType
+class MPLUGIN_PUBLIC MythMusicVolumeDialog : public MythScreenType
 {
     Q_OBJECT
   public:
@@ -231,7 +232,7 @@ class MPUBLIC MythMusicVolumeDialog : public MythScreenType
     MythUIProgressBar *m_volProgress  {nullptr};
 };
 
-class MPUBLIC TrackInfoDialog : public MythScreenType
+class MPLUGIN_PUBLIC TrackInfoDialog : public MythScreenType
 {
   Q_OBJECT
   public:
