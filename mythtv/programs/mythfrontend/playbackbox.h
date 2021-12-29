@@ -447,7 +447,7 @@ class PlaybackBox : public ScheduleCommon
 
     // Network Control Variables //////////////////////////////////////////////
     mutable QMutex      m_ncLock;
-    deque<QString>      m_networkControlCommands;
+    std::deque<QString> m_networkControlCommands;
 
     // Other
     TV                 *m_player              {nullptr};

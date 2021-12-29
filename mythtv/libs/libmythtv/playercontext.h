@@ -47,7 +47,7 @@ enum PseudoState
     kPseudoRecording     = 2,
 };
 
-using StringDeque = deque<QString>;
+using StringDeque = std::deque<QString>;
 
 class MTV_PUBLIC PlayerContext
 {

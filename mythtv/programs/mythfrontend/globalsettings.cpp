@@ -274,7 +274,7 @@ static GlobalComboBoxSetting *CommercialSkipMethod()
                                         "MythTV to detect when commercials "
                                         "start and end."));
 
-    deque<int> tmp = GetPreferredSkipTypeCombinations();
+    std::deque<int> tmp = GetPreferredSkipTypeCombinations();
 
     for (int pref : tmp)
         bc->addSelection(SkipTypeToString(pref), QString::number(pref));
