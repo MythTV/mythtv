@@ -7,7 +7,7 @@
 #include <QRunnable>
 
 // myth
-#include <mythbaseexp.h>
+#include <mythpluginexport.h>
 #include <mythcorecontext.h>
 
 // mythmusic
@@ -58,6 +58,6 @@ class MusicData : public QObject
 };
 
 // This global variable contains the MusicData instance for the application
-extern MBASE_PUBLIC MusicData *gMusicData;
+extern MPLUGIN_PUBLIC MusicData *gMusicData;
 
 #endif

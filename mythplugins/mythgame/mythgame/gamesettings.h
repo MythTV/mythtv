@@ -2,12 +2,13 @@
 #define GAMESETTINGS_H
 
 // MythTV headers
+#include <mythpluginexport.h>
 #include <standardsettings.h>
 
 QString GetGameTypeName(const QString &GameType);
 QString GetGameTypeExtensions(const QString &GameType);
 
-struct MPUBLIC GameGeneralSettings : public GroupSetting
+struct MPLUGIN_PUBLIC GameGeneralSettings : public GroupSetting
 {
     Q_OBJECT
 public:
@@ -36,7 +37,7 @@ private:
     PlayerId m_id;
 };
 
-class MPUBLIC GamePlayersList : public GroupSetting
+class MPLUGIN_PUBLIC GamePlayersList : public GroupSetting
 {
     Q_OBJECT
 public:

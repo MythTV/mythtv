@@ -64,6 +64,8 @@
 #include <mythlogging.h>
 #include <mythavutil.h>
 
+#include <mythpluginexport.h>
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -2256,7 +2258,7 @@ static int isRemote(const QString& filename)
     return 1;
 }
 
-class MPUBLIC MythArchiveHelperCommandLineParser : public MythCommandLineParser
+class MPLUGIN_PUBLIC MythArchiveHelperCommandLineParser : public MythCommandLineParser
 {
   public:
     MythArchiveHelperCommandLineParser();

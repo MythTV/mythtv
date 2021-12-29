@@ -1,13 +1,13 @@
 #ifndef ZMMINIPLAYER_H_
 #define ZMMINIPLAYER_H_
 
-#include <mythbaseexp.h>
+#include <mythpluginexport.h>
 #include "zmliveplayer.h"
 
 class QTimer;
 class MythUIImage;
 
-class MBASE_PUBLIC ZMMiniPlayer : public ZMLivePlayer
+class MPLUGIN_PUBLIC ZMMiniPlayer : public ZMLivePlayer
 {
   Q_OBJECT
 

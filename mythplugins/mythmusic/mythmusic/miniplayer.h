@@ -1,13 +1,14 @@
 #ifndef MINIPLAYER_H_
 #define MINIPLAYER_H_
 
+#include <mythpluginexport.h>
 #include <mythscreentype.h>
 
 #include "musiccommon.h"
 
 class QTimer;
 
-class MPUBLIC MiniPlayer : public MusicCommon
+class MPLUGIN_PUBLIC MiniPlayer : public MusicCommon
 {
   Q_OBJECT
 
