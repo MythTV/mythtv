@@ -9,7 +9,6 @@
 
 // Std
 #include <vector>
-using std::vector;
 
 class MythPainterVulkan;
 class MythVideoVulkan;
@@ -39,7 +38,7 @@ class MythVideoVulkan : public MythVideoGPU, public MythVulkanObject
     bool    SetupFrameFormat (VideoFrameType InputType, VideoFrameType OutputType, QSize Size,
                               VkCommandBuffer CmdBuffer);
 
-    vector<MythVideoTextureVulkan*> m_inputTextures;
+    std::vector<MythVideoTextureVulkan*> m_inputTextures;
 };
 
 #endif

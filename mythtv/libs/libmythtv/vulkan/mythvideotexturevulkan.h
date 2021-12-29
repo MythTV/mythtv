@@ -12,33 +12,34 @@ extern "C" {
 
 // Std
 #include <vector>
-using std::vector;
 
 class MythVideoTextureVulkan
 {
   public:
-    static vector<MythVideoTextureVulkan*> CreateTextures(MythVulkanObject* Vulkan,
-                                                          VkCommandBuffer   CommandBuffer,
-                                                          VideoFrameType    Type,
-                                                          VideoFrameType    Format,
-                                                          QSize             Size);
-    static void                            DeleteTextures(MythVulkanObject* Vulkan,
-                                                          VkCommandBuffer   CommandBuffer,
-                                                          vector<MythVideoTextureVulkan*>& Textures);
+    static std::vector<MythVideoTextureVulkan*>
+    CreateTextures(MythVulkanObject* Vulkan,
+                   VkCommandBuffer   CommandBuffer,
+                   VideoFrameType    Type,
+                   VideoFrameType    Format,
+                   QSize             Size);
+    static void DeleteTextures(MythVulkanObject* Vulkan,
+                               VkCommandBuffer   CommandBuffer,
+                               std::vector<MythVideoTextureVulkan*>& Textures);
   protected:
     MythVideoTextureVulkan(VideoFrameType Type, VideoFrameType Format);
     MythVideoTextureVulkan() = default;
 
   private:
     Q_DISABLE_COPY(MythVideoTextureVulkan)
-    static vector<MythVideoTextureVulkan*> CreateSoftwareTextures(MythVulkanObject* Vulkan,
-                                                                  VkCommandBuffer   CommandBuffer,
-                                                                  VideoFrameType    Type,
-                                                                  VideoFrameType    Format,
-                                                                  QSize             Size);
-    static void                            DeleteTexture (MythVulkanObject* Vulkan,
-                                                          VkCommandBuffer   CommandBuffer,
-                                                          MythVideoTextureVulkan* Texture);
+    static std::vector<MythVideoTextureVulkan*>
+    CreateSoftwareTextures(MythVulkanObject* Vulkan,
+                           VkCommandBuffer   CommandBuffer,
+                           VideoFrameType    Type,
+                           VideoFrameType    Format,
+                           QSize             Size);
+    static void DeleteTexture (MythVulkanObject* Vulkan,
+                               VkCommandBuffer   CommandBuffer,
+                               MythVideoTextureVulkan* Texture);
 
     bool           m_valid       { false };
     VideoFrameType m_frameType   { FMT_NONE };
