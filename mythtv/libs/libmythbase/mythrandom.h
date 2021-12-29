@@ -8,9 +8,9 @@ Convenience inline random number generator functions
 #include <cstdint>
 //#include <random> // could be used instead of Qt
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #include <QtGlobal>
-#else
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
 #include <QRandomGenerator>
 #endif
 
