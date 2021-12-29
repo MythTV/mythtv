@@ -230,7 +230,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
         }
         MythVideoTextureOpenGL::DeleteTextures(m_openglRender, m_inputTextures);
         QSize size(m_videoDim.width(), m_videoDim.height() >> 1);
-        vector<QSize> sizes;
+        std::vector<QSize> sizes;
         sizes.emplace_back(size);
         // N.B. If we are currently resizing, it will be turned off for this
         // deinterlacer, so the default linear texture filtering is OK.
@@ -264,7 +264,7 @@ bool MythOpenGLVideo::AddDeinterlacer(const MythVideoFrame* Frame, FrameScanType
     // create the correct number of reference textures
     if (refstocreate)
     {
-        vector<QSize> sizes;
+        std::vector<QSize> sizes;
         sizes.emplace_back(QSize(m_videoDim));
         m_prevTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         m_nextTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
@@ -501,7 +501,7 @@ bool MythOpenGLVideo::SetupFrameFormat(VideoFrameType InputType, VideoFrameType 
 
     if (!MythVideoFrame::HardwareFormat(InputType))
     {
-        vector<QSize> sizes;
+        std::vector<QSize> sizes;
         sizes.push_back(Size);
         m_inputTextures = MythVideoTextureOpenGL::CreateTextures(m_openglRender, m_inputType, m_outputType, sizes);
         if (m_inputTextures.empty())
@@ -612,7 +612,7 @@ void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
         {
             if (qAbs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
                 ResetTextures();
-            vector<MythVideoTextureOpenGL*> temp = m_prevTextures;
+            std::vector<MythVideoTextureOpenGL*> temp = m_prevTextures;
             m_prevTextures = m_inputTextures;
             m_inputTextures = m_nextTextures;
             m_nextTextures = temp;
@@ -678,7 +678,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     VideoResizing resize = Frame ? (MythVideoFrame::HardwareFramesFormat(Frame->m_type) ? Framebuffer : None) :
                                    (MythVideoFrame::HardwareFramesFormat(m_inputType)  ? Framebuffer : None);
 
-    vector<MythVideoTextureOpenGL*> inputtextures = m_inputTextures;
+    std::vector<MythVideoTextureOpenGL*> inputtextures = m_inputTextures;
     if (inputtextures.empty())
     {
         // This is experimental support for direct rendering to a framebuffer (e.g. DRM).
@@ -929,7 +929,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
             m_openglRender->SetViewPort(vrect);
 
             // bind correct textures
-            vector<MythGLTexture*> textures {};
+            std::vector<MythGLTexture*> textures {};
             BindTextures(deinterlacing, inputtextures, textures);
 
             // render
@@ -986,7 +986,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     }
 
     // bind correct textures
-    vector<MythGLTexture*> textures;
+    std::vector<MythGLTexture*> textures;
     BindTextures(deinterlacing, inputtextures, textures);
 
     // rotation
@@ -1025,8 +1025,8 @@ void MythOpenGLVideo::ResetTextures()
         texture->m_valid = false;
 }
 
-void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTextureOpenGL*>& Current,
-                                   vector<MythGLTexture*>& Textures)
+void MythOpenGLVideo::BindTextures(bool Deinterlacing, std::vector<MythVideoTextureOpenGL*>& Current,
+                                   std::vector<MythGLTexture*>& Textures)
 {
     if (Deinterlacing && !MythVideoFrame::HardwareFormat(m_inputType))
     {
@@ -1035,8 +1035,8 @@ void MythOpenGLVideo::BindTextures(bool Deinterlacing, vector<MythVideoTextureOp
             // if we are using reference frames, we want the current frame in the middle
             // but next will be the first valid, followed by current...
             size_t count = Current.size();
-            vector<MythVideoTextureOpenGL*>& current = Current[0]->m_valid ? Current : m_nextTextures;
-            vector<MythVideoTextureOpenGL*>& prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
+            std::vector<MythVideoTextureOpenGL*>& current = Current[0]->m_valid ? Current : m_nextTextures;
+            std::vector<MythVideoTextureOpenGL*>& prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
 
             for (uint i = 0; i < count; ++i)
                 Textures.push_back(reinterpret_cast<MythGLTexture*>(prev[i]));
