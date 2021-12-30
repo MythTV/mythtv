@@ -184,8 +184,6 @@ HEADERS += audio/audiooutputopensles.h
 HEADERS += audio/audiooutputaudiotrack.h
 }
 
-linux:DEFINES += linux
-
 cygwin {
     QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
     DEFINES += _WIN32
