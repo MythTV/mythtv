@@ -59,6 +59,9 @@ class ViewScheduled : public ScheduleCommon
 
     void EmbedTVWindow(void);
 
+    void UpdateUIListItem(MythUIButtonListItem* item,
+                          ProgramInfo *pginfo);
+
     bool  m_conflictBool              {false};
     QDate m_conflictDate;
 

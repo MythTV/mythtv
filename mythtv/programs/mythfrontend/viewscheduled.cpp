@@ -375,6 +375,52 @@ void ViewScheduled::ChangeGroup(MythUIButtonListItem* item)
         FillList();
 }
 
+void ViewScheduled::UpdateUIListItem(MythUIButtonListItem* item,
+                                     ProgramInfo *pginfo)
+{
+    QString state;
+
+    const RecStatus::Type recstatus = pginfo->GetRecordingStatus();
+    if (recstatus == RecStatus::Recording      ||
+        recstatus == RecStatus::Tuning)
+        state = "running";
+    else if (recstatus == RecStatus::Conflict  ||
+             recstatus == RecStatus::Offline   ||
+             recstatus == RecStatus::TunerBusy ||
+             recstatus == RecStatus::Failed    ||
+             recstatus == RecStatus::Failing   ||
+             recstatus == RecStatus::Aborted   ||
+             recstatus == RecStatus::Missed)
+        state = "error";
+    else if (recstatus == RecStatus::WillRecord ||
+             recstatus == RecStatus::Pending)
+    {
+        if (m_curinput == 0 || pginfo->GetInputID() == m_curinput)
+        {
+            if (pginfo->GetRecordingPriority2() < 0)
+                state = "warning";
+            else
+                state = "normal";
+        }
+    }
+    else if (recstatus == RecStatus::Repeat ||
+             recstatus == RecStatus::NeverRecord ||
+             recstatus == RecStatus::DontRecord ||
+             (recstatus != RecStatus::DontRecord &&
+              recstatus <= RecStatus::EarlierShowing))
+        state = "disabled";
+    else
+        state = "warning";
+
+    InfoMap infoMap;
+    pginfo->ToMap(infoMap);
+    item->SetTextFromMap(infoMap, state);
+
+    QString rating = QString::number(pginfo->GetStars(10));
+    item->DisplayState(rating, "ratingstate");
+    item->DisplayState(state, "status");
+}
+
 void ViewScheduled::FillList()
 {
     m_schedulesList->Reset();
@@ -405,51 +451,10 @@ void ViewScheduled::FillList()
             continue;
         }
 
-        QString state;
-
-        const RecStatus::Type recstatus = pginfo->GetRecordingStatus();
-        if (recstatus == RecStatus::Recording      ||
-            recstatus == RecStatus::Tuning)
-            state = "running";
-        else if (recstatus == RecStatus::Conflict  ||
-                 recstatus == RecStatus::Offline   ||
-                 recstatus == RecStatus::TunerBusy ||
-                 recstatus == RecStatus::Failed    ||
-                 recstatus == RecStatus::Failing   ||
-                 recstatus == RecStatus::Aborted   ||
-                 recstatus == RecStatus::Missed)
-            state = "error";
-        else if (recstatus == RecStatus::WillRecord ||
-                 recstatus == RecStatus::Pending)
-        {
-            if (m_curinput == 0 || pginfo->GetInputID() == m_curinput)
-            {
-                if (pginfo->GetRecordingPriority2() < 0)
-                    state = "warning";
-                else
-                    state = "normal";
-            }
-        }
-        else if (recstatus == RecStatus::Repeat ||
-                 recstatus == RecStatus::NeverRecord ||
-                 recstatus == RecStatus::DontRecord ||
-                 (recstatus != RecStatus::DontRecord &&
-                  recstatus <= RecStatus::EarlierShowing))
-            state = "disabled";
-        else
-            state = "warning";
-
         auto *item = new MythUIButtonListItem(m_schedulesList,"",
                                               QVariant::fromValue(pginfo));
 
-        InfoMap infoMap;
-        pginfo->ToMap(infoMap);
-        item->SetTextFromMap(infoMap, state);
-
-        QString rating = QString::number(pginfo->GetStars(10));
-        item->DisplayState(rating, "ratingstate");
-        item->DisplayState(state, "status");
-
+        UpdateUIListItem(item, pginfo);
         ++pit;
     }
 
