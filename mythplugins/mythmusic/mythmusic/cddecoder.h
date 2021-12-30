@@ -8,7 +8,6 @@
 
 #if CONFIG_DARWIN
 #include <vector>
-using std::vector;
 #endif
 
 #ifdef HAVE_CDIO
@@ -71,7 +70,7 @@ class CdDecoder : public Decoder
                        m_lastTrack,     ///< Last  AUDIO track
                        m_leadout;       ///< End of last track
     double             m_lengthInSecs;
-    vector<int>        m_tracks;        ///< Start block offset of each track
+    std::vector<int>   m_tracks;        ///< Start block offset of each track
 #endif
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex& getCdioMutex();
