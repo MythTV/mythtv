@@ -8,7 +8,7 @@
 // System specific C headers
 #include "compat.h"
 
-#ifdef linux
+#ifdef __linux__
 #include <sys/vfs.h>
 #include <sys/sysinfo.h>
 #endif

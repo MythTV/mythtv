@@ -42,7 +42,7 @@
 #include <unistd.h>
 
 // Various ways to get to thread's tid
-#if defined(linux)
+#if defined(__linux__)
 #include <sys/syscall.h>
 #elif defined(__FreeBSD__)
 extern "C" {
@@ -185,7 +185,7 @@ void LoggingItem::setThreadTid(void)
 
 #if defined(Q_OS_ANDROID)
         m_tid = (int64_t)gettid();
-#elif defined(linux)
+#elif defined(__linux__)
         m_tid = syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
         long lwpid;
