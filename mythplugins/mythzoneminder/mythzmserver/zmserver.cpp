@@ -28,7 +28,7 @@
 #include <sys/shm.h>
 #include <sys/mman.h>
 
-#ifdef linux
+#ifdef __linux__
 #  include <sys/vfs.h>
 #  include <sys/statvfs.h>
 #  include <sys/sysinfo.h>
