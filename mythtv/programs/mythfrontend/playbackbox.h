@@ -339,8 +339,7 @@ class PlaybackBox : public ScheduleCommon
     void HandlePreviewEvent(const QStringList &list);
     void HandleRecordingRemoveEvent(uint recordingID);
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
-    void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
-    void HandleUpdateProgramInfoFileSizeEvent(uint recordingID, uint64_t filesize);
+    void HandleUpdateItemEvent(uint recordingId, uint flags);
 
     void ScheduleUpdateUIList(void);
     void ShowMenu(void) override; // MythScreenType
@@ -363,6 +362,9 @@ class PlaybackBox : public ScheduleCommon
     MythUIText *m_noRecordingsText            {nullptr};
 
     MythUIImage *m_previewImage               {nullptr};
+
+    MythUIProgressBar *m_recordedProgress     {nullptr};
+    MythUIProgressBar *m_watchedProgress      {nullptr};
 
     QString      m_artHostOverride;
     constexpr static int kNumArtImages = 3;

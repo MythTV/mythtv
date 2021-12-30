@@ -194,6 +194,16 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,880,30</area>
+                    <progressbar name="buttonprogress1">
+                        <area>0,0,100%,100%</area>
+                        <layout>horizontal</layout>
+                        <style>reveal</style>
+                        <shape name="progressimage">
+                            <area>0,1,100%,100%-1</area>
+                            <type>box</type>
+                            <fill color="#000000" alpha="128"/>
+                        </shape>
+                    </progressbar>
                     <statetype name="status">
                         <position>3,2</position>
                         <state name="disabled">
@@ -224,15 +234,20 @@
                         <state name="marked"></state>
                     </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,2,656,28</area>
+                        <area>32,2,636,28</area>
                         <align>vcenter</align>
                     </textarea>
-                    <textarea name="shortstartdate" from="titlesubtitle">
-                        <area>634,2,120,28</area>
+                    <textarea name="watchedpercent" from="buttontext">
+                        <area>665,2,45,28</area>
+                        <align>right,vcenter</align>
+                        <template>%|watchedpercent|%%</template>
+                     </textarea>
+                    <textarea name="shortstartdate" from="buttontext">
+                        <area>714,2,60,28</area>
                         <align>right,vcenter</align>
                     </textarea>
-                    <textarea name="starttime" from="shortstartdate">
-                        <area>760,2,114,28</area>
+                    <textarea name="starttime" from="buttontext">
+                        <area>780,2,94,28</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <statetype name="watched">
@@ -264,8 +279,7 @@
                     <shape name="selectbar">
                         <area>0,0,100%,30</area>
                     </shape>
-                    <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,2,656,28</area>
+                    <textarea name="fonts" from="buttontext">
                         <font>basesmall_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -274,12 +288,20 @@
                         <font state="running">basesmall_running_selected</font>
                         <align>vcenter</align>
                     </textarea>
-                    <textarea name="shortstartdate" from="titlesubtitle">
-                        <area>634,2,120,28</area>
+                    <textarea name="titlesubtitle" from="fonts">
+                         <area>32,2,636,28</area>
+                    </textarea>
+                    <textarea name="watchedpercent" from="fonts">
+                        <area>665,2,45,28</area>
+                        <align>right,vcenter</align>
+                        <template>%|watchedpercent|%%</template>
+                     </textarea>
+                    <textarea name="shortstartdate" from="fonts">
+                       <area>714,2,60,28</area>
                         <align>right,vcenter</align>
                     </textarea>
-                    <textarea name="starttime" from="shortstartdate">
-                        <area>760,2,114,28</area>
+                    <textarea name="starttime" from="fonts">
+                        <area>780,2,94,28</area>
                         <align>right,vcenter</align>
                     </textarea>
                 </state>
@@ -415,7 +437,7 @@
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>30,480,885,210</area>
+            <area>30,480,885,180</area>
             <multiline>yes</multiline>
             <scroll direction="vertical" />
             <cutdown>no</cutdown>
@@ -432,6 +454,36 @@
             <filename />
             <preserveaspect>true</preserveaspect>
         </imagetype>
+
+        <group name="recordedgroup" depends="recordedmagic">
+            <textarea name="recordedmagic">
+                <template>%recordedpercent%</template>
+            </textarea>
+            <area>100,660,300,30</area>
+            <progressbar name="recordedprogressbar" from="baseprogressbar2">
+                <area>0,0,100%,100%</area>
+            </progressbar>
+            <textarea name="recordedpercent" from="basetextarea">
+                <area>0,0,100%,100%</area>
+                <align>hcenter,vcenter</align>
+                <template>%|recordedpercent|%% recorded</template>
+            </textarea>
+        </group>
+
+        <group name="wachedgroup" depends="watchedmagic">
+            <textarea name="watchedmagic">
+                <template>%watchedpercent%</template>
+            </textarea>
+            <area>490,660,300,30</area>
+            <progressbar name="watchedprogressbar" from="baseprogressbar2">
+                <area>0,0,100%,100%</area>
+            </progressbar>
+            <textarea name="foo" from="basetextarea">
+                <area>0,0,100%,100%</area>
+                <align>hcenter,vcenter</align>
+                <template>%|watchedpercent|%% watched</template>
+            </textarea>
+        </group>
 
         <textarea name="norecordings">
             <area>20,74,760,300</area>

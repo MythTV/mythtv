@@ -584,6 +584,13 @@ class MPUBLIC ProgramInfo
     void SetPositionMapDBReplacement(PMapDBReplacement *pmap)
         { m_positionMapDBReplacement = pmap; }
 
+    void CalculateRecordedProgress();
+    uint GetRecordedPercent() const       { return m_recordedPercent; }
+    void CalculateWatchedProgress(uint64_t pos);
+    uint GetWatchedPercent() const        { return m_watchedPercent; }
+    void SetWatchedPercent(uint progress) { m_watchedPercent = progress; }
+    void CalculateProgress(uint64_t pos);
+
     // Slow DB gets
     QString     QueryBasename(void) const;
 //  uint64_t    QueryFilesize(void) const; // TODO Remove
@@ -828,6 +835,8 @@ class MPUBLIC ProgramInfo
 
 // everything below this line is not serialized
     uint8_t         m_availableStatus {asAvailable}; // only used for playbackbox.cpp
+    int8_t          m_recordedPercent {-1};          // only used by UI
+    int8_t          m_watchedPercent  {-1};          // only used by UI
   public:
     void SetAvailableStatus(AvailableStatusType status, const QString &where);
     AvailableStatusType GetAvailableStatus(void) const

@@ -629,7 +629,7 @@
         </textarea>
     </textedit>
 
-    <!-- Base definition of a progressbar -->
+    <!-- Base definition of a green to red gradient progressbar -->
     <progressbar name="baseprogressbar">
         <area>0,0,536,38</area>
         <layout>horizontal</layout>
@@ -642,6 +642,24 @@
             <area>0,0,100%,100%</area>
             <filename>progressbar_fill.png</filename>
         </imagetype>
+    </progressbar>
+
+    <!-- Base definition of a green progressbar -->
+    <progressbar name="baseprogressbar2">
+        <area>0,0,300,40</area>
+        <layout>horizontal</layout>
+        <style>reveal</style>
+        <shape name="background">
+            <area>0,2,100%,100%-4</area>
+            <type>roundbox</type>
+            <line color="#00FF00" alpha="255" width="1" />
+            <cornerradius>12</cornerradius>
+        </shape>
+        <shape name="progressimage" from="background">
+            <line/>
+            <!-- color picked from osd/progressbar_fill.png -->
+            <fill color="#5da224" alpha="128"/>
+        </shape>
     </progressbar>
 
     <!-- Base definition of a vertical scrollbar -->

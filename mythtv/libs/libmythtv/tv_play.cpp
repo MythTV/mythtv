@@ -24,6 +24,7 @@
 #include "mythdirs.h"
 #include "mythmedia.h"
 #include "mythdate.h"
+#include "mconcurrent.h"
 
 // libmyth
 #include "programinfo.h"
@@ -9963,31 +9964,6 @@ bool TV::HandleOSDVideoExit(const QString& Action)
 
 void TV::HandleSaveLastPlayPosEvent()
 {
-    // Helper class to save the latest playback position (in a background thread
-    // to avoid playback glitches).  The ctor makes a copy of the ProgramInfo
-    // struct to avoid race conditions if playback ends and deletes objects
-    // before or while the background thread runs.
-    class PositionSaver : public QRunnable
-    {
-      public:
-        PositionSaver(const ProgramInfo &pginfo, uint64_t frame)
-          : m_pginfo(pginfo),
-            m_frame(frame) {}
-
-        void run() override
-        {
-            LOG(VB_PLAYBACK, LOG_DEBUG, QString("PositionSaver frame=%1").arg(m_frame));
-            frm_dir_map_t lastPlayPosMap;
-            lastPlayPosMap[m_frame] = MARK_UTIL_LASTPLAYPOS;
-            m_pginfo.ClearMarkupMap(MARK_UTIL_LASTPLAYPOS);
-            m_pginfo.SaveMarkupMap(lastPlayPosMap, MARK_UTIL_LASTPLAYPOS);
-        }
-
-      private:
-        const ProgramInfo m_pginfo;
-        const uint64_t m_frame;
-    };
-
     GetPlayerReadLock();
     m_playerContext.LockDeletePlayer(__FILE__, __LINE__);
     bool playing = m_player && !m_player->IsPaused();
@@ -9995,7 +9971,8 @@ void TV::HandleSaveLastPlayPosEvent()
     if (playing)
     {
         uint64_t framesPlayed = m_player->GetFramesPlayed();
-        MThreadPool::globalInstance()->start(new PositionSaver(*m_playerContext.m_playingInfo, framesPlayed), "PositionSaver");
+        MConcurrent::run("PositionSaver", m_playerContext.m_playingInfo,
+                         &ProgramInfo::SaveLastPlayPos, framesPlayed);
     }
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     ReturnPlayerLock();

@@ -50,6 +50,16 @@ bool MythUIProgressBar::ParseElement(
     return true;
 }
 
+void MythUIProgressBar::Set(int start, int total, int used)
+{
+    if (used != m_current || start != m_start || total != m_total)
+    {
+        m_start = start;
+        m_total = total;
+        SetUsed(used);
+    }
+}
+
 void MythUIProgressBar::SetStart(int value)
 {
     m_start = value;

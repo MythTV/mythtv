@@ -11,7 +11,7 @@ QT += xml
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-HEADERS += mthread.h mthreadpool.h mythchrono.h
+HEADERS += mthread.h mthreadpool.h mythchrono.h mconcurrent.h
 HEADERS += mythsocket.h mythsocket_cb.h
 HEADERS += mythbaseexp.h mythdbcon.h mythdb.h mythdbparams.h
 HEADERS += verbosedefs.h mythversion.h compat.h mythconfig.h

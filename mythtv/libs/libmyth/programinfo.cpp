@@ -1718,6 +1718,13 @@ void ProgramInfo::ToMap(InfoMap &progMap,
         progMap["lentime"] = QObject::tr("%n hour(s)","", hours);
     }
 
+    progMap["recordedpercent"] =
+        (m_recordedPercent >= 0)
+        ?  QString::number(m_recordedPercent) : QString();
+    progMap["watchedpercent"] =
+        ((m_watchedPercent > 0) && !IsWatched())
+        ? QString::number(m_watchedPercent) : QString();
+
     // This is calling toChar from recordingtypes.cpp, not the QChar
     // constructor.
     progMap["rectypechar"] = toQChar(GetRecordingRuleType());
@@ -6380,5 +6387,73 @@ uint64_t ProgramInfo::GetFilesize(void) const
 
     return db_filesize;
 }
+
+void ProgramInfo::CalculateRecordedProgress()
+{
+    if (m_recStatus != RecStatus::Recording)
+    {
+        m_recordedPercent = -1;
+        return;
+    }
+
+    QDateTime startTime = m_recStartTs;
+    QDateTime now = MythDate::current();
+    if (now < startTime)
+    {
+        m_recordedPercent = -1;
+        return;
+    }
+
+    QDateTime endTime = m_recEndTs;
+    int current = startTime.secsTo(now);
+    int duration = startTime.secsTo(endTime);
+    m_recordedPercent = std::clamp(current * 100 / duration, 0, 100);
+    LOG(VB_GUI, LOG_DEBUG, QString("%1 recorded percent %2/%3 = %4%")
+        .arg(m_title).arg(current).arg(duration).arg(m_recordedPercent));
+}
+
+void ProgramInfo::CalculateWatchedProgress(uint64_t pos)
+{
+    if (pos == 0)
+    {
+        m_watchedPercent = -1;
+        return;
+    }
+
+    uint64_t total = 0;
+    switch (m_recStatus)
+    {
+      case RecStatus::Recorded:
+          total = std::max((int64_t)0, QueryTotalFrames());
+        break;
+      case RecStatus::Recording:
+        // Active recordings won't have total frames set yet.
+        total = QueryLastFrameInPosMap();
+        break;
+      default:
+        break;
+    }
+
+    if (total == 0)
+    {
+        LOG(VB_GUI, LOG_DEBUG,
+            QString("%1 %2 no frame count. Please rebuild seek table for this recording.")
+            .arg(m_recordedId).arg(m_title));
+        m_watchedPercent = 0;
+        return;
+    }
+
+    m_watchedPercent = std::clamp(100 * pos / total, (uint64_t)0, (uint64_t)100);
+    LOG(VB_GUI, LOG_DEBUG, QString("%1 %2 watched percent %3/%4 = %5%")
+        .arg(m_recordedId).arg(m_title)
+        .arg(pos).arg(total).arg(m_watchedPercent));
+}
+
+void ProgramInfo::CalculateProgress(uint64_t pos)
+{
+    CalculateRecordedProgress();
+    CalculateWatchedProgress(pos);
+}
+
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
