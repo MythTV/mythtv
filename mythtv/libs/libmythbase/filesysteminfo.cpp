@@ -4,7 +4,7 @@
 
 #include <QtGlobal>
 
-#ifdef linux
+#ifdef __linux__
 #include <sys/vfs.h>
 #include <sys/sysinfo.h>
 #endif
@@ -241,7 +241,7 @@ void FileSystemInfo::PopulateFSProp(void)
             (!strcmp(fstypename, "afpfs")) ||   // AppleShare
             (!strcmp(fstypename, "smbfs")))     // SMB
                 setLocal(false);
-#elif __linux__
+#elif defined(__linux__)
         long fstype = statbuf.f_type;
         if ((fstype == 0x6969)  ||              // NFS
             (fstype == 0x517B)  ||              // SMB

@@ -17,7 +17,7 @@
 #include "mythlogging.h"
 #include "remotefile.h"
 
-#ifdef linux
+#ifdef __linux__
 #   include "mythcdrom-linux.h"
 #elif defined(__FreeBSD__)
 #   include "mythcdrom-freebsd.h"
@@ -43,7 +43,7 @@
 MythCDROM* MythCDROM::get(QObject* par, const QString& devicePath,
                           bool SuperMount, bool AllowEject)
 {
-#if defined(linux) && !defined(Q_OS_ANDROID)
+#if defined(__linux__) && !defined(Q_OS_ANDROID)
     return GetMythCDROMLinux(par, devicePath, SuperMount, AllowEject);
 #elif defined(__FreeBSD__)
     return GetMythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);

@@ -187,8 +187,6 @@ DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"
 DEFINES += MBASE_API
 
-linux:DEFINES += linux
-
 macx {
     HEADERS += mythcdrom-darwin.h
     SOURCES += mythcdrom-darwin.cpp

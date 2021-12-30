@@ -20,7 +20,7 @@
 #include "compat.h"
 #include <QtGlobal>
 
-#ifdef linux
+#ifdef __linux__
 #include <sys/vfs.h>
 #include <sys/sysinfo.h>
 #include <sys/stat.h> // for umask, chmod
