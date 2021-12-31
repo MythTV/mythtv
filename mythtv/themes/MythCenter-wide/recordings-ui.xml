@@ -151,6 +151,7 @@
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
+                <state name="inactive" from="active"/>
                 <state name="selectedinactive" from="active">
                     <shape name="selectbar">
                         <area>0,0,100%,30</area>
@@ -253,6 +254,7 @@
                         <state name="no" />
                     </statetype>
                 </state>
+                <state name="inactive" from="active"/>
                 <state name="selectedinactive" from="active">
                     <shape name="selectbar">
                         <area>0,0,100%,30</area>
