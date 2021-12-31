@@ -2967,6 +2967,8 @@ for opt do
     optval="${opt#*=}"
     case "$opt" in
 #Myth options
+        -O*) cxxoptflags=$opt
+        ;;
         --compile-type=*) compile_type=$optval
         ;;
         --libdir-name=*) libdir_name=$optval
