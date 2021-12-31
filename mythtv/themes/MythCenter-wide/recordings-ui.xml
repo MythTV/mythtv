@@ -192,36 +192,36 @@
             <triggerevent context="Global" action="MENU">RIGHT</triggerevent>
             <statetype name="buttonitem">
                 <state name="active">
-                <area>0,0,880,30</area>
-                <statetype name="status">
-                    <position>3,2</position>
-                    <state name="disabled">
-                        <imagetype name="statusimage">
-                            <filename>schedule_disabled.png</filename>
-                        </imagetype>
-                    </state>
-                    <state name="error">
-                        <imagetype name="statusimage">
-                            <filename>schedule_conflict.png</filename>
-                        </imagetype>
-                    </state>
-                    <state name="warning">
-                        <imagetype name="statusimage">
-                            <filename>schedule_other.png</filename>
-                        </imagetype>
-                    </state>
-<!--                <state name="normal">
-                        <imagetype name="statusimage">
-                            <filename>schedule_record.png</filename>
-                        </imagetype>
-                    </state> -->
-                    <state name="running">
-                        <imagetype name="statusimage">
-                            <filename>schedule_recording.png</filename>
-                        </imagetype>
-                    </state>
-                    <state name="marked"></state>
-                </statetype>
+                    <area>0,0,880,30</area>
+                    <statetype name="status">
+                        <position>3,2</position>
+                        <state name="disabled">
+                            <imagetype name="statusimage">
+                                <filename>schedule_disabled.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="error">
+                            <imagetype name="statusimage">
+                                <filename>schedule_conflict.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="warning">
+                            <imagetype name="statusimage">
+                                <filename>schedule_other.png</filename>
+                            </imagetype>
+                        </state>
+<!--                    <state name="normal">
+                            <imagetype name="statusimage">
+                                <filename>schedule_record.png</filename>
+                            </imagetype>
+                        </state> -->
+                        <state name="running">
+                            <imagetype name="statusimage">
+                                <filename>schedule_recording.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="marked"></state>
+                    </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
                         <area>32,2,656,28</area>
                         <align>vcenter</align>
