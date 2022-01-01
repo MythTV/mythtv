@@ -263,8 +263,21 @@ void ChannelEditor::itemChanged(MythUIButtonListItem *item)
 
 void ChannelEditor::fillList(void)
 {
-    QString currentValue = m_channelList->GetValue();
-    uint    currentIndex = qMax(m_channelList->GetCurrentPos(), 0);
+    // Index of current item and offset to the first displayed item
+    int currentIndex = std::max(m_channelList->GetCurrentPos(), 0);
+    int currentTopItemPos = std::max(m_channelList->GetTopItemPos(), 0);
+    int posOffset = currentIndex - currentTopItemPos;
+
+    // Identify the current item in the list with the new sorting order
+    MythUIButtonListItem *currentItem = m_channelList->GetItemCurrent();
+    QString currentServiceID;
+    QString currentTransportID;
+    if (currentItem)
+    {
+        currentServiceID = currentItem->GetText("serviceid");
+        currentTransportID = currentItem->GetText("transportid");
+    }
+
     m_channelList->Reset();
     QString newchanlabel = tr("(Add New Channel)");
     auto *item = new MythUIButtonListItem(m_channelList, "");
@@ -296,19 +309,19 @@ void ChannelEditor::fillList(void)
 
     if (m_currentSortMode == tr("Channel Name"))
     {
-        querystr += " ORDER BY channel.name";
+        querystr += " ORDER BY channel.name, dtv_multiplex.transportid, serviceid";
     }
     else if (m_currentSortMode == tr("Channel Number"))
     {
-        querystr += " ORDER BY channum + 0, SUBSTRING_INDEX(channum, '_', -1) + 0";
+        querystr += " ORDER BY channum + 0, SUBSTRING_INDEX(channum, '_', -1) + 0, dtv_multiplex.transportid, serviceid";
     }
     else if (m_currentSortMode == tr("Service ID"))
     {
-        querystr += " ORDER BY serviceid";
+        querystr += " ORDER BY serviceid, dtv_multiplex.transportid";
     }
     else if (m_currentSortMode == tr("Frequency"))
     {
-        querystr += " ORDER BY dtv_multiplex.frequency, serviceid";
+        querystr += " ORDER BY dtv_multiplex.frequency, dtv_multiplex.transportid, serviceid";
     }
     else if (m_currentSortMode == tr("Transport ID"))
     {
@@ -316,14 +329,14 @@ void ChannelEditor::fillList(void)
     }
     else if (m_currentSortMode == tr("Video Source"))
     {
-        querystr += " ORDER BY videosource.name, dtv_multiplex.transportid";
+        querystr += " ORDER BY videosource.name, dtv_multiplex.transportid, serviceid";
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
 
-    uint selidx = 0;
-    uint idx = 1;
+    int selidx = 0;
+    int idx = 1;
     if (query.exec() && query.size() > 0)
     {
         for (; query.next() ; idx++)
@@ -386,10 +399,9 @@ void ChannelEditor::fillList(void)
             if (m_sourceFilter == FILTER_ALL)
                 compoundname += " (" + sourceid  + ")";
 
-            bool sel = (chanid == currentValue);
+            bool sel = ((serviceid == currentServiceID) && (transportid == currentTransportID));
             selidx = (sel) ? idx : selidx;
-            item = new MythUIButtonListItem(m_channelList, "",
-                                                     QVariant::fromValue(chanid));
+            item = new MythUIButtonListItem(m_channelList, "", QVariant::fromValue(chanid));
             item->SetText(compoundname, "compoundname");
             item->SetText(chanid, "chanid");
             item->SetText(channum, "channum");
@@ -412,7 +424,24 @@ void ChannelEditor::fillList(void)
 
     // Make sure we select the current item, or the following one after
     // deletion, with wrap around to "(New Channel)" after deleting last item.
-    m_channelList->SetItemCurrent((!selidx && currentIndex < idx) ? currentIndex : selidx);
+    // Preserve the position on the screen of the current item as much as possible
+    // when the sorting order is changed.
+
+    // Index of current item
+    int newPosition = (!selidx && currentIndex < idx) ? currentIndex : selidx;
+
+    // Index of item on top line
+    int newTopPosition = newPosition - posOffset;
+
+    // Correction for number of items from first item to current item.
+    newTopPosition = std::max(newTopPosition, 0);
+
+    // Correction for number of items from current item to last item.
+    int getCount = m_channelList->GetCount();
+    int getVisibleCount = m_channelList->GetVisibleCount();
+    newTopPosition = std::min(newTopPosition, getCount - getVisibleCount);
+
+    m_channelList->SetItemCurrent(newPosition, newTopPosition);
 }
 
 void ChannelEditor::setSortMode(MythUIButtonListItem *item)
