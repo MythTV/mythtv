@@ -248,6 +248,20 @@ void MythHTTPSocket::Read()
     if (!MythHTTP::GetHeader(request->m_headers, "upgrade").isEmpty())
         response = MythHTTPResponse::UpgradeResponse(request, m_protocol, m_testSocket);
 
+    // Try (possibly file specific) handlers
+    if (response == nullptr)
+    {
+        for (const auto& [path, function] : m_config.m_handlers)
+        {
+            if (path == request->m_url.toString())
+            {
+                response = std::invoke(function, request);
+                if (response)
+                    break;
+            }
+        }
+    }
+
     const QString& rpath = request->m_path;
 
     // Try active services first - this is currently the services root only
