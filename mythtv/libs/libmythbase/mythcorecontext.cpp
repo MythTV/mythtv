@@ -1,4 +1,5 @@
 // Qt
+#include <QtGlobal>
 #include <QCoreApplication>
 #include <QUrl>
 #include <QDir>
@@ -34,7 +35,6 @@
 
 // MythTV
 #include "compat.h"
-#include "mythconfig.h"       // for CONFIG_DARWIN
 #include "mythdownloadmanager.h"
 #include "mythcorecontext.h"
 #include "mythsocket.h"
@@ -725,7 +725,7 @@ bool MythCoreContext::IsMasterBackend(void)
 
 bool MythCoreContext::BackendIsRunning(void)
 {
-#if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
+#if defined(Q_OS_DARWIN) || defined(__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -axc | grep -i mythbackend | grep -v grep > /dev/null";
 #elif defined _WIN32
     const char *command = "%systemroot%\\system32\\tasklist.exe "

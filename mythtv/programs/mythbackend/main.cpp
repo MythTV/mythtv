@@ -6,6 +6,7 @@
 #include <csignal> // for signal
 #include <cstdlib>
 
+#include <QtGlobal>
 #ifndef _WIN32
 #include <QCoreApplication>
 #else
@@ -16,7 +17,7 @@
 #include <QFile>
 #include <QDir>
 #include <QMap>
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
 #include <QProcessEnvironment>
 #endif
 
@@ -53,7 +54,7 @@
 #define LOC_WARN QString("MythBackend, Warning: ")
 #define LOC_ERR  QString("MythBackend, Error: ")
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // 10.6 uses some file handles for its new Grand Central Dispatch thingy
     #define UNUSED_FILENO 6
 #else
@@ -92,7 +93,7 @@ int main(int argc, char **argv)
 #endif
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHBACKEND);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
     QString path = QCoreApplication::applicationDirPath();
     setenv("PYTHONPATH",
            QString("%1/../Resources/lib/%2/site-packages:%3")
@@ -122,7 +123,7 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-#if ! CONFIG_DARWIN
+#ifndef Q_OS_DARWIN
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);

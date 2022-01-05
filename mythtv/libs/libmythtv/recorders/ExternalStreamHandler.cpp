@@ -10,6 +10,7 @@
 #include <poll.h>
 #include <sys/ioctl.h>
 #endif
+
 #include <QtGlobal>
 #ifdef Q_OS_ANDROID
 #include <sys/wait.h>
@@ -239,7 +240,7 @@ bool ExternIO::Run(void)
 /* Return true if the process is not, or is no longer running */
 bool ExternIO::KillIfRunning(const QString & cmd)
 {
-#if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
+#if defined(Q_OS_DARWIN) || defined(__FreeBSD__) || defined(__OpenBSD__)
     Q_UNUSED(cmd);
     return false;
 #elif defined USING_MINGW
