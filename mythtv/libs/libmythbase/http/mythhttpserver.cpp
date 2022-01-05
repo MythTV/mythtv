@@ -371,6 +371,7 @@ void MythHTTPServer::NewHandlers(const HTTPHandlers& Handlers)
         if (!std::any_of(m_config.m_handlers.cbegin(), m_config.m_handlers.cend(),
                          [&handler](const HTTPHandler& Handler) { return Handler.first == handler.first; }))
         {
+            LOG(VB_HTTP, LOG_INFO, LOC + QString("Adding handler for '%1'").arg(handler.first));
             m_config.m_handlers.push_back(handler);
             newhandlers = true;
         }
@@ -411,6 +412,7 @@ void MythHTTPServer::NewServices(const HTTPServices& Services)
         if (!std::any_of(m_config.m_services.cbegin(), m_config.m_services.cend(),
                          [&service](const HTTPService& Service) { return Service.first == service.first; }))
         {
+            LOG(VB_HTTP, LOG_INFO, LOC + QString("Adding service for '%1'").arg(service.first));
             m_config.m_services.push_back(service);
             newservices = true;
         }

@@ -5,7 +5,8 @@
 #ifdef USING_DBUS
 #include "platforms/mythpowerdbus.h"
 #endif
-#if defined(Q_OS_MAC)
+
+#ifdef Q_OS_DARWIN
 #include "platforms/mythpowerosx.h"
 #endif
 
@@ -86,7 +87,7 @@ MythPower* MythPower::AcquireRelease(void *Reference, bool Acquire, std::chrono:
         }
         else
         {
-#if defined(Q_OS_MAC)
+#ifdef Q_OS_DARWIN
             // NB OSX may have DBUS but it won't help here
             s_instance = new MythPowerOSX();
 #elif USING_DBUS

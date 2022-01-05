@@ -306,7 +306,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
                  QString("Disk %1 is mounted? Unmounting").arg(dev));
         device->unmount();
 
-#if !CONFIG_DARWIN
+#ifndef Q_OS_DARWIN
         if (device->isMounted())
         {
             ShowNotificationError(tr("Failed to unmount %1").arg(dev),
@@ -989,7 +989,7 @@ void MediaMonitor::ejectOpticalDisc()
 #ifdef __linux__
         LOG(VB_MEDIA, LOG_INFO, "Trying Linux 'eject -T' command");
         myth_system("eject -T");
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
         QString def = DEFAULT_CD;
         LOG(VB_MEDIA, LOG_INFO, "Trying 'diskutil eject " + def);
         myth_system("diskutil eject " + def);

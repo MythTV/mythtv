@@ -1,8 +1,8 @@
 // Qt
+#include <QtGlobal>
 #include <QGuiApplication>
 
 // MythTV
-#include "config.h"
 #include "mythmainwindow.h"
 #include "mythscreensaver.h"
 
@@ -14,7 +14,7 @@
 #include "platforms/mythscreensaverdbus.h"
 #endif
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 #include "platforms/mythscreensaverosx.h"
 #endif
 
@@ -49,7 +49,7 @@ MythScreenSaverControl::MythScreenSaverControl(MythMainWindow* MainWin, MythDisp
         m_screenSavers.push_back(new MythScreenSaverX11(this));
         delete display;
     }
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
     m_screenSavers.push_back(new MythScreenSaverOSX(this));
 #endif
 #if defined(ANDROID)

@@ -2,12 +2,14 @@
 #include <cstdlib>
 #include "compat.h"
 
+#include <QtGlobal>
+
 #ifdef __linux__
 #include <sys/vfs.h>
 #include <sys/sysinfo.h>
 #endif
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 #include <mach/mach.h>
 #endif
 
@@ -233,7 +235,7 @@ void FileSystemInfo::PopulateFSProp(void)
 
     if (statfs(getPath().toLocal8Bit().constData(), &statbuf) == 0)
     {
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
         char *fstypename = statbuf.f_fstypename;
         if ((!strcmp(fstypename, "nfs")) ||     // NFS|FTP
             (!strcmp(fstypename, "afpfs")) ||   // AppleShare
