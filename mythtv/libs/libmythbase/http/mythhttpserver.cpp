@@ -39,6 +39,7 @@ MythHTTPServer::MythHTTPServer()
     connect(this, &MythHTTPServer::RemoveServices, this, &MythHTTPServer::StaleServices);
     connect(this, &MythHTTPServer::MasterResolved, this, &MythHTTPServer::ResolveMaster);
     connect(this, &MythHTTPServer::HostResolved,   this, &MythHTTPServer::ResolveHost);
+    connect(this, &MythHTTPServer::AddErrorPageHandler, this, & MythHTTPServer::NewErrorPageHandler);
 
     // Find our static content
     m_config.m_rootDir = GetShareDir();
@@ -441,6 +442,23 @@ void MythHTTPServer::StaleServices(const HTTPServices& Services)
     }
     if (staleservices)
         emit ServicesChanged(m_config.m_services);
+}
+
+/*! \brief Add new error page handler.
+ *
+ * Handler to return error page when no other content is found.
+ *
+ * Used for single page web apps (eg. backend web app)
+ *
+*/
+void MythHTTPServer::NewErrorPageHandler(const HTTPHandler& Handler)
+{
+    bool newhandler = false;
+    LOG(VB_HTTP, LOG_INFO, LOC + QString("Adding error page handler"));
+    m_config.m_errorPageHandler = Handler;
+    newhandler = true;
+    if (newhandler)
+        emit ErrorHandlerChanged(m_config.m_errorPageHandler);
 }
 
 void MythHTTPServer::BuildHosts()

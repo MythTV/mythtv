@@ -16,6 +16,7 @@ MythHTTPInstance::MythHTTPInstance()
 {
     // We need to register some types and this should always be hit at least once
     // before they are needed
+    qRegisterMetaType<HTTPHandler>();
     qRegisterMetaType<HTTPHandlers>();
     qRegisterMetaType<HTTPServices>();
     qRegisterMetaType<DataPayload>();
@@ -106,6 +107,11 @@ void MythHTTPInstance::Addservices(const HTTPServices &Services)
 void MythHTTPInstance::RemoveServices(const HTTPServices &Services)
 {
     emit Instance().m_httpServer->RemoveServices(Services);
+}
+
+void MythHTTPInstance::AddErrorPageHandler(const HTTPHandler &Handler)
+{
+    emit Instance().m_httpServer->AddErrorPageHandler(Handler);
 }
 
 /*! \brief A convenience class to manage the lifetime of a MythHTTPInstance

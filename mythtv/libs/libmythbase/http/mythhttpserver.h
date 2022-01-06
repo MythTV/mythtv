@@ -24,12 +24,14 @@ class MythHTTPServer : public MythHTTPThreadPool
     void RemoveHandlers (const HTTPHandlers& Handlers);
     void AddServices    (const HTTPServices& Services);
     void RemoveServices (const HTTPServices& Services);
+    void AddErrorPageHandler (const HTTPHandler& Handler);
     // Outbound
     void PathsChanged   (const QStringList& Paths);
     void HandlersChanged(const HTTPHandlers& Handlers);
     void ServicesChanged(const HTTPServices& Services);
     void OriginsChanged (const QStringList& Origins);
     void HostsChanged   (const QStringList& Hosts);
+    void ErrorHandlerChanged (const HTTPHandler& Handler);
     // Internal
     void MasterResolved (QHostInfo Info);
     void HostResolved   (QHostInfo Info);
@@ -49,6 +51,7 @@ class MythHTTPServer : public MythHTTPThreadPool
     void StaleServices  (const HTTPServices& Services);
     void ResolveMaster  (QHostInfo Info);
     void ResolveHost    (QHostInfo Info);
+    void NewErrorPageHandler (const HTTPHandler& Handler);
 
   protected:
     MythHTTPServer();

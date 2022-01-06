@@ -53,6 +53,7 @@ using HTTPServiceCtor   = std::function<HTTPServicePtr()>;
 using HTTPService       = std::pair<QString,HTTPServiceCtor>;
 using HTTPServices      = std::vector<HTTPService>;
 
+Q_DECLARE_METATYPE(HTTPHandler)
 Q_DECLARE_METATYPE(HTTPHandlers)
 Q_DECLARE_METATYPE(HTTPServices)
 
@@ -70,6 +71,7 @@ class MythHTTPConfig
     QStringList  m_filePaths;
     HTTPHandlers m_handlers;
     HTTPServices m_services;
+    HTTPHandler  m_errorPageHandler;
 #ifndef QT_NO_OPENSSL
     QSslConfiguration m_sslConfig;
 #endif

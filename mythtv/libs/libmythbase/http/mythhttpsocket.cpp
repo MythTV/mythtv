@@ -312,6 +312,16 @@ void MythHTTPSocket::Read()
         }
     }
 
+    // Try error page handler
+    if (response == nullptr)
+    {
+        if(m_config.m_errorPageHandler.first.length() > 0)
+        {
+            auto function = m_config.m_errorPageHandler.second;
+            response = std::invoke(function, request);
+        }
+    }
+
     // then simple file path handlers
     if (response == nullptr)
     {

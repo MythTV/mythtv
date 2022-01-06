@@ -19,6 +19,7 @@ class MBASE_PUBLIC MythHTTPInstance
     static void RemoveHandlers   (const HTTPHandlers& Handlers);
     static void Addservices      (const HTTPServices& Services);
     static void RemoveServices   (const HTTPServices& Services);
+    static void AddErrorPageHandler (const HTTPHandler& Handler);
 
   private:
     Q_DISABLE_COPY(MythHTTPInstance)

@@ -781,6 +781,10 @@ int run_backend(MythBackendCommandLineParser &cmdline)
 
     MythHTTPInstance::Addservices(be_services);
 
+    // Send all unknown requests into the web app. make bookmarks and direct access work.
+    auto error_page = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/index.html"); };
+    MythHTTPInstance::AddErrorPageHandler({ "=404", error_page });
+
     // Serve components of the backend web app as if they were hosted at '/'
     auto main_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/main.js"); };
     auto styles_css = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/styles.css"); };
