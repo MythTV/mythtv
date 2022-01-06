@@ -2466,17 +2466,6 @@ void NuppelVideoRecorder::WriteVideo(MythVideoFrame *frame, bool skipsync,
     m_lf = fnum;
 }
 
-#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
-static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
-    __attribute__ ((unused)); /* <- suppress compiler warning */
-
-static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
-{
-    for (int i = 0; i < audio_channels * buf_cnt; i++)
-        buf[i] = qToLittleEndian<qint16>(buf[i]);
-}
-#endif
-
 void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, std::chrono::milliseconds timecode)
 {
     struct rtframeheader frameheader {};
@@ -2534,7 +2523,9 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, std::chrono::
         int sample_cnt = m_audioBufferSize / m_audioBytesPerSample;
 
 #if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
-        bswap_16_buf((short int*) buf, sample_cnt, m_audioChannels);
+        auto buf16 = reinterpret_cast<uint16_t *>(buf);
+        for (int i = 0; i < m_audioChannels * sample_cnt; i++)
+            buf16[i] = qToLittleEndian<uint16_t>(buf16[i]);
 #endif
 
         if (m_audioChannels == 2)

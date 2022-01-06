@@ -265,21 +265,12 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     return 1;
 }
 
-#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
-static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
-    __attribute__ ((unused)); /* <- suppress compiler warning */
-
-static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
-{
-    for (int i = 0; i < audio_channels * buf_cnt; i++)
-        buf[i] = qFromLittleEndian<int16_t>(buf[i]);
-}
-#endif
-
 int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber*/, std::chrono::milliseconds &Timecode)
 {
 #if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
-    bswap_16_buf((short int*) buf, m_audioFrameSize, m_audioChannels);
+    auto buf16 = reinterpret_cast<uint16_t *>(Buffer);
+    for (int i = 0; i < m_audioChannels * m_audioFrameSize; i++)
+        buf16[i] = qFromLittleEndian<uint16_t>(buf16[i]);
 #endif
 
     AVCodecContext *avctx   = m_codecMap.GetCodecContext(m_audioStream);
