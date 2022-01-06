@@ -453,12 +453,9 @@ void MythHTTPServer::StaleServices(const HTTPServices& Services)
 */
 void MythHTTPServer::NewErrorPageHandler(const HTTPHandler& Handler)
 {
-    bool newhandler = false;
     LOG(VB_HTTP, LOG_INFO, LOC + QString("Adding error page handler"));
     m_config.m_errorPageHandler = Handler;
-    newhandler = true;
-    if (newhandler)
-        emit ErrorHandlerChanged(m_config.m_errorPageHandler);
+    emit ErrorHandlerChanged(m_config.m_errorPageHandler);
 }
 
 void MythHTTPServer::BuildHosts()
