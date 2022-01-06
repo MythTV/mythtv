@@ -1,3 +1,4 @@
+#include <QtGlobal>
 #include <QAtomicInt>
 #include <QMutex>
 #include <QMutexLocker>
@@ -42,14 +43,14 @@
 #include <csignal>
 
 // Various ways to get to thread's tid
-#if defined(linux)
+#if defined(__linux__)
 #include <sys/syscall.h>
 #elif defined(__FreeBSD__)
 extern "C" {
 #include <sys/ucontext.h>
 #include <sys/thr.h>
 }
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
 #include <mach/mach.h>
 #endif
 

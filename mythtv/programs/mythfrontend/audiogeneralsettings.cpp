@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 
 // Qt headers
+#include <QtGlobal>
 #include <QCoreApplication>
 #include <QDir>
 #include <QEvent>
@@ -38,9 +39,9 @@ AudioDeviceComboBox::AudioDeviceComboBox(AudioConfigSettings *parent) :
     QString dflt = "ALSA:default";
 #elif USING_PULSEOUTPUT
     QString dflt = "PulseAudio:default";
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
     QString dflt = "CoreAudio:";
-#elif _WIN32
+#elif defined(_WIN32)
     QString dflt = "Windows:";
 #else
     QString dflt = "NULL";

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 
+#include <QtGlobal>
 #include <QFile>
 #include <QFileInfo>
 #include <QMap>
@@ -13,7 +14,7 @@
 #include <QDir>
 #include <QApplication>
 #include <QTimer>
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
 #include <QProcessEnvironment>
 #endif
 
@@ -140,7 +141,7 @@ static void resetAllKeys(void);
 void handleSIGUSR1(void);
 void handleSIGUSR2(void);
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 static bool gLoaded = false;
 #endif
 
@@ -778,10 +779,10 @@ static void playDisc()
         if ((command_string.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
             (command_string.length() < 1))
         {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
             // Convert a BSD 'leaf' name into a raw device path
             QString filename = "dvd://dev/r";   // e.g. 'dvd://dev/rdisk2'
-#elif _WIN32
+#elif defined(_WIN32)
             QString filename = "dvd:";          // e.g. 'dvd:E\\'
 #else
             QString filename = "dvd:/";         // e.g. 'dvd://dev/sda'
@@ -1849,7 +1850,7 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
     CleanupGuard callCleanup(cleanup);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
     QString path = QCoreApplication::applicationDirPath();
     setenv("PYTHONPATH",
            QString("%1/../Resources/lib/%2/site-packages:%3")
@@ -1863,7 +1864,7 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-#if ! CONFIG_DARWIN
+#ifndef Q_OS_DARWIN
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
@@ -2090,7 +2091,7 @@ int main(int argc, char **argv)
         }
     }
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     GetMythMainWindow()->SetEffectsEnabled(false);
     GetMythMainWindow()->Init();
     GetMythMainWindow()->SetEffectsEnabled(true);

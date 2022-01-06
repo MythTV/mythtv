@@ -1530,7 +1530,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             return false;
         }
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
         if (opt.startsWith("-psn_"))
         {
             std::cerr << "Ignoring Process Serial Number from command line"
@@ -2937,7 +2937,7 @@ int MythCommandLineParser::Daemonize(void) const
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         LOG(VB_GENERAL, LOG_WARNING, "Unable to ignore SIGPIPE");
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     if (toBool("daemon"))
     {
         std::cerr << "Daemonizing is unavailable in OSX" << std::endl;

@@ -7,6 +7,7 @@
 #include <sys/param.h>
 
 // Qt Headers
+#include <QtGlobal>
 #include <QDir>
 #include <QFileInfo>
 #include <QFileInfoList>
@@ -15,7 +16,6 @@
 
 // MythTV headers
 #include "mythmedia.h"
-#include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythmiscutil.h"
 #include "mythsystemlegacy.h"
@@ -29,7 +29,7 @@
 
 static const QString PATHTO_PMOUNT("/usr/bin/pmount");
 static const QString PATHTO_PUMOUNT("/usr/bin/pumount");
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     static const QString PATHTO_MOUNT("/sbin/mount");
 #else
     static const QString PATHTO_MOUNT("/bin/mount");
@@ -37,7 +37,7 @@ static const QString PATHTO_PUMOUNT("/usr/bin/pumount");
 static const QString PATHTO_UNMOUNT("/bin/umount");
 static const QString PATHTO_MOUNTS("/proc/mounts");
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 #   define USE_MOUNT_COMMAND
 #endif
 
@@ -113,7 +113,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
 {
     if (DoMount && isMounted())
     {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
         // Not an error - DiskArbitration has already mounted the device.
         // AddDevice calls mount() so onDeviceMounted() can get mediaType.
         onDeviceMounted();
@@ -307,7 +307,7 @@ MythMediaError MythMediaDevice::eject(bool open_close)
 {
     (void) open_close;
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     QString  command = "diskutil eject " + m_devicePath;
 
     myth_system(command, kMSRunBackground);
@@ -319,7 +319,7 @@ MythMediaError MythMediaDevice::eject(bool open_close)
 
 bool MythMediaDevice::isSameDevice(const QString &path)
 {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
     // The caller may be using a raw device instead of the BSD 'leaf' name
     if (path == "/dev/r" + m_devicePath)
         return true;
@@ -419,7 +419,7 @@ bool MythMediaDevice::findMountPath()
         QStringList deviceNames;
         getSymlinkTarget(deviceName, &deviceNames);
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
         // match short-style BSD node names:
         if (m_devicePath.startsWith("disk"))
             deviceNames << deviceName.mid(5);   // remove 5 chars - /dev/

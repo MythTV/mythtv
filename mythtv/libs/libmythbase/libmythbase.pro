@@ -83,6 +83,7 @@ HEADERS += http/mythhttprequest.h
 HEADERS += http/mythhttpresponse.h
 HEADERS += http/mythhttpfile.h
 HEADERS += http/mythhttpencoding.h
+HEADERS += http/mythhttprewrite.h
 HEADERS += http/mythhttproot.h
 HEADERS += http/mythhttpranges.h
 HEADERS += http/mythhttpcache.h
@@ -115,6 +116,7 @@ SOURCES += http/mythhttprequest.cpp
 SOURCES += http/mythhttpresponse.cpp
 SOURCES += http/mythhttpfile.cpp
 SOURCES += http/mythhttpencoding.cpp
+SOURCES += http/mythhttprewrite.cpp
 SOURCES += http/mythhttproot.cpp
 SOURCES += http/mythhttpranges.cpp
 SOURCES += http/mythhttpcache.cpp
@@ -184,8 +186,6 @@ DEPENDPATH  +=  ../../external/libudfread ./http ./http/serialisers
 DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
 DEFINES += LIBDIRNAME=\\\"$${LIBDIRNAME}\\\"
 DEFINES += MBASE_API
-
-linux:DEFINES += linux
 
 macx {
     HEADERS += mythcdrom-darwin.h

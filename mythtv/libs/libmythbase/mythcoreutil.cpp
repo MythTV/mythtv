@@ -7,13 +7,14 @@
 
 // System specific C headers
 #include "compat.h"
+#include <QtGlobal>
 
-#ifdef linux
+#ifdef __linux__
 #include <sys/vfs.h>
 #include <sys/sysinfo.h>
 #endif
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 #include <mach/mach.h>
 #endif
 

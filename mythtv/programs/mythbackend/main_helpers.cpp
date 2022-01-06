@@ -59,6 +59,7 @@
 
 // New webserver
 #include "libmythbase/http/mythhttproot.h"
+#include "libmythbase/http/mythhttprewrite.h"
 #include "libmythbase/http/mythhttpinstance.h"
 #include "servicesv2/v2myth.h"
 #include "servicesv2/v2video.h"
@@ -766,17 +767,38 @@ int run_backend(MythBackendCommandLineParser &cmdline)
     // Provide systemd ready notification (for type=notify units)
     be_sd_notify("READY=1");
 
-    MythHTTPInstance::Addservices({{ VIDEO_SERVICE, &MythHTTPService::Create<V2Video> }});
-    MythHTTPInstance::Addservices({{ MYTH_SERVICE, &MythHTTPService::Create<V2Myth> }});
-    MythHTTPInstance::Addservices({{ DVR_SERVICE, &MythHTTPService::Create<V2Dvr> }});
-    MythHTTPInstance::Addservices({{ CONTENT_SERVICE, &MythHTTPService::Create<V2Content> }});
-    MythHTTPInstance::Addservices({{ GUIDE_SERVICE, &MythHTTPService::Create<V2Guide> }});
-    MythHTTPInstance::Addservices({{ CHANNEL_SERVICE, &MythHTTPService::Create<V2Channel> }});
-    MythHTTPInstance::Addservices({{ STATUS_SERVICE, &MythHTTPService::Create<V2Status> }});
-    MythHTTPInstance::Addservices({{ CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> }});
-    MythHTTPInstance::Addservices({{ MUSIC_SERVICE, &MythHTTPService::Create<V2Music> }});
+    const HTTPServices be_services = {
+        { VIDEO_SERVICE, &MythHTTPService::Create<V2Video> },
+        { MYTH_SERVICE, &MythHTTPService::Create<V2Myth> },
+        { DVR_SERVICE, &MythHTTPService::Create<V2Dvr> },
+        { CONTENT_SERVICE, &MythHTTPService::Create<V2Content> },
+        { GUIDE_SERVICE, &MythHTTPService::Create<V2Guide> },
+        { CHANNEL_SERVICE, &MythHTTPService::Create<V2Channel> },
+        { STATUS_SERVICE, &MythHTTPService::Create<V2Status> },
+        { CAPTURE_SERVICE, &MythHTTPService::Create<V2Capture> },
+        { MUSIC_SERVICE, &MythHTTPService::Create<V2Music> },
+    };
+
+    MythHTTPInstance::Addservices(be_services);
+
+    // Serve components of the backend web app as if they were hosted at '/'
+    auto main_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/main.js"); };
+    auto styles_css = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/styles.css"); };
+    auto polyfills_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/polyfills.js"); };
+    auto runtime_js = [](auto && PH1) { return MythHTTPRewrite::RewriteFile(std::forward<decltype(PH1)>(PH1), "apps/backend/runtime.js"); };
+
+    // Default index page
     auto root = [](auto && PH1) { return MythHTTPRoot::RedirectRoot(std::forward<decltype(PH1)>(PH1), "apps/backend/index.html"); };
-    MythHTTPScopedInstance webserver({{ "/", root}});
+
+    const HTTPHandlers be_handlers = {
+        { "/main.js", main_js },
+        { "/styles.css", styles_css },
+        { "/polyfills.js", polyfills_js },
+        { "/runtime.js", runtime_js },
+        { "/", root }
+    };
+
+    MythHTTPScopedInstance webserver(be_handlers);
 
     ///////////////////////////////
     ///////////////////////////////
