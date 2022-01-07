@@ -32,6 +32,8 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
+#include <QtGlobal>
+
 #define LOC     QString("AudioInOSS: ")
 #define LOC_DEV QString("AudioInOSS(%1): ").arg(m_deviceName.constData())
 
@@ -79,7 +81,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
             break;
         case 16:
         default:
-#if HAVE_BIGENDIAN
+#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
             choice = AFMT_S16_BE;
             tag = "AFMT_S16_BE";
 #else

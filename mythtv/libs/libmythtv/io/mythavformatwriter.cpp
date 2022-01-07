@@ -17,19 +17,20 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#include "io/mythavformatwriter.h"
+
+#include <QtGlobal>
+#include <QtEndian>
 
 // MythTV
 #include "mythlogging.h"
 #include "mythcorecontext.h"
 #include "audiooutpututil.h"
 #include "mythavutil.h"
-#include "io/mythavformatwriter.h"
+
 
 // FFmpeg
 extern "C" {
-#if HAVE_BIGENDIAN
-#include "bswap.h"
-#endif
 #include "libavutil/opt.h"
 #include "libavutil/samplefmt.h"
 #include "libavutil/imgutils.h"
@@ -264,20 +265,20 @@ int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)
     return 1;
 }
 
-#if HAVE_BIGENDIAN
+#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
 static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
     __attribute__ ((unused)); /* <- suppress compiler warning */
 
 static void bswap_16_buf(short int *buf, int buf_cnt, int audio_channels)
 {
     for (int i = 0; i < audio_channels * buf_cnt; i++)
-        buf[i] = bswap_16(buf[i]);
+        buf[i] = qFromLittleEndian<int16_t>(buf[i]);
 }
 #endif
 
 int MythAVFormatWriter::WriteAudioFrame(unsigned char *Buffer, int /*FrameNumber*/, std::chrono::milliseconds &Timecode)
 {
-#if HAVE_BIGENDIAN
+#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
     bswap_16_buf((short int*) buf, m_audioFrameSize, m_audioChannels);
 #endif
 

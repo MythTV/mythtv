@@ -31,29 +31,19 @@
 
 // Qt
 #include <QtGlobal>
+#include <QtEndian>
 #include <QDateTime>
 #include <QSequentialIterable>
 #include <QTextStream>
 #include <QBuffer>
 
 // MythTV
-#include "mythconfig.h"
 #include "mythlogging.h"
 #include "mythbinaryplist.h"
 
 // Std
 #include <array>
 #include <cmath>
-#if HAVE_SYS_ENDIAN_H
-#include <sys/endian.h>
-#elif !defined(Q_OS_DARWIN)
-#include <endian.h>
-#else
-#include <libkern/OSByteOrder.h>
-#define be16toh(x) OSSwapBigToHostInt16(x)
-#define be32toh(x) OSSwapBigToHostInt32(x)
-#define be64toh(x) OSSwapBigToHostInt64(x)
-#endif
 
 #define LOC QString("PList: ")
 
@@ -93,7 +83,8 @@ enum
 template <typename T>
 static T convert_float(const uint8_t *p)
 {
-#if (HAVE_BIGENDIAN) && !defined (__VFP_FP__)
+// note: floating point endianness is not necessarily the same as integer endianness
+#if (Q_BYTE_ORDER == Q_BIG_ENDIAN) && !defined (__VFP_FP__)
     return *(reinterpret_cast<const T *>(p));
 #else
     static std::array<uint8_t,sizeof(T)> temp;
@@ -105,21 +96,6 @@ static T convert_float(const uint8_t *p)
     }
     return *(reinterpret_cast<const T *>(temp.data()));
 #endif
-}
-
-template <typename T>
-static T convert_int(const uint8_t *p)
-{
-    T tmp = *(reinterpret_cast<const T *>(p));
-    if constexpr (sizeof(T) == 1)
-        return tmp;
-    else if constexpr (sizeof(T) == 2)
-        return be16toh(tmp);
-    else if constexpr (sizeof(T) == 4)
-	return be32toh(tmp);
-    else if constexpr (sizeof(T) == 8)
-	return be64toh(tmp);
-    return 0;
 }
 
 MythBinaryPList::MythBinaryPList(const QByteArray& Data)
@@ -264,9 +240,9 @@ void MythBinaryPList::ParseBinaryPList(const QByteArray& Data)
     uint8_t* trailer = m_data + size - TRAILER_SIZE;
     m_offsetSize = *(trailer + TRAILER_OFFSIZE_INDEX);
     m_parmSize   = *(trailer + TRAILER_PARMSIZE_INDEX);
-    m_numObjs    = convert_int<uint64_t>(trailer + TRAILER_NUMOBJ_INDEX);
-    m_rootObj    = convert_int<uint64_t>(trailer + TRAILER_ROOTOBJ_INDEX);
-    auto offset_tindex = convert_int<uint64_t>(trailer + TRAILER_OFFTAB_INDEX);
+    m_numObjs    = qFromBigEndian<quint64>(trailer + TRAILER_NUMOBJ_INDEX);
+    m_rootObj    = qFromBigEndian<quint64>(trailer + TRAILER_ROOTOBJ_INDEX);
+    auto offset_tindex = qFromBigEndian<quint64>(trailer + TRAILER_OFFTAB_INDEX);
     m_offsetTable = m_data + offset_tindex;
 
     LOG(VB_GENERAL, LOG_DEBUG, LOC +
@@ -326,12 +302,12 @@ QVariant MythBinaryPList::ParseBinaryNode(uint64_t Num)
 uint64_t MythBinaryPList::GetBinaryUInt(uint8_t *Data, uint64_t Size)
 {
     if (Size == 1) return static_cast<uint64_t>(*Data);
-    if (Size == 2) return convert_int<quint16>(Data);
-    if (Size == 4) return convert_int<quint32>(Data);
-    if (Size == 8) return convert_int<uint64_t>(Data);
+    if (Size == 2) return qFromBigEndian<quint16>(Data);
+    if (Size == 4) return qFromBigEndian<quint32>(Data);
+    if (Size == 8) return qFromBigEndian<quint64>(Data);
     if (Size == 3)
     {
-#if defined(HAVE_BIGENDIAN)
+#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
         return static_cast<uint64_t>(((*Data) << 16) + (*(Data + 1) << 8) + (*(Data + 2)));
 #else
         return static_cast<uint64_t>((*Data) + (*(Data + 1) << 8) + ((*(Data + 2)) << 16));
@@ -502,7 +478,7 @@ QVariant MythBinaryPList::ParseBinaryUnicode(uint8_t* Data)
     QByteArray tmp;
     for (uint64_t i = 0; i < count; i++, Data += 2)
     {
-        auto twobyte = convert_int<quint16>(Data);
+        auto twobyte = qFromBigEndian<quint16>(Data);
         tmp.append(static_cast<char>(twobyte & 0xff));
         tmp.append(static_cast<char>((twobyte >> 8) & 0xff));
     }

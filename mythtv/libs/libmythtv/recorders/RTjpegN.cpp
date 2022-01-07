@@ -28,6 +28,19 @@
 #include <cstring>
 #include "RTjpegN.h"
 
+#include <QtGlobal>
+#if (Q_BYTE_ORDER == Q_BIG_ENDIAN)
+#define RTJPEG_SWAP_WORD(a) ( ((a) << 24) | \
+			(((a) << 8) & 0x00ff0000) | \
+			(((a) >> 8) & 0x0000ff00) | \
+			((unsigned long)(a) >>24) )
+#define RTJPEG_SWAP_HALFWORD(a) ( (((a) << 8) & 0xff00) | \
+			(((a) >> 8) & 0x00ff) )
+#else
+#define RTJPEG_SWAP_WORD(a) (a)
+#define RTJPEG_SWAP_HALFWORD(a) (a)
+#endif
+
 #ifdef MMX
 static mmx_t RTjpeg_ones;
 static mmx_t RTjpeg_half;

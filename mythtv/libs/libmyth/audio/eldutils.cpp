@@ -22,28 +22,17 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
+#include "eldutils.h"
 
 #include <cinttypes>
 #include <sys/types.h>
 
 #include <QString>
+#include <QtEndian>
 
-#include "mythconfig.h"
-#include "eldutils.h"
-#include "bswap.h"
 #include "audiooutputbase.h"
 
 #define LOC QString("ELDUTILS: ")
-
-#if HAVE_BIGENDIAN
-#define LE_SHORT(v)      bswap_16(*((uint16_t *)v))
-#define LE_INT(v)        bswap_32(*((uint32_t *)v))
-#define LE_INT64(v)      bswap_64(*((uint64_t *)v))
-#else
-#define LE_SHORT(v)      (*((uint16_t *)(v)))
-#define LE_INT(v)        (*((uint32_t *)(v)))
-#define LE_INT64(v)      (*((uint64_t *)(v)))
-#endif
 
 enum eld_versions
 {
@@ -268,11 +257,11 @@ int eld::update_eld(const char *buf, int size)
     m_e.aud_synch_delay = GRAB_BITS(buf, 6, 0, 8) * 2;
     m_e.spk_alloc       = GRAB_BITS(buf, 7, 0, 7);
 
-    m_e.port_id         = LE_INT64(buf + 8);
+    m_e.port_id         = qFromLittleEndian<uint64_t>(buf + 8);
 
     /* not specified, but the spec's tendency is little endian */
-    m_e.manufacture_id  = LE_SHORT(buf + 16);
-    m_e.product_id      = LE_SHORT(buf + 18);
+    m_e.manufacture_id  = qFromLittleEndian<uint16_t>(buf + 16);
+    m_e.product_id      = qFromLittleEndian<uint16_t>(buf + 18);
 
     if (ELD_FIXED_BYTES + mnl > size)
     {
