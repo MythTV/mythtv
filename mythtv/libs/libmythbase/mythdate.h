@@ -74,7 +74,7 @@ MBASE_PUBLIC std::chrono::seconds secsInFuture (const QDateTime& future);
  *     See QTime::toString for the a definition fo valid formatting
  *     characters.
  */
-inline MBASE_PUBLIC QString formatTime(std::chrono::milliseconds msecs, const QString& fmt)
+inline QString formatTime(std::chrono::milliseconds msecs, const QString& fmt)
 {
     return QTime::fromMSecsSinceStartOfDay(msecs.count()).toString(fmt);
 }
