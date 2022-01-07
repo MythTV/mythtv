@@ -223,8 +223,6 @@
 #    define SIGCONT 18
 #    define SIGSTOP 19
 
-#    define S_IRGRP 0
-#    define S_IROTH 0
 #    define O_SYNC 0
 
     #define mkfifo(path, mode) \
@@ -330,11 +328,6 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #  ifndef lseek64
 #    define lseek64( f, o, w ) _lseeki64( f, o, w )
 #  endif
-#endif
-
-#ifdef _WIN32
-#    define fseeko(stream, offset, whence) fseeko64(stream, offset, whence)
-#    define ftello(stream) ftello64(stream)
 #endif
 
 #ifdef Q_OS_ANDROID
