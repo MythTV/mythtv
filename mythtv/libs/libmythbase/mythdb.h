@@ -99,5 +99,6 @@ class MBASE_PUBLIC MythDB
 
  MBASE_PUBLIC  MythDB *GetMythDB();
  MBASE_PUBLIC  void DestroyMythDB();
+ MBASE_PUBLIC  MythDB *GetMythTestDB(const QString& testname);
 
 #endif

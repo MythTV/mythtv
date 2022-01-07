@@ -42,6 +42,7 @@ obj
 *.ipch
 .directory
 .vscode
+*.code-workspace
 .qmake.stash
 tags
 TAGS

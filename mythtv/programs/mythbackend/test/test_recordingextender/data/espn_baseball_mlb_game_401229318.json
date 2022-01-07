@@ -1,0 +1,1 @@
+{"$ref":"http://sports.core.api.espn.com/v2/sports/baseball/leagues/mlb/events/401229318/competitions/401229318/status?lang=en&region=us","clock":0.0,"displayClock":"0:00","period":1,"type":{"id":"2","name":"STATUS_IN_PROGRESS","state":"in","completed":false,"description":"In Progress","detail":"Bottom 1st","shortDetail":"Bot 1st"}}

@@ -286,6 +286,11 @@ static int decode_main_header(NUTContext *nut)
             ret = AVERROR_INVALIDDATA;
             goto fail;
         }
+        if (tmp_size < 0 || tmp_size > INT_MAX - count) {
+            av_log(s, AV_LOG_ERROR, "illegal size\n");
+            ret = AVERROR_INVALIDDATA;
+            goto fail;
+        }
 
         for (j = 0; j < count; j++, i++) {
             if (i == 'N') {
@@ -489,8 +494,8 @@ static int decode_info_header(NUTContext *nut)
     AVIOContext *bc    = s->pb;
     uint64_t tmp, chapter_start, chapter_len;
     unsigned int stream_id_plus1, count;
-    int chapter_id, i, ret = 0;
-    int64_t value, end;
+    int i, ret = 0;
+    int64_t chapter_id, value, end;
     char name[256], str_value[1024], type_str[256];
     const char *type;
     int *event_flags        = NULL;

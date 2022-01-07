@@ -10,7 +10,7 @@
 #include "mythcorecontext.h"
 #include "mythdate.h"
 #include "mythdbcon.h"
-
+#include "configuration.h"
 #include "mythmainwindow.h"
 
 #include <QTextStream>
@@ -36,7 +36,7 @@ MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString &sSharePath)
 {
 
     QString sUPnpDescPath =
-        UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", m_sSharePath );
+        MythCoreContext::GetConfiguration()->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "MFEXML_scpd.xml";
     m_sControlUrl          = "/MythFE";

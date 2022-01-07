@@ -84,6 +84,9 @@ HEADERS += serviceHosts/frontendServiceHost.h
 HEADERS += services/frontend.h
 SOURCES += services/frontend.cpp
 
+HEADERS += services/mythfrontendservice.h
+SOURCES += services/mythfrontendservice.cpp
+
 HEADERS += progdetails.h proginfolist.h
 SOURCES += progdetails.cpp proginfolist.cpp
 
@@ -111,7 +114,6 @@ win32 : !debug {
 }
 
 using_x11:DEFINES += USING_X11
-using_xrandr:DEFINES += USING_XRANDR
 using_opengl:DEFINES += USING_OPENGL
 using_vdpau:DEFINES += USING_VDPAU
 using_vaapi:using_opengl:DEFINES += USING_VAAPI

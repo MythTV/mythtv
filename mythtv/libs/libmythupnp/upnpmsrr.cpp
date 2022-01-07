@@ -8,6 +8,8 @@
 #include "upnp.h"
 #include "upnpmsrr.h"
 #include "mythlogging.h"
+#include "mythcorecontext.h"
+#include "configuration.h"
 
 #include <cmath>
 
@@ -34,7 +36,7 @@ UPnpMSRR::UPnpMSRR( UPnpDevice *pDevice, const QString &sSharePath )
     SetValue<unsigned short>("ValidationRevokedUpdateID"   , 0);
 
     QString sUPnpDescPath =
-        UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", m_sSharePath );
+        MythCoreContext::GetConfiguration()->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "MSRR_scpd.xml";
     m_sControlUrl          = "/MSRR_Control";

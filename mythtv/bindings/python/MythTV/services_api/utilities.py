@@ -2,19 +2,15 @@
 
 """API utilities."""
 
-from __future__ import print_function
-from __future__ import absolute_import
 from datetime import datetime, timedelta
 import logging
 import sys
 from ._version import __version__
 
 # pylint: disable=no-name-in-module, import-error
-if sys.version_info[0] == 2:
-    from urllib import quote
-elif sys.version_info[0] == 3:
+try:
     from urllib.parse import quote
-else:
+except:
     sys.exit('Unable to import urllib')
 # pylint: enable=no-name-in-module, import-error
 

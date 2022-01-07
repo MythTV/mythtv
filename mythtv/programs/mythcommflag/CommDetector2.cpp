@@ -15,7 +15,7 @@
 #include "compat.h"
 #include "mythdb.h"
 #include "mythlogging.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythcommflagplayer.h"
 #include "programinfo.h"
 #include "channelutil.h"
@@ -252,13 +252,13 @@ QString frameToTimestamp(long long frameno, float fps)
 {
     auto ms = millisecondsFromFloat(frameno / fps * 1000);
     auto secs = std::chrono::ceil<std::chrono::seconds>(ms);
-    return MythFormatTime(secs, "hh:mm:ss");
+    return MythDate::formatTime(secs, "hh:mm:ss");
 }
 
 QString frameToTimestampms(long long frameno, float fps)
 {
     auto ms = millisecondsFromFloat(frameno / fps * 1000);
-    QString timestr = MythFormatTime(ms, "mm:ss.zzz");
+    QString timestr = MythDate::formatTime(ms, "mm:ss.zzz");
     timestr.chop(1); // Chop 1 to return hundredths
     return timestr;
 }

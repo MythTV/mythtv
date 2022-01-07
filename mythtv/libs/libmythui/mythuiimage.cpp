@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <ctime>
+#include <random>
+#include <algorithm>
 
 // QT
 #include <QCoreApplication>
@@ -1634,36 +1636,65 @@ void MythUIImage::customEvent(QEvent *event)
 
 void MythUIImage::FindRandomImage(void)
 {
-    QDir imageDir(m_imageDirectory);
-
-    if (!imageDir.exists())
-    {
-        QString themeDir = GetMythUI()->GetThemeDir() + '/';
-        imageDir.setPath(themeDir + m_imageDirectory);
-    }
-
-    QStringList imageTypes;
-
-    QList< QByteArray > exts = QImageReader::supportedImageFormats();
-    for (const auto & ext : qAsConst(exts))
-    {
-        imageTypes.append(QString("*.").append(ext));
-    }
-
-    imageDir.setNameFilters(imageTypes);
-
-    QStringList imageList = imageDir.entryList();
     QString randFile;
 
-    if (!imageList.empty())
+    // find and save the list of available images
+    if (m_imageList.isEmpty())
     {
-        // try to find a different image
-        do
-        {
-            uint32_t rand = MythRandom() % static_cast<uint32_t>(imageList.size());
-            randFile = QString("%1%2").arg(m_imageDirectory, imageList.takeAt(static_cast<int>(rand)));
+        QDir imageDir(m_imageDirectory);
 
-        } while (imageList.size() > 1 && randFile == m_origFilename);
+        if (!imageDir.exists())
+        {
+            QString themeDir = GetMythUI()->GetThemeDir() + '/';
+            imageDir.setPath(themeDir + m_imageDirectory);
+        }
+
+        QStringList imageTypes;
+
+        QList< QByteArray > exts = QImageReader::supportedImageFormats();
+        for (const auto & ext : qAsConst(exts))
+        {
+            imageTypes.append(QString("*.").append(ext));
+        }
+
+        imageDir.setNameFilters(imageTypes);
+
+        m_imageList = imageDir.entryList();
+
+        if (m_imageList.empty())
+        {
+            m_origFilename = m_imageProperties.m_filename = randFile;
+            return;
+        }
+
+        // randomly shuffle the images
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(m_imageList.begin(), m_imageList.end(), g);
+        m_imageListIndex = 0;
+        randFile = QString("%1%2").arg(m_imageDirectory, m_imageList.at(m_imageListIndex));
+    }
+    else
+    {
+        if (!m_imageList.empty())
+        {
+            m_imageListIndex++;
+
+            // if we are at the last image in the list re-shuffle the list and start from the beginning
+            if (m_imageListIndex == m_imageList.size())
+            {
+                std::random_device rd;
+                std::mt19937 g(rd());
+                std::shuffle(m_imageList.begin(), m_imageList.end(), g);
+                m_imageListIndex = 0;
+            }
+
+            // make sure we don't show the same image again in the unlikely event the re-shuffle shows the same image again 
+            if (m_imageList.at(m_imageListIndex) == m_origFilename && m_imageList.size() > 1)
+                m_imageListIndex++;
+
+            randFile = QString("%1%2").arg(m_imageDirectory, m_imageList.at(m_imageListIndex));
+        }
     }
 
     m_origFilename = m_imageProperties.m_filename = randFile;

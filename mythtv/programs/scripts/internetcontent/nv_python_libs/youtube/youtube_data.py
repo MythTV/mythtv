@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from string import ascii_uppercase, ascii_lowercase
 
 class getData(object):
@@ -8,7 +8,7 @@ class getData(object):
 
     def update(self, data):
         total = []
-        for char in data.decode("hex"):
+        for char in bytes.fromhex(data).decode('ascii'):
             if char in ascii_uppercase:
                 index = (ascii_uppercase.find(char) + 13) % 26
                 total.append(ascii_uppercase[index])

@@ -88,18 +88,27 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
                                 uint8_t *buf, int buf_size,
                                 const short *samples)
 {
-    AVPacket pkt;
+    AVPacket *pkt;
     AVFrame *frame;
     int ret, samples_size;
 
-    av_init_packet(&pkt);
-    pkt.data = buf;
-    pkt.size = buf_size;
+    pkt = av_packet_alloc();
+    if (pkt == nullptr)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
+        return AVERROR(ENOMEM);
+    }
+
+    pkt->data = buf;
+    pkt->size = buf_size;
 
     if (samples) {
         frame = av_frame_alloc();
         if (!frame)
+        {
+            av_packet_free(&pkt);
             return AVERROR(ENOMEM);
+        }
 
         if (avctx->frame_size) {
             frame->nb_samples = avctx->frame_size;
@@ -111,6 +120,7 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
                 av_log(avctx, AV_LOG_ERROR, "avcodec_encode_audio() does not "
                                             "support this codec\n");
                 av_frame_free(&frame);
+                av_packet_free(&pkt);
                 return AVERROR(EINVAL);
             }
             nb_samples = (int64_t)buf_size * 8 /
@@ -118,6 +128,7 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
                           avctx->channels);
             if (nb_samples >= INT_MAX) {
                 av_frame_free(&frame);
+                av_packet_free(&pkt);
                 return AVERROR(EINVAL);
             }
             frame->nb_samples = nb_samples;
@@ -133,6 +144,7 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
                                             (const uint8_t *)samples,
                                             samples_size, 1)) < 0) {
             av_frame_free(&frame);
+            av_packet_free(&pkt);
             return ret;
         }
 
@@ -145,9 +157,9 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
     //  Now that avcodec_encode_audio2 is deprecated and replaced
     //  by 2 calls, this could be optimized
     //  into separate routines or separate threads.
-    ret = avcodec_receive_packet(avctx, &pkt);
+    ret = avcodec_receive_packet(avctx, pkt);
     if (ret != 0)
-        pkt.size=0;
+        pkt->size=0;
     if (ret == AVERROR(EAGAIN))
         ret = 0;
     if (ret == 0)
@@ -162,13 +174,15 @@ static int avcodec_encode_audio(AVCodecContext *avctx,
     }
 
     /* free any side data since we cannot return it */
-    av_packet_free_side_data(&pkt);
+    av_packet_free_side_data(pkt);
 
     if (frame && frame->extended_data != frame->data)
         av_freep(&frame->extended_data);
 
     av_frame_free(&frame);
-    return ret ? ret : pkt.size;
+    int size = pkt->size;
+    av_packet_free(&pkt);
+    return ret ? ret : size;
 }
 
 static int encode_mp2_audio(audio_frame_t *aframe, uint8_t *buffer, int bufsize)

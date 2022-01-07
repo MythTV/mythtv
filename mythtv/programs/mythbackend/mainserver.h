@@ -152,6 +152,8 @@ class MainServer : public QObject, public MythSocketCBs
     int GetExitCode() const { return m_exitCode; }
 
     void UpdateSystemdStatus(void);
+    void GetActiveBackends(QStringList &hosts);
+    PlaybackSock *GetMediaServerByHostname(const QString &hostname);
 
   protected slots:
     void reconnectTimeout(void);
@@ -167,8 +169,6 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleAnnounce(QStringList &slist, QStringList commands,
                         MythSocket *socket);
     void HandleDone(MythSocket *socket);
-
-    void GetActiveBackends(QStringList &hosts);
     void HandleActiveBackendsQuery(PlaybackSock *pbs);
     void HandleIsActiveBackendQuery(const QStringList &slist, PlaybackSock *pbs);
     void HandleMoveFile(PlaybackSock *pbs, const QString &storagegroup,
@@ -279,7 +279,6 @@ class MainServer : public QObject, public MythSocketCBs
     static void getGuideDataThrough(QDateTime &GuideDataThrough);
 
     PlaybackSock *GetSlaveByHostname(const QString &hostname);
-    PlaybackSock *GetMediaServerByHostname(const QString &hostname);
     PlaybackSock *GetPlaybackBySock(MythSocket *socket);
     FileTransfer *GetFileTransferByID(int id);
     FileTransfer *GetFileTransferBySock(MythSocket *socket);
@@ -308,7 +307,7 @@ class MainServer : public QObject, public MythSocketCBs
                                  int fd, const QString &filename,
                                  off_t fsize);
 
-    vector<LiveTVChain*> m_liveTVChains;
+    std::vector<LiveTVChain*> m_liveTVChains;
     QMutex               m_liveTVChainsLock;
 
     QMap<int, EncoderLink *> *m_encoderList  {nullptr};
@@ -317,10 +316,10 @@ class MainServer : public QObject, public MythSocketCBs
     MetadataFactory       *m_metadatafactory {nullptr};
 
     QReadWriteLock         m_sockListLock;
-    vector<PlaybackSock *> m_playbackList;
-    vector<FileTransfer *> m_fileTransferList;
+    std::vector<PlaybackSock *> m_playbackList;
+    std::vector<FileTransfer *> m_fileTransferList;
     QSet<MythSocket*>      m_controlSocketList;
-    vector<MythSocket*>    m_decrRefSocketList;
+    std::vector<MythSocket*>    m_decrRefSocketList;
 
     QMutex                      m_masterFreeSpaceListLock;
     FreeSpaceUpdater * volatile m_masterFreeSpaceListUpdater {nullptr};

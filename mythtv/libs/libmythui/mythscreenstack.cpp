@@ -4,7 +4,6 @@
 #include "mythpainter.h"
 #include "mythevent.h"
 
-#include <cassert>
 #include <chrono>
 
 #include <QCoreApplication>

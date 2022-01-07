@@ -1,44 +1,25 @@
 # -*- coding: UTF-8 -*-
 
-from __future__ import unicode_literals
-
 from datetime import datetime
 import sys
 
-
-if sys.version_info[0] == 2:
-    from HTMLParser import HTMLParser
-    from StringIO import StringIO
+from io import StringIO
+from html.parser import HTMLParser
 
 
-    class MLStripper(HTMLParser):
-        def __init__(self):
-            self.reset()
-            self.text = StringIO()
+class MLStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.strict = False
+        self.convert_charrefs= True
+        self.text = StringIO()
 
-        def handle_data(self, d):
-            self.text.write(d)
+    def handle_data(self, d):
+        self.text.write(d)
 
-        def get_data(self):
-            return self.text.getvalue()
-
-else:
-    from io import StringIO
-    from html.parser import HTMLParser
-
-    class MLStripper(HTMLParser):
-        def __init__(self):
-            super().__init__()
-            self.reset()
-            self.strict = False
-            self.convert_charrefs= True
-            self.text = StringIO()
-
-        def handle_data(self, d):
-            self.text.write(d)
-
-        def get_data(self):
-            return self.text.getvalue()
+    def get_data(self):
+        return self.text.getvalue()
 
 
 def strip_tags(html):

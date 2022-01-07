@@ -24,9 +24,11 @@
 #include "upnptasksearch.h"
 #include "mythversion.h"
 #include "compat.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 #include "mythdate.h"
 #include "mythlogging.h"
+#include "mythcorecontext.h"
+#include "configuration.h"
 
 static QPair<QHostAddress, int> kLinkLocal6 =
                             QHostAddress::parseSubnet("fe80::/10");
@@ -55,7 +57,7 @@ UPnpSearchTask::UPnpSearchTask( int          nServicePort,
     m_sST         = std::move(sST);
     m_sUDN        = std::move(sUDN);
     m_nServicePort= nServicePort;
-    m_nMaxAge     = UPnp::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
+    m_nMaxAge     = MythCoreContext::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
 
 } 
 
@@ -143,7 +145,11 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
 
                 pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
                                     m_nPeerPort );
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
                 std::this_thread::sleep_for( std::chrono::milliseconds( MythRandom() % 250 ));
+#else
+                std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
+#endif
                 pSocket->writeBlock( scPacket, scPacket.length(), m_peerAddress,
                                     m_nPeerPort );
             }

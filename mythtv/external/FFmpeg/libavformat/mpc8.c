@@ -127,7 +127,11 @@ static void mpc8_get_chunk_header(AVIOContext *pb, int *tag, int64_t *size)
     pos = avio_tell(pb);
     *tag = avio_rl16(pb);
     *size = ffio_read_varlen(pb);
-    *size -= avio_tell(pb) - pos;
+    pos -= avio_tell(pb);
+    if (av_sat_add64(*size, pos) != (uint64_t)*size + pos) {
+        *size = -1;
+    } else
+        *size += pos;
 }
 
 static void mpc8_parse_seektable(AVFormatContext *s, int64_t off)
@@ -173,7 +177,13 @@ static void mpc8_parse_seektable(AVFormatContext *s, int64_t off)
     }
     seekd = get_bits(&gb, 4);
     for(i = 0; i < 2; i++){
-        pos = gb_get_v(&gb) + c->header_pos;
+        pos = gb_get_v(&gb);
+        if (av_sat_add64(pos, c->header_pos) != pos + (uint64_t)c->header_pos) {
+            av_free(buf);
+            return;
+        }
+
+        pos += c->header_pos;
         ppos[1 - i] = pos;
         av_add_index_entry(s->streams[0], pos, i, 0, 0, AVINDEX_KEYFRAME);
     }
@@ -201,8 +211,11 @@ static void mpc8_handle_chunk(AVFormatContext *s, int tag, int64_t chunk_pos, in
 
     switch(tag){
     case TAG_SEEKTBLOFF:
-        pos = avio_tell(pb) + size;
+        pos = avio_tell(pb);
         off = ffio_read_varlen(pb);
+        if (pos > INT64_MAX - size || off < 0 || off > INT64_MAX - chunk_pos)
+            return;
+        pos += size;
         mpc8_parse_seektable(s, chunk_pos + off);
         avio_seek(pb, pos, SEEK_SET);
         break;

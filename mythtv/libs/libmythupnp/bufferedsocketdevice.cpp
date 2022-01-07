@@ -11,6 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <array>
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 #include <utility>

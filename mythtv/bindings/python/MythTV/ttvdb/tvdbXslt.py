@@ -36,12 +36,7 @@ __xsltExtentionList__ = []
 import os, sys, re, time, datetime, shutil, urllib, string
 from copy import deepcopy
 
-IS_PY2 = sys.version_info[0] == 2
-if not IS_PY2:
-    unicode = str
-    long = int
-
-baseXsltDir = u'%s/XSLT/' % os.path.dirname(os.path.realpath(__file__))
+baseXsltDir = '%s/XSLT/' % os.path.dirname(os.path.realpath(__file__))
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -54,25 +49,20 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
+        if isinstance(obj, str):
             obj.encode(self.encoding)
         try:
-            if IS_PY2:
-                self.out.write(obj)
-            else:
-                self.out.buffer.write(obj)
+            self.out.buffer.write(obj)
         except IOError:
             pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-if IS_PY2:
-    stdio_type = file
-else:
-    import io
-    stdio_type = io.TextIOWrapper
-    unicode = str
+
+import io
+stdio_type = io.TextIOWrapper
+
 if isinstance(sys.stdout, stdio_type):
     sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
     sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
@@ -84,7 +74,7 @@ try:
         from io import StringIO
     from lxml import etree
 except Exception as e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -96,7 +86,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -108,21 +98,21 @@ class xpathFunctions(object):
     """
     def __init__(self):
         self.filters = {
-            'fanart': [u'//_banners/%(type)s/raw/item'],
-            'poster': [u'//_banners/season/raw/item[subKey/text()="%(season)s"]',
-                       u'//_banners/%(type)s/raw/item'],
-            'banner': [u'//_banners/seasonwide/raw/item[subKey/text()="%(season)s"]',
-                       u'//_banners/series/raw/item[subKey/text()="graphical"]'],
+            'fanart': ['//_banners/%(type)s/raw/item'],
+            'poster': ['//_banners/season/raw/item[subKey/text()="%(season)s"]',
+                       '//_banners/%(type)s/raw/item'],
+            'banner': ['//_banners/seasonwide/raw/item[subKey/text()="%(season)s"]',
+                       '//_banners/series/raw/item[subKey/text()="graphical"]'],
             }
         self.dataFilters = {
-            'subtitle': [u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/EpisodeName/text()',
-                         u'//data/n%(season)s/n%(episode)s/episodeName/text()'],
-            'description': [u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/Overview/text()',
-                            u'//data/n%(season)s/n%(episode)s/overview/text()'],
-            'IMDB': [u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/IMDB_ID/text()',
-                     u'//data/n%(season)s/n%(episode)s/imdbId/text()'],
-            'allEpisodes': [u'//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]',
-                            u'//data/n%(season)s/n%(episode)s'],
+            'subtitle': ['//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/EpisodeName/text()',
+                         '//data/n%(season)s/n%(episode)s/episodeName/text()'],
+            'description': ['//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/Overview/text()',
+                            '//data/n%(season)s/n%(episode)s/overview/text()'],
+            'IMDB': ['//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]/IMDB_ID/text()',
+                     '//data/n%(season)s/n%(episode)s/imdbId/text()'],
+            'allEpisodes': ['//Data/Episode[SeasonNumber/text()="%(season)s" and EpisodeNumber/text()="%(episode)s"]',
+                            '//data/n%(season)s/n%(episode)s'],
             }
         self.persistentResult = ''
     # end __init__()
@@ -154,7 +144,7 @@ class xpathFunctions(object):
         Example call: tvdbXpath:ilastUpdated(string(lastupdated))
         return a date string in the standard format
         '''
-        return time.strftime(u'%a, %d %b %Y %H:%M:%S GMT', time.localtime(long(epoch)))
+        return time.strftime('%a, %d %b %Y %H:%M:%S GMT', time.localtime(int(epoch)))
     # end lastUpdated()
 
     def htmlToString(self, context, html):
@@ -162,8 +152,8 @@ class xpathFunctions(object):
         return the string without HTML tags or LFs
         '''
         if not len(html):
-            return u""
-        return self.massageText(html).strip().replace(u'', u"&apos;").replace(u'', u"&apos;")
+            return ""
+        return self.massageText(html).strip().replace('', "&apos;").replace('', "&apos;")
     # end htmlToString()
 
     def stringToList(self, context, arg):
@@ -182,11 +172,11 @@ class xpathFunctions(object):
         else:
             tmpList = tmpList2
         for value in tmpList:
-            if value == u'':
+            if value == '':
                 continue
-            value = value.replace(u'\n', u' ').strip()
-            if value != u'':
-                elementList.append(etree.XML(u'<listItem>%s</listItem>' % self.massageText(value)))
+            value = value.replace('\n', ' ').strip()
+            if value != '':
+                elementList.append(etree.XML('<listItem>%s</listItem>' % self.massageText(value)))
         return elementList
     # end stringToList()
 
@@ -221,13 +211,13 @@ class xpathFunctions(object):
                 if image.find('fileName') is None:
                     continue
                 # print("im2 %r" % image)
-                tmpElement = etree.XML(u'<image></image>')
+                tmpElement = etree.XML('<image></image>')
                 if args[1] == 'poster':
                     tmpElement.attrib['type'] = 'coverart'
                 else:
                     tmpElement.attrib['type'] = args[1]
-                tmpElement.attrib['url'] = u'http://www.thetvdb.com/banners/%s' % image.find('fileName').text
-                tmpElement.attrib['thumb'] = u'http://www.thetvdb.com/banners/%s' % image.find('thumbnail').text
+                tmpElement.attrib['url'] = 'http://www.thetvdb.com/banners/%s' % image.find('fileName').text
+                tmpElement.attrib['thumb'] = 'http://www.thetvdb.com/banners/%s' % image.find('thumbnail').text
                 tmpElement.attrib['rating'] = image.find('ratingsInfo').find('average').text
                 tmpImageSize = image.find('resolution').text
                 if tmpImageSize:
@@ -245,9 +235,9 @@ class xpathFunctions(object):
         if text is None:
             return text
         try:
-            return unicode(text, 'utf8')
+            return str(text, 'utf8')
         except UnicodeDecodeError:
-            return u''
+            return ''
         except (UnicodeEncodeError, TypeError):
             return text
     # end textUtf8()
@@ -263,7 +253,7 @@ class xpathFunctions(object):
         '''Replace all "&" characters with "&amp;"
         '''
         text = self.textUtf8(text)
-        return text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
+        return text.replace('&amp;','~~~~~').replace('&','&amp;').replace('~~~~~', '&amp;')
     # end ampReplace()
 
     def massageText(self, text):
@@ -279,9 +269,9 @@ class xpathFunctions(object):
             if text[:2] == "&#":
                 try:
                     if text[:3] == "&#x":
-                        return unichr(int(text[3:-1], 16))
+                        return chr(int(text[3:-1], 16))
                     else:
-                        return unichr(int(text[2:-1]))
+                        return chr(int(text[2:-1]))
                 except ValueError:
                     pass
             elif text[:1] == "&":
@@ -290,13 +280,13 @@ class xpathFunctions(object):
                 if entity:
                     if entity[:2] == "&#":
                         try:
-                            return unichr(int(entity[2:-1]))
+                            return chr(int(entity[2:-1]))
                         except ValueError:
                             pass
                     else:
-                        return unicode(entity, "iso-8859-1")
+                        return str(entity, "iso-8859-1")
             return text # leave as is
-        return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+        return self.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace('\n',' ')
     # end massageText()
 
     def getValue(self, context, *args):

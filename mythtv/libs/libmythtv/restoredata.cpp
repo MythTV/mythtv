@@ -64,7 +64,7 @@ class RestoreXMLTVID : public TransMythUICheckBoxSetting
         setHelpText(
             QObject::tr(
                 "If checked, copy the XMLTV ID in field \"xmltvid\" "
-                "from a deleted channel in this video source "
+                "from a deleted channel "
                 "or from a channel in another video source."));
         setValue(false);
     };
@@ -93,7 +93,7 @@ class RestoreIcon : public TransMythUICheckBoxSetting
         setHelpText(
             QObject::tr(
                 "If checked, copy the Icon filename in field \"icon\" "
-                "from a deleted channel in this video source "
+                "from a deleted channel "
                 "or from a channel in another video source."));
         setValue(false);
     };
@@ -195,7 +195,7 @@ void RestoreData::Restore()
         cd.found_visible = false;
 
         // Get xmltvid from the last deleted channel
-        // from any video source or from any channel
+        // from any video source or from a channel
         // on a different video source
         if (do_xmltvid && cd.xmltvid.isEmpty())
         {
@@ -227,7 +227,7 @@ void RestoreData::Restore()
         }
 
         // Get icon from the last deleted channel
-        // from any video source or from any channel
+        // from any video source or from a channel
         // on a different video source
         if (do_icon && cd.icon.isEmpty())
         {

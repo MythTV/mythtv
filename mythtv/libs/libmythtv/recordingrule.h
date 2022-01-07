@@ -97,8 +97,8 @@ class MTV_PUBLIC RecordingRule
     uint                   m_episode            {0};
 
     // Associated data for rule types
-    int                    m_channelid          {0};
     QString                m_station;     /// callsign?
+    int                    m_channelid          {0};
     /// Time for timeslot rules
     QTime                  m_findtime;
     int                    m_findid;
@@ -115,6 +115,7 @@ class MTV_PUBLIC RecordingRule
     RecordingDupMethodType m_dupMethod          {kDupCheckSubThenDesc};
     RecordingDupInType     m_dupIn              {kDupsInAll};
     unsigned               m_filter             {0};
+    AutoExtendType         m_autoExtend         {AutoExtendType::None};
 
     // Storage Options
     // TODO: These should all be converted to integer IDs instead

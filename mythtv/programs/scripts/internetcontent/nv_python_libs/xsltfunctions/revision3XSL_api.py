@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: revision3XSL_api - XPath and XSLT functions for the Revision3 RSS/HTML items
 # Python Script
@@ -32,9 +32,9 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
-
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -47,28 +47,26 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -80,7 +78,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -93,7 +91,7 @@ class xpathFunctions(object):
     def __init__(self):
         self.functList = ['revision3LinkGeneration', 'revision3Episode', 'revision3checkIfDBItem', ]
         self.episodeRegex = [
-            re.compile(u'''^.+?\\-\\-(?P<episodeno>[0-9]+)\\-\\-.*$''', re.UNICODE),
+            re.compile('''^.+?\\-\\-(?P<episodeno>[0-9]+)\\-\\-.*$''', re.UNICODE),
             ]
         self.namespaces = {
             'atom': "http://www.w3.org/2005/Atom",
@@ -109,7 +107,7 @@ class xpathFunctions(object):
         self.mediaIdFilters = [
             [etree.XPath('//object/@id', namespaces=self.namespaces ), None],
             ]
-        self.FullScreen = u'http://revision3.com/show/popupPlayer?video_id=%s&quality=high&offset=0'
+        self.FullScreen = 'http://revision3.com/show/popupPlayer?video_id=%s&quality=high&offset=0'
         self.FullScreenParser = common.parsers['html'].copy()
     # end __init__()
 
@@ -127,8 +125,8 @@ class xpathFunctions(object):
         webURL = arg[0]
         try:
             tmpHTML = etree.parse(webURL, self.FullScreenParser)
-        except Exception, errmsg:
-            sys.stderr.write(u"Error reading url(%s) error(%s)\n" % (webURL, errmsg))
+        except Exception as errmsg:
+            sys.stderr.write("Error reading url(%s) error(%s)\n" % (webURL, errmsg))
             return webURL
 
         for index in range(len(self.mediaIdFilters)):
@@ -141,7 +139,7 @@ class xpathFunctions(object):
                     videocode = match.groups()
                     return self.FullScreen % (videocode[0])
             else:
-                return self.FullScreen % (mediaId[0].strip().replace(u'player-', u''))
+                return self.FullScreen % (mediaId[0].strip().replace('player-', ''))
         else:
             return webURL
     # end revision3LinkGeneration()
@@ -154,16 +152,16 @@ class xpathFunctions(object):
         title = arg[0][0].find('title').text
         link = arg[0][0].find('enclosure').attrib['url']
 
-        episodeNumber = u''
+        episodeNumber = ''
         for index in range(len(self.episodeRegex)):
             match = self.episodeRegex[index].match(link)
             if match:
                 episodeNumber = int(match.groups()[0])
                 break
-        titleElement = etree.XML(u"<xml></xml>")
-        etree.SubElement(titleElement, "title").text = u'Ep%03d: %s' % (episodeNumber, title)
+        titleElement = etree.XML("<xml></xml>")
+        etree.SubElement(titleElement, "title").text = 'Ep%03d: %s' % (episodeNumber, title)
         if episodeNumber:
-            etree.SubElement(titleElement, "episode").text = u'%s' % episodeNumber
+            etree.SubElement(titleElement, "episode").text = '%s' % episodeNumber
         return [titleElement]
     # end revision3Episode()
 

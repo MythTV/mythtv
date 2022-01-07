@@ -18,10 +18,8 @@
 #include <sys/socket.h>
 #endif
 #include <unistd.h> // for usleep (and socket code on Q_OS_WIN)
-#include <algorithm> // for min/max
-using std::max;
+#include <algorithm> // for max
 #include <vector> // for vector
-using std::vector;
 
 // MythTV
 #include "mythsocket.h"
@@ -991,7 +989,7 @@ void MythSocket::ReadReal(char *data, int size, std::chrono::milliseconds max_wa
 
 void MythSocket::ResetReal(void)
 {
-    vector<char> trash;
+    std::vector<char> trash;
 
     m_tcpSocket->waitForReadyRead(30);
     do
@@ -999,7 +997,7 @@ void MythSocket::ResetReal(void)
         uint avail = m_tcpSocket->bytesAvailable();
         if (avail)
         {
-            trash.resize(max((uint)trash.size(),avail));
+            trash.resize(std::max((uint)trash.size(),avail));
             m_tcpSocket->read(trash.data(), avail);
         }
 

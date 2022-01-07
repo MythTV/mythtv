@@ -1,5 +1,4 @@
 // -*- Mode: c++ -*-
-#include "config.h"
 
 // Standard C headers
 #include <cstdio>
@@ -23,6 +22,7 @@
 #include <iostream>
 
 // Qt headers
+#include <QtGlobal>
 #if CONFIG_QTDBUS
 #include <QtDBus>
 #include <QDBusConnection>
@@ -51,11 +51,11 @@ extern "C" {
 
 
 #ifndef MNTTYPE_ISO9660
-#ifdef linux
-#define MNTTYPE_ISO9660 "iso9660"
-#elif defined(__FreeBSD__) || CONFIG_DARWIN || defined(__OpenBSD__)
-#define MNTTYPE_ISO9660 "cd9660"
-#endif
+#   ifdef __linux__
+#       define MNTTYPE_ISO9660 "iso9660"
+#   elif defined(__FreeBSD__) || defined(Q_OS_DARWIN) || defined(__OpenBSD__)
+#       define MNTTYPE_ISO9660 "cd9660"
+#   endif
 #endif
 
 #ifndef MNTTYPE_UDF
@@ -271,7 +271,7 @@ bool MediaMonitorUnix::CheckMountable(void)
     // Timed out
     return false;
 
-#elif defined linux
+#elif defined(__linux__)
     // NB needs script in /etc/udev/rules.d
     mkfifo(kUDEV_FIFO, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
     m_fifo = open(kUDEV_FIFO, O_RDONLY | O_NONBLOCK);
@@ -293,7 +293,7 @@ bool MediaMonitorUnix::CheckMountable(void)
         sysfs.cdUp();
     }
     return true;
-#else // linux
+#else // not CONFIG_QTDBUS and not linux
     return false;
 #endif
 }
@@ -304,7 +304,7 @@ bool MediaMonitorUnix::CheckMountable(void)
  */
 bool MediaMonitorUnix::CheckRemovable(const QString &dev)
 {
-#ifdef linux
+#ifdef __linux__
         QString removablePath = dev + "/removable";
         QFile   removable(removablePath);
         if (removable.exists() && removable.open(QIODevice::ReadOnly))
@@ -344,8 +344,8 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     // In case of error, a working default?  (device names usually match)
     ret.replace(QRegularExpression(".*/"), "/dev/");
 
-#ifdef linux
-  #if HAVE_LIBUDEV
+#ifdef __linux__
+#   if HAVE_LIBUDEV
     // Use libudev to determine the name
     ret.clear();
     struct udev *udev = udev_new();
@@ -382,7 +382,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     else
         LOG(VB_GENERAL, LOG_ALERT,
                  "MediaMonitorUnix::GetDeviceFile udev_new failed");
-  #else   // HAVE_LIBUDEV
+#   else   // !HAVE_LIBUDEV
     // Use udevadm info to determine the name
     QStringList  args;
     args << "info" << "-q"  << "name"
@@ -415,7 +415,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         ret = udevLine;
 
     delete udevinfo;
-  #endif // HAVE_LIBUDEV
+#   endif // HAVE_LIBUDEV
 #endif // linux
 
     LOG(VB_MEDIA, LOG_INFO, msg + "->'" + ret + "'");
@@ -456,7 +456,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
         }
     }
 
-#elif defined linux
+#elif defined(__linux__)
     QFile file("/proc/sys/dev/cdrom/info");
     if (file.open(QIODevice::ReadOnly))
     {
@@ -506,7 +506,7 @@ static void LookupModel(MythMediaDevice* device)
         }
     }
 
-#elif defined linux
+#elif defined(__linux__)
 
     // Given something like /dev/hda1, extract hda1
     QString devname = device->getRealDevice().mid(5,5);

@@ -10,7 +10,7 @@
 #include <QMutex>
 
 // MythTV
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 
 class TVRec;
 class MThread;

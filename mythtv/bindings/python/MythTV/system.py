@@ -7,7 +7,7 @@ Provides base classes for managing system calls.
 from MythTV.exceptions import MythError, MythDBError, MythFileError
 from MythTV.logging import MythLog
 from MythTV.altdict import DictData, OrdDict
-from MythTV.utility import levenshtein, DequeBuffer, py23_repr
+from MythTV.utility import levenshtein, DequeBuffer
 from MythTV.database import DBCache
 
 from subprocess import Popen
@@ -153,7 +153,7 @@ class System( DBCache ):
                     self.path, hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def append(self, *args):
         """
@@ -190,7 +190,7 @@ class Metadata( DictData ):
         def __init__(self, xml):
             list.__init__(self)
             if xml is None: return
-            for item in xml.getchildren():
+            for item in list(xml):
                 self.append(item.attrib['name'])
         def toXML(self):
             eroot = etree.Element(self.__class__.__name__.lower())
@@ -204,7 +204,7 @@ class Metadata( DictData ):
         def __init__(self, xml):
             list.__init__(self)
             if xml is None: return
-            for item in xml.getchildren():
+            for item in list(xml):
                 self.append(OrdDict(item.attrib.items()))
         def toXML(self):
             eroot = etree.Element(self.__class__.__name__.lower())
@@ -219,7 +219,7 @@ class Metadata( DictData ):
         def __init__(self, xml):
             OrdDict.__init__(self)
             if xml is None: return
-            for cert in xml.getchildren():
+            for cert in list(xml):
                 self[cert.attrib['locale']] = cert.attrib['name']
         def toXML(self):
             eroot = etree.Element('certifications')
@@ -256,7 +256,7 @@ class Metadata( DictData ):
                 getattr(self, subgroup.capitalize())(None)
 
     def _process(self, xml):
-        for element in xml.getchildren():
+        for element in list(xml):
             try:
                 if element.tag in self:
                     if (element.text == '') or (element.text is None):
@@ -331,7 +331,7 @@ class InternetMetadata( Metadata ):
                     'height','lang','rating','country','season','episode']
     def _fillNone(self): DictData._fillNone(self)
     def _process(self, xml):
-        for element in xml.getiterator():
+        for element in list(xml.iter()):
             if element.tag in self:
                 self[element.tag] = element.text
             elif element.tag.split(':')[-1] in self:
@@ -344,7 +344,7 @@ class Grabber( System ):
         except:
             raise StopIteration
 
-        for item in xml.getiterator('item'):
+        for item in list(xml.iter('item')):
             yield self.cls(item)
 
     def command(self, *args):

@@ -629,7 +629,6 @@ if enabled netvision; then
     check_py_lib lxml    || disable_netvision "Python lxml library (lxml)"
     check_py_lib xml     || disable_netvision "Python XML library (xml)"
     check_py_lib urllib  || disable_netvision "Python URL library (urllib)"
-    check_py_lib urllib2 || disable_netvision "Python URL library 2 (urllib2)"
     check_py_lib oauth   || disable_netvision "Python OAuth library (oauth)"
 
     disabled netvision && echo "Disabling MythNetvision due to missing dependencies."

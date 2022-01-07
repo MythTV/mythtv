@@ -81,5 +81,17 @@ MPUBLIC QString toString(RecSearchType rectype);
 MPUBLIC QString toRawString(RecSearchType rectype);
 MPUBLIC RecSearchType searchTypeFromString(const QString& type);
 
+enum class AutoExtendType : uint8_t
+{
+    None = 0,
+    ESPN,
+    MLB,
+    Last
+};
+MPUBLIC QString toString(AutoExtendType extType);
+MPUBLIC QString toDescription(AutoExtendType extType);
+MPUBLIC AutoExtendType autoExtendTypeFromString(const QString& type);
+MPUBLIC AutoExtendType autoExtendTypeFromInt(uint8_t type);
+
 #endif
 

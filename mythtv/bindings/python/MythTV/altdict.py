@@ -4,20 +4,23 @@
 from MythTV.exceptions import MythError
 from MythTV.utility import datetime
 
-from builtins import map as imap
-from builtins import zip as izip
 from datetime import date
 import locale
 
+
 class OrdDict( dict ):
     """
-    OrdData.__init__(raw) -> OrdData object
+    OrdDict.__init__(raw) -> OrdDict object
 
     A modified dictionary, that maintains the order of items.
-        Data can be accessed as attributes or items.
+    Data can be accessed as attributes or items.
+    Allows adding of local variables, which are not visible in the dictionary.
+    In contrast to dict, default iteration is done over values, not keys.
+    Supports pickling and unpickling.
     """
 
     _localvars = ['_field_order']
+
     def __getattr__(self, name):
         if name in self.__dict__:
             return self.__dict__[name]
@@ -33,50 +36,21 @@ class OrdDict( dict ):
         else:
             self[name] = value
 
-    def __setitem__(self, key, value):
-        if key not in self:
-            self._field_order.append(key)
-        dict.__setitem__(self, key, value)
-
     def __delattr__(self, name):
         if name in self.__dict__:
             del self.__dict__[name]
         else:
             del self[name]
 
-    def __delitem__(self, key):
-        dict.__delitem__(self, key)
-        self._field_order.remove(key)
-
     def __iter__(self):
-        return self.itervalues()
+        return iter(self.values())
 
-    def __init__(self, data=()):
-        dict.__init__(self)
-        self._field_order = []
-        for k,v in data:
-            self[k] = v
-
-    def keys(self):
-        return list(self.iterkeys())
-
-    def iterkeys(self):
-        return iter(self._field_order)
-
-    def values(self):
-        return list(self.itervalues())
-
-    def itervalues(self):
-        return imap(self.get, self.iterkeys())
-
-    def items(self):
-        return list(self.iteritems())
-
-    def iteritems(self):
-        return izip(self.iterkeys(), self.itervalues())
+    @property
+    def _field_order(self):
+        return list(self.keys())
 
     def copy(self):
-        c = self.__class__(self.iteritems())
+        c = self.__class__(iter(self.items()))
         for attr in self._localvars:
             try:
                 c.__setattr__(attr, self.__getattr__(attr))
@@ -84,9 +58,16 @@ class OrdDict( dict ):
                 pass
         return c
 
-    def clear(self):
-        dict.clear(self)
-        self._field_order = []
+    # legacy implementations, deprecated
+    def iteritems(self):
+        return iter(self.items())
+
+    def iterkeys(self):
+        return iter(self.keys())
+
+    def itervalues(self):
+        return iter(self.values())
+
 
 class DictData( OrdDict ):
     """
@@ -169,7 +150,7 @@ class DictData( OrdDict ):
         Returns the internal data back out in the format
             of the original raw list.
         """
-        data = self.values()
+        data = list(self.values())
         if self._field_type != 'Pass':
             for i,v in enumerate(data):
                 if v is None:
@@ -185,13 +166,13 @@ class DictData( OrdDict ):
 
     def copy(self):
         """Returns a deep copy of itself."""
-        return self.__class__(zip(self.iteritems()), _process=False)
+        return self.__class__(iter(self.items()), _process=False)
 
     def __getstate__(self):
         return dict(self)
 
     def __setstate__(self, state):
-        for k,v in state.iteritems():
+        for k,v in iter(state.items()):
             self[k] = v
 
 

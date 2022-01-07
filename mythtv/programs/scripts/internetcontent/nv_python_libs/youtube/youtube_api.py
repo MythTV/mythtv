@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: youtube_api - Simple-to-use Python interface to the youtube API (http://www.youtube.com/)
 # Python Script
@@ -37,14 +37,14 @@ __version__="v0.3.0"
 # 0.3.0 Adapted to the v3 API
 
 import os, struct, sys, re, time, shutil
-import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import json
 import logging
 from MythTV import MythXML
 from ..common import common_api
 
-from youtube_exceptions import (YouTubeUrlError, YouTubeHttpError, YouTubeRssError, YouTubeVideoNotFound, YouTubeInvalidSearchType, YouTubeXmlError, YouTubeVideoDetailError, YouTubeCategoryNotFound)
-from youtube_data import getData
+from .youtube_exceptions import (YouTubeUrlError, YouTubeHttpError, YouTubeRssError, YouTubeVideoNotFound, YouTubeInvalidSearchType, YouTubeXmlError, YouTubeVideoDetailError, YouTubeCategoryNotFound)
+from .youtube_data import getData
 
 try:
     import aniso8601
@@ -52,6 +52,7 @@ except:
     sys.stderr.write("The module aniso8601 could not be imported, duration "
                      "parsing will be disabled\n")
     pass
+
 
 class JsonHandler:
     """Deals with retrieval of JSON data from API
@@ -61,9 +62,9 @@ class JsonHandler:
 
     def getJson(self):
         try:
-            urlhandle = urllib.urlopen(self.url)
+            urlhandle = urllib.request.urlopen(self.url)
             return json.load(urlhandle)
-        except IOError, errormsg:
+        except IOError as errormsg:
             raise YouTubeHttpError(errormsg)
 
 
@@ -134,11 +135,11 @@ class Videos(object):
         self.config['search_all_languages'] = search_all_languages
 
         self.error_messages = \
-                {'YouTubeUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n",
-                'YouTubeHttpError': u"! Error: An HTTP communications error with YouTube was raised (%s)\n",
-                'YouTubeRssError': u"! Error: Invalid RSS meta data\nwas received from YouTube error (%s). Skipping item.\n",
-                'YouTubeVideoNotFound': u"! Error: Video search with YouTube did not return any results (%s)\n",
-                'YouTubeVideoDetailError': u"! Error: Invalid Video meta data detail\nwas received from YouTube error (%s). Skipping item.\n", }
+                {'YouTubeUrlError': "! Error: The URL (%s) cause the exception error (%s)\n",
+                'YouTubeHttpError': "! Error: An HTTP communications error with YouTube was raised (%s)\n",
+                'YouTubeRssError': "! Error: Invalid RSS meta data\nwas received from YouTube error (%s). Skipping item.\n",
+                'YouTubeVideoNotFound': "! Error: Video search with YouTube did not return any results (%s)\n",
+                'YouTubeVideoDetailError': "! Error: Invalid Video meta data detail\nwas received from YouTube error (%s). Skipping item.\n", }
 
         # This is an example that must be customized for each target site
         self.key_translation = \
@@ -165,7 +166,7 @@ class Videos(object):
         if language:
             self.config['language'] = language
         else:
-            self.config['language'] = u''
+            self.config['language'] = ''
 
         self.getUserPreferences("~/.mythtv/MythNetvision/userGrabberPrefs/youtube.xml")
 
@@ -174,7 +175,7 @@ class Videos(object):
         if region is not None and region.text:
             self.config['region'] = region.text
         else:
-            self.config['region'] = u'us'
+            self.config['region'] = 'us'
 
         self.apikey = getData().update(getData().a)
 
@@ -201,7 +202,7 @@ class Videos(object):
             }
 
         self.treeview = False
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/youtube.png'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/youtube.png'
     # end __init__()
 
     def getUserPreferences(self, userPreferenceFilePath):
@@ -215,15 +216,15 @@ class Videos(object):
                 os.makedirs(prefDir)
 
             fileName = os.path.basename(userPreferenceFilePath)
-            defaultConfig = u'%s/nv_python_libs/configs/XML/defaultUserPrefs/%s' \
+            defaultConfig = '%s/nv_python_libs/configs/XML/defaultUserPrefs/%s' \
                     % (baseProcessingDir, fileName)
             shutil.copy2(defaultConfig, userPreferenceFilePath)
 
         # Read the grabber hulu_config.xml configuration file
-        url = u'file://%s' % userPreferenceFilePath
+        url = 'file://%s' % userPreferenceFilePath
         if self.config['debug_enabled']:
             print(url)
-            print
+            print()
         try:
             self.userPrefs = self.common.etree.parse(url)
         except Exception as e:
@@ -246,7 +247,7 @@ class Videos(object):
         def getExternalIP():
             '''Find the external IP address of this computer.
             '''
-            url = urllib.URLopener()
+            url = urllib.request.URLopener()
             try:
                 resp = url.open('http://www.whatismyip.com/automation/n09230945.asp')
                 return resp.read()
@@ -260,15 +261,15 @@ class Videos(object):
             return {}
 
         try:
-            gs = urllib.urlopen('http://blogama.org/ip_query.php?ip=%s&output=xml' % ip)
+            gs = urllib.request.urlopen('http://blogama.org/ip_query.php?ip=%s&output=xml' % ip)
             txt = gs.read()
         except:
             try:
-                gs = urllib.urlopen('http://www.seomoz.org/ip2location/look.php?ip=%s' % ip)
+                gs = urllib.request.urlopen('http://www.seomoz.org/ip2location/look.php?ip=%s' % ip)
                 txt = gs.read()
             except:
                 try:
-                    gs = urllib.urlopen('http://api.hostip.info/?ip=%s' % ip)
+                    gs = urllib.request.urlopen('http://api.hostip.info/?ip=%s' % ip)
                     txt = gs.read()
                 except:
                     logging.error('GeoIP servers not available')
@@ -279,12 +280,12 @@ class Videos(object):
                 citys = re.findall(r'<City>([\w ]+)<',txt)[0]
                 lats,lons = re.findall(r'<Latitude>([\d\-\.]+)</Latitude>\s*<Longitude>([\d\-\.]+)<',txt)[0]
             elif txt.find('GLatLng') > 0:
-                citys,countrys = re.findall('<br />\s*([^<]+)<br />\s*([^<]+)<',txt)[0]
-                lats,lons = re.findall('LatLng\(([-\d\.]+),([-\d\.]+)',txt)[0]
+                citys,countrys = re.findall(r'<br />\s*([^<]+)<br />\s*([^<]+)<',txt)[0]
+                lats,lons = re.findall(r'LatLng\(([-\d\.]+),([-\d\.]+)',txt)[0]
             elif txt.find('<gml:coordinates>') > 0:
-                citys = re.findall('<Hostip>\s*<gml:name>(\w+)</gml:name>',txt)[0]
-                countrys = re.findall('<countryName>([\w ,\.]+)</countryName>',txt)[0]
-                lats,lons = re.findall('gml:coordinates>([-\d\.]+),([-\d\.]+)<',txt)[0]
+                citys = re.findall(r'<Hostip>\s*<gml:name>(\w+)</gml:name>',txt)[0]
+                countrys = re.findall(r'<countryName>([\w ,\.]+)</countryName>',txt)[0]
+                lats,lons = re.findall(r'gml:coordinates>([-\d\.]+),([-\d\.]+)<',txt)[0]
             else:
                 logging.error('error parsing IP result %s'%txt)
                 return {}
@@ -308,24 +309,24 @@ class Videos(object):
             if text[:2] == "&#":
                 try:
                     if text[:3] == "&#x":
-                        return unichr(int(text[3:-1], 16))
+                        return chr(int(text[3:-1], 16))
                     else:
-                        return unichr(int(text[2:-1]))
+                        return chr(int(text[2:-1]))
                 except ValueError:
                     pass
             elif text[:1] == "&":
-                import htmlentitydefs
-                entity = htmlentitydefs.entitydefs.get(text[1:-1])
+                import html.entities
+                entity = html.entities.entitydefs.get(text[1:-1])
                 if entity:
                     if entity[:2] == "&#":
                         try:
-                            return unichr(int(entity[2:-1]))
+                            return chr(int(entity[2:-1]))
                         except ValueError:
                             pass
                     else:
-                        return unicode(entity, "iso-8859-1")
+                        return str(entity, "iso-8859-1")
             return text # leave as is
-        return self.common.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.common.textUtf8(text)))
+        return self.common.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.common.textUtf8(text)))
     # end massageDescription()
 
     def _initLogger(self):
@@ -352,12 +353,12 @@ class Videos(object):
         '''
         self.tree_dir_icon = self.channel_icon
         if not dir_icon:
-            if not self.feed_icons.has_key(self.tree_key):
+            if self.tree_key not in self.feed_icons:
                 return self.tree_dir_icon
             dir_icon = self.feed_icons[self.tree_key]
             if not dir_icon:
                 return self.tree_dir_icon
-        self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
+        self.tree_dir_icon = '%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
         return self.tree_dir_icon
     # end setTreeViewIcon()
 
@@ -380,7 +381,7 @@ class Videos(object):
 
         result = self.getSearchResults(title, pagenumber, pagelen)
         if not result:
-            raise YouTubeVideoNotFound(u"No YouTube Video matches found for search value (%s)" % title)
+            raise YouTubeVideoNotFound("No YouTube Video matches found for search value (%s)" % title)
 
         self.channel['channel_numresults'] = int(result['pageInfo']['totalResults'])
         if 'nextPageToken' in result:
@@ -388,13 +389,13 @@ class Videos(object):
         if 'prevPageToken' in result:
             self.channel['prevpagetoken'] = result['prevPageToken']
 
-        ids = map(lambda entry: entry['id']['videoId'], result['items'])
+        ids = [entry['id']['videoId'] for entry in result['items']]
 
         result = self.getVideoDetails(ids)
-        data = map(lambda entry: self.parseDetails(entry), result['items'])
+        data = [self.parseDetails(entry) for entry in result['items']]
 
         if not len(data):
-            raise YouTubeVideoNotFound(u"No YouTube Video matches found for search value (%s)" % title)
+            raise YouTubeVideoNotFound("No YouTube Video matches found for search value (%s)" % title)
 
         return data
         # end searchTitle()
@@ -403,15 +404,15 @@ class Videos(object):
         url = ('https://www.googleapis.com/youtube/v3/search?part=snippet&' + \
                 'type=video&q=%s&maxResults=%s&order=relevance&' + \
                 'videoEmbeddable=true&key=%s&pageToken=%s') % \
-                (urllib.quote_plus(title.encode("utf-8")), pagelen, self.apikey,
+                (urllib.parse.quote_plus(title.encode("utf-8")), pagelen, self.apikey,
                         pagenumber)
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
 
         try:
             return JsonHandler(url).getJson()
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise YouTubeUrlError(self.error_messages['YouTubeUrlError'] % (url, errormsg))
 
     def getVideoDetails(self, ids):
@@ -443,20 +444,20 @@ class Videos(object):
             except Exception:
                 pass
 
-            for key in item.keys():
+            for key in list(item.keys()):
                 # Make sure there are no item elements that are None
                 if item[key] is None:
-                    item[key] = u''
+                    item[key] = ''
                 elif key == 'published_parsed': # 2010-01-23T08:38:39.000Z
                     if item[key]:
-                        pub_time = time.strptime(item[key].strip(), "%Y-%m-%dT%H:%M:%S.%fZ")
+                        pub_time = time.strptime(item[key].strip(), "%Y-%m-%dT%H:%M:%SZ")
                         item[key] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
                 elif key == 'media_description' or key == 'title':
                     # Strip the HTML tags
                     if item[key]:
                         item[key] = self.massageDescription(item[key].strip())
-                        item[key] = item[key].replace(u'|', u'-')
-                elif type(item[key]) == type(u''):
+                        item[key] = item[key].replace('|', '-')
+                elif type(item[key]) == type(''):
                     if item[key]:
                         item[key] = self.common.ampReplace(item[key].replace('"\n',' ').strip())
         except KeyError:
@@ -469,9 +470,9 @@ class Videos(object):
         """
         # Channel details and search results
         self.channel = {
-            'channel_title': u'YouTube',
-            'channel_link': u'http://www.youtube.com/',
-            'channel_description': u"Share your videos with friends, family, and the world.",
+            'channel_title': 'YouTube',
+            'channel_link': 'http://www.youtube.com/',
+            'channel_description': "Share your videos with friends, family, and the world.",
             'channel_numresults': 0,
             'channel_returned': 1,
             'channel_startindex': 0}
@@ -483,20 +484,20 @@ class Videos(object):
 
         try:
             data = self.searchTitle(title, pagenumber, self.page_limit)
-        except YouTubeVideoNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+        except YouTubeVideoNotFound as msg:
+            sys.stderr.write("%s\n" % msg)
             return None
-        except YouTubeUrlError, msg:
-            sys.stderr.write(u'%s\n' % msg)
+        except YouTubeUrlError as msg:
+            sys.stderr.write('%s\n' % msg)
             sys.exit(1)
-        except YouTubeHttpError, msg:
+        except YouTubeHttpError as msg:
             sys.stderr.write(self.error_messages['YouTubeHttpError'] % msg)
             sys.exit(1)
-        except YouTubeRssError, msg:
+        except YouTubeRssError as msg:
             sys.stderr.write(self.error_messages['YouTubeRssError'] % msg)
             sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data is None:
@@ -504,7 +505,7 @@ class Videos(object):
         if not len(data):
             return None
 
-        items = map(lambda match: self.translateItem(match), data)
+        items = [self.translateItem(match) for match in data]
         self.channel['channel_returned'] = len(items)
 
         if len(items):
@@ -514,11 +515,11 @@ class Videos(object):
 
     def translateItem(self, item):
         item_data = {}
-        for key in self.key_translation[1].keys():
-            if key in item.keys():
+        for key in list(self.key_translation[1].keys()):
+            if key in list(item.keys()):
                 item_data[self.key_translation[1][key]] = item[key]
             else:
-                item_data[self.key_translation[1][key]] = u''
+                item_data[self.key_translation[1][key]] = ''
         return item_data
 
     def displayTreeView(self):
@@ -527,16 +528,16 @@ class Videos(object):
         '''
         # Channel details and search results
         self.channel = {
-            'channel_title': u'YouTube',
-            'channel_link': u'http://www.youtube.com/',
-            'channel_description': u"Share your videos with friends, family, and the world.",
+            'channel_title': 'YouTube',
+            'channel_link': 'http://www.youtube.com/',
+            'channel_description': "Share your videos with friends, family, and the world.",
             'channel_numresults': 0,
             'channel_returned': 1,
             'channel_startindex': 0}
 
         etree = self.getVideoCategories()
         if etree is None:
-            raise YouTubeCategoryNotFound(u"No YouTube Categories found for Tree view")
+            raise YouTubeCategoryNotFound("No YouTube Categories found for Tree view")
 
         feed_names = {}
         for category in etree['items']:
@@ -584,18 +585,18 @@ class Videos(object):
         initial_length = len(dictionaries)
 
         if self.config['debug_enabled']:
-            print "Category URL:"
-            print url
-            print
+            print("Category URL:")
+            print(url)
+            print()
 
         try:
             result = JsonHandler(url).getJson()
-        except Exception, errormsg:
+        except Exception as errormsg:
             sys.stderr.write(self.error_messages['YouTubeUrlError'] % (url, errormsg))
             return dictionaries
 
         if result is None:
-            sys.stderr.write(u'1-No Videos for (%s)\n' % self.feed)
+            sys.stderr.write('1-No Videos for (%s)\n' % self.feed)
             return dictionaries
 
         if 'pageInfo' not in result or 'items' not in result:
@@ -616,7 +617,7 @@ class Videos(object):
             dictionaries.append(self.translateItem(item))
 
         if initial_length < len(dictionaries): # Need to check if there was any items for this Category
-            dictionaries.append(['', u'']) # Add the nested dictionary indicator
+            dictionaries.append(['', '']) # Add the nested dictionary indicator
         return dictionaries
     # end getVideosForURL()
 # end Videos() class

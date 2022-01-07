@@ -17,7 +17,6 @@
 #include <QObject>
 
 // MythTV
-#include "configuration.h"
 #include "mythpower.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -102,8 +101,6 @@ class UPNP_PUBLIC UPnp : public QObject
 
     protected:
 
-        static Configuration   *g_pConfig;
-
         HttpServer             *m_pHttpServer  {nullptr};
         int                     m_nServicePort {0};
 
@@ -115,9 +112,6 @@ class UPNP_PUBLIC UPnp : public QObject
     public:
         UPnp();
        ~UPnp() override;
-
-        static void           SetConfiguration( Configuration *pConfig );
-        static Configuration* GetConfiguration();
 
         bool Initialize( int nServicePort, HttpServer *pHttpServer );
         bool Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort,

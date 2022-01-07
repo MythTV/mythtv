@@ -19,7 +19,7 @@ class AudioOutputDigitalEncoder
     ~AudioOutputDigitalEncoder();
 
     bool   Init(AVCodecID codec_id, int bitrate, int samplerate, int channels);
-    int Encode(void *buf, int len, AudioFormat format);
+    int Encode(void *input, int len, AudioFormat format);
     int GetFrames(void *ptr, int maxlen);
     int    Buffered(void) const
     // assume 32 bit samples = 4 byte

@@ -21,8 +21,6 @@
 #  SOFTWARE.
 
 
-from __future__ import unicode_literals
-
 class Artwork(object):
     def __init__(self, data):
         self.id = data.get('id')        # ID for the artwork

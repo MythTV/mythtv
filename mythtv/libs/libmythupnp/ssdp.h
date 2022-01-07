@@ -13,6 +13,8 @@
 #ifndef SSDP_H
 #define SSDP_H
 
+#include <array>
+
 #include <QFile>
 
 #include "upnpexp.h"
@@ -77,7 +79,7 @@ class UPNP_PUBLIC SSDP : public MThread
     private:
 
         // ------------------------------------------------------------------
-        // Private so the singleton pattern can be inforced.
+        // Private so the singleton pattern can be enforced.
         // ------------------------------------------------------------------
 
         SSDP   ();

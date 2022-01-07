@@ -15,14 +15,8 @@ except ImportError:
     journal = None
 from sys import version_info, stdout, argv
 from datetime import datetime
-try:
-    from thread import allocate_lock
-except ImportError:
-    from _thread import allocate_lock
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from _thread import allocate_lock
+from io import StringIO
 from traceback import format_exc
 
 def _donothing(*args, **kwargs):

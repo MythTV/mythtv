@@ -61,7 +61,7 @@ bool MythStreamingBuffer::OpenFile(const QString &Filename, std::chrono::millise
     if (url.path().endsWith(QLatin1String("m3u8"), Qt::CaseInsensitive))
         url.setScheme("hls+http");
 
-    int res = ffurl_open(&m_context, url.toString().toLatin1(), AVIO_FLAG_READ, nullptr, nullptr);
+    int res = ffurl_open_whitelist(&m_context, url.toString().toLatin1(), AVIO_FLAG_READ, nullptr, nullptr, nullptr, nullptr, nullptr);
     if (res >= 0 && m_context && !m_context->is_streamed && ffurl_seek(m_context, 0, SEEK_SET) >= 0)
     {
         m_streamed   = false;

@@ -16,21 +16,6 @@
 #include "mythbaseexp.h"
 #include "mythsystem.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#include <QtGlobal>
-#else
-#include <QRandomGenerator>
-#endif
-
-MBASE_PUBLIC inline uint32_t MythRandom()
-{
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    return static_cast<uint32_t>(qrand());
-#else
-    return QRandomGenerator::global()->generate();
-#endif
-}
-
 MBASE_PUBLIC bool getUptime(std::chrono::seconds &uptime);
 MBASE_PUBLIC bool getMemStats(
     int &totalMB, int &freeMB, int &totalVM, int &freeVM);
@@ -43,7 +28,10 @@ MBASE_PUBLIC bool hasUtf8(const char *str);
 MBASE_PUBLIC bool ping(const QString &host, std::chrono::milliseconds timeout);
 MBASE_PUBLIC bool telnet(const QString &host, int port);
 
+namespace MythFile
+{
 MBASE_PUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);
+} // namespace MythFile
 MBASE_PUBLIC QString createTempFile(
     QString name_template = "/tmp/mythtv_XXXXXX", bool dir = false);
 MBASE_PUBLIC bool makeFileAccessible(const QString& filename);
@@ -56,25 +44,6 @@ MBASE_PUBLIC QString getSymlinkTarget(const QString &start_file,
                                       unsigned       maxLinks       = 255);
 
 MBASE_PUBLIC void wrapList(QStringList &list, int width);
-
-inline float clamp(float val, float minimum, float maximum)
-{
-    return std::min(std::max(val, minimum), maximum);
-}
-inline int   clamp(int val, int minimum, int maximum)
-{
-    return std::min(std::max(val, minimum), maximum);
-}
-inline float lerp(float r, float a, float b)
-{
-    return ((1.0F - r) * a) + (r * b);
-}
-inline int   lerp(float r, int a, int b)
-{
-    return (int) lerp(r, (float) a, (float) b);
-}
-inline float sq(float a) { return a*a; }
-inline int   sq(int   a) { return a*a; }
 
 static inline QString xml_bool_to_string(bool val)
 {
@@ -104,22 +73,6 @@ MBASE_PUBLIC void setHttpProxy(void);
 
 MBASE_PUBLIC int naturalCompare(const QString &_a, const QString &_b,
                                 Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive);
-
-/**
- * \brief Format a milliseconds time value
- *
- * Convert a millisecond time value into a textual representation of the value.
- *
- * \param msecs The time value in milliseconds. Since the type of this
- *     field is std::chrono::duration, any duration of a larger
- *     interval can be passed to this function and the compiler will
- *     convert it to milliseconds.
- *
- * \param fmt A formatting string specifying how to output the time.
- *     See QTime::toString for the a definition fo valid formatting
- *     characters.
- */
-MBASE_PUBLIC QString MythFormatTime(std::chrono::milliseconds msecs, const QString& fmt);
 
 // CPU Tick timing function
 #ifdef MMX

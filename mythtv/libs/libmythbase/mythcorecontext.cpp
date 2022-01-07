@@ -1,4 +1,5 @@
 // Qt
+#include <QtGlobal>
 #include <QCoreApplication>
 #include <QUrl>
 #include <QDir>
@@ -34,7 +35,6 @@
 
 // MythTV
 #include "compat.h"
-#include "mythconfig.h"       // for CONFIG_DARWIN
 #include "mythdownloadmanager.h"
 #include "mythcorecontext.h"
 #include "mythsocket.h"
@@ -50,6 +50,7 @@
 #include "mythplugin.h"
 #include "mythmiscutil.h"
 #include "mythpower.h"
+#include "configuration.h"
 
 #define LOC      QString("MythCoreContext::%1(): ").arg(__func__)
 
@@ -58,6 +59,7 @@
 #endif
 
 MythCoreContext *gCoreContext = nullptr;
+Configuration *MythCoreContext::g_pConfig {nullptr};
 
 class MythCoreContextPrivate : public QObject
 {
@@ -723,7 +725,7 @@ bool MythCoreContext::IsMasterBackend(void)
 
 bool MythCoreContext::BackendIsRunning(void)
 {
-#if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
+#if defined(Q_OS_DARWIN) || defined(__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -axc | grep -i mythbackend | grep -v grep > /dev/null";
 #elif defined _WIN32
     const char *command = "%systemroot%\\system32\\tasklist.exe "
@@ -1828,6 +1830,23 @@ void MythCoreContext::ResetSockets(void)
     if (d->m_eventSock)
         d->m_eventSock->DisconnectFromHost();
     dispatch(MythEvent("BACKEND_SOCKETS_CLOSED"));
+}
+
+void MythCoreContext::SetConfiguration( Configuration *pConfig )
+{
+    delete g_pConfig;
+    g_pConfig = pConfig;
+}
+
+Configuration *MythCoreContext::GetConfiguration()
+{
+    // If someone is asking for a config and it's nullptr, create a
+    // new XmlConfiguration since we don't have database info yet.
+
+    if (g_pConfig == nullptr)
+        g_pConfig = new XmlConfiguration( "config.xml" );
+
+    return g_pConfig;
 }
 
 void MythCoreContext::InitPower(bool Create)

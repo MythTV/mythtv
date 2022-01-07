@@ -164,6 +164,7 @@ typedef struct MixContext {
     int duration_mode;          /**< mode for determining duration */
     float dropout_transition;   /**< transition time when an input drops out */
     char *weights_str;          /**< string for custom weights for every input */
+    int normalize;              /**< if inputs are scaled */
 
     int nb_channels;            /**< number of channels */
     int sample_rate;            /**< sample rate */
@@ -195,6 +196,8 @@ static const AVOption amix_options[] = {
             OFFSET(dropout_transition), AV_OPT_TYPE_FLOAT, { .dbl = 2.0 }, 0, INT_MAX, A|F },
     { "weights", "Set weight for each input.",
             OFFSET(weights_str), AV_OPT_TYPE_STRING, {.str="1 1"}, 0, 0, A|F|T },
+    { "normalize", "Scale inputs",
+            OFFSET(normalize), AV_OPT_TYPE_BOOL, {.i64=1}, 0, 1, A|F|T },
     { NULL }
 };
 
@@ -227,10 +230,14 @@ static void calculate_scales(MixContext *s, int nb_samples)
     }
 
     for (i = 0; i < s->nb_inputs; i++) {
-        if (s->input_state[i] & INPUT_ON)
-            s->input_scale[i] = 1.0f / s->scale_norm[i] * FFSIGN(s->weights[i]);
-        else
+        if (s->input_state[i] & INPUT_ON) {
+            if (!s->normalize)
+                s->input_scale[i] = FFABS(s->weights[i]);
+            else
+                s->input_scale[i] = 1.0f / s->scale_norm[i] * FFSIGN(s->weights[i]);
+        } else {
             s->input_scale[i] = 0.0f;
+        }
     }
 }
 
@@ -309,6 +316,8 @@ static int output_frame(AVFilterLink *outlink)
                 }
             }
         }
+
+        s->next_pts = frame_list_next_pts(s->frame_list);
     } else {
         /* first input closed: use the available samples */
         nb_samples = INT_MAX;
@@ -324,7 +333,6 @@ static int output_frame(AVFilterLink *outlink)
         }
     }
 
-    s->next_pts = frame_list_next_pts(s->frame_list);
     frame_list_remove_samples(s->frame_list, nb_samples);
 
     calculate_scales(s, nb_samples);

@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: rev3_api - Simple-to-use Python interface to the Revision3 RSS feeds (http://revision3.com/)
 # Python Script
@@ -30,13 +30,14 @@ __version__="v0.1.4"
 # 0.1.4 Fixed missing shows from the creation of the user default preference due to Web site changes
 #       Fixed two incorrect variable names in debug messages
 
-import os, struct, sys, re, time, datetime, urllib, re
+import os, struct, sys, re, time, datetime, urllib.request, urllib.parse, urllib.error, re
 import logging
 from socket import gethostname, gethostbyname
 from threading import Thread
 from copy import deepcopy
 
-from rev3_exceptions import (Rev3UrlError, Rev3HttpError, Rev3RssError, Rev3VideoNotFound, Rev3ConfigFileError, Rev3UrlDownloadError)
+from .rev3_exceptions import (Rev3UrlError, Rev3HttpError, Rev3RssError, Rev3VideoNotFound, Rev3ConfigFileError, Rev3UrlDownloadError)
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -49,29 +50,24 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -83,7 +79,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -151,7 +147,7 @@ class Videos(object):
         self.common = common
         self.common.debug = debug   # Set the common function debug level
 
-        self.log_name = u'Rev3_Grabber'
+        self.log_name = 'Rev3_Grabber'
         self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
         self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
@@ -163,28 +159,28 @@ class Videos(object):
 
         self.config['search_all_languages'] = search_all_languages
 
-        self.error_messages = {'Rev3UrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'Rev3HttpError': u"! Error: An HTTP communications error with Rev3 was raised (%s)\n", 'Rev3RssError': u"! Error: Invalid RSS meta data\nwas received from Rev3 error (%s). Skipping item.\n", 'Rev3VideoNotFound': u"! Error: Video search with Rev3 did not return any results (%s)\n", 'Rev3ConfigFileError': u"! Error: rev3_config.xml file missing\nit should be located in and named as (%s).\n", 'Rev3UrlDownloadError': u"! Error: Downloading a RSS feed or Web page (%s).\n", }
+        self.error_messages = {'Rev3UrlError': "! Error: The URL (%s) cause the exception error (%s)\n", 'Rev3HttpError': "! Error: An HTTP communications error with Rev3 was raised (%s)\n", 'Rev3RssError': "! Error: Invalid RSS meta data\nwas received from Rev3 error (%s). Skipping item.\n", 'Rev3VideoNotFound': "! Error: Video search with Rev3 did not return any results (%s)\n", 'Rev3ConfigFileError': "! Error: rev3_config.xml file missing\nit should be located in and named as (%s).\n", 'Rev3UrlDownloadError': "! Error: Downloading a RSS feed or Web page (%s).\n", }
 
         # Channel details and search results
-        self.channel = {'channel_title': u'Revision3', 'channel_link': u'http://revision3.com/', 'channel_description': u"Revision3 is the leading television network for the internet generation.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'Revision3', 'channel_link': 'http://revision3.com/', 'channel_description': "Revision3 is the leading television network for the internet generation.", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
         # Season and/or Episode detection regex patterns
         self.s_e_Patterns = [
             # Season 3, Episode 8
-            re.compile(u'''^.+?Season\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Season\\ (?P<seasno>[0-9]+).*.+?Episode\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # "Episode 1" anywhere in text
-            re.compile(u'''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''^.+?Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
             # "Episode 1" at the start of the text
-            re.compile(u'''Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''Episode\\ (?P<seasno>[0-9]+).*$''', re.UNICODE),
             # "--0027--" when the episode is in the URl link
-            re.compile(u'''^.+?--(?P<seasno>[0-9]+)--.*$''', re.UNICODE),
+            re.compile('''^.+?--(?P<seasno>[0-9]+)--.*$''', re.UNICODE),
             ]
 
-        self.FullScreen = u'http://revision3.com/show/popupPlayer?video_id=%s&quality=high&offset=0'
+        self.FullScreen = 'http://revision3.com/show/popupPlayer?video_id=%s&quality=high&offset=0'
         self.FullScreenParser = self.common.parsers['html'].copy()
         self.FullScreenVidIDxPath = etree.XPath('//object', namespaces=self.common.namespaces )
 
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/rev3.png'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/rev3.png'
     # end __init__()
 
 ###########################################################################################################
@@ -198,16 +194,16 @@ class Videos(object):
         return nothing
         '''
         # Read the grabber rev3_config.xml configuration file
-        url = u'file://%s/nv_python_libs/configs/XML/rev3_config.xml' % (baseProcessingDir, )
+        url = 'file://%s/nv_python_libs/configs/XML/rev3_config.xml' % (baseProcessingDir, )
         if not os.path.isfile(url[7:]):
             raise Rev3ConfigFileError(self.error_messages['Rev3ConfigFileError'] % (url[7:], ))
 
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
         try:
             self.rev3_config = etree.parse(url)
-        except Exception, e:
+        except Exception as e:
             raise Rev3UrlError(self.error_messages['Rev3UrlError'] % (url, errormsg))
         return
     # end getRev3Config()
@@ -225,16 +221,16 @@ class Videos(object):
         # Check if the rev3.xml file exists
         userPreferenceFile = self.rev3_config.find('userPreferenceFile').text
         if userPreferenceFile[0] == '~':
-             self.rev3_config.find('userPreferenceFile').text = u"%s%s" % (os.path.expanduser(u"~"), userPreferenceFile[1:])
+             self.rev3_config.find('userPreferenceFile').text = "%s%s" % (os.path.expanduser("~"), userPreferenceFile[1:])
         if os.path.isfile(self.rev3_config.find('userPreferenceFile').text):
             # Read the grabber rev3_config.xml configuration file
-            url = u'file://%s' % (self.rev3_config.find('userPreferenceFile').text, )
+            url = 'file://%s' % (self.rev3_config.find('userPreferenceFile').text, )
             if self.config['debug_enabled']:
-                print url
-                print
+                print(url)
+                print()
             try:
                 self.userPrefs = etree.parse(url)
-            except Exception, e:
+            except Exception as e:
                 raise Rev3UrlError(self.error_messages['Rev3UrlError'] % (url, errormsg))
             # Check if the rev3.xml file is too old
             nextUpdateSecs = int(self.userPrefs.find('updateDuration').text)*86400 # seconds in a day
@@ -255,7 +251,7 @@ class Videos(object):
         ''' Create or update the rev3.xml user preferences file
         return nothing
         '''
-        userRev3 = etree.XML(u'''
+        userRev3 = etree.XML('''
 <userRev3>
 <!--
     The shows are split into three top level directories which represent how Rev3 categories
@@ -299,22 +295,22 @@ class Videos(object):
         linksTree = self.common.getUrlData(self.rev3_config.find('treeviewUrls'))
 
         if self.config['debug_enabled']:
-            print "create(%s)" % create
-            print "linksTree:"
+            print("create(%s)" % create)
+            print("linksTree:")
             sys.stdout.write(etree.tostring(linksTree, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Extract the show name and Web page links
-        showData = etree.XML(u'<xml></xml>')
-        complexFilter = u"//div[@class='subscribe_rss']//div//p[.='MP4']/..//a"
+        showData = etree.XML('<xml></xml>')
+        complexFilter = "//div[@class='subscribe_rss']//div//p[.='MP4']/..//a"
         for result in linksTree.xpath('//results'):
-            tmpDirectory = etree.XML(u'<directory></directory>')
+            tmpDirectory = etree.XML('<directory></directory>')
             dirName = result.find('name').text
             tmpDirectory.attrib['name'] = dirName
 
             if self.config['debug_enabled']:
-                print "Results: #Items(%s) for (%s)" % (len(result.xpath('.//a')), dirName)
-                print
+                print("Results: #Items(%s) for (%s)" % (len(result.xpath('.//a')), dirName))
+                print()
 
             for anchor in result.xpath('.//a'):
                 showURL = None
@@ -323,28 +319,28 @@ class Videos(object):
                     showFilter = complexFilter
                     tmpName = anchor.text
                 elif dirName == 'Revision3 Beta':
-                    tmpName = etree.tostring(anchor, method="text", encoding=unicode)
-                    showURL = u'http://revision3beta.com%sfeed/' % anchor.attrib.get('href')
+                    tmpName = etree.tostring(anchor, method="text", encoding=str)
+                    showURL = 'http://revision3beta.com%sfeed/' % anchor.attrib.get('href')
                     showFilter = None
                 elif dirName == 'Archived Shows':
-                    showURL = u'http://revision3.com%s' % anchor.attrib.get('href')
+                    showURL = 'http://revision3.com%s' % anchor.attrib.get('href')
                     showFilter = complexFilter
                     tmpName = anchor.text
-                if tmpName == u'Revision3 Beta':
+                if tmpName == 'Revision3 Beta':
                     continue
                 if showURL is not None:
                     url = etree.SubElement(tmpDirectory, "url")
                     etree.SubElement(url, "name").text = tmpName
                     etree.SubElement(url, "href").text = showURL
                     etree.SubElement(url, "filter").text = showFilter
-                    etree.SubElement(url, "parserType").text = u'html'
+                    etree.SubElement(url, "parserType").text = 'html'
             if tmpDirectory.find('url') is not None:
                 showData.append(tmpDirectory)
 
         if self.config['debug_enabled']:
-            print "showData:"
+            print("showData:")
             sys.stdout.write(etree.tostring(showData, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Assemble the feeds and formats
         for directory in showData.findall('directory'):
@@ -352,43 +348,43 @@ class Videos(object):
                 firstEnabled = True
             else:
                 firstEnabled = False
-            tmpDirectory = etree.XML(u'<directory></directory>')
+            tmpDirectory = etree.XML('<directory></directory>')
             tmpDirectory.attrib['name'] = directory.attrib['name']
-            if directory.attrib['name'] == u'Revision3 Beta':
+            if directory.attrib['name'] == 'Revision3 Beta':
                 for show in directory.findall('url'):
-                    tmpShow = etree.XML(u'<show></show>')
+                    tmpShow = etree.XML('<show></show>')
                     tmpShow.attrib['name'] = show.find('name').text
-                    mp4Format = etree.SubElement(tmpShow, u"mp4Format")
+                    mp4Format = etree.SubElement(tmpShow, "mp4Format")
                     if firstEnabled:
-                        mp4Format.attrib['enabled'] = u'true'
+                        mp4Format.attrib['enabled'] = 'true'
                         firstEnabled = False
                     else:
-                        mp4Format.attrib['enabled'] = u'false'
-                    mp4Format.attrib['name'] = u'Web Only'
+                        mp4Format.attrib['enabled'] = 'false'
+                    mp4Format.attrib['name'] = 'Web Only'
                     mp4Format.attrib['rss'] = show.find('href').text
                     tmpDirectory.append(tmpShow)
             else:
                 showResults = self.common.getUrlData(directory)
                 for show in showResults.xpath('//results'):
-                    tmpShow = etree.XML(u'<show></show>')
+                    tmpShow = etree.XML('<show></show>')
                     tmpShow.attrib['name'] = show.find('name').text
 
                     if self.config['debug_enabled']:
-                        print "Results: #Items(%s) for (%s)" % (len(show.xpath('.//a')), tmpShow.attrib['name'])
-                        print
+                        print("Results: #Items(%s) for (%s)" % (len(show.xpath('.//a')), tmpShow.attrib['name']))
+                        print()
 
                     for format in show.xpath('.//a'):
-                        link = u'http://revision3.com%s' % format.attrib['href']
+                        link = 'http://revision3.com%s' % format.attrib['href']
                         # If this is a "tekzilla" link without extra parameters that skip show
                         # This forces the Tekzilla weekly show to be separate from the daily show
                         if link.find('/tekzilla/') != -1 and link.find('?subshow=false') == -1:
                             continue
                         mp4Format = etree.SubElement(tmpShow, "mp4Format")
                         if firstEnabled:
-                            mp4Format.attrib['enabled'] = u'true'
+                            mp4Format.attrib['enabled'] = 'true'
                             firstEnabled = False
                         else:
-                            mp4Format.attrib['enabled'] = u'false'
+                            mp4Format.attrib['enabled'] = 'false'
                         mp4Format.attrib['name'] = format.text
                         mp4Format.attrib['rss'] = link
                     if tmpShow.find('mp4Format') is not None:
@@ -399,9 +395,9 @@ class Videos(object):
                 userRev3.append(tmpDirectory)
 
         if self.config['debug_enabled']:
-            print "Before any merging userRev3:"
+            print("Before any merging userRev3:")
             sys.stdout.write(etree.tostring(userRev3, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # If there was an existing rev3.xml file then add any relevant user settings to this new rev3.xml
         if not create:
@@ -411,25 +407,25 @@ class Videos(object):
                 mp4name = mp4Format.attrib['name']
                 elements = userRev3.xpath("//show[@name=$showName]/mp4Format[@name=$mp4name]", showName=showName, mp4name=mp4name)
                 if len(elements):
-                    elements[0].attrib['enabled'] = u'true'
+                    elements[0].attrib['enabled'] = 'true'
 
         if self.config['debug_enabled']:
-            print "After any merging userRev3:"
+            print("After any merging userRev3:")
             sys.stdout.write(etree.tostring(userRev3, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Save the rev3.xml file
-        prefDir = self.rev3_config.find('userPreferenceFile').text.replace(u'/rev3.xml', u'')
+        prefDir = self.rev3_config.find('userPreferenceFile').text.replace('/rev3.xml', '')
         if not os.path.isdir(prefDir):
             os.makedirs(prefDir)
         fd = open(self.rev3_config.find('userPreferenceFile').text, 'w')
-        fd.write(u'<userRev3>\n'+u''.join(etree.tostring(element, encoding='UTF-8', pretty_print=True) for element in userRev3)+u'</userRev3>')
+        fd.write('<userRev3>\n'+''.join(etree.tostring(element, encoding='UTF-8', pretty_print=True) for element in userRev3)+'</userRev3>')
         fd.close()
 
         # Read the refreshed user config file
         try:
             self.userPrefs = etree.parse(self.rev3_config.find('userPreferenceFile').text)
-        except Exception, e:
+        except Exception as e:
             raise Rev3UrlError(self.error_messages['Rev3UrlError'] % (url, errormsg))
         return
     # end updateRev3()
@@ -453,7 +449,7 @@ class Videos(object):
                 s_e[0], s_e[1] = match.groups()
                 break
             else:
-                s_e[1] = u'%s' % int(match.groups()[0])
+                s_e[1] = '%s' % int(match.groups()[0])
                 break
         return s_e
     # end getSeasonEpisode()
@@ -466,14 +462,14 @@ class Videos(object):
         videoID = None
         try:
             eTree = etree.parse(link, self.FullScreenParser)
-        except Exception, errormsg:
-            sys.stderr.write(u"! Error: The URL (%s) cause the exception error (%s)\n" % (link, errormsg))
+        except Exception as errormsg:
+            sys.stderr.write("! Error: The URL (%s) cause the exception error (%s)\n" % (link, errormsg))
             return videoID
 
         if self.config['debug_enabled']:
-            print "Raw unfiltered URL imput:"
+            print("Raw unfiltered URL imput:")
             sys.stdout.write(etree.tostring(eTree, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         if not eTree:
             return videoID
@@ -481,14 +477,14 @@ class Videos(object):
         # Filter out the video id
         try:
            tmpVideoID = self.FullScreenVidIDxPath(eTree)
-        except AssertionError, e:
+        except AssertionError as e:
             sys.stderr.write("No filter results for VideoID from url(%s)\n" % link)
             sys.stderr.write("! Error:(%s)\n" % e)
             return videoID
 
         if len(tmpVideoID):
             if tmpVideoID[0].get('id'):
-                videoID = tmpVideoID[0].attrib['id'].strip().replace(u'player-', u'')
+                videoID = tmpVideoID[0].attrib['id'].strip().replace('player-', '')
 
         return videoID
 
@@ -505,29 +501,29 @@ class Videos(object):
         return
         '''
         try:
-            searchVar = u'?q=%s' % (urllib.quote(title.encode("utf-8")).replace(u' ', u'+'))
+            searchVar = '?q=%s' % (urllib.parse.quote(title.encode("utf-8")).replace(' ', '+'))
         except UnicodeDecodeError:
-            searchVar = u'?q=%s' % (urllib.quote(title).replace(u' ', u'+'))
+            searchVar = '?q=%s' % (urllib.parse.quote(title).replace(' ', '+'))
         url = self.rev3_config.find('searchURLS').xpath(".//href")[0].text+searchVar
 
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
 
         self.rev3_config.find('searchURLS').xpath(".//href")[0].text = url
 
         # Perform a search
         try:
             resultTree = self.common.getUrlData(self.rev3_config.find('searchURLS'), pageFilter=self.rev3_config.find('searchURLS').xpath(".//pageFilter")[0].text)
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise Rev3UrlDownloadError(self.error_messages['Rev3UrlDownloadError'] % (errormsg))
 
         if resultTree is None:
-            raise Rev3VideoNotFound(u"No Rev3 Video matches found for search value (%s)" % title)
+            raise Rev3VideoNotFound("No Rev3 Video matches found for search value (%s)" % title)
 
         searchResults = resultTree.xpath('//result//li[@class="video"]')
         if not len(searchResults):
-            raise Rev3VideoNotFound(u"No Rev3 Video matches found for search value (%s)" % title)
+            raise Rev3VideoNotFound("No Rev3 Video matches found for search value (%s)" % title)
 
         # Set the number of search results returned
         self.channel['channel_numresults'] = len(searchResults)
@@ -549,13 +545,13 @@ class Videos(object):
                 # Extract and massage data
                 thumbNail = self.common.ampReplace(thumbnailFilter(result)[0])
                 title = self.common.massageText(titleFilter(result)[0].text.strip())
-                tmpDesc = etree.tostring(descFilter(result)[0], method="text", encoding=unicode).strip()
-                index = tmpDesc.find(u'¬ñ')
+                tmpDesc = etree.tostring(descFilter(result)[0], method="text", encoding=str).strip()
+                index = tmpDesc.find('¬ñ')
                 if index != -1:
                     tmpDesc = tmpDesc[index+1:].strip()
                 description = self.common.massageText(tmpDesc)
                 link = self.common.ampReplace(titleFilter(result)[0].attrib['href'])
-                author = u'Revision3'
+                author = 'Revision3'
                 # Insert data into a new item element
                 rev3Item.find('title').text = title
                 rev3Item.find('author').text = author
@@ -571,8 +567,8 @@ class Videos(object):
                     etree.SubElement(rev3Item, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = s_e[1]
                 itemDict[title.lower()] = rev3Item
 
-        if not len(itemDict.keys()):
-            raise Rev3VideoNotFound(u"No Rev3 Video matches found for search value (%s)" % title)
+        if not len(list(itemDict.keys())):
+            raise Rev3VideoNotFound("No Rev3 Video matches found for search value (%s)" % title)
 
         return [itemDict, resultTree.xpath('//pageInfo')[0].text]
         # end searchTitle()
@@ -585,9 +581,9 @@ class Videos(object):
         self.getRev3Config()
 
         if self.config['debug_enabled']:
-            print "self.rev3_config:"
+            print("self.rev3_config:")
             sys.stdout.write(etree.tostring(self.rev3_config, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Easier for debugging
 #        print self.searchTitle(title, pagenumber, self.page_limit)
@@ -596,27 +592,27 @@ class Videos(object):
 
         try:
             data = self.searchTitle(title, pagenumber, self.page_limit)
-        except Rev3VideoNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+        except Rev3VideoNotFound as msg:
+            sys.stderr.write("%s\n" % msg)
             sys.exit(0)
-        except Rev3UrlError, msg:
-            sys.stderr.write(u'%s\n' % msg)
+        except Rev3UrlError as msg:
+            sys.stderr.write('%s\n' % msg)
             sys.exit(1)
-        except Rev3HttpError, msg:
+        except Rev3HttpError as msg:
             sys.stderr.write(self.error_messages['Rev3HttpError'] % msg)
             sys.exit(1)
-        except Rev3RssError, msg:
+        except Rev3RssError as msg:
             sys.stderr.write(self.error_messages['Rev3RssError'] % msg)
             sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Set the paging values
-        itemCount = len(data[0].keys())
+        itemCount = len(list(data[0].keys()))
         if data[1] == 'true':
             self.channel['channel_returned'] = itemCount
             self.channel['channel_startindex'] = itemCount
@@ -637,7 +633,7 @@ class Videos(object):
                 lastKey = key
 
         # Output the MNV search results
-        sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+        sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
         sys.exit(0)
     # end searchForVideos()
@@ -646,69 +642,69 @@ class Videos(object):
         '''Gather the Revision3 feeds then get a max page of videos meta data in each of them
         Display the results and exit
         '''
-        personalFeed = u"Personal Feed" # A label used to identify processing of a personal RSS feed
+        personalFeed = "Personal Feed" # A label used to identify processing of a personal RSS feed
 
         # Get the user preferences that specify which shows and formats they want to be in the treeview
         try:
             self.getUserPreferences()
-        except Exception, e:
-            sys.stderr.write(u'%s' % e)
+        except Exception as e:
+            sys.stderr.write('%s' % e)
             sys.exit(1)
 
         if self.config['debug_enabled']:
-            print "self.userPrefs:"
+            print("self.userPrefs:")
             sys.stdout.write(etree.tostring(self.userPrefs, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Verify that there is at least one RSS feed that user wants to download
         rssFeeds = self.userPrefs.xpath("//mp4Format[@enabled='true']")
         personalFeeds = self.userPrefs.xpath("//treeviewURLS//url[@enabled='true']")
         if not len(rssFeeds) and not len(personalFeeds):
-            sys.stderr.write(u'There are no mp4Format or personal RSS feed elements "enabled" in your "rev3.xml" user preferences\nfile (%s)\n' % self.rev3_config.find('userPreferenceFile').text)
+            sys.stderr.write('There are no mp4Format or personal RSS feed elements "enabled" in your "rev3.xml" user preferences\nfile (%s)\n' % self.rev3_config.find('userPreferenceFile').text)
             sys.exit(1)
 
         # Create a structure of feeds that can be concurrently downloaded
-        showData = etree.XML(u'<xml></xml>')
+        showData = etree.XML('<xml></xml>')
         for feed in personalFeeds:
             rssFeeds.append(feed)
         count = 0
         for rssFeed in rssFeeds:
             if rssFeed.getparent().tag == 'treeviewURLS':
-                uniqueName = u'%s:%s' % (personalFeed, count)
+                uniqueName = '%s:%s' % (personalFeed, count)
                 count+=1
             else:
-                uniqueName = u'%s:%s:%s' % (rssFeed.getparent().getparent().attrib['name'], rssFeed.getparent().attrib['name'], rssFeed.attrib['name'])
-            url = etree.XML(u'<url></url>')
+                uniqueName = '%s:%s:%s' % (rssFeed.getparent().getparent().attrib['name'], rssFeed.getparent().attrib['name'], rssFeed.attrib['name'])
+            url = etree.XML('<url></url>')
             etree.SubElement(url, "name").text = uniqueName
             if uniqueName.startswith(personalFeed):
                 etree.SubElement(url, "href").text = rssFeed.text
             else:
                 etree.SubElement(url, "href").text = rssFeed.attrib['rss']
-            etree.SubElement(url, "filter").text = u"//channel"
-            etree.SubElement(url, "parserType").text = u'xml'
+            etree.SubElement(url, "filter").text = "//channel"
+            etree.SubElement(url, "parserType").text = 'xml'
             showData.append(url)
 
         if self.config['debug_enabled']:
-            print "showData:"
+            print("showData:")
             sys.stdout.write(etree.tostring(showData, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Get the RSS Feed data
         try:
             resultTree = self.common.getUrlData(showData)
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise Rev3UrlDownloadError(self.error_messages['Rev3UrlDownloadError'] % (errormsg))
 
         if resultTree is None:
             sys.exit(0)
 
         if self.config['debug_enabled']:
-            print "resultTree:"
+            print("resultTree:")
             sys.stdout.write(etree.tostring(resultTree, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Add the Channel element tree
         channelTree = self.common.mnvChannelElement(self.channel)
@@ -724,8 +720,8 @@ class Videos(object):
         itemLanguage = './/media:content'
         categoryDir = None
         showDir = None
-        categoryElement = etree.XML(u'<directory></directory>')
-        itemAuthor = u'Revision3'
+        categoryElement = etree.XML('<directory></directory>')
+        itemAuthor = 'Revision3'
         for result in resultTree.findall('results'):
             names = result.find('name').text.split(':')
             for index in range(len(names)):
@@ -734,15 +730,15 @@ class Videos(object):
             if channel.find('image') is not None:
                 channelThumbnail = self.common.ampReplace(imageFilter(channel)[0].text)
             else:
-                channelThumbnail = self.common.ampReplace(channel.find('link').text.replace(u'/watch/', u'/images/')+u'100.jpg')
-            channelLanguage = u'en'
+                channelThumbnail = self.common.ampReplace(channel.find('link').text.replace('/watch/', '/images/')+'100.jpg')
+            channelLanguage = 'en'
             if channel.find('language') is not None:
                 channelLanguage = channel.find('language').text[:2]
             # Create a new directory and/or subdirectory if required
             if names[0] != categoryDir:
                 if categoryDir is not None:
                     channelTree.append(categoryElement)
-                categoryElement = etree.XML(u'<directory></directory>')
+                categoryElement = etree.XML('<directory></directory>')
                 if names[0] == personalFeed:
                     categoryElement.attrib['name'] = channel.find('title').text
                 else:
@@ -753,17 +749,17 @@ class Videos(object):
                 if names[0] == personalFeed:
                     showElement = categoryElement
                 else:
-                    showElement = etree.SubElement(categoryElement, u"directory")
+                    showElement = etree.SubElement(categoryElement, "directory")
                     if names[2] == 'Web Only':
-                        showElement.attrib['name'] = u'%s' % (names[1])
+                        showElement.attrib['name'] = '%s' % (names[1])
                     else:
-                        showElement.attrib['name'] = u'%s: %s' % (names[1], names[2])
+                        showElement.attrib['name'] = '%s: %s' % (names[1], names[2])
                     showElement.attrib['thumbnail'] = channelThumbnail
                 showDir = names[1]
 
             if self.config['debug_enabled']:
-                print "Results: #Items(%s) for (%s)" % (len(itemFilter(result)), names)
-                print
+                print("Results: #Items(%s) for (%s)" % (len(itemFilter(result)), names))
+                print()
 
             # Convert each RSS item into a MNV item
             for itemData in itemFilter(result):
@@ -788,7 +784,7 @@ class Videos(object):
                 rev3Item.find('link').text = self.common.ampReplace(link)
                 rev3Item.xpath(itemDwnLink, namespaces=self.common.namespaces)[0].attrib['url'] = downLoadLink
                 try:
-                    rev3Item.xpath(itemThumbNail, namespaces=self.common.namespaces)[0].attrib['url'] = self.common.ampReplace(itemData.xpath(itemThumbNail, namespaces=self.common.namespaces)[0].attrib['url'].replace(u'--mini', u'--medium'))
+                    rev3Item.xpath(itemThumbNail, namespaces=self.common.namespaces)[0].attrib['url'] = self.common.ampReplace(itemData.xpath(itemThumbNail, namespaces=self.common.namespaces)[0].attrib['url'].replace('--mini', '--medium'))
                 except IndexError:
                     pass
                 try:
@@ -805,11 +801,11 @@ class Videos(object):
                 if s_e[1]:
                     etree.SubElement(rev3Item, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = s_e[1]
                 if s_e[0] and s_e[1]:
-                    rev3Item.find('title').text = u'S%02dE%02d: %s' % (int(s_e[0]), int (s_e[1]), rev3Item.find('title').text)
+                    rev3Item.find('title').text = 'S%02dE%02d: %s' % (int(s_e[0]), int (s_e[1]), rev3Item.find('title').text)
                 elif s_e[0]:
-                    rev3Item.find('title').text = u'S%02d: %s' % (int(s_e[0]), rev3Item.find('title').text)
+                    rev3Item.find('title').text = 'S%02d: %s' % (int(s_e[0]), rev3Item.find('title').text)
                 elif s_e[1]:
-                    rev3Item.find('title').text = u'Ep%03d: %s' % (int(s_e[1]), rev3Item.find('title').text)
+                    rev3Item.find('title').text = 'Ep%03d: %s' % (int(s_e[1]), rev3Item.find('title').text)
                 showElement.append(rev3Item)
 
         # Add the last directory processed
@@ -819,7 +815,7 @@ class Videos(object):
         # Check that there was at least some items
         if len(rssTree.xpath('//item')):
             # Output the MNV search results
-            sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+            sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
 
         sys.exit(0)

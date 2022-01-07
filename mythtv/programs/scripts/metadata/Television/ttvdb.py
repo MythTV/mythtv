@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # ----------------------
 # Name: ttvdb.py
@@ -886,11 +886,10 @@ Runtime:60
 0
 
 """
-from __future__ import print_function
 
 __title__ ="TheTVDB.com";
 __author__="R.D.Vaughan"
-__version__="2.0.0"
+__version__="2.0.1"
 
 # Version .1    Initial development
 # Version .2    Add an option to get season and episode numbers from ep name
@@ -992,6 +991,7 @@ __version__="2.0.0"
 #               and add a <collectionref> XML tag to Search and Query XML output
 # Version 1.1.6 Honor series name overrides during TV series search
 # Version 2.0.0 Update to API V2
+# Version 2.0.1 Remove python2 support
 
 usage_txt='''
 Usage: ttvdb.py usage: ttvdb -hdruviomMPFBDSC [parameters]
@@ -1242,11 +1242,7 @@ import shlex
 # logger.addHandler(ch)
 # logger.addHandler(fh)
 
-IS_PY2 = sys.version_info[0] == 2
-if IS_PY2:
-    import ConfigParser
-else:
-    import configparser as ConfigParser
+import configparser as ConfigParser
 
 class tvdb_account:
     # explicit username and account id are not required
@@ -1284,10 +1280,7 @@ Error:(%s)
     sys.exit(1)
 
 try:
-    if IS_PY2:
-        from StringIO import StringIO
-    else:
-        from io import StringIO
+    from io import StringIO
     from lxml import etree as etree
 except Exception as e:
     sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
@@ -1301,12 +1294,9 @@ except Exception as e:
     sys.stderr.write(u'\n! Error - Importing the "lxml" python library failed on error(%s)\n' % e)
     sys.exit(1)
 
-if IS_PY2:
-    stdio_type = file
-else:
-    import io
-    stdio_type = io.TextIOWrapper
-    unicode = str
+import io
+stdio_type = io.TextIOWrapper
+
 
 # disable the insecure request warning that we know we are going to get
 import urllib3
@@ -1334,15 +1324,15 @@ http_replace="http://www.thetvdb.com" #Keep replace code "just in case"
 
 name_parse=[
             # foo_[s01]_[e01]
-            re.compile('''^(.+?)[ \._\-]\[[Ss]([0-9]+?)\]_\[[Ee]([0-9]+?)\]?[^\\/]*$'''),
+            re.compile(r'''^(.+?)[ \._\-]\[[Ss]([0-9]+?)\]_\[[Ee]([0-9]+?)\]?[^\\/]*$'''),
             # foo.1x09*
-            re.compile('''^(.+?)[ \._\-]\[?([0-9]+)x([0-9]+)[^\\/]*$'''),
+            re.compile(r'''^(.+?)[ \._\-]\[?([0-9]+)x([0-9]+)[^\\/]*$'''),
             # foo.s01.e01, foo.s01_e01
-            re.compile('''^(.+?)[ \._\-][Ss]([0-9]+)[\.\- ]?[Ee]([0-9]+)[^\\/]*$'''),
+            re.compile(r'''^(.+?)[ \._\-][Ss]([0-9]+)[\.\- ]?[Ee]([0-9]+)[^\\/]*$'''),
             # foo.103*
-            re.compile('''^(.+)[ \._\-]([0-9]{1})([0-9]{2})[\._ -][^\\/]*$'''),
+            re.compile(r'''^(.+)[ \._\-]([0-9]{1})([0-9]{2})[\._ -][^\\/]*$'''),
             # foo.0103*
-            re.compile('''^(.+)[ \._\-]([0-9]{2})([0-9]{2,3})[\._ -][^\\/]*$'''),
+            re.compile(r'''^(.+)[ \._\-]([0-9]{2})([0-9]{2,3})[\._ -][^\\/]*$'''),
 ] # contains regex parsing filename parsing strings used to extract info from video filenames
 
 # Episode meta data that is massaged
@@ -1376,12 +1366,8 @@ if (not confdir) or (confdir == '/'):
         print("Unable to find MythTV directory for metadata cache.")
         sys.exit(1)
     confdir = os.path.join(confdir, '.mythtv')
-# different cache dirs due to different pickle protocols
-# TODO massage pickle so python3 generates python2 compatible pickles
-if IS_PY2:
-    cache_dir=os.path.join(confdir, "cache/tvdb_api/")
-else:
-    cache_dir=os.path.join(confdir, "cache/tvdb_api3/")
+
+cache_dir=os.path.join(confdir, "cache/tvdb_api3/")
 if not os.path.exists(cache_dir):
     os.makedirs(cache_dir)
 
@@ -1411,12 +1397,9 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
+        if isinstance(obj, str):
             obj = obj.encode(self.encoding)
-        if IS_PY2:
-            self.out.write(obj)
-        else:
-            self.out.buffer.write(obj)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
@@ -1449,14 +1432,14 @@ class Season( tvdb_api.Season ):
 
 # modified Episode class implementing a fuzzy search
 class Episode( tvdb_api.Episode ):
-    _re_strippart = re.compile('(.*) \([0-9]+\)')
+    _re_strippart = re.compile(r'(.*) \([0-9]+\)')
     def fuzzysearch(self, term = None, key = None):
         if term is None:
             raise TypeError("must supply string to search for (contents)")
 
-        term = unicode(term).lower()
+        term = str(term).lower()
         for cur_key, cur_value in self.items():
-            cur_key, cur_value = [unicode(a).lower() for a in [cur_key, cur_value]]
+            cur_key, cur_value = [str(a).lower() for a in [cur_key, cur_value]]
             if key is not None and cur_key != key:
                 continue
             distance = levenshtein(cur_value, term)
@@ -1742,7 +1725,7 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
             try:
                 cast_members = cast_members[:-2].encode('utf8')
             except (UnicodeDecodeError, AttributeError):
-                cast_members = unicode(cast_members[:-2],'utf8')
+                cast_members = str(cast_members[:-2],'utf8')
             cast_members = change_amp(cast_members)
             cast_members = change_to_commas(cast_members)
             cast_members=cast_members.replace('\n',' ')
@@ -1799,14 +1782,14 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                         elif isinstance(text, list):
                             # handle guest stars lists
                             text = ', '.join(text)
-                        text = change_amp(unicode(text))
+                        text = change_amp(str(text))
                         text = change_to_commas(text)
                         if text == 'None' and key.title() == 'Director':
                             text = u"Unknown"
                         try:
                             extra_ep_data.append(u"%s:%s" % (key.title(), text))
                         except UnicodeDecodeError:
-                            extra_ep_data.append(u"%s:%s" % (key.title(), unicode(text, "utf8")))
+                            extra_ep_data.append(u"%s:%s" % (key.title(), str(text, "utf8")))
                     continue
                 text = series_data[season][episode][key]
 
@@ -1821,7 +1804,7 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
                     if isinstance(text, dict):
                         # handle language tuple
                         text = list(text.values())[0]
-                    text = change_amp(unicode(text))
+                    text = change_amp(str(text))
                     value = change_to_commas(text)
                     value = value.replace(u'\n', u' ')
                 key_values[i]=value
@@ -1949,10 +1932,8 @@ def initialize_override_dictionary(useroptions, language):
     massage = {}
     overrides = {}
     overrides_id = {}
-    if IS_PY2:
-        cfg = ConfigParser.SafeConfigParser()
-    else:
-        cfg = ConfigParser.ConfigParser()
+
+    cfg = ConfigParser.ConfigParser()
     cfg.read(useroptions)
 
     for section in cfg.sections():
@@ -2006,7 +1987,7 @@ def initialize_override_dictionary(useroptions, language):
                 except:
                     sys.stdout.write("! Invalid Series (no matches found in thetvdb,com) (%s) sid (%s) in config file\n" % (key, sid))
                     sys.exit(1)
-                overrides[key]=unicode(series_name_sid.data[u'seriesName'])   #.encode('utf-8')
+                overrides[key]=str(series_name_sid.data[u'seriesName'])   #.encode('utf-8')
                 overrides_id[key] = sid
             continue
 
@@ -2208,30 +2189,29 @@ def displayCollectionXML(tvdb_api):
 def doc_test(opts):
     import doctest
 
-    if not IS_PY2:
-        # python 3 doctest capture when teh output is utf8 (bytes)
-        # convert it back to str
-        if isinstance(sys.stdout, OutStreamEncoder):
-            sys.stdout = sys.stdout.out
-            sys.stderr = sys.stderr.out
+    # python 3 doctest capture when teh output is utf8 (bytes)
+    # convert it back to str
+    if isinstance(sys.stdout, OutStreamEncoder):
+        sys.stdout = sys.stdout.out
+        sys.stderr = sys.stderr.out
 
-            class SpoofDocTestWriter(doctest._SpoofOut):
-                """Wraps a stream with an decoder"""
-                def __init__(self, *cwargs, **kwargs):
-                    super(SpoofDocTestWriter, self).__init__(*cwargs, **kwargs)
+        class SpoofDocTestWriter(doctest._SpoofOut):
+            """Wraps a stream with an decoder"""
+            def __init__(self, *cwargs, **kwargs):
+                super(SpoofDocTestWriter, self).__init__(*cwargs, **kwargs)
 
-                def write(self, obj):
-                    """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-                    if isinstance(obj, bytes):
-                        obj = obj.decode('utf-8')
-                    return super(SpoofDocTestWriter, self).write(obj)
+            def write(self, obj):
+                """Wraps the output stream, encoding Unicode strings with the specified encoding"""
+                if isinstance(obj, bytes):
+                    obj = obj.decode('utf-8')
+                return super(SpoofDocTestWriter, self).write(obj)
 
-                def __getattr__(self, attr):
-                    """Delegate everything but write to the stream"""
-                    return getattr(self.out, attr)
+            def __getattr__(self, attr):
+                """Delegate everything but write to the stream"""
+                return getattr(self.out, attr)
 
-            # replace _SpoofOut with our massager
-            doctest._SpoofOut = SpoofDocTestWriter
+        # replace _SpoofOut with our massager
+        doctest._SpoofOut = SpoofDocTestWriter
     return doctest.testmod(verbose=opts.debug, optionflags=doctest.ELLIPSIS, )
 
 def main():
@@ -2258,7 +2238,7 @@ def main():
     parser.add_option(  "-l", "--language", metavar="LANGUAGE", default=u'en', dest="language",
                         help=u"Select data that matches the specified language fall back to english if nothing found (e.g. 'es' Español, 'de' Deutsch ... etc)")
     parser.add_option(  "-a", "--area", metavar="COUNTRY", default=u'', dest="country",
-			help=u"Select data that matches the specificed country (e.g. 'de' Germany 'gb' UK). This option is currently not used.")
+                        help=u"Select data that matches the specificed country (e.g. 'de' Germany 'gb' UK). This option is currently not used.")
     parser.add_option(  "-n", "--num_seasons", action="store_true", default=False, dest="num_seasons",
                         help=u"Return the season numbers for a series")
     parser.add_option(  "-t", action="store_true", default=False, dest="test",
@@ -2291,11 +2271,6 @@ def main():
     if opts.test:
         print("Everything appears to be in order")
         return 0
-
-    # Make everything unicode utf8
-    if IS_PY2:
-        for index in range(len(series_season_ep)):
-            series_season_ep[index] = unicode(series_season_ep[index], 'utf8')
 
     if opts.debug == True:
         print("opts", opts)
@@ -2469,7 +2444,7 @@ def main():
             if match:
                 seriesname, seasno, epno = match.groups()
                 #remove ._- characters from name (- removed only if next to end of line)
-                seriesname = re.sub("[\._]|\-(?=$)", " ", seriesname).strip()
+                seriesname = re.sub(r"[\._]|\-(?=$)", " ", seriesname).strip()
                 series_season_ep = [seriesname, seasno, epno]
                 break # Matched - to the next file!
 

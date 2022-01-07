@@ -101,7 +101,7 @@ class UPNP_PUBLIC SSDPCache : public QObject,
     private:
 
         // ------------------------------------------------------------------
-        // Private so the singleton pattern can be inforced.
+        // Private so the singleton pattern can be enforced.
         // ------------------------------------------------------------------
 
         SSDPCache();

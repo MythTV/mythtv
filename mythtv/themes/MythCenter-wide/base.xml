@@ -488,6 +488,9 @@
     </spinbox>
 
     <!-- Base definition of a wide spinbox (room for strings) -->
+    <spinbox name="basemedwidespinbox" from="basespinbox">
+        <area>0,0,346,44</area>
+    </spinbox>
     <spinbox name="basewidespinbox" from="basespinbox">
         <area>0,0,696,44</area>
     </spinbox>

@@ -20,7 +20,7 @@
 #include "remoteutil.h"
 #include "mythevent.h"
 #include "mythdirs.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 
 #define LOC      QString("PlaybackBoxHelper: ")
 #define LOC_WARN QString("PlaybackBoxHelper Warning: ")

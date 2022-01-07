@@ -1241,7 +1241,7 @@ check_python(){
     log check_python
     check_cmd $python <<EOF
 import sys
-if sys.version_info < (2,6):
+if sys.version_info < (3,6,0):
     sys.exit(1)
 EOF
 }
@@ -1701,6 +1701,7 @@ INTRINSICS_LIST="
     intrinsics_neon
 "
 
+# unfortunately necessary because of internal FFmpeg header use
 COMPLEX_FUNCS="
     cabs
     cexp
@@ -1994,6 +1995,7 @@ MYTHTV_CONFIG_LIST='
     qtwebkit
     qtscript
     qtdbus
+    sqlite3
     taglib
     v4l2
     v4l2prime
@@ -5608,6 +5610,7 @@ if ! disabled network; then
     fi
 fi
 
+use_pkg_config sqlite3 sqlite3 "sqlite3.h" sqlite3_load_extension && enable sqlite3
 require_pkg_config samplerate samplerate samplerate.h src_get_version -lm
 
 # required to compile inline sse with some compilers
@@ -6577,7 +6580,7 @@ enabled egl &&  { check_lib EGL EGL/egl.h eglGetProcAddress "-lEGL" ||
                 }
 
 case $ID in
-    fedora|debian)
+    fedora|debian|raspbian)
         EXTRA_GLSLANG_LIBS="-lMachineIndependent -lGenericCodeGen" ;;
     ubuntu)
         case $VERSION_ID in
@@ -7018,7 +7021,7 @@ fi
 
 # Check for python dependencies
 if enabled bindings_python; then
-    check_python               || disable_bindings_python "Python 2.6 or greater"
+    check_python               || disable_bindings_python "Python 3.6 or greater"
     check_py_lib MySQLdb       || disable_bindings_python "MySQLdb"
     check_py_lib lxml          || disable_bindings_python "lxml"
     check_py_lib requests      || disable_bindings_python "requests"
@@ -7294,6 +7297,11 @@ if enabled lto; then
 fi
 
 ffmpeg_extra_cflags="$extra_cflags -w"
+if test "$ID" = "raspbian"; then
+    case $cpu in
+        armv*) ffmpeg_extra_ldflags="$ffmpeg_extra_libs -latomic" ;;
+    esac
+fi
 
 ## Call FFmpeg configure here
 echo
@@ -7304,6 +7312,7 @@ eval ./configure \
 $ffopts \
 --extra-cflags='"$ffmpeg_extra_cflags"' \
 --extra-ldflags='"$ffmpeg_extra_ldflags"' \
+--extra-libs='"$ffmpeg_extra_ldflags"' \
 --enable-stripping \
 --strip='"echo skipping strip"' \
 --disable-manpages  \

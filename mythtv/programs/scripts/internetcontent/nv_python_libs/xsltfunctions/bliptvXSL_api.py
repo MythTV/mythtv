@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: bliptvXSL_api - XPath and XSLT functions for the Blip.tv RSS/HTML itmes
 # Python Script
@@ -34,9 +34,9 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
-
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -49,28 +49,27 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
+
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -82,7 +81,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -95,13 +94,13 @@ class xpathFunctions(object):
     def __init__(self):
         self.functList = ['bliptvFlvLinkGeneration', 'bliptvDownloadLinkGeneration', 'bliptvEpisode', 'bliptvIsCustomHTML', ]
         self.episodeRegex = [
-            re.compile(u'''TERRA\\ (?P<episodeno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''TERRA\\ (?P<episodeno>[0-9]+).*$''', re.UNICODE),
             ]
         self.namespaces = {
-            'xsi': u"http://www.w3.org/2001/XMLSchema-instance",
-            'media': u"http://search.yahoo.com/mrss/",
-            'xhtml': u"http://www.w3.org/1999/xhtml",
-            'atm': u"http://www.w3.org/2005/Atom",
+            'xsi': "http://www.w3.org/2001/XMLSchema-instance",
+            'media': "http://search.yahoo.com/mrss/",
+            'xhtml': "http://www.w3.org/1999/xhtml",
+            'atm': "http://www.w3.org/2005/Atom",
             'mythtv': "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format",
             'itunes':"http://www.itunes.com/dtds/podcast-1.0.dtd",
             'creativeCommons': "http://backend.userland.com/creativeCommonsRssModule",
@@ -134,7 +133,7 @@ class xpathFunctions(object):
         flvFile = self.flvFilter(arg[0])
         if len(flvFile):
             flvFileLink = flvFile[0].attrib['url']
-            return u'%s%s' % (common.linkWebPage('dummy', 'bliptv'), flvFileLink.replace(u'.flv', u'').replace(u'http://blip.tv/file/get/', u''))
+            return '%s%s' % (common.linkWebPage('dummy', 'bliptv'), flvFileLink.replace('.flv', '').replace('http://blip.tv/file/get/', ''))
         else:
             return self.linkFilter(arg[0])[0]
     # end bliptvXSLLinkGeneration()
@@ -144,7 +143,7 @@ class xpathFunctions(object):
         Call example: 'mnvXpath:bliptvDownloadLinkGeneration(.)'
         return an array of one download link element
         '''
-        downloadLink = etree.XML(u'<link></link>')
+        downloadLink = etree.XML('<link></link>')
         flvFile = self.flvFilter(arg[0])
         m4vFile = self.m4vFilter(arg[0])
         if len(m4vFile):
@@ -184,13 +183,13 @@ class xpathFunctions(object):
         Call example: 'mnvXpath:bliptvEpisode(./title/text())'
         return the url link
         '''
-        episodeNumber = u''
+        episodeNumber = ''
         for index in range(len(self.episodeRegex)):
             match = self.episodeRegex[index].match(arg[0])
             if match:
                 episodeNumber = match.groups()
                 break
-        return etree.XML(u'<episode>%s</episode>' % episodeNumber)
+        return etree.XML('<episode>%s</episode>' % episodeNumber)
     # end bliptvEpisode()
 
     def bliptvIsCustomHTML(self, context, arg):

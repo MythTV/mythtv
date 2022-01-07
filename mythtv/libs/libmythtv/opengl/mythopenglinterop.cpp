@@ -64,12 +64,13 @@ void MythOpenGLInterop::GetTypes(MythRender* Render, InteropMap& Types)
 #endif
 }
 
-vector<MythVideoTextureOpenGL*> MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
-                                                            MythVideoColourSpace *ColourSpace,
-                                                            MythVideoFrame *Frame,
-                                                            FrameScanType Scan)
+std::vector<MythVideoTextureOpenGL*>
+MythOpenGLInterop::Retrieve(MythRenderOpenGL *Context,
+                            MythVideoColourSpace *ColourSpace,
+                            MythVideoFrame *Frame,
+                            FrameScanType Scan)
 {
-    vector<MythVideoTextureOpenGL*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     if (!(Context && Frame))
         return result;
 
@@ -125,11 +126,12 @@ MythOpenGLInterop::~MythOpenGLInterop()
     MythOpenGLInterop::DeleteTextures();
 }
 
-vector<MythVideoTextureOpenGL*> MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
-                                                           MythVideoColourSpace* /*ColourSpace*/,
-                                                           MythVideoFrame* /*Frame*/, FrameScanType /*Scan*/)
+std::vector<MythVideoTextureOpenGL*>
+MythOpenGLInterop::Acquire(MythRenderOpenGL* /*Context*/,
+                           MythVideoColourSpace* /*ColourSpace*/,
+                           MythVideoFrame* /*Frame*/, FrameScanType /*Scan*/)
 {
-    return vector<MythVideoTextureOpenGL*>();
+    return std::vector<MythVideoTextureOpenGL*>();
 }
 
 void MythOpenGLInterop::DeleteTextures()
@@ -140,7 +142,7 @@ void MythOpenGLInterop::DeleteTextures()
         int count = 0;
         for (auto it = m_openglTextures.constBegin(); it != m_openglTextures.constEnd(); ++it)
         {
-            vector<MythVideoTextureOpenGL*> textures = it.value();
+            std::vector<MythVideoTextureOpenGL*> textures = it.value();
             for (auto & texture : textures)
             {
                 if (texture->m_textureId)

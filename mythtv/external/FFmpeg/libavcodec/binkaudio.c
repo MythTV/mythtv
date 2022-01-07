@@ -30,6 +30,7 @@
 
 #include "libavutil/channel_layout.h"
 #include "libavutil/intfloat.h"
+#include "libavutil/mem_internal.h"
 
 #define BITSTREAM_READER_LE
 #include "avcodec.h"
@@ -52,9 +53,8 @@ typedef struct BinkAudioContext {
     int overlap_len;        ///< overlap size (samples)
     int block_size;
     int num_bands;
-    unsigned int *bands;
     float root;
-    DECLARE_ALIGNED(32, FFTSample, coeffs)[BINK_BLOCK_MAX_SIZE];
+    unsigned int bands[26];
     float previous[MAX_CHANNELS][BINK_BLOCK_MAX_SIZE / 16];  ///< coeffs from previous audio block
     float quant_table[96];
     AVPacket *pkt;
@@ -70,7 +70,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     BinkAudioContext *s = avctx->priv_data;
     int sample_rate = avctx->sample_rate;
     int sample_rate_half;
-    int i;
+    int i, ret;
     int frame_len_bits;
 
     /* determine frame length */
@@ -123,10 +123,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
         if (sample_rate_half <= ff_wma_critical_freqs[s->num_bands - 1])
             break;
 
-    s->bands = av_malloc((s->num_bands + 1) * sizeof(*s->bands));
-    if (!s->bands)
-        return AVERROR(ENOMEM);
-
     /* populate bands data */
     s->bands[0] = 2;
     for (i = 1; i < s->num_bands; i++)
@@ -136,11 +132,13 @@ static av_cold int decode_init(AVCodecContext *avctx)
     s->first = 1;
 
     if (CONFIG_BINKAUDIO_RDFT_DECODER && avctx->codec->id == AV_CODEC_ID_BINKAUDIO_RDFT)
-        ff_rdft_init(&s->trans.rdft, frame_len_bits, DFT_C2R);
+        ret = ff_rdft_init(&s->trans.rdft, frame_len_bits, DFT_C2R);
     else if (CONFIG_BINKAUDIO_DCT_DECODER)
-        ff_dct_init(&s->trans.dct, frame_len_bits, DCT_III);
+        ret = ff_dct_init(&s->trans.dct, frame_len_bits, DCT_III);
     else
         av_assert0(0);
+    if (ret < 0)
+        return ret;
 
     s->pkt = av_packet_alloc();
     if (!s->pkt)
@@ -274,7 +272,6 @@ static int decode_block(BinkAudioContext *s, float **out, int use_dct)
 static av_cold int decode_end(AVCodecContext *avctx)
 {
     BinkAudioContext * s = avctx->priv_data;
-    av_freep(&s->bands);
     if (CONFIG_BINKAUDIO_RDFT_DECODER && avctx->codec->id == AV_CODEC_ID_BINKAUDIO_RDFT)
         ff_rdft_end(&s->trans.rdft);
     else if (CONFIG_BINKAUDIO_DCT_DECODER)
@@ -350,6 +347,7 @@ AVCodec ff_binkaudio_rdft_decoder = {
     .close          = decode_end,
     .receive_frame  = binkaudio_receive_frame,
     .capabilities   = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };
 
 AVCodec ff_binkaudio_dct_decoder = {
@@ -362,4 +360,5 @@ AVCodec ff_binkaudio_dct_decoder = {
     .close          = decode_end,
     .receive_frame  = binkaudio_receive_frame,
     .capabilities   = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

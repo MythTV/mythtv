@@ -85,10 +85,11 @@ void goom_init (guint32 resx, guint32 resy, int cinemascope) {
 	pixel = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
 	back = (guint32 *) malloc (buffsize * sizeof (guint32) + 128);
 	//RAND_INIT ();
-        srand ((uintptr_t) pixel);
-        if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
-        rand_pos = 1 ;
-        while (rand_pos != 0) rand_tab [rand_pos++] = goom_rand () ;
+	srand ((uintptr_t) pixel);
+	if (!rand_tab) rand_tab = (int *) malloc (NB_RAND * sizeof(int)) ;
+	for (int i = 0; i < NB_RAND; i++)
+		rand_tab[i] = goom_rand();
+	rand_pos = 0;
                 
 	cycle = 0;
 

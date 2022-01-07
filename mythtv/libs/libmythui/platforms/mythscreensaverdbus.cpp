@@ -9,6 +9,7 @@
 #include "platforms/mythscreensaverdbus.h"
 
 // Std
+#include <array>
 #include <cstdint>
 #include <string>
 

@@ -16,6 +16,7 @@
 #include "mythlogging.h"
 #include "mythversion.h"  // for MYTH_BINARY_VERSION
 #include "mythcorecontext.h"
+#include "configuration.h"
 
 // MythDB
 #include "mythdb.h"
@@ -361,7 +362,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     if (pDevice == &m_rootDevice)
-        sFriendlyName = UPnp::GetConfiguration()->GetValue( "UPnP/FriendlyName",
+        sFriendlyName = MythCoreContext::GetConfiguration()->GetValue( "UPnP/FriendlyName",
                                                             sFriendlyName  );
 
     os << "<device>\n";
@@ -675,7 +676,7 @@ QString UPnpDeviceDesc::GetHostName() const
             LOG(VB_GENERAL, LOG_ERR,
                 "UPnpDeviceDesc: Error, could not determine host name." + ENO);
 
-        return UPnp::GetConfiguration()->GetValue("Settings/HostName",
+        return MythCoreContext::GetConfiguration()->GetValue("Settings/HostName",
                                                   localHostName);
     }
 

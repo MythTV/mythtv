@@ -5,15 +5,14 @@ Scraper for http://www.genius.com
 taxigps
 """
 import sys
+from urllib.request import urlopen, Request
+from urllib.parse import quote
+from html import parser as html_parser
 try:
-    from urllib2 import quote, urlopen, Request
-except ImportError:
-    from urllib.request import urlopen, Request
-    from urllib.parse import quote
-try:
-    import HTMLParser as html_parser
-except ImportError:
-	from html import parser as html_parser
+    # may be necessary for python 3.10
+    import html
+except:
+    pass
 import socket
 import re
 from hashlib import md5
@@ -21,10 +20,7 @@ import difflib
 from optparse import OptionParser
 from common import utilities
 
-if sys.version_info < (2, 7):
-    import simplejson
-else:
-    import json as simplejson
+import json as simplejson
 
 __author__      = "Paul Harrison and ronie'"
 __title__       = "Genius"
@@ -47,7 +43,7 @@ class LyricsFetcher:
 
         try:
             request = Request(self.url % (quote(lyrics.artist), '%20', quote(lyrics.title)))
-            request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0')
+            request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0')
             req = urlopen(request)
             response = req.read().decode('utf-8')
         except:
@@ -57,7 +53,12 @@ class LyricsFetcher:
         data = simplejson.loads(response)
 
         try:
-            self.page = data['response']['hits'][0]['result']['url']
+            name = data['response']['hits'][0]['result']['primary_artist']['name']
+            track = data['response']['hits'][0]['result']['title']
+            if (difflib.SequenceMatcher(None, lyrics.artist.lower(), name.lower()).ratio() > 0.8) and (difflib.SequenceMatcher(None, lyrics.title.lower(), track.lower()).ratio() > 0.8):
+                self.page = data['response']['hits'][0]['result']['url']
+            else:
+                return None
         except:
             return False
 
@@ -65,22 +66,24 @@ class LyricsFetcher:
 
         try:
             request = Request(self.page)
-            request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:25.0) Gecko/20100101 Firefox/25.0')
+            request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; rv:77.0) Gecko/20100101 Firefox/77.0')
             req = urlopen(request)
-            response = req.read().decode('utf-8')
+            response = req.read()
         except:
             return False
 
         req.close()
-        matchcode = re.search(u'<div class="lyrics">(.*?)</div>', response, flags=re.DOTALL)
-
+        try:
+            htmlparser = html_parser.HTMLParser()
+            response = htmlparser.unescape(response.decode('utf-8'))
+        except:
+            # may be necessary for python 3.10
+            response = html.unescape(response.decode('utf-8'))
+        matchcode = re.search(u'<div class="[lL]yrics.*?">(.*?)</div>', response, flags=re.DOTALL)
         try:
             lyricscode = (matchcode.group(1))
-            htmlparser = html_parser.HTMLParser()
-            lyricstext = htmlparser.unescape(lyricscode).replace(u'<br />', u'\n')
-            templyr = re.sub(u'<[^<]+?>', '', lyricstext)
-            lyr = re.sub(u'\[(.*?)\]', '', templyr)
-            lyrics.lyrics = lyr.strip().replace(u'\n\n\n', u'\n\n')
+            lyr = re.sub('<[^<]+?>', '', lyricscode)
+            lyrics.lyrics = lyr.replace('\\n','\n').strip()
             return True
         except:
             return False

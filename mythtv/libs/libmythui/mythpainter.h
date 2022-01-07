@@ -17,6 +17,7 @@ class QColor;
 #include "mythuiexp.h"
 
 #include <list>
+#include <memory>
 
 #ifdef _MSC_VER
 #  include <cstdint>    // int64_t
@@ -28,6 +29,7 @@ class UIEffects;
 
 using LayoutVector = QVector<QTextLayout *>;
 using FormatVector = QVector<QTextLayout::FormatRange>;
+using ProcSource = std::shared_ptr<QByteArray>;
 
 class MUI_PUBLIC MythPainter : public QObject
 {
@@ -60,6 +62,10 @@ class MUI_PUBLIC MythPainter : public QObject
 
     void DrawImage(int x, int y, MythImage *im, int alpha);
     void DrawImage(QPoint topLeft, MythImage *im, int alph);
+    virtual void DrawProcedural(QRect /*Area*/, int /*Alpha*/,
+                                const ProcSource& /*VertexSource*/,
+                                const ProcSource& /*FragmentSource*/,
+                                const QString& /*SourceHash*/) { }
 
     virtual void DrawText(QRect r, const QString &msg, int flags,
                           const MythFontProperties &font, int alpha,
@@ -124,12 +130,14 @@ class MUI_PUBLIC MythPainter : public QObject
 
     void CheckFormatImage(MythImage *im);
 
+    float m_frameTime { 0 };
+
     int m_hardwareCacheSize     { 0 };
     int m_maxHardwareCacheSize  { 0 };
 
   private:
     int64_t m_softwareCacheSize {0};
-    int64_t m_maxSoftwareCacheSize {1024 * 1024 * 48};
+    int64_t m_maxSoftwareCacheSize {48LL * 1024 * 1024};
 
     QMutex           m_allocationLock;
     QSet<MythImage*> m_allocatedImages;

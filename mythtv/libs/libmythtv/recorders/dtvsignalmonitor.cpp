@@ -310,8 +310,9 @@ void DTVSignalMonitor::HandlePAT(const ProgramAssociationTable *pat)
         GetStreamData()->SetVersionPAT(tsid, -1,0);
         // END HACK HACK HACK
 
-        DBG_SM("HandlePAT()", QString("Received PAT for tsid %1 waiting for tsid %2")
-            .arg(tsid).arg(m_transportID));
+        LOG(VB_CHANNEL, LOG_DEBUG, LOC + QString("HandlePAT() ") +
+            QString("Received PAT for tsid %1 waiting for tsid %2")
+                .arg(tsid).arg(m_transportID));
 
         // Only one entry in the PAT, just use this program
         int spts_program = 0;

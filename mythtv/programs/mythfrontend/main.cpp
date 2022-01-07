@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 
+#include <QtGlobal>
 #include <QFile>
 #include <QFileInfo>
 #include <QMap>
@@ -13,7 +14,7 @@
 #include <QDir>
 #include <QApplication>
 #include <QTimer>
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
 #include <QProcessEnvironment>
 #endif
 
@@ -124,6 +125,10 @@
 #define fe_sd_notify(x)
 #endif
 
+#include "libmythbase/http/mythhttproot.h"
+#include "libmythbase/http/mythhttpinstance.h"
+#include "services/mythfrontendservice.h"
+
 static MythThemedMenu *g_menu;
 
 static MediaRenderer  *g_pUPnp   = nullptr;
@@ -136,7 +141,7 @@ static void resetAllKeys(void);
 void handleSIGUSR1(void);
 void handleSIGUSR2(void);
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 static bool gLoaded = false;
 #endif
 
@@ -774,10 +779,10 @@ static void playDisc()
         if ((command_string.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
             (command_string.length() < 1))
         {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
             // Convert a BSD 'leaf' name into a raw device path
             QString filename = "dvd://dev/r";   // e.g. 'dvd://dev/rdisk2'
-#elif _WIN32
+#elif defined(_WIN32)
             QString filename = "dvd:";          // e.g. 'dvd:E\\'
 #else
             QString filename = "dvd:/";         // e.g. 'dvd://dev/sda'
@@ -1333,9 +1338,8 @@ static int internal_play_media(const QString &mrl, const QString &plot,
         }
         else
         {
-            // ToDo: Change string to "BD Failure" after 0.28 is released
             ShowNotificationError(QCoreApplication::translate("(MythFrontendMain)",
-                                                  "DVD Failure"),
+                                                  "BD Failure"),
                                                   sLocation,
                                                   bd.GetLastError());
             delete pginfo;
@@ -1846,7 +1850,7 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName(MYTH_APPNAME_MYTHFRONTEND);
     CleanupGuard callCleanup(cleanup);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_DARWIN
     QString path = QCoreApplication::applicationDirPath();
     setenv("PYTHONPATH",
            QString("%1/../Resources/lib/%2/site-packages:%3")
@@ -1860,7 +1864,7 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-#if ! CONFIG_DARWIN
+#ifndef Q_OS_DARWIN
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);
@@ -2087,7 +2091,7 @@ int main(int argc, char **argv)
         }
     }
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
     GetMythMainWindow()->SetEffectsEnabled(false);
     GetMythMainWindow()->Init();
     GetMythMainWindow()->SetEffectsEnabled(true);
@@ -2168,7 +2172,14 @@ int main(int argc, char **argv)
     fe_sd_notify("STATUS=")
     fe_sd_notify("READY=1")
 
-    int ret = QCoreApplication::exec();
+
+    int ret = 0;
+    {
+        MythHTTPInstance::Addservices({{ FRONTEND_SERVICE, &MythHTTPService::Create<MythFrontendService> }});
+        auto root = [](auto && PH1) { return MythHTTPRoot::RedirectRoot(std::forward<decltype(PH1)>(PH1), "mythfrontend.html"); };
+        MythHTTPScopedInstance webserver({{ "/", root}});
+        ret = QCoreApplication::exec();
+    }
 
     fe_sd_notify("STOPPING=1\nSTATUS=Exiting")
     if (ret==0)

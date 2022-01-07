@@ -4,7 +4,6 @@
 // C++
 #include <algorithm>
 #include <unistd.h> // for sleep()
-using std::max;
 
 // QT
 #include <QApplication>

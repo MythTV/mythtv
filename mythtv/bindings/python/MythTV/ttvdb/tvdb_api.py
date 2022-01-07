@@ -31,22 +31,10 @@ __author__ = "dbr/Ben"
 __version__ = "2.0-dev"
 
 
-IS_PY2 = sys.version_info[0] == 2
-
-if IS_PY2:
-    user_input = raw_input
-    from urllib import quote as url_quote
-else:
-    from urllib.parse import quote as url_quote
-    user_input = input
-
-
-if IS_PY2:
-    int_types = (int, long)
-    text_type = unicode
-else:
-    int_types = int
-    text_type = str
+from urllib.parse import quote as url_quote
+user_input = input
+int_types = int
+text_type = str
 
 lastTimeout = None
 
@@ -198,10 +186,7 @@ class ConsoleUI(BaseUI):
                 cshow['lid'],
                 extra
             )
-            if IS_PY2:
-                print(output.encode("UTF-8", "ignore"))
-            else:
-                print(output)
+            print(output)
 
     def selectSeries(self, allSeries):
         self._displaySeries(allSeries)
@@ -290,7 +275,7 @@ class Show(dict):
 
     def __repr__(self):
         return "<Show %r (containing %s seasons)>" % (
-            self.data.get(u'seriesName', 'instance'),
+            self.data.get('seriesName', 'instance'),
             len(self)
         )
 
@@ -439,9 +424,9 @@ class Episode(dict):
         self.season = season
 
     def __repr__(self):
-        seasno = self.get(u'airedSeason', 0)
-        epno = self.get(u'airedEpisodeNumber', 0)
-        epname = self.get(u'episodeName')
+        seasno = self.get('airedSeason', 0)
+        epno = self.get('airedEpisodeNumber', 0)
+        epname = self.get('episodeName')
         if epname is not None:
             return "<Episode %02dx%02d - %r>" % (seasno, epno, epname)
         else:
@@ -752,18 +737,18 @@ class Tvdb:
         self.config['base_url'] = "http://thetvdb.com"
         self.config['api_url'] = "https://api.thetvdb.com"
 
-        self.config['url_getSeries'] = u"%(api_url)s/search/series?name=%%s" % self.config
-        self.config['url_getSeriesById'] = u"%(api_url)s/search/series?id=%%s" % self.config
+        self.config['url_getSeries'] = "%(api_url)s/search/series?name=%%s" % self.config
+        self.config['url_getSeriesById'] = "%(api_url)s/search/series?id=%%s" % self.config
 
-        self.config['url_epInfo'] = u"%(api_url)s/series/%%s/episodes" % self.config
-        self.config['url_epDetail'] = u"%(api_url)s/episodes/%%s" % self.config
+        self.config['url_epInfo'] = "%(api_url)s/series/%%s/episodes" % self.config
+        self.config['url_epDetail'] = "%(api_url)s/episodes/%%s" % self.config
 
-        self.config['url_seriesInfo'] = u"%(api_url)s/series/%%s" % self.config
-        self.config['url_actorsInfo'] = u"%(api_url)s/series/%%s/actors" % self.config
+        self.config['url_seriesInfo'] = "%(api_url)s/series/%%s" % self.config
+        self.config['url_actorsInfo'] = "%(api_url)s/series/%%s/actors" % self.config
 
-        self.config['url_seriesBanner'] = u"%(api_url)s/series/%%s/images" % self.config
-        self.config['url_seriesBannerInfo'] = u"%(api_url)s/series/%%s/images/query?keyType=%%s" % self.config
-        self.config['url_artworkPrefix'] = u"%(base_url)s/banners/%%s" % self.config
+        self.config['url_seriesBanner'] = "%(api_url)s/series/%%s/images" % self.config
+        self.config['url_seriesBannerInfo'] = "%(api_url)s/series/%%s/images/query?keyType=%%s" % self.config
+        self.config['url_artworkPrefix'] = "%(base_url)s/banners/%%s" % self.config
 
         self.__authorized = False
         self.headers = {'Content-Type': 'application/json',
@@ -827,14 +812,14 @@ class Tvdb:
         links = r.get('links')
 
         if error:
-            if error == u'Resource not found':
+            if error == 'Resource not found':
                 # raise(tvdb_resourcenotfound)
                 # handle no data at a different level so it is more specific
                 pass
-            if error == u'Not Authorized':
+            if error == 'Not Authorized':
                 raise(tvdb_notauthorized)
         if errors:
-            if u'invalidLanguage' in errors:
+            if 'invalidLanguage' in errors:
                 # raise(tvdb_invalidlanguage(errors[u'invalidLanguage']))
                 # invalidLanguage does not mean there is no data
                 # there is just less data
@@ -858,7 +843,7 @@ class Tvdb:
         r_json = r.json()
         error = r_json.get('Error')
         if error:
-            if error == u'Not Authorized':
+            if error == 'Not Authorized':
                 raise(tvdb_notauthorized)
         token = r_json.get('token')
         self.headers['Authorization'] = "Bearer %s" % text_type(token)
@@ -946,8 +931,8 @@ class Tvdb:
         if self.config['sort_series']:
             series_lowercase = series.lower()
             for s in allSeries:
-                s[u'match_similarity'] = levenshtein(series_lowercase, s[u'seriesName'].lower())
-            allSeries.sort(key=lambda s: s[u'match_similarity'])
+                s['match_similarity'] = levenshtein(series_lowercase, s['seriesName'].lower())
+            allSeries.sort(key=lambda s: s['match_similarity'])
 
         return ui.selectSeries(allSeries)
 
@@ -1083,7 +1068,7 @@ class Tvdb:
         # set language
         if language is None:
             language = self.config['language']
-        self._setShowData(sid, u'language', language)
+        self._setShowData(sid, 'language', language)
 
         # Parse banners
         if self.config['banners_enabled']:
@@ -1097,7 +1082,7 @@ class Tvdb:
         log().debug('Getting all episodes of %s' % (sid))
 
         url = self.config['url_epInfo'] % sid
-        epsEt = self._getetsrc(url, language=self.shows[sid].data[u'language'])
+        epsEt = self._getetsrc(url, language=self.shows[sid].data['language'])
         if epsEt:
             for cur_ep in epsEt:
                 self._parseEpisodeInfo(sid, cur_ep)
@@ -1139,12 +1124,12 @@ class Tvdb:
         """Get detailed episode info"""
         try:
             if isinstance(episode, Episode):
-                url = self.config['url_epDetail'] % episode[u'id']
+                url = self.config['url_epDetail'] % episode['id']
             else:
                 season = int(season)
                 episode = int(episode)
-                url = self.config['url_epDetail'] % self.shows[sid][season][episode][u'id']
-            epInfo = self._getetsrc(url, language=self.shows[sid].data[u'language'])
+                url = self.config['url_epDetail'] % self.shows[sid][season][episode]['id']
+            epInfo = self._getetsrc(url, language=self.shows[sid].data['language'])
             self._parseEpisodeInfo(sid, epInfo)
         except KeyError:
             import traceback

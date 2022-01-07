@@ -13,6 +13,7 @@
 #include "internetContent.h"
 #include "mythdirs.h"
 #include "htmlserver.h"
+#include "configuration.h"
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
@@ -59,7 +60,7 @@ MediaServer::MediaServer(void) :
     // Initialize Configuration class (Database for Servers)
     // ----------------------------------------------------------------------
 
-    SetConfiguration( new DBConfiguration() );
+    MythCoreContext::SetConfiguration( new DBConfiguration() );
 
     // ----------------------------------------------------------------------
     // Create mini HTTP Server
@@ -72,9 +73,10 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 {
     LOG(VB_UPNP, LOG_INFO, "MediaServer::Init(): Begin");
 
-    int     nPort     = g_pConfig->GetValue( "BackendStatusPort", 6544 );
-    int     nSSLPort  = g_pConfig->GetValue( "BackendSSLPort", (g_pConfig->GetValue( "BackendStatusPort", 6544 ) + 10) );
-    int     nWSPort   = (g_pConfig->GetValue( "BackendStatusPort", 6544 ) + 5);
+    Configuration *pConfig = MythCoreContext::GetConfiguration();
+    int     nPort     = pConfig->GetValue( "BackendStatusPort", 6544 );
+    int     nSSLPort  = pConfig->GetValue( "BackendSSLPort", (nPort + 10) );
+    int     nWSPort   = (pConfig->GetValue( "BackendStatusPort", 6544 ) + 5);
 
     auto *pHttpServer = new HttpServer();
 
@@ -109,8 +111,7 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
         }
     }
 
-    QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",
-                                                m_sSharePath );
+    QString sFileName = pConfig->GetValue( "upnpDescXmlPath", m_sSharePath );
 
     if ( bIsMaster )
         sFileName  += "devicemaster.xml";

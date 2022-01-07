@@ -12,24 +12,17 @@ from MythTV.altdict import DictData
 from MythTV.connections import BEConnection, BEEventConnection
 from MythTV.database import DBCache
 from MythTV.utility import CMPRecord, datetime, ParseEnum, \
-                           CopyData, CopyData2, check_ipv6, py23_repr, resolve_ip
+                           CopyData, CopyData2, check_ipv6, resolve_ip
 
 from datetime import date
 from time import sleep
-try:
-    from thread import allocate_lock
-except ImportError:
-    from _thread import allocate_lock
+from _thread import allocate_lock
 from random import randint
 import socket
 import weakref
 import re
 import os
 
-try:
-    xrange
-except NameError:
-    xrange = range
 
 class BECache( object ):
     """
@@ -798,7 +791,7 @@ class FileOps( BECache ):
             pgrecordid = Program._field_order.index('recordid')
 
             res = self.inst.backendCommand(self.query).split(BACKEND_SEP)
-            for i in xrange(self.header_length):
+            for i in range(self.header_length):
                 res.pop(0)
             num_progs = int(res.pop(0))
             if num_progs*pgfieldcount != len(res):
@@ -830,7 +823,7 @@ class FreeSpace( DictData ):
                     % (self.path, self.host, hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def __init__(self, raw):
         DictData.__init__(self, raw)
@@ -877,11 +870,11 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
                      0,      0,      0,
                      0,      3,      4  ]
     def __str__(self):
-        return u"<Program '%s','%s' at %s>" % (self.title,
+        return "<Program '%s','%s' at %s>" % (self.title,
                  self.starttime.isoformat(' '), hex(id(self)))
 
     def __repr__(self):
-        return py23_repr(str(self))
+        return str(self)
 
     def __init__(self, raw, db=None):
         DictData.__init__(self, raw)
@@ -1011,7 +1004,7 @@ class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
                             ('R','description'), ('C','category'),
                             ('U','recgroup'), ('hn','hostname'),
                             ('c','chanid') ):
-            tmp = unicode(self[data]).replace('/','-')
+            tmp = str(self[data]).replace('/','-')
             path = path.replace('%'+tag, tmp)
 
         for (data, pre) in (   ('recstartts','%'), ('recendts','%e'),

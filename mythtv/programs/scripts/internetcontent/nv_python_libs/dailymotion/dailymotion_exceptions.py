@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: dailymotion_exceptions - Custom exceptions used or raised by dailymotion_api
 # Python Script

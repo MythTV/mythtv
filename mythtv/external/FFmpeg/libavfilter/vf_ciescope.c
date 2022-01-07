@@ -139,10 +139,10 @@ static int query_formats(AVFilterContext *ctx)
 {
     int ret;
 
-    if ((ret = ff_formats_ref(ff_make_format_list(in_pix_fmts), &ctx->inputs[0]->out_formats)) < 0)
+    if ((ret = ff_formats_ref(ff_make_format_list(in_pix_fmts), &ctx->inputs[0]->outcfg.formats)) < 0)
         return ret;
 
-    if ((ret = ff_formats_ref(ff_make_format_list(out_pix_fmts), &ctx->outputs[0]->in_formats)) < 0)
+    if ((ret = ff_formats_ref(ff_make_format_list(out_pix_fmts), &ctx->outputs[0]->incfg.formats)) < 0)
         return ret;
 
     return 0;
@@ -849,7 +849,8 @@ rgb_to_xy(double rc,
     *z = m[2][0] * rc + m[2][1] * gc + m[2][2] * bc;
 
     sum = *x + *y + *z;
-
+    if (sum == 0)
+        sum = 1;
     *x = *x / sum;
     *y = *y / sum;
 }

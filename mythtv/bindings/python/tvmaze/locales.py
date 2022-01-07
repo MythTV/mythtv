@@ -14,9 +14,6 @@
 # ----------------------
 
 
-from __future__ import unicode_literals
-
-
 class LocaleBase(object):
     __slots__ = ['__immutable']
     _stored = {}

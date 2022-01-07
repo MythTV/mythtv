@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: mashups_exceptions - Custom exceptions used or raised by mashups_api
 # Python Script

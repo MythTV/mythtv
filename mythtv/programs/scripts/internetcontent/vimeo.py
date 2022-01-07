@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # ----------------------
 # Name: vimeo.py
@@ -167,6 +167,7 @@ __search_max_page_items__ = 20
 __tree_max_page_items__ = 20
 
 import sys, os
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder
@@ -180,17 +181,18 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            self.out.write(obj.encode(self.encoding))
-        else:
-            self.out.write(obj)
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
+
 # Sub class sys.stdout and sys.stderr as a utf8 stream. Deals with print and stdout unicode issues
-sys.stdout = OutStreamEncoder(sys.stdout)
-sys.stderr = OutStreamEncoder(sys.stderr)
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 # Makes it easier to debug. Comment out for production
 #import nv_python_libs.vimeo.vimeo_api as target
@@ -198,7 +200,7 @@ sys.stderr = OutStreamEncoder(sys.stderr)
 # Verify that the tmdb_api modules are installed and accessible
 try:
     import nv_python_libs.vimeo.vimeo_api as target
-except Exception,e:
+except Exception as e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/vimeo" containing the modules vimeo_api.py (v0.2.0 or greater),
 They should have been included with the distribution of vimeo.py.
@@ -218,7 +220,7 @@ import nv_python_libs.mainProcess as process
 # Verify that the common process modules are installed and accessible
 try:
     import nv_python_libs.mainProcess as process
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The python script "nv_python_libs/mainProcess.py" must be present.
 Error(%s)
@@ -234,12 +236,13 @@ if __name__ == '__main__':
     apikey = ""
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
+    main.grabberInfo['enabled'] = True
     main.grabberInfo['title'] = __title__
-    main.grabberInfo['command'] = u'vimeo.py'
+    main.grabberInfo['command'] = 'vimeo.py'
     main.grabberInfo['author'] = __author__
     main.grabberInfo['thumbnail'] = 'vimeo.png'
     main.grabberInfo['type'] = ['video']
-    main.grabberInfo['desc'] = u"Vimeo is a respectful community of creative people who are passionate about sharing the videos they make."
+    main.grabberInfo['desc'] = "Vimeo is a respectful community of creative people who are passionate about sharing the videos they make."
     main.grabberInfo['version'] = __version__
     main.grabberInfo['search'] = True
     main.grabberInfo['tree'] = True

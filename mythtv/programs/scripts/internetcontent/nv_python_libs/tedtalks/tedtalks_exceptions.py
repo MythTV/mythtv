@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: tedtalks_exceptions - Custom exceptions used or raised by tedtalks_api
 # Python Script

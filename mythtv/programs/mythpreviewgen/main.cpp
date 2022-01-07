@@ -1,8 +1,3 @@
-#include "mythconfig.h"
-#if CONFIG_DARWIN
-    #include <sys/aio.h>    // O_SYNC
-#endif
-
 // C++ headers
 #include <cerrno>
 #include <csignal>
@@ -16,6 +11,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <QtGlobal>
 #ifndef _WIN32
 #include <QCoreApplication>
 #else
@@ -48,7 +44,7 @@
 #define LOC_WARN QString("MythPreviewGen, Warning: ")
 #define LOC_ERR  QString("MythPreviewGen, Error: ")
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MACOS
     // 10.6 uses some file handles for its new Grand Central Dispatch thingy
     #define UNUSED_FILENO 5
 #else
@@ -185,7 +181,7 @@ int main(int argc, char **argv)
     QList<int> signallist;
     signallist << SIGINT << SIGTERM << SIGSEGV << SIGABRT << SIGBUS << SIGFPE
                << SIGILL;
-#if ! CONFIG_DARWIN
+#ifndef Q_OS_DARWIN
     signallist << SIGRTMIN;
 #endif
     SignalHandler::Init(signallist);

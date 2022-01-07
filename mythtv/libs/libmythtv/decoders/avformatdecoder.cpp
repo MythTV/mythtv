@@ -4,7 +4,6 @@
 
 // C++ headers
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <iostream>
@@ -70,6 +69,7 @@ extern "C" {
 #include "io/mythmediabuffer.h"
 #include "mythframe.h"
 #include "mythchrono.h"
+#include "mythdate.h"
 #include "remoteencoder.h"
 #include "mythcorecontext.h"
 #include "mythdbcon.h"
@@ -235,7 +235,7 @@ static bool StreamHasRequiredParameters(AVCodecContext *Context, AVStream *Strea
             //    FAIL("Unspecified audio sample rate");
             //if (!Stream->codecpar->channels)
             //    FAIL("Unspecified number of audio channels");
-            if (!Stream->nb_decoded_frames && Context->codec_id == AV_CODEC_ID_DTS)
+            if (!Stream->internal->nb_decoded_frames && Context->codec_id == AV_CODEC_ID_DTS)
                 FAIL("No decodable DTS frames");
             break;
 
@@ -1265,7 +1265,7 @@ int AvFormatDecoder::OpenFile(MythMediaBuffer *Buffer, bool novideo,
         LOG(VB_PLAYBACK, LOG_INFO, LOC +
             QString("Chapter %1 found @ [%2]->%3")
                 .arg(i + 1,   2,10,QChar('0'))
-                .arg(MythFormatTime(msec, "HH:mm:ss.zzz"))
+                .arg(MythDate::formatTime(msec, "HH:mm:ss.zzz"))
                 .arg(framenum));
     }
 
@@ -1319,7 +1319,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
         estimated_fps = av_q2d(Stream->r_frame_rate);
 
     // build a list of possible rates, best first
-    vector<double> rates;
+    std::vector<double> rates;
 
     // matroska demuxer sets the default_duration to avg_frame_rate
     // mov,mp4,m4a,3gp,3g2,mj2 demuxer sets avg_frame_rate
@@ -1367,7 +1367,7 @@ float AvFormatDecoder::GetVideoFrameRate(AVStream *Stream, AVCodecContext *Conte
     auto IsStandard = [&FuzzyEquals](double Rate)
     {
         // List of known, standards based frame rates
-        static const vector<double> s_normRates =
+        static const std::vector<double> s_normRates =
         {
             24000.0 / 1001.0, 23.976, 24.0, 25.0, 30000.0 / 1001.0,
             29.97, 30.0, 50.0, 60000.0 / 1001.0, 59.94, 60.0, 100.0,
@@ -2466,10 +2466,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
             if (HAVE_THREADS)
             {
-                // All of our callbacks are thread safe. This should improve
-                // concurrency with software decode
-                enc->thread_safe_callbacks = 1;
-
                 // Only use a single thread for hardware decoding. There is no
                 // performance improvement with multithreaded hardware decode
                 // and asynchronous callbacks create issues with decoders that
@@ -3575,11 +3571,9 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt, boo
     {
         // MythTV logic expects that only one frame is processed
         // Save the packet for later and return.
-        auto *newPkt = new AVPacket;
-        memset(newPkt, 0, sizeof(AVPacket));
-        av_init_packet(newPkt);
-        av_packet_ref(newPkt, pkt);
-        m_storedPackets.prepend(newPkt);
+        auto *newPkt = av_packet_clone(pkt);
+        if (newPkt)
+            m_storedPackets.prepend(newPkt);
     }
     return true;
 }
@@ -4284,10 +4278,10 @@ int AvFormatDecoder::AutoSelectTrack(uint type)
     return DecoderBase::AutoSelectTrack(type);
 }
 
-static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key,
-                               const vector<int> &ftype)
+static std::vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key,
+                                    const std::vector<int> &ftype)
 {
-    vector<int> ret;
+    std::vector<int> ret;
 
     for (int index : ftype)
     {
@@ -4298,9 +4292,9 @@ static vector<int> filter_lang(const sinfo_vec_t &tracks, int lang_key,
     return ret;
 }
 
-static vector<int> filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
+static std::vector<int> filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
 {
-    vector<int> ret;
+    std::vector<int> ret;
 
     for (size_t i = 0; i < tracks.size(); i++)
     {
@@ -4313,7 +4307,7 @@ static vector<int> filter_type(const sinfo_vec_t &tracks, AudioTrackType type)
 
 int AvFormatDecoder::filter_max_ch(const AVFormatContext *ic,
                                    const sinfo_vec_t     &tracks,
-                                   const vector<int>     &fs,
+                                   const std::vector<int>&fs,
                                    enum AVCodecID         codecId,
                                    int                    profile)
 {
@@ -4458,7 +4452,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         LOG(VB_AUDIO, LOG_INFO, LOC + "Trying to select audio track (w/lang)");
 
         // Filter out commentary and audio description tracks
-        vector<int> ftype = filter_type(atracks, kAudioTypeNormal);
+        std::vector<int> ftype = filter_type(atracks, kAudioTypeNormal);
 
         if (ftype.empty())
         {
@@ -4473,7 +4467,7 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         uint language_key = iso639_str3_to_key(language_key_convert);
         uint canonical_key = iso639_key_to_canonical_key(language_key);
 
-        vector<int> flang = filter_lang(atracks, canonical_key, ftype);
+        std::vector<int> flang = filter_lang(atracks, canonical_key, ftype);
 
         if (m_audio->CanDTSHD())
             selTrack = filter_max_ch(m_ic, atracks, flang, AV_CODEC_ID_DTS,
@@ -4640,12 +4634,10 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     int audSubIdx = m_selectedTrack[kTrackTypeAudio].m_av_substream_index;
     m_trackLock.unlock();
 
-    AVPacket tmp_pkt;
-    av_init_packet(&tmp_pkt);
-    tmp_pkt.data = pkt->data;
-    tmp_pkt.size = pkt->size;
-
-    while (tmp_pkt.size > 0)
+    AVPacket *tmp_pkt = av_packet_alloc();
+    tmp_pkt->data = pkt->data;
+    tmp_pkt->size = pkt->size;
+    while (tmp_pkt->size > 0)
     {
         bool reselectAudioTrack = false;
 
@@ -4688,7 +4680,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     ctx->channels = m_audio->GetMaxChannels();
             }
 
-            ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, &tmp_pkt);
+            ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
             decoded_size = data_size;
             already_decoded = true;
             reselectAudioTrack |= ctx->channels;
@@ -4762,7 +4754,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
             {
                 if (m_audio->NeedDecodingBeforePassthrough())
                 {
-                    ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, &tmp_pkt);
+                    ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
                     decoded_size = data_size;
                 }
                 else
@@ -4770,10 +4762,10 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     decoded_size = -1;
                 }
             }
-            memcpy(m_audioSamples, tmp_pkt.data, tmp_pkt.size);
-            data_size = tmp_pkt.size;
+            memcpy(m_audioSamples, tmp_pkt->data, tmp_pkt->size);
+            data_size = tmp_pkt->size;
             // We have processed all the data, there can't be any left
-            tmp_pkt.size = 0;
+            tmp_pkt->size = 0;
         }
         else
         {
@@ -4789,7 +4781,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
                     ctx->request_channel_layout = 0;
                 }
 
-                ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, &tmp_pkt);
+                ret = m_audio->DecodeAudio(ctx, m_audioSamples, data_size, tmp_pkt);
                 decoded_size = data_size;
             }
         }
@@ -4798,13 +4790,14 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         if (ret < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Unknown audio decoding error");
+            av_packet_free(&tmp_pkt);
             return false;
         }
 
         if (data_size <= 0)
         {
-            tmp_pkt.data += ret;
-            tmp_pkt.size -= ret;
+            tmp_pkt->data += ret;
+            tmp_pkt->size -= ret;
             continue;
         }
 
@@ -4834,11 +4827,12 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         m_allowedQuit |= m_ringBuffer->IsInStillFrame() ||
                        m_audio->IsBufferAlmostFull();
 
-        tmp_pkt.data += ret;
-        tmp_pkt.size -= ret;
+        tmp_pkt->data += ret;
+        tmp_pkt->size -= ret;
         firstloop = false;
     }
 
+    av_packet_free(&tmp_pkt);
     return true;
 }
 
@@ -4944,20 +4938,13 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
         if (!storevideoframes && m_storedPackets.count() > 0)
         {
             if (pkt)
-            {
-                av_packet_unref(pkt);
-                delete pkt;
-            }
+                av_packet_free(&pkt);
             pkt = m_storedPackets.takeFirst();
         }
         else
         {
             if (!pkt)
-            {
-                pkt = new AVPacket;
-                memset(pkt, 0, sizeof(AVPacket));
-                av_init_packet(pkt);
-            }
+                pkt = av_packet_alloc();
 
             int retval = 0;
             if (!m_ic || ((retval = ReadPacket(m_ic, pkt, storevideoframes)) < 0))
@@ -4966,7 +4953,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     continue;
 
                 SetEof(true);
-                delete pkt;
+                av_packet_free(&pkt);
                 std::string errbuf(256,'\0');
                 QString errmsg;
                 if (av_strerror_stdstring(retval, errbuf) == 0)
@@ -5029,8 +5016,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             // have a fatal error, so check for this before continuing.
             if (m_parent->IsErrored())
             {
-                av_packet_unref(pkt);
-                delete pkt;
+                av_packet_free(&pkt);
                 return false;
             }
         }
@@ -5140,7 +5126,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             break;
     }
 
-    delete pkt;
+    av_packet_free(&pkt);
     return true;
 }
 

@@ -14,6 +14,7 @@
 #include "io/mythfilebuffer.h"
 
 // Std
+#include <array>
 #include <cstdlib>
 #include <cerrno>
 #include <sys/types.h>

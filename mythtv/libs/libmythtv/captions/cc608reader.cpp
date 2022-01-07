@@ -185,7 +185,7 @@ int CC608Reader::Update(unsigned char *inpos)
         int row = 0;
         int linecont = (subtitle.resumetext & CC_LINE_CONT);
 
-        auto *ccbuf = new vector<CC608Text*>;
+        auto *ccbuf = new std::vector<CC608Text*>;
         CC608Text *tmpcc = nullptr;
         int replace = linecont;
         int scroll = 0;
@@ -365,7 +365,7 @@ void CC608Reader::Update608Text(
         QString("scroll_ymax:%1 ").arg(scroll_ymax) +
         QString("streamIdx:%1 ").arg(streamIdx));
 #endif
-    vector<CC608Text*>::iterator i;
+    std::vector<CC608Text*>::iterator i;
     int visible = 0;
 
     m_state[streamIdx].m_output.m_lock.lock();

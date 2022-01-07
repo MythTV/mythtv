@@ -6,12 +6,11 @@ scraper by smory
 """
 
 import hashlib
-try:
-    from urllib2 import quote, urlopen
-except ImportError:
-    from urllib.request import urlopen
-    from urllib.parse import quote
+import math
+from urllib.request import Request, urlopen
+from urllib.parse import quote
 import re
+import time
 import chardet
 import sys
 from optparse import OptionParser
@@ -21,7 +20,7 @@ __author__      = "Paul Harrison and smory'"
 __title__       = "DarkLyrics"
 __description__ = "Search http://www.darklyrics.com/ - the largest metal lyrics archive on the Web"
 __priority__    = "180"
-__version__     = "0.1"
+__version__     = "0.2"
 __syncronized__ = False
 
 debug = False
@@ -31,17 +30,32 @@ class LyricsFetcher:
     def __init__( self ):
         self.base_url = "http://www.darklyrics.com/"
         self.searchUrl = "http://www.darklyrics.com/search?q=%term%"
+        self.cookie = self.getCookie()
+
+    def getCookie(self):
+         # http://www.darklyrics.com/tban.js
+         lastvisitts = str(int(math.ceil(time.time() * 1000 / (60 * 60 * 6 * 1000))))
+         lastvisittscookie = 0
+         for i in range(len(lastvisitts)):
+             lastvisittscookie = ((lastvisittscookie << 5) - lastvisittscookie) + ord(lastvisitts[i])
+             lastvisittscookie = lastvisittscookie & lastvisittscookie
+         return str(lastvisittscookie)
 
     def search(self, artist, title):
         term = quote((artist if artist else "") + " " + (title if title else ""))
 
         try:
-            request = urlopen(self.searchUrl.replace("%term%", term))
-            searchResponse = request.read()
+            headers = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0'}
+            cookies={'lastvisitts': self.cookie}
+            request = Request(self.searchUrl.replace("%term%", term))
+            request.add_header('User-Agent', headers['user-agent'])
+            request.add_header("Cookie", "lastvisitts=%s"% self.cookie)
+            content = urlopen(request, timeout=10)
+            searchResponse = content.read()
         except:
             return None
 
-        searchResult = re.findall(b"<h2><a\shref=\"(.*?#([0-9]+))\".*?>(.*?)</a></h2>", searchResponse)
+        searchResult = re.findall(rb"<h2><a\shref=\"(.*?#([0-9]+))\".*?>(.*?)</a></h2>", searchResponse)
 
         if len(searchResult) == 0:
             return None
@@ -68,7 +82,7 @@ class LyricsFetcher:
         except:
             return None
 
-        pattern = b"<a\sname=\"%index%\">(.*?)(?:<h3>|<div)"  # require multi line and dot all mode
+        pattern = rb"<a\sname=\"%index%\">(.*?)(?:<h3>|<div)"  # require multi line and dot all mode
         pattern = pattern.replace(b"%index%", index)
 
         match = re.search(pattern, res, re.MULTILINE | re.DOTALL)
@@ -90,7 +104,7 @@ class LyricsFetcher:
         except:
             return b""
 
-        match = re.search(b"<h2>(?:album|single|ep|live):?\s?(.*?)</h2>", res, re.IGNORECASE)
+        match = re.search(rb"<h2>(?:album|single|ep|live):?\s?(.*?)</h2>", res, re.IGNORECASE)
 
         if match:
             ret = (b"(" + match.group(1) + b")").replace(b"\"", b"")

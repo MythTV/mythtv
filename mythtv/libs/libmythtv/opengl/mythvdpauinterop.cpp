@@ -176,9 +176,9 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
         m_outputSurface = m_helper->CreateOutputSurface(size);
         if (m_outputSurface)
         {
-            vector<QSize> sizes;
+            std::vector<QSize> sizes;
             sizes.push_back(size);
-            vector<MythVideoTextureOpenGL*> textures =
+            std::vector<MythVideoTextureOpenGL*> textures =
                 MythVideoTextureOpenGL::CreateTextures(m_openglContext, FMT_VDPAU, FMT_RGBA32, sizes);
             if (textures.empty())
                 return false;
@@ -221,12 +221,13 @@ bool MythVDPAUInterop::InitVDPAU(AVVDPAUDeviceContext* DeviceContext, VdpVideoSu
  * \note We use a VdpVideoMixer to complete the conversion from YUV to RGB. Hence the returned
  * texture is RGB... We could use GL_NV_vdpau_interop2 to return raw YUV frames.
 */
-vector<MythVideoTextureOpenGL*> MythVDPAUInterop::Acquire(MythRenderOpenGL* Context,
-                                                          MythVideoColourSpace* ColourSpace,
-                                                          MythVideoFrame* Frame,
-                                                          FrameScanType Scan)
+std::vector<MythVideoTextureOpenGL*>
+MythVDPAUInterop::Acquire(MythRenderOpenGL* Context,
+                          MythVideoColourSpace* ColourSpace,
+                          MythVideoFrame* Frame,
+                          FrameScanType Scan)
 {
-    vector<MythVideoTextureOpenGL*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
         return result;
 

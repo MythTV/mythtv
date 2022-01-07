@@ -17,7 +17,8 @@
 #include <thread> // for sleep_for
 
 #include "upnp.h"
-#include "mythmiscutil.h"
+#include "mythchrono.h"
+#include "mythrandom.h"
 #include "mythlogging.h"
 
 #include "upnptasksearch.h"
@@ -25,6 +26,8 @@
 
 #include "mmulticastsocketdevice.h"
 #include "mbroadcastsocketdevice.h"
+#include "mythcorecontext.h"
+#include "configuration.h"
 
 #include <QStringList>
 
@@ -75,7 +78,7 @@ SSDP::SSDP() :
 {
     LOG(VB_UPNP, LOG_NOTICE, "Starting up SSDP Thread..." );
 
-    Configuration *pConfig = UPnp::GetConfiguration();
+    Configuration *pConfig = MythCoreContext::GetConfiguration();
 
     m_nPort       = pConfig->GetValue("UPnP/SSDP/Port"      , SSDP_PORT      );
     m_nSearchPort = pConfig->GetValue("UPnP/SSDP/SearchPort", SSDP_SEARCHPORT);
@@ -228,7 +231,11 @@ void SSDP::PerformSearch(const QString &sST, std::chrono::seconds timeout)
         LOG(VB_GENERAL, LOG_INFO,
             "SSDP::PerformSearch - did not write entire buffer.");
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom() % 250));
+#else
+    std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
+#endif
 
     if ( pSocket->writeBlock( sRequest.data(),
                               sRequest.size(), address, SSDP_PORT ) != nSize)
@@ -540,7 +547,11 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
 
     nMX = std::clamp(nMX, 0s, 120s);
 
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     auto nNewMX = std::chrono::milliseconds(MythRandom()) % nMX;
+#else
+    auto nNewMX = std::chrono::milliseconds(MythRandom(0, (duration_cast<std::chrono::milliseconds>(nMX)).count()));
+#endif
 
     // ----------------------------------------------------------------------
     // See what they are looking for...
@@ -691,7 +702,7 @@ SSDPExtension::SSDPExtension( int nServicePort , const QString &sSharePath)
     m_nServicePort(nServicePort)
 {
     m_nSupportedMethods |= (RequestTypeMSearch | RequestTypeNotify);
-    m_sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
+    m_sUPnpDescPath = MythCoreContext::GetConfiguration()->GetValue( "UPnP/DescXmlPath",
                                                  m_sSharePath );
 }
 

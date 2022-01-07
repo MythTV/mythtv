@@ -4,6 +4,7 @@
 #define TS_PACKET_H
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cstdlib>
 #include "mythcontext.h"

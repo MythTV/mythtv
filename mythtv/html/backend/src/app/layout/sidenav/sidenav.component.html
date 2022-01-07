@@ -1,0 +1,22 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav mode="side" opened>
+        <mat-list>
+            <mat-list-item>
+                <button mat-icon-button class="sidenav-icon" aria-label="Home" [routerLink]="''">
+                    <mat-icon>home</mat-icon>
+                </button>
+            </mat-list-item>
+            <mat-list-item>
+                <button mat-icon-button class="sidenav-icon" aria-label="Status" [routerLink]="'status'">
+                    <mat-icon>info</mat-icon>
+                </button>
+            </mat-list-item>
+            <mat-list-item>
+                <button mat-icon-button class="sidenav-icon" aria-label="Settings" [routerLink]="'settings'">
+                    <mat-icon>settings</mat-icon>
+                </button>
+            </mat-list-item>
+        </mat-list>
+    </mat-sidenav>
+    <router-outlet></router-outlet>
+</mat-sidenav-container>

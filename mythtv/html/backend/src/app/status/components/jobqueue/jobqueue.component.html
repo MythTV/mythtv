@@ -1,0 +1,15 @@
+<div class="statusBox">
+    <h2>Job queue</h2>
+    <div *ngIf="jobqueue?.length != 0; else noJobs">
+        <p>Jobs currently in Queue or recently ended:</p>
+        <ul>
+            <div *ngFor="let job of jobqueue">
+                <p>{{ job.StatusTime }} - {{ job.Program.Title }} - {{ JobTypeText(job.Type) }} - Status: {{ JobStatusText(job.Status) }} </p>
+                <!-- Add details of failed job -->
+            </div>
+        </ul>
+    </div>
+</div>
+<ng-template #noJobs>
+    <p>Job queue is currently empty</p>
+</ng-template>

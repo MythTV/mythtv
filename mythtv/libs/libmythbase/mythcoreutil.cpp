@@ -1,19 +1,20 @@
-
 #include "mythcoreutil.h"
 
 // POSIX
+#include <array>
 #include <unistd.h>
 #include <fcntl.h>
 
 // System specific C headers
 #include "compat.h"
+#include <QtGlobal>
 
-#ifdef linux
+#ifdef __linux__
 #include <sys/vfs.h>
 #include <sys/sysinfo.h>
 #endif
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 #include <mach/mach.h>
 #endif
 
@@ -31,9 +32,6 @@
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 #include "unzip2.h"
-
-#include "version.h"
-#include "mythversion.h"
 
 /** \fn getDiskSpace(const QString&,long long&,long long&)
  *  \brief Returns free space on disk containing file in KiB,
@@ -289,14 +287,5 @@ QString RemoteDownloadFileNow(const QString &url,
     return downloadRemoteFile("DOWNLOAD_FILE_NOW", url, storageGroup, filename);
 }
 
-const char *GetMythSourceVersion()
-{
-    return MYTH_SOURCE_VERSION;
-}
-
-const char *GetMythSourcePath()
-{
-    return MYTH_SOURCE_PATH;
-}
-
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
+

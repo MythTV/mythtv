@@ -3,13 +3,7 @@
 
 #include "decoder.h"
 
-#include <mythconfig.h>
 #include "config.h"
-
-#if CONFIG_DARWIN
-#include <vector>
-using std::vector;
-#endif
 
 #ifdef HAVE_CDIO
 # ifdef HAVE_CDPARANOIA_SUBDIR
@@ -43,9 +37,6 @@ class CdDecoder : public Decoder
     // TODO check this is still true
     MusicMetadata *getMetadata(int track);
 
-#if CONFIG_DARWIN
-    double lengthInSeconds();
-#endif
     int getNumTracks();
     int getNumCDAudioTracks();
 
@@ -63,16 +54,6 @@ class CdDecoder : public Decoder
 
     QString            m_deviceName;
 
-#if CONFIG_DARWIN
-    void lookupCDDB(const QString &hexID, uint tracks);
-
-    uint32_t           m_diskID;        ///< For CDDB1/FreeDB lookup
-    uint               m_firstTrack,    ///< First AUDIO track
-                       m_lastTrack,     ///< Last  AUDIO track
-                       m_leadout;       ///< End of last track
-    double             m_lengthInSecs;
-    vector<int>        m_tracks;        ///< Start block offset of each track
-#endif
 #if QT_VERSION < QT_VERSION_CHECK(5,14,0)
     static QMutex& getCdioMutex();
 #else

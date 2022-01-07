@@ -30,11 +30,11 @@
 #include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
 #include <unistd.h>
 
-#include <mythconfig.h>
-#if CONFIG_DARWIN or defined(__FreeBSD__)
+#include <QtGlobal>
+#if defined(Q_OS_DARWIN) or defined(__FreeBSD__)
 #include <sys/param.h>
 #include <sys/mount.h>
-#elif __linux__
+#elif defined(__linux__)
 #include <sys/vfs.h>
 #endif
 
@@ -1764,21 +1764,25 @@ static int grabThumbnail(const QString& inFile, const QString& thumbList, const 
 
 static int64_t getFrameCount(AVFormatContext *inputFC, int vid_id)
 {
-    AVPacket pkt;
     int64_t count = 0;
 
     LOG(VB_JOBQUEUE, LOG_INFO, "Calculating frame count");
 
-    av_init_packet(&pkt);
-
-    while (av_read_frame(inputFC, &pkt) >= 0)
+    AVPacket *pkt = av_packet_alloc();
+    if (pkt == nullptr)
     {
-        if (pkt.stream_index == vid_id)
+        LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
+        return 0;
+    }
+    while (av_read_frame(inputFC, pkt) >= 0)
+    {
+        if (pkt->stream_index == vid_id)
         {
             count++;
         }
-        av_packet_unref(&pkt);
+        av_packet_unref(pkt);
     }
+    av_packet_free(&pkt);
 
     return count;
 }
@@ -2233,14 +2237,15 @@ static int isRemote(const QString& filename)
     if (!QFile::exists(filename))
         return 0;
 
-#if CONFIG_DARWIN
+// TODO replace with FileSystemInfo?
+#ifdef Q_OS_DARWIN
     struct statfs statbuf {};
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((!strcmp(statbuf.f_fstypename, "nfs")) ||      // NFS|FTP
             (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
             (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
         return 2;
-#elif __linux__
+#elif defined(__linux__)
     struct statfs statbuf {};
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((statbuf.f_type == 0x6969) ||      // NFS

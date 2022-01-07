@@ -16,6 +16,8 @@
 #include "mythlocale.h"
 #include "mythsession.h"
 
+class Configuration;
+
 #define MYTH_APPNAME_MYTHBACKEND "mythbackend"
 #define MYTH_APPNAME_MYTHJOBQUEUE "mythjobqueue"
 #define MYTH_APPNAME_MYTHFRONTEND "mythfrontend"
@@ -238,6 +240,10 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     QString GetLanguageAndVariant(void);
     void ResetLanguage(void);
     void ResetSockets(void);
+
+    static void           SetConfiguration( Configuration *pConfig );
+    static Configuration* GetConfiguration();
+    static Configuration   *g_pConfig;
 
     using PlaybackStartCb = void (QObject::*)(void);
 

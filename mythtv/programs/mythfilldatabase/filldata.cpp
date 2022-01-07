@@ -95,14 +95,24 @@ bool FillData::GrabDataFromFile(int id, const QString &filename)
         return false;
 
     m_chanData.handleChannels(id, &chanlist);
-    if (proglist.count() == 0)
+    if (m_onlyUpdateChannels)
     {
-        LOG(VB_GENERAL, LOG_INFO, "No programs found in data.");
-        m_endOfData = true;
+        if (proglist.count() != 0)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "Skipping program guide updates");
+        }
     }
     else
     {
-        ProgramData::HandlePrograms(id, proglist);
+        if (proglist.count() == 0)
+        {
+            LOG(VB_GENERAL, LOG_INFO, "No programs found in data.");
+            m_endOfData = true;
+        }
+        else
+        {
+            ProgramData::HandlePrograms(id, proglist);
+        }
     }
     return true;
 }
@@ -144,8 +154,11 @@ bool FillData::GrabData(const Source& source, int offset)
     QString command = QString("nice %1 --config-file '%2' --output %3")
         .arg(xmltv_grabber, configfile, filename);
 
-
-    if (source.xmltvgrabber_prefmethod != "allatonce"  || m_noAllAtOnce)
+    if (m_onlyUpdateChannels && source.xmltvgrabber_apiconfig)
+    {
+        command += " --list-channels";
+    }
+    else if (source.xmltvgrabber_prefmethod != "allatonce"  || m_noAllAtOnce || m_onlyUpdateChannels)
     {
         // XMLTV Docs don't recommend grabbing one day at a
         // time but the current MythTV code is heavily geared
@@ -385,6 +398,12 @@ bool FillData::Run(SourceList &sourcelist)
                     if (capability == "cache")
                         (*it).xmltvgrabber_cache = true;
 
+                    if (capability == "apiconfig")
+                        (*it).xmltvgrabber_apiconfig = true;
+
+                    if (capability == "lineups")
+                        (*it).xmltvgrabber_lineups = true;
+
                     if (capability == "preferredmethod")
                         hasprefmethod = true;
                 }
@@ -420,7 +439,7 @@ bool FillData::Run(SourceList &sourcelist)
 
         m_needPostGrabProc |= true;
 
-        if ((*it).xmltvgrabber_prefmethod == "allatonce" && !m_noAllAtOnce)
+        if ((*it).xmltvgrabber_prefmethod == "allatonce" && !m_noAllAtOnce && !m_onlyUpdateChannels)
         {
             if (!GrabData(*it, 0))
                 ++failures;

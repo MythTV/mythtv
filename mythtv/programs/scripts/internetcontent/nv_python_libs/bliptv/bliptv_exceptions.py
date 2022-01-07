@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: bliptv_exceptions - Custom exceptions used or raised by bliptv_api
 # Python Script

@@ -111,6 +111,7 @@ static int cpia_decode_frame(AVCodecContext *avctx,
         // Read line length, two byte little endian
         linelength = AV_RL16(src);
         src += 2;
+        src_size -= 2;
 
         if (src_size < linelength) {
             frame->decode_error_flags = FF_DECODE_ERROR_INVALID_BITSTREAM;
@@ -230,4 +231,5 @@ AVCodec ff_cpia_decoder = {
     .close          = cpia_decode_end,
     .decode         = cpia_decode_frame,
     .capabilities   = AV_CODEC_CAP_DR1,
+    .caps_internal  = FF_CODEC_CAP_INIT_THREADSAFE,
 };

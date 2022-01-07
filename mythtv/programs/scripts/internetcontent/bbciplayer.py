@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # ----------------------
 # Name: bbciplayer.py
@@ -172,6 +172,7 @@ __search_max_page_items__ = 20
 __tree_max_page_items__ = 20
 
 import sys, os
+import io
 
 
 class OutStreamEncoder(object):
@@ -185,22 +186,17 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 # Used for debugging
@@ -209,7 +205,7 @@ try:
     '''Import the common python class
     '''
     import nv_python_libs.common.common_api as common_api
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/common" containing the modules common_api.py and
 common_exceptions.py (v0.1.3 or greater),
@@ -227,7 +223,7 @@ try:
     '''Import the python bbciplayer support classes
     '''
     import nv_python_libs.bbciplayer.bbciplayer_api as target
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/bbciplayer" containing the modules bbciplayer_api and
 bbciplayer_exceptions.py (v0.1.0 or greater),
@@ -242,7 +238,7 @@ if target.__version__ < '0.1.0':
 # Verify that the main process modules are installed and accessible
 try:
     import nv_python_libs.mainProcess as process
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The python script "nv_python_libs/mainProcess.py" must be present.
 Error(%s)
@@ -262,13 +258,14 @@ if __name__ == '__main__':
     target.common = common_api.Common()
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
+    main.grabberInfo['enabled'] = True
     main.grabberInfo['title'] = __title__
     main.grabberInfo['mashup_title'] = __mashup_title__
-    main.grabberInfo['command'] = u'bbciplayer.py'
+    main.grabberInfo['command'] = 'bbciplayer.py'
     main.grabberInfo['author'] = __author__
     main.grabberInfo['thumbnail'] = 'bbciplayer.png'
     main.grabberInfo['type'] = ['video', ]
-    main.grabberInfo['desc'] = u"BBC iPlayer is our service that lets you catch up with radio and television programmes from the past week."
+    main.grabberInfo['desc'] = "BBC iPlayer is our service that lets you catch up with radio and television programmes from the past week."
     main.grabberInfo['version'] = __version__
     main.grabberInfo['search'] = True
     main.grabberInfo['tree'] = True

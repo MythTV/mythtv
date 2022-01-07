@@ -19,6 +19,8 @@
 #include "upnputil.h"
 #include "mythlogging.h"
 #include "mythversion.h"
+#include "mythcorecontext.h"
+#include "configuration.h"
 
 #define DIDL_LITE_BEGIN "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\">"
 #define DIDL_LITE_END   "</DIDL-Lite>";
@@ -92,7 +94,7 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
     SetValue< QString  >( "ServiceResetToken",
                           QDateTime::currentDateTimeUtc().toString(Qt::ISODate) );
 
-    QString sUPnpDescPath = UPnp::GetConfiguration()->GetValue( "UPnP/DescXmlPath", sSharePath );
+    QString sUPnpDescPath = MythCoreContext::GetConfiguration()->GetValue( "UPnP/DescXmlPath", sSharePath );
 
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
     m_sControlUrl          = "/CDS_Control";

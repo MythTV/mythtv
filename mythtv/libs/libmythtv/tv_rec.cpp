@@ -38,6 +38,7 @@
 #include "mythdb.h"
 #include "tv_rec.h"
 #include "mythdate.h"
+#include "mythrandom.h"
 #include "osd.h"
 #include "../vboxutils.h"
 
@@ -113,6 +114,19 @@ bool TVRec::CreateChannel(const QString &startchannel,
             // VBOX presence failed, recorder is marked errored
             LOG(VB_GENERAL, LOG_ERR, LOC +
                 QString("CreateChannel(%1) failed due to VBOX not responding "
+                        "to network check on inputid [%2]")
+                .arg(startchannel).arg(m_inputId));
+            m_channel = nullptr;
+        }
+    }
+
+    if (m_genOpt.m_inputType == "SATIP")
+    {
+        if (!CardUtil::IsSatIPPresent(m_inputId))
+        {
+            // SatIP box presence failed, recorder is marked errored
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("CreateChannel(%1) failed due to SatIP box not responding "
                         "to network check on inputid [%2]")
                 .arg(startchannel).arg(m_inputId));
             m_channel = nullptr;
@@ -305,8 +319,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsle
         return;
 
     // We also need to check our input groups
-    vector<uint> inputids = CardUtil::GetConflictingInputs(
-        rcinfo->GetInputID());
+    std::vector<unsigned int> inputids = CardUtil::GetConflictingInputs(rcinfo->GetInputID());
 
     m_pendingRecordings[rcinfo->GetInputID()].m_possibleConflicts = inputids;
 
@@ -360,7 +373,7 @@ void TVRec::CancelNextRecording(bool cancel)
 
     if (cancel)
     {
-        vector<uint> &inputids = (*it).m_possibleConflicts;
+        std::vector<unsigned int> &inputids = (*it).m_possibleConflicts;
         for (uint inputid : inputids)
         {
             LOG(VB_RECORD, LOG_INFO, LOC +
@@ -473,13 +486,13 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
     {
         LOG(VB_RECORD, LOG_INFO, LOC +
             "Checking input group recorders - begin");
-        vector<uint> &inputids = pendinfo.m_possibleConflicts;
+        std::vector<unsigned int> &inputids = pendinfo.m_possibleConflicts;
 
         uint mplexid = 0;
         uint chanid = 0;
         uint sourceid = 0;
-        vector<uint> inputids2;
-        vector<TVState> states;
+        std::vector<unsigned int> inputids2;
+        std::vector<TVState> states;
 
         // Stop remote recordings if needed
         for (uint inputid : inputids)
@@ -1257,7 +1270,11 @@ static int num_inputs(void)
 static std::chrono::seconds eit_start_rand(uint inputId, std::chrono::seconds eitTransportTimeout)
 {
     // Randomize start time a bit
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
     auto timeout = std::chrono::seconds(MythRandom()) % (eitTransportTimeout.count() / 3);
+#else
+    auto timeout = std::chrono::seconds(MythRandom(0, eitTransportTimeout.count() / 3));
+#endif
 
     // Get the number of inputs and the position of the current input
     // to distribute the scan start evenly over eitTransportTimeout
@@ -1451,7 +1468,7 @@ void TVRec::run(void)
                 // a second tuner on a single card
                 s_inputsLock.lockForRead();
                 bool allow_eit = true;
-                vector<uint> inputids =
+                std::vector<unsigned int> inputids =
                     CardUtil::GetConflictingInputs(m_inputId);
                 InputInfo busy_input;
                 for (uint i = 0; i < inputids.size() && allow_eit; ++i)
@@ -2260,10 +2277,10 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
         QString(" AND capturecard.cardid != '%1'").arg(m_inputId),
     };
 
-    vector<uint>    fchanid;
-    vector<QString> fchannum;
-    vector<uint>    finputid;
-    vector<QString> fspacer;
+    std::vector<unsigned int>   fchanid;
+    std::vector<QString>        fchannum;
+    std::vector<unsigned int>   finputid;
+    std::vector<QString>        fspacer;
 
     for (const auto & str : inputquery)
     {

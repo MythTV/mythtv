@@ -24,29 +24,20 @@
 # ---------------------------------------------------
 # Roland Ernst
 # Changes implemented for MythTV:
-# - added python2 compatibility
+# - removed python2 compatibility
 #
 # ---------------------------------------------------
-
-
-from __future__ import unicode_literals
-
-# python 3 doesn't have a unicode type
-try:
-    unicode
-except:
-    unicode = str
 
 
 class Embed(object):
     def __init__(self, data):
         self.key = 'embed'
         self.value = None
-        if isinstance(data, unicode):
+        if isinstance(data, str):
             self.key = 'embed'
             self.value = data
         if isinstance(data, list) and len(data) > 0:
-            if all(isinstance(item, unicode) for item in data):
+            if all(isinstance(item, str) for item in data):
                 self.key = 'embed[]'
                 self.value = data
 

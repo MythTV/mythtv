@@ -6,8 +6,8 @@
 #include <QStringList>
 #include <QDateTime>
 
+#include <array>
 #include <vector>
-using std::vector;
 
 #include "mythexp.h"
 
@@ -16,7 +16,7 @@ class MythEvent;
 
 using system_load_array = std::array<double,3>;
 
-MPUBLIC vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
+MPUBLIC std::vector<ProgramInfo *> *RemoteGetRecordedList(int sort);
 MPUBLIC bool RemoteGetLoad(system_load_array &load);
 MPUBLIC bool RemoteGetUptime(std::chrono::seconds &uptime);
 MPUBLIC
@@ -28,12 +28,12 @@ MPUBLIC bool RemoteDeleteRecording( uint recordingID, bool forceMetadataDelete,
 MPUBLIC
 bool RemoteUndeleteRecording(uint recordingID);
 MPUBLIC
-void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);
+void RemoteGetAllScheduledRecordings(std::vector<ProgramInfo *> &scheduledlist);
 MPUBLIC
-void RemoteGetAllExpiringRecordings(vector<ProgramInfo *> &expiringlist);
-MPUBLIC uint RemoteGetRecordingList(vector<ProgramInfo *> &reclist,
+void RemoteGetAllExpiringRecordings(std::vector<ProgramInfo *> &expiringlist);
+MPUBLIC uint RemoteGetRecordingList(std::vector<ProgramInfo *> &reclist,
                                     QStringList &strList);
-MPUBLIC vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo);
+MPUBLIC std::vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewIfModified(
     const ProgramInfo &pginfo, const QString &cachefile);
@@ -45,7 +45,7 @@ MPUBLIC int RemoteGetRecordingMask(void);
 MPUBLIC int RemoteCheckForRecording(const ProgramInfo *pginfo);
 MPUBLIC int RemoteGetRecordingStatus(const ProgramInfo *pginfo, int overrecsecs,
                                      int underrecsecs);
-MPUBLIC vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
+MPUBLIC std::vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 
 MPUBLIC bool RemoteGetFileList(const QString& host, const QString& path, QStringList* list,
                        QString sgroup, bool fileNamesOnly = false);

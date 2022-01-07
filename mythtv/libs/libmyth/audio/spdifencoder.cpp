@@ -99,17 +99,24 @@ SPDIFEncoder::~SPDIFEncoder(void)
  */
 void SPDIFEncoder::WriteFrame(unsigned char *data, int size)
 {
-    AVPacket packet;
-    av_init_packet(&packet);
-    static int s_pts = 1; // to avoid warning "Encoder did not produce proper pts"
-    packet.pts     = s_pts++;
-    packet.data    = data;
-    packet.size    = size;
+    AVPacket *packet = av_packet_alloc();
+    if (packet == nullptr)
+    {
+        LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
+        return;
+    }
 
-    if (av_write_frame(m_oc, &packet) < 0)
+    static int s_pts = 1; // to avoid warning "Encoder did not produce proper pts"
+    packet->pts     = s_pts++;
+    packet->data    = data;
+    packet->size    = size;
+
+    if (av_write_frame(m_oc, packet) < 0)
     {
         LOG(VB_AUDIO, LOG_ERR, LOC + "av_write_frame");
     }
+
+    av_packet_free(&packet);
 }
 
 /**

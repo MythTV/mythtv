@@ -46,6 +46,7 @@ class SchedOptMixin
     MythUISpinBox    *m_endoffsetSpin   {nullptr};
     MythUIButtonList *m_dupmethodList   {nullptr};
     MythUIButtonList *m_dupscopeList    {nullptr};
+    MythUIButtonList *m_autoExtendList  {nullptr};
     MythUIButtonList *m_inputList       {nullptr};
     MythUICheckBox   *m_ruleactiveCheck {nullptr};
     MythUIButtonList *m_newrepeatList   {nullptr};

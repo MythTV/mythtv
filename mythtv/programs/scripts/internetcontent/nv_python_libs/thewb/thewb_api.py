@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: thewb_api - Simple-to-use Python interface to the The WB RSS feeds (http://www.thewb.com/)
 # Python Script
@@ -25,13 +25,14 @@ __version__="v0.1.3"
 # 0.1.2 Removed the need for python MythTV bindings and added "%SHAREDIR%" to icon directory path
 # 0.1.3 Fixes to accomodate changes to TheWB web site.
 
-import os, struct, sys, re, time, datetime, urllib
+import os, struct, sys, re, time, datetime, urllib.request, urllib.parse, urllib.error
 import logging
 from socket import gethostname, gethostbyname
 from threading import Thread
 from copy import deepcopy
 
-from thewb_exceptions import (TheWBUrlError, TheWBHttpError, TheWBRssError, TheWBVideoNotFound, TheWBConfigFileError, TheWBUrlDownloadError)
+from .thewb_exceptions import (TheWBUrlError, TheWBHttpError, TheWBRssError, TheWBVideoNotFound, TheWBConfigFileError, TheWBUrlDownloadError)
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -44,29 +45,23 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
+
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -78,7 +73,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -164,7 +159,7 @@ class Videos(object):
         self.common = common
         self.common.debug = debug   # Set the common function debug level
 
-        self.log_name = u'TheWB_Grabber'
+        self.log_name = 'TheWB_Grabber'
         self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
         self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
@@ -176,29 +171,29 @@ class Videos(object):
 
         self.config['search_all_languages'] = search_all_languages
 
-        self.error_messages = {'TheWBUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'TheWBHttpError': u"! Error: An HTTP communications error with The WB was raised (%s)\n", 'TheWBRssError': u"! Error: Invalid RSS meta data\nwas received from The WB error (%s). Skipping item.\n", 'TheWBVideoNotFound': u"! Error: Video search with The WB did not return any results (%s)\n", 'TheWBConfigFileError': u"! Error: thewb_config.xml file missing\nit should be located in and named as (%s).\n", 'TheWBUrlDownloadError': u"! Error: Downloading a RSS feed or Web page (%s).\n", }
+        self.error_messages = {'TheWBUrlError': "! Error: The URL (%s) cause the exception error (%s)\n", 'TheWBHttpError': "! Error: An HTTP communications error with The WB was raised (%s)\n", 'TheWBRssError': "! Error: Invalid RSS meta data\nwas received from The WB error (%s). Skipping item.\n", 'TheWBVideoNotFound': "! Error: Video search with The WB did not return any results (%s)\n", 'TheWBConfigFileError': "! Error: thewb_config.xml file missing\nit should be located in and named as (%s).\n", 'TheWBUrlDownloadError': "! Error: Downloading a RSS feed or Web page (%s).\n", }
 
         # Channel details and search results
-        self.channel = {'channel_title': u'The WB', 'channel_link': u'http://www.thewb.com/', 'channel_description': u"Watch full episodes of your favorite shows on The WB.com, like Friends, The O.C., Veronica Mars, Pushing Daisies, Smallville, Buffy The Vampire Slayer, One Tree Hill and Gilmore Girls.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'The WB', 'channel_link': 'http://www.thewb.com/', 'channel_description': "Watch full episodes of your favorite shows on The WB.com, like Friends, The O.C., Veronica Mars, Pushing Daisies, Smallville, Buffy The Vampire Slayer, One Tree Hill and Gilmore Girls.", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
 
         # Season and Episode detection regex patterns
         self.s_e_Patterns = [
             # Season 3: Ep. 13 (01:04:30)
-            re.compile(u'''Season\\ (?P<seasno>[0-9]+)\\:\\ Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<hours>[0-9]+)\\:(?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
+            re.compile('''Season\\ (?P<seasno>[0-9]+)\\:\\ Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<hours>[0-9]+)\\:(?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
             # Season 3: Ep. 13 (04:30)
-            re.compile(u'''Season\\ (?P<seasno>[0-9]+)\\:\\ Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
+            re.compile('''Season\\ (?P<seasno>[0-9]+)\\:\\ Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
             # Season 3: Ep. 13
-            re.compile(u'''Season\\ (?P<seasno>[0-9]+)\\:\\ Ep.\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''Season\\ (?P<seasno>[0-9]+)\\:\\ Ep.\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             # Ep. 13 (01:04:30)
-            re.compile(u'''Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<hours>[0-9]+)\\:(?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
+            re.compile('''Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<hours>[0-9]+)\\:(?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
             # Ep. 13 (04:30)
-            re.compile(u'''Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
+            re.compile('''Ep.\\ (?P<epno>[0-9]+)\\ \\((?P<minutes>[0-9]+)\\:(?P<seconds>[0-9]+).*$''', re.UNICODE),
             # Ep. 13
-            re.compile(u'''Ep.\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
+            re.compile('''Ep.\\ (?P<epno>[0-9]+).*$''', re.UNICODE),
             ]
 
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/thewb.png'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/thewb.png'
     # end __init__()
 
 ###########################################################################################################
@@ -226,16 +221,16 @@ class Videos(object):
         return nothing
         '''
         # Read the grabber thewb_config.xml configuration file
-        url = u'file://%s/nv_python_libs/configs/XML/thewb_config.xml' % (baseProcessingDir, )
+        url = 'file://%s/nv_python_libs/configs/XML/thewb_config.xml' % (baseProcessingDir, )
         if not os.path.isfile(url[7:]):
             raise TheWBConfigFileError(self.error_messages['TheWBConfigFileError'] % (url[7:], ))
 
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
         try:
             self.thewb_config = etree.parse(url)
-        except Exception, e:
+        except Exception as e:
             raise TheWBUrlError(self.error_messages['TheWBUrlError'] % (url, errormsg))
         return
     # end getTheWBConfig()
@@ -253,16 +248,16 @@ class Videos(object):
         # Check if the thewb.xml file exists
         userPreferenceFile = self.thewb_config.find('userPreferenceFile').text
         if userPreferenceFile[0] == '~':
-             self.thewb_config.find('userPreferenceFile').text = u"%s%s" % (os.path.expanduser(u"~"), userPreferenceFile[1:])
+             self.thewb_config.find('userPreferenceFile').text = "%s%s" % (os.path.expanduser("~"), userPreferenceFile[1:])
         if os.path.isfile(self.thewb_config.find('userPreferenceFile').text):
             # Read the grabber thewb_config.xml configuration file
-            url = u'file://%s' % (self.thewb_config.find('userPreferenceFile').text, )
+            url = 'file://%s' % (self.thewb_config.find('userPreferenceFile').text, )
             if self.config['debug_enabled']:
-                print url
-                print
+                print(url)
+                print()
             try:
                 self.userPrefs = etree.parse(url)
-            except Exception, e:
+            except Exception as e:
                 raise TheWBUrlError(self.error_messages['TheWBUrlError'] % (url, errormsg))
             # Check if the thewb.xml file is too old
             nextUpdateSecs = int(self.userPrefs.find('updateDuration').text)*86400 # seconds in a day
@@ -284,26 +279,26 @@ class Videos(object):
         return nothing
         '''
         # Read the default user preferences file
-        url = u'file://%s/nv_python_libs/configs/XML/defaultUserPrefs/thewb.xml' % (baseProcessingDir, )
+        url = 'file://%s/nv_python_libs/configs/XML/defaultUserPrefs/thewb.xml' % (baseProcessingDir, )
         if not os.path.isfile(url[7:]):
             raise TheWBConfigFileError(self.error_messages['TheWBConfigFileError'] % (url[7:], ))
 
         if self.config['debug_enabled']:
-            print 'updateTheWB url(%s)' % url
-            print
+            print('updateTheWB url(%s)' % url)
+            print()
         try:
             userTheWB = etree.parse(url)
-        except Exception, e:
+        except Exception as e:
             raise TheWBUrlError(self.error_messages['TheWBUrlError'] % (url, errormsg))
 
         # Get the current show links from the TheWB web site
         linksTree = self.common.getUrlData(self.thewb_config.find('treeviewUrls'))
 
         if self.config['debug_enabled']:
-            print "create(%s)" % create
-            print "linksTree:"
+            print("create(%s)" % create)
+            print("linksTree:")
             sys.stdout.write(etree.tostring(linksTree, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Check that at least several show directories were returned
         if not create:
@@ -311,25 +306,25 @@ class Videos(object):
                 return self.userPrefs
 
         # Assemble the feeds and formats
-        root = etree.XML(u'<xml></xml>')
+        root = etree.XML('<xml></xml>')
         for directory in linksTree.xpath('//results'):
-            tmpDirectory = etree.SubElement(root, u'showDirectories')
+            tmpDirectory = etree.SubElement(root, 'showDirectories')
             tmpDirectory.attrib['name'] = directory.find('name').text
             for show in directory.xpath('.//a'):
                 showName = show.text
                 # Skip any DVD references as they are not on-line videos
                 if showName.lower().find('dvd') != -1 or show.attrib['href'].lower().find('dvd') != -1:
                     continue
-                tmpShow = etree.XML(u'<url></url>')
-                tmpShow.attrib['enabled'] = u'true'
+                tmpShow = etree.XML('<url></url>')
+                tmpShow.attrib['enabled'] = 'true'
                 tmpShow.attrib['name'] = self.common.massageText(showName.strip())
-                tmpShow.text = self.common.ampReplace(show.attrib['href'].replace(u'/shows/', u'').replace(u'/', u'').strip())
+                tmpShow.text = self.common.ampReplace(show.attrib['href'].replace('/shows/', '').replace('/', '').strip())
                 tmpDirectory.append(tmpShow)
 
         if self.config['debug_enabled']:
-            print "Before any merging userTheWB:"
+            print("Before any merging userTheWB:")
             sys.stdout.write(etree.tostring(userTheWB, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # If there was an existing thewb.xml file then add any relevant user settings to
         # this new thewb.xml
@@ -340,27 +335,27 @@ class Videos(object):
             for rss in self.userPrefs.xpath("//url[@enabled='false']"):
                 elements = root.xpath("//url[text()=$URL]", URL=rss.text.strip())
                 if len(elements):
-                    elements[0].attrib['enabled'] = u'false'
+                    elements[0].attrib['enabled'] = 'false'
                     if rss.get('max'):
                         elements[0].attrib['max'] = rss.attrib['max']
 
         if self.config['debug_enabled']:
-            print "After any merging userTheWB:"
+            print("After any merging userTheWB:")
             sys.stdout.write(etree.tostring(userTheWB, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Save the thewb.xml file
-        prefDir = self.thewb_config.find('userPreferenceFile').text.replace(u'/thewb.xml', u'')
+        prefDir = self.thewb_config.find('userPreferenceFile').text.replace('/thewb.xml', '')
         if not os.path.isdir(prefDir):
             os.makedirs(prefDir)
         fd = open(self.thewb_config.find('userPreferenceFile').text, 'w')
-        fd.write(etree.tostring(userTheWB, encoding='UTF-8', pretty_print=True)[:-len(u'</userTheWB>')-1]+u''.join(etree.tostring(element, encoding='UTF-8', pretty_print=True) for element in root.xpath('/xml/*'))+u'</userTheWB>')
+        fd.write(etree.tostring(userTheWB, encoding='UTF-8', pretty_print=True)[:-len('</userTheWB>')-1]+''.join(etree.tostring(element, encoding='UTF-8', pretty_print=True) for element in root.xpath('/xml/*'))+'</userTheWB>')
         fd.close()
 
         # Input the refreshed user preference data
         try:
             self.userPrefs = etree.parse(self.thewb_config.find('userPreferenceFile').text)
-        except Exception, e:
+        except Exception as e:
             raise TheWBUrlError(self.error_messages['TheWBUrlError'] % (url, errormsg))
         return
     # end updateTheWB()
@@ -380,41 +375,41 @@ class Videos(object):
         orgURL = self.thewb_config.find('searchURLS').xpath(".//href")[0].text
 
         try:
-            searchVar = u'?q=%s' % (urllib.quote(title.encode("utf-8")).replace(u' ', u'+'))
+            searchVar = '?q=%s' % (urllib.parse.quote(title.encode("utf-8")).replace(' ', '+'))
         except UnicodeDecodeError:
-            searchVar = u'?q=%s' % (urllib.quote(title).replace(u' ', u'+'))
+            searchVar = '?q=%s' % (urllib.parse.quote(title).replace(' ', '+'))
         url = self.thewb_config.find('searchURLS').xpath(".//href")[0].text+searchVar
 
         if self.config['debug_enabled']:
-            print "Search url(%s)" % url
-            print
+            print("Search url(%s)" % url)
+            print()
 
         self.thewb_config.find('searchURLS').xpath(".//href")[0].text = url
 
         # Perform a search
         try:
             resultTree = self.common.getUrlData(self.thewb_config.find('searchURLS'), pageFilter=None)
-        except Exception, errormsg:
+        except Exception as errormsg:
             self.thewb_config.find('searchURLS').xpath(".//href")[0].text = orgURL
             raise TheWBUrlDownloadError(self.error_messages['TheWBUrlDownloadError'] % (errormsg))
 
         self.thewb_config.find('searchURLS').xpath(".//href")[0].text = orgURL
 
         if self.config['debug_enabled']:
-            print "resultTree count(%s)" % len(resultTree)
-            print etree.tostring(resultTree, encoding='UTF-8', pretty_print=True)
-            print
+            print("resultTree count(%s)" % len(resultTree))
+            print(etree.tostring(resultTree, encoding='UTF-8', pretty_print=True))
+            print()
 
         if resultTree is None:
             if ignoreError:
                 return [None, None]
-            raise TheWBVideoNotFound(u"No TheWB.com Video matches found for search value (%s)" % title)
+            raise TheWBVideoNotFound("No TheWB.com Video matches found for search value (%s)" % title)
 
         searchResults = resultTree.xpath('//result/div')
         if not len(searchResults):
             if ignoreError:
                 return [None, None]
-            raise TheWBVideoNotFound(u"No TheWB.com Video matches found for search value (%s)" % title)
+            raise TheWBVideoNotFound("No TheWB.com Video matches found for search value (%s)" % title)
 
         # Set the number of search results returned
         self.channel['channel_numresults'] = len(searchResults)
@@ -436,41 +431,41 @@ class Videos(object):
             if linkFilter(result) is not None:   # Make sure that this result actually has a video
                 thewbItem = etree.XML(self.common.mnvItem)
                 # These videos are only viewable in the US so add a country indicator
-                etree.SubElement(thewbItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = u'us'
+                etree.SubElement(thewbItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = 'us'
                 # Extract and massage data
                 thumbNail = self.common.ampReplace(thumbNailFilter(result)[0].attrib['src'])
                 title = titleFilter(result)[0].strip()
-                link = u'file://%s/nv_python_libs/configs/HTML/thewb.html?videocode=%s' % (baseProcessingDir, result.attrib['id'].replace(u'video_', u''))
+                link = 'file://%s/nv_python_libs/configs/HTML/thewb.html?videocode=%s' % (baseProcessingDir, result.attrib['id'].replace('video_', ''))
                 etree.SubElement(thewbItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
                 descriptionElement = textFilter(result)[0]
-                description = u''
+                description = ''
                 tmptitle = None
                 seasonNum = None
                 episodeNum = None
                 for e in descriptionElement.xpath('./*'):
                     try:
-                        eText = unicode(e.tail, 'UTF-8').strip()
+                        eText = str(e.tail, 'UTF-8').strip()
                     except:
                         continue
-                    if eText.startswith(u'Season ') or eText.startswith(u'EP'):
+                    if eText.startswith('Season ') or eText.startswith('EP'):
                         sed = self.getSeasonEpisode(eText)
                         if not len(sed):
                             continue
-                        infoList =  u'S%02dE%02d' % (int(sed[0]), int(sed[1]))
-                        seasonNum = u'%d' % int(sed[0])
-                        episodeNum = u'%d' % int(sed[1])
+                        infoList =  'S%02dE%02d' % (int(sed[0]), int(sed[1]))
+                        seasonNum = '%d' % int(sed[0])
+                        episodeNum = '%d' % int(sed[1])
                         if len(sed) == 5:
                             videoSeconds = int(sed[2])*3600+int(sed[3])*60+int(sed[4])
-                            itemDwnLink(thewbItem)[0].attrib['duration'] = unicode(videoSeconds)
+                            itemDwnLink(thewbItem)[0].attrib['duration'] = str(videoSeconds)
                         elif len(sed) == 4:
                             videoSeconds = int(sed[2])*60+int(sed[3])
-                            itemDwnLink(thewbItem)[0].attrib['duration'] = unicode(videoSeconds)
+                            itemDwnLink(thewbItem)[0].attrib['duration'] = str(videoSeconds)
 
-                        index = title.find(u':')
+                        index = title.find(':')
                         if index != -1:
-                            tmptitle = u'%s: %s %s' % (title[:index].strip(), infoList, title[index+1:].strip())
+                            tmptitle = '%s: %s %s' % (title[:index].strip(), infoList, title[index+1:].strip())
                         else:
-                            tmptitle = u'%s: %s' % (title.strip(), infoList)
+                            tmptitle = '%s: %s' % (title.strip(), infoList)
                 if tmptitle:
                     title = tmptitle
                 title = self.common.massageText(title.strip())
@@ -490,10 +485,10 @@ class Videos(object):
                     etree.SubElement(thewbItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = episodeNum
                 itemDict[title.lower()] = thewbItem
 
-        if not len(itemDict.keys()):
+        if not len(list(itemDict.keys())):
             if ignoreError:
                 return [None, None]
-            raise TheWBVideoNotFound(u"No TheWB Video matches found for search value (%s)" % title)
+            raise TheWBVideoNotFound("No TheWB Video matches found for search value (%s)" % title)
 
         return [itemDict, resultTree.xpath('//pageInfo')[0].text]
         # end searchTitle()
@@ -506,9 +501,9 @@ class Videos(object):
         self.getTheWBConfig()
 
         if self.config['debug_enabled']:
-            print "self.thewb_config:"
+            print("self.thewb_config:")
             sys.stdout.write(etree.tostring(self.thewb_config, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Easier for debugging
 #        print self.searchTitle(title, pagenumber, self.page_limit)
@@ -517,27 +512,27 @@ class Videos(object):
 
         try:
             data = self.searchTitle(title, pagenumber, self.page_limit)
-        except TheWBVideoNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+        except TheWBVideoNotFound as msg:
+            sys.stderr.write("%s\n" % msg)
             sys.exit(0)
-        except TheWBUrlError, msg:
-            sys.stderr.write(u'%s\n' % msg)
+        except TheWBUrlError as msg:
+            sys.stderr.write('%s\n' % msg)
             sys.exit(1)
-        except TheWBHttpError, msg:
+        except TheWBHttpError as msg:
             sys.stderr.write(self.error_messages['TheWBHttpError'] % msg)
             sys.exit(1)
-        except TheWBRssError, msg:
+        except TheWBRssError as msg:
             sys.stderr.write(self.error_messages['TheWBRssError'] % msg)
             sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Set the paging values
-        itemCount = len(data[0].keys())
+        itemCount = len(list(data[0].keys()))
         if data[1] == 'true':
             self.channel['channel_returned'] = itemCount
             self.channel['channel_startindex'] = itemCount
@@ -559,7 +554,7 @@ class Videos(object):
                 lastKey = key
 
         # Output the MNV search results
-        sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+        sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
         sys.exit(0)
     # end searchForVideos()
@@ -571,8 +566,8 @@ class Videos(object):
         # Get the user preferences that specify which shows and formats they want to be in the treeview
         try:
             self.getUserPreferences()
-        except Exception, e:
-            sys.stderr.write(u'%s\n' % e)
+        except Exception as e:
+            sys.stderr.write('%s\n' % e)
             sys.exit(1)
 
         # Verify that there is at least one RSS feed that user wants to download
@@ -580,19 +575,19 @@ class Videos(object):
         totalFeeds = self.userPrefs.xpath("//url[@enabled='true']")
 
         if self.config['debug_enabled']:
-            print "self.userPrefs show count(%s) total feed count(%s):" % (len(showFeeds), len(totalFeeds))
+            print("self.userPrefs show count(%s) total feed count(%s):" % (len(showFeeds), len(totalFeeds)))
             sys.stdout.write(etree.tostring(self.userPrefs, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         if not len(totalFeeds):
-            sys.stderr.write(u'There are no show or treeviewURLS elements "enabled" in your "thewb.xml" user preferences\nfile (%s)\n' % self.thewb_config.find('userPreferenceFile').text)
+            sys.stderr.write('There are no show or treeviewURLS elements "enabled" in your "thewb.xml" user preferences\nfile (%s)\n' % self.thewb_config.find('userPreferenceFile').text)
             sys.exit(1)
 
         # Massage channel icon
         self.channel_icon = self.common.ampReplace(self.channel_icon)
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Add the Channel element tree
         channelTree = self.common.mnvChannelElement(self.channel)
@@ -606,73 +601,73 @@ class Videos(object):
                     data = self.searchTitle(searchDetails.text.strip(), 1, self.page_limit, ignoreError=True)
                     if data[0] is None:
                     	continue
-                except TheWBVideoNotFound, msg:
-                    sys.stderr.write(u"%s\n" % msg)
+                except TheWBVideoNotFound as msg:
+                    sys.stderr.write("%s\n" % msg)
                     continue
-                except TheWBUrlError, msg:
-                    sys.stderr.write(u'%s\n' % msg)
+                except TheWBUrlError as msg:
+                    sys.stderr.write('%s\n' % msg)
                     continue
-                except TheWBHttpError, msg:
+                except TheWBHttpError as msg:
                     sys.stderr.write(self.error_messages['TheWBHttpError'] % msg)
                     continue
-                except TheWBRssError, msg:
+                except TheWBRssError as msg:
                     sys.stderr.write(self.error_messages['TheWBRssError'] % msg)
                     continue
-                except Exception, e:
-                    sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (searchDetails.text.strip(), e))
+                except Exception as e:
+                    sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (searchDetails.text.strip(), e))
                     continue
                 data.append(searchDetails.attrib['name'])
                 showItems[self.common.massageText(searchDetails.text.strip())] = data
                 continue
 
         if self.config['debug_enabled']:
-            print "After searches count(%s):" % len(showItems)
-            for key in showItems.keys():
-                print "Show(%s) name(%s) item count(%s)" % (key, showItems[key][2], len(showItems[key][0]))
-            print
+            print("After searches count(%s):" % len(showItems))
+            for key in list(showItems.keys()):
+                print("Show(%s) name(%s) item count(%s)" % (key, showItems[key][2], len(showItems[key][0])))
+            print()
 
         # Filter out any items that are not specifically for the show
-        for showNameKey in showItems.keys():
+        for showNameKey in list(showItems.keys()):
             tmpList = {}
-            for key in showItems[showNameKey][0].keys():
-                tmpLink = showItems[showNameKey][0][key].find('link').text.replace(self.thewb_config.find('searchURLS').xpath(".//href")[0].text, u'')
+            for key in list(showItems[showNameKey][0].keys()):
+                tmpLink = showItems[showNameKey][0][key].find('link').text.replace(self.thewb_config.find('searchURLS').xpath(".//href")[0].text, '')
                 if tmpLink.startswith(showNameKey):
                     tmpList[key] = showItems[showNameKey][0][key]
             showItems[showNameKey][0] = tmpList
 
         if self.config['debug_enabled']:
-            print "After search filter of non-show items count(%s):" % len(showItems)
-            for key in showItems.keys():
-                print "Show(%s) name(%s) item count(%s)" % (key, showItems[key][2], len(showItems[key][0]))
-            print
+            print("After search filter of non-show items count(%s):" % len(showItems))
+            for key in list(showItems.keys()):
+                print("Show(%s) name(%s) item count(%s)" % (key, showItems[key][2], len(showItems[key][0])))
+            print()
 
         # Create a structure of feeds that concurrently have videos
-        rssData = etree.XML(u'<xml></xml>')
-        rssFeedsUrl = u'http://www.thewb.com/shows/feed/'
+        rssData = etree.XML('<xml></xml>')
+        rssFeedsUrl = 'http://www.thewb.com/shows/feed/'
         for feedType in self.userPrefs.findall('showDirectories'):
             for rssFeed in self.userPrefs.xpath("//showDirectories/url[@enabled='true']"):
                 link = rssFeedsUrl+rssFeed.text
                 urlName = rssFeed.attrib.get('name')
                 if urlName:
-                     uniqueName = u'%s;%s' % (urlName, link)
+                     uniqueName = '%s;%s' % (urlName, link)
                 else:
-                    uniqueName = u'RSS;%s' % (link)
-                url = etree.XML(u'<url></url>')
+                    uniqueName = 'RSS;%s' % (link)
+                url = etree.XML('<url></url>')
                 etree.SubElement(url, "name").text = uniqueName
                 etree.SubElement(url, "href").text = link
-                etree.SubElement(url, "filter").text = u"//channel/title"
-                etree.SubElement(url, "filter").text = u"//item"
-                etree.SubElement(url, "parserType").text = u'xml'
+                etree.SubElement(url, "filter").text = "//channel/title"
+                etree.SubElement(url, "filter").text = "//item"
+                etree.SubElement(url, "parserType").text = 'xml'
                 rssData.append(url)
 
         if self.config['debug_enabled']:
-            print "rssData:"
+            print("rssData:")
             sys.stdout.write(etree.tostring(rssData, encoding='UTF-8', pretty_print=True))
-            print
+            print()
 
         # Get the RSS Feed data
-        self.channelLanguage = u'en'
-        self.itemAuthor = u'The WB.com'
+        self.channelLanguage = 'en'
+        self.itemAuthor = 'The WB.com'
         self.itemFilter = etree.XPath('.//item', namespaces=self.common.namespaces)
         self.titleFilter = etree.XPath('.//title', namespaces=self.common.namespaces)
         self.linkFilter = etree.XPath('.//link', namespaces=self.common.namespaces)
@@ -688,23 +683,23 @@ class Videos(object):
         if rssData.find('url') is not None:
             try:
                 resultTree = self.common.getUrlData(rssData)
-            except Exception, errormsg:
+            except Exception as errormsg:
                 raise TheWBUrlDownloadError(self.error_messages['TheWBUrlDownloadError'] % (errormsg))
 
             if self.config['debug_enabled']:
-                print "resultTree:"
+                print("resultTree:")
                 sys.stdout.write(etree.tostring(resultTree, encoding='UTF-8', pretty_print=True))
-                print
+                print()
 
             # Process each directory of the user preferences that have an enabled rss feed
             for result in resultTree.findall('results'):
-                names = result.find('name').text.split(u';')
+                names = result.find('name').text.split(';')
                 names[0] = self.common.massageText(names[0])
                 if names[0] == 'RSS':
                     names[0] = self.common.massageText(self.rssName(result.find('result'))[0].text.strip())
                     urlName = names[0]
                 else:
-                    urlName = result.find('url').text.replace(rssFeedsUrl, u'').strip()
+                    urlName = result.find('url').text.replace(rssFeedsUrl, '').strip()
 
                 urlMax = None
                 url = self.feedFilter(self.userPrefs, url=names[1])
@@ -722,8 +717,8 @@ class Videos(object):
                     if urlMax == 0:
                         urlMax = None
                 if self.config['debug_enabled']:
-                    print "Results: #Items(%s) for (%s)" % (len(self.itemFilter(result)), names)
-                    print
+                    print("Results: #Items(%s) for (%s)" % (len(self.itemFilter(result)), names))
+                    print()
                 self.createItems(showItems, result, urlName, names[0], urlMax=urlMax)
                 continue
 
@@ -732,26 +727,26 @@ class Videos(object):
             if not len(showItems[key][0]):
                 continue
             # Create a new directory and/or subdirectory if required
-            directoryElement = etree.SubElement(channelTree, u'directory')
+            directoryElement = etree.SubElement(channelTree, 'directory')
             directoryElement.attrib['name'] = showItems[key][2]
             directoryElement.attrib['thumbnail'] = self.channel_icon
 
             if self.config['debug_enabled']:
-                print "Results: #Items(%s) for (%s)" % (len(showItems[key][0]), showItems[key][2])
-                print
+                print("Results: #Items(%s) for (%s)" % (len(showItems[key][0]), showItems[key][2]))
+                print()
 
             # Copy all the items into the MNV RSS directory
             for itemKey in sorted(showItems[key][0].keys()):
                 directoryElement.append(showItems[key][0][itemKey])
 
         if self.config['debug_enabled']:
-            print "Final results: #Items(%s)" % len(rssTree.xpath('//item'))
-            print
+            print("Final results: #Items(%s)" % len(rssTree.xpath('//item')))
+            print()
 
         # Check that there was at least some items
         if len(rssTree.xpath('//item')):
             # Output the MNV search results
-            sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+            sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
 
         sys.exit(0)
@@ -764,7 +759,7 @@ class Videos(object):
         return nothing as the show item dictionary will have all the results
         '''
         # Initalize show if it has not already had a search result
-        if not urlName in showItems.keys():
+        if not urlName in list(showItems.keys()):
             showItems[urlName] = [{}, None, showName]
 
         # Convert each RSS item into a MNV item
@@ -772,10 +767,10 @@ class Videos(object):
         for thewbItem in self.itemFilter(result):
             newItem = etree.XML(self.common.mnvItem)
             # These videos are only viewable in the US so add a country indicator
-            etree.SubElement(newItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = u'us'
+            etree.SubElement(newItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = 'us'
             # Extract and massage data
             tmpLink = self.linkFilter(thewbItem)[0].text.strip()
-            link = self.common.ampReplace(u'file://%s/nv_python_libs/configs/HTML/thewb.html?videocode=%s' % (baseProcessingDir, tmpLink[tmpLink.rfind(u'/')+1:]))
+            link = self.common.ampReplace('file://%s/nv_python_libs/configs/HTML/thewb.html?videocode=%s' % (baseProcessingDir, tmpLink[tmpLink.rfind('/')+1:]))
             etree.SubElement(newItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
             # Convert the pubDate '2010-05-02T11:23:25-07:00' to a MNV pubdate format
             pubdate = self.pubdateFilter(thewbItem)
@@ -799,24 +794,24 @@ class Videos(object):
                     description = eText
                     continue
                 try:
-                    if eText.startswith(u'Season: ') or eText.startswith(u'EP: '):
-                        s_e = eText.replace(u'Season:',u'').replace(u', Episode:',u'').replace(u'EP:',u'').strip().split(u' ')
+                    if eText.startswith('Season: ') or eText.startswith('EP: '):
+                        s_e = eText.replace('Season:','').replace(', Episode:','').replace('EP:','').strip().split(' ')
                         if len(s_e) == 1 and can_int(s_e[0].strip()):
-                            eText = u'Ep(%02d)' % int(s_e[0].strip())
+                            eText = 'Ep(%02d)' % int(s_e[0].strip())
                             episodeNum = s_e[0].strip()
                         elif len(s_e) == 2 and can_int(s_e[0].strip()) and can_int(s_e[1].strip()):
-                            eText = u'S%02dE%02d' % (int(s_e[0].strip()), int(s_e[1].strip()))
+                            eText = 'S%02dE%02d' % (int(s_e[0].strip()), int(s_e[1].strip()))
                             seasonNum = s_e[0].strip()
                             episodeNum = s_e[1].strip()
-                        title = title.replace(u'-', u'–')
-                        index = title.find(u'–')
+                        title = title.replace('-', '–')
+                        index = title.find('–')
                         if index != -1:
-                            tmptitle = u'%s: %s %s' % (title[:index].strip(), eText.strip(), title[index:].strip())
+                            tmptitle = '%s: %s %s' % (title[:index].strip(), eText.strip(), title[index:].strip())
                         else:
-                            tmptitle = u'%s %s' % (title, eText.strip())
+                            tmptitle = '%s %s' % (title, eText.strip())
                         continue
-                    elif eText.startswith(u'Running Time: '):
-                        videoDuration = eText.replace(u'Running Time: ', u'').strip().split(u':')
+                    elif eText.startswith('Running Time: '):
+                        videoDuration = eText.replace('Running Time: ', '').strip().split(':')
                         if not len(videoDuration):
                             continue
                         videoSeconds = False
@@ -828,7 +823,7 @@ class Videos(object):
                             elif len(videoDuration) == 3:
                                 videoSeconds = int(videoDuration[0])*3600+int(videoDuration[1])*60+int(videoDuration[2])
                             if videoSeconds:
-                                self.itemDwnLink(newItem)[0].attrib['duration'] = unicode(videoSeconds)
+                                self.itemDwnLink(newItem)[0].attrib['duration'] = str(videoSeconds)
                         except:
                             pass
                 except UnicodeDecodeError:

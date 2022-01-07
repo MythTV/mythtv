@@ -26,11 +26,17 @@ using_backend {
     !win32-msvc*:SUBDIRS += scripts
     !mingw:!win32-msvc*: SUBDIRS += mythfilerecorder
     !mingw:!win32-msvc*: SUBDIRS += mythexternrecorder
+
+    # unit tests mythbackend
+    mythbackend-test.depends = sub-mythbackend
+    mythbackend-test.target = buildtestmythbackend
+    mythbackend-test.commands = cd mythbackend/test && $(QMAKE) && $(MAKE)
+    unix:QMAKE_EXTRA_TARGETS += mythbackend-test
 }
 
 using_mythtranscode: SUBDIRS += mythtranscode
 
-unittest.depends = mythfrontend-test
+unittest.depends = mythfrontend-test mythbackend-test
 unittest.target = test
 unittest.commands = scripts/unittests.sh
 unix:QMAKE_EXTRA_TARGETS += unittest

@@ -25,8 +25,10 @@
 #include "mmulticastsocketdevice.h"
 #include "mythlogging.h"
 #include "mythversion.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 #include "upnp.h"
+#include "mythcorecontext.h"
+#include "configuration.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -45,7 +47,7 @@ UPnpNotifyTask::UPnpNotifyTask( int nServicePort ) :
 {
     m_nServicePort = nServicePort;
 
-    m_nMaxAge      = UPnp::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
+    m_nMaxAge      = MythCoreContext::GetConfiguration()->GetDuration<std::chrono::seconds>( "UPnP/SSDP/MaxAge" , 1h );
 } 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -124,9 +126,16 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
 
         pSocket->writeBlock( scPacket, scPacket.length(),
                              pSocket->address(), pSocket->port() );
-        std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom() % 250));
-        pSocket->writeBlock( scPacket, scPacket.length(),
-                             pSocket->address(), pSocket->port() );
+        if (m_eNTS != NTS_byebye)
+        {
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom() % 250));
+#else
+            std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
+#endif
+            pSocket->writeBlock( scPacket, scPacket.length(),
+                                pSocket->address(), pSocket->port() );
+        }
     }
 }
 

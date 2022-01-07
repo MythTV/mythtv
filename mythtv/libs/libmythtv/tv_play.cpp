@@ -23,6 +23,7 @@
 #include "compat.h"
 #include "mythdirs.h"
 #include "mythmedia.h"
+#include "mythdate.h"
 
 // libmyth
 #include "programinfo.h"
@@ -67,17 +68,12 @@
 
 // Std
 #include <algorithm>
-#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <cstdarg>
 #include <cstdint>
 #include <cstdlib>
 #include <thread>
-
-#if ! HAVE_ROUND
-#define round(x) ((int) ((x) + 0.5))
-#endif
 
 #define DEBUG_CHANNEL_PREFIX 0 /**< set to 1 to debug channel prefixing */
 #define DEBUG_ACTIONS        0 /**< set to 1 to debug actions           */
@@ -956,7 +952,7 @@ class TV::SleepTimerInfo
     std::chrono::milliseconds milliseconds;
 };
 
-const vector<TV::SleepTimerInfo> TV::s_sleepTimes =
+const std::vector<TV::SleepTimerInfo> TV::s_sleepTimes =
 {
     { tr("Off",   "Sleep timer"),   0min },
     { tr("30m",   "Sleep timer"),  30min },
@@ -1664,7 +1660,7 @@ void TV::ShowOSDAskAllow()
     {
         // get the currently used input on our card
         bool busy_input_grps_loaded = false;
-        vector<uint> busy_input_grps;
+        std::vector<uint> busy_input_grps;
         InputInfo busy_input;
         RemoteIsBusy(cardid, busy_input);
 
@@ -1684,7 +1680,7 @@ void TV::ShowOSDAskAllow()
                 busy_input_grps_loaded = true;
             }
 
-            vector<uint> input_grps =
+            std::vector<uint> input_grps =
                 CardUtil::GetInputGroups((*it).m_info->GetInputID());
 
             for (uint grp : input_grps)
@@ -6645,7 +6641,7 @@ void TV::ShowLCDDVDInfo()
         int totalParts = dvd->NumPartsInTitle();
 
         mainStatus = tr("Title: %1 (%2)").arg(playingTitle)
-            .arg(MythFormatTime(dvd->GetTotalTimeOfTitle(), "HH:mm"));
+            .arg(MythDate::formatTime(dvd->GetTotalTimeOfTitle(), "HH:mm"));
         subStatus = tr("Chapter: %1/%2").arg(playingPart).arg(totalParts);
     }
     if ((dvdName != m_lcdCallsign) || (mainStatus != m_lcdTitle) || (subStatus != m_lcdSubtitle))
@@ -8705,7 +8701,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDi
             {
                 QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
                 QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
-                QString timestr = MythFormatTime(m_tvmChapterTimes[i], "HH:mm:ss");
+                QString timestr = MythDate::formatTime(m_tvmChapterTimes[i], "HH:mm:ss");
                 QString desc = chapter1 + QString(" (%1)").arg(timestr);
                 QString action = prefix + chapter2;
                 active = (m_tvmCurrentChapter == (i + 1));
@@ -9079,7 +9075,7 @@ void TV::PlaybackMenuInit(const MythTVMenu &Menu)
 
     m_tvmFillAutoDetect    = false;
 
-    m_tvmSpeedX100         = static_cast<int>(round(m_playerContext.m_tsNormal * 100));
+    m_tvmSpeedX100         = std::lroundf(m_playerContext.m_tsNormal * 100);
     m_tvmState             = m_playerContext.GetState();
     m_tvmIsRecording       = (m_tvmState == kState_WatchingRecording);
     m_tvmIsRecorded        = (m_tvmState == kState_WatchingPreRecorded);

@@ -11,27 +11,19 @@ from .tmdb_exceptions import *
 from .locales import get_locale
 from .cache import Cache
 
-# supports python2 and python3
-try:
-    from urllib  import urlencode
-    from urllib2 import Request   as _py23Request
-    from urllib2 import urlopen   as _py23urlopen
-    from urllib2 import HTTPError as _py23HTTPError
-
-except (NameError, ImportError):
-    from urllib.parse   import urlencode
-    from urllib.request import Request   as _py23Request
-    from urllib.request import urlopen   as _py23urlopen
-    from urllib.error   import HTTPError as _py23HTTPError
-    import urllib.error
-    import urllib.parse
+from urllib.parse   import urlencode
+from urllib.request import Request   as _py3Request
+from urllib.request import urlopen   as _py3urlopen
+from urllib.error   import HTTPError as _py3HTTPError
+import urllib.error
+import urllib.parse
 
 import json
 import os
 import time
 
 DEBUG = False
-cache = Cache(filename='pytmdb3.cache')  # split cache file into py2 and py3 ?
+cache = Cache(filename='pytmdb3.cache')
 
 #DEBUG = True
 #cache = Cache(engine='null')
@@ -56,7 +48,7 @@ def set_cache(engine=None, *args, **kwargs):
     cache.configure(engine, *args, **kwargs)
 
 
-class Request(_py23Request):
+class Request(_py3Request):
     _api_key = None
     _base_url = "http://api.themoviedb.org/3/"
 
@@ -84,7 +76,7 @@ class Request(_py23Request):
         url = '{0}{1}?{2}'\
                 .format(self._base_url, self._url, urlencode(kwargs))
 
-        _py23Request.__init__(self, url)
+        _py3Request.__init__(self, url)
         self.add_header('Accept', 'application/json')
         self.lifetime = 3600  # 1hr
 
@@ -105,7 +97,7 @@ class Request(_py23Request):
 
     def add_data(self, data):
         """Provide data to be sent with POST."""
-        _py23Request.data = (self, urllib.parse.urlencode(data))
+        _py3Request.data = (self, urllib.parse.urlencode(data))
 
     def open(self):
         """Open a file object to the specified URL."""
@@ -114,15 +106,15 @@ class Request(_py23Request):
                 print('loading '+self.get_full_url())
                 if self.data:
                     print('  '+self.data)
-            return _py23urlopen(self)
-        except _py23HTTPError as e:
+            return _py3urlopen(self)
+        except _py3HTTPError as e:
             raise TMDBHTTPError(e)
 
     def read(self):
         """Return result from specified URL as a string."""
         return self.open().read()
 
-    @cache.cached(_py23Request.get_full_url)
+    @cache.cached(_py3Request.get_full_url)
     def readJSON(self):
         """Parse result from specified URL as JSON data."""
         url = self.get_full_url()

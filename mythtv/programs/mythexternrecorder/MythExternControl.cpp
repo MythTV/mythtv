@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QTextStream>
 
+#include <array>
 #include <unistd.h>
 #include <poll.h>
 

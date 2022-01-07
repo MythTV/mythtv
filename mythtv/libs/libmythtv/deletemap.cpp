@@ -8,7 +8,7 @@
 #include "mythplayer.h"
 #include "programinfo.h"
 #include "mythcorecontext.h"            // for MythCoreContext, etc
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "mythtypes.h"                  // for InfoMap
 #include "mythuiactions.h"              // for ACTION_DOWN, ACTION_UP
 #include "playercontext.h"              // for PlayerContext
@@ -167,7 +167,7 @@ QString DeleteMap::CreateTimeString(uint64_t frame, bool use_cutlist,
     QString fmt = (ms >= 1h) ? "H:mm:ss" : "mm:ss";
     if (full_resolution)
         fmt += ".zzz";
-    return MythFormatTime(ms, fmt);
+    return MythDate::formatTime(ms, fmt);
 }
 
  /**

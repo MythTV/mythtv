@@ -1710,7 +1710,7 @@
         </buttonlist>
 
         <spinbox name="startoffset" from="basewidespinbox">
-            <area>70,300,660,40</area>
+            <area>70,300,325,40</area>
             <template type="negative">Start recording %n minute(s) late</template>
             <template type="zero">Start recording on time</template>
             <template type="positive">Start recording %n minute(s) early</template>
@@ -1718,7 +1718,7 @@
         </spinbox>
 
         <spinbox name="endoffset" from="basewidespinbox">
-            <area>70,345,660,40</area>
+            <area>405,300,325,40</area>
             <template type="negative">End recording %n minute(s) early</template>
             <template type="zero">End recording on time</template>
             <template type="positive">End recording %n minute(s) late</template>
@@ -1726,11 +1726,16 @@
         </spinbox>
 
         <buttonlist name="dupmethod" from="basewideselector">
-            <area>70,390,660,40</area>
+            <area>70,345,660,40</area>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="dupscope" from="basewideselector">
+            <area>70,390,660,40</area>
+            <helptext></helptext>
+        </buttonlist>
+
+        <buttonlist name="autoextend" from="basewideselector">
             <area>70,435,660,40</area>
             <helptext></helptext>
         </buttonlist>

@@ -89,7 +89,7 @@ void LookerUpper::HandleAllRecordingRules()
 {
     m_updaterules = true;
 
-    vector<ProgramInfo *> recordingList;
+    std::vector<ProgramInfo *> recordingList;
 
     RemoteGetAllScheduledRecordings(recordingList);
 
@@ -118,7 +118,7 @@ void LookerUpper::HandleAllArtwork(bool aggressive)
         m_updaterules = true;
 
     // First, handle all recording rules w/ inetrefs
-    vector<ProgramInfo *> recordingList;
+    std::vector<ProgramInfo *> recordingList;
 
     RemoteGetAllScheduledRecordings(recordingList);
     int maxartnum = 3;

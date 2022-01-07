@@ -2,8 +2,6 @@
 
 """API Client."""
 
-from __future__ import print_function
-from __future__ import absolute_import
 from os import fdopen
 
 from xml.etree import ElementTree

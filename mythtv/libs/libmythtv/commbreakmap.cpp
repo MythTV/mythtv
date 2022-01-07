@@ -1,7 +1,7 @@
 // MythTV
 #include "commbreakmap.h"
 #include "mythcontext.h"
-#include "mythmiscutil.h"
+#include "mythdate.h"
 #include "programinfo.h"
 
 #define LOC QString("CommBreakMap: ")
@@ -215,7 +215,7 @@ bool CommBreakMap::AutoCommercialSkip(uint64_t &jumpToFrame,
 
     auto skipped_seconds = std::chrono::seconds((int)((m_commBreakIter.key() -
                                  framesPlayed) / video_frame_rate));
-    QString skipTime = MythFormatTime(skipped_seconds, "m:ss");
+    QString skipTime = MythDate::formatTime(skipped_seconds, "m:ss");
     if (kCommSkipOn == m_autocommercialskip)
     {
         //: %1 is the skip time
@@ -335,7 +335,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
         MergeShortCommercials(video_frame_rate);
     int64_t framediff = m_commBreakIter.key() - framesPlayed;
     auto skipped_seconds = std::chrono::seconds((int)(framediff / video_frame_rate));
-    QString skipTime = MythFormatTime(skipped_seconds, "m:ss");
+    QString skipTime = MythDate::formatTime(skipped_seconds, "m:ss");
 
     if ((MythDate::secsInPast(m_lastIgnoredManualSkip) > 3s) &&
         (abs(skipped_seconds) >= m_maxskip))

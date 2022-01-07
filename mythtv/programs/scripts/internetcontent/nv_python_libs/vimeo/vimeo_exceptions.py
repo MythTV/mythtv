@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: vimeo_exceptions - Custom exceptions used or raised by vimeo_api
 # Python Script
@@ -18,24 +18,24 @@ __version__="v0.2.0"
 __all__ = ["VimeoUrlError", "VimeoHttpError", "VimeoResponseError", "VimeoVideoNotFound", "VimeoRequestTokenError", "VimeoAuthorizeTokenError", "VimeoVideosSearchError", "VimeoAllChannelError", ]
 
 __errmsgs__ = {
-'1': u'User not found - The user id or name was either not valid or not provided.',
-'96': u'Invalid signature - The api_sig passed was not valid.',
-'97': u'Missing signature - A signature was not passed.',
-'98': u'Login failed / Invalid auth token - The login details or auth token passed were invalid.',
-'100': u'Invalid API Key - The API key passed was not valid.',
-'105': u'Service currently unavailable - The requested service is temporarily unavailable.',
-'111': u'Format not found - The requested response format was not found.',
-'112': u'Method not found - The requested method was not found.',
-'301': u'Invalid consumer key - The consumer key passed was not valid.',
-'302': u'Invalid / expired token - The oauth_token passed was either not valid or has expired.',
-'303': u'Invalid signature - The oauth_signature passed was not valid.',
-'304': u'Invalid nonce - The oauth_nonce passed has already been used.',
-'305': u'Invalid signature - The oauth_signature passed was not valid.',
-'306': u'Unsupported signature method - We do not support that signature method.',
-'307': u'Missing required parameter - A required parameter was missing.',
-'308': u'Duplicate parameter - An OAuth protocol parameter was duplicated.',
-'901': u'Empty search - The search text cannot be empty.',
-'999': u'Rate limit exceeded - Please wait a few minutes before trying again.',
+'1': 'User not found - The user id or name was either not valid or not provided.',
+'96': 'Invalid signature - The api_sig passed was not valid.',
+'97': 'Missing signature - A signature was not passed.',
+'98': 'Login failed / Invalid auth token - The login details or auth token passed were invalid.',
+'100': 'Invalid API Key - The API key passed was not valid.',
+'105': 'Service currently unavailable - The requested service is temporarily unavailable.',
+'111': 'Format not found - The requested response format was not found.',
+'112': 'Method not found - The requested method was not found.',
+'301': 'Invalid consumer key - The consumer key passed was not valid.',
+'302': 'Invalid / expired token - The oauth_token passed was either not valid or has expired.',
+'303': 'Invalid signature - The oauth_signature passed was not valid.',
+'304': 'Invalid nonce - The oauth_nonce passed has already been used.',
+'305': 'Invalid signature - The oauth_signature passed was not valid.',
+'306': 'Unsupported signature method - We do not support that signature method.',
+'307': 'Missing required parameter - A required parameter was missing.',
+'308': 'Duplicate parameter - An OAuth protocol parameter was duplicated.',
+'901': 'Empty search - The search text cannot be empty.',
+'999': 'Rate limit exceeded - Please wait a few minutes before trying again.',
 }
 
 # Start of code used to access themoviedb.org api

@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-# Support python3 print syntax if we're running in python2
-from __future__ import print_function
-
-from __future__ import unicode_literals
-
 __title__ = "TVmaze.com"
 __author__ = "Roland Ernst, Steve Erlenborn"
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 
 import sys
@@ -20,10 +15,7 @@ from optparse import OptionParser
 def print_etree(etostr):
     """lxml.etree.tostring is a bytes object in python3, and a str in python2.
     """
-    if sys.version_info[0] == 2:
-        sys.stdout.write(etostr)
-    else:
-        sys.stdout.write(etostr.decode("utf-8"))
+    sys.stdout.write(etostr.decode("utf-8"))
 
 
 def check_item(m, mitem, ignore=True):
@@ -679,10 +671,7 @@ def main():
         import doctest
         try:
             with open("tvmaze_tests.txt") as f:
-                if sys.version_info[0] == 2:
-                    dtests = b"".join(f.readlines()).decode('utf-8')
-                else:
-                    dtests = "".join(f.readlines())
+                dtests = "".join(f.readlines())
             main.__doc__ += dtests
         except IOError:
             pass
@@ -708,10 +697,7 @@ def main():
         cachedir = os.path.join(confdir, 'cache')
         if not os.path.exists(cachedir):
             os.makedirs(cachedir)
-        if sys.version_info[0] == 2:
-            cache_name = os.path.join(cachedir, 'py2tvmaze')
-        else:
-            cache_name = os.path.join(cachedir, 'py3tvmaze')
+        cache_name = os.path.join(cachedir, 'py3tvmaze')
         import requests
         import requests_cache
         requests_cache.install_cache(cache_name, backend='sqlite', expire_after=3600)

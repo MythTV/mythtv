@@ -11,7 +11,6 @@ from datetime import datetime as _pydatetime, \
                      tzinfo as _pytzinfo, \
                      timedelta
 from collections import namedtuple
-from future.utils import with_metaclass
 import os
 import re
 import time
@@ -117,7 +116,7 @@ class basetzinfo( _pytzinfo ):
 #    database.
 #    """
 
-class posixtzinfo( with_metaclass(InputSingleton, basetzinfo) ):
+class posixtzinfo(basetzinfo, metaclass=InputSingleton):
     """
     Customized timezone class that can import timezone data from the local
     POSIX zoneinfo files.
@@ -473,13 +472,6 @@ class datetime( _pydatetime ):
 
     def mythformat(self):
         return self.astimezone(self.UTCTZ()).strftime('%Y%m%d%H%M%S')
-
-    def timestamp(self):
-        # utc time = local time - utc offset
-        utc_naive = self.replace(tzinfo=None) - self.utcoffset()
-        utc_naive = utc_naive.replace(tzinfo=None)
-        utc_epoch = self.utcfromtimestamp(0).replace(tzinfo=None)
-        return ((utc_naive - utc_epoch).total_seconds())
 
     def rfcformat(self):
         return self.strftime('%a, %d %b %Y %H:%M:%S %z')

@@ -9,10 +9,7 @@ import os
 import sys
 import socket
 
-try:
-    from urllib import urlopen
-except ImportError:
-    from urllib.request import urlopen
+from urllib.request import urlopen
 
 import re
 import chardet
@@ -32,9 +29,9 @@ debug = False
 
 socket.setdefaulttimeout(10)
 
-LYRIC_TITLE_STRIP=["\(live[^\)]*\)", "\(acoustic[^\)]*\)",
-                    "\([^\)]*mix\)", "\([^\)]*version\)",
-                    "\([^\)]*edit\)", "\(feat[^\)]*\)"]
+LYRIC_TITLE_STRIP=[r"\(live[^\)]*\)", r"\(acoustic[^\)]*\)",
+                   r"\([^\)]*mix\)", r"\([^\)]*version\)",
+                   r"\([^\)]*edit\)", r"\(feat[^\)]*\)"]
 LYRIC_TITLE_REPLACE=[("/", "-"),(" & ", " and ")]
 LYRIC_ARTIST_REPLACE=[("/", "-"),(" & ", " and ")]
 
@@ -115,16 +112,10 @@ class ttpClient(object):
     @staticmethod
     def EncodeArtTit(mystr):
         rtn = ''
-        if utilities.IS_PY2:
-            uni = unicode(mystr, 'UTF-8')
-            mystr = uni.encode('UTF-16')[2:]
-            for i in range(len(mystr)):
-                rtn += '%02x' % ord(mystr[i])
-        else:
-            uni = str(mystr)
-            mystr = uni.encode('UTF-16')[2:]
-            for i in range(len(mystr)):
-                rtn += '%02x' % (mystr[i])
+        uni = str(mystr)
+        mystr = uni.encode('UTF-16')[2:]
+        for i in range(len(mystr)):
+            rtn += '%02x' % (mystr[i])
         return rtn
 
 

@@ -39,7 +39,7 @@ void MythDRMPRIMEInterop::DeleteTextures(void)
         int count = 0;
         for (auto it = m_openglTextures.constBegin(); it != m_openglTextures.constEnd(); ++it)
         {
-            vector<MythVideoTextureOpenGL*> textures = it.value();
+            std::vector<MythVideoTextureOpenGL*> textures = it.value();
             for (auto & texture : textures)
             {
                 if (texture->m_data)
@@ -123,12 +123,13 @@ AVDRMFrameDescriptor* MythDRMPRIMEInterop::VerifyBuffer(MythRenderOpenGL *Contex
     return  reinterpret_cast<AVDRMFrameDescriptor*>(Frame->m_buffer);
 }
 
-vector<MythVideoTextureOpenGL*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
-                                                             MythVideoColourSpace *ColourSpace,
-                                                             MythVideoFrame *Frame,
-                                                             FrameScanType Scan)
+std::vector<MythVideoTextureOpenGL*>
+MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *Context,
+                             MythVideoColourSpace *ColourSpace,
+                             MythVideoFrame *Frame,
+                             FrameScanType Scan)
 {
-    vector<MythVideoTextureOpenGL*> result;
+    std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
         return result;
 
@@ -148,7 +149,7 @@ vector<MythVideoTextureOpenGL*> MythDRMPRIMEInterop::Acquire(MythRenderOpenGL *C
 
     auto Separate = [=]()
     {
-        vector<MythVideoTextureOpenGL*> textures;
+        std::vector<MythVideoTextureOpenGL*> textures;
         if (!m_openglTextures.contains(id))
         {
             textures = CreateTextures(drmdesc, m_openglContext, Frame, true);

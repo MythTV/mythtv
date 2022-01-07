@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # ----------------------
 # Name: mtv.py
@@ -167,6 +167,7 @@ __search_max_page_items__ = 10
 __tree_max_page_items__ = 20
 
 import sys, os
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -179,22 +180,17 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 # Used for debugging
@@ -203,7 +199,7 @@ sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 # Verify that the tmdb_api modules are installed and accessible
 try:
     import nv_python_libs.mtv.mtv_api as target
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/mtv" containing the modules mtv_api.py (v0.2.0 or greater),
 They should have been included with the distribution of mtv.py.
@@ -219,7 +215,7 @@ if target.__version__ < '0.2.0':
 # Verify that the common process modules are installed and accessible
 try:
     import nv_python_libs.mainProcess as process
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The python script "nv_python_libs/mainProcess.py" must be present.
 Error(%s)
@@ -235,12 +231,13 @@ if __name__ == '__main__':
     apikey = ""
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
+    main.grabberInfo['enabled'] = True
     main.grabberInfo['title'] = __title__
-    main.grabberInfo['command'] = u'mtv.py'
+    main.grabberInfo['command'] = 'mtv.py'
     main.grabberInfo['author'] = __author__
     main.grabberInfo['thumbnail'] = 'mtv.png'
     main.grabberInfo['type'] = ['video']
-    main.grabberInfo['desc'] = u"Visit MTV (Music Television) for TV shows, music videos, celebrity photos, and news."
+    main.grabberInfo['desc'] = "Visit MTV (Music Television) for TV shows, music videos, celebrity photos, and news."
     main.grabberInfo['version'] = __version__
     main.grabberInfo['search'] = True
     main.grabberInfo['tree'] = True

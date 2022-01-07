@@ -20,11 +20,6 @@
 #include <QDateTime>
 #include <Qt>
 
-#include "mythconfig.h"
-#if !( CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(_WIN32))
-#define USE_SETSOCKOPT
-#include <sys/sendfile.h>
-#endif
 #include <cerrno>
 #include <cstdlib>
 #include <fcntl.h>
@@ -46,6 +41,7 @@
 #include "mythcorecontext.h"
 #include "mythtimer.h"
 #include "mythcoreutil.h"
+#include "configuration.h"
 
 #include "serializers/xmlSerializer.h"
 #include "serializers/soapSerializer.h"
@@ -149,11 +145,6 @@ static QString StaticPage =
       "</HEAD>"
       "<BODY><H1>%2.</H1></BODY>"
     "</HTML>";
-
-#ifdef USE_SETSOCKOPT
-//static const int g_on          = 1;
-//static const int g_off         = 0;
-#endif
 
 const char *HTTPRequest::s_szServerHeaders = "Accept-Ranges: bytes\r\n";
 
@@ -332,7 +323,7 @@ qint64 HTTPRequest::SendResponse( void )
                 break;
             {
                 QFile file(m_sFileName);
-                if (file.exists() && file.size() < (2 * 1024 * 1024) && // For security/stability, limit size of files read into buffer to 2MiB
+                if (file.exists() && file.size() < (2LL * 1024 * 1024) && // For security/stability, limit size of files read into buffer to 2MiB
                     file.open(QIODevice::ReadOnly | QIODevice::Text))
                     m_response.buffer() = file.readAll();
 
@@ -358,23 +349,6 @@ qint64 HTTPRequest::SendResponse( void )
         QString("HTTPRequest::SendResponse(xml/html) (%1) :%2 -> %3: %4")
              .arg(m_sFileName, GetResponseStatus(), GetPeerAddress(),
                   QString::number(m_eResponseType)));
-
-    // ----------------------------------------------------------------------
-    // Make it so the header is sent with the data
-    // ----------------------------------------------------------------------
-
-#ifdef USE_SETSOCKOPT
-//     // Never send out partially complete segments
-//     if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK,
-//                    &g_on, sizeof( g_on )) < 0)
-//     {
-//         LOG(VB_HTTP, LOG_INFO,
-//             QString("HTTPRequest::SendResponse(xml/html) "
-//                     "setsockopt error setting TCP_CORK on ") + ENO);
-//     }
-#endif
-
-
 
     // ----------------------------------------------------------------------
     // Check for ETag match...
@@ -470,20 +444,6 @@ qint64 HTTPRequest::SendResponse( void )
             nBytes += bytesWritten;
     }
 
-    // ----------------------------------------------------------------------
-    // Turn off the option so any small remaining packets will be sent
-    // ----------------------------------------------------------------------
-
-#ifdef USE_SETSOCKOPT
-//     if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK,
-//                    &g_off, sizeof( g_off )) < 0)
-//     {
-//         LOG(VB_HTTP, LOG_INFO,
-//             QString("HTTPRequest::SendResponse(xml/html) "
-//                     "setsockopt error setting TCP_CORK off ") + ENO);
-//     }
-#endif
-
     return( nBytes );
 }
 
@@ -502,22 +462,6 @@ qint64 HTTPRequest::SendResponseFile( const QString& sFileName )
 
     m_eResponseType     = ResponseTypeOther;
     m_sResponseTypeText = "text/plain";
-
-    // ----------------------------------------------------------------------
-    // Make it so the header is sent with the data
-    // ----------------------------------------------------------------------
-
-#ifdef USE_SETSOCKOPT
-//     // Never send out partially complete segments
-//     if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK,
-//                    &g_on, sizeof( g_on )) < 0)
-//     {
-//         LOG(VB_HTTP, LOG_INFO,
-//             QString("HTTPRequest::SendResponseFile(%1) "
-//                     "setsockopt error setting TCP_CORK on " ).arg(sFileName) +
-//             ENO);
-//     }
-#endif
 
     QFile tmpFile( sFileName );
     if (tmpFile.exists( ) && tmpFile.open( QIODevice::ReadOnly ))
@@ -639,21 +583,6 @@ qint64 HTTPRequest::SendResponseFile( const QString& sFileName )
             nBytes = -1;
         }
     }
-
-    // ----------------------------------------------------------------------
-    // Turn off the option so any small remaining packets will be sent
-    // ----------------------------------------------------------------------
-
-#ifdef USE_SETSOCKOPT
-//     if (setsockopt(getSocketHandle(), SOL_TCP, TCP_CORK,
-//                    &g_off, sizeof( g_off )) < 0)
-//     {
-//         LOG(VB_HTTP, LOG_INFO,
-//             QString("HTTPRequest::SendResponseFile(%1) "
-//                     "setsockopt error setting TCP_CORK off ").arg(sFileName) +
-//             ENO);
-//     }
-#endif
 
     // -=>TODO: Only returns header length...
     //          should we change to return total bytes?
@@ -1860,7 +1789,7 @@ QString HTTPRequest::GetETagHash(const QByteArray &data)
 
 bool HTTPRequest::IsUrlProtected( const QString &sBaseUrl )
 {
-    QString sProtected = UPnp::GetConfiguration()->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
+    QString sProtected = MythCoreContext::GetConfiguration()->GetValue( "HTTP/Protected/Urls", "/setup;/Config" );
 
     QStringList oList = sProtected.split( ';' );
 

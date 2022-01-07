@@ -1,5 +1,5 @@
-#ifndef SATIPRECORDER_H_
-#define SATIPRECORDER_H_
+#ifndef SATIPRECORDER_H
+#define SATIPRECORDER_H
 
 // Qt includes
 #include <QString>
@@ -33,4 +33,4 @@ class SatIPRecorder : public DTVRecorder
     int                 m_inputId         {0};
 };
 
-#endif // SATIPRECORDER_H_
+#endif // SATIPRECORDER_H

@@ -6,7 +6,6 @@
 // C/C++ lib
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #include <cstdlib>
-using std::getenv;
 #endif
 #include <cstddef>
 #include <cstdio>
@@ -44,7 +43,7 @@ using std::getenv;
 #include "mythdirs.h"
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-#define qEnvironmentVariable getenv
+#define qEnvironmentVariable std::getenv
 #endif
 
 /*
@@ -58,7 +57,7 @@ using std::getenv;
  */
 static QAtomicInt s_nRequest(1); // Unique NetStream request ID
 static QMutex s_mtx; // Guard local static data e.g. NAMThread singleton
-const qint64 kMaxBuffer = 4 * 1024 * 1024L; // 0= unlimited, 1MB => 4secs @ 1.5Mbps
+static constexpr qint64 kMaxBuffer = 4LL * 1024 * 1024L; // 0= unlimited, 1MB => 4secs @ 1.5Mbps
 
 
 /*

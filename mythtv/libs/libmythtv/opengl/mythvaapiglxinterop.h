@@ -31,9 +31,11 @@ class MythVAAPIInteropGLXCopy : public MythVAAPIInteropGLX
   public:
     MythVAAPIInteropGLXCopy(MythPlayerUI* Player, MythRenderOpenGL* Context);
     ~MythVAAPIInteropGLXCopy() override;
-    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context,
-                                            MythVideoColourSpace* ColourSpace,
-                                            MythVideoFrame* Frame, FrameScanType Scan) override;
+
+    std::vector<MythVideoTextureOpenGL*>
+    Acquire(MythRenderOpenGL* Context,
+            MythVideoColourSpace* ColourSpace,
+            MythVideoFrame* Frame, FrameScanType Scan) override;
 
   private:
     void* m_glxSurface { nullptr };
@@ -49,9 +51,11 @@ class MythVAAPIInteropGLXPixmap : public MythVAAPIInteropGLX
   public:
     MythVAAPIInteropGLXPixmap(MythPlayerUI* Player, MythRenderOpenGL* Context);
     ~MythVAAPIInteropGLXPixmap() override;
-    vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL* Context,
-                                            MythVideoColourSpace* ColourSpace,
-                                            MythVideoFrame* Frame, FrameScanType Scan) override;
+
+    std::vector<MythVideoTextureOpenGL*>
+    Acquire(MythRenderOpenGL* Context,
+            MythVideoColourSpace* ColourSpace,
+            MythVideoFrame* Frame, FrameScanType Scan) override;
     static bool IsSupported(MythRenderOpenGL* Context);
 
   private:

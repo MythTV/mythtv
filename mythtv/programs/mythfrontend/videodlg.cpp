@@ -13,7 +13,7 @@
 #include <QUrl>
 
 #include "mythcontext.h"
-#include "mythmiscutil.h"
+#include "mythrandom.h"
 #include "mythdirs.h"
 
 #include "mythuihelper.h"
@@ -3071,7 +3071,11 @@ void VideoDialog::playVideoWithTrailers()
     while (!trailers.isEmpty() && i < trailersToPlay)
     {
         ++i;
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
         QString trailer = trailers.takeAt(static_cast<int>(MythRandom() % trailers.size()));
+#else
+        QString trailer = trailers.takeAt(MythRandom(0, trailers.size() - 1));
+#endif
 
         LOG(VB_GENERAL, LOG_DEBUG,
             QString("Random trailer to play will be: %1").arg(trailer));

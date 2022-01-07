@@ -606,7 +606,7 @@ void MythPainter::ExpireImages(int64_t max)
 // the following assume graphics hardware operates natively at 32bpp
 void MythPainter::SetMaximumCacheSizes(int hardware, int software)
 {
-    const int64_t kOneMeg = 1024 * 1024;
+    static constexpr int64_t kOneMeg = 1LL * 1024 * 1024;
     m_maxHardwareCacheSize = kOneMeg * hardware;
     m_maxSoftwareCacheSize = kOneMeg * software;
 

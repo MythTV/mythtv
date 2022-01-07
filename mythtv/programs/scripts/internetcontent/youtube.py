@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # ----------------------
 # Name: youtube.py
@@ -36,7 +36,7 @@ __version__="0.23"
 # 0.22  Change to support xml version information display
 # 0.23  Added the "command" tag to the xml version information display
 
-__usage_examples__ ='''
+__usage_examples__ =r'''
 (Option Help)
 > ./youtube.py -h
 Usage: ./youtube.py -hduvlST [parameters] <search text>
@@ -174,7 +174,7 @@ import sys, os
 # Verify that the tmdb_api modules are installed and accessible
 try:
     import nv_python_libs.youtube.youtube_api as target
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/youtube" containing the modules youtube_api.py (v0.2.0 or greater),
 They should have been included with the distribution of youtube.py.
@@ -190,7 +190,7 @@ if target.__version__ < '0.2.0':
 # Verify that the common process modules are installed and accessible
 try:
     import nv_python_libs.mainProcess as process
-except Exception, e:
+except Exception as e:
     sys.stderr.write('''
 The python script "nv_python_libs/mainProcess.py" must be present.
 Error(%s)
@@ -207,12 +207,13 @@ if __name__ == '__main__':
     target.baseProcessingDir = os.path.dirname( os.path.realpath(__file__))
     main = process.mainProcess(target, apikey, )
     main.grabberInfo = {}
+    main.grabberInfo['enabled'] = True
     main.grabberInfo['title'] = __title__
-    main.grabberInfo['command'] = u'youtube.py'
+    main.grabberInfo['command'] = 'youtube.py'
     main.grabberInfo['author'] = __author__
     main.grabberInfo['thumbnail'] = 'youtube.png'
     main.grabberInfo['type'] = ['video']
-    main.grabberInfo['desc'] = u"Share your videos with friends, family, and the world."
+    main.grabberInfo['desc'] = "Share your videos with friends, family, and the world."
     main.grabberInfo['version'] = __version__
     main.grabberInfo['search'] = True
     main.grabberInfo['tree'] = True

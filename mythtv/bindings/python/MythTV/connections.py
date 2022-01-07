@@ -10,34 +10,22 @@ from MythTV.utility import deadlinesocket
 
 from time import sleep, time
 from select import select
-try:
-    from thread import start_new_thread, allocate_lock, get_ident
-except ImportError:
-    from _thread import start_new_thread, allocate_lock, get_ident
+from _thread import start_new_thread, allocate_lock, get_ident
 import lxml.etree as etree
 import weakref
-try:
-    import urllib2
-except ImportError:
-    import urllib.request as urllib2
+import urllib.request
 import socket
-try:
-    import Queue
-except ImportError:
-    import queue as Queue
+import queue
 import json
 import re
 from builtins import str
 
+# Note: Support for oursql was removed in MythTV v32
 try:
-    from . import _conn_oursql as dbmodule
-    from ._conn_oursql import LoggedCursor
+    from . import _conn_mysqldb as dbmodule
+    from ._conn_mysqldb import LoggedCursor
 except:
-    try:
-        from . import _conn_mysqldb as dbmodule
-        from ._conn_mysqldb import LoggedCursor
-    except:
-        raise MythError("No viable database module found.")
+    raise MythError("No viable database module found.")
 
 class _Connection_Pool( object ):
     """
@@ -290,7 +278,7 @@ class BEConnection( object ):
 
         # return if not connected
         if not self.connected:
-            return u''
+            return ''
 
         # pull default timeout
         if deadline is None:
@@ -308,14 +296,14 @@ class BEConnection( object ):
                 timeout = (deadline-t) if (deadline-t>0) else 0.0
                 if len(select([self.socket],[],[], timeout)[0]) == 0:
                     # no data, return
-                    return u''
+                    return ''
                 res = self.socket.recvheader(deadline=deadline)
 
                 # convert to unicode
                 try:
                     res = str(b''.join([res]), 'utf-8')
                 except:
-                    res = u''.join([res])
+                    res = ''.join([res])
 
                 return res
         except MythError as e:
@@ -350,7 +338,7 @@ class BEEventConnection( BEConnection ):
 
         self.hostname = ""
         self.threadrunning = False
-        self.eventqueue = Queue.Queue()
+        self.eventqueue = queue.Queue()
 
         super(BEEventConnection, self).__init__(backend, port, localname,
                                                 False, deadline)
@@ -398,7 +386,7 @@ class BEEventConnection( BEConnection ):
                     try:
                         event = str(b''.join([event]), 'utf-8')
                     except:
-                        event = u''.join([event])
+                        event = ''.join([event])
 
                     if event[:15] == 'BACKEND_MESSAGE':
                         self.eventqueue.put(event)
@@ -439,7 +427,7 @@ class BEEventConnection( BEConnection ):
                                 raise
                             except:
                                 pass
-                except Queue.Empty:
+                except queue.Empty:
                     break
             sleep(0.1)
         self.threadrunning = False
@@ -549,7 +537,7 @@ class FEConnection( object ):
             except:
                 return self._res_help[mode](res)
         else:
-            self.socket.send((u"%s %s\n" % (mode, command)).encode('utf-8'))
+            self.socket.send(("%s %s\n" % (mode, command)).encode('utf-8'))
             return self._res_handler[mode](self.recv())
 
     def recv(self, deadline=None):
@@ -575,8 +563,8 @@ class XMLConnection( object ):
         either 'backend' or 'port' is not defined.
     """
 
-    class _Request( urllib2.Request ):
-        def open(self): return urllib2.urlopen(self)
+    class _Request( urllib.request.Request ):
+        def open(self): return urllib.request.urlopen(self)
         def read(self): return self.open().read()
 
         def setJSON(self):
@@ -620,7 +608,7 @@ class XMLConnection( object ):
         url = 'http://{0.host}:{0.port}/{1}'.format(self, path)
         if keyvars:
             url += '?' + '&'.join(
-                        ['{0}={1}'.format(k,urllib2.quote(v))
+                        ['{0}={1}'.format(k,urllib.request.quote(v))
                                 for k,v in keyvars.items()])
         self.log(self.log.NETWORK, self.log.DEBUG, 'Generating request', url)
         return self._Request(url)

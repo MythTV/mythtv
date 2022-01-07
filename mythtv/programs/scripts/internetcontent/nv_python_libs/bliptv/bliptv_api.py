@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: bliptv_api - Simple-to-use Python interface to the bliptv API (http://blip.tv/)
 # Python Script
@@ -38,7 +38,7 @@ __version__="v0.2.5"
 #       Removed a subdirectory level as the "Featured" RSS feed has been discontinued
 
 import os, struct, sys, re, time
-import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import logging
 from MythTV import MythXML
 
@@ -47,7 +47,8 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ElementTree
 
-from bliptv_exceptions import (BliptvUrlError, BliptvHttpError, BliptvRssError, BliptvVideoNotFound, BliptvXmlError)
+from .bliptv_exceptions import (BliptvUrlError, BliptvHttpError, BliptvRssError, BliptvVideoNotFound, BliptvXmlError)
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -60,22 +61,17 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 class XmlHandler:
@@ -86,8 +82,8 @@ class XmlHandler:
 
     def _grabUrl(self, url):
         try:
-            urlhandle = urllib.urlopen(url)
-        except IOError, errormsg:
+            urlhandle = urllib.request.urlopen(url)
+        except IOError as errormsg:
             raise BliptvHttpError(errormsg)
         return urlhandle.read()
 
@@ -95,7 +91,7 @@ class XmlHandler:
         xml = self._grabUrl(self.url)
         try:
             et = ElementTree.fromstring(xml)
-        except SyntaxError, errormsg:
+        except SyntaxError as errormsg:
             raise BliptvXmlError(errormsg)
         return et
 
@@ -174,7 +170,7 @@ class Videos(object):
         # Defaulting to ENGISH but the blip.tv apis do not support specifying a language
         self.config['language'] = "en"
 
-        self.error_messages = {'BliptvUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'BliptvHttpError': u"! Error: An HTTP communicating error with blip.tv was raised (%s)\n", 'BliptvRssError': u"! Error: Invalid RSS meta data\nwas received from blip.tv error (%s). Skipping item.\n", 'BliptvVideoNotFound': u"! Error: Video search with blip.tv did not return any results (%s)\n", }
+        self.error_messages = {'BliptvUrlError': "! Error: The URL (%s) cause the exception error (%s)\n", 'BliptvHttpError': "! Error: An HTTP communicating error with blip.tv was raised (%s)\n", 'BliptvRssError': "! Error: Invalid RSS meta data\nwas received from blip.tv error (%s). Skipping item.\n", 'BliptvVideoNotFound': "! Error: Video search with blip.tv did not return any results (%s)\n", }
 
         # This is an example that must be customized for each target site
         self.key_translation = [{'channel_title': 'channel_title', 'channel_link': 'channel_link', 'channel_description': 'channel_description', 'channel_numresults': 'channel_numresults', 'channel_returned': 'channel_returned', 'channel_startindex': 'channel_startindex'}, {'title': 'item_title', 'blip_safeusername': 'item_author', 'updated': 'item_pubdate', 'blip_puredescription': 'item_description', 'link': 'item_link', 'blip_picture': 'item_thumbnail', 'video': 'item_url', 'blip_runtime': 'item_duration', 'blip_rating': 'item_rating', 'width': 'item_width', 'height': 'item_height', 'language': 'item_lang'}]
@@ -182,22 +178,22 @@ class Videos(object):
         # The following url_ configs are based of the
         # http://blip.tv/about/api/
         self.config['base_url'] = "http://www.blip.tv%s"
-        self.config['thumb_url'] = u"http://a.images.blip.tv%s"
+        self.config['thumb_url'] = "http://a.images.blip.tv%s"
 
-        self.config[u'urls'] = {}
+        self.config['urls'] = {}
 
         # v2 api calls - An example that must be customized for each target site
-        self.config[u'urls'][u'video.search'] = "http://www.blip.tv/?search=%s;&page=%s;&pagelen=%s;&language_code=%s;&skin=rss"
-        self.config[u'urls'][u'categories'] = "http://www.blip.tv/?section=categories&cmd=view&skin=api"
+        self.config['urls']['video.search'] = "http://www.blip.tv/?search=%s;&page=%s;&pagelen=%s;&language_code=%s;&skin=rss"
+        self.config['urls']['categories'] = "http://www.blip.tv/?section=categories&cmd=view&skin=api"
 
-        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
+        self.config['image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
 
         # Functions that parse video data from RSS data
         self.config['item_parser'] = {}
         self.config['item_parser']['main'] = self.getVideosForURL
 
         # Tree view url and the function that parses that urls meta data
-        self.config[u'urls'][u'tree.view'] = {
+        self.config['urls']['tree.view'] = {
             'P_R_R_F': {
                 '__all__': ['http://www.blip.tv/%s/?skin=rss', 'main'],
                 },
@@ -216,7 +212,7 @@ class Videos(object):
                 ],
             # categories are dynamically filled in from a list retrieved from the blip.tv site
             'categories': [
-                ['Categories', u''],
+                ['Categories', ''],
                 ],
             }
 
@@ -226,7 +222,7 @@ class Videos(object):
                 #'cat name': {},
             },
             'categories': {
-                '__default__': {'categories_id': u'', 'sort': u'', },
+                '__default__': {'categories_id': '', 'sort': '', },
                 #'cat name': {},
             },
             }
@@ -248,7 +244,7 @@ class Videos(object):
         # Initialize the tree view flag so that the item parsing code can be used for multiple purposes
         self.categories = False
         self.treeview = False
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/bliptv.png'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/bliptv.png'
     # end __init__()
 
 
@@ -269,7 +265,7 @@ class Videos(object):
         def getExternalIP():
             '''Find the external IP address of this computer.
             '''
-            url = urllib.URLopener()
+            url = urllib.request.URLopener()
             try:
                 resp = url.open('http://www.whatismyip.com/automation/n09230945.asp')
                 return resp.read()
@@ -283,15 +279,15 @@ class Videos(object):
             return {}
 
         try:
-            gs = urllib.urlopen('http://blogama.org/ip_query.php?ip=%s&output=xml' % ip)
+            gs = urllib.request.urlopen('http://blogama.org/ip_query.php?ip=%s&output=xml' % ip)
             txt = gs.read()
         except:
             try:
-                gs = urllib.urlopen('http://www.seomoz.org/ip2location/look.php?ip=%s' % ip)
+                gs = urllib.request.urlopen('http://www.seomoz.org/ip2location/look.php?ip=%s' % ip)
                 txt = gs.read()
             except:
                 try:
-                    gs = urllib.urlopen('http://api.hostip.info/?ip=%s' % ip)
+                    gs = urllib.request.urlopen('http://api.hostip.info/?ip=%s' % ip)
                     txt = gs.read()
                 except:
                     logging.error('GeoIP servers not available')
@@ -302,12 +298,12 @@ class Videos(object):
                 citys = re.findall(r'<City>([\w ]+)<',txt)[0]
                 lats,lons = re.findall(r'<Latitude>([\d\-\.]+)</Latitude>\s*<Longitude>([\d\-\.]+)<',txt)[0]
             elif txt.find('GLatLng') > 0:
-                citys,countrys = re.findall('<br />\s*([^<]+)<br />\s*([^<]+)<',txt)[0]
-                lats,lons = re.findall('LatLng\(([-\d\.]+),([-\d\.]+)',txt)[0]
+                citys,countrys = re.findall(r'<br />\s*([^<]+)<br />\s*([^<]+)<',txt)[0]
+                lats,lons = re.findall(r'LatLng\(([-\d\.]+),([-\d\.]+)',txt)[0]
             elif txt.find('<gml:coordinates>') > 0:
-                citys = re.findall('<Hostip>\s*<gml:name>(\w+)</gml:name>',txt)[0]
-                countrys = re.findall('<countryName>([\w ,\.]+)</countryName>',txt)[0]
-                lats,lons = re.findall('gml:coordinates>([-\d\.]+),([-\d\.]+)<',txt)[0]
+                citys = re.findall(r'<Hostip>\s*<gml:name>(\w+)</gml:name>',txt)[0]
+                countrys = re.findall(r'<countryName>([\w ,\.]+)</countryName>',txt)[0]
+                lats,lons = re.findall(r'gml:coordinates>([-\d\.]+),([-\d\.]+)<',txt)[0]
             else:
                 logging.error('error parsing IP result %s'%txt)
                 return {}
@@ -330,24 +326,24 @@ class Videos(object):
             if text[:2] == "&#":
                 try:
                     if text[:3] == "&#x":
-                        return unichr(int(text[3:-1], 16))
+                        return chr(int(text[3:-1], 16))
                     else:
-                        return unichr(int(text[2:-1]))
+                        return chr(int(text[2:-1]))
                 except ValueError:
                     pass
             elif text[:1] == "&":
-                import htmlentitydefs
-                entity = htmlentitydefs.entitydefs.get(text[1:-1])
+                import html.entities
+                entity = html.entities.entitydefs.get(text[1:-1])
                 if entity:
                     if entity[:2] == "&#":
                         try:
-                            return unichr(int(entity[2:-1]))
+                            return chr(int(entity[2:-1]))
                         except ValueError:
                             pass
                     else:
-                        return unicode(entity, "iso-8859-1")
+                        return str(entity, "iso-8859-1")
             return text # leave as is
-        return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+        return self.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace('\n',' ')
     # end massageDescription()
 
 
@@ -374,9 +370,9 @@ class Videos(object):
         if text is None:
             return text
         try:
-            return unicode(text, 'utf8')
+            return str(text, 'utf8')
         except UnicodeDecodeError:
-            return u''
+            return ''
         except (UnicodeEncodeError, TypeError):
             return text
     # end textUtf8()
@@ -386,7 +382,7 @@ class Videos(object):
         '''Replace all "&" characters with "&amp;"
         '''
         text = self.textUtf8(text)
-        return text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
+        return text.replace('&amp;','~~~~~').replace('&','&amp;').replace('~~~~~', '&amp;')
     # end ampReplace()
 
     def setTreeViewIcon(self, dir_icon=None):
@@ -395,14 +391,14 @@ class Videos(object):
         '''
         self.tree_dir_icon = self.channel_icon
         if not dir_icon:
-            if not self.feed_icons.has_key(self.tree_key):
+            if self.tree_key not in self.feed_icons:
                 return self.tree_dir_icon
-            if not self.feed_icons[self.tree_key].has_key(self.feed):
+            if self.feed not in self.feed_icons[self.tree_key]:
                 return self.tree_dir_icon
             dir_icon = self.feed_icons[self.tree_key][self.feed]
             if not dir_icon:
                 return self.tree_dir_icon
-        self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
+        self.tree_dir_icon = '%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
         return self.tree_dir_icon
     # end setTreeViewIcon()
 
@@ -414,7 +410,7 @@ class Videos(object):
 
     def processVideoUrl(self, url):
         playerUrl = self.mythxml.getInternetContentUrl("nv_python_libs/configs/HTML/bliptv.html", \
-                                                       url.replace(u'http://blip.tv/play/', ''))
+                                                       url.replace('http://blip.tv/play/', ''))
         return self.ampReplace(playerUrl)
 
     def searchTitle(self, title, pagenumber, pagelen):
@@ -422,25 +418,25 @@ class Videos(object):
         return an array of matching item dictionaries
         return
         '''
-        url = self.config[u'urls'][u'video.search'] % (urllib.quote_plus(title.encode("utf-8")), pagenumber, pagelen, self.config['language'])
+        url = self.config['urls']['video.search'] % (urllib.parse.quote_plus(title.encode("utf-8")), pagenumber, pagelen, self.config['language'])
 
         if self.config['debug_enabled']:
-            print "Search URL:"
-            print url
-            print
+            print("Search URL:")
+            print(url)
+            print()
 
         try:
             etree = XmlHandler(url).getEt()
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise BliptvUrlError(self.error_messages['BliptvUrlError'] % (url, errormsg))
 
         if etree is None:
-            raise BliptvVideoNotFound(u"1-No blip.tv Video matches found for search value (%s)" % title)
+            raise BliptvVideoNotFound("1-No blip.tv Video matches found for search value (%s)" % title)
 
         # Massage each field and eliminate any item without a URL
         elements_final = []
         dictionary_first = False
-        directory_image = u''
+        directory_image = ''
         self.next_page = False
         language = self.config['language']
         for elements in etree.find('channel'):
@@ -452,7 +448,7 @@ class Videos(object):
                 continue
             item = {}
             item['language'] = language
-            embedURL = u''
+            embedURL = ''
             for elem in elements:
                 if elem.tag == 'title':
                     if elem.text:
@@ -503,18 +499,18 @@ class Videos(object):
                     if elem.text:
                         item['blip_rating'] = self.massageDescription(elem.text.strip())
                     continue
-            if not item.has_key('video') and not item.has_key('link') and not embedURL:
+            if 'video' not in item and 'link' not in item and not embedURL:
                 continue
             if embedURL:
                 item['link'] = self.processVideoUrl(embedURL)
-            if item.has_key('link') and not item.has_key('video'):
+            if 'link' in item and 'video' not in item:
                 continue
-            if item.has_key('video') and not item.has_key('link'):
+            if 'video' in item and 'link' not in item:
                 item['link'] = item['video']
             elements_final.append(item)
 
         if not len(elements_final):
-            raise BliptvVideoNotFound(u"2-No blip.tv Video matches found for search value (%s)" % title)
+            raise BliptvVideoNotFound("2-No blip.tv Video matches found for search value (%s)" % title)
 
         return elements_final
         # end searchTitle()
@@ -525,20 +521,20 @@ class Videos(object):
         """
         try:
             data = self.searchTitle(title, pagenumber, self.page_limit)
-        except BliptvVideoNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+        except BliptvVideoNotFound as msg:
+            sys.stderr.write("%s\n" % msg)
             return None
-        except BliptvUrlError, msg:
-            sys.stderr.write(u'%s' % msg)
+        except BliptvUrlError as msg:
+            sys.stderr.write('%s' % msg)
             sys.exit(1)
-        except BliptvHttpError, msg:
+        except BliptvHttpError as msg:
             sys.stderr.write(self.error_messages['BliptvHttpError'] % msg)
             sys.exit(1)
-        except BliptvRssError, msg:
+        except BliptvRssError as msg:
             sys.stderr.write(self.error_messages['BliptvRssError'] % msg)
             sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data is None:
@@ -549,15 +545,15 @@ class Videos(object):
         items = []
         for match in data:
             item_data = {}
-            for key in self.key_translation[1].keys():
-                if key in match.keys():
+            for key in list(self.key_translation[1].keys()):
+                if key in list(match.keys()):
                     item_data[self.key_translation[1][key]] = match[key]
                 else:
-                    item_data[self.key_translation[1][key]] = u''
+                    item_data[self.key_translation[1][key]] = ''
             items.append(item_data)
 
         # Channel details and search results
-        channel = {'channel_title': u'blip.tv', 'channel_link': u'http://blip.tv', 'channel_description': u"We're the next generation television network", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        channel = {'channel_title': 'blip.tv', 'channel_link': 'http://blip.tv', 'channel_description': "We're the next generation television network", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
         if len(items) == self.page_limit:
             channel['channel_numresults'] = self.page_limit * int(pagenumber) + 1
@@ -576,34 +572,34 @@ class Videos(object):
         '''Get the list of valid category ids and their name and update the proper dictionaries
         return nothing
         '''
-        url = self.config[u'urls'][u'categories']
+        url = self.config['urls']['categories']
         if self.config['debug_enabled']:
-            print "Category list URL:"
-            print url
-            print
+            print("Category list URL:")
+            print(url)
+            print()
 
         try:
             etree = XmlHandler(url).getEt()
-        except Exception, errormsg:
+        except Exception as errormsg:
             sys.stderr.write(self.error_messages['BliptvUrlError'] % (url, errormsg))
             self.tree_order.remove('categories')
             return
 
         if etree is None:
-            sys.stderr.write(u'1-No Categories found at (%s)\n' % url)
+            sys.stderr.write('1-No Categories found at (%s)\n' % url)
             self.tree_order.remove('categories')
             return
 
         if not etree.find('payload'):
-            sys.stderr.write(u'2-No Categories found at (%s)\n' % url)
+            sys.stderr.write('2-No Categories found at (%s)\n' % url)
             self.tree_order.remove('categories')
             return
 
         category = False
         for element in etree.find('payload'):
             if element.tag == 'category':
-                tmp_name = u''
-                tmp_id = u''
+                tmp_name = ''
+                tmp_id = ''
                 for e in element:
                     if e.tag == 'id':
                         if e.text == '-1':
@@ -619,11 +615,11 @@ class Videos(object):
                     self.feed_names['categories'][tmp_name] = tmp_id
 
         if not category:
-            sys.stderr.write(u'3-No Categories found at (%s)\n' % url)
+            sys.stderr.write('3-No Categories found at (%s)\n' % url)
             self.tree_order.remove('categories')
             return
 
-        self.tree_org['categories'].append([u'', u'']) # Adds a end of the Categories directory indicator
+        self.tree_org['categories'].append(['', '']) # Adds a end of the Categories directory indicator
 
         return
     # end getCategories()
@@ -633,11 +629,11 @@ class Videos(object):
         return array of directories and their video meta data
         '''
         # Channel details and search results
-        self.channel = {'channel_title': u'blip.tv', 'channel_link': u'http://blip.tv', 'channel_description': u"We're the next generation television network", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'blip.tv', 'channel_link': 'http://blip.tv', 'channel_description': "We're the next generation television network", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
         if self.config['debug_enabled']:
-            print self.config[u'urls']
-            print
+            print(self.config['urls'])
+            print()
 
         # Get category ids
         self.getCategories()
@@ -663,17 +659,17 @@ class Videos(object):
         additions = dict(self.tree_customize[self.tree_key]['__default__']) # Set defaults
 
         # Add customizations
-        if self.feed in self.tree_customize[self.tree_key].keys():
-            for element in self.tree_customize[self.tree_key][self.feed].keys():
+        if self.feed in list(self.tree_customize[self.tree_key].keys()):
+            for element in list(self.tree_customize[self.tree_key][self.feed].keys()):
                 additions[element] = self.tree_customize[self.tree_key][self.feed][element]
 
         # Make the search extension string that is added to the URL
-        addition = u''
-        for ky in additions.keys():
+        addition = ''
+        for ky in list(additions.keys()):
             if ky.startswith('add_'):
-                addition+=u'/%s' %  additions[ky]
+                addition+='/%s' %  additions[ky]
             else:
-                addition+=u'?%s=%s' %  (ky, additions[ky])
+                addition+='?%s=%s' %  (ky, additions[ky])
         index = URL.find('%')
         if index == -1:
             return (URL+addition)
@@ -691,17 +687,17 @@ class Videos(object):
                 if sets[0] != '': # Add the nested dictionaries display name
                     dictionaries.append([self.massageDescription(sets[0]), self.channel_icon])
                 else:
-                    dictionaries.append(['', u'']) # Add the nested dictionary indicator
+                    dictionaries.append(['', '']) # Add the nested dictionary indicator
                 continue
             temp_dictionary = []
             for self.feed in sets[1]:
                 if self.categories:
                     self.tree_customize[self.tree_key]['__default__']['categories_id'] = self.feed_names['categories'][sets[0]]
                     self.tree_customize[self.tree_key]['__default__']['sort'] = self.feed
-                if self.config[u'urls'][u'tree.view'][self.tree_key].has_key('__all__'):
-                    URL = self.config[u'urls'][u'tree.view'][self.tree_key]['__all__']
+                if '__all__' in self.config['urls']['tree.view'][self.tree_key]:
+                    URL = self.config['urls']['tree.view'][self.tree_key]['__all__']
                 else:
-                    URL = self.config[u'urls'][u'tree.view'][self.tree_key][self.feed]
+                    URL = self.config['urls']['tree.view'][self.tree_key][self.feed]
                 temp_dictionary = self.config['item_parser'][URL[1]](self.makeURL(URL[0]), temp_dictionary)
             if len(temp_dictionary):
                 if len(sets[0]): # Add the nested dictionaries display name
@@ -709,7 +705,7 @@ class Videos(object):
                 for element in temp_dictionary:
                     dictionaries.append(element)
                 if len(sets[0]):
-                    dictionaries.append(['', u'']) # Add the nested dictionary indicator
+                    dictionaries.append(['', '']) # Add the nested dictionary indicator
         return dictionaries
     # end getVideos()
 
@@ -720,35 +716,35 @@ class Videos(object):
         initial_length = len(dictionaries)
 
         if self.config['debug_enabled']:
-            print "Video URL:"
-            print url
-            print
+            print("Video URL:")
+            print(url)
+            print()
 
         try:
             etree = XmlHandler(url).getEt()
-        except Exception, errormsg:
+        except Exception as errormsg:
             sys.stderr.write(self.error_messages['BliptvUrlError'] % (url, errormsg))
             return dictionaries
 
         if etree is None:
-            sys.stderr.write(u'1-No Videos for (%s)\n' % self.feed)
+            sys.stderr.write('1-No Videos for (%s)\n' % self.feed)
             return dictionaries
 
         dictionary_first = False
         self.next_page = False
         language = self.config['language']
         for elements in etree.find('channel'):
-            if elements.tag.endswith(u'language'):
+            if elements.tag.endswith('language'):
                 if elements.text:
                     language = elements.text[:2]
                 continue
 
-            if not elements.tag.endswith(u'item'):
+            if not elements.tag.endswith('item'):
                 continue
 
             item = {}
             item['language'] = language
-            embedURL = u''
+            embedURL = ''
             for elem in elements:
                 if elem.tag == 'title':
                     if elem.text:
@@ -782,7 +778,7 @@ class Videos(object):
                     file_size = 0
                     for e in elem:
                         if e.tag.endswith('content'):
-                            for key in e.keys():
+                            for key in list(e.keys()):
                                 if key.endswith('vcodec'):
                                     break
                             else:
@@ -808,13 +804,13 @@ class Videos(object):
                     if elem.text:
                         item['blip_rating'] = self.massageDescription(elem.text.strip())
                     continue
-            if not item.has_key('video') and not item.has_key('link'):
+            if 'video' not in item and 'link' not in item:
                 continue
             if embedURL:
                 item['link'] = embedURL
-            if item.has_key('link') and not item.has_key('video'):
+            if 'link' in item and 'video' not in item:
                 continue
-            if item.has_key('video') and not item.has_key('link'):
+            if 'video' in item and 'link' not in item:
                 item['link'] = item['video']
 
             if self.treeview:
@@ -823,16 +819,16 @@ class Videos(object):
                     dictionary_first = True
 
             final_item = {}
-            for key in self.key_translation[1].keys():
-                if not item.has_key(key):
-                    final_item[self.key_translation[1][key]] = u''
+            for key in list(self.key_translation[1].keys()):
+                if key not in item:
+                    final_item[self.key_translation[1][key]] = ''
                 else:
                     final_item[self.key_translation[1][key]] = item[key]
             dictionaries.append(final_item)
 
         if self.treeview:
             if initial_length < len(dictionaries): # Need to check if there was any items for this Category
-                dictionaries.append(['', u'']) # Add the nested dictionary indicator
+                dictionaries.append(['', '']) # Add the nested dictionary indicator
         return dictionaries
     # end getVideosForURL()
 # end Videos() class

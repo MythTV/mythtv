@@ -30,7 +30,7 @@ static inline int RAND(void) {
 
 
 //#define iRAND(i) ((guint32)((float)i * RAND()/RAND_MAX))
-#define iRAND(i) (RAND()%(i))
+#define iRAND(i) (((uint)RAND())%(i))
 
 //inline unsigned int RAND(void);
 //inline unsigned int iRAND(int i);

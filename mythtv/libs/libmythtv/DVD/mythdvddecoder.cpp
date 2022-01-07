@@ -34,9 +34,7 @@ void MythDVDDecoder::ReleaseLastVideoPkt(void)
 {
     if (m_lastVideoPkt)
     {
-        av_packet_unref(m_lastVideoPkt);
-        delete m_lastVideoPkt;
-        m_lastVideoPkt = nullptr;
+        av_packet_free(&m_lastVideoPkt);
         m_lbaLastVideoPkt = INVALID_LBA;
     }
 }
@@ -292,15 +290,13 @@ bool MythDVDDecoder::ProcessVideoPacket(AVStream *Stream, AVPacket *Pkt, bool &R
         // should be displayed with audio)
         if (!m_lastVideoPkt)
         {
-            m_lastVideoPkt = new AVPacket;
-            memset(m_lastVideoPkt, 0, sizeof(AVPacket));
+            // This packet will be freed in the destructor.
+            m_lastVideoPkt = av_packet_alloc();
         }
         else
         {
             av_packet_unref(m_lastVideoPkt);
         }
-
-        av_init_packet(m_lastVideoPkt);
         av_packet_ref(m_lastVideoPkt, Pkt);
         m_lbaLastVideoPkt = m_curContext->GetLBA();
 

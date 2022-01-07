@@ -1,6 +1,7 @@
 #ifndef ZMCLIENT_H_
 #define ZMCLIENT_H_
 
+#include <array>
 #include <iostream>
 #include <vector>
 

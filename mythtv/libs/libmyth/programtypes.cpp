@@ -8,7 +8,6 @@
 #include "mythdate.h"
 
 #include <deque>
-using std::deque;
 
 const QString kPlayerInUseID           { QStringLiteral("player") };
 const QString kPIPPlayerInUseID        { QStringLiteral("pipplayer") };
@@ -123,9 +122,9 @@ QString SkipTypeToString(int flags)
     return ret;
 }
 
-deque<int> GetPreferredSkipTypeCombinations(void)
+std::deque<int> GetPreferredSkipTypeCombinations(void)
 {
-    deque<int> tmp;
+    std::deque<int> tmp;
     tmp.push_back(COMM_DETECT_BLANK | COMM_DETECT_SCENE | COMM_DETECT_LOGO);
     tmp.push_back(COMM_DETECT_BLANK);
     tmp.push_back(COMM_DETECT_BLANK | COMM_DETECT_SCENE);

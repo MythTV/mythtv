@@ -18,6 +18,7 @@
 #include <QUrlQuery>
 
 #include "mthread.h"
+#include "mythrandom.h"
 #include "mythdate.h"
 #include "mythlogging.h"
 #include "mythcorecontext.h"
@@ -135,7 +136,13 @@ QString AirPlayHardwareId()
     {
         QByteArray ba;
         for (int i = 0; i < AIRPLAY_HARDWARE_ID_SIZE; i++)
+        {
+#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
             ba.append((MythRandom() % 80) + 33);
+#else
+            ba.append(MythRandom(33, 33 + 80 - 1));
+#endif
+        }
         id = ba.toHex();
     }
     id = id.toUpper();

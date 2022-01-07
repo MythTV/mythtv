@@ -27,6 +27,7 @@
 #include "libavutil/bprint.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem.h"
+#include "bytestream.h"
 
 #define STYLE_FLAG_BOLD         (1<<0)
 #define STYLE_FLAG_ITALIC       (1<<1)
@@ -116,7 +117,7 @@ typedef struct {
 typedef struct {
     uint32_t type;
     size_t base_size;
-    int (*decode)(const uint8_t *tsmb, MovTextContext *m, AVPacket *avpkt);
+    int (*decode)(const uint8_t *tsmb, MovTextContext *m, const AVPacket *avpkt);
 } Box;
 
 static void mov_text_cleanup(MovTextContext *m)
@@ -137,8 +138,8 @@ static void mov_text_cleanup_ftab(MovTextContext *m)
 
 static int mov_text_tx3g(AVCodecContext *avctx, MovTextContext *m)
 {
-    uint8_t *tx3g_ptr = avctx->extradata;
-    int i, font_length, remaining = avctx->extradata_size - BOX_SIZE_INITIAL;
+    const uint8_t *tx3g_ptr = avctx->extradata;
+    int i, j = -1, font_length, remaining = avctx->extradata_size - BOX_SIZE_INITIAL;
     int8_t v_align, h_align;
     unsigned ftab_entries;
     StyleBox s_default;
@@ -150,8 +151,8 @@ static int mov_text_tx3g(AVCodecContext *avctx, MovTextContext *m)
     // Display Flags
     tx3g_ptr += 4;
     // Alignment
-    h_align = *tx3g_ptr++;
-    v_align = *tx3g_ptr++;
+    h_align = bytestream_get_byte(&tx3g_ptr);
+    v_align = bytestream_get_byte(&tx3g_ptr);
     if (h_align == 0) {
         if (v_align == 0)
             m->d.alignment = TOP_LEFT;
@@ -177,29 +178,24 @@ static int mov_text_tx3g(AVCodecContext *avctx, MovTextContext *m)
             m->d.alignment = BOTTOM_RIGHT;
     }
     // Background Color
-    m->d.back_color = AV_RB24(tx3g_ptr);
-    tx3g_ptr += 3;
-    m->d.back_alpha = AV_RB8(tx3g_ptr);
-    tx3g_ptr += 1;
+    m->d.back_color = bytestream_get_be24(&tx3g_ptr);
+    m->d.back_alpha = bytestream_get_byte(&tx3g_ptr);
     // BoxRecord
     tx3g_ptr += 8;
     // StyleRecord
     tx3g_ptr += 4;
     // fontID
-    m->d.fontID = AV_RB16(tx3g_ptr);
-    tx3g_ptr += 2;
+    m->d.fontID = bytestream_get_be16(&tx3g_ptr);
     // face-style-flags
-    s_default.style_flag = *tx3g_ptr++;
+    s_default.style_flag = bytestream_get_byte(&tx3g_ptr);
     m->d.bold = !!(s_default.style_flag & STYLE_FLAG_BOLD);
     m->d.italic = !!(s_default.style_flag & STYLE_FLAG_ITALIC);
     m->d.underline = !!(s_default.style_flag & STYLE_FLAG_UNDERLINE);
     // fontsize
-    m->d.fontsize = *tx3g_ptr++;
+    m->d.fontsize = bytestream_get_byte(&tx3g_ptr);
     // Primary color
-    m->d.color = AV_RB24(tx3g_ptr);
-    tx3g_ptr += 3;
-    m->d.alpha = AV_RB8(tx3g_ptr);
-    tx3g_ptr += 1;
+    m->d.color = bytestream_get_be24(&tx3g_ptr);
+    m->d.alpha = bytestream_get_byte(&tx3g_ptr);
     // FontRecord
     // FontRecord Size
     tx3g_ptr += 4;
@@ -209,7 +205,7 @@ static int mov_text_tx3g(AVCodecContext *avctx, MovTextContext *m)
     // In case of broken header, init default font
     m->d.font = ASS_DEFAULT_FONT;
 
-    ftab_entries = AV_RB16(tx3g_ptr);
+    ftab_entries = bytestream_get_be16(&tx3g_ptr);
     if (!ftab_entries)
         return 0;
     remaining   -= 3 * ftab_entries;
@@ -219,12 +215,12 @@ static int mov_text_tx3g(AVCodecContext *avctx, MovTextContext *m)
     if (!m->ftab)
         return AVERROR(ENOMEM);
     m->ftab_entries = ftab_entries;
-    tx3g_ptr += 2;
 
     for (i = 0; i < m->ftab_entries; i++) {
-        m->ftab[i].fontID = AV_RB16(tx3g_ptr);
-        tx3g_ptr += 2;
-        font_length = *tx3g_ptr++;
+        m->ftab[i].fontID = bytestream_get_be16(&tx3g_ptr);
+        if (m->ftab[i].fontID == m->d.fontID)
+            j = i;
+        font_length = bytestream_get_byte(&tx3g_ptr);
 
         remaining  -= font_length;
         if (remaining < 0) {
@@ -236,48 +232,42 @@ static int mov_text_tx3g(AVCodecContext *avctx, MovTextContext *m)
             mov_text_cleanup_ftab(m);
             return AVERROR(ENOMEM);
         }
-        memcpy(m->ftab[i].font, tx3g_ptr, font_length);
+        bytestream_get_buffer(&tx3g_ptr, m->ftab[i].font, font_length);
         m->ftab[i].font[font_length] = '\0';
-        tx3g_ptr = tx3g_ptr + font_length;
     }
-    for (i = 0; i < m->ftab_entries; i++) {
-        if (m->d.fontID == m->ftab[i].fontID)
-            m->d.font = m->ftab[i].font;
-    }
+    if (j >= 0)
+        m->d.font = m->ftab[j].font;
     return 0;
 }
 
-static int decode_twrp(const uint8_t *tsmb, MovTextContext *m, AVPacket *avpkt)
+static int decode_twrp(const uint8_t *tsmb, MovTextContext *m, const AVPacket *avpkt)
 {
     m->box_flags |= TWRP_BOX;
-    m->w.wrap_flag = *tsmb++;
+    m->w.wrap_flag = bytestream_get_byte(&tsmb);
     return 0;
 }
 
-static int decode_hlit(const uint8_t *tsmb, MovTextContext *m, AVPacket *avpkt)
+static int decode_hlit(const uint8_t *tsmb, MovTextContext *m, const AVPacket *avpkt)
 {
     m->box_flags |= HLIT_BOX;
-    m->h.hlit_start = AV_RB16(tsmb);
-    tsmb += 2;
-    m->h.hlit_end = AV_RB16(tsmb);
-    tsmb += 2;
+    m->h.hlit_start = bytestream_get_be16(&tsmb);
+    m->h.hlit_end   = bytestream_get_be16(&tsmb);
     return 0;
 }
 
-static int decode_hclr(const uint8_t *tsmb, MovTextContext *m, AVPacket *avpkt)
+static int decode_hclr(const uint8_t *tsmb, MovTextContext *m, const AVPacket *avpkt)
 {
     m->box_flags |= HCLR_BOX;
-    memcpy(m->c.hlit_color, tsmb, 4);
-    tsmb += 4;
+    bytestream_get_buffer(&tsmb, m->c.hlit_color, 4);
     return 0;
 }
 
-static int decode_styl(const uint8_t *tsmb, MovTextContext *m, AVPacket *avpkt)
+static int decode_styl(const uint8_t *tsmb, MovTextContext *m, const AVPacket *avpkt)
 {
     int i;
-    int style_entries = AV_RB16(tsmb);
+    int style_entries = bytestream_get_be16(&tsmb);
     StyleBox *tmp;
-    tsmb += 2;
+
     // A single style record is of length 12 bytes.
     if (m->tracksize + m->size_var + 2 + style_entries * 12 > avpkt->size)
         return -1;
@@ -291,30 +281,30 @@ static int decode_styl(const uint8_t *tsmb, MovTextContext *m, AVPacket *avpkt)
     m->box_flags |= STYL_BOX;
     for(i = 0; i < m->style_entries; i++) {
         StyleBox *style = &m->s[i];
-        style->style_start = AV_RB16(tsmb);
-        tsmb += 2;
-        style->style_end = AV_RB16(tsmb);
 
+        style->style_start = bytestream_get_be16(&tsmb);
+        style->style_end   = bytestream_get_be16(&tsmb);
         if (   style->style_end < style->style_start
             || (i && style->style_start < m->s[i - 1].style_end)) {
             mov_text_cleanup(m);
             return AVERROR(ENOMEM);
         }
+        if (style->style_start == style->style_end) {
+            /* Skip this style as it applies to no character */
+            tsmb += 8;
+            m->style_entries--;
+            i--;
+            continue;
+        }
 
-        tsmb += 2;
-        style->style_fontID = AV_RB16(tsmb);
-        tsmb += 2;
-        style->style_flag = AV_RB8(tsmb);
+        style->style_fontID = bytestream_get_be16(&tsmb);
+        style->style_flag   = bytestream_get_byte(&tsmb);
         style->bold      = !!(style->style_flag & STYLE_FLAG_BOLD);
         style->italic    = !!(style->style_flag & STYLE_FLAG_ITALIC);
         style->underline = !!(style->style_flag & STYLE_FLAG_UNDERLINE);
-        tsmb++;
-        style->fontsize = AV_RB8(tsmb);
-        tsmb++;
-        style->color = AV_RB24(tsmb);
-        tsmb += 3;
-        style->alpha = AV_RB8(tsmb);
-        tsmb++;
+        style->fontsize  = bytestream_get_byte(&tsmb);
+        style->color     = bytestream_get_be24(&tsmb);
+        style->alpha     = bytestream_get_byte(&tsmb);
     }
     return 0;
 }
@@ -348,7 +338,6 @@ static int text_to_ass(AVBPrint *buf, const char *text, const char *text_end,
     MovTextContext *m = avctx->priv_data;
     int i = 0;
     int text_pos = 0;
-    int style_active = 0;
     int entry = 0;
     int color = m->d.color;
 
@@ -365,8 +354,13 @@ static int text_to_ass(AVBPrint *buf, const char *text, const char *text_end,
 
         if ((m->box_flags & STYL_BOX) && entry < m->style_entries) {
             const StyleBox *style = &m->s[entry];
-            if (text_pos == style->style_start) {
-                style_active = 1;
+            if (text_pos == style->style_end) {
+                av_bprintf(buf, "{\\r}");
+                color = m->d.color;
+                entry++;
+                style++;
+            }
+            if (entry < m->style_entries && text_pos == style->style_start) {
                 if (style->bold ^ m->d.bold)
                     av_bprintf(buf, "{\\b%d}", style->bold);
                 if (style->italic ^ m->d.italic)
@@ -386,14 +380,6 @@ static int text_to_ass(AVBPrint *buf, const char *text, const char *text_end,
                 }
                 if (m->d.alpha != style->alpha)
                     av_bprintf(buf, "{\\1a&H%02X&}", 255 - style->alpha);
-            }
-            if (text_pos == style->style_end) {
-                if (style_active) {
-                    av_bprintf(buf, "{\\r}");
-                    style_active = 0;
-                    color = m->d.color;
-                }
-                entry++;
             }
         }
         if (m->box_flags & HLIT_BOX) {
@@ -426,19 +412,17 @@ static int text_to_ass(AVBPrint *buf, const char *text, const char *text_end,
             av_log(avctx, AV_LOG_ERROR, "invalid UTF-8 byte in subtitle\n");
             len = 1;
         }
-        for (i = 0; i < len; i++) {
-            switch (*text) {
-            case '\r':
-                break;
-            case '\n':
-                av_bprintf(buf, "\\N");
-                break;
-            default:
-                av_bprint_chars(buf, *text, 1);
-                break;
-            }
-            text++;
+        switch (*text) {
+        case '\r':
+            break;
+        case '\n':
+            av_bprintf(buf, "\\N");
+            break;
+        default:
+            av_bprint_append_data(buf, text, len);
+            break;
         }
+        text += len;
         text_pos++;
     }
 

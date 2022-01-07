@@ -24,6 +24,7 @@
 #define HEVCPARSER_H
 
 #include <H2645Parser.h>
+#include <array>
 #include <map>
 
 class HEVCParser : public H2645Parser

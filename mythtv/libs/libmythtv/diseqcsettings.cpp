@@ -5,6 +5,7 @@
  */
 
 // Std C headers
+#include <array>
 #include <cmath>
 #include <utility>
 

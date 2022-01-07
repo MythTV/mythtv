@@ -242,10 +242,11 @@ MythVAAPIInteropGLXCopy::~MythVAAPIInteropGLXCopy()
     }
 }
 
-vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL* Context,
-                                                                 MythVideoColourSpace* ColourSpace,
-                                                                 MythVideoFrame* Frame,
-                                                                 FrameScanType Scan)
+std::vector<MythVideoTextureOpenGL*>
+MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL* Context,
+                                 MythVideoColourSpace* ColourSpace,
+                                 MythVideoFrame* Frame,
+                                 FrameScanType Scan)
 {
     std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame)
@@ -338,10 +339,11 @@ MythVAAPIInteropGLXPixmap::~MythVAAPIInteropGLXPixmap()
         XFreePixmap(display, m_pixmap);
 }
 
-vector<MythVideoTextureOpenGL*> MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL* Context,
-                                                                   MythVideoColourSpace* ColourSpace,
-                                                                   MythVideoFrame* Frame,
-                                                                   FrameScanType Scan)
+std::vector<MythVideoTextureOpenGL*>
+MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL* Context,
+                                   MythVideoColourSpace* ColourSpace,
+                                   MythVideoFrame* Frame,
+                                   FrameScanType Scan)
 {
     std::vector<MythVideoTextureOpenGL*> result;
     if (!Frame)

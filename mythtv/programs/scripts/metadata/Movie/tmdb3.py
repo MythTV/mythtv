@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # ----------------------
 # Name: tmdb3.py
@@ -64,7 +64,7 @@ def main(showType, command):
                       "Needs inetref. ")
     parser.add_option('-C', "--collection", action="store_true", default=False,
                       dest="collectiondata", help="Get Collection data.")
-    parser.add_option('-l', "--language", metavar="LANGUAGE", default=u'en',
+    parser.add_option('-l', "--language", metavar="LANGUAGE", default='en',
                       dest="language", help="Specify language for filtering.")
     parser.add_option('-a', "--area", metavar="COUNTRY", default=None,
                       dest="country", help="Specify country for custom data.")

@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: mtv_api - Simple-to-use Python interface to the MTV API (http://www.mtv.com/)
 # Python Script
@@ -37,7 +37,7 @@ __version__="v0.2.5"
 
 import os, struct, sys, re, time
 from datetime import datetime, timedelta
-import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import logging
 
 try:
@@ -45,7 +45,8 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ElementTree
 
-from mtv_exceptions import (MtvUrlError, MtvHttpError, MtvRssError, MtvVideoNotFound, MtvInvalidSearchType, MtvXmlError, MtvVideoDetailError)
+from .mtv_exceptions import (MtvUrlError, MtvHttpError, MtvRssError, MtvVideoNotFound, MtvInvalidSearchType, MtvXmlError, MtvVideoDetailError)
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -58,22 +59,17 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 class XmlHandler:
@@ -84,8 +80,8 @@ class XmlHandler:
 
     def _grabUrl(self, url):
         try:
-            urlhandle = urllib.urlopen(url)
-        except IOError, errormsg:
+            urlhandle = urllib.request.urlopen(url)
+        except IOError as errormsg:
             raise MtvHttpError(errormsg)
         return urlhandle.read()
 
@@ -93,7 +89,7 @@ class XmlHandler:
         xml = self._grabUrl(self.url)
         try:
             et = ElementTree.fromstring(xml)
-        except SyntaxError, errormsg:
+        except SyntaxError as errormsg:
             raise MtvXmlError(errormsg)
         return et
 
@@ -171,22 +167,22 @@ class Videos(object):
         # Defaulting to ENGISH but the MTV apis do not support specifying a language
         self.config['language'] = "en"
 
-        self.error_messages = {'MtvUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'MtvHttpError': u"! Error: An HTTP communications error with MTV was raised (%s)\n", 'MtvRssError': u"! Error: Invalid RSS metadata\nwas received from MTV error (%s). Skipping item.\n", 'MtvVideoNotFound': u"! Error: Video search with MTV did not return any results (%s)\n", 'MtvVideoDetailError': u"! Error: Invalid Video metadata detail\nwas received from MTV error (%s). Skipping item.\n", }
+        self.error_messages = {'MtvUrlError': "! Error: The URL (%s) cause the exception error (%s)\n", 'MtvHttpError': "! Error: An HTTP communications error with MTV was raised (%s)\n", 'MtvRssError': "! Error: Invalid RSS metadata\nwas received from MTV error (%s). Skipping item.\n", 'MtvVideoNotFound': "! Error: Video search with MTV did not return any results (%s)\n", 'MtvVideoDetailError': "! Error: Invalid Video metadata detail\nwas received from MTV error (%s). Skipping item.\n", }
 
         # This is an example that must be customized for each target site
         self.key_translation = [{'channel_title': 'channel_title', 'channel_link': 'channel_link', 'channel_description': 'channel_description', 'channel_numresults': 'channel_numresults', 'channel_returned': 'channel_returned', 'channel_startindex': 'channel_startindex'}, {'title': 'item_title', 'media_credit': 'item_author', 'published_parsed': 'item_pubdate', 'media_description': 'item_description', 'video': 'item_link', 'thumbnail': 'item_thumbnail', 'link': 'item_url', 'duration': 'item_duration', 'item_rating': 'item_rating', 'item_width': 'item_width', 'item_height': 'item_height', 'language': 'item_lang'}]
 
-        self.config[u'urls'] = {}
+        self.config['urls'] = {}
 
-        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
-        self.config[u'urls'] = {}
+        self.config['image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
+        self.config['urls'] = {}
 
         # Functions that parse video data from RSS data
         self.config['item_parser'] = {}
         self.config['item_parser']['main'] = self.getVideosForURL
 
         # v2 api calls - An example that must be customized for each target site
-        self.config[u'urls'][u'tree.view'] = {
+        self.config['urls']['tree.view'] = {
             'new_genres': {
                 '__all__': ['http://api.mtvnservices.com/1/genre/%s/videos/?', 'main'],
                 },
@@ -207,8 +203,8 @@ class Videos(object):
         d1 = datetime.now()
         yr = d1 - timedelta(weeks=52)
         mts = d1 - timedelta(days=93)
-        last_3_months = u'%s-%s' % (mts.strftime('%m%d%Y'), d1.strftime('%m%d%Y'))
-        last_year = u'%s-%s' % (yr.strftime('%m%d%Y'), d1.strftime('%m%d%Y'))
+        last_3_months = '%s-%s' % (mts.strftime('%m%d%Y'), d1.strftime('%m%d%Y'))
+        last_year = '%s-%s' % (yr.strftime('%m%d%Y'), d1.strftime('%m%d%Y'))
 
         # http://api.mtvnservices.com/1/genre/rock/videos/?&max-results=20&start-index=1
         self.tree_customize = {
@@ -240,11 +236,11 @@ class Videos(object):
             },
             }
         # Get the absolute path to the mtv.html file
-        self.mtvHtmlPath = u'file://'+os.path.dirname( os.path.realpath( __file__ )).replace(u'/nv_python_libs/mtv', u'/nv_python_libs/configs/HTML/mtv.html?title=%s&amp;videocode=%s')
+        self.mtvHtmlPath = 'file://'+os.path.dirname( os.path.realpath( __file__ )).replace('/nv_python_libs/mtv', '/nv_python_libs/configs/HTML/mtv.html?title=%s&amp;videocode=%s')
 
         # Initialize the tree view flag so that the item parsing code can be used for multiple purposes
         self.treeview = False
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/mtv.png'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/mtv.png'
     # end __init__()
 
 ###########################################################################################################
@@ -266,24 +262,24 @@ class Videos(object):
             if text[:2] == "&#":
                 try:
                     if text[:3] == "&#x":
-                        return unichr(int(text[3:-1], 16))
+                        return chr(int(text[3:-1], 16))
                     else:
-                        return unichr(int(text[2:-1]))
+                        return chr(int(text[2:-1]))
                 except ValueError:
                     pass
             elif text[:1] == "&":
-                import htmlentitydefs
-                entity = htmlentitydefs.entitydefs.get(text[1:-1])
+                import html.entities
+                entity = html.entities.entitydefs.get(text[1:-1])
                 if entity:
                     if entity[:2] == "&#":
                         try:
-                            return unichr(int(entity[2:-1]))
+                            return chr(int(entity[2:-1]))
                         except ValueError:
                             pass
                     else:
-                        return unicode(entity, "iso-8859-1")
+                        return str(entity, "iso-8859-1")
             return text # leave as is
-        return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+        return self.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace('\n',' ')
     # end massageDescription()
 
 
@@ -310,9 +306,9 @@ class Videos(object):
         if text is None:
             return text
         try:
-            return unicode(text, 'utf8')
+            return str(text, 'utf8')
         except UnicodeDecodeError:
-            return u''
+            return ''
         except (UnicodeEncodeError, TypeError):
             return text
     # end textUtf8()
@@ -322,7 +318,7 @@ class Videos(object):
         '''Replace all "&" characters with "&amp;"
         '''
         text = self.textUtf8(text)
-        return text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
+        return text.replace('&amp;','~~~~~').replace('&','&amp;').replace('~~~~~', '&amp;')
     # end ampReplace()
 
 
@@ -332,14 +328,14 @@ class Videos(object):
         '''
         self.tree_dir_icon = self.channel_icon
         if not dir_icon:
-            if not self.feed_icons.has_key(self.tree_key):
+            if self.tree_key not in self.feed_icons:
                 return self.tree_dir_icon
-            if not self.feed_icons[self.tree_key].has_key(self.feed):
+            if self.feed not in self.feed_icons[self.tree_key]:
                 return self.tree_dir_icon
             dir_icon = self.feed_icons[self.tree_key][self.feed]
             if not dir_icon:
                 return self.tree_dir_icon
-        self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
+        self.tree_dir_icon = '%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
         return self.tree_dir_icon
     # end setTreeViewIcon()
 
@@ -355,18 +351,18 @@ class Videos(object):
         return an array of matching item dictionaries
         return
         '''
-        url = self.config[u'urls'][u'video.search'] % (urllib.quote_plus(title.encode("utf-8")), pagenumber , pagelen,)
+        url = self.config['urls']['video.search'] % (urllib.parse.quote_plus(title.encode("utf-8")), pagenumber , pagelen,)
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
 
         try:
             etree = XmlHandler(url).getEt()
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise MtvUrlError(self.error_messages['MtvUrlError'] % (url, errormsg))
 
         if etree is None:
-            raise MtvVideoNotFound(u"No MTV Video matches found for search value (%s)" % title)
+            raise MtvVideoNotFound("No MTV Video matches found for search value (%s)" % title)
 
         data = []
         for entry in etree:
@@ -391,35 +387,35 @@ class Videos(object):
 
         # Make sure there are no item elements that are None
         for item in data:
-            for key in item.keys():
+            for key in list(item.keys()):
                 if item[key] is None:
-                    item[key] = u''
+                    item[key] = ''
 
         # Massage each field and eliminate any item without a URL
         elements_final = []
         for item in data:
-            if not 'id' in item.keys():
+            if not 'id' in list(item.keys()):
                 continue
 
             video_details = None
             try:
-                video_details = self.videoDetails(item['id'], urllib.quote(item['title'].encode("utf-8")))
-            except MtvUrlError, msg:
+                video_details = self.videoDetails(item['id'], urllib.parse.quote(item['title'].encode("utf-8")))
+            except MtvUrlError as msg:
                 sys.stderr.write(self.error_messages['MtvUrlError'] % msg)
-            except MtvVideoDetailError, msg:
+            except MtvVideoDetailError as msg:
                 sys.stderr.write(self.error_messages['MtvVideoDetailError'] % msg)
-            except Exception, e:
-                sys.stderr.write(u"! Error: Unknown error while retrieving a Video's meta data. Skipping video.' (%s)\nError(%s)\n" % (title, e))
+            except Exception as e:
+                sys.stderr.write("! Error: Unknown error while retrieving a Video's meta data. Skipping video.' (%s)\nError(%s)\n" % (title, e))
 
             if video_details:
-                for key in video_details.keys():
+                for key in list(video_details.keys()):
                     item[key] = video_details[key]
 
-            item['language'] = u''
-            for key in item.keys():
+            item['language'] = ''
+            for key in list(item.keys()):
                 if key == 'content':
                     if len(item[key]):
-                        if item[key][0].has_key('language'):
+                        if 'language' in item[key][0]:
                             if item[key][0]['language'] is not None:
                                 item['language'] = item[key][0]['language']
                 if key == 'published_parsed': # '2009-12-21T00:00:00Z'
@@ -431,49 +427,49 @@ class Videos(object):
                     # Strip the HTML tags
                     if item[key]:
                         item[key] = self.massageDescription(item[key].strip())
-                        item[key] = item[key].replace(u'|', u'-')
+                        item[key] = item[key].replace('|', '-')
                     continue
-                if type(item[key]) == type(u''):
+                if type(item[key]) == type(''):
                     if item[key]:
                         item[key] = item[key].replace('"\n',' ').strip()
             elements_final.append(item)
 
         if not len(elements_final):
-            raise MtvVideoNotFound(u"No MTV Video matches found for search value (%s)" % title)
+            raise MtvVideoNotFound("No MTV Video matches found for search value (%s)" % title)
 
         return elements_final
         # end searchTitle()
 
 
-    def videoDetails(self, url, title=u''):
+    def videoDetails(self, url, title=''):
         '''Using the passed URL retrieve the video meta data details
         return a dictionary of video metadata details
         return
         '''
         if self.config['debug_enabled']:
-            print url
-            print
+            print(url)
+            print()
 
         try:
             etree = XmlHandler(url).getEt()
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise MtvUrlError(self.error_messages['MtvUrlError'] % (url, errormsg))
 
         if etree is None:
-            raise MtvVideoDetailError(u'1-No Video meta data for (%s)' % url)
+            raise MtvVideoDetailError('1-No Video meta data for (%s)' % url)
 
         metadata = {}
         cur_size = True
         for e in etree:
-            if e.tag.endswith(u'content') and e.text is None:
-                index = e.get('url').rindex(u':')
+            if e.tag.endswith('content') and e.text is None:
+                index = e.get('url').rindex(':')
                 metadata['video'] = self.mtvHtmlPath % (title,  e.get('url')[index+1:])
                 # !! This tag will need to be added at a later date
 #                metadata['customhtml'] = u'true'
                 metadata['duration'] =  e.get('duration')
-            if e.tag.endswith(u'player'):
+            if e.tag.endswith('player'):
                 metadata['link'] = e.get('url')
-            if e.tag.endswith(u'thumbnail'):
+            if e.tag.endswith('thumbnail'):
                 if cur_size == False:
                     continue
                 height = e.get('height')
@@ -486,11 +482,11 @@ class Videos(object):
                     break
 
         if not len(metadata):
-            raise MtvVideoDetailError(u'2-No Video meta data for (%s)' % url)
+            raise MtvVideoDetailError('2-No Video meta data for (%s)' % url)
 
-        if not metadata.has_key('video'):
+        if 'video' not in metadata:
             metadata['video'] =  metadata['link']
-            metadata['duration'] =  u''
+            metadata['duration'] =  ''
         else:
             metadata['link'] =  metadata['video']
 
@@ -503,11 +499,11 @@ class Videos(object):
         """
         # v2 api calls - An example that must be customized for each target site
         if self.grabber_title == 'MTV':
-            self.config[u'urls'][u'video.search'] = "http://api.mtvnservices.com/1/video/search/?term=%s&start-index=%s&max-results=%s"
+            self.config['urls']['video.search'] = "http://api.mtvnservices.com/1/video/search/?term=%s&start-index=%s&max-results=%s"
         elif self.grabber_title == 'MTV Artists': # This search type is not currently implemented
-            self.config[u'urls'][u'video.search'] = "http://api.mtvnservices.com/1/artist/search/?term=%s&start-index=%s&max-results=%s"
+            self.config['urls']['video.search'] = "http://api.mtvnservices.com/1/artist/search/?term=%s&start-index=%s&max-results=%s"
         else:
-            sys.stderr.write(u"! Error: MtvInvalidSearchType - The grabber name (%s) is invalid \n" % self.grabber_title)
+            sys.stderr.write("! Error: MtvInvalidSearchType - The grabber name (%s) is invalid \n" % self.grabber_title)
             sys.exit(1)
 
 
@@ -520,20 +516,20 @@ class Videos(object):
         startindex = (int(pagenumber) -1) * self.page_limit + 1
         try:
             data = self.searchTitle(title, startindex, self.page_limit)
-        except MtvVideoNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+        except MtvVideoNotFound as msg:
+            sys.stderr.write("%s\n" % msg)
             return None
-        except MtvUrlError, msg:
-            sys.stderr.write(u'%s\n' % msg)
+        except MtvUrlError as msg:
+            sys.stderr.write('%s\n' % msg)
             sys.exit(1)
-        except MtvHttpError, msg:
+        except MtvHttpError as msg:
             sys.stderr.write(self.error_messages['MtvHttpError'] % msg)
             sys.exit(1)
-        except MtvRssError, msg:
+        except MtvRssError as msg:
             sys.stderr.write(self.error_messages['MtvRssError'] % msg)
             sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data is None:
@@ -544,15 +540,15 @@ class Videos(object):
         items = []
         for match in data:
             item_data = {}
-            for key in self.key_translation[1].keys():
-                if key in match.keys():
+            for key in list(self.key_translation[1].keys()):
+                if key in list(match.keys()):
                     item_data[self.key_translation[1][key]] = match[key]
                 else:
-                    item_data[self.key_translation[1][key]] = u''
+                    item_data[self.key_translation[1][key]] = ''
             items.append(item_data)
 
         # Channel details and search results
-        channel = {'channel_title': u'MTV', 'channel_link': u'http://www.mtv.com', 'channel_description': u"Visit MTV (Music Television) for TV shows, music videos, celebrity photos, news.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        channel = {'channel_title': 'MTV', 'channel_link': 'http://www.mtv.com', 'channel_description': "Visit MTV (Music Television) for TV shows, music videos, celebrity photos, news.", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
         if len(items) == self.page_limit:
             channel['channel_numresults'] = self.page_limit * int(pagenumber) + 1
@@ -574,17 +570,17 @@ class Videos(object):
         return array of directories and their video metadata
         '''
         # Channel details and search results
-        self.channel = {'channel_title': u'MTV', 'channel_link': u'http://www.mtv.com', 'channel_description': u"Visit MTV (Music Television) for TV shows, music videos, celebrity photos, news.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'MTV', 'channel_link': 'http://www.mtv.com', 'channel_description': "Visit MTV (Music Television) for TV shows, music videos, celebrity photos, news.", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
         if self.config['debug_enabled']:
-            print self.config[u'urls']
-            print
+            print(self.config['urls'])
+            print()
 
         # Set the default videos per page limit for all feeds/categories/... etc
-        for key in self.tree_customize.keys():
-            if '__default__' in self.tree_customize[key].keys():
-                if 'max-results' in self.tree_customize[key]['__default__'].keys():
-                    self.tree_customize[key]['__default__']['max-results'] = unicode(self.page_limit)
+        for key in list(self.tree_customize.keys()):
+            if '__default__' in list(self.tree_customize[key].keys()):
+                if 'max-results' in list(self.tree_customize[key]['__default__'].keys()):
+                    self.tree_customize[key]['__default__']['max-results'] = str(self.page_limit)
 
         # Get videos within each category
         dictionaries = []
@@ -604,17 +600,17 @@ class Videos(object):
         additions = dict(self.tree_customize[self.tree_key]['__default__']) # Set defaults
 
         # Add customizations
-        if self.feed in self.tree_customize[self.tree_key].keys():
-            for element in self.tree_customize[self.tree_key][self.feed].keys():
+        if self.feed in list(self.tree_customize[self.tree_key].keys()):
+            for element in list(self.tree_customize[self.tree_key][self.feed].keys()):
                 additions[element] = self.tree_customize[self.tree_key][self.feed][element]
 
         # Make the search extension string that is added to the URL
-        addition = u''
-        for ky in additions.keys():
+        addition = ''
+        for ky in list(additions.keys()):
             if ky.startswith('add_'):
-                addition+=u'/%s' %  additions[ky]
+                addition+='/%s' %  additions[ky]
             else:
-                addition+=u'&%s=%s' %  (ky, additions[ky])
+                addition+='&%s=%s' %  (ky, additions[ky])
         index = URL.find('%')
         if index == -1:
             return (URL+addition)
@@ -635,14 +631,14 @@ class Videos(object):
                     except KeyError:
                         dictionaries.append([self.massageDescription(sets[0]), self.channel_icon])
                 else:
-                    dictionaries.append(['', u'']) # Add the nested dictionary indicator
+                    dictionaries.append(['', '']) # Add the nested dictionary indicator
                 continue
             temp_dictionary = []
             for self.feed in sets[1]:
-                if self.config[u'urls'][u'tree.view'][self.tree_key].has_key('__all__'):
-                    URL = self.config[u'urls'][u'tree.view'][self.tree_key]['__all__']
+                if '__all__' in self.config['urls']['tree.view'][self.tree_key]:
+                    URL = self.config['urls']['tree.view'][self.tree_key]['__all__']
                 else:
-                    URL = self.config[u'urls'][u'tree.view'][self.tree_key][self.feed]
+                    URL = self.config['urls']['tree.view'][self.tree_key][self.feed]
                 temp_dictionary = self.config['item_parser'][URL[1]](self.makeURL(URL[0]), temp_dictionary)
             if len(temp_dictionary):
                 if len(sets[0]): # Add the nested dictionaries display name
@@ -653,7 +649,7 @@ class Videos(object):
                 for element in temp_dictionary:
                     dictionaries.append(element)
                 if len(sets[0]):
-                    dictionaries.append(['', u'']) # Add the nested dictionary indicator
+                    dictionaries.append(['', '']) # Add the nested dictionary indicator
         return dictionaries
     # end getVideos()
 
@@ -665,29 +661,29 @@ class Videos(object):
         initial_length = len(dictionaries)
 
         if self.config['debug_enabled']:
-            print "Category URL:"
-            print url
-            print
+            print("Category URL:")
+            print(url)
+            print()
 
         try:
             etree = XmlHandler(url).getEt()
-        except Exception, errormsg:
+        except Exception as errormsg:
             sys.stderr.write(self.error_messages['MtvUrlError'] % (url, errormsg))
             return dictionaries
 
         if etree is None:
-            sys.stderr.write(u'1-No Videos for (%s)\n' % self.feed)
+            sys.stderr.write('1-No Videos for (%s)\n' % self.feed)
             return dictionaries
 
         dictionary_first = False
         for elements in etree:
-            if elements.tag.endswith(u'totalResults'):
+            if elements.tag.endswith('totalResults'):
                 self.channel['channel_numresults'] += int(elements.text)
                 self.channel['channel_startindex'] = self.page_limit
                 self.channel['channel_returned'] = self.page_limit # False value CHANGE later
                 continue
 
-            if not elements.tag.endswith(u'entry'):
+            if not elements.tag.endswith('entry'):
                 continue
 
             metadata = {}
@@ -695,33 +691,33 @@ class Videos(object):
             flash = False
             metadata['language'] = self.config['language']
             for e in elements:
-                if e.tag.endswith(u'title'):
+                if e.tag.endswith('title'):
                     if e.text is not None:
                         metadata['title'] = self.massageDescription(e.text.strip())
                     else:
-                        metadata['title'] = u''
+                        metadata['title'] = ''
                     continue
-                if e.tag == u'content':
+                if e.tag == 'content':
                     if e.text is not None:
                         metadata['media_description'] = self.massageDescription(e.text.strip())
                     else:
-                        metadata['media_description'] = u''
+                        metadata['media_description'] = ''
                     continue
-                if e.tag.endswith(u'published'): # '2007-03-06T00:00:00Z'
+                if e.tag.endswith('published'): # '2007-03-06T00:00:00Z'
                     if e.text is not None:
                         pub_time = time.strptime(e.text.strip(), "%Y-%m-%dT%H:%M:%SZ")
                         metadata['published_parsed'] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
                     else:
-                        metadata['published_parsed'] = u''
+                        metadata['published_parsed'] = ''
                     continue
-                if e.tag.endswith(u'content') and e.text is None:
+                if e.tag.endswith('content') and e.text is None:
                     metadata['video'] =  self.ampReplace(e.get('url'))
                     metadata['duration'] =  e.get('duration')
                     continue
-                if e.tag.endswith(u'player'):
+                if e.tag.endswith('player'):
                     metadata['link'] = self.ampReplace(e.get('url'))
                     continue
-                if e.tag.endswith(u'thumbnail'):
+                if e.tag.endswith('thumbnail'):
                     if cur_size == False:
                         continue
                     height = e.get('height')
@@ -732,27 +728,27 @@ class Videos(object):
                     if int(width) >= 200:
                         cur_size = False
                     continue
-                if e.tag.endswith(u'author'):
+                if e.tag.endswith('author'):
                     for a in e:
-                        if a.tag.endswith(u'name'):
+                        if a.tag.endswith('name'):
                             if a.text:
                                 metadata['media_credit'] = self.massageDescription(a.text.strip())
                             else:
-                                metadata['media_credit'] = u''
+                                metadata['media_credit'] = ''
                             break
                     continue
 
             if not len(metadata):
-                raise MtvVideoDetailError(u'2-No Video meta data for (%s)' % url)
+                raise MtvVideoDetailError('2-No Video meta data for (%s)' % url)
 
-            if not metadata.has_key('video') and not metadata.has_key('link'):
+            if 'video' not in metadata and 'link' not in metadata:
                 continue
 
-            if not metadata.has_key('video'):
+            if 'video' not in metadata:
                 metadata['video'] = metadata['link']
             else:
-                index = metadata['video'].rindex(u':')
-                metadata['video'] = self.mtvHtmlPath % (urllib.quote(metadata['title'].encode("utf-8")), metadata['video'][index+1:])
+                index = metadata['video'].rindex(':')
+                metadata['video'] = self.mtvHtmlPath % (urllib.parse.quote(metadata['title'].encode("utf-8")), metadata['video'][index+1:])
                 metadata['link'] =  metadata['video']
                 # !! This tag will need to be added at a later date
 #                metadata['customhtml'] = u'true'
@@ -762,15 +758,15 @@ class Videos(object):
                 dictionary_first = True
 
             final_item = {}
-            for key in self.key_translation[1].keys():
-                if not metadata.has_key(key):
-                    final_item[self.key_translation[1][key]] = u''
+            for key in list(self.key_translation[1].keys()):
+                if key not in metadata:
+                    final_item[self.key_translation[1][key]] = ''
                 else:
                     final_item[self.key_translation[1][key]] = metadata[key]
             dictionaries.append(final_item)
 
         if initial_length < len(dictionaries): # Need to check if there was any items for this Category
-            dictionaries.append(['', u'']) # Add the nested dictionary indicator
+            dictionaries.append(['', '']) # Add the nested dictionary indicator
         return dictionaries
     # end getVideosForURL()
 # end Videos() class

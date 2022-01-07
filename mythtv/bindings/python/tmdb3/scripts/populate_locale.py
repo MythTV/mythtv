@@ -39,7 +39,7 @@ for row in root.getroot().getchildren()[3].getchildren()[2].getchildren()[0]\
     if row.getchildren()[0].tag == "th":
         # skip header
         continue
-    if row.getchildren()[-1].text == u"\xa0":
+    if row.getchildren()[-1].text == "\xa0":
         # skip empty 639-1 code
         continue
     name, _, _, iso639_2, iso639_1 = [t.text for t in row]

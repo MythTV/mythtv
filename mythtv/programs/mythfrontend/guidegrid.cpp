@@ -460,7 +460,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
     }
     if (chanid == 0 && actualChannum.isEmpty())
     {
-        vector<uint> inputIDs = RemoteRequestFreeInputList(0);
+        std::vector<unsigned int> inputIDs = RemoteRequestFreeInputList(0);
         if (!inputIDs.empty())
             actualChannum = CardUtil::GetStartChannel(inputIDs[0]);
     }
@@ -1266,7 +1266,7 @@ ChannelInfoList GuideGrid::GetSelection(void) const
 
     uint si  = m_channelInfoIdx[idx];
 
-    vector<uint64_t> sel;
+    std::vector<uint64_t> sel;
     sel.push_back( MKKEY(idx, si) );
 
     const ChannelInfo *ch = GetChannelInfo(sel[0]>>32, sel[0]&0xffff);
@@ -1355,7 +1355,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
                                          0,
                                          (m_changrpid < 0) ? 0 : m_changrpid);
 
-    using uint_list_t = vector<uint>;
+    using uint_list_t = std::vector<unsigned int>;
     QMap<QString,uint_list_t> channum_to_index_map;
     QMap<QString,uint_list_t> callsign_to_index_map;
 
@@ -1636,7 +1636,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
     m_progPast = progPast;
 
     auto program = proglist->begin();
-    vector<ProgramInfo*> unknownlist;
+    std::vector<ProgramInfo*> unknownlist;
     bool unknown = false;
     ProgramInfo *proginfo = nullptr;
     for (int x = 0; x < m_timeCount; ++x)

@@ -18,14 +18,15 @@
 
 // System specific C headers
 #include "compat.h"
+#include <QtGlobal>
 
-#ifdef linux
+#ifdef __linux__
 #include <sys/vfs.h>
 #include <sys/sysinfo.h>
 #include <sys/stat.h> // for umask, chmod
 #endif
 
-#if CONFIG_DARWIN
+#ifdef Q_OS_DARWIN
 #include <mach/mach.h>
 #endif
 
@@ -58,7 +59,6 @@
 #include "mythcoreutil.h"
 #include "mythsystemlegacy.h"
 
-#include "mythconfig.h" // for CONFIG_DARWIN
 
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
 #define qEnvironmentVariable getenv
@@ -79,7 +79,7 @@ bool getUptime(std::chrono::seconds &uptime)
     }
     uptime = std::chrono::seconds(sinfo.uptime);
 
-#elif defined(__FreeBSD__) || CONFIG_DARWIN
+#elif defined(__FreeBSD__) || defined(Q_OS_DARWIN)
 
     std::array<int,2> mib { CTL_KERN, KERN_BOOTTIME };
     struct timeval bootTime;
@@ -128,7 +128,7 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     totalVM = (int)((sinfo.totalswap * sinfo.mem_unit)/MB);
     freeVM  = (int)((sinfo.freeswap  * sinfo.mem_unit)/MB);
     return true;
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
     mach_port_t             mp;
     mach_msg_type_number_t  count;
     vm_size_t               pageSize;
@@ -259,12 +259,12 @@ bool ping(const QString &host, std::chrono::milliseconds timeout)
     QString addrstr =
         MythCoreContext::resolveAddress(host, gCoreContext->ResolveAny, true);
     QHostAddress addr = QHostAddress(addrstr);
-#if defined(__FreeBSD__) || CONFIG_DARWIN
+#if defined(__FreeBSD__) || defined(Q_OS_DARWIN)
     QString timeoutparam("-t");
 #else
     // Linux, NetBSD, OpenBSD
     QString timeoutparam("-w");
-#endif
+#endif // UNIX-like
     QString pingcmd =
         addr.protocol() == QAbstractSocket::IPv6Protocol ? "ping6" : "ping";
     QString cmd = QString("%1 %2 %3 -c 1  %4  >/dev/null 2>&1")
@@ -274,7 +274,7 @@ bool ping(const QString &host, std::chrono::milliseconds timeout)
 
     return myth_system(cmd, kMSDontBlockInputDevs | kMSDontDisableDrawing |
                          kMSProcessEvents) == GENERIC_EXIT_OK;
-#endif
+#endif // _WIN32
 }
 
 /**
@@ -290,7 +290,7 @@ bool telnet(const QString &host, int port)
     return connected;
 }
 
-/** \fn copy(QFile&,QFile&,uint)
+/**
  *  \brief Copies src file to dst file.
  *
  *   If the dst file is open, it must be open for writing.
@@ -311,7 +311,7 @@ bool telnet(const QString &host, int port)
  *                    otherwise the default of 16 KB will be used.
  *  \return bytes copied on success, -1 on failure.
  */
-long long copy(QFile &dst, QFile &src, uint block_size)
+long long MythFile::copy(QFile &dst, QFile &src, uint block_size)
 {
     uint buflen = (block_size < 1024) ? (16 * 1024) : block_size;
     char *buf = new char[buflen];
@@ -692,7 +692,7 @@ bool IsPulseAudioRunning(void)
     return false;
 #else
 
-#if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
+#if defined(Q_OS_DARWIN) || defined(__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -ax | grep -i pulseaudio | grep -v grep > /dev/null";
 #else
     const char *command = "ps ch -C pulseaudio -o pid > /dev/null";
@@ -1233,11 +1233,6 @@ int naturalCompare(const QString &_a, const QString &_b, Qt::CaseSensitivity cas
     }
 
     return currA->isNull() ? -1 : + 1;
-}
-
-QString MythFormatTime(std::chrono::milliseconds msecs, const QString& fmt)
-{
-    return QTime::fromMSecsSinceStartOfDay(msecs.count()).toString(fmt);
 }
 
 /*

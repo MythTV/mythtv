@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 # Copyright (C) 2009 Marc Poulhiès
 #
 # Python module for Vimeo
@@ -55,17 +55,19 @@ __version__="v0.2.5"
 Python module to interact with Vimeo through its API (version 2)
 """
 import os, struct, sys, re, time, datetime
-import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import logging
 import pycurl
 import xml.etree.ElementTree as ET
 import inspect
-import oauth.oauth_api as oauth
+from .oauth import oauth_api as oauth
 from MythTV import MythXML
 
-from vimeo_exceptions import (VimeoUrlError, VimeoHttpError, VimeoResponseError, VimeoVideoNotFound, VimeoRequestTokenError, VimeoAuthorizeTokenError, VimeoVideosSearchError, VimeoAllChannelError, __errmsgs__)
+from .vimeo_exceptions import (VimeoUrlError, VimeoHttpError, VimeoResponseError, VimeoVideoNotFound, VimeoRequestTokenError, VimeoAuthorizeTokenError, VimeoVideosSearchError, VimeoAllChannelError, __errmsgs__)
 
-from vimeo_data import getData
+from .vimeo_data import getData
+
+import io
 
 
 REQUEST_TOKEN_URL = 'http://vimeo.com/oauth/request_token'
@@ -129,8 +131,8 @@ class CurlyRequest:
                 err_msg = t.find('err').attrib['msg']
                 raise Exception(err_code, err_msg, ET.tostring(t))
             return t
-        except Exception,e:
-            raise Exception(u'%s' % (e))
+        except Exception as e:
+            raise Exception('%s' % (e))
 
     def _body_callback(self, buf):
         self.buf += buf
@@ -140,9 +142,9 @@ class CurlyRequest:
         Send a simple GET request
         """
         if self.debug:
-            print "Request URL:"
-            print url
-            print
+            print("Request URL:")
+            print(url)
+            print()
 
         self.buf = ""
         curl = pycurl.Curl()
@@ -155,15 +157,15 @@ class CurlyRequest:
         self.buf = ""
 
         if self.debug:
-            print "Raw response:"
-            print p
-            print
+            print("Raw response:")
+            print(p)
+            print()
 
         return p
 
     def _upload_progress(self, download_t, download_d, upload_t, upload_d):
         # this is only for upload progress bar
-	if upload_t == 0:
+        if upload_t == 0:
             return 0
 
         self.pidx = (self.pidx + 1) % len(TURNING_BAR)
@@ -175,7 +177,7 @@ class CurlyRequest:
         else:
             pstr = '#'*done
 
-        print "\r%s[%s]  " %(TURNING_BAR[self.pidx], pstr),
+        print("\r%s[%s]  " %(TURNING_BAR[self.pidx], pstr), end=' ')
         return 0
 
     def do_post_call(self, url, args, use_progress=False):
@@ -602,22 +604,17 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 class Videos(object):
@@ -689,24 +686,24 @@ class Videos(object):
         # Defaulting to ENGISH but the vimeo.com apis do not support specifying a language
         self.config['language'] = "en"
 
-        self.error_messages = {'VimeoUrlError': u"! Error: The URL (%s) cause the exception error (%s)\n", 'VimeoHttpError': u"! Error: An HTTP communications error with vimeo.com was raised (%s)\n", 'VimeoResponseError': u"! Error: Invalid XML metadata\nwas received from vimeo.com error (%s). Skipping item.\n", 'VimeoVideoNotFound': u"! Error: Video search with vimeo.com did not return any results for (%s)\n", 'VimeoRequestTokenError': u"! Error: Vimeo get request token failed (%s)\n", 'VimeoAuthorizeTokenError': u"! Error: Video get authorise token failed (%s)\n", 'VimeoVideosSearchError': u"! Error: Video search failed (%s)\n", 'VimeoException': u"! Error: VimeoException (%s)\n", 'VimeoAllChannelError': u"! Error: Access Video Channel information failed (%s)\n", }
+        self.error_messages = {'VimeoUrlError': "! Error: The URL (%s) cause the exception error (%s)\n", 'VimeoHttpError': "! Error: An HTTP communications error with vimeo.com was raised (%s)\n", 'VimeoResponseError': "! Error: Invalid XML metadata\nwas received from vimeo.com error (%s). Skipping item.\n", 'VimeoVideoNotFound': "! Error: Video search with vimeo.com did not return any results for (%s)\n", 'VimeoRequestTokenError': "! Error: Vimeo get request token failed (%s)\n", 'VimeoAuthorizeTokenError': "! Error: Video get authorise token failed (%s)\n", 'VimeoVideosSearchError': "! Error: Video search failed (%s)\n", 'VimeoException': "! Error: VimeoException (%s)\n", 'VimeoAllChannelError': "! Error: Access Video Channel information failed (%s)\n", }
 
         # This is an example that must be customized for each target site
         self.key_translation = [{'channel_title': 'channel_title', 'channel_link': 'channel_link', 'channel_description': 'channel_description', 'channel_numresults': 'channel_numresults', 'channel_returned': 'channel_returned', 'channel_startindex': 'channel_startindex'}, {'title': 'item_title', 'display_name': 'item_author', 'upload_date': 'item_pubdate', 'description': 'item_description', 'url': 'item_link', 'thumbnail': 'item_thumbnail', 'url': 'item_url', 'duration': 'item_duration', 'number_of_likes': 'item_rating', 'width': 'item_width', 'height': 'item_height', 'language': 'item_lang'}]
 
         # The following url_ configs are based of the
         # http://vimeo.com/api/docs/advanced-api
-        self.config[u'methods'] = {}
+        self.config['methods'] = {}
         # Methods are actually set in initializeVimeo()
-        self.config[u'methods']['channels'] = None
-        self.config[u'methods']['channels_videos'] = None
+        self.config['methods']['channels'] = None
+        self.config['methods']['channels_videos'] = None
 
         # Functions that parse video data from RSS data
         self.config['item_parser'] = {}
         self.config['item_parser']['channels'] = self.getVideosForChannels
 
         # Tree view url and the function that parses that urls meta data
-        self.config[u'methods'][u'tree.view'] = {
+        self.config['methods']['tree.view'] = {
             'N_R_S': {
                 '__all__': ['channels_videos', 'channels'],
                 },
@@ -715,7 +712,7 @@ class Videos(object):
                 },
             }
 
-        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
+        self.config['image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
 
         self.tree_key_list = ['newest', 'most_recently_updated', 'most_subscribed']
 
@@ -723,9 +720,9 @@ class Videos(object):
 
         self.tree_org = {
             'N_R_S': [
-                ['Newest Channels/Most ...', u''],
+                ['Newest Channels/Most ...', ''],
                 ['', self.tree_key_list],
-                [u'',u'']
+                ['','']
                 ],
             'Everything HD': [
                 ['Everything HD: Newest Channels/Most ...', self.tree_key_list ]
@@ -761,7 +758,7 @@ class Videos(object):
 
         # Initialize the tree view flag so that the item parsing code can be used for multiple purposes
         self.treeview = False
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/vimeo.jpg'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/vimeo.jpg'
     # end __init__()
 
 ###########################################################################################################
@@ -783,24 +780,24 @@ class Videos(object):
             if text[:2] == "&#":
                 try:
                     if text[:3] == "&#x":
-                        return unichr(int(text[3:-1], 16))
+                        return chr(int(text[3:-1], 16))
                     else:
-                        return unichr(int(text[2:-1]))
+                        return chr(int(text[2:-1]))
                 except ValueError:
                     pass
             elif text[:1] == "&":
-                import htmlentitydefs
-                entity = htmlentitydefs.entitydefs.get(text[1:-1])
+                import html.entities
+                entity = html.entities.entitydefs.get(text[1:-1])
                 if entity:
                     if entity[:2] == "&#":
                         try:
-                            return unichr(int(entity[2:-1]))
+                            return chr(int(entity[2:-1]))
                         except ValueError:
                             pass
                     else:
-                        return unicode(entity, "iso-8859-1")
+                        return str(entity, "iso-8859-1")
             return text # leave as is
-        return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+        return self.ampReplace(re.sub(r"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace('\n',' ')
     # end massageDescription()
 
 
@@ -827,9 +824,9 @@ class Videos(object):
         if text is None:
             return text
         try:
-            return unicode(text, 'utf8')
+            return str(text, 'utf8')
         except UnicodeDecodeError:
-            return u''
+            return ''
         except (UnicodeEncodeError, TypeError):
             return text
     # end textUtf8()
@@ -839,7 +836,7 @@ class Videos(object):
         '''Replace all "&" characters with "&amp;"
         '''
         text = self.textUtf8(text)
-        return text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
+        return text.replace('&amp;','~~~~~').replace('&','&amp;').replace('~~~~~', '&amp;')
     # end ampReplace()
 
 
@@ -849,14 +846,14 @@ class Videos(object):
         '''
         self.tree_dir_icon = self.channel_icon
         if not dir_icon:
-            if not self.feed_icons.has_key(self.tree_key):
+            if self.tree_key not in self.feed_icons:
                 return self.tree_dir_icon
-            if not self.feed_icons[self.tree_key].has_key(self.feed):
+            if self.feed not in self.feed_icons[self.tree_key]:
                 return self.tree_dir_icon
             dir_icon = self.feed_icons[self.tree_key][self.feed]
             if not dir_icon:
                 return self.tree_dir_icon
-        self.tree_dir_icon = u'%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
+        self.tree_dir_icon = '%%SHAREDIR%%/mythnetvision/icons/%s.png' % (dir_icon, )
         return self.tree_dir_icon
     # end setTreeViewIcon()
 
@@ -877,21 +874,21 @@ class Videos(object):
             self.client.curly.debug = True
         try:
             self.client.get_request_token()
-        except Exception, msg:
-            raise VimeoRequestTokenError(u'%s', msg)
+        except Exception as msg:
+            raise VimeoRequestTokenError('%s', msg)
         try:
             self.client.get_authorize_token_url()
-        except Exception, msg:
-            raise VimeoAuthorizeTokenError(u'%s', msg)
+        except Exception as msg:
+            raise VimeoAuthorizeTokenError('%s', msg)
 
-        self.config[u'methods']['channels'] = self.client.vimeo_channels_getAll
-        self.config[u'methods']['channels_videos'] = self.client.vimeo_channels_getVideos
+        self.config['methods']['channels'] = self.client.vimeo_channels_getAll
+        self.config['methods']['channels_videos'] = self.client.vimeo_channels_getVideos
 
     # end initializeVimeo()
 
     def processVideoUrl(self, url):
         playerUrl = self.mythxml.getInternetContentUrl("nv_python_libs/configs/HTML/vimeo.html", \
-                                                       url.replace(u'http://vimeo.com/', ''))
+                                                       url.replace('http://vimeo.com/', ''))
         return self.ampReplace(playerUrl)
 
     def searchTitle(self, title, pagenumber, pagelen):
@@ -908,30 +905,30 @@ class Videos(object):
 #        print xml_data
 
         try:
-            xml_data = self.client.vimeo_videos_search(urllib.quote_plus(title.encode("utf-8")),
+            xml_data = self.client.vimeo_videos_search(urllib.parse.quote_plus(title.encode("utf-8")),
                              sort='most_liked',
                              per_page=pagelen,
                              page=pagenumber)
-        except Exception, msg:
-            raise VimeoVideosSearchError(u'%s' % msg)
+        except Exception as msg:
+            raise VimeoVideosSearchError('%s' % msg)
 
         if xml_data is None:
             raise VimeoVideoNotFound(self.error_messages['VimeoVideoNotFound'] % title)
 
-        if not len(xml_data.keys()):
+        if not len(list(xml_data.keys())):
             raise VimeoVideoNotFound(self.error_messages['VimeoVideoNotFound'] % title)
 
         if xml_data.tag == 'rsp':
             if not xml_data.get('stat') == 'ok':
-                if __errmsgs__.has_key(xml_data.get('stat')):
+                if xml_data.get('stat') in __errmsgs__:
                     errmsg = __errmsg__[xml_data.get('stat')]
-                    raise VimeoResponseError(u"Error %s - %s" % (xml_data.get('stat'), errmsg))
+                    raise VimeoResponseError("Error %s - %s" % (xml_data.get('stat'), errmsg))
                 else:
-                    errmsg = u'Unknown error'
-                    raise VimeoResponseError(u"Error %s - %s" % (xml_data.get('stat'), errmsg))
+                    errmsg = 'Unknown error'
+                    raise VimeoResponseError("Error %s - %s" % (xml_data.get('stat'), errmsg))
 
         elements_final = []
-        videos = xml_data.find(u"videos")
+        videos = xml_data.find("videos")
         if videos:
             if videos.get('total'):
                 if not int(videos.get('total')):
@@ -939,7 +936,7 @@ class Videos(object):
                 self.channel['channel_numresults'] = int(videos.get('total'))
 
         # Collect video meta data that matched the search value
-        for video in xml_data.find(u"videos").getchildren():
+        for video in xml_data.find("videos").getchildren():
             hd_flag = False
             embed_flag = False
             if video.tag == 'video':
@@ -967,20 +964,20 @@ class Videos(object):
                     if details.text:
                         v_details['display_name'] = self.massageDescription(details.get('display_name').strip())
                     else:
-                        v_details['display_name'] = u''
+                        v_details['display_name'] = ''
                     continue
                 if details.tag == 'description':
                     if details.text:
                         v_details[details.tag] = self.massageDescription(details.text.strip())
                     else:
-                        v_details[details.tag] = u''
+                        v_details[details.tag] = ''
                     continue
                 if details.tag == 'upload_date':
                     if details.text:
                         pub_time = time.strptime(details.text.strip(), "%Y-%m-%d %H:%M:%S")
                         v_details[details.tag] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
                     else:
-                        v_details[details.tag] = u''
+                        v_details[details.tag] = ''
                     continue
                 if details.tag == 'urls':
                     for url in details.getchildren():
@@ -991,7 +988,7 @@ class Videos(object):
                                 else:
                                     v_details[url.tag] = self.ampReplace(url.text.strip())
                             else:
-                                v_details[url.tag] = u''
+                                v_details[url.tag] = ''
                     continue
                 if details.tag == 'thumbnails':
                     largest = 0
@@ -1009,8 +1006,8 @@ class Videos(object):
                 if details.text:
                     v_details[details.tag] = self.massageDescription(details.text.strip())
                 else:
-                    v_details[details.tag] = u''
-            if hd_flag and not v_details.has_key('width'):
+                    v_details[details.tag] = ''
+            if hd_flag and 'width' not in v_details:
                 v_details['width'] = 1280
                 v_details['height'] = 720
             elements_final.append(v_details)
@@ -1026,7 +1023,7 @@ class Videos(object):
         """Common name for a video search. Used to interface with MythTV plugin NetVision
         """
         # Channel details and search results
-        self.channel = {'channel_title': u'Vimeo', 'channel_link': u'http://vimeo.com', 'channel_description': u"Vimeo is a respectful community of creative people who are passionate about sharing the videos they make.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'Vimeo', 'channel_link': 'http://vimeo.com', 'channel_description': "Vimeo is a respectful community of creative people who are passionate about sharing the videos they make.", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
         # Easier for debugging usually commented out
 #        data = self.searchTitle(title, pagenumber, self.page_limit)
@@ -1035,32 +1032,32 @@ class Videos(object):
 
         try:
             data = self.searchTitle(title, pagenumber, self.page_limit)
-        except VimeoVideoNotFound, msg:
-            sys.stderr.write(u'%s' % msg)
+        except VimeoVideoNotFound as msg:
+            sys.stderr.write('%s' % msg)
             return None
-        except VimeoUrlError, msg:
+        except VimeoUrlError as msg:
             sys.stderr.write(self.error_messages['VimeoUrlError'] % msg)
             sys.exit(1)
-        except VimeoHttpError, msg:
+        except VimeoHttpError as msg:
             sys.stderr.write(self.error_messages['VimeoHttpError'] % msg)
             sys.exit(1)
-        except VimeoResponseError, msg:
+        except VimeoResponseError as msg:
             sys.stderr.write(self.error_messages['VimeoResponseError'] % msg)
             sys.exit(1)
-        except VimeoAuthorizeTokenError, msg:
+        except VimeoAuthorizeTokenError as msg:
             sys.stderr.write(self.error_messages['VimeoAuthorizeTokenError'] % msg)
             sys.exit(1)
-        except VimeoVideosSearchError, msg:
+        except VimeoVideosSearchError as msg:
             sys.stderr.write(self.error_messages['VimeoVideosSearchError'] % msg)
             sys.exit(1)
-        except VimeoRequestTokenError, msg:
+        except VimeoRequestTokenError as msg:
             sys.stderr.write(self.error_messages['VimeoRequestTokenError'] % msg)
             sys.exit(1)
-        except VimeoException, msg:
+        except VimeoException as msg:
             sys.stderr.write(self.error_messages['VimeoException'] % msg)
             sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data is None:
@@ -1071,15 +1068,15 @@ class Videos(object):
         items = []
         for match in data:
             item_data = {}
-            for key in self.key_translation[1].keys():
+            for key in list(self.key_translation[1].keys()):
                 if key == 'url':
                     item_data['item_link'] = match[key]
                     item_data['item_url'] = match[key]
                     continue
-                if key in match.keys():
+                if key in list(match.keys()):
                     item_data[self.key_translation[1][key]] = match[key]
                 else:
-                    item_data[self.key_translation[1][key]] = u''
+                    item_data[self.key_translation[1][key]] = ''
             items.append(item_data)
 
         self.channel['channel_startindex'] = self.page_limit * int(pagenumber)
@@ -1117,29 +1114,29 @@ class Videos(object):
                     if page > 20: # Throttles excessive searching for HD groups within a category
                         break
                     try:
-                        xml_data = self.config[u'methods']['channels'](sort=sort,
+                        xml_data = self.config['methods']['channels'](sort=sort,
                                           per_page=None,
                                           page=page)
-                    except Exception, msg:
-                        raise VimeoAllChannelError(u'%s' % msg)
+                    except Exception as msg:
+                        raise VimeoAllChannelError('%s' % msg)
 
                     if xml_data is None:
                         raise VimeoAllChannelError(self.error_messages['1-VimeoAllChannelError'] % sort)
 
-                    if not len(xml_data.keys()):
+                    if not len(list(xml_data.keys())):
                         raise VimeoAllChannelError(self.error_messages['2-VimeoAllChannelError'] % sort)
 
                     if xml_data.tag == 'rsp':
                         if not xml_data.get('stat') == 'ok':
-                            if __errmsgs__.has_key(xml_data.get('stat')):
+                            if xml_data.get('stat') in __errmsgs__:
                                 errmsg = __errmsg__[xml_data.get('stat')]
-                                raise VimeoResponseError(u"Error %s - %s" % (xml_data.get('stat'), errmsg))
+                                raise VimeoResponseError("Error %s - %s" % (xml_data.get('stat'), errmsg))
                             else:
-                                errmsg = u'Unknown error'
-                                raise VimeoResponseError(u"Error %s - %s" % (xml_data.get('stat'), errmsg))
+                                errmsg = 'Unknown error'
+                                raise VimeoResponseError("Error %s - %s" % (xml_data.get('stat'), errmsg))
 
                     for channel in xml_data.find('channels'):
-                        index = channel.find('name').text.find(u'HD')
+                        index = channel.find('name').text.find('HD')
                         if index != -1:
                             if HD_count < self.channel_count['Everything HD'][sort][0]:
                                 if not channel.get('id') in HD_list:
@@ -1169,40 +1166,40 @@ class Videos(object):
         '''
         try:
             self.initializeVimeo()
-        except VimeoAuthorizeTokenError, msg:
+        except VimeoAuthorizeTokenError as msg:
             sys.stderr.write(self.error_messages['VimeoAuthorizeTokenError'] % msg)
             sys.exit(1)
-        except VimeoRequestTokenError, msg:
+        except VimeoRequestTokenError as msg:
             sys.stderr.write(self.error_messages['VimeoRequestTokenError'] % msg)
             sys.exit(1)
-        except VimeoException, msg:
+        except VimeoException as msg:
             sys.stderr.write(self.error_messages['VimeoException'] % msg)
             sys.exit(1)
-        except Exception, msg:
-            sys.stderr.write(u"! Error: Unknown error during a Vimeo API initialization (%s)\n" % msg)
+        except Exception as msg:
+            sys.stderr.write("! Error: Unknown error during a Vimeo API initialization (%s)\n" % msg)
             sys.exit(1)
 
         # Channel details and search results
-        self.channel = {'channel_title': u'Vimeo', 'channel_link': u'http://vimeo.com', 'channel_description': u"Vimeo is a respectful community of creative people who are passionate about sharing the videos they make.", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'Vimeo', 'channel_link': 'http://vimeo.com', 'channel_description': "Vimeo is a respectful community of creative people who are passionate about sharing the videos they make.", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
         if self.config['debug_enabled']:
-            print self.config[u'methods']
-            print
+            print(self.config['methods'])
+            print()
 
         # Initialize the Video channels data
         try:
             self.getChannels()
-        except VimeoResponseError, msg:
+        except VimeoResponseError as msg:
             sys.stderr.write(self.error_messages['VimeoResponseError'] % msg)
             sys.exit(1)
-        except VimeoAllChannelError, msg:
+        except VimeoAllChannelError as msg:
             sys.stderr.write(self.error_messages['VimeoAllChannelError'] % msg)
             sys.exit(1)
-        except VimeoException, msg:
+        except VimeoException as msg:
             sys.stderr.write(self.error_messages['VimeoException'] % msg)
             sys.exit(1)
-        except Exception, msg:
-            sys.stderr.write(u"! Error: Unknown error while getting all Channels (%s)\n" % msg)
+        except Exception as msg:
+            sys.stderr.write("! Error: Unknown error while getting all Channels (%s)\n" % msg)
             sys.exit(1)
 
         dictionaries = []
@@ -1230,15 +1227,15 @@ class Videos(object):
                     except KeyError:
                         dictionaries.append([self.massageDescription(sets[0]), self.channel_icon])
                 else:
-                    dictionaries.append(['', u'']) # Add the nested dictionary indicator
+                    dictionaries.append(['', '']) # Add the nested dictionary indicator
                 continue
             temp_dictionary = []
             for self.feed in sets[1]:
-                if self.config[u'methods'][u'tree.view'][self.tree_key].has_key('__all__'):
-                    URL = self.config[u'methods'][u'tree.view'][self.tree_key]['__all__']
+                if '__all__' in self.config['methods']['tree.view'][self.tree_key]:
+                    URL = self.config['methods']['tree.view'][self.tree_key]['__all__']
                 else:
-                    URL = self.config[u'methods'][u'tree.view'][self.tree_key][self.feed]
-                temp_dictionary = self.config['item_parser'][URL[1]](self.config[u'methods'][URL[0]], temp_dictionary)
+                    URL = self.config['methods']['tree.view'][self.tree_key][self.feed]
+                temp_dictionary = self.config['item_parser'][URL[1]](self.config['methods'][URL[0]], temp_dictionary)
             if len(temp_dictionary):
                 if len(sets[0]): # Add the nested dictionaries display name
                     try:
@@ -1248,7 +1245,7 @@ class Videos(object):
                 for element in temp_dictionary:
                     dictionaries.append(element)
                 if len(sets[0]):
-                    dictionaries.append(['', u'']) # Add the nested dictionary indicator
+                    dictionaries.append(['', '']) # Add the nested dictionary indicator
         return dictionaries
     # end getVideos()
 
@@ -1273,27 +1270,27 @@ class Videos(object):
 
             try:
                 tmp_dictionary = self.getTreeVideos(method, tmp_dictionary)
-            except VimeoVideoNotFound, msg:
+            except VimeoVideoNotFound as msg:
                 sys.stderr.write(self.error_messages['VimeoVideoNotFound'] % msg)
                 continue
-            except VimeoVideosSearchError, msg:
+            except VimeoVideosSearchError as msg:
                 sys.stderr.write(self.error_messages['VimeoVideosSearchError'] % msg)
                 sys.exit(1)
-            except VimeoResponseError, msg:
+            except VimeoResponseError as msg:
                 sys.stderr.write(self.error_messages['VimeoResponseError'] % msg)
                 sys.exit(1)
-            except VimeoException, msg:
+            except VimeoException as msg:
                 sys.stderr.write(self.error_messages['VimeoException'] % msg)
                 sys.exit(1)
-            except Exception, e:
-                sys.stderr.write(u"! Error: Unknown error during while getting all Channels (%s)\nError(%s)\n" % (self.dir_name, e))
+            except Exception as e:
+                sys.stderr.write("! Error: Unknown error during while getting all Channels (%s)\nError(%s)\n" % (self.dir_name, e))
                 sys.exit(1)
 
         if len(tmp_dictionary):
             dictionary.append([self.feed_names[self.tree_key][self.feed], self.setTreeViewIcon()])
             for element in tmp_dictionary:
                 dictionary.append(element)
-            dictionary.append(['', u''])
+            dictionary.append(['', ''])
         return dictionary
     # end getVideosForChannels()
 
@@ -1308,32 +1305,32 @@ class Videos(object):
             xml_data = method(channel_id=self.channel_id, full_response=1,
                              per_page=self.max_page,
                              page=self.next_page)
-        except Exception, msg:
-            raise VimeoVideosSearchError(u'%s' % msg)
+        except Exception as msg:
+            raise VimeoVideosSearchError('%s' % msg)
 
         if xml_data is None:
             raise VimeoVideoNotFound(self.error_messages['VimeoVideoNotFound'] % self.dir_name)
 
-        if not len(xml_data.keys()):
+        if not len(list(xml_data.keys())):
             raise VimeoVideoNotFound(self.error_messages['VimeoVideoNotFound'] % self.dir_name)
 
         if xml_data.tag == 'rsp':
             if not xml_data.get('stat') == 'ok':
-                if __errmsgs__.has_key(xml_data.get('stat')):
+                if xml_data.get('stat') in __errmsgs__:
                     errmsg = __errmsg__[xml_data.get('stat')]
-                    raise VimeoResponseError(u"Error %s - %s" % (xml_data.get('stat'), errmsg))
+                    raise VimeoResponseError("Error %s - %s" % (xml_data.get('stat'), errmsg))
                 else:
-                    errmsg = u'Unknown error'
-                    raise VimeoResponseError(u"Error %s - %s" % (xml_data.get('stat'), errmsg))
+                    errmsg = 'Unknown error'
+                    raise VimeoResponseError("Error %s - %s" % (xml_data.get('stat'), errmsg))
 
-        videos = xml_data.find(u"videos")
+        videos = xml_data.find("videos")
         if videos:
             if videos.get('total'):
                 self.channel['channel_numresults'] = int(videos.get('total'))
 
         # Collect video meta data that matched the search value
         dictionary_first = False
-        for video in xml_data.find(u"videos").getchildren():
+        for video in xml_data.find("videos").getchildren():
             hd_flag = False
             embed_flag = False
             if video.tag == 'video':
@@ -1361,24 +1358,24 @@ class Videos(object):
                     if details.text:
                         v_details['display_name'] = self.massageDescription(details.get('display_name').strip())
                     else:
-                        v_details['display_name'] = u''
+                        v_details['display_name'] = ''
                     continue
                 if details.tag == 'description':
                     if details.text:
                         if self.tree_list:
-                            v_details[details.tag] = self.massageDescription(u'Channel "%s": %s' % (self.dir_name, details.text.strip()))
+                            v_details[details.tag] = self.massageDescription('Channel "%s": %s' % (self.dir_name, details.text.strip()))
                         else:
                             v_details[details.tag] = self.massageDescription(details.text.strip())
                     else:
                         if self.tree_list:
-                            v_details[details.tag] = self.massageDescription(u'Channel "%s"' % self.dir_name)
+                            v_details[details.tag] = self.massageDescription('Channel "%s"' % self.dir_name)
                     continue
                 if details.tag == 'upload_date':
                     if details.text:
                         pub_time = time.strptime(details.text.strip(), "%Y-%m-%d %H:%M:%S")
                         v_details[details.tag] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
                     else:
-                        v_details[details.tag] = u''
+                        v_details[details.tag] = ''
                     continue
                 if details.tag == 'urls':
                     for url in details.getchildren():
@@ -1389,7 +1386,7 @@ class Videos(object):
                                 else:
                                     v_details[url.tag] = self.ampReplace(url.text.strip())
                             else:
-                                v_details[url.tag] = u''
+                                v_details[url.tag] = ''
                     continue
                 if details.tag == 'thumbnails':
                     largest = 0
@@ -1407,13 +1404,13 @@ class Videos(object):
                 if details.text:
                     v_details[details.tag] = self.massageDescription(details.text.strip())
                 else:
-                    v_details[details.tag] = u''
+                    v_details[details.tag] = ''
 
-            if hd_flag and not v_details.has_key('width'):
+            if hd_flag and 'width' not in v_details:
                 v_details['width'] = 1280
                 v_details['height'] = 720
 
-            if not v_details.has_key('url'):
+            if 'url' not in v_details:
                 continue
 
             if not dictionary_first and not self.tree_list:  # Add the dictionaries display name
@@ -1421,20 +1418,20 @@ class Videos(object):
                 dictionary_first = True
 
             final_item = {}
-            for key in self.key_translation[1].keys():
+            for key in list(self.key_translation[1].keys()):
                 if key == 'url':
                     final_item['item_link'] = v_details[key]
                     final_item['item_url'] = v_details[key]
                     continue
-                if v_details.has_key(key):
+                if key in v_details:
                     final_item[self.key_translation[1][key]] = v_details[key]
                 else:
-                    final_item[self.key_translation[1][key]] = u''
+                    final_item[self.key_translation[1][key]] = ''
             dictionaries.append(final_item)
 
         # Need to check if there was any items for this directory
         if initial_length < len(dictionaries) and not self.tree_list:
-            dictionaries.append(['', u'']) # Add the nested dictionary indicator
+            dictionaries.append(['', '']) # Add the nested dictionary indicator
         return dictionaries
     # end getTreeVideos()
 # end Videos() class

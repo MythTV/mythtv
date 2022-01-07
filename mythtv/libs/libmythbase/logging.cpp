@@ -1,3 +1,4 @@
+#include <QtGlobal>
 #include <QAtomicInt>
 #include <QMutex>
 #include <QMutexLocker>
@@ -42,14 +43,14 @@
 #include <unistd.h>
 
 // Various ways to get to thread's tid
-#if defined(linux)
+#if defined(__linux__)
 #include <sys/syscall.h>
 #elif defined(__FreeBSD__)
 extern "C" {
 #include <sys/ucontext.h>
 #include <sys/thr.h>
 }
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
 #include <mach/mach.h>
 #endif
 
@@ -185,14 +186,14 @@ void LoggingItem::setThreadTid(void)
 
 #if defined(Q_OS_ANDROID)
         m_tid = (int64_t)gettid();
-#elif defined(linux)
+#elif defined(__linux__)
         m_tid = syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
         long lwpid;
         int dummy = thr_self( &lwpid );
         (void)dummy;
         m_tid = (int64_t)lwpid;
-#elif CONFIG_DARWIN
+#elif defined(Q_OS_DARWIN)
         m_tid = (int64_t)mach_thread_self();
 #endif
         logThreadTidHash[m_threadId] = m_tid;

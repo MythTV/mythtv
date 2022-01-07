@@ -27,7 +27,7 @@ class MSqlDatabase
   friend class MDBManager;
   friend class MSqlQuery;
   public:
-    explicit MSqlDatabase(QString name);
+    explicit MSqlDatabase(QString name, QString driver = "QMYSQL");
    ~MSqlDatabase(void);
 
     bool OpenDatabase(bool skipdb = false);
@@ -43,6 +43,7 @@ class MSqlDatabase
 
   private:
     QString m_name;
+    QString m_driver;
     QSqlDatabase m_db;
     QDateTime m_lastDBKick;
     DatabaseParams m_dbparms;

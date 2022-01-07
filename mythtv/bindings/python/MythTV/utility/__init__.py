@@ -7,6 +7,5 @@ from .altdict import OrdDict, DictInvert, DictInvertCI
 
 from .other import _donothing, SchemaUpdate, databaseSearch, deadlinesocket, \
                    MARKUPLIST, levenshtein, ParseEnum, ParseSet, CopyData, \
-                   CopyData2, check_ipv6, QuickProperty, py23_str, py23_repr, \
-                   resolve_ip
+                   CopyData2, check_ipv6, QuickProperty, py3_str, resolve_ip
 

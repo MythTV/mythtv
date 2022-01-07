@@ -73,17 +73,19 @@ bool TestDatabase(const QString& dbHostName,
     return ret;
 }
 
-MSqlDatabase::MSqlDatabase(QString name)
-    : m_name(std::move(name))
+MSqlDatabase::MSqlDatabase(QString name, QString driver)
+    : m_name(std::move(name)), m_driver(std::move(driver))
 {
-    if (!QSqlDatabase::isDriverAvailable("QMYSQL"))
+    if (!QSqlDatabase::isDriverAvailable(m_driver))
     {
-        LOG(VB_FLUSH, LOG_CRIT, "FATAL: Unable to load the QT mysql driver, is it installed?");
+        LOG(VB_FLUSH, LOG_CRIT,
+            QString("FATAL: Unable to load the QT %1 driver, is it installed?")
+            .arg(m_driver));
         exit(GENERIC_EXIT_DB_ERROR); // Exits before we can process the log queue
         //return;
     }
 
-    m_db = QSqlDatabase::addDatabase("QMYSQL", m_name);
+    m_db = QSqlDatabase::addDatabase(m_driver, m_name);
     LOG(VB_DATABASE, LOG_INFO, "Database object created: " + m_name);
 
     if (!m_db.isValid() || m_db.isOpenError())
@@ -316,7 +318,9 @@ MSqlDatabase *MDBManager::popConnection(bool reuse)
     DBList &list = m_pool[QThread::currentThread()];
     if (list.isEmpty())
     {
-        db = new MSqlDatabase("DBManager" + QString::number(m_nextConnID++));
+        DatabaseParams params = GetMythDB()->GetDatabaseParams();
+        db = new MSqlDatabase("DBManager" + QString::number(m_nextConnID++),
+            params.m_dbType);
         ++m_connCount;
         LOG(VB_DATABASE, LOG_INFO,
                 QString("New DB connection, total: %1").arg(m_connCount));

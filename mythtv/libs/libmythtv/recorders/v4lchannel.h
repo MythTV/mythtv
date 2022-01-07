@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef CHANNEL_H
-#define CHANNEL_H
+#ifndef V4LCHANNEL_H
+#define V4LCHANNEL_H
 
 #include <utility>
 

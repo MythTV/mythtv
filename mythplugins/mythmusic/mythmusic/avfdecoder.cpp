@@ -430,10 +430,13 @@ void avfDecoder::run()
         return;
     }
 
-    AVPacket pkt;
-    AVPacket tmp_pkt;
-    memset(&pkt, 0, sizeof(AVPacket));
-    av_init_packet(&pkt);
+    AVPacket *pkt = av_packet_alloc();
+    AVPacket *tmp_pkt = av_packet_alloc();
+    if ((pkt == nullptr) || (tmp_pkt == nullptr))
+    {
+        LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
+        return;
+    }
 
     m_stat = DecoderEvent::Decoding;
     {
@@ -461,7 +464,7 @@ void avfDecoder::run()
         while (!m_finish && !m_userStop && m_seekTime <= 0.0)
         {
             // Read a packet from the input context
-            int res = av_read_frame(m_inputContext->getContext(), &pkt);
+            int res = av_read_frame(m_inputContext->getContext(), pkt);
             if (res < 0)
             {
                 if (res != AVERROR_EOF)
@@ -474,11 +477,9 @@ void avfDecoder::run()
                 break;
             }
 
-            av_init_packet(&tmp_pkt);
-            tmp_pkt.data = pkt.data;
-            tmp_pkt.size = pkt.size;
+            av_packet_ref(tmp_pkt, pkt);
 
-            while (tmp_pkt.size > 0 && !m_finish &&
+            while (tmp_pkt->size > 0 && !m_finish &&
                    !m_userStop && m_seekTime <= 0.0)
             {
                 int data_size = 0;
@@ -486,14 +487,14 @@ void avfDecoder::run()
                 int ret = output()->DecodeAudio(m_audioDec,
                                                 m_outputBuffer,
                                                 data_size,
-                                                &tmp_pkt);
+                                                tmp_pkt);
 
                 if (ret < 0)
                     break;
 
                 // Increment the output pointer and count
-                tmp_pkt.size -= ret;
-                tmp_pkt.data += ret;
+                tmp_pkt->size -= ret;
+                tmp_pkt->data += ret;
 
                 if (data_size <= 0)
                     continue;
@@ -501,7 +502,7 @@ void avfDecoder::run()
                 output()->AddData(m_outputBuffer, data_size, -1ms, 0);
             }
 
-            av_packet_unref(&pkt);
+            av_packet_unref(pkt);
 
             // Wait until we need to decode or supply more samples
             while (!m_finish && !m_userStop && m_seekTime <= 0.0)
@@ -537,6 +538,8 @@ void avfDecoder::run()
         dispatch(e);
     }
 
+    av_packet_free(&pkt);
+    av_packet_free(&tmp_pkt);
     deinit();
     RunEpilog();
 }

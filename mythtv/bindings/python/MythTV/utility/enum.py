@@ -6,13 +6,19 @@
 #              operation.
 #------------------------------
 
+# Important Note: The classes provided by this module are considered deprecated and will be
+#                 removed after the release of MythTV v32!
+#                 Please use the class 'IntEnum' from the module 'enum' provided by python3.
+
 from builtins import int
-from future.utils import with_metaclass
+from warnings import warn
 
 class EnumValue( object ):
     _next = 0
     _storage = []
     def __init__(self, name, value=None, friendly_name=None):
+        warn("Class 'EnumValue' will be removed after MythTV v32 release, "
+             "use 'IntEnum' from the module 'enum' provided by python3", DeprecationWarning, 1)
         self.name = self.friendly = name
         if friendly_name:
             self.friendly = friendly_name
@@ -52,9 +58,11 @@ class EnumType( type ):
             return cls(cls._values[key].value)
         raise AttributeError(key)
 
-class BaseEnum( with_metaclass( EnumType, object )):
+class BaseEnum( object, metaclass=EnumType ):
 
     def __init__(self, mode):
+        warn("Class 'BaseEnum' and it descendants will be removed after MythTV v32 release, "
+             "use 'IntEnum' from the module 'enum' provided by python3", DeprecationWarning, 1)
         self.mode = mode
 
     def __int__(self): return self.mode

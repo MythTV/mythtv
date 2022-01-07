@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: mnvsearch_api - Simple-to-use Python interface to search the MythNetvision data base tables
 #
@@ -27,14 +27,15 @@ __version__="0.1.4"
 # 0.1.4 Add the ability to search within a specific "feedtitle". Used mainly for searching large mashups
 #       Fixed a paging bug
 
-import os, struct, sys, re, time, datetime, shutil, urllib
+import os, struct, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error
 import logging
 from socket import gethostname, gethostbyname
 from threading import Thread
 from copy import deepcopy
 from operator import itemgetter, attrgetter
 
-from mnvsearch_exceptions import (MNVSQLError, MNVVideoNotFound, )
+from .mnvsearch_exceptions import (MNVSQLError, MNVVideoNotFound, )
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -47,22 +48,17 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 # Find out if the MythTV python bindings can be accessed and instances can created
@@ -75,27 +71,27 @@ try:
         '''
         MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
         mythdb = MythDB()
-    except MythError, e:
-        sys.stderr.write(u'\n! Error - %s\n' % e.args[0])
+    except MythError as e:
+        sys.stderr.write('\n! Error - %s\n' % e.args[0])
         filename = os.path.expanduser("~")+'/.mythtv/config.xml'
         if not os.path.isfile(filename):
-            sys.stderr.write(u'\n! Error - A correctly configured (%s) file must exist\n' % filename)
+            sys.stderr.write('\n! Error - A correctly configured (%s) file must exist\n' % filename)
         else:
-            sys.stderr.write(u'\n! Error - Check that (%s) is correctly configured\n' % filename)
+            sys.stderr.write('\n! Error - Check that (%s) is correctly configured\n' % filename)
         sys.exit(1)
-    except Exception, e:
-        sys.stderr.write(u"\n! Error - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
+    except Exception as e:
+        sys.stderr.write("\n! Error - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
         sys.exit(1)
-except Exception, e:
-    sys.stderr.write(u"\n! Error - MythTV python bindings could not be imported. error(%s)\n" % e)
+except Exception as e:
+    sys.stderr.write("\n! Error - MythTV python bindings could not be imported. error(%s)\n" % e)
     sys.exit(1)
 
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -107,7 +103,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -175,7 +171,7 @@ class Videos(object):
         self.common = common
         self.common.debug = debug   # Set the common function debug level
 
-        self.log_name = u'MNVsearch_Grabber'
+        self.log_name = 'MNVsearch_Grabber'
         self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
         self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
@@ -187,11 +183,11 @@ class Videos(object):
 
         self.config['search_all_languages'] = search_all_languages
 
-        self.error_messages = {'MNVSQLError': u"! Error: A SQL call cause the exception error (%s)\n", 'MNVVideoNotFound': u"! Error: Video search did not return any results (%s)\n", }
+        self.error_messages = {'MNVSQLError': "! Error: A SQL call cause the exception error (%s)\n", 'MNVVideoNotFound': "! Error: Video search did not return any results (%s)\n", }
         # Channel details and search results
-        self.channel = {'channel_title': u'Search all tree views', 'channel_link': u'http://www.mythtv.org/wiki/MythNetvision', 'channel_description': u"MythNetvision treeview data base search", 'channel_numresults': 0, 'channel_returned': 1, u'channel_startindex': 0}
+        self.channel = {'channel_title': 'Search all tree views', 'channel_link': 'http://www.mythtv.org/wiki/MythNetvision', 'channel_description': "MythNetvision treeview data base search", 'channel_numresults': 0, 'channel_returned': 1, 'channel_startindex': 0}
 
-        self.channel_icon = u'%SHAREDIR%/mythnetvision/icons/mnvsearch.png'
+        self.channel_icon = '%SHAREDIR%/mythnetvision/icons/mnvsearch.png'
     # end __init__()
 
 
@@ -209,16 +205,16 @@ class Videos(object):
         # Perform a search
         try:
             resultList = self.getTreeviewData(title, pagenumber, pagelen, feedtitle=feedtitle)
-        except Exception, errormsg:
+        except Exception as errormsg:
             raise MNVSQLError(self.error_messages['MNVSQLError'] % (errormsg))
 
         if self.config['debug_enabled']:
-            print "resultList: count(%s)" % len(resultList)
-            print resultList
-            print
+            print("resultList: count(%s)" % len(resultList))
+            print(resultList)
+            print()
 
         if not len(resultList):
-            raise MNVVideoNotFound(u"No treeview Video matches found for search value (%s)" % title)
+            raise MNVVideoNotFound("No treeview Video matches found for search value (%s)" % title)
 
         # Check to see if there are more items available to display
         morePages = False
@@ -253,30 +249,30 @@ class Videos(object):
             if result['mediaURL']:
                 itemContent(mnvsearchItem)[0].attrib['url'] = result['mediaURL']
             if result['filesize']:
-                itemContent(mnvsearchItem)[0].attrib['length'] = unicode(result['filesize'])
+                itemContent(mnvsearchItem)[0].attrib['length'] = str(result['filesize'])
             if result['time']:
-                itemContent(mnvsearchItem)[0].attrib['duration'] = unicode(result['time'])
+                itemContent(mnvsearchItem)[0].attrib['duration'] = str(result['time'])
             if result['width']:
-                itemContent(mnvsearchItem)[0].attrib['width'] = unicode(result['width'])
+                itemContent(mnvsearchItem)[0].attrib['width'] = str(result['width'])
             if result['height']:
-                itemContent(mnvsearchItem)[0].attrib['height'] = unicode(result['height'])
+                itemContent(mnvsearchItem)[0].attrib['height'] = str(result['height'])
             if result['language']:
                 itemContent(mnvsearchItem)[0].attrib['lang'] = result['language']
             if not result['season'] == 0 and not result['episode'] == 0:
                 if result['season']:
-                    etree.SubElement(mnvsearchItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}season").text = unicode(result['season'])
+                    etree.SubElement(mnvsearchItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}season").text = str(result['season'])
                 if result['episode']:
-                    etree.SubElement(mnvsearchItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = unicode(result['episode'])
+                    etree.SubElement(mnvsearchItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}episode").text = str(result['episode'])
             if result['customhtml'] == 1:
                 etree.SubElement(mnvsearchItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}customhtml").text = 'true'
             if result['countries']:
-                countries = result['countries'].split(u' ')
+                countries = result['countries'].split(' ')
                 for country in countries:
                     etree.SubElement(mnvsearchItem, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}country").text = country
             itemDict[result['title'].lower()] = mnvsearchItem
 
-        if not len(itemDict.keys()):
-            raise MNVVideoNotFound(u"No MNV Video matches found for search value (%s)" % title)
+        if not len(list(itemDict.keys())):
+            raise MNVVideoNotFound("No MNV Video matches found for search value (%s)" % title)
 
         # Set the number of search results returned
         if morePages:
@@ -298,28 +294,28 @@ class Videos(object):
 
         try:
             data = self.searchTitle(title, pagenumber, self.page_limit, feedtitle=feedtitle)
-        except MNVVideoNotFound, msg:
+        except MNVVideoNotFound as msg:
             if feedtitle:
                 return [{}, '0', '0', '0']
-            sys.stderr.write(u"%s\n" % msg)
+            sys.stderr.write("%s\n" % msg)
             sys.exit(0)
-        except MNVSQLError, msg:
-            sys.stderr.write(u'%s\n' % msg)
+        except MNVSQLError as msg:
+            sys.stderr.write('%s\n' % msg)
             sys.exit(1)
-        except Exception, e:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
+        except Exception as e:
+            sys.stderr.write("! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if self.config['debug_enabled']:
-            print "data: count(%s)" % len(data[0])
-            print data
-            print
+            print("data: count(%s)" % len(data[0]))
+            print(data)
+            print()
 
         # Create RSS element tree
-        rssTree = etree.XML(self.common.mnvRSS+u'</rss>')
+        rssTree = etree.XML(self.common.mnvRSS+'</rss>')
 
         # Set the paging values
-        itemCount = len(data[0].keys())
+        itemCount = len(list(data[0].keys()))
         if data[1] == True:
             self.channel['channel_returned'] = itemCount
             self.channel['channel_startindex'] = itemCount+(self.page_limit*(int(pagenumber)-1))
@@ -344,7 +340,7 @@ class Videos(object):
                 lastKey = key
 
         # Output the MNV search results
-        sys.stdout.write(u'<?xml version="1.0" encoding="UTF-8"?>\n')
+        sys.stdout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         sys.stdout.write(etree.tostring(rssTree, encoding='UTF-8', pretty_print=True))
         sys.exit(0)
     # end searchForVideos()
@@ -356,23 +352,23 @@ class Videos(object):
         return a list of items found in the search or an empty dictionary if none were found
         '''
         if feedtitle:
-            sqlStatement = u"(SELECT title, description, subtitle, season, episode, url, type, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, customhtml, countries FROM `internetcontentarticles` WHERE `feedtitle` LIKE '%%%%FEEDTITLE%%%%' AND (%s)) ORDER BY title ASC LIMIT %s , %s"
+            sqlStatement = "(SELECT title, description, subtitle, season, episode, url, type, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, customhtml, countries FROM `internetcontentarticles` WHERE `feedtitle` LIKE '%%%%FEEDTITLE%%%%' AND (%s)) ORDER BY title ASC LIMIT %s , %s"
         else:
-            sqlStatement = u'(SELECT title, description, subtitle, season, episode, url, type, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, customhtml, countries FROM `internetcontentarticles` WHERE %s) ORDER BY title ASC LIMIT %s , %s'
-        searchTerm = u"`title` LIKE '%%SEARCHTERM%%' OR `description` LIKE '%%SEARCHTERM%%'"
+            sqlStatement = '(SELECT title, description, subtitle, season, episode, url, type, thumbnail, mediaURL, author, date, rating, filesize, player, playerargs, download, downloadargs, time, width, height, language, customhtml, countries FROM `internetcontentarticles` WHERE %s) ORDER BY title ASC LIMIT %s , %s'
+        searchTerm = "`title` LIKE '%%SEARCHTERM%%' OR `description` LIKE '%%SEARCHTERM%%'"
 
         # Create the query variables search terms and the from/to paging values
-        searchList = searchTerms.split(u';')
+        searchList = searchTerms.split(';')
         if not len(searchList):
             return {}
 
-        dbSearchStatements = u''
+        dbSearchStatements = ''
         for aSearch in searchList:
-            tmpTerms = searchTerm.replace(u'SEARCHTERM', aSearch)
+            tmpTerms = searchTerm.replace('SEARCHTERM', aSearch)
             if not len(dbSearchStatements):
                 dbSearchStatements+=tmpTerms
             else:
-                dbSearchStatements+=u' OR ' + tmpTerms
+                dbSearchStatements+=' OR ' + tmpTerms
 
         if pagenumber == 1:
             fromResults = 0
@@ -382,14 +378,14 @@ class Videos(object):
             pageLimit = pagelen+1
 
         if feedtitle:
-            sqlStatement = sqlStatement.replace(u'FEEDTITLE', feedtitle)
+            sqlStatement = sqlStatement.replace('FEEDTITLE', feedtitle)
 
         query = sqlStatement % (dbSearchStatements, fromResults, pageLimit,)
         if self.config['debug_enabled']:
-            print "FromRow(%s) pageLimit(%s)" % (fromResults, pageLimit)
-            print "query:"
+            print("FromRow(%s) pageLimit(%s)" % (fromResults, pageLimit))
+            print("query:")
             sys.stdout.write(query)
-            print
+            print()
 
         # Make the data base call and parse the returned data to extract the matching video item data
         items = []

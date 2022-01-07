@@ -27,6 +27,8 @@
 #include "mythconfig.h" // for HAVE_GETIFADDRS
 #include "mythlogging.h"
 #include "httprequest.h"
+#include "mythcorecontext.h"
+#include "configuration.h"
 
 // POSIX headers 2, needs to be after compat.h for OS X
 #ifndef _WIN32
@@ -59,8 +61,9 @@ QString LookupUDN( const QString &sDeviceType )
     }
 
     sList.removeLast();
+    Configuration *pConfig = MythCoreContext::GetConfiguration();
     QString sName = "UPnP/UDN/" + sList.last();
-    QString sUDN  = UPnp::GetConfiguration()->GetValue( sName, "" );
+    QString sUDN  = pConfig->GetValue( sName, "" );
 
     LOG(VB_UPNP, LOG_INFO, sLoc + " sName=" + sName + ", sUDN=" + sUDN);
 
@@ -71,8 +74,6 @@ QString LookupUDN( const QString &sDeviceType )
         // QUuid returns the uuid enclosed with braces {} which is not
         // DLNA compliant, we need to remove them
         sUDN = sUDN.mid(1, 36);
-
-        Configuration *pConfig = UPnp::GetConfiguration();
 
         pConfig->SetValue( sName, sUDN );
         pConfig->Save();

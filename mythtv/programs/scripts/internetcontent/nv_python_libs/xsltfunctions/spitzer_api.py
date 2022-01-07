@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: spitzer_api - XPath and XSLT functions for the www.spitzer.caltech.edu grabber
 # Python Script
@@ -32,9 +32,9 @@ __xpathClassList__ = ['xpathFunctions', ]
 #__xsltExtentionList__ = ['xsltExtExample', ]
 __xsltExtentionList__ = []
 
-import os, sys, re, time, datetime, shutil, urllib, string
+import os, sys, re, time, datetime, shutil, urllib.request, urllib.parse, urllib.error, string
 from copy import deepcopy
-
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -47,28 +47,26 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        try:
+            self.out.buffer.write(obj)
+        except OSError:
+            pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -80,7 +78,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -111,15 +109,15 @@ class xpathFunctions(object):
         webURL = args[0]
         pageTitle = args[1]
         try:
-            tmpHandle = urllib.urlopen(webURL)
-            tmpHTML = unicode(tmpHandle.read(), 'utf-8')
+            tmpHandle = urllib.request.urlopen(webURL)
+            tmpHTML = str(tmpHandle.read(), 'utf-8')
             tmpHandle.close()
-        except Exception, errmsg:
-            sys.stderr.write(u"Error reading url(%s) error(%s)\n" % (webURL, errmsg))
+        except Exception as errmsg:
+            sys.stderr.write("Error reading url(%s) error(%s)\n" % (webURL, errmsg))
             return webURL
 
         # Get videocode
-        findText = u"file=mp4:"
+        findText = "file=mp4:"
         lenText = len(findText)
         posText = tmpHTML.find(findText)
         if posText == -1:
@@ -129,19 +127,19 @@ class xpathFunctions(object):
 
         # Fill out as much of the URL as possible
         customHTML = common.linkWebPage('dummy', 'spitzer')
-        customHTML = customHTML.replace('TITLE', urllib.quote(pageTitle))
+        customHTML = customHTML.replace('TITLE', urllib.parse.quote(pageTitle))
         customHTML = customHTML.replace('VIDEOCODE', tmpLink)
 
         # Get Thumbnail image
-        findText = u"image="
+        findText = "image="
         lenText = len(findText)
         posText = tmpHTML.find(findText)
         if posText == -1:
             self.persistence['spitzerThumbnailLink'] = False
-            return customHTML.replace('IMAGE', u'')
+            return customHTML.replace('IMAGE', '')
         tmpHTML = tmpHTML[posText+lenText:]
         tmpImage = tmpHTML[:tmpHTML.find('"')]
-        self.persistence['spitzerThumbnailLink'] = u'http://www.spitzer.caltech.edu%s' % tmpImage
+        self.persistence['spitzerThumbnailLink'] = 'http://www.spitzer.caltech.edu%s' % tmpImage
 
         return customHTML.replace('IMAGE', tmpImage)
     # end spitzerLinkGeneration()
@@ -152,7 +150,7 @@ class xpathFunctions(object):
         return the thumbnail url
         '''
         if not self.persistence['spitzerThumbnailLink']:
-            return u''
+            return ''
         else:
             return self.persistence['spitzerThumbnailLink']
     # end spitzerThumbnailLink()

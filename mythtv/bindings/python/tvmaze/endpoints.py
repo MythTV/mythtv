@@ -28,8 +28,6 @@
 #
 # ---------------------------------------------------
 
-from __future__ import unicode_literals
-
 
 API_URL = 'https://api.tvmaze.com'
 search_show_name = 'https://api.tvmaze.com/search/shows?'

@@ -92,6 +92,8 @@
 #include "libavutil/float_dsp.h"
 #include "libavutil/intfloat.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mem_internal.h"
+
 #include "avcodec.h"
 #include "internal.h"
 #include "get_bits.h"
@@ -983,13 +985,16 @@ static int decode_coeffs(WMAProDecodeCtx *s, int c)
 
     /** decode run level coded coefficients */
     if (cur_coeff < s->subframe_len) {
+        int ret;
+
         memset(&ci->coeffs[cur_coeff], 0,
                sizeof(*ci->coeffs) * (s->subframe_len - cur_coeff));
-        if (ff_wma_run_level_decode(s->avctx, &s->gb, vlc,
-                                    level, run, 1, ci->coeffs,
-                                    cur_coeff, s->subframe_len,
-                                    s->subframe_len, s->esc_len, 0))
-            return AVERROR_INVALIDDATA;
+        ret = ff_wma_run_level_decode(s->avctx, &s->gb, vlc,
+                                      level, run, 1, ci->coeffs,
+                                      cur_coeff, s->subframe_len,
+                                      s->subframe_len, s->esc_len, 0);
+        if (ret < 0)
+            return ret;
     }
 
     return 0;
@@ -1579,14 +1584,14 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
 
     s->num_saved_bits += len;
     if (!append) {
-        avpriv_copy_bits(&s->pb, gb->buffer + (get_bits_count(gb) >> 3),
+        ff_copy_bits(&s->pb, gb->buffer + (get_bits_count(gb) >> 3),
                      s->num_saved_bits);
     } else {
         int align = 8 - (get_bits_count(gb) & 7);
         align = FFMIN(align, len);
         put_bits(&s->pb, align, get_bits(gb, align));
         len -= align;
-        avpriv_copy_bits(&s->pb, gb->buffer + (get_bits_count(gb) >> 3), len);
+        ff_copy_bits(&s->pb, gb->buffer + (get_bits_count(gb) >> 3), len);
     }
     skip_bits_long(gb, len);
 

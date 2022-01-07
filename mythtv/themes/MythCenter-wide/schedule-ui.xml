@@ -1785,7 +1785,7 @@
             <helptext></helptext>
         </buttonlist>
 
-        <spinbox name="startoffset" from="basewidespinbox">
+        <spinbox name="startoffset" from="basemedwidespinbox">
             <position>250,400</position>
             <template type="negative">Start recording %n minute(s) late</template>
             <template type="zero">Start recording on time</template>
@@ -1793,8 +1793,8 @@
             <helptext></helptext>
         </spinbox>
 
-        <spinbox name="endoffset" from="basewidespinbox">
-            <position>250,444</position>
+        <spinbox name="endoffset" from="basemedwidespinbox">
+            <position>599,400</position>
             <template type="negative">End recording %n minute(s) early</template>
             <template type="zero">End recording on time</template>
             <template type="positive">End recording %n minute(s) late</template>
@@ -1802,11 +1802,16 @@
         </spinbox>
 
         <buttonlist name="dupmethod" from="basewideselector">
-            <position>250,490</position>
+            <position>250,444</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="dupscope" from="basewideselector">
+            <position>250,490</position>
+            <helptext></helptext>
+        </buttonlist>
+
+        <buttonlist name="autoextend" from="basewideselector">
             <position>250,534</position>
             <helptext></helptext>
         </buttonlist>

@@ -20,6 +20,7 @@
  */
 
 #include "avformat.h"
+#include "internal.h"
 #include "mpegts-mythtv.h"
 
 #ifdef _WIN32
@@ -71,7 +72,7 @@ AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id)
     av_set_pts_info(st, 33, 1, 90000);
     st->last_IP_pts = AV_NOPTS_VALUE;
     for(i=0; i<MAX_REORDER_DELAY+1; i++)
-        st->pts_buffer[i]= AV_NOPTS_VALUE;
+        st->internal->pts_buffer[i]= AV_NOPTS_VALUE;
     
     s->streams[s->nb_streams++] = st;
     return st;

@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+
 # ----------------------
 # Name: mainProcess.py
 # Python Script
@@ -21,7 +21,7 @@
 #-------------------------------------
 __title__ ="Netvision Common Query Processing";
 __author__="R.D.Vaughan"
-__version__="v0.2.5"
+__version__="v0.2.6"
 # 0.1.0 Initial development
 # 0.1.1 Refining the code like the additional of a grabber specifing the maximum number of items to return
 # 0.1.2 Added the Tree view option
@@ -32,12 +32,11 @@ __version__="v0.2.5"
 # 0.2.3 Added support of the XML version information
 # 0.2.4 Added the "command" tag to the XML version information
 # 0.2.5 Fixed a bug in the setting up of a search mashup page item maximum
+# 0.2.6 R. Ernst: Converted to python3, added option to disable a grabber script
 
 import sys, os
 from optparse import OptionParser
-import re
-from string import capitalize
-
+import io
 
 class OutStreamEncoder(object):
     """Wraps a stream with an encoder"""
@@ -50,29 +49,24 @@ class OutStreamEncoder(object):
 
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
-        if isinstance(obj, unicode):
-            try:
-                self.out.write(obj.encode(self.encoding))
-            except IOError:
-                pass
-        else:
-            try:
-                self.out.write(obj)
-            except IOError:
-                pass
+        if isinstance(obj, str):
+            obj = obj.encode(self.encoding)
+        self.out.buffer.write(obj)
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
-sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+if isinstance(sys.stdout, io.TextIOWrapper):
+    sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+    sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 
 try:
-    from StringIO import StringIO
+    from io import StringIO
     from lxml import etree
-except Exception, e:
-    sys.stderr.write(u'\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
+except Exception as e:
+    sys.stderr.write('\n! Error - Importing the "lxml" and "StringIO" python libraries failed on error(%s)\n' % e)
     sys.exit(1)
 
 # Check that the lxml library is current enough
@@ -84,7 +78,7 @@ for digit in etree.LIBXML_VERSION:
     version+=str(digit)+'.'
 version = version[:-1]
 if version < '2.7.2':
-    sys.stderr.write(u'''
+    sys.stderr.write('''
 ! Error - The installed version of the "lxml" python library "libxml" version is too old.
           At least "libxml" version 2.7.2 must be installed. Your version is (%s).
 ''' % version)
@@ -152,7 +146,7 @@ class siteQueries():
                 custom_ui = custom_ui,
                 language = language,
                 search_all_languages = search_all_languages,)
-        self.searchKeys = [u'title', u'releasedate', u'overview', u'url', u'thumbnail', u'video', u'runtime', u'viewcount']
+        self.searchKeys = ['title', 'releasedate', 'overview', 'url', 'thumbnail', 'video', 'runtime', 'viewcount']
 
         self.searchXML = {'header': """<?xml version="1.0" encoding="UTF-8"?>""", 'rss': """
 <rss version="2.0"
@@ -327,38 +321,38 @@ class mainProcess:
         parser = OptionParser()
 
         parser.add_option(  "-d", "--debug", action="store_true", default=False, dest="debug",
-                            help=u"Show debugging info (URLs, raw XML ... etc, info varies per grabber)")
+                            help="Show debugging info (URLs, raw XML ... etc, info varies per grabber)")
         parser.add_option(  "-u", "--usage", action="store_true", default=False, dest="usage",
-                            help=u"Display examples for executing the script")
+                            help="Display examples for executing the script")
         parser.add_option(  "-v", "--version", action="store_true", default=False, dest="version",
-                            help=u"Display grabber name and supported options")
-        parser.add_option(  "-l", "--language", metavar="LANGUAGE", default=u'', dest="language",
-                            help=u"Select data that matches the specified language fall back to English if nothing found (e.g. 'es' Español, 'de' Deutsch ... etc).\nNot all sites or grabbers support this option.")
+                            help="Display grabber name and supported options")
+        parser.add_option(  "-l", "--language", metavar="LANGUAGE", default='', dest="language",
+                            help="Select data that matches the specified language fall back to English if nothing found (e.g. 'es' Español, 'de' Deutsch ... etc).\nNot all sites or grabbers support this option.")
         parser.add_option(  "-p", "--pagenumber", metavar="PAGE NUMBER", default=1, dest="pagenumber",
-                            help=u"Display specific page of the search results. Default is page 1.\nPage number is ignored with the Tree View option (-T).")
-        functionality = u''
+                            help="Display specific page of the search results. Default is page 1.\nPage number is ignored with the Tree View option (-T).")
+        functionality = ''
         if self.grabberInfo['search']:
             parser.add_option(  "-S", "--search", action="store_true", default=False, dest="search",
-                                help=u"Search for videos")
+                                help="Search for videos")
             functionality+='S'
 
         if self.grabberInfo['tree']:
             parser.add_option(  "-T", "--treeview", action="store_true", default=False, dest="treeview",
-                                help=u"Display a Tree View of a sites videos")
+                                help="Display a Tree View of a sites videos")
             functionality+='T'
 
         if self.grabberInfo['html']:
             parser.add_option(  "-H", "--customhtml", action="store_true", default=False,
-                                dest="customhtml", help=u"Return a custom HTML Web page")
+                                dest="customhtml", help="Return a custom HTML Web page")
             functionality+='H'
 
-        parser.usage=u"./%%prog -hduvl%s [parameters] <search text>\nVersion: %s Author: %s\n\nFor details on the MythTV Netvision plugin see the wiki page at:\nhttp://www.mythtv.org/wiki/MythNetvision" % (functionality, self.grabberInfo['version'], self.grabberInfo['author'])
+        parser.usage="./%%prog -hduvl%s [parameters] <search text>\nVersion: %s Author: %s\n\nFor details on the MythTV Netvision plugin see the wiki page at:\nhttp://www.mythtv.org/wiki/MythNetvision" % (functionality, self.grabberInfo['version'], self.grabberInfo['author'])
 
         opts, args = parser.parse_args()
 
         # Make alls command line arguments unicode utf8
         for index in range(len(args)):
-            args[index] = unicode(args[index], 'utf8')
+            args[index] = str(args[index])
 
         if opts.debug:
             sys.stdout.write("\nopts: %s\n" % opts)
@@ -366,7 +360,11 @@ class mainProcess:
 
         # Process version command line requests
         if opts.version:
-            version = etree.XML(u'<grabber></grabber>')
+            # grabber scripts must be explicitly enabled
+            if self.grabberInfo.get('enabled', False):
+                version = etree.XML('<grabber></grabber>')
+            else:
+                version = etree.XML('<disabledgrabber></disabledgrabber>')
             etree.SubElement(version, "name").text = self.grabberInfo['title']
             etree.SubElement(version, "author").text = self.grabberInfo['author']
             etree.SubElement(version, "thumbnail").text = self.grabberInfo['thumbnail']
@@ -391,7 +389,7 @@ class mainProcess:
             if opts.search and not len(args) == 1:
                 sys.stderr.write("! Error: There must be one value for the search option. Your options are (%s)\n" % (args))
                 sys.exit(1)
-            if opts.search and args[0] == u'':
+            if opts.search and args[0] == '':
                 sys.stderr.write("! Error: There must be a non-empty search argument, yours is empty.\n")
                 sys.exit(1)
 
@@ -399,7 +397,7 @@ class mainProcess:
             if opts.customhtml and not len(args) == 1:
                 sys.stderr.write("! Error: There must be one value for the search option. Your options are (%s)\n" % (args))
                 sys.exit(1)
-            if opts.customhtml and args[0] == u'':
+            if opts.customhtml and args[0] == '':
                 sys.stderr.write("! Error: There must be a non-empty Videocode argument, yours is empty.\n")
                 sys.exit(1)
 
@@ -419,7 +417,7 @@ class mainProcess:
         # Set the maximum number of items to display per Mythtvnetvision search page
         if self.grabberInfo['search']:
             if opts.search:
-                if not 'SmaxPage' in self.grabberInfo.keys():
+                if not 'SmaxPage' in list(self.grabberInfo.keys()):
                     Queries.page_limit = 20   # Default items per page
                 else:
                     Queries.page_limit = self.grabberInfo['SmaxPage']
@@ -427,7 +425,7 @@ class mainProcess:
         # Set the maximum number of items to display per Mythtvnetvision tree view page
         if self.grabberInfo['tree']:
             if opts.treeview:
-                if not 'TmaxPage' in self.grabberInfo.keys():
+                if not 'TmaxPage' in list(self.grabberInfo.keys()):
                     Queries.page_limit = 20   # Default items per page
                 else:
                     Queries.page_limit = self.grabberInfo['TmaxPage']
@@ -436,7 +434,7 @@ class mainProcess:
         Queries.grabber_title = self.grabberInfo['title']
 
         # Set the mashup title
-        if not 'mashup_title' in self.grabberInfo.keys():
+        if not 'mashup_title' in list(self.grabberInfo.keys()):
             Queries.mashup_title = Queries.grabber_title
         else:
             if self.grabberInfo['search']:
