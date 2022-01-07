@@ -138,7 +138,7 @@ sudo apt-get --assume-yes remove pkg-config
 
 echo "Compiling mythtv"
 cd $buildPath/mythtv/mythtv
-./configure --prefix="$buildPath/install" --enable-cross-compile --cross-prefix=i686-w64-mingw32.shared- --target_os=mingw32 --arch=x86 --cpu=pentium3 --qmake=$qt5/bin/qmake --extra-cflags=-I$in1/include-I/home/ubuntu/Desktop/build/mxe/usr/lib/gcc/i686-w64-mingw32.shared/8.4.0/include/c++/i686-w64-mingw32.shared --extra-ldflags=-L$in1/lib --disable-lirc --disable-hdhomerun --disable-firewire --disable-ivtv --disable-vdpau  --disable-nvdec --disable-dxva2 --enable-libmp3lame --enable-libx264 --enable-libx265 --enable-libxvid --enable-libvpx --disable-w32threads
+./configure --prefix="$buildPath/install" --enable-cross-compile --cross-prefix=i686-w64-mingw32.shared- --target_os=mingw32 --arch=x86 --cpu=pentium3 --qmake=$qt5/bin/qmake --extra-cflags=-I$in1/include-I/home/ubuntu/Desktop/build/mxe/usr/lib/gcc/i686-w64-mingw32.shared/8.4.0/include/c++/i686-w64-mingw32.shared --extra-ldflags=-L$in1/lib --disable-lirc --disable-hdhomerun --disable-firewire --disable-vdpau  --disable-nvdec --disable-dxva2 --enable-libmp3lame --enable-libx264 --enable-libx265 --enable-libxvid --enable-libvpx --disable-w32threads
 
 make -j$(nproc)
 
