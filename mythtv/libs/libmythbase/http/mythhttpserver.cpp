@@ -167,8 +167,7 @@ void MythHTTPServer::Init()
         version = version.right(version.length() - 1);
 
 #ifdef _WIN32
-    QString server = QStringLiteral("Windows/%1.%2").arg(LOBYTE(LOWORD(GetVersion())))
-                                                    .arg(HIBYTE(LOWORD(GetVersion())));
+    QString server = QStringLiteral("Windows");
 #else
     struct utsname uname_info {};
     uname(&uname_info);
