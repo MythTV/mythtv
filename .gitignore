@@ -59,3 +59,4 @@ uic_wrapper.sh
 *.profdata
 __pycache__
 mocinclude.opt
+build

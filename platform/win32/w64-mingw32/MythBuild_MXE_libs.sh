@@ -8,107 +8,157 @@ sudo apt-get --assume-yes install \
      libtool libtool-bin ruby intltool p7zip-full python \
      pkg-config yasm mmv
 
-echo "Creating build tree"
-export buildPath=$PWD"/build"
-mkdir -p $buildPath
-cd $buildPath
-mkdir -p install/bin/plugins
-mkdir -p themes
+buildRoot=$PWD
+while test ! -e "$buildRoot/.git" ; do
+    buildRoot=${buildRoot%/*}
+    if test "x$buildRoot" == "x" ; then
+        echo "Cannot find .git file or directory.  Exiting."
+        exit
+    fi
+done
+export buildRoot
+echo "Build root is $buildRoot"
 
-echo "Cloning MythTV themes"
-cd $buildPath/themes
-git clone https://github.com/paul-h/MythCenterXMAS-wide.git
-git clone https://github.com/wesnewell/Functionality
-git clone https://github.com/MythTV-Themes/TintedGlass
-git clone https://github.com/MythTV-Themes/Readability
-git clone https://github.com/MythTV-Themes/Steppes
-git clone https://github.com/MythTV-Themes/Retro-wide
-git clone https://github.com/MythTV-Themes/LCARS
-git clone https://github.com/MythTV-Themes/Childish
-git clone https://github.com/MythTV-Themes/Arclight
-git clone https://github.com/MythTV-Themes/Mythbuntu
-git clone https://github.com/MythTV-Themes/blue-abstract-wide
-git clone https://github.com/MythTV-Themes/Mythbuntu-classic
-cd ..
-
-echo "Cloning MXE"
-git clone https://github.com/mxe/mxe.git
-
-echo "Add SQL to QT"
-sed -i 's/-no-sql-mysql /\//g' $buildPath/mxe/src/qt.mk
-
-cd mxe
-sudo make cc MXE_PLUGIN_DIRS=plugins/gcc8 MXE_TARGETS='i686-w64-mingw32.shared' vulkan-loader vulkan-headers qt5 nasm yasm libsamplerate taglib zlib gnutls mman-win32 pthreads libxml2 libdvdcss x264 x265 lame libass qtwebkit xvidcore libvpx vorbis flac
-cd ..
-
-find . -name \*.dll -exec cp {} \install/bin \;
-
+echo "Settings paths"
+export buildPath=$buildRoot"/build"
 export PATH=$buildPath"/mxe/usr/bin":$PATH
-sudo chmod -R 777 $buildPath/mxe
 
-echo -e "#define RTLD_LAZY 0 \n#define HAVE_DVDCSS_DVDCSS_H" | sudo -E tee $buildPath/mxe/usr/i686-w64-mingw32.shared/include/dlfcn.h
+if test "x$1" == "xclean" ; then
+    echo "Removing build tree"
+    rm -rf $buildPath
+fi
 
-sudo -E sed -i 's/#define GetUserName __MINGW_NAME_AW(GetUserName)//g' $buildPath/mxe/usr/i686-w64-mingw32.shared/include/winbase.h
-sudo -E sed -i 's/#define CopyFile __MINGW_NAME_AW(CopyFile)//g' $buildPath/mxe/usr/i686-w64-mingw32.shared/include/winbase.h
-sudo -E sed -i 's/#define MoveFile __MINGW_NAME_AW(MoveFile)//g' $buildPath/mxe/usr/i686-w64-mingw32.shared/include/winbase.h
+if test -e "$buildPath" ; then
+    echo "Build tree already exists"
+else
+    echo "Creating build tree"
+    mkdir -p $buildPath/install/bin/plugins
+    mkdir -p $buildPath/themes
+fi
 
-sudo cp $buildPath/mxe/usr/x86_64-pc-linux-gnu/bin/yasm $buildPath//mxe/usr/bin/yasm
-sudo cp $buildPath/mxe/usr/bin/i686-w64-mingw32.shared-pkg-config $buildPath//mxe/usr/bin/pkg-config
-sudo cp -R $buildPath/mxe/usr/lib/gcc/i686-w64-mingw32.shared/8.4.0/include/c++ $buildPath/mxe/usr/lib/gcc/i686-w64-mingw32.shared/8.4.0/include
+if test -e "$buildPath/themes/Mythbuntu-classic" ; then
+    echo "MythTV themes already exist"
+else
+    echo "Cloning MythTV themes"
+    cd $buildPath/themes
+    git clone https://github.com/paul-h/MythCenterXMAS-wide.git
+    git clone https://github.com/wesnewell/Functionality
+    git clone https://github.com/MythTV-Themes/TintedGlass
+    git clone https://github.com/MythTV-Themes/Readability
+    git clone https://github.com/MythTV-Themes/Steppes
+    git clone https://github.com/MythTV-Themes/Retro-wide
+    git clone https://github.com/MythTV-Themes/LCARS
+    git clone https://github.com/MythTV-Themes/Childish
+    git clone https://github.com/MythTV-Themes/Arclight
+    git clone https://github.com/MythTV-Themes/Mythbuntu
+    git clone https://github.com/MythTV-Themes/blue-abstract-wide
+    git clone https://github.com/MythTV-Themes/Mythbuntu-classic
+fi
 
-cp $buildPath/mythtv/platform/win32/w64-mingw32/Patches/libexiv2.patch $buildPath/mythtv/libexiv2.patch
-cd mythtv
-git apply libexiv2.patch -v
-rm libexiv2.patch
-cd ..
+cd $buildPath
+if test -d "mxe" ; then
+    echo "MXE already exists"
+else
+    echo "Cloning MXE"
+    git clone https://github.com/mxe/mxe.git
 
-echo "Compiling libudfread"
-GIT_SSL_NO_VERIFY= git clone https://code.videolan.org/videolan/libudfread.git
-cd libudfread
-./bootstrap
-./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --host=i686-w64-mingw32.shared
-# libtool won't build this as a shared library without this flag.
-sed -i 's/LDFLAGS = /LDFLAGS = -no-undefined/' Makefile
-make -j$(nproc)
-sudo make install
-cd ..
+    echo "Add SQL to QT"
+    sed -i 's/-no-sql-mysql /\//g' $buildPath/mxe/src/qt.mk
 
-GIT_SSL_NO_VERIFY= git clone https://code.videolan.org/videolan/libbluray.git
-cd $buildPath/libbluray
-GIT_SSL_NO_VERIFY= git submodule update --init
+    cd mxe
+    make cc MXE_PLUGIN_DIRS=plugins/gcc8 MXE_TARGETS='i686-w64-mingw32.shared' vulkan-loader vulkan-headers qt5 nasm yasm libsamplerate taglib zlib gnutls mman-win32 pthreads libxml2 libdvdcss x264 x265 lame libass qtwebkit xvidcore libvpx vorbis flac
+    cd ..
 
-sudo -E chmod -R 777 $buildPath/libbluray
+    find . -name \*.dll -exec cp {} \install/bin \;
 
-echo "Compiling libbluray"
-./bootstrap
-./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --disable-examples --with-freetype --with-libxml2 --disable-bdjava-jar --host=i686-w64-mingw32.shared
-make -j$(nproc)
-make install
-cd ..
+    chmod -R 755 $buildPath/mxe
 
-echo "Compiling libzip"
-git clone https://github.com/nih-at/libzip.git
-sudo -E chmod -R 777 $buildPath/libzip
-cd libzip
-$buildPath/mxe/usr/bin/i686-w64-mingw32.shared-cmake $buildPath/libzip
-make -j$(nproc)
-make install
-cd ..
+    echo -e "#define RTLD_LAZY 0 \n#define HAVE_DVDCSS_DVDCSS_H" | tee $buildPath/mxe/usr/i686-w64-mingw32.shared/include/dlfcn.h
 
-echo "Compiling SoundTouch"
-GIT_SSL_NO_VERIFY= git clone https://codeberg.org/soundtouch/soundtouch.git
-sudo -E chmod -R 777 $buildPath/soundtouch
-cd soundtouch
-./bootstrap
-./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --host=i686-w64-mingw32.shared
-sed -i 's/LDFLAGS = /LDFLAGS = -no-undefined/' $buildPath/soundtouch/source/SoundTouch/Makefile
-make -j$(nproc)
-make install
-cd ..
+    sed -i -e 's/#define GetUserName __MINGW_NAME_AW(GetUserName)//g' \
+	-e 's/#define CopyFile __MINGW_NAME_AW(CopyFile)//g'       \
+	-e 's/#define MoveFile __MINGW_NAME_AW(MoveFile)//g'       \
+	$buildPath/mxe/usr/i686-w64-mingw32.shared/include/winbase.h
 
-echo "Install endian.h"
-git clone https://gist.github.com/PkmX/63dd23f28ba885be53a5
-sudo -E cp $buildPath/63dd23f28ba885be53a5/portable_endian.h $buildPath/mxe/usr/i686-w64-mingw32.shared/include/endian.h
+    #sudo apt-get --assume-yes remove yasm
+
+    cp $buildPath/mxe/usr/x86_64-pc-linux-gnu/bin/yasm $buildPath/mxe/usr/bin/yasm
+    cp $buildPath/mxe/usr/bin/i686-w64-mingw32.shared-pkg-config $buildPath/mxe/usr/bin/pkg-config
+    cp -R $buildPath/mxe/usr/lib/gcc/i686-w64-mingw32.shared/8.4.0/include/c++ $buildPath/mxe/usr/lib/gcc/i686-w64-mingw32.shared/8.4.0/include
+fi
+
+
+cd $buildPath
+if test -d "libudfread" ; then
+    echo "Directory libudfread already exists"
+else
+    echo "Compiling libudfread"
+    GIT_SSL_NO_VERIFY= git clone https://code.videolan.org/videolan/libudfread.git
+    cd libudfread
+    ./bootstrap
+    ./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --host=i686-w64-mingw32.shared
+    # libtool won't build this as a shared library without this flag.
+    sed -i 's/LDFLAGS = /LDFLAGS = -no-undefined/' Makefile
+    make -j$(nproc)
+    make install
+fi
+
+
+cd $buildPath
+if test -d "libbluray" ; then
+    echo "Directory libbluray already exists"
+else
+    GIT_SSL_NO_VERIFY= git clone https://code.videolan.org/videolan/libbluray.git
+    chmod -R 755 libbluray
+    cd libbluray
+    GIT_SSL_NO_VERIFY= git submodule update --init
+
+    echo "Compiling libbluray"
+    ./bootstrap
+    ./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --disable-examples --with-freetype --with-libxml2 --disable-bdjava-jar --host=i686-w64-mingw32.shared
+    make -j$(nproc)
+    make install
+fi
+
+
+cd $buildPath
+if test -d "libzip" ; then
+    echo "Directory libzip already exists"
+else
+    echo "Compiling libzip"
+    git clone https://github.com/nih-at/libzip.git
+    chmod -R 755 libzip
+    cd libzip
+    $buildPath/mxe/usr/bin/i686-w64-mingw32.shared-cmake $buildPath/libzip
+    make -j$(nproc)
+    make install
+fi
+
+
+cd $buildPath
+if test -d "soundtouch" ; then
+    echo "Directory soundtouch already exists"
+else
+    echo "Compiling SoundTouch"
+    GIT_SSL_NO_VERIFY= git clone https://codeberg.org/soundtouch/soundtouch.git
+    chmod -R 755 soundtouch
+    cd soundtouch
+    ./bootstrap
+    ./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --host=i686-w64-mingw32.shared
+    sed -i 's/LDFLAGS = /LDFLAGS = -no-undefined/' $buildPath/soundtouch/source/SoundTouch/Makefile
+    make -j$(nproc)
+    make install
+fi
+
+
+cd $buildPath
+if test -f "$buildPath/mxe/usr/i686-w64-mingw32.shared/include/endian.h" ; then
+    echo "Endian.h already exists"
+else
+    echo "Install endian.h"
+    git clone https://gist.github.com/PkmX/63dd23f28ba885be53a5 portable_endian
+    cp $buildPath/portable_endian/portable_endian.h $buildPath/mxe/usr/i686-w64-mingw32.shared/include/endian.h
+fi
 
 
 echo "Done"

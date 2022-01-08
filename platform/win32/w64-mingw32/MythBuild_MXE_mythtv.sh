@@ -1,19 +1,44 @@
 #!/bin/bash
 
-export buildPath=$PWD"/build"
+buildRoot=$PWD
+while test ! -e "$buildRoot/.git" ; do
+    buildRoot=${buildRoot%/*}
+    if test "x$buildRoot" == "x" ; then
+        echo "Cannot find root directory containing .git file or directory.  Exiting."
+        exit
+    fi
+done
+export buildRoot
+echo "Build root is $buildRoot"
+
+echo "Settings paths"
+export buildPath=$buildRoot"/build"
 export PATH=$buildPath"/mxe/usr/bin":$PATH
 export qt5=$buildPath"/mxe/usr/i686-w64-mingw32.shared/qt5"
 export in1=$buildPath"/mxe/usr/i686-w64-mingw32.shared"
 
-git clone https://github.com/MythTV/mythtv.git
+if test "x$1" == "xclean" ; then
+    echo "Removing MythTV build directory"
+    rm -rf $buildPath/mythtv
+fi
+
+if test -e "$buildPath/mythtv" ; then
+    echo "MythTV build directory exists"
+else
+    echo "Creating MythTV build directory"
+    mkdir -p $buildPath/mythtv
+    cd $buildRoot
+    cp -al mythplugins mythtv platform themestringstool $buildPath/mythtv
+fi
 
 cd $buildPath/mythtv
-#git clean -xfd .
-#git fetch me
-#git reset --hard me/master
-#cp platform/win32/w64-mingw32/Patches/libexiv2.patch libexiv2.patch
-#git apply libexiv2.patch -v
-#rm libexiv2.patch
+if test -e .exif_patched ; then
+    echo "libexif source already patched"
+else
+    echo "Patching libexif source"
+    patch -p1 < platform/win32/w64-mingw32/Patches/libexiv2.patch
+    touch .exif_patched
+fi
 
 echo "Compiling mythtv"
 cd $buildPath/mythtv/mythtv
