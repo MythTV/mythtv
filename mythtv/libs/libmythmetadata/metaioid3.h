@@ -8,6 +8,11 @@
 // Taglib
 #include <id3v1tag.h>
 #include <id3v2tag.h>
+#ifdef Q_OS_WIN
+// The above indirectly includes winuser.h, which unconditionally
+// redefines the string SendMessage to SendMessageA.
+#undef SendMessage
+#endif
 #include <textidentificationframe.h>
 #include <attachedpictureframe.h>
 #include <popularimeterframe.h>
