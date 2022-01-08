@@ -288,6 +288,11 @@ inc.files += mythavutil.h           mythframe.h
 
 INSTALLS += inc
 
+inc3.path = $${PREFIX}/include/mythtv/libmythtv
+inc3.files = $${inc.files}
+
+INSTALLS += inc3
+
 inc2.path = $${PREFIX}/include/mythtv/goom
 inc2.files  = visualisations/goom/filters.h
 inc2.files += visualisations/goom/goomconfig.h
