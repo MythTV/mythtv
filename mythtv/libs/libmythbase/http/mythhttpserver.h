@@ -35,10 +35,10 @@ class MythHTTPServer : public MythHTTPThreadPool
     // Internal
     void MasterResolved (QHostInfo Info);
     void HostResolved   (QHostInfo Info);
+    void ProcessTCPQueue();
 
   public slots:
     void ThreadFinished ();
-    void ProcessTCPQueue();
 
   protected slots:
     void newTcpConnection(qintptr socket) override;
@@ -52,6 +52,7 @@ class MythHTTPServer : public MythHTTPThreadPool
     void ResolveMaster  (QHostInfo Info);
     void ResolveHost    (QHostInfo Info);
     void NewErrorPageHandler (const HTTPHandler& Handler);
+    void ProcessTCPQueueHandler();
 
   protected:
     MythHTTPServer();

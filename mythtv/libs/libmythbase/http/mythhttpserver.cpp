@@ -40,6 +40,7 @@ MythHTTPServer::MythHTTPServer()
     connect(this, &MythHTTPServer::MasterResolved, this, &MythHTTPServer::ResolveMaster);
     connect(this, &MythHTTPServer::HostResolved,   this, &MythHTTPServer::ResolveHost);
     connect(this, &MythHTTPServer::AddErrorPageHandler, this, & MythHTTPServer::NewErrorPageHandler);
+    connect(this, &MythHTTPServer::ProcessTCPQueue, this, & MythHTTPServer::ProcessTCPQueueHandler);
 
     // Find our static content
     m_config.m_rootDir = GetShareDir();
@@ -249,7 +250,7 @@ void MythHTTPServer::ThreadFinished()
     }
 }
 
-void MythHTTPServer::ProcessTCPQueue()
+void MythHTTPServer::ProcessTCPQueueHandler()
 {
     if (AvailableThreads() > 0)
     {
