@@ -193,6 +193,8 @@ bool Channel::UpdateDBChannel( uint          MplexID,
     {
 #ifndef _WIN32 // TODO Does not compile on Windows
         channel.m_visible = channelVisibleTypeFromString(ExtendedVisible);
+#else
+	Q_UNUSED(ExtendedVisible);
 #endif
     }
     else if (HAS_PARAM("visible"))
@@ -256,6 +258,7 @@ bool Channel::AddDBChannel( uint          MplexID,
     ChannelVisibleType chan_visible = kChannelVisible;
 
     #ifdef _WIN32 // TODO Needs fixing for Windows
+	Q_UNUSED(ExtendedVisible);
         chan_visible = (Visible ? kChannelVisible : kChannelNotVisible);
     #else
         if (HAS_PARAM("extendedvisible"))

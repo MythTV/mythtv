@@ -95,6 +95,8 @@ SignalHandler::SignalHandler(QList<int> &signallist, QObject *parent) :
 
         SetHandlerPrivate(signum, nullptr);
     }
+#else
+    Q_UNUSED(signallist);
 #endif // _WIN32
 }
 
@@ -178,6 +180,9 @@ void SignalHandler::SetHandlerPrivate(int signum, SigHandlerFunc handler)
     }
 
     LOG(VB_GENERAL, LOG_INFO, QString("Setup %1 handler").arg(signal_name));
+#else
+    Q_UNUSED(signum);
+    Q_UNUSED(handler);
 #endif
 }
 

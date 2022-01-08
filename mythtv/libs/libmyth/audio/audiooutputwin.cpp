@@ -95,6 +95,10 @@ void CALLBACK AudioOutputWinPrivate::waveOutProc(HWAVEOUT hwo, UINT uMsg,
                                                  DWORD dwInstance,
                                                  DWORD dwParam1, DWORD dwParam2)
 {
+    Q_UNUSED(hwo);
+    Q_UNUSED(dwParam1);
+    Q_UNUSED(dwParam2);
+
     if (uMsg != WOM_DONE)
         return;
 

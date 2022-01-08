@@ -192,6 +192,7 @@ MythDBBackupStatus DBUtil::BackupDB(QString &filename, bool disableRotation)
     filename = QString();
 
 #ifdef _WIN32
+    Q_UNUSED(disableRotation);
     LOG(VB_GENERAL, LOG_CRIT, "Database backups disabled on Windows.");
     return kDB_Backup_Disabled;
 #else

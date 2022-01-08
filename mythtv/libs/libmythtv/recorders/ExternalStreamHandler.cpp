@@ -100,6 +100,10 @@ bool ExternIO::Ready(int fd, std::chrono::milliseconds timeout, const QString & 
             m_error = "poll overflow";
         return false;
     }
+#else
+    Q_UNUSED(fd);
+    Q_UNUSED(timeout);
+    Q_UNUSED(what);
 #endif // !defined( USING_MINGW ) && !defined( _MSC_VER )
     return false;
 }
