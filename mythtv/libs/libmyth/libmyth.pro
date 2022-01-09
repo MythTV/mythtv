@@ -237,10 +237,6 @@ using_jack {
     SOURCES += audio/audiooutputjack.cpp
 }
 
-contains( HAVE_MMX, yes ) {
-    HEADERS += ../../external/FFmpeg/libavutil/cpu.h
-}
-
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
