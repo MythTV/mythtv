@@ -29,9 +29,6 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <sys/types.h>
-#if HAVE_GETOPT_H
-# include <getopt.h>
-#endif
 
 #include "cc.h"
 
