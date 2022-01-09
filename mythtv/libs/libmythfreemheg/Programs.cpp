@@ -40,14 +40,9 @@
 #include <QStringList>
 #include <QUrl>
 #include <QUrlQuery>
-#if HAVE_GETTIMEOFDAY == 0
-#include <sys/timeb.h>
-#endif
-#ifdef __FreeBSD__
-#include <sys/time.h>
-#else
+
 #include <ctime>
-#endif
+
 
 /*
  * Resident programs are subroutines to provide various string and date functions
