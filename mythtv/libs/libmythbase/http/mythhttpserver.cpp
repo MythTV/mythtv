@@ -525,8 +525,8 @@ void MythHTTPServer::BuildOrigins()
 
     // Add configured overrides - are these still needed?
     QStringList extras = gCoreContext->GetSetting("AllowedOriginsList", QString(
-                                                  "https://chromecast.mythtv.org,"
-                                                  "http://chromecast.mythtvcast.com")).split(",");
+                                                  "https://chromecast.mythtv.org"
+                                                  )).split(",");
     for (const auto & extra : extras)
     {
         QString clean = extra.trimmed();
