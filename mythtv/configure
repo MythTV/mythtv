@@ -1670,7 +1670,6 @@ HEADERS_LIST="
     mach_mach_time_h
     machine_ioctl_bt848_h
     machine_ioctl_meteor_h
-    malloc_h
     mntent_h
     opencv2_core_core_c_h
     OpenGL_gl3_h
@@ -1741,7 +1740,6 @@ MATH_FUNCS="
 
 SYSTEM_FUNCS="
     access
-    aligned_malloc
     arc4random
     clock_gettime
     closesocket
@@ -1774,13 +1772,11 @@ SYSTEM_FUNCS="
     lzo1x_999_compress
     mach_absolute_time
     MapViewOfFile
-    memalign
     mkstemp
     mmap
     mprotect
     nanosleep
     PeekNamedPipe
-    posix_memalign
     pthread_cancel
     sched_getaffinity
     SetConsoleTextAttribute
@@ -4800,7 +4796,6 @@ case $target_os in
         disable dv1394
         disable dvb
         disable ceton
-        enable  memalign_hack
         disable mythtranscode
         disable network
         enable opengl
@@ -5676,10 +5671,6 @@ case "$custom_allocator" in
         malloc_prefix=tc_
     ;;
 esac
-
-check_func_headers malloc.h _aligned_malloc     && enable aligned_malloc
-check_func  ${malloc_prefix}memalign            && enable memalign
-check_func  ${malloc_prefix}posix_memalign      && enable posix_memalign
 
 check_func  access
 check_func_headers stdlib.h arc4random
@@ -7094,12 +7085,6 @@ check_deps $CONFIG_LIST       \
            $USING_LIST        \
 
 enabled threads && ! enabled pthreads && ! enabled atomics_native && die "non pthread threading without atomics not supported, try adding --enable-pthreads or --cpu=i486 or higher if you are on x86"
-
-
-if test $target_os = "haiku"; then
-    disable memalign
-    disable posix_memalign
-fi
 
 # add_dep lib dep
 # -> enable ${lib}_deps_${dep}
