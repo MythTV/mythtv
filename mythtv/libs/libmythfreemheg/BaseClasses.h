@@ -22,8 +22,6 @@
 #if !defined(BASECLASSES_H)
 #define BASECLASSES_H
 
-#include "config.h"
-
 #include <cstdlib> // malloc etc.
 
 #include <array>
