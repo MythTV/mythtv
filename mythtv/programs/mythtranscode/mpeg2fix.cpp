@@ -1898,7 +1898,7 @@ int MPEG2fixup::InsertFrame(int frameNum, int64_t deltaPTS,
 
     {
         QString fname;
-#if SPEW_FILES
+#ifdef SPEW_FILES
         static int ins_count = 0;
         fname = (VERBOSE_LEVEL_CHECK(VB_PROCESS, LOG_ANY) ?
                 (QString("ins%1").arg(ins_count++)) : QString());
