@@ -77,7 +77,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
         m_statusLock = scanEvent->boolValue();
     else if (scanEvent->type() == ScannerEvent::SetStatusSignalToNoise)
         m_statusSnr = scanEvent->intValue() / 65535.0;
-#if THESE_ARE_CURRENTLY_IGNORED
+#if 0 // THESE_ARE_CURRENTLY_IGNORED
     else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
         ;
     else if (scanEvent->type() == ScannerEvent::SetStatusRotorPosition)
