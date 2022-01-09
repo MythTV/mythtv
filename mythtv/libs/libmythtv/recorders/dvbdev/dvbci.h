@@ -27,10 +27,7 @@
 #ifndef DVBCI_H
 #define DVBCI_H
 
-#if HAVE_STDINT_H
 #include <cstdint>
-#endif 
-
 #include <cstdio>
 #include <vector>
 
