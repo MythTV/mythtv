@@ -116,7 +116,7 @@ DTC::ImageMetadataInfoList* Image::GetImageInfoList(int id)
         imInfo->setLabel(parts[1]);
         imInfo->setValue(parts[2]);
 
-#if DUMP_METADATA_TAGS
+#if defined(DUMP_METADATA_TAGS) && DUMP_METADATA_TAGS
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("Metadata %1 : %2 : '%3'").arg(parts[0], parts[1], parts[2]));
 #endif
