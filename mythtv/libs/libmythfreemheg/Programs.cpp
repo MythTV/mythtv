@@ -19,7 +19,8 @@
 
 */
 
-#include "mythchrono.h"
+#include <algorithm>
+#include <limits>
 
 #include "Programs.h"
 #include "Ingredients.h"
@@ -37,9 +38,6 @@
 #include <QStringList>
 #include <QUrl>
 #include <QUrlQuery>
-
-#include <ctime>
-
 
 /*
  * Resident programs are subroutines to provide various string and date functions
@@ -152,6 +150,34 @@ static void GetString(MHParameter *parm, MHOctetString &str, MHEngine *engine)
     str.Copy(un.m_strVal);
 }
 
+/** @brief Midnight on 17 November 1858, the epoch of the modified Julian day.
+
+This is Qt::LocalTime, to match GetCurrentDate's use of local time.
+
+ETSI ES 202 184 V2.4.1 (2016-06) does not mention timezones.
+§11.10.4.2 GetCurrentDate "Retrieves the current @e local date and time."
+Emphasis mine.
+
+Therefore, for consistency, I will assume all dates are in the local timezone.
+Thus, the meaning of FormatDate using the output of GetCurrentDate is equivalent
+to QDateTime::currentDateTime().toString(…) with a suitably converted format string.
+*/
+static const QDateTime k_mJD_epoch = QDateTime(QDate(1858, 11, 17), QTime(0, 0), Qt::LocalTime);
+
+// match types with Qt
+static inline QDateTime recoverDateTime(int64_t mJDN, int64_t seconds)
+{
+    QDateTime dt = k_mJD_epoch;
+    return dt.addDays(mJDN).addSecs(seconds);
+}
+
+static void GetCurrentDate(int64_t& mJDN, int& seconds)
+{
+    auto dt = QDateTime::currentDateTime();
+    mJDN    = k_mJD_epoch.daysTo(dt); // returns a qint64
+    seconds = dt.time().msecsSinceStartOfDay() / 1000;
+}
+
 void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, const MHSequence<MHParameter *> &args, MHEngine *engine)
 {
     if (! m_fAvailable)
@@ -170,13 +196,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         {
             if (args.Size() == 2)
             {
-                // Adjust the time to local.  TODO: Check this.
-                auto epochSeconds = nowAsDuration<std::chrono::seconds>(true);
-                // Time as seconds since midnight.
-                int nTimeAsSecs = (epochSeconds % 24h).count();
-                // Modified Julian date as number of days since 17th November 1858.
-                // 1st Jan 1970 was date 40587.
-                int nModJulianDate = 40587 + epochSeconds / 24h;
+                int64_t mJDN = 0;
+                int nTimeAsSecs = 0;
+                GetCurrentDate(mJDN, nTimeAsSecs);
+                int nModJulianDate = std::clamp<int64_t>(mJDN, 0, std::numeric_limits<int>::max());
 
                 engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(nModJulianDate);
                 engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(nTimeAsSecs);
@@ -197,9 +220,8 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 GetString(args.GetAt(0), format, engine);
                 int date = GetInt(args.GetAt(1), engine); // As produced in GCD
                 int time = GetInt(args.GetAt(2), engine);
-                // Convert to a Unix date (secs since 1st Jan 1970) but adjusted for time zone.
-                time_t timet = (date - 40587) * (24 * 60 * 60) + time;
-                QDateTime dt = QDateTime::fromMSecsSinceEpoch(timet);
+
+                QDateTime dt = recoverDateTime(date, time);
                 MHOctetString result;
 
                 for (int i = 0; i < format.Size(); i++)
@@ -270,11 +292,17 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             if (args.Size() == 2)
             {
                 int date = GetInt(args.GetAt(0), engine); // Date as produced in GCD
-                // Convert to a Unix date (secs since 1st Jan 1970) but adjusted for time zone.
-                time_t timet = (date - 40587) * (24 * 60 * 60);
-                struct tm *timeStr = gmtime(&timet);
-                // 0 => Sunday, 1 => Monday etc.
-                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(timeStr->tm_wday);
+                QDateTime dt = recoverDateTime(date, 0);
+                // ETSI ES 202 184 V2.4.1 (2016-06) §11.10.4.4 GetDayOfWeek
+                // specifies "0 represents Sunday, 1 Monday, etc."
+
+                int dayOfWeek = dt.date().dayOfWeek();
+                // Gregorian calendar, returns 0 if invalid, 1 = Monday to 7 = Sunday
+                if (dayOfWeek == 7)
+                {
+                    dayOfWeek = 0;
+                }
+                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(dayOfWeek);
                 SetSuccessFlag(success, true, engine);
             }
             else
