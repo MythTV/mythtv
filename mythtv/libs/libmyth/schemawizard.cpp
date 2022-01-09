@@ -38,7 +38,7 @@ SchemaUpgradeWizard::SchemaUpgradeWizard(QString DBSchemaSetting,
     switch (gCoreContext->GetNumSetting("DBSchemaAutoUpgrade"))
     {
         case  1: m_autoUpgrade = true; break;
-#if ENABLE_SCHEMA_DEVELOPER_MODE
+#if defined(ENABLE_SCHEMA_DEVELOPER_MODE) && ENABLE_SCHEMA_DEVELOPER_MODE
         case -1: m_expertMode  = true; break;
 #endif
         default: break;
@@ -119,7 +119,7 @@ int SchemaUpgradeWizard::Compare(void)
                      .arg(m_schemaName, m_schemaSetting, m_DBver));
     }
 
-#if TESTING
+#if defined(TESTING) && TESTING
     //m_DBver = "9" + m_DBver + "-testing";
     m_DBver += "-testing";
     return 0;
@@ -240,7 +240,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     if (m_versionsBehind == -1)
         Compare();
 
-#if minDBMS_is_only_for_schema_upgrades
+#if defined(minDBMS_is_only_for_schema_upgrades) && minDBMS_is_only_for_schema_upgrades
     if (m_versionsBehind == 0)              // Why was this method even called?
         return MYTH_SCHEMA_USE_EXISTING;
 #endif
