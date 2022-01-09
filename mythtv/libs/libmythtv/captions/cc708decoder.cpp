@@ -13,6 +13,7 @@
 #define DEBUG_CAPTIONS         0
 #define DEBUG_CC_SERVICE       0
 #define DEBUG_CC_SERVICE_2     0
+#define DEBUG_CC_SERVICE_BLOCK 0
 #define DEBUG_CC_RAWPACKET     0
 #define DEBUG_CC_VALIDPACKET   0
 #define DEBUG_CC_DECODE        0
