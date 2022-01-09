@@ -32,9 +32,6 @@
 #include "Logging.h"
 #include "freemheg.h"
 
-#include "config.h"
-#include "libmythbase/compat.h"
-
 #include <QDateTime>
 #include <QLocale>
 #include <QStringList>
