@@ -23,6 +23,8 @@
 #if !defined(PARSETEXT_H)
 #define PARSETEXT_H
 
+#include <cstdlib> // malloc etc.
+
 class MHGroup;
 
 #include "ParseNode.h"
