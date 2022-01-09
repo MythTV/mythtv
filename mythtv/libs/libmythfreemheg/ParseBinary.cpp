@@ -23,6 +23,7 @@
 Parser for ASN1 binary notation.  Does minimal syntax checking, assuming that this will already have
 been done before the binary was produced.  Creates a MHParseNode tree structure.
 */
+#include <cstdlib> // malloc etc.
 
 #include "Engine.h"
 #include "ParseBinary.h"

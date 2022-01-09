@@ -25,6 +25,9 @@ This is very basic and is only there to enable some test programs to be run.
 */
 
 #include "ParseText.h"
+
+#include <cstdlib> // malloc etc.
+
 #include "ParseNode.h"
 #include "BaseClasses.h"
 #include "ASN1Codes.h"
