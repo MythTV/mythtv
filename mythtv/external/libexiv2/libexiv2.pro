@@ -18,6 +18,7 @@ contains(CC, gcc) {
 }
 QMAKE_CXXFLAGS += -Wno-missing-declarations -Wno-shadow
 QMAKE_CXXFLAGS += -Wno-zero-as-null-pointer-constant -Wno-double-promotion
+QMAKE_CXXFLAGS += -Wno-undef
 
 DEFINES += exiv2lib_EXPORTS
 
