@@ -16,7 +16,7 @@
 #include "libmythbase/mythlogging.h"
 
 #include "linuxfirewiredevice.h"
-#if USING_OSX_FIREWIRE
+#ifdef USING_OSX_FIREWIRE
 #include "darwinfirewiredevice.h"
 #endif
 #include "mpeg/mpegtables.h"
@@ -366,7 +366,7 @@ std::vector<AVCInfo> FirewireDevice::GetSTBList(void)
 
 #ifdef USING_LINUX_FIREWIRE
     list = LinuxFirewireDevice::GetSTBList();
-#elif USING_OSX_FIREWIRE
+#elif defined(USING_OSX_FIREWIRE)
     list = DarwinFirewireDevice::GetSTBList();
 #endif
 
