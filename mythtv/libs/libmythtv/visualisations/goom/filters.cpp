@@ -129,10 +129,10 @@ GoomCoefficients precalCoef = {};
 /* Prototypes to keep gcc from spewing warnings */
 void generatePrecalCoef (void);
 void calculatePXandPY (int x, int y, int *px, int *py);
-void setPixelRGB (Uint * buffer, Uint x, Uint y, Color c);
-void setPixelRGB_ (Uint * buffer, Uint x, Color c);
-inline void getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c);
-void getPixelRGB_ (const Uint * buffer, Uint x, Color * c);
+void setPixelRGB (unsigned int * buffer, unsigned int x, unsigned int y, Color c);
+void setPixelRGB_ (unsigned int * buffer, unsigned int x, Color c);
+inline void getPixelRGB (const unsigned int * buffer, unsigned int x, unsigned int y, Color * c);
+void getPixelRGB_ (const unsigned int * buffer, unsigned int x, Color * c);
 
 void
 generatePrecalCoef ()
@@ -300,7 +300,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 //#define _DEBUG
 
 /*inline*/ void
-setPixelRGB (Uint * buffer, Uint x, Uint y, Color c)
+setPixelRGB (unsigned int * buffer, unsigned int x, unsigned int y, Color c)
 {
 	// buffer[ y*WIDTH + x ] = (c.r<<16)|(c.v<<8)|c.b
 #ifdef _DEBUG_PIXEL
@@ -316,7 +316,7 @@ setPixelRGB (Uint * buffer, Uint x, Uint y, Color c)
 
 
 /*inline*/ void
-setPixelRGB_ (Uint * buffer, Uint x, Color c)
+setPixelRGB_ (unsigned int * buffer, unsigned int x, Color c)
 {
 #ifdef _DEBUG
 	if (x >= resolx * c_resoly) {
@@ -331,7 +331,7 @@ setPixelRGB_ (Uint * buffer, Uint x, Color c)
 
 
 inline void
-getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
+getPixelRGB (const unsigned int * buffer, unsigned int x, unsigned int y, Color * c)
 {
 #ifdef _DEBUG
 	if (x + y * resolx >= resolx * c_resoly) {
@@ -349,7 +349,7 @@ getPixelRGB (const Uint * buffer, Uint x, Uint y, Color * c)
 
 
 /*inline*/ void
-getPixelRGB_ (const Uint * buffer, Uint x, Color * c)
+getPixelRGB_ (const unsigned int * buffer, unsigned int x, Color * c)
 {
 	unsigned char *tmp8 = nullptr;
 
@@ -447,7 +447,7 @@ void c_zoom (unsigned int *lexpix1, unsigned int *lexpix2,
 
 /*===============================================================*/
 void
-zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uint resy, int switchIncr, float switchMult)
+zoomFilterFastRGB (unsigned int * pix1, unsigned int * pix2, ZoomFilterData * zf, unsigned int resx, unsigned int resy, int switchIncr, float switchMult)
 {
 	[[maybe_unused]] static unsigned char s_pertedec = 8;
 	static char s_firstTime = 1;
@@ -527,11 +527,11 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 				int     yperte = 0;
                                 int     yofs = 0;
 
-				for (Uint y = 0; y < resy; y++, yofs += resx) {
+				for (unsigned int y = 0; y < resy; y++, yofs += resx) {
 					int     xofs = yofs << 1;
 					int     xperte = 0;
 
-					for (Uint x = 0; x < resx; x++) {
+					for (unsigned int x = 0; x < resx; x++) {
 						brutS[xofs++] = xperte;
 						brutS[xofs++] = yperte;
 						xperte += sqrtperte;
@@ -596,8 +596,8 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 
 			/* sauvegarde de l'etat actuel dans la nouvelle source */
 
-			Uint y = prevX * prevY * 2;
-			for (Uint x = 0; x < y; x += 2) {
+			unsigned int y = prevX * prevY * 2;
+			for (unsigned int x = 0; x < y; x += 2) {
 				int     brutSmypos = brutS[x];
 				int     x2 = x + 1;
 				
@@ -622,10 +622,10 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 	if (s_interlaceStart>=0) {
             int maxEnd = (s_interlaceStart+INTERLACE_INCR);
 		/* creation de la nouvelle destination */
-                Uint y = (Uint)s_interlaceStart;
-		for ( ; (y < (Uint)prevY) && (y < (Uint)maxEnd); y++) {
-			Uint premul_y_prevX = y * prevX * 2;
-			for (Uint x = 0; x < prevX; x++) {
+                unsigned int y = (unsigned int)s_interlaceStart;
+		for ( ; (y < (unsigned int)prevY) && (y < (unsigned int)maxEnd); y++) {
+			unsigned int premul_y_prevX = y * prevX * 2;
+			for (unsigned int x = 0; x < prevX; x++) {
 				int     px = 0;
 				int     py = 0;
 				
@@ -670,10 +670,10 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 }
 
 void
-pointFilter (Uint * pix1, Color c, float t1, float t2, float t3, float t4, Uint cycle)
+pointFilter (unsigned int * pix1, Color c, float t1, float t2, float t3, float t4, unsigned int cycle)
 {
-	Uint    x = (Uint) ((int) (resolx/2) + (int) (t1 * cosf ((float) cycle / t3)));
-	Uint    y = (Uint) ((int) (c_resoly/2) + (int) (t2 * sinf ((float) cycle / t4)));
+	unsigned int    x = (unsigned int) ((int) (resolx/2) + (int) (t1 * cosf ((float) cycle / t3)));
+	unsigned int    y = (unsigned int) ((int) (c_resoly/2) + (int) (t2 * sinf ((float) cycle / t4)));
 
 	if ((x > 1) && (y > 1) && (x < resolx - 2) && (y < c_resoly - 2)) {
 		setPixelRGB (pix1, x + 1, y, c);
