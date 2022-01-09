@@ -32,6 +32,9 @@
 #include "freemheg.h"
 #include "mythrandom.h"
 
+#include "config.h"
+#include "compat.h"
+
 #include <QDateTime>
 #include <QLocale>
 #include <QStringList>
@@ -45,9 +48,6 @@
 #else
 #include <ctime>
 #endif
-
-#include "config.h"
-#include "compat.h"
 
 /*
  * Resident programs are subroutines to provide various string and date functions
