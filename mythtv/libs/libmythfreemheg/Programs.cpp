@@ -32,9 +32,6 @@
 #include "freemheg.h"
 #include "mythrandom.h"
 
-#include "config.h"
-#include "compat.h"
-
 #include <QDateTime>
 #include <QLocale>
 #include <QStringList>
