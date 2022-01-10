@@ -2,31 +2,11 @@
 
 echo "Tested on ubuntu 2004. Run this file to build mythtv for Windows"
 
-sudo apt-get --assume-yes install git
-sudo apt-get --assume-yes install gcc
-sudo apt-get --assume-yes install g++
-sudo apt-get --assume-yes install wget
-sudo apt-get --assume-yes install python3
-sudo apt-get --assume-yes install perl
-sudo apt-get --assume-yes install bzip2
-sudo apt-get --assume-yes install xy-utils
-sudo apt-get --assume-yes install lzip
-sudo apt-get --assume-yes install unzip
-sudo apt-get --assume-yes install libssl-dev
-sudo apt-get --assume-yes install p7zip
-sudo apt-get --assume-yes install make
-sudo apt-get --assume-yes install autoconf
-sudo apt-get --assume-yes install automake
-sudo apt-get --assume-yes install bison
-sudo apt-get --assume-yes install flex
-sudo apt-get --assume-yes install autopoint
-sudo apt-get --assume-yes install gperf
-sudo apt-get --assume-yes install libtool
-sudo apt-get --assume-yes install libtool-bin
-sudo apt-get --assume-yes install ruby
-sudo apt-get --assume-yes install intltool
-sudo apt-get --assume-yes install p7zip-full
-sudo apt-get --assume-yes install python
+sudo apt-get --assume-yes install \
+     git gcc g++ wget python3 perl bzip2 lzip unzip libssl-dev \
+     p7zip make autoconf automake bison flex autopoint gperf \
+     libtool libtool-bin ruby intltool p7zip-full python \
+     pkg-config yasm mmv
 
 echo "Creating build tree"
 export buildPath=$PWD"/build"
@@ -57,8 +37,6 @@ git clone https://github.com/mxe/mxe.git
 echo "Add SQL to QT"
 sed -i 's/-no-sql-mysql /\//g' $buildPath/mxe/src/qt.mk
 
-sudo apt-get --assume-yes install pkg-config
-
 cd mxe
 sudo make cc MXE_PLUGIN_DIRS=plugins/gcc8 MXE_TARGETS='i686-w64-mingw32.shared' vulkan-loader vulkan-headers qt5 nasm yasm libsamplerate taglib zlib gnutls mman-win32 pthreads libxml2 libdvdcss x264 x265 lame libass qtwebkit xvidcore libvpx vorbis flac
 cd ..
@@ -73,8 +51,6 @@ echo -e "#define RTLD_LAZY 0 \n#define HAVE_DVDCSS_DVDCSS_H" | sudo -E tee $buil
 sudo -E sed -i 's/#define GetUserName __MINGW_NAME_AW(GetUserName)//g' $buildPath/mxe/usr/i686-w64-mingw32.shared/include/winbase.h
 sudo -E sed -i 's/#define CopyFile __MINGW_NAME_AW(CopyFile)//g' $buildPath/mxe/usr/i686-w64-mingw32.shared/include/winbase.h
 sudo -E sed -i 's/#define MoveFile __MINGW_NAME_AW(MoveFile)//g' $buildPath/mxe/usr/i686-w64-mingw32.shared/include/winbase.h
-
-sudo apt-get --assume-yes remove yasm
 
 sudo cp $buildPath/mxe/usr/x86_64-pc-linux-gnu/bin/yasm $buildPath//mxe/usr/bin/yasm
 sudo cp $buildPath/mxe/usr/bin/i686-w64-mingw32.shared-pkg-config $buildPath//mxe/usr/bin/pkg-config
@@ -133,9 +109,6 @@ cd ..
 echo "Install endian.h"
 git clone https://gist.github.com/PkmX/63dd23f28ba885be53a5
 sudo -E cp $buildPath/63dd23f28ba885be53a5/portable_endian.h $buildPath/mxe/usr/i686-w64-mingw32.shared/include/endian.h
-
-
-sudo apt-get --assume-yes remove pkg-config
 
 
 echo "Done"
