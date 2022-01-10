@@ -92,6 +92,8 @@ GIT_SSL_NO_VERIFY= git clone https://code.videolan.org/videolan/libudfread.git
 cd libudfread
 ./bootstrap
 ./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --host=i686-w64-mingw32.shared
+# libtool won't build this as a shared library without this flag.
+sed -i 's/LDFLAGS = /LDFLAGS = -no-undefined/' Makefile
 make -j$(nproc)
 sudo make install
 cd ..
