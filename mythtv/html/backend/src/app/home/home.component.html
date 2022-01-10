@@ -4,6 +4,9 @@
 <div *ngIf="(m_timezone$ | async)?.TimeZoneInfo as timezone; else loading">
     <p>It is currently {{timezone.CurrentDateTime}} in timezone {{timezone.TimeZoneID}}, UTC offset {{timezone.UTCOffset}} hours</p>
 </div>
+<div *ngIf="(m_connectionInfo$ | async)?.ConnectionInfo as info; else loading">
+    <p>MythTV version is {{info.Version.Version}} from branch {{info.Version.Branch}} using protocol {{info.Version.Protocol}}</p>
+</div>
 <ng-template #loading>
     <div>Loading...</div>
 </ng-template>
