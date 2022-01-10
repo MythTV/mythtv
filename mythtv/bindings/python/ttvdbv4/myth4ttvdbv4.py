@@ -32,8 +32,8 @@ def _print_class_content(obj):
             print("    ", k, " : ", "[ %s ]" % '; '.join(x.name for x in obj.aliases))
         elif k.startswith('nameTranslations'):
             print("    ", k, " : ", v)
-        elif k.startswith('translations'):
-            print("    ", k, " : ", "[ %s ]" % '; '.join(x.name for x in obj.translations))
+        elif k.startswith('fetched_translations'):
+            print("    ", k, " : ", "[ %s ]" % '; '.join(x.name for x in obj.fetched_translations))
         elif k.startswith('name_similarity'):
             # name similarity is not calculated by now.
             pass
@@ -390,14 +390,14 @@ class Myth4TTVDBv4(object):
         #       $ ttvdb4.py -l ja -C 360893 --debug
 
         # get series name and overview:
-        ser_title, desc = self._get_info_from_translations(ser_x.translations)
+        ser_title, desc = self._get_info_from_translations(ser_x.fetched_translations)
         if not ser_title:
             ser_title = ser_x.name
         m.title = check_item(m, ("title", ser_title), ignore=False)
 
         # get subtitle and overview:
         if epi_x:
-            sub_title, sub_desc = self._get_info_from_translations(epi_x.translations)
+            sub_title, sub_desc = self._get_info_from_translations(epi_x.fetched_translations)
             if not sub_title:
                 sub_title = epi_x.name
             m.subtitle = check_item(m, ("subtitle", sub_title), ignore=False)
@@ -512,10 +512,10 @@ class Myth4TTVDBv4(object):
         # get series data:
         ser_x = ttvdb.getSeriesExtended(inetref)
 
-        ser_x.translations = []
+        ser_x.fetched_translations = []
         for lang in self._select_preferred_langs(ser_x.nameTranslations):
             translation = ttvdb.getSeriesTranslation(inetref, lang)
-            ser_x.translations.append(translation)
+            ser_x.fetched_translations.append(translation)
 
         if self.debug:
             print("%04d: buildSingle: Series information for %s:"
@@ -528,7 +528,7 @@ class Myth4TTVDBv4(object):
         epi_x = ttvdb.getEpisodeExtended(ep.id)
         for lang in self._select_preferred_langs(epi_x.nameTranslations):
             translation = ttvdb.getEpisodeTranslation(epi_x.id, lang)
-            epi_x.translations.append(translation)
+            epi_x.fetched_translations.append(translation)
         if self.debug:
             print("%04d: buildSingle: Episode Information for %s : %s : %s"
                   % (self._get_ellapsed_time(), inetref, season, episode))
@@ -574,10 +574,10 @@ class Myth4TTVDBv4(object):
         # get data for passed inetref and preferred translations
         ser_x = ttvdb.getSeriesExtended(tvinetref)
 
-        ser_x.translations = []
+        ser_x.fetched_translations = []
         for lang in self._select_preferred_langs(ser_x.nameTranslations):
             translation = ttvdb.getSeriesTranslation(tvinetref, lang)
-            ser_x.translations.append(translation)
+            ser_x.fetched_translations.append(translation)
 
         # define exact name found:
         ser_x.name_similarity = 1.0
@@ -766,9 +766,9 @@ class Myth4TTVDBv4(object):
         # loop over the list and calculate name_similarity of series and episode
         found_items = []
         for ser_x in ser_x_list:
-            if self.debug and ser_x.translations:
+            if self.debug and ser_x.fetched_translations:
                 print("%04d: buildNumbers: Checking series named '%s' with inetref '%s':"
-                      % (self._get_ellapsed_time(), ser_x.translations[0].name, ser_x.id))
+                      % (self._get_ellapsed_time(), ser_x.fetched_translations[0].name, ser_x.id))
             # get all episodes for every season, and calculate the name similarity
             episodes = []
             # get the default season type and search only for that:
@@ -791,13 +791,13 @@ class Myth4TTVDBv4(object):
                             all_names.extend(translation.aliases)
                             epi.name_similarity = \
                                 max([_name_match_quality(x, tvsubtitle) for x in all_names])
-                            epi.translations.append(translation)
+                            epi.fetched_translations.append(translation)
                         episodes.append(epi)
                         epi_id_list.append(epi.id)
                         if self.debug:
                             print("%04d: buildNumbers: Found episode names: '%s'"
                                   % (self._get_ellapsed_time(),
-                                     '; '.join([n.name for n in epi.translations])))
+                                     '; '.join([n.name for n in epi.fetched_translations])))
                             print("    with name similarity : %0.2f" % epi.name_similarity)
                             print("    with inetref %s : season# %d : episode# %d "
                                   % (ser_x.id, epi.seasonNumber, epi.number))
@@ -811,7 +811,7 @@ class Myth4TTVDBv4(object):
                 # get episode and season data for that episode
                 epi_x = ttvdb.getEpisodeExtended(epi.id)
                 # append the translations already collected:
-                epi_x.translations = epi.translations
+                epi_x.fetched_translations = epi.fetched_translations
                 epi_x.name_similarity = epi.name_similarity
 
                 sea_x = None
@@ -822,7 +822,7 @@ class Myth4TTVDBv4(object):
                 if self.debug:
                     print("%04d: buildNumbers: Selected episode names: '%s'"
                           % (self._get_ellapsed_time(),
-                             '; '.join([n.name for n in epi_x.translations])))
+                             '; '.join([n.name for n in epi_x.fetched_translations])))
                     print("    with name similarity : %0.2f" % epi.name_similarity)
 
                 found_items.append((ser_x, sea_x, epi_x))
@@ -835,11 +835,11 @@ class Myth4TTVDBv4(object):
         last_similarity = 2 * self.ThresholdStart
         for (ser_x, sea_x, epi_x) in found_items:
             overall_similarity = epi_x.name_similarity + ser_x.name_similarity
-            if self.debug and ser_x.translations:
+            if self.debug and ser_x.fetched_translations:
                 print("%04d: buildNumbers: Found item series: '%s', season: '%s', "
                       "episode: '%s' with overall similarity: %0.2f"
-                      % (self._get_ellapsed_time(), ser_x.translations[0].name,
-                         sea_x.number, epi_x.translations[0].name, overall_similarity))
+                      % (self._get_ellapsed_time(), ser_x.fetched_translations[0].name,
+                         sea_x.number, epi_x.fetched_translations[0].name, overall_similarity))
             # stop if match similarity decreases
             if overall_similarity > 2 * self.NameThreshold:      # default 1.98
                 exact_match_count += 1

@@ -16,7 +16,7 @@ from pprint import pprint
 from .definitions import *
 
 
-MYTHTV_TTVDBV4_API_VERSION = "4.4.0.1"
+MYTHTV_TTVDBV4_API_VERSION = "4.5.0.1"
 
 # set this to true for showing raw json data
 #JSONDEBUG = True
@@ -91,7 +91,7 @@ def _query_yielded(record, path, params, listname=None):
         params['page'] = curr_page
 
 
-"""Generated API for thetvdb.com TVDB API V4 v 4.4.0 @6c60be0 """
+"""Generated API for thetvdb.com TVDB API V4 v 4.5.0"""
 # modifications marked with '### XXX'
 
 
@@ -358,7 +358,7 @@ def getListTranslation(id, language):
     path = getListTranslation_path.format(id=str(id), language=language)
     res = _query_api(path)
     data = res['data'] if res.get('data') is not None else None
-    return( Translation(data) if data is not None else None )
+    return( [Translation(x) for x in data] if data is not None else [] )
 
 
 def getAllMovie(page=0, yielded=False):
@@ -529,12 +529,14 @@ def getSeriesExtended(id, meta=None):
     return( SeriesExtendedRecord(data) if data is not None else None )
 
 
-def getSeriesEpisodes(id, season_type, season=None, episodeNumber=None, page=0, yielded=False):
+def getSeriesEpisodes(id, season_type, season=None, episodeNumber=None, airDate=None, page=0, yielded=False):
     params = {}
     if season is not None:
         params['season'] = season
     if episodeNumber is not None:
         params['episodeNumber'] = episodeNumber
+    if airDate is not None:
+        params['airDate'] = airDate
     if page is not None:
         params['page'] = page
     path = getSeriesEpisodes_path.format(id=str(id), season_type=season_type)
@@ -543,7 +545,7 @@ def getSeriesEpisodes(id, season_type, season=None, episodeNumber=None, page=0, 
     else:
         res = _query_api(path, params)
         data = res['data'] if res.get('data') is not None else None
-        return( SeriesExtendedRecord(data['series']) if data is not None else None,
+        return( SeriesBaseRecord(data['series']) if data is not None else None,
                 [EpisodeBaseRecord(x) for x in data['episodes']] if data is not None else [] )
 
 

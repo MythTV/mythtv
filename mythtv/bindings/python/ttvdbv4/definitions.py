@@ -39,7 +39,7 @@ def _handle_list(handle, data):
         return l
 
 
-"""Generated API for thetvdb.com TVDB API V4 v 4.4.0 @6c60be0 """
+"""Generated API for thetvdb.com TVDB API V4 v 4.5.0"""
 # modifications marked with '### XXX'
 
 
@@ -76,6 +76,7 @@ class ArtworkExtendedRecord(object):
         self.seasonId = data.get('seasonId', 0)                              # integer
         self.seriesId = data.get('seriesId', 0)                              # integer
         self.seriesPeopleId = data.get('seriesPeopleId', 0)                  # integer
+        self.tagOptions = _handle_list(TagOption, data.get('tagOptions'))
         self.thumbnail = data.get('thumbnail', '')                           # string
         self.thumbnailHeight = data.get('thumbnailHeight', 0)                # integer
         self.thumbnailWidth = data.get('thumbnailWidth', 0)                  # integer
@@ -179,13 +180,14 @@ class Character(object):
         self.nameTranslations = _get_list(data, 'nameTranslations')
         self.overviewTranslations = _get_list(data, 'overviewTranslations')
         self.peopleId = data.get('peopleId', 0)                              # integer
+        self.personImgURL = data.get('personImgURL', '')                     # string
         self.seriesId = data.get('seriesId', 0)                              # integer
         self.sort = data.get('sort', 0)                                      # integer
         self.type = data.get('type', 0)                                      # integer
         self.url = data.get('url', '')                                       # string
         self.personName = data.get('personName', '')                         # string
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -202,9 +204,26 @@ class Company(object):
         self.overviewTranslations = _get_list(data, 'overviewTranslations')
         self.primaryCompanyType = data.get('primaryCompanyType', 0)          # integer
         self.slug = data.get('slug', '')                                     # string
+        self.companies = _handle_single(Companies, data.get('companies'))
+        self.parentCompany = _handle_single(ParentCompany, data.get('parentCompany'))
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
+
+
+class ParentCompany(object):
+    """A parent company record"""
+    def __init__(self, data):
+        self.id = data.get('id', 0)                                          # integer
+        self.name = data.get('name', '')                                     # string
+        self.relation = _handle_single(CompanyRelationShip, data.get('relation'))
+
+
+class CompanyRelationShip(object):
+    """A company relationship"""
+    def __init__(self, data):
+        self.id = data.get('id', 0)                                          # integer
+        self.typeName = data.get('typeName', '')                             # string
 
 
 class CompanyType(object):
@@ -219,6 +238,7 @@ class ContentRating(object):
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
         self.name = data.get('name', '')                                     # string
+        self.description = data.get('description', '')                       # string
         self.country = data.get('country', '')                               # string
         self.contentType = data.get('contentType', '')                       # string
         self.order = data.get('order', 0)                                    # integer
@@ -246,7 +266,7 @@ class EntityType(object):
     def __init__(self, data):
         self.id = data.get('id', 0)                                          # integer
         self.name = data.get('name', '')                                     # string
-        self.seriesId = data.get('seriesId', 0)                              # integer
+        self.hasSpecials = data.get('hasSpecials', False)                    # boolean
 
 
 class EntityUpdate(object):
@@ -256,6 +276,7 @@ class EntityUpdate(object):
         self.method = data.get('method', '')                                 # string
         self.recordId = data.get('recordId', 0)                              # integer
         self.timeStamp = data.get('timeStamp', 0)                            # integer
+        self.seriesId = data.get('seriesId', 0)                              # integer
 
 
 class EpisodeBaseRecord(object):
@@ -274,8 +295,11 @@ class EpisodeBaseRecord(object):
         self.seasonNumber = data.get('seasonNumber', 0)                      # integer
         self.seasons = _handle_list(SeasonBaseRecord, data.get('seasons'))
         self.seriesId = data.get('seriesId', 0)                              # integer
+        self.seasonName = data.get('seasonName', '')                         # string
+        self.lastUpdated = data.get('lastUpdated', '')                       # string
+        self.finaleType = data.get('finaleType', '')                         # string
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -306,8 +330,11 @@ class EpisodeExtendedRecord(object):
         self.seriesId = data.get('seriesId', 0)                              # integer
         self.tagOptions = _handle_list(TagOption, data.get('tagOptions'))
         self.trailers = _handle_list(Trailer, data.get('trailers'))
+        self.companies = _handle_list(Company, data.get('companies'))
+        self.lastUpdated = data.get('lastUpdated', '')                       # string
+        self.finaleType = data.get('finaleType', '')                         # string
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -346,8 +373,9 @@ class ListBaseRecord(object):
         self.overview = data.get('overview', '')                             # string
         self.overviewTranslations = _get_list(data, 'overviewTranslations')
         self.url = data.get('url', '')                                       # string
+        self.score = data.get('score', 0)                                    # integer
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -357,6 +385,8 @@ class ListExtendedRecord(object):
         self.aliases = _handle_list(Alias, data.get('aliases'))
         self.entities = _handle_list(Entity, data.get('entities'))
         self.id = data.get('id', 0)                                          # integer
+        self.image = data.get('image', '')                                   # string
+        self.imageIsFallback = data.get('imageIsFallback', False)            # boolean
         self.isOfficial = data.get('isOfficial', False)                      # boolean
         self.name = data.get('name', '')                                     # string
         self.nameTranslations = _get_list(data, 'nameTranslations')
@@ -365,7 +395,7 @@ class ListExtendedRecord(object):
         self.score = data.get('score', 0)                                    # integer
         self.url = data.get('url', '')                                       # string
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -381,8 +411,10 @@ class MovieBaseRecord(object):
         self.score = data.get('score', 0.0)                                  # number
         self.slug = data.get('slug', '')                                     # string
         self.status = _handle_single(Status, data.get('status'))
+        self.runtime = data.get('runtime', 0)                                # integer
+        self.lastUpdated = data.get('lastUpdated', '')                       # string
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -421,8 +453,7 @@ class MovieExtendedRecord(object):
         self.firstRelease = _handle_single(Release, data.get('firstRelease'))
         self.companies = _handle_single(Companies, data.get('companies'))
         # additional attributes needed by the mythtv grabber script:
-        # self.translations = []                                             # ### XXX
-        self.translations = _get_list(data, 'Translations')                  # ### XXX
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -443,7 +474,12 @@ class PeopleBaseRecord(object):
         self.id = data.get('id', 0)                                          # integer
         self.image = data.get('image', '')                                   # string
         self.name = data.get('name', '')                                     # string
+        self.nameTranslations = _get_list(data, 'nameTranslations')
+        self.overviewTranslations = _get_list(data, 'overviewTranslations')
         self.score = data.get('score', 0)                                    # integer
+        # additional attributes needed by the mythtv grabber script:
+        self.fetched_translations = []
+        self.name_similarity = 0.0
 
 
 class PeopleExtendedRecord(object):
@@ -503,23 +539,18 @@ class SearchResult(object):
         self.companyType = data.get('companyType', '')                       # string
         self.country = data.get('country', '')                               # string
         self.director = data.get('director', '')                             # string
-        self.extendedTitle = data.get('extendedTitle', '')                   # string
         self.genres = _get_list(data, 'genres')
+        self.objectID = data.get('objectID', '')                             # string
+        self.slug = data.get('slug', '')                                     # string
         self.id = data.get('id', '')                                         # string
         self.image_url = data.get('image_url', '')                           # string
-### XXX self.imageUrl = data.get('imageUrl', '')                             # string
         self.name = data.get('name', '')                                     # string
-        self.name_translated = data.get('name_translated', '')
-### XXX self.nameTranslated = data.get('nameTranslated', '')                 # string
-        self.official_list = data.get('official_list', '')                   # string
-### XXX self.officialList = data.get('officialList', '')                     # string
+        self.name_translated = data.get('name_translated', '')               # string
+        self.officialList = data.get('officialList', '')                     # string
         self.overview = data.get('overview', '')                             # string
         self.overview_translated = _get_list(data, 'overview_translated')
         self.posters = _get_list(data, 'posters')
         self.primary_language = data.get('primary_language', '')             # string
-### XXX self.primaryLanguage = data.get('primaryLanguage', '')               # string
-        self.primary_type = data.get('primary_type', '')                     # string
-### XXX self.primaryType = data.get('primaryType', '')                       # string
         self.status = data.get('status', '')                                 # string
         self.translationsWithLang = _get_list(data, 'translationsWithLang')
         self.tvdb_id = data.get('tvdb_id', '')                               # string
@@ -530,7 +561,7 @@ class SearchResult(object):
 ### XXX self.translations = _handle_list(TranslationSimple, data.get('translations'))
         self.translations = data.get('translations', {})                     ### XXX
         self.is_official = data.get('is_official', False)                    # boolean
-        self.remoteIds = _handle_list(RemoteID, data.get('remoteIds'))
+        self.remote_ids = _handle_list(RemoteID, data.get('remote_ids'))
         self.network = data.get('network', '')                               # string
         self.title = data.get('title', '')                                   # string
 ### XXX self.overviews = _handle_list(TranslationSimple, data.get('overviews'))
@@ -542,8 +573,6 @@ class SearchResult(object):
 class SeasonBaseRecord(object):
     """season genre record"""
     def __init__(self, data):
-        self.abbreviation = data.get('abbreviation', '')                     # string
-        self.country = data.get('country', '')                               # string
         self.id = data.get('id', 0)                                          # integer
         self.image = data.get('image', '')                                   # string
         self.imageType = data.get('imageType', 0)                            # integer
@@ -551,11 +580,11 @@ class SeasonBaseRecord(object):
         self.nameTranslations = _get_list(data, 'nameTranslations')
         self.number = data.get('number', 0)                                  # integer
         self.overviewTranslations = _get_list(data, 'overviewTranslations')
+        self.companies = _handle_single(Companies, data.get('companies'))
         self.seriesId = data.get('seriesId', 0)                              # integer
-        self.slug = data.get('slug', '')                                     # string
         self.type = _handle_single(SeasonType, data.get('type'))
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -578,17 +607,19 @@ class SeasonExtendedRecord(object):
         self.type = data.get('type', 0)                                      # integer
         self.companies = _handle_single(Companies, data.get('companies'))
         self.tagOptions = _handle_list(TagOption, data.get('tagOptions'))
+        self.translations = _handle_list(Translation, data.get('translations'))
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
 class SeasonType(object):
     """season type record"""
     def __init__(self, data):
+        self.alternateName = data.get('alternateName', '')                   # string
         self.id = data.get('id', 0)                                          # integer
         self.name = data.get('name', '')                                     # string
-        self.type = data.get('type', 0)                                      # integer
+        self.type = data.get('type', '')                                     # string
 
 
 class SeriesAirsDays(object):
@@ -629,8 +660,11 @@ class SeriesBaseRecord(object):
         self.score = data.get('score', 0.0)                                  # number
         self.slug = data.get('slug', '')                                     # string
         self.status = _handle_single(Status, data.get('status'))
+        self.lastUpdated = data.get('lastUpdated', '')                       # string
+        self.averageRuntime = data.get('averageRuntime', 0)                  # integer
+        self.episodes = _handle_list(EpisodeBaseRecord, data.get('episodes'))
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -662,16 +696,19 @@ class SeriesExtendedRecord(object):
         self.nextAired = data.get('nextAired', '')                           # string
         self.originalCountry = data.get('originalCountry', '')               # string
         self.originalLanguage = data.get('originalLanguage', '')             # string
+        self.originalNetwork = _handle_single(Company, data.get('originalNetwork'))
+        self.latestNetwork = _handle_single(Company, data.get('latestNetwork'))
         self.overviewTranslations = _get_list(data, 'overviewTranslations')
         self.remoteIds = _handle_list(RemoteID, data.get('remoteIds'))
         self.score = data.get('score', 0.0)                                  # number
         self.seasons = _handle_list(SeasonBaseRecord, data.get('seasons'))
         self.slug = data.get('slug', '')                                     # string
         self.status = _handle_single(Status, data.get('status'))
+        self.tags = _handle_list(TagOption, data.get('tags'))
         self.trailers = _handle_list(Trailer, data.get('trailers'))
+        self.translations = _handle_list(TranslationExtended, data.get('translations'))
         # additional attributes needed by the mythtv grabber script:
-        self.translations = []                                               # ### XXX
-        #self.translations = _handle_single(Translations, data.get('translations'))
+        self.fetched_translations = []
         self.name_similarity = 0.0
 
 
@@ -750,6 +787,14 @@ class TranslationSimple(object):
         self.language = data.get('language', '')                             # string
 
 
+class TranslationExtended(object):
+    """translation extended record"""
+    def __init__(self, data):
+        self.nameTranslations = _handle_list(Translation, data.get('nameTranslations'))
+        self.overviewTranslations = _handle_list(Translation, data.get('overviewTranslations'))
+        self.alias = _get_list(data, 'alias')
+
+
 class TagOptionEntity(object):
     """a entity with selected tag option"""
     def __init__(self, data):
@@ -801,13 +846,5 @@ class Links(object):
         self.prev = data.get('prev', '')                                     # string
         self.self = data.get('self', '')                                     # string
         self.next = data.get('next', '')                                     # string
-
-
-# ### XXX items not in OAS API Spec:
-
-class Translations(object):
-    """NameTranslation and OverviewTranslation records ### XXX """
-    def __init__(self, data):
-        self.aliases = _get_list(data, 'aliases')
-        self.nameTranslations = _handle_list(Translation, data.get('nameTranslations'))
-        self.overviewTranslations = _handle_list(Translation, data.get('overviewTranslations'))
+        self.total_items = data.get('total_items', 0)                        # integer
+        self.page_size = data.get('page_size', 0)                            # integer
