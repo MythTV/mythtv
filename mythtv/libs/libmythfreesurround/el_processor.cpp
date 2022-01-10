@@ -225,7 +225,8 @@ private:
 #endif
     static inline float sqr(float x) { return x*x; }
 
-    static inline float clamp(float x) { return std::clamp(x, -1.0F, 1.0F); }
+    /// Clamp the input to the interval [-1, 1], i.e. clamp the magnitude to the unit interval [0, 1]
+    static inline float clamp_unit_mag(float x) { return std::clamp(x, -1.0F, 1.0F); }
 
     // handle the output buffering for overlapped calls of block_decode
     void add_output(InputBufs input1, InputBufs input2, float center_width, float dimension, float adaption_rate, bool /*result*/=false) {
@@ -288,7 +289,7 @@ private:
 //              continue;       
 
             // calculate the amplitude/phase difference
-            float ampDiff = clamp((ampL+ampR < epsilon) ? 0 : (ampR-ampL) / (ampR+ampL));
+            float ampDiff = clamp_unit_mag((ampL+ampR < epsilon) ? 0 : (ampR-ampL) / (ampR+ampL));
             float phaseDiff = phaseL - phaseR;
             if (phaseDiff < -PI) phaseDiff += 2*PI;
             if (phaseDiff > PI) phaseDiff -= 2*PI;
@@ -302,10 +303,10 @@ private:
                 m_xFs[f] = get_xfs(ampDiff,m_yFs[f]);
 
                 // add dimension control
-                m_yFs[f] = clamp(m_yFs[f] - dimension);
+                m_yFs[f] = clamp_unit_mag(m_yFs[f] - dimension);
 
                 // add crossfeed control
-                m_xFs[f] = clamp(m_xFs[f] * (m_frontSeparation*(1+m_yFs[f])/2 + m_rearSeparation*(1-m_yFs[f])/2));
+                m_xFs[f] = clamp_unit_mag(m_xFs[f] * (m_frontSeparation*(1+m_yFs[f])/2 + m_rearSeparation*(1-m_yFs[f])/2));
 
                 // 3. generate frequency filters for each output channel
                 float left = (1-m_xFs[f])/2;
@@ -329,7 +330,7 @@ private:
                 // --- this is the old & simple steering mode ---
 
                 // calculate the amplitude/phase difference
-                float ampDiff = clamp((ampL+ampR < epsilon) ? 0 : (ampR-ampL) / (ampR+ampL));
+                float ampDiff = clamp_unit_mag((ampL+ampR < epsilon) ? 0 : (ampR-ampL) / (ampR+ampL));
                 float phaseDiff = phaseL - phaseR;
                 if (phaseDiff < -PI) phaseDiff += 2*PI;
                 if (phaseDiff > PI) phaseDiff -= 2*PI;
@@ -349,10 +350,10 @@ private:
                 }
 
                 // add dimension control
-                m_yFs[f] = clamp(m_yFs[f] - dimension);
+                m_yFs[f] = clamp_unit_mag(m_yFs[f] - dimension);
 
                 // add crossfeed control
-                m_xFs[f] = clamp(m_xFs[f] * (m_frontSeparation*(1+m_yFs[f])/2 + m_rearSeparation*(1-m_yFs[f])/2));
+                m_xFs[f] = clamp_unit_mag(m_xFs[f] * (m_frontSeparation*(1+m_yFs[f])/2 + m_rearSeparation*(1-m_yFs[f])/2));
 
                 // 3. generate frequency filters for each output channel, according to the signal position
                 // the sum of all channel volumes must be 1.0
