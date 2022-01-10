@@ -119,7 +119,7 @@ make install
 cd ..
 
 echo "Compiling SoundTouch"
-git clone https://gitlab.com/soundtouch/soundtouch.git
+GIT_SSL_NO_VERIFY= git clone https://codeberg.org/soundtouch/soundtouch.git
 sudo -E chmod -R 777 $buildPath/soundtouch
 cd soundtouch
 ./bootstrap
