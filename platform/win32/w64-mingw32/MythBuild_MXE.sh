@@ -88,7 +88,7 @@ rm libexiv2.patch
 cd ..
 
 echo "Compiling libudfread"
-git clone https://code.videolan.org/videolan/libudfread.git
+GIT_SSL_NO_VERIFY= git clone https://code.videolan.org/videolan/libudfread.git
 cd libudfread
 ./bootstrap
 ./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --host=i686-w64-mingw32.shared
@@ -96,9 +96,9 @@ make -j$(nproc)
 sudo make install
 cd ..
 
-git clone https://code.videolan.org/videolan/libbluray.git
+GIT_SSL_NO_VERIFY= git clone https://code.videolan.org/videolan/libbluray.git
 cd $buildPath/libbluray
-git submodule update --init
+GIT_SSL_NO_VERIFY= git submodule update --init
 
 sudo -E chmod -R 777 $buildPath/libbluray
 
