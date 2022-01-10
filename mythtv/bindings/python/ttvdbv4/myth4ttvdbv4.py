@@ -20,7 +20,7 @@ from collections import OrderedDict
 from enum import IntEnum
 from datetime import timedelta, datetime
 from MythTV.ttvdbv4 import ttvdbv4_api as ttvdb
-from MythTV.ttvdbv4.locales import Language
+from MythTV.ttvdbv4.locales import Language, Country
 from MythTV.ttvdbv4.utils import convert_date, strip_tags
 from MythTV import VideoMetadata
 from MythTV.utility import levenshtein
@@ -405,6 +405,7 @@ class Myth4TTVDBv4(object):
                 desc = sub_desc
             m.season = check_item(m, ("season", epi_x.seasonNumber), ignore=False)
             m.episode = check_item(m, ("episode", epi_x.number), ignore=False)
+            m.runtime = check_item(m, ("runtime", epi_x.runtime), ignore=True)
         desc = strip_tags(desc).replace("\r\n", "").replace("\n", "")
         m.description = check_item(m, ("description", desc))
 
@@ -438,6 +439,33 @@ class Myth4TTVDBv4(object):
                     m.categories.append(genre.name)
         except:
             pass
+
+        # add optional fields:
+        if epi_x:
+            try:
+                # add studios
+                for c in epi_x.companies:
+                    m.studios.append(c.name)
+            except:
+                pass
+            try:
+                # add IMDB reference
+                for r in epi_x.remoteIds:
+                    if r.sourceName == 'IMDB':
+                        m.imdb = check_item(m, ('imdb', r.id))
+                        break
+            except:
+                raise
+            if self.country:
+                try:
+                    # add certificates:
+                    area = Country.getstored(self.country).alpha3
+                    for c in epi_x.contentRatings:
+                        if c.country.lower() == area.lower():
+                            m.certifications[self.country] = c.name
+                            break
+                except:
+                    pass
 
         if self.ShowPeople:
             # add characters: see class 'People'
@@ -722,7 +750,7 @@ class Myth4TTVDBv4(object):
         # or  option -N title timestamp    ### XXX ToDo implement me
         # this may take several minutes
         # $ ttvdb4.py -l de -N 76568 "Emily in Nöten" --debug
-        # $ ttvdb4.py -l en -N 76568 "The Road Trip to Harvard" --debug
+        # $ ttvdb4.py -l en -a us - N 76568 "The Road Trip to Harvard" --debug
         # $ ttvdb4.py -l de -N "Die Munsters" "Der Liebestrank" --debug
         # $ ttvdb4.py -l de -N "Hawaii Five-0" "Geflügelsalat" --debug
         # $ ttvdb4.py -l en -N "The Munsters" 'My Fair Munster' --debug
