@@ -49,14 +49,14 @@ make -j$(nproc)
 cp $buildPath/mythtv/mythtv/external/FFmpeg/ffmpeg_g.exe $buildPath/mythtv/mythtv/external/FFmpeg/mythffmpeg.exe
 cp $buildPath/mythtv/mythtv/external/FFmpeg/ffprobe_g.exe $buildPath/mythtv/mythtv/external/FFmpeg/mythffprobe.exe
 make install
-cd ..
 
-chmod -R 777 $buildPath/install
-cd mythplugins
+# Hack warning. The libxxx.dll.a files get installed as liblibxxx.dll.a.
+cd $buildPath/install/lib
+mmv -d 'liblib*' 'lib#1'
 
+cd $buildPath/mythtv/mythplugins
 ./configure --prefix="$buildPath/install" -cross-prefix=i686-w64-mingw32.shared- --disable-mytharchive
 make -j$(nproc) install
-cd ..
 
 cp -R $buildPath/mythtv/platform/win32/w64-mingw32/Installer/. $buildPath/install/
 cp -R $buildPath/mythtv/mythtv/src/COPYING $buildPath/install/COPYING
