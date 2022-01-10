@@ -445,7 +445,15 @@ private:
 #endif
     }
 
-    // filter the complex source signal and add it to target
+    /**
+    @brief Filter the complex source signal in the frequency domain and add it
+           to the time domain target signal.
+
+    @param[in]  signal  The signal, in the frequency domain, to be filtered.
+    @param[in]  flt     The filter, in the frequency domain, to be applied.
+    @param[out] target  The signal, in the time domain, to which the filtered signal
+                        is added
+    */
     void apply_filter(cfloat *signal, const float *flt, float *target) {
 #ifdef USE_FFTW3
         // filter the signal
@@ -507,10 +515,10 @@ private:
 #else
     FFTContext *m_fftContextForward {nullptr};
     FFTContext *m_fftContextReverse {nullptr};
-    // intermediate arrays (FFTs of lt & rt, processing source)
+    // FFTs are computed in-place in these buffers on copies of the input
     FFTComplex *m_dftL {nullptr};
     FFTComplex *m_dftR {nullptr};
-    FFTComplex *m_src  {nullptr};
+    FFTComplex *m_src  {nullptr}; ///< Used only in apply_filter
 #endif
     // buffers
     std::vector<cfloat> m_frontL,m_frontR,m_avg,m_surL,m_surR; // the signal (phase-corrected) in the frequency domain
