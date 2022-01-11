@@ -9,9 +9,6 @@
 #include <QRunnable>
 #include <QMutex>
 
-// MythTV
-#include "mythrandom.h"
-
 class TVRec;
 class MThread;
 class ChannelBase;
@@ -65,7 +62,7 @@ class EITScanner : public QRunnable
     std::chrono::seconds  m_activeScanTrigTime      {0s};
     QStringList           m_activeScanChannels;
     QStringList::iterator m_activeScanNextChan;
-    uint                  m_activeScanNextChanIndex {MythRandom()};
+    uint                  m_activeScanNextChanIndex {0};
 
     uint                  m_cardnum;
 
