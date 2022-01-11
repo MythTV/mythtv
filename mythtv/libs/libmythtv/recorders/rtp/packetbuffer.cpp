@@ -4,8 +4,7 @@
  * Distributed as part of MythTV under GPL v2 and later.
  */
 
-// POSIX headers
-#include <cstdlib> // for random
+#include <cstdint>
 
 // MythTV headers
 #include "packetbuffer.h"
