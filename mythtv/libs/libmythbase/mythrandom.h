@@ -14,8 +14,6 @@ Convenience inline random number generator functions
 #include <QRandomGenerator>
 #endif
 
-#include "mythbaseexp.h"
-
 inline namespace MythRandomQt
 {
 /**
