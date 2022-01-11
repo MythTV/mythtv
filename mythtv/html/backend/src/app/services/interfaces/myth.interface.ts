@@ -45,3 +45,7 @@ export interface MythConnectionInfo {
         WOL:                WOL;
     }
 }
+
+export interface GetSettingResponse {
+    String:     string;
+}
