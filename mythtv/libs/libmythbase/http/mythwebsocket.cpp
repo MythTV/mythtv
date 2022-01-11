@@ -586,7 +586,7 @@ void MythWebSocket::SendFrame(WSOpCode Code, const DataPayloads& Payloads)
 #if QT_VERSION < QT_VERSION_CHECK(5,10,0)
             mask->data()[i] = static_cast<int8_t>(MythRandom() % 0x100);
 #else
-            mask->data()[i] = (int8_t)MythRandom(INT8_MIN, INT8_MAX);
+            mask->data()[i] = (int8_t)MythRandomInt(INT8_MIN, INT8_MAX);
 #endif
         }
         header->data()[1] |= 0x80;
