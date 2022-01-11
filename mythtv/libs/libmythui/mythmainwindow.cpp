@@ -1698,18 +1698,18 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
         case QEvent::InputMethod:
         {
             ResetIdleTimer();
-            QInputMethodEvent *ie = dynamic_cast<QInputMethodEvent*>(Event);
+            auto *ie = dynamic_cast<QInputMethodEvent*>(Event);
             QWidget *widget = QApplication::focusWidget();
             if (widget)
             {
                 ie->accept();
                 if (widget->isEnabled())
-                    qApp->notify(widget, ie);
+                    QCoreApplication::instance()->notify(widget, ie);
 
                 break;
             }
-            QVector<MythScreenStack *>::Iterator it;
-            for (it = m_priv->m_stackList.end()-1; it != m_priv->m_stackList.begin()-1; --it)
+            // NOLINTNEXTLINE(readability-qualified-auto) // qt6
+            for (auto it = m_priv->m_stackList.end()-1; it != m_priv->m_stackList.begin()-1; --it)
             {
                 MythScreenType *top = (*it)->GetTopScreen();
                 if (top)

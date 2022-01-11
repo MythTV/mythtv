@@ -397,10 +397,8 @@ void MythScreenType::ShowMenu(void)
 
 bool MythScreenType::inputMethodEvent(QInputMethodEvent *event)
 {
-    if (!GetMythMainWindow()->IsExitingToMain() && m_currentFocusWidget &&
-        m_currentFocusWidget->inputMethodEvent(event))
-        return true;
-    return false;
+    return !GetMythMainWindow()->IsExitingToMain() && m_currentFocusWidget &&
+        m_currentFocusWidget->inputMethodEvent(event);
 }
 
 bool MythScreenType::keyPressEvent(QKeyEvent *event)

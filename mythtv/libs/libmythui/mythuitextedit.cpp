@@ -464,13 +464,13 @@ bool MythUITextEdit::inputMethodEvent(QInputMethodEvent *event)
         m_isIMEinput = false;
         return true; // commited
     }
-    else if (m_isIMEinput && !event->preeditString().isEmpty())
+    if (m_isIMEinput && !event->preeditString().isEmpty())
     {
         m_message = m_messageBak;
         UpdateTmpString(event->preeditString());
         return true; // preedited
     }
-    else if (m_isIMEinput && _bak)
+    if (m_isIMEinput && _bak)
     { // Abort?
         m_isIMEinput = false;
         QString newmessage= m_messageBak;

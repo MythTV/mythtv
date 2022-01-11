@@ -339,10 +339,7 @@ void MythDialogBox::AddButtonV(const QString &title, QVariant data, bool newMenu
 
 bool MythDialogBox::inputMethodEvent(QInputMethodEvent *event)
 {
-    if (GetFocusWidget()->inputMethodEvent(event))
-        return true;
-
-    return false;
+    return GetFocusWidget()->inputMethodEvent(event);
 }
 
 bool MythDialogBox::keyPressEvent(QKeyEvent *event)
