@@ -16,6 +16,8 @@ Convenience inline random number generator functions
 
 #include "mythbaseexp.h"
 
+inline namespace MythRandomQt
+{
 /**
 @brief generate 32 random bits
 */
@@ -54,6 +56,6 @@ inline int MythRandom(int min, int max)
 }
 
 #endif
-
+} // namespace MythRandomQt
 
 #endif // MYTH_RANDOM_H_
