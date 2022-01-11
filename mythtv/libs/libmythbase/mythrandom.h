@@ -48,7 +48,7 @@ inline uint32_t MythRandom(uint32_t min, uint32_t max)
 /**
 @brief generate a random signed int in the range [min, max]
 */
-inline int MythRandom(int min, int max)
+inline int MythRandomInt(int min, int max)
 {
     return QRandomGenerator::global()->bounded(min, max);
 }
