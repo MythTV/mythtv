@@ -63,13 +63,9 @@ jobs:
         echo "MYTHTV_CONFIG=$MYTHTV_CONFIG --extra-cxxflags=-I/usr/local/include --extra-ldflags=-L/usr/local/lib" >> $GITHUB_ENV
       if: runner.os == 'macOS'
       
-    - name: debug ccache (not working on macOS) [pre]
+    - name: ccache statistics [pre]
       run: |
-        ccache -V
-        ccache -p
-        ccache -s
-        ls -alhp ~
-        du -hx -d 1 ~
+        ccache -sV
 
     - name: Configure core
       working-directory: ./mythtv
@@ -106,10 +102,6 @@ jobs:
       working-directory: ./mythplugins
       run: make -j4
 
-    - name: debug ccache (not working on macOS) [post]
+    - name: ccache statistics [post]
       run: |
-        ccache -V
-        ccache -p
-        ccache -s
-        ls -alhp ~
-        du -hx -d 1 ~
+        ccache -sV
