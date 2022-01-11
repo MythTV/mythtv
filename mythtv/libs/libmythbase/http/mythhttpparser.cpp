@@ -91,11 +91,11 @@ bool MythHTTPParser::Read(QTcpSocket* Socket, bool& Ready)
             int index = line.indexOf(":");
             if (index > 0)
             {
-                QByteArray key   = line.left(index).trimmed();
+                QByteArray key   = line.left(index).trimmed().toLower();
                 QByteArray value = line.mid(index + 1).trimmed();
-                if (key == "Content-Length")
+                if (key == "content-length")
                     m_contentLength = value.toLongLong();
-                m_headers->insert(key.toLower(), value);
+                m_headers->insert(key, value);
             }
             else
             {
