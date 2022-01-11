@@ -12,21 +12,9 @@
 
 PacketBuffer::PacketBuffer(unsigned int bitrate) :
     m_bitrate(bitrate),
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    m_next_empty_packet_key(0ULL)
-{
-    while (!m_next_empty_packet_key)
-    {
-        m_next_empty_packet_key =
-            (MythRandom() << 24) ^ (MythRandom() << 16) ^
-            (MythRandom() << 8) ^ MythRandom();
-    }
-}
-#else
     m_next_empty_packet_key(MythRandom64())
 {
 }
-#endif
 
 bool PacketBuffer::HasAvailablePacket(void) const
 {

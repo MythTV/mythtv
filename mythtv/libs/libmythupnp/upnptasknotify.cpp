@@ -128,11 +128,8 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                              pSocket->address(), pSocket->port() );
         if (m_eNTS != NTS_byebye)
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-            std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom() % 250));
-#else
             std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom(0, 250)));
-#endif
+
             pSocket->writeBlock( scPacket, scPacket.length(),
                                 pSocket->address(), pSocket->port() );
         }

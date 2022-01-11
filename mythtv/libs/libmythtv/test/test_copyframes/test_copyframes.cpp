@@ -101,11 +101,7 @@ static uint64_t FillRandom(MythVideoFrame* Frame)
         int offset = Frame->m_offsets[plane];
         for (int i = 0; i < width; ++i)
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-            unsigned char val = MythRandom() & 0xFF;
-#else
             unsigned char val = MythRandom(0, UCHAR_MAX);
-#endif
             Frame->m_buffer[offset++] = val;
             sum += val;
             counts++;
