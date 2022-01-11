@@ -28,13 +28,22 @@ jobs:
     - name: Setup build environment
       run: echo "MYTHTV_CONFIG=--prefix=${{ github.workspace }}/build/install --cc=${{ matrix.cc }} --cxx=${{ matrix.cxx }}" >> $GITHUB_ENV
       
-    - name: Check ccache
+    - name: Check ccache (linux)
       uses: actions/cache@v2
       with:
         path: ~/.ccache
         key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-${{ github.sha }}
         restore-keys: ${{ matrix.os }}-${{ matrix.cc }}-ccache
-  
+      if: runner.os == 'Linux'
+
+    - name: Check ccache (macOS)
+      uses: actions/cache@v2
+      with:
+        path: ~/Library/Caches/ccache
+        key: ${{ matrix.os }}-${{ matrix.cc }}-ccache-${{ github.sha }}
+        restore-keys: ${{ matrix.os }}-${{ matrix.cc }}-ccache
+      if: runner.os == 'macOS'
+
     # N.B. These dependencies are for the master branch. Unlike the ansible playlists they do not include old dependencies that may
     # be required for older versions. The list is intended to provide as much code coverage as possible (i.e. enable as many options as possible)
     - name: Install core dependencies (linux)
