@@ -1705,23 +1705,20 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
                 ie->accept();
                 if (widget->isEnabled())
                     QCoreApplication::instance()->notify(widget, ie);
-
                 break;
             }
             // NOLINTNEXTLINE(readability-qualified-auto) // qt6
             for (auto it = m_priv->m_stackList.end()-1; it != m_priv->m_stackList.begin()-1; --it)
             {
                 MythScreenType *top = (*it)->GetTopScreen();
-                if (top)
-                {
-                    if (top->inputMethodEvent(ie))
-                        return true;
-
-                    // Note:  The following break prevents keypresses being
-                    //        sent to windows below popups
-                    if ((*it)->objectName() == "popup stack")
-                        break;
-                }
+                if (top == nullptr)
+                    continue;
+                if (top->inputMethodEvent(ie))
+                    return true;
+                // Note:  The following break prevents keypresses being
+                //        sent to windows below popups
+                if ((*it)->objectName() == "popup stack")
+                    break;
             }
             break;
         }
