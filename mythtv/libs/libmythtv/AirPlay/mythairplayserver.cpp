@@ -137,11 +137,7 @@ QString AirPlayHardwareId()
         QByteArray ba;
         for (int i = 0; i < AIRPLAY_HARDWARE_ID_SIZE; i++)
         {
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-            ba.append((MythRandom() % 80) + 33);
-#else
             ba.append(MythRandom(33, 33 + 80 - 1));
-#endif
         }
         id = ba.toHex();
     }
@@ -153,16 +149,12 @@ QString AirPlayHardwareId()
 
 QString GenerateNonce(void)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5,10,0)
-    auto *randgen = QRandomGenerator::global();
     std::array<uint32_t,4> nonceParts {
-        randgen->generate(), randgen->generate(),
-        randgen->generate(), randgen->generate() };
-#else
-    std::srand(std::time(nullptr));
-    std::array<int32_t,4> nonceParts {
-        std::rand(), std::rand(), std::rand(), std::rand() };
-#endif
+        MythRandom(),
+        MythRandom(),
+        MythRandom(),
+        MythRandom()
+    };
 
     QString nonce;
     nonce =  QString::number(nonceParts[0], 16).toUpper();

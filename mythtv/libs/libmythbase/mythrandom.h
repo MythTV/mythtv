@@ -14,7 +14,7 @@ Convenience inline random number generator functions
 #include <QRandomGenerator>
 #endif
 
-inline namespace MythRandomQt
+namespace MythRandomQt
 {
 /**
 @brief generate 32 random bits
@@ -56,7 +56,7 @@ inline int MythRandomInt(int min, int max)
 #endif
 } // namespace MythRandomQt
 
-namespace MythRandomStd
+inline namespace MythRandomStd
 {
 
 using MythRandomGenerator_32 = std::mt19937;

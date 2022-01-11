@@ -297,14 +297,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             {
                 int nLimit = GetInt(args.GetAt(0), engine);
                 MHParameter *pResInt = args.GetAt(1);
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-                int r = static_cast<int>(MythRandom() % (nLimit + 1));
-#else
+                // ETSI ES 202 184 V2.4.1 (2016-06) §11.10.5 Random number function
+                // specifies "The returned value is undefined if the num parameter < 1."
+                // so this is fine.
                 int r = MythRandom(0, nLimit);
-/* note: undefined behavior if nLimit is negative, but the above % statement
-would also be incorrect in that case
-*/
-#endif
                 engine->FindObject(
                     *(pResInt->GetReference()))->SetVariableValue(r);
                 SetSuccessFlag(success, true, engine);

@@ -2384,12 +2384,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 {
     // sleep a little to let frontends reload the recordings list
     // after deleting a recording, then we can hammer the DB and filesystem
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    std::this_thread::sleep_for(3s);
-    std::this_thread::sleep_for(std::chrono::milliseconds(MythRandom()%2));
-#else
     std::this_thread::sleep_for(3s + std::chrono::microseconds(MythRandom(0, 2000)));
-#endif
 
     m_deletelock.lock();
 

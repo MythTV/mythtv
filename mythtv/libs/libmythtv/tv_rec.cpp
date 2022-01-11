@@ -1276,11 +1276,7 @@ static int num_inputs(void)
 static std::chrono::seconds eit_start_rand(uint inputId, std::chrono::seconds eitTransportTimeout)
 {
     // Randomize start time a bit
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    auto timeout = std::chrono::seconds(MythRandom()) % (eitTransportTimeout.count() / 3);
-#else
     auto timeout = std::chrono::seconds(MythRandom(0, eitTransportTimeout.count() / 3));
-#endif
 
     // Get the number of inputs and the position of the current input
     // to distribute the scan start evenly over eitTransportTimeout
