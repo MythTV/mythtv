@@ -93,7 +93,7 @@ if test -d "libudfread" ; then
     echo "Directory libudfread already exists"
 else
     echo "Compiling libudfread"
-    GIT_SSL_NO_VERIFY= git clone https://code.videolan.org/videolan/libudfread.git
+    git clone https://code.videolan.org/videolan/libudfread.git
     cd libudfread
     ./bootstrap
     ./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --host=i686-w64-mingw32.shared
@@ -108,10 +108,10 @@ cd $buildPath
 if test -d "libbluray" ; then
     echo "Directory libbluray already exists"
 else
-    GIT_SSL_NO_VERIFY= git clone https://code.videolan.org/videolan/libbluray.git
+    git clone https://code.videolan.org/videolan/libbluray.git
     chmod -R 755 libbluray
     cd libbluray
-    GIT_SSL_NO_VERIFY= git submodule update --init
+    git submodule update --init
 
     echo "Compiling libbluray"
     ./bootstrap
@@ -140,7 +140,7 @@ if test -d "soundtouch" ; then
     echo "Directory soundtouch already exists"
 else
     echo "Compiling SoundTouch"
-    GIT_SSL_NO_VERIFY= git clone https://codeberg.org/soundtouch/soundtouch.git
+    git clone https://codeberg.org/soundtouch/soundtouch.git
     chmod -R 755 soundtouch
     cd soundtouch
     ./bootstrap
