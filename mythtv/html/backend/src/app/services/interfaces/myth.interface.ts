@@ -55,3 +55,13 @@ export interface GetSettingRequest {
 export interface GetSettingResponse {
     String:     string;
 }
+
+export interface PutSettingRequest {
+    HostName:   string;
+    Key:        string;
+    Value:      string;
+}
+
+export interface PutSettingResponse {
+    bool:       boolean;
+}

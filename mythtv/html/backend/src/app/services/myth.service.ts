@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { MythHostName, MythTimeZone, MythConnectionInfo, Database, GetSettingRequest, GetSettingResponse } from './interfaces/myth.interface';
+import { MythHostName, MythTimeZone, MythConnectionInfo, Database, GetSettingRequest, GetSettingResponse, PutSettingRequest, PutSettingResponse } from './interfaces/myth.interface';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -36,4 +36,9 @@ export class MythService {
       .set("Default", (setting.Default) ? setting.Default : "");
     return this.httpClient.get<GetSettingResponse>('/Myth/GetSetting', {params})
   }
+
+  public PutSetting(setting: PutSettingRequest) : Observable<PutSettingResponse> {
+    return this.httpClient.post<PutSettingResponse>('/Myth/PutSetting', setting)
+  }
+
 }
