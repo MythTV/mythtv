@@ -46,15 +46,18 @@ void EITCache::ResetStatistics(void)
 QString EITCache::GetStatistics(void) const
 {
     QMutexLocker locker(&m_eventMapLock);
-    return QString(
-        "EITCache Access:%1 Hits:%2 "
-        "Table:%3 Version:%4 Endtime:%5 New:%6 "
-        "Pruned:%7 Pruned Hits:%8 Future:%9 Wrong Channel:%10 "
-        "Hit Ratio:%11")
-        .arg(m_accessCnt).arg(m_hitCnt)
-        .arg(m_tblChgCnt).arg(m_verChgCnt).arg(m_endChgCnt).arg(m_entryCnt)
-        .arg(m_pruneCnt).arg(m_prunedHitCnt).arg(m_futureHitCnt).arg(m_wrongChannelHitCnt)
-        .arg((m_hitCnt+m_prunedHitCnt+m_futureHitCnt+m_wrongChannelHitCnt)/(double)m_accessCnt);
+    return
+        QString("Access:%1 ").arg(m_accessCnt) +
+        QString("HitRatio:%1 ").arg((m_hitCnt+m_prunedHitCnt+m_futureHitCnt+m_wrongChannelHitCnt)/(double)m_accessCnt) +
+        QString("Hits:%1 ").arg(m_hitCnt) +
+        QString("Table:%1 ").arg(m_tblChgCnt) +
+        QString("Version:%1 ").arg(m_verChgCnt) +
+        QString("Endtime:%1 ").arg(m_endChgCnt) +
+        QString("New:%1 ").arg(m_entryCnt) +
+        QString("Pruned:%1 ").arg(m_pruneCnt) +
+        QString("PrunedHits:%1 ").arg(m_prunedHitCnt) +
+        QString("Future:%1 ").arg(m_futureHitCnt) +
+        QString("WrongChannel:%1").arg(m_wrongChannelHitCnt);
 }
 
 /*
@@ -335,7 +338,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
         (m_accessCnt < 1000000 && (m_accessCnt % 100000 == 0)) ||
         (m_accessCnt % 1000000 == 0))
     {
-        LOG(VB_EIT, LOG_INFO, GetStatistics());
+        LOG(VB_EIT, LOG_INFO, LOC + GetStatistics());
         WriteToDB();
     }
 
