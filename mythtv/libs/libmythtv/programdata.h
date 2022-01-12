@@ -112,7 +112,7 @@ class MTV_PUBLIC DBEvent
         m_episode(_episode),
         m_totalepisodes(_totalepisodes)
     {
-    }
+    }    DBEvent(const DBEvent &other);
 
     virtual ~DBEvent() { delete m_credits; }
 

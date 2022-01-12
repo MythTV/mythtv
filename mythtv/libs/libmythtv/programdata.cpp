@@ -232,6 +232,12 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
     if (this == &other)
         return *this;
 
+    *this = DBEvent(other);
+    return *this;
+}
+
+DBEvent::DBEvent(const DBEvent &other)
+{
     m_title           = other.m_title;
     m_subtitle        = other.m_subtitle;
     m_description     = other.m_description;
@@ -278,8 +284,6 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
     m_genres                  = other.m_genres;
 
     Squeeze();
-
-    return *this;
 }
 
 void DBEvent::Squeeze(void)
@@ -673,19 +677,29 @@ uint DBEvent::UpdateDB(
         return InsertDB(q, chanid);
     }
 
-    // Changing a starttime of a program that is being recorded can
-    // start another recording of the same program.
-    // Therefore we skip updates that change a starttime in the past
-    // unless the endtime is later.
-    if (m_starttime != p[match].m_starttime)
+    // Changing the starttime or the title of a program that is being
+    // recorded will start another recording of the same program.
+    // Therefore updates with a starttime in the past keep
+    // the old start time and program title.
     {
         QDateTime now = QDateTime::currentDateTimeUtc();
-        if (m_starttime < now && m_endtime <= p[match].m_endtime)
+
+        // Starttime in the past
+        if (m_starttime < now)
         {
-            LOG(VB_EIT, LOG_DEBUG,
-                QString("EIT:  skip '%1' starttime is in the past")
-                        .arg(m_title.left(35)));
-            return 0;
+            if ((m_starttime != p[match].m_starttime) ||
+                (m_title     != p[match].m_title    ))
+            {
+                LOG(VB_EIT, LOG_INFO,
+                    QString("EIT: update '%1' but starttime in the past, keep starttime and title")
+                            .arg(m_title.left(35)));
+
+                // Update matched item with current data but old starttime and title
+                DBEvent new_event(*this);
+                new_event.m_starttime = p[match].m_starttime;
+                new_event.m_title = p[match].m_title;
+                return new_event.UpdateDB(q, chanid, p[match]);
+            }
         }
     }
 
