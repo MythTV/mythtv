@@ -1,28 +1,14 @@
+import { ArtworkInfoList } from "./artwork.interface";
+import { CastMemberList } from "./castmember.interface";
 import { Channel } from "./channel.interface";
 import { Recording } from "./recording.interface";
 
-export interface ArtworkInfo {
-    // no data
-}
-
-export interface Artwork {
-    ArtworkInfos: ArtworkInfo[];
-}
-
-export interface CastMember {
-    // no data
-}
-
-export interface Cast {
-    CastMembers:        CastMember[];
-}
-
 export interface ScheduleOrProgram {
     Airdate:            string;
-    Artwork:            Artwork;
+    Artwork:            ArtworkInfoList;
     AudioPropNames:     string;
     AudioProps:         number;
-    Cast:               Cast;
+    Cast:               CastMemberList;
     CatType:            string;
     Category:           string;
     Channel:            Channel;
@@ -50,4 +36,14 @@ export interface ScheduleOrProgram {
     TotalEpisodes:      number;
     VideoPropNames:     string;
     VideoProps:         number;
+}
+
+export interface ProgramList {
+    StartIndex:         number;
+    Count:              number;
+    TotalAvailable:     number;
+    AsOf:               string; // DateTime
+    Version:            string;
+    ProtoVer:           string;
+    Programs:           ScheduleOrProgram[];
 }

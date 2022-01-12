@@ -1,4 +1,4 @@
-import { ScheduleOrProgram } from "./schedule.interface";
+import { ScheduleOrProgram } from "./program.interface";
 
 export interface JobQueueJob {
     Args:           string;
