@@ -46,6 +46,12 @@ export interface MythConnectionInfo {
     }
 }
 
+export interface GetSettingRequest {
+    HostName:   string;
+    Key:        string;
+    Default?:   string;
+}
+
 export interface GetSettingResponse {
     String:     string;
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { MythHostName, MythTimeZone, MythConnectionInfo, Database, GetSettingResponse } from './interfaces/myth.interface';
+import { MythHostName, MythTimeZone, MythConnectionInfo, Database, GetSettingRequest, GetSettingResponse } from './interfaces/myth.interface';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -29,8 +29,11 @@ export class MythService {
     return this.httpClient.get<MythConnectionInfo>('/Myth/GetConnectionInfo');
   }
 
-  public GetSetting(HostName: string, Key: string) : Observable<GetSettingResponse> {
-    let params = new HttpParams().set("HostName", HostName).set("Key", Key);
+  public GetSetting(setting : GetSettingRequest) : Observable<GetSettingResponse> {
+    let params = new HttpParams()
+      .set("HostName", setting.HostName)
+      .set("Key", setting.Key)
+      .set("Default", (setting.Default) ? setting.Default : "");
     return this.httpClient.get<GetSettingResponse>('/Myth/GetSetting', {params})
   }
 }

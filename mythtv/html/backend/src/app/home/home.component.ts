@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
     this.m_connectionInfo$ = this.mythService.GetConnectionInfo().pipe(
       tap(data => console.log(data)),
     )
-    this.m_setting$ = this.mythService.GetSetting("localhost", "TestSetting").pipe(
+    this.m_setting$ = this.mythService.GetSetting({HostName: "localhost", Key: "TestSetting"}).pipe(
       tap(data => console.log(data)),
     )
   }
