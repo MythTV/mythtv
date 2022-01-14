@@ -4,12 +4,22 @@
 <div *ngIf="(m_timezone$ | async)?.TimeZoneInfo as timezone; else loading">
     <p>It is currently {{timezone.CurrentDateTime}} in timezone {{timezone.TimeZoneID}}, UTC offset {{timezone.UTCOffset}} hours</p>
 </div>
-<div *ngIf="(m_connectionInfo$ | async)?.ConnectionInfo as info; else loading">
+<div *ngIf="(m_connectionInfo$ | async)?.ConnectionInfo as info; else loadingOrError">
     <p>MythTV version is {{info.Version.Version}} from branch {{info.Version.Branch}} using protocol {{info.Version.Protocol}}</p>
 </div>
 <div *ngIf="(m_setting$ | async)?.String as setting; else loading">
     <p>Setting "TestSetting" is currently set to "{{setting}}"</p>
 </div>
+
+<ng-template #loadingOrError>
+    <div *ngIf="errorRes else loading">
+        <p>Failed to get connection info: {{errorRes.message}}</p>
+    </div>
+    <ng-template #loading>
+        <p>Loading ConnectionInfo...</p>
+    </ng-template>
+</ng-template>
+
 <ng-template #loading>
-    <div>Loading...</div>
+    <p>Loading ...</p>
 </ng-template>
