@@ -223,7 +223,7 @@ void MythHTTPEncoding::GetJSONEncodedParameters(MythHTTPRequest* Request)
     {
         if (!key.isEmpty())
         {
-            QString value = json.value(key).toString();
+            QString value = json.value(key).toVariant().toString();
 
             Request->m_queries.insert(key.trimmed().toLower(), value);
             LOG(VB_HTTP, LOG_DEBUG, QString("Found URL param (%1=%2)").arg(key, value));
