@@ -44,6 +44,7 @@ class V2Myth : public MythHTTPService
     Q_CLASSINFO( "ProfileText",           "methods=GET"                 )
     Q_CLASSINFO( "ManageDigestUser",      "methods=POST"                )
     Q_CLASSINFO( "ManageUrlProtection",   "methods=POST"                )
+    Q_CLASSINFO( "SetConnectionInfo",     "methods=POST"                )
 
 
   public:
@@ -54,6 +55,13 @@ class V2Myth : public MythHTTPService
   public slots:
 
     static V2ConnectionInfo*   GetConnectionInfo   ( const QString   &Pin );
+
+    static bool                SetConnectionInfo   ( const QString &Host,
+                                                     const QString &UserName,
+                                                     const QString &Password,
+                                                     const QString &Name,
+                                                     int   Port,
+                                                     bool  DoTest);
 
     static QString      GetHostName         ( );
 
