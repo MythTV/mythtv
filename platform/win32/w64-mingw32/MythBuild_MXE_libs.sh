@@ -5,7 +5,7 @@ echo "Tested on ubuntu 2004. Run this file to build mythtv for Windows"
 sudo apt-get --assume-yes install \
      git gcc g++ wget python3 perl bzip2 lzip unzip libssl-dev \
      p7zip make autoconf automake bison flex autopoint gperf \
-     libtool libtool-bin ruby intltool p7zip-full python \
+     libtool libtool-bin ruby intltool p7zip-full \
      pkg-config yasm mmv
 
 buildRoot=$PWD
@@ -67,6 +67,10 @@ else
 
     cd mxe
     make cc MXE_PLUGIN_DIRS=plugins/gcc8 MXE_TARGETS='i686-w64-mingw32.shared' vulkan-loader vulkan-headers qt5 nasm yasm libsamplerate taglib zlib gnutls mman-win32 pthreads libxml2 libdvdcss x264 x265 lame libass qtwebkit xvidcore libvpx vorbis flac
+    if test $? != 0 ; then
+	echo "Failed to build mxe."
+	exit
+    fi
     cd ..
 
     find . -name \*.dll -exec cp {} \install/bin \;
@@ -100,6 +104,10 @@ else
     # libtool won't build this as a shared library without this flag.
     sed -i 's/LDFLAGS = /LDFLAGS = -no-undefined/' Makefile
     make -j$(nproc)
+    if test $? != 0 ; then
+	echo "Failed to build libudfread."
+	exit
+    fi
     make install
 fi
 
@@ -117,6 +125,10 @@ else
     ./bootstrap
     ./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --disable-examples --with-freetype --with-libxml2 --disable-bdjava-jar --host=i686-w64-mingw32.shared
     make -j$(nproc)
+    if test $? != 0 ; then
+	echo "Failed to build libbluray."
+	exit
+    fi
     make install
 fi
 
@@ -131,6 +143,10 @@ else
     cd libzip
     $buildPath/mxe/usr/bin/i686-w64-mingw32.shared-cmake $buildPath/libzip
     make -j$(nproc)
+    if test $? != 0 ; then
+	echo "Failed to build libzip."
+	exit
+    fi
     make install
 fi
 
@@ -147,6 +163,10 @@ else
     ./configure --prefix=$buildPath/mxe/usr/i686-w64-mingw32.shared --host=i686-w64-mingw32.shared
     sed -i 's/LDFLAGS = /LDFLAGS = -no-undefined/' $buildPath/soundtouch/source/SoundTouch/Makefile
     make -j$(nproc)
+    if test $? != 0 ; then
+	echo "Failed to build soundtouch."
+	exit
+    fi
     make install
 fi
 

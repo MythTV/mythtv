@@ -43,12 +43,24 @@ fi
 echo "Compiling mythtv"
 cd $buildPath/mythtv/mythtv
 ./configure --prefix="$buildPath/install" --enable-cross-compile --cross-prefix=i686-w64-mingw32.shared- --target_os=mingw32 --arch=x86 --cpu=pentium3 --qmake=$qt5/bin/qmake --extra-cflags=-I$in1/include-I/home/ubuntu/Desktop/build/mxe/usr/lib/gcc/i686-w64-mingw32.shared/8.4.0/include/c++/i686-w64-mingw32.shared --extra-ldflags=-L$in1/lib --disable-lirc --disable-hdhomerun --disable-firewire --disable-vdpau  --disable-nvdec --disable-dxva2 --enable-libmp3lame --enable-libx264 --enable-libx265 --enable-libxvid --enable-libvpx --disable-w32threads --enable-silent_cc
+if test $? != 0 ; then
+    echo "Configure failed."
+    exit
+fi
 
 make -j$(nproc)
+if test $? != 0 ; then
+    echo "Make failed."
+    exit
+fi
 
 cp $buildPath/mythtv/mythtv/external/FFmpeg/ffmpeg_g.exe $buildPath/mythtv/mythtv/external/FFmpeg/mythffmpeg.exe
 cp $buildPath/mythtv/mythtv/external/FFmpeg/ffprobe_g.exe $buildPath/mythtv/mythtv/external/FFmpeg/mythffprobe.exe
 make install
+if test $? != 0 ; then
+    echo "Make install failed."
+    exit
+fi
 
 # Hack warning. The libxxx.dll.a files get installed as liblibxxx.dll.a.
 cd $buildPath/install/lib
@@ -57,6 +69,10 @@ mmv -d 'liblib*' 'lib#1'
 cd $buildPath/mythtv/mythplugins
 ./configure --prefix="$buildPath/install" -cross-prefix=i686-w64-mingw32.shared- --disable-mytharchive
 make -j$(nproc) install
+if test $? != 0 ; then
+    echo "Make plugins failed."
+    exit
+fi
 
 cp -R $buildPath/mythtv/platform/win32/w64-mingw32/Installer/. $buildPath/install/
 cp -R $buildPath/mythtv/mythtv/src/COPYING $buildPath/install/COPYING
