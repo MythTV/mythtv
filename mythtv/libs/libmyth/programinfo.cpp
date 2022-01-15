@@ -6424,11 +6424,15 @@ void ProgramInfo::CalculateWatchedProgress(uint64_t pos)
     switch (m_recStatus)
     {
       case RecStatus::Recorded:
-          total = std::max((int64_t)0, QueryTotalFrames());
+        total = std::max((int64_t)0, QueryTotalFrames());
         break;
       case RecStatus::Recording:
-        // Active recordings won't have total frames set yet.
-        total = QueryLastFrameInPosMap();
+        {
+            // Compute expected total frames based on frame rate.
+            int64_t rate1000 = QueryAverageFrameRate();
+            int64_t duration = m_recStartTs.secsTo(m_recEndTs);
+            total = rate1000 * duration / 1000;
+        }
         break;
       default:
         break;
