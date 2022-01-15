@@ -2613,7 +2613,7 @@ void CaptureCard::fillSelections(GroupSetting *setting)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
-        "SELECT cardid, videodevice, cardtype "
+        "SELECT cardid, videodevice, cardtype, displayname "
         "FROM capturecard "
         "WHERE hostname = :HOSTNAME AND parentid = 0 "
         "ORDER BY cardid";
@@ -2634,8 +2634,11 @@ void CaptureCard::fillSelections(GroupSetting *setting)
         uint    cardid      = query.value(0).toUInt();
         QString videodevice = query.value(1).toString();
         QString cardtype    = query.value(2).toString();
+        QString displayname = query.value(3).toString();
 
-        QString label = CardUtil::GetDeviceLabel(cardtype, videodevice);
+        QString label = QString("%1 (%2)")
+            .arg(CardUtil::GetDeviceLabel(cardtype, videodevice), displayname);
+
         auto *card = new CaptureCard();
         card->loadByID(cardid);
         card->setLabel(label);
@@ -3712,7 +3715,7 @@ void CardInputEditor::Load(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT cardid, videodevice, cardtype, inputname "
+        "SELECT cardid, videodevice, cardtype, displayname "
         "FROM capturecard "
         "WHERE hostname = :HOSTNAME "
         "      AND parentid = 0 "
@@ -3730,13 +3733,13 @@ void CardInputEditor::Load(void)
         uint    cardid      = query.value(0).toUInt();
         QString videodevice = query.value(1).toString();
         QString cardtype    = query.value(2).toString();
-        QString inputname   = query.value(3).toString();
+        QString displayname = query.value(3).toString();
 
         auto *cardinput = new CardInput(cardtype, videodevice, cardid);
         cardinput->loadByID(cardid);
         QString inputlabel = QString("%1 (%2) -> %3")
             .arg(CardUtil::GetDeviceLabel(cardtype, videodevice),
-                 inputname, cardinput->getSourceName());
+                 displayname, cardinput->getSourceName());
         m_cardInputs.push_back(cardinput);
         cardinput->setLabel(inputlabel);
         addChild(cardinput);
