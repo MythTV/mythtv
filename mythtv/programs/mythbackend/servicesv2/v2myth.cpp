@@ -164,9 +164,9 @@ bool V2Myth::SetConnectionInfo(const QString &Host, const QString &UserName, con
 
     DatabaseParams dbparms;
     dbparms.m_dbName = db;
-    dbparms.m_dbUserName = std::move(UserName);
-    dbparms.m_dbPassword = std::move(Password);
-    dbparms.m_dbHostName = std::move(Host);
+    dbparms.m_dbUserName = UserName;
+    dbparms.m_dbPassword = Password;
+    dbparms.m_dbHostName = Host;
     dbparms.m_dbPort = port;
 
     // Just use some sane defaults for these values
