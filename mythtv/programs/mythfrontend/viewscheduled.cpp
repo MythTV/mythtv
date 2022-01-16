@@ -382,7 +382,7 @@ void ViewScheduled::ChangeGroup(MythUIButtonListItem* item)
 }
 
 void ViewScheduled::UpdateUIListItem(MythUIButtonListItem* item,
-                                     ProgramInfo *pginfo)
+                                     ProgramInfo *pginfo) const
 {
     QString state;
 

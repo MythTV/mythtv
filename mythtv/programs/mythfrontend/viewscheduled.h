@@ -60,7 +60,7 @@ class ViewScheduled : public ScheduleCommon
     void EmbedTVWindow(void);
 
     void UpdateUIListItem(MythUIButtonListItem* item,
-                          ProgramInfo *pginfo);
+                          ProgramInfo *pginfo) const;
     static void CalcRecordedPercent(ProgramInfo &pg);
 
     bool  m_conflictBool              {false};
