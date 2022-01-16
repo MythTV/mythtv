@@ -64,7 +64,7 @@ void TestVideoList::testGenericTree ()
         "The New Rogues", "new rogues", // subtitle, sortsubtitle
         QString(), // tagline
         2016, QDate(2016,10,25), // year, releasedate
-        "ttvdb.py_279121", //inetref
+        "ttvdb4.py_279121", //inetref
         0, // collectionref
         "http://thetvdb.com/?tab=episode&seriesid=279121&seasonid=671084&id=5714605", // homepage
         "Stefan Pleszczynski", // director
