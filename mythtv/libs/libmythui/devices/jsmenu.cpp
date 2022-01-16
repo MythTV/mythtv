@@ -44,15 +44,14 @@
 #include <linux/joystick.h>
 
 // Myth headers
+#include "config.h"
 #include "mythlogging.h"
 
 // Mythui headers
 #include "jsmenuevent.h"
 
-#ifdef __linux__
-extern "C" {
-    #include <libudev.h>
-}
+#ifdef HAVE_LIBUDEV
+#include <libudev.h>
 #endif
 
 #define LOC QString("JoystickMenuThread: ")
@@ -98,7 +97,7 @@ bool JoystickMenuThread::Init(QString &config_file)
                                                     .arg(m_devicename));
         m_readError = true;
         // If udev is avaliable we want to return true on read error to start the required loop
-#ifdef __linux__
+#ifdef HAVE_LIBUDEV
         return true;
 #else
         return false;
@@ -120,6 +119,10 @@ bool JoystickMenuThread::Init(QString &config_file)
             "Joystick disabled - ioctl JSIOCGBUTTONS failed");
         return false;
     }
+
+    LOG(VB_GENERAL, LOG_INFO, LOC +
+        QString("Controller has %1 axes and %2 buttons")
+        .arg(m_axesCount).arg(m_buttonCount));
 
     /*------------------------------------------------------------------------
     ** Allocate the arrays in which we track button and axis status
@@ -226,29 +229,28 @@ void JoystickMenuThread::run(void)
 
     while (!m_bStop && m_configRead)
     {
-#ifdef __linux__
-        if(m_configRead && m_readError){
+#ifdef HAVE_LIBUDEV
+        if (m_configRead && m_readError)
+        {
             LOG(VB_GENERAL, LOG_INFO, LOC +
                 QString("Joystick error, Awaiting Reconnection"));
-            struct udev *udev;
-            udev = udev_new();
-            struct udev_monitor *mon;
-            int fd;
-            struct udev_device *dev;
+            struct udev *udev = udev_new();
             /* Set up a monitor to monitor input devices */
-            mon = udev_monitor_new_from_netlink(udev, "udev");
-            udev_monitor_filter_add_match_subsystem_devtype(mon, "input", NULL);
+            struct udev_monitor *mon =
+                udev_monitor_new_from_netlink(udev, "udev");
+            udev_monitor_filter_add_match_subsystem_devtype(mon, "input", nullptr);
             udev_monitor_enable_receiving(mon);
             /* Get the file descriptor (fd) for the monitor.
             This fd will get passed to select() */
-            fd = udev_monitor_get_fd(mon);
+            int fd = udev_monitor_get_fd(mon);
             /* This section will run till no error, calling usleep() at
             the end of each pass. This is to use a udev_monitor in a
             non-blocking way. */
             /*===========================================================
              * instead of a loop, could QSocketNotifier be used here
              *=========================================================*/
-            while(!m_bStop && m_configRead && m_readError){
+            while (!m_bStop && m_configRead && m_readError)
+            {
                 /* Set up the call to select(). In this case, select() will
                    only operate on a single file descriptor, the one
                    associated with our udev_monitor. Note that the timeval
@@ -256,26 +258,27 @@ void JoystickMenuThread::run(void)
                    block.
                 */
                 fd_set fds;
-                struct timeval tv;
-                int ret;
+                struct timeval tv {};
                 FD_ZERO(&fds);
                 FD_SET(fd, &fds);
                 tv.tv_sec = 0;
                 tv.tv_usec = 0;
-                ret = select(fd+1, &fds, NULL, NULL, &tv);
+                int ret = select(fd+1, &fds, nullptr, nullptr, &tv);
                 /* Check if our file descriptor has received data. */
-                if (ret > 0 && FD_ISSET(fd, &fds)) {
-                     dev = udev_monitor_receive_device(mon);
-                     if (dev) {
-                             this->Init(m_configFile);
+                if (ret > 0 && FD_ISSET(fd, &fds))
+                {
+                    struct udev_device *dev = udev_monitor_receive_device(mon);
+                    if (dev)
+                    {
+                        this->Init(m_configFile);
+                        udev_device_unref(dev);
                     }
                 }
                 usleep(250ms);
             }
             // unref the monitor
             udev_monitor_unref(mon); // Also closes fd.
-            delete(udev);
-            delete(dev);
+            udev_unref(udev);
         }
 #endif
 
@@ -298,8 +301,8 @@ void JoystickMenuThread::run(void)
             **        (what happens when we unplug a joystick?)
             **--------------------------------------------------------------*/
             LOG(VB_GENERAL, LOG_ERR, "select: " + ENO);
-#ifdef __linux__
-            m_readError =true;
+#ifdef HAVE_LIBUDEV
+            m_readError = true;
             continue;
 #else
             return;
@@ -315,7 +318,7 @@ void JoystickMenuThread::run(void)
             if (rc != sizeof(js))
             {
                     LOG(VB_GENERAL, LOG_ERR, "error reading js:" + ENO);
-#ifdef __linux__
+#ifdef HAVE_LIBUDEV
             m_readError = true;
             continue;
 #else
