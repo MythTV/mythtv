@@ -194,16 +194,32 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,535,30</area>
+                    <!-- Watched progress -->
+                    <!--
                     <progressbar name="buttonprogress1">
-                        <area>0,0,100%,100%</area>
+                        <area>0,0%,100%,50%</area>
                         <layout>horizontal</layout>
                         <style>reveal</style>
                         <shape name="progressimage">
                             <area>0,1,100%,100%-1</area>
                             <type>box</type>
-                            <fill color="#000000" alpha="128"/>
+                            <fill color="#88dd44" alpha="128"/>
                         </shape>
                     </progressbar>
+                    -->
+                    <!-- Recorded progress -->
+                    <!--
+                    <progressbar name="buttonprogress2">
+                        <area>0,50%,100%,100%</area>
+                        <layout>horizontal</layout>
+                        <style>reveal</style>
+                        <shape name="progressimage">
+                            <area>0,1,100%,100%-1</area>
+                            <type>box</type>
+                            <fill color="#dd0000" alpha="128"/>
+                        </shape>
+                    </progressbar>
+                    -->
                     <statetype name="status">
                         <position>3,2</position>
                         <state name="disabled">
