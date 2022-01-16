@@ -209,7 +209,7 @@ void MythHTTPEncoding::GetJSONEncodedParameters(MythHTTPRequest* Request)
     if (!Request || !Request->m_content.get())
         return;
 
-    QJsonParseError parseError;
+    QJsonParseError parseError {};
     QJsonDocument doc = QJsonDocument::fromJson(static_cast<QByteArray>(Request->m_content->constData()), &parseError);
     if (parseError.error != QJsonParseError::NoError)
     {
