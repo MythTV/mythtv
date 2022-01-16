@@ -3881,6 +3881,22 @@ static bool doUpgradeTVDatabaseSchema(void)
             return false;
     }
 
+    if (dbver == "1373")
+    {
+        DBUpdates updates {
+            // adjust inetref prefixes to new grabber script
+            "UPDATE record SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
+            "UPDATE recorded SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
+            "UPDATE oldrecorded SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
+            "UPDATE videometadata SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
+            "UPDATE program SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
+            "UPDATE recordedprogram SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
+            "UPDATE recordedartwork SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');"
+        };
+        if (!performActualUpdate("MythTV", "DBSchemaVer",
+                                 updates, "1374", dbver))
+            return false;
+    }
     return true;
 }
 
