@@ -250,11 +250,11 @@
                         <state name="marked"></state>
                     </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,2,636,28</area>
+                        <area>32,2,623,28</area>
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="watchedpercent" from="buttontext">
-                        <area>665,2,45,28</area>
+                        <area>655,2,55,28</area>
                         <align>right,vcenter</align>
                         <template>%|watchedpercent|%%</template>
                      </textarea>
@@ -305,10 +305,10 @@
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="titlesubtitle" from="fonts">
-                         <area>32,2,636,28</area>
+                         <area>32,2,623,28</area>
                     </textarea>
                     <textarea name="watchedpercent" from="fonts">
-                        <area>665,2,45,28</area>
+                        <area>655,2,55,28</area>
                         <align>right,vcenter</align>
                         <template>%|watchedpercent|%%</template>
                      </textarea>
