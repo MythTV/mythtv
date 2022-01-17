@@ -521,6 +521,7 @@
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
                         <area>480,2,620,24</area>
+                        <!--
                         <progressbar name="buttonprogress2">
                             <area>0,0,100%,100%</area>
                             <layout>horizontal</layout>
@@ -531,6 +532,7 @@
                                 <fill color="#000000" alpha="128"/>
                             </shape>
                         </progressbar>
+                        -->
                     </textarea>
                     <textarea name="recordedpercent" from="buttontext">
                         <area>1105,2,45,28</area>
@@ -590,7 +592,7 @@
             <textarea name="recordedmagic">
                 <template>%recordedpercent%</template>
             </textarea>
-            <area>950,454,300,40</area>
+            <area>100,680,300,30</area>
             <progressbar name="recordedprogressbar" from="baseprogressbar2">
                 <area>0,0,100%,100%</area>
             </progressbar>
@@ -632,7 +634,7 @@
         </textarea>
 
         <textarea name="helptext" from="basetextarea">
-            <area>0,680,1280,30</area>
+            <area>400,680,480,30</area>
             <value>(1) All  (2) Important</value>
             <align>center</align>
         </textarea>
