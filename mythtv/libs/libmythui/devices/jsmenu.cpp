@@ -50,7 +50,7 @@
 // Mythui headers
 #include "jsmenuevent.h"
 
-#ifdef HAVE_LIBUDEV
+#if HAVE_LIBUDEV
 #include <libudev.h>
 #endif
 
@@ -97,7 +97,7 @@ bool JoystickMenuThread::Init(QString &config_file)
                                                     .arg(m_devicename));
         m_readError = true;
         // If udev is avaliable we want to return true on read error to start the required loop
-#ifdef HAVE_LIBUDEV
+#if HAVE_LIBUDEV
         return true;
 #else
         return false;
@@ -229,7 +229,7 @@ void JoystickMenuThread::run(void)
 
     while (!m_bStop && m_configRead)
     {
-#ifdef HAVE_LIBUDEV
+#if HAVE_LIBUDEV
         if (m_configRead && m_readError)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC +
@@ -301,7 +301,7 @@ void JoystickMenuThread::run(void)
             **        (what happens when we unplug a joystick?)
             **--------------------------------------------------------------*/
             LOG(VB_GENERAL, LOG_ERR, "select: " + ENO);
-#ifdef HAVE_LIBUDEV
+#if HAVE_LIBUDEV
             m_readError = true;
             continue;
 #else
@@ -318,7 +318,7 @@ void JoystickMenuThread::run(void)
             if (rc != sizeof(js))
             {
                     LOG(VB_GENERAL, LOG_ERR, "error reading js:" + ENO);
-#ifdef HAVE_LIBUDEV
+#if HAVE_LIBUDEV
             m_readError = true;
             continue;
 #else
