@@ -751,7 +751,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     static inline const std::chrono::milliseconds kSpeedChangeCheckFrequency    = 250ms;
     static inline const std::chrono::milliseconds kErrorRecoveryCheckFrequency  = 250ms;
     static inline const std::chrono::milliseconds kEndOfRecPromptCheckFrequency = 250ms;
-    static inline const std::chrono::milliseconds kSaveLastPlayPosTimeout       = 30s;
+    static inline const std::chrono::milliseconds kSaveLastPlayPosTimeout       = 5s;
 #ifdef USING_VALGRIND
     static inline const std::chrono::milliseconds kEndOfPlaybackFirstCheckTimer = 1min;
 #else
