@@ -1699,6 +1699,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
         {
             ResetIdleTimer();
             auto *ie = dynamic_cast<QInputMethodEvent*>(Event);
+            if (!ie)
+                return MythUIScreenBounds::eventFilter(Watched, Event);
             QWidget *widget = QApplication::focusWidget();
             if (widget)
             {
