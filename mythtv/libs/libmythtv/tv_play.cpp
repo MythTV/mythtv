@@ -9977,9 +9977,6 @@ void TV::HandleSaveLastPlayPosEvent()
     m_playerContext.UnlockDeletePlayer(__FILE__, __LINE__);
     ReturnPlayerLock();
 
-    KillTimer(m_saveLastPlayPosTimerId);
-    m_saveLastPlayPosTimerId = StartTimer(kSaveLastPlayPosTimeout, __LINE__);
-
     m_savePosOnExit = true;
 }
 
