@@ -470,7 +470,7 @@
                         -->
                     </textarea>
                     <textarea name="recordedpercent" from="buttontext">
-                        <area>675,2,45,24</area>
+                        <area>675,1,45,24</area>
                         <align>right,vcenter</align>
                         <template>%|recordedpercent|%%</template>
                      </textarea>
@@ -496,7 +496,7 @@
                         <area>375,1,300,24</area>
                     </textarea>
                     <textarea name="recordedpercent" from="buttontext">
-                        <area>675,2,45,24</area>
+                        <area>675,1,45,24</area>
                         <align>right,vcenter</align>
                         <template>%|recordedpercent|%%</template>
                      </textarea>
