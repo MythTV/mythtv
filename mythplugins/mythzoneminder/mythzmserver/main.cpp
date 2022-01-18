@@ -14,6 +14,7 @@
  * ============================================================ */
 
 #include <arpa/inet.h>
+#include <array>
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
