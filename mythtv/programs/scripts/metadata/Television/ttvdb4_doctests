@@ -1,0 +1,576 @@
+# -*- coding: UTF-8 -*-
+
+# ---------------------------------------
+# Author:  Roland Ernst
+# Purpose: MythTV Bindings for TheTVDB v4
+# ---------------------------------------
+
+# Doc-Tests for ttvdb4
+# file: ttvdb4_doctests
+
+# Note: These tests take several minutes to finish! Please be patient.
+
+# ttvdb4.py -l en -C 360893
+>>> sys.argv = shlex.split('ttvdb4 -l en -C 360893')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Chernobyl</title>
+    <description>Chernobyl dramatizes the story of the 1986 nuclear accident — one of the worst man-made catastrophes in history — and the sacrifices made to save Europe from unimaginable disaster.</description>
+    <inetref>360893</inetref>
+    <homepage>https://www.hbo.com/chernobyl/season-1</homepage>
+    <language>en</language>
+    <userrating>8.700000</userrating>
+    <year>2019</year>
+    <categories>
+      <category name="Mini-Series"/>
+      <category name="Drama"/>
+      <category name="Thriller"/>
+      <category name="History"/>
+    </categories>
+    <countries>
+      <country name="USA"/>
+    </countries>
+    <people>
+      <person name="Jared Harris" job="Actor" url="https://thetvdb.com/people/360332" character="Valery Legasov"/>
+      <person name="Stellan Skarsgård" job="Actor" url="https://thetvdb.com/people/378106" character="Boris Shcherbina"/>
+      <person name="Emily Watson" job="Actor" url="https://thetvdb.com/people/300426" character="Ulana Khomyuk"/>
+...
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/5cc12861c93e4.jpg" thumb="https://artworks.thetvdb.com/banners/posters/5cc12861c93e4_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/5d218b09c7dc3.jpg" thumb="https://artworks.thetvdb.com/banners/posters/5d218b09c7dc3_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/series/360893/posters/62015174.jpg" thumb="https://artworks.thetvdb.com/banners/series/360893/posters/62015174_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/5cd7e75b9e99a.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/5cd7e75b9e99a_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/5cb116e858285.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/5cb116e858285_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/5cbaf5ff5120b.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/5cbaf5ff5120b_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/5cc9f74c2ddd3.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/5cc9f74c2ddd3_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/5cd2c005cab09.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/5cd2c005cab09_t.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+### Japanese title, but only English overview:
+# ttvdb4.py -l ja -C 360893
+>>> sys.argv = shlex.split('ttvdb4 -l ja -C 360893')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>チェルノブイリ</title>
+    <description>Chernobyl dramatizes the story of the 1986 nuclear accident — one of the worst man-made catastrophes in history — and the sacrifices made to save Europe from unimaginable disaster.</description>
+    <inetref>360893</inetref>
+    <homepage>https://www.hbo.com/chernobyl/season-1</homepage>
+    <language>en</language>
+    <userrating>8.700000</userrating>
+    <year>2019</year>
+    <categories>
+      <category name="Mini-Series"/>
+      <category name="Drama"/>
+      <category name="Thriller"/>
+      <category name="History"/>
+    </categories>
+    <countries>
+      <country name="USA"/>
+    </countries>
+    <people>
+      <person name="Jared Harris" job="Actor" url="https://thetvdb.com/people/360332" character="Valery Legasov"/>
+      <person name="Stellan Skarsgård" job="Actor" url="https://thetvdb.com/people/378106" character="Boris Shcherbina"/>
+      <person name="Emily Watson" job="Actor" url="https://thetvdb.com/people/300426" character="Ulana Khomyuk"/>
+...
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/5cc12861c93e4.jpg" thumb="https://artworks.thetvdb.com/banners/posters/5cc12861c93e4_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/5d218b09c7dc3.jpg" thumb="https://artworks.thetvdb.com/banners/posters/5d218b09c7dc3_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/5cd7e75b9e99a.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/5cd7e75b9e99a_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/5cb116e858285.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/5cb116e858285_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/5cbaf5ff5120b.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/5cbaf5ff5120b_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/5cc9f74c2ddd3.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/5cc9f74c2ddd3_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/5cd2c005cab09.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/5cd2c005cab09_t.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# ttvdb4.py -l en -a us -D 76568 2 8
+>>> sys.argv = shlex.split('ttvdb4 -l en -a us -D 76568 2 8')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Gilmore Girls</title>
+    <subtitle>The Ins and Outs of Inns</subtitle>
+    <description>Lorelai and Sookie gear up their plans to open an inn but encounter a roadblock when the owner of their dream location refuses to sell the property. The unexpected arrival of Mia, the absentee owner of the Independence Inn, complicates matters even further.</description>
+    <season>2</season>
+    <episode>8</episode>
+    <inetref>76568</inetref>
+    <imdb>tt0588208</imdb>
+    <homepage>https://www.warnerbros.com/tv/gilmore-girls</homepage>
+    <language>en</language>
+    <userrating>9.000000</userrating>
+    <year>2000</year>
+    <runtime>44</runtime>
+    <certifications>
+      <certification locale="us" name="TV-14"/>
+    </certifications>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Romance"/>
+    </categories>
+    <countries>
+      <country name="USA"/>
+    </countries>
+    <studios>
+      <studio name="The WB"/>
+    </studios>
+    <people>
+      <person name="Lauren Graham" job="Actor" url="https://thetvdb.com/people/255106" character="Lorelai Gilmore"/>
+      <person name="Alexis Bledel" job="Actor" url="https://thetvdb.com/people/384680" character="Rory Gilmore"/>
+      <person name="Melissa McCarthy" job="Actor" url="https://thetvdb.com/people/296532" character="Sookie St. James"/>
+...
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/series/76568/seasons/10755/posters/62089217.jpg" thumb="https://artworks.thetvdb.com/banners/series/76568/seasons/10755/posters/62089217_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/76568-2-4.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/76568-2-4_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/76568-2-3.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/76568-2-3_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-14.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-14_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-15.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-15_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-18.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-18_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/76568-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/76568-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/text/76568-3.jpg" thumb="https://artworks.thetvdb.com/banners/text/76568-3_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/44-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/44-g_t.jpg"/>
+...
+      <image type="screenshot" url="https://artworks.thetvdb.com/banners/episodes/76568/200299.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# ttvdb4.py -l de -D 76568 3 9
+>>> sys.argv = shlex.split('ttvdb4 -l de -D 76568 3 9')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Gilmore Girls</title>
+    <subtitle>Stress hoch vier</subtitle>
+    <description>Rory und Lorelai haben mehrere Einladungen zu Thanksgiving. Wie jedes Jahr wollen sie zuerst zu den Kims, danach zu Sookie und zu guter Letzt zu Luke. Doch dann taucht Emily auf und besteht darauf, dass die beiden auch bei ihr und Richard vorbeikommen. Rory und Lorelai bleibt nichts anderes übrig, als an Thanksgiving vier Einladungen zu bewältigen.Nach kurzen Besuchen bei den Kims, bei Sookie und Jackson und bei Luke machen sich Lorelai und Rory auf den Weg nach Hartford. Dort erfährt Lorelai, dass Rory sich in Yale beworben hat, und glaubt nun, Richard und Emily hätten Rory manipuliert. Erbost nimmt sie ihre Tochter an die Hand und verlässt die Party.</description>
+    <season>3</season>
+    <episode>9</episode>
+    <inetref>76568</inetref>
+    <imdb>tt0588112</imdb>
+    <homepage>https://www.warnerbros.com/tv/gilmore-girls</homepage>
+    <language>en</language>
+    <userrating>9.000000</userrating>
+    <year>2000</year>
+    <runtime>41</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Romance"/>
+    </categories>
+    <countries>
+      <country name="USA"/>
+    </countries>
+    <studios>
+      <studio name="The WB"/>
+    </studios>
+    <people>
+      <person name="Lauren Graham" job="Actor" url="https://thetvdb.com/people/255106" character="Lorelai Gilmore"/>
+      <person name="Alexis Bledel" job="Actor" url="https://thetvdb.com/people/384680" character="Rory Gilmore"/>
+      <person name="Melissa McCarthy" job="Actor" url="https://thetvdb.com/people/296532" character="Sookie St. James"/>
+...
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/76568-3-3.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/76568-3-3_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/series/76568/seasons/10756/posters/62089218.jpg" thumb="https://artworks.thetvdb.com/banners/series/76568/seasons/10756/posters/62089218_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/76568-3-7.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/76568-3-7_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-14.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-14_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-15.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-15_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-18.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-18_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/76568-g4.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/76568-g4_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/76568-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/76568-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/text/76568-3.jpg" thumb="https://artworks.thetvdb.com/banners/text/76568-3_t.jpg"/>
+...
+      <image type="screenshot" url="https://artworks.thetvdb.com/banners/episodes/76568/200322.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# Single match with year:
+# ttvdb4.py -l en -M "Hawaii Five-0 (2010)"
+>>> sys.argv = shlex.split('ttvdb4 -l en -M "Hawaii Five-0 (2010)"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Hawaii Five-0</title>
+    <description>Detective Steve McGarrett, a decorated Naval officer turned cop, returned to Oahu after Hawaii's former governor persuaded him to head up the new team: his rules, no red tape and full blanket authority to hunt down the biggest "game" in town. Joining McGarrett are Detective Danny "Danno" Williams, a relocated ex-New Jersey cop; Captain Lou Grover, who formerly headed Hawaii's SWAT unit; Jerry Ortega, the islands' local conspiracy theorist; and Tani Rey, a bold, recent police academy graduate. Helping them is Adam Noshimuri, a friend with old ties to a deadly crime family; Junior Reigns, a former SEAL; Kamekona, a local entrepreneur who has his pulse on the Island; Sgt. Duke Lukela, a trusted member of the HPD; and medical examiner Dr. Noelani Cunha. The state's brash Five-0 unit, who may spar and jest among themselves, remain determined to eliminate the seedy elements from the 50th state.</description>
+    <inetref>164541</inetref>
+    <language>en</language>
+    <userrating>8.100000</userrating>
+    <year>2010</year>
+    <categories>
+      <category name="Drama"/>
+      <category name="Crime"/>
+      <category name="Action"/>
+    </categories>
+    <countries>
+      <country name="USA"/>
+    </countries>
+    <people>
+      <person name="Alex O'Loughlin" job="Actor" url="https://thetvdb.com/people/334781" character="Steve McGarrett"/>
+      <person name="Scott Caan" job="Actor" url="https://thetvdb.com/people/327319" character="Danny &quot;Danno&quot; Williams"/>
+      <person name="Daniel Dae Kim" job="Actor" url="https://thetvdb.com/people/268546" character="Chin Ho Kelly"/>
+      <person name="Grace Park" job="Actor" url="https://thetvdb.com/people/295725" character="Kono Kalakaua"/>
+...
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/164541-1.jpg" thumb="https://artworks.thetvdb.com/banners/posters/164541-1_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/164541-8.jpg" thumb="https://artworks.thetvdb.com/banners/posters/164541-8_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/164541-10.jpg" thumb="https://artworks.thetvdb.com/banners/posters/164541-10_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/164541-5.jpg" thumb="https://artworks.thetvdb.com/banners/posters/164541-5_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/164541-2.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/164541-2_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/164541-19.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/164541-19_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/164541-4.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/164541-4_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/164541-3.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/164541-3_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/164541-g3.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/164541-g3_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/164541-g5.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/164541-g5_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/164541-g4.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/164541-g4_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/164541-g8.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/164541-g8_t.jpg"/>
+...
+    </images>
+  </item>
+</metadata>
+
+
+# Single match:
+# ttvdb4.py -l de -M "Hawaii Five-O"
+>>> sys.argv = shlex.split('ttvdb4 -l de -M "Hawaii Five-O"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Hawaii Fünf-Null</title>
+    <description>Steve McGarrett ist der Leiter einer Polizei-Spezialeinheit, deren Aufgabe es ist, gegen das organisierte Verbrechen auf der Insel Hawaii vorzugehen. Dabei sind er und sein Assistent Danny Williams direkt dem Gouverneur von Hawaii unterstellt. Bei ihren Ermittlungen und Einsätzen werden sie durch Kollegen von der Polizei von Honolulu unterstützt.</description>
+    <inetref>71223</inetref>
+    <language>en</language>
+    <userrating>8.500000</userrating>
+    <year>1968</year>
+    <categories>
+      <category name="Drama"/>
+      <category name="Crime"/>
+      <category name="Adventure"/>
+      <category name="Action"/>
+      <category name="Mystery"/>
+    </categories>
+    <countries>
+      <country name="USA"/>
+    </countries>
+    <people>
+      <person name="Peggy Ryan" job="Actor" url="https://thetvdb.com/people/287834" character="Jenny"/>
+      <person name="William Smith" job="Actor" url="https://thetvdb.com/people/256501"/>
+      <person name="James MacArthur" job="Actor" url="https://thetvdb.com/people/263175" character="Det. Danny Williams"/>
+      <person name="Morgan White" job="Actor" url="https://thetvdb.com/people/287835"/>
+...
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/71223-1.jpg" thumb="https://artworks.thetvdb.com/banners/posters/71223-1_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/71223-2.jpg" thumb="https://artworks.thetvdb.com/banners/posters/71223-2_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/posters/71223-3.jpg" thumb="https://artworks.thetvdb.com/banners/posters/71223-3_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/71223-2.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/71223-2_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/71223-3.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/71223-3_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/71223-1.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/71223-1_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/71223-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/71223-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/1277-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/1277-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/71223-g2.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/71223-g2_t.jpg"/>
+...
+    </images>
+  </item>
+</metadata>
+
+
+# This takes long:
+# ttvdb4.py -l en -N 76568 "The Road Trip to Harvard"
+>>> sys.argv = shlex.split('ttvdb4 -l en -N 76568 "The Road Trip to Harvard"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Gilmore Girls</title>
+    <subtitle>The Road Trip to Harvard</subtitle>
+    <description>To escape everyone's reaction to the news of the broken engagement, Lorelai and Rory hit the road and stumble upon the bed and breakfast from hell. Rory gets a taste of college life while visiting Harvard, and Lorelai muses over what might have been. Lorelai decides to get serious about making her dream of opening an inn a reality.</description>
+    <season>2</season>
+    <episode>4</episode>
+    <inetref>76568</inetref>
+    <imdb>tt0588216</imdb>
+    <homepage>https://www.warnerbros.com/tv/gilmore-girls</homepage>
+    <language>en</language>
+    <userrating>9.000000</userrating>
+    <year>2000</year>
+    <runtime>43</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+      <category name="Romance"/>
+    </categories>
+    <countries>
+      <country name="USA"/>
+    </countries>
+    <studios>
+      <studio name="The WB"/>
+    </studios>
+    <people>
+      <person name="Lauren Graham" job="Actor" url="https://thetvdb.com/people/255106" character="Lorelai Gilmore"/>
+      <person name="Alexis Bledel" job="Actor" url="https://thetvdb.com/people/384680" character="Rory Gilmore"/>
+      <person name="Melissa McCarthy" job="Actor" url="https://thetvdb.com/people/296532" character="Sookie St. James"/>
+      <person name="Keiko Agena" job="Actor" url="https://thetvdb.com/people/267049" character="Lane Kim"/>
+...
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/series/76568/seasons/10755/posters/62089217.jpg" thumb="https://artworks.thetvdb.com/banners/series/76568/seasons/10755/posters/62089217_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/76568-2-4.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/76568-2-4_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/76568-2-3.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/76568-2-3_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/76568-2-5.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/76568-2-5_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-14.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-14_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-15.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-15_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-18.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-18_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/76568-23.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/76568-23_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/76568-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/76568-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/text/76568-3.jpg" thumb="https://artworks.thetvdb.com/banners/text/76568-3_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/44-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/44-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/76568-g3.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/76568-g3_t.jpg"/>
+...
+      <image type="screenshot" url="https://artworks.thetvdb.com/banners/episodes/76568/200295.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# Multiple episodes with the same name:
+# ttvdb4.py -l en -N "The Forsyte Saga" "Episode 1"
+>>> sys.argv = shlex.split('ttvdb4 -l en -N "The Forsyte Saga" "Episode 1"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>The Forsyte Saga (2002)</title>
+    <subtitle>Episode 1</subtitle>
+    <description>The Forsyte family gathers to celebrate the engagement of Winifred Forsythe to Montague Dartie. Soames Forsyte, a rich and successful partner in the family law firm, meets penniless but beautiful and accomplished Irene Heron. Young Jolyon, who is in love with his children’s French governess, Helene, decides to leave his wife, cutting himself off from the family and forfeiting his fortune.</description>
+    <season>1</season>
+    <episode>1</episode>
+    <inetref>81610</inetref>
+    <language>en</language>
+    <userrating>7.700000</userrating>
+    <year>2002</year>
+    <runtime>55</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Romance"/>
+    </categories>
+    <countries>
+      <country name="GBR"/>
+    </countries>
+    <studios>
+      <studio name="ITV"/>
+    </studios>
+    <people>
+      <person name="Damian Lewis" job="Actor" url="https://thetvdb.com/people/327374" character="Soames Forsyte"/>
+      <person name="Rupert Graves" job="Actor" url="https://thetvdb.com/people/258611" character="Jolyon Forsyte Jr."/>
+      <person name="Gina McKee" job="Actor" url="https://thetvdb.com/people/260544" character="Irene Forsyte"/>
+...
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/81610-1.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/81610-1_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/81610-1-3.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/81610-1-3_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/81610-1-4.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/81610-1-4_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/81610-1-2.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/81610-1-2_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/81610-1.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/81610-1_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/81610-3.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/81610-3_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/81610-2.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/81610-2_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/5d1d1c2975bad.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/5d1d1c2975bad_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/81610-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/81610-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/81610-g2.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/81610-g2_t.jpg"/>
+      <image type="screenshot" url="https://artworks.thetvdb.com/banners/episodes/81610/358149.jpg"/>
+    </images>
+  </item>
+  <item>
+    <title>The Forsyte Saga (2002)</title>
+    <subtitle>Episode 1</subtitle>
+    <description>The Forsyte family, including Soames and Annette’s daughter, Fleur, gathers in London when June arrives with her half-brother Jon (son of young Jolyon and Irene). Eleven years later, in 1920, Fleur and Jon meet again, unaware of their family connection.</description>
+    <season>2</season>
+    <episode>1</episode>
+    <inetref>81610</inetref>
+    <language>en</language>
+    <userrating>7.700000</userrating>
+    <year>2002</year>
+    <runtime>55</runtime>
+    <categories>
+      <category name="Drama"/>
+      <category name="Romance"/>
+    </categories>
+    <countries>
+      <country name="GBR"/>
+    </countries>
+    <studios>
+      <studio name="ITV"/>
+    </studios>
+    <people>
+      <person name="Damian Lewis" job="Actor" url="https://thetvdb.com/people/327374" character="Soames Forsyte"/>
+      <person name="Rupert Graves" job="Actor" url="https://thetvdb.com/people/258611" character="Jolyon Forsyte Jr."/>
+      <person name="Gina McKee" job="Actor" url="https://thetvdb.com/people/260544" character="Irene Forsyte"/>
+...
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/81610-2.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/81610-2_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/81610-2-2.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/81610-2-2_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/81610-2-3.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/81610-2-3_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/81610-2-4.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/81610-2-4_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/81610-1.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/81610-1_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/81610-3.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/81610-3_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/81610-2.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/81610-2_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/5d1d1c2975bad.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/5d1d1c2975bad_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/81610-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/81610-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/81610-g2.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/81610-g2_t.jpg"/>
+      <image type="screenshot" url="https://artworks.thetvdb.com/banners/episodes/81610/358157.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# This takes really long:
+# ttvdb4.py -l de -N "Die Munsters" "Der Liebestrank"
+>>> sys.argv = shlex.split('ttvdb4 -l de -N "Die Munsters" "Der Liebestrank"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Die Munsters</title>
+    <subtitle>Der Liebestrank</subtitle>
+    <description>Wieder einmal packt einen Liebhaber von Marilyn Munster das kalte Grausen, als er erstmals einem Familienmitglied der Munsters begegnet. Diesmal ist es Herman, der Marilyns Lover zu Tode erschreckt. Der Familienrat beschließt, daß Marilyn mit der irgendetwas nicht in Ordnung zu sein scheint schleunigst an den Mann gebracht werden muß. Um dem Plan gezielten Nachdruck zu verleihen, braut Opa Munster einen wirkungsvollen Liebestrank. Opas Flirt Cocktail hat Folgen, mit denen keiner gerechnet hat. Sein magischer Saft verleiht allen, die ihn zu sich nehmen, eine unwiderstehliche Anziehungskraft...</description>
+    <season>1</season>
+    <episode>2</episode>
+    <inetref>77280</inetref>
+    <language>en</language>
+    <userrating>8.300000</userrating>
+    <year>1964</year>
+    <runtime>25</runtime>
+    <categories>
+      <category name="Horror"/>
+      <category name="Fantasy"/>
+      <category name="Family"/>
+      <category name="Drama"/>
+      <category name="Comedy"/>
+    </categories>
+    <countries>
+      <country name="USA"/>
+    </countries>
+    <studios>
+      <studio name="CBS"/>
+    </studios>
+    <people>
+      <person name="Beverly Owen" job="Actor" url="https://thetvdb.com/people/7994017" character="Marilyn Munster"/>
+      <person name="Butch Patrick" job="Actor" url="https://thetvdb.com/people/270064" character="Eddie Munster"/>
+      <person name="Al Lewis" job="Actor" url="https://thetvdb.com/people/257438" character="Grandpa"/>
+      <person name="Yvonne De Carlo" job="Actor" url="https://thetvdb.com/people/353794" character="Lily Munster"/>
+      <person name="Pat Priest" job="Actor" url="https://thetvdb.com/people/265126" character="Marilyn Munster"/>
+      <person name="Fred Gwynne" job="Actor" url="https://thetvdb.com/people/297141" character="Herman Munster"/>
+      <person name="John Fiedler" job="Guest Star" url="https://thetvdb.com/people/256476"/>
+      <person name="Claire Carleton" job="Guest Star" url="https://thetvdb.com/people/259938"/>
+      <person name="Edward Mallory" job="Guest Star" url="https://thetvdb.com/people/264854"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/77280-1-3.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/77280-1-3_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/77280-1.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/77280-1_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/77280-1-2.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/77280-1-2_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/77280-1-4.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/77280-1-4_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/77280-4.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/77280-4_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/77280-5.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/77280-5_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/77280-7.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/77280-7_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/77280-1.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/77280-1_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/589-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/589-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/text/589.jpg" thumb="https://artworks.thetvdb.com/banners/text/589_t.jpg"/>
+      <image type="screenshot" url="https://artworks.thetvdb.com/banners/episodes/77280/236307.jpg"/>
+    </images>
+  </item>
+</metadata>
+
+
+# Series title with multiple dots, which gets removed during scanning for updates:
+# ttvdb4.py -l en -a us -N "Once Upon a Time Life" "The Blood"
+>>> sys.argv = shlex.split('ttvdb4 -l en -a us -N "Once Upon a Time Life" "The Blood"')
+>>> main()
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <item>
+    <title>Once Upon a Time... Life</title>
+    <subtitle>The Blood</subtitle>
+    <description>An exciting and interesting journey through the history of mankind, which begins with the creation of the world, the first living cell and evolution.</description>
+    <season>1</season>
+    <episode>5</episode>
+    <inetref>79158</inetref>
+    <language>fr</language>
+    <userrating>8.600000</userrating>
+    <year>1987</year>
+    <runtime>25</runtime>
+    <certifications>
+      <certification locale="us" name="TV-Y"/>
+    </certifications>
+    <categories>
+      <category name="Family"/>
+      <category name="Children"/>
+      <category name="Animation"/>
+    </categories>
+    <countries>
+      <country name="FRA"/>
+    </countries>
+    <studios>
+      <studio name="France 3"/>
+    </studios>
+    <people>
+      <person name="Roger Carel" job="Actor" url="https://thetvdb.com/people/318920"/>
+      <person name="Gilles Laurent" job="Actor" url="https://thetvdb.com/people/335829"/>
+      <person name="Gilles Tamiz" job="Actor" url="https://thetvdb.com/people/447047"/>
+    </people>
+    <images>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/79158-1-10.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/79158-1-10_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/79158-1.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/79158-1_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/79158-1-5.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/79158-1-5_t.jpg"/>
+      <image type="coverart" url="https://artworks.thetvdb.com/banners/seasons/79158-1-9.jpg" thumb="https://artworks.thetvdb.com/banners/seasons/79158-1-9_t.jpg"/>
+...
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/79158-1.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/79158-1_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/79158-2.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/79158-2_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/79158-3.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/79158-3_t.jpg"/>
+      <image type="fanart" url="https://artworks.thetvdb.com/banners/fanart/original/79158-4.jpg" thumb="https://artworks.thetvdb.com/banners/fanart/original/79158-4_t.jpg"/>
+...
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/79158-g10.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/79158-g10_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/e8537n-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/e8537n-g_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/e8537n-g2.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/e8537n-g2_t.jpg"/>
+      <image type="banner" url="https://artworks.thetvdb.com/banners/graphical/79158-g.jpg" thumb="https://artworks.thetvdb.com/banners/graphical/79158-g_t.jpg"/>
+...
+      <image type="screenshot" url="https://artworks.thetvdb.com/banners/episodes/79158/316495.jpg"/>
+    </images>
+  </item>
+</metadata>
