@@ -14,7 +14,7 @@
  * (i.e. qRegisterMetatype<>() has not been called).
 */
 MythHTTPMetaService::MythHTTPMetaService(const QString& Name, const QMetaObject& Meta,
-                                         HTTPRegisterTypes RegisterCallback,
+                                         const HTTPRegisterTypes& RegisterCallback,
                                          const QString& MethodsToHide)
   : m_meta(Meta),
     m_name(Name)
@@ -62,7 +62,7 @@ MythHTTPMetaService::MythHTTPMetaService(const QString& Name, const QMetaObject&
             if (hide.contains(name))
                 continue;
 
-            auto RemoveExisting = [](HTTPMethods& Methods, const HTTPMethodPtr Method, const QString& Search)
+            auto RemoveExisting = [](HTTPMethods& Methods, const HTTPMethodPtr& Method, const QString& Search)
             {
                 for (const auto & [_name, _method] : Methods)
                 {
