@@ -19,7 +19,7 @@
  *    MythHTTPService::AddHandlers( {{"/main.js", main_js }});
  * \endcode
 */
-HTTPResponse MythHTTPRewrite::RewriteFile(HTTPRequest2 Request, const QString &File)
+HTTPResponse MythHTTPRewrite::RewriteFile(const HTTPRequest2& Request, const QString &File)
 {
     auto result = static_cast<HTTPResponse>(nullptr);
     if (!Request)
@@ -47,7 +47,7 @@ HTTPResponse MythHTTPRewrite::RewriteFile(HTTPRequest2 Request, const QString &F
  *    MythHTTPService::AddErrorPageHandler( {{"=404", spa_index }});
  * \endcode
 */
-HTTPResponse MythHTTPRewrite::RewriteToSPA(HTTPRequest2 Request, const QString &File)
+HTTPResponse MythHTTPRewrite::RewriteToSPA(const HTTPRequest2& Request, const QString &File)
 {
     auto result = static_cast<HTTPResponse>(nullptr);
     if (!Request)

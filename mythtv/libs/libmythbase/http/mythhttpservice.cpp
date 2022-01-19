@@ -24,7 +24,7 @@ MythHTTPService::MythHTTPService(MythHTTPMetaService *MetaService)
  * \todo Error message always send an HTML version of the error message. This
  * should probably be context specific.
 */
-HTTPResponse MythHTTPService::HTTPRequest(HTTPRequest2 Request)
+HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
 {
     QString& method = Request->m_fileName;
     if (method.isEmpty())

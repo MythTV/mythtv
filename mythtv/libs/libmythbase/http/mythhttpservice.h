@@ -26,7 +26,7 @@ class MBASE_PUBLIC MythHTTPService : public QObject
     explicit MythHTTPService(MythHTTPMetaService* MetaService);
    ~MythHTTPService() override = default;
 
-    virtual HTTPResponse HTTPRequest(HTTPRequest2 Request);
+    virtual HTTPResponse HTTPRequest(const HTTPRequest2& Request);
     QString& Name();
 
   protected:

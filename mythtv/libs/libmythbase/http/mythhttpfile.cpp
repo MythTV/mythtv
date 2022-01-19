@@ -32,7 +32,7 @@ MythHTTPFile::MythHTTPFile(const QString& ShortName, const QString& FullName)
 {
 }
 
-HTTPResponse MythHTTPFile::ProcessFile(HTTPRequest2 Request)
+HTTPResponse MythHTTPFile::ProcessFile(const HTTPRequest2& Request)
 {
     // Build full path
     QString file = Request->m_root + Request->m_path + Request->m_fileName;
