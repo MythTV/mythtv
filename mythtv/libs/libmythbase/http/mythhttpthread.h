@@ -12,7 +12,7 @@ class MythHTTPThreadPool;
 class MythHTTPThread : public MThread
 {
   public:
-    MythHTTPThread(MythHTTPServer* Server, const MythHTTPConfig& Config,
+    MythHTTPThread(MythHTTPServer* Server, MythHTTPConfig Config,
                    const QString& ThreadName, qintptr Socket, bool Ssl);
     void Quit();
 
