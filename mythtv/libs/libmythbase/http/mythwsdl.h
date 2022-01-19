@@ -46,11 +46,12 @@ class MythWSDL : public QDomDocument
         QDomElement              m_oService;
 
     protected:
-        QDomElement CreateBindingOperation( QString path, HTTPMethodPtr handler,
+        QDomElement CreateBindingOperation( const QString& path,
+                                            const HTTPMethodPtr& handler,
                                             const QString &sClassName );
         QDomElement CreateMessage         ( const QString& sMsgName,
                                             const QString& sTypeName );
-        QDomElement CreateMethodType      ( HTTPMethodPtr handler,
+        QDomElement CreateMethodType      ( const HTTPMethodPtr& handler,
                                             QString       sTypeName,
                                             bool          bReturnType = false );
         static bool        IsCustomType          ( QString &sTypeName );
@@ -61,7 +62,7 @@ class MythWSDL : public QDomDocument
     public:
         explicit MythWSDL( MythHTTPMetaService *pMetaService )
             : m_pMetaService (pMetaService) {}
-        HTTPResponse GetWSDL( HTTPRequest2 Request );
+        HTTPResponse GetWSDL( const HTTPRequest2& Request );
 };
 
 #endif // WSDL_H
