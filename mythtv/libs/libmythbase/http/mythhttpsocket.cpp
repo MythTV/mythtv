@@ -25,9 +25,9 @@ using namespace std::chrono_literals;
 
 #define LOC QString(m_peer + ": ")
 
-MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, const MythHTTPConfig& Config)
+MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, MythHTTPConfig Config)
   : m_socketFD(Socket),
-    m_config(Config)
+    m_config(std::move(Config))
 {
     // Connect Finish signal to Stop
     connect(this, &MythHTTPSocket::Finish, this, &MythHTTPSocket::Stop);
