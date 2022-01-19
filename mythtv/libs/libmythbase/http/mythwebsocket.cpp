@@ -634,7 +634,7 @@ void MythWebSocket::PingReceived(DataPayload Payload)
 {
     if (m_closeReceived || m_closeSent)
         return;
-    SendFrame(WSOpPong, { Payload });
+    SendFrame(WSOpPong, { std::move(Payload) });
 }
 
 void MythWebSocket::PongReceived(const DataPayload& Payload)
