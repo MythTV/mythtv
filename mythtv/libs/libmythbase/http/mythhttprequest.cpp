@@ -25,8 +25,8 @@ MythHTTPRequest::MythHTTPRequest(const MythHTTPConfig& Config, QString Method,
                                  HTTPHeaders Headers, HTTPData Content, QTcpSocket* Socket /*=nullptr*/)
   : m_serverName(Config.m_serverName),
     m_method(std::move(Method)),
-    m_headers(Headers),
-    m_content(Content),
+    m_headers(std::move(Headers)),
+    m_content(std::move(Content)),
     m_root(Config.m_rootDir),
     m_timeout(Config.m_timeout)
 {
