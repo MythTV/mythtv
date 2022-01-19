@@ -217,7 +217,7 @@ HTTPResponse MythHTTPResponse::ErrorResponse(MythHTTPStatus Status, const QStrin
     return response;
 }
 
-HTTPResponse MythHTTPResponse::RedirectionResponse(HTTPRequest2 Request, const QString &Redirect)
+HTTPResponse MythHTTPResponse::RedirectionResponse(const HTTPRequest2& Request, const QString &Redirect)
 {
     Request->m_status = HTTPMovedPermanently;
     auto response = std::make_shared<MythHTTPResponse>(Request);
@@ -268,7 +268,7 @@ HTTPResponse MythHTTPResponse::FileResponse(const HTTPRequest2& Request, const H
     return response;
 }
 
-HTTPResponse MythHTTPResponse::EmptyResponse(HTTPRequest2 Request)
+HTTPResponse MythHTTPResponse::EmptyResponse(const HTTPRequest2& Request)
 {
     auto response = std::make_shared<MythHTTPResponse>(Request);
     response->AddDefaultHeaders();
