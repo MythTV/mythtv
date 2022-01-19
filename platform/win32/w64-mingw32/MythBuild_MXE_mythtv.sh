@@ -75,8 +75,8 @@ if test $? != 0 ; then
 fi
 
 cp -R $buildPath/mythtv/platform/win32/w64-mingw32/Installer/. $buildPath/install/
-cp -R $buildPath/mythtv/mythtv/src/COPYING $buildPath/install/COPYING
-cp -R $buildPath/themes/ $buildPath/install/share/mythtv/
+#cp -R $buildPath/mythtv/mythtv/src/COPYING $buildPath/install/COPYING
+rsync -a --exclude=".git" $buildPath/themes $buildPath/install/share/mythtv/
 
 cd $buildPath"/install/bin"
 
@@ -100,6 +100,6 @@ cd ..
 find . -name \*.a -exec cp {} \lib \;
 find . -name \*.lib -exec cp {} \lib \;
 
-zip -r MythTv_Windows.zip *
+zip -rq MythTv_Windows.zip *
 
 echo "Done"
