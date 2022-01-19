@@ -532,10 +532,10 @@ void MythHTTPSocket::Write(int64_t Written)
             written  = (*file)->m_written;
             itemsize = (*file)->m_partialSize > 0 ? (*file)->m_partialSize : static_cast<int64_t>((*file)->size());
             towrite  = std::min(itemsize - written, available);
-            int64_t offset = 0;
             HTTPMulti multipart { nullptr, nullptr };
             if (!(*file)->m_ranges.empty())
             {
+                int64_t offset = 0;
                 multipart = MythHTTPRanges::HandleRangeWrite(*file, available, towrite, offset);
                 if (offset != (*file)->pos())
                     (*file)->seek(offset);
