@@ -498,7 +498,7 @@ void MythWebSocket::CheckClose()
         m_socket->close();
 }
 
-void MythWebSocket::CloseReceived(DataPayload Payload)
+void MythWebSocket::CloseReceived(const DataPayload& Payload)
 {
     m_closeReceived = true;
 
@@ -637,7 +637,7 @@ void MythWebSocket::PingReceived(DataPayload Payload)
     SendFrame(WSOpPong, { Payload });
 }
 
-void MythWebSocket::PongReceived(DataPayload Payload)
+void MythWebSocket::PongReceived(const DataPayload& Payload)
 {
     // Validate against the last known ping payload and warn on error
     auto sizein = Payload.get() ? Payload->size() : 0;
