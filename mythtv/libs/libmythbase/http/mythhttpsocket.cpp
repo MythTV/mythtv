@@ -251,6 +251,7 @@ void MythHTTPSocket::Read()
     // Try (possibly file specific) handlers
     if (response == nullptr)
     {
+        // cppcheck-suppress unassignedVariable
         for (const auto& [path, function] : m_config.m_handlers)
         {
             if (path == request->m_url.toString())
@@ -284,6 +285,7 @@ void MythHTTPSocket::Read()
     // Then 'inactive' services
     if (response == nullptr)
     {
+        // cppcheck-suppress unassignedVariable
         for (const auto & [path, constructor] : m_config.m_services)
         {
             if (path == rpath)
@@ -301,6 +303,7 @@ void MythHTTPSocket::Read()
     // Try (dynamic) handlers
     if (response == nullptr)
     {
+        // cppcheck-suppress unassignedVariable
         for (const auto& [path, function] : m_config.m_handlers)
         {
             if (path == rpath)

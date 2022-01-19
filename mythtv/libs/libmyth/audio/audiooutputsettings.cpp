@@ -443,6 +443,7 @@ static const std::array<featureStruct,7> feature {{
 QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)
 {
     QStringList tmp;
+    // cppcheck-suppress unassignedVariable
     for (const auto & [flag, name] : feature)
     {
         if (arg & flag)

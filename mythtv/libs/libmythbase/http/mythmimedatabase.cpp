@@ -43,6 +43,7 @@ class MythMimeDatabasePriv
 
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
             QString("Custom entries: %1").arg(s_types.size()));
+        // cppcheck-suppress unassignedVariable
         for (const auto & [name, suffix, magic, weight, inherits] : s_types)
             m_mimes.push_back({name, suffix, magic, weight, inherits});
     }

@@ -48,6 +48,7 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
     // Find the method
     LOG(VB_HTTP, LOG_DEBUG, LOC + QString("Looking for method '%1'").arg(method));
     HTTPMethodPtr handler = nullptr;
+    // cppcheck-suppress unassignedVariable
     for (auto & [path, handle] : m_staticMetaService->m_slots)
         if (path == method) { handler = handle; break; }
 
