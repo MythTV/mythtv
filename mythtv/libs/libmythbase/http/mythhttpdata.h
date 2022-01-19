@@ -19,7 +19,7 @@ class MBASE_PUBLIC MythHTTPData : public QByteArray, public MythHTTPContent
     MythHTTPData();
     MythHTTPData(const QString& FileName, const char * Buffer);
     MythHTTPData(int Size, char Char);
-    MythHTTPData(const QByteArray& Other);
+    explicit MythHTTPData(const QByteArray& Other);
 
   private:
     Q_DISABLE_COPY(MythHTTPData)
