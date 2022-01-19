@@ -352,7 +352,7 @@ void MythHTTPSocket::Read()
  * Queue headers, queue content, signal whether to close the socket and push
  * first data to start the write.
 */
-void MythHTTPSocket::Respond(HTTPResponse Response)
+void MythHTTPSocket::Respond(const HTTPResponse& Response)
 {
     if (!Response || (m_socket->state() != QAbstractSocket::ConnectedState))
         return;
@@ -412,7 +412,7 @@ void MythHTTPSocket::Respond(HTTPResponse Response)
  *
  * This is used to send 503 Service Unavailable
 */
-void MythHTTPSocket::RespondDirect(qintptr Socket, HTTPResponse Response, const MythHTTPConfig &Config)
+void MythHTTPSocket::RespondDirect(qintptr Socket, const HTTPResponse& Response, const MythHTTPConfig &Config)
 {
     if (!(Socket && Response))
         return;
