@@ -369,11 +369,10 @@ QString XmlSerializer::FindOptionValue( const QStringList &sOptions, const QStri
 {
     QString sKey = sName + "=";
 
-    for (const QString& option : qAsConst(sOptions))
-    {
-        if (option.startsWith( sKey ))
-            return option.mid( sKey.length() );
-    }
+    auto hasKey = [&sKey](const QString& o) { return o.startsWith( sKey ); };
+    auto it = std::find_if(sOptions.cbegin(), sOptions.cend(), hasKey);
+    if (it != sOptions.cend())
+        return (*it).mid( sKey.length() );
 
     return QString();
 }

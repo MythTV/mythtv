@@ -560,10 +560,9 @@ void MythWebSocket::SendFrame(WSOpCode Code, const DataPayloads& Payloads)
         return;
 
     // Payload size (if needed)
-    int64_t length = 0;
-    for (const auto & payload : Payloads)
-        if (payload.get())
-            length += payload->size();
+    auto addNext = [](int64_t acc, const auto & payload)
+        { return payload.get() ? acc + payload->size() : acc; };
+    int64_t length = std::accumulate(Payloads.cbegin(), Payloads.cend(), 0, addNext);
 
     // Payload for control frames must not exceed 125bytes
     if ((Code & 0x8) && (length > 125))

@@ -84,9 +84,9 @@ MythNVDECInterop* MythNVDECInterop::CreateNVDEC(MythPlayerUI* Player, MythRender
     GetNVDECTypes(Context, types);
     if (auto nvdec = types.find(FMT_NVDEC); nvdec != types.end())
     {
-        for (auto type : nvdec->second)
-            if (type == GL_NVDEC)
-                return new MythNVDECInterop(Player, Context);
+        auto matchType = [](auto type){ return (type == GL_NVDEC); };
+        if (std::any_of(nvdec->second.cbegin(), nvdec->second.cend(), matchType))
+            return new MythNVDECInterop(Player, Context);
     }
     return nullptr;
 }

@@ -179,11 +179,9 @@ bool MythHTTPMetaService::isProtected(const QMetaObject& Meta, const QString& Me
 #else
         QStringList infos = QString(Meta.classInfo(index).value()).split(';', Qt::SkipEmptyParts);
 #endif
-        foreach (const QString &info, infos)
-        {
-            if (info.startsWith(QStringLiteral("AuthRequired=")))
-                return true;
-        }
+        auto isAuth = [](const QString& info)
+            { return info.startsWith(QStringLiteral("AuthRequired=")); };
+        return std::any_of(infos.cbegin(), infos.cend(), isAuth);
     }
     return false;
 }

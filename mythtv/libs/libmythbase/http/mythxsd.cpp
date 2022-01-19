@@ -969,11 +969,10 @@ QString MythXSD::ReadPropertyMetadata( QObject *pObject, const QString& sPropNam
 
         QString     sFullKey  = sKey + "=";
 
-        for (const QString& option : qAsConst(sOptions))
-        {
-            if (option.startsWith( sFullKey ))
-                return option.mid( sFullKey.length() );
-        }
+        auto hasKey = [&sFullKey](const QString& o) { return o.startsWith( sFullKey ); };
+        auto it = std::find_if(sOptions.cbegin(), sOptions.cend(), hasKey);
+        if (it != sOptions.cend())
+            return (*it).mid( sFullKey.length() );
     }
 
     return QString();
