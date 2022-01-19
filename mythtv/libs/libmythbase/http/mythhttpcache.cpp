@@ -48,7 +48,7 @@
  * size, type, and the client range and encoding requests. It should not however
  * be an issue (!)
  */
-void MythHTTPCache::PreConditionCheck(HTTPResponse Response)
+void MythHTTPCache::PreConditionCheck(const HTTPResponse& Response)
 {
     // Retrieve content
     auto * data = std::get_if<HTTPData>(&Response->m_response);
@@ -152,7 +152,7 @@ void MythHTTPCache::PreConditionCheck(HTTPResponse Response)
  *
  * Must be after a call to PreConditionCheck.
 */
-void MythHTTPCache::PreConditionHeaders(HTTPResponse Response)
+void MythHTTPCache::PreConditionHeaders(const HTTPResponse& Response)
 {
     // Retrieve content
     auto * data = std::get_if<HTTPData>(&Response->m_response);
