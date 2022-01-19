@@ -489,7 +489,7 @@ QDomElement MythWSDL::CreateMethodType( const HTTPMethodPtr& handler,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool MythWSDL::IsCustomType( QString &sTypeName )
+bool MythWSDL::IsCustomType( const QString &sTypeName )
 {
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     int id = QMetaType::type( sTypeName.toUtf8() );

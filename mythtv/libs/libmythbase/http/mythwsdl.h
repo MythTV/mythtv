@@ -54,7 +54,7 @@ class MythWSDL : public QDomDocument
         QDomElement CreateMethodType      ( const HTTPMethodPtr& handler,
                                             QString       sTypeName,
                                             bool          bReturnType = false );
-        static bool        IsCustomType          ( QString &sTypeName );
+        static bool        IsCustomType          ( const QString &sTypeName );
         static QString     ReadClassInfo         ( const QMetaObject *pMeta,
                                             const QString     &sKey );
         QString     AddTypeInfo           ( QString            sType );

@@ -69,7 +69,7 @@ class ActiveGame
     QString   getStartTimeAsString() const
         { return m_startTime.toString(Qt::ISODate); }
 
-    void      setInfo(SportInfo& info) { m_info = info; }
+    void      setInfo(const SportInfo& info) { m_info = info; }
     void      setTeams(QString team1, QString team2)
         { m_team1 = std::move(team1); m_team2 = std::move(team2); }
     void      setTeamsNorm(QString team1, QString team2)
