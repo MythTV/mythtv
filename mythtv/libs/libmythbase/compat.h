@@ -33,7 +33,12 @@
 #include <time.h>
 #endif
 
-#ifdef _WIN32
+#ifndef _WIN32
+#    include <sys/time.h>     // Mac OS X needs this before sys/resource
+#    include <sys/resource.h> // for setpriority
+#    include <sys/socket.h>
+#    include <sys/wait.h>     // For WIFEXITED on Mac OS X
+#else // _WIN32
 #    ifndef _MSC_VER
 #        define close wsock_close
 #    endif
@@ -64,16 +69,8 @@
 #    endif
 
 #    undef close
-#else
-#    include <sys/time.h>     // Mac OS X needs this before sys/resource
-#    include <sys/resource.h> // for setpriority
-#    include <sys/socket.h>
-#    include <sys/wait.h>     // For WIFEXITED on Mac OS X
-#endif
 
 
-
-#ifdef _WIN32
 #    define fsync(FD) 0
 //used in videodevice only - that code is not windows-compatible anyway
 #    define minor(X) 0
@@ -83,9 +80,9 @@
     #else
             typedef unsigned int uint;
    #endif
-#endif
 
-#if defined(__cplusplus) && defined(_WIN32)
+
+#   if defined(__cplusplus)
 
 #   define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #   define unsetenv(x) 0
@@ -117,9 +114,8 @@
 
         return -1;
     }
-#endif
+#   endif
 
-#ifdef _WIN32
 #define lstat stat
 #define nice(x) ((int)!::SetPriorityClass(\
                     ::GetCurrentProcess(), ((x) < -10) ? \
@@ -130,9 +126,8 @@
                         NORMAL_PRIORITY_CLASS)))))
 #define PRIO_PROCESS 0
 #define setpriority(x, y, z) ((x) == PRIO_PROCESS && y == 0 ? nice(z) : -1)
-#endif // _WIN32
 
-#ifdef _WIN32
+
     //signals: not tested
 #    define SIGHUP  1
 #    define SIGQUIT 3
@@ -185,11 +180,8 @@
 #    define geteuid() 0
 #    define setuid(x) 0
 #    define seteuid(x) 0
-#endif // _WIN32
 
 
-
-#ifdef _WIN32
 // TODO this stuff is not implemented yet
 #    define daemon(x, y) -1
 #    define getloadavg(x, y) -1
@@ -201,9 +193,7 @@
 #    define WEXITSTATUS(w) (((w) >> 8) & 0xff)
 #    define WTERMSIG(w)    ((w) & 0x7f)
 
-#endif // _WIN32
 
-#ifdef _WIN32
 #   ifdef LZO_COMPILE_TIME_ASSERT_HEADER
 #   undef LZO_COMPILE_TIME_ASSERT_HEADER
 #   endif
@@ -215,7 +205,8 @@
 #   endif
 
 #   define LZO_COMPILE_TIME_ASSERT( a )
-#endif
+
+#endif // _WIN32
 
 
 #ifdef _MSC_VER
