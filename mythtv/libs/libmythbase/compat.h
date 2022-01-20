@@ -9,6 +9,26 @@
 #    include <QtGlobal>       // for Q_OS_XXX
 #endif
 
+#include <sys/param.h>  // Defines BSD on FreeBSD, Mac OS X
+
+#include "mythconfig.h"
+
+// Libdvdnav now uses off64_t lseek64(), which BSD/Darwin doesn't have.
+// Luckily, its lseek() is already 64bit compatible
+#ifdef BSD
+    typedef off_t off64_t; //NOLINT(modernize-use-using) included from dvdnav C code
+#   define lseek64(f,o,w) lseek(f,o,w)
+#endif
+
+#ifdef Q_OS_ANDROID
+#   ifndef S_IREAD
+#       define S_IREAD S_IRUSR
+#   endif
+#   ifndef S_IWRITE
+#       define S_IWRITE S_IRUSR
+#   endif
+#endif
+
 #ifdef _WIN32
 #    ifndef _MSC_VER
 #        define close wsock_close
@@ -298,32 +318,12 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 
 #endif // _WIN32
 
-#include <sys/param.h>  // Defines BSD on FreeBSD, Mac OS X
-
-#include "mythconfig.h"
-
-// Libdvdnav now uses off64_t lseek64(), which BSD/Darwin doesn't have.
-// Luckily, its lseek() is already 64bit compatible
-#ifdef BSD
-    typedef off_t off64_t; //NOLINT(modernize-use-using) included from dvdnav C code
-#   define lseek64(f,o,w) lseek(f,o,w)
-#endif
-
 #if defined(_MSC_VER)
 #include <sys/stat.h>   // S_IREAD/WRITE on MinGW
 #  define S_IRUSR _S_IREAD
 #  ifndef lseek64
 #    define lseek64( f, o, w ) _lseeki64( f, o, w )
 #  endif
-#endif
-
-#ifdef Q_OS_ANDROID
-#   ifndef S_IREAD
-#       define S_IREAD S_IRUSR
-#   endif
-#   ifndef S_IWRITE
-#       define S_IWRITE S_IRUSR
-#   endif
 #endif
 
 #ifdef _WIN32
