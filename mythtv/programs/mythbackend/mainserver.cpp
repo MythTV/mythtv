@@ -2394,7 +2394,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         .arg(ds->m_chanid)
         .arg(ds->m_recstartts.toString(Qt::ISODate));
 
-    QString name = QString("deleteThread%1%2").arg(getpid()).arg(random());
+    QString name = QString("deleteThread%1%2").arg(getpid()).arg(MythRandom());
 #endif
     QFile checkFile(ds->m_filename);
 
