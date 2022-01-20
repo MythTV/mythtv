@@ -3,6 +3,7 @@
 
 #include <compat.h>
 #include <mythlogging.h>
+#include <mythrandom.h>
 
 // This was:
 // Bump Scope - Visualization Plugin for XMMS
@@ -409,7 +410,7 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
         if (m_ixo > ((int)m_width / 2) || m_ixo < -((int)m_width / 2))
         {
             m_ixo = (m_ixo > 0) ? (m_width / 2) : -(m_width / 2);
-            if (random() & 1)
+            if (rand_bool())
             {
                 m_ixd = (m_ixd > 0) ? -1 : 1;
                 m_iyd = 0;
@@ -425,7 +426,7 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
         if (m_iyo > ((int)m_height / 2) || m_iyo < -((int)m_height / 2))
         {
             m_iyo = (m_iyo > 0) ? (m_height / 2) : -(m_height / 2);
-            if (random() & 1)
+            if (rand_bool())
             {
                 m_ixd = (m_ixd > 0) ? -1 : 1;
                 m_iyd = 0;
@@ -445,14 +446,14 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
             rgb_to_hsv(m_color, &m_ih, &m_is, &m_iv);
             m_wasColor = 1;
 
-            if (random() & 1)
+            if (rand_bool())
             {
-                m_ihd = (random() & 1) * 2 - 1;
+                m_ihd = rand_bool() ? -1 : 1;
                 m_isd = 0;
             }
             else
             {
-                m_isd = 0.01 * ((random() & 1) * 2 - 1);
+                m_isd = rand_bool() ? -0.01 : 0.01;
                 m_ihd = 0;
             }
         }
@@ -468,16 +469,16 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
                 m_ih = 0;
             if (m_ih < 0)
                 m_ih = 359;
-            if ((random() % 150) == 0)
+            if (rand_bool(150))
             {
-                if (random() & 1)
+                if (rand_bool())
                 {
-                    m_ihd = (random() & 1) * 2 - 1;
+                    m_ihd = rand_bool() ? -1 : 1;
                     m_isd = 0;
                 }
                 else
                 {
-                    m_isd = 0.01 * ((random() & 1) * 2 - 1);
+                    m_isd = rand_bool() ? -0.01 : 0.01;
                     m_ihd = 0;
                 }
             }
@@ -494,19 +495,19 @@ bool BumpScope::draw(QPainter *p, const QColor &back)
                     m_isd = -0.01;
                 else if (m_is == 0)
                 {
-                    m_ihd = random() % 360;
+                    m_ihd = MythRandom(0, 360 - 1);
                     m_isd = 0.01;
                 }
                 else
                 {
-                    if (random() & 1)
+                    if (rand_bool())
                     {
-                        m_ihd = (random() & 1) * 2 - 1;
+                        m_ihd = rand_bool() ? -1 : 1;
                         m_isd = 0;
                     }
                     else
                     {
-                        m_isd = 0.01 * ((random() & 1) * 2 - 1);
+                        m_isd = rand_bool() ? -0.01 : 0.01;
                         m_ihd = 0;
                     }
                 }

@@ -25,6 +25,7 @@
 #include <lcddevice.h>
 #include <musicmetadata.h>
 #include <mythdate.h>
+#include <mythrandom.h>
 
 // MythMusic includes
 #include "musicdata.h"
@@ -1003,7 +1004,7 @@ void MusicCommon::cycleVisualizer(void)
 
             //Find a visual thats not like the previous visual
             do
-                next_visualizer = random() % m_visualModes.count();
+                next_visualizer = MythRandom(0, m_visualModes.count() - 1);
             while (next_visualizer == m_currentVisual);
             m_currentVisual = next_visualizer;
         }
