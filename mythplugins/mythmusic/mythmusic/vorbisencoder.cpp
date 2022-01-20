@@ -12,7 +12,7 @@
 
 // MythTV
 #include <mythcontext.h>
-#include <compat.h> // For random() on MINGW32
+#include <mythrandom.h>
 #include <musicmetadata.h>
 
 // MythMusic
@@ -59,7 +59,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     vorbis_analysis_init(&m_vd, &m_vi);
     vorbis_block_init(&m_vd, &m_vb);
 
-    ogg_stream_init(&m_os, random());
+    ogg_stream_init(&m_os, MythRandom());
 
     ogg_packet header_main;
     ogg_packet header_comments;

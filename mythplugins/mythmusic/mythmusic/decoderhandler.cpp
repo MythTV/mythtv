@@ -12,7 +12,7 @@
 #include <mythdownloadmanager.h>
 #include <mythdirs.h>
 #include <mythlogging.h>
-#include <compat.h> // For random() on MINGW32
+#include <mythrandom.h>
 #include <remotefile.h>
 #include <mythcorecontext.h>
 #include <musicmetadata.h>
@@ -142,7 +142,7 @@ bool DecoderHandler::next(void)
 
     if (m_meta.Format() == "cast")
     {
-        m_playlistPos = random() % m_playlist.size();
+        m_playlistPos = MythRandom(0, m_playlist.size() - 1);
     }
     else
     {
