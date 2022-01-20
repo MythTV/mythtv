@@ -3474,7 +3474,7 @@ void TVRec::HandleTuning(void)
 
     if (HasFlags(kFlagWaitingForRecPause))
     {
-        if (!m_recorder->IsPaused())
+        if (!m_recorder || !m_recorder->IsPaused())
             return;
 
         ClearFlags(kFlagWaitingForRecPause, __FILE__, __LINE__);
