@@ -137,9 +137,9 @@
 //used in videodevice only - that code is not windows-compatible anyway
 #    define minor(X) 0
 
-	#if defined(__cplusplus)
+    #if defined(__cplusplus)
             using uint = unsigned int;
-        #else
+    #else
             typedef unsigned int uint;
    #endif
 #endif
@@ -306,7 +306,7 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 // Luckily, its lseek() is already 64bit compatible
 #ifdef BSD
     typedef off_t off64_t; //NOLINT(modernize-use-using) included from dvdnav C code
-    #define lseek64(f,o,w) lseek(f,o,w)
+#   define lseek64(f,o,w) lseek(f,o,w)
 #endif
 
 #if defined(_MSC_VER)
@@ -318,12 +318,12 @@ static __inline struct tm *localtime_r(const time_t *timep, struct tm *result)
 #endif
 
 #ifdef Q_OS_ANDROID
-#ifndef S_IREAD
-#define S_IREAD S_IRUSR
-#endif
-#ifndef S_IWRITE
-#define S_IWRITE S_IRUSR
-#endif
+#   ifndef S_IREAD
+#       define S_IREAD S_IRUSR
+#   endif
+#   ifndef S_IWRITE
+#       define S_IWRITE S_IRUSR
+#   endif
 #endif
 
 #ifdef _WIN32
