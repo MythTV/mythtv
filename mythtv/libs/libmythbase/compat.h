@@ -6,10 +6,7 @@
 #define COMPAT_H
 
 #ifdef __cplusplus
-#    include <cstdio>         // for snprintf(), used by inline dlerror()
 #    include <QtGlobal>       // for Q_OS_XXX
-#else
-#    include <stdio.h>        // for snprintf(), used by inline dlerror()
 #endif
 
 #ifdef _WIN32
@@ -236,6 +233,7 @@
 #    define dlsym(x, y) GetProcAddress((HMODULE)(x), (y))
 
 #    ifdef __cplusplus
+#       include <cstdio>
         inline const char *dlerror(void)
         {
           #define DLERR_MAX 512
@@ -254,6 +252,7 @@
             return errStr;
         }
 #    else  // __cplusplus
+#        include <stdio.h>
 #        define dlerror()  "dlerror() is unimplemented."
 #   endif // __cplusplus
 
