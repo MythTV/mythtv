@@ -451,7 +451,7 @@ AVStream* MythAVFormatWriter::AddVideoStream(void)
         // the Baseline profile where the given bitrate and resolution permits
 
         if ((context->height > 720) || // Approximate highest resolution supported by Baseline 3.1
-            (context->bit_rate > 1000000)) // 14,000 Kbps aka 14Mbps maximum permissable rate for Baseline 3.1
+            (context->bit_rate > 1400000)) // 14,000 Kbps aka 14Mbps maximum permissable rate for Baseline 3.1
         {
             context->level = 40;
             // AVCodecContext AVOptions:
