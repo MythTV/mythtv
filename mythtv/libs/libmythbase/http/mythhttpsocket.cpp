@@ -88,6 +88,11 @@ MythHTTPSocket::MythHTTPSocket(qintptr Socket, bool SSL, MythHTTPConfig Config)
     auto service = MythHTTPService::Create<MythHTTPServices>();
     m_activeServices.emplace_back(service);
     auto * services = dynamic_cast<MythHTTPServices*>(service.get());
+    if (services == nullptr)
+    {
+        LOG(VB_HTTP, LOG_ERR, LOC + "Failed to get root services handler.");
+        return;
+    }
     connect(this, &MythHTTPSocket::UpdateServices, services, &MythHTTPServices::UpdateServices);
     services->UpdateServices(m_config.m_services);
 }
