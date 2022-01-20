@@ -75,7 +75,7 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
                     if (i > 4)
                         s->header_count = -2;
                 } else {
-                    int header_threshold = (avctx->codec_id != AV_CODEC_ID_NONE && avctx->codec_id != codec_id) || avctx->sample_rate == 0;
+                    int header_threshold = avctx->codec_id != AV_CODEC_ID_NONE && avctx->codec_id != codec_id;
                     if((state&SAME_HEADER_MASK) != (s->header&SAME_HEADER_MASK) && s->header)
                         s->header_count= -3;
                     s->header= state;
