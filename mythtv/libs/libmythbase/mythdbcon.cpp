@@ -27,6 +27,7 @@
 #include "mythdate.h"
 #include "portchecker.h"
 #include "mythmiscutil.h"
+#include "mythrandom.h"
 
 #define DEBUG_RECONNECT 0
 #if DEBUG_RECONNECT
@@ -620,7 +621,7 @@ bool MSqlQuery::exec()
     }
 
 #if DEBUG_RECONNECT
-    if (random() < RAND_MAX / 50)
+    if (rand_bool(50))
     {
         LOG(VB_GENERAL, LOG_INFO,
             "MSqlQuery disconnecting DB to test reconnection logic");

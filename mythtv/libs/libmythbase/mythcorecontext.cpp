@@ -155,9 +155,6 @@ MythCoreContextPrivate::MythCoreContextPrivate(MythCoreContext *lparent,
       m_power(nullptr)
 {
     MThread::ThreadSetup("CoreContext");
-#if QT_VERSION < QT_VERSION_CHECK(5,10,0)
-    srandom(MythDate::current().toSecsSinceEpoch() ^ QTime::currentTime().msec());
-#endif
 }
 
 static void delete_sock(
