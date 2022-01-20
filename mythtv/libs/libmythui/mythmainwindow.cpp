@@ -1108,7 +1108,9 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
 
     // Special case for custom QKeyEvent where the action is embedded directly
     // in the QKeyEvent text property. Used by MythFEXML http extension
-    if (Event->key() == 0 && !Event->text().isEmpty() && Event->modifiers() == Qt::NoModifier)
+    if (Event && Event->key() == 0 &&
+        !Event->text().isEmpty() &&
+        Event->modifiers() == Qt::NoModifier)
     {
         QString action = Event->text();
         // check if it is a jumppoint
