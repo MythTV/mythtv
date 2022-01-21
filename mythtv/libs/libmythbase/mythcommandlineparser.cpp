@@ -98,7 +98,7 @@ static int GetTermWidth(void)
 #endif
 }
 
-static QByteArray strip_quotes(QByteArray array)
+static QByteArray strip_quotes(const QByteArray& array)
 {
     return ((array.startsWith('"')  && array.endsWith('"') ) ||
             (array.startsWith('\'') && array.endsWith('\''))
