@@ -43,7 +43,9 @@ class PacketBuffer
   protected:
     uint m_bitrate;
 
-    /// Packets key to use for next empty packet
+    /** @brief Packets key to use for next empty packet.
+    The upper 32 bits are random and the lower 32 bits are incremented from 0.
+    */
     uint64_t m_next_empty_packet_key;
     
     /// Packets ready for reuse

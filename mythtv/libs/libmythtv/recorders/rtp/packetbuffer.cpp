@@ -12,7 +12,7 @@
 
 PacketBuffer::PacketBuffer(unsigned int bitrate) :
     m_bitrate(bitrate),
-    m_next_empty_packet_key(MythRandom64())
+    m_next_empty_packet_key(MythRandom() << 32)
 {
 }
 
@@ -48,7 +48,8 @@ UDPPacket PacketBuffer::GetEmptyPacket(void)
 
 void PacketBuffer::FreePacket(const UDPPacket &packet)
 {
-    uint64_t top = packet.GetKey() & (0xFFFFFFFFULL<<32);
-    if (top == (m_next_empty_packet_key & (0xFFFFFFFFULL<<32)))
+    static constexpr uint64_t k_mask_upper_32 = ~((UINT64_C(1) << (64 - 32)) - 1);
+    uint64_t top = packet.GetKey() & k_mask_upper_32;
+    if (top == (m_next_empty_packet_key & k_mask_upper_32))
         m_empty_packets[packet.GetKey()] = packet;
 }
