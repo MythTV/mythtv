@@ -151,7 +151,7 @@ static void av_mpegts_remove_stream(AVFormatContext *s, int id) {
     if (changes)
     {
         // flush queued packets after a stream change (might need to make smarter)
-        flush_packet_queue(s);
+        mythtv_flush_packet_queue(s);
 
         /* renumber the streams */
         av_log(NULL, AV_LOG_DEBUG, "av_mpegts_remove_stream: renumbering streams\n");
