@@ -21,8 +21,8 @@
 #include <thread>
 #include <csignal>
 #include "commandlineparser.h"
-#include "mythmiscutil.h"
 #include "MythExternRecApp.h"
+#include "mythchrono.h"
 
 #include <QElapsedTimer>
 #include <QFileInfo>
@@ -271,7 +271,7 @@ Q_SLOT void MythExternRecApp::Cleanup(void)
     if (m_cleanup.isEmpty())
         return;
 
-    QStringList args = MythSplitCommandString(m_cleanup);
+    QStringList args = MythCommandLineParser::MythSplitCommandString(m_cleanup);
     QString cmd = args.takeFirst();
 
     LOG(VB_RECORD, LOG_WARNING, LOC +
@@ -316,7 +316,7 @@ Q_SLOT void MythExternRecApp::DataStarted(void)
         cmd = cmd.left(pos);
     }
 
-    QStringList args = MythSplitCommandString(cmd);
+    QStringList args = MythCommandLineParser::MythSplitCommandString(cmd);
     cmd = args.takeFirst();
 
     TerminateProcess(m_finishTuneProc, "FinishTuning");
@@ -362,7 +362,7 @@ Q_SLOT void MythExternRecApp::LoadChannels(const QString & serial)
         QString cmd = m_scanCommand;
         cmd.replace("%CHANCONF%", m_channelsIni);
 
-        QStringList args = MythSplitCommandString(cmd);
+        QStringList args = MythCommandLineParser::MythSplitCommandString(cmd);
         cmd = args.takeFirst();
 
         QProcess scanner;
@@ -479,7 +479,7 @@ void MythExternRecApp::NewEpisodeStarting(const QString & channum)
     QString cmd = m_newEpisodeCommand;
     cmd.replace("%CHANNUM%", channum);
 
-    QStringList args = MythSplitCommandString(cmd);
+    QStringList args = MythCommandLineParser::MythSplitCommandString(cmd);
     cmd = args.takeFirst();
 
     LOG(VB_RECORD, LOG_WARNING, LOC +
@@ -601,7 +601,7 @@ Q_SLOT void MythExternRecApp::TuneChannel(const QString & serial,
 
     if (!m_tuneCommand.isEmpty())
     {
-        QStringList args = MythSplitCommandString(tunecmd);
+        QStringList args = MythCommandLineParser::MythSplitCommandString(tunecmd);
         QString cmd = args.takeFirst();
         m_tuningChannel = channum;
         m_tuneProc.start(cmd, args);
@@ -734,7 +734,7 @@ Q_SLOT void MythExternRecApp::StartStreaming(const QString & serial)
         return;
     }
 
-    QStringList args = MythSplitCommandString(m_command);
+    QStringList args = MythCommandLineParser::MythSplitCommandString(m_command);
     QString cmd = args.takeFirst();
     m_proc.start(cmd, args, QIODevice::ReadOnly|QIODevice::Unbuffered);
     m_proc.setTextModeEnabled(false);

@@ -40,4 +40,7 @@ private slots:
     static void test_overrides();
     void test_override_file();
     void cleanupTestCase();
+
+    static void test_parse_cmdline_data(void);
+    static void test_parse_cmdline(void);
 };
