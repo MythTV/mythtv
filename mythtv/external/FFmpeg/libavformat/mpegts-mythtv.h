@@ -81,7 +81,6 @@
 
 typedef struct MpegTSContext MpegTSContext;
 
-void mpegts_remove_stream(MpegTSContext *ts, int pid);
 MpegTSContext *avpriv_mpegts_parse_open(AVFormatContext *s);
 int avpriv_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                            const uint8_t *buf, int len);
