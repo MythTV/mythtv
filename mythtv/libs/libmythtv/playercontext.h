@@ -15,6 +15,7 @@
 #include <QHash>
 #include <QRect>
 #include <QObject>
+#include <QDateTime>
 
 // MythTV headers
 #include "videoouttypes.h"
@@ -119,6 +120,7 @@ class MTV_PUBLIC PlayerContext
     MythMediaBuffer    *m_buffer             {nullptr};
     ProgramInfo        *m_playingInfo        {nullptr}; ///< Currently playing info
     std::chrono::seconds m_playingLen        {0s};  ///< Initial CalculateLength()
+    QDateTime           m_playingRecStart;
     int                 m_lastCardid         {-1}; ///< CardID of current/last recorder
     /// 0 == normal, +1 == fast forward, -1 == rewind
     int                 m_ffRewState         {0};
