@@ -50,31 +50,22 @@
 #    define av_dlog(pctx, ...) do { if (0) av_log(pctx, AV_LOG_DEBUG, __VA_ARGS__); } while (0)
 #endif
 
-/* maximum size in which we look for synchronisation if
-   synchronisation is lost */
-#define MAX_RESYNC_SIZE 65536
-
-#define MAX_PES_PAYLOAD 200*1024
-
-#define MAX_MP4_DESCR_COUNT 16
-
 #define PMT_NOT_YET_FOUND 0
 #define PMT_NOT_IN_PAT    1
 #define PMT_FOUND         2
 
-typedef struct SectionContext SectionContext;
+typedef struct SectionContext {
+    int pid;
+    int stream_type;
+    int new_packet;
+    MpegTSContext *ts;
+    AVFormatContext *stream;
+    AVStream *st;
+} SectionContext;
 
 static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type);
 static void mpegts_cleanup_streams(MpegTSContext *ts);
 static int find_in_list(const int *pids, int pid);
-
-enum MpegTSFilterType {
-    MPEGTS_PES,
-    MPEGTS_SECTION,
-};
-
-typedef struct MpegTSFilter MpegTSFilter;
-
 
 static int is_pat_same(MpegTSContext *mpegts_ctx,
                        int *pmt_pnums, int *pmts_pids, unsigned int pmt_count);
@@ -160,6 +151,28 @@ static void av_mpegts_remove_stream(AVFormatContext *s, int id) {
     }
 }
 
+/** maximum number of PMT's we expect to be described in a PAT */
+#define PAT_MAX_PMT 128
+
+/** maximum number of streams we expect to be described in a PMT */
+#define PMT_PIDS_MAX 256
+
+
+/* maximum size in which we look for synchronisation if
+   synchronisation is lost */
+#define MAX_RESYNC_SIZE 65536
+
+#define MAX_PES_PAYLOAD 200*1024
+
+#define MAX_MP4_DESCR_COUNT 16
+
+enum MpegTSFilterType {
+    MPEGTS_PES,
+    MPEGTS_SECTION,
+};
+
+typedef struct MpegTSFilter MpegTSFilter;
+
 typedef int PESCallback(MpegTSFilter *f, const uint8_t *buf, int len, int is_start, int64_t pos);
 
 typedef struct MpegTSPESFilter {
@@ -197,12 +210,6 @@ struct MpegTSFilter {
         MpegTSSectionFilter section_filter;
     } u;
 };
-
-/** maximum number of PMT's we expect to be described in a PAT */
-#define PAT_MAX_PMT 128
-
-/** maximum number of streams we expect to be described in a PMT */
-#define PMT_PIDS_MAX 256
 
 #define MAX_PIDS_PER_PROGRAM 64
 struct Program {
@@ -319,15 +326,6 @@ typedef struct PESContext {
 } PESContext;
 
 extern AVInputFormat ff_mythtv_mpegts_demuxer;
-
-struct SectionContext {
-    int pid;
-    int stream_type;
-    int new_packet;
-    MpegTSContext *ts;
-    AVFormatContext *stream;
-    AVStream *st;
-};
 
 static void clear_program(MpegTSContext *ts, unsigned int programid)
 {
