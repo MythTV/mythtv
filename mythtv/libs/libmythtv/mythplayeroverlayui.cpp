@@ -205,7 +205,6 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
         Info.values.insert(relPrefix + "totalseconds", static_cast<int>(playbackLen.count()));
         Info.values[relPrefix + "position"] = pos;
 
-        QDateTime recordedtime = m_playerCtx->m_playingRecStart.addSecs(static_cast<qint64>(secsplayed.count()));
         QString text1;
         QString text2;
         QString text3;
@@ -237,7 +236,13 @@ void MythPlayerOverlayUI::UpdateSliderInfo(osdInfo &Info, bool PaddedFields)
         Info.text[relPrefix + "behindtime"] = islive ? text3 : QString();
         QString dtformat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d yyyy")
             + ", " + gCoreContext->GetSetting("TimeFormat", "hh:mm");
-        Info.text[relPrefix + "recordedtime"] = recordedtime.toLocalTime().toString(dtformat);
+
+        if (m_playerCtx->GetState() == kState_WatchingPreRecorded )
+        {
+            QDateTime recordedtime =
+                m_playerCtx->m_playingRecStart.addSecs(static_cast<qint64>(secsplayed.count()));
+            Info.text[relPrefix + "recordedtime"] = recordedtime.toLocalTime().toString(dtformat);
+        }
     }
 }
 
