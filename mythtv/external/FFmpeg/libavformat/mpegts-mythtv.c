@@ -1475,6 +1475,7 @@ static int mp4_read_iods(AVFormatContext *s, const uint8_t *buf, unsigned size,
     return 0;
 }
 
+#if 0 // used only in not compiled code
 static int mp4_read_od(AVFormatContext *s, const uint8_t *buf, unsigned size,
                        Mp4Descr *descr, int *descr_count, int max_descr_count)
 {
@@ -1551,6 +1552,7 @@ static void m4sl_cb(MpegTSFilter *filter, const uint8_t *section, int section_le
     for (i = 0; i < mp4_descr_count; i++)
         av_free(mp4_descr[i].dec_config_descr);
 }
+#endif // 0
 
 int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream_type,
                               const uint8_t **pp, const uint8_t *desc_list_end,
@@ -3066,6 +3068,7 @@ static int mpegts_read_close(AVFormatContext *s)
     return 0;
 }
 
+#ifdef USE_SYNCPOINT_SEARCH
 static int64_t mpegts_get_pcr(AVFormatContext *s, int stream_index,
                               int64_t *ppos, int64_t pos_limit)
 {
@@ -3095,6 +3098,7 @@ static int64_t mpegts_get_pcr(AVFormatContext *s, int stream_index,
 
     return AV_NOPTS_VALUE;
 }
+#endif
 
 static int64_t mpegts_get_dts(AVFormatContext *s, int stream_index,
                               int64_t *ppos, int64_t pos_limit)
