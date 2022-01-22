@@ -2803,12 +2803,8 @@ static int mpegts_read_header(AVFormatContext *s)
     AVIOContext *pb = s->pb;
     uint8_t buf[8*1024] = {0};
     int len, sid, i;
-    int64_t pos, probesize =
-#if FF_API_PROBESIZE_32
-                             s->probesize ? s->probesize : s->probesize2;
-#else
-                             s->probesize;
-#endif
+    int64_t pos;
+    int64_t probesize = s->probesize;
 
     memset(ts->pids, 0, NB_PID_MAX * sizeof(MpegTSFilter *));
 
