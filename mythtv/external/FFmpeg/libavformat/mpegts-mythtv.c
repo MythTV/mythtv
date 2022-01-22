@@ -98,13 +98,14 @@ static void av_mpegts_remove_stream(AVFormatContext *s, int id) {
     int changes = 0;
 
     for (i=0; i<s->nb_streams; i++) {
+        AVCodecContext *codec_ctx;
         if (s->streams[i]->id != id)
             continue;
 
         av_log(NULL, AV_LOG_DEBUG, "av_mpegts_remove_stream 0x%x\n", id);
 
         /* close codec context */
-        AVCodecContext *codec_ctx = s->streams[i]->codec;
+        codec_ctx = s->streams[i]->codec;
         if (codec_ctx->codec) {
             avcodec_close(codec_ctx);
             av_free(codec_ctx);
@@ -143,8 +144,7 @@ static void av_mpegts_remove_stream(AVFormatContext *s, int id) {
             (0 == strncmp(s->iformat->name, "mpegts", 6))) {
             av_log(NULL, AV_LOG_DEBUG,
                    "av_mpegts_remove_stream: mpegts_remove_stream\n");
-            MpegTSContext *context = (MpegTSContext*) s->priv_data;
-            mpegts_remove_stream(context, id);
+            mpegts_remove_stream((MpegTSContext*) s->priv_data, id);
         }
         changes = 1;
     }
@@ -1808,6 +1808,8 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     int mp4_descr_count = 0;
     int i;
 
+    int equal_streams = 0;
+
     pmt_entry_t items[PMT_PIDS_MAX];
     memset(&items, 0, sizeof(pmt_entry_t) * PMT_PIDS_MAX);
 
@@ -1945,11 +1947,13 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     /* if the pmt has changed delete old streams,
      * create new ones, and notify any listener.
      */
-    int equal_streams = pmt_equal_streams(ts, items, last_item);
+    equal_streams = pmt_equal_streams(ts, items, last_item);
     if (equal_streams != last_item || ts->pid_cnt != last_item)
     {
         AVFormatContext *avctx = ts->stream;
         int idx;
+        void* tmp0;
+        void* tmp1;
         /* flush out old AVPackets */
         ff_read_frame_flush(avctx);
 
@@ -1962,8 +1966,8 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             mpegts_add_stream(ts, h->id, &items[idx], prog_reg_desc, pcr_pid);
 
         /* cache pmt */
-        void *tmp0 = avctx->cur_pmt_sect;
-        void *tmp1 = av_malloc(section_len);
+        tmp0 = avctx->cur_pmt_sect;
+        tmp1 = av_malloc(section_len);
         memcpy(tmp1, section, section_len);
         avctx->cur_pmt_sect = (uint8_t*) tmp1;
         avctx->cur_pmt_sect_len = section_len;
@@ -2012,6 +2016,7 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
 
     for (idx = 0; idx < limit; idx++)
     {
+        MpegTSFilter *tss;
         /* check for pid */
         int loc = find_in_list(mpegts_ctx->pmt_pids, items[idx].pid);
         if (loc < 0)
@@ -2025,7 +2030,7 @@ static int pmt_equal_streams(MpegTSContext *mpegts_ctx,
         }
 
         /* check stream type */
-        MpegTSFilter *tss = mpegts_ctx->pids[items[idx].pid];
+        tss = mpegts_ctx->pids[items[idx].pid];
         if (!tss)
         {
 #ifdef DEBUG
@@ -2259,13 +2264,14 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
 
 void mpegts_remove_stream(MpegTSContext *ts, int pid)
 {
+    int indx = -1;
     av_log(NULL, AV_LOG_DEBUG, "mpegts_remove_stream 0x%x\n", pid);
     if (ts->pids[pid])
     {
         av_log(NULL, AV_LOG_DEBUG, "closing filter for pid 0x%x\n", pid);
         mpegts_close_filter(ts, ts->pids[pid]);
     }
-    int indx = find_in_list(ts->pmt_pids, pid);
+    indx = find_in_list(ts->pmt_pids, pid);
     if (indx >= 0)
     {
         memmove(ts->pmt_pids+indx, ts->pmt_pids+indx+1, PMT_PIDS_MAX-indx-1);
@@ -2291,6 +2297,7 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     int pmt_pids[PAT_MAX_PMT];
     unsigned int pmt_count = 0;
     int i;
+    int found = 0;
 
     av_dlog(ts->stream, "PAT:\n");
     hex_dump_debug(ts->stream, (uint8_t *)section, section_len);
@@ -2345,7 +2352,7 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         }
     }
 
-    int found = 0;
+    found = 0;
     for (i = 0; i < pmt_count; ++i)
     {
         /* if an MPEG program number is requested, and this is that program,
