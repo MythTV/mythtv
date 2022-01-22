@@ -1968,7 +1968,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             mpegts_add_stream(ts, h->id, &items[idx], prog_reg_desc, pcr_pid);
 
         /* cache pmt */
-        tmp0 = avctx->cur_pmt_sect;
+        tmp0 = (void*)avctx->cur_pmt_sect;
         tmp1 = av_malloc(section_len);
         memcpy(tmp1, section, section_len);
         avctx->cur_pmt_sect = (uint8_t*) tmp1;
