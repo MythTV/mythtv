@@ -1558,7 +1558,8 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, pmt_entry_t *item, int stream
                               MpegTSContext *ts, dvb_caption_info_t *dvbci)
 {
     const uint8_t *desc_end;
-    int desc_len, desc_tag, desc_es_id;
+    int desc_len, desc_tag;
+    //int desc_es_id;
     char *language;
     int i;
 
@@ -1796,17 +1797,16 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
     int last_item = 0;
     int desc_count = 0;
-    int streams_changed = 0;
-    PESContext *pes;
+    //int streams_changed = 0;
+    //PESContext *pes;
     const uint8_t *p, *p_end, *desc_list_end;
     int program_info_length, pcr_pid, pid, stream_type;
     int desc_list_len;
-    char *language;
+    //char *language;
     uint32_t prog_reg_desc = 0; /* registration descriptor */
 
     Mp4Descr mp4_descr[MAX_MP4_DESCR_COUNT] = {{ 0 }};
     int mp4_descr_count = 0;
-    int i;
 
     int equal_streams = 0;
 
@@ -2289,8 +2289,8 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     MpegTSContext *ts = filter->u.section_filter.opaque;
     SectionHeader h1, *h = &h1;
     const uint8_t *p, *p_end;
-    int sid, pmt_pid;
-    AVProgram *program;
+    //int sid, pmt_pid;
+    //AVProgram *program;
     char buf[256];
 
     int pmt_pnums[PAT_MAX_PMT];
