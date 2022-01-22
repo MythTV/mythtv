@@ -2445,7 +2445,7 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
             MpegEncContext *s  = &s1->mpeg_enc_ctx;
             int cccnt = p[5] & 0x1f;
             int cclen = 3 * cccnt + 2;
-            int proc  = (p[5] >> 6) & 1;
+            //int proc  = (p[5] >> 6) & 1;
             int blen  = s->tmp_atsc_cc_len;
 
             p += 5;
