@@ -2184,7 +2184,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             ts->pid_cnt++;
 
             av_log(NULL, AV_LOG_DEBUG, "mpegts_add_stream: "
-                   "stream #%d, has id 0x%x and codec %s, type %s at 0x%x\n",
+                   "stream #%d, has id 0x%x and codec %s, type %s at 0x%p\n",
                    st->index, st->id, avcodec_get_name(st->codecpar->codec_id),
                    av_get_media_type_string(st->codecpar->codec_type), st);
         } else {
@@ -2247,7 +2247,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             st->disposition   = item->dvbci.disposition;
 
             av_log(NULL, AV_LOG_DEBUG, "mpegts_add_stream: "
-                   "stream #%d, has id 0x%x and codec %s, type %s at 0x%x\n",
+                   "stream #%d, has id 0x%x and codec %s, type %s at 0x%p\n",
                    st->index, st->id, avcodec_get_name(st->codecpar->codec_id),
                    av_get_media_type_string(st->codecpar->codec_type), st);
         }
