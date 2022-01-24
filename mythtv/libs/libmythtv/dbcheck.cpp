@@ -3600,6 +3600,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         query.prepare("SELECT profileid, value, data FROM displayprofiles "
                       "ORDER BY profileid");
 
+        // coverity[unreachable] False positive.
         for (;;)
         {
             if (!query.exec())
