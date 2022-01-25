@@ -601,12 +601,15 @@ void OSD::SetExpiry(const QString &Window, enum OSDTimeout Timeout,
 void OSD::SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout,
                         std::chrono::milliseconds CustomTimeout)
 {
-    if (Timeout == kOSDTimeout_Ignore && CustomTimeout == 0ms)
+    std::chrono::milliseconds time { 0ms };
+    if (CustomTimeout != 0ms)
+        time = CustomTimeout;
+    else if ((Timeout > kOSDTimeout_Ignore) && (Timeout <= kOSDTimeout_Long))
+        time = m_timeouts[static_cast<size_t>(Timeout)];
+    else
         return;
 
     MythScreenType *win = GetWindow(Window);
-    std::chrono::milliseconds time = (CustomTimeout != 0ms)
-        ? CustomTimeout : m_timeouts[static_cast<size_t>(Timeout)];
     if ((time > 0ms) && win)
     {
         QDateTime expires = MythDate::current().addMSecs(time.count());
