@@ -51,7 +51,10 @@ static std::size_t replace_all(std::string& inout, std::string_view what, std::s
 static void convertToSqlite (DBUpdates& updates)
 {
     for (std::string& s : updates)
+    {
       replace_all(s, R"(\\)", R"(\)");
+      replace_all(s, "ENGINE=MyISAM DEFAULT CHARSET=utf8", "");
+    }
 }
 
 static bool enableSqliteRegex (void)

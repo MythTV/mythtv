@@ -5266,7 +5266,7 @@ DBUpdates getRecordingExtenderDbInfo (int version)
               key1 VARCHAR(256) NOT NULL,
               key2 VARCHAR(256) NOT NULL,
               UNIQUE(provider,key1,key2)
-              );)",
+              ) ENGINE=MyISAM DEFAULT CHARSET=utf8;)",
             R"(INSERT INTO sportsapi
             VALUES
               (   1,1,"Major League Baseball","baseball","mlb"),
@@ -5575,9 +5575,8 @@ DBUpdates getRecordingExtenderDbInfo (int version)
             R"(CREATE TABLE sportslisting (
               id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
               api INT UNSIGNED NOT NULL,
-              title VARCHAR(128) NOT NULL,
-              FOREIGN KEY(api) REFERENCES sportsapi(id)
-            );)",
+              title VARCHAR(128) NOT NULL
+            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;)",
 
             R"(INSERT INTO sportslisting (api,title)
             VALUES
@@ -5695,7 +5694,7 @@ DBUpdates getRecordingExtenderDbInfo (int version)
               pattern VARCHAR(256) NOT NULL,
               nth TINYINT UNSIGNED NOT NULL,
               replacement VARCHAR(128) NOT NULL
-            );)",
+            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;)",
 
             // Sigh. It would be nice if these patterns could use the
             // '\b' boundary matching sequence in the first part of
