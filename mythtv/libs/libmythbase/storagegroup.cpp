@@ -671,35 +671,26 @@ QString StorageGroup::FindNextDirMostFree(void)
     if (m_allowFallback)
         nextDir = kDefaultStorageDir;
 
-    if (!m_dirlist.empty())
-        nextDir = m_dirlist[0];
-
-    QDir checkDir("");
-    int curDir = 0;
-    while (curDir < m_dirlist.size())
+    for (const auto & dir : m_dirlist)
     {
-        checkDir.setPath(m_dirlist[curDir]);
-        if (!checkDir.exists())
+        if (!QDir(dir).exists())
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("FindNextDirMostFree: '%1' does not exist!")
-                    .arg(m_dirlist[curDir]));
-            curDir++;
+                QString("FindNextDirMostFree: '%1' does not exist!").arg(dir));
             continue;
         }
 
-        fsInfo = FileSystemInfo(QString(), m_dirlist[curDir]);
+        fsInfo = FileSystemInfo(QString(), dir);
         thisDirFree = fsInfo.getFreeSpace();
         LOG(VB_FILE, LOG_DEBUG, LOC +
             QString("FindNextDirMostFree: '%1' has %2 KiB free")
-                .arg(m_dirlist[curDir], QString::number(thisDirFree)));
+                .arg(dir, QString::number(thisDirFree)));
 
         if (thisDirFree > nextDirFree)
         {
-            nextDir     = m_dirlist[curDir];
+            nextDir     = dir;
             nextDirFree = thisDirFree;
         }
-        curDir++;
     }
 
     if (nextDir.isEmpty())
