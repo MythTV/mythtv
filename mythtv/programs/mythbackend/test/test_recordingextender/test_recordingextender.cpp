@@ -41,9 +41,9 @@ static std::size_t replace_all(std::string& inout, std::string_view what, std::s
 {
     std::size_t count{};
     for (std::string::size_type pos{};
-         std::string::npos != (pos = inout.find(what.data(), pos, what.length()));
+         std::string::npos != (pos = inout.find(what, pos));
          pos += with.length(), ++count) {
-        inout.replace(pos, what.length(), with.data(), with.length());
+        inout.replace(pos, what.length(), with);
     }
     return count;
 }
