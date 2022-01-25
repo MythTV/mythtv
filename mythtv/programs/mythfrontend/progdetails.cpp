@@ -865,6 +865,8 @@ void ProgDetails::loadPage(void)
 
     QString recordingHost;
     QString recordingInput;
+    QString recordedID;
+    QString recordedPathname;
     QString recordedFilename;
     QString recordedFileSize;
     QString recordingGroup;
@@ -877,6 +879,8 @@ void ProgDetails::loadPage(void)
 
     if (recorded)
     {
+        recordedID = QString::number(m_progInfo.GetRecordingID());
+        recordedPathname = m_progInfo.GetPathname();
         recordedFilename = m_progInfo.GetBasename();
         recordedFileSize = QString("%1 ")
             .arg(m_progInfo.GetFilesize()/((double)(1<<30)),0,'f',2);
@@ -902,6 +906,8 @@ void ProgDetails::loadPage(void)
     }
     addItem(tr("Recording Host"), recordingHost, ProgInfoList::kLevel2);
     addItem(tr("Recording Input"), recordingInput, ProgInfoList::kLevel2);
+    addItem(tr("Recorded ID"), recordedID, ProgInfoList::kLevel2);
+    addItem(tr("Recorded Pathname"), recordedPathname, ProgInfoList::kLevel2);
     addItem(tr("Recorded File Name"), recordedFilename, ProgInfoList::kLevel1);
     addItem(tr("Recorded File Size"), recordedFileSize, ProgInfoList::kLevel1);
     addItem(tr("Recording Profile"), recordingProfile, ProgInfoList::kLevel2);
