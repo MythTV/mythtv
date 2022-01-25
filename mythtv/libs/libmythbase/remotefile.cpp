@@ -376,7 +376,8 @@ void RemoteFile::Close(bool haslock)
 {
     if (isLocal())
     {
-        ::close(m_localFile);
+        if (m_localFile >= 0)
+            ::close(m_localFile);
         m_localFile = -1;
         delete m_fileWriter;
         m_fileWriter = nullptr;
