@@ -74,7 +74,7 @@ bool MythHTTPParser::Read(QTcpSocket* Socket, bool& Ready)
         m_linesRead++;
 
         // A large header suggests an error
-        if (line.size() > 1000)
+        if (line.size() > 2048)
         {
             LOG(VB_GENERAL, LOG_WARNING, LOC + "Unusually long header - quitting");
             return false;
