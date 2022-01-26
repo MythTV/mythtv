@@ -2,6 +2,7 @@
 #define DISKINFO_H_
 
 #include <cstdint>
+#include <utility>
 
 #include <QList>
 #include <QString>
