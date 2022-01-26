@@ -63,8 +63,8 @@ class MBASE_PUBLIC FileSystemInfo
     int64_t     getUsedSpace(void)    const { return m_used; }
     int         getWeight(void)       const { return m_weight; }
 
-    // reserved space could potentially result in this being negative
-    int64_t     getFreeSpace(void)    const { return m_total-m_used; }
+    // not cached because of use in mythbackend/autoexpire
+    int64_t     getFreeSpace(void)    const { return m_total - m_used; }
 
     // information puts
     void setHostname(QString hostname)      { m_hostname = std::move(hostname); }
