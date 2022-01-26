@@ -1,5 +1,8 @@
+#include "filesysteminfo.h"
+
 #include <unistd.h>
 #include <cstdlib>
+
 #include "compat.h"
 
 #include <QtGlobal>
@@ -11,6 +14,7 @@
 
 #ifdef Q_OS_DARWIN
 #include <mach/mach.h>
+#include <cstring>
 #endif
 
 #ifdef BSD
@@ -18,12 +22,12 @@
 #include <sys/mount.h>  // for struct statfs
 #endif
 
+#include <utility>
+
 #include <QList>
 #include <QString>
 #include <QStringList>
-#include <utility>
 
-#include "filesysteminfo.h"
 #include "mythcorecontext.h"
 #include "mythlogging.h"
 
