@@ -22,7 +22,7 @@
 #include <sys/mount.h>  // for struct statfs
 #endif
 
-#include <utility>
+#include <algorithm>
 
 #include <QList>
 #include <QString>
@@ -97,34 +97,30 @@ bool FileSystemInfo::FromStringList(QStringList::const_iterator &it,
     return true;
 }
 
+// TODO don't use QList
+// default: sock = nullptr
 QList<FileSystemInfo> FileSystemInfo::RemoteGetInfo(MythSocket *sock)
 {
-    FileSystemInfo fsInfo;
     QList<FileSystemInfo> fsInfos;
-    QStringList strlist(QString("QUERY_FREE_SPACE_LIST"));
+    QStringList strlist(QStringLiteral("QUERY_FREE_SPACE_LIST"));
 
-    bool sent = false;
-
-    if (sock)
-        sent = sock->SendReceiveStringList(strlist);
-    else
-        sent = gCoreContext->SendReceiveStringList(strlist);
-
-    if (sent)
+    if ((sock != nullptr)
+        ? sock->SendReceiveStringList(strlist)
+        : gCoreContext->SendReceiveStringList(strlist)
+       )
     {
-        int numdisks = strlist.size() / k_lines;
-
         QStringList::const_iterator it = strlist.cbegin();
-        for (int i = 0; i < numdisks; i++)
+        while (it < strlist.cend())
         {
-            fsInfo.FromStringList(it, strlist.cend());
-            fsInfos.append(fsInfo);
+            //FromStringList(it, strlist.cend());
+            fsInfos.append(FileSystemInfo(it, strlist.cend()));
         }
     }
 
     return fsInfos;
 }
 
+// O(n^2)
 void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
                                  bool merge, int64_t fuzz)
 {
@@ -145,15 +141,11 @@ void FileSystemInfo::Consolidate(QList<FileSystemInfo> &disks,
             if (it2->getFSysID() != -1) // disk has already been matched
                 continue;
 
-            int bSize = std::max(32, std::max(it1->getBlockSize(), it2->getBlockSize())
-                                        / 1024);
-            int64_t diffSize = it1->getTotalSpace() - it2->getTotalSpace();
-            int64_t diffUsed = it1->getUsedSpace() - it2->getUsedSpace();
-
-            if (diffSize < 0)
-                diffSize = 0 - diffSize;
-            if (diffUsed < 0)
-                diffUsed = 0 - diffUsed;
+            // almost certainly guaranteed to be 32 KiB
+            int bSize = std::max( {32 << 10, it1->getBlockSize(), it2->getBlockSize()} );
+            bSize >>= 10;
+            int64_t diffSize = std::abs(it1->getTotalSpace() - it2->getTotalSpace());
+            int64_t diffUsed = std::abs(it1->getUsedSpace()  - it2->getUsedSpace());
 
             if ((diffSize <= bSize) && (diffUsed <= fuzz))
             {
