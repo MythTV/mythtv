@@ -9,7 +9,6 @@
 
 #include "mythbaseexp.h"
 #include "mythsocket.h"
-#include "mythcorecontext.h"
 
 class MBASE_PUBLIC FileSystemInfo
 {
