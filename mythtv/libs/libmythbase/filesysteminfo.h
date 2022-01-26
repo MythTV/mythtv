@@ -53,18 +53,18 @@ class MBASE_PUBLIC FileSystemInfo
     void clear() { *this = FileSystemInfo(); }
 
     // information gets
-    QString     getHostname(void)     const { return m_hostname; }
-    QString     getPath(void)         const { return m_path; }
-    bool        isLocal(void)         const { return m_local; }
-    int         getFSysID(void)       const { return m_fsid; }
-    int         getGroupID(void)      const { return m_grpid; }
-    int         getBlockSize(void)    const { return m_blksize; }
-    int64_t     getTotalSpace(void)   const { return m_total; }
-    int64_t     getUsedSpace(void)    const { return m_used; }
-    int         getWeight(void)       const { return m_weight; }
+    QString     getHostname()     const { return m_hostname; }
+    QString     getPath()         const { return m_path; }
+    bool        isLocal()         const { return m_local; }
+    int         getFSysID()       const { return m_fsid; }
+    int         getGroupID()      const { return m_grpid; }
+    int         getBlockSize()    const { return m_blksize; }
+    int64_t     getTotalSpace()   const { return m_total; }
+    int64_t     getUsedSpace()    const { return m_used; }
+    int         getWeight()       const { return m_weight; }
 
     // not cached because of use in mythbackend/autoexpire
-    int64_t     getFreeSpace(void)    const { return m_total - m_used; }
+    int64_t     getFreeSpace()    const { return m_total - m_used; }
 
     // information puts
     void setHostname(QString hostname)      { m_hostname = std::move(hostname); }
