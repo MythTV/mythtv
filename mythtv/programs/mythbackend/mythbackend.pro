@@ -71,6 +71,10 @@ HEADERS += servicesv2/v2castMember.h servicesv2/v2castMemberList.h
 HEADERS += servicesv2/v2videoLookupInfo.h servicesv2/v2videoLookupInfoList.h
 HEADERS += servicesv2/v2videoStreamInfo.h servicesv2/v2videoStreamInfoList.h
 HEADERS += servicesv2/v2blurayInfo.h
+HEADERS += servicesv2/v2country.h servicesv2/v2countryList.h
+HEADERS += servicesv2/v2language.h servicesv2/v2languageList.h
+HEADERS += servicesv2/v2databaseStatus.h
+
 
 HEADERS += servicesv2/v2dvr.h servicesv2/v2recording.h
 HEADERS += servicesv2/v2programAndChannel.h servicesv2/v2programList.h
@@ -95,6 +99,7 @@ HEADERS += servicesv2/v2capture.h
 HEADERS += servicesv2/v2captureCard.h servicesv2/v2captureCardList.h
 HEADERS += servicesv2/v2music.h
 HEADERS += servicesv2/v2musicMetadataInfo.h servicesv2/v2musicMetadataInfoList.h
+HEADERS += servicesv2/v2config.h
 
 SOURCES += servicesv2/v2myth.cpp
 SOURCES += servicesv2/v2video.cpp
@@ -106,6 +111,7 @@ SOURCES += servicesv2/v2status.cpp
 SOURCES += servicesv2/v2capture.cpp
 SOURCES += servicesv2/v2music.cpp
 SOURCES += servicesv2/v2serviceUtil.cpp
+SOURCES += servicesv2/v2config.cpp
 
 using_oss:DEFINES += USING_OSS
 

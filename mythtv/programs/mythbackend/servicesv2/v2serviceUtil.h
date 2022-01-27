@@ -26,7 +26,7 @@
 
 const QStringList KnownServices = { "Capture", "Channel", "Content", \
                                     "Dvr",     "Guide",   "Music",   \
-                                    "Myth",    "Video" };
+                                    "Myth",    "Video",   "Config" };
 void V2FillVideoMetadataInfo (
                       V2VideoMetadataInfo *pVideoMetadataInfo,
                       const VideoMetadataListManager::VideoMetadataPtr& pMetadata,
