@@ -1,0 +1,9 @@
+<div class="programBox" [style.width.%]=durationToWidth()>
+    <div class="programTitle">{{ program.Title }}</div>
+    <div class="programBody">
+        <div *ngIf="program.SubTitle.length != 0">
+            <div class="programSubtitle">{{ program.SubTitle }}</div>
+        </div>
+        <div class="programDescription">{{ program.Description }}</div>
+    </div>
+</div>

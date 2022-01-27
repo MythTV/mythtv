@@ -1,0 +1,7 @@
+.channelRow {
+    display: block;
+    grid-template-columns: 90px auto;
+    width: 100%;
+    height: 82px;
+    padding-bottom: 2px;
+}

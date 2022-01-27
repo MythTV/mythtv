@@ -1,0 +1,36 @@
+.timebarbox {
+    display: block;
+    grid-template-columns: 90px auto;
+    grid-template-rows: 28px;
+    width: 100%;
+}
+
+.datebox {
+    float: left;
+    padding: 5px 8px 4px 7px;
+    color: #fdf6e3;
+    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
+    border-radius: 10px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.segmentsbox {
+    display: block;
+    float: left;
+    position: relative;
+    height: 100%;
+    width: calc(100% - 91px);
+}
+
+.segmentbox {
+    float: left;
+    width: 25%;
+    padding: 5px 8px 4px 7px;
+    color: #fdf6e3;
+    height: auto;
+    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
+    border-radius: 10px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}

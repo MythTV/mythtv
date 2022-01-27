@@ -1,3 +1,5 @@
+import { ScheduleOrProgram } from "./program.interface";
+
 export interface Channel {
     ATSCMajorChan:      number;
     ATSCMinorChan:      number;
@@ -17,7 +19,7 @@ export interface Channel {
     InputId:            number;
     Inputs:             string; // null in sample data
     MplexId:            number;
-    Programs:           string[]; // empty array in sample data
+    Programs:           ScheduleOrProgram[];
     ServiceId:          number;
     ServiceType:        number;
     SourceId:           number;

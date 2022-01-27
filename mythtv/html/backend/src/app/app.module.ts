@@ -22,6 +22,8 @@ import { PanelModule } from 'primeng/panel';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ListboxModule } from 'primeng/listbox';
 import { DialogModule } from 'primeng/dialog';
+import { DataViewModule } from 'primeng/dataview';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './layout/navbar/navbar.component';
@@ -42,7 +44,10 @@ import { BackendnetworkComponent } from './config/setupwizard/backendnetwork/bac
 import { SgsetupComponent } from './config/setupwizard/sgsetup/sgsetup.component';
 import { RestartComponent } from './config/setupwizard/restart/restart.component';
 import { TestbedComponent } from './testbed/testbed.component';
-
+import { GuideComponent } from './guide/guide.component';
+import { ChannelIconComponent } from './guide/components/channelicon/channelicon.component';
+import { ProgramEntryComponent } from './guide/components/programentry/programentry.component';
+import { TimebarComponent } from './guide/components/timebar/timebar.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +55,6 @@ import { TestbedComponent } from './testbed/testbed.component';
     NavbarComponent,
     SidenavComponent,
     SetupWizardComponent,
-
     DashboardComponent,
     StatusComponent,
     EncodersComponent,
@@ -65,6 +69,10 @@ import { TestbedComponent } from './testbed/testbed.component';
     SgsetupComponent,
     RestartComponent,
     TestbedComponent,
+    GuideComponent,
+    ChannelIconComponent,
+    ProgramEntryComponent,
+    TimebarComponent,
   ],
   imports: [
     BrowserModule,
@@ -88,7 +96,10 @@ import { TestbedComponent } from './testbed/testbed.component';
     PanelModule,
     SkeletonModule,
     ListboxModule,
-    DialogModule
+    DialogModule,
+    CardModule,
+    DataViewModule,
+    ProgressSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

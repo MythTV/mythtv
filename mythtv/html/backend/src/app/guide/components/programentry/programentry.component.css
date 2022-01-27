@@ -1,0 +1,52 @@
+.programBox {
+    float: left;
+    height: 80px;
+    padding: 0px 0px 0px 2px;
+    background-color: #586e75;
+    border-radius: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.programTitle {
+    padding: 5px 8px 4px 7px;
+    color: #fdf6e3;
+    width: 100%;
+    height: 28px;
+    background: linear-gradient(to bottom, #777777 1%, #555555 20%, #222222 99%);
+    border-radius: inherit;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    z-index: 4;
+    position: relative;
+    float: left;
+    font-size: 1.1em;
+    white-space: nowrap;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.programBody {
+    margin: 3px 5px 4px 5px;
+    padding: 0px 0px 0px 2px;
+    color: #eee8d5;
+    height: 45px;
+    z-index: 5;
+    /*font-size: 0.8em;*/
+}
+
+.programSubtitle {
+    color:#268bd2;
+    position: relative;
+    font-weight: bold;
+    margin-right: 5px;
+    z-index: 1px;
+    line-height: 15px;
+}
+
+.programDescription {
+    position: relative;
+    z-index: 1;
+    line-height: 15px;
+}
