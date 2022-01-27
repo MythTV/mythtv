@@ -1,14 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SettingsComponent } from './config/settings/settings.component';
-import { HomeComponent } from './home/home.component';
+import { SetupWizardComponent } from './config/setupwizard/setupwizard.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { StatusComponent } from './status/status.component';
+import { TestbedComponent } from './testbed/testbed.component';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: '', component: DashboardComponent },
   { path: 'status', component: StatusComponent },
-  { path: 'settings', component: SettingsComponent },
-
+  { path: 'settings', component: SetupWizardComponent },
+  { path: 'testbed', component: TestbedComponent },
 ];
 
 @NgModule({

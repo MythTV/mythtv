@@ -1,4 +1,25 @@
-.toolbar {
+.toolbar{
     background-color: #000000;
     color:steelblue;
+}
+
+ul.debug1{
+    border-style: solid;
+    border-color: blue;
+}
+
+div.debug1{
+    border-style: solid;
+    border-color: red;
+    background-color: #000000;
+}
+
+div.debug2{
+    border-style: solid;
+    border-color: yellow;
+}
+
+div.debug3{
+    border-style: solid;
+    border-color: green;
 }

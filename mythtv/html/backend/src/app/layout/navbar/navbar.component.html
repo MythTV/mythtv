@@ -1,5 +1,109 @@
-<!-- DOCS: https://material.angular.io/ -->
-<mat-toolbar class="toolbar">
-  <img src="/images/mythtv.png" width="180" height="64">
-  <span class="h1">MythTV Backend</span>
-</mat-toolbar>
+<div class="block-content">
+    <div style="overflow: hidden;" class="ng-star-inserted">
+        <div class="min-h-screen flex relative lg:static surface-ground">
+            <div id="app-sidebar-4"
+                class="bg-gray-900  hidden lg:block flex-shrink-0 absolute lg:static left-0 top-0 z-1 border-gray-800 w-18rem lg:w-5rem select-none">
+                <div class="flex flex-column h-full">
+                    <div class="toolbar flex align-items-left flex-shrink-0" style="height: 80px;"><img class="p-2"
+                            src="images/mythtv.png" alt="Image" height="80">
+
+                    </div>
+                    <div class="mt-3 select-none">
+                        <ul class="list-none p-3 lg:py-3 lg:px-2 m-0">
+                            <li [routerLink]="''" pTooltip="Dashboard">
+                                <a pripple=""
+                                    class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors"><i
+                                        class="pi pi-home mr-2 lg:mr-0 text-base lg:text-xl"></i><span
+                                        class="font-medium inline lg:hidden">Dashboard</span><span class="p-ink"></span>
+                                </a>
+                            </li>
+                            <li [routerLink]="'status'" pTooltip="Backend Status">
+                                <a pripple=""
+                                    class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors"><i
+                                        class="pi pi-info-circle mr-2 lg:mr-0 text-base lg:text-xl"></i><span
+                                        class="font-medium inline lg:hidden">Status</span><span
+                                        class="p-ink"></span></a>
+                            </li>
+                            <li [routerLink]="'settings'" pTooltip="Backend Setup">
+                                <a pripple=""
+                                    class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
+                                    <i class="pi pi-cog mr-2 lg:mr-0 text-base lg:text-xl"></i>
+                                    <span class="font-medium inline lg:hidden">Settings
+                                    </span>
+                                    <span class="p-ink"></span>
+                                </a>
+                            </li>
+                            <li [routerLink]="'testbed'" pTooltip="Testbed">
+                                <a pripple=""
+                                    class="p-ripple p-element flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-gray-300 hover:text-white transition-duration-150 transition-colors">
+                                    <i class="pi pi-pencil mr-2 lg:mr-0 text-base lg:text-xl"></i>
+                                    <span class="font-medium inline lg:hidden">Testbed
+                                    </span>
+                                    <span class="p-ink"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-auto">
+                        <hr class="mb-3 mx-2 border-top-1 border-none border-gray-800">
+                        <a pripple="" pTooltip="Switch Server"
+                            class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                            <i class="pi pi-server mr-2 lg:mr-0 text-base lg:text-xl"></i>
+                            <span class="font-medium inline lg:hidden">Switch Server</span>
+                            <span class="p-ink"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="min-h-screen flex flex-column relative flex-auto">
+                <div class="toolbar flex justify-content-between align-items-center pm-8 surface-section relative lg:static border-bottom-1 surface-border"
+                    style="height: 80px;">
+                    <div style="padding: 7rem;">
+                        <h1>MythTV Backend</h1>
+                    </div>
+
+                    <div class="pr-3">
+                        <a pripple=""
+                            class="p-ripple p-element cursor-pointer block lg:hidden text-300 hover:bg-gray-800">
+                            <i class="pi pi-ellipsis-v text-2xl"></i>
+                            <span class="p-ink"></span>
+                        </a>
+                        <ul
+                            class="toolbar list-none p-0 m-0 hidden lg:flex lg:align-items-center select-none lg:flex-row surface-section border-1 lg:border-none surface-border right-0 top-100 z-1 shadow-2 lg:shadow-none absolute lg:static">
+                            <li>
+                                <a pripple="" tooltipPosition="bottom" pTooltip="Switch Server"
+                                    class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                                    <i class="pi pi-server mr-2 lg:mr-0 text-base lg:text-xl"></i>
+                                    <span class="font-medium inline lg:hidden">Switch Server</span>
+                                    <span class="p-ink"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a pripple="" tooltipPosition="bottom" pTooltip="Change Language"
+                                    class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                                    <i class="pi pi-flag mr-2 lg:mr-0 text-base lg:text-xl"></i>
+                                    <span class="font-medium inline lg:hidden">Language</span>
+                                    <span class="p-ink"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a pripple="" tooltipPosition="bottom" pTooltip="Log In"
+                                    class="p-ripple p-element my-3 mx-2 flex align-items-center cursor-pointer p-3 lg:justify-content-center hover:bg-gray-800 border-round text-300 hover:text-0 transition-duration-150 transition-colors">
+                                    <i class="pi pi-sign-in mr-2 lg:mr-0 text-base lg:text-xl"></i>
+                                    <span class="font-medium inline lg:hidden">Login</span>
+                                    <span class="p-ink"></span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-gray-100 p-1 flex flex-column flex-auto">
+                    <div class="bg-gray-100 border-none surface-border border-round surface-section flex-auto">
+                        <router-outlet></router-outlet>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -3,23 +3,26 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import { MythService } from '../services/myth.service';
+import { ConfigService } from '../services/config.service';
 import { MythHostName, MythTimeZone, MythConnectionInfo, GetSettingResponse } from '../services/interfaces/myth.interface';
+import { MythDatabaseStatus } from '../services/interfaces/config.interface';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
 })
-export class HomeComponent implements OnInit {
+export class DashboardComponent implements OnInit {
   m_hostname$!: Observable<MythHostName>;
   m_timezone$!: Observable<MythTimeZone>;
   m_connectionInfo$!: Observable<MythConnectionInfo>;
   m_setting$!: Observable<GetSettingResponse>;
+  m_databaseStatus$!: Observable<MythDatabaseStatus>
 
   public errorRes!: HttpErrorResponse;
 
-  constructor(private mythService: MythService) { }
+  constructor(private mythService: MythService, private configService: ConfigService) { }
 
   ngOnInit(): void {
     this.m_hostname$ = this.mythService.GetHostName().pipe(
@@ -40,6 +43,10 @@ export class HomeComponent implements OnInit {
 
     this.m_setting$ = this.mythService.GetSetting({HostName: "localhost", Key: "TestSetting"}).pipe(
       tap(data => console.log(data)),
+    )
+
+    this.m_databaseStatus$ = this.configService.GetDatabaseStatus().pipe(
+      tap(data => console.log("Database Status: " + data)),
     )
   }
 }

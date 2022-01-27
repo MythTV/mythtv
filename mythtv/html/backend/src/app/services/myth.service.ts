@@ -1,14 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
+import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse} from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { MythHostName, MythTimeZone, MythConnectionInfo, Database, GetSettingRequest, GetSettingResponse, PutSettingRequest, PutSettingResponse } from './interfaces/myth.interface';
-
-const httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type':  'application/json'
-  })
-};
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +21,7 @@ export class MythService {
 
   public GetConnectionInfo() : Observable<MythConnectionInfo> {
     return this.httpClient.get<MythConnectionInfo>('/Myth/GetConnectionInfo');
-  }
+   }
 
   public GetSetting(setting : GetSettingRequest) : Observable<GetSettingResponse> {
     let params = new HttpParams()
@@ -38,7 +32,12 @@ export class MythService {
   }
 
   public PutSetting(setting: PutSettingRequest) : Observable<PutSettingResponse> {
+    console.log(setting);
     return this.httpClient.post<PutSettingResponse>('/Myth/PutSetting', setting)
   }
 
+  public SetConnectionInfo(data: Database) : Observable<PutSettingResponse> {
+    console.log("SetConnectionInfo :-" + data.Name);  
+    return this.httpClient.post<PutSettingResponse>('/Myth/SetConnectionInfo', data)
+  }
 }
